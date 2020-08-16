@@ -101,7 +101,9 @@ class MusicBlocks {
             "PenBlocksAPI",
             "RhythmBlocksAPI",
             "PitchBlocksAPI",
-            "VolumeBlocksAPI"
+            "OrnamentBlocksAPI",
+            "VolumeBlocksAPI",
+            "DrumBlocksAPI",
         ];
         for (let className of APIClassNames)
             importMembers(this, className);

@@ -225,6 +225,7 @@ function Activity() {
             "activity/js-export/RhythmBlocksAPI",
             "activity/js-export/PitchBlocksAPI",
             "activity/js-export/VolumeBlocksAPI",
+            "activity/js-export/DrumBlocksAPI",
             "widgets/widgetWindows",
             "widgets/jseditor",
             "widgets/modewidget",
