@@ -513,8 +513,14 @@ function setupPitchActions() {
             tur.singer.transposition += tur.singer.invertList.length > 0 ? -value : value;
 
             let listenerName = "_accidental_" + turtle + "_" + blk;
-            if (blk !== undefined && blk in logo.blocks.blockList)
+            if (blk !== undefined && blk in logo.blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
+
 
             let __listener = event => {
                 tur.singer.transposition += tur.singer.invertList.length > 0 ? value : -value;
@@ -539,8 +545,13 @@ function setupPitchActions() {
             tur.singer.scalarTranspositionValues.push(transValue);
 
             let listenerName = "_scalar_transposition_" + turtle;
-            if (blk !== undefined && blk in logo.blocks.blockList)
+            if (blk !== undefined && blk in logo.blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => {
                 transValue = tur.singer.scalarTranspositionValues.pop();
@@ -567,8 +578,13 @@ function setupPitchActions() {
             tur.singer.transpositionValues.push(transValue);
 
             let listenerName = "_transposition_" + turtle;
-            if (blk !== undefined && blk in logo.blocks.blockList)
+            if (blk !== undefined && blk in logo.blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => {
                 transValue = tur.singer.transpositionValues.pop();
@@ -621,8 +637,13 @@ function setupPitchActions() {
             }
 
             let listenerName = "_invert_" + turtle;
-            if (blk !== undefined && blk in logo.blocks.blockList)
+            if (blk !== undefined && blk in logo.blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => tur.singer.invertList.pop();
             logo.setTurtleListener(turtle, listenerName, __listener);
