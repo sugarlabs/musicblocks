@@ -7800,7 +7800,8 @@ function Block(protoblock, blocks, overrideName) {
                         case "mode":
                         case "timbre":
                             lockInit = true;
-                            this.blocks.reInitWidget(topBlock, 5000);
+                            if (this.blocks.blockList[topBlock].protoblock.staticLabels[0] == widgetTitle[i].innerHTML)
+                                this.blocks.reInitWidget(topBlock, 1500);
                             break;
                     }
                 }
