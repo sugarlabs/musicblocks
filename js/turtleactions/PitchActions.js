@@ -315,8 +315,8 @@ function setupPitchActions() {
                 note = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
             }
 
-            let semitones =
-                ref +
+            let semitones = ref;
+            semitones +=
                 NOTESFLAT.indexOf(note) !== -1 ?
                     NOTESFLAT.indexOf(note) - ref : NOTESSHARP.indexOf(note) - ref;
             /** calculates changes in reference octave which occur a semitone before the reference key */
