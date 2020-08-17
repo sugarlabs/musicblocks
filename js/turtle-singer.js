@@ -1215,7 +1215,7 @@ class Singer {
             }
         } else {
             // We start the music clock as the first note is being played
-            if (logo.firstNoteTime == null) {
+            if (logo.firstNoteTime === null) {
                 logo.firstNoteTime = new Date().getTime();
             }
 

@@ -65,6 +65,7 @@ class Mouse {
      * @returns {void}
      */
     run() {
+        this.turtle.doWait(0);
         this.flow(this.MB);
     }
 }
@@ -196,6 +197,7 @@ class MusicBlocks {
         }
 
         logo.prepSynths();
+        logo.firstNoteTime = null;
 
         for (let mouse of Mouse.MouseList)
             mouse.run();
@@ -229,7 +231,10 @@ class MusicBlocks {
                     cname[command](...args);
                 }
             }
-            setTimeout(resolve, 200);
+
+            let delay = this.turtle.waitTime;
+            this.turtle.doWait(0);
+            setTimeout(resolve, delay);
         });
     }
 
@@ -252,12 +257,15 @@ class MusicBlocks {
             if (signal !== null && signal !== undefined) {
                 logo.stage.dispatchEvent(signal);
             }
-            setTimeout(resolve, 200);
+
+            let delay = this.turtle.waitTime;
+            this.turtle.doWait(0);
+            setTimeout(resolve, delay);
         });
     }
 
     /**
-     * Returns a Promise for ending a mouse flow..
+     * Returns a Promise for ending a mouse flow.
      * @returns {Promise}
      */
     get ENDMOUSE() {
