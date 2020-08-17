@@ -1381,20 +1381,24 @@ The *Set mouse* block sends a stack of blocks to be run by the specified mouse.
 
 ## <a name="CONVERTERS"></a>3.8 Converters
 
-Converts are used to transform one form of inputs into other, more usable form of outputs. This section of the guide will talk about the various conversion options Music Blocks has to offer.
+Converters are used to transform one form of inputs into other, more usable form of outputs. This section of the guide will talk about the various conversion options Music Blocks has to offer.
 
-Generalised shape of a connector is:
+Generalized shape of a converter is:
 
 // insert image
 
-where right argument is converted accordingly and output is received on the left side.
+where the right argument is converted accordingly, and output is received on the left side.
+
+**Note:** Before an introduction of the different types of converters, a little intoduction on Y staff in Music Blocks. Staff is a set of horizontal lines and spaces and different positions along Y axis represents different notes. [C, D, E, F, G, A, B]
+
+// insert staff image
 
 ### <a name="y-to-pitch"></a>4.1 Y to Pitch
 
 This converter takes input in the form of a number that represents Staff Y position in pixels, and processes the value such that it can be used with certain pitch blocks (pitch number, nth modal pitch, pitch) to produce notes corresponding to given Staff Y position as an argument. 
 Additionally, the block can be plugged into a print block to view the converted note value.
 
-### <a name="y-to-pitch"></a>4.2 Pitch converter
+### <a name="pitch-converter"></a>4.2 Pitch converter
 
 Pitch converter offers a range of options through a pie-menu based interface and it can potentially convert or extract info out of the current playing pitch using the current pitch block as an input. 
 It can also take custom input in form or solfege, hertz, pitch number etc.
@@ -1418,7 +1422,7 @@ Returns a number between 1-7 corresponding to the scale degree of the note being
 Intuitively, returns the scale degree of the note being played with reference to the chosen mode. It can also be thought of as Scalar class with accidentals.
 
 #### 6. N^th Degree:
-Zero based index of the degree of note being played in the chosen mode.
+Zero-based index of the degree of note being played in the chosen mode.
 
 #### 7. Pitch in Hertz: 
 Returns the value in hertz of the pitch of the note being currently played.
@@ -1428,6 +1432,14 @@ Value of the pitch of the note currently being played. It is different from Pitc
 
 #### 9. Staff Y:
 Returns the Y staff position of the note being played according to staff dimensions. It takes into account only the letter class, no accidental info is processed.
+
+### <a name="number-2-octave"></a>4.3  Number to Octave
+
+This converter takes a numeric value which denotes pitch number and returns the octave corresponding to that pitch number.
+
+### <a name="number-2-pitch"></a>4.3  Number to Pitch
+
+This converter takes a numeric value which denotes pitch number and returns the pitch name corresponding to that pitch number. No octave is inferred.
 
 
 ## <a name="WIDGETS"></a>Widgets
