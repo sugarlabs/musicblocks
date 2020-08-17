@@ -176,30 +176,30 @@ const SAMPLE_2 =
     await mouse.playNote(1/4, async () => {
         await mouse.playPitch("sol", 4);
         await mouse.playPitch("do", 4);
-        return this.ENDFLOW;
+        return mouse.ENDFLOW;
     });
     await mouse.playNote(1/1, async () => {
         await mouse.playPitch("re", 4);
-        return this.ENDFLOW;
+        return mouse.ENDFLOW;
     });
     await mouse.playNote(1/4, async () => {
         await mouse.playPitch("mi", 4);
-        return this.ENDFLOW;
+        return mouse.ENDFLOW;
     });
     await mouse.playNote(1/4, async () => {
         await mouse.playPitch("fa", 4);
         await mouse.playNote(1/2, async () => {
             await mouse.playPitch("mi", 4);
-            return this.ENDFLOW;
+            return mouse.ENDFLOW;
         });
-        return this.ENDFLOW;
+        return mouse.ENDFLOW;
     });
     return mouse.ENDMOUSE;
 });
 
 new Mouse(async mouse => {
     await mouse.playPitch("re", 5);
-    return this.ENDMOUSE;
+    return mouse.ENDMOUSE;
 });
 
 MusicBlocks.run();
