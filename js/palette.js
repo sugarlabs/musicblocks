@@ -300,20 +300,6 @@ function Palettes() {
             return;
         }
 
-        if (name == "search" && this.showSearchWidget !== null) {
-            for (var i in this.dict) {
-                if (this.dict[i].visible) {
-                    this.dict[i].hideMenu();
-                    this.dict[i]._hideMenuItems();
-                }
-            }
-
-            console.debug("searching");
-            this.dict[name].visible = true;
-            this.showSearchWidget(true);
-            return;
-        }
-
         this.hideSearchWidget(true);
 
         // for (var i in this.dict) {
@@ -394,7 +380,7 @@ function Palettes() {
             document.body.style.cursor = "pointer";
         }
         row.onclick = (evt) => {
-            if (name == "search")this.showSearchWidget();
+            if (name == "search") this.showSearchWidget();
             else this.showPalette(name)
         }
         row.onmouseup = (evt) => {
@@ -610,7 +596,7 @@ function PaletteModel(palette, palettes, name) {
                     label = "arg " + arg;
                     break;
                 case "outputtools":
-                    label = "current pitch  ";
+                    label = "pitch converter";
                     break;
                 default:
                     if (blkname != modname) {
@@ -1049,6 +1035,7 @@ function Palette(palettes, name) {
 
     this.makeBlockFromSearch = function(protoblk, blkname, callback) {
         this._makeBlockFromPalette(protoblk, blkname, callback);
+        this.palettes.hideSearchWidget();
     };
 
     this._makeBlockFromPalette = function(protoblk, blkname, callback) {

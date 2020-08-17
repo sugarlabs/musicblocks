@@ -401,7 +401,7 @@ class Painter {
      * @param anticlockwise - boolean value regarding whether arc is cw or acw
      * @param invert - boolean value regarding whether coordinates are inverted or not
      */
-    arc(cx, cy, ox, oy, x, y, radius, start, end, anticlockwise, invert) {
+    _arc(cx, cy, ox, oy, x, y, radius, start, end, anticlockwise, invert) {
         let nx, ny, sa, ea;
 
         let turtles = this.turtles;
@@ -614,7 +614,7 @@ class Painter {
             ny = cy + Math.sin(oAngleRadians + angleRadians) * r;
         }
 
-        this.arc(
+        this._arc(
             cx,
             cy,
             ox,
@@ -871,6 +871,28 @@ class Painter {
         if (remainder > 0) {
             this._doArcPart(remainder * factor, radius);
         }
+    }
+
+    /**
+     * Sets control point 1 for bezier curve.
+     *
+     * @param {Number} x - x coordinate
+     * @param {Number} y - y coordinate
+     */
+    setControlPoint1(x, y) {
+        tur.painter.cp1x = x;
+        tur.painter.cp1y = y;
+    }
+
+    /**
+     * Sets control point 2 for bezier curve.
+     *
+     * @param {Number} x - x coordinate
+     * @param {Number} y - y coordinate
+     */
+    setControlPoint2(x, y) {
+        tur.painter.cp2x = x;
+        tur.painter.cp2y = y;
     }
 
     /**

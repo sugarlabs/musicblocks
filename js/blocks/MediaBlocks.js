@@ -303,6 +303,7 @@ function setupMediaBlocks() {
             this.formBlock({
                 outType: "fileout"
             });
+	    this.parameter = false;
         }
 
         arg(logo, turtle, blk, receivedArg) {

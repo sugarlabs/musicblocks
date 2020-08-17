@@ -218,6 +218,16 @@ function Activity() {
     if (_THIS_IS_MUSIC_BLOCKS_) {
         let MUSICBLOCKS_EXTRAS = [
             "Tone",
+            "activity/js-export/export",
+            "activity/js-export/sample",
+            "activity/js-export/GraphicsBlocksAPI",
+            "activity/js-export/PenBlocksAPI",
+            "activity/js-export/RhythmBlocksAPI",
+            "activity/js-export/PitchBlocksAPI",
+            "activity/js-export/IntervalsBlocksAPI",
+            "activity/js-export/OrnamentBlocksAPI",
+            "activity/js-export/VolumeBlocksAPI",
+            "activity/js-export/DrumBlocksAPI",
             "widgets/widgetWindows",
             "widgets/jseditor",
             "widgets/modewidget",
@@ -235,7 +245,9 @@ function Activity() {
             "activity/lilypond",
             "activity/abc",
             "activity/mxml",
+            "activity/turtleactions/RhythmActions",
             "activity/turtleactions/PitchActions",
+            "activity/turtleactions/IntervalsActions",
             "activity/turtleactions/ToneActions",
             "activity/turtleactions/OrnamentActions",
             "activity/turtleactions/VolumeActions",
@@ -2130,6 +2142,22 @@ function Activity() {
 
             searchBlockPosition = [100, 100];
             prepSearchWidget();
+            let closeListener = (e) => {
+                if (docById("search").style.visibility == "visible" &&
+                (e.target === docById("search") || docById("search").contains(e.target))) {
+                    //do nothing when clicked in the input field
+                }
+                else if (docById("ui-id-1").style.visibility == "visible" &&
+                (e.target === docById("ui-id-1") || docById("ui-id-1").contains(e.target))) {
+                    //do nothing when clicked on the menu
+                }
+                else {
+                    hideSearchWidget();
+                    document.removeEventListener("mousedown", closeListener);
+                }
+            };
+            document.addEventListener("mousedown", closeListener);
+
             // Give the browser time to update before selecting
             // focus.
             setTimeout(function() {
@@ -3916,7 +3944,6 @@ function Activity() {
                 switch (myBlock.name) {
                     case "namedbox":
                     case "namedarg":
-                    case "outputtools":
                         args = {
                             value: myBlock.privateData
                         };
@@ -3994,6 +4021,7 @@ function Activity() {
                     case "nameddoArg":
                     case "namedcalc":
                     case "namedcalcArg":
+                    case "outputtools":
                         args = {
                             value: myBlock.privateData
                         };

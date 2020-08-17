@@ -26,18 +26,7 @@ function setupIntervalsBlocks() {
         }
 
         flow(args, logo) {
-            logo.synth.inTemperament = args[0];
-            logo.synth.startingPitch = args[1] + "" + args[2];
-
-            logo.temperamentSelected.push(args[0]);
-            let len = logo.temperamentSelected.length;
-
-            if (
-                logo.temperamentSelected[len - 1] !==
-                logo.temperamentSelected[len - 2]
-            ) {
-                logo.synth.changeInTemperament = true;
-            }
+            Singer.IntervalsActions.setTemperament(args[0], args[1], args[2]);
         }
     }
 
@@ -100,42 +89,14 @@ function setupIntervalsBlocks() {
                     if (blockToCheck.name === "intervalname") {
                         // Augmented or diminished only
                         if (blockToCheck.value[0] === "a") {
-                            return (
-                                logo.parseArg(
-                                    logo,
-                                    turtle,
-                                    cblk,
-                                    blk,
-                                    receivedArg
-                                ) + 1
-                            );
+                            return (logo.parseArg(logo, turtle, cblk, blk, receivedArg) + 1);
                         } else if (blockToCheck.value[0] === "d") {
-                            return (
-                                logo.parseArg(
-                                    logo,
-                                    turtle,
-                                    cblk,
-                                    blk,
-                                    receivedArg
-                                ) - 1
-                            );
+                            return (logo.parseArg(logo, turtle, cblk, blk, receivedArg) - 1);
                         } else {
-                            return logo.parseArg(
-                                logo,
-                                turtle,
-                                cblk,
-                                blk,
-                                receivedArg
-                            );
+                            return logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                         }
                     } else if (blockToCheck.name !== "doubly") {
-                        let value = logo.parseArg(
-                            logo,
-                            turtle,
-                            cblk,
-                            blk,
-                            receivedArg
-                        );
+                        let value = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                         if (typeof value === "number") {
                             return value * 2;
                         } else if (typeof value === "string") {
@@ -145,11 +106,9 @@ function setupIntervalsBlocks() {
                         }
                     }
 
-                    currentblock =
-                        logo.blocks.blockList[currentblock].connections[1];
-                    if (currentblock === null) {
+                    currentblock = logo.blocks.blockList[currentblock].connections[1];
+                    if (currentblock === null)
                         return 0;
-                    }
                 }
             }
         }
@@ -457,33 +416,10 @@ function setupIntervalsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined) {
-                // Nothing to do.
+            if (args[1] === undefined)
                 return;
-            }
 
-            let arg;
-            if (args[0] === null || typeof args[0] !== "number") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1;
-            } else {
-                arg = args[0];
-            }
-
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            let i = arg > 0 ? Math.floor(arg) : Math.ceil(arg);
-            if (i !== 0) {
-                tur.singer.semitoneIntervals.push([i, tur.singer.noteDirection]);
-                tur.singer.noteDirection = 0;
-
-                let listenerName = "_semitone_interval_" + turtle;
-                logo.setDispatchBlock(blk, turtle, listenerName);
-
-                let __listener = () => tur.singer.semitoneIntervals.pop();
-
-                logo.setTurtleListener(turtle, listenerName, __listener);
-            }
+            Singer.IntervalsActions.setSemitoneInterval(args[0], turtle, blk);
 
             return [args[1], 1];
         }
@@ -610,25 +546,7 @@ function setupIntervalsBlocks() {
             if (args[1] === undefined)
                 return;
 
-            let arg;
-            if (args[0] === null || typeof args[0] !== "number") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1;
-            } else {
-                arg = args[0];
-            }
-
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            let i = arg > 0 ? Math.floor(arg) : Math.ceil(arg);
-            tur.singer.intervals.push(i);
-
-            let listenerName = "_interval_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = event => tur.singer.intervals.pop();
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            Singer.IntervalsActions.setScalarInterval(args[0], turtle, blk);
 
             return [args[1], 1];
         }
@@ -675,70 +593,10 @@ function setupIntervalsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined) {
-                // nothing to do
+            if (args[1] === undefined)
                 return;
-            }
 
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            tur.singer.inDefineMode = true;
-            tur.singer.defineMode = [];
-            let modeName;
-            if (args[0] === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
-                modeName = "custom";
-            } else {
-                modeName = args[0].toLowerCase();
-            }
-
-            let listenerName = "_definemode_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = function(event) {
-                MUSICALMODES[modeName] = [];
-                if (tur.singer.defineMode.indexOf(0) === -1) {
-                    tur.singer.defineMode.push(0);
-                    logo.errorMsg(_("Adding missing pitch number 0."));
-                }
-
-                let pitchNumbers = tur.singer.defineMode.sort(function(a, b) {
-                    return a[0] - b[0];
-                });
-
-                for (let i = 0; i < pitchNumbers.length; i++) {
-                    if (pitchNumbers[i] < 0 || pitchNumbers[i] > 11) {
-                        logo.errorMsg(
-                            _(
-                                "Ignoring pitch numbers less than zero or greater than eleven."
-                            )
-                        );
-                        continue;
-                    }
-
-                    if (i > 0 && pitchNumbers[i] === pitchNumbers[i - 1]) {
-                        logo.errorMsg(_("Ignoring duplicate pitch numbers."));
-                        continue;
-                    }
-
-                    if (i < pitchNumbers.length - 1) {
-                        MUSICALMODES[modeName].push(
-                            pitchNumbers[i + 1] - pitchNumbers[i]
-                        );
-                    } else {
-                        MUSICALMODES[modeName].push(12 - pitchNumbers[i]);
-                    }
-                }
-
-                let cblk = logo.blocks.blockList[blk].connections[1];
-                if (logo.blocks.blockList[cblk].name === "modename") {
-                    logo.blocks.updateBlockText(cblk);
-                }
-
-                tur.singer.inDefineMode = false;
-            };
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            Singer.IntervalsActions.defineMode(args[0], turtle, blk);
 
             return [args[1], 1];
         }
@@ -774,7 +632,7 @@ function setupIntervalsBlocks() {
 
         flow(args, logo, turtle) {
             if (args.length === 1) {
-                logo.turtles.ithTurtle(turtle).singer.moveable = args[0];
+                Singer.IntervalsActions.setMoveableDo(args[0], turtle);
             }
         }
     }
@@ -808,7 +666,7 @@ function setupIntervalsBlocks() {
             ) {
                 logo.statusFields.push([blk, "modelength"]);
             } else {
-                return getModeLength(logo.turtles.ithTurtle(turtle).singer.keySignature);
+                return Singer.IntervalsActions.getModeLength(turtle);
             }
         }
     }
@@ -833,8 +691,7 @@ function setupIntervalsBlocks() {
             ) {
                 logo.statusFields.push([blk, "currentmode"]);
             } else {
-                let obj = logo.turtles.ithTurtle(turtle).singer.keySignature.split(" ");
-                return obj[1];
+                return Singer.IntervalsActions.getCurrentMode(turtle);
             }
         }
     }
@@ -859,7 +716,7 @@ function setupIntervalsBlocks() {
             ) {
                 logo.statusFields.push([blk, "key"]);
             } else {
-                return logo.turtles.ithTurtle(turtle).singer.keySignature.split(' ')[0];
+                return Singer.IntervalsActions.getCurrentKey(turtle);
             }
         }
     }
@@ -877,8 +734,7 @@ function setupIntervalsBlocks() {
                 argTypes: ["textin"],
                 defaults: ["C"]
             });
-            this.hidden = true;
-            this.deprecated = true;
+            this.hidden = this.deprecated = true;
         }
 
         flow(args, logo, turtle) {
@@ -931,35 +787,10 @@ function setupIntervalsBlocks() {
 
         flow(args, logo, turtle, blk) {
             if (args.length === 2) {
-                let modename = "major";
-                for (let mode in MUSICALMODES) {
-                    if (mode === args[1] || _(mode) === args[1]) {
-                        modename = mode;
-                        logo._modeBlock =
-                            logo.blocks.blockList[blk].connections[2];
-                        break;
-                    }
-                }
+                let modename = Singer.IntervalsActions.GetModename(args[1]);
+                logo._modeBlock = blocks.blockList[blk].connections[2];
 
-                let tur = logo.turtles.ithTurtle(turtle);
-                // Check to see if there are any transpositions on the key
-                if (tur.singer.transposition !== 0) {
-                    let noteObj = getNote(
-                        args[0],
-                        4,
-                        tur.singer.transposition,
-                        tur.singer.keySignature,
-                        false,
-                        null,
-                        logo.errorMsg,
-                        logo.synth.inTemperament
-                    );
-                    tur.singer.keySignature = noteObj[0] + " " + modename;
-                    logo.notation.notationKey(turtle, noteObj[0], modename);
-                } else {
-                    tur.singer.keySignature = args[0] + " " + modename;
-                    logo.notation.notationKey(turtle, args[0], modename);
-                }
+                Singer.IntervalsActions.setKey(args[0], args[1], turtle, blk);
 
                 if (logo.insideModeWidget) {
                     // Ensure logo the mode for Turtle 0 is set, since it is used by the mode widget

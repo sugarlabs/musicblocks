@@ -14,7 +14,7 @@ const changeImage = (imgElement ,from ,to) => {
     if (imgElement.src === oldSrc){
         imgElement.src = newSrc
     }
-} 
+}
 
 function format(str, data) {
     str = str.replace(/{([a-zA-Z0-9.]*)}/g, function(match, name) {
@@ -1300,11 +1300,12 @@ function closeBlkWidgets (name) {
  *
  * @param {Object} obj - component object (controller) to which member
  * of its model and view are to be imported
+ * @param {String} className - used for adding members of JS based MB API classes
  * @param {*[]} modelArgs - constructor arguments for model
  * @param {*[]} viewArgs - constructor arguments for view
  * @returns {void}
  */
-function importMembers(obj, modelArgs, viewArgs) {
+function importMembers(obj, className, modelArgs, viewArgs) {
     /**
      * Adds methods and variables of one class, to another class' instance.
      *
@@ -1349,6 +1350,11 @@ function importMembers(obj, modelArgs, viewArgs) {
     };
 
     let cname = obj.constructor.name;   // class name of component object
+
+    if (className !== "" && className !== undefined) {
+        addMembers(obj, eval(className));
+        return;
+    }
 
     // Add members of Model (class type has to be controller's name + "Model")
     addMembers(obj, eval(cname + "." + cname + "Model"), modelArgs);
