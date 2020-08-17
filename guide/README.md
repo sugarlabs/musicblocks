@@ -1385,59 +1385,80 @@ Converters are used to transform one form of inputs into other, more usable form
 
 Generalized shape of a converter is:
 
-// insert image
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/number2pitch_block.svg
+ "Generalized converter")
 
 where the right argument is converted accordingly, and output is received on the left side.
 
 **Note:** Before an introduction of the different types of converters, a little intoduction on Y staff in Music Blocks. Staff is a set of horizontal lines and spaces and different positions along Y axis represents different notes. [C, D, E, F, G, A, B]
 
-// insert staff image
+![alt
+ tag](treble.svg
+ "Treble clef staff")
 
 ### <a name="y-to-pitch"></a>4.1 Y to Pitch
 
-This converter takes input in the form of a number that represents Staff Y position in pixels, and processes the value such that it can be used with certain pitch blocks (pitch number, nth modal pitch, pitch) to produce notes corresponding to given Staff Y position as an argument. 
+
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/ytopitch_block.svg
+ "Y to Pitch converter")
+
+This converter takes input in the form of a number that represents Staff Y position in pixels, and processes the value such that it can be used with certain pitch blocks (pitch number, nth modal pitch, pitch) to produce notes corresponding to given Staff Y position as an argument.  
 Additionally, the block can be plugged into a print block to view the converted note value.
 
 ### <a name="pitch-converter"></a>4.2 Pitch converter
+
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/outputtools_block.svg
+ "Pitch converter block")
 
 Pitch converter offers a range of options through a pie-menu based interface and it can potentially convert or extract info out of the current playing pitch using the current pitch block as an input. 
 It can also take custom input in form or solfege, hertz, pitch number etc.
 
 Various conversion options are:
 
-#### 1. Letter class: 
+#### **1. Letter class:** 
 Prints the alphabet data of the note being played e.g A, B, C, D, E, F, G. It doesn't print any info regarding accidentals.
 
-#### 2. Solfege Syllable:
+#### **2. Solfege Syllable:**
 Similar to Letter class, returns the data in form of solfege e.g do, re, mi.
 It too, gives no info regarding accidentals.
 
-#### 3. Pitch class:
+#### **3. Pitch class:**
 Returns a number between 0 to 11, corresponding to the note played, where C is 0 and B is 11. Each increase in the number signifies an increase by one semitone.
 
-#### 4. Scalar class:
+#### **4. Scalar class:**
 Returns a number between 1-7 corresponding to the scale degree of the note being played, with reference to the chosen mode. Provides no info regarding accidentals.
 
-#### 5. Scale Degree:
+#### **5. Scale Degree:**
 Intuitively, returns the scale degree of the note being played with reference to the chosen mode. It can also be thought of as Scalar class with accidentals.
 
-#### 6. N^th Degree:
+#### **6. N^th Degree:**
 Zero-based index of the degree of note being played in the chosen mode.
 
-#### 7. Pitch in Hertz: 
+#### **7. Pitch in Hertz:**
 Returns the value in hertz of the pitch of the note being currently played.
 
-#### 8. Pitch Number:
+#### **8. Pitch Number:**
 Value of the pitch of the note currently being played. It is different from Pitch class in the way that it can go below 0 and above 11 depending upon the octave.
 
-#### 9. Staff Y:
+#### **9. Staff Y:**
 Returns the Y staff position of the note being played according to staff dimensions. It takes into account only the letter class, no accidental info is processed.
 
-### <a name="number-2-octave"></a>4.3  Number to Octave
+### <a name="number-2-octave"></a>4.3  Number to Octave  
+  
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/number2octave_block.svg
+ "Y to Pitch converter")
 
 This converter takes a numeric value which denotes pitch number and returns the octave corresponding to that pitch number.
 
 ### <a name="number-2-pitch"></a>4.3  Number to Pitch
+
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/number2pitch_block.svg
+ "Y to Pitch converter")
 
 This converter takes a numeric value which denotes pitch number and returns the pitch name corresponding to that pitch number. No octave is inferred.
 
