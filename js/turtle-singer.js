@@ -633,6 +633,7 @@ class Singer {
      * @param {Object} blk - corresponding Block object index in blocks.blockList
      */
     static processPitch(note, octave, cents, turtle, blk) {
+        console.log(note, octave, cents);
         let tur = logo.turtles.ithTurtle(turtle);
 
         let noteObj = Singer.addScalarTransposition(
@@ -1586,6 +1587,7 @@ class Singer {
                                 var note = noteObj[0] + noteObj[1];
                             }
                         }
+                        console.log(note);
 
                         if (note !== "R") {
                             // Apply harmonic here instead of in synth.
