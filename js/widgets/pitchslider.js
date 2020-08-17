@@ -18,10 +18,8 @@ function PitchSlider() {
     this._delta = 0;
     const SEMITONE = Math.pow(2,1/12);
 
-    this._save = function() {
+    this._save = function(frequency) {
         var that = this;
-        var frequency =
-            this.frequency;
 
         for (var name in this._logo.blocks.palettes.dict) {
             this._logo.blocks.palettes.dict[name].hideMenu(true);
@@ -67,71 +65,88 @@ function PitchSlider() {
     };
 
     this.init = function(logo) {
-        if (!this.frequency) this.frequency = 392;
-        this._logo = logo;
         if (window.widgetWindows.openWindows["slider"])return;
-        let osc = new Tone.AMSynth().toDestination();
-        osc.triggerAttack(this.frequency);
-        for (let turtle in logo.turtles.turtleList){
-            if (logo.Oscilloscope && logo.Oscilloscope.pitchAnalysers && logo.Oscilloscope.pitchAnalysers[turtle])
-                osc.connect(logo.Oscilloscope.pitchAnalysers[turtle])
+        if (!this.frequencies || !this.frequencies.length) this.frequencies = [392];
+        this._logo = logo;
+
+        let oscillators = [];
+        this.sliders = {};
+        for (let freq in this.frequencies) {
+            let osc = new Tone.AMSynth().toDestination();
+            oscillators.push(osc);
         }
-        var w = window.innerWidth;
         this._cellScale = 1.0;
         var iconSize = ICONSIZE;
-
-        let min = this.frequency/2;
-        let max = this.frequency*2;
-
         var widgetWindow = window.widgetWindows.windowFor(
             this,
             "pitch slider",
             "slider"
         );
         this.widgetWindow = widgetWindow;
-	    widgetWindow.onclose = () => {
-            osc.triggerRelease();
+        widgetWindow.onclose = () => {
+            for (let osc of oscillators) osc.triggerRelease();
             widgetWindow.destroy();
         };
-        this.slider = widgetWindow.addRangeSlider(
-            this.frequency,
-            undefined,
-            min,
-            max
-        );
-        let changeFreq = () => {
-            this.frequency = this.slider.value;
-            osc.frequency.linearRampToValueAtTime(
-                this.frequency,
-                Tone.now() + 0.05
+
+        let makeToolbar = (id) => {
+
+            let toolBarDiv = document.createElement("div");
+            widgetWindow._toolbar.appendChild(toolBarDiv);
+            toolBarDiv.style.float = "left";
+
+            let min = this.frequencies[id]/2;
+            let max = this.frequencies[id]*2;
+
+            let slider = widgetWindow.addRangeSlider(
+                this.frequencies[id],
+                toolBarDiv,
+                min,
+                max
             );
-            freqLabel.innerHTML = '<label>'+this.frequency+'</label>';
-        } 
-        this.slider.oninput = () => {
-            changeFreq();
-        };
-        this.slider.onchange = () => {
-            this._save();
-            //osc.triggerRelease();
-            //widgetWindow.destroy();
+            this.sliders[id] = slider;
+
+            let changeFreq = () => {
+                this.frequencies[id] = this.sliders[id].value;
+                oscillators[id].frequency.linearRampToValueAtTime(
+                    this.frequencies[id],
+                    Tone.now() + 0.05
+                );
+                freqLabel.innerHTML = '<label>'+this.frequencies[id]+'</label>';
+            } 
+            slider.oninput = () => {
+                oscillators[id].triggerAttack(this.frequencies[id])
+                changeFreq();
+            };
+            slider.onchange = () => {
+                this._save(this.frequencies[id]);
+                oscillators[id].triggerRelease();
+            }
+            // label for frequency
+            let freqLabel = document.createElement("div");
+            freqLabel.className = "wfbtItem";
+            toolBarDiv.appendChild(freqLabel);
+            freqLabel.innerHTML = '<label>'+this.frequencies[id]+'</label>';
+
+            widgetWindow.addButton("up.svg",iconSize,_("Move up"),toolBarDiv).onclick = () => {
+                slider.value = Math.min(slider.value*SEMITONE, max); //value is a string
+                changeFreq();
+                oscillators[id].triggerAttackRelease(this.frequencies[id],1/32);
+            }
+
+            widgetWindow.addButton("down.svg",iconSize,_("Move down"),toolBarDiv).onclick = () => {
+                slider.value = Math.max(slider.value/SEMITONE, min); //value is a string
+                changeFreq();
+                oscillators[id].triggerAttackRelease(this.frequencies[id],1/32)
+            }
+
+            widgetWindow.addButton("export-chunk.svg",ICONSIZE,_("Save"),toolBarDiv).onclick = () => {
+                //osc.triggerRelease();
+                this._save(this.frequencies[id]);
+            }
         }
 
-        let freqLabel = document.createElement("div");
-        freqLabel.className = "wfbtItem";
-        widgetWindow._toolbar.appendChild(freqLabel);
-        freqLabel.innerHTML = '<label>'+this.frequency+'</label>';
-
-        widgetWindow.addButton("up.svg",iconSize,_("Move up")).onclick = () => {
-            this.slider.value = Math.min(this.slider.value*SEMITONE, max); //value is a string
-            changeFreq()
-        }
-        widgetWindow.addButton("down.svg",iconSize,_("Move down")).onclick = () => {
-        this.slider.value = Math.max(this.slider.value/SEMITONE, min); //value is a string
-            changeFreq()
-        }
-        widgetWindow.addButton("export-chunk.svg",ICONSIZE,_("Save")).onclick = () => {
-            //osc.triggerRelease();
-            this._save();
+        for (let id in this.frequencies) {
+            makeToolbar(id);
         }
 
         this._logo.textMsg(_("Click on the slider to create a note block."));

@@ -630,6 +630,7 @@ function setupWidgetBlocks() {
             }
 
             logo.inPitchSlider = true;
+            logo.pitchSlider.frequencies = [];
 
             let listenerName = "_pitchslider_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);

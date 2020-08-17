@@ -1278,7 +1278,7 @@ function setupPitchBlocks() {
 
                 logo.pitchStaircase.stairPitchBlocks.push(blk);
             } else if (logo.inPitchSlider) {
-                logo.pitchSlider.frequency = args[0];
+                logo.pitchSlider.frequencies.push(args[0]);
             }
 
             try {
