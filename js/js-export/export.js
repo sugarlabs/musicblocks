@@ -25,7 +25,7 @@
 class Mouse {
     /** Mouse objects in program */
     static MouseList = [];
-    /** maps Turtle object to Mouse object */
+    /** maps Turtle object (turtle ID) to Mouse object */
     static TurtleMouseMap = {};
 
     /**
@@ -46,7 +46,7 @@ class Mouse {
         this.MB = new MusicBlocks(this);    // associate a MusicBlocks object with each Mouse
 
         Mouse.MouseList.push(this);
-        Mouse.TurtleMouseMap[this.turtle] = this;
+        Mouse.TurtleMouseMap[this.turtle.id] = this;
     }
 
     /**
@@ -57,7 +57,7 @@ class Mouse {
      * @returns {Object|null} Mouse object
      */
     static getMouseFromTurtle(turtle) {
-        return turtle in Mouse.TurtleMouseMap ? Mouse.TurtleMouseMap[turtle] : null;
+        return turtle.id in Mouse.TurtleMouseMap ? Mouse.TurtleMouseMap[turtle.id] : null;
     }
 
     /**

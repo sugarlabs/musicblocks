@@ -152,20 +152,54 @@ MusicBlocks.run();
 
 const SAMPLE_1 =
 `new Mouse(async mouse => {
-	await mouse.playPitch("sol", 4);
-	for (let i = 0; i < 7; i++) {
-		await mouse.playNote(1/4, async () => {
-			await mouse.stepPitch(1);
-			return mouse.ENDFLOW;
-		});
-	}
-	for (let i = 0; i < 7; i++) {
-		await mouse.playNote(1/4, async () => {
-			await mouse.stepPitch(-1);
-			return mouse.ENDFLOW;
-		});
-	}
-	return mouse.ENDMOUSE;
+    await mouse.playPitch("sol", 4);
+    for (let i = 0; i < 7; i++) {
+        await mouse.playNote(1/4, async () => {
+            await mouse.stepPitch(1);
+            return mouse.ENDFLOW;
+        });
+    }
+    for (let i = 0; i < 7; i++) {
+        await mouse.playNote(1/4, async () => {
+            await mouse.stepPitch(-1);
+            return mouse.ENDFLOW;
+        });
+    }
+    return mouse.ENDMOUSE;
+});
+
+MusicBlocks.run();
+`;
+
+const SAMPLE_2 =
+`new Mouse(async mouse => {
+    await mouse.playNote(1/4, async () => {
+        await mouse.playPitch("sol", 4);
+        await mouse.playPitch("do", 4);
+        return this.ENDFLOW;
+    });
+    await mouse.playNote(1/1, async () => {
+        await mouse.playPitch("re", 4);
+        return this.ENDFLOW;
+    });
+    await mouse.playNote(1/4, async () => {
+        await mouse.playPitch("mi", 4);
+        return this.ENDFLOW;
+    });
+    await mouse.playNote(1/4, async () => {
+        await mouse.playPitch("fa", 4);
+        await mouse.playNote(1/2, async () => {
+            await mouse.playPitch("mi", 4);
+            return this.ENDFLOW;
+        });
+        return this.ENDFLOW;
+    });
+    return mouse.ENDMOUSE;
+});
+
+new Mouse(async mouse => {
+    await mouse.playPitch("re", 5);
+    return this.ENDMOUSE;
 });
 
 MusicBlocks.run();
