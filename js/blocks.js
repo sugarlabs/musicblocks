@@ -1651,7 +1651,8 @@ function Blocks(activity) {
                         case "temperament":
                         case "timbre":
                             lockInit = true;
-                            this.reInitWidget(initialTopBlock, 1500);
+                            if (this.blockList[initialTopBlock].protoblock.staticLabels[0] == widgetTitle[x].innerHTML)
+                                this.reInitWidget(initialTopBlock, 1500);
                             break;
                     }
                 }
@@ -2160,10 +2161,12 @@ function Blocks(activity) {
                             case "temperament":
                             case "timbre":
                                 lockInit = true;
-                                this.reInitWidget(
-                                    that.findTopBlock(thisBlock),
-                                    1500
-                                );
+                                let _newTopBlock = that.findTopBlock(thisBlock);
+                                if (this.blockList[_newTopBlock].protoblock.staticLabels[0] == widgetTitle[i].innerHTML)
+                                    this.reInitWidget(
+                                        _newTopBlock,
+                                        1500
+                                    );
                                 break;
                         }
                     }
