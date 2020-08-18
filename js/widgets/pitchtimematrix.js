@@ -910,7 +910,7 @@ function PitchTimeMatrix() {
                 switch (that._logo.tupletRhythms[i][0]) {
                     case "simple":
                     case "notes":
-                        var tupletParam = [that._logo.tupletParams[i]];
+                        var tupletParam = [that._logo.tupletParams[that._logo.tupletRhythms[i][1]]];
                         tupletParam.push([]);
                         for (
                             var j = 2;
@@ -3257,7 +3257,7 @@ function PitchTimeMatrix() {
             switch (this._logo.tupletRhythms[i][0]) {
                 case "simple":
                 case "notes":
-                    var tupletParam = [this._logo.tupletParams[i]];
+                    var tupletParam = [this._logo.tupletParams[this._logo.tupletRhythms[i][1]]];
                     tupletParam.push([]);
                     for (
                         var j = 2;
