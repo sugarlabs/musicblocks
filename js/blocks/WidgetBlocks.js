@@ -1079,7 +1079,7 @@ function setupWidgetBlocks() {
                         switch (logo.tupletRhythms[i][0]) {
                             case "notes":
                             case "simple":
-                                let tupletParam = [logo.tupletParams[i]];
+                                let tupletParam = [logo.tupletParams[logo.tupletRhythms[i][1]]];
                                 tupletParam.push([]);
                                 for (
                                     let j = 2;
