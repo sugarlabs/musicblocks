@@ -456,9 +456,7 @@ class Singer {
         tur.singer.tallyNotes = saveTallyNotes;
 
         // Restore previous state
-        console.debug(saveBoxes);
         logo.boxes = JSON.parse(saveBoxes);
-        console.debug(saveTurtleHeaps);
         logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
 
         tur.painter.doPenUp();
@@ -546,9 +544,7 @@ class Singer {
         tur.singer.tallyNotes = saveTallyNotes;
 
         // Restore previous state
-        console.debug(saveBoxes);
         logo.boxes = JSON.parse(saveBoxes);
-        console.debug(saveTurtleHeaps);
         logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
 
         tur.painter.doPenUp();
