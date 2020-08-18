@@ -25,8 +25,10 @@
 class Mouse {
     /** Mouse objects in program */
     static MouseList = [];
-    /** maps Turtle object to Mouse object */
+    /** maps Turtle object (turtle ID) to Mouse object */
     static TurtleMouseMap = {};
+    /** list of Turtle objects created by JavaScript based Music Blocks programs */
+    static AddedTurtles = [];
 
     /**
      * @constructor
@@ -38,6 +40,7 @@ class Mouse {
         } else {
             turtles.addTurtle();
             this.turtle = last(turtles.turtleList);
+            Mouse.AddedTurtles.push(this.turtle);
         }
 
         this.turtle.initTurtle(false);
@@ -46,7 +49,7 @@ class Mouse {
         this.MB = new MusicBlocks(this);    // associate a MusicBlocks object with each Mouse
 
         Mouse.MouseList.push(this);
-        Mouse.TurtleMouseMap[this.turtle] = this;
+        Mouse.TurtleMouseMap[this.turtle.id] = this;
     }
 
     /**
@@ -57,7 +60,7 @@ class Mouse {
      * @returns {Object|null} Mouse object
      */
     static getMouseFromTurtle(turtle) {
-        return turtle in Mouse.TurtleMouseMap ? Mouse.TurtleMouseMap[turtle] : null;
+        return turtle.id in Mouse.TurtleMouseMap ? Mouse.TurtleMouseMap[turtle.id] : null;
     }
 
     /**
@@ -173,6 +176,13 @@ class MusicBlocks {
         } else {
             MusicBlocks.isRun = false;
             MusicBlocks._methodList = {};
+        }
+
+        for (let turtle of Mouse.AddedTurtles) {
+            turtle.container.visible = false;
+            turtle.inTrash = true;
+            let turIndex = turtles.turtleList.indexOf(turtle);
+            turtles.turtleList.splice(turIndex, 1);
         }
 
         MusicBlocks._blockNo = -1;
