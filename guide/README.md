@@ -1399,7 +1399,6 @@ where the right argument is converted accordingly, and output is received on the
 
 ### <a name="y-to-pitch"></a>4.1 Y to Pitch
 
-
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/ytopitch_block.svg
  "Y to Pitch converter")
@@ -1416,9 +1415,15 @@ Additionally, the block can be plugged into a print block to view the converted 
 Pitch converter offers a range of options through a pie-menu based interface and it can potentially convert or extract info out of the current playing pitch using the current pitch block as an input. 
 It can also take custom input in form or solfege, hertz, pitch number etc.
 
-Various conversion options are:
+All these options are provided in the form of a pie-menu which can be accessed simply by clicking on the converter.
 
-#### **1. Letter class:** 
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchconverter.svg
+ "Pitch converter block")
+
+Below explained is the utility of every conversion option:
+
+#### **1. Letter class:**
 Prints the alphabet data of the note being played e.g A, B, C, D, E, F, G. It doesn't print any info regarding accidentals.
 
 #### **2. Solfege Syllable:**
