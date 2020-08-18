@@ -198,7 +198,7 @@ class Singer {
                 logo.pitchTimeMatrix.rowLabels.push(logo.blocks.blockList[blk].name);
                 logo.pitchTimeMatrix.rowArgs.push(args[0]);
             } else if (logo.inPitchSlider) {
-                logo.pitchSlider.Sliders.push([args[0], 0, 0]);
+                logo.pitchSlider.frequency = args[0];
             } else {
                 let tur = logo.turtles.ithTurtle(turtle);
 

@@ -1450,7 +1450,7 @@ function setupPitchBlocks() {
 
                 logo.pitchStaircase.stairPitchBlocks.push(blk);
             } else if (logo.inPitchSlider) {
-                logo.pitchSlider.Sliders.push([args[0], 0, 0]);
+                logo.pitchSlider.frequencies.push(args[0]);
             } else {
                 try {
                     return Singer.PitchActions.playHertz(arg, turtle, blk);
