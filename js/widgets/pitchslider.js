@@ -101,7 +101,8 @@ function PitchSlider() {
                 this.frequencies[id],
                 toolBarDiv,
                 min,
-                max
+                max,
+                "pitchSlider"
             );
             this.sliders[id] = slider;
 
