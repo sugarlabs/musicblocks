@@ -131,13 +131,13 @@ function PitchSlider() {
             widgetWindow.addButton("up.svg",iconSize,_("Move up"),toolBarDiv).onclick = () => {
                 slider.value = Math.min(slider.value*SEMITONE, max); //value is a string
                 changeFreq();
-                oscillators[id].triggerAttackRelease(this.frequencies[id],1/32);
+                oscillators[id].triggerAttackRelease(this.frequencies[id],"4n");
             }
 
             widgetWindow.addButton("down.svg",iconSize,_("Move down"),toolBarDiv).onclick = () => {
                 slider.value = Math.max(slider.value/SEMITONE, min); //value is a string
                 changeFreq();
-                oscillators[id].triggerAttackRelease(this.frequencies[id],1/32)
+                oscillators[id].triggerAttackRelease(this.frequencies[id],"4n")
             }
 
             widgetWindow.addButton("export-chunk.svg",ICONSIZE,_("Save"),toolBarDiv).onclick = () => {
