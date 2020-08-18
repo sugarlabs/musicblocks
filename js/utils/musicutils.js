@@ -1798,8 +1798,11 @@ function keySignatureToMode(keySignature) {
     } else {
         var key = parts[0];
     }
-
-    if (NOTESSHARP.indexOf(key) === -1 && NOTESFLAT.indexOf(key) === -1) {
+    if(key === "C" + FLAT) {
+        var keySignature = keySignature
+        var parts = keySignature.split(" ")
+        key = "C" + FLAT
+    } else if (NOTESSHARP.indexOf(key) === -1 && NOTESFLAT.indexOf(key) === -1) {
         console.debug("Invalid key or missing name; reverting to C.");
         // Is is possible that the key was left out?
         var keySignature = "C " + keySignature;
