@@ -1104,6 +1104,28 @@ input.timbreName {
     overflow-x:auto;
 }
 
+.pitchSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    box-shadow: 1px 1px 1px #000031;
+    border: 1px solid #00001E;
+    height: 45px;
+    width: 15px;
+    border-radius: 1px;
+    background: blue;
+    cursor: pointer;
+    margin-top: -8px;
+}
+
+.pitchSlider::-moz-range-thumb {
+    box-shadow: 1px 1px 1px #000031;
+    border: 1px solid #00001E;
+    height: 45px;
+    width: 15px;
+    border-radius: 1px;
+    background: blue;
+    cursor: pointer;
+}
+
 .headcol {
     user-select: none;
     text-align: center;
