@@ -1739,7 +1739,6 @@ function setupPitchBlocks() {
                 let obj = keySignatureToMode(tur.singer.keySignature);
                 
                 let isNegativeArg = scaledegree < 0 ? true : false;
-                let modeLength = MUSICALMODES[obj[1]].length;
                 
                 let ref = NOTESTEP[obj[0].substr(0, 1)] - 1;
                 if (obj[0].substr(1) === FLAT) {
@@ -1755,7 +1754,7 @@ function setupPitchBlocks() {
                     NOTESFLAT.indexOf(note) - ref : NOTESSHARP.indexOf(note) - ref;
                 
                 /** calculates changes in reference octave which occur a semitone before the reference key */
-                let deltaOctave = Math.floor((scaledegree - 1) / modeLength);
+                let deltaOctave = Math.floor((scaledegree - 1) / 7);
                 
                 /** calculates changes in octave when crossing B */
                 let deltaSemi = isNegativeArg ?
