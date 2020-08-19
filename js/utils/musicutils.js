@@ -1992,6 +1992,10 @@ function _getStepSize(
 function _buildScale(keySignature) {
     var obj = keySignatureToMode(keySignature);
     var myKeySignature = obj[0];
+    if(myKeySignature == "C" + FLAT) {
+        obj = keySignatureToMode("B " + obj[1])
+        myKeySignature = obj[0]
+    }
     if (obj[1] === "CUSTOM") {
         var halfSteps = customMode;
     } else {
@@ -2024,7 +2028,7 @@ function _buildScale(keySignature) {
         ii += halfSteps[i];
         scale.push(thisScale[ii % SEMITONES]);
     }
-
+    console.debug("Scale: " + scale)
     return [scale, halfSteps];
 }
 
