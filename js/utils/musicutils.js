@@ -2028,7 +2028,7 @@ function _buildScale(keySignature) {
         ii += halfSteps[i];
         scale.push(thisScale[ii % SEMITONES]);
     }
-    console.debug("Scale: " + scale)
+    
     return [scale, halfSteps];
 }
 
