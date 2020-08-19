@@ -647,6 +647,13 @@ function setupPitchBlocks() {
         constructor(name, displayName) {
             super("ytopitch", _("y to pitch"));
             this.setPalette("pitch");
+            this.setHelpString([
+                _(
+                    "Y to pitch block will convert a staff y position to corresponding pitch notation."
+                ),
+                "documentation",
+                ""
+            ]);
             this.formBlock({
                 args: 1,
                 defaults: [50]
