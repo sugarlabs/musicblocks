@@ -7094,11 +7094,12 @@ function Blocks(activity) {
                     break;
                 }
             }
+            let parentExpandableBlk = this.insideExpandableBlock(thisBlock);
             myBlock.connections[0] = null;
 
             // Add default block if user deletes all blocks from
             // inside the note block.
-            this.addDefaultBlock(parentBlock, thisBlock);
+            this.addDefaultBlock(parentExpandableBlk, thisBlock);
         }
 
         if (myBlock.name === "start" || myBlock.name === "drum") {
