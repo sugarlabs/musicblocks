@@ -4958,11 +4958,11 @@ function Block(protoblock, blocks, overrideName) {
             } else if (prevPitch + delta < 0) {
                 deltaOctave = 1;
             }
-
+            let attr;
             prevPitch = i;
             let note = noteValues[i];
             if (!custom) {
-                let attr =
+                attr =
                     that._accidentalsWheel.navItems[
                         that._accidentalsWheel.selectedNavItemIndex
                     ].title;
@@ -5001,16 +5001,21 @@ function Block(protoblock, blocks, overrideName) {
 
             let obj;
             if (that.name == "scaledegree2") {
-                let obj1 = splitScaleDegree(note);
-                note = scaleDegreeToPitchMapping(
+                note = note.replace(attr, "");
+                note = SOLFEGENAMES[note - 1];
+                note += attr;
+                obj = getNote(
+                    note,
+                    octave,
+                    0,
                     keySignature,
-                    obj1[0],
-                    KeySignatureEnv[2],
-                    null
+                    true,
+                    null,
+                    that.blocks.errorMsg,
+                    that.blocks.logo.synth.inTemperament
                 );
-                note += obj1[1];
-                obj = [note, octave];
             } else {
+                console.log(note);
                 obj = getNote(
                     note,
                     octave,
