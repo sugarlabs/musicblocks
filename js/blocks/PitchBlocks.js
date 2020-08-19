@@ -1732,12 +1732,38 @@ function setupPitchBlocks() {
                 note = scaleDegreeToPitchMapping(
                     tur.singer.keySignature, scaledegree, tur.singer.moveable, null
                 );
-
                 if (attr != NATURAL) {
                     note += attr;
                 }
 
-                octave = Math.floor(Math.min(9, Math.max(0, arg1)));
+                let obj = keySignatureToMode(tur.singer.keySignature);
+                
+                let isNegativeArg = scaledegree < 0 ? true : false;
+                let modeLength = MUSICALMODES[obj[1]].length;
+                
+                let ref = NOTESTEP[obj[0].substr(0, 1)] - 1;
+                if (obj[0].substr(1) === FLAT) {
+                    ref--;
+                } else if (obj[0].substr(1) === SHARP) {
+                    ref++;
+                }
+
+                let semitones = ref;
+                
+                semitones +=
+                NOTESFLAT.indexOf(note) !== -1 ?
+                    NOTESFLAT.indexOf(note) - ref : NOTESSHARP.indexOf(note) - ref;
+                
+                /** calculates changes in reference octave which occur a semitone before the reference key */
+                let deltaOctave = Math.floor((scaledegree - 1) / modeLength);
+                
+                /** calculates changes in octave when crossing B */
+                let deltaSemi = isNegativeArg ?
+                    (semitones > ref ? 1 : 0) : (semitones < ref ? 1 : 0);
+                
+                octave = ((isNegativeArg ? -1 : 1) * (deltaOctave + deltaSemi)) + Math.floor(
+                    calcOctave(tur.singer.currentOctave, arg1, tur.singer.lastNotePlayed, note)
+                );
                 cents = 0;
             } else if (typeof arg0 === "number" || !isNaN(Number(arg0))) {
                 arg0 = Number(arg0);
