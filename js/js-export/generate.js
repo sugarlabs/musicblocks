@@ -21,6 +21,8 @@
  * Conatins utility methods to generate block stack trees of start and action blocks.
  * Contains utility method that generates AST for the corresponding code for the trees.
  *
+ * Code is generated from the Abstract Syntax Tree using a library called "Astring".
+ *
  * * Internal functions' names are in PascalCase.
  */
 class JSGenerate {
@@ -34,6 +36,8 @@ class JSGenerate {
     static actionTrees = [];
     /** Abstract Syntax Tree for the corresponding code to be generated from the stack trees */
     static AST = {};
+    /** Final output code generated from the AST of the block stack trees */
+    static code = "";
 
     /**
      * Generates a tree representation of the "start" and "action" block stacks.
@@ -254,90 +258,26 @@ class JSGenerate {
     }
 
     /**
-     * Generates the Abstract Syntax Tree for the corresponding code to the generated from the stack trees.
+     * Generates the corresponding code to the generated from the stack trees by structuring the
+     * different Abstract Syntax Trees.
      *
      * @static
+     * @returns {void}
      */
-    static generateAST() {
-        JSGenerate.AST = {
-            "type": "Program",
-            "sourceType": "script",
-            "body": [
-                {
-                    "type": "ExpressionStatement",
-                    "expression": {
-                      "type": "CallExpression",
-                      "callee": {
-                        "type": "MemberExpression",
-                        "object": {
-                          "type": "Identifier",
-                          "name": "MusicBlocks"
-                        },
-                        "computed": false,
-                        "property": {
-                          "type": "Identifier",
-                          "name": "run"
-                        }
-                      },
-                      "arguments": []
-                    }
-                  }
-            ]
-        };
+    static generateCode() {
+        JSGenerate.AST = bareboneAST;
 
-        let mouseAST = {
-            "type": "ExpressionStatement",
-            "expression": {
-                "type": "NewExpression",
-                "callee": {
-                    "type": "Identifier",
-                    "name": "Mouse"
-                },
-                "arguments": [
-                    {
-                        "type": "ArrowFunctionExpression",
-                        "params": [
-                            {
-                                "type": "Identifier",
-                                "name": "mouse"
-                            }
-                        ],
-                        "body": {
-                            "type": "BlockStatement",
-                            "body": [
-                                {
-                                    "type": "ReturnStatement",
-                                    "argument": {
-                                        "type": "MemberExpression",
-                                        "object": {
-                                            "type": "Identifier",
-                                            "name": "mouse"
-                                        },
-                                        "computed": false,
-                                        "property": {
-                                            "type": "Identifier",
-                                            "name": "ENDMOUSE"
-                                        }
-                                    }
-                                }
-                            ]
-                        },
-                        "async": true,
-                        "expression": false
-                    }
-                ]
-            }
-        };
-
-        for (let i in JSGenerate.startTrees) {
-            JSGenerate.AST["body"].splice(i, 0, mouseAST);
+        for (let i = 0; i < JSGenerate.startTrees.length; i++) {
+            JSGenerate.AST["body"].splice(i, 0, getMouseAST(JSGenerate.startTrees[i]));
         }
 
-        console.log(astring.generate(JSGenerate.AST));
+        JSGenerate.code = astring.generate(JSGenerate.AST);
     }
 
     static run() {
         JSGenerate.generateStacksTree();
-        JSGenerate.generateAST();
+        // JSGenerate.printStacksTree();
+        JSGenerate.generateCode();
+        console.log(JSGenerate.code);
     }
 }
