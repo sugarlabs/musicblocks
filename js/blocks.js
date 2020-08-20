@@ -7228,8 +7228,8 @@ function Blocks(activity) {
             if (typeof this.blockList[blk].protoblock.updateParameter === "function") {
                 value = this.blockList[blk].protoblock.updateParameter(logo, turtle, blk);
             } else {
-                if (name in this.evalParameterDict) {
-                    eval(this.evalParameterDict[name]);
+                if (name in logo.evalParameterDict) {
+                    eval(logo.evalParameterDict[name]);
                 } else {
                     return;
                 }
