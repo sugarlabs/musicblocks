@@ -90,12 +90,139 @@ const mouseAST = {
 };
 
 /**
+ * Returns the Abstract Syntax Tree for a method call without function argument.
+ *
+ * @param {String} methodName - method name
+ * @param {[*]} args - tree of arguments
+ * @returns {Object} - Abstract Syntax Tree of method call
+ */
+function getMethodCallAST(methodName, args) {
+    return {
+        "type": "ExpressionStatement",
+        "expression": {
+            "type": "AwaitExpression",
+            "argument": {
+                "type": "CallExpression",
+                "callee": {
+                    "type": "MemberExpression",
+                    "object": {
+                        "type": "Identifier",
+                        "name": "mouse"
+                    },
+                    "computed": false,
+                    "property": {
+                        "type": "Identifier",
+                        "name": `${methodName}`
+                    }
+                },
+                "arguments": getArgsAST(args)
+            }
+        }
+    };
+}
+
+/**
+ * Returns the Abstract Syntax Tree for a method call with function argument.
+ *
+ * @param {String} methodName - method name
+ * @param {[*]} args - tree of arguments
+ * @param {[*]} flows - tree of flow statements
+ * @returns {Object} - Abstract Syntax Tree of method call
+ */
+function getMethodCallClampAST(methodName, args, flows) {
+    let AST = getMethodCallAST(methodName, args);
+
+    AST["expression"]["argument"]["arguments"].push({
+        "type": "ArrowFunctionExpression",
+        "params": [],
+        "body": {
+            "type": "BlockStatement",
+            "body": getBlockAST(flows)
+        },
+        "async": true,
+        "expression": false
+    });
+
+    last(AST["expression"]["argument"]["arguments"])["body"]["body"].push({
+        "type": "ReturnStatement",
+        "argument": {
+            "type": "MemberExpression",
+            "object": {
+                "type": "Identifier",
+                "name": "mouse"
+            },
+            "computed": false,
+            "property": {
+                "type": "Identifier",
+                "name": "ENDFLOW"
+            }
+        }
+    });
+
+    return AST;
+}
+
+/**
+ * Returns list of Abstract Syntax Trees corresponding to each argument of args.
+ *
+ * @param {[*]} args - tree of arguments
+ * @returns {[Object]} list of Abstract Syntax Trees
+ */
+function getArgsAST(args) {
+    return [
+        {
+            "type": "Literal",
+            "value": "sol"
+        }, {
+            "type": "Literal",
+            "value": 4
+        }
+    ];
+
+    if (args === undefined || args === null)
+        return [];
+
+    let ASTs = [];
+    for (let arg of args) {
+
+    }
+
+    return ASTs;
+}
+
+/**
+ * Returns list of Abstract Syntax Trees corresponding to each flow statement.
+ *
+ * @param {[*]} flows - tree of flow statements
+ * @returns {[Object]} list of Abstract Syntax Trees
+ */
+function getBlockAST(flows) {
+    // return [getMethodCallClampAST("playNote")];
+
+    if (flows === undefined || flows === null)
+        return [];
+
+    let ASTs = [];
+    for (let flow of flows) {
+
+    }
+
+    return ASTs;
+}
+
+/**
  * Returns the complete Abstract Syntax Tree specific to the mouse corresponding to the tree.
  *
  * @param {[*]} tree - stacks tree for the mouse
  * @returns {Object} mouse Abstract Syntax Tree for the tree
  */
 function getMouseAST(tree) {
-    let _mouseAST = JSON.parse(JSON.stringify(mouseAST));
-    return _mouseAST;
+    let AST = JSON.parse(JSON.stringify(mouseAST));
+
+    let ASTs = getBlockAST(tree);
+    for (let i in ASTs) {
+        AST["expression"]["arguments"][0]["body"]["body"].splice(i, 0, ASTs[i]);
+    }
+
+    return AST;
 }
