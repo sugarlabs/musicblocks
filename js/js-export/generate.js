@@ -18,44 +18,60 @@
  * @class
  */
 class JSGenerate {
+    /** list of the Block index numbers of all start blocks */
+    static startBlocks = [];
+    /** list of the Block index numbers of all action blocks */
+    static actionBlocks = [];
+    /** list of all the generated trees of start blocks */
+    static startTrees = [];
+    /** list of all the generated trees of action blocks */
+    static actionTrees = [];
+
     /**
-     * Generates a JSON of the tree representation of the "start" and "action" block stacks.
+     * Generates a tree representation of the "start" and "action" block stacks.
      *
      * @static
+     * @returns {void}
      */
     static generateStacksTree() {
         blocks.findStacks();
-        let startBlocks = [], actionBlocks = [];
 
         for (let blk of blocks.stackList) {
             if (blocks.blockList[blk].name === "start" && !blocks.blockList[blk].trash) {
-                startBlocks.push(blk);
+                JSGenerate.startBlocks.push(blk);
             } else if (blocks.blockList[blk].name === "action" && !blocks.blockList[blk].trash) {
                 // does the action stack have a name?
                 let c = blocks.blockList[blk].connections[1];
                 // is there a block in the action clamp?
                 let b = blocks.blockList[blk].connections[2];
                 if (c !== null && b !== null) {
-                    actionBlocks.push(blk);
+                    JSGenerate.actionBlocks.push(blk);
                 }
             }
         }
 
         /**
-         * Generates a tree representation of the block stack starting with blk.
+         * Recursively generates a tree representation of the block stack starting with blk.
          *
          * @param {Number} blk - Block representation in blocks.blockList
          * @param {Object} tree - list structure to store tree from blk
          * @param {Number} level - for clamp/doubleclamp blocks: 0/undefined for first flow, 1 for second flow
-         * @returns {Object} tree from blk
+         * @returns {[*]} tree from blk
          */
         function GenerateStackTree(blk, tree, level) {
+            /**
+             * Recursively generates a tree representation of the arguments starting with blk.
+             *
+             * @param {Object} blk - Block object
+             * @returns {[*]} tree representation
+             */
             function ParseArg(blk) {
                 let argLen = blk.protoblock.args;
-                if (blk.protoblock.style === "clamp")
+                if (blk.protoblock.style === "clamp") {
                     argLen -= 1;
-                else if (blk.protoblock.style === "doubleclamp")
+                } else if (blk.protoblock.style === "doubleclamp") {
                     argLen -= 2;
+                }
 
                 let args = [];
                 for (let i = 1; i <= argLen; i++) {
@@ -105,9 +121,11 @@ class JSGenerate {
 
             if (level === undefined)
                 level = 0;
+
             let nextBlk = blk.connections[blk.connections.length - 2 - level];
             nextBlk = blocks.blockList[nextBlk];
             while (nextBlk !== undefined) {
+                // ignore vertical spacers and hidden blocks
                 if (nextBlk.name !== "hidden" && nextBlk.name !== "vspace") {
                     if (nextBlk.name === "storein2") {
                         tree.push([nextBlk.name + "_" + nextBlk.privateData]);
@@ -140,7 +158,33 @@ class JSGenerate {
             return tree;
         }
 
+        for (let blk of JSGenerate.startBlocks)
+            JSGenerate.startTrees.push(GenerateStackTree(blocks.blockList[blk], []));
+
+        for (let blk of JSGenerate.actionBlocks)
+            JSGenerate.actionTrees.push(GenerateStackTree(blocks.blockList[blk], []));
+    }
+
+    /**
+     * Prints all the tree representations of start and action block stacks.
+     *
+     * @static
+     * @returns {void}
+     */
+    static printStacksTree() {
+        /**
+         * Recursively prints a tree starting from level.
+         *
+         * @param {[*]} tree - block stack tree
+         * @param {Number} level - nesting level
+         */
         function PrintTree(tree, level) {
+            /**
+             * Recursively generates the string of arguments.
+             *
+             * @param {[*]} args - arguments list
+             * @returns {String} serialized arguments
+             */
             function PrintArgs(args) {
                 if (args === null || args.length === 0) {
                     return "none";
@@ -182,16 +226,22 @@ class JSGenerate {
             }
         }
 
-        for (let blk of startBlocks) {
-            let tree = GenerateStackTree(blocks.blockList[blk], []);
-            PrintTree(tree);
-            console.log("%c _______________________________________", "color: silver");
+        if (JSGenerate.startTrees.length === 0) {
+            console.log("%cno start trees generated", "color: tomato");
+        } else {
+            for (let tree of JSGenerate.startTrees) {
+                PrintTree(tree);
+                console.log("%c _______________________________________", "color: silver");
+            }
         }
 
-        for (let blk of actionBlocks) {
-            let tree = GenerateStackTree(blocks.blockList[blk], []);
-            PrintTree(tree);
-            console.log("%c _______________________________________", "color: silver");
+        if (JSGenerate.startTrees.length === 0) {
+            console.log("%cno action trees generated", "color: tomato");
+        } else {
+            for (let tree of JSGenerate.actionTrees) {
+                PrintTree(tree);
+                console.log("%c _______________________________________", "color: silver");
+            }
         }
     }
 }
