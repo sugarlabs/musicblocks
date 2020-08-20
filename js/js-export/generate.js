@@ -16,6 +16,12 @@
 
 /**
  * @class
+ * @classdesc
+ * Contains data structures that store the list of start blocks and actions blocks.
+ * Conatins utility methods to generate block stack trees of start and action blocks.
+ * Contains utility method that generates AST for the corresponding code for the trees.
+ *
+ * * Internal functions' names are in PascalCase.
  */
 class JSGenerate {
     /** list of the Block index numbers of all start blocks */
@@ -26,6 +32,8 @@ class JSGenerate {
     static startTrees = [];
     /** list of all the generated trees of action blocks */
     static actionTrees = [];
+    /** Abstract Syntax Tree for the corresponding code to be generated from the stack trees */
+    static AST = {};
 
     /**
      * Generates a tree representation of the "start" and "action" block stacks.
@@ -243,5 +251,93 @@ class JSGenerate {
                 console.log("%c _______________________________________", "color: silver");
             }
         }
+    }
+
+    /**
+     * Generates the Abstract Syntax Tree for the corresponding code to the generated from the stack trees.
+     *
+     * @static
+     */
+    static generateAST() {
+        JSGenerate.AST = {
+            "type": "Program",
+            "sourceType": "script",
+            "body": [
+                {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                      "type": "CallExpression",
+                      "callee": {
+                        "type": "MemberExpression",
+                        "object": {
+                          "type": "Identifier",
+                          "name": "MusicBlocks"
+                        },
+                        "computed": false,
+                        "property": {
+                          "type": "Identifier",
+                          "name": "run"
+                        }
+                      },
+                      "arguments": []
+                    }
+                  }
+            ]
+        };
+
+        let mouseAST = {
+            "type": "ExpressionStatement",
+            "expression": {
+                "type": "NewExpression",
+                "callee": {
+                    "type": "Identifier",
+                    "name": "Mouse"
+                },
+                "arguments": [
+                    {
+                        "type": "ArrowFunctionExpression",
+                        "params": [
+                            {
+                                "type": "Identifier",
+                                "name": "mouse"
+                            }
+                        ],
+                        "body": {
+                            "type": "BlockStatement",
+                            "body": [
+                                {
+                                    "type": "ReturnStatement",
+                                    "argument": {
+                                        "type": "MemberExpression",
+                                        "object": {
+                                            "type": "Identifier",
+                                            "name": "mouse"
+                                        },
+                                        "computed": false,
+                                        "property": {
+                                            "type": "Identifier",
+                                            "name": "ENDMOUSE"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        "async": true,
+                        "expression": false
+                    }
+                ]
+            }
+        };
+
+        for (let i in JSGenerate.startTrees) {
+            JSGenerate.AST["body"].splice(i, 0, mouseAST);
+        }
+
+        console.log(astring.generate(JSGenerate.AST));
+    }
+
+    static run() {
+        JSGenerate.generateStacksTree();
+        JSGenerate.generateAST();
     }
 }
