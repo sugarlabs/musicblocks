@@ -2091,12 +2091,14 @@ function Activity() {
         deprecatedBlockNames = [];
 
         for (i in blocks.protoBlockDict) {
-            blockLabel = blocks.protoBlockDict[i].staticLabels.join(' ');
+            let block = blocks.protoBlockDict[i];
+            blockLabel = block.staticLabels.join(' ');
+            let artwork = block.palette.model.makeBlockInfo(0,block,block.name,block.name)["artwork64"];
             if (blockLabel) {
-                if (blocks.protoBlockDict[i].deprecated) {
+                if (block.deprecated) {
                     deprecatedBlockNames.push(blockLabel);
                 } else {
-                    searchSuggestions.push({label : blockLabel ,value : blocks.protoBlockDict[i].name ,specialDict :blocks.protoBlockDict[i] });
+                    searchSuggestions.push({label : blockLabel ,value : block.name ,specialDict :block ,artwork: artwork});
                 }
             }
         }
@@ -2147,7 +2149,7 @@ function Activity() {
                 (e.target === docById("search") || docById("search").contains(e.target))) {
                     //do nothing when clicked in the input field
                 }
-                else if (docById("ui-id-1").style.visibility == "visible" &&
+                else if (docById("ui-id-1").style.display == "block" &&
                 (e.target === docById("ui-id-1") || docById("ui-id-1").contains(e.target))) {
                     //do nothing when clicked on the menu
                 }
@@ -2192,6 +2194,14 @@ function Activity() {
             .autocomplete("widget")
             .addClass("scrollSearch");
 
+            $j( "#search" ).autocomplete( "instance" )._renderItem = function( ul, item ) {
+            return $j( "<li></li>" )
+                .data( "item.autocomplete", item )
+                .append( '<img src="' + item.artwork + '" height = "20px">' + 
+                         "<a>" + item.label + "</a>" 
+                    )
+                .appendTo( ul );
+        };
         let searchInput = searchWidget.idInput_custom;
         if (!searchInput || searchInput.length <= 0) return;
 
