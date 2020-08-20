@@ -459,281 +459,287 @@ function PaletteModel(palette, palettes, name) {
             // Create a proto block for each palette entry.
             var blkname = block.name;
             var modname = blkname;
-
-            switch (blkname) {
-                // Use the name of the action in the label
-                case "storein":
-                    modname = "store in " + block.defaults[0];
-                    var arg = block.defaults[0];
-                    break;
-                case "storein2":
-                    modname = "store in2 " + block.staticLabels[0];
-                    var arg = block.staticLabels[0];
-                    break;
-                case "box":
-                    modname = block.defaults[0];
-                    var arg = block.defaults[0];
-                    break;
-                case "namedbox":
-                    if (block.defaults[0] === undefined) {
-                        modname = "namedbox";
-                        var arg = _("box");
-                    } else {
-                        modname = block.defaults[0];
-                        var arg = block.defaults[0];
-                    }
-                    break;
-                case "namedarg":
-                    if (block.defaults[0] === undefined) {
-                        modname = "namedarg";
-                        var arg = "1";
-                    } else {
-                        modname = block.defaults[0];
-                        var arg = block.defaults[0];
-                    }
-                    break;
-                case "nameddo":
-                    if (block.defaults[0] === undefined) {
-                        modname = "nameddo";
-                        var arg = _("action");
-                    } else {
-                        modname = block.defaults[0];
-                        var arg = block.defaults[0];
-                    }
-                    break;
-                case "nameddoArg":
-                    if (block.defaults[0] === undefined) {
-                        modname = "nameddoArg";
-                        var arg = _("action");
-                    } else {
-                        modname = block.defaults[0];
-                        var arg = block.defaults[0];
-                    }
-                    break;
-                case "namedcalc":
-                    if (block.defaults[0] === undefined) {
-                        modname = "namedcalc";
-                        var arg = _("action");
-                    } else {
-                        modname = block.defaults[0];
-                        var arg = block.defaults[0];
-                    }
-                    break;
-                case "namedcalcArg":
-                    if (block.defaults[0] === undefined) {
-                        modname = "namedcalcArg";
-                        var arg = _("action");
-                    } else {
-                        modname = block.defaults[0];
-                        var arg = block.defaults[0];
-                    }
-                    break;
-            }
-
-            var protoBlock = this.palettes.blocks.protoBlockDict[blkname];
-            if (protoBlock === null) {
-                console.debug("Could not find block " + blkname);
-                continue;
-            }
-
-            var label = "";
-            // console.debug(protoBlock.name);
-            switch (protoBlock.name) {
-                case "text":
-                    label = _("text");
-                    break;
-                case "drumname":
-                    label = _("drum");
-                    break;
-                case "effectsname":
-                    label = _("effect");
-                    break;
-                case "solfege":
-                    label = i18nSolfege("sol");
-                    break;
-                case "eastindiansolfege":
-                    label = "sargam";
-                    break;
-                case "scaledegree2":
-                    label = "scale degree";
-                    break;
-                case "modename":
-                    label = _("mode name");
-                    break;
-                case "invertmode":
-                    label = _("invert mode");
-                    break;
-                case "voicename":
-                    label = _("voice name");
-                    break;
-                case "temperamentname":
-                    //TRANS: https://en.wikipedia.org/wiki/Musical_temperament
-                    label = _("temperament");
-                    break;
-                case "accidentalname":
-                    //TRANS: accidental refers to sharps, flats, etc.
-                    label = _("accidental");
-                    break;
-                case "notename":
-                    label = "G";
-                    break;
-                case "intervalname":
-                    label = _("interval name");
-                    break;
-                case "boolean":
-                    label = _("true");
-                    break;
-                case "number":
-                    label = NUMBERBLOCKDEFAULT.toString();
-                    break;
-                case "less":
-                case "greater":
-                case "equal":
-                    // Label should be inside _() when defined.
-                    label = protoBlock.staticLabels[0];
-                    break;
-                case "namedarg":
-                    label = "arg " + arg;
-                    break;
-                case "outputtools":
-                    label = "pitch converter";
-                    break;
-                default:
-                    if (blkname != modname) {
-                        // Override label for do, storein, box, and namedarg
-                        if (
-                            blkname === "storein" &&
-                            block.defaults[0] === _("box")
-                        ) {
-                            label = _("store in");
-                        } else if (blkname === "storein2") {
-                            if (block.staticLabels[0] === _("store in box")) {
-                                label = _("store in box");
-                            } else {
-                                label =
-                                    _("store in") + " " + block.staticLabels[0];
-                            }
-                        } else {
-                            label = block.defaults[0];
-                        }
-                    } else if (protoBlock.staticLabels.length > 0) {
-                        label = protoBlock.staticLabels[0];
-                        if (label === "") {
-                            if (blkname === "loadFile") {
-                                label = _("open file");
-                            } else {
-                                label = blkname;
-                            }
-                        }
-                    } else {
-                        label = blkname;
-                    }
-            }
-
-            if (
-                [
-                    "do",
-                    "nameddo",
-                    "namedbox",
-                    "namedcalc",
-                    "doArg",
-                    "calcArg",
-                    "nameddoArg",
-                    "namedcalcArg"
-                ].indexOf(protoBlock.name) != -1 &&
-                label != null
-            ) {
-                if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                    label = label.substr(0, STRINGLEN) + "...";
-                }
-            }
-
-            // Don't display the label on image blocks.
-            if (protoBlock.image) {
-                label = "";
-            }
-
-            var saveScale = protoBlock.scale;
-            protoBlock.scale = DEFAULTBLOCKSCALE;
-
-            // Finally, the SVGs!
-            switch (protoBlock.name) {
-                case "namedbox":
-                case "namedarg":
-                    // so the label will fit
-                    var svg = new SVG();
-                    svg.init();
-                    svg.setScale(protoBlock.scale);
-                    svg.setExpand(60, 0, 0, 0);
-                    svg.setOutie(true);
-                    var artwork = svg.basicBox();
-                    var docks = svg.docks;
-                    var height = svg.getHeight();
-                    break;
-                case "nameddo":
-                    // so the label will fit
-                    var svg = new SVG();
-                    svg.init();
-                    svg.setScale(protoBlock.scale);
-                    svg.setExpand(60, 0, 0, 0);
-                    var artwork = svg.basicBlock();
-                    var docks = svg.docks;
-                    var height = svg.getHeight();
-                    break;
-                default:
-                    var obj = protoBlock.generator();
-                    var artwork = obj[0];
-                    var docks = obj[1];
-                    var height = obj[3];
-                    break;
-            }
-
-            protoBlock.scale = saveScale;
-
-            if (protoBlock.disabled) {
-                artwork = artwork
-                    .replace(/fill_color/g, DISABLEDFILLCOLOR)
-                    .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
-                    .replace("block_label", safeSVG(label));
-            } else {
-                artwork = artwork
-                    .replace(
-                        /fill_color/g,
-                        PALETTEFILLCOLORS[protoBlock.palette.name]
-                    )
-                    .replace(
-                        /stroke_color/g,
-                        PALETTESTROKECOLORS[protoBlock.palette.name]
-                    )
-                    .replace("block_label", safeSVG(label));
-            }
-
-            for (var i = 0; i <= protoBlock.args; i++) {
-                artwork = artwork.replace(
-                    "arg_label_" + i,
-                    protoBlock.staticLabels[i] || ""
-                );
-            }
-
-            this.blocks.push({
-                blk,
-                blkname,
-                modname,
-                height: STANDARDBLOCKHEIGHT,
-                actualHeight: height,
-                label,
-                artwork,
-                artwork64:
-                    "data:image/svg+xml;base64," +
-                    window.btoa(unescape(encodeURIComponent(artwork))),
-                docks,
-                image: block.image,
-                scale: block.scale,
-                palettename: this.palette.name,
-                hidden: block.hidden
-            });
+            this.blocks.push(this.makeBlockInfo(blk,block,blkname,modname));
         }
     };
+    
+    this.makeBlockInfo = function(blk,block,blkname,modname) {
+        
+        switch (blkname) {
+            // Use the name of the action in the label
+            case "storein":
+                modname = "store in " + block.defaults[0];
+                var arg = block.defaults[0];
+                break;
+            case "storein2":
+                modname = "store in2 " + block.staticLabels[0];
+                var arg = block.staticLabels[0];
+                break;
+            case "box":
+                modname = block.defaults[0];
+                var arg = block.defaults[0];
+                break;
+            case "namedbox":
+                if (block.defaults[0] === undefined) {
+                    modname = "namedbox";
+                    var arg = _("box");
+                } else {
+                    modname = block.defaults[0];
+                    var arg = block.defaults[0];
+                }
+                break;
+            case "namedarg":
+                if (block.defaults[0] === undefined) {
+                    modname = "namedarg";
+                    var arg = "1";
+                } else {
+                    modname = block.defaults[0];
+                    var arg = block.defaults[0];
+                }
+                break;
+            case "nameddo":
+                if (block.defaults[0] === undefined) {
+                    modname = "nameddo";
+                    var arg = _("action");
+                } else {
+                    modname = block.defaults[0];
+                    var arg = block.defaults[0];
+                }
+                break;
+            case "nameddoArg":
+                if (block.defaults[0] === undefined) {
+                    modname = "nameddoArg";
+                    var arg = _("action");
+                } else {
+                    modname = block.defaults[0];
+                    var arg = block.defaults[0];
+                }
+                break;
+            case "namedcalc":
+                if (block.defaults[0] === undefined) {
+                    modname = "namedcalc";
+                    var arg = _("action");
+                } else {
+                    modname = block.defaults[0];
+                    var arg = block.defaults[0];
+                }
+                break;
+            case "namedcalcArg":
+                if (block.defaults[0] === undefined) {
+                    modname = "namedcalcArg";
+                    var arg = _("action");
+                } else {
+                    modname = block.defaults[0];
+                    var arg = block.defaults[0];
+                }
+                break;
+        }
+
+        var protoBlock = this.palettes.blocks.protoBlockDict[blkname];
+        if (protoBlock === null) {
+            console.debug("Could not find block " + blkname);
+            //continue;
+        }
+
+        var label = "";
+        // console.debug(protoBlock.name);
+        switch (protoBlock.name) {
+            case "text":
+                label = _("text");
+                break;
+            case "drumname":
+                label = _("drum");
+                break;
+            case "effectsname":
+                label = _("effect");
+                break;
+            case "solfege":
+                label = i18nSolfege("sol");
+                break;
+            case "eastindiansolfege":
+                label = "sargam";
+                break;
+            case "scaledegree2":
+                label = "scale degree";
+                break;
+            case "modename":
+                label = _("mode name");
+                break;
+            case "invertmode":
+                label = _("invert mode");
+                break;
+            case "voicename":
+                label = _("voice name");
+                break;
+            case "temperamentname":
+                //TRANS: https://en.wikipedia.org/wiki/Musical_temperament
+                label = _("temperament");
+                break;
+            case "accidentalname":
+                //TRANS: accidental refers to sharps, flats, etc.
+                label = _("accidental");
+                break;
+            case "notename":
+                label = "G";
+                break;
+            case "intervalname":
+                label = _("interval name");
+                break;
+            case "boolean":
+                label = _("true");
+                break;
+            case "number":
+                label = NUMBERBLOCKDEFAULT.toString();
+                break;
+            case "less":
+            case "greater":
+            case "equal":
+                // Label should be inside _() when defined.
+                label = protoBlock.staticLabels[0];
+                break;
+            case "namedarg":
+                label = "arg " + arg;
+                break;
+            case "outputtools":
+                label = "pitch converter";
+                break;
+            default:
+                if (blkname != modname) {
+                    // Override label for do, storein, box, and namedarg
+                    if (
+                        blkname === "storein" &&
+                        block.defaults[0] === _("box")
+                    ) {
+                        label = _("store in");
+                    } else if (blkname === "storein2") {
+                        if (block.staticLabels[0] === _("store in box")) {
+                            label = _("store in box");
+                        } else {
+                            label =
+                                _("store in") + " " + block.staticLabels[0];
+                        }
+                    } else {
+                        label = block.defaults[0];
+                    }
+                } else if (protoBlock.staticLabels.length > 0) {
+                    label = protoBlock.staticLabels[0];
+                    if (label === "") {
+                        if (blkname === "loadFile") {
+                            label = _("open file");
+                        } else {
+                            label = blkname;
+                        }
+                    }
+                } else {
+                    label = blkname;
+                }
+        }
+
+        if (
+            [
+                "do",
+                "nameddo",
+                "namedbox",
+                "namedcalc",
+                "doArg",
+                "calcArg",
+                "nameddoArg",
+                "namedcalcArg"
+            ].indexOf(protoBlock.name) != -1 &&
+            label != null
+        ) {
+            if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+                label = label.substr(0, STRINGLEN) + "...";
+            }
+        }
+
+        // Don't display the label on image blocks.
+        if (protoBlock.image) {
+            label = "";
+        }
+
+        var saveScale = protoBlock.scale;
+        protoBlock.scale = DEFAULTBLOCKSCALE;
+
+        // Finally, the SVGs!
+        switch (protoBlock.name) {
+            case "namedbox":
+            case "namedarg":
+                // so the label will fit
+                var svg = new SVG();
+                svg.init();
+                svg.setScale(protoBlock.scale);
+                svg.setExpand(60, 0, 0, 0);
+                svg.setOutie(true);
+                var artwork = svg.basicBox();
+                var docks = svg.docks;
+                var height = svg.getHeight();
+                break;
+            case "nameddo":
+                // so the label will fit
+                var svg = new SVG();
+                svg.init();
+                svg.setScale(protoBlock.scale);
+                svg.setExpand(60, 0, 0, 0);
+                var artwork = svg.basicBlock();
+                var docks = svg.docks;
+                var height = svg.getHeight();
+                break;
+            default:
+                var obj = protoBlock.generator();
+                var artwork = obj[0];
+                var docks = obj[1];
+                var height = obj[3];
+                break;
+        }
+
+        protoBlock.scale = saveScale;
+
+        if (protoBlock.disabled) {
+            artwork = artwork
+                .replace(/fill_color/g, DISABLEDFILLCOLOR)
+                .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
+                .replace("block_label", safeSVG(label));
+        } else {
+            artwork = artwork
+                .replace(
+                    /fill_color/g,
+                    PALETTEFILLCOLORS[protoBlock.palette.name]
+                )
+                .replace(
+                    /stroke_color/g,
+                    PALETTESTROKECOLORS[protoBlock.palette.name]
+                )
+                .replace("block_label", safeSVG(label));
+        }
+
+        for (var i = 0; i <= protoBlock.args; i++) {
+            artwork = artwork.replace(
+                "arg_label_" + i,
+                protoBlock.staticLabels[i] || ""
+            );
+        }
+
+        let blockInfo = {
+            blk,
+            blkname,
+            modname,
+            height: STANDARDBLOCKHEIGHT,
+            actualHeight: height,
+            label,
+            artwork,
+            artwork64:
+                "data:image/svg+xml;base64," +
+                window.btoa(unescape(encodeURIComponent(artwork))),
+            docks,
+            image: block.image,
+            scale: block.scale,
+            palettename: this.palette.name,
+            hidden: block.hidden
+        };
+
+        return blockInfo
+    }
 }
 
 // Define objects for individual palettes.

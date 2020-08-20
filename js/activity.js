@@ -595,7 +595,7 @@ function Activity() {
             sendAllToTrash(false, true);
             setTimeout(function() {
                 let message =
-		    blocks.protoBlockDict[name].helpString;
+                    blocks.protoBlockDict[name].helpString;
                 if (message.length < 4) {
                     // If there is nothing specified, just
                     // load the block.
@@ -641,7 +641,7 @@ function Activity() {
     _saveHelpBlocks = function() {
         // Save the artwork for every help block.
         let i = 0;
-	let blockHelpList = [];
+        let blockHelpList = [];
         for (let key in blocks.protoBlockDict){
             if (blocks.protoBlockDict[key].helpString !== undefined && blocks.protoBlockDict[key].helpString.length !== 0) {
                 blockHelpList.push(key);
@@ -1665,14 +1665,14 @@ function Activity() {
         turtles.setGridLabel(_("show Cartesian"));
         _hideCartesian();
         _hidePolar();
-	if (_THIS_IS_MUSIC_BLOCKS_) {
-	    _hideTreble();
-	    _hideGrand();
-	    _hideSoprano();
-	    _hideAlto();
-	    _hideTenor();
-	    _hideBass();
-	}
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            _hideTreble();
+            _hideGrand();
+            _hideSoprano();
+            _hideAlto();
+            _hideTenor();
+            _hideBass();
+        }
     };
 
     /*
@@ -1682,46 +1682,46 @@ function Activity() {
     let _doCartesianPolar = () => {
         if (cartesianBitmap.visible && polarBitmap.visible) {
             _hideCartesian();
-	    if (_THIS_IS_MUSIC_BLOCKS_) {
-		//.TRANS: show treble clef
-		turtles.setGridLabel(_("show treble"));
-	    } else {
-		//.TRANS: hide Polar coordinate overlay grid
-		turtles.setGridLabel(_("hide Polar"));
-	    }
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                //.TRANS: show treble clef
+                turtles.setGridLabel(_("show treble"));
+            } else {
+                //.TRANS: hide Polar coordinate overlay grid
+                turtles.setGridLabel(_("hide Polar"));
+            }
         } else if (!cartesianBitmap.visible && polarBitmap.visible) {
             _hidePolar();
-	    if (_THIS_IS_MUSIC_BLOCKS_) {
-		this._showTreble();
-		//.TRANS: show bass clef
-		turtles.setGridLabel(_("show bass"));
-	    } else {
-		//.TRANS: show Cartesian coordinate overlay grid
-		turtles.setGridLabel(_("show Cartesian"));
-	    }
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this._showTreble();
+                //.TRANS: show bass clef
+                turtles.setGridLabel(_("show bass"));
+            } else {
+                //.TRANS: show Cartesian coordinate overlay grid
+                turtles.setGridLabel(_("show Cartesian"));
+            }
         } else if (trebleBitmap.visible) {
             _hideTreble();
-	    this._showGrand();
+            this._showGrand();
             //.TRANS: show mezzo-soprano staff
             turtles.setGridLabel(_("show mezzo-soprano"));
         } else if (grandBitmap.visible) {
             _hideGrand();
-	        this._showSoprano();
+            this._showSoprano();
             //.TRANS: show alto clef
             turtles.setGridLabel(_("show alto"));
         } else if (sopranoBitmap.visible) {
             _hideSoprano();
-	        this._showAlto();
+            this._showAlto();
             //.TRANS: show tenor clef
             turtles.setGridLabel(_("show tenor"));
         } else if (altoBitmap.visible) {
             _hideAlto();
-	        this._showTenor();
+            this._showTenor();
             //.TRANS: show bass clef
             turtles.setGridLabel(_("show bass"));
         } else if (tenorBitmap.visible) {
             _hideTenor();
-	        this._showBass();
+            this._showBass();
             //.TRANS: hide bass clef
             turtles.setGridLabel(_("hide bass"));
         } else if (bassBitmap.visible) {
@@ -2091,12 +2091,14 @@ function Activity() {
         deprecatedBlockNames = [];
 
         for (i in blocks.protoBlockDict) {
-            blockLabel = blocks.protoBlockDict[i].staticLabels.join(' ');
+            let block = blocks.protoBlockDict[i];
+            blockLabel = block.staticLabels.join(' ');
+            let artwork = block.palette.model.makeBlockInfo(0, block, block.name, block.name)["artwork64"];
             if (blockLabel) {
-                if (blocks.protoBlockDict[i].deprecated) {
+                if (block.deprecated) {
                     deprecatedBlockNames.push(blockLabel);
                 } else {
-                    searchSuggestions.push({label : blockLabel ,value : blocks.protoBlockDict[i].name ,specialDict :blocks.protoBlockDict[i] });
+                    searchSuggestions.push({label: blockLabel, value: block.name, specialDict: block, artwork: artwork});
                 }
             }
         }
@@ -2147,7 +2149,7 @@ function Activity() {
                 (e.target === docById("search") || docById("search").contains(e.target))) {
                     //do nothing when clicked in the input field
                 }
-                else if (docById("ui-id-1").style.visibility == "visible" &&
+                else if (docById("ui-id-1").style.display == "block" &&
                 (e.target === docById("ui-id-1") || docById("ui-id-1").contains(e.target))) {
                     //do nothing when clicked on the menu
                 }
@@ -2192,6 +2194,14 @@ function Activity() {
             .autocomplete("widget")
             .addClass("scrollSearch");
 
+            $j( "#search" ).autocomplete( "instance" )._renderItem = function( ul, item ) {
+            return $j( "<li></li>" )
+                .data( "item.autocomplete", item )
+                .append( '<img src="' + item.artwork + '" height = "20px">' + 
+                         "<a>" + ' ' + item.label + "</a>" 
+                    )
+                .appendTo( ul );
+        };
         let searchInput = searchWidget.idInput_custom;
         if (!searchInput || searchInput.length <= 0) return;
 
