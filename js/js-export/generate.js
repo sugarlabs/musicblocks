@@ -46,6 +46,11 @@ class JSGenerate {
      * @returns {void}
      */
     static generateStacksTree() {
+        JSGenerate.startBlocks = [];
+        JSGenerate.actionBlocks = [];
+        JSGenerate.startTrees = [];
+        JSGenerate.actionTrees = [];
+
         blocks.findStacks();
 
         for (let blk of blocks.stackList) {
