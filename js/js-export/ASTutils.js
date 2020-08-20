@@ -169,16 +169,6 @@ function getMethodCallClampAST(methodName, args, flows) {
  * @returns {[Object]} list of Abstract Syntax Trees
  */
 function getArgsAST(args) {
-    return [
-        {
-            "type": "Literal",
-            "value": "sol"
-        }, {
-            "type": "Literal",
-            "value": 4
-        }
-    ];
-
     if (args === undefined || args === null)
         return [];
 
@@ -197,14 +187,16 @@ function getArgsAST(args) {
  * @returns {[Object]} list of Abstract Syntax Trees
  */
 function getBlockAST(flows) {
-    // return [getMethodCallClampAST("playNote")];
-
     if (flows === undefined || flows === null)
         return [];
 
     let ASTs = [];
     for (let flow of flows) {
-
+        if (flow[2] === null) {                         // no inner flow
+            ASTs.push(getMethodCallAST(...flow));
+        } else {                                        // has inner flow
+            ASTs.push(getMethodCallClampAST(...flow));
+        }
     }
 
     return ASTs;
