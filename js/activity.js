@@ -2149,7 +2149,7 @@ function Activity() {
                 (e.target === docById("search") || docById("search").contains(e.target))) {
                     //do nothing when clicked in the input field
                 }
-                else if (docById("ui-id-1").style.visibility == "visible" &&
+                else if (docById("ui-id-1").style.display == "block" &&
                 (e.target === docById("ui-id-1") || docById("ui-id-1").contains(e.target))) {
                     //do nothing when clicked on the menu
                 }
@@ -2197,8 +2197,8 @@ function Activity() {
             $j( "#search" ).autocomplete( "instance" )._renderItem = function( ul, item ) {
             return $j( "<li></li>" )
                 .data( "item.autocomplete", item )
-                .append( "<a>" + item.label + "</a>" +
-                        '<img src="' + item.artwork + '" height = "20px">' 
+                .append( '<img src="' + item.artwork + '" height = "20px">' + 
+                         "<a>" + item.label + "</a>" 
                     )
                 .appendTo( ul );
         };
