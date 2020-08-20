@@ -122,6 +122,69 @@ function getMethodCallAST(methodName, args) {
 }
 
 /**
+ * Returns the Abstract Syntax Tree for a method call in arguments.
+ *
+ * @param {String} methodName - method name
+ * @param {[*]} args - tree of arguments
+ * @returns {Object} - Abstract Syntax Tree of method call
+ */
+function getArgExpAST(methodName, args) {
+    const mathOps = {
+        "plus": ["binexp", "+"],
+        "minus": ["binexp", "-"],
+        "multiply": ["binexp", "*"],
+        "divide": ["binexp", "/"],
+        "mod": ["binexp", "%"],
+        "neg": ["unexp", "-"],
+        "abs": ["method", "Math.abs"],
+        "sqrt": ["method", "Math.sqrt"],
+        "power": ["method", "Math.pow"],
+        "int": ["method", "Math.floor"]
+    };
+
+    function getBinaryExpAST(operator, operand1, operand2) {
+        return {
+            "type": "BinaryExpression",
+            "left": getArgsAST([operand1])[0],
+            "right": getArgsAST([operand2])[0],
+            "operator": `${operator}`
+        };
+    }
+
+    function getUnaryExpAST(operator, operand) {
+        return {
+            "type": "UnaryExpression",
+            "operator": `${operator}`,
+            "argument": getArgsAST([operand])[0],
+            "prefix": true
+        };
+    }
+
+    function getCallExpAST(methodName, args) {
+        return {
+            "type": "CallExpression",
+            "callee": {
+                "type": "Identifier",
+                "name": `${methodName}`
+            },
+            "arguments": getArgsAST(args)
+        };
+    }
+
+    if (methodName in mathOps) {
+        if (mathOps[methodName][0] === "binexp") {
+            return getBinaryExpAST(mathOps[methodName][1], ...args);
+        } else if (mathOps[methodName][0] === "unexp") {
+            return getUnaryExpAST(mathOps[methodName][1], args[0]);
+        } else {
+            return getCallExpAST(mathOps[methodName][1], args);
+        }
+    } else {
+        return getCallExpAST(methodName, args);
+    }
+}
+
+/**
  * Returns the Abstract Syntax Tree for a method call with function argument.
  *
  * @param {String} methodName - method name
@@ -174,7 +237,14 @@ function getArgsAST(args) {
 
     let ASTs = [];
     for (let arg of args) {
-
+        if (typeof arg === "object") {
+            ASTs.push(getArgExpAST(arg[0], arg[1]));
+        } else {
+            ASTs.push({
+                "type": "Literal",
+                "value": arg
+            });
+        }
     }
 
     return ASTs;

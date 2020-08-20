@@ -203,23 +203,22 @@ class JSGenerate {
              * @returns {String} serialized arguments
              */
             function PrintArgs(args) {
-                if (args === null || args.length === 0) {
+                if (args === null || args.length === 0)
                     return "none";
-                } else {
-                    let str = "(";
-                    for (let arg of args) {
-                        if (arg === null) {
-                            str += "null";
-                        } else if (typeof arg === "object") {
-                            str += arg[0] + PrintArgs(arg[1]);
-                        } else {
-                            str += arg;
-                        }
-                        str += ", ";
+
+                let str = "(";
+                for (let arg of args) {
+                    if (arg === null) {
+                        str += "null";
+                    } else if (typeof arg === "object") {
+                        str += arg[0] + PrintArgs(arg[1]);
+                    } else {
+                        str += arg;
                     }
-                    str = str.substring(0, str.length - 2) + ")";
-                    return str;
+                    str += ", ";
                 }
+                str = str.substring(0, str.length - 2) + ")";
+                return str;
             }
 
             if (level === undefined)
@@ -270,7 +269,7 @@ class JSGenerate {
      * @returns {void}
      */
     static generateCode() {
-        JSGenerate.AST = bareboneAST;
+        JSGenerate.AST = JSON.parse(JSON.stringify(bareboneAST));
 
         for (let i = 0; i < JSGenerate.startTrees.length; i++) {
             JSGenerate.AST["body"].splice(i, 0, getMouseAST(JSGenerate.startTrees[i]));
