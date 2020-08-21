@@ -211,6 +211,39 @@ function getDoWhileLoopAST(args, flow) {
 }
 
 /**
+ * Returns the Abstract Syntax Tree for an increment assignment statement.
+ *
+ * @param {[*]} args - list of identifier and tree of arguments
+ * @param {*} isIncrement - whether increment statement
+ * @returns {Object} Abstract Syntax Tree of increment assignment statement
+ */
+function getIncrementStmntAST(args, isIncrement) {
+    let identifier = args[0].split("_")[1];
+    let arg = getArgsAST([args[1]])[0];
+
+    return {
+        "type": "ExpressionStatement",
+        "expression": {
+            "type": "AssignmentExpression",
+            "left": {
+                "type": "Identifier",
+                "name": identifier
+            },
+            "operator": "=",
+            "right": {
+                "type": "BinaryExpression",
+                "left": {
+                    "type": "Identifier",
+                    "name": identifier
+                },
+                "right": arg,
+                "operator": isIncrement ? "+" : "-"
+            }
+        }
+    };
+}
+
+/**
  * Returns the Abstract Syntax Tree for the bare minimum method defintion code
  *
  * @param {String} methodName - method name
@@ -512,8 +545,6 @@ function getBlockAST(flows, hiIteratorNum) {
                 "consequent": getBlockAST(flow[2])
             });
         } else if (flow[0].split("_")[0] === "storein2") {
-            console.log(flow[1]);
-            console.log(`|${getArgsAST(flow[1])[0]}|`);
             ASTs.push({
                 "type": "VariableDeclaration",
                 "kind": "let",
@@ -528,6 +559,12 @@ function getBlockAST(flows, hiIteratorNum) {
                     }
                 ]
             });
+        } else if (flow[0] === "increment") {
+            ASTs.push(getIncrementStmntAST(flow[1], true));
+        } else if (flow[0] === "incrementOne") {
+            ASTs.push(getIncrementStmntAST([flow[1][0], 1], true));
+        } else if (flow[0] === "decrementOne") {
+            ASTs.push(getIncrementStmntAST([flow[1][0], 1], false));
         } else {
             if (flow[2] === null) {                         // no inner flow
                 ASTs.push(getMethodCallAST(...flow));
