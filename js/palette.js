@@ -808,7 +808,8 @@ function Palette(palettes, name) {
             let header = this.menuContainer.children[0];
             header = header.insertRow();
             header.style.background = platformColor.selectorSelected;
-            header.innerHTML='<td style ="width: 10px ;height: 42px"></td><td></td>';
+            header.innerHTML='<td style ="width: 10px ;height: 42px"></td>';
+            header = header.children[0];
             let closeImg = makePaletteIcons(
                 CLOSEICON.replace("fill_color", platformColor.selectorSelected),
                 this.palettes.cellSize,
@@ -828,12 +829,18 @@ function Palette(palettes, name) {
             closeImg.onmouseleave = (evt) => {
                 document.body.style.cursor = "default";
             }
-            header.children[0].appendChild(labelImg);
+            header.appendChild(labelImg);
+
             let label = document.createElement("span");
             label.textContent = toTitleCase(_(this.name));
-            header.children[0].appendChild(label);
-            header.children[1].appendChild(closeImg);
-            header.children[1].appendChild(buttonContainers) ;
+            header.appendChild(label);
+
+            let closeDownImg = document.createElement("span");
+            closeDownImg.appendChild(closeImg);
+            closeDownImg.appendChild(buttonContainers) ;
+            closeDownImg.style = "float: right;";
+
+            header.appendChild(closeDownImg)
         }
 
         this._showMenuItems();
@@ -869,6 +876,8 @@ function Palette(palettes, name) {
             }
             let itemRow = paletteList.insertRow();
             let itemCell = itemRow.insertCell();
+            let right = itemRow.insertCell()
+            right.innerHTML ="&emsp;&emsp;&emsp;"
             var that = this ;
             let img = makePaletteIcons(
                 b.artwork
@@ -978,15 +987,17 @@ function Palette(palettes, name) {
             
         let mouseUpGrab = (evt) => {        
             paletteList.onmousemove= null ;
+            document.body.style.cursor = "default";
         };
         let mouseMoveGrab = (evt) => {
             let dy = evt.clientY - posY;
             paletteList.scrollTop = top - dy;
+            document.body.style.cursor = "grabbing";
         };
         let mouseDownGrab = (evt) => {
             posY = evt.clientY
             top = paletteList.scrollTop;
-            
+
             paletteList.onmousemove =  mouseMoveGrab;
             paletteList.onmouseup =  mouseUpGrab;
             paletteList.onmouseleave =  mouseUpGrab;
