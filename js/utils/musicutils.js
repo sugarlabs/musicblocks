@@ -135,7 +135,7 @@ const EQUIVALENTSHARPS = {
     "B♭": "A" + SHARP
 };
 const EQUIVALENTNATURALS = { "E♯": "F", "B♯": "C", "C♭": "B", "F♭": "E" };
-const EQUIVALENTACCIDENTALS = { "F": "E♯", "C": "B♯", "B": "C♭", "E": "F♭", "G": "F𝄪" };
+const EQUIVALENTACCIDENTALS = { "F": "E♯", "C": "B♯", "B": "C♭", "E": "F♭", "G": "F𝄪", "D": "C𝄪" };
 
 const EXTRATRANSPOSITIONS = {
     "E♯": ["F", 0],

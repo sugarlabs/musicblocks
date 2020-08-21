@@ -4790,7 +4790,11 @@ function Block(protoblock, blocks, overrideName) {
         }
         // auto selection of sharps and flats in fixed solfege
         // handles the case of opening the pie-menu, not whilst in the pie-menu
-        if ((!KeySignatureEnv[2] && this.name === "solfege") || (this.name === "notename")) {
+        if ((!KeySignatureEnv[2] && this.name === "solfege") ||
+        (this.name === "notename") &&
+        (["setkey", "setkey2"].indexOf(
+            this.blocks.blockList[this.connections[0]].name
+        ) === -1)) {
             if (scale[6 - i][0] == FIXEDSOLFEGE[note] ||
                 scale[6 - i][0] == note) {
                 accidental = scale[6 - i].substr(1);
@@ -4858,7 +4862,11 @@ function Block(protoblock, blocks, overrideName) {
             // FIXEDSOLFEGE converts solfege to alphabet, needed for solfege pie-menu
             // In case of alphabet, direct comparison is performed
 
-            if ((!KeySignatureEnv[2] && that.name == "solfege") || (that.name == "notename")) {
+            if ((!KeySignatureEnv[2] && that.name == "solfege") ||
+            (that.name == "notename") &&
+            (["setkey", "setkey2"].indexOf(
+                that.blocks.blockList[that.connections[0]].name
+            ) === -1)) {
                 let i = NOTENAMES.indexOf(FIXEDSOLFEGE[selection["note"]]);
                 if (i == -1) {
                     i = NOTENAMES.indexOf(selection["note"]);
