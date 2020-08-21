@@ -4774,9 +4774,18 @@ function Block(protoblock, blocks, overrideName) {
         prevPitch = i;
 
         this._pitchWheel.navigateWheel(i);
-        let scale = _buildScale(KeySignatureEnv[0] + " " + KeySignatureEnv[1])[0];
-        scale = scale.splice(0, scale.length - 1);
-        let rotation = {
+
+        const OFFSET = {
+            "major": 1,
+            "dorian": 2,
+            "phrygian": 3,
+            "lydian": 4,
+            "mixolydian": 5,
+            "aeolian": 6,
+            "locrian": 7
+        };
+
+        const ROTATION = {
             "A" : 2,
             "B" : 1,
             "C" : 0,
@@ -4785,9 +4794,25 @@ function Block(protoblock, blocks, overrideName) {
             "F" : 4,
             "G" : 3
         };
-        for (let j = 0; j < rotation[KeySignatureEnv[0].substr(0, 1)]; j++) {
+        const KEYS = ["C", "G", "D", "A", "E", "B", "C♭", "F♯", "G♭", "C♯", "D♭", "G♯", "A♭", "D♯", "E♭", "B♭", "F"];
+
+        let k = OFFSET[KeySignatureEnv[1]];
+        
+        let key;
+        for (let i in KEYS) {
+            let tempScale = _buildScale(KEYS[i] + " major")[0];
+            if (tempScale[k-1] == KeySignatureEnv[0]) {
+                key = KEYS[i];
+                break;
+            }
+        }
+        let scale = _buildScale(key + " major")[0];
+        scale = scale.splice(0, scale.length - 1);
+
+        for (let j = 0; j < ROTATION[key[0]]; j++) {
             scale.push(scale.shift());
         }
+
         // auto selection of sharps and flats in fixed solfege
         // handles the case of opening the pie-menu, not whilst in the pie-menu
         if ((!KeySignatureEnv[2] && this.name === "solfege") ||
