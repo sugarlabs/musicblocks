@@ -385,6 +385,12 @@ function getArgsAST(args) {
         } else if (typeof arg === "object") {
             ASTs.push(getArgExpAST(arg[0], arg[1]));
         } else {
+            if (typeof arg === "string") {
+                if (arg.split("_")[0] === "bool") {
+                    arg = arg.split("_")[1] === "true";
+                }
+            }
+
             ASTs.push({
                 "type": "Literal",
                 "value": arg
