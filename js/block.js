@@ -4817,9 +4817,9 @@ function Block(protoblock, blocks, overrideName) {
         // handles the case of opening the pie-menu, not whilst in the pie-menu
         if ((!KeySignatureEnv[2] && this.name === "solfege") ||
         (this.name === "notename") &&
-        (["setkey", "setkey2"].indexOf(
+        (this.connections[0] != undefined ? ["setkey", "setkey2"].indexOf(
             this.blocks.blockList[this.connections[0]].name
-        ) === -1)) {
+        ) === -1: true)) {
             if (scale[6 - i][0] == FIXEDSOLFEGE[note] ||
                 scale[6 - i][0] == note) {
                 accidental = scale[6 - i].substr(1);
@@ -4889,9 +4889,9 @@ function Block(protoblock, blocks, overrideName) {
 
             if ((!KeySignatureEnv[2] && that.name == "solfege") ||
             (that.name == "notename") &&
-            (["setkey", "setkey2"].indexOf(
+            (that.connections[0] != undefined ? ["setkey", "setkey2"].indexOf(
                 that.blocks.blockList[that.connections[0]].name
-            ) === -1)) {
+            ) === -1: true)) {
                 let i = NOTENAMES.indexOf(FIXEDSOLFEGE[selection["note"]]);
                 if (i == -1) {
                     i = NOTENAMES.indexOf(selection["note"]);
