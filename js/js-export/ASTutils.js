@@ -127,6 +127,9 @@ function getIfAST(args, ifFlow, elseFlow) {
  * @returns {Object} Abstract Syntax Tree of for-loop
  */
 function getForLoopAST(args, flow, iteratorNum) {
+    if (iteratorNum === undefined)
+        iteratorNum = 0;
+
     return {
         "type": "ForStatement",
         "init": {
@@ -168,6 +171,42 @@ function getForLoopAST(args, flow, iteratorNum) {
             "type": "BlockStatement",
             "body": getBlockAST(flow, iteratorNum + 1)
         }
+    };
+}
+
+/**
+ * Returns the Abstract Syntax tree for a while-loop block.
+ *
+ * @param {[*]} args - tree of arguments (for test condition)
+ * @param {[*]} flow - tree of flow statements
+ * @returns {Object} Abstract Syntax Tree of while-loop
+ */
+function getWhileLoopAST(args, flow) {
+    return {
+        "type": "WhileStatement",
+        "test": getArgsAST(args)[0],
+        "body": {
+            "type": "BlockStatement",
+            "body": getBlockAST(flow)
+        }
+    };
+}
+
+/**
+ * Returns the Abstract Syntax tree for a do-while-loop block.
+ *
+ * @param {[*]} args - tree of arguments (for test condition)
+ * @param {[*]} flow - tree of flow statements
+ * @returns {Object} Abstract Syntax Tree of do-while-loop
+ */
+function getDoWhileLoopAST(args, flow) {
+    return {
+        "type": "DoWhileStatement",
+        "body": {
+            "type": "BlockStatement",
+            "body": getBlockAST(flow)
+        },
+        "test": getArgsAST(args)[0]
     };
 }
 
@@ -408,9 +447,6 @@ function getBlockAST(flows, hiIteratorNum) {
     if (flows === undefined || flows === null)
         return [];
 
-    if (hiIteratorNum === undefined)
-        hiIteratorNum = 0;
-
     let ASTs = [];
     for (let flow of flows) {
         if (flow[0] === "if") {
@@ -419,6 +455,12 @@ function getBlockAST(flows, hiIteratorNum) {
             ASTs.push(getIfAST(flow[1], flow[2], flow[3]));
         } else if (flow[0] === "repeat") {
             ASTs.push(getForLoopAST(flow[1], flow[2], hiIteratorNum));
+        } else if (flow[0] === "while") {
+            ASTs.push(getWhileLoopAST(flow[1], flow[2]));
+        } else if (flow[0] === "forever") {
+            ASTs.push(getWhileLoopAST([true], flow[2]));
+        } else if (flow[0] === "until") {
+            ASTs.push(getDoWhileLoopAST(flow[1], flow[2]));
         } else {
             if (flow[2] === null) {                         // no inner flow
                 ASTs.push(getMethodCallAST(...flow));
