@@ -466,6 +466,36 @@ function getBlockAST(flows, hiIteratorNum) {
                 "type": "BreakStatement",
                 "label": null
             });
+        } else if (flow[0] === "switch") {
+            ASTs.push({
+                "type": "SwitchStatement",
+                "discriminant": getArgsAST(flow[1])[0],
+                "cases": getBlockAST(flow[2])
+            });
+        } else if (flow[0] === "case") {
+            let AST = {
+                "type": "SwitchCase",
+                "test": getArgsAST(flow[1])[0],
+                "consequent": [
+                    {
+                        "type": "BreakStatement",
+                        "label": null
+                    }
+                ]
+            };
+
+            let flowASTs = getBlockAST(flow[2]);
+            for (let i in flowASTs) {
+                AST["consequent"].splice(i, 0, flowASTs[i]);
+            }
+
+            ASTs.push(AST);
+        } else if (flow[0] === "defaultcase") {
+            ASTs.push({
+                "type": "SwitchCase",
+                "test": null,
+                "consequent": getBlockAST(flow[2])
+            });
         } else {
             if (flow[2] === null) {                         // no inner flow
                 ASTs.push(getMethodCallAST(...flow));
