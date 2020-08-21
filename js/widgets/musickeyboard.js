@@ -39,6 +39,7 @@ function MusicKeyboard() {
     this.keyboardShown = true;
     this.layout = [];
     this.idContainer = [];
+    this.tick = false;
 
     // Map between keyboard element ids and the note associated with the key.
     this.noteMapper = {};
@@ -159,6 +160,35 @@ function MusicKeyboard() {
         var current = [];
 
         var __startNote = function(event) {
+            if (that.tick && that.endTime != undefined) {
+                newDate = new Date();
+                newTime = newDate.getTime();
+                duration = (newTime - that.endTime) / 1000.0;
+
+                if (beginnerMode === "true") {
+                    duration = parseFloat(
+                        (Math.round(duration * 8) / 8).toFixed(3)
+                    );
+                } else {
+                    duration = parseFloat(
+                        (Math.round(duration * 16) / 16).toFixed(4)
+                    );
+                }
+
+                if (duration === 0) {
+                    duration = 0.125;
+                } else if (duration < 0) {
+                    duration = -duration;
+                }
+                that._notesPlayed.push({
+                    startTime: that.endTime,
+                    noteOctave: "R",
+                    objId: null,
+                    duration: parseFloat(duration)
+                });
+                that._createTable();
+            }
+
             if (WHITEKEYS.indexOf(event.keyCode) !== -1) {
                 var i = WHITEKEYS.indexOf(event.keyCode);
                 var id = "whiteRow" + i.toString();
@@ -194,21 +224,18 @@ function MusicKeyboard() {
                         ele.getAttribute("alt").split("__")[1];
                 }
                 prevKey = event.keyCode;
+
                 if (id == "rest") {    
                     return;
                 }
-                if (that.sustain.checked){
-                    that._logo.synth.startSound(0,that.instrumentMapper[id],temp2[id])
-                } else {
-                    that._logo.synth.trigger(
-                        0,
-                        temp2[id],
-                        1,
-                        that.instrumentMapper[id],
-                        null,
-                        null
-                    );
-                }
+                that._logo.synth.trigger(
+                    0,
+                    temp2[id],
+                    1,
+                    that.instrumentMapper[id],
+                    null,
+                    null
+                );
             }
         };
 
@@ -236,6 +263,7 @@ function MusicKeyboard() {
             newDate = new Date();
             newTime = newDate.getTime();
             duration = (newTime - startTime[id]) / 1000.0;
+            that.endTime = newTime;
 
             if (ele !== null && ele !== undefined) {
                 if (id.includes("blackRow")) {
@@ -396,7 +424,7 @@ function MusicKeyboard() {
 
     this.init = function(logo) {
         this._logo = logo;
-
+        this.tick = false;
         this.playingNow = false;
         var w = window.innerWidth;
         this._cellScale = w / 1200;
@@ -435,7 +463,7 @@ function MusicKeyboard() {
 
             selected = [];
             selectedNotes = [];
-            that.loopTick.stop();
+            if (that.loopTick) that.loopTick.stop();
             this.destroy();
         };
 
@@ -466,6 +494,7 @@ function MusicKeyboard() {
         ).onclick = function() {
             that._notesPlayed = [];
             selectedNotes = [];
+            this.endTime = undefined ;
             // if (!that.keyboardShown) {
             that._createTable();
             // }
@@ -488,12 +517,31 @@ function MusicKeyboard() {
             that.doMIDI();
         };
 
-        let el = document.createElement("div");
-        el.className = "wfbtItem" 
-        this.widgetWindow._toolbar.appendChild(el);
-        el.innerHTML = '<input type="checkbox" id="sustainCheck" name="sustainCheck"><label for="sustainCheck">SUSTAIN</label>'
-        this.sustain = el.children[0];
-
+        this.tickButton = widgetWindow.addButton(
+            "",
+            ICONSIZE,
+            _("tick")
+        )
+        this.tickButton.onclick = () => {
+            if (this.tick) {
+                this.tick = false;
+                that.loopTick.stop();
+            }
+            else {
+                this.tick = true;
+                this._logo.synth.loadSynth(0,"cow bell");
+                this.loopTick = this._logo.synth.loop(
+                    0,
+                    "cow bell",
+                    "C5",
+                    1/64,
+                    0,
+                    this.bpm || 90,
+                    0.07 
+                );
+                setTimeout(()=>{this._logo.synth.start();},500)
+            }
+        };
         // var cell = this._addButton(row1, 'table.svg', ICONSIZE, _('Table'));
 
         //that._createKeyboard();
@@ -510,17 +558,6 @@ function MusicKeyboard() {
         widgetWindow.getWidgetBody().style.width = "1000px";
 
         this._createKeyboard();
-        this._logo.synth.loadSynth(0,"cow bell");
-        this.loopTick = this._logo.synth.loop(
-            0,
-            "cow bell",
-            "C5",
-            1/64,
-            0,
-            this.bpm || 90,
-            0.07 
-        );
-        setTimeout(()=>{this._logo.synth.start();},500)
 
         //var wI = Math.max(Math.min(window.innerWidth, this._cellScale * (OUTERWINDOWWIDTH - 150)), BUTTONDIVWIDTH - BUTTONSIZE);
 
@@ -1184,7 +1221,7 @@ function MusicKeyboard() {
         }
 
         var innerDiv = docById("mkbInnerDiv");
-        innerDiv.scrollLeft += 3000; // Force to the right.
+        innerDiv.scrollLeft += 5000; // Force to the right.
         this.makeClickable();
     };
 
