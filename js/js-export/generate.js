@@ -38,8 +38,10 @@ class JSGenerate {
     static actionNames = [];
     /** Abstract Syntax Tree for the corresponding code to be generated from the stack trees */
     static AST = {};
-    /** Final output code generated from the AST of the block stack trees */
+    /** final output code generated from the AST of the block stack trees */
     static code = "";
+    /** whether code generation has failed */
+    static generateFailed = false;
 
     /**
      * Generates a tree representation of the "start" and "action" block stacks.
@@ -279,20 +281,40 @@ class JSGenerate {
      * @returns {void}
      */
     static generateCode() {
+        JSGenerate.generateFailed = false;
+
         JSGenerate.AST = JSON.parse(JSON.stringify(bareboneAST));
 
-        for (let i = 0; i < JSGenerate.actionTrees.length; i++) {
-            JSGenerate.AST["body"].splice(i, 0, getMethodAST(
-                JSGenerate.actionNames[i], JSGenerate.actionTrees[i])
-            );
+        try {
+            for (let i = 0; i < JSGenerate.actionTrees.length; i++) {
+                JSGenerate.AST["body"].splice(i, 0, getMethodAST(
+                    JSGenerate.actionNames[i], JSGenerate.actionTrees[i])
+                );
+            }
+
+            let offset = JSGenerate.actionTrees.length;
+            for (let i = 0; i < JSGenerate.startTrees.length; i++) {
+                JSGenerate.AST["body"].splice(i + offset, 0, getMouseAST(JSGenerate.startTrees[i]));
+            }
+        } catch (e) {
+            JSGenerate.generateFailed = true;
+            console.error("CANNOT GENERATE ABSTRACT SYNTAX TREE\nError:", e);
         }
 
-        let offset = JSGenerate.actionTrees.length;
-        for (let i = 0; i < JSGenerate.startTrees.length; i++) {
-            JSGenerate.AST["body"].splice(i + offset, 0, getMouseAST(JSGenerate.startTrees[i]));
+        if (!JSGenerate.generateFailed) {
+            try {
+                JSGenerate.code = astring.generate(JSGenerate.AST);
+            } catch (e) {
+                JSGenerate.generateFailed = true;
+                console.error("CANNOT GENERATE CODE\nError: INVALID ABSTRACT SYNTAX TREE");
+            }
         }
 
-        JSGenerate.code = astring.generate(JSGenerate.AST);
+        if (JSGenerate.generateFailed) {
+            let AST = JSON.parse(JSON.stringify(bareboneAST));
+            AST["body"].splice(0, 0, getMouseAST([]));
+            JSGenerate.code = astring.generate(AST);
+        }
     }
 
     static run() {

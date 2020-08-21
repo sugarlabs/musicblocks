@@ -17,6 +17,23 @@
  * The Abstract Syntax Trees are in ESTree specification.
 */
 
+/** Lookup table for block names to API method names */
+const methodNameLookup = {
+    // Rhythm blocks
+    "newnote": "playNote",
+    "rest2": "playRest",
+    "rhythmicdot2": "doRhythmicDot",
+    "tie": "doTie",
+    "multiplybeatfactor": "multiplyNoteValue",
+    "newswing2": "addSwing",
+    "mynotevalue": "getNoteValue",
+    // Pitch blocks
+    "pitch": "playPitch",
+    "steppitch": "stepPitch",
+    "nthmodalpitch": "playNthModalPitch",
+    "pitchnumber": "playPitchNumber"
+};
+
 /** Abstract Syntax Tree for the bare minimum program code */
 const bareboneAST = {
     "type": "Program",
@@ -500,6 +517,7 @@ function getMethodCallClampAST(methodName, args, flows) {
  * @param {[*]} flows - tree of flow statements
  * @param {Number} hiIteratorNum - highest iterator number in block
  * @returns {[Object]} list of Abstract Syntax Trees
+ * @throws {String} INVALID BLOCK Error
  */
 function getBlockAST(flows, hiIteratorNum) {
     if (flows === undefined || flows === null)
@@ -581,10 +599,15 @@ function getBlockAST(flows, hiIteratorNum) {
                 ASTs.push(getMethodCallAST(idName, flow[1], true));
             }
         } else {
-            if (flow[2] === null) {                         // no inner flow
-                ASTs.push(getMethodCallAST(...flow));
-            } else {                                        // has inner flow
-                ASTs.push(getMethodCallClampAST(...flow));
+            if (flow[0] in methodNameLookup) {
+                flow[0] = methodNameLookup[flow[0]];
+                if (flow[2] === null) {                         // no inner flow
+                    ASTs.push(getMethodCallAST(...flow));
+                } else {                                        // has inner flow
+                    ASTs.push(getMethodCallClampAST(...flow));
+                }
+            } else {
+                throw `CANNOT PROCESS "${flow[0]}" BLOCK`;
             }
         }
     }
