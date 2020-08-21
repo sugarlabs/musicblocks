@@ -90,6 +90,35 @@ const mouseAST = {
 };
 
 /**
+ * Returns the Abstract Syntax tree for an if/if-else block.
+ *
+ * @param {[*]} args - test arguments
+ * @param {[*]} ifFlow - flow for if condition
+ * @param {[*]} [elseFlow] - flow for else condition
+ * @returns {Object} Abstract Syntax Tree for if/if-else block
+ */
+function getIfAST(args, ifFlow, elseFlow) {
+    let AST = {
+        "type": "IfStatement",
+        "test": getArgsAST(args)[0],
+        "consequent": {
+            "type": "BlockStatement",
+            "body": getBlockAST(ifFlow)
+        },
+        "alternate": null
+    };
+
+    if (elseFlow !== undefined) {
+        AST["alternate"] = {
+            "type": "BlockStatement",
+            "body": getBlockAST(elseFlow)
+        }
+    }
+
+    return AST;
+}
+
+/**
  * Returns the Abstract Syntax Tree for the bare minimum method defintion code
  *
  * @param {String} methodName - method name
@@ -327,10 +356,16 @@ function getBlockAST(flows) {
 
     let ASTs = [];
     for (let flow of flows) {
-        if (flow[2] === null) {                         // no inner flow
-            ASTs.push(getMethodCallAST(...flow));
-        } else {                                        // has inner flow
-            ASTs.push(getMethodCallClampAST(...flow));
+        if (flow[0] === "if") {
+            ASTs.push(getIfAST(flow[1], flow[2]));
+        } else if (flow[0] === "ifthenelse") {
+            ASTs.push(getIfAST(flow[1], flow[2], flow[3]));
+        } else {
+            if (flow[2] === null) {                         // no inner flow
+                ASTs.push(getMethodCallAST(...flow));
+            } else {                                        // has inner flow
+                ASTs.push(getMethodCallClampAST(...flow));
+            }
         }
     }
 
