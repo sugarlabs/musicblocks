@@ -92,10 +92,10 @@ const mouseAST = {
 /**
  * Returns the Abstract Syntax tree for an if/if-else block.
  *
- * @param {[*]} args - test arguments
- * @param {[*]} ifFlow - flow for if condition
- * @param {[*]} [elseFlow] - flow for else condition
- * @returns {Object} Abstract Syntax Tree for if/if-else block
+ * @param {[*]} args - tree of arguments (for test argument)
+ * @param {[*]} ifFlow - tree of flow statements for if condition
+ * @param {[*]} [elseFlow] - tree of flow statements for else condition
+ * @returns {Object} Abstract Syntax Tree of if/if-else block
  */
 function getIfAST(args, ifFlow, elseFlow) {
     let AST = {
@@ -116,6 +116,59 @@ function getIfAST(args, ifFlow, elseFlow) {
     }
 
     return AST;
+}
+
+/**
+ * Returns the Abstract Syntax tree for a for-loop block.
+ *
+ * @param {[*]} args - tree of arguments (for repeat limit)
+ * @param {[*]} flow - tree of flow statements
+ * @param {Number} iteratorNum - iterator index number
+ * @returns {Object} Abstract Syntax Tree of for-loop
+ */
+function getForLoopAST(args, flow, iteratorNum) {
+    return {
+        "type": "ForStatement",
+        "init": {
+            "type": "VariableDeclaration",
+            "kind": "let",
+            "declarations": [
+                {
+                    "type": "VariableDeclarator",
+                    "id": {
+                        "type": "Identifier",
+                        "name": "i" + iteratorNum
+                    },
+                    "init": {
+                        "type": "Literal",
+                        "value": 0
+                    }
+                }
+            ]
+        },
+        "test": {
+            "type": "BinaryExpression",
+            "left": {
+                "type": "Identifier",
+                "name": "i" + iteratorNum
+            },
+            "right": getArgsAST(args)[0],
+            "operator": "<"
+        },
+        "update": {
+            "type": "UpdateExpression",
+            "argument": {
+                "type": "Identifier",
+                "name": "i" + iteratorNum
+            },
+            "operator": "++",
+            "prefix": false
+        },
+        "body": {
+            "type": "BlockStatement",
+            "body": getBlockAST(flow, iteratorNum + 1)
+        }
+    };
 }
 
 /**
@@ -348,11 +401,15 @@ function getMethodCallClampAST(methodName, args, flows) {
  * Returns list of Abstract Syntax Trees corresponding to each flow statement.
  *
  * @param {[*]} flows - tree of flow statements
+ * @param {Number} hiIteratorNum - highest iterator number in block
  * @returns {[Object]} list of Abstract Syntax Trees
  */
-function getBlockAST(flows) {
+function getBlockAST(flows, hiIteratorNum) {
     if (flows === undefined || flows === null)
         return [];
+
+    if (hiIteratorNum === undefined)
+        hiIteratorNum = 0;
 
     let ASTs = [];
     for (let flow of flows) {
@@ -360,6 +417,8 @@ function getBlockAST(flows) {
             ASTs.push(getIfAST(flow[1], flow[2]));
         } else if (flow[0] === "ifthenelse") {
             ASTs.push(getIfAST(flow[1], flow[2], flow[3]));
+        } else if (flow[0] === "repeat") {
+            ASTs.push(getForLoopAST(flow[1], flow[2], hiIteratorNum));
         } else {
             if (flow[2] === null) {                         // no inner flow
                 ASTs.push(getMethodCallAST(...flow));
