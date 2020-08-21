@@ -461,6 +461,11 @@ function getBlockAST(flows, hiIteratorNum) {
             ASTs.push(getWhileLoopAST([true], flow[2]));
         } else if (flow[0] === "until") {
             ASTs.push(getDoWhileLoopAST(flow[1], flow[2]));
+        } else if (flow[0] === "break") {
+            ASTs.push({
+                "type": "BreakStatement",
+                "label": null
+            });
         } else {
             if (flow[2] === null) {                         // no inner flow
                 ASTs.push(getMethodCallAST(...flow));
