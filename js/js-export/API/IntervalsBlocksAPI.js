@@ -32,7 +32,7 @@ class IntervalsBlocksAPI {
     }
 
     async defineMode(name, flow) {
-        await this.runCommand("setStaccato", [name, this.turIndex, MusicBlocks.BLK]);
+        await this.runCommand("defineMode", [name, this.turIndex, MusicBlocks.BLK]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }

@@ -33,7 +33,7 @@ class DrumBlocksAPI {
         return this.ENDFLOWCOMMAND;
     }
 
-    async setDrum(drum, flow) {
+    async mapPitchToDrum(drum, flow) {
         await this.runCommand("mapPitchToDrum", [drum, this.turIndex, MusicBlocks.BLK]);
         await flow();
         return this.ENDFLOWCOMMAND;

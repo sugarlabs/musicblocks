@@ -17,16 +17,47 @@
  * The Abstract Syntax Trees are in ESTree specification.
 */
 
-/** Lookup table for block names to API method names */
+/** list of clamp block names */
+const clampBlocks = [
+    // Rhythm blocks
+    "newnote",
+    "osctime",
+    "rhythmicdot2",
+    "tie",
+    "multiplybeatfactor",
+    "newswing2",
+    // Pitch blocks
+    "accidental",
+    "setscalartransposition",
+    "settransposition",
+    "invert1",
+    // Intervals blocks
+    "definemode",
+    "interval",
+    "semitoneinterval",
+    // Ornament blocks
+    "newstaccato",
+    "newslur",
+    "neighbor2",
+    // Volume blocks
+    "crescendo",
+    "decrescendo",
+    "articulation",
+    // Drum blocks
+    "setdrum",
+    "mapdrum"
+];
+
+/** lookup table for block names to API method names */
 const methodNameLookup = {
     // Rhythm blocks
     "newnote": "playNote",
+    "osctime": "playNoteMillis",
     "rest2": "playRest",
     "rhythmicdot2": "doRhythmicDot",
     "tie": "doTie",
     "multiplybeatfactor": "multiplyNoteValue",
     "newswing2": "addSwing",
-    "mynotevalue": "getNoteValue",
     // Pitch blocks
     "pitch": "playPitch",
     "steppitch": "stepPitch",
@@ -600,11 +631,12 @@ function getBlockAST(flows, hiIteratorNum) {
             }
         } else {
             if (flow[0] in methodNameLookup) {
+                let isClamp = clampBlocks.indexOf(flow[0]) !== -1;
                 flow[0] = methodNameLookup[flow[0]];
-                if (flow[2] === null) {                         // no inner flow
-                    ASTs.push(getMethodCallAST(...flow));
-                } else {                                        // has inner flow
+                if (isClamp) {                   // has inner flow
                     ASTs.push(getMethodCallClampAST(...flow));
+                } else {                                        // no inner flow
+                    ASTs.push(getMethodCallAST(...flow));
                 }
             } else {
                 throw `CANNOT PROCESS "${flow[0]}" BLOCK`;
