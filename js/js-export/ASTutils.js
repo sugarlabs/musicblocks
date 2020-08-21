@@ -214,7 +214,7 @@ function getDoWhileLoopAST(args, flow) {
  * Returns the Abstract Syntax Tree for an increment assignment statement.
  *
  * @param {[*]} args - list of identifier and tree of arguments
- * @param {*} isIncrement - whether increment statement
+ * @param {Boolean} isIncrement - whether increment statement
  * @returns {Object} Abstract Syntax Tree of increment assignment statement
  */
 function getIncrementStmntAST(args, isIncrement) {
@@ -301,10 +301,11 @@ function getMethodDefAST(methodName) {
  *
  * @param {String} methodName - method name
  * @param {[*]} args - tree of arguments
+ * @param {Boolean} isAction - whether method call is an action call
  * @returns {Object} - Abstract Syntax Tree of method call
  */
-function getMethodCallAST(methodName, args) {
-    return {
+function getMethodCallAST(methodName, args, isAction) {
+    let AST = {
         "type": "ExpressionStatement",
         "expression": {
             "type": "AwaitExpression",
@@ -326,6 +327,15 @@ function getMethodCallAST(methodName, args) {
             }
         }
     };
+
+    if (isAction) {
+        AST["expression"]["argument"]["callee"] = {
+            "type": "Identifier",
+            "name": `${methodName}`
+        };
+    }
+
+    return AST;
 }
 
 /**
@@ -544,27 +554,32 @@ function getBlockAST(flows, hiIteratorNum) {
                 "test": null,
                 "consequent": getBlockAST(flow[2])
             });
-        } else if (flow[0].split("_")[0] === "storein2") {
-            ASTs.push({
-                "type": "VariableDeclaration",
-                "kind": "let",
-                "declarations": [
-                    {
-                        "type": "VariableDeclarator",
-                        "id": {
-                            "type": "Identifier",
-                            "name": flow[0].split("_")[1]
-                        },
-                        "init": getArgsAST(flow[1])[0]
-                    }
-                ]
-            });
         } else if (flow[0] === "increment") {
             ASTs.push(getIncrementStmntAST(flow[1], true));
         } else if (flow[0] === "incrementOne") {
             ASTs.push(getIncrementStmntAST([flow[1][0], 1], true));
         } else if (flow[0] === "decrementOne") {
             ASTs.push(getIncrementStmntAST([flow[1][0], 1], false));
+        } else if (flow[0].split("_").length > 1) {
+            let [instruction, idName] = flow[0].split("_");
+            if (instruction === "storein2") {
+                ASTs.push({
+                    "type": "VariableDeclaration",
+                    "kind": "let",
+                    "declarations": [
+                        {
+                            "type": "VariableDeclarator",
+                            "id": {
+                                "type": "Identifier",
+                                "name": idName
+                            },
+                            "init": getArgsAST(flow[1])[0]
+                        }
+                    ]
+                });
+            } else if (instruction === "nameddo") {
+                ASTs.push(getMethodCallAST(idName, flow[1], true));
+            }
         } else {
             if (flow[2] === null) {                         // no inner flow
                 ASTs.push(getMethodCallAST(...flow));
