@@ -126,7 +126,7 @@ class JSGenerate {
                             }
                         } else {
                             if (arg.name === "namedbox") {
-                                args.push(arg.privateData);
+                                args.push("box_" + arg.privateData);
                             } else {
                                 args.push(arg.value);
                             }

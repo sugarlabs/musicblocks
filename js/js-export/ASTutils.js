@@ -385,16 +385,25 @@ function getArgsAST(args) {
         } else if (typeof arg === "object") {
             ASTs.push(getArgExpAST(arg[0], arg[1]));
         } else {
-            if (typeof arg === "string") {
-                if (arg.split("_")[0] === "bool") {
-                    arg = arg.split("_")[1] === "true";
+            if (typeof arg === "string" && arg.split("_").length > 1) {
+                let [type, argVal] = arg.split("_");
+                if (type === "bool") {
+                    ASTs.push({
+                        "type": "Literal",
+                        "value": argVal === "true"
+                    });
+                } else if (type === "box") {
+                    ASTs.push({
+                        "type": "Identifier",
+                        "name": argVal
+                    });
                 }
+            } else {
+                ASTs.push({
+                    "type": "Literal",
+                    "value": arg
+                });
             }
-
-            ASTs.push({
-                "type": "Literal",
-                "value": arg
-            });
         }
     }
 
@@ -501,6 +510,23 @@ function getBlockAST(flows, hiIteratorNum) {
                 "type": "SwitchCase",
                 "test": null,
                 "consequent": getBlockAST(flow[2])
+            });
+        } else if (flow[0].split("_")[0] === "storein2") {
+            console.log(flow[1]);
+            console.log(`|${getArgsAST(flow[1])[0]}|`);
+            ASTs.push({
+                "type": "VariableDeclaration",
+                "kind": "let",
+                "declarations": [
+                    {
+                        "type": "VariableDeclarator",
+                        "id": {
+                            "type": "Identifier",
+                            "name": flow[0].split("_")[1]
+                        },
+                        "init": getArgsAST(flow[1])[0]
+                    }
+                ]
             });
         } else {
             if (flow[2] === null) {                         // no inner flow
