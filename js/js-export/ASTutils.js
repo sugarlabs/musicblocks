@@ -90,6 +90,59 @@ const mouseAST = {
 };
 
 /**
+ * Returns the Abstract Syntax Tree for the bare minimum method defintion code
+ *
+ * @param {String} methodName - method name
+ * @returns {Object} Abstract Syntax Tree for method definition
+ */
+function getMethodDefAST(methodName) {
+    return {
+        "type": "VariableDeclaration",
+        "kind": "let",
+        "declarations": [
+            {
+                "type": "VariableDeclarator",
+                "id": {
+                    "type": "Identifier",
+                    "name": `${methodName}`
+                },
+                "init": {
+                    "type": "ArrowFunctionExpression",
+                    "params": [
+                        {
+                            "type": "Identifier",
+                            "name": "mouse"
+                        }
+                    ],
+                    "body": {
+                        "type": "BlockStatement",
+                        "body": [
+                            {
+                                "type": "ReturnStatement",
+                                "argument": {
+                                    "type": "MemberExpression",
+                                    "object": {
+                                        "type": "Identifier",
+                                        "name": "mouse"
+                                    },
+                                    "computed": false,
+                                    "property": {
+                                        "type": "Identifier",
+                                        "name": "ENDFLOW"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "async": true,
+                    "expression": false
+                }
+            }
+        ]
+    };
+}
+
+/**
  * Returns the Abstract Syntax Tree for a method call without function argument.
  *
  * @param {String} methodName - method name
@@ -135,6 +188,13 @@ function getArgExpAST(methodName, args) {
         "multiply": ["binexp", "*"],
         "divide": ["binexp", "/"],
         "mod": ["binexp", "%"],
+        "equal": ["binexp", "=="],
+        "less": ["binexp", "<"],
+        "greater": ["binexp", ">"],
+        "or": ["binexp", "|"],
+        "and": ["binexp", "&"],
+        "xor": ["binexp", "^"],
+        "not": ["unexp", "!"],
         "neg": ["unexp", "-"],
         "abs": ["method", "Math.abs"],
         "sqrt": ["method", "Math.sqrt"],
@@ -185,6 +245,36 @@ function getArgExpAST(methodName, args) {
 }
 
 /**
+ * Returns list of Abstract Syntax Trees corresponding to each argument of args.
+ *
+ * @param {[*]} args - tree of arguments
+ * @returns {[Object]} list of Abstract Syntax Trees
+ */
+function getArgsAST(args) {
+    if (args === undefined || args === null)
+        return [];
+
+    let ASTs = [];
+    for (let arg of args) {
+        if (arg === null) {
+            ASTs.push({
+                "type": "Literal",
+                "value": null
+            });
+        } else if (typeof arg === "object") {
+            ASTs.push(getArgExpAST(arg[0], arg[1]));
+        } else {
+            ASTs.push({
+                "type": "Literal",
+                "value": arg
+            });
+        }
+    }
+
+    return ASTs;
+}
+
+/**
  * Returns the Abstract Syntax Tree for a method call with function argument.
  *
  * @param {String} methodName - method name
@@ -226,31 +316,6 @@ function getMethodCallClampAST(methodName, args, flows) {
 }
 
 /**
- * Returns list of Abstract Syntax Trees corresponding to each argument of args.
- *
- * @param {[*]} args - tree of arguments
- * @returns {[Object]} list of Abstract Syntax Trees
- */
-function getArgsAST(args) {
-    if (args === undefined || args === null)
-        return [];
-
-    let ASTs = [];
-    for (let arg of args) {
-        if (typeof arg === "object") {
-            ASTs.push(getArgExpAST(arg[0], arg[1]));
-        } else {
-            ASTs.push({
-                "type": "Literal",
-                "value": arg
-            });
-        }
-    }
-
-    return ASTs;
-}
-
-/**
  * Returns list of Abstract Syntax Trees corresponding to each flow statement.
  *
  * @param {[*]} flows - tree of flow statements
@@ -270,6 +335,24 @@ function getBlockAST(flows) {
     }
 
     return ASTs;
+}
+
+/**
+ * Returns the complete Abstract Syntax Tree specific to the mouse corresponding to the tree.
+ *
+ * @param {String} methodName - method name
+ * @param {[*]} tree - stacks tree for the mouse
+ * @returns {Object} mouse Abstract Syntax Tree for the tree
+ */
+function getMethodAST(methodName, tree) {
+    let AST = getMethodDefAST(methodName);
+
+    let ASTs = getBlockAST(tree);
+    for (let i in ASTs) {
+        AST["declarations"][0]["init"]["body"]["body"].splice(i, 0, ASTs[i]);
+    }
+
+    return AST;
 }
 
 /**

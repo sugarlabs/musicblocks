@@ -34,6 +34,8 @@ class JSGenerate {
     static startTrees = [];
     /** list of all the generated trees of action blocks */
     static actionTrees = [];
+    /** list of all the action names corresponding to the generated trees of action blocks */
+    static actionNames = [];
     /** Abstract Syntax Tree for the corresponding code to be generated from the stack trees */
     static AST = {};
     /** Final output code generated from the AST of the block stack trees */
@@ -50,6 +52,7 @@ class JSGenerate {
         JSGenerate.actionBlocks = [];
         JSGenerate.startTrees = [];
         JSGenerate.actionTrees = [];
+        JSGenerate.actionNames = [];
 
         blocks.findStacks();
 
@@ -175,11 +178,18 @@ class JSGenerate {
             return tree;
         }
 
-        for (let blk of JSGenerate.startBlocks)
+        for (let blk of JSGenerate.startBlocks) {
             JSGenerate.startTrees.push(GenerateStackTree(blocks.blockList[blk], []));
+        }
 
-        for (let blk of JSGenerate.actionBlocks)
+        for (let blk of JSGenerate.actionBlocks) {
+            let actionName = blocks.blockList[blocks.blockList[blk].connections[1]].value;
+            if (actionName === null || actionName === undefined)
+                continue;
+
+            JSGenerate.actionNames.push(actionName);
             JSGenerate.actionTrees.push(GenerateStackTree(blocks.blockList[blk], []));
+        }
     }
 
     /**
@@ -271,8 +281,15 @@ class JSGenerate {
     static generateCode() {
         JSGenerate.AST = JSON.parse(JSON.stringify(bareboneAST));
 
+        for (let i = 0; i < JSGenerate.actionTrees.length; i++) {
+            JSGenerate.AST["body"].splice(i, 0, getMethodAST(
+                JSGenerate.actionNames[i], JSGenerate.actionTrees[i])
+            );
+        }
+
+        let offset = JSGenerate.actionTrees.length;
         for (let i = 0; i < JSGenerate.startTrees.length; i++) {
-            JSGenerate.AST["body"].splice(i, 0, getMouseAST(JSGenerate.startTrees[i]));
+            JSGenerate.AST["body"].splice(i + offset, 0, getMouseAST(JSGenerate.startTrees[i]));
         }
 
         JSGenerate.code = astring.generate(JSGenerate.AST);
