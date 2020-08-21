@@ -258,8 +258,11 @@ class JSGenerate {
             console.log("%cno start trees generated", "color: tomato");
         } else {
             for (let tree of JSGenerate.startTrees) {
+                console.log(
+                    "\n   " + "%c START ", "background: navy; color: white; font-weight: bold"
+                );
                 PrintTree(tree);
-                console.log("%c _______________________________________", "color: silver");
+                console.log("\n");
             }
         }
 
@@ -267,8 +270,11 @@ class JSGenerate {
             console.log("%cno action trees generated", "color: tomato");
         } else {
             for (let tree of JSGenerate.actionTrees) {
+                console.log(
+                    "\n   " + "%c ACTION ", "background: green; color: white; font-weight: bold"
+                );
                 PrintTree(tree);
-                console.log("%c _______________________________________", "color: silver");
+                console.log("\n");
             }
         }
     }
@@ -317,10 +323,39 @@ class JSGenerate {
         }
     }
 
-    static run() {
+    /**
+     * Runs the code generator
+     * * Runs the blocks stacks tree generator
+     * * Generates Abstract Syntax Trees from the blocks stacks trees
+     * * Serializes the Abstract Syntax Tree into JavaScript code
+     *
+     * @static
+     * @param {Boolean} printStacksTree - whether to print the stacks tree in the browser console
+     * @param {Boolean} printCode - whether to print the generated code in the browser console
+     * @returns {void}
+     */
+    static run(printStacksTree, printCode) {
         JSGenerate.generateStacksTree();
-        // JSGenerate.printStacksTree();
+        if (printStacksTree) {
+            console.log(
+                "\n   " + "%c STACK TREES ",
+                "background: greenyellow; color: midnightblue; font-weight: bold"
+            );
+            JSGenerate.printStacksTree();
+        }
+
         JSGenerate.generateCode();
-        console.log(JSGenerate.code);
+
+        if (printStacksTree & printCode) {
+            console.log("%c _______________________________________", "color: darkorange");
+        }
+
+        if (printCode) {
+            console.log(
+                "\n   " + "%c CODE ",
+                "background: greenyellow; color: midnightblue; font-weight: bold"
+            );
+            console.log(JSGenerate.code);
+        }
     }
 }

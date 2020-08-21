@@ -186,7 +186,8 @@ class JSEditor {
         this._jar = new CodeJar(codebox, highlight);
 
         // this._code = JS_STARTER;
-        this._code = SAMPLE_2;
+        // this._code = SAMPLE_2;
+        this.generateCode();
 
         codebox.className = "editor language-js";
         this._jar.updateCode(this._code);
@@ -222,6 +223,10 @@ class JSEditor {
 
     generateCode() {
         console.debug("Generate JavaScript");
+
+        JSGenerate.run(true);
+        this._code = JSGenerate.code;
+        this._jar.updateCode(this._code);
     }
 
     toggleHelp() {
