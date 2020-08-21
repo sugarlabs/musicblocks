@@ -160,9 +160,11 @@ function MusicKeyboard() {
         var current = [];
 
         var __startNote = function(event) {
+            if (id in startDate == false) {
+                startDate[id] = new Date();
+                startTime[id] = startDate[id].getTime();
+            }
             if (that.tick && that.endTime != undefined) {
-                newDate = new Date();
-                newTime = newDate.getTime();
                 duration = (newTime - that.endTime) / 1000.0;
 
                 if (beginnerMode === "true") {
@@ -187,6 +189,7 @@ function MusicKeyboard() {
                     duration: parseFloat(duration)
                 });
                 that._createTable();
+                that.endTime = newTime;
             }
 
             if (WHITEKEYS.indexOf(event.keyCode) !== -1) {
@@ -263,7 +266,6 @@ function MusicKeyboard() {
             newDate = new Date();
             newTime = newDate.getTime();
             duration = (newTime - startTime[id]) / 1000.0;
-            that.endTime = newTime;
 
             if (ele !== null && ele !== undefined) {
                 if (id.includes("blackRow")) {
@@ -312,6 +314,7 @@ function MusicKeyboard() {
                 }
                 that._createTable();
 
+                that.endTime = newTime;
                 delete startDate[id];
                 delete startTime[id];
                 delete temp1[id];
