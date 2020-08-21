@@ -1472,9 +1472,17 @@ input.timbreName {
     height: 28px;
     filter: invert(100%);
   }
-  ::-webkit-scrollbar {
-    display: none;
+
+  #PaletteBody_items::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; /* Chrome/Safari/Webkit */
   }
+
+  #PaletteBody_items {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE 10+ */
+  }
+
   .disable_highlighting {
     user-select: none;
-    }
+  }

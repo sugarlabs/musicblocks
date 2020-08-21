@@ -1224,7 +1224,7 @@ function MusicKeyboard() {
         }
 
         var innerDiv = docById("mkbInnerDiv");
-        innerDiv.scrollLeft += 5000; // Force to the right.
+        innerDiv.scrollLeft = objDiv.scrollWidth;// Force to the right.\
         this.makeClickable();
     };
 
