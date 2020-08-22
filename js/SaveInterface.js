@@ -480,37 +480,18 @@ function SaveInterface(PlanetInterface) {
 
     this.init = function() {
         this.timeLastSaved = -100;
-        window.onbeforeunload = function(e) {
+        let $j = jQuery.noConflict();
+        $j(window).bind("beforeunload",(event) => {
+            var saveButton = beginnerMode ? "#saveButton" : "#saveButtonAdvanced";
             if (
                 this.PlanetInterface !== undefined &&
                 this.PlanetInterface.getTimeLastSaved() !== this.timeLastSaved
             ) {
-                // The following section of code is a bit of a hack. In order to detect the user selecting
-                // "Cancel", we attempt to perform an action that would otherwise be blocked. That is, if the
-                // user does not cancel the navigation, the HTTP request will fail, and the prompt never shown.
-                setTimeout(
-                    function() {
-                        var xhr = new XMLHttpRequest();
-                        xhr.open("GET", document.location.href, true);
-                        xhr.onreadystatechange = function() {
-                            if (xhr.readyState === xhr.DONE) {
-                                if (
-                                    confirm(
-                                        _("Do you want to save your project?")
-                                    )
-                                ) {
-                                    this.saveHTMLNoPrompt();
-                                    this.timeLastSaved = this.PlanetInterface.getTimeLastSaved();
-                                }
-                            }
-                        }.bind(this);
-                        xhr.send();
-                    }.bind(this)
-                );
-
-                e.preventDefault();
-                e.returnValue = "";
+                event.preventDefault();
+                event.returnValue = "";
+                $j(saveButton).trigger("mouseenter") //will trigger when exit/reload cancelled.
+                return "";
             }
-        }.bind(this);
+        });
     };
 }
