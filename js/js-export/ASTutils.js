@@ -381,6 +381,12 @@ function getMethodCallAST(methodName, args, isAction) {
             "type": "Identifier",
             "name": `${methodName}`
         };
+        AST["expression"]["argument"]["arguments"] = [
+            {
+              "type": "Identifier",
+              "name": "mouse"
+            }
+        ];
     }
 
     return AST;
