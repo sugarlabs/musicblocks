@@ -371,7 +371,7 @@ function setupWidgetBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
-                logo.meterWidget.init(logo, logo._meterBlock);
+                logo.meterWidget.init(logo, logo._meterBlock ,blk);
                 logo.insideMeterWidget = false;
             };
 
