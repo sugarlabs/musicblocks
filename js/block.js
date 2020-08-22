@@ -4781,7 +4781,7 @@ function Block(protoblock, blocks, overrideName) {
             "phrygian": 3,
             "lydian": 4,
             "mixolydian": 5,
-            "aeolian": 6,
+            "minor": 6,
             "locrian": 7
         };
 
@@ -4794,15 +4794,22 @@ function Block(protoblock, blocks, overrideName) {
             "F" : 4,
             "G" : 3
         };
-        const KEYS = ["C", "G", "D", "A", "E", "B", "C♭", "F♯", "G♭", "C♯", "D♭", "G♯", "A♭", "D♯", "E♭", "B♭", "F"];
 
         let k = OFFSET[KeySignatureEnv[1]];
         
         let key;
-        for (let i in KEYS) {
-            let tempScale = _buildScale(KEYS[i] + " major")[0];
-            if (tempScale[k-1] == KeySignatureEnv[0]) {
-                key = KEYS[i];
+        let attrList = ["", SHARP, FLAT];
+        for (let j in attrList) {
+            for (let i in NOTENAMES) {
+                let tempScale = _buildScale(NOTENAMES[i] + attrList[j] + " major")[0];
+                console.log(tempScale);
+                if (tempScale[k-1] == KeySignatureEnv[0]) {
+                    key = NOTENAMES[i] + attrList[j];
+                    console.log(key);
+                    break;
+                }
+            }
+            if (key != undefined) {
                 break;
             }
         }
