@@ -56,13 +56,10 @@ function MeterWidget() {
             _("Play")
         ).onclick = function() {
             if (that._get_click_lock()) {
-                console.debug("click lock");
                 return;
             } else {
-                console.debug("CLICK PLAY/PAUSE");
                 that._click_lock = true;
                 if (that.__getPlayingStatus()) {
-                    console.debug("PAUSING");
                     this.innerHTML =
                         '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
                         _("Play all") +
@@ -75,7 +72,6 @@ function MeterWidget() {
                         '" vertical-align="middle">&nbsp;&nbsp;';
                     that._playing = false;
                 } else {
-                    console.debug("PLAYING");
                     this.innerHTML =
                         '&nbsp;&nbsp;<img src="header-icons/stop-button.svg" title="' +
                         _("Stop") +
@@ -140,22 +136,23 @@ function MeterWidget() {
 
         let divInput2 = document.createElement("div");
         divInput2.className = ("wfbtItem");
-        divInput2.innerHTML='<input style="float: left;" value="' + 1/this._beatValue + '" type="number" id="beatValue" min="1" max="35">'
+        divInput2.innerHTML='<input style="float: left;" value="' + 1 / this._beatValue + '" type="number" id="beatValue" min="1" max="35">'
 
         widgetWindow._toolbar.appendChild(divInput);
         widgetWindow._toolbar.appendChild(divInput2);
 
         widgetWindow.addButton(
-            "",
+            "reload.svg",
             ICONSIZE,
-            _("ReInit")
+            //TRANS.: Reset the widget layout
+            _("Reset")
         ).onclick = () => {
             //change Values of blocks in stack.
             let el = divInput.children[0];
             let el2 = divInput2.children[0];
 
-            divInput.children[0].value = Math.min(el.max,Math.max(el.min,el.value))
-            divInput2.children[0].value = Math.min(el2.max,Math.max(el2.min,el2.value))
+            divInput.children[0].value = Math.min(el.max, Math.max(el.min, el.value))
+            divInput2.children[0].value = Math.min(el2.max, Math.max(el2.min, el2.value))
 
             let bnBlk = this._logo.blocks.blockList[c1]; // number of beats
             let bvBlk = this._logo.blocks.blockList[c3]; // beat value
@@ -165,11 +162,11 @@ function MeterWidget() {
 
             bnBlk.value = bnValue;
             bnBlk.text.text = bnValue;
-            bnBlk.container.setChildIndex(bnBlk.text,  bnBlk.container.children.length - 1);
+            bnBlk.container.setChildIndex(bnBlk.text, bnBlk.container.children.length - 1);
 
             bvBlk.value = bvValue;
             bvBlk.text.text = bvValue;
-            bvBlk.container.setChildIndex(bvBlk.text,  bvBlk.container.children.length - 1);
+            bvBlk.container.setChildIndex(bvBlk.text, bvBlk.container.children.length - 1);
 
             logo.runLogoCommands(widgetBlock);
         }
@@ -200,7 +197,6 @@ function MeterWidget() {
 
     this.__playOneBeat = function(i, ms) {
         if (this.__getPauseStatus()) {
-            console.debug("PAUSING");
             for (let i = 0; i < this._strongBeats.length; i++) {
                 this._playWheel.navItems[i].navItem.hide();
             }
@@ -228,8 +224,9 @@ function MeterWidget() {
     };
 
     this._playBeat = function() {
+        let tur = this._logo.turtles.ithTurtle(0);
         let bpmFactor =
-            TONEBPM / this._logo.bpm[0].length > 0 ? last(this._logo.bpm[0]) : Singer.masterBPM;
+            TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
         for (let i = 0; i < this._strongBeats.length; i++) {
             this._playWheel.navItems[i].navItem.hide();
