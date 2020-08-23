@@ -62,4 +62,8 @@ class MeterBlocksAPI {
         await flow();
         return this.ENDFLOWCOMMAND;
     }
+
+    getNotesPlayed(noteValue) {
+        return this.runCommand("getNotesPlayed", [noteValue, this.turIndex]);
+    }
 }
