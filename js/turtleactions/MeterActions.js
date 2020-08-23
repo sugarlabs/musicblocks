@@ -369,5 +369,10 @@ function setupMeterActions() {
         static getBeatFactor(turtle) {
             return logo.turtles.ithTurtle(turtle).singer.beatFactor;
         }
+
+        static getCurrentMeter(turtle) {
+            let tur = logo.turtles.ithTurtle(turtle);
+            return tur.singer.beatsPerMeasure + ":" + tur.singer.noteValuePerBeat;
+        }
     }
 }

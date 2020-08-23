@@ -19,9 +19,7 @@ function setupMeterBlocks() {
             ) {
                 logo.statusFields.push([blk, "currentmeter"]);
             } else {
-                let tur = logo.turtles.ithTurtle(turtle);
-
-                return tur.singer.beatsPerMeasure + ":" + tur.singer.noteValuePerBeat;
+                return Singer.MeterActions.getCurrentMeter(turtle);
             }
         }
     }
