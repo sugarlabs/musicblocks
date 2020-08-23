@@ -293,5 +293,21 @@ function setupMeterActions() {
 
             logo.turtles.ithTurtle(turtle).singer.beatList.push("offbeat");
         }
+
+        static setNoClock(turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.drift++;
+
+            let listenerName = "_drift_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                if (tur.singer.drift > 0)
+                    tur.singer.drift--;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+        }
     }
 }

@@ -56,4 +56,10 @@ class MeterBlocksAPI {
     onWeakBeatDo(action) {
         this.runCommand("onWeakBeatDo", [action, null, null, this.turIndex, MusicBlocks.BLK]);
     }
+
+    async setNoClock(flow) {
+        await this.runCommand("setNoClock", [this.turIndex, MusicBlocks.BLK]);
+        await flow();
+        return this.ENDFLOWCOMMAND;
+    }
 }

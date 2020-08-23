@@ -413,20 +413,7 @@ function setupMeterBlocks() {
             if (args[0] === undefined)
                 return;
 
-            let tur = logo.turtles.ithTurtle(turtle);
-
-            tur.singer.drift++;
-
-            let listenerName = "_drift_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            let __listener = event => {
-                if (tur.singer.drift > 0) {
-                    tur.singer.drift--;
-                }
-            };
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            Singer.MeterActions.setNoClock(turtle, blk);
 
             return [args[0], 1];
         }
