@@ -330,7 +330,33 @@ class MusicBlocks {
         return Singer.RhythmActions.getNoteValue(this.turIndex);
     }
 
-    // ============================== RHYTHM ==================================
+    // ============================== METER ===================================
+
+    get WHOLENOTESPLAYED() {
+        return Singer.MeterActions.getWholeNotesPlayed(this.turIndex);
+    }
+
+    get BEATCOUNT() {
+        return Singer.MeterActions.getBeatCount(this.turIndex);
+    }
+
+    get MEASURECOUNT() {
+        return Singer.MeterActions.getMeasureCount(this.turIndex);
+    }
+
+    get BPM() {
+        return Singer.MeterActions.getBPM(this.turIndex);
+    }
+
+    get BEATFACTOR() {
+        return Singer.MeterActions.getBeatFactor(this.turIndex);
+    }
+
+    get CURRENTMETER() {
+        return Singer.MeterActions.getCurrentMeter(this.turIndex);
+    }
+
+    // ============================ INTERVALS =================================
 
     get CURRENTKEY() {
         return Singer.IntervalsActions.getCurrentKey(this.turIndex);
