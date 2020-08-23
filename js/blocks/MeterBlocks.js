@@ -94,18 +94,13 @@ function setupMeterBlocks() {
         }
 
         arg(logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
-
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "bpm"]);
-            } else if (tur.singer.bpm.length > 0) {
-                return last(tur.singer.bpm);
             } else {
-                return Singer.masterBPM;
+                return Singer.MeterActions.getBPM(turtle);
             }
         }
     }

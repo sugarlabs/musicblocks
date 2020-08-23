@@ -355,5 +355,15 @@ function setupMeterActions() {
                 ) + 1
             );
         }
+
+        static getBPM(turtle) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            if (tur.singer.bpm.length > 0) {
+                return last(tur.singer.bpm);
+            } else {
+                return Singer.masterBPM;
+            }
+        }
     }
 }
