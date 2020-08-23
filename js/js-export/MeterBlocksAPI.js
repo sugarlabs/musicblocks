@@ -38,4 +38,8 @@ class MeterBlocksAPI {
     setMasterBPM(bpm, beatValue) {
         this.runCommand("setMasterBPM", [bpm, beatValue, MusicBlocks.BLK]);
     }
+
+    onEveryNoteDo(action) {
+        this.runCommand("onEveryNoteDo", [action, null, null, this.turIndex, MusicBlocks.BLK]);
+    }
 }

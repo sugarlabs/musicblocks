@@ -675,32 +675,7 @@ function setupMeterBlocks() {
             if (!(args[0] in logo.actions)) {
                 logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
             } else {
-                let tur = logo.turtles.ithTurtle(turtle);
-
-                let __listener = event => {
-                    if (tur.running) {
-                        let queueBlock = new Queue(logo.actions[args[0]], 1, blk);
-                        tur.parentFlowQueue.push(blk);
-                        tur.queue.push(queueBlock);
-                    } else {
-                        // Since the turtle has stopped running, we need to run the stack from here
-                        if (isflow) {
-                            logo.runFromBlockNow(
-                                logo, turtle, logo.actions[args[0]], isflow, receivedArg
-                            );
-                        } else {
-                            logo.runFromBlock(
-                                logo, turtle, logo.actions[args[0]], isflow, receivedArg
-                            );
-                        }
-                    }
-                };
-
-                let turtleID = tur.id;
-                let eventName = "__everybeat_" + turtleID + "__";
-                logo.setTurtleListener(turtle, eventName, __listener);
-
-                tur.singer.beatList.push("everybeat");
+                Singer.MeterActions.onEveryNoteDo(args[0], isflow, receivedArg, turtle, blk);
             }
         }
     }
