@@ -223,8 +223,10 @@ function Activity() {
             "activity/js-export/GraphicsBlocksAPI",
             "activity/js-export/PenBlocksAPI",
             "activity/js-export/RhythmBlocksAPI",
+            "activity/js-export/MeterBlocksAPI",
             "activity/js-export/PitchBlocksAPI",
             "activity/js-export/IntervalsBlocksAPI",
+            "activity/js-export/ToneBlocksAPI",
             "activity/js-export/OrnamentBlocksAPI",
             "activity/js-export/VolumeBlocksAPI",
             "activity/js-export/DrumBlocksAPI",
@@ -246,6 +248,7 @@ function Activity() {
             "activity/abc",
             "activity/mxml",
             "activity/turtleactions/RhythmActions",
+            "activity/turtleactions/MeterActions",
             "activity/turtleactions/PitchActions",
             "activity/turtleactions/IntervalsActions",
             "activity/turtleactions/ToneActions",
@@ -2197,8 +2200,8 @@ function Activity() {
             $j( "#search" ).autocomplete( "instance" )._renderItem = function( ul, item ) {
             return $j( "<li></li>" )
                 .data( "item.autocomplete", item )
-                .append( '<img src="' + item.artwork + '" height = "20px">' + 
-                         "<a>" + ' ' + item.label + "</a>" 
+                .append( '<img src="' + item.artwork + '" height = "20px">' +
+                         "<a>" + ' ' + item.label + "</a>"
                     )
                 .appendTo( ul );
         };
