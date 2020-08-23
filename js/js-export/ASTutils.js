@@ -26,6 +26,8 @@ const clampBlocks = [
     "tie",
     "multiplybeatfactor",
     "newswing2",
+    // Meter blocks
+    "drift",
     // Pitch blocks
     "accidental",
     "setscalartransposition",
@@ -35,6 +37,14 @@ const clampBlocks = [
     "definemode",
     "interval",
     "semitoneinterval",
+    // Tone blocks
+    "settimbre",
+    "vibrato",
+    "chorus",
+    "phaser",
+    "tremolo",
+    "dis",
+    "harmonic2",
     // Ornament blocks
     "newstaccato",
     "newslur",
