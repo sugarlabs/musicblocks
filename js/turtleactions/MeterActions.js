@@ -365,5 +365,9 @@ function setupMeterActions() {
                 return Singer.masterBPM;
             }
         }
+
+        static getBeatFactor(turtle) {
+            return logo.turtles.ithTurtle(turtle).singer.beatFactor;
+        }
     }
 }

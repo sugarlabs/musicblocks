@@ -51,7 +51,7 @@ function setupMeterBlocks() {
             ) {
                 logo.statusFields.push([blk, "beatfactor"]);
             } else {
-                return logo.turtles.ithTurtle(turtle).singer.beatFactor;
+                return Singer.MeterActions.getBeatFactor(turtle);
             }
         }
     }
