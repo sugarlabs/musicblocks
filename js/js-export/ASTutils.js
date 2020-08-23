@@ -124,7 +124,37 @@ const methodNameLookup = {
     "playdrum": "playDrum",
     "setdrum": "setDrum",
     "mapdrum": "mapPitchToDrum",
-    "playnoise": "playNoise"
+    "playnoise": "playNoise",
+    // Number blocks
+    "random": "MathUtility.doRandom",
+    "oneOf": "MathUtility.doOneOf",
+    "distance": "MathUtility.doCalculateDistance",
+    // Graphics blocks
+    "forward": "doForward",
+    "back": "doForward",
+    "right": "doRight",
+    "left": "doRight",
+    "setxy": "doSetXY",
+    "setheading": "doSetHeading",
+    "arc": "doArc",
+    "bezier": "doBezier",
+    "controlpoint1": "setControlPoint1",
+    "controlpoint2": "setControlPoint2",
+    "clear": "doClear",
+    "scrollxy": "doScrollXY",
+    // Pen blocks
+    "setcolor": "doSetColor",
+    "setgrey": "doSetChroma",
+    "setshade": "doSetValue",
+    "sethue": "doSetHue",
+    "settranslucency": "doSetPenAlpha",
+    "setpensize": "doSetPensize",
+    "penup": "doPenUp",
+    "pendown": "doPenDown",
+    // "": "doStartFill",
+    // "": "doStartHollowLine",
+    // "": "fillBackground",
+    "setfont": "doSetFont"
 };
 
 /** Abstract Syntax Tree for the bare minimum program code */
