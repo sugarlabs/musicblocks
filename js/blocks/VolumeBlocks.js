@@ -63,7 +63,7 @@ function setupVolumeBlocks() {
             let len = Singer.masterVolume.length;
             Singer.masterVolume[len - 1] = value;
             if (!logo.turtles.ithTurtle(turtle).singer.suppressOutput) {
-                Singer.setMasterVolume(logo, value);
+                Singer.VolumeActions.setMasterVolume(logo, value);
             }
         }
 

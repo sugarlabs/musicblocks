@@ -68,11 +68,63 @@ const methodNameLookup = {
     "tie": "doTie",
     "multiplybeatfactor": "multiplyNoteValue",
     "newswing2": "addSwing",
+    // Meter blocks
+    "meter": "setMeter",
+    "pickup": "setPickup",
+    "setbpm3": "setBPM",
+    "setmasterbpm2": "setMasterBPM",
+    "everybeatdo": "onEveryNoteDo",
+    "everybeatdonew": "onEveryBeatDo",
+    "onbeatdo": "onStrongBeatDo",
+    "offbeatdo": "onWeakBeatDo",
+    "drift": "setNoClock",
+    "elapsednotes2": "getNotesPlayed",
     // Pitch blocks
     "pitch": "playPitch",
     "steppitch": "stepPitch",
     "nthmodalpitch": "playNthModalPitch",
-    "pitchnumber": "playPitchNumber"
+    "pitchnumber": "playPitchNumber",
+    "hertz": "playHertz",
+    "accidental": "setAccidental",
+    "setscalartransposition": "setScalarTranspose",
+    "settransposition": "setSemitoneTranspose",
+    "register": "setRegister",
+    "invert1": "invert",
+    "setpitchnumberoffset": "setPitchNumberOffset",
+    "deltapitch": "deltaPitch",
+    "deltapitch2": "deltaPitch",
+    // Intervals blocks
+    "setkey2": "setKey",
+    "movable": "setMoveableDo",
+    "definemode": "defineMode",
+    "interval": "setScalarInterval",
+    "semitoneinterval": "setSemitoneInterval",
+    "settemperament": "setTemperament",
+    // Tone blocks
+    "settimbre": "setTimbre",
+    "vibrato": "doVibrato",
+    "chorus": "doChorus",
+    "phaser": "doPhaser",
+    "tremolo": "doTremolo",
+    "dis": "doDistortion",
+    "harmonic2": "doHarmonic",
+    // Ornament blocks
+    "newstaccato": "setStaccato",
+    "newslur": "setSlur",
+    "neighbor2": "doNeighbor",
+    // Volume blocks
+    // "crescendo": "",
+    // "decrescendo": "",
+    "articulation": "setRelativeVolume",
+    "setnotevolume": "setMasterVolume",
+    "setpanning": "setPanning",
+    "setsynthvolume": "setSynthVolume",
+    "synthvolumefactor": "getSynthVolume",
+    // Drum blocks
+    "playdrum": "playDrum",
+    "setdrum": "setDrum",
+    "mapdrum": "mapPitchToDrum",
+    "playnoise": "playNoise"
 };
 
 /** Abstract Syntax Tree for the bare minimum program code */
