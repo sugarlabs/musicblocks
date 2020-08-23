@@ -309,5 +309,13 @@ function setupMeterActions() {
 
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
+
+        static getNotesPlayed(noteValue, turtle) {
+            if (noteValue === null || noteValue === 0)
+                return 0;
+
+            let tur = logo.turtles.ithTurtle(turtle);
+            return tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] / noteValue;
+        }
     }
 }

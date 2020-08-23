@@ -365,25 +365,13 @@ function setupMeterBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "elapsednotes2"]);
             } else {
                 let cblk = logo.blocks.blockList[blk].connections[1];
-                let notevalue = logo.parseArg(
-                    logo,
-                    turtle,
-                    cblk,
-                    blk,
-                    receivedArg
-                );
-                if (notevalue === null || notevalue === 0) {
-                    return 0;
-                } else {
-                    let tur = logo.turtles.ithTurtle(turtle);
-                    return tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] / notevalue;
-                }
+                let noteValue = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                return Singer.MeterActions.getNotesPlayed(noteValue, turtle);
             }
         }
     }
