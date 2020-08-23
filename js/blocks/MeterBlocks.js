@@ -203,20 +203,7 @@ function setupMeterBlocks() {
             ) {
                 logo.statusFields.push([blk, "beatvalue"]);
             } else {
-                let tur = logo.turtles.ithTurtle(turtle);
-
-                if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < tur.singer.pickup) {
-                    return 0;
-                } else {
-                    return (
-                        (
-                            (
-                                tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] -
-                                tur.singer.pickup
-                            ) * tur.singer.noteValuePerBeat
-                        ) % tur.singer.beatsPerMeasure
-                    ) + 1;
-                }
+                return Singer.MeterActions.getBeatCount(turtle);
             }
         }
     }

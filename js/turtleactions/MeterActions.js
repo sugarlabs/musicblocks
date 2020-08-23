@@ -322,5 +322,20 @@ function setupMeterActions() {
             let tur = logo.turtles.ithTurtle(turtle);
             return tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1];
         }
+
+        static getBeatCount(turtle) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < tur.singer.pickup)
+                return 0;
+
+            return (
+                (
+                    (
+                        tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] - tur.singer.pickup
+                    ) * tur.singer.noteValuePerBeat
+                ) % tur.singer.beatsPerMeasure
+            ) + 1;
+        }
     }
 }
