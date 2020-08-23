@@ -225,6 +225,7 @@ function Activity() {
             "activity/js-export/RhythmBlocksAPI",
             "activity/js-export/PitchBlocksAPI",
             "activity/js-export/IntervalsBlocksAPI",
+            "activity/js-export/ToneBlocksAPI",
             "activity/js-export/OrnamentBlocksAPI",
             "activity/js-export/VolumeBlocksAPI",
             "activity/js-export/DrumBlocksAPI",
@@ -2197,8 +2198,8 @@ function Activity() {
             $j( "#search" ).autocomplete( "instance" )._renderItem = function( ul, item ) {
             return $j( "<li></li>" )
                 .data( "item.autocomplete", item )
-                .append( '<img src="' + item.artwork + '" height = "20px">' + 
-                         "<a>" + ' ' + item.label + "</a>" 
+                .append( '<img src="' + item.artwork + '" height = "20px">' +
+                         "<a>" + ' ' + item.label + "</a>"
                     )
                 .appendTo( ul );
         };

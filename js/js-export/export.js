@@ -106,6 +106,7 @@ class MusicBlocks {
             "RhythmBlocksAPI",
             "PitchBlocksAPI",
             "IntervalsBlocksAPI",
+            "ToneBlocksAPI",
             "OrnamentBlocksAPI",
             "VolumeBlocksAPI",
             "DrumBlocksAPI",
