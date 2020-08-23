@@ -220,5 +220,50 @@ function setupMeterActions() {
             }
             tur.interval = setInterval(() => logo.stage.dispatchEvent(eventName), duration * 1000);
         }
+
+        static onStrongBeatDo(beat, action, isflow, receivedArg, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            // Set up a listener for this turtle/onbeat combo.
+            let __listener = event => {
+                if (tur.running) {
+                    let queueBlock = new Queue(logo.actions[action], 1, blk);
+                    tur.parentFlowQueue.push(blk);
+                    tur.queue.push(queueBlock);
+                } else {
+                    // Since the turtle has stopped running, we need to run the stack from here
+                    if (isflow) {
+                        logo.runFromBlockNow(
+                            logo, turtle, logo.actions[action], isflow, receivedArg
+                        );
+                    } else {
+                        logo.runFromBlock(
+                            logo, turtle, logo.actions[action], isflow, receivedArg
+                        );
+                    }
+                }
+            };
+
+            let turtleID = tur.id;
+            let eventName = "__beat_" + beat + "_" + turtleID + "__";
+            logo.setTurtleListener(turtle, eventName, __listener);
+
+            //remove any default strong beats other than "everybeat " or  "offbeat"
+            if (tur.singer.defaultStrongBeats) {
+                for (let i = 0; i < tur.singer.beatList.length; i++) {
+                    if (tur.singer.beatList[i] !== "everybeat" && tur.singer.beatList[i] !== "offbeat") {
+                        tur.singer.beatList.splice(i, 1);
+                        i--;
+                    }
+                }
+                tur.singer.defaultStrongBeats = false;
+            }
+
+            if (beat > tur.singer.beatsPerMeasure) {
+                tur.singer.factorList.push(beat);
+            } else {
+                tur.singer.beatList.push(beat);
+            }
+        }
     }
 }

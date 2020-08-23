@@ -509,52 +509,13 @@ function setupMeterBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
-            // Set up a listener for this turtle/onbeat combo.
             if (args.length === 2) {
                 if (!(args[1] in logo.actions)) {
                     logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
                 } else {
-                    let tur = logo.turtles.ithTurtle(turtle);
-
-                    let __listener = event => {
-                        if (tur.running) {
-                            let queueBlock = new Queue(logo.actions[args[1]], 1, blk);
-                            tur.parentFlowQueue.push(blk);
-                            tur.queue.push(queueBlock);
-                        } else {
-                            // Since the turtle has stopped running, we need to run the stack from here
-                            if (isflow) {
-                                logo.runFromBlockNow(
-                                    logo, turtle, logo.actions[args[1]], isflow, receivedArg
-                                );
-                            } else {
-                                logo.runFromBlock(
-                                    logo, turtle, logo.actions[args[1]], isflow, receivedArg
-                                );
-                            }
-                        }
-                    };
-
-                    let turtleID = tur.id;
-                    let eventName = "__beat_" + args[0] + "_" + turtleID + "__";
-                    logo.setTurtleListener(turtle, eventName, __listener);
-
-                    //remove any default strong beats other than "everybeat " or  "offbeat"
-                    if (tur.singer.defaultStrongBeats) {
-                        for (let i = 0; i < tur.singer.beatList.length; i++) {
-                            if (tur.singer.beatList[i] !== "everybeat" && tur.singer.beatList[i] !== "offbeat") {
-                                tur.singer.beatList.splice(i, 1);
-                                i--;
-                            }
-                        }
-                        tur.singer.defaultStrongBeats = false;
-                    }
-
-                    if (args[0] > tur.singer.beatsPerMeasure) {
-                        tur.singer.factorList.push(args[0]);
-                    } else {
-                        tur.singer.beatList.push(args[0]);
-                    }
+                    Singer.MeterActions.onStrongBeatDo(
+                        args[0], args[1], isflow, receivedArg, turtle, blk
+                    );
                 }
             }
         }
