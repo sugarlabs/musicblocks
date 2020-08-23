@@ -255,7 +255,44 @@ function setupDrumBlocks() {
                 arg = DEFAULTDRUM;
             }
 
-            Singer.DrumActions.playDrum(args[0], turtle, blk);
+            let drumname = Singer.DrumActions.GetDrumname(args[0]);
+
+            let tur = logo.turtles.ithTurtle(turtle);
+            // If we are in a setdrum clamp, override the drum name
+            if (tur.singer.drumStyle.length > 0) {
+                drumname = last(tur.singer.drumStyle);
+            }
+
+            if (logo.inPitchDrumMatrix) {
+                logo.pitchDrumMatrix.drums.push(drumname);
+                logo.pitchDrumMatrix.addColBlock(blk);
+                if (logo.drumBlocks.indexOf(blk) === -1) {
+                    logo.drumBlocks.push(blk);
+                }
+            } else if (logo.inMatrix) {
+                logo.pitchTimeMatrix.rowLabels.push(drumname);
+                logo.pitchTimeMatrix.rowArgs.push(-1);
+
+                logo.pitchTimeMatrix.addRowBlock(blk);
+                if (logo.drumBlocks.indexOf(blk) === -1) {
+                    logo.drumBlocks.push(blk);
+                }
+            } else if (
+                tur.singer.inNoteBlock.length > 0 ||
+                blocks.blockList[blk].connections[0] == null &&
+                    last(blocks.blockList[blk].connections) == null
+            ) {
+                Singer.DrumActions.playDrum(args[0], turtle, blk);
+            } else {
+                console.debug('PLAY DRUM ERROR: missing context');
+                return;
+            }
+
+            if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(tur.singer.beatFactor);
+            }
+
+            tur.singer.pushedNote = true;
         }
     }
 
