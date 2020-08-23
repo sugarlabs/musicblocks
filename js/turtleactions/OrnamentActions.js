@@ -37,8 +37,13 @@ function setupOrnamentActions() {
             tur.singer.staccato.push(1 / value);
 
             let listenerName = "_staccato_" + turtle;
-            if (blk !== undefined && blk in logo.blocks.blockList)
+            if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => tur.singer.staccato.pop();
 
@@ -63,8 +68,13 @@ function setupOrnamentActions() {
             }
 
             let listenerName = "_staccato_" + turtle;
-            if (blk !== undefined && blk in logo.blocks.blockList)
+            if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => {
                 tur.singer.staccato.pop();
@@ -93,8 +103,13 @@ function setupOrnamentActions() {
             tur.singer.neighborNoteValue.push(noteValue);
 
             let listenerName = "_neighbor_" + turtle + "_" + blk;
-            if (blk !== undefined && blk in logo.blocks.blockList)
+            if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => {
                 tur.singer.inNeighbor.pop();

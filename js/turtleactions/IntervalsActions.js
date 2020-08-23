@@ -152,8 +152,13 @@ function setupIntervalsActions() {
             }
 
             let listenerName = "_definemode_" + turtle;
-            if (blk !== undefined && blk in blocks.blockList)
+            if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => {
                 MUSICALMODES[modeName] = [];
@@ -219,8 +224,13 @@ function setupIntervalsActions() {
             tur.singer.intervals.push(i);
 
             let listenerName = "_interval_" + turtle;
-            if (blk !== undefined && blk in blocks.blockList)
+            if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => tur.singer.intervals.pop();
 
@@ -252,8 +262,13 @@ function setupIntervalsActions() {
                 tur.singer.noteDirection = 0;
 
                 let listenerName = "_semitone_interval_" + turtle;
-                if (blk !== undefined && blk in blocks.blockList)
+                if (blk !== undefined && blk in blocks.blockList) {
                     logo.setDispatchBlock(blk, turtle, listenerName);
+                } else if (MusicBlocks.isRun) {
+                    let mouse = Mouse.getMouseFromTurtle(tur);
+                    if (mouse !== null)
+                        mouse.MB.listeners.push(listenerName);
+                }
 
                 let __listener = () => tur.singer.semitoneIntervals.pop();
 
