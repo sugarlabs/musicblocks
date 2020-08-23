@@ -590,59 +590,10 @@ function setupMeterBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
-            // Set up a listener for every beat for this turtle.
-            let orgTurtle = turtle;
-            console.debug("used from: ", orgTurtle)
-            if (!turtles.turtleList[orgTurtle].companionTurtle){
-                turtle = logo.turtles.turtleList.length;
-                turtles.turtleList[orgTurtle].companionTurtle = turtle ;
-                logo.turtles.addTurtle(logo.blocks.blockList[blk], []);
-                console.debug("beat Turtle: ", turtle);
-            }
-            turtle = turtles.turtleList[orgTurtle].companionTurtle;
-
             if (!(args[0] in logo.actions)) {
                 logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
             } else {
-                let tur = logo.turtles.ithTurtle(turtle);
-
-                let __listener = event => {
-                    if (tur.running) {
-                        let queueBlock = new Queue(logo.actions[args[0]], 1, blk);
-                        tur.parentFlowQueue.push(blk);
-                        tur.queue.push(queueBlock);
-                    } else {
-                        // Since the turtle has stopped running, we need to run the stack from here
-                        if (isflow) {
-                            logo.runFromBlockNow(
-                                logo, turtle, logo.actions[args[0]], isflow, receivedArg
-                            );
-                        } else {
-                            logo.runFromBlock(
-                                logo, turtle, logo.actions[args[0]], isflow, receivedArg
-                            );
-                        }
-                    }
-                };
-
-                let eventName = "__everybeat_" + turtle + "__";
-                tur.queue = [];
-                tur.parentFlowQueue = [];
-                tur.unhighlightQueue = [];
-                tur.parameterQueue = [];
-                logo.initTurtle(turtle);
-                logo.setTurtleListener(turtle, eventName, __listener);
-
-                let turOrg = logo.turtles.ithTurtle(orgTurtle);
-                let duration =
-                    60 / (turOrg.singer.bpm.length > 0 ? last(turOrg.singer.bpm) : Singer.masterBPM);
-                if (tur.interval !== undefined) {
-                    clearInterval(tur.interval);
-                }
-                tur.interval = setInterval(
-                    () => logo.stage.dispatchEvent(eventName), duration * 1000
-                );
-                // console.debug("set listener: ", eventName);
+                Singer.MeterActions.onEveryBeatDo(args[0], isflow, receivedArg, turtle, blk);
             }
         }
     }

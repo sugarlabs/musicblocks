@@ -161,9 +161,7 @@ function setupMeterActions() {
                             logo, turtle, logo.actions[action], isflow, receivedArg
                         );
                     } else {
-                        logo.runFromBlock(
-                            logo, turtle, logo.actions[action], isflow, receivedArg
-                        );
+                        logo.runFromBlock(logo, turtle, logo.actions[action], isflow, receivedArg);
                     }
                 }
             };
@@ -173,6 +171,54 @@ function setupMeterActions() {
             logo.setTurtleListener(turtle, eventName, __listener);
 
             tur.singer.beatList.push("everybeat");
+        }
+
+        static onEveryBeatDo(action, isflow, receivedArg, turtle, blk) {
+            // Set up a listener for every beat for this turtle.
+            let orgTurtle = turtle;
+            console.debug("used from: ", orgTurtle)
+            if (!turtles.turtleList[orgTurtle].companionTurtle){
+                turtle = logo.turtles.turtleList.length;
+                turtles.turtleList[orgTurtle].companionTurtle = turtle ;
+                logo.turtles.addTurtle(logo.blocks.blockList[blk], []);
+                console.debug("beat Turtle: ", turtle);
+            }
+            turtle = turtles.turtleList[orgTurtle].companionTurtle;
+
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            let __listener = event => {
+                if (tur.running) {
+                    let queueBlock = new Queue(logo.actions[action], 1, blk);
+                    tur.parentFlowQueue.push(blk);
+                    tur.queue.push(queueBlock);
+                } else {
+                    // Since the turtle has stopped running, we need to run the stack from here
+                    if (isflow) {
+                        logo.runFromBlockNow(
+                            logo, turtle, logo.actions[action], isflow, receivedArg
+                        );
+                    } else {
+                        logo.runFromBlock(logo, turtle, logo.actions[action], isflow, receivedArg);
+                    }
+                }
+            };
+
+            let eventName = "__everybeat_" + turtle + "__";
+            tur.queue = [];
+            tur.parentFlowQueue = [];
+            tur.unhighlightQueue = [];
+            tur.parameterQueue = [];
+            logo.initTurtle(turtle);
+            logo.setTurtleListener(turtle, eventName, __listener);
+
+            let turOrg = logo.turtles.ithTurtle(orgTurtle);
+            let duration =
+                60 / turOrg.singer.bpm.length > 0 ? last(turOrg.singer.bpm) : Singer.masterBPM;
+            if (tur.interval !== undefined) {
+                clearInterval(tur.interval);
+            }
+            tur.interval = setInterval(() => logo.stage.dispatchEvent(eventName), duration * 1000);
         }
     }
 }

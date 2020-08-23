@@ -42,4 +42,8 @@ class MeterBlocksAPI {
     onEveryNoteDo(action) {
         this.runCommand("onEveryNoteDo", [action, null, null, this.turIndex, MusicBlocks.BLK]);
     }
+
+    onEveryBeatDo(action) {
+        this.runCommand("onEveryBeatDo", [action, null, null, this.turIndex, MusicBlocks.BLK]);
+    }
 }
