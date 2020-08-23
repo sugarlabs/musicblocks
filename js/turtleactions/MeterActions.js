@@ -265,5 +265,33 @@ function setupMeterActions() {
                 tur.singer.beatList.push(beat);
             }
         }
+
+        static onWeakBeatDo(action, isflow, receivedArg, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            // Set up a listener for this turtle/offbeat combo
+            let __listener = event => {
+                if (tur.running) {
+                    let queueBlock = new Queue(logo.actions[action], 1, blk);
+                    tur.parentFlowQueue.push(blk);
+                    tur.queue.push(queueBlock);
+                } else {
+                    // Since the turtle has stopped running, we need to run the stack from here
+                    if (isflow) {
+                        logo.runFromBlockNow(
+                            logo, turtle, logo.actions[action], isflow, receivedArg
+                        );
+                    } else {
+                        logo.runFromBlock(logo, turtle, logo.actions[action], isflow, receivedArg);
+                    }
+                }
+            };
+
+            let turtleID = tur.id;
+            let eventName = "__offbeat_" + turtleID + "__";
+            logo.setTurtleListener(turtle, eventName, __listener);
+
+            logo.turtles.ithTurtle(turtle).singer.beatList.push("offbeat");
+        }
     }
 }

@@ -49,7 +49,11 @@ class MeterBlocksAPI {
 
     onStrongBeatDo(beat, action) {
         this.runCommand(
-            "onEveryBeatDo", [beat, action, null, null, this.turIndex, MusicBlocks.BLK]
+            "onStrongBeatDo", [beat, action, null, null, this.turIndex, MusicBlocks.BLK]
         );
+    }
+
+    onWeakBeatDo(action) {
+        this.runCommand("onWeakBeatDo", [action, null, null, this.turIndex, MusicBlocks.BLK]);
     }
 }
