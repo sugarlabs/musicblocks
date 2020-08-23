@@ -323,8 +323,7 @@ function setupMeterBlocks() {
             ) {
                 logo.statusFields.push([blk, "elapsednotes"]);
             } else {
-                let tur = logo.turtles.ithTurtle(turtle);
-                return tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1];
+                return Singer.MeterActions.getWholeNotesPlayed(turtle);
             }
         }
     }

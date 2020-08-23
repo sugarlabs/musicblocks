@@ -317,5 +317,10 @@ function setupMeterActions() {
             let tur = logo.turtles.ithTurtle(turtle);
             return tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] / noteValue;
         }
+
+        static getWholeNotesPlayed(turtle) {
+            let tur = logo.turtles.ithTurtle(turtle);
+            return tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1];
+        }
     }
 }
