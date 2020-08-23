@@ -23,5 +23,49 @@
  * @classdesc methods are imported by a importMethod function call from MusicBlocks class.
  */
 class ToneBlocksAPI {
+    async setInstrument(instrument, flow) {
+        await this.runCommand("setTimbre", [instrument, this.turIndex, MusicBlocks.BLK]);
+        await flow();
+        return this.ENDFLOWCOMMAND;
+    }
 
+    async doVibrato(intensity, rate, flow) {
+        await this.runCommand("doVibrato", [intensity, rate, this.turIndex, MusicBlocks.BLK]);
+        await flow();
+        return this.ENDFLOWCOMMAND;
+    }
+
+    async doChorus(chorusRate, delayTime, chorusDepth, flow) {
+        await this.runCommand(
+            "doChorus", [chorusRate, delayTime, chorusDepth, this.turIndex, MusicBlocks.BLK]
+        );
+        await flow();
+        return this.ENDFLOWCOMMAND;
+    }
+
+    async doPhaser(rate, octaves, baseFrequency, flow) {
+        await this.runCommand(
+            "doPhaser", [rate, octaves, baseFrequency, this.turIndex, MusicBlocks.BLK]
+        );
+        await flow();
+        return this.ENDFLOWCOMMAND;
+    }
+
+    async doTremolo(frequency, depth, flow) {
+        await this.runCommand("doTremolo", [frequency, depth, this.turIndex, MusicBlocks.BLK]);
+        await flow();
+        return this.ENDFLOWCOMMAND;
+    }
+
+    async doDistortion(distortion, flow) {
+        await this.runCommand("doDistortion", [distortion, this.turIndex, MusicBlocks.BLK]);
+        await flow();
+        return this.ENDFLOWCOMMAND;
+    }
+
+    async doHarmonic(harmonic, flow) {
+        await this.runCommand("doHarmonic", [harmonic, this.turIndex, MusicBlocks.BLK]);
+        await flow();
+        return this.ENDFLOWCOMMAND;
+    }
 }
