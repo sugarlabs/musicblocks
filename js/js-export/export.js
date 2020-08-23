@@ -144,7 +144,7 @@ class MusicBlocks {
                 // "Painter.GraphicsActions",
                 // "Painter.PenActions",
                 "Singer.RhythmActions",
-                // "Singer.MeterActions",
+                "Singer.MeterActions",
                 "Singer.PitchActions",
                 "Singer.IntervalsActions",
                 "Singer.ToneActions",
