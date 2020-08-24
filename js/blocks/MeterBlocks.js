@@ -1113,6 +1113,7 @@ function setupMeterBlocks() {
             } else arg0 = args[0];
 
             if (logo.insideMeterWidget) logo._meterBlock = blk;
+            if (logo.inMusicKeyboard) logo.musicKeyboard.meterArgs = args;
 
             if (args[1] === null || typeof args[1] !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
