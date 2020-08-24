@@ -162,6 +162,7 @@ class Logo {
         this.notationOutput = "";
         this.notationNotes = {};
         this.runningLilypond = false;
+        this.collectingStats = false;
         this.runningAbc = false;
         this.runningMxml = false;
         this._checkingCompletionState = false;
@@ -1798,8 +1799,14 @@ class Logo {
                     tur.singer.justCounting.length === 0
                 ) {
                     if (logo.runningLilypond) {
-                        console.debug("saving lilypond output:");
-                        save.afterSaveLilypond();
+                        if (logo.collectingStats){
+                            console.debug("stats collection completed")
+                            getStatsFromNotation(logo);
+                        } else {
+                            console.debug("saving lilypond output:");
+                            save.afterSaveLilypond();
+                        }
+                        logo.collectingStats = false;
                         logo.runningLilypond = false;
                     } else if (logo.runningAbc) {
                         console.debug("saving abc output:");

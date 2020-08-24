@@ -183,6 +183,7 @@ function Activity() {
         "p5.dom.min",
         // 'mespeak',
         "Chart",
+        "activity/rubrics",
         "utils/utils",
         "activity/artwork",
         "widgets/status",
@@ -205,7 +206,6 @@ function Activity() {
         "activity/languagebox",
         "activity/basicblocks",
         "activity/blockfactory",
-        "activity/rubrics",
         "activity/macros",
         "activity/SaveInterface",
         "utils/musicutils",
@@ -1496,7 +1496,6 @@ function Activity() {
      */
     this.closeAnalytics = function(chartBitmap, ctx) {
         blocks.activeBlock = null;
-        let button = this;
         button.x = canvas.width / (2 * turtleBlocksScale) + 300 / Math.sqrt(2);
         button.y = 200.0;
         this.closeButton = _makeButton(
@@ -1507,13 +1506,13 @@ function Activity() {
             55,
             0
         );
-        this.closeButton.on("click", function(event) {
-            button.closeButton.visible = false;
+        this.closeButton.onclick = (event) => {
+            this.closeButton.style.visibility = "hidden";
             stage.removeChild(chartBitmap);
             blocks.showBlocks();
             update = true;
             ctx.clearRect(0, 0, 600, 600);
-        });
+        };
     };
 
     /*
@@ -1549,6 +1548,7 @@ function Activity() {
 
         let myRadarChart = null;
         let scores = analyzeProject(blocks);
+        let projectStats = runAnalytics(logo)
         let data = scoreToChartData(scores);
         let Analytics = this;
         Analytics.close = th.closeAnalytics;
