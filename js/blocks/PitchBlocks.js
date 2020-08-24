@@ -1719,7 +1719,7 @@ function setupPitchBlocks() {
                 cname = logo.blocks.blockList[c].name;
             }
 
-            if (cname === "scaledegree2") {
+            if (cname === "scaledegree2" || !isNaN(Number(arg0[0])) || !isNaN(Number(arg0[1]))) {
                 let scaledegree = logo.blocks.blockList[c].value;
                 let attr;
 
@@ -1736,24 +1736,32 @@ function setupPitchBlocks() {
                 }
 
                 scaledegree = Number(scaledegree.replace(attr, ""));
-                note = scaleDegreeToPitchMapping(
-                    tur.singer.keySignature, scaledegree, tur.singer.moveable, null
-                );
                 if (attr != NATURAL) {
                     note += attr;
                 }
 
                 let obj = keySignatureToMode(tur.singer.keySignature);
                 
-                let isNegativeArg = scaledegree < 0 ? true : false;
-                
+                let isNegativeArg = (scaledegree <= 0) ? true : false;
+                let sd;
+                if (isNegativeArg) {
+                    let multiplier = Math.floor(Math.abs(scaledegree) / 7);
+                    sd = scaledegree + ((multiplier + 1) * 7);
+                } else {
+                    sd = Math.floor(scaledegree) % 7;
+                    if (sd == 0) sd = 7;
+                }
+                scaledegree = Math.abs(scaledegree);
+
                 let ref = NOTESTEP[obj[0].substr(0, 1)] - 1;
                 if (obj[0].substr(1) === FLAT) {
                     ref--;
                 } else if (obj[0].substr(1) === SHARP) {
                     ref++;
                 }
-
+                note = scaleDegreeToPitchMapping(
+                    tur.singer.keySignature, sd, tur.singer.moveable, null
+                );
                 let semitones = ref;
                 
                 semitones +=
@@ -1761,7 +1769,7 @@ function setupPitchBlocks() {
                     NOTESFLAT.indexOf(note) - ref : NOTESSHARP.indexOf(note) - ref;
                 
                 /** calculates changes in reference octave which occur a semitone before the reference key */
-                let deltaOctave = Math.floor((scaledegree - 1) / 7);
+                let deltaOctave = isNegativeArg ? Math.floor((scaledegree + 1) / 7) : Math.floor((scaledegree - 1) / 7);
                 
                 /** calculates changes in octave when crossing B */
                 let deltaSemi = isNegativeArg ?
