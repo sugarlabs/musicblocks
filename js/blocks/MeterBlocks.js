@@ -639,7 +639,6 @@ function setupMeterBlocks() {
                 if (tur.interval !== undefined) {
                     clearInterval(tur.interval);
                 }
-                logo.stage.dispatchEvent(eventName);
                 tur.interval = setInterval(
                     () => logo.stage.dispatchEvent(eventName), duration * 1000
                 );
