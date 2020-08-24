@@ -1999,9 +1999,6 @@ function _buildScale(keySignature) {
     if(myKeySignature == "C" + FLAT) {
         obj = keySignatureToMode("B " + obj[1])
         myKeySignature = obj[0]
-    }else if(myKeySignature == "B" + SHARP) {
-        obj = keySignatureToMode("C " + obj[1])
-        myKeySignature = obj[0]
     }
     if (obj[1] === "CUSTOM") {
         var halfSteps = customMode;
