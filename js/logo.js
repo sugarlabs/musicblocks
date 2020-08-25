@@ -1802,7 +1802,7 @@ class Logo {
                         if (logo.collectingStats){
                             console.debug("stats collection completed")
                             logo.projectStats = getStatsFromNotation(logo);
-                            logo.statsWindow.jsonObject.innerHTML = JSON.stringify(projectStats); 
+                            logo.statsWindow.jsonObject.innerHTML = JSON.stringify(projectStats,undefined,4); 
                         } else {
                             console.debug("saving lilypond output:");
                             save.afterSaveLilypond();

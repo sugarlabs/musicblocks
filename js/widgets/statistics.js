@@ -70,6 +70,7 @@ function StatsWindow() {
             imageData = myRadarChart.toBase64Image();
             img = new Image();
             img.src = imageData;
+            img.width =  200;
             this.widgetWindow.getWidgetBody().appendChild(img)
             blocks.hideBlocks();
             logo.showBlocksAfterRun = false;
@@ -78,7 +79,8 @@ function StatsWindow() {
         options = getChartOptions(__callback);
         myRadarChart = new Chart(ctx).Radar(data, options);
         
-        this.jsonObject = document.createElement('p');
+        this.jsonObject = document.createElement('pre');
+        this.jsonObject.style.float = 'left';
         this.widgetWindow.getWidgetBody().appendChild(this.jsonObject)
 
     };

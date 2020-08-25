@@ -743,6 +743,9 @@ let getStatsFromNotation = (logo) => {
         end : []
     };
     projectStats["pitches"] = [];
+    projectStats["numberOfNotes"] = 0;
+
+    let noteId = 0;
 
     for (tur in notation.notationStaging){
         for (it in notation.notationStaging[tur]) {
@@ -751,9 +754,18 @@ let getStatsFromNotation = (logo) => {
             if (typeof item == "object" && item[0].length){
                 for (note of item[0]) {
                     projectStats["pitchNames"].add(note[0]);
+                    let freq = logo.synth._getFrequency(note);
                     projectStats["pitches"].push(
-                        logo.synth._getFrequency(note)
+                        freq
                     );
+                    if (projectStats["lowestNote"] == undefined || freq < projectStats["lowestNote"][2]) {
+                        projectStats["lowestNote"] = [note,noteId,freq];
+                    }
+                    if (projectStats["highestNote"] == undefined || freq > projectStats["highestNote"][2]) {
+                        projectStats["highestNote"] = [note,noteId,freq];
+                    }
+                    projectStats["numberOfNotes"]++;
+                    noteId++;
                 }
             }
             
