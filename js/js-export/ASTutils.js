@@ -58,9 +58,44 @@ const clampBlocks = [
     "mapdrum"
 ];
 
+/** lookup table for block names to setter names */
+const setterNameLookup = {
+        // Meter blocks
+    "pickup": "PICKUP",
+        // Intervals blocks
+    "movable": "MOVEABLE",
+        // Volume blocks
+    "setnotevolume": "MASTERVOLUME",
+    "setpanning": "PANNING",
+};
+
+/** lookup table for block names to getter names */
+const getterNameLookup = {
+        // Rhythm blocks
+    "mynotevalue": "NOTEVALUE",
+        // Meter blocks
+    "elapsednotes": "WHOLENOTESPLAYED",
+    "beatvalue": "BEATCOUNT",
+    "measurevalue": "MEASURECOUNT",
+    "bpmfactor": "BPM",
+    "beatfactor": "BEATFACTOR",
+    "currentmeter": "CURRENTMETER",
+        // Pitch blocks
+    "deltapitch2": "SCALARCHANGEINPITCH",
+    "deltapitch": "CHANGEINPITCH",
+    "consonantstepsizeup": "SCALARSTEPUP",
+    "consonantstepsizedown": "SCALARSTEPDOWN",
+        // Intervals blocks
+    "key": "CURRENTKEY",
+    "currentmode": "CURRENTMODE",
+    "modelength": "MODELENGTH",
+        // Volume blocks
+    "notevolumefactor": "MASTERVOLUME"
+};
+
 /** lookup table for block names to API method names */
 const methodNameLookup = {
-    // Rhythm blocks
+        // Rhythm blocks
     "newnote": "playNote",
     "osctime": "playNoteMillis",
     "rest2": "playRest",
@@ -68,9 +103,8 @@ const methodNameLookup = {
     "tie": "tie",
     "multiplybeatfactor": "multiplyNoteValue",
     "newswing2": "swing",
-    // Meter blocks
+        // Meter blocks
     "meter": "setMeter",
-    "pickup": "setPickup",
     "setbpm3": "setBPM",
     "setmasterbpm2": "setMasterBPM",
     "everybeatdo": "onEveryNoteDo",
@@ -79,7 +113,7 @@ const methodNameLookup = {
     "offbeatdo": "onWeakBeatDo",
     "drift": "setNoClock",
     "elapsednotes2": "getNotesPlayed",
-    // Pitch blocks
+        // Pitch blocks
     "pitch": "playPitch",
     "steppitch": "stepPitch",
     "nthmodalpitch": "playNthModalPitch",
@@ -91,16 +125,15 @@ const methodNameLookup = {
     "register": "setRegister",
     "invert1": "invert",
     "setpitchnumberoffset": "setPitchNumberOffset",
-    "deltapitch": "deltaPitch",
-    "deltapitch2": "deltaPitch",
-    // Intervals blocks
+    "number2pitch": "numToPitch",
+    "number2octave": "numToOctave",
+        // Intervals blocks
     "setkey2": "setKey",
-    "movable": "setMoveableDo",
     // "definemode": "defineMode",
     "interval": "setScalarInterval",
     "semitoneinterval": "setSemitoneInterval",
     "settemperament": "setTemperament",
-    // Tone blocks
+        // Tone blocks
     "settimbre": "setInstrument",
     "vibrato": "doVibrato",
     "chorus": "doChorus",
@@ -108,19 +141,17 @@ const methodNameLookup = {
     "tremolo": "doTremolo",
     "dis": "doDistortion",
     "harmonic2": "doHarmonic",
-    // Ornament blocks
+        // Ornament blocks
     "newstaccato": "setStaccato",
     "newslur": "setSlur",
     "neighbor2": "doNeighbor",
-    // Volume blocks
-    // "crescendo": "",
-    // "decrescendo": "",
+        // Volume blocks
+    "crescendo": "doCrescendo",
+    "decrescendo": "doDecrescendo",
     "articulation": "setRelativeVolume",
-    "setnotevolume": "setMasterVolume",
-    "setpanning": "setPanning",
     "setsynthvolume": "setSynthVolume",
     "synthvolumefactor": "getSynthVolume",
-    // Drum blocks
+        // Drum blocks
     "playdrum": "playDrum",
     "setdrum": "setDrum",
     "mapdrum": "mapPitchToDrum",
@@ -228,6 +259,57 @@ const mouseAST = {
         ]
     }
 };
+
+/**
+ * Returns the Abstract Syntax tree for a setter statement.
+ *
+ * @param {String} identifier - identifier name
+ * @param {[*]} - tree of arguments
+ * @returns {Object} Abstract Syntax Tree of getter
+ */
+function getSetAST(identifier, args) {
+    return {
+        "type": "ExpressionStatement",
+        "expression": {
+            "type": "AssignmentExpression",
+            "left": {
+                "type": "MemberExpression",
+                "object": {
+                    "type": "Identifier",
+                    "name": "mouse"
+                },
+                "computed": false,
+                "property": {
+                    "type": "Identifier",
+                    "name": `${identifier}`
+                }
+            },
+            "operator": "=",
+            "right": getArgsAST(args)[0]
+        }
+    };
+}
+
+/**
+ * Returns the Abstract Syntax tree for a getter statement.
+ *
+ * @param {String} identifier - identifier name
+ * @returns {Object} Abstract Syntax Tree of getter
+ */
+function getGetAST(identifier) {
+    return {
+        "type": "MemberExpression",
+        "object": {
+            "type": "Identifier",
+            "name": "mouse"
+        },
+        "computed": false,
+        "property": {
+            "type": "Identifier",
+            "name": `${identifier}`
+        }
+    };
+}
 
 /**
  * Returns the Abstract Syntax tree for an if/if-else block.
@@ -572,7 +654,11 @@ function getArgsAST(args) {
                 "value": null
             });
         } else if (typeof arg === "object") {
-            ASTs.push(getArgExpAST(arg[0], arg[1]));
+            if (arg[0] in getterNameLookup) {
+                ASTs.push(getGetAST(getterNameLookup[arg[0]]));
+            } else {
+                ASTs.push(getArgExpAST(arg[0], arg[1]));
+            }
         } else {
             if (typeof arg === "string" && arg.split("_").length > 1) {
                 let [type, argVal] = arg.split("_");
@@ -728,16 +814,40 @@ function getBlockAST(flows, hiIteratorNum) {
                 ASTs.push(getMethodCallAST(idName, flow[1], true));
             }
         } else {
-            if (flow[0] in methodNameLookup) {
+            if (flow[0] in setterNameLookup) {
+                ASTs.push(getSetAST(setterNameLookup[flow[0]], flow[1]));
+            } else if (flow[0] in methodNameLookup) {
                 let isClamp = clampBlocks.indexOf(flow[0]) !== -1;
                 flow[0] = methodNameLookup[flow[0]];
-                if (isClamp) {                   // has inner flow
+                if (isClamp) {                                  // has inner flow
                     ASTs.push(getMethodCallClampAST(...flow));
                 } else {                                        // no inner flow
                     ASTs.push(getMethodCallAST(...flow));
                 }
             } else {
-                throw `CANNOT PROCESS "${flow[0]}" BLOCK`;
+                if (flow[0] === "print") {
+                    ASTs.push({
+                        "type": "ExpressionStatement",
+                        "expression": {
+                            "type": "CallExpression",
+                            "callee": {
+                                "type": "MemberExpression",
+                                "object": {
+                                    "type": "Identifier",
+                                    "name": "console"
+                                },
+                                "computed": false,
+                                "property": {
+                                    "type": "Identifier",
+                                    "name": "log"
+                                }
+                            },
+                            "arguments": getArgsAST(flow[1])
+                        }
+                    });
+                } else {
+                    throw `CANNOT PROCESS "${flow[0]}" BLOCK`;
+                }
             }
         }
     }

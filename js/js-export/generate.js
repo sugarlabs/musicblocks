@@ -118,7 +118,9 @@ class JSGenerate {
                     }
 
                     if (arg.protoblock.style === "value") {
-                        if (
+                        if (arg.name in getterNameLookup) {
+                            args.push([arg.name, null]);
+                        } else if (
                             arg.protoblock.__proto__.__proto__.constructor.name === "BooleanBlock"
                         ) {
                             if (arg.name === "boolean") {

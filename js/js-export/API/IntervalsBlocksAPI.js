@@ -27,10 +27,6 @@ class IntervalsBlocksAPI {
         return this.runCommand("setKey", [key, mode, this.turIndex]);
     }
 
-    moveableDo(set) {
-        return this.runCommand("setMoveableDo", [set, this.turIndex]);
-    }
-
     async defineMode(name, flow) {
         await this.runCommand("defineMode", [name, this.turIndex, MusicBlocks.BLK]);
         await flow();

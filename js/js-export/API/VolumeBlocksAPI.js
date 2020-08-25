@@ -41,19 +41,11 @@ class VolumeBlocksAPI {
         return this.ENDFLOWCOMMAND;
     }
 
-    setMasterVolume(value) {
-        return this.runCommand("setMasterVolume", [value, this.turIndex]);
-    }
-
-    setPanning(value) {
-        this.runCommand("setPanning", [value, this.turIndex]);
-    }
-
     setSynthVolume(synth, value) {
-        this.runCommand("setSynthVolume", [synth, value, this.turIndex]);
+        return this.runCommand("setSynthVolume", [synth, value, this.turIndex]);
     }
 
     getSynthVolume(synth) {
-        this.runCommand("getSynthVolume", [synth, this.turIndex]);
+        return Singer.VolumeActions.getSynthVolume(synth, this.turIndex);
     }
 }

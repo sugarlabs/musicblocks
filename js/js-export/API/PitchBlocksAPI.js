@@ -73,23 +73,19 @@ class PitchBlocksAPI {
         return this.ENDFLOWCOMMAND;
     }
 
-    numToPitch(number, outType) {
-        return this.runCommand("numToPitch", [number, outType, this.turIndex]);
-    }
-
     setPitchNumberOffset(pitch, octave) {
         return this.runCommand("setPitchNumberOffset", [pitch, octave, this.turIndex]);
     }
 
+    numToPitch(number) {
+        return Singer.PitchActions.numToPitch(number, "pitch", this.turIndex);
+    }
+
+    numToOctave(number) {
+        return Singer.PitchActions.numToPitch(number, "octave", this.turIndex);
+    }
+
     getPitchInfo(type) {
-        return this.runCommand("getPitchInfo", [type, this.turIndex]);
-    }
-
-    deltaPitch(outType) {
-        return this.runCommand("deltaPitch", [outType, this.turIndex]);
-    }
-
-    consonantStepSize(type) {
-        return this.runCommand("constantStepSize", [type, this.turIndex]);
+        return Singer.PitchActions.getPitchInfo(type, this.turIndex);
     }
 }

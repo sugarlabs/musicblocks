@@ -24,35 +24,35 @@
  */
 class MeterBlocksAPI {
     setMeter(beatCount, noteValue) {
-        this.runCommand("setMeter", [beatCount, noteValue, this.turIndex]);
+        return this.runCommand("setMeter", [beatCount, noteValue, this.turIndex]);
     }
 
     setPickup(value) {
-        this.runCommand("setPickup", [value, this.turIndex]);
+        return this.runCommand("setPickup", [value, this.turIndex]);
     }
 
     setBPM(bpm, beatValue) {
-        this.runCommand("setBPM", [bpm, beatValue, this.turIndex]);
+        return this.runCommand("setBPM", [bpm, beatValue, this.turIndex]);
     }
 
     setMasterBPM(bpm, beatValue) {
-        this.runCommand("setMasterBPM", [bpm, beatValue]);
+        return this.runCommand("setMasterBPM", [bpm, beatValue]);
     }
 
     onEveryNoteDo(action) {
-        this.runCommand("onEveryNoteDo", [action, null, null, this.turIndex]);
+        return this.runCommand("onEveryNoteDo", [action, null, null, this.turIndex]);
     }
 
     onEveryBeatDo(action) {
-        this.runCommand("onEveryBeatDo", [action, null, null, this.turIndex]);
+        return this.runCommand("onEveryBeatDo", [action, null, null, this.turIndex]);
     }
 
     onStrongBeatDo(beat, action) {
-        this.runCommand("onStrongBeatDo", [beat, action, null, null, this.turIndex]);
+        return this.runCommand("onStrongBeatDo", [beat, action, null, null, this.turIndex]);
     }
 
     onWeakBeatDo(action) {
-        this.runCommand("onWeakBeatDo", [action, null, null, this.turIndex]);
+        return this.runCommand("onWeakBeatDo", [action, null, null, this.turIndex]);
     }
 
     async setNoClock(flow) {
@@ -62,6 +62,6 @@ class MeterBlocksAPI {
     }
 
     getNotesPlayed(noteValue) {
-        return this.runCommand("getNotesPlayed", [noteValue, this.turIndex]);
+        return Singer.MeterActions.getNotesPlayed(noteValue, this.turIndex);
     }
 }
