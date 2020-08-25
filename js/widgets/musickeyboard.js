@@ -227,6 +227,7 @@ function MusicKeyboard() {
                             objId: null,
                             duration: parseFloat(restDuration)
                         });
+                        //that._createTable();
                     }
                 }
                 endTime = undefined;
@@ -425,7 +426,8 @@ function MusicKeyboard() {
 	widgetWindow.show();
 
         this._keysLayout();
-        this.bpm = logo.turtles.ithTurtle(0).singer.bpm;
+        let tur = logo.turtles.ithTurtle(0);
+        this.bpm = tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
         var that = this;
 
         widgetWindow.onclose = function() {
