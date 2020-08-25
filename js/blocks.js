@@ -1651,7 +1651,8 @@ function Blocks(activity) {
                         case "temperament":
                         case "timbre":
                             lockInit = true;
-                            this.reInitWidget(initialTopBlock, 1500);
+                            if (this.blockList[initialTopBlock].protoblock.staticLabels[0] == widgetTitle[x].innerHTML)
+                                this.reInitWidget(initialTopBlock, 1500);
                             break;
                     }
                 }
@@ -2160,10 +2161,12 @@ function Blocks(activity) {
                             case "temperament":
                             case "timbre":
                                 lockInit = true;
-                                this.reInitWidget(
-                                    that.findTopBlock(thisBlock),
-                                    1500
-                                );
+                                let _newTopBlock = that.findTopBlock(thisBlock);
+                                if (this.blockList[_newTopBlock].protoblock.staticLabels[0] == widgetTitle[i].innerHTML)
+                                    this.reInitWidget(
+                                        _newTopBlock,
+                                        1500
+                                    );
                                 break;
                         }
                     }
@@ -2341,6 +2344,11 @@ function Blocks(activity) {
         if (
             type1 === "notein" &&
             ["solfegeout", "scaledegreeout", "textout", "noteout"].indexOf(type2) !== -1
+        ) {
+            return true;
+        }
+        if (
+            type1 === "pitchout" && type2 === "anyin"
         ) {
             return true;
         }
@@ -5225,7 +5233,6 @@ function Blocks(activity) {
                         break;
                     case "namedbox":
                     case "namedarg":
-                    case "outputtools":
                         blockItem = [
                             b,
                             [myBlock.name, { value: myBlock.privateData }],
@@ -5250,7 +5257,8 @@ function Blocks(activity) {
                     "nameddo",
                     "namedcalc",
                     "nameddoArg",
-                    "namedcalcArg"
+                    "namedcalcArg",
+                    "outputtools"
                 ].indexOf(myBlock.name) !== -1
             ) {
                 blockItem = [
@@ -6273,7 +6281,7 @@ function Blocks(activity) {
                         var value = args[1];
                         that.blockList[thisBlock].privateData = value;
                         that.blockList[thisBlock].overrideName = value;
-                    }
+                    };
                     this._makeNewBlockWithConnections(
                         "outputtools",
                         blockOffset,
@@ -7086,11 +7094,12 @@ function Blocks(activity) {
                     break;
                 }
             }
+            let parentExpandableBlk = this.insideExpandableBlock(thisBlock);
             myBlock.connections[0] = null;
 
             // Add default block if user deletes all blocks from
             // inside the note block.
-            this.addDefaultBlock(parentBlock, thisBlock);
+            this.addDefaultBlock(parentExpandableBlk, thisBlock);
         }
 
         if (myBlock.name === "start" || myBlock.name === "drum") {
@@ -7219,8 +7228,8 @@ function Blocks(activity) {
             if (typeof this.blockList[blk].protoblock.updateParameter === "function") {
                 value = this.blockList[blk].protoblock.updateParameter(logo, turtle, blk);
             } else {
-                if (name in this.evalParameterDict) {
-                    eval(this.evalParameterDict[name]);
+                if (name in logo.evalParameterDict) {
+                    eval(logo.evalParameterDict[name]);
                 } else {
                     return;
                 }

@@ -198,7 +198,7 @@ class Singer {
                 logo.pitchTimeMatrix.rowLabels.push(logo.blocks.blockList[blk].name);
                 logo.pitchTimeMatrix.rowArgs.push(args[0]);
             } else if (logo.inPitchSlider) {
-                logo.pitchSlider.Sliders.push([args[0], 0, 0]);
+                logo.pitchSlider.frequency = args[0];
             } else {
                 let tur = logo.turtles.ithTurtle(turtle);
 
@@ -456,9 +456,7 @@ class Singer {
         tur.singer.tallyNotes = saveTallyNotes;
 
         // Restore previous state
-        console.debug(saveBoxes);
         logo.boxes = JSON.parse(saveBoxes);
-        console.debug(saveTurtleHeaps);
         logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
 
         tur.painter.doPenUp();
@@ -546,9 +544,7 @@ class Singer {
         tur.singer.tallyNotes = saveTallyNotes;
 
         // Restore previous state
-        console.debug(saveBoxes);
         logo.boxes = JSON.parse(saveBoxes);
-        console.debug(saveTurtleHeaps);
         logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
 
         tur.painter.doPenUp();
@@ -1215,7 +1211,7 @@ class Singer {
             }
         } else {
             // We start the music clock as the first note is being played
-            if (logo.firstNoteTime == null) {
+            if (logo.firstNoteTime === null) {
                 logo.firstNoteTime = new Date().getTime();
             }
 

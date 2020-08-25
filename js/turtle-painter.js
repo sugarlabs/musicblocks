@@ -401,7 +401,7 @@ class Painter {
      * @param anticlockwise - boolean value regarding whether arc is cw or acw
      * @param invert - boolean value regarding whether coordinates are inverted or not
      */
-    arc(cx, cy, ox, oy, x, y, radius, start, end, anticlockwise, invert) {
+    _arc(cx, cy, ox, oy, x, y, radius, start, end, anticlockwise, invert) {
         let nx, ny, sa, ea;
 
         let turtles = this.turtles;
@@ -614,7 +614,7 @@ class Painter {
             ny = cy + Math.sin(oAngleRadians + angleRadians) * r;
         }
 
-        this.arc(
+        this._arc(
             cx,
             cy,
             ox,

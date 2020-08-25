@@ -41,10 +41,11 @@ class Turtle {
      * @param {Number} id - unique ID of Turtle
      * @param {String} name - name of Turtle
      * @param {Object} turtles - Turtles object (common to all turtles)
+     * @param {Number} startBlock - start block id
      */
-    constructor(id, name, turtles) {
+    constructor(id, name, turtles, startBlock) {
         // Import members of model and view (arguments only for model)
-        importMembers(this, "", [id, name, turtles]);
+        importMembers(this, "", [id, name, turtles, startBlock]);
 
         this.singer = new Singer(this);     // for music logic
         this.painter = new Painter(this);   // for drawing logic
@@ -599,13 +600,12 @@ Turtle.TurtleModel = class {
      * @param {String} name - name of Turtle
      * @param {Object} turtles - Turtles object (common to all turtles)
      */
-    constructor(id, name, turtles) {
+    constructor(id, name, turtles, startBlock) {
         this._id = id;              // unique ID of turtle
         this._name = name;          // name of the turtle
         this._turtles = turtles;    // object handling behavior of all turtles
 
-        this._startBlock = null;    // Which start block is associated with this turtle?
-
+        this._startBlock = startBlock;    // Which start block is associated with this turtle?
         this._queue = [];           // Queue of blocks this turtle is executing
         this._parentFlowQueue = [];
         this._unhighlightQueue = [];
@@ -787,7 +787,7 @@ Turtle.TurtleView = class {
             hitArea.y = -bounds.height / 2;
             this.container.hitArea = hitArea;
 
-            let startBlock = this.startBlock;
+            let startBlock = this._startBlock;
             if (startBlock != null) {
                 startBlock.container.removeChild(this._decorationBitmap);
                 this._decorationBitmap = new createjs.Bitmap(myImage);
@@ -903,7 +903,7 @@ Turtle.TurtleView = class {
             this.container.addChild(this._bitmap);
             this._createCache();
 
-            let startBlock = this.startBlock;
+            let startBlock = this._startBlock;
             if (startBlock != null) {
                 startBlock.updateCache();
                 this._decorationBitmap = this._bitmap.clone();

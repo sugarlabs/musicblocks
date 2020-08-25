@@ -492,7 +492,7 @@ class Logo {
      *
      * @returns {void}
      */
-    _prepSynths() {
+    prepSynths() {
         this.synth.newTone();
 
         for (let turtle in this.turtles.turtleList) {
@@ -1208,7 +1208,7 @@ class Logo {
         }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            this._prepSynths();
+            this.prepSynths();
         }
 
         this.notation.notationStaging = {};
