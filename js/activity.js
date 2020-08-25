@@ -242,6 +242,7 @@ function Activity() {
             "widgets/musickeyboard",
             "widgets/timbre",
             "widgets/oscilloscope",
+            "widgets/statistics",
             "activity/lilypond",
             "activity/abc",
             "activity/mxml",
@@ -1489,33 +1490,6 @@ function Activity() {
     };
 
     /*
-     * @param chartBitmap bitmap of analysis charts
-     * @param ctx canvas
-     * Renders close icon and functionality to
-     * stop analytics of the MB project
-     */
-    this.closeAnalytics = function(chartBitmap, ctx) {
-        blocks.activeBlock = null;
-        button.x = canvas.width / (2 * turtleBlocksScale) + 300 / Math.sqrt(2);
-        button.y = 200.0;
-        this.closeButton = _makeButton(
-            CANCELBUTTON,
-            _("Close"),
-            button.x,
-            button.y,
-            55,
-            0
-        );
-        this.closeButton.onclick = (event) => {
-            this.closeButton.style.visibility = "hidden";
-            stage.removeChild(chartBitmap);
-            blocks.showBlocks();
-            update = true;
-            ctx.clearRect(0, 0, 600, 600);
-        };
-    };
-
-    /*
      * @param canvas {compares existing canvas with a new blank canvas}
      * @return {boolean} {if canvas is blank }
      * Checks if the canvas is blank
@@ -1526,56 +1500,6 @@ function Activity() {
         blank.height = canvas.height;
         return canvas.toDataURL() === blank.toDataURL();
     }
-
-    /*
-     * Renders and carries out analysis
-     * of the MB project
-     */
-    closeAnalytics = this.closeAnalytics;
-    let th = this;
-    doAnalytics = function() {
-        toolbar.closeAuxToolbar(_showHideAuxMenu);
-        blocks.activeBlock = null;
-        myChart = docById("myChart");
-
-        if (_isCanvasBlank(myChart) === false) {
-            return;
-        }
-
-        let ctx = myChart.getContext("2d");
-        loading = true;
-        document.body.style.cursor = "wait";
-
-        let myRadarChart = null;
-        let scores = analyzeProject(blocks);
-        let projectStats = runAnalytics(logo)
-        let data = scoreToChartData(scores);
-        let Analytics = this;
-        Analytics.close = th.closeAnalytics;
-
-        __callback = function() {
-            imageData = myRadarChart.toBase64Image();
-            img = new Image();
-            img.onload = function() {
-                chartBitmap = new createjs.Bitmap(img);
-                stage.addChild(chartBitmap);
-                chartBitmap.x = canvas.width / (2 * turtleBlocksScale) - 300;
-                chartBitmap.y = 200;
-                chartBitmap.scaleX = chartBitmap.scaleY = chartBitmap.scale =
-                    600 / chartBitmap.image.width;
-                blocks.hideBlocks();
-                logo.showBlocksAfterRun = false;
-                update = true;
-                document.body.style.cursor = "default";
-                loading = false;
-                Analytics.close(chartBitmap, ctx);
-            };
-            img.src = imageData;
-        };
-
-        options = getChartOptions(__callback);
-        myRadarChart = new Chart(ctx).Radar(data, options);
-    };
 
     /*
      * Increases block size
@@ -5055,7 +4979,10 @@ function Activity() {
         toolbar.renderRunSlowlyIcon(that._doSlowButton);
         toolbar.renderRunStepIcon(_doStepButton);
         toolbar.renderAdvancedIcons(
-            doAnalytics,
+            () => {
+                if (!logo.statsWindow) logo.statsWindow = new StatsWindow();
+                logo.statsWindow.init()
+            },
             doOpenPlugin,
             deletePlugin,
             setScroller,

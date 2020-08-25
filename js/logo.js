@@ -1801,7 +1801,8 @@ class Logo {
                     if (logo.runningLilypond) {
                         if (logo.collectingStats){
                             console.debug("stats collection completed")
-                            getStatsFromNotation(logo);
+                            logo.projectStats = getStatsFromNotation(logo);
+                            logo.statsWindow.jsonObject.innerHTML = JSON.stringify(projectStats); 
                         } else {
                             console.debug("saving lilypond output:");
                             save.afterSaveLilypond();

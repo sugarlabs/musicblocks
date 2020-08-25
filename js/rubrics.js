@@ -733,8 +733,7 @@ let getStatsFromNotation = (logo) => {
     projectStats = {};
     // since we use the lilypond output to generate stats , please make sure to change these rules if 
     // we ever change the lilypond notation structure.
-    notation = logo.notation;
-
+    let notation = logo.notation;
     projectStats["duples"] = 0;
     projectStats["triplets"] = 0;
     projectStats["quintuplets"] = 0;
@@ -747,7 +746,7 @@ let getStatsFromNotation = (logo) => {
 
     for (tur in notation.notationStaging){
         for (it in notation.notationStaging[tur]) {
-            let item = notation.notationStaging[tur];
+            let item = notation.notationStaging[tur][it];
 
             if (typeof item == "object" && item[0].length){
                 for (note of item[0]) {
