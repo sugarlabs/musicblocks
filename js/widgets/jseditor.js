@@ -52,23 +52,11 @@ class JSEditor {
         this.styles = [
             "dracula",
             "github",
-            "solarized-dark",
-            "solarized-light",
             "railscasts",
-            "monokai-sublime",
-            "mono-blue",
-            "tomorrow",
-            "color-brewer",
-            "zenburn",
-            "agate",
-            "androidstudio",
-            "atom-one-light",
-            "rainbow",
             "vs",
-            "atom-one-dark"
         ].map((name) => {
             const link = document.createElement("link");
-            link.href = `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/${name}.min.css`;
+            link.href = `././lib/codejar/styles/${name}.min.css`;
             link.rel = "stylesheet";
             link.disabled = "true";
             document.head.appendChild(link);
