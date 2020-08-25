@@ -35,7 +35,7 @@ function setupRhythmActions() {
          * @param {Function} [_enqueue] - callback
          * @returns {void}
          */
-        static playNote(value, blkName, turtle, blk, _callback) {
+        static playNote(value, blkName, turtle, blk, _enqueue) {
             /**
             * We queue up the child flow of the note clamp and once all of the children are run, we
             * trigger a _playnote_ event, then wait for the note to play. The note can be specified

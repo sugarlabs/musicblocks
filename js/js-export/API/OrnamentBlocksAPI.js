@@ -24,13 +24,13 @@
  */
 class OrnamentBlocksAPI {
     async setStaccato(value, flow) {
-        await this.runCommand("setStaccato", [value, this.turIndex, MusicBlocks.BLK]);
+        await this.runCommand("setStaccato", [value, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
 
     async setSlur(value, flow) {
-        await this.runCommand("setSlur", [value, this.turIndex, MusicBlocks.BLK]);
+        await this.runCommand("setSlur", [value, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }

@@ -251,8 +251,9 @@ function setupPitchActions() {
 
             let obj;
             if (
-                blk !== undefined && blk in logo.blocks.blockList &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[1]].name === "ytopitch"
+                blk !== undefined &&
+                blk in blocks.blockList &&
+                blocks.blockList[blocks.blockList[blk].connections[1]].name === "ytopitch"
             ) {
                 obj = keySignatureToMode("C major");
             } else {
@@ -307,8 +308,9 @@ function setupPitchActions() {
 
             let note;
             if (
-                blk !== undefined && blk in logo.blocks.blockList &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[1]].name === "ytopitch"
+                blk !== undefined
+                && blk in blocks.blockList &&
+                blocks.blockList[blocks.blockList[blk].connections[1]].name === "ytopitch"
             ) {
                 note = nthDegreeToPitch("C major", scaleDegree);
             } else {
@@ -478,7 +480,6 @@ function setupPitchActions() {
                 }
             } else {
                 Singer.processPitch(note, octave, cents, turtle, blk);
-                // throw "NoNoteError";
             }
         }
 

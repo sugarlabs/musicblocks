@@ -38,13 +38,13 @@ class IntervalsBlocksAPI {
     }
 
     async setScalarInterval(value, flow) {
-        await this.runCommand("setScalarInterval", [value, this.turIndex, MusicBlocks.BLK]);
+        await this.runCommand("setScalarInterval", [value, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
 
     async setSemitoneInterval(value, flow) {
-        await this.runCommand("setSemitoneInterval", [value, this.turIndex, MusicBlocks.BLK]);
+        await this.runCommand("setSemitoneInterval", [value, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }

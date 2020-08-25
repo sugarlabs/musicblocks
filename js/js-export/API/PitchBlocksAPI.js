@@ -28,7 +28,7 @@ class PitchBlocksAPI {
     }
 
     stepPitch(value) {
-        return this.runCommand("stepPitch", [value, this.turIndex, MusicBlocks.BLK]);
+        return this.runCommand("stepPitch", [value, this.turIndex]);
     }
 
     playNthModalPitch(number, octave) {
@@ -52,13 +52,13 @@ class PitchBlocksAPI {
     }
 
     async setScalarTranspose(value, flow) {
-        await this.runCommand("setScalarTranspose", [value, this.turIndex, MusicBlocks.BLK]);
+        await this.runCommand("setScalarTranspose", [value, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
 
     async setSemitoneTranspose(value, flow) {
-        await this.runCommand("setSemitoneTranspose", [value, this.turIndex, MusicBlocks.BLK]);
+        await this.runCommand("setSemitoneTranspose", [value, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
@@ -68,7 +68,7 @@ class PitchBlocksAPI {
     }
 
     async invert(name, octave, mode, flow) {
-        await this.runCommand("invert", [name, octave, mode, this.turIndex, MusicBlocks.BLK]);
+        await this.runCommand("invert", [name, octave, mode, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }

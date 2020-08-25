@@ -28,18 +28,18 @@ class DrumBlocksAPI {
     }
 
     async setDrum(drum, flow) {
-        await this.runCommand("setDrum", [drum, this.turIndex, MusicBlocks.BLK]);
+        await this.runCommand("setDrum", [drum, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
 
     async mapPitchToDrum(drum, flow) {
-        await this.runCommand("mapPitchToDrum", [drum, this.turIndex, MusicBlocks.BLK]);
+        await this.runCommand("mapPitchToDrum", [drum, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
 
     playNoise(noise) {
-        return this.runCommand("playNoise", [noise, this.turIndex, MusicBlocks.BLK]);
+        return this.runCommand("playNoise", [noise, this.turIndex]);
     }
 }

@@ -24,25 +24,25 @@
  */
 class VolumeBlocksAPI {
     async doCrescendo(value, flow) {
-        await this.runCommand("doCrescendo", ["crescendo", value, this.turIndex, MusicBlocks.BLK]);
+        await this.runCommand("doCrescendo", ["crescendo", value, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
 
     async doDecrescendo(value, flow) {
-        await this.runCommand("doCrescendo", ["decrescendo", value, this.turIndex, MusicBlocks.BLK]);
+        await this.runCommand("doCrescendo", ["decrescendo", value, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
 
     async setRelativeVolume(value, flow) {
-        await this.runCommand("setRelativeVolume", [value, this.turIndex, MusicBlocks.BLK]);
+        await this.runCommand("setRelativeVolume", [value, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
 
     setMasterVolume(value) {
-        return this.runCommand("setMasterVolume", [value, this.turIndex, MusicBlocks.BLK]);
+        return this.runCommand("setMasterVolume", [value, this.turIndex]);
     }
 
     setPanning(value) {

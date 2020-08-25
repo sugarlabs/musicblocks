@@ -64,10 +64,10 @@ const methodNameLookup = {
     "newnote": "playNote",
     "osctime": "playNoteMillis",
     "rest2": "playRest",
-    "rhythmicdot2": "doRhythmicDot",
-    "tie": "doTie",
+    "rhythmicdot2": "dot",
+    "tie": "tie",
     "multiplybeatfactor": "multiplyNoteValue",
-    "newswing2": "addSwing",
+    "newswing2": "swing",
     // Meter blocks
     "meter": "setMeter",
     "pickup": "setPickup",
@@ -96,12 +96,12 @@ const methodNameLookup = {
     // Intervals blocks
     "setkey2": "setKey",
     "movable": "setMoveableDo",
-    "definemode": "defineMode",
+    // "definemode": "defineMode",
     "interval": "setScalarInterval",
     "semitoneinterval": "setSemitoneInterval",
     "settemperament": "setTemperament",
     // Tone blocks
-    "settimbre": "setTimbre",
+    "settimbre": "setInstrument",
     "vibrato": "doVibrato",
     "chorus": "doChorus",
     "phaser": "doPhaser",

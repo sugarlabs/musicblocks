@@ -3626,18 +3626,17 @@ function Activity() {
             clearTimeout(errorMsgTimeoutID);
         }
 
-        // Hide the button, as the program is going to be
-        // terminated.
+        // hide the button, as the program is going to be terminated
         _hideStopButton();
 
-        if (errorMsgText == null) {
-            // The container may not be ready yet, so do nothing.
+        // the container may not be ready yet, so do nothing
+        if (errorMsgText == null)
             return;
-        }
 
         if (
             blk !== undefined &&
             blk != null &&
+            blk in blocks.blockList &&
             !blocks.blockList[blk].collapsed
         ) {
             let fromX = (canvas.width - 1000) / 2;
