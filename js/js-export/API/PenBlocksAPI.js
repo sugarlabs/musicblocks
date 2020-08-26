@@ -81,7 +81,7 @@ class PenBlocksAPI {
     }
 
     fillBackground() {
-        return this.runCommand("_anonymous", () => logo.turtles.setBackgroundColor(turtle));
+        return this.runCommand("_anonymous", () => logo.turtles.setBackgroundColor(this.turIndex));
     }
 
     setFont(fontname) {
