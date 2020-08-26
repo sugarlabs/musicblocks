@@ -202,7 +202,9 @@ class JSInterface {
         // "": "doStartFill",
         // "": "doStartHollowLine",
         // "": "fillBackground",
-        "setfont": "doSetFont"
+        "setfont": "doSetFont",
+        // Extras
+        "print": "print"
     };
 
     /**

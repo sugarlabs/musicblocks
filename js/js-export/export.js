@@ -290,6 +290,19 @@ class MusicBlocks {
         });
     }
 
+    // ========= Special Instructions ==============================================================
+
+    print(value) {
+        console.log(value);
+        if (value === undefined) {
+            logo.textMsg("undefined");
+        } else if (value === null) {
+            logo.textMsg("null");
+        } else {
+            logo.textMsg(value.toString());
+        }
+    }
+
     // ========= Getters/Setters ===================================================================
 
     // ============================== GRAPHICS ================================
