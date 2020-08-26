@@ -24,41 +24,37 @@
  */
 class ToneBlocksAPI {
     async setInstrument(instrument, flow) {
-        await this.runCommand("setTimbre", [instrument, this.turIndex, MusicBlocks.BLK]);
+        await this.runCommand("setTimbre", [instrument, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
 
     async doVibrato(intensity, rate, flow) {
-        await this.runCommand("doVibrato", [intensity, rate, this.turIndex, MusicBlocks.BLK]);
+        await this.runCommand("doVibrato", [intensity, rate, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
 
     async doChorus(chorusRate, delayTime, chorusDepth, flow) {
-        await this.runCommand(
-            "doChorus", [chorusRate, delayTime, chorusDepth, this.turIndex, MusicBlocks.BLK]
-        );
+        await this.runCommand("doChorus", [chorusRate, delayTime, chorusDepth, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
 
     async doPhaser(rate, octaves, baseFrequency, flow) {
-        await this.runCommand(
-            "doPhaser", [rate, octaves, baseFrequency, this.turIndex, MusicBlocks.BLK]
-        );
+        await this.runCommand("doPhaser", [rate, octaves, baseFrequency, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
 
     async doTremolo(frequency, depth, flow) {
-        await this.runCommand("doTremolo", [frequency, depth, this.turIndex, MusicBlocks.BLK]);
+        await this.runCommand("doTremolo", [frequency, depth, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
 
     async doDistortion(distortion, flow) {
-        await this.runCommand("doDistortion", [distortion, this.turIndex, MusicBlocks.BLK]);
+        await this.runCommand("doDistortion", [distortion, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }

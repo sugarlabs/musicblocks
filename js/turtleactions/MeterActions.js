@@ -300,7 +300,13 @@ function setupMeterActions() {
             tur.singer.drift++;
 
             let listenerName = "_drift_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
+            if (blk !== undefined && blk in blocks.blockList) {
+                logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => {
                 if (tur.singer.drift > 0)

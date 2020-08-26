@@ -144,7 +144,7 @@ class MusicBlocks {
                 // "Painter.GraphicsActions",
                 // "Painter.PenActions",
                 "Singer.RhythmActions",
-                // "Singer.MeterActions",
+                "Singer.MeterActions",
                 "Singer.PitchActions",
                 "Singer.IntervalsActions",
                 "Singer.ToneActions",
@@ -290,7 +290,7 @@ class MusicBlocks {
         });
     }
 
-    // ========= Getters ==========================================================================
+    // ========= Getters/Setters ===================================================================
 
     // ============================== GRAPHICS ================================
 
@@ -332,6 +332,10 @@ class MusicBlocks {
 
     // ============================== METER ===================================
 
+    set PICKUP(value) {
+        Singer.MeterActions.setPickup(value, this.turIndex);
+    }
+
     get WHOLENOTESPLAYED() {
         return Singer.MeterActions.getWholeNotesPlayed(this.turIndex);
     }
@@ -356,7 +360,29 @@ class MusicBlocks {
         return Singer.MeterActions.getCurrentMeter(this.turIndex);
     }
 
+    // ============================== PITCH ===================================
+
+    get SCALARCHANGEINPITCH() {
+        return Singer.PitchActions.deltaPitch("deltapitch2", this.turIndex);
+    }
+
+    get CHANGEINPITCH() {
+        return Singer.PitchActions.deltaPitch("deltapitch", this.turIndex);
+    }
+
+    get SCALARSTEPUP() {
+        return Singer.PitchActions.consonantStepSize("up", this.turIndex);
+    }
+
+    get SCALARSTEPDOWN() {
+        return Singer.PitchActions.consonantStepSize("down", this.turIndex);
+    }
+
     // ============================ INTERVALS =================================
+
+    set MOVEABLEDO(moveable) {
+        Singer.IntervalsActions.setMoveableDo(moveable, this.turIndex);
+    }
 
     get CURRENTKEY() {
         return Singer.IntervalsActions.getCurrentKey(this.turIndex);
@@ -371,6 +397,14 @@ class MusicBlocks {
     }
 
     // ============================== VOLUME ==================================
+
+    set PANNING(value) {
+        Singer.VolumeActions.setPanning(value, this.turIndex);
+    }
+
+    set MASTERVOLUME(volume) {
+        Singer.VolumeActions.setMasterVolume(volume, this.turIndex);
+    }
 
     get MASTERVOLUME() {
         return Singer.VolumeActions.masterVolume;

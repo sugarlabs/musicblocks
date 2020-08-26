@@ -14,6 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License along with this
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
+ *
+ * Utility methods are in PascalCase.
+ * Action methods are in camelCase.
 */
 
 /**
@@ -24,13 +27,13 @@
 function setupDrumActions() {
     Singer.DrumActions = class {
         /**
-         * Plays a drum sound.
+         * Utility function that returns appropriate object key in DRUMNAMES corresponding to passed parameter.
          *
-         * @param {String} drum - drum name
-         * @param {Number} turtle - Turtle index in turtles.turtleList
-         * @param {Number} blk - corresponding Block object in blocks.blockList
+         * @static
+         * @param {String} drum
+         * @returns {String}
          */
-        static playDrum(drum, turtle, blk) {
+        static GetDrumname(drum) {
             let drumname = DEFAULTDRUM;
             if (drum.slice(0, 4) === "http") {
                 drumname = drum;
@@ -45,6 +48,18 @@ function setupDrumActions() {
                     }
                 }
             }
+            return drumname;
+        }
+
+        /**
+         * Plays a drum sound.
+         *
+         * @param {String} drum - drum name
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} blk - corresponding Block object in blocks.blockList
+         */
+        static playDrum(drum, turtle, blk) {
+            let drumname = Singer.DrumActions.GetDrumname(drum);
 
             let tur = logo.turtles.ithTurtle(turtle);
 
@@ -53,30 +68,13 @@ function setupDrumActions() {
                 drumname = last(tur.singer.drumStyle);
             }
 
-            if (logo.inPitchDrumMatrix) {
-                logo.pitchDrumMatrix.drums.push(drumname);
-                logo.pitchDrumMatrix.addColBlock(blk);
-                if (logo.drumBlocks.indexOf(blk) === -1) {
-                    logo.drumBlocks.push(blk);
-                }
-            } else if (logo.inMatrix) {
-                logo.pitchTimeMatrix.rowLabels.push(drumname);
-                logo.pitchTimeMatrix.rowArgs.push(-1);
-
-                logo.pitchTimeMatrix.addRowBlock(blk);
-                if (logo.drumBlocks.indexOf(blk) === -1) {
-                    logo.drumBlocks.push(blk);
-                }
-            } else if (tur.singer.inNoteBlock.length > 0) {
+            if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.noteDrums[last(tur.singer.inNoteBlock)].push(drumname);
                 if (tur.singer.synthVolume[drumname] === undefined) {
                     tur.singer.synthVolume[drumname] = [DEFAULTVOLUME];
                     tur.singer.crescendoInitialVolume[drumname] = [DEFAULTVOLUME];
                 }
-            } else if (
-                logo.blocks.blockList[blk].connections[0] == null &&
-                last(logo.blocks.blockList[blk].connections) == null
-            ) {
+            } else {
                 // Play a stand-alone drum block as a quarter note.
                 logo.clearNoteParams(tur, blk, []);
                 tur.singer.inNoteBlock.push(blk);
@@ -88,13 +86,6 @@ function setupDrumActions() {
                     () => tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
 
                 Singer.processNote(noteBeatValue, false, blk, turtle, __callback);
-            } else {
-                console.debug('PLAY DRUM ERROR: missing context');
-                return;
-            }
-
-            if (tur.singer.inNoteBlock.length > 0) {
-                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(tur.singer.beatFactor);
             }
 
             tur.singer.pushedNote = true;
@@ -122,8 +113,13 @@ function setupDrumActions() {
             tur.singer.drumStyle.push(drumname);
 
             let listenerName = "_setdrum_" + turtle;
-            if (blk !== undefined && blk in logo.blocks.blockList)
+            if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => {
                 tur.singer.drumStyle.pop();
@@ -160,8 +156,13 @@ function setupDrumActions() {
             tur.singer.drumStyle.push(drumname);
 
             let listenerName = "_mapdrum_" + turtle;
-            if (blk !== undefined && blk in logo.blocks.blockList)
+            if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => tur.singer.drumStyle.pop();
 
