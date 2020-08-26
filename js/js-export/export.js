@@ -292,14 +292,14 @@ class MusicBlocks {
 
     // ========= Special Instructions ==============================================================
 
-    print(value) {
-        console.log(value);
-        if (value === undefined) {
+    print(message) {
+        console.log(message);
+        if (message === undefined) {
             logo.textMsg("undefined");
-        } else if (value === null) {
+        } else if (message === null) {
             logo.textMsg("null");
         } else {
-            logo.textMsg(value.toString());
+            logo.textMsg(message.toString());
         }
     }
 

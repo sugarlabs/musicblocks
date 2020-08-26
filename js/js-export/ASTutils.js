@@ -617,7 +617,7 @@ class ASTUtils {
             } else if (flow[0] === "while") {
                 ASTs.push(ASTUtils._getWhileLoopAST(flow[1], flow[2], iterMax));
             } else if (flow[0] === "forever") {
-                ASTs.push(ASTUtils._getWhileLoopAST([true], flow[2], iterMax));
+                ASTs.push(ASTUtils._getWhileLoopAST([1000], flow[2], iterMax));
             } else if (flow[0] === "until") {
                 ASTs.push(ASTUtils._getDoWhileLoopAST(flow[1], flow[2], iterMax));
             } else if (flow[0] === "break") {
