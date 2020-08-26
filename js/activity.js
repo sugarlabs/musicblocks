@@ -220,6 +220,7 @@ function Activity() {
             "Tone",
             "activity/js-export/export",
             "activity/js-export/sample",
+            "activity/js-export/interface",
             "activity/js-export/ASTutils",
             "activity/js-export/generate",
             "activity/js-export/API/GraphicsBlocksAPI",

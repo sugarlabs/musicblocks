@@ -17,177 +17,6 @@
  * The Abstract Syntax Trees are in ESTree specification.
 */
 
-/** list of clamp block names */
-const clampBlocks = [
-    // Rhythm blocks
-    "newnote",
-    "osctime",
-    "rhythmicdot2",
-    "tie",
-    "multiplybeatfactor",
-    "newswing2",
-    // Meter blocks
-    "drift",
-    // Pitch blocks
-    "accidental",
-    "setscalartransposition",
-    "settransposition",
-    "invert1",
-    // Intervals blocks
-    "definemode",
-    "interval",
-    "semitoneinterval",
-    // Tone blocks
-    "settimbre",
-    "vibrato",
-    "chorus",
-    "phaser",
-    "tremolo",
-    "dis",
-    "harmonic2",
-    // Ornament blocks
-    "newstaccato",
-    "newslur",
-    "neighbor2",
-    // Volume blocks
-    "crescendo",
-    "decrescendo",
-    "articulation",
-    // Drum blocks
-    "setdrum",
-    "mapdrum"
-];
-
-/** lookup table for block names to setter names */
-const setterNameLookup = {
-        // Meter blocks
-    "pickup": "PICKUP",
-        // Intervals blocks
-    "movable": "MOVEABLE",
-        // Volume blocks
-    "setnotevolume": "MASTERVOLUME",
-    "setpanning": "PANNING",
-};
-
-/** lookup table for block names to getter names */
-const getterNameLookup = {
-        // Rhythm blocks
-    "mynotevalue": "NOTEVALUE",
-        // Meter blocks
-    "elapsednotes": "WHOLENOTESPLAYED",
-    "beatvalue": "BEATCOUNT",
-    "measurevalue": "MEASURECOUNT",
-    "bpmfactor": "BPM",
-    "beatfactor": "BEATFACTOR",
-    "currentmeter": "CURRENTMETER",
-        // Pitch blocks
-    "deltapitch2": "SCALARCHANGEINPITCH",
-    "deltapitch": "CHANGEINPITCH",
-    "consonantstepsizeup": "SCALARSTEPUP",
-    "consonantstepsizedown": "SCALARSTEPDOWN",
-        // Intervals blocks
-    "key": "CURRENTKEY",
-    "currentmode": "CURRENTMODE",
-    "modelength": "MODELENGTH",
-        // Volume blocks
-    "notevolumefactor": "MASTERVOLUME"
-};
-
-/** lookup table for block names to API method names */
-const methodNameLookup = {
-        // Rhythm blocks
-    "newnote": "playNote",
-    "osctime": "playNoteMillis",
-    "rest2": "playRest",
-    "rhythmicdot2": "dot",
-    "tie": "tie",
-    "multiplybeatfactor": "multiplyNoteValue",
-    "newswing2": "swing",
-        // Meter blocks
-    "meter": "setMeter",
-    "setbpm3": "setBPM",
-    "setmasterbpm2": "setMasterBPM",
-    "everybeatdo": "onEveryNoteDo",
-    "everybeatdonew": "onEveryBeatDo",
-    "onbeatdo": "onStrongBeatDo",
-    "offbeatdo": "onWeakBeatDo",
-    "drift": "setNoClock",
-    "elapsednotes2": "getNotesPlayed",
-        // Pitch blocks
-    "pitch": "playPitch",
-    "steppitch": "stepPitch",
-    "nthmodalpitch": "playNthModalPitch",
-    "pitchnumber": "playPitchNumber",
-    "hertz": "playHertz",
-    "accidental": "setAccidental",
-    "setscalartransposition": "setScalarTranspose",
-    "settransposition": "setSemitoneTranspose",
-    "register": "setRegister",
-    "invert1": "invert",
-    "setpitchnumberoffset": "setPitchNumberOffset",
-    "number2pitch": "numToPitch",
-    "number2octave": "numToOctave",
-        // Intervals blocks
-    "setkey2": "setKey",
-    // "definemode": "defineMode",
-    "interval": "setScalarInterval",
-    "semitoneinterval": "setSemitoneInterval",
-    "settemperament": "setTemperament",
-        // Tone blocks
-    "settimbre": "setInstrument",
-    "vibrato": "doVibrato",
-    "chorus": "doChorus",
-    "phaser": "doPhaser",
-    "tremolo": "doTremolo",
-    "dis": "doDistortion",
-    "harmonic2": "doHarmonic",
-        // Ornament blocks
-    "newstaccato": "setStaccato",
-    "newslur": "setSlur",
-    "neighbor2": "doNeighbor",
-        // Volume blocks
-    "crescendo": "doCrescendo",
-    "decrescendo": "doDecrescendo",
-    "articulation": "setRelativeVolume",
-    "setsynthvolume": "setSynthVolume",
-    "synthvolumefactor": "getSynthVolume",
-        // Drum blocks
-    "playdrum": "playDrum",
-    "setdrum": "setDrum",
-    "mapdrum": "mapPitchToDrum",
-    "playnoise": "playNoise",
-    // Number blocks
-    "random": "MathUtility.doRandom",
-    "oneOf": "MathUtility.doOneOf",
-    "distance": "MathUtility.doCalculateDistance",
-    // Graphics blocks
-    "forward": "goForward",
-    "back": "goBackward",
-    "right": "turnRight",
-    "left": "turnLeft",
-    "setxy": "setXY",
-    "setheading": "setHeading",
-    "arc": "drawArc",
-    "bezier": "drawBezier",
-    "controlpoint1": "setBezierControlPoint1",
-    "controlpoint2": "setBezierControlPoint2",
-    "clear": "clear",
-    "scrollxy": "scrollXY",
-    // Pen blocks
-    "setcolor": "setColor",
-    "setgrey": "setGrey",
-    "setshade": "setShade",
-    "sethue": "setHue",
-    "settranslucency": "setTranslucency",
-    "setpensize": "setPensize",
-    "penup": "penUp",
-    "pendown": "penDown",
-    // "": "doStartFill",
-    // "": "doStartHollowLine",
-    "background": "fillBackground",
-    "setfont": "setFont"
-};
-
 /** Abstract Syntax Tree for the bare minimum program code */
 const bareboneAST = {
     "type": "Program",
@@ -654,8 +483,8 @@ function getArgsAST(args) {
                 "value": null
             });
         } else if (typeof arg === "object") {
-            if (arg[0] in getterNameLookup) {
-                ASTs.push(getGetAST(getterNameLookup[arg[0]]));
+            if (JSInterface.isGetter(arg[0])) {
+                ASTs.push(getGetAST(JSInterface.getGetterName(arg[0])));
             } else {
                 ASTs.push(getArgExpAST(arg[0], arg[1]));
             }
@@ -814,11 +643,11 @@ function getBlockAST(flows, hiIteratorNum) {
                 ASTs.push(getMethodCallAST(idName, flow[1], true));
             }
         } else {
-            if (flow[0] in setterNameLookup) {
-                ASTs.push(getSetAST(setterNameLookup[flow[0]], flow[1]));
-            } else if (flow[0] in methodNameLookup) {
-                let isClamp = clampBlocks.indexOf(flow[0]) !== -1;
-                flow[0] = methodNameLookup[flow[0]];
+            if (JSInterface.isSetter(flow[0])) {
+                ASTs.push(getSetAST(JSInterface.getSetterName(flow[0]), flow[1]));
+            } else if (JSInterface.isMethod(flow[0])) {
+                let isClamp = JSInterface.isClampBlock(flow[0]);
+                flow[0] = JSInterface.getMethodName(flow[0]);
                 if (isClamp) {                                  // has inner flow
                     ASTs.push(getMethodCallClampAST(...flow));
                 } else {                                        // no inner flow
