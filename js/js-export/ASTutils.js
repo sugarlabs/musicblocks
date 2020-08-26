@@ -171,15 +171,16 @@ class ASTUtils {
      * @param {[*]} args - tree of arguments (for test argument)
      * @param {[*]} ifFlow - tree of flow statements for if condition
      * @param {[*]} [elseFlow] - tree of flow statements for else condition
+     * @param {Number} iteratorNum - iterator index number
      * @returns {Object} Abstract Syntax Tree of if/if-else block
      */
-    static _getIfAST(args, ifFlow, elseFlow) {
+    static _getIfAST(args, ifFlow, elseFlow, iteratorNum) {
         let AST = {
             "type": "IfStatement",
             "test": ASTUtils._getArgsAST(args)[0],
             "consequent": {
                 "type": "BlockStatement",
-                "body": ASTUtils._getBlockAST(ifFlow)
+                "body": ASTUtils._getBlockAST(ifFlow, iteratorNum)
             },
             "alternate": null
         };
@@ -187,7 +188,7 @@ class ASTUtils {
         if (elseFlow !== undefined) {
             AST["alternate"] = {
                 "type": "BlockStatement",
-                "body": ASTUtils._getBlockAST(elseFlow)
+                "body": ASTUtils._getBlockAST(elseFlow, iteratorNum)
             }
         }
 
@@ -257,15 +258,16 @@ class ASTUtils {
      * @static
      * @param {[*]} args - tree of arguments (for test condition)
      * @param {[*]} flow - tree of flow statements
+     * @param {Number} iteratorNum - iterator index number
      * @returns {Object} Abstract Syntax Tree of while-loop
      */
-    static _getWhileLoopAST(args, flow) {
+    static _getWhileLoopAST(args, flow, iteratorNum) {
         return {
             "type": "WhileStatement",
             "test": ASTUtils._getArgsAST(args)[0],
             "body": {
                 "type": "BlockStatement",
-                "body": ASTUtils._getBlockAST(flow)
+                "body": ASTUtils._getBlockAST(flow, iteratorNum)
             }
         };
     }
@@ -276,14 +278,15 @@ class ASTUtils {
      * @static
      * @param {[*]} args - tree of arguments (for test condition)
      * @param {[*]} flow - tree of flow statements
+     * @param {Number} iteratorNum - iterator index number
      * @returns {Object} Abstract Syntax Tree of do-while-loop
      */
-    static _getDoWhileLoopAST(args, flow) {
+    static _getDoWhileLoopAST(args, flow, iteratorNum) {
         return {
             "type": "DoWhileStatement",
             "body": {
                 "type": "BlockStatement",
-                "body": ASTUtils._getBlockAST(flow)
+                "body": ASTUtils._getBlockAST(flow, iteratorNum)
             },
             "test": ASTUtils._getArgsAST(args)[0]
         };
@@ -554,9 +557,10 @@ class ASTUtils {
      * @param {String} methodName - method name
      * @param {[*]} args - tree of arguments
      * @param {[*]} flows - tree of flow statements
+     * @param {Number} iteratorNum - iterator index number
      * @returns {Object} - Abstract Syntax Tree of method call
      */
-    static _getMethodCallClampAST(methodName, args, flows) {
+    static _getMethodCallClampAST(methodName, args, flows, iteratorNum) {
         let AST = ASTUtils._getMethodCallAST(methodName, args);
 
         AST["expression"]["argument"]["arguments"].push({
@@ -564,7 +568,7 @@ class ASTUtils {
             "params": [],
             "body": {
                 "type": "BlockStatement",
-                "body": ASTUtils._getBlockAST(flows)
+                "body": ASTUtils._getBlockAST(flows, iteratorNum)
             },
             "async": true,
             "expression": false
@@ -594,28 +598,28 @@ class ASTUtils {
      *
      * @static
      * @param {[*]} flows - tree of flow statements
-     * @param {Number} hiIteratorNum - highest iterator number in block
+     * @param {Number} iterMax - highest iterator number in block
      * @returns {[Object]} list of Abstract Syntax Trees
      * @throws {String} INVALID BLOCK Error
      */
-    static _getBlockAST(flows, hiIteratorNum) {
+    static _getBlockAST(flows, iterMax) {
         if (flows === undefined || flows === null)
             return [];
 
         let ASTs = [];
         for (let flow of flows) {
             if (flow[0] === "if") {
-                ASTs.push(ASTUtils._getIfAST(flow[1], flow[2]));
+                ASTs.push(ASTUtils._getIfAST(flow[1], flow[2], iterMax));
             } else if (flow[0] === "ifthenelse") {
-                ASTs.push(ASTUtils._getIfAST(flow[1], flow[2], flow[3]));
+                ASTs.push(ASTUtils._getIfAST(flow[1], flow[2], flow[3], iterMax));
             } else if (flow[0] === "repeat") {
-                ASTs.push(ASTUtils._getForLoopAST(flow[1], flow[2], hiIteratorNum));
+                ASTs.push(ASTUtils._getForLoopAST(flow[1], flow[2], iterMax));
             } else if (flow[0] === "while") {
-                ASTs.push(ASTUtils._getWhileLoopAST(flow[1], flow[2]));
+                ASTs.push(ASTUtils._getWhileLoopAST(flow[1], flow[2], iterMax));
             } else if (flow[0] === "forever") {
-                ASTs.push(ASTUtils._getWhileLoopAST([true], flow[2]));
+                ASTs.push(ASTUtils._getWhileLoopAST([true], flow[2], iterMax));
             } else if (flow[0] === "until") {
-                ASTs.push(ASTUtils._getDoWhileLoopAST(flow[1], flow[2]));
+                ASTs.push(ASTUtils._getDoWhileLoopAST(flow[1], flow[2], iterMax));
             } else if (flow[0] === "break") {
                 ASTs.push({
                     "type": "BreakStatement",
@@ -625,7 +629,7 @@ class ASTUtils {
                 ASTs.push({
                     "type": "SwitchStatement",
                     "discriminant": ASTUtils._getArgsAST(flow[1])[0],
-                    "cases": ASTUtils._getBlockAST(flow[2])
+                    "cases": ASTUtils._getBlockAST(flow[2], iterMax)
                 });
             } else if (flow[0] === "case") {
                 let AST = {
@@ -639,7 +643,7 @@ class ASTUtils {
                     ]
                 };
 
-                let flowASTs = ASTUtils._getBlockAST(flow[2]);
+                let flowASTs = ASTUtils._getBlockAST(flow[2], iterMax);
                 for (let i in flowASTs) {
                     AST["consequent"].splice(i, 0, flowASTs[i]);
                 }
@@ -649,7 +653,7 @@ class ASTUtils {
                 ASTs.push({
                     "type": "SwitchCase",
                     "test": null,
-                    "consequent": ASTUtils._getBlockAST(flow[2])
+                    "consequent": ASTUtils._getBlockAST(flow[2], iterMax)
                 });
             } else if (flow[0] === "increment") {
                 ASTs.push(ASTUtils._getIncrementStmntAST(flow[1], true));
@@ -684,7 +688,7 @@ class ASTUtils {
                     let isClamp = JSInterface.isClampBlock(flow[0]);
                     flow[0] = JSInterface.getMethodName(flow[0]);
                     if (isClamp) {                                  // has inner flow
-                        ASTs.push(ASTUtils._getMethodCallClampAST(...flow));
+                        ASTs.push(ASTUtils._getMethodCallClampAST(...flow, iterMax));
                     } else {                                        // no inner flow
                         ASTs.push(ASTUtils._getMethodCallAST(...flow));
                     }
