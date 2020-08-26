@@ -24,34 +24,40 @@
  */
 class PenBlocksAPI {
     setColor(value) {
-        value = Math.max(0, Math.min(100, Math.floor(value)));
-        return this.runCommand("doSetColor", [value]);
+        let args = JSInterface.validateArgs("setColor", [value]);
+        // value = Math.max(0, Math.min(100, Math.floor(value)));
+        return this.runCommand("doSetColor", [args[0]]);
     }
 
     setGrey(value) {
-        value = Math.max(0, Math.min(100, Math.floor(value)));
-        return this.runCommand("doSetChroma", [value]);
+        let args = JSInterface.validateArgs("setGrey", [value]);
+        // value = Math.max(0, Math.min(100, Math.floor(value)));
+        return this.runCommand("doSetChroma", [args[0]]);
     }
 
     setShade(value) {
-        value = Math.max(0, Math.min(100, Math.floor(value)));
-        return this.runCommand("doSetValue", [value]);
+        let args = JSInterface.validateArgs("setShade", [value]);
+        // value = Math.max(0, Math.min(100, Math.floor(value)));
+        return this.runCommand("doSetValue", [args[0]]);
     }
 
     setHue(value) {
-        value = Math.max(0, Math.min(100, Math.floor(value)));
-        return this.runCommand("doSetHue", [value]);
+        let args = JSInterface.validateArgs("setHue", [value]);
+        // value = Math.max(0, Math.min(100, Math.floor(value)));
+        return this.runCommand("doSetHue", [args[0]]);
     }
 
     setTranslucency(value) {
-        value = Math.max(0, Math.min(100, Math.floor(value)));
-        value = 1.0 - arg / 100;
-        return this.runCommand("doSetPenAlpha", [value]);
+        let args = JSInterface.validateArgs("setTranslucency", [value]);
+        // value = Math.max(0, Math.min(100, Math.floor(value)));
+        args[0] = 1.0 - args[0] / 100;
+        return this.runCommand("doSetPenAlpha", [args[0]]);
     }
 
     setPensize(value) {
-        value = Math.max(0, Math.min(100, Math.floor(value)));
-        return this.runCommand("doSetPensize", [value]);
+        let args = JSInterface.validateArgs("setPensize", [value]);
+        // value = Math.max(0, Math.min(100, Math.floor(value)));
+        return this.runCommand("doSetPensize", [args[0]]);
     }
 
     penUp() {
@@ -85,6 +91,7 @@ class PenBlocksAPI {
     }
 
     setFont(fontname) {
-        return this.runCommand("doSetFont", [fontname]);
+        let args = JSInterface.validateArgs("setFont", [fontname]);
+        return this.runCommand("doSetFont", [args[0]]);
     }
 }

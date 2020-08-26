@@ -24,44 +24,51 @@
  */
 class ToneBlocksAPI {
     async setInstrument(instrument, flow) {
-        await this.runCommand("setTimbre", [instrument, this.turIndex]);
-        await flow();
+        let args = JSInterface.validateArgs("setInstrument", [instrument, flow]);
+        await this.runCommand("setTimbre", [args[0], this.turIndex]);
+        await args[1]();
         return this.ENDFLOWCOMMAND;
     }
 
     async doVibrato(intensity, rate, flow) {
-        await this.runCommand("doVibrato", [intensity, rate, this.turIndex]);
-        await flow();
+        let args = JSInterface.validateArgs("doVibrato", [intensity, rate, flow]);
+        await this.runCommand("doVibrato", [args[0], args[1], this.turIndex]);
+        await args[2]();
         return this.ENDFLOWCOMMAND;
     }
 
     async doChorus(chorusRate, delayTime, chorusDepth, flow) {
-        await this.runCommand("doChorus", [chorusRate, delayTime, chorusDepth, this.turIndex]);
-        await flow();
+        let args = JSInterface.validateArgs("doChorus", [chorusRate, delayTime, chorusDepth, flow]);
+        await this.runCommand("doChorus", [args[0], args[1], args[2], this.turIndex]);
+        await args[3]();
         return this.ENDFLOWCOMMAND;
     }
 
     async doPhaser(rate, octaves, baseFrequency, flow) {
-        await this.runCommand("doPhaser", [rate, octaves, baseFrequency, this.turIndex]);
-        await flow();
+        let args = JSInterface.validateArgs("doPhaser", [rate, octaves, baseFrequency, flow]);
+        await this.runCommand("doPhaser", [args[0], args[1], args[2], this.turIndex]);
+        await args[3]();
         return this.ENDFLOWCOMMAND;
     }
 
     async doTremolo(frequency, depth, flow) {
-        await this.runCommand("doTremolo", [frequency, depth, this.turIndex]);
-        await flow();
+        let args = JSInterface.validateArgs("doTremolo", [frequency, depth, flow]);
+        await this.runCommand("doTremolo", [args[0], args[1], this.turIndex]);
+        await args[2]();
         return this.ENDFLOWCOMMAND;
     }
 
     async doDistortion(distortion, flow) {
-        await this.runCommand("doDistortion", [distortion, this.turIndex]);
-        await flow();
+        let args = JSInterface.validateArgs("doDistortion", [distortion, flow]);
+        await this.runCommand("doDistortion", [args[0], this.turIndex]);
+        await args[1]();
         return this.ENDFLOWCOMMAND;
     }
 
     async doHarmonic(harmonic, flow) {
-        await this.runCommand("doHarmonic", [harmonic, this.turIndex, MusicBlocks.BLK]);
-        await flow();
+        let args = JSInterface.validateArgs("doHarmonic", [harmonic, flow]);
+        await this.runCommand("doHarmonic", [args[0], this.turIndex, MusicBlocks.BLK]);
+        await args[1]();
         return this.ENDFLOWCOMMAND;
     }
 }

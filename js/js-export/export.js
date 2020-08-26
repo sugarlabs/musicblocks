@@ -346,7 +346,8 @@ class MusicBlocks {
     // ============================== METER ===================================
 
     set PICKUP(value) {
-        Singer.MeterActions.setPickup(value, this.turIndex);
+        let args = JSInterface.validateArgs("PICKUP", [value]);
+        Singer.MeterActions.setPickup(args[0], this.turIndex);
     }
 
     get WHOLENOTESPLAYED() {
@@ -394,7 +395,8 @@ class MusicBlocks {
     // ============================ INTERVALS =================================
 
     set MOVEABLEDO(moveable) {
-        Singer.IntervalsActions.setMoveableDo(moveable, this.turIndex);
+        let args = JSInterface.validateArgs("MOVEABLEDO", [moveable]);
+        Singer.IntervalsActions.setMoveableDo(args[0], this.turIndex);
     }
 
     get CURRENTKEY() {
@@ -412,11 +414,13 @@ class MusicBlocks {
     // ============================== VOLUME ==================================
 
     set PANNING(value) {
-        Singer.VolumeActions.setPanning(value, this.turIndex);
+        let args = JSInterface.validateArgs("PANNING", [value]);
+        Singer.VolumeActions.setPanning(args[0], this.turIndex);
     }
 
     set MASTERVOLUME(volume) {
-        Singer.VolumeActions.setMasterVolume(volume, this.turIndex);
+        let args = JSInterface.validateArgs("MASTERVOLUME", [volume]);
+        Singer.VolumeActions.setMasterVolume(args[0], this.turIndex);
     }
 
     get MASTERVOLUME() {
