@@ -2066,6 +2066,47 @@ class Singer {
 
             if (last(tur.singer.inNoteBlock) !== null) {
                 __playnote();
+
+                if (logo.specialArgs.length > 0) {
+                    let runAgainBlockParam = logo.specialArgs.pop()
+                    let _ar = runAgainBlockParam
+                    let blockN = _ar[3];
+        
+                    //update args for pitch in hertz and current pitch and then redo the flow block they are attatched to(print/storein etc).
+        
+                    let args = [];
+                    for (let i = 1; i <= logo.blocks.blockList[blockN].protoblock.args; i++) {
+                        if (logo.blocks.blockList[blockN].protoblock.dockTypes[i] === "in") {
+                            if (logo.blocks.blockList[blockN].connections[i] == null) {
+                                console.debug("skipping inflow args");
+                            } else {
+                                args.push(logo.blocks.blockList[blockN].connections[i]);
+                            }
+                        } else {
+                            args.push(
+                                logo.parseArg(
+                                    logo,
+                                    _ar[2],
+                                    logo.blocks.blockList[blockN].connections[i],
+                                    blockN,
+                                    _ar[4]
+                                )
+                            );
+                        }
+                    }
+                    //args, logo, turtle, blk, receivedArg, null, isflow
+                    if (typeof logo.blocks.blockList[blockN].protoblock.flow === "function") {
+                        logo.blocks.blockList[blockN].protoblock.flow(
+                            args,
+                            _ar[1],
+                            _ar[2],
+                            _ar[3],
+                            _ar[4],
+                            _ar[5],
+                            _ar[6]
+                        );
+                    }
+                }
             }
         }
 
