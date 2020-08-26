@@ -214,10 +214,11 @@ function setupMeterActions() {
 
             let turOrg = logo.turtles.ithTurtle(orgTurtle);
             let duration =
-                60 / turOrg.singer.bpm.length > 0 ? last(turOrg.singer.bpm) : Singer.masterBPM;
+                60 / (turOrg.singer.bpm.length > 0 ? last(turOrg.singer.bpm) : Singer.masterBPM);
             if (tur.interval !== undefined) {
                 clearInterval(tur.interval);
             }
+            logo.stage.dispatchEvent(eventName);
             tur.interval = setInterval(() => logo.stage.dispatchEvent(eventName), duration * 1000);
         }
 
