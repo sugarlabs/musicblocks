@@ -218,7 +218,7 @@ function SaveInterface(PlanetInterface) {
         this.logo.synth.setupRecorder();
         this.logo.synth.recorder.start();
         this.logo.runLogoCommands();
-        this.logo.textMsg(_("Your recording is in progress"));
+        this.logo.textMsg(_("Your recording is in progress."));
     };
 
     this.saveAbc = function(filename) {
