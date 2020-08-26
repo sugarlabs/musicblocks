@@ -40,25 +40,25 @@ class RhythmBlocksAPI {
     }
 
     async dot(value, flow) {
-        await this.runCommand("doRhythmicDot", [value, this.turIndex, MusicBlocks.BLK]);
+        await this.runCommand("doRhythmicDot", [value, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
 
     async tie(flow) {
-        await this.runCommand("doTie", [this.turIndex, MusicBlocks.BLK]);
+        await this.runCommand("doTie", [this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
 
     async multiplyNoteValue(factor, flow) {
-        await this.runCommand("multiplyNoteValue", [factor, this.turIndex, MusicBlocks.BLK]);
+        await this.runCommand("multiplyNoteValue", [factor, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
 
     async swing(swingValue, noteValue, flow) {
-        await this.runCommand("addSwing", [swingValue, noteValue, this.turIndex, MusicBlocks.BLK]);
+        await this.runCommand("addSwing", [swingValue, noteValue, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }

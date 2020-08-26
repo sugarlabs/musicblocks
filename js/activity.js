@@ -220,16 +220,18 @@ function Activity() {
             "Tone",
             "activity/js-export/export",
             "activity/js-export/sample",
-            "activity/js-export/GraphicsBlocksAPI",
-            "activity/js-export/PenBlocksAPI",
-            "activity/js-export/RhythmBlocksAPI",
-            "activity/js-export/MeterBlocksAPI",
-            "activity/js-export/PitchBlocksAPI",
-            "activity/js-export/IntervalsBlocksAPI",
-            "activity/js-export/ToneBlocksAPI",
-            "activity/js-export/OrnamentBlocksAPI",
-            "activity/js-export/VolumeBlocksAPI",
-            "activity/js-export/DrumBlocksAPI",
+            "activity/js-export/ASTutils",
+            "activity/js-export/generate",
+            "activity/js-export/API/GraphicsBlocksAPI",
+            "activity/js-export/API/PenBlocksAPI",
+            "activity/js-export/API/RhythmBlocksAPI",
+            "activity/js-export/API/MeterBlocksAPI",
+            "activity/js-export/API/PitchBlocksAPI",
+            "activity/js-export/API/IntervalsBlocksAPI",
+            "activity/js-export/API/ToneBlocksAPI",
+            "activity/js-export/API/OrnamentBlocksAPI",
+            "activity/js-export/API/VolumeBlocksAPI",
+            "activity/js-export/API/DrumBlocksAPI",
             "widgets/widgetWindows",
             "widgets/jseditor",
             "widgets/modewidget",
@@ -3624,18 +3626,17 @@ function Activity() {
             clearTimeout(errorMsgTimeoutID);
         }
 
-        // Hide the button, as the program is going to be
-        // terminated.
+        // hide the button, as the program is going to be terminated
         _hideStopButton();
 
-        if (errorMsgText == null) {
-            // The container may not be ready yet, so do nothing.
+        // the container may not be ready yet, so do nothing
+        if (errorMsgText == null)
             return;
-        }
 
         if (
             blk !== undefined &&
             blk != null &&
+            blk in blocks.blockList &&
             !blocks.blockList[blk].collapsed
         ) {
             let fromX = (canvas.width - 1000) / 2;

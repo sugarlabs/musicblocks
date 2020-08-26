@@ -1,6 +1,6 @@
 /**
  * @file This contains the API function defimitions for JavaScript based Music Blocks code specific
- * to Ornament blocks.
+ * to Drum blocks.
  * @author Anindya Kundu
  *
  * @copyright 2020 Anindya Kundu
@@ -16,28 +16,30 @@
 */
 
 /**
- * Class pertaining to the API methods specific to Ornament blocks for JavaScript based Music Blocks
+ * Class pertaining to the API methods specific to Drum blocks for JavaScript based Music Blocks
  * programs.
  *
  * @class
  * @classdesc methods are imported by a importMethod function call from MusicBlocks class.
  */
-class OrnamentBlocksAPI {
-    async setStaccato(value, flow) {
-        await this.runCommand("setStaccato", [value, this.turIndex, MusicBlocks.BLK]);
+class DrumBlocksAPI {
+    playDrum(drum) {
+        return this.runCommand("playDrum", [drum, this.turIndex, MusicBlocks.BLK]);
+    }
+
+    async setDrum(drum, flow) {
+        await this.runCommand("setDrum", [drum, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
 
-    async setSlur(value, flow) {
-        await this.runCommand("setSlur", [value, this.turIndex, MusicBlocks.BLK]);
+    async mapPitchToDrum(drum, flow) {
+        await this.runCommand("mapPitchToDrum", [drum, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
 
-    async doneighbor(interval, noteValue, flow) {
-        await this.runCommand("doNeighbor", [interval, noteValue, this.turIndex, MusicBlocks.BLK]);
-        await flow();
-        return this.ENDFLOWCOMMAND;
+    playNoise(noise) {
+        return this.runCommand("playNoise", [noise, this.turIndex]);
     }
 }

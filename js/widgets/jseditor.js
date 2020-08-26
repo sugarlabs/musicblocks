@@ -52,23 +52,11 @@ class JSEditor {
         this.styles = [
             "dracula",
             "github",
-            "solarized-dark",
-            "solarized-light",
             "railscasts",
-            "monokai-sublime",
-            "mono-blue",
-            "tomorrow",
-            "color-brewer",
-            "zenburn",
-            "agate",
-            "androidstudio",
-            "atom-one-light",
-            "rainbow",
             "vs",
-            "atom-one-dark"
         ].map((name) => {
             const link = document.createElement("link");
-            link.href = `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/${name}.min.css`;
+            link.href = `././lib/codejar/styles/${name}.min.css`;
             link.rel = "stylesheet";
             link.disabled = "true";
             document.head.appendChild(link);
@@ -186,7 +174,8 @@ class JSEditor {
         this._jar = new CodeJar(codebox, highlight);
 
         // this._code = JS_STARTER;
-        this._code = SAMPLE_2;
+        // this._code = SAMPLE_2;
+        this.generateCode();
 
         codebox.className = "editor language-js";
         this._jar.updateCode(this._code);
@@ -222,6 +211,10 @@ class JSEditor {
 
     generateCode() {
         console.debug("Generate JavaScript");
+
+        JSGenerate.run(true);
+        this._code = JSGenerate.code;
+        this._jar.updateCode(this._code);
     }
 
     toggleHelp() {

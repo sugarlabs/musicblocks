@@ -61,8 +61,13 @@ function setupToneActions() {
             }
 
             let listenerName = "_settimbre_" + turtle;
-            if (blk !== undefined && blk in logo.blocks.blockList)
+            if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => {
                 tur.inSetTimbre = false;
@@ -97,8 +102,13 @@ function setupToneActions() {
             tur.singer.vibratoRate.push(1 / rate);
 
             let listenerName = "_vibrato_" + turtle;
-            if (blk !== undefined && blk in logo.blocks.blockList)
+            if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => {
                 tur.singer.vibratoIntensity.pop();
@@ -142,8 +152,13 @@ function setupToneActions() {
             tur.singer.chorusDepth.push(chorusDepth);
 
             let listenerName = "_chorus_" + turtle;
-            if (blk !== undefined && blk in logo.blocks.blockList)
+            if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => {
                 tur.singer.chorusRate.pop();
@@ -171,8 +186,13 @@ function setupToneActions() {
             tur.singer.baseFrequency.push(baseFrequency);
 
             let listenerName = "_phaser_" + turtle;
-            if (blk !== undefined && blk in logo.blocks.blockList)
+            if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => {
                 tur.singer.rate.pop();
@@ -206,8 +226,13 @@ function setupToneActions() {
             tur.singer.tremoloDepth.push(depth);
 
             let listenerName = "_tremolo_" + turtle;
-            if (blk !== undefined && blk in logo.blocks.blockList)
+            if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => {
                 tur.singer.tremoloFrequency.pop();
@@ -237,8 +262,13 @@ function setupToneActions() {
             tur.singer.distortionAmount.push(distortion);
 
             let listenerName = "_distortion_" + turtle;
-            if (blk !== undefined && blk in logo.blocks.blockList)
+            if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             logo.setTurtleListener(
                 turtle, listenerName, event => tur.singer.distortionAmount.pop()
@@ -274,7 +304,13 @@ function setupToneActions() {
             logo.notation.notationBeginHarmonics(turtle);
 
             let listenerName = "_harmonic_" + turtle + "_" + blk;
-            logo.setDispatchBlock(blk, turtle, listenerName);
+            if (blk !== undefined && blk in blocks.blockList) {
+                logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                let mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null)
+                    mouse.MB.listeners.push(listenerName);
+            }
 
             let __listener = event => {
                 tur.singer.inHarmonic.pop();

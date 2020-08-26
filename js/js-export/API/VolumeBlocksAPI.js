@@ -1,6 +1,6 @@
 /**
  * @file This contains the API function defimitions for JavaScript based Music Blocks code specific
- * to Intervals blocks.
+ * to Volume blocks.
  * @author Anindya Kundu
  *
  * @copyright 2020 Anindya Kundu
@@ -16,40 +16,36 @@
 */
 
 /**
- * Class pertaining to the API methods specific to Intervals blocks for JavaScript based Music Blocks
+ * Class pertaining to the API methods specific to Volume blocks for JavaScript based Music Blocks
  * programs.
  *
  * @class
  * @classdesc methods are imported by a importMethod function call from MusicBlocks class.
  */
-class IntervalsBlocksAPI {
-    setKey(key, mode) {
-        return this.runCommand("setKey", [key, mode, this.turIndex]);
-    }
-
-    moveableDo(set) {
-        return this.runCommand("setMoveableDo", [set, this.turIndex]);
-    }
-
-    async defineMode(name, flow) {
-        await this.runCommand("setStaccato", [name, this.turIndex, MusicBlocks.BLK]);
+class VolumeBlocksAPI {
+    async doCrescendo(value, flow) {
+        await this.runCommand("doCrescendo", ["crescendo", value, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
 
-    async setScalarInterval(value, flow) {
-        await this.runCommand("setScalarInterval", [value, this.turIndex, MusicBlocks.BLK]);
+    async doDecrescendo(value, flow) {
+        await this.runCommand("doCrescendo", ["decrescendo", value, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
 
-    async setSemitoneInterval(value, flow) {
-        await this.runCommand("setSemitoneInterval", [value, this.turIndex, MusicBlocks.BLK]);
+    async setRelativeVolume(value, flow) {
+        await this.runCommand("setRelativeVolume", [value, this.turIndex]);
         await flow();
         return this.ENDFLOWCOMMAND;
     }
 
-    setTemperament(temperament, pitch, octave) {
-        return this.runCommand("setTemperament", [temperament, pitch, octave]);
+    setSynthVolume(synth, value) {
+        return this.runCommand("setSynthVolume", [synth, value, this.turIndex]);
+    }
+
+    getSynthVolume(synth) {
+        return Singer.VolumeActions.getSynthVolume(synth, this.turIndex);
     }
 }
