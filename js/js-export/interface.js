@@ -1352,12 +1352,6 @@ class JSInterface {
                 }
             }
         ]
-    };
-
-    static logError(message, color) {
-        if (color === undefined)
-            color = "gold";
-        console.log("%c" + message, `color: ${color}`);
     }
 
     /**
@@ -1383,7 +1377,7 @@ class JSInterface {
                         arg = Number(arg);
                     } else {
                         let error = `TypeMismatch error: expected "number" but found "string"`;
-                        JSInterface.logError(error, "red");
+                        JSEditor.logConsole(error, "maroon");
                         throw error;
                     }
                 } else if (typeof arg === "string" && props["type"] === "boolean") {
@@ -1392,13 +1386,13 @@ class JSInterface {
                     } else if (arg.toLowerCase() === "false") {
                         arg = false;
                     } else {
-                        JSInterface.logError(`${arg} in "${methodName}" reset to ${true}`);
+                        JSEditor.logConsole(`${arg} in "${methodName}" reset to ${true}`);
                         arg = true;
                     }
                 } else {
                     let error =
                         `TypeMismatch error: expected "${props["type"]}" but found "${typeof arg}"`;
-                    JSInterface.logError(error, "red");
+                    JSEditor.logConsole(error, "maroon");
                     throw error;
                 }
             }
@@ -1406,19 +1400,19 @@ class JSInterface {
             switch (props["type"]) {
                 case "number":
                     if (arg < props["constraints"]["min"]) {
-                        JSInterface.logError(
+                        JSEditor.logConsole(
                             `${arg} in "${methodName}" reset to ${props["constraints"]["min"]}`
                         );
                         arg = props["constraints"]["min"];
                     } else if (arg > props["constraints"]["max"]) {
-                        JSInterface.logError(
+                        JSEditor.logConsole(
                             `${arg} in "${methodName}" reset to ${props["constraints"]["max"]}`
                         );
                         arg = props["constraints"]["min"];
                     }
 
                     if (props["constraints"]["integer"] && !Number.isInteger(arg)) {
-                        JSInterface.logError(
+                        JSEditor.logConsole(
                             `${arg} in "${methodName}" reset to ${Math.floor(arg)}`
                         );
                         arg = Math.floor(arg);
@@ -1431,7 +1425,7 @@ class JSInterface {
                         arg[Symbol.toStringTag] !== "AsyncFunction"
                     ) {
                         let error = `${args[0]} error: expected "async" function`;
-                        JSInterface.logError(error, "red");
+                        JSEditor.logConsole(error, "maroon");
                         throw error;
                     }
                     break;
@@ -1467,7 +1461,7 @@ class JSInterface {
                                 }
                             }
                         } else {
-                            JSInterface.logError(`${arg} in "${methodName}" reset to ${"sol"}`);
+                            JSEditor.logConsole(`${arg} in "${methodName}" reset to ${"sol"}`);
                             arg = "sol";
                         }
                     } else if (props["constraints"]["type"] === "accidental") {
@@ -1502,7 +1496,7 @@ class JSInterface {
                         if (index !== -1) {
                             arg = props["constraints"]["values"][index];
                         } else {
-                            JSInterface.logError(
+                            JSEditor.logConsole(
                                 `${arg} in "${methodName}" reset to ${props["constraints"][
                                     "values"
                                 ][props["constraints"]["defaultIndex"]]}`
@@ -1545,7 +1539,7 @@ class JSInterface {
                         if (instruments.indexOf(arg) !== -1) {
                             arg = arg.toLowerCase();
                         } else {
-                            JSInterface.logError(
+                            JSEditor.logConsole(
                                 `${arg} in "${methodName}" reset to ${"electronic synth"}`
                             );
                             arg = "electronic synth";
@@ -1575,7 +1569,7 @@ class JSInterface {
                         if (drums.indexOf(arg) !== -1) {
                             arg = arg.toLowerCase();
                         } else {
-                            JSInterface.logError(
+                            JSEditor.logConsole(
                                 `${arg} in "${methodName}" reset to ${"kick drum"}`
                             );
                             arg = "kick drum";
@@ -1588,7 +1582,7 @@ class JSInterface {
                         } else if (arg.toLowerCase() === "pink noise") {
                             arg = "noise3";
                         } else {
-                            JSInterface.logError(
+                            JSEditor.logConsole(
                                 `${arg} in "${methodName}" reset to ${"white noise"}`
                             );
                             arg = "noise1";
@@ -1615,7 +1609,7 @@ class JSInterface {
                                 }
                             }
                         } else {
-                            JSInterface.logError(`${arg} in "${methodName}" reset to ${"C"}`);
+                            JSEditor.logConsole(`${arg} in "${methodName}" reset to ${"C"}`);
                             arg = "C";
                         }
                     }

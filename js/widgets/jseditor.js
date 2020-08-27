@@ -33,7 +33,7 @@ class JSEditor {
             window.widgetWindows.windowFor(this, "JavaScript Editor", "JavaScript Editor");
         this.widgetWindow.clear();
         this.widgetWindow.show();
-        this.widgetWindow.setPosition(160, 160);
+        this.widgetWindow.setPosition(160, 132);
 
         let that = this;
         this.widgetWindow.onClose = function() {
@@ -69,8 +69,10 @@ class JSEditor {
     }
 
     setup() {
+        let maxHeight = docById("overlayCanvas").height;
+
         this._editor.style.width = "39rem";
-        this._editor.style.height = "43rem";
+        this._editor.style.height = `${maxHeight - 33 - 128 - 12}px`;
         this._editor.style.display = "flex";
         this._editor.style.flexDirection = "column";
 
@@ -153,7 +155,7 @@ class JSEditor {
             codebox.classList.add("editor");
             codebox.classList.add("language-js");
             codebox.style.width = "100%";
-            codebox.style.height = "calc(100% - 3rem)";
+            codebox.style.height = "calc(100% - 11rem)";
             codebox.style.boxSizing = "border-box";
             codebox.style.padding = ".25rem";
             codebox.style.fontFamily = '"PT Mono", monospace';
@@ -165,6 +167,40 @@ class JSEditor {
             codebox.style.tabSize = "4";
             codebox.style.cursor = "text";
         this._editor.appendChild(codebox);
+
+        let consolelabel = document.createElement("div");
+            consolelabel.style.width = "100%";
+            consolelabel.style.height = "1.75rem";
+            consolelabel.style.boxSizing = "border-box";
+            consolelabel.style.borderTop = "1px solid gray";
+            consolelabel.style.borderBottom = "1px solid gray";
+            consolelabel.style.padding = ".25rem";
+            consolelabel.style.fontFamily = '"PT Mono", monospace';
+            consolelabel.style.fontSize = "14px";
+            consolelabel.style.fontWeight = "700";
+            consolelabel.style.letterSpacing = "normal";
+            consolelabel.style.lineHeight = "20px";
+            consolelabel.style.color = "indigo"
+            consolelabel.style.background = "white";
+            consolelabel.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;CONSOLE";
+        this._editor.appendChild(consolelabel);
+
+        let editorconsole = document.createElement("div");
+            editorconsole.id = "editorConsole";
+            editorconsole.style.width = "100%";
+            editorconsole.style.height = "8.25rem";
+            editorconsole.style.overflow = "auto";
+            editorconsole.style.boxSizing = "border-box";
+            editorconsole.style.padding = ".25rem";
+            editorconsole.style.fontFamily = '"PT Mono", monospace';
+            editorconsole.style.fontSize = "14px";
+            editorconsole.style.fontWeight = "400";
+            editorconsole.style.letterSpacing = "normal";
+            editorconsole.style.lineHeight = "20px";
+            codebox.style.resize = "none !important";
+            editorconsole.style.background = "lightcyan";
+            editorconsole.style.cursor = "text";
+        this._editor.appendChild(editorconsole);
 
         const highlight = (editor) => {
             editor.textContent = editor.textContent;
@@ -193,9 +229,25 @@ class JSEditor {
         this.widgetWindow.takeFocus();
     }
 
+    static logConsole(message, color) {
+        if (color === undefined)
+            color = "midnightblue";
+        if (docById("editorConsole")) {
+            if (docById("editorConsole").innerHTML !== "")
+                docById("editorConsole").innerHTML += "</br>";
+            docById("editorConsole").innerHTML += `<span style="color: ${color}">${message}</span>`;
+        } else {
+            console.error("EDITOR MISSING!");
+        }
+        console.log("%c" + message, `color: ${color}`);
+    }
+
     runCode() {
         if (this._showingHelp)
             return;
+
+        if (docById("editorConsole"))
+            docById("editorConsole").innerHTML = "";
 
         console.debug("Run JavaScript");
 
@@ -203,7 +255,7 @@ class JSEditor {
             MusicBlocks.init(true);
             new Function(this._code)();
         } catch (e) {
-            console.error(e);
+            JSEditor.logConsole(e, "maroon");
         }
     }
 
