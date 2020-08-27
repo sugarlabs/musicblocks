@@ -79,10 +79,22 @@ function StatsWindow() {
         options = getChartOptions(__callback);
         myRadarChart = new Chart(ctx).Radar(data, options);
         
-        this.jsonObject = document.createElement('pre');
+        this.jsonObject = document.createElement('ul');
         this.jsonObject.style.float = 'left';
         this.widgetWindow.getWidgetBody().appendChild(this.jsonObject)
 
     };
+    this.displayInfo = (stats) => {
+        this.jsonObject.innerHTML = 
+            '<li>Duples: '+stats["duples"]+'</li>' +
+            '<li>triplets: '+stats["triplets"]+'</li>' +
+            '<li>quintuplets: '+stats["quintuplets"]+'</li>' +
+            '<li>pitchNames: '+Array.from(stats["pitchNames"])+'</li>' +
+            '<li>numberOfNotes: '+stats["numberOfNotes"]+'</li>' +
+            '<li>lowestNote: '+stats["lowestNote"][0]+" , "+stats["lowestNote"][2]+'</li>' +
+            '<li>highestNote: '+stats["highestNote"][0]+" , "+stats["highestNote"][2]+'</li>' +
+            '<li>rests used: '+stats["rests"]+'</li>' +
+            '<li>ornaments used: '+stats["ornaments"]+'</li>'
+    }
 
 }
