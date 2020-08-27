@@ -555,7 +555,7 @@ function setupVolumeBlocks() {
                 arg = 0;
             }
 
-            Singer.VolumeActions.setRelativeVolume(volume, turtle, blk);
+            Singer.VolumeActions.setRelativeVolume(arg, turtle, blk);
 
             return [args[1], 1];
         }
