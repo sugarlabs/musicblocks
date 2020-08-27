@@ -472,7 +472,7 @@ Turtles.TurtlesModel = class {
                 }
 
                 if ("name" in infoDict) {
-                    turtle.painter.rename(infoDict["name"]);
+                    turtle.rename(infoDict["name"]);
                 }
             }
         }, 2000);
