@@ -1505,7 +1505,7 @@ class JSInterface {
                                 props["constraints"]["defaultIndex"]
                             ];
                         }
-                    } else if (props["constraints"]["type"] === "instrument") {
+                    } else if (props["constraints"]["type"] === "synth") {
                         const instruments = [
                             "piano",
                             "violin",
