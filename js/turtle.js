@@ -889,7 +889,7 @@ Turtle.TurtleView = class {
      * @param {Function} refreshCanvas - callback to refresh canvas
      * @returns {void}
      */
-    makeTurtleBitmap(data, refreshCanvas) {
+    makeTurtleBitmap(data, refreshCanvas, useTurtleArtwork) {
         // Works with Chrome, Safari, Firefox (untested on IE)
         let img = new Image();
 
@@ -904,7 +904,7 @@ Turtle.TurtleView = class {
             this._createCache();
 
             let startBlock = this._startBlock;
-            if (startBlock != null) {
+            if (useTurtleArtwork && startBlock != null) {
                 startBlock.updateCache();
                 this._decorationBitmap = this._bitmap.clone();
                 startBlock.container.addChild(this._decorationBitmap);
