@@ -69,10 +69,17 @@ class JSEditor {
     }
 
     setup() {
-        let maxHeight = docById("overlayCanvas").height;
+        this.widgetWindow.onmaximize = () => {
+            let editor = this.widgetWindow.getWidgetBody().childNodes[0];
+                editor.style.width = this.widgetWindow._maximized ? "100%" : "39rem";
+                editor.style.height =
+                    this.widgetWindow._maximized ?
+                        `calc(100vh - ${64 + 33}px` :
+                        `${docById("overlayCanvas").height - 33 - 128 - 12}px`;
+        }
 
         this._editor.style.width = "39rem";
-        this._editor.style.height = `${maxHeight - 33 - 128 - 12}px`;
+        this._editor.style.height = `${docById("overlayCanvas").height - 33 - 128 - 12}px`;
         this._editor.style.display = "flex";
         this._editor.style.flexDirection = "column";
 
