@@ -135,6 +135,8 @@ const EQUIVALENTSHARPS = {
     "B♭": "A" + SHARP
 };
 const EQUIVALENTNATURALS = { "E♯": "F", "B♯": "C", "C♭": "B", "F♭": "E" };
+const EQUIVALENTACCIDENTALS = { "F": "E♯", "C": "B♯", "B": "C♭", "E": "F♭", "G": "F𝄪", "D": "C𝄪", "A": "G𝄪"};
+
 const EXTRATRANSPOSITIONS = {
     "E♯": ["F", 0],
     "B♯": ["C", 1],
@@ -1987,6 +1989,13 @@ function _getStepSize(
 }
 
 function _buildScale(keySignature) {
+
+    // FIX ME: temporary hard-coded fix to avoid errors in pitch preview
+    if (keySignature == "C♭ major") {
+        let scale = ["C♭", "D♭", "E♭", "F♭", "G♭", "A♭", "B♭", "C♭"];
+        return [scale, halfSteps];
+    }
+
     var obj = keySignatureToMode(keySignature);
     var myKeySignature = obj[0];
     if (obj[1] === "CUSTOM") {
