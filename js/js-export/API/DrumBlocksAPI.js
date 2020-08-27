@@ -24,22 +24,26 @@
  */
 class DrumBlocksAPI {
     playDrum(drum) {
-        return this.runCommand("playDrum", [drum, this.turIndex, MusicBlocks.BLK]);
+        let args = JSInterface.validateArgs("playDrum", [drum]);
+        return this.runCommand("playDrum", [args[0], this.turIndex, MusicBlocks.BLK]);
     }
 
     async setDrum(drum, flow) {
-        await this.runCommand("setDrum", [drum, this.turIndex]);
-        await flow();
+        let args = JSInterface.validateArgs("setDrum", [drum, flow]);
+        await this.runCommand("setDrum", [args[0], this.turIndex]);
+        await args[1]();
         return this.ENDFLOWCOMMAND;
     }
 
     async mapPitchToDrum(drum, flow) {
-        await this.runCommand("mapPitchToDrum", [drum, this.turIndex]);
-        await flow();
+        let args = JSInterface.validateArgs("mapPitchToDrum", [drum, flow]);
+        await this.runCommand("mapPitchToDrum", [args[0], this.turIndex]);
+        await args[1]();
         return this.ENDFLOWCOMMAND;
     }
 
     playNoise(noise) {
-        return this.runCommand("playNoise", [noise, this.turIndex]);
+        let args = JSInterface.validateArgs("playNoise", [noise]);
+        return this.runCommand("playNoise", [args[0], this.turIndex]);
     }
 }

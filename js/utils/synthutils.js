@@ -66,12 +66,7 @@ const VOICENAMES = [
     //.TRANS: xylophone musical instrument
     [_("xylophone"), "xylophone", "images/8_bellset_key_6.svg", "precussion"],
     //.TRANS: polytone synthesizer
-    [
-        _("electronic synth"),
-        "electronic synth",
-        "images/synth.svg",
-        "electronic"
-    ],
+    [_("electronic synth"), "electronic synth", "images/synth.svg", "electronic"],
     //.TRANS: simple monotone synthesizer
     // [_('simple 1'), 'simple 1', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
@@ -118,21 +113,9 @@ const DRUMNAMES = [
     //.TRANS: musical instrument
     [_("cow bell"), "cow bell", "images/cowbell.svg", "cb", "bell"],
     //.TRANS: musical instrument
-    [
-        _("triangle bell"),
-        "triangle bell",
-        "images/trianglebell.svg",
-        "tri",
-        "bell"
-    ],
+    [_("triangle bell"), "triangle bell", "images/trianglebell.svg", "tri", "bell"],
     //.TRANS: musical instrument
-    [
-        _("finger cymbals"),
-        "finger cymbals",
-        "images/fingercymbals.svg",
-        "cymca",
-        "bell"
-    ],
+    [_("finger cymbals"), "finger cymbals", "images/fingercymbals.svg", "cymca", "bell"],
     //.TRANS: musical instrument
     // [_('japanese bell'), 'japanese bell', 'images/cowbell.svg', 'hh', 'bell'],
     //.TRANS: a musically tuned set of bells
@@ -791,7 +774,7 @@ function Synth() {
         }
         this.recorder.ondataavailable = (evt) => {
             console.log(evt.data);
-            if (typeof evt.data === 'undefined' || evt.data.size === 0) 
+            if (typeof evt.data === 'undefined' || evt.data.size === 0)
                 return;
             chunks.push(evt.data)
         };
@@ -1623,7 +1606,7 @@ function Synth() {
         console.debug("Crescendo",instrumentName ,":" ,oldVol ,"to" ,volume ,"t:" ,rampTime);
 
         synth.volume.linearRampToValueAtTime(db, Tone.now() + rampTime);
-    } 
+    }
 
     this.setVolume = function(turtle, instrumentName, volume) {
         // We pass in volume as a number from 0 to 100.

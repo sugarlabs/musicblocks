@@ -24,28 +24,33 @@
  */
 class VolumeBlocksAPI {
     async doCrescendo(value, flow) {
-        await this.runCommand("doCrescendo", ["crescendo", value, this.turIndex]);
-        await flow();
+        let args = JSInterface.validateArgs("doCrescendo", [value, flow]);
+        await this.runCommand("doCrescendo", ["crescendo", args[0], this.turIndex]);
+        await args[1]();
         return this.ENDFLOWCOMMAND;
     }
 
     async doDecrescendo(value, flow) {
-        await this.runCommand("doCrescendo", ["decrescendo", value, this.turIndex]);
-        await flow();
+        let args = JSInterface.validateArgs("doDecrescendo", [value, flow]);
+        await this.runCommand("doCrescendo", ["decrescendo", args[0], this.turIndex]);
+        await args[1]();
         return this.ENDFLOWCOMMAND;
     }
 
     async setRelativeVolume(value, flow) {
-        await this.runCommand("setRelativeVolume", [value, this.turIndex]);
-        await flow();
+        let args = JSInterface.validateArgs("setRelativeVolume", [value, flow]);
+        await this.runCommand("setRelativeVolume", [args[0], this.turIndex]);
+        await args[1]();
         return this.ENDFLOWCOMMAND;
     }
 
     setSynthVolume(synth, value) {
-        return this.runCommand("setSynthVolume", [synth, value, this.turIndex]);
+        let args = JSInterface.validateArgs("setSynthVolume", [synth, value]);
+        return this.runCommand("setSynthVolume", [args[0], args[1], this.turIndex]);
     }
 
     getSynthVolume(synth) {
-        return Singer.VolumeActions.getSynthVolume(synth, this.turIndex);
+        let args = JSInterface.validateArgs("getSynthVolume", [synth]);
+        return Singer.VolumeActions.getSynthVolume(args[0], this.turIndex);
     }
 }

@@ -118,7 +118,7 @@ class JSGenerate {
                     }
 
                     if (arg.protoblock.style === "value") {
-                        if (arg.name in getterNameLookup) {
+                        if (JSInterface.isGetter(arg.name)) {
                             args.push([arg.name, null]);
                         } else if (
                             arg.protoblock.__proto__.__proto__.constructor.name === "BooleanBlock"
@@ -291,18 +291,20 @@ class JSGenerate {
     static generateCode() {
         JSGenerate.generateFailed = false;
 
-        JSGenerate.AST = JSON.parse(JSON.stringify(bareboneAST));
+        JSGenerate.AST = JSON.parse(JSON.stringify(ASTUtils.BAREBONE_AST));
 
         try {
             for (let i = 0; i < JSGenerate.actionTrees.length; i++) {
-                JSGenerate.AST["body"].splice(i, 0, getMethodAST(
+                JSGenerate.AST["body"].splice(i, 0, ASTUtils.getMethodAST(
                     JSGenerate.actionNames[i], JSGenerate.actionTrees[i])
                 );
             }
 
             let offset = JSGenerate.actionTrees.length;
             for (let i = 0; i < JSGenerate.startTrees.length; i++) {
-                JSGenerate.AST["body"].splice(i + offset, 0, getMouseAST(JSGenerate.startTrees[i]));
+                JSGenerate.AST["body"].splice(i + offset, 0, ASTUtils.getMouseAST(
+                    JSGenerate.startTrees[i])
+                );
             }
         } catch (e) {
             JSGenerate.generateFailed = true;
@@ -319,8 +321,8 @@ class JSGenerate {
         }
 
         if (JSGenerate.generateFailed) {
-            let AST = JSON.parse(JSON.stringify(bareboneAST));
-            AST["body"].splice(0, 0, getMouseAST([]));
+            let AST = JSON.parse(JSON.stringify(ASTUtils.BAREBONE_AST));
+            AST["body"].splice(0, 0, ASTUtils.getMouseAST([]));
             JSGenerate.code = astring.generate(AST);
         }
     }
