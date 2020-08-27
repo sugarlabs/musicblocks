@@ -342,7 +342,6 @@ function Activity() {
         currentKeyCode = 0;
         pasteContainer = null;
         pasteImage = null;
-        chartBitmap = null;
         merging = false;
         loading = false;
         // On-screen buttons
@@ -844,11 +843,6 @@ function Activity() {
     _allClear = function(noErase) {
         blocks.activeBlock = null;
         hideDOMLabel();
-
-        if (chartBitmap != null) {
-            stage.removeChild(chartBitmap);
-            var chartBitmap = null;
-        }
 
         logo.boxes = {};
         logo.time = 0;
@@ -3094,10 +3088,6 @@ function Activity() {
             palettes.hide();
             changeImage(hideBlocksContainer.children[0],SHOWBLOCKSBUTTON,HIDEBLOCKSFADEDBUTTON);
         } else {
-            if (chartBitmap != null) {
-                stage.removeChild(chartBitmap);
-                chartBitmap = null;
-            }
             changeImage(hideBlocksContainer.children[0],HIDEBLOCKSFADEDBUTTON,SHOWBLOCKSBUTTON);
             blocks.showBlocks();
             palettes.show();
