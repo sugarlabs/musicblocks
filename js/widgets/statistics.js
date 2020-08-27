@@ -85,16 +85,18 @@ function StatsWindow() {
 
     };
     this.displayInfo = (stats) => {
+	let lowHertz = stats["lowestNote"][2] + 0.5;
+	let highHertz = stats["highestNote"][2] + 0.5;
         this.jsonObject.innerHTML = 
-            '<li>Duples: '+stats["duples"]+'</li>' +
-            '<li>triplets: '+stats["triplets"]+'</li>' +
-            '<li>quintuplets: '+stats["quintuplets"]+'</li>' +
-            '<li>pitchNames: '+Array.from(stats["pitchNames"])+'</li>' +
-            '<li>numberOfNotes: '+stats["numberOfNotes"]+'</li>' +
-            '<li>lowestNote: '+stats["lowestNote"][0]+" , "+stats["lowestNote"][2]+'</li>' +
-            '<li>highestNote: '+stats["highestNote"][0]+" , "+stats["highestNote"][2]+'</li>' +
-            '<li>rests used: '+stats["rests"]+'</li>' +
-            '<li>ornaments used: '+stats["ornaments"]+'</li>'
+            '<li>duples: ' + stats["duples"] + '</li>'  + 
+            '<li>triplets: ' + stats["triplets"] + '</li>'  + 
+            '<li>quintuplets: ' + stats["quintuplets"] + '</li>'  + 
+            '<li>pitch names: ' + Array.from(stats["pitchNames"]) + '</li>'  + 
+            '<li>number of notes: ' + stats["numberOfNotes"] + '</li>'  + 
+            '<li>lowest note: ' + stats["lowestNote"][0] + " , " + lowHertz.toFixed(0) + 'Hz</li>'  + 
+            '<li>highest note: ' + stats["highestNote"][0] + " , " + highHertz.toFixed(0) + 'Hz</li>'  + 
+            '<li>rests used: ' + stats["rests"] + '</li>'  + 
+            '<li>ornaments used: ' + stats["ornaments"] + '</li>'
     }
 
 }
