@@ -644,7 +644,8 @@ class JSInterface {
                 "type": "string",
                 "constraints": {
                     "type": "oneof",
-                    "values": ["even", "odd", "scalar"]
+                    "values": ["even", "odd", "scalar"],
+                    "defaultIndex": 0
                 }
             }
         ],
@@ -695,7 +696,18 @@ class JSInterface {
             {
                 "type": "string",
                 "constraints": {
-                    "type": "mode"
+                    "type": "oneof",
+                    "values": [
+                        "major",
+                        "ionian",
+                        "dorian",
+                        "phrygian",
+                        "lydian",
+                        "myxolydian",
+                        "minor",
+                        "aeolian"
+                    ],
+                    "defaultIndex": 0
                 }
             }
         ],
@@ -740,7 +752,15 @@ class JSInterface {
             {
                 "type": "string",
                 "constraints": {
-                    "type": "temperament"
+                    "type": "oneof",
+                    "values": [
+                        "equal",
+                        "just intonation",
+                        "Pythagorean",
+                        "1/3 comma meantone",
+                        "1/4 comma meantone"
+                    ],
+                    "defaultIndex": 0
                 }
             },
             {
@@ -763,7 +783,7 @@ class JSInterface {
             {
                 "type": "string",
                 "constraints": {
-                    "type": "instrument"
+                    "type": "synth"
                 }
             },
             {
@@ -1366,6 +1386,15 @@ class JSInterface {
                         JSInterface.logError(error, "red");
                         throw error;
                     }
+                } else if (typeof arg === "string" && props["type"] === "boolean") {
+                    if (arg.toLowerCase() === "true") {
+                        arg = true;
+                    } else if (arg.toLowerCase() === "false") {
+                        arg = false;
+                    } else {
+                        JSInterface.logError(`${arg} in "${methodName}" reset to ${true}`);
+                        arg = true;
+                    }
                 } else {
                     let error =
                         `TypeMismatch error: expected "${props["type"]}" but found "${typeof arg}"`;
@@ -1404,6 +1433,191 @@ class JSInterface {
                         let error = `${args[0]} error: expected "async" function`;
                         JSInterface.logError(error, "red");
                         throw error;
+                    }
+                    break;
+
+                case "string":
+                    if (props["constraints"]["type"] === "solfegeorletter") {
+                        let strs = arg.split(" ");
+                        const solfeges = ["do", "re", "mi", "fa", "sol", "la", "ti"];
+                        const letters = ["c", "d", "e", "f", "g", "a", "b"];
+                        if (
+                            solfeges.indexOf(strs[0].toLowerCase()) !== -1 ||
+                            letters.indexOf(strs[0].toLowerCase()) !== -1
+                        ) {
+                            if (solfeges.indexOf(strs[0].toLowerCase()) !== -1) {
+                                arg = strs[0].toLowerCase();
+                            } else {
+                                arg = strs[0].toUpperCase();
+                            }
+
+                            if (strs.length > 1) {
+                                const accidentals = [SHARP, FLAT, NATURAL, DOUBLESHARP, DOUBLEFLAT];
+                                const accidentals2 = {
+                                    "sharp": SHARP,
+                                    "flat": FLAT,
+                                    "doublesharp": DOUBLESHARP,
+                                    "doubleflat": DOUBLEFLAT
+                                };
+
+                                if (accidentals.indexOf(strs[1]) !== -1) {
+                                    arg += strs[1];
+                                } else if (strs[1].toLowerCase() in accidentals2) {
+                                    arg += accidentals2[strs[1].toLowerCase()];
+                                }
+                            }
+                        } else {
+                            JSInterface.logError(`${arg} in "${methodName}" reset to ${"sol"}`);
+                            arg = "sol";
+                        }
+                    } else if (props["constraints"]["type"] === "accidental") {
+                        const accidentalOuts = [
+                            `sharp ${SHARP}`,
+                            `flat ${FLAT}`,
+                            `natural ${NATURAL}`,
+                            `double sharp ${DOUBLESHARP}`,
+                            `double flat ${DOUBLEFLAT}`
+                        ];
+                        const accidentals = [SHARP, FLAT, NATURAL, DOUBLESHARP, DOUBLEFLAT];
+                        const accidentals2 = [
+                            "sharp", "flat", "natural", "doublesharp", "doubleflat"
+                        ];
+
+                        if (accidentals.indexOf(arg) !== -1) {
+                            arg = accidentalOuts[accidentals.indexOf(arg)];
+                        } else if (accidentals2.indexOf(arg.toLowerCase()) !== -1) {
+                            arg = accidentalOuts[accidentals2.indexOf(arg.toLowerCase())];
+                        }
+                    } else if (props["constraints"]["type"] === "oneof") {
+                        let index = -1;
+                        for (let i in props["constraints"]["values"]) {
+                            if (
+                                props["constraints"]["values"][i].toLowerCase() ===
+                                    arg.toLowerCase()
+                            ) {
+                                index = i;
+                                break;
+                            }
+                        }
+                        if (index !== -1) {
+                            arg = props["constraints"]["values"][index];
+                        } else {
+                            JSInterface.logError(
+                                `${arg} in "${methodName}" reset to ${props["constraints"][
+                                    "values"
+                                ][props["constraints"]["defaultIndex"]]}`
+                            );
+                            arg = props["constraints"]["values"][
+                                props["constraints"]["defaultIndex"]
+                            ];
+                        }
+                    } else if (props["constraints"]["type"] === "instrument") {
+                        const instruments = [
+                            "piano",
+                            "violin",
+                            "viola",
+                            "cello",
+                            "bass",
+                            "double bass",
+                            "guitar",
+                            "acoustic guitar",
+                            "flute",
+                            "clarinet",
+                            "saxophone",
+                            "tuba",
+                            "trumpet",
+                            "oboe",
+                            "trombone",
+                            "banjo",
+                            "koto",
+                            "dulcimer",
+                            "electric guitar",
+                            "bassoon",
+                            "celeste",
+                            "xylophone",
+                            "electronic synth",
+                            "sine",
+                            "square",
+                            "sawtooth",
+                            "triangle",
+                            "vibraphone",
+                        ];
+                        if (instruments.indexOf(arg) !== -1) {
+                            arg = arg.toLowerCase();
+                        } else {
+                            JSInterface.logError(
+                                `${arg} in "${methodName}" reset to ${"electronic synth"}`
+                            );
+                            arg = "electronic synth";
+                        }
+                    } else if (props["constraints"]["type"] === "drum") {
+                        const drums = [
+                            "snare drum",
+                            "kick drum",
+                            "tom tom",
+                            "floor tom tom",
+                            "cup drum",
+                            "darbuka drum",
+                            "japanese drum",
+                            "hi hat",
+                            "ride bell",
+                            "cow bell",
+                            "triangle bell",
+                            "finger cymbals",
+                            "chime",
+                            "gong",
+                            "clang",
+                            "crash",
+                            "clap",
+                            "slap",
+                            "raindrop"
+                        ];
+                        if (drums.indexOf(arg) !== -1) {
+                            arg = arg.toLowerCase();
+                        } else {
+                            JSInterface.logError(
+                                `${arg} in "${methodName}" reset to ${"kick drum"}`
+                            );
+                            arg = "kick drum";
+                        }
+                    } else if (props["constraints"]["type"] === "noise") {
+                        if (arg.toLowerCase() === "white noise") {
+                            arg = "noise1";
+                        } else if (arg.toLowerCase() === "brown noise") {
+                            arg = "noise2";
+                        } else if (arg.toLowerCase() === "pink noise") {
+                            arg = "noise3";
+                        } else {
+                            JSInterface.logError(
+                                `${arg} in "${methodName}" reset to ${"white noise"}`
+                            );
+                            arg = "noise1";
+                        }
+                    } else if (props["constraints"]["type"] === "letterkey") {
+                        let strs = arg.split(" ");
+                        const letters = ["c", "d", "e", "f", "g", "a", "b"];
+                        if (letters.indexOf(strs[0].toLowerCase()) !== -1) {
+                            arg = strs[0].toUpperCase();
+
+                            if (strs.length > 1) {
+                                const accidentals = [SHARP, FLAT, NATURAL, DOUBLESHARP, DOUBLEFLAT];
+                                const accidentals2 = {
+                                    "sharp": SHARP,
+                                    "flat": FLAT,
+                                    "doublesharp": DOUBLESHARP,
+                                    "doubleflat": DOUBLEFLAT
+                                };
+
+                                if (accidentals.indexOf(strs[1]) !== -1) {
+                                    arg += strs[1];
+                                } else if (strs[1].toLowerCase() in accidentals2) {
+                                    arg += accidentals2[strs[1].toLowerCase()];
+                                }
+                            }
+                        } else {
+                            JSInterface.logError(`${arg} in "${methodName}" reset to ${"C"}`);
+                            arg = "C";
+                        }
                     }
                     break;
             }
