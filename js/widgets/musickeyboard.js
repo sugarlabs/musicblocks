@@ -74,35 +74,6 @@ function MusicKeyboard() {
             return a.startTime - b.startTime;
         });
 
-        // Cluster notes that start at the same time.
-        if (beginnerMode === "true") {
-            var minimumDuration = 125; // 1/8 note
-        } else {
-            var minimumDuration = 62.5; // 1/16 note
-        }
-
-        var last = this._notesPlayed[0].startTime;
-        for (var i = 1; i < this._notesPlayed.length; i++) {
-            while (
-                i < this._notesPlayed.length &&
-                this._notesPlayed[i].startTime - last < minimumDuration
-            ) {
-                last = this._notesPlayed[i].startTime;
-                this._notesPlayed[i].startTime = this._notesPlayed[
-                    i - 1
-                ].startTime;
-                i++;
-            }
-
-            if (i < this._notesPlayed.length) {
-                last = this._notesPlayed[i].startTime;
-                this._notesPlayed[i].startTime =
-                    this._notesPlayed[i - 1].startTime +
-                    this._notesPlayed[i - 1].duration * 1000 +
-                    minimumDuration;
-            }
-        }
-
         // selectedNotes is used for playback. Coincident notes are
         // grouped together. It is built from notesPlayed.
 
@@ -153,11 +124,10 @@ function MusicKeyboard() {
     this.addKeyboardShortcuts = function() {
         var that = this;
         var duration = 0;
-        var endTime ;
         var startTime = {};
         var temp1 = {};
         var temp2 = {};
-        var current = [];
+        var current = new Set();
 
         var __startNote = function(event) {
             if (WHITEKEYS.indexOf(event.keyCode) !== -1) {
@@ -171,7 +141,7 @@ function MusicKeyboard() {
             }
 
             var ele = docById(id);
-            if (id in startTime == false) {
+            if (!(id in startTime)) {
                 startDate = new Date();
                 startTime[id] = startDate.getTime();
             }
@@ -196,7 +166,7 @@ function MusicKeyboard() {
                 }
 
                 if (id == "rest") {
-                    endTime = undefined;
+                    that.endTime = undefined;
                     return;
                 }
 
@@ -210,7 +180,7 @@ function MusicKeyboard() {
                 );
 
                 if (that.tick) {
-                    restDuration = (startTime[id] - endTime) / 1000.0;
+                    restDuration = (startTime[id] - that.endTime) / 1000.0;
 
                     restDuration = parseFloat(
                         (Math.round(restDuration / that.meterArgs[1]) * that.meterArgs[1]).toFixed(3)
@@ -222,7 +192,7 @@ function MusicKeyboard() {
                     else {
                         console.log("rest ",restDuration)
                         that._notesPlayed.push({
-                            startTime: endTime,
+                            startTime: that.endTime,
                             noteOctave: "R",
                             objId: null,
                             duration: parseFloat(restDuration)
@@ -230,17 +200,17 @@ function MusicKeyboard() {
                         //that._createTable();
                     }
                 }
-                endTime = undefined;
+                that.endTime = undefined;
             }
         };
 
         var __keyboarddown = function(event) {
-            if (current.indexOf(event.keyCode)>-1)return;
+            if (current.has(event.keyCode))return;
 
             __startNote(event);
-            current.push(event.keyCode);
+            current.add(event.keyCode)
 
-            event.preventDefault();
+            //event.preventDefault();
         };
 
         var __endNote = function(event) {
@@ -256,8 +226,8 @@ function MusicKeyboard() {
 
             var ele = docById(id);
             newDate = new Date();
-            endTime = newDate.getTime();
-            duration = (endTime - startTime[id]) / 1000.0;
+            that.endTime = newDate.getTime();
+            duration = (that.endTime - startTime[id]) / 1000.0;
 
             if (ele !== null && ele !== undefined) {
                 if (id.includes("blackRow")) {
@@ -307,9 +277,9 @@ function MusicKeyboard() {
         };
 
         var __keyboardup = function(event) {
-            current.splice(current.indexOf(event.keyCode),1);   
+            current.delete(event.keyCode)  
             __endNote(event);
-            event.preventDefault();
+            //event.preventDefault();
         };
 
         document.onkeydown = __keyboarddown;
@@ -482,7 +452,6 @@ function MusicKeyboard() {
         ).onclick = function() {
             that._notesPlayed = [];
             selectedNotes = [];
-            endTime = {} ;
             // if (!that.keyboardShown) {
             that._createTable();
             // }
@@ -506,7 +475,7 @@ function MusicKeyboard() {
         };
 
         this.tickButton = widgetWindow.addButton(
-            "",
+            "metronome.svg",
             ICONSIZE,
             _("tick")
         )

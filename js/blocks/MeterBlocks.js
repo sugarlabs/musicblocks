@@ -631,9 +631,6 @@ function setupMeterBlocks() {
                 let bpmnumberblock = logo.blocks.blockList[blk].connections[1];
                 logo.tempo.BPMs.push(logo.blocks.blockList[bpmnumberblock].text.text);
             }
-            if (logo.inMusicKeyboard) {
-                logo.musicKeyboard.bpm = bpm;
-            }
         }
     }
 
