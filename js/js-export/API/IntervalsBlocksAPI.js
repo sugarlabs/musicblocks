@@ -36,7 +36,7 @@ class IntervalsBlocksAPI {
     }
 
     async setScalarInterval(value, flow) {
-        let args = JSInterface.validateArgs("setScalatInterval", [value, flow]);
+        let args = JSInterface.validateArgs("setScalarInterval", [value, flow]);
         await this.runCommand("setScalarInterval", [args[0], this.turIndex]);
         await args[1]();
         return this.ENDFLOWCOMMAND;

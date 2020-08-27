@@ -28,11 +28,6 @@ class MeterBlocksAPI {
         return this.runCommand("setMeter", [args[0], args[1], this.turIndex]);
     }
 
-    setPickup(value) {
-        let args = JSInterface.validateArgs("setPickup", [value]);
-        return this.runCommand("setPickup", [args[0], this.turIndex]);
-    }
-
     setBPM(bpm, beatValue) {
         let args = JSInterface.validateArgs("setBPM", [bpm, beatValue]);
         return this.runCommand("setBPM", [args[0], args[1], this.turIndex]);

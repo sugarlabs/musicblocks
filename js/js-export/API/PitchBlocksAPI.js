@@ -98,8 +98,8 @@ class PitchBlocksAPI {
         return Singer.PitchActions.numToPitch(args[0], "octave", this.turIndex);
     }
 
-    getPitchInfo(type) {
-        let args = JSInterface.validateArgs("getPitchInfo", [type]);
-        return Singer.PitchActions.getPitchInfo(args[0], this.turIndex);
-    }
+    // getPitchInfo(type) {
+    //     let args = JSInterface.validateArgs("getPitchInfo", [type]);
+    //     return Singer.PitchActions.getPitchInfo(args[0], this.turIndex);
+    // }
 }
