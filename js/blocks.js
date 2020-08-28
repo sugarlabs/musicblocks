@@ -4313,11 +4313,7 @@ function Blocks(activity) {
     this._newLocalArgBlock = async function(name) {
         // name === 1, 2, 3, ...
         var blkname = "arg_" + name;
-        if ("myArg_" + name in this.protoBlockDict) {
-            return;
-        }
-
-        if (blkname in this.protoBlockDict) {
+        if ("myArg_" + blkname in this.protoBlockDict) {
             return;
         }
 
