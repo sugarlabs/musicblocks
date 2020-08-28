@@ -4185,8 +4185,7 @@ function Activity() {
      * Toggles display of javaScript editor widget.
      */
     _toggleJSWindow = () => {
-        let jsEditor = new JSEditor();
-        jsEditor.init();
+        new JSEditor();
     };
 
     /*

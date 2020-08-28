@@ -15,17 +15,17 @@
 */
 
 /**
- * Class pertaining to all features of the JavsScript Editor for writing and reviewing corresponding
- * JavaScript code for Music Blocks programs.
- *
  * @class
+ * @classdesc pertains to setting up all features of the JavsScript Editor for writing and reviewing
+ * corresponding JavaScript code for Music Blocks programs.
  *
- * Private methods' names begin with underscore '_".
- * Unused methods' names begin with double underscore '__'.
- * Internal functions' names are in PascalCase.
+ * Private members' names begin with underscore '_".
  */
 class JSEditor {
-    init() {
+    /**
+     * @constructor
+     */
+    constructor() {
         this.isOpen = true;
         this._showingHelp = false;
 
@@ -35,15 +35,19 @@ class JSEditor {
         this.widgetWindow.show();
         this.widgetWindow.setPosition(160, 132);
 
-        // Position the widget and make it visible
+        /** topmost DOM container for the widget contents */
         this._editor = document.createElement("div");
 
+        /** stores CodeJar object for the editor */
         this._jar = null;
+        /** code to be displayed in the editor */
         this._code = null;
+        /** actual code backup up when help is shown */
         this._codeBck = null;
 
-        this.currentStyle = 0;
-        this.styles = [
+        // setup editor window styles
+        this._currentStyle = 0;
+        this._styles = [
             "dracula",
             "github",
             "railscasts",
@@ -56,13 +60,18 @@ class JSEditor {
             document.head.appendChild(link);
             return link;
         });
-        this.styles[this.currentStyle].removeAttribute("disabled");
+        this._styles[this._currentStyle].removeAttribute("disabled");
 
-        this.setup();
-        this.setLinesCount(this._code);
+        this._setup();
+        this._setLinesCount(this._code);
     }
 
-    setup() {
+    /**
+     * Renders the editor and all the subcomponents in the DOM.
+     * Sets up CodeJar.
+     * @returns {void}
+     */
+    _setup() {
         this.widgetWindow.onmaximize = () => {
             let editor = this.widgetWindow.getWidgetBody().childNodes[0];
                 editor.style.width = this.widgetWindow._maximized ? "100%" : "39rem";
@@ -103,7 +112,7 @@ class JSEditor {
                     helpBtn.style.background = "#2196f3";
                     helpBtn.style.cursor = "pointer";
                     helpBtn.innerHTML = "help_outline";
-                    helpBtn.onclick = this.toggleHelp.bind(this);
+                    helpBtn.onclick = this._toggleHelp.bind(this);
                 menuLeft.appendChild(helpBtn);
 
                 let generateBtn = document.createElement("span");
@@ -115,7 +124,7 @@ class JSEditor {
                     generateBtn.style.background = "#2196f3";
                     generateBtn.style.cursor = "pointer";
                     generateBtn.innerHTML = "autorenew";
-                    generateBtn.onclick = this.generateCode.bind(this);
+                    generateBtn.onclick = this._generateCode.bind(this);
                 menuLeft.appendChild(generateBtn);
 
                 let runBtn = document.createElement("span");
@@ -127,7 +136,7 @@ class JSEditor {
                     runBtn.style.background = "#2196f3";
                     runBtn.style.cursor = "pointer";
                     runBtn.innerHTML = "play_arrow";
-                    runBtn.onclick = this.runCode.bind(this);
+                    runBtn.onclick = this._runCode.bind(this);
                 menuLeft.appendChild(runBtn);
             menubar.appendChild(menuLeft);
 
@@ -147,7 +156,7 @@ class JSEditor {
                     styleBtn.style.background = "#2196f3";
                     styleBtn.style.cursor = "pointer";
                     styleBtn.innerHTML = "invert_colors";
-                    styleBtn.onclick = this.changeStyle.bind(this);
+                    styleBtn.onclick = this._changeStyle.bind(this);
                 menuRight.appendChild(styleBtn);
             menubar.appendChild(menuRight);
         this._editor.appendChild(menubar);
@@ -246,7 +255,7 @@ class JSEditor {
 
         this._jar = new CodeJar(codebox, highlight);
 
-        this.generateCode();
+        this._generateCode();
 
         codebox.className = "editor language-js";
         this._jar.updateCode(this._code);
@@ -259,7 +268,7 @@ class JSEditor {
         this._jar.onUpdate(code => {
             if (!this._showingHelp)
                 this._code = code;
-            this.setLinesCount(this._code);
+            this._setLinesCount(this._code);
         });
 
         this.widgetWindow.getWidgetBody().append(this._editor);
@@ -267,6 +276,14 @@ class JSEditor {
         this.widgetWindow.takeFocus();
     }
 
+    /**
+     * Logs a message to the console of the JSEditor widget.
+     *
+     * @static
+     * @param {String} message
+     * @param {String} color - text color
+     * @returns {void}
+     */
     static logConsole(message, color) {
         if (color === undefined)
             color = "midnightblue";
@@ -280,7 +297,13 @@ class JSEditor {
         console.log("%c" + message, `color: ${color}`);
     }
 
-    runCode() {
+    /**
+     * Triggerred when the "run" button on the widget is pressed.
+     * Runs the JavaScript code that is in the editor.
+     *
+     * @returns {void}
+     */
+    _runCode() {
         if (this._showingHelp)
             return;
 
@@ -297,15 +320,31 @@ class JSEditor {
         }
     }
 
-    generateCode() {
+    /**
+     * Triggered when the widget is opened or when the "generate" button is pressed.
+     * Interfaces with JSGenerate to generate JavaScript code from the blocks stacks.
+     *
+     * @returns {void}
+     */
+    _generateCode() {
         console.debug("Generate JavaScript");
 
         JSGenerate.run(true);
         this._code = JSGenerate.code;
         this._jar.updateCode(this._code);
+        this._setLinesCount(this._code);
     }
 
-    setLinesCount(code) {
+    /**
+     * Refreshes the line numbers by the code in the editor.
+     *
+     * @param {String} code - corresponding code (to find the number of lines)
+     * @returns {void}
+     */
+    _setLinesCount(code) {
+        if (!docById("editorLines"))
+            return;
+
         const linesCount = code.replace(/\n+$/, "\n").split("\n").length + 1;
         let text = "";
         for (let i = 1; i < linesCount; i++) {
@@ -314,7 +353,13 @@ class JSEditor {
         docById("editorLines").innerText = text;
     }
 
-    toggleHelp() {
+    /**
+     * Triggered when the help button is played.
+     * Toggle help (guide) display.
+     *
+     * @returns {void}
+     */
+    _toggleHelp() {
         this._showingHelp = !this._showingHelp;
         let helpBtn = docById("js_editor_help_btn");
 
@@ -323,21 +368,28 @@ class JSEditor {
             helpBtn.style.color = "gold";
             this._codeBck = this._code;
             this._jar.updateCode(JS_API);
-            this.setLinesCount(JS_API);
+            this._setLinesCount(JS_API);
         } else {
             console.debug("Hiding Help");
             helpBtn.style.color = "white";
             this._jar.updateCode(this._codeBck);
-            this.setLinesCount(this._codeBck);
+            this._setLinesCount(this._codeBck);
             this._code = this._codeBck;
         }
     }
 
-    changeStyle(event) {
+    /**
+     * Triggered when the "change-style" button is pressed.
+     * Changes to the next editor style.
+     *
+     * @param {Object} event
+     * @returns {void}
+     */
+    _changeStyle(event) {
         event.preventDefault();
 
-        this.styles[this.currentStyle].setAttribute("disabled", "true");
-        this.currentStyle = (this.currentStyle + 1) % this.styles.length;
-        this.styles[this.currentStyle].removeAttribute("disabled");
+        this._styles[this._currentStyle].setAttribute("disabled", "true");
+        this._currentStyle = (this._currentStyle + 1) % this._styles.length;
+        this._styles[this._currentStyle].removeAttribute("disabled");
     }
 }
