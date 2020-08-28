@@ -179,8 +179,8 @@ function setupMeterActions() {
             console.debug("used from: ", orgTurtle)
             if (!turtles.turtleList[orgTurtle].companionTurtle){
                 turtle = logo.turtles.turtleList.length;
-                turtles.turtleList[orgTurtle].companionTurtle = turtle ;
-                logo.turtles.addTurtle(logo.blocks.blockList[blk], []);
+                turtles.turtleList[orgTurtle].companionTurtle = turtle;
+                logo.turtles.addTurtle(logo.blocks.blockList[blk], {});
                 console.debug("beat Turtle: ", turtle);
             }
             turtle = turtles.turtleList[orgTurtle].companionTurtle;
