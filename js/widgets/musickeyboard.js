@@ -30,6 +30,7 @@ function MusicKeyboard() {
 
     var beginnerMode = localStorage.beginnerMode;
 
+    var unit = beginnerMode === "true" ? 8 : 16;
     this._stopOrCloseClicked = false;
     this.playingNow = false;
 
@@ -182,15 +183,18 @@ function MusicKeyboard() {
                 if (that.tick) {
                     restDuration = (startTime[id] - that.endTime) / 1000.0;
 
+                    restDuration/=60; //time in minutes
+                    restDuration*=that.bpm;
+                    restDuration*=that.meterArgs[1];
+
                     restDuration = parseFloat(
-                        (Math.round(restDuration / that.meterArgs[1]) * that.meterArgs[1]).toFixed(3)
+                        (Math.round(restDuration*unit)/unit).toFixed(4)
                     );
 
                     if (restDuration === 0) {
                         restDuration = 0;
                     }
                     else {
-                        console.log("rest ",restDuration)
                         that._notesPlayed.push({
                             startTime: that.endTime,
                             noteOctave: "R",
@@ -237,12 +241,17 @@ function MusicKeyboard() {
                 }
 
                 var no = ele.getAttribute("alt").split("__")[2];
+
+                duration/=60;
+                duration*=that.bpm;
+                duration*=that.meterArgs[1];
+
                 duration = parseFloat(
-                    (Math.round(duration / that.meterArgs[1]) * that.meterArgs[1]).toFixed(3)
+                    (Math.round(duration*unit)/unit).toFixed(4)
                 );
 
                 if (duration === 0) {
-                    duration = that.meterArgs[1];
+                    duration = 1/unit;
                 } else if (duration < 0) {
                     duration = -duration;
                 }
