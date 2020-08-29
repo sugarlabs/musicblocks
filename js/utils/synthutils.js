@@ -1554,6 +1554,18 @@ function Synth() {
         }
     };
 
+    this.startSound = function(turtle, instrumentName, note) {
+        let flag = instrumentsSource[instrumentName][0];
+        switch (flag) {
+            case 1: // drum
+                instruments[turtle][instrumentName].start();
+                break;
+            default:
+                instruments[turtle][instrumentName].triggerAttack(note);
+                break;
+        }
+    };
+
     this.stopSound = function(turtle, instrumentName, note) {
         let flag = instrumentsSource[instrumentName][0];
         switch (flag) {
@@ -1568,6 +1580,20 @@ function Synth() {
                 }
                 break;
         }
+    };
+
+    this.loop = function(turtle, instrumentName, note, duration, start, bpm ,velocity) {
+        let synthA = instruments[turtle][instrumentName] 
+        let flag = instrumentsSource[instrumentName][0]
+        let loopA = new Tone.Loop(time => {
+            if (flag == 1) {
+                this.setVolume(turtle,instrumentName,velocity*100)
+                instruments[turtle][instrumentName].start();
+            }
+            else
+                synthA.triggerAttackRelease(note, duration, time, velocity);
+        }, 60/bpm).start(start);
+        return loopA;
     };
 
     this.start = function() {

@@ -20,6 +20,7 @@ function MusicKeyboard() {
     // Mapping between keycodes and virtual keyboard
     const BLACKKEYS = [87, 69, 82, 84, 89, 85, 73, 79];
     const WHITEKEYS = [65, 83, 68, 70, 71, 72, 74, 75, 76];
+    const SPACE = 32;
 
     var saveOnKeyDown = document.onkeydown;
     var saveOnKeyUp = document.onkeyup;
@@ -29,6 +30,7 @@ function MusicKeyboard() {
 
     var beginnerMode = localStorage.beginnerMode;
 
+    var unit = beginnerMode === "true" ? 8 : 16;
     this._stopOrCloseClicked = false;
     this.playingNow = false;
 
@@ -38,6 +40,8 @@ function MusicKeyboard() {
     this.keyboardShown = true;
     this.layout = [];
     this.idContainer = [];
+    this.tick = false;
+    this.meterArgs = [4,1/4];
 
     // Map between keyboard element ids and the note associated with the key.
     this.noteMapper = {};
@@ -70,35 +74,6 @@ function MusicKeyboard() {
         this._notesPlayed.sort(function(a, b) {
             return a.startTime - b.startTime;
         });
-
-        // Cluster notes that start at the same time.
-        if (beginnerMode === "true") {
-            var minimumDuration = 125; // 1/8 note
-        } else {
-            var minimumDuration = 62.5; // 1/16 note
-        }
-
-        var last = this._notesPlayed[0].startTime;
-        for (var i = 1; i < this._notesPlayed.length; i++) {
-            while (
-                i < this._notesPlayed.length &&
-                this._notesPlayed[i].startTime - last < minimumDuration
-            ) {
-                last = this._notesPlayed[i].startTime;
-                this._notesPlayed[i].startTime = this._notesPlayed[
-                    i - 1
-                ].startTime;
-                i++;
-            }
-
-            if (i < this._notesPlayed.length) {
-                last = this._notesPlayed[i].startTime;
-                this._notesPlayed[i].startTime =
-                    this._notesPlayed[i - 1].startTime +
-                    this._notesPlayed[i - 1].duration * 1000 +
-                    minimumDuration;
-            }
-        }
 
         // selectedNotes is used for playback. Coincident notes are
         // grouped together. It is built from notesPlayed.
@@ -150,11 +125,10 @@ function MusicKeyboard() {
     this.addKeyboardShortcuts = function() {
         var that = this;
         var duration = 0;
-        var startDate = {};
         var startTime = {};
         var temp1 = {};
         var temp2 = {};
-        var prevKey = 0;
+        var current = new Set();
 
         var __startNote = function(event) {
             if (WHITEKEYS.indexOf(event.keyCode) !== -1) {
@@ -163,12 +137,14 @@ function MusicKeyboard() {
             } else if (BLACKKEYS.indexOf(event.keyCode) !== -1) {
                 var i = BLACKKEYS.indexOf(event.keyCode);
                 var id = "blackRow" + i.toString();
+            } else if (SPACE == event.keyCode) {
+                var id = "rest";
             }
 
             var ele = docById(id);
-            if (id in startDate == false) {
-                startDate[id] = new Date();
-                startTime[id] = startDate[id].getTime();
+            if (!(id in startTime)) {
+                startDate = new Date();
+                startTime[id] = startDate.getTime();
             }
 
             if (ele !== null && ele !== undefined) {
@@ -190,6 +166,11 @@ function MusicKeyboard() {
                         ele.getAttribute("alt").split("__")[1];
                 }
 
+                if (id == "rest") {
+                    that.endTime = undefined;
+                    return;
+                }
+
                 that._logo.synth.trigger(
                     0,
                     temp2[id],
@@ -198,12 +179,42 @@ function MusicKeyboard() {
                     null,
                     null
                 );
-                prevKey = event.keyCode;
+
+                if (that.tick) {
+                    restDuration = (startTime[id] - that.endTime) / 1000.0;
+
+                    restDuration/=60; //time in minutes
+                    restDuration*=that.bpm;
+                    restDuration*=that.meterArgs[1];
+
+                    restDuration = parseFloat(
+                        (Math.round(restDuration*unit)/unit).toFixed(4)
+                    );
+
+                    if (restDuration === 0) {
+                        restDuration = 0;
+                    }
+                    else {
+                        that._notesPlayed.push({
+                            startTime: that.endTime,
+                            noteOctave: "R",
+                            objId: null,
+                            duration: parseFloat(restDuration)
+                        });
+                        //that._createTable();
+                    }
+                }
+                that.endTime = undefined;
             }
         };
 
         var __keyboarddown = function(event) {
+            if (current.has(event.keyCode))return;
+
             __startNote(event);
+            current.add(event.keyCode)
+
+            //event.preventDefault();
         };
 
         var __endNote = function(event) {
@@ -213,12 +224,14 @@ function MusicKeyboard() {
             } else if (BLACKKEYS.indexOf(event.keyCode) !== -1) {
                 var i = BLACKKEYS.indexOf(event.keyCode);
                 var id = "blackRow" + i.toString();
+            } else if (SPACE == event.keyCode) {
+                var id = "rest";
             }
 
             var ele = docById(id);
             newDate = new Date();
-            newTime = newDate.getTime();
-            duration = (newTime - startTime[id]) / 1000.0;
+            that.endTime = newDate.getTime();
+            duration = (that.endTime - startTime[id]) / 1000.0;
 
             if (ele !== null && ele !== undefined) {
                 if (id.includes("blackRow")) {
@@ -228,39 +241,44 @@ function MusicKeyboard() {
                 }
 
                 var no = ele.getAttribute("alt").split("__")[2];
-                if (beginnerMode === "true") {
-                    duration = parseFloat(
-                        (Math.round(duration * 8) / 8).toFixed(3)
-                    );
-                } else {
-                    duration = parseFloat(
-                        (Math.round(duration * 16) / 16).toFixed(4)
-                    );
-                }
+
+                duration/=60;
+                duration*=that.bpm;
+                duration*=that.meterArgs[1];
+
+                duration = parseFloat(
+                    (Math.round(duration*unit)/unit).toFixed(4)
+                );
 
                 if (duration === 0) {
-                    duration = 0.125;
+                    duration = 1/unit;
                 } else if (duration < 0) {
                     duration = -duration;
                 }
-
-                that._logo.synth.stopSound(
-                    0,
-                    that.instrumentMapper[id],
-                    temp2[id]
-                );
-
-                that._notesPlayed.push({
-                    startTime: startTime[id],
-                    noteOctave: temp2[id],
-                    objId: id,
-                    duration: duration,
-                    voice: that.instrumentMapper[id],
-                    blockNumber: that.blockNumberMapper[id]
-                });
+                if (id == "rest") {
+                    that._notesPlayed.push({
+                        startTime: startTime[id],
+                        noteOctave: "R",
+                        objId: null,
+                        duration: parseFloat(duration)
+                    });
+                } else {
+                    that._logo.synth.stopSound(
+                        0,
+                        that.instrumentMapper[id],
+                        temp2[id]
+                    );
+                    that._notesPlayed.push({
+                        startTime: startTime[id],
+                        noteOctave: temp2[id],
+                        objId: id,
+                        duration: duration,
+                        voice: that.instrumentMapper[id],
+                        blockNumber: that.blockNumberMapper[id]
+                    });
+                }
                 that._createTable();
 
-                delete startDate[id];
                 delete startTime[id];
                 delete temp1[id];
                 delete temp2[id];
@@ -268,7 +286,9 @@ function MusicKeyboard() {
         };
 
         var __keyboardup = function(event) {
+            current.delete(event.keyCode)  
             __endNote(event);
+            //event.preventDefault();
         };
 
         document.onkeydown = __keyboarddown;
@@ -370,7 +390,7 @@ function MusicKeyboard() {
 
     this.init = function(logo) {
         this._logo = logo;
-
+        this.tick = false;
         this.playingNow = false;
         var w = window.innerWidth;
         this._cellScale = w / 1200;
@@ -385,7 +405,8 @@ function MusicKeyboard() {
 	widgetWindow.show();
 
         this._keysLayout();
-
+        let tur = logo.turtles.ithTurtle(0);
+        this.bpm = tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
         var that = this;
 
         widgetWindow.onclose = function() {
@@ -409,7 +430,7 @@ function MusicKeyboard() {
 
             selected = [];
             selectedNotes = [];
-
+            if (that.loopTick) that.loopTick.stop();
             this.destroy();
         };
 
@@ -462,6 +483,31 @@ function MusicKeyboard() {
             that.doMIDI();
         };
 
+        this.tickButton = widgetWindow.addButton(
+            "metronome.svg",
+            ICONSIZE,
+            _("Metronome")
+        )
+        this.tickButton.onclick = () => {
+            if (this.tick) {
+                this.tick = false;
+                that.loopTick.stop();
+            }
+            else {
+                this.tick = true;
+                this._logo.synth.loadSynth(0,"cow bell");
+                this.loopTick = this._logo.synth.loop(
+                    0,
+                    "cow bell",
+                    "C5",
+                    1/64,
+                    0,
+                    this.bpm || 90,
+                    0.07 
+                );
+                setTimeout(()=>{this._logo.synth.start();},500)
+            }
+        };
         // var cell = this._addButton(row1, 'table.svg', ICONSIZE, _('Table'));
 
         //that._createKeyboard();
@@ -1141,7 +1187,7 @@ function MusicKeyboard() {
         }
 
         var innerDiv = docById("mkbInnerDiv");
-        innerDiv.scrollLeft += 3000; // Force to the right.
+        innerDiv.scrollLeft = innerDiv.scrollWidth;// Force to the right.\
         this.makeClickable();
     };
 
@@ -2334,6 +2380,21 @@ function MusicKeyboard() {
                 parenttbl.appendChild(newel);
             }
         }
+        var parenttbl = document.getElementById("myrow");
+        var newel = document.createElement("td");
+        parenttbl.appendChild(newel)
+        newel.style.textAlign = "center";
+        newel.setAttribute("id", "rest");
+        newel.setAttribute(
+            "alt","R__"
+        );
+        newel.innerHTML =
+            "<small>(" +
+	    // .TRANS: a rest is a pause in the music.
+            _("rest") +
+            ")</small><br/>";
+        newel.style.position = "relative";
+        newel.style.zIndex = "100";
 
         for (var i = 0; i < that.idContainer.length; i++) {
             this.loadHandler(
