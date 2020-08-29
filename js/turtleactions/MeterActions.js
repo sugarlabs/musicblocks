@@ -36,21 +36,17 @@ function setupMeterActions() {
             tur.singer.noteValuePerBeat = noteValue <= 0 ? 4 : 1 / noteValue;
 
             // setup default strong / weak beats until any strong beat block is used
-
             if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 4) {
                 tur.singer.beatList.push(1);
                 tur.singer.beatList.push(3);
                 tur.singer.defaultStrongBeats = true;
-            }
-            else if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 2) {
+            } else if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 2) {
                 tur.singer.beatList.push(1);
                 tur.singer.defaultStrongBeats = true;
-            }
-            else if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 3) {
+            } else if (tur.singer.noteValuePerBeat == 4 && tur.singer.beatsPerMeasure == 3) {
                 tur.singer.beatList.push(1);
                 tur.singer.defaultStrongBeats = true;
-            }
-            else if (tur.singer.noteValuePerBeat == 8 && tur.singer.beatsPerMeasure == 6) {
+            } else if (tur.singer.noteValuePerBeat == 8 && tur.singer.beatsPerMeasure == 6) {
                 tur.singer.beatList.push(1);
                 tur.singer.beatList.push(4);
                 tur.singer.defaultStrongBeats = true;
@@ -181,7 +177,7 @@ function setupMeterActions() {
                 turtle = logo.turtles.turtleList.length;
                 turtles.turtleList[orgTurtle].companionTurtle = turtle;
                 logo.turtles.addTurtle(logo.blocks.blockList[blk], {});
-		logo.prepSynths();
+                logo.prepSynths();
                 console.debug("beat Turtle: ", turtle);
             }
             turtle = turtles.turtleList[orgTurtle].companionTurtle;
@@ -216,6 +212,8 @@ function setupMeterActions() {
             let turOrg = logo.turtles.ithTurtle(orgTurtle);
             let duration =
                 60 / (turOrg.singer.bpm.length > 0 ? last(turOrg.singer.bpm) : Singer.masterBPM);
+            // Consider meter when calculating duration.
+            duration = duration * 4 / turOrg.singer.noteValuePerBeat;
             if (tur.interval !== undefined) {
                 clearInterval(tur.interval);
             }
