@@ -27,7 +27,7 @@ function setupRhythmBlocks() {
             ) {
                 logo.statusFields.push([blk, "mynotevalue"]);
             } else {
-                return Singer.RhythmActions.getNoteValue(turtle);
+                return Singer.RhythmActions.getNoteValue(logo.turtles.companionTurtle(turtle));
             }
         }
     }

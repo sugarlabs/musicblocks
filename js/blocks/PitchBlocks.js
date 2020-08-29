@@ -129,7 +129,7 @@ function setupPitchBlocks() {
             ) {
                 logo.statusFields.push([blk, "transposition"]);
             } else {
-                return logo.turtles.ithTurtle(turtle).singer.transposition;
+                return logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle)).singer.transposition;
             }
         }
     }
@@ -244,7 +244,7 @@ function setupPitchBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
             let obj = numberToPitch(Math.floor(value) + tur.singer.pitchNumberOffset);
@@ -259,7 +259,7 @@ function setupPitchBlocks() {
             ) {
                 logo.statusFields.push([blk, "mypitch"]);
             } else {
-                let tur = logo.turtles.ithTurtle(turtle);
+                let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
                 let value = null;
                 let obj;
@@ -335,7 +335,7 @@ function setupPitchBlocks() {
             ) {
                 logo.statusFields.push([blk, "pitchinhertz"]);
             } else {
-                let tur = logo.turtles.ithTurtle(turtle);
+                let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
                 if (tur.singer.lastNotePlayed !== null) {
                     return logo.synth._getFrequency(
@@ -408,7 +408,7 @@ function setupPitchBlocks() {
                 logo.statusFields.push([blk, "outputtools"]);
             } else {
                 let cblk1 = logo.blocks.blockList[blk].connections[1];
-                let tur = logo.turtles.ithTurtle(turtle);
+                let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
                 let arg1;
                 let notePlayed;
                 if (cblk1 != null) {
@@ -891,7 +891,7 @@ function setupPitchBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (logo.blocks.blockList[blk].name === "invert") {
                 tur.singer.invertList.push([args[0], args[1], "even"]);
@@ -1329,7 +1329,7 @@ function setupPitchBlocks() {
             if (args[0] === undefined)
                 return;
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
             tur.singer.transposition += tur.singer.invertList.length > 0 ? 1 : -1;
 
             let listenerName = "_flat_" + turtle;
@@ -1405,7 +1405,7 @@ function setupPitchBlocks() {
 
             let obj = frequencyToPitch(arg);
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (obj[0] === "?") {
                 logo.errorMsg(INVALIDPITCH, blk);
@@ -1708,7 +1708,7 @@ function setupPitchBlocks() {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             let note, octave, cents;
 
