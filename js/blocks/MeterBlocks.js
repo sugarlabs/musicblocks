@@ -826,6 +826,7 @@ function setupMeterBlocks() {
             }
 
             if (logo.insideMeterWidget) logo._meterBlock = blk;
+            if (logo.inMusicKeyboard) logo.musicKeyboard.meterArgs = args;
 
             Singer.MeterActions.setMeter(arg0, arg1, turtle);
         }

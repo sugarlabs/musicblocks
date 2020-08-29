@@ -688,46 +688,37 @@ function setupWidgetBlocks() {
             this.setPalette("widgets");
             this.setHelpString();
             this.formBlock({ name: _("music keyboard"), canCollapse: true });
-            if (this.lang === "ja")
-                this.makeMacro((x, y) => [
-                    [0, "musickeyboard", x, y, [null, 1, 16]],
-                    [1, "pitch", 0, 0, [0, 2, 3, 4]],
-                    [2, ["solfege", { value: "sol" }], 0, 0, [1]],
-                    [3, ["number", { value: 4 }], 0, 0, [1]],
-                    [4, "pitch", 0, 0, [1, 5, 6, 7]],
-                    [5, ["solfege", { value: "fa" }], 0, 0, [4]],
-                    [6, ["number", { value: 4 }], 0, 0, [4]],
-                    [7, "pitch", 0, 0, [4, 8, 9, 10]],
-                    [8, ["solfege", { value: "mi" }], 0, 0, [7]],
-                    [9, ["number", { value: 4 }], 0, 0, [7]],
-                    [10, "pitch", 0, 0, [7, 11, 12, 13]],
-                    [11, ["solfege", { value: "re" }], 0, 0, [10]],
-                    [12, ["number", { value: 4 }], 0, 0, [10]],
-                    [13, "pitch", 0, 0, [10, 14, 15, null]],
-                    [14, ["solfege", { value: "do" }], 0, 0, [13]],
-                    [15, ["number", { value: 4 }], 0, 0, [13]],
-                    [16, "hiddennoflow", 0, 0, [0, null]]
-                ]);
-            else
-                this.makeMacro((x, y) => [
-                    [0, "musickeyboard", x, y, [null, 1, 16]],
-                    [1, "pitch", 0, 0, [0, 2, 3, 4]],
-                    [2, ["solfege", { value: "sol" }], 0, 0, [1]],
-                    [3, ["number", { value: 4 }], 0, 0, [1]],
-                    [4, "pitch", 0, 0, [1, 5, 6, 7]],
-                    [5, ["solfege", { value: "fa" }], 0, 0, [4]],
-                    [6, ["number", { value: 4 }], 0, 0, [4]],
-                    [7, "pitch", 0, 0, [4, 8, 9, 10]],
-                    [8, ["solfege", { value: "mi" }], 0, 0, [7]],
-                    [9, ["number", { value: 4 }], 0, 0, [7]],
-                    [10, "pitch", 0, 0, [7, 11, 12, 13]],
-                    [11, ["solfege", { value: "re" }], 0, 0, [10]],
-                    [12, ["number", { value: 4 }], 0, 0, [10]],
-                    [13, "pitch", 0, 0, [10, 14, 15, null]],
-                    [14, ["solfege", { value: "do" }], 0, 0, [13]],
-                    [15, ["number", { value: 4 }], 0, 0, [13]],
-                    [16, "hiddennoflow", 0, 0, [0, null]]
-                ]);
+            this.makeMacro((x, y) => [
+                [0,"setbpm3",0,0,[12,1,2,5]],
+                [1,["number",{"value":90}],0,0,[0]],
+                [2,"divide",0,0,[0,3,4]],
+                [3,["number",{"value":1}],0,0,[2]],
+                [4,["number",{"value":4}],0,0,[2]],
+                [5,"vspace",0,0,[0,6]],
+                [6,"meter",0,0,[5,7,8,11]],
+                [7,["number",{"value":4}],0,0,[6]],
+                [8,"divide",0,0,[6,9,10]],
+                [9,["number",{"value":1}],0,0,[8]],
+                [10,["number",{"value":4}],0,0,[8]],
+                [11,"vspace",0,0,[6,13]],
+                [12,["musickeyboard",{"collapsed":false}],x,y,[null,0,28]],
+                [13,"pitch",0,0,[11,14,15,16]],
+                [14,["solfege",{"value":"sol"}],0,0,[13]],
+                [15,["number",{"value":4}],0,0,[13]],
+                [16,"pitch",0,0,[13,17,18,19]],
+                [17,["solfege",{"value":"fa"}],0,0,[16]],
+                [18,["number",{"value":4}],0,0,[16]],
+                [19,"pitch",0,0,[16,20,21,22]],
+                [20,["solfege",{"value":"mi"}],0,0,[19]],
+                [21,["number",{"value":4}],0,0,[19]],
+                [22,"pitch",0,0,[19,23,24,25]],
+                [23,["solfege",{"value":"re"}],0,0,[22]],
+                [24,["number",{"value":4}],0,0,[22]],
+                [25,"pitch",0,0,[22,26,27,null]],
+                [26,["solfege",{"value":"do"}],0,0,[25]],
+                [27,["number",{"value":4}],0,0,[25]],
+                [28,"hiddennoflow",0,0,[12,null]]
+            ]);
         }
     }
 
