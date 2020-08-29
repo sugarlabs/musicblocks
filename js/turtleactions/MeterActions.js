@@ -181,6 +181,7 @@ function setupMeterActions() {
                 turtle = logo.turtles.turtleList.length;
                 turtles.turtleList[orgTurtle].companionTurtle = turtle;
                 logo.turtles.addTurtle(logo.blocks.blockList[blk], {});
+		logo.prepSynths();
                 console.debug("beat Turtle: ", turtle);
             }
             turtle = turtles.turtleList[orgTurtle].companionTurtle;
