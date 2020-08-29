@@ -4802,10 +4802,9 @@ function Block(protoblock, blocks, overrideName) {
         for (let j in attrList) {
             for (let i in NOTENAMES) {
                 let tempScale = _buildScale(NOTENAMES[i] + attrList[j] + " major")[0];
-                console.log(tempScale);
                 if (tempScale[k-1] == KeySignatureEnv[0]) {
                     key = NOTENAMES[i] + attrList[j];
-                    console.log(key);
+                    console.debug(key);
                     break;
                 }
             }
@@ -5076,7 +5075,7 @@ function Block(protoblock, blocks, overrideName) {
                     that.blocks.logo.synth.inTemperament
                 );
             } else {
-                console.log(note);
+                // console.debug(note);
                 obj = getNote(
                     note,
                     octave,
