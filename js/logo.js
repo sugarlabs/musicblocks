@@ -1523,9 +1523,9 @@ class Logo {
                         )
                     );
                 }
-                if (logo.turtles.ithTurtle(turtle).singer.inNoteBlock.length > 0 && 
-                    ["pitchinhertz","currentpitch"].indexOf(logo.blocks.blockList[logo.blocks.blockList[blk].connections[i]].name) !== -1) {
-                    logo.specialArgs.push([args, logo, turtle, blk, receivedArg, null, isflow]);  //redo after noteBlock Ends
+                if (logo.turtles.ithTurtle(turtle).singer.inNoteBlock.length > 0 && logo.blocks.blockList[logo.blocks.blockList[blk].connections[i]].name === "currentpitch") {
+                // Re-eval this arg after note block ends to ensure that the current pitch is uptodate.
+                logo.specialArgs.push([args, logo, turtle, blk, receivedArg, null, isflow]);
                 }
             }
         }
