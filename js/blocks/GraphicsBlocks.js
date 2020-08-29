@@ -14,12 +14,12 @@ function setupGraphicsBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            let turtleObj = logo.turtles.turtleList[turtle];
+            let turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetHeading(value);
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.turtles.turtleList[turtle].orientation);
+            return toFixed2(logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].orientation);
         }
 
         arg(logo, turtle, blk) {
@@ -30,7 +30,7 @@ function setupGraphicsBlocks() {
             ) {
                 logo.statusFields.push([blk, "heading"]);
             } else {
-                return logo.turtles.turtleList[turtle].orientation;
+                return logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].orientation;
             }
         }
     }
@@ -55,12 +55,12 @@ function setupGraphicsBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            let turtleObj = logo.turtles.turtleList[turtle];
+            let turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetXY(turtleObj.x, value);
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.turtles.turtleList[turtle].y);
+            return toFixed2(logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].y);
         }
 
         arg(logo, turtle, blk) {
@@ -72,7 +72,7 @@ function setupGraphicsBlocks() {
                 logo.statusFields.push([blk, "y"]);
             } else {
                 return logo.turtles.screenY2turtleY(
-                    logo.turtles.turtleList[turtle].container.y
+                    logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].container.y
                 );
             }
         }
@@ -98,12 +98,12 @@ function setupGraphicsBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            let turtleObj = logo.turtles.turtleList[turtle];
+            let turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetXY(value, turtleObj.y);
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.turtles.turtleList[turtle].x);
+            return toFixed2(logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].x);
         }
 
         arg(logo, turtle, blk) {
@@ -115,7 +115,7 @@ function setupGraphicsBlocks() {
                 logo.statusFields.push([blk, "x"]);
             } else {
                 return logo.turtles.screenX2turtleX(
-                    logo.turtles.turtleList[turtle].container.x
+                    logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].container.x
                 );
             }
         }
@@ -144,7 +144,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
@@ -163,15 +163,15 @@ function setupGraphicsBlocks() {
                 } else {
                     if (tur.singer.suppressOutput) {
                         let savedPenState =
-                            logo.turtles.turtleList[turtle].painter.penState;
-                        logo.turtles.turtleList[turtle].painter.penState = false;
-                        logo.turtles.turtleList[turtle].painter.doScrollXY(
+                            logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.penState;
+                        logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.penState = false;
+                        logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.doScrollXY(
                             args[0],
                             args[1]
                         );
-                        logo.turtles.turtleList[turtle].painter.penState = savedPenState;
+                        logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.penState = savedPenState;
                     } else {
-                        logo.turtles.turtleList[turtle].painter.doScrollXY(
+                        logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.doScrollXY(
                             args[0],
                             args[1]
                         );
@@ -190,7 +190,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (logo.inMatrix) {
                 // ignore clear block in matrix
@@ -234,7 +234,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
@@ -271,7 +271,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
@@ -306,7 +306,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
@@ -350,7 +350,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
@@ -398,7 +398,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
                 if (typeof args[0] === "string") {
@@ -446,7 +446,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
@@ -498,7 +498,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
                 if (typeof args[0] === "string") {
@@ -550,7 +550,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
                 if (typeof args[0] === "string") {
@@ -601,7 +601,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
                 if (typeof args[0] === "string") {
@@ -652,7 +652,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
                 if (typeof args[0] === "string") {

@@ -112,7 +112,7 @@ function setupPenBlocks() {
         }
 
         flow(args, logo, turtle) {
-            logo.turtles.turtleList[turtle].painter.doStartFill();
+            logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.doStartFill();
         }
     }
 
@@ -125,7 +125,7 @@ function setupPenBlocks() {
         }
 
         flow(args, logo, turtle) {
-            logo.turtles.turtleList[turtle].painter.doEndFill();
+            logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.doEndFill();
         }
     }
 
@@ -144,16 +144,16 @@ function setupPenBlocks() {
 
         flow(args, logo, turtle) {
             if (args.length === 3) {
-                let hue = logo.turtles.turtleList[turtle].painter.color;
-                let value = logo.turtles.turtleList[turtle].painter.value;
-                let chroma = logo.turtles.turtleList[turtle].painter.chroma;
-                logo.turtles.turtleList[turtle].painter.doSetHue(args[0]);
-                logo.turtles.turtleList[turtle].painter.doSetValue(args[1]);
-                logo.turtles.turtleList[turtle].painter.doSetChroma(args[2]);
-                logo.turtles.setBackgroundColor(turtle);
-                logo.turtles.turtleList[turtle].painter.doSetHue(hue);
-                logo.turtles.turtleList[turtle].painter.doSetValue(value);
-                logo.turtles.turtleList[turtle].painter.doSetChroma(chroma);
+                let hue = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.color;
+                let value = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.value;
+                let chroma = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.chroma;
+                logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.doSetHue(args[0]);
+                logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.doSetValue(args[1]);
+                logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.doSetChroma(args[2]);
+                logo.turtles.setBackgroundColor(logo.turtles.companionTurtle(turtle));
+                logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.doSetHue(hue);
+                logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.doSetValue(value);
+                logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.doSetChroma(chroma);
                 logo.svgOutput = "";
             }
         }
@@ -172,11 +172,11 @@ function setupPenBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.turtles.turtleList[turtle].painter.chroma);
+            return toFixed2(logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.chroma);
         }
 
         setter(logo, value, turtle, blk) {
-            let turtleObj = logo.turtles.turtleList[turtle];
+            let turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetChroma(value);
         }
 
@@ -188,7 +188,7 @@ function setupPenBlocks() {
             ) {
                 logo.statusFields.push([blk, "grey"]);
             } else {
-                return logo.turtles.turtleList[turtle].painter.chroma;
+                return logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.chroma;
             }
         }
     }
@@ -206,11 +206,11 @@ function setupPenBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.turtles.turtleList[turtle].painter.value);
+            return toFixed2(logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.value);
         }
 
         setter(logo, value, turtle, blk) {
-            let turtleObj = logo.turtles.turtleList[turtle];
+            let turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetValue(value);
         }
 
@@ -222,7 +222,7 @@ function setupPenBlocks() {
             ) {
                 logo.statusFields.push([blk, "shade"]);
             } else {
-                return logo.turtles.turtleList[turtle].painter.value;
+                return logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.value;
             }
         }
     }
@@ -241,11 +241,11 @@ function setupPenBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.turtles.turtleList[turtle].painter.color);
+            return toFixed2(logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.color);
         }
 
         setter(logo, value, turtle, blk) {
-            let turtleObj = logo.turtles.turtleList[turtle];
+            let turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetColor(value);
         }
 
@@ -257,7 +257,7 @@ function setupPenBlocks() {
             ) {
                 logo.statusFields.push([blk, "color"]);
             } else {
-                return logo.turtles.turtleList[turtle].painter.color;
+                return logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.color;
             }
         }
     }
@@ -275,11 +275,11 @@ function setupPenBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.turtles.turtleList[turtle].painter.stroke);
+            return toFixed2(logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.stroke);
         }
 
         setter(logo, value, turtle, blk) {
-            let turtleObj = logo.turtles.turtleList[turtle];
+            let turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetPensize(value);
         }
 
@@ -291,7 +291,7 @@ function setupPenBlocks() {
             ) {
                 logo.statusFields.push([blk, "pensize"]);
             } else {
-                return logo.turtles.turtleList[turtle].painter.stroke;
+                return logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.stroke;
             }
         }
     }
@@ -320,7 +320,7 @@ function setupPenBlocks() {
             }
 
             if (typeof args[0] === "string") {
-                logo.turtles.turtleList[turtle].painter.doSetFont(args[0]);
+                logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.doSetFont(args[0]);
             }
         }
     }
@@ -339,7 +339,7 @@ function setupPenBlocks() {
         }
 
         flow(args, logo, turtle) {
-            logo.turtles.setBackgroundColor(turtle);
+            logo.turtles.setBackgroundColor(logo.turtles.companionTurtle(turtle));
             logo.svgOutput = "";
         }
     }
@@ -371,7 +371,7 @@ function setupPenBlocks() {
                 return;
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -426,7 +426,7 @@ function setupPenBlocks() {
                 return;
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -480,7 +480,7 @@ function setupPenBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -505,7 +505,7 @@ function setupPenBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -540,7 +540,7 @@ function setupPenBlocks() {
                 return;
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (typeof args[0] === "string") {
                 logo.errorMsg(NANERRORMSG, blk);
@@ -585,7 +585,7 @@ function setupPenBlocks() {
                 return;
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (typeof args[0] === "string") {
                 logo.errorMsg(NANERRORMSG, blk);
@@ -631,7 +631,7 @@ function setupPenBlocks() {
                 return;
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (typeof args[0] === "string") {
                 logo.errorMsg(NANERRORMSG, blk);
@@ -679,7 +679,7 @@ function setupPenBlocks() {
                 return;
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (typeof args[0] === "string") {
                 logo.errorMsg(NANERRORMSG, blk);
@@ -724,7 +724,7 @@ function setupPenBlocks() {
                 return;
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (typeof args[0] === "string") {
                 logo.errorMsg(NANERRORMSG, blk);
@@ -770,7 +770,7 @@ function setupPenBlocks() {
                 return;
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (typeof args[0] === "string") {
                 logo.errorMsg(NANERRORMSG, blk);

@@ -367,7 +367,7 @@ function setupPitchBlocks() {
                     .name === "outputtools"
             ) {
             } else {
-                let tur = logo.turtles.ithTurtle(turtle);
+                let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
                 if (tur.singer.lastNotePlayed !== null) {
                     return tur.singer.lastNotePlayed[0];

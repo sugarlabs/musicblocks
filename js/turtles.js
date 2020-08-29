@@ -511,6 +511,20 @@ Turtles.TurtlesModel = class {
     ithTurtle(i) {
         return this._turtleList[Number(i)];
     }
+
+
+    /**
+     * @param {Number} i - index number
+     * @returns index number of companion turtle or i
+     */
+    companionTurtle(i) {
+        for (let t = 0; t < this._turtleList.length; t++) {
+            if (this._turtleList[t].companionTurtle === i) {
+                return t;
+            }
+        }
+        return i;
+    }
 };
 
 /**

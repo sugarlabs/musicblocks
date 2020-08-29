@@ -522,7 +522,7 @@ class Logo {
                             instrumentsFilters[0][instrumentName];
                     }
 
-                    // .. and any effects
+                    // ...and any effects
                     if (instrumentName in instrumentsEffects[0]) {
                         instrumentsEffects[turtle][instrumentName] =
                             instrumentsEffects[0][instrumentName];
