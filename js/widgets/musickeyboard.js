@@ -486,7 +486,7 @@ function MusicKeyboard() {
         this.tickButton = widgetWindow.addButton(
             "metronome.svg",
             ICONSIZE,
-            _("tick")
+            _("Metronome")
         )
         this.tickButton.onclick = () => {
             if (this.tick) {
@@ -2390,7 +2390,8 @@ function MusicKeyboard() {
         );
         newel.innerHTML =
             "<small>(" +
-            "REST" +
+	    // .TRANS: a rest is a pause in the music.
+            _("rest") +
             ")</small><br/>";
         newel.style.position = "relative";
         newel.style.zIndex = "100";
