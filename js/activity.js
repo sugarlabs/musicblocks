@@ -218,8 +218,8 @@ function Activity() {
     if (_THIS_IS_MUSIC_BLOCKS_) {
         let MUSICBLOCKS_EXTRAS = [
             "Tone",
+            "activity/js-export/samples/sample",
             "activity/js-export/export",
-            "activity/js-export/sample",
             "activity/js-export/interface",
             "activity/js-export/ASTutils",
             "activity/js-export/generate",
