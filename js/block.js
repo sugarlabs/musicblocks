@@ -4961,6 +4961,15 @@ function Block(protoblock, blocks, overrideName) {
             __pitchPreview();
         };
 
+        let __selectionChangedOctave = () => {
+            let octave = Number(
+                that._octavesWheel.navItems[
+                    that._octavesWheel.selectedNavItemIndex
+                ].title
+            );
+            that.blocks.setPitchOctave(that.connections[0], octave);
+            __pitchPreview();
+        }
 
         let __selectionChangedAccidental = () => {
             selection["attr"] =
@@ -5132,7 +5141,7 @@ function Block(protoblock, blocks, overrideName) {
             for (let i = 0; i < 8; i++) {
                 this._octavesWheel.navItems[
                     i
-                ].navigateFunction = __pitchPreview;
+                ].navigateFunction = __selectionChangedOctave;
             }
         }
 
