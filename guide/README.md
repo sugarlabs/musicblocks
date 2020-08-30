@@ -65,6 +65,8 @@ also available.
     11. [Music Keyboard](#keyboard)
     12. [Changing Temperament](#temperament)
 5. [Beyond Music Blocks](#BEYOND-MUSIC-BLOCKS)
+    1. [LilyPond](#LILYPOND)
+    2. [JavaScript](#JAVASCRIPT)
 
 [APPENDIX: Palette Tables](#APPENDIX_1)
 
@@ -2380,13 +2382,16 @@ The *Drag* button will drag the widget.
 
 The *Close* button will close the widget.
 
-## <a name="BEYOND-MUSIC-BLOCKS"></a>Beyond Music Blocks
+## <a name="BEYOND-MUSIC-BLOCKS"></a>5. Beyond Music Blocks
 
 [Previous Section (4. Widgets)](#WIDGETS) | [Back to Table of Contents](#TOC)
 
 Music Blocks is a waypoint, not a destination. One of the goals is to
-point the learner towards other powerful tools. One such tool is
-[Lilypond](http://lilypond.org), a music engraving program.
+point the learner towards other powerful tools.
+
+## <a name="LILYPOND"></a>5.1 Lilypond
+
+One such tool is [Lilypond](http://lilypond.org), a music engraving program.
 
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/lilypond1.svg
@@ -2429,6 +2434,65 @@ e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
  "sheet music")
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523043053377623&run=True)
+
+## <a name="JAVASCRIPT"></a>5.2 JavaScript
+
+There are practical limits to the size and complexity of Music Blocks
+programs. At some point we expect Music Blocks programmers to move on
+to text-based programming languages. To facilitate this transition,
+there is a JavaScript widget that will convert your Music Blocks
+program into JavaScript.
+
+The JavaScript code is written and viewed on the **JavaScript Editor**
+widget which can be opened by pressing on the "*Toggle JavaScript
+Editor*" (`<>`) button in the auxilliary menu.
+
+### Example code
+
+For the block stacks (and mouse art generated after running),
+
+![Example Project](./samples/mode-up-down.png)
+
+the following code is generated:
+
+```
+let action = async mouse => {
+    await mouse.playNote(1 / 4, async () => {
+        await mouse.playPitch("do", 4);
+        console.log(mouse.NOTEVALUE);
+        return mouse.ENDFLOW;
+    });
+    let box1 = 0;
+    let box2 = 360 / mouse.MODELENGTH;
+    for (let i0 = 0; i0 < mouse.MODELENGTH * 2; i0++) {
+        await mouse.playNote(1 / 4, async () => {
+            if (box1 < mouse.MODELENGTH) {
+                await mouse.stepPitch(1);
+                await mouse.turnRight(box2);
+            } else {
+                await mouse.stepPitch(-1);
+                await mouse.turnLeft(box2);
+            }
+            await mouse.goForward(100);
+            return mouse.ENDFLOW;
+        });
+        box1 = box1 + 1;
+    }
+    return mouse.ENDFLOW;
+};
+new Mouse(async mouse => {
+    await mouse.clear();
+    await mouse.setInstrument("guitar", async () => {
+        await mouse.setColor(50);
+        await action(mouse);
+        return mouse.ENDFLOW;
+    });
+    return mouse.ENDMOUSE;
+});
+MusicBlocks.run();
+```
+
+Here's the complete [API](./samples/sample.js) of methods, getters, setters.
 
 ## <a name="APPENDIX_1"></a>Appendix: Palette Tables
 
