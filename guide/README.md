@@ -2451,7 +2451,7 @@ Editor*" (`<>`) button in the auxilliary menu.
 
 For the block stacks (and mouse art generated after running),
 
-![Example Project](./samples/mode-up-down.png)
+![Example Project](../js/js-export/samples/mode-up-down.png)
 
 the following code is generated:
 
@@ -2492,7 +2492,8 @@ new Mouse(async mouse => {
 MusicBlocks.run();
 ```
 
-Here's the complete [API](./samples/sample.js) of methods, getters, setters.
+Here's the complete [API](../js/js-export/samples/sample.js) of
+methods, getters, setters.
 
 ## <a name="APPENDIX_1"></a>Appendix: Palette Tables
 
