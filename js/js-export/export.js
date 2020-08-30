@@ -1,5 +1,5 @@
 /**
- * @file This contains the API classes' defimitions and utilities for JavaScript based Music Blocks code.
+ * @file This contains the API classes' definitions and utilities for JavaScript based Music Blocks code.
  * @author Anindya Kundu
  *
  * @copyright 2020 Anindya Kundu

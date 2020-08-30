@@ -44,8 +44,8 @@ class VolumeBlocksAPI {
         return this.ENDFLOWCOMMAND;
     }
 
-    setSynthVolume(synth, value) {
-        let args = JSInterface.validateArgs("setSynthVolume", [synth, value]);
+    setSynthVolume(synth, volume) {
+        let args = JSInterface.validateArgs("setSynthVolume", [synth, volume]);
         return this.runCommand("setSynthVolume", [args[0], args[1], this.turIndex]);
     }
 

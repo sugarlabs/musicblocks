@@ -1,8 +1,8 @@
 MusicBlocks/js
 ==============
 
-The core code for Music Blocks resides in this directory and the
-blocks subdirectory.
+The core code for Music Blocks resides in this directory, the blocks and the turtleactions
+subdirectory.
 
 * `activity.js` -- where the menus are defined
 
