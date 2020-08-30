@@ -12,125 +12,17 @@
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.0.1\n"
 
-#: js/RhythmBlockPaletteBlocks.js:14
-#: js/RhythmBlockPaletteBlocks.js:177
-#: js/RhythmBlockPaletteBlocks.js:14
-#: js/RhythmBlockPaletteBlocks.js:177
-#: js/RhythmBlockPaletteBlocks.js:14
-#: js/RhythmBlockPaletteBlocks.js:177
-#: js/RhythmBlockPaletteBlocks.js:14
-#: js/RhythmBlockPaletteBlocks.js:177
-#: js/RhythmBlockPaletteBlocks.js:14
-#: js/RhythmBlockPaletteBlocks.js:170
-#: js/block.js:1436
-#: js/block.js:7910
-#: js/block.js:7931
-#: js/block.js:7948
-#: js/activity.js:2693
-#: js/palette.js:932
-#: js/palette.js:941
-#: js/palette.js:950
-#: js/palette.js:959
-#: js/palette.js:2511
-#: js/palette.js:2522
-#: js/palette.js:2533
-#: js/palette.js:2544
-#: js/palette.js:2563
-#: js/turtledefs.js:76
-#: js/rubrics.js:497
-#: js/macros.js:153
-#: js/macros.js:249
-#: js/macros.js:250
-#: js/macros.js:259
-#: js/macros.js:801
-#: js/blocks.js:1120
-#: js/blocks.js:3549
-#: js/blocks.js:3550
-#: js/blocks.js:3786
-#: js/blocks.js:4168
-#: js/blocks.js:4363
-#: js/blocks.js:5526
-#: js/blocks.js:6776
-#: js/ActionBlocks.js:99
-#: js/ActionBlocks.js:147
-#: js/ActionBlocks.js:350
-#: js/ActionBlocks.js:415
-#: js/ActionBlocks.js:569
-#: js/ActionBlocks.js:629
-#: js/ActionBlocks.js:765
-#: js/ActionBlocks.js:768
-#: js/ActionBlocks.js:773
-#: js/ActionBlocks.js:805
-#: js/MeterBlocks.js:412
-#: js/MeterBlocks.js:479
-#: js/MeterBlocks.js:568
-#: js/MeterBlocks.js:669
-#: js/musickeyboard.js:2360
-#: js/pitchtimematrix.js:4708
-#: js/rhythmruler.js:1602
-#: js/rhythmruler.js:1610
-#: js/rhythmruler.js:1911
-#: js/rhythmruler.js:1919
-#: js/block.js:1436
-#: js/block.js:7947
-#: js/block.js:7968
-#: js/block.js:7985
-#: js/activity.js:2937
-#: js/palette.js:512
-#: js/palette.js:521
-#: js/palette.js:530
-#: js/palette.js:539
-#: js/palette.js:1118
-#: js/palette.js:1129
-#: js/palette.js:1140
-#: js/palette.js:1151
-#: js/palette.js:1170
-#: js/turtledefs.js:76
-#: js/rubrics.js:497
-#: js/macros.js:153
-#: js/macros.js:249
-#: js/macros.js:250
-#: js/macros.js:259
-#: js/macros.js:801
-#: js/blocks.js:1120
-#: js/blocks.js:3549
-#: js/blocks.js:3550
-#: js/blocks.js:3786
-#: js/blocks.js:4168
-#: js/blocks.js:4363
-#: js/blocks.js:5526
-#: js/blocks.js:6776
-#: js/ActionBlocks.js:99
-#: js/ActionBlocks.js:147
-#: js/ActionBlocks.js:343
-#: js/ActionBlocks.js:408
-#: js/ActionBlocks.js:562
-#: js/ActionBlocks.js:622
-#: js/ActionBlocks.js:749
-#: js/ActionBlocks.js:752
-#: js/ActionBlocks.js:757
-#: js/ActionBlocks.js:789
-#: js/MeterBlocks.js:414
-#: js/MeterBlocks.js:469
-#: js/MeterBlocks.js:544
-#: js/MeterBlocks.js:632
-#: js/musickeyboard.js:2360
-#: js/pitchtimematrix.js:4706
-#: js/rhythmruler.js:1602
-#: js/rhythmruler.js:1610
-#: js/rhythmruler.js:1911
-#: js/rhythmruler.js:1919
 msgid "action"
 msgstr "アクション"
 
 #: js/block.js:1443
-#: js/logo.js:1442
+#: js/logo.js:1433
 #: js/lilypond.js:803
 #: js/lilypond.js:983
 #: js/lilypond.js:1030
-#: js/turtle-painter.js:1143
-#: js/turtle-painter.js:1144
-#: js/turtles.js:108
+#: js/turtle-painter.js:1165
+#: js/turtle-painter.js:1166
+#: js/turtles.js:126
 #: js/ActionBlocks.js:704
 #: js/ExtrasBlocks.js:434
 msgid "start"
@@ -141,7 +33,7 @@ msgid "matrix"
 msgstr "フレーズメーカー"
 
 #: js/block.js:1457
-#: js/WidgetBlocks.js:1076
+#: js/WidgetBlocks.js:1120
 #: plugins/rodi.rtp:328
 msgid "status"
 msgstr "実行じょうきょう"
@@ -166,13 +58,13 @@ msgid "stair"
 msgstr "階段"
 
 #: js/block.js:1492
-#: js/WidgetBlocks.js:444
+#: js/WidgetBlocks.js:498
 #.TRANS: the speed at music is should be played.
 msgid "tempo"
 msgstr "メトロノーム"
 
 #: js/block.js:1499
-#: js/IntervalsBlocks.js:922
+#: js/IntervalsBlocks.js:778
 #.TRANS: mode, e.g., Major in C Major
 ## 旋法＝せんぽう；https://ja.wikipedia.org/wiki/%E3%83%A2%E3%83%BC%E3%83%89_(%E6%97%8B%E6%B3%95)
 msgid "mode"
@@ -189,21 +81,21 @@ msgstr "キーボード"
 
 #: js/block.js:1520
 #: js/block.js:2426
-#: js/palette.js:560
+#: js/palette.js:551
 #: js/turtledefs.js:74
 #: js/lilypond.js:783
 #: js/lilypond.js:964
 #: js/lilypond.js:1017
-#: js/RhythmBlocks.js:696
-#: js/DrumBlocks.js:320
-#: js/VolumeBlocks.js:332
+#: js/RhythmBlocks.js:511
+#: js/DrumBlocks.js:234
+#: js/VolumeBlocks.js:328
 #: js/pitchtimematrix.js:733
 msgid "drum"
 msgstr "ドラム"
 
 #: js/block.js:1527
-#: js/WidgetBlocks.js:792
-#: js/WidgetBlocks.js:825
+#: js/WidgetBlocks.js:836
+#: js/WidgetBlocks.js:869
 #.TRANS: widget for subdividing a measure into distinct rhythmic elements
 msgid "rhythm maker"
 msgstr "リズムメーカー"
@@ -216,14 +108,14 @@ msgstr "リズムメーカー"
 #: js/RhythmBlockPaletteBlocks.js:309
 #: js/RhythmBlockPaletteBlocks.js:357
 #: js/RhythmBlockPaletteBlocks.js:395
-#: js/RhythmBlockPaletteBlocks.js:616
+#: js/RhythmBlockPaletteBlocks.js:617
 #: js/RhythmBlocks.js:5
-#: js/RhythmBlocks.js:257
-#: js/RhythmBlocks.js:696
-#: js/RhythmBlocks.js:722
+#: js/RhythmBlocks.js:232
+#: js/RhythmBlocks.js:511
+#: js/RhythmBlocks.js:537
 #: js/OrnamentBlocks.js:72
-#: js/OrnamentBlocks.js:131
-#: js/MeterBlocks.js:1056
+#: js/OrnamentBlocks.js:116
+#: js/MeterBlocks.js:805
 #: js/pitchtimematrix.js:643
 #: js/pitchtimematrix.js:2521
 #: js/pitchtimematrix.js:2564
@@ -235,20 +127,20 @@ msgstr "音の長さ"
 #: js/block.js:1541
 #: js/block.js:2112
 #: js/block.js:2142
-#: js/OrnamentBlocks.js:131
-#: js/IntervalsBlocks.js:598
+#: js/OrnamentBlocks.js:116
+#: js/IntervalsBlocks.js:534
 #.TRANS: calculate a relative step between notes based on semi-tones
 ## https://ja.wikibooks.org/wiki/%E9%9F%B3%E7%A8%8B#%E5%85%A8%E9%9F%B3%E9%9A%8E%E7%9A%84%E9%9F%B3%E7%A8%8B
 msgid "scalar interval"
 msgstr "音階の上下"
 
 #: js/block.js:1548
-#: js/RhythmBlocks.js:99
+#: js/RhythmBlocks.js:74
 msgid "milliseconds"
 msgstr "ミリ秒"
 
 #: js/block.js:1555
-#: js/palette.js:585
+#: js/palette.js:576
 #: js/WidgetBlocks.js:165
 #: js/IntervalsBlocks.js:18
 msgid "temperament"
@@ -258,7 +150,7 @@ msgstr "音律"
 #: js/block.js:2202
 #: js/block.js:2259
 #: js/block.js:2429
-#: js/RhythmBlocks.js:646
+#: js/RhythmBlocks.js:472
 #: js/ExtrasBlocks.js:439
 #: js/rhythmruler.js:366
 #: js/rhythmruler.js:506
@@ -266,12 +158,12 @@ msgid "silence"
 msgstr "休符"
 
 #: js/block.js:2292
-#: js/block.js:3280
-#: js/block.js:3309
-#: js/activity.js:2402
-#: js/activity.js:2456
-#: js/musicutils.js:2833
-#: js/musicutils.js:3329
+#: js/block.js:3293
+#: js/block.js:3322
+#: js/activity.js:2433
+#: js/activity.js:2487
+#: js/musicutils.js:3018
+#: js/musicutils.js:3514
 #.TRANS: the note names must be separated by single spaces
 #.TRANS: the note names must be separated by single spaces
 ## The spaces must not be "Japanese" spaces
@@ -291,20 +183,20 @@ msgstr "上"
 #: js/turtledefs.js:69
 #: js/rubrics.js:491
 #: js/SensorsBlocks.js:107
-#: js/PitchBlocks.js:2258
-#: js/PitchBlocks.js:2271
+#: js/PitchBlocks.js:1667
+#: js/PitchBlocks.js:1680
 #: js/IntervalsBlocks.js:18
-#: js/musickeyboard.js:1469
+#: js/musickeyboard.js:1515
 #: js/pitchtimematrix.js:731
 #.TRANS: pitch number
 #.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
 msgid "pitch"
 msgstr "音の高さ"
 
-#: js/block.js:3667
-#: js/palette.js:598
-#: js/blocks.js:2645
-#: js/blocks.js:3277
+#: js/block.js:3680
+#: js/palette.js:589
+#: js/blocks.js:2668
+#: js/blocks.js:3300
 #: js/SensorsBlocks.js:511
 #: js/BooleanBlocks.js:21
 #: js/BooleanBlocks.js:63
@@ -318,9 +210,9 @@ msgstr "音の高さ"
 msgid "true"
 msgstr "真"
 
-#: js/block.js:3667
-#: js/blocks.js:2647
-#: js/blocks.js:3279
+#: js/block.js:3680
+#: js/blocks.js:2670
+#: js/blocks.js:3302
 #: js/SensorsBlocks.js:513
 #: js/BooleanBlocks.js:23
 #: js/BooleanBlocks.js:65
@@ -333,381 +225,386 @@ msgstr "真"
 msgid "false"
 msgstr "偽"
 
-#: js/block.js:3676
-#: js/ExtrasBlocks.js:917
+#: js/block.js:3689
+#: js/ExtrasBlocks.js:933
 msgid "Cartesian"
 msgstr "ほうがん（ざひょう）を表示"
 
-#: js/block.js:3677
-#: js/ExtrasBlocks.js:920
+#: js/block.js:3690
+#: js/ExtrasBlocks.js:936
 msgid "polar"
 msgstr "極座標を表示"
 
-#: js/block.js:3678
-#: js/ExtrasBlocks.js:923
+#: js/block.js:3691
+#: js/ExtrasBlocks.js:939
 msgid "Cartesian+polar"
 msgstr "右岸座標と極座標を表示"
 
-#: js/block.js:3679
-#: js/ExtrasBlocks.js:927
+#: js/block.js:3692
+#: js/ExtrasBlocks.js:943
 msgid "treble"
 msgstr "トレブル記号"
 
-#: js/block.js:3680
-#: js/ExtrasBlocks.js:930
+#: js/block.js:3693
+#: js/ExtrasBlocks.js:946
 msgid "grand staff"
 msgstr "トレブルとバス記号"
 
-#: js/block.js:3681
-#: js/ExtrasBlocks.js:933
+#: js/block.js:3694
+#: js/ExtrasBlocks.js:949
 msgid "mezzo-soprano"
 msgstr "メゾソプラノ記号"
 
-#: js/block.js:3682
-#: js/ExtrasBlocks.js:936
+#: js/block.js:3695
+#: js/ExtrasBlocks.js:952
 msgid "alto"
 msgstr "アルト記号"
 
-#: js/block.js:3683
-#: js/ExtrasBlocks.js:939
+#: js/block.js:3696
+#: js/ExtrasBlocks.js:955
 msgid "tenor"
 msgstr "テノール記号"
 
-#: js/block.js:3684
-#: js/ExtrasBlocks.js:942
+#: js/block.js:3697
+#: js/ExtrasBlocks.js:958
 #: js/synthutils.js:33
-#: js/musicutils.js:627
+#: js/musicutils.js:632
 #.TRANS: musical instrument
 msgid "bass"
 msgstr "コントラバス"
 
-#: js/block.js:3685
-#: js/ExtrasBlocks.js:945
+#: js/block.js:3698
+#: js/ExtrasBlocks.js:961
 msgid "none"
 msgstr "なし"
 
-#: js/block.js:3700
-#: js/block.js:3710
-#: js/PitchBlocks.js:320
-#: js/PitchBlocks.js:1697
+#: js/block.js:3713
+#: js/block.js:3723
+#: js/PitchBlocks.js:227
+#: js/PitchBlocks.js:1478
 #.TRANS: convert current note to piano key (1-88)
 #.TRANS: a mapping of pitch to the 88 piano keys
 msgid "pitch number"
 msgstr "音の高さを数で表示"
 
-#: js/block.js:3701
-#: js/block.js:3711
-#: js/PitchBlocks.js:405
+#: js/block.js:3714
+#: js/block.js:3724
+#: js/PitchBlocks.js:312
 #.TRANS: the current pitch expressed in Hertz
 msgid "pitch in hertz"
 msgstr "音の高さをヘルツで表示"
 
-#: js/block.js:3702
-#: js/block.js:3707
+#: js/block.js:3715
+#: js/block.js:3720
 msgid "letter class"
 msgstr "アルファベット・クラス"
 
-#: js/block.js:3703
-#: js/block.js:3715
+#: js/block.js:3716
+#: js/block.js:3728
 msgid "staff y"
 msgstr "音部記号のｙ座標"
 
-#: js/block.js:3708
+#: js/block.js:3721
 msgid "solfege syllable"
 msgstr "階名（ド、レ、ミ）"
 
-#: js/block.js:3709
+#: js/block.js:3722
 msgid "pitch class"
 msgstr "ピッチクラス"
 
-#: js/block.js:3712
+#: js/block.js:3725
 msgid "scalar class"
 msgstr "音階クラス"
 
-#: js/block.js:3713
+#: js/block.js:3726
 msgid "scale degree"
 msgstr "音度"
 
-#: js/block.js:3714
+#: js/block.js:3727
 msgid "nth degree"
 msgstr "ピッチ度"
 
-#: js/block.js:4626
-#: js/musickeyboard.js:1789
+#: js/block.js:3729
+msgid "pitch to shade"
+msgstr ""
+
+#: js/block.js:3730
+msgid "pitch to color"
+msgstr ""
+
+#: js/block.js:4695
+#: js/musickeyboard.js:1835
 #: js/pitchtimematrix.js:1757
-#: js/musicutils.js:698
-#: js/musicutils.js:702
+#: js/musicutils.js:703
+#: js/musicutils.js:707
 #.TRANS: double sharp is a music term related to pitch
 msgid "double sharp"
 msgstr "ダブルシャープ"
 
-#: js/block.js:4627
-#: js/PitchBlocks.js:1361
-#: js/PitchBlocks.js:1438
-#: js/musickeyboard.js:1790
+#: js/block.js:4696
+#: js/PitchBlocks.js:1352
+#: js/musickeyboard.js:1836
 #: js/pitchtimematrix.js:1758
 #: js/pitchtimematrix.js:5076
-#: js/musicutils.js:696
-#: js/musicutils.js:703
+#: js/musicutils.js:701
+#: js/musicutils.js:708
 #.TRANS: sharp is a half-step up in pitch
 #.TRANS: sharp is a music term related to pitch
 ## ♯は日本語で嬰（えい）、♭は変（へん）と言います|http://musical-grammar.com/scale003.html
 msgid "sharp"
 msgstr "シャープ"
 
-#: js/block.js:4628
-#: js/musickeyboard.js:1791
+#: js/block.js:4697
+#: js/musickeyboard.js:1837
 #: js/pitchtimematrix.js:1759
-#: js/musicutils.js:694
-#: js/musicutils.js:704
+#: js/musicutils.js:699
+#: js/musicutils.js:709
 #.TRANS: natural is a music term related to pitch
 msgid "natural"
 msgstr "ナチュラル"
 
-#: js/block.js:4629
-#: js/PitchBlocks.js:1364
-#: js/PitchBlocks.js:1396
-#: js/musickeyboard.js:1792
+#: js/block.js:4698
+#: js/PitchBlocks.js:1311
+#: js/musickeyboard.js:1838
 #: js/pitchtimematrix.js:1760
 #: js/pitchtimematrix.js:5166
-#: js/musicutils.js:692
-#: js/musicutils.js:705
+#: js/musicutils.js:697
+#: js/musicutils.js:710
 #.TRANS: flat is a half-step down in pitch
 #.TRANS: flat is a music term related to pitch
 ## ♯は日本語で嬰（えい）、♭は変（へん）と言います|http://musical-grammar.com/scale003.html
 msgid "flat"
 msgstr "フラット"
 
-#: js/block.js:4630
-#: js/musickeyboard.js:1793
+#: js/block.js:4699
+#: js/musickeyboard.js:1839
 #: js/pitchtimematrix.js:1761
-#: js/musicutils.js:690
-#: js/musicutils.js:706
+#: js/musicutils.js:695
+#: js/musicutils.js:711
 #.TRANS: double flat is a music term related to pitch
 msgid "double flat"
 msgstr "ダブルフラット"
 
-#: js/block.js:7198
-#: js/PitchBlocks.js:1232
-#: js/musicutils.js:518
+#: js/block.js:7339
+#: js/PitchBlocks.js:1196
+#: js/musicutils.js:523
 #.TRANS: unison means the note is the same as the current note
 #.TRANS: unison is a music term related to intervals
 msgid "unison"
 msgstr "ユニゾン（同度）"
 
-#: js/block.js:7367
-#: js/block.js:7448
-#: js/musicutils.js:526
-#: js/musicutils.js:728
+#: js/block.js:7508
+#: js/block.js:7589
+#: js/musicutils.js:531
+#: js/musicutils.js:733
 #.TRANS: major is a music term related to intervals and mode
 msgid "major"
 msgstr "メジャー"
 
-#: js/block.js:7367
-#: js/block.js:7448
-#: js/musicutils.js:544
+#: js/block.js:7508
+#: js/block.js:7589
+#: js/musicutils.js:549
 #.TRANS: modal scale for music
 msgid "ionian"
 msgstr "アイオニアン音階"
 
-#: js/block.js:7371
-#: js/block.js:7452
-#: js/musicutils.js:524
-#: js/musicutils.js:725
+#: js/block.js:7512
+#: js/block.js:7593
+#: js/musicutils.js:529
+#: js/musicutils.js:730
 #.TRANS: minor is a music term related to intervals and mode
 ## 短=たん；http://jisho.org/word/%E7%9F%AD 
 msgid "minor"
 msgstr "マイナー（短）"
 
-#: js/block.js:7371
-#: js/block.js:7452
-#: js/musicutils.js:554
+#: js/block.js:7512
+#: js/block.js:7593
+#: js/musicutils.js:559
 #.TRANS: modal scale for music
 msgid "aeolian"
 msgstr "エオリアン音階"
 
-#: js/block.js:7876
+#: js/block.js:8018
 msgid "Not a number"
 msgstr "数字ではありません"
 
-#: js/block.js:8146
+#: js/block.js:8288
 msgid "Duplicate"
 msgstr "複製する"
 
-#: js/block.js:8147
+#: js/block.js:8289
 msgid "Extract"
 msgstr "取り出す"
 
-#: js/block.js:8148
+#: js/block.js:8290
 msgid "Move to trash"
 msgstr "すてる"
 
-#: js/block.js:8149
-#: js/activity.js:1479
+#: js/block.js:8291
 #: js/pitchdrummatrix.js:152
 #: js/timbre.js:1031
 #: js/StringHelper.js:55
 msgid "Close"
 msgstr "閉じる"
 
-#: js/block.js:8151
+#: js/block.js:8293
 msgid "Save stack"
 msgstr "スタックをほぞん"
 
-#: js/block.js:8155
+#: js/block.js:8297
 #: js/turtledefs.js:458
 #: js/turtledefs.js:731
-#: js/toolbar.js:521
-#: js/toolbar.js:580
-#: js/toolbar.js:616
-#: js/toolbar.js:669
+#: js/toolbar.js:517
+#: js/toolbar.js:577
+#: js/toolbar.js:614
+#: js/toolbar.js:668
 msgid "Help"
 msgstr "説明"
 
-#: js/activity.js:337
+#: js/activity.js:362
 msgid "search for blocks"
 msgstr "ブロックをさがす"
 
-#: js/activity.js:1074
+#: js/activity.js:1094
 msgid "You have chosen key "
 msgstr "音の高さは"
 
-#: js/activity.js:1075
+#: js/activity.js:1095
 msgid " for your pitch preview."
 msgstr "の音階によって設定しています。"
 
-#: js/activity.js:1135
+#: js/activity.js:1155
 msgid "Refresh your browser to change to advanced mode."
 msgstr "高度モードにするには、ブラウザをこうしんして下さい。"
 
-#: js/activity.js:1144
+#: js/activity.js:1164
 msgid "Refresh your browser to change to beginner mode."
 msgstr "はってんモードにするには、ブラウザをこうしんしてください。"
 
-#: js/activity.js:1436
+#: js/activity.js:1462
 msgid "Catching mice"
 msgstr "ネズミをつかまえているよ"
 
-#: js/activity.js:1437
+#: js/activity.js:1463
 msgid "Cleaning the instruments"
 msgstr "楽器のおていれをしているよ"
 
-#: js/activity.js:1438
+#: js/activity.js:1464
 msgid "Testing key pieces"
 msgstr "キーボードの音をたしかめているよ"
 
-#: js/activity.js:1439
+#: js/activity.js:1465
 msgid "Sight-reading"
 msgstr "がくふをよみこんでいるよ"
 
-#: js/activity.js:1440
+#: js/activity.js:1466
 msgid "Combining math and music"
 msgstr "音楽と算数をくっつけているよ"
 
-#: js/activity.js:1441
+#: js/activity.js:1467
 msgid "Generating more blocks"
 msgstr "ブロックをたくさんつくっているよ"
 
-#: js/activity.js:1442
+#: js/activity.js:1468
 msgid "Do Re Mi Fa Sol La Ti Do"
 msgstr "ド　レ　ミ　ファ　ソ　ラ　シ　ド"
 
-#: js/activity.js:1443
+#: js/activity.js:1469
 msgid "Tuning string instruments"
 msgstr "楽器のチューニングをしているよ"
 
-#: js/activity.js:1444
+#: js/activity.js:1470
 msgid "Pressing random keys"
 msgstr "キーボードでおんがくをつくっているよ"
 
-#: js/activity.js:1640
-#: js/activity.js:1675
-#: js/activity.js:1704
-#: js/turtles.js:783
+#: js/activity.js:1589
+#: js/activity.js:1624
+#: js/activity.js:1653
+#: js/turtles.js:825
 #.TRANS: show Cartesian coordinate overlay grid
 msgid "show Cartesian"
 msgstr "ほうがん（ざひょう）を表示"
 
-#: js/activity.js:1662
+#: js/activity.js:1611
 #.TRANS: show treble clef
 msgid "show treble"
 msgstr "トレブル記号を表示"
 
-#: js/activity.js:1665
+#: js/activity.js:1614
 #.TRANS: hide Polar coordinate overlay grid
 msgid "hide Polar"
 msgstr "中心の角度をかくす"
 
-#: js/activity.js:1672
-#: js/activity.js:1696
+#: js/activity.js:1621
+#: js/activity.js:1645
 #.TRANS: show bass clef
 #.TRANS: show bass clef
 msgid "show bass"
 msgstr "バス記号を表示"
 
-#: js/activity.js:1681
+#: js/activity.js:1630
 #.TRANS: show mezzo-soprano staff
 msgid "show mezzo-soprano"
 msgstr "メゾソプラノを表示"
 
-#: js/activity.js:1686
+#: js/activity.js:1635
 #.TRANS: show alto clef
 msgid "show alto"
 msgstr "アルト記号を表示"
 
-#: js/activity.js:1691
+#: js/activity.js:1640
 #.TRANS: show tenor clef
 msgid "show tenor"
 msgstr "テノール記号を表示"
 
-#: js/activity.js:1701
+#: js/activity.js:1650
 #.TRANS: hide bass clef
 msgid "hide bass"
 msgstr "バス記号を隠す"
 
-#: js/activity.js:1708
+#: js/activity.js:1657
 #.TRANS: show Polar coordinate overlay grid
 msgid "show Polar"
 msgstr "ほうがんと角度を表示"
 
-#: js/activity.js:1712
+#: js/activity.js:1661
 #.TRANS: hide Cartesian coordinate overlay grid
 msgid "hide Cartesian"
 msgstr "ほうがん（ざひょう）をかくす"
 
-#: js/activity.js:2126
+#: js/activity.js:2155
 msgid "This block is deprecated."
 msgstr "このブロックはもうありません。"
 
-#: js/activity.js:2128
+#: js/activity.js:2157
 msgid "Block cannot be found."
 msgstr "ブロックが見つかりません。"
 
-#: js/activity.js:2355
+#: js/activity.js:2386
 msgid "Saving block artwork"
 msgstr "ブロックのアートを保存中"
 
-#: js/activity.js:2359
+#: js/activity.js:2390
 #: js/LocalCard.js:17
 msgid "Copy"
 msgstr "コピー"
 
-#: js/activity.js:2366
+#: js/activity.js:2397
 msgid "Erase"
 msgstr "消す"
 
-#: js/activity.js:2370
-#: js/activity.js:2601
+#: js/activity.js:2401
+#: js/activity.js:2632
 #: js/turtledefs.js:293
-#: js/toolbar.js:512
-#: js/toolbar.js:571
-#: js/toolbar.js:607
-#: js/toolbar.js:660
-#: js/musickeyboard.js:419
-#: js/musickeyboard.js:592
-#: js/musickeyboard.js:594
-#: js/musickeyboard.js:682
-#: js/musickeyboard.js:684
+#: js/toolbar.js:508
+#: js/toolbar.js:568
+#: js/toolbar.js:605
+#: js/toolbar.js:659
+#: js/musickeyboard.js:440
+#: js/musickeyboard.js:638
+#: js/musickeyboard.js:640
+#: js/musickeyboard.js:728
+#: js/musickeyboard.js:730
 #: js/pitchdrummatrix.js:122
 #: js/pitchtimematrix.js:244
 #: js/pitchtimematrix.js:4246
@@ -734,15 +631,15 @@ msgstr "消す"
 msgid "Play"
 msgstr "実行"
 
-#: js/activity.js:2374
+#: js/activity.js:2405
 #: js/turtledefs.js:299
 #: js/turtledefs.js:515
-#: js/toolbar.js:513
-#: js/toolbar.js:572
-#: js/toolbar.js:608
-#: js/toolbar.js:661
-#: js/meterwidget.js:81
-#: js/meterwidget.js:83
+#: js/toolbar.js:509
+#: js/toolbar.js:569
+#: js/toolbar.js:606
+#: js/toolbar.js:660
+#: js/meterwidget.js:77
+#: js/meterwidget.js:79
 #: js/temperament.js:1847
 #: js/temperament.js:1849
 #: js/modewidget.js:74
@@ -750,117 +647,117 @@ msgstr "実行"
 msgid "Stop"
 msgstr "停止"
 
-#: js/activity.js:2378
-#: js/activity.js:2389
+#: js/activity.js:2409
+#: js/activity.js:2420
 msgid "Paste"
 msgstr "貼り付け"
 
-#: js/activity.js:2382
+#: js/activity.js:2413
 msgid "Save block help"
 msgstr "ブロックの ヘルプを 保存"
 
-#: js/activity.js:2460
+#: js/activity.js:2491
 msgid "Jumping to the bottom of the page."
 msgstr "画面の下にジャンプしています"
 
-#: js/activity.js:2467
+#: js/activity.js:2498
 msgid "Scrolling up."
 msgstr "上にスクロールしています"
 
-#: js/activity.js:2472
+#: js/activity.js:2503
 msgid "Scrolling down."
 msgstr "下にスクロールしています"
 
-#: js/activity.js:2477
+#: js/activity.js:2508
 msgid "Extracting block"
 msgstr "ブロックを取り出しています"
 
-#: js/activity.js:2484
+#: js/activity.js:2516
 msgid "Moving block up."
 msgstr "ブロックを上に動かしています"
 
-#: js/activity.js:2508
+#: js/activity.js:2540
 msgid "Moving block down."
 msgstr "ブロックを下に動かしています"
 
-#: js/activity.js:2530
+#: js/activity.js:2562
 msgid "Moving block left."
 msgstr "ブロックを左に動かしています"
 
-#: js/activity.js:2547
+#: js/activity.js:2579
 msgid "Moving block right."
 msgstr "ブロックを右に動かしています"
 
-#: js/activity.js:2563
+#: js/activity.js:2594
 msgid "Jump to home position."
 msgstr "まんなかにジャンプする"
 
-#: js/activity.js:2593
+#: js/activity.js:2624
 msgid "Hide blocks"
 msgstr "ブロックを非表示"
 
-#: js/activity.js:3174
+#: js/activity.js:3201
 #: js/SaveInterface.js:73
 #: js/SaveInterface.js:141
 #: js/SaveInterface.js:180
-#: js/SaveInterface.js:259
-#: js/SaveInterface.js:296
+#: js/SaveInterface.js:256
+#: js/SaveInterface.js:293
 #: js/ProjectStorage.js:13
 #: js/GlobalPlanet.js:373
 msgid "My Project"
 msgstr "自分のプロジェクト"
 
-#: js/activity.js:3301
+#: js/activity.js:3328
 msgid "Click the run button to run the project."
 msgstr "プロジェクトを再生するため、再生のボタンをクリックしてください。"
 
-#: js/activity.js:3358
+#: js/activity.js:3385
 msgid "Please set browser zoom level to 100%"
 msgstr "ブラウザ表示を100%に設定してください。"
 
-#: js/activity.js:4066
-#: js/activity.js:4066
+#: js/activity.js:4092
+#: js/activity.js:4092
 #: js/turtledefs.js:368
 #: js/turtledefs.js:611
 msgid "Home"
 msgstr "ホーム"
 
-#: js/activity.js:4087
+#: js/activity.js:4113
 msgid "Show/hide block"
 msgstr "ブロックを表示する/かくす"
 
-#: js/activity.js:4104
+#: js/activity.js:4130
 msgid "Expand/collapse blocks"
 msgstr "ブロックを広げる/折りたたむ"
 
-#: js/activity.js:4121
+#: js/activity.js:4147
 #: js/turtledefs.js:388
 #: js/turtledefs.js:631
 msgid "Decrease block size"
 msgstr "ブロックの表示を小さくする"
 
-#: js/activity.js:4138
+#: js/activity.js:4164
 #: js/turtledefs.js:394
 #: js/turtledefs.js:637
 msgid "Increase block size"
 msgstr "ブロックの表示を大きくする"
 
-#: js/activity.js:4172
+#: js/activity.js:4205
 #: js/turtledefs.js:464
 #: js/turtledefs.js:737
 #: js/help.js:278
 msgid "About"
 msgstr "ミュージック・ブロックスについて"
 
-#: js/activity.js:4350
+#: js/activity.js:4383
 msgid "Could not parse JSON input."
 msgstr "JSONのインプットのパースができません。"
 
-#: js/activity.js:4723
+#: js/activity.js:4757
 msgid "project undefined"
 msgstr ""
 
-#: js/activity.js:5486
+#: js/activity.js:5524
 msgid "Invalid parameters"
 msgstr ""
 
@@ -876,25 +773,25 @@ msgstr "Lilypondではこのピックアップを対応できません："
 msgid "Not a valid pitch name"
 msgstr "選ばれた音名が適切ではありません。"
 
-#: js/logo.js:688
+#: js/logo.js:695
 #: js/HeapBlocks.js:269
 msgid "You must select a file."
 msgstr "ファイルをえらんでください。"
 
-#: js/logo.js:1828
+#: js/logo.js:1829
 msgid "Playback is ready."
 msgstr "コンパイル完了"
 
-#: js/palette.js:494
-#: js/palette.js:620
-#: js/palette.js:1095
+#: js/palette.js:485
+#: js/palette.js:611
+#: js/palette.js:1099
 #: js/blocks.js:1312
-#: js/blocks.js:3503
-#: js/blocks.js:3924
-#: js/blocks.js:3954
-#: js/blocks.js:4001
-#: js/blocks.js:4035
-#: js/blocks.js:6805
+#: js/blocks.js:3526
+#: js/blocks.js:3947
+#: js/blocks.js:3977
+#: js/blocks.js:4024
+#: js/blocks.js:4058
+#: js/blocks.js:6824
 #: js/BoxesBlocks.js:144
 #: js/BoxesBlocks.js:147
 #: js/BoxesBlocks.js:204
@@ -904,56 +801,56 @@ msgstr "コンパイル完了"
 msgid "box"
 msgstr "箱"
 
-#: js/palette.js:557
-#: js/blocks.js:3311
-#: js/MediaBlocks.js:553
+#: js/palette.js:548
+#: js/blocks.js:3334
+#: js/MediaBlocks.js:554
 msgid "text"
 msgstr "文字そざい"
 
-#: js/palette.js:563
+#: js/palette.js:554
 msgid "effect"
 msgstr "こうかおん"
 
-#: js/palette.js:575
+#: js/palette.js:566
 msgid "mode name"
 msgstr "モード名"
 
-#: js/palette.js:578
+#: js/palette.js:569
 msgid "invert mode"
 msgstr "モードを反転させる"
 
-#: js/palette.js:581
+#: js/palette.js:572
 msgid "voice name"
 msgstr "音名"
 
-#: js/palette.js:589
-#: js/PitchBlocks.js:1325
+#: js/palette.js:580
+#: js/PitchBlocks.js:1271
 #.TRANS: An accidental is a modification to a pitch, e.g., sharp or flat.
 msgid "accidental"
 msgstr "変化記号"
 
-#: js/palette.js:595
+#: js/palette.js:586
 msgid "interval name"
 msgstr "音程名"
 
-#: js/palette.js:622
-#: js/palette.js:628
-#: js/palette.js:1031
-#: js/blocks.js:4209
+#: js/palette.js:613
+#: js/palette.js:619
+#: js/palette.js:1034
+#: js/blocks.js:4232
 #: js/BoxesBlocks.js:286
 #.TRANS: put something into a container for later reference
 msgid "store in"
 msgstr "入れる"
 
-#: js/palette.js:624
-#: js/palette.js:625
-#: js/blocks.js:3502
+#: js/palette.js:615
+#: js/palette.js:616
+#: js/blocks.js:3525
 #: js/BoxesBlocks.js:259
 msgid "store in box"
 msgstr "箱にほぞん"
 
-#: js/palette.js:637
-#: js/blocks.js:2542
+#: js/palette.js:628
+#: js/blocks.js:2565
 msgid "open file"
 msgstr "ファイルを開く"
 
@@ -982,7 +879,7 @@ msgstr "音符"
 
 #: js/turtledefs.js:68
 #: js/WidgetBlocks.js:350
-#: js/MeterBlocks.js:1039
+#: js/MeterBlocks.js:788
 #.TRANS: musical meter (time signature), e.g., 4:4
 msgid "meter"
 msgstr "拍子"
@@ -1001,9 +898,9 @@ msgid "ornament"
 msgstr "そうしょく"
 
 #: js/turtledefs.js:73
-#: js/VolumeBlocks.js:211
-#: js/VolumeBlocks.js:332
-#: js/VolumeBlocks.js:366
+#: js/VolumeBlocks.js:207
+#: js/VolumeBlocks.js:328
+#: js/VolumeBlocks.js:362
 msgid "volume"
 msgstr "音量"
 
@@ -1033,8 +930,8 @@ msgstr "ペン"
 
 #: js/turtledefs.js:81
 #: js/rubrics.js:495
-#: js/PitchBlocks.js:1781
-#: js/PitchBlocks.js:1897
+#: js/PitchBlocks.js:1535
+#: js/PitchBlocks.js:1579
 msgid "number"
 msgstr "すうち"
 
@@ -1126,10 +1023,10 @@ msgstr "プログラムは、このボタンをおすかわりに、キーボー
 
 #: js/turtledefs.js:307
 #: js/turtledefs.js:524
-#: js/toolbar.js:514
-#: js/toolbar.js:573
-#: js/toolbar.js:609
-#: js/toolbar.js:662
+#: js/toolbar.js:510
+#: js/toolbar.js:570
+#: js/toolbar.js:607
+#: js/toolbar.js:661
 #: js/StringHelper.js:19
 msgid "New project"
 msgstr "新しいプロジェクト"
@@ -1141,10 +1038,10 @@ msgstr "新しいプロジェクトを作る。"
 
 #: js/turtledefs.js:313
 #: js/turtledefs.js:530
-#: js/toolbar.js:515
-#: js/toolbar.js:574
-#: js/toolbar.js:610
-#: js/toolbar.js:663
+#: js/toolbar.js:511
+#: js/toolbar.js:571
+#: js/toolbar.js:608
+#: js/toolbar.js:662
 msgid "Load project from file"
 msgstr "プロジェクトを読みこむ"
 
@@ -1155,12 +1052,12 @@ msgstr "コンピューターに保存してあるファイルから、ミュー
 
 #: js/turtledefs.js:319
 #: js/turtledefs.js:537
-#: js/toolbar.js:516
-#: js/toolbar.js:575
-#: js/toolbar.js:576
-#: js/toolbar.js:611
+#: js/toolbar.js:512
+#: js/toolbar.js:572
+#: js/toolbar.js:573
+#: js/toolbar.js:609
+#: js/toolbar.js:663
 #: js/toolbar.js:664
-#: js/toolbar.js:665
 msgid "Save project"
 msgstr "プロジェクトをほぞん"
 
@@ -1170,10 +1067,10 @@ msgid "Save your project to a file."
 msgstr "げんざい開いているプロジェクトをほぞんする。"
 
 #: js/turtledefs.js:325
-#: js/toolbar.js:518
-#: js/toolbar.js:577
-#: js/toolbar.js:613
-#: js/toolbar.js:666
+#: js/toolbar.js:514
+#: js/toolbar.js:574
+#: js/toolbar.js:611
+#: js/toolbar.js:665
 msgid "Find and share projects"
 msgstr "みんなの作品"
 
@@ -1196,13 +1093,13 @@ msgstr "カンバス上にほうがん（ざひょう）や中心の角度を表
 
 #: js/turtledefs.js:353
 #: js/turtledefs.js:596
-#: js/turtles.js:798
+#: js/turtles.js:840
 msgid "Clean"
 msgstr "ネズミとペンをもどす"
 
 #: js/turtledefs.js:361
 #: js/turtledefs.js:604
-#: js/turtles.js:815
+#: js/turtles.js:857
 msgid "Collapse"
 msgstr "カンバスをしゅくしょう"
 
@@ -1262,10 +1159,10 @@ msgstr "クリックをすると、ゆっくりとしたスピードでプログ
 
 #: js/turtledefs.js:415
 #: js/turtledefs.js:658
-#: js/toolbar.js:523
-#: js/toolbar.js:582
-#: js/toolbar.js:618
-#: js/toolbar.js:671
+#: js/toolbar.js:519
+#: js/toolbar.js:579
+#: js/toolbar.js:616
+#: js/toolbar.js:670
 msgid "Run step by step"
 msgstr "ブロックを１つずつ実行する"
 
@@ -1276,9 +1173,9 @@ msgstr "クリックをすると、とてもゆっくり、ブロックを１つ
 
 #: js/turtledefs.js:421
 #: js/turtledefs.js:706
-#: js/toolbar.js:531
-#: js/toolbar.js:590
-#: js/toolbar.js:626
+#: js/toolbar.js:528
+#: js/toolbar.js:588
+#: js/toolbar.js:625
 #: js/toolbar.js:679
 msgid "Restore"
 msgstr "すてたブロックをもどす"
@@ -1300,10 +1197,10 @@ msgstr "ミュージック・ブロックスをかんたんモード／はって
 
 #: js/turtledefs.js:435
 #: js/turtledefs.js:692
-#: js/toolbar.js:534
-#: js/toolbar.js:593
-#: js/toolbar.js:602
-#: js/toolbar.js:627
+#: js/toolbar.js:531
+#: js/toolbar.js:591
+#: js/toolbar.js:600
+#: js/toolbar.js:626
 #: js/toolbar.js:680
 #: js/toolbar.js:686
 msgid "Select language"
@@ -1377,9 +1274,9 @@ msgid "save"
 msgstr "保存する"
 
 #: js/turtledefs.js:541
-#: js/toolbar.js:538
-#: js/toolbar.js:595
-#: js/toolbar.js:631
+#: js/toolbar.js:535
+#: js/toolbar.js:593
+#: js/toolbar.js:630
 msgid "Save mouse artwork as SVG"
 msgstr "SVGでほぞん"
 
@@ -1388,11 +1285,11 @@ msgid "Save graphics from your project to as SVG."
 msgstr "プロジェクトのグラフィックをSVGで保存"
 
 #: js/turtledefs.js:545
+#: js/toolbar.js:533
 #: js/toolbar.js:536
-#: js/toolbar.js:539
-#: js/toolbar.js:596
-#: js/toolbar.js:629
-#: js/toolbar.js:632
+#: js/toolbar.js:594
+#: js/toolbar.js:628
+#: js/toolbar.js:631
 msgid "Save mouse artwork as PNG"
 msgstr "PNGでほぞん"
 
@@ -1401,8 +1298,8 @@ msgid "Save graphics from your project as PNG."
 msgstr "プロジェクトのグラフィックをPNGで保存"
 
 #: js/turtledefs.js:549
-#: js/toolbar.js:540
-#: js/toolbar.js:597
+#: js/toolbar.js:537
+#: js/toolbar.js:595
 msgid "Save music as WAV"
 msgstr "WAVでほぞん"
 
@@ -1411,8 +1308,8 @@ msgid "Save audio from your project as WAV."
 msgstr "プロジェクトの音をWAVで保存"
 
 #: js/turtledefs.js:553
-#: js/toolbar.js:541
-#: js/toolbar.js:598
+#: js/toolbar.js:538
+#: js/toolbar.js:596
 msgid "Save sheet music as ABC"
 msgstr "ABCのフォーマットでほぞん"
 
@@ -1421,8 +1318,8 @@ msgid "Save your project to as an ABC file."
 msgstr "プロジェクトをABCで保存"
 
 #: js/turtledefs.js:557
-#: js/toolbar.js:542
-#: js/toolbar.js:599
+#: js/toolbar.js:539
+#: js/toolbar.js:597
 msgid "Save sheet music as Lilypond"
 msgstr "がくふ(Lilypondのフォーマット)でほぞん"
 
@@ -1431,9 +1328,9 @@ msgid "Save your project to as a Lilypond file."
 msgstr "作成した音楽を、コンピューター上でがくふをえがくファイル（Lilypondファイル）に変えてほぞんする。"
 
 #: js/turtledefs.js:561
-#: js/toolbar.js:546
-#: js/toolbar.js:600
-#: js/toolbar.js:635
+#: js/toolbar.js:543
+#: js/toolbar.js:598
+#: js/toolbar.js:634
 #: js/toolbar.js:684
 msgid "Save block artwork as SVG"
 msgstr "ブロックのアートをほぞん"
@@ -1463,10 +1360,10 @@ msgid "You can scroll the blocks on the canvas."
 msgstr "カンバス上をドラッグそうさしたときに、画面をスクロールさせることができる方向を上下だけと上下左右に変える。"
 
 #: js/turtledefs.js:678
-#: js/toolbar.js:524
-#: js/toolbar.js:583
-#: js/toolbar.js:619
-#: js/toolbar.js:672
+#: js/toolbar.js:520
+#: js/toolbar.js:580
+#: js/toolbar.js:617
+#: js/toolbar.js:671
 msgid "Display statistics"
 msgstr "とうけいを表示する"
 
@@ -1475,10 +1372,10 @@ msgid "Display statistics about your Music project."
 msgstr "プロジェクトに含まれているブロックの種類、わりあいなど、とうけいてきなじょうほうを表示する。"
 
 #: js/turtledefs.js:684
-#: js/toolbar.js:526
-#: js/toolbar.js:585
-#: js/toolbar.js:621
-#: js/toolbar.js:674
+#: js/toolbar.js:522
+#: js/toolbar.js:582
+#: js/toolbar.js:619
+#: js/toolbar.js:673
 msgid "Delete plugin"
 msgstr "プラグインを消す"
 
@@ -1494,185 +1391,192 @@ msgstr "アートを包む"
 msgid "Turn Turtle wrapping On or Off."
 msgstr "アートを包むか・包まない"
 
-#: js/toolbar.js:511
-#: js/toolbar.js:570
+#: js/toolbar.js:507
+#: js/toolbar.js:567
 msgid "About Music Blocks"
 msgstr "ミュージック・ブロックスについて"
 
-#: js/toolbar.js:517
-#: js/toolbar.js:535
-#: js/toolbar.js:537
-#: js/toolbar.js:594
-#: js/toolbar.js:612
-#: js/toolbar.js:628
-#: js/toolbar.js:630
+#: js/toolbar.js:513
+#: js/toolbar.js:532
+#: js/toolbar.js:534
+#: js/toolbar.js:592
+#: js/toolbar.js:610
+#: js/toolbar.js:627
+#: js/toolbar.js:629
 #: js/toolbar.js:681
 msgid "Save project as HTML"
 msgstr "HTMLをほぞん"
 
-#: js/toolbar.js:519
-#: js/toolbar.js:578
-#: js/toolbar.js:614
-#: js/toolbar.js:667
+#: js/toolbar.js:515
+#: js/toolbar.js:575
+#: js/toolbar.js:612
+#: js/toolbar.js:666
 msgid "Offline. Sharing is unavailable"
 msgstr "オフライン。シェア機能が使えません"
 
-#: js/toolbar.js:520
-#: js/toolbar.js:579
-#: js/toolbar.js:615
-#: js/toolbar.js:668
+#: js/toolbar.js:516
+#: js/toolbar.js:576
+#: js/toolbar.js:613
+#: js/toolbar.js:667
 msgid "Auxilary menu"
 msgstr "サブメニュー"
 
-#: js/toolbar.js:522
-#: js/toolbar.js:581
-#: js/toolbar.js:617
-#: js/toolbar.js:670
+#: js/toolbar.js:518
+#: js/toolbar.js:578
+#: js/toolbar.js:615
+#: js/toolbar.js:669
 msgid "Run slowly"
 msgstr "ゆっくり実行する"
 
-#: js/toolbar.js:525
-#: js/toolbar.js:584
-#: js/toolbar.js:620
-#: js/toolbar.js:673
+#: js/toolbar.js:521
+#: js/toolbar.js:581
+#: js/toolbar.js:618
+#: js/toolbar.js:672
 msgid "Load plugin"
 msgstr "プラグインを読みこむ"
 
-#: js/toolbar.js:527
-#: js/toolbar.js:586
-#: js/toolbar.js:622
-#: js/toolbar.js:675
+#: js/toolbar.js:523
+#: js/toolbar.js:583
+#: js/toolbar.js:620
+#: js/toolbar.js:674
 msgid "Enable horizontal scrolling"
 msgstr "自由な方向にスクロール"
 
-#: js/toolbar.js:528
-#: js/toolbar.js:587
-#: js/toolbar.js:623
-#: js/toolbar.js:676
+#: js/toolbar.js:524
+#: js/toolbar.js:584
+#: js/toolbar.js:621
+#: js/toolbar.js:675
 msgid "Disable horizontal scrolling"
 msgstr "たて方向にスクロール"
 
-#: js/toolbar.js:529
-#: js/toolbar.js:588
-#: js/toolbar.js:624
-#: js/toolbar.js:677
+#: js/toolbar.js:525
+#: js/toolbar.js:585
+#: js/toolbar.js:622
+#: js/toolbar.js:676
 #: js/LocalCard.js:52
 msgid "Merge with current project"
 msgstr "プロジェクトを組みあわせる"
 
-#: js/toolbar.js:530
-#: js/toolbar.js:589
-#: js/toolbar.js:625
-#: js/toolbar.js:678
+#: js/toolbar.js:526
+#: js/toolbar.js:586
+#: js/toolbar.js:623
+#: js/toolbar.js:677
 msgid "Set Pitch Preview"
 msgstr ""
 
-#: js/toolbar.js:532
-#: js/toolbar.js:591
+#: js/toolbar.js:527
+#: js/toolbar.js:587
+#: js/toolbar.js:624
+#: js/toolbar.js:678
+msgid "Toggle JavaScript Editor"
+msgstr ""
+
+#: js/toolbar.js:529
+#: js/toolbar.js:589
 msgid "Switch to beginner mode"
 msgstr "かんたんモードにする"
 
-#: js/toolbar.js:533
-#: js/toolbar.js:592
+#: js/toolbar.js:530
+#: js/toolbar.js:590
 msgid "Switch to advanced mode"
 msgstr "はってんモードにする"
 
-#: js/toolbar.js:543
+#: js/toolbar.js:540
 msgid "Save sheet music as MusicXML"
 msgstr "プロジェクトをMusicXML楽譜でほぞん"
 
-#: js/toolbar.js:549
-#: js/toolbar.js:601
-#: js/toolbar.js:638
+#: js/toolbar.js:546
+#: js/toolbar.js:599
+#: js/toolbar.js:637
 #: js/toolbar.js:685
 msgid "Confirm"
 msgstr "作成する"
 
-#: js/toolbar.js:550
-#: js/toolbar.js:639
+#: js/toolbar.js:547
+#: js/toolbar.js:638
 msgid "English (United States)"
 msgstr ""
 
-#: js/toolbar.js:551
-#: js/toolbar.js:640
+#: js/toolbar.js:548
+#: js/toolbar.js:639
 msgid "English (United Kingdom)"
 msgstr ""
 
-#: js/toolbar.js:552
-#: js/toolbar.js:641
+#: js/toolbar.js:549
+#: js/toolbar.js:640
 msgid "日本語"
 msgstr ""
 
-#: js/toolbar.js:553
+#: js/toolbar.js:550
 msgid "한국어"
 msgstr ""
 
-#: js/toolbar.js:554
-#: js/toolbar.js:643
+#: js/toolbar.js:551
+#: js/toolbar.js:642
 msgid "español"
 msgstr ""
 
-#: js/toolbar.js:555
-#: js/toolbar.js:644
+#: js/toolbar.js:552
+#: js/toolbar.js:643
 msgid "português"
 msgstr ""
 
-#: js/toolbar.js:556
-#: js/toolbar.js:645
+#: js/toolbar.js:553
+#: js/toolbar.js:644
 msgid "にほんご"
 msgstr ""
 
-#: js/toolbar.js:557
-#: js/toolbar.js:646
+#: js/toolbar.js:554
+#: js/toolbar.js:645
 msgid "中文"
 msgstr ""
 
-#: js/toolbar.js:558
-#: js/toolbar.js:647
+#: js/toolbar.js:555
+#: js/toolbar.js:646
 msgid "ภาษาไทย"
 msgstr ""
 
-#: js/toolbar.js:559
-#: js/toolbar.js:648
+#: js/toolbar.js:556
+#: js/toolbar.js:647
 msgid "aymara"
 msgstr ""
 
-#: js/toolbar.js:560
-#: js/toolbar.js:649
+#: js/toolbar.js:557
+#: js/toolbar.js:648
 msgid "quechua"
 msgstr ""
 
-#: js/toolbar.js:561
-#: js/toolbar.js:650
+#: js/toolbar.js:558
+#: js/toolbar.js:649
 msgid "guarani"
 msgstr ""
 
-#: js/toolbar.js:562
-#: js/toolbar.js:651
+#: js/toolbar.js:559
+#: js/toolbar.js:650
 msgid "हिंदी"
 msgstr ""
 
-#: js/toolbar.js:563
-#: js/toolbar.js:652
+#: js/toolbar.js:560
+#: js/toolbar.js:651
 msgid "igbo"
 msgstr ""
 
-#: js/toolbar.js:564
-#: js/toolbar.js:653
+#: js/toolbar.js:561
+#: js/toolbar.js:652
 msgid "عربى"
 msgstr ""
 
-#: js/toolbar.js:565
-#: js/toolbar.js:654
+#: js/toolbar.js:562
+#: js/toolbar.js:653
 msgid "עִברִית"
 msgstr ""
 
-#: js/toolbar.js:606
-#: js/toolbar.js:659
+#: js/toolbar.js:604
+#: js/toolbar.js:658
 msgid "About Turtle Blocks"
 msgstr "タートル・ブロックスについて"
 
-#: js/toolbar.js:642
+#: js/toolbar.js:641
 msgid "한국인"
 msgstr ""
 
@@ -1728,39 +1632,43 @@ msgstr "プロジェクトのコードを非表示にする"
 msgid "No description provided"
 msgstr "記入がありません"
 
-#: js/SaveInterface.js:271
+#: js/SaveInterface.js:221
+msgid "Your recording is in progress."
+msgstr ""
+
+#: js/SaveInterface.js:268
 #.TRANS: File name prompt for save as Lilypond
 msgid "File name"
 msgstr "ファイル名"
 
-#: js/SaveInterface.js:273
+#: js/SaveInterface.js:270
 #: js/StringHelper.js:25
 #.TRANS: Project title prompt for save as Lilypond
 msgid "Project title"
 msgstr "曲名"
 
-#: js/SaveInterface.js:275
+#: js/SaveInterface.js:272
 #.TRANS: Project title prompt for save as Lilypond
 msgid "Project author"
 msgstr "作曲家"
 
-#: js/SaveInterface.js:277
+#: js/SaveInterface.js:274
 #.TRANS: MIDI prompt for save as Lilypond
 msgid "Include MIDI output?"
 msgstr "MIDIのアウトプットがくふにもまとめましょうか？"
 
-#: js/SaveInterface.js:283
+#: js/SaveInterface.js:280
 #.TRANS: Guitar prompt for save as Lilypond
 #.TRANS: Lilypond is a scripting language for generating sheet music
 msgid "Save as Lilypond"
 msgstr "Lilypondがくふのフォーマットでほぞん"
 
-#: js/SaveInterface.js:286
+#: js/SaveInterface.js:283
 #.TRANS: PDF --> Portable Document Format - a typeset version of the Lilypond file
 msgid "Save as PDF"
 msgstr "PDFでほぞん"
 
-#: js/SaveInterface.js:305
+#: js/SaveInterface.js:302
 #: js/EnsembleBlocks.js:62
 #: js/EnsembleBlocks.js:123
 #: js/EnsembleBlocks.js:167
@@ -1782,10 +1690,6 @@ msgstr "PDFでほぞん"
 msgid "Mr. Mouse"
 msgstr "ミスター・マウス"
 
-#: js/SaveInterface.js:503
-msgid "Do you want to save your project?"
-msgstr "プロジェクトをほぞんしますか"
-
 #: js/rubrics.js:493
 #: js/lilypond.js:20
 #: js/lilypond.js:973
@@ -1798,12 +1702,12 @@ msgstr "ネズミ"
 msgid "mice"
 msgstr "ネズミ達の関係"
 
-#: js/turtle-singer.js:1766
+#: js/turtle-singer.js:1693
 #.TRANS: partials are weighted components in a harmonic series
 msgid "Warning: Note value greater than 2."
 msgstr "注意：音の長さは2より大きいです。"
 
-#: js/turtle-singer.js:1908
+#: js/turtle-singer.js:1806
 msgid "synth cannot play chords."
 msgstr "このシンセでは和音ができません"
 
@@ -1859,53 +1763,53 @@ msgstr "Lilypondはこの音階を無視します"
 #: js/lilypond.js:984
 #: js/lilypond.js:1031
 #: js/ActionBlocks.js:717
-#: js/ExtrasBlocks.js:878
+#: js/ExtrasBlocks.js:892
 msgid "start drum"
 msgstr "ドラム・スタート"
 
 #: js/macros.js:678
-#: js/synthutils.js:165
-#: js/musicutils.js:673
+#: js/synthutils.js:148
+#: js/musicutils.js:678
 #.TRANS: animal sound effect
 msgid "duck"
 msgstr "あひる"
 
-#: js/blocks.js:1785
+#: js/blocks.js:1786
 msgid "Consider breaking this stack into parts."
 msgstr "アクションブロックを使ってプログラムをまとめませんか"
 
-#: js/blocks.js:3507
-#: js/blocks.js:3976
-#: js/blocks.js:4010
-#: js/blocks.js:4044
-#: js/blocks.js:5987
-#: js/blocks.js:6012
+#: js/blocks.js:3530
+#: js/blocks.js:3999
+#: js/blocks.js:4033
+#: js/blocks.js:4067
+#: js/blocks.js:6006
+#: js/blocks.js:6031
 #: js/BoxesBlocks.js:364
 msgid "box1"
 msgstr "箱１"
 
-#: js/blocks.js:3509
-#: js/blocks.js:3978
-#: js/blocks.js:4012
-#: js/blocks.js:4046
-#: js/blocks.js:5989
-#: js/blocks.js:6014
+#: js/blocks.js:3532
+#: js/blocks.js:4001
+#: js/blocks.js:4035
+#: js/blocks.js:4069
+#: js/blocks.js:6008
+#: js/blocks.js:6033
 #: js/BoxesBlocks.js:317
 msgid "box2"
 msgstr "箱２"
 
-#: js/blocks.js:4209
+#: js/blocks.js:4232
 #: js/EnsembleBlocks.js:296
-#: js/MediaBlocks.js:377
-#: js/PitchBlocks.js:636
-#: js/PitchBlocks.js:822
-#: js/PitchBlocks.js:2287
+#: js/MediaBlocks.js:378
+#: js/PitchBlocks.js:574
+#: js/PitchBlocks.js:847
+#: js/PitchBlocks.js:1696
 #: js/BoxesBlocks.js:294
 msgid "name"
 msgstr "名前"
 
-#: js/blocks.js:4209
-#: js/RhythmBlocks.js:937
+#: js/blocks.js:4232
+#: js/RhythmBlocks.js:752
 #: js/BoxesBlocks.js:35
 #: js/BoxesBlocks.js:294
 #: js/HeapBlocks.js:397
@@ -1913,15 +1817,15 @@ msgstr "名前"
 msgid "value"
 msgstr "値"
 
-#: js/blocks.js:5078
+#: js/blocks.js:5097
 msgid "There is no block selected."
 msgstr "ブロックが選ばれていません"
 
-#: js/blocks.js:7106
+#: js/blocks.js:7129
 msgid "You must always have at least one start block."
 msgstr "スタートブロックは、１つ以上残しておいてください。"
 
-#: js/turtles.js:838
+#: js/turtles.js:880
 msgid "Expand"
 msgstr "カンバスをかくだい"
 
@@ -1936,7 +1840,7 @@ msgstr "連符（かけ算）"
 #: js/RhythmBlockPaletteBlocks.js:173
 #: js/RhythmBlockPaletteBlocks.js:309
 #: js/RhythmBlockPaletteBlocks.js:357
-#: js/RhythmBlockPaletteBlocks.js:616
+#: js/RhythmBlockPaletteBlocks.js:617
 msgid "number of notes"
 msgstr "音符の数"
 
@@ -1985,109 +1889,108 @@ msgstr "全音符"
 msgid "tuplet"
 msgstr "～連符（タプル）"
 
-#: js/RhythmBlockPaletteBlocks.js:546
+#: js/RhythmBlockPaletteBlocks.js:547
 #.TRANS: A tuplet divided into 7 time values.
 msgid "septuplet"
 msgstr "７連符"
 
-#: js/RhythmBlockPaletteBlocks.js:563
+#: js/RhythmBlockPaletteBlocks.js:564
 #.TRANS: A tuplet divided into 5 time values.
 msgid "quintuplet"
 msgstr "５連符"
 
-#: js/RhythmBlockPaletteBlocks.js:580
+#: js/RhythmBlockPaletteBlocks.js:581
 #.TRANS: A tuplet divided into 3 time values.
 msgid "triplet"
 msgstr "３連符"
 
-#: js/RhythmBlockPaletteBlocks.js:596
+#: js/RhythmBlockPaletteBlocks.js:597
 msgid "simple tuplet"
 msgstr "連符（わり算）"
 
-#: js/RhythmBlocks.js:127
-#: js/RhythmBlocks.js:900
-#: js/RhythmBlocks.js:962
+#: js/RhythmBlocks.js:101
+#: js/RhythmBlocks.js:714
+#: js/RhythmBlocks.js:777
 msgid "Note value must be greater than 0."
 msgstr "音の長さは、0より大きいあたいをせっていしてください。"
 
-#: js/RhythmBlocks.js:150
-#: js/RhythmBlocks.js:196
-#: js/RhythmBlocks.js:251
+#: js/RhythmBlocks.js:125
+#: js/RhythmBlocks.js:171
+#: js/RhythmBlocks.js:226
 #.TRANS: swing is a rhythmic variation that emphasises the offbeat
 msgid "swing"
 msgstr "スイング"
 
-#: js/RhythmBlocks.js:256
+#: js/RhythmBlocks.js:231
 #.TRANS: the amount to shift to the offbeat note
 msgid "swing value"
 msgstr "スイングの数値"
 
-#: js/RhythmBlocks.js:324
+#: js/RhythmBlocks.js:275
 msgid "The Skip notes block will cause notes to be skipped."
 msgstr ""
 
-#: js/RhythmBlocks.js:332
+#: js/RhythmBlocks.js:283
 #.TRANS: substitute rests on notes being skipped
 ## 省略＝しょうりゃく
 msgid "skip notes"
 msgstr "音符の省略"
 
-#: js/RhythmBlocks.js:360
+#: js/RhythmBlocks.js:311
 #.TRANS: speed up note duration by some factor, e.g. convert 1/4 to 1/8 notes by using a factor of 2
 msgid "multiply note value"
 msgstr "音価を～倍にするファクター"
 
-#: js/RhythmBlocks.js:425
+#: js/RhythmBlocks.js:359
 #.TRANS: tie notes together into one longer note
 ## http://musical-grammar.com/pause001.html
 msgid "tie"
 msgstr "タイ"
 
-#: js/RhythmBlocks.js:533
-#: js/RhythmBlocks.js:596
+#: js/RhythmBlocks.js:385
+#: js/RhythmBlocks.js:448
 #.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
 ## I need to look this up.
 msgid "dot"
 msgstr "付点音符"
 
-#: js/RhythmBlocks.js:553
-#: js/RhythmBlocks.js:618
+#: js/RhythmBlocks.js:405
 msgid "An argument of -1 results in a note value of 0."
 msgstr "ー１は０の音価にします"
 
-#: js/RhythmBlocks.js:584
+#: js/RhythmBlocks.js:436
 msgid "The Dot block extends the duration of a note by 50%."
 msgstr ""
 
-#: js/RhythmBlocks.js:695
+#: js/RhythmBlocks.js:510
 #.TRANS: Japanese only: note value block for drum
 msgid "note value drum"
 msgstr "音符（ドラム）"
 
-#: js/RhythmBlocks.js:733
+#: js/RhythmBlocks.js:548
 msgid "392 hertz"
 msgstr "３９２ヘルツ"
 
-#: js/RhythmBlocks.js:935
+#: js/RhythmBlocks.js:750
 #: js/ExtrasBlocks.js:358
 #: js/ExtrasBlocks.js:395
-#: js/PitchBlocks.js:909
-#: js/PitchBlocks.js:941
+#: js/PitchBlocks.js:888
+#: js/PitchBlocks.js:920
 #: js/status.js:194
 #: plugins/rodi.rtp:196
 #.TRANS: a musical note consisting of pitch and duration
 msgid "note"
 msgstr "音符"
 
-#: js/RhythmBlocks.js:937
+#: js/RhythmBlocks.js:752
 msgid "value2"
 msgstr "長さ"
 
-#: js/RhythmBlocks.js:985
+#: js/RhythmBlocks.js:802
 msgid "define frequency"
 msgstr "周波数を明確にする"
 
-#: js/RhythmBlocks.js:994
+#: js/RhythmBlocks.js:811
 msgid "octave space"
 msgstr "オクターヴ・スペース"
 
@@ -2291,35 +2194,31 @@ msgstr "ノイズ"
 
 #: js/DrumBlocks.js:61
 #: js/synthutils.js:16
-#: js/musicutils.js:643
+#: js/musicutils.js:648
 #.TRANS: white noise synthesizer
 ## guessing -- to be verified
 msgid "white noise"
 msgstr "ホワイトノイズ"
 
-#: js/DrumBlocks.js:104
-msgid "Noise Block: Did you mean to use a Note block?"
-msgstr "音符ブロックを使いますか？"
-
-#: js/DrumBlocks.js:173
+#: js/DrumBlocks.js:136
 msgid "Replace every instance of a pitch with a drum sound."
 msgstr ""
 
-#: js/DrumBlocks.js:180
+#: js/DrumBlocks.js:143
 #.TRANS: map a pitch to a drum sound
 msgid "map pitch to drum"
 msgstr "音符をドラムに変える"
 
-#: js/DrumBlocks.js:256
+#: js/DrumBlocks.js:196
 #.TRANS: set the current drum sound for playback
 msgid "set drum"
 msgstr "ドラムをせってい"
 
-#: js/DrumBlocks.js:307
+#: js/DrumBlocks.js:221
 msgid "sound effect"
 msgstr "こうかおん"
 
-#: js/DrumBlocks.js:325
+#: js/DrumBlocks.js:239
 msgid "You can use multiple Drum blocks within a Note block."
 msgstr "<h2>ドラムブロック</h2><br>「音符（おんぷ）ブロック」のなかに入れて使う。色々なドラムの音色を選ぶことができる。１つの「音符（おんぷ）ブロック」の中でふくすうの音色のドラムを組み合わせて使うことができる。"
 
@@ -2375,8 +2274,8 @@ msgid "filter"
 msgstr "フィルター"
 
 #: js/WidgetBlocks.js:85
-#: js/musicutils.js:597
-#: js/musicutils.js:942
+#: js/musicutils.js:602
+#: js/musicutils.js:947
 #.TRANS: highpass filter
 ## https://info.shimamura.co.jp/digital/knowledge/2014/11/36725
 msgid "highpass"
@@ -2398,7 +2297,7 @@ msgid "rolloff"
 msgstr "ロールオフ"
 
 #: js/WidgetBlocks.js:91
-#: js/MediaBlocks.js:339
+#: js/MediaBlocks.js:340
 #: js/timbre.js:1946
 ## ひらがな＝しゅうはすう http://jisho.org/word/%E5%91%A8%E6%B3%A2%E6%95%B0  and http://en.wikipedia.org/wiki/Frequency?oldid=494868190  and http://ja.wikipedia.org/wiki/%E5%91%A8%E6%B3%A2%E6%95%B0?oldid=42704051 
 msgid "frequency"
@@ -2411,64 +2310,67 @@ msgstr ""
 
 #: js/WidgetBlocks.js:230
 #: js/WidgetBlocks.js:235
-#: js/VolumeBlocks.js:252
-#: js/VolumeBlocks.js:405
-#: js/ToneBlocks.js:866
-#: js/IntervalsBlocks.js:654
+#: js/VolumeBlocks.js:248
+#: js/ToneBlocks.js:601
+#: js/IntervalsBlocks.js:572
 #: js/modewidget.js:858
-#: js/synthutils.js:92
-#: js/musicutils.js:595
-#: js/musicutils.js:646
-#: js/musicutils.js:688
-#: js/musicutils.js:973
+#: js/synthutils.js:87
+#: js/musicutils.js:600
+#: js/musicutils.js:651
+#: js/musicutils.js:693
+#: js/musicutils.js:978
 #.TRANS: customize voice
 ## Literally "my own"
 msgid "custom"
 msgstr "オリジナル"
 
-#: js/WidgetBlocks.js:399
+#: js/WidgetBlocks.js:396
+msgid "oscilloscope"
+msgstr ""
+
+#: js/WidgetBlocks.js:453
 #.TRANS: musical mode is the pattern of half-steps in an octave, e.g., Major or Minor modes
 msgid "custom mode"
 msgstr "音階"
 
-#: js/WidgetBlocks.js:437
+#: js/WidgetBlocks.js:491
 msgid "The Tempo block opens a metronome to visualize the beat."
 msgstr "<h2>メトロノームブロック</h2><br>メトロノームを表示する。ボタンをおすと、メトロノームのはやさを変えられる。テーブルには、１分あたりの拍（はく）の数が表示される。<br><br>★拍（はく）とは<br>くり返されるリズムのこと。"
 
-#: js/WidgetBlocks.js:491
+#: js/WidgetBlocks.js:545
 #.TRANS: makes a mapping between pitches and drum sounds
 msgid "pitch-drum mapper"
 msgstr "音高-ドラム・マッパー"
 
-#: js/WidgetBlocks.js:564
+#: js/WidgetBlocks.js:618
 #.TRANS: widget to generate pitches using a slider
 msgid "pitch slider"
 msgstr "ヘルツスライダー"
 
-#: js/WidgetBlocks.js:602
+#: js/WidgetBlocks.js:655
 msgid "chromatic keyboard"
 msgstr "クロマティック・キーボード"
 
-#: js/WidgetBlocks.js:637
-#: js/WidgetBlocks.js:708
+#: js/WidgetBlocks.js:690
+#: js/WidgetBlocks.js:752
 #.TRANS: widget to generate pitches using a slider
 msgid "music keyboard"
 msgstr "キーボード"
 
-#: js/WidgetBlocks.js:752
+#: js/WidgetBlocks.js:796
 #.TRANS: generate a progressive sequence of pitches
 msgid "pitch staircase"
 msgstr "音高の数列を作る"
 
-#: js/WidgetBlocks.js:873
+#: js/WidgetBlocks.js:917
 msgid "G major scale"
 msgstr "Gメジャー"
 
-#: js/WidgetBlocks.js:901
+#: js/WidgetBlocks.js:945
 msgid "C major scale"
 msgstr "Cメジャー"
 
-#: js/WidgetBlocks.js:943
+#: js/WidgetBlocks.js:987
 #.TRANS: assigns pitch to a sequence of beats to generate a melody
 msgid "phrase maker"
 msgstr "フレーズメーカー"
@@ -2510,7 +2412,7 @@ msgstr "<h2>アクションブロック（指定）</h2><br>指定したアク�
 #: js/ActionBlocks.js:336
 #: js/ActionBlocks.js:560
 #: js/ActionBlocks.js:620
-#: js/MeterBlocks.js:470
+#: js/MeterBlocks.js:420
 #.TRANS: translate do1 the same as do (take an action) (JAPANESE ONLY)
 msgid "do1"
 msgstr "アクション実行"
@@ -2521,7 +2423,7 @@ msgstr "アクション実行"
 #: js/ActionBlocks.js:620
 #: js/FlowBlocks.js:528
 #: js/FlowBlocks.js:587
-#: js/MeterBlocks.js:470
+#: js/MeterBlocks.js:420
 msgid "do"
 msgstr "アクション"
 
@@ -2615,8 +2517,8 @@ msgstr ""
 
 #: js/FlowBlocks.js:426
 #: js/FlowBlocks.js:432
-#: js/musickeyboard.js:536
-#: js/musickeyboard.js:538
+#: js/musickeyboard.js:582
+#: js/musickeyboard.js:584
 #: js/pitchtimematrix.js:4143
 #: js/timbre.js:424
 #: js/timbre.js:426
@@ -2802,9 +2704,9 @@ msgstr "箱へ"
 #: js/GraphicsBlocks.js:96
 #: js/GraphicsBlocks.js:142
 #: js/GraphicsBlocks.js:232
-#: js/GraphicsBlocks.js:270
-#: js/GraphicsBlocks.js:306
-#: js/GraphicsBlocks.js:446
+#: js/GraphicsBlocks.js:269
+#: js/GraphicsBlocks.js:304
+#: js/GraphicsBlocks.js:444
 msgid "x"
 msgstr "xざひょう（よこ）"
 
@@ -2813,9 +2715,9 @@ msgstr "xざひょう（よこ）"
 #: js/GraphicsBlocks.js:53
 #: js/GraphicsBlocks.js:142
 #: js/GraphicsBlocks.js:232
-#: js/GraphicsBlocks.js:270
-#: js/GraphicsBlocks.js:306
-#: js/GraphicsBlocks.js:446
+#: js/GraphicsBlocks.js:269
+#: js/GraphicsBlocks.js:304
+#: js/GraphicsBlocks.js:444
 msgid "y"
 msgstr "yざひょう（たて）"
 
@@ -2922,32 +2824,32 @@ msgid "slur factor"
 msgstr "スラーの長さファクター"
 
 #: js/OrnamentBlocks.js:69
-#: js/OrnamentBlocks.js:128
+#: js/OrnamentBlocks.js:113
 #.TRANS: the neighbor refers to a neighboring note, e.g., D is a neighbor of C
 ## This seems to have a lot of great stuff: https://ja.wikipedia.org/wiki/%E9%9D%9E%E5%92%8C%E5%A3%B0%E9%9F%B3#%E5%88%BA%E7%B9%8D%E9%9F%B3
 msgid "neighbor"
 msgstr "音を加える"
 
 #: js/OrnamentBlocks.js:72
-#: js/IntervalsBlocks.js:443
+#: js/IntervalsBlocks.js:402
 #.TRANS: calculate a relative step between notes based on semi-tones
 ## https://ja.wikibooks.org/wiki/%E9%9F%B3%E7%A8%8B#%E5%8D%8A%E9%9F%B3%E9%9A%8E%E7%9A%84%E9%9F%B3%E7%A8%8B
 msgid "semi-tone interval"
 msgstr "半音階的音程"
 
-#: js/OrnamentBlocks.js:152
+#: js/OrnamentBlocks.js:137
 #.TRANS: glide (glissando) is a blended overlap successive notes
 msgid "glide"
 msgstr "グリッサンド"
 
-#: js/OrnamentBlocks.js:220
-#: js/OrnamentBlocks.js:338
+#: js/OrnamentBlocks.js:205
+#: js/OrnamentBlocks.js:282
 #.TRANS: slur or legato is an overlap successive notes
 msgid "slur"
 msgstr "スラー"
 
-#: js/OrnamentBlocks.js:280
-#: js/OrnamentBlocks.js:370
+#: js/OrnamentBlocks.js:239
+#: js/OrnamentBlocks.js:314
 #.TRANS: play each note sharply detached from the others
 msgid "staccato"
 msgstr "スタッカート"
@@ -2959,84 +2861,87 @@ msgstr ""
 
 #: js/VolumeBlocks.js:19
 #: js/synthutils.js:25
-#: js/musicutils.js:621
+#: js/musicutils.js:626
 #.TRANS: musical instrument
 msgid "piano"
 msgstr "ピアノ"
 
-#: js/VolumeBlocks.js:56
+#: js/VolumeBlocks.js:52
 #.TRANS: the volume at which notes are played
 msgid "master volume"
 msgstr "マスター音量"
 
-#: js/VolumeBlocks.js:60
+#: js/VolumeBlocks.js:56
 msgid "The Master volume block returns the master volume."
 msgstr ""
 
-#: js/VolumeBlocks.js:204
-#: js/VolumeBlocks.js:344
+#: js/VolumeBlocks.js:200
+#: js/VolumeBlocks.js:340
 msgid "set synth volume"
 msgstr "楽器の音量をせってい"
 
-#: js/VolumeBlocks.js:211
-#: js/VolumeBlocks.js:366
+#: js/VolumeBlocks.js:207
+#: js/VolumeBlocks.js:362
 msgid "synth"
 msgstr "楽器"
 
-#: js/VolumeBlocks.js:244
-#: js/VolumeBlocks.js:397
-#: js/VolumeBlocks.js:491
-#: js/VolumeBlocks.js:546
+#: js/VolumeBlocks.js:240
+#: js/VolumeBlocks.js:386
+#: js/VolumeBlocks.js:495
 msgid "Setting volume to 0."
 msgstr "音量を「0」にせっていします。"
 
-#: js/VolumeBlocks.js:250
-#: js/VolumeBlocks.js:403
-#: js/synthutils.js:70
-#: js/musicutils.js:638
+#: js/VolumeBlocks.js:246
+#: js/synthutils.js:69
+#: js/musicutils.js:643
 #.TRANS: polytone synthesizer
 msgid "electronic synth"
 msgstr "シンセサイザー"
 
-#: js/VolumeBlocks.js:281
+#: js/VolumeBlocks.js:277
 msgid "Synth not found"
 msgstr ""
 
-#: js/VolumeBlocks.js:324
+#: js/VolumeBlocks.js:320
 #.TRANS: set the loudness level
 msgid "set drum volume"
 msgstr "ドラムの音量をせってい"
 
-#: js/VolumeBlocks.js:353
+#: js/VolumeBlocks.js:349
 msgid "eg guitar violin snare drum etc."
 msgstr "<br>"
 
-#: js/VolumeBlocks.js:355
+#: js/VolumeBlocks.js:351
 msgid "The default volume is 50."
 msgstr "デフォルトは音量５０。"
 
-#: js/VolumeBlocks.js:357
+#: js/VolumeBlocks.js:353
 msgid "The range is 0 for silence to 100 for full volume."
 msgstr "０から１００までのすうちをせっていできる。<br><br> "
 
-#: js/VolumeBlocks.js:460
-#: js/VolumeBlocks.js:510
+#: js/VolumeBlocks.js:397
+#.TRANS: set the distribution of volume
+msgid "set panning"
+msgstr ""
+
+#: js/VolumeBlocks.js:426
+#: js/VolumeBlocks.js:459
 #.TRANS: set the loudness level
 #.TRANS: set the loudness level
 msgid "set master volume"
 msgstr "全体の音量をせってい"
 
-#: js/VolumeBlocks.js:588
+#: js/VolumeBlocks.js:537
 #.TRANS: set an articulation (change in volume)
 msgid "set relative volume"
 msgstr "相対音量を設定"
 
-#: js/VolumeBlocks.js:681
+#: js/VolumeBlocks.js:585
 #.TRANS: a gradual increase in loudness
 msgid "decrescendo"
 msgstr "デクレシェンド"
 
-#: js/VolumeBlocks.js:760
+#: js/VolumeBlocks.js:628
 #.TRANS: a gradual increase in loudness
 msgid "crescendo"
 msgstr "クレシェンド"
@@ -3187,22 +3092,22 @@ msgstr "結果を表示"
 msgid "The Print block displays text at the top of the screen."
 msgstr "<h2>表示ブロック（結果）</h2><br>画面の上部に、指定した実行結果のすうちや文字を表示する。表示したテキストはクリックすると消すことができる。どこでプログラムがまちがっているかをかくにんする際（デバグ）などによく用いられる。"
 
-#: js/ExtrasBlocks.js:889
+#: js/ExtrasBlocks.js:904
 msgid "display grid"
 msgstr "グリッドを表示"
 
-#: js/ExtrasBlocks.js:894
+#: js/ExtrasBlocks.js:909
 msgid "The Display Grid Block changes the grid type"
 msgstr ""
 
-#: js/ExtrasBlocks.js:963
-#: js/ExtrasBlocks.js:973
-#: js/ExtrasBlocks.js:987
-#: js/ExtrasBlocks.js:1001
-#: js/ExtrasBlocks.js:1010
-#: js/ExtrasBlocks.js:1020
-#: js/ExtrasBlocks.js:1030
-#: js/ExtrasBlocks.js:1040
+#: js/ExtrasBlocks.js:979
+#: js/ExtrasBlocks.js:989
+#: js/ExtrasBlocks.js:1003
+#: js/ExtrasBlocks.js:1017
+#: js/ExtrasBlocks.js:1026
+#: js/ExtrasBlocks.js:1036
+#: js/ExtrasBlocks.js:1046
+#: js/ExtrasBlocks.js:1056
 ## fushou
 msgid "unknown"
 msgstr "不明"
@@ -3212,142 +3117,132 @@ msgstr "不明"
 msgid "current meter"
 msgstr "現代の拍子"
 
-#: js/MeterBlocks.js:32
+#: js/MeterBlocks.js:30
 #.TRANS: number of beats per minute
 ## probably a little wrong. This is just multiply, I think...
 msgid "beat factor"
 msgstr "拍を～倍にするファクター"
 
-#: js/MeterBlocks.js:76
+#: js/MeterBlocks.js:74
 #: js/status.js:152
 #.TRANS: number of beats played per minute
 msgid "beats per minute2"
 msgstr "１分当たりの拍の数"
 
-#: js/MeterBlocks.js:77
-#: js/MeterBlocks.js:798
-#: js/MeterBlocks.js:890
-#: js/MeterBlocks.js:949
+#: js/MeterBlocks.js:75
+#: js/MeterBlocks.js:594
+#: js/MeterBlocks.js:645
+#: js/MeterBlocks.js:704
 #.TRANS: sets tempo by defniing a beat and beats per minute
 msgid "beats per minute"
 msgstr "スピードを決める"
 
-#: js/MeterBlocks.js:116
+#: js/MeterBlocks.js:109
 #.TRANS: count of current musical measure in meter
 msgid "measure count"
 msgstr "小節の数"
 
-#: js/MeterBlocks.js:120
+#: js/MeterBlocks.js:113
 msgid "The Measure count block returns the current measure."
 msgstr ""
 
-#: js/MeterBlocks.js:160
+#: js/MeterBlocks.js:138
 #.TRANS: count of current beat in the meter
 ## trying "what beat"
 msgid "beat count"
 msgstr "拍の位置"
 
-#: js/MeterBlocks.js:183
+#: js/MeterBlocks.js:161
 msgid "eg 1, 2, 3, or 4."
 msgstr "<br>図の例では、それぞれの小節の１拍（ぱく）目に、特定のアクション・イベントを起こしている。"
 
-#: js/MeterBlocks.js:227
+#: js/MeterBlocks.js:192
 #.TRANS: count the number of notes
 msgid "sum note values"
 msgstr ""
 
-#: js/MeterBlocks.js:264
+#: js/MeterBlocks.js:229
+#.TRANS: count the number of notes
+msgid "note counter"
+msgstr "音符の合計数"
+
+#: js/MeterBlocks.js:266
 #.TRANS: number of whole notes that have been played
 msgid "whole notes played"
 msgstr "さいせいされた全音符の数"
 
-#: js/MeterBlocks.js:298
+#: js/MeterBlocks.js:299
 #.TRANS: number of notes that have been played
 msgid "notes played"
 msgstr "全体の拍の数"
 
-#: js/MeterBlocks.js:306
+#: js/MeterBlocks.js:307
 msgid "(By default, it counts quarter notes.)"
 msgstr "<br><br>★拍（はく）とは<br>くり返されるリズムのこと。"
 
-#: js/MeterBlocks.js:367
+#: js/MeterBlocks.js:356
 #.TRANS: don't lock notes to master clock
 msgid "no clock"
 msgstr "クロックなし"
 
-#: js/MeterBlocks.js:401
+#: js/MeterBlocks.js:377
 msgid "on weak beat do"
 msgstr "弱拍に～する"
 
-#: js/MeterBlocks.js:456
+#: js/MeterBlocks.js:406
 msgid "on strong beat"
 msgstr "強拍に"
 
-#: js/MeterBlocks.js:470
+#: js/MeterBlocks.js:420
 ## http://musical-grammar.com/time004.html
 msgid "beat"
 msgstr "拍子"
 
-#: js/MeterBlocks.js:528
+#: js/MeterBlocks.js:439
 msgid "on every beat do"
 msgstr "全ての拍子にアクション実行"
 
-#: js/MeterBlocks.js:616
+#: js/MeterBlocks.js:478
 msgid "on every note do"
 msgstr "全ての音符にアクション実行"
 
-#: js/MeterBlocks.js:674
-#: js/MeterBlocks.js:760
+#: js/MeterBlocks.js:511
+#: js/MeterBlocks.js:558
 #.TRANS: sets tempo by defniing a beat and beats per minute
 msgid "master beats per minute"
 msgstr "全体のスピードを決める"
 
-#: js/MeterBlocks.js:690
-#: js/MeterBlocks.js:814
-#: js/MeterBlocks.js:892
+#: js/MeterBlocks.js:527
+#: js/MeterBlocks.js:610
+#: js/MeterBlocks.js:647
 msgid "bpm"
 msgstr "１分あたりの拍の数"
 
-#: js/MeterBlocks.js:690
-#: js/MeterBlocks.js:814
-#: js/MeterBlocks.js:892
+#: js/MeterBlocks.js:527
+#: js/MeterBlocks.js:610
+#: js/MeterBlocks.js:647
 msgid "beat value"
 msgstr "１拍"
 
-#: js/MeterBlocks.js:718
-#: js/MeterBlocks.js:842
-msgid "beats per minute must be greater than"
-msgstr ""
-
-#: js/MeterBlocks.js:728
-#: js/MeterBlocks.js:852
-msgid "maximum"
-msgstr ""
-
-#: js/MeterBlocks.js:734
-#: js/MeterBlocks.js:858
-msgid "beats per minute is"
-msgstr ""
-
-#: js/MeterBlocks.js:773
-#: js/MeterBlocks.js:917
-#: js/MeterBlocks.js:967
+#: js/MeterBlocks.js:571
+#: js/MeterBlocks.js:672
+#: js/MeterBlocks.js:722
 msgid "Beats per minute must be > 30."
 msgstr "１分あたりの拍の数には、３０より大きいあたいをせっていしてください。"
 
-#: js/MeterBlocks.js:776
-#: js/MeterBlocks.js:920
-#: js/MeterBlocks.js:970
+#: js/MeterBlocks.js:574
+#: js/MeterBlocks.js:675
+#: js/MeterBlocks.js:725
 msgid "Maximum beats per minute is 1000."
 msgstr "1分あたりの拍の数は、最大1000です。"
 
-#: js/MeterBlocks.js:995
+#: js/MeterBlocks.js:750
 #.TRANS: anacrusis
 ## 弱起＝じゃっき；https://ja.wikipedia.org/wiki/%E5%BC%B1%E8%B5%B7
 msgid "pickup"
 msgstr "ピックアップ"
 
-#: js/MeterBlocks.js:1056
+#: js/MeterBlocks.js:805
 ## https://ja.wikipedia.org/wiki/%E6%8B%8D%E5%AD%90
 msgid "number of beats"
 msgstr "拍の数"
@@ -3359,9 +3254,9 @@ msgstr "オシレータ―"
 
 #: js/ToneBlocks.js:9
 #: js/PitchBlocks.js:35
-#: js/synthutils.js:90
-#: js/musicutils.js:614
-#: js/musicutils.js:955
+#: js/synthutils.js:85
+#: js/musicutils.js:619
+#: js/musicutils.js:960
 #.TRANS: triangle wave
 msgid "triangle"
 msgstr "三角の波"
@@ -3394,84 +3289,63 @@ msgstr "ビブラートエフェクタのレート"
 msgid "vibrato intensity"
 msgstr "ビブラートエフェクタの強度"
 
-#: js/ToneBlocks.js:105
-#: js/ToneBlocks.js:174
-#: js/ToneBlocks.js:234
-#: js/timbre.js:835
-msgid "Unable to use synth due to existing oscillator"
-msgstr "オシレーターがあるため、シンセが使えません。"
-
-#: js/ToneBlocks.js:152
+#: js/ToneBlocks.js:107
 #: js/timbre.js:1246
 #.TRANS: AM (amplitude modulation) synthesizer
 msgid "AM synth"
 msgstr "AM シンセ"
 
-#: js/ToneBlocks.js:188
-#: js/ToneBlocks.js:248
-msgid "The input cannot be negative."
-msgstr "マイナスの数値をいれることはできません。"
-
-#: js/ToneBlocks.js:212
+#: js/ToneBlocks.js:131
 #: js/timbre.js:1248
 #.TRANS: FM (frequency modulation) synthesizer
 msgid "FM synth"
 msgstr "FM シンセ"
 
-#: js/ToneBlocks.js:273
+#: js/ToneBlocks.js:154
 msgid "partial"
 msgstr "倍音"
 
-#: js/ToneBlocks.js:291
+#: js/ToneBlocks.js:172
 #.TRANS: partials are weighted components in a harmonic series
 msgid "Partial weight must be between 0 and 1."
 msgstr "倍音のウェートは０と１の間である必要があります。"
 
-#: js/ToneBlocks.js:325
+#: js/ToneBlocks.js:206
 #.TRANS: partials are weighted components in a harmonic series
 #.TRANS: partials are weighted components in a harmonic series
 msgid "weighted partials"
 msgstr "ウェート倍音"
 
-#: js/ToneBlocks.js:373
+#: js/ToneBlocks.js:254
 #.TRANS: A harmonic is a overtone.
 msgid "harmonic"
 msgstr "ハーモニックス"
 
-#: js/ToneBlocks.js:387
-#.TRANS: partials components in a harmonic series
-msgid "Partial must be greater than or equal to 0."
-msgstr "倍音が０以上である必要があります。"
-
-#: js/ToneBlocks.js:425
+#: js/ToneBlocks.js:277
 msgid "The Distortion block adds distortion to the pitch."
 msgstr ""
 
-#: js/ToneBlocks.js:432
+#: js/ToneBlocks.js:284
 #: js/timbre.js:2194
 #.TRANS: distortion is an alteration in the sound
 ## https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q1055887895
 msgid "distortion"
 msgstr "ディストーション"
 
-#: js/ToneBlocks.js:441
-msgid "Distortion must be from 0 to 100."
-msgstr "ディストーションは、0から100までのはんいでせっていしてください。"
-
-#: js/ToneBlocks.js:475
+#: js/ToneBlocks.js:312
 msgid "The Tremolo block adds a wavering effect."
 msgstr "<h2>トレモロブロック</h2><br>ゆれるような音のひびきにする。はやさで、ゆれのはやさを調節できる。<br>"
 
-#: js/ToneBlocks.js:483
+#: js/ToneBlocks.js:320
 #: js/timbre.js:2186
 #.TRANS: a wavering effect in a musical tone
 msgid "tremolo"
 msgstr "トレモロ"
 
-#: js/ToneBlocks.js:488
-#: js/ToneBlocks.js:554
-#: js/ToneBlocks.js:613
-#: js/ToneBlocks.js:677
+#: js/ToneBlocks.js:325
+#: js/ToneBlocks.js:370
+#: js/ToneBlocks.js:411
+#: js/ToneBlocks.js:451
 #: js/timbre.js:2231
 #: js/timbre.js:2329
 #: js/timbre.js:2467
@@ -3480,95 +3354,80 @@ msgstr "トレモロ"
 msgid "rate"
 msgstr "はやさ"
 
-#: js/ToneBlocks.js:490
-#: js/ToneBlocks.js:613
+#: js/ToneBlocks.js:327
+#: js/ToneBlocks.js:411
 #: js/timbre.js:2234
 #: js/timbre.js:2473
 #.TRANS: amplitude of tremolo waver
 msgid "depth"
 msgstr "大きさ"
 
-#: js/ToneBlocks.js:507
-#: js/ToneBlocks.js:623
-#.TRANS: Depth is the intesity of the tremolo or chorus effect.
-## http://jisho.org/word/%E5%A4%89%E5%9F%9F ; 変域＝へんいき
-msgid "Depth is out of range."
-msgstr "（エフェクタの）深さの数字が変域外です。"
-
-#: js/ToneBlocks.js:544
+#: js/ToneBlocks.js:360
 msgid "The Phaser block adds a sweeping sound."
 msgstr ""
 
-#: js/ToneBlocks.js:551
+#: js/ToneBlocks.js:367
 #: js/timbre.js:2192
 #.TRANS: alter the phase of the sound
 msgid "phaser"
 msgstr "フェーザー"
 
-#: js/ToneBlocks.js:554
+#: js/ToneBlocks.js:370
 #: js/timbre.js:2577
 msgid "octaves"
 msgstr "オクターヴ"
 
-#: js/ToneBlocks.js:554
+#: js/ToneBlocks.js:370
 #: js/timbre.js:2580
 ## guessing...
 msgid "base frequency"
 msgstr "基本周波数"
 
-#: js/ToneBlocks.js:602
+#: js/ToneBlocks.js:400
 msgid "The Chorus block adds a chorus effect."
 msgstr "<h2>コーラスブロック</h2><br>広がりのある音のひびきにする。はやさとずれで、ひびきが残る感じを調節できる。<br>"
 
-#: js/ToneBlocks.js:610
+#: js/ToneBlocks.js:408
 #: js/timbre.js:2190
 #.TRANS: musical effect to simulate a choral sound
 msgid "chorus"
 msgstr "コーラス"
 
-#: js/ToneBlocks.js:613
+#: js/ToneBlocks.js:411
 msgid "delay"
 msgstr "ずれ"
 
-#: js/ToneBlocks.js:666
+#: js/ToneBlocks.js:440
 msgid "The Vibrato block adds a rapid, slight variation in pitch."
 msgstr "<h2>ビブラートブロック</h2><br>音の高さに小きざみな変化をつける。"
 
-#: js/ToneBlocks.js:674
+#: js/ToneBlocks.js:448
 #: js/timbre.js:2188
 #.TRANS: a rapid, slight variation in pitch
 msgid "vibrato"
 msgstr "ビブラート"
 
-#: js/ToneBlocks.js:677
+#: js/ToneBlocks.js:451
 #: js/timbre.js:2328
 ## just put "bigness"
 msgid "intensity"
 msgstr "大きさ"
 
-#: js/ToneBlocks.js:696
-msgid "Vibrato intensity must be between 1 and 100."
-msgstr "ビブラートの大きさは、1から100までのはんいでせっていしてください。"
-
-#: js/ToneBlocks.js:703
-msgid "Vibrato rate must be greater than 0."
-msgstr "ビブラートのはやさは、0より大きいあたいをせっていしてください。"
-
-#: js/ToneBlocks.js:743
+#: js/ToneBlocks.js:478
 #.TRANS: select synthesizer
 msgid "set synth"
 msgstr "シンセを設定"
 
-#: js/ToneBlocks.js:797
+#: js/ToneBlocks.js:532
 msgid "synth name"
 msgstr "シンセの名前"
 
-#: js/ToneBlocks.js:825
-#: js/ToneBlocks.js:854
+#: js/ToneBlocks.js:560
+#: js/ToneBlocks.js:589
 msgid "eg guitar piano violin or cello."
 msgstr "（例えば、ギター、ピアノ、バイオリン、チェロなど）。"
 
-#: js/ToneBlocks.js:863
+#: js/ToneBlocks.js:598
 #.TRANS: set the characteristics of a custom instrument
 msgid "set instrument"
 msgstr "音色をせってい"
@@ -3725,119 +3584,119 @@ msgstr ""
 msgid "The Video block selects video for use with the Show block."
 msgstr ""
 
-#: js/MediaBlocks.js:315
+#: js/MediaBlocks.js:316
 ## A/Vを停止
 msgid "stop media"
 msgstr "メデイアを停止"
 
-#: js/MediaBlocks.js:318
+#: js/MediaBlocks.js:319
 msgid "The Stop media block stops audio or video playback."
 msgstr ""
 
-#: js/MediaBlocks.js:333
-#: js/PitchBlocks.js:1480
-#: js/musickeyboard.js:1470
+#: js/MediaBlocks.js:334
+#: js/PitchBlocks.js:1382
+#: js/musickeyboard.js:1516
 #: js/pitchtimematrix.js:732
 #.TRANS: a measure of frequency: one cycle per second
 msgid "hertz"
 msgstr "ヘルツ"
 
-#: js/MediaBlocks.js:339
+#: js/MediaBlocks.js:340
 msgid "duration (ms)"
 msgstr "長さ（ミリ秒）"
 
-#: js/MediaBlocks.js:361
+#: js/MediaBlocks.js:362
 #.TRANS: translate a note into hertz, e.g., A4 -> 440HZ
 ## 周波数=しゅうはすう https://ja.wikipedia.org/wiki/%E5%91%A8%E6%B3%A2%E6%95%B0
 msgid "note to frequency"
 msgstr "音符の高さを周波数表示へ"
 
-#: js/MediaBlocks.js:377
-#: js/PitchBlocks.js:636
-#: js/PitchBlocks.js:822
-#: js/PitchBlocks.js:2287
+#: js/MediaBlocks.js:378
+#: js/PitchBlocks.js:574
+#: js/PitchBlocks.js:847
+#: js/PitchBlocks.js:1696
 #.TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
 msgid "name2"
 msgstr "名前"
 
-#: js/MediaBlocks.js:378
-#: js/PitchBlocks.js:637
-#: js/PitchBlocks.js:823
-#: js/PitchBlocks.js:909
-#: js/PitchBlocks.js:941
-#: js/PitchBlocks.js:1040
-#: js/PitchBlocks.js:1781
-#: js/PitchBlocks.js:1897
-#: js/PitchBlocks.js:2288
+#: js/MediaBlocks.js:379
+#: js/PitchBlocks.js:575
+#: js/PitchBlocks.js:848
+#: js/PitchBlocks.js:888
+#: js/PitchBlocks.js:920
+#: js/PitchBlocks.js:1004
+#: js/PitchBlocks.js:1535
+#: js/PitchBlocks.js:1579
+#: js/PitchBlocks.js:1697
 #: js/IntervalsBlocks.js:18
 #.TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
 msgid "octave"
 msgstr "オクターヴの高さ"
 
-#: js/MediaBlocks.js:492
+#: js/MediaBlocks.js:493
 #.TRANS: Avatar is the image used to determine the appearance of the mouse.
 msgid "avatar"
 msgstr "ネズミへんこう"
 
-#: js/MediaBlocks.js:509
-#: js/MediaBlocks.js:552
+#: js/MediaBlocks.js:510
+#: js/MediaBlocks.js:553
 #.TRANS: a media object
 msgid "size"
 msgstr "大きさ"
 
-#: js/MediaBlocks.js:509
+#: js/MediaBlocks.js:510
 msgid "image"
 msgstr "がぞうそざい"
 
-#: js/MediaBlocks.js:549
+#: js/MediaBlocks.js:550
 #.TRANS: show1 is show as in display an image or text on the screen.
 msgid "show1"
 msgstr "スタンプ"
 
-#: js/MediaBlocks.js:549
+#: js/MediaBlocks.js:550
 ## Uncertain. Maybe 展示する。Or Maybe 現らす
 msgid "show"
 msgstr "表示する"
 
-#: js/MediaBlocks.js:552
+#: js/MediaBlocks.js:553
 msgid "obj"
 msgstr "そざい"
 
-#: js/MediaBlocks.js:580
+#: js/MediaBlocks.js:581
 msgid "The Media block is used to import an image."
 msgstr "<h2>がぞうブロック</h2><br>がぞうのブロック。ブロックのマークをおすと、コンピューター上からがぞうファイルを読み込むことができる。"
 
-#: js/MediaBlocks.js:589
+#: js/MediaBlocks.js:590
 #.TRANS: "video material" is used instead of an image in Japanese
 msgid "video material"
 msgstr "がぞうそざい"
 
-#: js/MediaBlocks.js:611
+#: js/MediaBlocks.js:612
 msgid "The Text block holds a text string."
 msgstr "<h2>文字ブロック</h2><br>文字を指定するブロック。"
 
 #: js/PitchBlocks.js:12
-#: js/synthutils.js:86
-#: js/musicutils.js:613
-#: js/musicutils.js:954
+#: js/synthutils.js:81
+#: js/musicutils.js:618
+#: js/musicutils.js:959
 #.TRANS: square wave
 ## 矩形波＝くけいは；https://synth-voice.sakura.ne.jp/synth-voice/html5/synth-basic01.html;http://jisho.org/word/%E7%9F%A9%E5%BD%A2%E6%B3%A2 
 msgid "square"
 msgstr "四角の波"
 
 #: js/PitchBlocks.js:58
-#: js/synthutils.js:84
-#: js/musicutils.js:612
-#: js/musicutils.js:953
+#: js/synthutils.js:79
+#: js/musicutils.js:617
+#: js/musicutils.js:958
 #.TRANS: sine wave
 ## https://synth-voice.sakura.ne.jp/synth-voice/html5/synth-basic01.html
 msgid "sine"
 msgstr "サイン波"
 
 #: js/PitchBlocks.js:81
-#: js/synthutils.js:88
-#: js/musicutils.js:615
-#: js/musicutils.js:956
+#: js/synthutils.js:83
+#: js/musicutils.js:620
+#: js/musicutils.js:961
 #.TRANS: sawtooth wave
 msgid "sawtooth"
 msgstr "ぎざぎざの波"
@@ -3853,197 +3712,194 @@ msgstr "移調"
 msgid "scalar step down"
 msgstr "音階内で~度下がる:"
 
-#: js/PitchBlocks.js:174
+#: js/PitchBlocks.js:164
 #.TRANS: step up one note in current musical scale
 msgid "scalar step up"
 msgstr "音階内で~度上がる:"
 
-#: js/PitchBlocks.js:208
+#: js/PitchBlocks.js:188
 #.TRANS: the change measured in half-steps between the current pitch and the previous pitch
 msgid "change in pitch"
 msgstr "音程の違い"
 
-#: js/PitchBlocks.js:313
+#: js/PitchBlocks.js:220
 #.TRANS: the change measured in scale-steps between the current pitch and the previous pitch
 msgid "scalar change in pitch"
 msgstr ""
 
-#: js/PitchBlocks.js:450
+#: js/PitchBlocks.js:352
+msgid "current pitch"
+msgstr ""
+
+#: js/PitchBlocks.js:387
 msgid "This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."
 msgstr ""
 
-#: js/PitchBlocks.js:607
-#: js/musickeyboard.js:459
+#: js/PitchBlocks.js:545
+#: js/musickeyboard.js:480
 #.TRANS: MIDI is a technical standard for electronic music
 msgid "MIDI"
 msgstr ""
 
-#: js/PitchBlocks.js:620
+#: js/PitchBlocks.js:558
 #.TRANS: set an offset associated with the numeric piano keyboard mapping
 msgid "set pitch number offset"
 msgstr "音高の数字を初期化"
 
-#: js/PitchBlocks.js:677
+#: js/PitchBlocks.js:598
 #.TRANS: convert piano key number (1-88) to pitch
 msgid "number to pitch"
 msgstr "数字を音名へ"
 
-#: js/PitchBlocks.js:714
+#: js/PitchBlocks.js:635
 #.TRANS: convert piano key number (1-88) to octave
 msgid "number to octave"
 msgstr "数値をオクターヴ表記へ"
 
-#: js/PitchBlocks.js:746
+#: js/PitchBlocks.js:648
+msgid "y to pitch"
+msgstr ""
+
+#: js/PitchBlocks.js:771
 msgid "Pitch can be specified in terms of ni dha pa ma ga re sa."
 msgstr ""
 
-#: js/PitchBlocks.js:760
+#: js/PitchBlocks.js:785
 msgid "Pitch can be specified in terms of C D E F G A B."
 msgstr "<h2>音の高さブロック</h2><br>音の高さを、CDEFGABの７つのアルファベットでせっていする。たとえば、ドならばＣ、レならばＤであらわされる。"
 
-#: js/PitchBlocks.js:774
+#: js/PitchBlocks.js:799
 msgid "Pitch can be specified in terms of do re mi fa sol la ti."
 msgstr "<h2>音の高さブロック</h2><br>音の高さを、ド、レ、ミ、ファ、ソ、ラ、シの７つのソルフェージュでせっていする。"
 
-#: js/PitchBlocks.js:817
+#: js/PitchBlocks.js:842
 #.TRANS: pitch inversion rotates a pitch around another pitch
 ## 転回＝てんかい
 msgid "invert"
 msgstr "両方向にずれる"
 
-#: js/PitchBlocks.js:819
-#: js/PitchBlocks.js:825
-#: js/PitchBlocks.js:873
-#: js/musicutils.js:617
-#: js/musicutils.js:718
+#: js/PitchBlocks.js:844
+#: js/PitchBlocks.js:850
+#: js/musicutils.js:622
+#: js/musicutils.js:723
 #.TRANS: invert based on even or odd number or musical scale
 #.TRANS: even numbers
 ## 偶数＝ぐうすう；page 170 Collins Shubun
 msgid "even"
 msgstr "偶数"
 
-#: js/PitchBlocks.js:825
-#: js/PitchBlocks.js:875
-#: js/musicutils.js:619
-#: js/musicutils.js:719
+#: js/PitchBlocks.js:850
+#: js/musicutils.js:624
+#: js/musicutils.js:724
 #.TRANS: odd numbers
 ## 奇数＝きすう；page 343 Collins Shubun
 msgid "odd"
 msgstr "奇数"
 
-#: js/PitchBlocks.js:825
-#: js/PitchBlocks.js:877
-#: js/musicutils.js:620
-#: js/musicutils.js:720
+#: js/PitchBlocks.js:850
+#: js/musicutils.js:625
+#: js/musicutils.js:725
 ## check
 msgid "scalar"
 msgstr "音階的"
 
-#: js/PitchBlocks.js:903
+#: js/PitchBlocks.js:882
 #.TRANS: pitch inversion rotates a pitch around another pitch (odd number)
 msgid "invert (odd)"
 msgstr "転回を （奇数）"
 
-#: js/PitchBlocks.js:935
+#: js/PitchBlocks.js:914
 #.TRANS: pitch inversion rotates a pitch around another pitch (even number)
 msgid "invert (even)"
 msgstr "転回を （偶数）"
 
-#: js/PitchBlocks.js:956
+#: js/PitchBlocks.js:935
 #.TRANS: register is the octave of the current pitch
 msgid "register"
 msgstr "登録"
 
-#: js/PitchBlocks.js:988
+#: js/PitchBlocks.js:967
 msgid "In the example shown above, sol is shifted up to sol#."
 msgstr "例の画像に<em>ソル</em>が<em>ソル#</em>に上に移動されています。"
 
-#: js/PitchBlocks.js:994
+#: js/PitchBlocks.js:973
 #.TRANS: adjust the amount of shift (up or down) of a pitch
 msgid "semi-tone transpose"
 msgstr "半音で移調"
 
-#: js/PitchBlocks.js:1055
+#: js/PitchBlocks.js:1019
 msgid "custom pitch"
 msgstr "カスタムピッチ"
 
-#: js/PitchBlocks.js:1079
+#: js/PitchBlocks.js:1043
 #.TRANS: down sixth means the note is five scale degrees below current note
 msgid "down sixth"
 msgstr "音階で6度下"
 
-#: js/PitchBlocks.js:1098
+#: js/PitchBlocks.js:1062
 #.TRANS: down third means the note is two scale degrees below current note
 msgid "down third"
 msgstr "音階で3度下"
 
-#: js/PitchBlocks.js:1117
+#: js/PitchBlocks.js:1081
 #.TRANS: seventh means the note is the six scale degrees above current note
 msgid "seventh"
 msgstr "7度の音"
 
-#: js/PitchBlocks.js:1136
+#: js/PitchBlocks.js:1100
 #.TRANS: sixth means the note is the five scale degrees above current note
 msgid "sixth"
 msgstr "6度の音"
 
-#: js/PitchBlocks.js:1155
+#: js/PitchBlocks.js:1119
 #.TRANS: fifth means the note is the four scale degrees above current note
 msgid "fifth"
 msgstr "5度の音"
 
-#: js/PitchBlocks.js:1175
+#: js/PitchBlocks.js:1139
 #.TRANS: fourth means the note is three scale degrees above current note
 msgid "fourth"
 msgstr "４度の音"
 
-#: js/PitchBlocks.js:1194
+#: js/PitchBlocks.js:1158
 #.TRANS: third means the note is two scale degrees above current note
 msgid "third"
 msgstr "3度の音"
 
-#: js/PitchBlocks.js:1213
+#: js/PitchBlocks.js:1177
 #.TRANS: second means the note is one scale degree above current note
 msgid "second"
 msgstr "2度の音"
 
-#: js/PitchBlocks.js:1257
+#: js/PitchBlocks.js:1221
 msgid "In the example shown above, sol is shifted up to la."
 msgstr "<br><br>図の例では、ソがラに、ラがシに、シがドに…と置きかえられている。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。<br>★調とは<br>中心的な役わりをはたす音と、音階の種類によって決まる、曲の感じ。中心的な役わりをはたす音だけを指すこともある。"
 
-#: js/PitchBlocks.js:1264
+#: js/PitchBlocks.js:1228
 #.TRANS: adjust the amount of shift (up or down) of a pitch by musical scale (scalar) steps
 msgid "scalar transpose"
 msgstr "調を変える"
 
-#: js/PitchBlocks.js:1318
+#: js/PitchBlocks.js:1264
 msgid "The Accidental block is used to create sharps and flats"
 msgstr "<em>変化記号</em>ブロックは <em>シャープ(嬰)</em>と<em>フラット(変)</em>を決める機能です。"
 
-#: js/PitchBlocks.js:1687
+#: js/PitchBlocks.js:1466
 msgid "Hertz Block: Did you mean to use a Note block?"
 msgstr "ヘルツブロック：音符ブロックを使いますか？"
 
-#: js/PitchBlocks.js:1763
-#: js/PitchBlocks.js:1881
+#: js/PitchBlocks.js:1517
+#: js/PitchBlocks.js:1563
 #.TRANS: a numeric mapping of the notes in an octave based on the musical mode
 #.TRANS: a numeric mapping of the notes in an octave based on the musical mode
 msgid "nth modal pitch"
 msgstr "ピッチ度"
 
-#: js/PitchBlocks.js:2028
+#: js/PitchBlocks.js:1639
 #.TRANS: a numeric mapping of the notes in an octave based on the musical mode
 #.TRANS: step some number of notes in current musical scale
 msgid "scalar step"
 msgstr "音階内を上る／下りる"
-
-#: js/PitchBlocks.js:2054
-msgid "The Scalar Step Block must be used inside of a Note Block."
-msgstr "音階内を上る／下りるブロックは、音符ブロックの中に入れて使ってください。"
-
-#: js/PitchBlocks.js:2073
-msgid "The Scalar Step Block must be preceded by a Pitch Block."
-msgstr "音階内を上る／下りるブロックは、音の高さブロックの後に使ってください。"
 
 #: js/GraphicsBlocks.js:5
 #.TRANS: orientation or compass direction
@@ -4100,119 +3956,119 @@ msgid "control point 2"
 msgstr "コントロール点２"
 
 #: js/GraphicsBlocks.js:232
-#: js/GraphicsBlocks.js:270
-#: js/GraphicsBlocks.js:306
-#: js/GraphicsBlocks.js:446
+#: js/GraphicsBlocks.js:269
+#: js/GraphicsBlocks.js:304
+#: js/GraphicsBlocks.js:444
 msgid "x1"
 msgstr "xざひょう（ネズミ）"
 
 #: js/GraphicsBlocks.js:232
-#: js/GraphicsBlocks.js:270
-#: js/GraphicsBlocks.js:306
-#: js/GraphicsBlocks.js:446
+#: js/GraphicsBlocks.js:269
+#: js/GraphicsBlocks.js:304
+#: js/GraphicsBlocks.js:444
 msgid "y1"
 msgstr "yざひょう（ネズミ）"
 
-#: js/GraphicsBlocks.js:266
+#: js/GraphicsBlocks.js:265
 #.TRANS: control point in a bezier curve
 msgid "control point 1"
 msgstr "コントロール点１"
 
-#: js/GraphicsBlocks.js:295
+#: js/GraphicsBlocks.js:293
 msgid "The Bezier block draws a Bezier curve."
 msgstr ""
 
-#: js/GraphicsBlocks.js:302
+#: js/GraphicsBlocks.js:300
 #.TRANS: Bézier curves employ at least three points to define a curve
 ## https://ja.wikipedia.org/wiki/%E3%83%99%E3%82%B8%E3%82%A7%E6%9B%B2%E7%B7%9A
 msgid "bezier"
 msgstr "ベジェ曲線"
 
-#: js/GraphicsBlocks.js:339
+#: js/GraphicsBlocks.js:337
 msgid "The Arc block moves the mouse in a arc."
 msgstr "<h2>いどうブロック</h2><br>ネズミの位置を、指定した大きさと角度の円をえがいていどうさせる。角度のすうちは、プラスだと右回り、マイナスだと左回りになる。"
 
-#: js/GraphicsBlocks.js:347
+#: js/GraphicsBlocks.js:345
 #.TRANS: draws a part of the circumference of a circle
 ## ひらがな＝えん\E3\81
 msgid "arc"
 msgstr "円をえがいていどう"
 
-#: js/GraphicsBlocks.js:350
+#: js/GraphicsBlocks.js:348
 ## 角度＝かくど；ジーニアス英和辞典
 msgid "angle"
 msgstr "角度"
 
-#: js/GraphicsBlocks.js:350
+#: js/GraphicsBlocks.js:348
 ## ひらがな＝はんけ\E3\81
 msgid "radius"
 msgstr "半径"
 
-#: js/GraphicsBlocks.js:388
+#: js/GraphicsBlocks.js:386
 #.TRANS: set compass heading
 msgid "set heading"
 msgstr "向きを変える"
 
-#: js/GraphicsBlocks.js:391
+#: js/GraphicsBlocks.js:389
 msgid "The Set heading block sets the heading of the mouse."
 msgstr "<h2>いどうブロック</h2><br>ネズミの向きを、指定したすうちの角度に変える。"
 
-#: js/GraphicsBlocks.js:442
+#: js/GraphicsBlocks.js:440
 #.TRANS: set xy (Cartesian) position
 msgid "set xy"
 msgstr "指定ざひょうにいどう"
 
-#: js/GraphicsBlocks.js:488
+#: js/GraphicsBlocks.js:486
 msgid "The Right block turns the mouse to the right."
 msgstr "<h2>いどうブロック</h2><br>ネズミの向きを、指定したすうちの角度で右回りに回転させる。"
 
-#: js/GraphicsBlocks.js:496
+#: js/GraphicsBlocks.js:494
 #.TRANS: right1 and right are when turning right (clockwise)
 msgid "right1"
 msgstr "右を向く"
 
-#: js/GraphicsBlocks.js:496
+#: js/GraphicsBlocks.js:494
 #: plugins/rodi.rtp:79
 #: plugins/rodi.rtp:344
 #: plugins/rodi.rtp:379
 msgid "right"
 msgstr "ざひょうち（右）"
 
-#: js/GraphicsBlocks.js:540
+#: js/GraphicsBlocks.js:538
 msgid "The Left block turns the mouse to the left."
 msgstr "<h2>いどうブロック</h2><br>ネズミの向きを、指定したすうちの角度で左回りに回転させる。"
 
-#: js/GraphicsBlocks.js:548
+#: js/GraphicsBlocks.js:546
 #.TRANS: left and left1 are when turning left (counter-clockwise)
 msgid "left1"
 msgstr "左を向く"
 
-#: js/GraphicsBlocks.js:548
+#: js/GraphicsBlocks.js:546
 #: plugins/rodi.rtp:81
 #: plugins/rodi.rtp:343
 #: plugins/rodi.rtp:366
 msgid "left"
 msgstr "ざひょうち（左）"
 
-#: js/GraphicsBlocks.js:588
+#: js/GraphicsBlocks.js:586
 #: plugins/rodi.rtp:71
 #: plugins/rodi.rtp:391
 #.TRANS: move backward (in the opposite direction of the current heading)
 msgid "back"
 msgstr "後ろへ進む"
 
-#: js/GraphicsBlocks.js:593
+#: js/GraphicsBlocks.js:591
 msgid "The Back block moves the mouse backward."
 msgstr "<h2>いどうブロック</h2><br>指定したすうち分、ネズミを後ろにもどす。体の向きは変えない。"
 
-#: js/GraphicsBlocks.js:639
+#: js/GraphicsBlocks.js:637
 #: plugins/rodi.rtp:73
 #: plugins/rodi.rtp:404
 #.TRANS: move forward (in the direction of the current heading)
 msgid "forward"
 msgstr "前へ進む"
 
-#: js/GraphicsBlocks.js:644
+#: js/GraphicsBlocks.js:642
 msgid "The Forward block moves the mouse forward."
 msgstr "<h2>いどうブロック</h2><br>指定したすうち分、ネズミを前に進める。"
 
@@ -4282,118 +4138,109 @@ msgstr "箱１にすうちを入れる"
 msgid "set temperament"
 msgstr "音律をせってい"
 
-#: js/IntervalsBlocks.js:75
+#: js/IntervalsBlocks.js:64
 msgid "doubly"
 msgstr "重"
 
-#: js/IntervalsBlocks.js:78
+#: js/IntervalsBlocks.js:67
 msgid "The Doubly block will double the size of an interval."
 msgstr ""
 
-#: js/IntervalsBlocks.js:181
+#: js/IntervalsBlocks.js:140
 #.TRANS: measure the distance between two pitches in semi-tones
 msgid "semi-tone interval measure"
 msgstr "半音階的音程で計る"
 
-#: js/IntervalsBlocks.js:234
-#: js/IntervalsBlocks.js:333
+#: js/IntervalsBlocks.js:193
+#: js/IntervalsBlocks.js:292
 msgid "You must use two pitch blocks when measuring an interval."
 msgstr "音程を計る際は、２つの音符を使う必要があります。"
 
-#: js/IntervalsBlocks.js:276
+#: js/IntervalsBlocks.js:235
 #.TRANS: measure the distance between two pitches in steps of musical scale
 msgid "scalar interval measure"
 msgstr "全音階的音程で計る"
 
-#: js/IntervalsBlocks.js:420
-#: js/musicutils.js:528
-#: js/musicutils.js:724
+#: js/IntervalsBlocks.js:379
+#: js/musicutils.js:533
+#: js/musicutils.js:729
 #.TRANS: perfect is a music term related to intervals
 msgid "perfect"
 msgstr "パーフェクト（完全）"
 
-#: js/IntervalsBlocks.js:437
+#: js/IntervalsBlocks.js:396
 msgid "In the figure, we add sol# to sol."
 msgstr "例の画像には<em>ソル</em>が<em>ソル#</em>になります。"
 
-#: js/IntervalsBlocks.js:552
+#: js/IntervalsBlocks.js:488
 msgid "chord5"
 msgstr "５度の和音"
 
-#: js/IntervalsBlocks.js:552
-#: js/IntervalsBlocks.js:558
-#: js/IntervalsBlocks.js:564
+#: js/IntervalsBlocks.js:488
+#: js/IntervalsBlocks.js:494
+#: js/IntervalsBlocks.js:500
 msgid "chord"
 msgstr "の和音"
 
-#: js/IntervalsBlocks.js:558
+#: js/IntervalsBlocks.js:494
 msgid "chord4"
 msgstr "4度の和音"
 
-#: js/IntervalsBlocks.js:564
+#: js/IntervalsBlocks.js:500
 msgid "chord1"
 msgstr "1度の和音"
 
-#: js/IntervalsBlocks.js:591
+#: js/IntervalsBlocks.js:527
 #.TRANS: down <n>th means the note is <n - 1> scale degrees below current note
 #.TRANS: <n>th means the note is the <n - 1> scale degrees above current note
 msgid "In the figure, we add la to sol."
 msgstr "<br><br>上の図では、ソの「音符（おんぷ）ブロック」をきじゅんにして、「音階の上下ブロック」のすうちを２にせっていしているので、ソと、ソから２音あがったシの音が同時にえんそうされる。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。"
 
-#: js/IntervalsBlocks.js:651
+#: js/IntervalsBlocks.js:569
 #.TRANS: define a custom mode
 ## http://jisho.org/word/%E5%AE%9A%E7%BE%A9 
 msgid "define mode"
 msgstr "モードを定義する"
 
-#: js/IntervalsBlocks.js:702
-msgid "Adding missing pitch number 0."
-msgstr "ピッチ数値「0」を加える"
-
-#: js/IntervalsBlocks.js:720
-## check verb
-msgid "Ignoring duplicate pitch numbers."
-msgstr "重複しているピッチ数値は無視します"
-
-#: js/IntervalsBlocks.js:749
+#: js/IntervalsBlocks.js:607
 msgid "moveable Do"
 msgstr "移動ド"
 
-#: js/IntervalsBlocks.js:785
+#: js/IntervalsBlocks.js:643
 #.TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
 msgid "mode length"
 msgstr "音階の音数"
 
-#: js/IntervalsBlocks.js:794
+#: js/IntervalsBlocks.js:652
 msgid "Most Western scales have 7 notes."
 msgstr "西洋のほとんどの音階は、7つの音をもつ。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。"
 
-#: js/IntervalsBlocks.js:819
+#: js/IntervalsBlocks.js:677
 #.TRANS: the mode in music is 'major', 'minor', etc.
 msgid "current mode"
 msgstr "現代の音階"
 
-#: js/IntervalsBlocks.js:845
+#: js/IntervalsBlocks.js:702
 #.TRANS: the key is a group of pitches with which a music composition is created
 msgid "current key"
 msgstr "現代の調"
 
-#: js/IntervalsBlocks.js:869
-#: js/IntervalsBlocks.js:894
+#: js/IntervalsBlocks.js:726
+#: js/IntervalsBlocks.js:750
 #.TRANS: set the key and mode, e.g. C Major
 msgid "set key"
 msgstr "調をせってい"
 
-#: js/IntervalsBlocks.js:900
-#: js/IntervalsBlocks.js:906
+#: js/IntervalsBlocks.js:756
+#: js/IntervalsBlocks.js:762
 msgid "The Set key block is used to set the key and mode,"
 msgstr "<h2>調をせっていブロック</h2><br>調の部分に音の高さ、音階の部分に音階の種類を選び、調をせっていする。<br><br>★調とは<br>中心的な役わりをはたす音と、音階の種類によって決まる、曲の感じ。中心的な役わりをはたす音だけを指すこともある。<br>★音階とは<br>順番に並んだ音のまとまり。"
 
-#: js/IntervalsBlocks.js:908
+#: js/IntervalsBlocks.js:764
 msgid "eg C Major"
 msgstr "たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。"
 
-#: js/IntervalsBlocks.js:920
+#: js/IntervalsBlocks.js:776
 #.TRANS: key, e.g., C in C Major
 ## Also could be キー
 msgid "key"
@@ -4676,10 +4523,11 @@ msgstr ""
 msgid "Take a tour"
 msgstr "ツアーを始めよう"
 
-#: js/musickeyboard.js:431
+#: js/musickeyboard.js:452
 #: js/pitchdrummatrix.js:132
+#: js/pitchslider.js:143
 #: js/pitchtimematrix.js:256
-#: js/meterwidget.js:104
+#: js/meterwidget.js:100
 #: js/timbre.js:809
 #: js/temperament.js:2156
 #: js/modewidget.js:90
@@ -4687,7 +4535,7 @@ msgstr "ツアーを始めよう"
 msgid "Save"
 msgstr "保存する"
 
-#: js/musickeyboard.js:439
+#: js/musickeyboard.js:460
 #: js/pitchdrummatrix.js:147
 #: js/pitchtimematrix.js:273
 #: js/rhythmruler.js:2478
@@ -4697,22 +4545,33 @@ msgstr "保存する"
 msgid "Clear"
 msgstr "もとにもどす"
 
-#: js/musickeyboard.js:451
+#: js/musickeyboard.js:472
 #: js/pitchtimematrix.js:296
 msgid "Add note"
 msgstr "音符を足す"
 
-#: js/musickeyboard.js:465
+#: js/musickeyboard.js:489
+msgid "Metronome"
+msgstr ""
+
+#: js/musickeyboard.js:511
 #: js/temperament.js:2164
 msgid "Table"
 msgstr "グリッド"
 
-#: js/musickeyboard.js:1076
+#: js/musickeyboard.js:1122
 #: plugins/rodi.rtp:197
 msgid "duration"
 msgstr "期間の設定"
 
-#: js/musickeyboard.js:2599
+#: js/musickeyboard.js:2394
+#: js/pitchdrummatrix.js:184
+#: js/musicutils.js:228
+#: js/musicutils.js:347
+msgid "rest"
+msgstr "休符"
+
+#: js/musickeyboard.js:2660
 #: js/pitchtimematrix.js:5284
 #: js/tempo.js:226
 #: js/rhythmruler.js:1551
@@ -4724,40 +4583,42 @@ msgstr "期間の設定"
 msgid "New action block generated!"
 msgstr "新しいアクションを作りました！"
 
-#: js/musickeyboard.js:2744
-#: js/musickeyboard.js:2750
+#: js/musickeyboard.js:2805
+#: js/musickeyboard.js:2811
 msgid "MIDI device present."
 msgstr "MIDIデバイスが見つかりました。"
 
-#: js/musickeyboard.js:2753
+#: js/musickeyboard.js:2814
 msgid "No MIDI device found."
 msgstr "MIDIデバイスが見つかりません。"
 
-#: js/musickeyboard.js:2758
+#: js/musickeyboard.js:2819
 msgid "Failed to get MIDI access in browser."
 msgstr "ブラウザはMIDIのアクセスができませんでした。"
-
-#: js/pitchdrummatrix.js:184
-#: js/musicutils.js:226
-#: js/musicutils.js:345
-msgid "rest"
-msgstr "休符"
 
 #: js/pitchdrummatrix.js:315
 msgid "Click in the grid to map notes to drums."
 msgstr "グラフにクリックして音符をどちらのドラムに変えるか決めることができます。"
 
-#: js/pitchslider.js:330
+#: js/pitchslider.js:131
 msgid "Move up"
 msgstr "上げる"
 
-#: js/pitchslider.js:341
+#: js/pitchslider.js:137
 msgid "Move down"
 msgstr "下げる"
 
-#: js/pitchslider.js:349
+#: js/pitchslider.js:153
 msgid "Click on the slider to create a note block."
 msgstr "スライダーで音の高さを変えます。"
+
+#: js/oscilloscope.js:49
+msgid "ZOOM IN"
+msgstr ""
+
+#: js/oscilloscope.js:61
+msgid "ZOOM OUT"
+msgstr ""
 
 #: js/pitchtimematrix.js:282
 msgid "Export"
@@ -4776,8 +4637,8 @@ msgstr "ます目をクリックするとメロディやリズムを作れます
 msgid "tuplet value"
 msgstr "何連符価"
 
-#: js/meterwidget.js:68
-#: js/meterwidget.js:70
+#: js/meterwidget.js:65
+#: js/meterwidget.js:67
 #: js/rhythmruler.js:972
 #: js/rhythmruler.js:974
 #: js/rhythmruler.js:994
@@ -4793,13 +4654,21 @@ msgstr "何連符価"
 msgid "Play all"
 msgstr "全てさいせい"
 
-#: js/meterwidget.js:137
+#: js/meterwidget.js:148
+msgid "Reset"
+msgstr ""
+
+#: js/meterwidget.js:175
 msgid "Click in the circle to select strong beats for the meter."
 msgstr "クリックで強い拍の位置を選べます。"
 
 #: js/timbre.js:817
 msgid "Synthesizer"
 msgstr "シンセサイザー"
+
+#: js/timbre.js:835
+msgid "Unable to use synth due to existing oscillator"
+msgstr "オシレーターがあるため、シンセが使えません。"
 
 #: js/timbre.js:843
 msgid "Oscillator"
@@ -4909,8 +4778,8 @@ msgstr "リズムメーカーの音の長さは、最大２５６です。"
 
 #: js/rhythmruler.js:1192
 #: js/rhythmruler.js:1602
-#: js/synthutils.js:101
-#: js/musicutils.js:647
+#: js/synthutils.js:96
+#: js/musicutils.js:652
 #.TRANS: musical instrument
 ## https://ja.wikipedia.org/wiki/%E3%83%89%E3%83%A9%E3%83%A0%E3%82%BB%E3%83%83%E3%83%88
 msgid "snare drum"
@@ -4918,7 +4787,7 @@ msgstr "スネアドラム"
 
 #: js/rhythmruler.js:1911
 #: js/synthutils.js:37
-#: js/musicutils.js:629
+#: js/musicutils.js:634
 #.TRANS: musical instrument
 msgid "guitar"
 msgstr "ギター"
@@ -4974,627 +4843,627 @@ msgid "Click on a note to create a new step."
 msgstr "ピッチをクリックすると新しい段が作れますよ。"
 
 #: js/synthutils.js:18
-#: js/musicutils.js:644
+#: js/musicutils.js:649
 #.TRANS: brown noise synthesizer
 ## https://ja.wikipedia.org/wiki/%E3%83%96%E3%83%A9%E3%82%A6%E3%83%8B%E3%82%A2%E3%83%B3%E3%83%8E%E3%82%A4%E3%82%BA
 msgid "brown noise"
 msgstr "ブラウンノイズ"
 
 #: js/synthutils.js:20
-#: js/musicutils.js:645
+#: js/musicutils.js:650
 #.TRANS: pink noise synthesizer
 msgid "pink noise"
 msgstr "ピンクノイズ"
 
 #: js/synthutils.js:27
-#: js/musicutils.js:622
+#: js/musicutils.js:627
 #.TRANS: musical instrument
 ## http://jisho.org/word/%E4%BC%91%E7%AC%A6 ひらがな＝きゅうふ Also 休止符
 msgid "violin"
 msgstr "バイオリン"
 
 #: js/synthutils.js:29
-#: js/musicutils.js:623
+#: js/musicutils.js:628
 #.TRANS: viola musical instrument
 msgid "viola"
 msgstr "ビオラ"
 
 #: js/synthutils.js:31
-#: js/musicutils.js:626
+#: js/musicutils.js:631
 #.TRANS: musical instrument
 msgid "cello"
 msgstr "チェロ"
 
 #: js/synthutils.js:35
-#: js/musicutils.js:628
+#: js/musicutils.js:633
 #.TRANS: viola musical instrument
 msgid "double bass"
 msgstr "ダブルベース"
 
 #: js/synthutils.js:39
-#: js/musicutils.js:630
+#: js/musicutils.js:635
 #.TRANS: musical instrument
 msgid "acoustic guitar"
 msgstr "アコースティック"
 
 #: js/synthutils.js:41
-#: js/musicutils.js:631
+#: js/musicutils.js:636
 #.TRANS: musical instrument
 msgid "flute"
 msgstr "フルート"
 
 #: js/synthutils.js:43
-#: js/musicutils.js:632
+#: js/musicutils.js:637
 #.TRANS: musical instrument
 msgid "clarinet"
 msgstr "クラリネット"
 
 #: js/synthutils.js:45
-#: js/musicutils.js:633
+#: js/musicutils.js:638
 #.TRANS: musical instrument
 msgid "saxophone"
 msgstr "サクソフォン"
 
 #: js/synthutils.js:47
-#: js/musicutils.js:634
+#: js/musicutils.js:639
 #.TRANS: musical instrument
 msgid "tuba"
 msgstr "チューバ"
 
 #: js/synthutils.js:49
-#: js/musicutils.js:635
+#: js/musicutils.js:640
 #.TRANS: musical instrument
 msgid "trumpet"
 msgstr "トランペット"
 
 #: js/synthutils.js:51
-#: js/musicutils.js:636
+#: js/musicutils.js:641
 #.TRANS: musical instrument
 msgid "oboe"
 msgstr "オーボエ"
 
 #: js/synthutils.js:53
-#: js/musicutils.js:637
+#: js/musicutils.js:642
 #.TRANS: musical instrument
 msgid "trombone"
 msgstr "トロンボーン"
 
 #: js/synthutils.js:55
-#: js/musicutils.js:674
+#: js/musicutils.js:679
 #.TRANS: musical instrument
 msgid "banjo"
 msgstr "バンジョー"
 
 #: js/synthutils.js:57
-#: js/musicutils.js:675
+#: js/musicutils.js:680
 #.TRANS: musical instrument
 msgid "koto"
 msgstr "こと"
 
 #: js/synthutils.js:59
-#: js/musicutils.js:676
+#: js/musicutils.js:681
 #.TRANS: musical instrument
 msgid "dulcimer"
 msgstr "ダルシマー"
 
 #: js/synthutils.js:61
-#: js/musicutils.js:677
+#: js/musicutils.js:682
 #.TRANS: musical instrument
 msgid "electric guitar"
 msgstr "エレキギター"
 
 #: js/synthutils.js:63
-#: js/musicutils.js:678
+#: js/musicutils.js:683
 #.TRANS: musical instrument
 msgid "bassoon"
 msgstr "バスーン"
 
 #: js/synthutils.js:65
-#: js/musicutils.js:679
+#: js/musicutils.js:684
 #.TRANS: musical instrument
 msgid "celeste"
 msgstr "セレスタ"
 
 #: js/synthutils.js:67
-#: js/musicutils.js:624
+#: js/musicutils.js:629
 #.TRANS: xylophone musical instrument
 msgid "xylophone"
 msgstr "木琴"
 
-#: js/synthutils.js:76
-#: js/musicutils.js:639
+#: js/synthutils.js:71
+#: js/musicutils.js:644
 #.TRANS: simple monotone synthesizer
 msgid "simple 1"
 msgstr "シンプル１"
 
-#: js/synthutils.js:78
+#: js/synthutils.js:73
 #.TRANS: simple monotone synthesizer
 msgid "simple-2"
 msgstr "シンプル・シンセ２"
 
-#: js/synthutils.js:80
+#: js/synthutils.js:75
 #.TRANS: simple monotone synthesizer
 msgid "simple-3"
 msgstr "シンプル・シンセ３"
 
-#: js/synthutils.js:82
+#: js/synthutils.js:77
 #.TRANS: simple monotone synthesizer
 msgid "simple-4"
 msgstr "シンプル・シンセ４"
 
-#: js/synthutils.js:94
-#: js/musicutils.js:625
+#: js/synthutils.js:89
+#: js/musicutils.js:630
 #.TRANS: vibraphone musical instrument
 msgid "vibraphone"
 msgstr "鉄琴"
 
-#: js/synthutils.js:103
-#: js/musicutils.js:648
+#: js/synthutils.js:98
+#: js/musicutils.js:653
 #.TRANS: musical instrument
 ## https://ja.wikipedia.org/wiki/%E3%83%89%E3%83%A9%E3%83%A0%E3%82%BB%E3%83%83%E3%83%88
 msgid "kick drum"
 msgstr "キックドラム"
 
-#: js/synthutils.js:105
-#: js/musicutils.js:649
+#: js/synthutils.js:100
+#: js/musicutils.js:654
 #.TRANS: musical instrument
 ## https://ja.wikipedia.org/wiki/%E3%83%89%E3%83%A9%E3%83%A0%E3%82%BB%E3%83%83%E3%83%88
 msgid "tom tom"
 msgstr "タムタム"
 
-#: js/synthutils.js:107
-#: js/musicutils.js:650
+#: js/synthutils.js:102
+#: js/musicutils.js:655
 #.TRANS: musical instrument
 ## https://ja.wikipedia.org/wiki/%E3%83%89%E3%83%A9%E3%83%A0%E3%82%BB%E3%83%83%E3%83%88
 msgid "floor tom"
 msgstr "フロアタム"
 
-#: js/synthutils.js:109
-#: js/musicutils.js:651
+#: js/synthutils.js:104
+#: js/musicutils.js:656
 #.TRANS: a drum made from an inverted cup
 ## Guessing
 msgid "cup drum"
 msgstr "カップドラム"
 
-#: js/synthutils.js:111
-#: js/musicutils.js:652
+#: js/synthutils.js:106
+#: js/musicutils.js:657
 #.TRANS: musical instrument
 ## https://ja.wikipedia.org/wiki/%E3%83%80%E3%83%A9%E3%83%96%E3%83%83%E3%82%AB
 msgid "darbuka drum"
 msgstr "ダブカドラム"
 
-#: js/synthutils.js:113
+#: js/synthutils.js:108
 #.TRANS: musical instrument
 msgid "taiko"
 msgstr "太鼓"
 
-#: js/synthutils.js:115
-#: js/musicutils.js:653
+#: js/synthutils.js:110
+#: js/musicutils.js:658
 #.TRANS: musical instrument
 msgid "hi hat"
 msgstr "ハイハット"
 
-#: js/synthutils.js:117
-#: js/musicutils.js:654
+#: js/synthutils.js:112
+#: js/musicutils.js:659
 #.TRANS: a small metal bell
 msgid "ride bell"
 msgstr "ライドベル"
 
-#: js/synthutils.js:119
-#: js/musicutils.js:655
+#: js/synthutils.js:114
+#: js/musicutils.js:660
 #.TRANS: musical instrument
 msgid "cow bell"
 msgstr "カウベル"
 
-#: js/synthutils.js:122
-#: js/musicutils.js:658
+#: js/synthutils.js:116
+#: js/musicutils.js:663
 #.TRANS: musical instrument
 msgid "triangle bell"
 msgstr "トライアングル"
 
-#: js/synthutils.js:130
-#: js/musicutils.js:659
+#: js/synthutils.js:118
+#: js/musicutils.js:664
 #.TRANS: musical instrument
 ## https://ja.wikipedia.org/wiki/%E3%83%95%E3%82%A3%E3%83%B3%E3%82%AC%E3%83%BC%E3%82%B7%E3%83%B3%E3%83%90%E3%83%AB
 msgid "finger cymbals"
 msgstr "フィンガーシンバル"
 
-#: js/synthutils.js:137
-#: js/musicutils.js:657
+#: js/synthutils.js:120
+#: js/musicutils.js:662
 #.TRANS: musical instrument
 msgid "japanese bell"
 msgstr "鉦"
 
-#: js/synthutils.js:139
-#: js/musicutils.js:660
+#: js/synthutils.js:122
+#: js/musicutils.js:665
 #.TRANS: a musically tuned set of bells
 ## https://ja.wikipedia.org/wiki/%E3%83%81%E3%83%A3%E3%82%A4%E3%83%A0
 msgid "chime"
 msgstr "チャイム"
 
-#: js/synthutils.js:141
-#: js/musicutils.js:661
+#: js/synthutils.js:124
+#: js/musicutils.js:666
 #.TRANS: a musical instrument
 msgid "gong"
 msgstr "ドラ"
 
-#: js/synthutils.js:143
-#: js/musicutils.js:662
+#: js/synthutils.js:126
+#: js/musicutils.js:667
 #.TRANS: sound effect
 ## http://jisho.org/word/%E3%81%8B%E3%81%A1%E3%82%83%E3%81%8B%E3%81%A1%E3%82%83 
 msgid "clang"
 msgstr "カチャカチャ"
 
-#: js/synthutils.js:145
-#: js/musicutils.js:663
+#: js/synthutils.js:128
+#: js/musicutils.js:668
 #.TRANS: sound effect
 msgid "crash"
 msgstr "クラッシュ"
 
-#: js/synthutils.js:147
-#: js/musicutils.js:664
+#: js/synthutils.js:130
+#: js/musicutils.js:669
 #.TRANS: sound effect
 msgid "bottle"
 msgstr "空きびん"
 
-#: js/synthutils.js:149
-#: js/musicutils.js:665
+#: js/synthutils.js:132
+#: js/musicutils.js:670
 #.TRANS: sound effect
 msgid "clap"
 msgstr "てびょうし"
 
-#: js/synthutils.js:151
-#: js/musicutils.js:666
+#: js/synthutils.js:134
+#: js/musicutils.js:671
 #.TRANS: sound effect
 ## http://jisho.org/word/%E5%B9%B3%E6%89%8B%E6%89%93%E3%81%A1 
 msgid "slap"
 msgstr "ピシャリ"
 
-#: js/synthutils.js:153
-#: js/musicutils.js:667
+#: js/synthutils.js:136
+#: js/musicutils.js:672
 #.TRANS: sound effect
 msgid "splash"
 msgstr "しぶき"
 
-#: js/synthutils.js:155
-#: js/musicutils.js:668
+#: js/synthutils.js:138
+#: js/musicutils.js:673
 #.TRANS: sound effect
 ## http://jisho.org/word/%E3%81%97%E3%82%85%E3%82%8F%E3%81%97%E3%82%85%E3%82%8F 
 msgid "bubbles"
 msgstr "あわ"
 
-#: js/synthutils.js:157
-#: js/musicutils.js:669
+#: js/synthutils.js:140
+#: js/musicutils.js:674
 #.TRANS: sound effect
 msgid "raindrop"
 msgstr "雨のしずく"
 
-#: js/synthutils.js:159
-#: js/musicutils.js:670
+#: js/synthutils.js:142
+#: js/musicutils.js:675
 #.TRANS: animal sound effect
 msgid "cat"
 msgstr "ねこ"
 
-#: js/synthutils.js:161
-#: js/musicutils.js:671
+#: js/synthutils.js:144
+#: js/musicutils.js:676
 #.TRANS: animal sound effect
 ## 絡糸嬢=らくしじょう；http://jisho.org/word/%E7%B5%A1%E7%B3%B8%E5%AC%A2 
 msgid "cricket"
 msgstr "こおろぎ"
 
-#: js/synthutils.js:163
-#: js/musicutils.js:672
+#: js/synthutils.js:146
+#: js/musicutils.js:677
 #.TRANS: animal sound effect
 msgid "dog"
 msgstr "いぬ"
 
-#: js/musicutils.js:430
+#: js/musicutils.js:432
 #.TRANS: ordinal number. Please keep exactly one space between each number.
 msgid "1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th"
 msgstr "１度 2度 3度 4度 5度 6度 7度 8度 9度 10度 11度 12度"
 
-#: js/musicutils.js:520
-#: js/musicutils.js:727
+#: js/musicutils.js:525
+#: js/musicutils.js:732
 #.TRANS: augmented is a music term related to intervals
 ## 増=ぞう
 msgid "augmented"
 msgstr "オーギュメント（増）"
 
-#: js/musicutils.js:522
-#: js/musicutils.js:726
+#: js/musicutils.js:527
+#: js/musicutils.js:731
 #.TRANS: diminished is a music term related to intervals and mode
 ## for scale, it would be ディミニッシュト・スケール
 ## 減=げん
 msgid "diminished"
 msgstr "ディミニッシュ（減）"
 
-#: js/musicutils.js:530
+#: js/musicutils.js:535
 #.TRANS: twelve semi-tone scale for music
 msgid "chromatic"
 msgstr "クロマティック音階"
 
-#: js/musicutils.js:531
+#: js/musicutils.js:536
 msgid "algerian"
 msgstr "アルジェリア音階"
 
-#: js/musicutils.js:532
+#: js/musicutils.js:537
 msgid "spanish"
 msgstr "スペイン音階"
 
-#: js/musicutils.js:534
+#: js/musicutils.js:539
 #.TRANS: modal scale in music
 ## there are two "octotonics" and they also share the "diminished" name as well... ; https://en.wikipedia.org/wiki/Octatonic_scale
 msgid "octatonic"
 msgstr "オクタトニック・スケール"
 
-#: js/musicutils.js:536
+#: js/musicutils.js:541
 #.TRANS: harmonic major scale in music
 ## https://en.wikipedia.org/wiki/Harmonic_major_scale
 msgid "harmonic major"
 msgstr "ハーモニック・メジャー（和声長音階）"
 
-#: js/musicutils.js:538
+#: js/musicutils.js:543
 #.TRANS: natural minor scales in music
 ## https://cyta.jp/composition/c/entry/6542
 msgid "natural minor"
 msgstr "自然短音階"
 
-#: js/musicutils.js:540
+#: js/musicutils.js:545
 #.TRANS: harmonic minor scale in music
 ## 和声短音階=わせいたのんかい； https://ja.wikipedia.org/wiki/%E9%9F%B3%E9%9A%8E
 msgid "harmonic minor"
 msgstr "和声短音階"
 
-#: js/musicutils.js:542
+#: js/musicutils.js:547
 #.TRANS: melodic minor scale in music
 ## 旋律短音階=せんりつたのんかい；http://jisho.org/word/%E6%97%8B%E5%BE%8B%E7%9A%84%E7%9F%AD%E9%9F%B3%E9%9A%8E 
 msgid "melodic minor"
 msgstr "旋律短音階"
 
-#: js/musicutils.js:546
+#: js/musicutils.js:551
 #.TRANS: modal scale for music
 msgid "dorian"
 msgstr "ドリアン音階"
 
-#: js/musicutils.js:548
+#: js/musicutils.js:553
 #.TRANS: modal scale for music
 msgid "phrygian"
 msgstr "フリジアン音階"
 
-#: js/musicutils.js:550
+#: js/musicutils.js:555
 #.TRANS: modal scale for music
 msgid "lydian"
 msgstr "リディアン音階"
 
-#: js/musicutils.js:552
+#: js/musicutils.js:557
 #.TRANS: modal scale for music
 msgid "mixolydian"
 msgstr "ミクソリディアン音階"
 
-#: js/musicutils.js:556
+#: js/musicutils.js:561
 #.TRANS: modal scale for music
 msgid "locrian"
 msgstr "ロクリアン音階"
 
-#: js/musicutils.js:558
+#: js/musicutils.js:563
 #.TRANS: minor jazz scale for music
 msgid "jazz minor"
 msgstr "オルタード音階"
 
-#: js/musicutils.js:560
+#: js/musicutils.js:565
 #.TRANS: bebop scale for music
 msgid "bebop"
 msgstr "ビバップ音階"
 
-#: js/musicutils.js:561
+#: js/musicutils.js:566
 msgid "arabic"
 msgstr "アラビア音階"
 
-#: js/musicutils.js:562
+#: js/musicutils.js:567
 msgid "byzantine"
 msgstr "ビザンティン"
 
-#: js/musicutils.js:564
+#: js/musicutils.js:569
 #.TRANS: musical scale for music by Verdi
 msgid "enigmatic"
 msgstr "ヴェルディの音階"
 
-#: js/musicutils.js:565
+#: js/musicutils.js:570
 msgid "ethiopian"
 msgstr "エチオピア音階"
 
-#: js/musicutils.js:567
+#: js/musicutils.js:572
 #.TRANS: Ethiopic scale for music
 ## https://en.wikipedia.org/wiki/Ge%27ez_language ; I only see ge'ez as a language on wikipedia...
 msgid "geez"
 msgstr "ゲエズ音階"
 
-#: js/musicutils.js:568
+#: js/musicutils.js:573
 ## http://jisho.org/word/%E3%83%92%E3%83%B3%E3%82%BA%E3%83%BC 
 msgid "hindu"
 msgstr "ヒンドゥー音階"
 
-#: js/musicutils.js:569
+#: js/musicutils.js:574
 msgid "hungarian"
 msgstr "ハンガリー音階"
 
-#: js/musicutils.js:571
+#: js/musicutils.js:576
 #.TRANS: minor Romanian scale for music
 msgid "romanian minor"
 msgstr "ルーマニア・マイナー音階"
 
-#: js/musicutils.js:572
+#: js/musicutils.js:577
 msgid "spanish gypsy"
 msgstr "スパニッシュ・ジプシー音階"
 
-#: js/musicutils.js:574
+#: js/musicutils.js:579
 #.TRANS: musical scale for Mid-Eastern music
 ## https://en.wikipedia.org/wiki/Arabic_maqam;looks like there are many... oh well, we need to split them up, I guess...
 msgid "maqam"
 msgstr "マカーム音階"
 
-#: js/musicutils.js:576
+#: js/musicutils.js:581
 #.TRANS: minor blues scale for music
 msgid "minor blues"
 msgstr "マイナー・ブルース音階"
 
-#: js/musicutils.js:578
+#: js/musicutils.js:583
 #.TRANS: major blues scale for music
 msgid "major blues"
 msgstr "メジャー・ブルース音階"
 
-#: js/musicutils.js:579
+#: js/musicutils.js:584
 msgid "whole tone"
 msgstr "ホールトーン音階"
 
-#: js/musicutils.js:581
+#: js/musicutils.js:586
 #.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "minor pentatonic"
 msgid "minor pentatonic"
 msgstr "マイナー・ペンタトニック音階"
 
-#: js/musicutils.js:583
+#: js/musicutils.js:588
 #.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "major pentatonic"
 msgid "major pentatonic"
 msgstr "メジャー・ペンタトニック音階"
 
-#: js/musicutils.js:584
+#: js/musicutils.js:589
 msgid "chinese"
 msgstr "中国音階"
 
-#: js/musicutils.js:585
+#: js/musicutils.js:590
 msgid "egyptian"
 msgstr "エジプト音階"
 
-#: js/musicutils.js:587
+#: js/musicutils.js:592
 #.TRANS: https://en.wikipedia.org/wiki/Hirajoshi_scale NOTE: There are three different versions of this scale
 msgid "hirajoshi"
 msgstr "平調子"
 
-#: js/musicutils.js:588
+#: js/musicutils.js:593
 msgid "Japan"
 msgstr "日本"
 
-#: js/musicutils.js:590
+#: js/musicutils.js:595
 #.TRANS: https://en.wikipedia.org/wiki/In_scale and https://en.wikipedia.org/wiki/Sakura_Sakura
 ## https://kotobank.jp/word/%E9%99%B0%E9%9F%B3%E9%9A%8E-32775
 msgid "in"
 msgstr "陰音階"
 
-#: js/musicutils.js:592
+#: js/musicutils.js:597
 #.TRANS: https://en.wikipedia.org/wiki/Miny%C5%8D_scale
 ## I cannot find the Japanese translation on Wikipedia and therefore cannot guess the Kanji
 msgid "minyo"
 msgstr "民謡音階"
 
-#: js/musicutils.js:594
+#: js/musicutils.js:599
 #.TRANS: Italian mathematician
 msgid "fibonacci"
 msgstr "フィボナッチ音階"
 
-#: js/musicutils.js:599
-#: js/musicutils.js:943
+#: js/musicutils.js:604
+#: js/musicutils.js:948
 #.TRANS: lowpass filter
 msgid "lowpass"
 msgstr "ローパス・フィルター"
 
-#: js/musicutils.js:601
-#: js/musicutils.js:944
+#: js/musicutils.js:606
+#: js/musicutils.js:949
 #.TRANS: bandpass filter
 msgid "bandpass"
 msgstr "バンドパス・フィルター"
 
-#: js/musicutils.js:603
-#: js/musicutils.js:945
+#: js/musicutils.js:608
+#: js/musicutils.js:950
 #.TRANS: high-shelf filter
 ## http://d.hatena.ne.jp/y_takeuchi/20130407/p1
 msgid "highshelf"
 msgstr "ハイシェルフ・フィルター"
 
-#: js/musicutils.js:605
-#: js/musicutils.js:946
+#: js/musicutils.js:610
+#: js/musicutils.js:951
 #.TRANS: low-shelf filter
 msgid "lowshelf"
 msgstr "ローシェルフ・フィルター"
 
-#: js/musicutils.js:607
-#: js/musicutils.js:947
+#: js/musicutils.js:612
+#: js/musicutils.js:952
 #.TRANS: notch-shelf filter
 ## https://synth-voice.sakura.ne.jp/synth-voice/html5/synth-basic02.html
 msgid "notch"
 msgstr "ノッチ・フィルター"
 
-#: js/musicutils.js:609
-#: js/musicutils.js:948
+#: js/musicutils.js:614
+#: js/musicutils.js:953
 #.TRANS: all-pass filter
 ## http://www7b.biglobe.ne.jp/~kochan/workshop/analog/allpass.htm
 msgid "allpass"
 msgstr "オールパスフィルター"
 
-#: js/musicutils.js:611
-#: js/musicutils.js:949
+#: js/musicutils.js:616
+#: js/musicutils.js:954
 #.TRANS: peaking filter
 ## http://www.geocities.jp/meimei_8/filt/peek/af_peek.html
 msgid "peaking"
 msgstr "ピーク・フィルタ"
 
-#: js/musicutils.js:640
+#: js/musicutils.js:645
 msgid "simple 2"
 msgstr "シンプル２"
 
-#: js/musicutils.js:641
+#: js/musicutils.js:646
 msgid "simple 3"
 msgstr "シンプル３"
 
-#: js/musicutils.js:642
+#: js/musicutils.js:647
 msgid "simple 4"
 msgstr "シンプル４"
 
-#: js/musicutils.js:656
+#: js/musicutils.js:661
 msgid "japanese drum"
 msgstr "太鼓"
 
-#: js/musicutils.js:681
-#: js/musicutils.js:960
-#: js/musicutils.js:968
+#: js/musicutils.js:686
+#: js/musicutils.js:965
+#: js/musicutils.js:973
 #.TRANS: musical temperament
 msgid "equal"
 msgstr "平均律"
 
-#: js/musicutils.js:683
-#: js/musicutils.js:962
-#: js/musicutils.js:970
+#: js/musicutils.js:688
+#: js/musicutils.js:967
+#: js/musicutils.js:975
 #.TRANS: musical temperament
 msgid "Pythagorean"
 msgstr "ピタゴラス音律 "
 
-#: js/musicutils.js:685
-#: js/musicutils.js:961
-#: js/musicutils.js:969
+#: js/musicutils.js:690
+#: js/musicutils.js:966
+#: js/musicutils.js:974
 #.TRANS: musical temperament
 msgid "just intonation"
 msgstr "純正律"
 
-#: js/musicutils.js:687
-#: js/musicutils.js:963
-#: js/musicutils.js:964
-#: js/musicutils.js:971
-#: js/musicutils.js:972
+#: js/musicutils.js:692
+#: js/musicutils.js:968
+#: js/musicutils.js:969
+#: js/musicutils.js:976
+#: js/musicutils.js:977
 #.TRANS: musical temperament
 msgid "meantone"
 msgstr "中全音律"
 
-#: js/musicutils.js:3000
-#: js/musicutils.js:3034
+#: js/musicutils.js:3185
+#: js/musicutils.js:3219
 msgid "current"
 msgstr "現在の"
 
-#: js/musicutils.js:3003
-#: js/musicutils.js:3025
+#: js/musicutils.js:3188
+#: js/musicutils.js:3210
 msgid "next"
 msgstr "この次の"
 
-#: js/musicutils.js:3006
-#: js/musicutils.js:3030
+#: js/musicutils.js:3191
+#: js/musicutils.js:3215
 msgid "previous"
 msgstr "この前の"
 
@@ -6305,6 +6174,91 @@ msgstr "ファイルを選ぶ必要があります"
 msgid "The file you selected does not contain a valid heap."
 msgstr "選んだファイルには、正しいヒープが含まれません。"
 
+#: js/SaveInterface.js:503
+
+#~msgid "Do you want to save your project?"
+#~msgstr "プロジェクトをほぞんしますか"
+
+#: js/DrumBlocks.js:104
+
+#~msgid "Noise Block: Did you mean to use a Note block?"
+#~msgstr "音符ブロックを使いますか？"
+
+#: js/MeterBlocks.js:718
+
+#: js/MeterBlocks.js:842
+
+#~msgid "beats per minute must be greater than"
+#~msgstr ""
+
+#: js/MeterBlocks.js:728
+
+#: js/MeterBlocks.js:852
+
+#~msgid "maximum"
+#~msgstr ""
+
+#: js/MeterBlocks.js:734
+
+#: js/MeterBlocks.js:858
+
+#~msgid "beats per minute is"
+#~msgstr ""
+
+#: js/ToneBlocks.js:188
+
+#: js/ToneBlocks.js:248
+
+#~msgid "The input cannot be negative."
+#~msgstr "マイナスの数値をいれることはできません。"
+
+#: js/ToneBlocks.js:387
+
+#~msgid "Partial must be greater than or equal to 0."
+#~msgstr "倍音が０以上である必要があります。"
+
+#: js/ToneBlocks.js:441
+
+#~msgid "Distortion must be from 0 to 100."
+#~msgstr "ディストーションは、0から100までのはんいでせっていしてください。"
+
+#: js/ToneBlocks.js:507
+
+#: js/ToneBlocks.js:623
+
+#~msgid "Depth is out of range."
+#~msgstr "（エフェクタの）深さの数字が変域外です。"
+
+#: js/ToneBlocks.js:696
+
+#~msgid "Vibrato intensity must be between 1 and 100."
+#~msgstr "ビブラートの大きさは、1から100までのはんいでせっていしてください。"
+
+#: js/ToneBlocks.js:703
+
+#~msgid "Vibrato rate must be greater than 0."
+#~msgstr "ビブラートのはやさは、0より大きいあたいをせっていしてください。"
+
+#: js/PitchBlocks.js:2054
+
+#~msgid "The Scalar Step Block must be used inside of a Note Block."
+#~msgstr "音階内を上る／下りるブロックは、音符ブロックの中に入れて使ってください。"
+
+#: js/PitchBlocks.js:2073
+
+#~msgid "The Scalar Step Block must be preceded by a Pitch Block."
+#~msgstr "音階内を上る／下りるブロックは、音の高さブロックの後に使ってください。"
+
+#: js/IntervalsBlocks.js:702
+
+#~msgid "Adding missing pitch number 0."
+#~msgstr "ピッチ数値「0」を加える"
+
+#: js/IntervalsBlocks.js:720
+
+#~msgid "Ignoring duplicate pitch numbers."
+#~msgstr "重複しているピッチ数値は無視します"
+
 #: js/palette.js:1188
 
 #~msgid "Click to select a block."
@@ -6741,9 +6695,6 @@ msgstr "選んだファイルには、正しいヒープが含まれません。
 
 #~msgid "Include guitar tablature output?"
 #~msgstr "ギターのTABもがくふにまとめましょうか？"
-
-#~msgid "note counter"
-#~msgstr "音符の合計数"
 
 #~msgid "down minor"
 #~msgstr "短３度下"
