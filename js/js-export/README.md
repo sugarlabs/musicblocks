@@ -276,6 +276,11 @@ on the `switch-case` block inside it.
     mouse.GETTERNAME
     ```
 
+* (finally) to run
+  ```
+  MusicBlocks.run();
+  ```
+
 ### Example code
 
 For the block stacks (and mouse art generated after running),
@@ -320,3 +325,5 @@ new Mouse(async mouse => {
 });
 MusicBlocks.run();
 ```
+
+Here's the complete [API](./samples/sample.js) of methods, getters, setters.
