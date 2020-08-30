@@ -394,24 +394,24 @@ msgstr "tono en hertz"
 #: js/block.js:3715
 #: js/block.js:3720
 msgid "letter class"
-msgstr ""
+msgstr "clase de letras"
 
 #: js/block.js:3716
 #: js/block.js:3728
 msgid "staff y"
-msgstr ""
+msgstr "musical y"
 
 #: js/block.js:3721
 msgid "solfege syllable"
-msgstr ""
+msgstr "sílaba solfege"
 
 #: js/block.js:3722
 msgid "pitch class"
-msgstr ""
+msgstr "clase de tono"
 
 #: js/block.js:3725
 msgid "scalar class"
-msgstr ""
+msgstr "clase de escala"
 
 #: js/block.js:3726
 msgid "scale degree"
@@ -419,15 +419,15 @@ msgstr "grado de escala"
 
 #: js/block.js:3727
 msgid "nth degree"
-msgstr ""
+msgstr "nth grado"
 
 #: js/block.js:3729
 msgid "pitch to shade"
-msgstr ""
+msgstr "tono a la sombra"
 
 #: js/block.js:3730
 msgid "pitch to color"
-msgstr ""
+msgstr "tono a color"
 
 #: js/block.js:4695
 #: js/musickeyboard.js:1835
@@ -524,7 +524,7 @@ msgstr "no es un número"
 
 #: js/block.js:8288
 msgid "Duplicate"
-msgstr ""
+msgstr "Duplicar"
 
 #: js/block.js:8289
 msgid "Extract"
@@ -561,11 +561,11 @@ msgstr "buscar bloques"
 
 #: js/activity.js:1094
 msgid "You have chosen key "
-msgstr ""
+msgstr "Ha elegido la tecla "
 
 #: js/activity.js:1095
 msgid " for your pitch preview."
-msgstr ""
+msgstr " para la vista previa de su tono."
 
 #: js/activity.js:1155
 msgid "Refresh your browser to change to advanced mode."
@@ -577,39 +577,39 @@ msgstr "Actualice su navegador para cambiar al modo principiante."
 
 #: js/activity.js:1462
 msgid "Catching mice"
-msgstr ""
+msgstr "atrapar ratones"
 
 #: js/activity.js:1463
 msgid "Cleaning the instruments"
-msgstr ""
+msgstr "limpiar los instrumentos"
 
 #: js/activity.js:1464
 msgid "Testing key pieces"
-msgstr ""
+msgstr "probando piezas clave"
 
 #: js/activity.js:1465
 msgid "Sight-reading"
-msgstr ""
+msgstr "lectura a primera vista"
 
 #: js/activity.js:1466
 msgid "Combining math and music"
-msgstr ""
+msgstr "combinando matemáticas y música"
 
 #: js/activity.js:1467
 msgid "Generating more blocks"
-msgstr ""
+msgstr "generando más bloques"
 
 #: js/activity.js:1468
 msgid "Do Re Mi Fa Sol La Ti Do"
-msgstr ""
+msgstr "Do Re Mi Fa Sol La Si Do"
 
 #: js/activity.js:1469
 msgid "Tuning string instruments"
-msgstr ""
+msgstr "afinar instrumentos de cuerda"
 
 #: js/activity.js:1470
 msgid "Pressing random keys"
-msgstr ""
+msgstr "presionando teclas aleatorias"
 
 #: js/activity.js:1589
 #: js/activity.js:1624
@@ -622,7 +622,7 @@ msgstr "Mostrar Cartesian"
 #: js/activity.js:1611
 #.TRANS: show treble clef
 msgid "show treble"
-msgstr ""
+msgstr "Mostrar treble"
 
 #: js/activity.js:1614
 #.TRANS: hide Polar coordinate overlay grid
@@ -634,27 +634,27 @@ msgstr "Ocultar Polar"
 #.TRANS: show bass clef
 #.TRANS: show bass clef
 msgid "show bass"
-msgstr ""
+msgstr "Mostrar bass"
 
 #: js/activity.js:1630
 #.TRANS: show mezzo-soprano staff
 msgid "show mezzo-soprano"
-msgstr ""
+msgstr "Mostrar mezzo-soprano"
 
 #: js/activity.js:1635
 #.TRANS: show alto clef
 msgid "show alto"
-msgstr ""
+msgstr "Mostrar alto"
 
 #: js/activity.js:1640
 #.TRANS: show tenor clef
 msgid "show tenor"
-msgstr ""
+msgstr "Mostrar tenor"
 
 #: js/activity.js:1650
 #.TRANS: hide bass clef
 msgid "hide bass"
-msgstr ""
+msgstr "Ocultar bass"
 
 #: js/activity.js:1657
 #.TRANS: show Polar coordinate overlay grid
@@ -676,7 +676,7 @@ msgstr "Este bloque no se puede encontrar."
 
 #: js/activity.js:2386
 msgid "Saving block artwork"
-msgstr ""
+msgstr "Guardar ilustraciones de bloques"
 
 #: js/activity.js:2390
 #: js/LocalCard.js:17
@@ -685,7 +685,7 @@ msgstr "Copiar"
 
 #: js/activity.js:2397
 msgid "Erase"
-msgstr ""
+msgstr "Borrar"
 
 #: js/activity.js:2401
 #: js/activity.js:2632
@@ -748,47 +748,47 @@ msgstr "Pegar"
 
 #: js/activity.js:2413
 msgid "Save block help"
-msgstr ""
+msgstr "Guardar ayuda de bloque"
 
 #: js/activity.js:2491
 msgid "Jumping to the bottom of the page."
-msgstr ""
+msgstr "Saltando al final de la página"
 
 #: js/activity.js:2498
 msgid "Scrolling up."
-msgstr ""
+msgstr "Desplazarse hacia arriba"
 
 #: js/activity.js:2503
 msgid "Scrolling down."
-msgstr ""
+msgstr "Desplazarse hacia abajo"
 
 #: js/activity.js:2508
 msgid "Extracting block"
-msgstr ""
+msgstr "Bloque de extracción"
 
 #: js/activity.js:2516
 msgid "Moving block up."
-msgstr ""
+msgstr "Mover bloque hacia arriba"
 
 #: js/activity.js:2540
 msgid "Moving block down."
-msgstr ""
+msgstr "Mover bloque hacia abajo"
 
 #: js/activity.js:2562
 msgid "Moving block left."
-msgstr ""
+msgstr "Mover bloque a la izquierda"
 
 #: js/activity.js:2579
 msgid "Moving block right."
-msgstr ""
+msgstr "Mover bloque a la derecha"
 
 #: js/activity.js:2594
 msgid "Jump to home position."
-msgstr ""
+msgstr "Saltar a la posición inicial"
 
 #: js/activity.js:2624
 msgid "Hide blocks"
-msgstr ""
+msgstr "Ocultar bloques"
 
 #: js/activity.js:3201
 #: js/SaveInterface.js:73
@@ -803,7 +803,7 @@ msgstr "Mi proyecto"
 
 #: js/activity.js:3328
 msgid "Click the run button to run the project."
-msgstr ""
+msgstr "Haga clic en el botón ejecutar para ejecutar el proyecto."
 
 #: js/activity.js:3385
 msgid "Please set browser zoom level to 100%"
@@ -1056,7 +1056,7 @@ msgstr "extras"
 
 #: js/turtledefs.js:88
 msgid "my blocks"
-msgstr ""
+msgstr "mis bloques"
 
 #: js/turtledefs.js:122
 msgid "music"
@@ -1476,11 +1476,11 @@ msgstr "Eliminar un plugin seleccionado."
 
 #: js/turtledefs.js:698
 msgid "Wrap Turtle"
-msgstr ""
+msgstr "Envolver tortuga"
 
 #: js/turtledefs.js:699
 msgid "Turn Turtle wrapping On or Off."
-msgstr ""
+msgstr "Encender / apagar la envoltura de tortugas"
 
 #: js/toolbar.js:507
 #: js/toolbar.js:567
@@ -1553,14 +1553,14 @@ msgstr "Unir con el proyecto actual"
 #: js/toolbar.js:623
 #: js/toolbar.js:677
 msgid "Set Pitch Preview"
-msgstr ""
+msgstr "Establecer vista previa de tono"
 
 #: js/toolbar.js:527
 #: js/toolbar.js:587
 #: js/toolbar.js:624
 #: js/toolbar.js:678
 msgid "Toggle JavaScript Editor"
-msgstr ""
+msgstr "Alternar editor de JavaScript"
 
 #: js/toolbar.js:529
 #: js/toolbar.js:589
@@ -1574,7 +1574,7 @@ msgstr "Cambiar a modo avanzado"
 
 #: js/toolbar.js:540
 msgid "Save sheet music as MusicXML"
-msgstr ""
+msgstr "Guardar partituras como MusicXML"
 
 #: js/toolbar.js:546
 #: js/toolbar.js:599
@@ -1665,7 +1665,7 @@ msgstr ""
 #: js/toolbar.js:604
 #: js/toolbar.js:658
 msgid "About Turtle Blocks"
-msgstr ""
+msgstr "Sobre bloques de tortuga"
 
 #: js/toolbar.js:641
 msgid "한국인"
@@ -1673,11 +1673,11 @@ msgstr ""
 
 #: js/toolbar.js:682
 msgid "Save turtle artwork as SVG"
-msgstr ""
+msgstr "Guardar la ilustración de la tortuga como SVG"
 
 #: js/toolbar.js:683
 msgid "Save turtle artwork as PNG"
-msgstr ""
+msgstr "Guardar la ilustración de la tortuga como PNG"
 
 #: js/SaveInterface.js:26
 #: js/SaveInterface.js:28
@@ -1725,7 +1725,7 @@ msgstr "Ninguna descripción provista"
 
 #: js/SaveInterface.js:221
 msgid "Your recording is in progress."
-msgstr ""
+msgstr "Tu grabación está en curso."
 
 #: js/SaveInterface.js:268
 #.TRANS: File name prompt for save as Lilypond
@@ -1796,7 +1796,7 @@ msgstr "ratón"
 #: js/turtle-singer.js:1693
 #.TRANS: partials are weighted components in a harmonic series
 msgid "Warning: Note value greater than 2."
-msgstr ""
+msgstr "Advertencia. El valor de la nota es mayor que 2"
 
 #: js/turtle-singer.js:1806
 msgid "synth cannot play chords."
@@ -2401,7 +2401,7 @@ msgstr "personalizado"
 
 #: js/WidgetBlocks.js:396
 msgid "oscilloscope"
-msgstr ""
+msgstr "osciloscopio"
 
 #: js/WidgetBlocks.js:453
 #.TRANS: musical mode is the pattern of half-steps in an octave, e.g., Major or Minor modes
@@ -2979,7 +2979,7 @@ msgstr "El rango es de 0 para el silencio a 100 para el volumen completo."
 #: js/VolumeBlocks.js:397
 #.TRANS: set the distribution of volume
 msgid "set panning"
-msgstr ""
+msgstr "establecer panorámica"
 
 #: js/VolumeBlocks.js:426
 #: js/VolumeBlocks.js:459
@@ -3760,7 +3760,7 @@ msgstr "cambio en tono escalar"
 
 #: js/PitchBlocks.js:352
 msgid "current pitch"
-msgstr ""
+msgstr "tono actual"
 
 #: js/PitchBlocks.js:387
 msgid "This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."
@@ -3789,7 +3789,7 @@ msgstr "número a octava"
 
 #: js/PitchBlocks.js:648
 msgid "y to pitch"
-msgstr ""
+msgstr "y para tono"
 
 #: js/PitchBlocks.js:771
 msgid "Pitch can be specified in terms of ni dha pa ma ga re sa."
@@ -4558,7 +4558,7 @@ msgstr "Agrega una nota"
 
 #: js/musickeyboard.js:489
 msgid "Metronome"
-msgstr ""
+msgstr "Metrónomo"
 
 #: js/musickeyboard.js:511
 #: js/temperament.js:2164
@@ -4620,11 +4620,11 @@ msgstr "Haga clic en el control deslizante para crear un bloque de notas."
 
 #: js/oscilloscope.js:49
 msgid "ZOOM IN"
-msgstr ""
+msgstr "ampliar"
 
 #: js/oscilloscope.js:61
 msgid "ZOOM OUT"
-msgstr ""
+msgstr "reducir"
 
 #: js/pitchtimematrix.js:282
 msgid "Export"
@@ -4662,7 +4662,7 @@ msgstr "Jugar todo"
 
 #: js/meterwidget.js:148
 msgid "Reset"
-msgstr ""
+msgstr "Reiniciar"
 
 #: js/meterwidget.js:175
 msgid "Click in the circle to select strong beats for the meter."
@@ -4877,7 +4877,7 @@ msgstr "violonchelo"
 #: js/musicutils.js:633
 #.TRANS: viola musical instrument
 msgid "double bass"
-msgstr ""
+msgstr "contrabajo"
 
 #: js/synthutils.js:39
 #: js/musicutils.js:635
@@ -4967,7 +4967,7 @@ msgstr ""
 #: js/musicutils.js:629
 #.TRANS: xylophone musical instrument
 msgid "xylophone"
-msgstr ""
+msgstr "xilófono"
 
 #: js/synthutils.js:71
 #: js/musicutils.js:644
@@ -4994,7 +4994,7 @@ msgstr ""
 #: js/musicutils.js:630
 #.TRANS: vibraphone musical instrument
 msgid "vibraphone"
-msgstr ""
+msgstr "vibráfono"
 
 #: js/synthutils.js:98
 #: js/musicutils.js:653
