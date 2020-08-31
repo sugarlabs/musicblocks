@@ -1029,6 +1029,7 @@ function setupWidgetBlocks() {
             if (logo.pitchTimeMatrix === null) {
                 logo.pitchTimeMatrix = new PitchTimeMatrix();
             }
+            logo.pitchTimeMatrix.blockNo = blk;
 
             logo.pitchTimeMatrix._instrumentName = DEFAULTVOICE;
 

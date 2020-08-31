@@ -1170,7 +1170,7 @@ class Singer {
                 logo.pitchTimeMatrix.addColBlock(blk, 1);
 
                 // block ID of parent "matrix" block
-                let mat_block = logo.pitchTimeMatrix.blockNo;
+                let mat_block = logo.pitchTimeMatrix.blockNo || -1;
 
                 for (let i = 0; i < logo.pitchBlocks.length; i++) {
                     logo.pitchTimeMatrix.addNode(
