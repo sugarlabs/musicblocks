@@ -1417,7 +1417,7 @@ function setupPitchBlocks() {
                 }
 
                 logo.pitchTimeMatrix.rowLabels.push(logo.blocks.blockList[blk].name);
-                logo.pitchTimeMatrix.rowArgs.push(arg);
+                logo.pitchTimeMatrix.rowArgs.push(arg.toFixed(3));
                 // convert hertz to note/octave
                 let note = obj;
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];
