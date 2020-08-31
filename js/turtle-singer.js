@@ -1169,17 +1169,9 @@ class Singer {
             if (tur.singer.inNoteBlock.length > 0) {
                 logo.pitchTimeMatrix.addColBlock(blk, 1);
 
-                // Find the block ID of parent "matrix" block
-                let mat_block = -1;
-                let par = logo.blocks.blockList[blk].connections[0];
-                while (par != null) {
-                    if (logo.blocks.blockList[par].name === "matrix") {
-                        mat_block = par;
-                        break;
-                    } else {
-                        par = logo.blocks.blockList[par].connections[0];
-                    }
-                }
+                // block ID of parent "matrix" block
+                let mat_block = logo.pitchTimeMatrix.blockNo;
+
                 for (let i = 0; i < logo.pitchBlocks.length; i++) {
                     logo.pitchTimeMatrix.addNode(
                         logo.pitchBlocks[i], blk, 0, mat_block
