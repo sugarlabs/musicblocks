@@ -128,14 +128,18 @@ Associates, LLC, [Center for Music and the Arts in Education
 Education](http://music-in-education.org/) Some of the initial graphics
 were contributed by [Chie Yasuda](http://www.chieyasuda.com).
 
-Much of the initial coding specific to Music Blocks was done by
-Yash Khandelwal as part of Google Summer of Code (GSoC) 2015. Hemant
-Kasat contributed to additional widgets as part of GSoC
-2016. Additional contributions are being made by Tayba Wasim, Dinuka
-Tharangi Jayaweera, Prachi Agrawal, Cristina Del Puerto, and Hrishi
-Patel as part of GSoC 2017. During GSoC 2018, Riya Lohia developed a
+Much of the initial coding specific to Music Blocks was done by Yash
+Khandelwal as part of Google Summer of Code (GSoC) 2015. Hemant Kasat
+contributed to additional widgets as part of GSoC 2016. Additional
+contributions are being made by Tayba Wasim, Dinuka Tharangi
+Jayaweera, Prachi Agrawal, Cristina Del Puerto, and Hrishi Patel as
+part of GSoC 2017. During GSoC 2018, Riya Lohia developed a
 Temperament Widget. Ritwik Abhishek added a keyboard widget and a
-pitch-tracking widget.
+pitch-tracking widget. During GSoC 2019, Favor Kelvin refactored much
+of the code to use promises. During GSoC 2020, Meganindya did a major
+refactoring of the code base to support JavaScript export. Avrial
+enhanced the internal representation of mode and key. Sksum fixed 70+
+bugs and added support for pitch tracking and MIDI import.
 
 Many students contributed to the project as part of Google Code-in
 (2015&ndash;2020). Sam Parkinson built the Planet during GCI. Emily
