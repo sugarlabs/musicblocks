@@ -56,7 +56,7 @@ Blocks (e.g., <code>cd /musicblocks</code>)
 it. (Get it from https://www.python.org) You can test for Python in a
 terminal: <code>python</code>. Type <code>exit()</code> to exit
 Python.
- 
+
 (3) After cloning the musicblocks repository, run the command:
 
 ```
@@ -136,9 +136,9 @@ Jayaweera, Prachi Agrawal, Cristina Del Puerto, and Hrishi Patel as
 part of GSoC 2017. During GSoC 2018, Riya Lohia developed a
 Temperament Widget. Ritwik Abhishek added a keyboard widget and a
 pitch-tracking widget. During GSoC 2019, Favor Kelvin refactored much
-of the code to use promises. During GSoC 2020, Meganindya did a major
-refactoring of the code base to support JavaScript export. Avrial
-enhanced the internal representation of mode and key. Sksum fixed 70+
+of the code to use promises. During GSoC 2020, Anindya Kundu did a major
+refactoring of the code base to support JavaScript export. Aviral Gangwar
+enhanced the internal representation of mode and key. Saksham Mrig fixed 70+
 bugs and added support for pitch tracking and MIDI import.
 
 Many students contributed to the project as part of Google Code-in
