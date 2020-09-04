@@ -822,9 +822,7 @@ function setupActionBlocks() {
                     }
                 }
 
-                let __listener = event => {
-                    tur.singer.backward.pop();
-                };
+                let __listener = event => tur.singer.backward.pop();
 
                 logo.setTurtleListener(turtle, listenerName, __listener);
             } else {
