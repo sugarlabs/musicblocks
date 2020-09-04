@@ -2346,7 +2346,7 @@ function PitchTimeMatrix() {
 
             if (i === 0) {
                 this._sortedRowMap.push(0);
-            } else if (i > 0 && obj[1] === last(this.rowLabels)) {
+            } else if (i > 0 && obj[1] !== "hertz" && obj[1] === last(this.rowLabels)) {
                 console.debug(
                     "skipping " + obj[1] + " " + last(this.rowLabels)
                 );
