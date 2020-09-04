@@ -1544,8 +1544,7 @@ class Logo {
             // All flow blocks have a last connection (nextFlow), but it can be null (i.e., end of a flow)
             if (tur.singer.backward.length > 0) {
                 // We only run backwards in the "first generation" children
-                let c =
-                    logo.blocks.blockList[last(tur.singer.backward)].name === "backward" ? 1 : 2;
+                let c = blocks.blockList[last(tur.singer.backward)].name === "backward" ? 1 : 2;
 
                 if (
                     !logo.blocks.sameGeneration(
@@ -1640,7 +1639,7 @@ class Logo {
         // Is the block in a queued clamp?
         if (blk !== logo._ignoringBlock) {
             if (blk in tur.endOfClampSignals) {
-                for (let i = 0; i < tur.endOfClampSignals[blk].length; i++) {
+                while (tur.endOfClampSignals[blk].length > 0) {
                     let signal = tur.endOfClampSignals[blk].pop();
                     if (signal != null) {
                         logo.stage.dispatchEvent(signal);
