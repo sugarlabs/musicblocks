@@ -1703,8 +1703,13 @@ function setupPitchBlocks() {
             // Default value is G4 or (sol, 4)
             let arg0 = args[0] !== null ? args[0] : "sol";
             let arg1 = args[1] !== null ? args[1] : 4;
+            // is arg0 of the form C,4 or sol,5
+            if (typeof(arg0) === "object") {
+                arg1 = arg0[1];
+                arg0 = arg0[0];
+            }
 
-            if (args[0] === null || args[1] === null) {
+            if (arg0 === null || arg1 === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
             }
 
