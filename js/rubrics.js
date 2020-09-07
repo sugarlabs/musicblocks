@@ -710,3 +710,97 @@ function getChartOptions(callback) {
             '<ul class="<%=name.toLowerCase()%>-legend"><% for (var i=0; i<datasets.length; i++){%><li><span style="background-color:<%=datasets[i].strokeColor%>"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>'
     };
 }
+
+let runAnalytics = (logo) => {
+    // using lilypond output to run through code and get some stats
+    logo.runningLilypond = true;
+    logo.notationNotes = {};
+    for (
+        var turtle = 0;
+        turtle < logo.turtles.turtleList.length;
+        turtle++
+    ) {
+        logo.notation.notationStaging[turtle] = [];
+        logo.notation.notationDrumStaging[turtle] = [];
+        logo.turtles.turtleList[turtle].painter.doClear(true, true, true);
+    }
+    document.body.style.cursor = "wait";
+    logo.collectingStats = true;
+    logo.runLogoCommands();
+}
+
+let getStatsFromNotation = (logo) => {
+    projectStats = {};
+    // since we use the lilypond output to generate stats , please make sure to change these rules if 
+    // we ever change the lilypond notation structure.
+    let notation = logo.notation;
+    projectStats["duples"] = 0;
+    projectStats["triplets"] = 0;
+    projectStats["quintuplets"] = 0;
+    projectStats["pitchNames"] = new Set();
+    projectStats["articulation"] = {
+        begin : [],
+        end : []
+    };
+    projectStats["pitches"] = [];
+    projectStats["numberOfNotes"] = 0;
+
+    let noteId = 0;
+
+    for (tur in notation.notationStaging){
+        for (it in notation.notationStaging[tur]) {
+            let item = notation.notationStaging[tur][it];
+
+            if (typeof item == "object" && item[0].length){
+                for (note of item[0]) {
+                    projectStats["pitchNames"].add(note[0]);
+                    let freq = logo.synth._getFrequency(note);
+                    projectStats["pitches"].push(
+                        freq
+                    );
+                    if (projectStats["lowestNote"] == undefined || freq < projectStats["lowestNote"][2]) {
+                        projectStats["lowestNote"] = [note,noteId,freq];
+                    }
+                    if (projectStats["highestNote"] == undefined || freq > projectStats["highestNote"][2]) {
+                        projectStats["highestNote"] = [note,noteId,freq];
+                    }
+                    projectStats["numberOfNotes"]++;
+                    noteId++;
+                }
+            }
+            
+            if (item[1] == 2)projectStats["duples"]++;
+            else if (item[1] == 3)projectStats["triplets"]++;
+            else if (item[1] == 5)projectStats["quintuplets"]++;
+            
+            if (typeof item == "string") {
+                if (item == "begin articulation") projectStats["articulation"].begin.push(it);
+                else if (item == "end articulation") projectStats["articulation"].begin.push(it);
+            }
+
+            
+        }
+    }
+
+    blockList = logo.blocks.blockList;
+    projectStats["rests"] = 0;
+    projectStats["ornaments"] = 0;
+    for (var b  of blockList) {
+        if (b.trash) {
+            continue;
+        }
+        switch(b.name){
+            case "rest2" :
+                projectStats["rests"]++;
+            case "":
+            default :
+        }
+        switch(b.protoblock.palette.name){
+            case("ornaments"):
+                projectStats["ornaments"]++;
+            default:
+        }
+    }
+    console.debug(projectStats);
+    return projectStats
+}

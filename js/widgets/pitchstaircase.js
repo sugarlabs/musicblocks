@@ -89,7 +89,7 @@ function PitchStaircase() {
             // The stairstep for this row.
             // var solfege = this.Stairs[i][0];
             // var octave = this.Stairs[i][1];
-            // var solfegetonote = getNote(solfege, octave, 0, this._logo.keySignature[this.logoturtle], false, null, this._logo.errorMsg)[0];
+            // var solfegetonote = getNote(solfege, octave, 0, this._logo.turtles.ithTurtle(this.logoturtle).singer.keySignature, false, null, this._logo.errorMsg)[0];
             var frequency = this.Stairs[i][2];
 
             // The play button for this row.

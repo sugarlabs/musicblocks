@@ -32,7 +32,7 @@ const DEFAULTPALETTE = "rhythm";
 var TITLESTRING = _(
     "Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way."
 );
-const VERSION = "3.1";
+const VERSION = "3.3";
 
 // We don't include 'extras' since we want to be able to delete
 // plugins from the extras palette.

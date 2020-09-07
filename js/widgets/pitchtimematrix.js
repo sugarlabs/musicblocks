@@ -583,7 +583,7 @@ function PitchTimeMatrix() {
                         this.rowLabels[i],
                         this.rowArgs[i],
                         0,
-                        this._logo.keySignature[0],
+                        this._logo.turtles.ithTurtle(0).singer.keySignature,
                         false,
                         null,
                         this._logo.errorMsg,
@@ -910,7 +910,7 @@ function PitchTimeMatrix() {
                 switch (that._logo.tupletRhythms[i][0]) {
                     case "simple":
                     case "notes":
-                        var tupletParam = [that._logo.tupletParams[i]];
+                        var tupletParam = [that._logo.tupletParams[that._logo.tupletRhythms[i][1]]];
                         tupletParam.push([]);
                         for (
                             var j = 2;
@@ -1909,7 +1909,7 @@ function PitchTimeMatrix() {
                         label,
                         octave,
                         0,
-                        that._logo.keySignature[0],
+                        that._logo.turtles.ithTurtle(0).singer.keySignature,
                         false,
                         null,
                         that._logo.errorMsg,
@@ -1989,7 +1989,7 @@ function PitchTimeMatrix() {
                     that.rowLabels[index],
                     that.rowArgs[index],
                     0,
-                    that._logo.keySignature[0],
+                    that._logo.turtles.ithTurtle(0).singer.keySignature,
                     false,
                     null,
                     that._logo.errorMsg,
@@ -2034,7 +2034,7 @@ function PitchTimeMatrix() {
                     label,
                     octave,
                     0,
-                    that._logo.keySignature[0],
+                    that._logo.turtles.ithTurtle(0).singer.keySignature,
                     false,
                     null,
                     that._logo.errorMsg,
@@ -2052,15 +2052,13 @@ function PitchTimeMatrix() {
                     null
                 );
             } else if (condition === "drumblocks") {
-                if (
-                    that._logo.instrumentNames[0] === undefined ||
-                    that._logo.instrumentNames[0].indexOf(label) === -1
-                ) {
-                    if (that._logo.instrumentNames[0] === undefined) {
-                        that._logo.instrumentNames[0] = [];
-                    }
+                let tur = that._logo.turtles.ithTurtle(0);
 
-                    that._logo.instrumentNames[0].push(label);
+                if (
+                    tur.singer.instrumentNames.length === 0 ||
+                    tur.singer.instrumentNames.indexOf(label) === -1
+                ) {
+                    tur.singer.instrumentNames.push(label);
                     if (label === DEFAULTVOICE) {
                         that._logo.synth.createDefaultSynth(0);
                     }
@@ -2269,7 +2267,7 @@ function PitchTimeMatrix() {
                 sortableList.push([
                     noteToFrequency(
                         this.rowLabels[i] + this.rowArgs[i],
-                        this._logo.keySignature[0]
+                        this._logo.turtles.ithTurtle(0).singer.keySignature
                     ),
                     this.rowLabels[i],
                     this.rowArgs[i],
@@ -2348,7 +2346,7 @@ function PitchTimeMatrix() {
 
             if (i === 0) {
                 this._sortedRowMap.push(0);
-            } else if (i > 0 && obj[1] === last(this.rowLabels)) {
+            } else if (i > 0 && obj[1] !== "hertz" && obj[1] === last(this.rowLabels)) {
                 console.debug(
                     "skipping " + obj[1] + " " + last(this.rowLabels)
                 );
@@ -3259,7 +3257,7 @@ function PitchTimeMatrix() {
             switch (this._logo.tupletRhythms[i][0]) {
                 case "simple":
                 case "notes":
-                    var tupletParam = [this._logo.tupletParams[i]];
+                    var tupletParam = [this._logo.tupletParams[this._logo.tupletRhythms[i][1]]];
                     tupletParam.push([]);
                     for (
                         var j = 2;

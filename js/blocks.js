@@ -1651,7 +1651,8 @@ function Blocks(activity) {
                         case "temperament":
                         case "timbre":
                             lockInit = true;
-                            this.reInitWidget(initialTopBlock, 1500);
+                            if (this.blockList[initialTopBlock].protoblock.staticLabels[0] == widgetTitle[x].innerHTML)
+                                this.reInitWidget(initialTopBlock, 1500);
                             break;
                     }
                 }
@@ -2160,10 +2161,12 @@ function Blocks(activity) {
                             case "temperament":
                             case "timbre":
                                 lockInit = true;
-                                this.reInitWidget(
-                                    that.findTopBlock(thisBlock),
-                                    1500
-                                );
+                                let _newTopBlock = that.findTopBlock(thisBlock);
+                                if (this.blockList[_newTopBlock].protoblock.staticLabels[0] == widgetTitle[i].innerHTML)
+                                    this.reInitWidget(
+                                        _newTopBlock,
+                                        1500
+                                    );
                                 break;
                         }
                     }
@@ -2345,7 +2348,12 @@ function Blocks(activity) {
             return true;
         }
         if (
-            type1 === "gridout" && type2 ==="gridin"
+            type1 === "pitchout" && type2 === "anyin"
+        ) {
+            return true;
+        }
+        if (
+            type1 === "gridout" && type2 === "anyin"
         ) {
             return true;
         }
@@ -2517,6 +2525,21 @@ function Blocks(activity) {
             for (var b = 0; b < this.dragGroup.length; b++) {
                 this.moveBlockRelative(this.dragGroup[b], dx, dy);
             }
+        }
+    };
+
+    /*
+     * Moves all blocks except given stack
+     * @param blk - exception
+     * @param dx - delta x 
+     * @param dy - delta y
+     * @public
+     * @return {void}
+     */
+    this.moveAllBlocksExcept = function(blk, dx, dy) {
+        for (let block in this.blockList){
+            let topBlock = this.blockList[this.findTopBlock(block)];
+            if (topBlock !== blk) this.moveBlockRelative(block, dx, dy);
         }
     };
 
@@ -4290,11 +4313,7 @@ function Blocks(activity) {
     this._newLocalArgBlock = async function(name) {
         // name === 1, 2, 3, ...
         var blkname = "arg_" + name;
-        if ("myArg_" + name in this.protoBlockDict) {
-            return;
-        }
-
-        if (blkname in this.protoBlockDict) {
+        if ("myArg_" + blkname in this.protoBlockDict) {
             return;
         }
 
@@ -5210,7 +5229,6 @@ function Blocks(activity) {
                         break;
                     case "namedbox":
                     case "namedarg":
-                    case "outputtools":
                         blockItem = [
                             b,
                             [myBlock.name, { value: myBlock.privateData }],
@@ -5235,7 +5253,8 @@ function Blocks(activity) {
                     "nameddo",
                     "namedcalc",
                     "nameddoArg",
-                    "namedcalcArg"
+                    "namedcalcArg",
+                    "outputtools"
                 ].indexOf(myBlock.name) !== -1
             ) {
                 blockItem = [
@@ -6258,7 +6277,7 @@ function Blocks(activity) {
                         var value = args[1];
                         that.blockList[thisBlock].privateData = value;
                         that.blockList[thisBlock].overrideName = value;
-                    }
+                    };
                     this._makeNewBlockWithConnections(
                         "outputtools",
                         blockOffset,
@@ -7071,11 +7090,12 @@ function Blocks(activity) {
                     break;
                 }
             }
+            let parentExpandableBlk = this.insideExpandableBlock(thisBlock);
             myBlock.connections[0] = null;
 
             // Add default block if user deletes all blocks from
             // inside the note block.
-            this.addDefaultBlock(parentBlock, thisBlock);
+            this.addDefaultBlock(parentExpandableBlk, thisBlock);
         }
 
         if (myBlock.name === "start" || myBlock.name === "drum") {
@@ -7083,7 +7103,10 @@ function Blocks(activity) {
             var turtleNotInTrash = 0;
             for (var i = 0; i < this.turtles.turtleList.length; i++) {
                 if (!this.turtles.turtleList[i].inTrash) {
-                    turtleNotInTrash += 1;
+                    // Don't count companion turtle.
+                    if (this.turtles.turtleList[i].companionTurtle === undefined) {
+                        turtleNotInTrash += 1;
+                    }
                 }
             }
 
@@ -7204,8 +7227,8 @@ function Blocks(activity) {
             if (typeof this.blockList[blk].protoblock.updateParameter === "function") {
                 value = this.blockList[blk].protoblock.updateParameter(logo, turtle, blk);
             } else {
-                if (name in this.evalParameterDict) {
-                    eval(this.evalParameterDict[name]);
+                if (name in logo.evalParameterDict) {
+                    eval(logo.evalParameterDict[name]);
                 } else {
                     return;
                 }

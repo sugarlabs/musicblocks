@@ -457,7 +457,7 @@ saveAbcOutput = function(logo) {
     for (let t in logo.notation.notationStaging) {
         logo.notationOutput +=
             "K:" +
-            logo.keySignature[t]
+            logo.turtles.ithTurtle(t).singer.keySignature
                 .toUpperCase()
                 .replace(" ", "")
                 .replace("♭", "b")

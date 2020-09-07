@@ -221,13 +221,15 @@ function setupExtrasBlocks() {
 
             if (logo.blocks.blockList[args[0]].name === "start") {
                 let thisTurtle = logo.blocks.blockList[args[0]].value;
+                let tur = logo.turtles.ithTurtle(thisTurtle);
                 console.debug("run start " + thisTurtle);
+
                 logo.initTurtle(thisTurtle);
-                logo.turtles.turtleList[thisTurtle].queue = [];
-                logo.parentFlowQueue[thisTurtle] = [];
-                logo.unhighlightQueue[thisTurtle] = [];
-                logo.parameterQueue[thisTurtle] = [];
-                logo.turtles.turtleList[thisTurtle].running = true;
+                tur.queue = [];
+                tur.parentFlowQueue = [];
+                tur.unhighlightQueue = [];
+                tur.parameterQueue = [];
+                tur.running = true;
                 logo.runFromBlock(logo, thisTurtle, args[0], 0, receivedArg);
             } else {
                 return [args[0], 1];
@@ -380,15 +382,13 @@ function setupExtrasBlocks() {
             let name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
             let blockNumber = logo.blocks.blockList.length;
 
-            let x = logo.turtles.turtleX2screenX(
-                logo.turtles.turtleList[turtle].x
-            );
-            let y = logo.turtles.turtleY2screenY(
-                logo.turtles.turtleList[turtle].y
-            );
+            let tur = logo.turtles.ithTurtle(turtle);
 
-            // We need to wait for the new block to load before continuing.
-            logo.doWait(turtle, 1);
+            let x = logo.turtles.turtleX2screenX(tur.x);
+            let y = logo.turtles.turtleY2screenY(tur.y);
+
+            // We need to wait for the new block to load before continuing
+            tur.doWait(1);
 
             // We special case note blocks.
             //.TRANS: a musical note consisting of pitch and duration
@@ -778,15 +778,16 @@ function setupExtrasBlocks() {
         }
 
         flow(args, logo, turtle) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (args.length === 1) {
                 let bpmFactor =
-                    TONEBPM /
-                    logo.bpm[turtle].length > 0 ? last(logo.bpm[turtle]) : Singer.masterBPM;
+                    TONEBPM / tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
 
                 let noteBeatValue = bpmFactor / (1 / args[0]);
-                logo.previousTurtleTime[turtle] = logo.turtleTime[turtle];
-                logo.turtleTime[turtle] += noteBeatValue;
-                logo.doWait(turtle, args[0]);
+                tur.singer.previousTurtleTime = tur.singer.turtleTime;
+                tur.singer.turtleTime += noteBeatValue;
+                tur.doWait(args[0]);
             }
         }
     }
@@ -814,7 +815,7 @@ function setupExtrasBlocks() {
         flow(args, logo, turtle) {
             if (args[0] !== null) {
                 console.debug(args[0].toString());
-                if (!logo.suppressOutput[turtle] && logo.turtleDelay > 0) {
+                if (!logo.turtles.ithTurtle(turtle).singer.suppressOutput && logo.turtleDelay > 0) {
                     logo.textMsg(args[0].toString());
                 }
             }
@@ -844,10 +845,26 @@ function setupExtrasBlocks() {
 
         flow(args, logo, turtle, blk) {
             let cblk = logo.blocks.blockList[blk].connections[1];
-            if (!logo.inStatusMatrix) {
+            if (logo.inOscilloscope && cblk !== null) {
+                let name = logo.blocks.blockList[cblk].value;
+                let turtle = -1;
+                for (let i = 0; i < logo.turtles.turtleList.length; i++) {
+                    if (!logo.turtles.turtleList[i].inTrash) {
+                        let turtleName = turtles.turtleList[i].name;
+                        if (turtleName === name) turtle = i;
+                    }
+                }
+                if (turtle > -1 && logo.oscilloscopeTurtles.indexOf(logo.turtles.turtleList[turtle]) < 0) logo.oscilloscopeTurtles.push(logo.turtles.turtleList[turtle])
+            } else if (!logo.inStatusMatrix) {
                 if (args.length === 1) {
                     if (args[0] !== null) {
-                        if (!logo.suppressOutput[turtle]) {
+                        let tur = logo.turtles.ithTurtle(turtle);
+
+                        if (!tur.singer.suppressOutput) {
+                            if (logo.blocks.blockList[cblk].name === "grid"){
+                                let temp = new DisplayGridBlock();    
+                                temp.flow(args,logo,turtle,blk);
+                            }
                             if (args[0] === undefined) {
                                 logo.textMsg("undefined");
                             } else if (args[0] === null) {
@@ -856,7 +873,7 @@ function setupExtrasBlocks() {
                                 logo.textMsg(args[0].toString());
                             }
                         } else if (logo.runningLilypond) {
-                            if (logo.inNoteBlock[turtle].length > 0) {
+                            if (tur.singer.inNoteBlock.length > 0) {
                                 logo.notation.notationMarkup(turtle, args[0].toString());
                             }
                         }
@@ -881,6 +898,7 @@ function setupExtrasBlocks() {
         }
     }
 
+    //DEPRECATED grid: now used with print block.
     class DisplayGridBlock extends FlowBlock {
         constructor() {
             super("displaygrid", _("display grid"));
@@ -902,6 +920,7 @@ function setupExtrasBlocks() {
                 [0, "displaygrid", x, y, [null, 1, null]],
                 [1, ["grid", { value: "Cartesian" }], 0, 0, [0]],
             ]);
+            this.hidden = this.deprecated = true;
         }
 
         flow(args, logo, turtle, blk) {
@@ -1060,8 +1079,8 @@ function setupExtrasBlocks() {
     new OpenProjectBlock().setup();
     new FloatToStringBlock().setup();
     new DrumBlock().setup();
-    new GridBlock().setup();
     new DisplayGridBlock().setup();
+    new GridBlock().setup();
     new VSpaceBlock().setup();
     new HSpaceBlock().setup();
     new WaitBlock().setup();

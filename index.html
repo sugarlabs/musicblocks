@@ -7,14 +7,10 @@
             concepts.
         </title>
 
-        <meta
-            name="viewport"
-            content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height"
-        />
-        <link
-            href="https://fonts.googleapis.com/icon?family=Material+Icons"
-            rel="stylesheet"
-        />
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height"/>
+
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+        <link href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="css/activities.css" />
         <link rel="stylesheet" href="dist/css/style.css" />
         <link rel="stylesheet" href="dist/css/keyboard.css" />
@@ -47,17 +43,17 @@
 
         <script src="lib/modernizr-2.6.2.min.js" defer></script>
 
-        <script src="lib/recorder.js" defer></script>
-
         <script src="lib/raphael.min.js" defer></script>
 
         <script src="lib/wheelnav.js" defer></script>
 
-        <link
-            rel="prefetch"
-            type="application/l10n"
-            href="./localization.ini"
-        />
+        <script src="lib/codejar/codejar.min.js" defer></script>
+
+        <script src="lib/codejar/highlight.pack.js" defer></script>
+
+        <script src="lib/astring.min.js" defer></script>
+
+        <link rel="prefetch" type="application/l10n" href="./localization.ini"/>
 
         <script data-main="js/loader" src="lib/require.js" defer></script>
 
@@ -66,11 +62,7 @@
         <link rel="icon" sizes="192x192" href="favicon.ico" />
         <meta id="theme-color" name="theme-color" content="#2196F3" />
 
-        <link
-            type="text/css"
-            href="fonts/material-icons.css"
-            rel="stylesheet"
-        />
+        <link type="text/css" href="fonts/material-icons.css" rel="stylesheet"/>
         <link rel="stylesheet" href="lib/materialize-iso.css" />
 
         <script src="lib/easeljs.min.js" defer></script>
@@ -119,6 +111,15 @@
     </head>
 
     <!-- #96D3F3-->
+    <div style="display: none;" id="chooseKeyDiv" tabindex="-1">
+    </div>
+    <div id="moveable" tabindex="-1">
+        <p>Solfege Pitch Preview</p>
+        <input class="radioBtn" type="radio" name="moveable" value="true">
+            <label for="moveabledo">Moveable Do</label>
+        <input class="radioBtn" type="radio" name="moveable" id="fixed" checked="checked" value="false">
+            <label for="fixed">Fixed</label>
+    </div>
 
     <body
         onload="init();"
@@ -421,18 +422,6 @@
                 tabindex="-1"
             ></div>
 
-            <div id="searchBar" tabindex="-1">
-                <input
-                    type="text"
-                    name="search"
-                    id="search"
-                    class="ui-autocomplete"
-                    placeholder="Search for Blocks"
-                    tabindex="-1"
-                />
-                <ul class="matches" id="searchResults"></ul>
-            </div>
-
             <div id="pastecode" tabindex="-1">
                 <input
                     type="text"
@@ -692,12 +681,32 @@
                                     >
                                 </li>
                                 <li>
-                                    <a 
-                                        id="wrapTurtle" 
+                                    <a
+                                        id="wrapTurtle"
                                         class="tooltipped"
                                         data-position="bottom"
                                         ><i class="material-icons md-48"
                                             >wrap_text</i
+                                        ></a
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        id="chooseKeyIcon"
+                                        class="tooltipped"
+                                        data-position="bottom"
+                                        ><i class="material-icons md-48"
+                                            >music_note</i
+                                        ></a
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        id="toggleJavaScriptIcon"
+                                        class="tooltipped"
+                                        data-position="bottom"
+                                        ><i class="material-icons md-48"
+                                            >code</i
                                         ></a
                                     >
                                 </li>
@@ -706,7 +715,7 @@
                                     id="aligns_merge_under_load"
                                     style="user-select: none; visibility: hidden;"
                                 >
-                                    <a style="color: transparent;">space</a>
+                                    <a style="color: transparent;">space&nbsp;&nbsp;&nbsp;</a>
                                 </li>
                                 <li>
                                     <a
@@ -799,5 +808,18 @@
             </div>
         </div>
         <!-- hideContents -->
+
+        <div id="searchBar" tabindex="-1">
+            <input
+                type="text"
+                name="search"
+                id="search"
+                class="ui-autocomplete"
+                placeholder="Search for Blocks"
+                tabindex="-1"
+            />
+            <ul class="matches" id="searchResults"></ul>
+        </div>
+
     </body>
 </html>

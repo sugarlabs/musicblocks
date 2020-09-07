@@ -28,21 +28,23 @@ also available.
       2. [Sharps and Flats](#SHARPS-AND-FLATS)
       3. [Adjusting Transposition](#ADJUST-TRANSPOSITION)
       4. [Summary of Pitch Movements](#PITCH-MOVEMENT)
-      5. [Dotted Notes](#DOTTED)
-      6. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
-      7. [Repeating Notes](#REPETITION)
-      8. [Swinging Notes and Tied Notes](#SWINGING)
-      9. [Set Volume, Crescendo, Staccato, and Slur Blocks](#MORE-TRANSFORMATIONS)
-      10. [Intervals](#INTERVALS)
-      11. [Inversion](#INVERSION)
-      12. [Backwards](#BACKWARDS)
-      13. [Setting Voice and Keys](#SETTING)
-      14. [Vibrato, Tremelo, et al.](#VIBRATO)
+      5. [Fixed and Movable Pitch Systems](#FIXED-AND-MOVABLE-PITCH-SYSTEMS)
+      6. [Dotted Notes](#DOTTED)
+      7. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
+      8. [Repeating Notes](#REPETITION)
+      9. [Swinging Notes and Tied Notes](#SWINGING)
+      10. [Set Volume, Crescendo, Staccato, and Slur Blocks](#MORE-TRANSFORMATIONS)
+      11. [Intervals](#INTERVALS)
+      12. [Inversion](#INVERSION)
+      13. [Backwards](#BACKWARDS)
+      14. [Setting Voice and Keys](#SETTING)
+      15. [Vibrato, Tremelo, et al.](#VIBRATO)
    3. [Voices](#VOICES)
    4. [Graphics](#GRAPHICS)
    5. [Beat](#BEAT)
    6. [Interactions](#INTERACTIONS)
    7. [Ensemble](#ENSEMBLE)
+   8. [Converters](#CONVERTERS)
 4. [Widgets](#WIDGETS)
     1. [Monitoring Status](#status)
     2. [Generating Chunks of Notes](#pitch-time)
@@ -63,6 +65,8 @@ also available.
     11. [Music Keyboard](#keyboard)
     12. [Changing Temperament](#temperament)
 5. [Beyond Music Blocks](#BEYOND-MUSIC-BLOCKS)
+    1. [LilyPond](#LILYPOND)
+    2. [JavaScript](#JAVASCRIPT)
 
 [APPENDIX: Palette Tables](#APPENDIX_1)
 
@@ -166,15 +170,24 @@ The pitch of the next block is specified using a *Pitch-name* block
 (`G` in `Octave 4`), which contains the notes `C D E F G A B`.
 
 The next block is specified using a *Scale-degree* block (the `5th note`
-in the scale, 'G', also in 'Octave 4'), `C == 1, D == 2, ...`
+in the scale, 'G', also in 'Octave 4'), `C == 1, D == 2, ...`. The
+*Scale-Degree* block has numbers like the *Number* block, but also has 
+an accidental so that the user may play pitches outside a given key.
+
+The next blocks is specified using a *Nth Modal Pitch* block. This
+block takes a number argument and turns it into the "nth pitch of 
+a given scale" with an index of 0 (i.e. C for C major is 0). Therefore
+in order to get `G`, we input the number 4. The octave argument will
+force the octave up or down; otherwise the user may just keep going up
+or down in either direction to go through scalar pitches of any mode.
 
 The next block is specified using a *Pitch-number* block (the `7th
-semi-tone` above `C` in `Octave 4`). The offset for the pitch number
-can be modified using the *Set-pitch-number-offset* block.
+semi-tone` above `C` in `Octave 4` is `G`). The offset for the pitch
+number can be modified using the *Set-pitch-number-offset* block.
 
 The pitch of the next block is specified using the *Hertz* block in
-conjunction with a *Number* block (`392` Hertz) , which corresponds to
-the frequency of the sound made.
+conjunction with a *Number* block (`392` Hertz is `G` in `Octave 4`),
+which corresponds to the frequency of the sound made.
 
 The octave is specified using a number block and is restricted to
 whole numbers. In the case where the pitch name is specified by
@@ -420,7 +433,7 @@ The *Register* block provides an easy way to modify the register
 used to bump the `Mi 4` note up by one octave and then to bump the
 `Sol 4` note down by one octave.
 
-#### <a name="PITCH-MOVEMENT"></a>3.2.4 Summary of Pitch Movements
+#### <a name="PITCH-MOVEMENT"></a>3.2.5 Summary of Pitch Movements
 
 | Representation | Pitch Movement | Properties |
 | --- | --- | --- |
@@ -429,12 +442,12 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 | | | -1=previous scalar pitch in current key and mode |
 | | | If the argument to scalar step is positive, it moves up the scale; if it is negative, it moves down the scale. |
 
-| Music Blocks |
+| Music Blocks Code for Scalar Step |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement1.svg "scalar") |
 | The example above demonstrates traveling up and down the major scale by moving an octave up from the starting note, do, one note at a time and then back down the same way. |
 
-| Standard Notation |
+| Standard Notation with Scalar Step |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement1.png "scalar step up and down") |
 
@@ -446,11 +459,11 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 | | | An argument of -12 will shift down one octave. |
 | | | An argument of zero will not change the pitch. |
 
-| Music Blocks |
+| Music Blocks Code with Scalar Transpose |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement2.svg "semi-tone transposition") |
 
-| Standard Notation |
+| Standard Notation for Scalar Transpose |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement2.png "semi-tone transposition") |
 
@@ -462,24 +475,24 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 | | | For example: Transposing C-D-E-F by 4 (fifth) will give us G-A-B-C
 | | | To transpose an octave: shift by the mode length (7 in major scales) up or down. |
 
-| Music Blocks |
+| Music Blocks for Set Key and Movable Do | 
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement3.svg "scalar transposition") |
 
-| Standard Notation |
+| Standard Notation for Set Key and Movable Do |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement3.png "scalar transposition") |
 
 | Representation | Pitch Movement | Properties |
 | --- | --- | --- |
 | Scale Degree | Scalar | The key block sets the key and mode. |
-| | | The scale degree blocks indicate which position the pitch is taking in the scale relative to the tonic. |
+| | | The scale degree blocks indicate which position the pitch is taking in the scale relative to the tonic which is "scale degree 1". |
 
-| Music Blocks |
+| Music Blocks Code with Scale Degrees 1-5 |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement4.svg "scale degree") |
 
-| Standard Notation |
+| Standard Notation for Scale Degrees 1-5 |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement4.png "scale degree") |
 
@@ -490,11 +503,11 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 | | | For example, in C major - Do is C, Re is D, Mi is E, etc. |
 | | | In F major - Do is F, Re is G, Mi is A |
 
-| Music Blocks |
+| Music Blocks Code with Set Key and Movable Do |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement5.svg "moveable do") |
 
-| Standard Notation |
+| Standard Notation Code for Set Key and Movable Do |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement5.png "moveable do") |
 
@@ -502,15 +515,172 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 | --- | --- | --- |
 | Movable “Do” | Advanced transposition by mode | You also have the option of changing the mode to Minor, Major, Chromatic, and many other exotic modes like hirajoshi, as shown in the example below. |
 
-| Music Blocks |
+| Music Blocks for Set Key and Scalar Step |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement6.svg "moveable do") |
 
-| Standard Notation |
+| Standard Notation with Set Key and Scalar Step |
 | --- |
 | ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchmovement6.png "moveable do") |
 
-#### <a name="DOTTED"></a>3.2.5 Dotted Notes
+#### <a name="FIXED-AND-MOVABLE-PITCH-SYSTEMS"></a>3.2.5 Pitch Systems: Fixed and Movable and Subsystems
+
+Music Blocks allows users to express and explore musical ideas in a
+variety of different systems. The main systems of expression are fixed
+and movable.
+
+**Fixed and Movable Systems**
+
+Fixed pitch systems represent pitches in an absolute way. Pitches in a
+fixed system do not change, regardless of a tonal context (such as key
+or mode). Movable systems, on the other hand, represent pitches in a
+relative way based on their tonal context.
+
+An example of a fixed system is Alphabet Notation. Pitches are
+expressed as `A`, `B`, `C`, `D`, `E`, `F`, and `G`. Regardless of
+whether the key is C major or G minor, the pitch of `G` is the
+same. In Alphabet Notation, pitches are the same ("fixed") regardless
+of the context.
+
+![Alphabet Fixed
+ System](https://rawgit.com/sugarlabs/musicblocks/master/guide/systems-alphabet.svg
+ "Alphabet (Fixed) System")
+
+An example of a movable system is Scale Degree. Pitches are expressed
+as `1`, `2`, `3`, `4`, `5`, `6`, and `7`. For C major, these pitches
+are `C`, `D`, `E`, `F`, `G`, `A`, and `B`. For G (natural) minor,
+these pitches are `G`, `A`, `Bb`, `C`, `D`, `Eb`, and `F`. For D
+dorian, these pitches are `D`, `E`, `F`, `G`, `A`, `B`, and `C`. In
+all three examples, the pitches are determined by the tonal context.
+
+![Scale Degree Movable
+ System](https://rawgit.com/sugarlabs/musicblocks/master/guide/systems-scale-degree.svg
+ "Scale Degree (Movable) System")
+
+Solfege is an example of a system that can be either fixed or movable;
+it can either be a fixed system (Fixed Solfege) or a movable system
+(Movable Solfege).
+
+Fixed Solfege works like the alphabet system; `La` is `A`, `Ti` is
+`B`, `Do` is `C`, etc. Context does not affect the sounding
+pitch. Movable Solfege works like the Scale Degree system; for any
+major, `Do` is 1st scale degree, `Re` is 2nd, `Mi` is 3rd, `Fa` is
+4th, etc. Hence, in Movable Solfege in the key of G (natural) minor,
+`Do` is `G`, `Re` is `A`, et al.
+
+![Movable Solfege
+ System](https://rawgit.com/sugarlabs/musicblocks/master/guide/systems-movable-solfege.svg
+ "Movable Solfege System")
+
+Music Blocks users can create and preview code in both Fixed Solfege
+and Movable Solfege. Teachers and learners may use either system (or
+both) to express their musical ideas as well as deepen their
+understanding of music.
+
+**Using Tonal Context with Movable Systems**
+
+For movable systems an important point of context is its key and
+mode. For "C Major", the key is "C" and the mode is "Major" (also
+called Ionian). Key and mode are important as they define the tonal
+framework, i.e., which pitches are "in" and which are "out". It also
+defines the function of the pitches within the framework. This is why
+for scale degrees `1`, `2`, `3`, `4`, and `5`, the expected result for
+C major is `C`, `D`, `E`, `F`, and `G` (skipping any sharps/flats),
+while those same scale degrees for D major are `D`, `E`, `F#`, `G`,
+and `A`. The set of pitches that make up C major have no sharps or
+flats, so they are skipped. D major has two sharps, `F#` and `C#`. The
+`F#` is the 3rd scale degree for D major.
+
+Scale Degree with *Set Key* is a very powerful tool for expression. It
+is also very common in music pedagogy. However, because the number
+values 1-7 are hard wired into this system, it is a tool that works
+best to express seven-pitch tonal frameworks (e.g. major, minor, and
+other common seven pitch scales). For musical ideas where a more
+purely mathematical form of expression is required, Music Blocks
+offers the user the *nth Modal Pitch* block.
+
+*nth Modal Pitch* is similar to *Scale Degree* in that it is a movable
+system that uses numbers to express pitches. However, unlike *Scale
+Degree*, *nth Modal Pitch* starts at `0`, allows for negative
+numbers, and is not restricted to a seven-pitch tonal framework. `0`
+is the first pitch of the mode, `1` is the next pitch, `2` is the
+pitch above that, etc. `-1` is the pitch before the first pitch of
+the mode. This tool is expecially helpful for expressing a musical
+idea that requires computation as you can run computations directly
+on the number value. It is also helpful if you are, for example,
+creating music in a whole tone (six note) pitch space. In the case of
+*Set Key* set to "whole tone", `6` would be the octave above.
+
+**Pitch Number, MIDI, and Set Pitch Number Offset**
+
+*Pitch Number* is similar to *nth Modal Pitch* in that it is a
+zero-based, mathematical system to express pitches. However, unlike
+*nth Modal Pitch*, *Pitch Number* disregards any tonal framework. It
+is also chromatic by default, meaning that its pitch space includes
+the sharp/flat pitches (black keys on piano) as well as the natural
+pitches (white keys on piano). By default, middle C (C_4) is `0`. The
+C major scale in the 4th octave is `0`, `2`, `4`, `5`, `7`, `9`, and
+`11`. `12` is the C an octave above middle C (C_5). This system is
+useful mathematically, but because it disregards key, it is difficult
+to control when creating music. That being said, fretted instruments
+such as ukulele and guitar use this system to express pitch, so it is
+a good system for expressing how these instruments work.
+
+MIDI also uses a similar system to *Pitch Number* to express pitches,
+but the 0 is offset from Music Blocks' default. In order to change the
+sounding pitch of `0` for *Pitch Number*, use *set pitch number
+offset*. This makes *Pitch Number* blocks behave as a relative system
+as it transposes the pitches up or down accordingly (but has no effect
+on key).
+
+**Two Subsystems for Movable**
+
+For Movable Do, there exists yet two more systems. One system, which
+we call `Movable=Do`, allows the user to express solfege syllables in
+relation to the Major mode. Therefore, if a user were to specify A
+minor, then La would be A, the first scale degree in A Minor. The
+other system, which we call `Movable=La` allows the user to express
+solfege in relation to the particular mode specified. Therefore, if a
+user were to specify A Minor, then Do would be A. *Scale Degree* works
+like `Movable=La` by default such that `1` is always the first pitch
+of a given mode.
+
+Because some users may want to explicitly spell out all of the pitches
+regardless of the chosen key, we allow them to use Scale Degree with
+the *Movable Do* block (remember, Scale Degree works like Movable=La
+by default). Please see [this
+code](https://rawgithub.com/sugarlabs/musicblocks/master/examples/2-spelling-systems-for-Scale-Degree.html)
+as an example.
+
+The following chart describes the behavior of different blocks
+depending on whether or not a *Movable Do* block is present.
+
+| Block(s) | Fixed or Movable? (Do or La?) | Set Key Transformation? |
+| --- | --- | --- |
+| Alphabet Pitch | Fixed | No effect. |
+| Solfege | Fixed by default  | No effect. |
+| Solfege and Movable=Do | Specified via "movable" block set to Do | Yes. |
+| Solfege and Movable=La | Specified via "movable" block set to La | Yes. Works like Scale Degree. |
+| n^th modal pitch | Movable | Yes. Good for modes of any length. |
+| Scale Degree | Movable | Yes. Most useful for 7 note systems. Works just like Movable=La for Solfege by default. |
+| Scale Degree and Movable=Do | Movable | Yes. When preceded by Movable=Do, the user can be explicit in their spelling. |
+| Scalar Step | Movable | Yes. Navigates up/down within *nth modal pitch* space. |
+| Scalar Interval | Movable | Yes. Adds above/under within *nth modal pitch* space. |
+| Scalar Inversion | Movable | Yes. Inversion around a specified axis within *nth modal pitch* space. |
+| Pitch Number | Movable | No effect. Pitches can be transformed via Set Pitch Number Offset. |
+
+Illustrative Examples:
+
+The following example exposes how the Scale Degree functionality
+combines math and musical modifiers. When combining numbers and
+accidentals, it recreates the same functionality as the *Scale Degree*
+block.
+
+![Scale Degree Improv Example](https://rawgit.com/sugarlabs/musicblocks/master/guide/scale-degree-improv.svg "Scale Degree Improv")
+
+[Scale Degree Improv](https://rawgit.com/sugarlabs/musicblocks/master/examples/Scale-Degree-Improv.html)
+
+#### <a name="DOTTED"></a>3.2.6 Dotted Notes
 
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform4.svg
@@ -535,11 +705,9 @@ The chart below shows two common examples, dotted quarter and dotted
 eighth, and how to achieve them with either the dot block or by direct
 calculation into a note's note value.
 
-![alt
- tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/DotsChart.svg
- "using dotted notes")
+![alt tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/DotsChart.svg "using dotted notes")
 
-#### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.6 Changing Note(s) duration via Mathematical Operations
+#### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.7 Changing Note(s) duration via Mathematical Operations
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform5.svg "Changing note duration for a note or notes")
 
@@ -559,7 +727,7 @@ decreased over time, at each repetition.
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
 
-#### <a name="REPETITION"></a>3.2.7 Repeating Notes
+#### <a name="REPETITION"></a>3.2.8 Repeating Notes
 
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform6.svg
@@ -573,7 +741,7 @@ In the example, on the left, the result would be `Sol, Re, Sol, Sol,
 Re, Sol, Sol, Re, Sol, Sol, Re, Sol`; on the right the result would be
 `Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol`.
 
-#### <a name="SWINGING"></a>3.2.8 Swinging Notes and Tied Notes
+#### <a name="SWINGING"></a>3.2.9 Swinging Notes and Tied Notes
 
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform7.svg
@@ -596,7 +764,7 @@ notes must be identical in pitch, but can vary in rhythm.)
  tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/TiesChart.svg
  "using notes with ties")
 
-#### <a name="MORE-TRANSFORMATIONS"></a>3.2.9 Set Volume, Crescendo, Staccato, and Slur
+#### <a name="MORE-TRANSFORMATIONS"></a>3.2.10 Set Volume, Crescendo, Staccato, and Slur
 
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform8.svg
@@ -642,7 +810,7 @@ The *Slur* block lengthens the sustain of notes&mdash;running longer than
 the noted duration and blending it into the next note&mdash;while
 maintaining the specified rhythmic value of the notes.
 
-#### <a name="INTERVALS"></a>3.2.10 Intervals
+#### <a name="INTERVALS"></a>3.2.11 Intervals
 
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform9.svg
@@ -689,7 +857,7 @@ double diminishment.
 The *Semi-tone interval measure* block can be used to measure the
 number of half-steps between two pitched.
 
-#### <a name= "INVERSION"></a>3.2.11 Inversion
+#### <a name= "INVERSION"></a>3.2.12 Inversion
 
 The *Invert* block will rotate a series of notes around a target
 note. There are three different modes of the *Invert* block: *even*,
@@ -798,7 +966,7 @@ midway between `C5` and `C♯5`.  In the *invert (scalar)* example,
 notes are inverted around `C5`, by scalar steps rather than
 half-steps.
 
-#### <a name="BACKWARDS"></a>3.2.12 Backwards
+#### <a name="BACKWARDS"></a>3.2.13 Backwards
 
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform11.svg
@@ -818,7 +986,7 @@ Note that all of the blocks inside a *Backward* block are reverse, so
 use this feature with caution if you include logic intermixed with
 notes.
 
-#### <a name= "SETTING"></a>3.2.13 Setting Voice and Keys
+#### <a name= "SETTING"></a>3.2.14 Setting Voice and Keys
 
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform12.svg
@@ -847,7 +1015,7 @@ The *Define mode* block can be used to define a custom mode by
 defining the number and size of the steps within an octave. You can
 use your custom mode with the *Set key* block.
 
-#### <a name="VIBRATO"></a>3.2.14 Vibrato, Tremelo, et al.
+#### <a name="VIBRATO"></a>3.2.15 Vibrato, Tremelo, et al.
 
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform15.svg
@@ -1212,6 +1380,95 @@ The *Set mouse* block sends a stack of blocks to be run by the specified mouse.
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/setturtle_block.svg
  "set mouse")
+
+## <a name="CONVERTERS"></a>3.8 Converters
+
+Converters are used to transform one form of inputs into other, more usable form of outputs. This section of the guide will talk about the various conversion options Music Blocks has to offer.
+
+Generalized shape of a converter is:
+
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/number2pitch_block.svg
+ "Generalized converter")
+
+where the right argument is converted accordingly, and output is received on the left side.
+
+**Note:** Before an introduction of the different types of converters, a little intoduction on Y staff in Music Blocks. Staff is a set of horizontal lines and spaces and different positions along Y axis represents different notes. [C, D, E, F, G, A, B]
+
+![alt
+ tag](treble.svg
+ "Treble clef staff")
+
+### <a name="y-to-pitch"></a>4.1 Y to Pitch
+
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/ytopitch_block.svg
+ "Y to Pitch converter")
+
+This converter takes input in the form of a number that represents Staff Y position in pixels, and processes the value such that it can be used with certain pitch blocks (pitch number, nth modal pitch, pitch) to produce notes corresponding to given Staff Y position as an argument.  
+Additionally, the block can be plugged into a print block to view the converted note value.
+
+### <a name="pitch-converter"></a>4.2 Pitch converter
+
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/outputtools_block.svg
+ "Pitch converter block")
+
+Pitch converter offers a range of options through a pie-menu based interface and it can potentially convert or extract info out of the current playing pitch using the current pitch block as an input. 
+It can also take custom input in form or solfege, hertz, pitch number etc.
+
+All these options are provided in the form of a pie-menu which can be accessed simply by clicking on the converter.
+
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/pitchconverter.svg
+ "Pitch converter block")
+
+Below explained is the utility of every conversion option:
+
+#### **1. Letter class:**
+Prints the alphabet data of the note being played e.g A, B, C, D, E, F, G. It doesn't print any info regarding accidentals.
+
+#### **2. Solfege Syllable:**
+Similar to Letter class, returns the data in form of solfege e.g do, re, mi.
+It too, gives no info regarding accidentals.
+
+#### **3. Pitch class:**
+Returns a number between 0 to 11, corresponding to the note played, where C is 0 and B is 11. Each increase in the number signifies an increase by one semitone.
+
+#### **4. Scalar class:**
+Returns a number between 1-7 corresponding to the scale degree of the note being played, with reference to the chosen mode. Provides no info regarding accidentals.
+
+#### **5. Scale Degree:**
+Intuitively, returns the scale degree of the note being played with reference to the chosen mode. It can also be thought of as Scalar class with accidentals.
+
+#### **6. N^th Degree:**
+Zero-based index of the degree of note being played in the chosen mode.
+
+#### **7. Pitch in Hertz:**
+Returns the value in hertz of the pitch of the note being currently played.
+
+#### **8. Pitch Number:**
+Value of the pitch of the note currently being played. It is different from Pitch class in the way that it can go below 0 and above 11 depending upon the octave.
+
+#### **9. Staff Y:**
+Returns the Y staff position of the note being played according to staff dimensions. It takes into account only the letter class, no accidental info is processed.
+
+### <a name="number-2-octave"></a>4.3  Number to Octave  
+  
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/number2octave_block.svg
+ "Y to Pitch converter")
+
+This converter takes a numeric value which denotes pitch number and returns the octave corresponding to that pitch number.
+
+### <a name="number-2-pitch"></a>4.3  Number to Pitch
+
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/number2pitch_block.svg
+ "Y to Pitch converter")
+
+This converter takes a numeric value which denotes pitch number and returns the pitch name corresponding to that pitch number. No octave is inferred.
+
 
 ## <a name="WIDGETS"></a>Widgets
 
@@ -2125,13 +2382,16 @@ The *Drag* button will drag the widget.
 
 The *Close* button will close the widget.
 
-## <a name="BEYOND-MUSIC-BLOCKS"></a>Beyond Music Blocks
+## <a name="BEYOND-MUSIC-BLOCKS"></a>5. Beyond Music Blocks
 
 [Previous Section (4. Widgets)](#WIDGETS) | [Back to Table of Contents](#TOC)
 
 Music Blocks is a waypoint, not a destination. One of the goals is to
-point the learner towards other powerful tools. One such tool is
-[Lilypond](http://lilypond.org), a music engraving program.
+point the learner towards other powerful tools.
+
+## <a name="LILYPOND"></a>5.1 Lilypond
+
+One such tool is [Lilypond](http://lilypond.org), a music engraving program.
 
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/lilypond1.svg
@@ -2174,6 +2434,66 @@ e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
  "sheet music")
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523043053377623&run=True)
+
+## <a name="JAVASCRIPT"></a>5.2 JavaScript
+
+There are practical limits to the size and complexity of Music Blocks
+programs. At some point we expect Music Blocks programmers to move on
+to text-based programming languages. To facilitate this transition,
+there is a JavaScript widget that will convert your Music Blocks
+program into JavaScript.
+
+The JavaScript code is written and viewed on the **JavaScript Editor**
+widget which can be opened by pressing on the "*Toggle JavaScript
+Editor*" (`<>`) button in the auxilliary menu.
+
+### Example code
+
+For the block stacks (and mouse art generated after running),
+
+![Example Project](../js/js-export/samples/mode-up-down.png)
+
+the following code is generated:
+
+```
+let action = async mouse => {
+    await mouse.playNote(1 / 4, async () => {
+        await mouse.playPitch("do", 4);
+        console.log(mouse.NOTEVALUE);
+        return mouse.ENDFLOW;
+    });
+    let box1 = 0;
+    let box2 = 360 / mouse.MODELENGTH;
+    for (let i0 = 0; i0 < mouse.MODELENGTH * 2; i0++) {
+        await mouse.playNote(1 / 4, async () => {
+            if (box1 < mouse.MODELENGTH) {
+                await mouse.stepPitch(1);
+                await mouse.turnRight(box2);
+            } else {
+                await mouse.stepPitch(-1);
+                await mouse.turnLeft(box2);
+            }
+            await mouse.goForward(100);
+            return mouse.ENDFLOW;
+        });
+        box1 = box1 + 1;
+    }
+    return mouse.ENDFLOW;
+};
+new Mouse(async mouse => {
+    await mouse.clear();
+    await mouse.setInstrument("guitar", async () => {
+        await mouse.setColor(50);
+        await action(mouse);
+        return mouse.ENDFLOW;
+    });
+    return mouse.ENDMOUSE;
+});
+MusicBlocks.run();
+```
+
+Here's the complete [API](../js/js-export/samples/sample.js) of
+methods, getters, setters.
 
 ## <a name="APPENDIX_1"></a>Appendix: Palette Tables
 

@@ -8,6 +8,13 @@
 // You should have received a copy of the GNU Affero General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+const changeImage = (imgElement ,from ,to) => {
+    oldSrc = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(from)));
+    newSrc = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(to)));
+    if (imgElement.src === oldSrc){
+        imgElement.src = newSrc
+    }
+}
 
 function format(str, data) {
     str = str.replace(/{([a-zA-Z0-9.]*)}/g, function(match, name) {
@@ -509,7 +516,7 @@ function processPluginData(
     if (newPalette) {
         try {
             console.debug("CALLING makePalettes");
-            palettes.makePalettes();
+            palettes.makePalettes(1);
         } catch (e) {
             console.debug("makePalettes: " + e);
         }
@@ -634,7 +641,6 @@ function processPluginData(
 
     setTimeout(function() {
         palettes.show();
-        palettes.bringToTop();
     }, 2000);
 
     // Return the object in case we need to save it to local storage.
@@ -721,7 +727,7 @@ function processMacroData(macroData, palettes, blocks, macroDict) {
             blocks.addToMyPalette(name, macroDict[name]);
         }
 
-        palettes.makePalettes();
+        palettes.makePalettes(1);
     }
 }
 
@@ -1294,11 +1300,12 @@ function closeBlkWidgets (name) {
  *
  * @param {Object} obj - component object (controller) to which member
  * of its model and view are to be imported
+ * @param {String} className - used for adding members of JS based MB API classes
  * @param {*[]} modelArgs - constructor arguments for model
  * @param {*[]} viewArgs - constructor arguments for view
  * @returns {void}
  */
-function importMembers(obj, modelArgs, viewArgs) {
+function importMembers(obj, className, modelArgs, viewArgs) {
     /**
      * Adds methods and variables of one class, to another class' instance.
      *
@@ -1343,6 +1350,11 @@ function importMembers(obj, modelArgs, viewArgs) {
     };
 
     let cname = obj.constructor.name;   // class name of component object
+
+    if (className !== "" && className !== undefined) {
+        addMembers(obj, eval(className));
+        return;
+    }
 
     // Add members of Model (class type has to be controller's name + "Model")
     addMembers(obj, eval(cname + "." + cname + "Model"), modelArgs);

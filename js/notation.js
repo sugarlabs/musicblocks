@@ -31,12 +31,12 @@ class Notation {
     constructor(logo) {
         this._logo = logo;
 
-        // _notationStaging is used to aggregate all of the notes played in a performance.
+        // _notationStaging is used to aggregate all of the notes played in a performance
         this._notationStaging = {};
         this._notationDrumStaging = {};
-        // _markup is used to aggregate markup for individual notes.
+        // _markup is used to aggregate markup for individual notes
         this._markup = {};
-        // _pickup is used to manage the specification of a pickup.
+        // _pickup is used to manage the specification of a pickup
         this._pickupPOW2 = {};
         this._pickupPoint = {};
     }
@@ -137,14 +137,10 @@ class Notation {
      * @param drum
      * @returns {void}
      */
-    doUpdateNotation(
-        note,
-        duration,
-        turtle,
-        insideChord,
-        drum
-    ) {
+    doUpdateNotation(note, duration, turtle, insideChord, drum) {
         let obj = durationToNoteValue(duration);
+
+        let tur = this._logo.turtles.ithTurtle(turtle);
 
         this._notationStaging[turtle].push([
             note,
@@ -153,31 +149,19 @@ class Notation {
             obj[2],
             obj[3],
             insideChord,
-            this._logo.staccato[turtle].length > 0 && last(this._logo.staccato[turtle]) > 0
+            tur.singer.staccato.length > 0 && last(tur.singer.staccato) > 0
         ]);
 
         // If no drum is specified, add a rest to the drum line.
         // Otherwise, add the drum.
         if (drum.length === 0) {
             this._notationDrumStaging[turtle].push([
-                ["R"],
-                obj[0],
-                obj[1],
-                obj[2],
-                obj[3],
-                insideChord,
-                false
+                ["R"], obj[0], obj[1], obj[2], obj[3], insideChord, false
             ]);
         } else if (["noise1", "noise2", "noise3"].indexOf(drum[0]) === -1) {
             let drumSymbol = getDrumSymbol(drum[0]);
             this._notationDrumStaging[turtle].push([
-                [drumSymbol],
-                obj[0],
-                obj[1],
-                obj[2],
-                obj[3],
-                insideChord,
-                false
+                [drumSymbol], obj[0], obj[1], obj[2], obj[3], insideChord, false
             ]);
         }
 
@@ -187,9 +171,9 @@ class Notation {
             if (turtle in this._markup) {
                 for (let i = 0; i < this._markup[turtle].length; i++) {
                     let markup = this._markup[turtle][i];
-                    if (typeof markup === "number") { // Hertz block
+                    if (typeof markup === "number") {   // Hertz block
                         this._notationMarkup(turtle, toFixed2(markup), false);
-                    } else if (markup.length > 0) { // Print block
+                    } else if (markup.length > 0) {     // Print block
                         this._notationMarkup(turtle, markup, true);
                     }
                 }

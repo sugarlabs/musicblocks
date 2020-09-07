@@ -76,7 +76,7 @@ function Toolbar() {
     };
 
     // let wrapTurtleTooltipData = "Wrap Turtle Off";
-    
+
     this.renderWrapIcon = function() {
         let wrapIcon = docById("wrapTurtle");
         let wrapButtonTooltipData = "Turtle Wrap Off";
@@ -204,15 +204,7 @@ function Toolbar() {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     var saveWAV = docById("save-wav");
 
-                    // Until we fix #1744, disable recorder on FF
-                    // if (platform.FF) {
-                    saveWAV.disabled = true;
-                    saveWAV.className = "grey-text inactiveLink";
-                    // } else {
-                    //    saveWAV.onclick = function () {
-                    //        wave_onclick();
-                    //    };
-                    // }
+                    saveWAV.onclick = wave_onclick;
 
                     var saveLY = docById("save-ly");
 
@@ -397,6 +389,18 @@ function Toolbar() {
         };
     };
 
+    this.renderChooseKeyIcon = function(onclick) {
+        var chooseKeyIcon = docById("chooseKeyIcon");
+        docById("chooseKeyDiv").style.display = "none";
+        chooseKeyIcon.onclick = () => {
+            onclick();
+        };
+    };
+
+    this.renderJavaScriptIcon = function(onclick) {
+        docById("toggleJavaScriptIcon").onclick = () => onclick();
+    };
+
     this.renderLanguageSelectIcon = function(languageBox) {
         var languageSelectIcon = docById("languageSelectIcon");
         languageSelectIcon.onclick = function() {
@@ -519,6 +523,8 @@ function Toolbar() {
             ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
             ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
             ["mergeWithCurrentIcon", _("Merge with current project")],
+            ["chooseKeyIcon", _("Set Pitch Preview")],
+            ["toggleJavaScriptIcon", _("Toggle JavaScript Editor")],
             ["restoreIcon", _("Restore")],
             ["beginnerMode", _("Switch to beginner mode")],
             ["advancedMode", _("Switch to advanced mode")],
@@ -577,6 +583,8 @@ function Toolbar() {
             _("Enable horizontal scrolling"),
             _("Disable horizontal scrolling"),
             _("Merge with current project"),
+            _("Set Pitch Preview"),
+            _("Toggle JavaScript Editor"),
             _("Restore"),
             _("Switch to beginner mode"),
             _("Switch to advanced mode"),
@@ -612,6 +620,8 @@ function Toolbar() {
             ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
             ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
             ["mergeWithCurrentIcon", _("Merge with current project")],
+            ["chooseKeyIcon", _("Set Pitch Preview")],
+            ["toggleJavaScriptIcon", _("Toggle JavaScript Editor")],
             ["restoreIcon", _("Restore")],
             ["languageSelectIcon", _("Select language")],
             ["save-html-beg", _("Save project as HTML"), "innerHTML"],
@@ -664,6 +674,8 @@ function Toolbar() {
             _("Enable horizontal scrolling"),
             _("Disable horizontal scrolling"),
             _("Merge with current project"),
+            _("Set Pitch Preview"),
+            _("Toggle JavaScript Editor"),
             _("Restore"),
             _("Select language"),
             _("Save project as HTML"),

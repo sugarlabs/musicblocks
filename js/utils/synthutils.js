@@ -66,12 +66,7 @@ const VOICENAMES = [
     //.TRANS: xylophone musical instrument
     [_("xylophone"), "xylophone", "images/8_bellset_key_6.svg", "precussion"],
     //.TRANS: polytone synthesizer
-    [
-        _("electronic synth"),
-        "electronic synth",
-        "images/synth.svg",
-        "electronic"
-    ],
+    [_("electronic synth"), "electronic synth", "images/synth.svg", "electronic"],
     //.TRANS: simple monotone synthesizer
     // [_('simple 1'), 'simple 1', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
@@ -118,21 +113,9 @@ const DRUMNAMES = [
     //.TRANS: musical instrument
     [_("cow bell"), "cow bell", "images/cowbell.svg", "cb", "bell"],
     //.TRANS: musical instrument
-    [
-        _("triangle bell"),
-        "triangle bell",
-        "images/trianglebell.svg",
-        "tri",
-        "bell"
-    ],
+    [_("triangle bell"), "triangle bell", "images/trianglebell.svg", "tri", "bell"],
     //.TRANS: musical instrument
-    [
-        _("finger cymbals"),
-        "finger cymbals",
-        "images/fingercymbals.svg",
-        "cymca",
-        "bell"
-    ],
+    [_("finger cymbals"), "finger cymbals", "images/fingercymbals.svg", "cymca", "bell"],
     //.TRANS: musical instrument
     // [_('japanese bell'), 'japanese bell', 'images/cowbell.svg', 'hh', 'bell'],
     //.TRANS: a musically tuned set of bells
@@ -286,6 +269,20 @@ const SAMPLECENTERNO = {
     "double bass": ["C4", 39]
 };
 
+const percussionInstruments = [
+    "koto",
+    "banjo",
+    "dulcimer",
+    "xylophone",
+    "celeste"
+];
+const stringInstruments = [
+    "piano",
+    "guitar",
+    "acoustic guitar",
+    "electric guitar"
+];
+
 // Validate the passed on parameters in a function as per the default
 // parameters values
 function validateAndSetParams(defaultParams, params) {
@@ -369,7 +366,7 @@ function Synth() {
     this.noteFrequencies = {};
 
     this.newTone = function() {
-        this.tone = new Tone();
+        this.tone = Tone;
     };
 
     this.temperamentChanged = function(temperament, startingPitch) {
@@ -759,10 +756,51 @@ function Synth() {
         }
     });
 
-    // Until we fix #1744, disable recorder on FF
-    if (!platform.FF) {
-        // recoder breaks with Tone.js v13.8.25
-        // this.recorder = new Recorder(Tone.Master);
+    this.setupRecorder = () => {
+        const cont = Tone.getContext();
+        const dest = cont.createMediaStreamDestination();
+        var chunks = [];
+        let stream = dest.stream;
+        if (platform.FF){
+            this.recorder = new MediaRecorder(stream, {type: "audio/wav"});
+        }
+        else {
+            this.recorder = new MediaRecorder(stream, {mimeType: 'audio/webm'});
+        }
+        for (let tur in instruments){
+            for (let synth in instruments[tur]) {
+                instruments[tur][synth].connect(dest);
+            }
+        }
+        this.recorder.ondataavailable = (evt) => {
+            console.log(evt.data);
+            if (typeof evt.data === 'undefined' || evt.data.size === 0)
+                return;
+            chunks.push(evt.data)
+        };
+        this.recorder.onstop = (e) => {
+            if (!chunks.length) return;
+            let blob;
+            if (platform.FF) {
+                blob = new Blob(chunks, {type: "audio/wav"})
+            } else {
+                blob = new Blob(chunks, {type: "audio/ogg"})
+            }
+            chunks = [];
+            let url = URL.createObjectURL(blob);
+            download(url,"")
+        }
+        let download = (uri, name) => {
+            let link = document.createElement("a");
+            link.download = name;
+            link.href = uri;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            delete link;
+        }
+        // this.recorder.start();
+        // setTimeout(()=>{this.recorder.stop();},5000);
     }
 
     // Function that provides default parameters for various synths
@@ -957,9 +995,9 @@ function Synth() {
             "create default poly/default/custom synth for turtle " + turtle
         );
         let default_synth = new Tone.PolySynth(
-            POLYCOUNT,
-            Tone.AMSynth
-        ).toMaster();
+            Tone.AMSynth,
+            POLYCOUNT
+        ).toDestination();
         instruments[turtle]["electronic synth"] = default_synth;
         instrumentsSource["electronic synth"] = [0, "electronic synth"];
         instruments[turtle]["custom"] = default_synth;
@@ -1036,8 +1074,8 @@ function Synth() {
                 instrumentsSource[instrumentName] = [0, "poly"];
                 console.debug("poly");
                 builtin_synth = new Tone.PolySynth(
-                    synthOptions.polyphony,
-                    Tone.AMSynth
+                    Tone.AMSynth,
+                    synthOptions.polyphony
                 );
                 break;
             case "noise1":
@@ -1050,7 +1088,7 @@ function Synth() {
             default:
                 instrumentsSource[instrumentName] = [0, "poly"];
                 console.debug("poly (default)");
-                builtin_synth = new Tone.PolySynth(POLYCOUNT, Tone.AMSynth);
+                builtin_synth = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT);
                 break;
         }
 
@@ -1072,7 +1110,7 @@ function Synth() {
         } else if (sourceName.toLowerCase() === "duosynth") {
             tempSynth = new Tone.DuoSynth(synthOptions);
         } else {
-            tempSynth = new Tone.PolySynth(POLYCOUNT, Tone.AMSynth);
+            tempSynth = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT);
         }
 
         return tempSynth;
@@ -1089,31 +1127,31 @@ function Synth() {
                 instrumentName,
                 sourceName,
                 null
-            ).toMaster();
+            ).toDestination();
         } else if (sourceName in BUILTIN_SYNTHS) {
             instruments[turtle][instrumentName] = this._createBuiltinSynth(
                 turtle,
                 instrumentName,
                 sourceName,
                 params
-            ).toMaster();
+            ).toDestination();
         } else if (sourceName in CUSTOM_SYNTHS) {
             instruments[turtle][instrumentName] = this._createCustomSynth(
                 sourceName,
                 params
-            ).toMaster();
+            ).toDestination();
             instrumentsSource[instrumentName] = [0, "poly"];
         } else {
             if (sourceName.length >= 4) {
                 if (sourceName.slice(0, 4) === "http") {
                     instruments[turtle][sourceName] = new Tone.Sampler(
                         sourceName
-                    ).toMaster();
+                    ).toDestination();
                     instrumentsSource[instrumentName] = [1, "drum"];
                 } else if (sourceName.slice(0, 4) === "file") {
                     instruments[turtle][sourceName] = new Tone.Sampler(
                         sourceName
-                    ).toMaster();
+                    ).toDestination();
                     instrumentsSource[instrumentName] = [1, "drum"];
                 } else if (sourceName === "drum") {
                     instruments[turtle][sourceName] = this._createSampleSynth(
@@ -1121,7 +1159,7 @@ function Synth() {
                         sourceName,
                         sourceName,
                         null
-                    ).toMaster();
+                    ).toDestination();
                     instrumentsSource[instrumentName] = [1, "drum"];
                 }
             }
@@ -1148,12 +1186,12 @@ function Synth() {
             console.debug(sourceName + " already loaded");
         } else {
             console.debug("loading " + sourceName);
-            this.setVolume(turtle, sourceName, DEFAULTVOLUME);
             this.createSynth(turtle, sourceName, sourceName, null);
         }
+        this.setVolume(turtle, sourceName, last(Singer.masterVolume));
 
         if (sourceName in instruments[turtle]) {
-            return instruments[turtle][sourceName].toMaster();
+            return instruments[turtle][sourceName].toDestination();
         }
 
         return null;
@@ -1220,7 +1258,7 @@ function Synth() {
                         paramsFilters[k].filterRolloff
                     );
                     temp_filters.push(filterVal);
-                    synth.chain(temp_filters[k], Tone.Master);
+                    synth.chain(temp_filters[k], Tone.Destination);
                 }
             }
 
@@ -1230,14 +1268,14 @@ function Synth() {
                         1 / paramsEffects.vibratoFrequency,
                         paramsEffects.vibratoIntensity
                     );
-                    synth.chain(vibrato, Tone.Master);
+                    synth.chain(vibrato, Tone.Destination);
                 }
 
                 if (paramsEffects.doDistortion) {
                     var distort = new Tone.Distortion(
                         paramsEffects.distortionAmount
-                    ).toMaster();
-                    synth.connect(distort, Tone.Master);
+                    ).toDestination();
+                    synth.connect(distort, Tone.Destination);
                 }
 
                 if (paramsEffects.doTremolo) {
@@ -1245,7 +1283,7 @@ function Synth() {
                         frequency: paramsEffects.tremoloFrequency,
                         depth: paramsEffects.tremoloDepth
                     })
-                        .toMaster()
+                        .toDestination()
                         .start();
                     synth.chain(tremolo);
                 }
@@ -1255,8 +1293,8 @@ function Synth() {
                         frequency: paramsEffects.rate,
                         octaves: paramsEffects.octaves,
                         baseFrequency: paramsEffects.baseFrequency
-                    }).toMaster();
-                    synth.chain(phaser, Tone.Master);
+                    }).toDestination();
+                    synth.chain(phaser, Tone.Destination);
                 }
 
                 if (paramsEffects.doChorus) {
@@ -1264,8 +1302,8 @@ function Synth() {
                         frequency: paramsEffects.chorusRate,
                         delayTime: paramsEffects.delayTime,
                         depth: paramsEffects.chorusDepth
-                    }).toMaster();
-                    synth.chain(chorusEffect, Tone.Master);
+                    }).toDestination();
+                    synth.chain(chorusEffect, Tone.Destination);
                 }
 
                 if (paramsEffects.doPartials) {
@@ -1477,7 +1515,7 @@ function Synth() {
                 break;
             case 2: // voice sample
                 this._performNotes(
-                    tempSynth.toMaster(),
+                    tempSynth.toDestination(),
                     notes,
                     beatValue,
                     paramsEffects,
@@ -1491,7 +1529,7 @@ function Synth() {
                 }
 
                 this._performNotes(
-                    tempSynth.toMaster(),
+                    tempSynth.toDestination(),
                     tempNotes,
                     beatValue,
                     paramsEffects,
@@ -1505,13 +1543,25 @@ function Synth() {
             case 0: // default synth
             default:
                 this._performNotes(
-                    tempSynth.toMaster(),
+                    tempSynth.toDestination(),
                     tempNotes,
                     beatValue,
                     paramsEffects,
                     paramsFilters,
                     setNote
                 );
+                break;
+        }
+    };
+
+    this.startSound = function(turtle, instrumentName, note) {
+        let flag = instrumentsSource[instrumentName][0];
+        switch (flag) {
+            case 1: // drum
+                instruments[turtle][instrumentName].start();
+                break;
+            default:
+                instruments[turtle][instrumentName].triggerAttack(note);
                 break;
         }
     };
@@ -1532,6 +1582,20 @@ function Synth() {
         }
     };
 
+    this.loop = function(turtle, instrumentName, note, duration, start, bpm ,velocity) {
+        let synthA = instruments[turtle][instrumentName] 
+        let flag = instrumentsSource[instrumentName][0]
+        let loopA = new Tone.Loop(time => {
+            if (flag == 1) {
+                this.setVolume(turtle,instrumentName,velocity*100)
+                instruments[turtle][instrumentName].start();
+            }
+            else
+                synthA.triggerAttackRelease(note, duration, time, velocity);
+        }, 60/bpm).start(start);
+        return loopA;
+    };
+
     this.start = function() {
         Tone.Transport.start();
     };
@@ -1539,6 +1603,36 @@ function Synth() {
     this.stop = function() {
         Tone.Transport.stop();
     };
+
+    this.rampTo = function(turtle, instrumentName,oldVol, volume, rampTime){
+        if (percussionInstruments.includes(instrumentName) || stringInstruments.includes(instrumentName))
+            return;
+
+        let nv;
+        if (instrumentName in DEFAULTSYNTHVOLUME) {
+            let sv = DEFAULTSYNTHVOLUME[instrumentName];
+            if (volume > 50) {
+                let d = 100 - sv;
+                nv = ((volume - 50) / 50) * d + sv;
+            } else {
+                nv = (volume / 50) * sv;
+            }
+        } else {
+            nv = volume;
+        }
+
+        let db = Tone.gainToDb(nv / 100);
+
+        let synth = instruments[turtle]["electronic synth"] ;
+        if (instrumentName in instruments[turtle]) {
+            synth = instruments[turtle][instrumentName];
+        }
+
+        console.debug("Crescendo(decibels)",instrumentName ,":" ,synth.volume.value ,"to" ,db ,"t:" ,rampTime );
+        console.debug("Crescendo",instrumentName ,":" ,oldVol ,"to" ,volume ,"t:" ,rampTime);
+
+        synth.volume.linearRampToValueAtTime(db, Tone.now() + rampTime);
+    }
 
     this.setVolume = function(turtle, instrumentName, volume) {
         // We pass in volume as a number from 0 to 100.
@@ -1575,7 +1669,7 @@ function Synth() {
 
     this.setMasterVolume = function(volume) {
         let db = Tone.gainToDb(volume / 100);
-        Tone.Master.volume.rampTo(db, 0.01);
+        Tone.Destination.volume.rampTo(db, 0.01);
     };
 
     return this;

@@ -14,12 +14,12 @@ function setupGraphicsBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            let turtleObj = logo.turtles.turtleList[turtle];
+            let turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetHeading(value);
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.turtles.turtleList[turtle].orientation);
+            return toFixed2(logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].orientation);
         }
 
         arg(logo, turtle, blk) {
@@ -30,7 +30,7 @@ function setupGraphicsBlocks() {
             ) {
                 logo.statusFields.push([blk, "heading"]);
             } else {
-                return logo.turtles.turtleList[turtle].orientation;
+                return logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].orientation;
             }
         }
     }
@@ -55,12 +55,12 @@ function setupGraphicsBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            let turtleObj = logo.turtles.turtleList[turtle];
+            let turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetXY(turtleObj.x, value);
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.turtles.turtleList[turtle].y);
+            return toFixed2(logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].y);
         }
 
         arg(logo, turtle, blk) {
@@ -72,7 +72,7 @@ function setupGraphicsBlocks() {
                 logo.statusFields.push([blk, "y"]);
             } else {
                 return logo.turtles.screenY2turtleY(
-                    logo.turtles.turtleList[turtle].container.y
+                    logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].container.y
                 );
             }
         }
@@ -98,12 +98,12 @@ function setupGraphicsBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            let turtleObj = logo.turtles.turtleList[turtle];
+            let turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetXY(value, turtleObj.y);
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.turtles.turtleList[turtle].x);
+            return toFixed2(logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].x);
         }
 
         arg(logo, turtle, blk) {
@@ -115,7 +115,7 @@ function setupGraphicsBlocks() {
                 logo.statusFields.push([blk, "x"]);
             } else {
                 return logo.turtles.screenX2turtleX(
-                    logo.turtles.turtleList[turtle].container.x
+                    logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].container.x
                 );
             }
         }
@@ -144,7 +144,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
@@ -158,20 +158,20 @@ function setupGraphicsBlocks() {
                         logo.blocks.blockList[blk].name
                     );
                     logo.pitchTimeMatrix.rowArgs.push([args[0], args[1]]);
-                } else if (logo.inNoteBlock[turtle].length > 0) {
-                    tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+                } else if (tur.singer.inNoteBlock.length > 0) {
+                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
-                    if (logo.suppressOutput[turtle]) {
+                    if (tur.singer.suppressOutput) {
                         let savedPenState =
-                            logo.turtles.turtleList[turtle].painter.penState;
-                        logo.turtles.turtleList[turtle].painter.penState = false;
-                        logo.turtles.turtleList[turtle].painter.doScrollXY(
+                            logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.penState;
+                        logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.penState = false;
+                        logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.doScrollXY(
                             args[0],
                             args[1]
                         );
-                        logo.turtles.turtleList[turtle].painter.penState = savedPenState;
+                        logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.penState = savedPenState;
                     } else {
-                        logo.turtles.turtleList[turtle].painter.doScrollXY(
+                        logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.doScrollXY(
                             args[0],
                             args[1]
                         );
@@ -190,14 +190,14 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (logo.inMatrix) {
                 // ignore clear block in matrix
-            } else if (logo.inNoteBlock[turtle].length > 0) {
-                tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+            } else if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
             } else {
-                if (logo.suppressOutput[turtle]) {
+                if (tur.singer.suppressOutput) {
                     let savedPenState = tur.painter.penState;
                     tur.painter.penState = false;
                     tur.painter.doSetXY(0, 0);
@@ -234,16 +234,15 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
                     logo.errorMsg(NANERRORMSG, blk);
-                } else if (logo.inNoteBlock[turtle].length > 0) {
-                    tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+                } else if (tur.singer.inNoteBlock.length > 0) {
+                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
-                    logo.cp2x[turtle] = args[0];
-                    logo.cp2y[turtle] = args[1];
+                    tur.painter.setControlPoint2(args);
                 }
             }
         }
@@ -272,16 +271,15 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
                     logo.errorMsg(NANERRORMSG, blk);
-                } else if (logo.inNoteBlock[turtle].length > 0) {
-                    tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+                } else if (tur.singer.inNoteBlock.length > 0) {
+                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
-                    logo.cp1x[turtle] = args[0];
-                    logo.cp1y[turtle] = args[1];
+                    tur.painter.setControlPoint1(args);
                 }
             }
         }
@@ -308,35 +306,21 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
                     logo.errorMsg(NANERRORMSG, blk);
-                } else if (logo.inNoteBlock[turtle].length > 0) {
-                    tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+                } else if (tur.singer.inNoteBlock.length > 0) {
+                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
-                    if (logo.suppressOutput[turtle]) {
+                    if (tur.singer.suppressOutput) {
                         let savedPenState = tur.painter.penState;
                         tur.painter.penState = false;
-                        tur.painter.doBezier(
-                            logo.cp1x[turtle],
-                            logo.cp1y[turtle],
-                            logo.cp2x[turtle],
-                            logo.cp2y[turtle],
-                            args[0],
-                            args[1]
-                        );
+                        tur.painter.doBezier(args[0], args[1]);
                         tur.painter.penState = savedPenState;
                     } else {
-                        tur.painter.doBezier(
-                            logo.cp1x[turtle],
-                            logo.cp1y[turtle],
-                            logo.cp2x[turtle],
-                            logo.cp2y[turtle],
-                            args[0],
-                            args[1]
-                        );
+                        tur.painter.doBezier(args[0], args[1]);
                     }
                 }
             }
@@ -366,7 +350,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
@@ -380,10 +364,10 @@ function setupGraphicsBlocks() {
                         logo.blocks.blockList[blk].name
                     );
                     logo.pitchTimeMatrix.rowArgs.push([args[0], args[1]]);
-                } else if (logo.inNoteBlock[turtle].length > 0) {
-                    tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+                } else if (tur.singer.inNoteBlock.length > 0) {
+                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
-                    if (logo.suppressOutput[turtle]) {
+                    if (tur.singer.suppressOutput) {
                         let savedPenState = tur.painter.penState;
                         tur.painter.penState = false;
                         tur.painter.doArc(args[0], args[1]);
@@ -414,7 +398,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
                 if (typeof args[0] === "string") {
@@ -428,8 +412,8 @@ function setupGraphicsBlocks() {
                         logo.blocks.blockList[blk].name
                     );
                     logo.pitchTimeMatrix.rowArgs.push(args[0]);
-                } else if (logo.inNoteBlock[turtle].length > 0) {
-                    tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+                } else if (tur.singer.inNoteBlock.length > 0) {
+                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
                     tur.painter.doSetHeading(args[0]);
                 }
@@ -462,7 +446,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
@@ -476,10 +460,10 @@ function setupGraphicsBlocks() {
                         logo.blocks.blockList[blk].name
                     );
                     logo.pitchTimeMatrix.rowArgs.push([args[0], args[1]]);
-                } else if (logo.inNoteBlock[turtle].length > 0) {
-                    tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+                } else if (tur.singer.inNoteBlock.length > 0) {
+                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
-                    if (logo.suppressOutput[turtle]) {
+                    if (tur.singer.suppressOutput) {
                         let savedPenState = tur.painter.penState;
                         tur.painter.penState = false;
                         tur.painter.doSetXY(args[0], args[1]);
@@ -514,7 +498,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
                 if (typeof args[0] === "string") {
@@ -528,10 +512,10 @@ function setupGraphicsBlocks() {
                         logo.blocks.blockList[blk].name
                     );
                     logo.pitchTimeMatrix.rowArgs.push(args[0]);
-                } else if (logo.inNoteBlock[turtle].length > 0) {
-                    tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+                } else if (tur.singer.inNoteBlock.length > 0) {
+                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
-                    if (logo.suppressOutput[turtle]) {
+                    if (tur.singer.suppressOutput) {
                         let savedPenState = tur.painter.penState;
                         tur.painter.penState = false;
                         tur.painter.doRight(args[0]);
@@ -566,7 +550,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
                 if (typeof args[0] === "string") {
@@ -580,10 +564,10 @@ function setupGraphicsBlocks() {
                         logo.blocks.blockList[blk].name
                     );
                     logo.pitchTimeMatrix.rowArgs.push(args[0]);
-                } else if (logo.inNoteBlock[turtle].length > 0) {
-                    tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+                } else if (tur.singer.inNoteBlock.length > 0) {
+                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
-                    if (logo.suppressOutput[turtle]) {
+                    if (tur.singer.suppressOutput) {
                         let savedPenState = tur.painter.penState;
                         tur.painter.penState = false;
                         tur.painter.doRight(-args[0]);
@@ -617,7 +601,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
                 if (typeof args[0] === "string") {
@@ -631,10 +615,10 @@ function setupGraphicsBlocks() {
                         logo.blocks.blockList[blk].name
                     );
                     logo.pitchTimeMatrix.rowArgs.push(args[0]);
-                } else if (logo.inNoteBlock[turtle].length > 0) {
-                    tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+                } else if (tur.singer.inNoteBlock.length > 0) {
+                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
-                    if (logo.suppressOutput[turtle]) {
+                    if (tur.singer.suppressOutput) {
                         let savedPenState = tur.painter.penState;
                         tur.painter.penState = false;
                         tur.painter.doForward(-args[0]);
@@ -668,7 +652,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
                 if (typeof args[0] === "string") {
@@ -682,10 +666,10 @@ function setupGraphicsBlocks() {
                         logo.blocks.blockList[blk].name
                     );
                     logo.pitchTimeMatrix.rowArgs.push(args[0]);
-                } else if (logo.inNoteBlock[turtle].length > 0) {
-                    tur.singer.embeddedGraphics[last(logo.inNoteBlock[turtle])].push(blk);
+                } else if (tur.singer.inNoteBlock.length > 0) {
+                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
-                    if (logo.suppressOutput[turtle]) {
+                    if (tur.singer.suppressOutput) {
                         let savedPenState = tur.painter.penState;
                         tur.painter.penState = false;
                         tur.painter.doForward(args[0]);
@@ -703,9 +687,9 @@ function setupGraphicsBlocks() {
     new XBlock().setup();
     new ScrollXYBlock().setup();
     new ClearBlock().setup();
-    new ControlPoint1Block().setup();
-    new ControlPoint2Block().setup();
     new BezierBlock().setup();
+    new ControlPoint2Block().setup();
+    new ControlPoint1Block().setup();
     new ArcBlock().setup();
     new SetHeadingBlock().setup();
     new SetXYBlock().setup();

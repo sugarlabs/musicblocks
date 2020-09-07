@@ -667,9 +667,24 @@ function setupNumberBlocks() {
 
                     let a, b;
                     if (cblk0 !== null && logo.blocks.blockList[cblk0].name === "pitch") {
-                        let noteBlock = logo.blocks.blockList[cblk0].connections[1];
+                        
+                        if (logo.blocks.blockList[cblk2].name === "accidentalname") {
+                            let scaledegree;
+                            if (logo.blocks.blockList[cblk1].name === "namedbox") {
+                                scaledegree = logo.boxes[logo.blocks.blockList[cblk1].overrideName];
+                            } else {
+                                scaledegree = logo.blocks.blockList[cblk1].value;
+                            }
 
-                        a = typeof logo.blocks.blockList[cblk1].value === "string" ?
+                            let attr = logo.blocks.blockList[cblk2].value.split(" ");
+                            attr = attr[attr.length - 1];
+                            scaledegree += attr;
+
+                            return scaledegree;
+                        } else {
+                            let noteBlock = logo.blocks.blockList[cblk0].connections[1];
+
+                            a = typeof logo.blocks.blockList[cblk1].value === "string" ?
                                 calcOctave(
                                     tur.singer.currentOctave,
                                     logo.blocks.blockList[cblk1].value,
@@ -678,7 +693,7 @@ function setupNumberBlocks() {
                                 ) :
                                 logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
 
-                        b = typeof logo.blocks.blockList[cblk2].value === "string" ?
+                            b = typeof logo.blocks.blockList[cblk2].value === "string" ?
                                 calcOctave(
                                     tur.singer.currentOctave,
                                     logo.blocks.blockList[cblk2].value,
@@ -686,6 +701,7 @@ function setupNumberBlocks() {
                                     logo.blocks.blockList[noteBlock].value
                                 ) :
                                 logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                        }
                     } else {
                         a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                         b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
@@ -817,7 +833,15 @@ function setupNumberBlocks() {
             }
 
             try {
-                return MathUtility.doRandom(a, b, octave);
+                if (octave === undefined) {
+                    let randomResult = MathUtility.doRandom(a, b, octave);
+                    if (typeof randomResult === "object") {
+                        return randomResult[0];
+                    }
+                    return randomResult;
+                } else {
+                    return MathUtility.doRandom(a, b, octave);
+                }
             } catch (e) {
                 logo.stopTurtle = true;
                 logo.errorMsg(NANERRORMSG, blk);

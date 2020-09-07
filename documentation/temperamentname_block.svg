@@ -1,1 +1,115 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0"></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg1684"
+   version="1.1"
+   height="97.5"
+   width="319.5">
+  <metadata
+     id="metadata1690">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs1688" />
+  <g
+     id="g1652">
+    <g
+       id="g1650"
+       transform="scale(1.5)">
+      <path
+         id="path1632"
+         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 75.03418 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -42 z" />
+      <text
+         id="text1636"
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"><tspan
+           id="tspan1634"
+           y="21"
+           x="91">set temperament</tspan></text>
+      <text
+         id="text1640"
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"><tspan
+           id="tspan1638"
+           y="12"
+           x="91">temperament</tspan></text>
+      <text
+         id="text1644"
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"><tspan
+           id="tspan1642"
+           y="33"
+           x="91">pitch</tspan></text>
+      <text
+         id="text1648"
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"><tspan
+           id="tspan1646"
+           y="54"
+           x="91">octave</tspan></text>
+    </g>
+  </g>
+  <g
+     id="g1662"
+     transform="translate(141)">
+    <g
+       id="g1660"
+       transform="scale(1.5)">
+      <path
+         id="path1654"
+         style="fill:#3edcdd;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 h 110 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+      <text
+         id="text1658"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"><tspan
+           id="tspan1656"
+           y="14"
+           x="13">custom</tspan></text>
+    </g>
+  </g>
+  <g
+     id="g1672"
+     transform="translate(141,32)">
+    <g
+       id="g1670"
+       transform="scale(1.5)">
+      <path
+         id="path1664"
+         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+      <text
+         id="text1668"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"><tspan
+           id="tspan1666"
+           y="14"
+           x="13">C</tspan></text>
+    </g>
+  </g>
+  <g
+     id="g1682"
+     transform="translate(141,63)">
+    <g
+       id="g1680"
+       transform="scale(1.5)">
+      <path
+         id="path1674"
+         style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+      <text
+         id="text1678"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"><tspan
+           id="tspan1676"
+           y="14"
+           x="13">4</tspan></text>
+    </g>
+  </g>
+</svg>

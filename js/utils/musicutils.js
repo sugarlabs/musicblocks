@@ -135,6 +135,8 @@ const EQUIVALENTSHARPS = {
     "B♭": "A" + SHARP
 };
 const EQUIVALENTNATURALS = { "E♯": "F", "B♯": "C", "C♭": "B", "F♭": "E" };
+const EQUIVALENTACCIDENTALS = { "F": "E♯", "C": "B♯", "B": "C♭", "E": "F♭", "G": "F𝄪", "D": "C𝄪", "A": "G𝄪"};
+
 const EXTRATRANSPOSITIONS = {
     "E♯": ["F", 0],
     "B♯": ["C", 1],
@@ -462,6 +464,9 @@ var STARTINGPITCH = "C4";
 
 const RHYTHMRULERHEIGHT = 100;
 
+const YSTAFFNOTEHEIGHT = 12.5;
+const YSTAFFOCTAVEHEIGHT = 87.5;
+ 
 const SLIDERHEIGHT = 200;
 const SLIDERWIDTH = 50;
 
@@ -1604,6 +1609,168 @@ function getTemperamentName(name) {
     console.debug(name + " not found in TEMPERAMENTS");
     return DEFAULTTEMPERAMENT;
 }
+/**
+         * Converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al.
+         *
+         * @param {String} type - required format: letter class, solfege syllable, pitch class, scalar class, scale degree, nth degree, staff y, pitch number, pitch in hertz
+         * @param {notePlayed} note - Argument which is to be converted
+         * @param {tur} turtle - Current Turtle
+*/
+
+function getPitchInfo(type, notePlayed, tur) {
+    try {
+        switch (type) {
+            case "letter class":
+                let lc = notePlayed;
+                if (Number(lc)) {
+                    [lc] = frequencyToPitch(lc);
+                }
+                return lc[0];
+            case "solfege syllable":
+                let lc2 = notePlayed;
+                if (Number(lc2)) {
+                    lc2 = frequencyToPitch(lc2)[0] + frequencyToPitch(lc2)[1];
+                }
+                lc2 = lc2.substr(0, lc2.length - 1);
+                lc2 = lc2.replace("#", SHARP).replace("b", FLAT);
+                if (tur.singer.moveable === false) {
+                    return SOLFEGECONVERSIONTABLE[lc2];
+                } else {
+                    let i = _buildScale(tur.singer.keySignature)[0].indexOf(lc2);
+                    return SOLFEGENAMES[i];
+                }
+            case "pitch class":
+                let note = notePlayed;
+                if (Number(note)) {
+                    note = frequencyToPitch(note)[0] + frequencyToPitch(note)[1];
+                }
+                let num = pitchToNumber(
+                    note.substr(0, note.length - 1 ),
+                    note[note.length - 1],
+                    tur.singer.keySignature
+                );
+                return (num - 3) % 12;
+            case "scalar class":
+                let note2 = notePlayed;
+                if (Number(note2)) {
+                    note2 = frequencyToPitch(note2)[0] + frequencyToPitch(note2)[1];
+                }
+                note2 = note2.substr(0, note2.length - 1);
+                note2 = note2.replace("#", SHARP).replace("b", FLAT);
+                let scalarClass = scaleDegreeToPitchMapping(
+                    tur.singer.keySignature, null, tur.singer.moveable, note2
+                );
+                return scalarClass[0];
+            case "scale degree":
+                let note3 = notePlayed;
+                if (Number(note3)) {
+                    note3 = frequencyToPitch(note3)[0] + frequencyToPitch(note3)[1];
+                }
+                note3 = note3.substr(0, note3.length - 1);
+                note3 = note3.replace("#", SHARP).replace("b", FLAT);
+                let scalarClass1 = scaleDegreeToPitchMapping(
+                    tur.singer.keySignature, null, tur.singer.moveable, note3
+                );
+                return scalarClass1[0] + scalarClass1[1];
+            case "nth degree":
+                let note4 = notePlayed;
+                if (Number(note4)) {
+                    note4 = frequencyToPitch(note4)[0] + frequencyToPitch(note4)[1];
+                }
+                note4 = note4.substr(0, note4.length - 1);
+                note4 = note4.replace("#", SHARP).replace("b", FLAT);
+                return _buildScale(tur.singer.keySignature)[0].indexOf(note4);
+            case "staff y":
+                let lc1 = notePlayed;
+                let o1;
+                if (Number(lc1)) {
+                    [lc1, o1] = frequencyToPitch(lc1);
+                } else {
+                    lc1 = notePlayed[0];
+                    o1 = notePlayed.length === 2 ?
+                        notePlayed[1] :
+                        notePlayed[2];
+                }
+                // these numbers are subject to staff artwork
+                return ["C", "D", "E", "F", "G", "A", "B"].indexOf(lc1) *
+                    YSTAFFNOTEHEIGHT + (o1 - 4) * YSTAFFOCTAVEHEIGHT;
+            case "pitch number":
+                let obj;
+                if (tur.singer.lastNotePlayed !== null) {
+                    if (typeof notePlayed === "string") {
+                        let len = notePlayed.length;
+                        let pitch = notePlayed.slice(0, len - 1);
+                        let octave =
+                            parseInt(notePlayed.slice(len - 1));
+                        obj = [pitch, octave];
+                    } else {
+                        // Hertz?
+                        obj = frequencyToPitch(notePlayed);
+                    }
+                } else if (
+                    tur.singer.inNoteBlock in tur.singer.notePitches &&
+                    tur.singer.notePitches[last(tur.singer.inNoteBlock)].length > 0
+                ) {
+                    obj = getNote(
+                        tur.singer.notePitches[last(tur.singer.inNoteBlock)][0],
+                        tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][0],
+                        0,
+                        tur.singer.keySignature,
+                        tur.singer.moveable,
+                        null,
+                        logo.errorMsg
+                    );
+                } else {
+                    if (tur.singer.lastNotePlayed !== null) {
+                        console.debug("Cannot find a note ");
+                        logo.errorMsg(INVALIDPITCH, blk);
+                    }
+                    obj = ["G", 4];
+                }
+                return pitchToNumber(obj[0], obj[1], tur.singer.keySignature) -
+                    tur.singer.pitchNumberOffset;
+            case "pitch in hertz":
+                return logo.synth._getFrequency(
+                    notePlayed,
+                    logo.synth.changeInTemperament
+                );
+            case "pitch to color":
+                let note5 = notePlayed;
+                if (Number(note5)) {
+                    [note5] = frequencyToPitch(note5);
+                } else {
+                    note5 = note5.substr(0, note5.length - 1);
+                }
+                let attr;
+                console.log(note5);
+                if (note5.includes(SHARP)) {
+                    attr = SHARP;
+                } else if (note5.includes(FLAT)) {
+                    attr = FLAT;
+                } else {
+                    attr = NATURAL;
+                }
+                note5 = note5.replace(attr, "");
+                let color = NOTENAMES.indexOf(note5) * 16;
+                if (attr == SHARP) color += 8;
+                else if (attr == FLAT) color -= 8;
+                return color;
+            case "pitch to shade":
+                let note6 = notePlayed;
+                let octave;
+                if (Number(note6)) {
+                    [note6, octave] = frequencyToPitch(note6);
+                } else {
+                    octave = note6[note6.length - 1];
+                }
+                return (octave * 10);
+            default:
+                return "__INVALID_INPUT__";
+        }
+    } catch {
+        console.debug("Waiting for note to play");
+    }
+}
 
 function keySignatureToMode(keySignature) {
     // Convert from "A Minor" to "A" and "MINOR"
@@ -1633,8 +1800,15 @@ function keySignatureToMode(keySignature) {
     } else {
         var key = parts[0];
     }
-
-    if (NOTESSHARP.indexOf(key) === -1 && NOTESFLAT.indexOf(key) === -1) {
+    if(key === "C" + FLAT) {
+        var keySignature = keySignature
+        var parts = keySignature.split(" ")
+        key = "C" + FLAT
+    } else if (key == "B" + SHARP){
+        var keySignature = keySignature
+        var parts = keySignature.split(" ")
+        key = "B" + SHARP
+    } else if (NOTESSHARP.indexOf(key) === -1 && NOTESFLAT.indexOf(key) === -1) {
         console.debug("Invalid key or missing name; reverting to C.");
         // Is is possible that the key was left out?
         var keySignature = "C " + keySignature;
@@ -1822,8 +1996,19 @@ function _getStepSize(
 }
 
 function _buildScale(keySignature) {
+
+    // FIX ME: temporary hard-coded fix to avoid errors in pitch preview
+    if (keySignature == "C♭ major") {
+        let scale = ["C♭", "D♭", "E♭", "F♭", "G♭", "A♭", "B♭", "C♭"];
+        return [scale, halfSteps];
+    }
+
     var obj = keySignatureToMode(keySignature);
     var myKeySignature = obj[0];
+    if(myKeySignature == "C" + FLAT) {
+        obj = keySignatureToMode("B " + obj[1])
+        myKeySignature = obj[0]
+    }
     if (obj[1] === "CUSTOM") {
         var halfSteps = customMode;
     } else {
@@ -1856,7 +2041,7 @@ function _buildScale(keySignature) {
         ii += halfSteps[i];
         scale.push(thisScale[ii % SEMITONES]);
     }
-
+    
     return [scale, halfSteps];
 }
 
@@ -1937,7 +2122,7 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
                             }
                         }
                     }
-                }
+                } 
                 return sd;
             }
         } else if (chosenModePattern.length < 7) {
