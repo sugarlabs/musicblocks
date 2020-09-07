@@ -326,11 +326,11 @@ msgstr "ピッチ度"
 
 #: js/block.js:3729
 msgid "pitch to shade"
-msgstr ""
+msgstr "音の高さををシェードに"
 
 #: js/block.js:3730
 msgid "pitch to color"
-msgstr ""
+msgstr "音の高さを色に"
 
 #: js/block.js:4695
 #: js/musickeyboard.js:1835
@@ -467,7 +467,7 @@ msgstr "ブロックをさがす"
 
 #: js/activity.js:1094
 msgid "You have chosen key "
-msgstr "音の高さは"
+msgstr "変化記号は"
 
 #: js/activity.js:1095
 msgid " for your pitch preview."
@@ -1462,14 +1462,14 @@ msgstr "プロジェクトを組みあわせる"
 #: js/toolbar.js:623
 #: js/toolbar.js:677
 msgid "Set Pitch Preview"
-msgstr ""
+msgstr "変化記号を設定"
 
 #: js/toolbar.js:527
 #: js/toolbar.js:587
 #: js/toolbar.js:624
 #: js/toolbar.js:678
 msgid "Toggle JavaScript Editor"
-msgstr ""
+msgstr "JavaScript編集をオン／オフ"
 
 #: js/toolbar.js:529
 #: js/toolbar.js:589
