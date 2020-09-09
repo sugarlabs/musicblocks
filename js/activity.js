@@ -2720,6 +2720,10 @@ function Activity() {
      * Repositions containers/palette/home buttons
      */
     function _onResize(force) {
+        if (!force) {
+            console.debug("Saving locally due to resize event");
+            saveLocally();
+        }
         let $j = jQuery.noConflict();
         console.debug(
             "document.body.clientWidth and clientHeight: " +
