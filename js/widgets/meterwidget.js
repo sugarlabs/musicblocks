@@ -227,7 +227,6 @@ function MeterWidget() {
         let tur = this._logo.turtles.ithTurtle(0);
         let bpmFactor =
             TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
-
         for (let i = 0; i < this._strongBeats.length; i++) {
             this._playWheel.navItems[i].navItem.hide();
         }

@@ -67,7 +67,6 @@ function WidgetWindow(key, title) {
     // Scrolling in window body .
     this.top = 0;
     scrollEvent = function (evt) {
-
         let data = evt.wheelDelta || -evt.detail;
         let x = docByClass("wfbWidget")[0];
         let l = x.getElementsByTagName("tr").length;
@@ -76,9 +75,7 @@ function WidgetWindow(key, title) {
                 x.getElementsByTagName("tr")[that.top].style.display = "none";
                 that.top = that.top == l ? l : that.top + 1;
             }
-        }
-        else if (data > 0) {
-
+        } else if (data > 0) {
             x.getElementsByTagName("tr")[that.top--].style.display = "";
             that.top = that.top < 0 ? 0 : that.top;
         }
