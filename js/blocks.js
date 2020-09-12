@@ -643,6 +643,15 @@ function Blocks(activity) {
         __clampAdjuster(blk, myBlock, clamp);
     };
 
+    this._getRank = function(blk) {
+	let rank = 0;
+	while(blk !== null) {
+	    blk = this.insideExpandableBlock(blk);
+	    rank += 1;
+	}
+	return rank;
+    };
+
     /*
      * Return the block size in units of standard block size.
      * @param - blk - block number
@@ -6867,23 +6876,27 @@ function Blocks(activity) {
      * @return {void}
      */
     this._cleanupStacks = function() {
-        if (this._checkArgClampBlocks.length > 0) {
-            // We make multiple passes because we need to account for nesting.
-            for (var i = 0; i < this._checkArgClampBlocks.length; i++) {
-                for (var b = 0; b < this._checkArgClampBlocks.length; b++) {
-                    this._adjustArgClampBlock([this._checkArgClampBlocks[b]]);
-                }
-            }
+        // Sort the blocks from inside to outside.
+        let blocksToCheck = [];
+        for (let b = 0; b < this._checkArgClampBlocks.length; b++) {
+            blocksToCheck.push([b, this._getRank(b), '1arg']);
         }
 
-        if (this._checkTwoArgBlocks.length > 0) {
-            // We make multiple passes because we need to account for nesting.
-            for (var i = 0; i < this._checkTwoArgBlocks.length; i++) {
-                for (var b = 0; b < this._checkTwoArgBlocks.length; b++) {
-                    this._adjustExpandableTwoArgBlock([
-                        this._checkTwoArgBlocks[b]
-                    ]);
-                }
+        for (let b = 0; b < this._checkTwoArgBlocks.length; b++) {
+            blocksToCheck.push([b, this._getRank(b), '2arg']);
+        }
+
+        blocksToCheck = blocksToCheck.sort(function(a, b) {
+            return a[1] - b[1];
+        });
+
+        blocksToCheck = blocksToCheck.reverse();
+
+        for (let i = 0; i < blocksToCheck.length; i++) {
+            if (blocksToCheck[i][2] === '1arg') {
+                this._adjustArgClampBlock([blocksToCheck[i][0]]);
+            } else {
+                this._adjustExpandableTwoArgBlock([blocksToCheck[i][0]]);
             }
         }
 
