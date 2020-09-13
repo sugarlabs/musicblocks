@@ -1510,7 +1510,13 @@ function Synth() {
                 } else if (instrumentName.slice(0, 4) === "file") {
                     tempSynth.start();
                 } else {
-                    tempSynth.start();
+		    try {
+			tempSynth.start();
+		    } catch (e) {
+			// Occasionally we see "Start time must be
+			// strictly greater than previous start time"
+			console.log(e);
+		    }
                 }
                 break;
             case 2: // voice sample
