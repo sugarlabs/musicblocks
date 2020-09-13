@@ -664,7 +664,7 @@ function PitchTimeMatrix() {
         this._lookForNoteBlocksOrRepeat();
 
         // Sort them if there are note blocks.
-        if (!this.sorted && this._noteBlocks) {
+        if (!this.sorted) {
             setTimeout(function() {
                 console.debug("sorting");
                 that._sort();
