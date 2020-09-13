@@ -48,9 +48,10 @@ function setupPitchActions() {
 
             // Similar to pitch but calculated from previous note played.
             if (!logo.inMatrix && !logo.inMusicKeyboard && tur.singer.inNoteBlock.length === 0) {
-                logo.errorMsg(_("The Scalar Step Block must be used inside of a Note Block."), blk);
-                logo.stopTurtle = true;
-                return;
+                // logo.errorMsg(_("The Scalar Step Block must be used inside of a Note Block."), blk);
+                tur.singer.lastNotePlayed = ["G4", 4];
+                // logo.stopTurtle = true;
+                // return;
             }
 
             if (typeof value !== "number") {
@@ -67,7 +68,7 @@ function setupPitchActions() {
             }
 
             if (tur.singer.lastNotePlayed === null) {
-                logo.errorMsg(_("The Scalar Step Block must be preceded by a Pitch Block."), blk);
+                // logo.errorMsg(_("The Scalar Step Block must be preceded by a Pitch Block."), blk);
                 tur.singer.lastNotePlayed = ["G4", 4];
             }
 
@@ -93,7 +94,7 @@ function setupPitchActions() {
                     }
                 }
 
-                if (!logo.inMatrix && !logo.inMusicKeyboard) {
+                if (!logo.inMatrix && !logo.inMusicKeyboard && tur.singer.inNoteBlock.length > 0) {
                     tur.singer.notePitches[last(tur.singer.inNoteBlock)].push(noteObj[0]);
                     tur.singer.noteOctaves[last(tur.singer.inNoteBlock)].push(noteObj[1]);
                     tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(cents);
@@ -224,9 +225,11 @@ function setupPitchActions() {
 
             if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(tur.singer.beatFactor);
+                tur.singer.pushedNote = true;
+            } else {
+		// stand-alone block
+                Singer.processPitch(noteObj1[0], noteObj1[1], 0, turtle, blk);
             }
-
-            tur.singer.pushedNote = true;
         }
 
         /**
