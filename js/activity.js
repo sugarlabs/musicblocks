@@ -5561,7 +5561,9 @@ function Activity() {
 
         document.onkeydown = __keyPressed;
         _hideStopButton();
-        planet.planet.setAnalyzeProject(analyzeProject)
+        if (planet !== undefined) {
+            planet.planet.setAnalyzeProject(analyzeProject)
+        }
     };
 }
 
