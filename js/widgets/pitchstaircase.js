@@ -196,7 +196,7 @@ function PitchStaircase() {
         // Look for the Stair with this frequency.
         for (var n = 0; n < this.Stairs.length; n++) {
             if (this.Stairs[n][2] === frequency) {
-                break;
+		break;
             }
         }
 
@@ -209,8 +209,10 @@ function PitchStaircase() {
 
         var obj = frequencyToPitch(parseFloat(frequency) / inputNum);
         var foundStep = false;
+	var repeatStep = false;
         var isStepDeleted = true;
 
+	console.log(parseFloat(frequency) / inputNum);
         for (var i = 0; i < this.Stairs.length; i++) {
             if (this.Stairs[i][2] < parseFloat(frequency) / inputNum) {
                 this.Stairs.splice(i, 0, [
@@ -237,6 +239,7 @@ function PitchStaircase() {
                     this.Stairs[n][6]
                 ]);
                 foundStep = true;
+                repeatStep = true;
                 isStepDeleted = false;
                 break;
             }
@@ -254,7 +257,9 @@ function PitchStaircase() {
             ]);
             this._history.push(this.Stairs.length - 1);
         } else {
-            this._history.push(i);
+            if (!repeatStep) {
+                this._history.push(i);
+            }
         }
 
         this._makeStairs(i, isStepDeleted);
@@ -544,7 +549,7 @@ function PitchStaircase() {
         );
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
-	widgetWindow.show();
+        widgetWindow.show();
 
         var that = this;
 
