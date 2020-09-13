@@ -1541,7 +1541,9 @@ function Blocks(activity) {
          *     need to check to see if we need to rename it.
          * (7) Is it the name of a storein block? In which case we
          *     need to check to see if we need to add a palette entry.
-         * (8) And we need to recheck if it inside of a expandable block.
+	 * (8) Is it a case or default block? We need to make sure that
+	 *     they are inside a switch block.
+         * (9) And we need to recheck if it inside of a expandable block.
          */
         var initialTopBlock = this.findTopBlock(thisBlock);
         // Find any containing expandable blocks.
@@ -1634,22 +1636,23 @@ function Blocks(activity) {
             for (var x = 0; x < widgetTitle.length; x++) {
                 if (lockInit === false) {
                     switch (widgetTitle[x].innerHTML) {
-                        case "tempo":
-                        case "rhythm maker":
-                        case "pitch slider":
-                        case "pitch staircase":
-                        case "status":
-                        case "phrase maker":
-                        case "custom mode":
-                        case "music keyboard":
-                        case "pitch drum":
-                        case "meter":
-                        case "temperament":
-                        case "timbre":
-                            lockInit = true;
-                            if (this.blockList[initialTopBlock].protoblock.staticLabels[0] == widgetTitle[x].innerHTML)
-                                this.reInitWidget(initialTopBlock, 1500);
-                            break;
+                    case "oscilloscope":
+                    case "tempo":
+                    case "rhythm maker":
+                    case "pitch slider":
+                    case "pitch staircase":
+                    case "status":
+                    case "phrase maker":
+                    case "custom mode":
+                    case "music keyboard":
+                    case "pitch drum":
+                    case "meter":
+                    case "temperament":
+                    case "timbre":
+                        lockInit = true;
+                        if (this.blockList[initialTopBlock].protoblock.staticLabels[0] == widgetTitle[x].innerHTML)
+                            this.reInitWidget(initialTopBlock, 1500);
+                        break;
                     }
                 }
             }
@@ -2139,6 +2142,7 @@ function Blocks(activity) {
                     var that = this;
                     if (lockInit === false) {
                         switch (widgetTitle[i].innerHTML) {
+                        case "oscilloscope":
                         case "tempo":
                         case "rhythm maker":
                         case "pitch slider":
