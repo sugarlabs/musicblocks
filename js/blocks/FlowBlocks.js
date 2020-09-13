@@ -262,7 +262,7 @@ function setupFlowBlocks() {
             });
         }
 
-        flow(args, logo, turtle) {
+        flow(args, logo, turtle, blk) {
             let switchBlk = last(logo.switchBlocks[turtle]);
             if (switchBlk === null) {
                 logo.errorMsg(
@@ -297,7 +297,7 @@ function setupFlowBlocks() {
             });
         }
 
-        flow(args, logo, turtle) {
+        flow(args, logo, turtle, blk) {
             let switchBlk = last(logo.switchBlocks[turtle]);
             if (switchBlk === null) {
                 logo.errorMsg(
