@@ -1319,7 +1319,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         }
 
-        // this.blocks.refreshCanvas();
+        this.blocks.refreshCanvas();
         // stage.update();
     };
 
