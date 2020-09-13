@@ -639,13 +639,13 @@ function Blocks(activity) {
     };
 
     /*
-     * Returns degree of nesting, which is used to rank order the
+     * Returns depth of nesting, which is used to rank order the
      * blocks when adjusting their sizes.
-     * @param - thisBlock -new variable
-     * @public
-     * @return {void}
+     * @param - blk - block number
+     * @private
+     * @return depth
      */
-    this._getRank = function(blk) {
+    this._getNestingDepth = function(blk) {
         let rank = 0;
         while(blk !== null) {
             blk = this.insideExpandableBlock(blk);
@@ -6789,11 +6789,11 @@ function Blocks(activity) {
         // Sort the blocks from inside to outside.
         let blocksToCheck = [];
         for (let b = 0; b < this._checkArgClampBlocks.length; b++) {
-            blocksToCheck.push([b, this._getRank(b), '1arg']);
+            blocksToCheck.push([b, this._getNestingDepth(b), '1arg']);
         }
 
         for (let b = 0; b < this._checkTwoArgBlocks.length; b++) {
-            blocksToCheck.push([b, this._getRank(b), '2arg']);
+            blocksToCheck.push([b, this._getNestingDepth(b), '2arg']);
         }
 
         blocksToCheck = blocksToCheck.sort(function(a, b) {
