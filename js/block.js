@@ -7853,23 +7853,24 @@ function Block(protoblock, blocks, overrideName) {
             for (let i = 0; i < widgetTitle.length; i++) {
                 if (lockInit === false) {
                     switch (widgetTitle[i].innerHTML) {
-                        case "tempo":
-                        case "rhythm maker":
-                        case "pitch slider":
-                        case "pitch staircase":
-                        case "status":
-                        case "phrase maker":
-                        case "custom mode":
-                        case "music keyboard":
-                        case "pitch drum":
-                        case "meter":
-                        case "temperament":
-                        case "mode":
-                        case "timbre":
-                            lockInit = true;
-                            if (this.blocks.blockList[topBlock].protoblock.staticLabels[0] == widgetTitle[i].innerHTML)
-                                this.blocks.reInitWidget(topBlock, 1500);
-                            break;
+                    case "oscilloscope":
+                    case "tempo":
+                    case "rhythm maker":
+                    case "pitch slider":
+                    case "pitch staircase":
+                    case "status":
+                    case "phrase maker":
+                    case "custom mode":
+                    case "music keyboard":
+                    case "pitch drum":
+                    case "meter":
+                    case "temperament":
+                    case "mode":
+                    case "timbre":
+                        lockInit = true;
+                        if (this.blocks.blockList[topBlock].protoblock.staticLabels[0] == widgetTitle[i].innerHTML)
+                            this.blocks.reInitWidget(topBlock, 1500);
+                        break;
                     }
                 }
             }
