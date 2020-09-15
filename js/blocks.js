@@ -2312,6 +2312,12 @@ function Blocks(activity) {
         if (type1 === "fileout" && type2 === "filein") {
             return true;
         }
+        if (type1 === "casein" && type2 === "caseout") {
+            return true;
+        }
+        if (type1 === "caseout" && type2 === "casein") {
+            return true;
+        }
         if (
             type1 === "solfegein" &&
             ["anyout", "solfegeout", "textout", "noteout", "scaledegreeout", "numberout"].indexOf(

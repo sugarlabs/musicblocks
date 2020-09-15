@@ -1718,6 +1718,10 @@ class BaseBlock extends ProtoBlock {
         this.macroFunc = macroFunc;
     }
 
+    updateDockValue(slot, value) {
+        this.dockTypes[slot] = value;
+    }
+
     changeName(name) {
         this.name = name;
     }
