@@ -373,7 +373,7 @@ function setupMeterActions() {
         }
 
         static getBeatFactor(turtle) {
-            return logo.turtles.ithTurtle(turtle).singer.beatFactor;
+            return Singer.RhythmActions.getNoteValue(turtle) * logo.turtles.ithTurtle(turtle).singer.noteValuePerBeat;
         }
 
         static getCurrentMeter(turtle) {
