@@ -2379,7 +2379,6 @@ function PitchTimeMatrix() {
                 this._sortedRowMap.push(last(this._sortedRowMap) + 1);
                 lastObj = i;
             }
-            console.debug(obj, typeof obj[2]);
 
             this.rowLabels.push(obj[1]);
             this.rowArgs.push(Number(obj[2]));
@@ -2644,6 +2643,10 @@ function PitchTimeMatrix() {
             this._cellScale
         );
 
+        if (noteValue > 12) {
+            noteValueToDisplay = '<a href="#" title="' + param[0][0] + "/" + param[0][1] + '">.</a>';
+        }
+
         // Set the cells to 'rest'
         for (var i = 0; i < numberOfNotes; i++) {
             // The tuplet time factor * percentage of the tuplet that
@@ -2731,6 +2734,8 @@ function PitchTimeMatrix() {
             var obj = toFraction(
                 numerator / (totalNoteInterval / tupletTimeFactor)
             );
+            console.log(obj[1]);
+            if (obj[1] < 13) {
             if (NOTESYMBOLS != undefined && obj[1] in NOTESYMBOLS) {
                 cell.innerHTML =
                     obj[0] +
@@ -2745,6 +2750,9 @@ function PitchTimeMatrix() {
             } else {
                 cell.innerHTML =
                     obj[0] + "<br>&mdash;<br>" + obj[1] + "<br><br>";
+            }
+            } else {
+                cell.innerHTML = "";
             }
 
             var cellWidth = cell.style.width;
@@ -2839,6 +2847,10 @@ function PitchTimeMatrix() {
             1,
             this._cellScale
         );
+
+        if (noteValue > 12) {
+            noteValueToDisplay = '<a href="#" title="' + 1 + "/" + noteValue + '">.</a>';
+        }
 
         for (var i = 0; i < numBeats; i++) {
             this._notesToPlay.push([["R"], noteValue]);
