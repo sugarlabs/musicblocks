@@ -30,7 +30,13 @@ function setupMeterBlocks() {
             super("beatfactor", _("beat factor"));
             this.setPalette("meter");
             this.parameter = true;
-            this.setHelpString();
+            this.setHelpString([
+                _(
+                    "The Beat factor block returns the ratio of the note value to meter note value."
+                ),
+                "documentation",
+                ""
+            ]);
         }
 
         updateParameter(logo, turtle, blk) {
