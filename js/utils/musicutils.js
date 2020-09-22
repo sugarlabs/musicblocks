@@ -35,7 +35,7 @@ const THIRTYSECONDNOTE =
 const SIXTYFOURTHNOTE =
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7.0080001 14.528" height="4.1001244mm" width="1.9778134mm"> <g transform="translate(-345.3223,-325.39492)"> <g transform="translate(3.1093785,1.6864426)" style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"> <path d="m 342.21292,337.13248 q 0,-0.832 0.816,-1.472 0.816,-0.656 1.728,-0.656 0.528,0 0.944,0.272 l 0,-11.568 0.336,0 q 0.064,0.64 0.384,1.104 0.336,0.464 0.752,0.768 0.416,0.304 0.832,0.656 0.416,0.336 0.688,0.928 0.288,0.592 0.288,1.44 0,0.24 -0.144,0.768 0.256,0.608 0.256,1.376 0,0.32 -0.16,0.896 0.224,0.416 0.224,0.912 0,0.496 -0.24,0.96 0.304,0.448 0.304,1.024 0,0.384 -0.08,0.688 -0.08,0.304 -0.16,0.448 -0.08,0.144 -0.368,0.608 l -0.384,0 q 0.08,-0.16 0.192,-0.368 0.112,-0.224 0.16,-0.32 0.064,-0.096 0.112,-0.24 0.064,-0.144 0.08,-0.288 0.016,-0.144 0.016,-0.32 0,-0.272 -0.096,-0.512 -0.08,-0.256 -0.176,-0.432 -0.096,-0.192 -0.32,-0.4 -0.224,-0.208 -0.368,-0.32 -0.144,-0.128 -0.464,-0.304 -0.304,-0.192 -0.432,-0.256 -0.128,-0.064 -0.48,-0.224 -0.336,-0.176 -0.4,-0.208 l 0,4.064 q 0,0.896 -0.784,1.488 -0.784,0.592 -1.728,0.592 -0.528,0 -0.928,-0.304 -0.4,-0.32 -0.4,-0.8 z m 6.352,-8.384 q 0,-0.352 -0.144,-0.688 -0.128,-0.352 -0.288,-0.576 -0.16,-0.224 -0.48,-0.496 -0.32,-0.272 -0.512,-0.4 -0.192,-0.144 -0.592,-0.384 -0.384,-0.24 -0.496,-0.32 0.032,0.432 0.352,0.832 0.32,0.384 0.704,0.656 0.4,0.272 0.816,0.72 0.432,0.432 0.624,0.912 0.016,-0.176 0.016,-0.256 z m 0.016,2.128 q 0,-0.208 -0.048,-0.4 -0.032,-0.192 -0.08,-0.336 -0.048,-0.16 -0.176,-0.336 -0.128,-0.176 -0.208,-0.288 -0.08,-0.112 -0.272,-0.272 -0.192,-0.176 -0.288,-0.256 -0.096,-0.08 -0.352,-0.256 -0.24,-0.176 -0.336,-0.224 -0.096,-0.064 -0.384,-0.24 -0.288,-0.192 -0.384,-0.256 0.032,0.464 0.368,0.88 0.336,0.416 0.736,0.704 0.4,0.272 0.816,0.688 0.416,0.416 0.576,0.864 0.032,-0.192 0.032,-0.272 z m -0.016,1.936 q 0,-0.848 -0.624,-1.504 -0.608,-0.672 -1.872,-1.392 0.064,0.464 0.384,0.896 0.336,0.416 0.72,0.688 0.4,0.272 0.8,0.704 0.4,0.416 0.576,0.88 0.016,-0.064 0.016,-0.272 z" /> </g> </g> </svg>';
 
-// is there a "proper" double-sharp symbol as well? I see this from wikipedia: U+1D12A 𝄪 MUSICAL SYMBOL DOUBLE SHARP (HTML &#119082;) (https://en.wikipedia.org/wiki/Double_sharp)
+// Is there a "proper" double-sharp symbol as well? I see this from wikipedia: U+1D12A 𝄪 MUSICAL SYMBOL DOUBLE SHARP (HTML &#119082;) (https://en.wikipedia.org/wiki/Double_sharp)
 const SHARP = "♯";
 const FLAT = "♭";
 const NATURAL = "♮";
@@ -62,6 +62,7 @@ const BTOFLAT = {
     cb: "C" + FLAT,
     fb: "F" + FLAT
 };
+
 const STOSHARP = {
     "E#": "E" + SHARP,
     "G#": "G" + SHARP,
@@ -78,6 +79,7 @@ const STOSHARP = {
     "c#": "C" + SHARP,
     "f#": "F" + SHARP
 };
+
 const NOTESSHARP = [
     "C",
     "C" + SHARP,
@@ -92,6 +94,7 @@ const NOTESSHARP = [
     "A" + SHARP,
     "B"
 ];
+
 const NOTESFLAT = [
     "C",
     "D" + FLAT,
@@ -106,6 +109,7 @@ const NOTESFLAT = [
     "B" + FLAT,
     "B"
 ];
+
 const NOTESFLAT2 = [
     "c",
     "d" + FLAT,
@@ -120,6 +124,7 @@ const NOTESFLAT2 = [
     "b" + FLAT,
     "b"
 ];
+
 const EQUIVALENTFLATS = {
     "C♯": "D" + FLAT,
     "D♯": "E" + FLAT,
@@ -1611,157 +1616,168 @@ function getTemperamentName(name) {
     console.debug(name + " not found in TEMPERAMENTS");
     return DEFAULTTEMPERAMENT;
 }
+
 /**
-         * Converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al.
-         *
-         * @param {String} type - required format: letter class, solfege syllable, pitch class, scalar class, scale degree, nth degree, staff y, pitch number, pitch in hertz
-         * @param {notePlayed} note - Argument which is to be converted
-         * @param {tur} turtle - Current Turtle
+ * Converts the pitch value of the last note played into different formats
+ * such as hertz, letter name, pitch number, et al.
+ *
+ * @param {String} type - required format: letter class, solfege syllable,
+ * solfege class, pitch class, scalar class, scale degree, nth degree,
+ * staff y, pitch number, pitch in hertz
+ * @param {notePlayed} note - Argument which is to be converted
+ * @param {tur} turtle - Current Turtle
 */
 
+function _calculate_pitch_number(np, tur) {
+    let obj;
+    if (tur.singer.lastNotePlayed !== null) {
+        if (typeof np === "string") {
+            let octave = parseInt(np.slice(np.length - 1));
+            if (isNaN(octave)) {
+                octave = 4;
+            } else {
+                np = np.slice(0, np.length - 1);
+            }
+            obj = [np, octave];
+        } else {
+            // Hertz
+            obj = frequencyToPitch(np);
+        }
+    } else if (
+        tur.singer.inNoteBlock in tur.singer.notePitches &&
+            tur.singer.notePitches[last(tur.singer.inNoteBlock)].length > 0
+    ) {
+        obj = getNote(
+            tur.singer.notePitches[last(tur.singer.inNoteBlock)][0],
+            tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][0],
+            0,
+            tur.singer.keySignature,
+            tur.singer.moveable,
+            null,
+            logo.errorMsg
+        );
+    } else {
+        if (tur.singer.lastNotePlayed !== null) {
+            console.debug("Cannot find a note ");
+            logo.errorMsg(INVALIDPITCH, blk);
+        }
+        obj = ["G", 4];
+    }
+    return pitchToNumber(obj[0], obj[1], tur.singer.keySignature) -
+        tur.singer.pitchNumberOffset;
+};
+
 function getPitchInfo(type, notePlayed, tur) {
+    let np = notePlayed;
+    console.log(np);
+    let octave;
     try {
         switch (type) {
         case "letter class":
-            let lc = notePlayed;
-            if (Number(lc)) {
-                [lc] = frequencyToPitch(lc);
+            if (Number(np)) {
+                [np] = frequencyToPitch(np);
             }
-            return lc[0];
+            return np[0];
         case "solfege syllable":
-            let lc2 = notePlayed;
-            if (Number(lc2)) {
-                lc2 = frequencyToPitch(lc2)[0] + frequencyToPitch(lc2)[1];
+        case "solfege class":
+            if (Number(np)) {
+                np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
             }
-            lc2 = lc2.replace("#", SHARP).replace("b", FLAT);
+            if (type === "solfege class") {
+                np = np.substr(0, np.length - 1);
+            }
+            np = np.replace("#", SHARP).replace("b", FLAT);
             if (tur.singer.moveable === false)
-                return SOLFEGECONVERSIONTABLE[lc2];
-            let i = _buildScale(tur.singer.keySignature)[0].indexOf(lc2);
+                return SOLFEGECONVERSIONTABLE[np];
+            let i = _buildScale(tur.singer.keySignature)[0].indexOf(np);
             return SOLFEGENAMES[i];
         case "pitch class":
-            let note = notePlayed;
-            if (Number(note)) {
-                note = frequencyToPitch(note)[0] + frequencyToPitch(note)[1];
+            if (Number(np)) {
+                np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
             }
             let num = pitchToNumber(
-                note.substr(0, note.length - 1 ),
-                note[note.length - 1],
+                np.substr(0, np.length - 1 ),
+                np[np.length - 1],
                 tur.singer.keySignature
             );
             return (num - 3) % 12;
         case "scalar class":
-            let note2 = notePlayed;
-            if (Number(note2)) {
-                note2 = frequencyToPitch(note2)[0] + frequencyToPitch(note2)[1];
+            if (Number(np)) {
+                np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
             }
-            note2 = note2.substr(0, note2.length - 1);
-            note2 = note2.replace("#", SHARP).replace("b", FLAT);
+            np = np.substr(0, np.length - 1);
+            np = np.replace("#", SHARP).replace("b", FLAT);
             let scalarClass = scaleDegreeToPitchMapping(
-                tur.singer.keySignature, null, tur.singer.moveable, note2
+                tur.singer.keySignature, null, tur.singer.moveable, np
             );
             return scalarClass[0];
         case "scale degree":
-            let note3 = notePlayed;
-            if (Number(note3)) {
-                note3 = frequencyToPitch(note3)[0] + frequencyToPitch(note3)[1];
+            if (Number(np)) {
+                np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
             }
-            note3 = note3.substr(0, note3.length - 1);
-            note3 = note3.replace("#", SHARP).replace("b", FLAT);
+            np = np.substr(0, np.length - 1);
+            np = np.replace("#", SHARP).replace("b", FLAT);
             let scalarClass1 = scaleDegreeToPitchMapping(
-                tur.singer.keySignature, null, tur.singer.moveable, note3
+                tur.singer.keySignature, null, tur.singer.moveable, np
             );
             return scalarClass1[0] + scalarClass1[1];
         case "nth degree":
-            let note4 = notePlayed;
-            if (Number(note4)) {
-                note4 = frequencyToPitch(note4)[0] + frequencyToPitch(note4)[1];
+            if (Number(np)) {
+                np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
             }
-            note4 = note4.substr(0, note4.length - 1);
-            note4 = note4.replace("#", SHARP).replace("b", FLAT);
-            return _buildScale(tur.singer.keySignature)[0].indexOf(note4);
+            np = np.substr(0, np.length - 1);
+            np = np.replace("#", SHARP).replace("b", FLAT);
+            return _buildScale(tur.singer.keySignature)[0].indexOf(np);
         case "staff y":
-            let lc1 = notePlayed;
-            let o1;
-            if (Number(lc1)) {
-                [lc1, o1] = frequencyToPitch(lc1);
+            if (Number(np)) {
+                [np, octave] = frequencyToPitch(np);
             } else {
-                lc1 = notePlayed[0];
-                o1 = notePlayed.length === 2 ?
-                    notePlayed[1] :
-                    notePlayed[2];
+                np = notePlayed[0];
+                octave = notePlayed.length === 2 ? notePlayed[1] : notePlayed[2];
             }
             // these numbers are subject to staff artwork
-            return ["C", "D", "E", "F", "G", "A", "B"].indexOf(lc1) *
-                YSTAFFNOTEHEIGHT + (o1 - 4) * YSTAFFOCTAVEHEIGHT;
+            return ["C", "D", "E", "F", "G", "A", "B"].indexOf(np) *
+                YSTAFFNOTEHEIGHT + (octave - 4) * YSTAFFOCTAVEHEIGHT;
         case "pitch number":
-            let obj;
-            if (tur.singer.lastNotePlayed !== null) {
-                if (typeof notePlayed === "string") {
-                    let len = notePlayed.length;
-                    let pitch = notePlayed.slice(0, len - 1);
-                    let octave =
-                        parseInt(notePlayed.slice(len - 1));
-                    obj = [pitch, octave];
-                } else {
-                    // Hertz?
-                    obj = frequencyToPitch(notePlayed);
-                }
-            } else if (
-                tur.singer.inNoteBlock in tur.singer.notePitches &&
-                    tur.singer.notePitches[last(tur.singer.inNoteBlock)].length > 0
-            ) {
-                obj = getNote(
-                    tur.singer.notePitches[last(tur.singer.inNoteBlock)][0],
-                    tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][0],
-                    0,
-                    tur.singer.keySignature,
-                    tur.singer.moveable,
-                    null,
-                    logo.errorMsg
-                );
-            } else {
-                if (tur.singer.lastNotePlayed !== null) {
-                    console.debug("Cannot find a note ");
-                    logo.errorMsg(INVALIDPITCH, blk);
-                }
-                obj = ["G", 4];
-            }
-            return pitchToNumber(obj[0], obj[1], tur.singer.keySignature) -
-                tur.singer.pitchNumberOffset;
+            return _calculate_pitch_number(np, tur);
         case "pitch in hertz":
-            return logo.synth._getFrequency(
-                notePlayed,
-                logo.synth.changeInTemperament
-            );
+            return logo.synth._getFrequency(np, logo.synth.changeInTemperament);
         case "pitch to color":
-            let note5 = notePlayed;
-            if (Number(note5)) {
-                [note5] = frequencyToPitch(note5);
+            if (Number(np)) {
+                [np, octave] = frequencyToPitch(np);
             } else {
-                note5 = note5.substr(0, note5.length - 1);
+                np = np.substr(0, np.length - 1);
             }
-            let attr;
-            if (note5.includes(SHARP)) {
-                attr = SHARP;
-            } else if (note5.includes(FLAT)) {
-                attr = FLAT;
+
+            let color = 0;
+            if (NOTESSHARP.indexOf(np) !== -1) {
+                color = NOTESSHARP.indexOf(np) * 8.33;
+            } else if (NOTESFLAT.indexOf(np) !== -1) {
+                color = NOTESFLAT.indexOf(np) * 8.33;
             } else {
-                attr = NATURAL;
+                if (np.includes(DOUBLESHARP)) {
+                    np = np.replace(DOUBLESHARP, "");
+                    color = (NOTESSHARP.indexOf(np) + 2) * 8.33;
+                } else if (np.includes(DOUBLEFLAT)) {
+                    np = np.replace(DOUBLEFLAT, "");
+                    color = (NOTESFLAT.indexOf(np) - 2) * 8.33;
+                } else {
+                    console.debug('Pitch not found: ' + np);
+                }
             }
-            note5 = note5.replace(attr, "");
-            let color = NOTENAMES.indexOf(note5) * 16;
-            if (attr == SHARP) color += 8;
-            else if (attr == FLAT) color -= 8;
             return color;
         case "pitch to shade":
-            let note6 = notePlayed;
-            let octave;
-            if (Number(note6)) {
-                [note6, octave] = frequencyToPitch(note6);
+            // The expectation is a note in Hz.
+            if (Number(np)) {
+                [np, octave] = frequencyToPitch(np);
             } else {
-                octave = note6[note6.length - 1];
+                // But maybe it is of the form G4?
+                octave = np[np.length - 1];
+                if (isNaN(octave)) {
+                    octave = 4;
+                }
             }
-            return (octave * 10);
+            return (octave * 12.5);
         default:
             return "__INVALID_INPUT__";
         }

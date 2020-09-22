@@ -3718,6 +3718,7 @@ function Block(protoblock, blocks, overrideName) {
             } else {
                 Labels = [
                     _("letter class"),
+		    _("solfege class"),
                     _("solfege syllable"),
                     _("pitch class"),
                     _("pitch number"),

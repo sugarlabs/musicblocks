@@ -382,7 +382,7 @@ function setupPitchBlocks() {
             super("outputtools");
             this.setPalette("pitch");
             this.beginnerBlock(true);
-            this.extraWidth = 40;
+            this.extraWidth = 50;
             this.setHelpString([
                 _("This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."),
                 "documentation",
