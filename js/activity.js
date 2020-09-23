@@ -2018,11 +2018,16 @@ function Activity() {
             let block = blocks.protoBlockDict[i];
             blockLabel = block.staticLabels.join(' ');
             let artwork = block.palette.model.makeBlockInfo(0, block, block.name, block.name)["artwork64"];
-            if (blockLabel) {
+            if (blockLabel || block.extraSearchTerms !== undefined) {
                 if (block.deprecated) {
                     deprecatedBlockNames.push(blockLabel);
                 } else {
                     searchSuggestions.push({label: blockLabel, value: block.name, specialDict: block, artwork: artwork});
+                    if (block.extraSearchTerms !== undefined) {
+                        for (let i = 0; i < block.extraSearchTerms.length; i++) {
+                            searchSuggestions.push({label: block.extraSearchTerms[i], value: block.name, specialDict: block, artwork: artwork});
+                        }
+                    }
                 }
             }
         }

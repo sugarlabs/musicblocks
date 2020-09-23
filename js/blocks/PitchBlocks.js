@@ -389,6 +389,20 @@ function setupPitchBlocks() {
                 null,
                 "outputtoolshelp"
             ]);
+            this.extraSearchTerms = [
+                _("pitch number"),
+                _("pitch in hertz"),
+                _("letter class"),
+                _("solfege class"),
+                _("staff y"),
+                _("solfege syllable"),
+                _("pitch class"),
+                _("scalar class"),
+                _("scale degree"),
+                _("nth degree"),
+                _("pitch to shade"),
+                _("pitch to color")
+            ];
             this.formBlock({
                 args: 1,
                 argTypes: ["anyin"]

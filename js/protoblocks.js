@@ -1495,6 +1495,8 @@ class BaseBlock extends ProtoBlock {
         this.macroFunc = null;
         this._style = {};
         this.beginnerModeBlock = false;
+        this.deprecated = false;
+        this.extraSearchTerms = [];
         this.helpString = [];
 
         // Just for brevity

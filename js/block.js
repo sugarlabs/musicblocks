@@ -3709,27 +3709,9 @@ function Block(protoblock, blocks, overrideName) {
             selectedvalue = this.privateData;
             let Labels;
             if (beginnerMode) {
-                Labels = [
-                    _("pitch number"),
-                    _("pitch in hertz"),
-                    _("letter class"),
-                    _("staff y")
-                ];
+                Labels = this.protoblock.extraSearchTerms.slice(0, 5);
             } else {
-                Labels = [
-                    _("letter class"),
-		    _("solfege class"),
-                    _("solfege syllable"),
-                    _("pitch class"),
-                    _("pitch number"),
-                    _("pitch in hertz"),
-                    _("scalar class"),
-                    _("scale degree"),
-                    _("nth degree"),
-                    _("staff y"),
-                    _("pitch to shade"),
-                    _("pitch to color")
-                ];
+                Labels = this.protoblock.extraSearchTerms;
             }
 
             let Values = Labels;
