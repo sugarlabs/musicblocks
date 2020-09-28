@@ -55,7 +55,8 @@ Blocks (e.g., <code>cd /musicblocks</code>)
 (2) If you do not have Python installed, you'll need to install
 it. (Get it from https://www.python.org) You can test for Python in a
 terminal: <code>python</code>. Type <code>exit()</code> to exit
-Python.
+Python. (Note that on some older systems, the python3 command is not
+bound to python. You may need `sudo apt install python-is-python3`.
 
 (3) After cloning the musicblocks repository, run the command:
 
