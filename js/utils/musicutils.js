@@ -258,6 +258,7 @@ const PITCHES = [
     "B" + FLAT,
     "B"
 ];
+
 const PITCHES1 = [
     "C",
     "Db",
@@ -272,6 +273,7 @@ const PITCHES1 = [
     "Bb",
     "B"
 ];
+
 const PITCHES2 = [
     "C",
     "C" + SHARP,
@@ -286,6 +288,7 @@ const PITCHES2 = [
     "A" + SHARP,
     "B"
 ];
+
 const PITCHES3 = [
     "C",
     "C#",
@@ -300,6 +303,7 @@ const PITCHES3 = [
     "A#",
     "B"
 ];
+
 const NOTESTABLE = {
     1: "do",
     2: "do" + SHARP,
@@ -314,45 +318,56 @@ const NOTESTABLE = {
     11: "la" + SHARP,
     0: "ti"
 };
+
 const FIXEDSOLFEGE = {
-    do: "C",
-    re: "D",
-    mi: "E",
-    fa: "F",
-    sol: "G",
-    la: "A",
-    ti: "B"
+    "do": "C",
+    "re": "D",
+    "mi": "E",
+    "fa": "F",
+    "sol": "G",
+    "la": "A",
+    "ti": "B"
 };
+
 const FIXEDSOLFEGE1 = {
-    do: "C",
+    "do𝄫": "B",
+    "do♭": "C" + FLAT,
+    "do": "C",
     "do♯": "C" + SHARP,
-    "do𝄪": "C" + DOUBLESHARP,
-    "re𝄫": "D" + DOUBLEFLAT,
-    re: "D",
-    "re♯": "D" + SHARP,
-    "re𝄪": "D" + DOUBLESHARP,
-    "mi𝄫": "E" + DOUBLEFLAT,
-    mi: "E",
-    fa: "F",
-    "fa♯": "F" + SHARP,
-    "fa𝄪": "F" + DOUBLESHARP,
-    "sol𝄫": "G" + DOUBLEFLAT,
-    sol: "G",
-    "sol♯": "G" + SHARP,
-    "sol𝄪": "G" + DOUBLESHARP,
-    "la𝄫": "A" + DOUBLEFLAT,
-    la: "A",
-    "la♯": "A" + SHARP,
-    "la𝄪": "A" + DOUBLESHARP,
-    "ti𝄫": "B" + DOUBLEFLAT,
-    ti: "B",
+    "do𝄪": "D",
+    "re𝄫": "C",
     "re♭": "D" + FLAT,
+    "re": "D",
+    "re♯": "D" + SHARP,
+    "re𝄪": "E",
+    "mi𝄫": "D",
     "mi♭": "E" + FLAT,
+    "mi": "E",
+    "mi♯": "E" + SHARP,
+    "mi𝄪": "G",
+    "fa𝄫": "E" + FLAT,
+    "fa♭": "F" + FLAT,
+    "fa": "F",
+    "fa♯": "F" + SHARP,
+    "fa𝄪": "G" + SHARP,
+    "sol𝄫": "E",
     "sol♭": "G" + FLAT,
+    "sol": "G",
+    "sol♯": "G" + SHARP,
+    "sol𝄪": "A",
+    "la𝄫": "G",
     "la♭": "A" + FLAT,
+    "la": "A",
+    "la♯": "A" + SHARP,
+    "la𝄪": "B",
+    "ti𝄫": "A",
     "ti♭": "B" + FLAT,
-    R: _("rest")
+    "ti": "B",
+    "ti♯": "B" + SHARP,
+    "ti𝄪": "C",
+    "R": _("rest")
 };
+
 const NOTESTEP = { C: 1, D: 3, E: 5, F: 6, G: 8, A: 10, B: 12 };
 
 // Preference for sharps or flats
@@ -371,6 +386,7 @@ const SHARPPREFERENCE = [
     "g# minor",
     "d# minor"
 ];
+
 const FLATPREFERENCE = [
     "f major",
     "bb major",
@@ -397,6 +413,7 @@ const FLATPREFERENCE = [
 const SOLFNOTES = ["ti", "la", "sol", "fa", "mi", "re", "do"];
 const SCALENOTES = ["7", "6", "5", "4", "3", "2", "1"];
 const EASTINDIANSOLFNOTES = ["ni", "dha", "pa", "ma", "ga", "re", "sa"];
+
 const DRUMS = [
     "snare drum",
     "kick drum",
@@ -417,6 +434,7 @@ const DRUMS = [
     "clap",
     "slap"
 ];
+
 const GRAPHICS = [
     "forward",
     "back",
@@ -430,9 +448,12 @@ const GRAPHICS = [
     "set translucency",
     "set pen size"
 ];
-// const ARETINIANSOLFNOTES = ['si', 'la', 'sol', 'fa', 'mi', 're', 'ut']; //the "original solfege" https://en.wikipedia.org/wiki/Solf%C3%A8ge#Origin
-// const IROHASOLFNOTES = ['ro', 'i', 'to', 'he', 'ho', 'ni', 'ha']; //https://en.wikipedia.org/wiki/Iroha
+//The "original solfege" https://en.wikipedia.org/wiki/Solf%C3%A8ge#Origin
+// const ARETINIANSOLFNOTES = ['si', 'la', 'sol', 'fa', 'mi', 're', 'ut'];
+// https://en.wikipedia.org/wiki/Iroha
+// const IROHASOLFNOTES = ['ro', 'i', 'to', 'he', 'ho', 'ni', 'ha'];
 // const IROHASOLFNOTESJA = ['ロ','イ','ト','へ','ホ','二','ハ'];
+
 const SOLFATTRS = [DOUBLESHARP, SHARP, NATURAL, FLAT, DOUBLEFLAT];
 
 //.TRANS: ordinal number. Please keep exactly one space between each number.
@@ -1632,13 +1653,7 @@ function _calculate_pitch_number(np, tur) {
     let obj;
     if (tur.singer.lastNotePlayed !== null) {
         if (typeof np === "string") {
-            let octave = parseInt(np.slice(np.length - 1));
-            if (isNaN(octave)) {
-                octave = 4;
-            } else {
-                np = np.slice(0, np.length - 1);
-            }
-            obj = [np, octave];
+            obj = noteToObj(np);
         } else {
             // Hertz
             obj = frequencyToPitch(np);
@@ -2375,40 +2390,41 @@ const SOLFMAPPER = [
 
 function getScaleAndHalfSteps(keySignature) {
     // Determine scale and half-step pattern from key signature
-    var obj = keySignatureToMode(keySignature);
-    var myKeySignature = obj[0];
+    let obj = keySignatureToMode(keySignature);
+    let myKeySignature = obj[0];
     if (obj[1] === "CUSTOM") {
         var halfSteps = customMode;
     } else {
         var halfSteps = MUSICALMODES[obj[1]];
     }
 
-    var solfege = [];
+    let solfege = [];
 
     if (halfSteps.length === 7) {
-        for (var i = 0; i < halfSteps.length; i++) {
+        for (let i = 0; i < halfSteps.length; i++) {
             solfege.push(SOLFEGENAMES[i]);
-            for (var j = 1; j < halfSteps[i]; j++) {
+            for (let j = 1; j < halfSteps[i]; j++) {
                 solfege.push("");
             }
         }
     } else if (halfSteps.length > 7) {
         // If there are more than 7 notes, we need to add accidentals.
-        for (var i = 0; i < halfSteps.length; i++) {
+        for (let i = 0; i < halfSteps.length; i++) {
             if (solfege.indexOf(SOLFMAPPER[i]) === -1) {
                 solfege.push(SOLFMAPPER[i]);
             } else {
                 solfege.push(SOLFMAPPER[i] + SHARP);
             }
 
-            for (var j = 1; j < halfSteps[i]; j++) {
+            for (let j = 1; j < halfSteps[i]; j++) {
                 solfege.push("");
             }
         }
     } else {
         // If there are fewer than 7 notes, choose a solfege based on the mode spacing.
-        for (var i = 0; i < halfSteps.length; i++) {
-            var n = 0;
+        let n;
+        for (let i = 0; i < halfSteps.length; i++) {
+            n = 0;
             var solf = SOLFMAPPER[solfege.length];
             // Ensure there are no duplicates.
             while (solfege.indexOf(solf) !== -1) {
@@ -2418,16 +2434,15 @@ function getScaleAndHalfSteps(keySignature) {
 
             solfege.push(solf);
 
-            for (var j = 1; j < halfSteps[i]; j++) {
+            for (let j = 1; j < halfSteps[i]; j++) {
                 solfege.push("");
             }
         }
     }
 
+    let thisScale = NOTESSHARP;
     if (NOTESFLAT.indexOf(myKeySignature) !== -1) {
-        var thisScale = NOTESFLAT;
-    } else {
-        var thisScale = NOTESSHARP;
+        thisScale = NOTESFLAT;
     }
 
     if (myKeySignature in EXTRATRANSPOSITIONS) {
@@ -2535,18 +2550,18 @@ function getInterval(interval, keySignature, pitch) {
     // What do we do with the offset? Is it ignored? Or does it count
     // as one step in the interval?
 
+    let j = 0;
+
     if (interval === 0) {
         return 0;
     } else if (interval > 0) {
-        var j = 0;
-        for (var i = 0; i < interval; i++) {
+        for (let i = 0; i < interval; i++) {
             j += halfSteps[(ii + i) % halfSteps.length];
         }
         return j;
     } else {
-        var j = 0;
-        for (var i = 0; i > interval; i--) {
-            var z = (ii + i - 1) % halfSteps.length;
+        for (let i = 0; i > interval; i--) {
+            let z = (ii + i - 1) % halfSteps.length;
             while (z < 0) {
                 z += halfSteps.length;
             }
@@ -2823,12 +2838,12 @@ function frequencyToPitch(hz) {
     }
 
     // Calculate cents to keep track of drift
-    var cents = 0;
-    for (var i = 0; i < 8800; i++) {
-        var f = A0 * Math.pow(TWELVEHUNDRETHROOT2, i);
+    let cents = 0;
+    for (let i = 0; i < 8800; i++) {
+        let f = A0 * Math.pow(TWELVEHUNDRETHROOT2, i);
         if (hz < f * 1.0003 && hz > f * 0.9997) {
-            var cents = i % 100;
-            var j = Math.floor(i / 100 + 0.5);
+            cents = i % 100;
+            let j = Math.floor(i / 100 + 0.5);
             return [
                 PITCHES[(j + PITCHES.indexOf("A")) % 12],
                 Math.floor((j + PITCHES.indexOf("A")) / 12),
@@ -3330,6 +3345,27 @@ function getCustomNote(notes) {
 
 var isCustom = (temperament) => {
     return !(temperament in PreDefinedTemperaments) ;
+};
+
+function noteToObj(note) {
+    let octave = parseInt(note.slice(note.length - 1));
+    if (isNaN(octave)) {
+        octave = 4;
+    } else {
+        note = note.slice(0, note.length - 1);
+    }
+    return [note, octave];
+};
+
+function convertFromSolfege(note) {
+    // Convert to common letter class
+    if (note in FIXEDSOLFEGE1) {
+        note = FIXEDSOLFEGE1[note];
+    }
+    if (note in EQUIVALENTNATURALS) {
+        note = EQUIVALENTNATURALS[note];
+    }
+    return note;
 };
 
 function getNote(
