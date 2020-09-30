@@ -12,6 +12,7 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 function MusicKeyboard() {
+    const FAKEBLOCKNUMBER = 100000;
     const BUTTONDIVWIDTH = 535; // 5 buttons
     const OUTERWINDOWWIDTH = 758;
     const INNERWINDOWWIDTH = 50;
@@ -286,7 +287,7 @@ function MusicKeyboard() {
         };
 
         var __keyboardup = function(event) {
-            current.delete(event.keyCode)  
+            current.delete(event.keyCode)
             __endNote(event);
             //event.preventDefault();
         };
@@ -503,7 +504,7 @@ function MusicKeyboard() {
                     1/64,
                     0,
                     this.bpm || 90,
-                    0.07 
+                    0.07
                 );
                 setTimeout(()=>{this._logo.synth.start();},500)
             }
@@ -2165,7 +2166,7 @@ function MusicKeyboard() {
 
         for (var p = 0; p < this.layout.length; p++) {
             // If the blockNumber is null, don't add a label.
-            if (this.layout[p].noteName === null) {
+            if (this.layout[p].noteName > FAKEBLOCKNUMBER) {
                 var parenttbl2 = document.getElementById("myrow2");
                 var newel2 = document.createElement("td");
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
@@ -2265,7 +2266,7 @@ function MusicKeyboard() {
                 var nname = this.layout[p].noteName
                     .replace(SHARP, "")
                     .replace("#", "");
-                if (this.layout[p].blockNumber === null) {
+                if (this.layout[p].blockNumber > FAKEBLOCKNUMBER) {
                 } else if (SOLFEGENAMES.indexOf(nname) !== -1) {
                     newel2.innerHTML =
                         "<small>(" +
@@ -2325,7 +2326,7 @@ function MusicKeyboard() {
                 var nname = this.layout[p].noteName
                     .replace(FLAT, "")
                     .replace("b", "");
-                if (this.layout[p].blockNumber === null) {
+                if (this.layout[p].blockNumber > FAKEBLOCKNUMBER) {
                 } else if (SOLFEGENAMES.indexOf(nname) !== -1) {
                     newel2.innerHTML =
                         "<small>(" +
@@ -2369,7 +2370,7 @@ function MusicKeyboard() {
                     this.layout[p].blockNumber
                 ]);
 
-                if (this.layout[p].blockNumber === null) {
+                if (this.layout[p].blockNumber > FAKEBLOCKNUMBER) {
                 } else if (SOLFEGENAMES.indexOf(this.layout[p].noteName) !== -1) {
                     newel.innerHTML =
                         "<small>(" +
@@ -2841,112 +2842,117 @@ function MusicKeyboard() {
         navigator.requestMIDIAccess()
             .then(onMIDISuccess, onMIDIFailure);
     }
-}
 
+    function fillChromaticGaps(noteList) {
+        // Assuming list of either solfege or letter class of the form
+        // sol4 or G4.  Each entry is a dictionary with noteName and
+        // noteOctave.
 
-function fillChromaticGaps(noteList) {
-    // Assuming list of either solfege or letter class of the form sol4 or G4.
-    // Each entry is a dictionary with noteName and noteOctave.
+        let newList = [];
+        // Anything we don't recognize gets added to the end.
+        let hertzList = [];
+        let obj = null;
+        let fakeBlockNumber = FAKEBLOCKNUMBER + 1;
 
-    let newList = [];
-    // Anything we don't recognize gets added to the end.
-    let hertzList = [];
-    let obj = null;
-
-    // Find the first non-Hertz note.
-    for (let i = 0; i < noteList.length; i++) {
-        if (noteList[i].noteName === "hertz") {
-            hertzList.push(noteList[i]);
-        } else {
-            obj = [noteList[0].noteName, noteList[0].noteOctave];
-            break;
+        // Find the first non-Hertz note.
+        for (let i = 0; i < noteList.length; i++) {
+            if (noteList[i].noteName === "hertz") {
+                hertzList.push(noteList[i]);
+            } else {
+                obj = [noteList[0].noteName, noteList[0].noteOctave];
+                break;
+            }
         }
-    }
 
-    // Only Hertz, so nothing to do.
-    if (obj === null) {
-        return noteList;
-    }
+        // Only Hertz, so nothing to do.
+        if (obj === null) {
+            return noteList;
+        }
 
-    obj[0] = convertFromSolfege(obj[0]);
-    let j;
-    // Pad the left side.
-    for (let i = 0; i < PITCHES2.length; i++) {
-        newList.push({"noteName": PITCHES2[i],
-                      "noteOctave": obj[1],
-                      "blockNumber": noteList[0].blockNumber,
-                      "voice": noteList[0].voice});
-        j = i;
-        if (PITCHES2[i] === obj[0]) break;
-        if (PITCHES[i] === obj[0]) break;
-        newList[i].blockNumber = null;
-    }
+        obj[0] = convertFromSolfege(obj[0]);
+        let j;
+        // Pad the left side.
+        for (let i = 0; i < PITCHES2.length; i++) {
+            newList.push({"noteName": PITCHES2[i],
+                          "noteOctave": obj[1],
+                          "blockNumber": noteList[0].blockNumber,
+                          "voice": noteList[0].voice});
+            j = i;
+            if (PITCHES2[i] === obj[0]) break;
+            if (PITCHES[i] === obj[0]) break;
+            newList[i].blockNumber = fakeBlockNumber;
+            fakeBlockNumber += 1;
+        }
 
-    // Fill in any gaps
-    let lastOctave = obj[1];
-    let thisOctave;
-    let lastVoice;
-    for (let i = 1; i < noteList.length; i++) {
-        if (noteList[i].noteName === "hertz") {
-            hertzList.push(noteList[i]);
-        } else {
-            obj = [noteList[i].noteName, noteList[i].noteOctave];
-            thisOctave = obj[1];
-            lastVoice = noteList[i].voice;
-            obj[0] = convertFromSolfege(obj[0]);
+        // Fill in any gaps
+        let lastOctave = obj[1];
+        let thisOctave;
+        let lastVoice;
+        for (let i = 1; i < noteList.length; i++) {
+            if (noteList[i].noteName === "hertz") {
+                hertzList.push(noteList[i]);
+            } else {
+                obj = [noteList[i].noteName, noteList[i].noteOctave];
+                thisOctave = obj[1];
+                lastVoice = noteList[i].voice;
+                obj[0] = convertFromSolfege(obj[0]);
 
+                let k = PITCHES.indexOf(obj[0]);
+                if (k === -1) {
+                    k = PITCHES2.indexOf(obj[0]);
+                }
+                if (thisOctave > lastOctave) {
+                    k += 12;
+                }
+
+                if (k !== (j + 1) % 12) {
+                    // Fill in the gaps
+                    for (let l = j + 1; l < k; l++) {
+                        if (l % 12 === 0) {
+                            lastOctave += 1;
+                        }
+                        newList.push({"noteName": PITCHES2[l % 12],
+                                      "noteOctave": lastOctave,
+                                      "blockNumber": fakeBlockNumber,
+                                      "voice": lastVoice});
+                        fakeBlockNumber += 1;
+                    }
+                }
+                newList.push({"noteName": obj[0],
+                              "noteOctave": obj[1],
+                              "blockNumber": noteList[i].blockNumber,
+                              "voice": noteList[i].voice});
+                lastOctave = thisOctave;
+                j = k;
+            }
+        }
+
+        // Pad out the end of the list.
+        if (obj[0] !== "C") {
             let k = PITCHES.indexOf(obj[0]);
             if (k === -1) {
                 k = PITCHES2.indexOf(obj[0]);
             }
-            if (thisOctave > lastOctave) {
-                k += 12;
+            for (let i = (k + 1) % 12; i < PITCHES2.length; i++) {
+                if (i === 0) break;
+                newList.push({"noteName": PITCHES2[i],
+                              "noteOctave": obj[1],
+                              "blockNumber": fakeBlockNumber,
+                              "voice": lastVoice});
+                fakeBlockNumber += 1;
             }
-
-            if (k !== (j + 1) % 12) {
-                // Fill in the gaps
-                for (let l = j + 1; l < k; l++) {
-                    if (l % 12 === 0) {
-                        lastOctave += 1;
-                    }
-                    newList.push({"noteName": PITCHES2[l % 12],
-                                  "noteOctave": lastOctave,
-                                  "blockNumber": null,
-                                  "voice": lastVoice});
-                }
-            }
-            newList.push({"noteName": obj[0],
+            obj[1] += 1;
+            newList.push({"noteName": "C",
                           "noteOctave": obj[1],
-                          "blockNumber": noteList[i].blockNumber,
-                          "voice": noteList[i].voice});
-            lastOctave = thisOctave;
-            j = k;
-        }        
-    }
-    
-    // Pad out the end of the list.
-    if (obj[0] !== "C") {
-        let k = PITCHES.indexOf(obj[0]);
-        if (k === -1) {
-            k = PITCHES2.indexOf(obj[0]);
-        }
-        for (let i = (k + 1) % 12; i < PITCHES2.length; i++) {
-            if (i === 0) break;
-            newList.push({"noteName": PITCHES2[i],
-                          "noteOctave": obj[1],
-                          "blockNumber": null,
+                          "blockNumber": fakeBlockNumber,
                           "voice": lastVoice});
+            fakeBlockNumber += 1;
         }
-        obj[1] += 1;
-        newList.push({"noteName": "C",
-                      "noteOctave": obj[1],
-                      "blockNumber": null,
-                      "voice": lastVoice});
-    }
 
-    for (let i = 0; i < hertzList.length; i++) {
-        newList.push(hertzList[i]);
-    }
+        for (let i = 0; i < hertzList.length; i++) {
+            newList.push(hertzList[i]);
+        }
 
-    return newList
-};
+        return newList;
+    };
+}
