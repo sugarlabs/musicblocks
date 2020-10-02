@@ -200,7 +200,7 @@ function setupMediaBlocks() {
             this.formBlock({
                 args: 1,
                 defaults: [null],
-                argTypes: ["medain"]
+                argTypes: ["mediain"]
             });
 
             this.hidden = true;
