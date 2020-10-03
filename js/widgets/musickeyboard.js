@@ -526,8 +526,6 @@ function MusicKeyboard() {
 
         this._createKeyboard();
 
-        //var wI = Math.max(Math.min(window.innerWidth, this._cellScale * (OUTERWINDOWWIDTH - 150)), BUTTONDIVWIDTH - BUTTONSIZE);
-
         this._createTable();
 
         var w = Math.max(
@@ -549,8 +547,8 @@ function MusicKeyboard() {
                 docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
                 docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
                 try {
-                    docById("mkbInnerDiv").style.width = "calc(200vh - 200px)";
-                } catch (e) {
+                    docById("mkbInnerDiv").style.width = "calc(200vh - 64px)";
+                } catch (e) {  // Does this happen?
                     console.debug("Error calculating InnerDiv width");
                 }
 
@@ -1055,10 +1053,7 @@ function MusicKeyboard() {
         outerDiv.style.backgroundColor = "white";
         outerDiv.style.marginTop = "15px";
 
-        //var w = Math.max(Math.min(window.innerWidth, this._cellScale * (OUTERWINDOWWIDTH - 150)), BUTTONDIVWIDTH - BUTTONSIZE);
-        var innerDiv = docById("mkbInnerDiv");
-        innerDiv.style.marginLeft =
-            Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + "px";
+        docById("mkbInnerDiv").style.marginLeft = 0;
 
         var mkbTable = docById("mkbTable");
         if (selectedNotes.length < 1) {
@@ -1201,8 +1196,7 @@ function MusicKeyboard() {
             cell.style.backgroundColor = platformColor.rhythmcellcolor;
         }
 
-        var innerDiv = docById("mkbInnerDiv");
-        innerDiv.scrollLeft = innerDiv.scrollWidth;// Force to the right.\
+        docById("mkbInnerDiv").scrollLeft = innerDiv.scrollWidth;  // Force to the right.
         this.makeClickable();
     };
 
