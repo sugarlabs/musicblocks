@@ -2147,7 +2147,7 @@ function MusicKeyboard() {
             this.noteNames.push(PITCHES3[0]);
             this.octaves.push(5);
         }
-        document.getElementById("keyboardHolder2").style.display = "block";
+        // document.getElementById("keyboardHolder2").style.display = "block";
         that.idContainer = [];
         var myrowId = 0;
         var myrow2Id = 0;
