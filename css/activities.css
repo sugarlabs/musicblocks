@@ -723,15 +723,19 @@ table {
 
 #mkbOuterDiv {
     position: absolute;
+    width: 100% !important;
     display: flex;
     left: 0px;
     top: 140px;
     right: 5em;
-    overflow-y: auto;
+    overflow-y: scroll;
     overflow-x: none;
     background: rgba(255, 255, 255, 0.85);
 }
 
+#keyboardHolder2{
+    overflow:hidden !important;
+}
 #mkbInnerDiv {
     overflow-x:auto;
     margin-left: 53px;
