@@ -723,6 +723,7 @@ table {
 
 #mkbOuterDiv {
     position: absolute;
+    display: flex;
     left: 0px;
     top: 140px;
     right: 5em;
