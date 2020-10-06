@@ -2148,8 +2148,8 @@ function MusicKeyboard() {
         mkbKeyboardDiv.style.border = "0px";
         mkbKeyboardDiv.style.width = "300px";
         mkbKeyboardDiv.style.top = "0px";
+        mkbKeyboardDiv.style.overflow = "hidden";
         mkbKeyboardDiv.innerHTML = "";
-
         mkbKeyboardDiv.innerHTML =
             ' <div id="keyboardHolder2"><table class="white"><tbody><tr id="myrow"></tr></tbody></table><table class="black"><tbody><tr id="myrow2"></tr></tbody></table></div>';
 
@@ -2158,7 +2158,6 @@ function MusicKeyboard() {
         keyboardHolder2.style.left = "0px";
         keyboardHolder2.style.height = "145px";
         keyboardHolder2.style.backgroundColor = "white";
-
         var blackRow = document.getElementsByClassName("black");
         blackRow[0].style.top = "1px";
         blackRow[0].style.borderSpacing = "0px 0px 20px";
