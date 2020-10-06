@@ -2111,10 +2111,10 @@ function MusicKeyboard() {
         mkbKeyboardDiv.style.border = "0px";
         mkbKeyboardDiv.style.width = "300px";
         mkbKeyboardDiv.style.top = "0px";
+        mkbKeyboardDiv.style.overflow = "hidden";
         mkbKeyboardDiv.innerHTML = "";
-
         mkbKeyboardDiv.innerHTML =
-            ' <div id="keyboardHolder2" style="position: sticky;" ><table class="white"><tbody><tr id="myrow"></tr></tbody></table><table class="black"><tbody><tr id="myrow2"></tr></tbody></table></div>';
+            ' <div id="keyboardHolder2"><table class="white"><tbody><tr id="myrow"></tr></tbody></table><table class="black"><tbody><tr id="myrow2"></tr></tbody></table></div>';
 
         var keyboardHolder2 = docById("keyboardHolder2");
         keyboardHolder2.style.bottom = "10px";
