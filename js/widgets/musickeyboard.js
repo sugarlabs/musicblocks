@@ -2114,14 +2114,13 @@ function MusicKeyboard() {
         mkbKeyboardDiv.innerHTML = "";
 
         mkbKeyboardDiv.innerHTML =
-            ' <div id="keyboardHolder2"><table class="white"><tbody><tr id="myrow"></tr></tbody></table><table class="black"><tbody><tr id="myrow2"></tr></tbody></table></div>';
+            ' <div id="keyboardHolder2" style="position: sticky;" ><table class="white"><tbody><tr id="myrow"></tr></tbody></table><table class="black"><tbody><tr id="myrow2"></tr></tbody></table></div>';
 
         var keyboardHolder2 = docById("keyboardHolder2");
         keyboardHolder2.style.bottom = "10px";
         keyboardHolder2.style.left = "0px";
         keyboardHolder2.style.height = "145px";
         keyboardHolder2.style.backgroundColor = "white";
-
         var blackRow = document.getElementsByClassName("black");
         blackRow[0].style.top = "1px";
         blackRow[0].style.borderSpacing = "0px 0px 20px";

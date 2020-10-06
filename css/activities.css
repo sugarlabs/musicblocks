@@ -732,10 +732,6 @@ table {
     overflow-x: none;
     background: rgba(255, 255, 255, 0.85);
 }
-
-#keyboardHolder2{
-    overflow:hidden !important;
-}
 #mkbInnerDiv {
     overflow-x:auto;
     margin-left: 53px;
