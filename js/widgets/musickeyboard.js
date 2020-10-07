@@ -2143,13 +2143,13 @@ function MusicKeyboard() {
     this._createKeyboard = function() {
         document.onkeydown = null;
         var mkbKeyboardDiv = this.keyboardDiv;
-        mkbKeyboardDiv.style.display = "inline";
+        mkbKeyboardDiv.style.display = "flex";
         mkbKeyboardDiv.style.visibility = "visible";
         mkbKeyboardDiv.style.border = "0px";
-        mkbKeyboardDiv.style.width = "300px";
+        mkbKeyboardDiv.style.width = "100%";
         mkbKeyboardDiv.style.top = "0px";
+        mkbKeyboardDiv.style.overflow = "auto";
         mkbKeyboardDiv.innerHTML = "";
-
         mkbKeyboardDiv.innerHTML =
             ' <div id="keyboardHolder2"><table class="white"><tbody><tr id="myrow"></tr></tbody></table><table class="black"><tbody><tr id="myrow2"></tr></tbody></table></div>';
 
@@ -2158,7 +2158,6 @@ function MusicKeyboard() {
         keyboardHolder2.style.left = "0px";
         keyboardHolder2.style.height = "145px";
         keyboardHolder2.style.backgroundColor = "white";
-
         var blackRow = document.getElementsByClassName("black");
         blackRow[0].style.top = "1px";
         blackRow[0].style.borderSpacing = "0px 0px 20px";
@@ -2184,8 +2183,7 @@ function MusicKeyboard() {
             this.noteNames.push(PITCHES3[0]);
             this.octaves.push(5);
         }
-
-        document.getElementById("keyboardHolder2").style.display = "block";
+        // document.getElementById("keyboardHolder2").style.display = "block";
         that.idContainer = [];
         var myrowId = 0;
         var myrow2Id = 0;

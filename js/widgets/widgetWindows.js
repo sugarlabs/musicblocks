@@ -1,3 +1,14 @@
+// Copyright (c) 2020 Bottersnike
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
 window.widgetWindows = { openWindows: {}, _posCache: {} };
 
 function WidgetWindow(key, title) {
@@ -63,27 +74,41 @@ function WidgetWindow(key, title) {
 
     // Needed to keep things canvas-relative
     let canvas = docById("myCanvas");
-
+    
     // Scrolling in window body .
-    this.top = 0;
-    scrollEvent = function (evt) {
-        let data = evt.wheelDelta || -evt.detail;
-        let x = docByClass("wfbWidget")[0];
-        let l = x.getElementsByTagName("tr").length;
-        if (data < 0) {
-            if (x.getElementsByTagName("tr")[that.top] != null) {
-                x.getElementsByTagName("tr")[that.top].style.display = "none";
-                that.top = that.top == l ? l : that.top + 1;
-            }
-        } else if (data > 0) {
-            x.getElementsByTagName("tr")[that.top--].style.display = "";
-            that.top = that.top < 0 ? 0 : that.top;
-        }
-    };
+    // this.top = 0;
+    // scrollEvent = function (evt) {
+    //     let data = evt.wheelDelta || -evt.detail;
+    //     let x = docByClass("wfbWidget")[0];
+    //     let l = x.getElementsByTagName("tr").length;
+    //     if (data < 0) {
+    //         if (x.getElementsByTagName("tr")[that.top] != null) {
+    //             x.getElementsByTagName("tr")[that.top].style.display = "none";
+    //             that.top = that.top == l ? l : that.top + 1;
+    //         }
+    //     } else if (data > 0) {
+    //         x.getElementsByTagName("tr")[that.top--].style.display = "";
+    //         that.top = that.top < 0 ? 0 : that.top;
+    //     }
+    // };
+    function disableScroll() {
+        // Get the current page scroll position 
+        scrollTop =
+            window.pageYOffset || document.documentElement.scrollTop;
+        scrollLeft =
+            window.pageXOffset || document.documentElement.scrollLeft,
 
-    this._widget.addEventListener("mousewheel", scrollEvent, false);
-    this._widget.addEventListener("DOMMouseScroll", scrollEvent, false);
+            // if any scroll is attempted, 
+            // set this to the previous value 
+            window.onscroll = function () {
+                window.scrollTo(scrollLeft, scrollTop);
+            };
+    }
 
+
+    this._widget.addEventListener("wheel", disableScroll, false);
+    this._widget.addEventListener("DOMMouseScroll", disableScroll, false);
+    
     // Global watcher to track the mouse
     document.addEventListener("mousemove", function(e) {
         if (!that._dragging) return;
