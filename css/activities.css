@@ -723,17 +723,18 @@ table {
 
 #mkbOuterDiv {
     position: absolute;
+    max-height: 400px;
+    overflow-y: scroll;
+    width: 100% !important;
+    display: flex;
     left: 0px;
     top: 140px;
     right: 5em;
-    overflow-y: auto;
-    overflow-x: none;
     background: rgba(255, 255, 255, 0.85);
 }
-
 #mkbInnerDiv {
     overflow-x:auto;
-    margin-left: 53px;
+    margin-left: 0px;
 }
 
 #tempoDiv {

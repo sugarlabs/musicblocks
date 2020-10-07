@@ -277,6 +277,11 @@ function setupDrumBlocks() {
                 if (logo.drumBlocks.indexOf(blk) === -1) {
                     logo.drumBlocks.push(blk);
                 }
+            } else if (logo.inMusicKeyboard) {
+                logo.musicKeyboard.instruments.push(drumname);
+                logo.musicKeyboard.noteNames.push("drum");
+                logo.musicKeyboard.octaves.push(null);
+                logo.musicKeyboard.addRowBlock(blk);
             } else if (
                 tur.singer.inNoteBlock.length > 0 ||
                 blocks.blockList[blk].connections[0] == null &&
