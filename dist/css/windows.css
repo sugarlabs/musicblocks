@@ -138,7 +138,7 @@
     flex-grow: 1;
     padding: 2px;
     position: relative;
-    overflow: auto;
+    overflow: hidden;
 }
 #floatingWindows td {
     padding: 0;
