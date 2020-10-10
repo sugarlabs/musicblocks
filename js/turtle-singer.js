@@ -307,8 +307,9 @@ class Singer {
         if (lastNote === firstNote)
             return 0;
 
-        // Rather than just counting the semitones, we need to count the steps in the current key
-        // needed to get from firstNote pitch to lastNote pitch
+        // Rather than just counting the semitones, we need to count
+        // the steps in the current key needed to get from firstNote
+        // pitch to lastNote pitch
 
         let positive = false;
         if (lastNote > firstNote) {
@@ -317,17 +318,15 @@ class Singer {
         }
 
         let tur = logo.turtles.ithTurtle(turtle);
-
-        let noteObj = numberToPitch(lastNote + tur.singer.pitchNumberOffset);
-        let n = firstNote + tur.singer.pitchNumberOffset;
+        let n1 = firstNote + tur.singer.pitchNumberOffset;
+        let n2 = lastNote + tur.singer.pitchNumberOffset;
 
         let i = 0;
+        let noteObj = numberToPitch(n2);
         while (i++ < 100) {
-            n += getStepSizeUp(tur.singer.keySignature, noteObj[0]);
-            if (n >= firstNote + tur.singer.pitchNumberOffset)
-                break;
-
-            noteObj = numberToPitch(n);
+            n2 += getStepSizeUp(tur.singer.keySignature, noteObj[0], 1);
+            if (n2 >= n1) break;
+            noteObj = numberToPitch(n2);
         }
 
         return positive ? i : -i;

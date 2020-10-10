@@ -278,17 +278,17 @@ function setupIntervalsBlocks() {
                 let actionArgs = [];
                 let saveNoteCount = tur.singer.notesPlayed;
                 tur.running = true;
+                let distance = 0;
                 logo.runFromBlockNow(logo, turtle, cblk, true, actionArgs, tur.queue.length);
 
                 if (tur.singer.firstPitch.length > 0 && tur.singer.lastPitch.length > 0) {
-                    return Singer.scalarDistance(
+                    distance = Singer.scalarDistance(
                         logo, turtle, last(tur.singer.firstPitch), last(tur.singer.lastPitch)
                     );
-
                     tur.singer.firstPitch.pop();
                     tur.singer.lastPitch.pop();
                 } else {
-                    return 0;
+                    distance = 0;
                     logo.errorMsg(_("You must use two pitch blocks when measuring an interval."));
                 }
 
@@ -314,6 +314,7 @@ function setupIntervalsBlocks() {
 
                 // FIXME: we need to handle cascading.
                 tur.butNotThese = {};
+                return distance;
             }
         }
     }
