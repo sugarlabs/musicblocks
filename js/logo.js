@@ -82,6 +82,7 @@ class Logo {
         this.pitchStaircase = null;
         this.temperament = null;
         this.tempo = null;
+        this.sample = null;
         this.pitchSlider = null;
         this.musicKeyboard = null;
         this.modeWidget = null;
@@ -132,6 +133,7 @@ class Logo {
         this.rhythmRulerMeasure = null;
         this.inPitchStaircase = false;
         this.inTempo = false;
+        this.inSample = false;
         this.inPitchSlider = false;
         this.inMusicKeyboard = false;
         this._currentDrumlock = null;
