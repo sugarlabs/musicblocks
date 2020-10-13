@@ -666,7 +666,7 @@ function SampleWidget() {
         var w = window.innerWidth;
         var iconSize = ICONSIZE;
 
-        var widgetWindow = window.widgetWindows.windowFor(this, "tempo");
+        var widgetWindow = window.widgetWindows.windowFor(this, "sample");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
 	widgetWindow.show();
@@ -813,7 +813,7 @@ function SampleWidget() {
             );
         }
 
-        this._logo.textMsg(_("Adjust the tempo with the buttons."));
+        this._logo.textMsg(_("Record a sample to use as an instrument."));
         this.resume();
 
         widgetWindow.sendToCenter();
