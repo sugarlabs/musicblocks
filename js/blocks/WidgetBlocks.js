@@ -488,7 +488,7 @@ function setupWidgetBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Tempo block opens a metronome to visualize the beat!"),
+                _("The Tempo block opens a metronome to visualize the beat."),
                 "documentation",
                 null,
                 "tempo"

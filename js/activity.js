@@ -243,6 +243,7 @@ function Activity() {
             "widgets/pitchstaircase",
             "widgets/temperament",
             "widgets/tempo",
+            "widgets/sampler",
             "widgets/pitchslider",
             "widgets/musickeyboard",
             "widgets/timbre",
