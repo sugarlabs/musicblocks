@@ -792,8 +792,7 @@ function doUseCamera(
                 if (navigator.mozGetUserMedia) {
                     video.mozSrcObject = stream;
                 } else {
-                    let vendorURL = window.URL || window.webkitURL;
-                    video.src = vendorURL.createObjectURL(stream);
+                    video.srcObject = stream;
                 }
 
                 video.play();

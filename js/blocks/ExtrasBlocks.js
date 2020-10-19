@@ -864,8 +864,7 @@ function setupExtrasBlocks() {
                             if (logo.blocks.blockList[cblk].name === "grid"){
                                 let temp = new DisplayGridBlock();    
                                 temp.flow(args,logo,turtle,blk);
-                            }
-                            if (args[0] === undefined) {
+                            } else if (args[0] === undefined) {
                                 logo.textMsg("undefined");
                             } else if (args[0] === null) {
                                 logo.textMsg("null");
