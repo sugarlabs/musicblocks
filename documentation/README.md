@@ -34,7 +34,7 @@ of blocks representing the notes: `Sol 4`, `Mi 4`and `Sol 4`. The first two note
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/play-button.svg "play button")
 
 Try clicking on the *Start* block or click on the *Play* button. You
-should hear the notes play in succession: `Do` `Mi` `Sol` `Do`.
+should hear the notes play in succession: `Sol` `Mi` `Sol`.
 
 To write your own programs, drag blocks from their respective palettes
 on the left side of the screen. Use multiple blocks in stack(s) to
