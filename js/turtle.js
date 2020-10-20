@@ -289,6 +289,8 @@ class Turtle {
         this.singer.suppressOutput = suppressOutput;
 
         this.singer.dispatchFactor = 1;
+
+        this.singer.runningFromEvent = false;
     }
 
     // ================================ CONTROLLER ============================

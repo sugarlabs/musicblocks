@@ -638,6 +638,7 @@ function setupActionBlocks() {
                         tur.queue.push(queueBlock);
                     } else {
                         // Since the turtle has stopped running, we must run the stack from here
+                        tur.singer.runningFromEvent = true;
                         logo.runFromBlockNow(
                             logo, turtle, logo.actions[args[1]], false, receivedArg
                         );
