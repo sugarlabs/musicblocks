@@ -597,7 +597,7 @@ function setupToneBlocks() {
                 //.TRANS: set the characteristics of a custom instrument
                 name: _("set instrument"),
                 args: 1,
-                argTypes: ["anyin"],
+                argTypes: ["anyin", "mediain"],
                 defaults: [_("custom")]
             });
             this.makeMacro((x, y) => [
@@ -618,6 +618,7 @@ function setupToneBlocks() {
                 }
 
                 Singer.ToneActions.setTimbre(args[0], turtle, blk);
+                console.log(args[0]);
             }
 
             return [args[1], 1];

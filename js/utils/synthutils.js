@@ -360,6 +360,7 @@ function Synth() {
     this.samples = null;
     this.samplesuffix = "_SAMPLE";
     this.samplesManifest = null;
+    this.customSamplesManifest = null;
     this.changeInTemperament = false;
     this.inTemperament = "equal";
     this.startingPitch = "C4";
@@ -711,6 +712,8 @@ function Synth() {
                 { name: "snare drum", data: SNARE_SAMPLE }
             ]
         };
+        let data = function() {return null};
+        this.samplesManifest.voice.push({ name: "empty", data: data});
 
         if (this.samples === null) {
             this.samples = {};
@@ -723,6 +726,7 @@ function Synth() {
     };
 
     this._loadSample = function(sampleName) {
+        let accounted = false;
         for (let type in this.samplesManifest) {
             if (this.samplesManifest.hasOwnProperty(type)) {
                 for (let sample in this.samplesManifest[type]) {
@@ -733,11 +737,13 @@ function Synth() {
                             this.samples[type][name] = this.samplesManifest[
                                 type
                             ][sample].data();
+                            accounted = true;
                         }
                     }
                 }
             }
         }
+        
     };
 
     this.samplesQueue = []; // Samples that need to be loaded at start.
@@ -1118,6 +1124,15 @@ function Synth() {
 
     this.__createSynth = function(turtle, instrumentName, sourceName, params) {
         this._loadSample(sourceName);
+
+        if (!sourceName in this.samples.voice) {
+            let data = function() {return sourceName};
+            console.log(sourceName);
+            this.samplesManifest.voice.push({ name: "custom", data: data});
+            this._loadSample(sourceName);
+            instrumentName = "custom";
+            sourceName = "custom";
+        }
         if (
             sourceName in this.samples.voice ||
             sourceName in this.samples.drum
@@ -1589,7 +1604,7 @@ function Synth() {
     };
 
     this.loop = function(turtle, instrumentName, note, duration, start, bpm ,velocity) {
-        let synthA = instruments[turtle][instrumentName] 
+        let synthA = instruments[turtle][instrumentName]
         let flag = instrumentsSource[instrumentName][0]
         let loopA = new Tone.Loop(time => {
             if (flag == 1) {
