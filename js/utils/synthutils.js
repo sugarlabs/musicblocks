@@ -743,7 +743,7 @@ function Synth() {
                 }
             }
         }
-        
+
     };
 
     this.samplesQueue = []; // Samples that need to be loaded at start.
@@ -1124,14 +1124,12 @@ function Synth() {
 
     this.__createSynth = function(turtle, instrumentName, sourceName, params) {
         this._loadSample(sourceName);
-
-        if (!sourceName in this.samples.voice) {
+        if (!(sourceName in this.samples.voice)) {
             let data = function() {return sourceName};
-            console.log(sourceName);
             this.samplesManifest.voice.push({ name: "custom", data: data});
-            this._loadSample(sourceName);
+            this._loadSample("custom");
             instrumentName = "custom";
-            sourceName = "custom";
+            sourceName = data;
         }
         if (
             sourceName in this.samples.voice ||
