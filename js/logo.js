@@ -1598,7 +1598,7 @@ class Logo {
             }
         }
 
-        if (typeof logo.blocks.blockList[blk].protoblock.flow === "function") {
+        if (!logo.blocks.blockList[blk].isArgBlock()) {
             let res = logo.blocks.blockList[blk].protoblock.flow(
                 args, logo, turtle, blk, receivedArg, actionArgs, isflow
             );
