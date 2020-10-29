@@ -622,6 +622,8 @@ Turtles.TurtlesView = class {
         let color =
             turtle === -1 ? platformColor.background : this.turtleList[turtle].painter.canvasColor;
         this._backgroundColor = color;
+        this.makeBackground();
+        this.refreshCanvas();
     }
 
     /**
