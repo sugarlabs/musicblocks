@@ -618,7 +618,6 @@ function setupToneBlocks() {
                 }
 
                 Singer.ToneActions.setTimbre(args[0], turtle, blk);
-                console.log(args[0]);
             }
 
             return [args[1], 1];
