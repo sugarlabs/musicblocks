@@ -1128,6 +1128,21 @@ class Painter {
     }
 
     /**
+     * Clears the media layer
+     */
+    doClearMedia() {
+        // Clear all media
+        for (let i = 0; i < this.turtle.media.length; i++) {
+            // Could be in the image Container or the Stage
+            this.turtle.imageContainer.removeChild(this.turtle.media[i]);
+            this.turtles.stage.removeChild(this.turtle.media[i]);
+            delete this.turtle.media[i];
+        }
+
+        this.turtle.media = [];
+    }
+
+    /**
      * Takes in turtle functions to reset the turtle position, pen, skin, media.
      *
      * @param resetPen - boolean value regarding whether the pen's properties
@@ -1197,6 +1212,8 @@ class Painter {
         this.turtle.bitmap.rotation = this.turtle.orientation;
         this.turtle.updateCache();
 
+	this.doClearMedia();
+	/*
         // Clear all media
         for (let i = 0; i < this.turtle.media.length; i++) {
             // Could be in the image Container or the Stage
@@ -1206,7 +1223,7 @@ class Painter {
         }
 
         this.turtle.media = [];
-
+        */
         // Clear all graphics
         this._penDown = true;
         this._fillState = false;
