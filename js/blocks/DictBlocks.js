@@ -17,6 +17,35 @@ function _getDict(target, logo, turtle, k) {
         return logo.turtles.screenX2turtleX(logo.turtles.turtleList[target].container.x);
     } else if (k === "y") {
         return logo.turtles.screenY2turtleY(logo.turtles.turtleList[target].container.y);
+    } else if (k === _('notes played')) {
+        return logo.turtles.turtleList[target].singer.notesPlayed[0] / logo.turtles.turtleList[target].singer.notesPlayed[1];
+    } else if (k === _('pitch number')) {
+        let thisTurtle = logo.turtles.turtleList[target];
+        let obj;
+        if (thisTurtle.singer.lastNotePlayed !== null) {
+            let len = thisTurtle.singer.lastNotePlayed[0].length;
+            let pitch = thisTurtle.singer.lastNotePlayed[0].slice(0, len - 1);
+            let octave = parseInt(thisTurtle.singer.lastNotePlayed[0].slice(len - 1));
+
+            obj = [pitch, octave];
+        } else if (thisTurtle.singer.notePitches.length > 0) {
+            obj = getNote(
+                thisTurtle.singer.notePitches[0],
+                thisTurtle.singer.noteOctaves[0],
+                0,
+                thisTurtle.singer.keySignature,
+                tur.singer.moveable,
+                null,
+                logo.errorMsg,
+                logo.synth.inTemperament
+            );
+        } else {
+            console.debug("Cannot find a note for mouse " + target);
+            logo.errorMsg(INVALIDPITCH, blk);
+            obj = ["G", 4];
+        }
+
+        return pitchToNumber(obj[0], obj[1], thisTurtle.singer.keySignature) - thisTurtle.singer.pitchNumberOffset;
     } else {
         if (target in logo.turtleDicts[turtle]) {
             return logo.turtleDicts[turtle][target][k];
