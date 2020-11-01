@@ -288,8 +288,116 @@ function setupDictBlocks() {
         return;
     }
 
+    class GetDictBlock2 extends LeftBlock {
+        constructor() {
+            super("getDict2");
+            this.setPalette("dict");
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _(
+                    "The Get-dict block returns a value in the dictionary for a specified key."
+                ),
+                "documentation",
+                ""
+            ]);
+
+            this.formBlock({
+                //.TRANS: retrieve a value from the dictionary with a given key
+                name: _("get value"),
+                args: 1,
+                argTypes: ["anyin"],
+                defaults: [_('key')]
+            });
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            let cblk1 = logo.blocks.blockList[blk].connections[1];
+            if (cblk1 === null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return 0;
+            }
+
+            let a = logo.turtles.turtleList[turtle].name;
+            let k = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+
+            // Not sure this can happen.
+            if (!(turtle in logo.turtleDicts)) {
+                return 0;
+            }
+            // Is the dictionary the same as a turtle name?
+            let target = getTargetTurtle(logo.turtles, a);
+            if (target !== null) {
+                return _getDict(target, logo, turtle, k);
+            } else if (!(a in logo.turtleDicts[turtle])) {
+                return 0;
+            }
+
+            return logo.turtleDicts[turtle][a][k];
+        }
+    }
+
+    class SetDictBlock2 extends FlowBlock {
+        constructor() {
+            super("setDict2");
+            this.setPalette("dict");
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _(
+                    "The Set-dict block sets a value in the dictionary for a specified key."
+                ),
+                "documentation",
+                ""
+            ]);
+
+            this.formBlock({
+                //.TRANS: set a value in the dictionary for a given key
+                name: _("set value"),
+                args: 2,
+                argTypes: ["anyin", "anyin"],
+                argLabels: [_("key"), _("value")],
+                defaults: [_('key'), 0]
+            });
+        }
+
+        flow(args, logo, turtle, receivedArg) {
+            if (args[0] === null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return;
+            }
+            if (args[1] === null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return;
+            }
+
+            let a = logo.turtles.turtleList[turtle].name;
+            let k = args[0];
+            let v = args[1];
+
+            // Not sure this can happen.
+            if (!(turtle in logo.turtleDicts)) {
+                return 0;
+            }
+            // Is the dictionary the same as a turtle name?
+            let target = getTargetTurtle(logo.turtles, a);
+            if (target !== null) {
+                _setDict(target, logo, turtle, k, v);
+                return;
+            } else if (!(a in logo.turtleDicts[turtle])) {
+                logo.turtleDicts[turtle][a] = {};
+            }
+
+            logo.turtleDicts[turtle][a][k] = v;
+        }
+
+        return;
+    }
+
     new DictBlock().setup();
     new ShowDictBlock().setup();
     new SetDictBlock().setup();
     new GetDictBlock().setup();
+    new SetDictBlock2().setup();
+    new GetDictBlock2().setup();
 }
