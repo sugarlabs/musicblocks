@@ -242,8 +242,8 @@ function setupDictBlocks() {
             ]);
 
             this.formBlock({
-                //.TRANS: retrieve a value from the dictionary with a given key
-                name: _("set key"),
+                //.TRANS: set a value in the dictionary for a given key
+                name: _("set value"),
                 args: 3,
                 argTypes: ["anyin", "anyin", "anyin"],
                 argLabels: [_("name"), _("key"), _("value")],
