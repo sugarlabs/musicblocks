@@ -1,3 +1,83 @@
+function _getDict(target, logo, turtle, k) {
+    // This is the internal turtle dictionary that
+    // includes the turtle status.
+    if (k === _('color')) {
+        return logo.turtles.turtleList[target].painter.color;
+    } else if (k === _('shade')) {
+        return logo.turtles.turtleList[target].painter.value;
+    } else if (k === _('grey')) {
+        return logo.turtles.turtleList[target].painter.chroma;
+    } else if (k === _('pen size')) {
+        return logo.turtles.turtleList[target].painter.pensize;
+    } else if (k === _('font')) {
+        return logo.turtles.turtleList[target].painter.font;
+    } else if (k === _('heading')) {
+        return logo.turtles.turtleList[target].painter.heading;
+    } else if (k === "x") {
+        return logo.turtles.screenX2turtleX(logo.turtles.turtleList[target].container.x);
+    } else if (k === "y") {
+        return logo.turtles.screenY2turtleY(logo.turtles.turtleList[target].container.y);
+    } else {
+        if (target in logo.turtleDicts[turtle]) {
+            return logo.turtleDicts[turtle][target][k];
+        }
+    }
+    return 0;
+}
+
+
+function _setDict(target, logo, turtle, k, v) {
+    // This is the internal turtle dictionary that
+    // includes the turtle status.
+    if (k === _('color')) {
+        logo.turtles.turtleList[target].painter.doSetColor(v);
+    } else if (k === _('shade')) {
+        logo.turtles.turtleList[target].painter.doSetValue(v);
+    } else if (k === _('grey')) {
+        logo.turtles.turtleList[target].painter.doSetChroma(v);
+    } else if (k === _('pen size')) {
+        logo.turtles.turtleList[target].painter.doSetPensize(v);
+    } else if (k === _('font')) {
+        logo.turtles.turtleList[target].painter.doSetFont(v);
+    } else if (k === _('heading')) {
+        logo.turtles.turtleList[target].painter.doSetHeading(v);
+    } else if (k === "y") {
+        let x = logo.turtles.screenX2turtleX(logo.turtles.turtleList[target].container.x);
+        logo.turtles.turtleList[target].painter.doSetXY(x, v);
+    } else if (k === "x") {
+        let y = logo.turtles.screenY2turtleY(logo.turtles.turtleList[target].container.y);
+        logo.turtles.turtleList[target].painter.doSetXY(v, y);
+    } else {
+        if (!(target in logo.turtleDicts[turtle])) {
+            logo.turtleDicts[turtle][target] = {};
+        }
+        logo.turtleDicts[turtle][target][k] = v;
+    }
+    return;
+}
+
+
+function _serializeDict(target, logo, turtle) {
+    // This is the internal turtle dictionary that includes the turtle
+    // status.
+    let this_dict = {};
+    this_dict[_('color')] = logo.turtles.turtleList[target].painter.color;
+    this_dict[_('shade')] = logo.turtles.turtleList[target].painter.value;
+    this_dict[_('grey')] = logo.turtles.turtleList[target].painter.chroma;
+    this_dict[_('pen size')] = logo.turtles.turtleList[target].painter.stroke;
+    this_dict[_('font')] = logo.turtles.turtleList[target].painter.font;
+    this_dict[_('heading')] = logo.turtles.turtleList[target].painter.orientation;
+    this_dict["y"] = logo.turtles.screenY2turtleY(logo.turtles.turtleList[target].container.y);
+    this_dict["x"] = logo.turtles.screenX2turtleX(logo.turtles.turtleList[target].container.x);
+    if (target in logo.turtleDicts[turtle]) {
+        for(let k in logo.turtleDicts[turtle][target]) {
+            this_dict[k] = logo.turtleDicts[turtle][target][k];
+        }
+    }
+    return JSON.stringify(this_dict);
+}
+
+
 function setupDictBlocks() {
     class ShowDictBlock extends FlowBlock {
         constructor() {
@@ -36,23 +116,7 @@ function setupDictBlocks() {
             // Is the dictionary the same as a turtle name?
             let target = getTargetTurtle(logo.turtles, a);
             if (target !== null) {
-                // This should be the internal turtle dictionary that
-                // includes the turtle status.
-                let this_dict = {};
-                this_dict[_('color')] = logo.turtles.turtleList[target].painter.color;
-                this_dict[_('shade')] = logo.turtles.turtleList[target].painter.value;
-                this_dict[_('grey')] = logo.turtles.turtleList[target].painter.chroma;
-                this_dict[_('pen size')] = logo.turtles.turtleList[target].painter.stroke;
-                this_dict[_('font')] = logo.turtles.turtleList[target].painter.font;
-                this_dict[_('heading')] = logo.turtles.turtleList[target].painter.orientation;
-                this_dict["y"] = logo.turtles.screenY2turtleY(logo.turtles.turtleList[target].container.y);
-                this_dict["x"] = logo.turtles.screenX2turtleX(logo.turtles.turtleList[target].container.x);
-                if (a in logo.turtleDicts[turtle]) {
-                    for(let k in logo.turtleDicts[turtle][a]) {
-                        this_dict[k] = logo.turtleDicts[turtle][a][k];
-                    }
-                }
-                logo.textMsg(JSON.stringify(this_dict));
+                logo.textMsg(_serializeDict(target, logo, turtle));
                 return;
             } else if (!(a in logo.turtleDicts[turtle])) {
                 logo.turtleDicts[turtle][a] = {};
@@ -99,23 +163,7 @@ function setupDictBlocks() {
             // Is the dictionary the same as a turtle name?
             let target = getTargetTurtle(logo.turtles, a);
             if (target !== null) {
-                // This should be the internal turtle dictionary that
-                // includes the turtle status.
-                let this_dict = {};
-                this_dict[_('color')] = logo.turtles.turtleList[target].painter.color;
-                this_dict[_('shade')] = logo.turtles.turtleList[target].painter.value;
-                this_dict[_('grey')] = logo.turtles.turtleList[target].painter.chroma;
-                this_dict[_('pen size')] = logo.turtles.turtleList[target].painter.stroke;
-                this_dict[_('font')] = logo.turtles.turtleList[target].painter.font;
-                this_dict[_('heading')] = logo.turtles.turtleList[target].painter.orientation;
-                this_dict["y"] = logo.turtles.screenY2turtleY(logo.turtles.turtleList[target].container.y);
-                this_dict["x"] = logo.turtles.screenX2turtleX(logo.turtles.turtleList[target].container.x);
-                if (a in logo.turtleDicts[turtle]) {
-                    for(let k in logo.turtleDicts[turtle][a]) {
-                        this_dict[k] = logo.turtleDicts[turtle][a][k];
-                    }
-                }
-                return JSON.stringify(this_dict);
+                return _serializeDict(target, logo, turtle);
             } else if (!(a in logo.turtleDicts[turtle])) {
                 logo.turtleDicts[turtle][a] = {};
             }
@@ -170,30 +218,7 @@ function setupDictBlocks() {
             // Is the dictionary the same as a turtle name?
             let target = getTargetTurtle(logo.turtles, a);
             if (target !== null) {
-                // This should be the internal turtle dictionary that
-                // includes the turtle status.
-                if (k === _('color')) {
-                    return logo.turtles.turtleList[target].painter.color;
-                } else if (k === _('shade')) {
-                    return logo.turtles.turtleList[target].painter.value;
-                } else if (k === _('grey')) {
-                    return logo.turtles.turtleList[target].painter.chroma;
-                } else if (k === _('pen size')) {
-                    return logo.turtles.turtleList[target].painter.pensize;
-                } else if (k === _('font')) {
-                    return logo.turtles.turtleList[target].painter.font;
-                } else if (k === _('heading')) {
-                    return logo.turtles.turtleList[target].painter.heading;
-                } else if (k === "x") {
-                    return logo.turtles.screenX2turtleX(logo.turtles.turtleList[target].container.x);
-                } else if (k === "y") {
-                    return logo.turtles.screenY2turtleY(logo.turtles.turtleList[target].container.y);
-                } else {
-                    if (a in logo.turtleDicts[turtle]) {
-                        return logo.turtleDicts[turtle][a][k];
-                    }
-                }
-                return 0;
+                return _getDict(target, logo, turtle, k);
             } else if (!(a in logo.turtleDicts[turtle])) {
                 return 0;
             }
@@ -251,41 +276,16 @@ function setupDictBlocks() {
             // Is the dictionary the same as a turtle name?
             let target = getTargetTurtle(logo.turtles, a);
             if (target !== null) {
-                // This should be the internal turtle dictionary that
-                // includes the turtle status.
-                if (k === _('color')) {
-                    logo.turtles.turtleList[target].painter.doSetColor(v);
-                } else if (k === _('shade')) {
-                    logo.turtles.turtleList[target].painter.doSetValue(v);
-                } else if (k === _('grey')) {
-                    logo.turtles.turtleList[target].painter.doSetChroma(v);
-                } else if (k === _('pen size')) {
-                    logo.turtles.turtleList[target].painter.doSetPensize(v);
-                } else if (k === _('font')) {
-                    logo.turtles.turtleList[target].painter.doSetFont(v);
-                } else if (k === _('heading')) {
-                    logo.turtles.turtleList[target].painter.doSetHeading(v);
-                } else if (k === "y") {
-                    let x = logo.turtles.screenX2turtleX(logo.turtles.turtleList[target].container.x);
-                    logo.turtles.turtleList[target].painter.doSetXY(x, v);
-                } else if (k === "x") {
-                    let y = logo.turtles.screenY2turtleY(logo.turtles.turtleList[target].container.y);
-                    logo.turtles.turtleList[target].painter.doSetXY(v, y);
-                } else {
-                    if (!(a in logo.turtleDicts[turtle])) {
-                        logo.turtleDicts[turtle][a] = {};
-                        logo.turtleDicts[turtle][a][k] = v;
-                    }
-                }
+                _setDict(target, logo, turtle, k, v);
                 return;
             } else if (!(a in logo.turtleDicts[turtle])) {
                 logo.turtleDicts[turtle][a] = {};
-                logo.turtleDicts[turtle][a][k] = v;
-                return;
             }
 
             logo.turtleDicts[turtle][a][k] = v;
         }
+
+        return;
     }
 
     new DictBlock().setup();
