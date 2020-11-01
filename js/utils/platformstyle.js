@@ -52,6 +52,7 @@ window.platformColor = {
         extras: ["#C4C4C4", "#A0A0A0", "#B0B0B0", "#D0D0D0"],
         myblocks: ["#FFBF00", "#DAAF30", "#DAA926", "#FFE391"],
         heap: ["#D98A43", "#B7651A", "#D68136", "#ECC6A4"],
+        dict: ["#D98A43", "#B7651A", "#D68136", "#ECC6A4"],
         ensemble: ["#92A9FF", "#5370DC", "#728FF9", "#CDD8FF"]
     },
 

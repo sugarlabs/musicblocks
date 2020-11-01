@@ -392,7 +392,7 @@ class Singer {
     }
 
     /**
-     * Counts notes, with saving of the box, heap and turtle states.
+     * Counts notes, with saving of the box, heap, dict, and turtle states.
      *
      * @static
      * @param {Object} logo
@@ -411,6 +411,7 @@ class Singer {
         // We need to save the state of the boxes and heap although there is a potential of a boxes collision with other turtles
         let saveBoxes = JSON.stringify(logo.boxes);
         let saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
+	let saveTurtleDicts = JSON.stringify(logo.turtleDicts[turtle]);
         // .. and the turtle state
         let saveX = tur.x;
         let saveY = tur.y;
@@ -457,6 +458,7 @@ class Singer {
         // Restore previous state
         logo.boxes = JSON.parse(saveBoxes);
         logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
+        logo.turtleDicts[turtle] = JSON.parse(saveTurtleDicts);
 
         tur.painter.doPenUp();
         tur.painter.doSetXY(saveX, saveY);
@@ -482,7 +484,7 @@ class Singer {
     }
 
     /**
-     * Tally notes inside clamp (with saving of the box, heap and turtle states.)
+     * Tally notes inside clamp (with saving of the box, heap, dict, and turtle states.)
      *
      * @static
      * @param {Object} logo
@@ -498,9 +500,10 @@ class Singer {
 
         let saveSuppressStatus = tur.singer.suppressOutput;
 
-        // We need to save the state of the boxes and heap although there is a potential of a boxes collision with other turtles
+        // We need to save the state of the boxes, heap, and dict although there is a potential of a boxes collision with other turtles.
         let saveBoxes = JSON.stringify(logo.boxes);
         let saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
+        let saveTurtleDicts = JSON.stringify(logo.turtleDicts[turtle]);
         // .. and the turtle state
         let saveX = tur.x;
         let saveY = tur.y;
@@ -545,6 +548,7 @@ class Singer {
         // Restore previous state
         logo.boxes = JSON.parse(saveBoxes);
         logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
+        logo.turtleDicts[turtle] = JSON.parse(saveTurtleDicts);
 
         tur.painter.doPenUp();
         tur.painter.doSetXY(saveX, saveY);
