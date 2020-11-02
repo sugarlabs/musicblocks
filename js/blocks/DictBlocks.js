@@ -19,6 +19,10 @@ function _getDict(target, logo, turtle, k) {
         return logo.turtles.screenY2turtleY(logo.turtles.turtleList[target].container.y);
     } else if (k === _('notes played')) {
         return logo.turtles.turtleList[target].singer.notesPlayed[0] / logo.turtles.turtleList[target].singer.notesPlayed[1];
+    } else if (k === _('note value')) {
+        return Singer.RhythmActions.getNoteValue(target);
+    } else if (k === _('current pitch')) {
+        return logo.turtles.turtleList[target].singer.lastNotePlayed[0];
     } else if (k === _('pitch number')) {
         let thisTurtle = logo.turtles.turtleList[target];
         let obj;
