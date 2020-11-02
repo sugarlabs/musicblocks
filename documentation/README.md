@@ -346,8 +346,8 @@ object. You can have as many key/value pairs as you'd like in the
 dictionary and you can have as many dictionaries as you'd like as
 well. There is also a built-in dictionary associated with each *Start*
 block that has key/value pairs for parameters such as x, y, heading,
-color, shade, grey, pen size, notes played, current pitch, and note
-value.
+color, shade, grey, pen size, notes played, current pitch, pitch
+number, and note value.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/print_block.svg "print")
 
