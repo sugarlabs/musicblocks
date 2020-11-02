@@ -533,7 +533,7 @@ function setupFlowBlocks() {
             this.formBlock({
                 name: _("until"),
                 flows: {
-                    labels: [this.lang === "js" ? _("do2") : _("do")]
+                    labels: [this.lang === "ja" ? _("do2") : _("do")]
                 },
                 args: 1,
                 argTypes: ["booleanin"]
@@ -592,7 +592,7 @@ function setupFlowBlocks() {
             this.formBlock({
                 name: _("while"),
                 flows: {
-                    labels: [this.lang === "js" ? _("do2") : _("do")]
+                    labels: [this.lang === "ja" ? _("do2") : _("do")]
                 },
                 args: 1,
                 argTypes: ["booleanin"]
