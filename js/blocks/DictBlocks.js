@@ -219,13 +219,14 @@ function setupDictBlocks() {
                 ""
             ]);
 
+            labels: [this.lang === "js" ? _("do2") : _("do")]
             this.formBlock({
                 //.TRANS: retrieve a value from the dictionary with a given key
                 name: _("get value"),
                 args: 2,
                 argTypes: ["anyin", "anyin"],
-                argLabels: [_("name"), _("key")],
-                defaults: [_("My Dictionary"), _('key')]
+                argLabels: [_("name"), this.lang === "ja" ? _("key2") : _("key")],
+                defaults: [_("My Dictionary"), this.lang === "ja" ? _("key2") : _("key")]
             });
         }
 
@@ -279,8 +280,8 @@ function setupDictBlocks() {
                 name: _("set value"),
                 args: 3,
                 argTypes: ["anyin", "anyin", "anyin"],
-                argLabels: [_("name"), _("key"), _("value")],
-                defaults: [_("My Dictionary"), _('key'), 0]
+                argLabels: [_("name"), this.lang === "ja" ? _("key2") : _("key"), _("value")],
+                defaults: [_("My Dictionary"), this.lang === "ja" ? _("key2") : _("key"), 0]
             });
         }
 
@@ -340,7 +341,7 @@ function setupDictBlocks() {
                 name: _("get value"),
                 args: 1,
                 argTypes: ["anyin"],
-                defaults: [_('key')]
+                defaults: [this.lang === "ja" ? _("key2") : _("key")]
             });
         }
 
@@ -389,8 +390,8 @@ function setupDictBlocks() {
                 name: _("set value"),
                 args: 2,
                 argTypes: ["anyin", "anyin"],
-                argLabels: [_("key"), _("value")],
-                defaults: [_('key'), 0]
+                argLabels: [this.lang === "ja" ? _("key2") : _("key"), _("value")],
+                defaults: [this.lang === "ja" ? _("key2") : _("key"), 0]
             });
         }
 
