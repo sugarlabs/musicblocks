@@ -334,7 +334,20 @@ of the input form are then transferred to *Input-value* block.
 
 The *Push* and *Pop* blocks, found on the *Heap* palette, are used to
 store and retrieve values on/from a first-in, last-out (FILO) program
-heap.
+heap. There is a separate heap maintained for each *Start* block.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/getDict_block.svg "get value")
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/setDict_block.svg "set value")
+
+The *Get value* and *Set value* blocks are found on the *Dictionary*
+palette. They are used to get and set values in a dictionary
+object. You can have as many key/value pairs as you'd like in the
+dictionary and you can have as many dictionaries as you'd like as
+well. There is also a built-in dictionary associated with each *Start*
+block that has key/value pairs for parameters such as x, y, heading,
+color, shade, grey, pen size, notes played, current pitch, and note
+value.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/print_block.svg "print")
 
