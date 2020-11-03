@@ -1307,7 +1307,7 @@ Much of music involves multiple instruments (voices or "mice" in Music
 Blocks) playing together. There are a number of special blocks that
 can be used to coordinate the actions of an ensemble of mice.
 
-This secction will guide about different ensemble blocks, which
+This section will guide about different ensemble blocks, which
 communicate the status of mice by name, including notes played,
 current pen color, pitch number, etc.
 
