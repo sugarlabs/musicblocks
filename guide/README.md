@@ -2536,7 +2536,7 @@ Looking for a block? The tables below (one for beginner mode and one for advance
 | Tone | set instrument | | | | | | cursor y |
 | | vibrato | | | | | | click |
 | | chorus | | | | | | loudness |
-| | termolo | | | | | Ensemble | set name |
+| | tremolo | | | | | Ensemble | set name |
 | Ornament | staccato | | | | | | mouse name |
 | | slur | | | | 
 | | neighbor (+/-) | | | | 
