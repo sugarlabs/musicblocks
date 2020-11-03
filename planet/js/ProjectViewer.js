@@ -75,6 +75,8 @@ function ProjectViewer(Planet) {
     };
 
     this.openProject = function() {
+        var newPageTitle = proj.ProjectName;
+        document.title = newPageTitle;
         Planet.GlobalPlanet.openGlobalProject(this.id);
     };
 
