@@ -2326,7 +2326,7 @@ msgstr "オリジナル"
 
 #: js/WidgetBlocks.js:396
 msgid "oscilloscope"
-msgstr ""
+msgstr "オシロスコープ"
 
 #: js/WidgetBlocks.js:453
 #.TRANS: musical mode is the pattern of half-steps in an octave, e.g., Major or Minor modes
@@ -2857,7 +2857,7 @@ msgstr "スタッカート"
 #: js/VolumeBlocks.js:5
 #.TRANS: the volume for this synth
 msgid "synth volume"
-msgstr ""
+msgstr "シンセノ音量"
 
 #: js/VolumeBlocks.js:19
 #: js/synthutils.js:25
@@ -2900,7 +2900,7 @@ msgstr "シンセサイザー"
 
 #: js/VolumeBlocks.js:277
 msgid "Synth not found"
-msgstr ""
+msgstr "シンセが見つかりません"
 
 #: js/VolumeBlocks.js:320
 #.TRANS: set the loudness level
@@ -2922,7 +2922,7 @@ msgstr "０から１００までのすうちをせっていできる。<br><br> 
 #: js/VolumeBlocks.js:397
 #.TRANS: set the distribution of volume
 msgid "set panning"
-msgstr ""
+msgstr "ステレオを設定"
 
 #: js/VolumeBlocks.js:426
 #: js/VolumeBlocks.js:459
@@ -3729,7 +3729,7 @@ msgstr ""
 
 #: js/PitchBlocks.js:352
 msgid "current pitch"
-msgstr ""
+msgstr "現代の音の高さ"
 
 #: js/PitchBlocks.js:387
 msgid "This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."
@@ -3758,7 +3758,7 @@ msgstr "数値をオクターヴ表記へ"
 
 #: js/PitchBlocks.js:648
 msgid "y to pitch"
-msgstr ""
+msgstr "音の高さをy座に"
 
 #: js/PitchBlocks.js:771
 msgid "Pitch can be specified in terms of ni dha pa ma ga re sa."
