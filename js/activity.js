@@ -3310,6 +3310,7 @@ function Activity() {
             planet.initialiseNewProject();
             // Restore default cursor
             loading = false;
+
             document.body.style.cursor = "default";
             update = true;
         }, 2500);
@@ -4500,8 +4501,6 @@ function Activity() {
                 " " +
                 document.body.clientHeight
         );
-        var newTitle = this.PlanetInterface.getCurrentProjectName;
-        document.querySelector('title').textContent = newTitle;
         this._clientWidth = document.body.clientWidth;
         this._clientHeight = document.body.clientHeight;
 
@@ -4703,6 +4702,8 @@ function Activity() {
             };
 
             this.showMusicBlocks = function() {
+                this.planet = this.PlanetInterface.getCurrentProjectName;
+                document.querySelector('title').textContent = this.planet;
                 document.getElementById("toolbars").style.display = "block";
                 document.getElementById("palette").style.display = "block";
 
