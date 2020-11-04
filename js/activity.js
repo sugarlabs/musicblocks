@@ -3310,7 +3310,6 @@ function Activity() {
             planet.initialiseNewProject();
             // Restore default cursor
             loading = false;
-
             document.body.style.cursor = "default";
             update = true;
         }, 2500);
@@ -4501,6 +4500,8 @@ function Activity() {
                 " " +
                 document.body.clientHeight
         );
+        var newTitle = this.PlanetInterface.getCurrentProjectName;
+        document.querySelector('title').textContent = newTitle;
         this._clientWidth = document.body.clientWidth;
         this._clientHeight = document.body.clientHeight;
 
