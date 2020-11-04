@@ -2348,7 +2348,7 @@ between pitch numbers `0` and `1` and the resultant number of notes
 within an octave are changed from 12 to 13.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/temperament4.svg
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/temperament5.svg
  "Ratio Edit tool")
 
 The `Ratio` tool is used to add notes of specified ratios in such a
