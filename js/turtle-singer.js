@@ -2066,9 +2066,9 @@ class Singer {
                     let runAgainBlockParam = logo.specialArgs.pop()
                     let _ar = runAgainBlockParam
                     let blockN = _ar[3];
-        
+
                     //update args for pitch in hertz and current pitch and then redo the flow block they are attatched to(print/storein etc).
-        
+
                     let args = [];
                     for (let i = 1; i <= logo.blocks.blockList[blockN].protoblock.args; i++) {
                         if (logo.blocks.blockList[blockN].protoblock.dockTypes[i] === "in") {

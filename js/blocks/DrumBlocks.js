@@ -195,7 +195,7 @@ function setupDrumBlocks() {
                 //.TRANS: set the current drum sound for playback
                 name: _("set drum"),
                 args: 1,
-                argTypes: ["anyin"]
+                argTypes: ["anyin", "mediaout"]
             });
             this.makeMacro((x, y) => [
                 [0, "setdrum", x, y, [null, 1, 2, 7]],

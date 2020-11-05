@@ -727,7 +727,9 @@ function Synth() {
         }
     };
 
-    this._loadSample = function(sampleName) {
+    this._loadSample = function(sampleName, sampleType = "voice") {
+        let accounted = false;
+        outerloop:
         for (let type in this.samplesManifest) {
             if (this.samplesManifest.hasOwnProperty(type)) {
                 for (let sample in this.samplesManifest[type]) {
@@ -738,10 +740,17 @@ function Synth() {
                             this.samples[type][name] = this.samplesManifest[
                                 type
                             ][sample].data();
+                            accounted = true;
+                            break outerloop;
                         }
                     }
                 }
             }
+        }
+        if (!accounted) {
+            let data = function() {return sampleName};
+            this.samplesManifest[sampleType].push({ name: sampleName, data: data});
+            this._loadSample(sampleName, sampleType);
         }
 
     };
@@ -1126,17 +1135,9 @@ function Synth() {
         return tempSynth;
     };
 
-    this.__createSynth = function(turtle, instrumentName, sourceName, params) {
-        if (
-            !this.samplesManifest["voice"].hasOwnProperty(instrumentName) &&
-            !this.samplesManifest["drum"].hasOwnProperty(instrumentName)
-        )
-        {
-            let data = function() {return sourceName};
-            this.samplesManifest.voice.push({ name: instrumentName, data: data});
-        }
+    this.__createSynth = function(turtle, instrumentName, sourceName, params, sampleType) {
+        this._loadSample(sourceName, sampleType);
 
-        this._loadSample(sourceName);
         if (
             sourceName in this.samples.voice ||
             sourceName in this.samples.drum
@@ -1186,7 +1187,13 @@ function Synth() {
     };
 
     // Create the synth as per the user's input in the 'Timbre' clamp.
-    this.createSynth = function(turtle, instrumentName, sourceName, params) {
+    this.createSynth = function(
+        turtle,
+        instrumentName,
+        sourceName,
+        params,
+        sampleType = "voice"
+        ) {
         // We may have a race condition with the samples loader.
         if (this.samples === null) {
             this.samplesQueue.push([instrumentName, sourceName, params]);
@@ -1196,16 +1203,16 @@ function Synth() {
                 that.loadSamples();
             });
         } else {
-            this.__createSynth(turtle, instrumentName, sourceName, params);
+            this.__createSynth(turtle, instrumentName, sourceName, params, sampleType);
         }
     };
 
-    this.loadSynth = function(turtle, sourceName) {
+    this.loadSynth = function(turtle, sourceName, sampleType="voice") {
         if (sourceName in instruments[turtle]) {
             console.debug(sourceName + " already loaded");
         } else {
             console.debug("loading " + sourceName);
-            this.createSynth(turtle, sourceName, sourceName, null);
+            this.createSynth(turtle, sourceName, sourceName, null, sampleType);
         }
         this.setVolume(turtle, sourceName, last(Singer.masterVolume));
 
