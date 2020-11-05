@@ -154,18 +154,22 @@ function Activity() {
 
         if (localStorage.languagePreference !== undefined) {
             try {
+		console.log(localStorage.languagePreference);
                 lang = localStorage.languagePreference;
                 document.webL10n.setLanguage(lang);
+		console.log('SUCCESS');
             } catch (e) {
                 console.debug(e);
             }
         } else {
             // document.webL10n.getLanguage();
             lang = navigator.language;
+	    console.log(lang);
             if (lang.indexOf("-") !== -1) {
                 lang = lang.slice(0, lang.indexOf("-"));
                 document.webL10n.setLanguage(lang);
             }
+	    console.log('ELSE');
         }
     } catch (e) {
         console.debug(e);
@@ -276,6 +280,7 @@ function Activity() {
             "activity/blocks/BoxesBlocks",
             "activity/blocks/BooleanBlocks",
             "activity/blocks/HeapBlocks",
+            "activity/blocks/DictBlocks",
             "activity/blocks/ExtrasBlocks",
             "activity/blocks/GraphicsBlocks",
             "activity/blocks/PenBlocks",
@@ -860,6 +865,7 @@ function Activity() {
         logo.notationOutput = "";
         for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
             logo.turtleHeaps[turtle] = [];
+            logo.turtleDicts[turtle] = {};
             logo.notation.notationStaging[turtle] = [];
             logo.notation.notationDrumStaging[turtle] = [];
             if (noErase === undefined || !noErase) {
@@ -2017,7 +2023,7 @@ function Activity() {
 
         for (i in blocks.protoBlockDict) {
             let block = blocks.protoBlockDict[i];
-            blockLabel = block.staticLabels.join(' ');
+            let blockLabel = block.staticLabels.join(' ');
             let artwork = block.palette.model.makeBlockInfo(0, block, block.name, block.name)["artwork64"];
             if (blockLabel || block.extraSearchTerms !== undefined) {
                 if (block.deprecated) {
@@ -3437,6 +3443,7 @@ function Activity() {
                         turtle++
                     ) {
                         logo.turtleHeaps[turtle] = [];
+                        logo.turtleDicts[turtle] = {};
                         logo.notation.notationStaging[turtle] = [];
                         logo.notation.notationDrumStaging[turtle] = [];
                         turtles.turtleList[turtle].painter.doClear(true, true, false);

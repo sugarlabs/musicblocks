@@ -106,6 +106,7 @@ class Logo {
         this.actions = {};
         this.returns = {};
         this.turtleHeaps = {};
+        this.turtleDicts = {};
 
         // We store each case arg and flow by switch block no. and turtle
         this.switchCases = {};

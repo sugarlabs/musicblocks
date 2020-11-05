@@ -152,7 +152,7 @@ function setupIntervalsBlocks() {
 
             let saveSuppressStatus = tur.singer.suppressOutput;
 
-            // We need to save the state of the boxes and heap
+            // We need to save the state of the boxes, dicts, and heap
             // although there is a potential of a boxes
             // collision with other turtles.
             let saveBoxes = JSON.stringify(logo.boxes);
@@ -199,6 +199,7 @@ function setupIntervalsBlocks() {
             // Restore previous state
             logo.boxes = JSON.parse(saveBoxes);
             logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
+            logo.turtleDicts[turtle] = JSON.parse(saveTurtleDicts);
 
             tur.painter.doPenUp();
             tur.painter.doSetXY(saveX, saveY);
@@ -248,11 +249,12 @@ function setupIntervalsBlocks() {
 
             let saveSuppressStatus = tur.singer.suppressOutput;
 
-            // We need to save the state of the boxes and heap
+            // We need to save the state of the boxes, dicts, and heap
             // although there is a potential of a boxes
             // collision with other turtles.
             let saveBoxes = JSON.stringify(logo.boxes);
             let saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
+            let saveTurtleDicts = JSON.stringify(logo.turtleDicts[turtle]);
             // And the turtle state
             let saveX = tur.x;
             let saveY = tur.y;
@@ -298,6 +300,7 @@ function setupIntervalsBlocks() {
             // Restore previous state
             logo.boxes = JSON.parse(saveBoxes);
             logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
+            logo.turtleDicts[turtle] = JSON.parse(saveTurtleDicts);
 
             tur.painter.doPenUp();
             tur.painter.doSetXY(saveX, saveY);

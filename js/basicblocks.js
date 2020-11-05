@@ -71,6 +71,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     setupBoxesBlocks();
     setupBooleanBlocks();
     setupHeapBlocks();
+    setupDictBlocks();
     setupExtrasBlocks();
     setupGraphicsBlocks();
     setupPenBlocks();

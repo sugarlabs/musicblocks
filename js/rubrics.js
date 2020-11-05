@@ -288,6 +288,10 @@ const TACAT = {
     pop: "box",
     push: "box",
 
+    // dictionary palette
+    getDict: "box",
+    setDict: "box",
+
     // media palette
 
     leftpos: "ignore",

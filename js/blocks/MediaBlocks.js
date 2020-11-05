@@ -191,6 +191,24 @@ function setupMediaBlocks() {
         }
     }
 
+    class ClearMediaBlock extends FlowBlock {
+        constructor() {
+            //.TRANS: Erases the images and text
+            super("erasemedia", _("erase media"));
+            this.setPalette("media");
+            this.setHelpString([
+                _("The Erase Media block erases text and images."),
+                "documentation",
+                ""
+            ]);
+        }
+
+        flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+            tur.painter.doClearMedia();	    
+        }
+    }
+
     class PlaybackBlock extends FlowBlock {
         constructor() {
             //.TRANS: play an audio recording
@@ -636,6 +654,7 @@ function setupMediaBlocks() {
     new ToneBlock().setup();
     new ToFrequencyBlock().setup();
     new TurtleShellBlock().setup();
+    new ClearMediaBlock().setup();
     new ShowBlock().setup();
     new MediaBlock().setup();
     new TextBlock().setup();
