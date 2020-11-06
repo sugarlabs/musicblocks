@@ -727,7 +727,7 @@ function Synth() {
         }
     };
 
-    this._loadSample = function(sampleName, sampleType = "voice") {
+    this._loadSample = function(sampleName) {
         let accounted = false;
         outerloop:
         for (let type in this.samplesManifest) {
@@ -749,8 +749,9 @@ function Synth() {
         }
         if (!accounted) {
             let data = function() {return sampleName};
-            this.samplesManifest[sampleType].push({ name: sampleName, data: data});
-            this._loadSample(sampleName, sampleType);
+            this.samplesManifest.voice.push({ name: sampleName, data: data});
+            this.samplesManifest.drum.push({ name: sampleName, data: data});
+            this._loadSample(sampleName);
         }
 
     };
@@ -1135,8 +1136,8 @@ function Synth() {
         return tempSynth;
     };
 
-    this.__createSynth = function(turtle, instrumentName, sourceName, params, sampleType) {
-        this._loadSample(sourceName, sampleType);
+    this.__createSynth = function(turtle, instrumentName, sourceName, params) {
+        this._loadSample(sourceName);
 
         if (
             sourceName in this.samples.voice ||
@@ -1192,7 +1193,6 @@ function Synth() {
         instrumentName,
         sourceName,
         params,
-        sampleType = "voice"
         ) {
         // We may have a race condition with the samples loader.
         if (this.samples === null) {
@@ -1203,16 +1203,16 @@ function Synth() {
                 that.loadSamples();
             });
         } else {
-            this.__createSynth(turtle, instrumentName, sourceName, params, sampleType);
+            this.__createSynth(turtle, instrumentName, sourceName, params);
         }
     };
 
-    this.loadSynth = function(turtle, sourceName, sampleType="voice") {
+    this.loadSynth = function(turtle, sourceName) {
         if (sourceName in instruments[turtle]) {
             console.debug(sourceName + " already loaded");
         } else {
             console.debug("loading " + sourceName);
-            this.createSynth(turtle, sourceName, sourceName, null, sampleType);
+            this.createSynth(turtle, sourceName, sourceName, null);
         }
         this.setVolume(turtle, sourceName, last(Singer.masterVolume));
 
