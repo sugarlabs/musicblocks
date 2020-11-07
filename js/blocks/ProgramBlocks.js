@@ -156,6 +156,75 @@ function setupProgramBlocks() {
         }
     }
 
+    class LoadDictBlock extends FlowBlock {
+        constructor() {
+            super("loadDict");
+            this.setPalette("program");
+            this.setHelpString([
+                _("The Load-dictionary block loads a dictionary from a file."),
+                "documentation",
+                ""
+            ]);
+
+            this.formBlock({
+                //.TRANS: load a dictionary from a file
+                name: _("load dictionary"),
+                args: 2,
+                argTypes: ["textin", "filein"],
+                argLabels: [_("name"), _("file")],
+                defaults: [_("My Dictionary"), [null, null]]
+            });
+        }
+
+        flow(args, logo, turtle, blk) {
+            let block = logo.blocks.blockList[blk];
+            if (args[0] === null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return;
+            }
+            if (args[1] === null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return;
+            }
+
+            let a = args[0];
+            // Not sure this can happen.
+            if (!(turtle in logo.turtleDicts)) {
+                logo.turtleDicts[turtle] = {};
+            }
+
+            let c = block.connections[2];
+            if (c != null && logo.blocks.blockList[c].name === "loadFile") {
+                if (args.length !== 2) {
+                    logo.errorMsg(_("You must select a file."));
+                } else {
+                    try {
+                        let d = JSON.parse(logo.blocks.blockList[c].value[1]);
+                        // Is the dictionary the same as a turtle name?
+                        let target = getTargetTurtle(logo.turtles, a);
+                        if (target !== null) {
+                            // Copy any internal entries now.
+                            let k = Object.keys(d);
+                            for (let i=0; i < k.length; i++) {
+                                setDictValue(target, logo, turtle, k[i], d[k[i]]);
+                            }
+                        } else if (!(a in logo.turtleDicts[turtle])) {
+                            logo.turtleDicts[turtle][a] = foo;
+                        }
+                    } catch (e) {
+                        logo.errorMsg(
+                            _(
+                                "The file you selected does not contain a valid dictionary."
+                            )
+                        );
+                    }
+                }
+            } else {
+                logo.errorMsg(_("The load dictionary block needs a load file block."));
+            }
+        }
+    }
+
     class SaveHeapBlock extends FlowBlock {
         constructor() {
             super("saveHeap");
@@ -182,6 +251,61 @@ function setupProgramBlocks() {
                     "data:text/json;charset-utf-8," +
                         JSON.stringify(logo.turtleHeaps[turtle]),
                     args[0]
+                );
+            }
+        }
+    }
+
+    class SaveDictBlock extends FlowBlock {
+        constructor() {
+            super("saveDict");
+            this.setPalette("program");
+            this.setHelpString([
+                _("The Save-dictionary block saves a dictionary to a file."),
+                "documentation",
+                ""
+            ]);
+
+            this.formBlock({
+                //.TRANS: save a dictionary to a file
+                name: _("save dictionary"),
+                args: 2,
+                argTypes: ["textin", "textin"],
+                argLabels: [_("name"), _("file")],
+                defaults: [_("My Dictionary"), "dictionary.json"]
+            });
+        }
+
+        flow(args, logo, turtle) {
+            if (args[0] === null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return;
+            }
+            if (args[1] === null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return;
+            }
+
+            let a = args[0];
+            // Not sure this can happen.
+            if (!(turtle in logo.turtleDicts)) {
+                logo.turtleDicts[turtle] = {};
+            }
+            // Is the dictionary the same as a turtle name?
+            let target = getTargetTurtle(logo.turtles, a);
+            if (target === null) {
+                save.download(
+                    "json",
+                    "data:text/json;charset-utf-8," +
+                        JSON.stringify(logo.turtleDicts[turtle][a]),
+                    args[1]
+                );
+            } else {
+                save.download(
+                    "json",
+                    "data:text/json;charset-utf-8," +
+                        _serializeDict(target, logo, turtle),
+                    args[1]
                 );
             }
         }
@@ -736,6 +860,8 @@ function setupProgramBlocks() {
     new OpenPaletteBlock().setup();
     new LoadHeapFromAppBlock().setup();
     new SaveHeapToAppBlock().setup();
+    new SaveDictBlock().setup();
+    new LoadDictBlock().setup();
     new SaveHeapBlock().setup();
     new LoadHeapBlock().setup();
 }
