@@ -1307,7 +1307,7 @@ Much of music involves multiple instruments (voices or "mice" in Music
 Blocks) playing together. There are a number of special blocks that
 can be used to coordinate the actions of an ensemble of mice.
 
-This secction will guide about different ensemble blocks, which
+This section will guide about different ensemble blocks, which
 communicate the status of mice by name, including notes played,
 current pen color, pitch number, etc.
 
@@ -1331,43 +1331,39 @@ location for a specified mouse.
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtleheap_block.svg
  "mouse heap index")
 
-The *Mouse elapse notes* block returns the number of notes played by the
-specified mouse.
+You can use the dictionary entries to data between mice. The *Get
+value* block lets you specify a mouse name and the value you want to
+access. For example, you can access a mouse's pen attributes, such as
+color, shade, and grey values.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtleelapsednotes_block.svg
- "mouse notes played")
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/dictionary-pen.svg
+ "mouse pen attributes")
 
-The *Mouse pitch block* returns the current pitch number being played by
-the specified mouse.
-
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtlepitch_block.svg
- "mouse pitch number")
-
-The *X mouse* block returns the X position of the specified mouse.
+You can also access the mouse's graphics attributes, such as x, y, and
+heading. You can also set attributes of a mouse using the *Set value*
+block. In the example, a mouse's heading is set to 90.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/xturtle_block.svg
- "mouse x")
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/dictionary-graphics.svg
+ "mouse graphics attributes")
 
-The *Y mouse* block returns the Y position of the specified mouse.
-
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/yturtle_block.svg
- "mouse y")
-
-The *Mouse heading* block returns the heading of the specified mouse.
+Some music status is also available through the dictionary. You can
+access a mouse's "current pitch", "pitch number", "note value", the
+number of "notes played".
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtleheading_block.svg
- "mouse heading")
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/dictionary-music.svg
+ "mouse music attributes")
 
-The *Mouse color* block returns the pen color of the specified mouse.
+The dictionary can be used to share other things too. Just set a
+*key/value* pair with one mouse and access it from another.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtlecolor_block.svg
- "mouse color")
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/dictionary-key.svg
+ "sharing key/value pairs")
+
+Other Ensemble blocks include:
 
 The *Found mouse* block will return true if the specified mouse can be found.
 
@@ -2540,7 +2536,7 @@ Looking for a block? The tables below (one for beginner mode and one for advance
 | Tone | set instrument | | | | | | cursor y |
 | | vibrato | | | | | | click |
 | | chorus | | | | | | loudness |
-| | termolo | | | | | Ensemble | set name |
+| | tremolo | | | | | Ensemble | set name |
 | Ornament | staccato | | | | | | mouse name |
 | | slur | | | | 
 | | neighbor (+/-) | | | | 

@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="66.013542mm"
+   height="89.105515mm"
+   viewBox="0 0 66.013542 89.105515"
+   version="1.1"
+   id="svg3587">
+  <defs
+     id="defs3581" />
+  <metadata
+     id="metadata3584">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     transform="translate(-50.37773,-66.36258)">
+    <g
+       id="g3470"
+       transform="matrix(0.26458333,0,0,0.26458333,28.15273,71.198304)">
+      <g
+         transform="translate(84,255)"
+         id="g104">
+        <g
+           transform="scale(1.5)"
+           id="g102">
+          <path
+             d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 40.585937 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 26.5 h -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
+             style="fill:#d98a43;fill-opacity:1;stroke:#b7651a;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             id="path88" />
+          <text
+             style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+             id="text92"><tspan
+               x="65"
+               y="23"
+               id="tspan90">get value</tspan></text>
+          <text
+             style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+             id="text96"><tspan
+               x="65"
+               y="12"
+               id="tspan94">name</tspan></text>
+          <text
+             style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+             id="text100"><tspan
+               x="65"
+               y="33"
+               id="tspan98">key</tspan></text>
+        </g>
+      </g>
+      <g
+         transform="translate(185,255)"
+         id="g114">
+        <g
+           transform="scale(1.5)"
+           id="g112">
+          <path
+             d="m 8.5,0.5 h 87.807617 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             id="path106" />
+          <text
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+             id="text110"><tspan
+               x="13"
+               y="14"
+               id="tspan108">mouse name</tspan></text>
+        </g>
+      </g>
+      <g
+         transform="translate(185,287)"
+         id="g124">
+        <g
+           transform="scale(1.5)"
+           id="g122">
+          <path
+             d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             style="fill:#ff664b;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             id="path116" />
+          <text
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+             id="text120"><tspan
+               x="13"
+               y="14"
+               id="tspan118">notes played</tspan></text>
+        </g>
+      </g>
+    </g>
+    <g
+       id="g3428"
+       transform="matrix(0.26458333,0,0,0.26458333,4.0756475,78.533413)">
+      <g
+         transform="translate(175,-46)"
+         id="g256">
+        <g
+           transform="scale(1.5)"
+           id="g254">
+          <path
+             d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 40.585937 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 26.5 h -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
+             style="fill:#d98a43;fill-opacity:1;stroke:#b7651a;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             id="path240" />
+          <text
+             style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+             id="text244"><tspan
+               x="65"
+               y="23"
+               id="tspan242">get value</tspan></text>
+          <text
+             style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+             id="text248"><tspan
+               x="65"
+               y="12"
+               id="tspan246">name</tspan></text>
+          <text
+             style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+             id="text252"><tspan
+               x="65"
+               y="33"
+               id="tspan250">key</tspan></text>
+        </g>
+      </g>
+      <g
+         transform="translate(276,-46)"
+         id="g266">
+        <g
+           transform="scale(1.5)"
+           id="g264">
+          <path
+             d="m 8.5,0.5 h 87.807617 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             id="path258" />
+          <text
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+             id="text262"><tspan
+               x="13"
+               y="14"
+               id="tspan260">mouse name</tspan></text>
+        </g>
+      </g>
+      <g
+         transform="translate(276,-14)"
+         id="g276">
+        <g
+           transform="scale(1.5)"
+           id="g274">
+          <path
+             d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             style="fill:#ff664b;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             id="path268" />
+          <text
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+             id="text272"><tspan
+               x="13"
+               y="14"
+               id="tspan270">pitch number</tspan></text>
+        </g>
+      </g>
+    </g>
+    <g
+       id="g3407"
+       transform="matrix(0.26458333,0,0,0.26458333,3.8110641,80.409901)">
+      <g
+         transform="translate(176,38)"
+         id="g294">
+        <g
+           transform="scale(1.5)"
+           id="g292">
+          <path
+             d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 40.585937 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 26.5 h -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
+             style="fill:#d98a43;fill-opacity:1;stroke:#b7651a;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             id="path278" />
+          <text
+             style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+             id="text282"><tspan
+               x="65"
+               y="23"
+               id="tspan280">get value</tspan></text>
+          <text
+             style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+             id="text286"><tspan
+               x="65"
+               y="12"
+               id="tspan284">name</tspan></text>
+          <text
+             style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+             id="text290"><tspan
+               x="65"
+               y="33"
+               id="tspan288">key</tspan></text>
+        </g>
+      </g>
+      <g
+         transform="translate(277,38)"
+         id="g304">
+        <g
+           transform="scale(1.5)"
+           id="g302">
+          <path
+             d="m 8.5,0.5 h 87.807617 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             id="path296" />
+          <text
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+             id="text300"><tspan
+               x="13"
+               y="14"
+               id="tspan298">mouse name</tspan></text>
+        </g>
+      </g>
+      <g
+         transform="translate(277,70)"
+         id="g314">
+        <g
+           transform="scale(1.5)"
+           id="g312">
+          <path
+             d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             style="fill:#ff664b;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             id="path306" />
+          <text
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+             id="text310"><tspan
+               x="13"
+               y="14"
+               id="tspan308">current pitch</tspan></text>
+        </g>
+      </g>
+    </g>
+    <g
+       id="g3449"
+       transform="matrix(0.26458333,0,0,0.26458333,-65.245185,128.05931)">
+      <g
+         transform="translate(437,-51)"
+         id="g332">
+        <g
+           transform="scale(1.5)"
+           id="g330">
+          <path
+             d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 40.585937 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 26.5 h -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
+             style="fill:#d98a43;fill-opacity:1;stroke:#b7651a;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             id="path316" />
+          <text
+             style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+             id="text320"><tspan
+               x="65"
+               y="23"
+               id="tspan318">get value</tspan></text>
+          <text
+             style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+             id="text324"><tspan
+               x="65"
+               y="12"
+               id="tspan322">name</tspan></text>
+          <text
+             style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+             id="text328"><tspan
+               x="65"
+               y="33"
+               id="tspan326">key</tspan></text>
+        </g>
+      </g>
+      <g
+         transform="translate(538,-51)"
+         id="g342">
+        <g
+           transform="scale(1.5)"
+           id="g340">
+          <path
+             d="m 8.5,0.5 h 87.807617 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             id="path334" />
+          <text
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+             id="text338"><tspan
+               x="13"
+               y="14"
+               id="tspan336">mouse name</tspan></text>
+        </g>
+      </g>
+      <g
+         transform="translate(538,-19)"
+         id="g352">
+        <g
+           transform="scale(1.5)"
+           id="g350">
+          <path
+             d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+             style="fill:#ff664b;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+             id="path344" />
+          <text
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+             id="text348"><tspan
+               x="13"
+               y="14"
+               id="tspan346">note value</tspan></text>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
