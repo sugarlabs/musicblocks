@@ -281,6 +281,7 @@ function Activity() {
             "activity/blocks/HeapBlocks",
             "activity/blocks/DictBlocks",
             "activity/blocks/ExtrasBlocks",
+            "activity/blocks/ProgramBlocks",
             "activity/blocks/GraphicsBlocks",
             "activity/blocks/PenBlocks",
             "activity/blocks/MediaBlocks",
