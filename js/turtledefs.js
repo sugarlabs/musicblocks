@@ -88,6 +88,7 @@ const BUILTINPALETTESFORL23N = [
     _("dictionary"),
     _("ensemble"),
     _("extras"),
+    //.TRANS: program as in computer program
     _("program"),
     _("my blocks")
 ];
