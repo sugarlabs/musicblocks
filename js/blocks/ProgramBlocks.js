@@ -256,7 +256,7 @@ function setupProgramBlocks() {
                             // Copy any internal entries now.
                             let k = Object.keys(d);
                             for (let i=0; i < k.length; i++) {
-                                setDictValue(target, logo, turtle, k[i], d[k[i]]);
+                                Turtle.DictActions.setDictValue(target, turtle, k[i], d[k[i]]);
                             }
                         } else if (!(a in logo.turtleDicts[turtle])) {
                             logo.turtleDicts[turtle][a] = foo;
@@ -322,7 +322,7 @@ function setupProgramBlocks() {
                         // Copy any internal entries now.
                         let k = Object.keys(d);
                         for (let i=0; i < k.length; i++) {
-                            setDictValue(target, logo, turtle, k[i], d[k[i]]);
+                            Turtle.DictActions.setDictValue(target, turtle, k[i], d[k[i]]);
                         }
                     } else if (!(a in logo.turtleDicts[turtle])) {
                         logo.turtleDicts[turtle][a] = foo;
@@ -419,7 +419,7 @@ function setupProgramBlocks() {
                 save.download(
                     "json",
                     "data:text/json;charset-utf-8," +
-                        _serializeDict(target, logo, turtle),
+                        Turtle.DictActions.SerializeDict(target, turtle),
                     args[1]
                 );
             }
