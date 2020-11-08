@@ -61,6 +61,55 @@
 #: js/rhythmruler.js:1610
 #: js/rhythmruler.js:1911
 #: js/rhythmruler.js:1919
+#: js/block.js:1436
+#: js/block.js:8073
+#: js/block.js:8094
+#: js/block.js:8111
+#: js/activity.js:2984
+#: js/palette.js:503
+#: js/palette.js:512
+#: js/palette.js:521
+#: js/palette.js:530
+#: js/palette.js:1122
+#: js/palette.js:1133
+#: js/palette.js:1144
+#: js/palette.js:1155
+#: js/palette.js:1174
+#: js/turtledefs.js:78
+#: js/rubrics.js:501
+#: js/macros.js:153
+#: js/macros.js:249
+#: js/macros.js:250
+#: js/macros.js:259
+#: js/macros.js:801
+#: js/blocks.js:1112
+#: js/blocks.js:3545
+#: js/blocks.js:3546
+#: js/blocks.js:3779
+#: js/blocks.js:4160
+#: js/blocks.js:4346
+#: js/blocks.js:5496
+#: js/blocks.js:6721
+#: js/ActionBlocks.js:99
+#: js/ActionBlocks.js:147
+#: js/ActionBlocks.js:343
+#: js/ActionBlocks.js:408
+#: js/ActionBlocks.js:562
+#: js/ActionBlocks.js:622
+#: js/ActionBlocks.js:750
+#: js/ActionBlocks.js:753
+#: js/ActionBlocks.js:758
+#: js/ActionBlocks.js:790
+#: js/MeterBlocks.js:396
+#: js/MeterBlocks.js:425
+#: js/MeterBlocks.js:461
+#: js/MeterBlocks.js:500
+#: js/musickeyboard.js:2495
+#: js/pitchtimematrix.js:4718
+#: js/rhythmruler.js:1602
+#: js/rhythmruler.js:1610
+#: js/rhythmruler.js:1911
+#: js/rhythmruler.js:1919
 msgid "action"
 msgstr "アクション"
 
@@ -73,7 +122,7 @@ msgstr "アクション"
 #: js/turtle-painter.js:1181
 #: js/turtles.js:126
 #: js/ActionBlocks.js:705
-#: js/ProgramBlocks.js:584
+#: js/ProgramBlocks.js:823
 msgid "start"
 msgstr "スタート"
 
@@ -201,7 +250,7 @@ msgstr "おんりつ"
 #: js/block.js:2259
 #: js/block.js:2429
 #: js/RhythmBlocks.js:472
-#: js/ProgramBlocks.js:589
+#: js/ProgramBlocks.js:828
 #: js/rhythmruler.js:366
 #: js/rhythmruler.js:506
 msgid "silence"
@@ -773,6 +822,7 @@ msgstr "えらばれた おんめいが てきせつでは ありません。"
 
 #: js/logo.js:696
 #: js/ProgramBlocks.js:135
+#: js/ProgramBlocks.js:249
 msgid "You must select a file."
 msgstr "ファイルを えらんで ください。"
 
@@ -865,7 +915,7 @@ msgstr "けんさく"
 #: js/rubrics.js:494
 #: js/RhythmBlockPaletteBlocks.js:16
 #: js/RhythmBlockPaletteBlocks.js:170
-#: js/ProgramBlocks.js:204
+#: js/ProgramBlocks.js:443
 #: js/rhythmruler.js:1192
 #: js/rhythmruler.js:1200
 #: js/rhythmruler.js:1308
@@ -948,11 +998,13 @@ msgid "sensors"
 msgstr "センサー"
 
 #: js/turtledefs.js:87
+#: js/HeapBlocks.js:18
 msgid "heap"
 msgstr "ヒープ"
 
 #: js/turtledefs.js:88
-#: js/DictBlocks.js:177
+#: js/DictBlocks.js:178
+#: js/ProgramBlocks.js:293
 msgid "dictionary"
 msgstr ""
 
@@ -1812,19 +1864,22 @@ msgstr "はこ２"
 #: js/PitchBlocks.js:588
 #: js/PitchBlocks.js:861
 #: js/PitchBlocks.js:1710
-#: js/DictBlocks.js:228
-#: js/DictBlocks.js:283
+#: js/DictBlocks.js:229
+#: js/DictBlocks.js:284
 #: js/BoxesBlocks.js:294
+#: js/ProgramBlocks.js:224
+#: js/ProgramBlocks.js:293
+#: js/ProgramBlocks.js:389
 msgid "name"
 msgstr "なまえ"
 
 #: js/blocks.js:4200
 #: js/RhythmBlocks.js:752
-#: js/DictBlocks.js:283
-#: js/DictBlocks.js:393
+#: js/DictBlocks.js:284
+#: js/DictBlocks.js:394
 #: js/BoxesBlocks.js:35
 #: js/BoxesBlocks.js:294
-#: js/HeapBlocks.js:211
+#: js/HeapBlocks.js:237
 #: plugins/bitcoin.rtp:27
 msgid "value"
 msgstr "あたい"
@@ -1987,8 +2042,8 @@ msgstr "３９２ヘルツ"
 #: js/RhythmBlocks.js:750
 #: js/PitchBlocks.js:902
 #: js/PitchBlocks.js:934
-#: js/ProgramBlocks.js:508
-#: js/ProgramBlocks.js:545
+#: js/ProgramBlocks.js:747
+#: js/ProgramBlocks.js:784
 #: js/status.js:194
 #: plugins/rodi.rtp:196
 #.TRANS: a musical note consisting of pitch and duration
@@ -2450,7 +2505,7 @@ msgstr "アクション じっこう"
 #: js/FlowBlocks.js:536
 #: js/FlowBlocks.js:595
 #: js/MeterBlocks.js:426
-#: js/DictBlocks.js:222
+#: js/DictBlocks.js:223
 msgid "do"
 msgstr "アクション"
 
@@ -2574,7 +2629,7 @@ msgstr "までに"
 
 #: js/FlowBlocks.js:536
 #: js/FlowBlocks.js:595
-#: js/DictBlocks.js:222
+#: js/DictBlocks.js:223
 msgid "do2"
 msgstr "～する"
 
@@ -2633,7 +2688,7 @@ msgid "mouse name"
 msgstr "ネズミの なまえ"
 
 #: js/EnsembleBlocks.js:64
-#: js/HeapBlocks.js:210
+#: js/HeapBlocks.js:236
 #.TRANS: value1 is a numeric value (JAPANESE ONLY)
 ## Double-check. Not sure. May be too literal.
 msgid "index"
@@ -2641,14 +2696,14 @@ msgstr "インデックス"
 
 #: js/EnsembleBlocks.js:91
 #: js/EnsembleBlocks.js:886
-#: js/HeapBlocks.js:169
-#: js/HeapBlocks.js:233
+#: js/HeapBlocks.js:195
+#: js/HeapBlocks.js:259
 msgid "Index must be > 0."
 msgstr "インデクス ばんごうは 0 より おおきい ひつようが あります。"
 
 #: js/EnsembleBlocks.js:96
-#: js/HeapBlocks.js:174
-#: js/HeapBlocks.js:238
+#: js/HeapBlocks.js:200
+#: js/HeapBlocks.js:264
 msgid "Maximum heap size is 1000."
 msgstr "ヒープの おおきさは、 さいだい 1000です。"
 
@@ -2734,7 +2789,7 @@ msgstr "はこへ"
 #: js/GraphicsBlocks.js:269
 #: js/GraphicsBlocks.js:304
 #: js/GraphicsBlocks.js:444
-#: js/ProgramBlocks.js:300
+#: js/ProgramBlocks.js:539
 msgid "x"
 msgstr "xざひょう（よこ）"
 
@@ -2745,7 +2800,7 @@ msgstr "xざひょう（よこ）"
 #: js/GraphicsBlocks.js:269
 #: js/GraphicsBlocks.js:304
 #: js/GraphicsBlocks.js:444
-#: js/ProgramBlocks.js:300
+#: js/ProgramBlocks.js:539
 msgid "y"
 msgstr "yざひょう（たて）"
 
@@ -3936,50 +3991,53 @@ msgstr ""
 msgid "heading"
 msgstr "むき（ネズミ）"
 
-#: js/DictBlocks.js:131
+#: js/DictBlocks.js:132
 #.TRANS: Display the dictionary contents
 msgid "show dictionary"
 msgstr ""
 
-#: js/DictBlocks.js:134
-#: js/DictBlocks.js:180
-#: js/DictBlocks.js:229
-#: js/DictBlocks.js:284
+#: js/DictBlocks.js:135
+#: js/DictBlocks.js:181
+#: js/DictBlocks.js:230
+#: js/DictBlocks.js:285
+#: js/ProgramBlocks.js:225
+#: js/ProgramBlocks.js:294
+#: js/ProgramBlocks.js:390
 msgid "My Dictionary"
 msgstr ""
 
-#: js/DictBlocks.js:225
-#: js/DictBlocks.js:341
+#: js/DictBlocks.js:226
+#: js/DictBlocks.js:342
 #.TRANS: retrieve a value from the dictionary with a given key
 #.TRANS: retrieve a value from the dictionary with a given key
 msgid "get value"
 msgstr ""
 
-#: js/DictBlocks.js:228
 #: js/DictBlocks.js:229
-#: js/DictBlocks.js:283
+#: js/DictBlocks.js:230
 #: js/DictBlocks.js:284
-#: js/DictBlocks.js:344
-#: js/DictBlocks.js:393
+#: js/DictBlocks.js:285
+#: js/DictBlocks.js:345
 #: js/DictBlocks.js:394
+#: js/DictBlocks.js:395
 msgid "key2"
 msgstr ""
 
-#: js/DictBlocks.js:228
 #: js/DictBlocks.js:229
-#: js/DictBlocks.js:283
+#: js/DictBlocks.js:230
 #: js/DictBlocks.js:284
-#: js/DictBlocks.js:344
-#: js/DictBlocks.js:393
+#: js/DictBlocks.js:285
+#: js/DictBlocks.js:345
 #: js/DictBlocks.js:394
+#: js/DictBlocks.js:395
 #: js/IntervalsBlocks.js:780
 #.TRANS: key, e.g., C in C Major
 ## Also could be キー
 msgid "key"
 msgstr "ちょう"
 
-#: js/DictBlocks.js:280
-#: js/DictBlocks.js:390
+#: js/DictBlocks.js:281
+#: js/DictBlocks.js:391
 #.TRANS: set a value in the dictionary for a given key
 #.TRANS: set a value in the dictionary for a given key
 msgid "set value"
@@ -4162,7 +4220,7 @@ msgstr "はこへ"
 
 #: js/BoxesBlocks.js:35
 #: js/BoxesBlocks.js:293
-#: js/HeapBlocks.js:211
+#: js/HeapBlocks.js:237
 msgid "value1"
 msgstr "すうち"
 
@@ -4462,167 +4520,217 @@ msgid "The loadHeap block needs a loadFile block."
 msgstr "ロードヒープの ブロックには、 ロードファイル ブロックが ひつよう です。"
 
 #: js/ProgramBlocks.js:164
-msgid "The Save-heap block saves the heap to a file."
+msgid "The Set-heap block loads the heap."
 msgstr ""
 
 #: js/ProgramBlocks.js:171
+#: js/HeapBlocks.js:230
+#.TRANS: load the heap from a JSON encoding
+## 数値＝すうち；unsure if this is just a number value http://jisho.org/word/%E6%95%B0%E5%80%A4 
+msgid "set heap"
+msgstr "ヒープを せってい する"
+
+#: js/ProgramBlocks.js:204
+msgid "The Set heap block needs a heap."
+msgstr ""
+
+#: js/ProgramBlocks.js:214
+msgid "The Load-dictionary block loads a dictionary from a file."
+msgstr ""
+
+#: js/ProgramBlocks.js:221
+#.TRANS: load a dictionary from a file
+msgid "load dictionary"
+msgstr ""
+
+#: js/ProgramBlocks.js:224
+#: js/ProgramBlocks.js:389
+msgid "file"
+msgstr ""
+
+#: js/ProgramBlocks.js:273
+msgid "The load dictionary block needs a load file block."
+msgstr ""
+
+#: js/ProgramBlocks.js:283
+msgid "The Set-dictionary block loads a dictionary."
+msgstr ""
+
+#: js/ProgramBlocks.js:290
+#.TRANS: load a dictionary from a JSON encoding
+msgid "set dictionary"
+msgstr ""
+
+#: js/ProgramBlocks.js:338
+msgid "The set dictionary block needs a dictionary."
+msgstr ""
+
+#: js/ProgramBlocks.js:348
+msgid "The Save-heap block saves the heap to a file."
+msgstr ""
+
+#: js/ProgramBlocks.js:355
 #: plugins/heap.rtp:150
 #.TRANS: save the heap to a file
 msgid "save heap"
 msgstr "ヒープを ほぞん する"
 
-#: js/ProgramBlocks.js:195
+#: js/ProgramBlocks.js:379
+msgid "The Save-dictionary block saves a dictionary to a file."
+msgstr ""
+
+#: js/ProgramBlocks.js:386
+#.TRANS: save a dictionary to a file
+msgid "save dictionary"
+msgstr ""
+
+#: js/ProgramBlocks.js:434
 msgid "The Open palette block opens a palette."
 msgstr ""
 
-#: js/ProgramBlocks.js:201
+#: js/ProgramBlocks.js:440
 msgid "open palette"
 msgstr "パレットを ひらきます"
 
-#: js/ProgramBlocks.js:233
+#: js/ProgramBlocks.js:472
 msgid "The Delete block block removes a block."
 msgstr ""
 
-#: js/ProgramBlocks.js:241
+#: js/ProgramBlocks.js:480
 #.TRANS: Move this block to the trash.
 msgid "delete block"
 msgstr "ブロックを けす"
 
-#: js/ProgramBlocks.js:291
+#: js/ProgramBlocks.js:530
 msgid "The Move block block moves a block."
 msgstr ""
 
-#: js/ProgramBlocks.js:298
+#: js/ProgramBlocks.js:537
 #.TRANS: Move the position of a block on the screen.
 msgid "move block"
 msgstr "ブロックを うごかす"
 
-#: js/ProgramBlocks.js:300
-#: js/ProgramBlocks.js:407
+#: js/ProgramBlocks.js:539
+#: js/ProgramBlocks.js:646
 ## I need some context
 msgid "block number"
 msgstr "ブロックの ばんごう"
 
-#: js/ProgramBlocks.js:335
+#: js/ProgramBlocks.js:574
 #.TRANS: Run program beginning at this block.
 msgid "run block"
 msgstr "ブロックを じっこう"
 
-#: js/ProgramBlocks.js:395
+#: js/ProgramBlocks.js:634
 msgid "The Dock block block connections two blocks."
 msgstr ""
 
-#: js/ProgramBlocks.js:402
+#: js/ProgramBlocks.js:641
 #.TRANS: We can connect a block to another block.
 ## Check
 msgid "connect blocks"
 msgstr "ブロックを つなぐ"
 
-#: js/ProgramBlocks.js:405
+#: js/ProgramBlocks.js:644
 ## check
 msgid "target block"
 msgstr "もくひょうの ブロック"
 
-#: js/ProgramBlocks.js:406
+#: js/ProgramBlocks.js:645
 ## check; http://jisho.org/word/%E6%8E%A5%E7%B6%9A 
 msgid "connection number"
 msgstr "接続のばんごう"
 
-#: js/ProgramBlocks.js:491
+#: js/ProgramBlocks.js:730
 msgid "The Make block block creates a new block."
 msgstr ""
 
-#: js/ProgramBlocks.js:499
+#: js/ProgramBlocks.js:738
 #.TRANS: Create a new block programmatically.
 msgid "make block"
 msgstr "ブロックを つくる"
 
-#: js/ProgramBlocks.js:600
+#: js/ProgramBlocks.js:839
 msgid "Cannot find block"
 msgstr "ブロックが みつかりません"
 
-#: js/ProgramBlocks.js:684
+#: js/ProgramBlocks.js:923
 msgid "open project"
 msgstr "プロジェクトを ひらく"
 
-#: js/ProgramBlocks.js:710
+#: js/ProgramBlocks.js:949
 msgid "Please enter a valid URL."
 msgstr "ただしい URL をいれてください。"
 
-#: js/HeapBlocks.js:19
+#: js/HeapBlocks.js:45
 #: plugins/heap.rtp:126
 #.TRANS: Display the heap contents
 ## https://ja.wikipedia.org/wiki/%E3%83%92%E3%83%BC%E3%83%97
 msgid "show heap"
 msgstr "ヒープを ひょうじ する"
 
-#: js/HeapBlocks.js:38
+#: js/HeapBlocks.js:64
 msgid "The Heap-length block returns the length of the heap."
 msgstr ""
 
-#: js/HeapBlocks.js:45
+#: js/HeapBlocks.js:71
 #.TRANS: How many entries are in the heap?
 msgid "heap length"
 msgstr "ヒープの ながさ"
 
-#: js/HeapBlocks.js:65
+#: js/HeapBlocks.js:91
 msgid "The Heap-empty? block returns true if the heap is empty."
 msgstr ""
 
-#: js/HeapBlocks.js:72
+#: js/HeapBlocks.js:98
 #: plugins/heap.rtp:134
 #.TRANS: Is the heap empty?
 msgid "heap empty?"
 msgstr "ヒープは から ですか？"
 
-#: js/HeapBlocks.js:91
+#: js/HeapBlocks.js:117
 msgid "The Empty-heap block empties the heap."
 msgstr ""
 
-#: js/HeapBlocks.js:98
-#: js/HeapBlocks.js:276
+#: js/HeapBlocks.js:124
+#: js/HeapBlocks.js:302
 #: plugins/heap.rtp:42
 #: plugins/heap.rtp:142
 #.TRANS: empty the heap
 msgid "empty heap"
 msgstr "からの ヒープ"
 
-#: js/HeapBlocks.js:114
+#: js/HeapBlocks.js:140
 msgid "The Reverse-heap block reverses the order of the heap."
 msgstr ""
 
-#: js/HeapBlocks.js:121
+#: js/HeapBlocks.js:147
 #.TRANS: reverse the order of the heap
 msgid "reverse heap"
 msgstr "ヒープを ぎゃくに する"
 
-#: js/HeapBlocks.js:146
+#: js/HeapBlocks.js:172
 #.TRANS: retrieve a value from the heap at index position in the heap
 ## ひらがな＝さいば
 msgid "index heap"
 msgstr "ヒープに ばんごうを ふる"
 
-#: js/HeapBlocks.js:204
-## 数値＝すうち；unsure if this is just a number value http://jisho.org/word/%E6%95%B0%E5%80%A4 
-msgid "set heap"
-msgstr "ヒープを せってい する"
-
-#: js/HeapBlocks.js:258
+#: js/HeapBlocks.js:284
 msgid "The Pop block removes the value at the top of the heap."
 msgstr ""
 
-#: js/HeapBlocks.js:265
+#: js/HeapBlocks.js:291
 #: plugins/heap.rtp:118
 #.TRANS: pop a value off the top of the heap
 ## Guessing
 msgid "pop"
 msgstr "ポップ"
 
-#: js/HeapBlocks.js:288
+#: js/HeapBlocks.js:314
 msgid "The Push block adds a value to the top of the heap."
 msgstr ""
 
-#: js/HeapBlocks.js:295
+#: js/HeapBlocks.js:321
 #: plugins/heap.rtp:109
 #.TRANS: push a value onto the top of the heap
 ## more guessing

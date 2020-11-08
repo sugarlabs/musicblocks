@@ -1724,6 +1724,55 @@
 #: js/rhythmruler.js:1610
 #: js/rhythmruler.js:1911
 #: js/rhythmruler.js:1919
+#: js/block.js:1436
+#: js/block.js:8073
+#: js/block.js:8094
+#: js/block.js:8111
+#: js/activity.js:2984
+#: js/palette.js:503
+#: js/palette.js:512
+#: js/palette.js:521
+#: js/palette.js:530
+#: js/palette.js:1122
+#: js/palette.js:1133
+#: js/palette.js:1144
+#: js/palette.js:1155
+#: js/palette.js:1174
+#: js/turtledefs.js:78
+#: js/rubrics.js:501
+#: js/macros.js:153
+#: js/macros.js:249
+#: js/macros.js:250
+#: js/macros.js:259
+#: js/macros.js:801
+#: js/blocks.js:1112
+#: js/blocks.js:3545
+#: js/blocks.js:3546
+#: js/blocks.js:3779
+#: js/blocks.js:4160
+#: js/blocks.js:4346
+#: js/blocks.js:5496
+#: js/blocks.js:6721
+#: js/ActionBlocks.js:99
+#: js/ActionBlocks.js:147
+#: js/ActionBlocks.js:343
+#: js/ActionBlocks.js:408
+#: js/ActionBlocks.js:562
+#: js/ActionBlocks.js:622
+#: js/ActionBlocks.js:750
+#: js/ActionBlocks.js:753
+#: js/ActionBlocks.js:758
+#: js/ActionBlocks.js:790
+#: js/MeterBlocks.js:396
+#: js/MeterBlocks.js:425
+#: js/MeterBlocks.js:461
+#: js/MeterBlocks.js:500
+#: js/musickeyboard.js:2495
+#: js/pitchtimematrix.js:4718
+#: js/rhythmruler.js:1602
+#: js/rhythmruler.js:1610
+#: js/rhythmruler.js:1911
+#: js/rhythmruler.js:1919
 #.TRANS: acción
 msgid "action"
 msgstr "apopy"
@@ -1737,7 +1786,7 @@ msgstr "apopy"
 #: js/turtle-painter.js:1181
 #: js/turtles.js:126
 #: js/ActionBlocks.js:705
-#: js/ProgramBlocks.js:584
+#: js/ProgramBlocks.js:823
 #.TRANS: iniciar
 msgid "start"
 msgstr "ñepyrũ"
@@ -1879,7 +1928,7 @@ msgstr ""
 #: js/block.js:2259
 #: js/block.js:2429
 #: js/RhythmBlocks.js:472
-#: js/ProgramBlocks.js:589
+#: js/ProgramBlocks.js:828
 #: js/rhythmruler.js:366
 #: js/rhythmruler.js:506
 #.TRANS: silencio
@@ -2537,6 +2586,7 @@ msgstr ""
 
 #: js/logo.js:696
 #: js/ProgramBlocks.js:135
+#: js/ProgramBlocks.js:249
 #.TRANS: Debe seleccionar un archivo.
 msgid "You must select a file."
 msgstr "Eiporavo vaera peteĩ ñongatupyre"
@@ -2643,7 +2693,7 @@ msgstr ""
 #: js/rubrics.js:494
 #: js/RhythmBlockPaletteBlocks.js:16
 #: js/RhythmBlockPaletteBlocks.js:170
-#: js/ProgramBlocks.js:204
+#: js/ProgramBlocks.js:443
 #: js/rhythmruler.js:1192
 #: js/rhythmruler.js:1200
 #: js/rhythmruler.js:1308
@@ -2741,12 +2791,15 @@ msgid "sensors"
 msgstr "andúva"
 
 #: js/turtledefs.js:87
+#: js/HeapBlocks.js:18
 #.TRANS: pila
 msgid "heap"
 msgstr "chovi"
 
 #: js/turtledefs.js:88
-#: js/DictBlocks.js:177
+#: js/DictBlocks.js:178
+#: js/ProgramBlocks.js:293
+#.TRANS: 
 msgid "dictionary"
 msgstr ""
 
@@ -2762,6 +2815,7 @@ msgstr "ijykepegua"
 
 #: js/turtledefs.js:92
 #.TRANS: program as in computer program
+#.TRANS: 
 msgid "program"
 msgstr ""
 
@@ -3758,20 +3812,23 @@ msgstr ""
 #: js/PitchBlocks.js:588
 #: js/PitchBlocks.js:861
 #: js/PitchBlocks.js:1710
-#: js/DictBlocks.js:228
-#: js/DictBlocks.js:283
+#: js/DictBlocks.js:229
+#: js/DictBlocks.js:284
 #: js/BoxesBlocks.js:294
+#: js/ProgramBlocks.js:224
+#: js/ProgramBlocks.js:293
+#: js/ProgramBlocks.js:389
 #.TRANS: nombre
 msgid "name"
 msgstr "Téra"
 
 #: js/blocks.js:4200
 #: js/RhythmBlocks.js:752
-#: js/DictBlocks.js:283
-#: js/DictBlocks.js:393
+#: js/DictBlocks.js:284
+#: js/DictBlocks.js:394
 #: js/BoxesBlocks.js:35
 #: js/BoxesBlocks.js:294
-#: js/HeapBlocks.js:211
+#: js/HeapBlocks.js:237
 #: plugins/bitcoin.rtp:27
 #.TRANS: valor
 msgid "value"
@@ -3961,8 +4018,8 @@ msgstr "392 hertz"
 #: js/RhythmBlocks.js:750
 #: js/PitchBlocks.js:902
 #: js/PitchBlocks.js:934
-#: js/ProgramBlocks.js:508
-#: js/ProgramBlocks.js:545
+#: js/ProgramBlocks.js:747
+#: js/ProgramBlocks.js:784
 #: js/status.js:194
 #: plugins/rodi.rtp:196
 #.TRANS: a musical note consisting of pitch and duration
@@ -4500,7 +4557,7 @@ msgstr ""
 #: js/FlowBlocks.js:536
 #: js/FlowBlocks.js:595
 #: js/MeterBlocks.js:426
-#: js/DictBlocks.js:222
+#: js/DictBlocks.js:223
 #.TRANS: hacer
 msgid "do"
 msgstr "japo"
@@ -4645,7 +4702,7 @@ msgstr "peẽ"
 
 #: js/FlowBlocks.js:536
 #: js/FlowBlocks.js:595
-#: js/DictBlocks.js:222
+#: js/DictBlocks.js:223
 #.TRANS: hacer
 msgid "do2"
 msgstr ""
@@ -4715,7 +4772,7 @@ msgid "mouse name"
 msgstr "embohéra anguja"
 
 #: js/EnsembleBlocks.js:64
-#: js/HeapBlocks.js:210
+#: js/HeapBlocks.js:236
 #.TRANS: value1 is a numeric value (JAPANESE ONLY)
 #.TRANS: posición en la pila
 msgid "index"
@@ -4723,15 +4780,15 @@ msgstr "henda aty pe"
 
 #: js/EnsembleBlocks.js:91
 #: js/EnsembleBlocks.js:886
-#: js/HeapBlocks.js:169
-#: js/HeapBlocks.js:233
+#: js/HeapBlocks.js:195
+#: js/HeapBlocks.js:259
 #.TRANS: El índice debe ser > 0.
 msgid "Index must be > 0."
 msgstr "Rysýi tuichave vaerã mba’evegui"
 
 #: js/EnsembleBlocks.js:96
-#: js/HeapBlocks.js:174
-#: js/HeapBlocks.js:238
+#: js/HeapBlocks.js:200
+#: js/HeapBlocks.js:264
 #.TRANS: El tamaño máximo de pilas es 1000.
 msgid "Maximum heap size is 1000."
 msgstr ""
@@ -4830,7 +4887,7 @@ msgstr ""
 #: js/GraphicsBlocks.js:269
 #: js/GraphicsBlocks.js:304
 #: js/GraphicsBlocks.js:444
-#: js/ProgramBlocks.js:300
+#: js/ProgramBlocks.js:539
 #.TRANS: x
 msgid "x"
 msgstr "x"
@@ -4842,7 +4899,7 @@ msgstr "x"
 #: js/GraphicsBlocks.js:269
 #: js/GraphicsBlocks.js:304
 #: js/GraphicsBlocks.js:444
-#: js/ProgramBlocks.js:300
+#: js/ProgramBlocks.js:539
 #.TRANS: y
 msgid "y"
 msgstr "y"
@@ -5745,10 +5802,12 @@ msgstr "ejoko"
 
 #: js/MediaBlocks.js:197
 #.TRANS: Erases the images and text
+#.TRANS: 
 msgid "erase media"
 msgstr ""
 
 #: js/MediaBlocks.js:200
+#.TRANS: 
 msgid "The Erase Media block erases text and images."
 msgstr ""
 
@@ -5973,6 +6032,7 @@ msgid "letter class"
 msgstr ""
 
 #: js/PitchBlocks.js:396
+#.TRANS: 
 msgid "solfege class"
 msgstr ""
 
@@ -6216,6 +6276,7 @@ msgstr ""
 #: js/DictBlocks.js:12
 #: js/DictBlocks.js:73
 #: js/DictBlocks.js:101
+#.TRANS: 
 msgid "font"
 msgstr ""
 
@@ -6228,52 +6289,60 @@ msgstr ""
 msgid "heading"
 msgstr "rumbo"
 
-#: js/DictBlocks.js:131
+#: js/DictBlocks.js:132
 #.TRANS: Display the dictionary contents
+#.TRANS: 
 msgid "show dictionary"
 msgstr ""
 
-#: js/DictBlocks.js:134
-#: js/DictBlocks.js:180
-#: js/DictBlocks.js:229
-#: js/DictBlocks.js:284
+#: js/DictBlocks.js:135
+#: js/DictBlocks.js:181
+#: js/DictBlocks.js:230
+#: js/DictBlocks.js:285
+#: js/ProgramBlocks.js:225
+#: js/ProgramBlocks.js:294
+#: js/ProgramBlocks.js:390
+#.TRANS: 
 msgid "My Dictionary"
 msgstr ""
 
-#: js/DictBlocks.js:225
-#: js/DictBlocks.js:341
+#: js/DictBlocks.js:226
+#: js/DictBlocks.js:342
 #.TRANS: retrieve a value from the dictionary with a given key
 #.TRANS: retrieve a value from the dictionary with a given key
+#.TRANS: 
 msgid "get value"
 msgstr ""
 
-#: js/DictBlocks.js:228
 #: js/DictBlocks.js:229
-#: js/DictBlocks.js:283
+#: js/DictBlocks.js:230
 #: js/DictBlocks.js:284
-#: js/DictBlocks.js:344
-#: js/DictBlocks.js:393
+#: js/DictBlocks.js:285
+#: js/DictBlocks.js:345
 #: js/DictBlocks.js:394
+#: js/DictBlocks.js:395
+#.TRANS: 
 msgid "key2"
 msgstr ""
 
-#: js/DictBlocks.js:228
 #: js/DictBlocks.js:229
-#: js/DictBlocks.js:283
+#: js/DictBlocks.js:230
 #: js/DictBlocks.js:284
-#: js/DictBlocks.js:344
-#: js/DictBlocks.js:393
+#: js/DictBlocks.js:285
+#: js/DictBlocks.js:345
 #: js/DictBlocks.js:394
+#: js/DictBlocks.js:395
 #: js/IntervalsBlocks.js:780
 #.TRANS: key, e.g., C in C Major
 #.TRANS: clave
 msgid "key"
 msgstr "clave"
 
-#: js/DictBlocks.js:280
-#: js/DictBlocks.js:390
+#: js/DictBlocks.js:281
+#: js/DictBlocks.js:391
 #.TRANS: set a value in the dictionary for a given key
 #.TRANS: set a value in the dictionary for a given key
+#.TRANS: 
 msgid "set value"
 msgstr ""
 
@@ -6485,7 +6554,7 @@ msgstr "guarã"
 
 #: js/BoxesBlocks.js:35
 #: js/BoxesBlocks.js:293
-#: js/HeapBlocks.js:211
+#: js/HeapBlocks.js:237
 #.TRANS: valor
 msgid "value1"
 msgstr ""
@@ -6841,145 +6910,200 @@ msgid "The loadHeap block needs a loadFile block."
 msgstr "Pe vore chovi hupiha oikoteve peteĩ vore ñongatuha hupiha"
 
 #: js/ProgramBlocks.js:164
+msgid "The Set-heap block loads the heap."
+msgstr ""
+
+#: js/ProgramBlocks.js:171
+#: js/HeapBlocks.js:230
+#.TRANS: load the heap from a JSON encoding
+#.TRANS: modificar valor en pila
+msgid "set heap"
+msgstr "omoambue aty repy"
+
+#: js/ProgramBlocks.js:204
+msgid "The Set heap block needs a heap."
+msgstr ""
+
+#: js/ProgramBlocks.js:214
+msgid "The Load-dictionary block loads a dictionary from a file."
+msgstr ""
+
+#: js/ProgramBlocks.js:221
+#.TRANS: load a dictionary from a file
+msgid "load dictionary"
+msgstr ""
+
+#: js/ProgramBlocks.js:224
+#: js/ProgramBlocks.js:389
+msgid "file"
+msgstr ""
+
+#: js/ProgramBlocks.js:273
+msgid "The load dictionary block needs a load file block."
+msgstr ""
+
+#: js/ProgramBlocks.js:283
+msgid "The Set-dictionary block loads a dictionary."
+msgstr ""
+
+#: js/ProgramBlocks.js:290
+#.TRANS: load a dictionary from a JSON encoding
+msgid "set dictionary"
+msgstr ""
+
+#: js/ProgramBlocks.js:338
+msgid "The set dictionary block needs a dictionary."
+msgstr ""
+
+#: js/ProgramBlocks.js:348
 #.TRANS: El bloque Guardar pila guarda la pila en un archivo.
 msgid "The Save-heap block saves the heap to a file."
 msgstr ""
 
-#: js/ProgramBlocks.js:171
+#: js/ProgramBlocks.js:355
 #: plugins/heap.rtp:150
 #.TRANS: save the heap to a file
 #.TRANS: guardar pila
 msgid "save heap"
 msgstr "eñongatu aty"
 
-#: js/ProgramBlocks.js:195
+#: js/ProgramBlocks.js:379
+msgid "The Save-dictionary block saves a dictionary to a file."
+msgstr ""
+
+#: js/ProgramBlocks.js:386
+#.TRANS: save a dictionary to a file
+msgid "save dictionary"
+msgstr ""
+
+#: js/ProgramBlocks.js:434
 #.TRANS: El bloque abrir la paleta abre una paleta
 msgid "The Open palette block opens a palette."
 msgstr ""
 
-#: js/ProgramBlocks.js:201
+#: js/ProgramBlocks.js:440
 #.TRANS: abrir la paleta
 msgid "open palette"
 msgstr ""
 
-#: js/ProgramBlocks.js:233
+#: js/ProgramBlocks.js:472
 #.TRANS: El bloque eliminar bloque elimina un bloque
 msgid "The Delete block block removes a block."
 msgstr ""
 
-#: js/ProgramBlocks.js:241
+#: js/ProgramBlocks.js:480
 #.TRANS: Move this block to the trash.
 #.TRANS: eliminar bloque
 msgid "delete block"
 msgstr ""
 
-#: js/ProgramBlocks.js:291
+#: js/ProgramBlocks.js:530
 #.TRANS: El bloque mover bloque mueve un bloque.
 msgid "The Move block block moves a block."
 msgstr ""
 
-#: js/ProgramBlocks.js:298
+#: js/ProgramBlocks.js:537
 #.TRANS: Move the position of a block on the screen.
 #.TRANS: mover bloque
 msgid "move block"
 msgstr ""
 
-#: js/ProgramBlocks.js:300
-#: js/ProgramBlocks.js:407
+#: js/ProgramBlocks.js:539
+#: js/ProgramBlocks.js:646
 #.TRANS: número de bloque
 msgid "block number"
 msgstr ""
 
-#: js/ProgramBlocks.js:335
+#: js/ProgramBlocks.js:574
 #.TRANS: Run program beginning at this block.
 #.TRANS: ejecutar bloque
 msgid "run block"
 msgstr ""
 
-#: js/ProgramBlocks.js:395
+#: js/ProgramBlocks.js:634
 #.TRANS: El bloque connectar conecta dos bloques
 msgid "The Dock block block connections two blocks."
 msgstr ""
 
-#: js/ProgramBlocks.js:402
+#: js/ProgramBlocks.js:641
 #.TRANS: We can connect a block to another block.
 #.TRANS: connectar block
 msgid "connect blocks"
 msgstr ""
 
-#: js/ProgramBlocks.js:405
+#: js/ProgramBlocks.js:644
 #.TRANS: bloque de destino
 msgid "target block"
 msgstr ""
 
-#: js/ProgramBlocks.js:406
+#: js/ProgramBlocks.js:645
 #.TRANS: número de conexion
 msgid "connection number"
 msgstr ""
 
-#: js/ProgramBlocks.js:491
+#: js/ProgramBlocks.js:730
 #.TRANS: El bloque crear bloque crea un bloque.
 msgid "The Make block block creates a new block."
 msgstr ""
 
-#: js/ProgramBlocks.js:499
+#: js/ProgramBlocks.js:738
 #.TRANS: Create a new block programmatically.
 #.TRANS: crear bloque
 msgid "make block"
 msgstr ""
 
-#: js/ProgramBlocks.js:600
+#: js/ProgramBlocks.js:839
 #.TRANS: No se puede encontrar el bloque.
 msgid "Cannot find block"
 msgstr ""
 
-#: js/ProgramBlocks.js:684
+#: js/ProgramBlocks.js:923
 #.TRANS: abierto proyecto
 msgid "open project"
 msgstr "eipe’a jejaposéva"
 
-#: js/ProgramBlocks.js:710
+#: js/ProgramBlocks.js:949
 #.TRANS: Por favor introduzca un URL válido.
 msgid "Please enter a valid URL."
 msgstr ""
 
-#: js/HeapBlocks.js:19
+#: js/HeapBlocks.js:45
 #: plugins/heap.rtp:126
 #.TRANS: Display the heap contents
 #.TRANS: mostrar pila
 msgid "show heap"
 msgstr "oichuka aty"
 
-#: js/HeapBlocks.js:38
+#: js/HeapBlocks.js:64
 #.TRANS: El bloque Longitud de la pila devuelve la longitud de la pila.
 msgid "The Heap-length block returns the length of the heap."
 msgstr ""
 
-#: js/HeapBlocks.js:45
+#: js/HeapBlocks.js:71
 #.TRANS: How many entries are in the heap?
 #.TRANS: tamaño de la pila
 msgid "heap length"
 msgstr "aty jakatuha"
 
-#: js/HeapBlocks.js:65
+#: js/HeapBlocks.js:91
 #.TRANS: El bloque Pila-vacío? devuelve verdadero si la pila está vacío.
 msgid "The Heap-empty? block returns true if the heap is empty."
 msgstr ""
 
-#: js/HeapBlocks.js:72
+#: js/HeapBlocks.js:98
 #: plugins/heap.rtp:134
 #.TRANS: Is the heap empty?
 #.TRANS: ¿pila vacía?
 msgid "heap empty?"
 msgstr "aty nandi"
 
-#: js/HeapBlocks.js:91
+#: js/HeapBlocks.js:117
 #.TRANS: El bloque Vacío pila vacía la pila.
 msgid "The Empty-heap block empties the heap."
 msgstr ""
 
-#: js/HeapBlocks.js:98
-#: js/HeapBlocks.js:276
+#: js/HeapBlocks.js:124
+#: js/HeapBlocks.js:302
 #: plugins/heap.rtp:42
 #: plugins/heap.rtp:142
 #.TRANS: empty the heap
@@ -6987,46 +7111,41 @@ msgstr ""
 msgid "empty heap"
 msgstr "emonandi pe chovi"
 
-#: js/HeapBlocks.js:114
+#: js/HeapBlocks.js:140
 #.TRANS: El bloque Pila inversa invierte el orden de la pila.
 msgid "The Reverse-heap block reverses the order of the heap."
 msgstr ""
 
-#: js/HeapBlocks.js:121
+#: js/HeapBlocks.js:147
 #.TRANS: reverse the order of the heap
 #.TRANS: revertir la pila
 msgid "reverse heap"
 msgstr ""
 
-#: js/HeapBlocks.js:146
+#: js/HeapBlocks.js:172
 #.TRANS: retrieve a value from the heap at index position in the heap
 #.TRANS: valor en la pila
 msgid "index heap"
 msgstr "tepy aty pe"
 
-#: js/HeapBlocks.js:204
-#.TRANS: modificar valor en pila
-msgid "set heap"
-msgstr "omoambue aty repy"
-
-#: js/HeapBlocks.js:258
+#: js/HeapBlocks.js:284
 #.TRANS: El bloque Pop elimina el valor en la parte superior del pila.
 msgid "The Pop block removes the value at the top of the heap."
 msgstr ""
 
-#: js/HeapBlocks.js:265
+#: js/HeapBlocks.js:291
 #: plugins/heap.rtp:118
 #.TRANS: pop a value off the top of the heap
 #.TRANS: sacar
 msgid "pop"
 msgstr "pe’a"
 
-#: js/HeapBlocks.js:288
+#: js/HeapBlocks.js:314
 #.TRANS: El bloque Push agrega un valor a la parte superior del pila.
 msgid "The Push block adds a value to the top of the heap."
 msgstr ""
 
-#: js/HeapBlocks.js:295
+#: js/HeapBlocks.js:321
 #: plugins/heap.rtp:109
 #.TRANS: push a value onto the top of the heap
 #.TRANS: apilar
@@ -7084,64 +7203,78 @@ msgid "The Boolean block is used to specify true or false."
 msgstr ""
 
 #: js/PitchActions.js:51
+#.TRANS: El bloque Paso escalar debe utilizarse dentro de un bloque de nota.
 msgid "The Scalar Step Block must be used inside of a Note Block."
 msgstr ""
 
 #: js/PitchActions.js:71
+#.TRANS: El bloque Paso escalar debe ir precedida de un bloque de tono.
 msgid "The Scalar Step Block must be preceded by a Pitch Block."
 msgstr ""
 
 #: js/MeterActions.js:78
 #: js/MeterActions.js:116
+#.TRANS: latidos por minuto deben ser mayores que
 msgid "beats per minute must be greater than"
 msgstr ""
 
 #: js/MeterActions.js:88
 #: js/MeterActions.js:126
+#.TRANS: máximo
 msgid "maximum"
 msgstr ""
 
 #: js/MeterActions.js:94
 #: js/MeterActions.js:132
+#.TRANS: latidos por minuto es
 msgid "beats per minute is"
 msgstr ""
 
 #: js/DrumActions.js:209
+#.TRANS: Bloque de ruido: Quizás quiso decir utilizar un bloque de nota?
 msgid "Noise Block: Did you mean to use a Note block?"
 msgstr ""
 
 #: js/IntervalsActions.js:167
+#.TRANS: Agregar el número de tono que falta 0.
 msgid "Adding missing pitch number 0."
 msgstr ""
 
 #: js/IntervalsActions.js:175
+#.TRANS: Ignorando los números de tono menos de cero o más de once.
 msgid "Ignoring pitch numbers less than zero or greater than eleven."
 msgstr ""
 
 #: js/IntervalsActions.js:181
+#.TRANS: Ignorando números de tono duplicados.
 msgid "Ignoring duplicate pitch numbers."
 msgstr ""
 
 #: js/ToneActions.js:90
+#.TRANS: La intensidad del vibrato debe estar entre 1 y 100.
 msgid "Vibrato intensity must be between 1 and 100."
 msgstr "Vibrato mbarete oime vaerã peteĩ ha sa apytepe"
 
 #: js/ToneActions.js:95
+#.TRANS: La velocidad del vibrato debe ser mayor que 0.
 msgid "Vibrato rate must be greater than 0."
 msgstr "Vibrato pya’ekue tuichave vaerã mba’evegui"
 
 #: js/ToneActions.js:144
 #: js/ToneActions.js:219
 #.TRANS: Depth is the intesity of the tremolo or chorus effect.
+#.TRANS: El valor de profundidad está fuera de rango.
 msgid "Depth is out of range."
 msgstr ""
 
 #: js/ToneActions.js:256
+#.TRANS: El valor de distorsión debe ser de 0 a 100.
 msgid "Distortion must be from 0 to 100."
 msgstr ""
 
 #: js/ToneActions.js:288
 #.TRANS: partials components in a harmonic series
+#.TRANS: Parcial debe ser mayor o igual a 0.
 msgid "Partial must be greater than or equal to 0."
 msgstr ""
 
@@ -7155,6 +7288,7 @@ msgstr ""
 
 #: js/ToneActions.js:345
 #: js/ToneActions.js:381
+#.TRANS: La entrada no puede ser negativa.
 msgid "The input cannot be negative."
 msgstr ""
 
