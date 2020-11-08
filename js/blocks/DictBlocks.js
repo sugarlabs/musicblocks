@@ -116,6 +116,7 @@ function setupDictBlocks() {
         constructor() {
             super("showDict");
             this.setPalette("dict");
+	    this.hidden = this.deprecated = true;
             this.beginnerBlock(true);
 
             this.setHelpString([

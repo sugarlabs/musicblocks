@@ -29,6 +29,7 @@ function setupHeapBlocks() {
         constructor() {
             super("showHeap");
             this.setPalette("heap");
+	    this.hidden = this.deprecated = true;
             this.beginnerBlock(true);
 
             this.setHelpString([
