@@ -156,6 +156,56 @@ function setupProgramBlocks() {
         }
     }
 
+    class SetHeapBlock extends FlowBlock {
+        constructor() {
+            super("setHeap");
+            this.setPalette("program");
+            this.setHelpString([
+                _("The Set-heap block loads the heap."),
+                "documentation",
+                ""
+            ]);
+
+            this.formBlock({
+                //.TRANS: load the heap from a JSON encoding
+                name: _("set heap"),
+                args: 1,
+                argTypes: ["anyin"]
+            });
+        }
+
+        flow(args, logo, turtle, blk) {
+            let block = logo.blocks.blockList[blk];
+            let oldHeap;
+            if (turtle in logo.turtleHeaps) {
+                oldHeap = logo.turtleHeaps[turtle];
+            } else {
+                oldHeap = [];
+            }
+
+            let c = block.connections[1];
+            if (c !== null) {
+                try {
+                    logo.turtleHeaps[turtle] = JSON.parse(
+                        logo.blocks.blockList[c].value
+                    );
+                    if (!Array.isArray(logo.turtleHeaps[turtle])) {
+                        throw "is not array";
+                    }
+                } catch (e) {
+                    logo.turtleHeaps[turtle] = oldHeap;
+                    logo.errorMsg(
+                        _(
+                            "The block you selected does not contain a valid heap."
+                        )
+                    );
+                }
+            } else {
+                logo.errorMsg(_("The Set heap block needs a heap."));
+            }
+        }
+    }
+
     class LoadDictBlock extends FlowBlock {
         constructor() {
             super("loadDict");
@@ -221,6 +271,71 @@ function setupProgramBlocks() {
                 }
             } else {
                 logo.errorMsg(_("The load dictionary block needs a load file block."));
+            }
+        }
+    }
+
+    class SetDictBlock extends FlowBlock {
+        constructor() {
+            super("setDictionary");
+            this.setPalette("program");
+            this.setHelpString([
+                _("The Set-dictionary block loads a dictionary."),
+                "documentation",
+                ""
+            ]);
+
+            this.formBlock({
+                //.TRANS: load a dictionary from a JSON encoding
+                name: _("set dictionary"),
+                args: 2,
+                argTypes: ["textin", "anyin"],
+                argLabels: [_("name"), _("dictionary")],
+                defaults: [_("My Dictionary")]
+            });
+        }
+
+        flow(args, logo, turtle, blk) {
+            let block = logo.blocks.blockList[blk];
+            if (args[0] === null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return;
+            }
+            if (args[1] === null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return;
+            }
+
+            let a = args[0];
+            // Not sure this can happen.
+            if (!(turtle in logo.turtleDicts)) {
+                logo.turtleDicts[turtle] = {};
+            }
+
+            let c = block.connections[2];
+            if (c != null) {
+                try {
+                    let d = JSON.parse(logo.blocks.blockList[c].value);
+                    // Is the dictionary the same as a turtle name?
+                    let target = getTargetTurtle(logo.turtles, a);
+                    if (target !== null) {
+                        // Copy any internal entries now.
+                        let k = Object.keys(d);
+                        for (let i=0; i < k.length; i++) {
+                            setDictValue(target, logo, turtle, k[i], d[k[i]]);
+                        }
+                    } else if (!(a in logo.turtleDicts[turtle])) {
+                        logo.turtleDicts[turtle][a] = foo;
+                    }
+                } catch (e) {
+                    logo.errorMsg(
+                        _(
+                            "The block you selected does not contain a valid dictionary."
+                        )
+                    );
+                }
+            } else {
+                logo.errorMsg(_("The set dictionary block needs a dictionary."));
             }
         }
     }
@@ -862,6 +977,8 @@ function setupProgramBlocks() {
     new SaveHeapToAppBlock().setup();
     new SaveDictBlock().setup();
     new LoadDictBlock().setup();
+    new SetDictBlock().setup();
     new SaveHeapBlock().setup();
     new LoadHeapBlock().setup();
+    new SetHeapBlock().setup();
 }
