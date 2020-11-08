@@ -1,5 +1,30 @@
 function setupHeapBlocks() {
 
+    class HeapBlock extends ValueBlock {
+        constructor() {
+            super("heap");
+            this.setPalette("heap");
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _(
+                    "The Heap block returns the heap."
+                ),
+                "documentation",
+                ""
+            ]);
+
+            this.formBlock({
+                name: _("heap"),
+                outType: "numberout"
+            });
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            return JSON.stringify(logo.turtleHeaps[turtle]);
+        }
+    }
+
     class ShowHeapBlock extends FlowBlock {
         constructor() {
             super("showHeap");
@@ -313,6 +338,7 @@ function setupHeapBlocks() {
         }
     }
 
+    new HeapBlock().setup();
     new ShowHeapBlock().setup();
     new HeapLengthBlock().setup();
     new HeapEmptyBlock().setup();
