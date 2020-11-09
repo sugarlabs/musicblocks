@@ -391,8 +391,6 @@ function setupEnsembleBlocks() {
                 argTypes: ["anyin"],
                 defaults: [_("Mr. Mouse")]
             });
-            // Replaced by the dictionary get value block.
-            this.hidden = this.deprecated = true;
         }
 
         arg(logo, turtle, blk, receivedArg) {
@@ -424,8 +422,6 @@ function setupEnsembleBlocks() {
                 argTypes: ["anyin"],
                 defaults: [_("Mr. Mouse")]
             });
-            // Replaced by the dictionary get value block.
-            this.hidden = this.deprecated = true;
         }
 
         arg(logo, turtle, blk, receivedArg) {
