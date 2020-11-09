@@ -73,6 +73,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     setupHeapBlocks();
     setupDictBlocks();
     setupExtrasBlocks();
+    setupProgramBlocks();
     setupGraphicsBlocks();
     setupPenBlocks();
     setupMediaBlocks();
