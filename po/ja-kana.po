@@ -2407,7 +2407,7 @@ msgstr "オリジナル"
 
 #: js/WidgetBlocks.js:396
 msgid "oscilloscope"
-msgstr ""
+msgstr "オシロスコープ"
 
 #: js/WidgetBlocks.js:453
 #.TRANS: musical mode is the pattern of half-steps in an octave, e.g., Major or Minor modes
@@ -2940,7 +2940,7 @@ msgstr "スタッカート"
 #: js/VolumeBlocks.js:5
 #.TRANS: the volume for this synth
 msgid "synth volume"
-msgstr ""
+msgstr "シンセのおんりょう"
 
 #: js/VolumeBlocks.js:19
 #: js/synthutils.js:25
@@ -2985,7 +2985,7 @@ msgstr "シンセサイザー"
 
 #: js/VolumeBlocks.js:277
 msgid "Synth not found"
-msgstr ""
+msgstr "シンセがみつかりません"
 
 #: js/VolumeBlocks.js:320
 #.TRANS: set the loudness level
@@ -3007,7 +3007,7 @@ msgstr "０から １００までの すうちを せってい できる。 "
 #: js/VolumeBlocks.js:397
 #.TRANS: set the distribution of volume
 msgid "set panning"
-msgstr ""
+msgstr "ステレオをせってい"
 
 #: js/VolumeBlocks.js:426
 #: js/VolumeBlocks.js:459
@@ -3041,7 +3041,7 @@ msgstr "しょうすうからぶんすう"
 
 #: js/ExtrasBlocks.js:47
 msgid "save as ABC"
-msgstr ""
+msgstr "ABCフォーマットでほぞん"
 
 #: js/ExtrasBlocks.js:50
 #: js/ExtrasBlocks.js:73
@@ -3055,7 +3055,7 @@ msgstr "Lilypondのフォーマットでほぞん"
 
 #: js/ExtrasBlocks.js:93
 msgid "save as SVG"
-msgstr ""
+msgstr "SVGフォーマットでほぞん"
 
 #: js/ExtrasBlocks.js:128
 msgid "no background"
