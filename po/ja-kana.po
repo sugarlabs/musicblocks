@@ -1006,7 +1006,7 @@ msgstr "ヒープ"
 #: js/DictBlocks.js:178
 #: js/ProgramBlocks.js:293
 msgid "dictionary"
-msgstr ""
+msgstr "じしょ"
 
 #: js/turtledefs.js:89
 msgid "ensemble"
@@ -1019,7 +1019,7 @@ msgstr "そのた"
 #: js/turtledefs.js:92
 #.TRANS: program as in computer program
 msgid "program"
-msgstr ""
+msgstr "プログラム"
 
 #: js/turtledefs.js:93
 msgid "my blocks"
@@ -2859,19 +2859,19 @@ msgstr "<h2>もじブロック</h2><br>このプログラムを じっこうし�
 
 #: js/EnsembleBlocks.js:825
 msgid "mouse count"
-msgstr ""
+msgstr "なんひきのネズミ"
 
 #: js/EnsembleBlocks.js:830
 msgid "The Mouse-count block returns the number of mice."
-msgstr ""
+msgstr "「なんひきの ネズミ」のブロックは ネズミを かぞえって すうちを あらわす"
 
 #: js/EnsembleBlocks.js:848
 msgid "nth mouse name"
-msgstr ""
+msgstr "なんひきめ のネズミの なまえ"
 
 #: js/EnsembleBlocks.js:853
 msgid "The Nth-Mouse name block returns the name of the nth mice."
-msgstr ""
+msgstr "「なんひきめ のネズミの なまえ」のブロックは すうちによって ネズミの なまえを あらわす。"
 
 #: js/EnsembleBlocks.js:894
 #: js/EnsembleBlocks.js:945
@@ -3166,7 +3166,7 @@ msgstr " たとえば、 かくしょうせつの ３はくめに なにか ア�
 #: js/MeterBlocks.js:198
 #.TRANS: count the number of notes
 msgid "sum note values"
-msgstr ""
+msgstr "おとの ながさを たす"
 
 #: js/MeterBlocks.js:235
 #.TRANS: count the number of notes
@@ -3538,7 +3538,7 @@ msgstr "ざひょうち（みぎ）"
 #: js/MediaBlocks.js:37
 #.TRANS: left side of the screen
 msgid "left (screen)"
-msgstr ""
+msgstr "ざひょうち （ひだり）"
 
 #: js/MediaBlocks.js:70
 msgid "top (screen)"
@@ -3573,11 +3573,11 @@ msgstr "ていし"
 #: js/MediaBlocks.js:197
 #.TRANS: Erases the images and text
 msgid "erase media"
-msgstr ""
+msgstr "メディアを けす"
 
 #: js/MediaBlocks.js:200
 msgid "The Erase Media block erases text and images."
-msgstr ""
+msgstr "「メディアを けす」ブロックは もじと がぞうを けします。"
 
 #: js/MediaBlocks.js:215
 #.TRANS: play an audio recording
@@ -3742,7 +3742,7 @@ msgstr "おんていの ちがい"
 #: js/PitchBlocks.js:220
 #.TRANS: the change measured in scale-steps between the current pitch and the previous pitch
 msgid "scalar change in pitch"
-msgstr ""
+msgstr "おんかいに よって おんていの ちがい"
 
 #: js/PitchBlocks.js:227
 #: js/PitchBlocks.js:393
@@ -3762,7 +3762,7 @@ msgstr "おとのたかさを ヘルツで ひょうじ"
 #: js/PitchBlocks.js:352
 #: js/DictBlocks.js:24
 msgid "current pitch"
-msgstr ""
+msgstr "げんだいの おとの たかさ"
 
 #: js/PitchBlocks.js:387
 msgid "This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."
@@ -3774,7 +3774,7 @@ msgstr "アルファベット・クラス"
 
 #: js/PitchBlocks.js:396
 msgid "solfege class"
-msgstr ""
+msgstr "かいめい"
 
 #: js/PitchBlocks.js:397
 msgid "staff y"
@@ -3831,7 +3831,7 @@ msgstr "すうちをオクターヴ表記へ"
 
 #: js/PitchBlocks.js:662
 msgid "y to pitch"
-msgstr ""
+msgstr "おとの たかさを yに"
 
 #: js/PitchBlocks.js:785
 msgid "Pitch can be specified in terms of ni dha pa ma ga re sa."
@@ -3981,7 +3981,7 @@ msgstr "おんかいないを のぼる／おりる"
 #: js/DictBlocks.js:73
 #: js/DictBlocks.js:101
 msgid "font"
-msgstr ""
+msgstr "フォント"
 
 #: js/DictBlocks.js:14
 #: js/DictBlocks.js:75
@@ -3994,7 +3994,7 @@ msgstr "むき（ネズミ）"
 #: js/DictBlocks.js:132
 #.TRANS: Display the dictionary contents
 msgid "show dictionary"
-msgstr ""
+msgstr "じしょを あらわす"
 
 #: js/DictBlocks.js:135
 #: js/DictBlocks.js:181
@@ -4004,14 +4004,14 @@ msgstr ""
 #: js/ProgramBlocks.js:294
 #: js/ProgramBlocks.js:390
 msgid "My Dictionary"
-msgstr ""
+msgstr "わたしの じしょ"
 
 #: js/DictBlocks.js:226
 #: js/DictBlocks.js:342
 #.TRANS: retrieve a value from the dictionary with a given key
 #.TRANS: retrieve a value from the dictionary with a given key
 msgid "get value"
-msgstr ""
+msgstr "あたいを あらわす"
 
 #: js/DictBlocks.js:229
 #: js/DictBlocks.js:230
@@ -4041,7 +4041,7 @@ msgstr "ちょう"
 #.TRANS: set a value in the dictionary for a given key
 #.TRANS: set a value in the dictionary for a given key
 msgid "set value"
-msgstr ""
+msgstr "あたいを せってい"
 
 #: js/GraphicsBlocks.js:10
 msgid "The Heading block returns the orientation of the mouse."
@@ -4541,12 +4541,12 @@ msgstr ""
 #: js/ProgramBlocks.js:221
 #.TRANS: load a dictionary from a file
 msgid "load dictionary"
-msgstr ""
+msgstr "じしょを ロードする"
 
 #: js/ProgramBlocks.js:224
 #: js/ProgramBlocks.js:389
 msgid "file"
-msgstr ""
+msgstr "ファイル"
 
 #: js/ProgramBlocks.js:273
 msgid "The load dictionary block needs a load file block."
@@ -4559,7 +4559,7 @@ msgstr ""
 #: js/ProgramBlocks.js:290
 #.TRANS: load a dictionary from a JSON encoding
 msgid "set dictionary"
-msgstr ""
+msgstr "じしょを せってい"
 
 #: js/ProgramBlocks.js:338
 msgid "The set dictionary block needs a dictionary."
@@ -4582,7 +4582,7 @@ msgstr ""
 #: js/ProgramBlocks.js:386
 #.TRANS: save a dictionary to a file
 msgid "save dictionary"
-msgstr ""
+msgstr "じしょを せってい"
 
 #: js/ProgramBlocks.js:434
 msgid "The Open palette block opens a palette."
@@ -4794,7 +4794,7 @@ msgstr ""
 #: js/MeterActions.js:88
 #: js/MeterActions.js:126
 msgid "maximum"
-msgstr ""
+msgstr "さいだいげん"
 
 #: js/MeterActions.js:94
 #: js/MeterActions.js:132
@@ -4885,7 +4885,7 @@ msgstr "おんぷをた"
 
 #: js/musickeyboard.js:490
 msgid "Metronome"
-msgstr ""
+msgstr "メトロノーム"
 
 #: js/musickeyboard.js:512
 #: js/temperament.js:2164
