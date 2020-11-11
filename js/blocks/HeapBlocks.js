@@ -1,102 +1,27 @@
 function setupHeapBlocks() {
-    class LoadHeapFromAppBlock extends FlowBlock {
+
+    class HeapBlock extends ValueBlock {
         constructor() {
-            super("loadHeapFromApp");
+            super("heap");
             this.setPalette("heap");
+            this.beginnerBlock(true);
+
             this.setHelpString([
                 _(
-                    "The Load-heap-from-app block loads the heap from a web page."
+                    "The Heap block returns the heap."
                 ),
                 "documentation",
                 ""
             ]);
 
             this.formBlock({
-                //.TRANS: load the heap contents from a URL
-                name: _("load heap from App"),
-                args: 2,
-                argTypes: ["textin", "textin"],
-                defaults: ["appName", "localhost"]
+                name: _("heap"),
+                outType: "numberout"
             });
         }
 
-        flow(args, logo, turtle, blk) {
-            if (args[0] === null || args[1] === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
-                return;
-            }
-
-            let data = [];
-            let url = args[1];
-            let name = args[0];
-            let oldHeap;
-            let xmlHttp = new XMLHttpRequest();
-            xmlHttp.open("GET", url, false);
-            xmlHttp.send();
-            if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
-                console.debug(xmlHttp.responseText);
-                try {
-                    data = JSON.parse(xmlHttp.responseText);
-                } catch (e) {
-                    console.debug(e);
-                    logo.errorMsg(_("Error parsing JSON data:") + e);
-                }
-            } else if (xmlHttp.readyState === 4 && xmlHttp.status !== 200) {
-                console.debug("fetched the wrong page or network error...");
-                logo.errorMsg(_("404: Page not found"));
-                return;
-            } else {
-                logo.errorMsg("xmlHttp.readyState: " + xmlHttp.readyState);
-                return;
-            }
-            if (name in logo.turtleHeaps) {
-                oldHeap = turtleHeaps[turtle];
-            } else {
-                oldHeap = [];
-            }
-            logo.turtleHeaps[name] = data;
-        }
-    }
-
-    class SaveHeapToAppBlock extends FlowBlock {
-        constructor() {
-            super("saveHeapToApp");
-            this.setPalette("heap");
-            this.setHelpString([
-                _("The Save-heap-to-app block saves the heap to a web page."),
-                "documentation",
-                ""
-            ]);
-
-            this.formBlock({
-                //.TRANS: save the heap contents to a URL
-                name: _("save heap to App"),
-                args: 2,
-                argTypes: ["textin", "textin"],
-                defaults: ["appName", "localhost"]
-            });
-        }
-
-        flow(args, logo, turtle, blk) {
-            if (args[0] === null || args[1] === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
-                return;
-            }
-
-            let name = args[0];
-            let url = args[1];
-            if (name in logo.turtleHeaps) {
-                let data = JSON.stringify(logo.turtleHeaps[name]);
-                let xmlHttp = new XMLHttpRequest();
-                xmlHttp.open("POST", url, true);
-                xmlHttp.setRequestHeader(
-                    "Content-Type",
-                    "application/json;charset=UTF-8"
-                );
-                xmlHttp.send(data);
-            } else {
-                logo.errorMsg(_("Cannot find a valid heap for") + " " + name);
-            }
+        arg(logo, turtle, blk, receivedArg) {
+            return JSON.stringify(logo.turtleHeaps[turtle]);
         }
     }
 
@@ -104,6 +29,7 @@ function setupHeapBlocks() {
         constructor() {
             super("showHeap");
             this.setPalette("heap");
+	    this.hidden = this.deprecated = true;
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -201,92 +127,6 @@ function setupHeapBlocks() {
 
         flow(args, logo, turtle) {
             logo.turtleHeaps[turtle] = [];
-        }
-    }
-
-    class SaveHeapBlock extends FlowBlock {
-        constructor() {
-            super("saveHeap");
-            this.setPalette("heap");
-            this.setHelpString([
-                _("The Save-heap block saves the heap to a file."),
-                "documentation",
-                ""
-            ]);
-
-            this.formBlock({
-                //.TRANS: save the heap to a file
-                name: _("save heap"),
-                args: 1,
-                argTypes: ["textin"],
-                defaults: ["heap.json"]
-            });
-        }
-
-        flow(args, logo, turtle) {
-            if (args[0] !== null && turtle in logo.turtleHeaps) {
-                save.download(
-                    "json",
-                    "data:text/json;charset-utf-8," +
-                        JSON.stringify(logo.turtleHeaps[turtle]),
-                    args[0]
-                );
-            }
-        }
-    }
-
-    class LoadHeapBlock extends FlowBlock {
-        constructor() {
-            super("loadHeap");
-            this.setPalette("heap");
-            this.setHelpString([
-                _("The Load-heap block loads the heap from a file."),
-                "documentation",
-                ""
-            ]);
-
-            this.formBlock({
-                //.TRANS: load the heap from a file
-                name: _("load heap"),
-                args: 1,
-                argTypes: ["filein"],
-                defaults: [[null, null]]
-            });
-        }
-
-        flow(args, logo, turtle, blk) {
-            let block = logo.blocks.blockList[blk];
-            let oldHeap;
-            if (turtle in logo.turtleHeaps) {
-                oldHeap = logo.turtleHeaps[turtle];
-            } else {
-                oldHeap = [];
-            }
-
-            let c = block.connections[1];
-            if (c != null && logo.blocks.blockList[c].name === "loadFile") {
-                if (args.length !== 1) {
-                    logo.errorMsg(_("You must select a file."));
-                } else {
-                    try {
-                        logo.turtleHeaps[turtle] = JSON.parse(
-                            logo.blocks.blockList[c].value[1]
-                        );
-                        if (!Array.isArray(logo.turtleHeaps[turtle])) {
-                            throw "is not array";
-                        }
-                    } catch (e) {
-                        logo.turtleHeaps[turtle] = oldHeap;
-                        logo.errorMsg(
-                            _(
-                                "The file you selected does not contain a valid heap."
-                            )
-                        );
-                    }
-                }
-            } else {
-                logo.errorMsg(_("The loadHeap block needs a loadFile block."));
-            }
         }
     }
 
@@ -499,14 +339,11 @@ function setupHeapBlocks() {
         }
     }
 
-    new LoadHeapFromAppBlock().setup();
-    new SaveHeapToAppBlock().setup();
+    new HeapBlock().setup();
     new ShowHeapBlock().setup();
     new HeapLengthBlock().setup();
     new HeapEmptyBlock().setup();
     new EmptyHeapBlock().setup();
-    new SaveHeapBlock().setup();
-    new LoadHeapBlock().setup();
     new ReverseHeapBlock().setup();
     new IndexHeapBlock().setup();
     new SetHeapEntryBlock().setup();

@@ -59,7 +59,7 @@ function _getDict(target, logo, turtle, k) {
 }
 
 
-function _setDict(target, logo, turtle, k, v) {
+function setDictValue(target, logo, turtle, k, v) {
     // This is the internal turtle dictionary that
     // includes the turtle status.
     if (k === _('color')) {
@@ -116,6 +116,7 @@ function setupDictBlocks() {
         constructor() {
             super("showDict");
             this.setPalette("dict");
+	    this.hidden = this.deprecated = true;
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -310,7 +311,7 @@ function setupDictBlocks() {
             // Is the dictionary the same as a turtle name?
             let target = getTargetTurtle(logo.turtles, a);
             if (target !== null) {
-                _setDict(target, logo, turtle, k, v);
+                setDictValue(target, logo, turtle, k, v);
                 return;
             } else if (!(a in logo.turtleDicts[turtle])) {
                 logo.turtleDicts[turtle][a] = {};
@@ -416,7 +417,7 @@ function setupDictBlocks() {
             // Is the dictionary the same as a turtle name?
             let target = getTargetTurtle(logo.turtles, a);
             if (target !== null) {
-                _setDict(target, logo, turtle, k, v);
+                setDictValue(target, logo, turtle, k, v);
                 return;
             } else if (!(a in logo.turtleDicts[turtle])) {
                 logo.turtleDicts[turtle][a] = {};

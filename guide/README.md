@@ -1513,8 +1513,8 @@ e.g., x, y, heading, color, shade, grey, and pensize.
  "additional programming within the Status block")
 
 You can do additional programming within the status block. In the
-example above, `whole notes played` is divided by `4` (e.g. quarter notes)
-before being displayed.
+example above, `whole notes played` is multiplied by `4` (to calculate
+quarter notes played) before being displayed.
 
 ### <a name="GENERATION"></a>4.2 Generating Chunks of Notes 
 
