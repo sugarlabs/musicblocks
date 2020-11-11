@@ -1006,7 +1006,7 @@ msgstr "ヒープ"
 #: js/DictBlocks.js:178
 #: js/ProgramBlocks.js:293
 msgid "dictionary"
-msgstr ""
+msgstr "辞書"
 
 #: js/turtledefs.js:89
 msgid "ensemble"
@@ -1019,7 +1019,7 @@ msgstr "その他"
 #: js/turtledefs.js:92
 #.TRANS: program as in computer program
 msgid "program"
-msgstr ""
+msgstr "プログラム"
 
 #: js/turtledefs.js:93
 msgid "my blocks"
@@ -2859,19 +2859,19 @@ msgstr "<h2>文字ブロック</h2><br>このプログラムを実行してい�
 
 #: js/EnsembleBlocks.js:825
 msgid "mouse count"
-msgstr ""
+msgstr "何匹のネズミ"
 
 #: js/EnsembleBlocks.js:830
 msgid "The Mouse-count block returns the number of mice."
-msgstr ""
+msgstr "「何匹のネズミ」のブロックはネズミを数えって数字を表す。"
 
 #: js/EnsembleBlocks.js:848
 msgid "nth mouse name"
-msgstr ""
+msgstr "何匹目のネズミの名前"
 
 #: js/EnsembleBlocks.js:853
 msgid "The Nth-Mouse name block returns the name of the nth mice."
-msgstr ""
+msgstr "「何匹目のネズミの名前」のブロックは数字によってそのネズミの名前を表す。"
 
 #: js/EnsembleBlocks.js:894
 #: js/EnsembleBlocks.js:945
@@ -3573,11 +3573,11 @@ msgstr "再生を停止"
 #: js/MediaBlocks.js:197
 #.TRANS: Erases the images and text
 msgid "erase media"
-msgstr ""
+msgstr "メディアを消す"
 
 #: js/MediaBlocks.js:200
 msgid "The Erase Media block erases text and images."
-msgstr ""
+msgstr "「メディアを消す」のブロックは文字と画像を消します。"
 
 #: js/MediaBlocks.js:215
 #.TRANS: play an audio recording
@@ -3742,7 +3742,7 @@ msgstr "音程の違い"
 #: js/PitchBlocks.js:220
 #.TRANS: the change measured in scale-steps between the current pitch and the previous pitch
 msgid "scalar change in pitch"
-msgstr ""
+msgstr "音階のよって音程の違い"
 
 #: js/PitchBlocks.js:227
 #: js/PitchBlocks.js:393
@@ -3774,7 +3774,7 @@ msgstr "アルファベット・クラス"
 
 #: js/PitchBlocks.js:396
 msgid "solfege class"
-msgstr ""
+msgstr "階名"
 
 #: js/PitchBlocks.js:397
 msgid "staff y"
@@ -3786,7 +3786,7 @@ msgstr "階名（ド、レ、ミ）"
 
 #: js/PitchBlocks.js:399
 msgid "pitch class"
-msgstr "ピッチクラス"
+msgstr "ピッチ・クラス"
 
 #: js/PitchBlocks.js:400
 msgid "scalar class"
@@ -3981,7 +3981,7 @@ msgstr "音階内を上る／下りる"
 #: js/DictBlocks.js:73
 #: js/DictBlocks.js:101
 msgid "font"
-msgstr ""
+msgstr "フォント"
 
 #: js/DictBlocks.js:14
 #: js/DictBlocks.js:75
@@ -3994,7 +3994,7 @@ msgstr "向き（ネズミ）"
 #: js/DictBlocks.js:132
 #.TRANS: Display the dictionary contents
 msgid "show dictionary"
-msgstr ""
+msgstr "辞書を表す"
 
 #: js/DictBlocks.js:135
 #: js/DictBlocks.js:181
@@ -4004,14 +4004,14 @@ msgstr ""
 #: js/ProgramBlocks.js:294
 #: js/ProgramBlocks.js:390
 msgid "My Dictionary"
-msgstr ""
+msgstr "私の辞書"
 
 #: js/DictBlocks.js:226
 #: js/DictBlocks.js:342
 #.TRANS: retrieve a value from the dictionary with a given key
 #.TRANS: retrieve a value from the dictionary with a given key
 msgid "get value"
-msgstr ""
+msgstr "数価を表す"
 
 #: js/DictBlocks.js:229
 #: js/DictBlocks.js:230
@@ -4041,7 +4041,7 @@ msgstr "調"
 #.TRANS: set a value in the dictionary for a given key
 #.TRANS: set a value in the dictionary for a given key
 msgid "set value"
-msgstr ""
+msgstr "値を設定"
 
 #: js/GraphicsBlocks.js:10
 msgid "The Heading block returns the orientation of the mouse."
@@ -4541,12 +4541,12 @@ msgstr ""
 #: js/ProgramBlocks.js:221
 #.TRANS: load a dictionary from a file
 msgid "load dictionary"
-msgstr ""
+msgstr "辞書をロード"
 
 #: js/ProgramBlocks.js:224
 #: js/ProgramBlocks.js:389
 msgid "file"
-msgstr ""
+msgstr "ファイル"
 
 #: js/ProgramBlocks.js:273
 msgid "The load dictionary block needs a load file block."
@@ -4559,7 +4559,7 @@ msgstr ""
 #: js/ProgramBlocks.js:290
 #.TRANS: load a dictionary from a JSON encoding
 msgid "set dictionary"
-msgstr ""
+msgstr "辞書を設定"
 
 #: js/ProgramBlocks.js:338
 msgid "The set dictionary block needs a dictionary."
@@ -4582,7 +4582,7 @@ msgstr ""
 #: js/ProgramBlocks.js:386
 #.TRANS: save a dictionary to a file
 msgid "save dictionary"
-msgstr ""
+msgstr "辞書を保存"
 
 #: js/ProgramBlocks.js:434
 msgid "The Open palette block opens a palette."
@@ -4794,7 +4794,7 @@ msgstr ""
 #: js/MeterActions.js:88
 #: js/MeterActions.js:126
 msgid "maximum"
-msgstr ""
+msgstr "最大限"
 
 #: js/MeterActions.js:94
 #: js/MeterActions.js:132
@@ -4885,7 +4885,7 @@ msgstr "音符を足す"
 
 #: js/musickeyboard.js:490
 msgid "Metronome"
-msgstr ""
+msgstr "メトロノーム"
 
 #: js/musickeyboard.js:512
 #: js/temperament.js:2164
