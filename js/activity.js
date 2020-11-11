@@ -4702,7 +4702,7 @@ function Activity() {
             };
 
             this.showMusicBlocks = function() {
-                this.planet = this.PlanetInterface.getCurrentProjectName;
+                this.planet = this.getCurrentProjectName();
                 document.querySelector('title').textContent = this.planet;
                 document.getElementById("toolbars").style.display = "block";
                 document.getElementById("palette").style.display = "block";
