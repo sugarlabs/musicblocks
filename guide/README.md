@@ -1878,7 +1878,7 @@ the mode is changed inside the widget.
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/mode3.svg
  "creating Dorian mode")
 
-In the above example, the *Major* mode has been rotated clockwise,
+In the above example, the *Major* mode has been rotated counter-clockwise,
 transforming it into *Dorian*.
 
 ![alt
@@ -1886,7 +1886,7 @@ transforming it into *Dorian*.
  "creating Locrian mode")
 
 In the above example, the *Major* mode has been rotated
-counter-clockwise, transforming it into *Locrian*.
+clockwise, transforming it into *Locrian*.
 
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/mode5.svg
