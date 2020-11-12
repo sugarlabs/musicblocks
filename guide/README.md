@@ -2258,18 +2258,14 @@ all keys between C4 and G5 is created.
 When there are *Pitch* blocks inside the widget clamp, a keyboard with
 only those pitches is created.
 
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/keyboard3.svg
- "keyboard block with pitch block in clamp")
-
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/keyboard4.svg
- "keyboard widget with pitch block in clamp")
-
 Click on the keys to hear sounds. Click on the Play button to playback
 all of the notes played. Click on the Save button to output code (a
 series of *Note* blocks). The Clear button is used to delete all keys
 pressed previously in order to start new.
+
+The MIDI input allows for a using a MIDI device to generate notes.
+
+The metronome feature will generate a beat to enable candence.
 
 ###  <a name="temperament"></a>4.12 Changing Temperament
 
