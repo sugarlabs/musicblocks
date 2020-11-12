@@ -4702,9 +4702,7 @@ function Activity() {
             };
 
             this.showMusicBlocks = function() {
-                var globalTitleS = this.getCurrentProjectName();
-                console.log(globalTitleS);
-                document.title = globalTitleS;
+                document.title = this.getCurrentProjectName();
                 document.getElementById("toolbars").style.display = "block";
                 document.getElementById("palette").style.display = "block";
 
