@@ -1972,7 +1972,7 @@ sample. In the example above, a `kick drum` will be substitued for
 each occurance of a `Re` `4`.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/drum8.svg
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/drum5a.svg
  "pitch-drum matrix 1")
 
 ![alt
