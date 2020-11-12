@@ -64,6 +64,7 @@ also available.
     10. [Custom Timbres](#timbre)
     11. [Music Keyboard](#keyboard)
     12. [Changing Temperament](#temperament)
+    13. [Oscilloscope](#oscilloscope)
 5. [Beyond Music Blocks](#BEYOND-MUSIC-BLOCKS)
     1. [LilyPond](#LILYPOND)
     2. [JavaScript](#JAVASCRIPT)
@@ -2381,6 +2382,19 @@ changed to 3:1 after clicking on `Done`.
 The *Drag* button will drag the widget.
 
 The *Close* button will close the widget.
+
+###  <a name="oscilloscope"></a>4.13 Oscilloscope
+
+Music Blocks has an Oscillosope Widget to visualize the music as it plays.
+
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/oscilloscope1.svg
+ "Oscilloscope")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/oscilloscope2.svg
+ "Oscilloscope")
+
+A separate wave will be displayed for each mouse.
 
 ## <a name="BEYOND-MUSIC-BLOCKS"></a>5. Beyond Music Blocks
 
