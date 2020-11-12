@@ -2360,7 +2360,7 @@ of first pitch is (Starting Pitch Frequency) * (16/13) and second
 pitch is (Starting Pitch Frequency) * (16/13)².
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/temperament4.svg
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/temperament6.svg
  "Arbitrary Edit tool")
 
 The `Arbitrary` edit tool is used to add a note in an arbitrary
@@ -2371,7 +2371,7 @@ will be added somewhere between pitch numbers `2` and `3` by adjusting
 the frequency slider.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/temperament4.svg
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/temperament7.svg
  "Octave Space Edit tool")
 
 The `Octave Space` tool is used to edit the octave ratio. The standard
