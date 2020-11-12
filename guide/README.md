@@ -2336,8 +2336,7 @@ The *Add* button is used to edit notes through different tools:
 
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/temperament4.svg
- "Equal Edit tool")
-![alt
+ "Equal Edit tool") ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/temperament4a.svg
  "Temperament widget with new element")
 
@@ -2347,8 +2346,10 @@ between pitch numbers `0` and `1` and the resultant number of notes
 within an octave are changed from 12 to 13.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/temperament4.svg
- "Ratio Edit tool")
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/temperament5.svg
+ "Ratio Edit tool") ![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/temperament5a.svg
+ "Temperament widget with new element")
 
 The `Ratio` tool is used to add notes of specified ratios in such a
 way that the resultant pitches wrap inside a single octave. Recursion
