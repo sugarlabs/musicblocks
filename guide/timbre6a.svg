@@ -370,7 +370,7 @@
      id="path2499"
      style="stroke-width:0.330729" />
   <rect
-     style="fill:#93befe;fill-opacity:1;stroke:none;stroke-width:0.51634;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:0.51634;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="rect1673-4-3"
      width="16.933332"
      height="16.933332"
@@ -661,5 +661,182 @@ S</tspan></text>
          id="path3475"
          d="m 15.091,20.935 h 17.254 c 4.693,0 8.534,3.841 8.534,8.534 0,4.693 -3.841,8.533 -8.534,8.533 H 16.798" />
     </g>
+  </g>
+  <text
+     id="text1287"
+     y="25.402775"
+     x="52.1674"
+     style="font-style:normal;font-weight:normal;font-size:21.1991px;line-height:13.2495px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.529978px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     xml:space="preserve"><tspan
+       style="font-size:9.89294px;stroke-width:0.529978px"
+       y="25.402775"
+       x="52.1674"
+       id="tspan1285">tremolo</tspan></text>
+  <ellipse
+     ry="2.9057908"
+     rx="2.9057491"
+     cy="22.673536"
+     cx="33.353237"
+     id="path1315"
+     style="fill:#000000;fill-opacity:1;stroke:#808080;stroke-width:2.13809;stroke-linecap:round;stroke-miterlimit:1.41421;stroke-dasharray:none;stroke-opacity:1" />
+  <text
+     id="text1287-6"
+     y="39.087296"
+     x="51.273739"
+     style="font-style:normal;font-weight:normal;font-size:21.1991px;line-height:13.2495px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.529978px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     xml:space="preserve"><tspan
+       style="font-size:9.89294px;stroke-width:0.529978px"
+       y="39.087296"
+       x="51.273739"
+       id="tspan1285-7">vibrato</tspan></text>
+  <ellipse
+     ry="2.9057908"
+     rx="2.9057491"
+     cy="36.358055"
+     cx="33.353237"
+     id="path1315-5"
+     style="fill:none;fill-opacity:1;stroke:#808080;stroke-width:2.13809;stroke-linecap:round;stroke-miterlimit:1.41421;stroke-dasharray:none;stroke-opacity:1" />
+  <text
+     id="text1287-5"
+     y="52.771824"
+     x="51.273739"
+     style="font-style:normal;font-weight:normal;font-size:21.1991px;line-height:13.2495px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.529978px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     xml:space="preserve"><tspan
+       style="font-size:9.89294px;stroke-width:0.529978px"
+       y="52.771824"
+       x="51.273739"
+       id="tspan1285-3">chorus</tspan></text>
+  <ellipse
+     ry="2.9057908"
+     rx="2.9057491"
+     cy="50.042583"
+     cx="33.353237"
+     id="path1315-6"
+     style="fill:none;fill-opacity:1;stroke:#808080;stroke-width:2.13809;stroke-linecap:round;stroke-miterlimit:1.41421;stroke-dasharray:none;stroke-opacity:1" />
+  <text
+     id="text1287-5-0"
+     y="66.050232"
+     x="51.273739"
+     style="font-style:normal;font-weight:normal;font-size:21.1991px;line-height:13.2495px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.529978px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     xml:space="preserve"><tspan
+       style="font-size:9.89294px;stroke-width:0.529978px"
+       y="66.050232"
+       x="51.273739"
+       id="tspan1285-3-6">phaser</tspan></text>
+  <ellipse
+     ry="2.9057908"
+     rx="2.9057491"
+     cy="63.320995"
+     cx="33.353237"
+     id="path1315-6-3"
+     style="fill:none;fill-opacity:1;stroke:#808080;stroke-width:2.13809;stroke-linecap:round;stroke-miterlimit:1.41421;stroke-dasharray:none;stroke-opacity:1" />
+  <text
+     id="text1287-5-06"
+     y="80.140862"
+     x="51.273739"
+     style="font-style:normal;font-weight:normal;font-size:21.1991px;line-height:13.2495px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.529978px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     xml:space="preserve"><tspan
+       style="font-size:9.89294px;stroke-width:0.529978px"
+       y="80.140862"
+       x="51.273739"
+       id="tspan1285-3-1">distrotion</tspan></text>
+  <ellipse
+     ry="2.9057908"
+     rx="2.9057491"
+     cy="77.411621"
+     cx="33.353237"
+     id="path1315-6-5"
+     style="fill:none;fill-opacity:1;stroke:#808080;stroke-width:2.13809;stroke-linecap:round;stroke-miterlimit:1.41421;stroke-dasharray:none;stroke-opacity:1" />
+  <g
+     id="g10849"
+     transform="matrix(1.5192875,0,0,1.5192875,-14.840098,-88.999678)">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:6.61458px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="25.248228"
+       y="138.09375"
+       id="text1287-5-43"><tspan
+         id="tspan1285-3-14"
+         x="25.248228"
+         y="138.09375"
+         style="font-size:4.9389px;stroke-width:0.264583px">rate</tspan></text>
+    <rect
+       style="fill:#009300;fill-opacity:1;stroke:none;stroke-width:0.829702;stroke-linecap:round;stroke-miterlimit:1.41421;stroke-dasharray:none;stroke-opacity:1"
+       id="rect2157"
+       width="52.916668"
+       height="1.5875"
+       x="51.64455"
+       y="135.93747" />
+    <circle
+       style="fill:#007db3;fill-opacity:1;stroke:#000000;stroke-width:0.79742;stroke-linecap:round;stroke-miterlimit:1.41421;stroke-dasharray:none;stroke-opacity:1"
+       id="path2159"
+       cx="61.276161"
+       cy="136.73122"
+       r="2.778125" />
+    <circle
+       style="fill:#949494;fill-opacity:1;stroke:none;stroke-width:0.79742;stroke-linecap:round;stroke-miterlimit:1.41421;stroke-dasharray:none;stroke-opacity:1"
+       id="path2159-2"
+       cx="109.81742"
+       cy="136.73122"
+       r="2.778125" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:6.61458px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="107.72763"
+       y="137.88696"
+       id="text2178"><tspan
+         id="tspan2176"
+         x="107.72763"
+         y="137.88696"
+         style="font-size:3.175px;stroke-width:0.264583px">10</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:6.61458px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="25.248228"
+       y="150.55972"
+       id="text1287-5-9"><tspan
+         id="tspan1285-3-2"
+         x="25.248228"
+         y="150.55972"
+         style="font-size:4.9389px;stroke-width:0.264583px">depth</tspan></text>
+    <rect
+       style="fill:#009300;fill-opacity:1;stroke:none;stroke-width:0.829702;stroke-linecap:round;stroke-miterlimit:1.41421;stroke-dasharray:none;stroke-opacity:1"
+       id="rect2157-6"
+       width="52.916668"
+       height="1.5875"
+       x="51.64455"
+       y="148.40346" />
+    <circle
+       style="fill:#007db3;fill-opacity:1;stroke:#000000;stroke-width:0.79742;stroke-linecap:round;stroke-miterlimit:1.41421;stroke-dasharray:none;stroke-opacity:1"
+       id="path2159-8"
+       cx="78.102898"
+       cy="149.1972"
+       r="2.778125" />
+    <circle
+       style="fill:#949494;fill-opacity:1;stroke:none;stroke-width:0.79742;stroke-linecap:round;stroke-miterlimit:1.41421;stroke-dasharray:none;stroke-opacity:1"
+       id="path2159-2-9"
+       cx="109.81742"
+       cy="149.1972"
+       r="2.778125" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:6.61458px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="107.77959"
+       y="150.35295"
+       id="text2178-2"><tspan
+         id="tspan2176-6"
+         x="107.77959"
+         y="150.35295"
+         style="font-size:3.175px;stroke-width:0.264583px">50</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:6.61458px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="25.583092"
+       y="126.22729"
+       id="text997"><tspan
+         id="tspan995"
+         x="25.583092"
+         y="126.22729"
+         style="font-size:4.9389px;stroke-width:0.264583px">tremolo</tspan></text>
   </g>
 </svg>

@@ -2149,12 +2149,6 @@ The *Timbre* widget has a number of different panels, each of which is
 used to set the parameters of the components that define your custom
 timbre.
 
-From left to right:
-
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/timbre2a.svg
- "the play button")
-
 * The *Play* button, which lets you test the sound quality of your
 custom timbre. By default, it will play `Sol`, `Mi`, `Sol` using the
 combination of filters you define.
@@ -2165,10 +2159,6 @@ combination of filters you define.
 
 You can also put notes in the *Timbre* block to use for testing your
 sound. In the example above, a scale will be used for the test.
-
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/timbre2b.svg
- "the save button")
 
 * The *Save* button, which will save your custom timbre for use in
 your program.
@@ -2198,6 +2188,9 @@ envelope, with controls for attack, decay, sustain, and release.
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/timbre6.svg
  "select effect")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/timbre6a.svg
+ "tremolo")
 
 * The *Effects* button, which lets you add effects to your custom
 timbre: tremelo, vibrato, chorus, phaser, and distortion. When an
@@ -2210,30 +2203,10 @@ effect is selected, additional controls will appear in the widget.
 * The *Filter* button, which lets you choose between a number of
 different filter types.
 
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/timbre2c.svg
- "the add filter button")
-
 * The *Add filter* button, which lets you add addition filters to your
 custom timbre.
 
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/timbre2d.svg
- "the undo button")
-
 * The *Undo* button.
-
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/timbre2e.svg
- "the close button")
-
-* The *Close* button.
-
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/timbre2f.svg
- "the drag handle")
-
-* The *Drag* handle.
 
 As you add synthesizers, effects, and filters with the widget, blocks
 corresponding to your choices are added to the *Timbre* block. This
