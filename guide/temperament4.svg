@@ -680,57 +680,54 @@
          y="19.089405"
          style="stroke-width:0.264583">Equal  Ratios  Arbitary  Octave Space</tspan></text>
   </g>
+  <text
+     xml:space="preserve"
+     style="font-size:6.35px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+     x="26.944191"
+     y="40.848797"
+     id="text1115"><tspan
+       id="tspan1113"
+       x="26.944191"
+       y="40.848797"
+       style="stroke-width:0.264583">Pitch number              to</tspan></text>
+  <rect
+     style="fill:#93befe;fill-opacity:1;stroke:#646464;stroke-width:0.396875;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="rect1158-5"
+     width="13.229167"
+     height="13.229167"
+     x="112.70275"
+     y="31.866917" />
   <g
-     id="g1252"
-     transform="translate(-8.4636457,1.2046237)">
-    <g
-       id="g1221">
-      <text
-         xml:space="preserve"
-         style="font-size:6.35px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
-         x="35.407837"
-         y="39.644173"
-         id="text1115"><tspan
-           id="tspan1113"
-           x="35.407837"
-           y="39.644173"
-           style="stroke-width:0.264583">Pitch number              to</tspan></text>
-      <rect
-         style="fill:#93befe;fill-opacity:1;stroke:#646464;stroke-width:0.396875;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         id="rect1158"
-         width="13.229167"
-         height="13.229167"
-         x="85.494408"
-         y="30.662292" />
-      <rect
-         style="fill:#93befe;fill-opacity:1;stroke:#646464;stroke-width:0.396875;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         id="rect1158-5"
-         width="13.229167"
-         height="13.229167"
-         x="121.1664"
-         y="30.662292" />
-    </g>
+     id="g1011"
+     transform="translate(-3.7041669)">
+    <rect
+       style="fill:#93befe;fill-opacity:1;stroke:#646464;stroke-width:0.396875;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1158"
+       width="13.229167"
+       height="13.229167"
+       x="77.030762"
+       y="31.866917" />
     <text
        xml:space="preserve"
        style="font-size:6.35px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
-       x="90.069077"
-       y="39.588364"
+       x="81.605431"
+       y="40.792988"
        id="text1233"><tspan
          id="tspan1231"
-         x="90.069077"
-         y="39.588364"
+         x="81.605431"
+         y="40.792988"
          style="stroke-width:0.264583">0</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:6.35px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
-       x="125.48077"
-       y="39.757252"
-       id="text1237"><tspan
-         id="tspan1235"
-         x="125.48077"
-         y="39.757252"
-         style="stroke-width:0.264583">1</tspan></text>
   </g>
+  <text
+     xml:space="preserve"
+     style="font-size:6.35px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+     x="117.01712"
+     y="40.961876"
+     id="text1237"><tspan
+       id="tspan1235"
+       x="117.01712"
+       y="40.961876"
+       style="stroke-width:0.264583">1</tspan></text>
   <g
      id="g1260"
      transform="translate(-23.390724,1.4289222)">
