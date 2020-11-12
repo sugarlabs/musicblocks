@@ -2337,6 +2337,9 @@ The *Add* button is used to edit notes through different tools:
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/temperament4.svg
  "Equal Edit tool")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/temperament4a.svg
+ "Equal Edit tool")
 
 The `Equal` edit tool is used to make *equal divisions* between two
 pitch numbers.  In the above example, two equal divisions are made
