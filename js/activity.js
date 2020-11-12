@@ -4710,7 +4710,7 @@ function Activity() {
             };
 
             this.showMusicBlocks = function() {
-                document.title = this.getCurrentProjectName();
+                document.title = planet.getCurrentProjectName();
                 document.getElementById("toolbars").style.display = "block";
                 document.getElementById("palette").style.display = "block";
 
