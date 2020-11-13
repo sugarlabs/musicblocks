@@ -1692,16 +1692,16 @@ class BaseBlock extends ProtoBlock {
                     svg.docks[
                         svg.docks.length - this._style.flows.labels.length - 1
                     ][1];
-            else if (this.isLeftClamp) 
+            else if (this.isLeftClamp)
                 clickHeight =               // special Case with no .top and .bottom .
                     svg.docks[
-                        svg.docks.length - this._style.flows.labels.length 
-                    ][1];  
+                        svg.docks.length - this._style.flows.labels.length
+                    ][1];
             else clickHeight = svg.getHeight();
             if (this.size === 0) return [artwork, svg.docks, 0, 0, 0];
 
             // Special case for one argument boolean output blocks e.g found mouse
-            
+
             if(this._style.flows.left === "bool") {
                 artwork = svg.booleanNot(true); // OneArg
             }

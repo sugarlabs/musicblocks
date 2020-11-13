@@ -211,7 +211,7 @@ function setupDrumBlocks() {
 
         flow(args, logo, turtle, blk) {
             Singer.DrumActions.setDrum(args[0], turtle, blk);
-
+            console.log(args[0]);
             return [args[1], 1];
         }
     }

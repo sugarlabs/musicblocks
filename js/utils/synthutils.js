@@ -741,7 +741,7 @@ function Synth() {
                                 type
                             ][sample].data();
                             accounted = true;
-                            break outerloop;
+
                         }
                     }
                 }
@@ -750,7 +750,7 @@ function Synth() {
         if (!accounted) {
             let data = function() {return sampleName};
             this.samplesManifest.voice.push({ name: sampleName, data: data});
-            this.samplesManifest.drum.push({ name: sampleName, data: data});
+            this.samplesManifest.drum.push({  name: sampleName, data: data});
             this._loadSample(sampleName);
         }
 

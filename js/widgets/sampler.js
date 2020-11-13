@@ -4,7 +4,7 @@ function SampleWidget() {
     const BUTTONDIVWIDTH = 476; // 8 buttons 476 = (55 + 4) * 8
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
-    const TEMPOWIDTH = 700;
+    const SAMPLEWIDTH = 300;
     const TEMPOHEIGHT = 100;
     const YRADIUS = 75;
 
@@ -25,15 +25,50 @@ function SampleWidget() {
 
     this._draw = function() {
 
-      var canvas = this.tempoCanvases;
+      var canvas = this.sampleCanvas;
 
       var ctx = canvas.getContext("2d");
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.beginPath();
       ctx.fillStyle = "rgba(0,0,0,0)";
+
+      ctx.ellipse(
+          0,
+          0,
+          100,
+          100,
+          0,
+          0,
+          Math.PI * 2
+      );
+
       ctx.fill();
       ctx.closePath();
+
+
     }
+
+    this.__save = function() {
+        var that = this;
+        require("samples/banjo");
+        setTimeout(function() {
+            console.debug("saving the sample");
+            var newStack = [
+                [0, ["media", { value: "images/soundfile.svg", sample: BANJO_SAMPLE}], 100, 100, [null]]
+            ];
+            that._logo.blocks.loadNewBlocks(newStack);
+            that._logo.textMsg(_("New sample block generated!"));
+        }, 200 * i);
+    };
+
+    this._saveSample = function() {
+        // Save a BPM block for each tempo.
+            this.__save();
+    };
+
+    this._get_save_lock = function() {
+        return this._save_lock;
+    };
 
     this.init = function(logo) {
         this._logo = logo;
@@ -73,14 +108,21 @@ function SampleWidget() {
             this.destroy();
         };
 
+        this._save_lock = false;
         widgetWindow.addButton(
             "export-chunk.svg",
             iconSize,
-            _("Save tempo"),
+            _("Save sample"),
             ""
         ).onclick = function() {
             // Debounce button
-
+            if (!that._get_save_lock()) {
+                that._save_lock = true;
+                that._saveSample();
+                setTimeout(function() {
+                    that._save_lock = false;
+                }, 1000);
+            }
         };
 
         this.bodyTable = document.createElement("table");
@@ -90,14 +132,16 @@ function SampleWidget() {
         var r2 = this.bodyTable.insertRow();
         var r3 = this.bodyTable.insertRow();
 
-        this.tempoCanvases = document.createElement("canvas");
-        this.tempoCanvases.style.width = TEMPOWIDTH + "px";
-        this.tempoCanvases.style.height = TEMPOHEIGHT + "px";
-        this.tempoCanvases.style.margin = "1px";
-        this.tempoCanvases.style.background = "rgba(255, 0, 255, 1)";
+        this.sampleCanvas = document.createElement("canvas");
+        this.sampleCanvas.style.width = SAMPLEWIDTH + "px";
+        this.sampleCanvas.style.height = TEMPOHEIGHT + "px";
+        this.sampleCanvas.style.margin = "1px";
+        this.sampleCanvas.style.background = "rgba(255, 255, 255, 1)";
+
+
 
         var tcCell = r1.insertCell();
-        tcCell.appendChild(this.tempoCanvases);
+        tcCell.appendChild(this.sampleCanvas);
         tcCell.setAttribute("rowspan", "3");
 
         this._logo.textMsg(_("Record a sample to use as an instrument."));

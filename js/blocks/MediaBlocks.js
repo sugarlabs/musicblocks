@@ -205,7 +205,7 @@ function setupMediaBlocks() {
 
         flow(args, logo, turtle, blk) {
             let tur = logo.turtles.ithTurtle(turtle);
-            tur.painter.doClearMedia();	    
+            tur.painter.doClearMedia();
         }
     }
 
@@ -596,7 +596,7 @@ function setupMediaBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Media block is used to import an image."),
+                _("The Media block is used to import an image or a sound file."),
                 "documentation",
                 null,
                 "turtleshell"
@@ -614,6 +614,7 @@ function setupMediaBlocks() {
 
             this.formBlock({
                 image: "images/load-media.svg",
+                value: null,
                 outType: "mediaout"
             });
         }

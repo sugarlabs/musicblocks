@@ -61,7 +61,6 @@ function Activity() {
     ];
 
     const that = this;
-
     _doFastButton = this._doFastButton;
     _doSlowButton = this._doSlowButton;
     doHardStopButton = this.doHardStopButton;

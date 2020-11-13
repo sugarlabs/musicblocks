@@ -2523,7 +2523,7 @@ function Blocks(activity) {
     /*
      * Moves all blocks except given stack
      * @param blk - exception
-     * @param dx - delta x 
+     * @param dx - delta x
      * @param dy - delta y
      * @public
      * @return {void}
@@ -3297,14 +3297,14 @@ function Blocks(activity) {
             };
 
             postProcessArg = thisBlock;
-        } 
+        }
         else if (name === "outputtools") {
             var postProcess = function(args) {
                 that.blockList[thisBlock].value = null;
                 that.blockList[thisBlock].privateData = args[1];
             }
             postProcessArg = [thisBlock, arg];
-        } 
+        }
         else if (name === "text") {
             postProcessArg = [thisBlock, _("text")];
         } else if (name === "boolean") {
@@ -5910,7 +5910,7 @@ function Blocks(activity) {
                             that.logo.synth.startingPitch = value.startingPitch;
                             OCTAVERATIO = value.octaveSpace;
                             that.logo.customTemperamentDefined = true; //This is for custom pitch pie menu
-                            
+
                             // if temperament is defined "customPitch" should be available
                             that.logo.blocks.protoBlockDict["custompitch"].hidden = false;
                             that.logo.blocks.palettes.updatePalettes("pitch");
