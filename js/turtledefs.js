@@ -57,7 +57,7 @@ const BUILTINPALETTES = [
     "media",
     "sensors",
     "heap",
-    "dict",
+    "dictionary",
     "ensemble",
     "extras",
     "program",
@@ -113,7 +113,7 @@ const MULTIPALETTES = [
         "number",
         "boolean",
         "heap",
-        "dict",
+        "dictionary",
         "extras",
 	"program",
         "myblocks"
@@ -122,7 +122,7 @@ const MULTIPALETTES = [
 ];
 
 // Skip these palettes in beginner mode.
-const SKIPPALETTES = ["heap", "dict", "extras", "program"];
+const SKIPPALETTES = ["heap", "dictionary", "extras", "program"];
 
 // Icons used to select between multipalettes.
 const MULTIPALETTEICONS = ["music", "logic", "artwork"];

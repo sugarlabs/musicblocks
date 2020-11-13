@@ -115,7 +115,7 @@ function setupDictBlocks() {
     class ShowDictBlock extends FlowBlock {
         constructor() {
             super("showDict");
-            this.setPalette("dict");
+            this.setPalette("dictionary");
 	    this.hidden = this.deprecated = true;
             this.beginnerBlock(true);
 
@@ -163,7 +163,7 @@ function setupDictBlocks() {
     class DictBlock extends LeftBlock {
         constructor() {
             super("dictionary");
-            this.setPalette("dict");
+            this.setPalette("dictionary");
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -209,7 +209,7 @@ function setupDictBlocks() {
     class GetDictBlock extends LeftBlock {
         constructor() {
             super("getDict");
-            this.setPalette("dict");
+            this.setPalette("dictionary");
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -265,7 +265,7 @@ function setupDictBlocks() {
     class SetDictBlock extends FlowBlock {
         constructor() {
             super("setDict");
-            this.setPalette("dict");
+            this.setPalette("dictionary");
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -326,7 +326,7 @@ function setupDictBlocks() {
     class GetDictBlock2 extends LeftBlock {
         constructor() {
             super("getDict2");
-            this.setPalette("dict");
+            this.setPalette("dictionary");
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -375,7 +375,7 @@ function setupDictBlocks() {
     class SetDictBlock2 extends FlowBlock {
         constructor() {
             super("setDict2");
-            this.setPalette("dict");
+            this.setPalette("dictionary");
             this.beginnerBlock(true);
 
             this.setHelpString([
