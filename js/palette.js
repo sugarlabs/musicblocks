@@ -249,7 +249,10 @@ function Palettes() {
             )
             ,listBody                
         );
-        for (let name of MULTIPALETTES[i] ) {
+        for (let name of MULTIPALETTES[i]) {
+	    if (beginnerMode && SKIPPALETTES.indexOf(name) !== -1) {
+		continue;
+	    }
             if (name ==="myblocks" ) {
                 var n = this.countProtoBlocks("myblocks");
                 if (n === 0) {
