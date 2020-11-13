@@ -234,7 +234,7 @@ const PALETTECOLORS0 = {
     "program": [12.5, 60, 80],
     "myblocks": [57.5, 70, 14],
     "heap": [17.5, 60, 70],
-    "dict": [17.5, 60, 70],
+    "dictionary": [17.5, 60, 70],
     "mice": [7.5, 50, 0]
 };
 
@@ -261,7 +261,7 @@ const PALETTECOLORS = {
     "program": [12.5, 60, 49],
     "myblocks": [57.5, 70, 14],
     "heap": [17.5, 60, 28],
-    "dict": [17.5, 60, 28],
+    "dictionary": [17.5, 60, 28],
     "mice": [7.5, 50, 0]
 };
 
@@ -479,7 +479,7 @@ const PALETTEICONS = {
     "myblocks": MYBLOCKSPALETTEICON,
     "program": PROGRAMPALETTEICON,
     "heap": HEAPPALETTEICON,
-    "dict": DICTPALETTEICON,
+    "dictionary": DICTPALETTEICON,
     "ensemble": TURTLESPALETTEICON,
     "music": MUSICICON,
     "artwork": GRAPHICSICON,
