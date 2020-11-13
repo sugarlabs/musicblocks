@@ -54,7 +54,7 @@ function SampleWidget() {
         setTimeout(function() {
             console.debug("saving the sample");
             var newStack = [
-                [0, ["media", { value: "images/soundfile.svg", sample: BANJO_SAMPLE}], 100, 100, [null]]
+                [0, ["media", { value: BANJO_SAMPLE, sample: BANJO_SAMPLE}], 100, 100, [null]]
             ];
             that._logo.blocks.loadNewBlocks(newStack);
             that._logo.textMsg(_("New sample block generated!"));
