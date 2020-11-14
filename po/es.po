@@ -658,6 +658,9 @@ msgstr "afinar instrumentos de cuerda"
 msgid "Pressing random keys"
 msgstr "presionando teclas aleatorias"
 
+msgid "grid"
+msgstr "cuadrícula"
+
 #: js/activity.js:1596
 #: js/activity.js:1631
 #: js/activity.js:1660
@@ -3822,6 +3825,9 @@ msgstr "sílaba solfege"
 #: js/PitchBlocks.js:399
 msgid "pitch class"
 msgstr "clase de tono"
+
+msgid "pitch converter"
+msgstr "convertidor de tono"
 
 #: js/PitchBlocks.js:400
 msgid "scalar class"

@@ -547,6 +547,9 @@ function PaletteModel(palette, palettes, name) {
         var label = "";
         // console.debug(protoBlock.name);
         switch (protoBlock.name) {
+            case "grid":
+                label = _("grid");
+                break;
             case "text":
                 label = _("text");
                 break;
@@ -560,10 +563,10 @@ function PaletteModel(palette, palettes, name) {
                 label = i18nSolfege("sol");
                 break;
             case "eastindiansolfege":
-                label = "sargam";
+                label = _("sargam");
                 break;
             case "scaledegree2":
-                label = "scale degree";
+                label = _("scale degree");
                 break;
             case "modename":
                 label = _("mode name");
@@ -604,7 +607,7 @@ function PaletteModel(palette, palettes, name) {
                 label = "arg " + arg;
                 break;
             case "outputtools":
-                label = "pitch converter";
+                label = _("pitch converter");
                 break;
             default:
                 if (blkname != modname) {
