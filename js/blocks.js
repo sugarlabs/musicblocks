@@ -1,3 +1,4 @@
+    %
 // Copyright (c) 2014-19 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
@@ -1540,8 +1541,8 @@ function Blocks(activity) {
          *     need to check to see if we need to rename it.
          * (7) Is it the name of a storein block? In which case we
          *     need to check to see if we need to add a palette entry.
-	 * (8) Is it a case or default block? We need to make sure that
-	 *     they are inside a switch block.
+         * (8) Is it a case or default block? We need to make sure that
+         *     they are inside a switch block.
          * (9) And we need to recheck if it inside of a expandable block.
          */
         var initialTopBlock = this.findTopBlock(thisBlock);
@@ -6793,12 +6794,14 @@ function Blocks(activity) {
     this._cleanupStacks = function() {
         // Sort the blocks from inside to outside.
         let blocksToCheck = [];
-        for (let b = 0; b < this._checkArgClampBlocks.length; b++) {
-            blocksToCheck.push([b, this._getNestingDepth(b), '1arg']);
+        for (let b = 0; b  < this._checkArgClampBlocks.length; b++) {
+            let bb = this._checkArgClampBlocks[b];
+            blocksToCheck.push([bb, this._getNestingDepth(bb), '1arg']);
         }
 
         for (let b = 0; b < this._checkTwoArgBlocks.length; b++) {
-            blocksToCheck.push([b, this._getNestingDepth(b), '2arg']);
+            let bb = this._checkTwoArgBlocks[b];
+            blocksToCheck.push([bb, this._getNestingDepth(bb), '2arg']);
         }
 
         blocksToCheck = blocksToCheck.sort(function(a, b) {
@@ -6811,7 +6814,7 @@ function Blocks(activity) {
             if (blocksToCheck[i][2] === '1arg') {
                 this._adjustArgClampBlock([blocksToCheck[i][0]]);
             } else {
-                // this._adjustExpandableTwoArgBlock([blocksToCheck[i][0]]);
+                this._adjustExpandableTwoArgBlock([blocksToCheck[i][0]]);
             }
         }
 
