@@ -506,7 +506,7 @@ function Block(protoblock, blocks, overrideName) {
      */
     this.updateArgSlots = function(slotList) {
         this.argClampSlots = slotList;
-        this._newArtwork();
+        this._newArtwork(0);
         this.regenerateArtwork(false);
     };
 
