@@ -684,7 +684,6 @@ function Blocks(activity) {
         if (argBlocksToCheck.length === 0) {
             return;
         }
-
         var blk = argBlocksToCheck.pop();
         var myBlock = this.blockList[blk];
 
@@ -6812,7 +6811,7 @@ function Blocks(activity) {
             if (blocksToCheck[i][2] === '1arg') {
                 this._adjustArgClampBlock([blocksToCheck[i][0]]);
             } else {
-                this._adjustExpandableTwoArgBlock([blocksToCheck[i][0]]);
+                // this._adjustExpandableTwoArgBlock([blocksToCheck[i][0]]);
             }
         }
 

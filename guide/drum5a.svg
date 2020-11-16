@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="266.5"
+   height="365.34308"
+   version="1.1"
+   id="svg5448">
+  <metadata
+     id="metadata5454">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs5452" />
+  <g
+     id="g6138"
+     transform="translate(-327,-153.57846)">
+    <g
+       transform="translate(327,154)"
+       id="g5240">
+      <g
+         transform="scale(1.5)"
+         id="g5238">
+        <path
+           d="m 0.5,14.5 v -4 a 4,4 90 0 1 4,-4 h 4 l 5,-6 5,6 h 9 113.9209 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 168 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 l -5,6 -5,-6 h -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path5232" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text5236"><tspan
+             x="20"
+             y="22"
+             id="tspan5234">pitch-drum mapper</tspan></text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.5,0,0,0.5,331,169)"
+       id="g5258">
+      <g
+         style="isolation:isolate"
+         id="g5256">
+        <g
+           id="g5254"
+           data-name="レイヤー 2">
+          <g
+             id="g5252">
+            <rect
+               width="42"
+               height="42"
+               rx="5"
+               ry="5"
+               style="opacity:0.4;mix-blend-mode:multiply;fill:#292929"
+               id="rect5242"
+               x="0"
+               y="0" />
+            <path
+               d="m 30.56,29.8 -4.17,-4.16 h 2.26 a 1.035,1.035 0 1 0 0,-2.07 h -4.71 a 1.08,1.08 0 0 0 -1.11,1 v 0 c 0,0 0,0 0,0.06 v 4.64 0 a 1.04,1.04 0 1 0 2.08,0 v -2.19 l 4.19,4.19 a 1,1 0 0 0 1.46,0 1,1 0 0 0 0,-1.47 z"
+               style="fill:#ffffff"
+               id="path5244" />
+            <path
+               d="m 19.17,24.6 a 1.08,1.08 0 0 0 -1.11,-1 h -4.71 a 1.035,1.035 0 1 0 0,2.07 h 2.25 l -4.16,4.13 a 1.039447,1.039447 0 0 0 1.47,1.47 l 4.18,-4.19 v 2.26 a 1.04,1.04 0 1 0 2.08,0 V 24.7 c 0,0 0,0 0,-0.06 a 0.08,0.08 0 0 1 0,-0.04 z"
+               style="fill:#ffffff"
+               id="path5246" />
+            <path
+               d="m 23.94,20.5 h 4.7 a 1.04,1.04 0 1 0 0,-2.08 h -2.25 l 4.17,-4.16 a 1,1 0 0 0 0,-1.47 1,1 0 0 0 -1.46,0 L 24.91,17 v -2.28 a 1.04,1.04 0 1 0 -2.08,0 v 4.64 a 0.43,0.43 0 0 0 0,0.05 v 0.05 a 1.09,1.09 0 0 0 1.11,1.04 z"
+               style="fill:#ffffff"
+               id="path5248" />
+            <path
+               d="m 18.13,13.62 a 1.08,1.08 0 0 0 -1,1.09 V 17 l -4.18,-4.19 a 1,1 0 0 0 -1.47,0 1,1 0 0 0 0,1.46 l 4.16,4.17 h -2.29 a 1.04,1.04 0 1 0 0,2.08 h 4.71 a 1.09,1.09 0 0 0 1.11,-1 c 0,0 0,0 0,-0.06 v -4.75 a 1.07,1.07 0 0 0 -1.04,-1.09 z"
+               style="fill:#ffffff"
+               id="path5250" />
+          </g>
+        </g>
+      </g>
+    </g>
+    <g
+       transform="translate(341,195)"
+       id="g5278">
+      <g
+         transform="scale(1.5)"
+         id="g5276">
+        <path
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
+           style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path5262" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text5266"><tspan
+             x="46"
+             y="24"
+             id="tspan5264">pitch</tspan></text>
+        <text
+           style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text5270"><tspan
+             x="46"
+             y="12"
+             id="tspan5268">name</tspan></text>
+        <text
+           style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text5274"><tspan
+             x="46"
+             y="33"
+             id="tspan5272">octave</tspan></text>
+      </g>
+    </g>
+    <g
+       transform="translate(415,195)"
+       id="g5288">
+      <g
+         transform="scale(1.5)"
+         id="g5286">
+        <path
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path5280" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text5284"><tspan
+             x="13"
+             y="14"
+             id="tspan5282">sol</tspan></text>
+      </g>
+    </g>
+    <g
+       transform="translate(415,227)"
+       id="g5298">
+      <g
+         transform="scale(1.5)"
+         id="g5296">
+        <path
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path5290" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text5294"><tspan
+             x="13"
+             y="14"
+             id="tspan5292">4</tspan></text>
+      </g>
+    </g>
+    <g
+       transform="translate(341,258)"
+       id="g5316">
+      <g
+         transform="scale(1.5)"
+         id="g5314">
+        <path
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
+           style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path5300" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text5304"><tspan
+             x="46"
+             y="24"
+             id="tspan5302">pitch</tspan></text>
+        <text
+           style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text5308"><tspan
+             x="46"
+             y="12"
+             id="tspan5306">name</tspan></text>
+        <text
+           style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text5312"><tspan
+             x="46"
+             y="33"
+             id="tspan5310">octave</tspan></text>
+      </g>
+    </g>
+    <g
+       transform="translate(415,258)"
+       id="g5326">
+      <g
+         transform="scale(1.5)"
+         id="g5324">
+        <path
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path5318" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text5322"><tspan
+             x="13"
+             y="14"
+             id="tspan5320">mi</tspan></text>
+      </g>
+    </g>
+    <g
+       transform="translate(415,290)"
+       id="g5336">
+      <g
+         transform="scale(1.5)"
+         id="g5334">
+        <path
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path5328" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text5332"><tspan
+             x="13"
+             y="14"
+             id="tspan5330">4</tspan></text>
+      </g>
+    </g>
+    <g
+       transform="translate(341,321)"
+       id="g5354">
+      <g
+         transform="scale(1.5)"
+         id="g5352">
+        <path
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
+           style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path5338" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text5342"><tspan
+             x="46"
+             y="24"
+             id="tspan5340">pitch</tspan></text>
+        <text
+           style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text5346"><tspan
+             x="46"
+             y="12"
+             id="tspan5344">name</tspan></text>
+        <text
+           style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text5350"><tspan
+             x="46"
+             y="33"
+             id="tspan5348">octave</tspan></text>
+      </g>
+    </g>
+    <g
+       transform="translate(415,321)"
+       id="g5364">
+      <g
+         transform="scale(1.5)"
+         id="g5362">
+        <path
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path5356" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text5360"><tspan
+             x="13"
+             y="14"
+             id="tspan5358">re</tspan></text>
+      </g>
+    </g>
+    <g
+       transform="translate(415,353)"
+       id="g5374">
+      <g
+         transform="scale(1.5)"
+         id="g5372">
+        <path
+           d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path5366" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text5370"><tspan
+             x="13"
+             y="14"
+             id="tspan5368">4</tspan></text>
+      </g>
+    </g>
+    <g
+       transform="translate(341,384)"
+       id="g5388">
+      <g
+         transform="scale(1.5)"
+         id="g5386">
+        <path
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           style="fill:#3edcdd;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path5376" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text5380"><tspan
+             x="46"
+             y="14"
+             id="tspan5378">drum</tspan></text>
+        <text
+           style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text5384"><tspan
+             x="46"
+             y="12"
+             id="tspan5382" /></text>
+      </g>
+    </g>
+    <g
+       transform="translate(415,384)"
+       id="g5398">
+      <g
+         transform="scale(1.5)"
+         id="g5396">
+        <path
+           d="m 8.5,0.5 h 110 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#3edcdd;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path5390" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text5394"><tspan
+             x="13"
+             y="14"
+             id="tspan5392">kick drum</tspan></text>
+      </g>
+    </g>
+    <g
+       transform="translate(341,416)"
+       id="g5412">
+      <g
+         transform="scale(1.5)"
+         id="g5410">
+        <path
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           style="fill:#3edcdd;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path5400" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text5404"><tspan
+             x="46"
+             y="14"
+             id="tspan5402">drum</tspan></text>
+        <text
+           style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text5408"><tspan
+             x="46"
+             y="12"
+             id="tspan5406" /></text>
+      </g>
+    </g>
+    <g
+       transform="translate(415,416)"
+       id="g5422">
+      <g
+         transform="scale(1.5)"
+         id="g5420">
+        <path
+           d="m 8.5,0.5 h 110 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#3edcdd;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path5414" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text5418"><tspan
+             x="13"
+             y="14"
+             id="tspan5416">snare drum</tspan></text>
+      </g>
+    </g>
+    <g
+       transform="translate(341,448)"
+       id="g5436">
+      <g
+         transform="scale(1.5)"
+         id="g5434">
+        <path
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           style="fill:#3edcdd;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path5424" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text5428"><tspan
+             x="46"
+             y="14"
+             id="tspan5426">drum</tspan></text>
+        <text
+           style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text5432"><tspan
+             x="46"
+             y="12"
+             id="tspan5430" /></text>
+      </g>
+    </g>
+    <g
+       transform="translate(415,448)"
+       id="g5446">
+      <g
+         transform="scale(1.5)"
+         id="g5444">
+        <path
+           d="m 8.5,0.5 h 110 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#3edcdd;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path5438" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text5442"><tspan
+             x="13"
+             y="14"
+             id="tspan5440">ride bell</tspan></text>
+      </g>
+    </g>
+  </g>
+</svg>

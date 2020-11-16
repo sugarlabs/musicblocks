@@ -213,6 +213,55 @@
 #: js/rhythmruler.js:1610
 #: js/rhythmruler.js:1911
 #: js/rhythmruler.js:1919
+#: js/block.js:1436
+#: js/block.js:8073
+#: js/block.js:8094
+#: js/block.js:8111
+#: js/activity.js:2984
+#: js/palette.js:506
+#: js/palette.js:515
+#: js/palette.js:524
+#: js/palette.js:533
+#: js/palette.js:1128
+#: js/palette.js:1139
+#: js/palette.js:1150
+#: js/palette.js:1161
+#: js/palette.js:1180
+#: js/turtledefs.js:78
+#: js/rubrics.js:501
+#: js/macros.js:153
+#: js/macros.js:249
+#: js/macros.js:250
+#: js/macros.js:259
+#: js/macros.js:801
+#: js/blocks.js:1112
+#: js/blocks.js:3545
+#: js/blocks.js:3546
+#: js/blocks.js:3779
+#: js/blocks.js:4160
+#: js/blocks.js:4346
+#: js/blocks.js:5496
+#: js/blocks.js:6721
+#: js/ActionBlocks.js:99
+#: js/ActionBlocks.js:147
+#: js/ActionBlocks.js:343
+#: js/ActionBlocks.js:408
+#: js/ActionBlocks.js:562
+#: js/ActionBlocks.js:622
+#: js/ActionBlocks.js:750
+#: js/ActionBlocks.js:753
+#: js/ActionBlocks.js:758
+#: js/ActionBlocks.js:790
+#: js/MeterBlocks.js:396
+#: js/MeterBlocks.js:425
+#: js/MeterBlocks.js:461
+#: js/MeterBlocks.js:500
+#: js/musickeyboard.js:2495
+#: js/pitchtimematrix.js:4718
+#: js/rhythmruler.js:1602
+#: js/rhythmruler.js:1610
+#: js/rhythmruler.js:1911
+#: js/rhythmruler.js:1919
 msgid "action"
 msgstr "acción"
 
@@ -280,7 +329,7 @@ msgstr "teclado"
 
 #: js/block.js:1520
 #: js/block.js:2426
-#: js/palette.js:551
+#: js/palette.js:557
 #: js/turtledefs.js:76
 #: js/lilypond.js:783
 #: js/lilypond.js:964
@@ -339,7 +388,7 @@ msgid "milliseconds"
 msgstr "milisegundos"
 
 #: js/block.js:1555
-#: js/palette.js:576
+#: js/palette.js:582
 #: js/WidgetBlocks.js:165
 #: js/IntervalsBlocks.js:18
 msgid "temperament"
@@ -392,7 +441,7 @@ msgid "pitch"
 msgstr "tono"
 
 #: js/block.js:3680
-#: js/palette.js:589
+#: js/palette.js:595
 #: js/blocks.js:2660
 #: js/blocks.js:3275
 #: js/SensorsBlocks.js:511
@@ -894,11 +943,11 @@ msgstr "Acerca"
 msgid "Could not parse JSON input."
 msgstr "No se pudo analizar la entrada de JSON."
 
-#: js/activity.js:4774
+#: js/activity.js:4775
 msgid "project undefined"
 msgstr "El proyecto no está definido."
 
-#: js/activity.js:5541
+#: js/activity.js:5542
 msgid "Invalid parameters"
 msgstr "El parametro es invalido."
 
@@ -924,9 +973,9 @@ msgstr "Debe seleccionar un archivo."
 msgid "Playback is ready."
 msgstr "La reproducción está preparada."
 
-#: js/palette.js:485
-#: js/palette.js:611
-#: js/palette.js:1099
+#: js/palette.js:488
+#: js/palette.js:617
+#: js/palette.js:1105
 #: js/blocks.js:1304
 #: js/blocks.js:3499
 #: js/blocks.js:3917
@@ -942,55 +991,72 @@ msgstr "La reproducción está preparada."
 msgid "box"
 msgstr "caja"
 
-#: js/palette.js:548
+#: js/palette.js:551
+msgid "grid"
+msgstr "cuadrícula"
+
+#: js/palette.js:554
 #: js/blocks.js:3309
 #: js/MediaBlocks.js:572
 msgid "text"
 msgstr "texto"
 
-#: js/palette.js:554
+#: js/palette.js:560
 msgid "effect"
 msgstr "efecto"
 
 #: js/palette.js:566
+msgid "sargam"
+msgstr ""
+
+#: js/palette.js:569
+#: js/PitchBlocks.js:401
+msgid "scale degree"
+msgstr "grado de escala"
+
+#: js/palette.js:572
 msgid "mode name"
 msgstr "nombre de modo"
 
-#: js/palette.js:569
+#: js/palette.js:575
 msgid "invert mode"
 msgstr "modo invertido"
 
-#: js/palette.js:572
+#: js/palette.js:578
 msgid "voice name"
 msgstr "nombre de voz"
 
-#: js/palette.js:580
+#: js/palette.js:586
 #: js/PitchBlocks.js:1285
 #.TRANS: An accidental is a modification to a pitch, e.g., sharp or flat.
 msgid "accidental"
 msgstr "accidental"
 
-#: js/palette.js:586
+#: js/palette.js:592
 msgid "interval name"
 msgstr "nombre de intervalo"
 
-#: js/palette.js:613
+#: js/palette.js:610
+msgid "pitch converter"
+msgstr "convertidor de tono"
+
 #: js/palette.js:619
-#: js/palette.js:1034
+#: js/palette.js:625
+#: js/palette.js:1040
 #: js/blocks.js:4200
 #: js/BoxesBlocks.js:286
 #.TRANS: put something into a container for later reference
 msgid "store in"
 msgstr "guardar en"
 
-#: js/palette.js:615
-#: js/palette.js:616
+#: js/palette.js:621
+#: js/palette.js:622
 #: js/blocks.js:3498
 #: js/BoxesBlocks.js:259
 msgid "store in box"
 msgstr "guardar en caja"
 
-#: js/palette.js:628
+#: js/palette.js:634
 #: js/blocks.js:2557
 msgid "open file"
 msgstr "abrir archivo"
@@ -1828,15 +1894,15 @@ msgstr "Guardar como PDF"
 #: js/EnsembleBlocks.js:298
 #: js/EnsembleBlocks.js:351
 #: js/EnsembleBlocks.js:392
-#: js/EnsembleBlocks.js:425
-#: js/EnsembleBlocks.js:459
-#: js/EnsembleBlocks.js:497
-#: js/EnsembleBlocks.js:592
-#: js/EnsembleBlocks.js:676
-#: js/EnsembleBlocks.js:720
-#: js/EnsembleBlocks.js:750
-#: js/EnsembleBlocks.js:900
-#: js/EnsembleBlocks.js:959
+#: js/EnsembleBlocks.js:423
+#: js/EnsembleBlocks.js:455
+#: js/EnsembleBlocks.js:493
+#: js/EnsembleBlocks.js:588
+#: js/EnsembleBlocks.js:672
+#: js/EnsembleBlocks.js:716
+#: js/EnsembleBlocks.js:746
+#: js/EnsembleBlocks.js:896
+#: js/EnsembleBlocks.js:955
 #.TRANS: default project author when saving as Lilypond
 msgid "Mr. Mouse"
 msgstr "Sr. Ratón"
@@ -2750,7 +2816,7 @@ msgid "mouse index heap"
 msgstr "valor en la pila de ratón"
 
 #: js/EnsembleBlocks.js:64
-#: js/EnsembleBlocks.js:802
+#: js/EnsembleBlocks.js:798
 msgid "mouse name"
 msgstr "renombrar ratón"
 
@@ -2761,7 +2827,7 @@ msgid "index"
 msgstr "posición en la pila"
 
 #: js/EnsembleBlocks.js:91
-#: js/EnsembleBlocks.js:886
+#: js/EnsembleBlocks.js:882
 #: js/HeapBlocks.js:195
 #: js/HeapBlocks.js:259
 msgid "Index must be > 0."
@@ -2785,11 +2851,11 @@ msgstr "El bloque parar ratón parar el ratón especificado."
 #: js/EnsembleBlocks.js:183
 #: js/EnsembleBlocks.js:315
 #: js/EnsembleBlocks.js:368
-#: js/EnsembleBlocks.js:547
-#: js/EnsembleBlocks.js:634
-#: js/EnsembleBlocks.js:689
-#: js/EnsembleBlocks.js:879
-#: js/EnsembleBlocks.js:933
+#: js/EnsembleBlocks.js:543
+#: js/EnsembleBlocks.js:630
+#: js/EnsembleBlocks.js:685
+#: js/EnsembleBlocks.js:875
+#: js/EnsembleBlocks.js:929
 msgid "Cannot find mouse"
 msgstr "No se puede encontrar ratón"
 
@@ -2797,11 +2863,11 @@ msgstr "No se puede encontrar ratón"
 #: js/EnsembleBlocks.js:185
 #: js/EnsembleBlocks.js:317
 #: js/EnsembleBlocks.js:370
-#: js/EnsembleBlocks.js:549
-#: js/EnsembleBlocks.js:639
-#: js/EnsembleBlocks.js:691
-#: js/EnsembleBlocks.js:881
-#: js/EnsembleBlocks.js:935
+#: js/EnsembleBlocks.js:545
+#: js/EnsembleBlocks.js:635
+#: js/EnsembleBlocks.js:687
+#: js/EnsembleBlocks.js:877
+#: js/EnsembleBlocks.js:931
 msgid "Cannot find turtle"
 msgstr "No se puede encontrar tortuga."
 
@@ -2874,84 +2940,84 @@ msgstr "y"
 msgid "mouse y"
 msgstr "ratón y"
 
-#: js/EnsembleBlocks.js:412
+#: js/EnsembleBlocks.js:410
 #.TRANS: x position for this mouse
 msgid "mouse x"
 msgstr "ratón x"
 
-#: js/EnsembleBlocks.js:446
+#: js/EnsembleBlocks.js:442
 #.TRANS: notes played by this mouse
 msgid "mouse notes played"
 msgstr "notas jugadas de ratón"
 
-#: js/EnsembleBlocks.js:484
+#: js/EnsembleBlocks.js:480
 #.TRANS: convert current note for this turtle to piano key (1-88)
 msgid "mouse pitch number"
 msgstr "número de tono de ratón"
 
-#: js/EnsembleBlocks.js:585
-#: js/EnsembleBlocks.js:650
+#: js/EnsembleBlocks.js:581
+#: js/EnsembleBlocks.js:646
 msgid "mouse note value"
 msgstr "valor de la nota del ratón"
 
-#: js/EnsembleBlocks.js:665
+#: js/EnsembleBlocks.js:661
 msgid "mouse sync"
 msgstr "sincronizar"
 
-#: js/EnsembleBlocks.js:668
+#: js/EnsembleBlocks.js:664
 msgid "The Mouse sync block aligns the beat count between mice."
 msgstr "El bloque sincronizar alinea el conteo de latidos entre ratones."
 
-#: js/EnsembleBlocks.js:714
+#: js/EnsembleBlocks.js:710
 msgid "found mouse"
 msgstr "encontré el raton"
 
-#: js/EnsembleBlocks.js:739
+#: js/EnsembleBlocks.js:735
 msgid "new mouse"
 msgstr "nuevo ratón"
 
-#: js/EnsembleBlocks.js:742
+#: js/EnsembleBlocks.js:738
 msgid "The New mouse block will create a new mouse."
 msgstr "El bloque nuevo ratón crea un nuevo ratón."
 
-#: js/EnsembleBlocks.js:807
+#: js/EnsembleBlocks.js:803
 msgid "The Mouse-name block returns the name of a mouse."
 msgstr "El bloque Nombre del ratón devuelve el nombre de un ratón."
 
-#: js/EnsembleBlocks.js:825
+#: js/EnsembleBlocks.js:821
 msgid "mouse count"
 msgstr "recuento de ratones"
 
-#: js/EnsembleBlocks.js:830
+#: js/EnsembleBlocks.js:826
 msgid "The Mouse-count block returns the number of mice."
 msgstr "El bloque recuento de ratones devuelve el número de ratones."
 
-#: js/EnsembleBlocks.js:848
+#: js/EnsembleBlocks.js:844
 msgid "nth mouse name"
 msgstr "nombre de nth ratón"
 
-#: js/EnsembleBlocks.js:853
+#: js/EnsembleBlocks.js:849
 msgid "The Nth-Mouse name block returns the name of the nth mice."
 msgstr "El bloque nombre de nth ratón devuelve el nombre de nth ratón"
 
-#: js/EnsembleBlocks.js:894
-#: js/EnsembleBlocks.js:945
+#: js/EnsembleBlocks.js:890
+#: js/EnsembleBlocks.js:941
 msgid "set name"
 msgstr "fijar nombre"
 
-#: js/EnsembleBlocks.js:902
+#: js/EnsembleBlocks.js:898
 #: plugins/translate.rtp:95
 #: plugins/turtle.rtp:83
 msgid "source"
 msgstr "origen"
 
-#: js/EnsembleBlocks.js:902
+#: js/EnsembleBlocks.js:898
 #: plugins/translate.rtp:95
 #: plugins/turtle.rtp:84
 msgid "target"
 msgstr "destino"
 
-#: js/EnsembleBlocks.js:950
+#: js/EnsembleBlocks.js:946
 msgid "The Set-name block is used to name a mouse."
 msgstr "El bloque Fijar nombre se usa para nombrar un ratón."
 
@@ -3826,10 +3892,6 @@ msgstr "clase de tono"
 #: js/PitchBlocks.js:400
 msgid "scalar class"
 msgstr "clase de escala"
-
-#: js/PitchBlocks.js:401
-msgid "scale degree"
-msgstr "grado de escala"
 
 #: js/PitchBlocks.js:402
 msgid "nth degree"

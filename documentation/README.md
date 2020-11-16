@@ -462,6 +462,16 @@ the chunk in the clamp of the *Pitch-time Marix* block.
 More details about all of the widgets are available in the
 [Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md).
 
+Stats
+-----
+
+Project statistics are available from a button the the secondary
+toolbar in advanced mode.
+
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/stats.svg
+ "Stats Details")
+
 Planet View 
 -----------
 
