@@ -900,7 +900,7 @@ msgstr "はこ"
 
 #: js/palette.js:551
 msgid "grid"
-msgstr ""
+msgstr "グリッド"
 
 #: js/palette.js:554
 #: js/blocks.js:3309
