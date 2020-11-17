@@ -4083,7 +4083,7 @@ msgstr "あたいを あらわす"
 #: js/DictBlocks.js:394
 #: js/DictBlocks.js:395
 msgid "key2"
-msgstr ""
+msgstr "かぎ"
 
 #: js/DictBlocks.js:229
 #: js/DictBlocks.js:230

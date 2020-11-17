@@ -4083,7 +4083,7 @@ msgstr "数価を表す"
 #: js/DictBlocks.js:394
 #: js/DictBlocks.js:395
 msgid "key2"
-msgstr ""
+msgstr "鍵"
 
 #: js/DictBlocks.js:229
 #: js/DictBlocks.js:230
