@@ -12,7 +12,8 @@
 function Oscilloscope() {
     const ICONSIZE = 32;
     const analyserSize = 8192;
-
+    
+    
     this.init = function(logo) {
         this._logo = logo;
         this.pitchAnalysers = {};
@@ -100,7 +101,8 @@ function Oscilloscope() {
         let canvasCtx = canvas.getContext('2d');
         canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
         let draw = () => {
-            console.debug("oscilloscope running");
+            // console.debug("oscilloscope running");
+            
             this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
             canvasCtx.fillStyle = 'rgb(200, 200, 200)';
             var dataArray = this.pitchAnalysers[turtleIdx].getValue();
@@ -129,5 +131,8 @@ function Oscilloscope() {
             canvasCtx.stroke();
         };
         draw();
+        if (!this.playingNow) {
+            console.debug("oscilloscope running");
+        }
     }
 }
