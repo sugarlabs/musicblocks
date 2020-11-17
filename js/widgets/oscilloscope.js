@@ -12,7 +12,7 @@
 function Oscilloscope() {
     const ICONSIZE = 32;
     const analyserSize = 8192;
-    
+    let execution = 1;
     
     this.init = function(logo) {
         this._logo = logo;
@@ -130,9 +130,14 @@ function Oscilloscope() {
             canvasCtx.lineTo(canvas.width, canvas.height / 2);
             canvasCtx.stroke();
         };
-        draw();
-        if (!this.playingNow) {
-            console.debug("oscilloscope running");
+        if (execution === 1) {
+            if (!this.playingNow) {
+                console.debug("oscilloscope running");
+            }
+            draw();
+        }
+        else {
+
         }
     }
 }
