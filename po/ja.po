@@ -945,7 +945,7 @@ msgstr "音程名"
 
 #: js/palette.js:610
 msgid "pitch converter"
-msgstr ""
+msgstr "音の高さを調節"
 
 #: js/palette.js:619
 #: js/palette.js:625

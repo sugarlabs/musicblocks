@@ -945,7 +945,7 @@ msgstr "おんていめい"
 
 #: js/palette.js:610
 msgid "pitch converter"
-msgstr ""
+msgstr "おとのたかさをしょうせつ"
 
 #: js/palette.js:619
 #: js/palette.js:625
