@@ -626,9 +626,6 @@ function Blocks(activity) {
                 }
             }
 
-            // Ensure that the blocks are properly aligned.
-            that.adjustDocks(blk, true);
-
             // Recurse through the list.
             if (that.clampBlocksToCheck.length > 0) {
                 that.adjustExpandableClampBlock();
