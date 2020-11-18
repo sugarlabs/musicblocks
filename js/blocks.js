@@ -217,22 +217,25 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.setBlockScale = function(scale) {
+    this.setBlockScale = async function(scale) {
         console.debug("New block scale is " + scale);
         this.blockScale = scale;
 
+	let blk;
+	let stack;
+	let palette;
         // Regenerate all of the artwork at the new scale.
-        for (var blk = 0; blk < this.blockList.length; blk++) {
+        for (blk = 0; blk < this.blockList.length; blk++) {
             this.blockList[blk].resize(scale);
         }
 
         this.findStacks();
-        for (var stack = 0; stack < this.stackList.length; stack++) {
+        for (stack = 0; stack < this.stackList.length; stack++) {
             this.adjustDocks(this.stackList[stack], true);
         }
 
         // Make sure trash is still hidden.
-        for (var blk = 0; blk < this.blockList.length; blk++) {
+        for (blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].trash) {
                 this.blockList[blk].hide();
             }
@@ -240,15 +243,15 @@ function Blocks(activity) {
 
         // We reset the protoblock scale on the palettes, but don't
         // modify the palettes themselves.
-        for (var palette in this.palettes.dict) {
-            for (
-                var blk = 0;
-                blk < this.palettes.dict[palette].protoList.length;
-                blk++
-            ) {
+        for (palette in this.palettes.dict) {
+            for (blk = 0; blk < this.palettes.dict[palette].protoList.length; blk++) {
                 this.palettes.dict[palette].protoList[blk].scale = scale;
             }
         }
+
+	// Force a refresh.
+        await delayExecution(500);
+        this.refreshCanvas();
     };
 
     /*
