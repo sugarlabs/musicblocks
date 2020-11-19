@@ -638,7 +638,7 @@ function setupToneBlocks() {
             ]);
 
             this.formBlock({
-                image: "images/load-media.svg",
+                
                 outType: "mediaout"
             });
         }

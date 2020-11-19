@@ -1123,7 +1123,6 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         that.blocks.blockArt[that.blocks.blockList.indexOf(that)] = artwork;
-
         _blockMakeBitmap(artwork, __processBitmap, this);
     };
 
@@ -1909,7 +1908,7 @@ function Block(protoblock, blocks, overrideName) {
             let reader = new FileReader();
             reader.onloadend = function() {
                 if (reader.result) {
-                    if ((that.name === "media") || (that.name === "audiofile")) {
+                    if (that.name === "media") {
                         that.value = reader.result;
                         that.loadThumbnail(null);
                         return;
@@ -1918,7 +1917,7 @@ function Block(protoblock, blocks, overrideName) {
                     that.blocks.updateBlockText(thisBlock);
                 }
             };
-            if ((that.name === "media") || (that.name === "audiofile")) {
+            if (that.name === "media") {
                 reader.readAsDataURL(fileChooser.files[0]);
             } else {
                 reader.readAsText(fileChooser.files[0]);
@@ -3008,7 +3007,7 @@ function Block(protoblock, blocks, overrideName) {
                 if (new Date().getTime() - this.blocks.mouseDownTime < 500) {
                     if (!this.trash) {
                         this.blocks.mouseDownTime = new Date().getTime();
-                        if (this.name === "media" || this.name === "loadFile" || this.name === "audiofile") {
+                        if (this.name === "media" || this.name === "loadFile") {
                             this._doOpenMedia(thisBlock);
                         } else {
                             this._changeLabel();
