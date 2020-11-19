@@ -303,11 +303,8 @@ function setupEnsembleBlocks() {
                     _("y")
                 ]
             });
-            // Replaced by the dictionary get value block.
-            this.hidden = this.deprecated = true;
         }
 
-        // deprecated
         flow(args, logo, turtle, blk) {
             let targetTurtle = getTargetTurtle(logo.turtles, args[0]);
             if (targetTurtle === null) {
