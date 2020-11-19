@@ -1635,6 +1635,8 @@ function Blocks(activity) {
             // We found a match.
             myBlock.connections[0] = newBlock;
             let connection = this.blockList[newBlock].connections[newConnection];
+	    let bottom;
+
             if (connection == null) {
                 if (this.blockList[newBlock].isArgClamp()) {
                     // If it is an arg clamp, we may have to adjust
@@ -1688,7 +1690,7 @@ function Blocks(activity) {
                     } else if (["doArg", "nameddoArg"].indexOf(this.blockList[newBlock].name) !== -1 && newConnection === this.blockList[newBlock].connections.length - 1) {
                         // If it is the bottom of the flow, insert as
                         // usual.
-                        let bottom = this.findBottomBlock(thisBlock);
+                        bottom = this.findBottomBlock(thisBlock);
                         this.blockList[connection].connections[0] = bottom;
                         this.blockList[bottom].connections[this.blockList[bottom].connections.length - 1] = connection;
                     } else {
@@ -1824,7 +1826,7 @@ function Blocks(activity) {
                     // argclamparg blocks.
                     // console.debug("skipping argclamparg");
                 } else if (!this.blockList[thisBlock].isArgFlowClampBlock()) {
-                    let bottom = this.findBottomBlock(thisBlock);
+                    bottom = this.findBottomBlock(thisBlock);
                     this.blockList[connection].connections[0] = bottom;
                     this.blockList[bottom].connections[this.blockList[bottom].connections.length - 1] = connection;
                 } else {
