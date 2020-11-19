@@ -1824,7 +1824,7 @@ function Blocks(activity) {
                     // argclamparg blocks.
                     // console.debug("skipping argclamparg");
                 } else if (!this.blockList[thisBlock].isArgFlowClampBlock()) {
-                    var bottom = this.findBottomBlock(thisBlock);
+                    let bottom = this.findBottomBlock(thisBlock);
                     this.blockList[connection].connections[0] = bottom;
                     this.blockList[bottom].connections[this.blockList[bottom].connections.length - 1] = connection;
                 } else {
@@ -4158,7 +4158,7 @@ function Blocks(activity) {
 
         let c = last(this.blockList[blk].connections);
         if (this.blockList[blk].isClampBlock()) {
-            var n = this.blockList[blk].connections.length - 2;
+            let n = this.blockList[blk].connections.length - 2;
             c = this.blockList[blk].connections[n];
         }
 
@@ -4317,7 +4317,7 @@ function Blocks(activity) {
         let myBlock = this.blockList[blk];
         let dblk = myBlock.connections[0];
         // Are we connected to a divide block?
-        if ( myBlock.name === "number" && dblk !== null && this.blockList[dblk].name === "divide") {
+        if (myBlock.name === "number" && dblk !== null && this.blockList[dblk].name === "divide") {
             // Are we the denominator (c == 2) or numerator (c == 1)?
             if (this.blockList[dblk].connections[c] === this.blockList.indexOf(myBlock)) {
                 // Is the divide block connected to a note value block?
@@ -4760,8 +4760,8 @@ function Blocks(activity) {
         }
 
         // We'll need a list of existing storein and action names.
-        var currentActionNames = [];
-        var currentStoreinNames = [];
+        let currentActionNames = [];
+        let currentStoreinNames = [];
         for (let b = 0; b < this.blockList.length; b++) {
             if (this.blockList[b].trash) {
                 continue;
@@ -4839,7 +4839,7 @@ function Blocks(activity) {
 
             switch (name) {
             case "text":
-                var key = blkData[1][1];
+                let key = blkData[1][1];
                 if (stringValues[key] === undefined) {
                     stringValues[key] = [];
                 }
@@ -5447,7 +5447,7 @@ function Blocks(activity) {
                     that.updateBlockText(thisBlock);
                 };
 
-                this._makeNewBlockWithConnections( name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case "drumname":
                 postProcess = function(args) {
@@ -5457,7 +5457,7 @@ function Blocks(activity) {
                     that.updateBlockText(thisBlock);
                 };
 
-                this._makeNewBlockWithConnections( name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this drum
@@ -5473,7 +5473,7 @@ function Blocks(activity) {
                     that.updateBlockText(thisBlock);
                 };
 
-                this._makeNewBlockWithConnections( name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this drum
@@ -5493,7 +5493,7 @@ function Blocks(activity) {
                     that.updateBlockText(thisBlock);
                 };
 
-                this._makeNewBlockWithConnections( name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this voice
@@ -5515,7 +5515,7 @@ function Blocks(activity) {
                     that.updateBlockText(thisBlock);
                 };
 
-                this._makeNewBlockWithConnections( name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     // Load the synth for this noise
@@ -5772,7 +5772,7 @@ function Blocks(activity) {
                 let arg = null;
                 let c = myBlock.connections[1];
                 if (c != null && this.blockList[c].value !== _("action")) {
-                    if (this.newNameddoBlock( this.blockList[c].value, this.actionHasReturn(blk), this.actionHasArgs(blk))) {
+                    if (this.newNameddoBlock(this.blockList[c].value, this.actionHasReturn(blk), this.actionHasArgs(blk))) {
                         updatePalettes = true;
                     }
                 }
@@ -5814,7 +5814,7 @@ function Blocks(activity) {
         console.debug("Finished block loading");
         document.body.style.cursor = "default";
         document.getElementById("load-container").style.display = "none";
-        var myCustomEvent = new Event("finishedLoading");
+        let myCustomEvent = new Event("finishedLoading");
         document.dispatchEvent(myCustomEvent);
     };
 
@@ -5850,13 +5850,13 @@ function Blocks(activity) {
             }
         }
 
-        for (var blk = 0; blk < this._adjustTheseDocks.length; blk++) {
+        for (let blk = 0; blk < this._adjustTheseDocks.length; blk++) {
             this.adjustDocks(this._adjustTheseDocks[blk], true);
             // blockBlocks._expandTwoArgs();
             this._expandClamps();
         }
 
-        for (var blk = 0; blk < this._adjustTheseStacks.length; blk++) {
+        for (let blk = 0; blk < this._adjustTheseStacks.length; blk++) {
             this.raiseStackToTop(this._adjustTheseStacks[blk]);
         }
     };
@@ -5911,7 +5911,7 @@ function Blocks(activity) {
 
         let z = this.stage.children.length - 1;
         for (let b = 0; b < this.dragGroup.length; b++) {
-            this.stage.setChildIndex( this.blockList[this.dragGroup[b]].container, z);
+            this.stage.setChildIndex(this.blockList[this.dragGroup[b]].container, z);
             z -= 1;
         }
 
