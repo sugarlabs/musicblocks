@@ -624,6 +624,26 @@ function setupToneBlocks() {
         }
     }
 
+    class AudioFileBlock extends ValueBlock {
+        constructor() {
+            super("audiofile");
+            this.setPalette("tone");
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _("The audiofile block is used to import a sound file."),
+                "documentation",
+                null,
+                "turtleshell"
+            ]);
+
+            this.formBlock({
+                image: "images/load-media.svg",
+                outType: "mediaout"
+            });
+        }
+    }
+
     new OscillatorBlock().setup();
     new FillerTypeBlock().setup();
     new OscillatorTypeBlock().setup();
@@ -642,4 +662,5 @@ function setupToneBlocks() {
     new SynthNameBlock().setup();
     new VoiceNameBlock().setup();
     new SetTimbreBlock().setup();
+    new AudioFileBlock().setup();
 }

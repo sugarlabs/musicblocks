@@ -1909,7 +1909,7 @@ function Block(protoblock, blocks, overrideName) {
             let reader = new FileReader();
             reader.onloadend = function() {
                 if (reader.result) {
-                    if (that.name === "media") {
+                    if ((that.name === "media") || (that.name === "audiofile")) {
                         that.value = reader.result;
                         that.loadThumbnail(null);
                         return;
@@ -1918,7 +1918,7 @@ function Block(protoblock, blocks, overrideName) {
                     that.blocks.updateBlockText(thisBlock);
                 }
             };
-            if (that.name === "media") {
+            if ((that.name === "media") || (that.name === "audiofile")) {
                 reader.readAsDataURL(fileChooser.files[0]);
             } else {
                 reader.readAsText(fileChooser.files[0]);
@@ -2717,6 +2717,8 @@ function Block(protoblock, blocks, overrideName) {
             ) {
                 if (that.name === "media") {
                     that._doOpenMedia(thisBlock);
+                } else if (that.name === "audiofile") {
+                    that._doOpenMedia(thisBlock);
                 } else if (that.name === "loadFile") {
                     that._doOpenMedia(thisBlock);
                 } else if (SPECIALINPUTS.indexOf(that.name) !== -1) {
@@ -2999,14 +3001,14 @@ function Block(protoblock, blocks, overrideName) {
             }
         } else if (
             SPECIALINPUTS.indexOf(this.name) !== -1 ||
-            ["media", "loadFile"].indexOf(this.name) !== -1
+            ["media", "loadFile", "audiofile"].indexOf(this.name) !== -1
         ) {
             if (!haveClick) {
                 // Simulate click on Android.
                 if (new Date().getTime() - this.blocks.mouseDownTime < 500) {
                     if (!this.trash) {
                         this.blocks.mouseDownTime = new Date().getTime();
-                        if (this.name === "media" || this.name === "loadFile") {
+                        if (this.name === "media" || this.name === "loadFile" || this.name === "audiofile") {
                             this._doOpenMedia(thisBlock);
                         } else {
                             this._changeLabel();
@@ -4267,8 +4269,8 @@ function Block(protoblock, blocks, overrideName) {
                             this.value
                         );
                         break;
-                    case "setbpm3": case "setmasterbpm2": 
-                        this._piemenuNumber ( 
+                    case "setbpm3": case "setmasterbpm2":
+                        this._piemenuNumber (
                         [
                         40,
                         42,
@@ -4779,7 +4781,7 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         let k = OFFSET[KeySignatureEnv[1]];
-        
+
         let key;
         let attrList = ["", SHARP, FLAT];
         for (let j in attrList) {
@@ -5039,7 +5041,7 @@ function Block(protoblock, blocks, overrideName) {
                 that._octavesWheel.navigateWheel(8 - octave);
                 that.blocks.setPitchOctave(that.connections[0], octave);
             }
-            
+
             let keySignature = KeySignatureEnv[0] + " " + KeySignatureEnv[1];
 
             let obj;

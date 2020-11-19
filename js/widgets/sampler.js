@@ -1,14 +1,13 @@
 function SampleWidget() {
     const SAMPLESYNTH = "bottle";
-    const TEMPOINTERVAL = 5;
     const BUTTONDIVWIDTH = 476; // 8 buttons 476 = (55 + 4) * 8
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
-    const SAMPLEWIDTH = 300;
-    const TEMPOHEIGHT = 100;
+    const SAMPLEWIDTH = 600;
+    const SAMPLEHEIGHT = 200;
     const YRADIUS = 75;
 
-    this._xradius = YRADIUS / 3;
+    this.sampleData = "";
 
     this.pause = function() {
         clearInterval(this._intervalID);
@@ -26,25 +25,22 @@ function SampleWidget() {
     this._draw = function() {
 
       var canvas = this.sampleCanvas;
+      let middle = SAMPLEHEIGHT / 2;
 
       var ctx = canvas.getContext("2d");
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.beginPath();
-      ctx.fillStyle = "rgba(0,0,0,0)";
+      ctx.strokeStyle = '#0000FF';
+      ctx.lineWidth = 0;
 
-      ctx.ellipse(
-          0,
-          0,
-          100,
-          100,
-          0,
-          0,
-          Math.PI * 2
-      );
-
-      ctx.fill();
+      for (let x=0; x < SAMPLEWIDTH; x++) {
+          let amplitude = (x**2)%100;
+          ctx.moveTo(x, middle - amplitude);
+          ctx.lineTo(x, middle + amplitude);
+          ctx.stroke();
+          ctx.fill();
+      }
       ctx.closePath();
-
 
     }
 
@@ -54,7 +50,7 @@ function SampleWidget() {
         setTimeout(function() {
             console.debug("saving the sample");
             var newStack = [
-                [0, ["media", { value: BANJO_SAMPLE, sample: BANJO_SAMPLE}], 100, 100, [null]]
+                [0, ["audiofile", { value: this.sampleData}], 100, 100, [null]]
             ];
             that._logo.blocks.loadNewBlocks(newStack);
             that._logo.textMsg(_("New sample block generated!"));
@@ -62,7 +58,6 @@ function SampleWidget() {
     };
 
     this._saveSample = function() {
-        // Save a BPM block for each tempo.
             this.__save();
     };
 
@@ -125,6 +120,60 @@ function SampleWidget() {
             }
         };
 
+        widgetWindow.addButton(
+            "load-media.svg",
+            iconSize,
+            _("Upload sample"),
+            ""
+        ).onclick = function() {
+            let fileChooser = docById("myOpenAll");
+
+            let __readerAction = function(event) {
+                window.scroll(0, 0);
+                var sampleFile = fileChooser.files[0];
+                var reader = new FileReader;
+                reader.readAsDataURL(sampleFile);
+                console.log(sampleFile);
+
+                reader.onload = function(e) {
+                    var rawLog = reader.result;
+                    that.sampleData = rawLog;
+                    console.log(that.sampleData);
+                };
+
+                reader.onloadend = function() {
+                    if (reader.result) {
+                        value = [fileChooser.files[0].name, reader.result];
+                        //this.sampleData = value;
+                  } else {
+                  }
+              };
+              fileChooser.removeEventListener("change", __readerAction);
+          };
+
+          fileChooser.addEventListener("change", __readerAction, false);
+          fileChooser.focus();
+          fileChooser.click();
+          window.scroll(0, 0);
+        }
+
+        widgetWindow.addButton(
+            "media-playback-start.svg",
+            iconSize,
+            _("Play sample"),
+            ""
+        ).onclick = function() {
+            that._logo.synth.trigger(
+                0,
+                ["C2"],
+                0.0625,
+                that.sampleData,
+                null,
+                null,
+                false
+            );
+        }
+
         this.bodyTable = document.createElement("table");
         this.widgetWindow.getWidgetBody().appendChild(this.bodyTable);
 
@@ -134,7 +183,7 @@ function SampleWidget() {
 
         this.sampleCanvas = document.createElement("canvas");
         this.sampleCanvas.style.width = SAMPLEWIDTH + "px";
-        this.sampleCanvas.style.height = TEMPOHEIGHT + "px";
+        this.sampleCanvas.style.height = SAMPLEHEIGHT + "px";
         this.sampleCanvas.style.margin = "1px";
         this.sampleCanvas.style.background = "rgba(255, 255, 255, 1)";
 

@@ -100,6 +100,15 @@ function setupDrumActions() {
          */
         static setDrum(drum, turtle, blk) {
             let drumname = DEFAULTDRUM;
+
+
+            if (!(drum === null)) {
+                if (drum.slice(0,21) === "data:audio/wav;base64") {
+                    drumname = drum;
+                    logo.synth.loadSynth(turtle, drumname);
+                }
+            }
+
             for (let d in DRUMNAMES) {
                 if (DRUMNAMES[d][0] === drum) {
                     drumname = DRUMNAMES[d][1];

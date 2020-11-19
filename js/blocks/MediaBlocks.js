@@ -596,7 +596,7 @@ function setupMediaBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Media block is used to import an image or a sound file."),
+                _("The Media block is used to import an image."),
                 "documentation",
                 null,
                 "turtleshell"

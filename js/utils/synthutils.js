@@ -751,6 +751,7 @@ function Synth() {
             let data = function() {return sampleName};
             this.samplesManifest.voice.push({ name: sampleName, data: data});
             this.samplesManifest.drum.push({  name: sampleName, data: data});
+            console.debug("sample was not already in sample library");
             this._loadSample(sampleName);
         }
 
@@ -1269,6 +1270,8 @@ function Synth() {
         }
 
         if (paramsEffects === null && paramsFilters === null) {
+            console.debug(notes);
+            console.debug(beatValue);
             synth.triggerAttackRelease(notes, beatValue);
         } else {
             if (paramsFilters !== null && paramsFilters !== undefined) {
@@ -1520,6 +1523,8 @@ function Synth() {
         let tempNotes = notes;
         let tempSynth = instruments[turtle]["electronic synth"];
         let flag = 0;
+        console.log(instruments[turtle]);
+        console.log(instrumentName);
         if (instrumentName in instruments[turtle]) {
             tempSynth = instruments[turtle][instrumentName];
             flag = instrumentsSource[instrumentName][0];
@@ -1531,7 +1536,10 @@ function Synth() {
         // Get note values as per the source of the synth.
         switch (flag) {
             case 1: // drum
-                if (instrumentName.slice(0, 4) === "http") {
+                if (
+                    (instrumentName.slice(0, 4) === "http") ||
+                    (instrumentName.slice(0,21) === "data:audio/wav;base64"))
+                {
                     tempSynth.start();
                 } else if (instrumentName.slice(0, 4) === "file") {
                     tempSynth.start();

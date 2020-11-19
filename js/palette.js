@@ -167,7 +167,7 @@ function Palettes() {
         this.blocksContainer = bloc ;
         return this;
     };
-    
+
     // We need access to the macro dictionary because we load them.
     this.setMacroDictionary = function(obj) {
         this.macroDict = obj;
@@ -247,7 +247,7 @@ function Palettes() {
                 ,this.cellSize
                 ,this.cellSize
             )
-            ,listBody                
+            ,listBody
         );
         for (let name of MULTIPALETTES[i]) {
 	    if (beginnerMode && SKIPPALETTES.indexOf(name) !== -1) {
@@ -266,7 +266,7 @@ function Palettes() {
                     ,this.cellSize
                     ,this.cellSize
                 )
-                ,listBody                
+                ,listBody
             );
         }
         // for (let name in this.dict){
@@ -326,9 +326,9 @@ function Palettes() {
 
         this.hideSearchWidget(true);
 
-        if (docById("PaletteBody")) 
+        if (docById("PaletteBody"))
             docById("PaletteBody").parentNode.removeChild(docById("PaletteBody"));
-            
+
     };
 
     this.getInfo = function() {
@@ -465,9 +465,9 @@ function PaletteModel(palette, palettes, name) {
             this.blocks.push(this.makeBlockInfo(blk,block,blkname,modname));
         }
     };
-    
+
     this.makeBlockInfo = function(blk,block,blkname,modname) {
-        
+
         switch (blkname) {
             // Use the name of the action in the label
             case "storein":
@@ -782,7 +782,7 @@ function Palette(palettes, name) {
     };
 
     this.showMenu = function(createHeader) {
-        
+
         let palDiv = docById("palette");
         if (docById("PaletteBody"))
             palDiv.removeChild(docById("PaletteBody"));
@@ -857,7 +857,7 @@ function Palette(palettes, name) {
             this.palettes.hideSearchWidget(true);
         }
         if (docById("PaletteBody"))
-            docById("palette").removeChild(docById("PaletteBody"));        
+            docById("palette").removeChild(docById("PaletteBody"));
     };
 
     this._showMenuItems = function() {
@@ -891,9 +891,11 @@ function Palette(palettes, name) {
 
             //use artwork.js strings as images for : cameraPALETTE,videoPALETTE,mediaPALETTE
             if (b.image){
-                img = makePaletteIcons(
-                    eval(b.blkname+"PALETTE")
-                );
+                if (!(b.blkname === "audiofile")) {
+                    img = makePaletteIcons(
+                        eval(b.blkname+"PALETTE")
+                    );
+                }
             }
 
             img.onmouseover = (evt) => {
@@ -911,27 +913,27 @@ function Palette(palettes, name) {
 
             let down = function(event){
                 // (1) prepare to moving: make absolute and on top by z-index
-                let posit = img.style.position ; 
-                let zInd = img.style.zIndex ; 
+                let posit = img.style.position ;
+                let zInd = img.style.zIndex ;
                 img.style.position = 'absolute';
                 img.style.zIndex = 1000;
 
                 // move it out of any current parents directly into body
                 // to make it positioned relative to the body
                 document.body.appendChild(img);
-                
+
                 // centers the img at (pageX, pageY) coordinates
                 moveAt = (pageX, pageY) => {
                     img.style.left = pageX - img.offsetWidth / 2 + 'px';
                     img.style.top = pageY - img.offsetHeight / 2 + 'px';
                 }
-                
+
                 let onMouseMove = (e) => {
                     let x,y;
                     if (e.type === "touchmove"){
                         x = e.touches[0].clientX;
                         y = e.touches[0].clientY;
-                    }   
+                    }
                     else{
                         x = e.pageX;
                         y = e.pageY;
@@ -939,10 +941,10 @@ function Palette(palettes, name) {
                     moveAt(x,y);
                 }
                 onMouseMove(event)
-                
+
                 document.addEventListener('touchmove', onMouseMove);
                 document.addEventListener('mousemove', onMouseMove);
-                
+
                 let up = function (event) {
                     document.body.style.cursor = "default";
                     //that.palettes._hideMenus()
@@ -952,12 +954,12 @@ function Palette(palettes, name) {
                     let x,y;
                     x = parseInt (img.style.left);
                     y = parseInt (img.style.top);
-                    
+
                     img.style.position = posit;
                     img.style.zIndex = zInd;
                     document.body.removeChild(img);
                     itemCell.appendChild(img)
-                    
+
                     if (!x || !y) return ;
                     that._makeBlockFromProtoblock(
                         protoListScope[blk],
@@ -969,13 +971,13 @@ function Palette(palettes, name) {
                     );
                 };
 
-                img.ontouchend = up ;                  
+                img.ontouchend = up ;
                 img.onmouseup = up ;
             };
 
             img.ontouchstart = down ;
             img.onmousedown = down ;
-                
+
             itemCell.setAttribute("style","width: "+img.width+"px ");
             itemCell.appendChild(
                 img
@@ -990,8 +992,8 @@ function Palette(palettes, name) {
 
     this.setupGrabScroll = (paletteList) => {
         let posY,top;
-            
-        let mouseUpGrab = (evt) => {        
+
+        let mouseUpGrab = (evt) => {
             paletteList.onmousemove= null ;
             document.body.style.cursor = "default";
         };
@@ -1409,5 +1411,5 @@ function makePaletteIcons(data,width,height)  {
     window.btoa(unescape(encodeURIComponent(data)));
     if (width)img.width=width;
     if (height)img.height=height;
-    return img 
+    return img
 }

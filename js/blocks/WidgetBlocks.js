@@ -530,7 +530,7 @@ function setupWidgetBlocks() {
         }
     }
 
-    class MicRecordingBlock extends StackClampBlock {
+    class SampleBlock extends StackClampBlock {
         constructor() {
             super("sample");
             this.setPalette("widgets");
@@ -1208,7 +1208,7 @@ function setupWidgetBlocks() {
     new MeterWidgetBlock().setup();
     new ModeWidgetBlock().setup();
     new TempoBlock().setup();
-    new MicRecordingBlock().setup();
+    new SampleBlock().setup();
     new PitchDrumMatrixBlock().setup();
     new oscilloscopeWidgetBlock().setup();
     new PitchSliderBlock().setup();
