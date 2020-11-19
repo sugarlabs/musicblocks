@@ -5190,7 +5190,9 @@ function Activity() {
                                         stage.removeAllEventListeners(
                                             "trashsignal"
                                         );
-                                        planet.saveLocally();
+					if (planet) {
+                                            planet.saveLocally();
+					}
                                     };
 
                                     stage.addEventListener(
