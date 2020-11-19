@@ -2409,10 +2409,6 @@ function Activity() {
                     textMsg("Alt-E " + _("Erase"));
                     _allClear(false);
                     break;
-                case 79: // 'O'
-                    textMsg("Alt-O" + _("Reload Blocks"));
-                    blocks._cleanupStacks();
-                    break;
                 case 82: // 'R'
                     textMsg("Alt-R " + _("Play"));
                     that._doFastButton();
@@ -5194,7 +5190,9 @@ function Activity() {
                                         stage.removeAllEventListeners(
                                             "trashsignal"
                                         );
-                                        planet.saveLocally();
+					if (planet) {
+                                            planet.saveLocally();
+					}
                                     };
 
                                     stage.addEventListener(

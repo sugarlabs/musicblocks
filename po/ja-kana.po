@@ -900,7 +900,7 @@ msgstr "はこ"
 
 #: js/palette.js:551
 msgid "grid"
-msgstr ""
+msgstr "グリッド"
 
 #: js/palette.js:554
 #: js/blocks.js:3309
@@ -945,7 +945,7 @@ msgstr "おんていめい"
 
 #: js/palette.js:610
 msgid "pitch converter"
-msgstr ""
+msgstr "おとのたかさをしょうせつ"
 
 #: js/palette.js:619
 #: js/palette.js:625
@@ -4083,7 +4083,7 @@ msgstr "あたいを あらわす"
 #: js/DictBlocks.js:394
 #: js/DictBlocks.js:395
 msgid "key2"
-msgstr ""
+msgstr "キーワード"
 
 #: js/DictBlocks.js:229
 #: js/DictBlocks.js:230
