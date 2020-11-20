@@ -787,6 +787,14 @@ function Block(protoblock, blocks, overrideName) {
          */
         image.onload = function() {
             let bitmap = new createjs.Bitmap(image);
+            // Don't override the image on a media block.
+            if (that.name === "media") {
+                for (let i = 0; i < that.container.children.length; i++) {
+                    if (that.container.children[i].name === "media") {
+                        return;
+                    }
+                }
+            }
             bitmap.name = "media";
             that.container.addChild(bitmap);
             that._positionMedia(
@@ -880,6 +888,7 @@ function Block(protoblock, blocks, overrideName) {
                 if (firstTime) {
                     that._loadEventHandlers();
                     if (that.image !== null) {
+                        console.log(that.name);
                         that._addImage();
                     }
 
@@ -1843,17 +1852,15 @@ function Block(protoblock, blocks, overrideName) {
         // Load an image thumbnail onto block.
         let thisBlock = this.blocks.blockList.indexOf(this);
         let that = this;
-        if (
-            this.blocks.blockList[thisBlock].value === null &&
-            imagePath === null
-        ) {
+
+        if (this.blocks.blockList[thisBlock].value === null && imagePath === null) {
             return;
         }
         let image = new Image();
 
         image.onload = function() {
             // Before adding new artwork, remove any old artwork.
-            that.removeChildBitmap("media");
+            // that.removeChildBitmap("media");
 
             let bitmap = new createjs.Bitmap(image);
             bitmap.name = "media";
