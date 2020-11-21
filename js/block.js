@@ -5255,9 +5255,7 @@ function Block(protoblock, blocks, overrideName) {
 
         this.label.style.width =
             (Math.round(selectorWidth * this.blocks.blockScale) *
-                this.protoblock.scale) /
-            2 +
-            "px";
+                this.protoblock.scale) / 2 + "px";
         // Navigate to a the current number value.
         let i = wheelValues.indexOf(selectedValue);
         if (i === -1) {
@@ -5269,7 +5267,9 @@ function Block(protoblock, blocks, overrideName) {
             i = wheelValues.indexOf(Math.floor(selectedValue + 0.5));
         }
 
-        this._numberWheel.navigateWheel(i);
+        if (i !== -1) {
+            this._numberWheel.navigateWheel(i);
+        }
 
         this.label.style.fontSize =
             Math.round(
