@@ -63,6 +63,7 @@ function setupOrnamentBlocks() {
         constructor(name) {
             super(name || "neighbor");
             this.setPalette("ornament");
+            this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.setHelpString();
             this.formBlock({
                 //.TRANS: the neighbor refers to a neighboring note, e.g., D is a neighbor of C
@@ -98,6 +99,7 @@ function setupOrnamentBlocks() {
     class Neighbor2Block extends NeighborBlock {
         constructor() {
             super("neighbor2");
+            this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.beginnerBlock(true);
 
             this.setHelpString([

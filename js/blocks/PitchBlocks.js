@@ -948,6 +948,7 @@ function setupPitchBlocks() {
             //.TRANS: register is the octave of the current pitch
             super("register", _("register"));
             this.setPalette("pitch");
+            this.piemenuValuesC1 = [-3, -2, -1, 0, 1, 2, 3];
             this.setHelpString([
                 _(
                     "The Register block provides an easy way to modify the register (octave) of the notes that follow it."
@@ -973,6 +974,8 @@ function setupPitchBlocks() {
         constructor() {
             super("settransposition");
             this.setPalette("pitch");
+            this.piemenuValuesC1 = [-12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0,
+                                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
             this.setHelpString([
                 _(
                     "The Semi-tone transposition block will shift the pitches contained inside Note blocks up (or down) by half steps."
@@ -1227,6 +1230,7 @@ function setupPitchBlocks() {
         constructor() {
             super("setscalartransposition");
             this.setPalette("pitch");
+            this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.setHelpString([
                 _(
                     "The Scalar transposition block will shift the pitches contained inside Note blocks up (or down) the scale."
@@ -1576,6 +1580,7 @@ function setupPitchBlocks() {
             //.TRANS: a numeric mapping of the notes in an octave based on the musical mode
             super("nthmodalpitch", _("nth modal pitch"));
             this.setPalette("pitch");
+            this.piemenuValuesC1 = [7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7];
             this.setHelpString([
                 _(
                     "N^th Modal Pitch takes a number as an input as the n^th degree for the given mode. 0 is the first position, 1 is the second, -1 is the note before the first etc."
@@ -1652,6 +1657,7 @@ function setupPitchBlocks() {
             //.TRANS: step some number of notes in current musical scale
             super("steppitch", _("scalar step") + " (+/–)");
             this.setPalette("pitch");
+            this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.beginnerBlock(true);
             this.setHelpString([
                 _(

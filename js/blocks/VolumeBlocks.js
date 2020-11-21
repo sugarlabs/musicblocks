@@ -339,6 +339,7 @@ function setupVolumeBlocks() {
         constructor() {
             super("setsynthvolume", _("set synth volume"));
             this.setPalette("volume");
+            this.piemenuValuesC2 = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -396,6 +397,7 @@ function setupVolumeBlocks() {
             //.TRANS: set the distribution of volume
             super("setpanning", _("set panning"));
             this.setPalette("volume");
+            this.piemenuValuesC1 = [100, 80, 60, 40, 20, 0, -20, -40, -60, -80, -100];
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -425,6 +427,7 @@ function setupVolumeBlocks() {
             //.TRANS: set the loudness level
             super("setnotevolume", _("set master volume"));
             this.setPalette("volume");
+            this.piemenuValuesC1 = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -524,6 +527,7 @@ function setupVolumeBlocks() {
         constructor() {
             super("articulation");
             this.setPalette("volume");
+            this.piemenuValuesC1 = [-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25];
             this.setHelpString([
                 _(
                     "The Set relative volume block changes the volume of the contained notes."
@@ -565,6 +569,7 @@ function setupVolumeBlocks() {
         constructor(name) {
             super(name || "decrescendo");
             this.setPalette("volume");
+            this.piemenuValuesC1 = [1, 2, 3, 4, 5, 10, 15, 20];
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -608,6 +613,7 @@ function setupVolumeBlocks() {
         constructor() {
             super("crescendo");
             this.setPalette("volume");
+            this.piemenuValuesC1 = [1, 2, 3, 4, 5, 10, 15, 20];
             this.beginnerBlock(true);
 
             this.setHelpString([

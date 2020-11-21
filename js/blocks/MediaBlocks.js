@@ -205,7 +205,7 @@ function setupMediaBlocks() {
 
         flow(args, logo, turtle, blk) {
             let tur = logo.turtles.ithTurtle(turtle);
-            tur.painter.doClearMedia();	    
+            tur.painter.doClearMedia();            
         }
     }
 
@@ -321,11 +321,11 @@ function setupMediaBlocks() {
             this.formBlock({
                 outType: "fileout"
             });
-	    this.parameter = false;
+            this.parameter = false;
         }
 
         arg(logo, turtle, blk, receivedArg) {
-	    return logo.blocks.blockList[blk].value;
+            return logo.blocks.blockList[blk].value;
         }
     }
 
@@ -351,6 +351,8 @@ function setupMediaBlocks() {
         constructor() {
             super("tone", _("hertz"));
             this.setPalette("media");
+            this.piemenuValuesC1 = [220, 247, 262, 294, 330, 349, 392, 440, 494, 523,
+                                    587, 659, 698, 784, 880];
             this.setHelpString();
             this.formBlock({
                 args: 2,

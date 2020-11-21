@@ -154,6 +154,7 @@ function setupRhythmBlockPaletteBlocks() {
             super("rhythm2");
             this.setPalette(rhythmBlockPalette);
             this.beginnerBlock(true);
+	    this.piemenuValuesC1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
             this.setHelpString([
                 _("The Rhythm block is used to generate rhythm patterns."),
                 "documentation",
@@ -596,6 +597,7 @@ function setupRhythmBlockPaletteBlocks() {
         constructor() {
             super("stuplet", _("simple tuplet"));
             this.setPalette(rhythmBlockPalette);
+	    this.piemenuValuesC1 = [3, 5, 7, 11];
             this.beginnerBlock(true);
 
             this.setHelpString([

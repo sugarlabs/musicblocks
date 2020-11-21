@@ -1498,6 +1498,9 @@ class BaseBlock extends ProtoBlock {
         this.deprecated = false;
         this.extraSearchTerms = [];
         this.helpString = [];
+        this.piemenuValuesC1 = [];
+        this.piemenuValuesC2 = [];
+        this.piemenuValuesC3 = [];
 
         // Just for brevity
         this.lang = localStorage.languagePreference || navigator.language;

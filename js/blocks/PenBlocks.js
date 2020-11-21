@@ -520,6 +520,7 @@ function setupPenBlocks() {
             //.TRANS: set the width of the line drawn by the pen
             super("setpensize", _("set pen size"));
             this.setPalette("pen");
+            this.piemenuValuesC1 = [1, 2, 3, 5, 10, 15, 25, 50, 100];
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -567,6 +568,7 @@ function setupPenBlocks() {
             //.TRANS: set degree of translucence of the pen color
             super("settranslucency", _("set translucency"));
             this.setPalette("pen");
+            this.piemenuValuesC1 = [100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0];
             this.setHelpString([
                 _("The Set translucency block changes the opacity of the pen."),
                 "documentation",
@@ -613,6 +615,7 @@ function setupPenBlocks() {
         constructor() {
             super("sethue", _("set hue"));
             this.setPalette("pen");
+            this.piemenuValuesC1 = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90];
             this.setHelpString([
                 _("The Set hue block changes the color of the pen."),
                 "documentation",
@@ -657,6 +660,7 @@ function setupPenBlocks() {
         constructor() {
             super("setshade", _("set shade"));
             this.setPalette("pen");
+            this.piemenuValuesC1 = [100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0];
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -706,6 +710,7 @@ function setupPenBlocks() {
             //.TRANS: set the level of vividness of the pen color
             super("setgrey", _("set grey"));
             this.setPalette("pen");
+            this.piemenuValuesC1 = [100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0];
             this.setHelpString([
                 _("The Set grey block changes the vividness of the pen color."),
                 "documentation",
@@ -750,6 +755,7 @@ function setupPenBlocks() {
         constructor() {
             super("setcolor", _("set color"));
             this.setPalette("pen");
+            this.piemenuValuesC1 = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90];
             this.beginnerBlock(true);
 
             this.setHelpString([

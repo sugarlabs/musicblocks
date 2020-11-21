@@ -332,7 +332,11 @@ function setupGraphicsBlocks() {
             super("arc");
             this.setPalette("graphics");
             this.beginnerBlock(true);
-
+            this.piemenuValuesC1 = [15, 30, 45, 60, 75, 90, 105, 120, 135, 150,
+                                    165, 180, 195, 210, 225, 240, 255, 270,
+                                    285, 300, 315, 330, 345, 360];
+            this.piemenuValuesC2 = [25, 50, 75, 100, 125, 150, 175, 200, 225,
+                                    250, 275, 300];
             this.setHelpString([
                 _("The Arc block moves the mouse in a arc."),
                 "documentation",
@@ -385,6 +389,9 @@ function setupGraphicsBlocks() {
             //.TRANS: set compass heading
             super("setheading", _("set heading"));
             this.setPalette("graphics");
+            this.piemenuValuesC1 = [0, 30, 45, 60, 90, 120, 135, 150, 180,
+                                    210, 225, 240, 270, 300, 315, 330];
+
             this.setHelpString([
                 _("The Set heading block sets the heading of the mouse."),
                 "documentation",
@@ -481,7 +488,8 @@ function setupGraphicsBlocks() {
             super("right");
             this.setPalette("graphics");
             this.beginnerBlock(true);
-
+            this.piemenuValuesC1 = [0, 30, 60, 90, 120, 150, 180, 210, 240,
+                                    270, 300, 330];
             this.setHelpString([
                 _("The Right block turns the mouse to the right."),
                 "documentation",
@@ -533,6 +541,8 @@ function setupGraphicsBlocks() {
             super("left");
             this.setPalette("graphics");
             this.beginnerBlock(true);
+            this.piemenuValuesC1 = [330, 300, 270, 240, 210, 180, 150, 120, 90,
+                                    60, 30, 0];
 
             this.setHelpString([
                 _("The Left block turns the mouse to the left."),
