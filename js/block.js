@@ -2850,50 +2850,8 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
-        if (["steppitch",
-             "pitchnumber",
-             "meter",
-             "register",
-             "nthmodalpitch",
-             "rhythmicdot2",
-             "crescendo",
-             "decrescendo",
-             "harmonic2",
-             "interval",
-             "setscalartransposition",
-             "semitoneinterval",
-             "settransposition",
-             "setnotevolume",
-             "articulation",
-             "vibrato",
-             "dis",
-             "neighbor",
-             "neighbor2",
-             "tremolo",
-             "chorus",
-             "phaser",
-             "amsynth",
-             "fmsynth",
-             "duosynth",
-             "rhythm2",
-             "stuplet",
-             "duplicatenotes",
-             "setcolor",
-             "setshade",
-             "setgrey",
-             "sethue",
-             "setpensize",
-             "settranslucency",
-             "setheading",
-             "arc",
-             "onbeatdo",
-             "hertz",
-             "right",
-             "left",
-             "setpanning",
-             "setbpm3",
-             "setmasterbpm2"
-            ].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
+        if (this.blocks.blockList[
+            this.connections[0]].protoblock.piemenuValuesC1.length === 0) {
             return false;
         }
 
@@ -2912,12 +2870,8 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
-        if (["setsynthvolume",
-             "tremolo",
-             "chorus",
-             "phaser",
-             "duosynth",
-             "arc"].indexOf(this.blocks.blockList[cblk].name) === -1) {
+        if (this.blocks.blockList[
+            this.connections[0]].protoblock.piemenuValuesC2.length === 0) {
             return false;
         }
 
@@ -2936,7 +2890,8 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
-        if (["chorus"].indexOf(this.blocks.blockList[cblk].name) === -1) {
+        if (this.blocks.blockList[
+            this.connections[0]].protoblock.piemenuValuesC3.length === 0) {
             return false;
         }
 
