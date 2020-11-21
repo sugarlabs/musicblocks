@@ -1,4 +1,4 @@
-// Copyright (c) 2014-19 Walter Bender
+// Copyright (c) 2014-20 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -166,8 +166,8 @@ function Block(protoblock, blocks, overrideName) {
     this._check_meter_block = null;
 
     // Mouse position in events
-    this.original = { x: 0, y: 0 };
-    this.offset = { x: 0, y: 0 };
+    this.original = {x: 0, y: 0};
+    this.offset = {x: 0, y: 0};
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
@@ -192,12 +192,8 @@ function Block(protoblock, blocks, overrideName) {
                         that.regenerateArtwork(true, []);
                         checkBounds(loopCount + 1);
                     } else {
-                        that.container.cache(
-                            that.bounds.x,
-                            that.bounds.y,
-                            that.bounds.width,
-                            that.bounds.height
-                        );
+                        that.container.cache(that.bounds.x, that.bounds.y,
+					     that.bounds.width, that.bounds.height);
                         callback(that, args);
                         resolve();
                     }
@@ -263,22 +259,16 @@ function Block(protoblock, blocks, overrideName) {
             return true;
         }
 
-        if (
-            this.disconnectedBitmap !== null &&
-            this.disconnectedHighlightBitmap !== null
-        ) {
-            if (
-                !this.bitmap.visible &&
-                !this.highlightBitmap.visible &&
-                !this.disconnectedBitmap.visible &&
-                !this.disconnectedHighlightBitmap.visible
-            ) {
+        if (this.disconnectedBitmap !== null &&
+	    this.disconnectedHighlightBitmap !== null) {
+            if (!this.bitmap.visible &&
+		!this.highlightBitmap.visible &&
+		!this.disconnectedBitmap.visible &&
+		!this.disconnectedHighlightBitmap.visible) {
                 if (this.collapseBlockBitmap === null) {
                     return true;
-                } else if (
-                    !this.collapseBlockBitmap.visible &&
-                    !this.highlightCollapseBlockBitmap.visible
-                ) {
+                } else if (!this.collapseBlockBitmap.visible &&
+			   !this.highlightCollapseBlockBitmap.visible) {
                     return true;
                 }
             }
@@ -286,10 +276,8 @@ function Block(protoblock, blocks, overrideName) {
             if (!this.bitmap.visible && !this.highlightBitmap.visible) {
                 if (this.collapseBlockBitmap === null) {
                     return true;
-                } else if (
-                    !this.collapseBlockBitmap.visible &&
-                    !this.highlightCollapseBlockBitmap.visible
-                ) {
+                } else if (!this.collapseBlockBitmap.visible &&
+			   !this.highlightCollapseBlockBitmap.visible) {
                     return true;
                 }
             }
@@ -299,10 +287,7 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this.offScreen = function(boundary) {
-        return (
-            !this.trash &&
-            boundary.offScreen(this.container.x, this.container.y)
-        );
+        return (!this.trash && boundary.offScreen(this.container.x, this.container.y));
     };
 
     this.copySize = function() {
@@ -542,31 +527,18 @@ function Block(protoblock, blocks, overrideName) {
          */
         this.postProcess = function(that) {
             if (that.imageBitmap !== null) {
-                that._positionMedia(
-                    that.imageBitmap,
-                    that.imageBitmap.image.width,
-                    that.imageBitmap.image.height,
-                    scale
-                );
+                that._positionMedia(that.imageBitmap, that.imageBitmap.image.width,
+				    that.imageBitmap.image.height, scale);
                 z = that.container.children.length - 1;
                 that.container.setChildIndex(that.imageBitmap, z);
             }
 
             if (that.name === "start" || that.name === "drum") {
                 // Rescale the decoration on the start blocks.
-                for (
-                    let turtle = 0;
-                    turtle < that.blocks.turtles.turtleList.length;
-                    turtle++
-                ) {
-                    if (
-                        that.blocks.turtles.turtleList[turtle].startBlock
-                            === that
-                    ) {
-                        that.blocks.turtles.turtleList[turtle].resizeDecoration(
-                            scale,
-                            that.bitmap.image.width
-                        );
+                for (let t = 0; t < that.blocks.turtles.turtleList.length; t++) {
+                    if (that.blocks.turtles.turtleList[t].startBlock === that) {
+                        that.blocks.turtles.turtleList[t].resizeDecoration(
+			    scale, that.bitmap.image.width);
                         that._ensureDecorationOnTop();
                         break;
                     }
@@ -605,11 +577,8 @@ function Block(protoblock, blocks, overrideName) {
              * @private
              */
             let _postProcess = function(that) {
-                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
-                    scale / 3;
-                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale =
-                    scale / 3;
-
+                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale = scale / 3;
+                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale = scale / 3;
                 that.updateCache();
                 that._calculateBlockHitArea();
             };
@@ -652,89 +621,72 @@ function Block(protoblock, blocks, overrideName) {
             this.collapseArtwork = obj[0];
             obj = this.protoblock.generator(this.clampCount[0]);
         } else if (this.name === "ifthenelse") {
-            obj = this.protoblock.generator(
-                this.clampCount[0],
-                this.clampCount[1]
-            );
+            obj = this.protoblock.generator(this.clampCount[0], this.clampCount[1]);
         } else if (this.protoblock.style === "clamp") {
             obj = this.protoblock.generator(this.clampCount[0]);
         } else if (this.protoblock.style === "argflowclamp") {
             obj = this.protoblock.generator(this.clampCount[0]);
         } else {
             switch (this.name) {
-                case "equal":
-                case "greater":
-                case "less":
+            case "equal":
+            case "greater":
+            case "less":
+                obj = this.protoblock.generator(this.clampCount[0]);
+                break;
+            case "makeblock":
+            case "calcArg":
+            case "doArg":
+            case "namedcalcArg":
+            case "nameddoArg":
+                obj = this.protoblock.generator(this.argClampSlots);
+                this.size = 2;
+                for (let i = 0; i < this.argClampSlots.length; i++) {
+                    this.size += this.argClampSlots[i];
+                }
+                this.docks = [];
+                this.docks.push([obj[1][0][0], obj[1][0][1], this.protoblock.dockTypes[0]]);
+                break;
+            default:
+                if (this.isArgBlock()) {
                     obj = this.protoblock.generator(this.clampCount[0]);
-                    break;
-                case "makeblock":
-                case "calcArg":
-                case "doArg":
-                case "namedcalcArg":
-                case "nameddoArg":
-                    obj = this.protoblock.generator(this.argClampSlots);
-                    this.size = 2;
-                    for (let i = 0; i < this.argClampSlots.length; i++) {
-                        this.size += this.argClampSlots[i];
-                    }
-                    this.docks = [];
-                    this.docks.push([
-                        obj[1][0][0],
-                        obj[1][0][1],
-                        this.protoblock.dockTypes[0]
-                    ]);
-                    break;
-                default:
-                    if (this.isArgBlock()) {
-                        obj = this.protoblock.generator(this.clampCount[0]);
-                    } else if (this.isTwoArgBlock()) {
-                        obj = this.protoblock.generator(this.clampCount[0]);
-                    } else {
-                        obj = this.protoblock.generator();
-                    }
-                    this.size += plusMinus;
-                    break;
+                } else if (this.isTwoArgBlock()) {
+                    obj = this.protoblock.generator(this.clampCount[0]);
+                } else {
+                    obj = this.protoblock.generator();
+                }
+                this.size += plusMinus;
+                break;
             }
         }
 
         switch (this.name) {
-            case "nameddoArg":
-                for (let i = 1; i < obj[1].length - 1; i++) {
-                    this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
-                }
-
-                this.docks.push([obj[1][2][0], obj[1][2][1], "in"]);
-                break;
-            case "namedcalcArg":
-                for (let i = 1; i < obj[1].length; i++) {
-                    this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
-                }
-                break;
-            case "doArg":
-                this.docks.push([
-                    obj[1][1][0],
-                    obj[1][1][1],
-                    this.protoblock.dockTypes[1]
-                ]);
-                for (let i = 2; i < obj[1].length - 1; i++) {
-                    this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
-                }
-
-                this.docks.push([obj[1][3][0], obj[1][3][1], "in"]);
-                break;
-            case "makeblock":
-            case "calcArg":
-                this.docks.push([
-                    obj[1][1][0],
-                    obj[1][1][1],
-                    this.protoblock.dockTypes[1]
-                ]);
-                for (let i = 2; i < obj[1].length; i++) {
-                    this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
-                }
-                break;
-            default:
-                break;
+        case "nameddoArg":
+            for (let i = 1; i < obj[1].length - 1; i++) {
+                this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
+            }
+            this.docks.push([obj[1][2][0], obj[1][2][1], "in"]);
+            break;
+        case "namedcalcArg":
+            for (let i = 1; i < obj[1].length; i++) {
+                this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
+            }
+            break;
+        case "doArg":
+            this.docks.push([obj[1][1][0], obj[1][1][1], this.protoblock.dockTypes[1]]);
+            for (let i = 2; i < obj[1].length - 1; i++) {
+                this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
+            }
+            this.docks.push([obj[1][3][0], obj[1][3][1], "in"]);
+            break;
+        case "makeblock":
+        case "calcArg":
+            this.docks.push([obj[1][1][0], obj[1][1][1], this.protoblock.dockTypes[1]]);
+            for (let i = 2; i < obj[1].length; i++) {
+                this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
+            }
+            break;
+        default:
+            break;
         }
 
         // Save new artwork and dock positions.
@@ -762,12 +714,7 @@ function Block(protoblock, blocks, overrideName) {
      */
     this.imageLoad = function() {
         let fontSize = 10 * this.protoblock.scale;
-        this.text = new createjs.Text(
-            "",
-            fontSize + "px Sans",
-            platformColor.blockText
-        );
-
+        this.text = new createjs.Text("", fontSize + "px Sans", platformColor.blockText);
         this.generateArtwork(true, []);
     };
 
@@ -797,12 +744,15 @@ function Block(protoblock, blocks, overrideName) {
             }
             bitmap.name = "media";
             that.container.addChild(bitmap);
+            that._positionMedia(bitmap, image.width, image.height, that.protoblock.scale);
+	    /*
             that._positionMedia(
                 bitmap,
                 image.width,
                 image.height,
                 that.protoblock.scale
             );
+	    */
             that.imageBitmap = bitmap;
             that.updateCache();
         };
@@ -930,8 +880,7 @@ function Block(protoblock, blocks, overrideName) {
             that.container.addChild(that.disconnectedHighlightBitmap);
             that.disconnectedHighlightBitmap.x = 0;
             that.disconnectedHighlightBitmap.y = 0;
-            that.disconnectedHighlightBitmap.name =
-                "bmp_disconnect_hightlight_" + thisBlock;
+            that.disconnectedHighlightBitmap.name = "bmp_disconnect_hightlight_" + thisBlock;
             if (!that.blocks.logo.runningLilypond) {
                 that.disconnectedHighlightBitmap.cursor = "pointer";
             }
@@ -945,22 +894,13 @@ function Block(protoblock, blocks, overrideName) {
                     .replace("block_label", safeSVG(block_label));
             } else {
                 artwork = that.artwork
-                    .replace(
-                        /fill_color/g,
-                        PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name]
-                    )
-                    .replace(
-                        /stroke_color/g,
-                        HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name]
-                    )
+                    .replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name])
+                    .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
                     .replace("block_label", safeSVG(block_label));
             }
 
             for (let i = 1; i < that.protoblock.staticLabels.length; i++) {
-                artwork = artwork.replace(
-                    "arg_label_" + i,
-                    that.protoblock.staticLabels[i]
-                );
+                artwork = artwork.replace("arg_label_" + i, that.protoblock.staticLabels[i]);
             }
 
             _blockMakeBitmap(artwork, __processHighlightBitmap, that);
@@ -990,31 +930,16 @@ function Block(protoblock, blocks, overrideName) {
                     .replace("block_label", safeSVG(block_label));
             } else {
                 artwork = that.artwork
-                    .replace(
-                        /fill_color/g,
-                        platformColor.paletteColors[
-                            that.protoblock.palette.name
-                            ][3]
-                    )
-                    .replace(
-                        /stroke_color/g,
-                        HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name]
-                    )
+                    .replace(/fill_color/g, platformColor.paletteColors[that.protoblock.palette.name][3])
+                    .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
                     .replace("block_label", safeSVG(block_label));
             }
 
             for (let i = 1; i < that.protoblock.staticLabels.length; i++) {
-                artwork = artwork.replace(
-                    "arg_label_" + i,
-                    that.protoblock.staticLabels[i]
-                );
+                artwork = artwork.replace("arg_label_" + i, that.protoblock.staticLabels[i]);
             }
 
-            _blockMakeBitmap(
-                artwork,
-                __processDisconnectedHighlightBitmap,
-                that
-            );
+            _blockMakeBitmap(artwork, __processDisconnectedHighlightBitmap, that);
         };
 
         // Create the bitmap for the block.
@@ -1039,38 +964,23 @@ function Block(protoblock, blocks, overrideName) {
             } else {
                 artwork = that.artwork
                     .replace(/fill_color/g, platformColor.disconnected)
-                    .replace(
-                        /stroke_color/g,
-                        HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name]
-                    )
+                    .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
                     .replace("block_label", safeSVG(block_label));
             }
 
             for (let i = 1; i < that.protoblock.staticLabels.length; i++) {
-                artwork = artwork.replace(
-                    "arg_label_" + i,
-                    that.protoblock.staticLabels[i]
-                );
+                artwork = artwork.replace("arg_label_" + i, that.protoblock.staticLabels[i]);
             }
 
             _blockMakeBitmap(artwork, __processDisconnectedBitmap, that);
         };
 
         if (this.overrideName && this.name !== "outputtools") {
-            if (
-                [
-                    "namedbox",
-                    "storein2",
-                    "nameddo",
-                    "nameddoArg",
-                    "namedcalc",
-                    "namedcalcArg"
-                ].indexOf(this.name) !== -1
-            ) {
+            if (["namedbox", "storein2", "nameddo", "nameddoArg", "namedcalc",
+		 "namedcalcArg"].indexOf(this.name) !== -1) {
                 block_label = this.overrideName;
                 if (getTextWidth(block_label, "bold 20pt Sans") > TEXTWIDTH) {
-                    block_label =
-                        " " + block_label.substr(0, STRINGLEN) + "...";
+                    block_label = block_label.substr(0, STRINGLEN) + "...";
                 }
             } else {
                 block_label = this.overrideName;
@@ -1094,11 +1004,7 @@ function Block(protoblock, blocks, overrideName) {
             let obj = this.protoblock.generator();
             this.artwork = obj[0];
             for (let i = 0; i < obj[1].length; i++) {
-                this.docks.push([
-                    obj[1][i][0],
-                    obj[1][i][1],
-                    this.protoblock.dockTypes[i]
-                ]);
+                this.docks.push([obj[1][i][0], obj[1][i][1], this.protoblock.dockTypes[i]]);
             }
 
             this.width = obj[2];
@@ -1113,22 +1019,13 @@ function Block(protoblock, blocks, overrideName) {
                 .replace("block_label", safeSVG(block_label));
         } else {
             artwork = this.artwork
-                .replace(
-                    /fill_color/g,
-                    PALETTEFILLCOLORS[this.protoblock.palette.name]
-                )
-                .replace(
-                    /stroke_color/g,
-                    PALETTESTROKECOLORS[this.protoblock.palette.name]
-                )
+                .replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name])
+                .replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name])
                 .replace("block_label", safeSVG(block_label));
         }
 
         for (let i = 1; i < this.protoblock.staticLabels.length; i++) {
-            artwork = artwork.replace(
-                "arg_label_" + i,
-                this.protoblock.staticLabels[i]
-            );
+            artwork = artwork.replace("arg_label_" + i, this.protoblock.staticLabels[i]);
         }
 
         that.blocks.blockArt[that.blocks.blockList.indexOf(that)] = artwork;
@@ -1148,72 +1045,68 @@ function Block(protoblock, blocks, overrideName) {
         if (SPECIALINPUTS.indexOf(this.name) !== -1) {
             if (this.value == null) {
                 switch (this.name) {
-                    case "text":
-                        this.value = "---";
-                        break;
-                    case "solfege":
-                    case "eastindiansolfege":
-                        this.value = "sol";
-                        break;
-                    case "scaledegree2":
-                        this.value = "5";
-                        break;
-                    case "customNote":
-                        let len = this.blocks.logo.synth.startingPitch.length;
-                        this.value =
-                            this.blocks.logo.synth.startingPitch.substring(
-                                0,
-                                len - 1
-                            ) + "(+0)";
-                        break;
-                    case "notename":
-                        this.value = "G";
-                        break;
-                    case "rest":
-                        this.value = "rest";
-                        break;
-                    case "boolean":
-                        this.value = true;
-                        break;
-                    case "number":
-                        this.value = NUMBERBLOCKDEFAULT;
-                        break;
-                    case "modename":
-                        this.value = DEFAULTMODE;
-                        break;
-                    case "accidentalname":
-                        this.value = DEFAULTACCIDENTAL;
-                        break;
-                    case "intervalname":
-                        this.value = DEFAULTINTERVAL;
-                        break;
-                    case "invertmode":
-                        this.value = DEFAULTINVERT;
-                        break;
-                    case "voicename":
-                        this.value = DEFAULTVOICE;
-                        break;
-                    case "noisename":
-                        this.value = DEFAULTNOISE;
-                        break;
-                    case "drumname":
-                        this.value = DEFAULTDRUM;
-                        break;
-                    case "effectsname":
-                        this.value = DEFAULTEFFECT;
-                        break;
-                    case "filtertype":
-                        this.value = DEFAULTFILTERTYPE;
-                        break;
-                    case "oscillatortype":
-                        this.value = DEFAULTOSCILLATORTYPE;
-                        break;
-                    case "temperamentname":
-                        this.value = "equal";
-                        break;
-                    case "grid":
-                        this.value = "Cartesian";
-                        break;
+                case "text":
+                    this.value = "---";
+                    break;
+                case "solfege":
+                case "eastindiansolfege":
+                    this.value = "sol";
+                    break;
+                case "scaledegree2":
+                    this.value = "5";
+                    break;
+                case "customNote":
+                    let len = this.blocks.logo.synth.startingPitch.length;
+                    this.value = this.blocks.logo.synth.startingPitch.substring(0, len - 1) + "(+0)";
+                    break;
+                case "notename":
+                    this.value = "G";
+                    break;
+                case "rest":
+                    this.value = "rest";
+                    break;
+                case "boolean":
+                    this.value = true;
+                    break;
+                case "number":
+                    this.value = NUMBERBLOCKDEFAULT;
+                    break;
+                case "modename":
+                    this.value = DEFAULTMODE;
+                    break;
+                case "accidentalname":
+                    this.value = DEFAULTACCIDENTAL;
+                    break;
+                case "intervalname":
+                    this.value = DEFAULTINTERVAL;
+                    break;
+                case "invertmode":
+                    this.value = DEFAULTINVERT;
+                    break;
+                case "voicename":
+                    this.value = DEFAULTVOICE;
+                    break;
+                case "noisename":
+                    this.value = DEFAULTNOISE;
+                    break;
+                case "drumname":
+                    this.value = DEFAULTDRUM;
+                    break;
+                case "effectsname":
+                    this.value = DEFAULTEFFECT;
+                    break;
+                case "filtertype":
+                    this.value = DEFAULTFILTERTYPE;
+                    break;
+                case "oscillatortype":
+                    this.value = DEFAULTOSCILLATORTYPE;
+                    break;
+                case "temperamentname":
+                    this.value = "equal";
+                    break;
+                case "grid":
+                    this.value = "Cartesian";
+                    break;
                 }
             }
 
@@ -1255,10 +1148,8 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
 
-            if (
-                WIDENAMES.indexOf(this.name) === -1 &&
-                getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH
-            ) {
+            if (WIDENAMES.indexOf(this.name) === -1 &&
+                getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
                 label = label.substr(0, STRINGLEN) + "...";
             }
 
@@ -1280,13 +1171,6 @@ function Block(protoblock, blocks, overrideName) {
 
             // this.blocks.refreshCanvas();
             this.blocks.cleanupAfterLoad(this.name);
-            /*
-            if (this.trash) {
-                this.collapseText.visible = false;
-                this.collapseButtonBitmap.visible = false;
-                this.expandButtonBitmap.visible = false;
-            }
-            */
         } else {
             // Some blocks, e.g., Start blocks and Action blocks can
             // collapse, so add an event handler.
@@ -1310,17 +1194,12 @@ function Block(protoblock, blocks, overrideName) {
             this.collapseArtwork = obj[0];
 
             let postProcess = function(that) {
-                // that._loadCollapsibleEventHandlers();
                 that.loadComplete = true;
 
                 if (that.postProcess !== null) {
                     that.postProcess(that.postProcessArg);
                     that.postProcess = null;
                 }
-
-                // if (that.name !== 'text')
-                // if (that.isCollapsible())
-                //     that.unhighlight();
             };
 
             if (this.isCollapsible()) {
@@ -1329,7 +1208,6 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this.blocks.refreshCanvas();
-        // stage.update();
     };
 
     /*
@@ -1371,9 +1249,7 @@ function Block(protoblock, blocks, overrideName) {
             let image = new Image();
             image.onload = function() {
                 that.collapseButtonBitmap = new createjs.Bitmap(image);
-                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
-                    that.protoblock.scale / 3;
-
+                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale = that.protoblock.scale / 3;
                 that.container.addChild(that.collapseButtonBitmap);
                 that.collapseButtonBitmap.x = 2 * that.protoblock.scale;
                 if (that.isInlineCollapsible()) {
@@ -1440,138 +1316,81 @@ function Block(protoblock, blocks, overrideName) {
             if (that.collapseText === null) {
                 let fontSize = 10 * that.protoblock.scale;
                 switch (that.name) {
-                    case "action":
-                        that.collapseText = new createjs.Text(
-                            _("action"),
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
-                        break;
-                    case "start":
-                        that.collapseText = new createjs.Text(
-                            _("start"),
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
-                        break;
-                    case "matrix":
-                        that.collapseText = new createjs.Text(
-                            _("matrix"),
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
-                        break;
-                    case "status":
-                        that.collapseText = new createjs.Text(
-                            _("status"),
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
-                        break;
-                    case "pitchdrummatrix":
-                        that.collapseText = new createjs.Text(
-                            _("drum mapper"),
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
-                        break;
-                    case "rhythmruler":
-                        that.collapseText = new createjs.Text(
-                            _("ruler"),
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
-                        break;
-                    case "timbre":
-                        that.collapseText = new createjs.Text(
-                            _("timbre"),
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
-                        break;
-                    case "pitchstaircase":
-                        that.collapseText = new createjs.Text(
-                            _("stair"),
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
-                        break;
-                    case "tempo":
-                        that.collapseText = new createjs.Text(
-                            _("tempo"),
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
-                        break;
-                    case "modewidget":
-                        that.collapseText = new createjs.Text(
-                            _("mode"),
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
-                        break;
-                    case "pitchslider":
-                        that.collapseText = new createjs.Text(
-                            _("slider"),
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
-                        break;
-                    case "musickeyboard":
-                        that.collapseText = new createjs.Text(
-                            _("keyboard"),
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
-                        break;
-                    case "drum":
-                        that.collapseText = new createjs.Text(
-                            _("drum"),
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
-                        break;
-                    case "rhythmruler2":
-                        that.collapseText = new createjs.Text(
-                            _("rhythm maker"),
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
-                        break;
-                    case "newnote":
-                        that.collapseText = new createjs.Text(
-                            _("note value"),
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
-                        break;
-                    case "interval":
-                        that.collapseText = new createjs.Text(
-                            _("scalar interval"),
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
-                        break;
-                    case "osctime":
-                        that.collapseText = new createjs.Text(
-                            _("milliseconds"),
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
-                        break;
-                    case "temperament":
-                        that.collapseText = new createjs.Text(
-                            _("temperament"),
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
-                        break;
-                    default:
-                        that.collapseText = new createjs.Text(
-                            "foobar",
-                            fontSize + "px Sans",
-                            platformColor.blockText
-                        );
+                case "action":
+                    that.collapseText = new createjs.Text(
+			_("action"), fontSize + "px Sans", platformColor.blockText);
+                    break;
+                case "start":
+                    that.collapseText = new createjs.Text(
+			_("start"), fontSize + "px Sans", platformColor.blockText);
+		    break;
+		case "matrix":
+		    that.collapseText = new createjs.Text(
+			_("matrix"), fontSize + "px Sans", platformColor.blockText);
+		    break;
+                case "status":
+                    that.collapseText = new createjs.Text(
+			_("status"), fontSize + "px Sans", platformColor.blockText);
+                    break;
+                case "pitchdrummatrix":
+                    that.collapseText = new createjs.Text(
+			_("drum mapper"), fontSize + "px Sans", platformColor.blockText);
+                    break;
+                case "rhythmruler":
+                    that.collapseText = new createjs.Text(
+			_("ruler"), fontSize + "px Sans", platformColor.blockText);
+                    break;
+                case "timbre":
+                    that.collapseText = new createjs.Text(
+			_("timbre"), fontSize + "px Sans", platformColor.blockText);
+                    break;
+                case "pitchstaircase":
+                    that.collapseText = new createjs.Text(
+			_("stair"), fontSize + "px Sans", platformColor.blockText);
+                    break;
+                case "tempo":
+                    that.collapseText = new createjs.Text(
+			_("tempo"), fontSize + "px Sans", platformColor.blockText);
+                    break;
+                case "modewidget":
+                    that.collapseText = new createjs.Text(
+			_("mode"), fontSize + "px Sans", platformColor.blockText);
+                    break;
+                case "pitchslider":
+                    that.collapseText = new createjs.Text(
+			_("slider"), fontSize + "px Sans", platformColor.blockText);
+                    break;
+                case "musickeyboard":
+                    that.collapseText = new createjs.Text(
+			_("keyboard"), fontSize + "px Sans", platformColor.blockText);
+                    break;
+                case "drum":
+                    that.collapseText = new createjs.Text(
+			_("drum"), fontSize + "px Sans", platformColor.blockText);
+                    break;
+                case "rhythmruler2":
+                    that.collapseText = new createjs.Text(
+			_("rhythm maker"), fontSize + "px Sans", platformColor.blockText);
+                    break;
+                case "newnote":
+                    that.collapseText = new createjs.Text(
+			_("note value"), fontSize + "px Sans", platformColor.blockText);
+                    break;
+                case "interval":
+                    that.collapseText = new createjs.Text(
+			_("scalar interval"), fontSize + "px Sans", platformColor.blockText);
+                    break;
+                case "osctime":
+                    that.collapseText = new createjs.Text(
+			_("milliseconds"), fontSize + "px Sans", platformColor.blockText);
+                    break;
+                case "temperament":
+                    that.collapseText = new createjs.Text(
+			_("temperament"), fontSize + "px Sans", platformColor.blockText);
+                    break;
+                default:
+                    that.collapseText = new createjs.Text(
+			"foobar", fontSize + "px Sans", platformColor.blockText);
                 }
 
                 that.collapseText.textAlign = "left";
@@ -1584,17 +1403,10 @@ function Block(protoblock, blocks, overrideName) {
             that._ensureDecorationOnTop();
 
             // Save the collapsed block artwork for export.
-            that.blocks.blockCollapseArt[
-                that.blocks.blockList.indexOf(that)
-                ] = that.collapseArtwork
-                .replace(
-                    /fill_color/g,
-                    PALETTEFILLCOLORS[that.protoblock.palette.name]
-                )
-                .replace(
-                    /stroke_color/g,
-                    PALETTESTROKECOLORS[that.protoblock.palette.name]
-                )
+            that.blocks.blockCollapseArt[that.blocks.blockList.indexOf(that)] =
+		that.collapseArtwork
+                .replace(/fill_color/g, PALETTEFILLCOLORS[that.protoblock.palette.name])
+                .replace(/stroke_color/g, PALETTESTROKECOLORS[that.protoblock.palette.name])
                 .replace("block_label", safeSVG(that.collapseText.text));
 
             __processExpandButton(that);
@@ -1616,30 +1428,16 @@ function Block(protoblock, blocks, overrideName) {
 
             let artwork = that.collapseArtwork;
             _blockMakeBitmap(
-                artwork
-                    .replace(
-                        /fill_color/g,
-                        PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name]
-                    )
-                    .replace(
-                        /stroke_color/g,
-                        HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name]
-                    )
+		artwork
+		    .replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name])
+                    .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
                     .replace("block_label", ""),
-                __processHighlightCollapseBitmap,
-                that
-            );
+                __processHighlightCollapseBitmap, that);
         };
 
         let artwork = this.collapseArtwork
-            .replace(
-                /fill_color/g,
-                PALETTEFILLCOLORS[this.protoblock.palette.name]
-            )
-            .replace(
-                /stroke_color/g,
-                PALETTESTROKECOLORS[this.protoblock.palette.name]
-            )
+            .replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name])
+            .replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name])
             .replace("block_label", "");
         _blockMakeBitmap(artwork, __processCollapseBitmap, this);
     };
@@ -1690,11 +1488,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         if (this.blocks.blockList[last(this.connections)].name === "hidden") {
-            if (
-                last(
-                    this.blocks.blockList[last(this.connections)].connections
-                ) === null
-            ) {
+            if (last(this.blocks.blockList[last(this.connections)].connections) === null) {
                 return true;
             }
         }
@@ -1785,9 +1579,7 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this.isArgBlock = function() {
-        return (
-            this.protoblock.style === "value" || this.protoblock.style === "arg"
-        );
+        return (this.protoblock.style === "value" || this.protoblock.style === "arg");
     };
 
     this.isTwoArgBlock = function() {
@@ -1799,11 +1591,7 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this.isClampBlock = function() {
-        return (
-            this.protoblock.style === "clamp" ||
-            this.isDoubleClampBlock() ||
-            this.isArgFlowClampBlock()
-        );
+        return (this.protoblock.style === "clamp" || this.isDoubleClampBlock() || this.isArgFlowClampBlock());
     };
 
     this.isArgFlowClampBlock = function() {
@@ -1823,10 +1611,7 @@ function Block(protoblock, blocks, overrideName) {
     };
 
     this.isArgClamp = function() {
-        return (
-            this.protoblock.style === "argclamp" ||
-            this.protoblock.style === "argclamparg"
-        );
+        return (this.protoblock.style === "argclamp" || this.protoblock.style === "argclamparg");
     };
 
     this.isExpandableBlock = function() {
@@ -1873,13 +1658,11 @@ function Block(protoblock, blocks, overrideName) {
             let MAXHEIGHT = 450;
             if (image.width > image.height) {
                 if (image.width > MAXWIDTH) {
-                    bitmap.scaleX = bitmap.scaleY = bitmap.scale =
-                        MAXWIDTH / image.width;
+                    bitmap.scaleX = bitmap.scaleY = bitmap.scale = MAXWIDTH / image.width;
                 }
             } else {
                 if (image.height > MAXHEIGHT) {
-                    bitmap.scaleX = bitmap.scaleY = bitmap.scale =
-                        MAXHEIGHT / image.height;
+                    bitmap.scaleX = bitmap.scaleY = bitmap.scale = MAXHEIGHT / image.height;
                 }
             }
 
@@ -1889,12 +1672,8 @@ function Block(protoblock, blocks, overrideName) {
             that.imageBitmap = bitmap;
 
             // Next, scale the bitmap for the thumbnail.
-            that._positionMedia(
-                bitmap,
-                bitmap.image.width,
-                bitmap.image.height,
-                that.protoblock.scale
-            );
+            that._positionMedia(bitmap, bitmap.image.width, bitmap.image.height,
+				that.protoblock.scale);
             that.container.addChild(bitmap);
             that.updateCache();
         };
@@ -1989,22 +1768,18 @@ function Block(protoblock, blocks, overrideName) {
 
         if (this.isInlineCollapsible() && this.collapseText.visible) {
             switch (this.name) {
-                case "newnote":
-                    this._newNoteLabel();
-                    break;
-                case "interval":
-                    this._intervalLabel();
-                    break;
-                case "osctime":
-                    this._oscTimeLabel();
-                    break;
-                default:
-                    console.debug(
-                        "What do we do with a collapsed " +
-                        this.name +
-                        " block?"
-                    );
-                    break;
+            case "newnote":
+                this._newNoteLabel();
+                break;
+            case "interval":
+                this._intervalLabel();
+                break;
+            case "osctime":
+                this._oscTimeLabel();
+                break;
+            default:
+                console.debug("What do we do with a collapsed " + this.name + " block?");
+                break;
             }
         }
 
@@ -2124,14 +1899,10 @@ function Block(protoblock, blocks, overrideName) {
                 if (this.blocks.blockList[c].name === "divide") {
                     let c1 = this.blocks.blockList[c].connections[1];
                     let c2 = this.blocks.blockList[c].connections[2];
-                    if (
-                        this.blocks.blockList[c1].name === "number" &&
-                        this.blocks.blockList[c2].name === "number"
-                    ) {
-                        v =
-                            this.blocks.blockList[c1].value +
-                            "/" +
-                            this.blocks.blockList[c2].value;
+                    if (this.blocks.blockList[c1].name === "number" &&
+                        this.blocks.blockList[c2].name === "number") {
+                        v = this.blocks.blockList[c1].value + "/" +
+			    this.blocks.blockList[c2].value;
                         if (_THIS_IS_MUSIC_BLOCKS_) {
                             if (this.blocks.blockList[c2].value in NSYMBOLS) {
                                 v += NSYMBOLS[this.blocks.blockList[c2].value];
@@ -2173,13 +1944,9 @@ function Block(protoblock, blocks, overrideName) {
             if (this.blocks.blockList[c].name === "divide") {
                 let c1 = this.blocks.blockList[c].connections[1];
                 let c2 = this.blocks.blockList[c].connections[2];
-                if (
-                    this.blocks.blockList[c1].name === "number" &&
-                    this.blocks.blockList[c2].name === "number"
-                ) {
-                    v =
-                        this.blocks.blockList[c1].value +
-                        "/" +
+                if (this.blocks.blockList[c1].name === "number" &&
+                    this.blocks.blockList[c2].name === "number") {
+                    v = this.blocks.blockList[c1].value + "/" +
                         this.blocks.blockList[c2].value;
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         vi = this.blocks.blockList[c2].value;
@@ -2250,10 +2017,9 @@ function Block(protoblock, blocks, overrideName) {
                         this.blocks.blockList[ci].name === "number" &&
                         this.blocks.blockList[cii].name === "number"
                     ) {
-                        v =
-                            (this.blocks.blockList[c1].value /
-                                this.blocks.blockList[ci].value) *
-                            this.blocks.blockList[cii].value;
+                        v = (this.blocks.blockList[c1].value /
+			     this.blocks.blockList[ci].value) *
+			    this.blocks.blockList[cii].value;
                     }
                 }
             }
@@ -2291,152 +2057,91 @@ function Block(protoblock, blocks, overrideName) {
 
         let c1, c2;
         switch (this.blocks.blockList[c].name) {
-            case "pitch":
-                c1 = this.blocks.blockList[c].connections[1];
-                c2 = this.blocks.blockList[c].connections[2];
-                if (this.blocks.blockList[c2].name === "number") {
-                    if (this.blocks.blockList[c1].name === "solfege") {
-                        let solfnotes_ = _("ti la sol fa mi re do").split(" ");
-                        let stripped = this.blocks.blockList[c1].value
-                            .replace(SHARP, "")
-                            .replace(FLAT, "")
-                            .replace(DOUBLESHARP, "")
-                            .replace(DOUBLEFLAT, "");
-                        let i = [
-                            "ti",
-                            "la",
-                            "sol",
-                            "fa",
-                            "mi",
-                            "re",
-                            "do"
-                        ].indexOf(stripped);
-                        if (
-                            this.blocks.blockList[c1].value.indexOf(SHARP) !==
-                            -1
-                        ) {
-                            return (
-                                solfnotes_[i] +
-                                SHARP +
-                                " " +
-                                this.blocks.blockList[c2].value
-                            );
-                        } else if (
-                            this.blocks.blockList[c1].value.indexOf(FLAT) !== -1
-                        ) {
-                            return (
-                                solfnotes_[i] +
-                                FLAT +
-                                " " +
-                                this.blocks.blockList[c2].value
-                            );
-                        } else if (
-                            this.blocks.blockList[c1].value.indexOf(
-                                DOUBLESHARP
-                            ) !== -1
-                        ) {
-                            return (
-                                solfnotes_[i] +
-                                DOUBLESHARP +
-                                " " +
-                                this.blocks.blockList[c2].value
-                            );
-                        } else if (
-                            this.blocks.blockList[c1].value.indexOf(
-                                DOUBLEFLAT
-                            ) !== -1
-                        ) {
-                            return (
-                                solfnotes_[i] +
-                                DOUBLEFLAT +
-                                " " +
-                                this.blocks.blockList[c2].value
-                            );
-                        } else {
-                            return (
-                                solfnotes_[i] +
-                                " " +
-                                this.blocks.blockList[c2].value
-                            );
-                        }
-                    } else if (this.blocks.blockList[c1].name === "notename") {
-                        return (
-                            this.blocks.blockList[c1].value +
-                            " " +
-                            this.blocks.blockList[c2].value
-                        );
-                    } else if (this.blocks.blockList[c1].name === "scaledegree2") {
-                        obj = splitScaleDegree(this.blocks.blockList[c1].value);
-                        let note = obj[0];
-                        if(obj[1] !== NATURAL) {
-                            note += obj[1];
-                        }
-                        return (
-                            note +
-                            " " +
-                            this.blocks.blockList[c2].value
-                        );
+        case "pitch":
+            c1 = this.blocks.blockList[c].connections[1];
+            c2 = this.blocks.blockList[c].connections[2];
+            if (this.blocks.blockList[c2].name === "number") {
+                if (this.blocks.blockList[c1].name === "solfege") {
+                    let solfnotes_ = _("ti la sol fa mi re do").split(" ");
+                    let stripped = this.blocks.blockList[c1].value
+                        .replace(SHARP, "")
+                        .replace(FLAT, "")
+                        .replace(DOUBLESHARP, "")
+                        .replace(DOUBLEFLAT, "");
+                    let i = ["ti", "la", "sol", "fa", "mi", "re", "do"].indexOf(stripped);
+                    if (this.blocks.blockList[c1].value.indexOf(SHARP) !== -1) {
+                        return (solfnotes_[i] + SHARP + " " +
+				this.blocks.blockList[c2].value);
+                    } else if (this.blocks.blockList[c1].value.indexOf(FLAT) !== -1) {
+                        return (solfnotes_[i] + FLAT + " " +
+				this.blocks.blockList[c2].value);
+                    } else if (this.blocks.blockList[c1].value.indexOf(DOUBLESHARP) !== -1) {
+                        return (solfnotes_[i] + DOUBLESHARP + " " +
+				this.blocks.blockList[c2].value);
+                    } else if (this.blocks.blockList[c1].value.indexOf(DOUBLEFLAT) !== -1) {
+                        return (solfnotes_[i] + DOUBLEFLAT + " " +
+				this.blocks.blockList[c2].value);
+                    } else {
+                        return (solfnotes_[i] + " " + this.blocks.blockList[c2].value);
+                    }
+                } else if (this.blocks.blockList[c1].name === "notename") {
+                    return (this.blocks.blockList[c1].value + " " +
+			    this.blocks.blockList[c2].value);
+                } else if (this.blocks.blockList[c1].name === "scaledegree2") {
+                    obj = splitScaleDegree(this.blocks.blockList[c1].value);
+                    let note = obj[0];
+                    if (obj[1] !== NATURAL) {
+                        note += obj[1];
+                    }
+                    return (note + " " + this.blocks.blockList[c2].value);
+                }
+            }
+            break;
+        case "nthmodalpitch":
+            c1 = this.blocks.blockList[c].connections[1];
+            c2 = this.blocks.blockList[c].connections[2];
+            if (this.blocks.blockList[c2].name === "number") {
+                if (this.blocks.blockList[c1].name === "number") {
+                    let degrees = DEGREES.split(" ");
+                    let i = this.blocks.blockList[c1].value - 1;
+                    if (i > 0 && i < degrees.length) {
+                        return (degrees[i] + " " + this.blocks.blockList[c2].value);
+                    } else {
+                        return (this.blocks.blockList[c1].value + " " +
+                                this.blocks.blockList[c2].value);
                     }
                 }
-                break;
-            case "nthmodalpitch":
-                c1 = this.blocks.blockList[c].connections[1];
-                c2 = this.blocks.blockList[c].connections[2];
-                if (this.blocks.blockList[c2].name === "number") {
-                    if (this.blocks.blockList[c1].name === "number") {
-                        let degrees = DEGREES.split(" ");
-                        let i = this.blocks.blockList[c1].value - 1;
-                        if (i > 0 && i < degrees.length) {
-                            return (
-                                degrees[i] +
-                                " " +
-                                this.blocks.blockList[c2].value
-                            );
-                        } else {
-                            return (
-                                this.blocks.blockList[c1].value +
-                                " " +
-                                this.blocks.blockList[c2].value
-                            );
-                        }
-                    }
-                }
-                break;
-            case "hertz":
-                c1 = this.blocks.blockList[c].connections[0];
-                if (this.blocks.blockList[c1].name === "number") {
-                    return this.blocks.blockList[c1].value + "HZ";
-                }
-                break;
-            case "steppitch":
-                c1 = this.blocks.blockList[c].connections[1];
-                if (
-                    this.blocks.blockList[c1].name === "number" &&
-                    this.blocks.blockList[c1].value < 0
-                ) {
-                    //.TRANS: scalar step
-                    return (
-                        _("down") +
-                        " " +
-                        Math.abs(this.blocks.blockList[c1].value)
-                    );
-                } else return _("up") + " " + this.blocks.blockList[c1].value;
-                break;
-            case "pitchnumber":
-                c1 = this.blocks.blockList[c].connections[1];
-                if (this.blocks.blockList[c1].name === "number") {
-                    //.TRANS: pitch number
-                    return _("pitch") + " " + this.blocks.blockList[c1].value;
-                }
-                break;
-            case "playdrum":
-                return _("drum");
-                break;
-            case "rest2":
-                return _("silence");
-                break;
-            default:
-                return "";
+            }
+            break;
+        case "hertz":
+            c1 = this.blocks.blockList[c].connections[0];
+            if (this.blocks.blockList[c1].name === "number") {
+                return this.blocks.blockList[c1].value + "HZ";
+            }
+            break;
+        case "steppitch":
+            c1 = this.blocks.blockList[c].connections[1];
+            if (this.blocks.blockList[c1].name === "number" &&
+                this.blocks.blockList[c1].value < 0) {
+                //.TRANS: scalar step
+                return (_("down") + " " + Math.abs(this.blocks.blockList[c1].value));
+            } else return _("up") + " " + this.blocks.blockList[c1].value;
+            break;
+        case "pitchnumber":
+            c1 = this.blocks.blockList[c].connections[1];
+            if (this.blocks.blockList[c1].name === "number") {
+                //.TRANS: pitch number
+                return _("pitch") + " " + this.blocks.blockList[c1].value;
+            }
+            break;
+        case "playdrum":
+            return _("drum");
+            break;
+        case "rest2":
+            return _("silence");
+            break;
+        default:
+            return "";
         }
     };
 
@@ -2466,10 +2171,7 @@ function Block(protoblock, blocks, overrideName) {
                 let blk = this.blocks.dragGroup[b];
                 // Look to see if the local parent block is collapsed.
                 let parent = this.blocks.insideInlineCollapsibleBlock(blk);
-                if (
-                    parent === null ||
-                    !this.blocks.blockList[parent].collapsed
-                ) {
+                if (parent === null || !this.blocks.blockList[parent].collapsed) {
                     this.blocks.blockList[blk].container.visible = collapse;
                     if (collapse) {
                         this.blocks.blockList[blk].inCollapsed = false;
@@ -2491,12 +2193,10 @@ function Block(protoblock, blocks, overrideName) {
             // if there is more than one arg, e.g. n > 4.
             let n = this.docks.length, dy;
             if (collapse) {
-                dy =
-                    this.blocks.blockList[thisBlock].docks[n - 1][1] -
+                dy = this.blocks.blockList[thisBlock].docks[n - 1][1] -
                     this.blocks.blockList[thisBlock].docks[n - 2][1];
             } else {
-                dy =
-                    this.blocks.blockList[thisBlock].docks[n - 2][1] -
+                dy = this.blocks.blockList[thisBlock].docks[n - 2][1] -
                     this.blocks.blockList[thisBlock].docks[n - 1][1];
             }
 
@@ -2660,24 +2360,15 @@ function Block(protoblock, blocks, overrideName) {
         this.container.on("click", function(event) {
             // We might be able to check which button was clicked.
             if ("nativeEvent" in event) {
-                if (
-                    "button" in event.nativeEvent &&
-                    event.nativeEvent.button == 2
-                ) {
+                if ("button" in event.nativeEvent && event.nativeEvent.button == 2) {
                     that.blocks.stageClick = true;
                     docById("wheelDiv").style.display = "none";
                     that.piemenuBlockContext(thisBlock);
                     return;
-                } else if (
-                    "ctrlKey" in event.nativeEvent &&
-                    event.nativeEvent.ctrlKey
-                ) {
+                } else if ("ctrlKey" in event.nativeEvent && event.nativeEvent.ctrlKey) {
                     that.piemenuBlockContext(thisBlock);
                     return;
-                } else if (
-                    "shiftKey" in event.nativeEvent &&
-                    event.nativeEvent.shiftKey
-                ) {
+                } else if ("shiftKey" in event.nativeEvent && event.nativeEvent.shiftKey) {
                     if (that.blocks.turtles.running()) {
                         that.blocks.logo.doStopTurtles();
 
@@ -2711,17 +2402,12 @@ function Block(protoblock, blocks, overrideName) {
             hideDOMLabel();
             that._checkWidgets(false);
 
+	    let topBlk;
+
             dx = event.stageX / that.blocks.getStageScale() - that.container.x;
-            if (
-                !moved &&
-                that.isCollapsible() &&
-                dx < 30 / that.blocks.getStageScale()
-            ) {
+            if (!moved && that.isCollapsible() && dx < 30 / that.blocks.getStageScale()) {
                 that.collapseToggle();
-            } else if (
-                (!window.hasMouse && getInput) ||
-                (window.hasMouse && !moved)
-            ) {
+            } else if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
                 if (that.name === "media") {
                     that._doOpenMedia(thisBlock);
                 } else if (that.name === "loadFile") {
@@ -2735,15 +2421,9 @@ function Block(protoblock, blocks, overrideName) {
                         }
                     }
                 } else {
-                    if (
-                        !that.blocks.getLongPressStatus() &&
-                        !that.blocks.stageClick
-                    ) {
-                        var topBlock = that.blocks.findTopBlock(thisBlock);
-                        console.debug(
-                            "running from " +
-                            that.blocks.blockList[topBlock].name
-                        );
+                    if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
+                        topBlk = that.blocks.findTopBlock(thisBlock);
+                        console.debug("running from " + that.blocks.blockList[topBlk].name);
                         if (_THIS_IS_MUSIC_BLOCKS_) {
                             that.blocks.logo.synth.resume();
                         }
@@ -2752,22 +2432,17 @@ function Block(protoblock, blocks, overrideName) {
                             that.blocks.logo.doStopTurtles();
 
                             setTimeout(function() {
-                                that.blocks.logo.runLogoCommands(topBlock);
+                                that.blocks.logo.runLogoCommands(topBlk);
                             }, 250);
                         } else {
-                            that.blocks.logo.runLogoCommands(topBlock);
+                            that.blocks.logo.runLogoCommands(topBlk);
                         }
                     }
                 }
             } else if (!moved) {
-                if (
-                    !that.blocks.getLongPressStatus() &&
-                    !that.blocks.stageClick
-                ) {
-                    var topBlock = that.blocks.findTopBlock(thisBlock);
-                    console.debug(
-                        "running from " + that.blocks.blockList[topBlock].name
-                    );
+                if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
+                    topBlk = that.blocks.findTopBlock(thisBlock);
+                    console.debug("running from " + that.blocks.blockList[topBlk].name);
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         that.blocks.logo.synth.resume();
                     }
@@ -2776,10 +2451,10 @@ function Block(protoblock, blocks, overrideName) {
                         that.blocks.logo.doStopTurtles();
 
                         setTimeout(function() {
-                            that.blocks.logo.runLogoCommands(topBlock);
+                            that.blocks.logo.runLogoCommands(topBlk);
                         }, 250);
                     } else {
-                        that.blocks.logo.runLogoCommands(topBlock);
+                        that.blocks.logo.runLogoCommands(topBlk);
                     }
                 }
             }
@@ -2805,10 +2480,8 @@ function Block(protoblock, blocks, overrideName) {
 
             // And possibly the collapse button.
             if (that.collapseContainer != null) {
-                that.blocks.stage.setChildIndex(
-                    that.collapseContainer,
-                    that.blocks.stage.children.length - 1
-                );
+                that.blocks.stage.setChildIndex(that.collapseContainer,
+						that.blocks.stage.children.length - 1);
             }
 
             moved = false;
@@ -2838,15 +2511,10 @@ function Block(protoblock, blocks, overrideName) {
                 // Make it eaiser to select text on mobile.
                 setTimeout(function() {
                     moved =
-                        Math.abs(
-                            event.stageX / that.blocks.getStageScale() -
-                            that.original.x
-                        ) +
-                        Math.abs(
-                            event.stageY / that.blocks.getStageScale() -
-                            that.original.y
-                        ) >
-                        20 && !window.hasMouse;
+			Math.abs(event.stageX / that.blocks.getStageScale() -
+				 that.original.x) +
+                        Math.abs(event.stageY / that.blocks.getStageScale() -
+				 that.original.y) > 20 && !window.hasMouse;
                     getInput = !moved;
                 }, 200);
             }
@@ -2854,16 +2522,10 @@ function Block(protoblock, blocks, overrideName) {
             let oldX = that.container.x;
             let oldY = that.container.y;
 
-            let dx = Math.round(
-                event.stageX / that.blocks.getStageScale() +
-                that.offset.x -
-                oldX
-            );
-            let dy = Math.round(
-                event.stageY / that.blocks.getStageScale() +
-                that.offset.y -
-                oldY
-            );
+            let dx = Math.round(event.stageX / that.blocks.getStageScale() +
+				that.offset.x - oldX);
+            let dy = Math.round(event.stageY / that.blocks.getStageScale() +
+				that.offset.y - oldY);
 
             let finalPos = oldY + dy;
             if (that.blocks.stage.y === 0 && finalPos < 45) {
@@ -2893,12 +2555,8 @@ function Block(protoblock, blocks, overrideName) {
             that.blocks.moveBlockRelative(thisBlock, dx, dy);
 
             // If we are over the trash, warn the user.
-            if (
-                trashcan.overTrashcan(
-                    event.stageX / that.blocks.getStageScale(),
-                    event.stageY / that.blocks.getStageScale()
-                )
-            ) {
+            if (trashcan.overTrashcan(event.stageX / that.blocks.getStageScale(),
+				      event.stageY / that.blocks.getStageScale())) {
                 trashcan.startHighlightAnimation();
             } else {
                 trashcan.stopHighlightAnimation();
@@ -2981,12 +2639,8 @@ function Block(protoblock, blocks, overrideName) {
 
         if (moved) {
             // Check if block is in the trash.
-            if (
-                trashcan.overTrashcan(
-                    event.stageX / this.blocks.getStageScale(),
-                    event.stageY / this.blocks.getStageScale()
-                )
-            ) {
+            if (trashcan.overTrashcan(event.stageX / this.blocks.getStageScale(),
+				      event.stageY / this.blocks.getStageScale())) {
                 if (trashcan.isVisible) {
                     this.blocks.sendStackToTrash(this);
                 }
@@ -3026,13 +2680,10 @@ function Block(protoblock, blocks, overrideName) {
         if (hideDOM) {
             // Did the mouse move out off the block? If so, hide the
             // label DOM element.
-            if (
-                event.stageX / this.blocks.getStageScale() < this.container.x ||
+            if (event.stageX / this.blocks.getStageScale() < this.container.x ||
                 event.stageX / this.blocks.getStageScale() >
-                this.container.x + this.width ||
-                event.stageY < this.container.y ||
-                event.stageY > this.container.y + this.hitHeight
-            ) {
+		(this.container.x + this.width) || event.stageY < this.container.y ||
+                event.stageY > (this.container.y + this.hitHeight)) {
                 // There are lots of special cases where we want to
                 // use piemenus. Make sure this is not one of them.
                 if (!this._usePiemenu()) {
@@ -3107,57 +2758,55 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
-        if (
-            [
-                "steppitch",
-                "pitchnumber",
-                "meter",
-                "register",
-                "nthmodalpitch",
-                "rhythmicdot2",
-                "crescendo",
-                "decrescendo",
-                "harmonic2",
-                "interval",
-                "setscalartransposition",
-                "semitoneinterval",
-                "settransposition",
-                "setnotevolume",
-                "articulation",
-                "vibrato",
-                "dis",
-                "neighbor",
-                "neighbor2",
-                "tremolo",
-                "chorus",
-                "phaser",
-                "amsynth",
-                "fmsynth",
-                "duosynth",
-                "rhythm2",
-                "stuplet",
-                "duplicatenotes",
-                "setcolor",
-                "setshade",
-                "setgrey",
-                "sethue",
-                "setpensize",
-                "settranslucency",
-                "setheading",
-                "arc",
-                "onbeatdo",
-                "hertz",
-                "right",
-                "left",
-                "setpanning",
-                "setbpm3",
-                "setmasterbpm2"
-            ].indexOf(this.blocks.blockList[this.connections[0]].name) === -1
-        ) {
+        if (["steppitch",
+             "pitchnumber",
+             "meter",
+             "register",
+             "nthmodalpitch",
+             "rhythmicdot2",
+             "crescendo",
+             "decrescendo",
+             "harmonic2",
+             "interval",
+             "setscalartransposition",
+             "semitoneinterval",
+             "settransposition",
+             "setnotevolume",
+             "articulation",
+             "vibrato",
+             "dis",
+             "neighbor",
+             "neighbor2",
+             "tremolo",
+             "chorus",
+             "phaser",
+             "amsynth",
+             "fmsynth",
+             "duosynth",
+             "rhythm2",
+             "stuplet",
+             "duplicatenotes",
+             "setcolor",
+             "setshade",
+             "setgrey",
+             "sethue",
+             "setpensize",
+             "settranslucency",
+             "setheading",
+             "arc",
+             "onbeatdo",
+             "hertz",
+             "right",
+             "left",
+             "setpanning",
+             "setbpm3",
+             "setmasterbpm2"
+            ].indexOf(this.blocks.blockList[this.connections[0]].name) === -1) {
             return false;
         }
 
-        return this.blocks.blockList[cblk].connections[1] === this.blocks.blockList.indexOf(this);
+        return this.blocks.blockList[cblk].connections[1] ===
+	    this.blocks.blockList.indexOf(this);
     };
 
     this._usePieNumberC2 = function() {
@@ -3171,20 +2820,17 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
-        if (
-            [
-                "setsynthvolume",
-                "tremolo",
-                "chorus",
-                "phaser",
-                "duosynth",
-                "arc"
-            ].indexOf(this.blocks.blockList[cblk].name) === -1
-        ) {
+        if (["setsynthvolume",
+             "tremolo",
+             "chorus",
+             "phaser",
+             "duosynth",
+             "arc"].indexOf(this.blocks.blockList[cblk].name) === -1) {
             return false;
         }
 
-        return this.blocks.blockList[cblk].connections[2] === this.blocks.blockList.indexOf(this);
+        return this.blocks.blockList[cblk].connections[2] ===
+	    this.blocks.blockList.indexOf(this);
     };
 
     this._usePieNumberC3 = function() {
@@ -3202,7 +2848,8 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
-        return this.blocks.blockList[cblk].connections[3] === this.blocks.blockList.indexOf(this);
+        return this.blocks.blockList[cblk].connections[3] ===
+	    this.blocks.blockList.indexOf(this);
     };
 
     this._ensureDecorationOnTop = function() {
@@ -3216,16 +2863,11 @@ function Block(protoblock, blocks, overrideName) {
                     dx = (25 * this.protoblock.scale) / 2;
                 }
 
-                for (
-                    let turtle = 0;
-                    turtle < this.blocks.turtles.turtleList.length;
-                    turtle++
-                ) {
+                for (let t = 0; t < this.blocks.turtles.turtleList.length; t++) {
                     if (
-                        this.blocks.turtles.turtleList[turtle].startBlock
-                            === this
+                        this.blocks.turtles.turtleList[t].startBlock === this
                     ) {
-                        this.blocks.turtles.turtleList[turtle].decorationBitmap.x =
+                        this.blocks.turtles.turtleList[t].decorationBitmap.x =
                             this.width - dx - (30 * this.protoblock.scale) / 2;
                         break;
                     }
@@ -3289,8 +2931,7 @@ function Block(protoblock, blocks, overrideName) {
         if (this.name === "text") {
             labelElem.innerHTML =
                 '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="text" type="text" value="' +
-                labelValue +
-                '" />';
+                labelValue + '" />';
             labelElem.classList.add("hasKeyboard");
             this.label = docById("textLabel");
         } else if (this.name === "solfege") {
@@ -3300,27 +2941,14 @@ function Block(protoblock, blocks, overrideName) {
             let solfnotes_ = _("ti la sol fa mi re do").split(" ");
 
             if (this.piemenuOKtoLaunch()) {
-                this._piemenuPitches(
-                    solfnotes_,
-                    SOLFNOTES,
-                    SOLFATTRS,
-                    obj[0],
-                    obj[1]
-                );
+                this._piemenuPitches(solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
             }
         } else if (this.name === "scaledegree2") {
             obj = splitScaleDegree(this.value);
             let scalenotes_ = ("7 6 5 4 3 2 1").split(" ");
-            if(this.piemenuOKtoLaunch()) {
-                this._piemenuPitches(
-                    scalenotes_,
-                    SCALENOTES,
-                    SOLFATTRS,
-                    obj[0],
-                    obj[1]
-                )
+            if (this.piemenuOKtoLaunch()) {
+                this._piemenuPitches(scalenotes_, SCALENOTES, SOLFATTRS, obj[0], obj[1]);
             };
-
         } else if (this.name === "customNote") {
             if (!this.blocks.logo.customTemperamentDefined) {
                 // If custom temperament is not defined by user,
@@ -3329,40 +2957,32 @@ function Block(protoblock, blocks, overrideName) {
                 let solfnotes_ = _("ti la sol fa mi re do").split(" ");
 
                 if (this.piemenuOKtoLaunch()) {
-                    this._piemenuPitches(
-                        solfnotes_,
-                        SOLFNOTES,
-                        SOLFATTRS,
-                        obj[0],
-                        obj[1]
-                    );
+                    this._piemenuPitches(solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
                 }
             } else {
-                let noteLabels = TEMPERAMENT ;
+                let noteLabels = TEMPERAMENT;
 
                 let customLabels =  [];
                 for (let lab in noteLabels)
-                    if (!(lab in PreDefinedTemperaments))customLabels.push(lab);
+                    if (!(lab in PreDefinedTemperaments)) {
+			customLabels.push(lab);
+		    }
 
-                let selectedCustom ;
+                let selectedCustom;
                 if (this.customID != null) {
-                    selectedCustom = this.customID ;
+                    selectedCustom = this.customID;
                 } else {
                     selectedCustom = customLabels[0];
                 }
 
-                let selectedNote ;
+                let selectedNote;
                 if (this.value != null) {
                     selectedNote = this.value;
                 } else {
                     selectedNote = TEMPERAMENT[selectedCustom]["0"][1];
                 }
-                this._customNotes(
-                    noteLabels,
-                    customLabels,
-                    selectedCustom,
-                    selectedNote
-                );
+
+                this._customNotes(noteLabels, customLabels, selectedCustom, selectedNote);
             }
         } else if (this.name === "eastindiansolfege") {
             obj = splitSolfege(this.value);
@@ -3370,13 +2990,8 @@ function Block(protoblock, blocks, overrideName) {
             selectedattr = obj[1];
 
             if (this.piemenuOKtoLaunch()) {
-                this._piemenuPitches(
-                    EASTINDIANSOLFNOTES,
-                    SOLFNOTES,
-                    SOLFATTRS,
-                    obj[0],
-                    obj[1]
-                );
+                this._piemenuPitches(EASTINDIANSOLFNOTES, SOLFNOTES, SOLFATTRS, obj[0],
+				     obj[1]);
             }
         } else if (this.name === "notename") {
             const NOTENOTES = ["B", "A", "G", "F", "E", "D", "C"];
@@ -3399,13 +3014,8 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             if (this.piemenuOKtoLaunch()) {
-                this._piemenuPitches(
-                    NOTENOTES,
-                    NOTENOTES,
-                    SOLFATTRS,
-                    selectednote,
-                    selectedattr
-                );
+                this._piemenuPitches(NOTENOTES, NOTENOTES, SOLFATTRS, selectednote,
+				     selectedattr);
             }
         } else if (this.name === "modename") {
             if (this.value != null) {
@@ -3423,14 +3033,9 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             if (this.piemenuOKtoLaunch()) {
-                this._piemenuAccidentals(
-                    ACCIDENTALLABELS,
-                    ACCIDENTALNAMES,
-                    selectedaccidental
-                );
+                this._piemenuAccidentals(ACCIDENTALLABELS, ACCIDENTALNAMES,
+					 selectedaccidental);
             }
-            // labelElem.innerHTML = '';
-            // this.label = docById('accidentalnameLabel');
         } else if (this.name === "intervalname") {
             if (this.value != null) {
                 selectedinterval = this.value;
@@ -3489,12 +3094,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
 
-            this._piemenuVoices(
-                drumLabels,
-                drumValues,
-                categories,
-                selecteddrum
-            );
+            this._piemenuVoices(DrumLabels, drumValues, categories, selecteddrum);
         } else if (this.name === "effectsname") {
             if (this.value != null) {
                  selecteddrum = this.value;
@@ -3527,12 +3127,8 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
 
-            this._piemenuVoices(
-                effectLabels,
-                effectValues,
-                effectcategories,
-                selectedeffect
-            );
+            this._piemenuVoices(effectLabels, effectValues, effectcategories,
+				selectedeffect);
         } else if (this.name === "filtertype") {
             if (this.value != null) {
                 selectedtype = this.value;
@@ -3547,12 +3143,8 @@ function Block(protoblock, blocks, overrideName) {
                 filterValues.push(FILTERTYPES[i][1]);
             }
 
-            this._piemenuBasic(
-                filterLabels,
-                filterValues,
-                selectedtype,
-                platformColor.piemenuBasic
-            );
+            this._piemenuBasic(filterLabels, filterValues, selectedtype,
+			       platformColor.piemenuBasic);
         } else if (this.name === "oscillatortype") {
             if (this.value != null) {
                 selectedtype = this.value;
@@ -3567,12 +3159,8 @@ function Block(protoblock, blocks, overrideName) {
                 oscValues.push(OSCTYPES[i][1]);
             }
 
-            this._piemenuBasic(
-                oscLabels,
-                oscValues,
-                selectedtype,
-                platformColor.piemenuBasic
-            );
+            this._piemenuBasic(oscLabels, oscValues, selectedtype,
+			       platformColor.piemenuBasic);
         } else if (this.name === "voicename") {
             if (this.value != null) {
                 selectedvoice = this.value;
@@ -3606,12 +3194,7 @@ function Block(protoblock, blocks, overrideName) {
                 categories.push(categoriesList.indexOf(VOICENAMES[i][3]));
             }
 
-            this._piemenuVoices(
-                voiceLabels,
-                voiceValues,
-                categories,
-                selectedvoice
-            );
+            this._piemenuVoices(voiceLabels, voiceValues, categories, selectedvoice);
         } else if (this.name === "noisename") {
             if (this.value != null) {
                 selectednoise = this.value;
@@ -3671,12 +3254,8 @@ function Block(protoblock, blocks, overrideName) {
                 temperamentValues.push(TEMPERAMENTS[i][1]);
             }
 
-            this._piemenuBasic(
-                temperamentLabels,
-                temperamentValues,
-                selectedTemperament,
-                platformColor.piemenuBasic
-            );
+            this._piemenuBasic(temperamentLabels, temperamentValues, selectedTemperament,
+			       platformColor.piemenuBasic);
         } else if (this.name === "boolean") {
             if (this.value != null) {
                 selectedvalue = this.value;
@@ -3692,26 +3271,21 @@ function Block(protoblock, blocks, overrideName) {
 
             selectedvalue = this.value;
 
-            let Labels = [
-                _("Cartesian"),
-                _("polar"),
-                _("Cartesian+polar") ,
-                _("treble") ,
-                _("grand staff") ,
-                _("mezzo-soprano") ,
-                _("alto") ,
-                _("tenor"),
-                _("bass") ,
-                _("none")
-            ];
-            let Values = Labels ;
+            let gridLabels = [_("Cartesian"),
+			      _("polar"),
+			      _("Cartesian+polar") ,
+			      _("treble") ,
+			      _("grand staff") ,
+			      _("mezzo-soprano") ,
+			      _("alto") ,
+			      _("tenor"),
+			      _("bass") ,
+			      _("none")
+			     ];
+            let gridValues = gridLabels ;
 
-            this._piemenuBasic(
-                Labels,
-                Values,
-                selectedvalue,
-                platformColor.piemenuBasic
-            );
+            this._piemenuBasic(gridLabels, gridValues, selectedvalue,
+			       platformColor.piemenuBasic);
         } else if (this.name === "outputtools") {
             selectedvalue = this.privateData;
             let Labels;
@@ -3722,12 +3296,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             let Values = Labels;
-            this._piemenuBasic(
-                Labels,
-                Values,
-                selectedvalue,
-                platformColor.piemenuBasic
-            );
+            this._piemenuBasic(Labels, Values, selectedvalue, platformColor.piemenuBasic);
         } else {
             // If the number block is connected to a pitch block, then
             // use the pie menu for octaves. Other special cases as well.
@@ -3738,12 +3307,9 @@ function Block(protoblock, blocks, overrideName) {
                 let cblk = this.connections[0];
                 if (cblk !== null) {
                     cblk = this.blocks.blockList[cblk].connections[0];
-                    if (
-                        cblk !== null &&
-                        ["rhythm2", "stuplet"].indexOf(
-                            this.blocks.blockList[cblk].name
-                        ) !== -1
-                    ) {
+                    if (cblk !== null &&
+                        ["rhythm2", "stuplet"].indexOf(this.blocks.blockList[cblk].name)
+			!== -1) {
                         this._piemenuNumber([2, 4, 8, 16], this.value);
                     } else {
                         this._piemenuNoteValue(this.value);
@@ -3766,12 +3332,9 @@ function Block(protoblock, blocks, overrideName) {
                 let cblk = this.connections[0];
                 if (cblk !== null) {
                     cblk = this.blocks.blockList[cblk].connections[0];
-                    if (
-                        cblk !== null &&
+                    if (cblk !== null &&
                         ["neighbor", "neighbor2", "rhythm2", "stuplet"].indexOf(
-                            this.blocks.blockList[cblk].name
-                        ) !== -1
-                    ) {
+                            this.blocks.blockList[cblk].name) !== -1) {
                         values = [3, 2, 1];
                     }
                 }
@@ -3784,550 +3347,211 @@ function Block(protoblock, blocks, overrideName) {
                     this.blocks.blockList[this.connections[0]].connections[0]
                     ].name;
                 switch (name) {
-                    case "interval":
-                    case "setscalartransposition":
-                        this._piemenuNumber(
-                            [
-                                -7,
-                                -6,
-                                -5,
-                                -4,
-                                -3,
-                                -2,
-                                -1,
-                                0,
-                                1,
-                                2,
-                                3,
-                                4,
-                                5,
-                                6,
-                                7
-                            ],
-                            this.value
-                        );
-                        break;
-                    case "semitoneinterval":
-                    case "settransposition":
-                        this._piemenuNumber(
-                            [
-                                -12,
-                                -11,
-                                -10,
-                                -9,
-                                -8,
-                                -7,
-                                -6,
-                                -5,
-                                -4,
-                                -3,
-                                -2,
-                                -1,
-                                0,
-                                1,
-                                2,
-                                3,
-                                4,
-                                5,
-                                6,
-                                7,
-                                8,
-                                9,
-                                10,
-                                11,
-                                12
-                            ],
-                            this.value
-                        );
-                        break;
+                case "interval":
+                case "setscalartransposition":
+                    this._piemenuNumber(
+			[-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7], this.value);
+                    break;
+                case "semitoneinterval":
+                case "settransposition":
+                    this._piemenuNumber(
+                        [-12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0,
+                         1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], this.value);
+                    break;
                 }
             } else if (this._usePieNumberC3()) {
                 if (this.blocks.blockList[this.connections[0]].name === "chorus") {
                     this._piemenuNumber(
-                        [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-                        this.value
-                    );
+                        [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], this.value);
                 }
             } else if (this._usePieNumberC2()) {
                 switch (this.blocks.blockList[this.connections[0]].name) {
-                    case "duosynth":
-                        this._piemenuNumber(
-                            [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-                            this.value
-                        );
-                        break;
-                    case "setsynthvolume":
-                    case "tremolo":
-                        this._piemenuNumber(
-                            [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-                            this.value
-                        );
-                        break;
-                    case "chorus":
-                        this._piemenuNumber(
-                            [2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 9, 10],
-                            this.value
-                        );
-                        break;
-                    case "phaser":
-                        this._piemenuNumber([1, 2, 3], this.value);
-                        break;
-                    case "arc":
-                        this._piemenuNumber(
-                            [
-                                25,
-                                50,
-                                75,
-                                100,
-                                125,
-                                150,
-                                175,
-                                200,
-                                225,
-                                250,
-                                275,
-                                300
-                            ],
-                            this.value
-                        );
-                        break;
+                case "duosynth":
+                    this._piemenuNumber([10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+					this.value);
+                    break;
+                case "setsynthvolume":
+                case "tremolo":
+                    this._piemenuNumber([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+					this.value);
+                    break;
+                case "chorus":
+                    this._piemenuNumber([2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 9, 10],
+					this.value);
+                    break;
+                case "phaser":
+                    this._piemenuNumber([1, 2, 3], this.value);
+                    break;
+                case "arc":
+                    this._piemenuNumber(
+                        [25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300],
+                        this.value);
+                    break;
                 }
             } else if (this._usePieNumberC1()) {
                 switch (this.blocks.blockList[this.connections[0]].name) {
-                    case "setpensize":
-                        this._piemenuNumber(
-                            [1, 2, 3, 5, 10, 15, 25, 50, 100],
-                            this.value
-                        );
-                        break;
-                    case "setcolor":
-                    case "sethue":
-                        this._piemenuColor(
-                            [0, 10, 20, 30, 40, 50, 60, 70, 80, 90],
-                            this.value,
-                            this.blocks.blockList[this.connections[0]].name
-                        );
-                        break;
-                    case "setshade":
-                    case "settranslucency":
-                    case "setgrey":
-                        this._piemenuColor(
-                            [100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0],
-                            this.value,
-                            this.blocks.blockList[this.connections[0]].name
-                        );
-                        break;
-                    case "duplicatenotes":
-                        this._piemenuNumber([2, 3, 4, 5, 6, 7, 8], this.value);
-                        break;
-                    case "setheading":
-                        this._piemenuNumber(
-                            [
-                                0,
-                                30,
-                                45,
-                                60,
-                                90,
-                                120,
-                                135,
-                                150,
-                                180,
-                                210,
-                                225,
-                                240,
-                                270,
-                                300,
-                                315,
-                                330
-                            ],
-                            this.value
-                        );
-                        break;
-                    case "rhythm2":
-                        this._piemenuNumber(
-                            [
-                                1,
-                                2,
-                                3,
-                                4,
-                                5,
-                                6,
-                                7,
-                                8,
-                                9,
-                                10,
-                                11,
-                                12,
-                                13,
-                                14,
-                                15,
-                                16
-                            ],
-                            this.value
-                        );
-                        break;
-                    case "stuplet":
-                        this._piemenuNumber([3, 5, 7, 11], this.value);
-                        break;
-                    case "amsynth": // harmocity
-                        this._piemenuNumber([1, 2], this.value);
-                        break;
-                    case "fmsynth": // modulation index
-                        this._piemenuNumber([1, 5, 10, 15, 20, 25], this.value);
-                        break;
-                    case "chorus":
-                        this._piemenuNumber(
-                            [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5],
-                            this.value
-                        );
-                        break;
-                    case "phaser":
-                    case "tremolo":
-                        this._piemenuNumber(
-                            [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 20],
-                            this.value
-                        );
-                        break;
-                    case "arc":
-                        this._piemenuNumber(
-                            [
-                                15,
-                                30,
-                                45,
-                                60,
-                                75,
-                                90,
-                                105,
-                                120,
-                                135,
-                                150,
-                                165,
-                                180,
-                                195,
-                                210,
-                                225,
-                                240,
-                                255,
-                                270,
-                                285,
-                                300,
-                                315,
-                                330,
-                                345,
-                                360
-                            ],
-                            this.value
-                        );
-                        break;
-                    case "rhythmicdot2":
-                        this._piemenuNumber([1, 2, 3], this.value);
-                        break;
-                    case "register":
-                        this._piemenuNumber(
-                            [-3, -2, -1, 0, 1, 2, 3],
-                            this.value
-                        );
-                        break;
-                    case "nthmodalpitch":
-                        this._piemenuNthModalPitch(
-                            [7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7],
-                            this.value
-                        );
-                        break;
-                    case "onbeatdo":
-                    case "meter":
-                        this._piemenuNumber(
-                            [
-                                1,
-                                2,
-                                3,
-                                4,
-                                5,
-                                6,
-                                7,
-                                8,
-                                9,
-                                10,
-                                11,
-                                12,
-                                13,
-                                14,
-                                15,
-                                16
-                            ],
-                            this.value
-                        );
-                        break;
-                    case "pitchnumber":
-                        let temperament;
-                        for (let i = 0; i < this.blocks.blockList.length; i++) {
-                            if (
-                                this.blocks.blockList[i].name ===
-                                "settemperament" &&
-                                this.blocks.blockList[i].connections[0] !== null
-                            ) {
-                                let index = this.blocks.blockList[i]
-                                    .connections[1];
-                                temperament = this.blocks.blockList[index]
-                                    .value;
-                            }
-                        }
-
-                        if (temperament === undefined) {
-                            temperament = "equal";
-                        }
-
-                        if (temperament === "equal") {
-                            this._piemenuNumber(
-                                [
-                                    -3,
-                                    -2,
-                                    -1,
-                                    0,
-                                    1,
-                                    2,
-                                    3,
-                                    4,
-                                    5,
-                                    6,
-                                    7,
-                                    8,
-                                    9,
-                                    10,
-                                    11,
-                                    12
-                                ],
-                                this.value
-                            );
-                        } else {
-                            let pitchNumbers = [];
-                            for (
-                                let i = 0;
-                                i < TEMPERAMENT[temperament]["pitchNumber"];
-                                i++
-                            ) {
-                                pitchNumbers.push(i);
-                            }
-                            this._piemenuNumber(pitchNumbers, this.value);
-                        }
-                        break;
-                    case "neighbor":
-                    case "neighbor2":
-                    case "steppitch":
-                    case "interval":
-                    case "setscalartransposition":
-                        this._piemenuNumber(
-                            [
-                                -7,
-                                -6,
-                                -5,
-                                -4,
-                                -3,
-                                -2,
-                                -1,
-                                0,
-                                1,
-                                2,
-                                3,
-                                4,
-                                5,
-                                6,
-                                7
-                            ],
-                            this.value
-                        );
-                        break;
-                    case "decrescendo":
-                    case "crescendo":
-                        this._piemenuNumber(
-                            [1, 2, 3, 4, 5, 10, 15, 20],
-                            this.value
-                        );
-                        break;
-                    case "harmonic2":
-                        this._piemenuNumber(
-                            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-                            this.value
-                        );
-                        break;
-                    case "vibrato":
-                        this._piemenuNumber(
-                            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-                            this.value
-                        );
-                        break;
-                    case "semitoneinterval":
-                    case "settransposition":
-                        this._piemenuNumber(
-                            [
-                                -12,
-                                -11,
-                                -10,
-                                -9,
-                                -8,
-                                -7,
-                                -6,
-                                -5,
-                                -4,
-                                -3,
-                                -2,
-                                -1,
-                                0,
-                                1,
-                                2,
-                                3,
-                                4,
-                                5,
-                                6,
-                                7,
-                                8,
-                                9,
-                                10,
-                                11,
-                                12
-                            ],
-                            this.value
-                        );
-                        break;
-                    case "setnotevolume":
-                        this._piemenuNumber(
-                            [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-                            this.value
-                        );
-                        break;
-                    case "dis":
-                    case "duosynth":
-                        this._piemenuNumber(
-                            [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-                            this.value
-                        );
-                        break;
-                    case "articulation":
-                        this._piemenuNumber(
-                            [-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25],
-                            this.value
-                        );
-                        break;
-                    case "hertz":
-                        this._piemenuNumber(
-                            [
-                                220,
-                                247,
-                                262,
-                                294,
-                                330,
-                                349,
-                                392,
-                                440,
-                                494,
-                                523,
-                                587,
-                                659,
-                                698,
-                                784,
-                                880
-                            ],
-                            this.value
-                        );
-                        break;
-                    case "right":
-                        this._piemenuNumber(
-                            [
-                                0,
-                                30,
-                                60,
-                                90,
-                                120,
-                                150,
-                                180,
-                                210,
-                                240,
-                                270,
-                                300,
-                                330
-                            ],
-                            this.value
-                        );
-                        break;
-                    case "left":
-                        this._piemenuNumber(
-                            [
-                                330,
-                                300,
-                                270,
-                                240,
-                                210,
-                                180,
-                                150,
-                                120,
-                                90,
-                                60,
-                                30,
-                                0
-                            ],
-                            this.value
-                        );
-                        break;
-                    case "setpanning":
-                        this._piemenuNumber(
-                            [ 100, 80, 60, 40, 20, 0, -20, -40, -60, -80, -100],
-                            this.value
-                        );
-                        break;
-                    case "setbpm3": case "setmasterbpm2": 
-                        this._piemenuNumber ( 
-                        [
-                        40,
-                        42,
-                        44,
-                        46,
-                        48,
-                        50,
-                        52,
-                        54,
-                        56,
-                        58,
-                        60,
-                        63,
-                        66,
-                        69,
-                        72,
-                        76,
-                        80,
-                        84,
-                        88,
-                        90,
-                        92,
-                        96,
-                        100,
-                        104,
-                        108,
-                        112,
-                        116,
-                        120,
-                        126,
-                        132,
-                        138,
-                        144,
-                        152,
-                        160,
-                        168,
-                        176,
-                        184,
-                        192,
-                        200,
-                        208,
-                    ],
-                    this.value
-                    );
+                case "setpensize":
+                    this._piemenuNumber([1, 2, 3, 5, 10, 15, 25, 50, 100], this.value);
                     break;
+                case "setcolor":
+                case "sethue":
+                    this._piemenuColor([0, 10, 20, 30, 40, 50, 60, 70, 80, 90],
+				       this.value,
+				       this.blocks.blockList[this.connections[0]].name);
+                    break;
+                case "setshade":
+                case "settranslucency":
+                case "setgrey":
+                    this._piemenuColor([100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0],
+				       this.value,
+				       this.blocks.blockList[this.connections[0]].name);
+		    break;
+                case "duplicatenotes":
+                    this._piemenuNumber([2, 3, 4, 5, 6, 7, 8], this.value);
+                    break;
+                case "setheading":
+                    this._piemenuNumber(
+                        [0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300,
+			 315, 330], this.value);
+                    break;
+                case "rhythm2":
+                    this._piemenuNumber(
+                        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+                        this.value);
+                    break;
+                case "stuplet":
+                    this._piemenuNumber([3, 5, 7, 11], this.value);
+                    break;
+                case "amsynth": // harmocity
+                    this._piemenuNumber([1, 2], this.value);
+                    break;
+                case "fmsynth": // modulation index
+                    this._piemenuNumber([1, 5, 10, 15, 20, 25], this.value);
+                    break;
+                case "chorus":
+                    this._piemenuNumber([0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5],
+					this.value);
+                    break;
+                case "phaser":
+                case "tremolo":
+                    this._piemenuNumber([0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 20],
+					this.value);
+                    break;
+                case "arc":
+                    this._piemenuNumber(
+                        [15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180, 195, 210,
+			 225, 240, 255, 270, 285, 300, 315, 330, 345, 360],
+                        this.value);
+                    break;
+                case "rhythmicdot2":
+                    this._piemenuNumber([1, 2, 3], this.value);
+                    break;
+                case "register":
+                    this._piemenuNumber([-3, -2, -1, 0, 1, 2, 3], this.value);
+                    break;
+                case "nthmodalpitch":
+                    this._piemenuNthModalPitch(
+                        [7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7], this.value);
+                    break;
+                case "onbeatdo":
+                case "meter":
+                    this._piemenuNumber(
+                        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+                        this.value);
+                    break;
+                case "pitchnumber":
+                    let temperament;
+                    for (let i = 0; i < this.blocks.blockList.length; i++) {
+                        if (this.blocks.blockList[i].name === "settemperament" &&
+                            this.blocks.blockList[i].connections[0] !== null) {
+                            let index = this.blocks.blockList[i].connections[1];
+                            temperament = this.blocks.blockList[index].value;
+                        }
+                    }
 
+                    if (temperament === undefined) {
+                        temperament = "equal";
+                    }
+
+                    if (temperament === "equal") {
+                        this._piemenuNumber(
+                            [-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                            this.value);
+                    } else {
+                        let pitchNumbers = [];
+                        for (let i = 0; i < TEMPERAMENT[temperament]["pitchNumber"]; i++) {
+                            pitchNumbers.push(i);
+                        }
+                        this._piemenuNumber(pitchNumbers, this.value);
+                    }
+                    break;
+                case "neighbor":
+                case "neighbor2":
+                case "steppitch":
+                case "interval":
+                case "setscalartransposition":
+                    this._piemenuNumber(
+			[-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7],
+                        this.value);
+                    break;
+                case "decrescendo":
+                case "crescendo":
+                    this._piemenuNumber([1, 2, 3, 4, 5, 10, 15, 20], this.value);
+                    break;
+                case "harmonic2":
+                    this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], this.value);
+                    break;
+                case "vibrato":
+                    this._piemenuNumber([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], this.value);
+                    break;
+                case "semitoneinterval":
+                case "settransposition":
+                    this._piemenuNumber(
+                        [-12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0,
+			 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], this.value);
+                    break;
+                case "setnotevolume":
+                    this._piemenuNumber([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+					this.value);
+                    break;
+                case "dis":
+                case "duosynth":
+                    this._piemenuNumber([10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+					this.value);
+                    break;
+                case "articulation":
+                    this._piemenuNumber([-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25],
+					this.value);
+                    break;
+                case "hertz":
+                    this._piemenuNumber(
+                        [220, 247, 262, 294, 330, 349, 392, 440, 494, 523, 587, 659, 698,
+			 784, 880], this.value);
+                    break;
+                case "right":
+                    this._piemenuNumber(
+                        [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330],
+			this.value);
+                    break;
+                case "left":
+                    this._piemenuNumber(
+                        [330, 300, 270, 240, 210, 180, 150, 120, 90, 60, 30, 0],
+                        this.value);
+                    break;
+                case "setpanning":
+                    this._piemenuNumber([100, 80, 60, 40, 20, 0, -20, -40, -60, -80, -100],
+					this.value);
+                    break;
+                case "setbpm3": case "setmasterbpm2": 
+                    this._piemenuNumber ( 
+			[42, 46, 50, 54, 58, 63, 69, 76, 84, 90, 96, 104, 112, 120, 132,
+			 144,  160,  176,  192,  208], this.value);
+                    break;
                 }
             } else {
                 labelElem.innerHTML =
                     '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' +
-                    labelValue +
-                    '" />';
+                    labelValue + '" />';
                 labelElem.classList.add("hasKeyboard");
                 this.label = docById("numberLabel");
             }
@@ -4381,26 +3605,17 @@ function Block(protoblock, blocks, overrideName) {
                 that._labelChanged(false, true);
             });
 
-            this.label.style.left =
-                Math.round(
-                    (x + this.blocks.stage.x) * this.blocks.getStageScale() +
-                    canvasLeft
-                ) + "px";
-            this.label.style.top =
-                Math.round(
-                    (y + this.blocks.stage.y) * this.blocks.getStageScale() +
-                    canvasTop
-                ) + "px";
-            this.label.style.width =
-                (Math.round(selectorWidth * this.blocks.blockScale) *
-                    this.protoblock.scale) /
-                2 +
-                "px";
+            this.label.style.left = Math.round(
+		(x + this.blocks.stage.x) *
+		    this.blocks.getStageScale() + canvasLeft) + "px";
+            this.label.style.top = Math.round(
+		(y + this.blocks.stage.y) *
+		    this.blocks.getStageScale() + canvasTop) + "px";
+            this.label.style.width = Math.round(
+		selectorWidth * this.blocks.blockScale * this.protoblock.scale / 2) + "px";
 
-            this.label.style.fontSize =
-                Math.round(
-                    (20 * this.blocks.blockScale * this.protoblock.scale) / 2
-                ) + "px";
+            this.label.style.fontSize = Math.round(
+		20 * this.blocks.blockScale * this.protoblock.scale / 2) + "px";
             this.label.style.display = "";
             this.label.focus();
             if (this.labelattr != null) {
@@ -4447,44 +3662,39 @@ function Block(protoblock, blocks, overrideName) {
         // denominator argument?
         let dblk = this.connections[0];
         // Are we connected to a divide block?
-        if (
-            this.name === "number" &&
-            dblk !== null &&
-            this.blocks.blockList[dblk].name === "divide"
-        ) {
+        if (this.name === "number" && dblk !== null &&
+            this.blocks.blockList[dblk].name === "divide") {
             // Are we the denominator (c == 2) or numerator (c == 1)?
-            if (
-                this.blocks.blockList[dblk].connections[c] ===
-                this.blocks.blockList.indexOf(this)
-            ) {
+            if (this.blocks.blockList[dblk].connections[c] ===
+                this.blocks.blockList.indexOf(this)) {
                 // Is the divide block connected to a note value block?
                 cblk = this.blocks.blockList[dblk].connections[0];
                 if (cblk !== null) {
                     // Is it the first or second arg?
                     switch (this.blocks.blockList[cblk].name) {
-                        case "newnote":
-                        case "pickup":
-                        case "tuplet4":
-                        case "newstaccato":
-                        case "newslur":
-                        case "elapsednotes2":
-                            return this.blocks.blockList[cblk].connections[1] === dblk;
-                            break;
-                        case "meter":
-                            this._check_meter_block = cblk;
-                        case "setbpm2":
-                        case "setmasterbpm2":
-                        case "stuplet":
-                        case "rhythm2":
-                        case "newswing2":
-                        case "vibrato":
-                        case "neighbor":
-                        case "neighbor2":
-                            return this.blocks.blockList[cblk].connections[2] === dblk;
-                            break;
-                        default:
-                            return false;
-                            break;
+                    case "newnote":
+                    case "pickup":
+                    case "tuplet4":
+                    case "newstaccato":
+                    case "newslur":
+                    case "elapsednotes2":
+                        return this.blocks.blockList[cblk].connections[1] === dblk;
+                        break;
+                    case "meter":
+                        this._check_meter_block = cblk;
+                    case "setbpm2":
+                    case "setmasterbpm2":
+                    case "stuplet":
+                    case "rhythm2":
+                    case "newswing2":
+                    case "vibrato":
+                    case "neighbor":
+                    case "neighbor2":
+                        return this.blocks.blockList[cblk].connections[2] === dblk;
+                        break;
+                    default:
+                        return false;
+                        break;
                     }
                 }
             }
@@ -4503,45 +3713,43 @@ function Block(protoblock, blocks, overrideName) {
         if (cblk !== null) {
             // Is it the first or second arg?
             switch (this.blocks.blockList[cblk].name) {
-                case "newnote":
-                case "pickup":
-                case "tuplet4":
-                case "newstaccato":
-                case "newslur":
-                case "elapsednotes2":
+            case "newnote":
+            case "pickup":
+            case "tuplet4":
+            case "newstaccato":
+            case "newslur":
+            case "elapsednotes2":
+                if (this.blocks.blockList[cblk].connections[1] === dblk) {
+                    cblk = this.blocks.blockList[dblk].connections[2];
+                    return this.blocks.blockList[cblk].value;
+                } else {
+                    return 1;
+                }
+                break;
+            case "meter":
+                this._check_meter_block = cblk;
+            case "setbpm2":
+            case "setmasterbpm2":
+            case "stuplet":
+            case "rhythm2":
+            case "newswing2":
+            case "vibrato":
+            case "neighbor":
+            case "neighbor2":
+                if (this.blocks.blockList[cblk].connections[2] === dblk) {
                     if (this.blocks.blockList[cblk].connections[1] === dblk) {
                         cblk = this.blocks.blockList[dblk].connections[2];
                         return this.blocks.blockList[cblk].value;
                     } else {
                         return 1;
                     }
-                    break;
-                case "meter":
-                    this._check_meter_block = cblk;
-                case "setbpm2":
-                case "setmasterbpm2":
-                case "stuplet":
-                case "rhythm2":
-                case "newswing2":
-                case "vibrato":
-                case "neighbor":
-                case "neighbor2":
-                    if (this.blocks.blockList[cblk].connections[2] === dblk) {
-                        if (
-                            this.blocks.blockList[cblk].connections[1] === dblk
-                        ) {
-                            cblk = this.blocks.blockList[dblk].connections[2];
-                            return this.blocks.blockList[cblk].value;
-                        } else {
-                            return 1;
-                        }
-                    } else {
-                        return 1;
-                    }
-                    break;
-                default:
+                } else {
                     return 1;
-                    break;
+                }
+                break;
+            default:
+                return 1;
+                break;
             }
         }
 
@@ -4550,29 +3758,15 @@ function Block(protoblock, blocks, overrideName) {
 
     this._octaveNumber = function() {
         // Is this a number block being used as an octave argument?
-        return (
-            this.name === "number" &&
-            this.connections[0] !== null &&
-            [
-                "pitch",
-                "setpitchnumberoffset",
-                "invert1",
-                "tofrequency",
-                "nthmodalpitch"
-            ].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1 &&
-            this.blocks.blockList[this.connections[0]].connections[2] ===
-            this.blocks.blockList.indexOf(this)
-        );
+        return (this.name === "number" && this.connections[0] !== null &&
+		["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "nthmodalpitch"
+		].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1 &&
+		this.blocks.blockList[this.connections[0]].connections[2] ===
+		this.blocks.blockList.indexOf(this));
     };
 
-    this._piemenuPitches = function(
-        noteLabels,
-        noteValues,
-        accidentals,
-        note,
-        accidental,
-        custom
-    ) {
+    this._piemenuPitches = function(noteLabels, noteValues, accidentals, note, accidental,
+				    custom) {
         let prevPitch = null;
 
         // wheelNav pie menu for pitch selection
@@ -4586,20 +3780,15 @@ function Block(protoblock, blocks, overrideName) {
 
         // Some blocks have both pitch and octave, so we can modify
         // both at once.
-        let hasOctaveWheel =
-            this.connections[0] !== null &&
+        let hasOctaveWheel = this.connections[0] !== null &&
             ["pitch", "setpitchnumberoffset", "invert1", "tofrequency"].indexOf(
-                this.blocks.blockList[this.connections[0]].name
-            ) !== -1;
+                this.blocks.blockList[this.connections[0]].name) !== -1;
 
         // If we are attached to a set key block, we want to order
         // pitch by fifths.
-        if (
-            this.connections[0] !== null &&
-            ["setkey", "setkey2"].indexOf(
-                this.blocks.blockList[this.connections[0]].name
-            ) !== -1
-        ) {
+        if (this.connections[0] !== null &&
+            ["setkey", "setkey2"].indexOf(this.blocks.blockList[this.connections[0]].name
+					 ) !== -1) {
             noteLabels = ["C", "G", "D", "A", "E", "B", "F"];
             noteValues = ["C", "G", "D", "A", "E", "B", "F"];
         }
@@ -4611,17 +3800,12 @@ function Block(protoblock, blocks, overrideName) {
 
         if (!custom) {
             // the accidental selector
-            this._accidentalsWheel = new wheelnav(
-                "_accidentalsWheel",
-                this._pitchWheel.raphael
-            );
+            this._accidentalsWheel = new wheelnav("_accidentalsWheel",
+						  this._pitchWheel.raphael);
         }
         // the octave selector
         if (hasOctaveWheel) {
-            this._octavesWheel = new wheelnav(
-                "_octavesWheel",
-                this._pitchWheel.raphael
-            );
+            this._octavesWheel = new wheelnav("_octavesWheel", this._pitchWheel.raphael);
         }
 
         // exit button
@@ -4658,14 +3842,15 @@ function Block(protoblock, blocks, overrideName) {
         this._exitWheel.createWheel(["×", " "]);
 
         if (!custom) {
-            this._accidentalsWheel.colors =
-                platformColor.accidentalsWheelcolors;
+            this._accidentalsWheel.colors = platformColor.accidentalsWheelcolors;
             this._accidentalsWheel.slicePathFunction = slicePath().DonutSlice;
             this._accidentalsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
             this._accidentalsWheel.slicePathCustom.minRadiusPercent = 0.5;
             this._accidentalsWheel.slicePathCustom.maxRadiusPercent = 0.75;
-            this._accidentalsWheel.sliceSelectedPathCustom = this._accidentalsWheel.slicePathCustom;
-            this._accidentalsWheel.sliceInitPathCustom = this._accidentalsWheel.slicePathCustom;
+            this._accidentalsWheel.sliceSelectedPathCustom =
+		this._accidentalsWheel.slicePathCustom;
+            this._accidentalsWheel.sliceInitPathCustom =
+		this._accidentalsWheel.slicePathCustom;
 
             let accidentalLabels = [];
             for (let i = 0; i < accidentals.length; i++) {
@@ -4697,22 +3882,8 @@ function Block(protoblock, blocks, overrideName) {
             this._octavesWheel.slicePathCustom.maxRadiusPercent = 0.95;
             this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
             this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
-            let octaveLabels = [
-                "8",
-                "7",
-                "6",
-                "5",
-                "4",
-                "3",
-                "2",
-                "1",
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
-            ];
+            let octaveLabels = ["8", "7", "6", "5", "4", "3", "2", "1",
+				null, null, null, null, null, null];
             this._octavesWheel.animatetime = 0; // 300;
             this._octavesWheel.createWheel(octaveLabels);
         }
@@ -4721,69 +3892,39 @@ function Block(protoblock, blocks, overrideName) {
         let x = this.container.x;
         let y = this.container.y;
 
-        let canvasLeft =
-            this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
-        let canvasTop =
-            this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+        let canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        let canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
 
         docById("wheelDiv").style.position = "absolute";
         docById("wheelDiv").style.height = "300px";
         docById("wheelDiv").style.width = "300px";
-        docById("wheelDiv").style.left =
-            Math.min(
-                this.blocks.turtles._canvas.width - 300,
-                Math.max(
-                    0,
-                    Math.round(
-                        (x + this.blocks.stage.x) *
-                        this.blocks.getStageScale() +
-                        canvasLeft
-                    ) - 200
-                )
-            ) + "px";
-        docById("wheelDiv").style.top =
-            Math.min(
-                this.blocks.turtles._canvas.height - 350,
-                Math.max(
-                    0,
-                    Math.round(
-                        (y + this.blocks.stage.y) *
-                        this.blocks.getStageScale() +
-                        canvasTop
-                    ) - 200
-                )
-            ) + "px";
+        docById("wheelDiv").style.left = Math.min(
+            this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round(
+                (x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)
+        ) + "px";
+        docById("wheelDiv").style.top = Math.min(
+            this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round(
+                (y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)
+        ) + "px";
 
         // Navigate to a the current note value.
         let i = noteValues.indexOf(note);
         if (i === -1) {
-            if (custom) i = 0 ;
-            else i = 4 ;
+            if (custom) {
+		i = 0;
+	    } else {
+		i = 4;
+	    }
         }
 
         prevPitch = i;
 
         this._pitchWheel.navigateWheel(i);
 
-        const OFFSET = {
-            "major": 1,
-            "dorian": 2,
-            "phrygian": 3,
-            "lydian": 4,
-            "mixolydian": 5,
-            "minor": 6,
-            "locrian": 7
-        };
+        const OFFSET = {"major": 1, "dorian": 2, "phrygian": 3, "lydian": 4,
+			"mixolydian": 5, "minor": 6, "locrian": 7};
 
-        const ROTATION = {
-            "A" : 2,
-            "B" : 1,
-            "C" : 0,
-            "D" : 6,
-            "E" : 5,
-            "F" : 4,
-            "G" : 3
-        };
+        const ROTATION = {"A" : 2, "B" : 1, "C" : 0, "D" : 6, "E" : 5, "F" : 4, "G" : 3};
 
         let k = OFFSET[KeySignatureEnv[1]];
         
@@ -4812,12 +3953,10 @@ function Block(protoblock, blocks, overrideName) {
         // auto selection of sharps and flats in fixed solfege
         // handles the case of opening the pie-menu, not whilst in the pie-menu
         if ((!KeySignatureEnv[2] && this.name === "solfege") ||
-        (this.name === "notename") &&
-        (this.connections[0] != undefined ? ["setkey", "setkey2"].indexOf(
-            this.blocks.blockList[this.connections[0]].name
-        ) === -1: true)) {
-            if (scale[6 - i][0] == FIXEDSOLFEGE[note] ||
-                scale[6 - i][0] == note) {
+	    (this.name === "notename") &&
+	    (this.connections[0] != undefined ? ["setkey", "setkey2"].indexOf(
+		this.blocks.blockList[this.connections[0]].name) === -1: true)) {
+            if (scale[6 - i][0] == FIXEDSOLFEGE[note] || scale[6 - i][0] == note) {
                 accidental = scale[6 - i].substr(1);
             } else {
                 accidental = EQUIVALENTACCIDENTALS[scale[6-i]].substr(1);
@@ -4833,24 +3972,24 @@ function Block(protoblock, blocks, overrideName) {
                 this._accidentalsWheel.navigateWheel(2);
             } else {
                 switch (accidental) {
-                    case DOUBLEFLAT:
-                        this._accidentalsWheel.navigateWheel(4);
-                        break;
-                    case FLAT:
-                        this._accidentalsWheel.navigateWheel(3);
-                        break;
-                    case NATURAL:
-                        this._accidentalsWheel.navigateWheel(2);
-                        break;
-                    case SHARP:
-                        this._accidentalsWheel.navigateWheel(1);
-                        break;
-                    case DOUBLESHARP:
-                        this._accidentalsWheel.navigateWheel(0);
-                        break;
-                    default:
-                        this._accidentalsWheel.navigateWheel(2);
-                        break;
+                case DOUBLEFLAT:
+                    this._accidentalsWheel.navigateWheel(4);
+                    break;
+                case FLAT:
+                    this._accidentalsWheel.navigateWheel(3);
+                    break;
+                case NATURAL:
+                    this._accidentalsWheel.navigateWheel(2);
+                    break;
+                case SHARP:
+                    this._accidentalsWheel.navigateWheel(1);
+                    break;
+                case DOUBLESHARP:
+                    this._accidentalsWheel.navigateWheel(0);
+                    break;
+                default:
+                    this._accidentalsWheel.navigateWheel(2);
+                    break;
                 }
             }
         }
@@ -4873,8 +4012,7 @@ function Block(protoblock, blocks, overrideName) {
 
         let __selectionChangedSolfege = function() {
             selection["note"] =
-                that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex]
-                    .title;
+                that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
             let i = noteLabels.indexOf(selection["note"]);
             that.value = noteValues[i];
 
@@ -4886,8 +4024,7 @@ function Block(protoblock, blocks, overrideName) {
             if ((!KeySignatureEnv[2] && that.name == "solfege") ||
             (that.name == "notename") &&
             (that.connections[0] != undefined ? ["setkey", "setkey2"].indexOf(
-                that.blocks.blockList[that.connections[0]].name
-            ) === -1: true)) {
+                that.blocks.blockList[that.connections[0]].name) === -1: true)) {
                 let i = NOTENAMES.indexOf(FIXEDSOLFEGE[selection["note"]]);
                 if (i == -1) {
                     i = NOTENAMES.indexOf(selection["note"]);
@@ -4899,24 +4036,24 @@ function Block(protoblock, blocks, overrideName) {
                     selection["attr"] = EQUIVALENTACCIDENTALS[scale[i]].substr(1);
                 }
                 switch (selection["attr"]) {
-                    case DOUBLEFLAT:
-                        that._accidentalsWheel.navigateWheel(4);
-                        break;
-                    case FLAT:
-                        that._accidentalsWheel.navigateWheel(3);
-                        break;
-                    case NATURAL:
-                        that._accidentalsWheel.navigateWheel(2);
-                        break;
-                    case SHARP:
-                        that._accidentalsWheel.navigateWheel(1);
-                        break;
-                    case DOUBLESHARP:
-                        that._accidentalsWheel.navigateWheel(0);
-                        break;
-                    default:
-                        that._accidentalsWheel.navigateWheel(2);
-                        break;
+                case DOUBLEFLAT:
+                    that._accidentalsWheel.navigateWheel(4);
+                    break;
+                case FLAT:
+                    that._accidentalsWheel.navigateWheel(3);
+                    break;
+                case NATURAL:
+                    that._accidentalsWheel.navigateWheel(2);
+                    break;
+                case SHARP:
+                    that._accidentalsWheel.navigateWheel(1);
+                    break;
+                case DOUBLESHARP:
+                    that._accidentalsWheel.navigateWheel(0);
+                    break;
+                default:
+                    that._accidentalsWheel.navigateWheel(2);
+                    break;
                 }
             }
             that.text.text = selection["note"];
@@ -4931,19 +4068,13 @@ function Block(protoblock, blocks, overrideName) {
             if (hasOctaveWheel) {
                 // Set the octave of the pitch block if available
                 let octave = Number(
-                    that._octavesWheel.navItems[
-                        that._octavesWheel.selectedNavItemIndex
-                    ].title
-                );
+                    that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex
+					       ].title);
                 that.blocks.setPitchOctave(that.connections[0], octave);
             }
 
-            if (
-                that.connections[0] !== null &&
-                ["setkey", "setkey2"].indexOf(
-                    that.blocks.blockList[that.connections[0]].name
-                ) !== -1
-            ) {
+            if (that.connections[0] !== null && ["setkey", "setkey2"].indexOf(
+                that.blocks.blockList[that.connections[0]].name) !== -1) {
                 // We may need to update the mode widget.
                 that.blocks.logo._modeBlock = that.blocks.blockList.indexOf(that);
             }
@@ -4952,20 +4083,16 @@ function Block(protoblock, blocks, overrideName) {
 
         let __selectionChangedOctave = () => {
             let octave = Number(
-                that._octavesWheel.navItems[
-                    that._octavesWheel.selectedNavItemIndex
-                ].title
-            );
+                that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex
+					   ].title);
             that.blocks.setPitchOctave(that.connections[0], octave);
             __pitchPreview();
         }
 
         let __selectionChangedAccidental = () => {
             selection["attr"] =
-                that._accidentalsWheel.navItems[
-                    that._accidentalsWheel.selectedNavItemIndex
-                ].title;
-
+                that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex
+					       ].title;
             if (selection["attr"] !== "♮") {
                 that.value = selection["note"] + selection["attr"];
             } else {
@@ -5012,11 +4139,8 @@ function Block(protoblock, blocks, overrideName) {
             prevPitch = i;
             let note = noteValues[i];
             if (!custom) {
-                attr =
-                    that._accidentalsWheel.navItems[
-                        that._accidentalsWheel.selectedNavItemIndex
-                    ].title;
-
+                attr = that._accidentalsWheel.navItems[
+                    that._accidentalsWheel.selectedNavItemIndex].title;
                 if (label === " ") {
                     return;
                 } else if (attr !== "♮") {
@@ -5026,11 +4150,8 @@ function Block(protoblock, blocks, overrideName) {
 
             let octave;
             if (hasOctaveWheel) {
-                octave = Number(
-                    that._octavesWheel.navItems[
-                        that._octavesWheel.selectedNavItemIndex
-                    ].title
-                );
+                octave = Number(that._octavesWheel.navItems[
+                    that._octavesWheel.selectedNavItemIndex].title);
             } else {
                 octave = 4;
             }
@@ -5054,28 +4175,12 @@ function Block(protoblock, blocks, overrideName) {
                 note = note.replace(attr, "");
                 note = SOLFEGENAMES[note - 1];
                 note += attr;
-                obj = getNote(
-                    note,
-                    octave,
-                    0,
-                    keySignature,
-                    true,
-                    null,
-                    that.blocks.errorMsg,
-                    that.blocks.logo.synth.inTemperament
-                );
+                obj = getNote(note, octave, 0, keySignature, true, null,
+			      that.blocks.errorMsg, that.blocks.logo.synth.inTemperament);
             } else {
                 // console.debug(note);
-                obj = getNote(
-                    note,
-                    octave,
-                    0,
-                    keySignature,
-                    KeySignatureEnv[2],
-                    null,
-                    that.blocks.errorMsg,
-                    that.blocks.logo.synth.inTemperament
-                );
+                obj = getNote(note, octave, 0, keySignature, KeySignatureEnv[2], null,
+			      that.blocks.errorMsg, that.blocks.logo.synth.inTemperament);
             }
             if (!custom) {
                 obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
@@ -5083,10 +4188,8 @@ function Block(protoblock, blocks, overrideName) {
 
             let tur = that.blocks.logo.turtles.ithTurtle(0);
 
-            if (
-                tur.singer.instrumentNames.length === 0 ||
-                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
-            ) {
+            if (tur.singer.instrumentNames.length === 0 ||
+                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1) {
                 tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
@@ -5097,14 +4200,8 @@ function Block(protoblock, blocks, overrideName) {
 
             if (!that._triggerLock) {
                 that._triggerLock = true;
-                that.blocks.logo.synth.trigger(
-                    0,
-                    [obj[0] + obj[1]],
-                    1 / 8,
-                    DEFAULTVOICE,
-                    null,
-                    null
-                );
+                that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE,
+					       null, null);
             }
 
             setTimeout(function() {
@@ -5120,17 +4217,14 @@ function Block(protoblock, blocks, overrideName) {
 
         if (!custom) {
             for (let i = 0; i < accidentals.length; i++) {
-                this._accidentalsWheel.navItems[
-                    i
-                ].navigateFunction = __selectionChangedAccidental;
+                this._accidentalsWheel.navItems[i].navigateFunction =
+		    __selectionChangedAccidental;
             }
         }
 
         if (hasOctaveWheel) {
             for (let i = 0; i < 8; i++) {
-                this._octavesWheel.navItems[
-                    i
-                ].navigateFunction = __selectionChangedOctave;
+                this._octavesWheel.navItems[i].navigateFunction = __selectionChangedOctave;
             }
         }
 
@@ -5149,12 +4243,7 @@ function Block(protoblock, blocks, overrideName) {
         };
     };
 
-    this._customNotes = function(
-        noteLabels,
-        customLabels,
-        selectedCustom,
-        selectedNote
-    ){
+    this._customNotes = function(noteLabels, customLabels, selectedCustom, selectedNote) {
         // pie menu for customNote selection
         if (this.blocks.stageClick) {
             return;
@@ -5164,32 +4253,20 @@ function Block(protoblock, blocks, overrideName) {
 
         // Some blocks have both pitch and octave, so we can modify
         // both at once.
-        let hasOctaveWheel =
-            this.connections[0] !== null &&
+        let hasOctaveWheel = this.connections[0] !== null &&
             ["pitch", "setpitchnumberoffset", "invert1", "tofrequency"].indexOf(
-                this.blocks.blockList[this.connections[0]].name
-            ) !== -1;
+                this.blocks.blockList[this.connections[0]].name) !== -1;
 
         // Use advanced constructor for more wheelnav on same div
         this._customWheel = new wheelnav("wheelDiv", null, 800, 800);
 
-
-        this._cusNoteWheel = new wheelnav(
-            "_cusNoteWheel",
-            this._customWheel.raphael
-        );
+        this._cusNoteWheel = new wheelnav("_cusNoteWheel", this._customWheel.raphael);
         // exit button
-        this._exitWheel = new wheelnav(
-            "_exitWheel",
-            this._customWheel.raphael
-        );
+        this._exitWheel = new wheelnav("_exitWheel", this._customWheel.raphael);
 
         // the octave selector
         if (hasOctaveWheel) {
-            this._octavesWheel = new wheelnav(
-                "_octavesWheel",
-                this._customWheel.raphael
-            );
+            this._octavesWheel = new wheelnav("_octavesWheel", this._customWheel.raphael);
         }
 
 
@@ -5228,22 +4305,8 @@ function Block(protoblock, blocks, overrideName) {
             this._octavesWheel.slicePathCustom.maxRadiusPercent = 1;
             this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
             this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
-            let octaveLabels = [
-                "8",
-                "7",
-                "6",
-                "5",
-                "4",
-                "3",
-                "2",
-                "1",
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
-            ];
+            let octaveLabels = ["8", "7", "6", "5", "4", "3", "2", "1",
+				null, null, null, null, null, null];
             this._octavesWheel.animatetime = 0; // 300;
             this._octavesWheel.createWheel(octaveLabels);
         }
@@ -5270,8 +4333,7 @@ function Block(protoblock, blocks, overrideName) {
             thisCustom = 0 ;
         }
 
-        this._cusNoteWheel.navAngle =
-            -(180 / customLabels.length) + 180 / labels.length;
+        this._cusNoteWheel.navAngle = -(180 / customLabels.length) + 180 / labels.length;
         this._cusNoteWheel.createWheel(labels);
 
         this._exitWheel.colors = platformColor.exitWheelcolors;
@@ -5290,39 +4352,22 @@ function Block(protoblock, blocks, overrideName) {
         let x = this.container.x;
         let y = this.container.y;
 
-        let canvasLeft =
-            this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
-        let canvasTop =
-            this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+        let canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        let canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
 
         docById("wheelDiv").style.position = "absolute";
         docById("wheelDiv").style.height = "400px";
         docById("wheelDiv").style.width = "400px";
-        docById("wheelDiv").style.left =
-            Math.min(
-                this.blocks.turtles._canvas.width - 400,
-                Math.max(
-                    0,
-                    Math.round(
-                        (x + this.blocks.stage.x) *
-                        this.blocks.getStageScale() +
-                        canvasLeft
-                    ) - 200
-                )
-            ) + "px";
-        docById("wheelDiv").style.top =
-            Math.min(
-                this.blocks.turtles._canvas.height - 450,
-                Math.max(
-                    0,
-                    Math.round(
-                        (y + this.blocks.stage.y) *
-                        this.blocks.getStageScale() +
-                        canvasTop
-                    ) - 200
-                )
-            ) + "px";
-
+        docById("wheelDiv").style.left = Math.min(
+	    this.blocks.turtles._canvas.width - 400,
+	    Math.max(0, Math.round(
+                (x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft
+            ) - 200)) + "px";
+        docById("wheelDiv").style.top = Math.min(
+            this.blocks.turtles._canvas.height - 450,
+            Math.max(0, Math.round(
+                (y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop
+            ) - 200)) + "px";
 
         if (hasOctaveWheel) {
             // Use the octave associated with this block, if available.
@@ -5337,23 +4382,16 @@ function Block(protoblock, blocks, overrideName) {
         let __setupAction = function(i) {
             that._customWheel.navItems[i].navigateFunction = function() {
                 that.customID =
-                    that._customWheel.navItems[
-                        that._customWheel.selectedNavItemIndex
-                        ].title;
+                    that._customWheel.navItems[that._customWheel.selectedNavItemIndex
+					      ].title;
                 for (let l = 0; l < customLabels.length; l++) {
                     for (let j = 0; j < max; j++) {
                         if (l !== i) {
-                            that._cusNoteWheel.navItems[
-                            l * max + j
-                                ].navItem.hide();
+                            that._cusNoteWheel.navItems[l * max + j].navItem.hide();
                             } else if (labels[l * max + j] == "") {
-                            that._cusNoteWheel.navItems[
-                            l * max + j
-                                ].navItem.hide();
+                            that._cusNoteWheel.navItems[l * max + j].navItem.hide();
                         } else {
-                            that._cusNoteWheel.navItems[
-                            l * max + j
-                                ].navItem.show();
+                            that._cusNoteWheel.navItems[l * max + j].navItem.show();
                         }
                     }
                 }
@@ -5386,7 +4424,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         if (typeof j  == "number")
-            this._cusNoteWheel.navigateWheel(max * customLabels.indexOf (selectedCustom) + j);
+            this._cusNoteWheel.navigateWheel(max * customLabels.indexOf(selectedCustom) + j);
 
         let __exitMenu = function() {
             that._piemenuExitTime = new Date().getTime();
@@ -5394,14 +4432,10 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         let __selectionChanged = function() {
-            let label =
-                that._customWheel.navItems[
-                    that._customWheel.selectedNavItemIndex
-                    ].title;
-            let note =
-                that._cusNoteWheel.navItems[
-                    that._cusNoteWheel.selectedNavItemIndex
-                    ].title;
+            let label = that._customWheel.navItems[that._customWheel.selectedNavItemIndex
+						  ].title;
+            let note = that._cusNoteWheel.navItems[that._cusNoteWheel.selectedNavItemIndex
+						  ].title;
 
             that.value = note;
             that.text.text =note;
@@ -5409,10 +4443,8 @@ function Block(protoblock, blocks, overrideName) {
 
             if (hasOctaveWheel) {
                 // Set the octave of the pitch block if available
-                octave = Number(
-                    that._octavesWheel.navItems[
-                        that._octavesWheel.selectedNavItemIndex
-                        ].title
+                octave = Number(that._octavesWheel.navItems[
+                        that._octavesWheel.selectedNavItemIndex].title
                 );
                 that.blocks.setPitchOctave(that.connections[0], octave);
             }
@@ -5421,23 +4453,12 @@ function Block(protoblock, blocks, overrideName) {
             that.container.setChildIndex(that.text, that.container.children.length - 1);
             that.updateCache();
 
-            let obj = getNote(
-                note,
-                octave,
-                0,
-                "C major",
-                false,
-                null,
-                that.blocks.errorMsg,
-                label
-            );
-
+            let obj = getNote(note, octave, 0, "C major", false, null,
+			      that.blocks.errorMsg, label);
             let tur = that.blocks.logo.turtles.ithTurtle(0);
 
-            if (
-                tur.singer.instrumentNames.length === 0 ||
-                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
-            ) {
+            if (tur.singer.instrumentNames.length === 0 ||
+                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1) {
                 tur.singer.instrumentNames.push(DEFAULTVOICE);
                 that.blocks.logo.synth.createDefaultSynth(0);
                 that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
@@ -5464,16 +4485,12 @@ function Block(protoblock, blocks, overrideName) {
         }
         if (hasOctaveWheel) {
             for (let i = 0; i < 8; i++) {
-                this._octavesWheel.navItems[
-                    i
-                    ].navigateFunction = __selectionChanged;
+                this._octavesWheel.navItems[i].navigateFunction = __selectionChanged;
             }
         }
         // Set up handlers for preview.
         for (var i = 0; i < labels.length; i++) {
-            this._cusNoteWheel.navItems[
-                i
-            ].navigateFunction = __selectionChanged;
+            this._cusNoteWheel.navItems[i].navigateFunction = __selectionChanged;
         }
 
         this._exitWheel.navItems[0].navigateFunction = __exitMenu;
@@ -7969,7 +6986,7 @@ function Block(protoblock, blocks, overrideName) {
                         }
                     }
                     this.value = newValue;
-                    var label = this.value.toString();
+                    let label = this.value.toString();
                     if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
                         label = label.substr(0, STRINGLEN) + "...";
                     }
@@ -8016,32 +7033,34 @@ function Block(protoblock, blocks, overrideName) {
             this.value = newValue;
         }
 
+	let obj;
+	let label;
+	let attr;
+
         if (this.name === "solfege") {
-            let obj = splitSolfege(this.value);
-            var label = i18nSolfege(obj[0]);
-            let attr = obj[1];
+            obj = splitSolfege(this.value);
+            label = i18nSolfege(obj[0]);
+            attr = obj[1];
 
             if (attr !== "♮") {
                 label += attr;
             }
         } else if (this.name === "eastindiansolfege") {
-            let obj = splitSolfege(this.value);
-            var label = WESTERN2EISOLFEGENAMES[obj[0]];
-            let attr = obj[1];
+            obj = splitSolfege(this.value);
+            label = WESTERN2EISOLFEGENAMES[obj[0]];
+            attr = obj[1];
 
             if (attr !== "♮") {
                 label += attr;
             }
         } else if (this.name === "modename") {
-            var label = this.value + " " + getModeNumbers(this.value);
+            label = this.value + " " + getModeNumbers(this.value);
         } else {
-            var label = this.value.toString();
+            label = this.value.toString();
         }
 
-        if (
-            WIDENAMES.indexOf(this.name) === -1 &&
-            getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH
-        ) {
+        if (WIDENAMES.indexOf(this.name) === -1 &&
+            getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
             let slen = label.length - 5;
             let nlabel = "" + label.substr(0, slen) + "...";
             while (getTextWidth(nlabel, "bold 20pt Sans") > TEXTWIDTH) {
@@ -8092,24 +7111,15 @@ function Block(protoblock, blocks, overrideName) {
                         this.blocks.actionHasArgs(c)
                     );
                     let blockPalette = this.blocks.palettes.dict["action"];
-                    for (
-                        var blk = 0;
-                        blk < blockPalette.protoList.length;
-                        blk++
-                    ) {
+                    for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
                         let block = blockPalette.protoList[blk];
                         if (oldValue === _("action")) {
-                            if (
-                                block.name === "nameddo" &&
-                                block.defaults.length === 0
-                            ) {
+                            if (block.name === "nameddo" && block.defaults.length === 0) {
                                 block.hidden = true;
                             }
                         } else {
-                            if (
-                                block.name === "nameddo" &&
-                                block.defaults[0] === oldValue
-                            ) {
+                            if (block.name === "nameddo" &&
+				block.defaults[0] === oldValue) {
                                 blockPalette.remove(block, oldValue);
                             }
                         }
@@ -8117,10 +7127,8 @@ function Block(protoblock, blocks, overrideName) {
 
                     if (oldValue === _("action")) {
                         this.blocks.newNameddoBlock(
-                            newValue,
-                            this.blocks.actionHasReturn(c),
-                            this.blocks.actionHasArgs(c)
-                        );
+			    newValue, this.blocks.actionHasReturn(c),
+			    this.blocks.actionHasArgs(c));
                         this.blocks.setActionProtoVisiblity(false);
                     }
                     this.blocks.renameNameddos(oldValue, newValue);
@@ -8178,25 +7186,13 @@ function Block(protoblock, blocks, overrideName) {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             // Load the synth for the selected drum.
             if (this.name === "drumname") {
-                this.blocks.logo.synth.loadSynth(
-                    0,
-                    getDrumSynthName(this.value)
-                );
+                this.blocks.logo.synth.loadSynth(0, getDrumSynthName(this.value));
             } else if (this.name === "effectsname") {
-                this.blocks.logo.synth.loadSynth(
-                    0,
-                    getDrumSynthName(this.value)
-                );
+                this.blocks.logo.synth.loadSynth(0, getDrumSynthName(this.value));
             } else if (this.name === "voicename") {
-                this.blocks.logo.synth.loadSynth(
-                    0,
-                    getVoiceSynthName(this.value)
-                );
+                this.blocks.logo.synth.loadSynth(0, getVoiceSynthName(this.value));
             } else if (this.name === "noisename") {
-                this.blocks.logo.synth.loadSynth(
-                    0,
-                    getNoiseSynthName(this.value)
-                );
+                this.blocks.logo.synth.loadSynth(0, getNoiseSynthName(this.value));
             }
         }
     };
@@ -8221,25 +7217,15 @@ function Block(protoblock, blocks, overrideName) {
         let x = this.blocks.blockList[thisBlock].container.x;
         let y = this.blocks.blockList[thisBlock].container.y;
 
-        let canvasLeft =
-            this.blocks.canvas.offsetLeft + 28 * this.blocks.getStageScale();
-        let canvasTop =
-            this.blocks.canvas.offsetTop + 6 * this.blocks.getStageScale();
+        let canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.getStageScale();
+        let canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.getStageScale();
 
         docById("contextWheelDiv").style.left =
-            Math.round(
-                (x + this.blocks.stage.x) * this.blocks.getStageScale() +
-                canvasLeft
-            ) -
-            150 +
-            "px";
+            Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() +
+                       canvasLeft) - 150 + "px";
         docById("contextWheelDiv").style.top =
-            Math.round(
-                (y + this.blocks.stage.y) * this.blocks.getStageScale() +
-                canvasTop
-            ) -
-            150 +
-            "px";
+            Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() +
+                       canvasTop) - 150 + "px";
 
         docById("contextWheelDiv").style.display = "";
 
