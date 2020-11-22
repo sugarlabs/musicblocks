@@ -2798,9 +2798,14 @@ function Blocks(activity) {
      * @private
      * @return {void}
      */
-    this._makeNewBlockWithConnections = function(name, blockOffset, connections, postProcess, postProcessArg) {
-        let myBlock = this.makeNewBlock(name, postProcess, postProcessArg);
-        if (myBlock === null) {
+    this._makeNewBlockWithConnections = function(
+	name, blockOffset, connections, postProcess, postProcessArg) {
+        if (typeof collapsed === "undefined") {
+            collapsed = false;
+        }
+
+        myBlock = this.makeNewBlock(name, postProcess, postProcessArg);
+        if (myBlock == null) {
             console.debug("could not make block " + name);
             return;
         }
@@ -2809,7 +2814,6 @@ function Blocks(activity) {
             if (c === myBlock.docks.length) {
                 break;
             }
-
             if (connections[c] == null) {
                 myBlock.connections.push(null);
             } else {
@@ -2848,10 +2852,18 @@ function Blocks(activity) {
             }
         }
 
-        if (["namedbox", "nameddo", "namedcalc", "nameddoArg", "namedcalcArg", "outputtools"].indexOf(name) !== -1) {
-            this.blockList.push(new Block(this.protoBlockDict[name], this, postProcessArg[1]));
+        if (["namedbox",
+             "nameddo",
+             "namedcalc",
+             "nameddoArg",
+             "namedcalcArg",
+             "outputtools"].indexOf(name) !== -1) {
+            this.blockList.push(
+                new Block(this.protoBlockDict[name], this, postProcessArg[1])
+            );
         } else if (name === "namedarg") {
-            this.blockList.push(new Block(this.protoBlockDict[name], this, "arg " + postProcessArg[1]));
+            this.blockList.push(new Block(
+		this.protoBlockDict[name], this, "arg " + postProcessArg[1]));
         } else {
             this.blockList.push(new Block(this.protoBlockDict[name], this));
         }
@@ -2890,7 +2902,8 @@ function Blocks(activity) {
      * @return {void}
      */
     this.makeBlock = function(name, arg) {
-        let postProcess = function(args) {
+	let postProcess;
+        postProcess = function(args) {
             let thisBlock = args[0];
             let value = args[1];
 	    let label;
@@ -2905,13 +2918,14 @@ function Blocks(activity) {
                 that.blockList[thisBlock].text.text = _(value);
                 break;
             case "noisename":
-                that.blockList[thisBlock].text.text = getNoiseName(value);
+                label = getNoiseName(value);
                 break;
             case "temperamentname":
                 that.blockList[thisBlock].text.text = _(TEMPERAMENTS[0][1]);
                 for (let i = 0; i < TEMPERAMENTS.length; i++) {
                     if (TEMPERAMENTS[i][1] === value) {
-                        that.blockList[thisBlock].text.text = TEMPERAMENTS[i][0];
+                        that.blockList[thisBlock].text.text =
+                            TEMPERAMENTS[i][0];
                         break;
                     }
                 }
@@ -2935,15 +2949,16 @@ function Blocks(activity) {
         let that = this;
         let thisBlock = this.blockList.length;
         if (name === "start") {
-            let postProcess = function(thisBlock) {
-                that.blockList[thisBlock].value = that.turtles.turtleList.length;
+            postProcess = function(thisBlock) {
+                that.blockList[thisBlock].value =
+                    that.turtles.turtleList.length;
                 that.turtles.addTurtle(that.blockList[thisBlock]);
             };
 
             postProcessArg = thisBlock;
         } 
         else if (name === "outputtools") {
-            let postProcess = function(args) {
+            postProcess = function(args) {
                 that.blockList[thisBlock].value = null;
                 that.blockList[thisBlock].privateData = args[1];
             }
@@ -2958,8 +2973,11 @@ function Blocks(activity) {
         } else if (name === "scaledegree2") {
             postProcessArg = [thisBlock, "5"];
         } else if (name === "customNote") {
-	    let len = this.logo.synth.startingPitch.length;
-            postProcessArg = [thisBlock, this.logo.synth.startingPitch.substring(0, len - 1) + "(+0)"];
+            let len = this.logo.synth.startingPitch.length;
+            postProcessArg = [
+                thisBlock,
+                this.logo.synth.startingPitch.substring(0, len - 1) + "(+0)"
+            ];
         } else if (name === "notename") {
             postProcessArg = [thisBlock, "G"];
         } else if (name === "drumname") {
@@ -2975,114 +2993,130 @@ function Blocks(activity) {
         } else if (name === "noisename") {
             postProcessArg = [thisBlock, DEFAULTNOISE];
         } else if (name === "eastindiansolfege") {
-            let postProcess = function(args) {
-                let thisBlock = args[0];
-                let value = args[1];
-                that.blockList[thisBlock].value = value;
-                that.blockList[thisBlock].text.text = WESTERN2EISOLFEGENAMES[value];
-                that.blockList[thisBlock].container.updateCache();
+            postProcess = function(args) {
+                let b = args[0];
+                let v = args[1];
+                that.blockList[b].value = v;
+                that.blockList[b].text.text = WESTERN2EISOLFEGENAMES[v];
+                that.blockList[b].container.updateCache();
             };
+
             postProcessArg = [thisBlock, "sol"];
         } else if (name === "modename") {
-            let postProcess = function(args) {
-                let thisBlock = args[0];
-                let value = args[1];
-                that.blockList[thisBlock].value = value;
-                that.blockList[thisBlock].text.text = value; // + ' ' + getModeNumbers(this.value);
-                that.blockList[thisBlock].container.updateCache();
+            postProcess = function(args) {
+                let b = args[0];
+                let v = args[1];
+                that.blockList[b].value = v;
+                that.blockList[b].text.text = v;
+                that.blockList[b].container.updateCache();
             };
+
             postProcessArg = [thisBlock, DEFAULTMODE];
         } else if (name === "accidentalname") {
-            let postProcess = function(args) {
-                let thisBlock = args[0];
-                let value = args[1];
-                that.blockList[thisBlock].value = value;
-                let obj = value.split(" ");
-                that.blockList[thisBlock].text.text = _(obj[0]) + " " + obj[1];
-                that.blockList[thisBlock].container.updateCache();
+            postProcess = function(args) {
+                let b = args[0];
+                let v = args[1];
+                that.blockList[b].value = v;
+                let o = v.split(" ");
+                that.blockList[b].text.text = _(o[0]) + " " + o[1];
+                that.blockList[b].container.updateCache();
             };
+
             postProcessArg = [thisBlock, DEFAULTACCIDENTAL];
         } else if (name === "intervalname") {
-            let postProcess = function(args) {
-                let thisBlock = args[0];
-                let value = args[1];
-                that.blockList[thisBlock].value = value;
-                let obj = value.split(" ");
-                that.blockList[thisBlock].text.text = _(obj[0]) + " " + obj[1];
-                that.blockList[thisBlock].container.updateCache();
+            postProcess = function(args) {
+                let b = args[0];
+                let v = args[1];
+                that.blockList[b].value = v;
+                let o = v.split(" ");
+                that.blockList[b].text.text = _(o[0]) + " " + o[1];
+                that.blockList[b].container.updateCache();
             };
+
             postProcessArg = [thisBlock, DEFAULTINTERVAL];
         } else if (name === "temperamentname") {
             postProcessArg = [thisBlock, DEFAULTTEMPERAMENT];
         } else if (name === "invertmode") {
             postProcessArg = [thisBlock, DEFAULTINVERT];
         } else if (name === "number") {
-            let postProcess = function(args) {
-                let thisBlock = args[0];
-                let value = Number(args[1]);
-                that.blockList[thisBlock].value = value;
-                that.blockList[thisBlock].text.text = value.toString();
-                that.blockList[thisBlock].container.updateCache();
+            postProcess = function(args) {
+                let b = args[0];
+                let v = Number(args[1]);
+                that.blockList[b].value = v;
+                that.blockList[b].text.text = v.toString();
+                that.blockList[b].container.updateCache();
             };
+
             postProcessArg = [thisBlock, NUMBERBLOCKDEFAULT];
         } else if (name === "loudness" || name === "pitchness") {
-            let postProcess = function() {
+            postProcess = function() {
                 that.logo.initMediaDevices();
             };
         } else if (name === "media") {
-            let postProcess = function(args) {
-                let thisBlock = args[0];
-                let value = args[1];
-                that.blockList[thisBlock].value = value;
-                if (value === null) {
-                    that.blockList[thisBlock].image = "images/load-media.svg";
+            postProcess = function(args) {
+                let b = args[0];
+                let v = args[1];
+                that.blockList[b].value = v;
+                if (v == null) {
+                    that.blockList[b].image = "images/load-media.svg";
                 } else {
-                    that.blockList[thisBlock].image = null;
+                    that.blockList[b].image = null;
                 }
             };
-            postProcessArg = [thisBlock, null];
+
+            postProcessArg = [b, null];
         } else if (name === "camera") {
-            let postProcess = function(args) {
-                let thisBlock = args[0];
-                let value = args[1];
-                that.blockList[thisBlock].value = CAMERAVALUE;
-                if (value === null) {
-                    that.blockList[thisBlock].image = "images/camera.svg";
+            postProcess = function(args) {
+                let b = args[0];
+                let v = args[1];
+                that.blockList[b].value = CAMERAVALUE;
+                if (v == null) {
+                    that.blockList[b].image = "images/camera.svg";
                 } else {
-                    that.blockList[thisBlock].image = null;
+                    that.blockList[b].image = null;
                 }
             };
+
             postProcessArg = [thisBlock, null];
         } else if (name === "video") {
-            let postProcess = function(args) {
-                let thisBlock = args[0];
-                let value = args[1];
-                that.blockList[thisBlock].value = VIDEOVALUE;
-                if (value == null) {
-                    that.blockList[thisBlock].image = "images/video.svg";
+            postProcess = function(args) {
+                let b = args[0];
+                let v = args[1];
+                that.blockList[b].value = VIDEOVALUE;
+                if (v == null) {
+                    that.blockList[b].image = "images/video.svg";
                 } else {
-                    that.blockList[thisBlock].image = null;
+                    that.blockList[b].image = null;
                 }
             };
+
             postProcessArg = [thisBlock, null];
         } else if (name === "loadFile") {
-            let postProcess = function(args) {
+            postProcess = function(args) {
                 that.updateBlockText(args[0]);
             };
+
             postProcessArg = [thisBlock, null];
-        } else if (["storein2", "namedbox", "nameddo", "namedcalc", "nameddoArg", "namedcalcArg", "namedarg"].indexOf(name) !== -1) {
-            let postProcess = function(args) {
+        } else if (["storein2",
+                    "namedbox",
+                    "nameddo",
+                    "namedcalc",
+                    "nameddoArg",
+                    "namedcalcArg",
+                    "namedarg"].indexOf(name) !== -1) {
+            postProcess = function(args) {
                 that.blockList[thisBlock].value = null;
                 that.blockList[thisBlock].privateData = args[1];
             };
+
             postProcessArg = [thisBlock, arg];
         } else if (name === "newnote") {
-            let postProcess = function(args) {
-                let thisBlock = args[0];
+            postProcess = function(args) {
             };
+
             postProcessArg = [thisBlock, null];
         } else {
-            let postProcess = null;
+            postProcess = null;
         }
 
         let protoFound = false;
@@ -3096,14 +3130,19 @@ function Blocks(activity) {
                     that.makeNewBlock(proto, postProcess, postProcessArg);
                     protoFound = true;
                     break;
-                } else if (["namedbox", "nameddo", "namedcalc", "nameddoArg", "namedcalcArg", "namedarg"].indexOf(name) !== -1) {
+                } else if (["namedbox",
+                            "nameddo",
+                            "namedcalc",
+                            "nameddoArg",
+                            "namedcalcArg",
+                            "namedarg"].indexOf(name) !== -1) {
                     if (that.protoBlockDict[proto].defaults[0] === undefined) {
                         that.makeNewBlock(proto, postProcess, postProcessArg);
                         protoFound = true;
                         break;
                     }
                 } else if (name === "storein2") {
-                    let postProcess = function(args) {
+                    postProcess = function(args) {
                         let c = that.blockList[thisBlock].connections[0];
                         if (args[1] === _("store in box")) {
                             that.blockList[c].privateData = _("box");
@@ -3164,72 +3203,76 @@ function Blocks(activity) {
 
             let that = this;
             let thisBlock = this.blockList.length;
-	    let postProcess;
-            if (myBlock.docks.length > i && myBlock.docks[i + 1][2] === "anyin") {
+            if (myBlock.docks.length > i &&
+                myBlock.docks[i + 1][2] === "anyin") {
                 if (value == null) {
                     console.debug("cannot set default value");
                 } else if (typeof value === "string") {
                     postProcess = function(args) {
-                        let thisBlock = args[0];
-                        let value = args[1];
-                        that.blockList[thisBlock].value = value;
-                        let label = value.toString();
-                        if (WIDENAMES.indexOf(that.blockList[thisBlock].name) === -1 && getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                            label = label.substr(0, STRINGLEN) + "...";
+                        let b = args[0];
+                        let v = args[1];
+                        that.blockList[b].value = v;
+                        let l = value.toString();
+                        if (WIDENAMES.indexOf(that.blockList[b].name) === -1 &&
+                            getTextWidth(l, "bold 20pt Sans") > TEXTWIDTH) {
+                            l = l.substr(0, STRINGLEN) + "...";
                         }
-                        that.blockList[thisBlock].text.text = label;
-                        that.blockList[thisBlock].container.updateCache();
+                        that.blockList[b].text.text = l;
+                        that.blockList[b].container.updateCache();
                     };
+
                     this.makeNewBlock("text", postProcess, [thisBlock, value]);
                 } else {
                     postProcess = function(args) {
-                        let thisBlock = args[0];
-                        let value = Number(args[1]);
-                        that.blockList[thisBlock].value = value;
-                        that.blockList[thisBlock].text.text = value.toString();
+                        let b = args[0];
+                        let v = Number(args[1]);
+                        that.blockList[b].value = v;
+                        that.blockList[b].text.text = v.toString();
                     };
 
-                    this.makeNewBlock("number", postProcess, [thisBlock, value]);
+                    this.makeNewBlock(
+			"number", postProcess, [thisBlock, value]);
                 }
             } else if (myBlock.docks[i + 1][2] === "textin") {
                 postProcess = function(args) {
-                    let thisBlock = args[0];
-                    let value = args[1];
-                    that.blockList[thisBlock].value = value;
-                    let label = value.toString();
-                    if (WIDENAMES.indexOf(that.blockList[thisBlock].name) === -1 && getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
-                        label = label.substr(0, STRINGLEN) + "...";
+                    let b = args[0];
+                    let v = args[1];
+                    that.blockList[b].value = v;
+                    let l = v.toString();
+                    if (WIDENAMES.indexOf(that.blockList[b].name) === -1 &&
+                        getTextWidth(l, "bold 20pt Sans") > TEXTWIDTH) {
+                        l = l.substr(0, STRINGLEN) + "...";
                     }
-                    that.blockList[thisBlock].text.text = label;
+                    that.blockList[b].text.text = l;
                 };
 
                 this.makeNewBlock("text", postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === "solfegein") {
                 postProcess = function(args) {
-                    let thisBlock = args[0];
-                    let value = args[1];
-                    that.blockList[thisBlock].value = value;
-                    let label = i18nSolfege(value.toString());
-                    that.blockList[thisBlock].text.text = label;
+                    let b = args[0];
+                    let v = args[1];
+                    that.blockList[b].value = v;
+                    let l = i18nSolfege(v.toString());
+                    that.blockList[b].text.text = l;
                 };
 
                 this.makeNewBlock("solfege", postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === "notein") {
                 postProcess = function(args) {
-                    let thisBlock = args[0];
-                    let value = args[1];
-                    that.blockList[thisBlock].value = value;
-                    let label = value.toString();
-                    that.blockList[thisBlock].text.text = label;
+                    let b = args[0];
+                    let v = args[1];
+                    that.blockList[b].value = v;
+                    let label = v.toString();
+                    that.blockList[b].text.text = l;
                 };
 
                 this.makeNewBlock("notename", postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === "mediain") {
                 postProcess = function(args) {
-                    let thisBlock = args[0];
-                    let value = args[1];
-                    that.blockList[thisBlock].value = value;
-                    if (value != null) {
+                    let b = args[0];
+                    let v = args[1];
+                    that.blockList[b].value = v;
+                    if (v != null) {
                         // loadThumbnail(that, thisBlock, null);
                     }
                 };
@@ -3242,10 +3285,10 @@ function Blocks(activity) {
                 this.makeNewBlock("loadFile", postProcess, thisBlock);
             } else {
                 postProcess = function(args) {
-                    let thisBlock = args[0];
-                    let value = args[1];
-                    that.blockList[thisBlock].value = value;
-                    that.blockList[thisBlock].text.text = value.toString();
+                    let b = args[0];
+                    let v = args[1];
+                    that.blockList[b].value = v;
+                    that.blockList[b].text.text = v.toString();
                 };
 
                 this.makeNewBlock("number", postProcess, [thisBlock, value]);
