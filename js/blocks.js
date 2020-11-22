@@ -2946,8 +2946,8 @@ function Blocks(activity) {
         };
 
         let postProcessArg = null;
-        let that = this;
-        let thisBlock = this.blockList.length;
+        var that = this;
+        var thisBlock = this.blockList.length;
         if (name === "start") {
             postProcess = function(thisBlock) {
                 that.blockList[thisBlock].value =
@@ -3201,8 +3201,8 @@ function Blocks(activity) {
                 }
             }
 
-            let that = this;
-            let thisBlock = this.blockList.length;
+            var that = this;
+            var thisBlock = this.blockList.length;
             if (myBlock.docks.length > i &&
                 myBlock.docks[i + 1][2] === "anyin") {
                 if (value == null) {
