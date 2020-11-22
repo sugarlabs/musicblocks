@@ -1399,7 +1399,9 @@ function Blocks(activity) {
     // when its widget windows is open.
     this.reInitWidget = async function(topBlock, timeout) {
         await delayExecution(timeout);
-        this.logo.runLogoCommands(topBlock);
+        if (!this.blockList[topBlock].trash) {
+            this.logo.runLogoCommands(topBlock);
+        }
     };
 
     /*
@@ -1635,7 +1637,7 @@ function Blocks(activity) {
             // We found a match.
             myBlock.connections[0] = newBlock;
             let connection = this.blockList[newBlock].connections[newConnection];
-	    let bottom;
+            let bottom;
 
             if (connection == null) {
                 if (this.blockList[newBlock].isArgClamp()) {
@@ -2624,7 +2626,7 @@ function Blocks(activity) {
      * @return {void}
      */
     this._searchForExpandables = function(blk) {
-	let c;
+        let c;
         while (blk != null && this.blockList[blk] != null && !this.blockList[blk].isValueBlock()) {
             // More checks for malformed or corrupted block data.
             this._searchCounter += 1;
@@ -2729,7 +2731,7 @@ function Blocks(activity) {
             return;
         }
 
-	let thisBlock = blk;
+        let thisBlock = blk;
         if (blk === null) {
             thisBlock = this.highlightedBlock;
         }
@@ -2799,7 +2801,7 @@ function Blocks(activity) {
      * @return {void}
      */
     this._makeNewBlockWithConnections = function(
-	name, blockOffset, connections, postProcess, postProcessArg) {
+        name, blockOffset, connections, postProcess, postProcessArg) {
         if (typeof collapsed === "undefined") {
             collapsed = false;
         }
@@ -2863,7 +2865,7 @@ function Blocks(activity) {
             );
         } else if (name === "namedarg") {
             this.blockList.push(new Block(
-		this.protoBlockDict[name], this, "arg " + postProcessArg[1]));
+                this.protoBlockDict[name], this, "arg " + postProcessArg[1]));
         } else {
             this.blockList.push(new Block(this.protoBlockDict[name], this));
         }
@@ -2902,11 +2904,11 @@ function Blocks(activity) {
      * @return {void}
      */
     this.makeBlock = function(name, arg) {
-	let postProcess;
+        let postProcess;
         postProcess = function(args) {
             let thisBlock = args[0];
             let value = args[1];
-	    let label;
+            let label;
             that.blockList[thisBlock].value = value;
             switch (that.blockList[thisBlock].name) {
             case "drumname":
@@ -3231,7 +3233,7 @@ function Blocks(activity) {
                     };
 
                     this.makeNewBlock(
-			"number", postProcess, [thisBlock, value]);
+                        "number", postProcess, [thisBlock, value]);
                 }
             } else if (myBlock.docks[i + 1][2] === "textin") {
                 postProcess = function(args) {
@@ -4330,7 +4332,7 @@ function Blocks(activity) {
         let mblk = myBlock.connections[0];
         // Are we connected to a multiply block?
         if (myBlock.name === "number" && mblk !== null && this.blockList[mblk].name === "multiply") {
-	    let cblk = this.blockList[mblk].connections[1];
+            let cblk = this.blockList[mblk].connections[1];
             if (this.blockList[mblk].connections[1] === blk) {
                 cblk = this.blockList[mblk].connections[2];
             }
@@ -4487,8 +4489,8 @@ function Blocks(activity) {
 
         let myBlock = this.blockList[blk];
         return (myBlock.name === "number" && myBlock.connections[0] !== null &&
-		["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "nthmodalpitch"].indexOf(this.blockList[myBlock.connections[0]].name) !== -1 &&
-		this.blockList[myBlock.connections[0]].connections[2] === blk);
+                ["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "nthmodalpitch"].indexOf(this.blockList[myBlock.connections[0]].name) !== -1 &&
+                this.blockList[myBlock.connections[0]].connections[2] === blk);
     };
 
     /*
@@ -4642,7 +4644,7 @@ function Blocks(activity) {
         // the block containing its label.
         let nameBlk = blockObjs[0][4][1];
 
-	let name;
+        let name;
         if (nameBlk == null) {
             console.debug("action not named... skipping");
         } else {
@@ -4674,8 +4676,8 @@ function Blocks(activity) {
     this._copyBlocksToObj = function() {
         let blockObjs = [];
         let blockMap = {};
-	let x;
-	let y;
+        let x;
+        let y;
 
         this.findDragGroup(this.selectedStack);
         for (let b = 0; b < this.dragGroup.length; b++) {
@@ -4688,7 +4690,7 @@ function Blocks(activity) {
                 y = 0;
             }
 
-	    let blockItem;
+            let blockItem;
             if (myBlock.isValueBlock()) {
                 switch (myBlock.name) {
                 case "media":
@@ -4734,7 +4736,7 @@ function Blocks(activity) {
      * @return {void}
      */
     this.addToMyPalette = function(name, obj) {
-	// FIXME: where is obj used?
+        // FIXME: where is obj used?
         let myBlock = new ProtoBlock("macro_" + name);
         let blkName = "macro_" + name;
         this.protoBlockDict[blkName] = myBlock;
@@ -4847,7 +4849,7 @@ function Blocks(activity) {
         // Scan for any new action and storein blocks to identify
         // duplicates. We also need to track start and action blocks
         // that may need to be collapsed.
-	let name;
+        let name;
         for (let b = 0; b < blockObjs.length; b++) {
             let blkData = blockObjs[b];
             // blkData[1] could be a string or an object.
@@ -4983,7 +4985,7 @@ function Blocks(activity) {
             }
 
             // and any do blocks
-	    let blkName;
+            let blkName;
             for (let d in doNames) {
                 let thisBlkData = blockObjs[d];
                 if (typeof thisBlkData[1] === "string") {
@@ -5019,7 +5021,7 @@ function Blocks(activity) {
         // convert old-style notes to new-style notes.
         blockObjsLength = blockObjs.length;
         let extraBlocksLength = 0;
-	let len;
+        let len;
 
         for (let b = 0; b < blockObjsLength; b++) {
             if (typeof blockObjs[b][1] === "object") {
@@ -5073,7 +5075,7 @@ function Blocks(activity) {
                         extraBlocksLength += 1;
                     } else {
                         let nextBlock = blockObjs[b][4][len - 1];
-			let nextName;
+                        let nextName;
                         if (typeof blockObjs[nextBlock][1] === "object") {
                             nextName = blockObjs[nextBlock][1][0];
                         } else {
@@ -5141,7 +5143,7 @@ function Blocks(activity) {
                     extraBlocksLength += 1;
                 } else {
                     let nextBlock = blockObjs[b][4][2];
-		    let nextName;
+                    let nextName;
                     if (typeof blockObjs[nextBlock][1] === "object") {
                         nextName = blockObjs[nextBlock][1][0];
                     } else {
@@ -5175,7 +5177,7 @@ function Blocks(activity) {
         for (let b = 0; b < this._loadCounter; b++) {
             let thisBlock = blockOffset + b;
             let blkData = blockObjs[b];
-	    let blkInfo;
+            let blkInfo;
 
             if (typeof blkData[1] === "object") {
                 if (blkData[1].length === 1) {
@@ -5196,8 +5198,8 @@ function Blocks(activity) {
             }
 
             let name = blkInfo[0];
-	    let value;
-	    let text;
+            let value;
+            let text;
             let collapsed = false;
             if (COLLAPSIBLES.indexOf(name) !== -1) {
                 collapsed = blkInfo[1]["collapsed"];
@@ -5544,11 +5546,11 @@ function Blocks(activity) {
                     // Load the synth for this voice
                     try {
                         if (value === null) {
-			    value = DEFAULTVOICE;
-			}
+                            value = DEFAULTVOICE;
+                        }
                         this.logo.synth.loadSynth(0, getVoiceSynthName(value));
                     } catch (e) {
-			console.debug(e);
+                        console.debug(e);
                     }
                 }
                 break;
@@ -5566,8 +5568,8 @@ function Blocks(activity) {
                     // Load the synth for this noise
                     try {
                         if (value === null) {
-			    value = DEFAULTNOISE;
-			}
+                            value = DEFAULTNOISE;
+                        }
                         this.logo.synth.loadSynth(0, getNoiseSynthName(value));
                     } catch (e) {
                         console.debug(e);
@@ -5601,7 +5603,7 @@ function Blocks(activity) {
                 };
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-		break;
+                break;
             case "video":
                 postProcess = function(args) {
                     let thisBlock = args[0];
@@ -5630,8 +5632,8 @@ function Blocks(activity) {
                 };
 
                 this._makeNewBlockWithConnections("number", blockOffset, blkData[4], postProcess, thisBlock);
-		break;
-	    case "orange":
+                break;
+            case "orange":
                 postProcess = function(thisBlock) {
                     that.blockList[thisBlock].value = 10;
                     that.updateBlockText(thisBlock);
@@ -5670,7 +5672,7 @@ function Blocks(activity) {
                 };
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-		break;
+                break;
             default:
                 // Check that name is in the proto list
                 if (!(name in this.protoBlockDict) || this.protoBlockDict[name] == null) {
@@ -5831,7 +5833,7 @@ function Blocks(activity) {
         updatePalettes = false;
         for (let blk = 0; blk < this.blockList.length; blk++) {
             if (!this.blockList[blk].trash && this.blockList[blk].name === "storein") {
-		let myBlock = this.blockList[blk];
+                let myBlock = this.blockList[blk];
                 let arg = null;
                 let c = myBlock.connections[1];
                 if (c != null && this.blockList[c].value !== _("box")) {
@@ -6011,8 +6013,8 @@ function Blocks(activity) {
                     }
                 }
 
-		let argBlock;
-		let blockValue;
+                let argBlock;
+                let blockValue;
                 switch (thisBlock.name) {
                 case "doArg":
                 case "calcArg":
