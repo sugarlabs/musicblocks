@@ -1,24 +1,64 @@
 {
     "name": "MusicBlocks",
+    "short_name": "Music Blocks",
     "version": "2.3",
     "manifest_version": 2,
     "author": "Sugar Labs",
     "description": "Learn to program music with snap-together blocks.",
-    "icons": {
-        "512": "/activity/activity-icon-color-512.png",
-      	"128": "/activity/activity-icon-color-128.png"
-    },
+    "icons": [
+        {
+            "src": "activity/activity-icon-color-0-75.png",
+            "sizes": "36x36",
+            "type": "image/png",
+            "density": "0.75"
+        },
+        {
+            "src": "activity/activity-icon-color-1-00.png",
+            "sizes": "48x48",
+            "type": "image/png",
+            "density": "1.0"
+        },
+        {
+            "src": "activity/activity-icon-color-1-50.png",
+            "sizes": "72x72",
+            "type": "image/png",
+            "density": "1.5"
+        },
+        {
+            "src": "activity/activity-icon-color-2-00.png",
+            "sizes": "96x96",
+            "type": "image/png",
+            "density": "2.0"
+        },
+        {
+            "src": "activity/activity-icon-color-3-00.png",
+            "sizes": "144x144",
+            "type": "image/png",
+            "density": "3.0"
+        },
+        {
+            "src": "activity/activity-icon-color-4-00.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "density": "4.0"
+        },
+        {
+            "src": "/activity/activity-icon-color-512.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "any maskable"
+        }
+    ],
+    "start_url": "index.html",
+    "background_color": "#F9F9F9",
+    "theme_color": "#2196F3",
+    "display": "standalone",
+    "orientation": "portrait",
     "background": {
-       "scripts": ["js/background.js"]
+        "scripts": ["js/background.js"]
     },
-    "web_accessible_resources": [
-        "index.html"
-    ],
-    "permissions": [
-	"clipboardWrite",
-      	"storage",
-      	"unlimitedStorage"
-    ],
+    "web_accessible_resources": ["index.html"],
+    "permissions": ["clipboardWrite", "storage", "unlimitedStorage"],
     "browser_action": {
         "default_icon": "/activity/activity-icon-color-128.png"
     }
