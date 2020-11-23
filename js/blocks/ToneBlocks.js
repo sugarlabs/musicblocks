@@ -364,8 +364,11 @@ function setupToneBlocks() {
         constructor() {
             super("phaser");
             this.setPalette("tone");
-            this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 20];
+            this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5,
+                                    10, 20];
             this.piemenuValuesC2 = [1, 2, 3];
+            this.piemenuValuesC3 = [220, 247, 262, 294, 330, 349, 392, 440,
+                                    494, 523, 587, 659, 698, 783, 880];
             this.setHelpString([
                 _("The Phaser block adds a sweeping sound."),
                 "documentation",
