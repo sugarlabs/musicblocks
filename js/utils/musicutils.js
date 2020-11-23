@@ -140,7 +140,8 @@ const EQUIVALENTSHARPS = {
     "B♭": "A" + SHARP
 };
 const EQUIVALENTNATURALS = { "E♯": "F", "B♯": "C", "C♭": "B", "F♭": "E" };
-const EQUIVALENTACCIDENTALS = { "F": "E♯", "C": "B♯", "B": "C♭", "E": "F♭", "G": "F𝄪", "D": "C𝄪", "A": "G𝄪"};
+const EQUIVALENTACCIDENTALS = { "F": "E♯", "C": "B♯", "B": "C♭", "E": "F♭",
+                                "G": "F𝄪", "D": "C𝄪", "A": "G𝄪"};
 
 const EXTRATRANSPOSITIONS = {
     "E♯": ["F", 0],
@@ -2071,6 +2072,19 @@ function _buildScale(keySignature) {
         scale.push(thisScale[ii % SEMITONES]);
     }
     
+    // Make sure there are no repeated letter names for seven step scales
+    if (scale.length === 8) {
+        for (let n = 0; n < 7; n++) {
+            if (scale[n][0] === scale[n + 1][0]) {
+                if (scale[n] in EQUIVALENTACCIDENTALS) {
+                    scale[n] = EQUIVALENTACCIDENTALS[scale[n]];
+                } else if (scale[n] in EQUIVALENTNATURALS) {
+                    scale[n] = EQUIVALENTNATURALS[scale[n]];
+                }
+            }
+        }
+    }
+
     return [scale, halfSteps];
 }
 
