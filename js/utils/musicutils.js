@@ -2083,8 +2083,17 @@ function _buildScale(keySignature) {
                 }
             }
         }
+	// Two passes because we may have collisions.
+        for (let n = 0; n < 7; n++) {
+            if (scale[n][0] === scale[n + 1][0]) {
+                if (scale[n] in EQUIVALENTACCIDENTALS) {
+                    scale[n] = EQUIVALENTACCIDENTALS[scale[n]];
+                } else if (scale[n] in EQUIVALENTNATURALS) {
+                    scale[n] = EQUIVALENTNATURALS[scale[n]];
+                }
+            }
+        }
     }
-
     return [scale, halfSteps];
 }
 
