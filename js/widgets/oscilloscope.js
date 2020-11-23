@@ -8,12 +8,12 @@
 // You should have received a copy of the GNU Affero General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
-
+let execution = true;
 function Oscilloscope() {
+    console.debug("oscilloscope function running");
+    if (execution) {
     const ICONSIZE = 32;
     const analyserSize = 8192;
-    let execution = 1;
-    
     this.init = function(logo) {
         this._logo = logo;
         this.pitchAnalysers = {};
@@ -101,8 +101,6 @@ function Oscilloscope() {
         let canvasCtx = canvas.getContext('2d');
         canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
         let draw = () => {
-            // console.debug("oscilloscope running");
-            
             this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
             canvasCtx.fillStyle = 'rgb(200, 200, 200)';
             var dataArray = this.pitchAnalysers[turtleIdx].getValue();
@@ -129,15 +127,13 @@ function Oscilloscope() {
             }
             canvasCtx.lineTo(canvas.width, canvas.height / 2);
             canvasCtx.stroke();
-        };
-        if (execution === 1) {
+        } 
+        draw();
+    };
+
             if (!this.playingNow) {
                 console.debug("oscilloscope running");
             }
-            draw();
-        }
-        else {
-
-        }
     }
+    execution=false;
 }
