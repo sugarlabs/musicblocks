@@ -2746,12 +2746,10 @@ function calcNoteValueToDisplay(a, b, scale) {
 
     if (parseInt(noteValue) < noteValue) {
         noteValueToDisplay = parseInt(noteValue * 1.5);
-	console.log(b + ' / ' + a + ' ' + noteValueToDisplay);
         if ((noteValueToDisplay * 2) in NSYMBOLS) {
             var value = (b / a); // * noteValueToDisplay;
             let obj = toFraction(value);
             let d0, d1;
-	    console.log(obj[0] + ' / ' + obj[1]);
             Number.isInteger(obj[0]) ? d0 = 0 : d0 = 2;
             Number.isInteger(obj[1]) ? d1 = 0 : d1 = 2;
             noteValueToDisplay =
