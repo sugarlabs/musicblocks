@@ -80,11 +80,7 @@ function Activity() {
     if (_THIS_IS_TURTLE_BLOCKS_) {
         function facebookInit() {
             window.fbAsyncInit = function () {
-                FB.init({
-                    appId: '1496189893985945',
-                    xfbml: true,
-                    version: 'v2.1'
-                });
+                FB.init({ appId: '1496189893985945', xfbml: true, version: 'v2.1' });
 
                 // ADD ADDITIONAL FACEBOOK CODE HERE
             };
@@ -2059,15 +2055,17 @@ function Activity() {
         let searchResult = blocks.protoBlockDict.hasOwnProperty(protoName);
 
         if (searchResult) {
-            palettes.dict[paletteName].makeBlockFromSearch(protoblk, protoName, function (
-                newBlock
-            ) {
-                blocks.moveBlock(
-                    newBlock,
-                    100 + searchBlockPosition[0] - blocksContainer.x,
-                    searchBlockPosition[1] - blocksContainer.y
-                );
-            });
+            palettes.dict[paletteName].makeBlockFromSearch(
+                protoblk,
+                protoName,
+                function (newBlock) {
+                    blocks.moveBlock(
+                        newBlock,
+                        100 + searchBlockPosition[0] - blocksContainer.x,
+                        searchBlockPosition[1] - blocksContainer.y
+                    );
+                }
+            );
 
             // Move the position of the next newly created block.
             searchBlockPosition[0] += STANDARDBLOCKHEIGHT;
@@ -4482,10 +4480,10 @@ function Activity() {
                 window.scroll(0, 0);
             };
 
-            this.showMusicBlocks = function() {
+            this.showMusicBlocks = function () {
                 document.title = planet.getCurrentProjectName();
-                document.getElementById("toolbars").style.display = "block";
-                document.getElementById("palette").style.display = "block";
+                document.getElementById('toolbars').style.display = 'block';
+                document.getElementById('palette').style.display = 'block';
 
                 prepSearchWidget();
                 widgetWindows.showWindows();
@@ -4905,12 +4903,10 @@ function Activity() {
                                     // Wait for the old blocks to be removed.
                                     let __listener = function (event) {
                                         blocks.loadNewBlocks(obj);
-                                        stage.removeAllEventListeners(
-                                            "trashsignal"
-                                        );
-					if (planet) {
+                                        stage.removeAllEventListeners('trashsignal');
+                                        if (planet) {
                                             planet.saveLocally();
-					}
+                                        }
                                     };
 
                                     stage.addEventListener('trashsignal', __listener, false);

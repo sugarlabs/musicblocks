@@ -16,7 +16,7 @@
  * Private methods' names begin with underscore '_".
  * Unused methods' names begin with double underscore '__'.
  * Internal functions' names are in PascalCase.
-*/
+ */
 
 /**
  * @class
@@ -100,7 +100,7 @@ class MusicBlocks {
             MusicBlocks._blockNo = 0;
         }
 
-        let APIClassNames = [
+        [
             "GraphicsBlocksAPI",
             "PenBlocksAPI",
             "RhythmBlocksAPI",
@@ -110,10 +110,8 @@ class MusicBlocks {
             "ToneBlocksAPI",
             "OrnamentBlocksAPI",
             "VolumeBlocksAPI",
-            "DrumBlocksAPI",
-        ];
-        for (let className of APIClassNames)
-            importMembers(this, className);
+            "DrumBlocksAPI"
+        ].forEach((className) => importMembers(this, className));
     }
 
     /**
@@ -139,7 +137,7 @@ class MusicBlocks {
          * @returns {void}
          */
         function CreateAPIMethodList() {
-            let actionClassNames = [
+            [
                 "Painter",
                 // "Painter.GraphicsActions",
                 // "Painter.PenActions",
@@ -151,25 +149,24 @@ class MusicBlocks {
                 "Singer.OrnamentActions",
                 "Singer.VolumeActions",
                 "Singer.DrumActions"
-            ];
-            for (let className of actionClassNames) {
+            ].forEach((className) => {
                 MusicBlocks._methodList[className] = [];
 
                 if (className === "Painter") {
-                    for (
-                        let methodName of Object.getOwnPropertyNames(eval(className + ".prototype"))
-                    ) {
+                    for (let methodName of Object.getOwnPropertyNames(
+                        eval(className + ".prototype")
+                    )) {
                         if (methodName !== "constructor" && !methodName.startsWith("_"))
                             MusicBlocks._methodList[className].push(methodName);
                     }
-                    continue;
+                    return;
                 }
 
                 for (let methodName of Object.getOwnPropertyNames(eval(className))) {
                     if (methodName !== "length" && methodName !== "prototype")
                         MusicBlocks._methodList[className].push(methodName);
                 }
-            }
+            });
         }
 
         if (start) {
@@ -211,8 +208,7 @@ class MusicBlocks {
         logo.prepSynths();
         logo.firstNoteTime = null;
 
-        for (let mouse of Mouse.MouseList)
-            mouse.run();
+        Mouse.MouseList.forEach((mouse) => mouse.run());
     }
 
     /**
@@ -223,7 +219,7 @@ class MusicBlocks {
      * @returns {Promise}
      */
     runCommand(command, args) {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             if (command === "_anonymous") {
                 if (args !== undefined) args();
             } else {
@@ -255,7 +251,7 @@ class MusicBlocks {
      * @returns {Promise}
      */
     get ENDFLOW() {
-        return new Promise(resolve => resolve());
+        return new Promise((resolve) => resolve());
     }
 
     /**
@@ -264,7 +260,7 @@ class MusicBlocks {
      * @returns {Promise}
      */
     get ENDFLOWCOMMAND() {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             let signal = this.listeners.pop();
             if (signal !== null && signal !== undefined) {
                 logo.stage.dispatchEvent(signal);
@@ -281,10 +277,9 @@ class MusicBlocks {
      * @returns {Promise}
      */
     get ENDMOUSE() {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             Mouse.MouseList.splice(Mouse.MouseList.indexOf(this.mouse), 1);
-            if (Mouse.MouseList.length === 0)
-                MusicBlocks.init(false);
+            if (Mouse.MouseList.length === 0) MusicBlocks.init(false);
 
             resolve();
         });

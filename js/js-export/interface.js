@@ -71,11 +71,11 @@ class JSInterface {
      * lookup table for block names to setter names
      */
     static _setterNameLookup = {
-            // Meter blocks
+        // Meter blocks
         "pickup": "PICKUP",
-            // Intervals blocks
+        // Intervals blocks
         "movable": "MOVEABLE",
-            // Volume blocks
+        // Volume blocks
         "setnotevolume": "MASTERVOLUME",
         "setpanning": "PANNING",
     };
@@ -85,25 +85,25 @@ class JSInterface {
      * lookup table for block names to getter names
      */
     static _getterNameLookup = {
-            // Rhythm blocks
+        // Rhythm blocks
         "mynotevalue": "NOTEVALUE",
-            // Meter blocks
+        // Meter blocks
         "elapsednotes": "WHOLENOTESPLAYED",
         "beatvalue": "BEATCOUNT",
         "measurevalue": "MEASURECOUNT",
         "bpmfactor": "BPM",
         "beatfactor": "BEATFACTOR",
         "currentmeter": "CURRENTMETER",
-            // Pitch blocks
+        // Pitch blocks
         "deltapitch2": "SCALARCHANGEINPITCH",
         "deltapitch": "CHANGEINPITCH",
         "consonantstepsizeup": "SCALARSTEPUP",
         "consonantstepsizedown": "SCALARSTEPDOWN",
-            // Intervals blocks
+        // Intervals blocks
         "key": "CURRENTKEY",
         "currentmode": "CURRENTMODE",
         "modelength": "MODELENGTH",
-            // Volume blocks
+        // Volume blocks
         "notevolumefactor": "MASTERVOLUME"
     };
 
@@ -112,7 +112,7 @@ class JSInterface {
      * lookup table for block names to API method names
      */
     static _methodNameLookup = {
-            // Rhythm blocks
+        // Rhythm blocks
         "newnote": "playNote",
         "osctime": "playNoteMillis",
         "rest2": "playRest",
@@ -120,7 +120,7 @@ class JSInterface {
         "tie": "tie",
         "multiplybeatfactor": "multiplyNoteValue",
         "newswing2": "swing",
-            // Meter blocks
+        // Meter blocks
         "meter": "setMeter",
         "setbpm3": "setBPM",
         "setmasterbpm2": "setMasterBPM",
@@ -130,7 +130,7 @@ class JSInterface {
         "offbeatdo": "onWeakBeatDo",
         "drift": "setNoClock",
         "elapsednotes2": "getNotesPlayed",
-            // Pitch blocks
+        // Pitch blocks
         "pitch": "playPitch",
         "steppitch": "stepPitch",
         "nthmodalpitch": "playNthModalPitch",
@@ -144,13 +144,13 @@ class JSInterface {
         "setpitchnumberoffset": "setPitchNumberOffset",
         "number2pitch": "numToPitch",
         "number2octave": "numToOctave",
-            // Intervals blocks
+        // Intervals blocks
         "setkey2": "setKey",
         // "definemode": "defineMode",
         "interval": "setScalarInterval",
         "semitoneinterval": "setSemitoneInterval",
         "settemperament": "setTemperament",
-            // Tone blocks
+        // Tone blocks
         "settimbre": "setInstrument",
         "vibrato": "doVibrato",
         "chorus": "doChorus",
@@ -158,17 +158,17 @@ class JSInterface {
         "tremolo": "doTremolo",
         "dis": "doDistortion",
         "harmonic2": "doHarmonic",
-            // Ornament blocks
+        // Ornament blocks
         "newstaccato": "setStaccato",
         "newslur": "setSlur",
         "neighbor2": "doNeighbor",
-            // Volume blocks
+        // Volume blocks
         "crescendo": "doCrescendo",
         "decrescendo": "doDecrescendo",
         "articulation": "setRelativeVolume",
         "setsynthvolume": "setSynthVolume",
         "synthvolumefactor": "getSynthVolume",
-            // Drum blocks
+        // Drum blocks
         "playdrum": "playDrum",
         "setdrum": "setDrum",
         "mapdrum": "mapPitchToDrum",
@@ -1376,7 +1376,7 @@ class JSInterface {
                     if (!isNaN(Number(arg))) {
                         arg = Number(arg);
                     } else {
-                        let error = `TypeMismatch error: expected "number" but found "string"`;
+                        let error = 'TypeMismatch error: expected "number" but found "string"';
                         JSEditor.logConsole(error, "maroon");
                         throw error;
                     }
