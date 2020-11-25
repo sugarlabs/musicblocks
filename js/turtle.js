@@ -107,9 +107,7 @@ class Turtle {
      */
     async updateCache() {
         if (this.bounds == null) {
-            console.debug(
-                "Block container for " + this.name + " not yet ready."
-            );
+            console.debug("Block container for " + this.name + " not yet ready.");
             await delayExecution(300);
             this.updateCache();
         } else {
@@ -180,10 +178,10 @@ class Turtle {
         this.painter.cp2x = 100;
         this.painter.cp2y = 100;
 
-        /** @deprecated */  this.singer.attack = [];
-        /** @deprecated */  this.singer.decay = [];
-        /** @deprecated */  this.singer.sustain = [];
-        /** @deprecated */  this.singer.release = [];
+        /** @deprecated */ this.singer.attack = [];
+        /** @deprecated */ this.singer.decay = [];
+        /** @deprecated */ this.singer.sustain = [];
+        /** @deprecated */ this.singer.release = [];
 
         this.singer.scalarTransposition = 0;
         this.singer.scalarTranspositionValues = [];
@@ -232,7 +230,7 @@ class Turtle {
         this.singer.instrumentNames = ["electronic synth"];
         this.singer.inCrescendo = [];
         this.singer.crescendoDelta = [];
-        this.singer.crescendoInitialVolume = {"electronic synth": [DEFAULTVOLUME]};
+        this.singer.crescendoInitialVolume = { "electronic synth": [DEFAULTVOLUME] };
         this.singer.intervals = [];
         this.singer.semitoneIntervals = [];
         this.singer.staccato = [];
@@ -277,7 +275,7 @@ class Turtle {
         this.singer.defaultStrongBeats = false;
 
         this.singer.pickup = 0;
-        this.singer.beatsPerMeasure = 4;         // default is 4/4 time
+        this.singer.beatsPerMeasure = 4;        // default is 4/4 time
         this.singer.noteValuePerBeat = 4;
         this.singer.currentBeat = 0;
         this.singer.currentMeasure = 0;
@@ -291,6 +289,8 @@ class Turtle {
         this.singer.dispatchFactor = 1;
 
         this.singer.runningFromEvent = false;
+
+        logo.turtleDicts[turtles.turtleList.indexOf(this)] = [];
     }
 
     // ================================ CONTROLLER ============================
@@ -607,7 +607,7 @@ Turtle.TurtleModel = class {
         this._name = name;          // name of the turtle
         this._turtles = turtles;    // object handling behavior of all turtles
 
-        this._startBlock = startBlock;    // Which start block is associated with this turtle?
+        this._startBlock = startBlock;  // Which start block is associated with this turtle?
         this._queue = [];           // Queue of blocks this turtle is executing
         this._parentFlowQueue = [];
         this._unhighlightQueue = [];
@@ -773,18 +773,11 @@ Turtle.TurtleView = class {
 
             this.container.uncache();
             let bounds = this.container.getBounds();
-            this.container.cache(
-                bounds.x,
-                bounds.y,
-                bounds.width,
-                bounds.height
-            );
+            this.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
 
             // Recalculate the hit area as well
             let hitArea = new createjs.Shape();
-            hitArea.graphics
-                .beginFill("#FFF")
-                .drawRect(0, 0, bounds.width, bounds.height);
+            hitArea.graphics.beginFill("#FFF").drawRect(0, 0, bounds.width, bounds.height);
             hitArea.x = -bounds.width / 2;
             hitArea.y = -bounds.height / 2;
             this.container.hitArea = hitArea;
@@ -798,19 +791,14 @@ Turtle.TurtleView = class {
 
                 let width = startBlock.width;
                 // FIXME: Why is the position off? Does it need a scale factor?
-                this._decorationBitmap.x =
-                    width - (30 * startBlock.protoblock.scale) / 2;
-                this._decorationBitmap.y =
-                    (20 * startBlock.protoblock.scale) / 2;
+                this._decorationBitmap.x = width - (30 * startBlock.protoblock.scale) / 2;
+                this._decorationBitmap.y = (20 * startBlock.protoblock.scale) / 2;
                 this._decorationBitmap.scaleX =
-                    ((27.5 / image.width) * startBlock.protoblock.scale) /
-                    2;
+                    ((27.5 / image.width) * startBlock.protoblock.scale) / 2;
                 this._decorationBitmap.scaleY =
-                    ((27.5 / image.height) * startBlock.protoblock.scale) /
-                    2;
+                    ((27.5 / image.height) * startBlock.protoblock.scale) / 2;
                 this._decorationBitmap.scale =
-                    ((27.5 / image.width) * startBlock.protoblock.scale) /
-                    2;
+                    ((27.5 / image.width) * startBlock.protoblock.scale) / 2;
                 startBlock.updateCache();
             }
 
@@ -827,9 +815,7 @@ Turtle.TurtleView = class {
     resizeDecoration(scale, width) {
         this._decorationBitmap.x = width - (30 * scale) / 2;
         this._decorationBitmap.y = (35 * scale) / 2;
-        this._decorationBitmap.scaleX =
-            this._decorationBitmap.scaleY =
-            this._decorationBitmap.scale =
+        this._decorationBitmap.scaleX = this._decorationBitmap.scaleY = this._decorationBitmap.scale =
             (0.5 * scale) / 2;
     }
 
@@ -844,16 +830,11 @@ Turtle.TurtleView = class {
             return;
         }
 
-        let textList =
-            typeof myText !== "string" ? [myText.toString()] : myText.split("\\n");
+        let textList = typeof myText !== "string" ? [myText.toString()] : myText.split("\\n");
 
         let textSize = size.toString() + "px " + this.painter.font;
         for (i = 0; i < textList.length; i++) {
-            let text = new createjs.Text(
-                textList[i],
-                textSize,
-                this.painter.canvasColor
-            );
+            let text = new createjs.Text(textList[i], textSize, this.painter.canvasColor);
             text.textAlign = "left";
             text.textBaseline = "alphabetic";
             this.turtles.stage.addChild(text);
@@ -914,13 +895,9 @@ Turtle.TurtleView = class {
                 let width = startBlock.width;
                 let offset = 40;
 
-                this._decorationBitmap.x =
-                    width - (offset * startBlock.protoblock.scale) / 2;
-                this._decorationBitmap.y =
-                    (35 * startBlock.protoblock.scale) / 2;
-                this._decorationBitmap.scaleX =
-                    this._decorationBitmap.scaleY =
-                    this._decorationBitmap.scale =
+                this._decorationBitmap.x = width - (offset * startBlock.protoblock.scale) / 2;
+                this._decorationBitmap.y = (35 * startBlock.protoblock.scale) / 2;
+                this._decorationBitmap.scaleX = this._decorationBitmap.scaleY = this._decorationBitmap.scale =
                     (0.5 * startBlock.protoblock.scale) / 2;
                 startBlock.updateCache();
             }
@@ -928,8 +905,6 @@ Turtle.TurtleView = class {
             refreshCanvas();
         };
 
-        img.src =
-            "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(data)));
+        img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(data)));
     }
 };

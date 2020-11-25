@@ -12,10 +12,9 @@
  * You should have received a copy of the GNU Affero General Public License along with this
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
-*/
+ */
 
-const JS_API =
-`/*
+const JS_API = `/*
 ============================================================
        API
 ============================================================
@@ -123,6 +122,14 @@ pen down                    : penDown()
 fill background             : fillBackground()
 set font name               : setFont(fontname)
 
+    // Dictionary
+set value to unnamed dict   : setValue(key, value)
+set value to named dict     : setValue(key, value, dict)
+get value from unnamed dict : getValue(key)
+get value from named dict   : getValue(key, dict)
+get a dictionary            : getDict(dict)
+print a dictionary (on top) : showDict(dict)
+
 CLAMP BLOCK FUNCTIONS:
 ----------------------
 // flow refers to an async function callback    : async () => {...}
@@ -209,8 +216,7 @@ pen lightness               : SHADE
 pen saturation              : GREY
 */`;
 
-const JS_STARTER =
-`let rightSqr = async mouse => {
+const JS_STARTER = `let rightSqr = async mouse => {
     await mouse.hollowLine(async () => {
         for (let i = 0; i < 4; i++) {
             await mouse.goForward(100);
@@ -261,8 +267,7 @@ new Mouse(async mouse => {
 MusicBlocks.run();
 `;
 
-const SAMPLE_1 =
-`new Mouse(async mouse => {
+const SAMPLE_1 = `new Mouse(async mouse => {
     await mouse.playPitch("sol", 4);
     for (let i = 0; i < 7; i++) {
         await mouse.playNote(1/4, async () => {
@@ -282,8 +287,7 @@ const SAMPLE_1 =
 MusicBlocks.run();
 `;
 
-const SAMPLE_2 =
-`new Mouse(async mouse => {
+const SAMPLE_2 = `new Mouse(async mouse => {
     await mouse.playNote(1/4, async () => {
         await mouse.playPitch("sol", 4);
         await mouse.playPitch("do", 4);
