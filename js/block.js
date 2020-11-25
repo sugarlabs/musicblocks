@@ -7084,7 +7084,7 @@ function Block(protoblock, blocks, overrideName) {
                     let temptemperament = TEMPERAMENT[oldValue];
                     delete TEMPERAMENT[oldValue];
                     TEMPERAMENT[newValue] = temptemperament;
-                    updateTEMPERAMENTS();
+                    updateTemperaments();
                     break;
                 default:
                     break;
