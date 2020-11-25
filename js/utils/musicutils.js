@@ -2746,10 +2746,12 @@ function calcNoteValueToDisplay(a, b, scale) {
 
     if (parseInt(noteValue) < noteValue) {
         noteValueToDisplay = parseInt(noteValue * 1.5);
-        if (noteValueToDisplay in NSYMBOLS) {
-            var value = (b / a) * noteValueToDisplay;
+	console.log(b + ' / ' + a + ' ' + noteValueToDisplay);
+        if ((noteValueToDisplay * 2) in NSYMBOLS) {
+            var value = (b / a); // * noteValueToDisplay;
             let obj = toFraction(value);
             let d0, d1;
+	    console.log(obj[0] + ' / ' + obj[1]);
             Number.isInteger(obj[0]) ? d0 = 0 : d0 = 2;
             Number.isInteger(obj[1]) ? d1 = 0 : d1 = 2;
             noteValueToDisplay =
@@ -2759,12 +2761,12 @@ function calcNoteValueToDisplay(a, b, scale) {
                 // noteValueToDisplay.toString() +
                 obj[1].toFixed(d1) +
                 "<br>" +
-                NSYMBOLS[noteValueToDisplay] +
+                NSYMBOLS[noteValueToDisplay * 2] +
                 ".";
         } else {
             noteValueToDisplay = parseInt(noteValue * 1.75);
-            if (noteValueToDisplay in NSYMBOLS) {
-                var value = (b / a) * noteValueToDisplay;
+            if ((noteValueToDisplay * 2) in NSYMBOLS) {
+                var value = (b / a); // * noteValueToDisplay;
                 let obj = toFraction(value);
                 let d0, d1;
                 Number.isInteger(obj[0]) ? d0 = 0 : d0 = 2;
@@ -2776,7 +2778,7 @@ function calcNoteValueToDisplay(a, b, scale) {
                     // noteValueToDisplay.toString() +
                     obj[1].toFixed(d1) +
                     "<br>" +
-                    NSYMBOLS[noteValueToDisplay] +
+                    NSYMBOLS[noteValueToDisplay * 2] +
                     "..";
             } else {
                 noteValueToDisplay = reducedFraction(b, a);
