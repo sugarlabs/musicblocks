@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
-*/
+ */
 
 /**
  * @class
@@ -143,8 +143,7 @@ class JSGenerate {
                 return args;
             }
 
-            if (level === undefined)
-                level = 0;
+            if (level === undefined) level = 0;
 
             let nextBlk = blk.connections[blk.connections.length - 2 - level];
             nextBlk = blocks.blockList[nextBlk];
@@ -172,8 +171,7 @@ class JSGenerate {
 
                 if (nextBlk.connections.length > 0) {
                     nextBlk = blocks.blockList[last(nextBlk.connections)];
-                    if (nextBlk === undefined)
-                        break;
+                    if (nextBlk === undefined) break;
                 } else {
                     break;
                 }
@@ -188,8 +186,7 @@ class JSGenerate {
 
         for (let blk of JSGenerate.actionBlocks) {
             let actionName = blocks.blockList[blocks.blockList[blk].connections[1]].value;
-            if (actionName === null || actionName === undefined)
-                continue;
+            if (actionName === null || actionName === undefined) continue;
 
             JSGenerate.actionNames.push(actionName);
             JSGenerate.actionTrees.push(GenerateStackTree(blocks.blockList[blk], []));
@@ -217,8 +214,7 @@ class JSGenerate {
              * @returns {String} serialized arguments
              */
             function PrintArgs(args) {
-                if (args === null || args.length === 0)
-                    return "none";
+                if (args === null || args.length === 0) return "none";
 
                 let str = "(";
                 for (let arg of args) {
@@ -235,16 +231,16 @@ class JSGenerate {
                 return str;
             }
 
-            if (level === undefined)
-                level = 0;
+            if (level === undefined) level = 0;
 
             for (let i of tree) {
                 let spaces = "";
-                for (let j = 0; j < 4 * level; j++)
-                    spaces += " ";
+                for (let j = 0; j < 4 * level; j++) spaces += " ";
                 console.log(
                     "%c" + spaces + "%c" + i[0] + " : " + "%c" + PrintArgs(i[1]),
-                    "background: mediumslateblue", "background; none", "color: dodgerblue"
+                    "background: mediumslateblue",
+                    "background; none",
+                    "color: dodgerblue"
                 );
                 if (i[2] !== null) {
                     PrintTree(i[2], level + 1);
@@ -261,7 +257,8 @@ class JSGenerate {
         } else {
             for (let tree of JSGenerate.startTrees) {
                 console.log(
-                    "\n   " + "%c START ", "background: navy; color: white; font-weight: bold"
+                    "\n   " + "%c START ",
+                    "background: navy; color: white; font-weight: bold"
                 );
                 PrintTree(tree);
                 console.log("\n");
@@ -273,7 +270,8 @@ class JSGenerate {
         } else {
             for (let tree of JSGenerate.actionTrees) {
                 console.log(
-                    "\n   " + "%c ACTION ", "background: green; color: white; font-weight: bold"
+                    "\n   " + "%c ACTION ",
+                    "background: green; color: white; font-weight: bold"
                 );
                 PrintTree(tree);
                 console.log("\n");
@@ -295,15 +293,19 @@ class JSGenerate {
 
         try {
             for (let i = 0; i < JSGenerate.actionTrees.length; i++) {
-                JSGenerate.AST["body"].splice(i, 0, ASTUtils.getMethodAST(
-                    JSGenerate.actionNames[i], JSGenerate.actionTrees[i])
+                JSGenerate.AST["body"].splice(
+                    i,
+                    0,
+                    ASTUtils.getMethodAST(JSGenerate.actionNames[i], JSGenerate.actionTrees[i])
                 );
             }
 
             let offset = JSGenerate.actionTrees.length;
             for (let i = 0; i < JSGenerate.startTrees.length; i++) {
-                JSGenerate.AST["body"].splice(i + offset, 0, ASTUtils.getMouseAST(
-                    JSGenerate.startTrees[i])
+                JSGenerate.AST["body"].splice(
+                    i + offset,
+                    0,
+                    ASTUtils.getMouseAST(JSGenerate.startTrees[i])
                 );
             }
         } catch (e) {
@@ -313,7 +315,7 @@ class JSGenerate {
 
         if (!JSGenerate.generateFailed) {
             try {
-                JSGenerate.code = astring.generate(JSGenerate.AST, {"indent": "    "});
+                JSGenerate.code = astring.generate(JSGenerate.AST, { indent: "    " });
             } catch (e) {
                 JSGenerate.generateFailed = true;
                 console.error("CANNOT GENERATE CODE\nError: INVALID ABSTRACT SYNTAX TREE");

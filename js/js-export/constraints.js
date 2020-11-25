@@ -1099,8 +1099,8 @@ JSInterface._methodArgConstraints = {
             {
                 type: "number",
                 constraints: {
-                    min: 0,
-                    max: 50,
+                    min: -1000,
+                    max: 1000,
                     integer: true
                 }
             }
@@ -1115,8 +1115,8 @@ JSInterface._methodArgConstraints = {
             {
                 type: "number",
                 constraints: {
-                    min: 0,
-                    max: 50,
+                    min: -1000,
+                    max: 1000,
                     integer: true
                 }
             }
@@ -1129,12 +1129,7 @@ JSInterface._methodArgConstraints = {
                 }
             },
             {
-                type: "number",
-                constraints: {
-                    min: 0,
-                    max: 50,
-                    integer: true
-                }
+                type: "undefined"
             }
         ]
     ],
@@ -1149,8 +1144,8 @@ JSInterface._methodArgConstraints = {
             {
                 type: "number",
                 constraints: {
-                    min: 0,
-                    max: 50,
+                    min: -1000,
+                    max: 1000,
                     integer: true
                 }
             }
@@ -1163,12 +1158,7 @@ JSInterface._methodArgConstraints = {
                 }
             },
             {
-                type: "number",
-                constraints: {
-                    min: 0,
-                    max: 50,
-                    integer: true
-                }
+                type: "undefined"
             }
         ]
     ],
@@ -1181,12 +1171,7 @@ JSInterface._methodArgConstraints = {
                 }
             },
             {
-                type: "number",
-                constraints: {
-                    min: 0,
-                    max: 50,
-                    integer: true
-                }
+                type: "undefined"
             }
         ]
     ],
@@ -1199,12 +1184,7 @@ JSInterface._methodArgConstraints = {
                 }
             },
             {
-                type: "number",
-                constraints: {
-                    min: 0,
-                    max: 50,
-                    integer: true
-                }
+                type: "undefined"
             }
         ]
     ]

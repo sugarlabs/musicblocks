@@ -186,10 +186,9 @@ function setupDictActions() {
                 return Turtle.DictActions.SerializeDict(target, turtle);
             }
 
-            if (!(dict in logo.turtleDicts[turtle])) {
-                logo.turtleDicts[turtle][dict] = {};
-            }
-            return JSON.stringify(logo.turtleDicts[turtle][dict]);
+            return JSON.stringify(
+                dict in logo.turtleDicts[turtle] ? logo.turtleDicts[turtle][dict] : {}
+            );
         }
 
         /**

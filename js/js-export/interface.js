@@ -68,6 +68,12 @@ class JSInterface {
 
     /**
      * @static
+     * list of methods having a return value
+     */
+    static _returningMethods = ["getDict", "getDict2", "dictionary"];
+
+    /**
+     * @static
      * lookup table for block names to setter names
      */
     static _setterNameLookup = {
@@ -204,13 +210,22 @@ class JSInterface {
         background: "fillBackground",
         setfont: "setFont",
         // Dictionary blocks
-        showDict: "showDict",
+        dictionary: "getDict",
         setDict: "setValue",
         getDict: "getValue",
         setDict2: "setValue",
         getDict2: "getValue",
         // Extras
         print: "print"
+    };
+
+    /**
+     * @static
+     * maps block name to corresponding API args order
+     */
+    static _rearrangeArgsLookup = {
+        setDict: [1, 2, 0],
+        getDict: [1, 0]
     };
 
     /**
@@ -254,6 +269,16 @@ class JSInterface {
     }
 
     /**
+     * Returns whether passed argument corresponds to a method.
+     *
+     * @param {String} blockName
+     * @returns {Boolean}
+     */
+    static methodReturns(blockName) {
+        return JSInterface._returningMethods.indexOf(blockName) !== -1;
+    }
+
+    /**
      * Returns the setter name corresponding to the blockname, returns "null" if doesn't exist.
      *
      * @param {String} blockName
@@ -281,6 +306,20 @@ class JSInterface {
      */
     static getMethodName(blockName) {
         return JSInterface.isMethod(blockName) ? JSInterface._methodNameLookup[blockName] : null;
+    }
+
+    /**
+     * Rearranges the method arguments as required by the API.
+     *
+     * @param {String} methodName
+     * @param {[*]} args
+     * @returns {[*]}
+     */
+    static rearrangeMethodArgs(methodName, args) {
+        if (methodName in JSInterface._rearrangeArgsLookup) {
+            args = JSInterface._rearrangeArgsLookup[methodName].map((index) => args[index]);
+        }
+        return args;
     }
 
     // ========= Parameter Validation ==============================================================
@@ -359,7 +398,7 @@ class JSInterface {
                         JSEditor.logConsole(
                             `${arg} in "${methodName}" reset to ${props["constraints"]["max"]}`
                         );
-                        arg = props["constraints"]["min"];
+                        arg = props["constraints"]["max"];
                     }
 
                     if (props["constraints"]["integer"] && !Number.isInteger(arg)) {

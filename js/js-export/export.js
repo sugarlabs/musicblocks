@@ -46,7 +46,7 @@ class Mouse {
         this.turtle.initTurtle(false);
 
         this.flow = flow;
-        this.MB = new MusicBlocks(this);    // associate a MusicBlocks object with each Mouse
+        this.MB = new MusicBlocks(this); // associate a MusicBlocks object with each Mouse
 
         Mouse.MouseList.push(this);
         Mouse.TurtleMouseMap[this.turtle.id] = this;
@@ -289,7 +289,9 @@ class MusicBlocks {
     // ========= Special Instructions ==============================================================
 
     print(message) {
-        JSEditor.logConsole(message);
+        JSEditor.logConsole(
+            `Mouse "${this.turtle.name}" (${turtles.turtleList.indexOf(this.turtle)}): ${message}`
+        );
         if (message === undefined) {
             logo.textMsg("undefined");
         } else if (message === null) {
