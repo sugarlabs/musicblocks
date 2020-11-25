@@ -32,41 +32,41 @@ function setupDictActions() {
          * @static
          * @param {Number} target - target Turtle index in turtle.turtleList
          * @param {Number} turtle - Turtle index in turtle.turtleList
-         * @param {String} k - key
+         * @param {String} key - key
          * @returns {String|Number}
          */
-        static _GetDict(target, turtle, k) {
+        static _GetDict(target, turtle, key) {
             const targetTur = turtles.ithTurtle(target);
 
             // This is the internal turtle dictionary that includes the turtle status.
-            if (k === _("color")) {
+            if (key === _("color")) {
                 return targetTur.painter.color;
-            } else if (k === _("shade")) {
+            } else if (key === _("shade")) {
                 return targetTur.painter.value;
-            } else if (k === _("grey")) {
+            } else if (key === _("grey")) {
                 return targetTur.painter.chroma;
-            } else if (k === _("pen size")) {
+            } else if (key === _("pen size")) {
                 return targetTur.painter.pensize;
-            } else if (k === _("font")) {
+            } else if (key === _("font")) {
                 return targetTur.painter.font;
-            } else if (k === _("heading")) {
+            } else if (key === _("heading")) {
                 return targetTur.painter.heading;
-            } else if (k === "x") {
+            } else if (key === "x") {
                 return turtles.screenX2turtleX(targetTur.container.x);
-            } else if (k === "y") {
+            } else if (key === "y") {
                 return turtles.screenY2turtleY(targetTur.container.y);
-            } else if (k === _("notes played")) {
+            } else if (key === _("notes played")) {
                 return targetTur.singer.notesPlayed[0] / targetTur.singer.notesPlayed[1];
-            } else if (k === _("note value")) {
+            } else if (key === _("note value")) {
                 return Singer.RhythmActions.getNoteValue(target);
-            } else if (k === _("current pitch")) {
+            } else if (key === _("current pitch")) {
                 return targetTur.singer.lastNotePlayed[0];
-            } else if (k === _("pitch number")) {
+            } else if (key === _("pitch number")) {
                 let obj;
                 if (targetTur.singer.lastNotePlayed !== null) {
-                    let len = targetTur.singer.lastNotePlayed[0].length;
-                    let pitch = targetTur.singer.lastNotePlayed[0].slice(0, len - 1);
-                    let octave = parseInt(targetTur.singer.lastNotePlayed[0].slice(len - 1));
+                    const len = targetTur.singer.lastNotePlayed[0].length;
+                    const pitch = targetTur.singer.lastNotePlayed[0].slice(0, len - 1);
+                    const octave = parseInt(targetTur.singer.lastNotePlayed[0].slice(len - 1));
 
                     obj = [pitch, octave];
                 } else if (targetTur.singer.notePitches.length > 0) {
@@ -92,49 +92,49 @@ function setupDictActions() {
                 );
             } else {
                 if (target in logo.turtleDicts[turtle]) {
-                    return logo.turtleDicts[turtle][target][k];
+                    return logo.turtleDicts[turtle][target][key];
                 }
             }
             return 0;
         }
 
         /**
-         * utility function to set a value corresponding to a key
+         * Utility function to set a value corresponding to a key.
          *
          * @static
          * @param {Number} target - target Turtle index in turtle.turtleList
          * @param {Number} turtle - Turtle index in turtle.turtleList
-         * @param {String} k - key
-         * @param {*} v - value
+         * @param {String} key - key
+         * @param {*} value - value
          * @returns {void}
          */
-        static SetDictValue(target, turtle, k, v) {
+        static SetDictValue(target, turtle, key, value) {
             const targetTur = turtles.ithTurtle(target);
 
             // This is the internal turtle dictionary that includes the turtle status.
-            if (k === _("color")) {
-                targetTur.painter.doSetColor(v);
-            } else if (k === _("shade")) {
-                targetTur.painter.doSetValue(v);
-            } else if (k === _("grey")) {
-                targetTur.painter.doSetChroma(v);
-            } else if (k === _("pen size")) {
-                targetTur.painter.doSetPensize(v);
-            } else if (k === _("font")) {
-                targetTur.painter.doSetFont(v);
-            } else if (k === _("heading")) {
-                targetTur.painter.doSetHeading(v);
-            } else if (k === "y") {
-                let x = turtles.screenX2turtleX(targetTur.container.x);
-                targetTur.painter.doSetXY(x, v);
-            } else if (k === "x") {
-                let y = turtles.screenY2turtleY(targetTur.container.y);
-                targetTur.painter.doSetXY(v, y);
+            if (key === _("color")) {
+                targetTur.painter.doSetColor(value);
+            } else if (key === _("shade")) {
+                targetTur.painter.doSetValue(value);
+            } else if (key === _("grey")) {
+                targetTur.painter.doSetChroma(value);
+            } else if (key === _("pen size")) {
+                targetTur.painter.doSetPensize(value);
+            } else if (key === _("font")) {
+                targetTur.painter.doSetFont(value);
+            } else if (key === _("heading")) {
+                targetTur.painter.doSetHeading(value);
+            } else if (key === "y") {
+                const x = turtles.screenX2turtleX(targetTur.container.x);
+                targetTur.painter.doSetXY(x, value);
+            } else if (key === "x") {
+                const y = turtles.screenY2turtleY(targetTur.container.y);
+                targetTur.painter.doSetXY(value, y);
             } else {
                 if (!(target in logo.turtleDicts[turtle])) {
                     logo.turtleDicts[turtle][target] = {};
                 }
-                logo.turtleDicts[turtle][target][k] = v;
+                logo.turtleDicts[turtle][target][key] = value;
             }
         }
 
@@ -150,7 +150,7 @@ function setupDictActions() {
             const targetTur = turtles.ithTurtle(target);
 
             // This is the internal turtle dictionary that includes the turtle status.
-            let this_dict = {};
+            const this_dict = {};
             this_dict[_("color")] = targetTur.painter.color;
             this_dict[_("shade")] = targetTur.painter.value;
             this_dict[_("grey")] = targetTur.painter.chroma;
@@ -161,11 +161,35 @@ function setupDictActions() {
             this_dict["x"] = turtles.screenX2turtleX(targetTur.container.x);
 
             if (target in logo.turtleDicts[turtle]) {
-                for (let k in logo.turtleDicts[turtle][target]) {
-                    this_dict[k] = logo.turtleDicts[turtle][target][k];
+                for (const key in logo.turtleDicts[turtle][target]) {
+                    this_dict[key] = logo.turtleDicts[turtle][target][key];
                 }
             }
             return JSON.stringify(this_dict);
+        }
+
+        /**
+         * Returns the contents of the queried dictionary.
+         *
+         * @static
+         * @param {String|Number} dict - dictionary name
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @returns {String}
+         */
+        static getDict(dict, turtle) {
+            // Not sure this can happen.
+            if (!(turtle in logo.turtleDicts)) logo.turtleDicts[turtle] = {};
+
+            // Is the dictionary the same as a turtle name?
+            const target = getTargetTurtle(turtles, dict);
+            if (target !== null) {
+                return Turtle.DictActions.SerializeDict(target, turtle);
+            }
+
+            if (!(dict in logo.turtleDicts[turtle])) {
+                logo.turtleDicts[turtle][dict] = {};
+            }
+            return JSON.stringify(logo.turtleDicts[turtle][dict]);
         }
 
         /**
@@ -177,21 +201,7 @@ function setupDictActions() {
          * @returns {void}
          */
         static showDict(dict, turtle) {
-            // Not sure this can happen.
-            if (!(turtle in logo.turtleDicts)) {
-                logo.turtleDicts[turtle] = {};
-            }
-
-            // Is the dictionary the same as a turtle name?
-            const target = getTargetTurtle(turtles, dict);
-            if (target !== null) {
-                logo.textMsg(Turtle.DictActions.SerializeDict(target, turtle));
-                return;
-            } else if (!(dict in logo.turtleDicts[turtle])) {
-                logo.turtleDicts[turtle][dict] = {};
-            }
-
-            logo.textMsg(JSON.stringify(logo.turtleDicts[turtle][dict]));
+            logo.textMsg(Turtle.DictActions.getDict(dict, turtle));
         }
 
         /**
@@ -206,20 +216,18 @@ function setupDictActions() {
          */
         static setValue(dict, key, value, turtle) {
             // Not sure this can happen.
-            if (!(turtle in logo.turtleDicts)) {
-                return 0;
-            }
+            if (!(turtle in logo.turtleDicts)) return 0;
 
             // Is the dictionary the same as a turtle name?
-            let target = getTargetTurtle(turtles, dict);
+            const target = getTargetTurtle(turtles, dict);
             if (target !== null) {
                 Turtle.DictActions.SetDictValue(target, turtle, key, value);
-                return;
-            } else if (!(dict in logo.turtleDicts[turtle])) {
-                logo.turtleDicts[turtle][dict] = {};
+            } else {
+                if (!(dict in logo.turtleDicts[turtle])) {
+                    logo.turtleDicts[turtle][dict] = {};
+                }
+                logo.turtleDicts[turtle][dict][key] = value;
             }
-
-            logo.turtleDicts[turtle][dict][key] = value;
         }
 
         /**
@@ -233,12 +241,10 @@ function setupDictActions() {
          */
         static getValue(dict, key, turtle) {
             // Not sure this can happen.
-            if (!(turtle in logo.turtleDicts)) {
-                return 0;
-            }
+            if (!(turtle in logo.turtleDicts)) return 0;
 
             // Is the dictionary the same as a turtle name?
-            let target = getTargetTurtle(turtles, dict);
+            const target = getTargetTurtle(turtles, dict);
             if (target !== null) {
                 return Turtle.DictActions._GetDict(target, turtle, key);
             } else if (!(dict in logo.turtleDicts[turtle])) {

@@ -110,7 +110,8 @@ class MusicBlocks {
             "ToneBlocksAPI",
             "OrnamentBlocksAPI",
             "VolumeBlocksAPI",
-            "DrumBlocksAPI"
+            "DrumBlocksAPI",
+            "DictBlocksAPI"
         ].forEach((className) => importMembers(this, className));
     }
 
@@ -148,7 +149,8 @@ class MusicBlocks {
                 "Singer.ToneActions",
                 "Singer.OrnamentActions",
                 "Singer.VolumeActions",
-                "Singer.DrumActions"
+                "Singer.DrumActions",
+                "Turtle.DictActions"
             ].forEach((className) => {
                 MusicBlocks._methodList[className] = [];
 
@@ -220,6 +222,8 @@ class MusicBlocks {
      */
     runCommand(command, args) {
         return new Promise((resolve) => {
+            let returnVal;
+
             if (command === "_anonymous") {
                 if (args !== undefined) args();
             } else {
@@ -233,16 +237,13 @@ class MusicBlocks {
 
                 cname = cname === "Painter" ? this.turtle.painter : eval(cname);
 
-                if (args === undefined || args === []) {
-                    cname[command]();
-                } else {
-                    cname[command](...args);
-                }
+                returnVal =
+                    args === undefined || args === [] ? cname[command]() : cname[command](...args);
             }
 
             let delay = this.turtle.waitTime;
             this.turtle.doWait(0);
-            setTimeout(resolve, delay);
+            setTimeout(() => resolve(returnVal), delay);
         });
     }
 
@@ -288,7 +289,7 @@ class MusicBlocks {
     // ========= Special Instructions ==============================================================
 
     print(message) {
-        console.log(message);
+        JSEditor.logConsole(message);
         if (message === undefined) {
             logo.textMsg("undefined");
         } else if (message === null) {
