@@ -303,6 +303,24 @@ class JSInterface {
         let finalArgs = [];
         for (let i in constraints) {
             let [arg, props] = [args[i], constraints[i]];
+
+            // for multiple types
+            if (Array.isArray(props)) {
+                for (const prop of props) {
+                    if (typeof arg === prop["type"]) {
+                        props = prop;
+                        break;
+                    }
+                }
+                if (Array.isArray(props)) {
+                    const error = `TypeMismatch error: expected one of "${props
+                        .map((prop) => prop["type"])
+                        .toString()}" but found "${typeof arg}"`;
+                    JSEditor.logConsole(error, "maroon");
+                    throw error;
+                }
+            }
+
             if (typeof arg !== props["type"]) {
                 if (typeof arg === "string" && props["type"] === "number") {
                     if (!isNaN(Number(arg))) {

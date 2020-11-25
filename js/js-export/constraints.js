@@ -1086,10 +1086,126 @@ JSInterface._methodArgConstraints = {
                 integer: true
             }
         }
+    ],
+    // Dictionary blocks
+    setValue: [
+        [
+            {
+                type: "string",
+                constraints: {
+                    type: "any"
+                }
+            },
+            {
+                type: "number",
+                constraints: {
+                    min: 0,
+                    max: 50,
+                    integer: true
+                }
+            }
+        ],
+        [
+            {
+                type: "string",
+                constraints: {
+                    type: "any"
+                }
+            },
+            {
+                type: "number",
+                constraints: {
+                    min: 0,
+                    max: 50,
+                    integer: true
+                }
+            }
+        ],
+        [
+            {
+                type: "string",
+                constraints: {
+                    type: "any"
+                }
+            },
+            {
+                type: "number",
+                constraints: {
+                    min: 0,
+                    max: 50,
+                    integer: true
+                }
+            }
+        ]
+    ],
+    getValue: [
+        [
+            {
+                type: "string",
+                constraints: {
+                    type: "any"
+                }
+            },
+            {
+                type: "number",
+                constraints: {
+                    min: 0,
+                    max: 50,
+                    integer: true
+                }
+            }
+        ],
+        [
+            {
+                type: "string",
+                constraints: {
+                    type: "any"
+                }
+            },
+            {
+                type: "number",
+                constraints: {
+                    min: 0,
+                    max: 50,
+                    integer: true
+                }
+            }
+        ]
+    ],
+    getDict: [
+        [
+            {
+                type: "string",
+                constraints: {
+                    type: "any"
+                }
+            },
+            {
+                type: "number",
+                constraints: {
+                    min: 0,
+                    max: 50,
+                    integer: true
+                }
+            }
+        ]
+    ],
+    showDict: [
+        [
+            {
+                type: "string",
+                constraints: {
+                    type: "any"
+                }
+            },
+            {
+                type: "number",
+                constraints: {
+                    min: 0,
+                    max: 50,
+                    integer: true
+                }
+            }
+        ]
     ]
-    // showDict: [
-    //     {
-
-    //     }
-    // ]
 };
