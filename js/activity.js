@@ -235,7 +235,7 @@ function Activity() {
             'widgets/jseditor',
             'widgets/modewidget',
             'widgets/meterwidget',
-            'widgets/pitchtimematrix',
+            'widgets/phrasemaker',
             'widgets/pitchdrummatrix',
             'widgets/rhythmruler',
             'widgets/pitchstaircase',
