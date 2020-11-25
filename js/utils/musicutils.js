@@ -1685,7 +1685,6 @@ function _calculate_pitch_number(np, tur) {
 
 function getPitchInfo(type, notePlayed, tur) {
     let np = notePlayed;
-    console.log(np);
     let octave;
     try {
         switch (type) {
@@ -2749,10 +2748,16 @@ function calcNoteValueToDisplay(a, b, scale) {
         noteValueToDisplay = parseInt(noteValue * 1.5);
         if (noteValueToDisplay in NSYMBOLS) {
             var value = (b / a) * noteValueToDisplay;
+            let obj = toFraction(value);
+            let d0, d1;
+            Number.isInteger(obj[0]) ? d0 = 0 : d0 = 2;
+            Number.isInteger(obj[1]) ? d1 = 0 : d1 = 2;
             noteValueToDisplay =
-                value.toFixed(2) +
+                // value.toFixed(2) +
+                obj[0].toFixed(d0) +
                 "<br>&mdash;<br>" +
-                noteValueToDisplay.toString() +
+                // noteValueToDisplay.toString() +
+                obj[1].toFixed(d1) +
                 "<br>" +
                 NSYMBOLS[noteValueToDisplay] +
                 ".";
@@ -2760,10 +2765,16 @@ function calcNoteValueToDisplay(a, b, scale) {
             noteValueToDisplay = parseInt(noteValue * 1.75);
             if (noteValueToDisplay in NSYMBOLS) {
                 var value = (b / a) * noteValueToDisplay;
+                let obj = toFraction(value);
+                let d0, d1;
+                Number.isInteger(obj[0]) ? d0 = 0 : d0 = 2;
+                Number.isInteger(obj[1]) ? d1 = 0 : d1 = 2;
                 noteValueToDisplay =
-                    value.toFixed(2) +
+                    // value.toFixed(2) +
+                    obj[0].toFixed(d0) +
                     "<br>&mdash;<br>" +
-                    noteValueToDisplay.toString() +
+                    // noteValueToDisplay.toString() +
+                    obj[1].toFixed(d1) +
                     "<br>" +
                     NSYMBOLS[noteValueToDisplay] +
                     "..";
