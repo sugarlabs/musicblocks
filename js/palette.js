@@ -578,7 +578,7 @@ function PaletteModel(palette, palettes, name) {
                 label = _("voice name");
                 break;
             case "customNote":
-                label = _("custom note");
+                label = _("custom pitch");
                 break;
             case "temperamentname":
                 //TRANS: https://en.wikipedia.org/wiki/Musical_temperament
