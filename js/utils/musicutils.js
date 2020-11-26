@@ -462,9 +462,9 @@ const SOLFATTRS = [DOUBLESHARP, SHARP, NATURAL, FLAT, DOUBLEFLAT];
 const DEGREES = _("1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th");
 
 function getSharpFlatPreference(keySignature) {
-    var obj = keySignatureToMode(keySignature);
-    var obj2 = modeMapper(obj[0], obj[1]);
-    var ks = obj2[0] + " " + obj2[1];
+    let obj = keySignatureToMode(keySignature);
+    let obj2 = modeMapper(obj[0], obj[1]);
+    let ks = obj2[0] + " " + obj2[1];
 
     if (SHARPPREFERENCE.indexOf(ks) !== -1) {
         return "sharp";
@@ -490,7 +490,7 @@ const TWELVEHUNDRETHROOT2 = 1.0005777895065549;
 const A0 = 27.5;
 const C8 = 4186.01;
 var OCTAVERATIO = 2;
-var STARTINGPITCH = "C4";
+// var STARTINGPITCH = "C4";
 
 const RHYTHMRULERHEIGHT = 100;
 
@@ -2397,9 +2397,10 @@ function getScaleAndHalfSteps(keySignature) {
     } else {
         // If there are fewer than 7 notes, choose a solfege based on the mode spacing.
         let n;
+	let solf;
         for (let i = 0; i < halfSteps.length; i++) {
             n = 0;
-            var solf = SOLFMAPPER[solfege.length];
+            solf = SOLFMAPPER[solfege.length];
             // Ensure there are no duplicates.
             while (solfege.indexOf(solf) !== -1) {
                 n += 1;
@@ -2684,12 +2685,13 @@ function getNoteFromInterval(pitch, interval) {
 }
 
 function calcNoteValueToDisplay(a, b, scale) {
-    var noteValue = a / b;
-    var noteValueToDisplay = null;
+    let noteValue = a / b;
+    let noteValueToDisplay = null;
+    let cellScale;
     if (scale === undefined) {
-        var cellScale = 1.0;
+        cellScale = 1.0;
     } else {
-        var cellScale = scale;
+        cellScale = scale;
     }
 
     if (noteValue in NSYMBOLS) {
@@ -2702,12 +2704,14 @@ function calcNoteValueToDisplay(a, b, scale) {
         noteValueToDisplay = reducedFraction(b, a);
     }
 
+    let value;
+    let obj;
+    let d0, d1;
     if (parseInt(noteValue) < noteValue) {
         noteValueToDisplay = parseInt(noteValue * 1.5);
-        if ((noteValueToDisplay * 2) in NSYMBOLS) {
-            var value = (b / a); // * noteValueToDisplay;
-            let obj = toFraction(value);
-            let d0, d1;
+        if ((noteValueToDisplay) in NSYMBOLS) {
+            value = (b / a); // * noteValueToDisplay;
+            obj = toFraction(value);
             Number.isInteger(obj[0]) ? d0 = 0 : d0 = 2;
             Number.isInteger(obj[1]) ? d1 = 0 : d1 = 2;
             noteValueToDisplay =
@@ -2717,14 +2721,13 @@ function calcNoteValueToDisplay(a, b, scale) {
                 // noteValueToDisplay.toString() +
                 obj[1].toFixed(d1) +
                 "<br>" +
-                NSYMBOLS[noteValueToDisplay * 2] +
+                NSYMBOLS[noteValueToDisplay] +
                 ".";
         } else {
             noteValueToDisplay = parseInt(noteValue * 1.75);
-            if ((noteValueToDisplay * 2) in NSYMBOLS) {
-                var value = (b / a); // * noteValueToDisplay;
-                let obj = toFraction(value);
-                let d0, d1;
+            if ((noteValueToDisplay) in NSYMBOLS) {
+                value = (b / a); // * noteValueToDisplay;
+                obj = toFraction(value);
                 Number.isInteger(obj[0]) ? d0 = 0 : d0 = 2;
                 Number.isInteger(obj[1]) ? d1 = 0 : d1 = 2;
                 noteValueToDisplay =
@@ -2734,7 +2737,7 @@ function calcNoteValueToDisplay(a, b, scale) {
                     // noteValueToDisplay.toString() +
                     obj[1].toFixed(d1) +
                     "<br>" +
-                    NSYMBOLS[noteValueToDisplay * 2] +
+                    NSYMBOLS[noteValueToDisplay] +
                     "..";
             } else {
                 noteValueToDisplay = reducedFraction(b, a);
@@ -2748,18 +2751,20 @@ function calcNoteValueToDisplay(a, b, scale) {
 function durationToNoteValue(duration) {
     // returns [note value, no. of dots, tuplet factor]
 
+    let currentDotFactor;
+    let d;
     // Try to find a match or a dotted match.
-    for (var dotCount = 0; dotCount < 3; dotCount++) {
-        var currentDotFactor = 2 - 1 / Math.pow(2, dotCount);
-        var d = duration * currentDotFactor;
+    for (let dotCount = 0; dotCount < 3; dotCount++) {
+        currentDotFactor = 2 - 1 / Math.pow(2, dotCount);
+        d = duration * currentDotFactor;
         if (POWER2.indexOf(d) !== -1) {
             return [d, dotCount, null];
         }
     }
 
     // First, round down.
-    var roundDown = duration;
-    for (var i = 1; i < POWER2.length; i++) {
+    let roundDown = duration;
+    for (let i = 1; i < POWER2.length; i++) {
         // Rounding down
         if (roundDown < POWER2[i]) {
             roundDown = POWER2[i - 1];
@@ -2773,31 +2778,30 @@ function durationToNoteValue(duration) {
 
     // Convert duration into parts based on POW2 factors
     // e.g., 1 / 6 ==> [3, 2], 1 / 12 ==> [3, 4]
-    var i = 1;
-    while (Math.floor(duration / i) * i === duration) {
-        i = i * 2;
-        if (i > duration / 2) {
+    let j = 1;
+    while (Math.floor(duration / j) * j === duration) {
+        j = j * 2;
+        if (j > duration / 2) {
             break;
         }
     }
 
-    i = i / 2;
+    j = j / 2;
 
-    return [1, 0, [duration / i, i], roundDown];
+    return [1, 0, [duration / j, j], roundDown];
 }
 
 function toFraction(d) {
     // Convert float to its approximate fractional representation.
+    let flip = false;
     if (d > 1) {
-        var flip = true;
+        flip = true;
         d = 1 / d;
-    } else {
-        var flip = false;
     }
 
-    var df = 1.0;
-    var top = 1;
-    var bot = 1;
+    let df = 1.0;
+    let top = 1;
+    let bot = 1;
 
     while (Math.abs(df - d) > 0.00000001) {
         if (df < d) {
@@ -2810,7 +2814,7 @@ function toFraction(d) {
     }
 
     if (flip) {
-        var tmp = top;
+        let tmp = top;
         top = bot;
         bot = tmp;
     }
@@ -2855,55 +2859,53 @@ function numberToPitch(i, temperament, startPitch, offset) {
         temperament = "equal";
     }
 
+    let n = 0;
+    let pitchnumber;
     if (i < 0) {
-        var n = 0;
         while (i < 0) {
             i += 12;
             n += 1; // Count octave bump ups.
         }
+
         if (temperament === "equal") {
-            return [
-                PITCHES[(i + PITCHES.indexOf("A")) % 12],
-                Math.floor((i + PITCHES.indexOf("A")) / 12) - n
-            ];
+            return [PITCHES[(i + PITCHES.indexOf("A")) % 12],
+                    Math.floor((i + PITCHES.indexOf("A")) / 12) - n];
         } else {
-            var pitchNumber = Math.floor(i - offset);
+            pitchNumber = Math.floor(i - offset);
         }
     } else {
         if (temperament === "equal") {
-            return [
-                PITCHES[(i + PITCHES.indexOf("A")) % 12],
-                Math.floor((i + PITCHES.indexOf("A")) / 12)
-            ];
+            return [PITCHES[(i + PITCHES.indexOf("A")) % 12],
+                    Math.floor((i + PITCHES.indexOf("A")) / 12)];
         } else {
-            var pitchNumber = Math.floor(i - offset);
+            pitchNumber = Math.floor(i - offset);
         }
     }
+
+    let interval;
     if (isCustom(temperament)) {
         pitchNumber = pitchNumber + "";
         if (TEMPERAMENT[temperament][pitchNumber][1] === undefined) {
-            //If custom temperament is not defined, then it will store equal temperament notes.
-            for (var i = 0; i < 12; i++) {
-                var number = "" + i;
-                var interval = TEMPERAMENT["equal"]["interval"][i];
+            // If custom temperament is not defined, then it will
+            // store equal temperament notes.
+            for (let j = 0; j < 12; j++) {
+                let number = "" + j;
+                interval = TEMPERAMENT["equal"]["interval"][i];
                 TEMPERAMENT[temperament][number] = [
-                    Math.pow(2, i / 12),
+                    Math.pow(2, j / 12),
                     getNoteFromInterval(startPitch, interval)[0],
                     getNoteFromInterval(startPitch, interval)[1]
                 ];
             }
-            return [
-                TEMPERAMENT[temperament][pitchNumber][1],
-                TEMPERAMENT[temperament][pitchNumber][2]
-            ];
+
+            return [TEMPERAMENT[temperament][pitchNumber][1],
+                    TEMPERAMENT[temperament][pitchNumber][2]];
         } else {
-            return [
-                TEMPERAMENT[temperament][pitchNumber][1],
-                TEMPERAMENT[temperament][pitchNumber][2]
-            ];
+            return [TEMPERAMENT[temperament][pitchNumber][1],
+                    TEMPERAMENT[temperament][pitchNumber][2]];
         }
     } else {
-        var interval = TEMPERAMENT[temperament]["interval"][pitchNumber];
+        interval = TEMPERAMENT[temperament]["interval"][pitchNumber];
         return getNoteFromInterval(startPitch, interval);
     }
 }
