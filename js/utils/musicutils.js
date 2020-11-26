@@ -2563,12 +2563,15 @@ function getNoteFromInterval(pitch, interval) {
     var majorintervalNote;
 
     function findMajorInterval(interval) {
-        //For eg. If you are asked to write a major 3rd then the letters must be 3 apart.
-        //Eg Ab - C or D - F. This is irrelevant of whether the first note is a sharp or flat, eg G# - B.
-        //Then need to work out if you need a sharp or flat on the second note.
-        //A Major 3rd is 4 semitones. So, Ab - C needs to be Ab - C; D - F is D- F#; G# - B is G# - B#.
+        //For eg. If you are asked to write a major 3rd then the
+        //letters must be 3 apart.
+        //Eg Ab - C or D - F. This is irrelevant of whether the first
+        //note is a sharp or flat, eg G# - B.
+        //Then need to work out if you need a sharp or flat on the
+        //second note.
+        //A Major 3rd is 4 semitones. So, Ab - C needs to be Ab - C; D
+        //- F is D- F#; G# - B is G# - B#.
         //Same technique is used to code the findMajorInterval.
-
         var halfSteps = INTERVALVALUES[interval][0];
         var direction = INTERVALVALUES[interval][1];
         var note = numberToPitch(number + halfSteps);
