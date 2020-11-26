@@ -3101,3 +3101,133 @@ piemenuModes = function(block, selectedMode) {
     block._exitWheel.navItems[0].navigateFunction = __exitMenu;
     block._exitWheel.navItems[1].navigateFunction = __prepScale;
 };
+
+
+/*
+ * Sets up context menu for each block
+ */
+piemenuBlockContext = function(block) {
+    if (block.blocks.activeBlock === null) {
+        return;
+    }
+
+    let pasteDx = 0;
+    let pasteDy = 0;
+
+    let that = block;
+    let blockBlock = block.blocks.blockList.indexOf(block);
+
+    // Position the widget centered over the active block.
+    docById("contextWheelDiv").style.position = "absolute";
+
+    let x = block.blocks.blockList[blockBlock].container.x;
+    let y = block.blocks.blockList[blockBlock].container.y;
+
+    let canvasLeft = block.blocks.canvas.offsetLeft + 28 * block.blocks.getStageScale();
+    let canvasTop = block.blocks.canvas.offsetTop + 6 * block.blocks.getStageScale();
+
+    docById("contextWheelDiv").style.left =
+        Math.round((x + block.blocks.stage.x) * block.blocks.getStageScale() +
+                   canvasLeft) - 150 + "px";
+    docById("contextWheelDiv").style.top =
+        Math.round((y + block.blocks.stage.y) * block.blocks.getStageScale() +
+                   canvasTop) - 150 + "px";
+
+    docById("contextWheelDiv").style.display = "";
+
+    labels = [
+        "imgsrc:header-icons/copy-button.svg",
+        "imgsrc:header-icons/extract-button.svg",
+        "imgsrc:header-icons/empty-trash-button.svg",
+        "imgsrc:header-icons/cancel-button.svg"
+    ];
+
+    let topBlock = block.blocks.findTopBlock(blockBlock);
+    if (block.name === 'action') {
+        labels.push('imgsrc:header-icons/save-blocks-button.svg');
+    }
+    let message =
+        block.blocks.blockList[block.blocks.activeBlock].protoblock.helpString;
+    let helpButton;
+    if (message) {
+        labels.push("imgsrc:header-icons/help-button.svg");
+        helpButton = labels.length - 1;
+    } else {
+        helpButton = null;
+    }
+
+    let wheel = new wheelnav("contextWheelDiv", null, 250, 250);
+    wheel.colors = platformColor.wheelcolors;
+    wheel.slicePathFunction = slicePath().DonutSlice;
+    wheel.slicePathCustom = slicePath().DonutSliceCustomization();
+    wheel.slicePathCustom.minRadiusPercent = 0.2;
+    wheel.slicePathCustom.maxRadiusPercent = 0.6;
+    wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
+    wheel.sliceInitPathCustom = wheel.slicePathCustom;
+    wheel.clickModeRotate = false;
+    wheel.initWheel(labels);
+    wheel.createWheel();
+
+    wheel.navItems[0].setTooltip(_("Duplicate"));
+    wheel.navItems[1].setTooltip(_("Extract"));
+    wheel.navItems[2].setTooltip(_("Move to trash"));
+    wheel.navItems[3].setTooltip(_("Close"));
+    if (block.blocks.blockList[topBlock].name === "action") {
+        wheel.navItems[4].setTooltip(_("Save stack"));
+    }
+
+    if (helpButton !== null) {
+        wheel.navItems[helpButton].setTooltip(_("Help"));
+    }
+
+    wheel.navItems[0].selected = false;
+
+    wheel.navItems[0].navigateFunction = function() {
+        that.blocks.activeBlock = blockBlock;
+        that.blocks.prepareStackForCopy();
+        that.blocks.pasteDx = pasteDx;
+        that.blocks.pasteDy = pasteDy;
+        that.blocks.pasteStack();
+        pasteDx += 21;
+        pasteDy += 21;
+        // docById('contextWheelDiv').style.display = 'none';
+    };
+
+    wheel.navItems[1].navigateFunction = function() {
+        that.blocks.activeBlock = blockBlock;
+        that.blocks.extract();
+        docById("contextWheelDiv").style.display = "none";
+    };
+
+    wheel.navItems[2].navigateFunction = function() {
+        that.blocks.activeBlock = blockBlock;
+        that.blocks.extract();
+        that.blocks.sendStackToTrash(that.blocks.blockList[blockBlock]);
+        docById("contextWheelDiv").style.display = "none";
+    };
+
+    wheel.navItems[3].navigateFunction = function() {
+        docById("contextWheelDiv").style.display = "none";
+    };
+
+    if (block.name === "action") {
+        wheel.navItems[4].navigateFunction = function() {
+            that.blocks.activeBlock = blockBlock;
+            that.blocks.prepareStackForCopy();
+            that.blocks.saveStack();
+        };
+    }
+
+    if (helpButton !== null) {
+        wheel.navItems[helpButton].navigateFunction = function() {
+            that.blocks.activeBlock = blockBlock;
+            let helpWidget = new HelpWidget();
+            helpWidget.init(blocks);
+            docById("contextWheelDiv").style.display = "none";
+        };
+    }
+
+    setTimeout(function() {
+        that.blocks.stageClick = false;
+    }, 500);
+};

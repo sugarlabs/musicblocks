@@ -4598,7 +4598,7 @@ function Blocks(activity) {
         }
 
         this.inLongPress = true;
-        this.blockList[this.activeBlock].piemenuBlockContext();
+        piemenuBlockContext(this.blockList[this.activeBlock]);
     };
 
     /*
