@@ -28,7 +28,7 @@ function GlobalCard(Planet) {
         <div class="card-action"> \
             <div class="flexcontainer"> \
                 <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('More Details')+'" id="global-project-more-details-{ID}"><i class="material-icons">info</i></a> \
-                <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Open project')+'" id="global-project-open-{ID}"><i class="material-icons">launch</i></a> \
+                <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_("Open in Music Blocks")+'" id="global-project-open-{ID}"><i class="material-icons">launch</i></a> \
                 <a class="project-icon"></a> \
                 <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Merge with current project')+'" id="global-project-merge-{ID}"><i class="material-icons">merge_type</i></a> \ ';
 
