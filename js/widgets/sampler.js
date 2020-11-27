@@ -34,7 +34,7 @@ function SampleWidget() {
       ctx.lineWidth = 0;
 
       for (let x=0; x < SAMPLEWIDTH; x++) {
-          let amplitude = (x**2)%100;
+          let amplitude = (x**2)%50;
           ctx.moveTo(x, middle - amplitude);
           ctx.lineTo(x, middle + amplitude);
           ctx.stroke();

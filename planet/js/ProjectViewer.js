@@ -80,6 +80,12 @@ function ProjectViewer(Planet) {
         Planet.GlobalPlanet.openGlobalProject(this.id);
     };
 
+    this.mergeProject = function() {
+        // newPageTitle = proj.ProjectName;
+        // document.title = newPageTitle;
+        Planet.GlobalPlanet.mergeGlobalProject(this.id);
+    };
+
     this.openReporter = function() {
         console.log('load');
         document.getElementById('reportdescription').value = '';
@@ -136,6 +142,10 @@ function ProjectViewer(Planet) {
 
         document.getElementById('projectviewer-open-mb').addEventListener('click', function (evt) {
             that.openProject();
+        });
+
+        document.getElementById('projectviewer-merge-mb').addEventListener('click', function (evt) {
+            that.mergeProject();
         });
 
         document.getElementById('projectviewer-report-project').addEventListener('click', function (evt) {

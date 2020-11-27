@@ -411,6 +411,7 @@ function setupMeterBlocks() {
             // .TRANS: 'on' musical 'beat' 'do' some action
             super("onbeatdo", _("on strong beat"));
             this.setPalette("meter");
+            this.piemenuValuesC1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
             this.setHelpString([
                 _(
                     "The On-strong-beat block let you specify actions to take on specified beats."
@@ -516,6 +517,8 @@ function setupMeterBlocks() {
             //.TRANS: sets tempo by defniing a beat and beats per minute
             super("setmasterbpm2", _("master beats per minute"));
             this.setPalette("meter");
+            this.piemenuValuesC1 = [42, 46, 50, 54, 58, 63, 69, 76, 84, 90, 96, 104, 112,
+                                    120, 132, 144,  160,  176,  192,  208];
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -598,7 +601,9 @@ function setupMeterBlocks() {
         constructor() {
             //.TRANS: sets tempo by defniing a beat and beats per minute
             super("setbpm3", _("beats per minute"));
-            this.setPalette("meter");
+            this.setPalette("meter"); 
+            this.piemenuValuesC1 = [42, 46, 50, 54, 58, 63, 69, 76, 84, 90, 96, 104, 112,
+                                    120, 132, 144,  160,  176,  192,  208];
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -793,6 +798,7 @@ function setupMeterBlocks() {
             //.TRANS: musical meter (time signature), e.g., 4:4
             super("meter", _("meter"));
             this.setPalette("meter");
+            this.piemenuValuesC1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
             this.beginnerBlock(true);
 
             this.setHelpString([

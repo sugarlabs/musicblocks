@@ -378,6 +378,26 @@ function GlobalPlanet(Planet) {
         }, error);
     };
 
+    this.mergeGlobalProject = function(id, error) {
+        if (error === undefined) {
+            error = null;
+        }
+
+        let that = this;
+        this.getData(id, function(data) {
+            let remixedName;
+            if (id in that.cache) {
+                remixedName = that.remixPrefix + ' ' + that.cache[id].ProjectName;
+                Planet.ProjectStorage.initialiseNewProject(remixedName, data, that.cache[id].ProjectImage);
+            } else {
+                remixedName = that.remixPrefix + ' ' + _('My Project');
+                Planet.ProjectStorage.initialiseNewProject(remixedName, data, null);
+            }
+
+            Planet.loadProjectFromData(data, true);
+        }, error);
+    };
+    
     this.init = function() {
         if (!Planet.ConnectedToServer) {
             document.getElementById('globaltitle').textContent = _('Cannot connect to server');

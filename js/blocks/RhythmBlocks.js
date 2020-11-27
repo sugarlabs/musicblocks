@@ -432,6 +432,7 @@ function setupRhythmBlocks() {
         constructor() {
             super("rhythmicdot2");
             this.setPalette("rhythm");
+	    this.piemenuValuesC1 = [1, 2, 3];
             this.setHelpString([
                 _("The Dot block extends the duration of a note by 50%.") +
                     " " +

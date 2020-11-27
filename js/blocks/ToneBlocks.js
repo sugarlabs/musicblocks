@@ -81,6 +81,8 @@ function setupToneBlocks() {
             //.TRANS: a duo synthesizer combines a synth with a sequencer
             super("duosynth", _("duo synth"));
             this.setPalette("tone");
+            this.piemenuValuesC1 = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+            this.piemenuValuesC2 = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             this.setHelpString([
                 _(
                     "The Duo synth block is a duo-frequency modulator used to define a timbre."
@@ -106,6 +108,7 @@ function setupToneBlocks() {
             //.TRANS: AM (amplitude modulation) synthesizer
             super("amsynth", _("AM synth"));
             this.setPalette("tone");
+            this.piemenuValuesC1 = [1, 2];
             this.setHelpString([
                 _(
                     "The AM synth block is an amplitude modulator used to define a timbre."
@@ -130,6 +133,7 @@ function setupToneBlocks() {
             //.TRANS: FM (frequency modulation) synthesizer
             super("fmsynth", _("FM synth"));
             this.setPalette("tone");
+            this.piemenuValuesC1 = [1, 5, 10, 15, 20, 25];
             this.setHelpString([
                 _(
                     "The FM synth block is a frequency modulator used to define a timbre."
@@ -240,6 +244,7 @@ function setupToneBlocks() {
     class Harmonic2Block extends FlowClampBlock {
         constructor() {
             super("harmonic2");
+            this.piemenuValuesC1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
             this.setPalette("tone");
             this.setHelpString([
                 _(
@@ -273,6 +278,7 @@ function setupToneBlocks() {
         constructor() {
             super("dis");
             this.setPalette("tone");
+            this.piemenuValuesC1 = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             this.setHelpString([
                 _("The Distortion block adds distortion to the pitch."),
                 "documentation",
@@ -306,6 +312,8 @@ function setupToneBlocks() {
         constructor() {
             super("tremolo");
             this.setPalette("tone");
+            this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 20];
+            this.piemenuValuesC2 = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -356,6 +364,11 @@ function setupToneBlocks() {
         constructor() {
             super("phaser");
             this.setPalette("tone");
+            this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5,
+                                    10, 20];
+            this.piemenuValuesC2 = [1, 2, 3];
+            this.piemenuValuesC3 = [220, 247, 262, 294, 330, 349, 392, 440,
+                                    494, 523, 587, 659, 698, 783, 880];
             this.setHelpString([
                 _("The Phaser block adds a sweeping sound."),
                 "documentation",
@@ -394,6 +407,9 @@ function setupToneBlocks() {
         constructor() {
             super("chorus");
             this.setPalette("tone");
+            this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
+            this.piemenuValuesC2 = [2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 9, 10];
+            this.piemenuValuesC3 = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -434,6 +450,7 @@ function setupToneBlocks() {
         constructor() {
             super("vibrato");
             this.setPalette("tone");
+            this.piemenuValuesC1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
             this.beginnerBlock(true);
 
             this.setHelpString([

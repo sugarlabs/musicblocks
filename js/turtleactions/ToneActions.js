@@ -35,14 +35,31 @@ function setupToneActions() {
 
             tur.inSetTimbre = true;
 
+            let accounted = false;
             let synth = instrument;
             for (let voice in VOICENAMES) {
                 if (VOICENAMES[voice][0] === instrument) {
                     synth = VOICENAMES[voice][1];
+                    accounted = true;
                     break;
                 } else if (VOICENAMES[voice][1] === instrument) {
                     synth = instrument;
+                    accounted = true;
                     break;
+                }
+            }
+            if (!accounted && typeof instrument === "object"){
+                accounted = false;
+                for (let voice in CUSTOMSAMPLES){
+                    if (CUSTOMSAMPLES[voice][0] === instrument[0]){
+                        synth = CUSTOMSAMPLES[voice][0];
+                        accounted = true;
+                        break;
+                    }
+                }
+                if (!accounted) {
+                    CUSTOMSAMPLES.push([instrument[0], instrument[1]]);
+                    synth = instrument[0];
                 }
             }
 

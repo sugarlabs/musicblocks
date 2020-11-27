@@ -392,6 +392,8 @@ function setupIntervalsBlocks() {
         constructor() {
             super("semitoneinterval");
             this.setPalette("intervals");
+            this.piemenuValuesC1 = [-12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0,
+                                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
             this.setHelpString([
                 _(
                     "The Semi-tone interval block calculates a relative interval based on half steps."
@@ -523,6 +525,7 @@ function setupIntervalsBlocks() {
         constructor() {
             super("interval");
             this.setPalette("intervals");
+            this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.setHelpString([
                 _(
                     "The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode."

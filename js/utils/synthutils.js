@@ -269,8 +269,7 @@ const SAMPLECENTERNO = {
     "double bass": ["C4", 39]
 };
 
-customSampleCenterNo = {
-  custom: ["C4,", 39]};
+CUSTOMSAMPLES  = [];
 
 const percussionInstruments = [
     "koto",
@@ -729,7 +728,7 @@ function Synth() {
 
     this._loadSample = function(sampleName) {
         let accounted = false;
-        outerloop:
+        console.log(this.samples);
         for (let type in this.samplesManifest) {
             if (this.samplesManifest.hasOwnProperty(type)) {
                 for (let sample in this.samplesManifest[type]) {
@@ -748,13 +747,51 @@ function Synth() {
             }
         }
         if (!accounted) {
-            let data = function() {return sampleName};
-            this.samplesManifest.voice.push({ name: sampleName, data: data});
-            this.samplesManifest.drum.push({  name: sampleName, data: data});
-            console.debug("sample was not already in sample library");
-            this._loadSample(sampleName);
-        }
+            for (let customsample in CUSTOMSAMPLES) {
+                if (CUSTOMSAMPLES[customsample][0] === sampleName) {
+                    //datafunction = function() {return CUSTOMSAMPLES[customsample][1]};
+                    this.samples["voice"][sampleName] = CUSTOMSAMPLES[customsample][1];
+                    console.log(this.samples);
+                    return;
+                }
+            }
 
+            console.debug("sample was not already in sample library");
+            let data = null;
+            if (sampleName.slice(0,21) === "data:audio/wav;base64"){
+                data = function() {return sampleName};
+                this.samplesManifest.voice.push({ name: sampleName, data: data});
+                this.samplesManifest.drum.push({  name: sampleName, data: data});
+                this._loadSample(sampleName);
+            } else if (typeof sampleName === "object"){
+                data = function() {return sampleName[1]};
+                this.samplesManifest.voice.push({name: sampleName[0], data: data});
+                this.samplesManifest.drum.push({ name: sampleName[0], data: data});
+                this._loadSample(sampleName[0]);
+            }
+        }
+    };
+
+    this._loadSampleFromFile = function(sampleData) {
+        let data = function() {return sampleData[1]};
+        /*
+        console.log(typeof sampleData[1]);
+        function getBase64(file) {
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function () {
+                console.log(reader.result);
+            };
+            reader.onerror = function (error) {
+                console.log('Error: ', error);
+            };
+        }
+        data = getBase64(sampleData[1]);
+        */
+
+        this.samplesManifest.voice.push({name: sampleData[0], data: data});
+        this.samplesManifest.drum.push({ name: sampleData[0], data: data});
+        this._loadSample(sampleData[0]);
     };
 
     this.samplesQueue = []; // Samples that need to be loaded at start.
@@ -1138,7 +1175,13 @@ function Synth() {
     };
 
     this.__createSynth = function(turtle, instrumentName, sourceName, params) {
-        this._loadSample(sourceName);
+        if (typeof sourceName === "object") {
+            this._loadSampleFromFile(sourceName);
+            instrumentName = sourceName[0];
+            sourceName = sourceName[0];
+        } else {
+            this._loadSample(sourceName);
+        }
 
         if (
             sourceName in this.samples.voice ||
@@ -1523,8 +1566,6 @@ function Synth() {
         let tempNotes = notes;
         let tempSynth = instruments[turtle]["electronic synth"];
         let flag = 0;
-        console.log(instruments[turtle]);
-        console.log(instrumentName);
         if (instrumentName in instruments[turtle]) {
             tempSynth = instruments[turtle][instrumentName];
             flag = instrumentsSource[instrumentName][0];

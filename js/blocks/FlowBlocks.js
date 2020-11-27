@@ -55,6 +55,7 @@ function setupFlowBlocks() {
         constructor() {
             super("duplicatenotes");
             this.setPalette("flow");
+            this.piemenuValuesC1 = [2, 3, 4, 5, 6, 7, 8];
             this.setHelpString([
                 _("The Duplicate block will run each block multiple times.") +
                     " " +
@@ -261,8 +262,8 @@ function setupFlowBlocks() {
                 name: _("default")
             });
 
-	    this.updateDockValue(0, "caseout");
-	    this.updateDockValue(2, "casein");
+            this.updateDockValue(0, "caseout");
+            this.updateDockValue(2, "casein");
         }
 
         flow(args, logo, turtle, blk) {
@@ -299,8 +300,8 @@ function setupFlowBlocks() {
                 argTypes: ["anyin"]
             });
 
-	    this.updateDockValue(0, "caseout");
-	    this.updateDockValue(3, "casein");
+            this.updateDockValue(0, "caseout");
+            this.updateDockValue(3, "casein");
         }
 
         flow(args, logo, turtle, blk) {
@@ -344,7 +345,7 @@ function setupFlowBlocks() {
                 [5, "hidden", 0, 0, [0, null]]
             ]);
 
-	    this.updateDockValue(2, "casein");
+            this.updateDockValue(2, "casein");
         }
 
         flow(args, logo, turtle, blk) {
