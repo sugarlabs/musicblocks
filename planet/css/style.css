@@ -374,9 +374,9 @@ a {
 }
 
 #globalcontents .card {
-    height: 100%;
+	
+	display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
-#globalcontents .card-content {
-    height: 40%;
-}
