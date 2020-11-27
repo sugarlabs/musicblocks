@@ -369,3 +369,15 @@ a {
 	pointer-events: none;
 	cursor: default;
  }
+ #globalcontents .col.m6 {
+    margin-top: 2em;
+}
+
+#globalcontents .card {
+	height:100%;
+	
+	display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
