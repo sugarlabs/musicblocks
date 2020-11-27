@@ -54,8 +54,7 @@ function StringHelper(Planet) {
         ["projectviewer-reportsubmit-title",_("Report Project")],
         ["projectviewer-report-close",_("Close")],
         ["projectviewer-download-file",_("Download as File")],
-        ["projectviewer-open-mb",_("Open in Music Blocks")],
-        ["projectviewer-merge-mb",_("Merge with current project")]
+        ["projectviewer-open-mb",_("Open in Music Blocks")]
     ]
 
     this.init = function(){
