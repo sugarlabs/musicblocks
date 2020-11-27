@@ -82,7 +82,7 @@ function Trashcan() {
             that._borderHighlightBitmap.visible = true;
         };
 
-        var highlightString =
+        let highlightString =
             "rgb(" + this._highlightPower + "," + this._highlightPower +
             "," + this._highlightPower + ")";
         if (isActive) {

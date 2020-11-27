@@ -648,7 +648,7 @@ function SVG() {
         this.margins[2] = 0;
         this.margins[3] = 0;
 
-        var svg = this._newPath(x, y);
+        let svg = this._newPath(x, y);
         svg += this._corner(1, -1, 90, 0, 1, true, true, false);
         svg += this._doSlot();
         svg += this._rLineTo(this._expandX, 0);
