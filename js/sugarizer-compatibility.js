@@ -1,3 +1,14 @@
+// Copyright (c) 2015-20 Walter Bender
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
 define([
     "sugar-web/env",
     "sugar-web/activity/activity",
@@ -13,8 +24,9 @@ define([
         },
 
         saveLocally: function(callback) {
-            var t = this;
-            activity.getDatastoreObject().setDataAsText(JSON.stringify(t.data));
+            let that = this;
+            activity.getDatastoreObject().setDataAsText(JSON.stringify(
+		that.data));
             activity.getDatastoreObject().save(function() {
                 if (callback) {
                     callback();
@@ -30,15 +42,15 @@ define([
         },
 
         loadData: function(callback) {
-            var t = this;
+            let that = this;
             activity
                 .getDatastoreObject()
                 .loadAsText(function(error, metadata, jsonData) {
                     if (jsonData !== undefined && jsonData !== null) {
-                        t.data = JSON.parse(jsonData);
+                        that.data = JSON.parse(jsonData);
                     }
                     if (metadata.buddy_color) {
-                        t.xoColor = metadata.buddy_color;
+                        that.xoColor = metadata.buddy_color;
                     }
                     if (callback !== undefined) {
                         callback();
@@ -47,7 +59,7 @@ define([
         },
 
         hideLoading: function() {
-            var imageLoading = document.getElementById(
+            let imageLoading = document.getElementById(
                 "loading-image-container"
             );
             imageLoading.style.display = "none";
@@ -58,7 +70,7 @@ define([
         },
 
         getLanguage: function() {
-            var defaultSettings = {
+            let defaultSettings = {
                 name: "",
                 language:
                     typeof chrome != "undefined" &&
@@ -73,7 +85,7 @@ define([
                 return defaultSettings.language;
             }
 
-            var loadedSettings = datastore.localStorage.getValue(
+            let loadedSettings = datastore.localStorage.getValue(
                 "sugar_settings"
             );
             return loadedSettings.language;
