@@ -5216,8 +5216,8 @@ function Blocks(activity) {
                 }
             }
 
-            if (name in NAMEDICT) {
-                name = NAMEDICT[name];
+            if (name in BACKWARDCOMPATIBILIYDICT) {
+                name = BACKWARDCOMPATIBILIYDICT[name];
             }
 
             let that = this;
