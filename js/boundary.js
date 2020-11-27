@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2019 Walter Bender
+// Copyright (c) 2016-2020 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -63,7 +63,7 @@ function Boundary() {
         that = this;
 
         function __makeBoundary() {
-            var img = new Image();
+            let img = new Image();
             img.onload = function() {
                 bitmap = new createjs.Bitmap(img);
                 that._container.addChild(bitmap);
