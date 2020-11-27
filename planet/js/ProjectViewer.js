@@ -140,6 +140,14 @@ function ProjectViewer(Planet) {
             that.download();
         });
 
+        document.getElementById('projectviewer-open-mb').addEventListener('click', function (evt) {
+            that.openProject();
+        });
+
+        document.getElementById('projectviewer-merge-mb').addEventListener('click', function (evt) {
+            that.mergeProject();
+        });
+
         document.getElementById('projectviewer-report-project').addEventListener('click', function (evt) {
             that.openReporter();
         });

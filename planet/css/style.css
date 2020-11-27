@@ -301,12 +301,12 @@ a {
 	padding-right: 5px;
 }
 
-#projectviewer-download-file {
+#projectviewer-download-file, #projectviewer-open-mb {
 	margin-left: -1%;
 }
 
 @media only screen and (max-width: 1100px) {
-	#projectviewer-download-file {
+	#projectviewer-download-file, #projectviewer-open-mb, #projectviewer-merge-mb {
 		margin-left: -25px !important;
 	}
 
@@ -317,13 +317,13 @@ a {
 }
 
 @media only screen and (max-width: 650px) {
-	#projectviewer-download-file {
+	#projectviewer-download-file, #projectviewer-open-mb, #projectviewer-merge-mb {
 		font-size: 70%;
 	}
 }
 
 @media only screen and (max-width: 550px) {
-	#projectviewer-download-file {
+	#projectviewer-download-file, #projectviewer-open-mb, #projectviewer-merge-mb {
 		font-size: 60%;
 	}
 }
