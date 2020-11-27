@@ -774,6 +774,7 @@ function TimbreWidget() {
         widgetWindow.getWidgetBody().append(timbreTableDiv);
         widgetWindow.getWidgetBody().style.height = "500px";
         widgetWindow.getWidgetBody().style.width = "600px";
+        widgetWindow.getWidgetBody().style.overflowY = "auto";
 
         _unhighlightButtons = function() {
             addFilterButtonCell.style.backgroundColor = "#808080";
