@@ -27,15 +27,17 @@ function GlobalCard(Planet) {
         </div> \
         <div class="card-action"> \
             <div class="flexcontainer"> \
-                <a class="project-icon" id="global-project-more-details-{ID}">'+_('More Details')+'</a> \
-                <a class="project-icon"></a>';
+                <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('More Details')+'" id="global-project-more-details-{ID}"><i class="material-icons">info</i></a> \
+                <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Open project')+'" id="global-project-open-{ID}"><i class="material-icons">launch</i></a> \
+                <a class="project-icon"></a> \
+                <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Merge with current project')+'" id="global-project-merge-{ID}"><i class="material-icons">merge_type</i></a> \ ';
 
     if (Planet.ProjectStorage.isLiked(this.id)) {
         this.renderData += '\
                 <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Unlike project')+'"><i class="material-icons"id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a> ';
     } else {
         this.renderData += '\
-                <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Like project')+'"><i class="material-icons"id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a>/';
+                <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Like project')+'"><i class="material-icons"id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a>';
     }                    
     this.renderData += '\
                     <div id="global-share-{ID}"> \
@@ -98,9 +100,19 @@ function GlobalCard(Planet) {
             Planet.GlobalPlanet.ProjectViewer.open(that.id);
         });
 
+        // set open button listener
+        frag.getElementById('global-project-open-' + this.id).addEventListener('click', function (evt) {
+            Planet.GlobalPlanet.openGlobalProject(that.id);
+        });
+
         // set image listener
         frag.getElementById('global-project-image-' + this.id).addEventListener('click', function (evt) {
             Planet.GlobalPlanet.ProjectViewer.open(that.id);
+        });
+
+        // set merge modify listener
+        frag.getElementById('global-project-merge-' + this.id).addEventListener('click', function (evt) {
+            Planet.GlobalPlanet.mergeGlobalProject(that.id);
         });
 
         // set share button listener
