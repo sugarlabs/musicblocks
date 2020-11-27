@@ -317,7 +317,7 @@ a {
 }
 
 @media only screen and (max-width: 650px) {
-	#projectviewer-download-file, #projectviewer-open-mb. #projectviewer-merge-mb {
+	#projectviewer-download-file, #projectviewer-open-mb, #projectviewer-merge-mb {
 		font-size: 70%;
 	}
 }
