@@ -201,6 +201,7 @@ function Activity() {
         'activity/languagebox',
         'activity/basicblocks',
         'activity/blockfactory',
+	'activity/piemenus',
         'activity/rubrics',
         'activity/macros',
         'activity/SaveInterface',

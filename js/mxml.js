@@ -1,3 +1,14 @@
+// Copyright (c) 2019-20 Marcus Chong
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
 saveMxmlOutput = function(logo) {
     console.log("data is ");
     console.log(logo);
@@ -7,10 +18,11 @@ saveMxmlOutput = function(logo) {
 
     // temporary until I get more things sorted out
     const ignore = ["voice two", "voice one", "one voice"];
-    var res = "";
-    var indent = 0;
-    add = function(str) {
-        for (var i = 0; i < indent; i++) {
+    let res = "";
+    let indent = 0;
+
+    let add = function(str) {
+        for (let i = 0; i < indent; i++) {
             res += "    ";
         }
         res += str + "\n";
@@ -24,6 +36,8 @@ saveMxmlOutput = function(logo) {
     indent++;
     add("<part-list>");
     indent++;
+
+    let voice;
     // Why is logo.notation.notationStaging an object and not an array?
     Object.keys(logo.notation.notationStaging).forEach(voice => {
         if (logo.notation.notationStaging[voice].length === 0) {
@@ -53,29 +67,28 @@ saveMxmlOutput = function(logo) {
 
         // assume 4/4 time, 32 divisions bc smallest note is 1/32
         // key is C by default
-        var currMeasure = 1;
-        var divisions = 32;
-        var beats = 4;
-        var beatType = 4;
-        var beatsChanged = false;
-        var newDivisions = -1;
-        var newBeats = -1;
-        var newBeats = -1;
-        var newBeatType = -1;
-        var openedMeasureTag = false;
-        var queuedTempo = null;
-        var firstMeasure = true;
+        let currMeasure = 1;
+        let divisions = 32;
+        let beats = 4;
+        let beatType = 4;
+        let beatsChanged = false;
+        let newDivisions = -1;
+        let newBeats = -1;
+        let newBeatType = -1;
+        let openedMeasureTag = false;
+        let queuedTempo = null;
+        let firstMeasure = true;
         indent++;
-        var divisionsLeft = divisions;
-        var notes = logo.notation.notationStaging[voice];
+        let divisionsLeft = divisions;
+        let notes = logo.notation.notationStaging[voice];
 
         console.log(notes);
-        var cnter = 0;
+        let cnter = 0;
         console.log(notes.length);
 
-        for (var i = 0; i < notes.length; i += 1) {
+        for (let i = 0; i < notes.length; i += 1) {
             // obj = [note, duration, dotCount, tupletValue, roundDown, insideChord, staccato]
-            var obj = notes[i];
+            let obj = notes[i];
             if (["tie", "begin slur", "end slur"].includes(obj)) {
                 continue;
             }
@@ -130,9 +143,9 @@ saveMxmlOutput = function(logo) {
             }
 
             if (obj === "tempo") {
-                var bpm = notes[i + 1];
-                var beatMeasure = notes[i + 2];
-                var bpmAdjusted = Math.floor(bpm * (4 / beatMeasure));
+                let bpm = notes[i + 1];
+                let beatMeasure = notes[i + 2];
+                let bpmAdjusted = Math.floor(bpm * (4 / beatMeasure));
 
                 if (openedMeasureTag) {
                     add('<sound tempo="' + bpmAdjusted + '"/>');
@@ -161,14 +174,14 @@ saveMxmlOutput = function(logo) {
             console.log("i is " + i);
 
             // We only add </chord> tag to the non-first elements in a chord
-            var isChordNote = false;
-            for (var p of obj[0]) {
+            let isChordNote = false;
+            for (let p of obj[0]) {
                 console.log("pitch is " + obj[0][0]);
                 console.log("type of duration note is " + obj[1]);
                 console.log("number of dots is " + obj[2]);
 
-                var dur = 32 / obj[1];
-                for (var j = 0; j < obj[2]; j++) dur += dur / 2;
+                let dur = 32 / obj[1];
+                for (let j = 0; j < obj[2]; j++) dur += dur / 2;
 
                 if (divisionsLeft < dur && !isChordNote) {
                     if (openedMeasureTag) {
@@ -230,7 +243,7 @@ saveMxmlOutput = function(logo) {
                     divisionsLeft -= dur;
                 }
 
-                var alter;
+                let alter;
 
                 if (p[1] === "\u266d") {
                     alter = -1; // flat
@@ -312,8 +325,8 @@ saveMxmlOutput = function(logo) {
     add("</score-partwise>");
 
     // Filter voices
-    var mi = 1e5;
-    for (var i = 0; i < res.length - 1; i++) {
+    let mi = 1e5;
+    for (let i = 0; i < res.length - 1; i++) {
         if (
             (res[i] === "P" || res[i] === "#") &&
             "123456789".includes(res[i + 1])
@@ -324,7 +337,7 @@ saveMxmlOutput = function(logo) {
 
     console.log("mi is " + mi);
     res = res.split("");
-    for (var i = 0; i < res.length - 1; i++) {
+    for (let i = 0; i < res.length - 1; i++) {
         if (
             (res[i] === "P" || res[i] === "#") &&
             "123456789".includes(res[i + 1])
