@@ -12,190 +12,192 @@
 // FIXME: Use busy cursor
 
 // A viewer for Turtle Blocks plugins
-function PluginsViewer(canvas, stage, refreshCanvas, close, load) {
-    this.canvas = canvas;
-    this.stage = stage;
-    this.refreshCanvas = refreshCanvas;
-    this.closeViewer = close;
-    this.loadPlugin = load;
-    this.dict = {};
-    this.pluginFiles = [];
-    this.container = null;
-    this.prev = null;
-    this.next = null;
-    this.page = 0; // 4x4 image matrix per page
-    this.server = true;
+class PluginsViewer {
+    constructor(canvas, stage, refreshCanvas, close, load) {
+        this.canvas = canvas;
+        this.stage = stage;
+        this.refreshCanvas = refreshCanvas;
+        this.closeViewer = close;
+        this.loadPlugin = load;
+        this.dict = {};
+        this.pluginFiles = [];
+        this.container = null;
+        this.prev = null;
+        this.next = null;
+        this.page = 0; // 4x4 image matrix per page
+        this.server = true;
 
-    this.setServer = function(server) {
-        this.server = server;
-    };
+        this.setServer = function (server) {
+            this.server = server;
+        };
 
-    this.hide = function() {
-        if (this.container !== null) {
-            this.container.visible = false;
-            this.refreshCanvas();
-        }
-    };
+        this.hide = function () {
+            if (this.container !== null) {
+                this.container.visible = false;
+                this.refreshCanvas();
+            }
+        };
 
-    this.show = function(scale) {
-        this.scale = scale;
-        this.page = 0;
-        if (this.server) {
-            try {
-                let rawData = httpGet();
-                let obj = JSON.parse(rawData);
-                // console.debug('json parse: ' + obj);
-                // Look for svg
-                for (let file in obj) {
-                    if (fileExt(obj[file]) === "svg") {
-                        let name = fileBasename(obj[file]);
-                        if (this.pluginFiles.indexOf(name) === -1) {
-                            this.pluginFiles.push(name);
+        this.show = function (scale) {
+            this.scale = scale;
+            this.page = 0;
+            if (this.server) {
+                try {
+                    let rawData = httpGet();
+                    let obj = JSON.parse(rawData);
+                    // console.debug('json parse: ' + obj);
+                    // Look for svg
+                    for (let file in obj) {
+                        if (fileExt(obj[file]) === "svg") {
+                            let name = fileBasename(obj[file]);
+                            if (this.pluginFiles.indexOf(name) === -1) {
+                                this.pluginFiles.push(name);
+                            }
                         }
                     }
-                }
-                // and corresponding .json files
-                for (let file in this.pluginFiles) {
-                    let tbfile = this.pluginFiles[file] + ".json";
-                    if (!tbfile in obj) {
-                        this.pluginFiles.remove(this.pluginFiles[file]);
+                    // and corresponding .json files
+                    for (let file in this.pluginFiles) {
+                        let tbfile = this.pluginFiles[file] + ".json";
+                        if (!tbfile in obj) {
+                            this.pluginFiles.remove(this.pluginFiles[file]);
+                        }
                     }
+                } catch (e) {
+                    console.debug(e);
+                    return false;
                 }
-            } catch (e) {
-                console.debug(e);
-                return false;
+            } else {
+                // FIXME: grab files from a local server?
+                this.pluginFiles = SAMPLEPLUGINS;
             }
-        } else {
-            // FIXME: grab files from a local server?
-            this.pluginFiles = SAMPLEPLUGINS;
-        }
-        console.debug("found these projects: " + this.pluginFiles.sort());
+            console.debug("found these projects: " + this.pluginFiles.sort());
 
-        if (this.container === null) {
-            this.container = new createjs.Container();
-            this.stage.addChild(this.container);
-            this.container.x = Math.floor(
-                (this.canvas.width / scale - 650) / 2
-            );
-            this.container.y = 27;
+            if (this.container === null) {
+                this.container = new createjs.Container();
+                this.stage.addChild(this.container);
+                this.container.x = Math.floor(
+                    (this.canvas.width / scale - 650) / 2
+                );
+                this.container.y = 27;
 
-            function processBackground(viewer, name, bitmap, extras) {
-                viewer.container.addChild(bitmap);
+                function processBackground(viewer, name, bitmap, extras) {
+                    viewer.container.addChild(bitmap);
 
-                function processPrev(viewer, name, bitmap, extras) {
-                    viewer.prev = bitmap;
-                    viewer.container.addChild(viewer.prev);
-                    viewer.prev.x = 270;
-                    viewer.prev.y = 535;
+                    function processPrev(viewer, name, bitmap, extras) {
+                        viewer.prev = bitmap;
+                        viewer.container.addChild(viewer.prev);
+                        viewer.prev.x = 270;
+                        viewer.prev.y = 535;
 
-                    function processNext(viewer, name, bitmap, scale) {
-                        viewer.next = bitmap;
-                        viewer.container.addChild(viewer.next);
-                        viewer.next.x = 325;
-                        viewer.next.y = 535;
-                        viewer.container.visible = true;
-                        viewer.refreshCanvas();
-                        viewer.completeInit();
-                        loadThumbnailContainerHandler(viewer);
-                        return true;
+                        function processNext(viewer, name, bitmap, scale) {
+                            viewer.next = bitmap;
+                            viewer.container.addChild(viewer.next);
+                            viewer.next.x = 325;
+                            viewer.next.y = 535;
+                            viewer.container.visible = true;
+                            viewer.refreshCanvas();
+                            viewer.completeInit();
+                            loadThumbnailContainerHandler(viewer);
+                            return true;
+                        }
+
+                        makeViewerBitmap(
+                            viewer,
+                            NEXTBUTTON,
+                            "viewer",
+                            processNext,
+                            null
+                        );
                     }
 
                     makeViewerBitmap(
                         viewer,
-                        NEXTBUTTON,
+                        PREVBUTTON,
                         "viewer",
-                        processNext,
+                        processPrev,
                         null
                     );
                 }
 
                 makeViewerBitmap(
-                    viewer,
-                    PREVBUTTON,
+                    this,
+                    BACKGROUND,
                     "viewer",
-                    processPrev,
+                    processBackground,
                     null
                 );
-            }
-
-            makeViewerBitmap(
-                this,
-                BACKGROUND,
-                "viewer",
-                processBackground,
-                null
-            );
-        } else {
-            this.container.visible = true;
-            this.refreshCanvas();
-            this.completeInit();
-            return true;
-        }
-    };
-
-    this.downloadImage = function(p, prepareNextImage) {
-        let header = "data:image/svg+xml;utf8,";
-        let name = this.pluginFiles[p] + ".svg";
-        // console.debug('getting ' + name + ' from samples');
-        let data = header + SAMPLESSVG[name];
-        if (this.server) {
-            data = header + httpGet(name);
-        }
-        let image = new Image();
-        let viewer = this;
-
-        image.onload = function() {
-            bitmap = new createjs.Bitmap(data);
-            bitmap.scaleX = 0.5;
-            bitmap.scaleY = 0.5;
-            viewer.container.addChild(bitmap);
-            lastChild = last(viewer.container.children);
-            viewer.container.swapChildren(bitmap, lastChild);
-
-            viewer.dict[viewer.pluginFiles[p]] = bitmap;
-            x = 5 + (p % 4) * 160;
-            y = 55 + Math.floor((p % 16) / 4) * 120;
-            viewer.dict[viewer.pluginFiles[p]].x = x;
-            viewer.dict[viewer.pluginFiles[p]].y = y;
-            viewer.dict[viewer.pluginFiles[p]].visible = true;
-            viewer.refreshCanvas();
-            if (prepareNextImage !== null) {
-                prepareNextImage(viewer, p + 1);
+            } else {
+                this.container.visible = true;
+                this.refreshCanvas();
+                this.completeInit();
+                return true;
             }
         };
 
-        image.src = data;
-    };
+        this.downloadImage = function (p, prepareNextImage) {
+            let header = "data:image/svg+xml;utf8,";
+            let name = this.pluginFiles[p] + ".svg";
+            // console.debug('getting ' + name + ' from samples');
+            let data = header + SAMPLESSVG[name];
+            if (this.server) {
+                data = header + httpGet(name);
+            }
+            let image = new Image();
+            let viewer = this;
 
-    this.completeInit = function() {
-        let p = 0;
-        this.prepareNextImage(this, p);
-    };
+            image.onload = function () {
+                bitmap = new createjs.Bitmap(data);
+                bitmap.scaleX = 0.5;
+                bitmap.scaleY = 0.5;
+                viewer.container.addChild(bitmap);
+                lastChild = last(viewer.container.children);
+                viewer.container.swapChildren(bitmap, lastChild);
 
-    this.prepareNextImage = function(viewer, p) {
-        // TODO: this.pluginFiles.sort()
-        // Only download the images on the first page.
-        if (p < viewer.pluginFiles.length && p < viewer.page * 16 + 16) {
-            if (viewer.pluginFiles[p] in viewer.dict) {
+                viewer.dict[viewer.pluginFiles[p]] = bitmap;
                 x = 5 + (p % 4) * 160;
                 y = 55 + Math.floor((p % 16) / 4) * 120;
                 viewer.dict[viewer.pluginFiles[p]].x = x;
                 viewer.dict[viewer.pluginFiles[p]].y = y;
                 viewer.dict[viewer.pluginFiles[p]].visible = true;
-                viewer.prepareNextImage(viewer, p + 1);
+                viewer.refreshCanvas();
+                if (prepareNextImage !== null) {
+                    prepareNextImage(viewer, p + 1);
+                }
+            };
+
+            image.src = data;
+        };
+
+        this.completeInit = function () {
+            let p = 0;
+            this.prepareNextImage(this, p);
+        };
+
+        this.prepareNextImage = function (viewer, p) {
+            // TODO: this.pluginFiles.sort()
+            // Only download the images on the first page.
+            if (p < viewer.pluginFiles.length && p < viewer.page * 16 + 16) {
+                if (viewer.pluginFiles[p] in viewer.dict) {
+                    x = 5 + (p % 4) * 160;
+                    y = 55 + Math.floor((p % 16) / 4) * 120;
+                    viewer.dict[viewer.pluginFiles[p]].x = x;
+                    viewer.dict[viewer.pluginFiles[p]].y = y;
+                    viewer.dict[viewer.pluginFiles[p]].visible = true;
+                    viewer.prepareNextImage(viewer, p + 1);
+                } else {
+                    viewer.downloadImage(p, viewer.prepareNextImage);
+                }
             } else {
-                viewer.downloadImage(p, viewer.prepareNextImage);
+                if (viewer.page === 0) {
+                    viewer.prev.visible = false;
+                }
+                if ((viewer.page + 1) * 16 < viewer.pluginFiles.length) {
+                    viewer.next.visible = true;
+                }
+                viewer.refreshCanvas();
             }
-        } else {
-            if (viewer.page === 0) {
-                viewer.prev.visible = false;
-            }
-            if ((viewer.page + 1) * 16 < viewer.pluginFiles.length) {
-                viewer.next.visible = true;
-            }
-            viewer.refreshCanvas();
-        }
-    };
+        };
+    }
 }
 
 function hideCurrentPage(viewer) {
