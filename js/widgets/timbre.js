@@ -18,7 +18,7 @@ function TimbreWidget() {
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
 
-    var timbreTableDiv = document.createElement("div");
+    let timbreTableDiv = document.createElement("div");
 
     this.notesToPlay = [];
     this.env = [];
@@ -506,7 +506,7 @@ function TimbreWidget() {
     };
 
     this._undo = function () {
-        var blockValue = 0;
+        let blockValue = 0;
 
         if (this.isActive["envelope"]) {
             if (this.env.length > 1) {
@@ -1171,7 +1171,7 @@ function TimbreWidget() {
             this._logo.blocks.blockList[this.blockNo].connections[2] = n;
             this._logo.blocks.blockList[n].connections[0] = this.blockNo;
         } else {
-            var c =
+            let c =
                 this._logo.blocks.blockList[bottomOfClamp].connections.length -
                 1;
             // Check for nested clamps.
@@ -1183,7 +1183,7 @@ function TimbreWidget() {
                     this._logo.blocks.blockList[bottomOfClamp].connections[0]
                 ].name !== "newnote"
             ) {
-                var cblk = this._logo.blocks.blockList[bottomOfClamp]
+                let cblk = this._logo.blocks.blockList[bottomOfClamp]
                     .connections[0];
                 c = this._logo.blocks.blockList[cblk].connections.length - 2;
                 this._logo.blocks.clampBlocksToCheck.push([cblk, 0]);
@@ -1211,7 +1211,7 @@ function TimbreWidget() {
     this._synth = function () {
         //  console.debug('heysynth');
         var that = this;
-        var blockValue = 0;
+        let blockValue = 0;
 
         docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
         docById("synthButtonCell").onmouseover = function () { };
@@ -1623,7 +1623,7 @@ function TimbreWidget() {
 
     this._oscillator = function (newOscillator) {
         var that = this;
-        var blockValue = 0;
+        let blockValue = 0;
 
         if (this.osc.length !== 1) {
             blockValue = this.osc.length - 1;
@@ -1775,7 +1775,7 @@ function TimbreWidget() {
 
     this._envelope = function (newEnvelope) {
         var that = this;
-        var blockValue = 0;
+        let blockValue = 0;
 
         if (this.env.length !== 1) {
             blockValue = this.env.length - 1;
@@ -1888,7 +1888,7 @@ function TimbreWidget() {
     this._createFilter = function (f, env) {
         console.debug("adding filter " + f);
 
-        var blockValue = f;
+        let blockValue = f;
         var wrapperIDs = [f * 3, f * 3 + 1, f * 3 + 2];
         let radioIDs = [f * 4, f * 4 + 1, f * 4 + 2, f * 4 + 3];
 
@@ -2038,7 +2038,7 @@ function TimbreWidget() {
             });
 
             for (let i = 0; i < radioIDs.length; i++) {
-                var radioButton = docById("radio" + radioIDs[i]);
+                let radioButton = docById("radio" + radioIDs[i]);
 
                 radioButton.onclick = function (event) {
                     let elem = event.target;
@@ -2151,7 +2151,7 @@ function TimbreWidget() {
 
     this._effects = function () {
         var that = this;
-        var blockValue = 0;
+        let blockValue = 0;
 
         docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
         docById("effectsButtonCell").onmouseover = function () { };
@@ -2345,11 +2345,11 @@ function TimbreWidget() {
                             obj[0] + "/" + obj[1]; // that.vibratoParams[1];
                     } else {
                         // If necessary, add a vibrato block.
-                        var topOfTimbreClamp =
+                        let topOfTimbreClamp =
                             that._logo.blocks.blockList[that.blockNo]
                                 .connections[2];
 
-                        var vibratoBlock = that._logo.blocks.blockList.length;
+                        let vibratoBlock = that._logo.blocks.blockList.length;
                         const VIBRATOOBJ = [
                             [0, ["vibrato", {}], 0, 0, [null, 1, 3, 2, 6]],
                             [1, ["number", { value: 5 }], 0, 0, [0]],
