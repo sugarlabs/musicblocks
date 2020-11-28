@@ -2024,7 +2024,7 @@ function TemperamentWidget() {
             }
 
             if (i <= pitchNumber && i >= 0 && that._playing && p < 2) {
-                setTimeout(function() {
+                setTimeout(() => {
                     __playLoop(i);
                 }, Singer.defaultBPMFactor * 1000 * duration);
             } else {
@@ -2041,39 +2041,39 @@ function TemperamentWidget() {
                     ICONSIZE +
                     '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
                 if (i !== -1) {
-                    setTimeout(function() {
+                    setTimeout(() => {
                         if (
-                            that.circleIsVisible == false &&
+                            this.circleIsVisible == false &&
                             docById("wheelDiv4") == null
                         ) {
-                            that.notesCircle.navItems[i - 1].fillAttr =
+                            this.notesCircle.navItems[i - 1].fillAttr =
                                 "#c8C8C8";
-                            that.notesCircle.navItems[
+                            this.notesCircle.navItems[
                                 i - 1
                             ].sliceHoverAttr.fill = "#c8C8C8";
-                            that.notesCircle.navItems[
+                            this.notesCircle.navItems[
                                 i - 1
                             ].slicePathAttr.fill = "#c8C8C8";
-                            that.notesCircle.navItems[
+                            this.notesCircle.navItems[
                                 i - 1
                             ].sliceSelectedAttr.fill = "#c8C8C8";
-                            that.notesCircle.refreshWheel();
+                            this.notesCircle.refreshWheel();
                         } else if (
-                            that.circleIsVisible == true &&
+                            this.circleIsVisible == true &&
                             docById("wheelDiv4") == null
                         ) {
                             var j = i - 1;
                             docById("pitchNumber_" + j).style.background =
                                 platformColor.selectorBackground;
                         } else if (docById("wheelDiv4") !== null) {
-                            that.wheel1.navItems[i - 1].fillAttr = "#e0e0e0";
-                            that.wheel1.navItems[i - 1].sliceHoverAttr.fill =
+                            this.wheel1.navItems[i - 1].fillAttr = "#e0e0e0";
+                            this.wheel1.navItems[i - 1].sliceHoverAttr.fill =
                                 "#e0e0e0";
-                            that.wheel1.navItems[i - 1].slicePathAttr.fill =
+                            this.wheel1.navItems[i - 1].slicePathAttr.fill =
                                 "#e0e0e0";
-                            that.wheel1.navItems[i - 1].sliceSelectedAttr.fill =
+                            this.wheel1.navItems[i - 1].sliceSelectedAttr.fill =
                                 "#e0e0e0";
-                            that.wheel1.refreshWheel();
+                            this.wheel1.refreshWheel();
                         }
                     }, Singer.defaultBPMFactor * 1000 * duration);
                 }
