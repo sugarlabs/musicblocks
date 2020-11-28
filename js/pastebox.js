@@ -102,7 +102,7 @@ function PasteBox() {
         let locked = false;
         let that = this;
 
-        this._container.on("click", function(event) {
+        this._container.on("click", (event) =>{
             // We need a lock to "debouce" the click.
             if (locked) {
                 console.debug("debouncing click");
@@ -111,7 +111,7 @@ function PasteBox() {
 
             locked = true;
 
-            setTimeout(function() {
+            setTimeout(() => {
                 locked = false;
             }, 500);
 
