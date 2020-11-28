@@ -12,7 +12,7 @@
 "X-Generator: Pootle 2.0.5\n"
 
 #: js/activity.js:445
-#: js/block.js:3912
+#: js/rhythmruler.js:1919
 msgid "action"
 msgstr "क्रिया"
 
@@ -805,7 +805,7 @@ msgstr "में भंडारित करें"
 #: js/blocks.js:3498
 #: js/BoxesBlocks.js:259
 msgid "store in box"
-msgstr ""
+msgstr "बॉक्स में स्टोर करें"
 
 #: js/palette.js:634
 #: js/blocks.js:2557
@@ -815,11 +815,11 @@ msgstr "फाइल खोलें"
 #: js/turtledefs.js:23
 #.TRANS: put the URL to the guide here, e.g., https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md
 msgid "guide url"
-msgstr ""
+msgstr "url गाइड"
 
 #: js/turtledefs.js:68
 msgid "search"
-msgstr ""
+msgstr "खोज"
 
 #: js/turtledefs.js:69
 #: js/rubrics.js:494
@@ -951,43 +951,43 @@ msgstr ""
 #: js/turtledefs.js:500
 #: js/help.js:275
 msgid "Welcome to Music Blocks"
-msgstr ""
+msgstr "म्यूजिक ब्लॉक में आपका स्वागत है"
 
 #: js/turtledefs.js:290
 #: js/turtledefs.js:506
 #: js/help.js:276
 msgid "Meet Mr. Mouse!"
-msgstr ""
+msgstr "श्रीमान माउस से मिलें"
 
 #: js/turtledefs.js:291
 #: js/turtledefs.js:507
 msgid "Mr Mouse is our Music Blocks conductor."
-msgstr ""
+msgstr "श्री माउस हमारे संगीत ब्लॉक कंडक्टर है।"
 
 #: js/turtledefs.js:293
 #: js/turtledefs.js:509
 msgid "Mr Mouse encourages you to explore Music Blocks."
-msgstr ""
+msgstr "श्री माउस आपको संगीत ब्लॉक का पता लगाने के लिए प्रोत्साहित करता है।"
 
 #: js/turtledefs.js:295
 #: js/turtledefs.js:511
 msgid "Let us start our tour!"
-msgstr ""
+msgstr "हमें अपना दौरा शुरू करना चाहिए!"
 
 #: js/turtledefs.js:301
 #: js/turtledefs.js:517
 msgid "Click the run button to run the project in fast mode."
-msgstr ""
+msgstr "प्रोजेक्ट को तेज मोड में चलाने के लिए रन बटन पर क्लिक करें।"
 
 #: js/turtledefs.js:307
 #: js/turtledefs.js:523
 msgid "Stop the music (and the mice)."
-msgstr ""
+msgstr "संगीत (और चूहे) बंद करो।"
 
 #: js/turtledefs.js:309
 #: js/turtledefs.js:525
 msgid "You can also type Alt-S to stop."
-msgstr ""
+msgstr "आप रोकने के लिए Alt-S भी टाइप कर सकते हैं।"
 
 #: js/turtledefs.js:314
 #: js/turtledefs.js:531
@@ -997,12 +997,12 @@ msgstr ""
 #: js/toolbar.js:661
 #: js/StringHelper.js:19
 msgid "New project"
-msgstr ""
+msgstr "नया काम"
 
 #: js/turtledefs.js:315
 #: js/turtledefs.js:532
 msgid "Initialize a new project."
-msgstr ""
+msgstr "एक नई परियोजना की शुरुआत करें।"
 
 #: js/turtledefs.js:320
 #: js/turtledefs.js:537
