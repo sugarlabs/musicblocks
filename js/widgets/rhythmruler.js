@@ -167,18 +167,18 @@ function RhythmRuler() {
                     var drum = this._logo.blocks.blockList[drumBlockNo].value;
                 }
 
-                var that = this;
+                
                 // FIXME: Should be based on meter
                 for (var i = 0; i < 4; i++) {
-                    setTimeout(function() {
-                        that._logo.synth.trigger(
+                    setTimeout(() => {
+                        this._logo.synth.trigger(
                             0, "C4", Singer.defaultBPMFactor / 16, drum, null, null
                         );
                     }, (interval * i) / 4);
                 }
 
-                setTimeout(function() {
-                    that.__startTapping(noteValues, interval);
+                setTimeout(() => {
+                    this.__startTapping(noteValues, interval);
                 }, interval);
             }
         } else {
@@ -209,8 +209,8 @@ function RhythmRuler() {
 
         // Set a timeout to end tapping
         var that = this;
-        setTimeout(function() {
-            that.__endTapping();
+        setTimeout(() => {
+            this.__endTapping();
         }, interval);
 
         // Display a progress bar.
@@ -387,19 +387,19 @@ function RhythmRuler() {
             that._longPressStartTime = d.getTime();
             that._inLongPress = false;
 
-            that._longPressBeep = setTimeout(function() {
+            that._longPressBeep = setTimeout(() => {
                 // Removing audio feedback on long press since it
                 // occasionally confuses tone.js during rapid clicking
                 // in the widget.
 
                 // that._logo.synth.trigger(0, 'C4', 1 / 32, 'chime', null, null);
 
-                var cell = that._mouseDownCell;
+                var cell = this._mouseDownCell;
                 if (cell !== null && cell.parentNode !== null) {
-                    that._rulerSelected = cell.parentNode.getAttribute(
+                    this._rulerSelected = cell.parentNode.getAttribute(
                         "data-row"
                     );
-                    var noteValues = that.Rulers[that._rulerSelected][0];
+                    var noteValues = this.Rulers[this._rulerSelected][0];
                     var noteValue = noteValues[cell.cellIndex];
                     cell.style.backgroundColor =
                         platformColor.selectorBackground;
@@ -1016,9 +1016,9 @@ function RhythmRuler() {
                 this.__pause();
                 // Wait for pause to complete before restarting.
                 this._playingAll = true;
-                var that = this;
-                setTimeout(function() {
-                    that.__resume();
+                
+                setTimeout(() => {
+                    this.__resume();
                 }, 1000);
             }
         } else if (!this._playingAll) {
@@ -1160,14 +1160,14 @@ function RhythmRuler() {
                 d.getTime() - that._startingTime - that._elapsedTimes[rulerNo];
         }
 
-        setTimeout(function() {
+        setTimeout(() => {
             colIndex += 1;
             if (colIndex === noteValues.length) {
                 colIndex = 0;
             }
 
-            if (that._playing) {
-                that.__loop(noteTime, rulerNo, colIndex);
+            if (this._playing) {
+                this.__loop(noteTime, rulerNo, colIndex);
             }
         }, Singer.defaultBPMFactor * 1000 * noteTime - this._offsets[rulerNo]);
 
@@ -1176,24 +1176,24 @@ function RhythmRuler() {
 
     this._save = function(selectedRuler) {
         // Deprecated -- replaced by save tuplets code
-        var that = this;
+        
         for (var name in this._logo.blocks.palettes.dict) {
             this._logo.blocks.palettes.dict[name].hideMenu(true);
         }
 
         this._logo.refreshCanvas();
 
-        setTimeout(function() {
-            var ruler = that._rulers[selectedRuler];
-            var noteValues = that.Rulers[selectedRuler][0];
+        setTimeout(() => {
+            var ruler = this._rulers[selectedRuler];
+            var noteValues = this.Rulers[selectedRuler][0];
             // Get the first word of drum's name (ignore the word 'drum' itself)
             // and add 'rhythm'.
-            if (that.Drums[selectedRuler] === null) {
+            if (this.Drums[selectedRuler] === null) {
                 var stack_value = _("snare drum") + " " + _("rhythm");
             } else {
                 var stack_value =
-                    that._logo.blocks.blockList[
-                        that._logo.blocks.blockList[that.Drums[selectedRuler]]
+                    this._logo.blocks.blockList[
+                        this._logo.blocks.blockList[this.Drums[selectedRuler]]
                             .connections[1]
                     ].value.split(" ")[0] +
                     " " +
@@ -1284,32 +1284,32 @@ function RhythmRuler() {
                 }
             }
 
-            that._logo.blocks.loadNewBlocks(newStack);
-            if (selectedRuler > that.Rulers.length - 2) {
+            this._logo.blocks.loadNewBlocks(newStack);
+            if (selectedRuler > this.Rulers.length - 2) {
                 return;
             } else {
-                that._save(selectedRuler + 1);
+                this._save(selectedRuler + 1);
             }
         }, 500);
     };
 
     this._saveTuplets = function(selectedRuler) {
-        var that = this;
+        
         for (var name in this._logo.blocks.palettes.dict) {
             this._logo.blocks.palettes.dict[name].hideMenu(true);
         }
 
         this._logo.refreshCanvas();
 
-        setTimeout(function() {
-            var ruler = that._rulers[selectedRuler];
-            var noteValues = that.Rulers[selectedRuler][0];
-            if (that.Drums[selectedRuler] === null) {
+        setTimeout(() => {
+            var ruler = this._rulers[selectedRuler];
+            var noteValues = this.Rulers[selectedRuler][0];
+            if (this.Drums[selectedRuler] === null) {
                 var stack_value = _("rhythm");
             } else {
                 var stack_value =
-                    that._logo.blocks.blockList[
-                        that._logo.blocks.blockList[that.Drums[selectedRuler]]
+                    this._logo.blocks.blockList[
+                        this._logo.blocks.blockList[this.Drums[selectedRuler]]
                             .connections[1]
                     ].value.split(" ")[0] +
                     " " +
@@ -1451,11 +1451,11 @@ function RhythmRuler() {
                 }
             }
 
-            that._logo.blocks.loadNewBlocks(newStack);
-            if (selectedRuler > that.Rulers.length - 2) {
+            this._logo.blocks.loadNewBlocks(newStack);
+            if (selectedRuler > this.Rulers.length - 2) {
                 return;
             } else {
-                that._saveTuplets(selectedRuler + 1);
+                this._saveTuplets(selectedRuler + 1);
             }
         }, 500);
     };
@@ -1583,27 +1583,27 @@ function RhythmRuler() {
     };
 
     this._saveDrumMachine = function(selectedRuler, drum, effect) {
-        var that = this;
+        
         for (var name in this._logo.blocks.palettes.dict) {
             this._logo.blocks.palettes.dict[name].hideMenu(true);
         }
 
         this._logo.refreshCanvas();
 
-        setTimeout(function() {
-            var ruler = that._rulers[selectedRuler];
-            var noteValues = that.Rulers[selectedRuler][0];
+        setTimeout(() => {
+            var ruler = this._rulers[selectedRuler];
+            var noteValues = this.Rulers[selectedRuler][0];
             var delta = selectedRuler * 42;
 
             // Just save the action, not the drum machine itself.
             // var newStack = [[0, ['start', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, null]]];
             // newStack.push([1, 'forever', 0, 0, [0, 2, null]]);
-            if (that.Drums[selectedRuler] === null) {
+            if (this.Drums[selectedRuler] === null) {
                 var action_name = _("snare drum") + " " + _("action");
             } else {
                 var action_name =
-                    that._logo.blocks.blockList[
-                        that._logo.blocks.blockList[that.Drums[selectedRuler]]
+                    this._logo.blocks.blockList[
+                        this._logo.blocks.blockList[this.Drums[selectedRuler]]
                             .connections[1]
                     ].value.split(" ")[0] +
                     " " +
@@ -1875,27 +1875,27 @@ function RhythmRuler() {
                 }
             }
 
-            that._logo.blocks.loadNewBlocks(newStack);
-            that._logo.textMsg(_("New action block generated!"));
-            if (selectedRuler > that.Rulers.length - 2) {
+            this._logo.blocks.loadNewBlocks(newStack);
+            this._logo.textMsg(_("New action block generated!"));
+            if (selectedRuler > this.Rulers.length - 2) {
                 return;
             } else {
-                that._saveMachine(selectedRuler + 1);
+                this._saveMachine(selectedRuler + 1);
             }
         }, 500);
     };
 
     this._saveVoiceMachine = function(selectedRuler, voice) {
-        var that = this;
+        
         for (var name in this._logo.blocks.palettes.dict) {
             this._logo.blocks.palettes.dict[name].hideMenu(true);
         }
 
         this._logo.refreshCanvas();
 
-        setTimeout(function() {
-            var ruler = that._rulers[selectedRuler];
-            var noteValues = that.Rulers[selectedRuler][0];
+        setTimeout(() => {
+            var ruler = this._rulers[selectedRuler];
+            var noteValues = this.Rulers[selectedRuler][0];
             var delta = selectedRuler * 42;
 
             // Just save the action, not the drum machine itself.
@@ -1907,12 +1907,12 @@ function RhythmRuler() {
             // newStack.push([5, 'hidden', 0, 0, [4, null]]);
 
             // This should never happen.
-            if (that.Drums[selectedRuler] === null) {
+            if (this.Drums[selectedRuler] === null) {
                 var action_name = _("guitar") + " " + _("action");
             } else {
                 var action_name =
-                    that._logo.blocks.blockList[
-                        that._logo.blocks.blockList[that.Drums[selectedRuler]]
+                    this._logo.blocks.blockList[
+                        this._logo.blocks.blockList[this.Drums[selectedRuler]]
                             .connections[1]
                     ].value.split(" ")[0] +
                     "_" +
@@ -2248,11 +2248,11 @@ function RhythmRuler() {
                 }
             }
 
-            that._logo.blocks.loadNewBlocks(newStack);
-            if (selectedRuler > that.Rulers.length - 2) {
+            this._logo.blocks.loadNewBlocks(newStack);
+            if (selectedRuler > this.Rulers.length - 2) {
                 return;
             } else {
-                that._saveMachine(selectedRuler + 1);
+                this._saveMachine(selectedRuler + 1);
             }
         }, 500);
     };
@@ -2516,9 +2516,9 @@ function RhythmRuler() {
                 drumcell.className = "headcol"; // Position fixed when scrolling horizontally
 
                 drumcell.onclick = (function(id) {
-                    return function() {
-                        if (that._playing) {
-                            if (that._rulerPlaying === id) {
+                    return () => {
+                        if (this._playing) {
+                            if (this._rulerPlaying === id) {
                                 this.innerHTML =
                                     '<img src="header-icons/play-button.svg" title="' +
                                     _("Play") +
@@ -2529,28 +2529,28 @@ function RhythmRuler() {
                                     '" width="' +
                                     iconSize +
                                     '" vertical-align="middle">';
-                                that._playing = false;
-                                that._playingOne = false;
-                                that._playingAll = false;
-                                that._rulerPlaying = -1;
-                                that._startingTime = null;
-                                that._elapsedTimes[id] = 0;
-                                that._offsets[id] = 0;
+                                this._playing = false;
+                                this._playingOne = false;
+                                this._playingAll = false;
+                                this._rulerPlaying = -1;
+                                this._startingTime = null;
+                                this._elapsedTimes[id] = 0;
+                                this._offsets[id] = 0;
                                 setTimeout(
-                                    that._calculateZebraStripes(id),
+                                    this._calculateZebraStripes(id),
                                     1000
                                 );
                             }
                         } else {
-                            if (that._playingOne === false) {
-                                that._rulerSelected = id;
-                                that._logo.turtleDelay = 0;
-                                that._playing = true;
-                                that._playingOne = true;
-                                that._playingAll = false;
-                                that._cellCounter = 0;
-                                that._startingTime = null;
-                                that._rulerPlaying = id;
+                            if (this._playingOne === false) {
+                                this._rulerSelected = id;
+                                this._logo.turtleDelay = 0;
+                                this._playing = true;
+                                this._playingOne = true;
+                                this._playingAll = false;
+                                this._cellCounter = 0;
+                                this._startingTime = null;
+                                this._rulerPlaying = id;
                                 this.innerHTML =
                                     '<img src="header-icons/pause-button.svg" title="' +
                                     _("Pause") +
@@ -2561,9 +2561,9 @@ function RhythmRuler() {
                                     '" width="' +
                                     iconSize +
                                     '" vertical-align="middle">';
-                                that._elapsedTimes[id] = 0;
-                                that._offsets[id] = 0;
-                                that._playOne();
+                                this._elapsedTimes[id] = 0;
+                                this._offsets[id] = 0;
+                                this._playOne();
                             }
                         }
                     };
