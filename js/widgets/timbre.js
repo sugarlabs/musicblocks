@@ -254,7 +254,7 @@ function TimbreWidget() {
                 var topOfClamp = this._logo.blocks.blockList[
                     last(this.vibratoEffect)
                 ].connections[3];
-                var n = this._logo.blocks.blockList.length;
+                let n = this._logo.blocks.blockList.length;
                 const DIVOBJ = [
                     [0, ["divide", {}], 0, 0, [null, 1, 2]],
                     [1, ["number", { value: obj[0] }], 0, 0, [0]],
@@ -873,7 +873,7 @@ function TimbreWidget() {
                 ];
                 that._logo.blocks.loadNewBlocks(OSCILLATOROBJ);
 
-                var n = that._logo.blocks.blockList.length - 3;
+                let n = that._logo.blocks.blockList.length - 3;
                 that.osc.push(n);
                 that.oscParams.push(DEFAULTOSCILLATORTYPE);
                 that.oscParams.push(6);
@@ -927,7 +927,7 @@ function TimbreWidget() {
                 ];
                 that._logo.blocks.loadNewBlocks(ENVOBJ);
 
-                var n = that._logo.blocks.blockList.length - 5;
+                let n = that._logo.blocks.blockList.length - 5;
                 that.env.push(n);
                 that.ENVs.push(1);
                 that.ENVs.push(50);
@@ -991,7 +991,7 @@ function TimbreWidget() {
                 ];
                 that._logo.blocks.loadNewBlocks(FILTEROBJ);
 
-                var n = that._logo.blocks.blockList.length - 4;
+                let n = that._logo.blocks.blockList.length - 4;
                 that.fil.push(n);
                 that.filterParams.push(DEFAULTFILTERTYPE);
                 that.filterParams.push(-12);
@@ -1166,7 +1166,7 @@ function TimbreWidget() {
     };
 
     this.blockConnection = function (len, bottomOfClamp) {
-        var n = this._logo.blocks.blockList.length - len;
+        let n = this._logo.blocks.blockList.length - len;
         if (bottomOfClamp == null) {
             this._logo.blocks.blockList[this.blockNo].connections[2] = n;
             this._logo.blocks.blockList[n].connections[0] = this.blockNo;
@@ -1282,7 +1282,7 @@ function TimbreWidget() {
                         ];
                         that._logo.blocks.loadNewBlocks(AMSYNTHOBJ);
 
-                        var n = that._logo.blocks.blockList.length - 2;
+                        let n = that._logo.blocks.blockList.length - 2;
                         that.AMSynthesizer.push(n);
                         that.AMSynthParams.push(1);
 
@@ -1364,7 +1364,7 @@ function TimbreWidget() {
                         ];
                         that._logo.blocks.loadNewBlocks(FMSYNTHOBJ);
 
-                        var n = that._logo.blocks.blockList.length - 2;
+                        let n = that._logo.blocks.blockList.length - 2;
                         that.FMSynthesizer.push(n);
                         that.FMSynthParams.push(10);
 
@@ -1447,7 +1447,7 @@ function TimbreWidget() {
                         ];
                         that._logo.blocks.loadNewBlocks(NOISESYNTHOBJ);
 
-                        var n = that._logo.blocks.blockList.length - 2;
+                        let n = that._logo.blocks.blockList.length - 2;
                         that.NoiseSynthesizer.push(n);
                         that.NoiseSynthParams.push("white");
 
@@ -1528,7 +1528,7 @@ function TimbreWidget() {
                         ];
                         that._logo.blocks.loadNewBlocks(DUOSYNTHOBJ);
 
-                        var n = that._logo.blocks.blockList.length - 3;
+                        let n = that._logo.blocks.blockList.length - 3;
                         that.duoSynthesizer.push(n);
                         that.duoSynthParams.push(10);
                         that.duoSynthParams.push(6);
@@ -2116,7 +2116,7 @@ function TimbreWidget() {
         ];
         this._logo.blocks.loadNewBlocks(FILTEROBJ);
 
-        var n = this._logo.blocks.blockList.length - 4;
+        let n = this._logo.blocks.blockList.length - 4;
         var selectedFilters = instrumentsFilters[0][
             this.instrumentName
         ].slice();
@@ -2253,7 +2253,7 @@ function TimbreWidget() {
                             that._logo.blocks.blockList[that.blockNo]
                                 .connections[2];
 
-                        var n = that._logo.blocks.blockList.length;
+                        let n = that._logo.blocks.blockList.length;
                         const TREMOLOOBJ = [
                             [0, ["tremolo", {}], 0, 0, [null, 1, 2, null, 3]],
                             [1, ["number", { value: 10 }], 0, 0, [0]],
@@ -2491,7 +2491,7 @@ function TimbreWidget() {
                             that._logo.blocks.blockList[that.blockNo]
                                 .connections[2];
 
-                        var n = that._logo.blocks.blockList.length;
+                        let n = that._logo.blocks.blockList.length;
                         const CHORUSOBJ = [
                             [0, ["chorus", {}], 0, 0, [null, 1, 2, 3, null, 4]],
                             [1, ["number", { value: 2 }], 0, 0, [0]],
@@ -2598,7 +2598,7 @@ function TimbreWidget() {
                             that._logo.blocks.blockList[that.blockNo]
                                 .connections[2];
 
-                        var n = that._logo.blocks.blockList.length;
+                        let n = that._logo.blocks.blockList.length;
                         const PHASEROBJ = [
                             [0, ["phaser", {}], 0, 0, [null, 1, 2, 3, null, 4]],
                             [1, ["number", { value: 5 }], 0, 0, [0]],
@@ -2688,7 +2688,7 @@ function TimbreWidget() {
                             that._logo.blocks.blockList[that.blockNo]
                                 .connections[2];
 
-                        var n = that._logo.blocks.blockList.length;
+                        let n = that._logo.blocks.blockList.length;
                         const DISTORTIONOBJ = [
                             [0, ["dis", {}], 0, 0, [null, 1, null, 2]],
                             [1, ["number", { value: 40 }], 0, 0, [0]],
