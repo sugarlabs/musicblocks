@@ -6094,7 +6094,7 @@ class Blocks {
             }
 
             if (myBlock.name === "start" || myBlock.name === "drum") {
-                turtle = myBlock.value;
+                let turtle = myBlock.value;
                 let turtleNotInTrash = 0;
                 for (let i = 0; i < this.turtles.turtleList.length; i++) {
                     if (!this.turtles.turtleList[i].inTrash) {

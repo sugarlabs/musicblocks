@@ -866,7 +866,7 @@ class Palette {
                     document.body.appendChild(img);
 
                     // centers the img at (pageX, pageY) coordinates
-                    moveAt = (pageX, pageY) => {
+                    const moveAt = (pageX, pageY) => {
                         img.style.left = pageX - img.offsetWidth / 2 + 'px';
                         img.style.top = pageY - img.offsetHeight / 2 + 'px';
                     }
