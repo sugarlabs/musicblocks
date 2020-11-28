@@ -276,26 +276,26 @@ function loadThumbnailContainerHandler(viewer) {
 
     let locked = false;
 
-    viewer.container.on("click", function(event) {
+    viewer.container.on("click", (event) => {
         // We need a lock to "debouce" the click.
         if (locked) {
             console.debug("debouncing click");
             return;
         }
         locked = true;
-        setTimeout(function() {
+        setTimeout(() => {
             locked = false;
         }, 500);
         viewerClicked(viewer, event);
     });
 
-    viewer.container.on("mousedown", function(event) {
+    viewer.container.on("mousedown", (event) => {
         startX = event.stageX;
         startY = event.stageY;
         locked = true;
     });
 
-    viewer.container.on("pressup", function(event) {
+    viewer.container.on("pressup", (event) => {
         endX = event.stageX;
         endY = event.stageY;
         if (endY > startY + 30 || endX > startX + 30) {
