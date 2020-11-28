@@ -154,7 +154,7 @@ function SaveInterface(PlanetInterface) {
 
     this.saveHTMLNoPrompt = function() {
         setTimeout(
-            function() {
+            () => {
                 let html = "data:text/plain;charset=utf-8," +
                     encodeURIComponent(this.prepareHTML());
                 if (this.PlanetInterface !== undefined) {
