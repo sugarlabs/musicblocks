@@ -186,17 +186,17 @@ function Block(protoblock, blocks, overrideName) {
                         throw new Error("COULD NOT CREATE CACHE");
                     }
 
-                    that.bounds = that.container.getBounds();
+                    this.bounds = this.container.getBounds();
 
-                    if (that.bounds === null) {
+                    if (this.bounds === null) {
                         await delayExecution(100);
-                        that.regenerateArtwork(true, []);
+                        this.regenerateArtwork(true, []);
                         checkBounds(loopCount + 1);
                     } else {
-                        that.container.cache(
-                            that.bounds.x, that.bounds.y,
-                            that.bounds.width, that.bounds.height);
-                        callback(that, args);
+                        this.container.cache(
+                            this.bounds.x, this.bounds.y,
+                            this.bounds.width, this.bounds.height);
+                        callback(this, args);
                         resolve();
                     }
                 } catch (e) {
@@ -224,12 +224,12 @@ function Block(protoblock, blocks, overrideName) {
                         throw new Error("COULD NOT UPDATE CACHE");
                     }
 
-                    if (that.bounds == null) {
+                    if (this.bounds == null) {
                         updateBounds(loopCount + 1);
-                        await that.pause(200);
+                        await this.pause(200);
                     } else {
-                        that.container.updateCache();
-                        that.blocks.refreshCanvas();
+                        this.container.updateCache();
+                        this.blocks.refreshCanvas();
                         resolve();
                     }
                 } catch (e) {
@@ -2454,7 +2454,7 @@ function Block(protoblock, blocks, overrideName) {
                         that.blocks.logo.doStopTurtles();
 
                         setTimeout(() => {
-                            that.blocks.logo.runLogoCommands(topBlock);
+                            this.blocks.logo.runLogoCommands(topBlock);
                         }, 250);
                     } else {
                         that.blocks.logo.runLogoCommands(topBlock);
@@ -2517,7 +2517,7 @@ function Block(protoblock, blocks, overrideName) {
                             that.blocks.logo.doStopTurtles();
 
                             setTimeout(() => {
-                                that.blocks.logo.runLogoCommands(topBlk);
+                                this.blocks.logo.runLogoCommands(topBlk);
                             }, 250);
                         } else {
                             that.blocks.logo.runLogoCommands(topBlk);
@@ -2538,7 +2538,7 @@ function Block(protoblock, blocks, overrideName) {
                         that.blocks.logo.doStopTurtles();
 
                         setTimeout(() => {
-                            that.blocks.logo.runLogoCommands(topBlk);
+                            this.blocks.logo.runLogoCommands(topBlk);
                         }, 250);
                     } else {
                         that.blocks.logo.runLogoCommands(topBlk);
@@ -2551,12 +2551,12 @@ function Block(protoblock, blocks, overrideName) {
             docById("contextWheelDiv").style.display = "none";
 
             // Track time for detecting long pause...
-            that.blocks.mouseDownTime = new Date().getTime();
+            this.blocks.mouseDownTime = new Date().getTime();
 
             that.blocks.longPressTimeout = setTimeout(() => {
-                that.blocks.activeBlock = that.blocks.blockList.indexOf(that);
-                that._triggerLongPress = true;
-                that.blocks.triggerLongPress();
+                this.blocks.activeBlock = this.blocks.blockList.indexOf(this);
+                this._triggerLongPress = true;
+                this.blocks.triggerLongPress();
             }, LONGPRESSTIME);
 
             // Always show the trash when there is a block selected,
@@ -2589,7 +2589,7 @@ function Block(protoblock, blocks, overrideName) {
             event.nativeEvent.preventDefault();
 
             // Don't allow silence block to be dragged out of a note.
-            if (that.name === "rest2") {
+            if (this.name === "rest2") {
                 return;
             }
 
@@ -2599,10 +2599,10 @@ function Block(protoblock, blocks, overrideName) {
                 // Make it eaiser to select text on mobile.
                 setTimeout(() => {
                     moved =
-                        Math.abs(event.stageX / that.blocks.getStageScale() -
-                                 that.original.x) +
+                        Math.abs(event.stageX / this.blocks.getStageScale() -
+                                 this.original.x) +
                         Math.abs(event.stageY / that.blocks.getStageScale() -
-                                 that.original.y) > 20 && !window.hasMouse;
+                                 this.original.y) > 20 && !window.hasMouse;
                     getInput = !moved;
                 }, 200);
             }
@@ -2673,27 +2673,27 @@ function Block(protoblock, blocks, overrideName) {
         });
 
         this.container.on("mouseout", (event) => {
-            if (!that.blocks.getLongPressStatus()) {
-                that._mouseoutCallback(event, moved, haveClick, false);
+            if (!this.blocks.getLongPressStatus()) {
+                this._mouseoutCallback(event, moved, haveClick, false);
             } else {
-                clearTimeout(that.blocks.longPressTimeout);
-                that.blocks.longPressTimeout = null;
-                that.blocks.clearLongPress();
+                clearTimeout(this.blocks.longPressTimeout);
+                this.blocks.longPressTimeout = null;
+                this.blocks.clearLongPress();
             }
 
-            that.blocks.unhighlight(thisBlock, true);
-            that.blocks.activeBlock = null;
+            this.blocks.unhighlight(thisBlock, true);
+            this.blocks.activeBlock = null;
 
             moved = false;
         });
 
         this.container.on("pressup", (event) => {
-            if (!that.blocks.getLongPressStatus()) {
-                that._mouseoutCallback(event, moved, haveClick, false);
+            if (!this.blocks.getLongPressStatus()) {
+                this._mouseoutCallback(event, moved, haveClick, false);
             } else {
-                clearTimeout(that.blocks.longPressTimeout);
-                that.blocks.longPressTimeout = null;
-                that.blocks.clearLongPress();
+                clearTimeout(this.blocks.longPressTimeout);
+                this.blocks.longPressTimeout = null;
+                this.blocks.clearLongPress();
             }
 
             that.blocks.unhighlight(thisBlock, true);
@@ -3506,7 +3506,7 @@ function Block(protoblock, blocks, overrideName) {
             this.label.addEventListener("keypress", __keypress);
 
             this.label.addEventListener("change", () => {
-                that._labelChanged(false, true);
+                this._labelChanged(false, true);
             });
 
             this.label.style.left = Math.round(
@@ -3528,8 +3528,8 @@ function Block(protoblock, blocks, overrideName) {
 
             // Firefox fix
             setTimeout(() => {
-                that.label.style.display = "";
-                that.label.focus();
+                this.label.style.display = "";
+                this.label.focus();
                 focused = true;
             }, 100);
         }
