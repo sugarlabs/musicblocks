@@ -1086,7 +1086,7 @@ function Blocks(activity) {
                                 setTimeout(() => {
                                     blockPalette.remove(
                                         protoblock,
-                                        that.blockList[oldBlock].value
+                                        this.blockList[oldBlock].value
                                     );
                                     delete that.protoBlockDict["myDo_" + that.blockList[oldBlock].value];
                                     // that.palettes.hide();
