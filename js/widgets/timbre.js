@@ -251,7 +251,7 @@ function TimbreWidget() {
                 var obj = rationalToFraction(
                     this._logo.parseArg(this._logo, 0, divBlock, null, null)
                 );
-                var topOfClamp = this._logo.blocks.blockList[
+                let topOfClamp = this._logo.blocks.blockList[
                     last(this.vibratoEffect)
                 ].connections[3];
                 let n = this._logo.blocks.blockList.length;
@@ -854,7 +854,7 @@ function TimbreWidget() {
             that.isActive["oscillator"] = true;
 
             if (that.osc.length === 0) {
-                var topOfClamp =
+                let topOfClamp =
                     that._logo.blocks.blockList[that.blockNo].connections[2];
                 var bottomOfClamp = that._logo.blocks.findBottomBlock(
                     topOfClamp
@@ -912,7 +912,7 @@ function TimbreWidget() {
             that.isActive["envelope"] = true;
 
             if (that.env.length === 0) {
-                var topOfClamp =
+                let topOfClamp =
                     that._logo.blocks.blockList[that.blockNo].connections[2];
                 var bottomOfClamp = that._logo.blocks.findBottomBlock(
                     topOfClamp
@@ -977,7 +977,7 @@ function TimbreWidget() {
             that.isActive["filter"] = true;
 
             if (that.fil.length === 0) {
-                var topOfClamp =
+                let topOfClamp =
                     that._logo.blocks.blockList[that.blockNo].connections[2];
                 var bottomOfClamp = that._logo.blocks.findBottomBlock(
                     topOfClamp
@@ -1269,7 +1269,7 @@ function TimbreWidget() {
                     that.isActive["duosynth"] = false;
 
                     if (that.AMSynthesizer.length === 0) {
-                        var topOfClamp =
+                        let topOfClamp =
                             that._logo.blocks.blockList[that.blockNo]
                                 .connections[2];
                         var bottomOfClamp = that._logo.blocks.findBottomBlock(
@@ -1351,7 +1351,7 @@ function TimbreWidget() {
                     that.isActive["duosynth"] = false;
 
                     if (that.FMSynthesizer.length === 0) {
-                        var topOfClamp =
+                        let topOfClamp =
                             that._logo.blocks.blockList[that.blockNo]
                                 .connections[2];
                         var bottomOfClamp = that._logo.blocks.findBottomBlock(
@@ -1434,7 +1434,7 @@ function TimbreWidget() {
                     that.isActive["duosynth"] = false;
 
                     if (that.NoiseSynthesizer.length === 0) {
-                        var topOfClamp =
+                        let topOfClamp =
                             that._logo.blocks.blockList[that.blockNo]
                                 .connections[2];
                         var bottomOfClamp = that._logo.blocks.findBottomBlock(
@@ -1514,7 +1514,7 @@ function TimbreWidget() {
                     that.isActive["duosynth"] = true;
 
                     if (that.duoSynthesizer.length === 0) {
-                        var topOfClamp =
+                        let topOfClamp =
                             that._logo.blocks.blockList[that.blockNo]
                                 .connections[2];
                         var bottomOfClamp = that._logo.blocks.findBottomBlock(
@@ -2104,7 +2104,7 @@ function TimbreWidget() {
 
     this._addFilter = function () {
         var env = docById("timbreTable");
-        var topOfClamp = this._logo.blocks.blockList[this.blockNo]
+        let topOfClamp = this._logo.blocks.blockList[this.blockNo]
             .connections[2];
         var bottomOfClamp = this._logo.blocks.findBottomBlock(topOfClamp);
 
@@ -2249,7 +2249,7 @@ function TimbreWidget() {
 
                     if (that.tremoloEffect.length === 0) {
                         // This is the first block in the child stack of the Timbre clamp.
-                        var topOfClamp =
+                        let topOfClamp =
                             that._logo.blocks.blockList[that.blockNo]
                                 .connections[2];
 
@@ -2487,7 +2487,7 @@ function TimbreWidget() {
                     }
 
                     if (that.chorusEffect.length === 0) {
-                        var topOfClamp =
+                        let topOfClamp =
                             that._logo.blocks.blockList[that.blockNo]
                                 .connections[2];
 
@@ -2594,7 +2594,7 @@ function TimbreWidget() {
                     }
 
                     if (that.phaserEffect.length === 0) {
-                        var topOfClamp =
+                        let topOfClamp =
                             that._logo.blocks.blockList[that.blockNo]
                                 .connections[2];
 
@@ -2684,7 +2684,7 @@ function TimbreWidget() {
                     }
 
                     if (that.distortionEffect.length === 0) {
-                        var topOfClamp =
+                        let topOfClamp =
                             that._logo.blocks.blockList[that.blockNo]
                                 .connections[2];
 
