@@ -639,7 +639,7 @@ function TimbreWidget() {
                     "filterType"
                 ] = this.filterParams[i * 3];
 
-                var radioIDs = [i * 4, i * 4 + 1, i * 4 + 2, i * 4 + 3];
+                let radioIDs = [i * 4, i * 4 + 1, i * 4 + 2, i * 4 + 3];
                 if (this.filterParams[i * 3 + 1] === -12) {
                     docById("radio" + radioIDs[0]).checked = true;
                 } else {
@@ -1877,7 +1877,7 @@ function TimbreWidget() {
         var env = docById("timbreTable");
         env.innerHTML = "";
 
-        for (var f = 0; f < this.fil.length; f++) {
+        for (let f = 0; f < this.fil.length; f++) {
             this._createFilter(f, env);
         }
 
@@ -1890,7 +1890,7 @@ function TimbreWidget() {
 
         var blockValue = f;
         var wrapperIDs = [f * 3, f * 3 + 1, f * 3 + 2];
-        var radioIDs = [f * 4, f * 4 + 1, f * 4 + 2, f * 4 + 3];
+        let radioIDs = [f * 4, f * 4 + 1, f * 4 + 2, f * 4 + 3];
 
         if (f % 2 === 1) {
             var htmlElements = '<div class="rectangle"><p>&nbsp;</p>';
@@ -2016,8 +2016,8 @@ function TimbreWidget() {
     this._addFilterListeners = function () {
         // Add the various listeners needed for the filter panel
         var that = this;
-        for (var f = 0; f < this.fil.length; f++) {
-            var radioIDs = [f * 4, f * 4 + 1, f * 4 + 2, f * 4 + 3];
+        for (let f = 0; f < this.fil.length; f++) {
+            let radioIDs = [f * 4, f * 4 + 1, f * 4 + 2, f * 4 + 3];
 
             docById("sel" + f).addEventListener("change", function (event) {
                 docById("filterButtonCell").style.backgroundColor = "#C8C8C0";
@@ -2068,8 +2068,8 @@ function TimbreWidget() {
 
     this._updateFilters = function () {
         // Update the various inputs on the filters panel.
-        for (var f = 0; f < this.fil.length; f++) {
-            var radioIDs = [f * 4, f * 4 + 1, f * 4 + 2, f * 4 + 3];
+        for (let f = 0; f < this.fil.length; f++) {
+            let radioIDs = [f * 4, f * 4 + 1, f * 4 + 2, f * 4 + 3];
 
             docById("sel" + f).value =
                 instrumentsFilters[0][this.instrumentName][f]["filterType"];
