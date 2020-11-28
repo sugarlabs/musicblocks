@@ -463,9 +463,9 @@ function TimbreWidget() {
 
             i += 1;
             if (i < that.notesToPlay.length && that._playing) {
-                setTimeout(function() {
+                setTimeout(() => {
                     __playLoop(i);
-                }, Singer.defaultBPMFactor * 1000 * that.notesToPlay[i - 1][1]);
+                }, Singer.defaultBPMFactor * 1000 * this.notesToPlay[i - 1][1]);
             } else {
                 cell.innerHTML =
                     '&nbsp;&nbsp;<img src="header-icons/' +
