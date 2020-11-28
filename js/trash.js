@@ -159,7 +159,7 @@ function Trashcan() {
         this._inAnimation = true;
         let that = this;
 
-        this._animationInterval = setInterval(function() {
+        this._animationInterval = setInterval(() => {
             that._animationLevel += 20;
             if (that._animationLevel >= that.animationTime) {
                 that.isVisible = true;
