@@ -308,9 +308,9 @@ function Block(protoblock, blocks, overrideName) {
         return INLINECOLLAPSIBLES.indexOf(this.name) !== -1;
     };
 
-    /*
+    /***
      * Show the highlight artwork
-     * @return{void}
+     * @returns s {void}
      * @public
      */
     this.highlight = function() {
@@ -403,9 +403,9 @@ function Block(protoblock, blocks, overrideName) {
         this.container.updateCache();
     };
 
-    /*
+    /***
      * Remove highlight from block
-     * @return{void}
+     * @returns s {void}
      * @public
      */
     this.unhighlight = function() {
@@ -485,10 +485,10 @@ function Block(protoblock, blocks, overrideName) {
         this.container.updateCache();
     };
 
-    /*
+    /***
      * Resize and update number of slots in argClamp
      * @param-slotList how many slots to use
-     * @return{void}
+     * @returns s {void}
      * @public
      */
     this.updateArgSlots = function(slotList) {
@@ -497,11 +497,11 @@ function Block(protoblock, blocks, overrideName) {
         this.regenerateArtwork(false);
     };
 
-    /*
+    /***
      * Resize an expandable block.
      * @param-clamp which clamp to update (ifthenelse has 2 clamps)
      * @param-plusMinus how many slots to add or subtract
-     * @return{void}
+     * @returns s {void}
      * @public
      */
     this.updateSlots = function(clamp, plusMinus) {
@@ -510,21 +510,21 @@ function Block(protoblock, blocks, overrideName) {
         this.regenerateArtwork(false);
     };
 
-    /*
+    /***
      * If the block scale changes, we need to regenerate the
      * artwork and recalculate the hitarea.
      * @param-scale new block scale
-     * @return{void}
+     * @returns s {void}
      * @public
      */
     this.resize = function(scale) {
         let that = this;
 
-        /*
+        /***
          * After the new artwork is created, this function is used to add
          * decorations.
          * @param-that = this
-         * @return{void}
+         * @returns s {void}
          * @public
          */
         this.postProcess = function(that) {
@@ -572,11 +572,11 @@ function Block(protoblock, blocks, overrideName) {
         if (this.container !== null) {
             that = this;
 
-            /*
+            /**
              * After new buttons are creates, they are cached and a
              * new hit are is calculated
              * @param-that = this = container
-             * @return{void}
+             * @returns {void}
              * @private
              */
             let _postProcess = function(that) {
@@ -599,10 +599,10 @@ function Block(protoblock, blocks, overrideName) {
         }
     };
 
-    /*
+    /**
      * Create new artwork for a block
      * @param-plusMinus specifies how much a clamp block expands or contracts
-     * @return{void}
+     * @returns {void}
      * @private
      */
     this._newArtwork = function(plusMinus) {
@@ -712,7 +712,7 @@ function Block(protoblock, blocks, overrideName) {
         this.hitHeight = obj[4];
     };
 
-    /*
+    /**
      * Load any artwork associated with the block and create any
      * extra parts. Image components are loaded asynchronously so
      * most the work happens in callbacks.
@@ -720,7 +720,7 @@ function Block(protoblock, blocks, overrideName) {
      * We also need a text label for some blocks. For number and
      * text blocks, this is the primary label; for parameter
      * blocks, this is used to display the current block value.
-     * @return{void}
+     * @returns {void}
      * @public
      */
     this.imageLoad = function() {
@@ -730,18 +730,18 @@ function Block(protoblock, blocks, overrideName) {
         this.generateArtwork(true, []);
     };
 
-    /*
+    /**
      * Add an image to a block
-     * @return{void}
+     * @returns {void}
      * @private
      */
     this._addImage = function() {
         let image = new Image();
         let that = this;
 
-        /*
+        /**
          * The loader
-         * @return{void}
+         * @returns {void}
          * @private
          */
         image.onload = function() {
@@ -773,11 +773,11 @@ function Block(protoblock, blocks, overrideName) {
         image.src = this.image;
     };
 
-    /*
+    /**
      * Sometimes (in the case of namedboxes and nameddos) we need
      * to regenerate the artwork associated with a block.
      * @param-is the collapse artwork also generated?
-     * @return{void}
+     * @returns {void}
      * @public
      */
     this.regenerateArtwork = function(collapse) {
@@ -809,10 +809,10 @@ function Block(protoblock, blocks, overrideName) {
         this.generateArtwork(false);
     };
 
-    /*
+    /**
      * Generate the artwork for a block.
      * @param-the first time, add the event handlers
-     * @return{void}
+     * @returns {void}
      * @public
      */
     this.generateArtwork = function(firstTime) {
@@ -1060,9 +1060,9 @@ function Block(protoblock, blocks, overrideName) {
         _blockMakeBitmap(artwork, __processBitmap, this);
     };
 
-    /*
+    /**
      * After the block artwork has loaded, update labels, etc.
-     * @return{void}
+     * @returns {void}
      * @private
      */
     this._finishImageLoad = function() {
@@ -1239,19 +1239,19 @@ function Block(protoblock, blocks, overrideName) {
         this.blocks.refreshCanvas();
     };
 
-    /*
+    /**
      * Generate the collapsed artwork
      * @param postProcess = a process to run after the artwork is generated
-     * @return{void}
+     * @returns {void}
      * @private
      */
     this._generateCollapseArtwork = function(postProcess) {
         let that = this;
         let thisBlock = this.blocks.blockList.indexOf(this);
 
-        /*
+        /**
          * Run the postprocess function after the artwork is loaded
-         * @return{void}
+         * @returns {void}
          * @private
          */
         let __finishCollapse = function(that) {
@@ -1268,10 +1268,10 @@ function Block(protoblock, blocks, overrideName) {
             }
         };
 
-        /*
+        /**
          * Create the artwork for the collapse buttons
          * @param - that = this
-         * @return{void}
+         * @returns {void}
          * @private
          */
         let __processCollapseButton = function(that) {
@@ -1300,10 +1300,10 @@ function Block(protoblock, blocks, overrideName) {
                 window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)));
         };
 
-        /*
+        /**
          * Create the artwork for the expand buttons
          * @param - that = this
-         * @return{void}
+         * @returns {void}
          * @private
          */
         let __processExpandButton = function(that) {
@@ -1333,11 +1333,11 @@ function Block(protoblock, blocks, overrideName) {
                 window.btoa(unescape(encodeURIComponent(EXPANDBUTTON)));
         };
 
-        /*
+        /**
          * Processing the highlighted collapsed image
          * @param-bitmap = highlight artwork
          * @param-that = this
-         * @return{void}
+         * @returns {void}
          * @private
          */
         let __processHighlightCollapseBitmap = function(bitmap, that) {
@@ -1467,11 +1467,11 @@ function Block(protoblock, blocks, overrideName) {
             __processExpandButton(that);
         };
 
-        /*
+        /**
          * Processing the collapsed block
          * @param-bitmap = block artwork
          * @param-that = this
-         * @return{void}
+         * @returns {void}
          * @private
          */
         let __processCollapseBitmap = function(bitmap, that) {
@@ -1501,9 +1501,9 @@ function Block(protoblock, blocks, overrideName) {
         _blockMakeBitmap(artwork, __processCollapseBitmap, this);
     };
 
-    /*
+    /**
      * Hide this block
-     * @return{void}
+     * @returns {void}
      * @public
      */
     this.hide = function() {
@@ -1518,9 +1518,9 @@ function Block(protoblock, blocks, overrideName) {
         this.blocks.refreshCanvas();
     };
 
-    /*
+    /**
      * Is this block disconnected from other blocks?
-     * @return{boolean} true if the block is disconnected from other blocks
+     * @returns {boolean} true if the block is disconnected from other blocks
      * @public
      */
     this.isDisconnected = function() {
@@ -1556,9 +1556,9 @@ function Block(protoblock, blocks, overrideName) {
         return false;
     };
 
-    /*
+    /**
      * Show this block
-     * @return{void}
+     * @returns {void}
      * @public
      */
     this.show = function() {
@@ -2296,10 +2296,10 @@ function Block(protoblock, blocks, overrideName) {
         this.blocks.refreshCanvas();
     };
 
-    /*
+    /**
      * Position any addition text on a block
      * @param-blockscale is used to scale the text
-     * @return{void}
+     * @returns {void}
      * @private
      */
     this._positionText = function(blockScale) {
@@ -2342,14 +2342,14 @@ function Block(protoblock, blocks, overrideName) {
         this.updateCache();
     };
 
-    /*
+    /**
      * Position media artwork on a block.
      * @param-bitmap - image
      * @param-width-width of canvas
      * @param-height-height of canvas
      * @param-blockscale-scale
      * Position inserted media
-     * @return{void}
+     * @returns {void}
      * @private
      */
     this._positionMedia = function(bitmap, width, height, blockScale) {
@@ -2364,10 +2364,10 @@ function Block(protoblock, blocks, overrideName) {
         bitmap.y = (MEDIASAFEAREA[1] * blockScale) / 2;
     };
 
-    /*
+    /**
      * Position the label for a collapsed block
      * @param-blockscale-scale
-     * @return{void}
+     * @returns {void}
      * @private
      */
     this._positionCollapseLabel = function(blockScale) {
@@ -2392,10 +2392,10 @@ function Block(protoblock, blocks, overrideName) {
         this.container.setChildIndex(this.collapseText, z);
     };
 
-    /*
+    /**
      * Determine the hit area for a block
      * DEPRECATED
-     * @return{void}
+     * @returns {void}
      * @private
      */
     this._calculateBlockHitArea = function() {
@@ -2406,9 +2406,9 @@ function Block(protoblock, blocks, overrideName) {
         this.container.hitArea = hitArea;
     };
 
-    /*
+    /**
      * These are the event handlers for block containers.
-     * @return{void}
+     * @returns {void}
      * @private
      */
     this._loadEventHandlers = function() {
@@ -2702,14 +2702,14 @@ function Block(protoblock, blocks, overrideName) {
         });
     };
 
-    /*
+    /**
      * Common code for processing events
      * @param-event- mouse
      * @param-moved-cursor moved
      * @param-haveClick-when clickd
      * @param-hideDOM-hide mouse
      * set cursor style to default
-     * @return {void}
+     * @returns  {void}
      * @private
      */
     this._mouseoutCallback = function(event, moved, haveClick, hideDOM) {
@@ -2937,9 +2937,9 @@ function Block(protoblock, blocks, overrideName) {
         this.updateCache();
     };
 
-    /*
+    /**
      * Change the label in a parameter block
-     * @return{void}
+     * @returns {void}
      * @private
      */
     this._changeLabel = function() {
@@ -3534,10 +3534,10 @@ function Block(protoblock, blocks, overrideName) {
         }
     };
 
-    /**
+    /***
      * Keypress handler. Handles exit key (Tab and Enter) press.
      * @param{Event} KeyPress event object
-     * @returns{void}
+     * @returns s{void}
      * @private
      */
     this._exitKeyPressed = function(event) {
@@ -3547,9 +3547,9 @@ function Block(protoblock, blocks, overrideName) {
             this.label.removeEventListener("keypress", this._exitKeyPressed);
         }
     };
-    /*
+    /**
      * Check if pie menu is ok to launch
-     * @return{void}
+     * @returns {void}
      * @public
      */
     this.piemenuOKtoLaunch = function() {
@@ -4018,11 +4018,11 @@ function Block(protoblock, blocks, overrideName) {
     };
 }
 
-/*
+/**
  * set elements to a array
  * if element is string,then set element's id to element
  * @public
- * @return{void}
+ * @returns s {void}
  */
 function $() {
     let elements = new Array();
