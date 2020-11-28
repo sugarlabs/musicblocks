@@ -166,7 +166,7 @@ function SaveInterface(PlanetInterface) {
                         _("My Project").replace(" ", "_") + ".html",
                         html);
                 }
-            }.bind(this),
+            },
             500
         );
     };
