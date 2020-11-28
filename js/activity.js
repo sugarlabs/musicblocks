@@ -287,7 +287,7 @@ function Activity() {
         MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
     }
 
-    /*
+    /** 
      * Initialises major variables and renders default stack
      *
      */
@@ -464,7 +464,7 @@ function Activity() {
         pluginsImages = {};
     };
 
-    /*
+    /**
      * Recenters blocks by finding their position on the screen
      * and moving them accordingly
      */
@@ -580,7 +580,7 @@ function Activity() {
         }
     };
 
-    /*
+    /** 
      * @param zero {hides container}
      * @param one {shows container}
      */
@@ -663,8 +663,8 @@ function Activity() {
         sendAllToTrash(true, true);
     };
 
-    /*
-     * @return {SVG} returns SVG of blocks
+    /** 
+     * @returns {SVG} returns SVG of blocks
      */
     _printBlockSVG = function () {
         blocks.activeBlock = null;
@@ -858,7 +858,7 @@ function Activity() {
         }
     };
 
-    /*
+    /**
      * @param env {specifies environment}
      * Sets up play button functionality
      * Runs music blocks
@@ -1050,7 +1050,7 @@ function Activity() {
         }
     };
 
-    /*
+    /** 
      * @param onblur {when object loses focus}
      *
      * Stops running of music blocks.
@@ -1398,9 +1398,9 @@ function Activity() {
         }
     };
 
-    /*
+    /** 
      * @param canvas {compares existing canvas with a new blank canvas}
-     * @return {boolean} {if canvas is blank }
+     * @returns {boolean} {if canvas is blank }
      * Checks if the canvas is blank
      */
     function _isCanvasBlank(canvas) {
@@ -1770,7 +1770,7 @@ function Activity() {
     //     cameraID = id;
     // };
 
-    /*
+    /** 
      * @param imagePath {path of grid to be rendered}
      * Renders grid
      */
@@ -1793,12 +1793,12 @@ function Activity() {
         return bitmap;
     };
 
-    /*
+    /** 
      * @param  fillColor   {inner color of message}
      * @param  strokeColor {border of message}
      * @param  callback    {callback function assigned to particular message}
      * @param  y           {position on canvas}
-     * @return {description}
+     * @returns {description}
      */
     _createMsgContainer = function (fillColor, strokeColor, callback, y) {
         let container = new createjs.Container();
@@ -1860,7 +1860,7 @@ function Activity() {
         }
     };
 
-    /*
+    /**
      * @param  name {specifies svg to be rendered}
      * renders error message with appropriate artwork
      */
@@ -2591,8 +2591,8 @@ function Activity() {
         }
     }
 
-    /*
-     * @return currentKeyCode
+    /** 
+     * @returns currentKeyCode
      */
     this.getCurrentKeyCode = function () {
         return currentKeyCode;
@@ -2886,7 +2886,7 @@ function Activity() {
         }
     };
 
-    /*
+    /**
      * @param {boolean} addStartBlock {if true adds a new start block to new project instance}
      * @param {boolean} doNotSave     {if true discards any changes to project}
      *
@@ -3124,7 +3124,7 @@ function Activity() {
 
     window.prepareExport = prepareExport;
 
-    /*
+    /**
      * @param env {specifies environment}
      * Runs music blocks project
      */
@@ -3138,7 +3138,7 @@ function Activity() {
         }, 5000);
     };
 
-    /*
+    /**
      * @param  projectID {Planet project ID}
      * @param  flags     {parameteres}
      * @param  env       {specifies environment}
@@ -3228,7 +3228,7 @@ function Activity() {
         }
     };
 
-    /*
+    /**
      * Calculate time such that no matter how long it takes to
      * load the program, the loading animation will cycle at least
      * once.
@@ -4142,7 +4142,7 @@ function Activity() {
         return container;
     };
 
-    /*
+    /**
      * @param container longAction
      * @param ox extraLongAction,
      * @param oy longImg,
@@ -4188,7 +4188,7 @@ function Activity() {
         pasteBox.hide();
     };
 
-    /*
+    /**
      *
      * @param dy how much of a change in y
      *
