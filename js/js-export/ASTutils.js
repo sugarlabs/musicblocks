@@ -17,7 +17,7 @@
  * The Abstract Syntax Trees are in ESTree specification.
  *
  * Private members' names begin with underscore '_".
-*/
+ */
 
 /**
  * @class
@@ -30,78 +30,78 @@ class ASTUtils {
      * Abstract Syntax Tree for the bare minimum program code
      */
     static _bareboneAST = {
-        "type": "Program",
-        "sourceType": "script",
-        "body": [
+        type: "Program",
+        sourceType: "script",
+        body: [
             {
-                "type": "ExpressionStatement",
-                "expression": {
-                  "type": "CallExpression",
-                  "callee": {
-                    "type": "MemberExpression",
-                    "object": {
-                      "type": "Identifier",
-                      "name": "MusicBlocks"
+                type: "ExpressionStatement",
+                expression: {
+                    type: "CallExpression",
+                    callee: {
+                        type: "MemberExpression",
+                        object: {
+                            type: "Identifier",
+                            name: "MusicBlocks"
+                        },
+                        computed: false,
+                        property: {
+                            type: "Identifier",
+                            name: "run"
+                        }
                     },
-                    "computed": false,
-                    "property": {
-                      "type": "Identifier",
-                      "name": "run"
-                    }
-                  },
-                  "arguments": []
+                    arguments: []
                 }
-              }
+            }
         ]
-    }
+    };
 
     /**
      * @static
      * Abstract Syntax Tree for the bare minimum mouse code
      */
     static _mouseAST = {
-        "type": "ExpressionStatement",
-        "expression": {
-            "type": "NewExpression",
-            "callee": {
-                "type": "Identifier",
-                "name": "Mouse"
+        type: "ExpressionStatement",
+        expression: {
+            type: "NewExpression",
+            callee: {
+                type: "Identifier",
+                name: "Mouse"
             },
-            "arguments": [
+            arguments: [
                 {
-                    "type": "ArrowFunctionExpression",
-                    "params": [
+                    type: "ArrowFunctionExpression",
+                    params: [
                         {
-                            "type": "Identifier",
-                            "name": "mouse"
+                            type: "Identifier",
+                            name: "mouse"
                         }
                     ],
-                    "body": {
-                        "type": "BlockStatement",
-                        "body": [
+                    body: {
+                        type: "BlockStatement",
+                        body: [
                             {
-                                "type": "ReturnStatement",
-                                "argument": {
-                                    "type": "MemberExpression",
-                                    "object": {
-                                        "type": "Identifier",
-                                        "name": "mouse"
+                                type: "ReturnStatement",
+                                argument: {
+                                    type: "MemberExpression",
+                                    object: {
+                                        type: "Identifier",
+                                        name: "mouse"
                                     },
-                                    "computed": false,
-                                    "property": {
-                                        "type": "Identifier",
-                                        "name": "ENDMOUSE"
+                                    computed: false,
+                                    property: {
+                                        type: "Identifier",
+                                        name: "ENDMOUSE"
                                     }
                                 }
                             }
                         ]
                     },
-                    "async": true,
-                    "expression": false
+                    async: true,
+                    expression: false
                 }
             ]
         }
-    }
+    };
 
     /**
      * @static
@@ -121,23 +121,23 @@ class ASTUtils {
      */
     static _getSetAST(identifier, args) {
         return {
-            "type": "ExpressionStatement",
-            "expression": {
-                "type": "AssignmentExpression",
-                "left": {
-                    "type": "MemberExpression",
-                    "object": {
-                        "type": "Identifier",
-                        "name": "mouse"
+            type: "ExpressionStatement",
+            expression: {
+                type: "AssignmentExpression",
+                left: {
+                    type: "MemberExpression",
+                    object: {
+                        type: "Identifier",
+                        name: "mouse"
                     },
-                    "computed": false,
-                    "property": {
-                        "type": "Identifier",
-                        "name": `${identifier}`
+                    computed: false,
+                    property: {
+                        type: "Identifier",
+                        name: `${identifier}`
                     }
                 },
-                "operator": "=",
-                "right": ASTUtils._getArgsAST(args)[0]
+                operator: "=",
+                right: ASTUtils._getArgsAST(args)[0]
             }
         };
     }
@@ -151,15 +151,15 @@ class ASTUtils {
      */
     static _getGetAST(identifier) {
         return {
-            "type": "MemberExpression",
-            "object": {
-                "type": "Identifier",
-                "name": "mouse"
+            type: "MemberExpression",
+            object: {
+                type: "Identifier",
+                name: "mouse"
             },
-            "computed": false,
-            "property": {
-                "type": "Identifier",
-                "name": `${identifier}`
+            computed: false,
+            property: {
+                type: "Identifier",
+                name: `${identifier}`
             }
         };
     }
@@ -176,20 +176,20 @@ class ASTUtils {
      */
     static _getIfAST(args, ifFlow, elseFlow, iteratorNum) {
         let AST = {
-            "type": "IfStatement",
-            "test": ASTUtils._getArgsAST(args)[0],
-            "consequent": {
-                "type": "BlockStatement",
-                "body": ASTUtils._getBlockAST(ifFlow, iteratorNum)
+            type: "IfStatement",
+            test: ASTUtils._getArgsAST(args)[0],
+            consequent: {
+                type: "BlockStatement",
+                body: ASTUtils._getBlockAST(ifFlow, iteratorNum)
             },
-            "alternate": null
+            alternate: null
         };
 
         if (elseFlow !== undefined) {
             AST["alternate"] = {
-                "type": "BlockStatement",
-                "body": ASTUtils._getBlockAST(elseFlow, iteratorNum)
-            }
+                type: "BlockStatement",
+                body: ASTUtils._getBlockAST(elseFlow, iteratorNum)
+            };
         }
 
         return AST;
@@ -205,49 +205,48 @@ class ASTUtils {
      * @returns {Object} Abstract Syntax Tree of for-loop
      */
     static _getForLoopAST(args, flow, iteratorNum) {
-        if (iteratorNum === undefined)
-            iteratorNum = 0;
+        if (iteratorNum === undefined) iteratorNum = 0;
 
         return {
-            "type": "ForStatement",
-            "init": {
-                "type": "VariableDeclaration",
-                "kind": "let",
-                "declarations": [
+            type: "ForStatement",
+            init: {
+                type: "VariableDeclaration",
+                kind: "let",
+                declarations: [
                     {
-                        "type": "VariableDeclarator",
-                        "id": {
-                            "type": "Identifier",
-                            "name": "i" + iteratorNum
+                        type: "VariableDeclarator",
+                        id: {
+                            type: "Identifier",
+                            name: "i" + iteratorNum
                         },
-                        "init": {
-                            "type": "Literal",
-                            "value": 0
+                        init: {
+                            type: "Literal",
+                            value: 0
                         }
                     }
                 ]
             },
-            "test": {
-                "type": "BinaryExpression",
-                "left": {
-                    "type": "Identifier",
-                    "name": "i" + iteratorNum
+            test: {
+                type: "BinaryExpression",
+                left: {
+                    type: "Identifier",
+                    name: "i" + iteratorNum
                 },
-                "right": ASTUtils._getArgsAST(args)[0],
-                "operator": "<"
+                right: ASTUtils._getArgsAST(args)[0],
+                operator: "<"
             },
-            "update": {
-                "type": "UpdateExpression",
-                "argument": {
-                    "type": "Identifier",
-                    "name": "i" + iteratorNum
+            update: {
+                type: "UpdateExpression",
+                argument: {
+                    type: "Identifier",
+                    name: "i" + iteratorNum
                 },
-                "operator": "++",
-                "prefix": false
+                operator: "++",
+                prefix: false
             },
-            "body": {
-                "type": "BlockStatement",
-                "body": ASTUtils._getBlockAST(flow, iteratorNum + 1)
+            body: {
+                type: "BlockStatement",
+                body: ASTUtils._getBlockAST(flow, iteratorNum + 1)
             }
         };
     }
@@ -263,11 +262,11 @@ class ASTUtils {
      */
     static _getWhileLoopAST(args, flow, iteratorNum) {
         return {
-            "type": "WhileStatement",
-            "test": ASTUtils._getArgsAST(args)[0],
-            "body": {
-                "type": "BlockStatement",
-                "body": ASTUtils._getBlockAST(flow, iteratorNum)
+            type: "WhileStatement",
+            test: ASTUtils._getArgsAST(args)[0],
+            body: {
+                type: "BlockStatement",
+                body: ASTUtils._getBlockAST(flow, iteratorNum)
             }
         };
     }
@@ -283,12 +282,12 @@ class ASTUtils {
      */
     static _getDoWhileLoopAST(args, flow, iteratorNum) {
         return {
-            "type": "DoWhileStatement",
-            "body": {
-                "type": "BlockStatement",
-                "body": ASTUtils._getBlockAST(flow, iteratorNum)
+            type: "DoWhileStatement",
+            body: {
+                type: "BlockStatement",
+                body: ASTUtils._getBlockAST(flow, iteratorNum)
             },
-            "test": ASTUtils._getArgsAST(args)[0]
+            test: ASTUtils._getArgsAST(args)[0]
         };
     }
 
@@ -305,22 +304,22 @@ class ASTUtils {
         let arg = ASTUtils._getArgsAST([args[1]])[0];
 
         return {
-            "type": "ExpressionStatement",
-            "expression": {
-                "type": "AssignmentExpression",
-                "left": {
-                    "type": "Identifier",
-                    "name": identifier
+            type: "ExpressionStatement",
+            expression: {
+                type: "AssignmentExpression",
+                left: {
+                    type: "Identifier",
+                    name: identifier
                 },
-                "operator": "=",
-                "right": {
-                    "type": "BinaryExpression",
-                    "left": {
-                        "type": "Identifier",
-                        "name": identifier
+                operator: "=",
+                right: {
+                    type: "BinaryExpression",
+                    left: {
+                        type: "Identifier",
+                        name: identifier
                     },
-                    "right": arg,
-                    "operator": isIncrement ? "+" : "-"
+                    right: arg,
+                    operator: isIncrement ? "+" : "-"
                 }
             }
         };
@@ -335,45 +334,45 @@ class ASTUtils {
      */
     static _getMethodDefAST(methodName) {
         return {
-            "type": "VariableDeclaration",
-            "kind": "let",
-            "declarations": [
+            type: "VariableDeclaration",
+            kind: "let",
+            declarations: [
                 {
-                    "type": "VariableDeclarator",
-                    "id": {
-                        "type": "Identifier",
-                        "name": `${methodName}`
+                    type: "VariableDeclarator",
+                    id: {
+                        type: "Identifier",
+                        name: `${methodName}`
                     },
-                    "init": {
-                        "type": "ArrowFunctionExpression",
-                        "params": [
+                    init: {
+                        type: "ArrowFunctionExpression",
+                        params: [
                             {
-                                "type": "Identifier",
-                                "name": "mouse"
+                                type: "Identifier",
+                                name: "mouse"
                             }
                         ],
-                        "body": {
-                            "type": "BlockStatement",
-                            "body": [
+                        body: {
+                            type: "BlockStatement",
+                            body: [
                                 {
-                                    "type": "ReturnStatement",
-                                    "argument": {
-                                        "type": "MemberExpression",
-                                        "object": {
-                                            "type": "Identifier",
-                                            "name": "mouse"
+                                    type: "ReturnStatement",
+                                    argument: {
+                                        type: "MemberExpression",
+                                        object: {
+                                            type: "Identifier",
+                                            name: "mouse"
                                         },
-                                        "computed": false,
-                                        "property": {
-                                            "type": "Identifier",
-                                            "name": "ENDFLOW"
+                                        computed: false,
+                                        property: {
+                                            type: "Identifier",
+                                            name: "ENDFLOW"
                                         }
                                     }
                                 }
                             ]
                         },
-                        "async": true,
-                        "expression": false
+                        async: true,
+                        expression: false
                     }
                 }
             ]
@@ -386,44 +385,51 @@ class ASTUtils {
      * @static
      * @param {String} methodName - method name
      * @param {[*]} args - tree of arguments
-     * @param {Boolean} isAction - whether method call is an action call
+     * @param {Object} props - properties: { action: whether method call is an action call, statement: whether method call is expression statement }
      * @returns {Object} - Abstract Syntax Tree of method call
      */
-    static _getMethodCallAST(methodName, args, isAction) {
+    static _getMethodCallAST(methodName, args, props) {
         let AST = {
-            "type": "ExpressionStatement",
-            "expression": {
-                "type": "AwaitExpression",
-                "argument": {
-                    "type": "CallExpression",
-                    "callee": {
-                        "type": "MemberExpression",
-                        "object": {
-                            "type": "Identifier",
-                            "name": "mouse"
+            type: "ExpressionStatement",
+            expression: {
+                type: "AwaitExpression",
+                argument: {
+                    type: "CallExpression",
+                    callee: {
+                        type: "MemberExpression",
+                        object: {
+                            type: "Identifier",
+                            name: "mouse"
                         },
-                        "computed": false,
-                        "property": {
-                            "type": "Identifier",
-                            "name": `${methodName}`
+                        computed: false,
+                        property: {
+                            type: "Identifier",
+                            name: `${JSInterface.getMethodName(methodName)}`
                         }
                     },
-                    "arguments": ASTUtils._getArgsAST(args)
+                    arguments: ASTUtils._getArgsAST(
+                        JSInterface.rearrangeMethodArgs(methodName, args)
+                    )
                 }
             }
         };
 
-        if (isAction) {
-            AST["expression"]["argument"]["callee"] = {
-                "type": "Identifier",
-                "name": `${methodName}`
-            };
-            AST["expression"]["argument"]["arguments"] = [
-                {
-                  "type": "Identifier",
-                  "name": "mouse"
-                }
-            ];
+        if (props) {
+            if (props.action) {
+                AST["expression"]["argument"]["callee"] = {
+                    type: "Identifier",
+                    name: `${methodName}`
+                };
+                AST["expression"]["argument"]["arguments"] = [
+                    {
+                        type: "Identifier",
+                        name: "mouse"
+                    }
+                ];
+            }
+            if (props.statement === false) {
+                AST = AST["expression"];
+            }
         }
 
         return AST;
@@ -439,51 +445,51 @@ class ASTUtils {
      */
     static _getArgExpAST(methodName, args) {
         const mathOps = {
-            "plus": ["binexp", "+"],
-            "minus": ["binexp", "-"],
-            "multiply": ["binexp", "*"],
-            "divide": ["binexp", "/"],
-            "mod": ["binexp", "%"],
-            "equal": ["binexp", "=="],
-            "less": ["binexp", "<"],
-            "greater": ["binexp", ">"],
-            "or": ["binexp", "|"],
-            "and": ["binexp", "&"],
-            "xor": ["binexp", "^"],
-            "not": ["unexp", "!"],
-            "neg": ["unexp", "-"],
-            "abs": ["method", "Math.abs"],
-            "sqrt": ["method", "Math.sqrt"],
-            "power": ["method", "Math.pow"],
-            "int": ["method", "Math.floor"]
+            plus: ["binexp", "+"],
+            minus: ["binexp", "-"],
+            multiply: ["binexp", "*"],
+            divide: ["binexp", "/"],
+            mod: ["binexp", "%"],
+            equal: ["binexp", "=="],
+            less: ["binexp", "<"],
+            greater: ["binexp", ">"],
+            or: ["binexp", "|"],
+            and: ["binexp", "&"],
+            xor: ["binexp", "^"],
+            not: ["unexp", "!"],
+            neg: ["unexp", "-"],
+            abs: ["method", "Math.abs"],
+            sqrt: ["method", "Math.sqrt"],
+            power: ["method", "Math.pow"],
+            int: ["method", "Math.floor"]
         };
 
         function getBinaryExpAST(operator, operand1, operand2) {
             return {
-                "type": "BinaryExpression",
-                "left": ASTUtils._getArgsAST([operand1])[0],
-                "right": ASTUtils._getArgsAST([operand2])[0],
-                "operator": `${operator}`
+                type: "BinaryExpression",
+                left: ASTUtils._getArgsAST([operand1])[0],
+                right: ASTUtils._getArgsAST([operand2])[0],
+                operator: `${operator}`
             };
         }
 
         function getUnaryExpAST(operator, operand) {
             return {
-                "type": "UnaryExpression",
-                "operator": `${operator}`,
-                "argument": ASTUtils._getArgsAST([operand])[0],
-                "prefix": true
+                type: "UnaryExpression",
+                operator: `${operator}`,
+                argument: ASTUtils._getArgsAST([operand])[0],
+                prefix: true
             };
         }
 
         function getCallExpAST(methodName, args) {
             return {
-                "type": "CallExpression",
-                "callee": {
-                    "type": "Identifier",
-                    "name": `${methodName}`
+                type: "CallExpression",
+                callee: {
+                    type: "Identifier",
+                    name: `${methodName}`
                 },
-                "arguments": ASTUtils._getArgsAST(args)
+                arguments: ASTUtils._getArgsAST(args)
             };
         }
 
@@ -508,40 +514,43 @@ class ASTUtils {
      * @returns {[Object]} list of Abstract Syntax Trees
      */
     static _getArgsAST(args) {
-        if (args === undefined || args === null)
-            return [];
+        if (args === undefined || args === null) return [];
 
         let ASTs = [];
         for (let arg of args) {
             if (arg === null) {
                 ASTs.push({
-                    "type": "Literal",
-                    "value": null
+                    type: "Literal",
+                    value: null
                 });
             } else if (typeof arg === "object") {
                 if (JSInterface.isGetter(arg[0])) {
                     ASTs.push(ASTUtils._getGetAST(JSInterface.getGetterName(arg[0])));
                 } else {
-                    ASTs.push(ASTUtils._getArgExpAST(arg[0], arg[1]));
+                    ASTs.push(
+                        JSInterface.methodReturns(arg[0])
+                            ? ASTUtils._getMethodCallAST(arg[0], arg[1], { statement: false })
+                            : ASTUtils._getArgExpAST(arg[0], arg[1])
+                    );
                 }
             } else {
                 if (typeof arg === "string" && arg.split("_").length > 1) {
                     let [type, argVal] = arg.split("_");
                     if (type === "bool") {
                         ASTs.push({
-                            "type": "Literal",
-                            "value": argVal === "true"
+                            type: "Literal",
+                            value: argVal === "true"
                         });
                     } else if (type === "box") {
                         ASTs.push({
-                            "type": "Identifier",
-                            "name": argVal
+                            type: "Identifier",
+                            name: argVal
                         });
                     }
                 } else {
                     ASTs.push({
-                        "type": "Literal",
-                        "value": arg
+                        type: "Literal",
+                        value: arg
                     });
                 }
             }
@@ -564,28 +573,28 @@ class ASTUtils {
         let AST = ASTUtils._getMethodCallAST(methodName, args);
 
         AST["expression"]["argument"]["arguments"].push({
-            "type": "ArrowFunctionExpression",
-            "params": [],
-            "body": {
-                "type": "BlockStatement",
-                "body": ASTUtils._getBlockAST(flows, iteratorNum)
+            type: "ArrowFunctionExpression",
+            params: [],
+            body: {
+                type: "BlockStatement",
+                body: ASTUtils._getBlockAST(flows, iteratorNum)
             },
-            "async": true,
-            "expression": false
+            async: true,
+            expression: false
         });
 
         last(AST["expression"]["argument"]["arguments"])["body"]["body"].push({
-            "type": "ReturnStatement",
-            "argument": {
-                "type": "MemberExpression",
-                "object": {
-                    "type": "Identifier",
-                    "name": "mouse"
+            type: "ReturnStatement",
+            argument: {
+                type: "MemberExpression",
+                object: {
+                    type: "Identifier",
+                    name: "mouse"
                 },
-                "computed": false,
-                "property": {
-                    "type": "Identifier",
-                    "name": "ENDFLOW"
+                computed: false,
+                property: {
+                    type: "Identifier",
+                    name: "ENDFLOW"
                 }
             }
         });
@@ -603,8 +612,7 @@ class ASTUtils {
      * @throws {String} INVALID BLOCK Error
      */
     static _getBlockAST(flows, iterMax) {
-        if (flows === undefined || flows === null)
-            return [];
+        if (flows === undefined || flows === null) return [];
 
         let ASTs = [];
         for (let flow of flows) {
@@ -622,23 +630,23 @@ class ASTUtils {
                 ASTs.push(ASTUtils._getDoWhileLoopAST(flow[1], flow[2], iterMax));
             } else if (flow[0] === "break") {
                 ASTs.push({
-                    "type": "BreakStatement",
-                    "label": null
+                    type: "BreakStatement",
+                    label: null
                 });
             } else if (flow[0] === "switch") {
                 ASTs.push({
-                    "type": "SwitchStatement",
-                    "discriminant": ASTUtils._getArgsAST(flow[1])[0],
-                    "cases": ASTUtils._getBlockAST(flow[2], iterMax)
+                    type: "SwitchStatement",
+                    discriminant: ASTUtils._getArgsAST(flow[1])[0],
+                    cases: ASTUtils._getBlockAST(flow[2], iterMax)
                 });
             } else if (flow[0] === "case") {
                 let AST = {
-                    "type": "SwitchCase",
-                    "test": ASTUtils._getArgsAST(flow[1])[0],
-                    "consequent": [
+                    type: "SwitchCase",
+                    test: ASTUtils._getArgsAST(flow[1])[0],
+                    consequent: [
                         {
-                            "type": "BreakStatement",
-                            "label": null
+                            type: "BreakStatement",
+                            label: null
                         }
                     ]
                 };
@@ -651,9 +659,9 @@ class ASTUtils {
                 ASTs.push(AST);
             } else if (flow[0] === "defaultcase") {
                 ASTs.push({
-                    "type": "SwitchCase",
-                    "test": null,
-                    "consequent": ASTUtils._getBlockAST(flow[2], iterMax)
+                    type: "SwitchCase",
+                    test: null,
+                    consequent: ASTUtils._getBlockAST(flow[2], iterMax)
                 });
             } else if (flow[0] === "increment") {
                 ASTs.push(ASTUtils._getIncrementStmntAST(flow[1], true));
@@ -665,31 +673,31 @@ class ASTUtils {
                 let [instruction, idName] = flow[0].split("_");
                 if (instruction === "storein2") {
                     ASTs.push({
-                        "type": "VariableDeclaration",
-                        "kind": "let",
-                        "declarations": [
+                        type: "VariableDeclaration",
+                        kind: "let",
+                        declarations: [
                             {
-                                "type": "VariableDeclarator",
-                                "id": {
-                                    "type": "Identifier",
-                                    "name": idName
+                                type: "VariableDeclarator",
+                                id: {
+                                    type: "Identifier",
+                                    name: idName
                                 },
-                                "init": ASTUtils._getArgsAST(flow[1])[0]
+                                init: ASTUtils._getArgsAST(flow[1])[0]
                             }
                         ]
                     });
                 } else if (instruction === "nameddo") {
-                    ASTs.push(ASTUtils._getMethodCallAST(idName, flow[1], true));
+                    ASTs.push(ASTUtils._getMethodCallAST(idName, flow[1], { action: true }));
                 }
             } else {
                 if (JSInterface.isSetter(flow[0])) {
                     ASTs.push(ASTUtils._getSetAST(JSInterface.getSetterName(flow[0]), flow[1]));
                 } else if (JSInterface.isMethod(flow[0])) {
-                    let isClamp = JSInterface.isClampBlock(flow[0]);
-                    flow[0] = JSInterface.getMethodName(flow[0]);
-                    if (isClamp) {                                  // has inner flow
+                    if (JSInterface.isClampBlock(flow[0])) {
+                        // has inner flow
                         ASTs.push(ASTUtils._getMethodCallClampAST(...flow, iterMax));
-                    } else {                                        // no inner flow
+                    } else {
+                        // no inner flow
                         ASTs.push(ASTUtils._getMethodCallAST(...flow));
                     }
                 } else {

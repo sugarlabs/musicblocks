@@ -15,7 +15,7 @@
  * MA 02110-1335 USA.
  *
  * Private members' names begin with underscore '_".
-*/
+ */
 
 /**
  * @class
@@ -64,20 +64,26 @@ class JSInterface {
         // Drum blocks
         "setdrum",
         "mapdrum"
-    ]
+    ];
+
+    /**
+     * @static
+     * list of methods having a return value
+     */
+    static _returningMethods = ["getDict", "getDict2", "dictionary"];
 
     /**
      * @static
      * lookup table for block names to setter names
      */
     static _setterNameLookup = {
-            // Meter blocks
-        "pickup": "PICKUP",
-            // Intervals blocks
-        "movable": "MOVEABLE",
-            // Volume blocks
-        "setnotevolume": "MASTERVOLUME",
-        "setpanning": "PANNING",
+        // Meter blocks
+        pickup: "PICKUP",
+        // Intervals blocks
+        movable: "MOVEABLE",
+        // Volume blocks
+        setnotevolume: "MASTERVOLUME",
+        setpanning: "PANNING"
     };
 
     /**
@@ -85,26 +91,26 @@ class JSInterface {
      * lookup table for block names to getter names
      */
     static _getterNameLookup = {
-            // Rhythm blocks
-        "mynotevalue": "NOTEVALUE",
-            // Meter blocks
-        "elapsednotes": "WHOLENOTESPLAYED",
-        "beatvalue": "BEATCOUNT",
-        "measurevalue": "MEASURECOUNT",
-        "bpmfactor": "BPM",
-        "beatfactor": "BEATFACTOR",
-        "currentmeter": "CURRENTMETER",
-            // Pitch blocks
-        "deltapitch2": "SCALARCHANGEINPITCH",
-        "deltapitch": "CHANGEINPITCH",
-        "consonantstepsizeup": "SCALARSTEPUP",
-        "consonantstepsizedown": "SCALARSTEPDOWN",
-            // Intervals blocks
-        "key": "CURRENTKEY",
-        "currentmode": "CURRENTMODE",
-        "modelength": "MODELENGTH",
-            // Volume blocks
-        "notevolumefactor": "MASTERVOLUME"
+        // Rhythm blocks
+        mynotevalue: "NOTEVALUE",
+        // Meter blocks
+        elapsednotes: "WHOLENOTESPLAYED",
+        beatvalue: "BEATCOUNT",
+        measurevalue: "MEASURECOUNT",
+        bpmfactor: "BPM",
+        beatfactor: "BEATFACTOR",
+        currentmeter: "CURRENTMETER",
+        // Pitch blocks
+        deltapitch2: "SCALARCHANGEINPITCH",
+        deltapitch: "CHANGEINPITCH",
+        consonantstepsizeup: "SCALARSTEPUP",
+        consonantstepsizedown: "SCALARSTEPDOWN",
+        // Intervals blocks
+        key: "CURRENTKEY",
+        currentmode: "CURRENTMODE",
+        modelength: "MODELENGTH",
+        // Volume blocks
+        notevolumefactor: "MASTERVOLUME"
     };
 
     /**
@@ -112,99 +118,114 @@ class JSInterface {
      * lookup table for block names to API method names
      */
     static _methodNameLookup = {
-            // Rhythm blocks
-        "newnote": "playNote",
-        "osctime": "playNoteMillis",
-        "rest2": "playRest",
-        "rhythmicdot2": "dot",
-        "tie": "tie",
-        "multiplybeatfactor": "multiplyNoteValue",
-        "newswing2": "swing",
-            // Meter blocks
-        "meter": "setMeter",
-        "setbpm3": "setBPM",
-        "setmasterbpm2": "setMasterBPM",
-        "everybeatdo": "onEveryNoteDo",
-        "everybeatdonew": "onEveryBeatDo",
-        "onbeatdo": "onStrongBeatDo",
-        "offbeatdo": "onWeakBeatDo",
-        "drift": "setNoClock",
-        "elapsednotes2": "getNotesPlayed",
-            // Pitch blocks
-        "pitch": "playPitch",
-        "steppitch": "stepPitch",
-        "nthmodalpitch": "playNthModalPitch",
-        "pitchnumber": "playPitchNumber",
-        "hertz": "playHertz",
-        "accidental": "setAccidental",
-        "setscalartransposition": "setScalarTranspose",
-        "settransposition": "setSemitoneTranspose",
-        "register": "setRegister",
-        "invert1": "invert",
-        "setpitchnumberoffset": "setPitchNumberOffset",
-        "number2pitch": "numToPitch",
-        "number2octave": "numToOctave",
-            // Intervals blocks
-        "setkey2": "setKey",
+        // Rhythm blocks
+        newnote: "playNote",
+        osctime: "playNoteMillis",
+        rest2: "playRest",
+        rhythmicdot2: "dot",
+        tie: "tie",
+        multiplybeatfactor: "multiplyNoteValue",
+        newswing2: "swing",
+        // Meter blocks
+        meter: "setMeter",
+        setbpm3: "setBPM",
+        setmasterbpm2: "setMasterBPM",
+        everybeatdo: "onEveryNoteDo",
+        everybeatdonew: "onEveryBeatDo",
+        onbeatdo: "onStrongBeatDo",
+        offbeatdo: "onWeakBeatDo",
+        drift: "setNoClock",
+        elapsednotes2: "getNotesPlayed",
+        // Pitch blocks
+        pitch: "playPitch",
+        steppitch: "stepPitch",
+        nthmodalpitch: "playNthModalPitch",
+        pitchnumber: "playPitchNumber",
+        hertz: "playHertz",
+        accidental: "setAccidental",
+        setscalartransposition: "setScalarTranspose",
+        settransposition: "setSemitoneTranspose",
+        register: "setRegister",
+        invert1: "invert",
+        setpitchnumberoffset: "setPitchNumberOffset",
+        number2pitch: "numToPitch",
+        number2octave: "numToOctave",
+        // Intervals blocks
+        setkey2: "setKey",
         // "definemode": "defineMode",
-        "interval": "setScalarInterval",
-        "semitoneinterval": "setSemitoneInterval",
-        "settemperament": "setTemperament",
-            // Tone blocks
-        "settimbre": "setInstrument",
-        "vibrato": "doVibrato",
-        "chorus": "doChorus",
-        "phaser": "doPhaser",
-        "tremolo": "doTremolo",
-        "dis": "doDistortion",
-        "harmonic2": "doHarmonic",
-            // Ornament blocks
-        "newstaccato": "setStaccato",
-        "newslur": "setSlur",
-        "neighbor2": "doNeighbor",
-            // Volume blocks
-        "crescendo": "doCrescendo",
-        "decrescendo": "doDecrescendo",
-        "articulation": "setRelativeVolume",
-        "setsynthvolume": "setSynthVolume",
-        "synthvolumefactor": "getSynthVolume",
-            // Drum blocks
-        "playdrum": "playDrum",
-        "setdrum": "setDrum",
-        "mapdrum": "mapPitchToDrum",
-        "playnoise": "playNoise",
+        interval: "setScalarInterval",
+        semitoneinterval: "setSemitoneInterval",
+        settemperament: "setTemperament",
+        // Tone blocks
+        settimbre: "setInstrument",
+        vibrato: "doVibrato",
+        chorus: "doChorus",
+        phaser: "doPhaser",
+        tremolo: "doTremolo",
+        dis: "doDistortion",
+        harmonic2: "doHarmonic",
+        // Ornament blocks
+        newstaccato: "setStaccato",
+        newslur: "setSlur",
+        neighbor2: "doNeighbor",
+        // Volume blocks
+        crescendo: "doCrescendo",
+        decrescendo: "doDecrescendo",
+        articulation: "setRelativeVolume",
+        setsynthvolume: "setSynthVolume",
+        synthvolumefactor: "getSynthVolume",
+        // Drum blocks
+        playdrum: "playDrum",
+        setdrum: "setDrum",
+        mapdrum: "mapPitchToDrum",
+        playnoise: "playNoise",
         // Number blocks
-        "random": "MathUtility.doRandom",
-        "oneOf": "MathUtility.doOneOf",
-        "distance": "MathUtility.doCalculateDistance",
+        random: "MathUtility.doRandom",
+        oneOf: "MathUtility.doOneOf",
+        distance: "MathUtility.doCalculateDistance",
         // Graphics blocks
-        "forward": "goForward",
-        "back": "goBackward",
-        "right": "turnRight",
-        "left": "turnLeft",
-        "setxy": "setXY",
-        "setheading": "setHeading",
-        "arc": "drawArc",
-        "bezier": "drawBezier",
-        "controlpoint1": "setBezierControlPoint1",
-        "controlpoint2": "setBezierControlPoint2",
-        "clear": "clear",
-        "scrollxy": "scrollXY",
+        forward: "goForward",
+        back: "goBackward",
+        right: "turnRight",
+        left: "turnLeft",
+        setxy: "setXY",
+        setheading: "setHeading",
+        arc: "drawArc",
+        bezier: "drawBezier",
+        controlpoint1: "setBezierControlPoint1",
+        controlpoint2: "setBezierControlPoint2",
+        clear: "clear",
+        scrollxy: "scrollXY",
         // Pen blocks
-        "setcolor": "setColor",
-        "setgrey": "setGrey",
-        "setshade": "setShade",
-        "sethue": "setHue",
-        "settranslucency": "setTranslucency",
-        "setpensize": "setPensize",
-        "penup": "penUp",
-        "pendown": "penDown",
+        setcolor: "setColor",
+        setgrey: "setGrey",
+        setshade: "setShade",
+        sethue: "setHue",
+        settranslucency: "setTranslucency",
+        setpensize: "setPensize",
+        penup: "penUp",
+        pendown: "penDown",
         // "": "doStartFill",
         // "": "doStartHollowLine",
-        "background": "fillBackground",
-        "setfont": "setFont",
+        background: "fillBackground",
+        setfont: "setFont",
+        // Dictionary blocks
+        dictionary: "getDict",
+        setDict: "setValue",
+        getDict: "getValue",
+        setDict2: "setValue",
+        getDict2: "getValue",
         // Extras
-        "print": "print"
+        print: "print"
+    };
+
+    /**
+     * @static
+     * maps block name to corresponding API args order
+     */
+    static _rearrangeArgsLookup = {
+        setDict: [1, 2, 0],
+        getDict: [1, 0]
     };
 
     /**
@@ -248,6 +269,16 @@ class JSInterface {
     }
 
     /**
+     * Returns whether passed argument corresponds to a method.
+     *
+     * @param {String} blockName
+     * @returns {Boolean}
+     */
+    static methodReturns(blockName) {
+        return JSInterface._returningMethods.indexOf(blockName) !== -1;
+    }
+
+    /**
      * Returns the setter name corresponding to the blockname, returns "null" if doesn't exist.
      *
      * @param {String} blockName
@@ -277,1082 +308,21 @@ class JSInterface {
         return JSInterface.isMethod(blockName) ? JSInterface._methodNameLookup[blockName] : null;
     }
 
-    // ========= Parameter Validation ==============================================================
-
     /**
-     * @static
-     * lookup table for API method names to argument constraints
+     * Rearranges the method arguments as required by the API.
+     *
+     * @param {String} methodName
+     * @param {[*]} args
+     * @returns {[*]}
      */
-    static _methodArgConstraints = {
-        // Rhythm blocks
-        "playNote": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 1000,
-                    "integer": false
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "playNoteMillis": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 100000,
-                    "integer": false
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "dot": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 10,
-                    "integer": true
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "tie": [
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "multiplyNoteValue": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 1000,
-                    "integer": false
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "swing": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 1000,
-                    "integer": false
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 1000,
-                    "integer": false
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        // Meter blocks
-        "setMeter": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 1,
-                    "max": 16,
-                    "integer": true
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 1000,
-                    "integer": false
-                }
-            }
-        ],
-        "PICKUP": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 1000,
-                    "integer": false
-                }
-            }
-        ],
-        "setBPM": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 40,
-                    "max": 208,
-                    "integer": true
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 10,
-                    "integer": false
-                }
-            }
-        ],
-        "setMasterBPM": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 40,
-                    "max": 208,
-                    "integer": true
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 10,
-                    "integer": false
-                }
-            }
-        ],
-        "onEveryNoteDo": [
-            {
-                "type": "string",
-                "constraints": {
-                    "type": "any"
-                }
-            }
-        ],
-        "onEveryBeatDo": [
-            {
-                "type": "string",
-                "constraints": {
-                    "type": "any"
-                }
-            }
-        ],
-        "onStrongBeatDo": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 1,
-                    "max": 16,
-                    "integer": true
-                }
-            },
-            {
-                "type": "string",
-                "constraints": {
-                    "type": "any"
-                }
-            }
-        ],
-        "onWeakBeatDo": [
-            {
-                "type": "string",
-                "constraints": {
-                    "type": "any"
-                }
-            }
-        ],
-        "setNoClock": [
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "getNotesPlayed": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 1000,
-                    "integer": false
-                }
-            }
-        ],
-        // Pitch blocks
-        "playPitch": [
-            {
-                "type": "string",
-                "constraints": {
-                    "type": "solfegeorletter"
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 1,
-                    "max": 8,
-                    "integer": true
-                }
-            }
-        ],
-        "stepPitch": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -7,
-                    "max": 7,
-                    "integer": true
-                }
-            }
-        ],
-        "playNthModalPitch": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -7,
-                    "max": 7,
-                    "integer": true
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 1,
-                    "max": 8,
-                    "integer": true
-                }
-            }
-        ],
-        "playPitchNumber": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -3,
-                    "max": 12,
-                    "integer": true
-                }
-            }
-        ],
-        "playHertz": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 20,
-                    "max": 20000,
-                    "integer": false
-                }
-            }
-        ],
-        "setAccidental": [
-            {
-                "type": "string",
-                "constraints": {
-                    "type": "accidental"
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "setScalarTranspose": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -10,
-                    "max": 10,
-                    "integer": true
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "setSemitoneTranspose": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -10,
-                    "max": 10,
-                    "integer": true
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "setRegister": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -3,
-                    "max": 3,
-                    "integer": true
-                }
-            }
-        ],
-        "invert": [
-            {
-                "type": "string",
-                "constraints": {
-                    "type": "solfegeorletter"
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 1,
-                    "max": 8,
-                    "integer": true
-                }
-            },
-            {
-                "type": "string",
-                "constraints": {
-                    "type": "oneof",
-                    "values": ["even", "odd", "scalar"],
-                    "defaultIndex": 0
-                }
-            }
-        ],
-        "setPitchNumberOffset": [
-            {
-                "type": "string",
-                "constraints": {
-                    "type": "solfegeorletter"
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 1,
-                    "max": 8,
-                    "integer": true
-                }
-            }
-        ],
-        "numToPitch": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 100,
-                    "integer": true
-                }
-            }
-        ],
-        "numToOctave": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 100,
-                    "integer": true
-                }
-            }
-        ],
-        // Intervals blocks
-        "setKey": [
-            {
-                "type": "string",
-                "constraints": {
-                    "type": "letterkey"
-                }
-            },
-            {
-                "type": "string",
-                "constraints": {
-                    "type": "oneof",
-                    "values": [
-                        "major",
-                        "ionian",
-                        "dorian",
-                        "phrygian",
-                        "lydian",
-                        "myxolydian",
-                        "minor",
-                        "aeolian"
-                    ],
-                    "defaultIndex": 0
-                }
-            }
-        ],
-        "MOVEABLEDO": [
-            {
-                "type": "boolean"
-            }
-        ],
-        "setScalarInterval": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -7,
-                    "max": 7,
-                    "integer": true
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "setSemitoneInterval": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -12,
-                    "max": 12,
-                    "integer": true
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "setTemperament": [
-            {
-                "type": "string",
-                "constraints": {
-                    "type": "oneof",
-                    "values": [
-                        "equal",
-                        "just intonation",
-                        "Pythagorean",
-                        "1/3 comma meantone",
-                        "1/4 comma meantone"
-                    ],
-                    "defaultIndex": 0
-                }
-            },
-            {
-                "type": "string",
-                "constraints": {
-                    "type": "solfegeorletter"
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 10,
-                    "integer": true
-                }
-            }
-        ],
-        // Tone blocks
-        "setInstrument": [
-            {
-                "type": "string",
-                "constraints": {
-                    "type": "synth"
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "doVibrato": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 10,
-                    "integer": false
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 10,
-                    "integer": false
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "doChorus": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 10,
-                    "integer": false
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 10,
-                    "integer": false
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 100,
-                    "integer": false
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "doPhaser": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 20,
-                    "integer": false
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 3,
-                    "integer": true
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 20,
-                    "max": 20000,
-                    "integer": false
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "doTremolo": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 20,
-                    "integer": false
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 100,
-                    "integer": true
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "doDistortion": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 100,
-                    "integer": true
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "doHarmonic": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 11,
-                    "integer": true
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        // Ornament blocks
-        "setStaccato": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 1000,
-                    "integer": false
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "setSlur": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 1000,
-                    "integer": false
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "doNeighbor": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -7,
-                    "max": 7,
-                    "integer": true
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 1000,
-                    "integer": false
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        // Volume blocks
-        "doCrescendo": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 100,
-                    "integer": false
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "doDecrescendo": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 100,
-                    "integer": false
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "PANNING": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -100,
-                    "max": 100,
-                    "integer": true
-                }
-            }
-        ],
-        "MASTERVOLUME": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 100,
-                    "integer": true
-                }
-            }
-        ],
-        "setRelativeVolume": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -50,
-                    "max": 50,
-                    "integer": false
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "setSynthVolume": [
-            {
-                "type": "string",
-                "constraints": {
-                    "type": "synth"
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 100,
-                    "integer": false
-                }
-            }
-        ],
-        "getSynthVolume": [
-            {
-                "type": "string",
-                "constraints": {
-                    "type": "synth"
-                }
-            }
-        ],
-        // Drum blocks
-        "playDrum": [
-            {
-                "type": "string",
-                "constraints": {
-                    "type": "drum"
-                }
-            }
-        ],
-        "setDrum": [
-            {
-                "type": "string",
-                "constraints": {
-                    "type": "drum"
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "mapPitchToDrum": [
-            {
-                "type": "string",
-                "constraints": {
-                    "type": "drum"
-                }
-            },
-            {
-                "type": "function",
-                "constraints": {
-                    "async": true
-                }
-            }
-        ],
-        "playNoise": [
-            {
-                "type": "string",
-                "constraints": {
-                    "type": "noise"
-                }
-            }
-        ],
-        // Graphics blocks
-        "goForward": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -100000,
-                    "max": 100000,
-                    "integer": false
-                }
-            }
-        ],
-        "goBackward": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -100000,
-                    "max": 100000,
-                    "integer": false
-                }
-            }
-        ],
-        "turnRight": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -360,
-                    "max": 360,
-                    "integer": false
-                }
-            }
-        ],
-        "turnLeft": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -360,
-                    "max": 360,
-                    "integer": false
-                }
-            }
-        ],
-        "setXY": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -100000,
-                    "max": 100000,
-                    "integer": false
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -100000,
-                    "max": 100000,
-                    "integer": false
-                }
-            }
-        ],
-        "setHeading": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -360,
-                    "max": 360,
-                    "integer": false
-                }
-            }
-        ],
-        "drawArc": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -360,
-                    "max": 360,
-                    "integer": false
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 100000,
-                    "integer": false
-                }
-            }
-        ],
-        "drawBezier": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -100000,
-                    "max": 100000,
-                    "integer": false
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -100000,
-                    "max": 100000,
-                    "integer": false
-                }
-            }
-        ],
-        "setBezierControlPoint1": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -100000,
-                    "max": 100000,
-                    "integer": false
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -100000,
-                    "max": 100000,
-                    "integer": false
-                }
-            }
-        ],
-        "setBezierControlPoint1": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -100000,
-                    "max": 100000,
-                    "integer": false
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -100000,
-                    "max": 100000,
-                    "integer": false
-                }
-            }
-        ],
-        "scrollXY": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -100000,
-                    "max": 100000,
-                    "integer": false
-                }
-            },
-            {
-                "type": "number",
-                "constraints": {
-                    "min": -100000,
-                    "max": 100000,
-                    "integer": false
-                }
-            }
-        ],
-        // Pen blocks
-        "setColor": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 100,
-                    "integer": true
-                }
-            }
-        ],
-        "setGrey": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 100,
-                    "integer": true
-                }
-            }
-        ],
-        "setShade": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 100,
-                    "integer": true
-                }
-            }
-        ],
-        "setHue": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 100,
-                    "integer": true
-                }
-            }
-        ],
-        "setTranslucency": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 100,
-                    "integer": true
-                }
-            }
-        ],
-        "setPensize": [
-            {
-                "type": "number",
-                "constraints": {
-                    "min": 0,
-                    "max": 100,
-                    "integer": true
-                }
-            }
-        ]
+    static rearrangeMethodArgs(methodName, args) {
+        if (methodName in JSInterface._rearrangeArgsLookup) {
+            args = JSInterface._rearrangeArgsLookup[methodName].map((index) => args[index]);
+        }
+        return args;
     }
+
+    // ========= Parameter Validation ==============================================================
 
     /**
      * Validates arguments passed to API methods.
@@ -1364,13 +334,32 @@ class JSInterface {
      * @returns {[*]} - list of valid arguments
      */
     static validateArgs(methodName, args) {
-        if (!methodName in JSInterface._methodArgConstraints)
-            return args;
+        // JSInterface._methodArgConstraints is defined in ./constraints.js
+
+        if (!(methodName in JSInterface._methodArgConstraints)) return args;
 
         let constraints = JSInterface._methodArgConstraints[methodName];
         let finalArgs = [];
         for (let i in constraints) {
             let [arg, props] = [args[i], constraints[i]];
+
+            // for multiple types
+            if (Array.isArray(props)) {
+                for (const prop of props) {
+                    if (typeof arg === prop["type"]) {
+                        props = prop;
+                        break;
+                    }
+                }
+                if (Array.isArray(props)) {
+                    const error = `TypeMismatch error: expected one of "${props
+                        .map((prop) => prop["type"])
+                        .toString()}" but found "${typeof arg}"`;
+                    JSEditor.logConsole(error, "maroon");
+                    throw error;
+                }
+            }
+
             if (typeof arg !== props["type"]) {
                 if (typeof arg === "string" && props["type"] === "number") {
                     if (!isNaN(Number(arg))) {
@@ -1390,8 +379,9 @@ class JSInterface {
                         arg = true;
                     }
                 } else {
-                    let error =
-                        `TypeMismatch error: expected "${props["type"]}" but found "${typeof arg}"`;
+                    let error = `TypeMismatch error: expected "${
+                        props["type"]
+                    }" but found "${typeof arg}"`;
                     JSEditor.logConsole(error, "maroon");
                     throw error;
                 }
@@ -1408,7 +398,7 @@ class JSInterface {
                         JSEditor.logConsole(
                             `${arg} in "${methodName}" reset to ${props["constraints"]["max"]}`
                         );
-                        arg = props["constraints"]["min"];
+                        arg = props["constraints"]["max"];
                     }
 
                     if (props["constraints"]["integer"] && !Number.isInteger(arg)) {
@@ -1448,10 +438,10 @@ class JSInterface {
                             if (strs.length > 1) {
                                 const accidentals = [SHARP, FLAT, NATURAL, DOUBLESHARP, DOUBLEFLAT];
                                 const accidentals2 = {
-                                    "sharp": SHARP,
-                                    "flat": FLAT,
-                                    "doublesharp": DOUBLESHARP,
-                                    "doubleflat": DOUBLEFLAT
+                                    sharp: SHARP,
+                                    flat: FLAT,
+                                    doublesharp: DOUBLESHARP,
+                                    doubleflat: DOUBLEFLAT
                                 };
 
                                 if (accidentals.indexOf(strs[1]) !== -1) {
@@ -1474,7 +464,11 @@ class JSInterface {
                         ];
                         const accidentals = [SHARP, FLAT, NATURAL, DOUBLESHARP, DOUBLEFLAT];
                         const accidentals2 = [
-                            "sharp", "flat", "natural", "doublesharp", "doubleflat"
+                            "sharp",
+                            "flat",
+                            "natural",
+                            "doublesharp",
+                            "doubleflat"
                         ];
 
                         if (accidentals.indexOf(arg) !== -1) {
@@ -1487,7 +481,7 @@ class JSInterface {
                         for (let i in props["constraints"]["values"]) {
                             if (
                                 props["constraints"]["values"][i].toLowerCase() ===
-                                    arg.toLowerCase()
+                                arg.toLowerCase()
                             ) {
                                 index = i;
                                 break;
@@ -1497,13 +491,16 @@ class JSInterface {
                             arg = props["constraints"]["values"][index];
                         } else {
                             JSEditor.logConsole(
-                                `${arg} in "${methodName}" reset to ${props["constraints"][
-                                    "values"
-                                ][props["constraints"]["defaultIndex"]]}`
+                                `${arg} in "${methodName}" reset to ${
+                                    props["constraints"]["values"][
+                                        props["constraints"]["defaultIndex"]
+                                    ]
+                                }`
                             );
-                            arg = props["constraints"]["values"][
-                                props["constraints"]["defaultIndex"]
-                            ];
+                            arg =
+                                props["constraints"]["values"][
+                                    props["constraints"]["defaultIndex"]
+                                ];
                         }
                     } else if (props["constraints"]["type"] === "synth") {
                         const instruments = [
@@ -1534,7 +531,7 @@ class JSInterface {
                             "square",
                             "sawtooth",
                             "triangle",
-                            "vibraphone",
+                            "vibraphone"
                         ];
                         if (instruments.indexOf(arg) !== -1) {
                             arg = arg.toLowerCase();
@@ -1596,10 +593,10 @@ class JSInterface {
                             if (strs.length > 1) {
                                 const accidentals = [SHARP, FLAT, NATURAL, DOUBLESHARP, DOUBLEFLAT];
                                 const accidentals2 = {
-                                    "sharp": SHARP,
-                                    "flat": FLAT,
-                                    "doublesharp": DOUBLESHARP,
-                                    "doubleflat": DOUBLEFLAT
+                                    sharp: SHARP,
+                                    flat: FLAT,
+                                    doublesharp: DOUBLESHARP,
+                                    doubleflat: DOUBLEFLAT
                                 };
 
                                 if (accidentals.indexOf(strs[1]) !== -1) {

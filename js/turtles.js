@@ -43,7 +43,7 @@ class Turtles {
         // Inititalize all actions related to blocks executed by Turtle objects
         this.initActions();
 
-        this._refreshCanvas = null;     // function to refresh canvas
+        this._refreshCanvas = null; // function to refresh canvas
     }
 
     /**
@@ -74,6 +74,7 @@ class Turtles {
         setupOrnamentActions();
         setupVolumeActions();
         setupDrumActions();
+        setupDictActions();
     }
 
     /**
@@ -113,17 +114,15 @@ class Turtles {
         }
 
         let blkInfoAvailable =
-            typeof infoDict === "object" && Object.keys(infoDict).length > 0 ?
-                true : false;
+            typeof infoDict === "object" && Object.keys(infoDict).length > 0 ? true : false;
 
         // Unique ID of turtle is time of instantiation for the first time
         let id =
-            blkInfoAvailable && "id" in infoDict && infoDict["id"] !== Infinity ?
-                infoDict["id"] : Date.now();
+            blkInfoAvailable && "id" in infoDict && infoDict["id"] !== Infinity
+                ? infoDict["id"]
+                : Date.now();
 
-        let turtleName =
-            blkInfoAvailable && "name" in infoDict ?
-                infoDict["name"] : _("start");
+        let turtleName = blkInfoAvailable && "name" in infoDict ? infoDict["name"] : _("start");
 
         // Instantiate a new Turtle object
         let turtle = new Turtle(id, turtleName, this, startBlock);
@@ -133,8 +132,8 @@ class Turtles {
 
         let turtlesStage = this.stage;
 
-        let i = this.turtleList.length % 10;    // used for turtle (mouse) skin color
-        this.turtleList.push(turtle);           // add new turtle to turtle list
+        let i = this.turtleList.length % 10; // used for turtle (mouse) skin color
+        this.turtleList.push(turtle); // add new turtle to turtle list
 
         if (startBlock.name === "start") {
             this.createArtwork(turtle, i, true);
@@ -157,18 +156,18 @@ class Turtles {
         ===================================================
         */
 
-        turtle.container.on("mousedown", event => {
+        turtle.container.on("mousedown", (event) => {
             let scale = this.scale;
             let offset = {
                 x: turtle.container.x - event.stageX / scale,
-                y: turtle.container.y - event.stageY / scale
+                y: turtle.container.y - event.stageY / scale,
             };
 
             turtlesStage.dispatchEvent("CursorDown" + turtle.id);
             console.debug("--> [CursorDown " + turtle.name + "]");
 
             turtle.container.removeAllEventListeners("pressmove");
-            turtle.container.on("pressmove", event => {
+            turtle.container.on("pressmove", (event) => {
                 if (this.isShrunk() || turtle.running) {
                     return;
                 }
@@ -181,18 +180,18 @@ class Turtles {
             });
         });
 
-        turtle.container.on("pressup", event => {
+        turtle.container.on("pressup", (event) => {
             console.debug("--> [CursorUp " + turtle.name + "]");
             turtlesStage.dispatchEvent("CursorUp" + turtle.id);
         });
 
-        turtle.container.on("click", event => {
+        turtle.container.on("click", (event) => {
             // If turtles listen for clicks then they can be used as buttons
             console.debug("--> [click " + turtle.name + "]");
             turtlesStage.dispatchEvent("click" + turtle.id);
         });
 
-        turtle.container.on("mouseover", event => {
+        turtle.container.on("mouseover", (event) => {
             console.debug("--> [mouseover " + turtle.name + "]");
             turtlesStage.dispatchEvent("CursorOver" + turtle.id);
 
@@ -206,7 +205,7 @@ class Turtles {
             this.refreshCanvas();
         });
 
-        turtle.container.on("mouseout", event => {
+        turtle.container.on("mouseout", (event) => {
             console.debug("--> [mouseout " + turtle.name + "]");
             turtlesStage.dispatchEvent("CursorOut" + turtle.id);
 
@@ -380,17 +379,17 @@ Turtles.TurtlesModel = class {
      * @constructor
      */
     constructor() {
-        this._masterStage = null;       // createjs stage
-        this._stage = null;             // createjs container for turtle
+        this._masterStage = null; // createjs stage
+        this._stage = null; // createjs container for turtle
 
-        this._canvas = null;            // DOM canvas element
+        this._canvas = null; // DOM canvas element
 
         // These functions are directly called by TurtlesView
-        this._hideMenu = null;          // function to hide aux menu
-        this._doClear = null;           // function to clear the canvas
-        this._hideGrids = null;         // function to hide all grids
-        this._doGrid = null;            // function that renders Cartesian/Polar
-                                        //  grids and changes button labels
+        this._hideMenu = null; // function to hide aux menu
+        this._doClear = null; // function to clear the canvas
+        this._hideGrids = null; // function to hide all grids
+        this._doGrid = null; // function that renders Cartesian/Polar
+        //  grids and changes button labels
 
         // createjs border container
         this._borderContainer = new createjs.Container();
@@ -512,7 +511,6 @@ Turtles.TurtlesModel = class {
         return this._turtleList[Number(i)];
     }
 
-
     /**
      * @param {Number} i - index number
      * @returns index number of companion turtle or i
@@ -542,27 +540,27 @@ Turtles.TurtlesView = class {
      * @constructor
      */
     constructor() {
-        this._scale = 1.0;              // scale factor in [0, 1]
-        this._w = 1200;                 // stage width
-        this._h = 900;                  // stage height
+        this._scale = 1.0; // scale factor in [0, 1]
+        this._w = 1200; // stage width
+        this._h = 900; // stage height
 
-        this._isShrunk = false;         // whether canvas is collapsed
+        this._isShrunk = false; // whether canvas is collapsed
 
         /**
          * @todo write comments to describe each variable
          */
         this._expandedBoundary = null;
         this._collapsedBoundary = null;
-        this._expandButton = null;      // used by add method
-        this._collapseButton = null;    // used by add method
-        this._clearButton = null;       // used by add method
-        this._gridButton = null;        // used by add method
+        this._expandButton = null; // used by add method
+        this._collapseButton = null; // used by add method
+        this._clearButton = null; // used by add method
+        this._gridButton = null; // used by add method
 
         // canvas background color
         this._backgroundColor = platformColor.background;
 
         this._locked = false;
-        this._queue = [];               // temporarily stores [w, h, scale]
+        this._queue = []; // temporarily stores [w, h, scale]
     }
 
     /**
@@ -696,16 +694,13 @@ Turtles.TurtlesView = class {
      */
     createArtwork(turtle, i, useTurtleArtwork) {
         let artwork = useTurtleArtwork ? TURTLESVG : METRONOMESVG;
-        artwork = sugarizerCompatibility.isInsideSugarizer() ?
-            artwork
-                .replace(/fill_color/g, sugarizerCompatibility.xoColor.fill)
-                .replace(
-                    /stroke_color/g,
-                    sugarizerCompatibility.xoColor.stroke
-                ) :
-            artwork
-                .replace(/fill_color/g, FILLCOLORS[i])
-                .replace(/stroke_color/g, STROKECOLORS[i]);
+        artwork = sugarizerCompatibility.isInsideSugarizer()
+            ? artwork
+                  .replace(/fill_color/g, sugarizerCompatibility.xoColor.fill)
+                  .replace(/stroke_color/g, sugarizerCompatibility.xoColor.stroke)
+            : artwork
+                  .replace(/fill_color/g, FILLCOLORS[i])
+                  .replace(/stroke_color/g, STROKECOLORS[i]);
 
         turtle.makeTurtleBitmap(artwork, this.refreshCanvas, useTurtleArtwork);
 
@@ -735,14 +730,14 @@ Turtles.TurtlesView = class {
 
         let _makeButton = (svg, label, x, y) => {
             let container = document.createElement("div");
-            container.setAttribute("id", ""+label);
+            container.setAttribute("id", "" + label);
 
-            container.setAttribute("class","tooltipped");
-            container.setAttribute("data-tooltip",label);
-            container.setAttribute("data-position","bottom");
+            container.setAttribute("class", "tooltipped");
+            container.setAttribute("data-tooltip", label);
+            container.setAttribute("data-position", "bottom");
             jQuery.noConflict()(".tooltipped").tooltip({
                 html: true,
-                delay: 100
+                delay: 100,
             });
 
             container.onmouseover = (event) => {
@@ -757,12 +752,17 @@ Turtles.TurtlesView = class {
                 }
             };
             let img = new Image();
-            img.src =
-                "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(svg)));
+            img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(svg)));
 
             container.appendChild(img);
-            container.setAttribute("style","position: absolute; right:"+(document.body.clientWidth -x)+"px;  top: "+y+"px;")
+            container.setAttribute(
+                "style",
+                "position: absolute; right:" +
+                    (document.body.clientWidth - x) +
+                    "px;  top: " +
+                    y +
+                    "px;"
+            );
             docById("buttoncontainerTOP").appendChild(container);
             return container;
         };
@@ -770,25 +770,24 @@ Turtles.TurtlesView = class {
         /**
          * Setup dragging of smaller canvas .
          */
-        let dragCanvas = () =>{
-            let offset ;
+        let dragCanvas = () => {
+            let offset;
             turtlesStage.removeAllEventListeners("pressmove");
             turtlesStage.removeAllEventListeners("mousedown");
-            turtlesStage.on("mousedown",event => {
-                offset ={
-                    y:event.stageY - turtlesStage.y,
-                    x:event.stageX - turtlesStage.x
-                }
+            turtlesStage.on("mousedown", (event) => {
+                offset = {
+                    y: event.stageY - turtlesStage.y,
+                    x: event.stageX - turtlesStage.x,
+                };
             });
-            turtlesStage.on("pressmove",event => {
-                let x = event.stageX - offset.x ;
+            turtlesStage.on("pressmove", (event) => {
+                let x = event.stageX - offset.x;
                 let y = event.stageY - offset.y;
                 turtlesStage.x = Math.max(0, Math.min((this._w * 3) / 4, x));
                 turtlesStage.y = Math.max(55, Math.min((this._h * 3) / 4, y));
                 this.refreshCanvas();
-
-            })
-        }
+            });
+        };
 
         /**
          * Toggles visibility of menu and grids.
@@ -817,21 +816,25 @@ Turtles.TurtlesView = class {
             dragCanvas();
 
             this.refreshCanvas();
-        }
+        };
 
         /**
          * Makes 'cartesian' button by initailising 'CARTESIANBUTTON' SVG.
          * Assigns click listener function to doGrid() method.
          */
         let __makeGridButton = () => {
-            this._gridButton = _makeButton(CARTESIANBUTTON,_("show Cartesian"),this._w - 10 - 3 * 55, 70 + LEADING + 6);
+            this._gridButton = _makeButton(
+                CARTESIANBUTTON,
+                _("show Cartesian"),
+                this._w - 10 - 3 * 55,
+                70 + LEADING + 6
+            );
 
-            this._gridButton.onclick = event => {
+            this._gridButton.onclick = (event) => {
                 this.doGrid();
                 this._gridButton.setAttribute("data-tooltip", this._gridLabel);
                 jQuery.noConflict()(".tooltipped").tooltip("close");
             };
-
         };
 
         /**
@@ -839,16 +842,20 @@ Turtles.TurtlesView = class {
          * Assigns click listener function to call doClear() method.
          */
         let __makeClearButton = () => {
-            this._clearButton = _makeButton(CLEARBUTTON,_("Clean"),this._w - 5 - 2 * 55, 70 + LEADING + 6);
+            this._clearButton = _makeButton(
+                CLEARBUTTON,
+                _("Clean"),
+                this._w - 5 - 2 * 55,
+                70 + LEADING + 6
+            );
 
-            this._clearButton.onclick = event => {
+            this._clearButton.onclick = (event) => {
                 this.doClear();
             };
 
             if (doCollapse) {
                 __collapse();
             }
-
         };
 
         /**
@@ -856,9 +863,14 @@ Turtles.TurtlesView = class {
          * Assigns click listener function to call __collapse() method.
          */
         let __makeCollapseButton = () => {
-            this._collapseButton = _makeButton(COLLAPSEBUTTON,_("Collapse"),this._w - 55,70 + LEADING + 6);
+            this._collapseButton = _makeButton(
+                COLLAPSEBUTTON,
+                _("Collapse"),
+                this._w - 55,
+                70 + LEADING + 6
+            );
 
-            this._collapseButton.onclick = event => {
+            this._collapseButton.onclick = (event) => {
                 // If the aux toolbar is open, close it.
                 let auxToolbar = docById("aux-toolbar");
                 if (auxToolbar.style.display === "block") {
@@ -879,12 +891,17 @@ Turtles.TurtlesView = class {
          * Assigns click listener function to remove stage and add it at posiion 0.
          */
         let __makeExpandButton = () => {
-            this._expandButton = _makeButton(EXPANDBUTTON, _("Expand"), this._w - 55, 70 + LEADING + 6);
+            this._expandButton = _makeButton(
+                EXPANDBUTTON,
+                _("Expand"),
+                this._w - 55,
+                70 + LEADING + 6
+            );
             if (this._expandButton !== null) {
                 this._expandButton.style.visibility = "hidden";
             }
 
-            this._expandButton.onclick = event => {
+            this._expandButton.onclick = (event) => {
                 // If the aux toolbar is open, close it.
                 let auxToolbar = docById("aux-toolbar");
                 if (auxToolbar.style.display === "block") {
@@ -937,21 +954,23 @@ Turtles.TurtlesView = class {
          */
         let __makeAllButtons = () => {
             let second = false;
-            if (docById("buttoncontainerTOP")){
+            if (docById("buttoncontainerTOP")) {
                 jQuery.noConflict()(".tooltipped").tooltip("close");
-                docById("buttoncontainerTOP").parentElement.removeChild(docById("buttoncontainerTOP"));
+                docById("buttoncontainerTOP").parentElement.removeChild(
+                    docById("buttoncontainerTOP")
+                );
                 second = true;
             }
             let cont = document.createElement("div");
-            document.body.appendChild(cont)
-            cont.style.display = second ?"block":"none";
-            cont.setAttribute("id","buttoncontainerTOP");
+            document.body.appendChild(cont);
+            cont.style.display = second ? "block" : "none";
+            cont.setAttribute("id", "buttoncontainerTOP");
             __makeExpandButton();
             __makeClearButton();
             __makeGridButton();
             __makeCollapseButton();
             this._locked = false;
-        }
+        };
 
         /**
          * Makes second boundary for graphics (mouse) container by initialising 'MBOUNDARY' SVG.
@@ -968,7 +987,6 @@ Turtles.TurtlesView = class {
                 this._collapsedBoundary.y = 55 + LEADING;
                 borderContainer.addChild(this._collapsedBoundary);
                 this._collapsedBoundary.visible = false;
-
             };
 
             let dx = this._w - 20;
@@ -984,10 +1002,7 @@ Turtles.TurtlesView = class {
                                 .replace("X", 10)
                                 .replace("DY", dy)
                                 .replace("DX", dx)
-                                .replace(
-                                    "stroke_color",
-                                    platformColor.ruleColor
-                                )
+                                .replace("stroke_color", platformColor.ruleColor)
                                 .replace("fill_color", this._backgroundColor)
                                 .replace("STROKE", 20)
                         )
@@ -1028,10 +1043,7 @@ Turtles.TurtlesView = class {
                                 .replace("X", 10 / CONTAINERSCALEFACTOR)
                                 .replace("DY", dy)
                                 .replace("DX", dx)
-                                .replace(
-                                    "stroke_color",
-                                    platformColor.ruleColor
-                                )
+                                .replace("stroke_color", platformColor.ruleColor)
                                 .replace("fill_color", this._backgroundColor)
                                 .replace("STROKE", 20 / CONTAINERSCALEFACTOR)
                         )

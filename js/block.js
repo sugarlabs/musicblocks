@@ -2440,11 +2440,11 @@ function Block(protoblock, blocks, overrideName) {
                     event.nativeEvent.button == 2) {
                     that.blocks.stageClick = true;
                     docById("wheelDiv").style.display = "none";
-                    that.piemenuBlockContext(thisBlock);
+                    piemenuBlockContext(that);
                     return;
                 } else if ("ctrlKey" in event.nativeEvent &&
                            event.nativeEvent.ctrlKey) {
-                    that.piemenuBlockContext(thisBlock);
+                    piemenuBlockContext(that);
                     return;
                 } else if ("shiftKey" in event.nativeEvent &&
                            event.nativeEvent.shiftKey) {
@@ -2989,14 +2989,14 @@ function Block(protoblock, blocks, overrideName) {
             let solfnotes_ = _("ti la sol fa mi re do").split(" ");
 
             if (this.piemenuOKtoLaunch()) {
-                this._piemenuPitches(solfnotes_, SOLFNOTES, SOLFATTRS, obj[0],
+                piemenuPitches(this, solfnotes_, SOLFNOTES, SOLFATTRS, obj[0],
                                      obj[1]);
             }
         } else if (this.name === "scaledegree2") {
             obj = splitScaleDegree(this.value);
             let scalenotes_ = ("7 6 5 4 3 2 1").split(" ");
             if (this.piemenuOKtoLaunch()) {
-                this._piemenuPitches(scalenotes_, SCALENOTES, SOLFATTRS,
+                piemenuPitches(this, scalenotes_, SCALENOTES, SOLFATTRS,
                                      obj[0], obj[1]);
             };
         } else if (this.name === "customNote") {
@@ -3007,7 +3007,7 @@ function Block(protoblock, blocks, overrideName) {
                 let solfnotes_ = _("ti la sol fa mi re do").split(" ");
 
                 if (this.piemenuOKtoLaunch()) {
-                    this._piemenuPitches(solfnotes_, SOLFNOTES, SOLFATTRS,
+                    piemenuPitches(this, solfnotes_, SOLFNOTES, SOLFATTRS,
                                          obj[0], obj[1]);
                 }
             } else {
@@ -3032,7 +3032,7 @@ function Block(protoblock, blocks, overrideName) {
                     selectedNote = TEMPERAMENT[selectedCustom]["0"][1];
                 }
 
-                this._customNotes(noteLabels, customLabels, selectedCustom,
+                piemenuCustomNotes(this, noteLabels, customLabels, selectedCustom,
                                   selectedNote);
             }
         } else if (this.name === "eastindiansolfege") {
@@ -3041,7 +3041,7 @@ function Block(protoblock, blocks, overrideName) {
             selectedAttr = obj[1];
 
             if (this.piemenuOKtoLaunch()) {
-                this._piemenuPitches(EASTINDIANSOLFNOTES, SOLFNOTES, SOLFATTRS,
+                piemenuPitches(this, EASTINDIANSOLFNOTES, SOLFNOTES, SOLFATTRS,
                                      obj[0], obj[1]);
             }
         } else if (this.name === "notename") {
@@ -3065,7 +3065,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             if (this.piemenuOKtoLaunch()) {
-                this._piemenuPitches(NOTENOTES, NOTENOTES, SOLFATTRS,
+                piemenuPitches(this, NOTENOTES, NOTENOTES, SOLFATTRS,
                                      selectedNote, selectedAttr);
             }
         } else if (this.name === "modename") {
@@ -3075,7 +3075,7 @@ function Block(protoblock, blocks, overrideName) {
                 selectedMode = DEFAULTMODE;
             }
 
-            this._piemenuModes(selectedMode);
+            piemenuModes(this, selectedMode);
         } else if (this.name === "accidentalname") {
             if (this.value != null) {
                 selectedAccidental = this.value;
@@ -3084,7 +3084,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             if (this.piemenuOKtoLaunch()) {
-                this._piemenuAccidentals(ACCIDENTALLABELS, ACCIDENTALNAMES,
+                piemenuAccidentals(this, ACCIDENTALLABELS, ACCIDENTALNAMES,
                                          selectedAccidental);
             }
         } else if (this.name === "intervalname") {
@@ -3095,7 +3095,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             if (this.piemenuOKtoLaunch()) {
-                this._piemenuIntervals(selectedInterval);
+                piemenuIntervals(this, selectedInterval);
             }
         } else if (this.name === "invertmode") {
             if (this.value != null) {
@@ -3113,7 +3113,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             if (this.piemenuOKtoLaunch()) {
-                this._piemenuBasic(invertLabels, invertValues, selectedInvert);
+                piemenuBasic(this, invertLabels, invertValues, selectedInvert);
             }
         } else if (this.name === "drumname") {
             if (this.value != null) {
@@ -3145,7 +3145,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
 
-            this._piemenuVoices(DrumLabels, drumValues, categories,
+            piemenuVoices(this, DrumLabels, drumValues, categories,
                                 selectedDrum);
         } else if (this.name === "effectsname") {
             if (this.value != null) {
@@ -3179,7 +3179,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
 
-            this._piemenuVoices(effectLabels, effectValues, effectcategories,
+            piemenuVoices(this, effectLabels, effectValues, effectcategories,
                                 selectedEffect);
         } else if (this.name === "filtertype") {
             if (this.value != null) {
@@ -3195,7 +3195,7 @@ function Block(protoblock, blocks, overrideName) {
                 filterValues.push(FILTERTYPES[i][1]);
             }
 
-            this._piemenuBasic(filterLabels, filterValues, selectedType,
+            piemenuBasic(this, filterLabels, filterValues, selectedType,
                                platformColor.piemenuBasic);
         } else if (this.name === "oscillatortype") {
             if (this.value != null) {
@@ -3211,7 +3211,7 @@ function Block(protoblock, blocks, overrideName) {
                 oscValues.push(OSCTYPES[i][1]);
             }
 
-            this._piemenuBasic(oscLabels, oscValues, selectedType,
+            piemenuBasic(this, oscLabels, oscValues, selectedType,
                                platformColor.piemenuBasic);
         } else if (this.name === "voicename") {
             if (this.value != null) {
@@ -3246,7 +3246,7 @@ function Block(protoblock, blocks, overrideName) {
                 categories.push(categoriesList.indexOf(VOICENAMES[i][3]));
             }
 
-            this._piemenuVoices(voiceLabels, voiceValues, categories,
+            piemenuVoices(this, voiceLabels, voiceValues, categories,
                                 selectedVoice);
         } else if (this.name === "noisename") {
             if (this.value != null) {
@@ -3276,7 +3276,7 @@ function Block(protoblock, blocks, overrideName) {
                 categories.push(categoriesList.indexOf(NOISENAMES[i][3]));
             }
 
-            this._piemenuVoices(
+            piemenuVoices(this,
                 noiseLabels,
                 noiseValues,
                 categories,
@@ -3307,7 +3307,7 @@ function Block(protoblock, blocks, overrideName) {
                 temperamentValues.push(TEMPERAMENTS[i][1]);
             }
 
-            this._piemenuBasic(temperamentLabels, temperamentValues,
+            piemenuBasic(this, temperamentLabels, temperamentValues,
                                selectedTemperament,
                                platformColor.piemenuBasic);
         } else if (this.name === "boolean") {
@@ -3320,7 +3320,7 @@ function Block(protoblock, blocks, overrideName) {
             let booleanLabels = [_("true"), _("false")];
             let booleanValues = [true, false];
 
-            this._piemenuBoolean(booleanLabels, booleanValues, selectedValue);
+            piemenuBoolean(this, booleanLabels, booleanValues, selectedValue);
         } else if (this.name === "grid") {
 
             selectedValue = this.value;
@@ -3338,7 +3338,7 @@ function Block(protoblock, blocks, overrideName) {
                              ];
             let gridValues = gridLabels ;
 
-            this._piemenuBasic(gridLabels, gridValues, selectedValue,
+            piemenuBasic(this, gridLabels, gridValues, selectedValue,
                                platformColor.piemenuBasic);
         } else if (this.name === "outputtools") {
             selectedValue = this.privateData;
@@ -3350,14 +3350,14 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             let values = labels;
-            this._piemenuBasic(labels, values, selectedValue,
+            piemenuBasic(this, labels, values, selectedValue,
                                platformColor.piemenuBasic);
         } else {
             // If the number block is connected to a pitch block, then
             // use the pie menu for octaves. Other special cases as well.
             let blk = this.blocks.blockList.indexOf(this);
             if (this.blocks.octaveNumber(blk)) {
-                this._piemenuNumber([8, 7, 6, 5, 4, 3, 2, 1], this.value);
+                piemenuNumber(this, [8, 7, 6, 5, 4, 3, 2, 1], this.value);
             } else if (this.blocks.noteValueNumber(blk, 2)) {
                 let cblk = this.connections[0];
                 if (cblk !== null) {
@@ -3365,12 +3365,12 @@ function Block(protoblock, blocks, overrideName) {
                     if (cblk !== null &&
                         ["rhythm2", "stuplet"].indexOf(
                             this.blocks.blockList[cblk].name) !== -1) {
-                        this._piemenuNumber([2, 4, 8, 16], this.value);
+                        piemenuNumber(this, [2, 4, 8, 16], this.value);
                     } else {
-                        this._piemenuNoteValue(this.value);
+                        piemenuNoteValue(this, this.value);
                     }
                 } else {
-                    this._piemenuNoteValue(this.value);
+                    piemenuNoteValue(this, this.value);
                 }
             } else if (this.blocks.noteValueNumber(blk, 1)) {
                 let d = this.blocks.noteValueValue(blk);
@@ -3394,18 +3394,18 @@ function Block(protoblock, blocks, overrideName) {
                     }
                 }
 
-                this._piemenuNumber(values, this.value);
+                piemenuNumber(this, values, this.value);
             } else if (this.blocks.octaveModifierNumber(blk)) {
-                this._piemenuNumber([-2, -1, 0, 1, 2], this.value);
+                piemenuNumber(this, [-2, -1, 0, 1, 2], this.value);
             } else if (this.blocks.intervalModifierNumber(blk)) {
-                this._piemenuNumber(this.blocks.blockList[
+                piemenuNumber(this, this.blocks.blockList[
                     this.blocks.blockList[this.connections[0]].connections[0]
                 ].protoblock.piemenuValuesC1, this.value);
             } else if (this._usePieNumberC3()) {
-                this._piemenuNumber(this.blocks.blockList[
+                piemenuNumber(this, this.blocks.blockList[
                     this.connections[0]].protoblock.piemenuValuesC3, this.value);
             } else if (this._usePieNumberC2()) {
-                this._piemenuNumber(this.blocks.blockList[
+                piemenuNumber(this, this.blocks.blockList[
                     this.connections[0]].protoblock.piemenuValuesC2, this.value);
             } else if (this._usePieNumberC1()) {
                 switch (this.blocks.blockList[this.connections[0]].name) {
@@ -3414,7 +3414,7 @@ function Block(protoblock, blocks, overrideName) {
                 case "setshade":
                 case "settranslucency":
                 case "setgrey":
-                    this._piemenuNumber(
+                    piemenuNumber(this,
                         this.blocks.blockList[
                             this.connections[0]].protoblock.piemenuValuesC1,
                         this.value,
@@ -3435,7 +3435,7 @@ function Block(protoblock, blocks, overrideName) {
                     }
 
                     if (temperament === "equal") {
-                        this._piemenuNumber(
+                        piemenuNumber(this,
                             [-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
                             this.value);
                     } else {
@@ -3443,11 +3443,11 @@ function Block(protoblock, blocks, overrideName) {
                         for (let i = 0; i < TEMPERAMENT[temperament]["pitchNumber"]; i++) {
                             pitchNumbers.push(i);
                         }
-                        this._piemenuNumber(pitchNumbers, this.value);
+                        piemenuNumber(this, pitchNumbers, this.value);
                     }
                     break;
                 default:
-                    this._piemenuNumber(this.blocks.blockList[
+                    piemenuNumber(this, this.blocks.blockList[
                         this.connections[0]].protoblock.piemenuValuesC1,
                                         this.value);
                     break;
@@ -7085,7 +7085,7 @@ function Block(protoblock, blocks, overrideName) {
                     let temptemperament = TEMPERAMENT[oldValue];
                     delete TEMPERAMENT[oldValue];
                     TEMPERAMENT[newValue] = temptemperament;
-                    updateTEMPERAMENTS();
+                    updateTemperaments();
                     break;
                 default:
                     break;
@@ -7107,135 +7107,6 @@ function Block(protoblock, blocks, overrideName) {
                 this.blocks.logo.synth.loadSynth(0, getNoiseSynthName(this.value));
             }
         }
-    };
-
-    /*
-     * Sets up context menu for each block
-     */
-    this.piemenuBlockContext = function() {
-        if (this.blocks.activeBlock === null) {
-            return;
-        }
-
-        let pasteDx = 0;
-        let pasteDy = 0;
-
-        let that = this;
-        let thisBlock = this.blocks.blockList.indexOf(this);
-
-        // Position the widget centered over the active block.
-        docById("contextWheelDiv").style.position = "absolute";
-
-        let x = this.blocks.blockList[thisBlock].container.x;
-        let y = this.blocks.blockList[thisBlock].container.y;
-
-        let canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.getStageScale();
-        let canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.getStageScale();
-
-        docById("contextWheelDiv").style.left =
-            Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() +
-                       canvasLeft) - 150 + "px";
-        docById("contextWheelDiv").style.top =
-            Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() +
-                       canvasTop) - 150 + "px";
-
-        docById("contextWheelDiv").style.display = "";
-
-        labels = [
-            "imgsrc:header-icons/copy-button.svg",
-            "imgsrc:header-icons/extract-button.svg",
-            "imgsrc:header-icons/empty-trash-button.svg",
-            "imgsrc:header-icons/cancel-button.svg"
-        ];
-
-        let topBlock = this.blocks.findTopBlock(thisBlock);
-        if (this.name === 'action') {
-            labels.push('imgsrc:header-icons/save-blocks-button.svg');
-        }
-        let message =
-            this.blocks.blockList[this.blocks.activeBlock].protoblock.helpString;
-        let helpButton;
-        if (message) {
-            labels.push("imgsrc:header-icons/help-button.svg");
-            helpButton = labels.length - 1;
-        } else {
-            helpButton = null;
-        }
-
-        let wheel = new wheelnav("contextWheelDiv", null, 250, 250);
-        wheel.colors = platformColor.wheelcolors;
-        wheel.slicePathFunction = slicePath().DonutSlice;
-        wheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        wheel.slicePathCustom.minRadiusPercent = 0.2;
-        wheel.slicePathCustom.maxRadiusPercent = 0.6;
-        wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
-        wheel.sliceInitPathCustom = wheel.slicePathCustom;
-        wheel.clickModeRotate = false;
-        wheel.initWheel(labels);
-        wheel.createWheel();
-
-        wheel.navItems[0].setTooltip(_("Duplicate"));
-        wheel.navItems[1].setTooltip(_("Extract"));
-        wheel.navItems[2].setTooltip(_("Move to trash"));
-        wheel.navItems[3].setTooltip(_("Close"));
-        if (this.blocks.blockList[topBlock].name === "action") {
-            wheel.navItems[4].setTooltip(_("Save stack"));
-        }
-
-        if (helpButton !== null) {
-            wheel.navItems[helpButton].setTooltip(_("Help"));
-        }
-
-        wheel.navItems[0].selected = false;
-
-        wheel.navItems[0].navigateFunction = function() {
-            that.blocks.activeBlock = thisBlock;
-            that.blocks.prepareStackForCopy();
-            that.blocks.pasteDx = pasteDx;
-            that.blocks.pasteDy = pasteDy;
-            that.blocks.pasteStack();
-            pasteDx += 21;
-            pasteDy += 21;
-            // docById('contextWheelDiv').style.display = 'none';
-        };
-
-        wheel.navItems[1].navigateFunction = function() {
-            that.blocks.activeBlock = thisBlock;
-            that.blocks.extract();
-            docById("contextWheelDiv").style.display = "none";
-        };
-
-        wheel.navItems[2].navigateFunction = function() {
-            that.blocks.activeBlock = thisBlock;
-            that.blocks.extract();
-            that.blocks.sendStackToTrash(that.blocks.blockList[thisBlock]);
-            docById("contextWheelDiv").style.display = "none";
-        };
-
-        wheel.navItems[3].navigateFunction = function() {
-            docById("contextWheelDiv").style.display = "none";
-        };
-
-        if (this.name === "action") {
-            wheel.navItems[4].navigateFunction = function() {
-                that.blocks.activeBlock = thisBlock;
-                that.blocks.prepareStackForCopy();
-                that.blocks.saveStack();
-            };
-        }
-
-        if (helpButton !== null) {
-            wheel.navItems[helpButton].navigateFunction = function() {
-                that.blocks.activeBlock = thisBlock;
-                let helpWidget = new HelpWidget();
-                helpWidget.init(blocks);
-                docById("contextWheelDiv").style.display = "none";
-            };
-        }
-
-        setTimeout(function() {
-            that.blocks.stageClick = false;
-        }, 500);
     };
 }
 

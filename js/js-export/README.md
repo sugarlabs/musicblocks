@@ -24,6 +24,9 @@ The code corresponding to the JavaScript Editor widget is in
   of certain block names: used for the *AST* generation. Also contains
   the contraints and logic for argument validation for blocks.
 
+* `constraints.js` — contains the constraint definitions for the API methods'
+  arguments, for validation in `interface.js`.
+
 * `sample.js` — contains the help (guide) for the API, and some example codes.
 
 The `API` subdirectory stores the API method definitions of each block.
