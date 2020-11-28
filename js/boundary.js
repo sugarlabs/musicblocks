@@ -14,86 +14,88 @@
 // trash and hidden. There is a menu button that can be used to
 // restore trash.
 
-function Boundary() {
-    this._stage = null;
-    this._container = null;
+class Boundary {
+    constructor() {
+        this._stage = null;
+        this._container = null;
 
-    this.setStage = function(stage) {
-        this._stage = stage;
-        return this;
-    };
+        this.setStage = function(stage) {
+            this._stage = stage;
+            return this;
+        };
 
-    this.resizeEvent = function(scale) {};
+        this.resizeEvent = function(scale) {};
 
-    this.init = function() {
-        this._container = new createjs.Container();
-        this._stage.addChild(this._container);
-        this._stage.setChildIndex(this._container, 0);
-    };
+        this.init = function() {
+            this._container = new createjs.Container();
+            this._stage.addChild(this._container);
+            this._stage.setChildIndex(this._container, 0);
+        };
 
-    this.setScale = function(w, h, scale) {
-        this.destroy();
-        this.create(w, h, scale);
-    };
+        this.setScale = function(w, h, scale) {
+            this.destroy();
+            this.create(w, h, scale);
+        };
 
-    this.destroy = function() {
-        if (this._container.children.length > 0) {
-            this._container.removeChild(this._container.children[0]);
-        }
-    };
+        this.destroy = function() {
+            if (this._container.children.length > 0) {
+                this._container.removeChild(this._container.children[0]);
+            }
+        };
 
-    this.offScreen = function(x, y) {
-        return (
-            x < this.x ||
-            x > this.x + this.dx ||
-            y < this.y ||
-            y > this.y + this.dy
-        );
-    };
+        this.offScreen = function(x, y) {
+            return (
+                x < this.x ||
+                x > this.x + this.dx ||
+                y < this.y ||
+                y > this.y + this.dy
+            );
+        };
 
-    this.create = function(w, h, scale) {
-        this.w = w / scale;
-        this.x = 55 + 13;
-        this.dx = this.w - (110 + 26);
+        this.create = function(w, h, scale) {
+            this.w = w / scale;
+            this.x = 55 + 13;
+            this.dx = this.w - (110 + 26);
 
-        this.h = h / scale;
-        this.y = 55 + 13;
-        this.dy = this.h - (55 + 26);
+            this.h = h / scale;
+            this.y = 55 + 13;
+            this.dy = this.h - (55 + 26);
 
-        that = this;
+            let that = this;
 
-        function __makeBoundary() {
-            let img = new Image();
-            img.onload = function() {
-                bitmap = new createjs.Bitmap(img);
-                that._container.addChild(bitmap);
-            };
+            function __makeBoundary() {
+                let img = new Image();
+                img.onload = function() {
+                    bitmap = new createjs.Bitmap(img);
+                    that._container.addChild(bitmap);
+                };
 
-            img.src =
-                "data:image/svg+xml;base64," +
-                window.btoa(
-                    unescape(
-                        encodeURIComponent(
-                            BOUNDARY.replace("HEIGHT", that.h)
-                                .replace("WIDTH", that.w)
-                                .replace("Y", that.y)
-                                .replace("X", that.x)
-                                .replace("DY", that.dy)
-                                .replace("DX", that.dx)
-                                .replace("stroke_color", "#e08080")
+                img.src =
+                    "data:image/svg+xml;base64," +
+                    window.btoa(
+                        unescape(
+                            encodeURIComponent(
+                                BOUNDARY.replace("HEIGHT", that.h)
+                                    .replace("WIDTH", that.w)
+                                    .replace("Y", that.y)
+                                    .replace("X", that.x)
+                                    .replace("DY", that.dy)
+                                    .replace("DX", that.dx)
+                                    .replace("stroke_color", "#e08080")
+                            )
                         )
-                    )
-                );
-        }
+                    );
+            }
 
-        __makeBoundary();
-    };
+            __makeBoundary();
+        };
 
-    this.hide = function() {
-        this._container.visible = false;
-    };
+        this.hide = function() {
+            this._container.visible = false;
+        };
 
-    this.show = function() {
-        this._container.visible = true;
-    };
+        this.show = function() {
+            this._container.visible = true;
+        };
+    }
 }
