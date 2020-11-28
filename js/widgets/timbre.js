@@ -759,7 +759,7 @@ function TimbreWidget() {
         var widgetWindow = window.widgetWindows.windowFor(this, "timbre");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
-	widgetWindow.show();
+        widgetWindow.show();
 
         var w = window.innerWidth;
         this._cellScale = w / 1200;
@@ -2017,53 +2017,61 @@ function TimbreWidget() {
     this._addFilterListeners = function() {
         // Add the various listeners needed for the filter panel
         var that = this;
+
+        let __filterNameEvent = function(event) {
+            docById("filterButtonCell").style.backgroundColor = "#C8C8C0";
+            var elem = event.target;
+            var m = elem.id.slice(-1);
+            instrumentsFilters[0][that.instrumentName][m]["filterType"] =
+                elem.value;
+            that._update(m, elem.value, 0);
+            var error = instrumentsFilters[0][that.instrumentName].filter(
+                function(el) {
+                    return el.filterType === elem.value;
+                }
+            );
+            if (error.length > 1) {
+                that._logo.errorMsg(_("Filter already present."));
+            }
+            that._playNote("G4", 1 / 8);
+        };
+
+        let __radioEvent = function(event) {
+            var elem = event.target;
+            var m = Number(elem.id.replace("radio", ""));
+            instrumentsFilters[0][that.instrumentName][
+                Math.floor(m / 4)]["filterRolloff"] = parseFloat(this.value);
+            that._update(Math.floor(m / 4), this.value, 1);
+            that._playNote("G4", 1 / 8);
+        };
+
+        let __sliderEvent = function(event) {
+            docById("filterButtonCell").style.backgroundColor = "#C8C0C8";
+            var elem = event.target;
+            var m = elem.id.slice(-1);
+            docById("myRangeF" + m).value = parseFloat(elem.value);
+            docById("myspanF" + m).textContent = elem.value;
+            instrumentsFilters[0][that.instrumentName][m][
+                "filterFrequency"] = parseFloat(elem.value);
+            that._update(m, elem.value, 2);
+            that._playNote("G4", 1 / 8);
+        };
+
         for (var f = 0; f < this.fil.length; f++) {
             var radioIDs = [f * 4, f * 4 + 1, f * 4 + 2, f * 4 + 3];
 
-            docById("sel" + f).addEventListener("change", function(event) {
-                docById("filterButtonCell").style.backgroundColor = "#C8C8C0";
-                var elem = event.target;
-                var m = elem.id.slice(-1);
-                instrumentsFilters[0][that.instrumentName][m]["filterType"] =
-                    elem.value;
-                that._update(m, elem.value, 0);
-                var error = instrumentsFilters[0][that.instrumentName].filter(
-                    function(el) {
-                        return el.filterType === elem.value;
-                    }
-                );
-                if (error.length > 1) {
-                    that._logo.errorMsg(_("Filter already present."));
-                }
-                that._playNote("G4", 1 / 8);
-            });
+            docById("sel" + f).removeEventListener("change", __filterNameEvent);
+            docById("sel" + f).addEventListener("change", __filterNameEvent);
 
             for (var i = 0; i < radioIDs.length; i++) {
                 var radioButton = docById("radio" + radioIDs[i]);
-
-                radioButton.onclick = function(event) {
-                    var elem = event.target;
-                    var m = Number(elem.id.replace("radio", ""));
-                    instrumentsFilters[0][that.instrumentName][
-                        Math.floor(m / 4)
-                    ]["filterRolloff"] = parseFloat(this.value);
-                    that._update(Math.floor(m / 4), this.value, 1);
-                    that._playNote("G4", 1 / 8);
-                };
+                radioButton.removeEventListener("click", __radioEvent);
+                radioButton.addEventListener("click", __radioEvent);
             }
 
-            docById("myRangeF" + f).addEventListener("change", function(event) {
-                docById("filterButtonCell").style.backgroundColor = "#C8C0C8";
-                var elem = event.target;
-                var m = elem.id.slice(-1);
-                docById("myRangeF" + m).value = parseFloat(elem.value);
-                docById("myspanF" + m).textContent = elem.value;
-                instrumentsFilters[0][that.instrumentName][m][
-                    "filterFrequency"
-                ] = parseFloat(elem.value);
-                that._update(m, elem.value, 2);
-                that._playNote("G4", 1 / 8);
-            });
+            docById("myRangeF" + f).removeEventListener("change",
+                                                        __sliderEvent);
+            docById("myRangeF" + f).addEventListener("change", __sliderEvent);
         }
     };
 
@@ -2109,15 +2117,9 @@ function TimbreWidget() {
             .connections[2];
         var bottomOfClamp = this._logo.blocks.findBottomBlock(topOfClamp);
 
-        const FILTEROBJ = [
-            [0, ["filter", {}], 0, 0, [null, 3, 1, 2, null]],
-            [1, ["number", { value: -12 }], 0, 0, [0]],
-            [2, ["number", { value: 392 }], 0, 0, [0]],
-            [3, ["filtertype", { value: DEFAULTFILTERTYPE }], 0, 0, [0]]
-        ];
-        this._logo.blocks.loadNewBlocks(FILTEROBJ);
+        // The block we'll be adding will be at the end of the list.
+        this.fil.push(this._logo.blocks.blockList.length);
 
-        var n = this._logo.blocks.blockList.length - 4;
         var selectedFilters = instrumentsFilters[0][
             this.instrumentName
         ].slice();
@@ -2130,7 +2132,6 @@ function TimbreWidget() {
             return true;
         });
 
-        this.fil.push(n);
         if (filterType.length <= 0) {
             this.filterParams.push(DEFAULTFILTERTYPE);
         } else {
@@ -2139,6 +2140,16 @@ function TimbreWidget() {
 
         this.filterParams.push(-12);
         this.filterParams.push(392);
+
+        // Don't create the new blocks until we know what filter to use.
+        let len = this.filterParams.length;
+        this._logo.blocks.loadNewBlocks([
+            [0, ["filter", {}], 0, 0, [null, 3, 1, 2, null]],
+            [1, ["number", { value: this.filterParams[len - 2] }], 0, 0, [0]],
+            [2, ["number", { value: this.filterParams[len - 1] }], 0, 0, [0]],
+            [3, ["filtertype", { value: this.filterParams[len - 3] }],
+             0, 0, [0]]
+        ]);
 
         var that = this;
         setTimeout(that.blockConnection(4, bottomOfClamp), 500);
