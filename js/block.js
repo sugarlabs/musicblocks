@@ -173,7 +173,8 @@ function Block(protoblock, blocks, overrideName) {
     // Includes workaround for a race condition.
     this._createCache = function(callback, args) {
         let that = this;
-        return new Promise(function(resolve, reject) {
+        return new Promise((resolve, reject) =>
+         {
             let loopCount = 0;
 
             async function checkBounds(counter) {
@@ -210,7 +211,7 @@ function Block(protoblock, blocks, overrideName) {
     // Includes workaround for a race condition.
     this.updateCache = function(counter) {
         let that = this;
-        return new Promise(function(resolve, reject) {
+        return new Promise((resolve, reject) => {
             let loopCount = 0;
 
             async function updateBounds(counter) {
@@ -2452,7 +2453,7 @@ function Block(protoblock, blocks, overrideName) {
                     if (that.blocks.turtles.running()) {
                         that.blocks.logo.doStopTurtles();
 
-                        setTimeout(function() {
+                        setTimeout(() => {
                             that.blocks.logo.runLogoCommands(topBlock);
                         }, 250);
                     } else {
@@ -2475,7 +2476,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             locked = true;
-            setTimeout(function() {
+            setTimeout(() => {
                 locked = false;
             }, 500);
 
@@ -2515,7 +2516,7 @@ function Block(protoblock, blocks, overrideName) {
                         if (that.blocks.turtles.running()) {
                             that.blocks.logo.doStopTurtles();
 
-                            setTimeout(function() {
+                            setTimeout(() => {
                                 that.blocks.logo.runLogoCommands(topBlk);
                             }, 250);
                         } else {
@@ -2536,7 +2537,7 @@ function Block(protoblock, blocks, overrideName) {
                     if (that.blocks.turtles.running()) {
                         that.blocks.logo.doStopTurtles();
 
-                        setTimeout(function() {
+                        setTimeout(() => {
                             that.blocks.logo.runLogoCommands(topBlk);
                         }, 250);
                     } else {
@@ -2546,13 +2547,13 @@ function Block(protoblock, blocks, overrideName) {
             }
         });
 
-        this.container.on("mousedown", function(event) {
+        this.container.on("mousedown", (event) => {
             docById("contextWheelDiv").style.display = "none";
 
             // Track time for detecting long pause...
             that.blocks.mouseDownTime = new Date().getTime();
 
-            that.blocks.longPressTimeout = setTimeout(function() {
+            that.blocks.longPressTimeout = setTimeout(() => {
                 that.blocks.activeBlock = that.blocks.blockList.indexOf(that);
                 that._triggerLongPress = true;
                 that.blocks.triggerLongPress();
@@ -2583,7 +2584,7 @@ function Block(protoblock, blocks, overrideName) {
             };
         });
 
-        this.container.on("pressmove", function(event) {
+        this.container.on("pressmove", (event) => {
             // FIXME: More voodoo
             event.nativeEvent.preventDefault();
 
@@ -2596,7 +2597,7 @@ function Block(protoblock, blocks, overrideName) {
                 moved = true;
             } else {
                 // Make it eaiser to select text on mobile.
-                setTimeout(function() {
+                setTimeout(() => {
                     moved =
                         Math.abs(event.stageX / that.blocks.getStageScale() -
                                  that.original.x) +
@@ -2671,7 +2672,7 @@ function Block(protoblock, blocks, overrideName) {
             that.blocks.refreshCanvas();
         });
 
-        this.container.on("mouseout", function(event) {
+        this.container.on("mouseout", (event) => {
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false);
             } else {
@@ -2686,7 +2687,7 @@ function Block(protoblock, blocks, overrideName) {
             moved = false;
         });
 
-        this.container.on("pressup", function(event) {
+        this.container.on("pressup", (event) => {
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false);
             } else {
@@ -3504,7 +3505,7 @@ function Block(protoblock, blocks, overrideName) {
 
             this.label.addEventListener("keypress", __keypress);
 
-            this.label.addEventListener("change", function() {
+            this.label.addEventListener("change", () => {
                 that._labelChanged(false, true);
             });
 
@@ -3526,7 +3527,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             // Firefox fix
-            setTimeout(function() {
+            setTimeout(() => {
                 that.label.style.display = "";
                 that.label.focus();
                 focused = true;
@@ -4045,7 +4046,7 @@ function $() {
 
 window.hasMouse = false;
 // Mousemove is not emulated for touch
-document.addEventListener("mousemove", function(e) {
+document.addEventListener("mousemove", (e) => {
     window.hasMouse = true;
 });
 
