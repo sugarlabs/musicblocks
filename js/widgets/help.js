@@ -34,9 +34,9 @@ function HelpWidget() {
         this._helpDiv = document.createElement("div");
 
         // Give the DOM time to create the div.
-        let that = this;
-        setTimeout(function() {
-            that._setup(blocks);
+        
+        setTimeout(() => {
+            this._setup(blocks);
         }, 100);
     };
 
@@ -227,7 +227,7 @@ function HelpWidget() {
                                     ].makeBlockFromSearch(
                                         protoblk,
                                         protoName,
-                                        function(newBlock) {
+                                        (newBlock) =>{
                                             blocks.moveBlock(
                                                 newBlock,
                                                 100,
@@ -508,7 +508,7 @@ function HelpWidget() {
                                 ].makeBlockFromSearch(
                                     protoblk,
                                     protoName,
-                                    function(newBlock) {
+                                    (newBlock) => {
                                         blocks.moveBlock(
                                             newBlock,
                                             100,
