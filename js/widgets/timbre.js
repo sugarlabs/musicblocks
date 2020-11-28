@@ -774,7 +774,6 @@ function TimbreWidget() {
         widgetWindow.getWidgetBody().append(timbreTableDiv);
         widgetWindow.getWidgetBody().style.height = "500px";
         widgetWindow.getWidgetBody().style.width = "600px";
-        widgetWindow.getWidgetBody().style.overflowY = "auto";
 
         _unhighlightButtons = function () {
             addFilterButtonCell.style.backgroundColor = "#808080";
@@ -1665,7 +1664,7 @@ function TimbreWidget() {
         envAppend.style.overflow = "auto";
         env.append(envAppend);
 
-        var myDiv = docById("selOsc");
+        const myDiv = docById("selOsc");
         var selectOpt = '<select id="selOsc1">';
 
         for (let i = 0; i < OSCTYPES.length; i++) {
@@ -1890,7 +1889,7 @@ function TimbreWidget() {
         console.debug("adding filter " + f);
 
         let blockValue = f;
-        var wrapperIDs = [f * 3, f * 3 + 1, f * 3 + 2];
+        const wrapperIDs = [f * 3, f * 3 + 1, f * 3 + 2];
         let radioIDs = [f * 4, f * 4 + 1, f * 4 + 2, f * 4 + 3];
 
         if (f % 2 === 1) {
@@ -1901,8 +1900,8 @@ function TimbreWidget() {
             var htmlElements = "<div>";
         }
 
-        var selectorID = "selector" + f;
-        var selID = "sel" + f;
+        const selectorID = "selector" + f;
+        const selID = "sel" + f;
 
         htmlElements +=
             '<div class="wrapper" id="wrapper' +
