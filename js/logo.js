@@ -1269,7 +1269,7 @@ class Logo {
         }
 
         // Execute turtle code here
-        /***
+        /**
         ===========================================================================
         (1) Find the start block (or the top of each stack) and build a list
             of all of the named action stacks.
@@ -1337,7 +1337,7 @@ class Logo {
             this.turtles.turtleList[turtle].running = false;
         }
 
-        /***
+        /**
         ===========================================================================
         (2) Execute the stack. (A bit complicated due to lots of corner cases)
         ===========================================================================
@@ -1499,7 +1499,7 @@ class Logo {
         // Sometimes we don't want to unwind the entire queue
         if (queueStart === undefined) queueStart = 0;
 
-        /***
+        /**
         ===========================================================================
         (1) Evaluate any arguments (beginning with connection[1])
         ===========================================================================
@@ -1531,7 +1531,7 @@ class Logo {
             }
         }
 
-        /***
+        /**
         ===========================================================================
         (2) Run function associated with the block
         ===========================================================================
@@ -1632,7 +1632,7 @@ class Logo {
             logo.stopTurtle = true;
         }
 
-        /***
+        /**
         ===========================================================================
         (3) Queue block below the current block
         ===========================================================================
