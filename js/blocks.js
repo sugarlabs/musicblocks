@@ -1083,7 +1083,7 @@ function Blocks(activity) {
                         for (let b = 0; b < blockPalette.protoList.length; b++) {
                             let protoblock = blockPalette.protoList[b];
                             if (protoblock.name === "nameddo" && protoblock.defaults[0] === that.blockList[oldBlock].value) {
-                                setTimeout(function() {
+                                setTimeout(() => {
                                     blockPalette.remove(
                                         protoblock,
                                         that.blockList[oldBlock].value
@@ -5885,7 +5885,7 @@ function Blocks(activity) {
             blocksToCheck.push([bb, this._getNestingDepth(bb), '2arg']);
         }
 
-        blocksToCheck = blocksToCheck.sort(function(a, b) {
+        blocksToCheck = blocksToCheck.sort((a, b) => {
             return a[1] - b[1];
         });
 
