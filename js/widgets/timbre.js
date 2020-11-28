@@ -1591,7 +1591,7 @@ function TimbreWidget() {
                                     "synthButtonCell"
                                 ).style.backgroundColor = "#C8C8C8";
                                 let elem = event.target;
-                                var m = elem.id.slice(-1);
+                                let m = elem.id.slice(-1);
                                 docById("myRangeS" + m).value = parseFloat(
                                     elem.value
                                 );
@@ -1834,7 +1834,7 @@ function TimbreWidget() {
                     docById("envelopeButtonCell").style.backgroundColor =
                         "#C8C8C8";
                     let elem = event.target;
-                    var m = elem.id.slice(-1);
+                    let m = elem.id.slice(-1);
                     docById("myRange" + m).value = parseFloat(elem.value);
                     docById("myspan" + m).textContent = elem.value;
                     that.synthVals["envelope"][that.adsrMap[m]] =
@@ -2022,7 +2022,7 @@ function TimbreWidget() {
             docById("sel" + f).addEventListener("change", function (event) {
                 docById("filterButtonCell").style.backgroundColor = "#C8C8C0";
                 let elem = event.target;
-                var m = elem.id.slice(-1);
+                let m = elem.id.slice(-1);
                 instrumentsFilters[0][that.instrumentName][m]["filterType"] =
                     elem.value;
                 that._update(m, elem.value, 0);
@@ -2042,7 +2042,7 @@ function TimbreWidget() {
 
                 radioButton.onclick = function (event) {
                     let elem = event.target;
-                    var m = Number(elem.id.replace("radio", ""));
+                    let m = Number(elem.id.replace("radio", ""));
                     instrumentsFilters[0][that.instrumentName][
                         Math.floor(m / 4)
                     ]["filterRolloff"] = parseFloat(this.value);
@@ -2054,7 +2054,7 @@ function TimbreWidget() {
             docById("myRangeF" + f).addEventListener("change", function (event) {
                 docById("filterButtonCell").style.backgroundColor = "#C8C0C8";
                 let elem = event.target;
-                var m = elem.id.slice(-1);
+                let m = elem.id.slice(-1);
                 docById("myRangeF" + m).value = parseFloat(elem.value);
                 docById("myspanF" + m).textContent = elem.value;
                 instrumentsFilters[0][that.instrumentName][m][
@@ -2074,7 +2074,7 @@ function TimbreWidget() {
             docById("sel" + f).value =
                 instrumentsFilters[0][this.instrumentName][f]["filterType"];
 
-            var rolloff =
+            let rolloff =
                 instrumentsFilters[0][this.instrumentName][f]["filterRolloff"];
             if (rolloff === -12) {
                 docById("radio" + radioIDs[0]).checked = true;
@@ -2117,7 +2117,7 @@ function TimbreWidget() {
         this._logo.blocks.loadNewBlocks(FILTEROBJ);
 
         let n = this._logo.blocks.blockList.length - 4;
-        var selectedFilters = instrumentsFilters[0][
+        let selectedFilters = instrumentsFilters[0][
             this.instrumentName
         ].slice();
         var filterType = FILTERTYPES.slice().filter(function (filter) {
@@ -2277,7 +2277,7 @@ function TimbreWidget() {
                                     "effectsButtonCell"
                                 ).style.backgroundColor = "#C8C8C8";
                                 let elem = event.target;
-                                var m = elem.id.slice(-1);
+                                let m = elem.id.slice(-1);
                                 docById("myRangeFx" + m).value = parseFloat(
                                     elem.value
                                 );
@@ -2517,7 +2517,7 @@ function TimbreWidget() {
                                     "effectsButtonCell"
                                 ).style.backgroundColor = "#C8C8C8";
                                 let elem = event.target;
-                                var m = elem.id.slice(-1);
+                                let m = elem.id.slice(-1);
                                 docById("myRangeFx" + m).value = parseFloat(
                                     elem.value
                                 );
@@ -2624,7 +2624,7 @@ function TimbreWidget() {
                                     "effectsButtonCell"
                                 ).style.backgroundColor = "#C8C8C8";
                                 let elem = event.target;
-                                var m = elem.id.slice(-1);
+                                let m = elem.id.slice(-1);
                                 docById("myRangeFx" + m).value = parseFloat(
                                     elem.value
                                 );
@@ -2708,7 +2708,7 @@ function TimbreWidget() {
                             docById("effectsButtonCell").style.backgroundColor =
                                 "#C8C8C8";
                             let elem = event.target;
-                            var m = elem.id.slice(-1);
+                            let m = elem.id.slice(-1);
                             docById("myRangeFx0").value = parseFloat(
                                 elem.value
                             );
