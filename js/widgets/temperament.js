@@ -15,8 +15,8 @@ function TemperamentWidget() {
     const INNERWINDOWWIDTH = 600;
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
-    var temperamentTableDiv = document.createElement("div");
-    var temperamentCell = null;
+    let temperamentTableDiv = document.createElement("div");
+    let temperamentCell = null;
     this.inTemperament = null;
     this.lastTriggered = null;
     this.notes = [];
@@ -120,7 +120,7 @@ function TemperamentWidget() {
             }
 
             var labels = [];
-            for (var j = 0; j < pitchNumber; j++) {
+            for (let j = 0; j < pitchNumber; j++) {
                 var label = j.toString();
                 labels.push(label);
             }
@@ -140,7 +140,7 @@ function TemperamentWidget() {
             var baseAngle = [];
             var sliceAngle = [];
             var angleDiff = [];
-            for (var i = 0; i < this.notesCircle.navItemCount; i++) {
+            for (let i = 0; i < this.notesCircle.navItemCount; i++) {
                 this.notesCircle.navItems[i].fillAttr = "#c8C8C8";
                 this.notesCircle.navItems[i].titleAttr.font =
                     "20 20px Impact, Charcoal, sans-serif";
@@ -167,8 +167,8 @@ function TemperamentWidget() {
                 this.notesCircle.navItems[i].sliceAngle = sliceAngle[i];
             }
 
-            var menuRadius = (2 * Math.PI * radius) / pitchNumber / 3;
-            for (var i = 0; i < angleDiff.length; i++) {
+            let menuRadius = (2 * Math.PI * radius) / pitchNumber / 3;
+            for (let i = 0; i < angleDiff.length; i++) {
                 if (angleDiff[i] < 11) {
                     menuRadius = (2 * Math.PI * radius) / pitchNumber / 6;
                 }
@@ -254,7 +254,7 @@ function TemperamentWidget() {
                 var frequency = that.frequencies[0];
                 that.frequencies = [];
 
-                for (var i = 0; i < that.ratios.length; i++) {
+                for (let i = 0; i < that.ratios.length; i++) {
                     powers[i] =
                         12 *
                         (Math.log10(that.ratios[i]) /
@@ -277,7 +277,7 @@ function TemperamentWidget() {
     };
 
     this.showNoteInfo = function(event, angle) {
-        for (var i = 0; i < this.notesCircle.navItemCount; i++) {
+        for (let i = 0; i < this.notesCircle.navItemCount; i++) {
             if (
                 event.target.id == "wheelnav-wheelDiv2-slice-" + i ||
                 (event.target.innerHTML == i && event.target.innerHTML !== "")
@@ -309,7 +309,7 @@ function TemperamentWidget() {
                 docById("noteInfo").innerHTML +=
                     '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px align="right"><br>';
                 var noteDefined = false;
-                for (var j = 0; j < this.ratiosNotesPair.length; j++) {
+                for (let j = 0; j < this.ratiosNotesPair.length; j++) {
                     if (this.ratios[i] == this.ratiosNotesPair[j][0]) {
                         noteDefined = true;
                         docById("noteInfo").innerHTML +=
@@ -324,7 +324,7 @@ function TemperamentWidget() {
                         1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
                     var centsDiff = [];
                     var centsDiff1 = [];
-                    for (var j = 0; j < this.cents.length; j++) {
+                    for (let j = 0; j < this.cents.length; j++) {
                         centsDiff[j] = cents - this.cents[j];
                         centsDiff1[j] = Math.abs(cents - this.cents[j]);
                     }
@@ -417,7 +417,7 @@ function TemperamentWidget() {
             that.createMainWheel();
             var frequency1 = that.frequencies[0];
             that.frequencies = [];
-            for (var j = 0; j < that.ratios.length; j++) {
+            for (let j = 0; j < that.ratios.length; j++) {
                 that.frequencies[j] = that.ratios[j] * frequency1;
                 that.frequencies[j] = that.frequencies[j].toFixed(2);
             }
@@ -462,14 +462,14 @@ function TemperamentWidget() {
             '<thead id="tablehead"><tr id="menu"></tr></thead><tbody id="tablebody"></tbody>';
         var menus = "";
 
-        for (var i = 0; i < menuLabels.length; i++) {
+        for (let i = 0; i < menuLabels.length; i++) {
             menus += '<th id="menuLabels">' + menuLabels[i] + "</th>";
         }
 
         docById("menu").innerHTML = menus;
 
         var menuItems = document.querySelectorAll("#menuLabels");
-        for (var i = 0; i < menuLabels.length; i++) {
+        for (let i = 0; i < menuLabels.length; i++) {
             menuItems[i].style.background = platformColor.labelColor;
             menuItems[i].style.height = 30 + "px";
             menuItems[i].style.textAlign = "center";
@@ -490,7 +490,7 @@ function TemperamentWidget() {
             }
         }
         var pitchNumberColumn = "";
-        for (var i = 0; i <= this.pitchNumber; i++) {
+        for (let i = 0; i <= this.pitchNumber; i++) {
             pitchNumberColumn += '<tr id="notes_' + i + '"></tr>';
         }
 
@@ -505,7 +505,7 @@ function TemperamentWidget() {
         var noteToPlay = [];
         var ratios = [];
 
-        for (var i = 0; i <= this.pitchNumber; i++) {
+        for (let i = 0; i <= this.pitchNumber; i++) {
             notesRow[i] = docById("notes_" + i);
 
             notesCell[(i, 0)] = notesRow[i].insertCell(-1);
@@ -577,7 +577,7 @@ function TemperamentWidget() {
 
                 //Mode
                 notesCell[(i, 5)] = notesRow[i].insertCell(-1);
-                for (var j = 0; j < this.scaleNotes.length; j++) {
+                for (let j = 0; j < this.scaleNotes.length; j++) {
                     if (this.notes[i][0] == this.scaleNotes[j]) {
                         notesCell[(i, 5)].innerHTML = j;
                         break;
@@ -628,7 +628,7 @@ function TemperamentWidget() {
         var editMenus = ["Equal", "Ratios", "Arbitrary", "Octave Space"];
         var menus = "";
 
-        for (var i = 0; i < editMenus.length; i++) {
+        for (let i = 0; i < editMenus.length; i++) {
             menus += '<td id="editMenus">' + editMenus[i] + "</td>";
         }
 
@@ -636,7 +636,7 @@ function TemperamentWidget() {
         docById("editOctave").innerHTML +=
             '<tr><td colspan="4" id="userEdit"></td></tr>';
         var menuItems = document.querySelectorAll("#editMenus");
-        for (var i = 0; i < editMenus.length; i++) {
+        for (let i = 0; i < editMenus.length; i++) {
             menuItems[i].style.background = platformColor.selectorBackground;
             menuItems[i].style.height = 30 + "px";
             menuItems[i].style.textAlign = "center";
@@ -752,11 +752,11 @@ function TemperamentWidget() {
             divisions = Number(docById("divisions").value);
             this.tempRatios = this.ratios.slice();
             if (pitchNumber1 === pitchNumber2) {
-                for (var i = 0; i < divisions; i++) {
+                for (let i = 0; i < divisions; i++) {
                     ratio[i] = Math.pow(this.powerBase, i / divisions);
                     ratio1[i] = ratio[i].toFixed(2);
                 }
-                for (var i = 0; i < this.tempRatios.length; i++) {
+                for (let i = 0; i < this.tempRatios.length; i++) {
                     ratio2[i] = this.tempRatios[i];
                     ratio2[i] = ratio2[i].toFixed(2);
                 }
@@ -764,7 +764,7 @@ function TemperamentWidget() {
                     return ratio2.indexOf(val) == -1;
                 });
 
-                for (var i = 0; i < ratio4.length; i++) {
+                for (let i = 0; i < ratio4.length; i++) {
                     index[i] = ratio1.indexOf(ratio4[i]);
                     ratio3[i] = ratio[index[i]];
                 }
@@ -796,7 +796,7 @@ function TemperamentWidget() {
                     pitchNumber1 + 1,
                     Math.abs(pitchNumber1 - pitchNumber2) - 1
                 );
-                for (var i = 0; i < divisions - 1; i++) {
+                for (let i = 0; i < divisions - 1; i++) {
                     var power =
                         (Math.min(angle1, angle2) +
                             divisionAngle * (i + 1) -
@@ -815,7 +815,7 @@ function TemperamentWidget() {
                 this.ratios = this.tempRatios.slice();
                 var frequency = this.frequencies[0];
                 this.frequencies = [];
-                for (var i = 0; i <= pitchNumber; i++) {
+                for (let i = 0; i <= pitchNumber; i++) {
                     this.frequencies[i] = this.ratios[i] * frequency;
                     this.frequencies[i] = this.frequencies[i].toFixed(2);
                 }
@@ -828,7 +828,7 @@ function TemperamentWidget() {
                 docById("userEdit").innerHTML =
                     '<div id="wheelDiv2" class="wheelNav"></div>';
                 this.createMainWheel(this.tempRatios, pitchNumber);
-                for (var i = 0; i < pitchNumber; i++) {
+                for (let i = 0; i < pitchNumber; i++) {
                     this.notesCircle.navItems[i].fillAttr = "#e0e0e0";
                     this.notesCircle.navItems[i].sliceHoverAttr.fill =
                         "#e0e0e0";
@@ -846,7 +846,7 @@ function TemperamentWidget() {
                 ratios = this.tempRatios.slice();
                 var frequency = this.frequencies[0];
                 this.eqTempHzs = [];
-                for (var i = 0; i <= pitchNumber; i++) {
+                for (let i = 0; i <= pitchNumber; i++) {
                     this.eqTempHzs[i] = ratios[i] * frequency;
                     this.eqTempHzs[i] = this.eqTempHzs[i].toFixed(2);
                 }
@@ -858,7 +858,7 @@ function TemperamentWidget() {
                     that.ratios = that.tempRatios.slice();
                     var frequency = that.frequencies[0];
                     that.frequencies = [];
-                    for (var i = 0; i <= pitchNumber; i++) {
+                    for (let i = 0; i <= pitchNumber; i++) {
                         that.frequencies[i] = that.ratios[i] * frequency;
                         that.frequencies[i] = that.frequencies[i].toFixed(2);
                     }
@@ -942,7 +942,7 @@ function TemperamentWidget() {
 
             calculateRatios = function(i) {
                 if (frequency[i] < that.frequencies[len - 1]) {
-                    for (var j = 0; j < that.tempRatios.length; j++) {
+                    for (let j = 0; j < that.tempRatios.length; j++) {
                         ratioDifference[j] = ratio[i] - that.tempRatios[j];
                         if (ratioDifference[j] < 0) {
                             index.push(j);
@@ -962,7 +962,7 @@ function TemperamentWidget() {
                 }
             };
 
-            for (var i = 0; i < recursion; i++) {
+            for (let i = 0; i < recursion; i++) {
                 ratio[i] = Math.pow(ratio1, i + 1);
                 frequency[i] = that.frequencies[0] * ratio[i];
                 calculateRatios(i);
@@ -978,12 +978,12 @@ function TemperamentWidget() {
                 that.pitchNumber = that.ratios.length - 1;
                 var frequency1 = that.frequencies[0];
                 that.frequencies = [];
-                for (var i = 0; i <= that.pitchNumber; i++) {
+                for (let i = 0; i <= that.pitchNumber; i++) {
                     that.frequencies[i] = that.ratios[i] * frequency1;
                     that.frequencies[i] = that.frequencies[i].toFixed(2);
                 }
 
-                for (var i = 0; i < that.ratios.length; i++) {
+                for (let i = 0; i < that.ratios.length; i++) {
                     compareRatios[i] = that.ratios[i];
                     compareRatios[i] = compareRatios[i].toFixed(2);
                 }
@@ -995,7 +995,7 @@ function TemperamentWidget() {
                 docById("userEdit").innerHTML =
                     '<div id="wheelDiv2" class="wheelNav"></div>';
                 that.createMainWheel(that.tempRatios, pitchNumber);
-                for (var i = 0; i < pitchNumber; i++) {
+                for (let i = 0; i < pitchNumber; i++) {
                     that.notesCircle.navItems[i].fillAttr = "#e0e0e0";
                     that.notesCircle.navItems[i].sliceHoverAttr.fill =
                         "#e0e0e0";
@@ -1015,12 +1015,12 @@ function TemperamentWidget() {
                 that.NEqTempPitchNumber = ratios.length - 1;
                 var frequency1 = that.frequencies[0];
                 that.NEqTempHzs = [];
-                for (var i = 0; i <= that.NEqTempPitchNumber; i++) {
+                for (let i = 0; i <= that.NEqTempPitchNumber; i++) {
                     that.NEqTempHzs[i] = ratios[i] * frequency1;
                     that.NEqTempHzs[i] = that.NEqTempHzs[i].toFixed(2);
                 }
 
-                for (var i = 0; i < ratios.length; i++) {
+                for (let i = 0; i < ratios.length; i++) {
                     compareRatios[i] = ratios[i];
                     compareRatios[i] = compareRatios[i].toFixed(2);
                 }
@@ -1032,12 +1032,12 @@ function TemperamentWidget() {
                     that.pitchNumber = that.ratios.length - 1;
                     var frequency1 = that.frequencies[0];
                     that.frequencies = [];
-                    for (var i = 0; i <= that.pitchNumber; i++) {
+                    for (let i = 0; i <= that.pitchNumber; i++) {
                         that.frequencies[i] = that.ratios[i] * frequency1;
                         that.frequencies[i] = that.frequencies[i].toFixed(2);
                     }
 
-                    for (var i = 0; i < that.ratios.length; i++) {
+                    for (let i = 0; i < that.ratios.length; i++) {
                         compareRatios[i] = that.ratios[i];
                         compareRatios[i] = compareRatios[i].toFixed(2);
                     }
@@ -1082,7 +1082,7 @@ function TemperamentWidget() {
                 pitchNumber = this.pitchNumber;
             }
             var labels = [];
-            for (var j = 0; j < pitchNumber; j++) {
+            for (let j = 0; j < pitchNumber; j++) {
                 var label = j.toString();
                 labels.push(label);
             }
@@ -1106,7 +1106,7 @@ function TemperamentWidget() {
             var sliceAngle = [];
             var angle = [];
             var angleDiff = [];
-            for (var i = 0; i < this.wheel1.navItemCount; i++) {
+            for (let i = 0; i < this.wheel1.navItemCount; i++) {
                 this.wheel1.navItems[i].fillAttr = "#e0e0e0";
                 this.wheel1.navItems[i].titleAttr.font =
                     "20 20px Impact, Charcoal, sans-serif";
@@ -1132,7 +1132,7 @@ function TemperamentWidget() {
                 this.wheel1.navItems[i].sliceAngle = sliceAngle[i];
             }
             var menuRadius = (2 * Math.PI * radius) / pitchNumber / 3;
-            for (var i = 0; i < angleDiff.length; i++) {
+            for (let i = 0; i < angleDiff.length; i++) {
                 if (angleDiff[i] < 11) {
                     menuRadius = (2 * Math.PI * radius) / this.pitchNumber / 6;
                 }
@@ -1226,7 +1226,7 @@ function TemperamentWidget() {
             }
             this.wheel.navAngle = 270 + angleDiff1[0] / 2;
             this.wheel.initWheel(minutes);
-            for (var i = 0; i < pitchNumber; i++) {
+            for (let i = 0; i < pitchNumber; i++) {
                 if (i === 0) {
                     sliceAngle1[i] = 360 / pitchNumber;
                     baseAngle1[i] = this.wheel.navAngle - sliceAngle1[0] / 2;
@@ -1272,12 +1272,12 @@ function TemperamentWidget() {
             var compareRatios = [];
             var frequency1 = that.frequencies[0];
             that.frequencies = [];
-            for (var i = 0; i < that.ratios.length; i++) {
+            for (let i = 0; i < that.ratios.length; i++) {
                 that.frequencies[i] = that.ratios[i] * frequency1;
                 that.frequencies[i] = that.frequencies[i].toFixed(2);
             }
 
-            for (var i = 0; i < that.ratios.length; i++) {
+            for (let i = 0; i < that.ratios.length; i++) {
                 compareRatios[i] = that.ratios[i];
                 compareRatios[i] = compareRatios[i].toFixed(2);
             }
@@ -1290,11 +1290,11 @@ function TemperamentWidget() {
     this.arbitraryEditSlider = function(event, angle, ratios, pitchNumber) {
         var frequency = this.frequencies[0];
         var frequencies = [];
-        for (var j = 0; j <= pitchNumber; j++) {
+        for (let j = 0; j <= pitchNumber; j++) {
             frequencies[j] = ratios[j] * frequency;
             frequencies[j] = frequencies[j].toFixed(2);
         }
-        for (var i = 0; i < pitchNumber; i++) {
+        for (let i = 0; i < pitchNumber; i++) {
             if (event.target.parentNode.id == "wheelnav-wheelDiv3-title-" + i) {
                 var x =
                     event.clientX -
@@ -1352,7 +1352,7 @@ function TemperamentWidget() {
         var ratioDifference = [];
         this.tempRatios = this.tempRatios1.slice();
 
-        for (var j = 0; j < this.tempRatios.length; j++) {
+        for (let j = 0; j < this.tempRatios.length; j++) {
             ratioDifference[j] = ratio - this.tempRatios[j];
             ratioDifference[j] = ratioDifference[j].toFixed(2);
             if (ratioDifference[j] < 0) {
@@ -1420,7 +1420,7 @@ function TemperamentWidget() {
             var frequency = that.frequencies[0];
             that.frequencies = [];
 
-            for (var i = 0; i < len; i++) {
+            for (let i = 0; i < len; i++) {
                 powers[i] =
                     12 *
                     (Math.log10(that.ratios[i]) / Math.log10(that.powerBase));
@@ -1443,11 +1443,11 @@ function TemperamentWidget() {
         var intervals = [];
         var selectedTemperament;
 
-        for (var temperament in TEMPERAMENT) {
+        for (let temperament in TEMPERAMENT) {
             if (!isCustom(temperament)) {
                 var t = TEMPERAMENT[temperament];
                 var temperamentRatios = [];
-                for (var j = 0; j < t.interval.length; j++) {
+                for (let j = 0; j < t.interval.length; j++) {
                     intervals[j] = t.interval[j];
                     temperamentRatios[j] = t[intervals[j]];
                     temperamentRatios[j] = temperamentRatios[j].toFixed(2);
@@ -1479,8 +1479,8 @@ function TemperamentWidget() {
         this.notes = [];
 
         if (isCustom(this.inTemperament)) {
-            for (var i = 0; i < this.ratios.length; i++) {
-                for (var j = 0; j < this.ratiosNotesPair.length; j++) {
+            for (let i = 0; i < this.ratios.length; i++) {
+                for (let j = 0; j < this.ratiosNotesPair.length; j++) {
                     notesMatch = false;
                     if (this.ratios[i] == this.ratiosNotesPair[j][0]) {
                         notesMatch = true;
@@ -1496,7 +1496,7 @@ function TemperamentWidget() {
                         1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
                     var centsDiff = [];
                     var centsDiff1 = [];
-                    for (var j = 0; j < this.cents.length; j++) {
+                    for (let j = 0; j < this.cents.length; j++) {
                         centsDiff[j] = cents - this.cents[j];
                         centsDiff1[j] = Math.abs(cents - this.cents[j]);
                     }
@@ -1552,9 +1552,9 @@ function TemperamentWidget() {
             ],
             [9, "vspace", 0, 0, [5, 10]]
         ];
-        var previousBlock = 9;
+        let previousBlock = 9;
 
-        for (var i = 0; i < this.pitchNumber; i++) {
+        for (let i = 0; i < this.pitchNumber; i++) {
             var idx = newStack.length;
             if (
                 this.inTemperament === "equal" ||
@@ -1797,8 +1797,8 @@ function TemperamentWidget() {
             TEMPERAMENT[this.inTemperament] = [];
             TEMPERAMENT[this.inTemperament]["pitchNumber"] = this.pitchNumber;
             updateTEMPERAMENTS();
-            for (var i = 0; i < this.pitchNumber; i++) {
-                var number = "" + i;
+            for (let i = 0; i < this.pitchNumber; i++) {
+                let number = "" + i;
                 TEMPERAMENT[this.inTemperament][number] = [
                     this.ratios[i],
                     this.notes[i].substring(0, this.notes[i].length - 1),
@@ -1816,7 +1816,7 @@ function TemperamentWidget() {
 
     this.playNote = function(pitchNumber) {
         this._logo.resetSynth(0);
-        var duration = 1 / 2;
+        let duration = 1 / 2;
 
         if (docById("wheelDiv4") == null) {
             var notes = this.frequencies[pitchNumber];
@@ -1869,7 +1869,7 @@ function TemperamentWidget() {
                 '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
         }
 
-        var duration = 1 / 2;
+        let duration = 1 / 2;
         var startingPitch = this._logo.synth.startingPitch;
         var startingPitchOcatve = Number(startingPitch.slice(-1));
         var octave = startingPitchOcatve - 1;
@@ -1880,7 +1880,7 @@ function TemperamentWidget() {
             "C Major"
         );
         var that = this;
-        var pitchNumber = this.pitchNumber;
+        let pitchNumber = this.pitchNumber;
         if (this.editMode == "equal" && this.eqTempPitchNumber) pitchNumber = this.eqTempPitchNumber ;
         else if  (this.editMode == "ratio" && this.NEqTempPitchNumber) pitchNumber = this.NEqTempPitchNumber ;
         if (docById("wheelDiv4") !== null) {
@@ -2181,13 +2181,13 @@ function TemperamentWidget() {
         this.ratios = [];
         this.ratiosNotesPair = [];
 
-        for (var i = 0; i <= this.pitchNumber; i++) {
+        for (let i = 0; i <= this.pitchNumber; i++) {
             if (
                 isCustom(this.inTemperament) &&
                 TEMPERAMENT[this.inTemperament]["0"][1] !== undefined
             ) {
                 //If temperament selected is custom and it is defined by user.
-                var pitchNumber = i + "";
+                let pitchNumber = i + "";
                 if (i === this.pitchNumber) {
                     this.notes[i] = [
                         TEMPERAMENT[this.inTemperament]["0"][1],
