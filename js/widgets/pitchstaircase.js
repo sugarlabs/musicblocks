@@ -169,7 +169,7 @@ function PitchStaircase() {
     };
 
     this._dissectStair = function(event) {
-        var that = this;
+        
         var inputNum1 = this._musicRatio1.value;
 
         if (isNaN(inputNum1)) {
@@ -271,7 +271,7 @@ function PitchStaircase() {
         var frequency = Number(stepCell.getAttribute("id"));
         this._logo.synth.trigger(0, frequency, 1, DEFAULTVOICE, null, null);
 
-        setTimeout(function() {
+        setTimeout(() => {
             stepCell.style.backgroundColor = platformColor.selectorBackground;
         }, 1000);
     };
@@ -295,7 +295,7 @@ function PitchStaircase() {
             );
         }
 
-        setTimeout(function() {
+        setTimeout(() => {
             for (var i = 0; i < that.Stairs.length; i++) {
                 var stepCell = that._stepTables[i].rows[0].cells[1];
                 stepCell.style.backgroundColor =
@@ -305,7 +305,7 @@ function PitchStaircase() {
     };
 
     this.playUpAndDown = function() {
-        var that = this;
+        
         var pitchnotes = [];
         var note =
             this.Stairs[this.Stairs.length - 1][0] +
@@ -319,11 +319,11 @@ function PitchStaircase() {
     };
 
     this._playNext = function(index, next) {
-        var that = this;
+        
         if (index === this.Stairs.length) {
-            setTimeout(function() {
-                for (var i = 0; i < that.Stairs.length; i++) {
-                    var stepCell = that._stepTables[i].rows[0].cells[1];
+            setTimeout(() => {
+                for (var i = 0; i < this.Stairs.length; i++) {
+                    var stepCell = this._stepTables[i].rows[0].cells[1];
                     stepCell.style.backgroundColor =
                         platformColor.selectorBackground;
                 }
@@ -332,16 +332,16 @@ function PitchStaircase() {
         }
 
         if (index === -1) {
-            setTimeout(function() {
-                for (var i = 0; i < that.Stairs.length; i++) {
-                    var stepCell = that._stepTables[i].rows[0].cells[1];
+            setTimeout(() => {
+                for (var i = 0; i < this.Stairs.length; i++) {
+                    var stepCell = this._stepTables[i].rows[0].cells[1];
                     stepCell.style.backgroundColor =
                         platformColor.selectorBackground;
                 }
             }, 1000);
 
-            setTimeout(function() {
-                that._playNext(0, 1);
+            setTimeout(() => {
+                this._playNext(0, 1);
             }, 200);
 
             return;
@@ -353,16 +353,16 @@ function PitchStaircase() {
         var previousRowNumber = index - next;
         var pscTableCell = this._stepTables[previousRowNumber];
 
-        setTimeout(function() {
+        setTimeout(() => {
             if (pscTableCell != null) {
                 var stepCell = pscTableCell.rows[0].cells[1];
                 stepCell.style.backgroundColor =
                     platformColor.selectorBackground;
             }
 
-            var stepCell = that._stepTables[index].rows[0].cells[1];
+            var stepCell = this._stepTables[index].rows[0].cells[1];
             stepCell.style.backgroundColor = platformColor.selectorBackground;
-            that._logo.synth.trigger(
+            this._logo.synth.trigger(
                 0,
                 pitchnotes,
                 1,
@@ -370,8 +370,8 @@ function PitchStaircase() {
                 null,
                 null
             );
-            if (index < that.Stairs.length || index > -1) {
-                that._playNext(index + next, next);
+            if (index < this.Stairs.length || index > -1) {
+                this._playNext(index + next, next);
             }
         }, 1000);
     };
