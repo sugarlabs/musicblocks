@@ -72,7 +72,7 @@ function MusicKeyboard() {
         }
 
         // We want to sort the list by startTime.
-        this._notesPlayed.sort(function(a, b) {
+        this._notesPlayed.sort((a, b) => {
             return a.startTime - b.startTime;
         });
 
@@ -646,21 +646,21 @@ function MusicKeyboard() {
     };
 
     this.playOne = function(counter, time, playButtonCell) {
-        var that = this;
-        setTimeout(function() {
+        
+        setTimeout(() => {
             if (counter < selectedNotes.length) {
-                if (that._stopOrCloseClicked) {
+                if (this._stopOrCloseClicked) {
                     return;
                 }
 
-                if (!that.keyboardShown) {
+                if (!this.keyboardShown) {
                     var cell = docById("cells-" + counter);
                     cell.style.backgroundColor =
                         platformColor.selectorBackground;
                 }
 
                 if (
-                    that.keyboardShown &&
+                    this.keyboardShown &&
                     selectedNotes[counter - 1].objId[0] !== null
                 ) {
                     for (
@@ -685,10 +685,10 @@ function MusicKeyboard() {
                     i++
                 ) {
                     if (
-                        that.keyboardShown &&
+                        this.keyboardShown &&
                         selectedNotes[counter].objId[0] !== null
                     ) {
-                        var id = that.idContainer.findIndex(function(ele) {
+                        var id = this.idContainer.findIndex(function(ele) {
                             return ele[1] === selectedNotes[counter].objId[i];
                         });
 
@@ -706,8 +706,8 @@ function MusicKeyboard() {
                     notes.push(res);
                 }
 
-                if (that.playingNow) {
-                    that._playChord(
+                if (this.playingNow) {
+                    this._playChord(
                         notes,
                         selectedNotes[counter].duration,
                         selectedNotes[counter].voice
@@ -718,7 +718,7 @@ function MusicKeyboard() {
                     Math,
                     selectedNotes[counter].duration
                 );
-                that.playOne(counter + 1, maxWidth, playButtonCell);
+                this.playOne(counter + 1, maxWidth, playButtonCell);
             } else {
                 playButtonCell.innerHTML =
                     '&nbsp;&nbsp;<img src="header-icons/' +
@@ -732,11 +732,11 @@ function MusicKeyboard() {
                     '" width="' +
                     ICONSIZE +
                     '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-                that.playingNow = false;
-                if (!that.keyboardShown) {
-                    that._createTable();
+                this.playingNow = false;
+                if (!this.keyboardShown) {
+                    this._createTable();
                 } else {
-                    that._createKeyboard();
+                    this._createKeyboard();
                 }
             }
         }, time * 1000 + 125);
@@ -747,9 +747,9 @@ function MusicKeyboard() {
             return;
         }
 
-        var that = this;
-        setTimeout(function() {
-            that._logo.synth.trigger(
+        
+        setTimeout(()  => {
+            this._logo.synth.trigger(
                 0,
                 notes[0],
                 noteValue[0],
@@ -760,8 +760,8 @@ function MusicKeyboard() {
         }, 1);
 
         if (notes.length > 1) {
-            setTimeout(function() {
-                that._logo.synth.trigger(
+            setTimeout(() => {
+                this._logo.synth.trigger(
                     0,
                     notes[1],
                     noteValue[0],
@@ -773,8 +773,8 @@ function MusicKeyboard() {
         }
 
         if (notes.length > 2) {
-            setTimeout(function() {
-                that._logo.synth.trigger(
+            setTimeout(()  => {
+                this._logo.synth.trigger(
                     0,
                     notes[2],
                     noteValue[0],
@@ -786,8 +786,8 @@ function MusicKeyboard() {
         }
 
         if (notes.length > 3) {
-            setTimeout(function() {
-                that._logo.synth.trigger(
+            setTimeout(() => {
+                this._logo.synth.trigger(
                     0,
                     notes[3],
                     noteValue[0],
@@ -833,26 +833,26 @@ function MusicKeyboard() {
             }
         }
 
-        var sortedList = sortableList.sort(function(a, b) {
+        var sortedList = sortableList.sor((a, b) => {
             return a.frequency - b.frequency;
         });
 
         var unique = [];
         this.remove = [];
-        var that = this;
-        sortedList = sortedList.filter(function(item) {
+        
+        sortedList = sortedList.filter((item) => {
             if (unique.indexOf(item.noteName + item.noteOctave) === -1) {
                 unique.push(item.noteName + item.noteOctave);
                 return true;
             }
 
-            that.remove.push(item.blockNumber);
+            this.remove.push(item.blockNumber);
             return false;
         });
 
         function removeBlock(i) {
-            setTimeout(function() {
-                that._removePitchBlock(that.remove[i]);
+            setTimeout(() => {
+                this._removePitchBlock(this.remove[i]);
             }, 200);
         }
 
@@ -877,7 +877,7 @@ function MusicKeyboard() {
     this._setNotes = function(colIndex, playNote) {
         var start = docById("cells-" + colIndex).getAttribute("start");
 
-        this._notesPlayed = this._notesPlayed.filter(function(ele) {
+        this._notesPlayed = this._notesPlayed.filter((ele) => {
             return ele.startTime != parseInt(start);
         });
 
@@ -901,7 +901,7 @@ function MusicKeyboard() {
                 objId: null,
                 duration: parseFloat(dur)
             });
-            this._notesPlayed.sort(function(a, b) {
+            this._notesPlayed.sort((a, b) => {
                 return a.startTime - b.startTime;
             });
         }
@@ -933,7 +933,7 @@ function MusicKeyboard() {
             voice: this.layout[n - j - 1].voice
         });
 
-        this._notesPlayed.sort(function(a, b) {
+        this._notesPlayed.sort((a, b) => {
             return a.startTime - b.startTime;
         });
 
@@ -1390,7 +1390,7 @@ function MusicKeyboard() {
         start = parseInt(start);
         duration = parseInt(duration[0]) / parseInt(duration[1]);
         var newduration = parseFloat((Math.round(duration * 8) / 8).toFixed(3));
-        this._notesPlayed = this._notesPlayed.map(function(item) {
+        this._notesPlayed = this._notesPlayed.map((item) => {
             if (item.startTime === start) {
                 item.duration = newduration;
             }
@@ -1405,10 +1405,10 @@ function MusicKeyboard() {
         var cell = docById(cellId);
         var dur = cell.getAttribute("dur");
 
-        this._notesPlayed = this._notesPlayed.reduce(function(
+        this._notesPlayed = this._notesPlayed.reduce((
             prevValue,
             curValue
-        ) {
+        ) => {
             if (parseInt(curValue.startTime) === start) {
                 prevValue = prevValue.concat([curValue]);
                 var oldcurValue = JSON.parse(JSON.stringify(curValue));
@@ -1437,7 +1437,7 @@ function MusicKeyboard() {
     this._deleteNotes = function(start) {
         start = parseInt(start);
 
-        this._notesPlayed = this._notesPlayed.filter(function(ele) {
+        this._notesPlayed = this._notesPlayed.filter((ele) => {
             return parseInt(ele.startTime) !== start;
         });
 
@@ -1447,10 +1447,10 @@ function MusicKeyboard() {
     this._divideNotes = function(start, divideNoteBy) {
         start = parseInt(start);
 
-        this._notesPlayed = this._notesPlayed.reduce(function(
+        this._notesPlayed = this._notesPlayed.reduce((
             prevValue,
             curValue
-        ) {
+        ) => {
             if (parseInt(curValue.startTime) === start) {
                 if (beginnerMode === "true") {
                     if (curValue.duration / divideNoteBy < 0.125) {
@@ -1642,17 +1642,17 @@ function MusicKeyboard() {
             if (aboveBlock !== -1) {
                 console.log(rLabel + ' ' + rArg + ' ' + newBlock + ' ' +  that.layout[0].voice);
                 creatingNewNote = true;
-                setTimeout(function() {
-                    that._addNotesBlockBetween(aboveBlock, newBlock);
+                setTimeout(() => {
+                    this._addNotesBlockBetween(aboveBlock, newBlock);
                     creatingNewNote = false;
-                    that.layout.push({
+                    this.layout.push({
                         noteName: rLabel,
                         noteOctave: rArg,
                         blockNumber: newBlock,
-                        voice: that.layout[0].voice
+                        voice: this.layout[0].voice
                     });
-                    that._sortLayout();
-                    that._createTable();
+                    this._sortLayout();
+                    this._createTable();
                 }, 500);
             } else {
                 console.log('Could not find anywhere to insert new block.');
@@ -1687,14 +1687,14 @@ function MusicKeyboard() {
 
     this._sortLayout = function() {
         var that = this;
-        this.layout.sort(function(a, b) {
+        this.layout.sort((a, b) => {
             var aValue, bValue;
             if (a.noteName == "hertz") {
                 aValue = a.noteOctave;
             } else {
                 aValue = noteToFrequency(
                     a.noteName + a.noteOctave,
-                    that._logo.turtles.ithTurtle(0).singer.keySignature
+                    this._logo.turtles.ithTurtle(0).singer.keySignature
                 );
             }
             if (b.noteName == "hertz") {
@@ -1702,7 +1702,7 @@ function MusicKeyboard() {
             } else {
                 bValue = noteToFrequency(
                     b.noteName + b.noteOctave,
-                    that._logo.turtles.ithTurtle(0).singer.keySignature
+                    this._logo.turtles.ithTurtle(0).singer.keySignature
                 );
             }
 
@@ -1711,22 +1711,22 @@ function MusicKeyboard() {
 
         var unique = [];
         this.remove = [];
-        this.layout = this.layout.filter(function(item, pos) {
+        this.layout = this.layout.filter((item, pos) => {
             if (unique.indexOf(item.noteName + item.noteOctave) === -1) {
                 unique.push(item.noteName + item.noteOctave);
                 return true;
             }
 
-            that.remove = [
-                that.layout[pos - 1].blockNumber,
-                that.layout[pos].blockNumber
+            this.remove = [
+                this.layout[pos - 1].blockNumber,
+                this.layout[pos].blockNumber
             ];
             return false;
         });
 
-        this._notesPlayed.map(function(item) {
-            if (item.objId === that.remove[1]) {
-                item.objId = that.remove[0];
+        this._notesPlayed.map((item) => {
+            if (item.objId === this.remove[1]) {
+                item.objId = this.remove[0];
             }
 
             return item;
@@ -1988,7 +1988,7 @@ function MusicKeyboard() {
             cell.innerHTML =
                 that.layout[index].noteName +
                 that.layout[index].noteOctave.toString();
-            that._notesPlayed.map(function(item) {
+            that._notesPlayed.map((item) => {
                 if (item.objId == that.layout[index].blockNumber) {
                     item.noteOctave = parseInt(blockValue);
                 }
@@ -2069,7 +2069,7 @@ function MusicKeyboard() {
                     temp1.replace(SHARP, "#").replace(FLAT, "b") + octave;
             }
 
-            that._notesPlayed.map(function(item) {
+            that._notesPlayed.map((item)  => {
                 if (item.objId == that.layout[index].blockNumber) {
                     item.noteOctave = temp2;
                 }
