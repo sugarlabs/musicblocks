@@ -496,7 +496,7 @@ function PaletteModel(palette, palettes, name) {
             console.debug("Could not find block " + blkname);
         }
 
-        var label = "";
+        let label = "";
         switch (protoBlock.name) {
         case "grid":
             label = _("grid");
@@ -949,8 +949,8 @@ function Palette(palettes, name) {
     }
 
     this.getInfo = function() {
-        var returnString = this.name + " palette:";
-        for (var thisBlock in this.protoList) {
+        let returnString = this.name + " palette:";
+        for (let thisBlock in this.protoList) {
             returnString += " " + this.protoList[thisBlock].name;
         }
         return returnString;
@@ -958,24 +958,20 @@ function Palette(palettes, name) {
 
     this.remove = function(protoblock, name) {
         // Remove the protoblock and its associated artwork container.
-        var i = this.protoList.indexOf(protoblock);
+        let i = this.protoList.indexOf(protoblock);
         if (i !== -1) {
             this.protoList.splice(i, 1);
         }
 
-        for (var i = 0; i < this.model.blocks.length; i++) {
-            if (
-                ["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].indexOf(
-                    this.model.blocks[i].blkname
-                ) !== -1 &&
-                this.model.blocks[i].modname === name
-            ) {
+        for (let i = 0; i < this.model.blocks.length; i++) {
+            if (["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].indexOf(
+                    this.model.blocks[i].blkname) !== -1 &&
+                this.model.blocks[i].modname === name) {
                 this.model.blocks.splice(i, 1);
                 break;
             } else if (
                 ["storein"].indexOf(this.model.blocks[i].blkname) !== -1 &&
-                this.model.blocks[i].modname === _("store in") + " " + name
-            ) {
+                this.model.blocks[i].modname === _("store in") + " " + name) {
                 this.model.blocks.splice(i, 1);
                 break;
             }
@@ -1004,173 +1000,156 @@ function Palette(palettes, name) {
             return;
         }
 
+        let newBlk;
+        let arg;
         switch (protoblk.name) {
-            case "do":
-                blkname = "do " + protoblk.defaults[0];
-                var newBlk = protoblk.name;
-                var arg = protoblk.defaults[0];
-                break;
-            case "storein":
-                // Use the name of the box in the label
-                blkname = "store in " + protoblk.defaults[0];
-                var newBlk = protoblk.name;
-                var arg = protoblk.defaults[0];
-                break;
-            case "storein2":
-                // Use the name of the box in the label
-                console.debug(
-                    "storein2" +
-                        " " +
-                        protoblk.defaults[0] +
-                        " " +
-                        protoblk.staticLabels[0]
-                );
-                blkname = "store in2 " + protoblk.defaults[0];
-                var newBlk = protoblk.name;
-                var arg = protoblk.staticLabels[0];
-                break;
-            case "box":
-                // Use the name of the box in the label
+        case "do":
+            blkname = "do " + protoblk.defaults[0];
+            newBlk = protoblk.name;
+            arg = protoblk.defaults[0];
+            break;
+        case "storein":
+            // Use the name of the box in the label
+            blkname = "store in " + protoblk.defaults[0];
+            newBlk = protoblk.name;
+            arg = protoblk.defaults[0];
+            break;
+        case "storein2":
+            // Use the name of the box in the label
+            console.debug("storein2" + " " + protoblk.defaults[0] + " " +
+                          protoblk.staticLabels[0]);
+            blkname = "store in2 " + protoblk.defaults[0];
+            newBlk = protoblk.name;
+            arg = protoblk.staticLabels[0];
+            break;
+        case "box":
+            // Use the name of the box in the label
+            blkname = protoblk.defaults[0];
+            newBlk = protoblk.name;
+            arg = protoblk.defaults[0];
+            break;
+        case "namedbox":
+            // Use the name of the box in the label
+            if (protoblk.defaults[0] === undefined) {
+                blkname = "namedbox";
+                arg = _("box");
+            } else {
+                console.debug(protoblk.defaults[0]);
                 blkname = protoblk.defaults[0];
-                var newBlk = protoblk.name;
-                var arg = protoblk.defaults[0];
-                break;
-            case "namedbox":
-                // Use the name of the box in the label
-                if (protoblk.defaults[0] === undefined) {
-                    blkname = "namedbox";
-                    var arg = _("box");
-                } else {
-                    console.debug(protoblk.defaults[0]);
-                    blkname = protoblk.defaults[0];
-                    var arg = protoblk.defaults[0];
-                }
-                var newBlk = protoblk.name;
-                break;
-            case "namedarg":
-                // Use the name of the arg in the label
-                if (protoblk.defaults[0] === undefined) {
-                    blkname = "namedarg";
-                    var arg = "1";
-                } else {
-                    blkname = protoblk.defaults[0];
-                    var arg = protoblk.defaults[0];
-                }
-                var newBlk = protoblk.name;
-                break;
-            case "nameddo":
-                // Use the name of the action in the label
-                if (protoblk.defaults[0] === undefined) {
-                    blkname = "nameddo";
-                    var arg = _("action");
-                } else {
-                    blkname = protoblk.defaults[0];
-                    var arg = protoblk.defaults[0];
-                }
-                var newBlk = protoblk.name;
-                break;
-            case "nameddoArg":
-                // Use the name of the action in the label
-                if (protoblk.defaults[0] === undefined) {
-                    blkname = "nameddoArg";
-                    var arg = _("action");
-                } else {
-                    blkname = protoblk.defaults[0];
-                    var arg = protoblk.defaults[0];
-                }
-                var newBlk = protoblk.name;
-                break;
-            case "namedcalc":
-                // Use the name of the action in the label
-                if (protoblk.defaults[0] === undefined) {
-                    blkname = "namedcalc";
-                    var arg = _("action");
-                } else {
-                    blkname = protoblk.defaults[0];
-                    var arg = protoblk.defaults[0];
-                }
-                var newBlk = protoblk.name;
-                break;
-            case "namedcalcArg":
-                // Use the name of the action in the label
-                if (protoblk.defaults[0] === undefined) {
-                    blkname = "namedcalcArg";
-                    var arg = _("action");
-                } else {
-                    blkname = protoblk.defaults[0];
-                    var arg = protoblk.defaults[0];
-                }
-                var newBlk = protoblk.name;
-                break;
-            case "outputtools":
-                if (protoblk.defaults[0] === undefined) {
-                    blkname = "outputtools";
-                    var arg = "letter class";
-                } else {
-                    blkname = protoblk.defaults[0];
-                    var arg = protoblk.defaults[0];
-                }
-                var newBlk = protoblk.name;
-                break;
-            default:
-                if (blkname === "nameddo") {
-                    var arg = _("action");
-                } else {
-                    var arg = "__NOARG__";
-                }
+                arg = protoblk.defaults[0];
+            }
+            newBlk = protoblk.name;
+            break;
+        case "namedarg":
+            // Use the name of the arg in the label
+            if (protoblk.defaults[0] === undefined) {
+                blkname = "namedarg";
+                arg = "1";
+            } else {
+                blkname = protoblk.defaults[0];
+                arg = protoblk.defaults[0];
+            }
+            newBlk = protoblk.name;
+            break;
+        case "nameddo":
+            // Use the name of the action in the label
+            if (protoblk.defaults[0] === undefined) {
+                blkname = "nameddo";
+                arg = _("action");
+            } else {
+                blkname = protoblk.defaults[0];
+                arg = protoblk.defaults[0];
+            }
+            newBlk = protoblk.name;
+            break;
+        case "nameddoArg":
+            // Use the name of the action in the label
+            if (protoblk.defaults[0] === undefined) {
+                blkname = "nameddoArg";
+                arg = _("action");
+            } else {
+                blkname = protoblk.defaults[0];
+                arg = protoblk.defaults[0];
+            }
+            newBlk = protoblk.name;
+            break;
+        case "namedcalc":
+            // Use the name of the action in the label
+            if (protoblk.defaults[0] === undefined) {
+                blkname = "namedcalc";
+                arg = _("action");
+            } else {
+                blkname = protoblk.defaults[0];
+                arg = protoblk.defaults[0];
+            }
+            newBlk = protoblk.name;
+            break;
+        case "namedcalcArg":
+            // Use the name of the action in the label
+            if (protoblk.defaults[0] === undefined) {
+                blkname = "namedcalcArg";
+                arg = _("action");
+            } else {
+                blkname = protoblk.defaults[0];
+                arg = protoblk.defaults[0];
+            }
+            newBlk = protoblk.name;
+            break;
+        case "outputtools":
+            if (protoblk.defaults[0] === undefined) {
+                blkname = "outputtools";
+                arg = "letter class";
+            } else {
+                blkname = protoblk.defaults[0];
+                arg = protoblk.defaults[0];
+            }
+            newBlk = protoblk.name;
+            break;
+        default:
+            if (blkname === "nameddo") {
+                arg = _("action");
+            } else {
+                arg = "__NOARG__";
+            }
 
-                var newBlk = blkname;
-                break;
+            newBlk = blkname;
+            break;
         }
 
-        var lastBlock = this.palettes.blocks.blockList.length;
+        let lastBlock = this.palettes.blocks.blockList.length;
 
-        if (
-            [
-                "namedbox",
-                "nameddo",
-                "namedcalc",
-                "nameddoArg",
-                "namedcalcArg"
-            ].indexOf(protoblk.name) === -1 &&
-            blockIsMacro(blkname)
-        ) {
-            var moved = true;
-            var saveX = 100;
-            var saveY = 100;
+        if (["namedbox",
+             "nameddo",
+             "namedcalc",
+             "nameddoArg",
+             "namedcalcArg"].indexOf(protoblk.name) === -1 &&
+            blockIsMacro(blkname)) {
             this._makeBlockFromProtoblock(
                 protoblk,
-                moved,
+                true,
                 blkname,
                 null,
-                saveX,
-                saveY
+                100,
+                100
             );
             callback(lastBlock);
-        } else if (
-            [
-                "namedbox",
-                "nameddo",
-                "namedcalc",
-                "nameddoArg",
-                "namedcalcArg"
-            ].indexOf(protoblk.name) === -1 &&
-            blkname in this.palettes.pluginMacros
-        ) {
-            var moved = true;
-            var saveX = 100;
-            var saveY = 100;
+        } else if (["namedbox",
+                    "nameddo",
+                    "namedcalc",
+                    "nameddoArg",
+                    "namedcalcArg"].indexOf(protoblk.name) === -1 &&
+                   blkname in this.palettes.pluginMacros) {
             this._makeBlockFromProtoblock(
                 protoblk,
-                moved,
+                true,
                 blkname,
                 null,
-                saveX,
-                saveY
+                100,
+                100
             );
             callback(lastBlock);
         } else {
-            var newBlock = paletteBlockButtonPush(
+            let newBlock = paletteBlockButtonPush(
                 this.palettes.blocks,
                 newBlk,
                 arg
@@ -1182,11 +1161,12 @@ function Palette(palettes, name) {
     this._makeBlockFromProtoblock = function(
         protoblk, moved, blkname, event, saveX, saveY) {
         let that = this;
+        let newBlock;
 
         function __myCallback(newBlock) {
             // Move the drag group under the cursor.
             that.palettes.blocks.findDragGroup(newBlock);
-            for (var i in that.palettes.blocks.dragGroup) {
+            for (let i in that.palettes.blocks.dragGroup) {
                 that.palettes.blocks.moveBlockRelative(
                     that.palettes.blocks.dragGroup[i], saveX, saveY);
             }
@@ -1199,24 +1179,23 @@ function Palette(palettes, name) {
             moved = false;
             this.draggingProtoBlock = false;
 
-            var macroExpansion = null;
+            let macroExpansion = null;
             if (["namedbox",
                  "nameddo",
                  "namedcalc",
                  "nameddoArg",
                  "namedcalcArg"].indexOf(protoblk.name) === -1) {
-                var macroExpansion = getMacroExpansion(blkname, saveX, saveY);
+                macroExpansion = getMacroExpansion(blkname, saveX, saveY);
                 if (macroExpansion === null) {
                     // Maybe it is a plugin macro?
                     if (blkname in this.palettes.pluginMacros) {
-                        let macroExpansion =
-                            this.palettes.getPluginMacroExpansion(
-                                blkname, saveX, saveY);
+                        macroExpansion = this.palettes.getPluginMacroExpansion(
+                            blkname, saveX, saveY);
                     }
                 }
             }
 
-            if (macroExpansion != null) {
+            if (macroExpansion !== null) {
                 this.palettes.blocks.loadNewBlocks(macroExpansion);
                 let thisBlock = this.palettes.blocks.blockList.length - 1;
                 let topBlk = this.palettes.blocks.findTopBlock(thisBlock);
@@ -1255,7 +1234,7 @@ function Palette(palettes, name) {
                         }
                     }
 
-                    var newBlock = [
+                    newBlock = [
                         this.palettes.macroDict[macroName][b][0],
                         newValue,
                         this.palettes.macroDict[macroName][b][2],
@@ -1278,11 +1257,9 @@ function Palette(palettes, name) {
                     this.palettes.blocks.blockList[topBlk].collapseToggle();
                 }, 500);
             } else {
-                let newBlock = this._makeBlockFromPalette(
-                    protoblk, blkname, __myCallback, newBlock);
+                newBlock = this._makeBlockFromPalette(
+                    protoblk, blkname, __myCallback);
             }
-
-            // Put the protoblock back on the palette...
         }
     };
 
