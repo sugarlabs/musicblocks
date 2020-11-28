@@ -2397,7 +2397,7 @@ function getScaleAndHalfSteps(keySignature) {
     } else {
         // If there are fewer than 7 notes, choose a solfege based on the mode spacing.
         let n;
-	let solf;
+        let solf;
         for (let i = 0; i < halfSteps.length; i++) {
             n = 0;
             solf = SOLFMAPPER[solfege.length];
@@ -2602,9 +2602,9 @@ function getNoteFromInterval(pitch, interval) {
 
     function findOtherIntervals(interval) {
         let num = interval.split(" ");
-	let majorNote;
-	let accidental;
-	let index1;
+        let majorNote;
+        let accidental;
+        let index1;
 
         if (interval === "minor 2" ||
             interval === "minor 3" ||
@@ -3059,7 +3059,7 @@ function splitScaleDegree(value) {
 function splitSolfege(value) {
     // Separate the pitch from any attributes, e.g., # or b
     if (value != null && typeof value === "string") {
-	let note, attr;
+        let note, attr;
         if (SOLFNOTES.indexOf(value) !== -1) {
             note = value;
             attr = "";
@@ -3079,7 +3079,7 @@ function splitSolfege(value) {
             }
         }
 
-	return [note, attr];
+        return [note, attr];
     }
 
     return ["sol", ""];
@@ -3100,7 +3100,7 @@ function getNumber(notename, octave) {
     if (notename.substring(0, 1) in NOTESTEP) {
         num += NOTESTEP[notename.substring(0, 1)];
         if (notename.length >= 1) {
-	    let delta;
+            let delta;
             delta = notename.substring(1);
             if (delta === "bb" || delta === DOUBLEFLAT) {
                 num -= 2;
@@ -3203,10 +3203,10 @@ calcOctave = function(currentOctave, arg, lastNotePlayed, currentNote) {
     default:
         try {
             if (changedCurrent) {
-		return changedCurrent;
-	    } else {
-		return Math.floor(Number(arg));
-	    }
+                return changedCurrent;
+            } else {
+                return Math.floor(Number(arg));
+            }
         } catch (e) {
             console.debug("cannot convert " + arg + " to a number");
             return currentOctave;
@@ -3263,7 +3263,7 @@ function reducedFraction(a, b) {
 
     if ([1, 2, 4, 8, 16].indexOf(b / gcm) !== -1) {
         return (a / gcm + "<br>&mdash;<br>" + b / gcm + "<br>" +
-		NSYMBOLS[b / gcm]);
+                NSYMBOLS[b / gcm]);
     } else {
         return a / gcm + "<br>&mdash;<br>" + b / gcm + "<br><br>";
     }
@@ -3313,7 +3313,7 @@ function getCustomNote(notes) {
         break;
     case "##":
     case "*":
-    case "x":	
+    case "x":        
     case DOUBLESHARP:
         notes = notes + "𝄪" + centsInfo;
         break;
@@ -3354,7 +3354,7 @@ function convertFromSolfege(note) {
 };
 
 function getNote(noteArg, octave, transposition, keySignature, movable,
-		 direction, errorMsg, temperament) {
+                 direction, errorMsg, temperament) {
     if (temperament === undefined) {
         temperament = "equal";
     }
@@ -3412,7 +3412,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
             break;
         case "##":
         case "*":
-	case "x":
+        case "x":
         case DOUBLESHARP:
             noteArg += "#";
             rememberSharp = true;
@@ -3461,7 +3461,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
                 keySignature = "C major";
             }
 
-	    let obj;
+            let obj;
             if (movable) {
                 obj = getScaleAndHalfSteps(keySignature);
             } else {
@@ -3472,14 +3472,14 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
             let halfSteps = obj[1];
             let myKeySignature = obj[2];
             let mode = obj[3];
-	    let offset;
+            let offset;
             if (movable) {
                 // Ensure it is a valid key signature.
                 offset = thisScale.indexOf(myKeySignature);
                 if (offset === -1) {
                     console.debug("WARNING: Key " + myKeySignature +
-				  " not found in " + thisScale +
-				  ". Using default of C");
+                                  " not found in " + thisScale +
+                                  ". Using default of C");
                     offset = 0;
                     thisScale = NOTESSHARP;
                 }
@@ -3508,14 +3508,14 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
                 }
             }
 
-	    let solfegePart;
+            let solfegePart;
             if (halfSteps.indexOf(noteArg.substr(0, 1).toLowerCase()) !== -1) {
                 solfegePart = noteArg.substr(0, 1).toLowerCase();
             } else if (halfSteps.indexOf(noteArg.substr(0, 2).toLowerCase())
-		       !== -1) {
+                       !== -1) {
                 solfegePart = noteArg.substr(0, 2).toLowerCase();
             } else if (halfSteps.indexOf(noteArg.substr(0, 3).toLowerCase())
-		       !== -1) {
+                       !== -1) {
                 solfegePart = noteArg.substr(0, 3).toLowerCase();
             } else {
                 // The note should already be translated, but just in case...
@@ -3524,15 +3524,15 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
                 //.TRANS: the note names must be separated by single spaces
                 let solfnotes_ = _("ti la sol fa mi re do").split(" ");
                 if (solfnotes_.indexOf(noteArg.substr(0, 1).toLowerCase())
-		    !== -1) {
+                    !== -1) {
                     solfegePart = SOLFNOTES[solfnotes_.indexOf(
                         noteArg.substr(0, 2).toLowerCase())];
                 } else if (solfnotes_.indexOf(
-		    noteArg.substr(0, 2).toLowerCase()) !== -1) {
+                    noteArg.substr(0, 2).toLowerCase()) !== -1) {
                     solfegePart = SOLFNOTES[solfnotes_.indexOf(
                         noteArg.substr(0, 2).toLowerCase())];
                 } else if (solfnotes_.indexOf(
-		    noteArg.substr(0, 3).toLowerCase()) !== -1) {
+                    noteArg.substr(0, 3).toLowerCase()) !== -1) {
                     solfegePart = SOLFNOTES[solfnotes_.indexOf(
                         noteArg.substr(0, 3).toLowerCase())];
                 } else {
@@ -3541,7 +3541,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
             }
 
             if (movable) {
-		let i;
+                let i;
                 switch (mode) {
                 case "dorian":
                     i = SOLFEGENAMES.indexOf(solfegePart);
@@ -3630,7 +3630,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
                 }
             }
 
-	    let index;
+            let index;
             if (halfSteps.indexOf(solfegePart) !== -1) {
                 index = halfSteps.indexOf(solfegePart) + offset;
                 if (index > 11) {
@@ -3661,7 +3661,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
         }
 
         if (transposition && transposition !== 0) {
-	    let deltaOctave, deltaNote;
+            let deltaOctave, deltaNote;
             if (transposition < 0) {
                 deltaOctave = -Math.floor(-transposition / 12);
                 deltaNote = -(-transposition % 12);
@@ -3781,7 +3781,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
         }
     } else if (isCustom(temperament)) {
         note = getCustomNote(noteArg);
-	let pitchNumber = null;
+        let pitchNumber = null;
         for (let number in TEMPERAMENT[temperament]) {
             if (number !== "pitchNumber") {
                 if (note === TEMPERAMENT[temperament][number][1]) {
@@ -3793,12 +3793,12 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
 
         if (pitchNumber === null) {
             return getNote(noteArg, octave, transposition, keySignature,
-			   movable, direction, errorMsg);
+                           movable, direction, errorMsg);
         }
 
         let inOctave = octave;
         let octaveLength = TEMPERAMENT[temperament]["pitchNumber"];
-	let deltaOctave, deltaNote;
+        let deltaOctave, deltaNote;
         if (transposition !== 0) {
             if (transposition < 0) {
                 deltaOctave = -Math.floor(-transposition / octaveLength);
@@ -3842,7 +3842,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
             break;
         case "##":
         case "*":
-	case "x":
+        case "x":
         case DOUBLESHARP:
             noteArg += "𝄪";
             break;
@@ -3860,7 +3860,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
 
         note = noteArg;
 
-	let deltaOctave, deltaNote;
+        let deltaOctave, deltaNote;
         if (transposition && transposition !== 0) {
             if (transposition < 0) {
                 deltaOctave = -Math.floor(-transposition / 12);
@@ -3872,7 +3872,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
 
             octave += deltaOctave;
 
-	    let pitch, note1, octave1;
+            let pitch, note1, octave1;
             if (deltaNote > 0) {
                 pitch = note + "" + octave;
                 for (let interval in INTERVALVALUES) {
