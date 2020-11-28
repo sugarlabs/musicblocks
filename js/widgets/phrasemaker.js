@@ -665,9 +665,9 @@ function PitchTimeMatrix() {
 
         // Sort them if there are note blocks.
         if (!this.sorted) {
-            setTimeout(function() {
+            setTimeout(() => {
                 console.debug("sorting");
-                that._sort();
+                this._sort();
             }, 1000);
         } else {
             this.sorted = false;
@@ -933,8 +933,8 @@ function PitchTimeMatrix() {
 
             that.makeClickable();
             if (label === "pitch") {
-                setTimeout(function() {
-                    that.pitchBlockAdded(newBlock);
+                setTimeout(() => {
+                    this.pitchBlockAdded(newBlock);
                 }, 200);
             }
         };
@@ -2070,10 +2070,10 @@ function PitchTimeMatrix() {
                     var timeout = 0;
                 }
 
-                setTimeout(function() {
-                    that._logo.synth.setMasterVolume(DEFAULTVOLUME);
-                    Singer.setSynthVolume(that._logo, 0, label, DEFAULTVOLUME);
-                    that._logo.synth.trigger(
+                setTimeout(() => {
+                    this._logo.synth.setMasterVolume(DEFAULTVOLUME);
+                    Singer.setSynthVolume(this._logo, 0, label, DEFAULTVOLUME);
+                    this._logo.synth.trigger(
                         0,
                         "G4",
                         1 / 4,
@@ -2082,7 +2082,7 @@ function PitchTimeMatrix() {
                         null,
                         false
                     );
-                    that._logo.synth.start();
+                    this._logo.synth.start();
                 }, timeout);
             }
             __selectionChanged();
@@ -2314,7 +2314,7 @@ function PitchTimeMatrix() {
             }
         }
 
-        var sortedList = sortableList.sort(function(a, b) {
+        var sortedList = sortableList.sort((a, b) => {
             return a[0] - b[0];
         });
 
@@ -2358,9 +2358,9 @@ function PitchTimeMatrix() {
                         ),
                         500
                     );
-                    this.columnBlocksMap = this.columnBlocksMap.filter(function(
+                    this.columnBlocksMap = this.columnBlocksMap.filter((
                         ele
-                    ) {
+                    ) => {
                         return (
                             ele[0] !== oldColumnBlockMap[sortedList[lastObj][3]][0]
                         );
@@ -4343,50 +4343,50 @@ function PitchTimeMatrix() {
 
         noteValue = this._notesToPlay[noteCounter][1];
         time = 1 / noteValue;
-        var that = this;
+        
 
-        setTimeout(function() {
+        setTimeout(() => {
             // Did we just play the last note?
-            if (noteCounter === that._notesToPlay.length - 1) {
-                that._resetMatrix();
+            if (noteCounter === this._notesToPlay.length - 1) {
+                this._resetMatrix();
 
-                that.widgetWindow.modifyButton(
+                this.widgetWindow.modifyButton(
                     0,
                     "play-button.svg",
                     ICONSIZE,
                     _("Play")
                 );
-                that.playingNow = false;
+                this.playingNow = false;
             } else {
-                var row = that._noteValueRow;
-                var cell = row.cells[that._colIndex];
+                var row = this._noteValueRow;
+                var cell = row.cells[this._colIndex];
 
                 if (cell != undefined) {
                     cell.style.backgroundColor =
                         platformColor.selectorBackground;
                     if (cell.colSpan > 1) {
-                        var row = that._tupletNoteValueRow;
-                        var tupletCell = row.cells[that._notesCounter];
+                        var row = this._tupletNoteValueRow;
+                        var tupletCell = row.cells[this._notesCounter];
                         tupletCell.style.backgroundColor =
                             platformColor.selectorBackground;
                     }
                 }
 
-                if (that._notesCounter >= that._notesToPlay.length) {
-                    that._notesCounter = 1;
-                    that._logo.synth.stop();
+                if (this._notesCounter >= this._notesToPlay.length) {
+                    this._notesCounter = 1;
+                    this._logo.synth.stop();
                 }
 
-                note = that._notesToPlay[that._notesCounter][0];
-                noteValue = that._notesToPlay[that._notesCounter][1];
-                that._notesCounter += 1;
+                note = this._notesToPlay[this._notesCounter][0];
+                noteValue = this._notesToPlay[this._notesCounter][1];
+                this._notesCounter += 1;
 
                 var pitchNotes = [];
                 var synthNotes = [];
                 var drumNotes = [];
 
                 // Note can be a chord, hence it is an array.
-                if (!that._stopOrCloseClicked) {
+                if (!this._stopOrCloseClicked) {
                     for (var i = 0; i < note.length; i++) {
                         if (typeof note[i] === "number") {
                             var drumName = null;
@@ -4407,9 +4407,9 @@ function PitchTimeMatrix() {
                                 synthNotes.push(note[i]);
                                 continue;
                             } else if (MATRIXGRAPHICS.indexOf(obj[0]) !== -1) {
-                                that._processGraphics(obj);
+                                this._processGraphics(obj);
                             } else if (MATRIXGRAPHICS2.indexOf(obj[0]) !== -1) {
-                                that._processGraphics(obj);
+                                this._processGraphics(obj);
                             } else {
                                 pitchNotes.push(
                                     note[i]
@@ -4422,48 +4422,48 @@ function PitchTimeMatrix() {
                 }
 
                 if (note[0] !== "R" && pitchNotes.length > 0) {
-                    that._playChord(pitchNotes, Singer.defaultBPMFactor / noteValue);
+                    this._playChord(pitchNotes, Singer.defaultBPMFactor / noteValue);
                 }
 
                 for (var i = 0; i < synthNotes.length; i++) {
-                    that._logo.synth.trigger(
+                    this._logo.synth.trigger(
                         0,
                         [Number(synthNotes[i])],
                         Singer.defaultBPMFactor / noteValue,
-                        that._instrumentName,
+                        this._instrumentName,
                         null,
                         null
                     );
                 }
 
                 for (var i = 0; i < drumNotes.length; i++) {
-                    that._logo.synth.trigger(
+                    this._logo.synth.trigger(
                         0, ["C2"], Singer.defaultBPMFactor / noteValue, drumNotes[i], null, null
                     );
                 }
             }
 
-            var row = that._noteValueRow;
-            var cell = row.cells[that._colIndex];
+            var row = this._noteValueRow;
+            var cell = row.cells[this._colIndex];
             if (cell != undefined) {
                 if (cell.colSpan > 1) {
-                    that._spanCounter += 1;
-                    if (that._spanCounter === cell.colSpan) {
-                        that._spanCounter = 0;
-                        that._colIndex += 1;
+                    this._spanCounter += 1;
+                    if (this._spanCounter === cell.colSpan) {
+                        this._spanCounter = 0;
+                        this._colIndex += 1;
                     }
                 } else {
-                    that._spanCounter = 0;
-                    that._colIndex += 1;
+                    this._spanCounter = 0;
+                    this._colIndex += 1;
                 }
 
                 noteCounter += 1;
 
-                if (noteCounter < that._notesToPlay.length && that.playingNow) {
-                    that.__playNote(time, noteCounter);
+                if (noteCounter < this._notesToPlay.length && this.playingNow) {
+                    this.__playNote(time, noteCounter);
                 } else {
-                    that._resetMatrix();
-                    that.widgetWindow.modifyButton(
+                    this._resetMatrix();
+                    this.widgetWindow.modifyButton(
                         0,
                         "play-button.svg",
                         ICONSIZE,
@@ -4471,29 +4471,29 @@ function PitchTimeMatrix() {
                     );
                 }
             }
-        }, Singer.defaultBPMFactor * 1000 * time + that._logo.turtleDelay);
+        }, Singer.defaultBPMFactor * 1000 * time + this._logo.turtleDelay);
     };
 
     this._playChord = function(notes, noteValue) {
-        var that = this;
-        setTimeout(function() {
-            that._logo.synth.trigger(
+        
+        setTimeout(() => {
+            this._logo.synth.trigger(
                 0,
                 notes[0],
                 noteValue,
-                that._instrumentName,
+                this._instrumentName,
                 null,
                 null
             );
         }, 1);
 
         if (notes.length > 1) {
-            setTimeout(function() {
-                that._logo.synth.trigger(
+            setTimeout(() => {
+                this._logo.synth.trigger(
                     0,
                     notes[1],
                     noteValue,
-                    that._instrumentName,
+                    this._instrumentName,
                     null,
                     null
                 );
@@ -4501,12 +4501,12 @@ function PitchTimeMatrix() {
         }
 
         if (notes.length > 2) {
-            setTimeout(function() {
-                that._logo.synth.trigger(
+            setTimeout(() => {
+                this._logo.synth.trigger(
                     0,
                     notes[2],
                     noteValue,
-                    that._instrumentName,
+                    this._instrumentName,
                     null,
                     null
                 );
@@ -4514,12 +4514,12 @@ function PitchTimeMatrix() {
         }
 
         if (notes.length > 3) {
-            setTimeout(function() {
-                that._logo.synth.trigger(
+            setTimeout(() => {
+                this._logo.synth.trigger(
                     0,
                     notes[3],
                     noteValue,
-                    that._instrumentName,
+                    this._instrumentName,
                     null,
                     null
                 );
