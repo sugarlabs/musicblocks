@@ -104,7 +104,7 @@ function TimbreWidget() {
     this.instrumentName = "custom";
 
     this._addButton = function (row, icon, iconSize, label) {
-        var cell = row.insertCell(-1);
+        let cell = row.insertCell(-1);
         cell.innerHTML =
             '&nbsp;&nbsp;<img src="header-icons/' +
             icon +
@@ -333,8 +333,8 @@ function TimbreWidget() {
     this._playNote = function (note, duration) {
         this._logo.synth.setMasterVolume(last(Singer.masterVolume));
 
-        var timbreEffects = instrumentsEffects[0][this.instrumentName];
-        var paramsEffects = {
+        let timbreEffects = instrumentsEffects[0][this.instrumentName];
+        let paramsEffects = {
             doVibrato: false,
             doDistortion: false,
             doTremolo: false,
@@ -415,7 +415,7 @@ function TimbreWidget() {
 
         this._logo.resetSynth(0);
 
-        var cell = this.playButton;
+        let cell = this.playButton;
         if (this._playing) {
             cell.innerHTML =
                 '&nbsp;&nbsp;<img src="header-icons/' +
@@ -856,7 +856,7 @@ function TimbreWidget() {
             if (that.osc.length === 0) {
                 let topOfClamp =
                     that._logo.blocks.blockList[that.blockNo].connections[2];
-                var bottomOfClamp = that._logo.blocks.findBottomBlock(
+                let bottomOfClamp = that._logo.blocks.findBottomBlock(
                     topOfClamp
                 );
 
@@ -914,7 +914,7 @@ function TimbreWidget() {
             if (that.env.length === 0) {
                 let topOfClamp =
                     that._logo.blocks.blockList[that.blockNo].connections[2];
-                var bottomOfClamp = that._logo.blocks.findBottomBlock(
+                let bottomOfClamp = that._logo.blocks.findBottomBlock(
                     topOfClamp
                 );
 
@@ -979,7 +979,7 @@ function TimbreWidget() {
             if (that.fil.length === 0) {
                 let topOfClamp =
                     that._logo.blocks.blockList[that.blockNo].connections[2];
-                var bottomOfClamp = that._logo.blocks.findBottomBlock(
+                let bottomOfClamp = that._logo.blocks.findBottomBlock(
                     topOfClamp
                 );
 
@@ -1272,7 +1272,7 @@ function TimbreWidget() {
                         let topOfClamp =
                             that._logo.blocks.blockList[that.blockNo]
                                 .connections[2];
-                        var bottomOfClamp = that._logo.blocks.findBottomBlock(
+                        let bottomOfClamp = that._logo.blocks.findBottomBlock(
                             topOfClamp
                         );
 
@@ -1354,7 +1354,7 @@ function TimbreWidget() {
                         let topOfClamp =
                             that._logo.blocks.blockList[that.blockNo]
                                 .connections[2];
-                        var bottomOfClamp = that._logo.blocks.findBottomBlock(
+                        let bottomOfClamp = that._logo.blocks.findBottomBlock(
                             topOfClamp
                         );
 
@@ -1437,7 +1437,7 @@ function TimbreWidget() {
                         let topOfClamp =
                             that._logo.blocks.blockList[that.blockNo]
                                 .connections[2];
-                        var bottomOfClamp = that._logo.blocks.findBottomBlock(
+                        let bottomOfClamp = that._logo.blocks.findBottomBlock(
                             topOfClamp
                         );
 
@@ -1517,7 +1517,7 @@ function TimbreWidget() {
                         let topOfClamp =
                             that._logo.blocks.blockList[that.blockNo]
                                 .connections[2];
-                        var bottomOfClamp = that._logo.blocks.findBottomBlock(
+                        let bottomOfClamp = that._logo.blocks.findBottomBlock(
                             topOfClamp
                         );
 
@@ -2106,7 +2106,7 @@ function TimbreWidget() {
         var env = docById("timbreTable");
         let topOfClamp = this._logo.blocks.blockList[this.blockNo]
             .connections[2];
-        var bottomOfClamp = this._logo.blocks.findBottomBlock(topOfClamp);
+        let bottomOfClamp = this._logo.blocks.findBottomBlock(topOfClamp);
 
         const FILTEROBJ = [
             [0, ["filter", {}], 0, 0, [null, 3, 1, 2, null]],
