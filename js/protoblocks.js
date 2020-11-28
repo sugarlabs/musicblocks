@@ -68,14 +68,14 @@ function ProtoBlock(name) {
         if (this.staticLabels.length === 0) {
             return;
         }
-        var c = new createjs.Container();
-        var text = new createjs.Text(
+        let c = new createjs.Container();
+        let text = new createjs.Text(
             this.staticLabels[0],
             this.fontSize + "px Sans",
             "#000000"
         );
         c.addChild(text);
-        var b = c.getBounds();
+        let b = c.getBounds();
         this.textWidth = b.width;
         this.extraWidth += Math.max(b.width - 30, 0);
     };
@@ -97,7 +97,7 @@ function ProtoBlock(name) {
     };
 
     this.zeroArgBlockGenerator = function() {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setTab(true);
@@ -106,9 +106,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
-        var artwork = svg.basicBlock();
         return [
-            artwork,
+            svg.basicBlock(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -135,7 +134,7 @@ function ProtoBlock(name) {
     };
 
     this.hiddenBlockFlowGenerator = function() {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setSlot(true);
@@ -144,9 +143,9 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
         // We need to generate the artwork in order to generate the dock.
-        var artwork = svg.basicBlock();
+        let artwork = svg.basicBlock();
         // Then we replace the artwork with a single pixel.
-        var artwork =
+        artwork =
             '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"><text style="font-size:10px;fill:#000000;font-family:sans-serif;text-anchor:end"><tspan x="46.333333333333336" y="13.5">block_label</tspan></text></svg>';
         // And bring the last dock position to the top.
         svg.docks[1][1] = svg.docks[0][1];
@@ -162,7 +161,7 @@ function ProtoBlock(name) {
     };
 
     this.basicBlockNoFlowGenerator = function() {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setSlot(true);
@@ -173,9 +172,8 @@ function ProtoBlock(name) {
         }
 
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
-        var artwork = svg.basicBlock();
         return [
-            artwork,
+            svg.basicBlock(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -192,7 +190,7 @@ function ProtoBlock(name) {
     };
 
     this.basicBlockCollapsedGenerator = function() {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setCap(true);
@@ -203,9 +201,8 @@ function ProtoBlock(name) {
         }
 
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
-        var artwork = svg.basicBlock();
         return [
-            artwork,
+            svg.basicBlock(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -223,7 +220,7 @@ function ProtoBlock(name) {
     };
 
     this.oneArgBlockGenerator = function() {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setTab(true);
@@ -235,9 +232,8 @@ function ProtoBlock(name) {
         }
 
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
-        var artwork = svg.basicBlock();
         return [
-            artwork,
+            svg.basicBlock(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -256,7 +252,7 @@ function ProtoBlock(name) {
     };
 
     this.oneBooleanArgBlockGenerator = function() {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setTab(true);
@@ -269,9 +265,8 @@ function ProtoBlock(name) {
         }
 
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
-        var artwork = svg.basicBlock();
         return [
-            artwork,
+            svg.basicBlock(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -293,7 +288,7 @@ function ProtoBlock(name) {
     };
 
     this.twoArgBlockGenerator = function(expandY) {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setTab(true);
@@ -303,10 +298,7 @@ function ProtoBlock(name) {
         if (expandY) {
             svg.setExpand(
                 30 + this.extraWidth,
-                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2,
-                0,
-                0
-            );
+                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
@@ -315,9 +307,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.basicBlock();
         return [
-            artwork,
+            svg.basicBlock(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -340,7 +331,7 @@ function ProtoBlock(name) {
     };
 
     this.threeArgBlockGenerator = function(expandY) {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setTab(true);
@@ -350,10 +341,7 @@ function ProtoBlock(name) {
         if (expandY) {
             svg.setExpand(
                 30 + this.extraWidth,
-                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2,
-                0,
-                0
-            );
+                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
@@ -362,9 +350,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.basicBlock();
         return [
-            artwork,
+            svg.basicBlock(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -387,7 +374,7 @@ function ProtoBlock(name) {
     };
 
     this.fourArgBlockGenerator = function(expandY) {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setTab(true);
@@ -397,10 +384,7 @@ function ProtoBlock(name) {
         if (expandY) {
             svg.setExpand(
                 30 + this.extraWidth,
-                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2,
-                0,
-                0
-            );
+                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
@@ -409,9 +393,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.basicBlock();
         return [
-            artwork,
+            svg.basicBlock(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -431,7 +414,7 @@ function ProtoBlock(name) {
     };
 
     this.oneArgMathBlockGenerator = function() {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setSlot(false);
@@ -444,9 +427,8 @@ function ProtoBlock(name) {
         }
 
         svg.setExpand(30 + this.extraWidth, 0, 0, 0);
-        var artwork = svg.basicBlock();
         return [
-            artwork,
+            svg.basicBlock(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -468,7 +450,7 @@ function ProtoBlock(name) {
     };
 
     this.twoArgMathBlockGenerator = function(expandY) {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setSlot(false);
@@ -479,10 +461,7 @@ function ProtoBlock(name) {
         if (expandY) {
             svg.setExpand(
                 30 + this.extraWidth,
-                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2,
-                0,
-                0
-            );
+                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
@@ -491,9 +470,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.basicBlock();
         return [
-            artwork,
+            svg.basicBlock(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -516,7 +494,7 @@ function ProtoBlock(name) {
     };
 
     this.threeArgMathBlockGenerator = function(expandY) {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setSlot(false);
@@ -527,10 +505,7 @@ function ProtoBlock(name) {
         if (expandY) {
             svg.setExpand(
                 30 + this.extraWidth,
-                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2,
-                0,
-                0
-            );
+                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
@@ -539,9 +514,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.basicBlock();
         return [
-            artwork,
+            svg.basicBlock(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -565,7 +539,7 @@ function ProtoBlock(name) {
     };
 
     this.fourArgMathBlockGenerator = function(expandY) {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setSlot(false);
@@ -576,10 +550,7 @@ function ProtoBlock(name) {
         if (expandY) {
             svg.setExpand(
                 30 + this.extraWidth,
-                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2,
-                0,
-                0
-            );
+                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
         } else {
             svg.setExpand(30 + this.extraWidth, 0, 0, 0);
         }
@@ -588,9 +559,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.basicBlock();
         return [
-            artwork,
+            svg.basicBlock(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -609,7 +579,7 @@ function ProtoBlock(name) {
     };
 
     this.valueBlockGenerator = function() {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         // Extra room for parameter label
@@ -620,9 +590,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.basicBox();
         return [
-            artwork,
+            svg.basicBox(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -642,7 +611,7 @@ function ProtoBlock(name) {
     };
 
     this.mediaBlockGenerator = function() {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         // Extra room for graphics
@@ -653,9 +622,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.basicBox();
         return [
-            artwork,
+            svg.basicBox(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -677,7 +645,7 @@ function ProtoBlock(name) {
     };
 
     this.stackClampZeroArgBlockGenerator = function(slots) {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setCap(true);
@@ -695,9 +663,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.basicClamp();
         return [
-            artwork,
+            svg.basicClamp(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -718,7 +685,7 @@ function ProtoBlock(name) {
     };
 
     this.flowClampBlockGenerator = function(slots) {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setTab(true);
@@ -736,9 +703,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.basicClamp();
         return [
-            artwork,
+            svg.basicClamp(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -760,7 +726,7 @@ function ProtoBlock(name) {
     };
 
     this.flowClampOneArgBlockGenerator = function(slots) {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setTab(true);
@@ -779,9 +745,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.basicClamp();
         return [
-            artwork,
+            svg.basicClamp(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -805,7 +770,7 @@ function ProtoBlock(name) {
     };
 
     this.flowClampTwoArgBlockGenerator = function(slots) {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setTab(true);
@@ -823,9 +788,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.basicClamp();
         return [
-            artwork,
+            svg.basicClamp(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -848,7 +812,7 @@ function ProtoBlock(name) {
     };
 
     this.flowClampThreeArgBlockGenerator = function(slots) {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setTab(true);
@@ -866,9 +830,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.basicClamp();
         return [
-            artwork,
+            svg.basicClamp(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -890,7 +853,7 @@ function ProtoBlock(name) {
     };
 
     this.argClampOneArgBlockGenerator = function(slots) {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setTab(true);
@@ -908,11 +871,10 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.argClamp();
         // The hit area extends halfway between the label dock and the
         // first innie arg dock.
         return [
-            artwork,
+            svg.argClamp(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -933,7 +895,7 @@ function ProtoBlock(name) {
     };
 
     this.argClampOneArgMathBlockGenerator = function(slots) {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setInnies([true]);
@@ -952,11 +914,10 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.argClamp();
         // The hit area extends halfway between the label dock and the
         // first innie arg dock.
         return [
-            artwork,
+            svg.argClamp(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -977,7 +938,7 @@ function ProtoBlock(name) {
     };
 
     this.argClampBlockGenerator = function(slots) {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setTab(true);
@@ -993,9 +954,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.argClamp();
         return [
-            artwork,
+            svg.argClamp(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -1015,7 +975,7 @@ function ProtoBlock(name) {
     };
 
     this.argClampMathBlockGenerator = function(slots) {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setOutie(true);
@@ -1033,9 +993,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.argClamp();
         return [
-            artwork,
+            svg.argClamp(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -1058,7 +1017,7 @@ function ProtoBlock(name) {
     };
 
     this.flowClampBooleanArgBlockGenerator = function(slots) {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setTab(true);
@@ -1076,9 +1035,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.basicClamp();
         return [
-            artwork,
+            svg.basicClamp(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -1106,7 +1064,7 @@ function ProtoBlock(name) {
         bottomSlots,
         topSlots
     ) {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setTab(true);
@@ -1132,9 +1090,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.basicClamp();
         return [
-            artwork,
+            svg.basicClamp(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -1155,7 +1112,7 @@ function ProtoBlock(name) {
     };
 
     this.flowClampZeroArgBlockGenerator = function(slots) {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setTab(true);
@@ -1172,9 +1129,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.basicClamp();
         return [
-            artwork,
+            svg.basicClamp(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -1194,7 +1150,7 @@ function ProtoBlock(name) {
     };
 
     this.argFlowClampGenerator = function(slots) {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setSlot(false);
@@ -1211,9 +1167,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.basicClamp();
         return [
-            artwork,
+            svg.basicClamp(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -1236,7 +1191,7 @@ function ProtoBlock(name) {
     };
 
     this.stackClampOneArgBlockGenerator = function(slots) {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setCap(true);
@@ -1255,9 +1210,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.basicClamp();
         return [
-            artwork,
+            svg.basicClamp(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -1275,7 +1229,7 @@ function ProtoBlock(name) {
     };
 
     this.booleanZeroArgBlockGenerator = function() {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setExpand(60 + this.extraWidth, 0, 0, 4);
@@ -1284,9 +1238,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.booleanNot(true);
         return [
-            artwork,
+            svg.booleanNot(true),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -1306,7 +1259,7 @@ function ProtoBlock(name) {
     };
 
     this.booleanOneArgBlockGenerator = function() {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
@@ -1316,9 +1269,8 @@ function ProtoBlock(name) {
         }
 
         svg.setInnies([true]);
-        var artwork = svg.booleanNot(true); // OneArg
         return [
-            artwork,
+            svg.booleanNot(true),  // OneArg
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -1338,7 +1290,7 @@ function ProtoBlock(name) {
     };
 
     this.booleanOneBooleanArgBlockGenerator = function() {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
@@ -1347,9 +1299,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.booleanNot(false);
         return [
-            artwork,
+            svg.booleanNot(false),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -1370,7 +1321,7 @@ function ProtoBlock(name) {
     };
 
     this.booleanTwoBooleanArgBlockGenerator = function() {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
@@ -1379,9 +1330,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.booleanAndOr();
         return [
-            artwork,
+            svg.booleanAndOr(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -1403,17 +1353,14 @@ function ProtoBlock(name) {
     };
 
     this.booleanTwoArgBlockGenerator = function(expandY) {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
 
         if (expandY) {
             svg.setExpand(
                 10 + this.extraWidth,
-                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2,
-                0,
-                0
-            );
+                ((expandY - 1) * STANDARDBLOCKHEIGHT) / 2, 0, 0);
         } else {
             svg.setExpand(10 + this.extraWidth, 0, 0, 0);
         }
@@ -1422,9 +1369,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.booleanCompare();
         return [
-            artwork,
+            svg.booleanCompare(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -1443,7 +1389,7 @@ function ProtoBlock(name) {
     };
 
     this.parameterBlockGenerator = function() {
-        var svg = new SVG();
+        let svg = new SVG();
         svg.init();
         svg.setScale(this.scale);
         // Extra room for parameter label
@@ -1454,9 +1400,8 @@ function ProtoBlock(name) {
             svg.setFontSize(this.fontsize);
         }
 
-        var artwork = svg.basicBox();
         return [
-            artwork,
+            svg.basicBox(),
             svg.docks,
             svg.getWidth(),
             svg.getHeight(),
@@ -1588,7 +1533,7 @@ class BaseBlock extends ProtoBlock {
             );
 
         this.generator = function() {
-            var svg = new SVG();
+            let svg = new SVG();
             svg.init();
             svg.setScale(this.scale);
 

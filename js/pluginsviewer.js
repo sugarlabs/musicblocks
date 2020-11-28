@@ -42,21 +42,21 @@ function PluginsViewer(canvas, stage, refreshCanvas, close, load) {
         this.page = 0;
         if (this.server) {
             try {
-                var rawData = httpGet();
-                var obj = JSON.parse(rawData);
+                let rawData = httpGet();
+                let obj = JSON.parse(rawData);
                 // console.debug('json parse: ' + obj);
                 // Look for svg
-                for (var file in obj) {
+                for (let file in obj) {
                     if (fileExt(obj[file]) === "svg") {
-                        var name = fileBasename(obj[file]);
+                        let name = fileBasename(obj[file]);
                         if (this.pluginFiles.indexOf(name) === -1) {
                             this.pluginFiles.push(name);
                         }
                     }
                 }
                 // and corresponding .json files
-                for (var file in this.pluginFiles) {
-                    var tbfile = this.pluginFiles[file] + ".json";
+                for (let file in this.pluginFiles) {
+                    let tbfile = this.pluginFiles[file] + ".json";
                     if (!tbfile in obj) {
                         this.pluginFiles.remove(this.pluginFiles[file]);
                     }
@@ -134,16 +134,15 @@ function PluginsViewer(canvas, stage, refreshCanvas, close, load) {
     };
 
     this.downloadImage = function(p, prepareNextImage) {
-        var header = "data:image/svg+xml;utf8,";
-        var name = this.pluginFiles[p] + ".svg";
+        let header = "data:image/svg+xml;utf8,";
+        let name = this.pluginFiles[p] + ".svg";
         // console.debug('getting ' + name + ' from samples');
+        let data = header + SAMPLESSVG[name];
         if (this.server) {
-            var data = header + httpGet(name);
-        } else {
-            var data = header + SAMPLESSVG[name];
+            data = header + httpGet(name);
         }
-        var image = new Image();
-        var viewer = this;
+        let image = new Image();
+        let viewer = this;
 
         image.onload = function() {
             bitmap = new createjs.Bitmap(data);
@@ -169,7 +168,7 @@ function PluginsViewer(canvas, stage, refreshCanvas, close, load) {
     };
 
     this.completeInit = function() {
-        var p = 0;
+        let p = 0;
         this.prepareNextImage(this, p);
     };
 
@@ -200,10 +199,10 @@ function PluginsViewer(canvas, stage, refreshCanvas, close, load) {
 }
 
 function hideCurrentPage(viewer) {
-    var min = viewer.page * 16;
-    var max = Math.min(viewer.pluginFiles.length, (viewer.page + 1) * 16);
+    let min = viewer.page * 16;
+    let max = Math.min(viewer.pluginFiles.length, (viewer.page + 1) * 16);
     // Hide the current page.
-    for (var p = min; p < max; p++) {
+    for (let p = min; p < max; p++) {
         viewer.dict[viewer.pluginFiles[p]].visible = false;
     }
     // Go back to previous page.
@@ -215,8 +214,8 @@ function hideCurrentPage(viewer) {
         viewer.next.visible = true;
     }
     // Show the current page.
-    var min = viewer.page * 16;
-    var max = Math.min(viewer.pluginFiles.length, (viewer.page + 1) * 16);
+    min = viewer.page * 16;
+    max = Math.min(viewer.pluginFiles.length, (viewer.page + 1) * 16);
     for (var p = min; p < max; p++) {
         viewer.dict[viewer.pluginFiles[p]].visible = true;
     }
@@ -224,10 +223,10 @@ function hideCurrentPage(viewer) {
 }
 
 function showNextPage(viewer) {
-    var min = viewer.page * 16;
-    var max = Math.min(viewer.pluginFiles.length, (viewer.page + 1) * 16);
+    let min = viewer.page * 16;
+    let max = Math.min(viewer.pluginFiles.length, (viewer.page + 1) * 16);
     // Hide the current page.
-    for (var p = min; p < max; p++) {
+    for (let p = min; p < max; p++) {
         viewer.dict[viewer.pluginFiles[p]].visible = false;
     }
     // Advance to next page.
@@ -241,8 +240,8 @@ function showNextPage(viewer) {
 }
 
 function viewerClicked(viewer, event) {
-    var x = event.stageX / viewer.scale - viewer.container.x;
-    var y = event.stageY / viewer.scale - viewer.container.y;
+    let x = event.stageX / viewer.scale - viewer.container.x;
+    let y = event.stageY / viewer.scale - viewer.container.y;
     if (x > 600 && y < 55) {
         viewer.hide();
         viewer.closeViewer();
@@ -254,9 +253,9 @@ function viewerClicked(viewer, event) {
         }
     } else {
         // Select a plugin.
-        var col = Math.floor((x - 5) / 160);
-        var row = Math.floor((y - 55) / 120);
-        var p = row * 4 + col + 16 * viewer.page;
+        let col = Math.floor((x - 5) / 160);
+        let row = Math.floor((y - 55) / 120);
+        let p = row * 4 + col + 16 * viewer.page;
         if (p < viewer.pluginFiles.length) {
             viewer.hide();
             viewer.closeViewer();
@@ -266,16 +265,16 @@ function viewerClicked(viewer, event) {
 }
 
 function loadThumbnailContainerHandler(viewer) {
-    var hitArea = new createjs.Shape();
-    var w = 650;
-    var h = 590;
-    var startX, startY, endX, endY;
+    let hitArea = new createjs.Shape();
+    let w = 650;
+    let h = 590;
+    let startX, startY, endX, endY;
     hitArea.graphics.beginFill("#FFF").drawRect(0, 0, w, h);
     hitArea.x = 0;
     hitArea.y = 0;
     viewer.container.hitArea = hitArea;
 
-    var locked = false;
+    let locked = false;
 
     viewer.container.on("click", function(event) {
         // We need a lock to "debouce" the click.
@@ -319,13 +318,12 @@ function loadThumbnailContainerHandler(viewer) {
 function makeViewerBitmap(viewer, data, name, callback, extras) {
     // Async creation of bitmap from SVG data
     // Works with Chrome, Safari, Firefox (untested on IE)
-    var img = new Image();
+    let img = new Image();
     img.onload = function() {
         bitmap = new createjs.Bitmap(img);
         callback(viewer, name, bitmap, extras);
     };
 
-    img.src =
-        "data:image/svg+xml;base64," +
+    img.src ="data:image/svg+xml;base64," +
         window.btoa(unescape(encodeURIComponent(data)));
 }
