@@ -1796,9 +1796,12 @@ function TemperamentWidget() {
         if (isCustom(this.inTemperament)) {   
             TEMPERAMENT[this.inTemperament] = [];
             TEMPERAMENT[this.inTemperament]["pitchNumber"] = this.pitchNumber;
+
             updateTEMPERAMENTS();
             for (let i = 0; i < this.pitchNumber; i++) {
                 let number = "" + i;
+
+
                 TEMPERAMENT[this.inTemperament][number] = [
                     this.ratios[i],
                     this.notes[i].substring(0, this.notes[i].length - 1),

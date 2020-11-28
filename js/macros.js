@@ -700,13 +700,8 @@ function getMacroExpansion(blkname, x, y) {
         [7, ["number", { value: 400 }], 0, 0, [6]],
         [8, "playdrum", 0, 0, [4, 9, null]],
         [9, ["drumname", { value: "kick drum" }], 0, 0, [8]],
-        [
-            10,
-            ["action", { collapsed: false }],
-            x,
-            y + 200,
-            [null, 11, 12, null]
-        ],
+        [10, ["action", { collapsed: false }], x, y + 200,
+         [null, 11, 12, null]],
         [11, ["text", { value: "action" }], 0, 0, [10]],
         [12, "hidden", 0, 0, [10, 13]],
         [13, "setshade", 0, 0, [12, 18, 14]],
@@ -1173,7 +1168,6 @@ function getMacroExpansion(blkname, x, y) {
         [23, ["number", { value: 4 }], 0, 0, [21]],
         [24, "hidden", 0, 0, [16, null]]
     ];
-
     const OUTPUTTOOLSHELP = [
         [0,["status",{"collapsed":false}],468,153,[null,1,4]],
         [1,"hidden",482,194,[0,19]],
@@ -1197,7 +1191,6 @@ function getMacroExpansion(blkname, x, y) {
         [19,"print",482,194,[1,20,15]],
         [20,["outputtools",{"value":"letter class"}],556,194,[19]]
     ];
-
     const PHASERHELP = [
         [0, "phaser", x, y, [null, 1, 2, 3, 4, null]],
         [1, ["number", { value: 0.5 }], 0, 0, [0]],
@@ -1694,12 +1687,9 @@ function getMacroExpansion(blkname, x, y) {
         xyhelp: XYHELP
     };
 
-    if (
-        ["namedbox", "nameddo", "namedcalc", "namedarg", "nameddoArg"].indexOf(
-            blkname
-        ) === -1 &&
-        blkname in BUILTINMACROS
-    ) {
+    if (["namedbox", "nameddo", "namedcalc",
+	 "namedarg", "nameddoArg"].indexOf(blkname) === -1 &&
+        blkname in BUILTINMACROS) {
         return BUILTINMACROS[blkname];
     } else {
         return null;

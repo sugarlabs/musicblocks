@@ -4598,7 +4598,7 @@ function Blocks(activity) {
         }
 
         this.inLongPress = true;
-        this.blockList[this.activeBlock].piemenuBlockContext();
+        piemenuBlockContext(this.blockList[this.activeBlock]);
     };
 
     /*
@@ -5216,8 +5216,8 @@ function Blocks(activity) {
                 }
             }
 
-            if (name in NAMEDICT) {
-                name = NAMEDICT[name];
+            if (name in BACKWARDCOMPATIBILIYDICT) {
+                name = BACKWARDCOMPATIBILIYDICT[name];
             }
 
             let that = this;
@@ -5251,13 +5251,15 @@ function Blocks(activity) {
                     let thisBlock = args[0];
                     let value = args[1];
                     if (value.customTemperamentNotes !== undefined) {
-                        TEMPERAMENT = {...TEMPERAMENT,...value.customTemperamentNotes}
+                        TEMPERAMENT = {
+			    ...TEMPERAMENT, ...value.customTemperamentNotes
+			}
                         for (let temp in value.customTemperamentNotes){
                             if (!(temp in PreDefinedTemperaments)){
                                 TEMPERAMENT[temp]["pitchNumber"] = value.customTemperamentNotes[temp].length;
                             }
                         }
-                        updateTEMPERAMENTS();
+                        updateTemperaments();
                         that.logo.synth.startingPitch = value.startingPitch;
                         OCTAVERATIO = value.octaveSpace;
                         that.logo.customTemperamentDefined = true; //This is for custom pitch pie menu

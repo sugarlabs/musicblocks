@@ -7,7 +7,7 @@
    xmlns="http://www.w3.org/2000/svg"
    id="svg1394"
    version="1.1"
-   height="813.34308"
+   height="781.34308"
    width="639.38788">
   <metadata
      id="metadata1400">
@@ -25,27 +25,25 @@
      id="defs1398" />
   <g
      id="g736"
-     transform="translate(-3.3333333e-6,7.4215375)">
+     transform="translate(0,7.4215375)">
     <g
        id="g734"
        transform="scale(1.5)">
       <path
          id="path728"
          style="fill:#ffbf00;fill-opacity:1;stroke:#daaf30;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         d="m 0.5,14.5 v -4 a 4,4 90 0 1 4,-4 h 4 l 5,-6 5,6 h 9 30 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 462 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 l -5,6 -5,-6 h -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+         d="m 0.5,14.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 l 5,-6 5,6 h 9 30 4 c 2.209139,0 4,1.790861 4,4 v 4 4 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 c -2.761424,0 -5,2.238576 -5,5 v 4 4 440.66667 4 c 0,2.76142 2.238576,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.20914 -1.790861,4 -4,4 h -4 -9 l -5,6 -5,-6 h -4 c -2.209139,0 -4,-1.79086 -4,-4 v -4 z" />
       <text
          id="text732"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan730"
            y="21.5"
-           x="5.3333335">start</tspan>
-      </text>
+           x="5.3333335">start</tspan></text>
     </g>
   </g>
   <g
      id="g754"
-     transform="translate(26.999997,362.92154)">
+     transform="translate(27,362.92154)">
     <g
        id="g752"
        transform="scale(1.5)">
@@ -55,33 +53,27 @@
          d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z" />
       <text
          id="text742"
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan740"
            y="24"
-           x="46.333332">add</tspan>
-      </text>
+           x="46.333332">add</tspan></text>
       <text
          id="text746"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan744"
            y="11.25"
-           x="46.333332">to</tspan>
-      </text>
+           x="46.333332">to</tspan></text>
       <text
          id="text750"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan748"
            y="32.25"
-           x="46.333332">value</tspan>
-      </text>
+           x="46.333332">value</tspan></text>
     </g>
   </g>
   <g
      id="g772"
-     transform="translate(13.499997,47.921537)">
+     transform="translate(13.5,47.921537)">
     <g
        id="g770"
        transform="scale(1.5)">
@@ -91,33 +83,27 @@
          d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 32.792969 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z" />
       <text
          id="text760"
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan758"
            y="24"
-           x="49.126301">store in</tspan>
-      </text>
+           x="49.126301">store in</tspan></text>
       <text
          id="text764"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan762"
            y="11.25"
-           x="49.126301">name</tspan>
-      </text>
+           x="49.126301">name</tspan></text>
       <text
          id="text768"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan766"
            y="32.25"
-           x="49.126301">value</tspan>
-      </text>
+           x="49.126301">value</tspan></text>
     </g>
   </g>
   <g
      id="g782"
-     transform="translate(91.189457,47.921537)">
+     transform="translate(91.18946,47.921537)">
     <g
        id="g780"
        transform="scale(1.5)">
@@ -127,17 +113,15 @@
          d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text778"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan776"
            y="13.833333"
-           x="13.333333">box</tspan>
-      </text>
+           x="13.333333">box</tspan></text>
     </g>
   </g>
   <g
      id="g792"
-     transform="translate(91.189457,79.421537)">
+     transform="translate(91.18946,79.421537)">
     <g
        id="g790"
        transform="scale(1.5)">
@@ -147,12 +131,10 @@
          d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text788"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan786"
            y="13.833333"
-           x="13.333333">0</tspan>
-      </text>
+           x="13.333333">0</tspan></text>
     </g>
   </g>
   <g
@@ -167,25 +149,21 @@
          d="m 0.5,14.5 v -4 a 4,4 90 0 1 4,-4 h 4 l 5,-6 5,6 h 9 35 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -35 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 315 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 l -5,6 -5,-6 h -4 a 4,4 90 0 1 -4,-4 v -4 z" />
       <text
          id="text798"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan796"
            y="21.5"
-           x="5.3333335">action</tspan>
-      </text>
+           x="5.3333335">action</tspan></text>
       <text
          id="text802"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan800"
            y="5.25"
-           x="60.333332" />
-      </text>
+           x="60.333332" /></text>
     </g>
   </g>
   <g
      id="g816"
-     transform="translate(408.16667,9.4215375)">
+     transform="translate(408.16667,9.4215376)">
     <g
        id="g814"
        transform="scale(1.5)">
@@ -195,12 +173,10 @@
          d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text812"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan810"
            y="13.833333"
-           x="13.333333">action</tspan>
-      </text>
+           x="13.333333">action</tspan></text>
     </g>
   </g>
   <g
@@ -215,20 +191,16 @@
          d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 80.60059 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 273 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
       <text
          id="text822"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan820"
            y="15.25"
-           x="5.3333335">semi-tone transpose</tspan>
-      </text>
+           x="5.3333335">semi-tone transpose</tspan></text>
       <text
          id="text826"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan824"
            y="11.25"
-           x="105.93392" />
-      </text>
+           x="105.93392" /></text>
     </g>
   </g>
   <g
@@ -243,17 +215,15 @@
          d="m 8.5,0.5 h 80 v 20 h -80 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text836"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan834"
            y="13.833333"
-           x="13.333333">box</tspan>
-      </text>
+           x="13.333333">box</tspan></text>
     </g>
   </g>
   <g
      id="g850"
-     transform="translate(13.499997,110.92154)">
+     transform="translate(13.5,110.92154)">
     <g
        id="g848"
        transform="scale(1.5)">
@@ -263,17 +233,15 @@
          d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 40 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -40 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
       <text
          id="text846"
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan844"
            y="13.5"
-           x="56.333332">action</tspan>
-      </text>
+           x="56.333332">action</tspan></text>
     </g>
   </g>
   <g
      id="g868"
-     transform="translate(13.499997,142.42154)">
+     transform="translate(13.5,142.42154)">
     <g
        id="g866"
        transform="scale(1.5)">
@@ -283,33 +251,27 @@
          d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z" />
       <text
          id="text856"
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan854"
            y="24"
-           x="46.333332">add</tspan>
-      </text>
+           x="46.333332">add</tspan></text>
       <text
          id="text860"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan858"
            y="11.25"
-           x="46.333332">to</tspan>
-      </text>
+           x="46.333332">to</tspan></text>
       <text
          id="text864"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan862"
            y="32.25"
-           x="46.333332">value</tspan>
-      </text>
+           x="46.333332">value</tspan></text>
     </g>
   </g>
   <g
      id="g878"
-     transform="translate(86.999997,142.42154)">
+     transform="translate(87,142.42154)">
     <g
        id="g876"
        transform="scale(1.5)">
@@ -319,17 +281,15 @@
          d="m 8.5,0.5 h 80 v 20 h -80 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text874"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan872"
            y="13.833333"
-           x="13.333333">box</tspan>
-      </text>
+           x="13.333333">box</tspan></text>
     </g>
   </g>
   <g
      id="g888"
-     transform="translate(13.499997,205.42154)">
+     transform="translate(13.5,205.42154)">
     <g
        id="g886"
        transform="scale(1.5)">
@@ -339,12 +299,10 @@
          d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 40 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -40 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
       <text
          id="text884"
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan882"
            y="13.5"
-           x="56.333332">action</tspan>
-      </text>
+           x="56.333332">action</tspan></text>
     </g>
   </g>
   <g
@@ -359,20 +317,16 @@
          d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 20 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 84 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
       <text
          id="text894"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan892"
            y="15.25"
-           x="5.3333335">repeat</tspan>
-      </text>
+           x="5.3333335">repeat</tspan></text>
       <text
          id="text898"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan896"
            y="11.25"
-           x="45.333332" />
-      </text>
+           x="45.333332" /></text>
     </g>
   </g>
   <g
@@ -387,12 +341,10 @@
          d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text908"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan906"
            y="13.833333"
-           x="13.333333">4</tspan>
-      </text>
+           x="13.333333">4</tspan></text>
     </g>
   </g>
   <g
@@ -407,20 +359,16 @@
          d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 36.147461 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
       <text
          id="text918"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan916"
            y="15.25"
-           x="5.3333335">note value</tspan>
-      </text>
+           x="5.3333335">note value</tspan></text>
       <text
          id="text922"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan920"
            y="11.25"
-           x="61.480793" />
-      </text>
+           x="61.480793" /></text>
     </g>
   </g>
   <g
@@ -435,28 +383,22 @@
          d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z" />
       <text
          id="text932"
-         style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan930"
            y="23.799999"
-           x="54.333332">/</tspan>
-      </text>
+           x="54.333332">/</tspan></text>
       <text
          id="text936"
-         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:9.33333px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan934"
            y="10.75"
-           x="54.333332" />
-      </text>
+           x="54.333332" /></text>
       <text
          id="text940"
-         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:9.33333px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan938"
            y="31.75"
-           x="54.333332" />
-      </text>
+           x="54.333332" /></text>
     </g>
   </g>
   <g
@@ -471,12 +413,10 @@
          d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text950"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan948"
            y="13.833333"
-           x="13.333333">1</tspan>
-      </text>
+           x="13.333333">1</tspan></text>
     </g>
   </g>
   <g
@@ -491,12 +431,10 @@
          d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text960"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan958"
            y="13.833333"
-           x="13.333333">8</tspan>
-      </text>
+           x="13.333333">8</tspan></text>
     </g>
   </g>
   <path
@@ -507,13 +445,11 @@
      y="135.42154"
      x="367.66666"
      id="text970"
-     style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#000000;stroke-width:1.5">
-    <tspan
+     style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#000000;stroke-width:1.5"><tspan
        style="stroke-width:1.5"
        id="tspan968"
        y="155.67154"
-       x="422.16666">↓</tspan>
-  </text>
+       x="422.16666">↓</tspan></text>
   <g
      id="g992"
      transform="translate(367.66667,166.92154)">
@@ -526,28 +462,22 @@
          d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z" />
       <text
          id="text980"
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan978"
            y="24"
-           x="46.333332">pitch</tspan>
-      </text>
+           x="46.333332">pitch</tspan></text>
       <text
          id="text984"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan982"
            y="11.25"
-           x="46.333332">name</tspan>
-      </text>
+           x="46.333332">name</tspan></text>
       <text
          id="text988"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan986"
            y="32.25"
-           x="46.333332">octave</tspan>
-      </text>
+           x="46.333332">octave</tspan></text>
     </g>
   </g>
   <g
@@ -562,12 +492,10 @@
          d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text998"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan996"
            y="13.833333"
-           x="13.333333">do</tspan>
-      </text>
+           x="13.333333">do</tspan></text>
     </g>
   </g>
   <g
@@ -582,12 +510,10 @@
          d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text1008"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan1006"
            y="13.833333"
-           x="13.333333">4</tspan>
-      </text>
+           x="13.333333">4</tspan></text>
     </g>
   </g>
   <g
@@ -602,20 +528,16 @@
          d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 20 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 84 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
       <text
          id="text1018"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan1016"
            y="15.25"
-           x="5.3333335">repeat</tspan>
-      </text>
+           x="5.3333335">repeat</tspan></text>
       <text
          id="text1022"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1020"
            y="11.25"
-           x="45.333332" />
-      </text>
+           x="45.333332" /></text>
     </g>
   </g>
   <g
@@ -630,12 +552,10 @@
          d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text1032"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan1030"
            y="13.833333"
-           x="13.333333">2</tspan>
-      </text>
+           x="13.333333">2</tspan></text>
     </g>
   </g>
   <g
@@ -650,20 +570,16 @@
          d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 36.147461 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
       <text
          id="text1042"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan1040"
            y="15.25"
-           x="5.3333335">note value</tspan>
-      </text>
+           x="5.3333335">note value</tspan></text>
       <text
          id="text1046"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1044"
            y="11.25"
-           x="61.480793" />
-      </text>
+           x="61.480793" /></text>
     </g>
   </g>
   <g
@@ -678,28 +594,22 @@
          d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z" />
       <text
          id="text1056"
-         style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1054"
            y="23.799999"
-           x="54.333332">/</tspan>
-      </text>
+           x="54.333332">/</tspan></text>
       <text
          id="text1060"
-         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:9.33333px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1058"
            y="10.75"
-           x="54.333332" />
-      </text>
+           x="54.333332" /></text>
       <text
          id="text1064"
-         style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:9.33333px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1062"
            y="31.75"
-           x="54.333332" />
-      </text>
+           x="54.333332" /></text>
     </g>
   </g>
   <g
@@ -714,12 +624,10 @@
          d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text1074"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan1072"
            y="13.833333"
-           x="13.333333">1</tspan>
-      </text>
+           x="13.333333">1</tspan></text>
     </g>
   </g>
   <g
@@ -734,12 +642,10 @@
          d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text1084"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan1082"
            y="13.833333"
-           x="13.333333">4</tspan>
-      </text>
+           x="13.333333">4</tspan></text>
     </g>
   </g>
   <path
@@ -750,13 +656,11 @@
      y="355.92154"
      x="367.66666"
      id="text1094"
-     style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#000000;stroke-width:1.5">
-    <tspan
+     style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#000000;stroke-width:1.5"><tspan
        style="stroke-width:1.5"
        id="tspan1092"
        y="376.17154"
-       x="422.16666">↓</tspan>
-  </text>
+       x="422.16666">↓</tspan></text>
   <g
      id="g1116"
      transform="translate(367.66667,387.42154)">
@@ -769,28 +673,22 @@
          d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z" />
       <text
          id="text1104"
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1102"
            y="24"
-           x="46.333332">pitch</tspan>
-      </text>
+           x="46.333332">pitch</tspan></text>
       <text
          id="text1108"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1106"
            y="11.25"
-           x="46.333332">name</tspan>
-      </text>
+           x="46.333332">name</tspan></text>
       <text
          id="text1112"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1110"
            y="32.25"
-           x="46.333332">octave</tspan>
-      </text>
+           x="46.333332">octave</tspan></text>
     </g>
   </g>
   <g
@@ -805,12 +703,10 @@
          d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text1122"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan1120"
            y="13.833333"
-           x="13.333333">do</tspan>
-      </text>
+           x="13.333333">do</tspan></text>
     </g>
   </g>
   <g
@@ -825,17 +721,15 @@
          d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text1132"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan1130"
            y="13.833333"
-           x="13.333333">4</tspan>
-      </text>
+           x="13.333333">4</tspan></text>
     </g>
   </g>
   <g
      id="g1150"
-     transform="translate(13.499997,331.42154)">
+     transform="translate(13.5,331.42154)">
     <g
        id="g1148"
        transform="scale(1.5)">
@@ -845,25 +739,21 @@
          d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 20 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
       <text
          id="text1142"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan1140"
            y="15.25"
-           x="5.3333335">repeat</tspan>
-      </text>
+           x="5.3333335">repeat</tspan></text>
       <text
          id="text1146"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1144"
            y="11.25"
-           x="45.333332" />
-      </text>
+           x="45.333332" /></text>
     </g>
   </g>
   <g
      id="g1160"
-     transform="translate(85.499997,331.42154)">
+     transform="translate(85.5,331.42154)">
     <g
        id="g1158"
        transform="scale(1.5)">
@@ -873,12 +763,10 @@
          d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text1156"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan1154"
            y="13.833333"
-           x="13.333333">2</tspan>
-      </text>
+           x="13.333333">2</tspan></text>
     </g>
   </g>
   <g
@@ -893,17 +781,15 @@
          d="m 8.5,0.5 h 80 v 20 h -80 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text1166"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan1164"
            y="13.833333"
-           x="13.333333">box</tspan>
-      </text>
+           x="13.333333">box</tspan></text>
     </g>
   </g>
   <g
      id="g1180"
-     transform="translate(13.499997,551.92154)">
+     transform="translate(13.5,551.92154)">
     <g
        id="g1178"
        transform="scale(1.5)">
@@ -913,17 +799,15 @@
          d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 40 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -40 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
       <text
          id="text1176"
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1174"
            y="13.5"
-           x="56.333332">action</tspan>
-      </text>
+           x="56.333332">action</tspan></text>
     </g>
   </g>
   <g
      id="g1198"
-     transform="translate(13.499997,236.92154)">
+     transform="translate(13.5,236.92154)">
     <g
        id="g1196"
        transform="scale(1.5)">
@@ -933,33 +817,27 @@
          d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z" />
       <text
          id="text1186"
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1184"
            y="24"
-           x="46.333332">add</tspan>
-      </text>
+           x="46.333332">add</tspan></text>
       <text
          id="text1190"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1188"
            y="11.25"
-           x="46.333332">to</tspan>
-      </text>
+           x="46.333332">to</tspan></text>
       <text
          id="text1194"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1192"
            y="32.25"
-           x="46.333332">value</tspan>
-      </text>
+           x="46.333332">value</tspan></text>
     </g>
   </g>
   <g
      id="g1208"
-     transform="translate(86.999997,236.92154)">
+     transform="translate(87,236.92154)">
     <g
        id="g1206"
        transform="scale(1.5)">
@@ -969,17 +847,15 @@
          d="m 8.5,0.5 h 80 v 20 h -80 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text1204"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan1202"
            y="13.833333"
-           x="13.333333">box</tspan>
-      </text>
+           x="13.333333">box</tspan></text>
     </g>
   </g>
   <g
      id="g1218"
-     transform="translate(13.499997,299.92154)">
+     transform="translate(13.5,299.92154)">
     <g
        id="g1216"
        transform="scale(1.5)">
@@ -989,17 +865,15 @@
          d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 40 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -40 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
       <text
          id="text1214"
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1212"
            y="13.5"
-           x="56.333332">action</tspan>
-      </text>
+           x="56.333332">action</tspan></text>
     </g>
   </g>
   <g
      id="g1232"
-     transform="translate(13.499997,583.42154)">
+     transform="translate(13.5,583.42154)">
     <g
        id="g1230"
        transform="scale(1.5)">
@@ -1009,25 +883,21 @@
          d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 20 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
       <text
          id="text1224"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan1222"
            y="15.25"
-           x="5.3333335">repeat</tspan>
-      </text>
+           x="5.3333335">repeat</tspan></text>
       <text
          id="text1228"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1226"
            y="11.25"
-           x="45.333332" />
-      </text>
+           x="45.333332" /></text>
     </g>
   </g>
   <g
      id="g1242"
-     transform="translate(85.499997,583.42154)">
+     transform="translate(85.5,583.42154)">
     <g
        id="g1240"
        transform="scale(1.5)">
@@ -1037,17 +907,15 @@
          d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text1238"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan1236"
            y="13.833333"
-           x="13.333333">2</tspan>
-      </text>
+           x="13.333333">2</tspan></text>
     </g>
   </g>
   <g
      id="g1252"
-     transform="translate(26.999997,425.92154)">
+     transform="translate(27,425.92154)">
     <g
        id="g1250"
        transform="scale(1.5)">
@@ -1057,17 +925,15 @@
          d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 40 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -40 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
       <text
          id="text1248"
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1246"
            y="13.5"
-           x="56.333332">action</tspan>
-      </text>
+           x="56.333332">action</tspan></text>
     </g>
   </g>
   <g
      id="g1262"
-     transform="translate(26.999997,677.92154)">
+     transform="translate(27,677.92154)">
     <g
        id="g1260"
        transform="scale(1.5)">
@@ -1077,17 +943,15 @@
          d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 40 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -40 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
       <text
          id="text1258"
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1256"
            y="13.5"
-           x="56.333332">action</tspan>
-      </text>
+           x="56.333332">action</tspan></text>
     </g>
   </g>
   <g
      id="g1280"
-     transform="translate(13.499997,488.92154)">
+     transform="translate(13.5,488.92154)">
     <g
        id="g1278"
        transform="scale(1.5)">
@@ -1097,33 +961,27 @@
          d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z" />
       <text
          id="text1268"
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1266"
            y="24"
-           x="46.333332">add</tspan>
-      </text>
+           x="46.333332">add</tspan></text>
       <text
          id="text1272"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1270"
            y="11.25"
-           x="46.333332">to</tspan>
-      </text>
+           x="46.333332">to</tspan></text>
       <text
          id="text1276"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1274"
            y="32.25"
-           x="46.333332">value</tspan>
-      </text>
+           x="46.333332">value</tspan></text>
     </g>
   </g>
   <g
      id="g1298"
-     transform="translate(26.999997,614.92154)">
+     transform="translate(27,614.92154)">
     <g
        id="g1296"
        transform="scale(1.5)">
@@ -1133,33 +991,27 @@
          d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z" />
       <text
          id="text1286"
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1284"
            y="24"
-           x="46.333332">add</tspan>
-      </text>
+           x="46.333332">add</tspan></text>
       <text
          id="text1290"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1288"
            y="11.25"
-           x="46.333332">to</tspan>
-      </text>
+           x="46.333332">to</tspan></text>
       <text
          id="text1294"
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000">
-        <tspan
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#000000"><tspan
            id="tspan1292"
            y="32.25"
-           x="46.333332">value</tspan>
-      </text>
+           x="46.333332">value</tspan></text>
     </g>
   </g>
   <g
      id="g1308"
-     transform="translate(86.999997,488.92154)">
+     transform="translate(87,488.92154)">
     <g
        id="g1306"
        transform="scale(1.5)">
@@ -1169,12 +1021,10 @@
          d="m 8.5,0.5 h 80 v 20 h -80 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text1304"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan1302"
            y="13.833333"
-           x="13.333333">box</tspan>
-      </text>
+           x="13.333333">box</tspan></text>
     </g>
   </g>
   <g
@@ -1189,60 +1039,21 @@
          d="m 8.5,0.5 h 80 v 20 h -80 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text1314"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan1312"
            y="13.833333"
-           x="13.333333">box</tspan>
-      </text>
+           x="13.333333">box</tspan></text>
     </g>
   </g>
-  <path
-     id="path1320"
-     style="fill:#c4c4c4;fill-opacity:1;stroke:#a0a0a0;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
-     d="m 14.249997,753.67154 v -6 a 6,6 0 0 1 6,-6 h 6 v 3 h 15 v -3 h 106.728513 6 a 6,6 0 0 1 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 a 6,6 0 0 1 -6,6 h -6 -106.728513 -1.5 v 3 h -12 v -3 h -1.5 -6 a 6,6 0 0 1 -6,-6 v -6 z" />
   <text
      y="740.92157"
-     x="13.499997"
-     id="text1324"
-     style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#000000;stroke-width:1.5">
-    <tspan
-       style="stroke-width:1.5"
-       id="tspan1322"
-       y="761.17157"
-       x="144.72852">save as lilypond</tspan>
-  </text>
-  <text
-     y="740.92157"
-     x="13.499997"
+     x="13.5"
      id="text1328"
-     style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000;stroke-width:1.5">
-    <tspan
+     style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000;stroke-width:1.5"><tspan
        style="stroke-width:1.5"
        id="tspan1326"
        y="757.79657"
-       x="144.72852" />
-  </text>
-  <g
-     id="g1342"
-     transform="translate(148.72852,740.92154)">
-    <g
-       id="g1340"
-       transform="scale(1.5)">
-      <path
-         id="path1334"
-         style="fill:#ff6648;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
-      <text
-         id="text1338"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
-           id="tspan1336"
-           y="13.833333"
-           x="13.333333">hotdog.ly</tspan>
-      </text>
-    </g>
-  </g>
+       x="144.72852" /></text>
   <g
      id="g1352"
      transform="translate(100.5,394.42154)">
@@ -1255,17 +1066,15 @@
          d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text1348"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan1346"
            y="13.833333"
-           x="13.333333">-2</tspan>
-      </text>
+           x="13.333333">-2</tspan></text>
     </g>
   </g>
   <g
      id="g1362"
-     transform="translate(86.999997,520.42154)">
+     transform="translate(87,520.42154)">
     <g
        id="g1360"
        transform="scale(1.5)">
@@ -1275,12 +1084,10 @@
          d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text1358"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan1356"
            y="13.833333"
-           x="13.333333">-1</tspan>
-      </text>
+           x="13.333333">-1</tspan></text>
     </g>
   </g>
   <g
@@ -1295,17 +1102,15 @@
          d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text1368"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan1366"
            y="13.833333"
-           x="13.333333">-2</tspan>
-      </text>
+           x="13.333333">-2</tspan></text>
     </g>
   </g>
   <g
      id="g1382"
-     transform="translate(86.999997,268.42154)">
+     transform="translate(87,268.42154)">
     <g
        id="g1380"
        transform="scale(1.5)">
@@ -1315,17 +1120,15 @@
          d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text1378"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan1376"
            y="13.833333"
-           x="13.333333">2</tspan>
-      </text>
+           x="13.333333">2</tspan></text>
     </g>
   </g>
   <g
      id="g1392"
-     transform="translate(86.999997,173.92154)">
+     transform="translate(87,173.92154)">
     <g
        id="g1390"
        transform="scale(1.5)">
@@ -1335,12 +1138,10 @@
          d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
       <text
          id="text1388"
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000">
-        <tspan
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"><tspan
            id="tspan1386"
            y="13.833333"
-           x="13.333333">7</tspan>
-      </text>
+           x="13.333333">7</tspan></text>
     </g>
   </g>
 </svg>

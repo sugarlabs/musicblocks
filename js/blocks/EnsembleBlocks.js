@@ -2,29 +2,22 @@
  * The target-turtle name can be a string or an int. Makes sure there is a turtle by this name and then finds the associated start block.
  * @param   turtles instance
  * @param   {number|string} targetTurtle
- * @returns {number|object}
+ * @returns {number|null}
  */
 function getTargetTurtle(turtles, targetTurtle) {
-    // We'll compare the names as strings.
-    if (typeof targetTurtle === "number") {
-        targetTurtle = targetTurtle.toString();
-    }
+    // We'll compare the names as strings so convert to "string" if "number".
+    targetTurtle = targetTurtle.toString();
 
-    for (let i = 0; i < turtles.turtleList.length; i++) {
-        if (!turtles.turtleList[i].inTrash) {
-            let turtleName = turtles.turtleList[i].name;
-            if (typeof turtleName === "number") {
-                turtleName = turtleName.toString();
-            }
-
-            if (turtleName === targetTurtle) {
-                return i;
-            }
+    for (const i in turtles.turtleList) {
+        const turtle = turtles.ithTurtle(i);
+        if (!turtle.inTrash) {
+            // Convert to string incase of type "number".
+            const turtleName = turtle.name.toString();
+            if (turtleName === targetTurtle) return i;
         }
     }
 
-    console.log(targetTurtle + " not found");
-    console.log(turtles.turtleList);
+    console.debug(`turtle "${targetTurtle}" not found`);
     return null;
 }
 
@@ -39,9 +32,7 @@ function _blockFindTurtle(logo, turtle, blk, receivedArg) {
         console.log("Could not find target turtle name from arg");
         return null;
     }
-    return logo.turtles.turtleList[
-        getTargetTurtle(logo.turtles, targetTurtle)
-    ];
+    return logo.turtles.turtleList[getTargetTurtle(logo.turtles, targetTurtle)];
 }
 
 function setupEnsembleBlocks() {
@@ -69,12 +60,12 @@ function setupEnsembleBlocks() {
             let cblk1 = logo.blocks.blockList[blk].connections[1];
             if (cblk1 === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-		return -1;
-	    }
+                return -1;
+            }
 
-	    let targetTurtle = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-	    let i = getTargetTurtle(logo.turtles, targetTurtle);
-	    if (i < 0) return -1;
+            let targetTurtle = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            let i = getTargetTurtle(logo.turtles, targetTurtle);
+            if (i < 0) return -1;
 
             let cblk2 = logo.blocks.blockList[blk].connections[2];
             if (cblk2 === null) {
@@ -101,7 +92,7 @@ function setupEnsembleBlocks() {
                         logo.turtleHeaps[i].push(0);
                     }
                     return logo.turtleHeaps[i][a - 1];
-		    b
+                    b;
                 } else {
                     logo.errorMsg(NANERRORMSG, blk);
                 }
@@ -171,7 +162,7 @@ function setupEnsembleBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
-	    console.log('start mouse from mouse ' + turtle);
+            console.log("start mouse from mouse " + turtle);
             if (args[0] === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return;
@@ -212,13 +203,7 @@ function setupEnsembleBlocks() {
                 }
                 if (foundStartBlock) {
                     console.debug("STARTING " + targetTurtle + " " + startBlk);
-                    logo.runFromBlock(
-                        logo,
-                        targetTurtle,
-                        startBlk,
-                        isflow,
-                        receivedArg
-                    );
+                    logo.runFromBlock(logo, targetTurtle, startBlk, isflow, receivedArg);
                 } else {
                     logo.errorMsg(_("Cannot find start block") + " " + args[0], blk);
                 }
@@ -232,9 +217,7 @@ function setupEnsembleBlocks() {
             super("turtlecolor", _("mouse color"));
             this.setPalette("ensemble");
             this.setHelpString([
-                _(
-                    "The Mouse color block returns the pen color of the specified mouse."
-                ),
+                _("The Mouse color block returns the pen color of the specified mouse."),
                 "documentation",
                 ""
             ]);
@@ -262,9 +245,7 @@ function setupEnsembleBlocks() {
             super("turtleheading", _("mouse heading"));
             this.setPalette("ensemble");
             this.setHelpString([
-                _(
-                    "The Mouse heading block returns the heading of the specified mouse."
-                ),
+                _("The Mouse heading block returns the heading of the specified mouse."),
                 "documentation",
                 ""
             ]);
@@ -297,11 +278,7 @@ function setupEnsembleBlocks() {
                 args: 3,
                 defaults: [_("Mr. Mouse"), 0, 0],
                 argTypes: ["anyin", "numberin", "numberin"],
-                argLabels: [
-                    this.lang === "ja" ? _("name1") : _("name"),
-                    _("x"),
-                    _("y")
-                ]
+                argLabels: [this.lang === "ja" ? _("name1") : _("name"), _("x"), _("y")]
             });
         }
 
@@ -314,17 +291,11 @@ function setupEnsembleBlocks() {
                     logo.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
                 }
             } else if (args.length === 3) {
-                if (
-                    typeof args[1] === "string" ||
-                    typeof args[2] === "string"
-                ) {
+                if (typeof args[1] === "string" || typeof args[2] === "string") {
                     logo.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else {
-                    logo.turtles.turtleList[targetTurtle].painter.doSetXY(
-                        args[1],
-                        args[2]
-                    );
+                    logo.turtles.turtleList[targetTurtle].painter.doSetXY(args[1], args[2]);
                 }
             }
         }
@@ -335,9 +306,7 @@ function setupEnsembleBlocks() {
             super("setturtle");
             this.setPalette("ensemble");
             this.setHelpString([
-                _(
-                    "The Set mouse block sends a stack of blocks to be run by the specified mouse."
-                ),
+                _("The Set mouse block sends a stack of blocks to be run by the specified mouse."),
                 "documentation",
                 ""
             ]);
@@ -353,13 +322,7 @@ function setupEnsembleBlocks() {
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
             let targetTurtle = getTargetTurtle(logo.turtles, args[0]);
             if (targetTurtle !== null) {
-                logo.runFromBlock(
-                    logo,
-                    targetTurtle,
-                    args[1],
-                    isflow,
-                    receivedArg
-                );
+                logo.runFromBlock(logo, targetTurtle, args[1], isflow, receivedArg);
             } else {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     logo.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
@@ -376,9 +339,7 @@ function setupEnsembleBlocks() {
             super("yturtle", _("mouse y"));
             this.setPalette("ensemble");
             this.setHelpString([
-                _(
-                    "The Y mouse block returns the Y position of the specified mouse."
-                ),
+                _("The Y mouse block returns the Y position of the specified mouse."),
                 "documentation",
                 ""
             ]);
@@ -393,8 +354,7 @@ function setupEnsembleBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             let thisTurtle = _blockFindTurtle(logo, turtle, blk, receivedArg);
 
-            if (thisTurtle)
-                return logo.turtles.screenY2turtleY(thisTurtle.container.y);
+            if (thisTurtle) return logo.turtles.screenY2turtleY(thisTurtle.container.y);
             thisTurtle = logo.turtles.turtleList[turtle];
             console.log("Mouse not found. Using current mouse value instead.");
             return logo.turtles.screenY2turtleY(thisTurtle.container.y);
@@ -407,9 +367,7 @@ function setupEnsembleBlocks() {
             super("xturtle", _("mouse x"));
             this.setPalette("ensemble");
             this.setHelpString([
-                _(
-                    "The X mouse block returns the X position of the specified mouse."
-                ),
+                _("The X mouse block returns the X position of the specified mouse."),
                 "documentation",
                 ""
             ]);
@@ -424,8 +382,7 @@ function setupEnsembleBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             let thisTurtle = _blockFindTurtle(logo, turtle, blk, receivedArg);
 
-            if (thisTurtle)
-                return logo.turtles.screenX2turtleX(thisTurtle.container.x);
+            if (thisTurtle) return logo.turtles.screenX2turtleX(thisTurtle.container.x);
 
             thisTurtle = logo.turtles.turtleList[turtle];
             console.log("Mouse not found. Using current mouse value instead.");
@@ -623,15 +580,9 @@ function setupEnsembleBlocks() {
 
             if (value === null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    logo.errorMsg(
-                        _("Cannot find mouse") + " " + targetTurtle,
-                        blk
-                    );
+                    logo.errorMsg(_("Cannot find mouse") + " " + targetTurtle, blk);
                 } else {
-                    logo.errorMsg(
-                        _("Cannot find turtle") + " " + targetTurtle,
-                        blk
-                    );
+                    logo.errorMsg(_("Cannot find turtle") + " " + targetTurtle, blk);
                 }
                 logo.blocks.blockList[blk].value = -1;
             }
@@ -684,8 +635,9 @@ function setupEnsembleBlocks() {
                     logo.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
                 }
             } else {
-                logo.turtles.ithTurtle(turtle).singer.turtleTime =
-                    logo.turtles.ithTurtle(targetTurtle).singer.turtleTime;
+                logo.turtles.ithTurtle(turtle).singer.turtleTime = logo.turtles.ithTurtle(
+                    targetTurtle
+                ).singer.turtleTime;
             }
         }
     }
@@ -694,11 +646,9 @@ function setupEnsembleBlocks() {
         constructor() {
             super("foundturtle");
             this.setPalette("ensemble");
-	        // this.extraWidth = 20;
+            // this.extraWidth = 20;
             this.setHelpString([
-                _(
-                    "The Found mouse block will return true if the specified mouse can be found."
-                ),
+                _("The Found mouse block will return true if the specified mouse can be found."),
                 "documentation",
                 ""
             ]);
@@ -716,13 +666,7 @@ function setupEnsembleBlocks() {
 
         arg(logo, turtle, blk, receivedArg) {
             let cblk = logo.blocks.blockList[blk].connections[1];
-            let targetTurtle = logo.parseArg(
-                logo,
-                turtle,
-                cblk,
-                blk,
-                receivedArg
-            );
+            let targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
             return getTargetTurtle(logo.turtles, targetTurtle) !== null;
         }
     }
@@ -817,7 +761,7 @@ function setupEnsembleBlocks() {
         constructor() {
             super("turtlecount", _("mouse count"));
             this.setPalette("ensemble");
-            this.hidden = (this.lang === "ja");
+            this.hidden = this.lang === "ja";
 
             this.setHelpString([
                 _("The Mouse-count block returns the number of mice."),
@@ -840,7 +784,7 @@ function setupEnsembleBlocks() {
         constructor() {
             super("nthturtle", _("nth mouse name"));
             this.setPalette("ensemble");
-            this.hidden = (this.lang === "ja");
+            this.hidden = this.lang === "ja";
 
             this.setHelpString([
                 _("The Nth-Mouse name block returns the name of the nth mice."),
@@ -864,7 +808,7 @@ function setupEnsembleBlocks() {
             }
             let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
             if (typeof a === "number") {
-                a -= 1;  // Internally, we count from 0
+                a -= 1; // Internally, we count from 0
                 if (a >= 0 && a < logo.turtles.turtleList.length) {
                     return logo.turtles.turtleList[a].name;
                 } else {
