@@ -756,18 +756,18 @@ function TimbreWidget() {
 
         this._playing = false;
 
-        var widgetWindow = window.widgetWindows.windowFor(this, "timbre");
+        const widgetWindow = window.widgetWindows.windowFor(this, "timbre");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
 
-        var w = window.innerWidth;
+        const w = window.innerWidth;
         this._cellScale = w / 1200;
-        var iconSize = ICONSIZE * this._cellScale;
+        const iconSize = ICONSIZE * this._cellScale;
 
-        var buttonTable = document.createElement("table");
-        var header = buttonTable.createTHead();
-        var row = header.insertRow(0);
+        const buttonTable = document.createElement("table");
+        const header = buttonTable.createTHead();
+        const row = header.insertRow(0);
 
         var that = this;
 
@@ -942,7 +942,7 @@ function TimbreWidget() {
             }
         };
 
-        var effectsButtonCell = widgetWindow.addButton(
+        const effectsButtonCell = widgetWindow.addButton(
             "effects.svg",
             ICONSIZE,
             _("Effects")
@@ -960,7 +960,7 @@ function TimbreWidget() {
             that._effects();
         };
 
-        var filterButtonCell = widgetWindow.addButton(
+        const filterButtonCell = widgetWindow.addButton(
             "filter.svg",
             ICONSIZE,
             _("Filter")
@@ -1104,8 +1104,8 @@ function TimbreWidget() {
 
     this._blockReplace = function (oldblk, newblk) {
         // Find the connections from the old block
-        var c0 = this._logo.blocks.blockList[oldblk].connections[0];
-        var c1 = last(this._logo.blocks.blockList[oldblk].connections);
+        const c0 = this._logo.blocks.blockList[oldblk].connections[0];
+        const c1 = last(this._logo.blocks.blockList[oldblk].connections);
 
         // Connect the new block
         this._logo.blocks.blockList[newblk].connections[0] = c0;
@@ -1225,8 +1225,8 @@ function TimbreWidget() {
         timbreTableDiv.style.height = "300px";
         timbreTableDiv.innerHTML = '<div id="timbreTable"></div>';
 
-        var env = docById("timbreTable");
-        var htmlElements = "";
+        let env = docById("timbreTable");
+        let htmlElements = "";
         for (let i = 0; i < 2; i++) {
             htmlElements += '<div id ="synth' + i + '"></div>';
         }
@@ -1240,7 +1240,7 @@ function TimbreWidget() {
         envAppend.style.overflow = "auto";
         env.append(envAppend);
 
-        var mainDiv = docById("synth0");
+        let mainDiv = docById("synth0");
         mainDiv.innerHTML =
             '<p><input type="radio" name="synthsName" value="AMSynth"/>' +
             _("AM synth") +
@@ -1250,9 +1250,9 @@ function TimbreWidget() {
             _("duo synth") +
             "</br></p>";
 
-        var subDiv = docById("synth1");
-        var synthsName = docByName("synthsName");
-        var synthChosen;
+        let subDiv = docById("synth1");
+        let synthsName = docByName("synthsName");
+        let synthChosen;
         for (let i = 0; i < synthsName.length; i++) {
             synthsName[i].onclick = function () {
                 synthChosen = this.value;
@@ -1641,8 +1641,8 @@ function TimbreWidget() {
         timbreTableDiv.style.height = "300px";
         timbreTableDiv.innerHTML = '<div id="timbreTable"></div>';
 
-        var env = docById("timbreTable");
-        var htmlElements =
+        const env = docById("timbreTable");
+        const htmlElements =
             '<div id="wrapperOsc0"><div id="sOsc0"><span>' +
             _("type") +
             '</span></div><div id="selOsc"></div></div>';
