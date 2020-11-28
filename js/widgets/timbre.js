@@ -144,7 +144,7 @@ function TimbreWidget() {
         // k is the parameter to update (There can be multiple
         // parameters per block.)
 
-        var updateParams = [];
+        let updateParams = [];
 
         if (this.isActive["envelope"] === true && this.env[i] != null) {
             for (j = 0; j < 4; j++) {
@@ -227,7 +227,7 @@ function TimbreWidget() {
                 this.vibratoEffect[i]
             ].connections[1];
             // The rate arg of the vibrato block must be in the form: a / b
-            var divBlock = this._logo.blocks.blockList[this.vibratoEffect[i]]
+            let divBlock = this._logo.blocks.blockList[this.vibratoEffect[i]]
                 .connections[2];
             if (
                 this._logo.blocks.blockList[divBlock].name === "divide" &&
@@ -240,15 +240,15 @@ function TimbreWidget() {
                     this._logo.blocks.blockList[divBlock].connections[2]
                 ].name === "number"
             ) {
-                var numBlock = this._logo.blocks.blockList[divBlock]
+                let numBlock = this._logo.blocks.blockList[divBlock]
                     .connections[1];
-                var denomBlock = this._logo.blocks.blockList[divBlock]
+                let denomBlock = this._logo.blocks.blockList[divBlock]
                     .connections[2];
                 updateParams[1] = denomBlock;
                 updateParams[2] = numBlock;
             } else {
                 // Convert to a / b format
-                var obj = rationalToFraction(
+                let obj = rationalToFraction(
                     this._logo.parseArg(this._logo, 0, divBlock, null, null)
                 );
                 let topOfClamp = this._logo.blocks.blockList[
@@ -490,7 +490,7 @@ function TimbreWidget() {
 
     this._save = function () {
         // Just save a set timbre block with the current instrument name.
-        var obj = [
+        let obj = [
             [
                 0,
                 "settimbre",
@@ -2338,7 +2338,7 @@ function TimbreWidget() {
                         // Scale of rate is 0 to 1, so we need to multiply by 100
                         docById("myRangeFx1").value =
                             100 / parseFloat(that.vibratoParams[1]);
-                        var obj = rationalToFraction(
+                        let obj = rationalToFraction(
                             1 / parseFloat(that.vibratoParams[1])
                         );
                         docById("myspanFx1").textContent =
@@ -2419,10 +2419,10 @@ function TimbreWidget() {
                             docById("myRangeFx1").value = parseFloat(
                                 elem.value
                             );
-                            var obj = oneHundredToFraction(elem.value);
+                            let obj = oneHundredToFraction(elem.value);
                             docById("myspanFx1").textContent =
                                 obj[0] + "/" + obj[1];
-                            var temp = parseFloat(obj[0]) / parseFloat(obj[1]);
+                            let temp = parseFloat(obj[0]) / parseFloat(obj[1]);
 
                             instrumentsEffects[0][that.instrumentName][
                                 "vibratoFrequency"
