@@ -96,7 +96,7 @@ function PitchStaircase() {
             playCell.className = "headcol"; // This cell is fixed horizontally.
             playCell.setAttribute("id", i);
 
-            var stepCell = stepTableRow.insertCell();
+            let stepCell = stepTableRow.insertCell();
             stepCell.setAttribute("id", frequency);
             stepCell.style.width =
                 (INNERWINDOWWIDTH * parseFloat(DEFAULTFREQUENCY / frequency) *
@@ -528,11 +528,11 @@ function PitchStaircase() {
         // TODO: THIS
         // DO NOT COMMIT WITH THIS COMMENTED
         /*
-        var cell = row.insertCell();
+        let cell = row.insertCell();
         cell.innerHTML = '<h2>:</h2>';
         cell.style.backgroundColor = platformColor.selectorBackground;
 
-        var cell = row.insertCell();
+        let cell = row.insertCell();
         cell.innerHTML = '<input id="musicratio2" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="musicratio2" type="musicratio2" value="' + 2 + '" />';
         cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
         cell.style.minWidth = cell.style.width;
