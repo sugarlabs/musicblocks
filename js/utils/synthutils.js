@@ -1299,15 +1299,15 @@ function Synth() {
             console.debug(notes);
         }
 
+        let numFilters;
+        let temp_filters = [];
         if (paramsEffects === null && paramsFilters === null) {
             console.debug(notes);
             console.debug(beatValue);
             synth.triggerAttackRelease(notes, beatValue);
         } else {
             if (paramsFilters !== null && paramsFilters !== undefined) {
-                let numFilters = paramsFilters.length; // no. of filters
-                let temp_filters = [];
-
+                numFilters = paramsFilters.length; // no. of filters
                 for (let k = 0; k < numFilters; k++) {
                     // filter rolloff has to be added
                     let filterVal = new Tone.Filter(

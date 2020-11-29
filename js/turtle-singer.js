@@ -2018,6 +2018,13 @@ class Singer {
                                 }
                             }
                         }
+                        // If the drum is played by itself, we need to update the lastNotePlayed.
+                        if (notes.length === 0) {
+                            tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
+                            tur.singer.lastNotePlayed = ["C2", noteBeatValue];
+                            tur.singer.noteStatus = [["C2"], noteBeatValue];
+                            tur.singer.lastPitchPlayed = tur.singer.lastNotePlayed;
+                        }
                     }
                 }
 
