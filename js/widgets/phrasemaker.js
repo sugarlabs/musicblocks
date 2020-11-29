@@ -26,7 +26,7 @@ const MATRIXGRAPHICS = [
 const MATRIXGRAPHICS2 = ["arc", "setxy"];
 const MATRIXSYNTHS = ["sine", "triangle", "sawtooth", "square", "hertz"]; // Deprecated
 
-class PitchTimeMatrix {
+class PhraseMaker {
     constructor() {
         // The phrasemaker widget
         const BUTTONDIVWIDTH = 535; // 8 buttons 535 = (55 + 4) * 9

@@ -1027,7 +1027,7 @@ function setupWidgetBlocks() {
             logo.inMatrix = true;
 
             if (logo.phraseMaker === null) {
-                logo.phraseMaker = new PitchTimeMatrix();
+                logo.phraseMaker = new PhraseMaker();
             }
             logo.phraseMaker.blockNo = blk;
 
