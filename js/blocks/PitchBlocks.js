@@ -1429,13 +1429,13 @@ function setupPitchBlocks() {
                 logo.errorMsg(INVALIDPITCH, blk);
                 logo.stopTurtle = true;
             } else if (logo.inMatrix) {
-                logo.pitchTimeMatrix.addRowBlock(blk);
+                logo.phraseMaker.addRowBlock(blk);
                 if (logo.pitchBlocks.indexOf(blk) === -1) {
                     logo.pitchBlocks.push(blk);
                 }
 
-                logo.pitchTimeMatrix.rowLabels.push(logo.blocks.blockList[blk].name);
-                logo.pitchTimeMatrix.rowArgs.push(arg.toFixed(0));
+                logo.phraseMaker.rowLabels.push(logo.blocks.blockList[blk].name);
+                logo.phraseMaker.rowArgs.push(arg.toFixed(0));
                 // convert hertz to note/octave
                 let note = obj;
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];

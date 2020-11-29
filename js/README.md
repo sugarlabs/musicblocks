@@ -89,7 +89,7 @@ Subdirectories with additional utilities
 	* `pitchdrummatrix.js` -- map pitches to drum sounds
 	* `pitchslider.js` -- generate pitch blocks based on frequency (in Hertz)
 	* `pitchstaircase.js` -- generate a collection of pitches based on ratios of frequency (Hertz)
-	* `pitchtimematrix.js` -- map pitch to rhythm (create a "chunk" of notes)
+	* `phrasemaker.js` -- map pitch to rhythm (create a "chunk" of notes)
 	* `rhythmruler.js` -- define rhythms (and drum machines)
 	* `status.js` -- track the status of various parameters as the program plays (a useful debugging tool)
 	* `tempo.js` -- change the tempo

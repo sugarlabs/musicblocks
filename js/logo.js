@@ -75,7 +75,7 @@ class Logo {
         this.showBlocksAfterRun = false;
 
         // Widgets
-        this.pitchTimeMatrix = null;
+        this.phraseMaker = null;
         this.pitchDrumMatrix = null;
         this.rhythmRuler = null;
         this.timbre = null;

@@ -61,7 +61,7 @@
 #: js/MeterBlocks.js:568
 #: js/MeterBlocks.js:669
 #: js/musickeyboard.js:2360
-#: js/pitchtimematrix.js:4708
+#: js/phrasemaker.js:4708
 #: js/rhythmruler.js:1602
 #: js/rhythmruler.js:1610
 #: js/rhythmruler.js:1911
@@ -110,7 +110,7 @@
 #: js/MeterBlocks.js:455
 #: js/MeterBlocks.js:494
 #: js/musickeyboard.js:2421
-#: js/pitchtimematrix.js:4706
+#: js/phrasemaker.js:4706
 #: js/rhythmruler.js:1602
 #: js/rhythmruler.js:1610
 #: js/rhythmruler.js:1911
@@ -159,7 +159,7 @@
 #: js/MeterBlocks.js:461
 #: js/MeterBlocks.js:500
 #: js/musickeyboard.js:2495
-#: js/pitchtimematrix.js:4718
+#: js/phrasemaker.js:4718
 #: js/rhythmruler.js:1602
 #: js/rhythmruler.js:1610
 #: js/rhythmruler.js:1911
@@ -208,7 +208,7 @@
 #: js/MeterBlocks.js:461
 #: js/MeterBlocks.js:500
 #: js/musickeyboard.js:2495
-#: js/pitchtimematrix.js:4718
+#: js/phrasemaker.js:4718
 #: js/rhythmruler.js:1602
 #: js/rhythmruler.js:1610
 #: js/rhythmruler.js:1911
@@ -257,7 +257,7 @@
 #: js/MeterBlocks.js:461
 #: js/MeterBlocks.js:500
 #: js/musickeyboard.js:2495
-#: js/pitchtimematrix.js:4718
+#: js/phrasemaker.js:4718
 #: js/rhythmruler.js:1602
 #: js/rhythmruler.js:1610
 #: js/rhythmruler.js:1911
@@ -349,7 +349,7 @@ msgstr "ñup’una taqi"
 #: js/RhythmBlocks.js:511
 #: js/DrumBlocks.js:234
 #: js/VolumeBlocks.js:328
-#: js/pitchtimematrix.js:733
+#: js/phrasemaker.js:733
 #.TRANS: tambor
 msgid "drum"
 msgstr "tarula"
@@ -379,10 +379,10 @@ msgstr " kunka ruray"
 #: js/OrnamentBlocks.js:116
 #: js/MeterBlocks.js:811
 #: js/DictBlocks.js:22
-#: js/pitchtimematrix.js:643
-#: js/pitchtimematrix.js:2520
-#: js/pitchtimematrix.js:2563
-#: js/pitchtimematrix.js:2668
+#: js/phrasemaker.js:643
+#: js/phrasemaker.js:2520
+#: js/phrasemaker.js:2563
+#: js/phrasemaker.js:2668
 #.TRANS: the value (e.g., 1/4 note) of the note being played.
 #.TRANS: valor de la nota
 msgid "note value"
@@ -456,7 +456,7 @@ msgstr ""
 #: js/PitchBlocks.js:1694
 #: js/IntervalsBlocks.js:18
 #: js/musickeyboard.js:1524
-#: js/pitchtimematrix.js:731
+#: js/phrasemaker.js:731
 #.TRANS: pitch number
 #.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
 #.TRANS: tono
@@ -560,7 +560,7 @@ msgstr ""
 
 #: js/block.js:4678
 #: js/musickeyboard.js:1874
-#: js/pitchtimematrix.js:1757
+#: js/phrasemaker.js:1757
 #: js/musicutils.js:731
 #: js/musicutils.js:735
 #.TRANS: double sharp is a music term related to pitch
@@ -572,8 +572,8 @@ msgstr "iskay ñañu kunka"
 #: js/PitchBlocks.js:1366
 #: js/PitchActions.js:502
 #: js/musickeyboard.js:1875
-#: js/pitchtimematrix.js:1758
-#: js/pitchtimematrix.js:5088
+#: js/phrasemaker.js:1758
+#: js/phrasemaker.js:5088
 #: js/musicutils.js:729
 #: js/musicutils.js:736
 #.TRANS: sharp is a half-step up in pitch
@@ -584,7 +584,7 @@ msgstr "allin uyarikuy"
 
 #: js/block.js:4680
 #: js/musickeyboard.js:1876
-#: js/pitchtimematrix.js:1759
+#: js/phrasemaker.js:1759
 #: js/musicutils.js:727
 #: js/musicutils.js:737
 #.TRANS: natural is a music term related to pitch
@@ -596,8 +596,8 @@ msgstr "purum"
 #: js/PitchBlocks.js:1325
 #: js/PitchActions.js:505
 #: js/musickeyboard.js:1877
-#: js/pitchtimematrix.js:1760
-#: js/pitchtimematrix.js:5178
+#: js/phrasemaker.js:1760
+#: js/phrasemaker.js:5178
 #: js/musicutils.js:725
 #: js/musicutils.js:738
 #.TRANS: flat is a half-step down in pitch
@@ -608,7 +608,7 @@ msgstr "pampa"
 
 #: js/block.js:4682
 #: js/musickeyboard.js:1878
-#: js/pitchtimematrix.js:1761
+#: js/phrasemaker.js:1761
 #: js/musicutils.js:723
 #: js/musicutils.js:739
 #.TRANS: double flat is a music term related to pitch
@@ -877,10 +877,10 @@ msgstr ""
 #: js/musickeyboard.js:727
 #: js/musickeyboard.js:729
 #: js/pitchdrummatrix.js:122
-#: js/pitchtimematrix.js:244
-#: js/pitchtimematrix.js:4258
-#: js/pitchtimematrix.js:4357
-#: js/pitchtimematrix.js:4470
+#: js/phrasemaker.js:244
+#: js/phrasemaker.js:4258
+#: js/phrasemaker.js:4357
+#: js/phrasemaker.js:4470
 #: js/meterwidget.js:56
 #: js/timbre.js:439
 #: js/timbre.js:441
@@ -1262,14 +1262,14 @@ msgid "widgets"
 msgstr ""
 
 #: js/turtledefs.js:81
-#: js/pitchtimematrix.js:734
+#: js/phrasemaker.js:734
 #.TRANS: gráficos
 msgid "graphics"
 msgstr "siq’ikuna"
 
 #: js/turtledefs.js:82
 #: js/rubrics.js:498
-#: js/pitchtimematrix.js:735
+#: js/phrasemaker.js:735
 #.TRANS: pluma
 msgid "pen"
 msgstr "qillqana"
@@ -3179,7 +3179,7 @@ msgstr "Por siempre, Repetir, Mientras o Hasta."
 #: js/FlowBlocks.js:440
 #: js/musickeyboard.js:581
 #: js/musickeyboard.js:583
-#: js/pitchtimematrix.js:4155
+#: js/phrasemaker.js:4155
 #: js/timbre.js:424
 #: js/timbre.js:426
 #: plugins/rodi.rtp:31
@@ -4359,7 +4359,7 @@ msgstr "El bloque detener medios detiene la reproducción de audio o video."
 #: js/MediaBlocks.js:352
 #: js/PitchBlocks.js:1396
 #: js/musickeyboard.js:1525
-#: js/pitchtimematrix.js:732
+#: js/phrasemaker.js:732
 #.TRANS: a measure of frequency: one cycle per second
 #.TRANS: hertz
 msgid "hertz"
@@ -5815,7 +5815,7 @@ msgstr "pusay"
 #: js/musickeyboard.js:453
 #: js/pitchdrummatrix.js:132
 #: js/pitchslider.js:143
-#: js/pitchtimematrix.js:256
+#: js/phrasemaker.js:256
 #: js/meterwidget.js:100
 #: js/timbre.js:809
 #: js/temperament.js:2156
@@ -5827,7 +5827,7 @@ msgstr "waqaychay"
 
 #: js/musickeyboard.js:461
 #: js/pitchdrummatrix.js:147
-#: js/pitchtimematrix.js:273
+#: js/phrasemaker.js:273
 #: js/rhythmruler.js:2478
 #: js/modewidget.js:98
 #: js/pitchstaircase.js:619
@@ -5837,7 +5837,7 @@ msgid "Clear"
 msgstr "pichay"
 
 #: js/musickeyboard.js:473
-#: js/pitchtimematrix.js:296
+#: js/phrasemaker.js:296
 #.TRANS: Agrega una nota
 msgid "Add note"
 msgstr "Agrega una nota"
@@ -5868,7 +5868,7 @@ msgid "rest"
 msgstr "samay"
 
 #: js/musickeyboard.js:2765
-#: js/pitchtimematrix.js:5296
+#: js/phrasemaker.js:5296
 #: js/tempo.js:226
 #: js/rhythmruler.js:1551
 #: js/rhythmruler.js:1879
@@ -5926,23 +5926,23 @@ msgstr ""
 msgid "ZOOM OUT"
 msgstr ""
 
-#: js/pitchtimematrix.js:282
+#: js/phrasemaker.js:282
 #.TRANS: Exportar
 msgid "Export"
 msgstr "hurquy"
 
-#: js/pitchtimematrix.js:291
+#: js/phrasemaker.js:291
 #.TRANS: Ordenar
 msgid "Sort"
 msgstr "ñiq’ichay"
 
-#: js/pitchtimematrix.js:676
+#: js/phrasemaker.js:676
 #.TRANS: Haga clic en la tabla para agregar notas.
 msgid "Click on the table to add notes."
 msgstr "Haga clic en la tabla para agregar notas."
 
-#: js/pitchtimematrix.js:2541
-#: js/pitchtimematrix.js:2679
+#: js/phrasemaker.js:2541
+#: js/phrasemaker.js:2679
 #.TRANS: valor del tuplet
 msgid "tuplet value"
 msgstr "tupla chimpu chani"

@@ -132,32 +132,32 @@ function setupPitchActions() {
             transposition = 0;
 
             if (logo.inMatrix) {
-                logo.pitchTimeMatrix.addRowBlock(blk);
+                logo.phraseMaker.addRowBlock(blk);
                 if (logo.pitchBlocks.indexOf(blk) === -1) {
                     logo.pitchBlocks.push(blk);
                 }
 
-                if (logo.pitchTimeMatrix.rowLabels.length > 0) {
-                    if (last(logo.pitchTimeMatrix.rowLabels) === "hertz") {
+                if (logo.phraseMaker.rowLabels.length > 0) {
+                    if (last(logo.phraseMaker.rowLabels) === "hertz") {
                         let freq = pitchToFrequency(
                             noteObj[0], noteObj[1], 0, tur.singer.keySignature
                         );
-                        logo.pitchTimeMatrix.rowLabels.push("hertz");
-                        logo.pitchTimeMatrix.rowArgs.push(parseInt(freq));
+                        logo.phraseMaker.rowLabels.push("hertz");
+                        logo.phraseMaker.rowArgs.push(parseInt(freq));
                     } else {
-                        if (SOLFEGENAMES1.indexOf(last(logo.pitchTimeMatrix.rowLabels)) !== -1) {
-                            logo.pitchTimeMatrix.rowLabels.push(
+                        if (SOLFEGENAMES1.indexOf(last(logo.phraseMaker.rowLabels)) !== -1) {
+                            logo.phraseMaker.rowLabels.push(
                                 SOLFEGECONVERSIONTABLE[noteObj1[0]]
                             );
                         } else {
-                            logo.pitchTimeMatrix.rowLabels.push(noteObj1[0]);
+                            logo.phraseMaker.rowLabels.push(noteObj1[0]);
                         }
 
-                        logo.pitchTimeMatrix.rowArgs.push(noteObj1[1]);
+                        logo.phraseMaker.rowArgs.push(noteObj1[1]);
                     }
                 } else {
-                    logo.pitchTimeMatrix.rowLabels.push(noteObj1[0]);
-                    logo.pitchTimeMatrix.rowArgs.push(noteObj1[1]);
+                    logo.phraseMaker.rowLabels.push(noteObj1[0]);
+                    logo.phraseMaker.rowArgs.push(noteObj1[1]);
                 }
 
                 tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
