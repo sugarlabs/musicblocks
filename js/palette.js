@@ -231,7 +231,6 @@ function Palettes() {
         listBody = palette.children[0].children[1].appendChild(
             document.createElement("tbody"));
         // Make an icon/button for each palette
-<<<<<<< HEAD
         this.makeButton(
             "search",
             makePaletteIcons(
@@ -241,11 +240,6 @@ function Palettes() {
             )
             ,listBody
         );
-=======
-        this.makeButton("search",
-                        makePaletteIcons(PALETTEICONS["search"], this.cellSize,
-                                         this.cellSize), listBody);
->>>>>>> upstream/master
         for (let name of MULTIPALETTES[i]) {
             if (beginnerMode && SKIPPALETTES.indexOf(name) !== -1) {
                 continue;
@@ -256,7 +250,6 @@ function Palettes() {
                     continue;
                 }
             }
-<<<<<<< HEAD
             this.makeButton(
                 name,
                 makePaletteIcons(
@@ -266,11 +259,6 @@ function Palettes() {
                 )
                 ,listBody
             );
-=======
-            this.makeButton(name,
-                            makePaletteIcons(PALETTEICONS[name], this.cellSize,
-                                             this.cellSize), listBody);
->>>>>>> upstream/master
         }
     };
 
@@ -442,15 +430,11 @@ function PaletteModel(palette, palettes, name) {
                                                 block.name));
         }
     };
-<<<<<<< HEAD
+
 
     this.makeBlockInfo = function(blk,block,blkname,modname) {
 
-=======
-    
-    this.makeBlockInfo = function(blk, block, blkname, modname) {
-        let arg;
->>>>>>> upstream/master
+
         switch (blkname) {
             // Use the name of the action in the label
         case "storein":
@@ -862,15 +846,13 @@ function Palette(palettes, name) {
             // Use artwork.js strings as images for:
             // cameraPALETTE, videoPALETTE, mediaPALETTE
             if (b.image){
-<<<<<<< HEAD
+
                 if (!(b.blkname === "audiofile")) {
                     img = makePaletteIcons(
                         eval(b.blkname+"PALETTE")
                     );
                 }
-=======
-                img = makePaletteIcons(eval(b.blkname+"PALETTE"));
->>>>>>> upstream/master
+
             }
 
             img.onmouseover = (evt) => {
@@ -909,12 +891,10 @@ function Palette(palettes, name) {
                     if (e.type === "touchmove"){
                         x = e.touches[0].clientX;
                         y = e.touches[0].clientY;
-<<<<<<< HEAD
+
                     }
                     else{
-=======
-                    } else {
->>>>>>> upstream/master
+
                         x = e.pageX;
                         y = e.pageY;
                     }
@@ -937,16 +917,11 @@ function Palette(palettes, name) {
                     img.style.position = posit;
                     img.style.zIndex = zInd;
                     document.body.removeChild(img);
-<<<<<<< HEAD
+
                     itemCell.appendChild(img)
 
                     if (!x || !y) return ;
-=======
-                    itemCell.appendChild(img);
-                    
-                    if (!x || !y) return;
 
->>>>>>> upstream/master
                     that._makeBlockFromProtoblock(
                         protoListScope[blk],
                         true,
@@ -957,7 +932,7 @@ function Palette(palettes, name) {
                     );
                 };
 
-<<<<<<< HEAD
+
                 img.ontouchend = up ;
                 img.onmouseup = up ;
             };
@@ -965,15 +940,7 @@ function Palette(palettes, name) {
             img.ontouchstart = down ;
             img.onmousedown = down ;
 
-=======
-                img.ontouchend = up;                  
-                img.onmouseup = up;
-            };
 
-            img.ontouchstart = down;
-            img.onmousedown = down;
-                
->>>>>>> upstream/master
             itemCell.setAttribute("style","width: "+img.width+"px ");
             itemCell.appendChild(img)
         }
