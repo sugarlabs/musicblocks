@@ -318,6 +318,7 @@ class Notation {
             this._notationStaging[turtle].push("pickup", beat);
             this._pickupPOW2[turtle] = true;
         } else {
+            let obj;
             if (this._logo.runningLilypond) {
                 obj = rationalToFraction(factor);
                 this._logo.errorMsg(
