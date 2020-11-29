@@ -19,46 +19,29 @@ function PitchSlider() {
     const SEMITONE = Math.pow(2,1/12);
 
     this._save = function(frequency) {
-        var that = this;
+        let that = this;
 
-        for (var name in this._logo.blocks.palettes.dict) {
+        for (let name in this._logo.blocks.palettes.dict) {
             this._logo.blocks.palettes.dict[name].hideMenu(true);
         }
 
         this._logo.refreshCanvas();
 
-        var newStack = [
-            [
-                0,
-                "note",
-                100 + this._delta,
-                100 + this._delta,
-                [null, 1, 2, null]
-            ],
-            [1, ["number", { value: 8 }], 0, 0, [0]]
-        ];
+        let newStack = [[0, "note", 100 + this._delta, 100 + this._delta,
+                         [null, 1, 2, null]],
+                        [1, ["number", { value: 8 }], 0, 0, [0]]];
         this._delta += 21;
 
-        var endOfStackIdx = 0;
-        var previousBlock = 0;
+        let endOfStackIdx = 0;
+        let previousBlock = 0;
 
-        var hertzIdx = newStack.length;
-        var frequencyIdx = hertzIdx + 1;
-        var hiddenIdx = hertzIdx + 2;
-        newStack.push([
-            hertzIdx,
-            "hertz",
-            0,
-            0,
-            [previousBlock, frequencyIdx, hiddenIdx]
-        ]);
-        newStack.push([
-            frequencyIdx,
-            ["number", { value: frequency }],
-            0,
-            0,
-            [hertzIdx]
-        ]);
+        let hertzIdx = newStack.length;
+        let frequencyIdx = hertzIdx + 1;
+        let hiddenIdx = hertzIdx + 2;
+        newStack.push([hertzIdx, "hertz", 0, 0,
+                       [previousBlock, frequencyIdx, hiddenIdx]]);
+        newStack.push([frequencyIdx, ["number", { value: frequency }],
+                       0, 0, [hertzIdx]]);
         newStack.push([hiddenIdx, "hidden", 0, 0, [hertzIdx, null]]);
 
         that._logo.blocks.loadNewBlocks(newStack);
@@ -76,12 +59,9 @@ function PitchSlider() {
             oscillators.push(osc);
         }
         this._cellScale = 1.0;
-        var iconSize = ICONSIZE;
-        var widgetWindow = window.widgetWindows.windowFor(
-            this,
-            "pitch slider",
-            "slider"
-        );
+        let iconSize = ICONSIZE;
+        let widgetWindow = window.widgetWindows.windowFor(
+            this, "pitch slider", "slider");
         this.widgetWindow = widgetWindow;
         widgetWindow.onclose = () => {
             for (let osc of oscillators) osc.triggerRelease();
