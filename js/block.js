@@ -1757,7 +1757,7 @@ function Block(protoblock, blocks, overrideName) {
 
         let __readerAction = function(event) {
             window.scroll(0, 0);
-
+            console.log("im here");
             let reader = new FileReader();
             reader.onloadend = function() {
                 if (reader.result) {
@@ -1771,6 +1771,8 @@ function Block(protoblock, blocks, overrideName) {
                 }
             };
             if (that.name === "media") {
+                reader.readAsDataURL(fileChooser.files[0]);
+            } else if (that.name === "audiofile") {
                 reader.readAsDataURL(fileChooser.files[0]);
             } else {
                 reader.readAsText(fileChooser.files[0]);
@@ -2759,7 +2761,7 @@ function Block(protoblock, blocks, overrideName) {
                 if (new Date().getTime() - this.blocks.mouseDownTime < 500) {
                     if (!this.trash) {
                         this.blocks.mouseDownTime = new Date().getTime();
-                        if (this.name === "media" || this.name === "loadFile") {
+                        if (this.name === "media" || this.name === "loadFile" || this.name === "audiofile") {
                             this._doOpenMedia(thisBlock);
                         } else {
                             this._changeLabel();

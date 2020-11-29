@@ -749,7 +749,7 @@ function Synth() {
             for (let customsample in CUSTOMSAMPLES) {
                 if (CUSTOMSAMPLES[customsample][0] === sampleName) {
                     //datafunction = function() {return CUSTOMSAMPLES[customsample][1]};
-                    newdata = CUSTOMSAMPLES[customsample][1];
+                    let newdata = (CUSTOMSAMPLES[customsample][1]);
                     console.log(newdata);
                     this.samples["voice"][sampleName] = BANJO_SAMPLE();//CUSTOMSAMPLES[customsample][1];
                     console.log(this.samples);
