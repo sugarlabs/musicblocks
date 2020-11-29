@@ -179,7 +179,7 @@ function PitchDrumMatrix() {
         // first column and a table of buttons in the second column.
         var pdmTable = docById("pdmTable");
 
-        var j = 0;
+        let j = 0;
         for (let i = 0; i < this.rowLabels.length; i++) {
             if (this.rowLabels[i].toLowerCase() === _("rest")) {
                 // In case there are rest notes included.
@@ -241,7 +241,7 @@ function PitchDrumMatrix() {
         labelCell.className = "headcol";
         labelCell.innerHTML = "";
 
-        var n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
+        let n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
         var outerDiv = docById("pdmOuterDiv");
         if (pdmTable.rows.length + 2 > n) {
             outerDiv.style.height = window.innerHeight / 2 + "px";
@@ -396,7 +396,7 @@ function PitchDrumMatrix() {
         cell.setAttribute("id", drumIdx); // Column // row.cells.length - 1);
 
         // Work around i8n bug in Firefox.
-        var name = getDrumName(drumname);
+        let name = getDrumName(drumname);
         if (name === "") {
             name = drumname;
         }
