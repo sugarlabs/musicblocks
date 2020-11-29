@@ -33,7 +33,7 @@ function Tempo() {
         this._intervals[i] = (60 / this.BPMs[i]) * 1000;
 
         if (this.BPMBlocks[i] != null) {
-            var blockNumber = this._logo.blocks.blockList[this.BPMBlocks[i]]
+            let blockNumber = this._logo.blocks.blockList[this.BPMBlocks[i]]
                 .connections[1];
             if (blockNumber != null) {
                 this._logo.blocks.blockList[blockNumber].value = parseFloat(
@@ -56,8 +56,8 @@ function Tempo() {
     this.resume = function() {
         // Reset widget time since we are restarting.
         // We will no longer keep synch with the turtles.
-        var d = new Date();
-        for (var i = 0; i < this.BPMs.length; i++) {
+        let d = new Date();
+        for (let i = 0; i < this.BPMs.length; i++) {
             this._widgetFirstTimes[i] = d.getTime();
             this._widgetNextTimes[i] =
                 this._widgetFirstTimes[i] + this._intervals[i];
@@ -65,7 +65,7 @@ function Tempo() {
         }
 
         // Restart the interval.
-        var that = this;
+        let that = this;
         if (this._intervalID !== null) {
             clearInterval(this._intervalID);
         }
@@ -119,10 +119,10 @@ function Tempo() {
     this._draw = function() {
         // First thing to do is figure out where we are supposed to be
         // based on the elapsed time.
-        var d = new Date();
+        let d = new Date();
 
-        for (var i = 0; i < this.BPMs.length; i++) {
-            var tempoCanvas = this.tempoCanvases[i];
+        for (let i = 0; i < this.BPMs.length; i++) {
+            let tempoCanvas = this.tempoCanvases[i];
             if (!tempoCanvas) continue;
 
             // We start the music clock as the first note is being
@@ -134,7 +134,7 @@ function Tempo() {
             }
 
             // How much time has gone by?
-            var deltaTime = this._widgetNextTimes[i] - d.getTime();
+            let deltaTime = this._widgetNextTimes[i] - d.getTime();
 
             // Are we done yet?
             if (d.getTime() > this._widgetNextTimes[i]) {
@@ -210,11 +210,11 @@ function Tempo() {
     };
 
     this.__save = function(i) {
-        var that = this;
+        let that = this;
         setTimeout(function() {
             console.debug("saving a BPM block for " + that.BPMs[i]);
-            var delta = i * 42;
-            var newStack = [
+            let delta = i * 42;
+            let newStack = [
                 [0, ["setbpm3", {}], 100 + delta, 100 + delta, [null, 1, 2, 5]],
                 [1, ["number", { value: that.BPMs[i] }], 0, 0, [0]],
                 [2, ["divide", {}], 0, 0, [0, 3, 4]],
@@ -230,7 +230,7 @@ function Tempo() {
     this._saveTempo = function() {
         // Save a BPM block for each tempo.
 
-        for (var i = 0; i < this.BPMs.length; i++) {
+        for (let i = 0; i < this.BPMs.length; i++) {
             this.__save(i);
         }
     };
@@ -259,16 +259,16 @@ function Tempo() {
             clearInterval(this._intervalID);
         }
 
-        var w = window.innerWidth;
-        var iconSize = ICONSIZE;
+        let w = window.innerWidth;
+        let iconSize = ICONSIZE;
 
-        var widgetWindow = window.widgetWindows.windowFor(this, "tempo");
+        let widgetWindow = window.widgetWindows.windowFor(this, "tempo");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
 	widgetWindow.show();
 
         // For the button callbacks
-        var that = this;
+        let that = this;
 
         widgetWindow.onclose = function() {
             if (that._intervalID != null) {
@@ -331,7 +331,7 @@ function Tempo() {
         this.bodyTable = document.createElement("table");
         this.widgetWindow.getWidgetBody().appendChild(this.bodyTable);
 
-        for (var i = 0; i < this.BPMs.length; i++) {
+        for (let i = 0; i < this.BPMs.length; i++) {
             this._directions.push(1);
             this._widgetFirstTimes.push(this._logo.firstNoteTime);
             if (this.BPMs[i] <= 0) {
@@ -343,9 +343,9 @@ function Tempo() {
                 this._widgetFirstTimes[i] - this._intervals[i]
             );
 
-            var r1 = this.bodyTable.insertRow();
-            var r2 = this.bodyTable.insertRow();
-            var r3 = this.bodyTable.insertRow();
+            let r1 = this.bodyTable.insertRow();
+            let r2 = this.bodyTable.insertRow();
+            let r3 = this.bodyTable.insertRow();
 
             widgetWindow.addButton(
                 "up.svg",
@@ -373,24 +373,24 @@ function Tempo() {
             this.tempoCanvases[i].style.height = TEMPOHEIGHT + "px";
             this.tempoCanvases[i].style.margin = "1px";
             this.tempoCanvases[i].style.background = "rgba(255, 255, 255, 1)";
-            var tcCell = r1.insertCell();
+            let tcCell = r1.insertCell();
             tcCell.appendChild(this.tempoCanvases[i]);
             tcCell.setAttribute("rowspan", "3");
 
             // The tempo can be set from the interval between
             // successive clicks on the canvas.
             this.tempoCanvases[i].onclick = (id => () => {
-                var d = new Date();
+                let d = new Date();
                 if (that._firstClickTime == null) {
                     that._firstClickTime = d.getTime();
                 } else {
-                    var newBPM = parseInt(
+                    let newBPM = parseInt(
                         (60 * 1000) / (d.getTime() - that._firstClickTime)
                     );
                     if (newBPM > 29 && newBPM < 1001) {
                         that.BPMs[id] = newBPM;
                         that._updateBPM(id);
-                        var BPMInput = that.BPMInputs[id];
+                        let BPMInput = that.BPMInputs[id];
                         BPMInput.value = that.BPMs[id];
                         that._firstClickTime = null;
                     } else {
