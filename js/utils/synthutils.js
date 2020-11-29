@@ -728,7 +728,6 @@ function Synth() {
 
     this._loadSample = function(sampleName) {
         let accounted = false;
-        console.log(this.samples);
         for (let type in this.samplesManifest) {
             if (this.samplesManifest.hasOwnProperty(type)) {
                 for (let sample in this.samplesManifest[type]) {
@@ -750,7 +749,9 @@ function Synth() {
             for (let customsample in CUSTOMSAMPLES) {
                 if (CUSTOMSAMPLES[customsample][0] === sampleName) {
                     //datafunction = function() {return CUSTOMSAMPLES[customsample][1]};
-                    this.samples["voice"][sampleName] = CUSTOMSAMPLES[customsample][1];
+                    newdata = CUSTOMSAMPLES[customsample][1];
+                    console.log(newdata);
+                    this.samples["voice"][sampleName] = BANJO_SAMPLE();//CUSTOMSAMPLES[customsample][1];
                     console.log(this.samples);
                     return;
                 }
