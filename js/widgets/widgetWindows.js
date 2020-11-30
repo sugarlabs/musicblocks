@@ -16,7 +16,7 @@ function WidgetWindow(key, title) {
     let that = this;
     this._key = key;
 
-    let create = (base, className, parent) => {
+    const create = (base, className, parent) => {
         let el = document.createElement(base);
         if (className) el.className = className;
         if (parent) parent.append(el);
@@ -44,7 +44,7 @@ function WidgetWindow(key, title) {
     this._toolbar = create("div", "wfbToolbar", this._body);
     this._widget = create("div", "wfbWidget", this._body);
 
-    var language = localStorage.languagePreference;
+    let language = localStorage.languagePreference;
     if (language === undefined) {
         language = navigator.language;
     }
@@ -91,7 +91,7 @@ function WidgetWindow(key, title) {
     //         that.top = that.top < 0 ? 0 : that.top;
     //     }
     // };
-    let disableScroll = () => {
+    const disableScroll = () => {
         // Get the current page scroll position 
         scrollTop =
             window.pageYOffset || document.documentElement.scrollTop;
@@ -131,7 +131,7 @@ function WidgetWindow(key, title) {
 
     // The title may change, as with the Help Widget.
     this.updateTitle = (title) => {
-        var wftTitle = docById(this._key + "WidgetID");
+        let wftTitle = docById(this._key + "WidgetID");
         wftTitle.innerHTML = title;
     };
 
