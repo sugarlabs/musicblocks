@@ -91,7 +91,7 @@ function MusicKeyboard() {
         ];
 
         var j = 0;
-        for (var i = 1; i < this._notesPlayed.length; i++) {
+        for (let i = 1; i < this._notesPlayed.length; i++) {
             while (
                 i < this._notesPlayed.length &&
                 this._notesPlayed[i].startTime ===
@@ -592,7 +592,7 @@ function MusicKeyboard() {
             }
 
             var notes = [];
-            for (var i = 0; i < selectedNotes[0].noteOctave.length; i++) {
+            for (let i = 0; i < selectedNotes[0].noteOctave.length; i++) {
                 if (this.keyboardShown && selectedNotes[0].objId[0] !== null) {
                     var ele = docById(selectedNotes[0].objId[i]);
                     if (ele !== null) {
@@ -802,7 +802,7 @@ function MusicKeyboard() {
     this._keysLayout = function() {
         this.layout = [];
         var sortableList = [];
-        for (var i = 0; i < this.noteNames.length; i++) {
+        for (let i = 0; i < this.noteNames.length; i++) {
             if (this.noteNames[i] === "drum") {
                 sortableList.push({
                     frequency: 1000000, // for sorting purposes
@@ -856,7 +856,7 @@ function MusicKeyboard() {
             }, 200);
         }
 
-        for (var i = 0; i < this.remove.length; i++) {
+        for (let i = 0; i < this.remove.length; i++) {
             removeBlock(i);
         }
 
@@ -864,7 +864,7 @@ function MusicKeyboard() {
         let newList = fillChromaticGaps(sortedList);
         console.log(newList);
 
-        for (var i = 0; i < newList.length; i++) {
+        for (let i = 0; i < newList.length; i++) {
             this.layout.push({
                 noteName: newList[i].noteName,
                 noteOctave: newList[i].noteOctave,
@@ -883,7 +883,7 @@ function MusicKeyboard() {
 
         // Look for each cell that is marked in this column.
         silence = true;
-        for (var j = 0; j < this.layout.length; j++) {
+        for (let j = 0; j < this.layout.length; j++) {
             var row = docById("mkb" + j);
             var cell = row.cells[colIndex];
             if (cell.style.backgroundColor === "black") {
@@ -951,7 +951,7 @@ function MusicKeyboard() {
 
     this.makeClickable = function() {
         var rowNote = docById("mkbNoteDurationRow");
-        for (var i = 0; i < selectedNotes.length; i++) {
+        for (let i = 0; i < selectedNotes.length; i++) {
             var cell = rowNote.cells[i];
             var that = this;
             cell.onclick = function(event) {
@@ -964,10 +964,10 @@ function MusicKeyboard() {
             };
         }
 
-        for (var i = 0; i < this.layout.length; i++) {
+        for (let i = 0; i < this.layout.length; i++) {
             // The buttons get added to the embedded table.
             var row = docById("mkb" + i);
-            for (var j = 0; j < row.cells.length; j++) {
+            for (let j = 0; j < row.cells.length; j++) {
                 var cell = row.cells[j];
                 // Give each clickable cell a unique id
                 cell.setAttribute("id", i + ":" + j);
@@ -1061,7 +1061,7 @@ function MusicKeyboard() {
         var that = this;
         j = 0;
         var n = this.layout.length;
-        for (var i = this.layout.length - 1; i >= 0; i--) {
+        for (let i = this.layout.length - 1; i >= 0; i--) {
             var mkbTableRow = mkbTable.insertRow();
             var cell = mkbTableRow.insertCell();
             cell.style.backgroundColor = platformColor.graphicsLabelBackground;
@@ -1136,7 +1136,7 @@ function MusicKeyboard() {
             '<table  class="mkbTable" cellpadding="0px"><tr id="mkbNoteDurationRow"></tr></table>';
         var cellColor = "lightgrey";
 
-        for (var j = 0; j < selectedNotes.length; j++) {
+        for (let j = 0; j < selectedNotes.length; j++) {
             var maxWidth = Math.max.apply(Math, selectedNotes[j].duration);
             var noteMaxWidth =
                 this._noteWidth(
@@ -1145,7 +1145,7 @@ function MusicKeyboard() {
                     2 +
                 "px";
             var n = this.layout.length;
-            for (var i = 0; i < this.layout.length; i++) {
+            for (let i = 0; i < this.layout.length; i++) {
                 var row = docById("mkb" + i);
                 var cell = row.insertCell();
                 cell.style.height =
@@ -1297,7 +1297,7 @@ function MusicKeyboard() {
         this._durationWheel.clickModeRotate = false;
         this._durationWheel.createWheel(editDurationLabels);
 
-        for (var i = 0; i < tabsLabels.length; i++) {
+        for (let i = 0; i < tabsLabels.length; i++) {
             this._tabsWheel.navItems[i].navItem.hide();
         }
 
@@ -1344,7 +1344,7 @@ function MusicKeyboard() {
 
         this._menuWheel.navItems[3].navigateFunction = function() {
             if (!flag) {
-                for (var i = 12; i < 19; i++) {
+                for (let i = 12; i < 19; i++) {
                     docById(
                         "wheelnav-wheelDivptm-title-3"
                     ).children[0].textContent = that.newNoteValue;
@@ -1353,7 +1353,7 @@ function MusicKeyboard() {
 
                 flag = 1;
             } else {
-                for (var i = 12; i < 19; i++) {
+                for (let i = 12; i < 19; i++) {
                     docById(
                         "wheelnav-wheelDivptm-title-3"
                     ).children[0].textContent = that.newNoteValue;
@@ -1371,11 +1371,11 @@ function MusicKeyboard() {
             that._updateDuration(start, duration);
         };
 
-        for (var i = 0; i < editDurationLabels.length; i++) {
+        for (let i = 0; i < editDurationLabels.length; i++) {
             this._durationWheel.navItems[i].navigateFunction = __selectValue;
         }
 
-        for (var i = 12; i < 19; i++) {
+        for (let i = 12; i < 19; i++) {
             this._tabsWheel.navItems[i].navigateFunction = function() {
                 var j = that._tabsWheel.selectedNavItemIndex;
                 that.newNoteValue = tabsLabels[j];
@@ -1412,7 +1412,7 @@ function MusicKeyboard() {
             if (parseInt(curValue.startTime) === start) {
                 prevValue = prevValue.concat([curValue]);
                 var oldcurValue = JSON.parse(JSON.stringify(curValue));
-                for (var i = 0; i < divideNoteBy; i++) {
+                for (let i = 0; i < divideNoteBy; i++) {
                     var newcurValue = JSON.parse(JSON.stringify(oldcurValue));
                     newcurValue.startTime =
                         oldcurValue.startTime + oldcurValue.duration * 1000;
@@ -1466,7 +1466,7 @@ function MusicKeyboard() {
                 newcurValue.duration = curValue.duration / divideNoteBy;
                 prevValue = prevValue.concat([newcurValue]);
                 var oldcurValue = newcurValue;
-                for (var i = 0; i < divideNoteBy - 1; i++) {
+                for (let i = 0; i < divideNoteBy - 1; i++) {
                     var newcurValue2 = JSON.parse(JSON.stringify(oldcurValue));
                     newcurValue2.startTime = parseInt(
                         newcurValue2.startTime + newcurValue2.duration * 1000
@@ -1777,7 +1777,7 @@ function MusicKeyboard() {
         var accidentals = ["𝄪", "♯", "♮", "♭", "𝄫"];
         var noteLabels = ["ti", "la", "sol", "fa", "mi", "re", "do"];
         var noteLabelsI18n = [];
-        for (var i = 0; i < noteLabels.length; i++) {
+        for (let i = 0; i < noteLabels.length; i++) {
             noteLabelsI18n.push(i18nSolfege(noteLabels[i]));
         }
 
@@ -1857,11 +1857,11 @@ function MusicKeyboard() {
             this._accidentalsWheel.sliceInitPathCustom = this._accidentalsWheel.slicePathCustom;
 
             var accidentalLabels = [];
-            for (var i = 0; i < accidentals.length; i++) {
+            for (let i = 0; i < accidentals.length; i++) {
                 accidentalLabels.push(accidentals[i]);
             }
 
-            for (var i = 0; i < 9; i++) {
+            for (let i = 0; i < 9; i++) {
                 accidentalLabels.push(null);
                 this._accidentalsWheel.colors.push(
                     platformColor.accidentalsWheelcolorspush
@@ -1934,7 +1934,7 @@ function MusicKeyboard() {
             ].value;
             var accidentalsValue = 2;
 
-            for (var i = 0; i < accidentals.length; i++) {
+            for (let i = 0; i < accidentals.length; i++) {
                 if (noteValue.indexOf(accidentals[i]) !== -1) {
                     accidentalsValue = i;
                     noteValue = noteValue.substr(
@@ -1997,7 +1997,7 @@ function MusicKeyboard() {
         };
 
         if (condition === "synthsblocks") {
-            for (var i = 0; i < noteLabels.length; i++) {
+            for (let i = 0; i < noteLabels.length; i++) {
                 this._pitchWheel.navItems[
                     i
                 ].navigateFunction = __hertzSelectionChanged;
@@ -2122,17 +2122,17 @@ function MusicKeyboard() {
         };
 
         if (condition === "pitchblocks") {
-            for (var i = 0; i < noteLabels.length; i++) {
+            for (let i = 0; i < noteLabels.length; i++) {
                 this._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
             }
 
-            for (var i = 0; i < accidentals.length; i++) {
+            for (let i = 0; i < accidentals.length; i++) {
                 this._accidentalsWheel.navItems[
                     i
                 ].navigateFunction = __pitchPreview;
             }
 
-            for (var i = 0; i < 8; i++) {
+            for (let i = 0; i < 8; i++) {
                 this._octavesWheel.navItems[
                     i
                 ].navigateFunction = __pitchPreview;
@@ -2171,7 +2171,7 @@ function MusicKeyboard() {
         // For the button callbacks
         var that = this;
         if (this.noteNames.length === 0) {
-            for (var i = 0; i < PITCHES3.length; i++) {
+            for (let i = 0; i < PITCHES3.length; i++) {
                 this.noteNames.push(PITCHES3[i]);
                 this.octaves.push(4);
                 if (i === 4) {
@@ -2188,7 +2188,7 @@ function MusicKeyboard() {
         var myrowId = 0;
         var myrow2Id = 0;
 
-        for (var p = 0; p < this.layout.length; p++) {
+        for (let p = 0; p < this.layout.length; p++) {
             // If the blockNumber is null, don't add a label.
             if (this.layout[p].noteName > FAKEBLOCKNUMBER) {
                 var parenttbl2 = document.getElementById("myrow2");
@@ -2464,7 +2464,7 @@ function MusicKeyboard() {
         newel.style.position = "relative";
         newel.style.zIndex = "100";
 
-        for (var i = 0; i < that.idContainer.length; i++) {
+        for (let i = 0; i < that.idContainer.length; i++) {
             // If the blockNumber is null, don't make the key clickable.
             if (this.layout[i].blockNumber === null) {
                 console.log("skipping " + i);
