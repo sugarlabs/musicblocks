@@ -139,14 +139,14 @@ function PitchTimeMatrix() {
         // Search for previous instance of the same block (from a
         // repeat).
         var startIdx = 0;
-        for (var i = 0; i < this._colBlocks.length; i++) {
+        for (let i = 0; i < this._colBlocks.length; i++) {
             var obj = this._colBlocks[i];
             if (obj[0] === rhythmBlock) {
                 startIdx += 1;
             }
         }
 
-        for (var i = startIdx; i < n + startIdx; i++) {
+        for (let i = startIdx; i < n + startIdx; i++) {
             this._colBlocks.push([rhythmBlock, i]);
         }
     };
@@ -158,8 +158,8 @@ function PitchTimeMatrix() {
             this._blockMap[blk] = [];
         }
 
-        var j = 0;
-        for (var i = 0; i < this._blockMap[blk].length; i++) {
+        let j = 0;
+        for (let i = 0; i < this._blockMap[blk].length; i++) {
             var obj = this._blockMap[blk][i];
             if (
                 obj[0] === rowBlock &&
@@ -176,8 +176,8 @@ function PitchTimeMatrix() {
 
     this.removeNode = function(rowBlock, rhythmBlock, n) {
         // When the matrix is changed, we may need to remove nodes.
-        var blk = this.blockNo;
-        for (var i = 0; i < this._blockMap[blk].length; i++) {
+        let blk = this.blockNo;
+        for (let i = 0; i < this._blockMap[blk].length; i++) {
             var obj = this._blockMap[blk][i];
             if (
                 obj[0] === rowBlock &&
@@ -221,11 +221,11 @@ function PitchTimeMatrix() {
         this._matrixHasTuplets = false;
 
         // Add the buttons to the top row.
-        var that = this;
+        let that = this;
 
         widgetWindow.onclose = function() {
             that._rowOffset = [];
-            for (var i = 0; i < that._rowMap.length; i++) {
+            for (let i = 0; i < that._rowMap.length; i++) {
                 that._rowMap[i] = i;
             }
 
@@ -326,8 +326,8 @@ function PitchTimeMatrix() {
             }
         }
 
-        var j = 0;
-        for (var i = 0; i < this.rowLabels.length; i++) {
+        let j = 0;
+        for (let i = 0; i < this.rowLabels.length; i++) {
             if (this.rowLabels[i].toLowerCase() === "rest") {
                 this._rests += 1;
                 continue;
@@ -690,17 +690,17 @@ function PitchTimeMatrix() {
             "imgsrc: images/pen.svg"
         ];
         var valueLabel = [];
-        for (var i = 0; i < VALUES.length; i++) {
+        for (let i = 0; i < VALUES.length; i++) {
             var label = _(VALUES[i]);
             valueLabel.push(label);
         }
 
         var graphicLabels = [];
-        for (var i = 0; i < MATRIXGRAPHICS.length; i++) {
+        for (let i = 0; i < MATRIXGRAPHICS.length; i++) {
             graphicLabels.push(MATRIXGRAPHICS[i]);
         }
 
-        for (var i = 0; i < MATRIXGRAPHICS2.length; i++) {
+        for (let i = 0; i < MATRIXGRAPHICS2.length; i++) {
             graphicLabels.push(MATRIXGRAPHICS2[i]);
         }
 
@@ -761,7 +761,7 @@ function PitchTimeMatrix() {
                 Math.max(0, y * this._logo.blocks.getStageScale())
             ) + "px";
 
-        var that = this;
+        let that = this;
         this._exitWheel.navItems[0].navigateFunction = function() {
             docById("wheelDivptm").style.display = "none";
             that._menuWheel.removeWheel();
@@ -837,7 +837,7 @@ function PitchTimeMatrix() {
             switch (label) {
                 case "graphics":
                 case "pen":
-                    for (var i = graphicLabels.length - 1; i >= 0; i--) {
+                    for (let i = graphicLabels.length - 1; i >= 0; i--) {
                         blocksNo = that._mapNotesBlocks(graphicLabels[i]);
                         if (blocksNo.length >= 1) {
                             aboveBlock = last(blocksNo);
@@ -893,7 +893,7 @@ function PitchTimeMatrix() {
                     that._addNotesBlockBetween(aboveBlock, newBlock, false),
                     500
                 );
-                for (var i = 0; i < that.columnBlocksMap.length; i++) {
+                for (let i = 0; i < that.columnBlocksMap.length; i++) {
                     if (that.columnBlocksMap[i][0] === aboveBlock) {
                         break;
                     }
@@ -906,14 +906,14 @@ function PitchTimeMatrix() {
 
             that.sorted = false;
             that.init(that._logo);
-            for (var i = 0; i < that._logo.tupletRhythms.length; i++) {
+            for (let i = 0; i < that._logo.tupletRhythms.length; i++) {
                 switch (that._logo.tupletRhythms[i][0]) {
                     case "simple":
                     case "notes":
                         var tupletParam = [that._logo.tupletParams[that._logo.tupletRhythms[i][1]]];
                         tupletParam.push([]);
                         for (
-                            var j = 2;
+                            let j = 2;
                             j < that._logo.tupletRhythms[i].length;
                             j++
                         ) {
@@ -939,13 +939,13 @@ function PitchTimeMatrix() {
             }
         };
 
-        for (var i = 0; i < valueLabel.length; i++) {
+        for (let i = 0; i < valueLabel.length; i++) {
             this._menuWheel.navItems[i].navigateFunction = __subMenuChanged;
         }
     };
 
     this.pitchBlockAdded = function(blockN) {
-        for (var i = 0; i < this.columnBlocksMap.length; i++) {
+        for (let i = 0; i < this.columnBlocksMap.length; i++) {
             if (this.columnBlocksMap[i][0] === blockN) {
                 break;
             }
@@ -984,7 +984,7 @@ function PitchTimeMatrix() {
         );
         var _blockNames = MATRIXGRAPHICS2.slice();
         var _blockLabels = [];
-        for (var i = 0; i < _blockNames.length; i++) {
+        for (let i = 0; i < _blockNames.length; i++) {
             _blockLabels.push(
                 this._logo.blocks.protoBlockDict[_blockNames[i]][
                     "staticLabels"
@@ -1083,7 +1083,7 @@ function PitchTimeMatrix() {
         this.yblockValue = [yblockLabelValue.toString(), "y"];
         this._exitWheel.createWheel(["×", ""]);
 
-        var that = this;
+        let that = this;
         this._exitWheel.navItems[0].navigateFunction = function() {
             docById("wheelDivptm").style.display = "none";
             that._pitchWheel.removeWheel();
@@ -1109,19 +1109,19 @@ function PitchTimeMatrix() {
         };
 
         if (blockLabel === "arc") {
-            for (var i = 0; i < arcAngleLabel.length; i++) {
+            for (let i = 0; i < arcAngleLabel.length; i++) {
                 this._blockLabelsWheel2.navItems[
                     i
                 ].navigateFunction = __enterArgValue1;
             }
 
-            for (var i = 0; i < arcRadiusLabel.length; i++) {
+            for (let i = 0; i < arcRadiusLabel.length; i++) {
                 this._pitchWheel.navItems[
                     i
                 ].navigateFunction = __enterArgValue2;
             }
         } else if (blockLabel === "setxy") {
-            for (var i = 0; i < setxyValueLabel.length; i++) {
+            for (let i = 0; i < setxyValueLabel.length; i++) {
                 this._blockLabelsWheel2.navItems[
                     i
                 ].navigateFunction = __enterArgValue1;
@@ -1241,7 +1241,7 @@ function PitchTimeMatrix() {
             that._noteStored[blockIndex] = noteStored;
         };
 
-        for (var i = 0; i < _blockLabels.length; i++) {
+        for (let i = 0; i < _blockLabels.length; i++) {
             this._blockLabelsWheel.navItems[
                 i
             ].navigateFunction = __selectionChanged;
@@ -1320,14 +1320,14 @@ function PitchTimeMatrix() {
             var blockLabelsGraphics = [];
             var blockNamesPen = [];
             var blockLabelsPen = [];
-            for (var i = 0; i < 5; i++) {
+            for (let i = 0; i < 5; i++) {
                 var name = MATRIXGRAPHICS[i];
                 blockNamesGraphics.push(name);
                 blockLabelsGraphics.push(
                     this._logo.blocks.protoBlockDict[name]["staticLabels"][0]
                 );
             }
-            for (var i = 5; i < MATRIXGRAPHICS.length; i++) {
+            for (let i = 5; i < MATRIXGRAPHICS.length; i++) {
                 var name = MATRIXGRAPHICS[i];
                 blockNamesPen.push(name);
                 blockLabelsPen.push(
@@ -1424,7 +1424,7 @@ function PitchTimeMatrix() {
         this.blockValue = blockLabelValue.toString();
         this._exitWheel.createWheel(["×", ""]);
 
-        var that = this;
+        let that = this;
         this._exitWheel.navItems[0].navigateFunction = function() {
             docById("wheelDivptm").style.display = "none";
             that._pitchWheel.removeWheel();
@@ -1446,38 +1446,38 @@ function PitchTimeMatrix() {
 
         if (condition === "graphicsblocks") {
             if (blockLabel === "forward" || blockLabel === "back") {
-                for (var i = 0; i < forwardBackLabel.length; i++) {
+                for (let i = 0; i < forwardBackLabel.length; i++) {
                     this._pitchWheel.navItems[
                         i
                     ].navigateFunction = __enterArgValue;
                 }
             } else if (blockLabel === "right" || blockLabel === "left") {
-                for (var i = 0; i < leftRightLabel.length; i++) {
+                for (let i = 0; i < leftRightLabel.length; i++) {
                     this._pitchWheel.navItems[
                         i
                     ].navigateFunction = __enterArgValue;
                 }
             } else if (blockLabel === "setheading") {
-                for (var i = 0; i < setHeadingLabel.length; i++) {
+                for (let i = 0; i < setHeadingLabel.length; i++) {
                     this._pitchWheel.navItems[
                         i
                     ].navigateFunction = __enterArgValue;
                 }
             } else if (blockLabel === "setpensize") {
-                for (var i = 0; i < setPenSizeLabel.length; i++) {
+                for (let i = 0; i < setPenSizeLabel.length; i++) {
                     this._pitchWheel.navItems[
                         i
                     ].navigateFunction = __enterArgValue;
                 }
             } else {
-                for (var i = 0; i < setLabel.length; i++) {
+                for (let i = 0; i < setLabel.length; i++) {
                     this._pitchWheel.navItems[
                         i
                     ].navigateFunction = __enterArgValue;
                 }
             }
         } else if (condition === "synthsblocks") {
-            for (var i = 0; i < valueLabel.length; i++) {
+            for (let i = 0; i < valueLabel.length; i++) {
                 this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
             }
         }
@@ -1603,31 +1603,31 @@ function PitchTimeMatrix() {
 
         if (condition === "graphicsblocks") {
             if (blockLabel === "forward" || blockLabel === "back") {
-                for (var i = 0; i < blockLabelsGraphics.length; i++) {
+                for (let i = 0; i < blockLabelsGraphics.length; i++) {
                     this._blockLabelsWheel.navItems[
                         i
                     ].navigateFunction = __selectionChanged;
                 }
             } else if (blockLabel === "right" || blockLabel === "left") {
-                for (var i = 0; i < blockLabelsGraphics.length; i++) {
+                for (let i = 0; i < blockLabelsGraphics.length; i++) {
                     this._blockLabelsWheel.navItems[
                         i
                     ].navigateFunction = __selectionChanged;
                 }
             } else if (blockLabel === "setheading") {
-                for (var i = 0; i < blockLabelsGraphics.length; i++) {
+                for (let i = 0; i < blockLabelsGraphics.length; i++) {
                     this._blockLabelsWheel.navItems[
                         i
                     ].navigateFunction = __selectionChanged;
                 }
             } else if (blockLabel === "setpensize") {
-                for (var i = 0; i < blockLabelsPen.length; i++) {
+                for (let i = 0; i < blockLabelsPen.length; i++) {
                     this._blockLabelsWheel.navItems[
                         i
                     ].navigateFunction = __selectionChanged;
                 }
             } else {
-                for (var i = 0; i < blockLabelsPen.length; i++) {
+                for (let i = 0; i < blockLabelsPen.length; i++) {
                     this._blockLabelsWheel.navItems[
                         i
                     ].navigateFunction = __selectionChanged;
@@ -1643,7 +1643,7 @@ function PitchTimeMatrix() {
         var accidentals = ["𝄪", "♯", "♮", "♭", "𝄫"];
         var noteLabels = ["ti", "la", "sol", "fa", "mi", "re", "do"];
         var drumLabels = [];
-        for (var i = 0; i < DRUMS.length; i++) {
+        for (let i = 0; i < DRUMS.length; i++) {
             var label = _(DRUMS[i]);
             drumLabels.push(label);
         }
@@ -1673,7 +1673,7 @@ function PitchTimeMatrix() {
             const COLORS = platformColor.piemenuVoicesColors;
             var colors = [];
 
-            for (var i = 0; i < drumLabels.length; i++) {
+            for (let i = 0; i < drumLabels.length; i++) {
                 colors.push(COLORS[categories[i] % COLORS.length]);
             }
         }
@@ -1740,11 +1740,11 @@ function PitchTimeMatrix() {
             this._accidentalsWheel.sliceInitPathCustom = this._accidentalsWheel.slicePathCustom;
 
             var accidentalLabels = [];
-            for (var i = 0; i < accidentals.length; i++) {
+            for (let i = 0; i < accidentals.length; i++) {
                 accidentalLabels.push(accidentals[i]);
             }
 
-            for (var i = 0; i < 9; i++) {
+            for (let i = 0; i < 9; i++) {
                 accidentalLabels.push(null);
                 this._accidentalsWheel.colors.push(
                     platformColor.accidentalsWheelcolorspush
@@ -1817,7 +1817,7 @@ function PitchTimeMatrix() {
                 ].value;
                 var accidentalsValue = 2;
 
-                for (var i = 0; i < accidentals.length; i++) {
+                for (let i = 0; i < accidentals.length; i++) {
                     if (noteValue.indexOf(accidentals[i]) !== -1) {
                         accidentalsValue = i;
                         noteValue = noteValue.substr(
@@ -1836,7 +1836,7 @@ function PitchTimeMatrix() {
             this._pitchWheel.navigateWheel(noteLabels.indexOf(noteValue));
         }
 
-        var that = this;
+        let that = this;
         this._exitWheel.navItems[0].navigateFunction = function() {
             docById("wheelDivptm").style.display = "none";
             that._pitchWheel.removeWheel();
@@ -2088,16 +2088,16 @@ function PitchTimeMatrix() {
             __selectionChanged();
         };
 
-        for (var i = 0; i < noteLabels.length; i++) {
+        for (let i = 0; i < noteLabels.length; i++) {
             this._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
         }
         if (condition === "pitchblocks") {
-            for (var i = 0; i < accidentals.length; i++) {
+            for (let i = 0; i < accidentals.length; i++) {
                 this._accidentalsWheel.navItems[i]
                     .navigateFunction = __pitchPreview;
             }
 
-            for (var i = 0; i < 8; i++) {
+            for (let i = 0; i < 8; i++) {
                 this._octavesWheel.navItems[i]
                     .navigateFunction = __pitchPreview;
             }
@@ -2223,11 +2223,11 @@ function PitchTimeMatrix() {
 
         // Keep track of marked cells.
         this._markedColsInRow = [];
-        for (var r = 0; r < this.rowLabels.length; r++) {
+        for (let r = 0; r < this.rowLabels.length; r++) {
             var thisRow = [];
             var row = this._rows[r];
             var n = row.cells.length;
-            for (var i = 0; i < n; i++) {
+            for (let i = 0; i < n; i++) {
                 var cell = row.cells[i];
                 if (cell.style.backgroundColor === "black") {
                     thisRow.push(i);
@@ -2239,7 +2239,7 @@ function PitchTimeMatrix() {
         var sortableList = [];
         // Make a list to sort, skipping drums and graphics.
         // frequency;label;arg;row index
-        for (var i = 0; i < this.rowLabels.length; i++) {
+        for (let i = 0; i < this.rowLabels.length; i++) {
             if (this.rowLabels[i].toLowerCase() === "rest") {
                 continue;
             }
@@ -2278,7 +2278,7 @@ function PitchTimeMatrix() {
         }
 
         // Add the stuff we didn't sort.
-        for (var i = 0; i < this.rowLabels.length; i++) {
+        for (let i = 0; i < this.rowLabels.length; i++) {
             var drumName = getDrumName(this.rowLabels[i]);
             if (drumName != null) {
                 var drumIndex = getDrumIndex(this.rowLabels[i]);
@@ -2292,7 +2292,7 @@ function PitchTimeMatrix() {
             }
         }
 
-        for (var i = 0; i < this.rowLabels.length; i++) {
+        for (let i = 0; i < this.rowLabels.length; i++) {
             if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
                 var gi = MATRIXGRAPHICS.indexOf(this.rowLabels[i]) + 100;
                 sortableList.push([
@@ -2327,18 +2327,18 @@ function PitchTimeMatrix() {
 
         // Build a table to map back to original order.
         this._rowMapper = [];
-        for (var i = 0; i < sortedList.length; i++) {
+        for (let i = 0; i < sortedList.length; i++) {
             this._rowMapper.push(sortedList[i][3]);
         }
         var newColumnBlockMap = [];
         var oldColumnBlockMap = this.columnBlocksMap;
-        for (var i = 0; i < this._rowMapper.length; i++) {
+        for (let i = 0; i < this._rowMapper.length; i++) {
             newColumnBlockMap.push(this.columnBlocksMap[this._rowMapper[i]]);
         }
         this.columnBlocksMap = newColumnBlockMap;
         var lastObj = 0;
 
-        for (var i = 0; i < sortedList.length; i++) {
+        for (let i = 0; i < sortedList.length; i++) {
             var obj = sortedList[i];
 
             this._rowMap[obj[3]] = i;
@@ -2368,7 +2368,7 @@ function PitchTimeMatrix() {
                     lastObj = i;
                 }
                 // skip duplicates
-                for (var j = this._rowMap[i]; j < this._rowMap.length; j++) {
+                for (let j = this._rowMap[i]; j < this._rowMap.length; j++) {
                     this._rowOffset[j] -= 1;
                 }
 
@@ -2389,7 +2389,7 @@ function PitchTimeMatrix() {
         this.init(this._logo);
         this.sorted = true;
 
-        for (var i = 0; i < this._logo.tupletRhythms.length; i++) {
+        for (let i = 0; i < this._logo.tupletRhythms.length; i++) {
             switch (this._logo.tupletRhythms[i][0]) {
                 case "simple":
                 case "notes":
@@ -2398,7 +2398,7 @@ function PitchTimeMatrix() {
                     ];
                     tupletParam.push([]);
                     for (
-                        var j = 2;
+                        let j = 2;
                         j < this._logo.tupletRhythms[i].length;
                         j++
                     ) {
@@ -2447,7 +2447,7 @@ function PitchTimeMatrix() {
 
         var header = exportTable.createTHead();
 
-        for (var i = 0; i < this.rowLabels.length; i++) {
+        for (let i = 0; i < this.rowLabels.length; i++) {
             var exportRow = header.insertRow();
             // Add the row label...
             var exportLabel = exportRow.insertCell();
@@ -2496,7 +2496,7 @@ function PitchTimeMatrix() {
             }
 
             // Add then the note cells.
-            for (var j = 0, col; (col = this._rows[i].cells[j]); j++) {
+            for (let j = 0, col; (col = this._rows[i].cells[j]); j++) {
                 var exportCell = exportRow.insertCell();
                 exportCell.style.backgroundColor = col.style.backgroundColor;
                 exportCell.innerHTML = col.innerHTML;
@@ -2519,7 +2519,7 @@ function PitchTimeMatrix() {
             var exportLabel = exportRow.insertCell();
             exportLabel.innerHTML = _("note value");
             var noteValueRow = this._tupletNoteValueRow;
-            for (var i = 0; i < noteValueRow.cells.length; i++) {
+            for (let i = 0; i < noteValueRow.cells.length; i++) {
                 var exportCell = exportRow.insertCell();
                 var col = noteValueRow.cells[i];
                 exportCell.style.backgroundColor = col.style.backgroundColor;
@@ -2540,7 +2540,7 @@ function PitchTimeMatrix() {
             var exportLabel = exportRow.insertCell();
             exportLabel.innerHTML = _("tuplet value");
             var noteValueRow = this._tupletValueRow;
-            for (var i = 0; i < noteValueRow.cells.length; i++) {
+            for (let i = 0; i < noteValueRow.cells.length; i++) {
                 var exportCell = exportRow.insertCell();
                 var col = noteValueRow.cells[i];
                 exportCell.style.backgroundColor = col.style.backgroundColor;
@@ -2562,7 +2562,7 @@ function PitchTimeMatrix() {
         var exportLabel = exportRow.insertCell();
         exportLabel.innerHTML = _("note value");
         var noteValueRow = this._noteValueRow;
-        for (var i = 0; i < noteValueRow.cells.length; i++) {
+        for (let i = 0; i < noteValueRow.cells.length; i++) {
             var exportCell = exportRow.insertCell();
             var col = noteValueRow.cells[i];
             exportCell.style.backgroundColor = col.style.backgroundColor;
@@ -2618,7 +2618,7 @@ function PitchTimeMatrix() {
         var totalNoteInterval = 0;
         var ptmTable = docById("ptmTable");
 
-        for (var i = 0; i < numberOfNotes; i++) {
+        for (let i = 0; i < numberOfNotes; i++) {
             if (i === 0) {
                 var lcd = param[1][0];
             } else {
@@ -2629,7 +2629,7 @@ function PitchTimeMatrix() {
         }
 
         var tupletValue = 0;
-        for (var i = 0; i < numberOfNotes; i++) {
+        for (let i = 0; i < numberOfNotes; i++) {
             if (param[1][i] > 0) {
                 tupletValue += lcd / param[1][i];
             }
@@ -2648,7 +2648,7 @@ function PitchTimeMatrix() {
         }
 
         // Set the cells to 'rest'
-        for (var i = 0; i < numberOfNotes; i++) {
+        for (let i = 0; i < numberOfNotes; i++) {
             // The tuplet time factor * percentage of the tuplet that
             // is dedicated to this note
             this._notesToPlay.push([
@@ -2690,7 +2690,7 @@ function PitchTimeMatrix() {
             // where the tuplet begins.
             var noteRow = this._tupletNoteValueRow;
             var valueRow = this._tupletValueRow;
-            for (var i = 0; i < firstRow.cells.length; i++) {
+            for (let i = 0; i < firstRow.cells.length; i++) {
                 var cell = noteRow.insertCell();
                 cell.style.backgroundColor = platformColor.tupletBackground;
                 cell.style.width = firstRow.cells[i].style.width;
@@ -2713,7 +2713,7 @@ function PitchTimeMatrix() {
         var tupletNoteValue = noteValue * tupletValue;
 
         // Add the tuplet notes
-        for (var i = 0; i < numberOfNotes; i++) {
+        for (let i = 0; i < numberOfNotes; i++) {
             // Add the notes to the tuplet notes row too.
             // Add cell for tuplet note values
             var noteRow = this._tupletNoteValueRow;
@@ -2758,7 +2758,7 @@ function PitchTimeMatrix() {
             var cellWidth = cell.style.width;
 
             // Add the notes to the matrix a la addNote.
-            for (var j = 0; j < this.rowLabels.length; j++) {
+            for (let j = 0; j < this.rowLabels.length; j++) {
                 // Depending on the row, we choose a different background color.
                 if (MATRIXGRAPHICS.indexOf(this.rowLabels[j]) != -1) {
                     cellColor = platformColor.graphicsBackground;
@@ -2852,15 +2852,15 @@ function PitchTimeMatrix() {
             noteValueToDisplay = '<a href="#" title="' + 1 + "/" + noteValue + '">.</a>';
         }
 
-        for (var i = 0; i < numBeats; i++) {
+        for (let i = 0; i < numBeats; i++) {
             this._notesToPlay.push([["R"], noteValue]);
             this._outputAsTuplet.push([numBeats, noteValue]);
         }
 
         var rowCount = this.rowLabels.length - this._rests;
 
-        for (var j = 0; j < numBeats; j++) {
-            for (var i = 0; i < rowCount; i++) {
+        for (let j = 0; j < numBeats; j++) {
+            for (let i = 0; i < rowCount; i++) {
                 // Depending on the row, we choose a different background color.
                 if (
                     MATRIXGRAPHICS.indexOf(this.rowLabels[i]) != -1 ||
@@ -2957,8 +2957,8 @@ function PitchTimeMatrix() {
     this._lookForNoteBlocksOrRepeat = function() {
         this._noteBlocks = false;
         var bno = this.blockNo;
-        for (var i = 0; i < this._blockMap[bno].length; i++) {
-            var blk = this._blockMap[bno][i][1][0];
+        for (let i = 0; i < this._blockMap[bno].length; i++) {
+            let blk = this._blockMap[bno][i][1][0];
             if (blk === -1) {
                 continue;
             }
@@ -2985,13 +2985,13 @@ function PitchTimeMatrix() {
 
     this._syncMarkedBlocks = function() {
         var newBlockMap = [];
-        var blk = this.blockNo;
-        for (var i = 0; i < this._blockMap[blk].length; i++) {
+        let blk = this.blockNo;
+        for (let i = 0; i < this._blockMap[blk].length; i++) {
             if (this._blockMap[blk][i][0] === -1) {
                 continue;
             }
 
-            for (var j = 0; j < this._blockMapHelper.length; j++) {
+            for (let j = 0; j < this._blockMapHelper.length; j++) {
                 if (
                     JSON.stringify(this._blockMap[blk][i][1]) ===
                     JSON.stringify(this._blockMapHelper[j][0])
@@ -3083,7 +3083,7 @@ function PitchTimeMatrix() {
             ];
         }
         this._logo.blocks.loadNewBlocks(RHYTHMOBJ);
-        var that = this;
+        let that = this;
         if (this._logo.blocks.blockList[bottomOfClamp].name === "vspace") {
             setTimeout(that.blockConnection(6, bottomOfClamp), 500);
         } else {
@@ -3150,7 +3150,7 @@ function PitchTimeMatrix() {
 
     this._mapNotesBlocks = function(blockName, withName) {
         var notesBlockMap = [];
-        var blk = this._logo.blocks.blockList[this.blockNo].connections[1];
+        let blk = this._logo.blocks.blockList[this.blockNo].connections[1];
         var myBlock = this._logo.blocks.blockList[blk];
 
         var bottomBlockLoop = 0;
@@ -3200,7 +3200,7 @@ function PitchTimeMatrix() {
         var adjustedNotes = [];
         adjustedNotes.push([this._logo.tupletRhythms[0][2], 1]);
         var startidx = 1;
-        for (var i = 1; i < this._logo.tupletRhythms.length; i++) {
+        for (let i = 1; i < this._logo.tupletRhythms.length; i++) {
             if (this._logo.tupletRhythms[i][2] === last(adjustedNotes)[0]) {
                 startidx += 1;
             } else {
@@ -3222,7 +3222,7 @@ function PitchTimeMatrix() {
         var colBlocks = [];
         var n = adjustedNotes.length - notesBlockMap.length;
         if (n >= 0) {
-            for (var i = 0; i < notesBlockMap.length; i++) {
+            for (let i = 0; i < notesBlockMap.length; i++) {
                 this._update(
                     notesBlockMap[i],
                     adjustedNotes[i][0],
@@ -3231,7 +3231,7 @@ function PitchTimeMatrix() {
                 );
             }
         } else {
-            for (var i = 0; i < adjustedNotes.length; i++) {
+            for (let i = 0; i < adjustedNotes.length; i++) {
                 this._update(
                     notesBlockMap[i],
                     adjustedNotes[i][0],
@@ -3241,18 +3241,18 @@ function PitchTimeMatrix() {
             }
         }
 
-        for (var i = 0; i < n; i++) {
+        for (let i = 0; i < n; i++) {
             this._addRhythmBlock(
                 adjustedNotes[notesBlockMap.length + i][0],
                 adjustedNotes[notesBlockMap.length + i][1]
             );
         }
-        for (var i = n; i < 0; i++) {
+        for (let i = n; i < 0; i++) {
             this._deleteRhythmBlock(notesBlockMap[notesBlockMap.length + i]);
         }
         notesBlockMap = this._mapNotesBlocks("rhythm2");
-        for (var i = 0; i < notesBlockMap.length; i++) {
-            for (var j = 0; j < adjustedNotes[i][1]; j++) {
+        for (let i = 0; i < notesBlockMap.length; i++) {
+            for (let j = 0; j < adjustedNotes[i][1]; j++) {
                 colBlocks.push([notesBlockMap[i], j]);
             }
         }
@@ -3265,14 +3265,14 @@ function PitchTimeMatrix() {
         this.init(this._logo);
         this.sorted = false;
 
-        for (var i = 0; i < this._logo.tupletRhythms.length; i++) {
+        for (let i = 0; i < this._logo.tupletRhythms.length; i++) {
             switch (this._logo.tupletRhythms[i][0]) {
                 case "simple":
                 case "notes":
                     var tupletParam = [this._logo.tupletParams[this._logo.tupletRhythms[i][1]]];
                     tupletParam.push([]);
                     for (
-                        var j = 2;
+                        let j = 2;
                         j < this._logo.tupletRhythms[i].length;
                         j++
                     ) {
@@ -3299,7 +3299,7 @@ function PitchTimeMatrix() {
     this._addNotes = function(that, noteToDivide, notesToAdd) {
         noteToDivide = parseInt(noteToDivide);
         this._blockMapHelper = [];
-        for (var i = 0; i <= noteToDivide; i++) {
+        for (let i = 0; i <= noteToDivide; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
         }
         for (
@@ -3312,7 +3312,7 @@ function PitchTimeMatrix() {
                 [i + parseInt(notesToAdd)]
             ]);
         }
-        for (var i = 0; i < parseInt(notesToAdd); i++) {
+        for (let i = 0; i < parseInt(notesToAdd); i++) {
             this._logo.tupletRhythms = this._logo.tupletRhythms
                 .slice(0, noteToDivide + i + 1)
                 .concat(this._logo.tupletRhythms.slice(noteToDivide + i));
@@ -3328,7 +3328,7 @@ function PitchTimeMatrix() {
         }
         noteToDivide = parseInt(noteToDivide);
         this._blockMapHelper = [];
-        for (var i = 0; i < noteToDivide; i++) {
+        for (let i = 0; i < noteToDivide; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
         }
         for (
@@ -3349,7 +3349,7 @@ function PitchTimeMatrix() {
     this._divideNotes = function(that, noteToDivide, divideNoteBy) {
         noteToDivide = parseInt(noteToDivide);
         this._blockMapHelper = [];
-        for (var i = 0; i < noteToDivide; i++) {
+        for (let i = 0; i < noteToDivide; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
         }
         this._logo.tupletRhythms = this._logo.tupletRhythms
@@ -3363,9 +3363,9 @@ function PitchTimeMatrix() {
             ])
             .concat(this._logo.tupletRhythms.slice(noteToDivide + 1));
         this._blockMapHelper.push([this._colBlocks[noteToDivide], []]);
-        var j = 0;
+        let j = 0;
 
-        for (var i = 0; i < divideNoteBy - 1; i++) {
+        for (let i = 0; i < divideNoteBy - 1; i++) {
             this._logo.tupletRhythms = this._logo.tupletRhythms
                 .slice(0, noteToDivide + i + 1)
                 .concat(this._logo.tupletRhythms.slice(noteToDivide + i));
@@ -3374,7 +3374,7 @@ function PitchTimeMatrix() {
         }
         j++;
         this._blockMapHelper[noteToDivide][1].push(j);
-        for (var i = noteToDivide + 1; i < this._colBlocks.length; i++) {
+        for (let i = noteToDivide + 1; i < this._colBlocks.length; i++) {
             j++;
             this._blockMapHelper.push([this._colBlocks[i], [j]]);
         }
@@ -3395,11 +3395,11 @@ function PitchTimeMatrix() {
         }
 
         this._blockMapHelper = [];
-        for (var i = 0; i < downCellId; i++) {
+        for (let i = 0; i < downCellId; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
         }
-        var j = i;
-        for (var i = downCellId; i <= upCellId; i++) {
+        let j = i;
+        for (let i = downCellId; i <= upCellId; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [j]]);
         }
         j++;
@@ -3413,7 +3413,7 @@ function PitchTimeMatrix() {
         }
 
         var newNote = 0;
-        for (var i = downCellId; i <= upCellId; i++) {
+        for (let i = downCellId; i <= upCellId; i++) {
             newNote = newNote + 1 / parseFloat(this._logo.tupletRhythms[i][2]);
         }
 
@@ -3467,12 +3467,12 @@ function PitchTimeMatrix() {
         this._blockMapHelper = [];
         if (oldTupletValue < newTupletValue) {
             var k = 0;
-            for (var i = 0; i <= this._logo.tupletRhythms.length; i++) {
+            for (let i = 0; i <= this._logo.tupletRhythms.length; i++) {
                 if (i == noteToDivide) {
                     break;
                 }
                 for (
-                    var j = 0;
+                    let j = 0;
                     j < this._logo.tupletRhythms[i].length - 2;
                     j++
                 ) {
@@ -3481,7 +3481,7 @@ function PitchTimeMatrix() {
                 }
             }
             for (
-                var j = 0;
+                let j = 0;
                 j < this._logo.tupletRhythms[noteToDivide].length - 2;
                 j++
             ) {
@@ -3496,7 +3496,7 @@ function PitchTimeMatrix() {
                 i++
             ) {
                 for (
-                    var j = 0;
+                    let j = 0;
                     j < this._logo.tupletRhythms[i].length - 2;
                     j++
                 ) {
@@ -3506,7 +3506,7 @@ function PitchTimeMatrix() {
                 }
             }
 
-            for (var i = oldTupletValue; i < newTupletValue; i++) {
+            for (let i = oldTupletValue; i < newTupletValue; i++) {
                 this._logo.tupletRhythms[
                     noteToDivide
                 ] = this._logo.tupletRhythms[noteToDivide]
@@ -3519,12 +3519,12 @@ function PitchTimeMatrix() {
             }
         } else {
             var k = 0;
-            for (var i = 0; i <= this._logo.tupletRhythms.length; i++) {
+            for (let i = 0; i <= this._logo.tupletRhythms.length; i++) {
                 if (i === noteToDivide) {
                     break;
                 }
                 for (
-                    var j = 0;
+                    let j = 0;
                     j < this._logo.tupletRhythms[i].length - 2;
                     j++
                 ) {
@@ -3533,7 +3533,7 @@ function PitchTimeMatrix() {
                 }
             }
 
-            for (var i = oldTupletValue; i > newTupletValue; i--) {
+            for (let i = oldTupletValue; i > newTupletValue; i--) {
                 this._logo.tupletRhythms[
                     noteToDivide
                 ] = this._logo.tupletRhythms[noteToDivide].slice(
@@ -3542,7 +3542,7 @@ function PitchTimeMatrix() {
                 );
             }
             for (
-                var j = 0;
+                let j = 0;
                 j < this._logo.tupletRhythms[noteToDivide].length - 2;
                 j++
             ) {
@@ -3556,7 +3556,7 @@ function PitchTimeMatrix() {
                 i++
             ) {
                 for (
-                    var j = 0;
+                    let j = 0;
                     j < this._logo.tupletRhythms[i].length - 2;
                     j++
                 ) {
@@ -3568,8 +3568,8 @@ function PitchTimeMatrix() {
         }
         var notesBlockMap = this._mapNotesBlocks("stuplet");
         var colBlocks = [];
-        for (var i = 0; i < this._logo.tupletRhythms.length; i++) {
-            for (var j = 0; j < this._logo.tupletRhythms[i].length - 2; j++) {
+        for (let i = 0; i < this._logo.tupletRhythms.length; i++) {
+            for (let j = 0; j < this._logo.tupletRhythms[i].length - 2; j++) {
                 colBlocks.push([notesBlockMap[i], j]);
             }
         }
@@ -3716,7 +3716,7 @@ function PitchTimeMatrix() {
             this._tabsWheel.clickModeRotate = false;
             this._tabsWheel.createWheel(tabsLabels);
 
-            for (var i = 0; i < tabsLabels.length; i++) {
+            for (let i = 0; i < tabsLabels.length; i++) {
                 this._tabsWheel.navItems[i].navItem.hide();
             }
         }
@@ -3745,7 +3745,7 @@ function PitchTimeMatrix() {
                 Math.max(0, y * this._logo.blocks.getStageScale())
             ) + "px";
 
-        var that = this;
+        let that = this;
         this._exitWheel.navItems[0].navigateFunction = function() {
             docById("wheelDivptm").style.display = "none";
             that._menuWheel.removeWheel();
@@ -3795,7 +3795,7 @@ function PitchTimeMatrix() {
                 );
             };
 
-            for (var i = 0; i < mainTabsLabels.length; i++) {
+            for (let i = 0; i < mainTabsLabels.length; i++) {
                 if (i === 9 || i == 3) {
                     continue;
                 }
@@ -3858,7 +3858,7 @@ function PitchTimeMatrix() {
                 }
             };
 
-            for (var i = 2; i < mainTabsLabels.length; i++) {
+            for (let i = 2; i < mainTabsLabels.length; i++) {
                 this._menuWheel.navItems[i].navigateFunction = __enterValue;
             }
         } else if (condition === "rhythmnote") {
@@ -3877,7 +3877,7 @@ function PitchTimeMatrix() {
 
             this._menuWheel.navItems[3].navigateFunction = function() {
                 if (!flag) {
-                    for (var i = 12; i < 19; i++) {
+                    for (let i = 12; i < 19; i++) {
                         docById(
                             "wheelnav-wheelDivptm-title-3"
                         ).children[0].textContent = that.newNoteValue;
@@ -3886,7 +3886,7 @@ function PitchTimeMatrix() {
 
                     flag = 1;
                 } else {
-                    for (var i = 12; i < 19; i++) {
+                    for (let i = 12; i < 19; i++) {
                         docById(
                             "wheelnav-wheelDivptm-title-3"
                         ).children[0].textContent = that.newNoteValue;
@@ -3897,9 +3897,9 @@ function PitchTimeMatrix() {
                 }
             };
 
-            for (var i = 12; i < 19; i++) {
+            for (let i = 12; i < 19; i++) {
                 this._tabsWheel.navItems[i].navigateFunction = function() {
-                    var j = that._tabsWheel.selectedNavItemIndex;
+                    let j = that._tabsWheel.selectedNavItemIndex;
                     that.newNoteValue = tabsLabels[j];
                     docById(
                         "wheelnav-wheelDivptm-title-3"
@@ -3914,7 +3914,7 @@ function PitchTimeMatrix() {
         // clickable.
         var rowNote = this._noteValueRow;
         var rowTuplet = this._tupletValueRow;
-        for (var j = 0; j < rowNote.cells.length; j++) {
+        for (let j = 0; j < rowNote.cells.length; j++) {
             var cell = rowNote.cells[j];
             cell.setAttribute("id", j);
 
@@ -3923,7 +3923,7 @@ function PitchTimeMatrix() {
                 cellTuplet.setAttribute("id", j);
             }
 
-            var that = this;
+            let that = this;
 
             __mouseDownHandler = function(event) {
                 var cell = event.target;
@@ -3984,9 +3984,9 @@ function PitchTimeMatrix() {
 
         var rowCount = this.rowLabels.length;
 
-        for (var i = 0; i < rowCount; i++) {
+        for (let i = 0; i < rowCount; i++) {
             var row = this._rows[i];
-            for (var j = 0; j < row.cells.length; j++) {
+            for (let j = 0; j < row.cells.length; j++) {
                 var cell = row.cells[j];
                 if (cell.style.backgroundColor === "black") {
                     cell.style.backgroundColor = cell.getAttribute("cellColor");
@@ -3995,22 +3995,22 @@ function PitchTimeMatrix() {
             }
         }
 
-        for (var i = 0; i < rowCount; i++) {
+        for (let i = 0; i < rowCount; i++) {
             // The buttons get added to the embedded table.
             var row = this._rows[i];
-            for (var j = 0; j < row.cells.length; j++) {
+            for (let j = 0; j < row.cells.length; j++) {
                 var cell = row.cells[j];
                 // Give each clickable cell a unique id
                 cell.setAttribute("data-i", i);
                 cell.setAttribute("data-j", j);
 
-                var that = this;
+                let that = this;
                 var isMouseDown = false;
 
                 cell.onmousedown = function() {
                     isMouseDown = true;
                     var i = Number(this.getAttribute("data-i"));
-                    var j = Number(this.getAttribute("data-j"));
+                    let j = Number(this.getAttribute("data-j"));
                     if (this.style.backgroundColor === "black") {
                         this.style.backgroundColor = this.getAttribute(
                             "cellColor"
@@ -4025,7 +4025,7 @@ function PitchTimeMatrix() {
 
                 cell.onmouseover = function() {
                     var i = Number(this.getAttribute("data-i"));
-                    var j = Number(this.getAttribute("data-j"));
+                    let j = Number(this.getAttribute("data-j"));
                     if (isMouseDown) {
                         if (this.style.backgroundColor === "black") {
                             this.style.backgroundColor = this.getAttribute(
@@ -4052,11 +4052,11 @@ function PitchTimeMatrix() {
         // If we have sorted the rows, we can simply restore the
         // marked blocks.
         if (this.sorted) {
-            for (var i = 0; i < this._rowMapper.length; i++) {
+            for (let i = 0; i < this._rowMapper.length; i++) {
                 var ii = this._rowMapper[i];
                 var r = this._sortedRowMap[i];
                 var row = this._rows[r];
-                for (var j = 0; j < this._markedColsInRow[ii].length; j++) {
+                for (let j = 0; j < this._markedColsInRow[ii].length; j++) {
                     var c = this._markedColsInRow[ii][j];
                     var cell = row.cells[c];
                     cell.style.backgroundColor = "black";
@@ -4065,15 +4065,15 @@ function PitchTimeMatrix() {
             }
         } else {
             // Otherwise, we need to look at the blockMap.
-            var blk = this.blockNo;
-            for (var i = 0; i < this._blockMap[blk].length; i++) {
+            let blk = this.blockNo;
+            for (let i = 0; i < this._blockMap[blk].length; i++) {
                 var obj = this._blockMap[blk][i];
                 if (obj[0] !== -1) {
                     var n = obj[2];
                     var c = 0;
                     var rIdx = null;
                     // Look in the rowBlocks for the nth match
-                    for (var j = 0; j < this._rowBlocks.length; j++) {
+                    for (let j = 0; j < this._rowBlocks.length; j++) {
                         /* for note blocks within repeat block
                            their ids are added with a larger number
                            e.g. 11 becomes 1000011 or 2000011 */
@@ -4103,7 +4103,7 @@ function PitchTimeMatrix() {
                         this._rowOffset[this._rowMap[rIdx]];
 
                     var c = -1;
-                    for (var j = 0; j < this._colBlocks.length; j++) {
+                    for (let j = 0; j < this._colBlocks.length; j++) {
                         if (this._noteBlocks) {
                             if (
                                 this._colBlocks[j][0] === obj[1][0] &&
@@ -4169,7 +4169,7 @@ function PitchTimeMatrix() {
             var drumNotes = [];
 
             // Note can be a chord, hence it is an array.
-            for (var i = 0; i < note.length; i++) {
+            for (let i = 0; i < note.length; i++) {
                 if (typeof note[i] === "number") {
                     var drumName = null;
                 } else {
@@ -4231,7 +4231,7 @@ function PitchTimeMatrix() {
                 this._playChord(pitchNotes, Singer.defaultBPMFactor / noteValue);
             }
 
-            for (var i = 0; i < synthNotes.length; i++) {
+            for (let i = 0; i < synthNotes.length; i++) {
                 this._logo.synth.trigger(
                     0,
                     [Number(synthNotes[i])],
@@ -4242,7 +4242,7 @@ function PitchTimeMatrix() {
                 );
             }
 
-            for (var i = 0; i < drumNotes.length; i++) {
+            for (let i = 0; i < drumNotes.length; i++) {
                 this._logo.synth.trigger(
                     0, "C2", Singer.defaultBPMFactor / noteValue, drumNotes[i], null, null
                 );
@@ -4265,9 +4265,9 @@ function PitchTimeMatrix() {
         // row labels and note value (from "alt" attribute of
         // corresponding cells in the row)
         var notes = [];
-        for (var i = 0; i < this._colBlocks.length; i++) {
+        for (let i = 0; i < this._colBlocks.length; i++) {
             var note = [];
-            for (var j = 0; j < this.rowLabels.length; j++) {
+            for (let j = 0; j < this.rowLabels.length; j++) {
                 var row = this._rows[j];
                 var cell = row.cells[i];
                 if (cell.style.backgroundColor === "black") {
@@ -4321,14 +4321,14 @@ function PitchTimeMatrix() {
 
     this._resetMatrix = function() {
         var row = this._noteValueRow;
-        for (var i = 0; i < row.cells.length; i++) {
+        for (let i = 0; i < row.cells.length; i++) {
             var cell = row.cells[i];
             cell.style.backgroundColor = platformColor.rhythmcellcolor;
         }
 
         if (that._matrixHasTuplets) {
             var row = this._tupletNoteValueRow;
-            for (var i = 0; i < row.cells.length; i++) {
+            for (let i = 0; i < row.cells.length; i++) {
                 var cell = row.cells[i];
                 cell.style.backgroundColor = platformColor.tupletBackground;
             }
@@ -4343,7 +4343,7 @@ function PitchTimeMatrix() {
 
         noteValue = this._notesToPlay[noteCounter][1];
         time = 1 / noteValue;
-        var that = this;
+        let that = this;
 
         setTimeout(function() {
             // Did we just play the last note?
@@ -4387,7 +4387,7 @@ function PitchTimeMatrix() {
 
                 // Note can be a chord, hence it is an array.
                 if (!that._stopOrCloseClicked) {
-                    for (var i = 0; i < note.length; i++) {
+                    for (let i = 0; i < note.length; i++) {
                         if (typeof note[i] === "number") {
                             var drumName = null;
                         } else {
@@ -4425,7 +4425,7 @@ function PitchTimeMatrix() {
                     that._playChord(pitchNotes, Singer.defaultBPMFactor / noteValue);
                 }
 
-                for (var i = 0; i < synthNotes.length; i++) {
+                for (let i = 0; i < synthNotes.length; i++) {
                     that._logo.synth.trigger(
                         0,
                         [Number(synthNotes[i])],
@@ -4436,7 +4436,7 @@ function PitchTimeMatrix() {
                     );
                 }
 
-                for (var i = 0; i < drumNotes.length; i++) {
+                for (let i = 0; i < drumNotes.length; i++) {
                     that._logo.synth.trigger(
                         0, ["C2"], Singer.defaultBPMFactor / noteValue, drumNotes[i], null, null
                     );
@@ -4475,7 +4475,7 @@ function PitchTimeMatrix() {
     };
 
     this._playChord = function(notes, noteValue) {
-        var that = this;
+        let that = this;
         setTimeout(function() {
             that._logo.synth.trigger(
                 0,
@@ -4591,7 +4591,7 @@ function PitchTimeMatrix() {
             this.removeNode(rowBlock, rhythmBlockObj[0], rhythmBlockObj[1]);
         }
 
-        for (var j = 0; j < this.rowLabels.length; j++) {
+        for (let j = 0; j < this.rowLabels.length; j++) {
             var row = this._rows[j];
             var cell = row.cells[colIndex];
             if (cell.style.backgroundColor === "black") {
@@ -4684,9 +4684,9 @@ function PitchTimeMatrix() {
 
     this._clear = function() {
         // 'Unclick' every entry in the matrix.
-        for (var i = 0; i < this.rowLabels.length; i++) {
+        for (let i = 0; i < this.rowLabels.length; i++) {
             var row = this._rows[i];
-            for (var j = 0; j < row.cells.length; j++) {
+            for (let j = 0; j < row.cells.length; j++) {
                 var cell = row.cells[j];
                 if (cell.style.backgroundColor === "black") {
                     cell.style.backgroundColor = cell.getAttribute("cellColor");
@@ -4702,7 +4702,7 @@ function PitchTimeMatrix() {
          * note and pitch blocks (saving as chunks is deprecated). */
 
         // First, hide the palettes as they will need updating.
-        for (var name in this._logo.blocks.palettes.dict) {
+        for (let name in this._logo.blocks.palettes.dict) {
             this._logo.blocks.palettes.dict[name].hideMenu(true);
         }
         this._logo.refreshCanvas();
@@ -4722,7 +4722,7 @@ function PitchTimeMatrix() {
         // Retrieve the list of notes to play, that'll be saved
         this.collectNotesToPlay();
 
-        for (var i = 0; i < this._notesToPlay.length; i++) {
+        for (let i = 0; i < this._notesToPlay.length; i++) {
             // We want all of the notes in a column.
             var note = this._notesToPlay[i].slice(0);
             if (note[0] === "") {
@@ -4879,7 +4879,7 @@ function PitchTimeMatrix() {
             } else {
                 // Add the pitch and/or playdrum blocks to the Note block
                 var thisBlock = idx + delta;
-                for (var j = 0; j < note[0].length; j++) {
+                for (let j = 0; j < note[0].length; j++) {
                     // We need to point to the previous note or pitch block.
                     if (j === 0) {
                         if (delta === 5 || delta === 7) {
