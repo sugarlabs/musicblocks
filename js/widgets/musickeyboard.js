@@ -90,7 +90,7 @@ function MusicKeyboard() {
             }
         ];
 
-        var j = 0;
+        let j = 0;
         for (let i = 1; i < this._notesPlayed.length; i++) {
             while (
                 i < this._notesPlayed.length &&
@@ -131,18 +131,18 @@ function MusicKeyboard() {
         var temp2 = {};
         var current = new Set();
 
-        var __startNote = function(event) {
+        let __startNote = function(event) {
             if (WHITEKEYS.indexOf(event.keyCode) !== -1) {
-                var i = WHITEKEYS.indexOf(event.keyCode);
+                let i = WHITEKEYS.indexOf(event.keyCode);
                 var id = "whiteRow" + i.toString();
             } else if (BLACKKEYS.indexOf(event.keyCode) !== -1) {
-                var i = BLACKKEYS.indexOf(event.keyCode);
+                let i = BLACKKEYS.indexOf(event.keyCode);
                 var id = "blackRow" + i.toString();
             } else if (SPACE == event.keyCode) {
                 var id = "rest";
             }
 
-            var ele = docById(id);
+            let ele = docById(id);
             if (!(id in startTime)) {
                 startDate = new Date();
                 startTime[id] = startDate.getTime();
@@ -209,7 +209,7 @@ function MusicKeyboard() {
             }
         };
 
-        var __keyboarddown = function(event) {
+        let __keyboarddown = function(event) {
             if (current.has(event.keyCode))return;
 
             __startNote(event);
@@ -218,18 +218,18 @@ function MusicKeyboard() {
             //event.preventDefault();
         };
 
-        var __endNote = function(event) {
+        let __endNote = function(event) {
             if (WHITEKEYS.indexOf(event.keyCode) !== -1) {
-                var i = WHITEKEYS.indexOf(event.keyCode);
+                let i = WHITEKEYS.indexOf(event.keyCode);
                 var id = "whiteRow" + i.toString();
             } else if (BLACKKEYS.indexOf(event.keyCode) !== -1) {
-                var i = BLACKKEYS.indexOf(event.keyCode);
+                let i = BLACKKEYS.indexOf(event.keyCode);
                 var id = "blackRow" + i.toString();
             } else if (SPACE == event.keyCode) {
                 var id = "rest";
             }
 
-            var ele = docById(id);
+            let ele = docById(id);
             newDate = new Date();
             that.endTime = newDate.getTime();
             duration = (that.endTime - startTime[id]) / 1000.0;
@@ -286,7 +286,7 @@ function MusicKeyboard() {
             }
         };
 
-        var __keyboardup = function(event) {
+        let __keyboardup = function(event) {
             current.delete(event.keyCode)
             __endNote(event);
             //event.preventDefault();
@@ -319,7 +319,7 @@ function MusicKeyboard() {
         var startDate = new Date();
         var startTime = 0;
 
-        var __startNote = function(element) {
+        let __startNote = function(element) {
             startDate = new Date();
             startTime = startDate.getTime();  // Milliseconds();
             element.style.backgroundColor = platformColor.orange;
@@ -337,7 +337,7 @@ function MusicKeyboard() {
             __startNote(this);
         };
 
-        var __endNote = function(element) {
+        let __endNote = function(element) {
             var id = element.id;
             if (id.includes("blackRow")) {
                 element.style.backgroundColor = "black";
@@ -594,7 +594,7 @@ function MusicKeyboard() {
             var notes = [];
             for (let i = 0; i < selectedNotes[0].noteOctave.length; i++) {
                 if (this.keyboardShown && selectedNotes[0].objId[0] !== null) {
-                    var ele = docById(selectedNotes[0].objId[i]);
+                    let ele = docById(selectedNotes[0].objId[i]);
                     if (ele !== null) {
                         ele.style.backgroundColor = "lightgrey";
                     }
@@ -664,12 +664,12 @@ function MusicKeyboard() {
                     selectedNotes[counter - 1].objId[0] !== null
                 ) {
                     for (
-                        var i = 0;
+                        let i = 0;
                         i < selectedNotes[counter - 1].noteOctave.length;
                         i++
                     ) {
-                        var eleid = selectedNotes[counter - 1].objId[i];
-                        var ele = docById(eleid);
+                        let eleid = selectedNotes[counter - 1].objId[i];
+                        let ele = docById(eleid);
                         if (eleid.includes("blackRow")) {
                             ele.style.backgroundColor = "black";
                         } else {
@@ -680,7 +680,7 @@ function MusicKeyboard() {
 
                 var notes = [];
                 for (
-                    var i = 0;
+                    let i = 0;
                     i < selectedNotes[counter].noteOctave.length;
                     i++
                 ) {
@@ -692,7 +692,7 @@ function MusicKeyboard() {
                             return ele[1] === selectedNotes[counter].objId[i];
                         });
 
-                        var ele = docById(selectedNotes[counter].objId[i]);
+                        let ele = docById(selectedNotes[counter].objId[i]);
                         if (ele !== null) {
                             ele.style.backgroundColor = "lightgrey";
                         }
@@ -893,7 +893,7 @@ function MusicKeyboard() {
         }
 
         if (silence) {
-            var ele = docById("cells-" + colIndex);
+            let ele = docById("cells-" + colIndex);
             var dur = ele.getAttribute("dur");
             this._notesPlayed.push({
                 startTime: parseInt(start),
@@ -923,7 +923,7 @@ function MusicKeyboard() {
                 this.layout[n - j - 1].noteOctave;
         }
 
-        var ele = docById(j + ":" + colIndex);
+        let ele = docById(j + ":" + colIndex);
         this._notesPlayed.push({
             startTime: parseInt(start),
             noteOctave: temp2,
@@ -978,8 +978,8 @@ function MusicKeyboard() {
                 cell.onmousedown = function() {
                     isMouseDown = true;
                     var obj = this.id.split(":");
-                    var i = Number(obj[0]);
-                    var j = Number(obj[1]);
+                    let i = Number(obj[0]);
+                    let j = Number(obj[1]);
                     if (this.style.backgroundColor === "black") {
                         this.style.backgroundColor = this.getAttribute(
                             "cellColor"
@@ -993,8 +993,8 @@ function MusicKeyboard() {
 
                 cell.onmouseover = function() {
                     var obj = this.id.split(":");
-                    var i = Number(obj[0]);
-                    var j = Number(obj[1]);
+                    let i = Number(obj[0]);
+                    let j = Number(obj[1]);
                     if (isMouseDown) {
                         if (this.style.backgroundColor === "black") {
                             this.style.backgroundColor = this.getAttribute(
@@ -1364,8 +1364,8 @@ function MusicKeyboard() {
             }
         };
 
-        var __selectValue = function() {
-            var i = that._durationWheel.selectedNavItemIndex;
+        let __selectValue = function() {
+            let i = that._durationWheel.selectedNavItemIndex;
             var value = editDurationLabels[i];
             var duration = value.split("/");
             that._updateDuration(start, duration);
@@ -1377,7 +1377,7 @@ function MusicKeyboard() {
 
         for (let i = 12; i < 19; i++) {
             this._tabsWheel.navItems[i].navigateFunction = function() {
-                var j = that._tabsWheel.selectedNavItemIndex;
+                let j = that._tabsWheel.selectedNavItemIndex;
                 that.newNoteValue = tabsLabels[j];
                 docById(
                     "wheelnav-wheelDivptm-title-3"
@@ -1561,7 +1561,7 @@ function MusicKeyboard() {
         let rLabel;
         let rArg;
 
-        var __selectionChanged = function() {
+        let __selectionChanged = function() {
             if (creatingNewNote) { // Debounce
                 return;
             }
@@ -1966,7 +1966,7 @@ function MusicKeyboard() {
             that._sortLayout();
         };
 
-        var __hertzSelectionChanged = function() {
+        let __hertzSelectionChanged = function() {
             blockValue =
                 that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex]
                     .title;
@@ -2004,12 +2004,12 @@ function MusicKeyboard() {
             }
         }
 
-        var __selectionChanged = function() {
+        let __selectionChanged = function() {
             var label =
                 that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex]
                     .title;
             if (condition === "pitchblocks") {
-                var i = noteLabelsI18n.indexOf(label);
+                let i = noteLabelsI18n.indexOf(label);
                 var labelValue = noteLabels[i];
                 var attr =
                     that._accidentalsWheel.navItems[
@@ -2021,7 +2021,7 @@ function MusicKeyboard() {
                     flag = true;
                 }
             } else {
-                var i = noteLabels.indexOf(label);
+                let i = noteLabels.indexOf(label);
                 var labelValue = label;
             }
 
@@ -2077,11 +2077,11 @@ function MusicKeyboard() {
             });
         };
 
-        var __pitchPreview = function() {
+        let __pitchPreview = function() {
             var label =
                 that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex]
                     .title;
-            var i = noteLabelsI18n.indexOf(label);
+            let i = noteLabelsI18n.indexOf(label);
             var labelValue = noteLabels[i];
 
             var attr =
@@ -2153,12 +2153,12 @@ function MusicKeyboard() {
         mkbKeyboardDiv.innerHTML =
             ' <div id="keyboardHolder2"><table class="white"><tbody><tr id="myrow"></tr></tbody></table><table class="black"><tbody><tr id="myrow2"></tr></tbody></table></div>';
 
-        var keyboardHolder2 = docById("keyboardHolder2");
+        let keyboardHolder2 = docById("keyboardHolder2");
         keyboardHolder2.style.bottom = "10px";
         keyboardHolder2.style.left = "0px";
         keyboardHolder2.style.height = "145px";
         keyboardHolder2.style.backgroundColor = "white";
-        var blackRow = document.getElementsByClassName("black");
+        let blackRow = document.getElementsByClassName("black");
         blackRow[0].style.top = "1px";
         blackRow[0].style.borderSpacing = "0px 0px 20px";
         blackRow[0].style.borderCollapse = "separate";
@@ -2191,8 +2191,8 @@ function MusicKeyboard() {
         for (let p = 0; p < this.layout.length; p++) {
             // If the blockNumber is null, don't add a label.
             if (this.layout[p].noteName > FAKEBLOCKNUMBER) {
-                var parenttbl2 = document.getElementById("myrow2");
-                var newel2 = document.createElement("td");
+                let parenttbl2 = document.getElementById("myrow2");
+                let newel2 = document.createElement("td");
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
                 if ([2, 6, 9, 13, 16, 20].indexOf(myrow2Id) !== -1) {
                     parenttbl2.appendChild(newel2);
@@ -2226,8 +2226,8 @@ function MusicKeyboard() {
                 newel2.style.visibility = "hidden";
                 parenttbl2.appendChild(newel2);
             } else if (this.layout[p].noteName === "drum") {
-                var parenttbl = document.getElementById("myrow");
-                var newel = document.createElement("td");
+                let parenttbl = document.getElementById("myrow");
+                let newel = document.createElement("td");
                 newel.style.textAlign = "center";
                 newel.setAttribute("id", "whiteRow" + myrowId.toString());
                 newel.setAttribute(
@@ -2255,8 +2255,8 @@ function MusicKeyboard() {
                 newel.style.zIndex = "100";
                 parenttbl.appendChild(newel);
             } else if (this.layout[p].noteName === "hertz") {
-                var parenttbl = document.getElementById("myrow");
-                var newel = document.createElement("td");
+                let parenttbl = document.getElementById("myrow");
+                let newel = document.createElement("td");
                 newel.style.textAlign = "center";
                 newel.setAttribute("id", "whiteRow" + myrowId.toString());
                 newel.setAttribute(
@@ -2287,8 +2287,8 @@ function MusicKeyboard() {
                 this.layout[p].noteName.indexOf(SHARP) !== -1 ||
                 this.layout[p].noteName.indexOf("#") !== -1
             ) {
-                var parenttbl2 = document.getElementById("myrow2");
-                var newel2 = document.createElement("td");
+                let parenttbl2 = document.getElementById("myrow2");
+                let newel2 = document.createElement("td");
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
                 newel2.style.textAlign = "center";
                 if ([2, 6, 9, 13, 16, 20].indexOf(myrow2Id) !== -1) {
@@ -2347,8 +2347,8 @@ function MusicKeyboard() {
                 this.layout[p].noteName.indexOf(FLAT) !== -1 ||
                 this.layout[p].noteName.indexOf("b") !== -1
             ) {
-                var parenttbl2 = document.getElementById("myrow2");
-                var newel2 = document.createElement("td");
+                let parenttbl2 = document.getElementById("myrow2");
+                let newel2 = document.createElement("td");
                 var elementid2 = document.getElementsByTagName("td").length;
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
                 newel2.style.textAlign = "center";
@@ -2404,8 +2404,8 @@ function MusicKeyboard() {
                 newel2.style.zIndex = "200";
                 parenttbl2.appendChild(newel2);
             } else {
-                var parenttbl = document.getElementById("myrow");
-                var newel = document.createElement("td");
+                let parenttbl = document.getElementById("myrow");
+                let newel = document.createElement("td");
                 var elementid = document.getElementsByTagName("td").length;
 
                 newel.setAttribute("id", "whiteRow" + myrowId.toString());
@@ -2448,8 +2448,8 @@ function MusicKeyboard() {
                 parenttbl.appendChild(newel);
             }
         }
-        var parenttbl = document.getElementById("myrow");
-        var newel = document.createElement("td");
+        let parenttbl = document.getElementById("myrow");
+        let newel = document.createElement("td");
         parenttbl.appendChild(newel)
         newel.style.textAlign = "center";
         newel.setAttribute("id", "rest");
