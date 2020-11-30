@@ -13,7 +13,6 @@ window.widgetWindows = { openWindows: {}, _posCache: {} };
 
 function WidgetWindow(key, title) {
     // Keep a refernce to the object within handlers
-    let that = this;
     this._key = key;
 
     const create = (base, className, parent) => {
@@ -82,13 +81,13 @@ function WidgetWindow(key, title) {
     //     let x = docByClass("wfbWidget")[0];
     //     let l = x.getElementsByTagName("tr").length;
     //     if (data < 0) {
-    //         if (x.getElementsByTagName("tr")[that.top] != null) {
-    //             x.getElementsByTagName("tr")[that.top].style.display = "none";
-    //             that.top = that.top == l ? l : that.top + 1;
+    //         if (x.getElementsByTagName("tr")[this.top] != null) {
+    //             x.getElementsByTagName("tr")[this.top].style.display = "none";
+    //             this.top = this.top == l ? l : this.top + 1;
     //         }
     //     } else if (data > 0) {
-    //         x.getElementsByTagName("tr")[that.top--].style.display = "";
-    //         that.top = that.top < 0 ? 0 : that.top;
+    //         x.getElementsByTagName("tr")[this.top--].style.display = "";
+    //         this.top = this.top < 0 ? 0 : this.top;
     //     }
     // };
     const disableScroll = () => {
@@ -111,21 +110,21 @@ function WidgetWindow(key, title) {
     
     // Global watcher to track the mouse
     document.addEventListener("mousemove", (e)=> {
-        if (!that._dragging) return;
+        if (!this._dragging) return;
 
-        let x = e.clientX - that._dx,
-            y = e.clientY - that._dy;
+        let x = e.clientX - this._dx,
+            y = e.clientY - this._dy;
 
-        that.setPosition(x, y);
+        this.setPosition(x, y);
     });
 
     document.addEventListener("mousedown", (e)=> {
-        if (e.target === that._frame || that._frame.contains(e.target)) {
-            that._frame.style.opacity = "1";
-            that._frame.style.zIndex = "1";
+        if (e.target === this._frame || this._frame.contains(e.target)) {
+            this._frame.style.opacity = "1";
+            this._frame.style.zIndex = "1";
         } else {
-            that._frame.style.opacity = ".7";
-            that._frame.style.zIndex = "0";
+            this._frame.style.opacity = ".7";
+            this._frame.style.zIndex = "0";
         }
     });
 
@@ -138,55 +137,55 @@ function WidgetWindow(key, title) {
     // The handle needs the events bound as it's a sibling of the dragging div
     // not a relative in either direciton.
     this._drag.onmousedown = this._handle.onmousedown = (e)=> {
-        that._dragging = true;
-        if (that._maximized) {
+        this._dragging = true;
+        if (this._maximized) {
             // Perform special repositioning to make the drag feel right when
             // restoring a window from maximized.
-            let bcr = that._drag.getBoundingClientRect();
+            let bcr = this._drag.getBoundingClientRect();
             let dx = (bcr.left - e.clientX) / (bcr.right - bcr.left);
             let dy = bcr.top - e.clientY;
 
-            that.restore();
-            that.onmaximize();
+            this.restore();
+            this.onmaximize();
 
-            bcr = that._drag.getBoundingClientRect();
+            bcr = this._drag.getBoundingClientRect();
             dx *= bcr.right - bcr.left;
-            that.setPosition(e.clientX + dx, e.clientY + dy);
+            this.setPosition(e.clientX + dx, e.clientY + dy);
         }
 
-        that.takeFocus();
+        this.takeFocus();
 
-        that._dx = e.clientX - that._drag.getBoundingClientRect().left;
-        that._dy = e.clientY - that._drag.getBoundingClientRect().top;
+        this._dx = e.clientX - this._drag.getBoundingClientRect().left;
+        this._dy = e.clientY - this._drag.getBoundingClientRect().top;
         e.preventDefault();
     };
 
     document.addEventListener("mouseup", (e)=> {
-        that._dragging = false;
+        this._dragging = false;
     });
 
     // Wrapper to allow overloading
     closeButton.onclick = (e)=> {
-        that.close();
+        this.close();
 
         e.preventDefault();
         e.stopPropagation();
     };
 
     rollButton.onclick = (e)=> {
-        if (that._rolled) that.unroll();
-        else that.rollup();
-        that.takeFocus();
+        if (this._rolled) this.unroll();
+        else this.rollup();
+        this.takeFocus();
 
         e.preventDefault();
         e.stopPropagation();
     };
 
     maxminButton.onclick = maxminButton.onmousedown = (e)=> {
-        if (that._maximized) that.restore();
-        else that.maximize();
-        that.takeFocus();
-        that.onmaximize();
+        if (this._maximized) this.restore();
+        else this.maximize();
+        this.takeFocus();
+        this.onmaximize();
         e.preventDefault();
         e.stopImmediatePropagation();
     };
