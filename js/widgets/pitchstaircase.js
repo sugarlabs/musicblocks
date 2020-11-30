@@ -158,12 +158,17 @@ function PitchStaircase() {
 
     this._dissectStair = function(event) {
 <<<<<<< HEAD
+<<<<<<< HEAD
         
         var inputNum1 = this._musicRatio1.value;
 =======
         let that = this;
         let inputNum1 = this._musicRatio1.value;
 >>>>>>> upstream/master
+=======
+        let that = this;
+        let inputNum1 = this._musicRatio1.value;
+>>>>>>> 446b179e34ba9e0c1252d6effd06341b9c486707
 
         if (isNaN(inputNum1)) {
             inputNum1 = 3;
@@ -290,6 +295,7 @@ function PitchStaircase() {
         }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         setTimeout(() => {
             for (var i = 0; i < that.Stairs.length; i++) {
                 var stepCell = that._stepTables[i].rows[0].cells[1];
@@ -298,6 +304,11 @@ function PitchStaircase() {
             for (let i = 0; i < that.Stairs.length; i++) {
                 let stepCell = that._stepTables[i].rows[0].cells[1];
 >>>>>>> upstream/master
+=======
+        setTimeout(function() {
+            for (let i = 0; i < that.Stairs.length; i++) {
+                let stepCell = that._stepTables[i].rows[0].cells[1];
+>>>>>>> 446b179e34ba9e0c1252d6effd06341b9c486707
                 stepCell.style.backgroundColor =
                     platformColor.selectorBackground;
             }
@@ -305,6 +316,7 @@ function PitchStaircase() {
     };
 
     this.playUpAndDown = function() {
+<<<<<<< HEAD
 <<<<<<< HEAD
         
         var pitchnotes = [];
@@ -314,6 +326,11 @@ function PitchStaircase() {
         let pitchnotes = [];
         let note =
 >>>>>>> upstream/master
+=======
+        let that = this;
+        let pitchnotes = [];
+        let note =
+>>>>>>> 446b179e34ba9e0c1252d6effd06341b9c486707
             this.Stairs[this.Stairs.length - 1][0] +
             this.Stairs[this.Stairs.length - 1][1];
         pitchnotes.push(note.replace(/♭/g, "b").replace(/♯/g, "#"));
@@ -326,18 +343,24 @@ function PitchStaircase() {
 
     this._playNext = function(index, next) {
 <<<<<<< HEAD
+<<<<<<< HEAD
         
         if (index === this.Stairs.length) {
             setTimeout(() => {
                 for (var i = 0; i < this.Stairs.length; i++) {
                     var stepCell = this._stepTables[i].rows[0].cells[1];
 =======
+=======
+>>>>>>> 446b179e34ba9e0c1252d6effd06341b9c486707
         let that = this;
         if (index === this.Stairs.length) {
             setTimeout(function() {
                 for (let i = 0; i < that.Stairs.length; i++) {
                     let stepCell = that._stepTables[i].rows[0].cells[1];
+<<<<<<< HEAD
 >>>>>>> upstream/master
+=======
+>>>>>>> 446b179e34ba9e0c1252d6effd06341b9c486707
                     stepCell.style.backgroundColor =
                         platformColor.selectorBackground;
                 }
@@ -347,6 +370,7 @@ function PitchStaircase() {
 
         if (index === -1) {
 <<<<<<< HEAD
+<<<<<<< HEAD
             setTimeout(() => {
                 for (var i = 0; i < this.Stairs.length; i++) {
                     var stepCell = this._stepTables[i].rows[0].cells[1];
@@ -355,6 +379,11 @@ function PitchStaircase() {
                 for (let i = 0; i < that.Stairs.length; i++) {
                     let stepCell = that._stepTables[i].rows[0].cells[1];
 >>>>>>> upstream/master
+=======
+            setTimeout(function() {
+                for (let i = 0; i < that.Stairs.length; i++) {
+                    let stepCell = that._stepTables[i].rows[0].cells[1];
+>>>>>>> 446b179e34ba9e0c1252d6effd06341b9c486707
                     stepCell.style.backgroundColor =
                         platformColor.selectorBackground;
                 }
@@ -381,6 +410,7 @@ function PitchStaircase() {
             }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             var stepCell = this._stepTables[index].rows[0].cells[1];
             stepCell.style.backgroundColor = platformColor.selectorBackground;
             this._logo.synth.trigger(
@@ -394,13 +424,18 @@ function PitchStaircase() {
             if (index < this.Stairs.length || index > -1) {
                 this._playNext(index + next, next);
 =======
+=======
+>>>>>>> 446b179e34ba9e0c1252d6effd06341b9c486707
             let stepCell = that._stepTables[index].rows[0].cells[1];
             stepCell.style.backgroundColor = platformColor.selectorBackground;
             that._logo.synth.trigger(
                 0, pitchnotes, 1, DEFAULTVOICE, null, null);
             if (index < that.Stairs.length || index > -1) {
                 that._playNext(index + next, next);
+<<<<<<< HEAD
 >>>>>>> upstream/master
+=======
+>>>>>>> 446b179e34ba9e0c1252d6effd06341b9c486707
             }
         }, 1000);
     };
