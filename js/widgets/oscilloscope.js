@@ -14,7 +14,7 @@ let oscilloscopeExecution = true;
 function Oscilloscope() {
     const ICONSIZE = 32;
     const analyserSize = 8192;
-    this.init = function(logo) {
+    this.init = (logo) => {
         this._logo = logo;
         this.pitchAnalysers = {};
         this.playingNow = false;
@@ -91,7 +91,7 @@ function Oscilloscope() {
                 this.pitchAnalysers[turtle]);
     }
 
-    this.makeCanvas = function(width, height, turtle, turtleIdx) {
+    this.makeCanvas = (width, height, turtle, turtleIdx) => {
         let canvas = document.createElement("canvas");
         canvas.height = height;
         canvas.width = width;
