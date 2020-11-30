@@ -110,17 +110,17 @@ function MeterWidget() {
         meterTableDiv.innerHTML = '<div id="meterWheelDiv"></div>';
 
         // Grab the number of beats and beat value from the meter block.
+	let v1;
         if (meterBlock !== null) {
-            var c1 = this._logo.blocks.blockList[meterBlock].connections[1];
-            var v1;
+            let c1 = this._logo.blocks.blockList[meterBlock].connections[1];
             if (c1 !== null) {
                 v1 = this._logo.blocks.blockList[c1].value;
             } else {
                 v1 = 4;
             }
 
-            var c2 = this._logo.blocks.blockList[meterBlock].connections[2];
-            var c3 = this._logo.blocks.blockList[c2].connections[2];
+            let c2 = this._logo.blocks.blockList[meterBlock].connections[2];
+            let c3 = this._logo.blocks.blockList[c2].connections[2];
             if (c2 !== null) {
                 this._beatValue = this._logo.blocks.blockList[c2].value;
             }
