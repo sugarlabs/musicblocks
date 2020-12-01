@@ -94,84 +94,86 @@ const PIEMENUS = [
 ];
 
 // Define block instance objects and any methods that are intra-block.
-function Block(protoblock, blocks, overrideName) {
-    if (protoblock === null) {
-        console.debug("null protoblock sent to Block");
-        return;
+class Block {
+    constructor(protoblock, blocks, overrideName) {
+        if (protoblock === null) {
+            console.debug("null protoblock sent to Block");
+            return;
+        }
+
+        this.protoblock = protoblock;
+        this.name = protoblock.name;
+        this.overrideName = overrideName;
+        this.blocks = blocks;
+        this.collapsed = false; // Is this collapsible block collapsed?
+        this.inCollapsed = false; // Is this block in a collapsed stack?
+        this.trash = false; // Is this block in the trash?
+        this.loadComplete = false; // Has the block finished loading?
+        this.label = null; // Editable textview in DOM.
+        this.labelattr = null; // Editable textview in DOM.
+        this.text = null; // A dynamically generated text label on block itself.
+        this.value = null; // Value for number, text, and media blocks.
+        this.privateData = null; // A block may have some private data,
+        // e.g., nameboxes use this field to store
+        // the box name associated with the block.
+        this.image = protoblock.image; // The file path of the image.
+        this.imageBitmap = null;
+        this.controller = null; // Note blocks get a controller
+
+        // All blocks have at a container and least one bitmap.
+        this.container = null;
+        this.bounds = null;
+        this.width = 0;
+        this.height = 0;
+        this.hitHeight = 0;
+        this.bitmap = null;
+        this.highlightBitmap = null;
+        this.disconnectedBitmap = null;
+        this.disconnectedHighlightBitmap = null;
+
+        // The svg from which the bitmaps are generated
+        this.artwork = null;
+        this.collapseArtwork = null;
+
+        // Start and Action blocks has a collapse button
+        this.collapseButtonBitmap = null;
+        this.expandButtonBitmap = null;
+        this.collapseBlockBitmap = null;
+        this.highlightCollapseBlockBitmap = null;
+        this.collapseText = null;
+
+        this.size = 1; // Proto size is copied here.
+        this.docks = []; // Proto dock is copied here.
+        this.connections = [];
+
+        // Keep track of clamp count for blocks with clamps.
+        this.clampCount = [1, 1];
+        this.argClampSlots = [1];
+
+        // Some blocks have some post process after they are first loaded.
+        this.postProcess = null;
+        this.postProcessArg = this;
+
+        // Lock on label change
+        this._labelLock = false;
+        this._piemenuExitTime = null;
+        this._triggerLongPress = false;
+
+        // Don't trigger notes on top of each other.
+        this._triggerLock = false;
+
+        // If we update the parameters of a meter block, we have extra
+        // actions to attend to.
+        this._check_meter_block = null;
+
+        // Mouse position in events
+        this.original = {x: 0, y: 0};
+        this.offset = {x: 0, y: 0};
     }
-
-    this.protoblock = protoblock;
-    this.name = protoblock.name;
-    this.overrideName = overrideName;
-    this.blocks = blocks;
-    this.collapsed = false; // Is this collapsible block collapsed?
-    this.inCollapsed = false; // Is this block in a collapsed stack?
-    this.trash = false; // Is this block in the trash?
-    this.loadComplete = false; // Has the block finished loading?
-    this.label = null; // Editable textview in DOM.
-    this.labelattr = null; // Editable textview in DOM.
-    this.text = null; // A dynamically generated text label on block itself.
-    this.value = null; // Value for number, text, and media blocks.
-    this.privateData = null; // A block may have some private data,
-    // e.g., nameboxes use this field to store
-    // the box name associated with the block.
-    this.image = protoblock.image; // The file path of the image.
-    this.imageBitmap = null;
-    this.controller = null; // Note blocks get a controller
-
-    // All blocks have at a container and least one bitmap.
-    this.container = null;
-    this.bounds = null;
-    this.width = 0;
-    this.height = 0;
-    this.hitHeight = 0;
-    this.bitmap = null;
-    this.highlightBitmap = null;
-    this.disconnectedBitmap = null;
-    this.disconnectedHighlightBitmap = null;
-
-    // The svg from which the bitmaps are generated
-    this.artwork = null;
-    this.collapseArtwork = null;
-
-    // Start and Action blocks has a collapse button
-    this.collapseButtonBitmap = null;
-    this.expandButtonBitmap = null;
-    this.collapseBlockBitmap = null;
-    this.highlightCollapseBlockBitmap = null;
-    this.collapseText = null;
-
-    this.size = 1; // Proto size is copied here.
-    this.docks = []; // Proto dock is copied here.
-    this.connections = [];
-
-    // Keep track of clamp count for blocks with clamps.
-    this.clampCount = [1, 1];
-    this.argClampSlots = [1];
-
-    // Some blocks have some post process after they are first loaded.
-    this.postProcess = null;
-    this.postProcessArg = this;
-
-    // Lock on label change
-    this._labelLock = false;
-    this._piemenuExitTime = null;
-    this._triggerLongPress = false;
-
-    // Don't trigger notes on top of each other.
-    this._triggerLock = false;
-
-    // If we update the parameters of a meter block, we have extra
-    // actions to attend to.
-    this._check_meter_block = null;
-
-    // Mouse position in events
-    this.original = {x: 0, y: 0};
-    this.offset = {x: 0, y: 0};
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
-    this._createCache = function(callback, args) {
+    _createCache(callback, args) {
         let that = this;
         return new Promise(function(resolve, reject) {
             let loopCount = 0;
@@ -204,11 +206,11 @@ function Block(protoblock, blocks, overrideName) {
             }
             checkBounds();
         });
-    };
+    }
 
     // Internal function for updating the cache.
     // Includes workaround for a race condition.
-    this.updateCache = function(counter) {
+    updateCache(counter) {
         let that = this;
         return new Promise(function(resolve, reject) {
             let loopCount = 0;
@@ -237,9 +239,9 @@ function Block(protoblock, blocks, overrideName) {
             }
             updateBounds();
         });
-    };
+    }
 
-    this.ignore = function() {
+    ignore() {
         if (this.bitmap === null) {
             return true;
         }
@@ -285,35 +287,35 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         return false;
-    };
+    }
 
-    this.offScreen = function(boundary) {
+    offScreen(boundary) {
         return (!this.trash && boundary.offScreen(
             this.container.x, this.container.y));
-    };
+    }
 
-    this.copySize = function() {
+    copySize() {
         this.size = this.protoblock.size;
-    };
+    }
 
-    this.getInfo = function() {
+    getInfo() {
         return this.name + " block";
-    };
+    }
 
-    this.isCollapsible = function() {
+    isCollapsible() {
         return COLLAPSIBLES.indexOf(this.name) !== -1;
-    };
+    }
 
-    this.isInlineCollapsible = function() {
+    isInlineCollapsible() {
         return INLINECOLLAPSIBLES.indexOf(this.name) !== -1;
-    };
+    }
 
-    /*
+    /**
      * Show the highlight artwork
      * @return{void}
      * @public
      */
-    this.highlight = function() {
+    highlight() {
         if (this.trash) {
             return;
         }
@@ -401,14 +403,14 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this.container.updateCache();
-    };
+    }
 
-    /*
+    /**
      * Remove highlight from block
      * @return{void}
      * @public
      */
-    this.unhighlight = function() {
+    unhighlight() {
         if (this.trash) {
             return;
         }
@@ -483,80 +485,74 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this.container.updateCache();
-    };
+    }
 
-    /*
+    /**
      * Resize and update number of slots in argClamp
      * @param-slotList how many slots to use
      * @return{void}
      * @public
      */
-    this.updateArgSlots = function(slotList) {
+    updateArgSlots(slotList) {
         this.argClampSlots = slotList;
         this._newArtwork(0);
         this.regenerateArtwork(false);
-    };
+    }
 
-    /*
+    /**
      * Resize an expandable block.
      * @param-clamp which clamp to update (ifthenelse has 2 clamps)
      * @param-plusMinus how many slots to add or subtract
      * @return{void}
      * @public
      */
-    this.updateSlots = function(clamp, plusMinus) {
+    updateSlots(clamp, plusMinus) {
         this.clampCount[clamp] += plusMinus;
         this._newArtwork(plusMinus);
         this.regenerateArtwork(false);
-    };
+    }
 
-    /*
+    /**
      * If the block scale changes, we need to regenerate the
      * artwork and recalculate the hitarea.
      * @param-scale new block scale
      * @return{void}
      * @public
      */
-    this.resize = function(scale) {
-        let that = this;
-
-        /*
-         * After the new artwork is created, this function is used to add
-         * decorations.
-         * @param-that = this
+    resize(scale) {
+        /**
+         * After the new artwork is created, this function is used to add decorations.
          * @return{void}
          * @public
          */
-        this.postProcess = function(that) {
-            if (that.imageBitmap !== null) {
-                that._positionMedia(that.imageBitmap,
-                                    that.imageBitmap.image.width,
-                                    that.imageBitmap.image.height, scale);
-                z = that.container.children.length - 1;
-                that.container.setChildIndex(that.imageBitmap, z);
+        this.postProcess = () => {
+            if (this.imageBitmap !== null) {
+                this._positionMedia(this.imageBitmap,
+                                    this.imageBitmap.image.width,
+                                    this.imageBitmap.image.height, scale);
+                z = this.container.children.length - 1;
+                this.container.setChildIndex(this.imageBitmap, z);
             }
 
-            if (that.name === "start" || that.name === "drum") {
+            if (this.name === "start" || this.name === "drum") {
                 // Rescale the decoration on the start blocks.
-                for (let t = 0; t < that.blocks.turtles.turtleList.length; t++) {
-                    if (that.blocks.turtles.turtleList[t].startBlock === that) {
-                        that.blocks.turtles.turtleList[t].resizeDecoration(
-                            scale, that.bitmap.image.width);
-                        that._ensureDecorationOnTop();
+                for (let t = 0; t < this.blocks.turtles.turtleList.length; t++) {
+                    if (this.blocks.turtles.turtleList[t].startBlock === this) {
+                        this.blocks.turtles.turtleList[t].resizeDecoration(
+                            scale, this.bitmap.image.width);
+                        this._ensureDecorationOnTop();
                         break;
                     }
                 }
-            } else if (that.isCollapsible()) {
-                that._ensureDecorationOnTop();
+            } else if (this.isCollapsible()) {
+                this._ensureDecorationOnTop();
             }
 
-            that.updateCache();
-            that._calculateBlockHitArea();
+            this.updateCache();
+            this._calculateBlockHitArea();
 
             // If it is in the trash, make sure it remains hidden.
-            if (that.trash) {
-                that.hide();
-            }
+            if (this.trash) this.hide();
         };
 
         this.postProcessArg = this;
@@ -572,7 +568,7 @@ function Block(protoblock, blocks, overrideName) {
         if (this.container !== null) {
             that = this;
 
-            /*
+            /**
              * After new buttons are creates, they are cached and a
              * new hit are is calculated
              * @param-that = this = container
@@ -597,15 +593,15 @@ function Block(protoblock, blocks, overrideName) {
                 this._positionCollapseLabel(scale);
             }
         }
-    };
+    }
 
-    /*
+    /**
      * Create new artwork for a block
      * @param-plusMinus specifies how much a clamp block expands or contracts
      * @return{void}
      * @private
      */
-    this._newArtwork = function(plusMinus) {
+    _newArtwork(plusMinus) {
         let proto, obj;
         if (this.isInlineCollapsible()) {
             proto = new ProtoBlock("collapse-note");
@@ -710,9 +706,9 @@ function Block(protoblock, blocks, overrideName) {
         this.width = obj[2];
         this.height = obj[3];
         this.hitHeight = obj[4];
-    };
+    }
 
-    /*
+    /**
      * Load any artwork associated with the block and create any
      * extra parts. Image components are loaded asynchronously so
      * most the work happens in callbacks.
@@ -723,23 +719,23 @@ function Block(protoblock, blocks, overrideName) {
      * @return{void}
      * @public
      */
-    this.imageLoad = function() {
+    imageLoad() {
         let fontSize = 10 * this.protoblock.scale;
         this.text = new createjs.Text("", fontSize + "px Sans",
                                       platformColor.blockText);
         this.generateArtwork(true, []);
-    };
+    }
 
-    /*
+    /**
      * Add an image to a block
      * @return{void}
      * @private
      */
-    this._addImage = function() {
+    _addImage() {
         let image = new Image();
         let that = this;
 
-        /*
+        /**
          * The loader
          * @return{void}
          * @private
@@ -771,16 +767,16 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         image.src = this.image;
-    };
+    }
 
-    /*
+    /**
      * Sometimes (in the case of namedboxes and nameddos) we need
      * to regenerate the artwork associated with a block.
      * @param-is the collapse artwork also generated?
      * @return{void}
      * @public
      */
-    this.regenerateArtwork = function(collapse) {
+    regenerateArtwork(collapse) {
         // First we need to remove the old artwork.
         if (this.bitmap != null) {
             this.container.removeChild(this.bitmap);
@@ -807,15 +803,15 @@ function Block(protoblock, blocks, overrideName) {
 
         // Then we generate new artwork.
         this.generateArtwork(false);
-    };
+    }
 
-    /*
+    /**
      * Generate the artwork for a block.
      * @param-the first time, add the event handlers
      * @return{void}
      * @public
      */
-    this.generateArtwork = function(firstTime) {
+    generateArtwork(firstTime) {
         // Get the block labels from the protoblock.
         let that = this;
         let thisBlock = this.blocks.blockList.indexOf(this);
@@ -1058,14 +1054,14 @@ function Block(protoblock, blocks, overrideName) {
         that.blocks.blockArt[that.blocks.blockList.indexOf(that)] = artwork;
 
         _blockMakeBitmap(artwork, __processBitmap, this);
-    };
+    }
 
-    /*
+    /**
      * After the block artwork has loaded, update labels, etc.
      * @return{void}
      * @private
      */
-    this._finishImageLoad = function() {
+    _finishImageLoad() {
         let thisBlock = this.blocks.blockList.indexOf(this);
         let proto, obj, label, attr;
         // Value blocks get a modifiable text label.
@@ -1237,19 +1233,19 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this.blocks.refreshCanvas();
-    };
+    }
 
-    /*
+    /**
      * Generate the collapsed artwork
      * @param postProcess = a process to run after the artwork is generated
      * @return{void}
      * @private
      */
-    this._generateCollapseArtwork = function(postProcess) {
+    _generateCollapseArtwork(postProcess) {
         let that = this;
         let thisBlock = this.blocks.blockList.indexOf(this);
 
-        /*
+        /**
          * Run the postprocess function after the artwork is loaded
          * @return{void}
          * @private
@@ -1268,7 +1264,7 @@ function Block(protoblock, blocks, overrideName) {
             }
         };
 
-        /*
+        /**
          * Create the artwork for the collapse buttons
          * @param - that = this
          * @return{void}
@@ -1300,7 +1296,7 @@ function Block(protoblock, blocks, overrideName) {
                 window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)));
         };
 
-        /*
+        /**
          * Create the artwork for the expand buttons
          * @param - that = this
          * @return{void}
@@ -1333,8 +1329,8 @@ function Block(protoblock, blocks, overrideName) {
                 window.btoa(unescape(encodeURIComponent(EXPANDBUTTON)));
         };
 
-        /*
-         * Processing the highlighted collapsed image
+        /**
+     * Processing the highlighted collapsed image
          * @param-bitmap = highlight artwork
          * @param-that = this
          * @return{void}
@@ -1467,8 +1463,8 @@ function Block(protoblock, blocks, overrideName) {
             __processExpandButton(that);
         };
 
-        /*
-         * Processing the collapsed block
+        /**
+     * Processing the collapsed block
          * @param-bitmap = block artwork
          * @param-that = this
          * @return{void}
@@ -1499,14 +1495,14 @@ function Block(protoblock, blocks, overrideName) {
                 this.protoblock.palette.name])
             .replace("block_label", "");
         _blockMakeBitmap(artwork, __processCollapseBitmap, this);
-    };
+    }
 
-    /*
+    /**
      * Hide this block
      * @return{void}
      * @public
      */
-    this.hide = function() {
+    hide() {
         this.container.visible = false;
         if (this.isCollapsible()) {
             this.collapseText.visible = false;
@@ -1516,14 +1512,14 @@ function Block(protoblock, blocks, overrideName) {
 
         this.updateCache();
         this.blocks.refreshCanvas();
-    };
+    }
 
-    /*
+    /**
      * Is this block disconnected from other blocks?
      * @return{boolean} true if the block is disconnected from other blocks
      * @public
      */
-    this.isDisconnected = function() {
+    isDisconnected() {
         if (this.disconnectedBitmap === null) {
             return false;
         }
@@ -1554,14 +1550,14 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         return false;
-    };
+    }
 
-    /*
+    /**
      * Show this block
      * @return{void}
      * @public
      */
-    this.show = function() {
+    show() {
         // If it is not in the trash and not in collapsed, then show it.
         if (!this.trash && !this.inCollapsed) {
             this.container.visible = true;
@@ -1628,76 +1624,76 @@ function Block(protoblock, blocks, overrideName) {
             this.updateCache();
             this.blocks.refreshCanvas();
         }
-    };
+    }
 
     // Utility functions
-    this.isValueBlock = function() {
+    isValueBlock() {
         return this.protoblock.style === "value";
-    };
+    }
 
-    this.isNoHitBlock = function() {
+    isNoHitBlock() {
         return NOHIT.indexOf(this.name) !== -1;
-    };
+    }
 
-    this.isArgBlock = function() {
+    isArgBlock() {
         return (this.protoblock.style === "value" ||
                 this.protoblock.style === "arg");
-    };
+    }
 
-    this.isTwoArgBlock = function() {
+    isTwoArgBlock() {
         return this.protoblock.style === "twoarg";
-    };
+    }
 
-    this.isTwoArgBooleanBlock = function() {
+    isTwoArgBooleanBlock() {
         return ["equal", "greater", "less"].indexOf(this.name) !== -1;
-    };
+    }
 
-    this.isClampBlock = function() {
+    isClampBlock() {
         return (this.protoblock.style === "clamp" ||
                 this.isDoubleClampBlock() || this.isArgFlowClampBlock());
-    };
+    }
 
-    this.isArgFlowClampBlock = function() {
+    isArgFlowClampBlock() {
         return this.protoblock.style === "argflowclamp";
-    };
+    }
 
-    this.isLeftClampBlock = function() {
+    isLeftClampBlock() {
         return this.protoblock.isLeftClamp;
-    };
+    }
 
-    this.isDoubleClampBlock = function() {
+    isDoubleClampBlock() {
         return this.protoblock.style === "doubleclamp";
-    };
+    }
 
-    this.isNoRunBlock = function() {
+    isNoRunBlock() {
         return this.name === "action";
-    };
+    }
 
-    this.isArgClamp = function() {
+    isArgClamp() {
         return (this.protoblock.style === "argclamp" ||
                 this.protoblock.style === "argclamparg");
-    };
+    }
 
-    this.isExpandableBlock = function() {
+    isExpandableBlock() {
         return this.protoblock.expandable;
-    };
+    }
 
-    this.getBlockId = function() {
+    getBlockId() {
         // Generate a UID based on the block index into the blockList.
         let number = blockBlocks.blockList.indexOf(this);
         return "_" + number.toString();
-    };
+    }
 
-    this.removeChildBitmap = function(name) {
+    removeChildBitmap(name) {
         for (let child = 0; child < this.container.children.length; child++) {
             if (this.container.children[child].name === name) {
                 this.container.removeChild(this.container.children[child]);
                 break;
             }
         }
-    };
+    }
 
-    this.loadThumbnail = function(imagePath) {
+    loadThumbnail(imagePath) {
         // Load an image thumbnail onto block.
         let thisBlock = this.blocks.blockList.indexOf(this);
         let that = this;
@@ -1750,9 +1746,9 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             image.src = imagePath;
         }
-    };
+    }
 
-    this._doOpenMedia = function(thisBlock) {
+    _doOpenMedia(thisBlock) {
         let fileChooser = docById("myOpenAll");
         let that = this;
 
@@ -1783,15 +1779,15 @@ function Block(protoblock, blocks, overrideName) {
         fileChooser.focus();
         fileChooser.click();
         window.scroll(0, 0);
-    };
+    }
 
-    this.setCollapsedState = function() {
+    setCollapsedState() {
         // Mark it as in a collapsed block and hide it.
         this.inCollapsed = true;
         this.hide();
-    };
+    }
 
-    this.setUncollapsedState = function(nblk) {
+    setUncollapsedState(nblk) {
         // It could be a block inside a note block, which may or may
         // not be hidden depending on the collapsed state of the
         // containing note block.
@@ -1806,9 +1802,9 @@ function Block(protoblock, blocks, overrideName) {
                 this.show();
             }
         }
-    };
+    }
 
-    this.collapseToggle = function() {
+    collapseToggle() {
         // Find the blocks to collapse/expand inside of a collapable
         // block.
         let thisBlock = this.blocks.blockList.indexOf(this);
@@ -1904,9 +1900,9 @@ function Block(protoblock, blocks, overrideName) {
         this.updateCache();
         this.unhighlight();
         this.blocks.refreshCanvas();
-    };
+    }
 
-    this._intervalLabel = function() {
+    _intervalLabel() {
         // Find pitch and value to display on the collapsed interval
         // block.
         let degrees = DEGREES.split(" ");
@@ -2000,9 +1996,9 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
         }
-    };
+    }
 
-    this._newNoteLabel = function() {
+    _newNoteLabel() {
         // Find pitch and value to display on the collapsed note value
         // block.
         let v = "";
@@ -2061,9 +2057,9 @@ function Block(protoblock, blocks, overrideName) {
                 this.collapseText.text = p + "... | " + v;
             }
         }
-    };
+    }
 
-    this._oscTimeLabel = function() {
+    _oscTimeLabel() {
         // Find Hertz and value to display on the collapsed note value
         // block.
         let v = "";
@@ -2117,9 +2113,9 @@ function Block(protoblock, blocks, overrideName) {
                 this.collapseText.text = p + "...";
             }
         }
-    };
+    }
 
-    this._getPitch = function(c) {
+    _getPitch(c) {
         if (c === null) {
             return "";
         }
@@ -2219,9 +2215,9 @@ function Block(protoblock, blocks, overrideName) {
         default:
             return "";
         }
-    };
+    }
 
-    this._toggle_inline = function(thisBlock, collapse) {
+    _toggle_inline(thisBlock, collapse) {
         // Toggle the collapsed state of blocks inside of a note (or
         // interval) block and reposition any blocks below
         // it. Finally, resize any surrounding clamps.
@@ -2294,15 +2290,15 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this.blocks.refreshCanvas();
-    };
+    }
 
-    /*
+    /**
      * Position any addition text on a block
      * @param-blockscale is used to scale the text
      * @return{void}
      * @private
      */
-    this._positionText = function(blockScale) {
+    _positionText(blockScale) {
         this.text.textBaseline = "alphabetic";
         this.text.textAlign = "right";
         let fontSize = 10 * blockScale;
@@ -2340,9 +2336,9 @@ function Block(protoblock, blocks, overrideName) {
         z = this.container.children.length - 1;
         this.container.setChildIndex(this.text, z);
         this.updateCache();
-    };
+    }
 
-    /*
+    /**
      * Position media artwork on a block.
      * @param-bitmap - image
      * @param-width-width of canvas
@@ -2352,7 +2348,7 @@ function Block(protoblock, blocks, overrideName) {
      * @return{void}
      * @private
      */
-    this._positionMedia = function(bitmap, width, height, blockScale) {
+    _positionMedia(bitmap, width, height, blockScale) {
         if (width > height) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale =
                 ((MEDIASAFEAREA[2] / width) * blockScale) / 2;
@@ -2362,15 +2358,15 @@ function Block(protoblock, blocks, overrideName) {
         }
         bitmap.x = ((MEDIASAFEAREA[0] - 10) * blockScale) / 2;
         bitmap.y = (MEDIASAFEAREA[1] * blockScale) / 2;
-    };
+    }
 
-    /*
+    /**
      * Position the label for a collapsed block
      * @param-blockscale-scale
      * @return{void}
      * @private
      */
-    this._positionCollapseLabel = function(blockScale) {
+    _positionCollapseLabel(blockScale) {
         if (this.isInlineCollapsible()) {
             this.collapseText.x = Math.floor(
                 ((COLLAPSETEXTX + STANDARDBLOCKHEIGHT) * blockScale) / 2 + 0.5
@@ -2390,28 +2386,28 @@ function Block(protoblock, blocks, overrideName) {
         // Ensure text is on top.
         z = this.container.children.length - 1;
         this.container.setChildIndex(this.collapseText, z);
-    };
+    }
 
-    /*
+    /**
      * Determine the hit area for a block
      * DEPRECATED
      * @return{void}
      * @private
      */
-    this._calculateBlockHitArea = function() {
+    _calculateBlockHitArea() {
         let hitArea = new createjs.Shape();
         hitArea.graphics
             .beginFill("platformColor.hitAreaGraphicsBeginFill")
             .drawRect(0, 0, this.width, this.hitHeight);
         this.container.hitArea = hitArea;
-    };
+    }
 
-    /*
+    /**
      * These are the event handlers for block containers.
      * @return{void}
      * @private
      */
-    this._loadEventHandlers = function() {
+    _loadEventHandlers() {
         let that = this;
         let thisBlock = this.blocks.blockList.indexOf(this);
 
@@ -2700,9 +2696,9 @@ function Block(protoblock, blocks, overrideName) {
 
             moved = false;
         });
-    };
+    }
 
-    /*
+    /**
      * Common code for processing events
      * @param-event- mouse
      * @param-moved-cursor moved
@@ -2712,7 +2708,7 @@ function Block(protoblock, blocks, overrideName) {
      * @return {void}
      * @private
      */
-    this._mouseoutCallback = function(event, moved, haveClick, hideDOM) {
+    _mouseoutCallback(event, moved, haveClick, hideDOM) {
         let thisBlock = this.blocks.blockList.indexOf(this);
         if (!this.blocks.logo.runningLilypond) {
             document.body.style.cursor = "default";
@@ -2790,9 +2786,9 @@ function Block(protoblock, blocks, overrideName) {
 
             this.blocks.activeBlock = null;
         }
-    };
+    }
 
-    this._usePiemenu = function() {
+    _usePiemenu() {
         // Check on all the special cases were we want to use a pie menu.
         this._check_meter_block = null;
 
@@ -2837,9 +2833,9 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         return false;
-    };
+    }
 
-    this._usePieNumberC1 = function() {
+    _usePieNumberC1() {
         // Return true if this number block plugs into Connection 1 of
         // a block that uses a pie menu. Add block names to the list
         // below and the switch statement in the _changeLabel
@@ -2857,9 +2853,9 @@ function Block(protoblock, blocks, overrideName) {
 
         return this.blocks.blockList[cblk].connections[1] ===
             this.blocks.blockList.indexOf(this);
-    };
+    }
 
-    this._usePieNumberC2 = function() {
+    _usePieNumberC2() {
         // Return true if this number block plugs into Connection 2 of
         // a block that uses a pie menu. Add block names to the list
         // below and the switch statement in the _changeLabel
@@ -2877,9 +2873,9 @@ function Block(protoblock, blocks, overrideName) {
 
         return this.blocks.blockList[cblk].connections[2] ===
             this.blocks.blockList.indexOf(this);
-    };
+    }
 
-    this._usePieNumberC3 = function() {
+    _usePieNumberC3() {
         // Return true if this number block plugs into Connection 3 of
         // a block that uses a pie menu. Add block names to the list
         // below and the switch statement in the _changeLabel
@@ -2897,9 +2893,9 @@ function Block(protoblock, blocks, overrideName) {
 
         return this.blocks.blockList[cblk].connections[3] ===
             this.blocks.blockList.indexOf(this);
-    };
+    }
 
-    this._ensureDecorationOnTop = function() {
+    _ensureDecorationOnTop() {
         // Find the turtle decoration and move it to the top.
         for (let child = 0; child < this.container.children.length; child++) {
             if (this.container.children[child].name === "decoration") {
@@ -2935,14 +2931,14 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this.updateCache();
-    };
+    }
 
-    /*
+    /**
      * Change the label in a parameter block
      * @return{void}
      * @private
      */
-    this._changeLabel = function() {
+    _changeLabel() {
         let that = this;
         let x = this.container.x;
         let y = this.container.y;
@@ -3532,7 +3528,7 @@ function Block(protoblock, blocks, overrideName) {
                 focused = true;
             }, 100);
         }
-    };
+    }
 
     /**
      * Keypress handler. Handles exit key (Tab and Enter) press.
@@ -3540,27 +3536,27 @@ function Block(protoblock, blocks, overrideName) {
      * @returns{void}
      * @private
      */
-    this._exitKeyPressed = function(event) {
+    _exitKeyPressed(event) {
         if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
             this._labelChanged(true, false);
             event.preventDefault();
             this.label.removeEventListener("keypress", this._exitKeyPressed);
         }
-    };
-    /*
+    }
+    /**
      * Check if pie menu is ok to launch
      * @return{void}
      * @public
      */
-    this.piemenuOKtoLaunch = function() {
+    piemenuOKtoLaunch() {
         if (this._piemenuExitTime === null) {
             return true;
         }
 
         return new Date().getTime() - this._piemenuExitTime > 200;
-    };
+    }
 
-    this._noteValueNumber = function(c) {
+    _noteValueNumber(c) {
         // Is this a number block being used as a note value
         // denominator argument?
         let dblk = this.connections[0];
@@ -3604,9 +3600,9 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         return false;
-    };
+    }
 
-    this._noteValueValue = function() {
+    _noteValueValue() {
         // Return the number block value being used as a note value
         // denominator argument.
         let dblk = this.connections[0];
@@ -3657,18 +3653,18 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         return 1;
-    };
+    }
 
-    this._octaveNumber = function() {
+    _octaveNumber() {
         // Is this a number block being used as an octave argument?
         return (this.name === "number" && this.connections[0] !== null &&
                 ["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "nthmodalpitch"
                 ].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1 &&
                 this.blocks.blockList[this.connections[0]].connections[2] ===
                 this.blocks.blockList.indexOf(this));
-    };
+    }
 
-    this._checkWidgets = function(closeInput) {
+    _checkWidgets(closeInput) {
         // Detect if label is changed, then reinit widget windows
         // if they are open.
         let thisBlock = this.blocks.blockList.indexOf(this);
@@ -3702,9 +3698,9 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
         }
-    };
+    }
 
-    this._labelChanged = function(closeInput, notPieMenu) {
+    _labelChanged(closeInput, notPieMenu) {
         // Update the block values as they change in the DOM label.
 
         // Instead, we do this when we hide the DOM element.
@@ -4015,10 +4011,10 @@ function Block(protoblock, blocks, overrideName) {
                 this.blocks.logo.synth.loadSynth(0, getNoiseSynthName(this.value));
             }
         }
-    };
+    }
 }
 
-/*
+/**
  * set elements to a array
  * if element is string,then set element's id to element
  * @public
