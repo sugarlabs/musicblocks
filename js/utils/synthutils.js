@@ -751,7 +751,7 @@ function Synth() {
                     //datafunction = function() {return CUSTOMSAMPLES[customsample][1]};
                     let newdata = (CUSTOMSAMPLES[customsample][1]);
                     console.log(newdata);
-                    this.samples["voice"][sampleName] = BANJO_SAMPLE();//CUSTOMSAMPLES[customsample][1];
+                    this.samples["voice"][sampleName] = CUSTOMSAMPLES[customsample][1];
                     console.log(this.samples);
                     return;
                 }
