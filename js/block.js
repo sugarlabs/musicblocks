@@ -175,12 +175,10 @@ class Block {
     // Includes workaround for a race condition.
     _createCache(callback, args) {
         let that = this;
-<<<<<<< HEAD
+
         return new Promise((resolve, reject) =>
          {
-=======
-        return new Promise(function (resolve, reject) {
->>>>>>> upstream/master
+
             let loopCount = 0;
 
             async function checkBounds(counter) {
@@ -199,20 +197,14 @@ class Block {
                         this.regenerateArtwork(true, []);
                         checkBounds(loopCount + 1);
                     } else {
-<<<<<<< HEAD
+
                         this.container.cache(
-                            this.bounds.x, this.bounds.y,
-                            this.bounds.width, this.bounds.height);
+                            this.bounds.x, 
+                            this.bounds.y,
+                            this.bounds.width,
+                             this.bounds.height);
                         callback(this, args);
-=======
-                        that.container.cache(
-                            that.bounds.x,
-                            that.bounds.y,
-                            that.bounds.width,
-                            that.bounds.height
-                        );
-                        callback(that, args);
->>>>>>> upstream/master
+
                         resolve();
                     }
                 } catch (e) {
@@ -227,11 +219,8 @@ class Block {
     // Includes workaround for a race condition.
     updateCache(counter) {
         let that = this;
-<<<<<<< HEAD
+
         return new Promise((resolve, reject) => {
-=======
-        return new Promise(function (resolve, reject) {
->>>>>>> upstream/master
             let loopCount = 0;
 
             async function updateBounds(counter) {
@@ -2471,13 +2460,10 @@ class Block {
                     if (that.blocks.turtles.running()) {
                         that.blocks.logo.doStopTurtles();
 
-<<<<<<< HEAD
+
                         setTimeout(() => {
                             this.blocks.logo.runLogoCommands(topBlock);
-=======
-                        setTimeout(function () {
-                            that.blocks.logo.runLogoCommands(topBlock);
->>>>>>> upstream/master
+
                         }, 250);
                     } else {
                         that.blocks.logo.runLogoCommands(topBlock);
@@ -2499,11 +2485,9 @@ class Block {
             }
 
             locked = true;
-<<<<<<< HEAD
+
             setTimeout(() => {
-=======
-            setTimeout(function () {
->>>>>>> upstream/master
+
                 locked = false;
             }, 500);
 
@@ -2539,13 +2523,9 @@ class Block {
                         if (that.blocks.turtles.running()) {
                             that.blocks.logo.doStopTurtles();
 
-<<<<<<< HEAD
+
                             setTimeout(() => {
                                 this.blocks.logo.runLogoCommands(topBlk);
-=======
-                            setTimeout(function () {
-                                that.blocks.logo.runLogoCommands(topBlk);
->>>>>>> upstream/master
                             }, 250);
                         } else {
                             that.blocks.logo.runLogoCommands(topBlk);
@@ -2563,13 +2543,10 @@ class Block {
                     if (that.blocks.turtles.running()) {
                         that.blocks.logo.doStopTurtles();
 
-<<<<<<< HEAD
+
                         setTimeout(() => {
                             this.blocks.logo.runLogoCommands(topBlk);
-=======
-                        setTimeout(function () {
-                            that.blocks.logo.runLogoCommands(topBlk);
->>>>>>> upstream/master
+
                         }, 250);
                     } else {
                         that.blocks.logo.runLogoCommands(topBlk);
@@ -2578,27 +2555,19 @@ class Block {
             }
         });
 
-<<<<<<< HEAD
+
         this.container.on("mousedown", (event) => {
-=======
-        this.container.on("mousedown", function (event) {
->>>>>>> upstream/master
+
             docById("contextWheelDiv").style.display = "none";
 
             // Track time for detecting long pause...
             this.blocks.mouseDownTime = new Date().getTime();
 
-<<<<<<< HEAD
-            that.blocks.longPressTimeout = setTimeout(() => {
+
+            this.blocks.longPressTimeout = setTimeout(() => {
                 this.blocks.activeBlock = this.blocks.blockList.indexOf(this);
                 this._triggerLongPress = true;
                 this.blocks.triggerLongPress();
-=======
-            that.blocks.longPressTimeout = setTimeout(function () {
-                that.blocks.activeBlock = that.blocks.blockList.indexOf(that);
-                that._triggerLongPress = true;
-                that.blocks.triggerLongPress();
->>>>>>> upstream/master
             }, LONGPRESSTIME);
 
             // Always show the trash when there is a block selected,
@@ -2627,11 +2596,8 @@ class Block {
             };
         });
 
-<<<<<<< HEAD
+
         this.container.on("pressmove", (event) => {
-=======
-        this.container.on("pressmove", function (event) {
->>>>>>> upstream/master
             // FIXME: More voodoo
             event.nativeEvent.preventDefault();
 
@@ -2644,20 +2610,13 @@ class Block {
                 moved = true;
             } else {
                 // Make it eaiser to select text on mobile.
-<<<<<<< HEAD
+
                 setTimeout(() => {
                     moved =
                         Math.abs(event.stageX / this.blocks.getStageScale() -
                                  this.original.x) +
                         Math.abs(event.stageY / that.blocks.getStageScale() -
                                  this.original.y) > 20 && !window.hasMouse;
-=======
-                setTimeout(function () {
-                    moved =
-                        Math.abs(event.stageX / that.blocks.getStageScale() - that.original.x) +
-                            Math.abs(event.stageY / that.blocks.getStageScale() - that.original.y) >
-                            20 && !window.hasMouse;
->>>>>>> upstream/master
                     getInput = !moved;
                 }, 200);
             }
@@ -2725,15 +2684,10 @@ class Block {
             that.blocks.refreshCanvas();
         });
 
-<<<<<<< HEAD
+
         this.container.on("mouseout", (event) => {
             if (!this.blocks.getLongPressStatus()) {
                 this._mouseoutCallback(event, moved, haveClick, false);
-=======
-        this.container.on("mouseout", function (event) {
-            if (!that.blocks.getLongPressStatus()) {
-                that._mouseoutCallback(event, moved, haveClick, false);
->>>>>>> upstream/master
             } else {
                 clearTimeout(this.blocks.longPressTimeout);
                 this.blocks.longPressTimeout = null;
@@ -2746,15 +2700,10 @@ class Block {
             moved = false;
         });
 
-<<<<<<< HEAD
+
         this.container.on("pressup", (event) => {
             if (!this.blocks.getLongPressStatus()) {
                 this._mouseoutCallback(event, moved, haveClick, false);
-=======
-        this.container.on("pressup", function (event) {
-            if (!that.blocks.getLongPressStatus()) {
-                that._mouseoutCallback(event, moved, haveClick, false);
->>>>>>> upstream/master
             } else {
                 clearTimeout(this.blocks.longPressTimeout);
                 this.blocks.longPressTimeout = null;
@@ -3582,13 +3531,9 @@ class Block {
 
             this.label.addEventListener("keypress", __keypress);
 
-<<<<<<< HEAD
+
             this.label.addEventListener("change", () => {
                 this._labelChanged(false, true);
-=======
-            this.label.addEventListener("change", function () {
-                that._labelChanged(false, true);
->>>>>>> upstream/master
             });
 
             this.label.style.left =
@@ -3610,15 +3555,10 @@ class Block {
             }
 
             // Firefox fix
-<<<<<<< HEAD
+
             setTimeout(() => {
                 this.label.style.display = "";
                 this.label.focus();
-=======
-            setTimeout(function () {
-                that.label.style.display = "";
-                that.label.focus();
->>>>>>> upstream/master
                 focused = true;
             }, 100);
         }
@@ -4137,11 +4077,10 @@ function $() {
 
 window.hasMouse = false;
 // Mousemove is not emulated for touch
-<<<<<<< HEAD
+
 document.addEventListener("mousemove", (e) => {
 =======
-document.addEventListener("mousemove", function (e) {
->>>>>>> upstream/master
+
     window.hasMouse = true;
 });
 
