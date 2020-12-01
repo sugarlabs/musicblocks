@@ -14,8 +14,8 @@ Chrome        | Supported
 Safari        | Supported
 Firefox       | Supported
 Opera         | Supported
-IE            | Not Supported
-Edge	      | Coming soon
+IE            | Not supported
+Edge	      | Recent versions supported
 
 You can run it from
 [https://musicblocks.sugarlabs.org](https://musicblocks.sugarlabs.org).
@@ -28,16 +28,13 @@ Getting Started
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/getting_started_blocks.svg "default blocks")
 
 When you first launch Music Blocks in your browser, you'll see a stack
-of blocks representing four notes: `Do 4`, `Mi 4`, `Sol 4` and `Do
-5`. The first note is a `1/2` note; the second and third notes are
-`1/4` notes; the fourth note is a `1/1` note.
-
-https://github.com/sugarlabs/
+of blocks representing the notes: `Sol 4`, `Mi 4`and `Sol 4`. The first two notes are `1/4` note; third note is 
+`1/2` note.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/play-button.svg "play button")
 
 Try clicking on the *Start* block or click on the *Play* button. You
-should hear the notes play in succession: `Do` `Mi` `Sol` `Do`.
+should hear the notes play in succession: `Sol` `Mi` `Sol`.
 
 To write your own programs, drag blocks from their respective palettes
 on the left side of the screen. Use multiple blocks in stack(s) to
@@ -86,7 +83,8 @@ etc. and also the button for selecting language.
 (3) The *Palette* toolbar is on the left side of the screen. New
 blocks are dragged from the palette.
 
-(4) On the upper right of the canvas is a small toolbar for showing grids, clearing the screen, and toggling the display size.
+(4) On the upper right of the canvas is a small toolbar for showing
+grids, clearing the screen, and toggling the display size.
 
 (5) On the lower right of the canvas is a small toolbar where you will
 find the *Home* button, buttons for show/hide blocks, expand/collapse
@@ -266,7 +264,10 @@ Blocks.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/forward_block.svg "forward")
 
-The *Forward* block, found on the *Mouse* palette, is used to draw straight lines. (Note that if this block is used inside of a *Note value* block&mdash;the line will be drawn as the note plays; otherwise the line is drawn "instantly".)
+The *Forward* block, found on the *Mouse* palette, is used to draw
+straight lines. (Note that if this block is used inside of a *Note
+value* block&mdash;the line will be drawn as the note plays; otherwise
+the line is drawn "instantly".)
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/left_block.svg "right")
 
@@ -319,13 +320,34 @@ create some interactivity in your program.
 
 The *Cursor x* and *Cursor y* blocks, also found on the *Sensors* palette, return the X and Y coordinates of the cursor. These blocks can also be used to create interactive programs.
 
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/input_block.svg "input")
+
+Prompting the user for input is done with the *Input* block. This
+block will display a messgae with a prompt and open an input form at
+the current position of the mouse. Program execution is paused until
+the user types into the form and types RETURN (or Enter). The contents
+of the input form are then transferred to *Input-value* block.
+
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/push_block.svg "push")
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/pop_block.svg "pop")
 
 The *Push* and *Pop* blocks, found on the *Heap* palette, are used to
 store and retrieve values on/from a first-in, last-out (FILO) program
-heap.
+heap. There is a separate heap maintained for each *Start* block.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/getDict_block.svg "get value")
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/setDict_block.svg "set value")
+
+The *Get value* and *Set value* blocks are found on the *Dictionary*
+palette. They are used to get and set values in a dictionary
+object. You can have as many key/value pairs as you'd like in the
+dictionary and you can have as many dictionaries as you'd like as
+well. There is also a built-in dictionary associated with each *Start*
+block that has key/value pairs for parameters such as x, y, heading,
+color, shade, grey, pen size, notes played, current pitch, pitch
+number, and note value.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/print_block.svg "print")
 
@@ -334,13 +356,37 @@ messages during program execution. It is very useful as a debugging
 tool and also as a means of adding lyrics to your music&mdash;think
 karaoke.
 
+Flow Palette
+------------
+
+The Flow palette is described in more detail in the Turtle Blocks
+documentation. Here we review a few ways to approach taking different
+actions on different beats.
+
+The *Switch* block will take the action defined in the *Case* that
+matches the argument passed to the *Switch* block. In the figure
+below, it will take a different action based on the beat value: "on
+case 1 run action1", "on case 2, run action2", ..., "on case 4 run
+action4". You can also define a default action.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/switch-on-beat.svg "Switch on Beat")
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/switch-actions.svg "Switch actions")
+
+Another way to do the same thing is with the *Do* block found on the
+Action palette. In the figure below, we add the beat count to "action"
+to create a series of strings: "action1", "action2", ...,
+"action4". We then "do" that action.
+
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/do-actions.svg "Do actions")
+
 Widget Palette
 --------------
 
 Music Blocks has various Widgets that can be used within Music Blocks
 to enhance your experience. The *Pitch-time matrix* is described here.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/chords.png "The Pitch-Time Matrix")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/widget.png "The Pitch-Time Matrix")
 
 Many of the blocks on this palette are used to create a matrix of
 "pitch" and "note value". The matrix is a convenient and intuitive way
@@ -415,6 +461,16 @@ the chunk in the clamp of the *Pitch-time Marix* block.
 
 More details about all of the widgets are available in the
 [Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md).
+
+Stats
+-----
+
+Project statistics are available from a button the the secondary
+toolbar in advanced mode.
+
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/stats.svg
+ "Stats Details")
 
 Planet View 
 -----------

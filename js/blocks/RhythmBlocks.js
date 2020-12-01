@@ -1,342 +1,3 @@
-function _playNote(args, logo, turtle, blk, receivedArg) {
-    // We queue up the child flow of the note clamp and
-    // once all of the children are run, we trigger a
-    // _playnote_ event, then wait for the note to play.
-    // The note can be specified by pitch or synth blocks.
-    // The osctime block specifies the duration in
-    // milleseconds while the note block specifies
-    // duration as a beat value. Note: we should consider
-    // the use of the global timer in Tone.js for more
-    // accuracy.
-    let childFlow, childFlowCount;
-
-    if (args[1] === undefined) {
-        // Should never happen, but if it does, nothing to do.
-        return;
-    }
-
-    // Use the outer most note when nesting to determine the beat.
-    if (logo.inNoteBlock[turtle].length === 0) {
-        if (
-            logo.notesPlayed[turtle][0] / logo.notesPlayed[turtle][1] <
-            logo.pickup[turtle]
-        ) {
-            var beatValue = 0;
-            var measureValue = 0;
-        } else {
-            var beatValue =
-                (((logo.notesPlayed[turtle][0] / logo.notesPlayed[turtle][1] -
-                    logo.pickup[turtle]) *
-                    logo.noteValuePerBeat[turtle]) %
-                    logo.beatsPerMeasure[turtle]) +
-                1;
-            var measureValue =
-                Math.floor(
-                    ((logo.notesPlayed[turtle][0] /
-                        logo.notesPlayed[turtle][1] -
-                        logo.pickup[turtle]) *
-                        logo.noteValuePerBeat[turtle]) /
-                        logo.beatsPerMeasure[turtle]
-                ) + 1;
-        }
-
-        logo.currentBeat[turtle] = beatValue;
-        logo.currentMeasure[turtle] = measureValue;
-    }
-
-    childFlow = args[1];
-    childFlowCount = 1;
-
-    // And only trigger from the outer most note when nesting.
-    if (logo.inNoteBlock[turtle].length === 0) {
-        // Queue any beat actions.
-        // Put the childFlow into the queue before the beat action
-        // so logo the beat action is at the end of the FILO.
-        // Note: The offbeat cannot be Beat 1.
-        if (logo.beatList[turtle].indexOf("everybeat") !== -1) {
-            var queueBlock = new Queue(
-                childFlow,
-                childFlowCount,
-                blk,
-                receivedArg
-            );
-            logo.parentFlowQueue[turtle].push(blk);
-            logo.turtles.turtleList[turtle].queue.push(queueBlock);
-            childFlow = null;
-
-            var eventName = "__everybeat_" + turtle + "__";
-            logo.stage.dispatchEvent(eventName);
-        }
-
-        if (logo.beatList[turtle].indexOf(beatValue) !== -1) {
-            var queueBlock = new Queue(
-                childFlow,
-                childFlowCount,
-                blk,
-                receivedArg
-            );
-            logo.parentFlowQueue[turtle].push(blk);
-            logo.turtles.turtleList[turtle].queue.push(queueBlock);
-            childFlow = null;
-
-            var eventName = "__beat_" + beatValue + "_" + turtle + "__";
-            logo.stage.dispatchEvent(eventName);
-        } else if (
-            beatValue > 1 &&
-            logo.beatList[turtle].indexOf("offbeat") !== -1
-        ) {
-            var queueBlock = new Queue(
-                childFlow,
-                childFlowCount,
-                blk,
-                receivedArg
-            );
-            logo.parentFlowQueue[turtle].push(blk);
-            logo.turtles.turtleList[turtle].queue.push(queueBlock);
-            childFlow = null;
-
-            var eventName = "__offbeat_" + turtle + "__";
-            logo.stage.dispatchEvent(eventName);
-        }
-
-        var thisBeat =
-            beatValue +
-            logo.beatsPerMeasure[turtle] * (logo.currentMeasure[turtle] - 1);
-        for (var f = 0; f < logo.factorList[turtle].length; f++) {
-            var factor = thisBeat / logo.factorList[turtle][f];
-            if (factor === Math.floor(factor)) {
-                var queueBlock = new Queue(
-                    childFlow,
-                    childFlowCount,
-                    blk,
-                    receivedArg
-                );
-                logo.parentFlowQueue[turtle].push(blk);
-                logo.turtles.turtleList[turtle].queue.push(queueBlock);
-                childFlow = null;
-
-                var eventName =
-                    "__beat_" +
-                    logo.factorList[turtle][f] +
-                    "_" +
-                    turtle +
-                    "__";
-                logo.stage.dispatchEvent(eventName);
-            }
-        }
-    }
-
-    // A note can contain multiple pitch blocks to create
-    // a chord. The chord is accumuated in these arrays,
-    // which are used when we play the note.
-    logo.clearNoteParams(turtle, blk, []);
-
-    if (args[0] === null || typeof args[0] !== "number") {
-        logo.errorMsg(NOINPUTERRORMSG, blk);
-        var arg = 1 / 4;
-    } else {
-        var arg = args[0];
-    }
-
-    // Ensure logo note duration is positive.
-    if (arg > 0) {
-        if (logo.blocks.blockList[blk].name === "newnote") {
-            var noteBeatValue = 1 / arg;
-        } else {
-            var noteBeatValue = arg;
-        }
-    } else {
-        //.TRANS: Note value is the note duration.
-        logo.errorMsg(_("Note value must be greater than 0."), blk);
-        var noteBeatValue = -arg;
-    }
-
-    logo.inNoteBlock[turtle].push(blk);
-    if (logo.inNoteBlock[turtle].length > 1) {
-        logo.multipleVoices[turtle] = true;
-    }
-
-    // Adjust the note value based on the beatFactor.
-    logo.noteValue[turtle][last(logo.inNoteBlock[turtle])] =
-        1 / (noteBeatValue * logo.beatFactor[turtle]);
-
-    var listenerName = "_playnote_" + turtle;
-    logo._setDispatchBlock(blk, turtle, listenerName);
-
-    var __listener = function(event) {
-        if (logo.multipleVoices[turtle]) {
-            logo.notationVoices(turtle, logo.inNoteBlock[turtle].length);
-        }
-
-        if (logo.inNoteBlock[turtle].length > 0) {
-            if (logo.inNeighbor[turtle].length > 0) {
-                var neighborNoteValue = logo.neighborNoteValue[turtle];
-                logo.neighborArgBeat[turtle].push(
-                    logo.beatFactor[turtle] * (1 / neighborNoteValue)
-                );
-
-                var nextBeat =
-                    1 / noteBeatValue - 2 * logo.neighborNoteValue[turtle];
-                logo.neighborArgCurrentBeat[turtle].push(
-                    logo.beatFactor[turtle] * (1 / nextBeat)
-                );
-            }
-
-            logo._processNote(
-                1 / logo.noteValue[turtle][last(logo.inNoteBlock[turtle])],
-                last(logo.inNoteBlock[turtle]),
-                turtle
-            );
-        }
-
-        delete logo.oscList[turtle][last(logo.inNoteBlock[turtle])];
-        delete logo.noteBeat[turtle][last(logo.inNoteBlock[turtle])];
-        delete logo.noteBeatValues[turtle][last(logo.inNoteBlock[turtle])];
-        delete logo.noteValue[turtle][last(logo.inNoteBlock[turtle])];
-        delete logo.notePitches[turtle][last(logo.inNoteBlock[turtle])];
-        delete logo.noteOctaves[turtle][last(logo.inNoteBlock[turtle])];
-        delete logo.noteCents[turtle][last(logo.inNoteBlock[turtle])];
-        delete logo.noteHertz[turtle][last(logo.inNoteBlock[turtle])];
-        delete logo.noteDrums[turtle][last(logo.inNoteBlock[turtle])];
-        delete logo.embeddedGraphics[turtle][last(logo.inNoteBlock[turtle])];
-        logo.inNoteBlock[turtle].splice(-1, 1);
-
-        if (
-            logo.multipleVoices[turtle] &&
-            logo.inNoteBlock[turtle].length === 0
-        ) {
-            logo.notationVoices(turtle, logo.inNoteBlock[turtle].length);
-            logo.multipleVoices[turtle] = false;
-        }
-
-        // FIXME: broken when nesting
-        logo.pitchBlocks = [];
-        logo.drumBlocks = [];
-    };
-
-    logo._setListener(turtle, listenerName, __listener);
-
-    return [childFlow, childFlowCount];
-}
-
-function _playSwing(args, logo, turtle, blk) {
-    let childFlow;
-
-    // Grab a bit from the next note to give to the current note.
-    if (logo.blocks.blockList[blk].name === "newswing2") {
-        if (args[2] === undefined) {
-            // Nothing to do.
-            return;
-        }
-
-        if (args[0] === null || typeof args[0] !== "number" || args[0] <= 0) {
-            logo.errorMsg(NOINPUTERRORMSG, blk);
-            var arg0 = 1 / 24;
-        } else {
-            var arg0 = args[0];
-        }
-
-        if (args[1] === null || typeof args[1] !== "number" || args[1] <= 0) {
-            logo.errorMsg(NOINPUTERRORMSG, blk);
-            var arg1 = 1 / 8;
-        } else {
-            var arg1 = args[1];
-        }
-
-        if (logo.suppressOutput[turtle]) {
-            logo.notationSwing(turtle);
-        } else {
-            logo.swing[turtle].push(1 / arg0);
-            logo.swingTarget[turtle].push(1 / arg1);
-        }
-        childFlow = args[2];
-    } else if (logo.blocks.blockList[blk].name === "newswing") {
-        // deprecated
-        logo.swing[turtle].push(1 / args[0]);
-        logo.swingTarget[turtle].push(null);
-        childFlow = args[1];
-    } else {
-        // deprecated
-        logo.swing[turtle].push(args[0]);
-        logo.swingTarget[turtle].push(null);
-        childFlow = args[1];
-    }
-    logo.swingCarryOver[turtle] = 0;
-
-    var listenerName = "_swing_" + turtle;
-    logo._setDispatchBlock(blk, turtle, listenerName);
-
-    var __listener = function(event) {
-        if (!logo.suppressOutput[turtle]) {
-            logo.swingTarget[turtle].pop();
-            logo.swing[turtle].pop();
-        }
-
-        logo.swingCarryOver[turtle] = 0;
-    };
-
-    logo._setListener(turtle, listenerName, __listener);
-
-    return [childFlow, 1];
-}
-
-function _playDotted(args, logo, turtle, blk) {
-    // Dotting a note will increase its play time by
-    // a(2 - 1/2^n)
-    if (logo.blocks.blockList[blk].name === "rhythmicdot") {
-        var arg = 1;
-    } else {
-        if (args[0] == null) {
-            logo.errorMsg(NOINPUTERRORMSG, blk);
-            var arg = 0;
-        } else {
-            var arg = args[0];
-        }
-    }
-
-    var currentDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
-    logo.beatFactor[turtle] *= currentDotFactor;
-    if (arg >= 0) {
-        logo.dotCount[turtle] += arg;
-    } else if (arg === -1) {
-        logo.errorMsg(
-            _("An argument of -1 results in a note value of 0."),
-            blk
-        );
-        console.debug("ignoring dot arg of -1");
-        arg = 0;
-    } else {
-        logo.dotCount[turtle] += 1 / arg;
-    }
-
-    var newDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
-    logo.beatFactor[turtle] /= newDotFactor;
-
-    var listenerName = "_dot_" + turtle;
-    logo._setDispatchBlock(blk, turtle, listenerName);
-
-    var __listener = function(event) {
-        var currentDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
-        logo.beatFactor[turtle] *= currentDotFactor;
-        if (arg >= 0) {
-            logo.dotCount[turtle] -= arg;
-        } else {
-            logo.dotCount[turtle] -= 1 / arg;
-        }
-
-        var newDotFactor = 2 - 1 / Math.pow(2, logo.dotCount[turtle]);
-        logo.beatFactor[turtle] /= newDotFactor;
-    };
-
-    logo._setListener(turtle, listenerName, __listener);
-
-    if (logo.blocks.blockList[blk].name === "rhythmicdot") {
-        return [args[0], 1];
-    } else {
-        return [args[1], 1];
-    }
-}
-
 function setupRhythmBlocks() {
     class MyNoteValueBlock extends ValueBlock {
         constructor() {
@@ -362,48 +23,11 @@ function setupRhythmBlocks() {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                blocks.blockList[blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "mynotevalue"]);
             } else {
-                var value = 0;
-                if (
-                    logo.noteValue[turtle][last(logo.inNoteBlock[turtle])] !==
-                        null &&
-                    logo.noteValue[turtle][last(logo.inNoteBlock[turtle])] !==
-                        undefined
-                ) {
-                    if (
-                        logo.noteValue[turtle][
-                            last(logo.inNoteBlock[turtle])
-                        ] !== 0
-                    ) {
-                        value =
-                            1 /
-                            logo.noteValue[turtle][
-                                last(logo.inNoteBlock[turtle])
-                            ];
-                    } else {
-                        value = 0;
-                    }
-                } else if (logo.lastNotePlayed[turtle] !== null) {
-                    value = logo.lastNotePlayed[turtle][1];
-                } else if (
-                    logo.notePitches[turtle][last(logo.inNoteBlock[turtle])] !==
-                        undefined &&
-                    logo.notePitches[turtle][last(logo.inNoteBlock[turtle])]
-                        .length > 0
-                ) {
-                    value =
-                        logo.noteBeat[turtle][last(logo.inNoteBlock[turtle])];
-                } else {
-                    console.debug("Cannot find a note for turtle " + turtle);
-                    value = 0;
-                }
-
-                if (value !== 0) return 1 / value;
-                return 0;
+                return Singer.RhythmActions.getNoteValue(logo.turtles.companionTurtle(turtle));
             }
         }
     }
@@ -424,12 +48,11 @@ function setupRhythmBlocks() {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "skip"]);
             } else {
-                return logo.skipFactor[turtle];
+                return logo.turtles.ithTurtle(turtle).singer.skipFactor;
             }
         }
     }
@@ -469,7 +92,26 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
-            return _playNote(args, logo, turtle, blk, receivedArg);
+            if (args[1] === undefined)
+                return;
+
+            if (args[0] === null || typeof args[0] !== "number")
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+            else if (args[0] <= 0)
+                logo.errorMsg(_("Note value must be greater than 0."), blk);
+            let value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
+
+            let _callback = () => {
+                let tur = logo.turtles.ithTurtle(turtle);
+
+                let queueBlock = new Queue(args[1], 1, blk, receivedArg);
+                tur.parentFlowQueue.push(blk);
+                tur.queue.push(queueBlock);
+            }
+
+            Singer.RhythmActions.playNote(value, "osctime", turtle, blk, _callback);
+
+            return [args[1], 1];
         }
     }
 
@@ -480,7 +122,6 @@ function setupRhythmBlocks() {
             this.setHelpString();
 
             this.formBlock({
-                //.TRANS: swing is a rhythmic variation that emphasises the offbeat
                 name: _("swing"),
                 args: 1,
                 defaults: [32]
@@ -490,11 +131,32 @@ function setupRhythmBlocks() {
                 [1, ["number", { value: 32 }], 0, 0, [0]],
                 [2, "hidden", 0, 0, [0, null]]
             ]);
-            this.hidden = true;
+            this.hidden = this.deprecated = true;
         }
 
         flow(args, logo, turtle, blk) {
-            return _playSwing(args, logo, turtle, blk);
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.swing.push(args[0]);
+            tur.singer.swingTarget.push(null);
+
+            tur.singer.swingCarryOver = 0;
+
+            let listenerName = "_swing_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                if (!tur.singer.suppressOutput) {
+                    tur.singer.swingTarget.pop();
+                    tur.singer.swing.pop();
+                }
+
+                tur.singer.swingCarryOver = 0;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            return [args[1], 1];
         }
     }
 
@@ -518,11 +180,32 @@ function setupRhythmBlocks() {
                 [4, "vspace", 0, 0, [0, null]],
                 [5, "hidden", 0, 0, [0, null]]
             ]);
-            this.hidden = true;
+            this.hidden = this.deprecated = true;
         }
 
         flow(args, logo, turtle, blk) {
-            return _playSwing(args, logo, turtle, blk);
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.swing.push(1 / args[0]);
+            tur.singer.swingTarget.push(null);
+
+            tur.singer.swingCarryOver = 0;
+
+            let listenerName = "_swing_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                if (!tur.singer.suppressOutput) {
+                    tur.singer.swingTarget.pop();
+                    tur.singer.swing.pop();
+                }
+
+                tur.singer.swingCarryOver = 0;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            return [args[1], 1];
         }
     }
 
@@ -566,7 +249,21 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            return _playSwing(args, logo, turtle, blk);
+            if (args[2] === undefined)
+                return;
+
+            if (
+                args[0] === null || typeof args[0] !== "number" || args[0] <= 0 ||
+                args[1] === null || typeof args[1] !== "number" || args[1] <= 0
+            )   logo.errorMsg(NOINPUTERRORMSG, blk);
+            let arg0 =
+                args[0] === null || typeof args[0] !== "number" || args[0] <= 0 ? 1 / 24 : args[0];
+            let arg1 =
+                args[1] === null || typeof args[1] !== "number" || args[1] <= 0 ? 1 / 8 : args[1];
+
+            Singer.RhythmActions.addSwing(arg0, arg1, turtle, blk);
+
+            return [args[2], 1];
         }
     }
 
@@ -627,32 +324,16 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined) {
-                // Nothing to do.
+            if (args[1] === undefined)
                 return;
-            }
 
-            if (
-                args[0] === null ||
-                typeof args[0] !== "number" ||
-                args[0] <= 0
-            ) {
+            let factor = args[0];
+            if (factor === null || typeof factor !== "number" || factor <= 0) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                var factor = 2;
-            } else {
-                var factor = args[0];
+                factor = 2;
             }
 
-            logo.beatFactor[turtle] /= factor;
-
-            var listenerName = "_multiplybeat_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function(event) {
-                logo.beatFactor[turtle] *= factor;
-            };
-
-            logo._setListener(turtle, listenerName, __listener);
+            Singer.RhythmActions.multiplyNoteValue(factor, turtle, blk);
 
             return [args[1], 1];
         }
@@ -684,120 +365,11 @@ function setupRhythmBlocks() {
             ]);
         }
 
-        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
-            if (args[0] === undefined) {
-                // Nothing to do.
+        flow(args, logo, turtle, blk) {
+            if (args[0] === undefined)
                 return;
-            }
 
-            // Tie notes together in pairs.
-            logo.tie[turtle] = true;
-            logo.tieNotePitches[turtle] = [];
-            logo.tieNoteExtras[turtle] = [];
-            logo.tieCarryOver[turtle] = 0;
-            logo.tieFirstDrums[turtle] = [];
-
-            var listenerName = "_tie_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function(event) {
-                logo.tie[turtle] = false;
-
-                // If tieCarryOver > 0, we have one more note to
-                // play.
-                if (logo.tieCarryOver[turtle] > 0) {
-                    if (logo.justCounting[turtle].length === 0) {
-                        var lastNote = last(logo.inNoteBlock[turtle]);
-                        if (
-                            lastNote != null &&
-                            lastNote in logo.notePitches[turtle]
-                        ) {
-                            // Remove the note from the Lilypond list.
-                            for (
-                                var i = 0;
-                                i <
-                                logo.notePitches[turtle][
-                                    last(logo.inNoteBlock[turtle])
-                                ].length;
-                                i++
-                            ) {
-                                logo.notationRemoveTie(turtle);
-                            }
-                        }
-                    }
-
-                    // Restore the extra note and play it
-                    var saveBlk = logo.tieNoteExtras[turtle][0];
-                    var noteValue = logo.tieCarryOver[turtle];
-                    logo.tieCarryOver[turtle] = 0;
-
-                    logo.inNoteBlock[turtle].push(saveBlk);
-
-                    logo.notePitches[turtle][saveBlk] = [];
-                    logo.noteOctaves[turtle][saveBlk] = [];
-                    logo.noteCents[turtle][saveBlk] = [];
-                    logo.noteHertz[turtle][saveBlk] = [];
-                    for (
-                        var i = 0;
-                        i < logo.tieNotePitches[turtle].length;
-                        i++
-                    ) {
-                        logo.notePitches[turtle][saveBlk].push(
-                            logo.tieNotePitches[turtle][i][0]
-                        );
-                        logo.noteOctaves[turtle][saveBlk].push(
-                            logo.tieNotePitches[turtle][i][1]
-                        );
-                        logo.noteCents[turtle][saveBlk].push(
-                            logo.tieNotePitches[turtle][i][2]
-                        );
-                        logo.noteHertz[turtle][saveBlk].push(
-                            logo.tieNotePitches[turtle][i][3]
-                        );
-                    }
-
-                    logo.oscList[turtle][saveBlk] =
-                        logo.tieNoteExtras[turtle][1];
-                    logo.noteBeat[turtle][saveBlk] =
-                        logo.tieNoteExtras[turtle][2];
-                    logo.noteBeatValues[turtle][saveBlk] =
-                        logo.tieNoteExtras[turtle][3];
-                    logo.noteDrums[turtle][saveBlk] =
-                        logo.tieNoteExtras[turtle][4];
-                    // Graphics will have already been rendered.
-                    logo.embeddedGraphics[turtle][saveBlk] = [];
-
-                    logo._processNote(noteValue, saveBlk, turtle);
-                    if (logo.bpm[turtle].length > 0) {
-                        var bpmFactor = TONEBPM / last(logo.bpm[turtle]);
-                    } else {
-                        var bpmFactor = TONEBPM / logo._masterBPM;
-                    }
-
-                    // Wait until this note is played before continuing.
-                    logo._doWait(turtle, bpmFactor / noteValue);
-
-                    logo.inNoteBlock[turtle].pop();
-
-                    delete logo.notePitches[turtle][saveBlk];
-                    delete logo.noteOctaves[turtle][saveBlk];
-                    delete logo.noteCents[turtle][saveBlk];
-                    delete logo.noteHertz[turtle][saveBlk];
-                    delete logo.oscList[turtle][saveBlk];
-                    delete logo.noteBeat[turtle][saveBlk];
-                    delete logo.noteBeatValues[turtle][saveBlk];
-                    delete logo.noteDrums[turtle][saveBlk];
-                    delete logo.embeddedGraphics[turtle][saveBlk];
-
-                    // Remove duplicate note
-                    logo.notationStaging[turtle].pop();
-                }
-
-                logo.tieNotePitches[turtle] = [];
-                logo.tieNoteExtras[turtle] = [];
-            };
-
-            logo._setListener(turtle, listenerName, __listener);
+            Singer.RhythmActions.doTie(turtle, blk);
 
             return [args[0], 1];
         }
@@ -810,7 +382,6 @@ function setupRhythmBlocks() {
             this.setHelpString();
 
             this.formBlock({
-                //.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
                 name: _("dot"),
                 canCollapse: true
             });
@@ -818,12 +389,42 @@ function setupRhythmBlocks() {
                 [0, "rhythmicdot", x, y, [null, null, 1]],
                 [1, "hidden", 0, 0, [0, null]]
             ]);
-            this.hidden = true;
-            this.deprecated = true;
+            this.hidden = this.deprecated = true;
         }
 
         flow(args, logo, turtle, blk) {
-            return _playDotted(args, logo, turtle, blk);
+            if (args[0] === null) logo.errorMsg(NOINPUTERRORMSG, blk);
+            let arg = 1;
+
+            let tur = logo.turtles.ithTurtle(turtle);
+            let currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
+            tur.singer.beatFactor *= currentDotFactor;
+            if (arg >= 0) {
+                tur.singer.dotCount += arg;
+            } else if (arg === -1) {
+                logo.errorMsg(_("An argument of -1 results in a note value of 0."), blk);
+                arg = 0;
+            } else {
+                tur.singer.dotCount += 1 / arg;
+            }
+
+            let newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
+            tur.singer.beatFactor /= newDotFactor;
+
+            let listenerName = "_dot_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                let currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
+                tur.singer.beatFactor *= currentDotFactor;
+                tur.singer.dotCount -= arg >= 0 ? arg : 1 / arg;
+                let newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
+                tur.singer.beatFactor /= newDotFactor;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            return [args[0], 1];
         }
     }
 
@@ -831,6 +432,7 @@ function setupRhythmBlocks() {
         constructor() {
             super("rhythmicdot2");
             this.setPalette("rhythm");
+	    this.piemenuValuesC1 = [1, 2, 3];
             this.setHelpString([
                 _("The Dot block extends the duration of a note by 50%.") +
                     " " +
@@ -857,7 +459,12 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            return _playDotted(args, logo, turtle, blk);
+            if (args[0] === null) logo.errorMsg(NOINPUTERRORMSG, blk);
+            let arg = args[0] === null ? 0 : args[0];
+
+            Singer.RhythmActions.doRhythmicDot(arg, turtle ,blk);
+
+            return [args[1], 1];
         }
     }
 
@@ -887,20 +494,7 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle) {
-            if (logo.inNoteBlock[turtle].length > 0) {
-                logo.notePitches[turtle][last(logo.inNoteBlock[turtle])].push(
-                    "rest"
-                );
-                logo.noteOctaves[turtle][last(logo.inNoteBlock[turtle])].push(
-                    4
-                );
-                logo.noteCents[turtle][last(logo.inNoteBlock[turtle])].push(0);
-                logo.noteHertz[turtle][last(logo.inNoteBlock[turtle])].push(0);
-                logo.noteBeatValues[turtle][
-                    last(logo.inNoteBlock[turtle])
-                ].push(logo.beatFactor[turtle]);
-                logo.pushedNote[turtle] = true;
-            }
+            Singer.RhythmActions.playRest(turtle);
         }
     }
 
@@ -990,7 +584,7 @@ function setupRhythmBlocks() {
 
     class Note7Block extends _NoteValueBlock {
         constructor() {
-            super("note7", "5 4");
+            super("note7", "4 4");
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "newnote", x, y, [null, 1, 4, 8]],
@@ -998,8 +592,28 @@ function setupRhythmBlocks() {
                 [2, ["number", { value: 1 }], 0, 0, [1]],
                 [3, ["number", { value: 4 }], 0, 0, [1]],
                 [4, "vspace", 0, 0, [0, 5]],
-                [5, "scaledegree", 0, 0, [4, 6, 7, null]],
-                [6, ["number", { value: 5 }], 0, 0, [5]],
+                [5, "nthmodalpitch", 0, 0, [4, 6, 7, null]],
+                [6, ["number", { value: 4 }], 0, 0, [5]],
+                [7, ["number", { value: 4 }], 0, 0, [5]],
+                [8, "hidden", 0, 0, [0, null]]
+            ]);
+        }
+
+        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {}
+    }
+
+    class Note8Block extends _NoteValueBlock {
+        constructor() {
+            super("note8", "scale degree");
+            this.setHelpString();
+            this.makeMacro((x, y) => [
+                [0, "newnote", x, y, [null, 1, 4, 8]],
+                [1, "divide", 0, 0, [0, 2, 3]],
+                [2, ["number", { value: 1 }], 0, 0, [1]],
+                [3, ["number", { value: 4 }], 0, 0, [1]],
+                [4, "vspace", 0, 0, [0, 5]],
+                [5, "pitch", 0, 0, [4, 6, 7, null]],
+                [6, ["scaledegree2", { value: "5" }], 0, 0, [5]],
                 [7, ["number", { value: 4 }], 0, 0, [5]],
                 [8, "hidden", 0, 0, [0, null]]
             ]);
@@ -1087,12 +701,31 @@ function setupRhythmBlocks() {
                 [4, ["number", { value: 4 }], 0, 0, [2]],
                 [5, "hidden", 0, 0, [0, null]]
             ]);
-            this.hidden = true;
-            this.deprecated = true;
+            this.hidden = this.deprecated = true;
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
-            return _playNote(args, logo, turtle, blk, receivedArg);
+            // Should never happen, but if it does, nothing to do
+            if (args[1] === undefined)
+                return;
+
+            if (args[0] === null || typeof args[0] !== "number")
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+            else if (args[0] <= 0)
+                logo.errorMsg(_("Note value must be greater than 0."), blk);
+            let value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
+
+            let _callback = () => {
+                let tur = logo.turtles.ithTurtle(turtle);
+
+                let queueBlock = new Queue(args[1], 1, blk, receivedArg);
+                tur.parentFlowQueue.push(blk);
+                tur.queue.push(queueBlock);
+            }
+
+            Singer.RhythmActions.playNote(value, "note", turtle, blk, _callback);
+
+            return [args[1], 1];
         }
     }
 
@@ -1135,7 +768,28 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
-            return _playNote(args, logo, turtle, blk, receivedArg);
+            // Should never happen, but if it does, nothing to do
+            if (args[1] === undefined)
+                return;
+
+            if (args[0] === null || typeof args[0] !== "number")
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+            else if (args[0] <= 0)
+                logo.errorMsg(_("Note value must be greater than 0."), blk);
+
+            let value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
+
+            let _callback = () => {
+                let tur = logo.turtles.ithTurtle(turtle);
+
+                let queueBlock = new Queue(args[1], 1, blk, receivedArg);
+                tur.parentFlowQueue.push(blk);
+                tur.queue.push(queueBlock);
+            }
+
+            Singer.RhythmActions.playNote(value, "newnote", turtle, blk, _callback);
+
+            return [args[1], 1];
         }
     }
 
@@ -1181,6 +835,7 @@ function setupRhythmBlocks() {
     new Note4Block().setup();
     new Note3Block().setup();
     new Note5Block().setup();
+    new Note8Block().setup();
     new Note7Block().setup();
     new Note6Block().setup();
     new Note2Block().setup();
@@ -1188,4 +843,5 @@ function setupRhythmBlocks() {
     new NoteBlock().setup();
     new NewNoteBlock().setup();
     new DefineFrequencyBlock().setup();
+    new OctaveSpaceBlock().setup();
 }

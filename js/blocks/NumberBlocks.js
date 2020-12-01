@@ -12,6 +12,7 @@ function setupNumberBlocks() {
             this.formBlock({
                 name: _("int"),
                 args: 1,
+                argTypes: ["anyin"],
                 defaults: [100]
             });
         }
@@ -19,27 +20,24 @@ function setupNumberBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "int"]);
             } else {
-                var cblk = logo.blocks.blockList[blk].connections[1];
+                let cblk = logo.blocks.blockList[blk].connections[1];
+
                 if (cblk === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     return 0;
                 } else {
-                    var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-                    if (typeof a === "number") {
-                        return Math.floor(a);
-                    } else {
-                        try {
-                            return Math.floor(Number(a));
-                        } catch (e) {
-                            console.debug(e);
-                            logo.errorMsg(NANERRORMSG, blk);
-                            return 0;
-                        }
+                    let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+
+                    try {
+                        return MathUtility.doInt(a);
+                    } catch (e) {
+                        this.stopTurtle = true;
+                        logo.errorMsg(NANERRORMSG, blk);
+                        return 0;
                     }
                 }
             }
@@ -59,7 +57,7 @@ function setupNumberBlocks() {
             this.formBlock({
                 name: _("mod"),
                 args: 2,
-                defaults: [100, 10]
+                defaults: [100, 12]
             });
         }
 
@@ -70,34 +68,24 @@ function setupNumberBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "mod"]);
             } else {
-                var cblk1 = logo.blocks.blockList[blk].connections[1];
-                var cblk2 = logo.blocks.blockList[blk].connections[2];
+                let cblk1 = logo.blocks.blockList[blk].connections[1];
+                let cblk2 = logo.blocks.blockList[blk].connections[2];
+
                 if (cblk1 === null || cblk2 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     return 0;
                 } else {
-                    var a = logo.parseArg(
-                        logo,
-                        turtle,
-                        cblk1,
-                        blk,
-                        receivedArg
-                    );
-                    var b = logo.parseArg(
-                        logo,
-                        turtle,
-                        cblk2,
-                        blk,
-                        receivedArg
-                    );
-                    if (typeof a === "number" && typeof b === "number") {
-                        return logo._doMod(a, b);
-                    } else {
+                    let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                    let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+
+                    try {
+                        return MathUtility.doMod(a, b);
+                    } catch (e) {
+                        logo.stopTurtle = true;
                         logo.errorMsg(NANERRORMSG, blk);
                         return 0;
                     }
@@ -131,45 +119,28 @@ function setupNumberBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "power"]);
             } else {
-                var cblk1 = logo.blocks.blockList[blk].connections[1];
-                var cblk2 = logo.blocks.blockList[blk].connections[2];
+                let cblk1 = logo.blocks.blockList[blk].connections[1];
+                let cblk2 = logo.blocks.blockList[blk].connections[2];
+
                 if (cblk1 === null || cblk2 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     if (cblk1 !== null) {
-                        var a = logo.parseArg(
-                            logo,
-                            turtle,
-                            cblk1,
-                            blk,
-                            receivedArg
-                        );
-                        return a;
+                        return logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                     } else {
                         return 0;
                     }
                 } else {
-                    var a = logo.parseArg(
-                        logo,
-                        turtle,
-                        cblk1,
-                        blk,
-                        receivedArg
-                    );
-                    var b = logo.parseArg(
-                        logo,
-                        turtle,
-                        cblk2,
-                        blk,
-                        receivedArg
-                    );
-                    if (typeof a === "number" && typeof b === "number") {
-                        return logo._doPower(a, b);
-                    } else {
+                    let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                    let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+
+                    try {
+                        return MathUtility.doPower(a, b);
+                    } catch (e) {
+                        logo.stopTurtle = true;
                         logo.errorMsg(NANERRORMSG, blk);
                         return 0;
                     }
@@ -202,26 +173,27 @@ function setupNumberBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, logo.blocks.blockList[blk].name]);
             } else {
-                var cblk = logo.blocks.blockList[blk].connections[1];
+                let cblk = logo.blocks.blockList[blk].connections[1];
+
                 if (cblk === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     return 0;
                 } else {
-                    var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-                    if (typeof a === "number") {
-                        if (a < 0) {
+                    let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                    try {
+                        return MathUtility.doSqrt(a);
+                    } catch (e) {
+                        logo.stopTurtle = true;
+                        if (e === "NanError") {
+                            logo.errorMsg(NANERRORMSG, blk);
+                        } else if (e === "NoSqrtError") {
                             logo.errorMsg(NOSQRTERRORMSG, blk);
-                            a = -a;
+                            return MathUtility.doSqrt(-a);
                         }
-
-                        return logo._doSqrt(a);
-                    } else {
-                        logo.errorMsg(NANERRORMSG, blk);
                         return 0;
                     }
                 }
@@ -252,20 +224,22 @@ function setupNumberBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, logo.blocks.blockList[blk].name]);
             } else {
-                var cblk = logo.blocks.blockList[blk].connections[1];
+                let cblk = logo.blocks.blockList[blk].connections[1];
+
                 if (cblk === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     return 0;
                 } else {
-                    var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-                    if (typeof a === "number") {
-                        return Math.abs(a);
-                    } else {
+                    let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+
+                    try {
+                        return MathUtility.doAbs(a);
+                    } catch (e) {
+                        this.stopTurtle = true;
                         logo.errorMsg(NANERRORMSG, blk);
                         return 0;
                     }
@@ -311,60 +285,27 @@ function setupNumberBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "distance"]);
             } else {
-                var cblk1 = logo.blocks.blockList[blk].connections[1];
-                var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var cblk3 = logo.blocks.blockList[blk].connections[3];
-                var cblk4 = logo.blocks.blockList[blk].connections[4];
-                if (
-                    cblk1 === null ||
-                    cblk2 === null ||
-                    cblk3 === null ||
-                    cblk4 === null
-                ) {
+                let cblk1 = logo.blocks.blockList[blk].connections[1];
+                let cblk2 = logo.blocks.blockList[blk].connections[2];
+                let cblk3 = logo.blocks.blockList[blk].connections[3];
+                let cblk4 = logo.blocks.blockList[blk].connections[4];
+
+                if (cblk1 === null || cblk2 === null || cblk3 === null || cblk4 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     return 0;
                 } else {
-                    var x1 = logo.parseArg(
-                        logo,
-                        turtle,
-                        cblk1,
-                        blk,
-                        receivedArg
-                    );
-                    var y1 = logo.parseArg(
-                        logo,
-                        turtle,
-                        cblk2,
-                        blk,
-                        receivedArg
-                    );
-                    var x2 = logo.parseArg(
-                        logo,
-                        turtle,
-                        cblk3,
-                        blk,
-                        receivedArg
-                    );
-                    var y2 = logo.parseArg(
-                        logo,
-                        turtle,
-                        cblk4,
-                        blk,
-                        receivedArg
-                    );
-                    if (
-                        typeof x1 === "number" &&
-                        typeof y1 === "number" &&
-                        typeof x2 === "number" &&
-                        typeof y2 === "number"
-                    ) {
-                        return logo._docalculatedistance(x1, y1, x2, y2);
-                    } else {
+                    let x1 = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                    let y1 = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                    let x2 = logo.parseArg(logo, turtle, cblk3, blk, receivedArg);
+                    let y2 = logo.parseArg(logo, turtle, cblk4, blk, receivedArg);
+
+                    try {
+                        return MathUtility.doCalculateDistance(x1, y1, x2, y2);
+                    } catch (e) {
                         logo.errorMsg(NANERRORMSG, blk);
                         return 0;
                     }
@@ -401,46 +342,33 @@ function setupNumberBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "divide"]);
             } else {
-                var cblk1 = logo.blocks.blockList[blk].connections[1];
-                var cblk2 = logo.blocks.blockList[blk].connections[2];
+                let cblk1 = logo.blocks.blockList[blk].connections[1];
+                let cblk2 = logo.blocks.blockList[blk].connections[2];
+
                 if (cblk1 === null || cblk2 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     if (cblk1 !== null) {
-                        var a = logo.parseArg(
-                            logo,
-                            turtle,
-                            cblk1,
-                            blk,
-                            receivedArg
-                        );
-                        return a;
+                        return logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                     } else {
                         return 0;
                     }
                 } else {
-                    var a = logo.parseArg(
-                        logo,
-                        turtle,
-                        cblk1,
-                        blk,
-                        receivedArg
-                    );
-                    var b = logo.parseArg(
-                        logo,
-                        turtle,
-                        cblk2,
-                        blk,
-                        receivedArg
-                    );
-                    if (typeof a === "number" && typeof b === "number") {
-                        return logo._doDivide(a, b);
-                    } else {
-                        logo.errorMsg(NANERRORMSG, blk);
+                    let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                    let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+
+                    try {
+                        return MathUtility.doDivide(a, b);
+                    } catch (e) {
+                        logo.stopTurtle = true;
+                        if (e === "NanError") {
+                            logo.errorMsg(NANERRORMSG, blk);
+                        } else if (e === "DivByZeroError") {
+                            logo.errorMsg(ZERODIVIDEERRORMSG, blk);
+                        }
                         return 0;
                     }
                 }
@@ -476,81 +404,66 @@ function setupNumberBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "multiply"]);
             } else {
-                var cblk1 = logo.blocks.blockList[blk].connections[1];
-                var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var cblk0 = logo.blocks.blockList[blk].connections[0];
-                var noteBlock = logo.blocks.blockList[cblk0].connections[1];
+                let cblk1 = logo.blocks.blockList[blk].connections[1];
+                let cblk2 = logo.blocks.blockList[blk].connections[2];
+
                 if (cblk1 === null || cblk2 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     if (cblk1 !== null) {
-                        var a = logo.parseArg(
-                            logo,
-                            turtle,
-                            cblk1,
-                            blk,
-                            receivedArg
-                        );
-                        return a;
+                        return logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                     } else if (cblk2 !== null) {
-                        var b = logo.parseArg(
-                            logo,
-                            turtle,
-                            cblk2,
-                            blk,
-                            receivedArg
-                        );
-                        return b;
+                        return logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                     } else {
                         return 0;
                     }
                 } else {
-                    // We have a special case for certain keywords
-                    // associated with octaves: current, next, and
-                    // previous.
+                    let tur = logo.turtles.ithTurtle(turtle);
+
+                    // We have a special case for certain keywords associated with octaves:
+                    // current, next, and previous.
+
+                    let cblk0 = logo.blocks.blockList[blk].connections[0];
+
+                    let a, b;
                     if (
-                        typeof logo.blocks.blockList[cblk1].value === "string"
+                        cblk0 !== null &&
+                        logo.blocks.blockList[cblk0].name === "pitch"
                     ) {
-                        var a = calcOctave(
-                            logo.currentOctave[turtle],
-                            logo.blocks.blockList[cblk1].value,
-                            logo.lastNotePlayed[turtle],
-                            logo.blocks.blockList[noteBlock].value
-                        );
+                        let noteBlock = logo.blocks.blockList[cblk0].connections[1];
+
+                        a = typeof logo.blocks.blockList[cblk1].value === "string" ?
+                                calcOctave(
+                                    tur.singer.currentOctave,
+                                    logo.blocks.blockList[cblk1].value,
+                                    tur.singer.lastNotePlayed,
+                                    logo.blocks.blockList[noteBlock].value
+                                ) :
+                                logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+
+                        b = typeof logo.blocks.blockList[cblk2].value === "string" ?
+                                calcOctave(
+                                    tur.singer.currentOctave,
+                                    logo.blocks.blockList[cblk2].value,
+                                    tur.singer.lastNotePlayed,
+                                    logo.blocks.blockList[noteBlock].value
+                                ) :
+                                logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                     } else {
-                        var a = logo.parseArg(
-                            logo,
-                            turtle,
-                            cblk1,
-                            blk,
-                            receivedArg
-                        );
+                        a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                        b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                     }
 
-                    if (
-                        typeof logo.blocks.blockList[cblk2].value === "string"
-                    ) {
-                        var b = calcOctave(
-                            logo.currentOctave[turtle],
-                            logo.blocks.blockList[cblk2].value,
-                            logo.lastNotePlayed[turtle],
-                            logo.blocks.blockList[noteBlock].value
-                        );
-                    } else {
-                        var b = logo.parseArg(
-                            logo,
-                            turtle,
-                            cblk2,
-                            blk,
-                            receivedArg
-                        );
+                    try {
+                        return MathUtility.doMultiply(a, b);
+                    } catch (e) {
+                        logo.stopTurtle = true;
+                        logo.errorMsg(NANERRORMSG, blk);
+                        return 0;
                     }
-
-                    return logo._doMultiply(a, b);
                 }
             }
         }
@@ -566,8 +479,8 @@ function setupNumberBlocks() {
             this.formBlock({
                 name: "–",
                 args: 1,
-                argTypes: "anyin",
-                outType: "anyout"
+                argTypes: ["anyin"],
+                outType: "numberout"
             });
         }
 
@@ -578,20 +491,18 @@ function setupNumberBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "neg"]);
             } else {
-                var cblk = logo.blocks.blockList[blk].connections[1];
+                let cblk = logo.blocks.blockList[blk].connections[1];
+
                 if (cblk !== null) {
-                    var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-                    if (typeof a === "number") {
-                        return logo._doMinus(0, a);
-                    } else if (typeof a === "string") {
-                        var obj = a.split("");
-                        return obj.reverse().join("");
-                    } else {
+                    let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+
+                    try {
+                        return MathUtility.doNegate(a);
+                    } catch {
                         return a;
                     }
                 } else {
@@ -630,81 +541,66 @@ function setupNumberBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "minus"]);
             } else {
-                var cblk1 = logo.blocks.blockList[blk].connections[1];
-                var cblk2 = logo.blocks.blockList[blk].connections[2];
-                var cblk0 = logo.blocks.blockList[blk].connections[0];
-                var noteBlock = logo.blocks.blockList[cblk0].connections[1];
+                let cblk1 = logo.blocks.blockList[blk].connections[1];
+                let cblk2 = logo.blocks.blockList[blk].connections[2];
+
                 if (cblk1 === null || cblk2 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     if (cblk1 !== null) {
-                        var a = logo.parseArg(
-                            logo,
-                            turtle,
-                            cblk1,
-                            blk,
-                            receivedArg
-                        );
-                        return a;
+                        return logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                     } else if (cblk2 !== null) {
-                        var b = logo.parseArg(
-                            logo,
-                            turtle,
-                            cblk2,
-                            blk,
-                            receivedArg
-                        );
-                        return -b;
+                        return -1 * logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                     } else {
                         return 0;
                     }
                 } else {
-                    // We have a special case for certain keywords
-                    // associated with octaves: current, next, and
-                    // previous.
+                    let tur = logo.turtles.ithTurtle(turtle);
+
+                    // We have a special case for certain keywords associated with octaves:
+                    // current, next, and previous.
+
+                    let cblk0 = logo.blocks.blockList[blk].connections[0];
+
+                    let a, b;
                     if (
-                        typeof logo.blocks.blockList[cblk1].value === "string"
+                        cblk0 !== null &&
+                        logo.blocks.blockList[cblk0].name === "pitch"
                     ) {
-                        var a = calcOctave(
-                            logo.currentOctave[turtle],
-                            logo.blocks.blockList[cblk1].value,
-                            logo.lastNotePlayed[turtle],
-                            logo.blocks.blockList[noteBlock].value
-                        );
+                        let noteBlock = logo.blocks.blockList[cblk0].connections[1];
+
+                        a = typeof logo.blocks.blockList[cblk1].value === "string" ?
+                                calcOctave(
+                                    tur.singer.currentOctave,
+                                    logo.blocks.blockList[cblk1].value,
+                                    tur.singer.lastNotePlayed,
+                                    logo.blocks.blockList[noteBlock].value
+                                ) :
+                                logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+
+                        b = typeof logo.blocks.blockList[cblk2].value === "string" ?
+                                calcOctave(
+                                    tur.singer.currentOctave,
+                                    logo.blocks.blockList[cblk2].value,
+                                    tur.singer.lastNotePlayed,
+                                    logo.blocks.blockList[noteBlock].value
+                                ) :
+                                logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                     } else {
-                        var a = logo.parseArg(
-                            logo,
-                            turtle,
-                            cblk1,
-                            blk,
-                            receivedArg
-                        );
+                        a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                        b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                     }
 
-                    if (
-                        typeof logo.blocks.blockList[cblk2].value === "string"
-                    ) {
-                        var b = calcOctave(
-                            logo.currentOctave[turtle],
-                            logo.blocks.blockList[cblk2].value,
-                            logo.lastNotePlayed[turtle],
-                            logo.blocks.blockList[noteBlock].value
-                        );
-                    } else {
-                        var b = logo.parseArg(
-                            logo,
-                            turtle,
-                            cblk2,
-                            blk,
-                            receivedArg
-                        );
+                    try {
+                        return MathUtility.doMinus(a, b);
+                    } catch (e) {
+                        logo.stopTurtle = true;
+                        logo.errorMsg(NANERRORMSG, blk);
+                        return 0;
                     }
-
-                    return logo._doMinus(a, b);
                 }
             }
         }
@@ -743,108 +639,75 @@ function setupNumberBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "plus"]);
             } else {
-                var cblk1 = logo.blocks.blockList[blk].connections[1];
-                var cblk2 = logo.blocks.blockList[blk].connections[2];
+                let cblk1 = logo.blocks.blockList[blk].connections[1];
+                let cblk2 = logo.blocks.blockList[blk].connections[2];
+
                 if (cblk1 === null || cblk2 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     if (cblk1 !== null) {
-                        var a = logo.parseArg(
-                            logo,
-                            turtle,
-                            cblk1,
-                            blk,
-                            receivedArg
-                        );
-                        return a;
+                        return logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                     } else if (cblk2 !== null) {
-                        var b = logo.parseArg(
-                            logo,
-                            turtle,
-                            cblk2,
-                            blk,
-                            receivedArg
-                        );
-                        return b;
+                        return logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                     } else {
                         return 0;
                     }
                 } else {
-                    // We have a special case for certain keywords
-                    // associated with octaves: current, next, and
-                    // previous. In the case of plus, since we use it
-                    // for string concatenation as well, we check to
-                    // see if the block is connected to a pitch block
-                    // before assuming octave.
+                    let tur = logo.turtles.ithTurtle(turtle);
 
-                    var cblk0 = logo.blocks.blockList[blk].connections[0];
-                    if (
-                        cblk0 !== null &&
-                        logo.blocks.blockList[cblk0].name === "pitch"
-                    ) {
-                        var noteBlock =
-                            logo.blocks.blockList[cblk0].connections[1];
-                        if (
-                            typeof logo.blocks.blockList[cblk1].value ===
-                            "string"
-                        ) {
-                            var a = calcOctave(
-                                logo.currentOctave[turtle],
-                                logo.blocks.blockList[cblk1].value,
-                                logo.lastNotePlayed[turtle],
-                                logo.blocks.blockList[noteBlock].value
-                            );
-                        } else {
-                            var a = logo.parseArg(
-                                logo,
-                                turtle,
-                                cblk1,
-                                blk,
-                                receivedArg
-                            );
-                        }
+                    // We have a special case for certain keywords associated with octaves:
+                    // current, next, and previous. In the case of plus, since we use it
+                    // for string concatenation as well, we check to see if the block is
+                    // connected to a pitch block before assuming octave.
 
-                        if (
-                            typeof logo.blocks.blockList[cblk2].value ===
-                            "string"
-                        ) {
-                            var b = calcOctave(
-                                logo.currentOctave[turtle],
-                                logo.blocks.blockList[cblk2].value,
-                                logo.lastNotePlayed[turtle],
-                                logo.blocks.blockList[noteBlock].value
-                            );
+                    let cblk0 = logo.blocks.blockList[blk].connections[0];
+
+                    let a, b;
+                    if (cblk0 !== null && logo.blocks.blockList[cblk0].name === "pitch") {
+                        
+                        if (logo.blocks.blockList[cblk2].name === "accidentalname") {
+                            let scaledegree;
+                            if (logo.blocks.blockList[cblk1].name === "namedbox") {
+                                scaledegree = logo.boxes[logo.blocks.blockList[cblk1].overrideName];
+                            } else {
+                                scaledegree = logo.blocks.blockList[cblk1].value;
+                            }
+
+                            let attr = logo.blocks.blockList[cblk2].value.split(" ");
+                            attr = attr[attr.length - 1];
+                            scaledegree += attr;
+
+                            return scaledegree;
                         } else {
-                            var b = logo.parseArg(
-                                logo,
-                                turtle,
-                                cblk2,
-                                blk,
-                                receivedArg
-                            );
+                            let noteBlock = logo.blocks.blockList[cblk0].connections[1];
+
+                            a = typeof logo.blocks.blockList[cblk1].value === "string" ?
+                                calcOctave(
+                                    tur.singer.currentOctave,
+                                    logo.blocks.blockList[cblk1].value,
+                                    tur.singer.lastNotePlayed,
+                                    logo.blocks.blockList[noteBlock].value
+                                ) :
+                                logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+
+                            b = typeof logo.blocks.blockList[cblk2].value === "string" ?
+                                calcOctave(
+                                    tur.singer.currentOctave,
+                                    logo.blocks.blockList[cblk2].value,
+                                    tur.singer.lastNotePlayed,
+                                    logo.blocks.blockList[noteBlock].value
+                                ) :
+                                logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                         }
                     } else {
-                        var a = logo.parseArg(
-                            logo,
-                            turtle,
-                            cblk1,
-                            blk,
-                            receivedArg
-                        );
-                        var b = logo.parseArg(
-                            logo,
-                            turtle,
-                            cblk2,
-                            blk,
-                            receivedArg
-                        );
+                        a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                        b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                     }
 
-                    return logo._doPlus(a, b);
+                    return MathUtility.doPlus(a, b);
                 }
             }
         }
@@ -866,7 +729,7 @@ function setupNumberBlocks() {
             this.formBlock({
                 name: _("one of"),
                 args: 2,
-                argLabels: [_("this"), _("logo")],
+                argLabels: [_("this"), _("that")],
                 outType: "anyout",
                 argTypes: ["anyin", "anyin"],
                 defaults: [-90, 90]
@@ -888,35 +751,28 @@ function setupNumberBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            var cblk1 = logo.blocks.blockList[blk].connections[1];
-            var cblk2 = logo.blocks.blockList[blk].connections[2];
+            let cblk1 = logo.blocks.blockList[blk].connections[1];
+            let cblk2 = logo.blocks.blockList[blk].connections[2];
+
+            let a, b;
+            if (cblk1 !== null) {
+                a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            }
+            if (cblk2 !== null) {
+                b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+            }
+
             if (cblk1 === null || cblk2 === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 if (cblk1 !== null) {
-                    var a = logo.parseArg(
-                        logo,
-                        turtle,
-                        cblk1,
-                        blk,
-                        receivedArg
-                    );
                     return a;
                 } else if (cblk2 !== null) {
-                    var b = logo.parseArg(
-                        logo,
-                        turtle,
-                        cblk2,
-                        blk,
-                        receivedArg
-                    );
                     return b;
                 } else {
                     return 0;
                 }
             } else {
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                return logo._doOneOf(a, b);
+                return MathUtility.doOneOf(a, b);
             }
         }
     }
@@ -952,34 +808,45 @@ function setupNumberBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            var cblk1 = logo.blocks.blockList[blk].connections[1];
-            var cblk2 = logo.blocks.blockList[blk].connections[2];
+            let cblk0 = logo.blocks.blockList[blk].connections[0];
+            let cblk1 = logo.blocks.blockList[blk].connections[1];
+            let cblk2 = logo.blocks.blockList[blk].connections[2];
+            
             if (cblk1 === null || cblk2 === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             }
-            var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-            var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-            if (typeof a === "number" && typeof b === "number") {
-                return logo._doRandom(a, b);
-            } else if (
-                typeof a === "string" &&
-                typeof b === "string" &&
-                SOLFEGENAMES.indexOf(a) != -1 &&
-                SOLFEGENAMES.indexOf(b) != -1
-            ) {
-                var ai = SOLFEGENAMES.indexOf(a);
-                var bi = SOLFEGENAMES.indexOf(b);
-                if (ai > bi) {
-                    ai = SOLFEGENAMES.indexOf(b);
-                    bi = SOLFEGENAMES.indexOf(a);
-                }
 
-                var ii = logo._doRandom(ai, bi);
-                return SOLFEGENAMES[ii];
+            let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+            let octave = undefined;
+
+            // Check if connected to pitch block and read octave values
+            if (cblk0 !== null) {
+                let par = logo.blocks.blockList[cblk0];
+                while (par.name === "hspace") {
+                    par = logo.blocks.blockList[par.connections[0]];
+                }
+                if (par.name === "pitch") {
+                    octave = logo.blocks.blockList[par.connections[2]].value;
+                }
             }
-            logo.errorMsg(NOINPUTERRORMSG, blk);
-            return false;
+
+            try {
+                if (octave === undefined) {
+                    let randomResult = MathUtility.doRandom(a, b, octave);
+                    if (typeof randomResult === "object") {
+                        return randomResult[0];
+                    }
+                    return randomResult;
+                } else {
+                    return MathUtility.doRandom(a, b, octave);
+                }
+            } catch (e) {
+                logo.stopTurtle = true;
+                logo.errorMsg(NANERRORMSG, blk);
+                return 0;
+            }
         }
     }
 

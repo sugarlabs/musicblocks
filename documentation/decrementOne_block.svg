@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg16"
+   version="1.1"
+   height="34.5"
+   width="137.5">
+  <metadata
+     id="metadata22">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs20" />
+  <g
+     transform="translate(10)"
+     id="g14">
+    <g
+       id="g12"
+       transform="scale(1.5)">
+      <path
+         id="path2"
+         style="fill:#ffbf00;fill-opacity:1;stroke:#daaf30;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m -6.1666667,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 9.9999997 v -2 H 76.5 h 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -64.666667 -1 v 2 H 2.8333333 v -2 h -1 -4 c -2.209139,0 -4,-1.790861 -4,-4 v -4 z" />
+      <text
+         id="text6"
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"><tspan
+           id="tspan4"
+           y="14"
+           x="74">subtract 1 from</tspan></text>
+      <text
+         id="text10"
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"><tspan
+           id="tspan8"
+           y="12"
+           x="74" /></text>
+    </g>
+  </g>
+</svg>

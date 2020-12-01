@@ -12,8 +12,8 @@ const autoprefixer = require('autoprefixer');
 const cssnano = require('cssnano');
 const replace = require('gulp-replace');
 const minifyCSS = require("gulp-minify-css");
-const cleanCSS = require('gulp-clean-css');
 const gulp = require('gulp'); 
+const prettier = require('gulp-prettier');
 
 
 // File paths
@@ -25,7 +25,7 @@ const files = {
 
 }
 
-function sassTask(){    
+const sassTask = () => {    
     return src(files.sassPath)
         .pipe(sourcemaps.init()) // initialize sourcemaps first
         .pipe(sass()) // compile SASS to CSS
@@ -35,7 +35,7 @@ function sassTask(){
     ); // put final CSS in dist folder
 }
 
-function cssTask () { 
+const cssTask = () => { 
     return src(files.cssPath)
                .pipe(minifyCSS({compatibility: 'ie8'}))
                .pipe(gulp.dest('dist/css'));
@@ -45,7 +45,7 @@ function cssTask () {
 
 
 // JS task: concatenates and uglifies JS files to app.min.js
-function jsTask(){
+const jsTask = () => {
     return src([
         files.jsPath
         ])
@@ -61,24 +61,41 @@ function jsTask(){
 
 // Cachebust
 const cbString = new Date().getTime();
-function cacheBustTask(){
+const cacheBustTask = () => {
     return src(['index.html'])
         .pipe(replace(/cb=\d+/g, 'cb=' + cbString))
         .pipe(dest('.'));
 }
 
+//This gulp task formats the js files
+
+const prettify = () => {
+    return gulp.src(files.jsPath)
+      .pipe(prettier({ singleQuote: true,
+                       trailingComma: "all"
+    }))
+      .pipe(gulp.dest('./dist/js')); 
+ };
+
+//to check whether or not files adhere to Prettier's formatting
+
+const validate = () => {
+    return gulp.src(files.jsPath)
+        .pipe(prettier.check({ singleQuote: true, trailingComma: "all"}));
+};
+
 // Watch task: watch SASS , CSS and JS files for changes
 // If any change, run sass, css and js tasks simultaneously
-function watchTask(){
+const watchTask = () => {
     watch([ files.jsPath, files.cssPath, files.sassPath ], 
         parallel( jsTask, cssTask, sassTask));    
 }
 
 // Export the default Gulp task so it can be run
 // Runs the sass ,css and js tasks simultaneously
-// then runs cacheBust, then watch task
+// then runs prettify, cacheBust, watch task, then validate
 exports.default = series(
-    parallel( jsTask, cssTask , sassTask ), 
+    parallel( jsTask, cssTask , sassTask ), prettify,
     cacheBustTask,
-    watchTask
+    watchTask, validate
 );

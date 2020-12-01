@@ -53,14 +53,15 @@ function StringHelper(Planet) {
         ["projectviewer-report-submit",_("Submit")],
         ["projectviewer-reportsubmit-title",_("Report Project")],
         ["projectviewer-report-close",_("Close")],
-        ["projectviewer-download-file",_("Download as File")],
-        ["projectviewer-open-mb",_("Open in Music Blocks")]
+        ["projectviewer-download-file",_("Download as File"),"data-tooltip"],
+        ["projectviewer-open-mb",_("Open in Music Blocks"),"data-tooltip"],
+        ["projectviewer-merge-mb",_("Merge with current project"),"data-tooltip"]
     ]
 
     this.init = function(){
-        for (var i = 0; i<this.strings.length; i++){
-            var obj = this.strings[i];
-            var elem = document.getElementById(obj[0]);
+        for (let i = 0; i<this.strings.length; i++){
+            let obj = this.strings[i];
+            let elem = document.getElementById(obj[0]);
             if (this.strings[i].length==3){
                 elem.setAttribute(obj[2],obj[1]);
             } else {

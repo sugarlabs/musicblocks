@@ -31,8 +31,9 @@ function GlobalPlanet(Planet) {
     this.remixPrefix = _('Remix of');
 
     this.initTagList = function() {
-        for (var i = 0; i < this.specialTags.length; i++) {
-            var t = new GlobalTag(Planet);
+        let t;
+        for (let i = 0; i < this.specialTags.length; i++) {
+            t = new GlobalTag(Planet);
             t.init(this.specialTags[i]);
             this.tags.push(t);
             if (this.specialTags[i].defaultTag === true) {
@@ -40,11 +41,11 @@ function GlobalPlanet(Planet) {
             }
         }
 
-        var tagsToInitialise = [];
+        let tagsToInitialise = [];
 
-        var keys = Object.keys(Planet.TagsManifest);
-        for (var i = 0; i < keys.length; i++) {
-            var t = new GlobalTag(Planet);
+        let keys = Object.keys(Planet.TagsManifest);
+        for (let i = 0; i < keys.length; i++) {
+            t = new GlobalTag(Planet);
             t.init({'id': keys[i]});
             this.tags.push(t);
             if (this.defaultMainTags.indexOf(Planet.TagsManifest[keys[i]].TagName)!=-1){
@@ -58,14 +59,14 @@ function GlobalPlanet(Planet) {
             this.selectSpecialTag(this.defaultTag);
         }
 
-        for (var i = 0; i<tagsToInitialise.length; i++){
+        for (let i = 0; i<tagsToInitialise.length; i++){
             tagsToInitialise[i].select();
         }
         this.refreshTagList();
     };
 
     this.selectSpecialTag = function(tag) {
-        for (var i = 0; i < this.tags.length; i++) {
+        for (let i = 0; i < this.tags.length; i++) {
             this.tags[i].unselect();
         }
         tag.select();
@@ -73,7 +74,7 @@ function GlobalPlanet(Planet) {
     };
 
     this.unselectSpecialTags = function() {
-        for (var i = 0; i < this.tags.length; i++) {
+        for (let i = 0; i < this.tags.length; i++) {
             if (this.tags[i].specialTag) {
                 this.tags[i].unselect();
             }
@@ -81,8 +82,8 @@ function GlobalPlanet(Planet) {
     };
 
     this.refreshTagList = function() {
-        var tagids = [];
-        for (var i = 0; i < this.tags.length; i++) {
+        let tagids = [];
+        for (let i = 0; i < this.tags.length; i++) {
             if (this.tags[i].specialTag === false && this.tags[i].selected === true) {
                 tagids.push(this.tags[i].id);
             }
@@ -171,8 +172,8 @@ function GlobalPlanet(Planet) {
     };
 
     this.addProjects = function(data) {
-        var toDownload = [];
-        for (var i = 0; i < data.length; i++) {
+        let toDownload = [];
+        for (let i = 0; i < data.length; i++) {
             if (this.cache.hasOwnProperty(data[i][0])) {
                 if (this.cache[data[i][0]].ProjectLastUpdated !== data[i][1]) {
                     toDownload.push(data[i]);
@@ -183,7 +184,7 @@ function GlobalPlanet(Planet) {
         }
 
         this.loadCount = toDownload.length;
-        var l = data.length;
+        let l = data.length;
         if (l === this.page + 1) {
             data.pop();
         }
@@ -211,11 +212,12 @@ function GlobalPlanet(Planet) {
 
     this.downloadProjectsToCache = function(data, callback) {
         this.loadCount = data.length;
-        for (var i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++) {
             (function() {
-                var id = data[i][0];
+                let id = data[i][0];
                 Planet.ServerInterface.getProjectDetails(id, function(d) {
-                    var tempid = id;this.addProjectToCache(tempid, d, callback)
+                    let tempid = id;
+                    this.addProjectToCache(tempid, d, callback)
                 }.bind(this));
             }.bind(this))();
         }
@@ -292,9 +294,9 @@ function GlobalPlanet(Planet) {
     };
 
     this.render = function(data) {
-        for (var i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++) {
             if (this.cache.hasOwnProperty(data[i][0])) {
-                var g = new GlobalCard(Planet);
+                let g = new GlobalCard(Planet);
                 g.init(data[i][0]);
                 g.render();
                 this.cards.push(g);
@@ -342,7 +344,7 @@ function GlobalPlanet(Planet) {
     };
 
     this.showLoadMore = function() {
-        var l = document.getElementById('load-more-projects');
+        let l = document.getElementById('load-more-projects');
         l.style.display = 'block';
         l.classList.remove('disabled');
         this.loadButtonShown = true;
@@ -361,13 +363,14 @@ function GlobalPlanet(Planet) {
             error = null;
         }
 
-        var that = this;
+        let that = this;
         this.getData(id, function(data) {
+            let remixedName;
             if (id in that.cache) {
-                var remixedName = that.remixPrefix + ' ' + that.cache[id].ProjectName;
+                remixedName = that.remixPrefix + ' ' + that.cache[id].ProjectName;
                 Planet.ProjectStorage.initialiseNewProject(remixedName, data, that.cache[id].ProjectImage);
             } else {
-                var remixedName = that.remixPrefix + ' ' + _('My Project');
+                remixedName = that.remixPrefix + ' ' + _('My Project');
                 Planet.ProjectStorage.initialiseNewProject(remixedName, data, null);
             }
 
@@ -375,12 +378,32 @@ function GlobalPlanet(Planet) {
         }, error);
     };
 
+    this.mergeGlobalProject = function(id, error) {
+        if (error === undefined) {
+            error = null;
+        }
+
+        let that = this;
+        this.getData(id, function(data) {
+            let remixedName;
+            if (id in that.cache) {
+                remixedName = that.remixPrefix + ' ' + that.cache[id].ProjectName;
+                Planet.ProjectStorage.initialiseNewProject(remixedName, data, that.cache[id].ProjectImage);
+            } else {
+                remixedName = that.remixPrefix + ' ' + _('My Project');
+                Planet.ProjectStorage.initialiseNewProject(remixedName, data, null);
+            }
+
+            Planet.loadProjectFromData(data, true);
+        }, error);
+    };
+    
     this.init = function() {
         if (!Planet.ConnectedToServer) {
             document.getElementById('globaltitle').textContent = _('Cannot connect to server');
             document.getElementById('globalcontents').innerHTML = this.offlineHTML;
         } else {
-            var that = this;
+            let that = this;
 
             jQuery('#sort-select').material_select(function (evt) {
                 that.sortBy = document.getElementById('sort-select').value;
@@ -408,7 +431,7 @@ function GlobalPlanet(Planet) {
                 }
             });
 
-            var debouncedfunction = debounce(this.search.bind(this), 250);
+            let debouncedfunction = debounce(this.search.bind(this), 250);
 
             document.getElementById('global-search').addEventListener('input',  function (evt) {
                 that.searchString = this.value;

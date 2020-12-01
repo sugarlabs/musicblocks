@@ -1,8 +1,8 @@
 MusicBlocks/js
 ==============
 
-The core code for Music Blocks resides in this directory and the
-blocks subdirectory.
+The core code for Music Blocks resides in this directory, the blocks and the turtleactions
+subdirectory.
 
 * `activity.js` -- where the menus are defined
 
@@ -142,7 +142,7 @@ you want to add your new block.
 Block classes can also extend each other. Your class definition and
 `super()` call should follow this syntax:
 
-``` 
+```
     // one block extending another
     class UniqueNameBlock extends SomeBlockClass{
       constructor() {
@@ -162,7 +162,7 @@ At this point your class definition should look similar to this:
       this.setPalette('paletteName');
     }
   }
-``` 
+```
 
 The color of the block is defined by the palette used.
 
@@ -193,7 +193,7 @@ used with the `Add-1` and `Add to` blocks.
 
 ```
     setter(logo, value, turtle, blk) {
-        logo.turtles.turtleList[turtle].doSetHeading(value);
+        logo.turtles.turtleList[turtle].painter.doSetHeading(value);
     }
 ```
 
@@ -295,7 +295,7 @@ class UniqueNameBlock extends SomeBlockClass{
 In some cases, you may want a block on the palette to expand into a stack
 of blocks.
 
-Note: Macro related code is no longed written in `macros.js` 
+Note: Macro related code is no longed written in `macros.js`
 
 To add a macro:
 
@@ -376,7 +376,7 @@ class StartDrumBlock extends StartBlock {
 }
   ```
 
-### A macro definiton: 
+### A macro definiton:
 
   ```
     this.makeMacro((x, y) => [
@@ -391,7 +391,7 @@ class StartDrumBlock extends StartBlock {
 
 `formBlock` is a method of `BaseBlock`. This function takes a JSON-like object describing the visual appearance of the block, its arguments etc. The format of that object is as follows:
 
-1. `name` : This specifies the display name on the block. Typically it is of the format  `_('...')`. 
+1. `name` : This specifies the display name on the block. Typically it is of the format  `_('...')`.
 
 Note: If the `name` is omitted or is set to an empty string, a second argument of `false` should be passed to `formBlock` or else it will resize the block to fit the non-existent text.
 
@@ -403,15 +403,15 @@ Note: If the `name` is omitted or is set to an empty string, a second argument o
 
       * `left`: Defines how top of the block should connect. It's value is a boolean.
 
-      * `type` : Defines the flow used by the block. 
-      
+      * `type` : Defines the flow used by the block.
+
         Values:
 
         * `flow` : Flow blocks are most commonly used one.
         * `arg` : Mainly used for blocks like do and calculate.
         * `value`: Used for blocks such as number.
         * `null` : Indicates that it is just a plain block with nothing special.
-      
+
       * `labels` : Defines the labels to be displayed for each flow branch. This list is also used to determine how many flows a block has. To mark an unlabelled flow use and empty string.
 
 3. `args` : Defines the number of arguments the block takes.
@@ -422,7 +422,7 @@ Note: If the `name` is omitted or is set to an empty string, a second argument o
 
 6. `defaults` : A list of default values for arguments.
 
-e.g. Below definition shows the use of most of the above properties: 
+e.g. Below definition shows the use of most of the above properties:
 ```
 class MakeBlockBlock extends LeftBlock {
     constructor() {
@@ -452,7 +452,7 @@ Note: The call to `formBlock` will attempt further call
 second argument. There is currently no way to define left-hand output
 as a boolean. Though it can be done by passing a third option of
 `bool` to `flows.left`
-  
+
 ### Setting up listeners in clamp blocks
 
 Clamp blocks are a bit complicated since they have interior flows and
@@ -475,7 +475,7 @@ as the *Start* block, do not have any external flow, so their
 will make this assignment for you (typically this is the block that
 immediately follows the clamp block).
 
-`that._setDispatchBlock(blk, turtle, listenerName);`
+`that.setDispatchBlock(blk, turtle, listenerName);`
 
 4. Create a listener event, where you typically clean up anything
 associated with the clamp block's childFlow.
@@ -511,10 +511,10 @@ In order to set up a new synth effect:
 * As mentioned above, if you are adding user-facing strings, be sure
   to add them in this format: `_('string')` This allows the string to
   be set up for translation into other languages.
-  
+
 * Before processing the notes, you need to check if the argument is present
   of if the type of argument is correct, else, set `stopTurtle` to true.
-  
+
 * If you are changing the functionality of an existing block (adding a
   new arg, etc.) then you probably should mark the existing block as
   hidden and add a new block instead so as to not break existing

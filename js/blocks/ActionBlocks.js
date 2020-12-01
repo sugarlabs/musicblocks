@@ -43,16 +43,16 @@ function setupActionBlocks() {
         }
 
         flow(args) {
-            var URL = window.location.href;
-            var urlParts;
-            var outurl;
+            let URL = window.location.href;
+            let urlParts;
+            let outurl;
             if (URL.indexOf("?") > 0) {
-                var urlParts = URL.split("?");
+                 urlParts = URL.split("?");
                 if (urlParts[1].indexOf("&") > 0) {
-                    var newUrlParts = urlParts[1].split("&");
-                    for (var i = 0; i < newUrlParts.length; i++) {
+                    let newUrlParts = urlParts[1].split("&");
+                    for (let i = 0; i < newUrlParts.length; i++) {
                         if (newUrlParts[i].indexOf("=") > 0) {
-                            var tempargs = newUrlParts[i].split("=");
+                            let tempargs = newUrlParts[i].split("=");
                             switch (tempargs[0].toLowerCase()) {
                                 case "outurl":
                                     outurl = tempargs[1];
@@ -63,10 +63,10 @@ function setupActionBlocks() {
                 }
             }
             if (args.length === 1) {
-                var jsonRet = {};
+                let jsonRet = {};
                 jsonRet["result"] = args[0];
-                var json = JSON.stringify(jsonRet);
-                var xmlHttp = new XMLHttpRequest();
+                let json = JSON.stringify(jsonRet);
+                let xmlHttp = new XMLHttpRequest();
                 xmlHttp.open("POST", outurl, true);
                 // Call a function when the state changes.
                 xmlHttp.onreadystatechange = function() {
@@ -102,18 +102,18 @@ function setupActionBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            var actionArgs = [];
-            var cblk = logo.blocks.blockList[blk].connections[1];
+            let actionArgs = [];
+            let cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             } else {
-                var name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                let name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 actionArgs = receivedArg;
                 // logo.getBlockAtStartOfArg(blk);
                 if (name in logo.actions) {
                     logo.turtles.turtleList[turtle].running = true;
-                    logo._runFromBlockNow(
+                    logo.runFromBlockNow(
                         logo,
                         turtle,
                         logo.actions[name],
@@ -149,14 +149,14 @@ function setupActionBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
-            var name = logo.blocks.blockList[blk].privateData;
-            var actionArgs = [];
+            let name = logo.blocks.blockList[blk].privateData;
+            let actionArgs = [];
 
             actionArgs = receivedArg;
             // logo.getBlockAtStartOfArg(blk);
             if (name in logo.actions) {
                 logo.turtles.turtleList[turtle].running = true;
-                logo._runFromBlockNow(
+                logo.runFromBlockNow(
                     logo,
                     turtle,
                     logo.actions[name],
@@ -182,8 +182,7 @@ function setupActionBlocks() {
                 ""
             ]);
 
-            //.TRANS: do1 is do (take) an action (JAPANESE ONLY)
-            //.TRANS: take (do) some action
+            //.TRANS: translate do1 the same as do (take an action) (JAPANESE ONLY)
             this.formBlock({
                 name: this.lang === "ja" ? _("do1") : _("do"),
                 flows: {
@@ -194,19 +193,19 @@ function setupActionBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs) {
-            var name = logo.blocks.blockList[blk].privateData;
+            let name = logo.blocks.blockList[blk].privateData;
             while (actionArgs.length > 0) {
                 actionArgs.pop();
             }
 
             if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (
-                    var i = 0;
+                    let i = 0;
                     i < logo.blocks.blockList[blk].argClampSlots.length;
                     i++
                 ) {
                     if (logo.blocks.blockList[blk].connections[i + 1] != null) {
-                        var t = logo.parseArg(
+                        let t = logo.parseArg(
                             logo,
                             turtle,
                             logo.blocks.blockList[blk].connections[i + 1],
@@ -220,43 +219,36 @@ function setupActionBlocks() {
                 }
             }
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (name in logo.actions) {
-                if (logo.justCounting[turtle].length === 0) {
-                    logo.notationLineBreak(turtle);
+                if (tur.singer.justCounting.length === 0) {
+                    logo.notation.notationLineBreak(turtle);
                 }
 
                 let childFlow;
-                if (logo.backward[turtle].length > 0) {
+                if (tur.singer.backward.length > 0) {
                     childFlow = logo.blocks.findBottomBlock(logo.actions[name]);
-                    var actionBlk = logo.blocks.findTopBlock(
-                        logo.actions[name]
-                    );
-                    logo.backward[turtle].push(actionBlk);
+                    let actionBlk = logo.blocks.findTopBlock(logo.actions[name]);
+                    tur.singer.backward.push(actionBlk);
 
-                    var listenerName = "_backward_action_" + turtle + "_" + blk;
-                    logo._setDispatchBlock(blk, turtle, listenerName);
+                    let listenerName = "_backward_action_" + turtle + "_" + blk;
+                    logo.setDispatchBlock(blk, turtle, listenerName);
 
-                    var nextBlock =
-                        logo.blocks.blockList[actionBlk].connections[2];
-                    if (nextBlock == null) {
-                        logo.backward[turtle].pop();
+                    let nextBlock = logo.blocks.blockList[actionBlk].connections[2];
+                    if (nextBlock === null) {
+                        tur.singer.backward.pop();
                     } else {
-                        if (nextBlock in logo.endOfClampSignals[turtle]) {
-                            logo.endOfClampSignals[turtle][nextBlock].push(
-                                listenerName
-                            );
+                        if (nextBlock in tur.endOfClampSignals) {
+                            tur.endOfClampSignals[nextBlock].push(listenerName);
                         } else {
-                            logo.endOfClampSignals[turtle][nextBlock] = [
-                                listenerName
-                            ];
+                            tur.endOfClampSignals[nextBlock] = [listenerName];
                         }
                     }
 
-                    var __listener = function(event) {
-                        logo.backward[turtle].pop();
-                    };
+                    let __listener = event => tur.singer.backward.pop();
 
-                    logo._setListener(turtle, listenerName, __listener);
+                    logo.setTurtleListener(turtle, listenerName, __listener);
                 } else {
                     childFlow = logo.actions[name];
                 }
@@ -292,16 +284,16 @@ function setupActionBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            var name = logo.blocks.blockList[blk].privateData;
-            var actionArgs = [];
+            let name = logo.blocks.blockList[blk].privateData;
+            let actionArgs = [];
             // logo.getBlockAtStartOfArg(blk);
             if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (
-                    var i = 0;
+                    let i = 0;
                     i < logo.blocks.blockList[blk].argClampSlots.length;
                     i++
                 ) {
-                    var t = logo.parseArg(
+                    let t = logo.parseArg(
                         logo,
                         turtle,
                         logo.blocks.blockList[blk].connections[i + 1],
@@ -314,7 +306,7 @@ function setupActionBlocks() {
             if (name in logo.actions) {
                 // Just run the stack.
                 logo.turtles.turtleList[turtle].running = true;
-                logo._runFromBlockNow(
+                logo.runFromBlockNow(
                     logo,
                     turtle,
                     logo.actions[name],
@@ -359,12 +351,12 @@ function setupActionBlocks() {
 
             if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (
-                    var i = 0;
+                    let i = 0;
                     i < logo.blocks.blockList[blk].argClampSlots.length;
                     i++
                 ) {
                     if (logo.blocks.blockList[blk].connections[i + 2] != null) {
-                        var t = logo.parseArg(
+                        let t = logo.parseArg(
                             logo,
                             turtle,
                             logo.blocks.blockList[blk].connections[i + 2],
@@ -380,8 +372,8 @@ function setupActionBlocks() {
 
             if (args.length >= 1) {
                 if (args[0] in logo.actions) {
-                    if (logo.justCounting[turtle].length === 0) {
-                        logo.notationLineBreak(turtle);
+                    if (logo.turtles.ithTurtle(turtle).singer.justCounting.length === 0) {
+                        logo.notation.notationLineBreak(turtle);
                     }
                     return [logo.actions[args[0]], 1];
                 } else {
@@ -418,15 +410,15 @@ function setupActionBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            var actionArgs = [];
+            let actionArgs = [];
             // logo.getBlockAtStartOfArg(blk);
             if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (
-                    var i = 0;
+                    let i = 0;
                     i < logo.blocks.blockList[blk].argClampSlots.length;
                     i++
                 ) {
-                    var t = logo.parseArg(
+                    let t = logo.parseArg(
                         logo,
                         turtle,
                         logo.blocks.blockList[blk].connections[i + 2],
@@ -436,15 +428,15 @@ function setupActionBlocks() {
                     actionArgs.push(t);
                 }
             }
-            var cblk = logo.blocks.blockList[blk].connections[1];
+            let cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             } else {
-                var name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                let name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (name in logo.actions) {
                     logo.turtles.turtleList[turtle].running = true;
-                    logo._runFromBlockNow(
+                    logo.runFromBlockNow(
                         logo,
                         turtle,
                         logo.actions[name],
@@ -483,15 +475,15 @@ function setupActionBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            var cblk = logo.blocks.blockList[blk].connections[1];
+            let cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             } else {
-                var name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-                var action_args = receivedArg;
+                let name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                let action_args = receivedArg;
                 if (action_args && action_args.length >= Number(name)) {
-                    var value = action_args[Number(name) - 1];
+                    let value = action_args[Number(name) - 1];
                     return value;
                 } else {
                     logo.errorMsg(_("Invalid argument"), blk);
@@ -524,18 +516,18 @@ function setupActionBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            var name = logo.blocks.blockList[blk].privateData;
-            var actionArgs = receivedArg;
+            let name = logo.blocks.blockList[blk].privateData;
+            let actionArgs = receivedArg;
 
             // If an action block with an arg is clicked,
             // the arg will have no value.
-            if (actionArgs == null) {
+            if (actionArgs === null) {
                 logo.errorMsg(_("Invalid argument"), blk);
                 return 0;
             }
 
             if (actionArgs.length >= Number(name)) {
-                var value = actionArgs[Number(name) - 1];
+                let value = actionArgs[Number(name) - 1];
                 return value;
             } else {
                 logo.errorMsg(_("Invalid argument"), blk);
@@ -548,6 +540,7 @@ function setupActionBlocks() {
 
     class DoBlock extends FlowBlock {
         constructor() {
+	    //.TRANS: do is the do something or take an action.
             super("do");
             this.setPalette("action");
             this.beginnerBlock(true);
@@ -575,8 +568,8 @@ function setupActionBlocks() {
             if (args.length === 0) return;
 
             if (args[0] in logo.actions) {
-                if (logo.justCounting[turtle].length === 0) {
-                    logo.notationLineBreak(turtle);
+                if (logo.turtles.ithTurtle(turtle).singer.justCounting.length === 0) {
+                    logo.notation.notationLineBreak(turtle);
                 }
 
                 return [logo.actions[args[0]], 1];
@@ -636,32 +629,24 @@ function setupActionBlocks() {
             if (!(args[1] in logo.actions)) {
                 logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
             } else {
-                var __listener = function(event) {
-                    if (logo.turtles.turtleList[turtle].running) {
-                        var queueBlock = new Queue(
-                            logo.actions[args[1]],
-                            1,
-                            blk
-                        );
-                        logo.parentFlowQueue[turtle].push(blk);
-                        logo.turtles.turtleList[turtle].queue.push(queueBlock);
+                let tur = logo.turtles.ithTurtle(turtle);
+
+                let __listener = event => {
+                    if (tur.running) {
+                        let queueBlock = new Queue(logo.actions[args[1]], 1, blk);
+                        tur.parentFlowQueue.push(blk);
+                        tur.queue.push(queueBlock);
                     } else {
-                        // Since the turtle has stopped
-                        // running, we must run the stack
-                        // from here.
-                        logo._runFromBlockNow(
-                            logo,
-                            turtle,
-                            logo.actions[args[1]],
-                            false,
-                            receivedArg
+                        // Since the turtle has stopped running, we must run the stack from here
+                        tur.singer.runningFromEvent = true;
+                        logo.runFromBlockNow(
+                            logo, turtle, logo.actions[args[1]], false, receivedArg
                         );
                     }
                 };
 
-                // If there is already a listener, remove it
-                // before adding the new one.
-                logo._setListener(turtle, args[0], __listener);
+                // If there is already a listener, remove it before adding the new one
+                logo.setTurtleListener(turtle, args[0], __listener);
             }
         }
     }
@@ -684,7 +669,7 @@ function setupActionBlocks() {
                 name: _("broadcast"),
                 args: 1,
                 defaults: [_("event")],
-                argTypes: ["textin"]
+                argTypes: ["anyin"]
             });
         }
 
@@ -694,7 +679,7 @@ function setupActionBlocks() {
 
             // If the event is not in the event list, add it.
             if (!(args[0] in logo.eventList)) {
-                var event = new Event(args[0]);
+                let event = new Event(args[0]);
                 logo.eventList[args[0]] = event;
             }
             logo.stage.dispatchEvent(args[0]);
@@ -765,7 +750,8 @@ function setupActionBlocks() {
                 name: _("action"),
                 args: 1,
                 argLabels: [""],
-                defaults: [_("action")]
+                defaults: [_("action")],
+                argTypes: ["anyin"]
             });
             this.makeMacro((x, y) => [
                 [0, "action", x, y, [null, 1, 2, null]],
@@ -778,8 +764,8 @@ function setupActionBlocks() {
             if (args.length === 0) return;
 
             if (args[0] in logo.actions) {
-                if (logo.justCounting[turtle].length === 0) {
-                    logo.notationLineBreak(turtle);
+                if (logo.turtles.ithTurtle(turtle).singer.justCounting.length === 0) {
+                    logo.notation.notationLineBreak(turtle);
                 }
 
                 return [logo.actions[args[0]], 1];
@@ -806,43 +792,40 @@ function setupActionBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            var name = logo.blocks.blockList[blk].privateData;
+            let name = logo.blocks.blockList[blk].privateData;
             if (!(name in logo.actions)) {
                 logo.errorMsg(NOACTIONERRORMSG, blk, name);
             }
-            if (logo.justCounting[turtle].length === 0) {
-                logo.notationLineBreak(turtle);
+
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            if (tur.singer.justCounting.length === 0) {
+                logo.notation.notationLineBreak(turtle);
             }
 
             let childFlow;
-            if (logo.backward[turtle].length > 0) {
+            if (tur.singer.backward.length > 0) {
                 childFlow = logo.blocks.findBottomBlock(logo.actions[name]);
-                var actionBlk = logo.blocks.findTopBlock(logo.actions[name]);
-                logo.backward[turtle].push(actionBlk);
+                let actionBlk = logo.blocks.findTopBlock(logo.actions[name]);
+                tur.singer.backward.push(actionBlk);
 
-                var listenerName = "_backward_action_" + turtle + "_" + blk;
-                logo._setDispatchBlock(blk, turtle, listenerName);
+                let listenerName = "_backward_action_" + turtle + "_" + blk;
+                logo.setDispatchBlock(blk, turtle, listenerName);
 
-                var nextBlock = logo.blocks.blockList[actionBlk].connections[2];
-                if (nextBlock == null) {
-                    logo.backward[turtle].pop();
+                let nextBlock = logo.blocks.blockList[actionBlk].connections[2];
+                if (nextBlock === null) {
+                    tur.singer.backward.pop();
                 } else {
-                    if (nextBlock in logo.endOfClampSignals[turtle]) {
-                        logo.endOfClampSignals[turtle][nextBlock].push(
-                            listenerName
-                        );
+                    if (nextBlock in tur.endOfClampSignals) {
+                        tur.endOfClampSignals[nextBlock].push(listenerName);
                     } else {
-                        logo.endOfClampSignals[turtle][nextBlock] = [
-                            listenerName
-                        ];
+                        tur.endOfClampSignals[nextBlock] = [listenerName];
                     }
                 }
 
-                var __listener = function(event) {
-                    logo.backward[turtle].pop();
-                };
+                let __listener = event => tur.singer.backward.pop();
 
-                logo._setListener(turtle, listenerName, __listener);
+                logo.setTurtleListener(turtle, listenerName, __listener);
             } else {
                 childFlow = logo.actions[name];
             }
@@ -884,4 +867,5 @@ function setupActionBlocks() {
     new StartBlock().setup();
     new ActionBlock().setup();
     new NamedDoBlock().setup();
+    new Temperament1Block().setup();
 }

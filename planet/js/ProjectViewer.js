@@ -23,13 +23,13 @@ function ProjectViewer(Planet) {
 
     this.open = function(id) {
         this.id = id;
-        var proj = this.ProjectCache[id];
+        let proj = this.ProjectCache[id];
         document.getElementById('projectviewer-title').textContent = proj.ProjectName;
         document.getElementById('projectviewer-last-updated').textContent = proj.ProjectLastUpdated;
         document.getElementById('projectviewer-date').textContent = proj.ProjectCreatedDate;
         document.getElementById('projectviewer-downloads').textContent = proj.ProjectDownloads;
         document.getElementById('projectviewer-likes').textContent = proj.ProjectLikes;
-        var img = proj.ProjectImage;
+        let img = proj.ProjectImage;
         if (img === '' || img === null) {
             if (proj.ProjectIsMusicBlocks==1) {
                 img = this.PlaceholderMBImage;
@@ -40,10 +40,10 @@ function ProjectViewer(Planet) {
 
         document.getElementById('projectviewer-image').src = img;
         document.getElementById('projectviewer-description').textContent = proj.ProjectDescription;
-        var tagcontainer = document.getElementById('projectviewer-tags');
+        let tagcontainer = document.getElementById('projectviewer-tags');
         tagcontainer.innerHTML = '';
-        for (var i = 0; i < proj.ProjectTags.length; i++) {
-            var chip = document.createElement('div');
+        for (let i = 0; i < proj.ProjectTags.length; i++) {
+            let chip = document.createElement('div');
             chip.classList.add('chipselect');
             chip.textContent = _(Planet.TagsManifest[proj.ProjectTags[i]].TagName);
             tagcontainer.appendChild(chip);
@@ -65,8 +65,8 @@ function ProjectViewer(Planet) {
     };
 
     this.afterDownload = function(data) {
-        var proj = this.ProjectCache[this.id];
-        var image = Planet.ProjectStorage.ImageDataURL;
+        let proj = this.ProjectCache[this.id];
+        let image = Planet.ProjectStorage.ImageDataURL;
         if (proj.ProjectImage !== '') {
             image = proj.ProjectImage;
         }
@@ -75,7 +75,15 @@ function ProjectViewer(Planet) {
     };
 
     this.openProject = function() {
+        // newPageTitle = proj.ProjectName;
+        // document.title = newPageTitle;
         Planet.GlobalPlanet.openGlobalProject(this.id);
+    };
+
+    this.mergeProject = function() {
+        // newPageTitle = proj.ProjectName;
+        // document.title = newPageTitle;
+        Planet.GlobalPlanet.mergeGlobalProject(this.id);
     };
 
     this.openReporter = function() {
@@ -90,7 +98,8 @@ function ProjectViewer(Planet) {
     };
 
     this.submitReporter = function() {
-        var text = document.getElementById('reportdescription').value;
+        let text;
+        text = document.getElementById('reportdescription').value;
         if (text === ''){
             document.getElementById('report-error').textContent = this.ReportDescriptionError;
             document.getElementById('report-error').style.display = 'block';
@@ -125,7 +134,7 @@ function ProjectViewer(Planet) {
     };
 
     this.init = function(){
-        var that = this;
+        let that = this;
 
         document.getElementById('projectviewer-download-file').addEventListener('click', function (evt) {
             that.download();
@@ -133,6 +142,10 @@ function ProjectViewer(Planet) {
 
         document.getElementById('projectviewer-open-mb').addEventListener('click', function (evt) {
             that.openProject();
+        });
+
+        document.getElementById('projectviewer-merge-mb').addEventListener('click', function (evt) {
+            that.mergeProject();
         });
 
         document.getElementById('projectviewer-report-project').addEventListener('click', function (evt) {

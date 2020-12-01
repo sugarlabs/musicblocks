@@ -27,9 +27,19 @@ function GlobalCard(Planet) {
         </div> \
         <div class="card-action"> \
             <div class="flexcontainer"> \
-                <a class="project-icon" id="global-project-more-details-{ID}">'+_('More Details')+'</a> \
+                <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('More Details')+'" id="global-project-more-details-{ID}"><i class="material-icons">info</i></a> \
+                <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_("Open in Music Blocks")+'" id="global-project-open-{ID}"><i class="material-icons">launch</i></a> \
                 <a class="project-icon"></a> \
-                <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Like project')+'"><i class="material-icons"id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a> \
+                <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Merge with current project')+'" id="global-project-merge-{ID}"><i class="material-icons">merge_type</i></a> \ ';
+
+    if (Planet.ProjectStorage.isLiked(this.id)) {
+        this.renderData += '\
+                <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Unlike project')+'"><i class="material-icons"id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a> ';
+    } else {
+        this.renderData += '\
+                <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Like project')+'"><i class="material-icons"id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a>';
+    }                    
+    this.renderData += '\
                     <div id="global-share-{ID}"> \
                                         <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Share project')+'" id="global-project-share-{ID}"><i class="material-icons">share</i></a> \
                                         <div class="card share-card" id="global-sharebox-{ID}" style="display:none;"> \
@@ -56,8 +66,8 @@ function GlobalCard(Planet) {
 
     this.render = function() {
         //TODO: Have a TB placeholder image specific to TB projects
-        var html = this.renderData.replace(new RegExp('\{ID\}', 'g'), this.id);
-        var frag = document.createRange().createContextualFragment(html);
+        let html = this.renderData.replace(new RegExp('\{ID\}', 'g'), this.id);
+        let frag = document.createRange().createContextualFragment(html);
 
         // set image
         if (this.ProjectData.ProjectImage !== null && this.ProjectData.ProjectImage !== ''){
@@ -69,9 +79,9 @@ function GlobalCard(Planet) {
         }
 
         // set tags
-        var tagcontainer = frag.getElementById('global-project-tags-' + this.id);
-        for (var i = 0; i < this.ProjectData.ProjectTags.length; i++){
-            var chip = document.createElement('div');
+        let tagcontainer = frag.getElementById('global-project-tags-' + this.id);
+        for (let i = 0; i < this.ProjectData.ProjectTags.length; i++){
+            let chip = document.createElement('div');
             chip.classList.add('chipselect');
             chip.textContent = _(Planet.TagsManifest[this.ProjectData.ProjectTags[i]].TagName);
             tagcontainer.appendChild(chip);
@@ -83,11 +93,16 @@ function GlobalCard(Planet) {
         // set number of likes
         frag.getElementById('global-project-likes-' + this.id).textContent = this.ProjectData.ProjectLikes.toString();
 
-        var that = this;
+        let that = this;
 
         // set view button listener
         frag.getElementById('global-project-more-details-' + this.id).addEventListener('click', function (evt) {
             Planet.GlobalPlanet.ProjectViewer.open(that.id);
+        });
+
+        // set open button listener
+        frag.getElementById('global-project-open-' + this.id).addEventListener('click', function (evt) {
+            Planet.GlobalPlanet.openGlobalProject(that.id);
         });
 
         // set image listener
@@ -95,9 +110,14 @@ function GlobalCard(Planet) {
             Planet.GlobalPlanet.ProjectViewer.open(that.id);
         });
 
+        // set merge modify listener
+        frag.getElementById('global-project-merge-' + this.id).addEventListener('click', function (evt) {
+            Planet.GlobalPlanet.mergeGlobalProject(that.id);
+        });
+
         // set share button listener
         frag.getElementById('global-project-share-' + this.id).addEventListener('click', function (evt) {
-            var s = document.getElementById('global-sharebox-' + that.id);
+            let s = document.getElementById('global-sharebox-' + that.id);
             if (s.style.display=='none') {
                 s.style.display = 'initial';
                 hideOnClickOutside([document.getElementById('global-share-' + that.id)], 'global-sharebox-' + that.id);
@@ -133,7 +153,7 @@ function GlobalCard(Planet) {
     };
 
     this.like = function() {
-        var like = true;
+        let like = true;
         if (Planet.ProjectStorage.isLiked(this.id)) {
             like = false;
         }
@@ -155,14 +175,14 @@ function GlobalCard(Planet) {
 
     this.setLike = function(like) {
         Planet.ProjectStorage.like(this.id,like);
-        var incr = 1;
-        var text = 'favorite';
+        let incr = 1;
+        let text = 'favorite';
         if (!like) {
             incr = -1;
             text = 'favorite_border';
         }
 
-        var l = document.getElementById('global-project-likes-' + this.id);
+        let l = document.getElementById('global-project-likes-' + this.id);
         l.textContent = (parseInt(l.textContent) + incr).toString();
         document.getElementById('global-like-icon-' + this.id).textContent = text;
     };
@@ -174,7 +194,7 @@ function GlobalCard(Planet) {
 };
 
 function copyURLToClipboard() {
-    var clipboard = new ClipboardJS('.copyshareurl');
+    let clipboard = new ClipboardJS('.copyshareurl');
     clipboard.on('success', function (e) {
         console.info('Copied:', e.text);
         e.clearSelection();

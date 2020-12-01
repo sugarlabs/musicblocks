@@ -37,9 +37,17 @@
       "sizes": "192x192",
       "type": "image/png",
       "density": "4.0"
+    },
+    {
+      "src": "/activity/activity-icon-color-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
   "start_url": "index.html",
+  "background_color": "#F9F9F9",
+  "theme_color": "#2196F3",
   "display": "standalone",
   "orientation": "portrait"
 }

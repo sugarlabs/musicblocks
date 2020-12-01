@@ -1,4 +1,107 @@
 function setupSensorsBlocks() {
+    class InputBlock extends FlowBlock {
+        constructor() {
+            super("input");
+            this.setPalette("sensors");
+            this.parameter = true;
+            this.setHelpString([
+                _(
+                    "The Input block prompts for keyboard input."
+                ),
+                "documentation",
+                ""
+            ]);
+
+            this.formBlock({
+                name: _("input"),
+                args: 1,
+                argTypes: ["anyin"],
+                defaults: [_("Input a value")],
+            });
+
+            if (this.lang === "ja") this.hidden = true;
+        }
+
+        flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            // Pause the flow while we wait for input
+            tur.doWait(120);
+
+            // Display the input form.
+            docById("labelDiv").innerHTML =
+                '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="input" type="text" value="" />';
+            let inputElem = docById("textLabel");
+            let cblk = logo.blocks.blockList[blk].connections[1];
+            if (cblk !== null) {
+                inputElem.placeholder = logo.blocks.blockList[cblk].value;
+            }
+            inputElem.style.left = logo.turtles.turtleList[turtle].container.x + "px";
+            inputElem.style.top = logo.turtles.turtleList[turtle].container.y + "px";
+            inputElem.focus();
+
+            docById("labelDiv").classList.add("hasKeyboard");
+
+            // Add a handler to continue flow after the input.
+            function __keyPressed(event) {
+                if (event.keyCode === 13) { // RETURN
+                    let inputElem = docById("textLabel");
+                    console.debug(inputElem.value);
+                    console.debug('trying a number');
+                    let value = inputElem.value;
+                    if (isNaN(value)) {
+                        logo.inputValues[turtle] = value;
+                    } else {
+                        logo.inputValues[turtle] = Number(value);
+                    }
+
+                    inputElem.blur();
+                    inputElem.style.display = "none";
+                    logo.clearTurtleRun(turtle);
+                    docById("labelDiv").classList.remove("hasKeyboard");
+                }
+            };
+
+            docById("textLabel").addEventListener("keypress", __keyPressed);
+        };
+    }
+
+    class InputValueBlock extends ValueBlock {
+        constructor() {
+            super("inputvalue", _("input value"));
+            this.setPalette("sensors");
+            this.parameter = true;
+
+            this.setHelpString([
+                _(
+                    "The Input-value block stores the input."
+                ),
+                "documentation",
+                null,
+                "input"
+            ]);
+
+            if (this.lang === "ja") this.hidden = true;
+        }
+
+        updateParameter(logo, turtle, blk) {
+            if (turtle in logo.inputValues) {
+                return logo.inputValues[turtle];
+            } else {
+                return 0;
+            }
+        }
+
+        arg(logo, turtle, blk) {
+            if (turtle in logo.inputValues) {
+                return logo.inputValues[turtle];
+            } else {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return 0;
+            }
+        }
+    }
+
     class PitchnessBlock extends ValueBlock {
         constructor() {
             super("pitchness", _("pitch"));
@@ -14,27 +117,28 @@ function setupSensorsBlocks() {
             if (logo.mic === null || _THIS_IS_TURTLE_BLOCKS_) {
                 return 440;
             }
-            if (logo.pitchAnalyser == null) {
+            if (logo.pitchAnalyser === null) {
                 logo.pitchAnalyser = new Tone.Analyser({
                     type: "fft",
-                    size: this.limit
+                    size: logo.limit,
+                    smoothing : 0
                 });
-
-                this.mic.connect(this.pitchAnalyser);
+                logo.mic.connect(logo.pitchAnalyser);
             }
 
-            var values = logo.pitchAnalyser.getValue();
-            var max = 0;
-            var idx = 0;
-            for (var i = 0; i < this.limit; i++) {
-                var v2 = values[i] * values[i];
-                if (v2 > max) {
+
+            let values = logo.pitchAnalyser.getValue();
+            let max = Infinity;
+            let idx = 0;                                // frequency bin
+            for (let i = 0; i < logo.limit; i++) {
+                let v2 = -values[i] ;
+                if (v2 < max) {
                     max = v2;
                     idx = i;
                 }
             }
-
-            return idx;
+            let freq = idx / (logo.pitchAnalyser.sampleTime * logo.limit * 2);
+            return freq ;
         }
     }
 
@@ -43,6 +147,9 @@ function setupSensorsBlocks() {
             super("loudness", _("loudness"));
             this.setPalette("sensors");
             this.parameter = true;
+	    // Put this block on the beginner palette except in Japanese.
+            this.beginnerBlock(!(this.lang === "ja"));
+
             this.setHelpString([
                 _(
                     "The Loudness block returns the volume detected by the microphone."
@@ -63,7 +170,7 @@ function setupSensorsBlocks() {
             if (_THIS_IS_TURTLE_BLOCKS_) {
                 return Math.round(logo.mic.getLevel() * 1000);
             }
-            if (logo.volumeAnalyser == null) {
+            if (logo.volumeAnalyser === null) {
                 logo.volumeAnalyser = new Tone.Analyser({
                     type: "waveform",
                     size: logo.limit
@@ -72,13 +179,13 @@ function setupSensorsBlocks() {
                 logo.mic.connect(logo.volumeAnalyser);
             }
 
-            var values = logo.volumeAnalyser.getValue();
-            var sum = 0;
-            for (var k = 0; k < logo.limit; k++) {
+            let values = logo.volumeAnalyser.getValue();
+            let sum = 0;
+            for (let k = 0; k < logo.limit; k++) {
                 sum += values[k] * values[k];
             }
 
-            var rms = Math.sqrt(sum / logo.limit);
+            let rms = Math.sqrt(sum / logo.limit);
             return Math.round(rms * 100);
         }
     }
@@ -90,7 +197,7 @@ function setupSensorsBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Click block returns True if a mouse has been clicked."),
+                _("The Click block triggers an event if a mouse has been clicked."),
                 "documentation",
                 null,
                 "clickhelp"
@@ -98,7 +205,82 @@ function setupSensorsBlocks() {
         }
 
         arg(logo, turtle) {
-            return "click" + logo.turtles.turtleList[turtle].name;
+            return "click" + logo.turtles.turtleList[turtle].id;
+        }
+    }
+
+    class MyCursoroverBlock extends ValueBlock {
+        constructor() {
+	    // TRANS: The mouse cursor is over the mouse icon
+            super("mycursorover", _("cursor over"));
+            this.setPalette("sensors");
+
+            this.setHelpString([
+                _("The Cursor over block triggers an event when the cursor is moved over a mouse."),
+                "documentation",
+                null,
+                "cursoroverhelp"
+            ]);
+        }
+
+        arg(logo, turtle) {
+            return "CursorOver" + logo.turtles.turtleList[turtle].id;
+        }
+    }
+
+    class MyCursoroutBlock extends ValueBlock {
+        constructor() {
+	    // TRANS: The cursor is "out" -- it is no longer over the mouse.
+            super("mycursorout", _("cursor out"));
+            this.setPalette("sensors");
+
+            this.setHelpString([
+		// TRANS: hover
+                _("The Cursor out block triggers an event when the cursor is moved off of a mouse."),
+                "documentation",
+                null,
+                "cursorouthelp"
+            ]);
+        }
+
+        arg(logo, turtle) {
+            return "CursorOut" + logo.turtles.turtleList[turtle].id;
+        }
+    }
+
+    class MyCursordownBlock extends ValueBlock {
+        constructor() {
+            super("mycursordown", _("cursor button down"));
+            this.setPalette("sensors");
+
+            this.setHelpString([
+                _("The Cursor button down block triggers an event when the curson button is press on a mouse."),
+                "documentation",
+                null,
+                "cursordownhelp"
+            ]);
+        }
+
+        arg(logo, turtle) {
+            return "CursorDown" + logo.turtles.turtleList[turtle].id;
+        }
+    }
+
+    class MyCursorupBlock extends ValueBlock {
+        constructor() {
+            super("mycursorup", _("cursor button up"));
+            this.setPalette("sensors");
+
+            this.setHelpString([
+                _("The Cursor button up block triggers an event when the cursor button is released while over a mouse."),
+                "documentation",
+                null,
+                "cursoruphelp"
+            ]);
+        }
+
+        arg(logo, turtle) {
+            return "CursorUp" + logo.turtles.turtleList[turtle].id;
         }
     }
 
@@ -121,10 +303,10 @@ function setupSensorsBlocks() {
         }
 
         arg(logo, turtle) {
-            var colorString = logo.turtles.turtleList[turtle].canvasColor;
+            let colorString = logo.turtles.turtleList[turtle].painter.canvasColor;
             if (colorString[2] === "#")
                 colorString = hex2rgb(colorString.split("#")[1]);
-            var obj = colorString.split("(")[1].split(",");
+            let obj = colorString.split("(")[1].split(",");
             return parseInt(Number(obj[0]) / 2.55);
         }
     }
@@ -148,10 +330,10 @@ function setupSensorsBlocks() {
         }
 
         arg(logo, turtle) {
-            var colorString = logo.turtles.turtleList[turtle].canvasColor;
+            let colorString = logo.turtles.turtleList[turtle].painter.canvasColor;
             if (colorString[1] === "#")
                 colorString = hex2rgb(colorString.split("#")[1]);
-            var obj = colorString.split("(")[1].split(",");
+            let obj = colorString.split("(")[1].split(",");
             return parseInt(Number(obj[0]) / 2.55);
         }
     }
@@ -175,10 +357,10 @@ function setupSensorsBlocks() {
         }
 
         arg(logo, turtle) {
-            var colorString = logo.turtles.turtleList[turtle].canvasColor;
+            let colorString = logo.turtles.turtleList[turtle].painter.canvasColor;
             if (colorString[0] === "#")
                 colorString = hex2rgb(colorString.split("#")[1]);
-            var obj = colorString.split("(")[1].split(",");
+            let obj = colorString.split("(")[1].split(",");
             return parseInt(Number(obj[0]) / 2.55);
         }
     }
@@ -202,17 +384,17 @@ function setupSensorsBlocks() {
         }
 
         arg(logo, turtle) {
-            var wasVisible = logo.turtles.turtleList[turtle].container.visible;
+            let wasVisible = logo.turtles.turtleList[turtle].container.visible;
             logo.turtles.turtleList[turtle].container.visible = false;
-            var x = logo.turtles.turtleList[turtle].container.x;
-            var y = logo.turtles.turtleList[turtle].container.y;
+            let x = logo.turtles.turtleList[turtle].container.x;
+            let y = logo.turtles.turtleList[turtle].container.y;
             logo.refreshCanvas();
 
-            var canvas = docById("overlayCanvas");
-            var ctx = canvas.getContext("2d");
-            var imgData = ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1)
+            let canvas = docById("overlayCanvas");
+            let ctx = canvas.getContext("2d");
+            let imgData = ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1)
                 .data;
-            var color = searchColors(imgData[0], imgData[1], imgData[2]);
+            let color = searchColors(imgData[0], imgData[1], imgData[2]);
             if (imgData[3] === 0) {
                 (color = body.style.background
                     .substring(
@@ -235,6 +417,9 @@ function setupSensorsBlocks() {
             super("time", _("time"));
             this.setPalette("sensors");
             this.parameter = true;
+	    // Put this block on the beginner palette except in Japanese.
+            this.beginnerBlock(!(this.lang === "ja"));
+
             this.setHelpString([
                 _(
                     "The Time block returns the number of seconds that the program has been running."
@@ -249,7 +434,7 @@ function setupSensorsBlocks() {
         }
 
         arg(logo) {
-            var d = new Date();
+            let d = new Date();
             return (d.getTime() - logo.time) / 1000;
         }
     }
@@ -362,12 +547,12 @@ function setupSensorsBlocks() {
             ) {
                 logo.statusFields.push([blk, "toascii"]);
             } else {
-                var cblk1 = logo.blocks.blockList[blk].connections[1];
-                if (cblk === null) {
+                let cblk1 = logo.blocks.blockList[blk].connections[1];
+                if (cblk1 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     return "A";
                 }
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 if (typeof a === "number") {
                     if (a < 1) return 0;
                     else return String.fromCharCode(a);
@@ -407,17 +592,23 @@ function setupSensorsBlocks() {
         }
     }
 
-    new PitchnessBlock().setup();
-    new LoudnessBlock().setup();
-    new MyClickBlock().setup();
     new GetBlueBlock().setup();
     new GetGreenBlock().setup();
     new GetRedBlock().setup();
     new GetColorPixelBlock().setup();
-    new TimeBlock().setup();
-    new MouseYBlock().setup();
-    new MouseXBlock().setup();
-    new MouseButtonBlock().setup();
     new ToASCIIBlock().setup();
     new KeyboardBlock().setup();
+    new InputValueBlock().setup();
+    new InputBlock().setup();
+    new TimeBlock().setup();
+    new PitchnessBlock().setup();
+    new LoudnessBlock().setup();
+    new MyCursoroutBlock().setup();
+    new MyCursoroverBlock().setup();
+    new MyCursorupBlock().setup();
+    new MyCursordownBlock().setup();
+    new MyClickBlock().setup();
+    new MouseButtonBlock().setup();
+    new MouseYBlock().setup();
+    new MouseXBlock().setup();
 }

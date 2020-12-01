@@ -25,12 +25,12 @@ function setupBooleanBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            var cblk = logo.blocks.blockList[blk].connections[1];
+            let cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
-            var a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+            let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
             try {
                 return !a;
             } catch (e) {
@@ -67,14 +67,14 @@ function setupBooleanBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            var cblk1 = logo.blocks.blockList[blk].connections[1];
-            var cblk2 = logo.blocks.blockList[blk].connections[2];
+            let cblk1 = logo.blocks.blockList[blk].connections[1];
+            let cblk2 = logo.blocks.blockList[blk].connections[2];
             if (cblk1 === null || cblk2 === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             } else {
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 return a && b;
             }
         }
@@ -106,15 +106,54 @@ function setupBooleanBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            var cblk1 = logo.blocks.blockList[blk].connections[1];
-            var cblk2 = logo.blocks.blockList[blk].connections[2];
+            let cblk1 = logo.blocks.blockList[blk].connections[1];
+            let cblk2 = logo.blocks.blockList[blk].connections[2];
             if (cblk1 === null || cblk2 === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             } else {
-                var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 return a || b;
+            }
+        }
+    }
+
+    class XorBlock extends BooleanBlock {
+        constructor() {
+            super("xor");
+            this.setPalette("boolean");
+            this.setHelpString([
+                _("The XOR block is the logical XOR operator."),
+                "documentation",
+                ""
+            ]);
+            this.parameter = true;
+            this.formBlock({
+                name: _("xor"),
+                args: 2,
+                argTypes: ["booleanin", "booleanin"]
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            if (logo.blocks.blockList[blk].value) {
+                return _("true");
+            } else {
+                return _("false");
+            }
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            let cblk1 = logo.blocks.blockList[blk].connections[1];
+            let cblk2 = logo.blocks.blockList[blk].connections[2];
+            if (cblk1 === null || cblk2 === null) {
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            } else {
+                let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                return ((a && !b)||(!a && b));
             }
         }
     }
@@ -150,15 +189,15 @@ function setupBooleanBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            var cblk1 = logo.blocks.blockList[blk].connections[1];
-            var cblk2 = logo.blocks.blockList[blk].connections[2];
+            let cblk1 = logo.blocks.blockList[blk].connections[1];
+            let cblk2 = logo.blocks.blockList[blk].connections[2];
             if (cblk1 === null || cblk2 === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
 
-            var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-            var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+            let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
             try {
                 return Number(a) > Number(b);
             } catch (e) {
@@ -200,14 +239,14 @@ function setupBooleanBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            var cblk1 = logo.blocks.blockList[blk].connections[1];
-            var cblk2 = logo.blocks.blockList[blk].connections[2];
+            let cblk1 = logo.blocks.blockList[blk].connections[1];
+            let cblk2 = logo.blocks.blockList[blk].connections[2];
             if (cblk1 === null || cblk2 === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
-            var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-            var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+            let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
             try {
                 return Number(a) < Number(b);
             } catch (e) {
@@ -247,14 +286,14 @@ function setupBooleanBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            var cblk1 = logo.blocks.blockList[blk].connections[1];
-            var cblk2 = logo.blocks.blockList[blk].connections[2];
+            let cblk1 = logo.blocks.blockList[blk].connections[1];
+            let cblk2 = logo.blocks.blockList[blk].connections[2];
             if (cblk1 === null || cblk2 === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
-            var a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-            var b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+            let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
             try {
                 return a === b;
             } catch (e) {
@@ -288,6 +327,7 @@ function setupBooleanBlocks() {
     }
 
     new NotBlock().setup();
+    new XorBlock().setup();
     new AndBlock().setup();
     new OrBlock().setup();
     new GreaterBlock().setup();

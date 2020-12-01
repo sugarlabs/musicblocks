@@ -14,14 +14,15 @@ function setupOrnamentBlocks() {
         }
 
         arg(logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "staccato"]);
-            } else if (logo.staccato[turtle].length > 0) {
-                return last(logo.staccato[turtle]);
+            } else if (tur.singer.staccato.length > 0) {
+                return last(tur.singer.staccato);
             } else {
                 return 0;
             }
@@ -43,14 +44,15 @@ function setupOrnamentBlocks() {
         }
 
         arg(logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "slur"]);
-            } else if (logo.staccato[turtle].length > 0) {
-                return -last(logo.staccato[turtle]);
+            } else if (tur.singer.staccato.length > 0) {
+                return -last(tur.singer.staccato);
             } else {
                 return 0;
             }
@@ -61,9 +63,10 @@ function setupOrnamentBlocks() {
         constructor(name) {
             super(name || "neighbor");
             this.setPalette("ornament");
+            this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.setHelpString();
             this.formBlock({
-                //.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
+                //.TRANS: the neighbor refers to a neighboring note, e.g., D is a neighbor of C
                 name: _("neighbor") + " (+/–)",
                 args: 2,
                 defaults: [1, 1 / 16],
@@ -87,20 +90,7 @@ function setupOrnamentBlocks() {
                 return;
             }
 
-            logo.inNeighbor[turtle].push(blk);
-            logo.neighborStepPitch[turtle].push(args[0]);
-            logo.neighborNoteValue[turtle].push(args[1]);
-
-            var listenerName = "_neighbor_" + turtle + "_" + blk;
-            logo._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function(event) {
-                logo.inNeighbor[turtle].pop();
-                logo.neighborStepPitch[turtle].pop();
-                logo.neighborNoteValue[turtle].pop();
-            };
-
-            logo._setListener(turtle, listenerName, __listener);
+            Singer.OrnamentActions.doNeighbor(args[0], args[1], turtle, blk);
 
             return [args[2], 1];
         }
@@ -109,6 +99,7 @@ function setupOrnamentBlocks() {
     class Neighbor2Block extends NeighborBlock {
         constructor() {
             super("neighbor2");
+            this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -121,7 +112,6 @@ function setupOrnamentBlocks() {
             ]);
 
             this.formBlock({
-                //.TRANS: the neigbor refers to a neighboring note, e.g., D is a neighbor of C
                 name: _("neighbor") + " (+/–)",
                 args: 2,
                 defaults: [1, 1 / 16],
@@ -171,34 +161,37 @@ function setupOrnamentBlocks() {
                 return;
             }
 
+            let arg;
             if (args[0] === null || typeof args[0] !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                var arg = 1 / 16;
+                arg = 1 / 16;
             } else {
-                var arg = args[0];
+                arg = args[0];
             }
 
-            logo.glide[turtle].push(arg);
+            let tur = logo.turtles.ithTurtle(turtle);
 
-            if (logo.justCounting[turtle].length === 0) {
-                logo.notationBeginSlur(turtle);
+            tur.singer.glide.push(arg);
+
+            if (tur.singer.justCounting.length === 0) {
+                logo.notation.notationBeginSlur(turtle);
             }
 
-            logo.glideOverride[turtle] = logo._noteCounter(turtle, args[1]);
-            console.debug("length of glide " + logo.glideOverride[turtle]);
+            tur.singer.glideOverride = Singer.noteCounter(logo, turtle, args[1]);
+            console.debug("length of glide " + tur.singer.glideOverride);
 
-            var listenerName = "_glide_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            let listenerName = "_glide_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
-                if (logo.justCounting[turtle].length === 0) {
-                    logo.notationEndSlur(turtle);
+            let __listener = event => {
+                if (tur.singer.justCounting.length === 0) {
+                    logo.notation.notationEndSlur(turtle);
                 }
 
-                logo.glide[turtle].pop();
+                tur.singer.glide.pop();
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }
@@ -224,39 +217,16 @@ function setupOrnamentBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined) {
-                // Nothing to do.
+            if (args[1] === undefined)
                 return;
-            }
 
-            if (args[0] === null || typeof args[0] !== "number") {
+            let arg = args[0];
+            if (arg === null || typeof arg !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                var arg = 1 / 16;
-            } else {
-                var arg = args[0];
+                arg = 1 / 16;
             }
 
-            if (logo.blocks.blockList[blk].name === "slur") {
-                logo.staccato[turtle].push(-arg);
-            } else {
-                logo.staccato[turtle].push(-1 / arg);
-            }
-
-            if (logo.justCounting[turtle].length === 0) {
-                logo.notationBeginSlur(turtle);
-            }
-
-            var listenerName = "_staccato_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function(event) {
-                logo.staccato[turtle].pop();
-                if (logo.justCounting[turtle].length === 0) {
-                    logo.notationEndSlur(turtle);
-                }
-            };
-
-            logo._setListener(turtle, listenerName, __listener);
+            Singer.OrnamentActions.setSlur(arg, turtle, blk);
 
             return [args[1], 1];
         }
@@ -268,7 +238,6 @@ function setupOrnamentBlocks() {
             this.setPalette("ornament");
             this.setHelpString();
             this.formBlock({
-                //.TRANS: play each note sharply detached from the others
                 name: _("staccato"),
                 args: 1,
                 defaults: [32]
@@ -282,32 +251,16 @@ function setupOrnamentBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined) {
-                // Nothing to do.
+            if (args[1] === undefined)
                 return;
-            }
 
-            if (args[0] === null || typeof args[0] !== "number") {
+            let arg = args[0];
+            if (arg === null || typeof arg !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                var arg = 1 / 32;
-            } else {
-                var arg = args[0];
+                arg = 1 / 32;
             }
 
-            if (logo.blocks.blockList[blk].name === "newstaccato") {
-                logo.staccato[turtle].push(1 / arg);
-            } else {
-                logo.staccato[turtle].push(arg);
-            }
-
-            var listenerName = "_staccato_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function(event) {
-                logo.staccato[turtle].pop();
-            };
-
-            logo._setListener(turtle, listenerName, __listener);
+            Singer.OrnamentActions.setStaccato(arg, turtle, blk);
 
             return [args[1], 1];
         }
@@ -328,7 +281,6 @@ function setupOrnamentBlocks() {
             ]);
 
             this.formBlock({
-                //.TRANS: legato: overlap successive notes
                 name: _("slur"),
                 args: 1,
                 defaults: [1 / 16]

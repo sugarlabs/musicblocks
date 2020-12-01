@@ -23,6 +23,8 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (args.length === 4 && typeof args[0] === "number") {
                 if (args[0] < 0 || args[0] > 100) {
                     logo.errorMsg(_("Attack value should be from 0 to 100."));
@@ -37,25 +39,17 @@ function setupWidgetBlocks() {
                     logo.errorMsg(_("Release value should be from 0-100."));
                 }
 
-                logo.attack[turtle].push(args[0] / 100);
-                logo.decay[turtle].push(args[1] / 100);
-                logo.sustain[turtle].push(args[2] / 100);
-                logo.release[turtle].push(args[3] / 100);
+                turtle.singer.attack.push(args[0] / 100);
+                turtle.singer.decay.push(args[1] / 100);
+                turtle.singer.sustain.push(args[2] / 100);
+                turtle.singer.release.push(args[3] / 100);
             }
 
             if (logo.inTimbre) {
-                logo.timbre.synthVals["envelope"]["attack"] = last(
-                    logo.attack[turtle]
-                );
-                logo.timbre.synthVals["envelope"]["decay"] = last(
-                    logo.decay[turtle]
-                );
-                logo.timbre.synthVals["envelope"]["sustain"] = last(
-                    logo.sustain[turtle]
-                );
-                logo.timbre.synthVals["envelope"]["release"] = last(
-                    logo.release[turtle]
-                );
+                logo.timbre.synthVals["envelope"]["attack"] = last(tur.singer.attack);
+                logo.timbre.synthVals["envelope"]["decay"] = last(tur.singer.decay);
+                logo.timbre.synthVals["envelope"]["sustain"] = last(tur.singer.sustain);
+                logo.timbre.synthVals["envelope"]["release"] = last(tur.singer.release);
 
                 if (logo.timbre.env.length != 0) {
                     logo.errorMsg(
@@ -72,18 +66,10 @@ function setupWidgetBlocks() {
                 }
 
                 logo.timbre.env.push(blk);
-                logo.timbre.ENVs.push(
-                    Math.round(last(logo.attack[turtle]) * 100)
-                );
-                logo.timbre.ENVs.push(
-                    Math.round(last(logo.decay[turtle]) * 100)
-                );
-                logo.timbre.ENVs.push(
-                    Math.round(last(logo.sustain[turtle]) * 100)
-                );
-                logo.timbre.ENVs.push(
-                    Math.round(last(logo.release[turtle]) * 100)
-                );
+                logo.timbre.ENVs.push(Math.round(last(tur.singer.attack) * 100));
+                logo.timbre.ENVs.push(Math.round(last(tur.singer.decay) * 100));
+                logo.timbre.ENVs.push(Math.round(last(tur.singer.sustain) * 100));
+                logo.timbre.ENVs.push(Math.round(last(tur.singer.release) * 100));
             }
         }
     }
@@ -110,12 +96,12 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            var filtertype = DEFAULTFILTERTYPE;
-            var freq;
-            var rollOff;
+            let filtertype = DEFAULTFILTERTYPE;
+            let freq;
+            let rollOff;
 
             if (args.length === 3 && typeof args[1] === "number") {
-                for (var ftype in FILTERTYPES) {
+                for (let ftype in FILTERTYPES) {
                     if (FILTERTYPES[ftype][0] === args[0]) {
                         filtertype = FILTERTYPES[ftype][1];
                     } else if (FILTERTYPES[ftype][1] === args[0]) {
@@ -193,41 +179,41 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.temperament == null) {
+            if (logo.temperament === null) {
                 logo.temperament = new TemperamentWidget();
             }
 
             logo.insideTemperament = true;
             logo.temperament.inTemperament = args[0];
-            var scale = [];
+            let scale = [];
 
             if (
                 logo.blocks.blockList[logo.blocks.blockList[blk].connections[2]]
                     .name === "pitch"
             ) {
-                var pitchBlock =
+                let pitchBlock =
                     logo.blocks.blockList[
                         logo.blocks.blockList[blk].connections[2]
                     ];
-                var note =
+                let note =
                     logo.blocks.blockList[pitchBlock.connections[1]].value;
-                var octave =
+                let octave =
                     logo.blocks.blockList[pitchBlock.connections[2]].value;
-                var setKey = logo.blocks.blockList[pitchBlock.connections[3]];
+                let setKey = logo.blocks.blockList[pitchBlock.connections[3]];
                 scale[0] = logo.blocks.blockList[setKey.connections[1]].value;
                 scale[1] = logo.blocks.blockList[setKey.connections[2]].value;
                 logo.synth.startingPitch = note + octave;
                 logo.temperament.scale = scale;
             }
 
-            var listenerName = "_temperament_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            let listenerName = "_temperament_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.temperament.init(logo);
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
         }
     }
 
@@ -279,7 +265,7 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.timbre == null) {
+            if (logo.timbre === null) {
                 logo.timbre = new TimbreWidget();
             }
 
@@ -336,14 +322,14 @@ function setupWidgetBlocks() {
             logo.timbre.duoSynthParams = [];
             logo.timbre.notesToPlay = [];
 
-            var listenerName = "_timbre_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            let listenerName = "_timbre_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.timbre.init(logo);
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }
@@ -361,7 +347,6 @@ function setupWidgetBlocks() {
                 null,
                 "meterwidget"
             ]);
-            //.TRANS: musical meter, e.g., 4:4
             this.formBlock({ name: _("meter"), canCollapse: true });
             this.makeMacro((x, y) => [
                 [0, ["meterwidget", { collapsed: false }], x, y, [null, 1, 7]],
@@ -376,21 +361,75 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.meterWidget == null) {
+            if (logo.meterWidget === null) {
                 logo.meterWidget = new MeterWidget();
             }
 
             logo.insideMeterWidget = true;
 
-            var listenerName = "_meterwidget_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            let listenerName = "_meterwidget_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
-                logo.meterWidget.init(logo, logo._meterBlock);
+            let __listener = function(event) {
+                logo.meterWidget.init(logo, logo._meterBlock, blk);
                 logo.insideMeterWidget = false;
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            if (args.length === 1) return [args[0], 1];
+        }
+    }
+
+    class oscilloscopeWidgetBlock extends StackClampBlock {
+        constructor() {
+            super("oscilloscope");
+            this.setPalette("widgets");
+            this.setHelpString([
+                _(
+                    "The oscilloscope block opens a tool to visualize waveforms."
+                ),
+                "documentation",
+                null,
+                "oscilloscope"
+            ]);
+            this.formBlock({ name: _("oscilloscope"), canCollapse: true });
+            let addPrintTurtle = (blocks,turtle,prev,last) => {
+                let len = blocks.length;
+                let next = last ? null : len+2
+                blocks.push([len, "print", 0, 0, [prev, len + 1, next]]);
+                blocks.push([len + 1, ["text", { value: turtle.name}], 0, 0, [len, null]]);
+                return blocks;
+            }
+
+            this.makeMacro((x, y) => {
+                let blocks = [[0,"oscilloscope", x, y, [null, 1, null]]];
+                for (let turtle of turtles.turtleList) {
+                    if (!turtle.inTrash)
+                        blocks = addPrintTurtle(blocks, turtle, Math.max(0, blocks.length - 2), turtle == last(turtles.turtleList));
+                }
+                blocks[0][4][2]=blocks.length;
+                blocks.push([blocks.length, "hiddennoflow", 0, 0, [0, null]]);
+                return blocks;
+            });
+        }
+
+        flow(args, logo, turtle, blk) {
+            if (logo.Oscilloscope === null) {
+                logo.Oscilloscope = new Oscilloscope();
+            }
+            logo.oscilloscopeTurtles = [];
+            logo.inOscilloscope = true;
+
+            let listenerName = "_oscilloscope_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = function(event) {
+                logo.Oscilloscope.init(logo);
+                logo.inOscilloscope = false;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             if (args.length === 1) return [args[0], 1];
         }
@@ -422,21 +461,21 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.modeWidget == null) {
+            if (logo.modeWidget === null) {
                 logo.modeWidget = new ModeWidget();
             }
 
             logo.insideModeWidget = true;
 
-            var listenerName = "_modewidget_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            let listenerName = "_modewidget_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.modeWidget.init(logo, logo._modeBlock);
                 logo.insideModeWidget = false;
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             if (args.length === 1) return [args[0], 1];
         }
@@ -470,7 +509,7 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
-            if (logo.tempo == null) {
+            if (logo.tempo === null) {
                 logo.tempo = new Tempo();
             }
 
@@ -478,14 +517,14 @@ function setupWidgetBlocks() {
             logo.tempo.BPMBlocks = [];
             logo.tempo.BPMs = [];
 
-            var listenerName = "_tempo_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            let listenerName = "_tempo_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.tempo.init(logo);
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[0], 1];
         }
@@ -526,7 +565,7 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.pitchDrumMatrix == null) {
+            if (logo.pitchDrumMatrix === null) {
                 logo.pitchDrumMatrix = new PitchDrumMatrix();
             }
 
@@ -536,10 +575,10 @@ function setupWidgetBlocks() {
             logo.pitchDrumMatrix.drums = [];
             logo.pitchDrumMatrix.clearBlocks();
 
-            var listenerName = "_pitchdrummatrix_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            let listenerName = "_pitchdrummatrix_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 if (
                     logo.pitchDrumMatrix.drums.length === 0 ||
                     logo.pitchDrumMatrix.rowLabels.length === 0
@@ -557,7 +596,7 @@ function setupWidgetBlocks() {
                 }
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             if (args.length === 1) return [args[0], 1];
         }
@@ -586,23 +625,22 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.pitchSlider == null) {
+            if (logo.pitchSlider === null) {
                 logo.pitchSlider = new PitchSlider();
             }
 
-            logo.pitchSlider.Sliders = [];
-
             logo.inPitchSlider = true;
+            logo.pitchSlider.frequencies = [];
 
-            var listenerName = "_pitchslider_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            let listenerName = "_pitchslider_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.pitchSlider.init(logo);
                 logo.inPitchSlider = false;
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[0], 1];
         }
@@ -650,46 +688,37 @@ function setupWidgetBlocks() {
             this.setPalette("widgets");
             this.setHelpString();
             this.formBlock({ name: _("music keyboard"), canCollapse: true });
-            if (this.lang === "ja")
-                this.makeMacro((x, y) => [
-                    [0, "musickeyboard", x, y, [null, 1, 16]],
-                    [1, "pitch", 0, 0, [0, 2, 3, 4]],
-                    [2, ["solfege", { value: "sol" }], 0, 0, [1]],
-                    [3, ["number", { value: 4 }], 0, 0, [1]],
-                    [4, "pitch", 0, 0, [1, 5, 6, 7]],
-                    [5, ["solfege", { value: "fa" }], 0, 0, [4]],
-                    [6, ["number", { value: 4 }], 0, 0, [4]],
-                    [7, "pitch", 0, 0, [4, 8, 9, 10]],
-                    [8, ["solfege", { value: "mi" }], 0, 0, [7]],
-                    [9, ["number", { value: 4 }], 0, 0, [7]],
-                    [10, "pitch", 0, 0, [7, 11, 12, 13]],
-                    [11, ["solfege", { value: "re" }], 0, 0, [10]],
-                    [12, ["number", { value: 4 }], 0, 0, [10]],
-                    [13, "pitch", 0, 0, [10, 14, 15, null]],
-                    [14, ["solfege", { value: "do" }], 0, 0, [13]],
-                    [15, ["number", { value: 4 }], 0, 0, [13]],
-                    [16, "hiddennoflow", 0, 0, [0, null]]
-                ]);
-            else
-                this.makeMacro((x, y) => [
-                    [0, "musickeyboard", x, y, [null, 1, 16]],
-                    [1, "pitch", 0, 0, [0, 2, 3, 4]],
-                    [2, ["solfege", { value: "sol" }], 0, 0, [1]],
-                    [3, ["number", { value: 4 }], 0, 0, [1]],
-                    [4, "pitch", 0, 0, [1, 5, 6, 7]],
-                    [5, ["solfege", { value: "fa" }], 0, 0, [4]],
-                    [6, ["number", { value: 4 }], 0, 0, [4]],
-                    [7, "pitch", 0, 0, [4, 8, 9, 10]],
-                    [8, ["solfege", { value: "mi" }], 0, 0, [7]],
-                    [9, ["number", { value: 4 }], 0, 0, [7]],
-                    [10, "pitch", 0, 0, [7, 11, 12, 13]],
-                    [11, ["solfege", { value: "re" }], 0, 0, [10]],
-                    [12, ["number", { value: 4 }], 0, 0, [10]],
-                    [13, "pitch", 0, 0, [10, 14, 15, null]],
-                    [14, ["solfege", { value: "do" }], 0, 0, [13]],
-                    [15, ["number", { value: 4 }], 0, 0, [13]],
-                    [16, "hiddennoflow", 0, 0, [0, null]]
-                ]);
+            this.makeMacro((x, y) => [
+                [0,"setbpm3",0,0,[12,1,2,5]],
+                [1,["number",{"value":90}],0,0,[0]],
+                [2,"divide",0,0,[0,3,4]],
+                [3,["number",{"value":1}],0,0,[2]],
+                [4,["number",{"value":4}],0,0,[2]],
+                [5,"vspace",0,0,[0,6]],
+                [6,"meter",0,0,[5,7,8,11]],
+                [7,["number",{"value":4}],0,0,[6]],
+                [8,"divide",0,0,[6,9,10]],
+                [9,["number",{"value":1}],0,0,[8]],
+                [10,["number",{"value":4}],0,0,[8]],
+                [11,"vspace",0,0,[6,13]],
+                [12,["musickeyboard",{"collapsed":false}],x,y,[null,0,28]],
+                [13,"pitch",0,0,[11,14,15,16]],
+                [14,["solfege",{"value":"sol"}],0,0,[13]],
+                [15,["number",{"value":4}],0,0,[13]],
+                [16,"pitch",0,0,[13,17,18,19]],
+                [17,["solfege",{"value":"fa"}],0,0,[16]],
+                [18,["number",{"value":4}],0,0,[16]],
+                [19,"pitch",0,0,[16,20,21,22]],
+                [20,["solfege",{"value":"mi"}],0,0,[19]],
+                [21,["number",{"value":4}],0,0,[19]],
+                [22,"pitch",0,0,[19,23,24,25]],
+                [23,["solfege",{"value":"re"}],0,0,[22]],
+                [24,["number",{"value":4}],0,0,[22]],
+                [25,"pitch",0,0,[22,26,27,null]],
+                [26,["solfege",{"value":"do"}],0,0,[25]],
+                [27,["number",{"value":4}],0,0,[25]],
+                [28,"hiddennoflow",0,0,[12,null]]
+            ]);
         }
     }
 
@@ -735,14 +764,14 @@ function setupWidgetBlocks() {
             logo.musicKeyboard.octaves = [];
             logo.musicKeyboard._rowBlocks = [];
 
-            var listenerName = "_musickeyboard_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            let listenerName = "_musickeyboard_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.musicKeyboard.init(logo);
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             if (args.length === 1) return [args[0], 1];
         }
@@ -775,7 +804,7 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.pitchStaircase == null) {
+            if (logo.pitchStaircase === null) {
                 logo.pitchStaircase = new PitchStaircase();
             }
 
@@ -784,15 +813,15 @@ function setupWidgetBlocks() {
 
             logo.inPitchStaircase = true;
 
-            var listenerName = "_pitchstaircase_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            let listenerName = "_pitchstaircase_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.pitchStaircase.init(logo);
                 logo.inPitchStaircase = false;
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[0], 1];
         }
@@ -805,6 +834,8 @@ function setupWidgetBlocks() {
             this.setHelpString();
             //.TRANS: widget for subdividing a measure into distinct rhythmic elements
             this.formBlock({ name: _("rhythm maker"), canCollapse: true });
+            this.beginnerBlock(true);
+
             this.makeMacro((x, y) => [
                 [0, "rhythmruler2", x, y, [null, 1, 9]],
                 [1, "setdrum", 0, 0, [0, 2, 3, 8]],
@@ -825,7 +856,6 @@ function setupWidgetBlocks() {
         constructor() {
             super("rhythmruler2");
             this.setPalette("widgets");
-            this.beginnerBlock(true);
 
             this.setHelpString([
                 _(
@@ -836,7 +866,6 @@ function setupWidgetBlocks() {
                 "rhythmruler2"
             ]);
 
-            //.TRANS: widget for subdividing a measure into distinct rhythmic elements
             this.formBlock({ name: _("rhythm maker"), canCollapse: true });
             this.makeMacro((x, y) => [
                 [0, "rhythmruler2", x, y, [null, 1, 17]],
@@ -858,7 +887,7 @@ function setupWidgetBlocks() {
                 [16, "hidden", 0, 0, [9, null]],
                 [17, "hiddennoflow", 0, 0, [0, null]]
             ]);
-            if (beginnerMode) this.hidden = true;
+            this.hidden = beginnerMode;
         }
 
         flow(args, logo, turtle, blk) {
@@ -870,14 +899,14 @@ function setupWidgetBlocks() {
             logo.rhythmRuler.Drums = [];
             logo.inRhythmRuler = true;
 
-            var listenerName = "_rhythmruler_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            let listenerName = "_rhythmruler_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.rhythmRuler.init(logo);
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[0], 1];
         }
@@ -997,9 +1026,10 @@ function setupWidgetBlocks() {
         flow(args, logo, turtle, blk) {
             logo.inMatrix = true;
 
-            if (logo.pitchTimeMatrix == null) {
+            if (logo.pitchTimeMatrix === null) {
                 logo.pitchTimeMatrix = new PitchTimeMatrix();
             }
+            logo.pitchTimeMatrix.blockNo = blk;
 
             logo.pitchTimeMatrix._instrumentName = DEFAULTVOICE;
 
@@ -1012,10 +1042,10 @@ function setupWidgetBlocks() {
             logo.tupletParams = [];
             logo.addingNotesToTuplet = false;
 
-            var listenerName = "_matrix_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            let listenerName = "_matrix_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 if (
                     logo.tupletRhythms.length === 0 ||
                     logo.pitchTimeMatrix.rowLabels.length === 0
@@ -1032,7 +1062,7 @@ function setupWidgetBlocks() {
                     logo.pitchTimeMatrix.sorted = false;
                     logo.pitchTimeMatrix.init(logo);
 
-                    for (var i = 0; i < logo.tupletRhythms.length; i++) {
+                    for (let i = 0; i < logo.tupletRhythms.length; i++) {
                         // We have two cases: (1) notes in a tuplet;
                         // and (2) rhythm block outside of a
                         // tuplet. Rhythm blocks in a tuplet are
@@ -1040,10 +1070,10 @@ function setupWidgetBlocks() {
                         switch (logo.tupletRhythms[i][0]) {
                             case "notes":
                             case "simple":
-                                var tupletParam = [logo.tupletParams[i]];
+                                let tupletParam = [logo.tupletParams[logo.tupletRhythms[i][1]]];
                                 tupletParam.push([]);
                                 for (
-                                    var j = 2;
+                                    let j = 2;
                                     j < logo.tupletRhythms[i].length;
                                     j++
                                 ) {
@@ -1067,7 +1097,7 @@ function setupWidgetBlocks() {
                 }
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             if (args.length === 1) return [args[0], 1];
         }
@@ -1090,24 +1120,25 @@ function setupWidgetBlocks() {
 
             this.formBlock({ name: _("status"), canCollapse: true });
             this.makeMacro((x, y) => [
-                [0, "status", x, y, [null, 1, 12]],
-                [1, "hidden", 0, 0, [0, 10]],
-                [2, "print", 0, 0, [10, 3, 4]],
-                [3, "beatvalue", 0, 0, [2]],
-                [4, "print", 0, 0, [2, 5, 6]],
-                [5, "measurevalue", 0, 0, [4]],
-                [6, "print", 0, 0, [4, 7, 8]],
-                [7, "elapsednotes", 0, 0, [6]],
-                [8, "print", 0, 0, [6, 9, null]],
-                [9, "bpmfactor", 0, 0, [8]],
-                [10, "print", 0, 0, [1, 11, 2]],
-                [11, "pitchinhertz", 0, 0, [10]],
-                [12, "hiddennoflow", 0, 0, [0, null]]
+                [0, "status", x, y, [null,1,11]],
+                [1, "hidden", 0, 0, [0,10]],
+                [2, "print",  0, 0, [10,3,4]],
+                [3, "beatvalue" , 0, 0, [2]],
+                [4, "print", 0, 0, [2,5,6]],
+                [5, "measurevalue", 0, 0,[4]],
+                [6, "print",0,0,[4,7,8]],
+                [7, "elapsednotes" , 0 , 0 ,[6]],
+                [8, "print",0,0,[6,9,null]],
+                [9, "bpmfactor", 0, 0,[8]],
+                [10, "print",0 ,0 ,[1,12,2]],
+                [11, "hiddennoflow", 0, 0,[0,null]],
+                [12, ["outputtools",{"value":"letter class"}], 0, 0,[10,13]],
+                [13, "currentpitch", 0, 0,[12]]
             ]);
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.statusMatrix == null) {
+            if (logo.statusMatrix === null) {
                 logo.statusMatrix = new StatusMatrix();
             }
 
@@ -1116,15 +1147,15 @@ function setupWidgetBlocks() {
 
             logo.inStatusMatrix = true;
 
-            var listenerName = "_status_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            let listenerName = "_status_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function(event) {
+            let __listener = function(event) {
                 logo.statusMatrix.init(logo);
                 logo.inStatusMatrix = false;
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             if (args.length === 1) return [args[0], 1];
         }
@@ -1138,6 +1169,7 @@ function setupWidgetBlocks() {
     new ModeWidgetBlock().setup();
     new TempoBlock().setup();
     new PitchDrumMatrixBlock().setup();
+    new oscilloscopeWidgetBlock().setup();
     new PitchSliderBlock().setup();
     new ChromaticBlock().setup();
     new MusicKeyboard2Block().setup();

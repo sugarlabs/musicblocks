@@ -1,4 +1,4 @@
-// Copyright (c) 2014-19 Walter Bender
+// Copyright (c) 2014-20 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -13,7 +13,7 @@
 
 // Some names changed between the Python verison and the
 // JS version so look up name in the conversion dictionary.
-var NAMEDICT = {
+const BACKWARDCOMPATIBILIYDICT = {
     fullscreen: "vspace",
     fillscreen2: "fillscreen",
     sandwichclampcollapsed: "clamp",
@@ -71,7 +71,9 @@ function initBasicProtoBlocks(palettes, blocks) {
     setupBoxesBlocks();
     setupBooleanBlocks();
     setupHeapBlocks();
+    setupDictBlocks();
     setupExtrasBlocks();
+    setupProgramBlocks();
     setupGraphicsBlocks();
     setupPenBlocks();
     setupMediaBlocks();
@@ -79,7 +81,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     setupEnsembleBlocks();
 
     // Push protoblocks onto their palettes.
-    for (var protoblock in blocks.protoBlockDict) {
+    for (let protoblock in blocks.protoBlockDict) {
         if (blocks.protoBlockDict[protoblock].palette != null) {
             blocks.protoBlockDict[protoblock].palette.add(
                 blocks.protoBlockDict[protoblock]

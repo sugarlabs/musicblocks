@@ -43,13 +43,9 @@ function SaveInterface(PlanetInterface) {
         _("Music Blocks Guide") +
         "</a>." +
         "</p><p>" +
-        _(
-            "To run this project, open Music Blocks in a web browser and drag and drop this file into the browser window."
-        ) +
+        _("To run this project, open Music Blocks in a web browser and drag and drop this file into the browser window.") +
         " " +
-        _(
-            "Alternatively, open the file in Music Blocks using the Load project button."
-        ) +
+        _("Alternatively, open the file in Music Blocks using the Load project button.") +
         '</p></div><div class="moreinfo-div"> <div class="tbcode"><h4>' +
         _("Project Code") +
         "</h4>" +
@@ -67,7 +63,7 @@ function SaveInterface(PlanetInterface) {
         ').content=title; document.title=name; document.getElementById("title").textContent=title; document.getElementsByClassName("code")[0].style.display = "none";</script></body></html>';
 
     this.download = function(extension, dataurl, defaultfilename) {
-        var filename = null;
+        let filename = null;
         if (defaultfilename === undefined || defaultfilename === null) {
             if (this.PlanetInterface === undefined) {
                 defaultfilename = _("My Project");
@@ -107,7 +103,7 @@ function SaveInterface(PlanetInterface) {
     };
 
     this.downloadURL = function(filename, dataurl) {
-        var a = document.createElement("a");
+        let a = document.createElement("a");
         a.setAttribute("href", dataurl);
         a.setAttribute("download", filename);
         document.body.appendChild(a);
@@ -116,36 +112,29 @@ function SaveInterface(PlanetInterface) {
     };
 
     this.setVariables = function(vars) {
-        for (var i = 0; i < vars.length; i++) {
+        for (let i = 0; i < vars.length; i++) {
             this[vars[i][0]] = vars[i][1];
         }
     };
 
     //Save Functions - n.b. include filename parameter - can be left blank / undefined
     this.prepareHTML = function() {
-        var file = this.htmlSaveTemplate;
+        let file = this.htmlSaveTemplate;
+        let description = _("No description provided");
         if (this.PlanetInterface !== undefined) {
-            var description = this.PlanetInterface.getCurrentProjectDescription();
-        } else {
-            var description = _("No description provided");
+            description = this.PlanetInterface.getCurrentProjectDescription();
         }
 
-        if (description == null) {
-            description = _("No description provided");
+        //let author = ''; //currently we're using anonymous for authors - not storing names
+        let name = _("My Project");
+        if (this.PlanetInterface !== undefined) {
+            name = this.PlanetInterface.getCurrentProjectName();
         }
 
-        //var author = ''; //currently we're using anonymous for authors - not storing names
+        let data = prepareExport();
+        let image = "";
         if (this.PlanetInterface !== undefined) {
-            var name = this.PlanetInterface.getCurrentProjectName();
-        } else {
-            var name = _("My Project");
-        }
-
-        var data = prepareExport();
-        if (this.PlanetInterface !== undefined) {
-            var image = this.PlanetInterface.getCurrentProjectImage();
-        } else {
-            var image = ""; // FIXME
+            image = this.PlanetInterface.getCurrentProjectImage();
         }
 
         file = file
@@ -157,8 +146,7 @@ function SaveInterface(PlanetInterface) {
     };
 
     this.saveHTML = function(filename) {
-        var html =
-            "data:text/plain;charset=utf-8," +
+        let html = "data:text/plain;charset=utf-8," +
             encodeURIComponent(this.prepareHTML());
         console.debug(filename);
         this.download("html", html, filename);
@@ -167,19 +155,16 @@ function SaveInterface(PlanetInterface) {
     this.saveHTMLNoPrompt = function() {
         setTimeout(
             function() {
-                var html =
-                    "data:text/plain;charset=utf-8," +
+                let html = "data:text/plain;charset=utf-8," +
                     encodeURIComponent(this.prepareHTML());
                 if (this.PlanetInterface !== undefined) {
                     this.downloadURL(
                         this.PlanetInterface.getCurrentProjectName() + ".html",
-                        html
-                    );
+                        html);
                 } else {
                     this.downloadURL(
                         _("My Project").replace(" ", "_") + ".html",
-                        html
-                    );
+                        html);
                 }
             }.bind(this),
             500
@@ -187,7 +172,7 @@ function SaveInterface(PlanetInterface) {
     };
 
     this.saveSVG = function(filename) {
-        var svg =
+        let svg =
             "data:image/svg+xml;utf8," +
             doSVG(
                 this.logo.canvas,
@@ -201,12 +186,12 @@ function SaveInterface(PlanetInterface) {
     };
 
     this.savePNG = function(filename) {
-        var png = docById("overlayCanvas").toDataURL("image/png");
+        let png = docById("overlayCanvas").toDataURL("image/png");
         this.download("png", png, filename);
     };
 
     this.saveBlockArtwork = function(filename) {
-        var svg = "data:image/svg+xml;utf8," + this.printBlockSVG();
+        let svg = "data:image/svg+xml;utf8," + this.printBlockSVG();
         this.download("svg", svg, filename);
     };
     
@@ -214,18 +199,12 @@ function SaveInterface(PlanetInterface) {
     this.saveWAV = function(filename) {
         document.body.style.cursor = "wait";
         this.filename = filename;
-        this.logo.playbackQueue = {};
-        this.logo.playbackTime = 0;
-        this.logo.compiling = true;
         this.logo.recording = true;
         console.debug("DURING SAVE WAV");
+        this.logo.synth.setupRecorder();
+        this.logo.synth.recorder.start();
         this.logo.runLogoCommands();
-    };
-
-    this.afterSaveWAV = function(blob) {
-        console.debug("AFTER SAVE WAV");
-        //don't reset cursor
-        this.download("wav", URL.createObjectURL(blob));
+        this.logo.textMsg(_("Your recording is in progress."));
     };
 
     this.saveWEBM = function(filename){
@@ -243,25 +222,21 @@ function SaveInterface(PlanetInterface) {
         this.logo.runningAbc = true;
         this.logo.notationOutput = ABCHEADER;
         this.logo.notationNotes = {};
-        for (
-            var turtle = 0;
-            turtle < this.turtles.turtleList.length;
-            turtle++
-        ) {
-            this.logo.notationStaging[turtle] = [];
-            this.logo.notationDrumStaging[turtle] = [];
-            this.turtles.turtleList[turtle].doClear(true, true, true);
+        for (let t = 0; t < this.turtles.turtleList.length; t++) {
+            this.logo.notation.notationStaging[t] = [];
+            this.logo.notation.notationDrumStaging[t] = [];
+            this.turtles.turtleList[t].painter.doClear(true, true, true);
         }
         this.logo.runLogoCommands();
     };
 
     this.afterSaveAbc = function(filename) {
-        var abc = encodeURIComponent(saveAbcOutput(this.logo));
+        let abc = encodeURIComponent(saveAbcOutput(this.logo));
         this.download("abc", "data:text;utf8," + abc, filename);
     };
 
     this.saveLilypond = function(filename) {
-        var lyext = "ly";
+        let lyext = "ly";
         if (filename === undefined) {
             if (this.PlanetInterface !== undefined) {
                 filename = this.PlanetInterface.getCurrentProjectName();
@@ -269,13 +244,14 @@ function SaveInterface(PlanetInterface) {
                 filename = _("My Project");
             }
         }
+
         if (fileExt(filename) != lyext) {
             filename += "." + lyext;
         }
 
         console.debug("Saving .ly file");
         docById("lilypondModal").style.display = "block";
-        var projectTitle, projectAuthor, MIDICheck, guitarCheck;
+        let projectTitle, projectAuthor, MIDICheck, guitarCheck;
 
         //.TRANS: File name prompt for save as Lilypond
         docById("fileNameText").textContent = _("File name");
@@ -291,23 +267,17 @@ function SaveInterface(PlanetInterface) {
         );
         //.TRANS: Lilypond is a scripting language for generating sheet music
         docById("submitLilypond").textContent = _("Save as Lilypond");
-        //.TRANS: PDF --> Portable Document Format - a typeset version of the Lilypond file
-
-        // docById('submitPDF').textContent = _('Save as PDF');
-
-        //TRANS: default file name when saving as Lilypond
         docById("fileName").value = filename;
-        //TRANS: default project title when saving as Lilypond
         if (this.PlanetInterface !== undefined) {
-            docById(
-                "title"
-            ).value = this.PlanetInterface.getCurrentProjectName();
+            docById("title").value =
+                this.PlanetInterface.getCurrentProjectName();
         } else {
+            //.TRANS: default project title when saving as Lilypond
             docById("title").value = _("My Project");
         }
 
         // Load custom author saved in local storage.
-        var customAuthorData = this.storage.getItem("customAuthor");
+        let customAuthorData = this.storage.getItem("customAuthor");
         if (customAuthorData != undefined) {
             docById("author").value = JSON.parse(customAuthorData);
         } else {
@@ -324,9 +294,9 @@ function SaveInterface(PlanetInterface) {
         // } else {
         //     docById('submitPDF').disabled = true;
         // }
-        var t = this;
+        let that = this;
         docByClass("close")[0].onclick = function() {
-            t.logo.runningLilypond = false;
+            that.logo.runningLilypond = false;
             docById("lilypondModal").style.display = "none";
         };
     };
@@ -335,15 +305,15 @@ function SaveInterface(PlanetInterface) {
         if (isPDF === undefined) {
             isPDF = false;
         }
-        var filename = docById("fileName").value;
-        var projectTitle = docById("title").value;
-        var projectAuthor = docById("author").value;
+        let filename = docById("fileName").value;
+        let projectTitle = docById("title").value;
+        let projectAuthor = docById("author").value;
 
         // Save the author in local storage.
         this.storage.setItem("customAuthor", JSON.stringify(projectAuthor));
 
-        var MIDICheck = docById("MIDICheck").checked;
-        var guitarCheck = docById("guitarCheck").checked;
+        let MIDICheck = docById("MIDICheck").checked;
+        let guitarCheck = docById("guitarCheck").checked;
 
         if (filename != null) {
             if (fileExt(filename) !== "ly") {
@@ -351,12 +321,12 @@ function SaveInterface(PlanetInterface) {
             }
         }
 
-        var mapLilypondObj = {
+        let mapLilypondObj = {
             "My Music Blocks Creation": projectTitle,
             "Mr. Mouse": projectAuthor
         };
 
-        var lyheader = LILYPONDHEADER.replace(
+        let lyheader = LILYPONDHEADER.replace(
             /My Music Blocks Creation|Mr. Mouse/gi,
             function(matched) {
                 return mapLilypondObj[matched];
@@ -391,14 +361,10 @@ function SaveInterface(PlanetInterface) {
         }
         this.logo.notationOutput = lyheader;
         this.logo.notationNotes = {};
-        for (
-            var turtle = 0;
-            turtle < this.turtles.turtleList.length;
-            turtle++
-        ) {
-            this.logo.notationStaging[turtle] = [];
-            this.logo.notationDrumStaging[turtle] = [];
-            this.turtles.turtleList[turtle].doClear(true, true, true);
+        for (let t = 0; t < this.turtles.turtleList.length; t++) {
+            this.logo.notation.notationStaging[t] = [];
+            this.logo.notation.notationDrumStaging[t] = [];
+            this.turtles.turtleList[t].painter.doClear(true, true, true);
         }
         document.body.style.cursor = "wait";
         this.logo.runLogoCommands();
@@ -408,14 +374,14 @@ function SaveInterface(PlanetInterface) {
     };
 
     this.afterSaveLilypond = function(filename) {
-        var ly = saveLilypondOutput(this.logo);
+        let ly = saveLilypondOutput(this.logo);
         switch (this.notationConvert) {
-            case "pdf":
-                this.afterSaveLilypondPDF(ly, filename);
-                break;
-            default:
-                this.afterSaveLilypondLY(ly, filename);
-                break;
+        case "pdf":
+            this.afterSaveLilypondPDF(ly, filename);
+            break;
+        default:
+            this.afterSaveLilypondLY(ly, filename);
+            break;
         }
         this.notationConvert = "";
     };
@@ -431,18 +397,14 @@ function SaveInterface(PlanetInterface) {
             document.execCommand("copy");
             tmp.remove();
             textMsg(
-                _(
-                    "The Lilypond code is copied to clipboard. You can paste it here: "
-                ) +
-                    "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a>."
-            );
+                _("The Lilypond code is copied to clipboard. You can paste it here: ") +
+                    "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> "
+                  + "or "
+                  + "<a href='http://lilybin.com/' target='_blank'>http://lilybin.com</a>.");
         }
 
         this.download(
-            "ly",
-            "data:text;utf8," + encodeURIComponent(lydata),
-            filename
-        );
+            "ly", "data:text;utf8," + encodeURIComponent(lydata), filename);
     };
 
     this.afterSaveLilypondPDF = function(lydata, filename) {
@@ -460,14 +422,10 @@ function SaveInterface(PlanetInterface) {
 
     this.saveMxml = function(filename) {
         this.logo.runningMxml = true;
-        for (
-            var turtle = 0;
-            turtle < this.turtles.turtleList.length;
-            turtle++
-        ) {
-            this.logo.notationStaging[turtle] = [];
-            this.logo.notationDrumStaging[turtle] = [];
-            this.turtles.turtleList[turtle].doClear(true, true, true);
+        for (let t = 0; t < this.turtles.turtleList.length; t++) {
+            this.logo.notation.notationStaging[t] = [];
+            this.logo.notation.notationDrumStaging[t] = [];
+            this.turtles.turtleList[t].painter.doClear(true, true, true);
         }
 
         this.logo.runLogoCommands();
@@ -475,52 +433,34 @@ function SaveInterface(PlanetInterface) {
     };
 
     this.afterSaveMxml = function(filename) {
-        var data = saveMxmlOutput(this.logo);
+        let data = saveMxmlOutput(this.logo);
         data = saveMxmlOutput(this.logo);
 
         console.log("data is:");
         console.log(data);
         this.download(
-            "xml",
-            "data:text;utf8," + encodeURIComponent(data),
-            filename
-        );
+            "xml", "data:text;utf8," + encodeURIComponent(data), filename);
         this.logo.runningMxml = false;
     };
 
     this.init = function() {
         this.timeLastSaved = -100;
-        window.onbeforeunload = function(e) {
-            if (
-                this.PlanetInterface !== undefined &&
-                this.PlanetInterface.getTimeLastSaved() !== this.timeLastSaved
-            ) {
-                // The following section of code is a bit of a hack. In order to detect the user selecting
-                // "Cancel", we attempt to perform an action that would otherwise be blocked. That is, if the
-                // user does not cancel the navigation, the HTTP request will fail, and the prompt never shown.
-                setTimeout(
-                    function() {
-                        var xhr = new XMLHttpRequest();
-                        xhr.open("GET", document.location.href, true);
-                        xhr.onreadystatechange = function() {
-                            if (xhr.readyState === xhr.DONE) {
-                                if (
-                                    confirm(
-                                        _("Do you want to save your project?")
-                                    )
-                                ) {
-                                    this.saveHTMLNoPrompt();
-                                    this.timeLastSaved = this.PlanetInterface.getTimeLastSaved();
-                                }
-                            }
-                        }.bind(this);
-                        xhr.send();
-                    }.bind(this)
-                );
-
-                e.preventDefault();
-                e.returnValue = "";
+        let $j = jQuery.noConflict();
+        $j(window).bind("beforeunload",(event) => {
+            let saveButton = "#saveButtonAdvanced";
+            if (beginnerMode) {
+                saveButton = "#saveButton";
             }
-        }.bind(this);
+
+            if (this.PlanetInterface.getTimeLastSaved() !==
+                this.timeLastSaved &&
+                this.PlanetInterface !== undefined) {
+                event.preventDefault();
+                event.returnValue = "";
+                // Will trigger when exit/reload cancelled.
+                $j(saveButton).trigger("mouseenter")
+                return "";
+            }
+        });
     };
 }

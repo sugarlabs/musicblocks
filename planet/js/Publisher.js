@@ -21,9 +21,54 @@ function Publisher(Planet) {
     this.ProjectTable = Planet.LocalPlanet.ProjectTable;
     this.IsShareLink = false;
 
+    this.dataToTags = (DATA) => {
+        // convert to blocks like structure.
+        DATA = JSON.parse(DATA);
+        let blocks = {
+            blockList: []
+        };
+
+        for (let i of DATA) {
+            let block = {};
+            if (typeof i[1] === "string") {
+                block.name = i[1];
+            } else {
+                block.name = i[1][0];
+            }
+            block.connections = i[4];
+            blocks.blockList.push(block);
+        }
+        //convert blocks to score.
+        let score = Planet.analyzeProject(blocks);
+
+        //0("rhythm"),1("pitch"),2("tone"),3("mouse"),4("pen"),5("number"),
+        //6("flow"),7("action"),8("sensors"),9("media"),10("mice")
+
+        //use score to map tags.
+        let tags = [];
+        //Pitch, Tone, and/or Rhythm
+        if (score[1] && score[2]){
+            tags.push("2");//music
+        }
+        //pen,mouse
+        if (score[3] && score[4]){
+            tags.push("3");//art
+        }
+        //sensors
+        if (score[8]){
+            tags.push("5")//interactive;
+        }
+        //number
+        if (score[5]){
+            tags.push("4")//math;
+        }
+
+        return tags ;
+    } 
+
     this.findTagWithName = function(name) {
-        var keys = Object.keys(Planet.TagsManifest);
-        for (var i = 0; i < keys.length; i++) {
+        let keys = Object.keys(Planet.TagsManifest);
+        for (let i = 0; i < keys.length; i++) {
             if (Planet.TagsManifest[keys[i]].TagName === name) {
                 return keys[i];
             }
@@ -32,10 +77,10 @@ function Publisher(Planet) {
     };
 
     this.addTags = function() {
-        var tags = Planet.TagsManifest;
+        let tags = Planet.TagsManifest;
         this.ChipTags = {};
-        var keys = Object.keys(tags);
-        for (var i = 0; i < keys.length; i++) {
+        let keys = Object.keys(tags);
+        for (let i = 0; i < keys.length; i++) {
             if (tags[keys[i]].IsTagUserAddable === '1') {
                 this.ChipTags[tags[keys[i]].TagName] = null;
             }
@@ -49,12 +94,12 @@ function Publisher(Planet) {
             }
         });
 
-        var maxLength = 5;
-        var that = this;
+        let maxLength = 5;
+        let that = this;
 
         jQuery('#tagsadd').on('chip.add', function(e, chip) {
             // you have the added chip here
-            var arr = jQuery('#tagsadd').material_chip('data');
+            let arr = jQuery('#tagsadd').material_chip('data');
             if (!(chip.tag in that.ChipTags)) {
                 arr.splice(arr.length - 1, 1);
             } else {
@@ -82,9 +127,9 @@ function Publisher(Planet) {
     };
 
     this.setTags = function(arr) {
-        var a = [];
-        for (var i = 0; i < arr.length; i++) {
-            var o = {};
+        let a = [];
+        for (let i = 0; i < arr.length; i++) {
+            let o = {};
             o.tag = Planet.TagsManifest[arr[i]].TagName;
             o.id = arr[i];
             a.push(o);
@@ -93,16 +138,16 @@ function Publisher(Planet) {
     };
 
     this.getTags = function() {
-        var t = jQuery('#tagsadd').material_chip('data');
-        var a = [];
-        for (var i = 0; i < t.length; i++) {
+        let t = jQuery('#tagsadd').material_chip('data');
+        let a = [];
+        for (let i = 0; i < t.length; i++) {
             a.push(t[i].id);
         }
         return a;
     };
 
     this.initSubmit = function() {
-        var t = this;
+        let t = this;
         document.getElementById('publisher-submit').addEventListener('click', this.publishProject.bind(this));
     };
 
@@ -112,16 +157,19 @@ function Publisher(Planet) {
         }
 
         this.IsShareLink = IsShareLink;
-        var name = this.ProjectTable[id].ProjectName;
-        var image = this.ProjectTable[id].ProjectImage;
-        var published = this.ProjectTable[id].PublishedData;
+        let name = this.ProjectTable[id].ProjectName;
+        let image = this.ProjectTable[id].ProjectImage;
+        let published = this.ProjectTable[id].PublishedData;
+        let DATA = this.ProjectTable[id].ProjectData;
+        let description;
+        let tags;
         if (published !== null) {
-            var description = published.ProjectDescription;
-            var tags = published.ProjectTags;
+            description = published.ProjectDescription;
+            tags = published.ProjectTags;
             document.getElementById('publisher-ptitle').textContent = _('Republish Project');
         } else {
-            var description = '';
-            var tags = [];
+            description = '';
+            tags = this.dataToTags(DATA);
             document.getElementById('publisher-ptitle').textContent = _('Publish Project');
         }
 
@@ -154,10 +202,10 @@ function Publisher(Planet) {
         document.getElementById('publisher-error').style.display = 'none';
         document.getElementById('publisher-progress').style.visibility = 'visible';
 
-        var errors = false;
-        var id = document.getElementById('publish-id').value;
-        var title = document.getElementById('publish-title');
-        var titlelabel = document.getElementById('publish-title-label');
+        let errors = false;
+        let id = document.getElementById('publish-id').value;
+        let title = document.getElementById('publish-title');
+        let titlelabel = document.getElementById('publish-title-label');
         if (title.value.length < this.TitleLowerBound) {
             errors = true;
             titlelabel.setAttribute('data-error', _('This field is required'));
@@ -172,8 +220,8 @@ function Publisher(Planet) {
             titlelabel.classList.add('active');
         }
 
-        var description = document.getElementById('publish-description');
-        var descriptionlabel = document.getElementById('publish-description-label');
+        let description = document.getElementById('publish-description');
+        let descriptionlabel = document.getElementById('publish-description-label');
         if (description.value.length < this.DescriptionLowerBound) {
             errors = true;
             descriptionlabel.setAttribute('data-error', _('This field is required'));
@@ -191,12 +239,12 @@ function Publisher(Planet) {
         if (errors === true) {
             this.hideProgressBar();
         } else {
-            var submitobj = {};
+            let submitobj = {};
             submitobj.ProjectID = id;
             submitobj.ProjectName = title.value;
             submitobj.ProjectDescription = description.value;
             //TODO: Convert these into real block names once integrated into MB
-            //var obj = palettes.getProtoNameAndPalette('MIDI');
+            //let obj = palettes.getProtoNameAndPalette('MIDI');
             //console.log(obj[0]);
             //console.log(obj[1]);
             //console.log(obj[2]);
@@ -206,16 +254,16 @@ function Publisher(Planet) {
             submitobj.ProjectIsMusicBlocks = (Planet.IsMusicBlocks ? 1 : 0);
             submitobj.ProjectCreatorName = Planet.ProjectStorage.getDefaultCreatorName();
             submitobj.ProjectTags = this.getTags();
-            var send = JSON.stringify(submitobj);
-            var published = {};
+            let send = JSON.stringify(submitobj);
+            let published = {};
             published.ProjectDescription = description.value;
             published.ProjectTags = this.getTags();
             document.getElementById('publisher-submit').style.cursor = 'wait';
             document.getElementById('publisher-cancel').style.cursor = 'wait';
-            for (var i=0; i<document.getElementById('publisher-form').getElementsByTagName("INPUT").length; i++) {
+            for (let i=0; i<document.getElementById('publisher-form').getElementsByTagName("INPUT").length; i++) {
               document.getElementById('publisher-form').getElementsByTagName("INPUT")[i].style.cursor = 'wait';
             }
-            for (var i=0; i<document.getElementById('publisher-form').getElementsByTagName("TEXTAREA").length; i++) {
+            for (let i=0; i<document.getElementById('publisher-form').getElementsByTagName("TEXTAREA").length; i++) {
               document.getElementById('publisher-form').getElementsByTagName("TEXTAREA")[i].style.cursor = 'wait';
             }
             document.body.style.cursor = 'wait';
@@ -233,9 +281,9 @@ function Publisher(Planet) {
             return '';
         }
 
-        var words = new Set();
-        for (var i = 0; i < tb.length; i++) {
-            var block = tb[i];
+        let words = new Set();
+        for (let i = 0; i < tb.length; i++) {
+            let block = tb[i];
             if (typeof block[1] === 'string') {
                 words.add(block[1]);
             } else if (Array.isArray(block[1])) {
@@ -245,7 +293,7 @@ function Publisher(Planet) {
             }
         }
 
-        var s = '';
+        let s = '';
         for (let item of words) {
             s += item + ' ';
         }
@@ -274,10 +322,10 @@ function Publisher(Planet) {
         }
         document.getElementById('publisher-submit').style.cursor = 'pointer';
         document.getElementById('publisher-cancel').style.cursor = 'pointer';
-        for (var i=0; i<document.getElementById('publisher-form').getElementsByTagName("INPUT").length; i++) {
+        for (let i=0; i<document.getElementById('publisher-form').getElementsByTagName("INPUT").length; i++) {
           document.getElementById('publisher-form').getElementsByTagName("INPUT")[i].style.cursor = 'text';
         }
-        for (var i=0; i<document.getElementById('publisher-form').getElementsByTagName("TEXTAREA").length; i++) {
+        for (let i=0; i<document.getElementById('publisher-form').getElementsByTagName("TEXTAREA").length; i++) {
           document.getElementById('publisher-form').getElementsByTagName("TEXTAREA")[i].style.cursor = 'text';
         }
         document.body.style.cursor = 'default';
@@ -294,11 +342,11 @@ function Publisher(Planet) {
 
     this.init = function() {
         if (!Planet.ConnectedToServer) {
-            var element = document.getElementById('publisher-form');
+            let element = document.getElementById('publisher-form');
             element.parentNode.removeChild(element);
             element = document.getElementById('publisher-submit');
             element.parentNode.removeChild(element);
-            var frag = document.createRange().createContextualFragment(this.PublisherOfflineHTML);
+            let frag = document.createRange().createContextualFragment(this.PublisherOfflineHTML);
             document.getElementById('publisher-content').appendChild(frag);
         } else {
             this.addTags();

@@ -10,7 +10,7 @@ Music Blocks is a programming language and collection of manipulative
 tools for exploring musical and mathematical concepts in an
 integrative and fun way.
 
-**Refer the following sections below to get familiar with this awesome project:**
+**Refer the following sections below to get familiar with this project:**
 
 * [Running Music Blocks](#RUNNING_MUSIC_BLOCKS)
 * [How to set up a local server](#HOW_TO_SET_UP_A_LOCAL_SERVER)
@@ -24,6 +24,8 @@ integrative and fun way.
 ![alt tag](https://raw.githubusercontent.com/sugarlabs/musicblocks/master/screenshots/Screenshot-1.png)
 
 ![alt tag](https://raw.githubusercontent.com/sugarlabs/musicblocks/master/screenshots/Screenshot-2.png)
+
+Some background on why music and programming can be found [here](http://github.com/sugarlabs/musicblocks/tree/master/WhyMusicBlocks.md).
 
 ## <a name="RUNNING_MUSIC_BLOCKS"></a>Running Music Blocks
 
@@ -53,8 +55,9 @@ Blocks (e.g., <code>cd /musicblocks</code>)
 (2) If you do not have Python installed, you'll need to install
 it. (Get it from https://www.python.org) You can test for Python in a
 terminal: <code>python</code>. Type <code>exit()</code> to exit
-Python.
- 
+Python. (Note that on some older systems, the python3 command is not
+bound to python. You may need `sudo apt install python-is-python3`.
+
 (3) After cloning the musicblocks repository, run the command:
 
 ```
@@ -63,7 +66,7 @@ $ npm run serve
 
 This works on all Operating Systems with Python.
 
-On Windows sytems with multiple Python installations, it is
+On Windows systems with multiple Python installations, it is
 recommended to use this command instead:
 
 ```
@@ -73,7 +76,7 @@ $ npm run winserve
 NOTE: Make sure you can run either <code>python</code> or
 <code>py</code> from your terminal.
 
-(4) You should see a message: <code>Serving HTTP on 0.0.0.0 port 3000
+(4) You should see a message: <code>Serving HTTP on 127.0.0.1 port 3000
 ...</code> since the HTTPServer is set to start listening on Port
 3000.
 
@@ -102,7 +105,7 @@ modules are described in more detail in [js
 README.md](https://github.com/sugarlabs/musicblocks/blob/master/js/README.md)
 
 Note: As with any change, please make your own copy by cloning this
-[respository](https://github.com/sugarlabs/musicblocks.git). Make
+[repository](https://github.com/sugarlabs/musicblocks.git). Make
 your changes, test them, and then make a pull request.
 
 See [Contributing
@@ -126,14 +129,18 @@ Associates, LLC, [Center for Music and the Arts in Education
 Education](http://music-in-education.org/) Some of the initial graphics
 were contributed by [Chie Yasuda](http://www.chieyasuda.com).
 
-Much of the initial coding specific to Music Blocks was done by
-Yash Khandelwal as part of Google Summer of Code (GSoC) 2015. Hemant
-Kasat contributed to additional widgets as part of GSoC
-2016. Additional contributions are being made by Tayba Wasim, Dinuka
-Tharangi Jayaweera, Prachi Agrawal, Cristina Del Puerto, and Hrishi
-Patel as part of GSoC 2017. During GSoC 2018, Riya Lohia developed a
+Much of the initial coding specific to Music Blocks was done by Yash
+Khandelwal as part of Google Summer of Code (GSoC) 2015. Hemant Kasat
+contributed to additional widgets as part of GSoC 2016. Additional
+contributions are being made by Tayba Wasim, Dinuka Tharangi
+Jayaweera, Prachi Agrawal, Cristina Del Puerto, and Hrishi Patel as
+part of GSoC 2017. During GSoC 2018, Riya Lohia developed a
 Temperament Widget. Ritwik Abhishek added a keyboard widget and a
-pitch-tracking widget.
+pitch-tracking widget. During GSoC 2019, Favor Kelvin refactored much
+of the code to use promises. During GSoC 2020, Anindya Kundu did a major
+refactoring of the code base to support JavaScript export. Aviral Gangwar
+enhanced the internal representation of mode and key. Saksham Mrig fixed 70+
+bugs and added support for pitch tracking and MIDI import.
 
 Many students contributed to the project as part of Google Code-in
 (2015&ndash;2020). Sam Parkinson built the Planet during GCI. Emily

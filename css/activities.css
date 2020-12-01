@@ -11,7 +11,7 @@
     url(https://example.com/MaterialIcons-Regular.ttf) format('truetype');
 }
 */
- 
+
 *:focus {
     outline: none;
 }
@@ -70,7 +70,7 @@
 .ui-menu {
   position: relative;
   background-color: rgba(255,255,255,1.0);
-  max-width: 250px;
+  max-width: 350px;
   font-size: 24px;
 }
 
@@ -102,7 +102,7 @@
 }
 
 .scrollSearch {
-    max-height: 150px;
+    max-height: 200px;
     margin-bottom: 10px;
     overflow-x: auto;
     overflow-y: auto;
@@ -391,7 +391,7 @@ body {
     overflow: hidden;
 }
 
-body.noScroll { 
+body.noScroll {
     overflow: hidden;
 }
 
@@ -408,6 +408,17 @@ select {
     padding: 0 !important;
     border: 0 !important;
     width: 20px;
+}
+
+input.input {
+    background-color: #FFF !important;
+    text-align: center;
+    font-weight: bold !important;
+    font-size: 24px !important;
+    resize: none !important;
+    padding: 0px !important;
+    border: 1px !important;
+    width: 200px;
 }
 
 input.text {
@@ -712,17 +723,18 @@ table {
 
 #mkbOuterDiv {
     position: absolute;
+    max-height: 400px;
+    overflow-y: scroll;
+    width: 100% !important;
+    display: flex;
     left: 0px;
     top: 140px;
     right: 5em;
-    overflow-y: auto;
-    overflow-x: none;
     background: rgba(255, 255, 255, 0.85);
 }
-
 #mkbInnerDiv {
     overflow-x:auto;
-    margin-left: 53px;
+    margin-left: 0px;
 }
 
 #tempoDiv {
@@ -968,10 +980,10 @@ input.timbreName {
 
 #userEdit input {
     height: 40px;
-    width: 40px; 
+    width: 40px;
     background: #8CC6FF;
     border: 1px solid black;
-    text-align: center; 
+    text-align: center;
 }
 
 .popup {
@@ -1001,7 +1013,7 @@ input.timbreName {
 }
 
 @-webkit-keyframes fadeIn {
-    from {opacity: 0;} 
+    from {opacity: 0;}
     to {opacity: 1;}
 }
 
@@ -1091,6 +1103,28 @@ input.timbreName {
 
 #sliderInnerDiv {
     overflow-x:auto;
+}
+
+.pitchSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    box-shadow: 1px 1px 1px #000031;
+    border: 1px solid #00001E;
+    height: 45px;
+    width: 15px;
+    border-radius: 1px;
+    background: blue;
+    cursor: pointer;
+    margin-top: -8px;
+}
+
+.pitchSlider::-moz-range-thumb {
+    box-shadow: 1px 1px 1px #000031;
+    border: 1px solid #00001E;
+    height: 45px;
+    width: 15px;
+    border-radius: 1px;
+    background: blue;
+    cursor: pointer;
 }
 
 .headcol {
@@ -1354,6 +1388,36 @@ input.timbreName {
     height: 100%;
 }
 
+#chooseKeyDiv {
+    height: 350px;
+    width: 350px;
+    margin: auto;
+    z-index: 10;
+    background: #f2f2f2;
+    border-radius: 50%;
+    position: fixed;
+}
+
+#chooseKeyDiv > svg {
+    width: 100%;
+    height: 100%;
+    transition: width 2s linear 1s;
+}
+
+#moveable {
+    margin: auto;
+    z-index: 10;
+    position: fixed;
+    display: none;
+    background: #f2f2f2;
+    font-family: sans-serif;
+    text-align: center;
+}
+
+.radioBtn {
+    cursor: pointer;
+}
+
 @media (max-width: 880px) {
     .wheelNav {
         height: 330px;
@@ -1387,7 +1451,7 @@ input.timbreName {
     top: 130px;
     left: 50%;
     margin-left: -500px;
-    padding-top: 2px; 
+    padding-top: 2px;
     border-radius: 8px;
     background-color: white;
     font-family: Arial, Helvetica, sans-serif;
@@ -1398,6 +1462,13 @@ input.timbreName {
     cursor: pointer;
     visibility: hidden;
 }
+
+#palette td ,thead ,tr ,table {
+    border-collapse: collapse;
+    padding: 0;
+    margin: 0;
+    border:0;
+ }
 
  #printText {
     border: 2px solid rgb(150, 150, 150);
@@ -1423,4 +1494,18 @@ input.timbreName {
     width: 28px;
     height: 28px;
     filter: invert(100%);
+  }
+
+  #PaletteBody_items::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; /* Chrome/Safari/Webkit */
+  }
+
+  #PaletteBody_items {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE 10+ */
+  }
+
+  .disable_highlighting {
+    user-select: none;
   }

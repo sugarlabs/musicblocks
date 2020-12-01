@@ -68,80 +68,35 @@ function setupDrumBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let arg;
-            if (
-                args.length !== 1 ||
-                args[0] == null ||
-                typeof args[0] !== "string"
-            ) {
+            let arg = args[0];
+            if (args.length !== 1 || arg == null || typeof arg !== "string") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 arg = "noise1";
-            } else {
-                arg = args[0];
             }
 
-            let noisename = arg;
-            for (let noise in NOISENAMES) {
-                if (NOISENAMES[noise][0] === arg) {
-                    noisename = NOISENAMES[noise][1];
-                    break;
-                } else if (NOISENAMES[noise][1] === arg) {
-                    noisename = arg;
-                    break;
-                }
-            }
-
-            if (logo.inNoteBlock[turtle].length > 0) {
-                // Add the noise sound as if it were a drum
-                logo.noteDrums[turtle][last(logo.inNoteBlock[turtle])].push(
-                    noisename
-                );
-                if (logo.synthVolume[turtle][noisename] == undefined) {
-                    logo.synthVolume[turtle][noisename] = [DEFAULTVOLUME];
-                    logo.crescendoInitialVolume[turtle][noisename] = [
-                        DEFAULTVOLUME
-                    ];
-                }
-            } else {
-                logo.errorMsg(
-                    _("Noise Block: Did you mean to use a Note block?"),
-                    blk
-                );
-                return;
-            }
-
-            if (logo.inNoteBlock[turtle].length > 0) {
-                logo.noteBeatValues[turtle][
-                    last(logo.inNoteBlock[turtle])
-                ].push(logo.beatFactor[turtle]);
-            }
-
-            logo.pushedNote[turtle] = true;
+            Singer.DrumActions.playNoise(arg, turtle, blk);
         }
     }
 
     function _createPlayDrumMacros() {
         class PlayDrumMacroBlock extends FlowBlock {
             constructor(name, displayName, isDrum, drumName) {
-                super(name, _(name || displayName));
+                if (displayName === undefined) {
+                    super(name, _(name));
+                } else {
+                    super(name, _(displayName));
+                }
                 this.setPalette("drum");
                 this.formBlock({ args: 1 });
                 this.makeMacro((x, y) => [
                     [0, "playdrum", x, y, [null, 1, null]],
                     [
-                        1,
-                        [
+                        1, [
                             isDrum ? "drumname" : "effectsname",
                             {
-                                value:
-                                    drumName || isDrum
-                                        ? displayName || name
-                                        : name
+                                value: drumName || isDrum ? displayName || name : name
                             }
-                        ],
-                        0,
-                        0,
-                        [0]
+                        ], 0, 0, [0]
                     ]
                 ]);
             }
@@ -167,12 +122,7 @@ function setupDrumBlocks() {
         new PlayDrumMacroBlock("hihat", "hi hat", true).setup();
         new PlayDrumMacroBlock("darbuka", "darbuka drum", true).setup();
         new PlayDrumMacroBlock("cup", "cup drum", true).setup();
-        new PlayDrumMacroBlock(
-            "floortom",
-            "floor tom",
-            true,
-            "floor tom tom"
-        ).setup();
+        new PlayDrumMacroBlock("floortom", "floor tom", true, "floor tom tom").setup();
         new PlayDrumMacroBlock("tom", "tom tom", true).setup();
         new PlayDrumMacroBlock("kick", "kick drum", true).setup();
         new PlayDrumMacroBlock("snare", "snare drum", true).setup();
@@ -205,30 +155,7 @@ function setupDrumBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            var drumname = DEFAULTDRUM;
-            for (var drum in DRUMNAMES) {
-                if (DRUMNAMES[drum][0] === args[0]) {
-                    drumname = DRUMNAMES[drum][1];
-                } else if (DRUMNAMES[drum][1] === args[0]) {
-                    drumname = args[0];
-                }
-            }
-
-            logo.drumStyle[turtle].push(drumname);
-
-            var listenerName = "_mapdrum_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function(event) {
-                logo.drumStyle[turtle].pop();
-            };
-
-            logo._setListener(turtle, listenerName, __listener);
-            if (logo.inRhythmRuler) {
-                logo._currentDrumBlock = blk;
-                logo.rhythmRuler.Drums.push(blk);
-                logo.rhythmRuler.Rulers.push([[], []]);
-            }
+            Singer.DrumActions.mapPitchToDrum(args[0], turtle, blk);
 
             return [args[1], 1];
         }
@@ -283,31 +210,7 @@ function setupDrumBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            var drumname = DEFAULTDRUM;
-            for (var drum in DRUMNAMES) {
-                if (DRUMNAMES[drum][0] === args[0]) {
-                    drumname = DRUMNAMES[drum][1];
-                } else if (DRUMNAMES[drum][1] === args[0]) {
-                    drumname = args[0];
-                }
-            }
-
-            logo.drumStyle[turtle].push(drumname);
-
-            var listenerName = "_setdrum_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
-
-            var __listener = function(event) {
-                var drumname = logo.drumStyle[turtle].pop();
-                logo.pitchDrumTable[turtle] = {};
-            };
-
-            logo._setListener(turtle, listenerName, __listener);
-            if (logo.inRhythmRuler) {
-                logo._currentDrumBlock = blk;
-                logo.rhythmRuler.Drums.push(blk);
-                logo.rhythmRuler.Rulers.push([[], []]);
-            }
+            Singer.DrumActions.setDrum(args[0], turtle, blk);
 
             return [args[1], 1];
         }
@@ -346,35 +249,18 @@ function setupDrumBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (
-                args.length !== 1 ||
-                args[0] == null ||
-                typeof args[0] !== "string"
-            ) {
+            let arg = args[0];
+            if (args.length !== 1 || arg == null || typeof arg !== "string") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                var arg = DEFAULTDRUM;
-            } else {
-                var arg = args[0];
+                arg = DEFAULTDRUM;
             }
 
-            var drumname = DEFAULTDRUM;
-            if (arg.slice(0, 4) === "http") {
-                drumname = arg;
-            } else {
-                for (var drum in DRUMNAMES) {
-                    if (DRUMNAMES[drum][0] === arg) {
-                        drumname = DRUMNAMES[drum][1];
-                        break;
-                    } else if (DRUMNAMES[drum][1] === arg) {
-                        drumname = arg;
-                        break;
-                    }
-                }
-            }
+            let drumname = Singer.DrumActions.GetDrumname(args[0]);
 
-            // If we are in a setdrum clamp, override the drum name.
-            if (logo.drumStyle[turtle].length > 0) {
-                drumname = last(logo.drumStyle[turtle]);
+            let tur = logo.turtles.ithTurtle(turtle);
+            // If we are in a setdrum clamp, override the drum name
+            if (tur.singer.drumStyle.length > 0) {
+                drumname = last(tur.singer.drumStyle);
             }
 
             if (logo.inPitchDrumMatrix) {
@@ -391,57 +277,27 @@ function setupDrumBlocks() {
                 if (logo.drumBlocks.indexOf(blk) === -1) {
                     logo.drumBlocks.push(blk);
                 }
-            } else if (logo.inNoteBlock[turtle].length > 0) {
-                logo.noteDrums[turtle][last(logo.inNoteBlock[turtle])].push(
-                    drumname
-                );
-                if (logo.synthVolume[turtle][drumname] == undefined) {
-                    logo.synthVolume[turtle][drumname] = [DEFAULTVOLUME];
-                    logo.crescendoInitialVolume[turtle][drumname] = [
-                        DEFAULTVOLUME
-                    ];
-                }
+            } else if (logo.inMusicKeyboard) {
+                logo.musicKeyboard.instruments.push(drumname);
+                logo.musicKeyboard.noteNames.push("drum");
+                logo.musicKeyboard.octaves.push(null);
+                logo.musicKeyboard.addRowBlock(blk);
             } else if (
-                logo.blocks.blockList[blk].connections[0] == null &&
-                last(logo.blocks.blockList[blk].connections) == null
+                tur.singer.inNoteBlock.length > 0 ||
+                blocks.blockList[blk].connections[0] == null &&
+                    last(blocks.blockList[blk].connections) == null
             ) {
-                // Play a stand-alone drum block as a quarter note.
-                logo.clearNoteParams(turtle, blk, []);
-                logo.inNoteBlock[turtle].push(blk);
-                logo.noteDrums[turtle][last(logo.inNoteBlock[turtle])].push(
-                    drumname
-                );
-
-                if (logo.bpm[turtle].length > 0) {
-                    var bpmFactor = TONEBPM / last(logo.bpm[turtle]);
-                } else {
-                    var bpmFactor = TONEBPM / logo._masterBPM;
-                }
-
-                var noteBeatValue = 4;
-                var beatValue = bpmFactor / noteBeatValue;
-
-                __callback = function() {
-                    var j = logo.inNoteBlock[turtle].indexOf(blk);
-                    logo.inNoteBlock[turtle].splice(j, 1);
-                };
-
-                logo._processNote(noteBeatValue, blk, turtle, __callback);
+                Singer.DrumActions.playDrum(args[0], turtle, blk);
             } else {
-                logo.errorMsg(
-                    _("Drum Block: Did you mean to use a Note block?"),
-                    blk
-                );
+                console.debug('PLAY DRUM ERROR: missing context');
                 return;
             }
 
-            if (logo.inNoteBlock[turtle].length > 0) {
-                logo.noteBeatValues[turtle][
-                    last(logo.inNoteBlock[turtle])
-                ].push(logo.beatFactor[turtle]);
+            if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(tur.singer.beatFactor);
             }
 
-            logo.pushedNote[turtle] = true;
+            tur.singer.pushedNote = true;
         }
     }
 

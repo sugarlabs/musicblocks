@@ -23,32 +23,30 @@ function setupFlowBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            logo.backward[turtle].push(blk);
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            tur.singer.backward.push(blk);
             // Set child to bottom block inside clamp
             let childFlow = logo.blocks.findBottomBlock(args[0]);
             let childFlowCount = 1;
 
-            var listenerName = "_backward_" + turtle + "_" + blk;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            let listenerName = "_backward_" + turtle + "_" + blk;
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
-            var nextBlock = logo.blocks.blockList[blk].connections[2];
-            if (nextBlock == null) {
-                logo.backward[turtle].pop();
+            let nextBlock = logo.blocks.blockList[blk].connections[2];
+            if (nextBlock === null) {
+                tur.singer.backward.pop();
             } else {
-                if (nextBlock in logo.endOfClampSignals[turtle]) {
-                    logo.endOfClampSignals[turtle][nextBlock].push(
-                        listenerName
-                    );
+                if (nextBlock in tur.endOfClampSignals) {
+                    tur.endOfClampSignals[nextBlock].push(listenerName);
                 } else {
-                    logo.endOfClampSignals[turtle][nextBlock] = [listenerName];
+                    tur.endOfClampSignals[nextBlock] = [listenerName];
                 }
             }
 
-            var __listener = function() {
-                logo.backward[turtle].pop();
-            };
+            let __listener = event => tur.singer.backward.pop();
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
             return [childFlow, childFlowCount];
         }
     }
@@ -57,6 +55,7 @@ function setupFlowBlocks() {
         constructor() {
             super("duplicatenotes");
             this.setPalette("flow");
+            this.piemenuValuesC1 = [2, 3, 4, 5, 6, 7, 8];
             this.setHelpString([
                 _("The Duplicate block will run each block multiple times.") +
                     " " +
@@ -83,32 +82,35 @@ function setupFlowBlocks() {
         flow(args, logo, turtle, blk, receivedArg) {
             if (args[1] === undefined) return;
 
+            let arg0;
             if (
                 args[0] === null ||
                 typeof args[0] !== "number" ||
                 args[0] < 1
             ) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-                var arg0 = 2;
+                arg0 = 2;
             } else {
-                var arg0 = args[0];
+                arg0 = args[0];
             }
 
-            var factor = Math.floor(arg0);
+            let factor = Math.floor(arg0);
             if (factor < 1) {
                 logo.errorMsg(ZERODIVIDEERRORMSG, blk);
                 logo.stopTurtle = true;
             } else {
-                logo.duplicateFactor[turtle] *= factor;
+                let tur = logo.turtles.ithTurtle(turtle);
+
+                tur.singer.duplicateFactor *= factor;
 
                 // Queue each block in the clamp.
-                var listenerName = "_duplicate_" + turtle;
-                logo._setDispatchBlock(blk, turtle, listenerName);
+                let listenerName = "_duplicate_" + turtle;
+                logo.setDispatchBlock(blk, turtle, listenerName);
 
-                var __lookForOtherTurtles = function(blk, turtle) {
-                    for (var t in logo.connectionStore) {
+                let __lookForOtherTurtles = function(blk, turtle) {
+                    for (let t in logo.connectionStore) {
                         if (t !== turtle.toString()) {
-                            for (var b in logo.connectionStore[t]) {
+                            for (let b in logo.connectionStore[t]) {
                                 if (b === blk.toString()) {
                                     return t;
                                 }
@@ -119,11 +121,11 @@ function setupFlowBlocks() {
                     return null;
                 };
 
-                logo.inDuplicate[turtle] = true;
+                tur.singer.inDuplicate = true;
 
-                var __listener = function(event) {
-                    logo.inDuplicate[turtle] = false;
-                    logo.duplicateFactor[turtle] /= factor;
+                let __listener = event => {
+                    tur.singer.inDuplicate = false;
+                    tur.singer.duplicateFactor /= factor;
 
                     // Check for a race condition.
                     // FIXME: Do something about the race condition.
@@ -134,15 +136,13 @@ function setupFlowBlocks() {
                     logo.connectionStoreLock = true;
 
                     // The last turtle should restore the broken connections.
-                    if (__lookForOtherTurtles(blk, turtle) == null) {
-                        var n = logo.connectionStore[turtle][blk].length;
-                        for (var i = 0; i < n; i++) {
-                            var obj = logo.connectionStore[turtle][blk].pop();
-                            logo.blocks.blockList[obj[0]].connections[obj[1]] =
-                                obj[2];
+                    if (__lookForOtherTurtles(blk, turtle) === null) {
+                        let n = logo.connectionStore[turtle][blk].length;
+                        for (let i = 0; i < n; i++) {
+                            let obj = logo.connectionStore[turtle][blk].pop();
+                            logo.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
                             if (obj[2] != null) {
-                                logo.blocks.blockList[obj[2]].connections[0] =
-                                    obj[0];
+                                logo.blocks.blockList[obj[2]].connections[0] = obj[0];
                             }
                         }
                     } else {
@@ -152,7 +152,7 @@ function setupFlowBlocks() {
                     logo.connectionStoreLock = false;
                 };
 
-                logo._setListener(turtle, listenerName, __listener);
+                logo.setTurtleListener(turtle, listenerName, __listener);
 
                 // Test for race condition.
                 // FIXME: Do something about the race condition.
@@ -162,51 +162,34 @@ function setupFlowBlocks() {
 
                 logo.connectionStoreLock = true;
 
-                // Check to see if another turtle has already disconnected
-                // these blocks.
-                var otherTurtle = __lookForOtherTurtles(blk, turtle);
+                // Check to see if another turtle has already disconnected these blocks
+                let otherTurtle = __lookForOtherTurtles(blk, turtle);
                 if (otherTurtle != null) {
                     // Copy the connections and queue the blocks.
                     logo.connectionStore[turtle][blk] = [];
-                    for (
-                        var i = logo.connectionStore[otherTurtle][blk].length;
-                        i > 0;
-                        i--
-                    ) {
-                        var obj = [
+                    for (let i = logo.connectionStore[otherTurtle][blk].length; i > 0; i--) {
+                        let obj = [
                             logo.connectionStore[otherTurtle][blk][i - 1][0],
                             logo.connectionStore[otherTurtle][blk][i - 1][1],
                             logo.connectionStore[otherTurtle][blk][i - 1][2]
                         ];
                         logo.connectionStore[turtle][blk].push(obj);
-                        var child = obj[0];
+                        let child = obj[0];
                         if (logo.blocks.blockList[child].name === "hidden") {
                             child = logo.blocks.blockList[child].connections[0];
                         }
 
-                        var queueBlock = new Queue(
-                            child,
-                            factor,
-                            blk,
-                            receivedArg
-                        );
-                        logo.parentFlowQueue[turtle].push(blk);
-                        logo.turtles.turtleList[turtle].queue.push(queueBlock);
+                        let queueBlock = new Queue(child, factor, blk, receivedArg);
+                        tur.parentFlowQueue.push(blk);
+                        tur.queue.push(queueBlock);
                     }
                 } else {
-                    var child = logo.blocks.findBottomBlock(args[1]);
+                    let child = logo.blocks.findBottomBlock(args[1]);
                     while (child != blk) {
                         if (logo.blocks.blockList[child].name !== "hidden") {
-                            var queueBlock = new Queue(
-                                child,
-                                factor,
-                                blk,
-                                receivedArg
-                            );
-                            logo.parentFlowQueue[turtle].push(blk);
-                            logo.turtles.turtleList[turtle].queue.push(
-                                queueBlock
-                            );
+                            let queueBlock = new Queue(child, factor, blk, receivedArg);
+                            tur.parentFlowQueue.push(blk);
+                            tur.queue.push(queueBlock);
                         }
 
                         child = logo.blocks.blockList[child].connections[0];
@@ -216,11 +199,11 @@ function setupFlowBlocks() {
                     // that when we run the queues, only the individual blocks
                     // run.
                     logo.connectionStore[turtle][blk] = [];
-                    var child = args[1];
+                    child = args[1];
                     while (child != null) {
-                        var lastConnection =
+                        let lastConnection =
                             logo.blocks.blockList[child].connections.length - 1;
-                        var nextBlk =
+                        let nextBlk =
                             logo.blocks.blockList[child].connections[
                                 lastConnection
                             ];
@@ -266,15 +249,25 @@ function setupFlowBlocks() {
         constructor() {
             super("defaultcase");
             this.setPalette("flow");
-            this.setHelpString();
+            this.setHelpString([
+                _(
+                    "The Default block is used inside of a Switch to define the default action."
+                ),
+                "documentation",
+                null,
+                "switchhelp"
+            ]);
 
             this.formBlock({
                 name: _("default")
             });
+
+            this.updateDockValue(0, "caseout");
+            this.updateDockValue(2, "casein");
         }
 
-        flow(args, logo, turtle) {
-            var switchBlk = last(logo.switchBlocks[turtle]);
+        flow(args, logo, turtle, blk) {
+            let switchBlk = last(logo.switchBlocks[turtle]);
             if (switchBlk === null) {
                 logo.errorMsg(
                     _("The Case Block must be used inside of a Switch Block."),
@@ -306,10 +299,13 @@ function setupFlowBlocks() {
                 args: 1,
                 argTypes: ["anyin"]
             });
+
+            this.updateDockValue(0, "caseout");
+            this.updateDockValue(3, "casein");
         }
 
-        flow(args, logo, turtle) {
-            var switchBlk = last(logo.switchBlocks[turtle]);
+        flow(args, logo, turtle, blk) {
+            let switchBlk = last(logo.switchBlocks[turtle]);
             if (switchBlk === null) {
                 logo.errorMsg(
                     _("The Case Block must be used inside of a Switch Block."),
@@ -348,23 +344,28 @@ function setupFlowBlocks() {
                 [4, "defaultcase", 0, 0, [2, null, null]],
                 [5, "hidden", 0, 0, [0, null]]
             ]);
+
+            this.updateDockValue(2, "casein");
         }
 
         flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+
             logo.switchBlocks[turtle].push(blk);
             logo.switchCases[turtle][blk] = [];
 
-            var listenerName = "_switch_" + blk + "_" + turtle;
-            logo._setDispatchBlock(blk, turtle, listenerName);
+            let listenerName = "_switch_" + blk + "_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
 
-            var __listener = function() {
-                var switchBlk = last(logo.switchBlocks[turtle]);
+            let __listener = function() {
+                let switchBlk = last(logo.switchBlocks[turtle]);
                 // Run the cases here.
-                var argBlk = logo.blocks.blockList[switchBlk].connections[1];
+                let switchCase;
+                let argBlk = logo.blocks.blockList[switchBlk].connections[1];
                 if (argBlk == null) {
-                    var switchCase = "__default__";
+                    switchCase = "__default__";
                 } else {
-                    var switchCase = logo.parseArg(
+                    switchCase = logo.parseArg(
                         logo,
                         turtle,
                         argBlk,
@@ -372,29 +373,20 @@ function setupFlowBlocks() {
                     );
                 }
 
-                var caseFlow = null;
-                for (
-                    var i = 0;
-                    i < logo.switchCases[turtle][switchBlk].length;
-                    i++
-                ) {
-                    if (
-                        logo.switchCases[turtle][switchBlk][i][0] === switchCase
-                    ) {
+                let caseFlow = null;
+                for (let i = 0; i < logo.switchCases[turtle][switchBlk].length; i++) {
+                    if (logo.switchCases[turtle][switchBlk][i][0] === switchCase) {
                         caseFlow = logo.switchCases[turtle][switchBlk][i][1];
                         break;
-                    } else if (
-                        logo.switchCases[turtle][switchBlk][i][0] ===
-                        "__default__"
-                    ) {
+                    } else if (logo.switchCases[turtle][switchBlk][i][0] === "__default__") {
                         caseFlow = logo.switchCases[turtle][switchBlk][i][1];
                     }
                 }
 
                 if (caseFlow != null) {
-                    var queueBlock = new Queue(caseFlow, 1, switchBlk, null);
-                    logo.parentFlowQueue[turtle].push(switchBlk);
-                    logo.turtles.turtleList[turtle].queue.push(queueBlock);
+                    let queueBlock = new Queue(caseFlow, 1, switchBlk, null);
+                    tur.parentFlowQueue.push(switchBlk);
+                    tur.queue.push(queueBlock);
                 }
 
                 // Clean up afterward.
@@ -402,7 +394,7 @@ function setupFlowBlocks() {
                 logo.switchBlocks[turtle].pop();
             };
 
-            logo._setListener(turtle, listenerName, __listener);
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[1], 1];
         }
@@ -456,16 +448,14 @@ function setupFlowBlocks() {
         }
 
         flow(_, logo, turtle, blk) {
-            logo._doBreak(turtle);
-            // Since we pop the queue, we need to unhighlight our
-            // parent.
-            var parentBlk = logo.blocks.blockList[blk].connections[0];
+            let tur = logo.turtles.ithTurtle(turtle);
+
+            logo.doBreak(tur);
+            // Since we pop the queue, we need to unhighlight our parent
+            let parentBlk = logo.blocks.blockList[blk].connections[0];
             if (parentBlk != null) {
-                if (
-                    !logo.suppressOutput[turtle] &&
-                    logo.justCounting[turtle].length === 0
-                ) {
-                    logo.unhighlightQueue[turtle].push(parentBlk);
+                if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
+                    tur.unhighlightQueue.push(parentBlk);
                 }
             }
         }
@@ -492,43 +482,40 @@ function setupFlowBlocks() {
         flow(args, logo, turtle, blk) {
             if (args.length !== 1) return;
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (!args[0]) {
                 // Requeue.
-                var parentBlk = logo.blocks.blockList[blk].connections[0];
-                var queueBlock = new Queue(blk, 1, parentBlk);
-                logo.parentFlowQueue[turtle].push(parentBlk);
-                logo.turtles.turtleList[turtle].queue.push(queueBlock);
-                logo._doWait(0.05);
+                let parentBlk = logo.blocks.blockList[blk].connections[0];
+                let queueBlock = new Queue(blk, 1, parentBlk);
+                tur.parentFlowQueue.push(parentBlk);
+                tur.queue.push(queueBlock);
+                tur.doWait(0.05);
             } else {
                 // Since a wait for block was requeued each
                 // time, we need to flush the queue of all but
                 // the last one, otherwise the child of the
                 // while block is executed multiple times.
-                var queueLength = logo.turtles.turtleList[turtle].queue.length;
-                var kept_one = false;
-                for (var i = queueLength - 1; i > 0; i--) {
-                    if (
-                        logo.turtles.turtleList[turtle].queue[i].parentBlk ===
-                        blk
-                    ) {
+                let queueLength = tur.queue.length;
+                let kept_one = false;
+                for (let i = queueLength - 1; i > 0; i--) {
+                    if (tur.queue[i].parentBlk === blk) {
                         if (kept_one) {
-                            logo.turtles.turtleList[turtle].queue.pop();
+                            tur.queue.pop();
                         } else {
                             kept_one = true;
                         }
                     }
                 }
 
-                // We need to reset the turtle time.
-                if (logo.firstNoteTime == null) {
-                    var d = new Date();
-                    logo.firstNoteTime = d.getTime();
+                // We need to reset the turtle time
+                if (logo.firstNoteTime === null) {
+                    logo.firstNoteTime = new Date().getTime();
                 }
 
-                var d = new Date();
-                var elapsedTime = (d.getTime() - this.firstNoteTime) / 1000;
-                logo.turtleTime[turtle] = elapsedTime;
-                logo.previousTurtleTime[turtle] = elapsedTime;
+                let elapsedTime = (new Date().getTime() - this.firstNoteTime) / 1000;
+                tur.singer.turtleTime = elapsedTime;
+                tur.singer.previousTurtleTime = elapsedTime;
             }
         }
     }
@@ -547,7 +534,7 @@ function setupFlowBlocks() {
             this.formBlock({
                 name: _("until"),
                 flows: {
-                    labels: [this.lang === "js" ? _("do2") : _("do")]
+                    labels: [this.lang === "ja" ? _("do2") : _("do")]
                 },
                 args: 1,
                 argTypes: ["booleanin"]
@@ -557,36 +544,32 @@ function setupFlowBlocks() {
         flow(args, logo, turtle, blk) {
             if (args.length !== 2) return;
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (!args[0]) {
                 // We will add the outflow of the until block
                 // each time through, so we pop it off so as
                 // to not accumulate multiple copies.
-                var queueLength = logo.turtles.turtleList[turtle].queue.length;
+                let queueLength = tur.queue.length;
                 if (queueLength > 0) {
-                    if (
-                        logo.turtles.turtleList[turtle].queue[queueLength - 1]
-                            .parentBlk === blk
-                    ) {
-                        logo.turtles.turtleList[turtle].queue.pop();
+                    if (tur.queue[queueLength - 1].parentBlk === blk) {
+                        tur.queue.pop();
                     }
                 }
-                // Requeue.
-                var parentBlk = logo.blocks.blockList[blk].connections[0];
-                var queueBlock = new Queue(blk, 1, parentBlk);
-                logo.parentFlowQueue[turtle].push(parentBlk);
-                logo.turtles.turtleList[turtle].queue.push(queueBlock);
+                // Requeue
+                let parentBlk = logo.blocks.blockList[blk].connections[0];
+                let queueBlock = new Queue(blk, 1, parentBlk);
+                tur.parentFlowQueue.push(parentBlk);
+                tur.queue.push(queueBlock);
             } else {
                 // Since an until block was requeued each
                 // time, we need to flush the queue of all but
                 // the last one, otherwise the child of the
                 // until block is executed multiple times.
-                var queueLength = logo.turtles.turtleList[turtle].queue.length;
-                for (var i = queueLength - 1; i > 0; i--) {
-                    if (
-                        logo.turtles.turtleList[turtle].queue[i].parentBlk ===
-                        blk
-                    ) {
-                        logo.turtles.turtleList[turtle].queue.pop();
+                let queueLength = tur.queue.length;
+                for (let i = queueLength - 1; i > 0; i--) {
+                    if (tur.queue[i].parentBlk === blk) {
+                        tur.queue.pop();
                     }
                 }
             }
@@ -610,7 +593,7 @@ function setupFlowBlocks() {
             this.formBlock({
                 name: _("while"),
                 flows: {
-                    labels: [this.lang === "js" ? _("do2") : _("do")]
+                    labels: [this.lang === "ja" ? _("do2") : _("do")]
                 },
                 args: 1,
                 argTypes: ["booleanin"]
@@ -623,24 +606,23 @@ function setupFlowBlocks() {
             // itself.
             if (args.length !== 2) return;
 
+            let tur = logo.turtles.ithTurtle(turtle);
+
             if (args[0]) {
                 // We will add the outflow of the while block
                 // each time through, so we pop it off so as
                 // to not accumulate multiple copies.
-                var queueLength = logo.turtles.turtleList[turtle].queue.length;
+                let queueLength = tur.queue.length;
                 if (queueLength > 0) {
-                    if (
-                        logo.turtles.turtleList[turtle].queue[queueLength - 1]
-                            .parentBlk === blk
-                    ) {
-                        logo.turtles.turtleList[turtle].queue.pop();
+                    if (tur.queue[queueLength - 1].parentBlk === blk) {
+                        tur.queue.pop();
                     }
                 }
 
-                var parentBlk = logo.blocks.blockList[blk].connections[0];
-                var queueBlock = new Queue(blk, 1, parentBlk);
-                logo.parentFlowQueue[turtle].push(parentBlk);
-                logo.turtles.turtleList[turtle].queue.push(queueBlock);
+                let parentBlk = logo.blocks.blockList[blk].connections[0];
+                let queueBlock = new Queue(blk, 1, parentBlk);
+                tur.parentFlowQueue.push(parentBlk);
+                tur.queue.push(queueBlock);
 
                 // and queue the interior child flow.
                 return [args[1], 1];
@@ -649,14 +631,10 @@ function setupFlowBlocks() {
                 // we need to flush the queue of all but the
                 // last one, otherwise the child of the while
                 // block is executed multiple times.
-                var queueLength = logo.turtles.turtleList[turtle].queue.length;
-                for (var i = queueLength - 1; i > 0; i--) {
-                    if (
-                        logo.turtles.turtleList[turtle].queue[i].parentBlk ===
-                        blk
-                    ) {
-                        // if (logo.turtles.turtleList[turtle].queue[i].blk === blk) {
-                        logo.turtles.turtleList[turtle].queue.pop();
+                let queueLength = tur.queue.length;
+                for (let i = queueLength - 1; i > 0; i--) {
+                    if (tur.queue[i].parentBlk === blk) {
+                        tur.queue.pop();
                     }
                 }
             }
@@ -790,7 +768,7 @@ function setupFlowBlocks() {
         flow(args, logo, turtle) {
             if (args.length !== 1) return;
 
-            return [args[0], logo.suppressOutput[turtle] ? 20 : -1];
+            return [args[0], logo.turtles.ithTurtle(turtle).singer.suppressOutput ? 20 : -1];
         }
     }
 
@@ -817,7 +795,7 @@ function setupFlowBlocks() {
             });
         }
 
-        flow(args, logo) {
+        flow(args, logo, turtle, blk) {
             if (args[1] === undefined) return;
 
             let arg;
@@ -826,8 +804,9 @@ function setupFlowBlocks() {
                 typeof args[0] !== "number" ||
                 args[0] < 1
             ) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
-                arg = 1;
+                if (args[0] < 0)
+                    logo.errorMsg(POSNUMBER, blk);
+                return [null , 0];
             } else {
                 arg = args[0];
             }
@@ -853,7 +832,8 @@ function setupFlowBlocks() {
             ) {
                 logo.statusFields.push([blk, "duplicate"]);
             } else {
-                logo.blocks.blockList[blk].value = logo.duplicateFactor[turtle];
+                logo.blocks.blockList[blk].value =
+                    logo.turtles.ithTurtle(turtle).singer.duplicateFactor;
             }
         }
     }

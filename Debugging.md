@@ -15,7 +15,7 @@ testing, revising, etc.*&mdash;Cynthia Solomon
 *Sometimes bugs are serendipitously adopted as features worth
 perpetuating, sometimes procedures must be constructed to deal with
 the phenomena caused by their appearance, and sometimes the bugs and
-their side effect need to be removed. But in this pursuit, children
+their side effects need to be removed. But in this pursuit, children
 become creative researchers studying behavior, making up theories,
 trying out ideas, etc.*&mdash;Cynthia Solomon
 
@@ -32,13 +32,13 @@ trying out ideas, etc.*&mdash;Cynthia Solomon
 Programming is hard. Composing music is also hard. Both programming
 and composing involve some trial and error and serendipity. Inevitably
 you will make mistakes along the way. Music Blocks provides a number
-of mechanism, reviewed below, to help you explore ideas and find
+of mechanisms, reviewed below, to help you explore ideas and find
 mistakes.
 
 ## 1. Clicking on an individual stack of blocks
 
 The *Play* button (in top left corner) will run all of the *Start*
-blocks simultenously. (Every Music Blocks project has at least one
+blocks simultaneously. (Every Music Blocks project has at least one
 *Start* block). But you can also run an individual stack of code by
 clicking on a stack. This lets you test and debug small sections of
 code, or, as in the example below, you can play a single voice by
@@ -69,7 +69,7 @@ written to the browser console.
 
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/status1.svg "given Music block")
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/status2.svg "status in tabular form")
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/images/status_example_debug_guide.png "status in tabular form")
 
 The *Status widget* is a tool for inspecting the status of Music
 Blocks as it is running. By default, the key, BPM, and volume are
@@ -90,25 +90,20 @@ before being displayed.
 
 ## 4. Playback modes
 
-Clicking on the *Play* button will play your program at full
-speed. (It will also hide the blocks while the program runs, which
-improves performance.) But there are four other playback modes.
+Clicking on the Play button will play your program at full speed.
+(It will also hide the blocks while the program runs, which improves
+performance.) But there are two other playback modes.
 
-A "long press" on the *Play* button will invoke *Playback Slow*
-mode. The program will pause between the execution of each block and
-the block being executed will be highlighted. This is useful for
-following program flow, ensuring that the sequence of blocks being
-executed is what you expect. In addition, the value stored in any box
-or parameter is displayed on the block as the program runs, so you can
-"inspect" program elements as the program runs.
+On the Secondary Menu, there are two other Play buttons.
 
-An "extra long press" on the *Play* button will invoke *Playback Music
-Slow* mode. This mode is similar to *Playback Slow* mode, only the
-pause is only inserted between *Note Value* blocks. All other blocks
-are run at full speed.
+During Playback Slow mode the program will pause between the execution
+of each block and the block being executed will be highlighted. This is
+useful for following program flow, ensuring that the sequence of blocks
+being executed is what you expect. In addition, the value stored in any
+box or parameter is displayed on the block as the program runs, so you
+can "inspect" program elements as the program runs.
 
-Two other modes, *Run Step by Step* and *Run Note by Note* advance one
-block or one note per button press.
+Run Step by Step advances one block per button press.
 
 ## 5. Show and Hide blocks
 
@@ -118,7 +113,7 @@ useful for setting
 program to debug a specific section of code. By putting a *Show* block
 at the start of a problematic section of code and a *Hide* block at
 the end of the section, your program can be run full speed until it
-gets to the *Show* block. Then the blocks are blocks are displayed and
+gets to the *Show* block. Then the blocks are displayed and
 run in *Playback Slow* mode. When the *Hide* block is encountered, the
 blocks are hidden and the program resumes running at full speed.
 

@@ -43,19 +43,34 @@ function setupBoxesBlocks() {
             let i = args.length === 2 ? args[1] : 1;
 
             if (args.length > 0) {
-                var cblk = logo.blocks.blockList[blk].connections[1];
+                let cblk = logo.blocks.blockList[blk].connections[1];
+
                 if (logo.blocks.blockList[cblk].name === "text") {
                     // Work-around to #1302
                     // Look for a namedbox with this text value.
-                    var name = this.blocks.blockList[cblk].value;
-                    if (name in this.boxes) {
-                        this.boxes[name] = this.boxes[name] + i;
+                    let name = logo.blocks.blockList[cblk].value;
+                    if (name in logo.boxes) {
+                        logo.boxes[name] = logo.boxes[name] + i;
                         return;
                     }
                 }
 
-                var settingBlk = logo.blocks.blockList[blk].connections[1];
-                logo._blockSetter(settingBlk, args[0] + i, turtle);
+                let value = args[0] + i;
+
+                // A special case for solfege stored in boxes.
+                if (logo.blocks.blockList[cblk].name === "namedbox") {
+                    let j = SOLFEGENAMES.indexOf(logo.blocks.blockList[cblk].value);
+                    if (j !== -1) {
+                        j = j >= SOLFEGENAMES.length ? 0 : j;
+                        value = SOLFEGENAMES[j + i];
+                    }
+                }
+
+                try {
+                    logo.blocks.blockSetter(logo, cblk, value, turtle);
+                } catch (e) {
+                    logo.errorMsg(_("Block does not support incrementing."), cblk);
+                }
             }
         }
     }
@@ -86,6 +101,32 @@ function setupBoxesBlocks() {
         }
     }
 
+    class DecrementOneBlock extends IncrementBlock {
+        constructor() {
+            super("decrementOne");
+            this.setPalette("boxes");
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _("The Subtract-1-from block subtracts one from the value stored in a box."),
+                "documentation",
+                ""
+            ]);
+
+            this.formBlock({
+                name: _("subtract 1 from"),
+                args: 1,
+                argTypes: ["anyin"],
+                argLabels: [""]
+            });
+        }
+
+        flow(args, logo, turtle, blk) {
+            args[1] = -1;
+            super.flow(args, logo, turtle, blk);
+        }
+    }
+
     class BoxBlock extends LeftBlock {
         constructor() {
             super("box");
@@ -109,14 +150,8 @@ function setupBoxesBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            var cblk = logo.blocks.blockList[blk].connections[1];
-            var boxname = logo.parseArg(
-                that,
-                turtle,
-                cblk,
-                blk,
-                logo.receivedArg
-            );
+            let cblk = logo.blocks.blockList[blk].connections[1];
+            let boxname = logo.parseArg(that, turtle, cblk, blk, logo.receivedArg);
             if (boxname in logo.boxes) {
                 return logo.boxes[boxname];
             } else {
@@ -126,8 +161,8 @@ function setupBoxesBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            var cblk = logo.blocks.blockList[blk].connections[1];
-            var name = logo.parseArg(logo, turtle, cblk, blk, logo.receivedArg);
+            let cblk = logo.blocks.blockList[blk].connections[1];
+            let name = logo.parseArg(logo, turtle, cblk, blk, logo.receivedArg);
             if (name in logo.boxes) {
                 logo.boxes[name] = value;
             } else {
@@ -136,13 +171,13 @@ function setupBoxesBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            var cblk = logo.blocks.blockList[blk].connections[1];
+            let cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             }
 
-            var name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+            let name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
             if (name in logo.boxes) {
                 return logo.boxes[name];
             } else {
@@ -172,7 +207,7 @@ function setupBoxesBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            var name = logo.blocks.blockList[blk].privateData;
+            let name = logo.blocks.blockList[blk].privateData;
             if (name in logo.boxes) {
                 return logo.boxes[name];
             } else {
@@ -182,7 +217,7 @@ function setupBoxesBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            var name = logo.blocks.blockList[blk].privateData;
+            let name = logo.blocks.blockList[blk].privateData;
             if (name in logo.boxes) {
                 logo.boxes[name] = value;
             } else {
@@ -191,7 +226,7 @@ function setupBoxesBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            var name = logo.blocks.blockList[blk].privateData;
+            let name = logo.blocks.blockList[blk].privateData;
             if (
                 logo.inStatusMatrix &&
                 logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
@@ -213,6 +248,7 @@ function setupBoxesBlocks() {
         constructor() {
             super("storein2");
             this.setPalette("boxes");
+            this.beginnerBlock(true);
             this.setHelpString([
                 _("The Store in block will store a value in a box."),
                 "documentation",
@@ -255,7 +291,7 @@ function setupBoxesBlocks() {
                 argLabels:
                     this.lang === "ja"
                         ? [_("name1"), _("value1")]
-                        : [_("name"), _("name")]
+                        : [_("name"), _("value")]
             });
         }
 
@@ -272,13 +308,13 @@ function setupBoxesBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Box 2 block returns the value stored in Box 2."),
+                _("The Box2 block returns the value stored in Box2."),
                 "documentation",
                 null,
                 "box2help"
             ]);
 
-            this.formBlock({ name: _("box 2") });
+            this.formBlock({ name: _("box2") });
             this.makeMacro((x, y) => [
                 [0, ["namedbox", { value: "box2" }], x, y, [null]]
             ]);
@@ -293,7 +329,7 @@ function setupBoxesBlocks() {
 
             this.setHelpString([
                 _(
-                    "The Store in Box 2 block is used to store a value in Box 2."
+                    "The Store in Box2 block is used to store a value in Box2."
                 ),
                 "documentation",
                 null,
@@ -301,7 +337,7 @@ function setupBoxesBlocks() {
             ]);
 
             this.formBlock({
-                name: _("store in box 2"),
+                name: _("store in box2"),
                 args: 1,
                 defaults: [4]
             });
@@ -319,13 +355,13 @@ function setupBoxesBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Box 1 block returns the value stored in Box 1."),
+                _("The Box1 block returns the value stored in Box1."),
                 "documentation",
                 null,
                 "box1help"
             ]);
 
-            this.formBlock({ name: _("box 1") });
+            this.formBlock({ name: _("box1") });
             this.makeMacro((x, y) => [
                 [0, ["namedbox", { value: "box1" }], x, y, [null]]
             ]);
@@ -340,7 +376,7 @@ function setupBoxesBlocks() {
 
             this.setHelpString([
                 _(
-                    "The Store in Box 1 block is used to store a value in Box 1."
+                    "The Store in Box1 block is used to store a value in Box1."
                 ),
                 "documentation",
                 null,
@@ -348,7 +384,7 @@ function setupBoxesBlocks() {
             ]);
 
             this.formBlock({
-                name: _("store in box 1"),
+                name: _("store in box1"),
                 args: 1,
                 defaults: [4]
             });
@@ -359,6 +395,7 @@ function setupBoxesBlocks() {
         }
     }
 
+    new DecrementOneBlock().setup();
     new IncrementOneBlock().setup();
     new IncrementBlock().setup();
     new BoxBlock().setup();

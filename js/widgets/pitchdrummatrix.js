@@ -105,13 +105,12 @@ function PitchDrumMatrix() {
         var widgetWindow = window.widgetWindows.windowFor(this, "pitch drum");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
+	widgetWindow.show();
 
         // For the button callbacks
         var that = this;
 
         widgetWindow.onclose = function() {
-            pdmDiv.style.visibility = "hidden";
-            pdmButtonsDiv.style.visibility = "hidden";
             pdmTableDiv.style.visibility = "hidden";
             that._logo.hideMsgs();
             this.destroy();
@@ -122,7 +121,7 @@ function PitchDrumMatrix() {
             ICONSIZE,
             _("Play")
         ).onclick = function() {
-            that._logo.setTurtleDelay(0);
+            that._logo.turtleDelay = 0;
             that._playAll();
         };
 
@@ -363,6 +362,8 @@ function PitchDrumMatrix() {
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
             cell.style.backgroundColor = platformColor.selectorBackground;
+            cell.style.border = "2px solid white";
+            cell.style.borderRadius = "10px";
 
             cell.onmouseover = function() {
                 if (this.style.backgroundColor !== "black") {
@@ -623,7 +624,7 @@ function PitchDrumMatrix() {
             solfegeHTML,
             -1,
             0,
-            this._logo.keySignature[0],
+            this._logo.turtles.ithTurtle(0).singer.keySignature,
             false,
             null,
             this._logo.errorMsg
@@ -631,14 +632,9 @@ function PitchDrumMatrix() {
         var note = noteObj[0] + noteObj[1];
 
         if (playNote) {
-            var waitTime = this._logo.defaultBPMFactor * 1000 * 0.25;
+            var waitTime = Singer.defaultBPMFactor * 1000 * 0.25;
             this._logo.synth.trigger(
-                0,
-                note.replace(/♭/g, "b").replace(/♯/g, "#"),
-                0.125,
-                "default",
-                null,
-                null
+                0, note.replace(/♭/g, "b").replace(/♯/g, "#"), 0.125, "default", null, null
             );
 
             var that = this;
@@ -720,7 +716,7 @@ function PitchDrumMatrix() {
                 solfegeHTML,
                 -1,
                 0,
-                this._logo.keySignature[0],
+                this._logo.turtles.ithTurtle(0).singer.keySignature,
                 false,
                 null,
                 this._logo.errorMsg

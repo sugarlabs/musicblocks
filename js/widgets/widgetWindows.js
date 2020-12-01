@@ -1,11 +1,21 @@
+// Copyright (c) 2020 Bottersnike
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
 window.widgetWindows = { openWindows: {}, _posCache: {} };
 
 function WidgetWindow(key, title) {
     // Keep a refernce to the object within handlers
-    let that = this;
     this._key = key;
 
-    let create = function(base, className, parent) {
+    const create = (base, className, parent) => {
         let el = document.createElement(base);
         if (className) el.className = className;
         if (parent) parent.append(el);
@@ -33,7 +43,7 @@ function WidgetWindow(key, title) {
     this._toolbar = create("div", "wfbToolbar", this._body);
     this._widget = create("div", "wfbWidget", this._body);
 
-    var language = localStorage.languagePreference;
+    let language = localStorage.languagePreference;
     if (language === undefined) {
         language = navigator.language;
     }
@@ -63,90 +73,124 @@ function WidgetWindow(key, title) {
 
     // Needed to keep things canvas-relative
     let canvas = docById("myCanvas");
+    
+    // Scrolling in window body .
+    // this.top = 0;
+    // scrollEvent = function (evt) {
+    //     let data = evt.wheelDelta || -evt.detail;
+    //     let x = docByClass("wfbWidget")[0];
+    //     let l = x.getElementsByTagName("tr").length;
+    //     if (data < 0) {
+    //         if (x.getElementsByTagName("tr")[this.top] != null) {
+    //             x.getElementsByTagName("tr")[this.top].style.display = "none";
+    //             this.top = this.top == l ? l : this.top + 1;
+    //         }
+    //     } else if (data > 0) {
+    //         x.getElementsByTagName("tr")[this.top--].style.display = "";
+    //         this.top = this.top < 0 ? 0 : this.top;
+    //     }
+    // };
+    const disableScroll = () => {
+        // Get the current page scroll position 
+        scrollTop =
+            window.pageYOffset || document.documentElement.scrollTop;
+        scrollLeft =
+            window.pageXOffset || document.documentElement.scrollLeft,
 
+            // if any scroll is attempted, 
+            // set this to the previous value 
+            window.onscroll = ()=> {
+                window.scrollTo(scrollLeft, scrollTop);
+            };
+    }
+
+
+    this._widget.addEventListener("wheel", disableScroll, false);
+    this._widget.addEventListener("DOMMouseScroll", disableScroll, false);
+    
     // Global watcher to track the mouse
-    document.addEventListener("mousemove", function(e) {
-        if (!that._dragging) return;
+    document.addEventListener("mousemove", (e)=> {
+        if (!this._dragging) return;
 
-        let x = e.clientX - that._dx,
-            y = e.clientY - that._dy;
+        let x = e.clientX - this._dx,
+            y = e.clientY - this._dy;
 
-        that.setPosition(x, y);
+        this.setPosition(x, y);
     });
 
-    document.addEventListener("mousedown", function(e) {
-        if (e.target === that._frame || that._frame.contains(e.target)) {
-            that._frame.style.opacity = "1";
-            that._frame.style.zIndex = "1";
+    document.addEventListener("mousedown", (e)=> {
+        if (e.target === this._frame || this._frame.contains(e.target)) {
+            this._frame.style.opacity = "1";
+            this._frame.style.zIndex = "1";
         } else {
-            that._frame.style.opacity = ".7";
-            that._frame.style.zIndex = "0";
+            this._frame.style.opacity = ".7";
+            this._frame.style.zIndex = "0";
         }
     });
 
     // The title may change, as with the Help Widget.
-    this.updateTitle = function(title) {
-        var wftTitle = docById(this._key + "WidgetID");
+    this.updateTitle = (title) => {
+        let wftTitle = docById(this._key + "WidgetID");
         wftTitle.innerHTML = title;
     };
 
     // The handle needs the events bound as it's a sibling of the dragging div
     // not a relative in either direciton.
-    this._drag.onmousedown = this._handle.onmousedown = function(e) {
-        that._dragging = true;
-        if (that._maximized) {
+    this._drag.onmousedown = this._handle.onmousedown = (e)=> {
+        this._dragging = true;
+        if (this._maximized) {
             // Perform special repositioning to make the drag feel right when
             // restoring a window from maximized.
-            let bcr = that._drag.getBoundingClientRect();
+            let bcr = this._drag.getBoundingClientRect();
             let dx = (bcr.left - e.clientX) / (bcr.right - bcr.left);
             let dy = bcr.top - e.clientY;
 
-            that.restore();
-            that.onmaximize();
+            this.restore();
+            this.onmaximize();
 
-            bcr = that._drag.getBoundingClientRect();
+            bcr = this._drag.getBoundingClientRect();
             dx *= bcr.right - bcr.left;
-            that.setPosition(e.clientX + dx, e.clientY + dy);
+            this.setPosition(e.clientX + dx, e.clientY + dy);
         }
 
-        that.takeFocus();
+        this.takeFocus();
 
-        that._dx = e.clientX - that._drag.getBoundingClientRect().left;
-        that._dy = e.clientY - that._drag.getBoundingClientRect().top;
+        this._dx = e.clientX - this._drag.getBoundingClientRect().left;
+        this._dy = e.clientY - this._drag.getBoundingClientRect().top;
         e.preventDefault();
     };
 
-    document.addEventListener("mouseup", function(e) {
-        that._dragging = false;
+    document.addEventListener("mouseup", (e)=> {
+        this._dragging = false;
     });
 
     // Wrapper to allow overloading
-    closeButton.onclick = function(e) {
-        that.close();
+    closeButton.onclick = (e)=> {
+        this.close();
 
         e.preventDefault();
         e.stopPropagation();
     };
 
-    rollButton.onclick = function(e) {
-        if (that._rolled) that.unroll();
-        else that.rollup();
-        that.takeFocus();
+    rollButton.onclick = (e)=> {
+        if (this._rolled) this.unroll();
+        else this.rollup();
+        this.takeFocus();
 
         e.preventDefault();
         e.stopPropagation();
     };
 
-    maxminButton.onclick = maxminButton.onmousedown = function(e) {
-        if (that._maximized) that.restore();
-        else that.maximize();
-        that.takeFocus();
-        that.onmaximize();
+    maxminButton.onclick = maxminButton.onmousedown = (e)=> {
+        if (this._maximized) this.restore();
+        else this.maximize();
+        this.takeFocus();
+        this.onmaximize();
         e.preventDefault();
         e.stopImmediatePropagation();
     };
 
-    this.takeFocus = function() {
+    this.takeFocus = ()=> {
         let siblings = windows.children;
         for (let i = 0; i < siblings.length; i++) {
             siblings[i].style.zIndex = "0";
@@ -156,7 +200,7 @@ function WidgetWindow(key, title) {
         this._frame.style.opacity = "1";
     };
 
-    this.addButton = function(icon, iconSize, label, parent) {
+    this.addButton = (icon, iconSize, label, parent) => {
         let el = create("div", "wfbtItem", parent || this._toolbar);
         el.innerHTML =
             '<img src="header-icons/' +
@@ -174,18 +218,38 @@ function WidgetWindow(key, title) {
         return el;
     };
 
-    this.addInputButton = function(initial, parent) {
+    this.addInputButton = (initial, parent) => {
         let el = create("div", "wfbtItem", parent || this._toolbar);
         el.innerHTML = '<input value="' + initial + '" />';
         return el.querySelector("input");
     };
 
-    this.addDivider = function() {
+    this.addRangeSlider = (initial, parent, min, max, classNm) => {
+        let el = create("div", "wfbtItem", parent || this._toolbar);
+        el.style.height = "250px"
+        el.innerHTML =   '<input type="range" class="'+classNm+'"  min="'+min+'" max="'+max+'" value="'+initial+'">'
+        let slider = el.querySelector("input");
+        slider.style = " position:absolute;transform:rotate(270deg);height:10px;width:57%;"
+        return slider;
+    };
+
+    this.addSelectorButton = (list, initial, parent) => {
+        let el = create("div", "wfbtItem", parent || this._toolbar);
+        el.innerHTML = '<select value="' + initial + '" />';
+        let selector = el.querySelector("select");
+        for (let i of list) {
+            let newOption = new Option('turtle '+i,i);
+            selector.add(newOption);
+        }
+        return selector;
+    };
+
+    this.addDivider = ()=> {
         let el = create("div", "wfbtHR", this._toolbar);
         return el;
     };
 
-    this.modifyButton = function(index, icon, iconSize, label) {
+    this.modifyButton = (index, icon, iconSize, label) => {
         this._buttons[index].innerHTML =
             '<img src="header-icons/' +
             icon +
@@ -201,29 +265,33 @@ function WidgetWindow(key, title) {
         return this._buttons[index];
     };
 
-    this.getWidgetBody = function() {
+    this.getWidgetBody = ()=> {
         return this._widget;
     };
 
-    this.getDragElement = function() {
+    this.getDragElement = ()=> {
         return this._drag;
     };
 
-    this.onclose = function() {
+    this.onclose = ()=> {
         this.destroy();
     };
 
-    this.destroy = function() {
+    this.destroy = ()=> {
         this._frame.remove();
 
         window.widgetWindows.openWindows[this._key] = undefined;
     };
 
-    this.onmaximize = function() {
+    this.onmaximize = ()=> {
         return this;
     };
 
-    this.setPosition = function(x, y) {
+    this.show = ()=> {
+        this._frame.style.display = "block";
+    };
+
+    this.setPosition = (x, y) => {
         this._frame.style.left = x + "px";
         this._frame.style.top = Math.max(y, 64) + "px";
         window.widgetWindows._posCache[this._key] = [x, Math.max(y, 64)];
@@ -231,7 +299,7 @@ function WidgetWindow(key, title) {
         return this;
     };
 
-    this.sendToCenter = function() {
+    this.sendToCenter = ()=> {
         let fRect = this._frame.getBoundingClientRect();
         let cRect = canvas.getBoundingClientRect();
 
@@ -252,30 +320,30 @@ function WidgetWindow(key, title) {
         return this;
     };
 
-    this.isVisible = function() {
+    this.isVisible = ()=> {
         return this._visible;
     };
 
-    this.clear = function() {
+    this.clear = ()=> {
         this._widget.innerHTML = "";
         this._toolbar.innerHTML = "";
 
         return this;
     };
 
-    this.rollup = function() {
+    this.rollup = ()=> {
         this._rolled = true;
         this._body.style.display = "none";
         return this;
     };
 
-    this.unroll = function() {
+    this.unroll = ()=> {
         this._rolled = false;
         this._body.style.display = "flex";
         return this;
     };
 
-    this.maximize = function() {
+    this.maximize = ()=> {
         this._maxminIcon.setAttribute("src", "header-icons/icon-contract.svg");
         this._maximized = true;
         this.unroll();
@@ -288,7 +356,7 @@ function WidgetWindow(key, title) {
         this._frame.style.top = "64px";
     };
 
-    this.restore = function() {
+    this.restore = ()=> {
         this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
         this._maximized = false;
 
@@ -301,7 +369,7 @@ function WidgetWindow(key, title) {
         this._frame.style.height = "auto";
     };
 
-    this.close = function() {
+    this.close = ()=> {
         this.onclose();
     };
 
@@ -312,7 +380,7 @@ function WidgetWindow(key, title) {
     this.takeFocus();
 }
 
-window.widgetWindows.windowFor = function(widget, title, saveAs) {
+window.widgetWindows.windowFor = (widget, title, saveAs) => {
     let key = undefined;
     // Check for a blockNo attribute
     if (typeof widget.blockNo !== "undefined") key = widget.blockNo;
@@ -327,23 +395,29 @@ window.widgetWindows.windowFor = function(widget, title, saveAs) {
     return window.widgetWindows.openWindows[key].unroll();
 };
 
-window.widgetWindows.clear = function(name) {
+window.widgetWindows.clear = (name) => {
     let win = window.widgetWindows.openWindows[name];
     if (!win) return;
     if (typeof win.onclose === "function") win.onclose();
 };
 
-window.widgetWindows.isOpen = function(name) {
+window.widgetWindows.isOpen = (name) => {
     return window.widgetWindows.openWindows[name] ? true : "";
 };
 
-window.widgetWindows.hideWindows = function(name) {
+window.widgetWindows.hideAllWindows = ()=> {
     Object.values(window.widgetWindows.openWindows).forEach(win => {
         if (win !== undefined) win._frame.style.display = "none";
     });
 };
 
-window.widgetWindows.showWindows = function(name) {
+window.widgetWindows.hideWindow = (name) => {
+    let win = window.widgetWindows.openWindows[name];
+    if (!win) return;
+    win._frame.style.display = "none";
+};
+
+window.widgetWindows.showWindows = ()=> {
     Object.values(window.widgetWindows.openWindows).forEach(win => {
         if (win !== undefined) win._frame.style.display = "block";
     });
