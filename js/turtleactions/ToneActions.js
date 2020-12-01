@@ -31,7 +31,6 @@ function setupToneActions() {
          * @param {Number} blk - corresponding Block object in blocks.blockList
          */
         static setTimbre(instrument, turtle, blk) {
-	    console.log('turtle: ' + turtle + " " + instrument);
             let tur = logo.turtles.ithTurtle(turtle);
 
             tur.inSetTimbre = true;
@@ -63,6 +62,8 @@ function setupToneActions() {
                     synth = instrument[0];
                 }
             }
+            
+            console.log('turtle: ' + turtle + " " + synth);
 
             if (logo.inMatrix) {
                 logo.pitchTimeMatrix._instrumentName = synth;
