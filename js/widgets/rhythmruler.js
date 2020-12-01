@@ -169,19 +169,10 @@ function RhythmRuler() {
                     drum = this._logo.blocks.blockList[drumBlockNo].value;
                 }
 
-<<<<<<< HEAD
-                
-                // FIXME: Should be based on meter
-                for (var i = 0; i < 4; i++) {
-                    setTimeout(() => {
-                        this._logo.synth.trigger(
-=======
-                let that = this;
                 // FIXME: Should be based on meter
                 for (let i = 0; i < 4; i++) {
-                    setTimeout(function() {
-                        that._logo.synth.trigger(
->>>>>>> upstream/master
+                    setTimeout(() => {
+                        this._logo.synth.trigger(
                             0, "C4", Singer.defaultBPMFactor / 16, drum, null, null
                         );
                     }, (interval * i) / 4);
@@ -218,19 +209,12 @@ function RhythmRuler() {
         this._tapEndTime = this._tapTimes[0] + interval;
 
         // Set a timeout to end tapping
-<<<<<<< HEAD
-        var that = this;
         setTimeout(() => {
             this.__endTapping();
-=======
-        let that = this;
-        setTimeout(function() {
-            that.__endTapping();
->>>>>>> upstream/master
         }, interval);
 
         // Display a progress bar.
-        function __move(tick, stepSize) {
+        const __move = (tick, stepSize) => {
             let width = 1;
             let id = setInterval(frame, tick);
 
@@ -239,7 +223,7 @@ function RhythmRuler() {
                     clearInterval(id);
                 } else {
                     width += stepSize;
-                    that._progressBar.style.width = width + "%";
+                    this._progressBar.style.width = width + "%";
                 }
             }
         }
@@ -422,13 +406,7 @@ function RhythmRuler() {
                     this._rulerSelected = cell.parentNode.getAttribute(
                         "data-row"
                     );
-<<<<<<< HEAD
-                    var noteValues = this.Rulers[this._rulerSelected][0];
-                    var noteValue = noteValues[cell.cellIndex];
-=======
-                    let noteValues = that.Rulers[that._rulerSelected][0];
-                    let noteValue = noteValues[cell.cellIndex];
->>>>>>> upstream/master
+                    let noteValues = this.Rulers[this._rulerSelected][0];
                     cell.style.backgroundColor =
                         platformColor.selectorBackground;
                 }
@@ -1048,15 +1026,8 @@ function RhythmRuler() {
                 this.__pause();
                 // Wait for pause to complete before restarting.
                 this._playingAll = true;
-<<<<<<< HEAD
-                
                 setTimeout(() => {
                     this.__resume();
-=======
-                let that = this;
-                setTimeout(function() {
-                    that.__resume();
->>>>>>> upstream/master
                 }, 1000);
             }
         } else if (!this._playingAll) {
@@ -1215,11 +1186,6 @@ function RhythmRuler() {
 
     this._save = function(selectedRuler) {
         // Deprecated -- replaced by save tuplets code
-<<<<<<< HEAD
-        
-        for (var name in this._logo.blocks.palettes.dict) {
-=======
-        let that = this;
         for (let name in this._logo.blocks.palettes.dict) {
 >>>>>>> upstream/master
             this._logo.blocks.palettes.dict[name].hideMenu(true);
@@ -1227,32 +1193,18 @@ function RhythmRuler() {
 
         this._logo.refreshCanvas();
 
-<<<<<<< HEAD
         setTimeout(() => {
-            var ruler = this._rulers[selectedRuler];
-            var noteValues = this.Rulers[selectedRuler][0];
-            // Get the first word of drum's name (ignore the word 'drum' itself)
-            // and add 'rhythm'.
-            if (this.Drums[selectedRuler] === null) {
-                var stack_value = _("snare drum") + " " + _("rhythm");
-            } else {
-                var stack_value =
-                    this._logo.blocks.blockList[
-                        this._logo.blocks.blockList[this.Drums[selectedRuler]]
-=======
-        setTimeout(function() {
-            let ruler = that._rulers[selectedRuler];
-            let noteValues = that.Rulers[selectedRuler][0];
+            let ruler = this._rulers[selectedRuler];
+            let noteValues = this.Rulers[selectedRuler][0];
             // Get the first word of drum's name (ignore the word 'drum' itself)
             // and add 'rhythm'.
             let stack_value;
-            if (that.Drums[selectedRuler] === null) {
+            if (this.Drums[selectedRuler] === null) {
                 stack_value = _("snare drum") + " " + _("rhythm");
             } else {
                 stack_value =
-                    that._logo.blocks.blockList[
-                        that._logo.blocks.blockList[that.Drums[selectedRuler]]
->>>>>>> upstream/master
+                    this._logo.blocks.blockList[
+                        this._logo.blocks.blockList[this.Drums[selectedRuler]]
                             .connections[1]
                     ].value.split(" ")[0] +
                     " " +
@@ -1353,11 +1305,6 @@ function RhythmRuler() {
     };
 
     this._saveTuplets = function(selectedRuler) {
-<<<<<<< HEAD
-        
-        for (var name in this._logo.blocks.palettes.dict) {
-=======
-        let that = this;
         for (let name in this._logo.blocks.palettes.dict) {
 >>>>>>> upstream/master
             this._logo.blocks.palettes.dict[name].hideMenu(true);
@@ -1365,28 +1312,16 @@ function RhythmRuler() {
 
         this._logo.refreshCanvas();
 
-<<<<<<< HEAD
         setTimeout(() => {
-            var ruler = this._rulers[selectedRuler];
-            var noteValues = this.Rulers[selectedRuler][0];
-            if (this.Drums[selectedRuler] === null) {
-                var stack_value = _("rhythm");
-            } else {
-                var stack_value =
-                    this._logo.blocks.blockList[
-                        this._logo.blocks.blockList[this.Drums[selectedRuler]]
-=======
-        setTimeout(function() {
-            let ruler = that._rulers[selectedRuler];
-            let noteValues = that.Rulers[selectedRuler][0];
+            let ruler = this._rulers[selectedRuler];
+            let noteValues = this.Rulers[selectedRuler][0];
             let stack_value;
-            if (that.Drums[selectedRuler] === null) {
+            if (this.Drums[selectedRuler] === null) {
                 stack_value = _("rhythm");
             } else {
                 stack_value =
-                    that._logo.blocks.blockList[
-                        that._logo.blocks.blockList[that.Drums[selectedRuler]]
->>>>>>> upstream/master
+                    this._logo.blocks.blockList[
+                        this._logo.blocks.blockList[this.Drums[selectedRuler]]
                             .connections[1]
                     ].value.split(" ")[0] +
                     " " +
@@ -1661,11 +1596,6 @@ function RhythmRuler() {
     };
 
     this._saveDrumMachine = function(selectedRuler, drum, effect) {
-<<<<<<< HEAD
-        
-        for (var name in this._logo.blocks.palettes.dict) {
-=======
-        let that = this;
         for (let name in this._logo.blocks.palettes.dict) {
 >>>>>>> upstream/master
             this._logo.blocks.palettes.dict[name].hideMenu(true);
@@ -1680,8 +1610,8 @@ function RhythmRuler() {
             var delta = selectedRuler * 42;
 =======
         setTimeout(function() {
-            let ruler = that._rulers[selectedRuler];
-            let noteValues = that.Rulers[selectedRuler][0];
+            let ruler = this._rulers[selectedRuler];
+            let noteValues = this.Rulers[selectedRuler][0];
             let delta = selectedRuler * 42;
 >>>>>>> upstream/master
 
@@ -1697,13 +1627,12 @@ function RhythmRuler() {
                         this._logo.blocks.blockList[this.Drums[selectedRuler]]
 =======
             let action_name;
-            if (that.Drums[selectedRuler] === null) {
+            if (this.Drums[selectedRuler] === null) {
                 action_name = _("snare drum") + " " + _("action");
             } else {
                 action_name =
-                    that._logo.blocks.blockList[
-                        that._logo.blocks.blockList[that.Drums[selectedRuler]]
->>>>>>> upstream/master
+                    this._logo.blocks.blockList[
+                        this._logo.blocks.blockList[that.Drums[selectedRuler]]
                             .connections[1]
                     ].value.split(" ")[0] +
                     " " +
@@ -1986,11 +1915,6 @@ function RhythmRuler() {
     };
 
     this._saveVoiceMachine = function(selectedRuler, voice) {
-<<<<<<< HEAD
-        
-        for (var name in this._logo.blocks.palettes.dict) {
-=======
-        let that = this;
         for (let name in this._logo.blocks.palettes.dict) {
 >>>>>>> upstream/master
             this._logo.blocks.palettes.dict[name].hideMenu(true);
@@ -1998,15 +1922,9 @@ function RhythmRuler() {
 
         this._logo.refreshCanvas();
 
-<<<<<<< HEAD
         setTimeout(() => {
-            var ruler = this._rulers[selectedRuler];
-            var noteValues = this.Rulers[selectedRuler][0];
-            var delta = selectedRuler * 42;
-=======
-        setTimeout(function() {
-            let ruler = that._rulers[selectedRuler];
-            let noteValues = that.Rulers[selectedRuler][0];
+            let ruler = this._rulers[selectedRuler];
+            let noteValues = this.Rulers[selectedRuler][0];
             let delta = selectedRuler * 42;
 >>>>>>> upstream/master
 
@@ -2028,13 +1946,12 @@ function RhythmRuler() {
                         this._logo.blocks.blockList[this.Drums[selectedRuler]]
 =======
             let action_name;
-            if (that.Drums[selectedRuler] === null) {
-                let action_name = _("guitar") + " " + _("action");
+            if (this.Drums[selectedRuler] === null) {
+                action_name = _("guitar") + " " + _("action");
             } else {
                 let action_name =
-                    that._logo.blocks.blockList[
-                        that._logo.blocks.blockList[that.Drums[selectedRuler]]
->>>>>>> upstream/master
+                    this._logo.blocks.blockList[
+                        this._logo.blocks.blockList[this.Drums[selectedRuler]]
                             .connections[1]
                     ].value.split(" ")[0] +
                     "_" +
