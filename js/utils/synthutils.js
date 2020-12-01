@@ -773,7 +773,6 @@ function Synth() {
 
     this._loadSampleFromFile = function(sampleData) {
         let data = function() {return sampleData[1]};
-        /*
         console.log(typeof sampleData[1]);
         function getBase64(file) {
             var reader = new FileReader();
@@ -785,8 +784,7 @@ function Synth() {
                 console.log('Error: ', error);
             };
         }
-        data = getBase64(sampleData[1]);
-        */
+        data = getBase64(sampleData);
 
         this.samplesManifest.voice.push({name: sampleData[0], data: data});
         this.samplesManifest.drum.push({ name: sampleData[0], data: data});
