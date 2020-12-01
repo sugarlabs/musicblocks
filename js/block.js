@@ -1757,7 +1757,6 @@ function Block(protoblock, blocks, overrideName) {
 
         let __readerAction = function(event) {
             window.scroll(0, 0);
-            console.log("im here");
             let reader = new FileReader();
             reader.onloadend = function() {
                 if (reader.result) {
