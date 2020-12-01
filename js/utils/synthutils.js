@@ -759,7 +759,7 @@ function Synth() {
     this.setupRecorder = () => {
         const cont = Tone.getContext();
         const dest = cont.createMediaStreamDestination();
-        var chunks = [];
+        let chunks = [];
         let stream = dest.stream;
         if (platform.FF){
             this.recorder = new MediaRecorder(stream, {type: "audio/wav"});
@@ -1197,14 +1197,8 @@ function Synth() {
         return null;
     };
 
-    this._performNotes = function(
-        synth,
-        notes,
-        beatValue,
-        paramsEffects,
-        paramsFilters,
-        setNote
-    ) {
+    this._performNotes = function(synth, notes, beatValue, paramsEffects,
+                                  paramsFilters, setNote) {
         if (this.inTemperament !== "equal" && !isCustom(this.inTemperament)) {
             if (typeof notes === "number") {
                 notes = notes;
@@ -1213,18 +1207,11 @@ function Synth() {
                 notes = this._getFrequency(notes, this.changeInTemperament);
                 if (notes === undefined) {
                     if (notes1.substring(1, notes1.length - 1) == DOUBLEFLAT) {
-                        notes =
-                            notes1.substring(0, 1) +
-                            "" +
-                            "bb" +
+                        notes = notes1.substring(0, 1) + "" + "bb" +
                             notes1.substring(notes1.length - 1, notes1.length);
-                    } else if (
-                        notes1.substring(1, notes1.length - 1) == DOUBLESHARP
-                    ) {
-                        notes =
-                            notes1.substring(0, 1) +
-                            "" +
-                            "x" +
+                    } else if (notes1.substring(1, notes1.length - 1) ===
+                               DOUBLESHARP) {
+                        notes = notes1.substring(0, 1) + "" + "x" +
                             notes1.substring(notes1.length - 1, notes1.length);
                     } else {
                         notes = notes1;
@@ -1242,15 +1229,14 @@ function Synth() {
             console.debug(notes);
         }
 
+        let numFilters;
+        let temp_filters = [];
         if (paramsEffects === null && paramsFilters === null) {
             synth.triggerAttackRelease(notes, beatValue);
         } else {
             if (paramsFilters !== null && paramsFilters !== undefined) {
-                let numFilters = paramsFilters.length; // no. of filters
-                let k = 0;
-                let temp_filters = [];
-
-                for (k = 0; k < numFilters; k++) {
+                numFilters = paramsFilters.length; // no. of filters
+                for (let k = 0; k < numFilters; k++) {
                     // filter rolloff has to be added
                     let filterVal = new Tone.Filter(
                         paramsFilters[k].filterFrequency,
@@ -1262,24 +1248,25 @@ function Synth() {
                 }
             }
 
+            let vibrato, tremolo, phaser, distortion, chorus = null;
+            let neighbor = null;
             if (paramsEffects !== null && paramsEffects !== undefined) {
                 if (paramsEffects.doVibrato) {
-                    var vibrato = new Tone.Vibrato(
+                    vibrato = new Tone.Vibrato(
                         1 / paramsEffects.vibratoFrequency,
-                        paramsEffects.vibratoIntensity
-                    );
+                        paramsEffects.vibratoIntensity);
                     synth.chain(vibrato, Tone.Destination);
                 }
 
                 if (paramsEffects.doDistortion) {
-                    var distort = new Tone.Distortion(
+                    distortion = new Tone.Distortion(
                         paramsEffects.distortionAmount
                     ).toDestination();
-                    synth.connect(distort, Tone.Destination);
+                    synth.connect(distortion, Tone.Destination);
                 }
 
                 if (paramsEffects.doTremolo) {
-                    var tremolo = new Tone.Tremolo({
+                    tremolo = new Tone.Tremolo({
                         frequency: paramsEffects.tremoloFrequency,
                         depth: paramsEffects.tremoloDepth
                     })
@@ -1289,7 +1276,7 @@ function Synth() {
                 }
 
                 if (paramsEffects.doPhaser) {
-                    var phaser = new Tone.Phaser({
+                    phaser = new Tone.Phaser({
                         frequency: paramsEffects.rate,
                         octaves: paramsEffects.octaves,
                         baseFrequency: paramsEffects.baseFrequency
@@ -1298,12 +1285,12 @@ function Synth() {
                 }
 
                 if (paramsEffects.doChorus) {
-                    var chorusEffect = new Tone.Chorus({
+                    chorus = new Tone.Chorus({
                         frequency: paramsEffects.chorusRate,
                         delayTime: paramsEffects.delayTime,
                         depth: paramsEffects.chorusDepth
                     }).toDestination();
-                    synth.chain(chorusEffect, Tone.Destination);
+                    synth.chain(chorus, Tone.Destination);
                 }
 
                 if (paramsEffects.doPartials) {
@@ -1312,7 +1299,7 @@ function Synth() {
                     if (synth.oscillator !== undefined) {
                         synth.oscillator.partials = paramsEffects.partials;
                     } else if (synth.voices !== undefined) {
-                        for (i = 0; i < synth.voices.length; i++) {
+                        for (let i = 0; i < synth.voices.length; i++) {
                             synth.voices[i].oscillator.partials =
                                 paramsEffects.partials;
                         }
@@ -1325,7 +1312,7 @@ function Synth() {
                     if (synth.oscillator !== undefined) {
                         synth.portamento = paramsEffects.portamento;
                     } else if (synth.voices !== undefined) {
-                        for (i = 0; i < synth.voices.length; i++) {
+                        for (let i = 0; i < synth.voices.length; i++) {
                             synth.voices[i].portamento =
                                 paramsEffects.portamento;
                         }
@@ -1339,11 +1326,8 @@ function Synth() {
                     // Create an array of start times and durations
                     // for each note.
                     let obj = [];
-                    for (
-                        let i = 0;
-                        i < paramsEffects["neighborArgNote1"].length;
-                        i++
-                    ) {
+                    for (let i = 0;
+                        i < paramsEffects["neighborArgNote1"].length; i++) {
                         let note1 = paramsEffects["neighborArgNote1"][i]
                             .replace("♯", "#")
                             .replace("♭", "b");
@@ -1351,21 +1335,15 @@ function Synth() {
                             .replace("♯", "#")
                             .replace("♭", "b");
                         obj.push(
-                            { time: 0, note: note1, duration: firstTwoBeats },
-                            {
-                                time: firstTwoBeats,
-                                note: note2,
-                                duration: firstTwoBeats
-                            },
-                            {
-                                time: firstTwoBeats * 2,
-                                note: note1,
-                                duration: finalBeat
-                            }
+                            {time: 0, note: note1, duration: firstTwoBeats},
+                            {time: firstTwoBeats, note: note2,
+                             duration: firstTwoBeats},
+                            {time: firstTwoBeats * 2, note: note1,
+                             duration: finalBeat}
                         );
                     }
 
-                    var neighborEffect = new Tone.Part(function(time, value) {
+                    neighbor = new Tone.Part(function(time, value) {
                         synth.triggerAttackRelease(
                             value.note,
                             value.duration,
@@ -1380,7 +1358,7 @@ function Synth() {
                     if (synth.oscillator !== undefined) {
                         synth.setNote(notes);
                     } else if (synth.voices !== undefined) {
-                        for (i = 0; i < synth.voices.length; i++) {
+                        for (let i = 0; i < synth.voices.length; i++) {
                             synth.voices[i].setNote(notes);
                         }
                     }
@@ -1390,11 +1368,9 @@ function Synth() {
             }
 
             setTimeout(function() {
-                if (
-                    paramsEffects &&
+                if (paramsEffects &&
                     paramsEffects !== null &&
-                    paramsEffects !== undefined
-                ) {
+                    paramsEffects !== undefined) {
                     if (paramsEffects.doVibrato) {
                         vibrato.dispose();
                     }
@@ -1412,20 +1388,18 @@ function Synth() {
                     }
 
                     if (paramsEffects.doChorus) {
-                        chorusEffect.dispose();
+                        chorus.dispose();
                     }
 
                     if (paramsEffects.doNeighbor) {
-                        neighborEffect.dispose();
+                        neighbor.dispose();
                     }
                 }
 
-                if (
-                    paramsFilters &&
+                if (paramsFilters &&
                     paramsFilters !== null &&
-                    paramsFilters !== undefined
-                ) {
-                    for (k = 0; k < numFilters; k++) {
+                    paramsFilters !== undefined) {
+                    for (let k = 0; k < numFilters; k++) {
                         temp_filters[k].dispose();
                     }
                 }
@@ -1510,13 +1484,13 @@ function Synth() {
                 } else if (instrumentName.slice(0, 4) === "file") {
                     tempSynth.start();
                 } else {
-		    try {
-			tempSynth.start();
-		    } catch (e) {
-			// Occasionally we see "Start time must be
-			// strictly greater than previous start time"
-			console.log(e);
-		    }
+                    try {
+                        tempSynth.start();
+                    } catch (e) {
+                        // Occasionally we see "Start time must be
+                        // strictly greater than previous start time"
+                        console.log(e);
+                    }
                 }
                 break;
             case 2: // voice sample

@@ -16,17 +16,17 @@
 // leading edge, instead of the trailing.
 
 function debounce(func, wait, immediate) {
-    var timeout;
+    let timeout;
     return function () {
-        var context = this,
+        let context = this,
             args = arguments;
 
-        var later = function () {
+        let later = function () {
             timeout = null;
             if (!immediate) func.apply(context, args);
         };
 
-        var callNow = immediate && !timeout;
+        let callNow = immediate && !timeout;
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
         if (callNow) func.apply(context, args);
@@ -35,11 +35,11 @@ function debounce(func, wait, immediate) {
 
 function getCookie(cname) {
     // from W3Schools
-    var name = cname + '=';
-    var decodedCookie = decodeURIComponent(document.cookie);
-    var ca = decodedCookie.split(';');
-    for (var i = 0; i < ca.length; i++) {
-        var c = ca[i];
+    let name = cname + '=';
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
         while (c.charAt(0) === ' ') {
             c = c.substring(1);
         }
@@ -53,9 +53,9 @@ function getCookie(cname) {
 
 function setCookie(cname, cvalue, exdays) {
     // from W3Schools
-    var d = new Date();
+    let d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-    var expires = 'expires=' + d.toUTCString();
+    let expires = 'expires=' + d.toUTCString();
     document.cookie = cname + '=' + cvalue + ';' + expires + ';path=/';
 };
 
@@ -68,7 +68,7 @@ function toggleSearch(on) {
 };
 
 function toggleText(id, a, b) {
-    var t = document.getElementById(id).innerHTML;
+    let t = document.getElementById(id).innerHTML;
     if (t.indexOf(a) !== -1) {
         document.getElementById(id).innerHTML = t.replace(a, b);
     } else {
@@ -77,7 +77,7 @@ function toggleText(id, a, b) {
 };
 
 function toggleExpandable(id, c) {
-    var d = document.getElementById(id).className;
+    let d = document.getElementById(id).className;
     if (d === c + ' open') {
         document.getElementById(id).className = c;
     } else {
@@ -88,9 +88,9 @@ function toggleExpandable(id, c) {
 function hideOnClickOutside(eles, other) {
     // if click not in id, hide
     const outsideClickListener = function (event) {
-        var path = event.path || (event.composedPath && event.composedPath()) || composedPath(event.target);
-        var ok = false;
-        for (var i = 0; i < eles.length; i++) {
+        let path = event.path || (event.composedPath && event.composedPath()) || composedPath(event.target);
+        let ok = false;
+        for (let i = 0; i < eles.length; i++) {
             if (path.indexOf(eles[i]) !== -1) {
                 ok = true;
             }
@@ -110,10 +110,10 @@ function hideOnClickOutside(eles, other) {
 };
 
 function updateCheckboxes(id) {
-    var elements = document.getElementById(id).querySelectorAll('input:checked');
-    var urlel = document.getElementById(id).querySelectorAll('input[type=text]')[0];
-    var url = urlel.getAttribute('data-originalurl');
-    for (var i = 0; i < elements.length; i++) {
+    let elements = document.getElementById(id).querySelectorAll('input:checked');
+    let urlel = document.getElementById(id).querySelectorAll('input[type=text]')[0];
+    let url = urlel.getAttribute('data-originalurl');
+    for (let i = 0; i < elements.length; i++) {
         url += '&' + elements[i].name + '=True';
     }
 

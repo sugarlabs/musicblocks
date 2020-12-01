@@ -94,86 +94,88 @@ const PIEMENUS = [
 ];
 
 // Define block instance objects and any methods that are intra-block.
-function Block(protoblock, blocks, overrideName) {
-    if (protoblock === null) {
-        console.debug("null protoblock sent to Block");
-        return;
+class Block {
+    constructor(protoblock, blocks, overrideName) {
+        if (protoblock === null) {
+            console.debug("null protoblock sent to Block");
+            return;
+        }
+
+        this.protoblock = protoblock;
+        this.name = protoblock.name;
+        this.overrideName = overrideName;
+        this.blocks = blocks;
+        this.collapsed = false; // Is this collapsible block collapsed?
+        this.inCollapsed = false; // Is this block in a collapsed stack?
+        this.trash = false; // Is this block in the trash?
+        this.loadComplete = false; // Has the block finished loading?
+        this.label = null; // Editable textview in DOM.
+        this.labelattr = null; // Editable textview in DOM.
+        this.text = null; // A dynamically generated text label on block itself.
+        this.value = null; // Value for number, text, and media blocks.
+        this.privateData = null; // A block may have some private data,
+        // e.g., nameboxes use this field to store
+        // the box name associated with the block.
+        this.image = protoblock.image; // The file path of the image.
+        this.imageBitmap = null;
+        this.controller = null; // Note blocks get a controller
+
+        // All blocks have at a container and least one bitmap.
+        this.container = null;
+        this.bounds = null;
+        this.width = 0;
+        this.height = 0;
+        this.hitHeight = 0;
+        this.bitmap = null;
+        this.highlightBitmap = null;
+        this.disconnectedBitmap = null;
+        this.disconnectedHighlightBitmap = null;
+
+        // The svg from which the bitmaps are generated
+        this.artwork = null;
+        this.collapseArtwork = null;
+
+        // Start and Action blocks has a collapse button
+        this.collapseButtonBitmap = null;
+        this.expandButtonBitmap = null;
+        this.collapseBlockBitmap = null;
+        this.highlightCollapseBlockBitmap = null;
+        this.collapseText = null;
+
+        this.size = 1; // Proto size is copied here.
+        this.docks = []; // Proto dock is copied here.
+        this.connections = [];
+
+        // Keep track of clamp count for blocks with clamps.
+        this.clampCount = [1, 1];
+        this.argClampSlots = [1];
+
+        // Some blocks have some post process after they are first loaded.
+        this.postProcess = null;
+        this.postProcessArg = this;
+
+        // Lock on label change
+        this._labelLock = false;
+        this._piemenuExitTime = null;
+        this._triggerLongPress = false;
+
+        // Don't trigger notes on top of each other.
+        this._triggerLock = false;
+
+        // If we update the parameters of a meter block, we have extra
+        // actions to attend to.
+        this._check_meter_block = null;
+
+        // Mouse position in events
+        this.original = { x: 0, y: 0 };
+        this.offset = { x: 0, y: 0 };
     }
-
-    this.protoblock = protoblock;
-    this.name = protoblock.name;
-    this.overrideName = overrideName;
-    this.blocks = blocks;
-    this.collapsed = false; // Is this collapsible block collapsed?
-    this.inCollapsed = false; // Is this block in a collapsed stack?
-    this.trash = false; // Is this block in the trash?
-    this.loadComplete = false; // Has the block finished loading?
-    this.label = null; // Editable textview in DOM.
-    this.labelattr = null; // Editable textview in DOM.
-    this.text = null; // A dynamically generated text label on block itself.
-    this.value = null; // Value for number, text, and media blocks.
-    this.privateData = null; // A block may have some private data,
-    // e.g., nameboxes use this field to store
-    // the box name associated with the block.
-    this.image = protoblock.image; // The file path of the image.
-    this.imageBitmap = null;
-    this.controller = null; // Note blocks get a controller
-
-    // All blocks have at a container and least one bitmap.
-    this.container = null;
-    this.bounds = null;
-    this.width = 0;
-    this.height = 0;
-    this.hitHeight = 0;
-    this.bitmap = null;
-    this.highlightBitmap = null;
-    this.disconnectedBitmap = null;
-    this.disconnectedHighlightBitmap = null;
-
-    // The svg from which the bitmaps are generated
-    this.artwork = null;
-    this.collapseArtwork = null;
-
-    // Start and Action blocks has a collapse button
-    this.collapseButtonBitmap = null;
-    this.expandButtonBitmap = null;
-    this.collapseBlockBitmap = null;
-    this.highlightCollapseBlockBitmap = null;
-    this.collapseText = null;
-
-    this.size = 1; // Proto size is copied here.
-    this.docks = []; // Proto dock is copied here.
-    this.connections = [];
-
-    // Keep track of clamp count for blocks with clamps.
-    this.clampCount = [1, 1];
-    this.argClampSlots = [1];
-
-    // Some blocks have some post process after they are first loaded.
-    this.postProcess = null;
-    this.postProcessArg = this;
-
-    // Lock on label change
-    this._labelLock = false;
-    this._piemenuExitTime = null;
-    this._triggerLongPress = false;
-
-    // Don't trigger notes on top of each other.
-    this._triggerLock = false;
-
-    // If we update the parameters of a meter block, we have extra
-    // actions to attend to.
-    this._check_meter_block = null;
-
-    // Mouse position in events
-    this.original = {x: 0, y: 0};
-    this.offset = {x: 0, y: 0};
 
     // Internal function for creating cache.
     // Includes workaround for a race condition.
-    this._createCache = function(callback, args) {
+    _createCache(callback, args) {
         let that = this;
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             let loopCount = 0;
 
             async function checkBounds(counter) {
@@ -193,8 +195,11 @@ function Block(protoblock, blocks, overrideName) {
                         checkBounds(loopCount + 1);
                     } else {
                         that.container.cache(
-                            that.bounds.x, that.bounds.y,
-                            that.bounds.width, that.bounds.height);
+                            that.bounds.x,
+                            that.bounds.y,
+                            that.bounds.width,
+                            that.bounds.height
+                        );
                         callback(that, args);
                         resolve();
                     }
@@ -204,13 +209,13 @@ function Block(protoblock, blocks, overrideName) {
             }
             checkBounds();
         });
-    };
+    }
 
     // Internal function for updating the cache.
     // Includes workaround for a race condition.
-    this.updateCache = function(counter) {
+    updateCache(counter) {
         let that = this;
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             let loopCount = 0;
 
             async function updateBounds(counter) {
@@ -237,9 +242,9 @@ function Block(protoblock, blocks, overrideName) {
             }
             updateBounds();
         });
-    };
+    }
 
-    this.ignore = function() {
+    ignore() {
         if (this.bitmap === null) {
             return true;
         }
@@ -260,16 +265,19 @@ function Block(protoblock, blocks, overrideName) {
             return true;
         }
 
-        if (this.disconnectedBitmap !== null &&
-            this.disconnectedHighlightBitmap !== null) {
-            if (!this.bitmap.visible &&
+        if (this.disconnectedBitmap !== null && this.disconnectedHighlightBitmap !== null) {
+            if (
+                !this.bitmap.visible &&
                 !this.highlightBitmap.visible &&
                 !this.disconnectedBitmap.visible &&
-                !this.disconnectedHighlightBitmap.visible) {
+                !this.disconnectedHighlightBitmap.visible
+            ) {
                 if (this.collapseBlockBitmap === null) {
                     return true;
-                } else if (!this.collapseBlockBitmap.visible &&
-                           !this.highlightCollapseBlockBitmap.visible) {
+                } else if (
+                    !this.collapseBlockBitmap.visible &&
+                    !this.highlightCollapseBlockBitmap.visible
+                ) {
                     return true;
                 }
             }
@@ -277,43 +285,44 @@ function Block(protoblock, blocks, overrideName) {
             if (!this.bitmap.visible && !this.highlightBitmap.visible) {
                 if (this.collapseBlockBitmap === null) {
                     return true;
-                } else if (!this.collapseBlockBitmap.visible &&
-                           !this.highlightCollapseBlockBitmap.visible) {
+                } else if (
+                    !this.collapseBlockBitmap.visible &&
+                    !this.highlightCollapseBlockBitmap.visible
+                ) {
                     return true;
                 }
             }
         }
 
         return false;
-    };
+    }
 
-    this.offScreen = function(boundary) {
-        return (!this.trash && boundary.offScreen(
-            this.container.x, this.container.y));
-    };
+    offScreen(boundary) {
+        return !this.trash && boundary.offScreen(this.container.x, this.container.y);
+    }
 
-    this.copySize = function() {
+    copySize() {
         this.size = this.protoblock.size;
-    };
+    }
 
-    this.getInfo = function() {
+    getInfo() {
         return this.name + " block";
-    };
+    }
 
-    this.isCollapsible = function() {
+    isCollapsible() {
         return COLLAPSIBLES.indexOf(this.name) !== -1;
-    };
+    }
 
-    this.isInlineCollapsible = function() {
+    isInlineCollapsible() {
         return INLINECOLLAPSIBLES.indexOf(this.name) !== -1;
-    };
+    }
 
-    /*
+    /**
      * Show the highlight artwork
      * @return{void}
      * @public
      */
-    this.highlight = function() {
+    highlight() {
         if (this.trash) {
             return;
         }
@@ -401,14 +410,14 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this.container.updateCache();
-    };
+    }
 
-    /*
+    /**
      * Remove highlight from block
      * @return{void}
      * @public
      */
-    this.unhighlight = function() {
+    unhighlight() {
         if (this.trash) {
             return;
         }
@@ -483,80 +492,79 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this.container.updateCache();
-    };
+    }
 
-    /*
+    /**
      * Resize and update number of slots in argClamp
      * @param-slotList how many slots to use
      * @return{void}
      * @public
      */
-    this.updateArgSlots = function(slotList) {
+    updateArgSlots(slotList) {
         this.argClampSlots = slotList;
         this._newArtwork(0);
         this.regenerateArtwork(false);
-    };
+    }
 
-    /*
+    /**
      * Resize an expandable block.
      * @param-clamp which clamp to update (ifthenelse has 2 clamps)
      * @param-plusMinus how many slots to add or subtract
      * @return{void}
      * @public
      */
-    this.updateSlots = function(clamp, plusMinus) {
+    updateSlots(clamp, plusMinus) {
         this.clampCount[clamp] += plusMinus;
         this._newArtwork(plusMinus);
         this.regenerateArtwork(false);
-    };
+    }
 
-    /*
+    /**
      * If the block scale changes, we need to regenerate the
      * artwork and recalculate the hitarea.
      * @param-scale new block scale
      * @return{void}
      * @public
      */
-    this.resize = function(scale) {
-        let that = this;
-
-        /*
-         * After the new artwork is created, this function is used to add
-         * decorations.
-         * @param-that = this
+    resize(scale) {
+        /**
+         * After the new artwork is created, this function is used to add decorations.
          * @return{void}
          * @public
          */
-        this.postProcess = function(that) {
-            if (that.imageBitmap !== null) {
-                that._positionMedia(that.imageBitmap,
-                                    that.imageBitmap.image.width,
-                                    that.imageBitmap.image.height, scale);
-                z = that.container.children.length - 1;
-                that.container.setChildIndex(that.imageBitmap, z);
+        this.postProcess = () => {
+            if (this.imageBitmap !== null) {
+                this._positionMedia(
+                    this.imageBitmap,
+                    this.imageBitmap.image.width,
+                    this.imageBitmap.image.height,
+                    scale
+                );
+                const zIndex = this.container.children.length - 1;
+                this.container.setChildIndex(this.imageBitmap, zIndex);
             }
 
-            if (that.name === "start" || that.name === "drum") {
+            if (this.name === "start" || this.name === "drum") {
                 // Rescale the decoration on the start blocks.
-                for (let t = 0; t < that.blocks.turtles.turtleList.length; t++) {
-                    if (that.blocks.turtles.turtleList[t].startBlock === that) {
-                        that.blocks.turtles.turtleList[t].resizeDecoration(
-                            scale, that.bitmap.image.width);
-                        that._ensureDecorationOnTop();
+                for (let t = 0; t < this.blocks.turtles.turtleList.length; t++) {
+                    if (this.blocks.turtles.turtleList[t].startBlock === this) {
+                        this.blocks.turtles.turtleList[t].resizeDecoration(
+                            scale,
+                            this.bitmap.image.width
+                        );
+                        this._ensureDecorationOnTop();
                         break;
                     }
                 }
-            } else if (that.isCollapsible()) {
-                that._ensureDecorationOnTop();
+            } else if (this.isCollapsible()) {
+                this._ensureDecorationOnTop();
             }
 
-            that.updateCache();
-            that._calculateBlockHitArea();
+            this.updateCache();
+            this._calculateBlockHitArea();
 
             // If it is in the trash, make sure it remains hidden.
-            if (that.trash) {
-                that.hide();
-            }
+            if (this.trash) this.hide();
         };
 
         this.postProcessArg = this;
@@ -572,20 +580,18 @@ function Block(protoblock, blocks, overrideName) {
         if (this.container !== null) {
             that = this;
 
-            /*
+            /**
              * After new buttons are creates, they are cached and a
              * new hit are is calculated
              * @param-that = this = container
              * @return{void}
              * @private
              */
-            let _postProcess = function(that) {
-                that.collapseButtonBitmap.scaleX =
-                    that.collapseButtonBitmap.scaleY =
-                    that.collapseButtonBitmap.scale = scale / 3;
-                that.expandButtonBitmap.scaleX =
-                    that.expandButtonBitmap.scaleY =
-                    that.expandButtonBitmap.scale = scale / 3;
+            let _postProcess = function (that) {
+                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
+                    scale / 3;
+                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale =
+                    scale / 3;
                 that.updateCache();
                 that._calculateBlockHitArea();
             };
@@ -597,15 +603,15 @@ function Block(protoblock, blocks, overrideName) {
                 this._positionCollapseLabel(scale);
             }
         }
-    };
+    }
 
-    /*
+    /**
      * Create new artwork for a block
      * @param-plusMinus specifies how much a clamp block expands or contracts
      * @return{void}
      * @private
      */
-    this._newArtwork = function(plusMinus) {
+    _newArtwork(plusMinus) {
         let proto, obj;
         if (this.isInlineCollapsible()) {
             proto = new ProtoBlock("collapse-note");
@@ -628,76 +634,72 @@ function Block(protoblock, blocks, overrideName) {
             this.collapseArtwork = obj[0];
             obj = this.protoblock.generator(this.clampCount[0]);
         } else if (this.name === "ifthenelse") {
-            obj = this.protoblock.generator(this.clampCount[0],
-                                            this.clampCount[1]);
+            obj = this.protoblock.generator(this.clampCount[0], this.clampCount[1]);
         } else if (this.protoblock.style === "clamp") {
             obj = this.protoblock.generator(this.clampCount[0]);
         } else if (this.protoblock.style === "argflowclamp") {
             obj = this.protoblock.generator(this.clampCount[0]);
         } else {
             switch (this.name) {
-            case "equal":
-            case "greater":
-            case "less":
-                obj = this.protoblock.generator(this.clampCount[0]);
-                break;
-            case "makeblock":
-            case "calcArg":
-            case "doArg":
-            case "namedcalcArg":
-            case "nameddoArg":
-                obj = this.protoblock.generator(this.argClampSlots);
-                this.size = 2;
-                for (let i = 0; i < this.argClampSlots.length; i++) {
-                    this.size += this.argClampSlots[i];
-                }
-                this.docks = [];
-                this.docks.push([obj[1][0][0], obj[1][0][1],
-                                 this.protoblock.dockTypes[0]]);
-                break;
-            default:
-                if (this.isArgBlock()) {
+                case "equal":
+                case "greater":
+                case "less":
                     obj = this.protoblock.generator(this.clampCount[0]);
-                } else if (this.isTwoArgBlock()) {
-                    obj = this.protoblock.generator(this.clampCount[0]);
-                } else {
-                    obj = this.protoblock.generator();
-                }
-                this.size += plusMinus;
-                break;
+                    break;
+                case "makeblock":
+                case "calcArg":
+                case "doArg":
+                case "namedcalcArg":
+                case "nameddoArg":
+                    obj = this.protoblock.generator(this.argClampSlots);
+                    this.size = 2;
+                    for (let i = 0; i < this.argClampSlots.length; i++) {
+                        this.size += this.argClampSlots[i];
+                    }
+                    this.docks = [];
+                    this.docks.push([obj[1][0][0], obj[1][0][1], this.protoblock.dockTypes[0]]);
+                    break;
+                default:
+                    if (this.isArgBlock()) {
+                        obj = this.protoblock.generator(this.clampCount[0]);
+                    } else if (this.isTwoArgBlock()) {
+                        obj = this.protoblock.generator(this.clampCount[0]);
+                    } else {
+                        obj = this.protoblock.generator();
+                    }
+                    this.size += plusMinus;
+                    break;
             }
         }
 
         switch (this.name) {
-        case "nameddoArg":
-            for (let i = 1; i < obj[1].length - 1; i++) {
-                this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
-            }
-            this.docks.push([obj[1][2][0], obj[1][2][1], "in"]);
-            break;
-        case "namedcalcArg":
-            for (let i = 1; i < obj[1].length; i++) {
-                this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
-            }
-            break;
-        case "doArg":
-            this.docks.push([obj[1][1][0], obj[1][1][1],
-                             this.protoblock.dockTypes[1]]);
-            for (let i = 2; i < obj[1].length - 1; i++) {
-                this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
-            }
-            this.docks.push([obj[1][3][0], obj[1][3][1], "in"]);
-            break;
-        case "makeblock":
-        case "calcArg":
-            this.docks.push([obj[1][1][0], obj[1][1][1],
-                             this.protoblock.dockTypes[1]]);
-            for (let i = 2; i < obj[1].length; i++) {
-                this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
-            }
-            break;
-        default:
-            break;
+            case "nameddoArg":
+                for (let i = 1; i < obj[1].length - 1; i++) {
+                    this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
+                }
+                this.docks.push([obj[1][2][0], obj[1][2][1], "in"]);
+                break;
+            case "namedcalcArg":
+                for (let i = 1; i < obj[1].length; i++) {
+                    this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
+                }
+                break;
+            case "doArg":
+                this.docks.push([obj[1][1][0], obj[1][1][1], this.protoblock.dockTypes[1]]);
+                for (let i = 2; i < obj[1].length - 1; i++) {
+                    this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
+                }
+                this.docks.push([obj[1][3][0], obj[1][3][1], "in"]);
+                break;
+            case "makeblock":
+            case "calcArg":
+                this.docks.push([obj[1][1][0], obj[1][1][1], this.protoblock.dockTypes[1]]);
+                for (let i = 2; i < obj[1].length; i++) {
+                    this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
+                }
+                break;
+            default:
+                break;
         }
 
         // Save new artwork and dock positions.
@@ -710,9 +712,9 @@ function Block(protoblock, blocks, overrideName) {
         this.width = obj[2];
         this.height = obj[3];
         this.hitHeight = obj[4];
-    };
+    }
 
-    /*
+    /**
      * Load any artwork associated with the block and create any
      * extra parts. Image components are loaded asynchronously so
      * most the work happens in callbacks.
@@ -723,28 +725,27 @@ function Block(protoblock, blocks, overrideName) {
      * @return{void}
      * @public
      */
-    this.imageLoad = function() {
+    imageLoad() {
         let fontSize = 10 * this.protoblock.scale;
-        this.text = new createjs.Text("", fontSize + "px Sans",
-                                      platformColor.blockText);
+        this.text = new createjs.Text("", fontSize + "px Sans", platformColor.blockText);
         this.generateArtwork(true, []);
-    };
+    }
 
-    /*
+    /**
      * Add an image to a block
      * @return{void}
      * @private
      */
-    this._addImage = function() {
+    _addImage() {
         let image = new Image();
         let that = this;
 
-        /*
+        /**
          * The loader
          * @return{void}
          * @private
          */
-        image.onload = function() {
+        image.onload = function () {
             let bitmap = new createjs.Bitmap(image);
             // Don't override the image on a media block.
             if (that.name === "media") {
@@ -756,8 +757,7 @@ function Block(protoblock, blocks, overrideName) {
             }
             bitmap.name = "media";
             that.container.addChild(bitmap);
-            that._positionMedia(bitmap, image.width, image.height,
-                                that.protoblock.scale);
+            that._positionMedia(bitmap, image.width, image.height, that.protoblock.scale);
             /*
             that._positionMedia(
                 bitmap,
@@ -771,16 +771,16 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         image.src = this.image;
-    };
+    }
 
-    /*
+    /**
      * Sometimes (in the case of namedboxes and nameddos) we need
      * to regenerate the artwork associated with a block.
      * @param-is the collapse artwork also generated?
      * @return{void}
      * @public
      */
-    this.regenerateArtwork = function(collapse) {
+    regenerateArtwork(collapse) {
         // First we need to remove the old artwork.
         if (this.bitmap != null) {
             this.container.removeChild(this.bitmap);
@@ -807,22 +807,22 @@ function Block(protoblock, blocks, overrideName) {
 
         // Then we generate new artwork.
         this.generateArtwork(false);
-    };
+    }
 
-    /*
+    /**
      * Generate the artwork for a block.
      * @param-the first time, add the event handlers
      * @return{void}
      * @public
      */
-    this.generateArtwork = function(firstTime) {
+    generateArtwork(firstTime) {
         // Get the block labels from the protoblock.
         let that = this;
         let thisBlock = this.blocks.blockList.indexOf(this);
         let block_label = "";
 
         // Create the highlight bitmap for the block.
-        let __processHighlightBitmap = function(bitmap, that) {
+        let __processHighlightBitmap = function (bitmap, that) {
             if (that.highlightBitmap != null) {
                 that.container.removeChild(that.highlightBitmap);
             }
@@ -844,7 +844,7 @@ function Block(protoblock, blocks, overrideName) {
                 that.container.uncache();
             }
 
-            __callback = function(that, firstTime) {
+            const __callback = function (that, firstTime) {
                 that.blocks.refreshCanvas();
                 let thisBlock = that.blocks.blockList.indexOf(that);
 
@@ -884,7 +884,7 @@ function Block(protoblock, blocks, overrideName) {
         };
 
         // Create the disconnect highlight bitmap for the block.
-        let __processDisconnectedHighlightBitmap = function(bitmap, that) {
+        let __processDisconnectedHighlightBitmap = function (bitmap, that) {
             if (that.disconnectedHighlightBitmap != null) {
                 that.container.removeChild(that.disconnectedHighlightBitmap);
             }
@@ -893,8 +893,7 @@ function Block(protoblock, blocks, overrideName) {
             that.container.addChild(that.disconnectedHighlightBitmap);
             that.disconnectedHighlightBitmap.x = 0;
             that.disconnectedHighlightBitmap.y = 0;
-            that.disconnectedHighlightBitmap.name =
-                "bmp_disconnect_hightlight_" + thisBlock;
+            that.disconnectedHighlightBitmap.name = "bmp_disconnect_hightlight_" + thisBlock;
             if (!that.blocks.logo.runningLilypond) {
                 that.disconnectedHighlightBitmap.cursor = "pointer";
             }
@@ -908,23 +907,20 @@ function Block(protoblock, blocks, overrideName) {
                     .replace("block_label", safeSVG(block_label));
             } else {
                 artwork = that.artwork
-                    .replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[
-                        that.protoblock.palette.name])
-                    .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[
-                        that.protoblock.palette.name])
+                    .replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name])
+                    .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
                     .replace("block_label", safeSVG(block_label));
             }
 
             for (let i = 1; i < that.protoblock.staticLabels.length; i++) {
-                artwork = artwork.replace("arg_label_" + i,
-                                          that.protoblock.staticLabels[i]);
+                artwork = artwork.replace("arg_label_" + i, that.protoblock.staticLabels[i]);
             }
 
             _blockMakeBitmap(artwork, __processHighlightBitmap, that);
         };
 
         // Create the disconnect bitmap for the block.
-        let __processDisconnectedBitmap = function(bitmap, that) {
+        let __processDisconnectedBitmap = function (bitmap, that) {
             if (that.disconnectedBitmap != null) {
                 that.container.removeChild(that.disconnectedBitmap);
             }
@@ -947,24 +943,23 @@ function Block(protoblock, blocks, overrideName) {
                     .replace("block_label", safeSVG(block_label));
             } else {
                 artwork = that.artwork
-                    .replace(/fill_color/g, platformColor.paletteColors[
-                        that.protoblock.palette.name][3])
-                    .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[
-                        that.protoblock.palette.name])
+                    .replace(
+                        /fill_color/g,
+                        platformColor.paletteColors[that.protoblock.palette.name][3]
+                    )
+                    .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
                     .replace("block_label", safeSVG(block_label));
             }
 
             for (let i = 1; i < that.protoblock.staticLabels.length; i++) {
-                artwork = artwork.replace("arg_label_" + i,
-                                          that.protoblock.staticLabels[i]);
+                artwork = artwork.replace("arg_label_" + i, that.protoblock.staticLabels[i]);
             }
 
-            _blockMakeBitmap(artwork, __processDisconnectedHighlightBitmap,
-                             that);
+            _blockMakeBitmap(artwork, __processDisconnectedHighlightBitmap, that);
         };
 
         // Create the bitmap for the block.
-        let __processBitmap = function(bitmap, that) {
+        let __processBitmap = function (bitmap, that) {
             if (that.bitmap != null) {
                 that.container.removeChild(that.bitmap);
             }
@@ -985,22 +980,28 @@ function Block(protoblock, blocks, overrideName) {
             } else {
                 artwork = that.artwork
                     .replace(/fill_color/g, platformColor.disconnected)
-                    .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[
-                        that.protoblock.palette.name])
+                    .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
                     .replace("block_label", safeSVG(block_label));
             }
 
             for (let i = 1; i < that.protoblock.staticLabels.length; i++) {
-                artwork = artwork.replace("arg_label_" + i,
-                                          that.protoblock.staticLabels[i]);
+                artwork = artwork.replace("arg_label_" + i, that.protoblock.staticLabels[i]);
             }
 
             _blockMakeBitmap(artwork, __processDisconnectedBitmap, that);
         };
 
         if (this.overrideName && this.name !== "outputtools") {
-            if (["namedbox", "storein2", "nameddo", "nameddoArg", "namedcalc",
-                 "namedcalcArg"].indexOf(this.name) !== -1) {
+            if (
+                [
+                    "namedbox",
+                    "storein2",
+                    "nameddo",
+                    "nameddoArg",
+                    "namedcalc",
+                    "namedcalcArg"
+                ].indexOf(this.name) !== -1
+            ) {
                 block_label = this.overrideName;
                 if (getTextWidth(block_label, "bold 20pt Sans") > TEXTWIDTH) {
                     block_label = block_label.substr(0, STRINGLEN) + "...";
@@ -1008,10 +1009,7 @@ function Block(protoblock, blocks, overrideName) {
             } else {
                 block_label = this.overrideName;
             }
-        } else if (
-            this.protoblock.staticLabels.length > 0 &&
-            !this.protoblock.image
-        ) {
+        } else if (this.protoblock.staticLabels.length > 0 && !this.protoblock.image) {
             // Label should be defined inside _().
             block_label = this.protoblock.staticLabels[0];
         }
@@ -1027,8 +1025,7 @@ function Block(protoblock, blocks, overrideName) {
             let obj = this.protoblock.generator();
             this.artwork = obj[0];
             for (let i = 0; i < obj[1].length; i++) {
-                this.docks.push([obj[1][i][0], obj[1][i][1],
-                                 this.protoblock.dockTypes[i]]);
+                this.docks.push([obj[1][i][0], obj[1][i][1], this.protoblock.dockTypes[i]]);
             }
 
             this.width = obj[2];
@@ -1043,99 +1040,95 @@ function Block(protoblock, blocks, overrideName) {
                 .replace("block_label", safeSVG(block_label));
         } else {
             artwork = this.artwork
-                .replace(/fill_color/g, PALETTEFILLCOLORS[
-                    this.protoblock.palette.name])
-                .replace(/stroke_color/g, PALETTESTROKECOLORS[
-                    this.protoblock.palette.name])
+                .replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name])
+                .replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name])
                 .replace("block_label", safeSVG(block_label));
         }
 
         for (let i = 1; i < this.protoblock.staticLabels.length; i++) {
-            artwork = artwork.replace("arg_label_" + i,
-                                      this.protoblock.staticLabels[i]);
+            artwork = artwork.replace("arg_label_" + i, this.protoblock.staticLabels[i]);
         }
 
         that.blocks.blockArt[that.blocks.blockList.indexOf(that)] = artwork;
 
         _blockMakeBitmap(artwork, __processBitmap, this);
-    };
+    }
 
-    /*
+    /**
      * After the block artwork has loaded, update labels, etc.
      * @return{void}
      * @private
      */
-    this._finishImageLoad = function() {
+    _finishImageLoad() {
         let thisBlock = this.blocks.blockList.indexOf(this);
         let proto, obj, label, attr;
         // Value blocks get a modifiable text label.
         if (SPECIALINPUTS.indexOf(this.name) !== -1) {
             if (this.value == null) {
                 switch (this.name) {
-                case "text":
-                    this.value = "---";
-                    break;
-                case "solfege":
-                case "eastindiansolfege":
-                    this.value = "sol";
-                    break;
-                case "scaledegree2":
-                    this.value = "5";
-                    break;
-                case "customNote":
-                    let len = this.blocks.logo.synth.startingPitch.length;
-                    this.value =
-                        this.blocks.logo.synth.startingPitch.substring(
-                            0, len - 1) + "(+0)";
-                    break;
-                case "notename":
-                    this.value = "G";
-                    break;
-                case "rest":
-                    this.value = "rest";
-                    break;
-                case "boolean":
-                    this.value = true;
-                    break;
-                case "number":
-                    this.value = NUMBERBLOCKDEFAULT;
-                    break;
-                case "modename":
-                    this.value = DEFAULTMODE;
-                    break;
-                case "accidentalname":
-                    this.value = DEFAULTACCIDENTAL;
-                    break;
-                case "intervalname":
-                    this.value = DEFAULTINTERVAL;
-                    break;
-                case "invertmode":
-                    this.value = DEFAULTINVERT;
-                    break;
-                case "voicename":
-                    this.value = DEFAULTVOICE;
-                    break;
-                case "noisename":
-                    this.value = DEFAULTNOISE;
-                    break;
-                case "drumname":
-                    this.value = DEFAULTDRUM;
-                    break;
-                case "effectsname":
-                    this.value = DEFAULTEFFECT;
-                    break;
-                case "filtertype":
-                    this.value = DEFAULTFILTERTYPE;
-                    break;
-                case "oscillatortype":
-                    this.value = DEFAULTOSCILLATORTYPE;
-                    break;
-                case "temperamentname":
-                    this.value = "equal";
-                    break;
-                case "grid":
-                    this.value = "Cartesian";
-                    break;
+                    case "text":
+                        this.value = "---";
+                        break;
+                    case "solfege":
+                    case "eastindiansolfege":
+                        this.value = "sol";
+                        break;
+                    case "scaledegree2":
+                        this.value = "5";
+                        break;
+                    case "customNote":
+                        let len = this.blocks.logo.synth.startingPitch.length;
+                        this.value =
+                            this.blocks.logo.synth.startingPitch.substring(0, len - 1) + "(+0)";
+                        break;
+                    case "notename":
+                        this.value = "G";
+                        break;
+                    case "rest":
+                        this.value = "rest";
+                        break;
+                    case "boolean":
+                        this.value = true;
+                        break;
+                    case "number":
+                        this.value = NUMBERBLOCKDEFAULT;
+                        break;
+                    case "modename":
+                        this.value = DEFAULTMODE;
+                        break;
+                    case "accidentalname":
+                        this.value = DEFAULTACCIDENTAL;
+                        break;
+                    case "intervalname":
+                        this.value = DEFAULTINTERVAL;
+                        break;
+                    case "invertmode":
+                        this.value = DEFAULTINVERT;
+                        break;
+                    case "voicename":
+                        this.value = DEFAULTVOICE;
+                        break;
+                    case "noisename":
+                        this.value = DEFAULTNOISE;
+                        break;
+                    case "drumname":
+                        this.value = DEFAULTDRUM;
+                        break;
+                    case "effectsname":
+                        this.value = DEFAULTEFFECT;
+                        break;
+                    case "filtertype":
+                        this.value = DEFAULTFILTERTYPE;
+                        break;
+                    case "oscillatortype":
+                        this.value = DEFAULTOSCILLATORTYPE;
+                        break;
+                    case "temperamentname":
+                        this.value = "equal";
+                        break;
+                    case "grid":
+                        this.value = "Cartesian";
+                        break;
                 }
             }
 
@@ -1155,12 +1148,12 @@ function Block(protoblock, blocks, overrideName) {
                 if (attr !== "♮") {
                     label += attr;
                 }
-            } else if(this.name === "scaledegree2") {
+            } else if (this.name === "scaledegree2") {
                 obj = splitScaleDegree(this.value);
                 label = obj[0];
                 attr = obj[1];
 
-                if(attr !== "♮") {
+                if (attr !== "♮") {
                     label += attr;
                 }
             } else if (this.name === "drumname") {
@@ -1177,8 +1170,10 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
 
-            if (WIDENAMES.indexOf(this.name) === -1 &&
-                getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+            if (
+                WIDENAMES.indexOf(this.name) === -1 &&
+                getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH
+            ) {
                 label = label.substr(0, STRINGLEN) + "...";
             }
 
@@ -1222,7 +1217,7 @@ function Block(protoblock, blocks, overrideName) {
             obj = proto.generator();
             this.collapseArtwork = obj[0];
 
-            let postProcess = function(that) {
+            let postProcess = function (that) {
                 that.loadComplete = true;
 
                 if (that.postProcess !== null) {
@@ -1237,24 +1232,24 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this.blocks.refreshCanvas();
-    };
+    }
 
-    /*
+    /**
      * Generate the collapsed artwork
      * @param postProcess = a process to run after the artwork is generated
      * @return{void}
      * @private
      */
-    this._generateCollapseArtwork = function(postProcess) {
+    _generateCollapseArtwork(postProcess) {
         let that = this;
         let thisBlock = this.blocks.blockList.indexOf(this);
 
-        /*
+        /**
          * Run the postprocess function after the artwork is loaded
          * @return{void}
          * @private
          */
-        let __finishCollapse = function(that) {
+        let __finishCollapse = function (that) {
             if (postProcess !== null) {
                 postProcess(that);
             }
@@ -1268,19 +1263,17 @@ function Block(protoblock, blocks, overrideName) {
             }
         };
 
-        /*
+        /**
          * Create the artwork for the collapse buttons
          * @param - that = this
          * @return{void}
          * @private
          */
-        let __processCollapseButton = function(that) {
+        let __processCollapseButton = function (that) {
             let image = new Image();
-            image.onload = function() {
+            image.onload = function () {
                 that.collapseButtonBitmap = new createjs.Bitmap(image);
-                that.collapseButtonBitmap.scaleX =
-                    that.collapseButtonBitmap.scaleY =
-                    that.collapseButtonBitmap.scale =
+                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
                     that.protoblock.scale / 3;
                 that.container.addChild(that.collapseButtonBitmap);
                 that.collapseButtonBitmap.x = 2 * that.protoblock.scale;
@@ -1300,19 +1293,17 @@ function Block(protoblock, blocks, overrideName) {
                 window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)));
         };
 
-        /*
+        /**
          * Create the artwork for the expand buttons
          * @param - that = this
          * @return{void}
          * @private
          */
-        let __processExpandButton = function(that) {
+        let __processExpandButton = function (that) {
             let image = new Image();
-            image.onload = function() {
+            image.onload = function () {
                 that.expandButtonBitmap = new createjs.Bitmap(image);
-                that.expandButtonBitmap.scaleX =
-                    that.expandButtonBitmap.scaleY =
-                    that.expandButtonBitmap.scale =
+                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale =
                     that.protoblock.scale / 3;
 
                 that.container.addChild(that.expandButtonBitmap);
@@ -1333,117 +1324,154 @@ function Block(protoblock, blocks, overrideName) {
                 window.btoa(unescape(encodeURIComponent(EXPANDBUTTON)));
         };
 
-        /*
+        /**
          * Processing the highlighted collapsed image
          * @param-bitmap = highlight artwork
          * @param-that = this
          * @return{void}
          * @private
          */
-        let __processHighlightCollapseBitmap = function(bitmap, that) {
+        let __processHighlightCollapseBitmap = function (bitmap, that) {
             that.highlightCollapseBlockBitmap = bitmap;
-            that.highlightCollapseBlockBitmap.name =
-                "highlight_collapse_" + thisBlock;
+            that.highlightCollapseBlockBitmap.name = "highlight_collapse_" + thisBlock;
             that.container.addChild(that.highlightCollapseBlockBitmap);
             that.highlightCollapseBlockBitmap.visible = false;
 
             if (that.collapseText === null) {
                 let fontSize = 10 * that.protoblock.scale;
                 switch (that.name) {
-                case "action":
-                    that.collapseText = new createjs.Text(
-                        _("action"), fontSize + "px Sans",
-                        platformColor.blockText);
-                    break;
-                case "start":
-                    that.collapseText = new createjs.Text(
-                        _("start"), fontSize + "px Sans",
-                        platformColor.blockText);
-                    break;
-                case "matrix":
-                    that.collapseText = new createjs.Text(
-                        _("matrix"), fontSize + "px Sans",
-                        platformColor.blockText);
-                    break;
-                case "status":
-                    that.collapseText = new createjs.Text(
-                        _("status"), fontSize + "px Sans",
-                        platformColor.blockText);
-                    break;
-                case "pitchdrummatrix":
-                    that.collapseText = new createjs.Text(
-                        _("drum mapper"), fontSize + "px Sans",
-                        platformColor.blockText);
-                    break;
-                case "rhythmruler":
-                    that.collapseText = new createjs.Text(
-                        _("ruler"), fontSize + "px Sans",
-                        platformColor.blockText);
-                    break;
-                case "timbre":
-                    that.collapseText = new createjs.Text(
-                        _("timbre"), fontSize + "px Sans",
-                        platformColor.blockText);
-                    break;
-                case "pitchstaircase":
-                    that.collapseText = new createjs.Text(
-                        _("stair"), fontSize + "px Sans",
-                        platformColor.blockText);
-                    break;
-                case "tempo":
-                    that.collapseText = new createjs.Text(
-                        _("tempo"), fontSize + "px Sans",
-                        platformColor.blockText);
-                    break;
-                case "modewidget":
-                    that.collapseText = new createjs.Text(
-                        _("mode"), fontSize + "px Sans",
-                        platformColor.blockText);
-                    break;
-                case "pitchslider":
-                    that.collapseText = new createjs.Text(
-                        _("slider"), fontSize + "px Sans",
-                        platformColor.blockText);
-                    break;
-                case "musickeyboard":
-                    that.collapseText = new createjs.Text(
-                        _("keyboard"), fontSize + "px Sans",
-                        platformColor.blockText);
-                    break;
-                case "drum":
-                    that.collapseText = new createjs.Text(
-                        _("drum"), fontSize + "px Sans",
-                        platformColor.blockText);
-                    break;
-                case "rhythmruler2":
-                    that.collapseText = new createjs.Text(
-                        _("rhythm maker"), fontSize + "px Sans",
-                        platformColor.blockText);
-                    break;
-                case "newnote":
-                    that.collapseText = new createjs.Text(
-                        _("note value"), fontSize + "px Sans",
-                        platformColor.blockText);
-                    break;
-                case "interval":
-                    that.collapseText = new createjs.Text(
-                        _("scalar interval"), fontSize + "px Sans",
-                        platformColor.blockText);
-                    break;
-                case "osctime":
-                    that.collapseText = new createjs.Text(
-                        _("milliseconds"), fontSize + "px Sans",
-                        platformColor.blockText);
-                    break;
-                case "temperament":
-                    that.collapseText = new createjs.Text(
-                        _("temperament"), fontSize + "px Sans",
-                        platformColor.blockText);
-                    break;
-                default:
-                    that.collapseText = new createjs.Text(
-                        "foobar", fontSize + "px Sans",
-                        platformColor.blockText);
+                    case "action":
+                        that.collapseText = new createjs.Text(
+                            _("action"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
+                    case "start":
+                        that.collapseText = new createjs.Text(
+                            _("start"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
+                    case "matrix":
+                        that.collapseText = new createjs.Text(
+                            _("matrix"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
+                    case "status":
+                        that.collapseText = new createjs.Text(
+                            _("status"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
+                    case "pitchdrummatrix":
+                        that.collapseText = new createjs.Text(
+                            _("drum mapper"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
+                    case "rhythmruler":
+                        that.collapseText = new createjs.Text(
+                            _("ruler"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
+                    case "timbre":
+                        that.collapseText = new createjs.Text(
+                            _("timbre"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
+                    case "pitchstaircase":
+                        that.collapseText = new createjs.Text(
+                            _("stair"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
+                    case "tempo":
+                        that.collapseText = new createjs.Text(
+                            _("tempo"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
+                    case "modewidget":
+                        that.collapseText = new createjs.Text(
+                            _("mode"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
+                    case "pitchslider":
+                        that.collapseText = new createjs.Text(
+                            _("slider"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
+                    case "musickeyboard":
+                        that.collapseText = new createjs.Text(
+                            _("keyboard"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
+                    case "drum":
+                        that.collapseText = new createjs.Text(
+                            _("drum"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
+                    case "rhythmruler2":
+                        that.collapseText = new createjs.Text(
+                            _("rhythm maker"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
+                    case "newnote":
+                        that.collapseText = new createjs.Text(
+                            _("note value"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
+                    case "interval":
+                        that.collapseText = new createjs.Text(
+                            _("scalar interval"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
+                    case "osctime":
+                        that.collapseText = new createjs.Text(
+                            _("milliseconds"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
+                    case "temperament":
+                        that.collapseText = new createjs.Text(
+                            _("temperament"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
+                    default:
+                        that.collapseText = new createjs.Text(
+                            "foobar",
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
                 }
 
                 that.collapseText.textAlign = "left";
@@ -1456,25 +1484,22 @@ function Block(protoblock, blocks, overrideName) {
             that._ensureDecorationOnTop();
 
             // Save the collapsed block artwork for export.
-            that.blocks.blockCollapseArt[that.blocks.blockList.indexOf(that)] =
-                that.collapseArtwork
-                .replace(/fill_color/g, PALETTEFILLCOLORS[
-                    that.protoblock.palette.name])
-                .replace(/stroke_color/g, PALETTESTROKECOLORS[
-                    that.protoblock.palette.name])
+            that.blocks.blockCollapseArt[that.blocks.blockList.indexOf(that)] = that.collapseArtwork
+                .replace(/fill_color/g, PALETTEFILLCOLORS[that.protoblock.palette.name])
+                .replace(/stroke_color/g, PALETTESTROKECOLORS[that.protoblock.palette.name])
                 .replace("block_label", safeSVG(that.collapseText.text));
 
             __processExpandButton(that);
         };
 
-        /*
+        /**
          * Processing the collapsed block
          * @param-bitmap = block artwork
          * @param-that = this
          * @return{void}
          * @private
          */
-        let __processCollapseBitmap = function(bitmap, that) {
+        let __processCollapseBitmap = function (bitmap, that) {
             that.collapseBlockBitmap = bitmap;
             that.collapseBlockBitmap.name = "collapse_" + thisBlock;
             that.container.addChild(that.collapseBlockBitmap);
@@ -1484,29 +1509,27 @@ function Block(protoblock, blocks, overrideName) {
             let artwork = that.collapseArtwork;
             _blockMakeBitmap(
                 artwork
-                    .replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[
-                        that.protoblock.palette.name])
-                    .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[
-                        that.protoblock.palette.name])
+                    .replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name])
+                    .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
                     .replace("block_label", ""),
-                __processHighlightCollapseBitmap, that);
+                __processHighlightCollapseBitmap,
+                that
+            );
         };
 
         let artwork = this.collapseArtwork
-            .replace(/fill_color/g, PALETTEFILLCOLORS[
-                this.protoblock.palette.name])
-            .replace(/stroke_color/g, PALETTESTROKECOLORS[
-                this.protoblock.palette.name])
+            .replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name])
+            .replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name])
             .replace("block_label", "");
         _blockMakeBitmap(artwork, __processCollapseBitmap, this);
-    };
+    }
 
-    /*
+    /**
      * Hide this block
      * @return{void}
      * @public
      */
-    this.hide = function() {
+    hide() {
         this.container.visible = false;
         if (this.isCollapsible()) {
             this.collapseText.visible = false;
@@ -1516,14 +1539,14 @@ function Block(protoblock, blocks, overrideName) {
 
         this.updateCache();
         this.blocks.refreshCanvas();
-    };
+    }
 
-    /*
+    /**
      * Is this block disconnected from other blocks?
      * @return{boolean} true if the block is disconnected from other blocks
      * @public
      */
-    this.isDisconnected = function() {
+    isDisconnected() {
         if (this.disconnectedBitmap === null) {
             return false;
         }
@@ -1547,21 +1570,20 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         if (this.blocks.blockList[last(this.connections)].name === "hidden") {
-            if (last(this.blocks.blockList[
-                last(this.connections)].connections) === null) {
+            if (last(this.blocks.blockList[last(this.connections)].connections) === null) {
                 return true;
             }
         }
 
         return false;
-    };
+    }
 
-    /*
+    /**
      * Show this block
      * @return{void}
      * @public
      */
-    this.show = function() {
+    show() {
         // If it is not in the trash and not in collapsed, then show it.
         if (!this.trash && !this.inCollapsed) {
             this.container.visible = true;
@@ -1628,87 +1650,87 @@ function Block(protoblock, blocks, overrideName) {
             this.updateCache();
             this.blocks.refreshCanvas();
         }
-    };
+    }
 
     // Utility functions
-    this.isValueBlock = function() {
+    isValueBlock() {
         return this.protoblock.style === "value";
-    };
+    }
 
-    this.isNoHitBlock = function() {
+    isNoHitBlock() {
         return NOHIT.indexOf(this.name) !== -1;
-    };
+    }
 
-    this.isArgBlock = function() {
-        return (this.protoblock.style === "value" ||
-                this.protoblock.style === "arg");
-    };
+    isArgBlock() {
+        return this.protoblock.style === "value" || this.protoblock.style === "arg";
+    }
 
-    this.isTwoArgBlock = function() {
+    isTwoArgBlock() {
         return this.protoblock.style === "twoarg";
-    };
+    }
 
-    this.isTwoArgBooleanBlock = function() {
+    isTwoArgBooleanBlock() {
         return ["equal", "greater", "less"].indexOf(this.name) !== -1;
-    };
+    }
 
-    this.isClampBlock = function() {
-        return (this.protoblock.style === "clamp" ||
-                this.isDoubleClampBlock() || this.isArgFlowClampBlock());
-    };
+    isClampBlock() {
+        return (
+            this.protoblock.style === "clamp" ||
+            this.isDoubleClampBlock() ||
+            this.isArgFlowClampBlock()
+        );
+    }
 
-    this.isArgFlowClampBlock = function() {
+    isArgFlowClampBlock() {
         return this.protoblock.style === "argflowclamp";
-    };
+    }
 
-    this.isLeftClampBlock = function() {
+    isLeftClampBlock() {
         return this.protoblock.isLeftClamp;
-    };
+    }
 
-    this.isDoubleClampBlock = function() {
+    isDoubleClampBlock() {
         return this.protoblock.style === "doubleclamp";
-    };
+    }
 
-    this.isNoRunBlock = function() {
+    isNoRunBlock() {
         return this.name === "action";
-    };
+    }
 
-    this.isArgClamp = function() {
-        return (this.protoblock.style === "argclamp" ||
-                this.protoblock.style === "argclamparg");
-    };
+    isArgClamp() {
+        return this.protoblock.style === "argclamp" || this.protoblock.style === "argclamparg";
+    }
 
-    this.isExpandableBlock = function() {
+    isExpandableBlock() {
         return this.protoblock.expandable;
-    };
+    }
 
-    this.getBlockId = function() {
+    getBlockId() {
         // Generate a UID based on the block index into the blockList.
         let number = blockBlocks.blockList.indexOf(this);
         return "_" + number.toString();
-    };
+    }
 
-    this.removeChildBitmap = function(name) {
+    removeChildBitmap(name) {
         for (let child = 0; child < this.container.children.length; child++) {
             if (this.container.children[child].name === name) {
                 this.container.removeChild(this.container.children[child]);
                 break;
             }
         }
-    };
+    }
 
-    this.loadThumbnail = function(imagePath) {
+    loadThumbnail(imagePath) {
         // Load an image thumbnail onto block.
         let thisBlock = this.blocks.blockList.indexOf(this);
         let that = this;
 
-        if (this.blocks.blockList[thisBlock].value === null &&
-            imagePath === null) {
+        if (this.blocks.blockList[thisBlock].value === null && imagePath === null) {
             return;
         }
         let image = new Image();
 
-        image.onload = function() {
+        image.onload = function () {
             // Before adding new artwork, remove any old artwork.
             // that.removeChildBitmap("media");
 
@@ -1723,13 +1745,11 @@ function Block(protoblock, blocks, overrideName) {
             let MAXHEIGHT = 450;
             if (image.width > image.height) {
                 if (image.width > MAXWIDTH) {
-                    bitmap.scaleX = bitmap.scaleY = bitmap.scale =
-                        MAXWIDTH / image.width;
+                    bitmap.scaleX = bitmap.scaleY = bitmap.scale = MAXWIDTH / image.width;
                 }
             } else {
                 if (image.height > MAXHEIGHT) {
-                    bitmap.scaleX = bitmap.scaleY = bitmap.scale =
-                        MAXHEIGHT / image.height;
+                    bitmap.scaleX = bitmap.scaleY = bitmap.scale = MAXHEIGHT / image.height;
                 }
             }
 
@@ -1739,8 +1759,12 @@ function Block(protoblock, blocks, overrideName) {
             that.imageBitmap = bitmap;
 
             // Next, scale the bitmap for the thumbnail.
-            that._positionMedia(bitmap, bitmap.image.width, bitmap.image.height,
-                                that.protoblock.scale);
+            that._positionMedia(
+                bitmap,
+                bitmap.image.width,
+                bitmap.image.height,
+                that.protoblock.scale
+            );
             that.container.addChild(bitmap);
             that.updateCache();
         };
@@ -1750,17 +1774,17 @@ function Block(protoblock, blocks, overrideName) {
         } else {
             image.src = imagePath;
         }
-    };
+    }
 
-    this._doOpenMedia = function(thisBlock) {
+    _doOpenMedia(thisBlock) {
         let fileChooser = docById("myOpenAll");
         let that = this;
 
-        let __readerAction = function(event) {
+        let __readerAction = function (event) {
             window.scroll(0, 0);
 
             let reader = new FileReader();
-            reader.onloadend = function() {
+            reader.onloadend = function () {
                 if (reader.result) {
                     if (that.name === "media") {
                         that.value = reader.result;
@@ -1783,15 +1807,15 @@ function Block(protoblock, blocks, overrideName) {
         fileChooser.focus();
         fileChooser.click();
         window.scroll(0, 0);
-    };
+    }
 
-    this.setCollapsedState = function() {
+    setCollapsedState() {
         // Mark it as in a collapsed block and hide it.
         this.inCollapsed = true;
         this.hide();
-    };
+    }
 
-    this.setUncollapsedState = function(nblk) {
+    setUncollapsedState(nblk) {
         // It could be a block inside a note block, which may or may
         // not be hidden depending on the collapsed state of the
         // containing note block.
@@ -1806,9 +1830,9 @@ function Block(protoblock, blocks, overrideName) {
                 this.show();
             }
         }
-    };
+    }
 
-    this.collapseToggle = function() {
+    collapseToggle() {
         // Find the blocks to collapse/expand inside of a collapable
         // block.
         let thisBlock = this.blocks.blockList.indexOf(this);
@@ -1835,19 +1859,18 @@ function Block(protoblock, blocks, overrideName) {
 
         if (this.isInlineCollapsible() && this.collapseText.visible) {
             switch (this.name) {
-            case "newnote":
-                this._newNoteLabel();
-                break;
-            case "interval":
-                this._intervalLabel();
-                break;
-            case "osctime":
-                this._oscTimeLabel();
-                break;
-            default:
-                console.debug("What do we do with a collapsed " + this.name +
-                              " block?");
-                break;
+                case "newnote":
+                    this._newNoteLabel();
+                    break;
+                case "interval":
+                    this._intervalLabel();
+                    break;
+                case "osctime":
+                    this._oscTimeLabel();
+                    break;
+                default:
+                    console.debug("What do we do with a collapsed " + this.name + " block?");
+                    break;
             }
         }
 
@@ -1878,8 +1901,7 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         // Make sure the text is on top.
-        this.container.setChildIndex(this.collapseText,
-                                     this.container.children.length - 1);
+        this.container.setChildIndex(this.collapseText, this.container.children.length - 1);
 
         if (this.isInlineCollapsible()) {
             // Only collapse the contents of the note block.
@@ -1904,9 +1926,9 @@ function Block(protoblock, blocks, overrideName) {
         this.updateCache();
         this.unhighlight();
         this.blocks.refreshCanvas();
-    };
+    }
 
-    this._intervalLabel = function() {
+    _intervalLabel() {
         // Find pitch and value to display on the collapsed interval
         // block.
         let degrees = DEGREES.split(" ");
@@ -1918,7 +1940,8 @@ function Block(protoblock, blocks, overrideName) {
         let intervals = [];
         let i = 0;
 
-        let c = this.blocks.blockList.indexOf(this), lastIntervalBlock;
+        let c = this.blocks.blockList.indexOf(this),
+            lastIntervalBlock;
         while (c !== null) {
             lastIntervalBlock = c;
             let n = this.blocks.blockList[c].connections[1];
@@ -1947,9 +1970,7 @@ function Block(protoblock, blocks, overrideName) {
                 break;
             }
 
-            c = this.blocks.findNestedIntervalBlock(
-                this.blocks.blockList[c].connections[2]
-            );
+            c = this.blocks.findNestedIntervalBlock(this.blocks.blockList[c].connections[2]);
         }
 
         let itext = "";
@@ -1968,10 +1989,11 @@ function Block(protoblock, blocks, overrideName) {
                 if (this.blocks.blockList[c].name === "divide") {
                     let c1 = this.blocks.blockList[c].connections[1];
                     let c2 = this.blocks.blockList[c].connections[2];
-                    if (this.blocks.blockList[c1].name === "number" &&
-                        this.blocks.blockList[c2].name === "number") {
-                        v = this.blocks.blockList[c1].value + "/" +
-                            this.blocks.blockList[c2].value;
+                    if (
+                        this.blocks.blockList[c1].name === "number" &&
+                        this.blocks.blockList[c2].name === "number"
+                    ) {
+                        v = this.blocks.blockList[c1].value + "/" + this.blocks.blockList[c2].value;
                         if (_THIS_IS_MUSIC_BLOCKS_) {
                             if (this.blocks.blockList[c2].value in NSYMBOLS) {
                                 v += NSYMBOLS[this.blocks.blockList[c2].value];
@@ -1981,17 +2003,13 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
 
-            c = this.blocks.findFirstPitchBlock(
-                this.blocks.blockList[nblk].connections[2]
-            );
+            c = this.blocks.findFirstPitchBlock(this.blocks.blockList[nblk].connections[2]);
             let p = this._getPitch(c);
             if (c === null || p === "") {
                 this.collapseText.text = _("scalar interval") + itext;
             } else {
                 // Are there more pitch blocks in this note?
-                c = this.blocks.findFirstPitchBlock(
-                    last(this.blocks.blockList[c].connections)
-                );
+                c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
                 // Update the collapsed-block label.
                 if (c === null) {
                     this.collapseText.text = p + " | " + v + itext;
@@ -2000,9 +2018,9 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
         }
-    };
+    }
 
-    this._newNoteLabel = function() {
+    _newNoteLabel() {
         // Find pitch and value to display on the collapsed note value
         // block.
         let v = "";
@@ -2013,10 +2031,11 @@ function Block(protoblock, blocks, overrideName) {
             if (this.blocks.blockList[c].name === "divide") {
                 let c1 = this.blocks.blockList[c].connections[1];
                 let c2 = this.blocks.blockList[c].connections[2];
-                if (this.blocks.blockList[c1].name === "number" &&
-                    this.blocks.blockList[c2].name === "number") {
-                    v = this.blocks.blockList[c1].value + "/" +
-                        this.blocks.blockList[c2].value;
+                if (
+                    this.blocks.blockList[c1].name === "number" &&
+                    this.blocks.blockList[c2].name === "number"
+                ) {
+                    v = this.blocks.blockList[c1].value + "/" + this.blocks.blockList[c2].value;
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         vi = this.blocks.blockList[c2].value;
                         if (vi in NSYMBOLS) {
@@ -2051,9 +2070,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             // are there more pitch blocks in this note?
-            c = this.blocks.findFirstPitchBlock(
-                last(this.blocks.blockList[c].connections)
-            );
+            c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
             // Update the collapsed-block label.
             if (c === null) {
                 this.collapseText.text = p + " | " + v;
@@ -2061,9 +2078,9 @@ function Block(protoblock, blocks, overrideName) {
                 this.collapseText.text = p + "... | " + v;
             }
         }
-    };
+    }
 
-    this._oscTimeLabel = function() {
+    _oscTimeLabel() {
         // Find Hertz and value to display on the collapsed note value
         // block.
         let v = "";
@@ -2073,11 +2090,7 @@ function Block(protoblock, blocks, overrideName) {
             if (this.blocks.blockList[c].name === "divide") {
                 let c1 = this.blocks.blockList[c].connections[1];
                 let c2 = this.blocks.blockList[c].connections[2];
-                if (
-                    c1 !== null &&
-                    c2 !== null &&
-                    this.blocks.blockList[c2].name === "divide"
-                ) {
+                if (c1 !== null && c2 !== null && this.blocks.blockList[c2].name === "divide") {
                     let ci = this.blocks.blockList[c2].connections[1];
                     let cii = this.blocks.blockList[c2].connections[2];
                     if (
@@ -2086,8 +2099,8 @@ function Block(protoblock, blocks, overrideName) {
                         this.blocks.blockList[ci].name === "number" &&
                         this.blocks.blockList[cii].name === "number"
                     ) {
-                        v = (this.blocks.blockList[c1].value /
-                             this.blocks.blockList[ci].value) *
+                        v =
+                            (this.blocks.blockList[c1].value / this.blocks.blockList[ci].value) *
                             this.blocks.blockList[cii].value;
                     }
                 }
@@ -2103,9 +2116,7 @@ function Block(protoblock, blocks, overrideName) {
             this.collapseText.text = _("note value");
         } else {
             // Are there more pitch blocks in this note?
-            c = this.blocks.findFirstPitchBlock(
-                last(this.blocks.blockList[c].connections)
-            );
+            c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
             // Update the collapsed-block label.
             if (v !== "") {
                 if (c === null) {
@@ -2117,111 +2128,107 @@ function Block(protoblock, blocks, overrideName) {
                 this.collapseText.text = p + "...";
             }
         }
-    };
+    }
 
-    this._getPitch = function(c) {
+    _getPitch(c) {
         if (c === null) {
             return "";
         }
 
         let c1, c2;
         switch (this.blocks.blockList[c].name) {
-        case "pitch":
-            c1 = this.blocks.blockList[c].connections[1];
-            c2 = this.blocks.blockList[c].connections[2];
-            if (this.blocks.blockList[c2].name === "number") {
-                if (this.blocks.blockList[c1].name === "solfege") {
-                    let solfnotes_ = _("ti la sol fa mi re do").split(" ");
-                    let stripped = this.blocks.blockList[c1].value
-                        .replace(SHARP, "")
-                        .replace(FLAT, "")
-                        .replace(DOUBLESHARP, "")
-                        .replace(DOUBLEFLAT, "");
-                    let i = ["ti", "la", "sol", "fa", "mi", "re",
-                             "do"].indexOf(stripped);
-                    if (this.blocks.blockList[c1].value.indexOf(SHARP) !== -1) {
-                        return (solfnotes_[i] + SHARP + " " +
-                                this.blocks.blockList[c2].value);
-                    } else if (this.blocks.blockList[c1].value.indexOf(FLAT)
-                               !== -1) {
-                        return (solfnotes_[i] + FLAT + " " +
-                                this.blocks.blockList[c2].value);
-                    } else if (this.blocks.blockList[c1].value.indexOf(
-                        DOUBLESHARP) !== -1) {
-                        return (solfnotes_[i] + DOUBLESHARP + " " +
-                                this.blocks.blockList[c2].value);
-                    } else if (this.blocks.blockList[c1].value.indexOf(
-                        DOUBLEFLAT) !== -1) {
-                        return (solfnotes_[i] + DOUBLEFLAT + " " +
-                                this.blocks.blockList[c2].value);
-                    } else {
-                        return (solfnotes_[i] + " " +
-                                this.blocks.blockList[c2].value);
+            case "pitch":
+                c1 = this.blocks.blockList[c].connections[1];
+                c2 = this.blocks.blockList[c].connections[2];
+                if (this.blocks.blockList[c2].name === "number") {
+                    if (this.blocks.blockList[c1].name === "solfege") {
+                        let solfnotes_ = _("ti la sol fa mi re do").split(" ");
+                        let stripped = this.blocks.blockList[c1].value
+                            .replace(SHARP, "")
+                            .replace(FLAT, "")
+                            .replace(DOUBLESHARP, "")
+                            .replace(DOUBLEFLAT, "");
+                        let i = ["ti", "la", "sol", "fa", "mi", "re", "do"].indexOf(stripped);
+                        if (this.blocks.blockList[c1].value.indexOf(SHARP) !== -1) {
+                            return solfnotes_[i] + SHARP + " " + this.blocks.blockList[c2].value;
+                        } else if (this.blocks.blockList[c1].value.indexOf(FLAT) !== -1) {
+                            return solfnotes_[i] + FLAT + " " + this.blocks.blockList[c2].value;
+                        } else if (this.blocks.blockList[c1].value.indexOf(DOUBLESHARP) !== -1) {
+                            return (
+                                solfnotes_[i] + DOUBLESHARP + " " + this.blocks.blockList[c2].value
+                            );
+                        } else if (this.blocks.blockList[c1].value.indexOf(DOUBLEFLAT) !== -1) {
+                            return (
+                                solfnotes_[i] + DOUBLEFLAT + " " + this.blocks.blockList[c2].value
+                            );
+                        } else {
+                            return solfnotes_[i] + " " + this.blocks.blockList[c2].value;
+                        }
+                    } else if (this.blocks.blockList[c1].name === "notename") {
+                        return (
+                            this.blocks.blockList[c1].value + " " + this.blocks.blockList[c2].value
+                        );
+                    } else if (this.blocks.blockList[c1].name === "scaledegree2") {
+                        const obj = splitScaleDegree(this.blocks.blockList[c1].value);
+                        let note = obj[0];
+                        if (obj[1] !== NATURAL) {
+                            note += obj[1];
+                        }
+                        return note + " " + this.blocks.blockList[c2].value;
                     }
-                } else if (this.blocks.blockList[c1].name === "notename") {
-                    return (this.blocks.blockList[c1].value + " " +
-                            this.blocks.blockList[c2].value);
-                } else if (this.blocks.blockList[c1].name === "scaledegree2") {
-                    obj = splitScaleDegree(this.blocks.blockList[c1].value);
-                    let note = obj[0];
-                    if (obj[1] !== NATURAL) {
-                        note += obj[1];
-                    }
-                    return (note + " " + this.blocks.blockList[c2].value);
                 }
-            }
-            break;
-        case "nthmodalpitch":
-            c1 = this.blocks.blockList[c].connections[1];
-            c2 = this.blocks.blockList[c].connections[2];
-            if (this.blocks.blockList[c2].name === "number") {
+                break;
+            case "nthmodalpitch":
+                c1 = this.blocks.blockList[c].connections[1];
+                c2 = this.blocks.blockList[c].connections[2];
+                if (this.blocks.blockList[c2].name === "number") {
+                    if (this.blocks.blockList[c1].name === "number") {
+                        let degrees = DEGREES.split(" ");
+                        let i = this.blocks.blockList[c1].value - 1;
+                        if (i > 0 && i < degrees.length) {
+                            return degrees[i] + " " + this.blocks.blockList[c2].value;
+                        } else {
+                            return (
+                                this.blocks.blockList[c1].value +
+                                " " +
+                                this.blocks.blockList[c2].value
+                            );
+                        }
+                    }
+                }
+                break;
+            case "hertz":
+                c1 = this.blocks.blockList[c].connections[0];
                 if (this.blocks.blockList[c1].name === "number") {
-                    let degrees = DEGREES.split(" ");
-                    let i = this.blocks.blockList[c1].value - 1;
-                    if (i > 0 && i < degrees.length) {
-                        return (degrees[i] + " " +
-                                this.blocks.blockList[c2].value);
-                    } else {
-                        return (this.blocks.blockList[c1].value + " " +
-                                this.blocks.blockList[c2].value);
-                    }
+                    return this.blocks.blockList[c1].value + "HZ";
                 }
-            }
-            break;
-        case "hertz":
-            c1 = this.blocks.blockList[c].connections[0];
-            if (this.blocks.blockList[c1].name === "number") {
-                return this.blocks.blockList[c1].value + "HZ";
-            }
-            break;
-        case "steppitch":
-            c1 = this.blocks.blockList[c].connections[1];
-            if (this.blocks.blockList[c1].name === "number" &&
-                this.blocks.blockList[c1].value < 0) {
-                //.TRANS: scalar step
-                return (_("down") + " " + Math.abs(
-                    this.blocks.blockList[c1].value));
-            } else return _("up") + " " + this.blocks.blockList[c1].value;
-            break;
-        case "pitchnumber":
-            c1 = this.blocks.blockList[c].connections[1];
-            if (this.blocks.blockList[c1].name === "number") {
-                //.TRANS: pitch number
-                return _("pitch") + " " + this.blocks.blockList[c1].value;
-            }
-            break;
-        case "playdrum":
-            return _("drum");
-            break;
-        case "rest2":
-            return _("silence");
-            break;
-        default:
-            return "";
+                break;
+            case "steppitch":
+                c1 = this.blocks.blockList[c].connections[1];
+                if (
+                    this.blocks.blockList[c1].name === "number" &&
+                    this.blocks.blockList[c1].value < 0
+                ) {
+                    //.TRANS: scalar step
+                    return _("down") + " " + Math.abs(this.blocks.blockList[c1].value);
+                } else return _("up") + " " + this.blocks.blockList[c1].value;
+            case "pitchnumber":
+                c1 = this.blocks.blockList[c].connections[1];
+                if (this.blocks.blockList[c1].name === "number") {
+                    //.TRANS: pitch number
+                    return _("pitch") + " " + this.blocks.blockList[c1].value;
+                }
+                break;
+            case "playdrum":
+                return _("drum");
+            case "rest2":
+                return _("silence");
+            default:
+                return "";
         }
-    };
+    }
 
-    this._toggle_inline = function(thisBlock, collapse) {
+    _toggle_inline(thisBlock, collapse) {
         // Toggle the collapsed state of blocks inside of a note (or
         // interval) block and reposition any blocks below
         // it. Finally, resize any surrounding clamps.
@@ -2247,8 +2254,7 @@ function Block(protoblock, blocks, overrideName) {
                 let blk = this.blocks.dragGroup[b];
                 // Look to see if the local parent block is collapsed.
                 let parent = this.blocks.insideInlineCollapsibleBlock(blk);
-                if (parent === null ||
-                    !this.blocks.blockList[parent].collapsed) {
+                if (parent === null || !this.blocks.blockList[parent].collapsed) {
                     this.blocks.blockList[blk].container.visible = collapse;
                     if (collapse) {
                         this.blocks.blockList[blk].inCollapsed = false;
@@ -2268,12 +2274,15 @@ function Block(protoblock, blocks, overrideName) {
             // The last connection is flow. The second to last
             // connection is child flow.  FIX ME: This will not work
             // if there is more than one arg, e.g. n > 4.
-            let n = this.docks.length, dy;
+            let n = this.docks.length,
+                dy;
             if (collapse) {
-                dy = this.blocks.blockList[thisBlock].docks[n - 1][1] -
+                dy =
+                    this.blocks.blockList[thisBlock].docks[n - 1][1] -
                     this.blocks.blockList[thisBlock].docks[n - 2][1];
             } else {
-                dy = this.blocks.blockList[thisBlock].docks[n - 2][1] -
+                dy =
+                    this.blocks.blockList[thisBlock].docks[n - 2][1] -
                     this.blocks.blockList[thisBlock].docks[n - 1][1];
             }
 
@@ -2294,15 +2303,15 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this.blocks.refreshCanvas();
-    };
+    }
 
-    /*
+    /**
      * Position any addition text on a block
      * @param-blockscale is used to scale the text
      * @return{void}
      * @private
      */
-    this._positionText = function(blockScale) {
+    _positionText(blockScale) {
         this.text.textBaseline = "alphabetic";
         this.text.textAlign = "right";
         let fontSize = 10 * blockScale;
@@ -2337,12 +2346,12 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         // Ensure text is on top.
-        z = this.container.children.length - 1;
-        this.container.setChildIndex(this.text, z);
+        const zIndex = this.container.children.length - 1;
+        this.container.setChildIndex(this.text, zIndex);
         this.updateCache();
-    };
+    }
 
-    /*
+    /**
      * Position media artwork on a block.
      * @param-bitmap - image
      * @param-width-width of canvas
@@ -2352,7 +2361,7 @@ function Block(protoblock, blocks, overrideName) {
      * @return{void}
      * @private
      */
-    this._positionMedia = function(bitmap, width, height, blockScale) {
+    _positionMedia(bitmap, width, height, blockScale) {
         if (width > height) {
             bitmap.scaleX = bitmap.scaleY = bitmap.scale =
                 ((MEDIASAFEAREA[2] / width) * blockScale) / 2;
@@ -2362,62 +2371,56 @@ function Block(protoblock, blocks, overrideName) {
         }
         bitmap.x = ((MEDIASAFEAREA[0] - 10) * blockScale) / 2;
         bitmap.y = (MEDIASAFEAREA[1] * blockScale) / 2;
-    };
+    }
 
-    /*
+    /**
      * Position the label for a collapsed block
      * @param-blockscale-scale
      * @return{void}
      * @private
      */
-    this._positionCollapseLabel = function(blockScale) {
+    _positionCollapseLabel(blockScale) {
         if (this.isInlineCollapsible()) {
             this.collapseText.x = Math.floor(
                 ((COLLAPSETEXTX + STANDARDBLOCKHEIGHT) * blockScale) / 2 + 0.5
             );
-            this.collapseText.y = Math.floor(
-                ((COLLAPSETEXTY - 8) * blockScale) / 2 + 0.5
-            );
+            this.collapseText.y = Math.floor(((COLLAPSETEXTY - 8) * blockScale) / 2 + 0.5);
         } else {
-            this.collapseText.x = Math.floor(
-                ((COLLAPSETEXTX + 30) * blockScale) / 2 + 0.5
-            );
-            this.collapseText.y = Math.floor(
-                (COLLAPSETEXTY * blockScale) / 2 + 0.5
-            );
+            this.collapseText.x = Math.floor(((COLLAPSETEXTX + 30) * blockScale) / 2 + 0.5);
+            this.collapseText.y = Math.floor((COLLAPSETEXTY * blockScale) / 2 + 0.5);
         }
 
         // Ensure text is on top.
-        z = this.container.children.length - 1;
-        this.container.setChildIndex(this.collapseText, z);
-    };
+        const zIndex = this.container.children.length - 1;
+        this.container.setChildIndex(this.collapseText, zIndex);
+    }
 
-    /*
+    /**
      * Determine the hit area for a block
      * DEPRECATED
      * @return{void}
      * @private
      */
-    this._calculateBlockHitArea = function() {
+    _calculateBlockHitArea() {
         let hitArea = new createjs.Shape();
         hitArea.graphics
             .beginFill("platformColor.hitAreaGraphicsBeginFill")
             .drawRect(0, 0, this.width, this.hitHeight);
         this.container.hitArea = hitArea;
-    };
+    }
 
-    /*
+    /**
      * These are the event handlers for block containers.
      * @return{void}
      * @private
      */
-    this._loadEventHandlers = function() {
+    _loadEventHandlers() {
         let that = this;
         let thisBlock = this.blocks.blockList.indexOf(this);
 
         this._calculateBlockHitArea();
 
-        this.container.on("mouseover", function(event) {
+        this.container.on("mouseover", function (event) {
             docById("contextWheelDiv").style.display = "none";
 
             if (!that.blocks.logo.runningLilypond) {
@@ -2434,25 +2437,22 @@ function Block(protoblock, blocks, overrideName) {
         let locked = false;
         let getInput = window.hasMouse;
 
-        this.container.on("click", function(event) {
+        this.container.on("click", function (event) {
             // We might be able to check which button was clicked.
             if ("nativeEvent" in event) {
-                if ("button" in event.nativeEvent &&
-                    event.nativeEvent.button == 2) {
+                if ("button" in event.nativeEvent && event.nativeEvent.button == 2) {
                     that.blocks.stageClick = true;
                     docById("wheelDiv").style.display = "none";
-                    that.piemenuBlockContext(thisBlock);
+                    piemenuBlockContext(that);
                     return;
-                } else if ("ctrlKey" in event.nativeEvent &&
-                           event.nativeEvent.ctrlKey) {
-                    that.piemenuBlockContext(thisBlock);
+                } else if ("ctrlKey" in event.nativeEvent && event.nativeEvent.ctrlKey) {
+                    piemenuBlockContext(that);
                     return;
-                } else if ("shiftKey" in event.nativeEvent &&
-                           event.nativeEvent.shiftKey) {
+                } else if ("shiftKey" in event.nativeEvent && event.nativeEvent.shiftKey) {
                     if (that.blocks.turtles.running()) {
                         that.blocks.logo.doStopTurtles();
 
-                        setTimeout(function() {
+                        setTimeout(function () {
                             that.blocks.logo.runLogoCommands(topBlock);
                         }, 250);
                     } else {
@@ -2475,7 +2475,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             locked = true;
-            setTimeout(function() {
+            setTimeout(function () {
                 locked = false;
             }, 500);
 
@@ -2484,12 +2484,10 @@ function Block(protoblock, blocks, overrideName) {
 
             let topBlk;
 
-            dx = event.stageX / that.blocks.getStageScale() - that.container.x;
-            if (!moved && that.isCollapsible() &&
-                dx < (30 / that.blocks.getStageScale())) {
+            let dx = event.stageX / that.blocks.getStageScale() - that.container.x;
+            if (!moved && that.isCollapsible() && dx < 30 / that.blocks.getStageScale()) {
                 that.collapseToggle();
-            } else if ((!window.hasMouse && getInput) ||
-                       (window.hasMouse && !moved)) {
+            } else if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
                 if (that.name === "media") {
                     that._doOpenMedia(thisBlock);
                 } else if (that.name === "loadFile") {
@@ -2503,11 +2501,9 @@ function Block(protoblock, blocks, overrideName) {
                         }
                     }
                 } else {
-                    if (!that.blocks.getLongPressStatus() &&
-                        !that.blocks.stageClick) {
+                    if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
                         topBlk = that.blocks.findTopBlock(thisBlock);
-                        console.debug("running from " +
-                                      that.blocks.blockList[topBlk].name);
+                        console.debug("running from " + that.blocks.blockList[topBlk].name);
                         if (_THIS_IS_MUSIC_BLOCKS_) {
                             that.blocks.logo.synth.resume();
                         }
@@ -2515,7 +2511,7 @@ function Block(protoblock, blocks, overrideName) {
                         if (that.blocks.turtles.running()) {
                             that.blocks.logo.doStopTurtles();
 
-                            setTimeout(function() {
+                            setTimeout(function () {
                                 that.blocks.logo.runLogoCommands(topBlk);
                             }, 250);
                         } else {
@@ -2524,11 +2520,9 @@ function Block(protoblock, blocks, overrideName) {
                     }
                 }
             } else if (!moved) {
-                if (!that.blocks.getLongPressStatus() &&
-                    !that.blocks.stageClick) {
+                if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
                     topBlk = that.blocks.findTopBlock(thisBlock);
-                    console.debug("running from " +
-                                  that.blocks.blockList[topBlk].name);
+                    console.debug("running from " + that.blocks.blockList[topBlk].name);
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         that.blocks.logo.synth.resume();
                     }
@@ -2536,7 +2530,7 @@ function Block(protoblock, blocks, overrideName) {
                     if (that.blocks.turtles.running()) {
                         that.blocks.logo.doStopTurtles();
 
-                        setTimeout(function() {
+                        setTimeout(function () {
                             that.blocks.logo.runLogoCommands(topBlk);
                         }, 250);
                     } else {
@@ -2546,13 +2540,13 @@ function Block(protoblock, blocks, overrideName) {
             }
         });
 
-        this.container.on("mousedown", function(event) {
+        this.container.on("mousedown", function (event) {
             docById("contextWheelDiv").style.display = "none";
 
             // Track time for detecting long pause...
             that.blocks.mouseDownTime = new Date().getTime();
 
-            that.blocks.longPressTimeout = setTimeout(function() {
+            that.blocks.longPressTimeout = setTimeout(function () {
                 that.blocks.activeBlock = that.blocks.blockList.indexOf(that);
                 that._triggerLongPress = true;
                 that.blocks.triggerLongPress();
@@ -2568,7 +2562,8 @@ function Block(protoblock, blocks, overrideName) {
             if (that.collapseContainer != null) {
                 that.blocks.stage.setChildIndex(
                     that.collapseContainer,
-                    that.blocks.stage.children.length - 1);
+                    that.blocks.stage.children.length - 1
+                );
             }
 
             moved = false;
@@ -2583,7 +2578,7 @@ function Block(protoblock, blocks, overrideName) {
             };
         });
 
-        this.container.on("pressmove", function(event) {
+        this.container.on("pressmove", function (event) {
             // FIXME: More voodoo
             event.nativeEvent.preventDefault();
 
@@ -2596,12 +2591,11 @@ function Block(protoblock, blocks, overrideName) {
                 moved = true;
             } else {
                 // Make it eaiser to select text on mobile.
-                setTimeout(function() {
+                setTimeout(function () {
                     moved =
-                        Math.abs(event.stageX / that.blocks.getStageScale() -
-                                 that.original.x) +
-                        Math.abs(event.stageY / that.blocks.getStageScale() -
-                                 that.original.y) > 20 && !window.hasMouse;
+                        Math.abs(event.stageX / that.blocks.getStageScale() - that.original.x) +
+                            Math.abs(event.stageY / that.blocks.getStageScale() - that.original.y) >
+                            20 && !window.hasMouse;
                     getInput = !moved;
                 }, 200);
             }
@@ -2609,10 +2603,8 @@ function Block(protoblock, blocks, overrideName) {
             let oldX = that.container.x;
             let oldY = that.container.y;
 
-            let dx = Math.round(event.stageX / that.blocks.getStageScale() +
-                                that.offset.x - oldX);
-            let dy = Math.round(event.stageY / that.blocks.getStageScale() +
-                                that.offset.y - oldY);
+            let dx = Math.round(event.stageX / that.blocks.getStageScale() + that.offset.x - oldX);
+            let dy = Math.round(event.stageY / that.blocks.getStageScale() + that.offset.y - oldY);
 
             let finalPos = oldY + dy;
             if (that.blocks.stage.y === 0 && finalPos < 45) {
@@ -2621,14 +2613,12 @@ function Block(protoblock, blocks, overrideName) {
 
             // scroll when reached edges.
             if (event.stageX < 10 && scrollBlockContainer)
-                that.blocks.moveAllBlocksExcept(that,10,0);
-            else if (event.stageX > window.innerWidth-10 &&
-                     scrollBlockContainer)
-                that.blocks.moveAllBlocksExcept(that,-10,0);
-            else if (event.stageY > window.innerHeight-10)
-                that.blocks.moveAllBlocksExcept(that,0,-10);
-            else if (event.stageY < 60)
-                that.blocks.moveAllBlocksExcept(that,0,10);
+                that.blocks.moveAllBlocksExcept(that, 10, 0);
+            else if (event.stageX > window.innerWidth - 10 && scrollBlockContainer)
+                that.blocks.moveAllBlocksExcept(that, -10, 0);
+            else if (event.stageY > window.innerHeight - 10)
+                that.blocks.moveAllBlocksExcept(that, 0, -10);
+            else if (event.stageY < 60) that.blocks.moveAllBlocksExcept(that, 0, 10);
 
             if (that.blocks.longPressTimeout != null) {
                 clearTimeout(that.blocks.longPressTimeout);
@@ -2643,9 +2633,12 @@ function Block(protoblock, blocks, overrideName) {
             that.blocks.moveBlockRelative(thisBlock, dx, dy);
 
             // If we are over the trash, warn the user.
-            if (trashcan.overTrashcan(
-                event.stageX / that.blocks.getStageScale(),
-                event.stageY / that.blocks.getStageScale())) {
+            if (
+                trashcan.overTrashcan(
+                    event.stageX / that.blocks.getStageScale(),
+                    event.stageY / that.blocks.getStageScale()
+                )
+            ) {
                 trashcan.startHighlightAnimation();
             } else {
                 trashcan.stopHighlightAnimation();
@@ -2653,8 +2646,7 @@ function Block(protoblock, blocks, overrideName) {
 
             if (that.isValueBlock() && that.name !== "media") {
                 // Ensure text is on top
-                that.container.setChildIndex(
-                    that.text, that.container.children.length - 1);
+                that.container.setChildIndex(that.text, that.container.children.length - 1);
             }
 
             // ...and move any connected blocks.
@@ -2671,7 +2663,7 @@ function Block(protoblock, blocks, overrideName) {
             that.blocks.refreshCanvas();
         });
 
-        this.container.on("mouseout", function(event) {
+        this.container.on("mouseout", function (event) {
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false);
             } else {
@@ -2686,7 +2678,7 @@ function Block(protoblock, blocks, overrideName) {
             moved = false;
         });
 
-        this.container.on("pressup", function(event) {
+        this.container.on("pressup", function (event) {
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false);
             } else {
@@ -2700,9 +2692,9 @@ function Block(protoblock, blocks, overrideName) {
 
             moved = false;
         });
-    };
+    }
 
-    /*
+    /**
      * Common code for processing events
      * @param-event- mouse
      * @param-moved-cursor moved
@@ -2712,7 +2704,7 @@ function Block(protoblock, blocks, overrideName) {
      * @return {void}
      * @private
      */
-    this._mouseoutCallback = function(event, moved, haveClick, hideDOM) {
+    _mouseoutCallback(event, moved, haveClick, hideDOM) {
         let thisBlock = this.blocks.blockList.indexOf(this);
         if (!this.blocks.logo.runningLilypond) {
             document.body.style.cursor = "default";
@@ -2729,9 +2721,12 @@ function Block(protoblock, blocks, overrideName) {
 
         if (moved) {
             // Check if block is in the trash.
-            if (trashcan.overTrashcan(
-                event.stageX / this.blocks.getStageScale(),
-                event.stageY / this.blocks.getStageScale())) {
+            if (
+                trashcan.overTrashcan(
+                    event.stageX / this.blocks.getStageScale(),
+                    event.stageY / this.blocks.getStageScale()
+                )
+            ) {
                 if (trashcan.isVisible) {
                     this.blocks.sendStackToTrash(this);
                 }
@@ -2744,10 +2739,7 @@ function Block(protoblock, blocks, overrideName) {
                 // Just in case the blocks are not properly docked after
                 // the move (workaround for issue #38 -- Blocks fly
                 // apart). Still need to get to the root cause.
-                this.blocks.adjustDocks(
-                    this.blocks.blockList.indexOf(this),
-                    true
-                );
+                this.blocks.adjustDocks(this.blocks.blockList.indexOf(this), true);
             }
         } else if (
             SPECIALINPUTS.indexOf(this.name) !== -1 ||
@@ -2771,11 +2763,12 @@ function Block(protoblock, blocks, overrideName) {
         if (hideDOM) {
             // Did the mouse move out off the block? If so, hide the
             // label DOM element.
-            if (event.stageX / this.blocks.getStageScale() < this.container.x ||
-                event.stageX / this.blocks.getStageScale() >
-                (this.container.x + this.width) ||
+            if (
+                event.stageX / this.blocks.getStageScale() < this.container.x ||
+                event.stageX / this.blocks.getStageScale() > this.container.x + this.width ||
                 event.stageY < this.container.y ||
-                event.stageY > (this.container.y + this.hitHeight)) {
+                event.stageY > this.container.y + this.hitHeight
+            ) {
                 // There are lots of special cases where we want to
                 // use piemenus. Make sure this is not one of them.
                 if (!this._usePiemenu()) {
@@ -2790,9 +2783,9 @@ function Block(protoblock, blocks, overrideName) {
 
             this.blocks.activeBlock = null;
         }
-    };
+    }
 
-    this._usePiemenu = function() {
+    _usePiemenu() {
         // Check on all the special cases were we want to use a pie menu.
         this._check_meter_block = null;
 
@@ -2832,14 +2825,14 @@ function Block(protoblock, blocks, overrideName) {
             return true;
         }
 
-        if(this._usePieNumberC1()) {
+        if (this._usePieNumberC1()) {
             return true;
         }
 
         return false;
-    };
+    }
 
-    this._usePieNumberC1 = function() {
+    _usePieNumberC1() {
         // Return true if this number block plugs into Connection 1 of
         // a block that uses a pie menu. Add block names to the list
         // below and the switch statement in the _changeLabel
@@ -2850,16 +2843,14 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
-        if (this.blocks.blockList[
-            this.connections[0]].protoblock.piemenuValuesC1.length === 0) {
+        if (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC1.length === 0) {
             return false;
         }
 
-        return this.blocks.blockList[cblk].connections[1] ===
-            this.blocks.blockList.indexOf(this);
-    };
+        return this.blocks.blockList[cblk].connections[1] === this.blocks.blockList.indexOf(this);
+    }
 
-    this._usePieNumberC2 = function() {
+    _usePieNumberC2() {
         // Return true if this number block plugs into Connection 2 of
         // a block that uses a pie menu. Add block names to the list
         // below and the switch statement in the _changeLabel
@@ -2870,16 +2861,14 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
-        if (this.blocks.blockList[
-            this.connections[0]].protoblock.piemenuValuesC2.length === 0) {
+        if (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC2.length === 0) {
             return false;
         }
 
-        return this.blocks.blockList[cblk].connections[2] ===
-            this.blocks.blockList.indexOf(this);
-    };
+        return this.blocks.blockList[cblk].connections[2] === this.blocks.blockList.indexOf(this);
+    }
 
-    this._usePieNumberC3 = function() {
+    _usePieNumberC3() {
         // Return true if this number block plugs into Connection 3 of
         // a block that uses a pie menu. Add block names to the list
         // below and the switch statement in the _changeLabel
@@ -2890,16 +2879,14 @@ function Block(protoblock, blocks, overrideName) {
             return false;
         }
 
-        if (this.blocks.blockList[
-            this.connections[0]].protoblock.piemenuValuesC3.length === 0) {
+        if (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC3.length === 0) {
             return false;
         }
 
-        return this.blocks.blockList[cblk].connections[3] ===
-            this.blocks.blockList.indexOf(this);
-    };
+        return this.blocks.blockList[cblk].connections[3] === this.blocks.blockList.indexOf(this);
+    }
 
-    this._ensureDecorationOnTop = function() {
+    _ensureDecorationOnTop() {
         // Find the turtle decoration and move it to the top.
         for (let child = 0; child < this.container.children.length; child++) {
             if (this.container.children[child].name === "decoration") {
@@ -2911,9 +2898,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
 
                 for (let t = 0; t < this.blocks.turtles.turtleList.length; t++) {
-                    if (
-                        this.blocks.turtles.turtleList[t].startBlock === this
-                    ) {
+                    if (this.blocks.turtles.turtleList[t].startBlock === this) {
                         this.blocks.turtles.turtleList[t].decorationBitmap.x =
                             this.width - dx - (30 * this.protoblock.scale) / 2;
                         break;
@@ -2935,31 +2920,40 @@ function Block(protoblock, blocks, overrideName) {
         }
 
         this.updateCache();
-    };
+    }
 
-    /*
+    /**
      * Change the label in a parameter block
      * @return{void}
      * @private
      */
-    this._changeLabel = function() {
+    _changeLabel() {
         let that = this;
         let x = this.container.x;
         let y = this.container.y;
 
-        let canvasLeft =
-            this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
-        let canvasTop =
-            this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+        let canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        let canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
 
         let selectorWidth = 150;
 
         let movedStage = false;
-        let fromY, labelValue, obj, selectedNote,
-            selectedAttr, selectedAccidental, selectedMode,
-            selectedInvert, selectedInterval, selectedDrum,
-            selectedEffect, selectedVoice, selectedNoise,
-            selectedTemperament, selectedValue, selectedType;
+        let fromY,
+            labelValue,
+            obj,
+            selectedNote,
+            selectedAttr,
+            selectedAccidental,
+            selectedMode,
+            selectedInvert,
+            selectedInterval,
+            selectedDrum,
+            selectedEffect,
+            selectedVoice,
+            selectedNoise,
+            selectedTemperament,
+            selectedValue,
+            selectedType;
         if (!window.hasMouse && this.blocks.stage.y + y > 75) {
             movedStage = true;
             fromY = this.blocks.stage.y;
@@ -2978,7 +2972,8 @@ function Block(protoblock, blocks, overrideName) {
         if (this.name === "text") {
             labelElem.innerHTML =
                 '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="text" type="text" value="' +
-                labelValue + '" />';
+                labelValue +
+                '" />';
             labelElem.classList.add("hasKeyboard");
             this.label = docById("textLabel");
         } else if (this.name === "solfege") {
@@ -2988,16 +2983,14 @@ function Block(protoblock, blocks, overrideName) {
             let solfnotes_ = _("ti la sol fa mi re do").split(" ");
 
             if (this.piemenuOKtoLaunch()) {
-                this._piemenuPitches(solfnotes_, SOLFNOTES, SOLFATTRS, obj[0],
-                                     obj[1]);
+                piemenuPitches(this, solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
             }
         } else if (this.name === "scaledegree2") {
             obj = splitScaleDegree(this.value);
-            let scalenotes_ = ("7 6 5 4 3 2 1").split(" ");
+            let scalenotes_ = "7 6 5 4 3 2 1".split(" ");
             if (this.piemenuOKtoLaunch()) {
-                this._piemenuPitches(scalenotes_, SCALENOTES, SOLFATTRS,
-                                     obj[0], obj[1]);
-            };
+                piemenuPitches(this, scalenotes_, SCALENOTES, SOLFATTRS, obj[0], obj[1]);
+            }
         } else if (this.name === "customNote") {
             if (!this.blocks.logo.customTemperamentDefined) {
                 // If custom temperament is not defined by user,
@@ -3006,13 +2999,12 @@ function Block(protoblock, blocks, overrideName) {
                 let solfnotes_ = _("ti la sol fa mi re do").split(" ");
 
                 if (this.piemenuOKtoLaunch()) {
-                    this._piemenuPitches(solfnotes_, SOLFNOTES, SOLFATTRS,
-                                         obj[0], obj[1]);
+                    piemenuPitches(this, solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
                 }
             } else {
                 let noteLabels = TEMPERAMENT;
 
-                let customLabels =  [];
+                let customLabels = [];
                 for (let lab in noteLabels)
                     if (!(lab in PreDefinedTemperaments)) {
                         customLabels.push(lab);
@@ -3031,8 +3023,7 @@ function Block(protoblock, blocks, overrideName) {
                     selectedNote = TEMPERAMENT[selectedCustom]["0"][1];
                 }
 
-                this._customNotes(noteLabels, customLabels, selectedCustom,
-                                  selectedNote);
+                piemenuCustomNotes(this, noteLabels, customLabels, selectedCustom, selectedNote);
             }
         } else if (this.name === "eastindiansolfege") {
             obj = splitSolfege(this.value);
@@ -3040,8 +3031,7 @@ function Block(protoblock, blocks, overrideName) {
             selectedAttr = obj[1];
 
             if (this.piemenuOKtoLaunch()) {
-                this._piemenuPitches(EASTINDIANSOLFNOTES, SOLFNOTES, SOLFATTRS,
-                                     obj[0], obj[1]);
+                piemenuPitches(this, EASTINDIANSOLFNOTES, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
             }
         } else if (this.name === "notename") {
             const NOTENOTES = ["B", "A", "G", "F", "E", "D", "C"];
@@ -3064,8 +3054,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             if (this.piemenuOKtoLaunch()) {
-                this._piemenuPitches(NOTENOTES, NOTENOTES, SOLFATTRS,
-                                     selectedNote, selectedAttr);
+                piemenuPitches(this, NOTENOTES, NOTENOTES, SOLFATTRS, selectedNote, selectedAttr);
             }
         } else if (this.name === "modename") {
             if (this.value != null) {
@@ -3074,7 +3063,7 @@ function Block(protoblock, blocks, overrideName) {
                 selectedMode = DEFAULTMODE;
             }
 
-            this._piemenuModes(selectedMode);
+            piemenuModes(this, selectedMode);
         } else if (this.name === "accidentalname") {
             if (this.value != null) {
                 selectedAccidental = this.value;
@@ -3083,8 +3072,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             if (this.piemenuOKtoLaunch()) {
-                this._piemenuAccidentals(ACCIDENTALLABELS, ACCIDENTALNAMES,
-                                         selectedAccidental);
+                piemenuAccidentals(this, ACCIDENTALLABELS, ACCIDENTALNAMES, selectedAccidental);
             }
         } else if (this.name === "intervalname") {
             if (this.value != null) {
@@ -3094,7 +3082,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             if (this.piemenuOKtoLaunch()) {
-                this._piemenuIntervals(selectedInterval);
+                piemenuIntervals(this, selectedInterval);
             }
         } else if (this.name === "invertmode") {
             if (this.value != null) {
@@ -3112,7 +3100,7 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             if (this.piemenuOKtoLaunch()) {
-                this._piemenuBasic(invertLabels, invertValues, selectedInvert);
+                piemenuBasic(this, invertLabels, invertValues, selectedInvert);
             }
         } else if (this.name === "drumname") {
             if (this.value != null) {
@@ -3144,13 +3132,12 @@ function Block(protoblock, blocks, overrideName) {
                 }
             }
 
-            this._piemenuVoices(DrumLabels, drumValues, categories,
-                                selectedDrum);
+            piemenuVoices(this, DrumLabels, drumValues, categories, selectedDrum);
         } else if (this.name === "effectsname") {
             if (this.value != null) {
-                 selectedDrum = this.value;
+                selectedDrum = this.value;
             } else {
-                 selectedEffect = DEFAULTEFFECT;
+                selectedEffect = DEFAULTEFFECT;
             }
 
             let effectLabels = [];
@@ -3172,14 +3159,11 @@ function Block(protoblock, blocks, overrideName) {
                         effectcategoriesList.push(DRUMNAMES[i][4]);
                     }
 
-                    effectcategories.push(
-                        effectcategoriesList.indexOf(DRUMNAMES[i][4])
-                    );
+                    effectcategories.push(effectcategoriesList.indexOf(DRUMNAMES[i][4]));
                 }
             }
 
-            this._piemenuVoices(effectLabels, effectValues, effectcategories,
-                                selectedEffect);
+            piemenuVoices(this, effectLabels, effectValues, effectcategories, selectedEffect);
         } else if (this.name === "filtertype") {
             if (this.value != null) {
                 selectedType = this.value;
@@ -3194,8 +3178,13 @@ function Block(protoblock, blocks, overrideName) {
                 filterValues.push(FILTERTYPES[i][1]);
             }
 
-            this._piemenuBasic(filterLabels, filterValues, selectedType,
-                               platformColor.piemenuBasic);
+            piemenuBasic(
+                this,
+                filterLabels,
+                filterValues,
+                selectedType,
+                platformColor.piemenuBasic
+            );
         } else if (this.name === "oscillatortype") {
             if (this.value != null) {
                 selectedType = this.value;
@@ -3210,8 +3199,7 @@ function Block(protoblock, blocks, overrideName) {
                 oscValues.push(OSCTYPES[i][1]);
             }
 
-            this._piemenuBasic(oscLabels, oscValues, selectedType,
-                               platformColor.piemenuBasic);
+            piemenuBasic(this, oscLabels, oscValues, selectedType, platformColor.piemenuBasic);
         } else if (this.name === "voicename") {
             if (this.value != null) {
                 selectedVoice = this.value;
@@ -3245,8 +3233,7 @@ function Block(protoblock, blocks, overrideName) {
                 categories.push(categoriesList.indexOf(VOICENAMES[i][3]));
             }
 
-            this._piemenuVoices(voiceLabels, voiceValues, categories,
-                                selectedVoice);
+            piemenuVoices(this, voiceLabels, voiceValues, categories, selectedVoice);
         } else if (this.name === "noisename") {
             if (this.value != null) {
                 selectedNoise = this.value;
@@ -3275,13 +3262,7 @@ function Block(protoblock, blocks, overrideName) {
                 categories.push(categoriesList.indexOf(NOISENAMES[i][3]));
             }
 
-            this._piemenuVoices(
-                noiseLabels,
-                noiseValues,
-                categories,
-                selectedNoise,
-                90
-            );
+            piemenuVoices(this, noiseLabels, noiseValues, categories, selectedNoise, 90);
         } else if (this.name === "temperamentname") {
             if (this.value != null) {
                 selectedTemperament = this.value;
@@ -3306,9 +3287,13 @@ function Block(protoblock, blocks, overrideName) {
                 temperamentValues.push(TEMPERAMENTS[i][1]);
             }
 
-            this._piemenuBasic(temperamentLabels, temperamentValues,
-                               selectedTemperament,
-                               platformColor.piemenuBasic);
+            piemenuBasic(
+                this,
+                temperamentLabels,
+                temperamentValues,
+                selectedTemperament,
+                platformColor.piemenuBasic
+            );
         } else if (this.name === "boolean") {
             if (this.value != null) {
                 selectedValue = this.value;
@@ -3319,26 +3304,25 @@ function Block(protoblock, blocks, overrideName) {
             let booleanLabels = [_("true"), _("false")];
             let booleanValues = [true, false];
 
-            this._piemenuBoolean(booleanLabels, booleanValues, selectedValue);
+            piemenuBoolean(this, booleanLabels, booleanValues, selectedValue);
         } else if (this.name === "grid") {
-
             selectedValue = this.value;
 
-            let gridLabels = [_("Cartesian"),
-                              _("polar"),
-                              _("Cartesian+polar") ,
-                              _("treble") ,
-                              _("grand staff") ,
-                              _("mezzo-soprano") ,
-                              _("alto") ,
-                              _("tenor"),
-                              _("bass") ,
-                              _("none")
-                             ];
-            let gridValues = gridLabels ;
+            let gridLabels = [
+                _("Cartesian"),
+                _("polar"),
+                _("Cartesian+polar"),
+                _("treble"),
+                _("grand staff"),
+                _("mezzo-soprano"),
+                _("alto"),
+                _("tenor"),
+                _("bass"),
+                _("none")
+            ];
+            let gridValues = gridLabels;
 
-            this._piemenuBasic(gridLabels, gridValues, selectedValue,
-                               platformColor.piemenuBasic);
+            piemenuBasic(this, gridLabels, gridValues, selectedValue, platformColor.piemenuBasic);
         } else if (this.name === "outputtools") {
             selectedValue = this.privateData;
             let labels;
@@ -3349,27 +3333,27 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             let values = labels;
-            this._piemenuBasic(labels, values, selectedValue,
-                               platformColor.piemenuBasic);
+            piemenuBasic(this, labels, values, selectedValue, platformColor.piemenuBasic);
         } else {
             // If the number block is connected to a pitch block, then
             // use the pie menu for octaves. Other special cases as well.
             let blk = this.blocks.blockList.indexOf(this);
             if (this.blocks.octaveNumber(blk)) {
-                this._piemenuNumber([8, 7, 6, 5, 4, 3, 2, 1], this.value);
+                piemenuNumber(this, [8, 7, 6, 5, 4, 3, 2, 1], this.value);
             } else if (this.blocks.noteValueNumber(blk, 2)) {
                 let cblk = this.connections[0];
                 if (cblk !== null) {
                     cblk = this.blocks.blockList[cblk].connections[0];
-                    if (cblk !== null &&
-                        ["rhythm2", "stuplet"].indexOf(
-                            this.blocks.blockList[cblk].name) !== -1) {
-                        this._piemenuNumber([2, 4, 8, 16], this.value);
+                    if (
+                        cblk !== null &&
+                        ["rhythm2", "stuplet"].indexOf(this.blocks.blockList[cblk].name) !== -1
+                    ) {
+                        piemenuNumber(this, [2, 4, 8, 16], this.value);
                     } else {
-                        this._piemenuNoteValue(this.value);
+                        piemenuNoteValue(this, this.value);
                     }
                 } else {
-                    this._piemenuNoteValue(this.value);
+                    piemenuNoteValue(this, this.value);
                 }
             } else if (this.blocks.noteValueNumber(blk, 1)) {
                 let d = this.blocks.noteValueValue(blk);
@@ -3386,75 +3370,95 @@ function Block(protoblock, blocks, overrideName) {
                 let cblk = this.connections[0];
                 if (cblk !== null) {
                     cblk = this.blocks.blockList[cblk].connections[0];
-                    if (cblk !== null &&
+                    if (
+                        cblk !== null &&
                         ["neighbor", "neighbor2", "rhythm2", "stuplet"].indexOf(
-                            this.blocks.blockList[cblk].name) !== -1) {
+                            this.blocks.blockList[cblk].name
+                        ) !== -1
+                    ) {
                         values = [3, 2, 1];
                     }
                 }
 
-                this._piemenuNumber(values, this.value);
+                piemenuNumber(this, values, this.value);
             } else if (this.blocks.octaveModifierNumber(blk)) {
-                this._piemenuNumber([-2, -1, 0, 1, 2], this.value);
+                piemenuNumber(this, [-2, -1, 0, 1, 2], this.value);
             } else if (this.blocks.intervalModifierNumber(blk)) {
-                this._piemenuNumber(this.blocks.blockList[
-                    this.blocks.blockList[this.connections[0]].connections[0]
-                ].protoblock.piemenuValuesC1, this.value);
+                piemenuNumber(
+                    this,
+                    this.blocks.blockList[this.blocks.blockList[this.connections[0]].connections[0]]
+                        .protoblock.piemenuValuesC1,
+                    this.value
+                );
             } else if (this._usePieNumberC3()) {
-                this._piemenuNumber(this.blocks.blockList[
-                    this.connections[0]].protoblock.piemenuValuesC3, this.value);
+                piemenuNumber(
+                    this,
+                    this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC3,
+                    this.value
+                );
             } else if (this._usePieNumberC2()) {
-                this._piemenuNumber(this.blocks.blockList[
-                    this.connections[0]].protoblock.piemenuValuesC2, this.value);
+                piemenuNumber(
+                    this,
+                    this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC2,
+                    this.value
+                );
             } else if (this._usePieNumberC1()) {
                 switch (this.blocks.blockList[this.connections[0]].name) {
-                case "setcolor":
-                case "sethue":
-                case "setshade":
-                case "settranslucency":
-                case "setgrey":
-                    this._piemenuNumber(
-                        this.blocks.blockList[
-                            this.connections[0]].protoblock.piemenuValuesC1,
-                        this.value,
-                        this.blocks.blockList[this.connections[0]].name);
-                    break;
-                case "pitchnumber":
-                    let temperament;
-                    for (let i = 0; i < this.blocks.blockList.length; i++) {
-                        if (this.blocks.blockList[i].name === "settemperament" &&
-                            this.blocks.blockList[i].connections[0] !== null) {
-                            let index = this.blocks.blockList[i].connections[1];
-                            temperament = this.blocks.blockList[index].value;
+                    case "setcolor":
+                    case "sethue":
+                    case "setshade":
+                    case "settranslucency":
+                    case "setgrey":
+                        piemenuNumber(
+                            this,
+                            this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC1,
+                            this.value,
+                            this.blocks.blockList[this.connections[0]].name
+                        );
+                        break;
+                    case "pitchnumber":
+                        let temperament;
+                        for (let i = 0; i < this.blocks.blockList.length; i++) {
+                            if (
+                                this.blocks.blockList[i].name === "settemperament" &&
+                                this.blocks.blockList[i].connections[0] !== null
+                            ) {
+                                let index = this.blocks.blockList[i].connections[1];
+                                temperament = this.blocks.blockList[index].value;
+                            }
                         }
-                    }
 
-                    if (temperament === undefined) {
-                        temperament = "equal";
-                    }
-
-                    if (temperament === "equal") {
-                        this._piemenuNumber(
-                            [-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-                            this.value);
-                    } else {
-                        let pitchNumbers = [];
-                        for (let i = 0; i < TEMPERAMENT[temperament]["pitchNumber"]; i++) {
-                            pitchNumbers.push(i);
+                        if (temperament === undefined) {
+                            temperament = "equal";
                         }
-                        this._piemenuNumber(pitchNumbers, this.value);
-                    }
-                    break;
-                default:
-                    this._piemenuNumber(this.blocks.blockList[
-                        this.connections[0]].protoblock.piemenuValuesC1,
-                                        this.value);
-                    break;
+
+                        if (temperament === "equal") {
+                            piemenuNumber(
+                                this,
+                                [-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                                this.value
+                            );
+                        } else {
+                            let pitchNumbers = [];
+                            for (let i = 0; i < TEMPERAMENT[temperament]["pitchNumber"]; i++) {
+                                pitchNumbers.push(i);
+                            }
+                            piemenuNumber(this, pitchNumbers, this.value);
+                        }
+                        break;
+                    default:
+                        piemenuNumber(
+                            this,
+                            this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC1,
+                            this.value
+                        );
+                        break;
                 }
             } else {
                 labelElem.innerHTML =
                     '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' +
-                    labelValue + '" />';
+                    labelValue +
+                    '" />';
                 labelElem.classList.add("hasKeyboard");
                 this.label = docById("numberLabel");
             }
@@ -3464,7 +3468,7 @@ function Block(protoblock, blocks, overrideName) {
         if (!this._usePiemenu()) {
             let focused = false;
 
-            let __blur = function(event) {
+            let __blur = function (event) {
                 // Not sure why the change in the input is not available
                 // immediately in FireFox. We need a workaround if hardware
                 // acceleration is enabled.
@@ -3487,7 +3491,7 @@ function Block(protoblock, blocks, overrideName) {
                 }
             };
 
-            let __input = function(event) {
+            let __input = function (event) {
                 that._labelChanged(false, true);
             };
 
@@ -3496,7 +3500,7 @@ function Block(protoblock, blocks, overrideName) {
                 this.label.addEventListener("input", __input);
             }
 
-            let __keypress = function(event) {
+            let __keypress = function (event) {
                 if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
                     __blur(event);
                 }
@@ -3504,21 +3508,22 @@ function Block(protoblock, blocks, overrideName) {
 
             this.label.addEventListener("keypress", __keypress);
 
-            this.label.addEventListener("change", function() {
+            this.label.addEventListener("change", function () {
                 that._labelChanged(false, true);
             });
 
-            this.label.style.left = Math.round(
-                (x + this.blocks.stage.x) *
-                    this.blocks.getStageScale() + canvasLeft) + "px";
-            this.label.style.top = Math.round(
-                (y + this.blocks.stage.y) *
-                    this.blocks.getStageScale() + canvasTop) + "px";
-            this.label.style.width = Math.round(
-                selectorWidth * this.blocks.blockScale * this.protoblock.scale / 2) + "px";
+            this.label.style.left =
+                Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) +
+                "px";
+            this.label.style.top =
+                Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) +
+                "px";
+            this.label.style.width =
+                Math.round((selectorWidth * this.blocks.blockScale * this.protoblock.scale) / 2) +
+                "px";
 
-            this.label.style.fontSize = Math.round(
-                20 * this.blocks.blockScale * this.protoblock.scale / 2) + "px";
+            this.label.style.fontSize =
+                Math.round((20 * this.blocks.blockScale * this.protoblock.scale) / 2) + "px";
             this.label.style.display = "";
             this.label.focus();
             if (this.labelattr != null) {
@@ -3526,13 +3531,13 @@ function Block(protoblock, blocks, overrideName) {
             }
 
             // Firefox fix
-            setTimeout(function() {
+            setTimeout(function () {
                 that.label.style.display = "";
                 that.label.focus();
                 focused = true;
             }, 100);
         }
-    };
+    }
 
     /**
      * Keypress handler. Handles exit key (Tab and Enter) press.
@@ -3540,3226 +3545,137 @@ function Block(protoblock, blocks, overrideName) {
      * @returns{void}
      * @private
      */
-    this._exitKeyPressed = function(event) {
+    _exitKeyPressed(event) {
         if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
             this._labelChanged(true, false);
             event.preventDefault();
             this.label.removeEventListener("keypress", this._exitKeyPressed);
         }
-    };
-    /*
+    }
+    /**
      * Check if pie menu is ok to launch
      * @return{void}
      * @public
      */
-    this.piemenuOKtoLaunch = function() {
+    piemenuOKtoLaunch() {
         if (this._piemenuExitTime === null) {
             return true;
         }
 
         return new Date().getTime() - this._piemenuExitTime > 200;
-    };
+    }
 
-    this._noteValueNumber = function(c) {
+    _noteValueNumber(c) {
         // Is this a number block being used as a note value
         // denominator argument?
         let dblk = this.connections[0];
         // Are we connected to a divide block?
-        if (this.name === "number" && dblk !== null &&
-            this.blocks.blockList[dblk].name === "divide") {
+        if (
+            this.name === "number" &&
+            dblk !== null &&
+            this.blocks.blockList[dblk].name === "divide"
+        ) {
             // Are we the denominator (c == 2) or numerator (c == 1)?
-            if (this.blocks.blockList[dblk].connections[c] ===
-                this.blocks.blockList.indexOf(this)) {
+            if (
+                this.blocks.blockList[dblk].connections[c] === this.blocks.blockList.indexOf(this)
+            ) {
                 // Is the divide block connected to a note value block?
-                cblk = this.blocks.blockList[dblk].connections[0];
+                const cblk = this.blocks.blockList[dblk].connections[0];
                 if (cblk !== null) {
                     // Is it the first or second arg?
                     switch (this.blocks.blockList[cblk].name) {
-                    case "newnote":
-                    case "pickup":
-                    case "tuplet4":
-                    case "newstaccato":
-                    case "newslur":
-                    case "elapsednotes2":
-                        return this.blocks.blockList[cblk].connections[1] === dblk;
-                        break;
-                    case "meter":
-                        this._check_meter_block = cblk;
-                    case "setbpm2":
-                    case "setmasterbpm2":
-                    case "stuplet":
-                    case "rhythm2":
-                    case "newswing2":
-                    case "vibrato":
-                    case "neighbor":
-                    case "neighbor2":
-                        return this.blocks.blockList[cblk].connections[2] === dblk;
-                        break;
-                    default:
-                        return false;
-                        break;
+                        case "newnote":
+                        case "pickup":
+                        case "tuplet4":
+                        case "newstaccato":
+                        case "newslur":
+                        case "elapsednotes2":
+                            return this.blocks.blockList[cblk].connections[1] === dblk;
+                        case "meter":
+                            this._check_meter_block = cblk;
+                        case "setbpm2":
+                        case "setmasterbpm2":
+                        case "stuplet":
+                        case "rhythm2":
+                        case "newswing2":
+                        case "vibrato":
+                        case "neighbor":
+                        case "neighbor2":
+                            return this.blocks.blockList[cblk].connections[2] === dblk;
+                        default:
+                            return false;
                     }
                 }
             }
         }
 
         return false;
-    };
+    }
 
-    this._noteValueValue = function() {
+    _noteValueValue() {
         // Return the number block value being used as a note value
         // denominator argument.
         let dblk = this.connections[0];
         // We are connected to a divide block.
         // Is the divide block connected to a note value block?
-        cblk = this.blocks.blockList[dblk].connections[0];
+        let cblk = this.blocks.blockList[dblk].connections[0];
         if (cblk !== null) {
             // Is it the first or second arg?
             switch (this.blocks.blockList[cblk].name) {
-            case "newnote":
-            case "pickup":
-            case "tuplet4":
-            case "newstaccato":
-            case "newslur":
-            case "elapsednotes2":
-                if (this.blocks.blockList[cblk].connections[1] === dblk) {
-                    cblk = this.blocks.blockList[dblk].connections[2];
-                    return this.blocks.blockList[cblk].value;
-                } else {
-                    return 1;
-                }
-                break;
-            case "meter":
-                this._check_meter_block = cblk;
-            case "setbpm2":
-            case "setmasterbpm2":
-            case "stuplet":
-            case "rhythm2":
-            case "newswing2":
-            case "vibrato":
-            case "neighbor":
-            case "neighbor2":
-                if (this.blocks.blockList[cblk].connections[2] === dblk) {
+                case "newnote":
+                case "pickup":
+                case "tuplet4":
+                case "newstaccato":
+                case "newslur":
+                case "elapsednotes2":
                     if (this.blocks.blockList[cblk].connections[1] === dblk) {
                         cblk = this.blocks.blockList[dblk].connections[2];
                         return this.blocks.blockList[cblk].value;
                     } else {
                         return 1;
                     }
-                } else {
+                case "meter":
+                    this._check_meter_block = cblk;
+                case "setbpm2":
+                case "setmasterbpm2":
+                case "stuplet":
+                case "rhythm2":
+                case "newswing2":
+                case "vibrato":
+                case "neighbor":
+                case "neighbor2":
+                    if (this.blocks.blockList[cblk].connections[2] === dblk) {
+                        if (this.blocks.blockList[cblk].connections[1] === dblk) {
+                            cblk = this.blocks.blockList[dblk].connections[2];
+                            return this.blocks.blockList[cblk].value;
+                        } else {
+                            return 1;
+                        }
+                    } else {
+                        return 1;
+                    }
+                default:
                     return 1;
-                }
-                break;
-            default:
-                return 1;
-                break;
             }
         }
 
         return 1;
-    };
+    }
 
-    this._octaveNumber = function() {
+    _octaveNumber() {
         // Is this a number block being used as an octave argument?
-        return (this.name === "number" && this.connections[0] !== null &&
-                ["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "nthmodalpitch"
-                ].indexOf(this.blocks.blockList[this.connections[0]].name) !== -1 &&
-                this.blocks.blockList[this.connections[0]].connections[2] ===
-                this.blocks.blockList.indexOf(this));
-    };
-
-    this._piemenuPitches = function(noteLabels, noteValues, accidentals, note, accidental,
-                                    custom) {
-        let prevPitch = null;
-
-        // wheelNav pie menu for pitch selection
-        if (this.blocks.stageClick) {
-            return;
-        }
-
-        if (custom === undefined) {
-            custom = false;
-        }
-
-        // Some blocks have both pitch and octave, so we can modify
-        // both at once.
-        let hasOctaveWheel = this.connections[0] !== null &&
-            ["pitch", "setpitchnumberoffset", "invert1", "tofrequency"].indexOf(
-                this.blocks.blockList[this.connections[0]].name) !== -1;
-
-        // If we are attached to a set key block, we want to order
-        // pitch by fifths.
-        if (this.connections[0] !== null &&
-            ["setkey", "setkey2"].indexOf(this.blocks.blockList[this.connections[0]].name
-                                         ) !== -1) {
-            noteLabels = ["C", "G", "D", "A", "E", "B", "F"];
-            noteValues = ["C", "G", "D", "A", "E", "B", "F"];
-        }
-
-        docById("wheelDiv").style.display = "";
-
-        // the pitch selector
-        this._pitchWheel = new wheelnav("wheelDiv", null, 600, 600);
-
-        if (!custom) {
-            // the accidental selector
-            this._accidentalsWheel = new wheelnav("_accidentalsWheel",
-                                                  this._pitchWheel.raphael);
-        }
-        // the octave selector
-        if (hasOctaveWheel) {
-            this._octavesWheel = new wheelnav("_octavesWheel", this._pitchWheel.raphael);
-        }
-
-        // exit button
-        this._exitWheel = new wheelnav("_exitWheel", this._pitchWheel.raphael);
-
-        wheelnav.cssMode = true;
-
-        this._pitchWheel.keynavigateEnabled = false;
-
-        this._pitchWheel.colors = platformColor.pitchWheelcolors;
-        this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
-        this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
-        if (!custom) {
-            this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.5;
-        } else {
-            this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.75;
-        }
-
-        this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
-        this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
-
-        this._pitchWheel.animatetime = 0; // 300;
-        this._pitchWheel.createWheel(noteLabels);
-
-        this._exitWheel.colors = platformColor.exitWheelcolors;
-        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
-        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["×", " "]);
-
-        if (!custom) {
-            this._accidentalsWheel.colors = platformColor.accidentalsWheelcolors;
-            this._accidentalsWheel.slicePathFunction = slicePath().DonutSlice;
-            this._accidentalsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-            this._accidentalsWheel.slicePathCustom.minRadiusPercent = 0.5;
-            this._accidentalsWheel.slicePathCustom.maxRadiusPercent = 0.75;
-            this._accidentalsWheel.sliceSelectedPathCustom =
-                this._accidentalsWheel.slicePathCustom;
-            this._accidentalsWheel.sliceInitPathCustom =
-                this._accidentalsWheel.slicePathCustom;
-
-            let accidentalLabels = [];
-            for (let i = 0; i < accidentals.length; i++) {
-                accidentalLabels.push(accidentals[i]);
-            }
-
-            for (let i = 0; i < 9; i++) {
-                accidentalLabels.push(null);
-                this._accidentalsWheel.colors.push(
-                    platformColor.accidentalsWheelcolorspush
-                );
-            }
-
-            this._accidentalsWheel.animatetime = 0; // 300;
-            this._accidentalsWheel.createWheel(accidentalLabels);
-            this._accidentalsWheel.setTooltips([
-                _("double sharp"),
-                _("sharp"),
-                _("natural"),
-                _("flat"),
-                _("double flat")
-            ]);
-        }
-        if (hasOctaveWheel) {
-            this._octavesWheel.colors = platformColor.octavesWheelcolors;
-            this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
-            this._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-            this._octavesWheel.slicePathCustom.minRadiusPercent = 0.75;
-            this._octavesWheel.slicePathCustom.maxRadiusPercent = 0.95;
-            this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
-            this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
-            let octaveLabels = ["8", "7", "6", "5", "4", "3", "2", "1",
-                                null, null, null, null, null, null];
-            this._octavesWheel.animatetime = 0; // 300;
-            this._octavesWheel.createWheel(octaveLabels);
-        }
-
-        // Position the widget over the note block.
-        let x = this.container.x;
-        let y = this.container.y;
-
-        let canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
-        let canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
-
-        docById("wheelDiv").style.position = "absolute";
-        docById("wheelDiv").style.height = "300px";
-        docById("wheelDiv").style.width = "300px";
-        docById("wheelDiv").style.left = Math.min(
-            this.blocks.turtles._canvas.width - 300, Math.max(0, Math.round(
-                (x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) - 200)
-        ) + "px";
-        docById("wheelDiv").style.top = Math.min(
-            this.blocks.turtles._canvas.height - 350, Math.max(0, Math.round(
-                (y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) - 200)
-        ) + "px";
-
-        // Navigate to a the current note value.
-        let i = noteValues.indexOf(note);
-        if (i === -1) {
-            if (custom) {
-                i = 0;
-            } else {
-                i = 4;
-            }
-        }
-
-        prevPitch = i;
-
-        this._pitchWheel.navigateWheel(i);
-
-        const OFFSET = {"major": 1, "dorian": 2, "phrygian": 3, "lydian": 4,
-                        "mixolydian": 5, "minor": 6, "locrian": 7};
-
-        const ROTATION = {"A" : 2, "B" : 1, "C" : 0, "D" : 6, "E" : 5, "F" : 4, "G" : 3};
-
-        let k = OFFSET[KeySignatureEnv[1]];
-        
-        let key;
-        let attrList = ["", SHARP, FLAT];
-        for (let j in attrList) {
-            for (let i in NOTENAMES) {
-                let tempScale = _buildScale(NOTENAMES[i] + attrList[j] + " major")[0];
-                if (tempScale[k-1] == KeySignatureEnv[0]) {
-                    key = NOTENAMES[i] + attrList[j];
-                    console.debug(key);
-                    break;
-                }
-            }
-            if (key != undefined) {
-                break;
-            }
-        }
-        let scale = _buildScale(key + " major")[0];
-        scale = scale.splice(0, scale.length - 1);
-
-        for (let j = 0; j < ROTATION[key[0]]; j++) {
-            scale.push(scale.shift());
-        }
-
-        // auto selection of sharps and flats in fixed solfege
-        // handles the case of opening the pie-menu, not whilst in the pie-menu
-        if ((!KeySignatureEnv[2] && this.name === "solfege") ||
-            (this.name === "notename") &&
-            (this.connections[0] != undefined ? ["setkey", "setkey2"].indexOf(
-                this.blocks.blockList[this.connections[0]].name) === -1: true)) {
-            if (scale[6 - i][0] == FIXEDSOLFEGE[note] || scale[6 - i][0] == note) {
-                accidental = scale[6 - i].substr(1);
-            } else {
-                accidental = EQUIVALENTACCIDENTALS[scale[6-i]].substr(1);
-            }
-            this.value = this.value.replace(SHARP, "").replace(FLAT, "");
-            this.value += accidental;
-            this.text.text = this.value;
-        }
-
-        if (!custom) {
-            // Navigate to a the current accidental value.
-            if (accidental === "") {
-                this._accidentalsWheel.navigateWheel(2);
-            } else {
-                switch (accidental) {
-                case DOUBLEFLAT:
-                    this._accidentalsWheel.navigateWheel(4);
-                    break;
-                case FLAT:
-                    this._accidentalsWheel.navigateWheel(3);
-                    break;
-                case NATURAL:
-                    this._accidentalsWheel.navigateWheel(2);
-                    break;
-                case SHARP:
-                    this._accidentalsWheel.navigateWheel(1);
-                    break;
-                case DOUBLESHARP:
-                    this._accidentalsWheel.navigateWheel(0);
-                    break;
-                default:
-                    this._accidentalsWheel.navigateWheel(2);
-                    break;
-                }
-            }
-        }
-
-        if (hasOctaveWheel) {
-            // Use the octave associated with this block, if available.
-            let pitchOctave = this.blocks.findPitchOctave(this.connections[0]);
-
-            // Navigate to current octave
-            this._octavesWheel.navigateWheel(8 - pitchOctave);
-            prevOctave = 8 - pitchOctave;
-        }
-
-        // Set up event handlers
-        let that = this;
-        let selection = {
-            "note": note,
-            "attr": accidental
-        };
-
-        let __selectionChangedSolfege = function() {
-            selection["note"] =
-                that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
-            let i = noteLabels.indexOf(selection["note"]);
-            that.value = noteValues[i];
-
-            // auto selection of sharps and flats in fixed solfege
-            // handles the case of opening the pie-menu, not whilst in the pie-menu
-            // FIXEDSOLFEGE converts solfege to alphabet, needed for solfege pie-menu
-            // In case of alphabet, direct comparison is performed
-
-            if ((!KeySignatureEnv[2] && that.name == "solfege") ||
-            (that.name == "notename") &&
-            (that.connections[0] != undefined ? ["setkey", "setkey2"].indexOf(
-                that.blocks.blockList[that.connections[0]].name) === -1: true)) {
-                let i = NOTENAMES.indexOf(FIXEDSOLFEGE[selection["note"]]);
-                if (i == -1) {
-                    i = NOTENAMES.indexOf(selection["note"]);
-                }
-                if (scale[i][0] == FIXEDSOLFEGE[selection["note"]] ||
-                    scale[i][0] == selection["note"]) {
-                    selection["attr"] = scale[i].substr(1);
-                } else {
-                    selection["attr"] = EQUIVALENTACCIDENTALS[scale[i]].substr(1);
-                }
-                switch (selection["attr"]) {
-                case DOUBLEFLAT:
-                    that._accidentalsWheel.navigateWheel(4);
-                    break;
-                case FLAT:
-                    that._accidentalsWheel.navigateWheel(3);
-                    break;
-                case NATURAL:
-                    that._accidentalsWheel.navigateWheel(2);
-                    break;
-                case SHARP:
-                    that._accidentalsWheel.navigateWheel(1);
-                    break;
-                case DOUBLESHARP:
-                    that._accidentalsWheel.navigateWheel(0);
-                    break;
-                default:
-                    that._accidentalsWheel.navigateWheel(2);
-                    break;
-                }
-            }
-            that.text.text = selection["note"];
-            if (selection["attr"] !== "♮") {
-                that.text.text += selection["attr"];
-            }
-
-            // Make sure text is on top.
-            that.container.setChildIndex(that.text, that.container.children.length - 1);
-            that.updateCache();
-
-            if (hasOctaveWheel) {
-                // Set the octave of the pitch block if available
-                let octave = Number(
-                    that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex
-                                               ].title);
-                that.blocks.setPitchOctave(that.connections[0], octave);
-            }
-
-            if (that.connections[0] !== null && ["setkey", "setkey2"].indexOf(
-                that.blocks.blockList[that.connections[0]].name) !== -1) {
-                // We may need to update the mode widget.
-                that.blocks.logo._modeBlock = that.blocks.blockList.indexOf(that);
-            }
-            __pitchPreview();
-        };
-
-        let __selectionChangedOctave = () => {
-            let octave = Number(
-                that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex
-                                           ].title);
-            that.blocks.setPitchOctave(that.connections[0], octave);
-            __pitchPreview();
-        }
-
-        let __selectionChangedAccidental = () => {
-            selection["attr"] =
-                that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex
-                                               ].title;
-            if (selection["attr"] !== "♮") {
-                that.value = selection["note"] + selection["attr"];
-            } else {
-                that.value = selection["note"];
-            }
-            that.text.text = that.value;
-            that.container.setChildIndex(that.text, that.container.children.length - 1);
-            that.updateCache();
-            __pitchPreview();
-        };
-
-        /*
-         * Preview the selected pitch using the synth
-         * @return{void}
-         * @private
-         */
-        let __pitchPreview = function() {
-            let label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
-            let i = noteLabels.indexOf(label);
-
-            // Are we wrapping across C? We need to compare with the previous pitch
-            if (prevPitch === null) {
-                prevPitch = i;
-            }
-
-            let deltaPitch = i - prevPitch;
-            let delta;
-            if (deltaPitch > 3) {
-                delta = deltaPitch - 7;
-            } else if (deltaPitch < -3) {
-                delta = deltaPitch + 7;
-            } else {
-                delta = deltaPitch;
-            }
-
-            // If we wrapped across C, we need to adjust the octave.
-            let deltaOctave = 0;
-            if (prevPitch + delta > 6) {
-                deltaOctave = -1;
-            } else if (prevPitch + delta < 0) {
-                deltaOctave = 1;
-            }
-            let attr;
-            prevPitch = i;
-            let note = noteValues[i];
-            if (!custom) {
-                attr = that._accidentalsWheel.navItems[
-                    that._accidentalsWheel.selectedNavItemIndex].title;
-                if (label === " ") {
-                    return;
-                } else if (attr !== "♮") {
-                    note += attr;
-                }
-            }
-
-            let octave;
-            if (hasOctaveWheel) {
-                octave = Number(that._octavesWheel.navItems[
-                    that._octavesWheel.selectedNavItemIndex].title);
-            } else {
-                octave = 4;
-            }
-
-            octave += deltaOctave;
-            if (octave < 1) {
-                octave = 1;
-            } else if (octave > 8) {
-                octave = 8;
-            }
-
-            if (hasOctaveWheel && deltaOctave !== 0) {
-                that._octavesWheel.navigateWheel(8 - octave);
-                that.blocks.setPitchOctave(that.connections[0], octave);
-            }
-            
-            let keySignature = KeySignatureEnv[0] + " " + KeySignatureEnv[1];
-
-            let obj;
-            if (that.name == "scaledegree2") {
-                note = note.replace(attr, "");
-                note = SOLFEGENAMES[note - 1];
-                note += attr;
-                obj = getNote(note, octave, 0, keySignature, true, null,
-                              that.blocks.errorMsg, that.blocks.logo.synth.inTemperament);
-            } else {
-                // console.debug(note);
-                obj = getNote(note, octave, 0, keySignature, KeySignatureEnv[2], null,
-                              that.blocks.errorMsg, that.blocks.logo.synth.inTemperament);
-            }
-            if (!custom) {
-                obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
-            }
-
-            let tur = that.blocks.logo.turtles.ithTurtle(0);
-
-            if (tur.singer.instrumentNames.length === 0 ||
-                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1) {
-                tur.singer.instrumentNames.push(DEFAULTVOICE);
-                that.blocks.logo.synth.createDefaultSynth(0);
-                that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
-            }
-
-            that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
-            Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
-
-            if (!that._triggerLock) {
-                that._triggerLock = true;
-                that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE,
-                                               null, null);
-            }
-
-            setTimeout(function() {
-                that._triggerLock = false;
-            }, 1 / 8);
-
-        };
-
-        // Set up handlers for pitch preview.
-        for (let i = 0; i < noteValues.length; i++) {
-            this._pitchWheel.navItems[i].navigateFunction = __selectionChangedSolfege;
-        }
-
-        if (!custom) {
-            for (let i = 0; i < accidentals.length; i++) {
-                this._accidentalsWheel.navItems[i].navigateFunction =
-                    __selectionChangedAccidental;
-            }
-        }
-
-        if (hasOctaveWheel) {
-            for (let i = 0; i < 8; i++) {
-                this._octavesWheel.navItems[i].navigateFunction = __selectionChangedOctave;
-            }
-        }
-
-        // Hide the widget when the exit button is clicked.
-        this._exitWheel.navItems[0].navigateFunction = function() {
-            that._piemenuExitTime = new Date().getTime();
-            docById("wheelDiv").style.display = "none";
-            that._pitchWheel.removeWheel();
-            if (!custom) {
-                that._accidentalsWheel.removeWheel();
-            }
-            that._exitWheel.removeWheel();
-            if (hasOctaveWheel) {
-                that._octavesWheel.removeWheel();
-            }
-        };
-    };
-
-    this._customNotes = function(noteLabels, customLabels, selectedCustom, selectedNote) {
-        // pie menu for customNote selection
-        if (this.blocks.stageClick) {
-            return;
-        }
-
-        docById("wheelDiv").style.display = "";
-
-        // Some blocks have both pitch and octave, so we can modify
-        // both at once.
-        let hasOctaveWheel = this.connections[0] !== null &&
-            ["pitch", "setpitchnumberoffset", "invert1", "tofrequency"].indexOf(
-                this.blocks.blockList[this.connections[0]].name) !== -1;
-
-        // Use advanced constructor for more wheelnav on same div
-        this._customWheel = new wheelnav("wheelDiv", null, 800, 800);
-
-        this._cusNoteWheel = new wheelnav("_cusNoteWheel", this._customWheel.raphael);
-        // exit button
-        this._exitWheel = new wheelnav("_exitWheel", this._customWheel.raphael);
-
-        // the octave selector
-        if (hasOctaveWheel) {
-            this._octavesWheel = new wheelnav("_octavesWheel", this._customWheel.raphael);
-        }
-
-
-        wheelnav.cssMode = true;
-
-        this._customWheel.keynavigateEnabled = false;
-
-        //Customize slicePaths for proper size
-        this._customWheel.colors = platformColor.intervalNameWheelcolors;
-        this._customWheel.slicePathFunction = slicePath().DonutSlice;
-        this._customWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._customWheel.slicePathCustom.minRadiusPercent = 0.1;
-        this._customWheel.slicePathCustom.maxRadiusPercent = 0.5;
-        this._customWheel.sliceSelectedPathCustom = this._customWheel.slicePathCustom;
-        this._customWheel.sliceInitPathCustom = this._customWheel.slicePathCustom;
-        this._customWheel.titleRotateAngle = 0;
-        this._customWheel.animatetime = 0; // 300;
-        this._customWheel.clickModeRotate = false;
-        this._customWheel.createWheel(customLabels);
-
-        this._cusNoteWheel.colors = platformColor.intervalWheelcolors;
-        this._cusNoteWheel.slicePathFunction = slicePath().DonutSlice;
-        this._cusNoteWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._cusNoteWheel.slicePathCustom.minRadiusPercent = 0.5;
-        this._cusNoteWheel.slicePathCustom.maxRadiusPercent = 0.85;
-        //this._cusNoteWheel.titleRotateAngle = 0;
-        this._cusNoteWheel.titleFont = '100 24px Impact, sans-serif';
-        this._cusNoteWheel.sliceSelectedPathCustom = this._cusNoteWheel.slicePathCustom;
-        this._cusNoteWheel.sliceInitPathCustom = this._cusNoteWheel.slicePathCustom;
-
-        if (hasOctaveWheel) {
-            this._octavesWheel.colors = platformColor.octavesWheelcolors;
-            this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
-            this._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-            this._octavesWheel.slicePathCustom.minRadiusPercent = 0.85;
-            this._octavesWheel.slicePathCustom.maxRadiusPercent = 1;
-            this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
-            this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
-            let octaveLabels = ["8", "7", "6", "5", "4", "3", "2", "1",
-                                null, null, null, null, null, null];
-            this._octavesWheel.animatetime = 0; // 300;
-            this._octavesWheel.createWheel(octaveLabels);
-        }
-
-        //Disable rotation, set navAngle and create the menus
-        this._cusNoteWheel.clickModeRotate = false;
-        this._cusNoteWheel.animatetime = 0; // 300;
-        let labels = [];
-        let thisCustom=0;
-        let max =0 ;
-        for (let t of customLabels) {
-            max = max > noteLabels[t]["pitchNumber"] ? max : noteLabels[t]["pitchNumber"] ;
-        }
-        for (let t of customLabels) {
-            for(let k =noteLabels[t].length -1 ; k>=0 ;k--) {
-                if (k !== "pitchNumber") {
-                    labels.push(noteLabels[t][k][1]);
-                    thisCustom ++ ;
-                }
-            }
-            for (let extra = max - thisCustom ; extra > 0 ;extra--){
-                labels.push("");
-            }
-            thisCustom = 0 ;
-        }
-
-        this._cusNoteWheel.navAngle = -(180 / customLabels.length) + 180 / labels.length;
-        this._cusNoteWheel.createWheel(labels);
-
-        this._exitWheel.colors = platformColor.exitWheelcolors;
-        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.1;
-        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["×", " "]);
-
-        let that = this;
-
-        // position widget
-        let x = this.container.x;
-        let y = this.container.y;
-
-        let canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
-        let canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
-
-        docById("wheelDiv").style.position = "absolute";
-        docById("wheelDiv").style.height = "400px";
-        docById("wheelDiv").style.width = "400px";
-        docById("wheelDiv").style.left = Math.min(
-            this.blocks.turtles._canvas.width - 400,
-            Math.max(0, Math.round(
-                (x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft
-            ) - 200)) + "px";
-        docById("wheelDiv").style.top = Math.min(
-            this.blocks.turtles._canvas.height - 450,
-            Math.max(0, Math.round(
-                (y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop
-            ) - 200)) + "px";
-
-        if (hasOctaveWheel) {
-            // Use the octave associated with this block, if available.
-            let pitchOctave = this.blocks.findPitchOctave(this.connections[0]);
-
-            // Navigate to current octave
-            this._octavesWheel.navigateWheel(8 - pitchOctave);
-        }
-
-        // Add function to each main menu for show/hide sub menus
-        // FIXME: Add all tabs to each interval
-        let __setupAction = function(i) {
-            that._customWheel.navItems[i].navigateFunction = function() {
-                that.customID =
-                    that._customWheel.navItems[that._customWheel.selectedNavItemIndex
-                                              ].title;
-                for (let l = 0; l < customLabels.length; l++) {
-                    for (let j = 0; j < max; j++) {
-                        if (l !== i) {
-                            that._cusNoteWheel.navItems[l * max + j].navItem.hide();
-                            } else if (labels[l * max + j] == "") {
-                            that._cusNoteWheel.navItems[l * max + j].navItem.hide();
-                        } else {
-                            that._cusNoteWheel.navItems[l * max + j].navItem.show();
-                        }
-                    }
-                }
-            };
-        };
-
-        // Set up action for interval name so number tabs will
-        // initialize on load.
-        for (var i = 0; i < customLabels.length; i++) __setupAction(i);
-
-        // navigate to a specific starting point
-
-        for (var i = 0; i < customLabels.length; i++) {
-            if (selectedCustom === customLabels[i]) {
-                break;
-            }
-        }
-
-        if (i === customLabels.length) {
-            i = 0;
-        }
-
-        this._customWheel.navigateWheel(i);
-
-        let j = selectedNote ;
-        for (let x in noteLabels[selectedCustom]){
-            if (x != "pitchNumber" && noteLabels[selectedCustom][x][1] == j) {
-                j = +x ; break ;
-            }
-        }
-
-        if (typeof j  == "number")
-            this._cusNoteWheel.navigateWheel(max * customLabels.indexOf(selectedCustom) + j);
-
-        let __exitMenu = function() {
-            that._piemenuExitTime = new Date().getTime();
-            docById("wheelDiv").style.display = "none";
-        };
-
-        let __selectionChanged = function() {
-            let label = that._customWheel.navItems[that._customWheel.selectedNavItemIndex
-                                                  ].title;
-            let note = that._cusNoteWheel.navItems[that._cusNoteWheel.selectedNavItemIndex
-                                                  ].title;
-
-            that.value = note;
-            that.text.text =note;
-            let octave = 4 ;
-
-            if (hasOctaveWheel) {
-                // Set the octave of the pitch block if available
-                octave = Number(that._octavesWheel.navItems[
-                        that._octavesWheel.selectedNavItemIndex].title
-                );
-                that.blocks.setPitchOctave(that.connections[0], octave);
-            }
-
-            // Make sure text is on top.
-            that.container.setChildIndex(that.text, that.container.children.length - 1);
-            that.updateCache();
-
-            let obj = getNote(note, octave, 0, "C major", false, null,
-                              that.blocks.errorMsg, label);
-            let tur = that.blocks.logo.turtles.ithTurtle(0);
-
-            if (tur.singer.instrumentNames.length === 0 ||
-                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1) {
-                tur.singer.instrumentNames.push(DEFAULTVOICE);
-                that.blocks.logo.synth.createDefaultSynth(0);
-                that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
-            }
-
-            that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
-            Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
-
-            if (!that._triggerLock) {
-                //preview :
-                that._triggerLock = true;
-                let no = [obj[0]+obj[1]];
-                let notes1 = no ;
-                no = that.blocks.logo.synth.getCustomFrequency(no,that.customID);
-                if (no === undefined) {
-                    no = notes1;
-                }
-                instruments[0][DEFAULTVOICE].triggerAttackRelease(no, 1/8);
-            }
-
-            setTimeout(function() {
-                that._triggerLock = false;
-            }, 1 / 8);
-        }
-        if (hasOctaveWheel) {
-            for (let i = 0; i < 8; i++) {
-                this._octavesWheel.navItems[i].navigateFunction = __selectionChanged;
-            }
-        }
-        // Set up handlers for preview.
-        for (var i = 0; i < labels.length; i++) {
-            this._cusNoteWheel.navItems[i].navigateFunction = __selectionChanged;
-        }
-
-        this._exitWheel.navItems[0].navigateFunction = __exitMenu;
-    };
-
-    this._piemenuNthModalPitch = function(noteValues, note) {
-        // wheelNav pie menu for scale degree pitch selection
-
-        // check if a non-integer value is connected to note argument
-        // Pie menu would crash; so in such case navigate to closest integer
-
-        if (note % 1 !== 0) {
-            note = Math.floor(note + 0.5);
-        }
-
-        if (this.blocks.stageClick) {
-            return;
-        }
-
-        let noteLabels = [];
-        for (let i = 0; i < noteValues.length; i++) {
-            noteLabels.push(noteValues[i].toString());
-        }
-        noteLabels.push(null);
-
-        docById("wheelDiv").style.display = "";
-
-        this._pitchWheel = new wheelnav("wheelDiv", null, 600, 600);
-        this._octavesWheel = new wheelnav(
-            "_octavesWheel",
-            this._pitchWheel.raphael
+        return (
+            this.name === "number" &&
+            this.connections[0] !== null &&
+            ["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "nthmodalpitch"].indexOf(
+                this.blocks.blockList[this.connections[0]].name
+            ) !== -1 &&
+            this.blocks.blockList[this.connections[0]].connections[2] ===
+                this.blocks.blockList.indexOf(this)
         );
-        this._exitWheel = new wheelnav("_exitWheel", this._pitchWheel.raphael);
+    }
 
-        wheelnav.cssMode = true;
-
-        this._pitchWheel.keynavigateEnabled = false;
-
-        this._pitchWheel.colors = platformColor.pitchWheelcolors;
-        this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
-        this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.35;
-        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.72;
-        this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
-        this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
-
-        this._pitchWheel.animatetime = 0; // 300;
-        this._pitchWheel.createWheel(noteLabels);
-
-        this._exitWheel.colors = platformColor.exitWheelcolors;
-        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
-        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["×", " "]);
-
-        this._octavesWheel.colors = platformColor.octavesWheelcolors;
-        this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
-        this._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._octavesWheel.slicePathCustom.minRadiusPercent = 0.80;
-        this._octavesWheel.slicePathCustom.maxRadiusPercent = 1.00;
-        this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
-        this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
-        let octaveLabels = [
-            "8",
-            "7",
-            "6",
-            "5",
-            "4",
-            "3",
-            "2",
-            "1",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        ];
-        this._octavesWheel.animatetime = 0; // 300;
-        this._octavesWheel.createWheel(octaveLabels);
-
-        // enable changing values while pie-menu is open
-        let labelElem = docById("labelDiv");
-        labelElem.innerHTML =
-            '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' +
-            note +
-            '" />';
-        labelElem.classList.add("hasKeyboard");
-
-        this.label = docById("numberLabel");
-        this.label.addEventListener(
-            "keypress",
-            this._exitKeyPressed.bind(this)
-        );
-
-        this.label.addEventListener("change", function() {
-            that._labelChanged(false, false);
-        });
-
-        // Position the widget above/below note block.
-        let x = this.container.x;
-        let y = this.container.y;
-
-        let canvasLeft =
-            this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
-        let canvasTop =
-            this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
-
-        docById("wheelDiv").style.position = "absolute";
-        docById("wheelDiv").style.height = "300px";
-        docById("wheelDiv").style.width = "300px";
-
-        let selectorWidth = 150;
-        let left = Math.round(
-            (x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft
-        );
-        let top = Math.round(
-            (y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop
-        );
-        this.label.style.left = left + "px";
-        this.label.style.top = top + "px";
-
-        docById("wheelDiv").style.left =
-            Math.min(
-                Math.max(left - (300 - selectorWidth) / 2, 0),
-                this.blocks.turtles._canvas.width - 300
-            ) + "px";
-
-        if (top - 300 < 0) {
-            docById("wheelDiv").style.top = top + 40 + "px";
-        } else {
-            docById("wheelDiv").style.top = top - 300 + "px";
-        }
-
-        this.label.style.width =
-            (Math.round(selectorWidth * this.blocks.blockScale) *
-                this.protoblock.scale) /
-            2 +
-            "px";
-
-        this.label.style.fontSize =
-            Math.round(
-                (20 * this.blocks.blockScale * this.protoblock.scale) / 2
-            ) + "px";
-
-        // Navigate to a the current note value.
-        let i = noteValues.indexOf(note);
-
-        this._pitchWheel.navigateWheel(i);
-
-        // Use the octave associated with this block, if available.
-        let pitchOctave = this.blocks.findPitchOctave(this.connections[0]);
-
-        // Navigate to current octave
-        this._octavesWheel.navigateWheel(8 - pitchOctave);
-
-        // Set up event handlers
-        let that = this;
-
-        /*
-         * Change selection and set value to notevalue
-         * @return{void}
-         * @private
-         */
-        let __selectionChanged = function() {
-            let label =
-                that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex]
-                    .title;
-            let i = noteLabels.indexOf(label);
-            that.value = noteValues[i];
-            that.text.text = label;
-
-            // Make sure text is on top.
-            that.container.setChildIndex(that.text, that.container.children.length - 1);
-            that.updateCache();
-
-            // Set the octave of the pitch block if available
-            let octave = Number(
-                that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex
-                                           ].title
-            );
-            that.blocks.setPitchOctave(that.connections[0], octave);
-        };
-
-        /*
-         * Preview pitch
-         * @return{void}
-         * @private
-         */
-        let __pitchPreview = function() {
-            let label =
-                that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex]
-                    .title;
-            let i = noteLabels.indexOf(label);
-
-            /* We're using a default of C major ==> -7 to -1 should be one octave lower
-                than the reference, 0-6 in the same octave and 7 should be once octave higher
-            */
-            let deltaOctave = 0;
-            if (noteLabels[i] == 7) {
-                deltaOctave = 1;
-            } else if (noteLabels[i] < 0) {
-                deltaOctave = -1;
-            }
-
-            // prevPitch = i;
-            let octave = Number(
-                that._octavesWheel.navItems[
-                    that._octavesWheel.selectedNavItemIndex
-                ].title
-            );
-            octave += deltaOctave;
-            if (octave < 1) {
-                octave = 1;
-            } else if (octave > 8) {
-                octave = 8;
-            }
-
-            let note;
-
-            // Use C major as of now; fix this to use current keySignature once that feature is in place
-            let keySignature = KeySignatureEnv[0] + " " + KeySignatureEnv[1];
-            if (noteValues[i] >= 0) {
-                note = nthDegreeToPitch(keySignature, noteValues[i]);
-            } else {
-                note = nthDegreeToPitch(keySignature, 7 + noteValues[i]);
-            }
-
-            let tur = that.blocks.logo.turtles.ithTurtle(0);
-
-            if (
-                tur.singer.instrumentNames.length === 0 ||
-                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
-            ) {
-                tur.singer.instrumentNames.push(DEFAULTVOICE);
-                that.blocks.logo.synth.createDefaultSynth(0);
-                that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
-            }
-
-            that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
-            Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
-
-            //Play sample note and prevent extra sounds from playing
-            if (!that._triggerLock) {
-                that._triggerLock = true;
-                that.blocks.logo.synth.trigger(
-                    0,
-                    [note.replace(SHARP, "#").replace(FLAT, "b") + octave],
-                    1 / 8,
-                    DEFAULTVOICE,
-                    null,
-                    null
-                );
-            }
-
-            setTimeout(function() {
-                that._triggerLock = false;
-            }, 1 / 8);
-
-            __selectionChanged();
-        };
-        // Set up handlers for pitch preview.
-        for (let i = 0; i < noteValues.length; i++) {
-            this._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
-        }
-
-        for (let i = 0; i < 8; i++) {
-            this._octavesWheel.navItems[i].navigateFunction = __pitchPreview;
-        }
-
-        // Hide the widget when the exit button is clicked.
-        this._exitWheel.navItems[0].navigateFunction = function() {
-            that._piemenuExitTime = new Date().getTime();
-            docById("wheelDiv").style.display = "none";
-            that._pitchWheel.removeWheel();
-            that._exitWheel.removeWheel();
-            that._octavesWheel.removeWheel();
-        };
-    };
-
-    this._piemenuAccidentals = function(
-        accidentalLabels,
-        accidentalValues,
-        accidental
-    ) {
-        // wheelNav pie menu for accidental selection
-
-        if (this.blocks.stageClick) {
-            return;
-        }
-
-        docById("wheelDiv").style.display = "";
-
-        // the accidental selector
-        this._accidentalWheel = new wheelnav("wheelDiv", null, 600, 600);
-        // exit button
-        this._exitWheel = new wheelnav(
-            "_exitWheel",
-            this._accidentalWheel.raphael
-        );
-
-        let labels = [];
-        for (let i = 0; i < accidentalLabels.length; i++) {
-            labels.push(last(accidentalLabels[i].split(" ")));
-        }
-
-        labels.push(null);
-
-        wheelnav.cssMode = true;
-
-        this._accidentalWheel.keynavigateEnabled = false;
-
-        this._accidentalWheel.colors = platformColor.accidentalsWheelcolors;
-        this._accidentalWheel.slicePathFunction = slicePath().DonutSlice;
-        this._accidentalWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._accidentalWheel.slicePathCustom.minRadiusPercent = 0.2;
-        this._accidentalWheel.slicePathCustom.maxRadiusPercent = 0.6;
-        this._accidentalWheel.sliceSelectedPathCustom = this._accidentalWheel.slicePathCustom;
-        this._accidentalWheel.sliceInitPathCustom = this._accidentalWheel.slicePathCustom;
-        this._accidentalWheel.titleRotateAngle = 0;
-        this._accidentalWheel.animatetime = 0; // 300;
-        this._accidentalWheel.createWheel(labels);
-        this._accidentalWheel.setTooltips(accidentalLabels);
-
-        this._exitWheel.colors = platformColor.exitWheelcolors;
-        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
-        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["×", " "]);
-
-        let that = this;
-
-        let __selectionChanged = function() {
-            let label =
-                that._accidentalWheel.navItems[
-                    that._accidentalWheel.selectedNavItemIndex
-                    ].title;
-            let i = labels.indexOf(label);
-            that.value = accidentalValues[i];
-            that.text.text = accidentalLabels[i];
-
-            // Make sure text is on top.
-            that.container.setChildIndex(that.text, that.container.children.length - 1);
-            that.updateCache();
-        };
-
-        /*
-         * Exit menu
-         * @return{void}
-         * @private
-         */
-        let __exitMenu = function() {
-            that._piemenuExitTime = new Date().getTime();
-            docById("wheelDiv").style.display = "none";
-            that._accidentalWheel.removeWheel();
-            that._exitWheel.removeWheel();
-        };
-
-        // Position the widget over the note block.
-        let x = this.container.x;
-        let y = this.container.y;
-
-        let canvasLeft =
-            this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
-        let canvasTop =
-            this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
-
-        docById("wheelDiv").style.position = "absolute";
-        docById("wheelDiv").style.height = "300px";
-        docById("wheelDiv").style.width = "300px";
-        docById("wheelDiv").style.left =
-            Math.min(
-                this.blocks.turtles._canvas.width - 300,
-                Math.max(
-                    0,
-                    Math.round(
-                        (x + this.blocks.stage.x) *
-                        this.blocks.getStageScale() +
-                        canvasLeft
-                    ) - 200
-                )
-            ) + "px";
-        docById("wheelDiv").style.top =
-            Math.min(
-                this.blocks.turtles._canvas.height - 350,
-                Math.max(
-                    0,
-                    Math.round(
-                        (y + this.blocks.stage.y) *
-                        this.blocks.getStageScale() +
-                        canvasTop
-                    ) - 200
-                )
-            ) + "px";
-
-        // Navigate to a the current accidental value.
-        let i = accidentalValues.indexOf(accidental);
-        if (i === -1) {
-            i = 2;
-        }
-
-        this._accidentalWheel.navigateWheel(i);
-
-        // Hide the widget when the selection is made.
-        for (let i = 0; i < accidentalLabels.length; i++) {
-            this._accidentalWheel.navItems[i].navigateFunction = function() {
-                __selectionChanged();
-                __exitMenu();
-            };
-        }
-
-        // Or use the exit wheel...
-        this._exitWheel.navItems[0].navigateFunction = function() {
-            __exitMenu();
-        };
-    };
-
-    this._piemenuNoteValue = function(noteValue) {
-        // input form and  wheelNav pie menu for note value selection
-
-        if (this.blocks.stageClick) {
-            return;
-        }
-
-        docById("wheelDiv").style.display = "";
-
-        // We want powers of two on the bottom, nearest the input box
-        // as it is most common.
-        const WHEELVALUES = [3, 2, 7, 5];
-        let subWheelValues = {
-            2: [1, 2, 4, 8, 16, 32],
-            3: [1, 3, 6, 9, 12, 27],
-            5: [1, 5, 10, 15, 20, 25],
-            7: [1, 7, 14, 21, 28, 35]
-        };
-
-        let cblk = this.connections[0];
-        if (cblk !== null) {
-            cblk = this.blocks.blockList[cblk].connections[0];
-            if (
-                cblk !== null &&
-                ["neighbor", "neighbor2"].indexOf(
-                    this.blocks.blockList[cblk].name
-                ) !== -1
-            ) {
-                subWheelValues = {
-                    2: [8, 16, 32, 64],
-                    3: [9, 12, 27, 54],
-                    5: [10, 15, 20, 25],
-                    7: [14, 21, 28, 35]
-                };
-            }
-        }
-
-        // the noteValue selector
-        this._noteValueWheel = new wheelnav("wheelDiv", null, 600, 600);
-        // exit button
-        this._exitWheel = new wheelnav(
-            "_exitWheel",
-            this._noteValueWheel.raphael
-        );
-        // submenu wheel
-        this._tabsWheel = new wheelnav(
-            "_tabsWheel",
-            this._noteValueWheel.raphael
-        );
-
-        let noteValueLabels = [];
-        for (let i = 0; i < WHEELVALUES.length; i++) {
-            noteValueLabels.push(WHEELVALUES[i].toString());
-        }
-
-        wheelnav.cssMode = true;
-
-        this._noteValueWheel.keynavigateEnabled = false;
-
-        this._noteValueWheel.colors = platformColor.noteValueWheelcolors;
-        this._noteValueWheel.slicePathFunction = slicePath().DonutSlice;
-        this._noteValueWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._noteValueWheel.slicePathCustom.minRadiusPercent = 0.2;
-        this._noteValueWheel.slicePathCustom.maxRadiusPercent = 0.6;
-        this._noteValueWheel.sliceSelectedPathCustom = this._noteValueWheel.slicePathCustom;
-        this._noteValueWheel.sliceInitPathCustom = this._noteValueWheel.slicePathCustom;
-        this._noteValueWheel.animatetime = 0; // 300;
-        this._noteValueWheel.clickModeRotate = false;
-        this._noteValueWheel.createWheel(noteValueLabels);
-
-        this._exitWheel.colors = platformColor.exitWheelcolors;
-        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
-        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["×", " "]);
-
-        let tabsLabels = [];
-        for (let i = 0; i < WHEELVALUES.length; i++) {
-            for (var j = 0; j < subWheelValues[WHEELVALUES[i]].length; j++) {
-                tabsLabels.push(subWheelValues[WHEELVALUES[i]][j].toString());
-            }
-        }
-
-        this._tabsWheel.colors = platformColor.tabsWheelcolors;
-        this._tabsWheel.slicePathFunction = slicePath().DonutSlice;
-        this._tabsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._tabsWheel.slicePathCustom.minRadiusPercent = 0.6;
-        this._tabsWheel.slicePathCustom.maxRadiusPercent = 0.8;
-        this._tabsWheel.sliceSelectedPathCustom = this._tabsWheel.slicePathCustom;
-        this._tabsWheel.sliceInitPathCustom = this._tabsWheel.slicePathCustom;
-        this._tabsWheel.clickModeRotate = false;
-        this._tabsWheel.navAngle =
-            -180 / WHEELVALUES.length +
-            180 / (WHEELVALUES.length * subWheelValues[WHEELVALUES[0]].length);
-        this._tabsWheel.createWheel(tabsLabels);
-
-        let that = this;
-
-        /*
-         * set value to number of text
-         * @return{void}
-         * @private
-         */
-        let __selectionChanged = function() {
-            that.text.text =
-                that._tabsWheel.navItems[
-                    that._tabsWheel.selectedNavItemIndex
-                    ].title;
-            that.value = Number(that.text.text);
-
-            // Make sure text is on top.
-            that.container.setChildIndex(that.text, that.container.children.length - 1);
-            that.updateCache();
-        };
-
-        /*
-         * set pie menu's exit time to current time
-         * @return{void}
-         * @public
-         */
-        let __exitMenu = function() {
-            that._piemenuExitTime = new Date().getTime();
-            docById("wheelDiv").style.display = "none";
-            that._noteValueWheel.removeWheel();
-            that._exitWheel.removeWheel();
-            that.label.style.display = "none";
-            if (that._check_meter_block !== null) {
-                that.blocks.meter_block_changed(that._check_meter_block);
-            }
-        };
-
-        let labelElem = docById("labelDiv");
-        labelElem.innerHTML =
-            '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' +
-            noteValue +
-            '" />';
-        labelElem.classList.add("hasKeyboard");
-        this.label = docById("numberLabel");
-
-        this.label.addEventListener(
-            "keypress",
-            this._exitKeyPressed.bind(this)
-        );
-
-        this.label.addEventListener("change", function() {
-            that._labelChanged(false, false);
-        });
-
-        // Position the widget over the note block.
-        let x = this.container.x;
-        let y = this.container.y;
-
-        let canvasLeft =
-            this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
-        let canvasTop =
-            this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
-
-        docById("wheelDiv").style.position = "absolute";
-        docById("wheelDiv").style.height = "300px";
-        docById("wheelDiv").style.width = "300px";
-
-        let selectorWidth = 150;
-        let left = Math.round(
-            (x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft
-        );
-        let top = Math.round(
-            (y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop
-        );
-        this.label.style.left = left + "px";
-        this.label.style.top = top + "px";
-
-        docById("wheelDiv").style.left =
-            Math.min(
-                Math.max(left - (300 - selectorWidth) / 2, 0),
-                this.blocks.turtles._canvas.width - 300
-            ) + "px";
-        if (top - 300 < 0) {
-            docById("wheelDiv").style.top = top + 40 + "px";
-        } else {
-            docById("wheelDiv").style.top = top - 300 + "px";
-        }
-
-        this.label.style.width =
-            (Math.round(selectorWidth * this.blocks.blockScale) *
-                this.protoblock.scale) /
-            2 +
-            "px";
-
-        let __showHide = function() {
-            let i = that._noteValueWheel.selectedNavItemIndex;
-            for (let k = 0; k < WHEELVALUES.length; k++) {
-                for (
-                    let j = 0;
-                    j < subWheelValues[WHEELVALUES[0]].length;
-                    j++
-                ) {
-                    let n = k * subWheelValues[WHEELVALUES[0]].length;
-                    if (that._noteValueWheel.selectedNavItemIndex === k) {
-                        that._tabsWheel.navItems[n + j].navItem.show();
-                    } else {
-                        that._tabsWheel.navItems[n + j].navItem.hide();
-                    }
-                }
-            }
-        };
-
-        for (let i = 0; i < noteValueLabels.length; i++) {
-            this._noteValueWheel.navItems[i].navigateFunction = __showHide;
-        }
-
-        // Navigate to a the current noteValue value.
-        // Special case 1 to use power of 2.
-        if (noteValue === 1) {
-            this._noteValueWheel.navigateWheel(1);
-            this._tabsWheel.navigateWheel(0);
-        } else {
-            for (var i = 0; i < WHEELVALUES.length; i++) {
-                for (
-                    let j = 0;
-                    j < subWheelValues[WHEELVALUES[i]].length;
-                    j++
-                ) {
-                    if (subWheelValues[WHEELVALUES[i]][j] === noteValue) {
-                        this._noteValueWheel.navigateWheel(i);
-                        this._tabsWheel.navigateWheel(
-                            i * subWheelValues[WHEELVALUES[i]].length + j
-                        );
-                        break;
-                    }
-                }
-
-                if (j < subWheelValues[WHEELVALUES[i]].length) {
-                    break;
-                }
-            }
-
-            if (i === WHEELVALUES.length) {
-                this._noteValueWheel.navigateWheel(1);
-                this._tabsWheel.navigateWheel(2);
-            }
-        }
-
-        this.label.style.fontSize =
-            Math.round(
-                (20 * this.blocks.blockScale * this.protoblock.scale) / 2
-            ) + "px";
-        this.label.style.display = "";
-        this.label.focus();
-
-        // Hide the widget when the selection is made.
-        for (let i = 0; i < tabsLabels.length; i++) {
-            this._tabsWheel.navItems[i].navigateFunction = function() {
-                __selectionChanged();
-                __exitMenu();
-            };
-        }
-
-        // Or use the exit wheel...
-        this._exitWheel.navItems[0].navigateFunction = function() {
-            __exitMenu();
-        };
-    };
-
-    this._piemenuNumber = function(wheelValues, selectedValue) {
-        // input form and  wheelNav pie menu for number selection
-
-        if (this.blocks.stageClick) {
-            return;
-        }
-
-        docById("wheelDiv").style.display = "";
-
-        // the number selector
-        this._numberWheel = new wheelnav("wheelDiv", null, 600, 600);
-        // exit button
-        this._exitWheel = new wheelnav("_exitWheel", this._numberWheel.raphael);
-
-        let wheelLabels = [];
-        for (let i = 0; i < wheelValues.length; i++) {
-            wheelLabels.push(wheelValues[i].toString());
-        }
-
-        // spacer
-        wheelLabels.push(null);
-
-        wheelnav.cssMode = true;
-
-        this._numberWheel.keynavigateEnabled = false;
-
-        this._numberWheel.colors = platformColor.numberWheelcolors;
-        this._numberWheel.slicePathFunction = slicePath().DonutSlice;
-        this._numberWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        if (wheelValues.length > 16) {
-            this._numberWheel.slicePathCustom.minRadiusPercent = 0.6;
-            this._numberWheel.slicePathCustom.maxRadiusPercent = 1.0;
-        } else if (wheelValues.length > 10) {
-            this._numberWheel.slicePathCustom.minRadiusPercent = 0.5;
-            this._numberWheel.slicePathCustom.maxRadiusPercent = 0.9;
-        } else {
-            this._numberWheel.slicePathCustom.minRadiusPercent = 0.2;
-            this._numberWheel.slicePathCustom.maxRadiusPercent = 0.6;
-        }
-
-        this._numberWheel.sliceSelectedPathCustom = this._numberWheel.slicePathCustom;
-        this._numberWheel.sliceInitPathCustom = this._numberWheel.slicePathCustom;
-        if (this.blocks.blockList[
-            this.connections[0]].name === "setbpm3" ||
-            this.blocks.blockList[
-                this.connections[0]].name === "setmasterbpm2") {
-            this._numberWheel.titleRotateAngle = 0;
-            if (selectedValue === 90) {
-                selectedValue = 90;
-            } else if (selectedValue < 40) {
-                selectedValue = 40;
-            } else if (selectedValue < 60) {
-                selectedValue = Math.floor(this.value / 2) * 2;
-            } else if (selectedValue < 72) {
-                selectedValue = Math.floor(this.value / 3) * 3;
-            } else if (selectedValue < 120) {
-                selectedValue = Math.floor(this.value / 4) * 4;
-            } else if (selectedValue < 144) {
-                selectedValue = Math.floor(this.value / 6) * 6;
-            } else if (selectedValue < 208) {
-                selectedValue = Math.floor(this.value / 8) * 8;
-            } else {
-                selectedValue = 208;
-            }
-        } else if (this.blocks.blockList[
-            this.connections[0]].name === "setheading") {
-            // Set 0 (north) to the top of the wheel.
-            this._numberWheel.navAngle = -90;
-        }
-
-        this._numberWheel.animatetime = 0; // 300;
-        this._numberWheel.createWheel(wheelLabels);
-
-        if (this._numberWheel.navItems.length > 20) {
-            for (let i = 0; i < this._numberWheel.navItems.length; i++) {
-                this._numberWheel.navItems[i].titleAttr.font =
-                    "30 30px sans-serif";
-                this._numberWheel.navItems[i].titleSelectedAttr.font =
-                    "30 30px sans-serif";
-            }
-        }
-
-        this._exitWheel.colors = platformColor.exitWheelcolors2;
-        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
-        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["×", "-", "+"]);
-
-        let that = this;
-
-        let __selectionChanged = function() {
-            that.value = wheelValues[that._numberWheel.selectedNavItemIndex];
-            that.text.text =
-                wheelLabels[that._numberWheel.selectedNavItemIndex];
-
-            // Make sure text is on top.
-            that.container.setChildIndex(that.text,  that.container.children.length - 1);
-            that.updateCache();
-        };
-
-        let __exitMenu = function() {
-            that._piemenuExitTime = new Date().getTime();
-            docById("wheelDiv").style.display = "none";
-            that._numberWheel.removeWheel();
-            that._exitWheel.removeWheel();
-            that.label.style.display = "none";
-
-            if (that._check_meter_block !== null) {
-                that.blocks.meter_block_changed(that._check_meter_block);
-            }
-        };
-
-        let labelElem = docById("labelDiv");
-        labelElem.innerHTML =
-            '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' +
-            selectedValue +
-            '" />';
-        labelElem.classList.add("hasKeyboard");
-        this.label = docById("numberLabel");
-
-        this.label.addEventListener(
-            "keypress",
-            this._exitKeyPressed.bind(this)
-        );
-
-        this.label.addEventListener("change", function() {
-            that._labelChanged(false, false);
-        });
-
-        // Position the widget over the note block.
-        let x = this.container.x;
-        let y = this.container.y;
-
-        let canvasLeft =
-            this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
-        let canvasTop =
-            this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
-
-        docById("wheelDiv").style.position = "absolute";
-        docById("wheelDiv").style.height = "300px";
-        docById("wheelDiv").style.width = "300px";
-
-        let selectorWidth = 150;
-        let left = Math.round(
-            (x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft
-        );
-        let top = Math.round(
-            (y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop
-        );
-        this.label.style.left = left + "px";
-        this.label.style.top = top + "px";
-
-        docById("wheelDiv").style.left =
-            Math.min(
-                Math.max(left - (300 - selectorWidth) / 2, 0),
-                this.blocks.turtles._canvas.width - 300
-            ) + "px";
-        if (top - 300 < 0) {
-            docById("wheelDiv").style.top = top + 40 + "px";
-        } else {
-            docById("wheelDiv").style.top = top - 300 + "px";
-        }
-
-        this.label.style.width =
-            (Math.round(selectorWidth * this.blocks.blockScale) *
-                this.protoblock.scale) / 2 + "px";
-        // Navigate to a the current number value.
-        let i = wheelValues.indexOf(selectedValue);
-        if (i === -1) {
-            i = 0;
-        }
-
-        // In case of float value, navigate to the nearest integer
-        if (selectedValue % 1 !== 0) {
-            i = wheelValues.indexOf(Math.floor(selectedValue + 0.5));
-        }
-
-        if (i !== -1) {
-            this._numberWheel.navigateWheel(i);
-        }
-
-        this.label.style.fontSize =
-            Math.round(
-                (20 * this.blocks.blockScale * this.protoblock.scale) / 2
-            ) + "px";
-
-        this.label.style.display = "";
-        this.label.focus();
-
-        // Hide the widget when the selection is made.
-        for (let i = 0; i < wheelLabels.length; i++) {
-            this._numberWheel.navItems[i].navigateFunction = function() {
-                __selectionChanged();
-                __exitMenu();
-            };
-        }
-
-        // Or use the exit wheel...
-        this._exitWheel.navItems[0].navigateFunction = function() {
-            __exitMenu();
-        };
-
-        this._exitWheel.navItems[1].navigateFunction = function () {
-            let cblk1 = that.connections[0];
-            let cblk2 = that.blocks.blockList[cblk1].connections[0];
-
-            // Check if the number block is connected to a note value and prevent the value to go below zero
-            if ((that.value < 1) && (that.blocks.blockList[cblk1].name === 'newnote' || (cblk2 && that.blocks.blockList[cblk2].name == 'newnote'))) {
-                that.value = 0;
-            } else {
-                that.value -= 1;
-            }
-
-            that.text.text = that.value.toString();
-
-            // Make sure text is on top.
-            that.container.setChildIndex(that.text, that.container.children.length - 1);
-            that.updateCache();
-
-            that.label.value = that.value;
-        };
-
-        this._exitWheel.navItems[2].navigateFunction = function() {
-            that.value += 1;
-            that.text.text = that.value.toString();
-
-            // Make sure text is on top.
-            that.container.setChildIndex(that.text, that.container.children.length - 1);
-            that.updateCache();
-
-            that.label.value = that.value;
-        };
-
-        let __pitchPreviewForNum = function() {
-            let label = that._numberWheel.navItems[that._numberWheel.selectedNavItemIndex].title;
-            let i = wheelLabels.indexOf(label);
-            let actualPitch = numberToPitch(wheelValues[i] + 3);
-
-            let tur = that.blocks.logo.turtles.ithTurtle(0);
-
-            if (
-                tur.singer.instrumentNames.length === 0 ||
-                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
-            ) {
-                tur.singer.instrumentNames.push(DEFAULTVOICE);
-                that.blocks.logo.synth.createDefaultSynth(0);
-                that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
-            }
-
-            that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
-            Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
-
-            actualPitch[0] = actualPitch[0]
-                .replace(SHARP, "#")
-                .replace(FLAT, "b");
-            if (!that._triggerLock) {
-                that._triggerLock = true;
-                that.blocks.logo.synth.trigger(
-                    0,
-                    actualPitch[0] + (actualPitch[1] + 3),
-                    1 / 8,
-                    DEFAULTVOICE,
-                    null,
-                    null
-                );
-            }
-
-            setTimeout(function() {
-                that._triggerLock = false;
-            }, 1 / 8);
-
-            __selectionChanged();
-        };
-
-        let __hertzPreview = function() {
-            let label = that._numberWheel.navItems[that._numberWheel.selectedNavItemIndex].title;
-            let i = wheelLabels.indexOf(label);
-            let actualPitch = frequencyToPitch(wheelValues[i]);
-
-            let tur = that.blocks.logo.turtles.ithTurtle(0);
-
-            if (
-                tur.singer.instrumentNames.length === 0 ||
-                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
-            ) {
-                tur.singer.instrumentNames.push(DEFAULTVOICE);
-                that.blocks.logo.synth.createDefaultSynth(0);
-                that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
-            }
-
-            that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
-            Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
-
-            actualPitch[0] = actualPitch[0]
-                .replace(SHARP, "#")
-                .replace(FLAT, "b");
-            if (!that._triggerLock) {
-                that._triggerLock = true;
-                that.blocks.logo.synth.trigger(
-                    0,
-                    actualPitch[0] + actualPitch[1],
-                    1 / 8,
-                    DEFAULTVOICE,
-                    null,
-                    null
-                );
-            }
-
-            setTimeout(function() {
-                that._triggerLock = false;
-            }, 1 / 8);
-
-            __selectionChanged();
-        };
-
-        // Handler for pitchnumber preview. This is to ensure that
-        // only pitchnumber block's pie menu gets a sound preview
-        if (
-            this._usePieNumberC1() &&
-            this.blocks.blockList[this.connections[0]].name === "pitchnumber"
-        ) {
-            for (let i = 0; i < wheelValues.length; i++) {
-                this._numberWheel.navItems[
-                    i
-                    ].navigateFunction = __pitchPreviewForNum;
-            }
-        }
-
-        // Handler for Hertz preview. Need to also ensure that
-        // only hertz block gets a different sound preview
-        if (
-            this._usePieNumberC1() &&
-            this.blocks.blockList[this.connections[0]].name === "hertz"
-        ) {
-            for (let i = 0; i < wheelValues.length; i++) {
-                this._numberWheel.navItems[i].navigateFunction = __hertzPreview;
-            }
-        }
-    };
-
-    this._piemenuColor = function(wheelValues, selectedValue, mode) {
-        // input form and  wheelNav pie menu for setcolor selection
-
-        if (this.blocks.stageClick) {
-            return;
-        }
-
-        docById("wheelDiv").style.display = "";
-
-        // the number selector
-        this._numberWheel = new wheelnav("wheelDiv", null, 600, 600);
-        // exit button
-        this._exitWheel = new wheelnav("_exitWheel", this._numberWheel.raphael);
-
-        let wheelLabels = [];
-        for (let i = 0; i < wheelValues.length; i++) {
-            wheelLabels.push(wheelValues[i].toString());
-        }
-
-        wheelnav.cssMode = true;
-
-        this._numberWheel.keynavigateEnabled = false;
-
-        this._numberWheel.colors = [];
-        if (mode === "setcolor") {
-            for (let i = 0; i < wheelValues.length; i++) {
-                this._numberWheel.colors.push(
-                    COLORS40[Math.floor(wheelValues[i] / 2.5)][2]
-                );
-            }
-        } else if (mode === "sethue") {
-            for (let i = 0; i < wheelValues.length; i++) {
-                this._numberWheel.colors.push(
-                    getMunsellColor(wheelValues[i], 50, 50)
-                );
-            }
-        } else {
-            if (mode === "setshade") {
-                for (let i = 0; i < wheelValues.length; i++) {
-                    this._numberWheel.colors.push(
-                        getMunsellColor(0, wheelValues[i], 0)
-                    );
-                }
-            } else if (mode === "settranslucency") {
-                for (let i = 0; i < wheelValues.length; i++) {
-                    this._numberWheel.colors.push(
-                        getMunsellColor(35, 70, 100 - wheelValues[i])
-                    );
-                }
-            } else {
-                for (let i = 0; i < wheelValues.length; i++) {
-                    this._numberWheel.colors.push(
-                        getMunsellColor(60, 60, wheelValues[i])
-                    );
-                }
-            }
-
-            for (let i = 0; i < wheelValues.length; i++) {
-                wheelLabels.push(null);
-            }
-        }
-
-        this._numberWheel.slicePathFunction = slicePath().DonutSlice;
-        this._numberWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._numberWheel.slicePathCustom.minRadiusPercent = 0.6;
-        this._numberWheel.slicePathCustom.maxRadiusPercent = 1.0;
-
-        this._numberWheel.sliceSelectedPathCustom = this._numberWheel.slicePathCustom;
-        this._numberWheel.sliceInitPathCustom = this._numberWheel.slicePathCustom;
-        // this._numberWheel.titleRotateAngle = 0;
-        this._numberWheel.animatetime = 0; // 300;
-        this._numberWheel.createWheel(wheelLabels);
-
-        this._exitWheel.colors = platformColor.exitWheelcolors;
-        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
-        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["×", " "]);
-
-        let that = this;
-
-        let __selectionChanged = function() {
-            that.value = wheelValues[that._numberWheel.selectedNavItemIndex];
-            that.text.text =
-                wheelLabels[that._numberWheel.selectedNavItemIndex];
-
-            // Make sure text is on top.
-            that.container.setChildIndex(that.text, that.container.children.length - 1);
-            that.updateCache();
-        };
-
-        let __exitMenu = function() {
-            that._piemenuExitTime = new Date().getTime();
-            docById("wheelDiv").style.display = "none";
-            that._numberWheel.removeWheel();
-            that._exitWheel.removeWheel();
-            that.label.style.display = "none";
-        };
-
-        let labelElem = docById("labelDiv");
-        labelElem.innerHTML =
-            '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' +
-            selectedValue +
-            '" />';
-        labelElem.classList.add("hasKeyboard");
-        this.label = docById("numberLabel");
-
-        this.label.addEventListener(
-            "keypress",
-            this._exitKeyPressed.bind(this)
-        );
-
-        this.label.addEventListener("change", function() {
-            that._labelChanged(false, false);
-        });
-
-        // Position the widget over the note block.
-        let x = this.container.x;
-        let y = this.container.y;
-
-        let canvasLeft =
-            this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
-        let canvasTop =
-            this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
-
-        docById("wheelDiv").style.position = "absolute";
-        docById("wheelDiv").style.height = "300px";
-        docById("wheelDiv").style.width = "300px";
-
-        let selectorWidth = 150;
-        let left = Math.round(
-            (x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft
-        );
-        let top = Math.round(
-            (y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop
-        );
-        this.label.style.left = left + "px";
-        this.label.style.top = top + "px";
-
-        docById("wheelDiv").style.left =
-            Math.min(
-                Math.max(left - (300 - selectorWidth) / 2, 0),
-                this.blocks.turtles._canvas.width - 300
-            ) + "px";
-        if (top - 300 < 0) {
-            docById("wheelDiv").style.top = top + 40 + "px";
-        } else {
-            docById("wheelDiv").style.top = top - 300 + "px";
-        }
-
-        this.label.style.width =
-            (Math.round(selectorWidth * this.blocks.blockScale) *
-                this.protoblock.scale) /
-            2 +
-            "px";
-
-        // Navigate to a the current number value.
-        let i = wheelValues.indexOf(selectedValue);
-        if (i === -1) {
-            i = 0;
-        }
-
-        this._numberWheel.navigateWheel(i);
-        // docById('wheelDiv').style.display = '';
-
-        this.label.style.fontSize =
-            Math.round(
-                (20 * this.blocks.blockScale * this.protoblock.scale) / 2
-            ) + "px";
-        this.label.style.display = "";
-        this.label.focus();
-
-        // Hide the widget when the selection is made.
-        for (let i = 0; i < wheelLabels.length; i++) {
-            this._numberWheel.navItems[i].navigateFunction = function() {
-                __selectionChanged();
-                __exitMenu();
-            };
-        }
-
-        // Or use the exit wheel...
-        this._exitWheel.navItems[0].navigateFunction = function() {
-            __exitMenu();
-        };
-    };
-
-    this._piemenuBasic = function(
-        menuLabels,
-        menuValues,
-        selectedValue,
-        colors
-    ) {
-        // basic wheelNav pie menu
-
-        if (this.blocks.stageClick) {
-            return;
-        }
-
-        if (colors === undefined) {
-            colors = platformColor.piemenuBasicundefined;
-        }
-
-        docById("wheelDiv").style.display = "";
-
-        // reference to diameter of the basic wheel
-        let size = 800;
-        if (this.name === "outputtools" || this.name === "grid") {
-            // slightly larger menu
-            size = 1000;
-        }
-
-        // the selectedValueh selector
-        this._basicWheel = new wheelnav("wheelDiv", null, size, size);
-
-        let labels = [];
-        for (let i = 0; i < menuLabels.length; i++) {
-            labels.push(menuLabels[i]);
-        }
-
-        wheelnav.cssMode = true;
-
-        this._basicWheel.keynavigateEnabled = false;
-
-        this._basicWheel.colors = colors;
-        this._basicWheel.slicePathFunction = slicePath().DonutSlice;
-        this._basicWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._basicWheel.slicePathCustom.minRadiusPercent = 0.2;
-        this._basicWheel.slicePathCustom.maxRadiusPercent = 1.0;
-        this._basicWheel.sliceSelectedPathCustom = this._basicWheel.slicePathCustom;
-        this._basicWheel.sliceInitPathCustom = this._basicWheel.slicePathCustom;
-        this._basicWheel.titleRotateAngle = 0;
-        this._basicWheel.animatetime = 0; // 300;
-        this._basicWheel.createWheel(labels);
-
-        let that = this;
-
-        let __selectionChanged = function() {
-            let label =
-                that._basicWheel.navItems[that._basicWheel.selectedNavItemIndex]
-                    .title;
-            let i = labels.indexOf(label);
-            if (that.name === "outputtools") {
-                  that.overrideName = menuValues[i];
-                  that.privateData = menuValues[i];
-                  that.text.text = menuLabels[i];
-            } else {
-                that.value = menuValues[i];
-                that.text.text = menuLabels[i];
-            }
-            // Make sure text is on top.
-            that.container.setChildIndex(that.text, that.container.children.length - 1);
-            that.updateCache();
-        };
-
-        let __exitMenu = function() {
-            that._piemenuExitTime = new Date().getTime();
-            docById("wheelDiv").style.display = "none";
-            that._basicWheel.removeWheel();
-        };
-
-        // Position the widget over the note block.
-        let x = this.container.x;
-        let y = this.container.y;
-
-        let canvasLeft =
-            this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
-        let canvasTop =
-            this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
-
-        docById("wheelDiv").style.position = "absolute";
-        docById("wheelDiv").style.height = "300px";
-        docById("wheelDiv").style.width = "300px";
-        docById("wheelDiv").style.left =
-            Math.min(
-                this.blocks.turtles._canvas.width - 300,
-                Math.max(
-                    0,
-                    Math.round(
-                        (x + this.blocks.stage.x) *
-                        this.blocks.getStageScale() +
-                        canvasLeft
-                    ) - 200
-                )
-            ) + "px";
-        docById("wheelDiv").style.top =
-            Math.min(
-                this.blocks.turtles._canvas.height - 350,
-                Math.max(
-                    0,
-                    Math.round(
-                        (y + this.blocks.stage.y) *
-                        this.blocks.getStageScale() +
-                        canvasTop
-                    ) - 200
-                )
-            ) + "px";
-
-        // Navigate to a the current selectedValue value.
-        let i = menuValues.indexOf(selectedValue);
-        if (i === -1) {
-            i = 1;
-        }
-
-        this._basicWheel.navigateWheel(i);
-
-        // Hide the widget when the selection is made.
-        for (let i = 0; i < menuLabels.length; i++) {
-            this._basicWheel.navItems[i].navigateFunction = function() {
-                __selectionChanged();
-                __exitMenu();
-            };
-        }
-    };
-
-    this._piemenuBoolean = function(booleanLabels, booleanValues, boolean) {
-        // wheelNav pie menu for boolean selection
-
-        if (this.blocks.stageClick) {
-            return;
-        }
-
-        docById("wheelDiv").style.display = "";
-
-        // the booleanh selector
-        this._booleanWheel = new wheelnav("wheelDiv", null, 600, 600);
-
-        let labels = [];
-        for (let i = 0; i < booleanLabels.length; i++) {
-            labels.push(booleanLabels[i]);
-        }
-
-        wheelnav.cssMode = true;
-
-        this._booleanWheel.keynavigateEnabled = false;
-
-        this._booleanWheel.colors = platformColor.booleanWheelcolors;
-        this._booleanWheel.slicePathFunction = slicePath().DonutSlice;
-        this._booleanWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._booleanWheel.slicePathCustom.minRadiusPercent = 0;
-        this._booleanWheel.slicePathCustom.maxRadiusPercent = 0.6;
-        this._booleanWheel.sliceSelectedPathCustom = this._booleanWheel.slicePathCustom;
-        this._booleanWheel.sliceInitPathCustom = this._booleanWheel.slicePathCustom;
-        // this._booleanWheel.titleRotateAngle = 0;
-        this._booleanWheel.animatetime = 0; // 300;
-        this._booleanWheel.createWheel(labels);
-
-        let that = this;
-
-        let __selectionChanged = function() {
-            let label =
-                that._booleanWheel.navItems[
-                    that._booleanWheel.selectedNavItemIndex
-                    ].title;
-            let i = labels.indexOf(label);
-            that.value = booleanValues[i];
-            that.text.text = booleanLabels[i];
-
-            // Make sure text is on top.
-            that.container.setChildIndex(that.text, that.container.children.length - 1);
-            that.updateCache();
-        };
-
-        let __exitMenu = function() {
-            that._piemenuExitTime = new Date().getTime();
-            docById("wheelDiv").style.display = "none";
-            that._booleanWheel.removeWheel();
-        };
-
-        // Position the widget over the note block.
-        let x = this.container.x;
-        let y = this.container.y;
-
-        let canvasLeft =
-            this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
-        let canvasTop =
-            this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
-
-        docById("wheelDiv").style.position = "absolute";
-        docById("wheelDiv").style.height = "300px";
-        docById("wheelDiv").style.width = "300px";
-        docById("wheelDiv").style.left =
-            Math.min(
-                this.blocks.turtles._canvas.width - 300,
-                Math.max(
-                    0,
-                    Math.round(
-                        (x + this.blocks.stage.x) *
-                        this.blocks.getStageScale() +
-                        canvasLeft
-                    ) - 200
-                )
-            ) + "px";
-        docById("wheelDiv").style.top =
-            Math.min(
-                this.blocks.turtles._canvas.height - 350,
-                Math.max(
-                    0,
-                    Math.round(
-                        (y + this.blocks.stage.y) *
-                        this.blocks.getStageScale() +
-                        canvasTop
-                    ) - 200
-                )
-            ) + "px";
-
-        // Navigate to a the current boolean value.
-        let i = booleanValues.indexOf(boolean);
-        if (i === -1) {
-            i = 0;
-        }
-
-        this._booleanWheel.navigateWheel(i);
-
-        // Hide the widget when the selection is made.
-        this._booleanWheel.navItems[0].navigateFunction = function() {
-            __selectionChanged();
-            __exitMenu();
-        };
-
-        this._booleanWheel.navItems[1].navigateFunction = function() {
-            __selectionChanged();
-            __exitMenu();
-        };
-    };
-
-    this._piemenuVoices = function(
-        voiceLabels,
-        voiceValues,
-        categories,
-        voice,
-        rotate
-    ) {
-        // wheelNav pie menu for voice selection
-
-        if (this.blocks.stageClick) {
-            return;
-        }
-
-        const COLORS = platformColor.piemenuVoicesColors;
-        let colors = [];
-
-        for (let i = 0; i < voiceLabels.length; i++) {
-            colors.push(COLORS[categories[i] % COLORS.length]);
-        }
-
-        docById("wheelDiv").style.display = "";
-
-        // the voice selector
-        if (localStorage.kanaPreference === "kana") {
-            this._voiceWheel = new wheelnav("wheelDiv", null, 1200, 1200);
-        } else {
-            this._voiceWheel = new wheelnav("wheelDiv", null, 800, 800);
-        }
-
-        // exit button
-        this._exitWheel = new wheelnav("_exitWheel", this._voiceWheel.raphael);
-
-        wheelnav.cssMode = true;
-
-        this._voiceWheel.keynavigateEnabled = false;
-
-        this._voiceWheel.colors = colors;
-        this._voiceWheel.slicePathFunction = slicePath().DonutSlice;
-        this._voiceWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._voiceWheel.slicePathCustom.minRadiusPercent = 0.2;
-        this._voiceWheel.slicePathCustom.maxRadiusPercent = 1;
-        this._voiceWheel.sliceSelectedPathCustom = this._voiceWheel.slicePathCustom;
-        this._voiceWheel.sliceInitPathCustom = this._voiceWheel.slicePathCustom;
-        if (rotate === undefined) {
-            this._voiceWheel.titleRotateAngle = 0;
-        } else {
-            this._voiceWheel.titleRotateAngle = rotate;
-        }
-
-        this._voiceWheel.animatetime = 0; // 300;
-        this._voiceWheel.createWheel(voiceLabels);
-
-        // Special case for Japanese
-        let language = localStorage.languagePreference;
-        // if (language === 'ja') {
-        for (let i = 0; i < this._voiceWheel.navItems.length; i++) {
-            this._voiceWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
-            this._voiceWheel.navItems[i].titleSelectedAttr.font =
-                "30 30px sans-serif";
-        }
-        // }
-
-        this._exitWheel.colors = platformColor.exitWheelcolors;
-        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
-        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["×", " "]);
-
-        let that = this;
-
-        let __selectionChanged = function() {
-            let label =
-                that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex]
-                    .title;
-            let i = voiceLabels.indexOf(label);
-            that.value = voiceValues[i];
-            that.text.text = label;
-
-            if (getDrumName(that.value) === null) {
-                that.blocks.logo.synth.loadSynth(
-                    0,
-                    getVoiceSynthName(that.value)
-                );
-            } else {
-                that.blocks.logo.synth.loadSynth(
-                    0,
-                    getDrumSynthName(that.value)
-                );
-            }
-
-            // Make sure text is on top.
-            that.container.setChildIndex(that.text, that.container.children.length - 1);
-            that.updateCache();
-        };
-
-        /*
-         * Preview voice
-         * @return{void}
-         * @private
-         */
-        let __voicePreview = function() {
-            let label = that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex].title;
-            let i = voiceLabels.indexOf(label);
-            let voice = voiceValues[i];
-            let timeout = 0;
-
-            let tur = that.blocks.logo.turtles.ithTurtle(0);
-
-            if (
-                tur.singer.instrumentNames.length === 0 ||
-                tur.singer.instrumentNames.indexOf(voice) === -1
-            ) {
-                tur.singer.instrumentNames.push(voice);
-                if (voice === DEFAULTVOICE) {
-                    that.blocks.logo.synth.createDefaultSynth(0);
-                }
-
-                that.blocks.logo.synth.loadSynth(0, voice);
-                // give the synth time to load
-                timeout = 500;
-            }
-
-            setTimeout(function() {
-                that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
-                Singer.setSynthVolume(that.blocks.logo, 0, voice, DEFAULTVOLUME);
-                that.blocks.logo.synth.trigger(
-                    0,
-                    "G4",
-                    1 / 4,
-                    voice,
-                    null,
-                    null,
-                    false
-                );
-                that.blocks.logo.synth.start();
-            }, timeout);
-
-            __selectionChanged();
-        };
-
-        // position widget
-        let x = this.container.x;
-        let y = this.container.y;
-
-        let canvasLeft =
-            this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
-        let canvasTop =
-            this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
-
-        docById("wheelDiv").style.position = "absolute";
-        docById("wheelDiv").style.height = "400px";
-        docById("wheelDiv").style.width = "400px";
-        docById("wheelDiv").style.left =
-            Math.min(
-                this.blocks.turtles._canvas.width - 400,
-                Math.max(
-                    0,
-                    Math.round(
-                        (x + this.blocks.stage.x) *
-                        this.blocks.getStageScale() +
-                        canvasLeft
-                    ) - 200
-                )
-            ) + "px";
-        docById("wheelDiv").style.top =
-            Math.min(
-                this.blocks.turtles._canvas.height - 450,
-                Math.max(
-                    0,
-                    Math.round(
-                        (y + this.blocks.stage.y) *
-                        this.blocks.getStageScale() +
-                        canvasTop
-                    ) - 200
-                )
-            ) + "px";
-
-        // navigate to a specific starting point
-        let i = voiceValues.indexOf(voice);
-        if (i === -1) {
-            i = 0;
-        }
-
-        this._voiceWheel.navigateWheel(i);
-
-        // Set up handlers for voice preview.
-        for (let i = 0; i < voiceValues.length; i++) {
-            this._voiceWheel.navItems[i].navigateFunction = __voicePreview;
-        }
-
-        // Hide the widget when the exit button is clicked.
-        this._exitWheel.navItems[0].navigateFunction = function() {
-            that._piemenuExitTime = new Date().getTime();
-            docById("wheelDiv").style.display = "none";
-        };
-    };
-
-    this._piemenuIntervals = function(selectedInterval) {
-        // pie menu for interval selection
-
-        if (this.blocks.stageClick) {
-            return;
-        }
-
-        docById("wheelDiv").style.display = "";
-
-        // Use advanced constructor for more wheelnav on same div
-        let language = localStorage.languagePreference;
-        if (language === "ja") {
-            this._intervalNameWheel = new wheelnav(
-                "wheelDiv",
-                null,
-                1500,
-                1500
-            );
-        } else {
-            this._intervalNameWheel = new wheelnav("wheelDiv", null, 800, 800);
-        }
-
-        this._intervalWheel = new wheelnav(
-            "this._intervalWheel",
-            this._intervalNameWheel.raphael
-        );
-        // exit button
-        this._exitWheel = new wheelnav(
-            "_exitWheel",
-            this._intervalNameWheel.raphael
-        );
-
-        wheelnav.cssMode = true;
-
-        this._intervalNameWheel.keynavigateEnabled = false;
-
-        //Customize slicePaths for proper size
-        this._intervalNameWheel.colors = platformColor.intervalNameWheelcolors;
-        this._intervalNameWheel.slicePathFunction = slicePath().DonutSlice;
-        this._intervalNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._intervalNameWheel.slicePathCustom.minRadiusPercent = 0.2;
-        this._intervalNameWheel.slicePathCustom.maxRadiusPercent = 0.8;
-        this._intervalNameWheel.sliceSelectedPathCustom = this._intervalNameWheel.slicePathCustom;
-        this._intervalNameWheel.sliceInitPathCustom = this._intervalNameWheel.slicePathCustom;
-        this._intervalNameWheel.titleRotateAngle = 0;
-        this._intervalNameWheel.clickModeRotate = false;
-        // this._intervalNameWheel.clickModeRotate = false;
-        let labels = [];
-        for (var i = 0; i < INTERVALS.length; i++) {
-            labels.push(_(INTERVALS[i][1]));
-        }
-
-        this._intervalNameWheel.animatetime = 0; // 300;
-        this._intervalNameWheel.createWheel(labels);
-
-        this._intervalWheel.colors = platformColor.intervalWheelcolors;
-        this._intervalWheel.slicePathFunction = slicePath().DonutSlice;
-        this._intervalWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._intervalWheel.slicePathCustom.minRadiusPercent = 0.8;
-        this._intervalWheel.slicePathCustom.maxRadiusPercent = 1;
-        this._intervalWheel.sliceSelectedPathCustom = this._intervalWheel.slicePathCustom;
-        this._intervalWheel.sliceInitPathCustom = this._intervalWheel.slicePathCustom;
-
-        //Disable rotation, set navAngle and create the menus
-        this._intervalWheel.clickModeRotate = false;
-        // Align each set of numbers with its corresponding interval
-        this._intervalWheel.navAngle =
-            -(180 / labels.length) + 180 / (8 * labels.length);
-        this._intervalWheel.animatetime = 0; // 300;
-
-        let numbers = [];
-        for (let i = 0; i < INTERVALS.length; i++) {
-            for (let j = 1; j < 9; j++) {
-                numbers.push(j.toString());
-            }
-        }
-        this._intervalWheel.createWheel(numbers);
-
-        this._exitWheel.colors = platformColor.exitWheelcolors;
-        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
-        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["×", " "]);
-
-        let that = this;
-
-        // position widget
-        let x = this.container.x;
-        let y = this.container.y;
-
-        let canvasLeft =
-            this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
-        let canvasTop =
-            this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
-
-        docById("wheelDiv").style.position = "absolute";
-        docById("wheelDiv").style.height = "400px";
-        docById("wheelDiv").style.width = "400px";
-        docById("wheelDiv").style.left =
-            Math.min(
-                this.blocks.turtles._canvas.width - 400,
-                Math.max(
-                    0,
-                    Math.round(
-                        (x + this.blocks.stage.x) *
-                        this.blocks.getStageScale() +
-                        canvasLeft
-                    ) - 200
-                )
-            ) + "px";
-        docById("wheelDiv").style.top =
-            Math.min(
-                this.blocks.turtles._canvas.height - 450,
-                Math.max(
-                    0,
-                    Math.round(
-                        (y + this.blocks.stage.y) *
-                        this.blocks.getStageScale() +
-                        canvasTop
-                    ) - 200
-                )
-            ) + "px";
-
-        // Add function to each main menu for show/hide sub menus
-        // FIXME: Add all tabs to each interval
-        let __setupAction = function(i, activeTabs) {
-            that._intervalNameWheel.navItems[i].navigateFunction = function() {
-                for (let l = 0; l < labels.length; l++) {
-                    for (let j = 0; j < 8; j++) {
-                        if (l !== i) {
-                            that._intervalWheel.navItems[
-                            l * 8 + j
-                                ].navItem.hide();
-                        } else if (activeTabs.indexOf(j + 1) === -1) {
-                            that._intervalWheel.navItems[
-                            l * 8 + j
-                                ].navItem.hide();
-                        } else {
-                            that._intervalWheel.navItems[
-                            l * 8 + j
-                                ].navItem.show();
-                        }
-                    }
-                }
-            };
-        };
-
-        // Set up action for interval name so number tabs will
-        // initialize on load.
-        for (var i = 0; i < INTERVALS.length; i++) {
-            __setupAction(i, INTERVALS[i][2]);
-        }
-
-        // navigate to a specific starting point
-        let obj = selectedInterval.split(" ");
-        for (var i = 0; i < INTERVALS.length; i++) {
-            if (obj[0] === INTERVALS[i][1]) {
-                break;
-            }
-        }
-
-        if (i === INTERVALS.length) {
-            i = 0;
-        }
-
-        this._intervalNameWheel.navigateWheel(i);
-
-        let j = Number(obj[1]);
-        if (INTERVALS[i][2].indexOf(j) !== -1) {
-            this._intervalWheel.navigateWheel(j - 1);
-        } else {
-            this._intervalWheel.navigateWheel(INTERVALS[i][2][0] - 1);
-        }
-
-        let __exitMenu = function() {
-            that._piemenuExitTime = new Date().getTime();
-            docById("wheelDiv").style.display = "none";
-        };
-
-        let __selectionChanged = function() {
-            let label =
-                that._intervalNameWheel.navItems[
-                    that._intervalNameWheel.selectedNavItemIndex
-                ].title;
-            let number =
-                that._intervalWheel.navItems[that._intervalWheel.selectedNavItemIndex].title;
-
-            that.value = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][1] + " " + number;
-            if (label === "perfect 1") {
-                that.text.text = _("unison");
-            } else {
-                that.text.text = label + " " + number;
-            }
-
-            // Make sure text is on top.
-            that.container.setChildIndex(that.text, that.container.children.length - 1);
-            that.updateCache();
-
-            let obj = getNote("C", 4, INTERVALVALUES[that.value][0], "C major", false, null, null);
-            obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
-
-            let tur = that.blocks.logo.turtles.ithTurtle(0);
-
-            if (
-                tur.singer.instrumentNames.length === 0 ||
-                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
-            ) {
-                tur.singer.instrumentNames.push(DEFAULTVOICE);
-                that.blocks.logo.synth.createDefaultSynth(0);
-                that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
-            }
-
-            that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
-            Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, DEFAULTVOLUME);
-
-            if (!that._triggerLock) {
-                that._triggerLock = true;
-
-                that.blocks.logo.synth.trigger(
-                    0,
-                    ["C4", obj[0] + obj[1]],
-                    1 / 8,
-                    DEFAULTVOICE,
-                    null,
-                    null
-                );
-            }
-
-            setTimeout(function() {
-                that._triggerLock = false;
-            }, 1 / 8);
-        };
-
-        // Set up handlers for preview.
-        for (var i = 0; i < 8 * labels.length; i++) {
-            this._intervalWheel.navItems[
-                i
-                ].navigateFunction = __selectionChanged;
-        }
-
-        this._exitWheel.navItems[0].navigateFunction = __exitMenu;
-    };
-
-    this._piemenuModes = function(selectedMode) {
-        // pie menu for mode selection
-
-        if (this.blocks.stageClick) {
-            return;
-        }
-
-        // Look for a key block
-        let key = "C";
-        let modeGroup = "7"; // default mode group
-        let octave = false;
-
-        let c = this.connections[0];
-        if (c !== null) {
-            if (this.blocks.blockList[c].name === "setkey2") {
-                let c1 = this.blocks.blockList[c].connections[1];
-                if (c1 !== null) {
-                    if (this.blocks.blockList[c1].name === "notename") {
-                        key = this.blocks.blockList[c1].value;
-                    }
-                }
-            }
-        }
-
-        docById("wheelDiv").style.display = "";
-
-        //Use advanced constructor for more wheelnav on same div
-        this._modeWheel = new wheelnav("wheelDiv", null, 1200, 1200);
-        this._modeGroupWheel = new wheelnav(
-            "_modeGroupWheel",
-            this._modeWheel.raphael
-        );
-        this._modeNameWheel = null; // We build this wheel based on the group selection.
-        // exit button
-        this._exitWheel = new wheelnav("_exitWheel", this._modeWheel.raphael);
-
-        wheelnav.cssMode = true;
-
-        this._modeWheel.colors = platformColor.modeWheelcolors;
-        this._modeWheel.slicePathFunction = slicePath().DonutSlice;
-        this._modeWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._modeWheel.slicePathCustom.minRadiusPercent = 0.85;
-        this._modeWheel.slicePathCustom.maxRadiusPercent = 1;
-        this._modeWheel.sliceSelectedPathCustom = this._modeWheel.slicePathCustom;
-        this._modeWheel.sliceInitPathCustom = this._modeWheel.slicePathCustom;
-
-        // Disable rotation, set navAngle and create the menus
-        this._modeWheel.clickModeRotate = false;
-        this._modeWheel.navAngle = -90;
-        // this._modeWheel.selectedNavItemIndex = 2;
-        this._modeWheel.animatetime = 0; // 300;
-        this._modeWheel.createWheel([
-            "0",
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8",
-            "9",
-            "10",
-            "11"
-        ]);
-
-        this._modeGroupWheel.colors = platformColor.modeGroupWheelcolors;
-        this._modeGroupWheel.slicePathFunction = slicePath().DonutSlice;
-        this._modeGroupWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._modeGroupWheel.slicePathCustom.minRadiusPercent = 0.15;
-        this._modeGroupWheel.slicePathCustom.maxRadiusPercent = 0.3;
-        this._modeGroupWheel.sliceSelectedPathCustom = this._modeGroupWheel.slicePathCustom;
-        this._modeGroupWheel.sliceInitPathCustom = this._modeGroupWheel.slicePathCustom;
-
-        // Disable rotation, set navAngle and create the menus
-        // this._modeGroupWheel.clickModeRotate = false;
-        this._modeGroupWheel.navAngle = -90;
-        // this._modeGroupWheel.selectedNavItemIndex = 2;
-        this._modeGroupWheel.animatetime = 0; // 300;
-
-        let xlabels = [];
-        for (modegroup in MODE_PIE_MENUS) {
-            xlabels.push(modegroup);
-        }
-
-        this._modeGroupWheel.createWheel(xlabels);
-
-        this._exitWheel.colors = platformColor.exitWheelcolors;
-        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.15;
-        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["×", "▶"]); // imgsrc:header-icons/play-button.svg']);
-
-        let that = this;
-
-        let __selectionChanged = function() {
-            let title =
-                that._modeNameWheel.navItems[
-                    that._modeNameWheel.selectedNavItemIndex
-                    ].title;
-            if (title === " ") {
-                that._modeNameWheel.navigateWheel(
-                    (that._modeNameWheel.selectedNavItemIndex + 1) %
-                    that._modeNameWheel.navItems.length
-                );
-            } else {
-                that.text.text =
-                    that._modeNameWheel.navItems[
-                        that._modeNameWheel.selectedNavItemIndex
-                        ].title;
-
-                if (that.text.text === _("major") + " / " + _("ionian")) {
-                    that.value = "major";
-                } else if (
-                    that.text.text ===
-                    _("minor") + " / " + _("aeolian")
-                ) {
-                    that.value = "aeolian";
-                } else {
-                    for (let i = 0; i < MODE_PIE_MENUS[modeGroup].length; i++) {
-                        let modename = MODE_PIE_MENUS[modeGroup][i];
-
-                        if (_(modename) === that.text.text) {
-                            that.value = modename;
-                            break;
-                        }
-                    }
-                }
-
-                // Make sure text is on top.
-                that.container.setChildIndex(that.text, that.container.children.length - 1);
-                that.updateCache();
-            }
-        };
-
-        // Add function to each main menu for show/hide sub menus
-        let __setupAction = function(i, activeTabs) {
-            that._modeNameWheel.navItems[i].navigateFunction = function() {
-                for (let j = 0; j < 12; j++) {
-                    if (activeTabs.indexOf(j) === -1) {
-                        that._modeWheel.navItems[j].navItem.hide();
-                    } else {
-                        that._modeWheel.navItems[j].navItem.show();
-                    }
-                }
-
-                __selectionChanged();
-            };
-        };
-
-        // Build a pie menu of modes based on the current mode group.
-        let __buildModeNameWheel = function(grp) {
-            let newWheel = false;
-            if (that._modeNameWheel === null) {
-                that._modeNameWheel = new wheelnav(
-                    "_modeNameWheel",
-                    that._modeWheel.raphael
-                );
-                newWheel = true;
-            }
-
-            that._modeNameWheel.keynavigateEnabled = false;
-
-            // Customize slicePaths
-            let colors = [];
-            for (let i = 0; i < MODE_PIE_MENUS[grp].length; i++) {
-                let modename = MODE_PIE_MENUS[grp][i];
-                if (modename === " ") {
-                    colors.push(platformColor.modePieMenusIfColorPush);
-                } else {
-                    colors.push(platformColor.modePieMenusElseColorPush);
-                }
-            }
-
-            that._modeNameWheel.colors = colors;
-            that._modeNameWheel.slicePathFunction = slicePath().DonutSlice;
-            that._modeNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-            that._modeNameWheel.slicePathCustom.minRadiusPercent = 0.3; //0.15;
-            that._modeNameWheel.slicePathCustom.maxRadiusPercent = 0.85;
-            that._modeNameWheel.sliceSelectedPathCustom =
-                that._modeNameWheel.slicePathCustom;
-            that._modeNameWheel.sliceInitPathCustom =
-                that._modeNameWheel.slicePathCustom;
-            that._modeNameWheel.titleRotateAngle = 0;
-            // that._modeNameWheel.clickModeRotate = false;
-            that._modeNameWheel.navAngle = -90;
-            let labels = new Array();
-            for (let i = 0; i < MODE_PIE_MENUS[grp].length; i++) {
-                let modename = MODE_PIE_MENUS[grp][i];
-                switch (modename) {
-                    case "ionian":
-                    case "major":
-                        labels.push(_("major") + " / " + _("ionian"));
-                        break;
-                    case "aeolian":
-                    case "minor":
-                        labels.push(_("minor") + " / " + _("aeolian"));
-                        break;
-                    default:
-                        if (modename === " ") {
-                            labels.push(" ");
-                        } else {
-                            labels.push(_(modename));
-                        }
-                        break;
-                }
-            }
-
-            that._modeNameWheel.animatetime = 0; // 300;
-            if (newWheel) {
-                that._modeNameWheel.createWheel(labels);
-            } else {
-                for (let i = 0; i < that._modeNameWheel.navItems.length; i++) {
-                    // Maybe there is a method that does this.
-                    that._modeNameWheel.navItems[i].title = labels[i];
-                    that._modeNameWheel.navItems[i].basicNavTitleMax.title =
-                        labels[i];
-                    that._modeNameWheel.navItems[i].basicNavTitleMin.title =
-                        labels[i];
-                    that._modeNameWheel.navItems[i].hoverNavTitleMax.title =
-                        labels[i];
-                    that._modeNameWheel.navItems[i].hoverNavTitleMin.title =
-                        labels[i];
-                    that._modeNameWheel.navItems[i].selectedNavTitleMax.title =
-                        labels[i];
-                    that._modeNameWheel.navItems[i].selectedNavTitleMin.title =
-                        labels[i];
-                    that._modeNameWheel.navItems[i].initNavTitle.title =
-                        labels[i];
-                    that._modeNameWheel.navItems[i].fillAttr = colors[i];
-                    that._modeNameWheel.navItems[i].sliceHoverAttr.fill =
-                        colors[i];
-                    that._modeNameWheel.navItems[i].slicePathAttr.fill =
-                        colors[i];
-                    that._modeNameWheel.navItems[i].sliceSelectedAttr.fill =
-                        colors[i];
-                }
-
-                that._modeNameWheel.refreshWheel();
-            }
-
-            // Special case for Japanese
-            let language = localStorage.languagePreference;
-            if (language === "ja") {
-                for (let i = 0; i < that._modeNameWheel.navItems.length; i++) {
-                    that._modeNameWheel.navItems[i].titleAttr.font =
-                        "30 30px sans-serif";
-                    that._modeNameWheel.navItems[i].titleSelectedAttr.font =
-                        "30 30px sans-serif";
-                }
-            }
-
-            // Set up tabs for each mode.
-            let i = 0;
-            for (let j = 0; j < MODE_PIE_MENUS[grp].length; j++) {
-                let modename = MODE_PIE_MENUS[grp][j];
-                let activeTabs = [0];
-                if (modename !== " ") {
-                    let mode = MUSICALMODES[modename];
-                    for (let k = 0; k < mode.length; k++) {
-                        activeTabs.push(last(activeTabs) + mode[k]);
-                    }
-                }
-
-                __setupAction(i, activeTabs);
-                i += 1;
-            }
-
-            // Look for the selected mode.
-            for (i = 0; i < MODE_PIE_MENUS[grp].length; i++) {
-                if (MODE_PIE_MENUS[grp][i] === selectedMode) {
-                    break;
-                }
-            }
-
-            // if we didn't find the mode, use a default
-            if (i === labels.length) {
-                i = 0; // major/ionian
-            }
-
-            that._modeNameWheel.navigateWheel(i);
-        };
-
-        let __exitMenu = function() {
-            that._piemenuExitTime = new Date().getTime();
-            docById("wheelDiv").style.display = "none";
-            if (that._modeNameWheel !== null) {
-                that._modeNameWheel.removeWheel();
-            }
-        };
-
-        let __playNote = function() {
-            let o = 0;
-            if (octave) {
-                o = 12;
-            }
-
-            let i = that._modeWheel.selectedNavItemIndex;
-            // The mode doesn't matter here, since we are using semi-tones
-            let obj = getNote(key, 4, i + o, key + " chromatic", false, null, null);
-            obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
-
-            let tur = that.blocks.logo.turtles.ithTurtle(0);
-
-            if (
-                tur.singer.instrumentNames.length === 0 ||
-                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
-            ) {
-                tur.singer.instrumentNames.push(DEFAULTVOICE);
-                that.blocks.logo.synth.createDefaultSynth(0);
-                that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
-            }
-
-            that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
-            Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, DEFAULTVOLUME);
-            that.blocks.logo.synth.trigger(
-                0,
-                [obj[0] + obj[1]],
-                1 / 12,
-                DEFAULTVOICE,
-                null,
-                null
-            );
-        };
-
-        let __playScale = function(activeTabs, idx) {
-            // loop through selecting modeWheel slices with a delay.
-            if (idx < activeTabs.length) {
-                if (activeTabs[idx] < 12) {
-                    octave = false;
-                    that._modeWheel.navigateWheel(activeTabs[idx]);
-                } else {
-                    octave = true;
-                    that._modeWheel.navigateWheel(0);
-                }
-
-                setTimeout(function() {
-                    __playScale(activeTabs, idx + 1);
-                }, 1000 / 10); // slight delay between notes
-            }
-        };
-
-        /*
-         * prepare scale
-         * @return{void}
-         * @private
-         */
-        let __prepScale = function() {
-            let activeTabs = [0];
-            let mode = MUSICALMODES[that.value];
-            for (let k = 0; k < mode.length - 1; k++) {
-                activeTabs.push(last(activeTabs) + mode[k]);
-            }
-
-            activeTabs.push(12);
-            activeTabs.push(12);
-
-            for (let k = mode.length - 1; k >= 0; k--) {
-                activeTabs.push(last(activeTabs) - mode[k]);
-            }
-
-            __playScale(activeTabs, 0);
-        };
-
-        // position widget
-        let x = this.container.x;
-        let y = this.container.y;
-
-        let canvasLeft =
-            this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
-        let canvasTop =
-            this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
-
-        docById("wheelDiv").style.position = "absolute";
-        docById("wheelDiv").style.height = "600px";
-        docById("wheelDiv").style.width = "600px";
-
-        // This widget is large. Be sure it fits on the screen.
-        docById("wheelDiv").style.left =
-            Math.min(
-                this.blocks.turtles._canvas.width - 600,
-                Math.max(
-                    0,
-                    Math.round(
-                        (x + this.blocks.stage.x) *
-                        this.blocks.getStageScale() +
-                        canvasLeft
-                    ) - 200
-                )
-            ) + "px";
-        docById("wheelDiv").style.top =
-            Math.min(
-                this.blocks.turtles._canvas.height - 650,
-                Math.max(
-                    0,
-                    Math.round(
-                        (y + this.blocks.stage.y) *
-                        this.blocks.getStageScale() +
-                        canvasTop
-                    ) - 200
-                )
-            ) + "px";
-
-        for (let i = 0; i < 12; i++) {
-            that._modeWheel.navItems[i].navigateFunction = __playNote;
-        }
-
-        // navigate to a specific starting point
-        for (modeGroup in MODE_PIE_MENUS) {
-            for (var j = 0; j < MODE_PIE_MENUS[modeGroup].length; j++) {
-                let modename = MODE_PIE_MENUS[modeGroup][j];
-                if (modename === selectedMode) {
-                    break;
-                }
-            }
-
-            if (j < MODE_PIE_MENUS[modeGroup].length) {
-                break;
-            }
-        }
-
-        if (selectedMode === "major") {
-            modeGroup = "7";
-        }
-
-        let __buildModeWheel = function() {
-            let i = that._modeGroupWheel.selectedNavItemIndex;
-            modeGroup = that._modeGroupWheel.navItems[i].title;
-            __buildModeNameWheel(modeGroup);
-        };
-
-        for (let i = 0; i < this._modeGroupWheel.navItems.length; i++) {
-            this._modeGroupWheel.navItems[
-                i
-                ].navigateFunction = __buildModeWheel;
-        }
-
-        for (let i = 0; i < this._modeGroupWheel.navItems.length; i++) {
-            if (this._modeGroupWheel.navItems[i].title === modeGroup) {
-                this._modeGroupWheel.navigateWheel(i);
-                break;
-            }
-        }
-
-        this._exitWheel.navItems[0].navigateFunction = __exitMenu;
-        this._exitWheel.navItems[1].navigateFunction = __prepScale;
-    };
-
-    this._checkWidgets = function(closeInput) {
+    _checkWidgets(closeInput) {
         // Detect if label is changed, then reinit widget windows
         // if they are open.
         let thisBlock = this.blocks.blockList.indexOf(this);
@@ -6770,32 +3686,35 @@ function Block(protoblock, blocks, overrideName) {
             for (let i = 0; i < widgetTitle.length; i++) {
                 if (lockInit === false) {
                     switch (widgetTitle[i].innerHTML) {
-                    case "oscilloscope":
-                    case "tempo":
-                    case "rhythm maker":
-                    case "pitch slider":
-                    case "pitch staircase":
-                    case "status":
-                    case "phrase maker":
-                    case "custom mode":
-                    case "music keyboard":
-                    case "pitch drum":
-                    case "meter":
-                    case "temperament":
-                    case "mode":
-                    case "timbre":
-                        lockInit = true;
-                        if (this.blocks.blockList[topBlock].protoblock.staticLabels[0] == widgetTitle[i].innerHTML) {
-                            this.blocks.reInitWidget(topBlock, 1500);
-			}
-                        break;
+                        case "oscilloscope":
+                        case "tempo":
+                        case "rhythm maker":
+                        case "pitch slider":
+                        case "pitch staircase":
+                        case "status":
+                        case "phrase maker":
+                        case "custom mode":
+                        case "music keyboard":
+                        case "pitch drum":
+                        case "meter":
+                        case "temperament":
+                        case "mode":
+                        case "timbre":
+                            lockInit = true;
+                            if (
+                                this.blocks.blockList[topBlock].protoblock.staticLabels[0] ==
+                                widgetTitle[i].innerHTML
+                            ) {
+                                this.blocks.reInitWidget(topBlock, 1500);
+                            }
+                            break;
                     }
                 }
             }
         }
-    };
+    }
 
-    this._labelChanged = function(closeInput, notPieMenu) {
+    _labelChanged(closeInput, notPieMenu) {
         // Update the block values as they change in the DOM label.
 
         // Instead, we do this when we hide the DOM element.
@@ -6843,11 +3762,7 @@ function Block(protoblock, blocks, overrideName) {
         if (oldValue === newValue) {
             // Nothing to do in this case.
             this._labelLock = false;
-            if (
-                this.name !== "text" ||
-                c === null ||
-                this.blocks.blockList[c].name !== "storein"
-            ) {
+            if (this.name !== "text" || c === null || this.blocks.blockList[c].name !== "storein") {
                 return;
             }
         }
@@ -6858,14 +3773,10 @@ function Block(protoblock, blocks, overrideName) {
             let uniqueValue;
             switch (cblock.name) {
                 case "action":
-                    let that = this;
-
-                    that.blocks.palettes.removeActionPrototype(oldValue);
+                    this.blocks.palettes.removeActionPrototype(oldValue);
 
                     // Ensure new name is unique.
-                    uniqueValue = this.blocks.findUniqueActionName(
-                        newValue
-                    );
+                    uniqueValue = this.blocks.findUniqueActionName(newValue);
                     if (uniqueValue !== newValue) {
                         newValue = uniqueValue;
                         this.value = newValue;
@@ -6880,19 +3791,12 @@ function Block(protoblock, blocks, overrideName) {
                     break;
                 case "pitch":
                     // In case of custom temperament
-                    uniqueValue = this.blocks.findUniqueCustomName(
-                        newValue
-                    );
+                    uniqueValue = this.blocks.findUniqueCustomName(newValue);
                     newValue = uniqueValue;
                     for (let pitchNumber in TEMPERAMENT["custom"]) {
                         if (pitchNumber !== "pitchNumber") {
-                            if (
-                                oldValue ==
-                                TEMPERAMENT["custom"][pitchNumber][1]
-                            ) {
-                                TEMPERAMENT["custom"][
-                                    pitchNumber
-                                    ][1] = newValue;
+                            if (oldValue == TEMPERAMENT["custom"][pitchNumber][1]) {
+                                TEMPERAMENT["custom"][pitchNumber][1] = newValue;
                             }
                         }
                     }
@@ -6923,20 +3827,21 @@ function Block(protoblock, blocks, overrideName) {
 
             if (this.value === "-") {
                 this.value = -1;
-            } else if ((cblk2 !== null) && (newValue < 0) && (this.blocks.blockList[cblk1].name === 'newnote' || this.blocks.blockList[cblk2].name == 'newnote')) {
+            } else if (
+                cblk2 !== null &&
+                newValue < 0 &&
+                (this.blocks.blockList[cblk1].name === "newnote" ||
+                    this.blocks.blockList[cblk2].name == "newnote")
+            ) {
                 this.label.value = 0;
                 this.value = 0;
-            }
-            else {
+            } else {
                 this.value = Number(newValue);
             }
 
             if (isNaN(this.value)) {
                 let thisBlock = this.blocks.blockList.indexOf(this);
-                this.blocks.errorMsg(
-                    newValue + ": " + _("Not a number"),
-                    thisBlock
-                );
+                this.blocks.errorMsg(newValue + ": " + _("Not a number"), thisBlock);
                 this.blocks.refreshCanvas();
                 this.value = oldValue;
             }
@@ -6970,8 +3875,10 @@ function Block(protoblock, blocks, overrideName) {
             label = this.value.toString();
         }
 
-        if (WIDENAMES.indexOf(this.name) === -1 &&
-            getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+        if (
+            WIDENAMES.indexOf(this.name) === -1 &&
+            getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH
+        ) {
             let slen = label.length - 5;
             let nlabel = "" + label.substr(0, slen) + "...";
             while (getTextWidth(nlabel, "bold 20pt Sans") > TEXTWIDTH) {
@@ -7029,8 +3936,7 @@ function Block(protoblock, blocks, overrideName) {
                                 block.hidden = true;
                             }
                         } else {
-                            if (block.name === "nameddo" &&
-                                block.defaults[0] === oldValue) {
+                            if (block.name === "nameddo" && block.defaults[0] === oldValue) {
                                 blockPalette.remove(block, oldValue);
                             }
                         }
@@ -7038,8 +3944,10 @@ function Block(protoblock, blocks, overrideName) {
 
                     if (oldValue === _("action")) {
                         this.blocks.newNameddoBlock(
-                            newValue, this.blocks.actionHasReturn(c),
-                            this.blocks.actionHasArgs(c));
+                            newValue,
+                            this.blocks.actionHasReturn(c),
+                            this.blocks.actionHasArgs(c)
+                        );
                         this.blocks.setActionProtoVisiblity(false);
                     }
                     this.blocks.renameNameddos(oldValue, newValue);
@@ -7051,8 +3959,10 @@ function Block(protoblock, blocks, overrideName) {
                     // Check to see which connection we are using in
                     // cblock.  We only do something if blk is attached to
                     // the name connection (1).
-                    blk = this.blocks.blockList.indexOf(this);
-                    if (cblock.connections[1] === blk && closeInput) {
+                    if (
+                        cblock.connections[1] === this.blocks.blockList.indexOf(this) &&
+                        closeInput
+                    ) {
                         // If the label was the name of a storein, update the
                         // associated box this.blocks and the palette buttons.
                         if (this.value !== "box") {
@@ -7106,139 +4016,10 @@ function Block(protoblock, blocks, overrideName) {
                 this.blocks.logo.synth.loadSynth(0, getNoiseSynthName(this.value));
             }
         }
-    };
-
-    /*
-     * Sets up context menu for each block
-     */
-    this.piemenuBlockContext = function() {
-        if (this.blocks.activeBlock === null) {
-            return;
-        }
-
-        let pasteDx = 0;
-        let pasteDy = 0;
-
-        let that = this;
-        let thisBlock = this.blocks.blockList.indexOf(this);
-
-        // Position the widget centered over the active block.
-        docById("contextWheelDiv").style.position = "absolute";
-
-        let x = this.blocks.blockList[thisBlock].container.x;
-        let y = this.blocks.blockList[thisBlock].container.y;
-
-        let canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.getStageScale();
-        let canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.getStageScale();
-
-        docById("contextWheelDiv").style.left =
-            Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() +
-                       canvasLeft) - 150 + "px";
-        docById("contextWheelDiv").style.top =
-            Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() +
-                       canvasTop) - 150 + "px";
-
-        docById("contextWheelDiv").style.display = "";
-
-        labels = [
-            "imgsrc:header-icons/copy-button.svg",
-            "imgsrc:header-icons/extract-button.svg",
-            "imgsrc:header-icons/empty-trash-button.svg",
-            "imgsrc:header-icons/cancel-button.svg"
-        ];
-
-        let topBlock = this.blocks.findTopBlock(thisBlock);
-        if (this.name === 'action') {
-            labels.push('imgsrc:header-icons/save-blocks-button.svg');
-        }
-        let message =
-            this.blocks.blockList[this.blocks.activeBlock].protoblock.helpString;
-        let helpButton;
-        if (message) {
-            labels.push("imgsrc:header-icons/help-button.svg");
-            helpButton = labels.length - 1;
-        } else {
-            helpButton = null;
-        }
-
-        let wheel = new wheelnav("contextWheelDiv", null, 250, 250);
-        wheel.colors = platformColor.wheelcolors;
-        wheel.slicePathFunction = slicePath().DonutSlice;
-        wheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        wheel.slicePathCustom.minRadiusPercent = 0.2;
-        wheel.slicePathCustom.maxRadiusPercent = 0.6;
-        wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
-        wheel.sliceInitPathCustom = wheel.slicePathCustom;
-        wheel.clickModeRotate = false;
-        wheel.initWheel(labels);
-        wheel.createWheel();
-
-        wheel.navItems[0].setTooltip(_("Duplicate"));
-        wheel.navItems[1].setTooltip(_("Extract"));
-        wheel.navItems[2].setTooltip(_("Move to trash"));
-        wheel.navItems[3].setTooltip(_("Close"));
-        if (this.blocks.blockList[topBlock].name === "action") {
-            wheel.navItems[4].setTooltip(_("Save stack"));
-        }
-
-        if (helpButton !== null) {
-            wheel.navItems[helpButton].setTooltip(_("Help"));
-        }
-
-        wheel.navItems[0].selected = false;
-
-        wheel.navItems[0].navigateFunction = function() {
-            that.blocks.activeBlock = thisBlock;
-            that.blocks.prepareStackForCopy();
-            that.blocks.pasteDx = pasteDx;
-            that.blocks.pasteDy = pasteDy;
-            that.blocks.pasteStack();
-            pasteDx += 21;
-            pasteDy += 21;
-            // docById('contextWheelDiv').style.display = 'none';
-        };
-
-        wheel.navItems[1].navigateFunction = function() {
-            that.blocks.activeBlock = thisBlock;
-            that.blocks.extract();
-            docById("contextWheelDiv").style.display = "none";
-        };
-
-        wheel.navItems[2].navigateFunction = function() {
-            that.blocks.activeBlock = thisBlock;
-            that.blocks.extract();
-            that.blocks.sendStackToTrash(that.blocks.blockList[thisBlock]);
-            docById("contextWheelDiv").style.display = "none";
-        };
-
-        wheel.navItems[3].navigateFunction = function() {
-            docById("contextWheelDiv").style.display = "none";
-        };
-
-        if (this.name === "action") {
-            wheel.navItems[4].navigateFunction = function() {
-                that.blocks.activeBlock = thisBlock;
-                that.blocks.prepareStackForCopy();
-                that.blocks.saveStack();
-            };
-        }
-
-        if (helpButton !== null) {
-            wheel.navItems[helpButton].navigateFunction = function() {
-                that.blocks.activeBlock = thisBlock;
-                let helpWidget = new HelpWidget();
-                helpWidget.init(blocks);
-                docById("contextWheelDiv").style.display = "none";
-            };
-        }
-
-        setTimeout(function() {
-            that.blocks.stageClick = false;
-        }, 500);
-    };
+    }
 }
 
-/*
+/**
  * set elements to a array
  * if element is string,then set element's id to element
  * @public
@@ -7265,7 +4046,7 @@ function $() {
 
 window.hasMouse = false;
 // Mousemove is not emulated for touch
-document.addEventListener("mousemove", function(e) {
+document.addEventListener("mousemove", function (e) {
     window.hasMouse = true;
 });
 
@@ -7274,12 +4055,10 @@ function _blockMakeBitmap(data, callback, args) {
     // Works with Chrome, Safari, Firefox (untested on IE).
     let img = new Image();
 
-    img.onload = function() {
+    img.onload = function () {
         let bitmap = new createjs.Bitmap(img);
         callback(bitmap, args);
     };
 
-    img.src =
-        "data:image/svg+xml;base64," +
-        window.btoa(unescape(encodeURIComponent(data)));
+    img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(data)));
 }

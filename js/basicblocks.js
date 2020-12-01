@@ -1,4 +1,4 @@
-// Copyright (c) 2014-19 Walter Bender
+// Copyright (c) 2014-20 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -13,7 +13,7 @@
 
 // Some names changed between the Python verison and the
 // JS version so look up name in the conversion dictionary.
-var NAMEDICT = {
+const BACKWARDCOMPATIBILIYDICT = {
     fullscreen: "vspace",
     fillscreen2: "fillscreen",
     sandwichclampcollapsed: "clamp",

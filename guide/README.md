@@ -2381,9 +2381,8 @@ One such tool is [Lilypond](http://lilypond.org), a music engraving program.
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/lilypond1.svg
  "adding Save as Lilypond block")
 
-The *Save as Lilypond* block will transcribe your composition. The
-output of the program above is saved to `Downloads/hotdog.ly`. There is
-also a *Save as Lilypond* button on the secondary toolbar.
+The *Save as Lilypond* option from the Save menu will transcribe your
+composition (Only available in Advanced Mode).
 
 Note that if you use a *Print* block inside of a note, Lilypond will
 create a "markup" or annotation for that note. It is a simple way to
