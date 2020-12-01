@@ -114,14 +114,11 @@ class Block {
         this.text = null; // A dynamically generated text label on block itself.
         this.value = null; // Value for number, text, and media blocks.
         this.privateData = null; // A block may have some private data,
-
-
         // e.g., nameboxes use this field to store
         // the box name associated with the block.
         this.image = protoblock.image; // The file path of the image.
         this.imageBitmap = null;
         this.controller = null; // Note blocks get a controller
-
 
         // All blocks have at a container and least one bitmap.
         this.container = null;
@@ -848,7 +845,7 @@ class Block {
                     that.container.uncache();
                 }
 
-                const __callback = function (that, firstTime) {
+                const __callback = function(that, firstTime) {
                     that.blocks.refreshCanvas();
                     let thisBlock = that.blocks.blockList.indexOf(that);
 
@@ -912,8 +909,10 @@ class Block {
                         .replace("block_label", safeSVG(block_label));
                 } else {
                     artwork = that.artwork
-                        .replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name])
-                        .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
+                        .replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[
+                            that.protoblock.palette.name])
+                        .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[
+                            that.protoblock.palette.name])
                         .replace("block_label", safeSVG(block_label));
                 }
 
@@ -949,8 +948,10 @@ class Block {
                         .replace("block_label", safeSVG(block_label));
                 } else {
                     artwork = that.artwork
-                        .replace(/fill_color/g, platformColor.paletteColors[that.protoblock.palette.name][3])
-                        .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
+                        .replace(/fill_color/g, platformColor.paletteColors[
+                            that.protoblock.palette.name][3])
+                        .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[
+                            that.protoblock.palette.name])
                         .replace("block_label", safeSVG(block_label));
                 }
 
@@ -985,7 +986,8 @@ class Block {
                 } else {
                     artwork = that.artwork
                         .replace(/fill_color/g, platformColor.disconnected)
-                        .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
+                        .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[
+                            that.protoblock.palette.name])
                         .replace("block_label", safeSVG(block_label));
                 }
 
@@ -1007,8 +1009,10 @@ class Block {
                 } else {
                     block_label = this.overrideName;
                 }
-            } else if (this.protoblock.staticLabels.length > 0 &&
-                !this.protoblock.image) {
+            } else if (
+                this.protoblock.staticLabels.length > 0 &&
+                !this.protoblock.image
+            ) {
                 // Label should be defined inside _().
                 block_label = this.protoblock.staticLabels[0];
             }
@@ -1040,8 +1044,10 @@ class Block {
                     .replace("block_label", safeSVG(block_label));
             } else {
                 artwork = this.artwork
-                    .replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name])
-                    .replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name])
+                    .replace(/fill_color/g, PALETTEFILLCOLORS[
+                        this.protoblock.palette.name])
+                    .replace(/stroke_color/g, PALETTESTROKECOLORS[
+                        this.protoblock.palette.name])
                     .replace("block_label", safeSVG(block_label));
             }
 
@@ -1453,8 +1459,10 @@ class Block {
                 // Save the collapsed block artwork for export.
                 that.blocks.blockCollapseArt[that.blocks.blockList.indexOf(that)] =
                     that.collapseArtwork
-                        .replace(/fill_color/g, PALETTEFILLCOLORS[that.protoblock.palette.name])
-                        .replace(/stroke_color/g, PALETTESTROKECOLORS[that.protoblock.palette.name])
+                        .replace(/fill_color/g, PALETTEFILLCOLORS[
+                            that.protoblock.palette.name])
+                        .replace(/stroke_color/g, PALETTESTROKECOLORS[
+                            that.protoblock.palette.name])
                         .replace("block_label", safeSVG(that.collapseText.text));
 
                 __processExpandButton(that);
@@ -1484,8 +1492,10 @@ class Block {
             };
 
             let artwork = this.collapseArtwork
-                .replace(/fill_color/g, PALETTEFILLCOLORS[this.protoblock.palette.name])
-                .replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name])
+                .replace(/fill_color/g, PALETTEFILLCOLORS[
+                    this.protoblock.palette.name])
+                .replace(/stroke_color/g, PALETTESTROKECOLORS[
+                    this.protoblock.palette.name])
                 .replace("block_label", "");
             _blockMakeBitmap(artwork, __processCollapseBitmap, this);
         };
@@ -1536,7 +1546,8 @@ class Block {
             }
 
             if (this.blocks.blockList[last(this.connections)].name === "hidden") {
-                if (last(this.blocks.blockList[last(this.connections)].connections) === null) {
+                if (last(this.blocks.blockList[
+                    last(this.connections)].connections) === null) {
                     return true;
                 }
             }
@@ -1699,6 +1710,7 @@ class Block {
             image.onload = function () {
                 // Before adding new artwork, remove any old artwork.
                 // that.removeChildBitmap("media");
+                
                 let bitmap = new createjs.Bitmap(image);
                 bitmap.name = "media";
 
@@ -2060,15 +2072,18 @@ class Block {
                 if (this.blocks.blockList[c].name === "divide") {
                     let c1 = this.blocks.blockList[c].connections[1];
                     let c2 = this.blocks.blockList[c].connections[2];
-                    if (c1 !== null &&
+                    if (
+                        c1 !== null &&
                         c2 !== null &&
-                        this.blocks.blockList[c2].name === "divide") {
+                        this.blocks.blockList[c2].name === "divide"
+                    ) {
                         let ci = this.blocks.blockList[c2].connections[1];
                         let cii = this.blocks.blockList[c2].connections[2];
                         if (ci !== null &&
                             cii !== null &&
                             this.blocks.blockList[ci].name === "number" &&
-                            this.blocks.blockList[cii].name === "number") {
+                            this.blocks.blockList[cii].name === "number"
+                        ) {
                             v = (this.blocks.blockList[c1].value /
                                 this.blocks.blockList[ci].value) *
                                 this.blocks.blockList[cii].value;
@@ -2184,8 +2199,7 @@ class Block {
                         //.TRANS: scalar step
                         return (_("down") + " " + Math.abs(
                             this.blocks.blockList[c1].value));
-                    } else
-                        return _("up") + " " + this.blocks.blockList[c1].value;
+                    } else return _("up") + " " + this.blocks.blockList[c1].value;
                     break;
                 case "pitchnumber":
                     c1 = this.blocks.blockList[c].connections[1];
@@ -2209,6 +2223,7 @@ class Block {
             // Toggle the collapsed state of blocks inside of a note (or
             // interval) block and reposition any blocks below
             // it. Finally, resize any surrounding clamps.
+
             // Set collapsed state of note value arg blocks...
             if (this.connections[1] !== null) {
                 this.blocks.findDragGroup(this.connections[1]);
@@ -2732,8 +2747,10 @@ class Block {
                         true
                     );
                 }
-            } else if (SPECIALINPUTS.indexOf(this.name) !== -1 ||
-                ["media", "loadFile"].indexOf(this.name) !== -1) {
+            } else if (
+                SPECIALINPUTS.indexOf(this.name) !== -1 ||
+                ["media", "loadFile"].indexOf(this.name) !== -1
+            ) {
                 if (!haveClick) {
                     // Simulate click on Android.
                     if (new Date().getTime() - this.blocks.mouseDownTime < 500) {
@@ -2831,7 +2848,8 @@ class Block {
                 return false;
             }
 
-            if (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC1.length === 0) {
+            if (this.blocks.blockList[
+                this.connections[0]].protoblock.piemenuValuesC1.length === 0) {
                 return false;
             }
 
@@ -2850,7 +2868,8 @@ class Block {
                 return false;
             }
 
-            if (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC2.length === 0) {
+            if (this.blocks.blockList[
+                this.connections[0]].protoblock.piemenuValuesC2.length === 0) {
                 return false;
             }
 
@@ -2869,7 +2888,8 @@ class Block {
                 return false;
             }
 
-            if (this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC3.length === 0) {
+            if (this.blocks.blockList[
+                this.connections[0]].protoblock.piemenuValuesC3.length === 0) {
                 return false;
             }
 
@@ -2889,7 +2909,9 @@ class Block {
                     }
 
                     for (let t = 0; t < this.blocks.turtles.turtleList.length; t++) {
-                        if (this.blocks.turtles.turtleList[t].startBlock === this) {
+                        if (
+                            this.blocks.turtles.turtleList[t].startBlock === this
+                        ) {
                             this.blocks.turtles.turtleList[t].decorationBitmap.x =
                                 this.width - dx - (30 * this.protoblock.scale) / 2;
                             break;
@@ -2923,8 +2945,10 @@ class Block {
             let x = this.container.x;
             let y = this.container.y;
 
-            let canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
-            let canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+            let canvasLeft = 
+                this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
+            let canvasTop = 
+                this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
 
             let selectorWidth = 150;
 
@@ -3371,11 +3395,15 @@ class Block {
                 } else if (this.blocks.octaveModifierNumber(blk)) {
                     piemenuNumber(this, [-2, -1, 0, 1, 2], this.value);
                 } else if (this.blocks.intervalModifierNumber(blk)) {
-                    piemenuNumber(this, this.blocks.blockList[this.blocks.blockList[this.connections[0]].connections[0]].protoblock.piemenuValuesC1, this.value);
+                    piemenuNumber(this, this.blocks.blockList[
+                        this.blocks.blockList[this.connections[0]
+                    ].connections[0]].protoblock.piemenuValuesC1, this.value);
                 } else if (this._usePieNumberC3()) {
-                    piemenuNumber(this, this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC3, this.value);
+                    piemenuNumber(this, this.blocks.blockList[
+                        this.connections[0]].protoblock.piemenuValuesC3, this.value);
                 } else if (this._usePieNumberC2()) {
-                    piemenuNumber(this, this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC2, this.value);
+                    piemenuNumber(this, this.blocks.blockList[
+                        this.connections[0]].protoblock.piemenuValuesC2, this.value);
                 } else if (this._usePieNumberC1()) {
                     switch (this.blocks.blockList[this.connections[0]].name) {
                         case "setcolor":
@@ -3384,7 +3412,8 @@ class Block {
                         case "settranslucency":
                         case "setgrey":
                             piemenuNumber(this,
-                                this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC1,
+                                this.blocks.blockList[
+                                    this.connections[0]].protoblock.piemenuValuesC1,
                                 this.value,
                                 this.blocks.blockList[this.connections[0]].name);
                             break;
@@ -3415,7 +3444,8 @@ class Block {
                             }
                             break;
                         default:
-                            piemenuNumber(this, this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC1,
+                            piemenuNumber(this, this.blocks.blockList[
+                                this.connections[0]].protoblock.piemenuValuesC1,
                                 this.value);
                             break;
                     }
@@ -3674,6 +3704,7 @@ class Block {
 
         this._labelChanged = function (closeInput, notPieMenu) {
             // Update the block values as they change in the DOM label.
+
             // Instead, we do this when we hide the DOM element.
             // this._checkWidgets(closeInput);
             if (this === null || this.label === null) {
@@ -3718,9 +3749,11 @@ class Block {
             if (oldValue === newValue) {
                 // Nothing to do in this case.
                 this._labelLock = false;
-                if (this.name !== "text" ||
+                if (
+                    this.name !== "text" ||
                     c === null ||
-                    this.blocks.blockList[c].name !== "storein") {
+                    this.blocks.blockList[c].name !== "storein"
+                ) {
                     return;
                 }
             }
@@ -3759,9 +3792,13 @@ class Block {
                         newValue = uniqueValue;
                         for (let pitchNumber in TEMPERAMENT["custom"]) {
                             if (pitchNumber !== "pitchNumber") {
-                                if (oldValue ==
-                                    TEMPERAMENT["custom"][pitchNumber][1]) {
-                                    TEMPERAMENT["custom"][pitchNumber][1] = newValue;
+                                if (
+                                    oldValue ==
+                                    TEMPERAMENT["custom"][pitchNumber][1]
+                                ) {
+                                    TEMPERAMENT["custom"][
+                                        pitchNumber
+                                    ][1] = newValue;
                                 }
                             }
                         }
