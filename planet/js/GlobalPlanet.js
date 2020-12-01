@@ -387,7 +387,7 @@ function GlobalPlanet(Planet) {
         this.getData(id, function(data) {
             let remixedName;
             if (id in that.cache) {
-                remixedName = that.remixPrefix + ' ' + Planet.ProjectStorage.getCurrentProjectName();
+                remixedName = Planet.ProjectStorage.getCurrentProjectName();
                 Planet.ProjectStorage.initialiseNewProject(remixedName, data, that.cache[id].ProjectImage);
             } else {
                 remixedName = that.remixPrefix + ' ' + _('My Project');
