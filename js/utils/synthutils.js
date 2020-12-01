@@ -750,9 +750,7 @@ function Synth() {
                 if (CUSTOMSAMPLES[customsample][0] === sampleName) {
                     //datafunction = function() {return CUSTOMSAMPLES[customsample][1]};
                     let newdata = (CUSTOMSAMPLES[customsample][1]);
-                    console.log(newdata);
                     this.samples["voice"][sampleName] = CUSTOMSAMPLES[customsample][1];
-                    console.log(this.samples);
                     return;
                 }
             }
