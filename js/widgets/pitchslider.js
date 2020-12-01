@@ -18,8 +18,7 @@ function PitchSlider() {
     this._delta = 0;
     const SEMITONE = Math.pow(2,1/12);
 
-    this._save = function(frequency) {
-        let that = this;
+    this._save = (frequency) => {
 
         for (let name in this._logo.blocks.palettes.dict) {
             this._logo.blocks.palettes.dict[name].hideMenu(true);
@@ -44,10 +43,10 @@ function PitchSlider() {
                        0, 0, [hertzIdx]]);
         newStack.push([hiddenIdx, "hidden", 0, 0, [hertzIdx, null]]);
 
-        that._logo.blocks.loadNewBlocks(newStack);
+        this._logo.blocks.loadNewBlocks(newStack);
     };
 
-    this.init = function(logo) {
+    this.init = (logo) => {
         if (window.widgetWindows.openWindows["slider"])return;
         if (!this.frequencies || !this.frequencies.length) this.frequencies = [392];
         this._logo = logo;

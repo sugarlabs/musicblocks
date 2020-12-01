@@ -21,7 +21,7 @@ function StatusMatrix() {
     const FONTSCALEFACTOR = 75;
     let x, y; //Drop coordinates of statusDiv
 
-    this.init = function(logo) {
+    this.init = (logo) => {
         // Initializes the status matrix. First removes the
         // previous matrix and them make another one in DOM (document
         // object model)
@@ -39,14 +39,13 @@ function StatusMatrix() {
         widgetWindow.show();
 
         // For the button callbacks
-        let that = this;
         let cell;
 
         // The status table
         this._statusTable = document.createElement("table");
         widgetWindow.getWidgetBody().append(this._statusTable);
-        widgetWindow.onclose = function() {
-            that.isOpen = false;
+        widgetWindow.onclose = () => {
+            this.isOpen = false;
             this.destroy();
         };
 
@@ -201,7 +200,7 @@ function StatusMatrix() {
         widgetWindow.sendToCenter();
     };
 
-    this.updateAll = function() {
+    this.updateAll = () => {
         // Update status of all of the voices in the matrix.
         this._logo.updatingStatusMatrix = true;
 
