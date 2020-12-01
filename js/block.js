@@ -1485,8 +1485,10 @@ class Block {
                 let artwork = that.collapseArtwork;
                 _blockMakeBitmap(
                     artwork
-                        .replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[that.protoblock.palette.name])
-                        .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
+                        .replace(/fill_color/g, PALETTEHIGHLIGHTCOLORS[
+                            that.protoblock.palette.name])
+                        .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[
+                            that.protoblock.palette.name])
                         .replace("block_label", ""),
                     __processHighlightCollapseBitmap, that);
             };
@@ -2079,7 +2081,8 @@ class Block {
                     ) {
                         let ci = this.blocks.blockList[c2].connections[1];
                         let cii = this.blocks.blockList[c2].connections[2];
-                        if (ci !== null &&
+                        if (
+                            ci !== null &&
                             cii !== null &&
                             this.blocks.blockList[ci].name === "number" &&
                             this.blocks.blockList[cii].name === "number"
@@ -3396,8 +3399,8 @@ class Block {
                     piemenuNumber(this, [-2, -1, 0, 1, 2], this.value);
                 } else if (this.blocks.intervalModifierNumber(blk)) {
                     piemenuNumber(this, this.blocks.blockList[
-                        this.blocks.blockList[this.connections[0]
-                    ].connections[0]].protoblock.piemenuValuesC1, this.value);
+                    this.blocks.blockList[this.connections[0]].connections[0]
+                ].protoblock.piemenuValuesC1, this.value);
                 } else if (this._usePieNumberC3()) {
                     piemenuNumber(this, this.blocks.blockList[
                         this.connections[0]].protoblock.piemenuValuesC3, this.value);
@@ -3707,6 +3710,7 @@ class Block {
 
             // Instead, we do this when we hide the DOM element.
             // this._checkWidgets(closeInput);
+            
             if (this === null || this.label === null) {
                 this._labelLock = false;
                 return;
