@@ -1766,6 +1766,12 @@ function Block(protoblock, blocks, overrideName) {
                         return;
                     }
                     that.value = [fileChooser.files[0].name, reader.result];
+                    if (that.name === "audiofile") {
+                        if (!(CUSTOMSAMPLES.includes(that.value))) {
+                            CUSTOMSAMPLES.push(that.value);
+                            that.blocks.updateBlockText(thisBlock);
+                        }
+                    }
                     that.blocks.updateBlockText(thisBlock);
                 }
             };
