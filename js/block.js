@@ -540,8 +540,8 @@ class Block {
                     this.imageBitmap.image.height,
                     scale
                 );
-                z = this.container.children.length - 1;
-                this.container.setChildIndex(this.imageBitmap, z);
+                const zIndex = this.container.children.length - 1;
+                this.container.setChildIndex(this.imageBitmap, zIndex);
             }
 
             if (this.name === "start" || this.name === "drum") {
@@ -844,7 +844,7 @@ class Block {
                 that.container.uncache();
             }
 
-            __callback = function (that, firstTime) {
+            const __callback = function (that, firstTime) {
                 that.blocks.refreshCanvas();
                 let thisBlock = that.blocks.blockList.indexOf(that);
 
@@ -2169,7 +2169,7 @@ class Block {
                             this.blocks.blockList[c1].value + " " + this.blocks.blockList[c2].value
                         );
                     } else if (this.blocks.blockList[c1].name === "scaledegree2") {
-                        obj = splitScaleDegree(this.blocks.blockList[c1].value);
+                        const obj = splitScaleDegree(this.blocks.blockList[c1].value);
                         let note = obj[0];
                         if (obj[1] !== NATURAL) {
                             note += obj[1];
@@ -2212,7 +2212,6 @@ class Block {
                     //.TRANS: scalar step
                     return _("down") + " " + Math.abs(this.blocks.blockList[c1].value);
                 } else return _("up") + " " + this.blocks.blockList[c1].value;
-                break;
             case "pitchnumber":
                 c1 = this.blocks.blockList[c].connections[1];
                 if (this.blocks.blockList[c1].name === "number") {
@@ -2222,10 +2221,8 @@ class Block {
                 break;
             case "playdrum":
                 return _("drum");
-                break;
             case "rest2":
                 return _("silence");
-                break;
             default:
                 return "";
         }
@@ -2349,8 +2346,8 @@ class Block {
         }
 
         // Ensure text is on top.
-        z = this.container.children.length - 1;
-        this.container.setChildIndex(this.text, z);
+        const zIndex = this.container.children.length - 1;
+        this.container.setChildIndex(this.text, zIndex);
         this.updateCache();
     }
 
@@ -2394,8 +2391,8 @@ class Block {
         }
 
         // Ensure text is on top.
-        z = this.container.children.length - 1;
-        this.container.setChildIndex(this.collapseText, z);
+        const zIndex = this.container.children.length - 1;
+        this.container.setChildIndex(this.collapseText, zIndex);
     }
 
     /**
@@ -2487,7 +2484,7 @@ class Block {
 
             let topBlk;
 
-            dx = event.stageX / that.blocks.getStageScale() - that.container.x;
+            let dx = event.stageX / that.blocks.getStageScale() - that.container.x;
             if (!moved && that.isCollapsible() && dx < 30 / that.blocks.getStageScale()) {
                 that.collapseToggle();
             } else if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
@@ -3583,7 +3580,7 @@ class Block {
                 this.blocks.blockList[dblk].connections[c] === this.blocks.blockList.indexOf(this)
             ) {
                 // Is the divide block connected to a note value block?
-                cblk = this.blocks.blockList[dblk].connections[0];
+                const cblk = this.blocks.blockList[dblk].connections[0];
                 if (cblk !== null) {
                     // Is it the first or second arg?
                     switch (this.blocks.blockList[cblk].name) {
@@ -3594,7 +3591,6 @@ class Block {
                         case "newslur":
                         case "elapsednotes2":
                             return this.blocks.blockList[cblk].connections[1] === dblk;
-                            break;
                         case "meter":
                             this._check_meter_block = cblk;
                         case "setbpm2":
@@ -3606,10 +3602,8 @@ class Block {
                         case "neighbor":
                         case "neighbor2":
                             return this.blocks.blockList[cblk].connections[2] === dblk;
-                            break;
                         default:
                             return false;
-                            break;
                     }
                 }
             }
@@ -3624,7 +3618,7 @@ class Block {
         let dblk = this.connections[0];
         // We are connected to a divide block.
         // Is the divide block connected to a note value block?
-        cblk = this.blocks.blockList[dblk].connections[0];
+        let cblk = this.blocks.blockList[dblk].connections[0];
         if (cblk !== null) {
             // Is it the first or second arg?
             switch (this.blocks.blockList[cblk].name) {
@@ -3640,7 +3634,6 @@ class Block {
                     } else {
                         return 1;
                     }
-                    break;
                 case "meter":
                     this._check_meter_block = cblk;
                 case "setbpm2":
@@ -3661,10 +3654,8 @@ class Block {
                     } else {
                         return 1;
                     }
-                    break;
                 default:
                     return 1;
-                    break;
             }
         }
 
@@ -3782,9 +3773,7 @@ class Block {
             let uniqueValue;
             switch (cblock.name) {
                 case "action":
-                    let that = this;
-
-                    that.blocks.palettes.removeActionPrototype(oldValue);
+                    this.blocks.palettes.removeActionPrototype(oldValue);
 
                     // Ensure new name is unique.
                     uniqueValue = this.blocks.findUniqueActionName(newValue);
@@ -3970,8 +3959,10 @@ class Block {
                     // Check to see which connection we are using in
                     // cblock.  We only do something if blk is attached to
                     // the name connection (1).
-                    blk = this.blocks.blockList.indexOf(this);
-                    if (cblock.connections[1] === blk && closeInput) {
+                    if (
+                        cblock.connections[1] === this.blocks.blockList.indexOf(this) &&
+                        closeInput
+                    ) {
                         // If the label was the name of a storein, update the
                         // associated box this.blocks and the palette buttons.
                         if (this.value !== "box") {
