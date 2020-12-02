@@ -194,6 +194,7 @@ function SaveInterface(PlanetInterface) {
         let svg = "data:image/svg+xml;utf8," + this.printBlockSVG();
         this.download("svg", svg, filename);
     };
+    
 
     this.saveWAV = function(filename) {
         document.body.style.cursor = "wait";
@@ -206,6 +207,12 @@ function SaveInterface(PlanetInterface) {
         this.logo.textMsg(_("Your recording is in progress."));
     };
 
+    this.saveWEBM = function(filename){
+        document.body.style.cursor = "wait";
+        this.filename = filename;
+        this.download("webm", URL.createObjectURL(saveVideo()));
+    };
+    
     this.saveAbc = function(filename) {
         document.body.style.cursor = "wait";
         this.filename = filename;

@@ -1123,6 +1123,9 @@ class Logo {
         }
 
         this.showBlocksAfterRun = false;
+        
+        // Stop recording for WEBM when user press stop or cursor is not on current window.
+        stopRecord();
     }
 
     /**
@@ -1441,6 +1444,9 @@ class Logo {
         }
 
         this.refreshCanvas();
+        
+        // Start recording mouse artwork for WEBM.
+        startRecord();
     }
 
     /**
@@ -1925,6 +1931,9 @@ class Logo {
                     }
                 }
                 document.getElementById("stop").style.color = "white";
+                
+                // Stop recording of WEBM when program stops by itself.
+                stopRecord();
             }
         }
     }
