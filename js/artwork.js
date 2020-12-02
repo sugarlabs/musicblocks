@@ -118,13 +118,13 @@ function hideButtonHighlight(circles, stage) {
 
     createjs.Tween.get(circles.active).to({ alpha: 0 }, 200);
     createjs.Tween.get(circles.highlight).to({ alpha: 0 }, 400);
-    setTimeout(function() {
+    setTimeout(() => {
         stage.removeChild(circles.active, circles.highlight);
     }, 410);
 }
 
 function hidePaletteNameDisplay(palette_text, stage) {
-    setTimeout(function() {
+    setTimeout(() => {
         stage.removeChild(palette_text);
     }, 150);
 }
