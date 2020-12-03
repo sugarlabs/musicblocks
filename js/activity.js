@@ -242,6 +242,7 @@ function Activity() {
             'widgets/pitchstaircase',
             'widgets/temperament',
             'widgets/tempo',
+            'widgets/sampler',
             'widgets/pitchslider',
             'widgets/musickeyboard',
             'widgets/timbre',
@@ -3780,6 +3781,7 @@ function Activity() {
                     case 'timbre':
                     case 'pitchstaircase':
                     case 'tempo':
+                    case 'sample'
                     case 'pitchslider':
                     case 'musickeyboard':
                     case 'modewidget':
