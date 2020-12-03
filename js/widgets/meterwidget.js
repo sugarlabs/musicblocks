@@ -15,7 +15,7 @@ function MeterWidget() {
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
 
-    this.init = function(logo, meterBlock, widgetBlock) {
+    this.init = (logo, meterBlock, widgetBlock) => {
         this._logo = logo;
         this._meterBlock = meterBlock;
         this._strongBeats = [];
@@ -38,14 +38,13 @@ function MeterWidget() {
         Singer.setSynthVolume(this._logo, 0, "snare drum", PREVIEWVOLUME);
 
         // For the button callbacks
-        let that = this;
 
         this.meterDiv = document.createElement("table");
         widgetWindow.getWidgetBody().append(this.meterDiv);
 
-        widgetWindow.onclose = function() {
-            that._playing = false;
-            that._logo.hideMsgs();
+        widgetWindow.onclose = () => {
+            this._playing = false;
+            this._logo.hideMsgs();
             this.destroy();
         };
 
@@ -54,12 +53,12 @@ function MeterWidget() {
             "play-button.svg",
             ICONSIZE,
             _("Play")
-        ).onclick = function() {
-            if (that._get_click_lock()) {
+        ).onclick = () => {
+            if (this._get_click_lock()) {
                 return;
             } else {
-                that._click_lock = true;
-                if (that.__getPlayingStatus()) {
+                this._click_lock = true;
+                if (this.__getPlayingStatus()) {
                     this.innerHTML =
                         '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
                         _("Play all") +
@@ -70,7 +69,7 @@ function MeterWidget() {
                         '" width="' +
                         ICONSIZE +
                         '" vertical-align="middle">&nbsp;&nbsp;';
-                    that._playing = false;
+                    this._playing = false;
                 } else {
                     this.innerHTML =
                         '&nbsp;&nbsp;<img src="header-icons/stop-button.svg" title="' +
@@ -82,10 +81,10 @@ function MeterWidget() {
                         '" width="' +
                         ICONSIZE +
                         '" vertical-align="middle">&nbsp;&nbsp;';
-                    that._playing = true;
-                    that._logo.turtleDelay = 0;
-                    that._logo.resetSynth(0);
-                    that._playBeat();
+                    this._playing = true;
+                    this._logo.turtleDelay = 0;
+                    this._logo.resetSynth(0);
+                    this._playBeat();
                 }
             }
 
@@ -98,8 +97,8 @@ function MeterWidget() {
             "export-chunk.svg",
             ICONSIZE,
             _("Save")
-        ).onclick = function() {
-            that._save();
+        ).onclick = () => {
+            this._save();
         };
 
         // The pie menu goes here.
@@ -177,25 +176,25 @@ function MeterWidget() {
         widgetWindow.sendToCenter();
     };
 
-    this._get_click_lock = function() {
+    this._get_click_lock = () => {
         return this._click_lock;
     };
 
-    this.__playDrum = function(drum) {
+    this.__playDrum = (drum) => {
         this._logo.synth.trigger(
             0, "C4", Singer.defaultBPMFactor * this._beatValue, drum, null, null
         );
     };
 
-    this.__getPlayingStatus = function() {
+    this.__getPlayingStatus = () => {
         return this._playing;
     };
 
-    this.__getPauseStatus = function() {
+    this.__getPauseStatus = () => {
         return !this._playing;
     };
 
-    this.__playOneBeat = function(i, ms) {
+    this.__playOneBeat = (i, ms) => {
         if (this.__getPauseStatus()) {
             for (let i = 0; i < this._strongBeats.length; i++) {
                 this._playWheel.navItems[i].navItem.hide();
@@ -222,7 +221,7 @@ function MeterWidget() {
         }, ms);
     };
 
-    this._playBeat = function() {
+    this._playBeat = () => {
         let tur = this._logo.turtles.ithTurtle(0);
         let bpmFactor =
             TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
@@ -234,7 +233,7 @@ function MeterWidget() {
         this.__playOneBeat(0, noteBeatValue);
     };
 
-    this._addButton = function(row, icon, iconSize, label) {
+    this._addButton = (row, icon, iconSize, label) => {
         let cell = row.insertCell(-1);
         cell.innerHTML =
             '&nbsp;&nbsp;<img src="header-icons/' +
@@ -256,18 +255,18 @@ function MeterWidget() {
         cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = platformColor.selectorBackground;
 
-        cell.onmouseover = function() {
+        cell.onmouseover = () => {
             this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         };
 
-        cell.onmouseout = function() {
+        cell.onmouseout = ()  => {
             this.style.backgroundColor = platformColor.selectorBackground;
         };
 
         return cell;
     };
 
-    this._save = function() {
+    this._save = ()  => {
         // Export onbeatdo blocks for each strong beat
         let strongBeats = [];
         let newStack = [];
@@ -376,7 +375,7 @@ function MeterWidget() {
         this._logo.blocks.loadNewBlocks(newStack);
     };
 
-    this._piemenuMeter = function(numberOfBeats, beatValue) {
+    this._piemenuMeter = (numberOfBeats, beatValue) => {
         // pie menu for strong beat selection
 
         docById("meterWheelDiv").style.display = "";
@@ -502,28 +501,27 @@ function MeterWidget() {
             this._playWheel.navItems[i].navItem.hide();
         }
 
-        let that = this;
 
         // If a meterWheel sector is selected, show the corresponding
         // beat wheel sector.
-        let __setBeat = function() {
-            let i = that._meterWheel.selectedNavItemIndex;
-            that._strongBeats[i] = true;
-            that._beatWheel.navItems[i].navItem.show();
+        let __setBeat = () => {
+            let i = this._meterWheel.selectedNavItemIndex;
+            this._strongBeats[i] = true;
+            this._beatWheel.navItems[i].navItem.show();
         };
 
         // If a beatWheel sector is selected, hide it.
-        let __clearBeat = function() {
-            let i = that._beatWheel.selectedNavItemIndex;
-            that._beatWheel.navItems[i].navItem.hide();
-            that._strongBeats[i] = false;
+        let __clearBeat = () => {
+            let i = this._beatWheel.selectedNavItemIndex;
+            this._beatWheel.navItems[i].navItem.hide();
+            this._strongBeats[i] = false;
         };
 
         for (let i = 0; i < numberOfBeats; i++) {
-            that._meterWheel.navItems[i].navigateFunction = __setBeat;
-            that._beatWheel.navItems[i].navigateFunction = __clearBeat;
+            this._meterWheel.navItems[i].navigateFunction = __setBeat;
+            this._beatWheel.navItems[i].navigateFunction = __clearBeat;
             // Start with all beats hidden , except default strong/weak .
-            that._beatWheel.navItems[i].navItem.hide();
+            this._beatWheel.navItems[i].navItem.hide();
         }
 
         this.setupDefaultStrongWeakBeats(numberOfBeats, beatValue);
