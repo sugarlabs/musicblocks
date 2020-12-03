@@ -747,7 +747,7 @@ function Synth() {
         }
         if (!accounted) {
             for (let customsample in CUSTOMSAMPLES) {
-                if ((CUSTOMSAMPLES[customsample].includes(sampleName)) {
+                if (CUSTOMSAMPLES[customsample].includes(sampleName)) {
                     console.log("loaded custom sample");
                     this.samples["voice"][CUSTOMSAMPLES[customsample][0]] = CUSTOMSAMPLES[customsample][1];
                     return;
@@ -1138,7 +1138,7 @@ function Synth() {
     };
 
     this.__createSynth = function(turtle, instrumentName, sourceName, params) {
-
+        console.debug(CUSTOMSAMPLES);
         this._loadSample(sourceName);
 
         if (
