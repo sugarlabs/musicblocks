@@ -1367,7 +1367,7 @@ function Synth() {
                 }
             }
 
-            setTimeout(function() {
+            setTimeout(() => {
                 if (paramsEffects &&
                     paramsEffects !== null &&
                     paramsEffects !== undefined) {
