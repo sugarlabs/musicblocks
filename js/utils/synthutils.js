@@ -753,36 +753,8 @@ function Synth() {
                     return;
                 }
             }
-
             console.debug("sample was not already in sample library");
-            let data = null;
-            if (typeof sampleName === "object"){
-                data = function() {return sampleName[1]};
-                this.samplesManifest.voice.push({name: sampleName[0], data: data});
-                this.samplesManifest.drum.push({ name: sampleName[0], data: data});
-                this._loadSample(sampleName[0]);
-            }
         }
-    };
-
-    this._loadSampleFromFile = function(sampleData) {
-        let data = function() {return sampleData[1]};
-        console.log(typeof sampleData[1]);
-        function getBase64(file) {
-            var reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = function () {
-                console.log(reader.result);
-            };
-            reader.onerror = function (error) {
-                console.log('Error: ', error);
-            };
-        }
-        data = getBase64(sampleData);
-
-        this.samplesManifest.voice.push({name: sampleData[0], data: data});
-        this.samplesManifest.drum.push({ name: sampleData[0], data: data});
-        this._loadSample(sampleData[0]);
     };
 
     this.samplesQueue = []; // Samples that need to be loaded at start.
@@ -1166,14 +1138,8 @@ function Synth() {
     };
 
     this.__createSynth = function(turtle, instrumentName, sourceName, params) {
-        if (typeof sourceName === "object") {
-            console.log("object");
-            this._loadSampleFromFile(sourceName);
-            instrumentName = sourceName[0];
-            sourceName = sourceName[0];
-        } else {
-            this._loadSample(sourceName);
-        }
+
+        this._loadSample(sourceName);
 
         if (
             sourceName in this.samples.voice ||
