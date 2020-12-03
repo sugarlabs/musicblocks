@@ -68,7 +68,6 @@ function PitchSlider() {
         };
 
         let makeToolbar = (id) => {
-
             let toolBarDiv = document.createElement("div");
             widgetWindow._toolbar.appendChild(toolBarDiv);
             toolBarDiv.style.float = "left";
