@@ -10,20 +10,20 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 if (navigator.userAgent.search("Firefox") !== -1) {
-    browser.browserAction.onClicked.addListener(function(tab) {
+    browser.browserAction.onClicked.addListener((tab) => {
         browser.tabs.create({url: "index.html"});
     });
 
-    browser.runtime.onInstalled.addListener(function(tab) {
+    browser.runtime.onInstalled.addListener((tab) => {
         browser.tabs.create({url: "index.html"});
     });
 } else {
-    chrome.browserAction.onClicked.addListener(function(tab) {
+    chrome.browserAction.onClicked.addListener((tab) => {
         window.open(chrome.runtime.getURL("index.html"));
     });
 
-    chrome.runtime.onInstalled.addListener(function(tab) {
+    chrome.runtime.onInstalled.addListener((tab) => {
         window.open(chrome.runtime.getURL("index.html"));
     });
-    
+
 }
