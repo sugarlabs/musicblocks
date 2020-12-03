@@ -19,7 +19,7 @@ const changeImage = (imgElement ,from ,to) => {
 function format(str, data) {
     str = str.replace(/{([a-zA-Z0-9.]*)}/g, function(match, name) {
         x = data;
-        name.split(".").forEach(function(v) {
+        name.split(".").forEach((v) => {
             if (x === undefined) {
                 console.debug(
                     "Undefined value in template string",
@@ -36,7 +36,7 @@ function format(str, data) {
         return x;
     });
 
-    return str.replace(/{_([a-zA-Z0-9]+)}/g, function(match, item) {
+    return str.replace(/{_([a-zA-Z0-9]+)}/g, (match, item) =>{
         return _(item);
     });
 }
@@ -113,7 +113,7 @@ function HttpRequest(url, loadCallback, userCallback) {
     try {
         req.open("GET", url);
 
-        req.onreadystatechange = function() {
+        req.onreadystatechange = () => {
             objref.handler();
         };
 
@@ -639,7 +639,7 @@ function processPluginData(
     console.debug("updating palette " + name);
     palettes.updatePalettes(name);
 
-    setTimeout(function() {
+    setTimeout(() => {
         palettes.show();
     }, 2000);
 
@@ -788,7 +788,7 @@ function doUseCamera(
     if (!hasSetupCamera) {
         navigator.getMedia(
             { video: true, audio: false },
-            function(stream) {
+            (stream) => {
                 if (navigator.mozGetUserMedia) {
                     video.mozSrcObject = stream;
                 } else {
@@ -798,7 +798,7 @@ function doUseCamera(
                 video.play();
                 hasSetupCamera = true;
             },
-            function(error) {
+            (error) => {
                 errorMsg("Could not connect to camera");
                 console.debug("Could not connect to camera", error);
             }
@@ -816,7 +816,7 @@ function doUseCamera(
 
     video.addEventListener(
         "canplay",
-        function(event) {
+        (event) => {
             console.debug("canplay", streaming, hasSetupCamera);
             if (!streaming) {
                 video.setAttribute("width", w);
@@ -1269,8 +1269,8 @@ function hex2rgb(hex) {
 }
 
 function delayExecution(duration) {
-    return new Promise(function(resolve, reject) {
-        setTimeout(function() {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
             resolve(true);
         }, duration);
     });
