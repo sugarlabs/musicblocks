@@ -38,7 +38,7 @@ function MeterWidget() {
         Singer.setSynthVolume(this._logo, 0, "snare drum", PREVIEWVOLUME);
 
         // For the button callbacks
-
+        let that = this;
         this.meterDiv = document.createElement("table");
         widgetWindow.getWidgetBody().append(this.meterDiv);
 
