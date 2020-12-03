@@ -636,7 +636,6 @@ function PaletteModel(palette, palettes, name) {
         case "namedarg":
             // so the label will fit
             svg = new SVG();
-            svg.init();
             svg.setScale(protoBlock.scale);
             svg.setExpand(60, 0, 0, 0);
             svg.setOutie(true);
@@ -647,7 +646,6 @@ function PaletteModel(palette, palettes, name) {
         case "nameddo":
             // so the label will fit
             svg = new SVG();
-            svg.init();
             svg.setScale(protoBlock.scale);
             svg.setExpand(60, 0, 0, 0);
             artwork = svg.basicBlock();

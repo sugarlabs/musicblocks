@@ -175,7 +175,7 @@ class Block {
     // Includes workaround for a race condition.
     _createCache(callback, args) {
         let that = this;
-        return new Promise(function (resolve, reject) {
+        return new Promise( (resolve, reject)  =>{
             let loopCount = 0;
 
             async function checkBounds(counter) {
@@ -215,7 +215,7 @@ class Block {
     // Includes workaround for a race condition.
     updateCache(counter) {
         let that = this;
-        return new Promise(function (resolve, reject) {
+        return new Promise( (resolve, reject) =>{
             let loopCount = 0;
 
             async function updateBounds(counter) {
@@ -2459,7 +2459,7 @@ class Block {
                     if (that.blocks.turtles.running()) {
                         that.blocks.logo.doStopTurtles();
 
-                        setTimeout(function () {
+                        setTimeout( () => {
                             that.blocks.logo.runLogoCommands(topBlock);
                         }, 250);
                     } else {
@@ -2482,7 +2482,7 @@ class Block {
             }
 
             locked = true;
-            setTimeout(function () {
+            setTimeout( () => {
                 locked = false;
             }, 500);
 
@@ -2520,8 +2520,8 @@ class Block {
                         if (that.blocks.turtles.running()) {
                             that.blocks.logo.doStopTurtles();
 
-                            setTimeout(function () {
-                                that.blocks.logo.runLogoCommands(topBlk);
+                            setTimeout( () => {
+                                this.blocks.logo.runLogoCommands(topBlk);
                             }, 250);
                         } else {
                             that.blocks.logo.runLogoCommands(topBlk);
@@ -2539,8 +2539,8 @@ class Block {
                     if (that.blocks.turtles.running()) {
                         that.blocks.logo.doStopTurtles();
 
-                        setTimeout(function () {
-                            that.blocks.logo.runLogoCommands(topBlk);
+                        setTimeout( () => {
+                            this.blocks.logo.runLogoCommands(topBlk);
                         }, 250);
                     } else {
                         that.blocks.logo.runLogoCommands(topBlk);
@@ -2555,7 +2555,7 @@ class Block {
             // Track time for detecting long pause...
             that.blocks.mouseDownTime = new Date().getTime();
 
-            that.blocks.longPressTimeout = setTimeout(function () {
+            that.blocks.longPressTimeout = setTimeout( () => {
                 that.blocks.activeBlock = that.blocks.blockList.indexOf(that);
                 that._triggerLongPress = true;
                 that.blocks.triggerLongPress();
@@ -2600,7 +2600,7 @@ class Block {
                 moved = true;
             } else {
                 // Make it eaiser to select text on mobile.
-                setTimeout(function () {
+                setTimeout( () => {
                     moved =
                         Math.abs(event.stageX / that.blocks.getStageScale() - that.original.x) +
                             Math.abs(event.stageY / that.blocks.getStageScale() - that.original.y) >
@@ -3540,7 +3540,7 @@ class Block {
             }
 
             // Firefox fix
-            setTimeout(function () {
+            setTimeout( () => {
                 that.label.style.display = "";
                 that.label.focus();
                 focused = true;
