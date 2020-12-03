@@ -89,8 +89,8 @@ function MeterWidget() {
                 }
             }
 
-            setTimeout(function() {
-                that._click_lock = false;
+            setTimeout(() => {
+                this._click_lock = false;
             }, 1000);
         };
 
@@ -217,9 +217,8 @@ function MeterWidget() {
             this.__playDrum("kick drum");
         }
 
-        let that = this;
-        setTimeout(function() {
-            that.__playOneBeat((i + 1) % that._strongBeats.length, ms);
+        setTimeout(() => {
+            this.__playOneBeat((i + 1) % this._strongBeats.length, ms);
         }, ms);
     };
 
