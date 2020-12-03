@@ -11,6 +11,7 @@
 
 let oscilloscopeExecution = true;
 
+
 function Oscilloscope() {
     const ICONSIZE = 32;
     const analyserSize = 8192;
