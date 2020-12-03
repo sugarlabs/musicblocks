@@ -17,7 +17,7 @@ const changeImage = (imgElement ,from ,to) => {
 }
 
 function format(str, data) {
-    str = str.replace(/{([a-zA-Z0-9.]*)}/g, function(match, name) {
+    str = str.replace(/{([a-zA-Z0-9.]*)}/g, (match, name) => {
         x = data;
         name.split(".").forEach((v) => {
             if (x === undefined) {
@@ -135,7 +135,7 @@ function HttpRequest(url, loadCallback, userCallback) {
 
 function doBrowserCheck() {
     let matched, browser;
-    jQuery.uaMatch = function( ua ) {
+    jQuery.uaMatch = ( ua ) => {
         ua = ua.toLowerCase();
 
         let match = /(chrome)[ \/]([\w.]+)/.exec( ua ) ||
@@ -748,7 +748,7 @@ function doPublish(desc) {
     let descElem = docById("description");
     let msg = desc + " " + descElem.value + " " + url;
     console.debug("comment: " + msg);
-    let post_cb = function() {
+    let post_cb = () => {
         FB.api("/me/feed", "post", {
             message: msg
         });
