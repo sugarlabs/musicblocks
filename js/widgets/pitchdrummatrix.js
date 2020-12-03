@@ -136,7 +136,7 @@ function PitchDrumMatrix() {
                 that._save_lock = true;
                 that._save();
                 setTimeout(() => {
-                    this._save_lock = false;
+                    that._save_lock = false;
                 }, 1000);
             }
         };
