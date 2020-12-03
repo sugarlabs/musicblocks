@@ -26,7 +26,7 @@ class SVG {
     //     inner blocks are attached
     // else -- optional second `arm' for if-then-else blocks
     
-    init() {
+    constructor() {
         this._x = 0;
         this._y = 0;
         this._minX = 10000;
@@ -73,41 +73,41 @@ class SVG {
         this.margins = [0, 0, 0, 0];
         this._fontSize = 10;
         this._labelOffset = 0;
-    };
+    }
 
     // Attribute methods
     
     setFontSize(fontSize) {
         this._fontSize = fontSize;
-    };
+    }
 
     setLabelOffset(offset) {
         this._labelOffset = offset;
-    };
+    }
 
     setDrawInniess(flag) {
         this._draw_inniess = flag;
-    };
+    }
 
     getWidth() {
         return this._width;
-    };
+    }
 
     getHeight() {
         return this._height;
-    };
+    }
 
     clearDocks() {
         this.docks = [];
-    };
+    }
 
     setScale(scale) {
         this._scale = scale;
-    };
+    }
 
     setOrientation(orientation) {
         this._orientation = orientation;
-    };
+    }
 
     setClampCount(number) {
         this._clampCount = number;
@@ -117,14 +117,14 @@ class SVG {
                 this._clampSlots.push(1);
             }
         }
-    };
+    }
 
     setClampSlots(clamp, number) {
         if (clamp > this._clampCount.length - 1) {
             this.setClampCount(clamp + 1);
         }
         this._clampSlots[clamp] = number;
-    };
+    }
 
     setExpand(w, h, w2, h2) {
         // TODO: make this an array
@@ -132,80 +132,80 @@ class SVG {
         this._expandY = h;
         this._expandX2 = w2;
         this._expandY2 = h2;
-    };
+    }
 
     setstrokeWidth(stroke_width) {
         this._strokeWidth = stroke_width;
         this._calc_porch_params();
-    };
+    }
 
     setColors(colors) {
         this._fill = colors[0];
         this._stroke = colors[1];
-    };
+    }
 
     setFillColor(color) {
         this._fill = color;
-    };
+    }
 
     setStrokeColor(color) {
         this._stroke = color;
-    };
+    }
 
     setInnies(inniesArray) {
         for (let i = 0; i < inniesArray.length; i++) {
             this._innies.push(inniesArray[i]);
         }
-    };
+    }
 
     setOutie(flag) {
         // Only one outie.
         this._outie = flag;
-    };
+    }
 
     setSlot(flag) {
         this._slot = flag;
         if (flag) {
             this._cap = false;
         }
-    };
+    }
 
     setCap(flag) {
         this._cap = flag;
         if (flag) {
             this._slot = false;
         }
-    };
+    }
 
     setTab(flag) {
         this._tab = flag;
         if (flag) {
             this._tail = false;
         }
-    };
+    }
 
     setTail(flag) {
         this._tail = flag;
         if (flag) {
             this._tab = false;
         }
-    };
+    }
 
     setPorch(flag) {
         this._porch = flag;
-    };
+    }
 
     setBoolean(flag) {
         this._bool = flag;
-    };
+    }
 
     setElse(flag) {
         this._else = flag;
-    };
+    }
 
     setArm(flag) {
         this._arm = flag;
-    };
+    }
 
     // SVG-related helper methods
 
@@ -214,7 +214,7 @@ class SVG {
         this._minY = 10000;
         this._maxX = -10000;
         this._maxY = -10000;
-    };
+    }
 
     _checkMinMax() {
         if (this._x < this._minX) {
@@ -229,7 +229,7 @@ class SVG {
         if (this._y > this._maxY) {
             this._maxY = this._y;
         }
-    };
+    }
 
     _calculateXY() {
         let x = this._strokeWidth / 2.0;
@@ -255,7 +255,7 @@ class SVG {
         this.margins[0] = Math.floor(this.margins[0]);
         this.margins[1] = Math.floor(this.margins[1]);
         return [x, y];
-    };
+    }
 
     _calculateWH(addstrokeWidth) {
         if (addstrokeWidth) {
@@ -292,17 +292,17 @@ class SVG {
 
         this.margins[2] = Math.floor(this.margins[2] + 0.5);
         this.margins[3] = Math.floor(this.margins[3] + 0.5);
-    };
+    }
 
     _newPath(x, y) {
         this._x = x;
         this._y = y;
         return '<path d="m' + x + " " + y + " ";
-    };
+    }
 
     _closePath() {
         return 'z" ';
-    };
+    }
 
     text(x, y, fontSize, width, alignment, string) {
         this._x = x;
@@ -352,7 +352,7 @@ class SVG {
         }
         text += "</text>";
         return text;
-    };
+    }
 
     _lineTo(x, y) {
         this._checkMinMax();
@@ -364,7 +364,7 @@ class SVG {
             this._checkMinMax();
             return "L " + x + " " + y + " ";
         }
-    };
+    }
 
     _rLineTo(dx, dy) {
         if (dx === 0 && dy === 0) {
@@ -372,7 +372,7 @@ class SVG {
         } else {
             return this._lineTo(this._x + dx, this._y + dy);
         }
-    };
+    }
 
     _arcTo(x, y, r, a, l, s) {
         this._checkMinMax();
@@ -385,7 +385,7 @@ class SVG {
             return ("A " + r + " " + r + " " + a + " " + l + " " + s +
                 " " + x + " " + y + " ");
         }
-    };
+    }
 
     _rarcTo(signX, signY, a, l, s) {
         if (this._radius === 0) {
@@ -395,7 +395,7 @@ class SVG {
                 this._y + signY * this._radius,
                 this._radius, a, l, s);
         }
-    };
+    }
 
     _corner(signX, signY, a, l, s, start, end, skip) {
         let svg_str = "";
@@ -420,7 +420,7 @@ class SVG {
             }
         }
         return svg_str;
-    };
+    }
 
     _iCorner(signX, signY, a, l, s, start, end) {
         let svg_str = "";
@@ -443,7 +443,7 @@ class SVG {
             }
         }
         return svg_str;
-    };
+    }
 
     _doInnie() {
         this.docks.push([
@@ -464,7 +464,7 @@ class SVG {
             this._rLineTo(this._innieX2, 0) +
             this._rLineTo(0, -this._innieY1) +
             this._rLineTo(this._innieX1, 0));
-    };
+    }
 
     _doOutie() {
         if (!this._outie) {
@@ -484,7 +484,7 @@ class SVG {
             this._rLineTo(this._innieX1 + 2 * this._strokeWidth, 0) +
             this._rLineTo(0, -this._strokeWidth)
         );
-    };
+    }
 
     _doSlot() {
         let x;
@@ -502,7 +502,7 @@ class SVG {
         } else {
             return this._rLineTo(this._slotX, 0);
         }
-    };
+    }
 
     _doTail() {
         if (this._outie) {
@@ -515,7 +515,7 @@ class SVG {
         } else {
             return this._rLineTo(-this._slotX, 0);
         }
-    };
+    }
 
     _doTab() {
         if (this._outie) {
@@ -528,7 +528,7 @@ class SVG {
             this._rLineTo(-this._slotX + 2 * this._strokeWidth, 0) +
             this._rLineTo(0, -this._slotY) +
             this._rLineTo(-this._strokeWidth, 0));
-    };
+    }
 
     _doPorch(flag) {
         if (flag) {
@@ -540,7 +540,7 @@ class SVG {
                 this._rLineTo(this._porchX - this._radius, 0) +
                 this._corner(1, 1, 90, 0, 1, true, true, false));
         }
-    };
+    }
 
     _startBoolean(xoffset, yoffset) {
         let svg = this._newPath(xoffset, yoffset); // - this._radius);
@@ -551,7 +551,7 @@ class SVG {
         svg += this._rLineTo(this._strokeWidth, 0);
         svg += this._rLineTo(0, -this._expandY);
         return svg;
-    };
+    }
 
     _doBoolean() {
         this.docks.push([
@@ -560,7 +560,7 @@ class SVG {
         this.margins[2] =
             (this._x - this._radius - this._strokeWidth) * this._scale;
         return this._rarcTo(-1, 1, 90, 0, 0) + this._rarcTo(1, 1, 90, 0, 0);
-    };
+    }
 
     _endBoolean(notnot) {
         let svg = "";
@@ -576,7 +576,7 @@ class SVG {
         this._calculateWH(true);
         svg += this._style();
         return svg;
-    };
+    }
 
     _header(center) {
         // FIXME: Why are our calculations off by 2 x strokeWidth?
@@ -592,7 +592,7 @@ class SVG {
             <feFuncA type="linear" slope="0.2"/> </feComponentTransfer> \
             <feMerge> <feMergeNode/> <feMergeNode in="SourceGraphic"/> </feMerge> \
             </filter>');
-    };
+    }
 
     _transform(center) {
         let orientation = "";
@@ -608,7 +608,7 @@ class SVG {
             return ('<g transform="scale(' + this._scale + ", " +
                 this._scale + ')">' + orientation);
         }
-    };
+    }
 
     _footer() {
         if (this._orientation !== 0) {
@@ -616,13 +616,13 @@ class SVG {
         } else {
             return "</g></svg>";
         }
-    };
+    }
 
     _style() {
         return ('style="fill:' + this._fill + ";fill-opacity:1;stroke:" +
             this._stroke + ";stroke-width:" + this._strokeWidth +
             ';stroke-linecap:round;stroke-opacity:1;filter:url(#dropshadow);" />');
-    };
+    }
 
     /*
     The block construction methods typically start on the upper-left side
@@ -746,7 +746,7 @@ class SVG {
 
         svg += this._footer();
         return this._header(false) + svg;
-    };
+    }
 
     basicBox() {
         // Basic argument style used for numbers, text, media, parameters
@@ -780,7 +780,7 @@ class SVG {
 
         svg += this._footer();
         return this._header(false) + svg;
-    };
+    }
 
     booleanAndOr() {
         // Booleans are in a class of their own
@@ -823,7 +823,7 @@ class SVG {
 
         svg += this._footer();
         return this._header(false) + svg;
-    };
+    }
 
     booleanNot(notnot) {
         // Booleans are in a class of their own: not and not not
@@ -915,7 +915,7 @@ class SVG {
 
         svg += this._footer();
         return this._header(false) + svg;
-    };
+    }
 
     booleanCompare() {
         // Booleans are in a class of their own (greater than, less than, etc)
@@ -993,7 +993,7 @@ class SVG {
 
         svg += this._footer();
         return this._header(false) + svg;
-    };
+    }
 
     basicClamp() {
         // Special block for clamps around stacks; includes an 'arm'
@@ -1186,7 +1186,7 @@ class SVG {
 
         svg += this._footer();
         return this._header(false) + svg;
-    };
+    }
 
     argClamp() {
         // A clamp that contains innies rather than flow blocks
@@ -1296,7 +1296,7 @@ class SVG {
 
         svg += this._footer();
         return this._header(false) + svg;
-    };
+    }
 
     untilClamp() {
         // Until block is like clamp but docks are flipped
@@ -1359,8 +1359,7 @@ class SVG {
         }
 
         if (this._bool) {
-            // Swap bool and tab args so that the docking behaves like the
-            // while block.
+            // Swap bool and tab args so that the docking behaves like the while block.
             tx = this.docks[1][0];
             ty = this.docks[1][1];
             this.docks[1][0] = this.docks[2][0];
@@ -1371,7 +1370,7 @@ class SVG {
 
         svg += this._footer();
         return this._header(false) + svg;
-    };
+    }
 
     statusBlock(graphic) {
         // Generate a status block
@@ -1397,5 +1396,5 @@ class SVG {
         svg += this._style();
         svg += this._footer();
         return this._header(false) + svg;
-    };
+    }
 }
