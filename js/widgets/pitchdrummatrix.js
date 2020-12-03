@@ -135,8 +135,8 @@ function PitchDrumMatrix() {
             if (!that._get_save_lock()) {
                 that._save_lock = true;
                 that._save();
-                setTimeout(function() {
-                    that._save_lock = false;
+                setTimeout(() => {
+                    this._save_lock = false;
                 }, 1000);
             }
         };
@@ -532,13 +532,12 @@ function PitchDrumMatrix() {
         }
 
         if (i < pairs.length - 1) {
-            var that = this;
-            setTimeout(function() {
+            setTimeout(() => {
                 var ii = i + 1;
-                that._playPitchDrum(ii, pairs);
+                this._playPitchDrum(ii, pairs);
             }, 1000);
         } else {
-            setTimeout(function() {
+            setTimeout(() => {
                 for (var i = 0; i < pdmTable.rows.length - 1; i++) {
                     var pdmTableRow = pdmTable.rows[i];
                     var pitchCell = pdmTableRow.cells[0];
@@ -637,9 +636,9 @@ function PitchDrumMatrix() {
                 0, note.replace(/♭/g, "b").replace(/♯/g, "#"), 0.125, "default", null, null
             );
 
-            var that = this;
-            setTimeout(function() {
-                that._logo.synth.trigger(0, "C2", 0.125, drumName, null, null);
+            
+            setTimeout(() => {
+                this._logo.synth.trigger(0, "C2", 0.125, drumName, null, null);
             }, waitTime);
         }
     };
