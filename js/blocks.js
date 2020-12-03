@@ -38,112 +38,114 @@ const PITCHBLOCKS = [
  * @public
  * @return {void}
  */
-function Blocks(activity) {
-    if (sugarizerCompatibility.isInsideSugarizer()) {
-        storage = sugarizerCompatibility.data;
-    } else {
-        storage = localStorage;
+class Blocks {
+    constructor(activity) {
+        if (sugarizerCompatibility.isInsideSugarizer()) {
+            storage = sugarizerCompatibility.data;
+        } else {
+            storage = localStorage;
+        }
+    
+        this.activity = activity;
+        this.canvas = null;
+        this.stage = null;
+        this.refreshCanvas = null;
+        this.trashcan = null;
+        this.updateStage = null;
+        this.getStageScale = null;
+        // Did the user right cick?
+        this.stageClick = false;
+    
+        // We keep a list of stacks in the trash.
+        this.trashStacks = [];
+    
+        // We keep a dictionary for the proto blocks,
+        this.protoBlockDict = {};
+        // and a list of the blocks we create.
+        this.blockList = [];
+    
+        this.blockArt = {};
+        this.blockCollapseArt = {};
+    
+        // Track the time with mouse down.
+        this.mouseDownTime = 0;
+        this.longPressTimeout = null;
+    
+        // Paste offset is used to ensure pasted blocks don't overlap.
+        this.pasteDx = 0;
+        this.pasteDy = 0;
+    
+        // What did we select?
+        this.selectedStack = null;
+        // and a copy of the selected stack for pasting.
+        this.selectedBlocksObj = null;
+    
+        // If we somehow have a malformed block database (for example,
+        // from importing a corrupted datafile, we need to avoid infinite
+        // loops while crawling the block list.
+        this._loopCounter = 0;
+        this._sizeCounter = 0;
+        this._searchCounter = 0;
+    
+        // We need a reference to the palettes.
+        this.palettes = null;
+        // Which block, if any, is highlighted?
+        this.highlightedBlock = null;
+        // Which block, if any, is active?
+        this.activeBlock = null;
+        // Are the blocks visible?
+        this.visible = true;
+        // The group of blocks being dragged or moved together
+        this.dragGroup = [];
+        // The blocks at the tops of stacks
+        this.stackList = [];
+        // The blocks that need expanding
+        this._expandablesList = [];
+        // Number of blocks to load
+        this._loadCounter = 0;
+        // Stacks of blocks that need adjusting as blocks are repositioned
+        // due to expanding and contracting or insertion into the flow.
+        this._adjustTheseDocks = [];
+        // Blocks that need collapsing after load.
+        this.blocksToCollapse = [];
+        // Arg blocks that need expanding after load.
+        this._checkTwoArgBlocks = [];
+        // Arg clamp blocks that need expanding after load.
+        this._checkArgClampBlocks = [];
+        // Clamp blocks that need expanding after load.
+        this.clampBlocksToCheck = [];
+        // Blocks that don't run when clicked.
+        this.noRunBlocks = [];
+    
+        this._homeButtonContainers = [];
+        this.blockScale = DEFAULTBLOCKSCALE;
+    
+        // We need to know if we are processing a copy or save stack command.
+        this.inLongPress = false;
+        this.customTemperamentDefined = false;
+    
+        // We stage deletion of prototype action blocks on the palette so
+        // as to avoid palette refresh race conditions.
+        this.deleteActionTimeout = 0;
     }
-
-    this.activity = activity;
-    this.canvas = null;
-    this.stage = null;
-    this.refreshCanvas = null;
-    this.trashcan = null;
-    this.updateStage = null;
-    this.getStageScale = null;
-    // Did the user right cick?
-    this.stageClick = false;
-
-    // We keep a list of stacks in the trash.
-    this.trashStacks = [];
-
-    // We keep a dictionary for the proto blocks,
-    this.protoBlockDict = {};
-    // and a list of the blocks we create.
-    this.blockList = [];
-
-    this.blockArt = {};
-    this.blockCollapseArt = {};
-
-    // Track the time with mouse down.
-    this.mouseDownTime = 0;
-    this.longPressTimeout = null;
-
-    // Paste offset is used to ensure pasted blocks don't overlap.
-    this.pasteDx = 0;
-    this.pasteDy = 0;
-
-    // What did we select?
-    this.selectedStack = null;
-    // and a copy of the selected stack for pasting.
-    this.selectedBlocksObj = null;
-
-    // If we somehow have a malformed block database (for example,
-    // from importing a corrupted datafile, we need to avoid infinite
-    // loops while crawling the block list.
-    this._loopCounter = 0;
-    this._sizeCounter = 0;
-    this._searchCounter = 0;
-
-    // We need a reference to the palettes.
-    this.palettes = null;
-    // Which block, if any, is highlighted?
-    this.highlightedBlock = null;
-    // Which block, if any, is active?
-    this.activeBlock = null;
-    // Are the blocks visible?
-    this.visible = true;
-    // The group of blocks being dragged or moved together
-    this.dragGroup = [];
-    // The blocks at the tops of stacks
-    this.stackList = [];
-    // The blocks that need expanding
-    this._expandablesList = [];
-    // Number of blocks to load
-    this._loadCounter = 0;
-    // Stacks of blocks that need adjusting as blocks are repositioned
-    // due to expanding and contracting or insertion into the flow.
-    this._adjustTheseDocks = [];
-    // Blocks that need collapsing after load.
-    this.blocksToCollapse = [];
-    // Arg blocks that need expanding after load.
-    this._checkTwoArgBlocks = [];
-    // Arg clamp blocks that need expanding after load.
-    this._checkArgClampBlocks = [];
-    // Clamp blocks that need expanding after load.
-    this.clampBlocksToCheck = [];
-    // Blocks that don't run when clicked.
-    this.noRunBlocks = [];
-
-    this._homeButtonContainers = [];
-    this.blockScale = DEFAULTBLOCKSCALE;
-
-    // We need to know if we are processing a copy or save stack command.
-    this.inLongPress = false;
-    this.customTemperamentDefined = false;
-
-    // We stage deletion of prototype action blocks on the palette so
-    // as to avoid palette refresh race conditions.
-    this.deleteActionTimeout = 0;
 
     /*
      * Returns the long press status
      * @public
      * @return this.inLongPress
      */
-    this.getLongPressStatus = function() {
+    getLongPressStatus() {
         return this.inLongPress;
-    };
+    }
 
     /*
      * Sets long press status to false
      * @public
      * @return {void}
      */
-    this.clearLongPress = function() {
+    clearLongPress() {
         this.inLongPress = false;
-    };
+    }
 
     /*
      * We need access to the canvas.
@@ -151,10 +153,10 @@ function Blocks(activity) {
      * @public
      * @return this
      */
-    this.setCanvas = function(canvas) {
+    setCanvas(canvas) {
         this.canvas = canvas;
         return this;
-    };
+    }
 
     /*
      * We need access to the stage.
@@ -162,10 +164,10 @@ function Blocks(activity) {
      * @public
      * @return this
      */
-    this.setStage = function(stage) {
+    setStage(stage) {
         this.stage = stage;
         return this;
-    };
+    }
 
     /*
      * We need to be able to refreshe the canvas.
@@ -173,10 +175,10 @@ function Blocks(activity) {
      * @public
      * @return this
      */
-    this.setRefreshCanvas = function(refreshCanvas) {
+    setRefreshCanvas(refreshCanvas) {
         this.refreshCanvas = refreshCanvas;
         return this;
-    };
+    }
 
     /*
      * We need to access the trashcan.
@@ -184,10 +186,10 @@ function Blocks(activity) {
      * @public
      * @return this
      */
-    this.setTrashcan = function(trashcan) {
+    setTrashcan(trashcan) {
         this.trashcan = trashcan;
         return this;
-    };
+    }
 
     /*
      * We need to be able to update the stage.
@@ -195,10 +197,10 @@ function Blocks(activity) {
      * @public
      * @return this
      */
-    this.setUpdateStage = function(updateStage) {
+    setUpdateStage(updateStage) {
         this.updateStage = updateStage;
         return this;
-    };
+    }
 
     /*
      * We need to access the stage scale.
@@ -206,10 +208,10 @@ function Blocks(activity) {
      * @public
      * @return this
      */
-    this.setGetStageScale = function(getStageScale) {
+    setGetStageScale(getStageScale) {
         this.getStageScale = getStageScale;
         return this;
-    };
+    }
 
     /*
      * Change the scale of the blocks (and the protoblocks on the palette).
@@ -217,7 +219,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.setBlockScale = async function(scale) {
+    setBlockScale = async function(scale) {
         console.debug("New block scale is " + scale);
         this.blockScale = scale;
 
@@ -252,7 +254,7 @@ function Blocks(activity) {
         // Force a refresh.
         await delayExecution(500);
         this.refreshCanvas();
-    };
+    }
 
     /*
      * We need to access the message object.
@@ -260,9 +262,9 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.setMsgText = function(msgText) {
+    setMsgText(msgText) {
         this.msgText = msgText;
-    };
+    }
 
     /*
      * We need to access the error message object.
@@ -270,10 +272,10 @@ function Blocks(activity) {
      * @public
      * @return this
      */
-    this.setErrorMsg = function(errorMsg) {
+    setErrorMsg(errorMsg) {
         this.errorMsg = errorMsg;
         return this;
-    };
+    }
 
     /*
      * We need to access the macro dictionary to add data to it.
@@ -281,10 +283,10 @@ function Blocks(activity) {
      * @public
      * @return this
      */
-    this.setMacroDictionary = function(obj) {
+    setMacroDictionary(obj) {
         this.macroDict = obj;
         return this;
-    };
+    }
 
     /*
      * We need access to the turtles list because we associate a turtle
@@ -293,10 +295,10 @@ function Blocks(activity) {
      * @public
      * @return this
      */
-    this.setTurtles = function(turtles) {
+    setTurtles(turtles) {
         this.turtles = turtles;
         return this;
-    };
+    }
 
     /*
      * We need to access "Logo interpreter" when we click on blocks.
@@ -304,10 +306,10 @@ function Blocks(activity) {
      * @public
      * @return this
      */
-    this.setLogo = function(logo) {
+    setLogo(logo) {
         this.logo = logo;
         return this;
-    };
+    }
 
     /*
      * We need to access the right-click (and long press) context menu.
@@ -315,10 +317,10 @@ function Blocks(activity) {
      * @public
      * @return this
      */
-    this.setContextMenu = function(contextMenu) {
+    setContextMenu(contextMenu) {
         this.contextMenu = contextMenu;
         return this;
-    };
+    }
 
     /*
      * The scale of the graphics is determined by screen size.
@@ -327,24 +329,24 @@ function Blocks(activity) {
      * @return this
      */
 
-    this.setScale = function(scale) {
+    setScale(scale) {
         // this.blockScale = scale;
         return this;
-    };
+    }
 
     /*
      * Extract the blocks
      * @public
      * @return {void}
      */
-    this.extract = function() {
+    extract() {
         if (this.activeBlock != null) {
             // Don't extract silence blocks.
             if (this.blockList[this.activeBlock].name !== "rest2") {
                 this._extractBlock(this.activeBlock, true);
             }
         }
-    };
+    }
 
     /*
      * Pull a block from a stack, then readjust the docks.
@@ -353,7 +355,7 @@ function Blocks(activity) {
      * @private
      * @return {void}
      */
-    this._extractBlock = async function(blk, adjustDock) {
+    _extractBlock = async function(blk, adjustDock) {
         // Remove a single block from within a stack.
         let blkObj = this.blockList[blk];
 
@@ -412,14 +414,14 @@ function Blocks(activity) {
             this.moveStackRelative(blk, 4 * STANDARDBLOCKHEIGHT, 0);
             this.blockMoved(blk);
         }
-    };
+    }
 
     /*
      * Find the y position of the bottom-most block
      * @public
      * @return maxy
      */
-    this.bottomMostBlock = function() {
+    bottomMostBlock() {
         let maxy = -1000;
         for (let blk in this.blockList) {
             if (this.blockList[blk].container.y > maxy) {
@@ -428,7 +430,7 @@ function Blocks(activity) {
         }
 
         return maxy;
-    };
+    }
 
     /*
      * Toggle state of collapsible blocks, except for note blocks,
@@ -436,7 +438,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.toggleCollapsibles = function() {
+    toggleCollapsibles() {
         let allCollapsed = true;
         let someCollapsed = false;
         let blk;
@@ -484,7 +486,7 @@ function Blocks(activity) {
                 }
             }
         }
-    };
+    }
 
     /*
      * We need to access the go-home button and boundary.
@@ -493,11 +495,11 @@ function Blocks(activity) {
      * @public
      * @return this
      */
-    this.setHomeContainers = function(setContainers, boundary) {
+    setHomeContainers(setContainers, boundary) {
         this._setHomeButtonContainers = setContainers;
         this.boundary = boundary;
         return this;
-    };
+    }
 
     /*
      * Is this an action block?
@@ -505,9 +507,9 @@ function Blocks(activity) {
      * @private
      * @return boolean
      */
-    this._actionBlock = function(name) {
+    _actionBlock(name) {
         return ["do", "doArg", "calc", "calcArg"].indexOf(name) !== -1;
-    };
+    }
 
     /*
      * Is this a named action block?
@@ -515,22 +517,22 @@ function Blocks(activity) {
      * @private
      * @return boolean
      */
-    this._namedActionBlock = function(name) {
+    _namedActionBlock(name) {
         return ["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].indexOf(name) !== -1;
-    };
+    }
 
     /*
      * Adjust the dock positions of all blocks in the current drag group.
      * @private
      * @return {void}
      */
-    this._adjustBlockPositions = function() {
+    _adjustBlockPositions() {
         if (this.dragGroup.length < 2) {
             return;
         }
 
         this.adjustDocks(this.dragGroup[0], true);
-    };
+    }
 
     /*
      * Adjust the size of the clamp in an expandable block when
@@ -540,7 +542,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.adjustExpandableClampBlock = function() {
+    adjustExpandableClampBlock() {
         if (this.clampBlocksToCheck.length === 0) {
             return;
         }
@@ -569,7 +571,7 @@ function Blocks(activity) {
          * @private
          * @return {void}
          */
-        let __clampAdjuster = function(blk, myBlock, clamp) {
+        const __clampAdjuster = (blk, myBlock, clamp) => {
             // First we need to count up the number of (and size of) the
             // blocks inside the clamp; The child flow is usually the
             // second-to-last argument.
@@ -603,10 +605,10 @@ function Blocks(activity) {
             if (that.clampBlocksToCheck.length > 0) {
                 that.adjustExpandableClampBlock();
             }
-        };
+        }
 
         __clampAdjuster(blk, myBlock, clamp);
-    };
+    }
 
     /*
      * Returns depth of nesting, which is used to rank order the
@@ -615,14 +617,14 @@ function Blocks(activity) {
      * @private
      * @return depth
      */
-    this._getNestingDepth = function(blk) {
+    _getNestingDepth(blk) {
         let rank = 0;
         while(blk !== null) {
             blk = this.insideExpandableBlock(blk);
             rank += 1;
         }
         return rank;
-    };
+    }
 
     /*
      * Return the block size in units of standard block size.
@@ -630,7 +632,7 @@ function Blocks(activity) {
      * @private
      * @return block size
      */
-    this._getBlockSize = function(blk) {
+    _getBlockSize(blk) {
         let myBlock = this.blockList[blk];
         // Special case for collapsed note blocks.
         if (["newnote", "interval", "osctime"].indexOf(myBlock.name) !== -1 && myBlock.collapsed) {
@@ -638,7 +640,7 @@ function Blocks(activity) {
         }
 
         return myBlock.size;
-    };
+    }
 
     /*
      * Adjust the slot sizes of arg clamps.
@@ -646,7 +648,7 @@ function Blocks(activity) {
      * @private
      * @return {void}
      */
-    this._adjustArgClampBlock = function(argBlocksToCheck) {
+    _adjustArgClampBlock(argBlocksToCheck) {
         if (argBlocksToCheck.length === 0) {
             return;
         }
@@ -682,7 +684,7 @@ function Blocks(activity) {
         if (update) {
             myBlock.updateArgSlots(slotList);
         }
-    };
+    }
 
     /*
      * We also adjust the size of twoarg blocks. It is similar to how
@@ -692,7 +694,7 @@ function Blocks(activity) {
      * @private
      * @return {void}
      */
-    this._adjustExpandableTwoArgBlock = function(argBlocksToCheck) {
+    _adjustExpandableTwoArgBlock(argBlocksToCheck) {
         if (argBlocksToCheck.length === 0) {
             return;
         }
@@ -714,7 +716,7 @@ function Blocks(activity) {
                 myBlock.updateSlots(0, plusMinus);
             }
         }
-    };
+    }
 
     /*
      * Add or remove the vspace blocks
@@ -722,7 +724,7 @@ function Blocks(activity) {
      * @private
      * @return void
      */
-    this._addRemoveVspaceBlock = function(blk) {
+    _addRemoveVspaceBlock(blk) {
         let myBlock = this.blockList[blk];
 
         let c = myBlock.connections[myBlock.connections.length - 2];
@@ -739,14 +741,14 @@ function Blocks(activity) {
          * @private
          * @return number of vspace blocks found below this block
          */
-        let __howManyVSpaceBlocksBelow = function(blk) {
+        const __howManyVSpaceBlocksBelow = (blk) => {
             let nextBlock = last(that.blockList[blk].connections);
             if (nextBlock && that.blockList[nextBlock].name === "vspace") {
                 return 1 + __howManyVSpaceBlocksBelow(nextBlock);
                 // Recurse until it isn't a vspace
             }
             return 0;
-        };
+        }
 
         let vSpaceCount = __howManyVSpaceBlocksBelow(blk);
         if (secondArgumentSize < vSpaceCount + 1) {
@@ -773,7 +775,7 @@ function Blocks(activity) {
              * @private
              * @return {void}
              */
-            let __vspaceAdjuster = function(args) {
+            const __vspaceAdjuster = (args) => {
                 let thisBlock = args[0];
                 let nextBlock = args[1];
                 let vspace = args[2];
@@ -806,7 +808,7 @@ function Blocks(activity) {
                         [thisBlock, nextBlock, newPos, i + 1, n]
                     );
                 }
-            };
+            }
 
             this._makeNewBlockWithConnections(
                 "vspace",
@@ -816,7 +818,7 @@ function Blocks(activity) {
                 [myBlock, last(myBlock.connections), this.blockList.length, 0, secondArgumentSize - vSpaceCount - 1]
             );
         }
-    };
+    }
 
     /*
      * Calculate the sum of the sizes of all the blocks a stack.
@@ -824,7 +826,7 @@ function Blocks(activity) {
      * @private
      * @return int
      */
-    this._getStackSize = function(blk) {
+    _getStackSize(blk) {
         // How many block units in this stack?
         let size = 0;
         this._sizeCounter += 1;
@@ -901,7 +903,7 @@ function Blocks(activity) {
         }
 
         return size;
-    };
+    }
 
     /*
      * Given a block, adjust the dock position of all its connections.
@@ -911,7 +913,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.adjustDocks = function(blk, resetLoopCounter) {
+    adjustDocks(blk, resetLoopCounter) {
         let myBlock = this.blockList[blk];
 
         // For when we come in from makeBlock
@@ -1032,7 +1034,7 @@ function Blocks(activity) {
                 this.adjustDocks(cblk, true);
             }
         }
-    };
+    }
 
     /*
      * Add an action name whenever the user removes the name from
@@ -1046,7 +1048,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.addDefaultBlock = function(parentblk, oldBlock, skipOldBlock) {
+    addDefaultBlock(parentblk, oldBlock, skipOldBlock) {
         if (parentblk == null) {
             return;
         }
@@ -1062,7 +1064,7 @@ function Blocks(activity) {
                  * @public
                  * @return {void}
                  */
-                let postProcess = function(args) {
+                const postProcess = (args) => {
                     let parentblk = args[0];
                     let oldBlock = args[1];
 
@@ -1107,7 +1109,7 @@ function Blocks(activity) {
                     }
 
                     that.adjustDocks(parentblk, true);
-                };
+                }
 
                 this._makeNewBlockWithConnections("text", 0, [parentblk], postProcess, [parentblk, oldBlock]);
             }
@@ -1136,7 +1138,7 @@ function Blocks(activity) {
                     this.blockList[blk].container.updateCache();
 
                     this.adjustDocks(parentblk, true);
-                };
+                }
 
                 this._makeNewBlockWithConnections("number", 0, [parentblk], postProcess, [parentblk, oldBlock]);
             }
@@ -1176,7 +1178,7 @@ function Blocks(activity) {
                     this.blockList[blk].container.updateCache();
 
                     this.adjustDocks(parentblk, true);
-                };
+                }
 
                 let newBlockName = "solfege";
                 let newBlockValue = "sol";
@@ -1209,7 +1211,7 @@ function Blocks(activity) {
                  * @public
                  * @return {void}
                  */
-                let postProcess = function(args) {
+                const postProcess = (args) => {
                     let parentblk = args[0];
                     let oldBlock = args[1];
 
@@ -1224,7 +1226,7 @@ function Blocks(activity) {
                     that.blockList[blk].container.updateCache();
 
                     that.adjustDocks(parentblk, true);
-                };
+                }
 
                 this._makeNewBlockWithConnections("text", 0, [parentblk], postProcess, [parentblk, oldBlock]);
             }
@@ -1245,7 +1247,7 @@ function Blocks(activity) {
                 this.blockList[cblk].connections[1] = newSilenceBlock;
             }
         }
-    };
+    }
 
     /*
      * Remove any pitch blocks from a Note block if Silent block is inserted.
@@ -1254,7 +1256,7 @@ function Blocks(activity) {
      * @private
      * @return {void}
      */
-    this._deletePitchBlocks = function(thisBlock) {
+    _deletePitchBlocks(thisBlock) {
         // Find the top of the stack
         let c = this.blockList[thisBlock].connections[0];
         if (c === null) {
@@ -1307,7 +1309,7 @@ function Blocks(activity) {
                 break;
             }
         }
-    };
+    }
 
     /*
      * Deletes the next default element: either a Pitch block or a Silent block.
@@ -1315,7 +1317,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.deleteNextDefault = function(thisBlock) {
+    deleteNextDefault(thisBlock) {
         if (thisBlock == undefined) {
             return;
         }
@@ -1352,7 +1354,7 @@ function Blocks(activity) {
                 }
             }
         }
-    };
+    }
 
     /*
      * Remove the Silence block from a Note block if another block
@@ -1361,7 +1363,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.deletePreviousDefault = function(thisBlock) {
+    deletePreviousDefault(thisBlock) {
         let thisBlockobj = this.blockList[thisBlock];
         if (this._blockInStack(thisBlock, ["rest2"])) {
             this._deletePitchBlocks(thisBlock);
@@ -1393,16 +1395,16 @@ function Blocks(activity) {
 
             return thisBlockobj.connections[0];
         }
-    };
+    }
 
     // To make everything cleaner, use this function to reinit widget
     // when its widget windows is open.
-    this.reInitWidget = async function(topBlock, timeout) {
+    reInitWidget = async function(topBlock, timeout) {
         await delayExecution(timeout);
         if (!this.blockList[topBlock].trash) {
             this.logo.runLogoCommands(topBlock);
         }
-    };
+    }
 
     /*
      * Handle connections when blocks are moved.
@@ -1410,7 +1412,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.blockMoved = async function(thisBlock) {
+    blockMoved = async function(thisBlock) {
         /*
          * When a block is moved, we have to check the following:
          * (0) Is it inside of a expandable block?
@@ -1991,7 +1993,7 @@ function Blocks(activity) {
 
         this.adjustExpandableClampBlock();
         this.refreshCanvas();
-    };
+    }
 
     /*
      * Test for a valid connection between two dock types.
@@ -2000,7 +2002,7 @@ function Blocks(activity) {
      * @private
      * @return boolean
      */
-    this._testConnectionType = function(type1, type2) {
+    _testConnectionType(type1, type2) {
         // Can these two blocks dock?
         if (type1 === "in" && type2 === "out") {
             return true;
@@ -2075,25 +2077,25 @@ function Blocks(activity) {
             return true;
         }
         return false;
-    };
+    }
 
     /*
      * Ensure that all the blocks are where they are supposed to be.
      * @public
      * @return {void}
      */
-    this.updateBlockPositions = function() {
+    updateBlockPositions() {
         for (let blk = 0; blk < this.blockList.length; blk++) {
             this._moveBlock(blk, this.blockList[blk].container.x, this.blockList[blk].container.y);
         }
-    };
+    }
 
     /*
      * Move all the blocks to the top layer of the block container.
      * @public
      * @return {void}
      */
-    this.bringToTop = function() {
+    bringToTop() {
         this._adjustTheseStacks = [];
         let blk;
 
@@ -2109,14 +2111,14 @@ function Blocks(activity) {
         }
 
         this.refreshCanvas();
-    };
+    }
 
     /*
      * Checks the bounds to ensure blocks are "home".
      * @public
      * @return {void}
      */
-    this.checkBounds = function() {
+    checkBounds() {
         let onScreen = true;
         for (let blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].connections[0] == null) {
@@ -2134,17 +2136,17 @@ function Blocks(activity) {
             this._setHomeButtonContainers(false, true);
             this.boundary.hide();
         }
-    };
+    }
 
     /*
      * Move a block to a specified position and check the docks afterward.
      * @public
      * @return{void}
      */
-    this.moveBlock = function(blk, x, y) {
+    moveBlock(blk, x, y) {
         this._moveBlock(blk, x, y);
         this.adjustDocks(blk, true);
-    };
+    }
 
     /*
      * Move a block (and its label) to x, y.
@@ -2154,7 +2156,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this._moveBlock = function(blk, x, y) {
+    _moveBlock(blk, x, y) {
         let myBlock = this.blockList[blk];
         if (myBlock.container != null) {
             // Round position so font renders clearly.
@@ -2165,7 +2167,7 @@ function Blocks(activity) {
         } else {
             console.debug("No container yet for block " + myBlock.name);
         }
-    };
+    }
 
     /*
      * Relative move of a block (and its label) by dx, dy
@@ -2175,7 +2177,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.moveBlockRelative = function(blk, dx, dy) {
+    moveBlockRelative(blk, dx, dy) {
         this.inLongPress = false;
 
         let myBlock = this.blockList[blk];
@@ -2188,7 +2190,7 @@ function Blocks(activity) {
         } else {
             console.debug("No container yet for block " + myBlock.name);
         }
-    };
+    }
 
     /*
      * Moves the blocks in a stack to a new position.
@@ -2198,14 +2200,14 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.moveStackRelative = function(blk, dx, dy) {
+    moveStackRelative(blk, dx, dy) {
         this.findDragGroup(blk);
         if (this.dragGroup.length > 0) {
             for (let b = 0; b < this.dragGroup.length; b++) {
                 this.moveBlockRelative(this.dragGroup[b], dx, dy);
             }
         }
-    };
+    }
 
     /*
      * Moves all blocks except given stack
@@ -2215,12 +2217,12 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.moveAllBlocksExcept = function(blk, dx, dy) {
+    moveAllBlocksExcept(blk, dx, dy) {
         for (let block in this.blockList){
             let topBlock = this.blockList[this.findTopBlock(block)];
             if (topBlock !== blk) this.moveBlockRelative(block, dx, dy);
         }
-    };
+    }
 
     /*
      * Update the block labels.
@@ -2229,7 +2231,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.updateBlockText = function(blk) {
+    updateBlockText(blk) {
         let myBlock = this.blockList[blk];
         let maxLength = 8;
         if (myBlock.text == null) {
@@ -2378,7 +2380,7 @@ function Blocks(activity) {
         } else {
             console.debug("Load not yet complete for (" + blk + ") " + myBlock.name);
         }
-    };
+    }
 
     /*
      * Find the top block in the stack.
@@ -2386,7 +2388,7 @@ function Blocks(activity) {
      * @public
      * @return blk
      */
-    this.findTopBlock = function(blk) {
+    findTopBlock(blk) {
         // Find the top block in a stack.
         if (blk == null) {
             return null;
@@ -2424,7 +2426,7 @@ function Blocks(activity) {
         }
 
         return blk;
-    };
+    }
 
     /*
      * Checks if two blocks are of the same flow generation.
@@ -2433,7 +2435,7 @@ function Blocks(activity) {
      * @public
      * @return boolean
      */
-    this.sameGeneration = function(firstBlk, childBlk) {
+    sameGeneration(firstBlk, childBlk) {
         if (firstBlk == null || childBlk == null) {
             return false;
         }
@@ -2467,7 +2469,7 @@ function Blocks(activity) {
         }
 
         return false;
-    };
+    }
 
     /*
      * Check if there is a block type in any of the stacks.
@@ -2476,7 +2478,7 @@ function Blocks(activity) {
      * @private
      * @return boolean
      */
-    this._blockInStack = function(thisBlock, names) {
+    _blockInStack(thisBlock, names) {
         // Is there a block of any of these names in this stack?
         let counter = 0;
         while (thisBlock != null) {
@@ -2499,7 +2501,7 @@ function Blocks(activity) {
         }
 
         return false;
-    };
+    }
 
     /*
      * Find the bottom block in the stack.
@@ -2507,7 +2509,7 @@ function Blocks(activity) {
      * @public
      * @return blk
      */
-    this.findBottomBlock = function(blk) {
+    findBottomBlock(blk) {
         // Find the bottom block in a stack.
         if (blk == null) {
             return null;
@@ -2535,7 +2537,7 @@ function Blocks(activity) {
         }
 
         return blk;
-    };
+    }
 
     /*
      * Count all the blocks in the stack starting from blk.
@@ -2544,7 +2546,7 @@ function Blocks(activity) {
      * c = 0
      * @return c
      */
-    this._countBlocksInStack = function(blk) {
+    _countBlocksInStack(blk) {
         let c = 0;
         if (blk !== null) {
             c += 1;
@@ -2555,7 +2557,7 @@ function Blocks(activity) {
         }
 
         return c;
-    };
+    }
 
     /*
      * Find any block with null in its first connection.
@@ -2563,21 +2565,21 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.findStacks = function() {
+    findStacks() {
         this.stackList = [];
         for (let i = 0; i < this.blockList.length; i++) {
             if (this.blockList[i].connections[0] == null) {
                 this.stackList.push(i);
             }
         }
-    };
+    }
 
     /*
      * Find any clamp blocks.
      * @private
      * @return {void}
      */
-    this._findClamps = function() {
+    _findClamps() {
         this._expandablesList = [];
         this.findStacks(); // We start by finding the stacks
         for (let i = 0; i < this.stackList.length; i++) {
@@ -2586,14 +2588,14 @@ function Blocks(activity) {
         }
 
         this._searchForArgFlow();
-    };
+    }
 
     /*
      * Find any expandable arg blocks.
      * @public
      * @return {void}
      */
-    this._findTwoArgs = function() {
+    _findTwoArgs() {
         this._expandablesList = [];
         for (let i = 0; i < this.blockList.length; i++) {
             if (this.blockList[i].isArgBlock() && this.blockList[i].isExpandableBlock()) {
@@ -2602,14 +2604,14 @@ function Blocks(activity) {
                 this._expandablesList.push(i);
             }
         }
-    };
+    }
 
     /*
      * Search for argument flow blocks.
      * @private
      * @return{void}
      */
-    this._searchForArgFlow = function() {
+    _searchForArgFlow() {
         for (let blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].isArgFlowClampBlock()) {
                 this._searchCounter = 0;
@@ -2617,7 +2619,7 @@ function Blocks(activity) {
                 this._expandablesList.push(blk);
             }
         }
-    };
+    }
 
     /*
      * Search for expandable blocks below blk in stack.
@@ -2625,7 +2627,7 @@ function Blocks(activity) {
      * @private
      * @return {void}
      */
-    this._searchForExpandables = function(blk) {
+    _searchForExpandables(blk) {
         let c;
         while (blk != null && this.blockList[blk] != null && !this.blockList[blk].isValueBlock()) {
             // More checks for malformed or corrupted block data.
@@ -2657,25 +2659,25 @@ function Blocks(activity) {
                 blk = null;
             }
         }
-    };
+    }
 
     /*
      * Expand two-arg blocks as needed.
      * @private
      * @return {void}
      */
-    this._expandTwoArgs = function() {
+    _expandTwoArgs() {
         this._findTwoArgs();
         this._adjustExpandableTwoArgBlock(this._expandablesList);
         this.refreshCanvas();
-    };
+    }
 
     /*
      * Expand expandable clamp blocks as needed.
      * @private
      * @return {void}
      */
-    this._expandClamps = function() {
+    _expandClamps() {
         this._findClamps();
         this.clampBlocksToCheck = [];
         for (let i = 0; i < this._expandablesList.length; i++) {
@@ -2689,7 +2691,7 @@ function Blocks(activity) {
 
         this.adjustExpandableClampBlock();
         this.refreshCanvas();
-    };
+    }
 
     /*
      * Some blocks, e.g., sensor blocks for Butia, change their
@@ -2700,7 +2702,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.changeDisabledStatus = function(name, flag) {
+    changeDisabledStatus(name, flag) {
         for (let blk in this.blockList) {
             let myBlock = this.blockList[blk];
             if (myBlock.name === name) {
@@ -2708,25 +2710,25 @@ function Blocks(activity) {
                 myBlock.regenerateArtwork(false);
             }
         }
-    };
+    }
 
     /*
      * Unhighlight all blocks.
      * @public
      * @return {void}
      */
-    this.unhighlightAll = function() {
+    unhighlightAll() {
         for (let blk in this.blockList) {
             this.unhighlight(blk);
         }
-    };
+    }
 
     /*
      * Unhighlight a block
      * @public
      * return {void}
      */
-    this.unhighlight = function(blk) {
+    unhighlight(blk) {
         if (!this.visible) {
             return;
         }
@@ -2743,7 +2745,7 @@ function Blocks(activity) {
         if ((this.highlightedBlock === thisBlock)) {
             this.highlightedBlock = null;
         }
-    };
+    }
 
     /*
      * Highlight a block
@@ -2752,7 +2754,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.highlight = function(blk, unhighlight) {
+    highlight(blk, unhighlight) {
         if (!this.visible) {
             return;
         }
@@ -2764,31 +2766,31 @@ function Blocks(activity) {
             this.blockList[blk].highlight();
             this.highlightedBlock = blk;
         }
-    };
+    }
 
     /*
      * Hide all of the blocks.
      * @public
      * return {void}
      */
-    this.hide = function() {
+    hide() {
         for (let blk in this.blockList) {
             this.blockList[blk].hide();
         }
         this.visible = false;
-    };
+    }
 
     /*
      * Show all the blocks.
      * @public
      * return {void}
      */
-    this.show = function() {
+    show() {
         for (let blk in this.blockList) {
             this.blockList[blk].show();
         }
         this.visible = true;
-    };
+    }
 
     /*
      * Make a new block with connections
@@ -2800,13 +2802,13 @@ function Blocks(activity) {
      * @private
      * @return {void}
      */
-    this._makeNewBlockWithConnections = function(
+    _makeNewBlockWithConnections(
         name, blockOffset, connections, postProcess, postProcessArg) {
         if (typeof collapsed === "undefined") {
-            collapsed = false;
+            let collapsed = false;
         }
 
-        myBlock = this.makeNewBlock(name, postProcess, postProcessArg);
+        let myBlock = this.makeNewBlock(name, postProcess, postProcessArg);
         if (myBlock == null) {
             console.debug("could not make block " + name);
             return;
@@ -2822,7 +2824,7 @@ function Blocks(activity) {
                 myBlock.connections.push(connections[c] + blockOffset);
             }
         }
-    };
+    }
 
     /*
      * Create new block
@@ -2832,7 +2834,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.makeNewBlock = function(name, postProcess, postProcessArg) {
+    makeNewBlock(name, postProcess, postProcessArg) {
         // Create a new block
         if (!name in this.protoBlockDict) {
             // Should never happen: nop blocks should be substituted
@@ -2894,7 +2896,7 @@ function Blocks(activity) {
         // and we need to load the images into the container.
         myBlock.imageLoad();
         return myBlock;
-    };
+    }
 
     /*
      * Make new blocks from proto block, which is called from Palettes
@@ -2903,9 +2905,9 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.makeBlock = function(name, arg) {
+    makeBlock(name, arg) {
         let postProcess;
-        postProcess = function(args) {
+        postProcess = (args) => {
             let thisBlock = args[0];
             let value = args[1];
             let label;
@@ -2945,22 +2947,22 @@ function Blocks(activity) {
             }
 
             that.blockList[thisBlock].container.updateCache();
-        };
+        }
 
         let postProcessArg = null;
         var that = this;
         var thisBlock = this.blockList.length;
         if (name === "start") {
-            postProcess = function(thisBlock) {
+            postProcess = (thisBlock) => {
                 that.blockList[thisBlock].value =
                     that.turtles.turtleList.length;
                 that.turtles.addTurtle(that.blockList[thisBlock]);
-            };
+            }
 
             postProcessArg = thisBlock;
         } 
         else if (name === "outputtools") {
-            postProcess = function(args) {
+            postProcess = (args) => {
                 that.blockList[thisBlock].value = null;
                 that.blockList[thisBlock].privateData = args[1];
             }
@@ -2995,45 +2997,45 @@ function Blocks(activity) {
         } else if (name === "noisename") {
             postProcessArg = [thisBlock, DEFAULTNOISE];
         } else if (name === "eastindiansolfege") {
-            postProcess = function(args) {
+            postProcess = (args) => {
                 let b = args[0];
                 let v = args[1];
                 that.blockList[b].value = v;
                 that.blockList[b].text.text = WESTERN2EISOLFEGENAMES[v];
                 that.blockList[b].container.updateCache();
-            };
+            }
 
             postProcessArg = [thisBlock, "sol"];
         } else if (name === "modename") {
-            postProcess = function(args) {
+            postProcess = (args) => {
                 let b = args[0];
                 let v = args[1];
                 that.blockList[b].value = v;
                 that.blockList[b].text.text = v;
                 that.blockList[b].container.updateCache();
-            };
+            }
 
             postProcessArg = [thisBlock, DEFAULTMODE];
         } else if (name === "accidentalname") {
-            postProcess = function(args) {
+            postProcess = (args) => {
                 let b = args[0];
                 let v = args[1];
                 that.blockList[b].value = v;
                 let o = v.split(" ");
                 that.blockList[b].text.text = _(o[0]) + " " + o[1];
                 that.blockList[b].container.updateCache();
-            };
+            }
 
             postProcessArg = [thisBlock, DEFAULTACCIDENTAL];
         } else if (name === "intervalname") {
-            postProcess = function(args) {
+            postProcess = (args) => {
                 let b = args[0];
                 let v = args[1];
                 that.blockList[b].value = v;
                 let o = v.split(" ");
                 that.blockList[b].text.text = _(o[0]) + " " + o[1];
                 that.blockList[b].container.updateCache();
-            };
+            }
 
             postProcessArg = [thisBlock, DEFAULTINTERVAL];
         } else if (name === "temperamentname") {
@@ -3041,21 +3043,21 @@ function Blocks(activity) {
         } else if (name === "invertmode") {
             postProcessArg = [thisBlock, DEFAULTINVERT];
         } else if (name === "number") {
-            postProcess = function(args) {
+            postProcess = (args) => {
                 let b = args[0];
                 let v = Number(args[1]);
                 that.blockList[b].value = v;
                 that.blockList[b].text.text = v.toString();
                 that.blockList[b].container.updateCache();
-            };
+            }
 
             postProcessArg = [thisBlock, NUMBERBLOCKDEFAULT];
         } else if (name === "loudness" || name === "pitchness") {
-            postProcess = function() {
+            postProcess = () => {
                 that.logo.initMediaDevices();
-            };
+            }
         } else if (name === "media") {
-            postProcess = function(args) {
+            postProcess = (args) => {
                 let b = args[0];
                 let v = args[1];
                 that.blockList[b].value = v;
@@ -3064,11 +3066,11 @@ function Blocks(activity) {
                 } else {
                     that.blockList[b].image = null;
                 }
-            };
+            }
 
             postProcessArg = [b, null];
         } else if (name === "camera") {
-            postProcess = function(args) {
+            postProcess = (args) => {
                 let b = args[0];
                 let v = args[1];
                 that.blockList[b].value = CAMERAVALUE;
@@ -3077,11 +3079,11 @@ function Blocks(activity) {
                 } else {
                     that.blockList[b].image = null;
                 }
-            };
+            }
 
             postProcessArg = [thisBlock, null];
         } else if (name === "video") {
-            postProcess = function(args) {
+            postProcess = (args) => {
                 let b = args[0];
                 let v = args[1];
                 that.blockList[b].value = VIDEOVALUE;
@@ -3090,13 +3092,13 @@ function Blocks(activity) {
                 } else {
                     that.blockList[b].image = null;
                 }
-            };
+            }
 
             postProcessArg = [thisBlock, null];
         } else if (name === "loadFile") {
-            postProcess = function(args) {
+            postProcess = (args) => {
                 that.updateBlockText(args[0]);
-            };
+            }
 
             postProcessArg = [thisBlock, null];
         } else if (["storein2",
@@ -3106,15 +3108,15 @@ function Blocks(activity) {
                     "nameddoArg",
                     "namedcalcArg",
                     "namedarg"].indexOf(name) !== -1) {
-            postProcess = function(args) {
+            postProcess = (args) => {
                 that.blockList[thisBlock].value = null;
                 that.blockList[thisBlock].privateData = args[1];
-            };
+            }
 
             postProcessArg = [thisBlock, arg];
         } else if (name === "newnote") {
-            postProcess = function(args) {
-            };
+            postProcess = (args) => {
+            }
 
             postProcessArg = [thisBlock, null];
         } else {
@@ -3144,7 +3146,7 @@ function Blocks(activity) {
                         break;
                     }
                 } else if (name === "storein2") {
-                    postProcess = function(args) {
+                    postProcess = (args) => {
                         let c = that.blockList[thisBlock].connections[0];
                         if (args[1] === _("store in box")) {
                             that.blockList[c].privateData = _("box");
@@ -3159,7 +3161,7 @@ function Blocks(activity) {
                             }
                             that.blockList[c].regenerateArtwork(false);
                         }
-                    };
+                    }
 
                     postProcessArg = [thisBlock, arg];
 
@@ -3210,7 +3212,7 @@ function Blocks(activity) {
                 if (value == null) {
                     console.debug("cannot set default value");
                 } else if (typeof value === "string") {
-                    postProcess = function(args) {
+                    postProcess = (args) => {
                         let b = args[0];
                         let v = args[1];
                         that.blockList[b].value = v;
@@ -3221,22 +3223,22 @@ function Blocks(activity) {
                         }
                         that.blockList[b].text.text = l;
                         that.blockList[b].container.updateCache();
-                    };
+                    }
 
                     this.makeNewBlock("text", postProcess, [thisBlock, value]);
                 } else {
-                    postProcess = function(args) {
+                    postProcess = (args) => {
                         let b = args[0];
                         let v = Number(args[1]);
                         that.blockList[b].value = v;
                         that.blockList[b].text.text = v.toString();
-                    };
+                    }
 
                     this.makeNewBlock(
                         "number", postProcess, [thisBlock, value]);
                 }
             } else if (myBlock.docks[i + 1][2] === "textin") {
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let b = args[0];
                     let v = args[1];
                     that.blockList[b].value = v;
@@ -3246,52 +3248,52 @@ function Blocks(activity) {
                         l = l.substr(0, STRINGLEN) + "...";
                     }
                     that.blockList[b].text.text = l;
-                };
+                }
 
                 this.makeNewBlock("text", postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === "solfegein") {
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let b = args[0];
                     let v = args[1];
                     that.blockList[b].value = v;
                     let l = i18nSolfege(v.toString());
                     that.blockList[b].text.text = l;
-                };
+                }
 
                 this.makeNewBlock("solfege", postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === "notein") {
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let b = args[0];
                     let v = args[1];
                     that.blockList[b].value = v;
                     let label = v.toString();
                     that.blockList[b].text.text = l;
-                };
+                }
 
                 this.makeNewBlock("notename", postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === "mediain") {
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let b = args[0];
                     let v = args[1];
                     that.blockList[b].value = v;
                     if (v != null) {
                         // loadThumbnail(that, thisBlock, null);
                     }
-                };
+                }
 
                 this.makeNewBlock("media", postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === "filein") {
-                postProcess = function(blk) {
+                postProcess = (blk) => {
                     that.updateBlockText(blk);
-                };
+                }
                 this.makeNewBlock("loadFile", postProcess, thisBlock);
             } else {
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let b = args[0];
                     let v = args[1];
                     that.blockList[b].value = v;
                     that.blockList[b].text.text = v.toString();
-                };
+                }
 
                 this.makeNewBlock("number", postProcess, [thisBlock, value]);
             }
@@ -3308,7 +3310,7 @@ function Blocks(activity) {
         this.refreshCanvas();
 
         return blk;
-    };
+    }
 
     /*
      * Create the drag group from the blocks connected to blk.
@@ -3316,7 +3318,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.findDragGroup = function(blk) {
+    findDragGroup(blk) {
         if (blk == null) {
             console.debug("null block passed to findDragGroup");
             return;
@@ -3325,7 +3327,7 @@ function Blocks(activity) {
         this.dragLoopCounter = 0;
         this.dragGroup = [];
         this._calculateDragGroup(blk);
-    };
+    }
 
     /*
      * Give a block, find all the blocks connected to it.
@@ -3333,7 +3335,7 @@ function Blocks(activity) {
      * @private
      * @return {void}
      */
-    this._calculateDragGroup = function(blk) {
+    _calculateDragGroup(blk) {
         this.dragLoopCounter += 1;
         if (this.dragLoopCount > this.blockList.length) {
             console.debug("Maximum loop counter exceeded in calculateDragGroup... this is bad. " + blk);
@@ -3373,7 +3375,7 @@ function Blocks(activity) {
                 this._calculateDragGroup(cblk);
             }
         }
-    };
+    }
 
     /*
      * Set protoblock visibility on the Action palette.
@@ -3381,7 +3383,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.setActionProtoVisiblity = function(state) {
+    setActionProtoVisiblity(state) {
         // By default, the nameddo protoblock is hidden.
         let actionsPalette = this.palettes.dict["action"];
         let stateChanged = false;
@@ -3401,7 +3403,7 @@ function Blocks(activity) {
             this.palettes.updatePalettes("action");
             // this.palettes.show();
         }
-    };
+    }
 
     /*
      * Find a unique custom name for an Action block.
@@ -3409,7 +3411,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.findUniqueActionName = function(name, actionBlk) {
+    findUniqueActionName(name, actionBlk) {
         // If we have a stack named 'action', make the protoblock visible.
         if (name === _("action")) {
             this.setActionProtoVisiblity(true);
@@ -3436,7 +3438,7 @@ function Blocks(activity) {
         }
 
         return value;
-    };
+    }
 
     /*
      * Finds a unique custom name for custom mode block.
@@ -3444,7 +3446,7 @@ function Blocks(activity) {
      * @public
      * @return value
      */
-    this.findUniqueCustomName = function(name) {
+    findUniqueCustomName(name) {
         let noteNames = [];
         for (let blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].name === "text" && !this.blockList[blk].trash) {
@@ -3462,7 +3464,7 @@ function Blocks(activity) {
             i += 1;
         }
         return value;
-    };
+    }
 
     /*
      * Finds a unique custom name for temperament block.
@@ -3470,7 +3472,7 @@ function Blocks(activity) {
      * @public
      * @return value
      */
-    this.findUniqueTemperamentName = function(name) {
+    findUniqueTemperamentName(name) {
         let temperamentNames = [];
         for (let blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].name === "text" && !this.blockList[blk].trash) {
@@ -3488,14 +3490,14 @@ function Blocks(activity) {
             i += 1;
         }
         return value;
-    };
+    }
 
     /*
      * Make sure we initialize any drum with a URL name.
      * @private
      * @return {void}
      */
-    this._findDrumURLs = function() {
+    _findDrumURLs() {
         for (let blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].name === "text" || this.blockList[blk].name === "string") {
                 let c = this.blockList[blk].connections[0];
@@ -3508,7 +3510,7 @@ function Blocks(activity) {
                 }
             }
         }
-    };
+    }
 
     /*
      * Rename the block boxes.
@@ -3517,7 +3519,7 @@ function Blocks(activity) {
      * @public
      * return {void}
      */
-    this.renameBoxes = function(oldName, newName) {
+    renameBoxes(oldName, newName) {
         if (oldName === newName || oldName === _("box")) {
             return;
         }
@@ -3538,7 +3540,7 @@ function Blocks(activity) {
                 }
             }
         }
-    };
+    }
 
     /*
      * Rename Storedin boxes.
@@ -3547,7 +3549,7 @@ function Blocks(activity) {
      * @public
      * return {void}
      */
-    this.renameStoreinBoxes = function(oldName, newName) {
+    renameStoreinBoxes(oldName, newName) {
         if (oldName === newName || oldName === _("box")) {
             return;
         }
@@ -3585,7 +3587,7 @@ function Blocks(activity) {
                 }
             }
         }
-    };
+    }
 
     /*
      * Rename Storedin2 boxes.
@@ -3594,7 +3596,7 @@ function Blocks(activity) {
      * @public
      * return {void}
      */
-    this.renameStorein2Boxes = function(oldName, newName) {
+    renameStorein2Boxes(oldName, newName) {
         if (oldName === newName || oldName === _("box")) {
             return;
         }
@@ -3619,7 +3621,7 @@ function Blocks(activity) {
                 }
             }
         }
-    };
+    }
 
     /*
      * Rename Named boxes.
@@ -3628,7 +3630,7 @@ function Blocks(activity) {
      * @public
      * return {void}
      */
-    this.renameNamedboxes = function(oldName, newName) {
+    renameNamedboxes(oldName, newName) {
         if (oldName === newName || oldName === _("box")) {
             return;
         }
@@ -3654,7 +3656,7 @@ function Blocks(activity) {
                 }
             }
         }
-    };
+    }
 
     /*
      * Rename Do blocks.
@@ -3663,7 +3665,7 @@ function Blocks(activity) {
      * @public
      * return {void}
      */
-    this.renameDos = function(oldName, newName, skipBlock) {
+    renameDos(oldName, newName, skipBlock) {
         if (oldName === newName) {
             return;
         }
@@ -3700,7 +3702,7 @@ function Blocks(activity) {
                 myBlock.container.updateCache();
             }
         }
-    };
+    }
 
     /*
      * Renames Named do blocks.
@@ -3709,7 +3711,7 @@ function Blocks(activity) {
      * @private
      * @return 'do', 'doArg', 'calc', 'calcArg
      */
-    this.renameNameddos = function(oldName, newName) {
+    renameNameddos(oldName, newName) {
         if (oldName === newName) {
             return;
         }
@@ -3747,7 +3749,7 @@ function Blocks(activity) {
             this.palettes.updatePalettes("action");
             // this.palettes.show();
         }
-    };
+    }
 
     /*
      * Make a new Storein block.
@@ -3755,7 +3757,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.newStoreinBlock = function(name) {
+    newStoreinBlock(name) {
         if (name == null) {
             console.debug("null name passed to newStoreinBlock");
             return;
@@ -3783,7 +3785,7 @@ function Blocks(activity) {
             // Add the new block to the top of the palette.
             this.palettes.dict["boxes"].add(myStoreinBlock, true);
         }
-    };
+    }
 
     /*
      * Make a new Storein2 block.
@@ -3791,7 +3793,7 @@ function Blocks(activity) {
      * @public
      * return {void}
      */
-    this.newStorein2Block = function(name) {
+    newStorein2Block(name) {
         if (name == null) {
             console.debug("null name passed to newStorein2Block");
             return;
@@ -3815,7 +3817,7 @@ function Blocks(activity) {
             // Add the new block to the top of the palette.
             this.palettes.dict["boxes"].add(myStorein2Block, true);
         }
-    };
+    }
 
     /*
      * Make a new Named Box block.
@@ -3823,7 +3825,7 @@ function Blocks(activity) {
      * @public
      * return {void}
      */
-    this.newNamedboxBlock = function(name) {
+    newNamedboxBlock(name) {
         if (name == null) {
             console.debug("null name passed to newNamedboxBlock");
             return;
@@ -3846,7 +3848,7 @@ function Blocks(activity) {
 
         // Add the new block to the top of the palette.
         myBoxBlock.palette.add(myBoxBlock, true);
-    };
+    }
 
     /*
      * Make a new Local Arg block.
@@ -3854,7 +3856,7 @@ function Blocks(activity) {
      * @private
      * @return {void}
      */
-    this._newLocalArgBlock = async function(name) {
+    _newLocalArgBlock = async function(name) {
         // name === 1, 2, 3, ...
         let blkname = "arg_" + name;
         if ("myArg_" + blkname in this.protoBlockDict) {
@@ -3878,7 +3880,7 @@ function Blocks(activity) {
         // Add delay to avoid race condition.
         await delayExecution(100);
         this.palettes.updatePalettes("action");
-    };
+    }
 
     /*
      * Remove any unneeded Named Do blocks.
@@ -3886,7 +3888,7 @@ function Blocks(activity) {
      * @private
      * @return {void}
      */
-    this._removeNamedoEntries = function(name) {
+    _removeNamedoEntries(name) {
         // Delete any old palette entries.
         // console.debug('DELETE: removing old palette entries for ' + name);
         if (this.protoBlockDict["myDo_" + name]) {
@@ -3902,7 +3904,7 @@ function Blocks(activity) {
             this.protoBlockDict["myCalcArg_" + name].hide = true;
             delete this.protoBlockDict["myCalcArg_" + name];
         }
-    };
+    }
 
     /*
      * Depending upon the form of the associated action block, we
@@ -3914,7 +3916,7 @@ function Blocks(activity) {
      * @public
      * @return boolean
      */
-    this.newNameddoBlock = function(name, hasReturn, hasArgs) {
+    newNameddoBlock(name, hasReturn, hasArgs) {
         if (name === _("action")) {
             // 'action' already has its associated palette entries.
             return false;
@@ -3939,7 +3941,7 @@ function Blocks(activity) {
         }
 
         return false;
-    };
+    }
 
     /*
      * Make a new Named Calc block.
@@ -3947,7 +3949,7 @@ function Blocks(activity) {
      * @public
      * @return boolean
      */
-    this.newNamedcalcBlock = function(name) {
+    newNamedcalcBlock(name) {
         if (this.protoBlockDict["myCalc_" + name] === undefined) {
             let myCalcBlock = new ProtoBlock("namedcalc");
             this.protoBlockDict["myCalc_" + name] = myCalcBlock;
@@ -3961,7 +3963,7 @@ function Blocks(activity) {
         }
 
         return false;
-    };
+    }
 
     /*
      * Make a new Named Do Arg block.
@@ -3969,7 +3971,7 @@ function Blocks(activity) {
      * @public
      * return boolean
      */
-    this.newNameddoArgBlock = function(name) {
+    newNameddoArgBlock(name) {
         if (this.protoBlockDict["myDoArg_" + name] === undefined) {
             let myDoArgBlock = new ProtoBlock("nameddoArg");
             this.protoBlockDict["myDoArg_" + name] = myDoArgBlock;
@@ -3983,7 +3985,7 @@ function Blocks(activity) {
         }
 
         return false;
-    };
+    }
 
     /*
      * Make a new Named Calc Arg block.
@@ -3991,7 +3993,7 @@ function Blocks(activity) {
      * @public
      * return boolean
      */
-    this.newNamedcalcArgBlock = function(name) {
+    newNamedcalcArgBlock(name) {
         if (this.protoBlockDict["myCalcArg_" + name] === undefined) {
             let myCalcArgBlock = new ProtoBlock("namedcalcArg");
             this.protoBlockDict["myCalcArg_" + name] = myCalcArgBlock;
@@ -4005,9 +4007,9 @@ function Blocks(activity) {
         }
 
         return false;
-    };
+    }
 
-    this._insideArgClamp = function(blk) {
+    _insideArgClamp(blk) {
         // Returns a containing arg clamp block or null
         if (this.blockList[blk] == null) {
             // race condition?
@@ -4023,7 +4025,7 @@ function Blocks(activity) {
                 return null;
             }
         }
-    };
+    }
 
     /*
      * Return a list of containing clamp blocks or []
@@ -4032,7 +4034,7 @@ function Blocks(activity) {
      * @public
      * @return list of clamp blocks
      */
-    this.findNestedClampBlocks = function(blk, clampList) {
+    findNestedClampBlocks(blk, clampList) {
         if (this.blockList[blk] == null) {
             console.debug("null block in blockList? " + blk);
             return [];
@@ -4055,7 +4057,7 @@ function Blocks(activity) {
             // Keep looking.
             return this.findNestedClampBlocks(cblk, clampList);
         }
-    };
+    }
 
     /*
      * Return a containing expandable block or null.
@@ -4063,7 +4065,7 @@ function Blocks(activity) {
      * @public
      * @return expandable block
      */
-    this.insideExpandableBlock = function(blk) {
+    insideExpandableBlock(blk) {
         if (this.blockList[blk] == null) {
             // race condition?
             console.debug("null block in blockList? " + blk);
@@ -4085,7 +4087,7 @@ function Blocks(activity) {
                 return this.insideExpandableBlock(cblk);
             }
         }
-    };
+    }
 
     /*
      * Return a note block or null.
@@ -4093,7 +4095,7 @@ function Blocks(activity) {
      * @public
      * @return note block
      */
-    this._insideNoteBlock = function(blk) {
+    _insideNoteBlock(blk) {
         if (this.blockList[blk] == null) {
             console.debug("null block in blockList? " + blk);
             return null;
@@ -4119,7 +4121,7 @@ function Blocks(activity) {
                 return this._insideNoteBlock(cblk);
             }
         }
-    };
+    }
 
     /*
      * Find an instance of a block type by name.
@@ -4127,7 +4129,7 @@ function Blocks(activity) {
      * @public
      * @return boolean
      */
-    this.findBlockInstance = function(blkName) {
+    findBlockInstance(blkName) {
         // Returns true if block of name blkName is loaded.
         for (let blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].name === blkName && !this.blockList[blk].trash) {
@@ -4136,7 +4138,7 @@ function Blocks(activity) {
         }
 
         return false;
-    };
+    }
 
     /*
      * Return the first containing Note block, if any.
@@ -4144,7 +4146,7 @@ function Blocks(activity) {
      * @public
      * @return null or collapsible block
      */
-    this.insideInlineCollapsibleBlock = function(blk) {
+    insideInlineCollapsibleBlock(blk) {
         if (blk === null) {
             return null;
         }
@@ -4162,7 +4164,7 @@ function Blocks(activity) {
         }
 
         return this.insideInlineCollapsibleBlock(c0);
-    };
+    }
 
     /*
      * Return first Note block found.
@@ -4170,7 +4172,7 @@ function Blocks(activity) {
      * @public
      * @return note block
      */
-    this.findNoteBlock = function(blk) {
+    findNoteBlock(blk) {
         if (blk === null) {
             return null;
         }
@@ -4186,7 +4188,7 @@ function Blocks(activity) {
         }
 
         return this.findNoteBlock(c);
-    };
+    }
 
     /*
      * Return first Interval block found.
@@ -4194,7 +4196,7 @@ function Blocks(activity) {
      * @public
      * @return null or blk
      */
-    this.findNestedIntervalBlock = function(blk) {
+    findNestedIntervalBlock(blk) {
         if (blk === null) {
             return null;
         }
@@ -4210,7 +4212,7 @@ function Blocks(activity) {
         }
 
         return this.findNestedIntervalBlock(c);
-    };
+    }
 
     /*
      * Returns first Pitch block found.
@@ -4218,7 +4220,7 @@ function Blocks(activity) {
      * @public
      * @return null or blk
      */
-    this.findFirstPitchBlock = function(blk) {
+    findFirstPitchBlock(blk) {
         if (blk === null) {
             return null;
         }
@@ -4231,7 +4233,7 @@ function Blocks(activity) {
 
         let c = last(this.blockList[blk].connections);
         return this.findFirstPitchBlock(c);
-    };
+    }
 
     /*
      * Return octave associated with Pitch block.
@@ -4239,7 +4241,7 @@ function Blocks(activity) {
      * @public
      * @return 4
      */
-    this.findPitchOctave = function(blk) {
+    findPitchOctave(blk) {
         if (blk === null) {
             return 4;
         }
@@ -4256,7 +4258,7 @@ function Blocks(activity) {
         } else {
             return 4;
         }
-    };
+    }
 
     /*
      * Set octave associated with Pitch block.
@@ -4265,7 +4267,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.setPitchOctave = function(blk, octave) {
+    setPitchOctave(blk, octave) {
         if (blk === null) {
             return;
         }
@@ -4283,7 +4285,7 @@ function Blocks(activity) {
                 thisBlock.container.updateCache();
             }
         }
-    };
+    }
 
     /*
      * Check if a Number block used as a modifier in an Interval block.
@@ -4291,7 +4293,7 @@ function Blocks(activity) {
      * @public
      * @return boolean
      */
-    this.intervalModifierNumber = function(blk) {
+    intervalModifierNumber(blk) {
         if (blk === null) {
             return false;
         }
@@ -4314,7 +4316,7 @@ function Blocks(activity) {
         }
 
         return false;
-    };
+    }
 
     /*
      * Check if a Number block is being used as multipicant with a
@@ -4323,7 +4325,7 @@ function Blocks(activity) {
      * @public
      * @return boolean
      */
-    this.octaveModifierNumber = function(blk) {
+    octaveModifierNumber(blk) {
         if (blk === null) {
             return false;
         }
@@ -4348,7 +4350,7 @@ function Blocks(activity) {
         }
 
         return false;
-    };
+    }
 
     /*
      * Check if a Number block is used as a note value denominator argument.
@@ -4356,7 +4358,7 @@ function Blocks(activity) {
      * @public
      * @return boolean
      */
-    this.noteValueNumber = function(blk, c) {
+    noteValueNumber(blk, c) {
         if (blk === null) {
             return false;
         }
@@ -4410,7 +4412,7 @@ function Blocks(activity) {
         }
 
         return false;
-    };
+    }
 
     /*
      * Return the Number block value being used as a note value
@@ -4419,7 +4421,7 @@ function Blocks(activity) {
      * @public
      * @return 1
      */
-    this.noteValueValue = function(blk) {
+    noteValueValue(blk) {
         if (blk === null) {
             return 1;
         }
@@ -4474,7 +4476,7 @@ function Blocks(activity) {
         }
 
         return 1;
-    };
+    }
 
     /*
      * Check if a Number block being used as an octave argument?
@@ -4482,7 +4484,7 @@ function Blocks(activity) {
      * @public
      * @return boolean
      */
-    this.octaveNumber = function(blk) {
+    octaveNumber(blk) {
         if (blk === null) {
             return false;
         }
@@ -4491,7 +4493,7 @@ function Blocks(activity) {
         return (myBlock.name === "number" && myBlock.connections[0] !== null &&
                 ["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "nthmodalpitch"].indexOf(this.blockList[myBlock.connections[0]].name) !== -1 &&
                 this.blockList[myBlock.connections[0]].connections[2] === blk);
-    };
+    }
 
     /*
      * Check if the meter block note value changed, update the BPM block.
@@ -4499,7 +4501,7 @@ function Blocks(activity) {
      * @public
      * @return void
      */
-    this.meter_block_changed = function(blk) {
+    meter_block_changed(blk) {
         if (blk === null || this.blockList[blk].name !== "meter") {
             return;
         }
@@ -4559,7 +4561,7 @@ function Blocks(activity) {
                 this.updateBlockText(b2);
             }
         }
-    };
+    }
 
     /*
      *  Auto-select stack for copying -- no need to actually click on
@@ -4567,7 +4569,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.prepareStackForCopy = function() {
+    prepareStackForCopy() {
         if (this.activeBlock == null) {
             this.errorMsg(_("There is no block selected."));
             console.debug("No active block to copy.");
@@ -4584,14 +4586,14 @@ function Blocks(activity) {
         // Reset paste offset.
         this.pasteDx = 0;
         this.pasteDy = 0;
-    };
+    }
 
     /*
      * Triggers the long press of keys and clears timeout.
      * @public
      * @return {void}
      */
-    this.triggerLongPress = function() {
+    triggerLongPress() {
         if (this.longPressTimeout != null) {
             clearTimeout(this.longPressTimeout);
             this.longPressTimeout = null;
@@ -4599,14 +4601,14 @@ function Blocks(activity) {
 
         this.inLongPress = true;
         piemenuBlockContext(this.blockList[this.activeBlock]);
-    };
+    }
 
     /*
      * Copy a stack of blocks by creating a blockObjs and pasting.
      * @public
      * @return {void}
      */
-    this.pasteStack = function() {
+    pasteStack() {
         if (this.selectedStack == null) {
             return;
         }
@@ -4625,7 +4627,7 @@ function Blocks(activity) {
             this.pasteDy += 21;
             this.loadNewBlocks(this.selectedBlocksObj);
         }
-    };
+    }
 
     /*
      * Save a stack of blocks to local storage and the 'myblocks'
@@ -4633,7 +4635,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.saveStack = function() {
+    saveStack() {
         console.debug(this.selectedStack);
         if (this.selectedStack == null) {
             return;
@@ -4666,14 +4668,14 @@ function Blocks(activity) {
                 this.palettes.updatePalettes("myblocks");
             }
         }
-    };
+    }
 
     /*
      * Copies the Block to objects.
      * @public
      * @return blockObj
      */
-    this._copyBlocksToObj = function() {
+    _copyBlocksToObj() {
         let blockObjs = [];
         let blockMap = {};
         let x;
@@ -4726,7 +4728,7 @@ function Blocks(activity) {
         }
 
         return blockObjs;
-    };
+    }
 
     /*
      * On the palette we store the macro as a basic block.
@@ -4735,7 +4737,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.addToMyPalette = function(name, obj) {
+    addToMyPalette(name, obj) {
         // FIXME: where is obj used?
         let myBlock = new ProtoBlock("macro_" + name);
         let blkName = "macro_" + name;
@@ -4749,7 +4751,7 @@ function Blocks(activity) {
         myBlock.zeroArgBlock();
         myBlock.staticLabels.push(_(name));
         this.protoBlockDict[blkName].palette.add(this.protoBlockDict[blkName]);
-    };
+    }
 
     /*
      * Returns true if block of name blkName is loaded.
@@ -4757,14 +4759,14 @@ function Blocks(activity) {
      * @public
      * @return boolean
      */
-    this.findBlockInstance = function(blkName) {
+    findBlockInstance(blkName) {
         for (let blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].name === blkName && !this.blockList[blk].trash) {
                 return true;
             }
         }
         return false;
-    };
+    }
 
     /*
      * Load new blocks.
@@ -4772,7 +4774,7 @@ function Blocks(activity) {
      * @public
      * return {void}
      */
-    this.loadNewBlocks = function(blockObjs) {
+    loadNewBlocks(blockObjs) {
         // Playback Queue has been deprecated, but some old projects
         // may still have playback blocks appended, which we will
         // remove.
@@ -4981,7 +4983,7 @@ function Blocks(activity) {
             if (oldName !== name) {
                 // Change the name of the action...
                 console.debug("action " + oldName + " is being renamed " + name);
-                blkData[1][1] = { value: name };
+                blkData[1][1] = { value: name }
             }
 
             // and any do blocks
@@ -5019,7 +5021,7 @@ function Blocks(activity) {
         // This section of the code attempts to repair imported
         // code. For example, it adds missing hidden blocks and
         // convert old-style notes to new-style notes.
-        blockObjsLength = blockObjs.length;
+        let blockObjsLength = blockObjs.length;
         let extraBlocksLength = 0;
         let len;
 
@@ -5226,17 +5228,19 @@ function Blocks(activity) {
                 this.customTemperamentDefined = true;
             }
 
+            let postProcess;
+
             // A few special cases.
             switch (name) {
             case "start":
                 blkData[4][0] = null;
                 blkData[4][2] = null;
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let thisBlock = args[0];
                     let blkInfo = args[1];
                     that.blockList[thisBlock].value = that.turtles.turtleList.length;
                     that.turtles.addTurtle(that.blockList[thisBlock], blkInfo);
-                };
+                }
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]]);
                 break;
@@ -5247,7 +5251,7 @@ function Blocks(activity) {
                 this._makeNewBlockWithConnections("action", blockOffset, blkData[4], null, null);
                 break;
             case "temperament1":
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let thisBlock = args[0];
                     let value = args[1];
                     if (value.customTemperamentNotes !== undefined) {
@@ -5268,12 +5272,12 @@ function Blocks(activity) {
                         that.logo.blocks.protoBlockDict["custompitch"].hidden = false;
                         that.logo.blocks.palettes.updatePalettes("pitch");
                     }
-                };
+                }
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, blkInfo[1]]);
                 break;
             case "storein2":
                 // Named boxes and dos need private data.
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let thisBlock = args[0];
                     let value = args[1];
                     that.blockList[thisBlock].privateData = value;
@@ -5286,12 +5290,12 @@ function Blocks(activity) {
                         that.blockList[thisBlock].overrideName = value;
                     }
                     that.blockList[thisBlock].regenerateArtwork();
-                };
+                }
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case "namedbox":
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let thisBlock = args[0];
                     let value = args[1];
                     that.blockList[thisBlock].privateData = value;
@@ -5306,25 +5310,25 @@ function Blocks(activity) {
 
                     that.blockList[thisBlock].value = null;
                     that.blockList[thisBlock].regenerateArtwork();
-                };
+                }
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case "namedarg":
             case "namedcalc":
             case "nameddo":
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let thisBlock = args[0];
                     let value = args[1];
                     that.blockList[thisBlock].privateData = value;
                     that.blockList[thisBlock].value = null;
-                };
+                }
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case "doArg":
                 // Arg clamps may need extra slots added.
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let thisBlock = args[0];
                     let extraSlots = args[1].length - 4;
                     if (extraSlots > 0) {
@@ -5344,12 +5348,12 @@ function Blocks(activity) {
                         }
                     }
                     that._checkArgClampBlocks.push(thisBlock);
-                };
+                }
 
                 this._makeNewBlockWithConnections("doArg", blockOffset, blkData[4], postProcess, [thisBlock, blkData[4]]);
                 break;
             case "nameddoArg":
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let thisBlock = args[0];
                     let value = args[1];
                     that.blockList[thisBlock].privateData = value;
@@ -5372,12 +5376,12 @@ function Blocks(activity) {
                         }
                     }
                     that._checkArgClampBlocks.push(thisBlock);
-                };
+                }
 
                 this._makeNewBlockWithConnections("nameddoArg", blockOffset, blkData[4], postProcess, [thisBlock, value, blkData[4]]);
                 break;
             case "calcArg":
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let thisBlock = args[0];
                     let extraSlots = args[1].length - 3;
                     if (extraSlots > 0) {
@@ -5397,12 +5401,12 @@ function Blocks(activity) {
                         }
                     }
                     that._checkArgClampBlocks.push(thisBlock);
-                };
+                }
 
                 this._makeNewBlockWithConnections("calcArg", blockOffset, blkData[4], postProcess, [thisBlock, blkData[4]]);
                 break;
             case "namedcalcArg":
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let thisBlock = args[0];
                     let value = args[1];
                     that.blockList[thisBlock].privateData = value;
@@ -5425,12 +5429,12 @@ function Blocks(activity) {
                         }
                     }
                     that._checkArgClampBlocks.push(thisBlock);
-                };
+                }
 
                 this._makeNewBlockWithConnections("namedcalcArg", blockOffset, blkData[4], postProcess, [thisBlock, value, blkData[4]]);
                 break;
             case "makeblock":
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let thisBlock = args[0];
                     let extraSlots = args[1].length - 3;
                     if (extraSlots > 0) {
@@ -5449,28 +5453,28 @@ function Blocks(activity) {
                         }
                     }
                     that._checkArgClampBlocks.push(thisBlock);
-                };
+                }
 
                 this._makeNewBlockWithConnections("makeblock", blockOffset, blkData[4], postProcess, [thisBlock, blkData[4]]);
                 break;
             // Value blocks need a default value set.
             case "number":
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let thisBlock = args[0];
                     let value = args[1];
                     that.blockList[thisBlock].value = Number(value);
                     that.updateBlockText(thisBlock);
-                };
+                }
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case "outputtools":
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let thisBlock = args[0];
                     let value = args[1];
                     that.blockList[thisBlock].privateData = value;
                     that.blockList[thisBlock].overrideName = value;
-                };
+                }
 
                 this._makeNewBlockWithConnections("outputtools", blockOffset, blkData[4], postProcess, [thisBlock, blockObjs[b][1][1].value]);
                 break;
@@ -5489,22 +5493,22 @@ function Blocks(activity) {
             case "intervalname":
             case "grid":
             case "boolean":
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let thisBlock = args[0];
                     let value = args[1];
                     that.blockList[thisBlock].value = value;
                     that.updateBlockText(thisBlock);
-                };
+                }
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case "drumname":
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let thisBlock = args[0];
                     let value = args[1];
                     that.blockList[thisBlock].value = value;
                     that.updateBlockText(thisBlock);
-                };
+                }
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
 
@@ -5515,12 +5519,12 @@ function Blocks(activity) {
                 }
                 break;
             case "effectsname":
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let thisBlock = args[0];
                     let value = args[1];
                     that.blockList[thisBlock].value = value;
                     that.updateBlockText(thisBlock);
-                };
+                }
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
 
@@ -5531,7 +5535,7 @@ function Blocks(activity) {
                 }
                 break;
             case "voicename":
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let thisBlock = args[0];
                     let value = args[1];
                     if (["simple 1", "simple 2", "simple 3", "simple 4"].indexOf(value) !== -1) {
@@ -5540,7 +5544,7 @@ function Blocks(activity) {
 
                     that.blockList[thisBlock].value = value;
                     that.updateBlockText(thisBlock);
-                };
+                }
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
 
@@ -5557,12 +5561,12 @@ function Blocks(activity) {
                 }
                 break;
             case "noisename":
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let thisBlock = args[0];
                     let value = args[1];
                     that.blockList[thisBlock].value = value;
                     that.updateBlockText(thisBlock);
-                };
+                }
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
 
@@ -5585,7 +5589,7 @@ function Blocks(activity) {
                 break;
             case "media":
                 // Load a thumbnail into a media blocks.
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let thisBlock = args[0];
                     let value = args[1];
                     that.blockList[thisBlock].value = value;
@@ -5593,25 +5597,25 @@ function Blocks(activity) {
                         // Load artwork onto media block.
                         that.blockList[thisBlock].loadThumbnail(null);
                     }
-                };
+                }
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case "camera":
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let thisBlock = args[0];
                     let value = args[1];
                     that.blockList[thisBlock].value = CAMERAVALUE;
-                };
+                }
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             case "video":
-                postProcess = function(args) {
+                postProcess = (args) => {
                     let thisBlock = args[0];
                     let value = args[1];
                     that.blockList[thisBlock].value = VIDEOVALUE;
-                };
+                }
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
@@ -5620,68 +5624,68 @@ function Blocks(activity) {
             // backward compatibility with Python projects.
             case "red":
             case "black":
-                postProcess = function(thisBlock) {
+                postProcess = (thisBlock) => {
                     that.blockList[thisBlock].value = 0;
                     that.updateBlockText(thisBlock);
-                };
+                }
 
                 this._makeNewBlockWithConnections("number", blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case "white":
-                postProcess = function(thisBlock) {
+                postProcess = (thisBlock) => {
                     that.blockList[thisBlock].value = 100;
                     that.updateBlockText(thisBlock);
-                };
+                }
 
                 this._makeNewBlockWithConnections("number", blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case "orange":
-                postProcess = function(thisBlock) {
+                postProcess = (thisBlock) => {
                     that.blockList[thisBlock].value = 10;
                     that.updateBlockText(thisBlock);
-                };
+                }
 
                 this._makeNewBlockWithConnections("number", blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case "yellow":
-                postProcess = function(thisBlock) {
+                postProcess = (thisBlock) => {
                     that.blockList[thisBlock].value = 20;
                     that.updateBlockText(thisBlock);
-                };
+                }
 
                 this._makeNewBlockWithConnections("number", blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case "green":
-                postProcess = function(thisBlock) {
+                postProcess = (thisBlock) => {
                     that.blockList[thisBlock].value = 40;
                     that.updateBlockText(thisBlock);
-                };
+                }
 
                 this._makeNewBlockWithConnections("number", blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case "blue":
-                postProcess = function(thisBlock) {
+                postProcess = (thisBlock) => {
                     that.blockList[thisBlock].value = 70;
                     that.updateBlockText(thisBlock);
-                };
+                }
 
                 this._makeNewBlockWithConnections("number", blockOffset, blkData[4], postProcess, thisBlock);
                 break;
             case "loadFile":
-                postProcess = function(args) {
+                postProcess = (args) => {
                     that.blockList[args[0]].value = args[1];
                     that.updateBlockText(args[0]);
-                };
+                }
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             default:
                 // Check that name is in the proto list
                 if (!(name in this.protoBlockDict) || this.protoBlockDict[name] == null) {
-                    let postProcessUnknownBlock = function(args) {
+                    let postProcessUnknownBlock = (args) => {
                         // save original block name
                         that.blockList[args[0]].privateData = args[1];
-                    };
+                    }
 
                     let newName = name;
 
@@ -5785,7 +5789,7 @@ function Blocks(activity) {
                 }
             }
         }
-    };
+    }
 
     /*
      * If all the blocks are loaded, we can make the final adjustments.
@@ -5793,7 +5797,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.cleanupAfterLoad = async function(name) {
+    cleanupAfterLoad = async function(name) {
         this._loadCounter -= 1;
         if (this._loadCounter > 0) {
             return;
@@ -5865,14 +5869,14 @@ function Blocks(activity) {
         document.getElementById("load-container").style.display = "none";
         let myCustomEvent = new Event("finishedLoading");
         document.dispatchEvent(myCustomEvent);
-    };
+    }
 
     /*
      * Cleanup the stacks after load.
      * @private
      * @return {void}
      */
-    this._cleanupStacks = function() {
+    _cleanupStacks() {
         // Sort the blocks from inside to outside.
         let blocksToCheck = [];
         for (let b = 0; b  < this._checkArgClampBlocks.length; b++) {
@@ -5908,7 +5912,7 @@ function Blocks(activity) {
         for (let blk = 0; blk < this._adjustTheseStacks.length; blk++) {
             this.raiseStackToTop(this._adjustTheseStacks[blk]);
         }
-    };
+    }
 
     /*
      * Look for a Return block in an action stack.
@@ -5916,7 +5920,7 @@ function Blocks(activity) {
      * @public
      * @return boolean
      */
-    this.actionHasReturn = function(blk) {
+    actionHasReturn(blk) {
         if (this.blockList[blk].name !== "action") {
             return false;
         }
@@ -5927,7 +5931,7 @@ function Blocks(activity) {
             }
         }
         return false;
-    };
+    }
 
     /*
      * Look for an Arg block in an action stack.
@@ -5935,7 +5939,7 @@ function Blocks(activity) {
      * @public
      * @return boolean
      */
-    this.actionHasArgs = function(blk) {
+    actionHasArgs(blk) {
         if (this.blockList[blk].name !== "action") {
             return false;
         }
@@ -5946,7 +5950,7 @@ function Blocks(activity) {
             }
         }
         return false;
-    };
+    }
 
     /*
      * Move the stack associated with blk to the top.
@@ -5954,7 +5958,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.raiseStackToTop = function(blk) {
+    raiseStackToTop(blk) {
         let topBlk = this.findTopBlock(blk);
         this.findDragGroup(topBlk);
 
@@ -5965,7 +5969,7 @@ function Blocks(activity) {
         }
 
         this.refreshCanvas;
-    };
+    }
 
     /*
      * Deletes an Action block
@@ -5973,7 +5977,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.deleteActionBlock = async function(myBlock) {
+    deleteActionBlock = async function(myBlock) {
         let actionArg = this.blockList[myBlock.connections[1]];
         if (actionArg) {
             let actionName = actionArg.value;
@@ -6052,7 +6056,7 @@ function Blocks(activity) {
             this.deleteActionTimeout -= 50;
             this.palettes.removeActionPrototype(actionName);
         }
-    };
+    }
 
     /*
      * Send a stack of blocks to the trash.
@@ -6060,7 +6064,7 @@ function Blocks(activity) {
      * @public
      * @return {void}
      */
-    this.sendStackToTrash = function(myBlock) {
+    sendStackToTrash(myBlock) {
         // First, hide the palettes as they will need updating.
         for (let name in this.palettes.dict) {
             this.palettes.dict[name].hideMenu(true);
@@ -6165,14 +6169,14 @@ function Blocks(activity) {
             this._cleanupStacks();
             this.refreshCanvas();
         }
-    };
+    }
 
     /**
      * Clears all the blocks, updates the cache and refreshes the canvas.
      *
      * @returns {void}
      */
-    this.clearParameterBlocks = function() {
+    clearParameterBlocks() {
         for (let blk = 0; blk < this.blockList.length; blk++) {
             if (
                 this.blockList[blk].protoblock.parameter &&
@@ -6183,7 +6187,7 @@ function Blocks(activity) {
             }
         }
         this.refreshCanvas();
-    };
+    }
 
     /**
      * Updates the label on parameter blocks.
@@ -6193,7 +6197,7 @@ function Blocks(activity) {
      * @param blk
      * @returns {void}
      */
-    this.updateParameterBlock = function(logo, turtle, blk) {
+    updateParameterBlock(logo, turtle, blk) {
         let name = this.blockList[blk].name;
 
         if (this.blockList[blk].protoblock.parameter && this.blockList[blk].text !== null) {
@@ -6224,7 +6228,7 @@ function Blocks(activity) {
             this.blockList[blk].container.updateCache();
             this.refreshCanvas();
         }
-    };
+    }
 
     /**
      * Changes a property according to a block name and a value.
@@ -6235,7 +6239,7 @@ function Blocks(activity) {
      * @param turtle
      * @returns {void}
      */
-    this.blockSetter = function(logo, blk, value, turtle) {
+    blockSetter(logo, blk, value, turtle) {
         if (typeof this.blockList[blk].protoblock.setter === "function") {
             this.blockList[blk].protoblock.setter(logo, value, turtle, blk);
         } else {
@@ -6245,14 +6249,14 @@ function Blocks(activity) {
                 throw new Error();
             }
         }
-    };
+    }
 
     /**
      * Hides all the blocks.
      *
      * @returns {void}
      */
-    this.hideBlocks = function() {
+    hideBlocks() {
         this.palettes.hide();
         this.hide();
         this.refreshCanvas();
@@ -6263,7 +6267,7 @@ function Blocks(activity) {
      *
      * @returns {void}
      */
-    this.showBlocks = function() {
+    showBlocks() {
         this.palettes.show();
         this.show();
         this.bringToTop();
