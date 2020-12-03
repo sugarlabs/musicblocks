@@ -65,13 +65,13 @@ function Tempo() {
         }
 
         // Restart the interval.
-        var that = this;
+        
         if (this._intervalID !== null) {
             clearInterval(this._intervalID);
         }
 
-        this._intervalID = setInterval(function() {
-            that._draw();
+        this._intervalID = setInterval(() => {
+            this._draw();
         }, TEMPOINTERVAL);
     };
 
@@ -210,20 +210,19 @@ function Tempo() {
     };
 
     this.__save = function(i) {
-        var that = this;
-        setTimeout(function() {
-            console.debug("saving a BPM block for " + that.BPMs[i]);
+        setTimeout(() => {
+            console.debug("saving a BPM block for " + this.BPMs[i]);
             var delta = i * 42;
             var newStack = [
                 [0, ["setbpm3", {}], 100 + delta, 100 + delta, [null, 1, 2, 5]],
-                [1, ["number", { value: that.BPMs[i] }], 0, 0, [0]],
+                [1, ["number", { value: this.BPMs[i] }], 0, 0, [0]],
                 [2, ["divide", {}], 0, 0, [0, 3, 4]],
                 [3, ["number", { value: 1 }], 0, 0, [2]],
                 [4, ["number", { value: 4 }], 0, 0, [2]],
                 [5, ["vspace", {}], 0, 0, [0, null]]
             ];
-            that._logo.blocks.loadNewBlocks(newStack);
-            that._logo.textMsg(_("New action block generated!"));
+            this._logo.blocks.loadNewBlocks(newStack);
+            this._logo.textMsg(_("New action block generated!"));
         }, 200 * i);
     };
 
@@ -322,8 +321,8 @@ function Tempo() {
             if (!that._get_save_lock()) {
                 that._save_lock = true;
                 that._saveTempo();
-                setTimeout(function() {
-                    that._save_lock = false;
+                setTimeout(() => {
+                    this._save_lock = false;
                 }, 1000);
             }
         };
