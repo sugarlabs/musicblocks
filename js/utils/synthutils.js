@@ -747,22 +747,16 @@ function Synth() {
         }
         if (!accounted) {
             for (let customsample in CUSTOMSAMPLES) {
-                if (CUSTOMSAMPLES[customsample][0] === sampleName) {
-                    //datafunction = function() {return CUSTOMSAMPLES[customsample][1]};
-                    let newdata = (CUSTOMSAMPLES[customsample][1]);
-                    this.samples["voice"][sampleName] = CUSTOMSAMPLES[customsample][1];
+                if ((CUSTOMSAMPLES[customsample].includes(sampleName)) {
+                    console.log("loaded custom sample");
+                    this.samples["voice"][CUSTOMSAMPLES[customsample][0]] = CUSTOMSAMPLES[customsample][1];
                     return;
                 }
             }
 
             console.debug("sample was not already in sample library");
             let data = null;
-            if (sampleName.slice(0,21) === "data:audio/wav;base64"){
-                data = function() {return sampleName};
-                this.samplesManifest.voice.push({ name: sampleName, data: data});
-                this.samplesManifest.drum.push({  name: sampleName, data: data});
-                this._loadSample(sampleName);
-            } else if (typeof sampleName === "object"){
+            if (typeof sampleName === "object"){
                 data = function() {return sampleName[1]};
                 this.samplesManifest.voice.push({name: sampleName[0], data: data});
                 this.samplesManifest.drum.push({ name: sampleName[0], data: data});
@@ -1173,6 +1167,7 @@ function Synth() {
 
     this.__createSynth = function(turtle, instrumentName, sourceName, params) {
         if (typeof sourceName === "object") {
+            console.log("object");
             this._loadSampleFromFile(sourceName);
             instrumentName = sourceName[0];
             sourceName = sourceName[0];
