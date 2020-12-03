@@ -3781,7 +3781,7 @@ function Activity() {
                     case 'timbre':
                     case 'pitchstaircase':
                     case 'tempo':
-                    case 'sample'
+                    case 'sample':
                     case 'pitchslider':
                     case 'musickeyboard':
                     case 'modewidget':
