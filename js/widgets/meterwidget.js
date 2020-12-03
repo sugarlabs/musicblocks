@@ -43,9 +43,9 @@ function MeterWidget() {
         widgetWindow.getWidgetBody().append(this.meterDiv);
 
         widgetWindow.onclose = () => {
-            this._playing = false;
-            this._logo.hideMsgs();
-            this.destroy();
+            that._playing = false;
+            that._logo.hideMsgs();
+            that.destroy();
         };
 
         this._click_lock = false;
@@ -57,8 +57,8 @@ function MeterWidget() {
             if (this._get_click_lock()) {
                 return;
             } else {
-                this._click_lock = true;
-                if (this.__getPlayingStatus()) {
+                that._click_lock = true;
+                if (that.__getPlayingStatus()) {
                     this.innerHTML =
                         '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
                         _("Play all") +
@@ -69,7 +69,7 @@ function MeterWidget() {
                         '" width="' +
                         ICONSIZE +
                         '" vertical-align="middle">&nbsp;&nbsp;';
-                    this._playing = false;
+                    that._playing = false;
                 } else {
                     this.innerHTML =
                         '&nbsp;&nbsp;<img src="header-icons/stop-button.svg" title="' +
