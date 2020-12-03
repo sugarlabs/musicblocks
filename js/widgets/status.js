@@ -99,7 +99,6 @@ function StatusMatrix() {
                     iconSize +
                     '">&nbsp;&nbsp;';
             }
-
             cell.style.width = BUTTONSIZE * this._cellScale + "px";
             cell.style.height =
                 Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
