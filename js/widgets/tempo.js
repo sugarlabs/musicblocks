@@ -322,7 +322,7 @@ function Tempo() {
                 that._save_lock = true;
                 that._saveTempo();
                 setTimeout(() => {
-                    this._save_lock = false;
+                    that._save_lock = false;
                 }, 1000);
             }
         };
