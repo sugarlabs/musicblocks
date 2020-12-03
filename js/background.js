@@ -25,4 +25,5 @@ if (navigator.userAgent.search("Firefox") !== -1) {
     chrome.runtime.onInstalled.addListener(function(tab) {
         window.open(chrome.runtime.getURL("index.html"));
     });
+    
 }
