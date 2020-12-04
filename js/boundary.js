@@ -23,7 +23,7 @@ class Boundary {
     setStage = (stage) => {
         this._stage = stage;
         return this;
-    };
+    }
 
     resizeEvent = (scale) => {};
 
@@ -31,18 +31,18 @@ class Boundary {
         this._container = new createjs.Container();
         this._stage.addChild(this._container);
         this._stage.setChildIndex(this._container, 0);
-    };
+    }
 
     setScale = (w, h, scale) => {
         this.destroy();
         this.create(w, h, scale);
-    };
+    }
 
     destroy = () => {
         if (this._container.children.length > 0) {
             this._container.removeChild(this._container.children[0]);
         }
-    };
+    }
 
     offScreen = (x, y) => {
         return (
@@ -51,7 +51,7 @@ class Boundary {
             y < this.y ||
             y > this.y + this.dy
         );
-    };
+    }
 
     create = (w, h, scale) => {
         this.w = w / scale;
@@ -89,13 +89,13 @@ class Boundary {
         }
 
         __makeBoundary();
-    };
+    }
 
     hide = () => {
         this._container.visible = false;
-    };
+    }
 
     show = () => {
         this._container.visible = true;
-    };
+    }
 }
