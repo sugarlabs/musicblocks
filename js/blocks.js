@@ -26,7 +26,7 @@ const PITCHBLOCKS = ["pitch", "steppitch", "hertz", "pitchnumber", "nthmodalpitc
 // Blocks holds the list of blocks and most of the block-associated
 // methods, since most block manipulations are inter-block.
 
-/*
+/**
  * The class for managing the collection of blocks
  * @public
  * @return {void}
@@ -121,7 +121,7 @@ class Blocks {
         this.deleteActionTimeout = 0;
     }
 
-    /*
+    /**
      * Returns the long press status
      * @public
      * @return this.inLongPress
@@ -130,7 +130,7 @@ class Blocks {
         return this.inLongPress;
     }
 
-    /*
+    /**
      * Sets long press status to false
      * @public
      * @return {void}
@@ -139,7 +139,7 @@ class Blocks {
         this.inLongPress = false;
     }
 
-    /*
+    /**
      * We need access to the canvas.
      * @param - canvas
      * @public
@@ -150,7 +150,7 @@ class Blocks {
         return this;
     }
 
-    /*
+    /**
      * We need access to the stage.
      * @param - stage - staging area
      * @public
@@ -161,7 +161,7 @@ class Blocks {
         return this;
     }
 
-    /*
+    /**
      * We need to be able to refreshe the canvas.
      * @param - refreshCanvas - new variable
      * @public
@@ -172,7 +172,7 @@ class Blocks {
         return this;
     }
 
-    /*
+    /**
      * We need to access the trashcan.
      * @param - trashcan - new variable
      * @public
@@ -183,7 +183,7 @@ class Blocks {
         return this;
     }
 
-    /*
+    /**
      * We need to be able to update the stage.
      * @param - updateStage - new variable
      * @public
@@ -194,7 +194,7 @@ class Blocks {
         return this;
     }
 
-    /*
+    /**
      * We need to access the stage scale.
      * @param - getStageScale - new variable
      * @public
@@ -205,7 +205,7 @@ class Blocks {
         return this;
     }
 
-    /*
+    /**
      * Change the scale of the blocks (and the protoblocks on the palette).
      * @param - scale -new variable
      * @public
@@ -248,7 +248,7 @@ class Blocks {
         this.refreshCanvas();
     }
 
-    /*
+    /**
      * We need to access the message object.
      * @param - msgText -new variable
      * @public
@@ -258,7 +258,7 @@ class Blocks {
         this.msgText = msgText;
     }
 
-    /*
+    /**
      * We need to access the error message object.
      * @param - errorMsg -new variable
      * @public
@@ -269,7 +269,7 @@ class Blocks {
         return this;
     }
 
-    /*
+    /**
      * We need to access the macro dictionary to add data to it.
      * @param - obj - object
      * @public
@@ -280,7 +280,7 @@ class Blocks {
         return this;
     }
 
-    /*
+    /**
      * We need access to the turtles list because we associate a turtle
      * with each start block.
      * @param - turtles
@@ -292,7 +292,7 @@ class Blocks {
         return this;
     }
 
-    /*
+    /**
      * We need to access "Logo interpreter" when we click on blocks.
      * @param - logo
      * @public
@@ -303,7 +303,7 @@ class Blocks {
         return this;
     }
 
-    /*
+    /**
      * We need to access the right-click (and long press) context menu.
      * @param - contextMenu
      * @public
@@ -314,7 +314,7 @@ class Blocks {
         return this;
     }
 
-    /*
+    /**
      * The scale of the graphics is determined by screen size.
      * @param - scale -new variable
      * @public
@@ -326,7 +326,7 @@ class Blocks {
         return this;
     }
 
-    /*
+    /**
      * Extract the blocks
      * @public
      * @return {void}
@@ -340,7 +340,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Pull a block from a stack, then readjust the docks.
      * @param - blk - blocks
      * @param - adjustDock - new variable
@@ -410,7 +410,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Find the y position of the bottom-most block
      * @public
      * @return maxy
@@ -426,7 +426,7 @@ class Blocks {
         return maxy;
     }
 
-    /*
+    /**
      * Toggle state of collapsible blocks, except for note blocks,
      * which are handled separately.
      * @public
@@ -482,7 +482,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * We need to access the go-home button and boundary.
      * @param - setHomeContainers
      * @param - boundary
@@ -495,7 +495,7 @@ class Blocks {
         return this;
     }
 
-    /*
+    /**
      * Is this an action block?
      * @param - name - block name
      * @private
@@ -505,7 +505,7 @@ class Blocks {
         return ["do", "doArg", "calc", "calcArg"].indexOf(name) !== -1;
     }
 
-    /*
+    /**
      * Is this a named action block?
      * @param - name - block name
      * @private
@@ -515,7 +515,7 @@ class Blocks {
         return ["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].indexOf(name) !== -1;
     }
 
-    /*
+    /**
      * Adjust the dock positions of all blocks in the current drag group.
      * @private
      * @return {void}
@@ -528,7 +528,7 @@ class Blocks {
         this.adjustDocks(this.dragGroup[0], true);
     }
 
-    /*
+    /**
      * Adjust the size of the clamp in an expandable block when
      * block are inserted into (or removed from) the child flow.
      * This is a common operation for start and action blocks,
@@ -557,7 +557,7 @@ class Blocks {
             this._adjustArgClampBlock([blk]);
         }
 
-        /*
+        /**
          * Adjusts the clamp size
          * @param - blk - block number
          * @param - myBlock - block
@@ -604,7 +604,7 @@ class Blocks {
         __clampAdjuster(blk, myBlock, clamp);
     }
 
-    /*
+    /**
      * Returns depth of nesting, which is used to rank order the
      * blocks when adjusting their sizes.
      * @param - blk - block number
@@ -620,7 +620,7 @@ class Blocks {
         return rank;
     }
 
-    /*
+    /**
      * Return the block size in units of standard block size.
      * @param - blk - block number
      * @private
@@ -636,7 +636,7 @@ class Blocks {
         return myBlock.size;
     }
 
-    /*
+    /**
      * Adjust the slot sizes of arg clamps.
      * @param - argBlocksToCheck -new variable
      * @private
@@ -680,7 +680,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * We also adjust the size of twoarg blocks. It is similar to how
      * we adjust clamps, but enough different that it is in its own function.
      * @param - argBlocksToCheck - a list of blocks that need to be
@@ -712,7 +712,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Add or remove the vspace blocks
      * @param - blk - block number
      * @private
@@ -729,7 +729,7 @@ class Blocks {
 
         let that = this;
 
-        /*
+        /**
          * Checks the number of VSpace blocks are below the block we are checking against
          * @param - blk - block number
          * @private
@@ -763,7 +763,7 @@ class Blocks {
         } else if (secondArgumentSize > vSpaceCount + 1) {
             // Add vspace blocks
 
-            /*
+            /**
              * Adjusts the docks of the blocks connected to the vspace block
              * @param - args - [this block, the next block, the vspace block
              * @private
@@ -820,7 +820,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Calculate the sum of the sizes of all the blocks a stack.
      * @param - blk - block number
      * @private
@@ -908,7 +908,7 @@ class Blocks {
         return size;
     }
 
-    /*
+    /**
      * Given a block, adjust the dock position of all its connections.
      * @param - blk - block
      * @param - resetLoopCounter (to prevent infinite loops in the case the connections are broken).
@@ -1049,7 +1049,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Add an action name whenever the user removes the name from
        an action block.  Add a box name whenever the user removes
        the name from a storein block.  Add a Silence block
@@ -1071,7 +1071,7 @@ class Blocks {
             cblk = this.blockList[parentblk].connections[1];
             if (cblk == null) {
                 let that = this;
-                /*
+                /**
                  * Update Palette
                  * @param - args - arguments
                  * @public
@@ -1147,7 +1147,7 @@ class Blocks {
         } else if (this.blockList[parentblk].name === "pitch") {
             cblk = this.blockList[parentblk].connections[2];
             if (cblk == null) {
-                /*
+                /**
                  * Adjust Docks
                  * @param - args - arguments
                  * @public
@@ -1179,7 +1179,7 @@ class Blocks {
 
             let oblk = this.blockList[parentblk].connections[1];
             if (oblk == null) {
-                /*
+                /**
                  * Adjust Docks
                  * @param - args - arguments
                  * @public
@@ -1242,7 +1242,7 @@ class Blocks {
             cblk = this.blockList[parentblk].connections[1];
             if (cblk == null) {
                 let that = this;
-                /*
+                /**
                  * Adjust Docks
                  * @param - args - arguments
                  * @public
@@ -1292,7 +1292,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Remove any pitch blocks from a Note block if Silent block is inserted.
      * Deprecated since we do not allow silence blocks to be dragged.
      * @param - thisBlock -new variable
@@ -1354,7 +1354,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Deletes the next default element: either a Pitch block or a Silent block.
      * @param - thisBlock
      * @public
@@ -1398,7 +1398,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Remove the Silence block from a Note block if another block
        is inserted anywhere after the Silence block.
      * @param - thisBlock -new variable
@@ -1457,14 +1457,14 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Handle connections when blocks are moved.
      * @param - thisBlock -new variable
      * @public
      * @return {void}
      */
     async blockMoved(thisBlock) {
-        /*
+        /**
          * When a block is moved, we have to check the following:
          * (0) Is it inside of a expandable block?
          *     Is it connected to a collapsed block?
@@ -2134,7 +2134,7 @@ class Blocks {
         this.refreshCanvas();
     }
 
-    /*
+    /**
      * Test for a valid connection between two dock types.
      * @param - type1 - dock type 1
      * @param - type2 - dock type 2
@@ -2258,7 +2258,7 @@ class Blocks {
         return false;
     }
 
-    /*
+    /**
      * Ensure that all the blocks are where they are supposed to be.
      * @public
      * @return {void}
@@ -2269,7 +2269,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Move all the blocks to the top layer of the block container.
      * @public
      * @return {void}
@@ -2292,7 +2292,7 @@ class Blocks {
         this.refreshCanvas();
     }
 
-    /*
+    /**
      * Checks the bounds to ensure blocks are "home".
      * @public
      * @return {void}
@@ -2317,7 +2317,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Move a block to a specified position and check the docks afterward.
      * @public
      * @return{void}
@@ -2327,7 +2327,7 @@ class Blocks {
         this.adjustDocks(blk, true);
     }
 
-    /*
+    /**
      * Move a block (and its label) to x, y.
      * @param - blk - block
      * @param - x - x position
@@ -2348,7 +2348,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Relative move of a block (and its label) by dx, dy
      * @param - blk - block
      * @param - dx - updated x position
@@ -2371,7 +2371,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Moves the blocks in a stack to a new position.
      * @param blk - block
      * @param dx - x position
@@ -2388,7 +2388,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Moves all blocks except given stack
      * @param blk - exception
      * @param dx - delta x
@@ -2403,7 +2403,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Update the block labels.
      * When we create new blocks, we may not have assigned the value yet.
      * @param - blk - block
@@ -2561,7 +2561,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Find the top block in the stack.
      * @param - blk - block
      * @public
@@ -2618,7 +2618,7 @@ class Blocks {
         return blk;
     }
 
-    /*
+    /**
      * Checks if two blocks are of the same flow generation.
      * @param - firstblk
      * @param - childblk
@@ -2661,7 +2661,7 @@ class Blocks {
         return false;
     }
 
-    /*
+    /**
      * Check if there is a block type in any of the stacks.
      * @param - thisBlock - new variable
      * @param - names - names of blocks
@@ -2693,7 +2693,7 @@ class Blocks {
         return false;
     }
 
-    /*
+    /**
      * Find the bottom block in the stack.
      * @param - blk - block
      * @public
@@ -2729,7 +2729,7 @@ class Blocks {
         return blk;
     }
 
-    /*
+    /**
      * Count all the blocks in the stack starting from blk.
      * @param - blk - block
      * @private
@@ -2749,7 +2749,7 @@ class Blocks {
         return c;
     }
 
-    /*
+    /**
      * Find any block with null in its first connection.
      * Push them onto the stackList.
      * @public
@@ -2764,7 +2764,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Find any clamp blocks.
      * @private
      * @return {void}
@@ -2780,7 +2780,7 @@ class Blocks {
         this._searchForArgFlow();
     }
 
-    /*
+    /**
      * Find any expandable arg blocks.
      * @public
      * @return {void}
@@ -2796,7 +2796,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Search for argument flow blocks.
      * @private
      * @return{void}
@@ -2811,7 +2811,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Search for expandable blocks below blk in stack.
      * @param - blk - block
      * @private
@@ -2851,7 +2851,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Expand two-arg blocks as needed.
      * @private
      * @return {void}
@@ -2862,7 +2862,7 @@ class Blocks {
         this.refreshCanvas();
     }
 
-    /*
+    /**
      * Expand expandable clamp blocks as needed.
      * @private
      * @return {void}
@@ -2883,7 +2883,7 @@ class Blocks {
         this.refreshCanvas();
     }
 
-    /*
+    /**
      * Some blocks, e.g., sensor blocks for Butia, change their
        appearance depending upon if they have been enabled or
        disabled. If they have, change their disabled status
@@ -2902,7 +2902,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Unhighlight all blocks.
      * @public
      * @return {void}
@@ -2913,7 +2913,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Unhighlight a block
      * @public
      * return {void}
@@ -2937,7 +2937,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Highlight a block
      * @param - blk - block
      * @param - unhilight - new variable
@@ -2958,7 +2958,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Hide all of the blocks.
      * @public
      * return {void}
@@ -2970,7 +2970,7 @@ class Blocks {
         this.visible = false;
     }
 
-    /*
+    /**
      * Show all the blocks.
      * @public
      * return {void}
@@ -2982,7 +2982,7 @@ class Blocks {
         this.visible = true;
     }
 
-    /*
+    /**
      * Make a new block with connections
      * @param - name - new variable
      * @param - blockOffset - new variable
@@ -3015,7 +3015,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Create new block
      * @param - name
      * @param - postProcess
@@ -3090,7 +3090,7 @@ class Blocks {
         return myBlock;
     }
 
-    /*
+    /**
      * Make new blocks from proto block, which is called from Palettes
      * @param - name
      * @param - arg - argument
@@ -3509,7 +3509,7 @@ class Blocks {
         return blk;
     }
 
-    /*
+    /**
      * Create the drag group from the blocks connected to blk.
      * @param - blk - block
      * @public
@@ -3526,7 +3526,7 @@ class Blocks {
         this._calculateDragGroup(blk);
     }
 
-    /*
+    /**
      * Give a block, find all the blocks connected to it.
      * @param - blk - block
      * @private
@@ -3576,7 +3576,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Set protoblock visibility on the Action palette.
      * @param - state
      * @public
@@ -3604,7 +3604,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Find a unique custom name for an Action block.
      * @param - name
      * @public
@@ -3642,7 +3642,7 @@ class Blocks {
         return value;
     }
 
-    /*
+    /**
      * Finds a unique custom name for custom mode block.
      * @param - name - new variable
      * @public
@@ -3668,7 +3668,7 @@ class Blocks {
         return value;
     }
 
-    /*
+    /**
      * Finds a unique custom name for temperament block.
      * @param - name - new variable
      * @public
@@ -3698,7 +3698,7 @@ class Blocks {
         return value;
     }
 
-    /*
+    /**
      * Make sure we initialize any drum with a URL name.
      * @private
      * @return {void}
@@ -3723,7 +3723,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Rename the block boxes.
      * @param - oldName - old name of boxes
      * @param - newName - new variable
@@ -3753,7 +3753,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Rename Storedin boxes.
      * @param - oldName - old name of boxes
      * @param - newName - new variable
@@ -3800,7 +3800,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Rename Storedin2 boxes.
      * @param - oldName - old name of boxes
      * @param - newName - new variable
@@ -3834,7 +3834,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Rename Named boxes.
      * @param - oldName - old name of boxes
      * @param - newName - new variable
@@ -3869,7 +3869,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Rename Do blocks.
      * @param - oldName - old name of boxes
      * @param - newName - new variable
@@ -3929,7 +3929,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Renames Named do blocks.
      * @param oldName
      * @param newName - new variable
@@ -3984,7 +3984,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Make a new Storein block.
      * @param - name - new variable
      * @public
@@ -4020,7 +4020,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Make a new Storein2 block.
      * @param - name - new variable
      * @public
@@ -4052,7 +4052,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Make a new Named Box block.
      * @param - name - new variable
      * @public
@@ -4083,7 +4083,7 @@ class Blocks {
         myBoxBlock.palette.add(myBoxBlock, true);
     }
 
-    /*
+    /**
      * Make a new Local Arg block.
      * @param - blk - block
      * @private
@@ -4115,7 +4115,7 @@ class Blocks {
         this.palettes.updatePalettes("action");
     }
 
-    /*
+    /**
      * Remove any unneeded Named Do blocks.
      * @param - name
      * @private
@@ -4139,7 +4139,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Depending upon the form of the associated action block, we
        want to add a named do, a named calc, a named do w/args, or
        a named calc w/args.
@@ -4176,7 +4176,7 @@ class Blocks {
         return false;
     }
 
-    /*
+    /**
      * Make a new Named Calc block.
      * @param - name -new variable
      * @public
@@ -4198,7 +4198,7 @@ class Blocks {
         return false;
     }
 
-    /*
+    /**
      * Make a new Named Do Arg block.
      * @param - name - new variable
      * @public
@@ -4220,7 +4220,7 @@ class Blocks {
         return false;
     }
 
-    /*
+    /**
      * Make a new Named Calc Arg block.
      * @param - name - new variable
      * @public
@@ -4260,7 +4260,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Return a list of containing clamp blocks or []
      * @param - blk - block
      * @param - clampList
@@ -4292,7 +4292,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Return a containing expandable block or null.
      * @param - blk - block
      * @public
@@ -4325,7 +4325,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Return a note block or null.
      * @param - blk - block
      * @public
@@ -4359,7 +4359,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Find an instance of a block type by name.
      * @param - blkName
      * @public
@@ -4376,7 +4376,7 @@ class Blocks {
         return false;
     }
 
-    /*
+    /**
      * Return the first containing Note block, if any.
      * @param - blk - block
      * @public
@@ -4405,7 +4405,7 @@ class Blocks {
         return this.insideInlineCollapsibleBlock(c0);
     }
 
-    /*
+    /**
      * Return first Note block found.
      * @param - blk - block
      * @public
@@ -4429,7 +4429,7 @@ class Blocks {
         return this.findNoteBlock(c);
     }
 
-    /*
+    /**
      * Return first Interval block found.
      * @param - blk - block
      * @public
@@ -4453,7 +4453,7 @@ class Blocks {
         return this.findNestedIntervalBlock(c);
     }
 
-    /*
+    /**
      * Returns first Pitch block found.
      * @param - blk - block
      * @public
@@ -4474,7 +4474,7 @@ class Blocks {
         return this.findFirstPitchBlock(c);
     }
 
-    /*
+    /**
      * Return octave associated with Pitch block.
      * @param - blk - block
      * @public
@@ -4503,7 +4503,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Set octave associated with Pitch block.
      * @param - blk - block
      * @param - octave
@@ -4534,7 +4534,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Check if a Number block used as a modifier in an Interval block.
      * @param - blk - block
      * @public
@@ -4572,7 +4572,7 @@ class Blocks {
         return false;
     }
 
-    /*
+    /**
      * Check if a Number block is being used as multipicant with a
        Mode-length block.
      * @param - blk - block
@@ -4610,7 +4610,7 @@ class Blocks {
         return false;
     }
 
-    /*
+    /**
      * Check if a Number block is used as a note value denominator argument.
      * @param - blk - block
      * @public
@@ -4672,7 +4672,7 @@ class Blocks {
         return false;
     }
 
-    /*
+    /**
      * Return the Number block value being used as a note value
        denominator argument.
      * @param - blk - block
@@ -4736,7 +4736,7 @@ class Blocks {
         return 1;
     }
 
-    /*
+    /**
      * Check if a Number block being used as an octave argument?
      * @param - blk - block
      * @public
@@ -4758,7 +4758,7 @@ class Blocks {
         );
     }
 
-    /*
+    /**
      * Check if the meter block note value changed, update the BPM block.
      * @param - blk - block
      * @public
@@ -4826,7 +4826,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      *  Auto-select stack for copying -- no need to actually click on
         the copy button.
      * @public
@@ -4849,7 +4849,7 @@ class Blocks {
         this.pasteDy = 0;
     }
 
-    /*
+    /**
      * Triggers the long press of keys and clears timeout.
      * @public
      * @return {void}
@@ -4864,7 +4864,7 @@ class Blocks {
         piemenuBlockContext(this.blockList[this.activeBlock]);
     }
 
-    /*
+    /**
      * Copy a stack of blocks by creating a blockObjs and pasting.
      * @public
      * @return {void}
@@ -4890,7 +4890,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Save a stack of blocks to local storage and the 'myblocks'
        palette by creating a blockObjs.
      * @public
@@ -4931,7 +4931,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Copies the Block to objects.
      * @public
      * @return blockObj
@@ -5000,7 +5000,7 @@ class Blocks {
         return blockObjs;
     }
 
-    /*
+    /**
      * On the palette we store the macro as a basic block.
      * @param - name
      * @param - obj - object
@@ -5023,7 +5023,7 @@ class Blocks {
         this.protoBlockDict[blkName].palette.add(this.protoBlockDict[blkName]);
     }
 
-    /*
+    /**
      * Returns true if block of name blkName is loaded.
      * @param - blkName - block name
      * @public
@@ -5038,7 +5038,7 @@ class Blocks {
         return false;
     }
 
-    /*
+    /**
      * Load new blocks.
      * @param - blockObj - Block Objects
      * @public
@@ -6311,7 +6311,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * If all the blocks are loaded, we can make the final adjustments.
      * @param - name
      * @public
@@ -6400,7 +6400,7 @@ class Blocks {
         document.dispatchEvent(myCustomEvent);
     }
 
-    /*
+    /**
      * Cleanup the stacks after load.
      * @private
      * @return {void}
@@ -6443,7 +6443,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Look for a Return block in an action stack.
      * @param - blk - block
      * @public
@@ -6462,7 +6462,7 @@ class Blocks {
         return false;
     }
 
-    /*
+    /**
      * Look for an Arg block in an action stack.
      * @param - blk - block
      * @public
@@ -6484,7 +6484,7 @@ class Blocks {
         return false;
     }
 
-    /*
+    /**
      * Move the stack associated with blk to the top.
      * @param - blk - block
      * @public
@@ -6503,7 +6503,7 @@ class Blocks {
         this.refreshCanvas;
     }
 
-    /*
+    /**
      * Deletes an Action block
      * @param - myblock - new variable
      * @public
@@ -6600,7 +6600,7 @@ class Blocks {
         }
     }
 
-    /*
+    /**
      * Send a stack of blocks to the trash.
      * @param - myBlock
      * @public
