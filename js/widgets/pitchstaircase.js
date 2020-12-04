@@ -76,7 +76,6 @@ function PitchStaircase() {
             stairsLength = this.Stairs.length - 1;
         }
 
-        let that = this;
 
         for (let i = 0; i < this.Stairs.length; i++) {
             let pscTableRow = pscTable.insertRow();
@@ -129,13 +128,13 @@ function PitchStaircase() {
             stepCell.style.backgroundPosition = "center center";
 
             stepCell.addEventListener("click", (event) =>{
-                that._dissectStair(event);
+                this._dissectStair(event);
             });
 
-            playCell.onclick = function() {
-                let i = this.getAttribute("id");
-                let stepCell = that._stepTables[i].rows[0].cells[1];
-                that._playOne(stepCell);
+            playCell.onclick = () => {
+                let i = playCell.getAttribute("id");
+                let stepCell = this._stepTables[i].rows[0].cells[1];
+                this._playOne(stepCell);
             };
         }
     };
@@ -265,7 +264,6 @@ function PitchStaircase() {
     };
 
     this._playAll = function() {
-        let that = this;
         let pitchnotes = [];
 
         for (let i = 0; i < this.Stairs.length; i++) {
@@ -284,8 +282,8 @@ function PitchStaircase() {
         }
 
         setTimeout(() => {
-            for (let i = 0; i < that.Stairs.length; i++) {
-                let stepCell = that._stepTables[i].rows[0].cells[1];
+            for (let i = 0; i <this.Stairs.length; i++) {
+                let stepCell = this._stepTables[i].rows[0].cells[1];
                 stepCell.style.backgroundColor =
                     platformColor.selectorBackground;
             }
@@ -306,7 +304,7 @@ function PitchStaircase() {
     };
 
     this._playNext = function(index, next) {
-        let that = this;
+      
         if (index === this.Stairs.length) {
             setTimeout(() => {
                 for (let i = 0; i < this.Stairs.length; i++) {
@@ -347,12 +345,12 @@ function PitchStaircase() {
                     platformColor.selectorBackground;
             }
 
-            let stepCell = that._stepTables[index].rows[0].cells[1];
+            let stepCell = this._stepTables[index].rows[0].cells[1];
             stepCell.style.backgroundColor = platformColor.selectorBackground;
-            that._logo.synth.trigger(
+            this._logo.synth.trigger(
                 0, pitchnotes, 1, DEFAULTVOICE, null, null);
-            if (index < that.Stairs.length || index > -1) {
-                that._playNext(index + next, next);
+            if (index < this.Stairs.length || index > -1) {
+                this._playNext(index + next, next);
             }
         }, 1000);
     };
@@ -485,22 +483,22 @@ function PitchStaircase() {
         widgetWindow.clear();
         widgetWindow.show();
 
-        let that = this;
+    
 
         widgetWindow.addButton(
             "play-chord.svg",
             ICONSIZE,
             _("Play chord")
-        ).onclick = function() {
-            that._playAll();
+        ).onclick = () => {
+            this._playAll();
         };
 
         widgetWindow.addButton(
             "play-scale.svg",
             ICONSIZE,
             _("Play scale")
-        ).onclick = function() {
-            that.playUpAndDown();
+        ).onclick = () => {
+            this.playUpAndDown();
         };
 
         this._save_lock = false;
@@ -508,13 +506,13 @@ function PitchStaircase() {
             "export-chunk.svg",
             ICONSIZE,
             _("Save")
-        ).onclick = function() {
+        ).onclick = () => {
             // Debounce button
-            if (!that._get_save_lock()) {
-                that._save_lock = true;
-                that._save(0);
+            if (!this._get_save_lock()) {
+                this._save_lock = true;
+                this._save(0);
                 setTimeout(() => {
-                    that._save_lock = false;
+                    this._save_lock = false;
                 }, 1000);
             }
         };
@@ -543,16 +541,16 @@ function PitchStaircase() {
             "restore-button.svg",
             ICONSIZE,
             _("Undo")
-        ).onclick = function() {
-            that._undo();
+        ).onclick = () => {
+            this._undo();
         };
 
         widgetWindow.addButton(
             "erase-button.svg",
             ICONSIZE,
             _("Clear")
-        ).onclick = function() {
-            while (that._undo());
+        ).onclick = () => {
+            while (this._undo());
         };
 
         // The pitch-staircase (psc) table
