@@ -25,8 +25,7 @@ function Oscilloscope() {
         }
 
         this.drawVisualIDs = {};
-        let widgetWindow = window.widgetWindows.windowFor(
-            this, "oscilloscope");
+        let widgetWindow = window.widgetWindows.windowFor(this, "oscilloscope");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -49,18 +48,17 @@ function Oscilloscope() {
         zoomInButton.onclick = () => {
             this.zoomFactor += step;
         };
-        zoomInButton.children[0].src = "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(SMALLERBUTTON)));
+        zoomInButton.children[0].src =
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(SMALLERBUTTON)));
 
-        let zoomOutButton = widgetWindow.addButton(
-            "", ICONSIZE, _("ZOOM OUT"));
+        let zoomOutButton = widgetWindow.addButton("", ICONSIZE, _("ZOOM OUT"));
 
         zoomOutButton.onclick = () => {
             this.zoomFactor -= step;
         };
 
-        zoomOutButton.children[0].src = "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(BIGGERBUTTON)));
+        zoomOutButton.children[0].src =
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(BIGGERBUTTON)));
 
         widgetWindow.sendToCenter();
         this.widgetWindow = widgetWindow;
@@ -73,8 +71,7 @@ function Oscilloscope() {
         for (let turtle of this.divisions) {
             turtleIdx = logo.turtles.turtleList.indexOf(turtle);
             this.reconnectSynthsToAnalyser(turtleIdx);
-            this.makeCanvas(
-                700, 400 / this.divisions.length, turtle, turtleIdx);
+            this.makeCanvas(700, 400 / this.divisions.length, turtle, turtleIdx);
         }
     };
 
@@ -82,41 +79,40 @@ function Oscilloscope() {
         if (this.pitchAnalysers[turtle] === undefined) {
             this.pitchAnalysers[turtle] = new Tone.Analyser({
                 type: "waveform",
-                size: analyserSize,
+                size: analyserSize
             });
         }
 
         for (let synth in instruments[turtle])
-            instruments[turtle][synth].connect(
-                this.pitchAnalysers[turtle]);
-    }
+            instruments[turtle][synth].connect(this.pitchAnalysers[turtle]);
+    };
 
     this.makeCanvas = (width, height, turtle, turtleIdx) => {
         let canvas = document.createElement("canvas");
         canvas.height = height;
         canvas.width = width;
         this.widgetWindow.getWidgetBody().appendChild(canvas);
-        let canvasCtx = canvas.getContext('2d');
+        let canvasCtx = canvas.getContext("2d");
         canvasCtx.clearRect(0, 0, width, height);
 
         let draw = () => {
             this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
             if (!turtle.running) return;
 
-            canvasCtx.fillStyle = 'rgb(200, 200, 200)';
+            canvasCtx.fillStyle = "rgb(200, 200, 200)";
             let dataArray = this.pitchAnalysers[turtleIdx].getValue();
-            let bufferLength = dataArray.length ;
+            let bufferLength = dataArray.length;
             canvasCtx.fillRect(0, 0, width, height);
             canvasCtx.lineWidth = 2;
-            let rbga = turtle.painter._canvasColor
-            canvasCtx.strokeStyle = rbga ;
+            let rbga = turtle.painter._canvasColor;
+            canvasCtx.strokeStyle = rbga;
             canvasCtx.beginPath();
-            let sliceWidth = width * this.zoomFactor / bufferLength;
+            let sliceWidth = (width * this.zoomFactor) / bufferLength;
             let x = 0;
             let y;
 
             for (let i = 0; i < bufferLength; i++) {
-                y = height / 2 * (1 - dataArray[i]) + this.verticalOffset;
+                y = (height / 2) * (1 - dataArray[i]) + this.verticalOffset;
                 if (i === 0) {
                     canvasCtx.moveTo(x, y);
                 } else {
@@ -126,8 +122,8 @@ function Oscilloscope() {
             }
             canvasCtx.lineTo(canvas.width, canvas.height / 2);
             canvasCtx.stroke();
-        }
-	draw();
+        };
+        draw();
     };
 
     if (!this.playingNow) {
