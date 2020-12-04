@@ -550,26 +550,25 @@ function Synth() {
             }
         }
 
-        let that = this;
 
-        let __getFrequency = function(oneNote) {
+        let __getFrequency = (oneNote) => {
             let len = oneNote.length;
 
-            for (let note in that.noteFrequencies) {
+            for (let note in this.noteFrequencies) {
                 if (note === oneNote.substring(0, len - 1)) {
                     if (
-                        that.noteFrequencies[note][0] ===
+                        this.noteFrequencies[note][0] ===
                         Number(oneNote.slice(-1))
                     ) {
                         //Note to be played is in the same octave.
-                        return that.noteFrequencies[note][1];
+                        return this.noteFrequencies[note][1];
                     } else {
                         //Note to be played is not in the same octave.
                         let power =
                             Number(oneNote.slice(-1)) -
-                            that.noteFrequencies[note][0];
+                            this.noteFrequencies[note][0];
                         return (
-                            that.noteFrequencies[note][1] * Math.pow(2, power)
+                            this.noteFrequencies[note][1] * Math.pow(2, power)
                         );
                     }
                 }
@@ -596,11 +595,11 @@ function Synth() {
         }
     };
 
-    this.getCustomFrequency = function(notes,customID) {
+    this.getCustomFrequency = (notes,customID) => {
         let __getCustomFrequency = function(oneNote) {
             let octave = oneNote.slice(-1);
             oneNote = getCustomNote(oneNote.substring(0, oneNote.length - 1));
-            let pitch = that.startingPitch;
+            let pitch = this.startingPitch;
             let startPitchFrequency = pitchToFrequency(
                 pitch.substring(0, pitch.length - 1),
                 pitch.slice(-1),
@@ -742,16 +741,15 @@ function Synth() {
 
     this.samplesQueue = []; // Samples that need to be loaded at start.
 
-    let that = this;
     require(SOUNDSAMPLESDEFINES, function() {
-        that.loadSamples();
+        this.loadSamples();
 
-        for (let i = 0; i < that.samplesQueue.length; i++) {
-            that.__createSynth(
+        for (let i = 0; i < this.samplesQueue.length; i++) {
+            this.__createSynth(
                 0,
-                that.samplesQueue[i][0],
-                that.samplesQueue[i][1],
-                that.samplesQueue[i][2]
+                this.samplesQueue[i][0],
+                this.samplesQueue[i][1],
+                this.samplesQueue[i][2]
             );
         }
     });
@@ -1172,9 +1170,8 @@ function Synth() {
         if (this.samples === null) {
             this.samplesQueue.push([instrumentName, sourceName, params]);
 
-            let that = this;
-            require(SOUNDSAMPLESDEFINES, function() {
-                that.loadSamples();
+            require(SOUNDSAMPLESDEFINES, () => {
+                this.loadSamples();
             });
         } else {
             this.__createSynth(turtle, instrumentName, sourceName, params);
