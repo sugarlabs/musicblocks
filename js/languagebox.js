@@ -11,134 +11,135 @@
 
 //A dropdown for selecting language
 class LanguageBox {
+    language = localStorage.languagePreference;
+    
     constructor() {
-        var language = localStorage.languagePreference;
         this._message = null;
+    }
 
-        this.setMessage = function(message) {
-            this._message = message;
-            return this;
-        };
+    setMessage(message) {
+        this._message = message;
+        return this;
+    }
 
-        this.enUS_onclick = function() {
-            language = "enUS";
-            this.hide();
-        };
+    enUS_onclick() {
+        language = "enUS";
+        this.hide();
+    }
 
-        this.enUK_onclick = function() {
-            language = "enUK";
-            this.hide();
-        };
+    enUK_onclick() {
+        language = "enUK";
+        this.hide();
+    }
 
-        this.ko_onclick = function() {
-            language = "ko";
-            this.hide();
-        };
+    ko_onclick() {
+        language = "ko";
+        this.hide();
+    }
 
-        this.ja_onclick = function() {
-            language = "ja";
-            localStorage.kanaPreference = "kanji";
-            this.hide();
-        };
+    ja_onclick() {
+        language = "ja";
+        localStorage.kanaPreference = "kanji";
+        this.hide();
+    }
 
-        this.kana_onclick = function() {
-            language = "ja";
-            localStorage.kanaPreference = "kana";
-            this.hide();
-        };
+    kana_onclick() {
+        language = "ja";
+        localStorage.kanaPreference = "kana";
+        this.hide();
+    }
 
-        this.es_onclick = function() {
-            language = "es";
-            this.hide();
-        };
+    es_onclick() {
+        language = "es";
+        this.hide();
+    }
 
-        this.pt_onclick = function() {
-            language = "pt";
-            this.hide();
-        };
+    pt_onclick() {
+        language = "pt";
+        this.hide();
+    }
 
-        this.zhCN_onclick = function() {
-            language = "zhCN";
-            this.hide();
-        };
+    zhCN_onclick() {
+        language = "zhCN";
+        this.hide();
+    }
 
-        this.th_onclick = function() {
-            language = "th";
-            this.hide();
-        };
+    th_onclick() {
+        language = "th";
+        this.hide();
+    }
 
-        this.hi_onclick = function() {
-            language = "hi";
-            this.hide();
-        };
+    hi_onclick() {
+        language = "hi";
+        this.hide();
+    }
 
-        this.ibo_onclick = function() {
-            language = "ibo";
-            this.hide();
-        };
+    ibo_onclick() {
+        language = "ibo";
+        this.hide();
+    }
 
-        this.ar_onclick = function() {
-            language = "ar";
-            this.hide();
-        };
+    ar_onclick() {
+        language = "ar";
+        this.hide();
+    }
 
-        this.he_onclick = function() {
-            language = "he";
-            this.hide();
-        };
+    he_onclick() {
+        language = "he";
+        this.hide();
+    }
 
-        this.ayc_onclick = function() {
-            language = "ayc";
-            this.hide();
-        };
+    ayc_onclick() {
+        language = "ayc";
+        this.hide();
+    }
 
-        this.quz_onclick = function() {
-            language = "quz";
-            this.hide();
-        };
+    quz_onclick() {
+        language = "quz";
+        this.hide();
+    }
 
-        this.gug_onclick = function() {
-            language = "gug";
-            this.hide();
-        };
+    gug_onclick() {
+        language = "gug";
+        this.hide();
+    }
 
-        this.hide = function() {
-            const MSGPrefix =
-                "<a href='#' " +
-                "onClick='window.location.reload()'" +
-                "onMouseOver='this.style.opacity = 0.5'" +
-                "onMouseOut='this.style.opacity = 1'>";
-            const MSGSuffix = "</a>";
-            const MSG = {
-                default: _(
-                    "Refresh your browser to change your language preference."
-                ),
-                enUS: "Refresh your browser to change your language preference.",
-                enUK: "Refresh your browser to change your language preference.",
-                ja: "言語を変えるには、ブラウザをこうしんしてください。",
-                kana: "げんごを かえるには、ブラウザを こうしんしてください。",
-                ko: "언어 기본 설정을 변경하려면 브라우저를 새로 고치십시오.",
-                es: "Actualice su navegador para cambiar su preferencia de idioma.",
-                pt:
-                    "Atualize seu navegador para alterar sua preferência de idioma.",
-                zhCN: "刷新浏览器以更改您的语言偏好",
-                th: "รีเฟรชเบราเซอร์เพื่อเปลี่ยนการตั้งค่าภาษาของคุณ",
-                hi: "अपनी भाषा की वरीयता बदलने के लिए अपना ब्राउज़र ताज़ा करें",
-                ibo: "Mee ka nchọgharị gị gbanwee mmasị asụsụ gị.",
-                ar: "حدث المتصفح لتغيير تفضيلات اللغة.",
-                he: "רענן את הדפדפן כדי לשנות את העדפת השפה שלך.",
-                ayc: "Actualice su navegador para cambiar su preferencia de idioma.",
-                quz: "Actualice su navegador para cambiar su preferencia de idioma.",
-                gug: "Actualice su navegador para cambiar su preferencia de idioma."
-            };
+    hide() {
+        const MSGPrefix =
+            "<a href='#' " +
+            "onClick='window.location.reload()'" +
+            "onMouseOver='this.style.opacity = 0.5'" +
+            "onMouseOut='this.style.opacity = 1'>";
+        const MSGSuffix = "</a>";
+        const MSG = {
+            default: _(
+                "Refresh your browser to change your language preference."
+            ),
+            enUS: "Refresh your browser to change your language preference.",
+            enUK: "Refresh your browser to change your language preference.",
+            ja: "言語を変えるには、ブラウザをこうしんしてください。",
+            kana: "げんごを かえるには、ブラウザを こうしんしてください。",
+            ko: "언어 기본 설정을 변경하려면 브라우저를 새로 고치십시오.",
+            es: "Actualice su navegador para cambiar su preferencia de idioma.",
+            pt:
+                "Atualize seu navegador para alterar sua preferência de idioma.",
+            zhCN: "刷新浏览器以更改您的语言偏好",
+            th: "รีเฟรชเบราเซอร์เพื่อเปลี่ยนการตั้งค่าภาษาของคุณ",
+            hi: "अपनी भाषा की वरीयता बदलने के लिए अपना ब्राउज़र ताज़ा करें",
+            ibo: "Mee ka nchọgharị gị gbanwee mmasị asụsụ gị.",
+            ar: "حدث المتصفح لتغيير تفضيلات اللغة.",
+            he: "רענן את הדפדפן כדי לשנות את העדפת השפה שלך.",
+            ayc: "Actualice su navegador para cambiar su preferencia de idioma.",
+            quz: "Actualice su navegador para cambiar su preferencia de idioma.",
+            gug: "Actualice su navegador para cambiar su preferencia de idioma."
+        }
 
-            localStorage.languagePreference = language;
-            console.debug(language);
-            if (language === "ja" && localStorage.kanaPreference === "kana") {
-                this._message(MSGPrefix + MSG["kana"] + MSGSuffix);
-            } else {
-                this._message(MSGPrefix + MSG[language] + MSGSuffix);
-            }
-        };
+        localStorage.languagePreference = language;
+        console.debug(language);
+        if (language === "ja" && localStorage.kanaPreference === "kana") {
+            this._message(MSGPrefix + MSG["kana"] + MSGSuffix);
+        } else {
+            this._message(MSGPrefix + MSG[language] + MSGSuffix);
+        }
     }
 }
