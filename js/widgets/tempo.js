@@ -316,14 +316,12 @@ function Tempo() {
             iconSize,
             _("Save tempo"),
             ""
-        ).onclick = function() {
+        ).onclick = () => {
             // Debounce button
-            if (!that._get_save_lock()) {
-                that._save_lock = true;
-                that._saveTempo();
-                setTimeout(() => {
-                    that._save_lock = false;
-                }, 1000);
+            if (!this._get_save_lock()) {
+                this._save_lock = true;
+                this._saveTempo();
+                setTimeout(() => this._save_lock = false, 1000);
             }
         };
 

@@ -43,23 +43,20 @@ function MeterWidget() {
         widgetWindow.getWidgetBody().append(this.meterDiv);
 
         widgetWindow.onclose = () => {
-            that._playing = false;
-            that._logo.hideMsgs();
-            that.destroy();
+            this._playing = false;
+            this._logo.hideMsgs();
+            widgetWindow.destroy();
         };
 
         this._click_lock = false;
-        widgetWindow.addButton(
-            "play-button.svg",
-            ICONSIZE,
-            _("Play")
-        ).onclick = () => {
+        const playBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
+        playBtn.onclick = () => {
             if (this._get_click_lock()) {
                 return;
             } else {
-                that._click_lock = true;
-                if (that.__getPlayingStatus()) {
-                    this.innerHTML =
+                this._click_lock = true;
+                if (this.__getPlayingStatus()) {
+                    playBtn.innerHTML =
                         '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
                         _("Play all") +
                         '" alt="' +
@@ -69,9 +66,9 @@ function MeterWidget() {
                         '" width="' +
                         ICONSIZE +
                         '" vertical-align="middle">&nbsp;&nbsp;';
-                    that._playing = false;
+                    this._playing = false;
                 } else {
-                    this.innerHTML =
+                    playBtn.innerHTML =
                         '&nbsp;&nbsp;<img src="header-icons/stop-button.svg" title="' +
                         _("Stop") +
                         '" alt="' +
@@ -109,17 +106,17 @@ function MeterWidget() {
         meterTableDiv.innerHTML = '<div id="meterWheelDiv"></div>';
 
         // Grab the number of beats and beat value from the meter block.
-	let v1;
+        let v1, c1, c2, c3;
         if (meterBlock !== null) {
-            let c1 = this._logo.blocks.blockList[meterBlock].connections[1];
+            c1 = this._logo.blocks.blockList[meterBlock].connections[1];
             if (c1 !== null) {
                 v1 = this._logo.blocks.blockList[c1].value;
             } else {
                 v1 = 4;
             }
 
-            let c2 = this._logo.blocks.blockList[meterBlock].connections[2];
-            let c3 = this._logo.blocks.blockList[c2].connections[2];
+            c2 = this._logo.blocks.blockList[meterBlock].connections[2];
+            c3 = this._logo.blocks.blockList[c2].connections[2];
             if (c2 !== null) {
                 this._beatValue = this._logo.blocks.blockList[c2].value;
             }
