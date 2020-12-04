@@ -80,9 +80,8 @@ class Blocks {
         // and a copy of the selected stack for pasting.
         this.selectedBlocksObj = null;
     
-        // If we somehow have a malformed block database (for example,
-        // from importing a corrupted datafile, we need to avoid infinite
-        // loops while crawling the block list.
+        // If we somehow have a malformed block database (for example, from importing a corrupted
+        // datafile, we need to avoid infinite loops while crawling the block list.
         this._loopCounter = 0;
         this._sizeCounter = 0;
         this._searchCounter = 0;
@@ -219,7 +218,7 @@ class Blocks {
      * @public
      * @return {void}
      */
-    setBlockScale = async function(scale) {
+    async setBlockScale(scale) {
         console.debug("New block scale is " + scale);
         this.blockScale = scale;
 
@@ -355,7 +354,7 @@ class Blocks {
      * @private
      * @return {void}
      */
-    _extractBlock = async function(blk, adjustDock) {
+    async _extractBlock(blk, adjustDock) {
         // Remove a single block from within a stack.
         let blkObj = this.blockList[blk];
 
@@ -908,8 +907,7 @@ class Blocks {
     /*
      * Given a block, adjust the dock position of all its connections.
      * @param - blk - block
-     * @param - resetLoopCounter (to prevent infinite loops in the
-                                  case the connections are broken).
+     * @param - resetLoopCounter (to prevent infinite loops in the case the connections are broken).
      * @public
      * @return {void}
      */
@@ -1399,7 +1397,7 @@ class Blocks {
 
     // To make everything cleaner, use this function to reinit widget
     // when its widget windows is open.
-    reInitWidget = async function(topBlock, timeout) {
+    async reInitWidget(topBlock, timeout) {
         await delayExecution(timeout);
         if (!this.blockList[topBlock].trash) {
             this.logo.runLogoCommands(topBlock);
@@ -1412,7 +1410,7 @@ class Blocks {
      * @public
      * @return {void}
      */
-    blockMoved = async function(thisBlock) {
+    async blockMoved(thisBlock) {
         /*
          * When a block is moved, we have to check the following:
          * (0) Is it inside of a expandable block?
@@ -3856,7 +3854,7 @@ class Blocks {
      * @private
      * @return {void}
      */
-    _newLocalArgBlock = async function(name) {
+    async _newLocalArgBlock(name) {
         // name === 1, 2, 3, ...
         let blkname = "arg_" + name;
         if ("myArg_" + blkname in this.protoBlockDict) {
@@ -4370,7 +4368,7 @@ class Blocks {
             // Are we the denominator (c == 2) or numerator (c == 1)?
             if (this.blockList[dblk].connections[c] === this.blockList.indexOf(myBlock)) {
                 // Is the divide block connected to a note value block?
-                cblk = this.blockList[dblk].connections[0];
+                let cblk = this.blockList[dblk].connections[0];
                 if (cblk !== null) {
                     // Is it the first or second arg?
                     switch (this.blockList[cblk].name) {
@@ -4430,7 +4428,7 @@ class Blocks {
         let dblk = myBlock.connections[0];
         // We are connected to a divide block.
         // Is the divide block connected to a note value block?
-        cblk = this.blockList[dblk].connections[0];
+        let cblk = this.blockList[dblk].connections[0];
         if (cblk !== null) {
             // Is it the first or second arg?
             switch (this.blockList[cblk].name) {
@@ -4717,7 +4715,7 @@ class Blocks {
         }
 
         for (let b = 0; b < this.dragGroup.length; b++) {
-            myBlock = this.blockList[this.dragGroup[b]];
+            let myBlock = this.blockList[this.dragGroup[b]];
             for (let c = 0; c < myBlock.connections.length; c++) {
                 if (myBlock.connections[c] == null) {
                     blockObjs[b][4].push(null);
@@ -5797,7 +5795,7 @@ class Blocks {
      * @public
      * @return {void}
      */
-    cleanupAfterLoad = async function(name) {
+    async cleanupAfterLoad(name) {
         this._loadCounter -= 1;
         if (this._loadCounter > 0) {
             return;
@@ -5977,7 +5975,7 @@ class Blocks {
      * @public
      * @return {void}
      */
-    deleteActionBlock = async function(myBlock) {
+    async deleteActionBlock(myBlock) {
         let actionArg = this.blockList[myBlock.connections[1]];
         if (actionArg) {
             let actionName = actionArg.value;
