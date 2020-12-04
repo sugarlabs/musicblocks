@@ -4391,8 +4391,7 @@ function Activity() {
             .setRefreshCanvas(refreshCanvas)
             .init();
 
-        // Put the boundary in the turtles container so it scrolls
-        // with the blocks.
+        // Put the boundary in the turtles container so it scrolls with the blocks.
         turtles = new Turtles();
         turtles.masterStage = stage;
         turtles.stage = turtleContainer;
@@ -4403,11 +4402,9 @@ function Activity() {
         turtles.doGrid = _doCartesianPolar;
         turtles.refreshCanvas = refreshCanvas;
 
-        // Put the boundary in the blocks container so it scrolls
-        // with the blocks.
+        // Put the boundary in the blocks container so it scrolls with the blocks.
 
-        boundary = new Boundary();
-        boundary.setStage(blocksContainer).init();
+        boundary = new Boundary(blocksContainer);
 
         blocks = new Blocks(this);
         blocks

@@ -15,45 +15,31 @@
 // restore trash.
 
 class Boundary {
-    constructor() {
-        this._stage = null;
-        this._container = null;
-    }
-
-    setStage = (stage) => {
-        this._stage = stage;
-        return this;
-    }
-
-    resizeEvent = (scale) => {};
-
-    init = () => {
+    constructor(stage) {
         this._container = new createjs.Container();
+        this._stage = stage;
         this._stage.addChild(this._container);
         this._stage.setChildIndex(this._container, 0);
     }
 
-    setScale = (w, h, scale) => {
+    // resizeEvent(scale) {};
+
+    setScale(w, h, scale) {
         this.destroy();
         this.create(w, h, scale);
     }
 
-    destroy = () => {
+    destroy() {
         if (this._container.children.length > 0) {
             this._container.removeChild(this._container.children[0]);
         }
     }
 
-    offScreen = (x, y) => {
-        return (
-            x < this.x ||
-            x > this.x + this.dx ||
-            y < this.y ||
-            y > this.y + this.dy
-        );
+    offScreen(x, y) {
+        return (x < this.x || x > this.x + this.dx || y < this.y || y > this.y + this.dy);
     }
 
-    create = (w, h, scale) => {
+    create(w, h, scale) {
         this.w = w / scale;
         this.x = 55 + 13;
         this.dx = this.w - (110 + 26);
@@ -62,26 +48,23 @@ class Boundary {
         this.y = 55 + 13;
         this.dy = this.h - (55 + 26);
 
-        let that = this;
-
         const __makeBoundary = () => {
             let img = new Image();
             img.onload = () => {
                 bitmap = new createjs.Bitmap(img);
-                that._container.addChild(bitmap);
+                this._container.addChild(bitmap);
             };
-
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
                     unescape(
                         encodeURIComponent(
-                            BOUNDARY.replace("HEIGHT", that.h)
-                                .replace("WIDTH", that.w)
-                                .replace("Y", that.y)
-                                .replace("X", that.x)
-                                .replace("DY", that.dy)
-                                .replace("DX", that.dx)
+                            BOUNDARY.replace("HEIGHT", this.h)
+                                .replace("WIDTH", this.w)
+                                .replace("Y", this.y)
+                                .replace("X", this.x)
+                                .replace("DY", this.dy)
+                                .replace("DX", this.dx)
                                 .replace("stroke_color", "#e08080")
                         )
                     )
@@ -91,11 +74,11 @@ class Boundary {
         __makeBoundary();
     }
 
-    hide = () => {
+    hide() {
         this._container.visible = false;
     }
 
-    show = () => {
+    show() {
         this._container.visible = true;
     }
 }
