@@ -46,7 +46,7 @@ function StatusMatrix() {
         widgetWindow.getWidgetBody().append(this._statusTable);
         widgetWindow.onclose = () => {
             this.isOpen = false;
-            this.destroy();
+            widgetWindow.destroy();
         };
 
         // Each row in the status table contains a field label in the
