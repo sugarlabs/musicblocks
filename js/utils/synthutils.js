@@ -741,7 +741,7 @@ function Synth() {
 
     this.samplesQueue = []; // Samples that need to be loaded at start.
 
-    require(SOUNDSAMPLESDEFINES, function() {
+    require(SOUNDSAMPLESDEFINES, () => {
         this.loadSamples();
 
         for (let i = 0; i < this.samplesQueue.length; i++) {
