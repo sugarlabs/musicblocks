@@ -36,7 +36,7 @@ class Boundary {
     }
 
     offScreen(x, y) {
-        return (x < this.x || x > this.x + this.dx || y < this.y || y > this.y + this.dy);
+        return x < this.x || x > this.x + this.dx || y < this.y || y > this.y + this.dy;
     }
 
     create(w, h, scale) {
@@ -69,7 +69,7 @@ class Boundary {
                         )
                     )
                 );
-        }
+        };
 
         __makeBoundary();
     }
