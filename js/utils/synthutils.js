@@ -1138,7 +1138,6 @@ function Synth() {
     };
 
     this.__createSynth = function(turtle, instrumentName, sourceName, params) {
-        console.debug(CUSTOMSAMPLES);
         this._loadSample(sourceName);
 
         if (
