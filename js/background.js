@@ -11,11 +11,11 @@
 
 if (navigator.userAgent.search("Firefox") !== -1) {
     browser.browserAction.onClicked.addListener((tab) => {
-        browser.tabs.create({url: "index.html"});
+        browser.tabs.create({ url: "index.html" });
     });
 
     browser.runtime.onInstalled.addListener((tab) => {
-        browser.tabs.create({url: "index.html"});
+        browser.tabs.create({ url: "index.html" });
     });
 } else {
     chrome.browserAction.onClicked.addListener((tab) => {
@@ -25,5 +25,4 @@ if (navigator.userAgent.search("Firefox") !== -1) {
     chrome.runtime.onInstalled.addListener((tab) => {
         window.open(chrome.runtime.getURL("index.html"));
     });
-
 }

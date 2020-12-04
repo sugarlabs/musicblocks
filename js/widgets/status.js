@@ -32,8 +32,7 @@ function StatusMatrix() {
         this._cellScale = w / 1200;
         let iconSize = ICONSIZE * this._cellScale;
 
-        let widgetWindow = window.widgetWindows.windowFor(
-            this, "status", "status");
+        let widgetWindow = window.widgetWindows.windowFor(this, "status", "status");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -61,8 +60,7 @@ function StatusMatrix() {
         cell = row.insertCell();
         cell.style.backgroundColor = platformColor.selectorBackground;
         cell.className = "headcol";
-        cell.style.height =
-            Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
+        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
         cell.style.width = BUTTONSIZE * this._cellScale + "px";
         cell.innerHTML = "&nbsp;";
 
@@ -100,8 +98,7 @@ function StatusMatrix() {
                     '">&nbsp;&nbsp;';
             }
             cell.style.width = BUTTONSIZE * this._cellScale + "px";
-            cell.style.height =
-                Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
+            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
             cell.className = "headcol";
 
             activeTurtles += 1;
@@ -115,61 +112,54 @@ function StatusMatrix() {
             row = header.insertRow();
 
             cell = row.insertCell(); // i + 1);
-            cell.style.fontSize =
-                Math.floor(this._cellScale * FONTSCALEFACTOR) + "%";
+            cell.style.fontSize = Math.floor(this._cellScale * FONTSCALEFACTOR) + "%";
 
             console.debug(this._logo.statusFields[i][1]);
 
             switch (this._logo.statusFields[i][1]) {
-            case "plus":
-            case "minus":
-            case "neg":
-            case "divide":
-            case "power":
-            case "multiply":
-            case "sqrt":
-            case "int":
-            case "mod":
-                label = "";
-                break;
-            case "namedbox":
-                label = this._logo.blocks.blockList[
-                    this._logo.statusFields[i][0]].privateData;
-                break;
-            case "bpm":
-            case "bpmfactor":
-                if (localStorage.languagePreference === "ja") {
-                    label = _("beats per minute2");
-                } else {
-                    label = this._logo.blocks.blockList[
-                        this._logo.statusFields[i][0]
-                    ].protoblock.staticLabels[0];
-                }
-                console.debug(label);
-                break;
-            case "outputtools":
-                label = this._logo.blocks.blockList[
-                    this._logo.statusFields[i][0]].privateData;
+                case "plus":
+                case "minus":
+                case "neg":
+                case "divide":
+                case "power":
+                case "multiply":
+                case "sqrt":
+                case "int":
+                case "mod":
+                    label = "";
                     break;
-            default:
-                label = this._logo.blocks.blockList[
-                    this._logo.statusFields[i][0]].protoblock.staticLabels[0];
-                break;
+                case "namedbox":
+                    label = this._logo.blocks.blockList[this._logo.statusFields[i][0]].privateData;
+                    break;
+                case "bpm":
+                case "bpmfactor":
+                    if (localStorage.languagePreference === "ja") {
+                        label = _("beats per minute2");
+                    } else {
+                        label = this._logo.blocks.blockList[this._logo.statusFields[i][0]]
+                            .protoblock.staticLabels[0];
+                    }
+                    console.debug(label);
+                    break;
+                case "outputtools":
+                    label = this._logo.blocks.blockList[this._logo.statusFields[i][0]].privateData;
+                    break;
+                default:
+                    label = this._logo.blocks.blockList[this._logo.statusFields[i][0]].protoblock
+                        .staticLabels[0];
+                    break;
             }
 
             cell.innerHTML = "&nbsp;<b>" + label + "</b>";
-            cell.style.height =
-                Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
+            cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
 
             for (let j = 0; j < activeTurtles; j++) {
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
-                cell.style.fontSize =
-                    Math.floor(this._cellScale * FONTSCALEFACTOR) + "%";
+                cell.style.fontSize = Math.floor(this._cellScale * FONTSCALEFACTOR) + "%";
                 cell.innerHTML = "";
-                cell.style.height =
-                    Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
+                cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.textAlign = "center";
             }
         }
@@ -177,21 +167,17 @@ function StatusMatrix() {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             row = header.insertRow();
             cell = row.insertCell();
-            cell.style.fontSize =
-                Math.floor(this._cellScale * FONTSCALEFACTOR) + "%";
+            cell.style.fontSize = Math.floor(this._cellScale * FONTSCALEFACTOR) + "%";
             cell.innerHTML = "&nbsp;<b>" + _("note") + "</b>";
-            cell.style.height =
-                Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
+            cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
 
             for (let i = 0; i < activeTurtles; i++) {
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
-                cell.style.fontSize =
-                    Math.floor(this._cellScale * FONTSCALEFACTOR) + "%";
+                cell.style.fontSize = Math.floor(this._cellScale * FONTSCALEFACTOR) + "%";
                 cell.innerHTML = "";
-                cell.style.height =
-                    Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
+                cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.textAlign = "center";
             }
         }
@@ -224,75 +210,75 @@ function StatusMatrix() {
                 saveStatus = this._logo.inStatusMatrix;
                 this._logo.inStatusMatrix = false;
 
-                this._logo.parseArg(
-                    this._logo, t, this._logo.statusFields[i][0]);
-                switch (this._logo.blocks.blockList[
-                    this._logo.statusFields[i][0]].name) {
-                case "x":
-                case "y":
-                case "heading":
-                    value = this._logo.blocks.blockList[
-                        this._logo.statusFields[i][0]].value.toFixed(0);
-                    break;
-                case "mynotevalue":
-                    value = mixedNumber(
-                        this._logo.blocks.blockList[
-                            this._logo.statusFields[i][0]].value);
-                    break;
-                case "elapsednotes2":
+                this._logo.parseArg(this._logo, t, this._logo.statusFields[i][0]);
+                switch (this._logo.blocks.blockList[this._logo.statusFields[i][0]].name) {
+                    case "x":
+                    case "y":
+                    case "heading":
+                        value = this._logo.blocks.blockList[
+                            this._logo.statusFields[i][0]
+                        ].value.toFixed(0);
+                        break;
+                    case "mynotevalue":
+                        value = mixedNumber(
+                            this._logo.blocks.blockList[this._logo.statusFields[i][0]].value
+                        );
+                        break;
+                    case "elapsednotes2":
                         blk = this._logo.statusFields[i][0];
                         cblk = this._logo.blocks.blockList[blk].connections[1];
-                        noteValue = this._logo.parseArg(
-                            this._logo, t, cblk, blk, null);
+                        noteValue = this._logo.parseArg(this._logo, t, cblk, blk, null);
+                        value =
+                            mixedNumber(
+                                this._logo.blocks.blockList[this._logo.statusFields[i][0]].value
+                            ) +
+                            " × " +
+                            mixedNumber(noteValue);
+                        break;
+                    case "elapsednotes":
                         value = mixedNumber(
-                            this._logo.blocks.blockList[
-                                this._logo.statusFields[i][0]].value) +
-                            " × " + mixedNumber(noteValue);
-                    break;
-                case "elapsednotes":
-                    value = mixedNumber(
-                        this._logo.blocks.blockList[
-                            this._logo.statusFields[i][0]].value);
-                    break;
-                case "namedbox":
-                    name = this._logo.blocks.blockList[
-                            this._logo.statusFields[i][0]].privateData;
-                    if (name in this._logo.boxes) {
-                        value = this._logo.boxes[name];
-                    } else {
-                        value = "";
-                    }
-                    break;
-                case "beatvalue":
-                    value = mixedNumber(tur.singer.currentBeat);
-                    break;
-                case "measurevalue":
-                    value = tur.singer.currentMeasure;
-                    break;
-                case "pitchinhertz":
-                    value = "";
-                    if (tur.singer.noteStatus != null) {
-                        notes = tur.singer.noteStatus[0];
-                        for (let j = 0; j < notes.length; j++) {
-                            if (j > 0) {
-                                value += " ";
-                            }
-
-                            freq = this._logo.synth.getFrequency(
-                                    notes[j],
-                                    this._logo.synth.changeInTemperament);
-                            if (typeof freq === "number") {
-                                value += freq.toFixed(2);
-                            }
+                            this._logo.blocks.blockList[this._logo.statusFields[i][0]].value
+                        );
+                        break;
+                    case "namedbox":
+                        name = this._logo.blocks.blockList[this._logo.statusFields[i][0]]
+                            .privateData;
+                        if (name in this._logo.boxes) {
+                            value = this._logo.boxes[name];
+                        } else {
+                            value = "";
                         }
-                    } else {
+                        break;
+                    case "beatvalue":
+                        value = mixedNumber(tur.singer.currentBeat);
+                        break;
+                    case "measurevalue":
+                        value = tur.singer.currentMeasure;
+                        break;
+                    case "pitchinhertz":
                         value = "";
-                    }
-                    break;
-                default:
-                    value = this._logo.blocks.blockList[
-                        this._logo.statusFields[i][0]].value;
-                    break;
+                        if (tur.singer.noteStatus != null) {
+                            notes = tur.singer.noteStatus[0];
+                            for (let j = 0; j < notes.length; j++) {
+                                if (j > 0) {
+                                    value += " ";
+                                }
+
+                                freq = this._logo.synth.getFrequency(
+                                    notes[j],
+                                    this._logo.synth.changeInTemperament
+                                );
+                                if (typeof freq === "number") {
+                                    value += freq.toFixed(2);
+                                }
+                            }
+                        } else {
+                            value = "";
+                        }
+                        break;
+                    default:
+                        value = this._logo.blocks.blockList[this._logo.statusFields[i][0]].value;
+                        break;
                 }
 
                 this._logo.inStatusMatrix = saveStatus;
@@ -326,9 +312,7 @@ function StatusMatrix() {
 
                 cell = this._statusTable.rows[i + 1].cells[activeTurtles + 1];
                 if (cell != null) {
-                    cell.innerHTML = note
-                        .replace(/#/g, "♯")
-                        .replace(/b/g, "♭");
+                    cell.innerHTML = note.replace(/#/g, "♯").replace(/b/g, "♭");
                 }
             }
 

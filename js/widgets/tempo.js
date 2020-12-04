@@ -29,19 +29,14 @@ function Tempo() {
     this.BPMBlocks = [];
     this.tempoCanvases = [];
 
-    this._updateBPM = function(i) {
+    this._updateBPM = function (i) {
         this._intervals[i] = (60 / this.BPMs[i]) * 1000;
 
         if (this.BPMBlocks[i] != null) {
-            var blockNumber = this._logo.blocks.blockList[this.BPMBlocks[i]]
-                .connections[1];
+            var blockNumber = this._logo.blocks.blockList[this.BPMBlocks[i]].connections[1];
             if (blockNumber != null) {
-                this._logo.blocks.blockList[blockNumber].value = parseFloat(
-                    this.BPMs[i]
-                );
-                this._logo.blocks.blockList[blockNumber].text.text = this.BPMs[
-                    i
-                ];
+                this._logo.blocks.blockList[blockNumber].value = parseFloat(this.BPMs[i]);
+                this._logo.blocks.blockList[blockNumber].text.text = this.BPMs[i];
                 this._logo.blocks.blockList[blockNumber].updateCache();
                 this._logo.refreshCanvas();
                 saveLocally();
@@ -49,23 +44,22 @@ function Tempo() {
         }
     };
 
-    this.pause = function() {
+    this.pause = function () {
         clearInterval(this._intervalID);
     };
 
-    this.resume = function() {
+    this.resume = function () {
         // Reset widget time since we are restarting.
         // We will no longer keep synch with the turtles.
         var d = new Date();
         for (var i = 0; i < this.BPMs.length; i++) {
             this._widgetFirstTimes[i] = d.getTime();
-            this._widgetNextTimes[i] =
-                this._widgetFirstTimes[i] + this._intervals[i];
+            this._widgetNextTimes[i] = this._widgetFirstTimes[i] + this._intervals[i];
             this._directions[i] = 1;
         }
 
         // Restart the interval.
-        
+
         if (this._intervalID !== null) {
             clearInterval(this._intervalID);
         }
@@ -75,27 +69,22 @@ function Tempo() {
         }, TEMPOINTERVAL);
     };
 
-    this._useBPM = function(i) {
+    this._useBPM = function (i) {
         this.BPMs[i] = this.BPMInputs[i].value;
         if (this.BPMs[i] > 1000) {
             this.BPMs[i] = 1000;
-            this._logo.errorMsg(
-                _("The beats per minute must be between 30 and 1000.")
-            );
+            this._logo.errorMsg(_("The beats per minute must be between 30 and 1000."));
         } else if (this.BPMs[i] < 30) {
             this.BPMs[i] = 30;
-            this._logo.errorMsg(
-                _("The beats per minute must be between 30 and 1000.")
-            );
+            this._logo.errorMsg(_("The beats per minute must be between 30 and 1000."));
         }
 
         this._updateBPM(i);
         this.BPMInputs[i].value = this.BPMs[i];
     };
 
-    this.speedUp = function(i) {
-        this.BPMs[i] =
-            parseFloat(this.BPMs[i]) + Math.round(0.1 * this.BPMs[i]);
+    this.speedUp = function (i) {
+        this.BPMs[i] = parseFloat(this.BPMs[i]) + Math.round(0.1 * this.BPMs[i]);
 
         if (this.BPMs[i] > 1000) {
             this.BPMs[i] = 1000;
@@ -105,9 +94,8 @@ function Tempo() {
         this.BPMInputs[i].value = this.BPMs[i];
     };
 
-    this.slowDown = function(i) {
-        this.BPMs[i] =
-            parseFloat(this.BPMs[i]) - Math.round(0.1 * this.BPMs[i]);
+    this.slowDown = function (i) {
+        this.BPMs[i] = parseFloat(this.BPMs[i]) - Math.round(0.1 * this.BPMs[i]);
         if (this.BPMs[i] < 30) {
             this.BPMs[i] = 30;
         }
@@ -116,7 +104,7 @@ function Tempo() {
         this.BPMInputs[i].value = this.BPMs[i];
     };
 
-    this._draw = function() {
+    this._draw = function () {
         // First thing to do is figure out where we are supposed to be
         // based on the elapsed time.
         var d = new Date();
@@ -129,8 +117,7 @@ function Tempo() {
             // played.
             if (this._widgetFirstTimes[i] == null) {
                 this._widgetFirstTimes[i] = d.getTime();
-                this._widgetNextTimes[i] =
-                    this._widgetFirstTimes[i] + this._intervals[i];
+                this._widgetNextTimes[i] = this._widgetFirstTimes[i] + this._intervals[i];
             }
 
             // How much time has gone by?
@@ -139,15 +126,7 @@ function Tempo() {
             // Are we done yet?
             if (d.getTime() > this._widgetNextTimes[i]) {
                 // Play a tone.
-                this._logo.synth.trigger(
-                    0,
-                    ["C2"],
-                    0.0625,
-                    TEMPOSYNTH,
-                    null,
-                    null,
-                    false
-                );
+                this._logo.synth.trigger(0, ["C2"], 0.0625, TEMPOSYNTH, null, null, false);
                 this._widgetNextTimes[i] += this._intervals[i];
 
                 // Ensure we are at the edge.
@@ -159,8 +138,7 @@ function Tempo() {
             } else {
                 // Determine new x position based on delta time.
                 if (this._intervals[i] !== 0) {
-                    var dx =
-                        tempoCanvas.width * (deltaTime / this._intervals[i]);
+                    var dx = tempoCanvas.width * (deltaTime / this._intervals[i]);
                 } else {
                     var dx = 0;
                 }
@@ -195,21 +173,13 @@ function Tempo() {
             ctx.clearRect(0, 0, tempoCanvas.width, tempoCanvas.height);
             ctx.beginPath();
             ctx.fillStyle = "rgba(0,0,0,1)";
-            ctx.ellipse(
-                x,
-                YRADIUS,
-                Math.max(this._xradius, 1),
-                YRADIUS,
-                0,
-                0,
-                Math.PI * 2
-            );
+            ctx.ellipse(x, YRADIUS, Math.max(this._xradius, 1), YRADIUS, 0, 0, Math.PI * 2);
             ctx.fill();
             ctx.closePath();
         }
     };
 
-    this.__save = function(i) {
+    this.__save = function (i) {
         setTimeout(() => {
             console.debug("saving a BPM block for " + this.BPMs[i]);
             var delta = i * 42;
@@ -226,7 +196,7 @@ function Tempo() {
         }, 200 * i);
     };
 
-    this._saveTempo = function() {
+    this._saveTempo = function () {
         // Save a BPM block for each tempo.
 
         for (var i = 0; i < this.BPMs.length; i++) {
@@ -234,11 +204,11 @@ function Tempo() {
         }
     };
 
-    this._get_save_lock = function() {
+    this._get_save_lock = function () {
         return this._save_lock;
     };
 
-    this.init = function(logo) {
+    this.init = function (logo) {
         this._logo = logo;
         this._directions = [];
         this._widgetFirstTimes = [];
@@ -310,7 +280,7 @@ function Tempo() {
             if (!this._get_save_lock()) {
                 this._save_lock = true;
                 this._saveTempo();
-                setTimeout(() => this._save_lock = false, 1000);
+                setTimeout(() => (this._save_lock = false), 1000);
             }
         };
 
@@ -325,20 +295,15 @@ function Tempo() {
             }
 
             this._intervals.push((60 / this.BPMs[i]) * 1000);
-            this._widgetNextTimes.push(
-                this._widgetFirstTimes[i] - this._intervals[i]
-            );
+            this._widgetNextTimes.push(this._widgetFirstTimes[i] - this._intervals[i]);
 
             var r1 = this.bodyTable.insertRow();
             var r2 = this.bodyTable.insertRow();
             var r3 = this.bodyTable.insertRow();
 
-            widgetWindow.addButton(
-                "up.svg",
-                ICONSIZE,
-                _("speed up"),
-                r1.insertCell()
-            ).onclick = ((i) => () => this.speedUp(i))(i);
+            widgetWindow.addButton("up.svg", ICONSIZE, _("speed up"), r1.insertCell()).onclick = ((
+                i
+            ) => () => this.speedUp(i))(i);
             widgetWindow.addButton(
                 "down.svg",
                 ICONSIZE,
@@ -358,7 +323,7 @@ function Tempo() {
 
             // The tempo can be set from the interval between
             // successive clicks on the canvas.
-            this.tempoCanvases[i].onclick = (id => () => {
+            this.tempoCanvases[i].onclick = ((id) => () => {
                 const d = new Date();
                 if (this._firstClickTime == null) {
                     this._firstClickTime = d.getTime();

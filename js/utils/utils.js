@@ -8,26 +8,20 @@
 // You should have received a copy of the GNU Affero General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
-const changeImage = (imgElement ,from ,to) => {
+const changeImage = (imgElement, from, to) => {
     oldSrc = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(from)));
     newSrc = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(to)));
-    if (imgElement.src === oldSrc){
-        imgElement.src = newSrc
+    if (imgElement.src === oldSrc) {
+        imgElement.src = newSrc;
     }
-}
+};
 
 function format(str, data) {
     str = str.replace(/{([a-zA-Z0-9.]*)}/g, (match, name) => {
         x = data;
         name.split(".").forEach((v) => {
             if (x === undefined) {
-                console.debug(
-                    "Undefined value in template string",
-                    str,
-                    name,
-                    x,
-                    v
-                );
+                console.debug("Undefined value in template string", str, name, x, v);
             }
 
             x = x[v];
@@ -36,7 +30,7 @@ function format(str, data) {
         return x;
     });
 
-    return str.replace(/{_([a-zA-Z0-9]+)}/g, (match, item) =>{
+    return str.replace(/{_([a-zA-Z0-9]+)}/g, (match, item) => {
         return _(item);
     });
 }
@@ -120,9 +114,7 @@ function HttpRequest(url, loadCallback, userCallback) {
         req.send("");
     } catch (e) {
         if (self.console) {
-            console.debug(
-                "Failed to load resource from " + url + ": Network error."
-            );
+            console.debug("Failed to load resource from " + url + ": Network error.");
         }
 
         if (typeof userCallback === "function") {
@@ -135,33 +127,34 @@ function HttpRequest(url, loadCallback, userCallback) {
 
 function doBrowserCheck() {
     let matched, browser;
-    jQuery.uaMatch = ( ua ) => {
+    jQuery.uaMatch = (ua) => {
         ua = ua.toLowerCase();
 
-        let match = /(chrome)[ \/]([\w.]+)/.exec( ua ) ||
-            /(webkit)[ \/]([\w.]+)/.exec( ua ) ||
-            /(opera)(?:.*version|)[ \/]([\w.]+)/.exec( ua ) ||
-            /(msie) ([\w.]+)/.exec( ua ) ||
-            ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec( ua ) ||
+        let match =
+            /(chrome)[ \/]([\w.]+)/.exec(ua) ||
+            /(webkit)[ \/]([\w.]+)/.exec(ua) ||
+            /(opera)(?:.*version|)[ \/]([\w.]+)/.exec(ua) ||
+            /(msie) ([\w.]+)/.exec(ua) ||
+            (ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua)) ||
             [];
 
         return {
-            browser: match[ 1 ] || "",
-            version: match[ 2 ] || "0"
+            browser: match[1] || "",
+            version: match[2] || "0"
         };
     };
 
-    matched = jQuery.uaMatch( navigator.userAgent );
+    matched = jQuery.uaMatch(navigator.userAgent);
     browser = {};
 
-    if ( matched.browser ) {
-        browser[ matched.browser ] = true;
+    if (matched.browser) {
+        browser[matched.browser] = true;
         browser.version = matched.version;
     }
 
-    if ( browser.chrome ) {
+    if (browser.chrome) {
         browser.webkit = true;
-    } else if ( browser.webkit ) {
+    } else if (browser.webkit) {
         browser.safari = true;
     }
 
@@ -170,9 +163,9 @@ function doBrowserCheck() {
 
 // Check for Internet Explorer
 
-window.onload = function() {
+window.onload = function () {
     let userAgent = window.navigator.userAgent;
-    console.log("run detectIE")
+    console.log("run detectIE");
     // For IE 10 or older
     let MSIE = userAgent.indexOf("MSIE ");
     if (MSIE > 0) {
@@ -246,9 +239,7 @@ function last(myList) {
 
 function getTextWidth(text, font) {
     // re-use canvas object for better performance
-    let canvas =
-        getTextWidth.canvas ||
-        (getTextWidth.canvas = document.createElement("canvas"));
+    let canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
     let context = canvas.getContext("2d");
     context.font = font;
     let metrics = context.measureText(text);
@@ -488,8 +479,7 @@ function processPluginData(
             let strokeHighlightColor = "#404040";
             if ("HIGHLIGHTSTROKECOLORS" in obj) {
                 if (name in obj["HIGHLIGHTSTROKECOLORS"]) {
-                    strokeHighlightColor =
-                        obj["HIGHLIGHTSTROKECOLORS"][name];
+                    strokeHighlightColor = obj["HIGHLIGHTSTROKECOLORS"][name];
                     // console.debug(highlightColor);
                 }
             }
@@ -619,17 +609,11 @@ function processPluginData(
         try {
             // Push the protoblocks onto their palettes.
             if (blocks.protoBlockDict[protoblock].palette === undefined) {
-                console.debug(
-                    "Cannot find palette for protoblock " + protoblock
-                );
+                console.debug("Cannot find palette for protoblock " + protoblock);
             } else if (blocks.protoBlockDict[protoblock].palette === null) {
-                console.debug(
-                    "Cannot find palette for protoblock " + protoblock
-                );
+                console.debug("Cannot find palette for protoblock " + protoblock);
             } else {
-                blocks.protoBlockDict[protoblock].palette.add(
-                    blocks.protoBlockDict[protoblock]
-                );
+                blocks.protoBlockDict[protoblock].palette.add(blocks.protoBlockDict[protoblock]);
             }
         } catch (e) {
             console.debug(e);
@@ -657,13 +641,11 @@ function updatePluginObj(obj) {
     }
 
     for (let name in obj["PALETTESTROKECOLORS"]) {
-        pluginObjs["PALETTESTROKECOLORS"][name] =
-            obj["PALETTESTROKECOLORS"][name];
+        pluginObjs["PALETTESTROKECOLORS"][name] = obj["PALETTESTROKECOLORS"][name];
     }
 
     for (let name in obj["PALETTEHIGHLIGHTCOLORS"]) {
-        pluginObjs["PALETTEHIGHLIGHTCOLORS"][name] =
-            obj["PALETTEHIGHLIGHTCOLORS"][name];
+        pluginObjs["PALETTEHIGHLIGHTCOLORS"][name] = obj["PALETTEHIGHLIGHTCOLORS"][name];
     }
 
     for (let flow in obj["FLOWPLUGINS"]) {
@@ -761,15 +743,7 @@ function doPublish(desc) {
 
 // TODO: Move to camera plugin
 let hasSetupCamera = false;
-function doUseCamera(
-    args,
-    turtles,
-    turtle,
-    isVideo,
-    cameraID,
-    setCameraID,
-    errorMsg
-) {
+function doUseCamera(args, turtles, turtle, isVideo, cameraID, setCameraID, errorMsg) {
     let w = 320;
     let h = 240;
 
@@ -884,10 +858,7 @@ function displayMsg(blocks, text) {
 
 function safeSVG(label) {
     if (typeof label === "string") {
-        return label
-            .replace(/&/, "&amp;")
-            .replace(/</, "&lt;")
-            .replace(/>/, "&gt;");
+        return label.replace(/&/, "&amp;").replace(/</, "&lt;").replace(/>/, "&gt;");
     } else {
         return label;
     }
@@ -1278,17 +1249,17 @@ function delayExecution(duration) {
 
 function closeWidgets() {
     window.widgetWindows.hideAllWindows();
-};
+}
 
-function closeBlkWidgets (name) {
+function closeBlkWidgets(name) {
     let widgetTitle = document.getElementsByClassName("wftTitle");
     for (let i = 0; i < widgetTitle.length; i++) {
         if (widgetTitle[i].innerHTML === name) {
-           window.widgetWindows.hideWindow(widgetTitle[i].innerHTML);
-           break;
+            window.widgetWindows.hideWindow(widgetTitle[i].innerHTML);
+            break;
         }
     }
-};
+}
 
 /**
  * Adds methods and variables of model and view objects to controller
@@ -1348,7 +1319,7 @@ function importMembers(obj, className, modelArgs, viewArgs) {
         delete obj.added;
     };
 
-    let cname = obj.constructor.name;   // class name of component object
+    let cname = obj.constructor.name; // class name of component object
 
     if (className !== "" && className !== undefined) {
         addMembers(obj, eval(className));
