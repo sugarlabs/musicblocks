@@ -2512,7 +2512,7 @@ class Block {
                             that.blocks.logo.doStopTurtles();
 
                             setTimeout( () => {
-                                this.blocks.logo.runLogoCommands(topBlk);
+                                that.blocks.logo.runLogoCommands(topBlk);
                             }, 250);
                         } else {
                             that.blocks.logo.runLogoCommands(topBlk);
@@ -2531,7 +2531,7 @@ class Block {
                         that.blocks.logo.doStopTurtles();
 
                         setTimeout( () => {
-                            this.blocks.logo.runLogoCommands(topBlk);
+                            that.blocks.logo.runLogoCommands(topBlk);
                         }, 250);
                     } else {
                         that.blocks.logo.runLogoCommands(topBlk);
