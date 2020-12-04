@@ -105,32 +105,21 @@ function PitchDrumMatrix() {
         var widgetWindow = window.widgetWindows.windowFor(this, "pitch drum");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
-	widgetWindow.show();
+        widgetWindow.show();
 
-        // For the button callbacks
-        var that = this;
-
-        widgetWindow.onclose = function() {
+        widgetWindow.onclose = () => {
             pdmTableDiv.style.visibility = "hidden";
-            that._logo.hideMsgs();
-            this.destroy();
+            this._logo.hideMsgs();
+            widgetWindow.destroy();
         };
 
-        widgetWindow.addButton(
-            "play-button.svg",
-            ICONSIZE,
-            _("Play")
-        ).onclick = function() {
-            that._logo.turtleDelay = 0;
-            that._playAll();
+        widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play")).onclick = () => {
+            this._logo.turtleDelay = 0;
+            this._playAll();
         };
 
         this._save_lock = false;
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            ICONSIZE,
-            _("Save")
-        ).onclick = () => {
+        widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Save")).onclick = () => {
             // Debounce button
             if (!this._get_save_lock()) {
                 this._save_lock = true;
@@ -139,13 +128,9 @@ function PitchDrumMatrix() {
             }
         };
 
-        widgetWindow.addButton(
-            "erase-button.svg",
-            ICONSIZE,
-            _("Clear")
-        ).onclick = function() {
-            that._clear();
-        };
+        widgetWindow.addButton("erase-button.svg", ICONSIZE, _("Clear")).onclick = () => {
+            this._clear();
+        }
 
         // var cell = this._addButton(row,'close-button.svg', ICONSIZE, _('Close'));
 
@@ -415,31 +400,24 @@ function PitchDrumMatrix() {
     };
 
     this.makeClickable = function() {
-        // Once the entire matrix is generated, this function makes it
-        // clickable.
+        // Once the entire matrix is generated, this function makes it clickable.
         var pdmTable = docById("pdmTable");
-        var drumTable = docById("pdmDrumTable");
 
         for (var i = 0; i < pdmTable.rows.length - 1; i++) {
-            var table = docById("pdmCellTable" + i);
-            var cellRow = table.rows[0];
-            var that = this;
+            const table = docById("pdmCellTable" + i);
+            const cellRow = table.rows[0];
 
-            for (var j = 0; j < cellRow.cells.length; j++) {
+            for (let j = 0; j < cellRow.cells.length; j++) {
                 cell = cellRow.cells[j];
-
-                var drumRow = drumTable.rows[0];
-                var drumCell = drumRow.cells[j];
-
-                cell.onclick = function() {
-                    var rowcol = this.id.split(",");
-                    if (this.style.backgroundColor === "black") {
-                        this.style.backgroundColor =
+                cell.onclick = () => {
+                    var rowcol = cell.id.split(",");
+                    if (cell.style.backgroundColor === "black") {
+                        cell.style.backgroundColor =
                             platformColor.selectorBackground;
-                        that._setCellPitchDrum(rowcol[1], rowcol[0], false);
+                        this._setCellPitchDrum(rowcol[1], rowcol[0], false);
                     } else {
-                        this.style.backgroundColor = "black";
-                        that._setCellPitchDrum(rowcol[1], rowcol[0], true);
+                        cell.style.backgroundColor = "black";
+                        this._setCellPitchDrum(rowcol[1], rowcol[0], true);
                     }
                 };
             }

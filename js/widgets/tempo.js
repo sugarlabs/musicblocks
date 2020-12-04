@@ -264,26 +264,20 @@ function Tempo() {
         var widgetWindow = window.widgetWindows.windowFor(this, "tempo");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
-	widgetWindow.show();
+        widgetWindow.show();
 
-        // For the button callbacks
-        var that = this;
-
-        widgetWindow.onclose = function() {
-            if (that._intervalID != null) {
-                clearInterval(that._intervalID);
+        widgetWindow.onclose = () => {
+            if (this._intervalID != null) {
+                clearInterval(this._intervalID);
             }
-            this.destroy();
+            widgetWindow.destroy();
         };
 
-        widgetWindow.addButton(
-            "pause-button.svg",
-            ICONSIZE,
-            _("Pause")
-        ).onclick = function() {
-            if (that.isMoving) {
-                that.pause();
-                this.innerHTML =
+        const pauseBtn = widgetWindow.addButton("pause-button.svg", ICONSIZE, _("Pause"));
+        pauseBtn.onclick = () => {
+            if (this.isMoving) {
+                this.pause();
+                pauseBtn.innerHTML =
                     '<img src="header-icons/play-button.svg" title="' +
                     _("Pause") +
                     '" alt="' +
@@ -293,10 +287,10 @@ function Tempo() {
                     '" width="' +
                     ICONSIZE +
                     '" vertical-align="middle">';
-                that.isMoving = false;
+                this.isMoving = false;
             } else {
-                that.resume();
-                this.innerHTML =
+                this.resume();
+                pauseBtn.innerHTML =
                     '<img src="header-icons/pause-button.svg" title="' +
                     _("Play") +
                     '" alt="' +
@@ -306,17 +300,12 @@ function Tempo() {
                     '" width="' +
                     ICONSIZE +
                     '" vertical-align="middle">';
-                that.isMoving = true;
+                this.isMoving = true;
             }
         };
 
         this._save_lock = false;
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            iconSize,
-            _("Save tempo"),
-            ""
-        ).onclick = () => {
+        widgetWindow.addButton("export-chunk.svg", iconSize, _("Save tempo"), "").onclick = () => {
             // Debounce button
             if (!this._get_save_lock()) {
                 this._save_lock = true;
@@ -349,22 +338,15 @@ function Tempo() {
                 ICONSIZE,
                 _("speed up"),
                 r1.insertCell()
-            ).onclick = (i => () => {
-                that.speedUp(i);
-            })(i);
+            ).onclick = ((i) => () => this.speedUp(i))(i);
             widgetWindow.addButton(
                 "down.svg",
                 ICONSIZE,
                 _("slow down"),
                 r2.insertCell()
-            ).onclick = (i => () => {
-                that.slowDown(i);
-            })(i);
+            ).onclick = ((i) => () => this.slowDown(i))(i);
 
-            this.BPMInputs[i] = widgetWindow.addInputButton(
-                this.BPMs[i],
-                r3.insertCell()
-            );
+            this.BPMInputs[i] = widgetWindow.addInputButton(this.BPMs[i], r3.insertCell());
             this.tempoCanvases[i] = document.createElement("canvas");
             this.tempoCanvases[i].style.width = TEMPOWIDTH + "px";
             this.tempoCanvases[i].style.height = TEMPOHEIGHT + "px";
@@ -377,30 +359,28 @@ function Tempo() {
             // The tempo can be set from the interval between
             // successive clicks on the canvas.
             this.tempoCanvases[i].onclick = (id => () => {
-                var d = new Date();
-                if (that._firstClickTime == null) {
-                    that._firstClickTime = d.getTime();
+                const d = new Date();
+                if (this._firstClickTime == null) {
+                    this._firstClickTime = d.getTime();
                 } else {
-                    var newBPM = parseInt(
-                        (60 * 1000) / (d.getTime() - that._firstClickTime)
-                    );
+                    const newBPM = parseInt((60 * 1000) / (d.getTime() - this._firstClickTime));
                     if (newBPM > 29 && newBPM < 1001) {
-                        that.BPMs[id] = newBPM;
-                        that._updateBPM(id);
-                        var BPMInput = that.BPMInputs[id];
-                        BPMInput.value = that.BPMs[id];
-                        that._firstClickTime = null;
+                        this.BPMs[id] = newBPM;
+                        this._updateBPM(id);
+                        const BPMInput = this.BPMInputs[id];
+                        BPMInput.value = this.BPMs[id];
+                        this._firstClickTime = null;
                     } else {
-                        that._firstClickTime = d.getTime();
+                        this._firstClickTime = d.getTime();
                     }
                 }
             })(i);
 
             this.BPMInputs[i].addEventListener(
                 "keyup",
-                (id => e => {
+                ((id) => (e) => {
                     if (e.keyCode === 13) {
-                        that._useBPM(id);
+                        this._useBPM(id);
                     }
                 })(i)
             );
