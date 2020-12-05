@@ -12,32 +12,34 @@
 // FIXME: Use busy cursor
 
 // A viewer for Turtle Blocks plugins
-function PluginsViewer(canvas, stage, refreshCanvas, close, load) {
-    this.canvas = canvas;
-    this.stage = stage;
-    this.refreshCanvas = refreshCanvas;
-    this.closeViewer = close;
-    this.loadPlugin = load;
-    this.dict = {};
-    this.pluginFiles = [];
-    this.container = null;
-    this.prev = null;
-    this.next = null;
-    this.page = 0; // 4x4 image matrix per page
-    this.server = true;
+class PluginsViewer {
+    constructor(canvas, stage, refreshCanvas, close, load) {
+        this.canvas = canvas;
+        this.stage = stage;
+        this.refreshCanvas = refreshCanvas;
+        this.closeViewer = close;
+        this.loadPlugin = load;
+        this.dict = {};
+        this.pluginFiles = [];
+        this.container = null;
+        this.prev = null;
+        this.next = null;
+        this.page = 0; // 4x4 image matrix per page
+        this.server = true;
+    }
 
-    this.setServer = function(server) {
+    setServer(server) {
         this.server = server;
-    };
+    }
 
-    this.hide = function() {
+    hide() {
         if (this.container !== null) {
             this.container.visible = false;
             this.refreshCanvas();
         }
-    };
+    }
 
-    this.show = function(scale) {
+    show(scale) {
         this.scale = scale;
         this.page = 0;
         if (this.server) {
@@ -79,16 +81,16 @@ function PluginsViewer(canvas, stage, refreshCanvas, close, load) {
             );
             this.container.y = 27;
 
-            function processBackground(viewer, name, bitmap, extras) {
+            const processBackground = (viewer, name, bitmap, extras) => {
                 viewer.container.addChild(bitmap);
 
-                function processPrev(viewer, name, bitmap, extras) {
+                const processPrev = (viewer, name, bitmap, extras) => {
                     viewer.prev = bitmap;
                     viewer.container.addChild(viewer.prev);
                     viewer.prev.x = 270;
                     viewer.prev.y = 535;
 
-                    function processNext(viewer, name, bitmap, scale) {
+                    const processNext = (viewer, name, bitmap, scale) => {
                         viewer.next = bitmap;
                         viewer.container.addChild(viewer.next);
                         viewer.next.x = 325;
@@ -99,41 +101,20 @@ function PluginsViewer(canvas, stage, refreshCanvas, close, load) {
                         loadThumbnailContainerHandler(viewer);
                         return true;
                     }
-
-                    makeViewerBitmap(
-                        viewer,
-                        NEXTBUTTON,
-                        "viewer",
-                        processNext,
-                        null
-                    );
+                    makeViewerBitmap(viewer,NEXTBUTTON,"viewer",processNext,null);
                 }
-
-                makeViewerBitmap(
-                    viewer,
-                    PREVBUTTON,
-                    "viewer",
-                    processPrev,
-                    null
-                );
+                makeViewerBitmap(viewer,PREVBUTTON,"viewer",processPrev,null);
             }
-
-            makeViewerBitmap(
-                this,
-                BACKGROUND,
-                "viewer",
-                processBackground,
-                null
-            );
+            makeViewerBitmap(this,BACKGROUND,"viewer",processBackground,null);
         } else {
             this.container.visible = true;
             this.refreshCanvas();
             this.completeInit();
             return true;
         }
-    };
+    }
 
-    this.downloadImage = function(p, prepareNextImage) {
+    downloadImage(p, prepareNextImage) {
         let header = "data:image/svg+xml;utf8,";
         let name = this.pluginFiles[p] + ".svg";
         // console.debug('getting ' + name + ' from samples');
@@ -144,7 +125,7 @@ function PluginsViewer(canvas, stage, refreshCanvas, close, load) {
         let image = new Image();
         let viewer = this;
 
-        image.onload = function() {
+        image.onload = () => {
             bitmap = new createjs.Bitmap(data);
             bitmap.scaleX = 0.5;
             bitmap.scaleY = 0.5;
@@ -165,14 +146,14 @@ function PluginsViewer(canvas, stage, refreshCanvas, close, load) {
         };
 
         image.src = data;
-    };
+    }
 
-    this.completeInit = function() {
+    completeInit() {
         let p = 0;
         this.prepareNextImage(this, p);
-    };
+    }
 
-    this.prepareNextImage = function(viewer, p) {
+    prepareNextImage(viewer, p) {
         // TODO: this.pluginFiles.sort()
         // Only download the images on the first page.
         if (p < viewer.pluginFiles.length && p < viewer.page * 16 + 16) {
@@ -195,7 +176,7 @@ function PluginsViewer(canvas, stage, refreshCanvas, close, load) {
             }
             viewer.refreshCanvas();
         }
-    };
+    }
 }
 
 function hideCurrentPage(viewer) {
@@ -276,26 +257,26 @@ function loadThumbnailContainerHandler(viewer) {
 
     let locked = false;
 
-    viewer.container.on("click", function(event) {
+    viewer.container.on("click", (event) => {
         // We need a lock to "debouce" the click.
         if (locked) {
             console.debug("debouncing click");
             return;
         }
         locked = true;
-        setTimeout(function() {
+        setTimeout(() => {
             locked = false;
         }, 500);
         viewerClicked(viewer, event);
     });
 
-    viewer.container.on("mousedown", function(event) {
+    viewer.container.on("mousedown", (event) => {
         startX = event.stageX;
         startY = event.stageY;
         locked = true;
     });
 
-    viewer.container.on("pressup", function(event) {
+    viewer.container.on("pressup", (event) => {
         endX = event.stageX;
         endY = event.stageY;
         if (endY > startY + 30 || endX > startX + 30) {
@@ -319,7 +300,7 @@ function makeViewerBitmap(viewer, data, name, callback, extras) {
     // Async creation of bitmap from SVG data
     // Works with Chrome, Safari, Firefox (untested on IE)
     let img = new Image();
-    img.onload = function() {
+    img.onload = () => {
         bitmap = new createjs.Bitmap(img);
         callback(viewer, name, bitmap, extras);
     };

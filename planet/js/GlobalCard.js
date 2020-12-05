@@ -93,48 +93,47 @@ function GlobalCard(Planet) {
         // set number of likes
         frag.getElementById('global-project-likes-' + this.id).textContent = this.ProjectData.ProjectLikes.toString();
 
-        let that = this;
 
         // set view button listener
-        frag.getElementById('global-project-more-details-' + this.id).addEventListener('click', function (evt) {
-            Planet.GlobalPlanet.ProjectViewer.open(that.id);
+        frag.getElementById('global-project-more-details-' + this.id).addEventListener('click', (evt) => {
+            Planet.GlobalPlanet.ProjectViewer.open(this.id);
         });
 
         // set open button listener
-        frag.getElementById('global-project-open-' + this.id).addEventListener('click', function (evt) {
-            Planet.GlobalPlanet.openGlobalProject(that.id);
+        frag.getElementById('global-project-open-' + this.id).addEventListener('click', (evt) => {
+            Planet.GlobalPlanet.openGlobalProject(this.id);
         });
 
         // set image listener
-        frag.getElementById('global-project-image-' + this.id).addEventListener('click', function (evt) {
-            Planet.GlobalPlanet.ProjectViewer.open(that.id);
+        frag.getElementById('global-project-image-' + this.id).addEventListener('click', (evt) =>{
+            Planet.GlobalPlanet.ProjectViewer.open(this.id);
         });
 
         // set merge modify listener
-        frag.getElementById('global-project-merge-' + this.id).addEventListener('click', function (evt) {
-            Planet.GlobalPlanet.mergeGlobalProject(that.id);
+        frag.getElementById('global-project-merge-' + this.id).addEventListener('click', (evt) => {
+            Planet.GlobalPlanet.mergeGlobalProject(this.id);
         });
 
         // set share button listener
-        frag.getElementById('global-project-share-' + this.id).addEventListener('click', function (evt) {
-            let s = document.getElementById('global-sharebox-' + that.id);
+        frag.getElementById('global-project-share-' + this.id).addEventListener('click', (evt) => {
+            let s = document.getElementById('global-sharebox-' + this.id);
             if (s.style.display=='none') {
                 s.style.display = 'initial';
-                hideOnClickOutside([document.getElementById('global-share-' + that.id)], 'global-sharebox-' + that.id);
+                hideOnClickOutside([document.getElementById('global-share-' + this.id)], 'global-sharebox-' + this.id);
             } else {
                 s.style.display = 'none';
             }
         });
 
         // set share checkbox listener
-        frag.getElementById('global-checkboxrun-' + this.id).addEventListener('click', function (evt) {
-            updateCheckboxes('global-sharebox-' + that.id);
+        frag.getElementById('global-checkboxrun-' + this.id).addEventListener('click', (evt) => {
+            updateCheckboxes('global-sharebox-' + this.id);
         });
-        frag.getElementById('global-checkboxshow-' + this.id).addEventListener('click', function (evt) {
-            updateCheckboxes('global-sharebox-' + that.id);
+        frag.getElementById('global-checkboxshow-' + this.id).addEventListener('click', (evt) => {
+            updateCheckboxes('global-sharebox-' + this.id);
         });
-        frag.getElementById('global-checkboxcollapse-' + this.id).addEventListener('click', function (evt) {
-            updateCheckboxes('global-sharebox-' + that.id);
+        frag.getElementById('global-checkboxcollapse-' + this.id).addEventListener('click', (evt) => {
+            updateCheckboxes('global-sharebox-' + this.id);
         });
 
         // set like icon
@@ -144,12 +143,12 @@ function GlobalCard(Planet) {
             frag.getElementById('global-like-icon-' + this.id).textContent = 'favorite_border';
         }
 
-        frag.getElementById('global-like-icon-' + this.id).addEventListener('click', function (evt) {
-            that.like();
+        frag.getElementById('global-like-icon-' + this.id).addEventListener('click', (evt) => {
+            this.like();
         });
 
         document.getElementById('global-projects').appendChild(frag);
-        updateCheckboxes('global-sharebox-' + that.id);
+        updateCheckboxes('global-sharebox-' + this.id);
     };
 
     this.like = function() {
@@ -195,12 +194,12 @@ function GlobalCard(Planet) {
 
 function copyURLToClipboard() {
     let clipboard = new ClipboardJS('.copyshareurl');
-    clipboard.on('success', function (e) {
+    clipboard.on('success', (e) => {
         console.info('Copied:', e.text);
         e.clearSelection();
     });
 
-    clipboard.on('error', function (e) {
+    clipboard.on('error',  (e) => {
         alert("Failed to copy!");
         console.error('Failed to copy:', e.action);
     });
