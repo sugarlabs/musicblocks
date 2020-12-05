@@ -84,18 +84,17 @@ function Planet(isMusicBlocks, storage) {
         this.ServerInterface = new ServerInterface(this);
         this.ServerInterface.init();
 
-        let that = this;
 
-        document.getElementById('close-planet').addEventListener('click', function (evt) {
-            that.closeButton();
+        document.getElementById('close-planet').addEventListener('click', (evt) => {
+            this.closeButton();
         });
 
-        document.getElementById('planet-open-file').addEventListener('click', function (evt) {
-            that.loadProjectFromFile();
+        document.getElementById('planet-open-file').addEventListener('click', (evt) => {
+            this.loadProjectFromFile();
         });
 
-        document.getElementById('planet-new-project').addEventListener('click', function (evt) {
-            that.loadNewProject();
+        document.getElementById('planet-new-project').addEventListener('click', (evt) => {
+            this.loadNewProject();
         })
 
         this.ServerInterface.getTagManifest(function(data){this.initPlanets(data)}.bind(this));
