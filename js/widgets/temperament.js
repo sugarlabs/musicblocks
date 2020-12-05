@@ -1070,7 +1070,7 @@ function TemperamentWidget() {
     this.arbitraryEdit = function() {
         this.editMode = "arbitrary" ;        
         docById("userEdit").innerHTML = "";
-        var arbitraryEdit = docById("userEdit");
+        let arbitraryEdit = docById("userEdit");
         arbitraryEdit.innerHTML =
             '<br><div id="wheelDiv3" class="wheelNav"></div>';
         arbitraryEdit.style.paddingLeft = "0px";
@@ -1812,12 +1812,13 @@ function TemperamentWidget() {
         this._logo.blocks.loadNewBlocks(newStack1);
         this._logo.textMsg(_("New action block generated!"));
 
+        let number;
         if (isCustom(this.inTemperament)) {   
             TEMPERAMENT[this.inTemperament] = [];
             TEMPERAMENT[this.inTemperament]["pitchNumber"] = this.pitchNumber;
             updateTemperaments();
-            for (var i = 0; i < this.pitchNumber; i++) {
-                var number = "" + i;
+            for (let i = 0; i < this.pitchNumber; i++) {
+                number = "" + i;
                 TEMPERAMENT[this.inTemperament][number] = [
                     this.ratios[i],
                     this.notes[i].substring(0, this.notes[i].length - 1),

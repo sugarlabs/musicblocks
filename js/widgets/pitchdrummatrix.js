@@ -177,6 +177,7 @@ function PitchDrumMatrix() {
         let pdmTableRow;
         let labelCell;
         let pdmCell;
+	let pdmRow;
         let pdmCellTable;
         for (let i = 0; i < this.rowLabels.length; i++) {
             if (this.rowLabels[i].toLowerCase() === _("rest")) {
@@ -218,7 +219,7 @@ function PitchDrumMatrix() {
             pdmCellTable = docById("pdmCellTable" + j);
 
             // We'll use this element to put the clickable notes for this row.
-            var pdmRow = pdmCellTable.insertRow();
+            pdmRow = pdmCellTable.insertRow();
             pdmRow.setAttribute("id", "pdm" + j);
 
             j += 1;

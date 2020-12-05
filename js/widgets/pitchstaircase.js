@@ -88,7 +88,6 @@ function PitchStaircase() {
             let frequency = this.Stairs[i][2];
 
             // The play button for this row.
-            // var cell = stepTableRow.insertCell();
             let playCell = this._addButton(stepTableRow, "play-button.svg", ICONSIZE, _("Play"));
             playCell.className = "headcol"; // This cell is fixed horizontally.
             playCell.setAttribute("id", i);
