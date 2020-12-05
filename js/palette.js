@@ -16,7 +16,7 @@ const PALETTELEFTMARGIN = Math.floor(10 * PROTOBLOCKSCALE);
 const PALETTE_SCALE_FACTOR = 0.5;
 const PALETTE_WIDTH_FACTOR = 3;
 
-const paletteBlockButtonPush = (blocks, name, arg) => {
+function paletteBlockButtonPush(blocks, name, arg) {
     let blk = blocks.makeBlock(name, arg);
     return blk;
 }
@@ -122,7 +122,7 @@ class Palettes {
         }
     }
 
-    showSelection(i,tr){
+    showSelection(i,tr) {
         //selector menu design.
         for (let j = 0; j < MULTIPALETTES.length ; j++) {
             let img;
@@ -1266,7 +1266,7 @@ class Palette {
 
 }
 
-const initPalettes = async (palettes) => {
+async function initPalettes(palettes) {
     // Instantiate the palettes object on first load.
 
     for (let i = 0; i < BUILTINPALETTES.length; i++) {
@@ -1284,7 +1284,7 @@ const MODEDRAG = 1;
 const MODESCROLL = 2;
 const DECIDEDISTANCE = 20;
 
-const makePaletteIcons = (data,width,height) => {
+function makePaletteIcons(data,width,height) {
     let img = new Image();
     img.src =
     "data:image/svg+xml;base64," +
