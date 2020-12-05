@@ -38,10 +38,9 @@ function LocalPlanet(Planet) {
             }
         }
 
-        let that = this;
 
-        this.projects.sort(function(a, b) {
-            return that.ProjectTable[b[0]].DateLastModified - that.ProjectTable[a[0]].DateLastModified;
+        this.projects.sort((a, b) => {
+            return this.ProjectTable[b[0]].DateLastModified - this.ProjectTable[a[0]].DateLastModified;
 	});
     };
 
