@@ -179,7 +179,7 @@ class PluginsViewer {
     }
 }
 
-const hideCurrentPage = (viewer) => {
+function hideCurrentPage(viewer) {
     let min = viewer.page * 16;
     let max = Math.min(viewer.pluginFiles.length, (viewer.page + 1) * 16);
     // Hide the current page.
@@ -203,7 +203,7 @@ const hideCurrentPage = (viewer) => {
     viewer.refreshCanvas();
 }
 
-const showNextPage = (viewer) => {
+function showNextPage(viewer) {
     let min = viewer.page * 16;
     let max = Math.min(viewer.pluginFiles.length, (viewer.page + 1) * 16);
     // Hide the current page.
@@ -220,7 +220,7 @@ const showNextPage = (viewer) => {
     viewer.refreshCanvas();
 }
 
-const viewerClicked = (viewer, event) => {
+function viewerClicked(viewer, event) {
     let x = event.stageX / viewer.scale - viewer.container.x;
     let y = event.stageY / viewer.scale - viewer.container.y;
     if (x > 600 && y < 55) {
@@ -245,7 +245,7 @@ const viewerClicked = (viewer, event) => {
     }
 }
 
-const loadThumbnailContainerHandler = (viewer) => {
+function loadThumbnailContainerHandler(viewer) {
     let hitArea = new createjs.Shape();
     let w = 650;
     let h = 590;
@@ -296,7 +296,7 @@ const loadThumbnailContainerHandler = (viewer) => {
     });
 }
 
-const makeViewerBitmap = (viewer, data, name, callback, extras) => {
+function makeViewerBitmap(viewer, data, name, callback, extras) {
     // Async creation of bitmap from SVG data
     // Works with Chrome, Safari, Firefox (untested on IE)
     let img = new Image();
