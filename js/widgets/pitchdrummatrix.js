@@ -1,4 +1,4 @@
-// Copyright (c) 2016-19 Walter Bender
+// Copyright (c) 2016-20 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -70,8 +70,8 @@ function PitchDrumMatrix() {
     };
 
     this.addNode = function(pitchBlock, drumBlock) {
-        for (var i = 0; i < this._blockMap.length; i++) {
-            var obj = this._blockMap[i];
+        for (let i = 0; i < this._blockMap.length; i++) {
+            let obj = this._blockMap[i];
             if (obj[0] === pitchBlock && obj[1] === drumBlock) {
                 return; // node is already in the list
             }
@@ -80,8 +80,8 @@ function PitchDrumMatrix() {
     };
 
     this.removeNode = function(pitchBlock, drumBlock) {
-        for (var i = 0; i < this._blockMap.length; i++) {
-            var obj = this._blockMap[i];
+        for (let i = 0; i < this._blockMap.length; i++) {
+            let obj = this._blockMap[i];
             if (obj[0] === pitchBlock && obj[1] === drumBlock) {
                 this._blockMap[i] = [-1, -1]; // Mark as removed
             }
@@ -98,17 +98,17 @@ function PitchDrumMatrix() {
         // object model)
         this._logo = logo;
 
-        var w = window.innerWidth;
+        let w = window.innerWidth;
         this._cellScale = w / 1200;
-        var iconSize = ICONSIZE * this._cellScale;
+        let iconSize = ICONSIZE * this._cellScale;
 
-        var widgetWindow = window.widgetWindows.windowFor(this, "pitch drum");
+        let widgetWindow = window.widgetWindows.windowFor(this, "pitch drum");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
-	widgetWindow.show();
+        widgetWindow.show();
 
         // For the button callbacks
-        var that = this;
+        let that = this;
 
         widgetWindow.onclose = function() {
             pdmTableDiv.style.visibility = "hidden";
@@ -149,22 +149,13 @@ function PitchDrumMatrix() {
             that._clear();
         };
 
-        // var cell = this._addButton(row,'close-button.svg', ICONSIZE, _('Close'));
-
-        // cell.onclick=function() {
-        //     pdmDiv.style.visibility = 'hidden';
-        //     pdmButtonsDiv.style.visibility = 'hidden';
-        //     pdmTableDiv.style.visibility = 'hidden';
-        //     that._logo.hideMsgs();
-        // }
-
         this.pitchDrumDiv = document.createElement("div");
         widgetWindow.getWidgetBody().append(this.pitchDrumDiv);
         widgetWindow.getWidgetBody().style.height = "300px";
         widgetWindow.getWidgetBody().style.width = "300px";
 
         // The pdm table
-        var pdmTableDiv = this.pitchDrumDiv;
+        let pdmTableDiv = this.pitchDrumDiv;
         pdmTableDiv.style.display = "inline";
         pdmTableDiv.style.visibility = "visible";
         pdmTableDiv.style.border = "0px";
@@ -177,17 +168,19 @@ function PitchDrumMatrix() {
 
         // Each row in the pdm table contains a note label in the
         // first column and a table of buttons in the second column.
-        var pdmTable = docById("pdmTable");
-
-        var j = 0;
-        for (var i = 0; i < this.rowLabels.length; i++) {
+        let pdmTable = docById("pdmTable");
+        let pdmTableRow;
+        let labelCell;
+        let pdmCell;
+        let j = 0;
+        for (let i = 0; i < this.rowLabels.length; i++) {
             if (this.rowLabels[i].toLowerCase() === _("rest")) {
                 // In case there are rest notes included.
                 this._rests += 1;
                 continue;
             }
 
-            var drumName = getDrumName(this.rowLabels[i]);
+            let drumName = getDrumName(this.rowLabels[i]);
 
             if (drumName != null) {
                 // if it is a drum, we'll make it a column below.
@@ -195,10 +188,10 @@ function PitchDrumMatrix() {
                 continue;
             }
 
-            var pdmTableRow = pdmTable.insertRow();
+            pdmTableRow = pdmTable.insertRow();
 
             // A cell for the row label
-            var labelCell = pdmTableRow.insertCell();
+            labelCell = pdmTableRow.insertCell();
             labelCell.style.backgroundColor = platformColor.labelColor;
             labelCell.style.fontSize = this._cellScale * 100 + "%";
             labelCell.style.height =
@@ -211,24 +204,24 @@ function PitchDrumMatrix() {
             labelCell.innerHTML =
                 this.rowLabels[j] + this.rowArgs[j].toString().sub();
 
-            var pdmCell = pdmTableRow.insertCell();
+            pdmCell = pdmTableRow.insertCell();
             // Create tables to store individual notes.
             pdmCell.innerHTML =
                 '<table cellpadding="0px" id="pdmCellTable' +
                 j +
                 '"><tr></tr></table>';
-            var pdmCellTable = docById("pdmCellTable" + j);
+            let pdmCellTable = docById("pdmCellTable" + j);
 
             // We'll use this element to put the clickable notes for this row.
-            var pdmRow = pdmCellTable.insertRow();
+            let pdmRow = pdmCellTable.insertRow();
             pdmRow.setAttribute("id", "pdm" + j);
 
             j += 1;
         }
 
         // An extra row for the note and tuplet values
-        var pdmTableRow = pdmTable.insertRow();
-        var labelCell = pdmTableRow.insertCell();
+        pdmTableRow = pdmTable.insertRow();
+        labelCell = pdmTableRow.insertCell();
         labelCell.style.backgroundColor = platformColor.labelColor;
         labelCell.style.fontSize = this._cellScale * 100 + "%";
         labelCell.style.height =
@@ -241,11 +234,12 @@ function PitchDrumMatrix() {
         labelCell.className = "headcol";
         labelCell.innerHTML = "";
 
-        var n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
-        var outerDiv = docById("pdmOuterDiv");
+        let n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
+        let outerDiv = docById("pdmOuterDiv");
+        let ow;
         if (pdmTable.rows.length + 2 > n) {
             outerDiv.style.height = window.innerHeight / 2 + "px";
-            var ow = Math.max(
+            ow = Math.max(
                 Math.min(
                     window.innerWidth / 2,
                     this._cellScale *
@@ -261,7 +255,7 @@ function PitchDrumMatrix() {
                     MATRIXSOLFEHEIGHT *
                     (pdmTable.rows.length + 3) +
                 "px";
-            var ow = Math.max(
+            ow = Math.max(
                 Math.min(
                     window.innerWidth / 2,
                     this._cellScale *
@@ -274,21 +268,21 @@ function PitchDrumMatrix() {
 
         outerDiv.style.width = ow + "px";
 
-        var innerDiv = docById("pdmInnerDiv");
-        var iw = Math.min(
+        let innerDiv = docById("pdmInnerDiv");
+        let iw = Math.min(
             ow - 100,
             this._cellScale * this.drums.length * (DRUMNAMEWIDTH + 2)
         );
         innerDiv.style.width = iw + "px";
         innerDiv.style.marginLeft = BUTTONSIZE * this._cellScale + "px";
 
-        var pdmCell = pdmTableRow.insertCell();
+        pdmCell = pdmTableRow.insertCell();
         // Create table to store drum names.
         pdmCell.innerHTML =
             '<table cellpadding="0px" id="pdmDrumTable"><tr></tr></table>';
 
         // Add any drum blocks here.
-        for (var i = 0; i < this.drums.length; i++) {
+        for (let i = 0; i < this.drums.length; i++) {
             this._addDrum(i);
         }
 
@@ -316,7 +310,7 @@ function PitchDrumMatrix() {
     };
 
     this._addButton = function(row, icon, iconSize, label) {
-        var cell = row.insertCell(-1);
+        let cell = row.insertCell(-1);
         cell.innerHTML =
             '&nbsp;&nbsp;<img src="header-icons/' +
             icon +
@@ -349,12 +343,15 @@ function PitchDrumMatrix() {
     };
 
     this._addDrum = function(drumIdx) {
-        var drumname = this.drums[drumIdx];
-        var pdmTable = docById("pdmTable");
-        for (var i = 0; i < pdmTable.rows.length - 1; i++) {
-            var table = docById("pdmCellTable" + i);
-            var row = table.rows[0];
-            var cell = row.insertCell();
+        let drumname = this.drums[drumIdx];
+        let pdmTable = docById("pdmTable");
+        let table;
+        let row;
+        let cell;
+        for (let i = 0; i < pdmTable.rows.length - 1; i++) {
+            table = docById("pdmCellTable" + i);
+            row = table.rows[0];
+            cell = row.insertCell();
             cell.style.height =
                 Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
             cell.width = DRUMNAMEWIDTH;
@@ -380,9 +377,9 @@ function PitchDrumMatrix() {
             cell.setAttribute("id", i + "," + drumIdx); // row,column
         }
 
-        var drumTable = docById("pdmDrumTable");
-        var row = drumTable.rows[0];
-        var cell = row.insertCell();
+        let drumTable = docById("pdmDrumTable");
+        row = drumTable.rows[0];
+        cell = row.insertCell();
         cell.height =
             Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
         cell.width = DRUMNAMEWIDTH;
@@ -396,7 +393,7 @@ function PitchDrumMatrix() {
         cell.setAttribute("id", drumIdx); // Column // row.cells.length - 1);
 
         // Work around i8n bug in Firefox.
-        var name = getDrumName(drumname);
+        let name = getDrumName(drumname);
         if (name === "") {
             name = drumname;
         }
@@ -419,22 +416,27 @@ function PitchDrumMatrix() {
     this.makeClickable = function() {
         // Once the entire matrix is generated, this function makes it
         // clickable.
-        var pdmTable = docById("pdmTable");
-        var drumTable = docById("pdmDrumTable");
+        let pdmTable = docById("pdmTable");
+        let drumTable = docById("pdmDrumTable");
+        let table;
+        let cellRow;
+        let cell;
+        let drumRow;
+        let drumCell;
+        let that = this;
 
-        for (var i = 0; i < pdmTable.rows.length - 1; i++) {
-            var table = docById("pdmCellTable" + i);
-            var cellRow = table.rows[0];
-            var that = this;
+        for (let i = 0; i < pdmTable.rows.length - 1; i++) {
+            table = docById("pdmCellTable" + i);
+            cellRow = table.rows[0];
 
-            for (var j = 0; j < cellRow.cells.length; j++) {
+            for (let j = 0; j < cellRow.cells.length; j++) {
                 cell = cellRow.cells[j];
 
-                var drumRow = drumTable.rows[0];
-                var drumCell = drumRow.cells[j];
+                drumRow = drumTable.rows[0];
+                drumCell = drumRow.cells[j];
 
                 cell.onclick = function() {
-                    var rowcol = this.id.split(",");
+                    let rowcol = this.id.split(",");
                     if (this.style.backgroundColor === "black") {
                         this.style.backgroundColor =
                             platformColor.selectorBackground;
@@ -449,13 +451,15 @@ function PitchDrumMatrix() {
 
         // Mark any cells found in the blockMap from previous
         // instances of the matrix.
-        for (var i = 0; i < this._blockMap.length; i++) {
-            var obj = this._blockMap[i];
+        let row;
+        let col;
+        for (let i = 0; i < this._blockMap.length; i++) {
+            let obj = this._blockMap[i];
             if (obj[0] !== -1) {
                 // Look for this note in the pitch and drum blocks.
-                var row = this._rowBlocks.indexOf(obj[0]);
-                var col = -1;
-                for (var j = 0; j < this._colBlocks.length; j++) {
+                row = this._rowBlocks.indexOf(obj[0]);
+                col = -1;
+                for (let j = 0; j < this._colBlocks.length; j++) {
                     if (this._colBlocks[j] === obj[1]) {
                         col = j;
                         break;
@@ -468,10 +472,10 @@ function PitchDrumMatrix() {
 
                 // If we found a match, mark this cell and add this
                 // note to the play list.
-                var table = docById("pdmCellTable" + row);
-                var cellRow = table.rows[0];
+                table = docById("pdmCellTable" + row);
+                cellRow = table.rows[0];
 
-                var cell = cellRow.cells[col];
+                cell = cellRow.cells[col];
 
                 if (cell != undefined) {
                     cell.style.backgroundColor = "black";
@@ -485,15 +489,18 @@ function PitchDrumMatrix() {
         // Play all of the pitch/drum combinations in the matrix.
         this._logo.synth.stop();
 
-        var pairs = [];
+        let pairs = [];
+        let table;
+        let row;
+        let cell;
 
         // For each row (pitch), look for a drum.
-        var pdmTable = docById("pdmTable");
-        for (var i = 0; i < pdmTable.rows.length - 1; i++) {
-            var table = docById("pdmCellTable" + i);
-            var row = table.rows[0];
-            for (var j = 0; j < row.cells.length; j++) {
-                var cell = row.cells[j];
+        let pdmTable = docById("pdmTable");
+        for (let i = 0; i < pdmTable.rows.length - 1; i++) {
+            table = docById("pdmCellTable" + i);
+            row = table.rows[0];
+            for (let j = 0; j < row.cells.length; j++) {
+                cell = row.cells[j];
                 if (cell.style.backgroundColor === "black") {
                     pairs.push([i, j]);
                     break;
@@ -505,7 +512,7 @@ function PitchDrumMatrix() {
             }
         }
 
-        var i = 0;
+        let i = 0;
         if (i < pairs.length) {
             this._playPitchDrum(i, pairs);
         }
@@ -513,18 +520,21 @@ function PitchDrumMatrix() {
 
     this._playPitchDrum = function(i, pairs) {
         // Find the drum cell
-        var drumTable = docById("pdmDrumTable");
-        var row = drumTable.rows[0];
-        var drumCell = row.cells[i];
+        let drumTable = docById("pdmDrumTable");
+        let row = drumTable.rows[0];
+        let drumCell = row.cells[i];
 
-        var pdmTable = docById("pdmTable");
-        var table = docById("pdmCellTable" + i);
-        var row = table.rows[0];
-        var cell = row.cells[i];
+        let pdmTable = docById("pdmTable");
+        let table = docById("pdmCellTable" + i);
+        row = table.rows[0];
+        let cell = row.cells[i];
 
-        var pdmTable = docById("pdmTable");
-        var pdmTableRow = pdmTable.rows[i];
-        var pitchCell = pdmTableRow.cells[0];
+        pdmTable = docById("pdmTable");
+        let pdmTableRow = pdmTable.rows[i];
+        let pitchCell = pdmTableRow.cells[0];
+
+        let that = this;
+
         pitchCell.style.backgroundColor = platformColor.selectorBackground;
 
         if (pairs[i][1] !== -1) {
@@ -532,16 +542,15 @@ function PitchDrumMatrix() {
         }
 
         if (i < pairs.length - 1) {
-            var that = this;
             setTimeout(function() {
-                var ii = i + 1;
+                let ii = i + 1;
                 that._playPitchDrum(ii, pairs);
             }, 1000);
         } else {
             setTimeout(function() {
-                for (var i = 0; i < pdmTable.rows.length - 1; i++) {
-                    var pdmTableRow = pdmTable.rows[i];
-                    var pitchCell = pdmTableRow.cells[0];
+                for (let j = 0; j < pdmTable.rows.length - 1; j++) {
+                    let pdmTableRow = pdmTable.rows[j];
+                    let pitchCell = pdmTableRow.cells[0];
                     pitchCell.style.backgroundColor = platformColor.labelColor;
                 }
             }, 1000);
@@ -551,34 +560,38 @@ function PitchDrumMatrix() {
     this._setCellPitchDrum = function(colIndex, rowIndex, playNote) {
         // Sets corresponding pitch/drum when user clicks on any cell and
         // plays them.
-        var coli = Number(colIndex);
-        var rowi = Number(rowIndex);
+        let coli = Number(colIndex);
+        let rowi = Number(rowIndex);
 
         // Find the drum cell
-        var drumTable = docById("pdmDrumTable");
-        var row = drumTable.rows[0];
-        var drumCell = row.cells[coli];
+        let drumTable = docById("pdmDrumTable");
+        let row = drumTable.rows[0];
+        let drumCell = row.cells[coli];
 
-        var pdmTable = docById("pdmTable");
-        var table = docById("pdmCellTable" + rowi);
-        var row = table.rows[0];
+        let pdmTable = docById("pdmTable");
+        let table = docById("pdmCellTable" + rowi);
+        row = table.rows[0];
+
+        let pitchBlock;
+        let drumBlock;
+        let obj;
 
         // For the moment, we can only have one drum per pitch, so
         // clear the row.
         if (playNote) {
-            for (var i = 0; i < row.cells.length; i++) {
+            for (let i = 0; i < row.cells.length; i++) {
                 if (i === coli) {
                     continue;
                 }
 
                 cell = row.cells[i];
                 if (cell.style.backgroundColor === "black") {
-                    var pitchBlock = this._rowBlocks[rowi];
-                    var drumBlock = this._colBlocks[i];
+                    pitchBlock = this._rowBlocks[rowi];
+                    drumBlock = this._colBlocks[i];
                     this.removeNode(pitchBlock, drumBlock);
                     cell.style.backgroundColor =
                         platformColor.selectorBackground;
-                    var obj = cell.id.split(","); // row,column
+                    obj = cell.id.split(","); // row,column
                     this._setCellPitchDrum(
                         Number(obj[0]),
                         Number(obj[1]),
@@ -588,8 +601,8 @@ function PitchDrumMatrix() {
             }
         }
 
-        var pitchBlock = this._rowBlocks[rowi];
-        var drumBlock = this._colBlocks[coli];
+        pitchBlock = this._rowBlocks[rowi];
+        drumBlock = this._colBlocks[coli];
 
         if (playNote) {
             this.addNode(pitchBlock, drumBlock);
@@ -598,9 +611,9 @@ function PitchDrumMatrix() {
         }
 
         // if (table !== null) {
-        var table = docById("pdmCellTable" + rowi);
-        var row = table.rows[0];
-        for (var i = 0; i < row.cells.length; i++) {
+        table = docById("pdmCellTable" + rowi);
+        row = table.rows[0];
+        for (let i = 0; i < row.cells.length; i++) {
             cell = row.cells[i];
             if (cell.style.backgroundColor === "black") {
                 this._setPairCell(rowi, i, cell, playNote);
@@ -610,17 +623,17 @@ function PitchDrumMatrix() {
     };
 
     this._setPairCell = function(rowIndex, colIndex, cell, playNote) {
-        var pdmTable = docById("pdmTable");
-        var row = pdmTable.rows[rowIndex];
-        var solfegeHTML = row.cells[0].innerHTML;
+        let pdmTable = docById("pdmTable");
+        let row = pdmTable.rows[rowIndex];
+        let solfegeHTML = row.cells[0].innerHTML;
 
-        var drumTable = docById("pdmDrumTable");
-        var row = drumTable.rows[0];
-        var drumHTML = row.cells[colIndex].innerHTML.split('"');
-        var drumName = getDrumSynthName(drumHTML[3]);
+        let drumTable = docById("pdmDrumTable");
+        row = drumTable.rows[0];
+        let drumHTML = row.cells[colIndex].innerHTML.split('"');
+        let drumName = getDrumSynthName(drumHTML[3]);
 
         // Both solfege and octave are extracted from HTML by getNote.
-        var noteObj = getNote(
+        let noteObj = getNote(
             solfegeHTML,
             -1,
             0,
@@ -629,15 +642,16 @@ function PitchDrumMatrix() {
             null,
             this._logo.errorMsg
         );
-        var note = noteObj[0] + noteObj[1];
+
+        let note = noteObj[0] + noteObj[1];
+        let that = this;
 
         if (playNote) {
-            var waitTime = Singer.defaultBPMFactor * 1000 * 0.25;
+            let waitTime = Singer.defaultBPMFactor * 1000 * 0.25;
             this._logo.synth.trigger(
                 0, note.replace(/♭/g, "b").replace(/♯/g, "#"), 0.125, "default", null, null
             );
 
-            var that = this;
             setTimeout(function() {
                 that._logo.synth.trigger(0, "C2", 0.125, drumName, null, null);
             }, waitTime);
@@ -646,13 +660,16 @@ function PitchDrumMatrix() {
 
     this._clear = function() {
         // "Unclick" every entry in the matrix.
-        var pdmTable = docById("pdmTable");
+        let pdmTable = docById("pdmTable");
+        let table;
+        let row;
+        let cell;
 
-        for (var i = 0; i < pdmTable.rows.length - 1; i++) {
-            var table = docById("pdmCellTable" + i);
-            var row = table.rows[0];
-            for (var j = 0; j < row.cells.length; j++) {
-                var cell = row.cells[j];
+        for (let i = 0; i < pdmTable.rows.length - 1; i++) {
+            table = docById("pdmCellTable" + i);
+            row = table.rows[0];
+            for (let j = 0; j < row.cells.length; j++) {
+                cell = row.cells[j];
                 if (cell.style.backgroundColor === "black") {
                     cell.style.backgroundColor =
                         platformColor.selectorBackground;
@@ -667,22 +684,26 @@ function PitchDrumMatrix() {
         // set drum and pitch blocks.
 
         // First, hide the palettes as they will need updating.
-        for (var name in this._logo.blocks.palettes.dict) {
+        for (let name in this._logo.blocks.palettes.dict) {
             this._logo.blocks.palettes.dict[name].hideMenu(true);
         }
         this._logo.refreshCanvas();
 
-        var pairs = [];
+        let pairs = [];
 
-        var pdmTable = docById("pdmTable");
-        var drumTable = docById("pdmDrumTable");
+        let pdmTable = docById("pdmTable");
+        let drumTable = docById("pdmDrumTable");
+        let table;
+        let row;
+        let col;
+        let cell;
 
         // For each row (pitch), look for a drum.
-        for (var i = 0; i < pdmTable.rows.length - 1; i++) {
-            var table = docById("pdmCellTable" + i);
-            var row = table.rows[0];
-            for (var j = 0; j < row.cells.length; j++) {
-                var cell = row.cells[j];
+        for (let i = 0; i < pdmTable.rows.length - 1; i++) {
+            table = docById("pdmCellTable" + i);
+            row = table.rows[0];
+            for (let j = 0; j < row.cells.length; j++) {
+                cell = row.cells[j];
                 if (cell.style.backgroundColor === "black") {
                     pairs.push([i, j]);
                     continue;
@@ -694,25 +715,32 @@ function PitchDrumMatrix() {
             return;
         }
 
-        var newStack = [
+        let newStack = [
             [0, ["action", { collapsed: true }], 100, 100, [null, 1, 2, null]],
             [1, ["text", { value: "drums" }], 0, 0, [0]]
         ];
-        var endOfStackIdx = 0;
-        var previousBlock = 0;
+        let endOfStackIdx = 0;
+        let previousBlock = 0;
 
-        for (var i = 0; i < pairs.length; i++) {
-            var row = pairs[i][0];
-            var col = pairs[i][1];
+        let cellRow;
+        let solfegeHTML;
+        let drumRow;
+        let drumHTML;
+        let drumName;
+        let noteObj;
 
-            var cellRow = pdmTable.rows[row];
-            var solfegeHTML = cellRow.cells[0].innerHTML;
+        for (let i = 0; i < pairs.length; i++) {
+            row = pairs[i][0];
+            col = pairs[i][1];
 
-            var drumRow = drumTable.rows[0];
-            var drumHTML = drumRow.cells[col].innerHTML.split('"');
-            var drumName = getDrumSynthName(drumHTML[3]);
+            cellRow = pdmTable.rows[row];
+            solfegeHTML = cellRow.cells[0].innerHTML;
+
+            drumRow = drumTable.rows[0];
+            drumHTML = drumRow.cells[col].innerHTML.split('"');
+            drumName = getDrumSynthName(drumHTML[3]);
             // Both solfege and octave are extracted from HTML by getNote.
-            var noteObj = getNote(
+            noteObj = getNote(
                 solfegeHTML,
                 -1,
                 0,
@@ -721,16 +749,16 @@ function PitchDrumMatrix() {
                 null,
                 this._logo.errorMsg
             );
-            var pitch = noteObj[0];
-            var octave = noteObj[1];
+            let pitch = noteObj[0];
+            let octave = noteObj[1];
 
             // Add the set drum block and its value
-            var mapdrumidx = newStack.length;
-            var drumnameidx = mapdrumidx + 1;
-            var pitchidx = mapdrumidx + 2;
-            var notenameidx = mapdrumidx + 3;
-            var octaveidx = mapdrumidx + 4;
-            var hiddenidx = mapdrumidx + 5;
+            let mapdrumidx = newStack.length;
+            let drumnameidx = mapdrumidx + 1;
+            let pitchidx = mapdrumidx + 2;
+            let notenameidx = mapdrumidx + 3;
+            let octaveidx = mapdrumidx + 4;
+            let hiddenidx = mapdrumidx + 5;
 
             newStack.push([
                 mapdrumidx,
@@ -780,7 +808,7 @@ function PitchDrumMatrix() {
                 ]);
             }
 
-            var previousBlock = hiddenidx;
+            previousBlock = hiddenidx;
         }
 
         // Create a new stack for the chunk.
