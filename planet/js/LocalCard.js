@@ -95,54 +95,54 @@ function LocalCard(Planet){
         let that = this;
 
         // set edit modify listener
-        frag.getElementById('local-project-edit-' + this.id).addEventListener('click', function (evt) {
-            Planet.LocalPlanet.openProject(that.id);
+        frag.getElementById('local-project-edit-' + this.id).addEventListener('click',  (evt) => {
+            Planet.LocalPlanet.openProject(this.id);
         });
 
         // set image listener
-        frag.getElementById('local-project-image-' + this.id).addEventListener('click', function (evt) {
-            Planet.LocalPlanet.openProject(that.id);
+        frag.getElementById('local-project-image-' + this.id).addEventListener('click', (evt) => {
+            Planet.LocalPlanet.openProject(this.id);
         });
 
         // set merge modify listener
-        frag.getElementById('local-project-merge-' + this.id).addEventListener('click', function (evt) {
-            Planet.LocalPlanet.openProject(that.id);
+        frag.getElementById('local-project-merge-' + this.id).addEventListener('click', (evt) => {
+            Planet.LocalPlanet.openProject(this.id);
         });
 
         // set input modify listener
-        frag.getElementById('local-project-input-' + this.id).addEventListener('input', function (evt) {
-            Planet.ProjectStorage.renameProject(that.id, this.value);
+        frag.getElementById('local-project-input-' + this.id).addEventListener('input', (evt) => {
+            Planet.ProjectStorage.renameProject(this.id, frag.getElementById('local-project-input-' + this.id).value);
         });
 
         // set delete button listener
-        frag.getElementById('local-project-delete-' + this.id).addEventListener('click', function (evt) {
-            Planet.LocalPlanet.openDeleteModal(that.id);
+        frag.getElementById('local-project-delete-' + this.id).addEventListener('click', (evt) => {
+            Planet.LocalPlanet.openDeleteModal(this.id);
         });
                 
         // set publish button listener
-        frag.getElementById('local-project-publish-' + this.id).addEventListener('click', function (evt) {
-            Planet.LocalPlanet.Publisher.open(that.id);
+        frag.getElementById('local-project-publish-' + this.id).addEventListener('click', (evt) => {
+            Planet.LocalPlanet.Publisher.open(this.id);
         });
 
         // set download button listener
-        frag.getElementById('local-project-download-' + this.id).addEventListener('click', function (evt) {
-            that.download();
+        frag.getElementById('local-project-download-' + this.id).addEventListener('click', (evt) => {
+            this.download();
         });
 
         // set duplicate button listener
-        frag.getElementById('local-project-duplicate-' + this.id).addEventListener('click', function (evt) {
-            that.duplicate();
+        frag.getElementById('local-project-duplicate-' + this.id).addEventListener('click', (evt) => {
+            this.duplicate();
         });
 
         // set share button listener
-        frag.getElementById('local-project-share-' + this.id).addEventListener('click', function (evt) {
-            let s = document.getElementById('sharebox-' + that.id);
+        frag.getElementById('local-project-share-' + this.id).addEventListener('click', (evt) => {
+            let s = document.getElementById('sharebox-' + this.id);
             if (s.style.display === 'none') {
-                if (that.ProjectData.PublishedData !== null) {
+                if (this.ProjectData.PublishedData !== null) {
                     s.style.display = 'initial';
-                    hideOnClickOutside([document.getElementById('share-' + that.id)], 'sharebox-' + that.id);
+                    hideOnClickOutside([document.getElementById('share-' + this.id)], 'sharebox-' + this.id);
                 } else {
-                    Planet.LocalPlanet.Publisher.open(that.id, true);
+                    Planet.LocalPlanet.Publisher.open(this.id, true);
                 }
             } else {
                 s.style.display = 'none';
@@ -150,16 +150,16 @@ function LocalCard(Planet){
         });
 
         // set share checkbox listener
-        frag.getElementById('checkboxrun-' + this.id).addEventListener('click', function (evt) {
-            updateCheckboxes('sharebox-' + that.id);
+        frag.getElementById('checkboxrun-' + this.id).addEventListener('click', (evt) => {
+            updateCheckboxes('sharebox-' + this.id);
         });
 
-        frag.getElementById('checkboxshow-' + this.id).addEventListener('click', function (evt) {
-            updateCheckboxes('sharebox-' + that.id);
+        frag.getElementById('checkboxshow-' + this.id).addEventListener('click', (evt) => {
+            updateCheckboxes('sharebox-' + this.id);
         });
 
-        frag.getElementById('checkboxcollapse-' + this.id).addEventListener('click', function (evt) {
-            updateCheckboxes('sharebox-' + that.id);
+        frag.getElementById('checkboxcollapse-' + this.id).addEventListener('click', (evt) => {
+            updateCheckboxes('sharebox-' + this.id);
         });
 
         // set published cloud listener
@@ -168,14 +168,14 @@ function LocalCard(Planet){
             frag.getElementById('local-project-cloud-' + this.id).addEventListener('click', function (evt) {
                 // TODO: Implement view-published-project thing
                 document.getElementById('global-tab').click();
-                Planet.GlobalPlanet.forceAddToCache(that.id, function() {
-                    Planet.GlobalPlanet.ProjectViewer.open(that.id);
+                Planet.GlobalPlanet.forceAddToCache(this.id, () => {
+                    Planet.GlobalPlanet.ProjectViewer.open(LocalCard.id);
                 });
             });
         }
 
         document.getElementById('local-projects').appendChild(frag);
-        updateCheckboxes('sharebox-' + that.id);
+        updateCheckboxes('sharebox-' + this.id);
     };
 
     this.init = function(id) {
