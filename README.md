@@ -44,7 +44,7 @@ vanilla _JavaScript_. This means that most of the functionality can be accessed 
 
 However, using so, some functionality will not be available. On top of that, some web browsers
 (e.g., Firefox v68) have restrictions that prevent Music Blocks from running using `file:///`.
-Therefore it is best to launch a _local web server_ from the directory of Music Blocks.
+Therefore, it is best to launch a _local web server_ from the directory of Music Blocks.
 
 1. [Download](https://github.com/sugarlabs/musicblocks/archive/master.zip) Music Blocks, or clone
 (`https://github.com/sugarlabs/musicblocks.git` for _HTTPS_, or
@@ -59,10 +59,18 @@ some older Linux systems, the `python3` command is not bound to python. You may 
 `sudo apt install python-is-python3` on Debian-like distros, or equivalent on others.
 
 4. After cloning the musicblocks repository, run
-`python -c \"import os, sys; os.system('python -m SimpleHTTPServer 3000 --bind 127.0.0.1') if sys.version_info.major==2 else os.system('python -m http.server 3000 --bind 127.0.0.1');`
-on Linux or macOS, and
-`py -c \"import os, sys; os.system('py -m SimpleHTTPServer 3000') if sys.version_info.major==2 else os.system('py -m http.server 3000 --bind 127.0.0.1');`
-for Windows.
+
+    for _Linux_ and _macOS_:
+
+    ```bash
+    python -c \"import os, sys; os.system('python -m SimpleHTTPServer 3000 --bind 127.0.0.1') if sys.version_info.major==2 else os.system('python -m http.server 3000 --bind 127.0.0.1');
+    ```
+
+    for _Windows_:
+
+    ```bash
+    py -c \"import os, sys; os.system('py -m SimpleHTTPServer 3000') if sys.version_info.major==2 else os.system('py -m http.server 3000 --bind 127.0.0.1');
+    ```
 
     If you have `npm` installed, simply run `npm run serve` for Linux and macOS, and
     `npm run winserve` for Windows.
@@ -161,6 +169,11 @@ isn't ready for merging.
 ask it in a comment. If it is a general question about Music Blocks, please use the
 _Sugar-dev Devel <[sugar-devel@lists.sugarlabs.org](mailto:sugar-devel@lists.sugarlabs.org)>_
 mailing list.
+
+9. Work on things that matter. Follow three milestones: `Port Ready`, `Migration`, and `Future`.
+Those tagged `Port Ready` are priority. Those tagged with `Migration` will be taken care of during
+or after the foundation rebuild. Feel free to participate in the conversation, adding valuable
+comments. Those tagged with `Future` need not be addressed presently.
 
 _Please note there is no need to ask permission to work on an issue. You should check for pull
 requests linked to an issue you are addressing; if there are none, then assume nobody has done
