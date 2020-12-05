@@ -92,7 +92,6 @@ function LocalCard(Planet){
         // set input text
         frag.getElementById('local-project-input-' + this.id).value = this.ProjectData.ProjectName;
 
-        let that = this;
 
         // set edit modify listener
         frag.getElementById('local-project-edit-' + this.id).addEventListener('click',  (evt) => {
