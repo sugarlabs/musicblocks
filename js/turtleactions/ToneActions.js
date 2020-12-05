@@ -55,8 +55,13 @@ function setupToneActions() {
                 logo.synth.loadSynth(turtle, synth);
 
                 if (tur.singer.synthVolume[synth] === undefined) {
-                    tur.singer.synthVolume[synth] = [last(Singer.masterVolume)];
-                    tur.singer.crescendoInitialVolume[synth] = [last(Singer.masterVolume)];
+                    // The electronic synthvolume will track any
+                    // changes to the mater volume, e.g., the
+                    // articulation block.
+                    tur.singer.synthVolume[synth] =
+                        [last(tur.singer.synthVolume["electronic synth"])];
+                    tur.singer.crescendoInitialVolume[synth] =
+                        [last(tur.singer.synthVolume["electronic synth"])];
                 }
             }
 

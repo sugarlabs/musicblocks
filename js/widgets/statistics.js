@@ -20,11 +20,11 @@ function StatsWindow() {
         this._logo = logo;
         this.isOpen = true;
 
-        var w = window.innerWidth;
+        let w = window.innerWidth;
         this._cellScale = w / 1200;
-        var iconSize = ICONSIZE * this._cellScale;
+        let iconSize = ICONSIZE * this._cellScale;
 
-        var widgetWindow = window.widgetWindows.windowFor(
+        let widgetWindow = window.widgetWindows.windowFor(
             this,
             "stats",
             "stats"
@@ -33,7 +33,7 @@ function StatsWindow() {
         widgetWindow.clear();
 	    widgetWindow.show();
 
-        var that = this;
+        let that = this;
 
         widgetWindow.onclose = function() {
             that.isOpen = false;

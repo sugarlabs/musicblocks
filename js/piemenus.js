@@ -1386,16 +1386,12 @@ piemenuNoteValue = function(block, noteValue) {
         block._tabsWheel.navigateWheel(0);
     } else {
         for (let i = 0; i < WHEELVALUES.length; i++) {
-            for (
-                let j = 0;
-                j < subWheelValues[WHEELVALUES[i]].length;
-                j++
-            ) {
+	    let j;
+            for (j = 0; j < subWheelValues[WHEELVALUES[i]].length; j++) {
                 if (subWheelValues[WHEELVALUES[i]][j] === noteValue) {
                     block._noteValueWheel.navigateWheel(i);
                     block._tabsWheel.navigateWheel(
-                        i * subWheelValues[WHEELVALUES[i]].length + j
-                    );
+                        i * subWheelValues[WHEELVALUES[i]].length + j);
                     break;
                 }
             }

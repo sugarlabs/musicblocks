@@ -1286,7 +1286,7 @@ function setupPitchBlocks() {
             ]);
             this.formBlock({
                 //.TRANS: An accidental is a modification to a pitch, e.g., sharp or flat.
-                name: _("accidental"),
+                name: _("accidental override"),
                 args: 1
             });
             this.makeMacro((x, y) => [
