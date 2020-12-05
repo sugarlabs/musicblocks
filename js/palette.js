@@ -622,33 +622,31 @@ class PaletteModel {
         let height;
         switch (protoBlock.name) {
             case "namedbox":
-            case "namedarg":
-                // so the label will fit
-                svg = new SVG();
-                svg.init();
-                svg.setScale(protoBlock.scale);
-                svg.setExpand(60, 0, 0, 0);
-                svg.setOutie(true);
-                artwork = svg.basicBox();
-                docks = svg.docks;
-                height = svg.getHeight();
-                break;
-            case "nameddo":
-                // so the label will fit
-                svg = new SVG();
-                svg.init();
-                svg.setScale(protoBlock.scale);
-                svg.setExpand(60, 0, 0, 0);
-                artwork = svg.basicBlock();
-                docks = svg.docks;
-                height = svg.getHeight();
-                break;
-            default:
-                let obj = protoBlock.generator();
-                artwork = obj[0];
-                docks = obj[1];
-                height = obj[3];
-                break;
+        case "namedarg":
+            // so the label will fit
+            svg = new SVG();
+            svg.setScale(protoBlock.scale);
+            svg.setExpand(60, 0, 0, 0);
+            svg.setOutie(true);
+            artwork = svg.basicBox();
+            docks = svg.docks;
+            height = svg.getHeight();
+            break;
+        case "nameddo":
+            // so the label will fit
+            svg = new SVG();
+            svg.setScale(protoBlock.scale);
+            svg.setExpand(60, 0, 0, 0);
+            artwork = svg.basicBlock();
+            docks = svg.docks;
+            height = svg.getHeight();
+            break;
+        default:
+            let obj = protoBlock.generator();
+            artwork = obj[0];
+            docks = obj[1];
+            height = obj[3];
+            break;
         }
 
         protoBlock.scale = saveScale;
