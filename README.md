@@ -154,7 +154,7 @@ any, feel free to add a fix through a PR, or create a new issue ticket.
 at a time. The fewer the number of files addressed per PR, the better.
 
 5. Communicate effectively. Go straight to the point. You don't need to address anyone using
-'_sir_'. Don't write unnecessary comments; don't be over-apologetic. This is no superiority
+'_sir_'. Don't write unnecessary comments; don't be over-apologetic. There is no superiority
 hierarchy. Every single contribution is welcome, as long as it doesn't spam or distract the flow.
 
 6. Write useful, brief commit messages. Add commit descriptions if necessary. PR name should speak
@@ -165,12 +165,17 @@ about what it is addressing and not the issue. In case a PR fixes an issue, use 
 code. If a PR is a _work in progress (WIP)_, convert it to draft. It'll let the maintainers know it
 isn't ready for merging.
 
-8. If you have a question, do a _web search_ first. If you don't find any satisfactory answer, then
+8. Read and revise the concepts about programming constructs you're dealing with. You must be clear
+about the behavior of the language or compiler/transpiler. See
+[JavaScript docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript).
+
+9. If you have a question, do a _web search_ first. If you don't find any satisfactory answer, then
 ask it in a comment. If it is a general question about Music Blocks, please use the
 _Sugar-dev Devel <[sugar-devel@lists.sugarlabs.org](mailto:sugar-devel@lists.sugarlabs.org)>_
-mailing list.
+mailing list. Don't ask silly questions (unless you don't know it is silly ;p) before searching it
+on the web.
 
-9. Work on things that matter. Follow three milestones: `Port Ready`, `Migration`, and `Future`.
+10. Work on things that matter. Follow three milestones: `Port Ready`, `Migration`, and `Future`.
 Those tagged `Port Ready` are priority. Those tagged with `Migration` will be taken care of during
 or after the foundation rebuild. Feel free to participate in the conversation, adding valuable
 comments. Those tagged with `Future` need not be addressed presently.
