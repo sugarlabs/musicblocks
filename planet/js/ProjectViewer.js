@@ -134,30 +134,30 @@ function ProjectViewer(Planet) {
     };
 
     this.init = function(){
-        let that = this;
+        
 
-        document.getElementById('projectviewer-download-file').addEventListener('click', function (evt) {
-            that.download();
+        document.getElementById('projectviewer-download-file').addEventListener('click',  (evt) => {
+            this.download();
         });
 
-        document.getElementById('projectviewer-open-mb').addEventListener('click', function (evt) {
-            that.openProject();
+        document.getElementById('projectviewer-open-mb').addEventListener('click',  (evt) => {
+            this.openProject();
         });
 
-        document.getElementById('projectviewer-merge-mb').addEventListener('click', function (evt) {
-            that.mergeProject();
+        document.getElementById('projectviewer-merge-mb').addEventListener('click',  (evt) => {
+            this.mergeProject();
         });
 
-        document.getElementById('projectviewer-report-project').addEventListener('click', function (evt) {
-            that.openReporter();
+        document.getElementById('projectviewer-report-project').addEventListener('click',  (evt) => {
+            this.openReporter();
         });
 
-        document.getElementById('projectviewer-report-submit').addEventListener('click', function (evt) {
-            that.submitReporter();
+        document.getElementById('projectviewer-report-submit').addEventListener('click',  (evt) => {
+            this.submitReporter();
         });
 
-        document.getElementById('projectviewer-report-close').addEventListener('click', function (evt) {
-            that.closeReporter();
+        document.getElementById('projectviewer-report-close').addEventListener('click',  (evt) => {
+            this.closeReporter();
         });
     };
 };
