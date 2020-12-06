@@ -314,6 +314,7 @@ class Notation {
 
         // Lilypond partial must be a combination of powers of two.
         let beat = convertFactor(factor);
+	let obj;
         if (beat !== null) {
             this._notationStaging[turtle].push("pickup", beat);
             this._pickupPOW2[turtle] = true;
