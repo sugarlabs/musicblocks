@@ -363,14 +363,13 @@ function GlobalPlanet(Planet) {
             error = null;
         }
 
-        let that = this;
-        this.getData(id, function(data) {
+        this.getData(id, (data) => {
             let remixedName;
-            if (id in that.cache) {
-                remixedName = that.remixPrefix + ' ' + that.cache[id].ProjectName;
-                Planet.ProjectStorage.initialiseNewProject(remixedName, data, that.cache[id].ProjectImage);
+            if (id in this.cache) {
+                remixedName = this.remixPrefix + ' ' + this.cache[id].ProjectName;
+                Planet.ProjectStorage.initialiseNewProject(remixedName, data, this.cache[id].ProjectImage);
             } else {
-                remixedName = that.remixPrefix + ' ' + _('My Project');
+                remixedName = this.remixPrefix + ' ' + _('My Project');
                 Planet.ProjectStorage.initialiseNewProject(remixedName, data, null);
             }
 
@@ -383,14 +382,13 @@ function GlobalPlanet(Planet) {
             error = null;
         }
 
-        let that = this;
-        this.getData(id, function(data) {
+        this.getData(id, (data) => {
             let remixedName;
-            if (id in that.cache) {
-                remixedName = that.remixPrefix + ' ' + that.cache[id].ProjectName;
-                Planet.ProjectStorage.initialiseNewProject(remixedName, data, that.cache[id].ProjectImage);
+            if (id in this.cache) {
+                remixedName = Planet.ProjectStorage.getCurrentProjectName();
+                Planet.ProjectStorage.initialiseNewProject(remixedName, data, this.cache[id].ProjectImage);
             } else {
-                remixedName = that.remixPrefix + ' ' + _('My Project');
+                remixedName = this.remixPrefix + ' ' + _('My Project');
                 Planet.ProjectStorage.initialiseNewProject(remixedName, data, null);
             }
 
@@ -403,11 +401,10 @@ function GlobalPlanet(Planet) {
             document.getElementById('globaltitle').textContent = _('Cannot connect to server');
             document.getElementById('globalcontents').innerHTML = this.offlineHTML;
         } else {
-            let that = this;
 
-            jQuery('#sort-select').material_select(function (evt) {
-                that.sortBy = document.getElementById('sort-select').value;
-                that.refreshProjects();
+            jQuery('#sort-select').material_select( (evt) => {
+                this.sortBy = document.getElementById('sort-select').value;
+                this.refreshProjects();
             });
 
 
@@ -425,33 +422,33 @@ function GlobalPlanet(Planet) {
 
             this.initTagList();
 
-            document.getElementById('load-more-projects').addEventListener('click',  function (evt) {
-                if (that.loadButtonShown) {
-                    that.loadMoreProjects();
+            document.getElementById('load-more-projects').addEventListener('click',  (evt) => {
+                if (this.loadButtonShown) {
+                    this.loadMoreProjects();
                 }
             });
 
             let debouncedfunction = debounce(this.search.bind(this), 250);
 
-            document.getElementById('global-search').addEventListener('input',  function (evt) {
-                that.searchString = this.value;
+            document.getElementById('global-search').addEventListener('input',  (evt) => {
+                this.searchString = this.value;
                 debouncedfunction();
             });
 
-            document.getElementById('search-close').addEventListener('click', function (evt) {
+            document.getElementById('search-close').addEventListener('click',  (evt) => {
                 document.getElementById('global-search').value = '';
-                that.searchString = '';
-                this.style.display = 'none';
+                this.searchString = '';
+                document.getElementById('search-close').style.display = 'none';
                 debouncedfunction();
             });
             
-            document.body.onscroll = function () {
+            document.body.onscroll =  () => {
                 currentUserScrollPos = window.pageYOffset || document.documentElement.scrollTop;
                 maxScrollPos = Math.max( document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight);
                 
                 if ((currentUserScrollPos/maxScrollPos) * 100 >= 75) {
-                    if (that.loadButtonShown) {
-                        that.loadMoreProjects();
+                    if (this.loadButtonShown) {
+                        this.loadMoreProjects();
                     }
                }
             };

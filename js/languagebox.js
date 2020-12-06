@@ -10,98 +10,101 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 //A dropdown for selecting language
-function LanguageBox() {
-    var language = localStorage.languagePreference;
-    this._message = null;
+class LanguageBox {
+    language = localStorage.languagePreference;
+    
+    constructor() {
+        this._message = null;
+    }
 
-    this.setMessage = function(message) {
+    setMessage(message) {
         this._message = message;
         return this;
-    };
+    }
 
-    this.enUS_onclick = function() {
+    enUS_onclick() {
         language = "enUS";
         this.hide();
-    };
+    }
 
-    this.enUK_onclick = function() {
+    enUK_onclick() {
         language = "enUK";
         this.hide();
-    };
+    }
 
-    this.ko_onclick = function() {
+    ko_onclick() {
         language = "ko";
         this.hide();
-    };
+    }
 
-    this.ja_onclick = function() {
+    ja_onclick() {
         language = "ja";
         localStorage.kanaPreference = "kanji";
         this.hide();
-    };
+    }
 
-    this.kana_onclick = function() {
+    kana_onclick() {
         language = "ja";
         localStorage.kanaPreference = "kana";
         this.hide();
-    };
+    }
 
-    this.es_onclick = function() {
+    es_onclick() {
         language = "es";
         this.hide();
-    };
+    }
 
-    this.pt_onclick = function() {
+    pt_onclick() {
         language = "pt";
         this.hide();
-    };
+    }
 
-    this.zhCN_onclick = function() {
+    zhCN_onclick() {
         language = "zhCN";
         this.hide();
-    };
+    }
 
-    this.th_onclick = function() {
+    th_onclick() {
         language = "th";
         this.hide();
-    };
+    }
 
-    this.hi_onclick = function() {
+    hi_onclick() {
         language = "hi";
         this.hide();
-    };
+    }
 
-    this.ibo_onclick = function() {
+    ibo_onclick() {
         language = "ibo";
         this.hide();
-    };
+    }
 
-    this.ar_onclick = function() {
+    ar_onclick() {
         language = "ar";
         this.hide();
-    };
+    }
 
-    this.he_onclick = function() {
+    he_onclick() {
         language = "he";
         this.hide();
-    };
+    }
 
-    this.ayc_onclick = function() {
+    ayc_onclick() {
         language = "ayc";
         this.hide();
-    };
+    }
 
-    this.quz_onclick = function() {
+    quz_onclick() {
         language = "quz";
         this.hide();
-    };
+    }
 
-    this.gug_onclick = function() {
+    gug_onclick() {
         language = "gug";
         this.hide();
-    };
+    }
 
-    this.hide = function() {
+    hide() {
         const MSGPrefix =
             "<a href='#' " +
             "onClick='window.location.reload()'" +
@@ -116,7 +119,7 @@ function LanguageBox() {
             enUK: "Refresh your browser to change your language preference.",
             ja: "言語を変えるには、ブラウザをこうしんしてください。",
             kana: "げんごを かえるには、ブラウザを こうしんしてください。",
-	    ko: "언어 기본 설정을 변경하려면 브라우저를 새로 고치십시오.",
+            ko: "언어 기본 설정을 변경하려면 브라우저를 새로 고치십시오.",
             es: "Actualice su navegador para cambiar su preferencia de idioma.",
             pt:
                 "Atualize seu navegador para alterar sua preferência de idioma.",
@@ -129,7 +132,7 @@ function LanguageBox() {
             ayc: "Actualice su navegador para cambiar su preferencia de idioma.",
             quz: "Actualice su navegador para cambiar su preferencia de idioma.",
             gug: "Actualice su navegador para cambiar su preferencia de idioma."
-        };
+        }
 
         localStorage.languagePreference = language;
         console.debug(language);
@@ -138,5 +141,5 @@ function LanguageBox() {
         } else {
             this._message(MSGPrefix + MSG[language] + MSGSuffix);
         }
-    };
+    }
 }
