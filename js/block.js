@@ -578,7 +578,7 @@ class Block {
         }
 
         if (this.container !== null) {
-            that = this;
+            let that = this;
 
             /**
              * After new buttons are creates, they are cached and a
