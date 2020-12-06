@@ -4682,7 +4682,6 @@ function Activity() {
             ['printBlockSVG', _printBlockSVG],
             ['planet', planet]
         ]);
-        save.init();
 
         toolbar = new Toolbar();
         toolbar.init(beginnerMode);
