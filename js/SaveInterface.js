@@ -63,398 +63,388 @@ class SaveInterface {
             "'" +
             ').content=title; document.title=name; document.getElementById("title").textContent=title; document.getElementsByClassName("code")[0].style.display = "none";</script></body></html>';
 
-        this.download = function (extension, dataurl, defaultfilename) {
-            let filename = null;
-            if (defaultfilename === undefined || defaultfilename === null) {
-                if (this.PlanetInterface === undefined) {
-                    defaultfilename = _("My Project");
-                } else {
-                    defaultfilename = this.PlanetInterface.getCurrentProjectName();
-                }
+        this.timeLastSaved = -100;
+        let $j = jQuery.noConflict();
+        $j(window).bind("beforeunload", (event) => {
+            let saveButton = "#saveButtonAdvanced";
+            if (beginnerMode) {
+                saveButton = "#saveButton";
+            }
 
-                console.debug(defaultfilename);
+            if (this.PlanetInterface.getTimeLastSaved() !== this.timeLastSaved && this.PlanetInterface !== undefined) {
+                event.preventDefault();
+                event.returnValue = "";
+                // Will trigger when exit/reload cancelled.
+                $j(saveButton).trigger("mouseenter");
+                return "";
+            }
+        });
+    }
 
-                if (fileExt(defaultfilename) != extension) {
-                    defaultfilename += "." + extension;
-                }
-
-                if (window.isElectron == true) {
-                    filename = defaultfilename;
-                } else {
-                    filename = prompt("Filename:", defaultfilename);
-                }
+    download(extension, dataurl, defaultfilename) {
+        let filename = null;
+        if (defaultfilename === undefined || defaultfilename === null) {
+            if (this.PlanetInterface === undefined) {
+                defaultfilename = _("My Project");
             } else {
-                if (fileExt(defaultfilename) != extension) {
-                    defaultfilename += "." + extension;
-                }
+                defaultfilename = this.PlanetInterface.getCurrentProjectName();
+            }
+
+            console.debug(defaultfilename);
+
+            if (fileExt(defaultfilename) != extension) {
+                defaultfilename += "." + extension;
+            }
+
+            if (window.isElectron == true) {
                 filename = defaultfilename;
+            } else {
+                filename = prompt("Filename:", defaultfilename);
             }
-
-            console.debug(filename);
-            if (filename === null) {
-                console.debug("save cancelled");
-                return;
+        } else {
+            if (fileExt(defaultfilename) != extension) {
+                defaultfilename += "." + extension;
             }
+            filename = defaultfilename;
+        }
 
-            if (fileExt(filename) != extension) {
-                filename += "." + extension;
-            }
+        console.debug(filename);
+        if (filename === null) {
+            console.debug("save cancelled");
+            return;
+        }
 
-            this.downloadURL(filename, dataurl);
-        };
+        if (fileExt(filename) != extension) {
+            filename += "." + extension;
+        }
 
-        this.downloadURL = function (filename, dataurl) {
-            let a = document.createElement("a");
-            a.setAttribute("href", dataurl);
-            a.setAttribute("download", filename);
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        };
+        this.downloadURL(filename, dataurl);
+    }
 
-        this.setVariables = function (vars) {
-            for (let i = 0; i < vars.length; i++) {
-                this[vars[i][0]] = vars[i][1];
-            }
-        };
+    downloadURL(filename, dataurl) {
+        let a = document.createElement("a");
+        a.setAttribute("href", dataurl);
+        a.setAttribute("download", filename);
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
 
-        //Save Functions - n.b. include filename parameter - can be left blank / undefined
-        this.prepareHTML = function () {
-            let file = this.htmlSaveTemplate;
-            let description = _("No description provided");
-            if (this.PlanetInterface !== undefined) {
-                description = this.PlanetInterface.getCurrentProjectDescription();
-            }
+    setVariables(vars) {
+        for (let i = 0; i < vars.length; i++) {
+            this[vars[i][0]] = vars[i][1];
+        }
+    }
 
-            //let author = ''; //currently we're using anonymous for authors - not storing names
-            let name = _("My Project");
-            if (this.PlanetInterface !== undefined) {
-                name = this.PlanetInterface.getCurrentProjectName();
-            }
+    //Save Functions - n.b. include filename parameter - can be left blank / undefined
+    prepareHTML() {
+        let file = this.htmlSaveTemplate;
+        let description = _("No description provided");
+        if (this.PlanetInterface !== undefined) {
+            description = this.PlanetInterface.getCurrentProjectDescription();
+        }
 
-            let data = prepareExport();
-            let image = "";
-            if (this.PlanetInterface !== undefined) {
-                image = this.PlanetInterface.getCurrentProjectImage();
-            }
+        //let author = ''; //currently we're using anonymous for authors - not storing names
+        let name = _("My Project");
+        if (this.PlanetInterface !== undefined) {
+            name = this.PlanetInterface.getCurrentProjectName();
+        }
 
-            file = file
-                .replace(new RegExp("{{ project_description }}", "g"), description)
-                .replace(new RegExp("{{ project_name }}", "g"), name)
-                .replace(new RegExp("{{ data }}", "g"), data)
-                .replace(new RegExp("{{ project_image }}", "g"), image);
-            return file;
-        };
+        let data = prepareExport();
+        let image = "";
+        if (this.PlanetInterface !== undefined) {
+            image = this.PlanetInterface.getCurrentProjectImage();
+        }
 
-        this.saveHTML = function (filename) {
-            let html = "data:text/plain;charset=utf-8," +
-                encodeURIComponent(this.prepareHTML());
-            console.debug(filename);
-            this.download("html", html, filename);
-        };
+        file = file
+            .replace(new RegExp("{{ project_description }}", "g"), description)
+            .replace(new RegExp("{{ project_name }}", "g"), name)
+            .replace(new RegExp("{{ data }}", "g"), data)
+            .replace(new RegExp("{{ project_image }}", "g"), image);
+        return file;
+    }
 
-        this.saveHTMLNoPrompt = function () {
-            setTimeout(
-                function () {
-                    let html = "data:text/plain;charset=utf-8," +
-                        encodeURIComponent(this.prepareHTML());
-                    if (this.PlanetInterface !== undefined) {
-                        this.downloadURL(
-                            this.PlanetInterface.getCurrentProjectName() + ".html",
-                            html);
-                    } else {
-                        this.downloadURL(
-                            _("My Project").replace(" ", "_") + ".html",
-                            html);
-                    }
-                }.bind(this),
-                500
-            );
-        };
+    saveHTML(filename) {
+        let html = "data:text/plain;charset=utf-8," +
+            encodeURIComponent(this.prepareHTML());
+        console.debug(filename);
+        this.download("html", html, filename);
+    }
 
-        this.saveSVG = function (filename) {
-            let svg = "data:image/svg+xml;utf8," +
-                doSVG(
-                    this.logo.canvas,
-                    this.logo,
-                    this.logo.turtles,
-                    this.logo.canvas.width,
-                    this.logo.canvas.height,
-                    1.0
-                );
-            this.download("svg", svg, filename);
-        };
-
-        this.savePNG = function (filename) {
-            let png = docById("overlayCanvas").toDataURL("image/png");
-            this.download("png", png, filename);
-        };
-
-        this.saveBlockArtwork = function (filename) {
-            let svg = "data:image/svg+xml;utf8," + this.printBlockSVG();
-            this.download("svg", svg, filename);
-        };
-
-        this.saveWAV = function (filename) {
-            document.body.style.cursor = "wait";
-            this.filename = filename;
-            this.logo.recording = true;
-            console.debug("DURING SAVE WAV");
-            this.logo.synth.setupRecorder();
-            this.logo.synth.recorder.start();
-            this.logo.runLogoCommands();
-            this.logo.textMsg(_("Your recording is in progress."));
-        };
-
-        this.saveAbc = function (filename) {
-            document.body.style.cursor = "wait";
-            this.filename = filename;
-            console.debug("Saving .abc file");
-            //Suppress music and turtle output when generating
-            // Abc output.
-            this.logo.runningAbc = true;
-            this.logo.notationOutput = ABCHEADER;
-            this.logo.notationNotes = {};
-            for (let t = 0; t < this.turtles.turtleList.length; t++) {
-                this.logo.notation.notationStaging[t] = [];
-                this.logo.notation.notationDrumStaging[t] = [];
-                this.turtles.turtleList[t].painter.doClear(true, true, true);
-            }
-            this.logo.runLogoCommands();
-        };
-
-        this.afterSaveAbc = function (filename) {
-            let abc = encodeURIComponent(saveAbcOutput(this.logo));
-            this.download("abc", "data:text;utf8," + abc, filename);
-        };
-
-        this.saveLilypond = function (filename) {
-            let lyext = "ly";
-            if (filename === undefined) {
+    saveHTMLNoPrompt() {
+        setTimeout(() => {
+                let html = "data:text/plain;charset=utf-8," +
+                    encodeURIComponent(this.prepareHTML());
                 if (this.PlanetInterface !== undefined) {
-                    filename = this.PlanetInterface.getCurrentProjectName();
+                    this.downloadURL(
+                        this.PlanetInterface.getCurrentProjectName() + ".html",
+                        html);
                 } else {
-                    filename = _("My Project");
+                    this.downloadURL(
+                        _("My Project").replace(" ", "_") + ".html",
+                        html);
                 }
-            }
+            },500);
+    }
 
-            if (fileExt(filename) != lyext) {
-                filename += "." + lyext;
-            }
-
-            console.debug("Saving .ly file");
-            docById("lilypondModal").style.display = "block";
-            let projectTitle, projectAuthor, MIDICheck, guitarCheck;
-
-            //.TRANS: File name prompt for save as Lilypond
-            docById("fileNameText").textContent = _("File name");
-            //.TRANS: Project title prompt for save as Lilypond
-            docById("titleText").textContent = _("Project title");
-            //.TRANS: Project title prompt for save as Lilypond
-            docById("authorText").textContent = _("Project author");
-            //.TRANS: MIDI prompt for save as Lilypond
-            docById("MIDIText").textContent = _("Include MIDI output?");
-            //.TRANS: Guitar prompt for save as Lilypond
-            docById("guitarText").textContent = _(
-                "Include guitar tablature output?"
+    saveSVG(filename) {
+        let svg = "data:image/svg+xml;utf8," +
+            doSVG(
+                this.logo.canvas,
+                this.logo,
+                this.logo.turtles,
+                this.logo.canvas.width,
+                this.logo.canvas.height,
+                1.0
             );
-            //.TRANS: Lilypond is a scripting language for generating sheet music
-            docById("submitLilypond").textContent = _("Save as Lilypond");
-            docById("fileName").value = filename;
+        this.download("svg", svg, filename);
+    }
+
+    savePNG(filename) {
+        let png = docById("overlayCanvas").toDataURL("image/png");
+        this.download("png", png, filename);
+    }
+
+    saveBlockArtwork(filename) {
+        let svg = "data:image/svg+xml;utf8," + this.printBlockSVG();
+        this.download("svg", svg, filename);
+    }
+
+    saveWAV(filename) {
+        document.body.style.cursor = "wait";
+        this.filename = filename;
+        this.logo.recording = true;
+        console.debug("DURING SAVE WAV");
+        this.logo.synth.setupRecorder();
+        this.logo.synth.recorder.start();
+        this.logo.runLogoCommands();
+        this.logo.textMsg(_("Your recording is in progress."));
+    }
+
+    saveAbc(filename) {
+        document.body.style.cursor = "wait";
+        this.filename = filename;
+        console.debug("Saving .abc file");
+        //Suppress music and turtle output when generating
+        // Abc output.
+        this.logo.runningAbc = true;
+        this.logo.notationOutput = ABCHEADER;
+        this.logo.notationNotes = {};
+        for (let t = 0; t < this.turtles.turtleList.length; t++) {
+            this.logo.notation.notationStaging[t] = [];
+            this.logo.notation.notationDrumStaging[t] = [];
+            this.turtles.turtleList[t].painter.doClear(true, true, true);
+        }
+        this.logo.runLogoCommands();
+    }
+
+    afterSaveAbc(filename) {
+        let abc = encodeURIComponent(saveAbcOutput(this.logo));
+        this.download("abc", "data:text;utf8," + abc, filename);
+    }
+
+    saveLilypond(filename) {
+        let lyext = "ly";
+        if (filename === undefined) {
             if (this.PlanetInterface !== undefined) {
-                docById("title").value =
-                    this.PlanetInterface.getCurrentProjectName();
+                filename = this.PlanetInterface.getCurrentProjectName();
             } else {
-                //.TRANS: default project title when saving as Lilypond
-                docById("title").value = _("My Project");
+                filename = _("My Project");
             }
+        }
 
-            // Load custom author saved in local storage.
-            let customAuthorData = this.storage.getItem("customAuthor");
-            if (customAuthorData != undefined) {
-                docById("author").value = JSON.parse(customAuthorData);
-            } else {
-                //.TRANS: default project author when saving as Lilypond
-                docById("author").value = _("Mr. Mouse");
-            }
+        if (fileExt(filename) != lyext) {
+            filename += "." + lyext;
+        }
 
-            docById("submitLilypond").onclick = function () {
-                this.saveLYFile(false);
-            }.bind(this);
-            // if (this.planet){
-            //     docById('submitPDF').onclick = function(){this.saveLYFile(true);}.bind(this);
-            //     docById('submitPDF').disabled = false;
-            // } else {
-            //     docById('submitPDF').disabled = true;
-            // }
-            let that = this;
-            docByClass("close")[0].onclick = function () {
-                that.logo.runningLilypond = false;
-                docById("lilypondModal").style.display = "none";
-            };
+        console.debug("Saving .ly file");
+        docById("lilypondModal").style.display = "block";
+        let projectTitle, projectAuthor, MIDICheck, guitarCheck;
+
+        //.TRANS: File name prompt for save as Lilypond
+        docById("fileNameText").textContent = _("File name");
+        //.TRANS: Project title prompt for save as Lilypond
+        docById("titleText").textContent = _("Project title");
+        //.TRANS: Project title prompt for save as Lilypond
+        docById("authorText").textContent = _("Project author");
+        //.TRANS: MIDI prompt for save as Lilypond
+        docById("MIDIText").textContent = _("Include MIDI output?");
+        //.TRANS: Guitar prompt for save as Lilypond
+        docById("guitarText").textContent = _(
+            "Include guitar tablature output?"
+        );
+        //.TRANS: Lilypond is a scripting language for generating sheet music
+        docById("submitLilypond").textContent = _("Save as Lilypond");
+        docById("fileName").value = filename;
+        if (this.PlanetInterface !== undefined) {
+            docById("title").value =
+                this.PlanetInterface.getCurrentProjectName();
+        } else {
+            //.TRANS: default project title when saving as Lilypond
+            docById("title").value = _("My Project");
+        }
+
+        // Load custom author saved in local storage.
+        let customAuthorData = this.storage.getItem("customAuthor");
+        if (customAuthorData != undefined) {
+            docById("author").value = JSON.parse(customAuthorData);
+        } else {
+            //.TRANS: default project author when saving as Lilypond
+            docById("author").value = _("Mr. Mouse");
+        }
+
+        docById("submitLilypond").onclick = () => {
+            this.saveLYFile(false);
         };
-
-        this.saveLYFile = function (isPDF) {
-            if (isPDF === undefined) {
-                isPDF = false;
-            }
-            let filename = docById("fileName").value;
-            let projectTitle = docById("title").value;
-            let projectAuthor = docById("author").value;
-
-            // Save the author in local storage.
-            this.storage.setItem("customAuthor", JSON.stringify(projectAuthor));
-
-            let MIDICheck = docById("MIDICheck").checked;
-            let guitarCheck = docById("guitarCheck").checked;
-
-            if (filename != null) {
-                if (fileExt(filename) !== "ly") {
-                    filename += ".ly";
-                }
-            }
-
-            let mapLilypondObj = {
-                "My Music Blocks Creation": projectTitle,
-                "Mr. Mouse": projectAuthor
-            };
-
-            let lyheader = LILYPONDHEADER.replace(
-                /My Music Blocks Creation|Mr. Mouse/gi,
-                function (matched) {
-                    return mapLilypondObj[matched];
-                }
-            );
-
-            if (MIDICheck) {
-                MIDIOutput =
-                    "% MIDI SECTION\n% MIDI Output included! \n\n\\midi {\n   \\tempo 4=90\n}\n\n\n}\n\n";
-            } else {
-                MIDIOutput =
-                    "% MIDI SECTION\n% Delete the %{ and %} below to include MIDI output.\n%{\n\\midi {\n   \\tempo 4=90\n}\n%}\n\n}\n\n";
-            }
-
-            if (guitarCheck) {
-                guitarOutputHead =
-                    '\n\n% GUITAR TAB SECTION\n% Guitar tablature output included!\n\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
-                guitarOutputEnd = "      >>\n\n";
-            } else {
-                guitarOutputHead =
-                    '\n\n% GUITAR TAB SECTION\n% Delete the %{ and %} below to include guitar tablature output.\n%{\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
-                guitarOutputEnd = "      >>\n%}\n";
-            }
-
-            // Suppress music and turtle output when generating
-            // Lilypond output.
-            this.logo.runningLilypond = true;
-            if (isPDF) {
-                this.notationConvert = "pdf";
-            } else {
-                this.notationConvert = "";
-            }
-            this.logo.notationOutput = lyheader;
-            this.logo.notationNotes = {};
-            for (let t = 0; t < this.turtles.turtleList.length; t++) {
-                this.logo.notation.notationStaging[t] = [];
-                this.logo.notation.notationDrumStaging[t] = [];
-                this.turtles.turtleList[t].painter.doClear(true, true, true);
-            }
-            document.body.style.cursor = "wait";
-            this.logo.runLogoCommands();
-
-            // Close the dialog box after hitting button.
+        // if (this.planet){
+        //     docById('submitPDF').onclick = function(){this.saveLYFile(true);}.bind(this);
+        //     docById('submitPDF').disabled = false;
+        // } else {
+        //     docById('submitPDF').disabled = true;
+        // }
+        docByClass("close")[0].onclick = () => {
+            this.logo.runningLilypond = false;
             docById("lilypondModal").style.display = "none";
         };
+    }
 
-        this.afterSaveLilypond = function (filename) {
-            let ly = saveLilypondOutput(this.logo);
-            switch (this.notationConvert) {
-                case "pdf":
-                    this.afterSaveLilypondPDF(ly, filename);
-                    break;
-                default:
-                    this.afterSaveLilypondLY(ly, filename);
-                    break;
+    saveLYFile(isPDF) {
+        if (isPDF === undefined) {
+            isPDF = false;
+        }
+        let filename = docById("fileName").value;
+        let projectTitle = docById("title").value;
+        let projectAuthor = docById("author").value;
+
+        // Save the author in local storage.
+        this.storage.setItem("customAuthor", JSON.stringify(projectAuthor));
+
+        let MIDICheck = docById("MIDICheck").checked;
+        let guitarCheck = docById("guitarCheck").checked;
+
+        if (filename != null) {
+            if (fileExt(filename) !== "ly") {
+                filename += ".ly";
             }
+        }
+
+        let mapLilypondObj = {
+            "My Music Blocks Creation": projectTitle,
+            "Mr. Mouse": projectAuthor
+        };
+
+        let lyheader = LILYPONDHEADER.replace(
+            /My Music Blocks Creation|Mr. Mouse/gi,
+            (matched) => mapLilypondObj[matched]
+        );
+
+        if (MIDICheck) {
+            MIDIOutput =
+                "% MIDI SECTION\n% MIDI Output included! \n\n\\midi {\n   \\tempo 4=90\n}\n\n\n}\n\n";
+        } else {
+            MIDIOutput =
+                "% MIDI SECTION\n% Delete the %{ and %} below to include MIDI output.\n%{\n\\midi {\n   \\tempo 4=90\n}\n%}\n\n}\n\n";
+        }
+
+        if (guitarCheck) {
+            guitarOutputHead =
+                '\n\n% GUITAR TAB SECTION\n% Guitar tablature output included!\n\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
+            guitarOutputEnd = "      >>\n\n";
+        } else {
+            guitarOutputHead =
+                '\n\n% GUITAR TAB SECTION\n% Delete the %{ and %} below to include guitar tablature output.\n%{\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
+            guitarOutputEnd = "      >>\n%}\n";
+        }
+
+        // Suppress music and turtle output when generating
+        // Lilypond output.
+        this.logo.runningLilypond = true;
+        if (isPDF) {
+            this.notationConvert = "pdf";
+        } else {
             this.notationConvert = "";
-        };
+        }
+        this.logo.notationOutput = lyheader;
+        this.logo.notationNotes = {};
+        for (let t = 0; t < this.turtles.turtleList.length; t++) {
+            this.logo.notation.notationStaging[t] = [];
+            this.logo.notation.notationDrumStaging[t] = [];
+            this.turtles.turtleList[t].painter.doClear(true, true, true);
+        }
+        document.body.style.cursor = "wait";
+        this.logo.runLogoCommands();
 
-        this.afterSaveLilypondLY = function (lydata, filename) {
-            if (platform.FF) {
-                console.debug('execCommand("copy") does not work on FireFox');
+        // Close the dialog box after hitting button.
+        docById("lilypondModal").style.display = "none";
+    }
+
+    afterSaveLilypond(filename) {
+        let ly = saveLilypondOutput(this.logo);
+        switch (this.notationConvert) {
+            case "pdf":
+                this.afterSaveLilypondPDF(ly, filename);
+                break;
+            default:
+                this.afterSaveLilypondLY(ly, filename);
+                break;
+        }
+        this.notationConvert = "";
+    }
+
+    afterSaveLilypondLY(lydata, filename) {
+        if (platform.FF) {
+            console.debug('execCommand("copy") does not work on FireFox');
+        } else {
+            let tmp = jQuery("<textarea />").appendTo(document.body);
+            tmp.val(lydata);
+            tmp.select();
+            tmp[0].setSelectionRange(0, lydata.length);
+            document.execCommand("copy");
+            tmp.remove();
+            textMsg(
+                _("The Lilypond code is copied to clipboard. You can paste it here: ") +
+                "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> "
+                + "or "
+                + "<a href='http://lilybin.com/' target='_blank'>http://lilybin.com</a>.");
+        }
+
+        this.download(
+            "ly", "data:text;utf8," + encodeURIComponent(lydata), filename);
+    }
+
+    afterSaveLilypondPDF(lydata, filename) {
+        document.body.style.cursor = "wait";
+        window.Converter.ly2pdf(lydata, (success, dataurl) => {
+            document.body.style.cursor = "default";
+            if (!success) {
+                console.debug("Error: " + dataurl);
+                //TODO: Error message box
             } else {
-                let tmp = jQuery("<textarea />").appendTo(document.body);
-                tmp.val(lydata);
-                tmp.select();
-                tmp[0].setSelectionRange(0, lydata.length);
-                document.execCommand("copy");
-                tmp.remove();
-                textMsg(
-                    _("The Lilypond code is copied to clipboard. You can paste it here: ") +
-                    "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> "
-                    + "or "
-                    + "<a href='http://lilybin.com/' target='_blank'>http://lilybin.com</a>.");
+                save.download("pdf", dataurl, filename);
             }
+        });
+    }
 
-            this.download(
-                "ly", "data:text;utf8," + encodeURIComponent(lydata), filename);
-        };
+    saveMxml(filename) {
+        this.logo.runningMxml = true;
+        for (let t = 0; t < this.turtles.turtleList.length; t++) {
+            this.logo.notation.notationStaging[t] = [];
+            this.logo.notation.notationDrumStaging[t] = [];
+            this.turtles.turtleList[t].painter.doClear(true, true, true);
+        }
 
-        this.afterSaveLilypondPDF = function (lydata, filename) {
-            document.body.style.cursor = "wait";
-            window.Converter.ly2pdf(lydata, function (success, dataurl) {
-                document.body.style.cursor = "default";
-                if (!success) {
-                    console.debug("Error: " + dataurl);
-                    //TODO: Error message box
-                } else {
-                    save.download("pdf", dataurl, filename);
-                }
-            });
-        };
+        this.logo.runLogoCommands();
+        // this.download('musicxml', 'data:text;utf8,'+data);
+    }
 
-        this.saveMxml = function (filename) {
-            this.logo.runningMxml = true;
-            for (let t = 0; t < this.turtles.turtleList.length; t++) {
-                this.logo.notation.notationStaging[t] = [];
-                this.logo.notation.notationDrumStaging[t] = [];
-                this.turtles.turtleList[t].painter.doClear(true, true, true);
-            }
+    afterSaveMxml(filename) {
+        let data = saveMxmlOutput(this.logo);
+        data = saveMxmlOutput(this.logo);
 
-            this.logo.runLogoCommands();
-            // this.download('musicxml', 'data:text;utf8,'+data);
-        };
-
-        this.afterSaveMxml = function (filename) {
-            let data = saveMxmlOutput(this.logo);
-            data = saveMxmlOutput(this.logo);
-
-            console.log("data is:");
-            console.log(data);
-            this.download(
-                "xml", "data:text;utf8," + encodeURIComponent(data), filename);
-            this.logo.runningMxml = false;
-        };
-
-        this.init = function () {
-            this.timeLastSaved = -100;
-            let $j = jQuery.noConflict();
-            $j(window).bind("beforeunload", (event) => {
-                let saveButton = "#saveButtonAdvanced";
-                if (beginnerMode) {
-                    saveButton = "#saveButton";
-                }
-
-                if (this.PlanetInterface.getTimeLastSaved() !==
-                    this.timeLastSaved &&
-                    this.PlanetInterface !== undefined) {
-                    event.preventDefault();
-                    event.returnValue = "";
-                    // Will trigger when exit/reload cancelled.
-                    $j(saveButton).trigger("mouseenter");
-                    return "";
-                }
-            });
-        };
+        console.log("data is:");
+        console.log(data);
+        this.download(
+            "xml", "data:text;utf8," + encodeURIComponent(data), filename);
+        this.logo.runningMxml = false;
     }
 }
