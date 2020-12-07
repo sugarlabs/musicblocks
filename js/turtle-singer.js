@@ -1475,8 +1475,8 @@ class Singer {
                     tur.singer.tallyNotes++ ;
                 }
 
-                var notes = [];
-                var drums = [];
+                let notes = [];
+                let drums = [];
                 let insideChord = -1;
                 if (
                     tur.singer.notePitches[thisBlk].length + tur.singer.oscList[thisBlk].length > 1
@@ -1543,13 +1543,14 @@ class Singer {
                 }
 
                 // Process pitches
+		let noteObj, note;
                 if (tur.singer.notePitches[thisBlk].length > 0) {
                     for (let i = 0; i < tur.singer.notePitches[thisBlk].length; i++) {
                         if (tur.singer.notePitches[thisBlk][i] === "rest" || forceSilence) {
                             note = "R";
                             tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
                         } else {
-                            var noteObj = getNote(
+                            noteObj = getNote(
                                 tur.singer.notePitches[thisBlk][i],
                                 tur.singer.noteOctaves[thisBlk][i],
                                 0,
@@ -1562,9 +1563,9 @@ class Singer {
                             // If the cents for this note != 0, then we need to convert to frequency and add in the cents
                             if (tur.singer.noteCents[thisBlk][i] !== 0) {
                                 if (tur.singer.noteHertz[thisBlk][i] !== 0) {
-                                    var note = tur.singer.noteHertz[thisBlk][i];
+                                    note = tur.singer.noteHertz[thisBlk][i];
                                 } else {
-                                    var note = Math.floor(
+                                    note = Math.floor(
                                         pitchToFrequency(
                                             noteObj[0],
                                             noteObj[1],
@@ -1574,13 +1575,13 @@ class Singer {
                                     );
                                 }
                             } else {
-                                var note = noteObj[0] + noteObj[1];
+                                note = noteObj[0] + noteObj[1];
                             }
                         }
 
                         if (note !== "R") {
                             // Apply harmonic here instead of in synth.
-                            var p = partials.indexOf(1);
+                            let p = partials.indexOf(1);
                             if (p > 0) {
                                 note = noteToFrequency(note, tur.singer.keySignature) * (p + 1);
                             }
@@ -1636,14 +1637,15 @@ class Singer {
                         }
 
                         if (i === tur.singer.notePitches[thisBlk].length - 1) {
+			    let d;
                             if (duration > 0) {
                                 if (carry > 0) {
-                                    var d = 1 / (1 / duration - 1 / carry);
+                                    d = 1 / (1 / duration - 1 / carry);
                                 } else {
-                                    var d = duration;
+                                    d = duration;
                                 }
                             } else if (tur.singer.tieCarryOver > 0) {
-                                var d = tur.singer.tieCarryOver;
+                                d = tur.singer.tieCarryOver;
                             }
 
                             if (logo.runningLilypond || logo.runningMxml || logo.runningAbc) {
@@ -1669,7 +1671,7 @@ class Singer {
                     let numerator = [];
                     let denominator = [];
 
-                    for (var k = 0; k < notesFrequency.length; k++) {
+                    for (let k = 0; k < notesFrequency.length; k++) {
                         if (notesFrequency[k] !== undefined) {
                             ratio[k] = notesFrequency[k] / frequency;
                             number[k] = (
@@ -1682,7 +1684,7 @@ class Singer {
 
                     let notesInfo = "";
 
-                    var obj = rationalToFraction(1 / noteBeatValue);
+                    let obj = rationalToFraction(1 / noteBeatValue);
                     if (obj[0] > 0) {
                         if (obj[0] / obj[1] > 2) {
                             logo.errorMsg(_("Warning: Note value greater than 2."), blk);
@@ -1724,10 +1726,10 @@ class Singer {
                     }
 
                     if (notes.length > 0) {
-                        var len = notes[0].length;
+                        let len = notes[0].length;
                         if (typeof notes[0] === "number") {
-                            var obj = frequencyToPitch(notes[0]);
-                            tur.singer.currentOctave = obj[1];
+                            tur.singer.currentOctave =
+				frequencyToPitch(notes[0])[1];
                         } else {
                             tur.singer.currentOctave = parseInt(notes[0].slice(len - 1));
                         }
@@ -1948,7 +1950,7 @@ class Singer {
 
                     // If it is > 0, we already counted this note (e.g. pitch & drum combination)
                     if (tur.singer.notePitches[thisBlk].length === 0) {
-                        var obj = rationalToFraction(1 / noteBeatValue);
+                        let obj = rationalToFraction(1 / noteBeatValue);
                         if (obj[0] > 0) {
                             if (tur.singer.justCounting.length === 0) {
                                 console.debug(
@@ -1978,10 +1980,11 @@ class Singer {
 
                     if ((tur.singer.tie && tur.singer.tieCarryOver > 0) || duration > 0) {
                         // If we are in a tie, play the drum as if it were tied
+			let newBeatValue;
                         if (tur.singer.tie && noteBeatValue === 0) {
-                            var newBeatValue = 0;
+                            newBeatValue = 0;
                         } else {
-                            var newBeatValue = beatValue;
+                            newBeatValue = beatValue;
                             if (tieDelay > 0) {
                                 tur.singer.tieFirstDrums = [];
                             }
@@ -2017,6 +2020,13 @@ class Singer {
                                     }
                                 }
                             }
+                        }
+                        // If the drum is played by itself, we need to update the lastNotePlayed.
+                        if (notes.length === 0) {
+                            tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
+                            tur.singer.lastNotePlayed = ["C2", noteBeatValue];
+                            tur.singer.noteStatus = [["C2"], noteBeatValue];
+                            tur.singer.lastPitchPlayed = tur.singer.lastNotePlayed;
                         }
                     }
                 }

@@ -14,7 +14,7 @@ define([
     "sugar-web/activity/activity",
     "sugar-web/datastore"
 ], function(env, activity, datastore) {
-    var sugarizerCompatibility = {
+    let sugarizerCompatibility = {
         activity: activity,
         data: { allProjects: "[]" },
         env: env,

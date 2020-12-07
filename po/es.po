@@ -9,6 +9,9 @@
 "Language: es\n"
 "X-Generator: Poedit 1.7.4\n"
 
+msgid "accidental override"
+msgstr "anular accidental"
+
 #: js/RhythmBlockPaletteBlocks.js:14
 #: js/RhythmBlockPaletteBlocks.js:177
 #: js/RhythmBlockPaletteBlocks.js:14

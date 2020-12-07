@@ -17,16 +17,16 @@ function HelpWidget() {
     let appendedBlockList = [];
     let index = 0;
 
-    this.init = function(blocks) {
+    this.init = (blocks) => {
         this.isOpen = true;
 
         let widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
-	widgetWindow.show();
+	    widgetWindow.show();
 
-        widgetWindow.onClose = function() {
-            that.isOpen = false;
+        widgetWindow.onClose = () => {
+            this.isOpen = false;
             this.destroy();
         };
 
@@ -34,13 +34,13 @@ function HelpWidget() {
         this._helpDiv = document.createElement("div");
 
         // Give the DOM time to create the div.
-        let that = this;
-        setTimeout(function() {
-            that._setup(blocks);
+        
+        setTimeout(() => {
+            this._setup(blocks);
         }, 100);
     };
 
-    this._setup = function(blocks) {
+    this._setup = (blocks) => {
         let iconSize = ICONSIZE;
         // Which help page are we on?
         let page = 0;
@@ -57,7 +57,7 @@ function HelpWidget() {
 
         let leftArrow, rightArrow;
         if (blocks === null) {
-            let that = this;
+            
 
             this.widgetWindow.updateTitle(_("Take a tour"));
             rightArrow = document.getElementById("right-arrow");
@@ -70,24 +70,24 @@ function HelpWidget() {
 
             let cell = docById("left-arrow");
 
-            cell.onclick = function() {
+            cell.onclick = () => {
                 page = page - 1;
                 if (page < 0) {
                     page = HELPCONTENT.length - 1;
                 }
 
-                that._showPage(page);
+                this._showPage(page);
             };
 
             cell = docById("right-arrow");
 
-            cell.onclick = function() {
+            cell.onclick = () => {
                 page = page + 1;
                 if (page === HELPCONTENT.length) {
                     page = 0;
                 }
 
-                that._showPage(page);
+                this._showPage(page);
             };
         } else {
             if (blocks.activeBlock.name !== null) {
@@ -208,7 +208,7 @@ function HelpWidget() {
 
                     let loadButton = docById("loadButton");
                     if (loadButton !== null) {
-                        loadButton.onclick = function() {
+                        loadButton.onclick = () => {
                             if (message.length < 4) {
                                 // If there is nothing specified, just
                                 // load the block.
@@ -227,7 +227,7 @@ function HelpWidget() {
                                     ].makeBlockFromSearch(
                                         protoblk,
                                         protoName,
-                                        function(newBlock) {
+                                        (newBlock) => {
                                             blocks.moveBlock(
                                                 newBlock,
                                                 100,
@@ -256,7 +256,7 @@ function HelpWidget() {
                     }
                     let findIconMethod = docById("findIcon");
 
-                    findIconMethod.onclick = function() {
+                    findIconMethod.onclick = () => {
                         blocks.palettes.showPalette(object[1]);
                        
                     }
@@ -267,7 +267,7 @@ function HelpWidget() {
         this.widgetWindow.takeFocus();
     };
 
-    this._showPage = function(page) {
+    this._showPage = (page) => {
         let helpBody = docById("helpBodyDiv");
         let body = "";
         if (
@@ -309,9 +309,9 @@ function HelpWidget() {
             ].indexOf(HELPCONTENT[page][0]) !== -1
         ) {
             let cell = docById("right-arrow");
-            let that = this;
-            cell.onclick = function() {
-                that._prepareBlockList(blocks);
+            
+            cell.onclick = () => {
+                this._prepareBlockList(blocks);
             }
         }
 
@@ -323,7 +323,7 @@ function HelpWidget() {
 
     // Prepare a list of beginner and advanced blocks and cycle through their help
 
-    this._prepareBlockList = function(blocks) {
+    this._prepareBlockList = (blocks) => {
         for (let key in blocks.protoBlockDict){
             if(blocks.protoBlockDict[key].beginnerModeBlock === true && blocks.protoBlockDict[key].helpString !== undefined && blocks.protoBlockDict[key].helpString.length !== 0) {
                 beginnerBlocks.push(key);
@@ -348,7 +348,7 @@ function HelpWidget() {
     // Function to display help related to a single block
     // called recursively to cycle through help string of all blocks (Beginner Blocks First)
 
-    this._blockHelp = function(block, blocks) {
+    this._blockHelp = (block, blocks) => {
         let iconSize = ICONSIZE;
     
         let widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
@@ -365,22 +365,21 @@ function HelpWidget() {
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
         this.widgetWindow.sendToCenter();
         let cell = docById("right-arrow");
-        let that = this;
-        cell.onclick = function() {
+        cell.onclick = () => {
             if(index !== appendedBlockList.length - 1) {
                 index += 1;
         }
-            that._blockHelp(blocks.protoBlockDict[appendedBlockList[index]], blocks)
+            this._blockHelp(blocks.protoBlockDict[appendedBlockList[index]], blocks)
         }
 
         cell = docById("left-arrow");
         
-        cell.onclick = function() {
+        cell.onclick = () => {
             if(index !== 0){
                 index -= 1;
             }
             
-            that._blockHelp(blocks.protoBlockDict[appendedBlockList[index]], blocks);
+            this._blockHelp(blocks.protoBlockDict[appendedBlockList[index]], blocks);
         }
         if (block.name !== null) {
                 let label =
@@ -481,13 +480,13 @@ function HelpWidget() {
 
                 let findIconMethod = docById("findIcon");
 
-                findIconMethod.onclick = function() {
+                findIconMethod.onclick = () => {
                     block.palette.palettes.showPalette(block.palette.name);
                 }
 
                 let loadButton = docById("loadButton");
                 if (loadButton !== null) {
-                    loadButton.onclick = function() {
+                    loadButton.onclick = () => {
                         if (message.length < 4) {
                             // If there is nothing specified, just
                             // load the block.
@@ -508,7 +507,7 @@ function HelpWidget() {
                                 ].makeBlockFromSearch(
                                     protoblk,
                                     protoName,
-                                    function(newBlock) {
+                                    (newBlock) => {
                                         blocks.moveBlock(
                                             newBlock,
                                             100,
@@ -542,7 +541,7 @@ function HelpWidget() {
     }
     
 
-    this.showPageByName = function(pageName) {
+    this.showPageByName = (pageName) => {
         for (let i = 0; i < HELPCONTENT.length; i++) {
             if (HELPCONTENT[i].includes(pageName)) {
                 this._showPage(i);
