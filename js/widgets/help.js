@@ -21,6 +21,8 @@ function HelpWidget() {
         this.isOpen = true;
 
         let widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
+        widgetWindow.getWidgetBody().style.overflowY = "auto";
+        widgetWindow.getWidgetBody().style.maxHeight = "500px";
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
 	    widgetWindow.show();
@@ -29,12 +31,10 @@ function HelpWidget() {
             this.isOpen = false;
             this.destroy();
         };
-
         // Position the widget and make it visible.
         this._helpDiv = document.createElement("div");
 
         // Give the DOM time to create the div.
-        
         setTimeout(() => {
             this._setup(blocks);
         }, 100);
@@ -47,8 +47,8 @@ function HelpWidget() {
 
         this._helpDiv.style.width = iconSize * 2 + 425 + "px";
         this._helpDiv.style.backgroundColor = "#e8e8e8";
-        this._helpDiv.style.height = "65%";
-        this._helpDiv.style.overflowY = "auto";
+        // this._helpDiv.style.maxHeight = "100%";
+        // this._helpDiv.style.overflowY = "auto";
         this._helpDiv.innerHTML =
             '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
 
