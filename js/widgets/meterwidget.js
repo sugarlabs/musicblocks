@@ -9,13 +9,14 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-function MeterWidget() {
-    // A pie menu is used to show the meter and strong beats
-    const BUTTONDIVWIDTH = 535;
-    const BUTTONSIZE = 53;
-    const ICONSIZE = 32;
+const BUTTONDIVWIDTH = 535;
+const BUTTONSIZE = 53;
+const ICONSIZE = 32;
 
-    this.init = (logo, meterBlock, widgetBlock) => {
+class MeterWidget {
+    // A pie menu is used to show the meter and strong beats
+
+    constructor(logo, meterBlock, widgetBlock) {
         this._logo = logo;
         this._meterBlock = meterBlock;
         this._strongBeats = [];
@@ -170,13 +171,13 @@ function MeterWidget() {
 
         this._logo.textMsg(_("Click in the circle to select strong beats for the meter."));
         widgetWindow.sendToCenter();
-    };
+    }
 
-    this._get_click_lock = () => {
+    _get_click_lock() {
         return this._click_lock;
-    };
+    }
 
-    this.__playDrum = (drum) => {
+    __playDrum(drum) {
         this._logo.synth.trigger(
             0,
             "C4",
@@ -185,17 +186,17 @@ function MeterWidget() {
             null,
             null
         );
-    };
+    }
 
-    this.__getPlayingStatus = () => {
+    __getPlayingStatus() {
         return this._playing;
-    };
+    }
 
-    this.__getPauseStatus = () => {
+    __getPauseStatus() {
         return !this._playing;
-    };
+    }
 
-    this.__playOneBeat = (i, ms) => {
+    __playOneBeat(i, ms) {
         if (this.__getPauseStatus()) {
             for (let i = 0; i < this._strongBeats.length; i++) {
                 this._playWheel.navItems[i].navItem.hide();
@@ -220,9 +221,9 @@ function MeterWidget() {
         setTimeout(() => {
             this.__playOneBeat((i + 1) % this._strongBeats.length, ms);
         }, ms);
-    };
+    }
 
-    this._playBeat = () => {
+    _playBeat() {
         let tur = this._logo.turtles.ithTurtle(0);
         let bpmFactor =
             TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
@@ -232,9 +233,9 @@ function MeterWidget() {
 
         let noteBeatValue = bpmFactor * 1000 * this._beatValue;
         this.__playOneBeat(0, noteBeatValue);
-    };
+    }
 
-    this._addButton = (row, icon, iconSize, label) => {
+    _addButton(row, icon, iconSize, label) {
         let cell = row.insertCell(-1);
         cell.innerHTML =
             '&nbsp;&nbsp;<img src="header-icons/' +
@@ -265,9 +266,9 @@ function MeterWidget() {
         };
 
         return cell;
-    };
+    }
 
-    this._save = () => {
+    _save() {
         // Export onbeatdo blocks for each strong beat
         let strongBeats = [];
         let newStack = [];
@@ -308,9 +309,9 @@ function MeterWidget() {
 
         console.debug(newStack);
         this._logo.blocks.loadNewBlocks(newStack);
-    };
+    }
 
-    this._piemenuMeter = (numberOfBeats, beatValue) => {
+    _piemenuMeter(numberOfBeats, beatValue) {
         // pie menu for strong beat selection
 
         docById("meterWheelDiv").style.display = "";
@@ -459,9 +460,9 @@ function MeterWidget() {
         }
 
         this.setupDefaultStrongWeakBeats(numberOfBeats, beatValue);
-    };
+    }
 
-    this.setupDefaultStrongWeakBeats = (numberOfBeats, beatValue) => {
+    setupDefaultStrongWeakBeats(numberOfBeats, beatValue) {
         if (beatValue == 0.25 && numberOfBeats == 4) {
             this._strongBeats[0] = true;
             this._strongBeats[2] = true;
@@ -479,5 +480,5 @@ function MeterWidget() {
             this._beatWheel.navItems[0].navItem.show();
             this._beatWheel.navItems[3].navItem.show();
         }
-    };
+    }
 }

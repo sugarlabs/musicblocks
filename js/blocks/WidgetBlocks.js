@@ -361,17 +361,13 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.meterWidget === null) {
-                logo.meterWidget = new MeterWidget();
-            }
-
             logo.insideMeterWidget = true;
 
             let listenerName = "_meterwidget_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
-                logo.meterWidget.init(logo, logo._meterBlock, blk);
+                logo.meterWidget = new MeterWidget(logo, logo._meterBlock, blk);
                 logo.insideMeterWidget = false;
             };
 
