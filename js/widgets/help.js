@@ -47,6 +47,8 @@ function HelpWidget() {
 
         this._helpDiv.style.width = iconSize * 2 + 425 + "px";
         this._helpDiv.style.backgroundColor = "#e8e8e8";
+        this._helpDiv.style.height = "60%";
+        this._helpDiv.style.overflowY = "auto";
         this._helpDiv.innerHTML =
             '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
 
