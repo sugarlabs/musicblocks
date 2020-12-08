@@ -314,7 +314,7 @@ function WidgetWindow(key, title) {
 
         this.setPosition(
             (cRect.width - fRect.width) / 2,
-            (cRect.height - fRect.height) / 2
+            (cRect.height - fRect.height) / 3
         );
 
         return this;
