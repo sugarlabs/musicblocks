@@ -19,6 +19,7 @@ function SampleWidget() {
         var d = new Date();
 
         this._draw();
+        this.getBrowserAudio();
     };
 
 
