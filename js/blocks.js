@@ -2239,6 +2239,7 @@ function Blocks(activity) {
         let label;
         let obj;
         let attr;
+        console.log(myBlock.name);
         switch (myBlock.name) {
         case "loadFile":
             try {
@@ -2249,8 +2250,11 @@ function Blocks(activity) {
             maxLength = 10;
             break;
         case "audiofile":
-            label = _("open audio file");
-            break;
+            try {
+                label = myBlock.value[0].toString();
+            } catch (e) {
+                label = _("open audio file");
+            }
         case "solfege":
             if (myBlock.value === null) myBlock.value = "sol";
             obj = splitSolfege(myBlock.value);
