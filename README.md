@@ -141,7 +141,18 @@ these issues, whilst adding buffers for future additions. We'll also be using a 
 tech-stack to develop and maintain this project given its scale. After the core is built, we'll be
 porting features from this application to it.
 
-### Keep in mind
+### New Contributors
+
+Use the [discussions](https://github.com/sugarlabs/musicblocks/discussions) tab at the top of the
+repository to:
+
+- Ask questions you’re wondering about.
+- Share ideas.
+- Engage with other community members.
+
+Feel free. But, please don't spam :p.
+
+### Keep in Mind
 
 1. Your contributions need not necessarily have to address any discovered issue. If you encounter
 any, feel free to add a fix through a PR, or create a new issue ticket.
@@ -170,8 +181,9 @@ about the behavior of the language or compiler/transpiler. See
 [JavaScript docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript).
 
 9. If you have a question, do a _web search_ first. If you don't find any satisfactory answer, then
-ask it in a comment. If it is a general question about Music Blocks, please use the
-_Sugar-dev Devel <[sugar-devel@lists.sugarlabs.org](mailto:sugar-devel@lists.sugarlabs.org)>_
+ask it in a comment. If it is a general question about Music Blocks, please use the new
+[discussions](https://github.com/sugarlabs/musicblocks/discussions) tab on top the the repository,
+or the _Sugar-dev Devel <[sugar-devel@lists.sugarlabs.org](mailto:sugar-devel@lists.sugarlabs.org)>_
 mailing list. Don't ask silly questions (unless you don't know it is silly ;p) before searching it
 on the web.
 
