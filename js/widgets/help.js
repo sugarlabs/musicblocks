@@ -22,7 +22,8 @@ function HelpWidget() {
 
         let widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         widgetWindow.getWidgetBody().style.overflowY = "auto";
-        widgetWindow.getWidgetBody().style.maxHeight = "500px";
+        const canvasHeight = docById("myCanvas").getBoundingClientRect().height;
+        widgetWindow.getWidgetBody().style.maxHeight = `${0.75 * canvasHeight}px`;
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
 	    widgetWindow.show();
@@ -35,9 +36,10 @@ function HelpWidget() {
         this._helpDiv = document.createElement("div");
 
         // Give the DOM time to create the div.
-        setTimeout(() => {
-            this._setup(blocks);
-        }, 100);
+        setTimeout(() => this._setup(blocks), 0);
+
+        // Position center
+        setTimeout(this.widgetWindow.sendToCenter, 50);
     };
 
     this._setup = (blocks) => {
@@ -53,9 +55,6 @@ function HelpWidget() {
             '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
 
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
-
-        // Make help div appear in center of screen
-        this.widgetWindow.sendToCenter();
 
         let leftArrow, rightArrow;
         if (blocks === null) {
