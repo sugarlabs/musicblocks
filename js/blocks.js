@@ -2239,7 +2239,6 @@ function Blocks(activity) {
         let label;
         let obj;
         let attr;
-        console.log(myBlock.name);
         switch (myBlock.name) {
         case "loadFile":
             try {
