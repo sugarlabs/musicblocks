@@ -305,16 +305,14 @@ function WidgetWindow(key, title) {
 
         if (cRect.width === 0 || cRect.height === 0) {
             // The canvas isn't shown so we set some approximate numbers
-            this.setPosition(
-                200,
-                140
-            )
+            this.setPosition(200, 140);
             return this;
         }
 
+        const navHeight = document.querySelector("nav").offsetHeight;
         this.setPosition(
             (cRect.width - fRect.width) / 2,
-            (cRect.height - fRect.height) / 2
+            (cRect.height - fRect.height + navHeight) / 2
         );
 
         return this;
