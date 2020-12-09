@@ -578,7 +578,7 @@ class Block {
         }
 
         if (this.container !== null) {
-            that = this;
+            let that = this;
 
             /**
              * After new buttons are creates, they are cached and a
@@ -2540,7 +2540,7 @@ class Block {
                         that.blocks.logo.doStopTurtles();
 
                         setTimeout( () => {
-                            this.blocks.logo.runLogoCommands(topBlk);
+                            that.blocks.logo.runLogoCommands(topBlk);
                         }, 250);
                     } else {
                         that.blocks.logo.runLogoCommands(topBlk);

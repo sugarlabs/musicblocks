@@ -57,10 +57,9 @@ function GlobalTag(Planet) {
 
         tag.textContent = _(this.name);
 
-        let that = this;
 
-        tag.addEventListener('click', function (evt) {
-            that.onTagClick();
+        tag.addEventListener('click',  (evt) => {
+            this.onTagClick();
         });
 
         let el = document.getElementById('morechips');

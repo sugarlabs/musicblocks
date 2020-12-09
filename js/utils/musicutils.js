@@ -1846,7 +1846,7 @@ function getStepSizeDown(keySignature, pitch, transposition, temperament) {
 }
 
 function getModeLength(keySignature) {
-    return _buildScale(keySignature).length;
+    return _buildScale(keySignature)[1].length;
 }
 
 function _getStepSize(
