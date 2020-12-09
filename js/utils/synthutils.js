@@ -261,6 +261,8 @@ const SAMPLECENTERNO = {
     "double bass": ["C4", 39]
 };
 
+CUSTOMSAMPLES = [[]];
+
 const percussionInstruments = ["koto", "banjo", "dulcimer", "xylophone", "celeste"];
 const stringInstruments = ["piano", "guitar", "acoustic guitar", "electric guitar"];
 
@@ -969,7 +971,11 @@ function Synth() {
         if (sourceName in this.samples.voice) {
             instrumentsSource[instrumentName] = [2, sourceName];
             let noteDict = {};
-            noteDict[SAMPLECENTERNO[sourceName][0]] = this.samples.voice[sourceName];
+            if (sourceName in SAMPLECENTERNO) {
+                noteDict[SAMPLECENTERNO[sourceName][0]] = this.samples.voice[sourceName];
+            } else {
+                noteDict["C4"] = this.samples.voice[sourceName];
+            }
             tempSynth = new Tone.Sampler(noteDict);
         } else if (sourceName in this.samples.drum) {
             instrumentsSource[instrumentName] = [1, sourceName];
