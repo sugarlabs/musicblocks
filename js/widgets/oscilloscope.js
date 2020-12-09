@@ -48,8 +48,9 @@ function Oscilloscope() {
         zoomInButton.onclick = () => {
             this.zoomFactor += step;
         };
-        zoomInButton.children[0].src =
-            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(SMALLERBUTTON)));
+        zoomInButton.children[0].src = `data:image/svg+xml;base64,${window.btoa(
+            unescape(encodeURIComponent(SMALLERBUTTON))
+        )}`;
 
         let zoomOutButton = widgetWindow.addButton("", ICONSIZE, _("ZOOM OUT"));
 
@@ -57,8 +58,9 @@ function Oscilloscope() {
             this.zoomFactor -= step;
         };
 
-        zoomOutButton.children[0].src =
-            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(BIGGERBUTTON)));
+        zoomOutButton.children[0].src = `data:image/svg+xml;base64,${window.btoa(
+            unescape(encodeURIComponent(BIGGERBUTTON))
+        )}`;
 
         widgetWindow.sendToCenter();
         this.widgetWindow = widgetWindow;
