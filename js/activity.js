@@ -3979,16 +3979,14 @@ function Activity() {
      * Shows help page
      */
     _showHelp = function () {
-        let helpWidget = new HelpWidget();
-        helpWidget.init(null);
+        let helpWidget = new HelpWidget(null);
     };
 
     /*
      * Shows about page
      */
     _showAboutPage = function () {
-        let helpWidget = new HelpWidget();
-        helpWidget.init(null);
+        let helpWidget = new HelpWidget(null);
         helpWidget.showPageByName(_('About'));
     };
 

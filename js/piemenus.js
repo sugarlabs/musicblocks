@@ -3218,8 +3218,7 @@ piemenuBlockContext = function(block) {
     if (helpButton !== null) {
         wheel.navItems[helpButton].navigateFunction = function() {
             that.blocks.activeBlock = blockBlock;
-            let helpWidget = new HelpWidget();
-            helpWidget.init(blocks);
+            let helpWidget = new HelpWidget(blocks);
             docById("contextWheelDiv").style.display = "none";
         };
     }

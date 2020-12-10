@@ -10,16 +10,16 @@
 
 // This widget displays help about a block or a button.
 
-function HelpWidget() {
-    const ICONSIZE = 32;
-    let beginnerBlocks = [];
-    let advancedBlocks = [];
-    let appendedBlockList = [];
-    let index = 0;
+const ICONSIZE = 32;
 
-    this.init = (blocks) => {
+class HelpWidget {
+    constructor(blocks) {
+        this.beginnerBlocks = [];
+        this.advancedBlocks = [];
+        this.appendedBlockList = [];
+        this.index = 0;
         this.isOpen = true;
-
+    
         let widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         widgetWindow.getWidgetBody().style.overflowY = "auto";
         const canvasHeight = docById("myCanvas").getBoundingClientRect().height;
@@ -27,14 +27,13 @@ function HelpWidget() {
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
-
         widgetWindow.onClose = () => {
             this.isOpen = false;
             this.destroy();
         };
         // Position the widget and make it visible.
         this._helpDiv = document.createElement("div");
-
+    
         // Give the DOM time to create the div.
         setTimeout(() => this._setup(blocks), 0);
 
@@ -42,7 +41,7 @@ function HelpWidget() {
         setTimeout(this.widgetWindow.sendToCenter, 50);
     };
 
-    this._setup = (blocks) => {
+    _setup(blocks) {
         let iconSize = ICONSIZE;
         // Which help page are we on?
         let page = 0;
@@ -243,9 +242,9 @@ function HelpWidget() {
         }
 
         this.widgetWindow.takeFocus();
-    };
+    }
 
-    this._showPage = (page) => {
+    _showPage(page) {
         let helpBody = docById("helpBodyDiv");
         let body = "";
         if (
@@ -296,14 +295,14 @@ function HelpWidget() {
 
     // Prepare a list of beginner and advanced blocks and cycle through their help
 
-    this._prepareBlockList = (blocks) => {
+    _prepareBlockList(blocks) {
         for (let key in blocks.protoBlockDict) {
             if (
                 blocks.protoBlockDict[key].beginnerModeBlock === true &&
                 blocks.protoBlockDict[key].helpString !== undefined &&
                 blocks.protoBlockDict[key].helpString.length !== 0
             ) {
-                beginnerBlocks.push(key);
+                this.beginnerBlocks.push(key);
             }
         }
 
@@ -313,22 +312,23 @@ function HelpWidget() {
                 blocks.protoBlockDict[key].helpString !== undefined &&
                 blocks.protoBlockDict[key].helpString.length !== 0
             ) {
-                advancedBlocks.push(key);
+                this.advancedBlocks.push(key);
             }
         }
 
         // Array containing list of all blocks (Beginner blocks first)
+        
+        this.appendedBlockList.push(...this.beginnerBlocks);
+        this.appendedBlockList.push(...this.advancedBlocks);
 
-        appendedBlockList.push(...beginnerBlocks);
-        appendedBlockList.push(...advancedBlocks);
+        this._blockHelp(blocks.protoBlockDict[this.appendedBlockList[0]], blocks)
 
-        this._blockHelp(blocks.protoBlockDict[appendedBlockList[0]], blocks);
-    };
+    }
 
     // Function to display help related to a single block
     // called recursively to cycle through help string of all blocks (Beginner Blocks First)
 
-    this._blockHelp = (block, blocks) => {
+    _blockHelp(block, blocks) {
         let iconSize = ICONSIZE;
 
         let widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
@@ -346,21 +346,21 @@ function HelpWidget() {
         this.widgetWindow.sendToCenter();
         let cell = docById("right-arrow");
         cell.onclick = () => {
-            if (index !== appendedBlockList.length - 1) {
-                index += 1;
-            }
-            this._blockHelp(blocks.protoBlockDict[appendedBlockList[index]], blocks);
-        };
+            if(this.index !== this.appendedBlockList.length - 1) {
+                this.index += 1;
+        }
+            this._blockHelp(blocks.protoBlockDict[this.appendedBlockList[this.index]], blocks)
+        }
 
         cell = docById("left-arrow");
 
         cell.onclick = () => {
-            if (index !== 0) {
-                index -= 1;
+            if(this.index !== 0){
+                this.index -= 1;
             }
-
-            this._blockHelp(blocks.protoBlockDict[appendedBlockList[index]], blocks);
-        };
+            
+            this._blockHelp(blocks.protoBlockDict[this.appendedBlockList[this.index]], blocks);
+        }
         if (block.name !== null) {
             let label = block.staticLabels[0];
             this.widgetWindow.updateTitle(_(label));
@@ -498,11 +498,11 @@ function HelpWidget() {
         this.widgetWindow.takeFocus();
     };
 
-    this.showPageByName = (pageName) => {
+    showPageByName(pageName) {
         for (let i = 0; i < HELPCONTENT.length; i++) {
             if (HELPCONTENT[i].includes(pageName)) {
                 this._showPage(i);
             }
         }
-    };
+    }
 }
