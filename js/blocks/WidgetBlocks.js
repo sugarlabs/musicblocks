@@ -467,7 +467,7 @@ function setupWidgetBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
             
             let __listener = function(event) {
-                logo.modeWidget = new ModeWidget(logo, logo._modeBlock);
+                logo.modeWidget = new ModeWidget();
                 logo.insideModeWidget = false;
             };
 

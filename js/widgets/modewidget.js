@@ -20,11 +20,11 @@ class ModeWidget {
         }
     }
 
-    constructor(logo, modeBlock) {
+    constructor() {
         this._logo = logo;
-        this._modeBlock = modeBlock;
+        this._modeBlock = logo._modeBlock;
         this._locked = false;
-        this._pitch = this._logo.turtles.ithTurtle(0).singer.keySignature[0];
+        this._pitch = turtles.ithTurtle(0).singer.keySignature[0];
         this._noteValue = 0.333;
         this._undoStack = [];
         this._playing = false;
@@ -202,7 +202,7 @@ class ModeWidget {
     _setMode() {
         // Read in the current mode to start
         const currentModeName =
-            keySignatureToMode(this._logo.turtles.ithTurtle(0).singer.keySignature);
+            keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
         const currentMode = MUSICALMODES[currentModeName[1]];
 
         // Add the mode name in the bottom row of the table.
@@ -257,7 +257,7 @@ class ModeWidget {
             "images/highlights/sel_b.png"
         ];
         const currentModeName =
-            keySignatureToMode(this._logo.turtles.ithTurtle(0).singer.keySignature);
+            keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
         const letterName = currentModeName[0];
 
         const startDict = {
@@ -332,7 +332,7 @@ class ModeWidget {
         this._saveState();
         this.__invertOnePair(1);
         const currentModeName =
-            keySignatureToMode(this._logo.turtles.ithTurtle(0).singer.keySignature);
+            keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
         if (currentModeName[0] === "C") {
             this._showPiano();
         }
@@ -358,7 +358,7 @@ class ModeWidget {
             this._saveState();
             this._setModeName();
             const currentModeName = keySignatureToMode(
-                this._logo.turtles.ithTurtle(0).singer.keySignature
+                turtles.ithTurtle(0).singer.keySignature
             );
             if (currentModeName[0] === "C") {
                 this._showPiano();
@@ -415,7 +415,7 @@ class ModeWidget {
                     this._saveState();
                     this._setModeName();
                     const currentModeName = keySignatureToMode(
-                        this._logo.turtles.ithTurtle(0).singer.keySignature
+                        turtles.ithTurtle(0).singer.keySignature
                     );
                     if (currentModeName[0] === "C") {
                         this._showPiano();
@@ -467,7 +467,7 @@ class ModeWidget {
                     this._saveState();
                     this._setModeName();
                     const currentModeName = keySignatureToMode(
-                        this._logo.turtles.ithTurtle(0).singer.keySignature
+                        turtles.ithTurtle(0).singer.keySignature
                     );
                     if (currentModeName[0] === "C") {
                         this._showPiano();
@@ -556,7 +556,7 @@ class ModeWidget {
         const time = this._noteValue + 0.125;
 
         const currentKey =
-            keySignatureToMode(this._logo.turtles.ithTurtle(0).singer.keySignature)[0];
+            keySignatureToMode(turtles.ithTurtle(0).singer.keySignature)[0];
         if (currentKey === "C") {
             if (i > this._notesToPlay.length - 1) {
                 setTimeout(()=>{
@@ -613,7 +613,7 @@ class ModeWidget {
                 }
 
                 this._lastNotePlayed = note;
-                const ks = this._logo.turtles.ithTurtle(0).singer.keySignature;
+                const ks = turtles.ithTurtle(0).singer.keySignature;
                 const noteToPlay = getNote(
                     this._pitch,
                     4,
@@ -674,7 +674,7 @@ class ModeWidget {
                 this._playWheel.navItems[note % 12].navItem.show();
                 this._lastNotePlayed = note;
 
-                const ks = this._logo.turtles.ithTurtle(0).singer.keySignature;
+                const ks = turtles.ithTurtle(0).singer.keySignature;
                 const noteToPlay = getNote(
                     this._pitch,
                     4,
@@ -705,7 +705,7 @@ class ModeWidget {
     };
 
     _playNote(i) {
-        const ks = this._logo.turtles.ithTurtle(0).singer.keySignature;
+        const ks = turtles.ithTurtle(0).singer.keySignature;
 
         const noteToPlay = getNote(
             this._pitch,
@@ -743,7 +743,7 @@ class ModeWidget {
             this._resetNotes();
             this._setModeName();
             const currentModeName =
-                keySignatureToMode(this._logo.turtles.ithTurtle(0).singer.keySignature);
+                keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
             if (currentModeName[0] === "C") {
                 this._showPiano();
             }
@@ -762,7 +762,7 @@ class ModeWidget {
         this._resetNotes();
         this._setModeName();
         const currentModeName =
-            keySignatureToMode(this._logo.turtles.ithTurtle(0).singer.keySignature);
+            keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
         if (currentModeName[0] === "C") {
             this._showPiano();
         }
@@ -789,7 +789,7 @@ class ModeWidget {
         const n = table.rows.length - 1;
         const currentMode = JSON.stringify(this._calculateMode());
         const currentKey =
-            keySignatureToMode(this._logo.turtles.ithTurtle(0).singer.keySignature)[0];
+            keySignatureToMode(turtles.ithTurtle(0).singer.keySignature)[0];
 
         for (let mode in MUSICALMODES) {
             if (JSON.stringify(MUSICALMODES[mode]) === currentMode) {
@@ -1060,7 +1060,7 @@ class ModeWidget {
             this._playNote(i);
             this._setModeName();
             const currentModeName =
-                keySignatureToMode(this._logo.turtles.ithTurtle(0).singer.keySignature);
+                keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
             if (currentModeName[0] === "C") {
                 this._showPiano();
             }
@@ -1078,7 +1078,7 @@ class ModeWidget {
             this._selectedNotes[i] = false;
             this._setModeName();
             const currentModeName =
-                keySignatureToMode(this._logo.turtles.ithTurtle(0).singer.keySignature);
+                keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
             if (currentModeName[0] === "C") {
                 this._showPiano();
             }
