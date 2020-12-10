@@ -13,12 +13,15 @@
 // from given frequency to nextoctave frequency(two times the given frequency)
 // in continuous manner.
 
-function PitchSlider() {
-    const ICONSIZE = 32;
-    this._delta = 0;
-    const SEMITONE = Math.pow(2, 1 / 12);
+const ICONSIZE = 32;
+const SEMITONE = Math.pow(2, 1 / 12);
 
-    this._save = (frequency) => {
+class PitchSlider {
+    constructor() {
+        this._delta = 0;
+    }
+
+    _save(frequency) {
         for (let name in this._logo.blocks.palettes.dict) {
             this._logo.blocks.palettes.dict[name].hideMenu(true);
         }
@@ -42,9 +45,9 @@ function PitchSlider() {
         newStack.push([hiddenIdx, "hidden", 0, 0, [hertzIdx, null]]);
 
         this._logo.blocks.loadNewBlocks(newStack);
-    };
+    }
 
-    this.init = (logo) => {
+    init(logo) {
         if (window.widgetWindows.openWindows["slider"]) return;
         if (!this.frequencies || !this.frequencies.length) this.frequencies = [392];
         this._logo = logo;
@@ -136,5 +139,5 @@ function PitchSlider() {
         }
 
         this._logo.textMsg(_("Click on the slider to create a note block."));
-    };
+    }
 }
