@@ -5614,9 +5614,6 @@ function Blocks(activity) {
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
-
-            this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
-            break;
             case "camera":
                 postProcess = function(args) {
                     let thisBlock = args[0];
