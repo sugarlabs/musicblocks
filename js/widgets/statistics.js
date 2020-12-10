@@ -12,11 +12,12 @@
 // This widget makes displays the status of selected parameters and
 // notes as they are being played.
 
-function StatsWindow() {
-    const BUTTONSIZE = 53;
-    const ICONSIZE = 32;
+const BUTTONSIZE = 53;
+const ICONSIZE = 32;
 
-    this.init = function(logo) {
+class StatsWindow {
+
+    constructor(logo) {
         this._logo = logo;
         this.isOpen = true;
 
@@ -33,12 +34,10 @@ function StatsWindow() {
         widgetWindow.clear();
 	    widgetWindow.show();
 
-        let that = this;
-
-        widgetWindow.onclose = function() {
-            that.isOpen = false;
+        widgetWindow.onclose = ()=>{
+            this.isOpen = false;
             blocks.showBlocks();
-            this.destroy();
+            widgetWindow.destroy();
         };
         this.doAnalytics();
 
@@ -49,10 +48,10 @@ function StatsWindow() {
      * Renders and carries out analysis
      * of the MB project
      */
-    this.doAnalytics = function() {
+    doAnalytics() {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         blocks.activeBlock = null;
-        myChart = docById("myChart");
+        let myChart = docById("myChart");
 
         // if (_isCanvasBlank(myChart) === false) {
         //     return;
@@ -66,9 +65,9 @@ function StatsWindow() {
         let scores = analyzeProject(blocks);
         runAnalytics(logo)
         let data = scoreToChartData(scores);
-        __callback = () => {
-            imageData = myRadarChart.toBase64Image();
-            img = new Image();
+        let __callback = () => {
+            let imageData = myRadarChart.toBase64Image();
+            let img = new Image();
             img.src = imageData;
             img.width =  200;
             this.widgetWindow.getWidgetBody().appendChild(img)
@@ -76,7 +75,7 @@ function StatsWindow() {
             logo.showBlocksAfterRun = false;
             document.body.style.cursor = "default";
         };
-        options = getChartOptions(__callback);
+        let options = getChartOptions(__callback);
         myRadarChart = new Chart(ctx).Radar(data, options);
         
         this.jsonObject = document.createElement('ul');
@@ -84,9 +83,9 @@ function StatsWindow() {
         this.widgetWindow.getWidgetBody().appendChild(this.jsonObject)
 
     };
-    this.displayInfo = (stats) => {
-	let lowHertz = stats["lowestNote"][2] + 0.5;
-	let highHertz = stats["highestNote"][2] + 0.5;
+    displayInfo(stats) {
+        let lowHertz = stats["lowestNote"][2] + 0.5;
+        let highHertz = stats["highestNote"][2] + 0.5;
         this.jsonObject.innerHTML = 
             '<li>duples: ' + stats["duples"] + '</li>'  + 
             '<li>triplets: ' + stats["triplets"] + '</li>'  + 

@@ -4710,8 +4710,7 @@ function Activity() {
         toolbar.renderRunStepIcon(_doStepButton);
         toolbar.renderAdvancedIcons(
             () => {
-                if (!logo.statsWindow) logo.statsWindow = new StatsWindow();
-                logo.statsWindow.init();
+                logo.statsWindow = new StatsWindow();
             },
             doOpenPlugin,
             deletePlugin,
