@@ -657,7 +657,6 @@ function RhythmRuler() {
 
             ruler.deleteCell(newCellIndex);
 
-            // var noteValue = noteValues[newCellIndex];
             let newNoteValue = 0;
 
             newNoteValue = inputNum * noteValue;
