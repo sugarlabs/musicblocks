@@ -19,7 +19,7 @@ class HelpWidget {
         this.appendedBlockList = [];
         this.index = 0;
         this.isOpen = true;
-    
+
         let widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         widgetWindow.getWidgetBody().style.overflowY = "auto";
         const canvasHeight = docById("myCanvas").getBoundingClientRect().height;
@@ -33,13 +33,13 @@ class HelpWidget {
         };
         // Position the widget and make it visible.
         this._helpDiv = document.createElement("div");
-    
+
         // Give the DOM time to create the div.
         setTimeout(() => this._setup(blocks), 0);
 
         // Position center
         setTimeout(this.widgetWindow.sendToCenter, 50);
-    };
+    }
 
     _setup(blocks) {
         let iconSize = ICONSIZE;
@@ -291,7 +291,7 @@ class HelpWidget {
         helpBody.innerHTML = body;
 
         this.widgetWindow.takeFocus();
-    };
+    }
 
     // Prepare a list of beginner and advanced blocks and cycle through their help
 
@@ -317,12 +317,11 @@ class HelpWidget {
         }
 
         // Array containing list of all blocks (Beginner blocks first)
-        
+
         this.appendedBlockList.push(...this.beginnerBlocks);
         this.appendedBlockList.push(...this.advancedBlocks);
 
-        this._blockHelp(blocks.protoBlockDict[this.appendedBlockList[0]], blocks)
-
+        this._blockHelp(blocks.protoBlockDict[this.appendedBlockList[0]], blocks);
     }
 
     // Function to display help related to a single block
@@ -346,21 +345,21 @@ class HelpWidget {
         this.widgetWindow.sendToCenter();
         let cell = docById("right-arrow");
         cell.onclick = () => {
-            if(this.index !== this.appendedBlockList.length - 1) {
+            if (this.index !== this.appendedBlockList.length - 1) {
                 this.index += 1;
-        }
-            this._blockHelp(blocks.protoBlockDict[this.appendedBlockList[this.index]], blocks)
-        }
+            }
+            this._blockHelp(blocks.protoBlockDict[this.appendedBlockList[this.index]], blocks);
+        };
 
         cell = docById("left-arrow");
 
         cell.onclick = () => {
-            if(this.index !== 0){
+            if (this.index !== 0) {
                 this.index -= 1;
             }
-            
+
             this._blockHelp(blocks.protoBlockDict[this.appendedBlockList[this.index]], blocks);
-        }
+        };
         if (block.name !== null) {
             let label = block.staticLabels[0];
             this.widgetWindow.updateTitle(_(label));
@@ -496,7 +495,7 @@ class HelpWidget {
         }
 
         this.widgetWindow.takeFocus();
-    };
+    }
 
     showPageByName(pageName) {
         for (let i = 0; i < HELPCONTENT.length; i++) {
