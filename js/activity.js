@@ -3979,17 +3979,16 @@ function Activity() {
      * Shows help page
      */
     _showHelp = function () {
-        let helpWidget = new HelpWidget();
-        helpWidget.init(null);
+        // Will show welcome page by default.
+        new HelpWidget(null);
     };
 
     /*
      * Shows about page
      */
     _showAboutPage = function () {
-        let helpWidget = new HelpWidget();
-        helpWidget.init(null);
-        helpWidget.showPageByName(_('About'));
+        // Will show welcome page by default.
+        new HelpWidget(null);
     };
 
     /*
