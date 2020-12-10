@@ -461,17 +461,13 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.modeWidget === null) {
-                logo.modeWidget = new ModeWidget();
-            }
-
             logo.insideModeWidget = true;
-
+            
             let listenerName = "_modewidget_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
-
+            
             let __listener = function(event) {
-                logo.modeWidget.init(logo, logo._modeBlock);
+                logo.modeWidget = new ModeWidget(logo, logo._modeBlock);
                 logo.insideModeWidget = false;
             };
 
