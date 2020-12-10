@@ -2254,6 +2254,7 @@ function Blocks(activity) {
             } catch (e) {
                 label = _("open audio file");
             }
+            break;
         case "solfege":
             if (myBlock.value === null) myBlock.value = "sol";
             obj = splitSolfege(myBlock.value);
@@ -3099,7 +3100,7 @@ function Blocks(activity) {
             };
 
             postProcessArg = [thisBlock, null];
-        } else if (name === "loadFile") {
+        } else if (name === "loadFile" || name === "audiofile") {
             postProcess = function(args) {
                 that.updateBlockText(args[0]);
             };
@@ -5711,7 +5712,6 @@ function Blocks(activity) {
             case "audiofile":
                 postProcess = function(args) {
                     that.blockList[args[0]].value = args[1];
-                    that.blockList[args[0]].text = "audio file";
                     that.updateBlockText(args[0]);
                 }
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
