@@ -306,6 +306,7 @@ const TACAT = {
     camera: "ignore",
     video: "ignore",
     loadFile: "ignore",
+    audiofile: "ignore",
     stopvideocam: "ignore",
     tone: "media",
     tofrequency: "media",
@@ -724,7 +725,7 @@ let runAnalytics = (logo) => {
 
 let getStatsFromNotation = (logo) => {
     projectStats = {};
-    // since we use the lilypond output to generate stats , please make sure to change these rules if 
+    // since we use the lilypond output to generate stats , please make sure to change these rules if
     // we ever change the lilypond notation structure.
     let notation = logo.notation;
     projectStats["duples"] = 0;
@@ -761,7 +762,7 @@ let getStatsFromNotation = (logo) => {
                     noteId++;
                 }
             }
-            
+
             if (item[1] == 2) {
                 projectStats["duples"]++;
             } else if (item[1] == 3) {
