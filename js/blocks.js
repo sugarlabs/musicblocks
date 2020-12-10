@@ -2250,7 +2250,11 @@ function Blocks(activity) {
             break;
         case "audiofile":
             try {
-                label = myBlock.value[0].toString();
+                if (myBlock.value[0] === null) {
+                    label = _("open audio file");
+                } else {
+                    label = myBlock.value[0].toString();
+                }
             } catch (e) {
                 label = _("open audio file");
             }
