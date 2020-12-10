@@ -4711,7 +4711,6 @@ function Activity() {
         toolbar.renderAdvancedIcons(
             () => {
                 if (!logo.statsWindow) logo.statsWindow = new StatsWindow();
-                logo.statsWindow.init();
             },
             doOpenPlugin,
             deletePlugin,

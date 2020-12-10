@@ -12,92 +12,91 @@
 // This widget makes displays the status of selected parameters and
 // notes as they are being played.
 
+const BUTTONSIZE = 53;
+const ICONSIZE = 32;
+
 class StatsWindow {
-    constructor() {
-        const BUTTONSIZE = 53;
-        const ICONSIZE = 32;
 
-        this.init = function (logo) {
-            this._logo = logo;
-            this.isOpen = true;
+    constructor(logo) {
+        this._logo = logo;
+        this.isOpen = true;
 
-            let w = window.innerWidth;
-            this._cellScale = w / 1200;
-            let iconSize = ICONSIZE * this._cellScale;
+        let w = window.innerWidth;
+        this._cellScale = w / 1200;
+        let iconSize = ICONSIZE * this._cellScale;
 
-            let widgetWindow = window.widgetWindows.windowFor(
-                this,
-                "stats",
-                "stats"
-            );
-            this.widgetWindow = widgetWindow;
-            widgetWindow.clear();
-            widgetWindow.show();
+        let widgetWindow = window.widgetWindows.windowFor(
+            this,
+            "stats",
+            "stats"
+        );
+        this.widgetWindow = widgetWindow;
+        widgetWindow.clear();
+	    widgetWindow.show();
 
-            let that = this;
+        let that = this;
 
-            widgetWindow.onclose = function () {
-                that.isOpen = false;
-                blocks.showBlocks();
-                this.destroy();
-            };
-            this.doAnalytics();
-
-            widgetWindow.sendToCenter();
+        widgetWindow.onclose = function() {
+            that.isOpen = false;
+            blocks.showBlocks();
+            this.destroy();
         };
+        this.doAnalytics();
 
-        /*
-         * Renders and carries out analysis
-         * of the MB project
-         */
-        this.doAnalytics = function () {
-            toolbar.closeAuxToolbar(_showHideAuxMenu);
-            blocks.activeBlock = null;
-            let myChart = docById("myChart");
+        widgetWindow.sendToCenter();
+    }
 
-            // if (_isCanvasBlank(myChart) === false) {
-            //     return;
-            // }
-            let ctx = myChart.getContext("2d");
-            loading = true;
-            document.body.style.cursor = "wait";
+    /*  
+     * Renders and carries out analysis
+     * of the MB project
+     */
+    doAnalytics() {
+        toolbar.closeAuxToolbar(_showHideAuxMenu);
+        blocks.activeBlock = null;
+        let myChart = docById("myChart");
 
-            let myRadarChart = null;
-            let scores = analyzeProject(blocks);
-            runAnalytics(logo);
-            let data = scoreToChartData(scores);
-            __callback = () => {
-                let imageData = myRadarChart.toBase64Image();
-                let img = new Image();
-                img.src = imageData;
-                img.width = 200;
-                this.widgetWindow.getWidgetBody().appendChild(img);
-                blocks.hideBlocks();
-                logo.showBlocksAfterRun = false;
-                document.body.style.cursor = "default";
-            };
-            let options = getChartOptions(__callback);
-            myRadarChart = new Chart(ctx).Radar(data, options);
+        // if (_isCanvasBlank(myChart) === false) {
+        //     return;
+        // }
 
-            this.jsonObject = document.createElement('ul');
-            this.jsonObject.style.float = 'left';
-            this.widgetWindow.getWidgetBody().appendChild(this.jsonObject);
+        let ctx = myChart.getContext("2d");
+        loading = true;
+        document.body.style.cursor = "wait";
 
+        let myRadarChart = null;
+        let scores = analyzeProject(blocks);
+        runAnalytics(logo)
+        let data = scoreToChartData(scores);
+        const __callback = () => {
+            let imageData = myRadarChart.toBase64Image();
+            let img = new Image();
+            img.src = imageData;
+            img.width =  200;
+            this.widgetWindow.getWidgetBody().appendChild(img)
+            blocks.hideBlocks();
+            logo.showBlocksAfterRun = false;
+            document.body.style.cursor = "default";
         };
-        this.displayInfo = (stats) => {
-            let lowHertz = stats["lowestNote"][2] + 0.5;
-            let highHertz = stats["highestNote"][2] + 0.5;
-            this.jsonObject.innerHTML =
-                '<li>duples: ' + stats["duples"] + '</li>' +
-                '<li>triplets: ' + stats["triplets"] + '</li>' +
-                '<li>quintuplets: ' + stats["quintuplets"] + '</li>' +
-                '<li>pitch names: ' + Array.from(stats["pitchNames"]) + '</li>' +
-                '<li>number of notes: ' + stats["numberOfNotes"] + '</li>' +
-                '<li>lowest note: ' + stats["lowestNote"][0] + " , " + lowHertz.toFixed(0) + 'Hz</li>' +
-                '<li>highest note: ' + stats["highestNote"][0] + " , " + highHertz.toFixed(0) + 'Hz</li>' +
-                '<li>rests used: ' + stats["rests"] + '</li>' +
-                '<li>ornaments used: ' + stats["ornaments"] + '</li>';
-        };
+        let options = getChartOptions(__callback);
+        myRadarChart = new Chart(ctx).Radar(data, options);
+        
+        this.jsonObject = document.createElement('ul');
+        this.jsonObject.style.float = 'left';
+        this.widgetWindow.getWidgetBody().appendChild(this.jsonObject)
 
+    }
+    displayInfo(stats) {
+	let lowHertz = stats["lowestNote"][2] + 0.5;
+	let highHertz = stats["highestNote"][2] + 0.5;
+        this.jsonObject.innerHTML = 
+            '<li>duples: ' + stats["duples"] + '</li>'  + 
+            '<li>triplets: ' + stats["triplets"] + '</li>'  + 
+            '<li>quintuplets: ' + stats["quintuplets"] + '</li>'  + 
+            '<li>pitch names: ' + Array.from(stats["pitchNames"]) + '</li>'  + 
+            '<li>number of notes: ' + stats["numberOfNotes"] + '</li>'  + 
+            '<li>lowest note: ' + stats["lowestNote"][0] + " , " + lowHertz.toFixed(0) + 'Hz</li>'  + 
+            '<li>highest note: ' + stats["highestNote"][0] + " , " + highHertz.toFixed(0) + 'Hz</li>'  + 
+            '<li>rests used: ' + stats["rests"] + '</li>'  + 
+            '<li>ornaments used: ' + stats["ornaments"] + '</li>'
     }
 }
