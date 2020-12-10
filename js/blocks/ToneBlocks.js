@@ -654,10 +654,10 @@ function setupToneBlocks() {
                 "turtleshell"
             ]);
 
-            this.formBlock({
-                
+            this.formBlock({  
                 outType: "mediaout"
             });
+            this.parameter = false;
         }
     }
 
