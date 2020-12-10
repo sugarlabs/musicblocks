@@ -12,6 +12,9 @@
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.0.1\n"
 
+msgid "accidental-override"
+msgstr "変化記号を無効"
+
 #: js/block.js:1436
 #: js/block.js:8073
 #: js/block.js:8094
