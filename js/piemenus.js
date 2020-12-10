@@ -3059,7 +3059,8 @@ piemenuModes = function(block, selectedMode) {
     
     // navigate to a specific starting point
     for (modeGroup in MODE_PIE_MENUS) {
-        for (let j = 0; j < MODE_PIE_MENUS[modeGroup].length; j++) {
+        let j;
+        for (j = 0; j < MODE_PIE_MENUS[modeGroup].length; j++) {
             let modename = MODE_PIE_MENUS[modeGroup][j];
             if (modename === selectedMode) {
                 break;

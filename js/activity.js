@@ -15,7 +15,7 @@
 // (https://github.com/walterbender/turtleart), but implemented from
 // scratch. -- Walter Bender, October 2014.
 
-var KeySignatureEnv = ['C', 'major', false];
+let KeySignatureEnv = ['C', 'major', false];
 
 function Activity() {
     _THIS_IS_MUSIC_BLOCKS_ = true;
@@ -776,7 +776,7 @@ function Activity() {
 
             if (blocks.blockList[i].name === 'start') {
                 let x = blocks.blockList[i].container.x + 110;
-                var y = blocks.blockList[i].container.y + 12;
+                let y = blocks.blockList[i].container.y + 12;
                 svg += '<g transform="translate(' + x + ', ' + y + ') scale(0.4 0.4)">';
 
                 parts = TURTLESVG.replace(/fill_color/g, FILLCOLORS[startCounter])
@@ -1117,8 +1117,8 @@ function Activity() {
         docById('chooseKeyDiv').style.display = 'block';
         docById('moveable').style.display = 'block';
 
-        var keyNameWheel = new wheelnav('chooseKeyDiv', null, 1200, 1200);
-        var keyNameWheel2 = new wheelnav('keyNameWheel2', keyNameWheel.raphael);
+        let keyNameWheel = new wheelnav('chooseKeyDiv', null, 1200, 1200);
+        let keyNameWheel2 = new wheelnav('keyNameWheel2', keyNameWheel.raphael);
         let keys = ['C', 'G', 'D', 'A', 'E', 'B/C♭', 'F♯/G♭', 'C♯/D♭', 'G♯/A♭', 'D♯/E♭', 'B♭', 'F'];
 
         wheelnav.cssMode = true;
@@ -1159,7 +1159,7 @@ function Activity() {
         keyNameWheel2.animatetime = 0;
         keyNameWheel2.createWheel(keys2);
 
-        var modenameWheel = new wheelnav('modenameWheel', keyNameWheel.raphael);
+        let modenameWheel = new wheelnav('modenameWheel', keyNameWheel.raphael);
         modes = ['major', 'dorian', 'phrygian', 'lydian', 'mixolydian', 'minor', 'locrian'];
         modenameWheel.slicePathFunction = slicePath().DonutSlice;
         modenameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
@@ -1173,7 +1173,7 @@ function Activity() {
 
         modenameWheel.createWheel(modes);
 
-        var exitWheel = new wheelnav('exitWheel', keyNameWheel.raphael);
+        let exitWheel = new wheelnav('exitWheel', keyNameWheel.raphael);
         exitWheel.slicePathFunction = slicePath().DonutSlice;
         exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -1420,7 +1420,7 @@ function Activity() {
 
         if (!resizeDebounce) {
             if (blockscale < BLOCKSCALES.length - 1) {
-                let resizeDebounce = true;
+                resizeDebounce = true;
                 blockscale += 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
                 setTimeout(function () {
@@ -1442,7 +1442,7 @@ function Activity() {
 
         if (!resizeDebounce) {
             if (blockscale > 0) {
-                var resizeDebounce = true;
+                resizeDebounce = true;
                 blockscale -= 1;
                 blocks.setBlockScale(BLOCKSCALES[blockscale]);
             }
@@ -2666,8 +2666,6 @@ function Activity() {
         let smallSide = Math.min(w, h);
         let mobileSize;
         if (smallSide < cellSize * 9) {
-            // var mobileSize = true;
-            // FIXME
             mobileSize = false;
             if (w < cellSize * 10) {
                 turtleBlocksScale = smallSide / (cellSize * 11);
@@ -3369,7 +3367,7 @@ function Activity() {
 
         msgText.parent.visible = false;
         printText.classList.remove('show');
-        for (var i in errorArtwork) {
+        for (let i in errorArtwork) {
             errorArtwork[i].visible = false;
         }
 
@@ -3920,9 +3918,6 @@ function Activity() {
             );
         }
         let btnSize = cellSize;
-        // Upper left
-        // var x = 27.5 + 6;
-        // var y = toolbarHeight + 95.5 + 6;
         // Lower right
         let x = this._innerWidth - 4 * btnSize - 27.5;
         let y = this._innerHeight - 57.5;
@@ -3972,11 +3967,6 @@ function Activity() {
         largerContainer = _makeButton(BIGGERBUTTON, _('Increase block size'), x, y, btnSize, 0);
         that._loadButtonDragHandler(largerContainer, x, y, doLargerBlocks);
     };
-
-    // function doPopdownPalette() {
-    //     var p = new PopdownPalette(palettes);
-    //     p.popdown();
-    // };
 
     /**
      * Toggles display of javaScript editor widget.
@@ -4211,13 +4201,6 @@ function Activity() {
 
         // menuContainer.y += dy;
         blocksContainer.y += dy;
-        /*
-        var language = localStorage.languagePreference;
-        if (!beginnerMode || language !== 'ja') {
-            slowContainer.y += dy;
-            stepContainer.y += dy;
-        }
-        */
         refreshCanvas();
     };
 
@@ -4263,11 +4246,6 @@ function Activity() {
      * Sets up dependencies and vars
      */
     this.domReady = async function (doc) {
-        // _onResize = _onResize;
-        // var that = this;
-        // window.onblur = functionf () {
-        //     this.that.doHardStopButton(true);
-        // };
         saveLocally = undefined;
 
         // Do we need to update the stage?
@@ -4391,8 +4369,7 @@ function Activity() {
             .setRefreshCanvas(refreshCanvas)
             .init();
 
-        // Put the boundary in the turtles container so it scrolls
-        // with the blocks.
+        // Put the boundary in the turtles container so it scrolls with the blocks.
         turtles = new Turtles();
         turtles.masterStage = stage;
         turtles.stage = turtleContainer;
@@ -4403,11 +4380,9 @@ function Activity() {
         turtles.doGrid = _doCartesianPolar;
         turtles.refreshCanvas = refreshCanvas;
 
-        // Put the boundary in the blocks container so it scrolls
-        // with the blocks.
+        // Put the boundary in the blocks container so it scrolls with the blocks.
 
-        boundary = new Boundary();
-        boundary.setStage(blocksContainer).init();
+        boundary = new Boundary(blocksContainer);
 
         blocks = new Blocks(this);
         blocks
@@ -4707,7 +4682,6 @@ function Activity() {
             ['printBlockSVG', _printBlockSVG],
             ['planet', planet]
         ]);
-        save.init();
 
         toolbar = new Toolbar();
         toolbar.init(beginnerMode);
@@ -4736,8 +4710,7 @@ function Activity() {
         toolbar.renderRunStepIcon(_doStepButton);
         toolbar.renderAdvancedIcons(
             () => {
-                if (!logo.statsWindow) logo.statsWindow = new StatsWindow();
-                logo.statsWindow.init();
+                logo.statsWindow = new StatsWindow();
             },
             doOpenPlugin,
             deletePlugin,
@@ -4757,7 +4730,6 @@ function Activity() {
             __saveLocally = function () {
                 console.debug('overwriting session data (local)');
                 let data = prepareExport();
-                var svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
 
                 if (sugarizerCompatibility.isInsideSugarizer()) {
                     //sugarizerCompatibility.data.blocks = prepareExport();
@@ -4784,7 +4756,7 @@ function Activity() {
                 }
 
                 let img = new Image();
-                svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
+                let svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
 
                 img.onload = function () {
                     let bitmap = new createjs.Bitmap(img);
@@ -4840,7 +4812,7 @@ function Activity() {
         // Load any plugins saved in local storage.
         pluginData = storage.plugins;
         if (pluginData != null) {
-            var obj = processPluginData(
+            updatePluginObj(processPluginData(
                 pluginData,
                 palettes,
                 blocks,
@@ -4851,8 +4823,7 @@ function Activity() {
                 logo.evalOnStartList,
                 logo.evalOnStopList,
                 palettes.pluginMacros
-            );
-            updatePluginObj(obj);
+            ))
         }
 
         // Load custom mode saved in local storage.
