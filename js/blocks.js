@@ -4703,9 +4703,6 @@ function Blocks(activity) {
                 case "media":
                     blockItem = [b, [myBlock.name, null], x, y, []];
                     break;
-                case "audiofile":
-                    //blockItem = [b, [myBlock.name, null], x, y, []];
-                    //break;
                 case "namedbox":
                 case "namedarg":
                     blockItem = [b, [myBlock.name, { value: myBlock.privateData }], x, y, []];
@@ -5617,17 +5614,6 @@ function Blocks(activity) {
 
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
-            //case "audiofile":
-            // Load a thumbnail into a media blocks.
-            //postProcess = function(args) {
-                //let thisBlock = args[0];
-                //let value = args[1];
-                //that.blockList[thisBlock].value = value;
-                //if (value != null) {
-                    // Load artwork onto media block.
-                    //that.blockList[thisBlock].loadThumbnail(null);
-                //}
-            //};
 
             this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
             break;
