@@ -10,11 +10,11 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 let oscilloscopeExecution = true;
+const analyserSize = 8192;
 
-function Oscilloscope() {
-    const ICONSIZE = 32;
-    const analyserSize = 8192;
-    this.init = (logo) => {
+class Oscilloscope {
+    init(logo) {
+        const ICONSIZE = 32;
         this._logo = logo;
         this.pitchAnalysers = {};
         this.playingNow = false;
@@ -71,13 +71,13 @@ function Oscilloscope() {
         }
 
         for (let turtle of this.divisions) {
-            turtleIdx = logo.turtles.turtleList.indexOf(turtle);
+            let turtleIdx = logo.turtles.turtleList.indexOf(turtle);
             this.reconnectSynthsToAnalyser(turtleIdx);
             this.makeCanvas(700, 400 / this.divisions.length, turtle, turtleIdx);
         }
-    };
+    }
 
-    this.reconnectSynthsToAnalyser = (turtle) => {
+    reconnectSynthsToAnalyser(turtle) {
         if (this.pitchAnalysers[turtle] === undefined) {
             this.pitchAnalysers[turtle] = new Tone.Analyser({
                 type: "waveform",
@@ -87,9 +87,9 @@ function Oscilloscope() {
 
         for (let synth in instruments[turtle])
             instruments[turtle][synth].connect(this.pitchAnalysers[turtle]);
-    };
+    }
 
-    this.makeCanvas = (width, height, turtle, turtleIdx) => {
+    makeCanvas(width, height, turtle, turtleIdx) {
         let canvas = document.createElement("canvas");
         canvas.height = height;
         canvas.width = width;
@@ -126,9 +126,9 @@ function Oscilloscope() {
             canvasCtx.stroke();
         };
         draw();
-    };
-
-    if (!this.playingNow) {
-        console.debug("oscilloscope running");
     }
+
+    // if (playingNow) {
+    //     console.debug("oscilloscope running");
+    // }
 }
