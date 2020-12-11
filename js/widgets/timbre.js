@@ -103,7 +103,7 @@ function TimbreWidget() {
     this.blockNo = null; // index no. of the timbre widget block
     this.instrumentName = "custom";
 
-    this._addButton = function(row, icon, iconSize, label) {
+    this._addButton =(row, icon, iconSize, label)=> {
         let cell = row.insertCell(-1);
         cell.innerHTML =
             '&nbsp;&nbsp;<img src="header-icons/' +
@@ -125,18 +125,16 @@ function TimbreWidget() {
         cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = platformColor.selectorBackground;
 
-        cell.onmouseover = function() {
-            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-        };
+        cell.onmouseover = () => this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
+    
 
-        cell.onmouseout = function() {
-            this.style.backgroundColor = platformColor.selectorBackground;
-        };
+        cell.onmouseout = () =>this.style.backgroundColor = platformColor.selectorBackground;
+    
 
         return cell;
     };
 
-    this._update = function(i, value, k) {
+    this._update = (i, value, k)=> {
         // This function is used to update the parameters in the
         // blocks contained in the timbre widget clamp.
         // i is the index into the parameter array. (For example, there
@@ -361,7 +359,7 @@ function TimbreWidget() {
         }
     };
 
-    this._play = function() {
+    this._play = () => {
         this._playing = !this._playing;
 
         this._logo.resetSynth(0);
@@ -407,14 +405,14 @@ function TimbreWidget() {
             ];
         }
 
-        __playLoop = function(i) {
+        __playLoop = (i) => {
             if (that._playing) {
                 that._playNote(that.notesToPlay[i][0], that.notesToPlay[i][1]);
             }
 
             i += 1;
             if (i < that.notesToPlay.length && that._playing) {
-                setTimeout(function() {
+                setTimeout(() => {
                     __playLoop(i);
                 }, Singer.defaultBPMFactor * 1000 * that.notesToPlay[i - 1][1]);
             } else {
@@ -439,7 +437,7 @@ function TimbreWidget() {
         }
     };
 
-    this._save = function() {
+    this._save = () => {
         // Just save a set timbre block with the current instrument name.
         let obj = [
             [0, "settimbre", 100 + this._delta, 100 + this._delta,
@@ -451,7 +449,7 @@ function TimbreWidget() {
         this._delta += 42;
     };
 
-    this._undo = function() {
+    this._undo = () => {
         let blockValue = 0;
 
         if (this.isActive["envelope"]) {
@@ -700,7 +698,7 @@ function TimbreWidget() {
         widgetWindow.getWidgetBody().style.width = "600px";
         widgetWindow.getWidgetBody().style.overflowY = "auto";
 
-        _unhighlightButtons = function() {
+        _unhighlightButtons = () => {
             addFilterButtonCell.style.backgroundColor = "#808080";
             synthButtonCell.style.backgroundColor =
                 platformColor.selectorBackground;
@@ -714,7 +712,7 @@ function TimbreWidget() {
                 platformColor.selectorBackground;
         };
 
-        widgetWindow.onclose = function() {
+        widgetWindow.onclose = () => {
             that._logo.hideMsgs();
             this.destroy();
         };
@@ -724,7 +722,7 @@ function TimbreWidget() {
             ICONSIZE,
             _("Play")
         );
-        this.playButton.onclick = function() {
+        this.playButton.onclick = () => {
             that._play();
         };
 
@@ -744,7 +742,7 @@ function TimbreWidget() {
         synthButtonCell.id = "synthButtonCell";
         this.isActive["synth"] = false;
 
-        synthButtonCell.onclick = function() {
+        synthButtonCell.onclick = () => {
             _unhighlightButtons();
             //console.debug('synth button cell');
             for (let i = 0; i < that.activeParams.length; i++) {
@@ -828,7 +826,7 @@ function TimbreWidget() {
         envelopeButtonCell.id = "envelopeButtonCell";
         this.isActive["envelope"] = false;
 
-        envelopeButtonCell.onclick = function() {
+        envelopeButtonCell.onclick = () => {
             _unhighlightButtons();
             for (let i = 0; i < that.activeParams.length; i++) {
                 that.isActive[that.activeParams[i]] = false;
@@ -875,7 +873,7 @@ function TimbreWidget() {
         effectsButtonCell.id = "effectsButtonCell";
         this.isActive["effects"] = false;
 
-        effectsButtonCell.onclick = function() {
+        effectsButtonCell.onclick = () => {
             _unhighlightButtons();
             for (let i = 0; i < that.activeParams.length; i++) {
                 that.isActive[that.activeParams[i]] = false;
@@ -893,7 +891,7 @@ function TimbreWidget() {
         filterButtonCell.id = "filterButtonCell";
         this.isActive["filter"] = false;
 
-        filterButtonCell.onclick = function() {
+        filterButtonCell.onclick = () => {
             _unhighlightButtons();
             for (let i = 0; i < that.activeParams.length; i++) {
                 that.isActive[that.activeParams[i]] = false;
@@ -941,15 +939,15 @@ function TimbreWidget() {
             }
         };
 
-        addFilterButtonCell.onmouseover = function() {};
+        addFilterButtonCell.onmouseover = () => {};
 
-        addFilterButtonCell.onmouseout = function() {};
+        addFilterButtonCell.onmouseout = () => {};
 
         widgetWindow.addButton(
             "restore-button.svg",
             ICONSIZE,
             _("Undo")
-        ).onclick = function() {
+        ).onclick = ()=> {
             that._undo();
         };
 
@@ -1003,7 +1001,7 @@ function TimbreWidget() {
         this._logo.blocks.adjustDocks(this.blockNo, true);
     };
 
-    this._changeBlock = function(newblk, synthChosen, bottomOfClamp) {
+    this._changeBlock = (newblk, synthChosen, bottomOfClamp) => {
         let lastBlk = 0;
         if (this.AMSynthesizer.length !== 0 && synthChosen !== "AMSynth") {
             lastBlk = this.AMSynthesizer.pop();
@@ -1027,7 +1025,7 @@ function TimbreWidget() {
         }
     };
 
-    this._blockReplace = function(oldblk, newblk) {
+    this._blockReplace = (oldblk, newblk) => {
         // Find the connections from the old block
         let c0 = this._logo.blocks.blockList[oldblk].connections[0];
         let c1 = last(this._logo.blocks.blockList[oldblk].connections);
@@ -1084,7 +1082,7 @@ function TimbreWidget() {
         this._logo.refreshCanvas();
     };
 
-    this.blockConnection = function(len, bottomOfClamp) {
+    this.blockConnection = (len, bottomOfClamp) => {
         let n = this._logo.blocks.blockList.length - len;
         if (bottomOfClamp == null) {
             this._logo.blocks.blockList[this.blockNo].connections[2] = n;
@@ -1127,7 +1125,7 @@ function TimbreWidget() {
         this._logo.blocks.adjustDocks(this.blockNo, true);
     };
 
-    this._synth = function() {
+    this._synth = () => {
         //  console.debug('heysynth');
         let that = this;
         let blockValue = 0;
@@ -1540,7 +1538,7 @@ function TimbreWidget() {
         }
     };
 
-    this._oscillator = function(newOscillator) {
+    this._oscillator = (newOscillator) => {
         let that = this;
         let blockValue = 0;
 
@@ -1692,7 +1690,7 @@ function TimbreWidget() {
         }
     };
 
-    this._envelope = function(newEnvelope) {
+    this._envelope = (newEnvelope) => {
         let that = this;
         let blockValue = 0;
 
@@ -1780,7 +1778,7 @@ function TimbreWidget() {
         }
     };
 
-    this._filter = function() {
+    this._filter = () => {
         docById("filterButtonCell").style.backgroundColor = "#C8C8C8";
         docById("filterButtonCell").onmouseover = function() {};
         docById("filterButtonCell").onmouseout = function() {};
@@ -1804,7 +1802,7 @@ function TimbreWidget() {
         this._updateFilters();
     };
 
-    this._createFilter = function(f, env) {
+    this._createFilter = (f, env) => {
         console.debug("adding filter " + f);
 
         let blockValue = f;
@@ -1933,11 +1931,11 @@ function TimbreWidget() {
         }
     };
 
-    this._addFilterListeners = function() {
+    this._addFilterListeners = () => {
         // Add the various listeners needed for the filter panel
         let that = this;
 
-        let __filterNameEvent = function(event) {
+        let __filterNameEvent = (event) => {
             docById("filterButtonCell").style.backgroundColor = "#C8C8C0";
             let elem = event.target;
             let m = elem.id.slice(-1);
@@ -1955,7 +1953,7 @@ function TimbreWidget() {
             that._playNote("G4", 1 / 8);
         };
 
-        let __radioEvent = function(event) {
+        let __radioEvent = (event) => {
             let elem = event.target;
             let m = Number(elem.id.replace("radio", ""));
             instrumentsFilters[0][that.instrumentName][
@@ -1964,7 +1962,7 @@ function TimbreWidget() {
             that._playNote("G4", 1 / 8);
         };
 
-        let __sliderEvent = function(event) {
+        let __sliderEvent = (event) => {
             docById("filterButtonCell").style.backgroundColor = "#C8C0C8";
             let elem = event.target;
             let m = elem.id.slice(-1);
@@ -1994,7 +1992,7 @@ function TimbreWidget() {
         }
     };
 
-    this._updateFilters = function() {
+    this._updateFilters = () => {
         // Update the letious inputs on the filters panel.
         for (let f = 0; f < this.fil.length; f++) {
             let radioIDs = [f * 4, f * 4 + 1, f * 4 + 2, f * 4 + 3];
@@ -2030,7 +2028,7 @@ function TimbreWidget() {
         }
     };
 
-    this._addFilter = function() {
+    this._addFilter = () => {
         let env = docById("timbreTable");
         let topOfClamp = this._logo.blocks.blockList[this.blockNo]
             .connections[2];
@@ -2080,7 +2078,7 @@ function TimbreWidget() {
         this._updateFilters();
     };
 
-    this._effects = function() {
+    this._effects = () => {
         let that = this;
         let blockValue = 0;
 
