@@ -21,7 +21,7 @@ class ModeWidget {
     }
 
     constructor() {
-        this._modeBlock = logo._modeBlock;
+        this._modeBlock = logo.modeBlock;
         this._locked = false;
         this._pitch = turtles.ithTurtle(0).singer.keySignature[0];
         this._noteValue = 0.333;
