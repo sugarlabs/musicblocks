@@ -4375,7 +4375,7 @@ function PitchTimeMatrix() {
             cell.style.backgroundColor = platformColor.rhythmcellcolor;
         }
 
-        if (that._matrixHasTuplets) {
+        if (this._matrixHasTuplets) {
             row = this._tupletNoteValueRow;
             for (let i = 0; i < row.cells.length; i++) {
                 cell = row.cells[i];
