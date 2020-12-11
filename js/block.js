@@ -3127,7 +3127,7 @@ class Block {
                 }
             }
 
-            piemenuVoices(this, DrumLabels, drumValues, categories, selectedDrum);
+            piemenuVoices(this, drumLabels, drumValues, categories, selectedDrum);
         } else if (this.name === "effectsname") {
             if (this.value != null) {
                 selectedDrum = this.value;
