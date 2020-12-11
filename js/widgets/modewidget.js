@@ -142,10 +142,22 @@ class ModeWidget {
         this.widgetWindow.sendToCenter();
     }
 
+    /**
+     * @private
+     * @returns {boolean}
+     */
     _playingStatus() {
         return this._playing;
     }
 
+    /**
+     * @private
+     * @param {*} row 
+     * @param {string} icon 
+     * @param {number} iconSize 
+     * @param {*} label
+     * @returns {void} 
+     */
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
         cell.innerHTML =
@@ -179,6 +191,10 @@ class ModeWidget {
         return cell;
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _setMode() {
         // Read in the current mode to start
         const currentModeName = keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
@@ -212,6 +228,10 @@ class ModeWidget {
         }
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _showPiano() {
         const modePianoDiv = docById("modePianoDiv");
         modePianoDiv.style.display = "inline";
@@ -299,7 +319,10 @@ class ModeWidget {
                     highlightImgs[(i + startingPosition) % 12];
         }
     }
-
+    /**
+     * @private
+     * @returns {void}
+     */
     _invert() {
         if (this._locked) {
             return;
@@ -315,6 +338,11 @@ class ModeWidget {
         }
     }
 
+    /**
+     * @private
+     * @param {number} i
+     * @returns {void}
+     */
     __invertOnePair(i) {
         const tmp = this._selectedNotes[i];
         this._selectedNotes[i] = this._selectedNotes[12 - i];
@@ -346,6 +374,10 @@ class ModeWidget {
         }
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _resetNotes() {
         for (let i = 0; i < this._selectedNotes.length; i++) {
             if (this._selectedNotes[i]) {
@@ -357,6 +389,10 @@ class ModeWidget {
         }
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _rotateRight() {
         if (this._locked) {
             return;
@@ -371,7 +407,12 @@ class ModeWidget {
         this.__rotateRightOneCell(1);
     }
 
-    __rotateRightOneCell(i, cellColors) {
+    /**
+     * @private
+     * @param {number} i
+     * @returns {void}
+     */
+    __rotateRightOneCell(i) {
         this._selectedNotes[i] = this._newPattern[i];
         if (this._selectedNotes[i]) {
             this._noteWheel.navItems[i].navItem.show();
@@ -405,6 +446,10 @@ class ModeWidget {
         }
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _rotateLeft() {
         if (this._locked) {
             return;
@@ -423,6 +468,11 @@ class ModeWidget {
         this.__rotateLeftOneCell(11);
     }
 
+    /**
+     * @private
+     * @param {number} i
+     * @returns {void}
+     */
     __rotateLeftOneCell(i) {
         this._selectedNotes[i] = this._newPattern[i];
         if (this._selectedNotes[i]) {
@@ -457,6 +507,10 @@ class ModeWidget {
         }
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _playAll() {
         // Play all of the notes in the widget.
         if (this._locked) {
@@ -492,6 +546,11 @@ class ModeWidget {
         }
     }
 
+    /**
+     * @private
+     * @param {number} i - note to play
+     * @returns {void}
+     */
     __playNextNote(i) {
         const highlightImgs = [
             "images/highlights/sel_c.png",
@@ -645,6 +704,11 @@ class ModeWidget {
         }
     }
 
+    /**
+     * @private
+     * @param {number} i - note to play
+     * @returns {void}
+     */
     _playNote(i) {
         const ks = turtles.ithTurtle(0).singer.keySignature;
 
@@ -659,6 +723,10 @@ class ModeWidget {
         );
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _saveState() {
         const state = JSON.stringify(this._selectedNotes);
         if (state !== last(this._undoStack)) {
@@ -666,6 +734,10 @@ class ModeWidget {
         }
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _undo() {
         if (this._undoStack.length > 0) {
             const prevState = JSON.parse(this._undoStack.pop());
@@ -682,6 +754,10 @@ class ModeWidget {
         }
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _clear() {
         // "Unclick" every entry in the widget.
 
@@ -699,6 +775,10 @@ class ModeWidget {
         }
     }
 
+    /**
+     * @private
+     * @returns {Array<number>}
+     */
     _calculateMode() {
         const currentMode = [];
         let j = 1;
@@ -715,6 +795,10 @@ class ModeWidget {
         return currentMode;
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _setModeName() {
         const table = docById("modeTable");
         const n = table.rows.length - 1;
@@ -751,6 +835,10 @@ class ModeWidget {
         this.widgetWindow.updateTitle("");
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _save() {
         const table = docById("modeTable");
         const n = table.rows.length - 1;
@@ -858,6 +946,10 @@ class ModeWidget {
         }, 2000);
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _piemenuMode() {
         // pie menu for mode definition
 
