@@ -10,9 +10,9 @@
 
 // This widget displays help about a block or a button.
 
-const ICONSIZE = 32;
-
 class HelpWidget {
+    static ICONSIZE = 32;
+
     constructor(blocks) {
         this.beginnerBlocks = [];
         this.advancedBlocks = [];
@@ -42,7 +42,7 @@ class HelpWidget {
     }
 
     _setup(blocks) {
-        let iconSize = ICONSIZE;
+        let iconSize = HelpWidget.ICONSIZE;
         // Which help page are we on?
         let page = 0;
 
@@ -328,8 +328,6 @@ class HelpWidget {
     // called recursively to cycle through help string of all blocks (Beginner Blocks First)
 
     _blockHelp(block, blocks) {
-        let iconSize = ICONSIZE;
-
         let widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
