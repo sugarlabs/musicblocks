@@ -11,14 +11,10 @@
 
 class ModeWidget {
 
-    get CONSTANTS() {
-        return {
-            ICONSIZE: 32,
-            BUTTONSIZE: 53,
-            ROTATESPEED: 125,
-            BUTTONDIVWIDTH: 535
-        }
-    }
+    static ICONSIZE = 32;
+    static BUTTONSIZE = 53;
+    static ROTATESPEED = 125;
+    static BUTTONDIVWIDTH = 535;
 
     constructor() {
         this._modeBlock = logo.modeBlock;
@@ -32,7 +28,7 @@ class ModeWidget {
 
         const w = window.innerWidth;
         this._cellScale = w / 1200;
-        const iconSize = this.CONSTANTS.ICONSIZE * this._cellScale;
+        const iconSize = ModeWidget.ICONSIZE * this._cellScale;
 
         this.widgetWindow = window.widgetWindows.windowFor(this, "custom mode");
         this.widgetWindow.clear();
@@ -48,7 +44,7 @@ class ModeWidget {
 
         this._playButton = this.widgetWindow.addButton(
             "play-button.svg",
-            this.CONSTANTS.ICONSIZE,
+            ModeWidget.ICONSIZE,
             _("Play")
         );
         this._playButton.onclick = ()=>{
@@ -62,9 +58,9 @@ class ModeWidget {
                     '" alt="' +
                     _("Play all") +
                     '" height="' +
-                    this.CONSTANTS.ICONSIZE +
+                    ModeWidget.ICONSIZE +
                     '" width="' +
-                    this.CONSTANTS.ICONSIZE +
+                    ModeWidget.ICONSIZE +
                     '" vertical-align="middle">&nbsp;&nbsp;';
             } else {
                 this._playing = true;
@@ -75,9 +71,9 @@ class ModeWidget {
                     '" alt="' +
                     _("Stop") +
                     '" height="' +
-                    this.CONSTANTS.ICONSIZE +
+                    ModeWidget.ICONSIZE +
                     '" width="' +
-                    this.CONSTANTS.ICONSIZE +
+                    ModeWidget.ICONSIZE +
                     '" vertical-align="middle">&nbsp;&nbsp;';
 
                 this._playAll();
@@ -86,7 +82,7 @@ class ModeWidget {
 
         this.widgetWindow.addButton(
             "export-chunk.svg",
-            this.CONSTANTS.ICONSIZE,
+            ModeWidget.ICONSIZE,
             _("Save")
         ).onclick = ()=>{
             this._save();
@@ -94,7 +90,7 @@ class ModeWidget {
 
         this.widgetWindow.addButton(
             "erase-button.svg",
-            this.CONSTANTS.ICONSIZE,
+            ModeWidget.ICONSIZE,
             _("Clear")
         ).onclick = ()=>{
             this._clear();
@@ -102,7 +98,7 @@ class ModeWidget {
 
         this.widgetWindow.addButton(
             "rotate-left.svg",
-            this.CONSTANTS.ICONSIZE,
+            ModeWidget.ICONSIZE,
             _("Rotate counter clockwise")
         ).onclick = ()=>{
             this._rotateLeft();
@@ -110,7 +106,7 @@ class ModeWidget {
 
         this.widgetWindow.addButton(
             "rotate-right.svg",
-            this.CONSTANTS.ICONSIZE,
+            ModeWidget.ICONSIZE,
             _("Rotate clockwise")
         ).onclick = ()=>{
             this._rotateRight();
@@ -118,7 +114,7 @@ class ModeWidget {
 
         this.widgetWindow.addButton(
             "invert.svg",
-            this.CONSTANTS.ICONSIZE,
+            ModeWidget.ICONSIZE,
             _("Invert")
         ).onclick = ()=>{
             this._invert();
@@ -126,7 +122,7 @@ class ModeWidget {
 
         this.widgetWindow.addButton(
             "restore-button.svg",
-            this.CONSTANTS.ICONSIZE,
+            ModeWidget.ICONSIZE,
             _("Undo")
         ).onclick = ()=>{
             this._undo();
@@ -179,7 +175,7 @@ class ModeWidget {
             '" width="' +
             iconSize +
             '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-        cell.style.width = this.CONSTANTS.BUTTONSIZE + "px";
+        cell.style.width = ModeWidget.BUTTONSIZE + "px";
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.height = cell.style.width;
@@ -366,7 +362,7 @@ class ModeWidget {
         } else {
             setTimeout(()=>{
                 this.__invertOnePair(i + 1);
-            }, this.CONSTANTS.ROTATESPEED);
+            }, ModeWidget.ROTATESPEED);
         }
     };
 
@@ -425,11 +421,11 @@ class ModeWidget {
                     this._locked = false;
                     this._rotateRight();
                 }
-            }, this.CONSTANTS.ROTATESPEED);
+            }, ModeWidget.ROTATESPEED);
         } else {
             setTimeout(()=>{
                 this.__rotateRightOneCell((i + 1) % 12);
-            }, this.CONSTANTS.ROTATESPEED);
+            }, ModeWidget.ROTATESPEED);
         }
     };
 
@@ -477,11 +473,11 @@ class ModeWidget {
                     this._locked = false;
                     this._rotateLeft();
                 }
-            }, this.CONSTANTS.ROTATESPEED);
+            }, ModeWidget.ROTATESPEED);
         } else {
             setTimeout(()=>{
                 this.__rotateLeftOneCell(i - 1);
-            }, this.CONSTANTS.ROTATESPEED);
+            }, ModeWidget.ROTATESPEED);
         }
     };
 
@@ -571,9 +567,9 @@ class ModeWidget {
                         '" alt="' +
                         _("Play all") +
                         '" height="' +
-                        this.CONSTANTS.ICONSIZE +
+                        ModeWidget.ICONSIZE +
                         '" width="' +
-                        this.CONSTANTS.ICONSIZE +
+                        ModeWidget.ICONSIZE +
                         '" vertical-align="middle">&nbsp;&nbsp;';
                     this._resetNotes();
                     this._locked = false;
@@ -651,9 +647,9 @@ class ModeWidget {
                         '" alt="' +
                         _("Play all") +
                         '" height="' +
-                        this.CONSTANTS.ICONSIZE +
+                        ModeWidget.ICONSIZE +
                         '" width="' +
-                        this.CONSTANTS.ICONSIZE +
+                        ModeWidget.ICONSIZE +
                         '" vertical-align="middle">&nbsp;&nbsp;';
                     this._resetNotes();
                     this._locked = false;
