@@ -10,55 +10,53 @@
 
 // This widget displays help about a block or a button.
 
-function HelpWidget() {
-    const ICONSIZE = 32;
-    let beginnerBlocks = [];
-    let advancedBlocks = [];
-    let appendedBlockList = [];
-    let index = 0;
+const ICONSIZE = 32;
 
-    this.init = function(blocks) {
+class HelpWidget {
+    constructor(blocks) {
+        this.beginnerBlocks = [];
+        this.advancedBlocks = [];
+        this.appendedBlockList = [];
+        this.index = 0;
         this.isOpen = true;
 
         let widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
+        widgetWindow.getWidgetBody().style.overflowY = "auto";
+        const canvasHeight = docById("myCanvas").getBoundingClientRect().height;
+        widgetWindow.getWidgetBody().style.maxHeight = `${0.75 * canvasHeight}px`;
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
-	widgetWindow.show();
-
-        widgetWindow.onClose = function() {
-            that.isOpen = false;
+        widgetWindow.show();
+        widgetWindow.onClose = () => {
+            this.isOpen = false;
             this.destroy();
         };
-
         // Position the widget and make it visible.
         this._helpDiv = document.createElement("div");
 
         // Give the DOM time to create the div.
-        let that = this;
-        setTimeout(function() {
-            that._setup(blocks);
-        }, 100);
-    };
+        setTimeout(() => this._setup(blocks), 0);
 
-    this._setup = function(blocks) {
+        // Position center
+        setTimeout(this.widgetWindow.sendToCenter, 50);
+    }
+
+    _setup(blocks) {
         let iconSize = ICONSIZE;
         // Which help page are we on?
         let page = 0;
 
         this._helpDiv.style.width = iconSize * 2 + 425 + "px";
         this._helpDiv.style.backgroundColor = "#e8e8e8";
+        // this._helpDiv.style.maxHeight = "100%";
+        // this._helpDiv.style.overflowY = "auto";
         this._helpDiv.innerHTML =
             '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
 
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
 
-        // Make help div appear in center of screen
-        this.widgetWindow.sendToCenter();
-
         let leftArrow, rightArrow;
         if (blocks === null) {
-            let that = this;
-
             this.widgetWindow.updateTitle(_("Take a tour"));
             rightArrow = document.getElementById("right-arrow");
             rightArrow.style.display = "block";
@@ -70,30 +68,28 @@ function HelpWidget() {
 
             let cell = docById("left-arrow");
 
-            cell.onclick = function() {
+            cell.onclick = () => {
                 page = page - 1;
                 if (page < 0) {
                     page = HELPCONTENT.length - 1;
                 }
 
-                that._showPage(page);
+                this._showPage(page);
             };
 
             cell = docById("right-arrow");
 
-            cell.onclick = function() {
+            cell.onclick = () => {
                 page = page + 1;
                 if (page === HELPCONTENT.length) {
                     page = 0;
                 }
 
-                that._showPage(page);
+                this._showPage(page);
             };
         } else {
             if (blocks.activeBlock.name !== null) {
-                let label =
-                    blocks.blockList[blocks.activeBlock].protoblock
-                        .staticLabels[0];
+                let label = blocks.blockList[blocks.activeBlock].protoblock.staticLabels[0];
                 this.widgetWindow.updateTitle(_(label));
             }
 
@@ -116,7 +112,8 @@ function HelpWidget() {
             if (blocks.activeBlock.name !== null) {
                 let name = blocks.blockList[blocks.activeBlock].name;
 
-                let advIcon = '<a\
+                let advIcon =
+                    '<a\
                 class="tooltipped"\
                 data-toggle="tooltip"\
                 title="This block is only available in advance mode"\
@@ -128,7 +125,8 @@ function HelpWidget() {
                 ></a\
                 >';
 
-            let findIcon = '<a\
+                let findIcon =
+                    '<a\
             class="tooltipped"\
             data-toggle="tooltip"\
             title="Show Palette containing the block"\
@@ -141,14 +139,14 @@ function HelpWidget() {
             ></a\
             >';
 
-            let showPaletteParamater = blocks.blockList[blocks.activeBlock].protoblock.palette.name;
+                let showPaletteParamater =
+                    blocks.blockList[blocks.activeBlock].protoblock.palette.name;
                 // Each block's help entry contains a help string, the
                 // path of the help svg, an override name for the help
                 // svg file, and an optional macro name for generating
                 // the help output.
-                let message =
-                    blocks.blockList[blocks.activeBlock].protoblock.helpString;
-                
+                let message = blocks.blockList[blocks.activeBlock].protoblock.helpString;
+
                 if (message) {
                     let helpBody = docById("helpBodyDiv");
                     helpBody.style.height = "";
@@ -182,18 +180,13 @@ function HelpWidget() {
                                 break;
                         }
 
-                        body =
-                            body +
-                            '<p><img src="' +
-                            path +
-                            "/" +
-                            name +
-                            '_block.svg"></p>';
+                        body = body + '<p><img src="' + path + "/" + name + '_block.svg"></p>';
                     }
 
                     body = body + "<p>" + message[0] + "</p>";
 
-                    body += '<i style="margin-right: 10px" id="loadButton" data-toggle="tooltip" title="Load this block" class="material-icons md-48">get_app</i>';
+                    body +=
+                        '<i style="margin-right: 10px" id="loadButton" data-toggle="tooltip" title="Load this block" class="material-icons md-48">get_app</i>';
 
                     helpBody.innerHTML = body;
                     helpBody.innerHTML += findIcon;
@@ -202,48 +195,33 @@ function HelpWidget() {
                         helpBody.innerHTML += advIcon;
                     }
 
-                    let object = blocks.palettes.getProtoNameAndPalette(
-                        name
-                    );
+                    let object = blocks.palettes.getProtoNameAndPalette(name);
 
                     let loadButton = docById("loadButton");
                     if (loadButton !== null) {
-                        loadButton.onclick = function() {
+                        loadButton.onclick = () => {
                             if (message.length < 4) {
-                                // If there is nothing specified, just
-                                // load the block.
+                                // If there is nothing specified, just load the block.
                                 console.debug("CLICK: " + name);
 
                                 let protoblk = object[0];
                                 let paletteName = object[1];
                                 let protoName = object[2];
 
-                                let protoResult = blocks.protoBlockDict.hasOwnProperty(
-                                    protoName
-                                );
+                                let protoResult = blocks.protoBlockDict.hasOwnProperty(protoName);
                                 if (protoResult) {
-                                    blocks.palettes.dict[
-                                        paletteName
-                                    ].makeBlockFromSearch(
+                                    blocks.palettes.dict[paletteName].makeBlockFromSearch(
                                         protoblk,
                                         protoName,
-                                        function(newBlock) {
-                                            blocks.moveBlock(
-                                                newBlock,
-                                                100,
-                                                100
-                                            );
+                                        (newBlock) => {
+                                            blocks.moveBlock(newBlock, 100, 100);
                                         }
                                     );
                                 }
                             } else if (typeof message[3] === "string") {
                                 // If it is a string, load the macro
                                 // assocuated with this block
-                                let blocksToLoad = getMacroExpansion(
-                                    message[3],
-                                    100,
-                                    100
-                                );
+                                let blocksToLoad = getMacroExpansion(message[3], 100, 100);
                                 console.debug("CLICK: " + blocksToLoad);
                                 blocks.loadNewBlocks(blocksToLoad);
                             } else {
@@ -256,18 +234,17 @@ function HelpWidget() {
                     }
                     let findIconMethod = docById("findIcon");
 
-                    findIconMethod.onclick = function() {
+                    findIconMethod.onclick = () => {
                         blocks.palettes.showPalette(object[1]);
-                       
-                    }
+                    };
                 }
             }
         }
 
         this.widgetWindow.takeFocus();
-    };
+    }
 
-    this._showPage = function(page) {
+    _showPage(page) {
         let helpBody = docById("helpBodyDiv");
         let body = "";
         if (
@@ -279,8 +256,7 @@ function HelpWidget() {
                 _("Congratulations.")
             ].indexOf(HELPCONTENT[page][0]) !== -1
         ) {
-            body =
-                body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"></p>';
+            body = body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"></p>';
         } else {
             body =
                 body +
@@ -303,100 +279,101 @@ function HelpWidget() {
                 "</a></p>";
         }
 
-        if (
-            [
-                _("Congratulations.")
-            ].indexOf(HELPCONTENT[page][0]) !== -1
-        ) {
+        if ([_("Congratulations.")].indexOf(HELPCONTENT[page][0]) !== -1) {
             let cell = docById("right-arrow");
-            let that = this;
-            cell.onclick = function() {
-                that._prepareBlockList(blocks);
-            }
+
+            cell.onclick = () => {
+                this._prepareBlockList(blocks);
+            };
         }
 
         helpBody.style.color = "#505050";
         helpBody.innerHTML = body;
 
         this.widgetWindow.takeFocus();
-    };
+    }
 
     // Prepare a list of beginner and advanced blocks and cycle through their help
 
-    this._prepareBlockList = function(blocks) {
-        for (let key in blocks.protoBlockDict){
-            if(blocks.protoBlockDict[key].beginnerModeBlock === true && blocks.protoBlockDict[key].helpString !== undefined && blocks.protoBlockDict[key].helpString.length !== 0) {
-                beginnerBlocks.push(key);
+    _prepareBlockList(blocks) {
+        for (let key in blocks.protoBlockDict) {
+            if (
+                blocks.protoBlockDict[key].beginnerModeBlock === true &&
+                blocks.protoBlockDict[key].helpString !== undefined &&
+                blocks.protoBlockDict[key].helpString.length !== 0
+            ) {
+                this.beginnerBlocks.push(key);
             }
         }
 
-        for(let key in blocks.protoBlockDict) {
-            if(blocks.protoBlockDict[key].beginnerModeBlock === false && blocks.protoBlockDict[key].helpString !== undefined && blocks.protoBlockDict[key].helpString.length !== 0) {
-                advancedBlocks.push(key);
+        for (let key in blocks.protoBlockDict) {
+            if (
+                blocks.protoBlockDict[key].beginnerModeBlock === false &&
+                blocks.protoBlockDict[key].helpString !== undefined &&
+                blocks.protoBlockDict[key].helpString.length !== 0
+            ) {
+                this.advancedBlocks.push(key);
+            }
         }
-    }
 
         // Array containing list of all blocks (Beginner blocks first)
-        
-        appendedBlockList.push(...beginnerBlocks);
-        appendedBlockList.push(...advancedBlocks);
 
-        this._blockHelp(blocks.protoBlockDict[appendedBlockList[0]], blocks)
+        this.appendedBlockList.push(...this.beginnerBlocks);
+        this.appendedBlockList.push(...this.advancedBlocks);
 
+        this._blockHelp(blocks.protoBlockDict[this.appendedBlockList[0]], blocks);
     }
 
     // Function to display help related to a single block
     // called recursively to cycle through help string of all blocks (Beginner Blocks First)
 
-    this._blockHelp = function(block, blocks) {
+    _blockHelp(block, blocks) {
         let iconSize = ICONSIZE;
-    
+
         let widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         this._helpDiv = document.createElement("div");
-    
+
         this._helpDiv.style.width = "500px";
         this._helpDiv.style.height = "500px";
         this._helpDiv.style.backgroundColor = "#e8e8e8";
         this._helpDiv.innerHTML =
             '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
-    
+
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
         this.widgetWindow.sendToCenter();
         let cell = docById("right-arrow");
-        let that = this;
-        cell.onclick = function() {
-            if(index !== appendedBlockList.length - 1) {
-                index += 1;
-        }
-            that._blockHelp(blocks.protoBlockDict[appendedBlockList[index]], blocks)
-        }
+        cell.onclick = () => {
+            if (this.index !== this.appendedBlockList.length - 1) {
+                this.index += 1;
+            }
+            this._blockHelp(blocks.protoBlockDict[this.appendedBlockList[this.index]], blocks);
+        };
 
         cell = docById("left-arrow");
-        
-        cell.onclick = function() {
-            if(index !== 0){
-                index -= 1;
+
+        cell.onclick = () => {
+            if (this.index !== 0) {
+                this.index -= 1;
             }
-            
-            that._blockHelp(blocks.protoBlockDict[appendedBlockList[index]], blocks);
-        }
+
+            this._blockHelp(blocks.protoBlockDict[this.appendedBlockList[this.index]], blocks);
+        };
         if (block.name !== null) {
-                let label =
-                    block
-                        .staticLabels[0];
-                this.widgetWindow.updateTitle(_(label));
-            }
-    
+            let label = block.staticLabels[0];
+            this.widgetWindow.updateTitle(_(label));
+        }
+
         // display help menu
         // docById("helpBodyDiv").style.height = "325px";
         // docById("helpBodyDiv").style.width = "400px";
         // this._showPage(0);
-    
+
         if (block.name !== null) {
             let name = block.name;
-            let advIcon = '<a\
+            let advIcon =
+                '<a\
             class="tooltipped"\
             data-toggle="tooltip"\
             title="This block is only available in advance mode"\
@@ -408,7 +385,8 @@ function HelpWidget() {
             ></a\
         >';
 
-            let findIcon = '<a\
+            let findIcon =
+                '<a\
             class="tooltipped"\
             data-toggle="tooltip"\
             title="Show Palette containing the block"\
@@ -421,14 +399,12 @@ function HelpWidget() {
             ></a\
         >';
 
-            let message =
-                block.helpString;
+            let message = block.helpString;
 
             let helpBody = docById("helpBodyDiv");
-                helpBody.style.height = "500px";
-                helpBody.style.backgroundColor = "#e8e8e8";
+            helpBody.style.height = "500px";
+            helpBody.style.backgroundColor = "#e8e8e8";
             if (message) {
-    
                 let body = "";
                 if (message.length > 1) {
                     let path = message[1];
@@ -439,7 +415,7 @@ function HelpWidget() {
                     if (language === undefined) {
                         language = navigator.language;
                     }
-    
+
                     switch (language) {
                         case "ja":
                             if (localStorage.kanaPreference == "kana") {
@@ -457,21 +433,15 @@ function HelpWidget() {
                         default:
                             break;
                     }
-    
-                    body =
-                        body +
-                        '<p><img src="' +
-                        path +
-                        "/" +
-                        name +
-                        '_block.svg"></p>';
+
+                    body = body + '<p><img src="' + path + "/" + name + '_block.svg"></p>';
                 }
-    
+
                 body = body + "<p>" + message[0] + "</p>";
-    
+
                 body +=
                     '<i style="margin-right: 10px" id="loadButton" data-toggle="tooltip" title="Load this block" class="material-icons md-48">get_app</i>';
-    
+
                 helpBody.innerHTML = body;
                 helpBody.innerHTML += findIcon;
 
@@ -481,50 +451,36 @@ function HelpWidget() {
 
                 let findIconMethod = docById("findIcon");
 
-                findIconMethod.onclick = function() {
+                findIconMethod.onclick = () => {
                     block.palette.palettes.showPalette(block.palette.name);
-                }
+                };
 
                 let loadButton = docById("loadButton");
                 if (loadButton !== null) {
-                    loadButton.onclick = function() {
+                    loadButton.onclick = () => {
                         if (message.length < 4) {
                             // If there is nothing specified, just
                             // load the block.
                             console.debug("CLICK: " + name);
-                            let obj = blocks.palettes.getProtoNameAndPalette(
-                                name
-                            );
+                            let obj = blocks.palettes.getProtoNameAndPalette(name);
                             let protoblk = obj[0];
                             let paletteName = obj[1];
                             let protoName = obj[2];
-    
-                            let protoResult = blocks.protoBlockDict.hasOwnProperty(
-                                protoName
-                            );
+
+                            let protoResult = blocks.protoBlockDict.hasOwnProperty(protoName);
                             if (protoResult) {
-                                blocks.palettes.dict[
-                                    paletteName
-                                ].makeBlockFromSearch(
+                                blocks.palettes.dict[paletteName].makeBlockFromSearch(
                                     protoblk,
                                     protoName,
-                                    function(newBlock) {
-                                        blocks.moveBlock(
-                                            newBlock,
-                                            100,
-                                            100
-                                        );
+                                    (newBlock) => {
+                                        blocks.moveBlock(newBlock, 100, 100);
                                     }
                                 );
                             }
                         } else if (typeof message[3] === "string") {
                             // If it is a string, load the macro
                             // assocuated with this block
-                            let blocksToLoad = getMacroExpansion(
-                                message[3],
-                                100,
-                                100
-                            );
+                            let blocksToLoad = getMacroExpansion(message[3], 100, 100);
                             console.debug("CLICK: " + blocksToLoad);
                             blocks.loadNewBlocks(blocksToLoad);
                         } else {
@@ -537,16 +493,15 @@ function HelpWidget() {
                 }
             }
         }
-    
-    this.widgetWindow.takeFocus();
-    }
-    
 
-    this.showPageByName = function(pageName) {
+        this.widgetWindow.takeFocus();
+    }
+
+    showPageByName(pageName) {
         for (let i = 0; i < HELPCONTENT.length; i++) {
             if (HELPCONTENT[i].includes(pageName)) {
                 this._showPage(i);
             }
         }
-    };
+    }
 }

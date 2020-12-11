@@ -9,54 +9,36 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-// This widget makes displays the status of selected parameters and
-// notes as they are being played.
+const BUTTONSIZE = 53;
+const ICONSIZE = 32;
 
-function StatsWindow() {
-    const BUTTONSIZE = 53;
-    const ICONSIZE = 32;
-
-    this.init = function(logo) {
-        this._logo = logo;
+/**
+ * This widget makes displays the status of selected parameters and notes as they are being played.
+ */
+class StatsWindow {
+    constructor() {
         this.isOpen = true;
 
-        var w = window.innerWidth;
-        this._cellScale = w / 1200;
-        var iconSize = ICONSIZE * this._cellScale;
-
-        var widgetWindow = window.widgetWindows.windowFor(
-            this,
-            "stats",
-            "stats"
-        );
-        this.widgetWindow = widgetWindow;
-        widgetWindow.clear();
-	    widgetWindow.show();
-
-        var that = this;
-
-        widgetWindow.onclose = function() {
-            that.isOpen = false;
+        this.widgetWindow = window.widgetWindows.windowFor(this, "stats", "stats");
+        this.widgetWindow.clear();
+        this.widgetWindow.show();
+        this.widgetWindow.onclose = () => {
+            this.isOpen = false;
             blocks.showBlocks();
-            this.destroy();
+            this.widgetWindow.destroy();
         };
         this.doAnalytics();
 
-        widgetWindow.sendToCenter();
+        this.widgetWindow.sendToCenter();
     };
 
-    /*  
-     * Renders and carries out analysis
-     * of the MB project
+    /**
+     * Renders and carries out analysis of the MB project.
      */
-    this.doAnalytics = function() {
+    doAnalytics() {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         blocks.activeBlock = null;
-        myChart = docById("myChart");
-
-        // if (_isCanvasBlank(myChart) === false) {
-        //     return;
-        // }
+        let myChart = docById("myChart");
 
         let ctx = myChart.getContext("2d");
         loading = true;
@@ -64,30 +46,30 @@ function StatsWindow() {
 
         let myRadarChart = null;
         let scores = analyzeProject(blocks);
-        runAnalytics(logo)
+        runAnalytics(logo);
         let data = scoreToChartData(scores);
-        __callback = () => {
-            imageData = myRadarChart.toBase64Image();
-            img = new Image();
+        const __callback = () => {
+            let imageData = myRadarChart.toBase64Image();
+            let img = new Image();
             img.src = imageData;
-            img.width =  200;
-            this.widgetWindow.getWidgetBody().appendChild(img)
+            img.width = 200;
+            this.widgetWindow.getWidgetBody().appendChild(img);
             blocks.hideBlocks();
             logo.showBlocksAfterRun = false;
             document.body.style.cursor = "default";
         };
-        options = getChartOptions(__callback);
+        let options = getChartOptions(__callback);
         myRadarChart = new Chart(ctx).Radar(data, options);
-        
-        this.jsonObject = document.createElement('ul');
-        this.jsonObject.style.float = 'left';
-        this.widgetWindow.getWidgetBody().appendChild(this.jsonObject)
 
+        this.jsonObject = document.createElement("ul");
+        this.jsonObject.style.float = "left";
+        this.widgetWindow.getWidgetBody().appendChild(this.jsonObject);
     };
-    this.displayInfo = (stats) => {
-	let lowHertz = stats["lowestNote"][2] + 0.5;
-	let highHertz = stats["highestNote"][2] + 0.5;
-        this.jsonObject.innerHTML = 
+
+    displayInfo(stats) {
+        let lowHertz = stats["lowestNote"][2] + 0.5;
+        let highHertz = stats["highestNote"][2] + 0.5;
+        this.jsonObject.innerHTML =
             '<li>duples: ' + stats["duples"] + '</li>'  + 
             '<li>triplets: ' + stats["triplets"] + '</li>'  + 
             '<li>quintuplets: ' + stats["quintuplets"] + '</li>'  + 
@@ -98,5 +80,4 @@ function StatsWindow() {
             '<li>rests used: ' + stats["rests"] + '</li>'  + 
             '<li>ornaments used: ' + stats["ornaments"] + '</li>'
     }
-
 }

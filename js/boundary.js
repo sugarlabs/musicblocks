@@ -14,44 +14,32 @@
 // trash and hidden. There is a menu button that can be used to
 // restore trash.
 
-function Boundary() {
-    this._stage = null;
-    this._container = null;
-
-    this.setStage = function(stage) {
-        this._stage = stage;
-        return this;
-    };
-
-    this.resizeEvent = function(scale) {};
-
-    this.init = function() {
+class Boundary {
+    constructor(stage) {
         this._container = new createjs.Container();
+        this._stage = stage;
         this._stage.addChild(this._container);
         this._stage.setChildIndex(this._container, 0);
-    };
+    }
 
-    this.setScale = function(w, h, scale) {
+    // resizeEvent(scale) {};
+
+    setScale(w, h, scale) {
         this.destroy();
         this.create(w, h, scale);
-    };
+    }
 
-    this.destroy = function() {
+    destroy() {
         if (this._container.children.length > 0) {
             this._container.removeChild(this._container.children[0]);
         }
-    };
+    }
 
-    this.offScreen = function(x, y) {
-        return (
-            x < this.x ||
-            x > this.x + this.dx ||
-            y < this.y ||
-            y > this.y + this.dy
-        );
-    };
+    offScreen(x, y) {
+        return x < this.x || x > this.x + this.dx || y < this.y || y > this.y + this.dy;
+    }
 
-    this.create = function(w, h, scale) {
+    create(w, h, scale) {
         this.w = w / scale;
         this.x = 55 + 13;
         this.dx = this.w - (110 + 26);
@@ -60,40 +48,37 @@ function Boundary() {
         this.y = 55 + 13;
         this.dy = this.h - (55 + 26);
 
-        that = this;
-
-        function __makeBoundary() {
+        const __makeBoundary = () => {
             let img = new Image();
-            img.onload = function() {
+            img.onload = () => {
                 bitmap = new createjs.Bitmap(img);
-                that._container.addChild(bitmap);
+                this._container.addChild(bitmap);
             };
-
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
                     unescape(
                         encodeURIComponent(
-                            BOUNDARY.replace("HEIGHT", that.h)
-                                .replace("WIDTH", that.w)
-                                .replace("Y", that.y)
-                                .replace("X", that.x)
-                                .replace("DY", that.dy)
-                                .replace("DX", that.dx)
+                            BOUNDARY.replace("HEIGHT", this.h)
+                                .replace("WIDTH", this.w)
+                                .replace("Y", this.y)
+                                .replace("X", this.x)
+                                .replace("DY", this.dy)
+                                .replace("DX", this.dx)
                                 .replace("stroke_color", "#e08080")
                         )
                     )
                 );
-        }
+        };
 
         __makeBoundary();
-    };
+    }
 
-    this.hide = function() {
+    hide() {
         this._container.visible = false;
-    };
+    }
 
-    this.show = function() {
+    show() {
         this._container.visible = true;
-    };
+    }
 }

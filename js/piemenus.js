@@ -3059,7 +3059,8 @@ piemenuModes = function(block, selectedMode) {
     
     // navigate to a specific starting point
     for (modeGroup in MODE_PIE_MENUS) {
-        for (let j = 0; j < MODE_PIE_MENUS[modeGroup].length; j++) {
+        let j;
+        for (j = 0; j < MODE_PIE_MENUS[modeGroup].length; j++) {
             let modename = MODE_PIE_MENUS[modeGroup][j];
             if (modename === selectedMode) {
                 break;
@@ -3217,8 +3218,7 @@ piemenuBlockContext = function(block) {
     if (helpButton !== null) {
         wheel.navItems[helpButton].navigateFunction = function() {
             that.blocks.activeBlock = blockBlock;
-            let helpWidget = new HelpWidget();
-            helpWidget.init(blocks);
+            let helpWidget = new HelpWidget(blocks);
             docById("contextWheelDiv").style.display = "none";
         };
     }
