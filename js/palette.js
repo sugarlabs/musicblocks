@@ -441,8 +441,7 @@ class PaletteModel {
             // }
 
             // Create a proto block for each palette entry.
-            this.blocks.push(this.makeBlockInfo(blk, block, block.name,
-                block.name));
+            this.blocks.push(this.makeBlockInfo(blk, block, block.name, block.name));
         }
     }
 
@@ -618,14 +617,19 @@ class PaletteModel {
                 }
         }
 
-        if (["do",
-            "nameddo",
-            "namedbox",
-            "namedcalc",
-            "doArg",
-            "calcArg",
-            "nameddoArg",
-            "namedcalcArg"].indexOf(protoBlock.name) != -1 && label != null) {
+        if (
+            [
+                "do",
+                "nameddo",
+                "namedbox",
+                "namedcalc",
+                "doArg",
+                "calcArg",
+                "nameddoArg",
+                "namedcalcArg"
+            ].indexOf(protoBlock.name) != -1 &&
+            label != null
+        ) {
             if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
                 label = label.substr(0, STRINGLEN) + "...";
             }
@@ -646,31 +650,31 @@ class PaletteModel {
         let height;
         switch (protoBlock.name) {
             case "namedbox":
-        case "namedarg":
-            // so the label will fit
-            svg = new SVG();
-            svg.setScale(protoBlock.scale);
-            svg.setExpand(60, 0, 0, 0);
-            svg.setOutie(true);
-            artwork = svg.basicBox();
-            docks = svg.docks;
-            height = svg.getHeight();
-            break;
-        case "nameddo":
-            // so the label will fit
-            svg = new SVG();
-            svg.setScale(protoBlock.scale);
-            svg.setExpand(60, 0, 0, 0);
-            artwork = svg.basicBlock();
-            docks = svg.docks;
-            height = svg.getHeight();
-            break;
-        default:
-            let obj = protoBlock.generator();
-            artwork = obj[0];
-            docks = obj[1];
-            height = obj[3];
-            break;
+            case "namedarg":
+                // so the label will fit
+                svg = new SVG();
+                svg.setScale(protoBlock.scale);
+                svg.setExpand(60, 0, 0, 0);
+                svg.setOutie(true);
+                artwork = svg.basicBox();
+                docks = svg.docks;
+                height = svg.getHeight();
+                break;
+            case "nameddo":
+                // so the label will fit
+                svg = new SVG();
+                svg.setScale(protoBlock.scale);
+                svg.setExpand(60, 0, 0, 0);
+                artwork = svg.basicBlock();
+                docks = svg.docks;
+                height = svg.getHeight();
+                break;
+            default:
+                let obj = protoBlock.generator();
+                artwork = obj[0];
+                docks = obj[1];
+                height = obj[3];
+                break;
         }
 
         protoBlock.scale = saveScale;
@@ -682,16 +686,13 @@ class PaletteModel {
                 .replace("block_label", safeSVG(label));
         } else {
             artwork = artwork
-                .replace(/fill_color/g,
-                    PALETTEFILLCOLORS[protoBlock.palette.name])
-                .replace(/stroke_color/g,
-                    PALETTESTROKECOLORS[protoBlock.palette.name])
+                .replace(/fill_color/g, PALETTEFILLCOLORS[protoBlock.palette.name])
+                .replace(/stroke_color/g, PALETTESTROKECOLORS[protoBlock.palette.name])
                 .replace("block_label", safeSVG(label));
         }
 
         for (let i = 0; i <= protoBlock.args; i++) {
-            artwork = artwork.replace("arg_label_" + i,
-                protoBlock.staticLabels[i] || "");
+            artwork = artwork.replace("arg_label_" + i, protoBlock.staticLabels[i] || "");
         }
 
         return {
@@ -702,8 +703,8 @@ class PaletteModel {
             actualHeight: height,
             label,
             artwork,
-            artwork64: "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(artwork))),
+            artwork64:
+                "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(artwork))),
             docks,
             image: block.image,
             scale: block.scale,
@@ -745,8 +746,9 @@ class Palette {
     }
 
     hideMenu() {
-        docById("palette").childNodes[0].style.borderRight =
-            `1px solid ${platformColor.selectorSelected}`;
+        docById(
+            "palette"
+        ).childNodes[0].style.borderRight = `1px solid ${platformColor.selectorSelected}`;
         this._hideMenuItems();
     }
 
@@ -757,8 +759,7 @@ class Palette {
         const palBody = document.createElement("table");
         palBody.id = "PaletteBody";
         const palBodyHeight = window.innerHeight - this.palettes.top - this.palettes.cellSize - 26;
-        palBody.innerHTML =
-            `<thead></thead><tbody style = "display: block; height: ${palBodyHeight}px; overflow: auto;" id="PaletteBody_items" class="PalScrol"></tbody>`;
+        palBody.innerHTML = `<thead></thead><tbody style = "display: block; height: ${palBodyHeight}px; overflow: auto;" id="PaletteBody_items" class="PalScrol"></tbody>`;
         palBody.style.minWidth = "180px";
         palBody.style.background = platformColor.paletteBackground;
         palBody.style.float = "left";
@@ -804,8 +805,8 @@ class Palette {
                 this.palettes.cellSize
             );
             closeImg.onclick = () => this.hideMenu();
-            closeImg.onmouseover = () => document.body.style.cursor = "pointer";
-            closeImg.onmouseleave = () => document.body.style.cursor = "default";
+            closeImg.onmouseover = () => (document.body.style.cursor = "pointer");
+            closeImg.onmouseleave = () => (document.body.style.cursor = "default");
             closeDownImg.appendChild(closeImg);
             header.appendChild(closeDownImg);
         }
@@ -815,7 +816,7 @@ class Palette {
             upBtn.style.opacity = list.scrollTop === 0 ? "0" : "0.3";
             dnBtn.style.opacity =
                 list.scrollTop >= list.scrollHeight - list.offsetHeight ? "0" : "0.3";
-        }
+        };
 
         const buttonContainers = document.createDocumentFragment();
         const upBtn = makePaletteIcons(UPICON, this.palettes.cellSize, this.palettes.cellSize);
@@ -839,8 +840,7 @@ class Palette {
         if (this.name === "search" && this.palettes.hideSearchWidget !== null) {
             this.palettes.hideSearchWidget(true);
         }
-        if (docById("PaletteBody"))
-            docById("palette").removeChild(docById("PaletteBody"));
+        if (docById("PaletteBody")) docById("palette").removeChild(docById("PaletteBody"));
     }
 
     _showMenuItems() {
@@ -851,9 +851,8 @@ class Palette {
 
         let blocks = this.model.blocks;
         blocks.reverse();
-        let protoListScope = [...this.protoList] ;
-        if (last(blocks).blkname != last(protoListScope).name)
-            protoListScope.reverse();
+        let protoListScope = [...this.protoList];
+        if (last(blocks).blkname != last(protoListScope).name) protoListScope.reverse();
         for (let blk in blocks) {
             let b = blocks[blk];
 
@@ -866,21 +865,21 @@ class Palette {
 
             // Use artwork.js strings as images for:
             // cameraPALETTE, videoPALETTE, mediaPALETTE
-            if (b.image){
-                img = makePaletteIcons(eval(b.blkname+"PALETTE"));
+            if (b.image) {
+                img = makePaletteIcons(eval(b.blkname + "PALETTE"));
             }
 
-            img.onmouseover = () => document.body.style.cursor = "pointer";
-            img.onmouseleave = () => document.body.style.cursor = "default";
+            img.onmouseover = () => (document.body.style.cursor = "pointer");
+            img.onmouseleave = () => (document.body.style.cursor = "default");
 
             // Image Drag initiates a browser defined drag, which needs to be stoped.
             img.ondragstart = () => false;
 
             const down = (event) => {
                 // (1) prepare to moving: make absolute and on top by z-index
-                let posit = img.style.position ;
-                let zInd = img.style.zIndex ;
-                img.style.position = 'absolute';
+                let posit = img.style.position;
+                let zInd = img.style.zIndex;
+                img.style.position = "absolute";
                 img.style.zIndex = 1000;
 
                 // move it out of any current parents directly into body
@@ -889,13 +888,13 @@ class Palette {
 
                 // centers the img at (pageX, pageY) coordinates
                 const moveAt = (pageX, pageY) => {
-                    img.style.left = pageX - img.offsetWidth / 2 + 'px';
-                    img.style.top = pageY - img.offsetHeight / 2 + 'px';
-                }
+                    img.style.left = pageX - img.offsetWidth / 2 + "px";
+                    img.style.top = pageY - img.offsetHeight / 2 + "px";
+                };
 
                 const onMouseMove = (e) => {
                     let x, y;
-                    if (e.type === "touchmove"){
+                    if (e.type === "touchmove") {
                         x = e.touches[0].clientX;
                         y = e.touches[0].clientY;
                     } else {
@@ -903,20 +902,20 @@ class Palette {
                         y = e.pageY;
                     }
                     moveAt(x, y);
-                }
+                };
                 onMouseMove(event);
 
-                document.addEventListener('touchmove', onMouseMove);
-                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener("touchmove", onMouseMove);
+                document.addEventListener("mousemove", onMouseMove);
 
-                const up =  (event) => {
+                const up = (event) => {
                     document.body.style.cursor = "default";
-                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener("mousemove", onMouseMove);
                     img.onmouseup = null;
 
                     let x, y;
-                    x = parseInt (img.style.left);
-                    y = parseInt (img.style.top);
+                    x = parseInt(img.style.left);
+                    y = parseInt(img.style.top);
 
                     img.style.position = posit;
                     img.style.zIndex = zInd;
@@ -950,14 +949,13 @@ class Palette {
         if (this.palettes.mobile) {
             this.hide();
         }
-
     }
 
     setupGrabScroll(paletteList) {
-        let posY,top;
+        let posY, top;
 
         const mouseUpGrab = (evt) => {
-            paletteList.onmousemove= null ;
+            paletteList.onmousemove = null;
             document.body.style.cursor = "default";
         };
         const mouseMoveGrab = (evt) => {
@@ -969,9 +967,9 @@ class Palette {
             posY = evt.clientY;
             top = paletteList.scrollTop;
 
-            paletteList.onmousemove =  mouseMoveGrab;
-            paletteList.onmouseup =  mouseUpGrab;
-            paletteList.onmouseleave =  mouseUpGrab;
+            paletteList.onmousemove = mouseMoveGrab;
+            paletteList.onmouseup = mouseUpGrab;
+            paletteList.onmouseleave = mouseUpGrab;
         };
         paletteList.onmousedown = mouseDownGrab;
     }
@@ -992,26 +990,29 @@ class Palette {
         }
 
         for (let i = 0; i < this.model.blocks.length; i++) {
-            if (["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].indexOf(
-                this.model.blocks[i].blkname) !== -1 &&
-                this.model.blocks[i].modname === name) {
+            if (
+                ["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].indexOf(
+                    this.model.blocks[i].blkname
+                ) !== -1 &&
+                this.model.blocks[i].modname === name
+            ) {
                 this.model.blocks.splice(i, 1);
                 break;
             } else if (
                 ["storein"].indexOf(this.model.blocks[i].blkname) !== -1 &&
-                this.model.blocks[i].modname === _("store in") + " " + name) {
+                this.model.blocks[i].modname === _("store in") + " " + name
+            ) {
                 this.model.blocks.splice(i, 1);
                 break;
             }
         }
-
     }
 
     add(protoblock, top) {
         // Add a new palette entry to the end of the list (default) or
         // to the top.
         if (this.protoList.indexOf(protoblock) === -1) {
-            if (top)this.protoList.push(protoblock);
+            if (top) this.protoList.push(protoblock);
             else this.protoList.push(protoblock);
         }
         return this;
@@ -1044,8 +1045,9 @@ class Palette {
                 break;
             case "storein2":
                 // Use the name of the box in the label
-                console.debug("storein2" + " " + protoblk.defaults[0] + " " +
-                    protoblk.staticLabels[0]);
+                console.debug(
+                    "storein2" + " " + protoblk.defaults[0] + " " + protoblk.staticLabels[0]
+                );
                 blkname = "store in2 " + protoblk.defaults[0];
                 newBlk = protoblk.name;
                 arg = protoblk.staticLabels[0];
@@ -1146,48 +1148,29 @@ class Palette {
 
         let lastBlock = this.palettes.blocks.blockList.length;
 
-        if (["namedbox",
-            "nameddo",
-            "namedcalc",
-            "nameddoArg",
-            "namedcalcArg"].indexOf(protoblk.name) === -1 &&
-            blockIsMacro(blkname)) {
-            this._makeBlockFromProtoblock(
-                protoblk,
-                true,
-                blkname,
-                null,
-                100,
-                100
-            );
+        if (
+            ["namedbox", "nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(
+                protoblk.name
+            ) === -1 &&
+            blockIsMacro(blkname)
+        ) {
+            this._makeBlockFromProtoblock(protoblk, true, blkname, null, 100, 100);
             callback(lastBlock);
-        } else if (["namedbox",
-            "nameddo",
-            "namedcalc",
-            "nameddoArg",
-            "namedcalcArg"].indexOf(protoblk.name) === -1 &&
-            blkname in this.palettes.pluginMacros) {
-            this._makeBlockFromProtoblock(
-                protoblk,
-                true,
-                blkname,
-                null,
-                100,
-                100
-            );
+        } else if (
+            ["namedbox", "nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(
+                protoblk.name
+            ) === -1 &&
+            blkname in this.palettes.pluginMacros
+        ) {
+            this._makeBlockFromProtoblock(protoblk, true, blkname, null, 100, 100);
             callback(lastBlock);
         } else {
-            let newBlock = paletteBlockButtonPush(
-                this.palettes.blocks,
-                newBlk,
-                arg
-            );
+            let newBlock = paletteBlockButtonPush(this.palettes.blocks, newBlk, arg);
             callback(newBlock);
         }
     }
 
-    _makeBlockFromProtoblock(
-        protoblk, moved, blkname, event, saveX, saveY) {
+    _makeBlockFromProtoblock(protoblk, moved, blkname, event, saveX, saveY) {
         let newBlock;
 
         const __myCallback = (newBlock) => {
@@ -1195,29 +1178,35 @@ class Palette {
             this.palettes.blocks.findDragGroup(newBlock);
             for (let i in this.palettes.blocks.dragGroup) {
                 this.palettes.blocks.moveBlockRelative(
-                    this.palettes.blocks.dragGroup[i], saveX, saveY);
+                    this.palettes.blocks.dragGroup[i],
+                    saveX,
+                    saveY
+                );
             }
             // Dock with other blocks if needed
             this.palettes.blocks.blockMoved(newBlock);
             this.palettes.blocks.checkBounds();
-        }
+        };
 
         if (moved) {
             moved = false;
             this.draggingProtoBlock = false;
 
             let macroExpansion = null;
-            if (["namedbox",
-                "nameddo",
-                "namedcalc",
-                "nameddoArg",
-                "namedcalcArg"].indexOf(protoblk.name) === -1) {
+            if (
+                ["namedbox", "nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(
+                    protoblk.name
+                ) === -1
+            ) {
                 macroExpansion = getMacroExpansion(blkname, saveX, saveY);
                 if (macroExpansion === null) {
                     // Maybe it is a plugin macro?
                     if (blkname in this.palettes.pluginMacros) {
                         macroExpansion = this.palettes.getPluginMacroExpansion(
-                            blkname, saveX, saveY);
+                            blkname,
+                            saveX,
+                            saveY
+                        );
                     }
                 }
             }
@@ -1232,8 +1221,7 @@ class Palette {
 
                 // We need to copy the macro data so it is not overwritten.
                 let obj = [];
-                for (let b = 0; b < this.palettes.macroDict[macroName].length;
-                    b++) {
+                for (let b = 0; b < this.palettes.macroDict[macroName].length; b++) {
                     let valueEntry = this.palettes.macroDict[macroName][b][1];
                     let newValue = [];
                     if (typeof valueEntry === "string") {
@@ -1248,16 +1236,13 @@ class Palette {
                         if (valueEntry[0] === "number") {
                             newValue = [valueEntry[0], valueEntry[1]];
                         } else {
-                            newValue = [valueEntry[0],
-                            valueEntry[1].toString()];
+                            newValue = [valueEntry[0], valueEntry[1].toString()];
                         }
                     } else {
                         if (valueEntry[0] === "number") {
-                            newValue = [valueEntry[0],
-                            Number(valueEntry[1]["value"])];
+                            newValue = [valueEntry[0], Number(valueEntry[1]["value"])];
                         } else {
-                            newValue = [valueEntry[0],
-                            {value: valueEntry[1]["value"]}];
+                            newValue = [valueEntry[0], { value: valueEntry[1]["value"] }];
                         }
                     }
 
@@ -1273,8 +1258,8 @@ class Palette {
 
                 // Set the position of the top block in the stack
                 // before loading.
-                obj[0][2] = saveX
-                obj[0][3] = saveY
+                obj[0][2] = saveX;
+                obj[0][3] = saveY;
                 this.palettes.blocks.loadNewBlocks(obj);
 
                 // Ensure collapse state of new stack is set properly.
@@ -1284,12 +1269,10 @@ class Palette {
                     this.palettes.blocks.blockList[topBlk].collapseToggle();
                 }, 500);
             } else {
-                newBlock = this._makeBlockFromPalette(
-                    protoblk, blkname, __myCallback);
+                newBlock = this._makeBlockFromPalette(protoblk, blkname, __myCallback);
             }
         }
-    };
-
+    }
 }
 
 async function initPalettes(palettes) {
@@ -1310,12 +1293,10 @@ const MODEDRAG = 1;
 const MODESCROLL = 2;
 const DECIDEDISTANCE = 20;
 
-function makePaletteIcons(data,width,height) {
+function makePaletteIcons(data, width, height) {
     let img = new Image();
-    img.src =
-    "data:image/svg+xml;base64," +
-    window.btoa(unescape(encodeURIComponent(data)));
-    if (width)img.width=width;
-    if (height)img.height=height;
-    return img 
+    img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(data)));
+    if (width) img.width = width;
+    if (height) img.height = height;
+    return img;
 }
