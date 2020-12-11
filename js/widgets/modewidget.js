@@ -10,7 +10,6 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 class ModeWidget {
-
     static ICONSIZE = 32;
     static BUTTONSIZE = 53;
     static ROTATESPEED = 125;
@@ -32,12 +31,20 @@ class ModeWidget {
 
         this.widgetWindow = window.widgetWindows.windowFor(this, "custom mode");
         this.widgetWindow.clear();
-	    this.widgetWindow.show();
+        this.widgetWindow.show();
 
+        // The mode table (holds a pie menu and a label)
         this.modeTableDiv = document.createElement("div");
+        this.modeTableDiv.style.display = "inline";
+        this.modeTableDiv.style.visibility = "visible";
+        this.modeTableDiv.style.border = "0px";
+        this.modeTableDiv.innerHTML = '<div id="meterWheelDiv"></div>';
+        this.modeTableDiv.innerHTML += '<div id="modePianoDiv" class=""></div>';
+        this.modeTableDiv.innerHTML += '<table id="modeTable"></table>';
+
         this.widgetWindow.getWidgetBody().append(this.modeTableDiv);
 
-        this.widgetWindow.onclose = ()=>{
+        this.widgetWindow.onclose = () => {
             logo.hideMsgs();
             this.widgetWindow.destroy();
         };
@@ -47,7 +54,7 @@ class ModeWidget {
             ModeWidget.ICONSIZE,
             _("Play")
         );
-        this._playButton.onclick = ()=>{
+        this._playButton.onclick = () => {
             logo.resetSynth(0);
             if (this._playingStatus()) {
                 this._playing = false;
@@ -84,57 +91,37 @@ class ModeWidget {
             "export-chunk.svg",
             ModeWidget.ICONSIZE,
             _("Save")
-        ).onclick = ()=>{
-            this._save();
-        };
+        ).onclick = this._save.bind(this);
 
         this.widgetWindow.addButton(
             "erase-button.svg",
             ModeWidget.ICONSIZE,
             _("Clear")
-        ).onclick = ()=>{
-            this._clear();
-        };
+        ).onclick = this._clear.bind(this);
 
         this.widgetWindow.addButton(
             "rotate-left.svg",
             ModeWidget.ICONSIZE,
             _("Rotate counter clockwise")
-        ).onclick = ()=>{
-            this._rotateLeft();
-        };
+        ).onclick = this._rotateLeft.bind(this);
 
         this.widgetWindow.addButton(
             "rotate-right.svg",
             ModeWidget.ICONSIZE,
             _("Rotate clockwise")
-        ).onclick = ()=>{
-            this._rotateRight();
-        };
+        ).onclick = this._rotateRight.bind(this);
 
         this.widgetWindow.addButton(
             "invert.svg",
             ModeWidget.ICONSIZE,
             _("Invert")
-        ).onclick = ()=>{
-            this._invert();
-        };
+        ).onclick = this._invert.bind(this);
 
         this.widgetWindow.addButton(
             "restore-button.svg",
             ModeWidget.ICONSIZE,
             _("Undo")
-        ).onclick = ()=>{
-            this._undo();
-        };
-
-        // The mode table (holds a pie menu and a label)
-        this.modeTableDiv.style.display = "inline";
-        this.modeTableDiv.style.visibility = "visible";
-        this.modeTableDiv.style.border = "0px";
-        this.modeTableDiv.innerHTML = '<div id="meterWheelDiv"></div>';
-        this.modeTableDiv.innerHTML += '<div id="modePianoDiv" class=""></div>';
-        this.modeTableDiv.innerHTML += '<table id="modeTable"></table>';
+        ).onclick = this._undo.bind(this);
 
         this._piemenuMode();
 
@@ -151,15 +138,13 @@ class ModeWidget {
         this._setMode();
 
         //.TRANS: A circle of notes represents the musical mode.
-        logo.textMsg(
-            _("Click in the circle to select notes for the mode.")
-        );
+        logo.textMsg(_("Click in the circle to select notes for the mode."));
         this.widgetWindow.sendToCenter();
-    };
+    }
 
     _playingStatus() {
         return this._playing;
-    };
+    }
 
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
@@ -183,21 +168,20 @@ class ModeWidget {
         cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = platformColor.selectorBackground;
 
-        cell.onmouseover = function() {
+        cell.onmouseover = function () {
             this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         };
 
-        cell.onmouseout = function() {
+        cell.onmouseout = function () {
             this.style.backgroundColor = platformColor.selectorBackground;
         };
 
         return cell;
-    };
+    }
 
     _setMode() {
         // Read in the current mode to start
-        const currentModeName =
-            keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
+        const currentModeName = keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
         const currentMode = MUSICALMODES[currentModeName[1]];
 
         // Add the mode name in the bottom row of the table.
@@ -226,7 +210,7 @@ class ModeWidget {
         if (currentModeName[0] === "C") {
             this._showPiano();
         }
-    };
+    }
 
     _showPiano() {
         const modePianoDiv = docById("modePianoDiv");
@@ -251,31 +235,30 @@ class ModeWidget {
             "images/highlights/sel_a_sharp.png",
             "images/highlights/sel_b.png"
         ];
-        const currentModeName =
-            keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
+        const currentModeName = keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
         const letterName = currentModeName[0];
 
         const startDict = {
             "C♭": 11,
-            C: 0,
+            "C": 0,
             "C♯": 1,
             "D♭": 1,
-            D: 2,
+            "D": 2,
             "D♯": 3,
             "E♭": 3,
-            E: 4,
+            "E": 4,
             "E♯": 5,
             "F♭": 4,
-            F: 5,
+            "F": 5,
             "F♯": 6,
             "G♭": 6,
-            G: 7,
+            "G": 7,
             "G♯": 8,
             "A♭": 8,
-            A: 9,
+            "A": 9,
             "A♯": 10,
             "A♭": 10,
-            B: 11,
+            "B": 11,
             "B♯": 0
         };
         let startingPosition;
@@ -315,7 +298,7 @@ class ModeWidget {
                 document.getElementById("pkey_" + i).src =
                     highlightImgs[(i + startingPosition) % 12];
         }
-    };
+    }
 
     _invert() {
         if (this._locked) {
@@ -326,12 +309,11 @@ class ModeWidget {
 
         this._saveState();
         this.__invertOnePair(1);
-        const currentModeName =
-            keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
+        const currentModeName = keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
         if (currentModeName[0] === "C") {
             this._showPiano();
         }
-    };
+    }
 
     __invertOnePair(i) {
         const tmp = this._selectedNotes[i];
@@ -352,19 +334,17 @@ class ModeWidget {
         if (i === 5) {
             this._saveState();
             this._setModeName();
-            const currentModeName = keySignatureToMode(
-                turtles.ithTurtle(0).singer.keySignature
-            );
+            const currentModeName = keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
             if (currentModeName[0] === "C") {
                 this._showPiano();
             }
             this._locked = false;
         } else {
-            setTimeout(()=>{
+            setTimeout(() => {
                 this.__invertOnePair(i + 1);
             }, ModeWidget.ROTATESPEED);
         }
-    };
+    }
 
     _resetNotes() {
         for (let i = 0; i < this._selectedNotes.length; i++) {
@@ -373,27 +353,23 @@ class ModeWidget {
             } else {
                 this._noteWheel.navItems[i].navItem.hide();
             }
-
             this._playWheel.navItems[i].navItem.hide();
         }
-    };
+    }
 
     _rotateRight() {
         if (this._locked) {
             return;
         }
-
         this._locked = true;
-
         this._saveState();
         this._newPattern = [];
         this._newPattern.push(this._selectedNotes[11]);
         for (let i = 0; i < 11; i++) {
             this._newPattern.push(this._selectedNotes[i]);
         }
-
         this.__rotateRightOneCell(1);
-    };
+    }
 
     __rotateRightOneCell(i, cellColors) {
         this._selectedNotes[i] = this._newPattern[i];
@@ -404,7 +380,7 @@ class ModeWidget {
         }
 
         if (i === 0) {
-            setTimeout(()=>{
+            setTimeout(() => {
                 if (this._selectedNotes[0]) {
                     // We are done.
                     this._saveState();
@@ -423,11 +399,11 @@ class ModeWidget {
                 }
             }, ModeWidget.ROTATESPEED);
         } else {
-            setTimeout(()=>{
+            setTimeout(() => {
                 this.__rotateRightOneCell((i + 1) % 12);
             }, ModeWidget.ROTATESPEED);
         }
-    };
+    }
 
     _rotateLeft() {
         if (this._locked) {
@@ -445,7 +421,7 @@ class ModeWidget {
         this._newPattern.push(this._selectedNotes[0]);
 
         this.__rotateLeftOneCell(11);
-    };
+    }
 
     __rotateLeftOneCell(i) {
         this._selectedNotes[i] = this._newPattern[i];
@@ -456,7 +432,7 @@ class ModeWidget {
         }
 
         if (i === 0) {
-            setTimeout(()=>{
+            setTimeout(() => {
                 if (this._selectedNotes[0]) {
                     // We are done.
                     this._saveState();
@@ -475,11 +451,11 @@ class ModeWidget {
                 }
             }, ModeWidget.ROTATESPEED);
         } else {
-            setTimeout(()=>{
+            setTimeout(() => {
                 this.__rotateLeftOneCell(i - 1);
             }, ModeWidget.ROTATESPEED);
         }
-    };
+    }
 
     _playAll() {
         // Play all of the notes in the widget.
@@ -514,7 +490,7 @@ class ModeWidget {
         if (this._playing) {
             this.__playNextNote(0);
         }
-    };
+    }
 
     __playNextNote(i) {
         const highlightImgs = [
@@ -550,11 +526,10 @@ class ModeWidget {
         const startingposition = 0;
         const time = this._noteValue + 0.125;
 
-        const currentKey =
-            keySignatureToMode(turtles.ithTurtle(0).singer.keySignature)[0];
+        const currentKey = keySignatureToMode(turtles.ithTurtle(0).singer.keySignature)[0];
         if (currentKey === "C") {
             if (i > this._notesToPlay.length - 1) {
-                setTimeout(()=>{
+                setTimeout(() => {
                     // Did we just play the last note?
                     this._playing = false;
                     const note_key = document.getElementById("pkey_" + 0);
@@ -578,19 +553,13 @@ class ModeWidget {
                 return;
             }
 
-            setTimeout(()=>{
+            setTimeout(() => {
                 if (this._lastNotePlayed !== null) {
-                    this._playWheel.navItems[
-                        this._lastNotePlayed % 12
-                    ].navItem.hide();
-                    const note_key = document.getElementById(
-                        "pkey_" + (this._lastNotePlayed % 12)
-                    );
+                    this._playWheel.navItems[this._lastNotePlayed % 12].navItem.hide();
+                    const note_key = document.getElementById("pkey_" + (this._lastNotePlayed % 12));
                     if (note_key !== null) {
                         note_key.src =
-                            highlightImgs[
-                                (this._lastNotePlayed + startingposition) % 12
-                            ];
+                            highlightImgs[(this._lastNotePlayed + startingposition) % 12];
                     }
                 }
 
@@ -598,31 +567,19 @@ class ModeWidget {
                 this._playWheel.navItems[note % 12].navItem.show();
 
                 if (note !== 12) {
-                    const note_key = document.getElementById(
-                        "pkey_" + (note % 12)
-                    );
+                    const note_key = document.getElementById("pkey_" + (note % 12));
                     if (note_key !== null) {
-                        note_key.src =
-                            animationImgs[(note + startingposition) % 12];
+                        note_key.src = animationImgs[(note + startingposition) % 12];
                     }
                 }
 
                 this._lastNotePlayed = note;
                 const ks = turtles.ithTurtle(0).singer.keySignature;
-                const noteToPlay = getNote(
-                    this._pitch,
-                    4,
-                    note,
-                    ks,
-                    false,
-                    null,
-                    logo.errorMsg
-                );
+                const noteToPlay = getNote(this._pitch, 4, note, ks, false, null, logo.errorMsg);
                 logo.synth.trigger(
                     0,
-                    noteToPlay[0].replace(/♯/g, "#").replace(/♭/g, "b") +
-                        noteToPlay[1],
-                        this._noteValue,
+                    noteToPlay[0].replace(/♯/g, "#").replace(/♭/g, "b") + noteToPlay[1],
+                    this._noteValue,
                     DEFAULTVOICE,
                     null,
                     null
@@ -638,7 +595,7 @@ class ModeWidget {
             }, 1000 * time);
         } else {
             if (i > this._notesToPlay.length - 1) {
-                setTimeout(()=>{
+                setTimeout(() => {
                     // Did we just play the last note?
                     this._playing = false;
                     this._playButton.innerHTML =
@@ -658,11 +615,9 @@ class ModeWidget {
                 return;
             }
 
-            setTimeout(()=>{
+            setTimeout(() => {
                 if (this._lastNotePlayed !== null) {
-                    this._playWheel.navItems[
-                        this._lastNotePlayed % 12
-                    ].navItem.hide();
+                    this._playWheel.navItems[this._lastNotePlayed % 12].navItem.hide();
                 }
 
                 const note = this._notesToPlay[i];
@@ -670,19 +625,10 @@ class ModeWidget {
                 this._lastNotePlayed = note;
 
                 const ks = turtles.ithTurtle(0).singer.keySignature;
-                const noteToPlay = getNote(
-                    this._pitch,
-                    4,
-                    note,
-                    ks,
-                    false,
-                    null,
-                    logo.errorMsg
-                );
+                const noteToPlay = getNote(this._pitch, 4, note, ks, false, null, logo.errorMsg);
                 logo.synth.trigger(
                     0,
-                    noteToPlay[0].replace(/♯/g, "#").replace(/♭/g, "b") +
-                        noteToPlay[1],
+                    noteToPlay[0].replace(/♯/g, "#").replace(/♭/g, "b") + noteToPlay[1],
                     this._noteValue,
                     DEFAULTVOICE,
                     null,
@@ -697,20 +643,12 @@ class ModeWidget {
                 }
             }, 1000 * time);
         }
-    };
+    }
 
     _playNote(i) {
         const ks = turtles.ithTurtle(0).singer.keySignature;
 
-        const noteToPlay = getNote(
-            this._pitch,
-            4,
-            i,
-            ks,
-            false,
-            null,
-            logo.errorMsg
-        );
+        const noteToPlay = getNote(this._pitch, 4, i, ks, false, null, logo.errorMsg);
         logo.synth.trigger(
             0,
             noteToPlay[0].replace(/♯/g, "#").replace(/♭/g, "b") + noteToPlay[1],
@@ -719,14 +657,14 @@ class ModeWidget {
             null,
             null
         );
-    };
+    }
 
     _saveState() {
         const state = JSON.stringify(this._selectedNotes);
         if (state !== last(this._undoStack)) {
             this._undoStack.push(JSON.stringify(this._selectedNotes));
         }
-    };
+    }
 
     _undo() {
         if (this._undoStack.length > 0) {
@@ -737,13 +675,12 @@ class ModeWidget {
 
             this._resetNotes();
             this._setModeName();
-            const currentModeName =
-                keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
+            const currentModeName = keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
             if (currentModeName[0] === "C") {
                 this._showPiano();
             }
         }
-    };
+    }
 
     _clear() {
         // "Unclick" every entry in the widget.
@@ -756,12 +693,11 @@ class ModeWidget {
 
         this._resetNotes();
         this._setModeName();
-        const currentModeName =
-            keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
+        const currentModeName = keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
         if (currentModeName[0] === "C") {
             this._showPiano();
         }
-    };
+    }
 
     _calculateMode() {
         const currentMode = [];
@@ -777,14 +713,13 @@ class ModeWidget {
 
         currentMode.push(j);
         return currentMode;
-    };
+    }
 
     _setModeName() {
         const table = docById("modeTable");
         const n = table.rows.length - 1;
         const currentMode = JSON.stringify(this._calculateMode());
-        const currentKey =
-            keySignatureToMode(turtles.ithTurtle(0).singer.keySignature)[0];
+        const currentKey = keySignatureToMode(turtles.ithTurtle(0).singer.keySignature)[0];
 
         for (let mode in MUSICALMODES) {
             if (JSON.stringify(MUSICALMODES[mode]) === currentMode) {
@@ -796,13 +731,9 @@ class ModeWidget {
                             logo.blocks.blockList[i].value = mode;
                             logo.blocks.blockList[i].text.text = _(mode);
                             logo.blocks.blockList[i].updateCache();
-                        } else if (
-                            logo.blocks.blockList[i].name == "notename"
-                        ) {
+                        } else if (logo.blocks.blockList[i].name == "notename") {
                             logo.blocks.blockList[i].value = currentKey;
-                            logo.blocks.blockList[i].text.text = _(
-                                currentKey
-                            );
+                            logo.blocks.blockList[i].text.text = _(currentKey);
                         }
                     }
                     logo.refreshCanvas();
@@ -818,7 +749,7 @@ class ModeWidget {
         // console.debug('setModeName:' + 'not found');
         table.rows[n].cells[0].innerHTML = "";
         this.widgetWindow.updateTitle("");
-    };
+    }
 
     _save() {
         const table = docById("modeTable");
@@ -880,20 +811,8 @@ class ModeWidget {
                     [previousBlock, notenameidx, octaveidx, pitchidx + 3]
                 ]);
             }
-            newStack.push([
-                notenameidx,
-                ["solfege", { value: pitch }],
-                0,
-                0,
-                [pitchidx]
-            ]);
-            newStack.push([
-                octaveidx,
-                ["number", { value: octave }],
-                0,
-                0,
-                [pitchidx]
-            ]);
+            newStack.push([notenameidx, ["solfege", { value: pitch }], 0, 0, [pitchidx]]);
+            newStack.push([octaveidx, ["number", { value: octave }], 0, 0, [pitchidx]]);
             previousBlock = pitchidx;
         }
 
@@ -923,21 +842,9 @@ class ModeWidget {
             const idx = newStack.length;
 
             if (p === modeLength) {
-                newStack.push([
-                    idx,
-                    "pitchnumber",
-                    0,
-                    0,
-                    [previousBlock, idx + 1, null]
-                ]);
+                newStack.push([idx, "pitchnumber", 0, 0, [previousBlock, idx + 1, null]]);
             } else {
-                newStack.push([
-                    idx,
-                    "pitchnumber",
-                    0,
-                    0,
-                    [previousBlock, idx + 1, idx + 2]
-                ]);
+                newStack.push([idx, "pitchnumber", 0, 0, [previousBlock, idx + 1, idx + 2]]);
             }
 
             newStack.push([idx + 1, ["number", { value: i }], 0, 0, [idx]]);
@@ -946,10 +853,10 @@ class ModeWidget {
 
         // Create a new stack for the chunk.
         console.debug(newStack);
-        setTimeout(()=>{
+        setTimeout(() => {
             logo.blocks.loadNewBlocks(newStack);
         }, 2000);
-    };
+    }
 
     _piemenuMode() {
         // pie menu for mode definition
@@ -982,20 +889,7 @@ class ModeWidget {
         // this._modeWheel.selectedNavItemIndex = 2;
         this._modeWheel.animatetime = 0; // 300;
 
-        const labels = [
-            "0",
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8",
-            "9",
-            "10",
-            "11"
-        ];
+        const labels = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"];
         let noteList = [];
         for (let i = 0; i < 12; i++) {
             noteList.push(labels[i]);
@@ -1047,22 +941,21 @@ class ModeWidget {
 
         // If a modeWheel sector is selected, show the corresponding
         // note wheel sector.
-        const __setNote = ()=>{
+        const __setNote = () => {
             const i = this._modeWheel.selectedNavItemIndex;
             this._saveState();
             this._selectedNotes[i] = true;
             this._noteWheel.navItems[i].navItem.show();
             this._playNote(i);
             this._setModeName();
-            const currentModeName =
-                keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
+            const currentModeName = keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
             if (currentModeName[0] === "C") {
                 this._showPiano();
             }
         };
 
         // If a noteWheel sector is selected, hide it.
-        const __clearNote = ()=>{
+        const __clearNote = () => {
             const i = this._noteWheel.selectedNavItemIndex;
             if (i == 0) {
                 return; // Never hide the first note.
@@ -1072,8 +965,7 @@ class ModeWidget {
             this._saveState();
             this._selectedNotes[i] = false;
             this._setModeName();
-            const currentModeName =
-                keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
+            const currentModeName = keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
             if (currentModeName[0] === "C") {
                 this._showPiano();
             }
@@ -1085,5 +977,5 @@ class ModeWidget {
             // Start with all notes hidden.
             this._noteWheel.navItems[i].navItem.hide();
         }
-    };
+    }
 }
