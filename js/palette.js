@@ -768,7 +768,7 @@ class Palette {
                 palDiv.removeChild(x);
             }
             let labelImg = makePaletteIcons(
-                PALETTEICONS[name],
+                PALETTEICONS[this.name],
                 this.palettes.cellSize,
                 this.palettes.cellSize,
             );
