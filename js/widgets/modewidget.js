@@ -21,7 +21,6 @@ class ModeWidget {
     }
 
     constructor() {
-        this._logo = logo;
         this._modeBlock = logo._modeBlock;
         this._locked = false;
         this._pitch = turtles.ithTurtle(0).singer.keySignature[0];
@@ -43,7 +42,7 @@ class ModeWidget {
         this.widgetWindow.getWidgetBody().append(this.modeTableDiv);
 
         this.widgetWindow.onclose = ()=>{
-            this._logo.hideMsgs();
+            logo.hideMsgs();
             this.widgetWindow.destroy();
         };
 
@@ -53,7 +52,7 @@ class ModeWidget {
             _("Play")
         );
         this._playButton.onclick = ()=>{
-            this._logo.resetSynth(0);
+            logo.resetSynth(0);
             if (this._playingStatus()) {
                 this._playing = false;
 
@@ -156,7 +155,7 @@ class ModeWidget {
         this._setMode();
 
         //.TRANS: A circle of notes represents the musical mode.
-        this._logo.textMsg(
+        logo.textMsg(
             _("Click in the circle to select notes for the mode.")
         );
         this.widgetWindow.sendToCenter();
@@ -492,7 +491,7 @@ class ModeWidget {
             return;
         }
 
-        this._logo.synth.stop();
+        logo.synth.stop();
         this._locked = true;
 
         // Make a list of notes to play
@@ -621,9 +620,9 @@ class ModeWidget {
                     ks,
                     false,
                     null,
-                    this._logo.errorMsg
+                    logo.errorMsg
                 );
-                this._logo.synth.trigger(
+                logo.synth.trigger(
                     0,
                     noteToPlay[0].replace(/♯/g, "#").replace(/♭/g, "b") +
                         noteToPlay[1],
@@ -682,9 +681,9 @@ class ModeWidget {
                     ks,
                     false,
                     null,
-                    this._logo.errorMsg
+                    logo.errorMsg
                 );
-                this._logo.synth.trigger(
+                logo.synth.trigger(
                     0,
                     noteToPlay[0].replace(/♯/g, "#").replace(/♭/g, "b") +
                         noteToPlay[1],
@@ -714,9 +713,9 @@ class ModeWidget {
             ks,
             false,
             null,
-            this._logo.errorMsg
+            logo.errorMsg
         );
-        this._logo.synth.trigger(
+        logo.synth.trigger(
             0,
             noteToPlay[0].replace(/♯/g, "#").replace(/♭/g, "b") + noteToPlay[1],
             this._noteValue,
@@ -796,21 +795,21 @@ class ModeWidget {
                 // Update the value of the modename block inside of
                 // the mode widget block.
                 if (this._modeBlock != null) {
-                    for (let i in this._logo.blocks.blockList) {
-                        if (this._logo.blocks.blockList[i].name == "modename") {
-                            this._logo.blocks.blockList[i].value = mode;
-                            this._logo.blocks.blockList[i].text.text = _(mode);
-                            this._logo.blocks.blockList[i].updateCache();
+                    for (let i in logo.blocks.blockList) {
+                        if (logo.blocks.blockList[i].name == "modename") {
+                            logo.blocks.blockList[i].value = mode;
+                            logo.blocks.blockList[i].text.text = _(mode);
+                            logo.blocks.blockList[i].updateCache();
                         } else if (
-                            this._logo.blocks.blockList[i].name == "notename"
+                            logo.blocks.blockList[i].name == "notename"
                         ) {
-                            this._logo.blocks.blockList[i].value = currentKey;
-                            this._logo.blocks.blockList[i].text.text = _(
+                            logo.blocks.blockList[i].value = currentKey;
+                            logo.blocks.blockList[i].text.text = _(
                                 currentKey
                             );
                         }
                     }
-                    this._logo.refreshCanvas();
+                    logo.refreshCanvas();
                 }
 
                 const name = currentKey + " " + _(mode);
@@ -904,8 +903,8 @@ class ModeWidget {
 
         // Create a new stack for the chunk.
         console.debug(newStack);
-        this._logo.blocks.loadNewBlocks(newStack);
-        this._logo.textMsg(_("New action block generated!"));
+        logo.blocks.loadNewBlocks(newStack);
+        logo.textMsg(_("New action block generated!"));
 
         // And save a stack of pitchnumbers to be used with the define mode
         newStack = [
@@ -952,7 +951,7 @@ class ModeWidget {
         // Create a new stack for the chunk.
         console.debug(newStack);
         setTimeout(()=>{
-            this._logo.blocks.loadNewBlocks(newStack);
+            logo.blocks.loadNewBlocks(newStack);
         }, 2000);
     };
 
