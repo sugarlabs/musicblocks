@@ -139,7 +139,7 @@ class ModeWidget {
 
         //.TRANS: A circle of notes represents the musical mode.
         logo.textMsg(_("Click in the circle to select notes for the mode."));
-        this.widgetWindow.sendToCenter();
+        setTimeout(this.widgetWindow.sendToCenter, 0);
     }
 
     /**
@@ -151,12 +151,7 @@ class ModeWidget {
     }
 
     /**
-     * @private
-     * @param {*} row 
-     * @param {string} icon 
-     * @param {number} iconSize 
-     * @param {*} label
-     * @returns {void} 
+     * @deprecated
      */
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);

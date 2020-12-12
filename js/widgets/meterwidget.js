@@ -234,6 +234,9 @@ function MeterWidget() {
         this.__playOneBeat(0, noteBeatValue);
     };
 
+    /**
+     * @deprecated
+     */
     this._addButton = (row, icon, iconSize, label) => {
         let cell = row.insertCell(-1);
         cell.innerHTML =
