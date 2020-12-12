@@ -795,7 +795,7 @@ function setupIntervalsBlocks() {
         flow(args, logo, turtle, blk) {
             if (args.length === 2) {
                 let modename = Singer.IntervalsActions.GetModename(args[1]);
-                logo._modeBlock = blocks.blockList[blk].connections[2];
+                logo.modeBlock = blocks.blockList[blk].connections[2];
 
                 Singer.IntervalsActions.setKey(args[0], args[1], turtle, blk);
 
