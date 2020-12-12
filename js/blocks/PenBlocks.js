@@ -546,15 +546,15 @@ function setupPenBlocks() {
             if (typeof args[0] === "string") {
                 logo.errorMsg(NANERRORMSG, blk);
             } else if (logo.inMatrix) {
-                logo.pitchTimeMatrix.addRowBlock(blk);
+                logo.phraseMaker.addRowBlock(blk);
                 if (logo.pitchBlocks.indexOf(blk) === -1) {
                     logo.pitchBlocks.push(blk);
                 }
 
-                logo.pitchTimeMatrix.rowLabels.push(
+                logo.phraseMaker.rowLabels.push(
                     logo.blocks.blockList[blk].name
                 );
-                logo.pitchTimeMatrix.rowArgs.push(args[0]);
+                logo.phraseMaker.rowArgs.push(args[0]);
             } else if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
             } else {
@@ -592,15 +592,15 @@ function setupPenBlocks() {
             if (typeof args[0] === "string") {
                 logo.errorMsg(NANERRORMSG, blk);
             } else if (logo.inMatrix) {
-                logo.pitchTimeMatrix.addRowBlock(blk);
+                logo.phraseMaker.addRowBlock(blk);
                 if (logo.pitchBlocks.indexOf(blk) === -1) {
                     logo.pitchBlocks.push(blk);
                 }
 
-                logo.pitchTimeMatrix.rowLabels.push(
+                logo.phraseMaker.rowLabels.push(
                     logo.blocks.blockList[blk].name
                 );
-                logo.pitchTimeMatrix.rowArgs.push(args[0]);
+                logo.phraseMaker.rowArgs.push(args[0]);
             } else if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
             } else {
@@ -639,15 +639,15 @@ function setupPenBlocks() {
             if (typeof args[0] === "string") {
                 logo.errorMsg(NANERRORMSG, blk);
             } else if (logo.inMatrix) {
-                logo.pitchTimeMatrix.addRowBlock(blk);
+                logo.phraseMaker.addRowBlock(blk);
                 if (logo.pitchBlocks.indexOf(blk) === -1) {
                     logo.pitchBlocks.push(blk);
                 }
 
-                logo.pitchTimeMatrix.rowLabels.push(
+                logo.phraseMaker.rowLabels.push(
                     logo.blocks.blockList[blk].name
                 );
-                logo.pitchTimeMatrix.rowArgs.push(args[0]);
+                logo.phraseMaker.rowArgs.push(args[0]);
             } else if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
             } else {
@@ -688,15 +688,15 @@ function setupPenBlocks() {
             if (typeof args[0] === "string") {
                 logo.errorMsg(NANERRORMSG, blk);
             } else if (logo.inMatrix) {
-                logo.pitchTimeMatrix.addRowBlock(blk);
+                logo.phraseMaker.addRowBlock(blk);
                 if (logo.pitchBlocks.indexOf(blk) === -1) {
                     logo.pitchBlocks.push(blk);
                 }
 
-                logo.pitchTimeMatrix.rowLabels.push(
+                logo.phraseMaker.rowLabels.push(
                     logo.blocks.blockList[blk].name
                 );
-                logo.pitchTimeMatrix.rowArgs.push(args[0]);
+                logo.phraseMaker.rowArgs.push(args[0]);
             } else if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
             } else {
@@ -734,15 +734,15 @@ function setupPenBlocks() {
             if (typeof args[0] === "string") {
                 logo.errorMsg(NANERRORMSG, blk);
             } else if (logo.inMatrix) {
-                logo.pitchTimeMatrix.addRowBlock(blk);
+                logo.phraseMaker.addRowBlock(blk);
                 if (logo.pitchBlocks.indexOf(blk) === -1) {
                     logo.pitchBlocks.push(blk);
                 }
 
-                logo.pitchTimeMatrix.rowLabels.push(
+                logo.phraseMaker.rowLabels.push(
                     logo.blocks.blockList[blk].name
                 );
-                logo.pitchTimeMatrix.rowArgs.push(args[0]);
+                logo.phraseMaker.rowArgs.push(args[0]);
             } else if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
             } else {
@@ -781,15 +781,15 @@ function setupPenBlocks() {
             if (typeof args[0] === "string") {
                 logo.errorMsg(NANERRORMSG, blk);
             } else if (logo.inMatrix) {
-                logo.pitchTimeMatrix.addRowBlock(blk);
+                logo.phraseMaker.addRowBlock(blk);
                 if (logo.pitchBlocks.indexOf(blk) === -1) {
                     logo.pitchBlocks.push(blk);
                 }
 
-                logo.pitchTimeMatrix.rowLabels.push(
+                logo.phraseMaker.rowLabels.push(
                     logo.blocks.blockList[blk].name
                 );
-                logo.pitchTimeMatrix.rowArgs.push(args[0]);
+                logo.phraseMaker.rowArgs.push(args[0]);
             } else if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
             } else {

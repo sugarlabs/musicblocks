@@ -26,7 +26,7 @@ const MATRIXGRAPHICS = [
 const MATRIXGRAPHICS2 = ["arc", "setxy"];
 const MATRIXSYNTHS = ["sine", "triangle", "sawtooth", "square", "hertz"]; // Deprecated
 
-function PitchTimeMatrix() {
+function PhraseMaker() {
     // The phrasemaker widget
     const BUTTONDIVWIDTH = 535; // 8 buttons 535 = (55 + 4) * 9
     const OUTERWINDOWWIDTH = 758;
@@ -4375,7 +4375,7 @@ function PitchTimeMatrix() {
             cell.style.backgroundColor = platformColor.rhythmcellcolor;
         }
 
-        if (that._matrixHasTuplets) {
+        if (this._matrixHasTuplets) {
             row = this._tupletNoteValueRow;
             for (let i = 0; i < row.cells.length; i++) {
                 cell = row.cells[i];
@@ -4394,7 +4394,7 @@ function PitchTimeMatrix() {
         time = 1 / noteValue;
         let that = this;
 
-        setTimeout(function() {
+        setTimeout(() => {
             let row, cell, tupletCell;
             // Did we just play the last note?
             if (noteCounter === that._notesToPlay.length - 1) {
