@@ -26,100 +26,102 @@ const MATRIXGRAPHICS = [
 const MATRIXGRAPHICS2 = ["arc", "setxy"];
 const MATRIXSYNTHS = ["sine", "triangle", "sawtooth", "square", "hertz"]; // Deprecated
 
-function PhraseMaker() {
+class PhraseMaker {
     // The phrasemaker widget
-    const BUTTONDIVWIDTH = 535; // 8 buttons 535 = (55 + 4) * 9
-    const OUTERWINDOWWIDTH = 758;
-    const INNERWINDOWWIDTH = 630;
-    const BUTTONSIZE = 53;
-    const ICONSIZE = 24;
+    static BUTTONDIVWIDTH = 535; // 8 buttons 535 = (55 + 4) * 9
+    static OUTERWINDOWWIDTH = 758;
+    static INNERWINDOWWIDTH = 630;
+    static BUTTONSIZE = 53;
+    static ICONSIZE = 24;
 
-    this._stopOrCloseClicked = false;
-    this._instrumentName = DEFAULTVOICE;
+    constructor() {
+        this._stopOrCloseClicked = false;
+        this._instrumentName = DEFAULTVOICE;
 
-    this.paramsEffects = {
-        doVibrato: false,
-        doDistortion: false,
-        doTremolo: false,
-        doPhaser: false,
-        doChorus: false,
-        vibratoIntensity: 0,
-        vibratoFrequency: 0,
-        distortionAmount: 0,
-        tremoloFrequency: 0,
-        tremoloDepth: 0,
-        rate: 0,
-        octaves: 0,
-        baseFrequency: 0,
-        chorusRate: 0,
-        delayTime: 0,
-        chorusDepth: 0
-    };
+        this.paramsEffects = {
+            doVibrato: false,
+            doDistortion: false,
+            doTremolo: false,
+            doPhaser: false,
+            doChorus: false,
+            vibratoIntensity: 0,
+            vibratoFrequency: 0,
+            distortionAmount: 0,
+            tremoloFrequency: 0,
+            tremoloDepth: 0,
+            rate: 0,
+            octaves: 0,
+            baseFrequency: 0,
+            chorusRate: 0,
+            delayTime: 0,
+            chorusDepth: 0
+        };
 
-    // rowLabels can contain either a pitch, a drum, or a graphics commands
-    this.rowLabels = [];
-    // rowArgs can contain an octave or the arg(s) to a graphics command
-    this.rowArgs = [];
+        // rowLabels can contain either a pitch, a drum, or a graphics commands
+        this.rowLabels = [];
+        // rowArgs can contain an octave or the arg(s) to a graphics command
+        this.rowArgs = [];
 
-    // We need to treat note blocks differently since they have both
-    // pitch and rhythm.
-    this._noteBlocks = false;
+        // We need to treat note blocks differently since they have both
+        // pitch and rhythm.
+        this._noteBlocks = false;
 
-    this.sorted = false;
-    this._notesToPlay = [];
-    this._outputAsTuplet = []; // do we output 1/12 or 1/(3x4)?
-    this._matrixHasTuplets = false;
-    this._notesCounter = 0;
-    this._noteStored = [];
+        this.sorted = false;
+        this._notesToPlay = [];
+        this._outputAsTuplet = []; // do we output 1/12 or 1/(3x4)?
+        this._matrixHasTuplets = false;
+        this._notesCounter = 0;
+        this._noteStored = [];
 
-    // The pitch-block number associated with a row; a rhythm block is
-    // associated with a column. We need to keep track of which
-    // intersections in the grid are populated.  The blockMap is a
-    // list of selected nodes in the matrix that map pitch blocks to
-    // rhythm blocks (note that rhythm blocks can span multiple
-    // columns).
+        // The pitch-block number associated with a row; a rhythm block is
+        // associated with a column. We need to keep track of which
+        // intersections in the grid are populated.  The blockMap is a
+        // list of selected nodes in the matrix that map pitch blocks to
+        // rhythm blocks (note that rhythm blocks can span multiple
+        // columns).
 
-    // These arrays get created each time the matrix is built.
-    this._rowBlocks = []; // pitch-block number
-    this._colBlocks = []; // [rhythm-block number, note number]
+        // These arrays get created each time the matrix is built.
+        this._rowBlocks = []; // pitch-block number
+        this._colBlocks = []; // [rhythm-block number, note number]
 
-    // This array keeps track of the position of the rows after sorting.
-    this._rowMap = [];
-    // And offsets due to deleting duplicates.
-    this._rowOffset = [];
+        // This array keeps track of the position of the rows after sorting.
+        this._rowMap = [];
+        // And offsets due to deleting duplicates.
+        this._rowOffset = [];
 
-    // Track a number of DOM elements locally
-    this._rows = [];
-    this._headcols = [];
-    this._labelcols = [];
-    this._tupletNoteLabel = null;
-    this._tupletValueLabel = null;
-    this._tupletNoteValueLabel = null;
+        // Track a number of DOM elements locally
+        this._rows = [];
+        this._headcols = [];
+        this._labelcols = [];
+        this._tupletNoteLabel = null;
+        this._tupletValueLabel = null;
+        this._tupletNoteValueLabel = null;
 
-    this._tupletNoteValueRow = null;
-    this._tupletValueRow = null;
-    this._noteValueRow = null;
+        this._tupletNoteValueRow = null;
+        this._tupletValueRow = null;
+        this._noteValueRow = null;
 
-    // This array is preserved between sessions.
-    // We populate the blockMap whenever a note is selected and
-    // restore any notes that might be present.
-    this._blockMap = {};
+        // This array is preserved between sessions.
+        // We populate the blockMap whenever a note is selected and
+        // restore any notes that might be present.
+        this._blockMap = {};
 
-    this.blockNo = null;
-    this.notesBlockMap = [];
-    this._blockMapHelper = [];
-    this.columnBlocksMap = [];
+        this.blockNo = null;
+        this.notesBlockMap = [];
+        this._blockMapHelper = [];
+        this.columnBlocksMap = [];
+    }
 
-    this.clearBlocks = function() {
+    clearBlocks() {
         // When creating a new matrix, we want to clear out any old
         // block references.
         this._rowBlocks = [];
         this._colBlocks = [];
         this._rowMap = [];
         this._rowOffset = [];
-    };
+    }
 
-    this.addRowBlock = function(rowBlock) {
+    addRowBlock(rowBlock) {
         // When creating a matrix, we add rows whenever we encounter a
         // pitch or drum block (and some graphics blocks).
         this._rowMap.push(this._rowBlocks.length);
@@ -131,9 +133,9 @@ function PhraseMaker() {
         }
 
         this._rowBlocks.push(rowBlock);
-    };
+    }
 
-    this.addColBlock = function(rhythmBlock, n) {
+    addColBlock(rhythmBlock, n) {
         // When creating a matrix, we add columns when we encounter
         // rhythm blocks.
         // Search for previous instance of the same block (from a
@@ -150,9 +152,9 @@ function PhraseMaker() {
         for (let i = startIdx; i < n + startIdx; i++) {
             this._colBlocks.push([rhythmBlock, i]);
         }
-    };
+    }
 
-    this.addNode = function(rowBlock, rhythmBlock, n, blk) {
+    addNode(rowBlock, rhythmBlock, n, blk) {
         // A node exists for each cell in the matrix. It is used to
         // preserve and restore the state of the cell.
         if (this._blockMap[blk] === undefined) {
@@ -174,9 +176,9 @@ function PhraseMaker() {
         }
 
         this._blockMap[blk].push([rowBlock, [rhythmBlock, n], j]);
-    };
+    }
 
-    this.removeNode = function(rowBlock, rhythmBlock, n) {
+    removeNode(rowBlock, rhythmBlock, n) {
         // When the matrix is changed, we may need to remove nodes.
         let blk = this.blockNo;
         let obj;
@@ -190,14 +192,14 @@ function PhraseMaker() {
                 this._blockMap[blk].splice(i, 1);
             }
         }
-    };
+    }
 
-    this._get_save_lock = function() {
+    _get_save_lock() {
         // Debounce the save button.
         return this._save_lock;
-    };
+    }
 
-    this.init = function(logo) {
+    init(logo) {
         // Initializes the matrix. First removes the previous matrix
         // and then make another one in DOM (document object model)
         let tempTable;
@@ -211,7 +213,7 @@ function PhraseMaker() {
 
         let w = window.innerWidth;
         this._cellScale = Math.max(1, w / 1200);
-        let iconSize = ICONSIZE * this._cellScale;
+        let iconSize = PhraseMaker.ICONSIZE * this._cellScale;
 
         let widgetWindow = window.widgetWindows.windowFor(this, "phrase maker");
         this.widgetWindow = widgetWindow;
@@ -243,7 +245,7 @@ function PhraseMaker() {
 
         widgetWindow.addButton(
             "play-button.svg",
-            ICONSIZE,
+            PhraseMaker.ICONSIZE,
             _("Play")
         ).onclick = function() {
             that._logo.turtleDelay = 0;
@@ -255,7 +257,7 @@ function PhraseMaker() {
         this._save_lock = false;
         widgetWindow.addButton(
             "export-chunk.svg",
-            ICONSIZE,
+            PhraseMaker.ICONSIZE,
             _("Save")
         ).onclick = async function() {
             // Debounce the save button
@@ -272,7 +274,7 @@ function PhraseMaker() {
 
         widgetWindow.addButton(
             "erase-button.svg",
-            ICONSIZE,
+            PhraseMaker.ICONSIZE,
             _("Clear")
         ).onclick = function() {
             that._clear();
@@ -281,7 +283,7 @@ function PhraseMaker() {
         if (!localStorage.beginnerMode) {
             widgetWindow.addButton(
                 "export-button.svg",
-                ICONSIZE,
+                PhraseMaker.ICONSIZE,
                 _("Export")
             ).onclick = function() {
                 that._export();
@@ -290,13 +292,13 @@ function PhraseMaker() {
 
         widgetWindow.addButton(
             "sort.svg",
-            ICONSIZE,
+            PhraseMaker.ICONSIZE,
             _("Sort")
         ).onclick = function() {
             that._sort();
         };
 
-        let cell = widgetWindow.addButton("add2.svg", ICONSIZE, _("Add note"));
+        let cell = widgetWindow.addButton("add2.svg", PhraseMaker.ICONSIZE, _("Add note"));
         cell.setAttribute("id", "addnotes");
         cell.onclick = function() {
             that._createAddRowPieSubmenu();
@@ -479,7 +481,7 @@ function PhraseMaker() {
                 Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + "px";
             cell.style.maxWidth = cell.style.minWidth;
             cell.className = "labelcol"; // This cell is fixed horizontally.
-            cell.style.left = BUTTONSIZE * this._cellScale + "px";
+            cell.style.left = PhraseMaker.BUTTONSIZE * this._cellScale + "px";
             cell.setAttribute("alt", i);
             this._labelcols[i] = cell;
 
@@ -683,9 +685,9 @@ function PhraseMaker() {
         this._logo.textMsg(_("Click on the table to add notes."));
 
         this.widgetWindow.sendToCenter();
-    };
+    }
 
-    this._createAddRowPieSubmenu = function() {
+    _createAddRowPieSubmenu = function() {
         // This menu is used to add new rows to the matrix.
         docById("wheelDivptm").style.display = "";
         const VALUESLABEL = ["pitch", "hertz", "drum", "graphics", "pen"];
@@ -951,9 +953,9 @@ function PhraseMaker() {
         for (let i = 0; i < valueLabel.length; i++) {
             this._menuWheel.navItems[i].navigateFunction = __subMenuChanged;
         }
-    };
+    }
 
-    this.pitchBlockAdded = function(blockN) {
+    pitchBlockAdded = function(blockN) {
         let i;
         for (i = 0; i < this.columnBlocksMap.length; i++) {
             if (this.columnBlocksMap[i][0] === blockN) {
@@ -962,9 +964,9 @@ function PhraseMaker() {
         }
 
         setTimeout(this._createColumnPieSubmenu(i, "pitchblocks", true), 500);
-    };
+    }
 
-    this._createMatrixGraphics2PieSubmenu = function(blockIndex, blk) {
+    _createMatrixGraphics2PieSubmenu = function(blockIndex, blk) {
         // A wheel for modifying 2-arg graphics blocks
         docById("wheelDivptm").style.display = "";
         let arcRadiusLabel = [
@@ -1216,7 +1218,7 @@ function PhraseMaker() {
             // Update the cell label.
             let blockLabel;
             cell = that._headcols[blockIndex];
-            iconSize = ICONSIZE * (window.innerWidth / 1200);
+            iconSize = PhraseMaker.ICONSIZE * (window.innerWidth / 1200);
             if (MATRIXGRAPHICS2.indexOf(that.rowLabels[blockIndex]) !== -1) {
                 cell.innerHTML =
                     '&nbsp;&nbsp;<img src="' +
@@ -1258,13 +1260,9 @@ function PhraseMaker() {
                 i
             ].navigateFunction = __selectionChanged;
         }
-    };
+    }
 
-    this._createMatrixGraphicsPieSubmenu = function(
-        blockIndex,
-        condition,
-        blk
-    ) {
+    _createMatrixGraphicsPieSubmenu(blockIndex, condition, blk) {
         // A wheel for modifying 1-arg blocks (graphics and hertz)
         docById("wheelDivptm").style.display = "";
         let valueLabel, forwardBackLabel, leftRightLabel, setHeadingLabel,
@@ -1567,7 +1565,7 @@ function PhraseMaker() {
 
             // Update the cell label.
             let cell = that._headcols[blockIndex];
-            let iconSize = ICONSIZE * (window.innerWidth / 1200);
+            let iconSize = PhraseMaker.ICONSIZE * (window.innerWidth / 1200);
             if (MATRIXSYNTHS.indexOf(that.rowLabels[blockIndex]) !== -1) {
                 cell.innerHTML =
                     '&nbsp;&nbsp;<img src="' +
@@ -1652,9 +1650,9 @@ function PhraseMaker() {
                 }
             }
         }
-    };
+    }
 
-    this._createColumnPieSubmenu = function(index, condition, sortedClose) {
+    _createColumnPieSubmenu(index, condition, sortedClose) {
         index = parseInt(index);
         docById("wheelDivptm").style.display = "";
 
@@ -1969,7 +1967,7 @@ function PhraseMaker() {
             };
             let noteName = that.rowLabels[index];
             let w = window.innerWidth;
-            let iconSize = ICONSIZE * (w / 1200);
+            let iconSize = PhraseMaker.ICONSIZE * (w / 1200);
             if (drumName != null) {
                 cell.innerHTML =
                     '&nbsp;&nbsp;<img src="' +
@@ -2130,9 +2128,9 @@ function PhraseMaker() {
                     .navigateFunction = __pitchPreview;
             }
         }
-    };
+    }
 
-    this._blockReplace = function(oldblk, newblk) {
+    _blockReplace(oldblk, newblk) {
         // Find the connections from the old block
         let c0 = this._logo.blocks.blockList[oldblk].connections[0];
         let c1 = last(this._logo.blocks.blockList[oldblk].connections);
@@ -2193,9 +2191,9 @@ function PhraseMaker() {
         this._logo.blocks.sendStackToTrash(this._logo.blocks.blockList[oldblk]);
 
         this._logo.refreshCanvas();
-    };
+    }
 
-    this._addNotesBlockBetween = function(aboveBlock, block, topBlock) {
+    _addNotesBlockBetween(aboveBlock, block, topBlock) {
         let belowBlock;
         if (topBlock) {
             belowBlock = this._logo.blocks.blockList[aboveBlock]
@@ -2218,9 +2216,9 @@ function PhraseMaker() {
         this._logo.blocks.adjustDocks(this.blockNo, true);
         this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
         this._logo.blocks.refreshCanvas();
-    };
+    }
 
-    this._removePitchBlock = function(blockNo) {
+    _removePitchBlock(blockNo) {
         let c0 = this._logo.blocks.blockList[blockNo].connections[0];
         let c1 = last(this._logo.blocks.blockList[blockNo].connections);
         this._logo.blocks.blockList[c0].connections[
@@ -2237,14 +2235,14 @@ function PhraseMaker() {
         this._logo.blocks.adjustDocks(this.blockNo, true);
         this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
         this._logo.blocks.refreshCanvas();
-    };
+    }
 
-    this._generateDataURI = function(file) {
+    _generateDataURI(file) {
         let data = "data: text/html;charset=utf-8, " + encodeURIComponent(file);
         return data;
-    };
+    }
 
-    this._sort = function() {
+    _sort() {
         if (this.sorted) {
             console.debug("already sorted");
             return;
@@ -2450,9 +2448,9 @@ function PhraseMaker() {
         }
 
         this.makeClickable();
-    };
+    }
 
-    this._export = function() {
+    _export() {
         let exportWindow = window.open("");
         console.debug(exportWindow);
         let exportDocument = exportWindow.document;
@@ -2628,10 +2626,10 @@ function PhraseMaker() {
             "downloadb1"
         ).href = this._generateDataURI(uriData);
         exportDocument.close();
-    };
+    }
 
     // Deprecated
-    this.note2Solfege = function(note, index) {
+    note2Solfege(note, index) {
         let octave, newNote;
         if (["♭", "♯"].indexOf(note[1]) === -1) {
             octave = note[1];
@@ -2642,9 +2640,9 @@ function PhraseMaker() {
         }
         this.rowLabels[index] = newNote;
         this.rowArgs[index] = octave;
-    };
+    }
 
-    this.addTuplet = function(param) {
+    addTuplet(param) {
         // The first two parameters are the interval for the tuplet,
         // e.g., 1/4; the rest of the parameters are the list of notes
         // to be added to the tuplet, e.g., 1/8, 1/8, 1/8.
@@ -2749,7 +2747,7 @@ function PhraseMaker() {
         let tupletNoteValue = noteValue * tupletValue;
         let numerator, thisNoteValue, obj;
         let cellWidth, cellColor;
-        let ptmRow, drumname;
+        let ptmRow, drumName;
         // Add the tuplet notes
         for (let i = 0; i < numberOfNotes; i++) {
             // Add the notes to the tuplet notes row too.
@@ -2870,16 +2868,16 @@ function PhraseMaker() {
         cell.innerHTML = noteValueToDisplay;
         cell.style.backgroundColor = platformColor.rhythmcellcolor;
         this._matrixHasTuplets = true;
-    };
+    }
 
-    this._noteWidth = function(noteValue) {
+    _noteWidth(noteValue) {
         return Math.max(
             Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this._cellScale),
             15
         );
-    };
+    }
 
-    this.addNotes = function(numBeats, noteValue) {
+    addNotes(numBeats, noteValue) {
         let noteValueToDisplay = calcNoteValueToDisplay(
             noteValue,
             1,
@@ -2896,7 +2894,7 @@ function PhraseMaker() {
         }
 
         let rowCount = this.rowLabels.length - this._rests;
-        let drumname, row, cell;
+        let drumName, row, cell, cellColor;
         for (let j = 0; j < numBeats; j++) {
             for (let i = 0; i < rowCount; i++) {
                 // Depending on the row, we choose a different background color.
@@ -2990,9 +2988,9 @@ function PhraseMaker() {
                 cell.style.backgroundColor = platformColor.tupletBackground;
             }
         }
-    };
+    }
 
-    this._lookForNoteBlocksOrRepeat = function() {
+    _lookForNoteBlocksOrRepeat() {
         this._noteBlocks = false;
         let bno = this.blockNo;
         let blk;
@@ -3020,9 +3018,9 @@ function PhraseMaker() {
                 break;
             }
         }
-    };
+    }
 
-    this._syncMarkedBlocks = function() {
+    _syncMarkedBlocks() {
         let newBlockMap = [];
         let blk = this.blockNo;
         for (let i = 0; i < this._blockMap[blk].length; i++) {
@@ -3060,7 +3058,7 @@ function PhraseMaker() {
         });
     };
 
-    this.blockConnection = function(len, bottomOfClamp) {
+    blockConnection(len, bottomOfClamp) {
         let n = this._logo.blocks.blockList.length - len;
         let c;
         if (bottomOfClamp == null) {
@@ -3076,9 +3074,9 @@ function PhraseMaker() {
 
         this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
         this._logo.blocks.adjustDocks(this.blockNo, true);
-    };
+    }
 
-    this._deleteRhythmBlock = function(blockToDelete) {
+    _deleteRhythmBlock(blockToDelete) {
         if (
             last(this._logo.blocks.blockList[blockToDelete].connections) !==
             null
@@ -3094,9 +3092,9 @@ function PhraseMaker() {
         );
         this._logo.blocks.adjustDocks(this.blockNo, true);
         this._logo.blocks.refreshCanvas();
-    };
+    }
 
-    this._addRhythmBlock = function(value, times) {
+    _addRhythmBlock(value, times) {
         let RHYTHMOBJ = [];
         value = toFraction(value);
         let topOfClamp = this._logo.blocks.blockList[this.blockNo]
@@ -3130,9 +3128,9 @@ function PhraseMaker() {
             setTimeout(that.blockConnection(7, bottomOfClamp), 500);
         }
         this._logo.blocks.refreshCanvas();
-    };
+    }
 
-    this._update = function(i, value, k, noteCase) {
+    _update(i, value, k, noteCase) {
         let updates = [];
         value = toFraction(value);
         if (noteCase === "tupletnote") {
@@ -3186,9 +3184,9 @@ function PhraseMaker() {
             this._logo.refreshCanvas();
         }
         saveLocally();
-    };
+    }
 
-    this._mapNotesBlocks = function(blockName, withName) {
+    _mapNotesBlocks(blockName, withName) {
         let notesBlockMap = [];
         let blk = this._logo.blocks.blockList[this.blockNo].connections[1];
         let myBlock = this._logo.blocks.blockList[blk];
@@ -3234,9 +3232,9 @@ function PhraseMaker() {
         }
 
         return notesBlockMap;
-    };
+    }
 
-    this.recalculateBlocks = function() {
+    recalculateBlocks() {
         let adjustedNotes = [];
         adjustedNotes.push([this._logo.tupletRhythms[0][2], 1]);
         let startidx = 1;
@@ -3253,9 +3251,9 @@ function PhraseMaker() {
             adjustedNotes[adjustedNotes.length - 1][1] = startidx;
         }
         return adjustedNotes;
-    };
+    }
 
-    this._readjustNotesBlocks = function() {
+    _readjustNotesBlocks() {
         let notesBlockMap = this._mapNotesBlocks("rhythm2");
         let adjustedNotes = this.recalculateBlocks();
 
@@ -3297,9 +3295,9 @@ function PhraseMaker() {
             }
         }
         this._colBlocks = colBlocks;
-    };
+    }
 
-    this._restartGrid = function(that) {
+    _restartGrid(that) {
         this._matrixHasTuplets = false; // Force regeneration of tuplet rows.
         this.sorted = true;
         this.init(this._logo);
@@ -3335,9 +3333,9 @@ function PhraseMaker() {
         docById("wheelDivptm").style.display = "none";
         that._menuWheel.removeWheel();
         that._exitWheel.removeWheel();
-    };
+    }
 
-    this._addNotes = function(that, noteToDivide, notesToAdd) {
+    _addNotes(that, noteToDivide, notesToAdd) {
         noteToDivide = parseInt(noteToDivide);
         this._blockMapHelper = [];
         for (let i = 0; i <= noteToDivide; i++) {
@@ -3361,9 +3359,9 @@ function PhraseMaker() {
         this._readjustNotesBlocks();
         this._syncMarkedBlocks();
         this._restartGrid(that);
-    };
+    }
 
-    this._deleteNotes = function(that, noteToDivide) {
+    _deleteNotes(that, noteToDivide) {
         if (this._logo.tupletRhythms.length === 1) {
             return;
         }
@@ -3385,9 +3383,9 @@ function PhraseMaker() {
         this._readjustNotesBlocks();
         this._syncMarkedBlocks();
         this._restartGrid(that);
-    };
+    }
 
-    this._divideNotes = function(that, noteToDivide, divideNoteBy) {
+    _divideNotes(that, noteToDivide, divideNoteBy) {
         noteToDivide = parseInt(noteToDivide);
         this._blockMapHelper = [];
         for (let i = 0; i < noteToDivide; i++) {
@@ -3422,9 +3420,9 @@ function PhraseMaker() {
         this._readjustNotesBlocks();
         this._syncMarkedBlocks();
         this._restartGrid(that);
-    };
+    }
 
-    this._tieNotes = function(mouseDownCell, mouseUpCell) {
+    _tieNotes(mouseDownCell, mouseUpCell) {
         let downCellId = null;
         let upCellId = null;
         if (mouseDownCell.id < mouseUpCell.id) {
@@ -3472,9 +3470,9 @@ function PhraseMaker() {
         this._readjustNotesBlocks();
         this._syncMarkedBlocks();
         this._restartGrid(that);
-    };
+    }
 
-    this._updateTuplet = function(that, noteToDivide, newNoteValue, condition) {
+    _updateTuplet(that, noteToDivide, newNoteValue, condition) {
         this._logo.tupletParams[noteToDivide][1] = newNoteValue;
         this._restartGrid(that);
         let notesBlockMap;
@@ -3495,14 +3493,9 @@ function PhraseMaker() {
                 "tupletnote"
             );
         }
-    };
+    }
 
-    this._updateTupletValue = function(
-        that,
-        noteToDivide,
-        oldTupletValue,
-        newTupletValue
-    ) {
+    _updateTupletValue(that, noteToDivide, oldTupletValue, newTupletValue) {
         noteToDivide = parseInt(noteToDivide);
         oldTupletValue = parseInt(oldTupletValue);
         newTupletValue = parseInt(newTupletValue);
@@ -3626,9 +3619,9 @@ function PhraseMaker() {
             newTupletValue,
             "stupletvalue"
         );
-    };
+    }
 
-    this._createpiesubmenu = function(noteToDivide, tupletValue, condition) {
+    _createpiesubmenu(noteToDivide, tupletValue, condition) {
         docById("wheelDivptm").style.display = "";
 
         this._menuWheel = new wheelnav("wheelDivptm", null, 800, 800);
@@ -3953,9 +3946,9 @@ function PhraseMaker() {
                 };
             }
         }
-    };
+    }
 
-    this.makeClickable = function() {
+    makeClickable() {
         // Once the entire matrix is generated, this function makes it
         // clickable.
         let rowNote = this._noteValueRow;
@@ -3971,11 +3964,11 @@ function PhraseMaker() {
                 cellTuplet.setAttribute("id", j);
             }
 
-            __mouseDownHandler = function(event) {
+            const __mouseDownHandler = function(event) {
                 that._mouseDownCell = event.target;
             };
 
-            __mouseUpHandler = function(event) {
+            const __mouseUpHandler = function(event) {
                 that._mouseUpCell = event.target;
                 if (that._mouseDownCell !== that._mouseUpCell) {
                     that._tieNotes(that._mouseDownCell, that._mouseUpCell);
@@ -4188,7 +4181,7 @@ function PhraseMaker() {
         }
     };
 
-    this.playAll = function() {
+    playAll() {
         // Play all of the notes in the matrix.
         this.playingNow = !this.playingNow;
 
@@ -4196,7 +4189,7 @@ function PhraseMaker() {
             this.widgetWindow.modifyButton(
                 0,
                 "stop-button.svg",
-                ICONSIZE,
+                PhraseMaker.ICONSIZE,
                 _("stop")
             );
 
@@ -4212,7 +4205,7 @@ function PhraseMaker() {
             let pitchNotes = [];
             let synthNotes = [];
             let drumNotes = [];
-            let drumname, obj;
+            let drumName, obj;
 
             // Note can be a chord, hence it is an array.
             for (let i = 0; i < note.length; i++) {
@@ -4301,13 +4294,13 @@ function PhraseMaker() {
             this.widgetWindow.modifyButton(
                 0,
                 "play-button.svg",
-                ICONSIZE,
+                PhraseMaker.ICONSIZE,
                 _("Play")
             );
         }
     };
 
-    this.collectNotesToPlay = function() {
+    collectNotesToPlay() {
         // Generate the list of notes to play, on the fly from
         // row labels and note value (from "alt" attribute of
         // corresponding cells in the row)
@@ -4367,7 +4360,7 @@ function PhraseMaker() {
         this._notesToPlay = notes;
     }
 
-    this._resetMatrix = function() {
+    _resetMatrix() {
         let row = this._noteValueRow;
         let cell;
         for (let i = 0; i < row.cells.length; i++) {
@@ -4382,15 +4375,15 @@ function PhraseMaker() {
                 cell.style.backgroundColor = platformColor.tupletBackground;
             }
         }
-    };
+    }
 
-    this.__playNote = function(time, noteCounter) {
+    __playNote(time, noteCounter) {
         // If the widget is closed, stop playing.
         if (!this.widgetWindow.isVisible()) {
             return;
         }
 
-        noteValue = this._notesToPlay[noteCounter][1];
+        let noteValue = this._notesToPlay[noteCounter][1];
         time = 1 / noteValue;
         let that = this;
 
@@ -4403,7 +4396,7 @@ function PhraseMaker() {
                 that.widgetWindow.modifyButton(
                     0,
                     "play-button.svg",
-                    ICONSIZE,
+                    PhraseMaker.ICONSIZE,
                     _("Play")
                 );
                 that.playingNow = false;
@@ -4427,14 +4420,14 @@ function PhraseMaker() {
                     that._logo.synth.stop();
                 }
 
-                note = that._notesToPlay[that._notesCounter][0];
+                const note = that._notesToPlay[that._notesCounter][0];
                 noteValue = that._notesToPlay[that._notesCounter][1];
                 that._notesCounter += 1;
 
                 let pitchNotes = [];
                 let synthNotes = [];
                 let drumNotes = [];
-                let drumname, obj;
+                let drumName, obj;
                 // Note can be a chord, hence it is an array.
                 if (!that._stopOrCloseClicked) {
                     for (let i = 0; i < note.length; i++) {
@@ -4516,15 +4509,15 @@ function PhraseMaker() {
                     that.widgetWindow.modifyButton(
                         0,
                         "play-button.svg",
-                        ICONSIZE,
+                        PhraseMaker.ICONSIZE,
                         _("Play")
                     );
                 }
             }
         }, Singer.defaultBPMFactor * 1000 * time + that._logo.turtleDelay);
-    };
+    }
 
-    this._playChord = function(notes, noteValue) {
+    _playChord(notes, noteValue) {
         let that = this;
         setTimeout(function() {
             that._logo.synth.trigger(
@@ -4575,9 +4568,9 @@ function PhraseMaker() {
                 );
             }, 1);
         }
-    };
+    }
 
-    this._processGraphics = function(obj) {
+    _processGraphics(obj) {
         switch (obj[0]) {
             case "forward":
                 this._logo.turtles.turtleList[0].painter.doForward(obj[1]);
@@ -4623,9 +4616,9 @@ function PhraseMaker() {
                 console.debug("unknown graphics command " + obj[0]);
                 break;
         }
-    };
+    }
 
-    this._setNotes = function(colIndex, rowIndex, playNote) {
+    _setNotes(colIndex, rowIndex, playNote) {
         // Sets corresponding note when user clicks on any cell and
         // plays that note
         let rowBlock = this._rowBlocks[
@@ -4649,11 +4642,11 @@ function PhraseMaker() {
                 this._setNoteCell(j, colIndex, cell, playNote);
             }
         }
-    };
+    }
 
-    this._setNoteCell = function(j, colIndex, cell, playNote) {
+    _setNoteCell(j, colIndex, cell, playNote) {
         let note = this._noteStored[j];
-        let drumName, graphicsBlock, obj;
+        let drumName, graphicsBlock, graphicNote, obj;
         if (this.rowLabels[j] === "hertz") {
             drumName = null;
             graphicsBlock = false;
@@ -4732,9 +4725,9 @@ function PhraseMaker() {
                 null
             );
         }
-    };
+    }
 
-    this._clear = function() {
+    _clear() {
         // 'Unclick' every entry in the matrix.
         let row, cell;
         for (let i = 0; i < this.rowLabels.length; i++) {
@@ -4748,9 +4741,9 @@ function PhraseMaker() {
                 }
             }
         }
-    };
+    }
 
-    this._save = function() {
+    _save() {
         /* Saves the current matrix as an action stack consisting of
          * note and pitch blocks (saving as chunks is deprecated). */
 
@@ -5321,5 +5314,5 @@ function PhraseMaker() {
         // Create a new stack for the chunk.
         this._logo.blocks.loadNewBlocks(newStack);
         this._logo.textMsg(_("New action block generated!"));
-    };
+    }
 }
