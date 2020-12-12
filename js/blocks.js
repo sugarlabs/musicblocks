@@ -33,10 +33,10 @@ const PITCHBLOCKS = [
 // Blocks holds the list of blocks and most of the block-associated
 // methods, since most block manipulations are inter-block.
 
-/*
+/**
  * The class for managing the collection of blocks
  * @public
- * @return {void}
+ * @returns {void}
  */
 function Blocks(activity) {
     if (sugarizerCompatibility.isInsideSugarizer()) {
@@ -127,95 +127,95 @@ function Blocks(activity) {
     // as to avoid palette refresh race conditions.
     this.deleteActionTimeout = 0;
 
-    /*
+    /**
      * Returns the long press status
      * @public
-     * @return this.inLongPress
+     * @returns this.inLongPress
      */
     this.getLongPressStatus = function() {
         return this.inLongPress;
     };
 
-    /*
+    /**
      * Sets long press status to false
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.clearLongPress = function() {
         this.inLongPress = false;
     };
 
-    /*
+    /**
      * We need access to the canvas.
      * @param - canvas
      * @public
-     * @return this
+     * @returns this
      */
     this.setCanvas = function(canvas) {
         this.canvas = canvas;
         return this;
     };
 
-    /*
+    /**
      * We need access to the stage.
      * @param - stage - staging area
      * @public
-     * @return this
+     * @returns this
      */
     this.setStage = function(stage) {
         this.stage = stage;
         return this;
     };
 
-    /*
+    /**
      * We need to be able to refreshe the canvas.
      * @param - refreshCanvas - new variable
      * @public
-     * @return this
+     * @returns this
      */
     this.setRefreshCanvas = function(refreshCanvas) {
         this.refreshCanvas = refreshCanvas;
         return this;
     };
 
-    /*
+    /**
      * We need to access the trashcan.
      * @param - trashcan - new variable
      * @public
-     * @return this
+     * @returns this
      */
     this.setTrashcan = function(trashcan) {
         this.trashcan = trashcan;
         return this;
     };
 
-    /*
+    /**
      * We need to be able to update the stage.
      * @param - updateStage - new variable
      * @public
-     * @return this
+     * @returns this
      */
     this.setUpdateStage = function(updateStage) {
         this.updateStage = updateStage;
         return this;
     };
 
-    /*
+    /**
      * We need to access the stage scale.
      * @param - getStageScale - new variable
      * @public
-     * @return this
+     * @returns this
      */
     this.setGetStageScale = function(getStageScale) {
         this.getStageScale = getStageScale;
         return this;
     };
 
-    /*
+    /**
      * Change the scale of the blocks (and the protoblocks on the palette).
      * @param - scale -new variable
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.setBlockScale = async function(scale) {
         console.debug("New block scale is " + scale);
@@ -254,77 +254,77 @@ function Blocks(activity) {
         this.refreshCanvas();
     };
 
-    /*
+    /**
      * We need to access the message object.
      * @param - msgText -new variable
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.setMsgText = function(msgText) {
         this.msgText = msgText;
     };
 
-    /*
+    /**
      * We need to access the error message object.
      * @param - errorMsg -new variable
      * @public
-     * @return this
+     * @returns this
      */
     this.setErrorMsg = function(errorMsg) {
         this.errorMsg = errorMsg;
         return this;
     };
 
-    /*
+    /**
      * We need to access the macro dictionary to add data to it.
      * @param - obj - object
      * @public
-     * @return this
+     * @returns this
      */
     this.setMacroDictionary = function(obj) {
         this.macroDict = obj;
         return this;
     };
 
-    /*
+    /**
      * We need access to the turtles list because we associate a turtle
      * with each start block.
      * @param - turtles
      * @public
-     * @return this
+     * @returns this
      */
     this.setTurtles = function(turtles) {
         this.turtles = turtles;
         return this;
     };
 
-    /*
+    /**
      * We need to access "Logo interpreter" when we click on blocks.
      * @param - logo
      * @public
-     * @return this
+     * @returns this
      */
     this.setLogo = function(logo) {
         this.logo = logo;
         return this;
     };
 
-    /*
+    /**
      * We need to access the right-click (and long press) context menu.
      * @param - contextMenu
      * @public
-     * @return this
+     * @returns this
      */
     this.setContextMenu = function(contextMenu) {
         this.contextMenu = contextMenu;
         return this;
     };
 
-    /*
+    /**
      * The scale of the graphics is determined by screen size.
      * @param - scale -new variable
      * @public
-     * @return this
+     * @returns this
      */
 
     this.setScale = function(scale) {
@@ -332,10 +332,10 @@ function Blocks(activity) {
         return this;
     };
 
-    /*
+    /**
      * Extract the blocks
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.extract = function() {
         if (this.activeBlock != null) {
@@ -346,12 +346,12 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Pull a block from a stack, then readjust the docks.
      * @param - blk - blocks
      * @param - adjustDock - new variable
      * @private
-     * @return {void}
+     * @returns {void}
      */
     this._extractBlock = async function(blk, adjustDock) {
         // Remove a single block from within a stack.
@@ -414,10 +414,10 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Find the y position of the bottom-most block
      * @public
-     * @return maxy
+     * @returns maxy
      */
     this.bottomMostBlock = function() {
         let maxy = -1000;
@@ -430,11 +430,11 @@ function Blocks(activity) {
         return maxy;
     };
 
-    /*
+    /**
      * Toggle state of collapsible blocks, except for note blocks,
      * which are handled separately.
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.toggleCollapsibles = function() {
         let allCollapsed = true;
@@ -486,12 +486,12 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * We need to access the go-home button and boundary.
      * @param - setHomeContainers
      * @param - boundary
      * @public
-     * @return this
+     * @returns this
      */
     this.setHomeContainers = function(setContainers, boundary) {
         this._setHomeButtonContainers = setContainers;
@@ -499,30 +499,30 @@ function Blocks(activity) {
         return this;
     };
 
-    /*
+    /**
      * Is this an action block?
      * @param - name - block name
      * @private
-     * @return boolean
+     * @returns boolean
      */
     this._actionBlock = function(name) {
         return ["do", "doArg", "calc", "calcArg"].indexOf(name) !== -1;
     };
 
-    /*
+    /**
      * Is this a named action block?
      * @param - name - block name
      * @private
-     * @return boolean
+     * @returns boolean
      */
     this._namedActionBlock = function(name) {
         return ["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].indexOf(name) !== -1;
     };
 
-    /*
+    /**
      * Adjust the dock positions of all blocks in the current drag group.
      * @private
-     * @return {void}
+     * @returns {void}
      */
     this._adjustBlockPositions = function() {
         if (this.dragGroup.length < 2) {
@@ -532,13 +532,13 @@ function Blocks(activity) {
         this.adjustDocks(this.dragGroup[0], true);
     };
 
-    /*
+    /**
      * Adjust the size of the clamp in an expandable block when
      * block are inserted into (or removed from) the child flow.
      * This is a common operation for start and action blocks,
      * but also for repeat, forever, if, etc.
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.adjustExpandableClampBlock = function() {
         if (this.clampBlocksToCheck.length === 0) {
@@ -561,13 +561,13 @@ function Blocks(activity) {
             this._adjustArgClampBlock([blk]);
         }
 
-        /*
+        /**
          * Adjusts the clamp size
          * @param - blk - block number
          * @param - myBlock - block
          * @param - clamp (1 or 2)?
          * @private
-         * @return {void}
+         * @returns {void}
          */
         let __clampAdjuster = function(blk, myBlock, clamp) {
             // First we need to count up the number of (and size of) the
@@ -608,12 +608,12 @@ function Blocks(activity) {
         __clampAdjuster(blk, myBlock, clamp);
     };
 
-    /*
+    /**
      * Returns depth of nesting, which is used to rank order the
      * blocks when adjusting their sizes.
      * @param - blk - block number
      * @private
-     * @return depth
+     * @returns depth
      */
     this._getNestingDepth = function(blk) {
         let rank = 0;
@@ -624,11 +624,11 @@ function Blocks(activity) {
         return rank;
     };
 
-    /*
+    /**
      * Return the block size in units of standard block size.
      * @param - blk - block number
      * @private
-     * @return block size
+     * @returns block size
      */
     this._getBlockSize = function(blk) {
         let myBlock = this.blockList[blk];
@@ -640,11 +640,11 @@ function Blocks(activity) {
         return myBlock.size;
     };
 
-    /*
+    /**
      * Adjust the slot sizes of arg clamps.
      * @param - argBlocksToCheck -new variable
      * @private
-     * @return {void}
+     * @returns {void}
      */
     this._adjustArgClampBlock = function(argBlocksToCheck) {
         if (argBlocksToCheck.length === 0) {
@@ -684,13 +684,13 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * We also adjust the size of twoarg blocks. It is similar to how
      * we adjust clamps, but enough different that it is in its own function.
      * @param - argBlocksToCheck - a list of blocks that need to be
                                    checked for changes to their clamp sizes.
      * @private
-     * @return {void}
+     * @returns {void}
      */
     this._adjustExpandableTwoArgBlock = function(argBlocksToCheck) {
         if (argBlocksToCheck.length === 0) {
@@ -716,11 +716,11 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Add or remove the vspace blocks
      * @param - blk - block number
      * @private
-     * @return void
+     * @returns void
      */
     this._addRemoveVspaceBlock = function(blk) {
         let myBlock = this.blockList[blk];
@@ -733,11 +733,11 @@ function Blocks(activity) {
 
         let that = this;
 
-        /*
+        /**
          * Checks the number of VSpace blocks are below the block we are checking against
          * @param - blk - block number
          * @private
-         * @return number of vspace blocks found below this block
+         * @returns number of vspace blocks found below this block
          */
         let __howManyVSpaceBlocksBelow = function(blk) {
             let nextBlock = last(that.blockList[blk].connections);
@@ -767,11 +767,11 @@ function Blocks(activity) {
         } else if (secondArgumentSize > vSpaceCount + 1) {
             // Add vspace blocks
 
-            /*
+            /**
              * Adjusts the docks of the blocks connected to the vspace block
              * @param - args - [this block, the next block, the vspace block
              * @private
-             * @return {void}
+             * @returns {void}
              */
             let __vspaceAdjuster = function(args) {
                 let thisBlock = args[0];
@@ -818,11 +818,11 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Calculate the sum of the sizes of all the blocks a stack.
      * @param - blk - block number
      * @private
-     * @return int
+     * @returns int
      */
     this._getStackSize = function(blk) {
         // How many block units in this stack?
@@ -903,13 +903,13 @@ function Blocks(activity) {
         return size;
     };
 
-    /*
+    /**
      * Given a block, adjust the dock position of all its connections.
      * @param - blk - block
      * @param - resetLoopCounter (to prevent infinite loops in the
                                   case the connections are broken).
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.adjustDocks = function(blk, resetLoopCounter) {
         let myBlock = this.blockList[blk];
@@ -1034,7 +1034,7 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Add an action name whenever the user removes the name from
        an action block.  Add a box name whenever the user removes
        the name from a storein block.  Add a Silence block
@@ -1044,7 +1044,7 @@ function Blocks(activity) {
      * @param - oldBlock - old block
      * @param - skipOldBlock
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.addDefaultBlock = function(parentblk, oldBlock, skipOldBlock) {
         if (parentblk == null) {
@@ -1056,11 +1056,11 @@ function Blocks(activity) {
             cblk = this.blockList[parentblk].connections[1];
             if (cblk == null) {
                 let that = this;
-                /*
+                /**
                  * Update Palette
                  * @param - args - arguments
                  * @public
-                 * @return {void}
+                 * @returns {void}
                  */
                 let postProcess = function(args) {
                     let parentblk = args[0];
@@ -1114,11 +1114,11 @@ function Blocks(activity) {
         } else if (this.blockList[parentblk].name === "pitch") {
             cblk = this.blockList[parentblk].connections[2];
             if (cblk == null) {
-                /*
+                /**
                  * Adjust Docks
                  * @param - args - arguments
                  * @public
-                 * @return {void}
+                 * @returns {void}
                  */
                 let postProcess = (args) => {
                     let parentblk = args[0];
@@ -1143,11 +1143,11 @@ function Blocks(activity) {
 
             let oblk = this.blockList[parentblk].connections[1];
             if (oblk == null) {
-                /*
+                /**
                  * Adjust Docks
                  * @param - args - arguments
                  * @public
-                 * @return {void}
+                 * @returns {void}
                  */
                 let postProcess = (args) => {
                     let parentblk = args[0];
@@ -1203,11 +1203,11 @@ function Blocks(activity) {
             cblk = this.blockList[parentblk].connections[1];
             if (cblk == null) {
                 let that = this;
-                /*
+                /**
                  * Adjust Docks
                  * @param - args - arguments
                  * @public
-                 * @return {void}
+                 * @returns {void}
                  */
                 let postProcess = function(args) {
                     let parentblk = args[0];
@@ -1247,12 +1247,12 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Remove any pitch blocks from a Note block if Silent block is inserted.
      * Deprecated since we do not allow silence blocks to be dragged.
      * @param - thisBlock -new variable
      * @private
-     * @return {void}
+     * @returns {void}
      */
     this._deletePitchBlocks = function(thisBlock) {
         // Find the top of the stack
@@ -1309,11 +1309,11 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Deletes the next default element: either a Pitch block or a Silent block.
      * @param - thisBlock
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.deleteNextDefault = function(thisBlock) {
         if (thisBlock == undefined) {
@@ -1354,12 +1354,12 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Remove the Silence block from a Note block if another block
        is inserted anywhere after the Silence block.
      * @param - thisBlock -new variable
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.deletePreviousDefault = function(thisBlock) {
         let thisBlockobj = this.blockList[thisBlock];
@@ -1404,14 +1404,14 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Handle connections when blocks are moved.
      * @param - thisBlock -new variable
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.blockMoved = async function(thisBlock) {
-        /*
+        /**
          * When a block is moved, we have to check the following:
          * (0) Is it inside of a expandable block?
          *     Is it connected to a collapsed block?
@@ -1993,12 +1993,12 @@ function Blocks(activity) {
         this.refreshCanvas();
     };
 
-    /*
+    /**
      * Test for a valid connection between two dock types.
      * @param - type1 - dock type 1
      * @param - type2 - dock type 2
      * @private
-     * @return boolean
+     * @returns boolean
      */
     this._testConnectionType = function(type1, type2) {
         // Can these two blocks dock?
@@ -2077,10 +2077,10 @@ function Blocks(activity) {
         return false;
     };
 
-    /*
+    /**
      * Ensure that all the blocks are where they are supposed to be.
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.updateBlockPositions = function() {
         for (let blk = 0; blk < this.blockList.length; blk++) {
@@ -2088,10 +2088,10 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Move all the blocks to the top layer of the block container.
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.bringToTop = function() {
         this._adjustTheseStacks = [];
@@ -2111,10 +2111,10 @@ function Blocks(activity) {
         this.refreshCanvas();
     };
 
-    /*
+    /**
      * Checks the bounds to ensure blocks are "home".
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.checkBounds = function() {
         let onScreen = true;
@@ -2136,23 +2136,23 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Move a block to a specified position and check the docks afterward.
      * @public
-     * @return{void}
+     * @returns{void}
      */
     this.moveBlock = function(blk, x, y) {
         this._moveBlock(blk, x, y);
         this.adjustDocks(blk, true);
     };
 
-    /*
+    /**
      * Move a block (and its label) to x, y.
      * @param - blk - block
      * @param - x - x position
      * @param - y - y position
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this._moveBlock = function(blk, x, y) {
         let myBlock = this.blockList[blk];
@@ -2167,13 +2167,13 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Relative move of a block (and its label) by dx, dy
      * @param - blk - block
      * @param - dx - updated x position
      * @param - dy - updated y position
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.moveBlockRelative = function(blk, dx, dy) {
         this.inLongPress = false;
@@ -2190,13 +2190,13 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Moves the blocks in a stack to a new position.
      * @param blk - block
      * @param dx - x position
      * @param dy - y position
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.moveStackRelative = function(blk, dx, dy) {
         this.findDragGroup(blk);
@@ -2207,13 +2207,13 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Moves all blocks except given stack
      * @param blk - exception
      * @param dx - delta x
      * @param dy - delta y
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.moveAllBlocksExcept = function(blk, dx, dy) {
         for (let block in this.blockList){
@@ -2222,12 +2222,12 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Update the block labels.
      * When we create new blocks, we may not have assigned the value yet.
      * @param - blk - block
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.updateBlockText = function(blk) {
         let myBlock = this.blockList[blk];
@@ -2391,11 +2391,11 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Find the top block in the stack.
      * @param - blk - block
      * @public
-     * @return blk
+     * @returns blk
      */
     this.findTopBlock = function(blk) {
         // Find the top block in a stack.
@@ -2437,12 +2437,12 @@ function Blocks(activity) {
         return blk;
     };
 
-    /*
+    /**
      * Checks if two blocks are of the same flow generation.
      * @param - firstblk
      * @param - childblk
      * @public
-     * @return boolean
+     * @returns boolean
      */
     this.sameGeneration = function(firstBlk, childBlk) {
         if (firstBlk == null || childBlk == null) {
@@ -2480,12 +2480,12 @@ function Blocks(activity) {
         return false;
     };
 
-    /*
+    /**
      * Check if there is a block type in any of the stacks.
      * @param - thisBlock - new variable
      * @param - names - names of blocks
      * @private
-     * @return boolean
+     * @returns boolean
      */
     this._blockInStack = function(thisBlock, names) {
         // Is there a block of any of these names in this stack?
@@ -2512,11 +2512,11 @@ function Blocks(activity) {
         return false;
     };
 
-    /*
+    /**
      * Find the bottom block in the stack.
      * @param - blk - block
      * @public
-     * @return blk
+     * @returns blk
      */
     this.findBottomBlock = function(blk) {
         // Find the bottom block in a stack.
@@ -2548,12 +2548,12 @@ function Blocks(activity) {
         return blk;
     };
 
-    /*
+    /**
      * Count all the blocks in the stack starting from blk.
      * @param - blk - block
      * @private
      * c = 0
-     * @return c
+     * @returns c
      */
     this._countBlocksInStack = function(blk) {
         let c = 0;
@@ -2568,11 +2568,11 @@ function Blocks(activity) {
         return c;
     };
 
-    /*
+    /**
      * Find any block with null in its first connection.
      * Push them onto the stackList.
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.findStacks = function() {
         this.stackList = [];
@@ -2583,10 +2583,10 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Find any clamp blocks.
      * @private
-     * @return {void}
+     * @returns {void}
      */
     this._findClamps = function() {
         this._expandablesList = [];
@@ -2599,10 +2599,10 @@ function Blocks(activity) {
         this._searchForArgFlow();
     };
 
-    /*
+    /**
      * Find any expandable arg blocks.
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this._findTwoArgs = function() {
         this._expandablesList = [];
@@ -2615,10 +2615,10 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Search for argument flow blocks.
      * @private
-     * @return{void}
+     * @returns{void}
      */
     this._searchForArgFlow = function() {
         for (let blk = 0; blk < this.blockList.length; blk++) {
@@ -2630,11 +2630,11 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Search for expandable blocks below blk in stack.
      * @param - blk - block
      * @private
-     * @return {void}
+     * @returns {void}
      */
     this._searchForExpandables = function(blk) {
         let c;
@@ -2670,10 +2670,10 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Expand two-arg blocks as needed.
      * @private
-     * @return {void}
+     * @returns {void}
      */
     this._expandTwoArgs = function() {
         this._findTwoArgs();
@@ -2681,10 +2681,10 @@ function Blocks(activity) {
         this.refreshCanvas();
     };
 
-    /*
+    /**
      * Expand expandable clamp blocks as needed.
      * @private
-     * @return {void}
+     * @returns {void}
      */
     this._expandClamps = function() {
         this._findClamps();
@@ -2702,14 +2702,14 @@ function Blocks(activity) {
         this.refreshCanvas();
     };
 
-    /*
+    /**
      * Some blocks, e.g., sensor blocks for Butia, change their
        appearance depending upon if they have been enabled or
        disabled. If they have, change their disabled status
      * @param - name
      * @param - flag
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.changeDisabledStatus = function(name, flag) {
         for (let blk in this.blockList) {
@@ -2721,10 +2721,10 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Unhighlight all blocks.
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.unhighlightAll = function() {
         for (let blk in this.blockList) {
@@ -2732,7 +2732,7 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Unhighlight a block
      * @public
      * return {void}
@@ -2756,12 +2756,12 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Highlight a block
      * @param - blk - block
      * @param - unhilight - new variable
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.highlight = function(blk, unhighlight) {
         if (!this.visible) {
@@ -2777,7 +2777,7 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Hide all of the blocks.
      * @public
      * return {void}
@@ -2789,7 +2789,7 @@ function Blocks(activity) {
         this.visible = false;
     };
 
-    /*
+    /**
      * Show all the blocks.
      * @public
      * return {void}
@@ -2801,7 +2801,7 @@ function Blocks(activity) {
         this.visible = true;
     };
 
-    /*
+    /**
      * Make a new block with connections
      * @param - name - new variable
      * @param - blockOffset - new variable
@@ -2809,7 +2809,7 @@ function Blocks(activity) {
      * @param - postPorcess
      * @param - postProcessArg - Post process Argument
      * @private
-     * @return {void}
+     * @returns {void}
      */
     this._makeNewBlockWithConnections = function(
         name, blockOffset, connections, postProcess, postProcessArg) {
@@ -2835,13 +2835,13 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Create new block
      * @param - name
      * @param - postProcess
      * @param - postProcessArg
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.makeNewBlock = function(name, postProcess, postProcessArg) {
         // Create a new block
@@ -2907,12 +2907,12 @@ function Blocks(activity) {
         return myBlock;
     };
 
-    /*
+    /**
      * Make new blocks from proto block, which is called from Palettes
      * @param - name
      * @param - arg - argument
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.makeBlock = function(name, arg) {
         let postProcess;
@@ -3321,11 +3321,11 @@ function Blocks(activity) {
         return blk;
     };
 
-    /*
+    /**
      * Create the drag group from the blocks connected to blk.
      * @param - blk - block
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.findDragGroup = function(blk) {
         if (blk == null) {
@@ -3338,11 +3338,11 @@ function Blocks(activity) {
         this._calculateDragGroup(blk);
     };
 
-    /*
+    /**
      * Give a block, find all the blocks connected to it.
      * @param - blk - block
      * @private
-     * @return {void}
+     * @returns {void}
      */
     this._calculateDragGroup = function(blk) {
         this.dragLoopCounter += 1;
@@ -3386,11 +3386,11 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Set protoblock visibility on the Action palette.
      * @param - state
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.setActionProtoVisiblity = function(state) {
         // By default, the nameddo protoblock is hidden.
@@ -3414,11 +3414,11 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Find a unique custom name for an Action block.
      * @param - name
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.findUniqueActionName = function(name, actionBlk) {
         // If we have a stack named 'action', make the protoblock visible.
@@ -3449,11 +3449,11 @@ function Blocks(activity) {
         return value;
     };
 
-    /*
+    /**
      * Finds a unique custom name for custom mode block.
      * @param - name - new variable
      * @public
-     * @return value
+     * @returns value
      */
     this.findUniqueCustomName = function(name) {
         let noteNames = [];
@@ -3475,11 +3475,11 @@ function Blocks(activity) {
         return value;
     };
 
-    /*
+    /**
      * Finds a unique custom name for temperament block.
      * @param - name - new variable
      * @public
-     * @return value
+     * @returns value
      */
     this.findUniqueTemperamentName = function(name) {
         let temperamentNames = [];
@@ -3501,10 +3501,10 @@ function Blocks(activity) {
         return value;
     };
 
-    /*
+    /**
      * Make sure we initialize any drum with a URL name.
      * @private
-     * @return {void}
+     * @returns {void}
      */
     this._findDrumURLs = function() {
         for (let blk = 0; blk < this.blockList.length; blk++) {
@@ -3521,7 +3521,7 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Rename the block boxes.
      * @param - oldName - old name of boxes
      * @param - newName - new variable
@@ -3551,7 +3551,7 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Rename Storedin boxes.
      * @param - oldName - old name of boxes
      * @param - newName - new variable
@@ -3598,7 +3598,7 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Rename Storedin2 boxes.
      * @param - oldName - old name of boxes
      * @param - newName - new variable
@@ -3632,7 +3632,7 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Rename Named boxes.
      * @param - oldName - old name of boxes
      * @param - newName - new variable
@@ -3667,7 +3667,7 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Rename Do blocks.
      * @param - oldName - old name of boxes
      * @param - newName - new variable
@@ -3713,12 +3713,12 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Renames Named do blocks.
      * @param oldName
      * @param newName - new variable
      * @private
-     * @return 'do', 'doArg', 'calc', 'calcArg
+     * @returns 'do', 'doArg', 'calc', 'calcArg
      */
     this.renameNameddos = function(oldName, newName) {
         if (oldName === newName) {
@@ -3746,7 +3746,7 @@ function Blocks(activity) {
         let nameChanged = false;
         for (let blockId = 0; blockId < actionsPalette.protoList.length; blockId++) {
             let block = actionsPalette.protoList[blockId];
-            if (["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(block.name) !== -1 /* && block.defaults[0] !== _('action') */ && block.defaults[0] === oldName) {
+            if (["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(block.name) !== -1 /** && block.defaults[0] !== _('action') */ && block.defaults[0] === oldName) {
                 block.defaults[0] = newName;
                 nameChanged = true;
             }
@@ -3760,11 +3760,11 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Make a new Storein block.
      * @param - name - new variable
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.newStoreinBlock = function(name) {
         if (name == null) {
@@ -3796,7 +3796,7 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Make a new Storein2 block.
      * @param - name - new variable
      * @public
@@ -3828,7 +3828,7 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Make a new Named Box block.
      * @param - name - new variable
      * @public
@@ -3859,11 +3859,11 @@ function Blocks(activity) {
         myBoxBlock.palette.add(myBoxBlock, true);
     };
 
-    /*
+    /**
      * Make a new Local Arg block.
      * @param - blk - block
      * @private
-     * @return {void}
+     * @returns {void}
      */
     this._newLocalArgBlock = async function(name) {
         // name === 1, 2, 3, ...
@@ -3891,11 +3891,11 @@ function Blocks(activity) {
         this.palettes.updatePalettes("action");
     };
 
-    /*
+    /**
      * Remove any unneeded Named Do blocks.
      * @param - name
      * @private
-     * @return {void}
+     * @returns {void}
      */
     this._removeNamedoEntries = function(name) {
         // Delete any old palette entries.
@@ -3915,7 +3915,7 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Depending upon the form of the associated action block, we
        want to add a named do, a named calc, a named do w/args, or
        a named calc w/args.
@@ -3923,7 +3923,7 @@ function Blocks(activity) {
      * @param - hasReturn
      * @param - hasArgs
      * @public
-     * @return boolean
+     * @returns boolean
      */
     this.newNameddoBlock = function(name, hasReturn, hasArgs) {
         if (name === _("action")) {
@@ -3952,11 +3952,11 @@ function Blocks(activity) {
         return false;
     };
 
-    /*
+    /**
      * Make a new Named Calc block.
      * @param - name -new variable
      * @public
-     * @return boolean
+     * @returns boolean
      */
     this.newNamedcalcBlock = function(name) {
         if (this.protoBlockDict["myCalc_" + name] === undefined) {
@@ -3974,7 +3974,7 @@ function Blocks(activity) {
         return false;
     };
 
-    /*
+    /**
      * Make a new Named Do Arg block.
      * @param - name - new variable
      * @public
@@ -3996,7 +3996,7 @@ function Blocks(activity) {
         return false;
     };
 
-    /*
+    /**
      * Make a new Named Calc Arg block.
      * @param - name - new variable
      * @public
@@ -4036,12 +4036,12 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Return a list of containing clamp blocks or []
      * @param - blk - block
      * @param - clampList
      * @public
-     * @return list of clamp blocks
+     * @returns list of clamp blocks
      */
     this.findNestedClampBlocks = function(blk, clampList) {
         if (this.blockList[blk] == null) {
@@ -4068,11 +4068,11 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Return a containing expandable block or null.
      * @param - blk - block
      * @public
-     * @return expandable block
+     * @returns expandable block
      */
     this.insideExpandableBlock = function(blk) {
         if (this.blockList[blk] == null) {
@@ -4098,11 +4098,11 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Return a note block or null.
      * @param - blk - block
      * @public
-     * @return note block
+     * @returns note block
      */
     this._insideNoteBlock = function(blk) {
         if (this.blockList[blk] == null) {
@@ -4132,11 +4132,11 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Find an instance of a block type by name.
      * @param - blkName
      * @public
-     * @return boolean
+     * @returns boolean
      */
     this.findBlockInstance = function(blkName) {
         // Returns true if block of name blkName is loaded.
@@ -4149,11 +4149,11 @@ function Blocks(activity) {
         return false;
     };
 
-    /*
+    /**
      * Return the first containing Note block, if any.
      * @param - blk - block
      * @public
-     * @return null or collapsible block
+     * @returns null or collapsible block
      */
     this.insideInlineCollapsibleBlock = function(blk) {
         if (blk === null) {
@@ -4175,11 +4175,11 @@ function Blocks(activity) {
         return this.insideInlineCollapsibleBlock(c0);
     };
 
-    /*
+    /**
      * Return first Note block found.
      * @param - blk - block
      * @public
-     * @return note block
+     * @returns note block
      */
     this.findNoteBlock = function(blk) {
         if (blk === null) {
@@ -4199,11 +4199,11 @@ function Blocks(activity) {
         return this.findNoteBlock(c);
     };
 
-    /*
+    /**
      * Return first Interval block found.
      * @param - blk - block
      * @public
-     * @return null or blk
+     * @returns null or blk
      */
     this.findNestedIntervalBlock = function(blk) {
         if (blk === null) {
@@ -4223,11 +4223,11 @@ function Blocks(activity) {
         return this.findNestedIntervalBlock(c);
     };
 
-    /*
+    /**
      * Returns first Pitch block found.
      * @param - blk - block
      * @public
-     * @return null or blk
+     * @returns null or blk
      */
     this.findFirstPitchBlock = function(blk) {
         if (blk === null) {
@@ -4244,11 +4244,11 @@ function Blocks(activity) {
         return this.findFirstPitchBlock(c);
     };
 
-    /*
+    /**
      * Return octave associated with Pitch block.
      * @param - blk - block
      * @public
-     * @return 4
+     * @returns 4
      */
     this.findPitchOctave = function(blk) {
         if (blk === null) {
@@ -4269,12 +4269,12 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Set octave associated with Pitch block.
      * @param - blk - block
      * @param - octave
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.setPitchOctave = function(blk, octave) {
         if (blk === null) {
@@ -4296,11 +4296,11 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Check if a Number block used as a modifier in an Interval block.
      * @param - blk - block
      * @public
-     * @return boolean
+     * @returns boolean
      */
     this.intervalModifierNumber = function(blk) {
         if (blk === null) {
@@ -4327,12 +4327,12 @@ function Blocks(activity) {
         return false;
     };
 
-    /*
+    /**
      * Check if a Number block is being used as multipicant with a
        Mode-length block.
      * @param - blk - block
      * @public
-     * @return boolean
+     * @returns boolean
      */
     this.octaveModifierNumber = function(blk) {
         if (blk === null) {
@@ -4361,11 +4361,11 @@ function Blocks(activity) {
         return false;
     };
 
-    /*
+    /**
      * Check if a Number block is used as a note value denominator argument.
      * @param - blk - block
      * @public
-     * @return boolean
+     * @returns boolean
      */
     this.noteValueNumber = function(blk, c) {
         if (blk === null) {
@@ -4423,12 +4423,12 @@ function Blocks(activity) {
         return false;
     };
 
-    /*
+    /**
      * Return the Number block value being used as a note value
        denominator argument.
      * @param - blk - block
      * @public
-     * @return 1
+     * @returns 1
      */
     this.noteValueValue = function(blk) {
         if (blk === null) {
@@ -4487,11 +4487,11 @@ function Blocks(activity) {
         return 1;
     };
 
-    /*
+    /**
      * Check if a Number block being used as an octave argument?
      * @param - blk - block
      * @public
-     * @return boolean
+     * @returns boolean
      */
     this.octaveNumber = function(blk) {
         if (blk === null) {
@@ -4504,11 +4504,11 @@ function Blocks(activity) {
                 this.blockList[myBlock.connections[0]].connections[2] === blk);
     };
 
-    /*
+    /**
      * Check if the meter block note value changed, update the BPM block.
      * @param - blk - block
      * @public
-     * @return void
+     * @returns void
      */
     this.meter_block_changed = function(blk) {
         if (blk === null || this.blockList[blk].name !== "meter") {
@@ -4572,11 +4572,11 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      *  Auto-select stack for copying -- no need to actually click on
         the copy button.
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.prepareStackForCopy = function() {
         if (this.activeBlock == null) {
@@ -4597,10 +4597,10 @@ function Blocks(activity) {
         this.pasteDy = 0;
     };
 
-    /*
+    /**
      * Triggers the long press of keys and clears timeout.
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.triggerLongPress = function() {
         if (this.longPressTimeout != null) {
@@ -4612,10 +4612,10 @@ function Blocks(activity) {
         piemenuBlockContext(this.blockList[this.activeBlock]);
     };
 
-    /*
+    /**
      * Copy a stack of blocks by creating a blockObjs and pasting.
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.pasteStack = function() {
         if (this.selectedStack == null) {
@@ -4638,11 +4638,11 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Save a stack of blocks to local storage and the 'myblocks'
        palette by creating a blockObjs.
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.saveStack = function() {
         console.debug(this.selectedStack);
@@ -4679,10 +4679,10 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Copies the Block to objects.
      * @public
-     * @return blockObj
+     * @returns blockObj
      */
     this._copyBlocksToObj = function() {
         let blockObjs = [];
@@ -4739,12 +4739,12 @@ function Blocks(activity) {
         return blockObjs;
     };
 
-    /*
+    /**
      * On the palette we store the macro as a basic block.
      * @param - name
      * @param - obj - object
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.addToMyPalette = function(name, obj) {
         // FIXME: where is obj used?
@@ -4762,11 +4762,11 @@ function Blocks(activity) {
         this.protoBlockDict[blkName].palette.add(this.protoBlockDict[blkName]);
     };
 
-    /*
+    /**
      * Returns true if block of name blkName is loaded.
      * @param - blkName - block name
      * @public
-     * @return boolean
+     * @returns boolean
      */
     this.findBlockInstance = function(blkName) {
         for (let blk = 0; blk < this.blockList.length; blk++) {
@@ -4777,7 +4777,7 @@ function Blocks(activity) {
         return false;
     };
 
-    /*
+    /**
      * Load new blocks.
      * @param - blockObj - Block Objects
      * @public
@@ -5815,11 +5815,11 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * If all the blocks are loaded, we can make the final adjustments.
      * @param - name
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.cleanupAfterLoad = async function(name) {
         this._loadCounter -= 1;
@@ -5895,10 +5895,10 @@ function Blocks(activity) {
         document.dispatchEvent(myCustomEvent);
     };
 
-    /*
+    /**
      * Cleanup the stacks after load.
      * @private
-     * @return {void}
+     * @returns {void}
      */
     this._cleanupStacks = function() {
         // Sort the blocks from inside to outside.
@@ -5938,11 +5938,11 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Look for a Return block in an action stack.
      * @param - blk - block
      * @public
-     * @return boolean
+     * @returns boolean
      */
     this.actionHasReturn = function(blk) {
         if (this.blockList[blk].name !== "action") {
@@ -5957,11 +5957,11 @@ function Blocks(activity) {
         return false;
     };
 
-    /*
+    /**
      * Look for an Arg block in an action stack.
      * @param - blk - block
      * @public
-     * @return boolean
+     * @returns boolean
      */
     this.actionHasArgs = function(blk) {
         if (this.blockList[blk].name !== "action") {
@@ -5976,11 +5976,11 @@ function Blocks(activity) {
         return false;
     };
 
-    /*
+    /**
      * Move the stack associated with blk to the top.
      * @param - blk - block
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.raiseStackToTop = function(blk) {
         let topBlk = this.findTopBlock(blk);
@@ -5995,11 +5995,11 @@ function Blocks(activity) {
         this.refreshCanvas;
     };
 
-    /*
+    /**
      * Deletes an Action block
      * @param - myblock - new variable
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.deleteActionBlock = async function(myBlock) {
         let actionArg = this.blockList[myBlock.connections[1]];
@@ -6082,11 +6082,11 @@ function Blocks(activity) {
         }
     };
 
-    /*
+    /**
      * Send a stack of blocks to the trash.
      * @param - myBlock
      * @public
-     * @return {void}
+     * @returns {void}
      */
     this.sendStackToTrash = function(myBlock) {
         // First, hide the palettes as they will need updating.
@@ -6195,10 +6195,10 @@ function Blocks(activity) {
         }
     };
 
-    /**
+    /***
      * Clears all the blocks, updates the cache and refreshes the canvas.
      *
-     * @returns {void}
+     * @returnss {void}
      */
     this.clearParameterBlocks = function() {
         for (let blk = 0; blk < this.blockList.length; blk++) {
@@ -6213,13 +6213,13 @@ function Blocks(activity) {
         this.refreshCanvas();
     };
 
-    /**
+    /***
      * Updates the label on parameter blocks.
      *
      * @param logo
      * @param turtle
      * @param blk
-     * @returns {void}
+     * @returnss {void}
      */
     this.updateParameterBlock = function(logo, turtle, blk) {
         let name = this.blockList[blk].name;
@@ -6254,14 +6254,14 @@ function Blocks(activity) {
         }
     };
 
-    /**
+    /***
      * Changes a property according to a block name and a value.
      *
      * @param logo
      * @param blk
      * @param value
      * @param turtle
-     * @returns {void}
+     * @returnss {void}
      */
     this.blockSetter = function(logo, blk, value, turtle) {
         if (typeof this.blockList[blk].protoblock.setter === "function") {
@@ -6275,10 +6275,10 @@ function Blocks(activity) {
         }
     };
 
-    /**
+    /***
      * Hides all the blocks.
      *
-     * @returns {void}
+     * @returnss {void}
      */
     this.hideBlocks = function() {
         this.palettes.hide();
@@ -6286,10 +6286,10 @@ function Blocks(activity) {
         this.refreshCanvas();
     }
 
-    /**
+    /***
      * Shows all the blocks.
      *
-     * @returns {void}
+     * @returnss {void}
      */
     this.showBlocks = function() {
         this.palettes.show();

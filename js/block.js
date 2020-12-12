@@ -175,7 +175,7 @@ class Block {
     // Includes workaround for a race condition.
     _createCache(callback, args) {
         let that = this;
-        return new Promise( (resolve, reject)  =>{
+        return new Promise((resolve, reject) => {
             let loopCount = 0;
 
             async function checkBounds(counter) {
@@ -215,7 +215,7 @@ class Block {
     // Includes workaround for a race condition.
     updateCache(counter) {
         let that = this;
-        return new Promise( (resolve, reject) =>{
+        return new Promise((resolve, reject) => {
             let loopCount = 0;
 
             async function updateBounds(counter) {
@@ -318,9 +318,9 @@ class Block {
     }
 
     /**
-     * Show the highlight artwork
-     * @return{void}
+     * Show the highlight artwork.
      * @public
+     * @returns {void}
      */
     highlight() {
         if (this.trash) {
@@ -413,9 +413,9 @@ class Block {
     }
 
     /**
-     * Remove highlight from block
-     * @return{void}
+     * Remove highlight from block.
      * @public
+     * @returns {void}
      */
     unhighlight() {
         if (this.trash) {
@@ -495,10 +495,10 @@ class Block {
     }
 
     /**
-     * Resize and update number of slots in argClamp
-     * @param-slotList how many slots to use
-     * @return{void}
+     * Resize and update number of slots in argClamp.
      * @public
+     * @param slotList - how many slots to use
+     * @returns {void}
      */
     updateArgSlots(slotList) {
         this.argClampSlots = slotList;
@@ -508,10 +508,10 @@ class Block {
 
     /**
      * Resize an expandable block.
-     * @param-clamp which clamp to update (ifthenelse has 2 clamps)
-     * @param-plusMinus how many slots to add or subtract
-     * @return{void}
      * @public
+     * @param clamp - which clamp to update (ifthenelse has 2 clamps)
+     * @param plusMinus - how many slots to add or subtract
+     * @returns {void}
      */
     updateSlots(clamp, plusMinus) {
         this.clampCount[clamp] += plusMinus;
@@ -520,16 +520,15 @@ class Block {
     }
 
     /**
-     * If the block scale changes, we need to regenerate the
-     * artwork and recalculate the hitarea.
-     * @param-scale new block scale
-     * @return{void}
+     * If the block scale changes, we need to regenerate the artwork and recalculate the hitarea.
      * @public
+     * @param scale - new block scale
+     * @returns {void}
      */
     resize(scale) {
         /**
          * After the new artwork is created, this function is used to add decorations.
-         * @return{void}
+         * @returns {void}
          * @public
          */
         this.postProcess = () => {
@@ -581,11 +580,10 @@ class Block {
             let that = this;
 
             /**
-             * After new buttons are creates, they are cached and a
-             * new hit are is calculated
-             * @param-that = this = container
-             * @return{void}
+             * After new buttons are creates, they are cached and a new hit are is calculated.
              * @private
+             * @param that - = this = container
+             * @returns {void}
              */
             let _postProcess = function (that) {
                 that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
@@ -606,10 +604,10 @@ class Block {
     }
 
     /**
-     * Create new artwork for a block
-     * @param-plusMinus specifies how much a clamp block expands or contracts
-     * @return{void}
+     * Create new artwork for a block.
      * @private
+     * @param plusMinus - specifies how much a clamp block expands or contracts
+     * @returns {void}
      */
     _newArtwork(plusMinus) {
         let proto, obj;
@@ -715,15 +713,12 @@ class Block {
     }
 
     /**
-     * Load any artwork associated with the block and create any
-     * extra parts. Image components are loaded asynchronously so
-     * most the work happens in callbacks.
-     *
-     * We also need a text label for some blocks. For number and
-     * text blocks, this is the primary label; for parameter
-     * blocks, this is used to display the current block value.
-     * @return{void}
+     * Load any artwork associated with the block and create any extra parts. Image components are
+     * loaded asynchronously so most the work happens in callbacks.
+     * We also need a text label for some blocks. For number and text blocks, this is the primary
+     * label; for parameter blocks, this is used to display the current block value.
      * @public
+     * @returns {void}
      */
     imageLoad() {
         let fontSize = 10 * this.protoblock.scale;
@@ -732,18 +727,18 @@ class Block {
     }
 
     /**
-     * Add an image to a block
-     * @return{void}
+     * Add an image to a block.
      * @private
+     * @returns {void}
      */
     _addImage() {
         let image = new Image();
         let that = this;
 
         /**
-         * The loader
-         * @return{void}
+         * The loader.
          * @private
+         * @returns {void}
          */
         image.onload = function () {
             let bitmap = new createjs.Bitmap(image);
@@ -774,11 +769,11 @@ class Block {
     }
 
     /**
-     * Sometimes (in the case of namedboxes and nameddos) we need
-     * to regenerate the artwork associated with a block.
-     * @param-is the collapse artwork also generated?
-     * @return{void}
+     * Sometimes (in the case of namedboxes and nameddos) we need to regenerate the artwork
+     * associated with a block.
      * @public
+     * @param collapse -is the collapse artwork also generated?
+     * @returns {void}
      */
     regenerateArtwork(collapse) {
         // First we need to remove the old artwork.
@@ -811,9 +806,9 @@ class Block {
 
     /**
      * Generate the artwork for a block.
-     * @param-the first time, add the event handlers
-     * @return{void}
      * @public
+     * @param firstTime - the first time, add the event handlers
+     * @returns {void}
      */
     generateArtwork(firstTime) {
         // Get the block labels from the protoblock.
@@ -1056,8 +1051,8 @@ class Block {
 
     /**
      * After the block artwork has loaded, update labels, etc.
-     * @return{void}
      * @private
+     * @returns {void}
      */
     _finishImageLoad() {
         let thisBlock = this.blocks.blockList.indexOf(this);
@@ -1235,19 +1230,19 @@ class Block {
     }
 
     /**
-     * Generate the collapsed artwork
-     * @param postProcess = a process to run after the artwork is generated
-     * @return{void}
+     * Generate the collapsed artwork.
      * @private
+     * @param postProcess - a process to run after the artwork is generated
+     * @returns {void}
      */
     _generateCollapseArtwork(postProcess) {
         let that = this;
         let thisBlock = this.blocks.blockList.indexOf(this);
 
         /**
-         * Run the postprocess function after the artwork is loaded
-         * @return{void}
+         * Run the postprocess function after the artwork is loaded.
          * @private
+         * @returns {void}
          */
         let __finishCollapse = function (that) {
             if (postProcess !== null) {
@@ -1264,10 +1259,10 @@ class Block {
         };
 
         /**
-         * Create the artwork for the collapse buttons
-         * @param - that = this
-         * @return{void}
+         * Create the artwork for the collapse buttons.
          * @private
+         * @param that - = this
+         * @returns {void}
          */
         let __processCollapseButton = function (that) {
             let image = new Image();
@@ -1294,10 +1289,10 @@ class Block {
         };
 
         /**
-         * Create the artwork for the expand buttons
-         * @param - that = this
-         * @return{void}
+         * Create the artwork for the expand buttons.
          * @private
+         * @param that - = this
+         * @returns {void}
          */
         let __processExpandButton = function (that) {
             let image = new Image();
@@ -1325,11 +1320,11 @@ class Block {
         };
 
         /**
-         * Processing the highlighted collapsed image
-         * @param-bitmap = highlight artwork
-         * @param-that = this
-         * @return{void}
+         * Processing the highlighted collapsed image.
          * @private
+         * @param bitmap - highlight artwork
+         * @param that - = this
+         * @returns {void}
          */
         let __processHighlightCollapseBitmap = function (bitmap, that) {
             that.highlightCollapseBlockBitmap = bitmap;
@@ -1493,11 +1488,11 @@ class Block {
         };
 
         /**
-         * Processing the collapsed block
-         * @param-bitmap = block artwork
-         * @param-that = this
-         * @return{void}
+         * Processing the collapsed block.
          * @private
+         * @param bitmap - block artwork
+         * @param that - = this
+         * @returns {void}
          */
         let __processCollapseBitmap = function (bitmap, that) {
             that.collapseBlockBitmap = bitmap;
@@ -1525,9 +1520,9 @@ class Block {
     }
 
     /**
-     * Hide this block
-     * @return{void}
+     * Hide this block.
      * @public
+     * @returns {void}
      */
     hide() {
         this.container.visible = false;
@@ -1543,8 +1538,8 @@ class Block {
 
     /**
      * Is this block disconnected from other blocks?
-     * @return{boolean} true if the block is disconnected from other blocks
      * @public
+     * @returns {boolean} true if the block is disconnected from other blocks
      */
     isDisconnected() {
         if (this.disconnectedBitmap === null) {
@@ -1579,9 +1574,9 @@ class Block {
     }
 
     /**
-     * Show this block
-     * @return{void}
+     * Show this block.
      * @public
+     * @returns {void}
      */
     show() {
         // If it is not in the trash and not in collapsed, then show it.
@@ -2313,10 +2308,10 @@ class Block {
     }
 
     /**
-     * Position any addition text on a block
-     * @param-blockscale is used to scale the text
-     * @return{void}
+     * Position any addition text on a block.
      * @private
+     * @param blockscale - used to scale the text
+     * @returns {void}
      */
     _positionText(blockScale) {
         this.text.textBaseline = "alphabetic";
@@ -2360,13 +2355,13 @@ class Block {
 
     /**
      * Position media artwork on a block.
-     * @param-bitmap - image
-     * @param-width-width of canvas
-     * @param-height-height of canvas
-     * @param-blockscale-scale
-     * Position inserted media
-     * @return{void}
      * @private
+     * @param bitmap - image
+     * @param width - width of canvas
+     * @param height - height of canvas
+     * @param blockscale - scale
+     * Position inserted media.
+     * @returns {void}
      */
     _positionMedia(bitmap, width, height, blockScale) {
         if (width > height) {
@@ -2381,10 +2376,10 @@ class Block {
     }
 
     /**
-     * Position the label for a collapsed block
-     * @param-blockscale-scale
-     * @return{void}
+     * Position the label for a collapsed block.
      * @private
+     * @param blockscale - scale
+     * @returns {void}
      */
     _positionCollapseLabel(blockScale) {
         if (this.isInlineCollapsible()) {
@@ -2403,10 +2398,10 @@ class Block {
     }
 
     /**
-     * Determine the hit area for a block
-     * DEPRECATED
-     * @return{void}
+     * Determine the hit area for a block.
+     * @deprecated
      * @private
+     * @returns {void}
      */
     _calculateBlockHitArea() {
         let hitArea = new createjs.Shape();
@@ -2418,8 +2413,8 @@ class Block {
 
     /**
      * These are the event handlers for block containers.
-     * @return{void}
      * @private
+     * @returns {void}
      */
     _loadEventHandlers() {
         let that = this;
@@ -2459,7 +2454,7 @@ class Block {
                     if (that.blocks.turtles.running()) {
                         that.blocks.logo.doStopTurtles();
 
-                        setTimeout( () => {
+                        setTimeout(() => {
                             that.blocks.logo.runLogoCommands(topBlock);
                         }, 250);
                     } else {
@@ -2482,7 +2477,7 @@ class Block {
             }
 
             locked = true;
-            setTimeout( () => {
+            setTimeout(() => {
                 locked = false;
             }, 500);
 
@@ -2520,7 +2515,7 @@ class Block {
                         if (that.blocks.turtles.running()) {
                             that.blocks.logo.doStopTurtles();
 
-                            setTimeout( () => {
+                            setTimeout(() => {
                                 that.blocks.logo.runLogoCommands(topBlk);
                             }, 250);
                         } else {
@@ -2539,7 +2534,7 @@ class Block {
                     if (that.blocks.turtles.running()) {
                         that.blocks.logo.doStopTurtles();
 
-                        setTimeout( () => {
+                        setTimeout(() => {
                             that.blocks.logo.runLogoCommands(topBlk);
                         }, 250);
                     } else {
@@ -2555,7 +2550,7 @@ class Block {
             // Track time for detecting long pause...
             that.blocks.mouseDownTime = new Date().getTime();
 
-            that.blocks.longPressTimeout = setTimeout( () => {
+            that.blocks.longPressTimeout = setTimeout(() => {
                 that.blocks.activeBlock = that.blocks.blockList.indexOf(that);
                 that._triggerLongPress = true;
                 that.blocks.triggerLongPress();
@@ -2600,7 +2595,7 @@ class Block {
                 moved = true;
             } else {
                 // Make it eaiser to select text on mobile.
-                setTimeout( () => {
+                setTimeout(() => {
                     moved =
                         Math.abs(event.stageX / that.blocks.getStageScale() - that.original.x) +
                             Math.abs(event.stageY / that.blocks.getStageScale() - that.original.y) >
@@ -2704,14 +2699,14 @@ class Block {
     }
 
     /**
-     * Common code for processing events
-     * @param-event- mouse
-     * @param-moved-cursor moved
-     * @param-haveClick-when clickd
-     * @param-hideDOM-hide mouse
-     * set cursor style to default
-     * @return {void}
+     * Common code for processing events.
      * @private
+     * @param event - mouse
+     * @param moved - cursor moved
+     * @param haveClick - when clickd
+     * @param hideDOM - hide mouse
+     * Set cursor style to default.
+     * @returns {void}
      */
     _mouseoutCallback(event, moved, haveClick, hideDOM) {
         let thisBlock = this.blocks.blockList.indexOf(this);
@@ -2932,9 +2927,9 @@ class Block {
     }
 
     /**
-     * Change the label in a parameter block
-     * @return{void}
+     * Change the label in a parameter block.
      * @private
+     * @returns {void}
      */
     _changeLabel() {
         let that = this;
@@ -3141,7 +3136,7 @@ class Block {
                 }
             }
 
-            piemenuVoices(this, DrumLabels, drumValues, categories, selectedDrum);
+            piemenuVoices(this, drumLabels, drumValues, categories, selectedDrum);
         } else if (this.name === "effectsname") {
             if (this.value != null) {
                 selectedDrum = this.value;
@@ -3540,7 +3535,7 @@ class Block {
             }
 
             // Firefox fix
-            setTimeout( () => {
+            setTimeout(() => {
                 that.label.style.display = "";
                 that.label.focus();
                 focused = true;
@@ -3550,9 +3545,9 @@ class Block {
 
     /**
      * Keypress handler. Handles exit key (Tab and Enter) press.
-     * @param{Event} KeyPress event object
-     * @returns{void}
      * @private
+     * @param event - KeyPress event object
+     * @returns {void}
      */
     _exitKeyPressed(event) {
         if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
@@ -3561,10 +3556,11 @@ class Block {
             this.label.removeEventListener("keypress", this._exitKeyPressed);
         }
     }
+
     /**
-     * Check if pie menu is ok to launch
-     * @return{void}
+     * Check if pie menu is ok to launch.
      * @public
+     * @returns {void}
      */
     piemenuOKtoLaunch() {
         if (this._piemenuExitTime === null) {
@@ -4029,10 +4025,9 @@ class Block {
 }
 
 /**
- * set elements to a array
- * if element is string,then set element's id to element
+ * Set elements to a array; if element is string, then set element's id to element
  * @public
- * @return{void}
+ * @returns {void}
  */
 function $() {
     let elements = new Array();

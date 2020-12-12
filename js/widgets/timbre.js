@@ -103,6 +103,9 @@ function TimbreWidget() {
     this.blockNo = null; // index no. of the timbre widget block
     this.instrumentName = "custom";
 
+    /**
+     * @deprecated
+     */
     this._addButton = function(row, icon, iconSize, label) {
         let cell = row.insertCell(-1);
         cell.innerHTML =

@@ -182,7 +182,7 @@ class Logo {
         }
 
         // Mode widget
-        this._modeBlock = null;
+        this.modeBlock = null;
 
         // Meter widget
         this._meterBlock = null;
@@ -1238,7 +1238,7 @@ class Logo {
         this.pitchBlocks = [];
         this.drumBlocks = [];
         this.tuplet = false;
-        this._modeBlock = null;
+        this.modeBlock = null;
         this._meterBlock = null;
 
         // Remove any listeners that might be still active
