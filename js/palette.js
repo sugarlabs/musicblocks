@@ -555,7 +555,8 @@ class PaletteModel {
                 label = NUMBERBLOCKDEFAULT.toString();
                 break;
             case "audiofile":
-                label = _("open audio file");
+                label = _("audio file");
+                break;
             case "less":
             case "greater":
             case "equal":
