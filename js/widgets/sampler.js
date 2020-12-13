@@ -1,13 +1,13 @@
 function SampleWidget() {
-    const SAMPLESYNTH = "bottle";
     const BUTTONDIVWIDTH = 476; // 8 buttons 476 = (55 + 4) * 8
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
     const SAMPLEWIDTH = 600;
     const SAMPLEHEIGHT = 200;
-    const YRADIUS = 75;
+    const RENDERINTERVAL = 5;
 
     this.sampleData = "";
+    this.sampleName = "banjo";
 
     this.pause = function() {
         clearInterval(this._intervalID);
@@ -18,13 +18,22 @@ function SampleWidget() {
         // We will no longer keep synch with the turtles.
         var d = new Date();
 
-        this._draw();
         this.getBrowserAudio();
+
+        if (this._intervalID !== null) {
+            clearInterval(this._intervalID);
+        }
+
+        this._intervalID = setInterval(() => {
+            this._draw();
+        }, RENDERINTERVAL);
+
     };
 
 
     this._draw = function() {
 
+      let d = new Date();
       var canvas = this.sampleCanvas;
       let middle = SAMPLEHEIGHT / 2;
 
@@ -43,16 +52,28 @@ function SampleWidget() {
       }
       ctx.closePath();
 
+      ctx.font = "10px Verdana";
+      ctx.fillText(this.sampleName, 10, 50);
+
+      if (d.getTime() % 100 == 0) {
+          this._logo.synth.trigger(0, ["C2"], 0.0625, this.sampleName, null, null, false);
+      }
+
     }
 
     this.__save = function() {
         var that = this;
-        require("samples/banjo");
         setTimeout(function() {
             console.debug("saving the sample");
+
+            if (!([this.sampleName, this.sampleData] in CUSTOMSAMPLES)) {
+                CUSTOMSAMPLES.push([this.sampleName, this.sampleData]);
+            }
+
             var newStack = [
-                [0, ["audiofile", { value: this.sampleData}], 100, 100, [null]]
+                [0, ["audiofile", {value: this.sampleName}], 100, 100, [null]]
             ];
+
             that._logo.blocks.loadNewBlocks(newStack);
             that._logo.textMsg(_("New sample block generated!"));
         }, 200 * i);
@@ -80,7 +101,7 @@ function SampleWidget() {
 
         this._intervalID = null;
 
-        this._logo.synth.loadSynth(0, getDrumSynthName(SAMPLESYNTH));
+        this._logo.synth.loadSynth(0, getDrumSynthName("bottle"));
 
         if (this._intervalID != null) {
             clearInterval(this._intervalID);
@@ -145,7 +166,8 @@ function SampleWidget() {
                 reader.onloadend = function() {
                     if (reader.result) {
                         value = [fileChooser.files[0].name, reader.result];
-                        //this.sampleData = value;
+                        this.sampleData = value;
+                        this.sampleName = files[0].name;
                   } else {
                   }
               };
@@ -199,15 +221,15 @@ function SampleWidget() {
 
         widgetWindow.sendToCenter();
     };
-}
 
-async function getBrowserAudio({constraints}) {
-  let stream = null;
+    this.getBrowserAudio = async function({constraints}) {
+      let stream = null;
 
-  try {
-    stream = await navigator.mediaDevices.getUserMedia(constraints);
-    /* use the stream */
-  } catch(err) {
-    /* handle the error */
-  }
+      try {
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        /* use the stream */
+      } catch(err) {
+        /* handle the error */
+      }
+    }
 }
