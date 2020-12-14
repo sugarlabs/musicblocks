@@ -197,19 +197,19 @@ function SampleWidget() {
                 var sampleFile = fileChooser.files[0];
                 var reader = new FileReader;
                 reader.readAsDataURL(sampleFile);
-                console.log(sampleFile);
 
                 reader.onload = function(e) {
                     var rawLog = reader.result;
                     that.sampleData = rawLog;
-                    console.log(that.sampleData);
+                    that.sampleName = fileChooser.files[0].name;
                 };
 
                 reader.onloadend = function() {
                     if (reader.result) {
                         value = [fileChooser.files[0].name, reader.result];
                         this.sampleData = value;
-                        this.sampleName = files[0].name;
+                        this.sampleName = fileChooser.files[0].name;
+                        that.resume();
                   } else {
                   }
               };
