@@ -1176,8 +1176,6 @@ function Synth() {
         let numFilters;
         let temp_filters = [];
         if (paramsEffects === null && paramsFilters === null) {
-            console.debug(notes);
-            console.debug(beatValue);
             synth.triggerAttackRelease(notes, beatValue);
         } else {
             if (paramsFilters !== null && paramsFilters !== undefined) {
