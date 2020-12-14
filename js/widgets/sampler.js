@@ -5,9 +5,10 @@ function SampleWidget() {
     const SAMPLEWIDTH = 600;
     const SAMPLEHEIGHT = 200;
     const RENDERINTERVAL = 5;
+    const DEFAULTSAMPLE = "banjo";
 
     this.sampleData = "";
-    this.sampleName = "banjo";
+    this.sampleName = DEFAULTSAMPLE;
 
     this.pause = function() {
         clearInterval(this._intervalID);
@@ -101,7 +102,7 @@ function SampleWidget() {
 
         this._intervalID = null;
 
-        this._logo.synth.loadSynth(0, getDrumSynthName("bottle"));
+        this._logo.synth.loadSynth(0, getVoiceSynthName(DEFAULTSAMPLE));
 
         if (this._intervalID != null) {
             clearInterval(this._intervalID);
@@ -186,11 +187,13 @@ function SampleWidget() {
             _("Play sample"),
             ""
         ).onclick = function() {
+            console.log(that.sampleName);
+            that._logo.synth.loadSynth(0, getVoiceSynthName(that.sampleName));
             that._logo.synth.trigger(
                 0,
-                ["C2"],
+                ["C4"],
                 0.0625,
-                that.sampleData,
+                that.sampleName,
                 null,
                 null,
                 false
@@ -222,11 +225,11 @@ function SampleWidget() {
         widgetWindow.sendToCenter();
     };
 
-    this.getBrowserAudio = async function({constraints}) {
+    this.getBrowserAudio = async function() {
       let stream = null;
 
       try {
-        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        stream = await navigator.mediaDevices.getUserMedia();
         /* use the stream */
       } catch(err) {
         /* handle the error */
