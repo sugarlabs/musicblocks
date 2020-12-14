@@ -5,7 +5,7 @@ function SampleWidget() {
     const SAMPLEWIDTH = 600;
     const SAMPLEHEIGHT = 200;
     const RENDERINTERVAL = 5;
-    const DEFAULTSAMPLE = "banjo";
+    const DEFAULTSAMPLE = "electronic synth";
 
     this.sampleData = "";
     this.sampleName = DEFAULTSAMPLE;
@@ -46,7 +46,13 @@ function SampleWidget() {
       ctx.lineWidth = 0;
 
       for (let x=0; x < SAMPLEWIDTH; x++) {
-          let amplitude = (x**2)%50;
+          console.log(this.sampleData);
+          let period = Math.floor(this.sampleData.length / SAMPLEWIDTH);
+          let amplitude = 0;
+          let index = x*period+24;
+          if (index > this.sampleData.length) {
+              amplitude = this.sampleData.charCodeAt(index) - 64;
+          }
           ctx.moveTo(x, middle - amplitude);
           ctx.lineTo(x, middle + amplitude);
           ctx.stroke();
@@ -55,12 +61,7 @@ function SampleWidget() {
       ctx.closePath();
 
       ctx.font = "10px Verdana";
-      ctx.fillText(this.sampleName, 10, 50);
-
-      if (d.getTime() % 100 == 0) {
-          this._logo.synth.trigger(0, ["C2"], 0.0625, this.sampleName, null, null, false);
-      }
-
+      ctx.fillText(this.sampleName, 10, 10);
     }
 
     this.__save = function() {
@@ -167,23 +168,6 @@ function SampleWidget() {
             }
         };
 
-        this._save_lock = false;
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            iconSize,
-            _("Save sample"),
-            ""
-        ).onclick = function() {
-            // Debounce button
-            if (!that._get_save_lock()) {
-                that._save_lock = true;
-                that._saveSample();
-                setTimeout(function() {
-                    that._save_lock = false;
-                }, 1000);
-            }
-        };
-
         widgetWindow.addButton(
             "load-media.svg",
             iconSize,
@@ -221,6 +205,23 @@ function SampleWidget() {
           fileChooser.click();
           window.scroll(0, 0);
         }
+
+        this._save_lock = false;
+        widgetWindow.addButton(
+            "export-chunk.svg",
+            iconSize,
+            _("Save sample"),
+            ""
+        ).onclick = function() {
+            // Debounce button
+            if (!that._get_save_lock()) {
+                that._save_lock = true;
+                that._saveSample();
+                setTimeout(function() {
+                    that._save_lock = false;
+                }, 1000);
+            }
+        };
 
         this.bodyTable = document.createElement("table");
         this.widgetWindow.getWidgetBody().appendChild(this.bodyTable);
