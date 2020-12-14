@@ -9,6 +9,7 @@ function SampleWidget() {
 
     this.sampleData = "";
     this.sampleName = DEFAULTSAMPLE;
+    this.pitchAdjustment = "C4";
 
     this.pause = function() {
         clearInterval(this._intervalID);
@@ -126,6 +127,46 @@ function SampleWidget() {
             this.destroy();
         };
 
+        let playBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
+        playBtn.onclick = () => {
+            if (this.isMoving) {
+                this.pause();
+                playBtn.innerHTML =
+                    '<img src="header-icons/play-button.svg" title="' +
+                    _("Pause") +
+                    '" alt="' +
+                    _("Pause") +
+                    '" height="' +
+                    ICONSIZE +
+                    '" width="' +
+                    ICONSIZE +
+                    '" vertical-align="middle">';
+                this.isMoving = false;
+            } else {
+                this.resume();
+                playBtn.innerHTML =
+                    '<img src="header-icons/pause-button.svg" title="' +
+                    _("Play") +
+                    '" alt="' +
+                    _("Play") +
+                    '" height="' +
+                    ICONSIZE +
+                    '" width="' +
+                    ICONSIZE +
+                    '" vertical-align="middle">';
+                this._logo.synth.loadSynth(0, getVoiceSynthName(this.sampleName));
+                this._logo.synth.trigger(
+                    0,
+                    [this.pitchAdjustment],
+                    1,
+                    this.sampleName,
+                    null,
+                    null,
+                    false);
+                this.isMoving = true;
+            }
+        };
+
         this._save_lock = false;
         widgetWindow.addButton(
             "export-chunk.svg",
@@ -179,25 +220,6 @@ function SampleWidget() {
           fileChooser.focus();
           fileChooser.click();
           window.scroll(0, 0);
-        }
-
-        widgetWindow.addButton(
-            "media-playback-start.svg",
-            iconSize,
-            _("Play sample"),
-            ""
-        ).onclick = function() {
-            console.log(that.sampleName);
-            that._logo.synth.loadSynth(0, getVoiceSynthName(that.sampleName));
-            that._logo.synth.trigger(
-                0,
-                ["C4"],
-                0.0625,
-                that.sampleName,
-                null,
-                null,
-                false
-            );
         }
 
         this.bodyTable = document.createElement("table");
