@@ -261,7 +261,7 @@ const SAMPLECENTERNO = {
     "double bass": ["C4", 39]
 };
 
-CUSTOMSAMPLES = [[]];
+CUSTOMSAMPLES = [];
 
 const percussionInstruments = ["koto", "banjo", "dulcimer", "xylophone", "celeste"];
 const stringInstruments = ["piano", "guitar", "acoustic guitar", "electric guitar"];
