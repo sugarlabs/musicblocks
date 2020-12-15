@@ -5,11 +5,13 @@ function SampleWidget() {
     const SAMPLEWIDTH = 600;
     const SAMPLEHEIGHT = 200;
     const RENDERINTERVAL = 5;
+
     const DEFAULTSAMPLE = "electronic synth";
+    const CENTERPITCHHERTZ = 262;
 
     this.sampleData = "";
     this.sampleName = DEFAULTSAMPLE;
-    this.pitchAdjustment = "C4";
+    this.pitchAdjustment = 0;
 
     this.pause = function() {
         clearInterval(this._intervalID);
@@ -32,6 +34,16 @@ function SampleWidget() {
 
     };
 
+    this.pitchUp = function (i) {
+        this.pitchAdjustment++;
+        this.pitchInput = this.pitchAdjustment;
+    };
+
+    this.pitchDown = function (i) {
+        this.pitchAdjustment++;
+        this.pitchInput = this.pitchAdjustment;
+    };
+
 
     this._draw = function() {
 
@@ -46,11 +58,10 @@ function SampleWidget() {
       ctx.lineWidth = 0;
 
       for (let x=0; x < SAMPLEWIDTH; x++) {
-          console.log(this.sampleData);
           let period = Math.floor(this.sampleData.length / SAMPLEWIDTH);
           let amplitude = 0;
           let index = x*period+24;
-          if (index > this.sampleData.length) {
+          if (index < this.sampleData.length) {
               amplitude = this.sampleData.charCodeAt(index) - 64;
           }
           ctx.moveTo(x, middle - amplitude);
@@ -158,7 +169,7 @@ function SampleWidget() {
                 this._logo.synth.loadSynth(0, getVoiceSynthName(this.sampleName));
                 this._logo.synth.trigger(
                     0,
-                    [this.pitchAdjustment],
+                    [CENTERPITCHHERTZ],
                     1,
                     this.sampleName,
                     null,
@@ -226,21 +237,52 @@ function SampleWidget() {
         this.bodyTable = document.createElement("table");
         this.widgetWindow.getWidgetBody().appendChild(this.bodyTable);
 
-        var r1 = this.bodyTable.insertRow();
-        var r2 = this.bodyTable.insertRow();
-        var r3 = this.bodyTable.insertRow();
+        this.bodyTable = document.createElement("table");
+        this.widgetWindow.getWidgetBody().appendChild(this.bodyTable);
 
-        this.sampleCanvas = document.createElement("canvas");
-        this.sampleCanvas.style.width = SAMPLEWIDTH + "px";
-        this.sampleCanvas.style.height = SAMPLEHEIGHT + "px";
-        this.sampleCanvas.style.margin = "1px";
-        this.sampleCanvas.style.background = "rgba(255, 255, 255, 1)";
+        let r1, r2, r3, vCell;
+        for (let i = 0; i < 1; i++) {
+            this._directions.push(1);
+            this._widgetFirstTimes.push(this._logo.firstNoteTime);
 
+            r1 = this.bodyTable.insertRow();
+            r2 = this.bodyTable.insertRow();
+            r3 = this.bodyTable.insertRow();
 
+            widgetWindow.addButton(
+                "up.svg",
+                ICONSIZE,
+                _("speed up"),
+                r1.insertCell()
+            ).onclick = ((i) => () => this.pitchUp(i))(i);
 
-        var tcCell = r1.insertCell();
-        tcCell.appendChild(this.sampleCanvas);
-        tcCell.setAttribute("rowspan", "3");
+            this.pitchInput = widgetWindow.addInputButton(this.pitchAdjustment, r3.insertCell());
+
+            widgetWindow.addButton(
+                "down.svg",
+                ICONSIZE,
+                _("slow down"),
+                r2.insertCell()
+            ).onclick = ((i) => () => this.pitchDown(i))(i);
+
+            this.sampleCanvas = document.createElement("canvas");
+            this.sampleCanvas.style.width = SAMPLEWIDTH + "px";
+            this.sampleCanvas.style.height = SAMPLEHEIGHT + "px";
+            this.sampleCanvas.style.margin = "1px";
+            this.sampleCanvas.style.background = "rgba(255, 255, 255, 1)";
+            vCell = r1.insertCell();
+            vCell.appendChild(this.sampleCanvas);
+            vCell.setAttribute("rowspan", "3");
+
+            this.pitchInput.addEventListener(
+                "keyup",
+                ((id) => (e) => {
+                    if (e.keyCode === 13) {
+
+                    }
+                })(i)
+            );
+        }
 
         this._logo.textMsg(_("Record a sample to use as an instrument."));
         this.resume();
