@@ -104,7 +104,7 @@ function SampleWidget() {
         this._widgetNextTimes = [];
         this._firstClickTimes = null;
         this._intervals = [];
-        this.isMoving = true;
+        this.isMoving = false;
         if (this._intervalID != undefined && this._intervalID != null) {
             clearInterval(this._intervalID);
         }
@@ -141,9 +141,9 @@ function SampleWidget() {
                 this.pause();
                 playBtn.innerHTML =
                     '<img src="header-icons/play-button.svg" title="' +
-                    _("Pause") +
+                    _("Play") +
                     '" alt="' +
-                    _("Pause") +
+                    _("Play") +
                     '" height="' +
                     ICONSIZE +
                     '" width="' +
@@ -154,9 +154,9 @@ function SampleWidget() {
                 this.resume();
                 playBtn.innerHTML =
                     '<img src="header-icons/pause-button.svg" title="' +
-                    _("Play") +
+                    _("Pause") +
                     '" alt="' +
-                    _("Play") +
+                    _("Pause") +
                     '" height="' +
                     ICONSIZE +
                     '" width="' +
