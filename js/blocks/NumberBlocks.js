@@ -329,7 +329,7 @@ function setupNumberBlocks() {
 
             this.fontsize = 9;
             this.formBlock({
-                name: this.lang === "ja" ? "/" : "/",
+                name: this.lang === "ja" ? "➗" : "/",
                 args: 2,
                 defaults: [1, 4]
             });
