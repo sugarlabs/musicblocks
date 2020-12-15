@@ -496,7 +496,7 @@ const RHYTHMRULERHEIGHT = 100;
 
 const YSTAFFNOTEHEIGHT = 12.5;
 const YSTAFFOCTAVEHEIGHT = 87.5;
- 
+
 const SLIDERHEIGHT = 200;
 const SLIDERWIDTH = 50;
 
@@ -993,7 +993,7 @@ const OSCTYPES = [
     [_("sawtooth"), "sawtooth"]
 ];
 
-const INITIALTEMPERAMENTS = [ 
+const INITIALTEMPERAMENTS = [
     [_("equal"), "equal", "equal"],
     [_("just intonation"), "just intonation", "just intonation"],
     [_("Pythagorean"), "Pythagorean", "Pythagorean"],
@@ -1024,7 +1024,7 @@ let PreDefinedTemperaments = {
     "just intonation": true,
     "Pythagorean": true,
     "1/3 comma meantone": true,
-    "1/4 comma meantone": true 
+    "1/4 comma meantone": true
 }
 
 let TEMPERAMENT = {
@@ -1578,7 +1578,13 @@ function getVoiceSynthName(name) {
         }
     }
 
-    console.debug(name + " not found in VOICENAMES");
+    for (let i = 0; i < CUSTOMSAMPLES.length; i++) {
+        if (CUSTOMSAMPLES[i][0] === name || CUSTOMSAMPLES[i][1] === name) {
+            return CUSTOMSAMPLES[i][1];
+        }
+    }
+
+    console.debug(name + " not found in VOICENAMES or CUSTOMSAMPLES");
     return DEFAULTVOICE;
 }
 
@@ -2024,7 +2030,7 @@ function _buildScale(keySignature) {
         ii += halfSteps[i];
         scale.push(thisScale[ii % SEMITONES]);
     }
-    
+
     // Make sure there are no repeated letter names for seven step scales
     if (scale.length === 8) {
         for (let n = 0; n < 7; n++) {
@@ -2063,7 +2069,7 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
     let obj1 = _buildScale(keySignature);
     let chosenModeScale = obj1[0];
     let chosenModePattern = obj1[1];
-    
+
     // Pitch numbers of the chosen mode
     let semitones = [0];
 
@@ -2127,13 +2133,13 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
                             }
                         }
                     }
-                } 
+                }
                 return sd;
             }
         } else if (chosenModePattern.length < 7) {
             // Major scale of the choosen key is used as fallback
             let majorScale = _buildScale(chosenMode[0] + " major")[0];
-            
+
             // according to the choosenModePattern, calculate defined scale degrees
             for (let i = 0; i < chosenModePattern.length; i++) {
                 switch (semitones[i]) {
@@ -2145,7 +2151,7 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
                     definedScaleDegree.push(2);
                     break;
                 case 3:
-                case 4: 
+                case 4:
                     definedScaleDegree.push(3);
                     break;
                 case 5:
@@ -2159,7 +2165,7 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
                     } else if (semitones[i] + chosenModeScale[i] != 7) {
                         definedScaleDegree.push(5);
                     }
-                    break; 
+                    break;
                 case 7:
                     definedScaleDegree.push(5);
                     break;
@@ -2174,7 +2180,7 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
                 default:
                     continue;
                 }
-    
+
                 semitones.push(semitones[i] + chosenModePattern[i]);
             }
 
@@ -2189,7 +2195,7 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
                     finalScale.push(majorScale[i]);
                 }
             }
-            
+
             if (pitch === null) {
                 return finalScale[scaleDegree];
             }
@@ -2214,15 +2220,15 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
                 }
                 return sd;
             }
-    
+
         } else {
-            // For scales with greater than 7 notes 
+            // For scales with greater than 7 notes
             // All scales degrees are defined, just prefer the perfect/major ones
-            
+
             for (let i = 0; i < chosenModePattern.length; i++) {
                 semitones.push(semitones[i]+chosenModePattern[i]);
             }
-    
+
             for (let i = 0; i < semitones.length; i++) {
                 switch(semitones[i]) {
                 case 0:
@@ -2261,8 +2267,8 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
                     break;
                 case 6:
                     if (semitones[i - 1] == 5 && semitones[i + 1] != 7 ||
-                        semitones[i - 1] != 5 && semitones[i + 1] == 7) { 
-                        finalScale.push(chosenModeScale[i]);  
+                        semitones[i - 1] != 5 && semitones[i + 1] == 7) {
+                        finalScale.push(chosenModeScale[i]);
                     }
                     break;
                 case 7:
@@ -2336,10 +2342,10 @@ function nthDegreeToPitch(keySignature, scaleDegree) {
     // Scale degree is specified as do === 1, re === 2, etc., so we need
     // to subtract 1 to make it zero-based.
     // scaleDegree -= 1;
-    
+
     // We mod to ensure we don't run out of notes.
     // FixMe: bump octave if we wrap.
-    
+
     scaleDegree %= scale.length - 1;
     return scale[scaleDegree];
 }
@@ -3049,7 +3055,7 @@ function splitScaleDegree(value) {
     if (!value) {
         return [5, NATURAL];
     }
-    
+
     let note = value.slice(0, 1);
     let attr = value.slice(1);
     return [note, attr];
@@ -3313,7 +3319,7 @@ function getCustomNote(notes) {
         break;
     case "##":
     case "*":
-    case "x":        
+    case "x":
     case DOUBLESHARP:
         notes = notes + "𝄪" + centsInfo;
         break;
