@@ -525,7 +525,7 @@ class PhraseMaker {
                 cell.setAttribute("alt", i + "__" + "graphicsblocks");
 
                 cell.onclick = (event) => {
-                    eCell = event.target;
+                    let eCell = event.target;
                     if (eCell.getAttribute("alt") === null) {
                         eCell = eCell.parentNode;
                     }
@@ -1842,7 +1842,11 @@ class PhraseMaker {
                     octaveLabels.indexOf(octaveValue.toString())
                 );
             }
-            this._pitchWheel.navigateWheel(noteLabels.indexOf(noteValue));
+            if (condition === "drumblocks") {
+                this._pitchWheel.navigateWheel(noteLabels.indexOf(docBySelector('.labelcol[alt="'+ index + '__drumblocks"]').innerText));
+            } else {
+                this._pitchWheel.navigateWheel(noteLabels.indexOf(noteValue));
+            }
         }
 
         this._exitWheel.navItems[0].navigateFunction = () => {
