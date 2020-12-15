@@ -2,9 +2,9 @@ function SampleWidget() {
     const BUTTONDIVWIDTH = 476; // 8 buttons 476 = (55 + 4) * 8
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
-    const SAMPLEWIDTH = 600;
+    const SAMPLEWIDTH = 400;
     const SAMPLEHEIGHT = 200;
-    const RENDERINTERVAL = 5;
+    const RENDERINTERVAL = 50;
 
     const DEFAULTSAMPLE = "electronic synth";
     const CENTERPITCHHERTZ = 262;
@@ -22,15 +22,15 @@ function SampleWidget() {
         // We will no longer keep synch with the turtles.
         var d = new Date();
 
-        this.getBrowserAudio();
+        //this.getBrowserAudio();
 
-        if (this._intervalID !== null) {
-            clearInterval(this._intervalID);
-        }
+        //if (this._intervalID !== null) {
+        //    clearInterval(this._intervalID);
+        //}
 
-        this._intervalID = setInterval(() => {
-            this._draw();
-        }, RENDERINTERVAL);
+        //this._intervalID = setInterval(() => {
+        //    this._draw();
+        //}, RENDERINTERVAL);
 
     };
 
@@ -191,19 +191,16 @@ function SampleWidget() {
 
                 reader.onload = function(e) {
                     var rawLog = reader.result;
-                    console.log("part 1 ");
                     that.sampleData = rawLog;
                     that.sampleName = fileChooser.files[0].name;
+                    that._addSample();
+                    that._draw();
                 };
 
                 reader.onloadend = function() {
                     if (reader.result) {
-                        console.log("part 2");
                         value = [fileChooser.files[0].name, reader.result];
-                        that.sampleData = value;
-                        that.sampleName = fileChooser.files[0].name;
 
-                        that._addSample();
 
                         that.resume();
                   } else {
@@ -292,11 +289,14 @@ function SampleWidget() {
     };
 
     this._addSample = function() {
-        if (!([this.sampleName, this.sampleData] in CUSTOMSAMPLES)) {
-            CUSTOMSAMPLES.push([this.sampleName, this.sampleData]);
-            console.log(CUSTOMSAMPLES);
+        for (i=0; i < CUSTOMSAMPLES.length; i++) {
+            if (CUSTOMSAMPLES[i][0] == this.sampleName) {
+                return;
+            }
         }
-    };
+        CUSTOMSAMPLES.push([this.sampleName, this.sampleData]);
+        console.log(CUSTOMSAMPLES);
+    }
 
 
     this.getBrowserAudio = async function() {
