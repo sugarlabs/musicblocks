@@ -3,7 +3,7 @@ function SampleWidget() {
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
     const SAMPLEWIDTH = 400;
-    const SAMPLEHEIGHT = 200;
+    const SAMPLEHEIGHT = 160;
     const RENDERINTERVAL = 50;
 
     const DEFAULTSAMPLE = "electronic synth";
@@ -36,18 +36,25 @@ function SampleWidget() {
 
     this.pitchUp = function (i) {
         this.pitchAdjustment++;
+        this.pitchInput.value = this.pitchAdjustment;
     };
 
     this.pitchDown = function (i) {
         this.pitchAdjustment--;
+        this.pitchInput.value = this.pitchAdjustment;
     };
+
+    this._usePitch = function (i) {
+        this.pitchAdjustment = this.pitchInput.value;
+        this.pitchInput.value = this.pitchAdjustment;
+    }
 
 
     this._draw = function() {
 
       let d = new Date();
       var canvas = this.sampleCanvas;
-      let middle = SAMPLEHEIGHT / 2;
+      let middle = SAMPLEHEIGHT / 2 - 15;
 
       var ctx = canvas.getContext("2d");
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -165,7 +172,7 @@ function SampleWidget() {
                 this._logo.synth.loadSynth(0, getVoiceSynthName(this.sampleName));
                 this._logo.synth.trigger(
                     0,
-                    [CENTERPITCHHERTZ],
+                    [CENTERPITCHHERTZ + this.pitchAdjustment],
                     1,
                     this.sampleName,
                     null,
@@ -254,13 +261,13 @@ function SampleWidget() {
                 r1.insertCell()
             ).onclick = ((i) => () => this.pitchUp(i))(i);
 
-            this.pitchInput = widgetWindow.addInputButton(this.pitchAdjustment, r3.insertCell());
+            this.pitchInput = widgetWindow.addInputButton(this.pitchAdjustment, r2.insertCell());
 
             widgetWindow.addButton(
                 "down.svg",
                 ICONSIZE,
                 _("slow down"),
-                r2.insertCell()
+                r3.insertCell()
             ).onclick = ((i) => () => this.pitchDown(i))(i);
 
             this.sampleCanvas = document.createElement("canvas");
@@ -276,7 +283,7 @@ function SampleWidget() {
                 "keyup",
                 ((id) => (e) => {
                     if (e.keyCode === 13) {
-
+                        this._usePitch(id);
                     }
                 })(i)
             );
