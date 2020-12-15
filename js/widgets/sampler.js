@@ -36,12 +36,10 @@ function SampleWidget() {
 
     this.pitchUp = function (i) {
         this.pitchAdjustment++;
-        this.pitchInput = this.pitchAdjustment;
     };
 
     this.pitchDown = function (i) {
-        this.pitchAdjustment++;
-        this.pitchInput = this.pitchAdjustment;
+        this.pitchAdjustment--;
     };
 
 
@@ -80,9 +78,7 @@ function SampleWidget() {
         setTimeout(function() {
             console.debug("saving the sample");
 
-            if (!([this.sampleName, this.sampleData] in CUSTOMSAMPLES)) {
-                CUSTOMSAMPLES.push([this.sampleName, this.sampleData]);
-            }
+            this._addSample();
 
             var newStack = [
                 [0, ["audiofile", {value: this.sampleName}], 100, 100, [null]]
@@ -204,6 +200,9 @@ function SampleWidget() {
                         value = [fileChooser.files[0].name, reader.result];
                         this.sampleData = value;
                         this.sampleName = fileChooser.files[0].name;
+
+                        this._addSample();
+
                         that.resume();
                   } else {
                   }
@@ -289,6 +288,14 @@ function SampleWidget() {
 
         widgetWindow.sendToCenter();
     };
+
+    this._addSample = function () {
+        if (!([this.sampleName, this.sampleData] in CUSTOMSAMPLES)) {
+            CUSTOMSAMPLES.push([this.sampleName, this.sampleData]);
+            console.log(CUSTOMSAMPLES);
+        }
+    }
+
 
     this.getBrowserAudio = async function() {
       let stream = null;
