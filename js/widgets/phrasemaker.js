@@ -4105,8 +4105,8 @@ class PhraseMaker {
                         idsliced =
                             this._rowBlocks[j]
                                 .toString()
-                                .slice(-obj[0].toString().length);
-                        if (idsliced === obj[0].toString()) {
+                                .slice(-obj[0]?.toString()?.length);
+                        if (idsliced === obj[0]?.toString()) {
                             if ((c++) === n) {
                                 rIdx = j;
                                 break;
