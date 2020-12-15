@@ -191,17 +191,19 @@ function SampleWidget() {
 
                 reader.onload = function(e) {
                     var rawLog = reader.result;
+                    console.log("part 1 ");
                     that.sampleData = rawLog;
                     that.sampleName = fileChooser.files[0].name;
                 };
 
                 reader.onloadend = function() {
                     if (reader.result) {
+                        console.log("part 2");
                         value = [fileChooser.files[0].name, reader.result];
-                        this.sampleData = value;
-                        this.sampleName = fileChooser.files[0].name;
+                        that.sampleData = value;
+                        that.sampleName = fileChooser.files[0].name;
 
-                        this._addSample();
+                        that._addSample();
 
                         that.resume();
                   } else {
@@ -289,12 +291,12 @@ function SampleWidget() {
         widgetWindow.sendToCenter();
     };
 
-    this._addSample = function () {
+    this._addSample = function() {
         if (!([this.sampleName, this.sampleData] in CUSTOMSAMPLES)) {
             CUSTOMSAMPLES.push([this.sampleName, this.sampleData]);
             console.log(CUSTOMSAMPLES);
         }
-    }
+    };
 
 
     this.getBrowserAudio = async function() {
