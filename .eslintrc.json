@@ -11,7 +11,14 @@
     "no-mixed-spaces-and-tabs": "warn",
     // "no-unused-vars": "warn",
     // "no-use-before-define": "error",
-    "no-undef": "off",
+    "prefer-const": [
+      "warn",
+      {
+        "destructuring": "any",
+        "ignoreReadBeforeAssign": true
+      }
+    ],
+    "no-undef": "warn",
     "no-unused-vars": "off",
     "indent": ["warn", 4, { "SwitchCase": 1 }],
     "quotes": ["warn", "double", { "avoidEscape": true }],

@@ -228,6 +228,10 @@ function docByName(name) {
     return document.getElementsByName(name);
 }
 
+function docBySelector(selector) {
+    return document.querySelector(selector);
+}
+
 function last(myList) {
     let i = myList.length;
     if (i === 0) {

@@ -934,7 +934,7 @@ function Activity() {
 
         if (false) {
             // _THIS_IS_MUSIC_BLOCKS_ && docById('ptmDiv').style.visibility === 'visible') {
-            logo.pitchTimeMatrix.playAll();
+            logo.phraseMaker.playAll();
         } else if (!turtles.running()) {
             logo.runLogoCommands();
         } else {
