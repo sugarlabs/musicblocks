@@ -749,10 +749,11 @@ function Activity() {
             svg += '</g>';
 
             if (blocks.blockList[i].isCollapsible()) {
+                let y;
                 if (INLINECOLLAPSIBLES.indexOf(blocks.blockList[i].name) !== -1) {
-                    let y = blocks.blockList[i].container.y + 4;
+                    y = blocks.blockList[i].container.y + 4;
                 } else {
-                    let y = blocks.blockList[i].container.y + 12;
+                    y = blocks.blockList[i].container.y + 12;
                 }
 
                 svg +=
