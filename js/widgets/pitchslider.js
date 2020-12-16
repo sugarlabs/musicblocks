@@ -18,10 +18,40 @@ class PitchSlider {
         const ICONSIZE = 32;
         this._delta = 0;
         const SEMITONE = Math.pow(2, 1 / 12)
-        
+    }
+
+
+    _save(frequency) {
+        for (let name in logo.blocks.palettes.dict) {
+            logo.blocks.palettes.dict[name].hideMenu(true);
+        }
+
+        logo.refreshCanvas();
+
+        let newStack = [
+            [0, "note", 100 + this._delta, 100 + this._delta, [null, 1, 2, null]],
+            [1, ["number", { value: 8 }], 0, 0, [0]]
+        ];
+        this._delta += 21;
+
+        let endOfStackIdx = 0;
+        let previousBlock = 0;
+
+        let hertzIdx = newStack.length;
+        let frequencyIdx = hertzIdx + 1;
+        let hiddenIdx = hertzIdx + 2;
+        newStack.push([hertzIdx, "hertz", 0, 0, [previousBlock, frequencyIdx, hiddenIdx]]);
+        newStack.push([frequencyIdx, ["number", { value: frequency }], 0, 0, [hertzIdx]]);
+        newStack.push([hiddenIdx, "hidden", 0, 0, [hertzIdx, null]]);
+
+        logo.blocks.loadNewBlocks(newStack);
+    };
+
+
+    init() {
         if (window.widgetWindows.openWindows["slider"]) return;
         if (!this.frequencies || !this.frequencies.length) this.frequencies = [392];
-        this._logo = logo;
+
 
         let oscillators = [];
         this.sliders = {};
@@ -30,7 +60,6 @@ class PitchSlider {
             oscillators.push(osc);
         }
         this._cellScale = 1.0;
-        let iconSize = ICONSIZE;
         let widgetWindow = window.widgetWindows.windowFor(this, "pitch slider", "slider");
         this.widgetWindow = widgetWindow;
         widgetWindow.onclose = () => {
@@ -42,10 +71,8 @@ class PitchSlider {
             let toolBarDiv = document.createElement("div");
             widgetWindow._toolbar.appendChild(toolBarDiv);
             toolBarDiv.style.float = "left";
-
             let min = this.frequencies[id] / 2;
             let max = this.frequencies[id] * 2;
-
             let slider = widgetWindow.addRangeSlider(
                 this.frequencies[id],
                 toolBarDiv,
@@ -77,15 +104,14 @@ class PitchSlider {
             toolBarDiv.appendChild(freqLabel);
             freqLabel.innerHTML = "<label>" + this.frequencies[id] + "</label>";
 
-            widgetWindow.addButton("up.svg", iconSize, _("Move up"), toolBarDiv).onclick = () => {
-                slider.value = Math.min(slider.value * SEMITONE, max); //value is a string
-                changeFreq();
+            widgetWindow.addButton("up.svg", ICONSIZE, _("Move up"), toolBarDiv).onclick = () => {
+                slider.value = Math.min(slider.value * SEMITONE, max); //value is a string                    changeFreq();
                 oscillators[id].triggerAttackRelease(this.frequencies[id], "4n");
             };
 
             widgetWindow.addButton(
                 "down.svg",
-                iconSize,
+                ICONSIZE,
                 _("Move down"),
                 toolBarDiv
             ).onclick = () => {
@@ -104,44 +130,13 @@ class PitchSlider {
                 this._save(this.frequencies[id]);
             };
         };
-        
 
         for (let id in this.frequencies) {
             makeToolbar(id);
         }
 
-        this._logo.textMsg(_("Click on the slider to create a note block."));
+        logo.textMsg(_("Click on the slider to create a note block."));
         setTimeout(this.widgetWindow.sendToCenter, 0);
     };
-
-
-    _save(frequency) {
-        for (let name in logo.blocks.palettes.dict) {
-            logo.blocks.palettes.dict[name].hideMenu(true);
-        }
-
-        logo.refreshCanvas();
-
-        let newStack = [
-            [0, "note", 100 + this._delta, 100 + this._delta, [null, 1, 2, null]],
-            [1, ["number", { value: 8 }], 0, 0, [0]]
-        ];
-        this._delta += 21;
-
-        let endOfStackIdx = 0;
-        let previousBlock = 0;
-
-        let hertzIdx = newStack.length;
-        let frequencyIdx = hertzIdx + 1;
-        let hiddenIdx = hertzIdx + 2;
-        newStack.push([hertzIdx, "hertz", 0, 0, [previousBlock, frequencyIdx, hiddenIdx]]);
-        newStack.push([frequencyIdx, ["number", { value: frequency }], 0, 0, [hertzIdx]]);
-        newStack.push([hiddenIdx, "hidden", 0, 0, [hertzIdx, null]]);
-
-        logo.blocks.loadNewBlocks(newStack);
-    };
-
-
-
 
 };
