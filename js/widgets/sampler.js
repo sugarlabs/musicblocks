@@ -170,9 +170,11 @@ function SampleWidget() {
                     ICONSIZE +
                     '" vertical-align="middle">';
                 this._logo.synth.loadSynth(0, getVoiceSynthName(this.sampleName));
+                let finalpitch = Math.floor(CENTERPITCHHERTZ * Math.pow(2, this.pitchAdjustment/12));
+                console.log(finalpitch);
                 this._logo.synth.trigger(
                     0,
-                    [CENTERPITCHHERTZ + this.pitchAdjustment],
+                    [finalpitch],
                     1,
                     this.sampleName,
                     null,
