@@ -462,10 +462,10 @@ function setupWidgetBlocks() {
 
         flow(args, logo, turtle, blk) {
             logo.insideModeWidget = true;
-            
+
             let listenerName = "_modewidget_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
-            
+
             let __listener = function(event) {
                 logo.modeWidget = new ModeWidget();
                 logo.insideModeWidget = false;
@@ -543,7 +543,9 @@ function setupWidgetBlocks() {
             this.formBlock({ name: _("sample"), canCollapse: true });
             this.makeMacro((x, y) => [
               [0, "sample", x, y, [null, 1]],
-              [1, "hiddennoflow", 0, 0, [0, null]]
+              [1, "settimbre", 0, 0, [null, 2, null, 3]],
+              [2, ["voicename", { value: DEFAULTVOICE }], 0, 0, [0]],
+              [3, "hidden", 0, 0, [0, null]]
             ]);
         }
 
