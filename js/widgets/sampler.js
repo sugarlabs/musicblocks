@@ -169,7 +169,7 @@ function SampleWidget() {
                     '" width="' +
                     ICONSIZE +
                     '" vertical-align="middle">';
-                if (!(this.sampleName == "") {
+                if (!(this.sampleName == "")) {
                     this._logo.synth.loadSynth(0, getVoiceSynthName(this.sampleName));
                     let finalpitch = Math.floor(CENTERPITCHHERTZ * Math.pow(2, this.pitchAdjustment/12));
                     console.log(finalpitch);
