@@ -169,18 +169,20 @@ function SampleWidget() {
                     '" width="' +
                     ICONSIZE +
                     '" vertical-align="middle">';
-                this._logo.synth.loadSynth(0, getVoiceSynthName(this.sampleName));
-                let finalpitch = Math.floor(CENTERPITCHHERTZ * Math.pow(2, this.pitchAdjustment/12));
-                console.log(finalpitch);
-                this._logo.synth.trigger(
-                    0,
-                    [finalpitch],
-                    1,
-                    this.sampleName,
-                    null,
-                    null,
-                    false);
-                this.isMoving = true;
+                if (!(this.sampleName == "") {
+                    this._logo.synth.loadSynth(0, getVoiceSynthName(this.sampleName));
+                    let finalpitch = Math.floor(CENTERPITCHHERTZ * Math.pow(2, this.pitchAdjustment/12));
+                    console.log(finalpitch);
+                    this._logo.synth.trigger(
+                        0,
+                        [finalpitch],
+                        1,
+                        this.sampleName,
+                        null,
+                        null,
+                        false);
+                    this.isMoving = true;
+                }
             }
         };
 
