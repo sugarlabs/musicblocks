@@ -30,6 +30,9 @@ function TemperamentWidget() {
     this.circleIsVisible = true;
     this.playbackForward = true;
 
+    /**
+     * @deprecated
+     */
     this._addButton = function(row, icon, iconSize, label) {
         let cell = row.insertCell(-1);
         cell.innerHTML =

@@ -321,7 +321,7 @@ piemenuPitches = function(
         if (that.connections[0] !== null && ["setkey", "setkey2"].indexOf(
             that.blocks.blockList[that.connections[0]].name) !== -1) {
             // We may need to update the mode widget.
-            that.blocks.logo._modeBlock = that.blocks.blockList.indexOf(that);
+            that.blocks.logo.modeBlock = that.blocks.blockList.indexOf(that);
         }
         __pitchPreview();
     };
@@ -3218,8 +3218,7 @@ piemenuBlockContext = function(block) {
     if (helpButton !== null) {
         wheel.navItems[helpButton].navigateFunction = function() {
             that.blocks.activeBlock = blockBlock;
-            let helpWidget = new HelpWidget();
-            helpWidget.init(blocks);
+            let helpWidget = new HelpWidget(blocks);
             docById("contextWheelDiv").style.display = "none";
         };
     }

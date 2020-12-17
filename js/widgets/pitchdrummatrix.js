@@ -315,6 +315,9 @@ function PitchDrumMatrix() {
         this._logo.textMsg(_("Click in the grid to map notes to drums."));
     };
 
+    /**
+     * @deprecated
+     */
     this._addButton = function(row, icon, iconSize, label) {
         let cell = row.insertCell(-1);
         cell.innerHTML =
