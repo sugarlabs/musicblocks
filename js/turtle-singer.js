@@ -190,13 +190,13 @@ class Singer {
             let obj = frequencyToPitch(args[0]);
 
             if (logo.inMatrix) {
-                logo.pitchTimeMatrix.addRowBlock(blk);
+                logo.phraseMaker.addRowBlock(blk);
                 if (logo.pitchBlocks.indexOf(blk) === -1) {
                     logo.pitchBlocks.push(blk);
                 }
 
-                logo.pitchTimeMatrix.rowLabels.push(logo.blocks.blockList[blk].name);
-                logo.pitchTimeMatrix.rowArgs.push(args[0]);
+                logo.phraseMaker.rowLabels.push(logo.blocks.blockList[blk].name);
+                logo.phraseMaker.rowArgs.push(args[0]);
             } else if (logo.inPitchSlider) {
                 logo.pitchSlider.frequency = args[0];
             } else {
@@ -748,7 +748,7 @@ class Singer {
             }
         } else if (logo.inMatrix) {
             if (note.toLowerCase() !== "rest") {
-                logo.pitchTimeMatrix.addRowBlock(blk);
+                logo.phraseMaker.addRowBlock(blk);
                 if (logo.pitchBlocks.indexOf(blk) === -1) {
                     logo.pitchBlocks.push(blk);
                 }
@@ -784,24 +784,24 @@ class Singer {
 
                 // If we are in a setdrum clamp, override the pitch.
                 if (tur.singer.drumStyle.length > 0) {
-                    logo.pitchTimeMatrix.rowLabels.push(
+                    logo.phraseMaker.rowLabels.push(
                         last(tur.singer.drumStyle)
                     );
-                    logo.pitchTimeMatrix.rowArgs.push(-1);
+                    logo.phraseMaker.rowArgs.push(-1);
                 } else {
                     // Was the pitch arg a note name or solfege name?
                     if (
                         SOLFEGENAMES1.indexOf(note) !== -1 &&
                         noteObj[0] in SOLFEGECONVERSIONTABLE
                     ) {
-                        logo.pitchTimeMatrix.rowLabels.push(
+                        logo.phraseMaker.rowLabels.push(
                             SOLFEGECONVERSIONTABLE[noteObj[0]]
                         );
                     } else {
-                        logo.pitchTimeMatrix.rowLabels.push(noteObj[0]);
+                        logo.phraseMaker.rowLabels.push(noteObj[0]);
                     }
 
-                    logo.pitchTimeMatrix.rowArgs.push(noteObj[1]);
+                    logo.phraseMaker.rowArgs.push(noteObj[1]);
                 }
             }
         } else if (tur.singer.inNoteBlock.length > 0) {
@@ -1170,19 +1170,19 @@ class Singer {
             tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], noteBeatValue];
         } else if (logo.inMatrix || logo.tuplet) {
             if (tur.singer.inNoteBlock.length > 0) {
-                logo.pitchTimeMatrix.addColBlock(blk, 1);
+                logo.phraseMaker.addColBlock(blk, 1);
 
                 // block ID of parent "matrix" block
-                let mat_block = logo.pitchTimeMatrix.blockNo || -1;
+                let mat_block = logo.phraseMaker.blockNo || -1;
 
                 for (let i = 0; i < logo.pitchBlocks.length; i++) {
-                    logo.pitchTimeMatrix.addNode(
+                    logo.phraseMaker.addNode(
                         logo.pitchBlocks[i], blk, 0, mat_block
                     );
                 }
 
                 for (let i = 0; i < logo.drumBlocks.length; i++) {
-                    logo.pitchTimeMatrix.addNode(
+                    logo.phraseMaker.addNode(
                         logo.drumBlocks[i], blk, 0, mat_block
                     );
                 }

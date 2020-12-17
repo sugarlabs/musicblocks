@@ -269,10 +269,10 @@ function setupDrumBlocks() {
                     logo.drumBlocks.push(blk);
                 }
             } else if (logo.inMatrix) {
-                logo.pitchTimeMatrix.rowLabels.push(drumname);
-                logo.pitchTimeMatrix.rowArgs.push(-1);
+                logo.phraseMaker.rowLabels.push(drumname);
+                logo.phraseMaker.rowArgs.push(-1);
 
-                logo.pitchTimeMatrix.addRowBlock(blk);
+                logo.phraseMaker.addRowBlock(blk);
                 if (logo.drumBlocks.indexOf(blk) === -1) {
                     logo.drumBlocks.push(blk);
                 }

@@ -66,7 +66,7 @@ function setupToneActions() {
             console.log('turtle: ' + turtle + " " + synth);
 
             if (logo.inMatrix) {
-                logo.pitchTimeMatrix._instrumentName = synth;
+                logo.phraseMaker._instrumentName = synth;
             }
 
             if (tur.singer.instrumentNames.indexOf(synth) === -1) {

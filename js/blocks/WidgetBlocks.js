@@ -1063,17 +1063,17 @@ function setupWidgetBlocks() {
         flow(args, logo, turtle, blk) {
             logo.inMatrix = true;
 
-            if (logo.pitchTimeMatrix === null) {
-                logo.pitchTimeMatrix = new PitchTimeMatrix();
+            if (logo.phraseMaker === null) {
+                logo.phraseMaker = new PhraseMaker();
             }
-            logo.pitchTimeMatrix.blockNo = blk;
+            logo.phraseMaker.blockNo = blk;
 
-            logo.pitchTimeMatrix._instrumentName = DEFAULTVOICE;
+            logo.phraseMaker._instrumentName = DEFAULTVOICE;
 
-            logo.pitchTimeMatrix.rowLabels = [];
-            logo.pitchTimeMatrix.rowArgs = [];
-            logo.pitchTimeMatrix.graphicsBlocks = [];
-            logo.pitchTimeMatrix.clearBlocks();
+            logo.phraseMaker.rowLabels = [];
+            logo.phraseMaker.rowArgs = [];
+            logo.phraseMaker.graphicsBlocks = [];
+            logo.phraseMaker.clearBlocks();
 
             logo.tupletRhythms = [];
             logo.tupletParams = [];
@@ -1085,7 +1085,7 @@ function setupWidgetBlocks() {
             let __listener = function(event) {
                 if (
                     logo.tupletRhythms.length === 0 ||
-                    logo.pitchTimeMatrix.rowLabels.length === 0
+                    logo.phraseMaker.rowLabels.length === 0
                 ) {
                     logo.errorMsg(
                         _(
@@ -1095,9 +1095,9 @@ function setupWidgetBlocks() {
                     );
                 } else {
                     // Process queued up rhythms.
-                    logo.pitchTimeMatrix.blockNo = blk;
-                    logo.pitchTimeMatrix.sorted = false;
-                    logo.pitchTimeMatrix.init(logo);
+                    logo.phraseMaker.blockNo = blk;
+                    logo.phraseMaker.sorted = false;
+                    logo.phraseMaker.init(logo);
 
                     for (let i = 0; i < logo.tupletRhythms.length; i++) {
                         // We have two cases: (1) notes in a tuplet;
@@ -1119,10 +1119,10 @@ function setupWidgetBlocks() {
                                     );
                                 }
 
-                                logo.pitchTimeMatrix.addTuplet(tupletParam);
+                                logo.phraseMaker.addTuplet(tupletParam);
                                 break;
                             default:
-                                logo.pitchTimeMatrix.addNotes(
+                                logo.phraseMaker.addNotes(
                                     logo.tupletRhythms[i][1],
                                     logo.tupletRhythms[i][2]
                                 );
@@ -1130,7 +1130,7 @@ function setupWidgetBlocks() {
                         }
                     }
 
-                    logo.pitchTimeMatrix.makeClickable();
+                    logo.phraseMaker.makeClickable();
                 }
             };
 
