@@ -55,7 +55,7 @@ function setupRhythmBlockPaletteBlocks() {
 
             if (logo.inMatrix || logo.tuplet) {
                 if (logo.inMatrix) {
-                    logo.pitchTimeMatrix.addColBlock(blk, arg0);
+                    logo.phraseMaker.addColBlock(blk, arg0);
                 }
 
                 for (let i = 0; i < args[0]; i++) {
@@ -654,7 +654,7 @@ function setupRhythmBlockPaletteBlocks() {
 
             let noteBeatValue = (1 / arg1) * logo.turtles.ithTurtle(turtle).singer.beatFactor;
             if (logo.inMatrix || logo.tuplet) {
-                logo.pitchTimeMatrix.addColBlock(blk, arg0);
+                logo.phraseMaker.addColBlock(blk, arg0);
                 if (logo.tuplet) {
                     // The simple-tuplet block is inside.
                     for (let i = 0; i < arg0; i++) {
