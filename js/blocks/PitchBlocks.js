@@ -354,6 +354,14 @@ function setupPitchBlocks() {
             this.beginnerBlock(true);
             this.parameter = true;
             this.formBlock({ outType: "pitchout" });
+            this.setHelpString([
+                _(
+                    "The Current Pitch block gives us information of current pitch being played.In the example above it prints 329.62755691287055 the value of current pitch in hertz"
+                ),
+                "documentation",
+                null,
+                "currentpitchhelp"
+            ]);
         }
 
         updateParameter(logo, turtle, blk) {
