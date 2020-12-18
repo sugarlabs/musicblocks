@@ -539,12 +539,11 @@ function setupWidgetBlocks() {
                 "sample"
             ]);
 
+            //.TRANS: the speed at music is should be played.
             this.formBlock({ name: _("sample"), canCollapse: true });
             this.makeMacro((x, y) => [
-              [0, "sample", x, y, [null, null, 1]],
-              [1, "settimbre", 0, 0, [0, 2]],
-              [2, ["audiofile", {value: _("hi")}], 0, 0, [1]],
-              [3, "hiddennoflow", 0, 0, [0, null]]
+              [0, "sample", x, y, [null, 1]],
+              [1, "hiddennoflow", 0, 0, [0, null]]
             ]);
         }
 
@@ -1063,17 +1062,17 @@ function setupWidgetBlocks() {
         flow(args, logo, turtle, blk) {
             logo.inMatrix = true;
 
-            if (logo.phraseMaker === null) {
-                logo.phraseMaker = new PhraseMaker();
+            if (logo.pitchTimeMatrix === null) {
+                logo.pitchTimeMatrix = new PitchTimeMatrix();
             }
-            logo.phraseMaker.blockNo = blk;
+            logo.pitchTimeMatrix.blockNo = blk;
 
-            logo.phraseMaker._instrumentName = DEFAULTVOICE;
+            logo.pitchTimeMatrix._instrumentName = DEFAULTVOICE;
 
-            logo.phraseMaker.rowLabels = [];
-            logo.phraseMaker.rowArgs = [];
-            logo.phraseMaker.graphicsBlocks = [];
-            logo.phraseMaker.clearBlocks();
+            logo.pitchTimeMatrix.rowLabels = [];
+            logo.pitchTimeMatrix.rowArgs = [];
+            logo.pitchTimeMatrix.graphicsBlocks = [];
+            logo.pitchTimeMatrix.clearBlocks();
 
             logo.tupletRhythms = [];
             logo.tupletParams = [];
@@ -1085,7 +1084,7 @@ function setupWidgetBlocks() {
             let __listener = function(event) {
                 if (
                     logo.tupletRhythms.length === 0 ||
-                    logo.phraseMaker.rowLabels.length === 0
+                    logo.pitchTimeMatrix.rowLabels.length === 0
                 ) {
                     logo.errorMsg(
                         _(
@@ -1095,9 +1094,9 @@ function setupWidgetBlocks() {
                     );
                 } else {
                     // Process queued up rhythms.
-                    logo.phraseMaker.blockNo = blk;
-                    logo.phraseMaker.sorted = false;
-                    logo.phraseMaker.init(logo);
+                    logo.pitchTimeMatrix.blockNo = blk;
+                    logo.pitchTimeMatrix.sorted = false;
+                    logo.pitchTimeMatrix.init(logo);
 
                     for (let i = 0; i < logo.tupletRhythms.length; i++) {
                         // We have two cases: (1) notes in a tuplet;
@@ -1119,10 +1118,10 @@ function setupWidgetBlocks() {
                                     );
                                 }
 
-                                logo.phraseMaker.addTuplet(tupletParam);
+                                logo.pitchTimeMatrix.addTuplet(tupletParam);
                                 break;
                             default:
-                                logo.phraseMaker.addNotes(
+                                logo.pitchTimeMatrix.addNotes(
                                     logo.tupletRhythms[i][1],
                                     logo.tupletRhythms[i][2]
                                 );
@@ -1130,7 +1129,7 @@ function setupWidgetBlocks() {
                         }
                     }
 
-                    logo.phraseMaker.makeClickable();
+                    logo.pitchTimeMatrix.makeClickable();
                 }
             };
 
