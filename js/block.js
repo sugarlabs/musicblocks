@@ -3404,7 +3404,7 @@ class Block {
                     case "setshade":
                     case "settranslucency":
                     case "setgrey":
-                        piemenuNumber(
+                        piemenuColor(
                             this,
                             this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC1,
                             this.value,
