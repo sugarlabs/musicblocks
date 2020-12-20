@@ -926,12 +926,7 @@ Turtles.TurtlesView = class {
                 70 + LEADING + 6
             );
 
-            this._gridButton.onclick = (event) => {
-                this.createGridPieMenu();
-                // this.doGrid();
-                // this._gridButton.setAttribute("data-tooltip", this._gridLabel);
-                // jQuery.noConflict()(".tooltipped").tooltip("close");
-            };
+            this._gridButton.onclick = (this.createGridPieMenu).bind(this);
         };
 
         /**
