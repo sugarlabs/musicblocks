@@ -1990,6 +1990,10 @@ function Activity() {
                     (e.target === docById("ui-id-1") || docById("ui-id-1").contains(e.target))
                 ) {
                     //do nothing when clicked on the menu
+                } else if (
+                    document.getElementsByTagName("tr")[2].contains(e.target)
+                ) {
+                    //do nothing when clicked on the search row
                 } else {
                     hideSearchWidget();
                     document.removeEventListener("mousedown", closeListener);
