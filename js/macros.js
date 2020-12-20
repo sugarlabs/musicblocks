@@ -52,6 +52,7 @@ function blockIsMacro(blkname) {
         "broadcasthelp",
         "chorushelp",
         "clickhelp",
+        "currentpitchhelp",
 	"cursordownhelp",
 	"cursorouthelp",
 	"cursoroverhelp",
@@ -328,6 +329,15 @@ function getMacroExpansion(blkname, x, y) {
         [14, "playdrum", 0, 0, [13, 16, null]],
         [15, "hidden", 0, 0, [9, null]],
         [16, "turtlename", 0, 0, [14]]
+    ];
+    const CURRENTPITCHHELP = [
+        [0, ["action", { collapsed: false }], x, y + 100, [null, 1, 2, null]],
+        [1, ["text", { value: "action" }], 0, 0, [0]],
+        [2, "hidden", 0, 0, [0, 3]],
+        [3, "forward", 533, 361, [2, 6, null]],
+        [4, "everybeatdo", x, y, [null, 5, null]],
+        [5, ["text", { value: "action" }], 0, 0, [4]],
+        [6, "deltapitch", 0, 0, [3]]
     ];
     const CURSORDOWNHELP = [
         [0, ["start", { collapsed: false }], x, y, [null, 1, null]],
@@ -1626,6 +1636,7 @@ function getMacroExpansion(blkname, x, y) {
         broadcasthelp: BROADCASTHELP,
         chorushelp: CHORUSHELP,
         clickhelp: CLICKHELP,
+        currentpitchhelp: CURRENTPITCHHELP,
 	cursordownhelp: CURSORDOWNHELP,
 	cursorouthelp: CURSOROUTHELP,
 	cursoroverhelp: CURSOROVERHELP,
