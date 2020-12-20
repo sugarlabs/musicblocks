@@ -356,7 +356,7 @@ function setupPitchBlocks() {
             this.formBlock({ outType: "pitchout" });
             this.setHelpString([
                 _(
-                    "The Current Pitch block gives us information of current pitch being played.In the example above it prints 329.62755691287055 the value of current pitch in hertz"
+                    "The Current Pitch block is used with the Pitch Converter block. In the example above, current pitch, sol 4, is displayed as 392 hertz."
                 ),
                 "documentation",
                 null,
