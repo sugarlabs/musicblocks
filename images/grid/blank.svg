@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg
+	xmlns="http://www.w3.org/2000/svg"
+	version="1.1"
+	width="601"
+	height="601">
+<rect
+	width="600"
+	height="600"
+	x="0.5"
+	y="0.5"
+	rx="37.5"
+	ry="37.5"
+	style="fill:#fff;fill-opacity:1;stroke:#888888;stroke-width:1"/>
+
+<rect
+	width="552.625"
+	height="552.625"
+	x="23.9375"
+	y="23.9375"
+	rx="13.5625"
+	ry="13.5625"
+	style="fill:none;stroke:#888888;stroke-width:15.625"/>
+</svg>

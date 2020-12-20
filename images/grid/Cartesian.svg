@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+	baseProfile="tiny" xml:lang="en"
+	viewBox="0,0,800,800" >
+    <title>Gauss plane (background)</title>
+	<defs>
+		<desc>default values for path, text</desc>
+		<style type="text/css">
+		<![CDATA[
+		  path {fill:black; stroke:black; stroke-width:2; }
+		  .blue {fill:blue; stroke:blue; }
+		  .green {fill:lime; stroke:lime; }
+		  .red {fill:red; stroke:red; }
+		  .orange {fill:darkorange; stroke:darkorange; }
+		  .dashed {fill:white; fill-opacity:0; stroke:#888888; stroke-width:1; stroke-dasharray:8,8; }
+		  circle {fill:none; fill-opacity:0; stroke:black; stroke-width:2; }
+		  .blue {fill:blue; stroke:blue; }
+		  .green {fill:lime; stroke:lime; }
+		  .red {fill:red; stroke:red; }
+		  .orange {fill:darkorange; stroke:darkorange; }
+		  .dashed {stroke:#888888; stroke-width:1; stroke-dasharray:8,8; }
+		  text {font-family:sans-serif; stroke:black; stroke-width:0; }
+		  .blue {stroke:blue; }
+		  .green {stroke:lime; }
+		  .red {stroke:red; }
+		  .orange {stroke:darkorange; }
+		]]>
+		</style>
+		<desc>mark the end of a ray (axises, complex numbers)</desc>
+		<marker id="triangle"
+		  viewBox="0 0 10 10"
+		  preserveAspectRatio="none"
+		  overflow="visible"
+		  refX="10" refY="5"
+		  markerUnits="strokeWidth"
+		  markerWidth="10" markerHeight="6"
+		  orient="auto">
+		  <path d="M 0 0 L 10 5 L 0 10 z" />
+		</marker>
+	</defs>
+	<g marker-end="url(#triangle)" >
+		<desc>show the real and the imaginary axis</desc>
+		<path d =  "M   0,400 H 800" />
+		<path d =  "M 400,800 V 000" />
+	</g>
+	<g>
+		<desc>show horizontal and vertical units - grey and dashed;
+			  note: paint the grey lines before the black ones scaling the axises</desc>
+		<path class="dashed" d = "M 0, 80 H 800 M 0,160 H 800 M 0,240 H 800 M 0,320 H 800 
+								  M 0,480 H 800 M 0,560 H 800 M 0,640 H 800 M 0,720 H 800" />
+		<path class="dashed" d = "M  80,0 V 800 M 160,0 V 800 M 240,0 V 800 M 320,0 V 800 
+								  M 480,0 V 800 M 560,0 V 800 M 640,0 V 800 M 720,0 V 800" />
+	</g>
+	<g>
+		<desc>scale of the horizontal axis: first the units, next halfs of a unit</desc>
+		<path d =  "M  80,400 V 420 M 160,400 V 420 M 240,400 V 420 M 320,400 V 420 
+					M 480,400 V 420 M 560,400 V 420 M 640,400 V 420 M 720,400 V 420" />
+		<path d =  "M  40,400 V 412 M 120,400 V 412 M 200,400 V 412 M 280,400 V 412 
+					M 360,400 V 412 M 440,400 V 412 M 520,400 V 412 M 600,400 V 412 
+					M 680,400 V 412 M 760,400 V 412" />
+	
+		<desc>scale of the vertical axis: first the units, next halfs of a unit</desc>
+		<path d =  "M 380, 80 H 400 M 380,160 H 400 M 380,240 H 400 M 380,320 H 400
+					M 380,480 H 400 M 380,560 H 400 M 380,640 H 400 M 380,720 H 400" />
+		<path d =  "M 388, 40 H 400 M 388,120 H 400 M 388,200 H 400 M 388,280 H 400 
+					M 388,360 H 400 M 388,440 H 400 M 388,520 H 400 M 388,600 H 400 
+					M 388,680 H 400 M 388,760 H 400" />
+	</g>
+	<g font-size="36">
+		<desc>mark the origin of the coordinate system</desc>
+		<text x="388" y="413" font-style="italic">0</text>
+	</g>
+	<g font-size="30">
+		<desc>mark the axises: real and imaginary</desc>
+		<text x="760" y="385" >Re</text>
+		<text x="410" y= "24" >Im</text>
+	</g>
+	<g font-size="24" >
+		<desc>mark the units - first at the horizontal axis, then at the vertical axis</desc>
+		<text x= "85" y="424" >–4</text>
+		<text x="165" y="424" >–3</text>
+		<text x="245" y="424" >–2</text>
+		<text x="325" y="424" >–1</text>
+		<text x="485" y="424" >1</text>
+		<text x="565" y="424" >2</text>
+		<text x="645" y="424" >3</text>
+		<text x="725" y="424" >4</text>
+		<text x="380" y="072" >4</text>
+		<text x="380" y="152" >3</text>
+		<text x="380" y="232" >2</text>
+		<text x="380" y="312" >1</text>
+		<text x="365" y="472" >–1</text>
+		<text x="365" y="552" >–2</text>
+		<text x="365" y="632" >–3</text>
+		<text x="365" y="712" >–4</text>
+	</g>
+</svg>
+

@@ -97,6 +97,15 @@ window.platformColor = {
         "#93e042",
         "#adfd55"
     ],
+    "gridWheelcolors": {
+        "wheel": [
+            "#ffffff"
+        ],
+        "selected": {
+            "fill": "#dedede",
+            "stroke": "#a3a3a3"
+        }
+    },
     "drumWheelcolors": ["#1fadae", "#3edcdd"],
     "graphicWheelcolors": ["#92a9ff", "#728ff9"],
     "accidentalsWheelcolors": [
