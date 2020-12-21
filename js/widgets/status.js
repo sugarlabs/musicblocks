@@ -14,12 +14,12 @@
 
 class StatusMatrix {
     constructor() {
-        const BUTTONDIVWIDTH = 128;
-        const BUTTONSIZE = 53;
-        const ICONSIZE = 32;
-        const OUTERWINDOWWIDTH = 620;
-        const INNERWINDOWWIDTH = OUTERWINDOWWIDTH - BUTTONSIZE * 1.5;
-        const FONTSCALEFACTOR = 75;
+        this.BUTTONDIVWIDTH = 128;
+        this.BUTTONSIZE = 53;
+        this.ICONSIZE = 32;
+        this.OUTERWINDOWWIDTH = 620;
+        this.INNERWINDOWWIDTH = OUTERWINDOWWIDTH - BUTTONSIZE * 1.5;
+        this.FONTSCALEFACTOR = 75;
         let x, y; //Drop coordinates of statusDiv
     }
 
