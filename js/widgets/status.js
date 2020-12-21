@@ -12,20 +12,22 @@
 // This widget makes displays the status of selected parameters and
 // notes as they are being played.
 
-function StatusMatrix() {
-    const BUTTONDIVWIDTH = 128;
-    const BUTTONSIZE = 53;
-    const ICONSIZE = 32;
-    const OUTERWINDOWWIDTH = 620;
-    const INNERWINDOWWIDTH = OUTERWINDOWWIDTH - BUTTONSIZE * 1.5;
-    const FONTSCALEFACTOR = 75;
-    let x, y; //Drop coordinates of statusDiv
+class StatusMatrix {
+    constructor() {
+        this.BUTTONDIVWIDTH = 128;
+        this.BUTTONSIZE = 53;
+        this.ICONSIZE = 32;
+        this.OUTERWINDOWWIDTH = 620;
+        this.INNERWINDOWWIDTH = OUTERWINDOWWIDTH - BUTTONSIZE * 1.5;
+        this.FONTSCALEFACTOR = 75;
+        let x, y; //Drop coordinates of statusDiv
+    }
 
-    this.init = (logo) => {
+    init = () => {
         // Initializes the status matrix. First removes the
         // previous matrix and them make another one in DOM (document
         // object model)
-        this._logo = logo;
+
         this.isOpen = true;
 
         let w = window.innerWidth;
@@ -66,8 +68,8 @@ function StatusMatrix() {
 
         // One column per mouse/turtle
         let activeTurtles = 0;
-        for (let t = 0; t < this._logo.turtles.turtleList.length; t++) {
-            if (this._logo.turtles.turtleList[t].inTrash) {
+        for (let t = 0; t < logo.turtles.turtleList.length; t++) {
+            if (logo.turtles.turtleList[t].inTrash) {
                 continue;
             }
 
@@ -77,9 +79,9 @@ function StatusMatrix() {
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 cell.innerHTML =
                     '&nbsp;&nbsp;<img src="images/mouse.svg" title="' +
-                    this._logo.turtles.turtleList[t].name +
+                    logo.turtles.turtleList[t].name +
                     '" alt="' +
-                    this._logo.turtles.turtleList[t].name +
+                    logo.turtles.turtleList[t].name +
                     '" height="' +
                     iconSize +
                     '" width="' +
@@ -88,9 +90,9 @@ function StatusMatrix() {
             } else {
                 cell.innerHTML =
                     '&nbsp;&nbsp;<img src="header-icons/turtle-button.svg" title="' +
-                    this._logo.turtles.turtleList[t].name +
+                    logo.turtles.turtleList[t].name +
                     '" alt="' +
-                    this._logo.turtles.turtleList[t].name +
+                    logo.turtles.turtleList[t].name +
                     '" height="' +
                     iconSize +
                     '" width="' +
@@ -108,15 +110,15 @@ function StatusMatrix() {
 
         // One row per field, one column per mouse (plus the labels)
         let label;
-        for (let i = 0; i < this._logo.statusFields.length; i++) {
+        for (let i = 0; i < logo.statusFields.length; i++) {
             row = header.insertRow();
 
             cell = row.insertCell(); // i + 1);
             cell.style.fontSize = Math.floor(this._cellScale * FONTSCALEFACTOR) + "%";
 
-            console.debug(this._logo.statusFields[i][1]);
+            console.debug(logo.statusFields[i][1]);
 
-            switch (this._logo.statusFields[i][1]) {
+            switch (logo.statusFields[i][1]) {
                 case "plus":
                 case "minus":
                 case "neg":
@@ -129,23 +131,23 @@ function StatusMatrix() {
                     label = "";
                     break;
                 case "namedbox":
-                    label = this._logo.blocks.blockList[this._logo.statusFields[i][0]].privateData;
+                    label = logo.blocks.blockList[logo.statusFields[i][0]].privateData;
                     break;
                 case "bpm":
                 case "bpmfactor":
                     if (localStorage.languagePreference === "ja") {
                         label = _("beats per minute2");
                     } else {
-                        label = this._logo.blocks.blockList[this._logo.statusFields[i][0]]
+                        label = logo.blocks.blockList[logo.statusFields[i][0]]
                             .protoblock.staticLabels[0];
                     }
                     console.debug(label);
                     break;
                 case "outputtools":
-                    label = this._logo.blocks.blockList[this._logo.statusFields[i][0]].privateData;
+                    label = logo.blocks.blockList[logo.statusFields[i][0]].privateData;
                     break;
                 default:
-                    label = this._logo.blocks.blockList[this._logo.statusFields[i][0]].protoblock
+                    label = logo.blocks.blockList[logo.statusFields[i][0]].protoblock
                         .staticLabels[0];
                     break;
             }
@@ -185,16 +187,16 @@ function StatusMatrix() {
         widgetWindow.sendToCenter();
     };
 
-    this.updateAll = () => {
+    updateAll = () => {
         // Update status of all of the voices in the matrix.
-        this._logo.updatingStatusMatrix = true;
+        logo.updatingStatusMatrix = true;
 
         let activeTurtles = 0;
         let cell;
-        for (let t = 0; t < this._logo.turtles.turtleList.length; t++) {
-            let tur = this._logo.turtles.ithTurtle(t);
+        for (let t = 0; t < logo.turtles.turtleList.length; t++) {
+            let tur = logo.turtles.ithTurtle(t);
 
-            if (this._logo.turtles.turtleList[t].inTrash) {
+            if (logo.turtles.turtleList[t].inTrash) {
                 continue;
             }
 
@@ -206,45 +208,43 @@ function StatusMatrix() {
             let noteValue;
             let freq;
             let i;
-            for (i = 0; i < this._logo.statusFields.length; i++) {
-                saveStatus = this._logo.inStatusMatrix;
-                this._logo.inStatusMatrix = false;
+            for (i = 0; i < logo.statusFields.length; i++) {
+                saveStatus = logo.inStatusMatrix;
+                logo.inStatusMatrix = false;
 
-                this._logo.parseArg(this._logo, t, this._logo.statusFields[i][0]);
-                switch (this._logo.blocks.blockList[this._logo.statusFields[i][0]].name) {
+                logo.parseArg(logo, t, logo.statusFields[i][0]);
+                switch (logo.blocks.blockList[logo.statusFields[i][0]].name) {
                     case "x":
                     case "y":
                     case "heading":
-                        value = this._logo.blocks.blockList[
-                            this._logo.statusFields[i][0]
-                        ].value.toFixed(0);
+                        value = logo.blocks.blockList[logo.statusFields[i][0]].value.toFixed(0);
                         break;
                     case "mynotevalue":
                         value = mixedNumber(
-                            this._logo.blocks.blockList[this._logo.statusFields[i][0]].value
+                            logo.blocks.blockList[logo.statusFields[i][0]].value
                         );
                         break;
                     case "elapsednotes2":
-                        blk = this._logo.statusFields[i][0];
-                        cblk = this._logo.blocks.blockList[blk].connections[1];
-                        noteValue = this._logo.parseArg(this._logo, t, cblk, blk, null);
+                        blk = logo.statusFields[i][0];
+                        cblk = logo.blocks.blockList[blk].connections[1];
+                        noteValue = logo.parseArg(logo, t, cblk, blk, null);
                         value =
                             mixedNumber(
-                                this._logo.blocks.blockList[this._logo.statusFields[i][0]].value
+                                logo.blocks.blockList[logo.statusFields[i][0]].value
                             ) +
                             " × " +
                             mixedNumber(noteValue);
                         break;
                     case "elapsednotes":
                         value = mixedNumber(
-                            this._logo.blocks.blockList[this._logo.statusFields[i][0]].value
+                            logo.blocks.blockList[logo.statusFields[i][0]].value
                         );
                         break;
                     case "namedbox":
-                        name = this._logo.blocks.blockList[this._logo.statusFields[i][0]]
+                        name = logo.blocks.blockList[logo.statusFields[i][0]]
                             .privateData;
-                        if (name in this._logo.boxes) {
-                            value = this._logo.boxes[name];
+                        if (name in logo.boxes) {
+                            value = logo.boxes[name];
                         } else {
                             value = "";
                         }
@@ -264,9 +264,9 @@ function StatusMatrix() {
                                     value += " ";
                                 }
 
-                                freq = this._logo.synth.getFrequency(
+                                freq = logo.synth.getFrequency(
                                     notes[j],
-                                    this._logo.synth.changeInTemperament
+                                    logo.synth.changeInTemperament
                                 );
                                 if (typeof freq === "number") {
                                     value += freq.toFixed(2);
@@ -277,11 +277,11 @@ function StatusMatrix() {
                         }
                         break;
                     default:
-                        value = this._logo.blocks.blockList[this._logo.statusFields[i][0]].value;
+                        value = logo.blocks.blockList[logo.statusFields[i][0]].value;
                         break;
                 }
 
-                this._logo.inStatusMatrix = saveStatus;
+                logo.inStatusMatrix = saveStatus;
 
                 cell = this._statusTable.rows[i + 1].cells[activeTurtles + 1];
                 if (cell != null) {
@@ -319,6 +319,7 @@ function StatusMatrix() {
             activeTurtles += 1;
         }
 
-        this._logo.updatingStatusMatrix = false;
+        logo.updatingStatusMatrix = false;
     };
+
 }
