@@ -11,10 +11,10 @@
 
 let oscilloscopeExecution = true;
 
-function Oscilloscope() {
-    const ICONSIZE = 32;
-    const analyserSize = 8192;
-    this.init = (logo) => {
+class Oscilloscope {
+    static ICONSIZE = 32;
+    static analyserSize = 8192;
+    constructor(logo) {
         this._logo = logo;
         this.pitchAnalysers = {};
         this.playingNow = false;
@@ -43,7 +43,7 @@ function Oscilloscope() {
         let step = 10;
         this.zoomFactor = 40.0;
         this.verticalOffset = 0;
-        let zoomInButton = widgetWindow.addButton("", ICONSIZE, _("ZOOM IN"));
+        let zoomInButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("ZOOM IN"));
 
         zoomInButton.onclick = () => {
             this.zoomFactor += step;
@@ -52,7 +52,7 @@ function Oscilloscope() {
             unescape(encodeURIComponent(SMALLERBUTTON))
         )}`;
 
-        let zoomOutButton = widgetWindow.addButton("", ICONSIZE, _("ZOOM OUT"));
+        let zoomOutButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("ZOOM OUT"));
 
         zoomOutButton.onclick = () => {
             this.zoomFactor -= step;
@@ -71,17 +71,20 @@ function Oscilloscope() {
         }
 
         for (let turtle of this.divisions) {
-            turtleIdx = logo.turtles.turtleList.indexOf(turtle);
+            let turtleIdx = logo.turtles.turtleList.indexOf(turtle);
             this.reconnectSynthsToAnalyser(turtleIdx);
             this.makeCanvas(700, 400 / this.divisions.length, turtle, turtleIdx);
         }
-    };
+        if (!this.playingNow) {
+            console.debug("oscilloscope running");
+        }
+    }
 
-    this.reconnectSynthsToAnalyser = (turtle) => {
+    reconnectSynthsToAnalyser = (turtle) => {
         if (this.pitchAnalysers[turtle] === undefined) {
             this.pitchAnalysers[turtle] = new Tone.Analyser({
                 type: "waveform",
-                size: analyserSize
+                size: Oscilloscope.analyserSize
             });
         }
 
@@ -89,7 +92,7 @@ function Oscilloscope() {
             instruments[turtle][synth].connect(this.pitchAnalysers[turtle]);
     };
 
-    this.makeCanvas = (width, height, turtle, turtleIdx) => {
+    makeCanvas = (width, height, turtle, turtleIdx) => {
         let canvas = document.createElement("canvas");
         canvas.height = height;
         canvas.width = width;
@@ -127,8 +130,4 @@ function Oscilloscope() {
         };
         draw();
     };
-
-    if (!this.playingNow) {
-        console.debug("oscilloscope running");
-    }
 }
