@@ -30,24 +30,6 @@ function LocalCard(Planet){
                         <div class="flexcontainer"> \
                                 <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Edit project')+'" id="local-project-edit-{ID}"><i class="material-icons">edit</i></a> \
                                 <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Delete project')+'" id="local-project-delete-{ID}"><i class="material-icons">delete</i></a> \
-                                <div id="share-{ID}"> \
-                                        <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Share project')+'" id="local-project-share-{ID}"><i class="material-icons">share</i></a> \
-                                        <div class="card share-card" id="sharebox-{ID}" style="display:none;"> \
-                                                <div class="card-content shareurltext"> \
-                                                        <div class="shareurltitle">'+_('Share')+'</div> \
-                                                        <input type="text" name="shareurl" class="shareurlinput" data-originalurl="https://musicblocks.sugarlabs.org/index.html?id={ID}"> \
-                                                        <div class="shareurl-advanced" id="advanced-{ID}"> \
-                                                                <div class="shareurltitle">'+_('Flags')+'</div> \
-                                                                <div><input type="checkbox" name="run" id="checkboxrun-{ID}" checked><label for="checkboxrun-{ID}">'+_('Run project on startup.')+'</label></div> \
-                                                                <div><input type="checkbox" name="show" id="checkboxshow-{ID}"><label for="checkboxshow-{ID}">'+_('Show code blocks on startup.')+'</label></div> \
-                                                                <div><input type="checkbox" name="collapse" id="checkboxcollapse-{ID}"><label for="checkboxcollapse-{ID}">'+_('Collapse code blocks on startup.')+'</label></div> \
-                                                        </div> \
-                                                </div> \
-                                                <div class="card-action"> \
-                                                        <a onclick="toggleExpandable(\'advanced-{ID}\',\'shareurl-advanced\');">'+_('Advanced Options')+'</a> \
-                                                </div> \
-                                        </div> \
-                                </div> \
                                 <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Download project')+'" id="local-project-download-{ID}"><i class="material-icons">file_download</i></a> \
                                 <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Merge with current project')+'" id="local-project-merge-{ID}"><i class="material-icons">merge_type</i></a> \
                                 <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Duplicate project')+'" id="local-project-duplicate-{ID}"><i class="material-icons">content_copy</i></a> \
@@ -134,34 +116,6 @@ function LocalCard(Planet){
             that.duplicate();
         });
 
-        // set share button listener
-        frag.getElementById('local-project-share-' + this.id).addEventListener('click', function (evt) {
-            let s = document.getElementById('sharebox-' + that.id);
-            if (s.style.display === 'none') {
-                if (that.ProjectData.PublishedData !== null) {
-                    s.style.display = 'initial';
-                    hideOnClickOutside([document.getElementById('share-' + that.id)], 'sharebox-' + that.id);
-                } else {
-                    Planet.LocalPlanet.Publisher.open(that.id, true);
-                }
-            } else {
-                s.style.display = 'none';
-            }
-        });
-
-        // set share checkbox listener
-        frag.getElementById('checkboxrun-' + this.id).addEventListener('click', function (evt) {
-            updateCheckboxes('sharebox-' + that.id);
-        });
-
-        frag.getElementById('checkboxshow-' + this.id).addEventListener('click', function (evt) {
-            updateCheckboxes('sharebox-' + that.id);
-        });
-
-        frag.getElementById('checkboxcollapse-' + this.id).addEventListener('click', function (evt) {
-            updateCheckboxes('sharebox-' + that.id);
-        });
-
         // set published cloud listener
         if (this.ProjectData.PublishedData !== null){
             frag.getElementById('local-project-cloud-' + this.id).style.display = 'initial';
@@ -175,7 +129,6 @@ function LocalCard(Planet){
         }
 
         document.getElementById('local-projects').appendChild(frag);
-        updateCheckboxes('sharebox-' + that.id);
     };
 
     this.init = function(id) {
