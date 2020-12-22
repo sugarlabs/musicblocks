@@ -1,21 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.0"
    width="810"
    height="1200"
-   id="svg1894"
-   sodipodi:version="0.32"
-   inkscape:version="0.46"
-   sodipodi:docname="Tenor_clef_with_ref.svg"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+   id="svg1894">
   <metadata
      id="metadata22">
     <rdf:RDF>
@@ -27,34 +20,8 @@
       </cc:Work>
     </rdf:RDF>
   </metadata>
-  <sodipodi:namedview
-     inkscape:window-height="883"
-     inkscape:window-width="1271"
-     inkscape:pageshadow="2"
-     inkscape:pageopacity="0.0"
-     guidetolerance="10.0"
-     gridtolerance="10.0"
-     objecttolerance="10.0"
-     borderopacity="1.0"
-     bordercolor="#666666"
-     pagecolor="#ffffff"
-     id="base"
-     showgrid="false"
-     inkscape:zoom="0.5421152"
-     inkscape:cx="154.92219"
-     inkscape:cy="600"
-     inkscape:window-x="24"
-     inkscape:window-y="24"
-     inkscape:current-layer="layer3" />
   <defs
      id="defs1896">
-    <inkscape:perspective
-       sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 600 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="810 : 600 : 1"
-       inkscape:persp3d-origin="405 : 400 : 1"
-       id="perspective24" />
     <style
        type="text/css"
        id="style6" />
@@ -63,11 +30,8 @@
        id="style2282" />
   </defs>
   <g
-     inkscape:groupmode="layer"
      id="layer1"
-     inkscape:label="staff"
-     style="display:inline"
-     sodipodi:insensitive="true">
+     style="display:inline">
     <g
        transform="translate(19.223193,196.55764)"
        id="g1934">
@@ -94,50 +58,34 @@
     </g>
   </g>
   <g
-     inkscape:groupmode="layer"
      id="layer2"
-     inkscape:label="clef"
-     style="display:inline"
-     sodipodi:insensitive="true">
+     style="display:inline">
     <path
        id="path2432"
        style="fill:#131516;stroke:#131516;stroke-width:0.60001558"
        d="M 103.85139,708.14124 L 103.85139,247.72297 L 103.85139,237.54026 L 157.14449,237.54026 L 157.14449,697.95853 L 157.14449,708.14124 L 103.85139,708.14124 z M 183.99139,708.14124 L 183.99139,247.72297 L 183.99139,237.54026 L 201.02114,237.54026 L 201.02114,468.14872 C 209.43584,463.75618 218.05089,454.77143 226.46559,440.5955 C 235.08064,426.61923 242.29324,411.84432 247.90304,396.0711 C 253.51284,380.29788 256.51809,368.71754 256.91879,361.13042 C 259.52334,377.90195 263.73069,391.27923 269.34049,401.46194 C 275.15064,411.44499 281.36149,418.63279 288.57409,423.02533 C 295.78669,427.21821 302.79894,429.41448 310.01154,429.41448 C 327.84269,429.41448 339.06229,421.42804 343.87069,405.2555 C 348.67909,389.08296 351.08329,369.31652 351.08329,345.95619 C 351.08329,335.37415 350.88294,325.79042 350.28189,317.40466 C 349.68084,309.0189 348.47874,300.43348 346.27489,291.84805 C 344.27139,283.26263 340.86544,275.47585 336.05704,268.68738 C 331.04829,261.8989 324.63709,257.10704 316.62309,254.71111 C 309.41049,252.7145 302.19789,251.71619 295.18564,251.71619 C 288.77444,251.71619 283.36499,252.91416 279.15764,255.11043 C 274.74994,257.3067 272.34574,260.70094 271.94504,264.69416 C 272.94679,268.28806 275.35099,272.48094 279.55834,277.47246 C 283.76569,282.26433 286.57059,286.05789 288.17339,288.45382 C 289.77619,290.84975 290.57759,294.24399 290.57759,298.83619 C 290.57759,307.02229 287.77269,313.81076 282.16289,319.40127 C 276.55309,324.99178 269.14014,327.9867 259.72369,327.9867 C 250.50759,327.9867 242.89429,324.59246 237.28449,318.00365 C 231.67469,311.21517 228.66944,303.22873 228.26874,294.24399 C 229.07014,282.06467 233.47784,271.48263 241.29149,262.69755 C 249.30549,254.11213 259.12264,247.52331 270.94329,243.13077 C 282.76394,238.73823 294.58459,236.54196 306.60559,236.54196 C 320.22939,236.54196 333.25214,238.93789 345.67384,243.72975 C 358.29589,248.52162 369.51549,255.70941 379.13229,264.89382 C 388.94944,274.27789 396.76309,285.65856 402.37289,299.23551 C 407.98269,312.6128 410.78759,327.9867 410.78759,344.95788 C 410.78759,368.51788 406.37989,388.08466 397.76484,403.45855 C 388.94944,419.03211 377.72984,430.61245 364.10604,437.80024 C 350.28189,444.98804 335.65634,448.98126 320.22939,449.38058 C 304.20139,448.38228 290.77794,444.78838 280.15939,438.59889 L 258.92229,472.94058 L 280.15939,507.08261 C 294.78494,501.09278 309.21014,498.09787 323.23464,498.09787 C 341.06579,498.09787 356.49274,503.28905 369.91619,513.2721 C 383.13929,523.45481 393.35714,536.43278 400.36939,552.60532 C 407.18129,568.77786 410.78759,585.34972 410.78759,602.52057 C 410.78759,621.2887 406.58024,638.85887 398.16554,655.03141 C 389.75084,671.20395 377.93019,683.98226 362.70359,693.76565 C 347.27664,703.34937 329.84619,708.14124 310.01154,708.14124 C 286.97129,707.14293 267.73769,701.75209 252.31074,691.76904 C 236.88379,681.98565 229.27049,667.21073 229.27049,647.84362 C 230.07189,638.45955 233.47784,631.27175 239.48834,625.88091 C 245.49884,620.2904 251.91004,617.49515 258.92229,616.89616 C 267.33699,616.89616 274.95029,619.89108 281.56184,625.88091 C 288.17339,631.67108 291.57934,639.05853 291.57934,647.84362 C 291.57934,651.23785 290.77794,654.43243 289.17514,657.42735 C 287.57234,660.2226 285.36849,663.61684 282.16289,667.61006 C 278.95729,671.40362 276.75344,674.19887 275.55134,675.99582 C 274.34924,677.99243 273.34749,680.1887 272.94679,682.98395 C 272.94679,686.57785 275.15064,689.57277 279.75869,691.9687 C 284.16639,694.36463 289.97654,695.76226 296.98879,696.36124 C 319.02729,695.36294 333.65284,685.97887 341.06579,668.60836 C 348.27839,650.83853 351.88469,629.07548 351.88469,602.52057 C 351.88469,579.55955 349.28014,559.39379 344.07104,542.22295 C 338.86194,524.85244 327.64234,516.26702 310.01154,516.26702 C 294.38424,516.26702 282.36324,522.85583 273.94854,536.43278 C 265.53384,549.81007 260.12439,565.58328 257.72019,583.75244 C 255.11564,568.37854 251.10864,553.60363 245.29849,539.42769 C 239.48834,525.0521 232.87679,512.47346 225.06314,501.69176 C 217.65019,491.10973 209.43584,482.52431 201.02114,476.53448 L 201.02114,708.14124 L 183.99139,708.14124 z" />
   </g>
   <g
-     inkscape:groupmode="layer"
      id="layer3"
-     inkscape:label="notes"
      style="display:inline">
     <path
-       sodipodi:type="arc"
        style="fill:#ffffff;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;fill-opacity:1"
        id="path2498"
-       sodipodi:cx="594.89203"
-       sodipodi:cy="452.004"
-       sodipodi:rx="69.173492"
-       sodipodi:ry="69.173492"
        d="M 664.06552,452.004 A 69.173492,69.173492 0 1 1 664.06552,452.004 A 69.173492,69.173492 0 1 1 664.06552,452.004 z" />
     <path
-       sodipodi:type="arc"
        style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="path3276"
-       sodipodi:cx="656.68701"
-       sodipodi:cy="471.37259"
-       sodipodi:rx="108.83295"
-       sodipodi:ry="108.83295"
        d="M 765.51996,471.37259 A 108.83295,108.83295 0 1 1 547.85406,471.37259 A 108.83295,108.83295 0 1 1 765.51996,471.37259 z"
        transform="matrix(0.8480015,0,0,0.8480015,42.632065,71.647957)" />
     <text
        xml:space="preserve"
-       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:sans-serif;-inkscape-font-specification:Sans;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="511.35129"
        y="523.79059"
-       id="text3278"
-       sodipodi:linespacing="100%"><tspan
-         sodipodi:role="line"
+       id="text3278"><tspan
          id="tspan3280"
          x="511.35129"
-         y="523.79059">C4</tspan></text>
+         y="523.79059"
+         style="font-size:144px;line-height:1;font-family:sans-serif">C4</tspan></text>
   </g>
 </svg>

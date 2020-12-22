@@ -554,7 +554,7 @@ Turtles.TurtlesView = class {
         this._expandButton = null; // used by add method
         this._collapseButton = null; // used by add method
         this._clearButton = null; // used by add method
-        this._gridButton = null; // used by add method
+        this.gridButton = null; // used by add method
 
         // canvas background color
         this._backgroundColor = platformColor.background;
@@ -687,100 +687,6 @@ Turtles.TurtlesView = class {
         return this._invertY(y);
     }
 
-    /**
-     * Creates pie menu for Grid selection.
-     *
-     * @returns {void}
-     */
-    createGridPieMenu() {
-        docById("wheelDivptm").style.display = "none";
-        const x = this._gridButton.getBoundingClientRect().x;
-        const y = this._gridButton.getBoundingClientRect().y;
-        docById("wheelDivptm").style.position = "absolute";
-        docById("wheelDivptm").style.height = "400px";
-        docById("wheelDivptm").style.width = "400px";
-        docById("wheelDivptm").style.left =
-            Math.min(
-                logo.blocks.turtles._canvas.width - 200,
-                Math.max(0, x * logo.blocks.getStageScale())
-            ) - 350 + "px";
-        docById("wheelDivptm").style.top =
-            Math.min(
-                logo.blocks.turtles._canvas.height - 250,
-                Math.max(0, y * logo.blocks.getStageScale())
-            ) + "px";
-        docById("wheelDivptm").style.display = "";
-        
-        const grids = [
-            "imgsrc: images/grid/blank.svg", 
-            "imgsrc: images/grid/Cartesian.svg", 
-            "imgsrc: images/grid/Cartesian polar.svg", 
-            "imgsrc: images/grid/Polar.svg", 
-            "imgsrc: images/grid/Treble.svg", 
-            "imgsrc: images/grid/Grand.svg", 
-            "imgsrc: images/grid/Mezzo-soprano.svg", 
-            "imgsrc: images/grid/Alto.svg", 
-            "imgsrc: images/grid/Tenor.svg", 
-            "imgsrc: images/grid/Bass.svg", 
-            ""];
-        
-        const gridLabels = [
-            "Blank",
-            "Cartesian",
-            "Cartesian Polar",
-            "Polar",
-            "Treble",
-            "Grand",
-            "Mezzo Soprano",
-            "Alto",
-            "Tenor",
-            "Bass",
-            "Blank"
-        ];
-        this.gridWheel = new wheelnav("wheelDivptm", null, 300, 300);
-        this._exitWheel = new wheelnav("_exitWheel", this.gridWheel.raphael);
-
-        this.gridWheel.keynavigateEnabled = false;
-        this.gridWheel.slicePathFunction = slicePath().DonutSlice;
-        this.gridWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this.gridWheel.colors = platformColor.gridWheelcolors.wheel;
-        this.gridWheel.slicePathCustom.minRadiusPercent = 0.3;
-        this.gridWheel.slicePathCustom.maxRadiusPercent = 1;
-        this.gridWheel.sliceSelectedPathCustom = this.gridWheel.slicePathCustom;
-        this.gridWheel.sliceInitPathCustom = this.gridWheel.slicePathCustom;
-        this.gridWheel.animatetime = 0; // 300;
-        this.gridWheel.clickModeRotate = false;
-        const { fill, stroke } = platformColor.gridWheelcolors.selected;
-        this.gridWheel.sliceHoverAttr = { fill, stroke, 'stroke-width': 2 };
-        this.gridWheel.sliceSelectedAttr = { fill, stroke, 'stroke-width': 2 };
-        
-        this.gridWheel.clockwise = false;
-        this.gridWheel.initWheel(grids);
-        this.gridWheel.navItems[gridLabels.length - 1].enabled = false;
-        this.gridWheel.createWheel();
-        this.gridWheel.navigateWheel(this.currentGrid? this.currentGrid: 0);
-
-        for (let i = 0; i < gridLabels.length; i++) {
-            this.gridWheel.navItems[i].navigateFunction = this.doGrid;
-            this.gridWheel.navItems[i].setTooltip(gridLabels[i]);
-        }
-
-        this._exitWheel.colors = platformColor.exitWheelcolors;
-        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.3;
-        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["×", " "]);
-        
-        this._exitWheel.navItems[0].navigateFunction = () => {
-            docById("wheelDivptm").style.display = "none";
-            this.gridWheel.removeWheel();
-            this._exitWheel.removeWheel();
-        };
-    }
     /**
      * Creates the artwork for the turtle (mouse) 's skin.
      *
@@ -919,14 +825,14 @@ Turtles.TurtlesView = class {
          * Assigns click listener function to doGrid() method.
          */
         let __makeGridButton = () => {
-            this._gridButton = _makeButton(
+            this.gridButton = _makeButton(
                 CARTESIANBUTTON,
                 _("Grid"),
                 this._w - 10 - 3 * 55,
                 70 + LEADING + 6
             );
 
-            this._gridButton.onclick = (this.createGridPieMenu).bind(this);
+            this.gridButton.onclick = piemenuGrid;
         };
 
         /**
@@ -973,7 +879,7 @@ Turtles.TurtlesView = class {
                 }
                 this._expandButton.style.visibility = "visible";
                 this._collapseButton.style.visibility = "hidden";
-                this._gridButton.style.visibility = "hidden";
+                this.gridButton.style.visibility = "hidden";
                 __collapse();
             };
         };
@@ -1005,7 +911,7 @@ Turtles.TurtlesView = class {
                 this.hideMenu();
                 this.setStageScale(1.0);
                 this._expandedBoundary.visible = true;
-                this._gridButton.style.visibility = "visible";
+                this.gridButton.style.visibility = "visible";
                 this._collapseButton.style.visibility = "visible";
                 this._expandButton.style.visibility = "hidden";
                 this._collapsedBoundary.visible = false;
@@ -1027,12 +933,12 @@ Turtles.TurtlesView = class {
                 this._clearButton.scale = 1;
                 this._clearButton.x = this._w - 5 - 2 * 55;
 
-                if (this._gridButton !== null) {
-                    this._gridButton.scaleX = 1;
-                    this._gridButton.scaleY = 1;
-                    this._gridButton.scale = 1;
-                    this._gridButton.x = this._w - 10 - 3 * 55;
-                    this._gridButton.visible = true;
+                if (this.gridButton !== null) {
+                    this.gridButton.scaleX = 1;
+                    this.gridButton.scaleY = 1;
+                    this.gridButton.scale = 1;
+                    this.gridButton.x = this._w - 10 - 3 * 55;
+                    this.gridButton.visible = true;
                 }
 
                 // remove the stage and add it back in position 0

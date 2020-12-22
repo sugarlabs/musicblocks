@@ -1500,7 +1500,6 @@ function Activity() {
             _hideAlto();
             _hideTenor();
             _hideBass();
-            _hideTenor();
         }
     };
 
