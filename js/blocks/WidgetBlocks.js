@@ -415,9 +415,6 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.Oscilloscope === null) {
-                logo.Oscilloscope = new Oscilloscope();
-            }
             logo.oscilloscopeTurtles = [];
             logo.inOscilloscope = true;
 
@@ -425,7 +422,7 @@ function setupWidgetBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
-                logo.Oscilloscope.init(logo);
+                logo.Oscilloscope = new Oscilloscope(logo);
                 logo.inOscilloscope = false;
             };
 
