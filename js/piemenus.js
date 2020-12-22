@@ -3227,3 +3227,98 @@ piemenuBlockContext = function(block) {
         that.blocks.stageClick = false;
     }, 500);
 };
+
+/**
+ * Creates pie menu for Grid selection.
+ *
+ * @returns {void}
+ */
+piemenuGrid = function() {
+    docById("wheelDivptm").style.display = "none";
+    const x = turtles.gridButton.getBoundingClientRect().x;
+    const y = turtles.gridButton.getBoundingClientRect().y;
+    docById("wheelDivptm").style.position = "absolute";
+    docById("wheelDivptm").style.height = "400px";
+    docById("wheelDivptm").style.width = "400px";
+    docById("wheelDivptm").style.left =
+        Math.min(
+            logo.blocks.turtles._canvas.width - 200,
+            Math.max(0, x * logo.blocks.getStageScale())
+        ) - 350 + "px";
+    docById("wheelDivptm").style.top =
+        Math.min(
+            logo.blocks.turtles._canvas.height - 250,
+            Math.max(0, y * logo.blocks.getStageScale())
+        ) + "px";
+    docById("wheelDivptm").style.display = "";
+    
+    const grids = [
+        "imgsrc: images/grid/blank.svg", 
+        "imgsrc: images/grid/Cartesian.svg", 
+        "imgsrc: images/grid/Cartesian polar.svg", 
+        "imgsrc: images/grid/Polar.svg", 
+        "imgsrc: images/grid/Treble.svg", 
+        "imgsrc: images/grid/Grand.svg", 
+        "imgsrc: images/grid/Mezzo-soprano.svg", 
+        "imgsrc: images/grid/Alto.svg", 
+        "imgsrc: images/grid/Tenor.svg", 
+        "imgsrc: images/grid/Bass.svg", 
+        ""];
+    
+    const gridLabels = [
+        "Blank",
+        "Cartesian",
+        "Cartesian Polar",
+        "Polar",
+        "Treble",
+        "Grand",
+        "Mezzo Soprano",
+        "Alto",
+        "Tenor",
+        "Bass",
+        "Blank"
+    ];
+    turtles.gridWheel = new wheelnav("wheelDivptm", null, 300, 300);
+    turtles._exitWheel = new wheelnav("_exitWheel", turtles.gridWheel.raphael);
+
+    turtles.gridWheel.keynavigateEnabled = false;
+    turtles.gridWheel.slicePathFunction = slicePath().DonutSlice;
+    turtles.gridWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+    turtles.gridWheel.colors = platformColor.gridWheelcolors.wheel;
+    turtles.gridWheel.slicePathCustom.minRadiusPercent = 0.3;
+    turtles.gridWheel.slicePathCustom.maxRadiusPercent = 1;
+    turtles.gridWheel.sliceSelectedPathCustom = turtles.gridWheel.slicePathCustom;
+    turtles.gridWheel.sliceInitPathCustom = turtles.gridWheel.slicePathCustom;
+    turtles.gridWheel.animatetime = 0; // 300;
+    turtles.gridWheel.clickModeRotate = false;
+    const { fill, stroke } = platformColor.gridWheelcolors.selected;
+    turtles.gridWheel.sliceHoverAttr = { fill, stroke, 'stroke-width': 2 };
+    turtles.gridWheel.sliceSelectedAttr = { fill, stroke, 'stroke-width': 2 };
+    
+    turtles.gridWheel.clockwise = false;
+    turtles.gridWheel.initWheel(grids);
+    turtles.gridWheel.navItems[gridLabels.length - 1].enabled = false;
+    turtles.gridWheel.createWheel();
+    turtles.gridWheel.navigateWheel(turtles.currentGrid? turtles.currentGrid: 0);
+
+    for (let i = 0; i < gridLabels.length; i++) {
+        turtles.gridWheel.navItems[i].navigateFunction = turtles.doGrid;
+        turtles.gridWheel.navItems[i].setTooltip(gridLabels[i]);
+    }
+
+    turtles._exitWheel.colors = platformColor.exitWheelcolors;
+    turtles._exitWheel.slicePathFunction = slicePath().DonutSlice;
+    turtles._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+    turtles._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+    turtles._exitWheel.slicePathCustom.maxRadiusPercent = 0.3;
+    turtles._exitWheel.sliceSelectedPathCustom = turtles._exitWheel.slicePathCustom;
+    turtles._exitWheel.sliceInitPathCustom = turtles._exitWheel.slicePathCustom;
+    turtles._exitWheel.clickModeRotate = false;
+    turtles._exitWheel.createWheel(["×", " "]);
+    
+    turtles._exitWheel.navItems[0].navigateFunction = () => {
+        docById("wheelDivptm").style.display = "none";
+        turtles.gridWheel.removeWheel();
+        turtles._exitWheel.removeWheel();
+    };
+}
