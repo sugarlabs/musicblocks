@@ -9,13 +9,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-function MeterWidget() {
+class MeterWidget {
     // A pie menu is used to show the meter and strong beats
-    const BUTTONDIVWIDTH = 535;
-    const BUTTONSIZE = 53;
-    const ICONSIZE = 32;
+    static BUTTONDIVWIDTH = 535;
+    static BUTTONSIZE = 53;
+    static ICONSIZE = 32;
 
-    this.init = (logo, meterBlock, widgetBlock) => {
+    constructor(logo, meterBlock, widgetBlock) {
         this._logo = logo;
         this._meterBlock = meterBlock;
         this._strongBeats = [];
@@ -25,7 +25,7 @@ function MeterWidget() {
 
         let w = window.innerWidth;
         this._cellScale = w / 1200;
-        let iconSize = ICONSIZE * this._cellScale;
+        let iconSize = MeterWidget.ICONSIZE * this._cellScale;
 
         let widgetWindow = window.widgetWindows.windowFor(this, "meter");
         this.widgetWindow = widgetWindow;
@@ -48,7 +48,7 @@ function MeterWidget() {
         };
 
         this._click_lock = false;
-        const playBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
+        const playBtn = widgetWindow.addButton("play-button.svg", MeterWidget.ICONSIZE, _("Play"));
         playBtn.onclick = () => {
             if (this._get_click_lock()) {
                 return;
@@ -61,9 +61,9 @@ function MeterWidget() {
                         '" alt="' +
                         _("Play all") +
                         '" height="' +
-                        ICONSIZE +
+                        MeterWidget.ICONSIZE +
                         '" width="' +
-                        ICONSIZE +
+                        MeterWidget.ICONSIZE +
                         '" vertical-align="middle">&nbsp;&nbsp;';
                     this._playing = false;
                 } else {
@@ -73,9 +73,9 @@ function MeterWidget() {
                         '" alt="' +
                         _("Stop") +
                         '" height="' +
-                        ICONSIZE +
+                        MeterWidget.ICONSIZE +
                         '" width="' +
-                        ICONSIZE +
+                        MeterWidget.ICONSIZE +
                         '" vertical-align="middle">&nbsp;&nbsp;';
                     this._playing = true;
                     this._logo.turtleDelay = 0;
@@ -89,7 +89,11 @@ function MeterWidget() {
             }, 1000);
         };
 
-        widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Save")).onclick = () => {
+        widgetWindow.addButton(
+            "export-chunk.svg",
+            MeterWidget.ICONSIZE,
+            _("Save")
+        ).onclick = () => {
             this._save();
         };
 
@@ -140,7 +144,7 @@ function MeterWidget() {
 
         widgetWindow.addButton(
             "reload.svg",
-            ICONSIZE,
+            MeterWidget.ICONSIZE,
             //TRANS.: Reset the widget layout
             _("Reset")
         ).onclick = () => {
@@ -170,13 +174,13 @@ function MeterWidget() {
 
         this._logo.textMsg(_("Click in the circle to select strong beats for the meter."));
         widgetWindow.sendToCenter();
-    };
+    }
 
-    this._get_click_lock = () => {
+    _get_click_lock = () => {
         return this._click_lock;
     };
 
-    this.__playDrum = (drum) => {
+    __playDrum = (drum) => {
         this._logo.synth.trigger(
             0,
             "C4",
@@ -187,15 +191,15 @@ function MeterWidget() {
         );
     };
 
-    this.__getPlayingStatus = () => {
+    __getPlayingStatus = () => {
         return this._playing;
     };
 
-    this.__getPauseStatus = () => {
+    __getPauseStatus = () => {
         return !this._playing;
     };
 
-    this.__playOneBeat = (i, ms) => {
+    __playOneBeat = (i, ms) => {
         if (this.__getPauseStatus()) {
             for (let i = 0; i < this._strongBeats.length; i++) {
                 this._playWheel.navItems[i].navItem.hide();
@@ -222,7 +226,7 @@ function MeterWidget() {
         }, ms);
     };
 
-    this._playBeat = () => {
+    _playBeat = () => {
         let tur = this._logo.turtles.ithTurtle(0);
         let bpmFactor =
             TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
@@ -237,7 +241,7 @@ function MeterWidget() {
     /**
      * @deprecated
      */
-    this._addButton = (row, icon, iconSize, label) => {
+    _addButton = (row, icon, iconSize, label) => {
         let cell = row.insertCell(-1);
         cell.innerHTML =
             '&nbsp;&nbsp;<img src="header-icons/' +
@@ -251,7 +255,7 @@ function MeterWidget() {
             '" width="' +
             iconSize +
             '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-        cell.style.width = BUTTONSIZE + "px";
+        cell.style.width = MeterWidget.BUTTONSIZE + "px";
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.height = cell.style.width;
@@ -270,7 +274,7 @@ function MeterWidget() {
         return cell;
     };
 
-    this._save = () => {
+    _save = () => {
         // Export onbeatdo blocks for each strong beat
         let strongBeats = [];
         let newStack = [];
@@ -313,7 +317,7 @@ function MeterWidget() {
         this._logo.blocks.loadNewBlocks(newStack);
     };
 
-    this._piemenuMeter = (numberOfBeats, beatValue) => {
+    _piemenuMeter = (numberOfBeats, beatValue) => {
         // pie menu for strong beat selection
 
         docById("meterWheelDiv").style.display = "";
@@ -464,7 +468,7 @@ function MeterWidget() {
         this.setupDefaultStrongWeakBeats(numberOfBeats, beatValue);
     };
 
-    this.setupDefaultStrongWeakBeats = (numberOfBeats, beatValue) => {
+    setupDefaultStrongWeakBeats = (numberOfBeats, beatValue) => {
         if (beatValue == 0.25 && numberOfBeats == 4) {
             this._strongBeats[0] = true;
             this._strongBeats[2] = true;
