@@ -22,8 +22,8 @@ class HelpWidget {
 
         let widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         widgetWindow.getWidgetBody().style.overflowY = "auto";
-        const canvasHeight = docById("myCanvas").getBoundingClientRect().height;
-        widgetWindow.getWidgetBody().style.maxHeight = `${0.75 * canvasHeight}px`;
+        // const canvasHeight = docById("myCanvas").getBoundingClientRect().height;
+        widgetWindow.getWidgetBody().style.maxHeight = "500px";
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
