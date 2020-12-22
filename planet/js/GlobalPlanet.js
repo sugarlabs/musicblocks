@@ -431,7 +431,7 @@ function GlobalPlanet(Planet) {
             let debouncedfunction = debounce(this.search.bind(this), 250);
 
             document.getElementById('global-search').addEventListener('input',  (evt) => {
-                this.searchString = this.value;
+                this.searchString = document.getElementById('global-search').value;
                 debouncedfunction();
             });
 
