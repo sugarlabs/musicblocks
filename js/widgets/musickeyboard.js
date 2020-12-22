@@ -2941,8 +2941,11 @@ function MusicKeyboard() {
             this.midiON = false;
         }
 
-        navigator.requestMIDIAccess()
-            .then(onMIDISuccess, onMIDIFailure);
+        if (navigator.requestMIDIAccess)
+            navigator.requestMIDIAccess({ sysex: true })
+                .then(onMIDISuccess, onMIDIFailure);
+        else
+            logo.errorMsg(_("Failed to get MIDI access in browser."));
     }
 
     function fillChromaticGaps(noteList) {
