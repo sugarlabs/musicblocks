@@ -66,7 +66,7 @@ class StatusMatrix {
 
         // One column per mouse/turtle
         const activeTurtles = 0;
-        for (let t = 0; t < logo.turtles.turtleList.length; t++) {
+        for (let t in logo.turtles.turtleList) {
             if (logo.turtles.turtleList[t].inTrash) {
                 continue;
             }
@@ -108,7 +108,7 @@ class StatusMatrix {
 
         // One row per field, one column per mouse (plus the labels)
         let label;
-        for (let i = 0; i < logo.statusFields.length; i++) {
+        for (let i in logo.statusFields) {
             row = header.insertRow();
 
             cell = row.insertCell(); // i + 1);
@@ -154,7 +154,7 @@ class StatusMatrix {
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
 
-            for (let j = 0; j < activeTurtles; j++) {
+            for (let j in activeTurtles) {
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
                 cell.style.fontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) + "%";
@@ -172,7 +172,7 @@ class StatusMatrix {
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
 
-            for (let i = 0; i < activeTurtles; i++) {
+            for (let i in activeTurtles) {
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
                 cell.style.fontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) + "%";
@@ -191,7 +191,7 @@ class StatusMatrix {
 
         const activeTurtles = 0;
         let cell;
-        for (let t = 0; t < logo.turtles.turtleList.length; t++) {
+        for (let t in logo.turtles.turtleList) {
             const tur = logo.turtles.ithTurtle(t);
 
             if (logo.turtles.turtleList[t].inTrash) {
@@ -206,7 +206,7 @@ class StatusMatrix {
             let noteValue;
             let freq;
             let i;
-            for (i = 0; i < logo.statusFields.length; i++) {
+            for (i in logo.statusFields) {
                 saveStatus = logo.inStatusMatrix;
                 logo.inStatusMatrix = false;
 
@@ -257,7 +257,7 @@ class StatusMatrix {
                         value = "";
                         if (tur.singer.noteStatus != null) {
                             notes = tur.singer.noteStatus[0];
-                            for (let j = 0; j < notes.length; j++) {
+                            for (let j in notes) {
                                 if (j > 0) {
                                     value += " ";
                                 }
@@ -294,7 +294,7 @@ class StatusMatrix {
                 value = "";
                 if (tur.singer.noteStatus != null) {
                     notes = tur.singer.noteStatus[0];
-                    for (let j = 0; j < notes.length; j++) {
+                    for (let j in notes) {
                         if (typeof notes[j] === "number") {
                             note += toFixed2(notes[j]);
                             note += "Hz ";
