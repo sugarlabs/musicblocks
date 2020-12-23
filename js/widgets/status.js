@@ -13,28 +13,26 @@
 // notes as they are being played.
 
 class StatusMatrix {
-    constructor() {
-        this.BUTTONDIVWIDTH = 128;
-        this.BUTTONSIZE = 53;
-        this.ICONSIZE = 32;
-        this.OUTERWINDOWWIDTH = 620;
-        this.INNERWINDOWWIDTH = OUTERWINDOWWIDTH - BUTTONSIZE * 1.5;
-        this.FONTSCALEFACTOR = 75;
-        let x, y; //Drop coordinates of statusDiv
-    }
+    static BUTTONDIVWIDTH = 128;
+    static BUTTONSIZE = 53;
+    static ICONSIZE = 32;
+    static OUTERWINDOWWIDTH = 620;
+    static INNERWINDOWWIDTH = StatusMatrix.OUTERWINDOWWIDTH - StatusMatrix.BUTTONSIZE * 1.5;
+    static FONTSCALEFACTOR = 75;
 
-    init = () => {
+    init() {
+        let x, y; //Drop coordinates of statusDiv
         // Initializes the status matrix. First removes the
         // previous matrix and them make another one in DOM (document
         // object model)
 
         this.isOpen = true;
 
-        let w = window.innerWidth;
+        const w = window.innerWidth;
         this._cellScale = w / 1200;
-        let iconSize = ICONSIZE * this._cellScale;
+        let iconSize = StatusMatrix.ICONSIZE * this._cellScale;
 
-        let widgetWindow = window.widgetWindows.windowFor(this, "status", "status");
+        const widgetWindow = window.widgetWindows.windowFor(this, "status", "status");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -54,8 +52,8 @@ class StatusMatrix {
         // first column and a table of values (one per mouse) in the
         // remaining columns.
         // The first row contains the mice icons.
-        let header = this._statusTable.createTHead();
-        let row = header.insertRow();
+        const header = this._statusTable.createTHead();
+        const row = header.insertRow();
 
         iconSize = Math.floor(this._cellScale * 24);
 
@@ -63,11 +61,11 @@ class StatusMatrix {
         cell.style.backgroundColor = platformColor.selectorBackground;
         cell.className = "headcol";
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
-        cell.style.width = BUTTONSIZE * this._cellScale + "px";
+        cell.style.width = StatusMatrix.BUTTONSIZE * this._cellScale + "px";
         cell.innerHTML = "&nbsp;";
 
         // One column per mouse/turtle
-        let activeTurtles = 0;
+        const activeTurtles = 0;
         for (let t = 0; t < logo.turtles.turtleList.length; t++) {
             if (logo.turtles.turtleList[t].inTrash) {
                 continue;
@@ -99,7 +97,7 @@ class StatusMatrix {
                     iconSize +
                     '">&nbsp;&nbsp;';
             }
-            cell.style.width = BUTTONSIZE * this._cellScale + "px";
+            cell.style.width = StatusMatrix.BUTTONSIZE * this._cellScale + "px";
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
             cell.className = "headcol";
 
@@ -114,7 +112,7 @@ class StatusMatrix {
             row = header.insertRow();
 
             cell = row.insertCell(); // i + 1);
-            cell.style.fontSize = Math.floor(this._cellScale * FONTSCALEFACTOR) + "%";
+            cell.style.fontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) + "%";
 
             console.debug(logo.statusFields[i][1]);
 
@@ -159,7 +157,7 @@ class StatusMatrix {
             for (let j = 0; j < activeTurtles; j++) {
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
-                cell.style.fontSize = Math.floor(this._cellScale * FONTSCALEFACTOR) + "%";
+                cell.style.fontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) + "%";
                 cell.innerHTML = "";
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.textAlign = "center";
@@ -169,7 +167,7 @@ class StatusMatrix {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             row = header.insertRow();
             cell = row.insertCell();
-            cell.style.fontSize = Math.floor(this._cellScale * FONTSCALEFACTOR) + "%";
+            cell.style.fontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) + "%";
             cell.innerHTML = "&nbsp;<b>" + _("note") + "</b>";
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
@@ -177,7 +175,7 @@ class StatusMatrix {
             for (let i = 0; i < activeTurtles; i++) {
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
-                cell.style.fontSize = Math.floor(this._cellScale * FONTSCALEFACTOR) + "%";
+                cell.style.fontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) + "%";
                 cell.innerHTML = "";
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.textAlign = "center";
@@ -185,16 +183,16 @@ class StatusMatrix {
         }
 
         widgetWindow.sendToCenter();
-    };
+    }
 
-    updateAll = () => {
+    updateAll() {
         // Update status of all of the voices in the matrix.
         logo.updatingStatusMatrix = true;
 
-        let activeTurtles = 0;
+        const activeTurtles = 0;
         let cell;
         for (let t = 0; t < logo.turtles.turtleList.length; t++) {
-            let tur = logo.turtles.ithTurtle(t);
+            const tur = logo.turtles.ithTurtle(t);
 
             if (logo.turtles.turtleList[t].inTrash) {
                 continue;
@@ -290,6 +288,7 @@ class StatusMatrix {
             }
 
             let obj;
+            let note;
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 note = "";
                 value = "";
