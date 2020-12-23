@@ -291,6 +291,23 @@ function setupRhythmBlocks() {
                 [2, "hidden", 0, 0, [0, null]]
             ]);
         }
+
+        flow(args, logo, turtle, blk) {
+            let tur = logo.turtles.ithTurtle(turtle);
+            let arg = args[0] === null ? 0 : args[0];
+            tur.singer.skipFactor += arg;
+
+            let listenerName = "_skip_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = event => {
+                tur.singer.skipFactor -= arg;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            return [args[1], 1];
+        }
     }
 
     class MultiplyBeatFactorBlock extends FlowClampBlock {
@@ -432,7 +449,7 @@ function setupRhythmBlocks() {
         constructor() {
             super("rhythmicdot2");
             this.setPalette("rhythm");
-	    this.piemenuValuesC1 = [1, 2, 3];
+            this.piemenuValuesC1 = [1, 2, 3];
             this.setHelpString([
                 _("The Dot block extends the duration of a note by 50%.") +
                     " " +
