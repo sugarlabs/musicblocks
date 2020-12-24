@@ -176,11 +176,11 @@ class MeterWidget {
         widgetWindow.sendToCenter();
     }
 
-    _get_click_lock = () => {
+    _get_click_lock() {
         return this._click_lock;
     };
 
-    __playDrum = (drum) => {
+    __playDrum(drum) {
         this._logo.synth.trigger(
             0,
             "C4",
@@ -191,15 +191,15 @@ class MeterWidget {
         );
     };
 
-    __getPlayingStatus = () => {
+    __getPlayingStatus() {
         return this._playing;
     };
 
-    __getPauseStatus = () => {
+    __getPauseStatus() {
         return !this._playing;
     };
 
-    __playOneBeat = (i, ms) => {
+    __playOneBeat(i, ms) {
         if (this.__getPauseStatus()) {
             for (let i = 0; i < this._strongBeats.length; i++) {
                 this._playWheel.navItems[i].navItem.hide();
@@ -226,7 +226,7 @@ class MeterWidget {
         }, ms);
     };
 
-    _playBeat = () => {
+    _playBeat() {
         let tur = this._logo.turtles.ithTurtle(0);
         let bpmFactor =
             TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
@@ -241,7 +241,7 @@ class MeterWidget {
     /**
      * @deprecated
      */
-    _addButton = (row, icon, iconSize, label) => {
+    _addButton(row, icon, iconSize, label) {
         let cell = row.insertCell(-1);
         cell.innerHTML =
             '&nbsp;&nbsp;<img src="header-icons/' +
@@ -274,7 +274,7 @@ class MeterWidget {
         return cell;
     };
 
-    _save = () => {
+    _save() {
         // Export onbeatdo blocks for each strong beat
         let strongBeats = [];
         let newStack = [];
@@ -317,7 +317,7 @@ class MeterWidget {
         this._logo.blocks.loadNewBlocks(newStack);
     };
 
-    _piemenuMeter = (numberOfBeats, beatValue) => {
+    _piemenuMeter(numberOfBeats, beatValue) {
         // pie menu for strong beat selection
 
         docById("meterWheelDiv").style.display = "";
@@ -468,7 +468,7 @@ class MeterWidget {
         this.setupDefaultStrongWeakBeats(numberOfBeats, beatValue);
     };
 
-    setupDefaultStrongWeakBeats = (numberOfBeats, beatValue) => {
+    setupDefaultStrongWeakBeats(numberOfBeats, beatValue) {
         if (beatValue == 0.25 && numberOfBeats == 4) {
             this._strongBeats[0] = true;
             this._strongBeats[2] = true;
