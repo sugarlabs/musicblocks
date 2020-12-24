@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 // Copyright (c) 2016-20 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
@@ -65,8 +66,8 @@ class StatusMatrix {
         cell.innerHTML = "&nbsp;";
 
         // One column per mouse/turtle
-        const activeTurtles = 0;
-        for (let t in logo.turtles.turtleList) {
+        let activeTurtles = 0;
+        for (const t in logo.turtles.turtleList) {
             if (logo.turtles.turtleList[t].inTrash) {
                 continue;
             }
@@ -108,8 +109,8 @@ class StatusMatrix {
 
         // One row per field, one column per mouse (plus the labels)
         let label;
-        for (let i in logo.statusFields) {
-            row = header.insertRow();
+        for (const i in logo.statusFields) {
+            const row = header.insertRow();
 
             cell = row.insertCell(); // i + 1);
             cell.style.fontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) + "%";
@@ -154,7 +155,7 @@ class StatusMatrix {
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
 
-            for (let j in activeTurtles) {
+            for (const j in activeTurtles) {
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
                 cell.style.fontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) + "%";
@@ -165,14 +166,14 @@ class StatusMatrix {
         }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            row = header.insertRow();
+            const row = header.insertRow();
             cell = row.insertCell();
             cell.style.fontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) + "%";
             cell.innerHTML = "&nbsp;<b>" + _("note") + "</b>";
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
 
-            for (let i in activeTurtles) {
+            for (const i in activeTurtles) {
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
                 cell.style.fontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) + "%";
@@ -189,9 +190,9 @@ class StatusMatrix {
         // Update status of all of the voices in the matrix.
         logo.updatingStatusMatrix = true;
 
-        const activeTurtles = 0;
+        let activeTurtles = 0;
         let cell;
-        for (let t in logo.turtles.turtleList) {
+        for (const t in logo.turtles.turtleList) {
             const tur = logo.turtles.ithTurtle(t);
 
             if (logo.turtles.turtleList[t].inTrash) {
@@ -257,7 +258,7 @@ class StatusMatrix {
                         value = "";
                         if (tur.singer.noteStatus != null) {
                             notes = tur.singer.noteStatus[0];
-                            for (let j in notes) {
+                            for (const j in notes) {
                                 if (j > 0) {
                                     value += " ";
                                 }
@@ -294,7 +295,7 @@ class StatusMatrix {
                 value = "";
                 if (tur.singer.noteStatus != null) {
                     notes = tur.singer.noteStatus[0];
-                    for (let j in notes) {
+                    for (const j in notes) {
                         if (typeof notes[j] === "number") {
                             note += toFixed2(notes[j]);
                             note += "Hz ";
