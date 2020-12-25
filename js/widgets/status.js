@@ -282,7 +282,8 @@ class StatusMatrix {
 
                 logo.inStatusMatrix = saveStatus;
 
-                cell = this._statusTable.rows[i + 1].cells[activeTurtles + 1];
+                cell = this._statusTable && this._statusTable.rows[i + 1] &&
+                    this._statusTable.cells[activeTurtles + 1];
                 if (cell != null) {
                     cell.innerHTML = value;
                 }
@@ -310,7 +311,8 @@ class StatusMatrix {
                     note += obj[1] + "/" + obj[0];
                 }
 
-                cell = this._statusTable.rows[i + 1].cells[activeTurtles + 1];
+                cell = this._statusTable && this._statusTable.rows[i + 1] &&
+                    this._statusTable.cells[activeTurtles + 1];
                 if (cell != null) {
                     cell.innerHTML = note.replace(/#/g, "♯").replace(/b/g, "♭");
                 }
