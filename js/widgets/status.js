@@ -12,16 +12,18 @@
 // This widget makes displays the status of selected parameters and
 // notes as they are being played.
 
-function StatusMatrix() {
-    const BUTTONDIVWIDTH = 128;
-    const BUTTONSIZE = 53;
-    const ICONSIZE = 32;
-    const OUTERWINDOWWIDTH = 620;
-    const INNERWINDOWWIDTH = OUTERWINDOWWIDTH - BUTTONSIZE * 1.5;
-    const FONTSCALEFACTOR = 75;
-    let x, y; //Drop coordinates of statusDiv
+// constrants 
+const BUTTONDIVWIDTH = 128;
+const BUTTONSIZE = 53;
+const ICONSIZE = 32;
+const OUTERWINDOWWIDTH = 620;
+const INNERWINDOWWIDTH = OUTERWINDOWWIDTH - BUTTONSIZE * 1.5;
+const FONTSCALEFACTOR = 75;
+let x, y; //Drop coordinates of statusDiv
 
-    this.init = (logo) => {
+class StatusMatrix {
+    
+    init(logo) {
         // Initializes the status matrix. First removes the
         // previous matrix and them make another one in DOM (document
         // object model)
@@ -183,9 +185,9 @@ function StatusMatrix() {
         }
 
         widgetWindow.sendToCenter();
-    };
+    }
 
-    this.updateAll = () => {
+    updateAll() {
         // Update status of all of the voices in the matrix.
         this._logo.updatingStatusMatrix = true;
 
@@ -320,5 +322,5 @@ function StatusMatrix() {
         }
 
         this._logo.updatingStatusMatrix = false;
-    };
+    }
 }
