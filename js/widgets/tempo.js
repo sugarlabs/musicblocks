@@ -23,7 +23,7 @@ class Tempo {
     static YRADIUS = 75;
 
     constructor() {
-        this._xradius = YRADIUS / 3;
+        this._xradius = Tempo.YRADIUS / 3;
 
         this.BPMs = [];
         this.BPMInputs = [];
@@ -68,7 +68,7 @@ class Tempo {
 
             this._intervalID = setInterval(() => {
                 this._draw();
-            }, TEMPOINTERVAL);
+            }, Tempo.TEMPOINTERVAL);
         };
 
         this._useBPM = function (i) {
@@ -128,7 +128,7 @@ class Tempo {
                 // Are we done yet?
                 if (d.getTime() > this._widgetNextTimes[i]) {
                     // Play a tone.
-                    this._logo.synth.trigger(0, ["C2"], 0.0625, TEMPOSYNTH, null, null, false);
+                    this._logo.synth.trigger(0, ["C2"], 0.0625, Tempo.TEMPOSYNTH, null, null, false);
                     this._widgetNextTimes[i] += this._intervals[i];
 
                     // Ensure we are at the edge.
@@ -146,12 +146,12 @@ class Tempo {
                     }
 
                     // Set this._xradius based on the dx to achieve the compressing effect
-                    if (tempoCanvas.width - dx <= YRADIUS / 3) {
+                    if (tempoCanvas.width - dx <= Tempo.YRADIUS / 3) {
                         this._xradius = tempoCanvas.width - dx;
-                    } else if (dx <= YRADIUS / 3) {
+                    } else if (dx <= Tempo.YRADIUS / 3) {
                         this._xradius = dx;
                     } else {
-                        this._xradius = YRADIUS / 3;
+                        this._xradius = Tempo.YRADIUS / 3;
                     }
 
                     // Set x based on dx and direction
@@ -175,7 +175,7 @@ class Tempo {
                 ctx.clearRect(0, 0, tempoCanvas.width, tempoCanvas.height);
                 ctx.beginPath();
                 ctx.fillStyle = "rgba(0,0,0,1)";
-                ctx.ellipse(x, YRADIUS, Math.max(this._xradius, 1), YRADIUS, 0, 0, Math.PI * 2);
+                ctx.ellipse(x, Tempo.YRADIUS, Math.max(this._xradius, 1), Tempo.YRADIUS, 0, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.closePath();
             }
@@ -230,14 +230,14 @@ class Tempo {
 
             this._intervalID = null;
 
-            this._logo.synth.loadSynth(0, getDrumSynthName(TEMPOSYNTH));
+            this._logo.synth.loadSynth(0, getDrumSynthName(Tempo.TEMPOSYNTH));
 
             if (this._intervalID != null) {
                 clearInterval(this._intervalID);
             }
 
             let w = window.innerWidth;
-            let iconSize = ICONSIZE;
+            let iconSize = Tempo.ICONSIZE;
 
             let widgetWindow = window.widgetWindows.windowFor(this, "tempo");
             this.widgetWindow = widgetWindow;
@@ -251,7 +251,7 @@ class Tempo {
                 widgetWindow.destroy();
             };
 
-            let pauseBtn = widgetWindow.addButton("pause-button.svg", ICONSIZE, _("Pause"));
+            let pauseBtn = widgetWindow.addButton("pause-button.svg", Tempo.ICONSIZE, _("Pause"));
             pauseBtn.onclick = () => {
                 if (this.isMoving) {
                     this.pause();
@@ -261,9 +261,9 @@ class Tempo {
                         '" alt="' +
                         _("Pause") +
                         '" height="' +
-                        ICONSIZE +
+                        Tempo.ICONSIZE +
                         '" width="' +
-                        ICONSIZE +
+                        Tempo.ICONSIZE +
                         '" vertical-align="middle">';
                     this.isMoving = false;
                 } else {
@@ -274,9 +274,9 @@ class Tempo {
                         '" alt="' +
                         _("Play") +
                         '" height="' +
-                        ICONSIZE +
+                        Tempo.ICONSIZE +
                         '" width="' +
-                        ICONSIZE +
+                        Tempo.ICONSIZE +
                         '" vertical-align="middle">';
                     this.isMoving = true;
                 }
@@ -310,20 +310,20 @@ class Tempo {
                 r2 = this.bodyTable.insertRow();
                 r3 = this.bodyTable.insertRow();
 
-                widgetWindow.addButton("up.svg", ICONSIZE, _("speed up"), r1.insertCell()).onclick = ((
+                widgetWindow.addButton("up.svg", Tempo.ICONSIZE, _("speed up"), r1.insertCell()).onclick = ((
                     i
                 ) => () => this.speedUp(i))(i);
                 widgetWindow.addButton(
                     "down.svg",
-                    ICONSIZE,
+                    Tempo.ICONSIZE,
                     _("slow down"),
                     r2.insertCell()
                 ).onclick = ((i) => () => this.slowDown(i))(i);
 
                 this.BPMInputs[i] = widgetWindow.addInputButton(this.BPMs[i], r3.insertCell());
                 this.tempoCanvases[i] = document.createElement("canvas");
-                this.tempoCanvases[i].style.width = TEMPOWIDTH + "px";
-                this.tempoCanvases[i].style.height = TEMPOHEIGHT + "px";
+                this.tempoCanvases[i].style.width = Tempo.TEMPOWIDTH + "px";
+                this.tempoCanvases[i].style.height = Tempo.TEMPOHEIGHT + "px";
                 this.tempoCanvases[i].style.margin = "1px";
                 this.tempoCanvases[i].style.background = "rgba(255, 255, 255, 1)";
                 tcCell = r1.insertCell();
