@@ -1727,7 +1727,7 @@ class Block {
 
         image.onload = function () {
             // Before adding new artwork, remove any old artwork.
-            // that.removeChildBitmap("media");
+            that.removeChildBitmap("media");
 
             let bitmap = new createjs.Bitmap(image);
             bitmap.name = "media";
