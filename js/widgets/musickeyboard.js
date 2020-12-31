@@ -2205,9 +2205,7 @@ function MusicKeyboard() {
             elementid, elementid2; 
         for (let p = 0; p < this.layout.length; p++) {
             // If the blockNumber is null, don't add a label.
-            console.log(`All note names = ${this.layout[p].noteName}`);
             if (this.layout[p].noteName > FAKEBLOCKNUMBER) {
-                console.log(`Possibility 1 - note name = ${this.layout[p].noteName}`);
                 parenttbl2 = document.getElementById("myrow2");
                 newel2 = document.createElement("td");
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
@@ -2304,7 +2302,6 @@ function MusicKeyboard() {
                 this.layout[p].noteName.indexOf(SHARP) !== -1 ||
                 this.layout[p].noteName.indexOf("#") !== -1
             ) {
-                console.log(`Possibility 2 - note name = ${this.layout[p].noteName}`);
                 parenttbl2 = document.getElementById("myrow2");
                 newel2 = document.createElement("td");
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
@@ -2360,13 +2357,11 @@ function MusicKeyboard() {
                 myrow2Id++;
                 newel2.style.position = "relative";
                 newel2.style.zIndex = "200";
-                console.log(newel2);
                 parenttbl2.appendChild(newel2);
             } else if (
                 this.layout[p].noteName.indexOf(FLAT) !== -1 ||
                 this.layout[p].noteName.indexOf("b") !== -1
             ) {
-                console.log(`Possibility 3 - note name = ${this.layout[p].noteName}`);
                 parenttbl2 = document.getElementById("myrow2");
                 newel2 = document.createElement("td");
                 elementid2 = document.getElementsByTagName("td").length;
@@ -3018,7 +3013,6 @@ function MusicKeyboard() {
                 thisOctave = obj[1];
                 lastVoice = noteList[i].voice;
                 obj[0] = convertFromSolfege(obj[0]);
-                // console.log(`from fillChromaticGaps ${obj[0]}`);
                 let k = PITCHES.indexOf(obj[0]);
                 if (k === -1) {
                     k = PITCHES2.indexOf(obj[0]);
