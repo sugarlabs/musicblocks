@@ -554,13 +554,15 @@ Turtles.TurtlesView = class {
         this._expandButton = null; // used by add method
         this._collapseButton = null; // used by add method
         this._clearButton = null; // used by add method
-        this._gridButton = null; // used by add method
+        this.gridButton = null; // used by add method
 
         // canvas background color
         this._backgroundColor = platformColor.background;
 
         this._locked = false;
         this._queue = []; // temporarily stores [w, h, scale]
+
+        this.currentGrid = null;
     }
 
     /**
@@ -823,18 +825,14 @@ Turtles.TurtlesView = class {
          * Assigns click listener function to doGrid() method.
          */
         let __makeGridButton = () => {
-            this._gridButton = _makeButton(
+            this.gridButton = _makeButton(
                 CARTESIANBUTTON,
-                _("show Cartesian"),
+                _("Grid"),
                 this._w - 10 - 3 * 55,
                 70 + LEADING + 6
             );
 
-            this._gridButton.onclick = (event) => {
-                this.doGrid();
-                this._gridButton.setAttribute("data-tooltip", this._gridLabel);
-                jQuery.noConflict()(".tooltipped").tooltip("close");
-            };
+            this.gridButton.onclick = piemenuGrid;
         };
 
         /**
@@ -881,7 +879,7 @@ Turtles.TurtlesView = class {
                 }
                 this._expandButton.style.visibility = "visible";
                 this._collapseButton.style.visibility = "hidden";
-                this._gridButton.style.visibility = "hidden";
+                this.gridButton.style.visibility = "hidden";
                 __collapse();
             };
         };
@@ -913,7 +911,7 @@ Turtles.TurtlesView = class {
                 this.hideMenu();
                 this.setStageScale(1.0);
                 this._expandedBoundary.visible = true;
-                this._gridButton.style.visibility = "visible";
+                this.gridButton.style.visibility = "visible";
                 this._collapseButton.style.visibility = "visible";
                 this._expandButton.style.visibility = "hidden";
                 this._collapsedBoundary.visible = false;
@@ -935,12 +933,12 @@ Turtles.TurtlesView = class {
                 this._clearButton.scale = 1;
                 this._clearButton.x = this._w - 5 - 2 * 55;
 
-                if (this._gridButton !== null) {
-                    this._gridButton.scaleX = 1;
-                    this._gridButton.scaleY = 1;
-                    this._gridButton.scale = 1;
-                    this._gridButton.x = this._w - 10 - 3 * 55;
-                    this._gridButton.visible = true;
+                if (this.gridButton !== null) {
+                    this.gridButton.scaleX = 1;
+                    this.gridButton.scaleY = 1;
+                    this.gridButton.scale = 1;
+                    this.gridButton.x = this._w - 10 - 3 * 55;
+                    this.gridButton.visible = true;
                 }
 
                 // remove the stage and add it back in position 0

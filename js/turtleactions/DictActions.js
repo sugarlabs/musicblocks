@@ -90,6 +90,10 @@ function setupDictActions() {
                     pitchToNumber(obj[0], obj[1], targetTur.singer.keySignature) -
                     targetTur.singer.pitchNumberOffset
                 );
+            } else if (target in logo.turtleDicts &&
+                       target in logo.turtleDicts[target] &&
+                       key in logo.turtleDicts[target][target]) {
+                    return logo.turtleDicts[target][target][key];
             } else {
                 if (target in logo.turtleDicts[turtle]) {
                     return logo.turtleDicts[turtle][target][key];
@@ -241,7 +245,6 @@ function setupDictActions() {
         static getValue(dict, key, turtle) {
             // Not sure this can happen.
             if (!(turtle in logo.turtleDicts)) return 0;
-
             // Is the dictionary the same as a turtle name?
             const target = getTargetTurtle(turtles, dict);
             if (target !== null) {

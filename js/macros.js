@@ -52,10 +52,11 @@ function blockIsMacro(blkname) {
         "broadcasthelp",
         "chorushelp",
         "clickhelp",
-	"cursordownhelp",
-	"cursorouthelp",
-	"cursoroverhelp",
-	"cursoruphelp",
+        "currentpitchhelp",
+        "cursordownhelp",
+        "cursorouthelp",
+        "cursoroverhelp",
+        "cursoruphelp",
         "decrescendohelp",
         "deltapitchhelp",
         "dishelp",
@@ -328,6 +329,20 @@ function getMacroExpansion(blkname, x, y) {
         [14, "playdrum", 0, 0, [13, 16, null]],
         [15, "hidden", 0, 0, [9, null]],
         [16, "turtlename", 0, 0, [14]]
+    ];
+    const CURRENTPITCHHELP = [
+        [0, "newnote", x, y, [null, 1, 4, 8]],
+        [1, "divide", 0, 0, [0, 2, 3]],
+        [2, ["number", { "value": 1 }], 0, 0, [1]],
+        [3, ["number", { "value": 4 }], 0, 0, [1]],
+        [4, "vspace", 0, 0, [0, 5]],
+        [5, "pitch", 0, 0, [4, 6, 7, null]],
+        [6, ["solfege", { "value": "sol" }], 0, 0, [5]],
+        [7, ["number", { "value": 4 }], 0, 0, [5]],
+        [8, "hidden", 0, 0, [0, 9]],
+        [9, "print", 0, 0, [8, 10, null]],
+        [10, ["outputtools", { "value": "pitch in hertz" }], 0, 0, [9, 11]],
+        [11, "currentpitch", 0, 0, [10]]
     ];
     const CURSORDOWNHELP = [
         [0, ["start", { collapsed: false }], x, y, [null, 1, null]],
@@ -1169,27 +1184,36 @@ function getMacroExpansion(blkname, x, y) {
         [24, "hidden", 0, 0, [16, null]]
     ];
     const OUTPUTTOOLSHELP = [
-        [0,["status",{"collapsed":false}],468,153,[null,1,4]],
-        [1,"hidden",482,194,[0,19]],
-        [2,"print",482,418,[11,6,13]],
-        [3,"print",482,290,[17,5,7]],
-        [4,"hiddennoflow",483,507,[0,null]],
-        [5,["outputtools",{"value":"pitch number"}],556,290,[3]],
-        [6,["outputtools",{"value":"nth degree"}],556,418,[2]],
-        [7,"print",482,322,[3,8,9]],
-        [8,["outputtools",{"value":"pitch in hertz"}],556,322,[7]],
-        [9,"print",482,354,[7,10,11]],
-        [10,["outputtools",{"value":"scalar class"}],556,354,[9]],
-        [11,"print",482,386,[9,12,2]],
-        [12,["outputtools",{"value":"scale degree"}],556,386,[11]],
-        [13,"print",482,450,[2,14,null]],
-        [14,["outputtools",{"value":"staff y"}],556,450,[13]],
-        [15,"print",482,226,[19,16,17]],
-        [16,["outputtools",{"value":"solfege syllable"}],556,226,[15]],
-        [17,"print",482,258,[15,18,3]],
-        [18,["outputtools",{"value":"pitch class"}],556,258,[17]],
-        [19,"print",482,194,[1,20,15]],
-        [20,["outputtools",{"value":"letter class"}],556,194,[19]]
+        [0, ["status", {"collapsed":false}], x, y, [null, 1, 4]],
+        [1, "hidden", 0, 0, [0, 19]],
+        [2, "print", 0, 0, [11, 6, 13]],
+        [3, "print", 0, 0, [17, 5, 7]],
+        [4, "hiddennoflow", 0, 0, [0, null]],
+        [5, ["outputtools", {"value":"pitch number"}], 0, 0, [3,  21]],
+        [6, ["outputtools", {"value":"nth degree"}], 0, 0, [2,  22]],
+        [7, "print", 0, 0, [3, 8, 9]],
+        [8, ["outputtools", {"value":"pitch in hertz"}], 0, 0, [7,  23]],
+        [9, "print", 0, 0, [7, 10, 11]],
+        [10, ["outputtools", {"value":"scalar class"}], 0, 0, [9,  24]],
+        [11, "print", 0, 0, [9, 12, 2]],
+        [12, ["outputtools", {"value":"scale degree"}], 0, 0, [11,  25]],
+        [13, "print", 0, 0, [2, 14, null]],
+        [14, ["outputtools", {"value":"staff y"}], 0, 0, [13,  26]],
+        [15, "print", 0, 0, [19, 16, 17]],
+        [16, ["outputtools", {"value":"solfege syllable"}], 0, 0, [15,  27]],
+        [17, "print", 0, 0, [15, 18, 3]],
+        [18, ["outputtools", {"value":"pitch class"}], 0, 0, [17,  28]],
+        [19, "print", 0, 0, [1, 20, 15]],
+        [20, ["outputtools", {"value":"letter class"}], 0, 0, [19,  29]],
+        [21, "currentpitch", 0, 0, [5]],
+        [22, "currentpitch", 0, 0, [6]],
+        [23, "currentpitch", 0, 0, [8]],
+        [24, "currentpitch", 0, 0, [10]],
+        [25, "currentpitch", 0, 0, [12]],
+        [26, "currentpitch", 0, 0, [14]],
+        [27, "currentpitch", 0, 0, [16]],
+        [28, "currentpitch", 0, 0, [18]],
+        [29, "currentpitch", 0, 0, [20]]
     ];
     const PHASERHELP = [
         [0, "phaser", x, y, [null, 1, 2, 3, 4, null]],
@@ -1626,10 +1650,11 @@ function getMacroExpansion(blkname, x, y) {
         broadcasthelp: BROADCASTHELP,
         chorushelp: CHORUSHELP,
         clickhelp: CLICKHELP,
-	cursordownhelp: CURSORDOWNHELP,
-	cursorouthelp: CURSOROUTHELP,
-	cursoroverhelp: CURSOROVERHELP,
-	cursoruphelp: CURSORUPHELP,
+        currentpitchhelp: CURRENTPITCHHELP,
+        cursordownhelp: CURSORDOWNHELP,
+        cursorouthelp: CURSOROUTHELP,
+        cursoroverhelp: CURSOROVERHELP,
+        cursoruphelp: CURSORUPHELP,
         crescendohelp: CRESCENDOHELP,
         decrescendohelp: DECRESCENDOHELP,
         deletehelp: DELETEHELP,
@@ -1688,7 +1713,7 @@ function getMacroExpansion(blkname, x, y) {
     };
 
     if (["namedbox", "nameddo", "namedcalc",
-	 "namedarg", "nameddoArg"].indexOf(blkname) === -1 &&
+         "namedarg", "nameddoArg"].indexOf(blkname) === -1 &&
         blkname in BUILTINMACROS) {
         return BUILTINMACROS[blkname];
     } else {

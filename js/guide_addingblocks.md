@@ -38,7 +38,7 @@ block is defined.
    
 2. Assign the block to a palette.
   
-   `newlock.palette = palettes.dict['palettename'];`
+   `newblock.palette = palettes.dict['palettename'];`
 
    Palettename can be pitch, tone, rythm, etc. The color of the block
    is determined by the palette to which it is assigned. A complete
