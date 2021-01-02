@@ -12,44 +12,44 @@
 // This widget enable us to manipulate the beats per minute. It
 // behaves like a metronome and updates the master BPM block.
 
-function Tempo() {
-    const TEMPOSYNTH = "bottle";
-    const TEMPOINTERVAL = 5;
-    const BUTTONDIVWIDTH = 476; // 8 buttons 476 = (55 + 4) * 8
-    const BUTTONSIZE = 53;
-    const ICONSIZE = 32;
-    const TEMPOWIDTH = 700;
-    const TEMPOHEIGHT = 100;
-    const YRADIUS = 75;
+class Tempo {
+    static TEMPOSYNTH = "bottle";
+    static TEMPOINTERVAL = 5;
+    static BUTTONDIVWIDTH = 476; // 8 buttons 476 = (55 + 4) * 8
+    static BUTTONSIZE = 53;
+    static ICONSIZE = 32;
+    static TEMPOWIDTH = 700;
+    static TEMPOHEIGHT = 100;
+    static YRADIUS = 75;
+    constructor() {
+        this._xradius = Tempo.YRADIUS / 3;
+        this.BPMs = [];
+        this.BPMInputs = [];
+        this.BPMBlocks = [];
+        this.tempoCanvases = [];
+    }
 
-    this._xradius = YRADIUS / 3;
-
-    this.BPMs = [];
-    this.BPMInputs = [];
-    this.BPMBlocks = [];
-    this.tempoCanvases = [];
-
-    this._updateBPM = function (i) {
+    _updateBPM(i) {
         this._intervals[i] = (60 / this.BPMs[i]) * 1000;
 
         let blockNumber;
         if (this.BPMBlocks[i] != null) {
-            blockNumber = this._logo.blocks.blockList[this.BPMBlocks[i]].connections[1];
+            blockNumber = logo.blocks.blockList[this.BPMBlocks[i]].connections[1];
             if (blockNumber != null) {
-                this._logo.blocks.blockList[blockNumber].value = parseFloat(this.BPMs[i]);
-                this._logo.blocks.blockList[blockNumber].text.text = this.BPMs[i];
-                this._logo.blocks.blockList[blockNumber].updateCache();
-                this._logo.refreshCanvas();
+                logo.blocks.blockList[blockNumber].value = parseFloat(this.BPMs[i]);
+                logo.blocks.blockList[blockNumber].text.text = this.BPMs[i];
+                logo.blocks.blockList[blockNumber].updateCache();
+                logo.refreshCanvas();
                 saveLocally();
             }
         }
-    };
+    }
 
-    this.pause = function () {
+    pause() {
         clearInterval(this._intervalID);
-    };
+    }
 
-    this.resume = function () {
+    resume() {
         // Reset widget time since we are restarting.
         // We will no longer keep synch with the turtles.
         let d = new Date();
@@ -60,31 +60,30 @@ function Tempo() {
         }
 
         // Restart the interval.
-
         if (this._intervalID !== null) {
             clearInterval(this._intervalID);
         }
 
         this._intervalID = setInterval(() => {
             this._draw();
-        }, TEMPOINTERVAL);
-    };
+        }, Tempo.TEMPOINTERVAL);
+    }
 
-    this._useBPM = function (i) {
+    _useBPM(i) {
         this.BPMs[i] = this.BPMInputs[i].value;
         if (this.BPMs[i] > 1000) {
             this.BPMs[i] = 1000;
-            this._logo.errorMsg(_("The beats per minute must be between 30 and 1000."));
+            logo.errorMsg(_("The beats per minute must be between 30 and 1000."));
         } else if (this.BPMs[i] < 30) {
             this.BPMs[i] = 30;
-            this._logo.errorMsg(_("The beats per minute must be between 30 and 1000."));
+            logo.errorMsg(_("The beats per minute must be between 30 and 1000."));
         }
 
         this._updateBPM(i);
         this.BPMInputs[i].value = this.BPMs[i];
-    };
+    }
 
-    this.speedUp = function (i) {
+    speedUp(i) {
         this.BPMs[i] = parseFloat(this.BPMs[i]) + Math.round(0.1 * this.BPMs[i]);
 
         if (this.BPMs[i] > 1000) {
@@ -93,9 +92,9 @@ function Tempo() {
 
         this._updateBPM(i);
         this.BPMInputs[i].value = this.BPMs[i];
-    };
+    }
 
-    this.slowDown = function (i) {
+    slowDown(i) {
         this.BPMs[i] = parseFloat(this.BPMs[i]) - Math.round(0.1 * this.BPMs[i]);
         if (this.BPMs[i] < 30) {
             this.BPMs[i] = 30;
@@ -105,14 +104,15 @@ function Tempo() {
         this.BPMInputs[i].value = this.BPMs[i];
     };
 
-    this._draw = function () {
+    _draw() {
         // First thing to do is figure out where we are supposed to be
         // based on the elapsed time.
         let d = new Date();
         let tempoCanvas, deltaTime, dx, x, ctx;
         for (let i = 0; i < this.BPMs.length; i++) {
             tempoCanvas = this.tempoCanvases[i];
-            if (!tempoCanvas) continue;
+            if (!tempoCanvas)
+                continue;
 
             // We start the music clock as the first note is being
             // played.
@@ -127,7 +127,7 @@ function Tempo() {
             // Are we done yet?
             if (d.getTime() > this._widgetNextTimes[i]) {
                 // Play a tone.
-                this._logo.synth.trigger(0, ["C2"], 0.0625, TEMPOSYNTH, null, null, false);
+                logo.synth.trigger(0, ["C2"], 0.0625, Tempo.TEMPOSYNTH, null, null, false);
                 this._widgetNextTimes[i] += this._intervals[i];
 
                 // Ensure we are at the edge.
@@ -145,12 +145,12 @@ function Tempo() {
                 }
 
                 // Set this._xradius based on the dx to achieve the compressing effect
-                if (tempoCanvas.width - dx <= YRADIUS / 3) {
+                if (tempoCanvas.width - dx <= Tempo.YRADIUS / 3) {
                     this._xradius = tempoCanvas.width - dx;
-                } else if (dx <= YRADIUS / 3) {
+                } else if (dx <= Tempo.YRADIUS / 3) {
                     this._xradius = dx;
                 } else {
-                    this._xradius = YRADIUS / 3;
+                    this._xradius = Tempo.YRADIUS / 3;
                 }
 
                 // Set x based on dx and direction
@@ -174,13 +174,13 @@ function Tempo() {
             ctx.clearRect(0, 0, tempoCanvas.width, tempoCanvas.height);
             ctx.beginPath();
             ctx.fillStyle = "rgba(0,0,0,1)";
-            ctx.ellipse(x, YRADIUS, Math.max(this._xradius, 1), YRADIUS, 0, 0, Math.PI * 2);
+            ctx.ellipse(x, Tempo.YRADIUS, Math.max(this._xradius, 1), Tempo.YRADIUS, 0, 0, Math.PI * 2);
             ctx.fill();
             ctx.closePath();
         }
-    };
+    }
 
-    this.__save = function (i) {
+    __save(i) {
         setTimeout(() => {
             console.debug("saving a BPM block for " + this.BPMs[i]);
             let delta = i * 42;
@@ -192,25 +192,23 @@ function Tempo() {
                 [4, ["number", { value: 4 }], 0, 0, [2]],
                 [5, ["vspace", {}], 0, 0, [0, null]]
             ];
-            this._logo.blocks.loadNewBlocks(newStack);
-            this._logo.textMsg(_("New action block generated!"));
+            logo.blocks.loadNewBlocks(newStack);
+            logo.textMsg(_("New action block generated!"));
         }, 200 * i);
-    };
+    }
 
-    this._saveTempo = function () {
+    _saveTempo() {
         // Save a BPM block for each tempo.
-
         for (let i = 0; i < this.BPMs.length; i++) {
             this.__save(i);
         }
-    };
+    }
 
-    this._get_save_lock = function () {
+    _get_save_lock() {
         return this._save_lock;
     };
 
-    this.init = function (logo) {
-        this._logo = logo;
+    init(logo) {
         this._directions = [];
         this._widgetFirstTimes = [];
         this._widgetNextTimes = [];
@@ -222,15 +220,13 @@ function Tempo() {
         }
 
         this._intervalID = null;
-
-        this._logo.synth.loadSynth(0, getDrumSynthName(TEMPOSYNTH));
+        logo.synth.loadSynth(0, getDrumSynthName(Tempo.TEMPOSYNTH));
 
         if (this._intervalID != null) {
             clearInterval(this._intervalID);
         }
 
         let w = window.innerWidth;
-        let iconSize = ICONSIZE;
 
         let widgetWindow = window.widgetWindows.windowFor(this, "tempo");
         this.widgetWindow = widgetWindow;
@@ -244,7 +240,7 @@ function Tempo() {
             widgetWindow.destroy();
         };
 
-        let pauseBtn = widgetWindow.addButton("pause-button.svg", ICONSIZE, _("Pause"));
+        let pauseBtn = widgetWindow.addButton("pause-button.svg", Tempo.ICONSIZE, _("Pause"));
         pauseBtn.onclick = () => {
             if (this.isMoving) {
                 this.pause();
@@ -254,9 +250,9 @@ function Tempo() {
                     '" alt="' +
                     _("Pause") +
                     '" height="' +
-                    ICONSIZE +
+                    Tempo.ICONSIZE +
                     '" width="' +
-                    ICONSIZE +
+                    Tempo.ICONSIZE +
                     '" vertical-align="middle">';
                 this.isMoving = false;
             } else {
@@ -267,16 +263,16 @@ function Tempo() {
                     '" alt="' +
                     _("Play") +
                     '" height="' +
-                    ICONSIZE +
+                    Tempo.ICONSIZE +
                     '" width="' +
-                    ICONSIZE +
+                    Tempo.ICONSIZE +
                     '" vertical-align="middle">';
                 this.isMoving = true;
             }
         };
 
         this._save_lock = false;
-        widgetWindow.addButton("export-chunk.svg", iconSize, _("Save tempo"), "").onclick = () => {
+        widgetWindow.addButton("export-chunk.svg", Tempo.ICONSIZE, _("Save tempo"), "").onclick = () => {
             // Debounce button
             if (!this._get_save_lock()) {
                 this._save_lock = true;
@@ -291,7 +287,7 @@ function Tempo() {
         let r1, r2, r3, tcCell;
         for (let i = 0; i < this.BPMs.length; i++) {
             this._directions.push(1);
-            this._widgetFirstTimes.push(this._logo.firstNoteTime);
+            this._widgetFirstTimes.push(logo.firstNoteTime);
             if (this.BPMs[i] <= 0) {
                 this.BPMs[i] = 30;
             }
@@ -302,21 +298,20 @@ function Tempo() {
             r1 = this.bodyTable.insertRow();
             r2 = this.bodyTable.insertRow();
             r3 = this.bodyTable.insertRow();
-
-            widgetWindow.addButton("up.svg", ICONSIZE, _("speed up"), r1.insertCell()).onclick = ((
+            widgetWindow.addButton("up.svg", Tempo.ICONSIZE, _("speed up"), r1.insertCell()).onclick = ((
                 i
             ) => () => this.speedUp(i))(i);
             widgetWindow.addButton(
                 "down.svg",
-                ICONSIZE,
+                Tempo.ICONSIZE,
                 _("slow down"),
                 r2.insertCell()
             ).onclick = ((i) => () => this.slowDown(i))(i);
 
             this.BPMInputs[i] = widgetWindow.addInputButton(this.BPMs[i], r3.insertCell());
             this.tempoCanvases[i] = document.createElement("canvas");
-            this.tempoCanvases[i].style.width = TEMPOWIDTH + "px";
-            this.tempoCanvases[i].style.height = TEMPOHEIGHT + "px";
+            this.tempoCanvases[i].style.width = Tempo.TEMPOWIDTH + "px";
+            this.tempoCanvases[i].style.height = Tempo.TEMPOHEIGHT + "px";
             this.tempoCanvases[i].style.margin = "1px";
             this.tempoCanvases[i].style.background = "rgba(255, 255, 255, 1)";
             tcCell = r1.insertCell();
@@ -354,9 +349,9 @@ function Tempo() {
             );
         }
 
-        this._logo.textMsg(_("Adjust the tempo with the buttons."));
+        logo.textMsg(_("Adjust the tempo with the buttons."));
         this.resume();
 
         widgetWindow.sendToCenter();
-    };
+    }
 }
