@@ -2978,7 +2978,7 @@ function MusicKeyboard() {
         }
 
         obj[0] = convertFromSolfege(obj[0]);
-        let j;
+        let j = 0;
         if (obj[0] !== 'C') {
             // Pad the left side.
             for (let i = 0; i < PITCHES2.length; i++) {
@@ -3013,7 +3013,6 @@ function MusicKeyboard() {
                 thisOctave = obj[1];
                 lastVoice = noteList[i].voice;
                 obj[0] = convertFromSolfege(obj[0]);
-
                 let k = PITCHES.indexOf(obj[0]);
                 if (k === -1) {
                     k = PITCHES2.indexOf(obj[0]);
