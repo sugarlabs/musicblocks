@@ -54,9 +54,9 @@ Therefore, it is best to launch a _local web server_ from the directory of Music
 `cd path/to/musicblocks/`.
 
 3. If you do not have [_Python_](https://www.python.org) installed, you'll need to install it.
-You can test for Python in a terminal using `python`. Type `exit()` to exit Python. (_Note that on
+You can test for Python in a terminal using `python`. Type `exit()` to exit Python. (Note that on
 some older Linux systems, the `python3` command is not bound to python. You may need to perform a
-`sudo apt install python-is-python3` on Debian-like distros, or equivalent on others.
+`sudo apt install python-is-python3` on Debian-like distros, or equivalent on others.)
 
 4. After cloning the musicblocks repository, run
 
@@ -78,7 +78,7 @@ some older Linux systems, the `python3` command is not bound to python. You may 
     **NOTE:** _Make sure you can run either `python` or `py` from your terminal, to launch the
     Python prompt._
 
-5. You should see a message `erving HTTP on 127.0.0.1 port 3000 (http://127.0.0.1:3000/) ...` since
+5. You should see a message `Serving HTTP on 127.0.0.1 port 3000 (http://127.0.0.1:3000/) ...` since
 the HTTP Server is set to start listening on port 3000.
 
 6. Open your favorite browser and visit `localhost:3000` or `127.0.0.1:3000`.
