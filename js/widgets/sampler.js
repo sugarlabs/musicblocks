@@ -10,6 +10,7 @@ function SampleWidget() {
     const CENTERPITCHHERTZ = 262;
 
     this.sampleData = "";
+    this.freqArray = new Uint8Array();
     this.sampleName = DEFAULTSAMPLE;
     this.pitchAdjustment = 0;
 
@@ -34,17 +35,19 @@ function SampleWidget() {
 
     };
 
-    this.pitchUp = function (i) {
+    this.pitchUp = function () {
+        this._usePitch(this.pitchInput.value);
         this.pitchAdjustment++;
         this.pitchInput.value = this.pitchAdjustment;
     };
 
-    this.pitchDown = function (i) {
+    this.pitchDown = function () {
+        this._usePitch(this.pitchInput.value);
         this.pitchAdjustment--;
         this.pitchInput.value = this.pitchAdjustment;
     };
 
-    this._usePitch = function (i) {
+    this._usePitch = function () {
         this.pitchAdjustment = this.pitchInput.value;
         this.pitchInput.value = this.pitchAdjustment;
     }
@@ -62,12 +65,16 @@ function SampleWidget() {
       ctx.strokeStyle = '#0000FF';
       ctx.lineWidth = 0;
 
+      let period = Math.floor(this.sampleData.length / SAMPLEWIDTH);
+
       for (let x=0; x < SAMPLEWIDTH; x++) {
-          let period = Math.floor(this.sampleData.length / SAMPLEWIDTH);
           let amplitude = 0;
           let index = x*period+24;
-          if (index < this.sampleData.length) {
-              amplitude = this.sampleData.charCodeAt(index) - 64;
+          //if (index < this.sampleData.length) {
+          //    amplitude = this.sampleData.charCodeAt(index) - 64;
+          //}
+          if (x < this.freqArray.length) {
+              amplitude = this.freqArray[x];
           }
           ctx.moveTo(x, middle - amplitude);
           ctx.lineTo(x, middle + amplitude);
@@ -170,8 +177,13 @@ function SampleWidget() {
                     ICONSIZE +
                     '" vertical-align="middle">';
                 if (!(this.sampleName == "")) {
+                    this._usePitch(this.pitchInput.value);
                     this._logo.synth.loadSynth(0, getVoiceSynthName(this.sampleName));
-                    let finalpitch = Math.floor(CENTERPITCHHERTZ * Math.pow(2, this.pitchAdjustment/12));
+                    let finalAdjustment = 0;
+                    if (!isNaN(this.pitchAdjustment)) {
+                        finalAdjustment = this.pitchAdjustment;
+                    }
+                    let finalpitch = Math.floor(CENTERPITCHHERTZ * Math.pow(2, finalAdjustment/12));
                     console.log(finalpitch);
                     this._logo.synth.trigger(
                         0,
@@ -261,7 +273,7 @@ function SampleWidget() {
             widgetWindow.addButton(
                 "up.svg",
                 ICONSIZE,
-                _("speed up"),
+                _("pitch up"),
                 r1.insertCell()
             ).onclick = ((i) => () => this.pitchUp(i))(i);
 
@@ -270,7 +282,7 @@ function SampleWidget() {
             widgetWindow.addButton(
                 "down.svg",
                 ICONSIZE,
-                _("slow down"),
+                _("pitch down"),
                 r3.insertCell()
             ).onclick = ((i) => () => this.pitchDown(i))(i);
 
@@ -287,9 +299,10 @@ function SampleWidget() {
                 "keyup",
                 ((id) => (e) => {
                     if (e.keyCode === 13) {
+                        console.log("use pitch");
                         this._usePitch(id);
                     }
-                })(i)
+                })
             );
         }
 
@@ -310,14 +323,101 @@ function SampleWidget() {
     }
 
 
-    this.getBrowserAudio = async function() {
-      let stream = null;
+    this.webaudio_tooling_obj = function () {
+        var audioContext = new AudioContext();
+        console.log("audio is starting up ...");
 
-      try {
-        stream = await navigator.mediaDevices.getUserMedia();
-        /* use the stream */
-      } catch(err) {
-        /* handle the error */
-      }
+        var BUFF_SIZE = 16384;
+
+        var audioInput = null,
+            microphone_stream = null,
+            gain_node = null,
+            script_processor_node = null,
+            script_processor_fft_node = null,
+            analyserNode = null;
+
+        if (!navigator.getUserMedia)
+                navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
+                              navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+        if (navigator.getUserMedia){
+
+            navigator.getUserMedia({audio:true},
+              function(stream) {
+                  start_microphone(stream);
+              },
+              function(e) {
+                alert('Error capturing audio.');
+              }
+            );
+
+        } else { alert('getUserMedia not supported in this browser.'); }
+
+        function show_some_data(given_typed_array, num_row_to_display, label) {
+
+            var size_buffer = given_typed_array.length;
+            var index = 0;
+            var max_index = num_row_to_display;
+
+            console.log("__________ " + label);
+
+            for (; index < max_index && index < size_buffer; index += 1) {
+
+                console.log(given_typed_array[index]);
+            }
+        }
+
+        function process_microphone_buffer(event) { // invoked by event loop
+
+            var i, N, inp, microphone_output_buffer;
+
+            microphone_output_buffer = event.inputBuffer.getChannelData(0); // just mono - 1 channel for now
+
+            // microphone_output_buffer  <-- this buffer contains current gulp of data size BUFF_SIZE
+
+            show_some_data(microphone_output_buffer, 5, "from getChannelData");
+        }
+
+        function start_microphone(stream){
+
+          gain_node = audioContext.createGain();
+          gain_node.connect( audioContext.destination );
+
+          microphone_stream = audioContext.createMediaStreamSource(stream);
+          microphone_stream.connect(gain_node);
+
+          script_processor_node = audioContext.createScriptProcessor(BUFF_SIZE, 1, 1);
+          script_processor_node.onaudioprocess = process_microphone_buffer;
+
+          microphone_stream.connect(script_processor_node);
+
+          //enable volume control for output speakers
+
+          // setup FFT
+
+          script_processor_fft_node = audioContext.createScriptProcessor(2048, 1, 1);
+          script_processor_fft_node.connect(gain_node);
+
+          analyserNode = audioContext.createAnalyser();
+          analyserNode.smoothingTimeConstant = 0;
+          analyserNode.fftSize = 2048;
+
+          microphone_stream.connect(analyserNode);
+
+          analyserNode.connect(script_processor_fft_node);
+
+          script_processor_fft_node.onaudioprocess = function() {
+
+            // get the average for the first channel
+            array = new Uint8Array(analyserNode.frequencyBinCount);
+            analyserNode.getByteFrequencyData(array);
+
+            // draw the spectrogram
+            if (microphone_stream.playbackState == microphone_stream.PLAYING_STATE) {
+
+                show_some_data(array, 5, "from fft");
+            }
+          };
+        }
     }
 }
