@@ -632,6 +632,10 @@ function setupToneBlocks() {
                     logo._currentDrumBlock = blk;
                     logo.rhythmRuler.Drums.push(blk);
                     logo.rhythmRuler.Rulers.push([[], []]);
+                } else if (logo.inSample) {
+                    logo.sample.sampleBlock = blk;
+                    logo.sample.sampleName = args[0];
+          }
                 }
 
                 Singer.ToneActions.setTimbre(args[0], turtle, blk);
@@ -654,7 +658,7 @@ function setupToneBlocks() {
                 "turtleshell"
             ]);
 
-            this.formBlock({  
+            this.formBlock({
                 outType: "mediaout"
             });
             this.parameter = false;
