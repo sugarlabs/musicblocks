@@ -541,7 +541,7 @@ function setupWidgetBlocks() {
             this.makeMacro((x, y) => [
               [0, "sample", x, y, [null, 1, 3]],
               [1, "settimbre", 0, 0, [0, 2, null, 4]],
-              [2, "audiofile", 0, 0, [1]],
+              [2, ["audiofile", {value: "Ding.wav"}], 0, 0, [1]],
               [3, "hiddennoflow", 0, 0, [0, null]],
               [4, "vspace", 0, 0, [1, null]]
             ]);
@@ -552,6 +552,7 @@ function setupWidgetBlocks() {
             if (logo.sample === null) {
                 logo.sample = new SampleWidget();
             }
+            logo.inSample = true;
             logo.sample = new SampleWidget();
 
             let listenerName = "_sample_" + turtle;
