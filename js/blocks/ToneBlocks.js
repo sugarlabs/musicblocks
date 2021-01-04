@@ -662,6 +662,11 @@ function setupToneBlocks() {
                 args: 1
             });
             this.parameter = true;
+
+            this.makeMacro((x, y) => [
+                [0, "audiofile", x, y, [null, 1]],
+                [1, {"number", value: 0}, 0, 0, [0]],
+            ]);
         }
 
         updateParameter(logo, turtle, blk) {
