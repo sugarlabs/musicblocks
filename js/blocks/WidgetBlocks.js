@@ -527,6 +527,7 @@ function setupWidgetBlocks() {
         constructor() {
             super("sample");
             this.setPalette("widgets");
+            this.parameter = true;
             this.beginnerBlock(true);
 
             this.setHelpString([

@@ -635,7 +635,6 @@ function setupToneBlocks() {
                 } else if (logo.inSample) {
                     logo.sample.sampleBlock = blk;
                     logo.sample.sampleName = args[0];
-          }
                 }
 
                 Singer.ToneActions.setTimbre(args[0], turtle, blk);
@@ -645,23 +644,39 @@ function setupToneBlocks() {
         }
     }
 
-    class AudioFileBlock extends ValueBlock {
+    class AudioFileBlock extends LeftBlock {
         constructor() {
-            super("audiofile");
+            super("audiofile"));
             this.setPalette("tone");
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The audiofile block is used to import a sound file."),
+                _("Import a sound file and correct its pitch."),
                 "documentation",
                 null,
                 "turtleshell"
             ]);
 
             this.formBlock({
-                outType: "mediaout"
+                outType: "mediaout",
+                args: 1
             });
-            this.parameter = false;
+            this.parameter = true;
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return logo.blocks.blockList[blk].value;
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            if (
+                logo.inStatusMatrix &&
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+            ) {
+                logo.statusFields.push([blk, "audiofile"]);
+            } else {
+                return;
+            }
         }
     }
 
