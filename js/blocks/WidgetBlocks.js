@@ -540,16 +540,13 @@ function setupWidgetBlocks() {
             //.TRANS: the speed at music is should be played.
             this.formBlock({ name: _("sample"), canCollapse: true });
             this.makeMacro((x, y) => [
-              [0, "sample", x, y, [null, 1, 9]],
-              [1, "settimbre", 0, 0, [0, 2, 3, 8]],
-              [2, ["audiofile", { value: "Ding.wav" }], 0, 0, [1]],
-              [3, "rhythm2", 0, 0, [1, 4, 5, null]],
-              [4, ["number", { value: 1 }], 0, 0, [3]],
-              [5, "divide", 0, 0, [3, 6, 7]],
-              [6, ["number", { value: 1 }], 0, 0, [5]],
-              [7, ["number", { value: 1 }], 0, 0, [5]],
-              [8, "hidden", 0, 0, [1, null]],
-              [9, "hiddennoflow", 0, 0, [0, null]]
+              [0, "sample", x, y, [null, 1, 6]],
+              [1, "settimbre", 0, 0, [0, 2, 4, 5]],
+              [2, ["audiofile", { value: "" }], 0, 0, [1, 3]],
+              [3, ["number", {value: 0}], 0, 0, [2]],
+              [4, "vspace", 0, 0, [1, null]],
+              [5, "hidden", 0, 0, [1, null]],
+              [6, "hiddennoflow", 0, 0, [0, null]]
 
               /*
               [0, "sample", x, y, [null, 1, 6]],
