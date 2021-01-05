@@ -2251,12 +2251,12 @@ function Blocks(activity) {
         case "audiofile":
             try {
                 if (myBlock.value[0] === null) {
-                    label = _("open audio file");
+                    label = _("//");
                 } else {
                     label = myBlock.value[0].toString();
                 }
             } catch (e) {
-                label = _("open audio file");
+                label = _("//");
             }
             break;
         case "solfege":
