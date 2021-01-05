@@ -646,7 +646,7 @@ function setupToneBlocks() {
 
     class AudioFileBlock extends LeftBlock {
         constructor() {
-            super("audiofile", _("audio file"));
+            super("audiofile");
             this.setPalette("tone");
             this.beginnerBlock(true);
 

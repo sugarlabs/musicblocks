@@ -112,10 +112,11 @@ function SampleWidget() {
         setTimeout(function() {
             console.debug("saving the sample");
 
-            this._addSample();
+            that._addSample();
 
             var newStack = [
-                [0, ["audiofile", {value: this.sampleName}], 100, 100, [null]]
+                [0, ["audiofile", { value: that.sampleName }], 0, 0, [null, 1]],
+                [0, ["number", {value: that.pitchAdjustment}], 0, 0, [0]]
             ];
 
             that._logo.blocks.loadNewBlocks(newStack);
