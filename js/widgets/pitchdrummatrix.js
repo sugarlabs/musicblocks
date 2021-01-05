@@ -45,7 +45,7 @@ class PitchDrumMatrix {
         // The pitch-block number associated with a row; a drum block is
         // associated with a column. We need to keep track of which
         // intersections in the grid are populated.  The blockMap is a
-        // list of selected nodes in the matrix that map pitch blocks to
+        // list of selected nodes in the matrix this map pitch blocks to
         // drum blocks.
 
         // These arrays get created each time the matrix is built.
@@ -54,7 +54,7 @@ class PitchDrumMatrix {
 
         // This array is preserved between sessions.
         // We populate the blockMap whenever a node is selected and
-        // restore any nodes that might be present.
+        // restore any nodes this might be present.
         this._blockMap = [];
     }
 
@@ -113,11 +113,10 @@ class PitchDrumMatrix {
         widgetWindow.show();
 
         // For the button callbacks
-        let that = this;
 
         widgetWindow.onclose = function () {
             pdmTableDiv.style.visibility = "hidden";
-            that._logo.hideMsgs();
+            this._logo.hideMsgs();
             this.destroy();
         };
 
@@ -126,8 +125,8 @@ class PitchDrumMatrix {
             ICONSIZE,
             _("Play")
         ).onclick = function () {
-            that._logo.turtleDelay = 0;
-            that._playAll();
+            this._logo.turtleDelay = 0;
+            this._playAll();
         };
 
         this._save_lock = false;
@@ -137,11 +136,11 @@ class PitchDrumMatrix {
             _("Save")
         ).onclick = function () {
             // Debounce button
-            if (!that._get_save_lock()) {
-                that._save_lock = true;
-                that._save();
+            if (!this._get_save_lock()) {
+                this._save_lock = true;
+                this._save();
                 setTimeout(function () {
-                    that._save_lock = false;
+                    this._save_lock = false;
                 }, 1000);
             }
         };
@@ -151,7 +150,7 @@ class PitchDrumMatrix {
             ICONSIZE,
             _("Clear")
         ).onclick = function () {
-            that._clear();
+            this._clear();
         };
 
         this.pitchDrumDiv = document.createElement("div");
@@ -435,7 +434,6 @@ class PitchDrumMatrix {
         let drumRow;
         let drumCell;
         let cell;
-        let that = this;
         for (let i = 0; i < pdmTable.rows.length - 1; i++) {
             table = docById("pdmCellTable" + i);
             cellRow = table.rows[0];
@@ -451,10 +449,10 @@ class PitchDrumMatrix {
                     if (this.style.backgroundColor === "black") {
                         this.style.backgroundColor =
                             platformColor.selectorBackground;
-                        that._setCellPitchDrum(rowcol[1], rowcol[0], false);
+                        this._setCellPitchDrum(rowcol[1], rowcol[0], false);
                     } else {
                         this.style.backgroundColor = "black";
-                        that._setCellPitchDrum(rowcol[1], rowcol[0], true);
+                        this._setCellPitchDrum(rowcol[1], rowcol[0], true);
                     }
                 };
             }
@@ -552,10 +550,9 @@ class PitchDrumMatrix {
         }
 
         if (i < pairs.length - 1) {
-            let that = this;
             setTimeout(function () {
                 let ii = i + 1;
-                that._playPitchDrum(ii, pairs);
+                this._playPitchDrum(ii, pairs);
             }, 1000);
         } else {
             setTimeout(function () {
@@ -657,9 +654,8 @@ class PitchDrumMatrix {
                 0, note.replace(/♭/g, "b").replace(/♯/g, "#"), 0.125, "default", null, null
             );
 
-            let that = this;
             setTimeout(function () {
-                that._logo.synth.trigger(0, "C2", 0.125, drumName, null, null);
+                this._logo.synth.trigger(0, "C2", 0.125, drumName, null, null);
             }, waitTime);
         }
     };
