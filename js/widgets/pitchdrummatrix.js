@@ -29,13 +29,14 @@ Drum and Pitch blocks.
 */
 
 class PitchDrumMatrix {
+    static BUTTONDIVWIDTH = 295; // 5 buttons
+    static DRUMNAMEWIDTH = 50;
+    static OUTERWINDOWWIDTH = 128;
+    static INNERWINDOWWIDTH = 50;
+    static BUTTONSIZE = 53;
+    static ICONSIZE = 32;
+
     constructor() {
-        const BUTTONDIVWIDTH = 295; // 5 buttons
-        const DRUMNAMEWIDTH = 50;
-        const OUTERWINDOWWIDTH = 128;
-        const INNERWINDOWWIDTH = 50;
-        const BUTTONSIZE = 53;
-        const ICONSIZE = 32;
 
         this.rowLabels = [];
         this.rowArgs = [];
@@ -105,7 +106,7 @@ class PitchDrumMatrix {
 
         let w = window.innerWidth;
         this._cellScale = w / 1200;
-        let iconSize = ICONSIZE * this._cellScale;
+        let iconSize = PitchDrumMatrix.ICONSIZE * this._cellScale;
 
         let widgetWindow = window.widgetWindows.windowFor(this, "pitch drum");
         this.widgetWindow = widgetWindow;
@@ -122,7 +123,7 @@ class PitchDrumMatrix {
 
         widgetWindow.addButton(
             "play-button.svg",
-            ICONSIZE,
+            PitchDrumMatrix.ICONSIZE,
             _("Play")
         ).onclick = function () {
             this._logo.turtleDelay = 0;
@@ -132,7 +133,7 @@ class PitchDrumMatrix {
         this._save_lock = false;
         widgetWindow.addButton(
             "export-chunk.svg",
-            ICONSIZE,
+            PitchDrumMatrix.ICONSIZE,
             _("Save")
         ).onclick = function () {
             // Debounce button
@@ -147,7 +148,7 @@ class PitchDrumMatrix {
 
         widgetWindow.addButton(
             "erase-button.svg",
-            ICONSIZE,
+            PitchDrumMatrix.ICONSIZE,
             _("Clear")
         ).onclick = function () {
             this._clear();
@@ -251,11 +252,11 @@ class PitchDrumMatrix {
                 Math.min(
                     window.innerWidth / 2,
                     this._cellScale *
-                    (this.drums.length * (DRUMNAMEWIDTH + 2) +
+                    (this.drums.length * (PitchDrumMatrix.DRUMNAMEWIDTH + 2) +
                         MATRIXSOLFEWIDTH +
                         24)
                 ),
-                BUTTONDIVWIDTH
+                PitchDrumMatrix.BUTTONDIVWIDTH
             ); // Add room for the vertical slider.
         } else {
             outerDiv.style.height =
@@ -267,10 +268,10 @@ class PitchDrumMatrix {
                 Math.min(
                     window.innerWidth / 2,
                     this._cellScale *
-                    (this.drums.length * (DRUMNAMEWIDTH + 2) +
+                    (this.drums.length * (PitchDrumMatrix.DRUMNAMEWIDTH + 2) +
                         MATRIXSOLFEWIDTH)
                 ),
-                BUTTONDIVWIDTH
+                PitchDrumMatrix.BUTTONDIVWIDTH
             );
         }
 
@@ -279,10 +280,10 @@ class PitchDrumMatrix {
         let innerDiv = docById("pdmInnerDiv");
         let iw = Math.min(
             ow - 100,
-            this._cellScale * this.drums.length * (DRUMNAMEWIDTH + 2)
+            this._cellScale * this.drums.length * (PitchDrumMatrix.DRUMNAMEWIDTH + 2)
         );
         innerDiv.style.width = iw + "px";
-        innerDiv.style.marginLeft = BUTTONSIZE * this._cellScale + "px";
+        innerDiv.style.marginLeft = PitchDrumMatrix.BUTTONSIZE * this._cellScale + "px";
 
         pdmCell = pdmTableRow.insertCell();
         // Create table to store drum names.
@@ -334,7 +335,7 @@ class PitchDrumMatrix {
             '" width="' +
             iconSize +
             '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-        cell.style.width = BUTTONSIZE + "px";
+        cell.style.width = PitchDrumMatrix.BUTTONSIZE + "px";
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.height = cell.style.width;
@@ -365,7 +366,7 @@ class PitchDrumMatrix {
             cell = row.insertCell();
             cell.style.height =
                 Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
-            cell.width = DRUMNAMEWIDTH;
+            cell.width = PitchDrumMatrix.DRUMNAMEWIDTH;
             cell.style.width = cell.width;
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
@@ -393,7 +394,7 @@ class PitchDrumMatrix {
         cell = row.insertCell();
         cell.height =
             Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
-        cell.width = DRUMNAMEWIDTH;
+        cell.width = PitchDrumMatrix.DRUMNAMEWIDTH;
         cell.style.width = cell.width;
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
@@ -417,9 +418,9 @@ class PitchDrumMatrix {
             '" alt="' +
             name +
             '" height="' +
-            ICONSIZE +
+            PitchDrumMatrix.ICONSIZE +
             '" width="' +
-            ICONSIZE +
+            PitchDrumMatrix.ICONSIZE +
             '" vertical-align="middle">&nbsp;&nbsp;';
         cell.style.backgroundColor = platformColor.selectorBackground;
     };
