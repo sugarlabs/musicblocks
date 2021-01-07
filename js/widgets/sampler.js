@@ -22,7 +22,8 @@ function SampleWidget() {
         if (this.sampleBlock != null) {
             blockNumber = this._logo.blocks.blockList[this.sampleBlock].connections[1];
             if (blockNumber != null) {
-                this._logo.blocks.blockList[blockNumber].value = this.sampleName;
+                this._logo.blocks.blockList[blockNumber].value = [this.sampleName, this.sampleData];
+                console.log(this._logo.blocks.blockList[blockNumber].value);
                 this._logo.blocks.blockList[blockNumber].text.text = this.sampleName;
                 this._logo.blocks.blockList[blockNumber].updateCache();
                 this._logo.refreshCanvas();

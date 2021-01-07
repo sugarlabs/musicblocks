@@ -2253,7 +2253,11 @@ function Blocks(activity) {
                 if (myBlock.value[0] === null) {
                     label = _("audio file");
                 } else {
+                    if (typeof myBlock.value === "string") {
+                        label = myBlock.value;
+                    } else {
                     label = myBlock.value[0].toString();
+                    }
                 }
             } catch (e) {
                 label = _("audio file");
