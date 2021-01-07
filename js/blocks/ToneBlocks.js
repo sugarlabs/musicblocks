@@ -670,9 +670,7 @@ function setupToneBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            console.log(this.value);
-            console.log(logo.blocks.blockList[blk].value);
-            return logo.blocks.blockList[blk].value;
+            return logo.blocks.blockList[blk].value[0];
         }
 
         arg(logo, turtle, blk, receivedArg) {
@@ -682,7 +680,7 @@ function setupToneBlocks() {
             ) {
                 logo.statusFields.push([blk, "audiofile"]);
             } else {
-                return logo.blocks.blockList[blk].value;
+                return logo.blocks.blockList[blk].value[0];
             }
         }
     }
