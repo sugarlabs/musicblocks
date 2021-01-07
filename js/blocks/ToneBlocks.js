@@ -664,7 +664,7 @@ function setupToneBlocks() {
             this.parameter = true;
 
             this.makeMacro((x, y) => [
-                [0, ["audiofile" {value: ["new", ""]}], x, y, [null, 1]],
+                [0, ["audiofile", {value: ["new", ""]}], x, y, [null, 1]],
                 [1, ["number", {value: 0}], 0, 0, [0]],
             ]);
         }
