@@ -658,7 +658,7 @@ function setupToneBlocks() {
             ]);
 
             this.formBlock({
-                outType: "mediaout",
+                outType: "textout",
                 args: 1
             });
             this.parameter = true;
@@ -670,6 +670,8 @@ function setupToneBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
+            console.log(this.value);
+            console.log(logo.blocks.blockList[blk].value);
             return logo.blocks.blockList[blk].value;
         }
 
@@ -680,7 +682,7 @@ function setupToneBlocks() {
             ) {
                 logo.statusFields.push([blk, "audiofile"]);
             } else {
-                return;
+                return logo.blocks.blockList[blk].value;
             }
         }
     }
