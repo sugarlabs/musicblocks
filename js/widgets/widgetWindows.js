@@ -20,6 +20,10 @@
 window.widgetWindows = { openWindows: {}, _posCache: {} };
 
 class WidgetWindow {
+    /**
+     * @param {string} key 
+     * @param {string} title 
+     */
     constructor(key, title) {
         // Keep a refernce to the object within handlers
         this._key = key;
@@ -70,6 +74,13 @@ class WidgetWindow {
         this.takeFocus();
     }
 
+    /**
+     * @private
+     * @param {string} base 
+     * @param {string} className 
+     * @param {HTMLElement} parent
+     * @returns {HTMLElement}
+     */
     _create = (base, className, parent) => {
         const el = document.createElement(base);
         if (className) el.className = className;
@@ -77,6 +88,10 @@ class WidgetWindow {
         return el;
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _createUIelements = () => {
         const windows = docById("floatingWindows");
         this._frame = this._create("div", "windowFrame", windows);
@@ -94,7 +109,7 @@ class WidgetWindow {
                 let dx = (bcr.left - e.clientX) / (bcr.right - bcr.left);
                 const dy = bcr.top - e.clientY;
 
-                this.restore();
+                this._restore();
                 this.onmaximize();
 
                 bcr = this._drag.getBoundingClientRect();
@@ -120,7 +135,7 @@ class WidgetWindow {
         const rollButton = this._create("div", "wftButton rollup", this._drag);
         rollButton.onclick = (e) => {
             if (this._rolled) this.unroll();
-            else this.rollup();
+            else this._rollup();
             this.takeFocus();
 
             e.preventDefault();
@@ -129,12 +144,12 @@ class WidgetWindow {
 
         const titleEl = this._create("div", "wftTitle", this._drag);
         titleEl.innerHTML = _(this._title);
-        titleEl.id = key + "WidgetID";
+        titleEl.id = this._key + "WidgetID";
 
         const maxminButton = this._create("div", "wftButton wftMaxmin", this._drag);
         maxminButton.onclick = maxminButton.onmousedown = (e) => {
-            if (this._maximized) this.restore();
-            else this.maximize();
+            if (this._maximized) this._restore();
+            else this._maximize();
             this.takeFocus();
             this.onmaximize();
             e.preventDefault();
@@ -163,6 +178,10 @@ class WidgetWindow {
         this._widget.addEventListener("DOMMouseScroll", disableScroll, false);
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _setupLanguage() {
         let language = localStorage.languagePreference;
         if (language === undefined) {
@@ -181,12 +200,27 @@ class WidgetWindow {
         }
     }
 
+    /**
+     * @public
+     * @param {string} initial 
+     * @param {HTMLElement} parent 
+     * @returns {HTMLElement}
+     */
     addInputButton = (initial, parent) => {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
         el.innerHTML = '<input value="' + initial + '" />';
         return el.querySelector("input");
     }
 
+    /**
+     * @public
+     * @param {number} initial 
+     * @param {HTMLElement} parent 
+     * @param {number} min 
+     * @param {number} max 
+     * @param {string} classNm 
+     * @returns {HTMLElement}
+     */
     addRangeSlider = (initial, parent, min, max, classNm) => {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
         el.style.height = "250px";
@@ -205,6 +239,9 @@ class WidgetWindow {
         return slider;
     }
 
+    /**
+     * @deprecated
+     */
     addSelectorButton = (list, initial, parent) => {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
         el.innerHTML = '<select value="' + initial + '" />';
@@ -216,11 +253,23 @@ class WidgetWindow {
         return selector;
     }
 
+    /**
+     * @public
+     * @returns {HTMLElement}
+     */
     addDivider = () => {
         const el = this._create("div", "wfbtHR", this._toolbar);
         return el;
     }
 
+    /**
+     * @public
+     * @param {number} index 
+     * @param {string} icon 
+     * @param {number} iconSize 
+     * @param {string} label 
+     * @returns {HTMLElement}
+     */
     modifyButton = (index, icon, iconSize, label) => {
         this._buttons[index].innerHTML =
             '<img src="header-icons/' +
@@ -237,16 +286,28 @@ class WidgetWindow {
         return this._buttons[index];
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     close = () => {
         this.onclose();
     }
 
-    // The title may change, as with the Help Widget.
+    /**
+     * The title may change, as with the Help Widget.
+     * @public
+     * @returns {void}
+     */
     updateTitle = (title) => {
         const wftTitle = docById(this._key + "WidgetID");
         wftTitle.innerHTML = title;
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     takeFocus = () => {
         const windows = docById("floatingWindows");
         const siblings = windows.children;
@@ -258,7 +319,20 @@ class WidgetWindow {
         this._frame.style.opacity = "1";
     }
 
+    /**
+     * @public
+     * @param {*} icon 
+     * @param {*} iconSize 
+     * @param {*} label 
+     * @param {HTMLElement} parent
+     * @returns {HTMLElement} 
+     */
     addButton = (icon, iconSize, label, parent) => {
+        console.log("From WidgetWindow addButton");
+        console.log(`type of icon = ${typeof(icon)}`);
+        console.log(`type of iconSize = ${typeof(iconSize)}`);
+        console.log(`type of label = ${typeof(label)}`);
+
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
         el.innerHTML =
             '<img src="header-icons/' +
@@ -276,6 +350,10 @@ class WidgetWindow {
         return el;
     }
 
+    /**
+     * @public
+     * @returns {WidgetWindow} this
+     */
     sendToCenter = () => {
         const canvas = docById("myCanvas");
         const fRect = this._frame.getBoundingClientRect();
@@ -296,7 +374,11 @@ class WidgetWindow {
         return this;
     }
 
-    restore = () => {
+    /**
+     * @private
+     * @returns {void}
+     */
+    _restore = () => {
         this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
         this._maximized = false;
 
@@ -309,7 +391,11 @@ class WidgetWindow {
         this._frame.style.height = "auto";
     }
 
-    maximize = () => {
+    /**
+     * @private
+     * @returns {void}
+     */
+    _maximize = () => {
         this._maxminIcon.setAttribute("src", "header-icons/icon-contract.svg");
         this._maximized = true;
         this.unroll();
@@ -322,56 +408,98 @@ class WidgetWindow {
         this._frame.style.top = "64px";
     }
 
+    /**
+     * @public
+     * @returns {HTMLElement}
+     */
     getWidgetBody = () => {
         return this._widget;
     }
 
+    /**
+     * @deprecated
+     */
     getDragElement = () => {
         return this._drag;
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     onclose = () => {
         this.destroy();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     destroy = () => {
         this._frame.remove();
         window.widgetWindows.openWindows[this._key] = undefined;
     }
 
+    /**
+     * @public
+     * @returns {WidgetWindow} this
+     */
     onmaximize = () => {
         return this;
     }
 
+    /**
+     * @returns {void}
+     */
     show = () => {
         this._frame.style.display = "block";
     }
 
+    /**
+     * @public
+     * @param {number} x 
+     * @param {number} y 
+     * @returns {WidgetWindow} this
+     */
     setPosition = (x, y) => {
         this._frame.style.left = x + "px";
         this._frame.style.top = Math.max(y, 64) + "px";
         window.widgetWindows._posCache[this._key] = [x, Math.max(y, 64)];
-
         return this;
     }
 
+    /**
+     * @public
+     * @returns {boolean}
+     */
     isVisible = () => {
         return this._visible;
     }
 
+    /**
+     * @public
+     * @return {WidgetWindow} this
+     */
     clear = () => {
         this._widget.innerHTML = "";
         this._toolbar.innerHTML = "";
-
         return this;
     }
 
-    rollup = () => {
+    /**
+     * @private
+     * @return {WidgetWindow} this
+     */
+    _rollup = () => {
         this._rolled = true;
         this._body.style.display = "none";
         return this;
     }
 
+    /**
+     * @public
+     * @return {WidgetWindow} this
+     */
     unroll = () => {
         this._rolled = false;
         this._body.style.display = "flex";
