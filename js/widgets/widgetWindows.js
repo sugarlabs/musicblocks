@@ -9,6 +9,14 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/*global _, docById*/
+
+/*
+     Globals location
+     - js/utils/utils.js
+         _, docById
+ */
+
 window.widgetWindows = { openWindows: {}, _posCache: {} };
 
 class WidgetWindow {
@@ -16,20 +24,20 @@ class WidgetWindow {
         // Keep a refernce to the object within handlers
         this._key = key;
 
-        let windows = docById("floatingWindows");
+        const windows = docById("floatingWindows");
         this._frame = this._create("div", "windowFrame", windows);
 
         this._drag = this._create("div", "wfTopBar", this._frame);
         this._handle = this._create("div", "wfHandle", this._drag);
 
-        let closeButton = this._create("div", "wftButton close", this._drag);
-        let rollButton = this._create("div", "wftButton rollup", this._drag);
+        const closeButton = this._create("div", "wftButton close", this._drag);
+        const rollButton = this._create("div", "wftButton rollup", this._drag);
 
-        let titleEl = this._create("div", "wftTitle", this._drag);
+        const titleEl = this._create("div", "wftTitle", this._drag);
         titleEl.innerHTML = _(title);
         titleEl.id = key + "WidgetID";
 
-        let maxminButton = this._create("div", "wftButton wftMaxmin", this._drag);
+        const maxminButton = this._create("div", "wftButton wftMaxmin", this._drag);
         this._maxminIcon = this._create("img", undefined, maxminButton);
         this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
 
@@ -99,7 +107,7 @@ class WidgetWindow {
         document.addEventListener("mousemove", (e) => {
             if (!this._dragging) return;
 
-            let x = e.clientX - this._dx,
+            const x = e.clientX - this._dx,
                 y = e.clientY - this._dy;
 
             this.setPosition(x, y);
@@ -124,7 +132,7 @@ class WidgetWindow {
                 // restoring a window from maximized.
                 let bcr = this._drag.getBoundingClientRect();
                 let dx = (bcr.left - e.clientX) / (bcr.right - bcr.left);
-                let dy = bcr.top - e.clientY;
+                const dy = bcr.top - e.clientY;
 
                 this.restore();
                 this.onmaximize();
@@ -171,28 +179,28 @@ class WidgetWindow {
             e.stopImmediatePropagation();
         };
 
-        if (!!window.widgetWindows._posCache[this._key]) {
-            let _pos = window.widgetWindows._posCache[this._key];
+        if (window.widgetWindows._posCache[this._key]) {
+            const _pos = window.widgetWindows._posCache[this._key];
             this.setPosition(_pos[0], _pos[1]);
         }
         this.takeFocus();
     }
 
     _create = (base, className, parent) => {
-        let el = document.createElement(base);
+        const el = document.createElement(base);
         if (className) el.className = className;
         if (parent) parent.append(el);
         return el;
     };
 
     addInputButton = (initial, parent) => {
-        let el = this._create("div", "wfbtItem", parent || this._toolbar);
+        const el = this._create("div", "wfbtItem", parent || this._toolbar);
         el.innerHTML = '<input value="' + initial + '" />';
         return el.querySelector("input");
     }
 
     addRangeSlider = (initial, parent, min, max, classNm) => {
-        let el = this._create("div", "wfbtItem", parent || this._toolbar);
+        const el = this._create("div", "wfbtItem", parent || this._toolbar);
         el.style.height = "250px";
         el.innerHTML =
             '<input type="range" class="' +
@@ -204,24 +212,24 @@ class WidgetWindow {
             '" value="' +
             initial +
             '">';
-        let slider = el.querySelector("input");
+        const slider = el.querySelector("input");
         slider.style = " position:absolute;transform:rotate(270deg);height:10px;width:57%;";
         return slider;
     }
 
     addSelectorButton = (list, initial, parent) => {
-        let el = this._create("div", "wfbtItem", parent || this._toolbar);
+        const el = this._create("div", "wfbtItem", parent || this._toolbar);
         el.innerHTML = '<select value="' + initial + '" />';
-        let selector = el.querySelector("select");
-        for (let i of list) {
-            let newOption = new Option("turtle " + i, i);
+        const selector = el.querySelector("select");
+        for (const i of list) {
+            const newOption = new Option("turtle " + i, i);
             selector.add(newOption);
         }
         return selector;
     }
 
     addDivider = () => {
-        let el = this._create("div", "wfbtHR", this._toolbar);
+        const el = this._create("div", "wfbtHR", this._toolbar);
         return el;
     }
 
@@ -247,13 +255,13 @@ class WidgetWindow {
 
     // The title may change, as with the Help Widget.
     updateTitle = (title) => {
-        let wftTitle = docById(this._key + "WidgetID");
+        const wftTitle = docById(this._key + "WidgetID");
         wftTitle.innerHTML = title;
     }
 
     takeFocus = () => {
-        let windows = docById("floatingWindows");
-        let siblings = windows.children;
+        const windows = docById("floatingWindows");
+        const siblings = windows.children;
         for (let i = 0; i < siblings.length; i++) {
             siblings[i].style.zIndex = "0";
             siblings[i].style.opacity = ".7";
@@ -263,7 +271,7 @@ class WidgetWindow {
     }
 
     addButton = (icon, iconSize, label, parent) => {
-        let el = this._create("div", "wfbtItem", parent || this._toolbar);
+        const el = this._create("div", "wfbtItem", parent || this._toolbar);
         el.innerHTML =
             '<img src="header-icons/' +
             icon +
@@ -281,9 +289,9 @@ class WidgetWindow {
     }
 
     sendToCenter = () => {
-        let canvas = docById("myCanvas");
-        let fRect = this._frame.getBoundingClientRect();
-        let cRect = canvas.getBoundingClientRect();
+        const canvas = docById("myCanvas");
+        const fRect = this._frame.getBoundingClientRect();
+        const cRect = canvas.getBoundingClientRect();
 
         if (cRect.width === 0 || cRect.height === 0) {
             // The canvas isn't shown so we set some approximate numbers
@@ -391,7 +399,7 @@ window.widgetWindows.windowFor = (widget, title, saveAs) => {
     else key = saveAs || title;
 
     if (typeof window.widgetWindows.openWindows[key] === "undefined") {
-        let win = new WidgetWindow(key, title).sendToCenter();
+        const win = new WidgetWindow(key, title).sendToCenter();
         window.widgetWindows.openWindows[key] = win;
     }
 
@@ -399,7 +407,7 @@ window.widgetWindows.windowFor = (widget, title, saveAs) => {
 };
 
 window.widgetWindows.clear = (name) => {
-    let win = window.widgetWindows.openWindows[name];
+    const win = window.widgetWindows.openWindows[name];
     if (!win) return;
     if (typeof win.onclose === "function") win.onclose();
 };
@@ -415,7 +423,7 @@ window.widgetWindows.hideAllWindows = () => {
 };
 
 window.widgetWindows.hideWindow = (name) => {
-    let win = window.widgetWindows.openWindows[name];
+    const win = window.widgetWindows.openWindows[name];
     if (!win) return;
     win._frame.style.display = "none";
 };
