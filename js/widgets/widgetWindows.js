@@ -507,6 +507,13 @@ class WidgetWindow {
     }
 }
 
+/**
+ * 
+ * @param {Object} widget 
+ * @param {string} title 
+ * @param {string} saveAs 
+ * @returns {WidgetWindow} this
+ */
 window.widgetWindows.windowFor = (widget, title, saveAs) => {
     let key = undefined;
     // Check for a blockNo attribute
@@ -522,28 +529,47 @@ window.widgetWindows.windowFor = (widget, title, saveAs) => {
     return window.widgetWindows.openWindows[key].unroll();
 };
 
+/**
+ * @deprecated
+ */
 window.widgetWindows.clear = (name) => {
     const win = window.widgetWindows.openWindows[name];
     if (!win) return;
     if (typeof win.onclose === "function") win.onclose();
 };
 
+/**
+ * @public
+ * @param {string} name
+ * @returns {boolean} 
+ */
 window.widgetWindows.isOpen = (name) => {
     return window.widgetWindows.openWindows[name] ? true : "";
 };
 
+/**
+ * @public
+ * @returns {void}
+ */
 window.widgetWindows.hideAllWindows = () => {
     Object.values(window.widgetWindows.openWindows).forEach((win) => {
         if (win !== undefined) win._frame.style.display = "none";
     });
 };
 
+/**
+ * @public
+ * @param {string} name 
+ */
 window.widgetWindows.hideWindow = (name) => {
     const win = window.widgetWindows.openWindows[name];
     if (!win) return;
     win._frame.style.display = "none";
 };
 
+/**
+ * @returns {void}
+ */
 window.widgetWindows.showWindows = () => {
     Object.values(window.widgetWindows.openWindows).forEach((win) => {
         if (win !== undefined) win._frame.style.display = "block";
