@@ -81,7 +81,7 @@ class WidgetWindow {
      * @param {HTMLElement} parent
      * @returns {HTMLElement}
      */
-    _create = (base, className, parent) => {
+    _create(base, className, parent) {
         const el = document.createElement(base);
         if (className) el.className = className;
         if (parent) parent.append(el);
@@ -92,7 +92,7 @@ class WidgetWindow {
      * @private
      * @returns {void}
      */
-    _createUIelements = () => {
+    _createUIelements() {
         const windows = docById("floatingWindows");
         this._frame = this._create("div", "windowFrame", windows);
 
@@ -206,7 +206,7 @@ class WidgetWindow {
      * @param {HTMLElement} parent 
      * @returns {HTMLElement}
      */
-    addInputButton = (initial, parent) => {
+    addInputButton(initial, parent) {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
         el.innerHTML = '<input value="' + initial + '" />';
         return el.querySelector("input");
@@ -221,7 +221,7 @@ class WidgetWindow {
      * @param {string} classNm 
      * @returns {HTMLElement}
      */
-    addRangeSlider = (initial, parent, min, max, classNm) => {
+    addRangeSlider(initial, parent, min, max, classNm) {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
         el.style.height = "250px";
         el.innerHTML =
@@ -242,7 +242,7 @@ class WidgetWindow {
     /**
      * @deprecated
      */
-    addSelectorButton = (list, initial, parent) => {
+    addSelectorButton(list, initial, parent) {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
         el.innerHTML = '<select value="' + initial + '" />';
         const selector = el.querySelector("select");
@@ -257,7 +257,7 @@ class WidgetWindow {
      * @public
      * @returns {HTMLElement}
      */
-    addDivider = () => {
+    addDivider() {
         const el = this._create("div", "wfbtHR", this._toolbar);
         return el;
     }
@@ -270,7 +270,7 @@ class WidgetWindow {
      * @param {string} label 
      * @returns {HTMLElement}
      */
-    modifyButton = (index, icon, iconSize, label) => {
+    modifyButton(index, icon, iconSize, label) {
         this._buttons[index].innerHTML =
             '<img src="header-icons/' +
             icon +
@@ -290,7 +290,7 @@ class WidgetWindow {
      * @public
      * @returns {void}
      */
-    close = () => {
+    close() {
         this.onclose();
     }
 
@@ -299,7 +299,7 @@ class WidgetWindow {
      * @public
      * @returns {void}
      */
-    updateTitle = (title) => {
+    updateTitle(title) {
         const wftTitle = docById(this._key + "WidgetID");
         wftTitle.innerHTML = title;
     }
@@ -308,7 +308,7 @@ class WidgetWindow {
      * @public
      * @returns {void}
      */
-    takeFocus = () => {
+    takeFocus() {
         const windows = docById("floatingWindows");
         const siblings = windows.children;
         for (let i = 0; i < siblings.length; i++) {
@@ -327,7 +327,7 @@ class WidgetWindow {
      * @param {HTMLElement} parent
      * @returns {HTMLElement} 
      */
-    addButton = (icon, iconSize, label, parent) => {
+    addButton(icon, iconSize, label, parent) {
         console.log("From WidgetWindow addButton");
         console.log(`type of icon = ${typeof(icon)}`);
         console.log(`type of iconSize = ${typeof(iconSize)}`);
@@ -354,7 +354,7 @@ class WidgetWindow {
      * @public
      * @returns {WidgetWindow} this
      */
-    sendToCenter = () => {
+    sendToCenter() {
         const canvas = docById("myCanvas");
         const fRect = this._frame.getBoundingClientRect();
         const cRect = canvas.getBoundingClientRect();
@@ -378,7 +378,7 @@ class WidgetWindow {
      * @private
      * @returns {void}
      */
-    _restore = () => {
+    _restore() {
         this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
         this._maximized = false;
 
@@ -395,7 +395,7 @@ class WidgetWindow {
      * @private
      * @returns {void}
      */
-    _maximize = () => {
+    _maximize() {
         this._maxminIcon.setAttribute("src", "header-icons/icon-contract.svg");
         this._maximized = true;
         this.unroll();
@@ -412,14 +412,14 @@ class WidgetWindow {
      * @public
      * @returns {HTMLElement}
      */
-    getWidgetBody = () => {
+    getWidgetBody() {
         return this._widget;
     }
 
     /**
      * @deprecated
      */
-    getDragElement = () => {
+    getDragElement() {
         return this._drag;
     }
 
@@ -427,7 +427,7 @@ class WidgetWindow {
      * @public
      * @returns {void}
      */
-    onclose = () => {
+    onclose() {
         this.destroy();
     }
 
@@ -435,7 +435,7 @@ class WidgetWindow {
      * @public
      * @returns {void}
      */
-    destroy = () => {
+    destroy() {
         this._frame.remove();
         window.widgetWindows.openWindows[this._key] = undefined;
     }
@@ -444,14 +444,14 @@ class WidgetWindow {
      * @public
      * @returns {WidgetWindow} this
      */
-    onmaximize = () => {
+    onmaximize() {
         return this;
     }
 
     /**
      * @returns {void}
      */
-    show = () => {
+    show() {
         this._frame.style.display = "block";
     }
 
@@ -461,7 +461,7 @@ class WidgetWindow {
      * @param {number} y 
      * @returns {WidgetWindow} this
      */
-    setPosition = (x, y) => {
+    setPosition(x, y) {
         this._frame.style.left = x + "px";
         this._frame.style.top = Math.max(y, 64) + "px";
         window.widgetWindows._posCache[this._key] = [x, Math.max(y, 64)];
@@ -472,7 +472,7 @@ class WidgetWindow {
      * @public
      * @returns {boolean}
      */
-    isVisible = () => {
+    isVisible() {
         return this._visible;
     }
 
@@ -480,7 +480,7 @@ class WidgetWindow {
      * @public
      * @return {WidgetWindow} this
      */
-    clear = () => {
+    clear() {
         this._widget.innerHTML = "";
         this._toolbar.innerHTML = "";
         return this;
@@ -490,7 +490,7 @@ class WidgetWindow {
      * @private
      * @return {WidgetWindow} this
      */
-    _rollup = () => {
+    _rollup() {
         this._rolled = true;
         this._body.style.display = "none";
         return this;
@@ -500,7 +500,7 @@ class WidgetWindow {
      * @public
      * @return {WidgetWindow} this
      */
-    unroll = () => {
+    unroll() {
         this._rolled = false;
         this._body.style.display = "flex";
         return this;
