@@ -23,44 +23,6 @@ class WidgetWindow {
     constructor(key, title) {
         // Keep a refernce to the object within handlers
         this._key = key;
-
-        const windows = docById("floatingWindows");
-        this._frame = this._create("div", "windowFrame", windows);
-
-        this._drag = this._create("div", "wfTopBar", this._frame);
-        this._handle = this._create("div", "wfHandle", this._drag);
-
-        const closeButton = this._create("div", "wftButton close", this._drag);
-        const rollButton = this._create("div", "wftButton rollup", this._drag);
-
-        const titleEl = this._create("div", "wftTitle", this._drag);
-        titleEl.innerHTML = _(title);
-        titleEl.id = key + "WidgetID";
-
-        const maxminButton = this._create("div", "wftButton wftMaxmin", this._drag);
-        this._maxminIcon = this._create("img", undefined, maxminButton);
-        this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
-
-        this._body = this._create("div", "wfWinBody", this._frame);
-        this._toolbar = this._create("div", "wfbToolbar", this._body);
-        this._widget = this._create("div", "wfbWidget", this._body);
-
-        let language = localStorage.languagePreference;
-        if (language === undefined) {
-            language = navigator.language;
-        }
-
-        console.debug("language setting is " + language);
-        // For Japanese, put the toolbar on the top.
-        if (language === "ja") {
-            this._body.style.flexDirection = "column";
-            this._body.style.flexGrow = "1";
-            this._toolbar.style.overflowY = "auto";
-            this._toolbar.style.width = "100%";
-            this._toolbar.style.display = "flex";
-            this._toolbar.style.flexShrink = "0";
-        }
-
         this._visible = true;
         this._rolled = false;
         this._maximized = false;
@@ -73,56 +35,11 @@ class WidgetWindow {
         this._dx = this._dy = 0;
         this._dragging = false;
 
-        // Scrolling in window body .
-        // this.top = 0;
-        // scrollEvent = function (evt) {
-        //     let data = evt.wheelDelta || -evt.detail;
-        //     let x = docByClass("wfbWidget")[0];
-        //     let l = x.getElementsByTagName("tr").length;
-        //     if (data < 0) {
-        //         if (x.getElementsByTagName("tr")[this.top] != null) {
-        //             x.getElementsByTagName("tr")[this.top].style.display = "none";
-        //             this.top = this.top == l ? l : this.top + 1;
-        //         }
-        //     } else if (data > 0) {
-        //         x.getElementsByTagName("tr")[this.top--].style.display = "";
-        //         this.top = this.top < 0 ? 0 : this.top;
-        //     }
-        // };
-        const disableScroll = () => {
-            // Get the current page scroll position
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-            // if any scroll is attempted,
-            // set this to the previous value
-            window.onscroll = () => {
-                window.scrollTo(scrollLeft, scrollTop);
-            };
-        };
+        const windows = docById("floatingWindows");
+        this._frame = this._create("div", "windowFrame", windows);
 
-        this._widget.addEventListener("wheel", disableScroll, false);
-        this._widget.addEventListener("DOMMouseScroll", disableScroll, false);
-
-        // Global watcher to track the mouse
-        document.addEventListener("mousemove", (e) => {
-            if (!this._dragging) return;
-
-            const x = e.clientX - this._dx,
-                y = e.clientY - this._dy;
-
-            this.setPosition(x, y);
-        });
-
-        document.addEventListener("mousedown", (e) => {
-            if (e.target === this._frame || this._frame.contains(e.target)) {
-                this._frame.style.opacity = "1";
-                this._frame.style.zIndex = "1";
-            } else {
-                this._frame.style.opacity = ".7";
-                this._frame.style.zIndex = "0";
-            }
-        });
-
+        this._drag = this._create("div", "wfTopBar", this._frame);
+        this._handle = this._create("div", "wfHandle", this._drag);
         // The handle needs the events bound as it's a sibling of the dragging div
         // not a relative in either direciton.
         this._drag.onmousedown = this._handle.onmousedown = (e) => {
@@ -149,11 +66,7 @@ class WidgetWindow {
             e.preventDefault();
         };
 
-        document.addEventListener("mouseup", (e) => {
-            this._dragging = false;
-        });
-
-        // Wrapper to allow overloading
+        const closeButton = this._create("div", "wftButton close", this._drag);
         closeButton.onclick = (e) => {
             this.close();
 
@@ -161,6 +74,7 @@ class WidgetWindow {
             e.stopPropagation();
         };
 
+        const rollButton = this._create("div", "wftButton rollup", this._drag);
         rollButton.onclick = (e) => {
             if (this._rolled) this.unroll();
             else this.rollup();
@@ -170,6 +84,11 @@ class WidgetWindow {
             e.stopPropagation();
         };
 
+        const titleEl = this._create("div", "wftTitle", this._drag);
+        titleEl.innerHTML = _(title);
+        titleEl.id = key + "WidgetID";
+
+        const maxminButton = this._create("div", "wftButton wftMaxmin", this._drag);
         maxminButton.onclick = maxminButton.onmousedown = (e) => {
             if (this._maximized) this.restore();
             else this.maximize();
@@ -179,10 +98,62 @@ class WidgetWindow {
             e.stopImmediatePropagation();
         };
 
+        this._maxminIcon = this._create("img", undefined, maxminButton);
+        this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
+
+        this._body = this._create("div", "wfWinBody", this._frame);
+        this._toolbar = this._create("div", "wfbToolbar", this._body);
+
+        this._widget = this._create("div", "wfbWidget", this._body);
+        this._widget.addEventListener("wheel", this._disableScroll, false);
+        this._widget.addEventListener("DOMMouseScroll", this._disableScroll, false);
+
+
+        let language = localStorage.languagePreference;
+        if (language === undefined) {
+            language = navigator.language;
+        }
+
+        console.debug("language setting is " + language);
+        // For Japanese, put the toolbar on the top.
+        if (language === "ja") {
+            this._body.style.flexDirection = "column";
+            this._body.style.flexGrow = "1";
+            this._toolbar.style.overflowY = "auto";
+            this._toolbar.style.width = "100%";
+            this._toolbar.style.display = "flex";
+            this._toolbar.style.flexShrink = "0";
+        }
+
+        // Global watcher to track the mouse
+        document.addEventListener("mousemove", (e) => {
+            if (!this._dragging) return;
+
+            const x = e.clientX - this._dx,
+                y = e.clientY - this._dy;
+
+            this.setPosition(x, y);
+        });
+
+        document.addEventListener("mousedown", (e) => {
+            if (e.target === this._frame || this._frame.contains(e.target)) {
+                this._frame.style.opacity = "1";
+                this._frame.style.zIndex = "1";
+            } else {
+                this._frame.style.opacity = ".7";
+                this._frame.style.zIndex = "0";
+            }
+        });
+
+        document.addEventListener("mouseup", (e) => {
+            this._dragging = false;
+        });
+
         if (window.widgetWindows._posCache[this._key]) {
             const _pos = window.widgetWindows._posCache[this._key];
             this.setPosition(_pos[0], _pos[1]);
         }
+
         this.takeFocus();
     }
 
@@ -191,7 +162,18 @@ class WidgetWindow {
         if (className) el.className = className;
         if (parent) parent.append(el);
         return el;
-    };
+    }
+
+    _disableScroll = () => {
+        // Get the current page scroll position
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+        // if any scroll is attempted,
+        // set this to the previous value
+        window.onscroll = () => {
+            window.scrollTo(scrollLeft, scrollTop);
+        };
+    }
 
     addInputButton = (initial, parent) => {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
