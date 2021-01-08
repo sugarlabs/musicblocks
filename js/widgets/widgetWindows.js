@@ -23,18 +23,61 @@ class WidgetWindow {
     constructor(key, title) {
         // Keep a refernce to the object within handlers
         this._key = key;
+        this._buttons = [];
+        this._first = true;
+        this._title = title;
         this._visible = true;
         this._rolled = false;
-        this._maximized = false;
         this._savedPos = null;
-        this._first = true;
-
-        this._buttons = [];
+        this._maximized = false;
 
         // Drag offset for correct positioning
         this._dx = this._dy = 0;
         this._dragging = false;
 
+        this._createUIelements();
+        this._setupLanguage();
+
+        // Global watcher to track the mouse
+        document.addEventListener("mousemove", (e) => {
+            if (!this._dragging) return;
+
+            const x = e.clientX - this._dx,
+                y = e.clientY - this._dy;
+
+            this.setPosition(x, y);
+        });
+
+        document.addEventListener("mousedown", (e) => {
+            if (e.target === this._frame || this._frame.contains(e.target)) {
+                this._frame.style.opacity = "1";
+                this._frame.style.zIndex = "1";
+            } else {
+                this._frame.style.opacity = ".7";
+                this._frame.style.zIndex = "0";
+            }
+        });
+
+        document.addEventListener("mouseup", (e) => {
+            this._dragging = false;
+        });
+
+        if (window.widgetWindows._posCache[this._key]) {
+            const _pos = window.widgetWindows._posCache[this._key];
+            this.setPosition(_pos[0], _pos[1]);
+        }
+
+        this.takeFocus();
+    }
+
+    _create = (base, className, parent) => {
+        const el = document.createElement(base);
+        if (className) el.className = className;
+        if (parent) parent.append(el);
+        return el;
+    }
+
+    _createUIelements = () => {
         const windows = docById("floatingWindows");
         this._frame = this._create("div", "windowFrame", windows);
 
@@ -85,7 +128,7 @@ class WidgetWindow {
         };
 
         const titleEl = this._create("div", "wftTitle", this._drag);
-        titleEl.innerHTML = _(title);
+        titleEl.innerHTML = _(this._title);
         titleEl.id = key + "WidgetID";
 
         const maxminButton = this._create("div", "wftButton wftMaxmin", this._drag);
@@ -104,11 +147,23 @@ class WidgetWindow {
         this._body = this._create("div", "wfWinBody", this._frame);
         this._toolbar = this._create("div", "wfbToolbar", this._body);
 
+        const disableScroll = () => {
+            // Get the current page scroll position
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+            // if any scroll is attempted,
+            // set this to the previous value
+            window.onscroll = () => {
+                window.scrollTo(scrollLeft, scrollTop);
+            };
+        }
+
         this._widget = this._create("div", "wfbWidget", this._body);
-        this._widget.addEventListener("wheel", this._disableScroll, false);
-        this._widget.addEventListener("DOMMouseScroll", this._disableScroll, false);
+        this._widget.addEventListener("wheel", disableScroll, false);
+        this._widget.addEventListener("DOMMouseScroll", disableScroll, false);
+    }
 
-
+    _setupLanguage() {
         let language = localStorage.languagePreference;
         if (language === undefined) {
             language = navigator.language;
@@ -124,55 +179,6 @@ class WidgetWindow {
             this._toolbar.style.display = "flex";
             this._toolbar.style.flexShrink = "0";
         }
-
-        // Global watcher to track the mouse
-        document.addEventListener("mousemove", (e) => {
-            if (!this._dragging) return;
-
-            const x = e.clientX - this._dx,
-                y = e.clientY - this._dy;
-
-            this.setPosition(x, y);
-        });
-
-        document.addEventListener("mousedown", (e) => {
-            if (e.target === this._frame || this._frame.contains(e.target)) {
-                this._frame.style.opacity = "1";
-                this._frame.style.zIndex = "1";
-            } else {
-                this._frame.style.opacity = ".7";
-                this._frame.style.zIndex = "0";
-            }
-        });
-
-        document.addEventListener("mouseup", (e) => {
-            this._dragging = false;
-        });
-
-        if (window.widgetWindows._posCache[this._key]) {
-            const _pos = window.widgetWindows._posCache[this._key];
-            this.setPosition(_pos[0], _pos[1]);
-        }
-
-        this.takeFocus();
-    }
-
-    _create = (base, className, parent) => {
-        const el = document.createElement(base);
-        if (className) el.className = className;
-        if (parent) parent.append(el);
-        return el;
-    }
-
-    _disableScroll = () => {
-        // Get the current page scroll position
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-        // if any scroll is attempted,
-        // set this to the previous value
-        window.onscroll = () => {
-            window.scrollTo(scrollLeft, scrollTop);
-        };
     }
 
     addInputButton = (initial, parent) => {
