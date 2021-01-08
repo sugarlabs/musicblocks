@@ -16,33 +16,26 @@ class WidgetWindow {
         // Keep a refernce to the object within handlers
         this._key = key;
 
-        const create = (base, className, parent) => {
-            let el = document.createElement(base);
-            if (className) el.className = className;
-            if (parent) parent.append(el);
-            return el;
-        };
-
         let windows = docById("floatingWindows");
-        this._frame = create("div", "windowFrame", windows);
+        this._frame = this._create("div", "windowFrame", windows);
 
-        this._drag = create("div", "wfTopBar", this._frame);
-        this._handle = create("div", "wfHandle", this._drag);
+        this._drag = this._create("div", "wfTopBar", this._frame);
+        this._handle = this._create("div", "wfHandle", this._drag);
 
-        let closeButton = create("div", "wftButton close", this._drag);
-        let rollButton = create("div", "wftButton rollup", this._drag);
+        let closeButton = this._create("div", "wftButton close", this._drag);
+        let rollButton = this._create("div", "wftButton rollup", this._drag);
 
-        let titleEl = create("div", "wftTitle", this._drag);
+        let titleEl = this._create("div", "wftTitle", this._drag);
         titleEl.innerHTML = _(title);
         titleEl.id = key + "WidgetID";
 
-        let maxminButton = create("div", "wftButton wftMaxmin", this._drag);
-        this._maxminIcon = create("img", undefined, maxminButton);
+        let maxminButton = this._create("div", "wftButton wftMaxmin", this._drag);
+        this._maxminIcon = this._create("img", undefined, maxminButton);
         this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
 
-        this._body = create("div", "wfWinBody", this._frame);
-        this._toolbar = create("div", "wfbToolbar", this._body);
-        this._widget = create("div", "wfbWidget", this._body);
+        this._body = this._create("div", "wfWinBody", this._frame);
+        this._toolbar = this._create("div", "wfbToolbar", this._body);
+        this._widget = this._create("div", "wfbWidget", this._body);
 
         let language = localStorage.languagePreference;
         if (language === undefined) {
@@ -71,9 +64,6 @@ class WidgetWindow {
         // Drag offset for correct positioning
         this._dx = this._dy = 0;
         this._dragging = false;
-
-        // Needed to keep things canvas-relative
-        let canvas = docById("myCanvas");
 
         // Scrolling in window body .
         // this.top = 0;
@@ -124,12 +114,6 @@ class WidgetWindow {
                 this._frame.style.zIndex = "0";
             }
         });
-
-        // The title may change, as with the Help Widget.
-        this.updateTitle = (title) => {
-            let wftTitle = docById(this._key + "WidgetID");
-            wftTitle.innerHTML = title;
-        };
 
         // The handle needs the events bound as it's a sibling of the dragging div
         // not a relative in either direciton.
@@ -187,201 +171,215 @@ class WidgetWindow {
             e.stopImmediatePropagation();
         };
 
-        this.takeFocus = () => {
-            let siblings = windows.children;
-            for (let i = 0; i < siblings.length; i++) {
-                siblings[i].style.zIndex = "0";
-                siblings[i].style.opacity = ".7";
-            }
-            this._frame.style.zIndex = "1";
-            this._frame.style.opacity = "1";
-        };
-
-        this.addButton = (icon, iconSize, label, parent) => {
-            let el = create("div", "wfbtItem", parent || this._toolbar);
-            el.innerHTML =
-                '<img src="header-icons/' +
-                icon +
-                '" title="' +
-                label +
-                '" alt="' +
-                label +
-                '" height="' +
-                iconSize +
-                '" width="' +
-                iconSize +
-                '" />';
-            this._buttons.push(el);
-            return el;
-        };
-
-        this.addInputButton = (initial, parent) => {
-            let el = create("div", "wfbtItem", parent || this._toolbar);
-            el.innerHTML = '<input value="' + initial + '" />';
-            return el.querySelector("input");
-        };
-
-        this.addRangeSlider = (initial, parent, min, max, classNm) => {
-            let el = create("div", "wfbtItem", parent || this._toolbar);
-            el.style.height = "250px";
-            el.innerHTML =
-                '<input type="range" class="' +
-                classNm +
-                '"  min="' +
-                min +
-                '" max="' +
-                max +
-                '" value="' +
-                initial +
-                '">';
-            let slider = el.querySelector("input");
-            slider.style = " position:absolute;transform:rotate(270deg);height:10px;width:57%;";
-            return slider;
-        };
-
-        this.addSelectorButton = (list, initial, parent) => {
-            let el = create("div", "wfbtItem", parent || this._toolbar);
-            el.innerHTML = '<select value="' + initial + '" />';
-            let selector = el.querySelector("select");
-            for (let i of list) {
-                let newOption = new Option("turtle " + i, i);
-                selector.add(newOption);
-            }
-            return selector;
-        };
-
-        this.addDivider = () => {
-            let el = create("div", "wfbtHR", this._toolbar);
-            return el;
-        };
-
-        this.modifyButton = (index, icon, iconSize, label) => {
-            this._buttons[index].innerHTML =
-                '<img src="header-icons/' +
-                icon +
-                '" title="' +
-                label +
-                '" alt="' +
-                label +
-                '" height="' +
-                iconSize +
-                '" width="' +
-                iconSize +
-                '" />';
-            return this._buttons[index];
-        };
-
-        this.getWidgetBody = () => {
-            return this._widget;
-        };
-
-        this.getDragElement = () => {
-            return this._drag;
-        };
-
-        this.onclose = () => {
-            this.destroy();
-        };
-
-        this.destroy = () => {
-            this._frame.remove();
-
-            window.widgetWindows.openWindows[this._key] = undefined;
-        };
-
-        this.onmaximize = () => {
-            return this;
-        };
-
-        this.show = () => {
-            this._frame.style.display = "block";
-        };
-
-        this.setPosition = (x, y) => {
-            this._frame.style.left = x + "px";
-            this._frame.style.top = Math.max(y, 64) + "px";
-            window.widgetWindows._posCache[this._key] = [x, Math.max(y, 64)];
-
-            return this;
-        };
-
-        this.sendToCenter = () => {
-            let fRect = this._frame.getBoundingClientRect();
-            let cRect = canvas.getBoundingClientRect();
-
-            if (cRect.width === 0 || cRect.height === 0) {
-                // The canvas isn't shown so we set some approximate numbers
-                this.setPosition(200, 140);
-                return this;
-            }
-
-            const navHeight = document.querySelector("nav").offsetHeight;
-            this.setPosition(
-                (cRect.width - fRect.width) / 2,
-                (cRect.height - fRect.height + navHeight) / 2
-            );
-
-            return this;
-        };
-
-        this.isVisible = () => {
-            return this._visible;
-        };
-
-        this.clear = () => {
-            this._widget.innerHTML = "";
-            this._toolbar.innerHTML = "";
-
-            return this;
-        };
-
-        this.rollup = () => {
-            this._rolled = true;
-            this._body.style.display = "none";
-            return this;
-        };
-
-        this.unroll = () => {
-            this._rolled = false;
-            this._body.style.display = "flex";
-            return this;
-        };
-
-        this.maximize = () => {
-            this._maxminIcon.setAttribute("src", "header-icons/icon-contract.svg");
-            this._maximized = true;
-            this.unroll();
-            this.takeFocus();
-
-            this._savedPos = [this._frame.style.left, this._frame.style.top];
-            this._frame.style.width = "100vw";
-            this._frame.style.height = "calc(100vh - 64px)";
-            this._frame.style.left = "0";
-            this._frame.style.top = "64px";
-        };
-
-        this.restore = () => {
-            this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
-            this._maximized = false;
-
-            if (this._savedPos) {
-                this._frame.style.left = this._savedPos[0];
-                this._frame.style.top = this._savedPos[1];
-                this._savedPos = null;
-            }
-            this._frame.style.width = "auto";
-            this._frame.style.height = "auto";
-        };
-
-        this.close = () => {
-            this.onclose();
-        };
-
         if (!!window.widgetWindows._posCache[this._key]) {
             let _pos = window.widgetWindows._posCache[this._key];
             this.setPosition(_pos[0], _pos[1]);
         }
         this.takeFocus();
+    }
+
+    _create = (base, className, parent) => {
+        let el = document.createElement(base);
+        if (className) el.className = className;
+        if (parent) parent.append(el);
+        return el;
+    };
+
+    addInputButton = (initial, parent) => {
+        let el = this._create("div", "wfbtItem", parent || this._toolbar);
+        el.innerHTML = '<input value="' + initial + '" />';
+        return el.querySelector("input");
+    }
+
+    addRangeSlider = (initial, parent, min, max, classNm) => {
+        let el = this._create("div", "wfbtItem", parent || this._toolbar);
+        el.style.height = "250px";
+        el.innerHTML =
+            '<input type="range" class="' +
+            classNm +
+            '"  min="' +
+            min +
+            '" max="' +
+            max +
+            '" value="' +
+            initial +
+            '">';
+        let slider = el.querySelector("input");
+        slider.style = " position:absolute;transform:rotate(270deg);height:10px;width:57%;";
+        return slider;
+    }
+
+    addSelectorButton = (list, initial, parent) => {
+        let el = this._create("div", "wfbtItem", parent || this._toolbar);
+        el.innerHTML = '<select value="' + initial + '" />';
+        let selector = el.querySelector("select");
+        for (let i of list) {
+            let newOption = new Option("turtle " + i, i);
+            selector.add(newOption);
+        }
+        return selector;
+    }
+
+    addDivider = () => {
+        let el = this._create("div", "wfbtHR", this._toolbar);
+        return el;
+    }
+
+    modifyButton = (index, icon, iconSize, label) => {
+        this._buttons[index].innerHTML =
+            '<img src="header-icons/' +
+            icon +
+            '" title="' +
+            label +
+            '" alt="' +
+            label +
+            '" height="' +
+            iconSize +
+            '" width="' +
+            iconSize +
+            '" />';
+        return this._buttons[index];
+    }
+
+    close = () => {
+        this.onclose();
+    }
+
+    // The title may change, as with the Help Widget.
+    updateTitle = (title) => {
+        let wftTitle = docById(this._key + "WidgetID");
+        wftTitle.innerHTML = title;
+    }
+
+    takeFocus = () => {
+        let windows = docById("floatingWindows");
+        let siblings = windows.children;
+        for (let i = 0; i < siblings.length; i++) {
+            siblings[i].style.zIndex = "0";
+            siblings[i].style.opacity = ".7";
+        }
+        this._frame.style.zIndex = "1";
+        this._frame.style.opacity = "1";
+    }
+
+    addButton = (icon, iconSize, label, parent) => {
+        let el = this._create("div", "wfbtItem", parent || this._toolbar);
+        el.innerHTML =
+            '<img src="header-icons/' +
+            icon +
+            '" title="' +
+            label +
+            '" alt="' +
+            label +
+            '" height="' +
+            iconSize +
+            '" width="' +
+            iconSize +
+            '" />';
+        this._buttons.push(el);
+        return el;
+    }
+
+    sendToCenter = () => {
+        let canvas = docById("myCanvas");
+        let fRect = this._frame.getBoundingClientRect();
+        let cRect = canvas.getBoundingClientRect();
+
+        if (cRect.width === 0 || cRect.height === 0) {
+            // The canvas isn't shown so we set some approximate numbers
+            this.setPosition(200, 140);
+            return this;
+        }
+
+        const navHeight = document.querySelector("nav").offsetHeight;
+        this.setPosition(
+            (cRect.width - fRect.width) / 2,
+            (cRect.height - fRect.height + navHeight) / 2
+        );
+
+        return this;
+    }
+
+    restore = () => {
+        this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
+        this._maximized = false;
+
+        if (this._savedPos) {
+            this._frame.style.left = this._savedPos[0];
+            this._frame.style.top = this._savedPos[1];
+            this._savedPos = null;
+        }
+        this._frame.style.width = "auto";
+        this._frame.style.height = "auto";
+    }
+
+    maximize = () => {
+        this._maxminIcon.setAttribute("src", "header-icons/icon-contract.svg");
+        this._maximized = true;
+        this.unroll();
+        this.takeFocus();
+
+        this._savedPos = [this._frame.style.left, this._frame.style.top];
+        this._frame.style.width = "100vw";
+        this._frame.style.height = "calc(100vh - 64px)";
+        this._frame.style.left = "0";
+        this._frame.style.top = "64px";
+    }
+
+    getWidgetBody = () => {
+        return this._widget;
+    }
+
+    getDragElement = () => {
+        return this._drag;
+    }
+
+    onclose = () => {
+        this.destroy();
+    }
+
+    destroy = () => {
+        this._frame.remove();
+        window.widgetWindows.openWindows[this._key] = undefined;
+    }
+
+    onmaximize = () => {
+        return this;
+    }
+
+    show = () => {
+        this._frame.style.display = "block";
+    }
+
+    setPosition = (x, y) => {
+        this._frame.style.left = x + "px";
+        this._frame.style.top = Math.max(y, 64) + "px";
+        window.widgetWindows._posCache[this._key] = [x, Math.max(y, 64)];
+
+        return this;
+    }
+
+    isVisible = () => {
+        return this._visible;
+    }
+
+    clear = () => {
+        this._widget.innerHTML = "";
+        this._toolbar.innerHTML = "";
+
+        return this;
+    }
+
+    rollup = () => {
+        this._rolled = true;
+        this._body.style.display = "none";
+        return this;
+    }
+
+    unroll = () => {
+        this._rolled = false;
+        this._body.style.display = "flex";
+        return this;
     }
 }
 
