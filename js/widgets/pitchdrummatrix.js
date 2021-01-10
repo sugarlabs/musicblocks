@@ -115,7 +115,7 @@ class PitchDrumMatrix {
 
         // For the button callbacks
 
-        widgetWindow.onclose = function () {
+        widgetWindow.onclose = () => {
             pdmTableDiv.style.visibility = "hidden";
             this._logo.hideMsgs();
             this.destroy();
@@ -125,7 +125,7 @@ class PitchDrumMatrix {
             "play-button.svg",
             PitchDrumMatrix.ICONSIZE,
             _("Play")
-        ).onclick = function () {
+        ).onclick = () => {
             this._logo.turtleDelay = 0;
             this._playAll();
         };
@@ -135,12 +135,12 @@ class PitchDrumMatrix {
             "export-chunk.svg",
             PitchDrumMatrix.ICONSIZE,
             _("Save")
-        ).onclick = function () {
+        ).onclick = () => {
             // Debounce button
             if (!this._get_save_lock()) {
                 this._save_lock = true;
                 this._save();
-                setTimeout(function () {
+                setTimeout(() => {
                     this._save_lock = false;
                 }, 1000);
             }
@@ -150,7 +150,7 @@ class PitchDrumMatrix {
             "erase-button.svg",
             PitchDrumMatrix.ICONSIZE,
             _("Clear")
-        ).onclick = function () {
+        ).onclick = () => {
             this._clear();
         };
 
@@ -445,7 +445,7 @@ class PitchDrumMatrix {
                 drumRow = drumTable.rows[0];
                 drumCell = drumRow.cells[j];
 
-                cell.onclick = function () {
+                cell.onclick = () => {
                     let rowcol = this.id.split(",");
                     if (this.style.backgroundColor === "black") {
                         this.style.backgroundColor =
@@ -551,12 +551,12 @@ class PitchDrumMatrix {
         }
 
         if (i < pairs.length - 1) {
-            setTimeout(function () {
+            setTimeout(() => {
                 let ii = i + 1;
                 this._playPitchDrum(ii, pairs);
             }, 1000);
         } else {
-            setTimeout(function () {
+            setTimeout(() => {
                 for (let ii = 0; ii < pdmTable.rows.length - 1; ii++) {
                     pdmTable.rows[ii].cells[0].style.backgroundColor =
                         platformColor.labelColor;
@@ -655,7 +655,7 @@ class PitchDrumMatrix {
                 0, note.replace(/♭/g, "b").replace(/♯/g, "#"), 0.125, "default", null, null
             );
 
-            setTimeout(function () {
+            setTimeout(() => {
                 this._logo.synth.trigger(0, "C2", 0.125, drumName, null, null);
             }, waitTime);
         }
