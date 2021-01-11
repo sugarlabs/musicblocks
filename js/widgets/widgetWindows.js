@@ -72,6 +72,8 @@ class WidgetWindow {
         }
 
         this.takeFocus();
+
+        this.sendToCenter = this.sendToCenter.bind(this);
     }
 
     /**
@@ -328,11 +330,6 @@ class WidgetWindow {
      * @returns {HTMLElement} 
      */
     addButton(icon, iconSize, label, parent) {
-        console.log("From WidgetWindow addButton");
-        console.log(`type of icon = ${typeof(icon)}`);
-        console.log(`type of iconSize = ${typeof(iconSize)}`);
-        console.log(`type of label = ${typeof(label)}`);
-
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
         el.innerHTML =
             '<img src="header-icons/' +
