@@ -172,7 +172,7 @@ hierarchy. Every single contribution is welcome, as long as it doesn't spam or d
 about what it is addressing and not the issue. In case a PR fixes an issue, use `fixes #ticketno` or
 `closes #ticketno` in the PR's comment. Briefly explain what your PR is doing.
 
-7. Always test you changes extensively before creating a PR. There's no sense in merging broken
+7. Always test your changes extensively before creating a PR. There's no sense in merging broken
 code. If a PR is a _work in progress (WIP)_, convert it to draft. It'll let the maintainers know it
 isn't ready for merging.
 
