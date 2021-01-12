@@ -636,6 +636,7 @@ function setupToneBlocks() {
                     logo.sample.sampleBlock = blk;
                     console.log(args[0]);
                     logo.sample.sampleName = args[0];
+                    logo.sample.sampleData = args[1];
                 }
 
                 Singer.ToneActions.setTimbre(args[0], turtle, blk);
@@ -671,8 +672,7 @@ function setupToneBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            console.log(logo.blocks.blockList[blk].value);
-            return logo.blocks.blockList[blk].value;
+            return logo.blocks.blockList[blk].value[0];
         }
 
         arg(logo, turtle, blk, receivedArg) {
@@ -682,8 +682,7 @@ function setupToneBlocks() {
             ) {
                 logo.statusFields.push([blk, "audiofile"]);
             } else {
-                console.log(logo.blocks.blockList[blk].value);
-                return logo.blocks.blockList[blk].value;
+                return logo.blocks.blockList[blk].value[0];
             }
         }
     }
