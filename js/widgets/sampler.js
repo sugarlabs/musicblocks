@@ -24,7 +24,6 @@ function SampleWidget() {
             if (blockNumber != null) {
                 this._logo.blocks.blockList[blockNumber].value = [this.sampleName, this.sampleData];
                 console.log(this._logo.blocks.blockList[blockNumber].value);
-                this._logo.blocks.blockList[blockNumber].text.text = this.sampleName;
                 this._logo.blocks.blockList[blockNumber].updateCache();
                 this._logo.refreshCanvas();
                 saveLocally();
@@ -116,7 +115,7 @@ function SampleWidget() {
             that._addSample();
 
             var newStack = [
-                [0, ["audiofile", { value: that.sampleName }], 0, 0, [null, 1]],
+                [0, ["audiofile", { value: [that.sampleName, that.sampleData]}], 0, 0, [null, 1]],
                 [0, ["number", {value: that.pitchAdjustment}], 0, 0, [0]]
             ];
 

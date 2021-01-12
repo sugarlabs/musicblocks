@@ -1785,10 +1785,12 @@ class Block {
                         that.loadThumbnail(null);
                         return;
                     }
-                    that.value = [fileChooser.files[0].name, reader.result];
+                    let filevalue = reader.result;
+                    let filename = fileChooser.files[0].name;
                     if (that.name === "audiofile") {
-                        if (!(CUSTOMSAMPLES.includes(that.value))) {
-                            CUSTOMSAMPLES.push(that.value);
+                        that.value = [filename, filevalue];
+                        if (!(CUSTOMSAMPLES.includes([filename, filevalue]))) {
+                            CUSTOMSAMPLES.push([filename, filevalue]);
                             that.blocks.updateBlockText(thisBlock);
                         }
                     }

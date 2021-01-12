@@ -634,6 +634,7 @@ function setupToneBlocks() {
                     logo.rhythmRuler.Rulers.push([[], []]);
                 } else if (logo.inSample) {
                     logo.sample.sampleBlock = blk;
+                    console.log(args[0]);
                     logo.sample.sampleName = args[0];
                 }
 
@@ -664,13 +665,14 @@ function setupToneBlocks() {
             this.parameter = true;
 
             this.makeMacro((x, y) => [
-                [0, ["audiofile", {value: ["new", ""]}], x, y, [null, 1]],
+                [0, ["audiofile", {value: null}], x, y, [null, 1]],
                 [1, ["number", {value: 0}], 0, 0, [0]],
             ]);
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value[0];
+            console.log(logo.blocks.blockList[blk].value);
+            return logo.blocks.blockList[blk].value;
         }
 
         arg(logo, turtle, blk, receivedArg) {
@@ -680,7 +682,8 @@ function setupToneBlocks() {
             ) {
                 logo.statusFields.push([blk, "audiofile"]);
             } else {
-                return logo.blocks.blockList[blk].value[0];
+                console.log(logo.blocks.blockList[blk].value);
+                return logo.blocks.blockList[blk].value;
             }
         }
     }
