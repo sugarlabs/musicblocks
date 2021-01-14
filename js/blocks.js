@@ -2254,7 +2254,7 @@ function Blocks(activity) {
                     label = _("audio file");
                 } else {
                     console.log(myBlock.value);
-                    label = myBlock.value.toString();
+                    label = myBlock.value[0].toString();
                 }
             } catch (e) {
                 label = _("audio file");
@@ -5699,6 +5699,9 @@ function Blocks(activity) {
                 break;
             case "audiofile":
                 postProcess = function(args) {
+                    console.log(args[0]);
+                    console.log(args[1]);
+                    console.log(that.blockList[args[0]].value);
                     that.blockList[args[0]].value = args[1];
                     that.updateBlockText(args[0]);
                 }
