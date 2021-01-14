@@ -1504,67 +1504,76 @@ function Activity() {
     };
 
     /*
-     * Renders Cartesian/Polar/Treble/et al. grids and changes button
-     * labels accordingly
+     * Renders Cartesian/Polar/Treble/et al. grids
      */
     let _doCartesianPolar = () => {
-        if (cartesianBitmap.visible && polarBitmap.visible) {
-            _hideCartesian();
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                //.TRANS: show treble clef
-                turtles.setGridLabel(_("show treble"));
-            } else {
-                //.TRANS: hide Polar coordinate overlay grid
-                turtles.setGridLabel(_("hide Polar"));
-            }
-        } else if (!cartesianBitmap.visible && polarBitmap.visible) {
-            _hidePolar();
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                this._showTreble();
-                //.TRANS: show bass clef
-                turtles.setGridLabel(_("show bass"));
-            } else {
-                //.TRANS: show Cartesian coordinate overlay grid
-                turtles.setGridLabel(_("show Cartesian"));
-            }
-        } else if (trebleBitmap.visible) {
-            _hideTreble();
-            this._showGrand();
-            //.TRANS: show mezzo-soprano staff
-            turtles.setGridLabel(_("show mezzo-soprano"));
-        } else if (grandBitmap.visible) {
-            _hideGrand();
-            this._showSoprano();
-            //.TRANS: show alto clef
-            turtles.setGridLabel(_("show alto"));
-        } else if (sopranoBitmap.visible) {
-            _hideSoprano();
-            this._showAlto();
-            //.TRANS: show tenor clef
-            turtles.setGridLabel(_("show tenor"));
-        } else if (altoBitmap.visible) {
-            _hideAlto();
-            this._showTenor();
-            //.TRANS: show bass clef
-            turtles.setGridLabel(_("show bass"));
-        } else if (tenorBitmap.visible) {
-            _hideTenor();
-            this._showBass();
-            //.TRANS: hide bass clef
-            turtles.setGridLabel(_("hide bass"));
-        } else if (bassBitmap.visible) {
-            _hideBass();
-            turtles.setGridLabel(_("show Cartesian"));
-        } else if (!cartesianBitmap.visible && !polarBitmap.visible) {
-            this._showCartesian();
-            //.TRANS: show Polar coordinate overlay grid
-            turtles.setGridLabel(_("show Polar"));
-        } else if (cartesianBitmap.visible && !polarBitmap.visible) {
-            this._showPolar();
-            //.TRANS: hide Cartesian coordinate overlay grid
-            turtles.setGridLabel(_("hide Cartesian"));
-        }
 
+        switch(turtles.currentGrid){
+            case 1:
+                _hideCartesian();
+                break;
+            case 2:
+                _hideCartesian();
+                _hidePolar();
+                break;
+            case 3:
+                _hidePolar();
+                break;
+            case 4:
+                _hideTreble();
+                break;
+            case 5:
+                _hideGrand();
+                break;
+            case 6:
+                _hideSoprano();
+                break;
+            case 7:
+                _hideAlto();
+                break;
+            case 8:
+                _hideTenor();
+                break;
+            case 9:
+                _hideBass();
+                break;
+            default:
+                console.log("Blank Grid");     
+        }
+        
+        switch(turtles.gridWheel.selectedNavItemIndex){
+            case 1:
+                this._showCartesian();
+                break;
+            case 2:
+                this._showCartesian();
+                this._showPolar();
+                break;
+            case 3:
+                this._showPolar();
+                break;
+            case 4:
+                this._showTreble();
+                break;
+            case 5:
+                this._showGrand();
+                break;
+            case 6:
+                this._showSoprano();
+                break;
+            case 7:
+                this._showAlto();
+                break;
+            case 8:
+                this._showTenor();
+                break;
+            case 9:
+                this._showBass();
+                break;
+            default:
+                console.log("Blank Grid");
+        }
+        turtles.currentGrid = turtles.gridWheel.selectedNavItemIndex;
         update = true;
     };
 
@@ -1990,6 +1999,10 @@ function Activity() {
                     (e.target === docById("ui-id-1") || docById("ui-id-1").contains(e.target))
                 ) {
                     //do nothing when clicked on the menu
+                } else if (
+                    document.getElementsByTagName("tr")[2].contains(e.target)
+                ) {
+                    //do nothing when clicked on the search row
                 } else {
                     hideSearchWidget();
                     document.removeEventListener("mousedown", closeListener);

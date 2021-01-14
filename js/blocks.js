@@ -3066,7 +3066,7 @@ function Blocks(activity) {
                 }
             };
 
-            postProcessArg = [b, null];
+            postProcessArg = [thisBlock, null];
         } else if (name === "camera") {
             postProcess = function(args) {
                 let b = args[0];

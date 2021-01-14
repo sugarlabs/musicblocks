@@ -2645,9 +2645,11 @@ function MusicKeyboard() {
         };
 
         if (navigator.requestMIDIAccess)
-            navigator.requestMIDIAccess({ sysex: true }).then(onMIDISuccess, onMIDIFailure);
-        else logo.errorMsg(_("Failed to get MIDI access in browser."));
-    };
+            navigator.requestMIDIAccess({ sysex: true })
+                .then(onMIDISuccess, onMIDIFailure);
+        else
+            logo.errorMsg(_("Failed to get MIDI access in browser."));
+    }
 
     function fillChromaticGaps(noteList) {
         // Assuming list of either solfege or letter class of the form
@@ -2680,7 +2682,7 @@ function MusicKeyboard() {
 
         obj[0] = convertFromSolfege(obj[0]);
         let j = 0;
-        if (obj[0] !== "C") {
+        if (obj[0] !== 'C') {
             // Pad the left side.
             for (let i = 0; i < PITCHES2.length; i++) {
                 newList.push({

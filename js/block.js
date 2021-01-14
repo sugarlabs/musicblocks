@@ -1727,7 +1727,7 @@ class Block {
 
         image.onload = function () {
             // Before adding new artwork, remove any old artwork.
-            // that.removeChildBitmap("media");
+            that.removeChildBitmap("media");
 
             let bitmap = new createjs.Bitmap(image);
             bitmap.name = "media";
@@ -3404,7 +3404,7 @@ class Block {
                     case "setshade":
                     case "settranslucency":
                     case "setgrey":
-                        piemenuNumber(
+                        piemenuColor(
                             this,
                             this.blocks.blockList[this.connections[0]].protoblock.piemenuValuesC1,
                             this.value,

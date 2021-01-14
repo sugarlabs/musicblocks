@@ -389,6 +389,7 @@ function setupGraphicsBlocks() {
             //.TRANS: set compass heading
             super("setheading", _("set heading"));
             this.setPalette("graphics");
+            this.beginnerBlock(this.lang !== "ja");
             this.piemenuValuesC1 = [0, 30, 45, 60, 90, 120, 135, 150, 180,
                                     210, 225, 240, 270, 300, 315, 330];
 

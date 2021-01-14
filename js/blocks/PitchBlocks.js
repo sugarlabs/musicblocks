@@ -354,6 +354,14 @@ function setupPitchBlocks() {
             this.beginnerBlock(true);
             this.parameter = true;
             this.formBlock({ outType: "pitchout" });
+            this.setHelpString([
+                _(
+                    "The Current Pitch block is used with the Pitch Converter block. In the example above, current pitch, sol 4, is displayed as 392 hertz."
+                ),
+                "documentation",
+                null,
+                "currentpitchhelp"
+            ]);
         }
 
         updateParameter(logo, turtle, blk) {

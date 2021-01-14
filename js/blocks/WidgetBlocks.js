@@ -361,17 +361,14 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.meterWidget === null) {
-                logo.meterWidget = new MeterWidget();
-            }
-
             logo.insideMeterWidget = true;
 
             let listenerName = "_meterwidget_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
-                logo.meterWidget.init(logo, logo._meterBlock, blk);
+                logo.meterWidget = new MeterWidget(blk);
+
                 logo.insideMeterWidget = false;
             };
 
@@ -415,9 +412,6 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (logo.Oscilloscope === null) {
-                logo.Oscilloscope = new Oscilloscope();
-            }
             logo.oscilloscopeTurtles = [];
             logo.inOscilloscope = true;
 
@@ -425,7 +419,7 @@ function setupWidgetBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
-                logo.Oscilloscope.init(logo);
+                logo.Oscilloscope = new Oscilloscope(logo);
                 logo.inOscilloscope = false;
             };
 
