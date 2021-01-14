@@ -747,10 +747,11 @@ function Activity() {
             svg += "</g>";
 
             if (blocks.blockList[i].isCollapsible()) {
+                let y;
                 if (INLINECOLLAPSIBLES.indexOf(blocks.blockList[i].name) !== -1) {
-                    let y = blocks.blockList[i].container.y + 4;
+                    y = blocks.blockList[i].container.y + 4;
                 } else {
-                    let y = blocks.blockList[i].container.y + 12;
+                    y = blocks.blockList[i].container.y + 12;
                 }
 
                 svg +=
@@ -4708,7 +4709,7 @@ function Activity() {
         toolbar.renderRunStepIcon(_doStepButton);
         toolbar.renderAdvancedIcons(
             () => {
-                logo.statsWindow = new StatsWindow();
+                if(!logo.statsWindow) logo.statsWindow = new StatsWindow();
             },
             doOpenPlugin,
             deletePlugin,
