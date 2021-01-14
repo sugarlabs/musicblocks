@@ -23,8 +23,14 @@ function SampleWidget() {
             blockNumber = this._logo.blocks.blockList[this.sampleBlock].connections[1];
             if (blockNumber != null) {
                 this._logo.blocks.blockList[blockNumber].value = [this.sampleName, this.sampleData];
-                console.log(this._logo.blocks.blockList[blockNumber].value);
                 this._logo.blocks.blockList[blockNumber].updateCache();
+
+                numberBlockNumber = this._logo.blocks.blockList[blockNumber].connections[0];
+                if (numberBlockNumber != null) {
+                    this._logo.blocks.blockList[numberBlockNumber].value = this.pitchAdjustment;
+
+                    this._logo.blocks.blockList[numberBlockNumber].updateCache();
+                }
                 this._logo.refreshCanvas();
                 saveLocally();
             }
@@ -147,6 +153,12 @@ function SampleWidget() {
         this._intervalID = null;
 
         this._logo.synth.loadSynth(0, getVoiceSynthName(DEFAULTSAMPLE));
+
+        for (i=0;i<CUSTOMSAMPLES.length;i++) {
+            if (CUSTOMSAMPLES[i][0] == this.sampleName) {
+                this.sampleData = CUSTOMSAMPLES[i][1];
+            }
+        }
 
         if (this._intervalID != null) {
             clearInterval(this._intervalID);
