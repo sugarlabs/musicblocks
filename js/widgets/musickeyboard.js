@@ -407,7 +407,6 @@ function MusicKeyboard() {
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
-        console.log(this.noteNames);
         this._keysLayout();
         let tur = logo.turtles.ithTurtle(0);
         this.bpm = tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
@@ -436,7 +435,7 @@ function MusicKeyboard() {
             selected = [];
             selectedNotes = [];
             if (this.loopTick) this.loopTick.stop();
-            this.destroy();
+            widgetWindow.destroy();
         };
 
         this.playButton = widgetWindow.addButton(
@@ -863,9 +862,7 @@ function MusicKeyboard() {
             removeBlock(i);
         }
 
-        console.log(sortedList);
         let newList = fillChromaticGaps(sortedList);
-        console.log(newList);
 
         for (let i = 0; i < newList.length; i++) {
             this.layout.push({
@@ -981,7 +978,8 @@ function MusicKeyboard() {
 
                 isMouseDown = false;
 
-                cell.onmousedown = () => {
+                cell.onmousedown = (e) => {
+                    cell = e.target;
                     let obj, i, j;
                     isMouseDown = true;
                     obj = cell.id.split(":");
@@ -1108,8 +1106,8 @@ function MusicKeyboard() {
                     cell = cell.parentNode;
                 }
 
-                let index = cell.getAttribute("alt").split("__")[0];
-                let condition = cell.getAttribute("alt").split("__")[1];
+                const index = cell.getAttribute("alt").split("__")[0];
+                const condition = cell.getAttribute("alt").split("__")[1];
                 this._createColumnPieSubmenu(index, condition);
             };
 
@@ -1590,7 +1588,6 @@ function MusicKeyboard() {
                 rLabel = pitchLabels[(i + 1) % pitchLabels.length];
                 for (let j = this.layout.length; j > 0; j--) {
                     rArg = this.layout[j - 1].noteOctave;
-                    console.log(rArg);
                     if (isNaN(rArg)) {
                         continue;
                     }
@@ -1651,7 +1648,6 @@ function MusicKeyboard() {
                 }
             }
             if (aboveBlock !== -1) {
-                console.log(rLabel + ' ' + rArg + ' ' + newBlock + ' ' +  this.layout[0].voice);
                 creatingNewNote = true;
                 setTimeout(() => {
                     this._addNotesBlockBetween(aboveBlock, newBlock);
@@ -1782,6 +1778,12 @@ function MusicKeyboard() {
 
     this._createColumnPieSubmenu = function(index, condition) {
         index = parseInt(index);
+        if (
+            blocks.blockList[this.layout[this.layout.length - index - 1].blockNumber] === undefined
+        ) {
+            return;
+        }
+
         docById("wheelDivptm").style.display = "";
         docById("wheelDivptm").style.zIndex = "300";
 
@@ -1857,6 +1859,23 @@ function MusicKeyboard() {
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.createWheel(["x", " "]);
 
+        const octaveLabels = [
+            "8",
+            "7",
+            "6",
+            "5",
+            "4",
+            "3",
+            "2",
+            "1",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ];
+
         if (condition === "pitchblocks") {
             this._accidentalsWheel.colors =
                 platformColor.accidentalsWheelcolors;
@@ -1896,22 +1915,6 @@ function MusicKeyboard() {
             this._octavesWheel.slicePathCustom.maxRadiusPercent = 0.95;
             this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
             this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
-            let octaveLabels = [
-                "8",
-                "7",
-                "6",
-                "5",
-                "4",
-                "3",
-                "2",
-                "1",
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
-            ];
             this._octavesWheel.animatetime = 0; // 300;
             this._octavesWheel.createWheel(octaveLabels);
         }
@@ -1934,8 +1937,9 @@ function MusicKeyboard() {
             ) + "px";
 
         index = this.layout.length - index - 1;
-        let  block = this.layout[index].blockNumber;
-        let  noteValue = this._logo.blocks.blockList[
+        let block = this.layout[index].blockNumber;
+
+        let noteValue = this._logo.blocks.blockList[
             this._logo.blocks.blockList[block].connections[1]
         ].value;
 
@@ -1957,14 +1961,11 @@ function MusicKeyboard() {
             }
 
             this._accidentalsWheel.navigateWheel(accidentalsValue);
-            this._octavesWheel.navigateWheel(
-                octaveLabels.indexOf(octaveValue.toString())
-            );
+            this._octavesWheel.navigateWheel(octaveLabels.indexOf(octaveValue.toString()));
 
             this._pitchWheel.navigateWheel(noteLabels.indexOf(noteValue));
         }
 
-         
         this._exitWheel.navItems[0].navigateFunction = () => {
             docById("wheelDivptm").style.display = "none";
             this._pitchWheel.removeWheel();
@@ -2050,15 +2051,13 @@ function MusicKeyboard() {
                 z
             );
             this._logo.blocks.blockList[noteLabelBlock].updateCache();
+
+            let octave;
             if (condition === "pitchblocks") {
-                let octave = Number(
-                    this._octavesWheel.navItems[
-                        this._octavesWheel.selectedNavItemIndex
-                    ].title
+                octave = Number(
+                    this._octavesWheel.navItems[this._octavesWheel.selectedNavItemIndex].title
                 );
-                this._logo.blocks.blockList[
-                    noteLabelBlock
-                ].blocks.setPitchOctave(
+                this._logo.blocks.blockList[noteLabelBlock].blocks.setPitchOctave(
                     this._logo.blocks.blockList[noteLabelBlock].connections[0],
                     octave
                 );
@@ -2775,7 +2774,6 @@ function MusicKeyboard() {
             }
         }
 
-        console.log(newStack);
         this._logo.blocks.loadNewBlocks(newStack);
         this._logo.textMsg(_("New action block generated!"));
     };
@@ -2941,8 +2939,11 @@ function MusicKeyboard() {
             this.midiON = false;
         }
 
-        navigator.requestMIDIAccess()
-            .then(onMIDISuccess, onMIDIFailure);
+        if (navigator.requestMIDIAccess)
+            navigator.requestMIDIAccess({ sysex: true })
+                .then(onMIDISuccess, onMIDIFailure);
+        else
+            logo.errorMsg(_("Failed to get MIDI access in browser."));
     }
 
     function fillChromaticGaps(noteList) {
@@ -2975,7 +2976,7 @@ function MusicKeyboard() {
         }
 
         obj[0] = convertFromSolfege(obj[0]);
-        let j;
+        let j = 0;
         if (obj[0] !== 'C') {
             // Pad the left side.
             for (let i = 0; i < PITCHES2.length; i++) {
@@ -3010,7 +3011,6 @@ function MusicKeyboard() {
                 thisOctave = obj[1];
                 lastVoice = noteList[i].voice;
                 obj[0] = convertFromSolfege(obj[0]);
-
                 let k = PITCHES.indexOf(obj[0]);
                 if (k === -1) {
                     k = PITCHES2.indexOf(obj[0]);
