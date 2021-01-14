@@ -46,7 +46,7 @@ class PitchDrumMatrix {
         // The pitch-block number associated with a row; a drum block is
         // associated with a column. We need to keep track of which
         // intersections in the grid are populated.  The blockMap is a
-        // list of selected nodes in the matrix this map pitch blocks to
+        // list of selected nodes in the matrix that map pitch blocks to
         // drum blocks.
 
         // These arrays get created each time the matrix is built.
@@ -55,7 +55,7 @@ class PitchDrumMatrix {
 
         // This array is preserved between sessions.
         // We populate the blockMap whenever a node is selected and
-        // restore any nodes this might be present.
+        // restore any nodes that might be present.
         this._blockMap = [];
     }
 
@@ -118,7 +118,7 @@ class PitchDrumMatrix {
         widgetWindow.onclose = () => {
             pdmTableDiv.style.visibility = "hidden";
             this._logo.hideMsgs();
-            this.destroy();
+            widgetWindow.destroy();
         };
 
         widgetWindow.addButton(
@@ -343,12 +343,12 @@ class PitchDrumMatrix {
         cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = platformColor.selectorBackground;
 
-        cell.onmouseover = function () {
-            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
+        cell.onmouseover = () => {
+            cell.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         };
 
-        cell.onmouseout = function () {
-            this.style.backgroundColor = platformColor.selectorBackground;
+        cell.onmouseout = () => {
+            cell.style.backgroundColor = platformColor.selectorBackground;
         };
 
         return cell;
@@ -374,15 +374,14 @@ class PitchDrumMatrix {
             cell.style.border = "2px solid white";
             cell.style.borderRadius = "10px";
 
-            cell.onmouseover = function () {
-                if (this.style.backgroundColor !== "black") {
-                    this.style.backgroundColor = platformColor.selectorSelected;
+            cell.onmouseover = () => {
+                if (cell.style.backgroundColor !== "black") {
+                    cell.style.backgroundColor = platformColor.selectorSelected;
                 }
             };
-            cell.onmouseout = function () {
-                if (this.style.backgroundColor !== "black") {
-                    this.style.backgroundColor =
-                        platformColor.selectorBackground;
+            cell.onmouseout = () => {
+                if (cell.style.backgroundColor !== "black") {
+                    cell.style.backgroundColor = platformColor.selectorBackground;
                 }
             };
 
@@ -445,14 +444,14 @@ class PitchDrumMatrix {
                 drumRow = drumTable.rows[0];
                 drumCell = drumRow.cells[j];
 
-                cell.onclick = () => {
-                    let rowcol = this.id.split(",");
-                    if (this.style.backgroundColor === "black") {
-                        this.style.backgroundColor =
-                            platformColor.selectorBackground;
+                cell.onclick = (e) => {
+                    const currCell = e.target;
+                    const rowcol = currCell.id.split(",");
+                    if (currCell.style.backgroundColor === "black") {
+                        currCell.style.backgroundColor = platformColor.selectorBackground;
                         this._setCellPitchDrum(rowcol[1], rowcol[0], false);
                     } else {
-                        this.style.backgroundColor = "black";
+                        currCell.style.backgroundColor = "black";
                         this._setCellPitchDrum(rowcol[1], rowcol[0], true);
                     }
                 };
@@ -574,9 +573,6 @@ class PitchDrumMatrix {
         // Find the drum cell
         let drumTable = docById("pdmDrumTable");
         let row = drumTable.rows[0];
-        let drumCell = row.cells[coli];
-
-        let pdmTable = docById("pdmTable");
         let table = docById("pdmCellTable" + rowi);
         row = table.rows[0];
 
@@ -584,6 +580,7 @@ class PitchDrumMatrix {
         // clear the row.
         let pitchBlock;
         let drumBlock;
+        let cell;
         if (playNote) {
             let obj;
             for (let i = 0; i < row.cells.length; i++) {
@@ -591,7 +588,7 @@ class PitchDrumMatrix {
                     continue;
                 }
 
-                cell = row.cells[i];
+               cell = row.cells[i];
                 if (cell.style.backgroundColor === "black") {
                     pitchBlock = this._rowBlocks[rowi];
                     drumBlock = this._colBlocks[i];
