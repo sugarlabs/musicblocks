@@ -21,6 +21,7 @@ class Tempo {
     static TEMPOWIDTH = 700;
     static TEMPOHEIGHT = 100;
     static YRADIUS = 75;
+
     constructor() {
         this._xradius = Tempo.YRADIUS / 3;
         this.BPMs = [];
@@ -50,9 +51,8 @@ class Tempo {
     }
 
     resume() {
-        // Reset widget time since we are restarting.
-        // We will no longer keep synch with the turtles.
-        let d = new Date();
+        // Reset widget time since we are restarting. We will no longer keep synch with the turtles.
+        const d = new Date();
         for (let i = 0; i < this.BPMs.length; i++) {
             this._widgetFirstTimes[i] = d.getTime();
             this._widgetNextTimes[i] = this._widgetFirstTimes[i] + this._intervals[i];
@@ -102,20 +102,17 @@ class Tempo {
 
         this._updateBPM(i);
         this.BPMInputs[i].value = this.BPMs[i];
-    };
+    }
 
     _draw() {
-        // First thing to do is figure out where we are supposed to be
-        // based on the elapsed time.
-        let d = new Date();
+        // First thing to do is figure out where we are supposed to be based on the elapsed time.
+        const d = new Date();
         let tempoCanvas, deltaTime, dx, x, ctx;
         for (let i = 0; i < this.BPMs.length; i++) {
             tempoCanvas = this.tempoCanvases[i];
-            if (!tempoCanvas)
-                continue;
+            if (!tempoCanvas) continue;
 
-            // We start the music clock as the first note is being
-            // played.
+            // We start the music clock as the first note is being played.
             if (this._widgetFirstTimes[i] == null) {
                 this._widgetFirstTimes[i] = d.getTime();
                 this._widgetNextTimes[i] = this._widgetFirstTimes[i] + this._intervals[i];
@@ -174,7 +171,15 @@ class Tempo {
             ctx.clearRect(0, 0, tempoCanvas.width, tempoCanvas.height);
             ctx.beginPath();
             ctx.fillStyle = "rgba(0,0,0,1)";
-            ctx.ellipse(x, Tempo.YRADIUS, Math.max(this._xradius, 1), Tempo.YRADIUS, 0, 0, Math.PI * 2);
+            ctx.ellipse(
+                x,
+                Tempo.YRADIUS,
+                Math.max(this._xradius, 1),
+                Tempo.YRADIUS,
+                0,
+                0,
+                Math.PI * 2
+            );
             ctx.fill();
             ctx.closePath();
         }
@@ -183,8 +188,8 @@ class Tempo {
     __save(i) {
         setTimeout(() => {
             console.debug("saving a BPM block for " + this.BPMs[i]);
-            let delta = i * 42;
-            let newStack = [
+            const delta = i * 42;
+            const newStack = [
                 [0, ["setbpm3", {}], 100 + delta, 100 + delta, [null, 1, 2, 5]],
                 [1, ["number", { value: this.BPMs[i] }], 0, 0, [0]],
                 [2, ["divide", {}], 0, 0, [0, 3, 4]],
@@ -206,9 +211,9 @@ class Tempo {
 
     _get_save_lock() {
         return this._save_lock;
-    };
+    }
 
-    init(logo) {
+    init() {
         this._directions = [];
         this._widgetFirstTimes = [];
         this._widgetNextTimes = [];
@@ -226,9 +231,7 @@ class Tempo {
             clearInterval(this._intervalID);
         }
 
-        let w = window.innerWidth;
-
-        let widgetWindow = window.widgetWindows.windowFor(this, "tempo");
+        const widgetWindow = window.widgetWindows.windowFor(this, "tempo");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -240,7 +243,7 @@ class Tempo {
             widgetWindow.destroy();
         };
 
-        let pauseBtn = widgetWindow.addButton("pause-button.svg", Tempo.ICONSIZE, _("Pause"));
+        const pauseBtn = widgetWindow.addButton("pause-button.svg", Tempo.ICONSIZE, _("Pause"));
         pauseBtn.onclick = () => {
             if (this.isMoving) {
                 this.pause();
@@ -272,7 +275,12 @@ class Tempo {
         };
 
         this._save_lock = false;
-        widgetWindow.addButton("export-chunk.svg", Tempo.ICONSIZE, _("Save tempo"), "").onclick = () => {
+        widgetWindow.addButton(
+            "export-chunk.svg",
+            Tempo.ICONSIZE,
+            _("Save tempo"),
+            ""
+        ).onclick = () => {
             // Debounce button
             if (!this._get_save_lock()) {
                 this._save_lock = true;
@@ -298,9 +306,12 @@ class Tempo {
             r1 = this.bodyTable.insertRow();
             r2 = this.bodyTable.insertRow();
             r3 = this.bodyTable.insertRow();
-            widgetWindow.addButton("up.svg", Tempo.ICONSIZE, _("speed up"), r1.insertCell()).onclick = ((
-                i
-            ) => () => this.speedUp(i))(i);
+            widgetWindow.addButton(
+                "up.svg",
+                Tempo.ICONSIZE,
+                _("speed up"),
+                r1.insertCell()
+            ).onclick = ((i) => () => this.speedUp(i))(i);
             widgetWindow.addButton(
                 "down.svg",
                 Tempo.ICONSIZE,
@@ -318,10 +329,9 @@ class Tempo {
             tcCell.appendChild(this.tempoCanvases[i]);
             tcCell.setAttribute("rowspan", "3");
 
-            // The tempo can be set from the interval between
-            // successive clicks on the canvas.
+            // The tempo can be set from the interval between successive clicks on the canvas.
             this.tempoCanvases[i].onclick = ((id) => () => {
-                let d = new Date();
+                const d = new Date();
                 let newBPM, BPMInput;
                 if (this._firstClickTime == null) {
                     this._firstClickTime = d.getTime();
