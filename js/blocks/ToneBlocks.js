@@ -634,11 +634,10 @@ function setupToneBlocks() {
                     logo.rhythmRuler.Rulers.push([[], []]);
                 } else if (logo.inSample) {
                     logo.sample.sampleBlock = blk;
-                    console.log(args[0]);
-                    logo.sample.sampleName = args[0];
+                    logo.sample.sampleName = args[0][0];
                 }
 
-                Singer.ToneActions.setTimbre(args[0], turtle, blk);
+                Singer.ToneActions.setTimbre(args[0][0], turtle, blk);
             }
 
             return [args[1], 1];
@@ -671,7 +670,7 @@ function setupToneBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value[0];
+            return logo.blocks.blockList[blk].value;
         }
 
         arg(logo, turtle, blk, receivedArg) {
@@ -682,12 +681,7 @@ function setupToneBlocks() {
                 logo.statusFields.push([blk, "audiofile"]);
             } else {
                 let filename = logo.blocks.blockList[blk].value;
-                console.log(filename);
-                if (typeof filename == "string") {
-                    return logo.blocks.blockList[blk].value;
-                } else {
-                    return logo.blocks.blockList[blk].value[0];
-                }
+                return logo.blocks.blockList[blk].value;
             }
         }
     }
