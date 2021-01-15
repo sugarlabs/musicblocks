@@ -198,7 +198,7 @@ class PitchStaircase{
         let repeatStep = false;
         let isStepDeleted = true;
 
-        console.log(parseFloat(frequency) / inputNum);
+        
         for (let i = 0; i < this.Stairs.length; i++) {
             if (this.Stairs[i][2] < parseFloat(frequency) / inputNum) {
                 this.Stairs.splice(i, 0, [
