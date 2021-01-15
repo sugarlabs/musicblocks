@@ -32,9 +32,9 @@ function setupToneActions() {
          */
         static setTimbre(instrument, turtle, blk) {
             let tur = logo.turtles.ithTurtle(turtle);
-            console.log(instrument);
 
             tur.inSetTimbre = true;
+
 
             let accounted = false;
             let synth = instrument;
