@@ -110,7 +110,16 @@ class JSInterface {
         currentmode: "CURRENTMODE",
         modelength: "MODELENGTH",
         // Volume blocks
-        notevolumefactor: "MASTERVOLUME"
+        notevolumefactor: "MASTERVOLUME",
+        // Graphics blocks
+        x: "X",
+        y: "Y",
+        heading: "HEADING",
+        // Pen blocks
+        pensize: "PENSIZE",
+        color: "COLOR",
+        shade: "SHADE",
+        grey: "GREY"
     };
 
     /**
