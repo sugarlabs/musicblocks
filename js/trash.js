@@ -14,11 +14,10 @@
 // trash and hidden. There is a menu button that can be used to
 // restore trash.
 
-
-
 class Trashcan {
     static TRASHWIDTH = 120;
     static TRASHHEIGHT = 120;
+
     constructor(stage, canvas, cellSize, refreshCanvas) {
         this.isVisible = false;
         this._canvas = canvas;
@@ -45,25 +44,25 @@ class Trashcan {
     setCanvas(canvas) {
         this._canvas = canvas;
         return this;
-    };
+    }
 
     setStage(stage) {
         this._stage = stage;
         return this;
-    };
+    }
 
     setSize(size) {
         this._size = size;
         return this;
-    };
+    }
 
     setRefreshCanvas(refreshCanvas) {
         this._refreshCanvas = refreshCanvas;
         return this;
-    };
+    }
 
     _makeBorderHighlight(isActive) {
-        let img = new Image();
+        const img = new Image();
 
         img.onload = () => {
             this._borderHighlightBitmap = new createjs.Bitmap(img);
@@ -73,9 +72,7 @@ class Trashcan {
                 this._container.visible = false;
                 this._isHighlightInitialized = true;
             } else {
-                this._container.removeChildAt(
-                    this._container.children.length - 1
-                );
+                this._container.removeChildAt(this._container.children.length - 1);
             }
 
             this._container.addChild(this._borderHighlightBitmap);
@@ -83,39 +80,50 @@ class Trashcan {
         };
 
         let highlightString =
-            "rgb(" + this._highlightPower + "," + this._highlightPower +
-            "," + this._highlightPower + ")";
+            "rgb(" +
+            this._highlightPower +
+            "," +
+            this._highlightPower +
+            "," +
+            this._highlightPower +
+            ")";
         if (isActive) {
             // When trash is activated, warn the user with red highlight.
             highlightString = platformColor.trashActive;
         }
 
-        img.src = "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(
-                BORDER.replace("stroke_color", highlightString))));
-    };
+        img.src =
+            "data:image/svg+xml;base64," +
+            window.btoa(
+                unescape(encodeURIComponent(BORDER.replace("stroke_color", highlightString)))
+            );
+    }
 
     _makeBorder() {
-        let img = new Image();
+        const img = new Image();
 
         img.onload = () => {
-            let border = new createjs.Bitmap(img);
+            const border = new createjs.Bitmap(img);
             border.scaleX = this._size / this._iconsize;
             border.scaleY = this._size / this._iconsize;
             this._container.addChild(border);
             this._makeBorderHighlight(false);
         };
 
-        img.src = "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(
-                BORDER.replace("stroke_color", platformColor.trashBorder))));
-    };
+        img.src =
+            "data:image/svg+xml;base64," +
+            window.btoa(
+                unescape(
+                    encodeURIComponent(BORDER.replace("stroke_color", platformColor.trashBorder))
+                )
+            );
+    }
 
     _makeTrash() {
-        let img = new Image();
+        const img = new Image();
 
         img.onload = () => {
-            let bitmap = new createjs.Bitmap(img);
+            const bitmap = new createjs.Bitmap(img);
             this._container.addChild(bitmap);
             this._iconsize = bitmap.getBounds().width;
             bitmap.scaleX = this._size / this._iconsize;
@@ -125,29 +133,31 @@ class Trashcan {
             this._makeBorder();
         };
 
-        img.src = "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(
-                TRASHICON.replace(/fill_color/g, platformColor.trashBorder))));
-    };
+        img.src =
+            "data:image/svg+xml;base64," +
+            window.btoa(
+                unescape(
+                    encodeURIComponent(TRASHICON.replace(/fill_color/g, platformColor.trashBorder))
+                )
+            );
+    }
 
     resizeEvent(scale) {
         this._scale = scale;
         this._container.x = (this._canvas.width / this._scale - Trashcan.TRASHWIDTH) / 2;
         this._container.y = this._canvas.height / this._scale - Trashcan.TRASHHEIGHT;
-    };
+    }
 
     hide() {
-        createjs.Tween.get(this._container)
-            .to({ alpha: 0 }, 200)
-            .set({ visible: false });
-    };
+        createjs.Tween.get(this._container).to({ alpha: 0 }, 200).set({ visible: false });
+    }
 
     show() {
         this.stopHighlightAnimation();
         createjs.Tween.get(this._container)
             .to({ alpha: 0.0, visible: true })
             .to({ alpha: 1.0 }, 200);
-    };
+    }
 
     startHighlightAnimation() {
         if (this._inAnimation) {
@@ -167,13 +177,15 @@ class Trashcan {
             }
 
             this._highlightPower = parseInt(
-                255 - 255 * (this._animationLevel / this.animationTime), 10);
+                255 - 255 * (this._animationLevel / this.animationTime),
+                10
+            );
             this._makeBorderHighlight(false);
             this._refreshCanvas();
         }, 20);
 
         this._switchHighlightVisibility(true);
-    };
+    }
 
     stopHighlightAnimation() {
         if (!this._inAnimation) {
@@ -187,18 +199,18 @@ class Trashcan {
         this._highlightPower = 255;
         this._makeBorderHighlight(false);
         this._switchHighlightVisibility(false);
-    };
+    }
 
     _switchHighlightVisibility(bool) {
         last(this._container.children).visible = bool;
         this._container.children[1].visible = !bool;
         this._container.visible = true;
         this._refreshCanvas();
-    };
+    }
 
     overTrashcan(x, y) {
-        let tx = this._container.x;
-        let ty = this._container.y;
+        const tx = this._container.x;
+        const ty = this._container.y;
 
         if (x < tx) {
             return false;
@@ -211,5 +223,5 @@ class Trashcan {
         }
 
         return true;
-    };
+    }
 }
