@@ -237,7 +237,7 @@ class WidgetWindow {
             initial +
             '">';
         const slider = el.querySelector("input");
-        slider.style = " position:absolute;transform:rotate(270deg);height:10px;width:57%;";
+        slider.style = " position:absolute;transform:rotate(270deg);height:10px;width:250px;";
         return slider;
     }
 
