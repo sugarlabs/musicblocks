@@ -62,9 +62,8 @@ class WidgetWindow {
             }
         });
 
-        document.addEventListener("mouseup", () => {
-            this._dragging = false;
-        });
+        this._dragTopHandler = this._dragTopHandler.bind(this);
+        document.addEventListener("mouseup", this._dragTopHandler, true);
 
         if (window.widgetWindows._posCache[this._key]) {
             const _pos = window.widgetWindows._posCache[this._key];
@@ -150,8 +149,12 @@ class WidgetWindow {
 
         const maxminButton = this._create("div", "wftButton wftMaxmin", this._drag);
         maxminButton.onclick = maxminButton.onmousedown = (e) => {
-            if (this._maximized) this._restore();
-            else this._maximize();
+            if (this._maximized) {
+                this._restore();
+                this.sendToCenter();
+            } else {
+                this._maximize();
+            }
             this.takeFocus();
             this.onmaximize();
             e.preventDefault();
@@ -179,6 +182,21 @@ class WidgetWindow {
         this._widget.addEventListener("wheel", disableScroll, false);
         this._widget.addEventListener("DOMMouseScroll", disableScroll, false);
     }
+
+    /**
+     * @param {*} e 
+     * @returns {void}
+     */
+    _dragTopHandler(e) {
+        this._dragging = false;
+        if (this._frame.style.top  === "64px"){
+            this._maximize();
+            this.takeFocus();
+            this.onmaximize();
+            e.preventDefault();
+            e.stopImmediatePropagation();
+        }
+    };
 
     /**
      * @private
@@ -293,6 +311,7 @@ class WidgetWindow {
      * @returns {void}
      */
     close() {
+        document.removeEventListener("mouseup", this._dragTopHandler, true);
         this.onclose();
     }
 
