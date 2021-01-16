@@ -51,7 +51,7 @@ class Boundary {
         const __makeBoundary = () => {
             let img = new Image();
             img.onload = () => {
-                bitmap = new createjs.Bitmap(img);
+                let bitmap = new createjs.Bitmap(img);
                 this._container.addChild(bitmap);
             };
             img.src =

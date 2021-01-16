@@ -4360,13 +4360,7 @@ function Activity() {
         stage.addChild(trashContainer, blocksContainer);
         that._setupBlocksContainerEvents();
 
-        trashcan = new Trashcan();
-        trashcan
-            .setCanvas(canvas)
-            .setStage(trashContainer)
-            .setSize(cellSize)
-            .setRefreshCanvas(refreshCanvas)
-            .init();
+        trashcan = new Trashcan(trashContainer, canvas, cellSize, refreshCanvas);
 
         // Put the boundary in the turtles container so it scrolls with the blocks.
         turtles = new Turtles();
