@@ -502,7 +502,7 @@ class ASTUtils {
                 return getCallExpAST(mathOps[methodName][1], args);
             }
         } else {
-            return getCallExpAST(methodName, args);
+            return getCallExpAST(JSInterface.getMethodName(methodName), args);
         }
     }
 
