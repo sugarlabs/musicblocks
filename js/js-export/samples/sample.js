@@ -178,6 +178,13 @@ set relative volume         : setRelativeVolume(value, flow)
 set drum                    : setDrum(drum, flow)
 map pitch to drum           : mapPitchToDrum(drum, flow)
 
+    // Number
+// use MathUtility.funcName(...) instead of mouse.funcName(...) for these
+
+random                      : doRandom(lowerLimit, upperLimit)
+one of                      : doOneOf(value_1, value_2)
+distance                    : doCalculateDistance(x_1, y_1, x_2, y_2)
+
     // Pen
 draw filled polygon         : fillShape(flow)
 draw hollow lines           : hollowLine(flow)
