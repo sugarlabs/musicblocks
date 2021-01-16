@@ -72,6 +72,8 @@ class WidgetWindow {
         }
 
         this.takeFocus();
+
+        this.sendToCenter = this.sendToCenter.bind(this);
     }
 
     /**
@@ -235,7 +237,7 @@ class WidgetWindow {
             initial +
             '">';
         const slider = el.querySelector("input");
-        slider.style = " position:absolute;transform:rotate(270deg);height:10px;width:57%;";
+        slider.style = " position:absolute;transform:rotate(270deg);height:10px;width:250px;";
         return slider;
     }
 
@@ -328,11 +330,6 @@ class WidgetWindow {
      * @returns {HTMLElement} 
      */
     addButton(icon, iconSize, label, parent) {
-        console.log("From WidgetWindow addButton");
-        console.log(`type of icon = ${typeof(icon)}`);
-        console.log(`type of iconSize = ${typeof(iconSize)}`);
-        console.log(`type of label = ${typeof(label)}`);
-
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
         el.innerHTML =
             '<img src="header-icons/' +
