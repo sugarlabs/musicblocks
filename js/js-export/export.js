@@ -320,19 +320,19 @@ class MusicBlocks {
     // ================================ PEN ===================================
 
     get PENSIZE() {
-        return this.turtle.stroke;
+        return this.turtle.painter.stroke;
     }
 
     get COLOR() {
-        return this.turtle.color;
+        return this.turtle.painter.color;
     }
 
     get SHADE() {
-        return this.turtle.value;
+        return this.turtle.painter.value;
     }
 
     get GREY() {
-        return this.turtle.chroma;
+        return this.turtle.painter.chroma;
     }
 
     // ============================== RHYTHM ==================================
