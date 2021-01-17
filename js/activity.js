@@ -5245,4 +5245,5 @@ define(MYDEFINES, function (compatibility) {
     activity.setupDependencies();
     activity.doContextMenus();
     activity.doPluginsAndPaletteCols();
+    return activity;
 });

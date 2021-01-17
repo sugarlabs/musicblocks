@@ -11,6 +11,7 @@
 
 requirejs.config({
     baseUrl: "lib",
+    waitSeconds: "0",
     shim: {
         easel: {
             exports: "createjs"
