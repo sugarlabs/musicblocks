@@ -284,7 +284,7 @@ class Toolbar {
             runSlowlyIcon.style.display = "none";
         }
 
-        runSlowlyIcon.onclick = function() {
+        runSlowlyIcon.onclick = () => {
             onclick();
             docById("stop").style.color = stopIconColorWhenPlaying;
         };
