@@ -175,7 +175,7 @@ class ASTUtils {
      * @returns {Object} Abstract Syntax Tree of if/if-else block
      */
     static _getIfAST(args, ifFlow, elseFlow, iteratorNum) {
-        let AST = {
+        const AST = {
             type: "IfStatement",
             test: ASTUtils._getArgsAST(args)[0],
             consequent: {
@@ -300,8 +300,8 @@ class ASTUtils {
      * @returns {Object} Abstract Syntax Tree of increment assignment statement
      */
     static _getIncrementStmntAST(args, isIncrement) {
-        let identifier = args[0].split("_")[1];
-        let arg = ASTUtils._getArgsAST([args[1]])[0];
+        const identifier = args[0].split("_")[1];
+        const arg = ASTUtils._getArgsAST([args[1]])[0];
 
         return {
             type: "ExpressionStatement",
@@ -502,7 +502,7 @@ class ASTUtils {
                 return getCallExpAST(mathOps[methodName][1], args);
             }
         } else {
-            return getCallExpAST(methodName, args);
+            return getCallExpAST(JSInterface.getMethodName(methodName), args);
         }
     }
 
@@ -516,8 +516,8 @@ class ASTUtils {
     static _getArgsAST(args) {
         if (args === undefined || args === null) return [];
 
-        let ASTs = [];
-        for (let arg of args) {
+        const ASTs = [];
+        for (const arg of args) {
             if (arg === null) {
                 ASTs.push({
                     type: "Literal",
@@ -535,7 +535,7 @@ class ASTUtils {
                 }
             } else {
                 if (typeof arg === "string" && arg.split("_").length > 1) {
-                    let [type, argVal] = arg.split("_");
+                    const [type, argVal] = arg.split("_");
                     if (type === "bool") {
                         ASTs.push({
                             type: "Literal",
@@ -570,7 +570,7 @@ class ASTUtils {
      * @returns {Object} - Abstract Syntax Tree of method call
      */
     static _getMethodCallClampAST(methodName, args, flows, iteratorNum) {
-        let AST = ASTUtils._getMethodCallAST(methodName, args);
+        const AST = ASTUtils._getMethodCallAST(methodName, args);
 
         AST["expression"]["argument"]["arguments"].push({
             type: "ArrowFunctionExpression",
@@ -614,8 +614,8 @@ class ASTUtils {
     static _getBlockAST(flows, iterMax) {
         if (flows === undefined || flows === null) return [];
 
-        let ASTs = [];
-        for (let flow of flows) {
+        const ASTs = [];
+        for (const flow of flows) {
             if (flow[0] === "if") {
                 ASTs.push(ASTUtils._getIfAST(flow[1], flow[2], iterMax));
             } else if (flow[0] === "ifthenelse") {
@@ -640,7 +640,7 @@ class ASTUtils {
                     cases: ASTUtils._getBlockAST(flow[2], iterMax)
                 });
             } else if (flow[0] === "case") {
-                let AST = {
+                const AST = {
                     type: "SwitchCase",
                     test: ASTUtils._getArgsAST(flow[1])[0],
                     consequent: [
@@ -651,8 +651,8 @@ class ASTUtils {
                     ]
                 };
 
-                let flowASTs = ASTUtils._getBlockAST(flow[2], iterMax);
-                for (let i in flowASTs) {
+                const flowASTs = ASTUtils._getBlockAST(flow[2], iterMax);
+                for (const i in flowASTs) {
                     AST["consequent"].splice(i, 0, flowASTs[i]);
                 }
 
@@ -670,7 +670,7 @@ class ASTUtils {
             } else if (flow[0] === "decrementOne") {
                 ASTs.push(ASTUtils._getIncrementStmntAST([flow[1][0], 1], false));
             } else if (flow[0].split("_").length > 1) {
-                let [instruction, idName] = flow[0].split("_");
+                const [instruction, idName] = flow[0].split("_");
                 if (instruction === "storein2") {
                     ASTs.push({
                         type: "VariableDeclaration",
@@ -718,10 +718,10 @@ class ASTUtils {
      * @returns {Object} mouse Abstract Syntax Tree for the tree
      */
     static getMethodAST(methodName, tree) {
-        let AST = ASTUtils._getMethodDefAST(methodName);
+        const AST = ASTUtils._getMethodDefAST(methodName);
 
-        let ASTs = ASTUtils._getBlockAST(tree);
-        for (let i in ASTs) {
+        const ASTs = ASTUtils._getBlockAST(tree);
+        for (const i in ASTs) {
             AST["declarations"][0]["init"]["body"]["body"].splice(i, 0, ASTs[i]);
         }
 
@@ -736,10 +736,10 @@ class ASTUtils {
      * @returns {Object} mouse Abstract Syntax Tree for the tree
      */
     static getMouseAST(tree) {
-        let AST = JSON.parse(JSON.stringify(ASTUtils._mouseAST));
+        const AST = JSON.parse(JSON.stringify(ASTUtils._mouseAST));
 
-        let ASTs = ASTUtils._getBlockAST(tree);
-        for (let i in ASTs) {
+        const ASTs = ASTUtils._getBlockAST(tree);
+        for (const i in ASTs) {
             AST["expression"]["arguments"][0]["body"]["body"].splice(i, 0, ASTs[i]);
         }
 
