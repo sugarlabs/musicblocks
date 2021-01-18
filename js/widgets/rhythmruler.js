@@ -16,58 +16,18 @@
 // rulerButtonsDiv is for the widget buttons
 // rulerTableDiv is for the drum buttons (fixed first col) and the ruler cells
 
-function RhythmRuler() {
-    const ROWHEIGHT = 130;
-    const RULERHEIGHT = 70;
-    const BUTTONSIZE = 51;
-    const ICONSIZE = 32;
-    const DEL = 46;
+class RhythmRuler {
+    static ROWHEIGHT = 130;
+    static RULERHEIGHT = 70;
+    static BUTTONSIZE = 51;
+    static ICONSIZE = 32;
+    static DEL = 46;
 
-    // There is one ruler per drum.
-    this.Drums = [];
-    // Rulers, one per drum, contain the subdivisions defined by rhythm blocks.
-    this.Rulers = [];
-    // Save the history of divisions so as to be able to restore them.
-    this._dissectHistory = [];
-    this._undoList = [];
-
-    this._playing = false;
-    this._playingOne = false;
-    this._playingAll = false;
-    this._cellCounter = 0;
-
-    // Keep a elapsed time for each ruler to maintain sync.
-    this._elapsedTimes = [];
-    // Starting time from which we measure for sync.
-    this._startingTime = null;
-
-    this._offsets = [];
-    this._rulerSelected = 0;
-    this._rulerPlaying = -1;
-
-    this._tapMode = false;
-    this._tapTimes = [];
-    this._tapCell = null;
-    this._tapEndTime = null;
-
-    this._longPressStartTime = null;
-    this._inLongPress = false;
-
-    this._mouseDownCell = null;
-    this._mouseUpCell = null;
-
-    this._wheel = null;
-
-    // Element references
-    this._dissectNumber = null;
-    this._progressBar = null;
-    this._rulers = [];
-
-    this._noteWidth = function(noteValue) {
+    _noteWidth(noteValue) {
         return Math.floor(EIGHTHNOTEWIDTH * (8 / Math.abs(noteValue)) * 4);
-    };
+    }
 
-    this._calculateZebraStripes = function(rulerno) {
+    _calculateZebraStripes(rulerno) {
         let ruler = this._rulers[rulerno];
         let evenColor;
         if (this._rulerSelected % 2 === 0) {
@@ -100,9 +60,9 @@ function RhythmRuler() {
                 }
             }
         }
-    };
+    }
 
-    this._dissectRuler = function(event, ruler) {
+    _dissectRuler(event, ruler) {
         let cell = event.target;
         if (cell === null) {
             return;
@@ -138,16 +98,15 @@ function RhythmRuler() {
                     this._tapMode = false;
                     this._tapTimes = [];
                     this._tapEndTime = null;
-                    let iconSize = ICONSIZE;
                     this._tapButton.innerHTML =
                         '<img src="header-icons/tap-button.svg" title="' +
                         _("tap a rhythm") +
                         '" alt="' +
                         _("tap a rhythm") +
                         '" height="' +
-                        iconSize +
+                        RhythmRuler.ICONSIZE +
                         '" width="' +
-                        iconSize +
+                        RhythmRuler.ICONSIZE +
                         '" vertical-align="middle">';
                     return;
                 }
@@ -163,17 +122,17 @@ function RhythmRuler() {
                 if (this.Drums[this._rulerSelected] === null) {
                     drum = "snare drum";
                 } else {
-                    let drumBlockNo = this._logo.blocks.blockList[
+                    let drumBlockNo = logo.blocks.blockList[
                         this.Drums[this._rulerSelected]
                     ].connections[1];
-                    drum = this._logo.blocks.blockList[drumBlockNo].value;
+                    drum = logo.blocks.blockList[drumBlockNo].value;
                 }
 
                 let that = this;
                 // FIXME: Should be based on meter
                 for (let i = 0; i < 4; i++) {
                     setTimeout(function() {
-                        that._logo.synth.trigger(
+                        logo.synth.trigger(
                             0, "C4", Singer.defaultBPMFactor / 16, drum, null, null
                         );
                     }, (interval * i) / 4);
@@ -202,9 +161,9 @@ function RhythmRuler() {
 
         //Save dissect history everytime user dissects ruler
         this.saveDissectHistory();
-    };
+    }
 
-    this.__startTapping = function(noteValues, interval) {
+    __startTapping(noteValues, interval) {
         let d = new Date();
         this._tapTimes = [d.getTime()];
         this._tapEndTime = this._tapTimes[0] + interval;
@@ -234,9 +193,9 @@ function RhythmRuler() {
         this._progressBar = this._tapCell.querySelector(".progressBar");
         // Progress once per 8th note.
         __move(interval / 8, 100 / 8);
-    };
+    }
 
-    this.__endTapping = function() {
+    __endTapping() {
         if (cell.parentNode === null) {
             console.debug("Null parent node in endTapping");
             return;
@@ -335,20 +294,19 @@ function RhythmRuler() {
         this._tapTimes = [];
         this._tapCell = null;
         this._tapEndTime = null;
-        let iconSize = ICONSIZE;
         this._tapButton.innerHTML =
             '<img src="header-icons/tap-button.svg" title="' +
             _("tap a rhythm") +
             '" alt="' +
             _("tap a rhythm") +
             '" height="' +
-            iconSize +
+            RhythmRuler.ICONSIZE +
             '" width="' +
-            iconSize +
+            RhythmRuler.ICONSIZE +
             '" vertical-align="middle">';
-    };
+    }
 
-    this.__addCellEventHandlers = function(cell, cellWidth, noteValue) {
+    __addCellEventHandlers(cell, cellWidth, noteValue) {
         let that = this;
 
         __mouseOverHandler = function(event) {
@@ -475,13 +433,13 @@ function RhythmRuler() {
 
         cell.removeEventListener("click", __clickHandler);
         cell.addEventListener("click", __clickHandler);
-    };
+    }
 
-    this.__getLongPressStatus = function() {
+    __getLongPressStatus() {
         return this._inLongPress;
-    };
+    }
 
-    this.__toggleRestState = function(cell, addToUndoList) {
+    __toggleRestState(cell, addToUndoList) {
         let that = this;
 
         if (cell !== null && cell.parentNode !== null) {
@@ -562,9 +520,9 @@ function RhythmRuler() {
         }
 
         // this._piemenuRuler(this._rulerSelected);
-    };
+    }
 
-    this.__divideFromList = function(cell, newNoteValues, addToUndoList) {
+    __divideFromList(cell, newNoteValues, addToUndoList) {
         if (typeof cell !== "object") {
             return;
         }
@@ -603,7 +561,7 @@ function RhythmRuler() {
 
                 newCell.style.width = newCellWidth + "px";
                 newCell.style.minWidth = newCell.style.width;
-                newCell.style.height = RULERHEIGHT + "px";
+                newCell.style.height = RhythmRuler.RULERHEIGHT + "px";
                 newCell.style.minHeight = newCell.style.height;
                 newCell.style.maxHeight = newCell.style.height;
 
@@ -618,9 +576,9 @@ function RhythmRuler() {
         }
 
         // this._piemenuRuler(this._rulerSelected);
-    };
+    }
 
-    this.__dissectByNumber = function(cell, inputNum, addToUndoList) {
+    __dissectByNumber(cell, inputNum, addToUndoList) {
         if (typeof cell !== "object") {
             return;
         }
@@ -640,12 +598,12 @@ function RhythmRuler() {
 
             let noteValue = noteValues[newCellIndex];
             if (inputNum * noteValue > 256) {
-                this._logo.errorMsg(
+                logo.errorMsg(
                     _("Maximum value of 256 has been exceeded.")
                 );
                 return;
             } else {
-                this._logo.hideMsgs();
+                logo.hideMsgs();
             }
 
             let divisionHistory = this.Rulers[this._rulerSelected][1];
@@ -678,7 +636,7 @@ function RhythmRuler() {
 
                 newCell.style.width = newCellWidth + "px";
                 newCell.style.minWidth = newCell.style.width;
-                newCell.style.height = RULERHEIGHT + "px";
+                newCell.style.height = RhythmRuler.RULERHEIGHT + "px";
                 newCell.style.minHeight = newCell.style.height;
                 newCell.style.maxHeight = newCell.style.height;
 
@@ -695,7 +653,7 @@ function RhythmRuler() {
         // this._piemenuRuler(this._rulerSelected);
     };
 
-    this._tieRuler = function(event, ruler) {
+    _tieRuler(event, ruler) {
         if (this._playing) {
             console.warn("You cannot tie while widget is playing.");
             return;
@@ -713,9 +671,9 @@ function RhythmRuler() {
         }
 
         // this._piemenuRuler(this._rulerSelected);
-    };
+    }
 
-    this.__tie = function(addToUndoList) {
+    __tie(addToUndoList) {
         let ruler = this._rulers[this._rulerSelected];
 
         if (this._mouseDownCell === null || this._mouseUpCell === null) {
@@ -783,7 +741,7 @@ function RhythmRuler() {
 
             this._mouseDownCell.style.width = newCellWidth + "px";
             this._mouseDownCell.style.minWidth = this._mouseDownCell.style.width;
-            this._mouseDownCell.style.height = RULERHEIGHT + "px";
+            this._mouseDownCell.style.height = RhythmRuler.RULERHEIGHT + "px";
             this._mouseDownCell.style.minHeight = this._mouseDownCell.style.height;
             this._mouseDownCell.style.maxHeight = this._mouseDownCell.style.height;
 
@@ -795,11 +753,11 @@ function RhythmRuler() {
 
             this._calculateZebraStripes(this._rulerSelected);
         }
-    };
+    }
 
-    this._undo = function() {
+    _undo() {
         // FIXME: Add undo for REST
-        this._logo.synth.stop();
+        logo.synth.stop();
         this._startingTime = null;
         this._playing = false;
         this._playingAll = false;
@@ -832,7 +790,7 @@ function RhythmRuler() {
             let newCell = ruler.insertCell(newCellIndex);
             newCell.style.width = this._noteWidth(newNoteValue) + "px";
             newCell.style.minWidth = newCell.style.width;
-            newCell.style.height = RULERHEIGHT + "px";
+            newCell.style.height = RhythmRuler.RULERHEIGHT + "px";
             newCell.style.minHeight = newCell.style.height;
             newCell.style.maxHeight = newCell.style.height;
 
@@ -869,7 +827,7 @@ function RhythmRuler() {
             let newCell = ruler.insertCell(newCellIndex);
             newCell.style.width = newCellWidth + "px";
             newCell.style.minWidth = newCell.style.width;
-            newCell.style.height = RULERHEIGHT + "px";
+            newCell.style.height = RhythmRuler.RULERHEIGHT + "px";
             newCell.style.minHeight = newCell.style.height;
             newCell.style.maxHeight = newCell.style.height;
 
@@ -900,7 +858,7 @@ function RhythmRuler() {
                 let oldCellWidth = this._noteWidth(history[0][1]);
                 oldCell.style.width = oldCellWidth + "px";
                 oldCell.style.minWidth = oldCell.style.width;
-                oldCell.style.height = RULERHEIGHT + "px";
+                oldCell.style.height = RhythmRuler.RULERHEIGHT + "px";
                 oldCell.style.minHeight = oldCell.style.height;
                 oldCell.style.maxHeight = oldCell.style.height;
 
@@ -916,7 +874,7 @@ function RhythmRuler() {
                     let newCellWidth = this._noteWidth(history[i][1]);
                     newCell.style.width = newCellWidth + "px";
                     newCell.style.minWidth = newCell.style.width;
-                    newCell.style.height = RULERHEIGHT + "px";
+                    newCell.style.height = RhythmRuler.RULERHEIGHT + "px";
                     newCell.style.minHeight = newCell.style.height;
                     newCell.style.maxHeight = newCell.style.height;
 
@@ -949,41 +907,39 @@ function RhythmRuler() {
         this._calculateZebraStripes(lastRuler);
 
         // this._piemenuRuler(this._rulerSelected);
-    };
+    }
 
-    this._tap = function() {
+    _tap() {
         this._tapMode = true;
-        let iconSize = ICONSIZE;
         this._tapButton.innerHTML =
             '<img src="header-icons/tap-active-button.svg" title="' +
             _("tap a rhythm") +
             '" alt="' +
             _("tap a rhythm") +
             '" height="' +
-            iconSize +
+            RhythmRuler.ICONSIZE +
             '" width="' +
-            iconSize +
+            RhythmRuler.ICONSIZE +
             '" vertical-align="middle">';
-    };
+    }
 
-    this._clear = function() {
-        this._logo.synth.stop();
-        this._logo.resetSynth(0);
+    _clear() {
+        logo.synth.stop();
+        logo.resetSynth(0);
         this._playing = false;
         this._playingAll = false;
         this._playingOne = false;
         this._rulerPlaying = -1;
         this._startingTime = null;
-        let iconSize = ICONSIZE;
         this._playAllCell.innerHTML =
             '<img src="header-icons/play-button.svg" title="' +
             _("Play all") +
             '" alt="' +
             _("Play all") +
             '" height="' +
-            iconSize +
+            RhythmRuler.ICONSIZE +
             '" width="' +
-            iconSize +
+            RhythmRuler.ICONSIZE +
             '" vertical-align="middle">';
         for (r = 0; r < this.Rulers.length; r++) {
             this._rulerSelected = r;
@@ -993,19 +949,18 @@ function RhythmRuler() {
         }
 
         // this._piemenuRuler(this._rulerSelected);
-    };
+    }
 
-    this.__pause = function() {
-        let iconSize = ICONSIZE;
+    __pause() {
         this._playAllCell.innerHTML =
             '<img src="header-icons/play-button.svg" title="' +
             _("Play all") +
             '" alt="' +
             _("Play all") +
             '" height="' +
-            iconSize +
+            RhythmRuler.ICONSIZE +
             '" width="' +
-            iconSize +
+            RhythmRuler.ICONSIZE +
             '" vertical-align="middle">';
         this._playing = false;
         this._playingAll = false;
@@ -1015,9 +970,9 @@ function RhythmRuler() {
         for (let i = 0; i < this.Rulers.length; i++) {
             this._calculateZebraStripes(i);
         }
-    };
+    }
 
-    this.playAll = function() {
+    playAll() {
         // External call from run button.
         if (this._playing) {
             if (this._playingAll) {
@@ -1032,21 +987,20 @@ function RhythmRuler() {
         } else if (!this._playingAll) {
             this.__resume();
         }
-    };
+    }
 
-    this.__resume = function() {
-        let iconSize = ICONSIZE;
+    __resume() {
         this._playAllCell.innerHTML =
             '<img src="header-icons/pause-button.svg" title="' +
             _("Pause") +
             '" alt="' +
             _("Pause") +
             '" height="' +
-            iconSize +
+            RhythmRuler.iconSize +
             '" width="' +
-            iconSize +
+            RhythmRuler.iconSize +
             '" vertical-align="middle">';
-        this._logo.turtleDelay = 0;
+        logo.turtleDelay = 0;
         this._playingAll = true;
         this._playing = true;
         this._playingOne = false;
@@ -1058,11 +1012,11 @@ function RhythmRuler() {
         }
 
         this._playAll();
-    };
+    }
 
-    this._playAll = function() {
-        this._logo.synth.stop();
-        this._logo.resetSynth(0);
+    _playAll() {
+        logo.synth.stop();
+        logo.resetSynth(0);
         if (this._startingTime === null) {
             let d = new Date();
             this._startingTime = d.getTime();
@@ -1075,11 +1029,11 @@ function RhythmRuler() {
         for (let i = 0; i < this.Rulers.length; i++) {
             this.__loop(0, i, 0);
         }
-    };
+    }
 
-    this._playOne = function() {
-        this._logo.synth.stop();
-        this._logo.resetSynth(0);
+    _playOne() {
+        logo.synth.stop();
+        logo.resetSynth(0);
         if (this._startingTime === null) {
             let d = new Date();
             this._startingTime = d.getTime();
@@ -1089,9 +1043,9 @@ function RhythmRuler() {
         console.debug("this._rulerSelected " + this._rulerSelected);
 
         this.__loop(0, this._rulerSelected, 0);
-    };
+    }
 
-    this.__loop = function(noteTime, rulerNo, colIndex) {
+    __loop(noteTime, rulerNo, colIndex) {
         let ruler = this._rulers[rulerNo];
         if (ruler === null) {
             console.warn("Cannot find ruler " + rulerNo + ". Widget closed?");
@@ -1112,9 +1066,9 @@ function RhythmRuler() {
         if (this.Drums[rulerNo] === null) {
             drum = "snare drum";
         } else {
-            let drumblockno = this._logo.blocks.blockList[this.Drums[rulerNo]]
+            let drumblockno = logo.blocks.blockList[this.Drums[rulerNo]]
                 .connections[1];
-            drum = this._logo.blocks.blockList[drumblockno].value;
+            drum = logo.blocks.blockList[drumblockno].value;
         }
 
         let foundDrum = false;
@@ -1150,11 +1104,11 @@ function RhythmRuler() {
             // Play the current note.
             if (noteValue > 0) {
                 if (foundVoice) {
-                    that._logo.synth.trigger(
+                    logo.synth.trigger(
                         0, "C4", Singer.defaultBPMFactor / noteValue, drum, null, null, false
                     );
                 } else if (foundDrum) {
-                    that._logo.synth.trigger(
+                    logo.synth.trigger(
                         0, ["C4"], Singer.defaultBPMFactor / noteValue, drum, null, null
                     );
                 }
@@ -1181,16 +1135,16 @@ function RhythmRuler() {
         }, Singer.defaultBPMFactor * 1000 * noteTime - this._offsets[rulerNo]);
 
         this._elapsedTimes[rulerNo] += Singer.defaultBPMFactor * 1000 * noteTime;
-    };
+    }
 
-    this._save = function(selectedRuler) {
+    _save(selectedRuler) {
         // Deprecated -- replaced by save tuplets code
         let that = this;
-        for (let name in this._logo.blocks.palettes.dict) {
-            this._logo.blocks.palettes.dict[name].hideMenu(true);
+        for (let name in logo.blocks.palettes.dict) {
+            logo.blocks.palettes.dict[name].hideMenu(true);
         }
 
-        this._logo.refreshCanvas();
+        logo.refreshCanvas();
 
         setTimeout(function() {
             let ruler = that._rulers[selectedRuler];
@@ -1202,8 +1156,8 @@ function RhythmRuler() {
                 stack_value = _("snare drum") + " " + _("rhythm");
             } else {
                 stack_value =
-                    that._logo.blocks.blockList[
-                        that._logo.blocks.blockList[that.Drums[selectedRuler]]
+                    logo.blocks.blockList[
+                        logo.blocks.blockList[that.Drums[selectedRuler]]
                             .connections[1]
                     ].value.split(" ")[0] +
                     " " +
@@ -1294,22 +1248,22 @@ function RhythmRuler() {
                 }
             }
 
-            that._logo.blocks.loadNewBlocks(newStack);
+            logo.blocks.loadNewBlocks(newStack);
             if (selectedRuler > that.Rulers.length - 2) {
                 return;
             } else {
                 that._save(selectedRuler + 1);
             }
         }, 500);
-    };
+    }
 
-    this._saveTuplets = function(selectedRuler) {
+    _saveTuplets(selectedRuler) {
         let that = this;
-        for (let name in this._logo.blocks.palettes.dict) {
-            this._logo.blocks.palettes.dict[name].hideMenu(true);
+        for (let name in logo.blocks.palettes.dict) {
+            logo.blocks.palettes.dict[name].hideMenu(true);
         }
 
-        this._logo.refreshCanvas();
+        logo.refreshCanvas();
 
         setTimeout(function() {
             let ruler = that._rulers[selectedRuler];
@@ -1319,8 +1273,8 @@ function RhythmRuler() {
                 stack_value = _("rhythm");
             } else {
                 stack_value =
-                    that._logo.blocks.blockList[
-                        that._logo.blocks.blockList[that.Drums[selectedRuler]]
+                    logo.blocks.blockList[
+                        logo.blocks.blockList[that.Drums[selectedRuler]]
                             .connections[1]
                     ].value.split(" ")[0] +
                     " " +
@@ -1462,22 +1416,22 @@ function RhythmRuler() {
                 }
             }
 
-            that._logo.blocks.loadNewBlocks(newStack);
+            logo.blocks.loadNewBlocks(newStack);
             if (selectedRuler > that.Rulers.length - 2) {
                 return;
             } else {
                 that._saveTuplets(selectedRuler + 1);
             }
         }, 500);
-    };
+    }
 
-    this._saveTupletsMerged = function(noteValues) {
+    _saveTupletsMerged(noteValues) {
         let that = this;
-        for (let name in this._logo.blocks.palettes.dict) {
-            this._logo.blocks.palettes.dict[name].hideMenu(true);
+        for (let name in logo.blocks.palettes.dict) {
+            logo.blocks.palettes.dict[name].hideMenu(true);
         }
 
-        this._logo.refreshCanvas();
+        logo.refreshCanvas();
 
         let stack_value = _("rhythm");
         let delta = 42;
@@ -1558,20 +1512,20 @@ function RhythmRuler() {
             }
         }
 
-        that._logo.blocks.loadNewBlocks(newStack);
-        that._logo.textMsg(_("New action block generated!"));
-    };
+        logo.blocks.loadNewBlocks(newStack);
+        logo.textMsg(_("New action block generated!"));
+    }
 
-    this._saveMachine = function(selectedRuler) {
+    _saveMachine(selectedRuler) {
         // We are either saving a drum machine or a voice machine.
         let drum;
         if (this.Drums[selectedRuler] === null) {
             drum = "snare drum";
         } else {
-            let drumBlockNo = this._logo.blocks.blockList[
+            let drumBlockNo = logo.blocks.blockList[
                 this.Drums[selectedRuler]
             ].connections[1];
-            drum = this._logo.blocks.blockList[drumBlockNo].value;
+            drum = logo.blocks.blockList[drumBlockNo].value;
         }
 
         for (let d = 0; d < DRUMNAMES.length; d++) {
@@ -1592,15 +1546,15 @@ function RhythmRuler() {
                 return;
             }
         }
-    };
+    }
 
-    this._saveDrumMachine = function(selectedRuler, drum, effect) {
+    _saveDrumMachine(selectedRuler, drum, effect) {
         let that = this;
-        for (let name in this._logo.blocks.palettes.dict) {
-            this._logo.blocks.palettes.dict[name].hideMenu(true);
+        for (let name in logo.blocks.palettes.dict) {
+            logo.blocks.palettes.dict[name].hideMenu(true);
         }
 
-        this._logo.refreshCanvas();
+        logo.refreshCanvas();
 
         setTimeout(function() {
             let ruler = that._rulers[selectedRuler];
@@ -1615,8 +1569,8 @@ function RhythmRuler() {
                 action_name = _("snare drum") + " " + _("action");
             } else {
                 action_name =
-                    that._logo.blocks.blockList[
-                        that._logo.blocks.blockList[that.Drums[selectedRuler]]
+                    logo.blocks.blockList[
+                        logo.blocks.blockList[that.Drums[selectedRuler]]
                             .connections[1]
                     ].value.split(" ")[0] +
                     " " +
@@ -1888,23 +1842,23 @@ function RhythmRuler() {
                 }
             }
 
-            that._logo.blocks.loadNewBlocks(newStack);
-            that._logo.textMsg(_("New action block generated!"));
+            logo.blocks.loadNewBlocks(newStack);
+            logo.textMsg(_("New action block generated!"));
             if (selectedRuler > that.Rulers.length - 2) {
                 return;
             } else {
                 that._saveMachine(selectedRuler + 1);
             }
         }, 500);
-    };
+    }
 
-    this._saveVoiceMachine = function(selectedRuler, voice) {
+    _saveVoiceMachine(selectedRuler, voice) {
         let that = this;
-        for (let name in this._logo.blocks.palettes.dict) {
-            this._logo.blocks.palettes.dict[name].hideMenu(true);
+        for (let name in logo.blocks.palettes.dict) {
+            logo.blocks.palettes.dict[name].hideMenu(true);
         }
 
-        this._logo.refreshCanvas();
+        logo.refreshCanvas();
 
         setTimeout(function() {
             let ruler = that._rulers[selectedRuler];
@@ -1925,8 +1879,8 @@ function RhythmRuler() {
                 let action_name = _("guitar") + " " + _("action");
             } else {
                 let action_name =
-                    that._logo.blocks.blockList[
-                        that._logo.blocks.blockList[that.Drums[selectedRuler]]
+                    logo.blocks.blockList[
+                        logo.blocks.blockList[that.Drums[selectedRuler]]
                             .connections[1]
                     ].value.split(" ")[0] +
                     "_" +
@@ -2262,16 +2216,16 @@ function RhythmRuler() {
                 }
             }
 
-            that._logo.blocks.loadNewBlocks(newStack);
+            logo.blocks.loadNewBlocks(newStack);
             if (selectedRuler > that.Rulers.length - 2) {
                 return;
             } else {
                 that._saveMachine(selectedRuler + 1);
             }
         }, 500);
-    };
+    }
 
-    this._mergeRulers = function() {
+    _mergeRulers() {
         // Merge the rulers into one set of rhythms.
         rList = [];
         let noteValues;
@@ -2301,15 +2255,14 @@ function RhythmRuler() {
         }
 
         return noteValues;
-    };
+    }
 
-    this._get_save_lock = function() {
+    _get_save_lock() {
         return this._save_lock;
-    };
+    }
 
-    this.init = function(logo) {
+    constructor() {
         console.debug("init RhythmRuler");
-        this._logo = logo;
 
         this._bpmFactor = (1000 * TONEBPM) / Singer.masterBPM;
 
@@ -2319,6 +2272,46 @@ function RhythmRuler() {
         this._rulerPlaying = -1;
         this._startingTime = null;
         this._expanded = false;
+
+            // There is one ruler per drum.
+        this.Drums = [];
+        // Rulers, one per drum, contain the subdivisions defined by rhythm blocks.
+        this.Rulers = [];
+        // Save the history of divisions so as to be able to restore them.
+        this._dissectHistory = [];
+        this._undoList = [];
+
+        this._playing = false;
+        this._playingOne = false;
+        this._playingAll = false;
+        this._cellCounter = 0;
+
+        // Keep a elapsed time for each ruler to maintain sync.
+        this._elapsedTimes = [];
+        // Starting time from which we measure for sync.
+        this._startingTime = null;
+
+        this._offsets = [];
+        this._rulerSelected = 0;
+        this._rulerPlaying = -1;
+
+        this._tapMode = false;
+        this._tapTimes = [];
+        this._tapCell = null;
+        this._tapEndTime = null;
+
+        this._longPressStartTime = null;
+        this._inLongPress = false;
+
+        this._mouseDownCell = null;
+        this._mouseUpCell = null;
+
+        this._wheel = null;
+
+        // Element references
+        this._dissectNumber = null;
+        this._progressBar = null;
+        this._rulers = [];
 
         // If there are no drums, add one.
         if (this.Drums.length === 0) {
@@ -2335,7 +2328,6 @@ function RhythmRuler() {
 
         let w = window.innerWidth;
         this._cellScale = 1.0;
-        let iconSize = ICONSIZE;
 
         let widgetWindow = window.widgetWindows.windowFor(this, "rhythm maker");
         this.widgetWindow = widgetWindow;
@@ -2384,14 +2376,14 @@ function RhythmRuler() {
             that._playing = false;
             that._playingOne = false;
             that._playingAll = false;
-            that._logo.hideMsgs();
+            logo.hideMsgs();
 
             that.widgetWindow.destroy();
         };
 
         this._playAllCell = widgetWindow.addButton(
             "play-button.svg",
-            iconSize,
+            RhythmRuler.ICONSIZE,
             _("Play all")
         );
         this._playAllCell.onclick = function() {
@@ -2405,7 +2397,7 @@ function RhythmRuler() {
         this._save_lock = false;
         widgetWindow.addButton(
             "export-chunk.svg",
-            iconSize,
+            RhythmRuler.ICONSIZE,
             _("Save rhythms")
         ).onclick = async function() {
             // that._save(0);
@@ -2425,7 +2417,7 @@ function RhythmRuler() {
 
         widgetWindow.addButton(
             "export-drums.svg",
-            iconSize,
+            RhythmRuler.ICONSIZE,
             _("Save drum machine")
         ).onclick = async function() {
             // Debounce button
@@ -2470,7 +2462,7 @@ function RhythmRuler() {
 
         widgetWindow.addButton(
             "restore-button.svg",
-            iconSize,
+            RhythmRuler.ICONSIZE,
             _("Undo")
         ).onclick = function() {
             that._undo();
@@ -2479,7 +2471,7 @@ function RhythmRuler() {
         //.TRANS: user can tap out a rhythm by clicking on a ruler.
         this._tapButton = widgetWindow.addButton(
             "tap-button.svg",
-            iconSize,
+            RhythmRuler.ICONSIZE,
             _("Tap a rhythm")
         );
         this._tapButton.onclick = function() {
@@ -2489,7 +2481,7 @@ function RhythmRuler() {
         //.TRANS: clear all subdivisions from the ruler.
         widgetWindow.addButton(
             "erase-button.svg",
-            iconSize,
+            RhythmRuler.ICONSIZE,
             _("Clear")
         ).onclick = function() {
             that._clear();
@@ -2524,9 +2516,9 @@ function RhythmRuler() {
                     '" alt="' +
                     _("Play") +
                     '" height="' +
-                    iconSize +
+                    RhythmRuler.ICONSIZE +
                     '" width="' +
-                    iconSize +
+                    RhythmRuler.ICONSIZE +
                     '" />';
                 drumcell.className = "headcol"; // Position fixed when scrolling horizontally
 
@@ -2540,9 +2532,9 @@ function RhythmRuler() {
                                     '" alt="' +
                                     _("Play") +
                                     '" height="' +
-                                    iconSize +
+                                    RhythmRuler.ICONSIZE +
                                     '" width="' +
-                                    iconSize +
+                                    RhythmRuler.ICONSIZE +
                                     '" vertical-align="middle">';
                                 that._playing = false;
                                 that._playingOne = false;
@@ -2559,7 +2551,7 @@ function RhythmRuler() {
                         } else {
                             if (that._playingOne === false) {
                                 that._rulerSelected = id;
-                                that._logo.turtleDelay = 0;
+                                logo.turtleDelay = 0;
                                 that._playing = true;
                                 that._playingOne = true;
                                 that._playingAll = false;
@@ -2572,9 +2564,9 @@ function RhythmRuler() {
                                     '" alt="' +
                                     _("Pause") +
                                     '" height="' +
-                                    iconSize +
+                                    RhythmRuler.ICONSIZE +
                                     '" width="' +
-                                    iconSize +
+                                    RhythmRuler.ICONSIZE +
                                     '" vertical-align="middle">';
                                 that._elapsedTimes[id] = 0;
                                 that._offsets[id] = 0;
@@ -2608,7 +2600,7 @@ function RhythmRuler() {
                     1,
                     this._cellScale
                 );
-                rulerSubCell.style.height = RULERHEIGHT + "px";
+                rulerSubCell.style.height = RhythmRuler.RULERHEIGHT + "px";
                 rulerSubCell.style.minHeight = rulerSubCell.style.height;
                 rulerSubCell.style.maxHeight = rulerSubCell.style.height;
                 rulerSubCell.style.width = this._noteWidth(noteValue) + "px";
@@ -2644,9 +2636,9 @@ function RhythmRuler() {
             }
 
             // Match the play button height to the ruler height.
-            rhythmRulerTableRow.cells[0].style.width = BUTTONSIZE + "px";
-            rhythmRulerTableRow.cells[0].style.minWidth = BUTTONSIZE + "px";
-            rhythmRulerTableRow.cells[0].style.maxWidth = BUTTONSIZE + "px";
+            rhythmRulerTableRow.cells[0].style.width = RhythmRuler.BUTTONSIZE + "px";
+            rhythmRulerTableRow.cells[0].style.minWidth = RhythmRuler.BUTTONSIZE + "px";
+            rhythmRulerTableRow.cells[0].style.maxWidth = RhythmRuler.BUTTONSIZE + "px";
             rhythmRulerTableRow.cells[0].style.height =
                 rulerRow.offsetHeight + "px";
             rhythmRulerTableRow.cells[0].style.minHeight =
@@ -2736,11 +2728,11 @@ function RhythmRuler() {
             }
         }
 
-        this._logo.textMsg(_("Click on the ruler to divide it."));
+        logo.textMsg(_("Click on the ruler to divide it."));
         // this._piemenuRuler(this._rulerSelected);
-    };
+    }
 
-    this.saveDissectHistory = function() {
+    saveDissectHistory () {
         // Save the new dissect history.
         let that = this;
         let dissectHistory = [];
@@ -2776,7 +2768,7 @@ function RhythmRuler() {
         that._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
     };
 
-    this._piemenuRuler = function(selectedRuler) {
+    _piemenuRuler(selectedRuler) {
         return; // In progress
         /*
         // piemenu version of ruler
@@ -2823,9 +2815,9 @@ function RhythmRuler() {
 
         this._wheel.createWheel();
         */
-    };
+    }
 
-    this._piemenuNumber = function(wheelValues, selectedValue) {
+    _piemenuNumber(wheelValues, selectedValue) {
         // input form and  wheelNav pie menu for number selection
         docById("wheelDiv").style.display = "";
 
@@ -2909,9 +2901,9 @@ function RhythmRuler() {
         this._exitWheel.navItems[0].navigateFunction = function() {
             __exitMenu();
         };
-    };
+    }
 
-    this._positionWheel = function() {
+    _positionWheel() {
         if (docById("wheelDiv").style.display == "none") {
             return;
         }
@@ -2928,12 +2920,12 @@ function RhythmRuler() {
         docById("wheelDiv").style.left =
             Math.min(
                 Math.max(x - (300 - selectorWidth) / 2, 0),
-                this._logo.blocks.turtles._canvas.width - 300
+                logo.blocks.turtles._canvas.width - 300
             ) + "px";
         if (y - 300 < 0) {
             docById("wheelDiv").style.top = y + 60 + "px";
         } else {
             docById("wheelDiv").style.top = y - 300 + "px";
         }
-    };
+    }
 }
