@@ -659,13 +659,14 @@ function setupToneBlocks() {
 
             this.formBlock({
                 outType: "textout",
-                args: 1
+                args: 1,
+                argTypes: "anyin"
             });
             this.parameter = true;
 
             this.makeMacro((x, y) => [
-                [0, ["audiofile", {value: ["electronic synth", ""]}], x, y, [null, 1]],
-                [1, ["mypitch", {value: 0}], 0, 0, [0]],
+                [0, ["audiofile", {value: ["audiofile", ""]}], x, y, [null, 1]],
+                [1, ["solfege", {value: 0}], 0, 0, [0]],
             ]);
         }
 
