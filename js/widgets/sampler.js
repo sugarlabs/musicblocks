@@ -28,7 +28,6 @@ function SampleWidget() {
                 numberBlockNumber = this._logo.blocks.blockList[blockNumber].connections[0];
                 if (numberBlockNumber != null) {
                     this._logo.blocks.blockList[numberBlockNumber].value = this.pitchAdjustment;
-
                     this._logo.blocks.blockList[numberBlockNumber].updateCache();
                 }
                 this._logo.refreshCanvas();

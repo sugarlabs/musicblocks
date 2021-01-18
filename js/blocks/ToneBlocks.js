@@ -614,7 +614,7 @@ function setupToneBlocks() {
                 //.TRANS: set the characteristics of a custom instrument
                 name: _("set instrument"),
                 args: 1,
-                argTypes: ["anyin", "mediaout"],
+                argTypes: ["anyin"],
                 defaults: [_("custom")]
             });
             this.makeMacro((x, y) => [
