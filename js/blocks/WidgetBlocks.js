@@ -543,7 +543,7 @@ function setupWidgetBlocks() {
               [0, "sample", x, y, [null, 1, 6]],
               [1, "settimbre", 0, 0, [0, 2, 4, 5]],
               [2, ["audiofile", { value: null}], 0, 0, [1, 3]],
-              [3, ["number", {value: 0}], 0, 0, [2]],
+              [3, ["deltapitch", {value: 0}], 0, 0, [2]],
               [4, "vspace", 0, 0, [1, null]],
               [5, "hidden", 0, 0, [1, null]],
               [6, "hiddennoflow", 0, 0, [0, null]]
