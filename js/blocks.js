@@ -5699,8 +5699,6 @@ function Blocks(activity) {
                 break;
             case "audiofile":
                 postProcess = function(args) {
-                    console.log(args[0]);
-                    console.log(args[1]);
                     console.log(that.blockList[args[0]].value);
                     that.blockList[args[0]].value = args[1];
                     that.updateBlockText(args[0]);
