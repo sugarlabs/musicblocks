@@ -660,7 +660,7 @@ function setupToneBlocks() {
             this.formBlock({
                 outType: "textout",
                 args: 1,
-                argTypes: "anyin"
+                argTypes: ["anyin"]
             });
             this.parameter = true;
 
