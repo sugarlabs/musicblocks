@@ -665,12 +665,13 @@ function setupToneBlocks() {
             this.parameter = true;
 
             this.makeMacro((x, y) => [
-                [0, ["audiofile", {value: ["audiofile", ""]}], x, y, [null, 1]],
+                [0, ["audiofile", {value: ["", "", 0]}], x, y, [null, 1]],
                 [1, ["solfege", {value: 0}], 0, 0, [0]],
             ]);
         }
 
         updateParameter(logo, turtle, blk) {
+            console.log(logo.blocks.blockList[blk].value);
             return logo.blocks.blockList[blk].value;
         }
 
@@ -681,7 +682,19 @@ function setupToneBlocks() {
             ) {
                 logo.statusFields.push([blk, "audiofile"]);
             } else {
-                let filename = logo.blocks.blockList[blk].value;
+                console.log(receivedArg);
+
+                let cblk1 = logo.blocks.blockList[blk].connections[1];
+                console.log(cblk1);
+                console.log(logo.blocks.blockList[cblk1].value);
+                let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+                let arg1;
+                let notePlayed;
+                if (cblk1 != null) {
+                    arg1 = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                }
+                console.log(arg1);
+                logo.blocks.blockList[blk].value[2] = receivedArg;
                 return logo.blocks.blockList[blk].value;
             }
         }
