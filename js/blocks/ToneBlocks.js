@@ -694,7 +694,6 @@ function setupToneBlocks() {
                 if (cblk2 != null) {
                     let ovalue = logo.blocks.blockList[cblk2].value;
                     logo.blocks.blockList[blk].value[3] = ovalue;
-                    console.log(ovalue);
                 }
                 console.log(logo.blocks.blockList[blk].value);
                 return logo.blocks.blockList[blk].value;

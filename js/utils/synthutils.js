@@ -1065,6 +1065,8 @@ function Synth() {
     };
 
     this.__createSynth = function (turtle, instrumentName, sourceName, params) {
+        console.log(instrumentName);
+        console.log(sourceName);
         this._loadSample(sourceName);
         if (sourceName in this.samples.voice || sourceName in this.samples.drum) {
             instruments[turtle][instrumentName] = this._createSampleSynth(
@@ -1122,6 +1124,7 @@ function Synth() {
     };
 
     this.loadSynth = function (turtle, sourceName) {
+        console.log(instruments[turtle]);
         if (sourceName in instruments[turtle]) {
             console.debug(sourceName + " already loaded");
         } else {

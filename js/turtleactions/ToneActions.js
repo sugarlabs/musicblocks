@@ -32,6 +32,7 @@ function setupToneActions() {
          */
         static setTimbre(instrument, turtle, blk) {
             let tur = logo.turtles.ithTurtle(turtle);
+            console.log(instrument);
 
             tur.inSetTimbre = true;
 
@@ -49,6 +50,7 @@ function setupToneActions() {
                     break;
                 }
             }
+            /*
             if (!accounted && typeof instrument === "object"){
                 accounted = false;
                 for (let voice in CUSTOMSAMPLES){
@@ -63,6 +65,7 @@ function setupToneActions() {
                     synth = instrument[0];
                 }
             }
+            */
 
             if ((synth === undefined) || (synth === null)) {
                 synth = "electronic synth";
