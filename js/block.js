@@ -1788,7 +1788,7 @@ class Block {
                     let filevalue = reader.result;
                     let filename = fileChooser.files[0].name;
                     if (that.name === "audiofile") {
-                        that.value = [filename, filevalue, 0];
+                        that.value = [filename, filevalue, "do", 4];
                         if (!(CUSTOMSAMPLES.includes([filename, filevalue]))) {
                             CUSTOMSAMPLES.push([filename, filevalue]);
                             that.blocks.updateBlockText(thisBlock);
