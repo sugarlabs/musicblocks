@@ -683,12 +683,18 @@ function setupToneBlocks() {
                 logo.statusFields.push([blk, "audiofile"]);
             } else {
                 if (logo.blocks.blockList[blk].value === null) {
-                    logo.blocks.blockList[blk].value = ["", "", 0];
+                    logo.blocks.blockList[blk].value = ["", "", "do", 4];
                 }
-                let cblk = logo.blocks.blockList[blk].connections[1];
-                if (cblk != null) {
-                    let cval = logo.blocks.blockList[cblk].value;
-                    logo.blocks.blockList[blk].value[2] = cval;
+                let cblk1 = logo.blocks.blockList[blk].connections[1];
+                if (cblk1 != null) {
+                    let svalue = logo.blocks.blockList[cblk1].value;
+                    logo.blocks.blockList[blk].value[2] = svalue;
+                }
+                let cblk2 = logo.blocks.blockList[blk].connections[2];
+                if (cblk2 != null) {
+                    let ovalue = logo.blocks.blockList[cblk2].value;
+                    logo.blocks.blockList[blk].value[3] = ovalue;
+                    console.log(ovalue);
                 }
                 console.log(logo.blocks.blockList[blk].value);
                 return logo.blocks.blockList[blk].value;
