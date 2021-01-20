@@ -267,10 +267,35 @@ class PhraseMaker {
             widgetWindow.destroy();
         };
 
-        widgetWindow.addButton("play-button.svg", PhraseMaker.ICONSIZE, _("Play")).onclick = () => {
+        this._playButton = widgetWindow.addButton("play-button.svg", PhraseMaker.ICONSIZE, _("Play"));
+        
+        this._playButton.onclick = () => {
             logo.turtleDelay = 0;
 
             logo.resetSynth(0);
+            if(this.playingNow) {
+                this._playButton.innerHTML =
+                    '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
+                    _("Play") +
+                    '" alt="' +
+                    _("Play") +
+                    '" height="' +
+                    PhraseMaker.ICONSIZE +
+                    '" width="' +
+                    PhraseMaker.ICONSIZE +
+                    '" vertical-align="middle">&nbsp;&nbsp;';
+            } else {
+                this._playButton.innerHTML =
+                    '&nbsp;&nbsp;<img src="header-icons/stop-button.svg" title="' +
+                    _("Stop") +
+                    '" alt="' +
+                    _("Stop") +
+                    '" height="' +
+                    PhraseMaker.ICONSIZE +
+                    '" width="' +
+                    PhraseMaker.ICONSIZE +
+                    '" vertical-align="middle">&nbsp;&nbsp;';
+            }
             this.playAll();
         };
 
@@ -3887,6 +3912,16 @@ class PhraseMaker {
                     _("Play")
                 );
                 this.playingNow = false;
+                this._playButton.innerHTML =
+                        '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
+                        _("Play") +
+                        '" alt="' +
+                        _("Play") +
+                        '" height="' +
+                        PhraseMaker.ICONSIZE +
+                        '" width="' +
+                        PhraseMaker.ICONSIZE +
+                        '" vertical-align="middle">&nbsp;&nbsp;';
             } else {
                 row = this._noteValueRow;
                 cell = row.cells[this._colIndex];
