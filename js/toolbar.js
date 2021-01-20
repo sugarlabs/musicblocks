@@ -9,75 +9,75 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 let WRAP = true;
+const $j = jQuery.noConflict();
 
-function Toolbar() {
-    let $j = jQuery.noConflict();
-    let stopIconColorWhenPlaying = "#ea174c";
-    let language = localStorage.languagePreference;
-    if (language === undefined) {
-        language = navigator.language;
+class Toolbar {
+    constructor() {
+        this.stopIconColorWhenPlaying = "#ea174c";
+        this.language = localStorage.languagePreference;
+        if (this.language === undefined) {
+            this.language = navigator.language;
+        }
+        this.tooltipsDisabled = false;
     }
 
-    let tooltipsDisabled = false;
-
-    this.renderLogoIcon = function(onclick) {
+    renderLogoIcon(onclick) {
         let logoIcon = docById("mb-logo");
-        if (language === "ja") {
+        if (this.language === "ja") {
             logoIcon.innerHTML =
                 '<img style="width: 100%;" src="images/logo-ja.svg">';
         }
 
-        logoIcon.onmouseenter = function() {
+        logoIcon.onmouseenter = () => {
             document.body.style.cursor = "pointer";
         };
 
-        logoIcon.onmouseleave = function() {
+        logoIcon.onmouseleave = () => {
             document.body.style.cursor = "default";
         };
 
-        logoIcon.onclick = function() {
+        logoIcon.onclick = () => {
             onclick();
         };
-    };
+    }
 
-    this.renderPlayIcon = function(onclick) {
+    renderPlayIcon(onclick) {
         let playIcon = docById("play");
         let stopIcon = docById("stop");
 
-        playIcon.onclick = function() {
+        playIcon.onclick = () => {
             onclick();
-            stopIcon.style.color = stopIconColorWhenPlaying;
+            stopIcon.style.color = this.stopIconColorWhenPlaying;
         };
-    };
+    }
 
-    this.renderStopIcon = function(onclick) {
+    renderStopIcon(onclick) {
         let stopIcon = docById("stop");
 
-        stopIcon.onclick = function() {
+        stopIcon.onclick = () => {
             onclick();
             stopIcon.style.color = "white";
         };
-    };
+    }
 
-    this.renderNewProjectIcon = function(onclick) {
+    renderNewProjectIcon(onclick) {
         let newProjectIcon = docById("new-project");
 
-        newProjectIcon.onclick = function() {
+        newProjectIcon.onclick = () => {
             onclick();
         };
-    };
+    }
 
-    this.renderLoadIcon = function(onclick) {
+    renderLoadIcon(onclick) {
         let loadIcon = docById("load");
 
-        loadIcon.onclick = function() {
+        loadIcon.onclick = () => {
             onclick();
         };
-    };
+    }
 
     // let wrapTurtleTooltipData = "Wrap Turtle Off";
-
-    this.renderWrapIcon = function() {
+    renderWrapIcon() {
         let wrapIcon = docById("wrapTurtle");
         let wrapButtonTooltipData = "Turtle Wrap Off";
 
@@ -100,10 +100,10 @@ function Toolbar() {
                 html: true,
                 delay: 100
             });
-        }
+        };
     }
 
-    this.renderSaveIcons = function(
+    renderSaveIcons(
         html_onclick,
         doSVG_onclick,
         svg_onclick,
@@ -117,7 +117,7 @@ function Toolbar() {
         let saveButtonAdvanced = docById("saveButtonAdvanced");
         let saveHTML;
         let savePNG;
-        let saveWAV
+        let saveWAV;
         let saveSVG;
         let saveLY;
         let saveABC;
@@ -125,19 +125,19 @@ function Toolbar() {
         let svgData;
 
         if (beginnerMode) {
-            if (_THIS_IS_MUSIC_BLOCKS_ && language === "ja") {
-                saveButton.onclick = function() {
+            if (_THIS_IS_MUSIC_BLOCKS_ && this.language === "ja") {
+                saveButton.onclick = () => {
                     html_onclick();
                 };
             } else {
                 saveButton.style.display = "block";
                 saveButtonAdvanced.style.display = "none";
 
-                saveButton.onclick = function() {
+                saveButton.onclick = () => {
                     //html_onclick();
                     saveHTML = docById("save-html-beg");
                     console.debug(saveHTML);
-                    saveHTML.onclick = function() {
+                    saveHTML.onclick = () => {
                         html_onclick();
                     };
 
@@ -158,7 +158,7 @@ function Toolbar() {
                     } else {
                         savePNG.disabled = false;
                         savePNG.className = "";
-                        savePNG.onclick = function() {
+                        savePNG.onclick = () => {
                             png_onclick();
                         };
                     }
@@ -168,11 +168,11 @@ function Toolbar() {
             console.debug("ADVANCED MODE BUTTONS");
             saveButton.style.display = "none";
             saveButtonAdvanced.style.display = "block";
-            saveButtonAdvanced.onclick = function() {
+            saveButtonAdvanced.onclick = () => {
                 saveHTML = docById("save-html");
                 console.debug(saveHTML);
 
-                saveHTML.onclick = function() {
+                saveHTML.onclick = () => {
                     html_onclick();
                 };
 
@@ -200,11 +200,11 @@ function Toolbar() {
                     saveSVG.className = "";
                     savePNG.className = "";
 
-                    saveSVG.onclick = function() {
+                    saveSVG.onclick = () => {
                         svg_onclick();
                     };
 
-                    savePNG.onclick = function() {
+                    savePNG.onclick = () => {
                         png_onclick();
                     };
                 }
@@ -216,38 +216,38 @@ function Toolbar() {
 
                     saveLY = docById("save-ly");
 
-                    saveLY.onclick = function() {
+                    saveLY.onclick = () => {
                         ly_onclick();
                     };
 
                     saveABC = docById("save-abc");
 
-                    saveABC.onclick = function() {
+                    saveABC.onclick = () => {
                         abc_onclick();
                     };
 
                     saveMXML = docById("save-mxml");
 
-                    saveMXML.onclick = function() {
+                    saveMXML.onclick = () => {
                         mxml_onclick();
                     };
                 }
 
                 let saveArtworkSVG = docById("save-blockartwork-svg");
 
-                saveArtworkSVG.onclick = function() {
+                saveArtworkSVG.onclick = () => {
                     blockartworksvg_onclick();
                 };
             };
         }
-    };
+    }
 
-    this.renderPlanetIcon = function(planet, onclick) {
+    renderPlanetIcon(planet, onclick) {
         let planetIcon = docById("planetIcon");
         let planetIconDisabled = docById("planetIconDisabled");
 
         if (planet) {
-            planetIcon.onclick = function() {
+            planetIcon.onclick = () => {
                 docById("toolbars").style.display = "none";
                 docById("wheelDiv").style.display = "none";
                 docById("contextWheelDiv").style.display = "none";
@@ -257,12 +257,12 @@ function Toolbar() {
             planetIcon.style.display = "none";
             planetIconDisabled.style.display = "block";
         }
-    };
+    }
 
-    this.renderMenuIcon = function(onclick) {
+    renderMenuIcon(onclick) {
         let menuIcon = docById("menu");
         let auxToolbar = docById("aux-toolbar");
-        menuIcon.onclick = function() {
+        menuIcon.onclick = () => {
             if (auxToolbar.style.display == "" ||
                 auxToolbar.style.display == "none") {
                 onclick(false);
@@ -275,58 +275,70 @@ function Toolbar() {
                 menuIcon.innerHTML = "menu";
                 docById("toggleAuxBtn").className -= "blue darken-1";
             }
-        };
-    };
-
-    this.renderHelpIcon = function(onclick) {
-        let helpIcon = docById("helpIcon");
-
-        helpIcon.onclick = function() {
-            onclick();
-        };
-    };
-
-    this.renderModeSelectIcon = function(onclick) {
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            let begIcon = docById("beginnerMode");
-            let advIcon = docById("advancedMode");
-            if (begIcon.style.display === "none") {
-                advIcon.onclick = function() {
-                    onclick();
-                };
-            } else {
-                begIcon.onclick = function() {
-                    onclick();
-                };
-            }
         }
-    };
+    }
 
-    this.renderRunSlowlyIcon = function(onclick) {
+    renderRunSlowlyIcon(onclick) {
         let runSlowlyIcon = docById("runSlowlyIcon");
         if (_THIS_IS_MUSIC_BLOCKS_ && beginnerMode && language === "ja") {
             runSlowlyIcon.style.display = "none";
         }
 
-        runSlowlyIcon.onclick = function() {
+        runSlowlyIcon.onclick = () => {
             onclick();
             docById("stop").style.color = stopIconColorWhenPlaying;
         };
-    };
+    }
 
-    this.renderRunStepIcon = function(onclick) {
+    renderHelpIcon(onclick) {
+        let helpIcon = docById("helpIcon");
+
+        helpIcon.onclick = () => {
+            onclick();
+        };
+    }
+
+    renderModeSelectIcon(onclick) {
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            let begIcon = docById("beginnerMode");
+            let advIcon = docById("advancedMode");
+            if (begIcon.style.display === "none") {
+                advIcon.onclick = () => {
+                    onclick();
+                };
+            } else {
+                begIcon.onclick = () => {
+                    onclick();
+                };
+            }
+        }
+    }
+
+    renderRunSlowlyIcon(onclick) {
+        let runSlowlyIcon = docById("runSlowlyIcon");
+        if (_THIS_IS_MUSIC_BLOCKS_ && beginnerMode && this.language === "ja") {
+            runSlowlyIcon.style.display = "none";
+        }
+
+        runSlowlyIcon.onclick = () => {
+            onclick();
+            docById("stop").style.color = this.stopIconColorWhenPlaying;
+        };
+    }
+
+    renderRunStepIcon(onclick) {
         let runStepByStepIcon = docById("runStepByStepIcon");
-        if (_THIS_IS_MUSIC_BLOCKS_ && beginnerMode && language === "ja") {
+        if (_THIS_IS_MUSIC_BLOCKS_ && beginnerMode && this.language === "ja") {
             runStepByStepIcon.style.display = "none";
         }
 
-        runStepByStepIcon.onclick = function() {
+        runStepByStepIcon.onclick = () => {
             onclick();
-            docById("stop").style.color = stopIconColorWhenPlaying;
+            docById("stop").style.color = this.stopIconColorWhenPlaying;
         };
-    };
+    }
 
-    this.renderAdvancedIcons = function(
+    renderAdvancedIcons(
         analytics_onclick,
         openPlugin_onclick,
         delPlugin_onclick,
@@ -339,24 +351,24 @@ function Toolbar() {
         let disableHorizScrollIcon = docById("disableHorizScrollIcon");
 
         if (!_THIS_IS_MUSIC_BLOCKS_ || !beginnerMode) {
-            displayStatsIcon.onclick = function() {
+            displayStatsIcon.onclick = () => {
                 analytics_onclick();
             };
 
-            loadPluginIcon.onclick = function() {
+            loadPluginIcon.onclick = () => {
                 openPlugin_onclick();
             };
 
-            delPluginIcon.onclick = function() {
+            delPluginIcon.onclick = () => {
                 delPlugin_onclick();
             };
 
-            enableHorizScrollIcon.onclick = function() {
+            enableHorizScrollIcon.onclick = () => {
                 setScroller();
                 _setupBlocksContainerEvents();
             };
 
-            disableHorizScrollIcon.onclick = function() {
+            disableHorizScrollIcon.onclick = () => {
                 setScroller();
                 _setupBlocksContainerEvents();
             };
@@ -366,148 +378,146 @@ function Toolbar() {
             delPluginIcon.style.display = "none";
             enableHorizScrollIcon.style.display = "none";
         }
-    };
+    }
 
     // let scrollEnabled = false;
-    // this.renderEnableHorizScrollIcon = function (setScroller, _setupBlocksContainerEvents) {
+    // renderEnableHorizScrollIcon(setScroller, _setupBlocksContainerEvents) {
     //     let enableHorizScrollIcon = docById('enableHorizScrollIcon');
-    //     enableHorizScrollIcon.onclick = function () {
+    //     enableHorizScrollIcon.onclick = () => {
     //         setScroller();
     //         _setupBlocksContainerEvents();
     //     }
-
     // }
-
-    this.renderMergeIcon = function(onclick) {
+    renderMergeIcon(onclick) {
         let mergeWithCurrentIcon = docById("mergeWithCurrentIcon");
 
-        mergeWithCurrentIcon.onclick = function() {
+        mergeWithCurrentIcon.onclick = () => {
             onclick();
         };
-    };
+    }
 
-    this.renderRestoreIcon = function(onclick) {
+    renderRestoreIcon(onclick) {
         let restoreIcon = docById("restoreIcon");
 
-        restoreIcon.onclick = function() {
+        restoreIcon.onclick = () => {
             onclick();
         };
-    };
+    }
 
-    this.renderChooseKeyIcon = function(onclick) {
+    renderChooseKeyIcon(onclick) {
         let chooseKeyIcon = docById("chooseKeyIcon");
         docById("chooseKeyDiv").style.display = "none";
         chooseKeyIcon.onclick = () => {
             onclick();
         };
-    };
+    }
 
-    this.renderJavaScriptIcon = function(onclick) {
+    renderJavaScriptIcon(onclick) {
         docById("toggleJavaScriptIcon").onclick = () => onclick();
-    };
+    }
 
-    this.renderLanguageSelectIcon = function(languageBox) {
+    renderLanguageSelectIcon(languageBox) {
         let languageSelectIcon = docById("languageSelectIcon");
-        languageSelectIcon.onclick = function() {
+        languageSelectIcon.onclick = () => {
             let enUS = docById("enUS");
 
-            enUS.onclick = function() {
+            enUS.onclick = () => {
                 languageBox.enUS_onclick();
             };
 
             let enUK = docById("enUK");
 
-            enUK.onclick = function() {
+            enUK.onclick = () => {
                 languageBox.enUK_onclick();
             };
 
             let es = docById("es");
 
-            es.onclick = function() {
+            es.onclick = () => {
                 languageBox.es_onclick();
             };
 
             let pt = docById("pt");
 
-            pt.onclick = function() {
+            pt.onclick = () => {
                 languageBox.pt_onclick();
             };
 
             let ko = docById("ko");
 
-            ko.onclick = function() {
+            ko.onclick = () => {
                 languageBox.ko_onclick();
             };
 
             let ja = docById("ja");
 
-            ja.onclick = function() {
+            ja.onclick = () => {
                 languageBox.ja_onclick();
             };
 
             let kana = docById("kana");
 
-            kana.onclick = function() {
+            kana.onclick = () => {
                 languageBox.kana_onclick();
             };
 
             let zhCN = docById("zhCN");
 
-            zhCN.onclick = function() {
+            zhCN.onclick = () => {
                 languageBox.zhCN_onclick();
             };
 
             let th = docById("th");
 
-            th.onclick = function() {
+            th.onclick = () => {
                 languageBox.th_onclick();
             };
 
             let ayc = docById("ayc");
 
-            ayc.onclick = function() {
+            ayc.onclick = () => {
                 languageBox.ayc_onclick();
             };
 
             let quz = docById("quz");
 
-            quz.onclick = function() {
+            quz.onclick = () => {
                 languageBox.quz_onclick();
             };
 
             let gug = docById("gug");
 
-            gug.onclick = function() {
+            gug.onclick = () => {
                 languageBox.gug_onclick();
             };
 
             let hi = docById("hi");
 
-            hi.onclick = function() {
+            hi.onclick = () => {
                 languageBox.hi_onclick();
             };
 
             let ibo = docById("ibo");
 
-            ibo.onclick = function() {
+            ibo.onclick = () => {
                 languageBox.ibo_onclick();
             };
 
             let ar = docById("ar");
 
-            ar.onclick = function() {
+            ar.onclick = () => {
                 languageBox.ar_onclick();
             };
 
             let he = docById("he");
 
-            he.onclick = function() {
+            he.onclick = () => {
                 languageBox.he_onclick();
             };
         };
-    };
+    }
 
-    this.init = function(mode) {
+    init(mode) {
         let strings;
         let strings_;
         if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -718,7 +728,7 @@ function Toolbar() {
             }
         }
 
-        if (!tooltipsDisabled) {
+        if (!this.tooltipsDisabled) {
             $j(".tooltipped").tooltip({
                 html: true,
                 delay: 100
@@ -727,17 +737,17 @@ function Toolbar() {
 
         $j(".materialize-iso, .dropdown-trigger").dropdown({
             constrainWidth: false,
-            hover: false, // Activate on hover
+            hover: false,
             belowOrigin: true // Displays dropdown below the button
         });
-    };
+    }
 
-    this.disableTooltips = function(jquery) {
+    disableTooltips = (jquery) => {
         jquery(".tooltipped").tooltip("remove");
-        tooltipsDisabled = true;
-    };
+        this.tooltipsDisabled = true;
+    }
 
-    this.closeAuxToolbar = function(onclick) {
+    closeAuxToolbar = (onclick) => {
         if (auxToolbar.style.display === "block") {
             onclick(false);
             let menuIcon = docById("menu");
@@ -745,5 +755,5 @@ function Toolbar() {
             menuIcon.innerHTML = "menu";
             docById("toggleAuxBtn").className -= "blue darken-1";
         }
-    };
+    }
 }

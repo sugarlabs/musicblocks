@@ -58,7 +58,7 @@ class JSGenerate {
 
         blocks.findStacks();
 
-        for (let blk of blocks.stackList) {
+        for (const blk of blocks.stackList) {
             if (blocks.blockList[blk].name === "start" && !blocks.blockList[blk].trash) {
                 JSGenerate.startBlocks.push(blk);
             } else if (blocks.blockList[blk].name === "action" && !blocks.blockList[blk].trash) {
@@ -95,7 +95,7 @@ class JSGenerate {
                     argLen -= 2;
                 }
 
-                let args = [];
+                const args = [];
                 for (let i = 1; i <= argLen; i++) {
                     let arg = blocks.blockList[blk.connections[i]];
                     if (arg === undefined) {
@@ -156,7 +156,7 @@ class JSGenerate {
                         tree.push([nextBlk.name]);
                     }
 
-                    let args = ParseArg(nextBlk);
+                    const args = ParseArg(nextBlk);
                     last(tree).push(args.length === 0 ? null : args);
 
                     if (nextBlk.protoblock.style === "clamp") {
@@ -180,11 +180,11 @@ class JSGenerate {
             return tree;
         }
 
-        for (let blk of JSGenerate.startBlocks) {
+        for (const blk of JSGenerate.startBlocks) {
             JSGenerate.startTrees.push(GenerateStackTree(blocks.blockList[blk], []));
         }
 
-        for (let blk of JSGenerate.actionBlocks) {
+        for (const blk of JSGenerate.actionBlocks) {
             let actionName = blocks.blockList[blocks.blockList[blk].connections[1]].value;
             if (actionName === null || actionName === undefined) continue;
 
@@ -217,7 +217,7 @@ class JSGenerate {
                 if (args === null || args.length === 0) return "none";
 
                 let str = "(";
-                for (let arg of args) {
+                for (const arg of args) {
                     if (arg === null) {
                         str += "null";
                     } else if (typeof arg === "object") {
@@ -233,7 +233,7 @@ class JSGenerate {
 
             if (level === undefined) level = 0;
 
-            for (let i of tree) {
+            for (const i of tree) {
                 let spaces = "";
                 for (let j = 0; j < 4 * level; j++) spaces += " ";
                 console.log(
@@ -255,7 +255,7 @@ class JSGenerate {
         if (JSGenerate.startTrees.length === 0) {
             console.log("%cno start trees generated", "color: tomato");
         } else {
-            for (let tree of JSGenerate.startTrees) {
+            for (const tree of JSGenerate.startTrees) {
                 console.log(
                     "\n   " + "%c START ",
                     "background: navy; color: white; font-weight: bold"
@@ -268,7 +268,7 @@ class JSGenerate {
         if (JSGenerate.startTrees.length === 0) {
             console.log("%cno action trees generated", "color: tomato");
         } else {
-            for (let tree of JSGenerate.actionTrees) {
+            for (const tree of JSGenerate.actionTrees) {
                 console.log(
                     "\n   " + "%c ACTION ",
                     "background: green; color: white; font-weight: bold"
@@ -300,7 +300,7 @@ class JSGenerate {
                 );
             }
 
-            let offset = JSGenerate.actionTrees.length;
+            const offset = JSGenerate.actionTrees.length;
             for (let i = 0; i < JSGenerate.startTrees.length; i++) {
                 JSGenerate.AST["body"].splice(
                     i + offset,
@@ -323,7 +323,7 @@ class JSGenerate {
         }
 
         if (JSGenerate.generateFailed) {
-            let AST = JSON.parse(JSON.stringify(ASTUtils.BAREBONE_AST));
+            const AST = JSON.parse(JSON.stringify(ASTUtils.BAREBONE_AST));
             AST["body"].splice(0, 0, ASTUtils.getMouseAST([]));
             JSGenerate.code = astring.generate(AST);
         }

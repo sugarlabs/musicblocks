@@ -748,10 +748,11 @@ function Activity() {
             svg += "</g>";
 
             if (blocks.blockList[i].isCollapsible()) {
+                let y;
                 if (INLINECOLLAPSIBLES.indexOf(blocks.blockList[i].name) !== -1) {
-                    let y = blocks.blockList[i].container.y + 4;
+                    y = blocks.blockList[i].container.y + 4;
                 } else {
-                    let y = blocks.blockList[i].container.y + 12;
+                    y = blocks.blockList[i].container.y + 12;
                 }
 
                 svg +=
@@ -4360,13 +4361,7 @@ function Activity() {
         stage.addChild(trashContainer, blocksContainer);
         that._setupBlocksContainerEvents();
 
-        trashcan = new Trashcan();
-        trashcan
-            .setCanvas(canvas)
-            .setStage(trashContainer)
-            .setSize(cellSize)
-            .setRefreshCanvas(refreshCanvas)
-            .init();
+        trashcan = new Trashcan(trashContainer, canvas, cellSize, refreshCanvas);
 
         // Put the boundary in the turtles container so it scrolls with the blocks.
         turtles = new Turtles();
@@ -4709,7 +4704,7 @@ function Activity() {
         toolbar.renderRunStepIcon(_doStepButton);
         toolbar.renderAdvancedIcons(
             () => {
-                logo.statsWindow = new StatsWindow();
+                if(!logo.statsWindow) logo.statsWindow = new StatsWindow();
             },
             doOpenPlugin,
             deletePlugin,

@@ -3,7 +3,7 @@
   "env": { "es6": true, "browser": true, "node": true },
   "extends": ["eslint:recommended"],
   "rules": {
-      "no-console": "warn",
+      # "no-console": "warn",
       "no-mixed-spaces-and-tabs": "warn",
       # "no-unused-vars": "warn",
       # "no-use-before-define": "error",
