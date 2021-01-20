@@ -1124,7 +1124,6 @@ function Synth() {
     };
 
     this.loadSynth = function (turtle, sourceName) {
-        console.log(instruments[turtle]);
         if (sourceName in instruments[turtle]) {
             console.debug(sourceName + " already loaded");
         } else {

@@ -634,7 +634,7 @@ function setupToneBlocks() {
                     logo.rhythmRuler.Rulers.push([[], []]);
                 } else if (logo.inSample) {
                     logo.sample.sampleBlock = blk;
-                    logo.sample.sampleName = args[0][0];
+                    logo.sample.sampleName = args[0];
                 }
 
                 Singer.ToneActions.setTimbre(args[0][0], turtle, blk);
