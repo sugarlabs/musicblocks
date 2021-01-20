@@ -720,7 +720,7 @@ class Painter {
                 h
             );
 
-        if (!WRAP || !out) {
+        if (!WRAP || !out || this._fillState) {
             this._move(ox, oy, nx, ny, true);
             turtles.refreshCanvas();
         } else {
