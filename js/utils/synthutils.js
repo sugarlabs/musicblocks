@@ -697,6 +697,13 @@ function Synth() {
             }
         }
         if (!accounted) {
+
+            if (typeof sampleName === "object") {
+                console.log("loaded custom sample");
+                this.samples["voice"][sampleName[0]] = sampleName[1];
+                return;
+            }
+            /*
             for (let customsample in CUSTOMSAMPLES) {
                 if (CUSTOMSAMPLES[customsample].includes(sampleName)) {
                     console.log("loaded custom sample");
@@ -704,6 +711,7 @@ function Synth() {
                     return;
                 }
             }
+            */
             console.debug("sample was not already in sample library");
         }
     };
@@ -969,6 +977,7 @@ function Synth() {
     this._createSampleSynth = function (turtle, instrumentName, sourceName, params) {
         let tempSynth;
         if (sourceName in this.samples.voice) {
+            console.log("♯ 𝄪 ♭ 𝄫");
             instrumentsSource[instrumentName] = [2, sourceName];
             let noteDict = {};
             if (sourceName in SAMPLECENTERNO) {
@@ -990,6 +999,30 @@ function Synth() {
 
         return tempSynth;
     };
+
+    this._createCustomSampleSynth = function (turtle, name, sourceData, params) {
+        console.log(sourceData);
+        instrumentsSource[name] = [2, sourceData];
+        console.log(instrumentsSource);
+        let pitchName = "C4";
+        let solfegeDict = {do:"C", re:"D", mi:"E", fa:"F", sol:"G", la:"A", ti:"B"};
+        let accidentalDict = "𝄫♭♮♯𝄪"
+        let solfege = sourceData[2];
+        let accidental = "";
+        console.log(solfege);
+        if (accidentalDict.includes(solfege[-1])) {
+            let accidental = solfege[-1];
+            solfege = solfege.slice(0,-1);
+        }
+        let letter = solfegeDict[solfege] + accidental;
+        pitchName = letter + sourceData[3].toString();
+        let noteDict = {};
+
+        console.log(pitchName);
+        noteDict[pitchName] = this.samples.voice[sourceData];
+        tempSynth = new Tone.Sampler(noteDict);
+        return tempSynth;
+    }
 
     // Function using builtin synths from Tone.js
     this._createBuiltinSynth = function (turtle, instrumentName, sourceName, params) {
@@ -1065,8 +1098,6 @@ function Synth() {
     };
 
     this.__createSynth = function (turtle, instrumentName, sourceName, params) {
-        console.log(instrumentName);
-        console.log(sourceName);
         this._loadSample(sourceName);
         if (sourceName in this.samples.voice || sourceName in this.samples.drum) {
             instruments[turtle][instrumentName] = this._createSampleSynth(
@@ -1075,6 +1106,15 @@ function Synth() {
                 sourceName,
                 null
             ).toDestination();
+        } else if (typeof sourceName === "object" && (sourceName[0] in this.samples.voice || sourceName[0] in this.samples.drum)) {
+            let j = sourceName[0];
+            instruments[turtle][j] = this._createCustomSampleSynth(
+                turtle,
+                j,
+                sourceName,
+                null
+            ).toDestination();
+            console.log(instruments[turtle]);
         } else if (sourceName in BUILTIN_SYNTHS) {
             instruments[turtle][instrumentName] = this._createBuiltinSynth(
                 turtle,
