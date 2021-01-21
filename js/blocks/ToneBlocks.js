@@ -665,13 +665,13 @@ function setupToneBlocks() {
             this.parameter = true;
 
             this.makeMacro((x, y) => [
-                [0, ["audiofile", {value: ["", "", "do", 4]}], x, y, [null, 1]],
-                [1, ["solfege", {value: 0}], 0, 0, [0]],
+                [0, ["audiofile", {value: ["", "", "do", 4]}], x, y, [null, 1, 2]],
+                [1, ["solfege", {value: "do"}], 0, 0, [0]],
+                [2, ["number", {value: 4}], 0, 0, [0]]
             ]);
         }
 
         updateParameter(logo, turtle, blk) {
-            console.log(logo.blocks.blockList[blk].value);
             return logo.blocks.blockList[blk].value;
         }
 
@@ -695,7 +695,6 @@ function setupToneBlocks() {
                     let ovalue = logo.blocks.blockList[cblk2].value;
                     logo.blocks.blockList[blk].value[3] = ovalue;
                 }
-                console.log(logo.blocks.blockList[blk].value);
                 return logo.blocks.blockList[blk].value;
             }
         }
