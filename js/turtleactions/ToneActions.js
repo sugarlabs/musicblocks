@@ -33,6 +33,7 @@ function setupToneActions() {
         static setTimbre(instrument, turtle, blk) {
             let tur = logo.turtles.ithTurtle(turtle);
 
+            console.log(instrument);
             tur.inSetTimbre = true;
 
 
@@ -65,6 +66,9 @@ function setupToneActions() {
                 }
             }
             */
+            if (!accounted && typeof instrument === "object"){
+                synth = instrument[0];
+            }
 
             if ((synth === undefined) || (synth === null)) {
                 synth = "electronic synth";
@@ -78,8 +82,13 @@ function setupToneActions() {
 
             if (tur.singer.instrumentNames.indexOf(synth) === -1) {
                 tur.singer.instrumentNames.push(synth);
-                logo.synth.loadSynth(turtle, synth);
-
+                console.log("hi");
+                if (typeof instrument === "object") {
+                    console.log("there");
+                    logo.synth.loadSynth(turtle, instrument);
+                } else {
+                    logo.synth.loadSynth(turtle, synth);
+                }
                 if (tur.singer.synthVolume[synth] === undefined) {
                     // The electronic synthvolume will track any
                     // changes to the mater volume, e.g., the
