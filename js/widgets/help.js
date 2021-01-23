@@ -28,6 +28,9 @@
 class HelpWidget {
     static ICONSIZE = 32;
 
+    /**
+     * @param {Blocks} blocks
+     */
     constructor(blocks) {
         this.beginnerBlocks = [];
         this.advancedBlocks = [];
@@ -56,6 +59,11 @@ class HelpWidget {
         setTimeout(this.widgetWindow.sendToCenter, 50);
     }
 
+    /**
+     * @private
+     * @param {Blocks} blocks
+     * @returns {void}
+     */
     _setup(blocks) {
         const iconSize = HelpWidget.ICONSIZE;
         // Which help page are we on?
@@ -260,6 +268,11 @@ class HelpWidget {
         this.widgetWindow.takeFocus();
     }
 
+    /**
+     * @private
+     * @param {number} page
+     * @returns {void}
+     */
     _showPage(page) {
         const helpBody = docById("helpBodyDiv");
         let body = "";
@@ -309,8 +322,12 @@ class HelpWidget {
         this.widgetWindow.takeFocus();
     }
 
-    // Prepare a list of beginner and advanced blocks and cycle through their help
-
+    /**
+     * Prepare a list of beginner and advanced blocks and cycle through their help
+     * @private
+     * @param {Blocks} blocks
+     * @returns {void}
+     */
     _prepareBlockList(blocks) {
         for (const key in blocks.protoBlockDict) {
             if (
@@ -340,9 +357,15 @@ class HelpWidget {
         this._blockHelp(blocks.protoBlockDict[this.appendedBlockList[0]], blocks);
     }
 
-    // Function to display help related to a single block
-    // called recursively to cycle through help string of all blocks (Beginner Blocks First)
 
+    /**
+     * Function to display help related to a single block
+     * called recursively to cycle through help string of all blocks (Beginner Blocks First)
+     * @private
+     * @param {ProtoBlock} block 
+     * @param {Blocks} blocks 
+     * @returns {void}
+     */
     _blockHelp(block, blocks) {
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         this.widgetWindow = widgetWindow;
@@ -378,11 +401,6 @@ class HelpWidget {
             const label = block.staticLabels[0];
             this.widgetWindow.updateTitle(_(label));
         }
-
-        // display help menu
-        // docById("helpBodyDiv").style.height = "325px";
-        // docById("helpBodyDiv").style.width = "400px";
-        // this._showPage(0);
 
         if (block.name !== null) {
             const name = block.name;
@@ -514,6 +532,9 @@ class HelpWidget {
         this.widgetWindow.takeFocus();
     }
 
+    /**
+     * @deprecated
+     */
     showPageByName(pageName) {
         for (let i = 0; i < HELPCONTENT.length; i++) {
             if (HELPCONTENT[i].includes(pageName)) {
