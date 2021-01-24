@@ -142,8 +142,7 @@ function SampleWidget() {
             that._addSample();
 
             var newStack = [
-                [0, ["audiofile", { value: [that.sampleName, that.sampleData]}], 0, 0, [null, 1]],
-                [0, ["number", {value: that.pitchCenter}], 0, 0, [0]]
+                [0, ["audiofile", { value: [that.sampleName, that.sampleData]}], 0, 0, [null, null]],
             ];
 
             that._logo.blocks.loadNewBlocks(newStack);
