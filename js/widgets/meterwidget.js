@@ -36,6 +36,9 @@ class MeterWidget {
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
 
+    /**
+     * @param {number} widgetBlock 
+     */
     constructor(widgetBlock) {
         this._meterBlock = logo._meterBlock;
         this._strongBeats = [];
@@ -187,22 +190,45 @@ class MeterWidget {
         widgetWindow.sendToCenter();
     }
 
+    /**
+     * @private
+     * @returns {boolean}
+     */
     _get_click_lock() {
         return this._click_lock;
     }
 
+    /**
+     * @private
+     * @param {string} drum 
+     * @returns {void}
+     */
     __playDrum(drum) {
         logo.synth.trigger(0, "C4", Singer.defaultBPMFactor * this._beatValue, drum, null, null);
     }
 
+    /**
+     * @private
+     * @returns {boolean}
+     */
     __getPlayingStatus() {
         return this._playing;
     }
 
+    /**
+     * @private
+     * @returns {boolean}
+     */
     __getPauseStatus() {
         return !this._playing;
     }
 
+    /**
+     * @private
+     * @param {number} i 
+     * @param {number} ms 
+     * @returns {void}
+     */
     __playOneBeat(i, ms) {
         if (this.__getPauseStatus()) {
             for (let i = 0; i < this._strongBeats.length; i++) {
@@ -230,6 +256,10 @@ class MeterWidget {
         }, ms);
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _playBeat() {
         const tur = logo.turtles.ithTurtle(0);
         const bpmFactor =
@@ -278,6 +308,10 @@ class MeterWidget {
         return cell;
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _save() {
         // Export onbeatdo blocks for each strong beat
         const strongBeats = [];
@@ -409,6 +443,12 @@ class MeterWidget {
         logo.blocks.loadNewBlocks(newStack);
     }
 
+    /**
+     * @private
+     * @param {number} numberOfBeats 
+     * @param {number} beatValue 
+     * @returns {void}
+     */
     _piemenuMeter(numberOfBeats, beatValue) {
         // pie menu for strong beat selection
 
@@ -557,10 +597,16 @@ class MeterWidget {
             this._beatWheel.navItems[i].navItem.hide();
         }
 
-        this.setupDefaultStrongWeakBeats(numberOfBeats, beatValue);
+        this._setupDefaultStrongWeakBeats(numberOfBeats, beatValue);
     }
 
-    setupDefaultStrongWeakBeats(numberOfBeats, beatValue) {
+    /**
+     * @private
+     * @param {number} numberOfBeats 
+     * @param {number} beatValue 
+     * @returns {void}
+     */
+    _setupDefaultStrongWeakBeats(numberOfBeats, beatValue) {
         if (beatValue == 0.25 && numberOfBeats == 4) {
             this._strongBeats[0] = true;
             this._strongBeats[2] = true;
