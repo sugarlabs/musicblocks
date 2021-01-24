@@ -82,9 +82,7 @@ function setupToneActions() {
 
             if (tur.singer.instrumentNames.indexOf(synth) === -1) {
                 tur.singer.instrumentNames.push(synth);
-                console.log("hi");
                 if (typeof instrument === "object") {
-                    console.log("there");
                     logo.synth.loadSynth(turtle, instrument);
                 } else {
                     logo.synth.loadSynth(turtle, synth);
