@@ -29,7 +29,7 @@
          PREVIEWVOLUME, TONEBPM
 */
 
-// eslint-disable-next-line no-unused-vars
+/*exported MeterWidget*/
 class MeterWidget {
     // A pie menu is used to show the meter and strong beats
     static BUTTONDIVWIDTH = 535;
@@ -68,6 +68,8 @@ class MeterWidget {
             logo.hideMsgs();
             widgetWindow.destroy();
         };
+
+        widgetWindow.onmaximize = this._scale;
 
         this._click_lock = false;
         const playBtn = widgetWindow.addButton("play-button.svg", MeterWidget.ICONSIZE, _("Play"));
@@ -188,6 +190,20 @@ class MeterWidget {
 
         logo.textMsg(_("Click in the circle to select strong beats for the meter."));
         widgetWindow.sendToCenter();
+        this._scale.call(this.widgetWindow);
+    }
+
+    _scale() {
+        const windowHeight =
+            this.getWidgetFrame().offsetHeight - this.getDragElement().offsetHeight;
+        const svg = this.getWidgetBody().getElementsByTagName("svg")[0];
+        const scale = this.isMaximized() ? windowHeight / 400 : 1;
+        svg.style.pointerEvents = "none";
+        svg.setAttribute("height", `${400 * scale}px`);
+        svg.setAttribute("width", `${400 * scale}px`);
+        setTimeout(() => {
+            svg.style.pointerEvents = "auto";
+        }, 100);
     }
 
     /**
@@ -363,7 +379,8 @@ class MeterWidget {
     _piemenuMeter(numberOfBeats, beatValue) {
         // pie menu for strong beat selection
 
-        docById("meterWheelDiv").style.display = "";
+        docById("meterWheelDiv").style.display = "flex";
+        docById("meterWheelDiv").style.justifyContent = "center";
 
         // Use advanced constructor for multiple wheelnavs in the same div.
         // The meterWheel is used to hold the strong beats.
