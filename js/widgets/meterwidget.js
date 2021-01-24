@@ -9,6 +9,27 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/*global logo, Singer, _, last, platformColor, docById, wheelnav, slicePath, PREVIEWVOLUME, TONEBPM*/
+
+/*
+     Globals location
+     - lib/wheelnav
+         slicePath, wheelnav
+     
+     - js/utils/utils.js
+         _, last, docById
+     
+     - js/turtle-singer.js
+         Singer
+     
+     - js/utils/platformstyle.js
+         platformColor
+     
+     - js/logo.js
+         PREVIEWVOLUME, TONEBPM
+*/
+
+// eslint-disable-next-line no-unused-vars
 class MeterWidget {
     // A pie menu is used to show the meter and strong beats
     static BUTTONDIVWIDTH = 535;
@@ -22,10 +43,10 @@ class MeterWidget {
         this._click_lock = false;
         this._beatValue = 1 / 4;
 
-        let w = window.innerWidth;
+        const w = window.innerWidth;
         this._cellScale = w / 1200;
 
-        let widgetWindow = window.widgetWindows.windowFor(this, "meter");
+        const widgetWindow = window.widgetWindows.windowFor(this, "meter");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
 
@@ -96,7 +117,7 @@ class MeterWidget {
         };
 
         // The pie menu goes here.
-        let meterTableDiv = this.meterDiv;
+        const meterTableDiv = this.meterDiv;
         meterTableDiv.style.display = "inline";
         meterTableDiv.style.visibility = "visible";
         meterTableDiv.style.border = "0px";
@@ -210,14 +231,14 @@ class MeterWidget {
     }
 
     _playBeat() {
-        let tur = logo.turtles.ithTurtle(0);
-        let bpmFactor =
+        const tur = logo.turtles.ithTurtle(0);
+        const bpmFactor =
             TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
         for (let i = 0; i < this._strongBeats.length; i++) {
             this._playWheel.navItems[i].navItem.hide();
         }
 
-        let noteBeatValue = bpmFactor * 1000 * this._beatValue;
+        const noteBeatValue = bpmFactor * 1000 * this._beatValue;
         this.__playOneBeat(0, noteBeatValue);
     }
 
@@ -225,7 +246,7 @@ class MeterWidget {
      * @deprecated
      */
     _addButton(row, icon, iconSize, label) {
-        let cell = row.insertCell(-1);
+        const cell = row.insertCell(-1);
         cell.innerHTML =
             '&nbsp;&nbsp;<img src="header-icons/' +
             icon +
@@ -259,10 +280,10 @@ class MeterWidget {
 
     _save() {
         // Export onbeatdo blocks for each strong beat
-        let strongBeats = [];
-        let newStack = [];
+        const strongBeats = [];
+        const newStack = [];
 
-        let numberOfBeats = this._strongBeats.length;
+        const numberOfBeats = this._strongBeats.length;
 
         for (let i = 0; i < numberOfBeats; i++) {
             if (this._strongBeats[i]) {
@@ -384,7 +405,7 @@ class MeterWidget {
             n += 3;
         }
 
-        console.debug(newStack);
+        // console.debug(newStack);
         logo.blocks.loadNewBlocks(newStack);
     }
 
@@ -423,7 +444,7 @@ class MeterWidget {
             numberOfBeats = 16;
         }
 
-        let labels = [
+        const labels = [
             "1",
             "2",
             "3",
@@ -516,15 +537,15 @@ class MeterWidget {
 
         // If a meterWheel sector is selected, show the corresponding
         // beat wheel sector.
-        let __setBeat = () => {
-            let i = this._meterWheel.selectedNavItemIndex;
+        const __setBeat = () => {
+            const i = this._meterWheel.selectedNavItemIndex;
             this._strongBeats[i] = true;
             this._beatWheel.navItems[i].navItem.show();
         };
 
         // If a beatWheel sector is selected, hide it.
-        let __clearBeat = () => {
-            let i = this._beatWheel.selectedNavItemIndex;
+        const __clearBeat = () => {
+            const i = this._beatWheel.selectedNavItemIndex;
             this._beatWheel.navItems[i].navItem.hide();
             this._strongBeats[i] = false;
         };
