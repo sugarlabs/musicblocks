@@ -1,16 +1,14 @@
 {
-  "parser": "babel-eslint",
   "env": {
     "es6": true,
-    "browser": true,
-    "node": true
+    "browser": true
   },
   "extends": ["eslint:recommended", "prettier"],
   "rules": {
-    // "no-console": "warn",
+    "no-console": "warn",
     "no-mixed-spaces-and-tabs": "warn",
-    // "no-unused-vars": "warn",
-    // "no-use-before-define": "error",
+    "no-unused-vars": "warn",
+    "no-use-before-define": "error",
     "prefer-const": [
       "warn",
       {
@@ -18,8 +16,7 @@
         "ignoreReadBeforeAssign": true
       }
     ],
-    "no-undef": "warn",
-    "no-unused-vars": "off",
+    "no-undef": "error",
     "indent": ["warn", 4, { "SwitchCase": 1 }],
     "quotes": ["warn", "double", { "avoidEscape": true }],
     "semi": "error",
