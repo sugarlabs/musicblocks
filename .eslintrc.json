@@ -3,6 +3,7 @@
     "es6": true,
     "browser": true
   },
+  "parser": "babel-eslint",
   "extends": ["eslint:recommended", "prettier"],
   "rules": {
     "no-console": "warn",
