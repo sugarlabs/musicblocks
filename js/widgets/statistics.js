@@ -9,19 +9,14 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/**
- * This widget makes displays the status of selected parameters and notes as they are being played.
- */
-
-/*global , docById*/
-
 /*
-     Globals locations
-     
-     - js/utils/utils.js
-        _, docById
-     
+  global logo, blocks, docById, _showHideAuxMenu, analyzeProject, runAnalytics, scoreToChartData,
+  getChartOptions, loading:writable, Chart
  */
+
+/* exported StatsWindow, loading */
+
+/** This widget displays the status of selected parameters and notes as they are being played. */
 class StatsWindow {
     constructor() {
         this.isOpen = true;
@@ -37,11 +32,9 @@ class StatsWindow {
         this.doAnalytics();
 
         this.widgetWindow.sendToCenter();
-    };
+    }
 
-    /**
-     * Renders and carries out analysis of the MB project.
-     */
+    /** Renders and carries out analysis of the MB project. */
     doAnalytics() {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         blocks.activeBlock = null;
@@ -71,20 +64,42 @@ class StatsWindow {
         this.jsonObject = document.createElement("ul");
         this.jsonObject.style.float = "left";
         this.widgetWindow.getWidgetBody().appendChild(this.jsonObject);
-    };
+    }
 
     displayInfo(stats) {
         const lowHertz = stats["lowestNote"][2] + 0.5;
         const highHertz = stats["highestNote"][2] + 0.5;
         this.jsonObject.innerHTML =
-            "<li>duples: " + stats["duples"] + "</li>" +
-            "<li>triplets: " + stats["triplets"] + "</li>" +
-            "<li>quintuplets: " + stats["quintuplets"] + "</li>" +
-            "<li>pitch names: " + Array.from(stats["pitchNames"]) + "</li>" +
-            "<li>number of notes: " + stats["numberOfNotes"] + "</li>" +
-            "<li>lowest note: " + stats["lowestNote"][0] + " , " + lowHertz.toFixed(0) + "Hz</li>" +
-            "<li>highest note: " + stats["highestNote"][0] + " , " + highHertz.toFixed(0) + "Hz</li>" +
-            "<li>rests used: " + stats["rests"] + "</li>" +
-            "<li>ornaments used: " + stats["ornaments"] + "</li>";
+            "<li>duples: " +
+            stats["duples"] +
+            "</li>" +
+            "<li>triplets: " +
+            stats["triplets"] +
+            "</li>" +
+            "<li>quintuplets: " +
+            stats["quintuplets"] +
+            "</li>" +
+            "<li>pitch names: " +
+            Array.from(stats["pitchNames"]) +
+            "</li>" +
+            "<li>number of notes: " +
+            stats["numberOfNotes"] +
+            "</li>" +
+            "<li>lowest note: " +
+            stats["lowestNote"][0] +
+            " , " +
+            lowHertz.toFixed(0) +
+            "Hz</li>" +
+            "<li>highest note: " +
+            stats["highestNote"][0] +
+            " , " +
+            highHertz.toFixed(0) +
+            "Hz</li>" +
+            "<li>rests used: " +
+            stats["rests"] +
+            "</li>" +
+            "<li>ornaments used: " +
+            stats["ornaments"] +
+            "</li>";
     }
 }
