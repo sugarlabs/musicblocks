@@ -138,6 +138,7 @@ class MeterWidget {
         //TRANS.: Reset the widget layout
         widgetWindow.addButton("reload.svg", MeterWidget.ICONSIZE, _("Reset")).onclick = () => {
             //change Values of blocks in stack.
+            this._playing = false;
             const el = divInput.children[0];
             const el2 = divInput2.children[0];
 
