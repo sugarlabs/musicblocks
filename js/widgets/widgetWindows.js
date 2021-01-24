@@ -62,7 +62,7 @@ class WidgetWindow {
             }
         });
 
-        document.addEventListener("mouseup", (e) => {
+        document.addEventListener("mouseup", () => {
             this._dragging = false;
         });
 
@@ -173,7 +173,7 @@ class WidgetWindow {
             window.onscroll = () => {
                 window.scrollTo(scrollLeft, scrollTop);
             };
-        }
+        };
 
         this._widget = this._create("div", "wfbWidget", this._body);
         this._widget.addEventListener("wheel", disableScroll, false);
@@ -190,7 +190,7 @@ class WidgetWindow {
             language = navigator.language;
         }
 
-        console.debug("language setting is " + language);
+        // console.debug("language setting is " + language);
         // For Japanese, put the toolbar on the top.
         if (language === "ja") {
             this._body.style.flexDirection = "column";
@@ -414,6 +414,14 @@ class WidgetWindow {
     }
 
     /**
+     * @public
+     * @returns {HTMLElement}
+     */
+    getWidgetFrame() {
+        return this._frame;
+    }
+
+    /**
      * @deprecated
      */
     getDragElement() {
@@ -443,6 +451,14 @@ class WidgetWindow {
      */
     onmaximize() {
         return this;
+    }
+
+    /**
+     * @public
+     * @returns {boolean}
+     */
+    isMaximized() {
+        return this._maximized;
     }
 
     /**
