@@ -10,7 +10,7 @@
 
 // This widget displays help about a block or a button.
 
-/*global _, docById, getMacroExpansion, HELPCONTENT*/
+/*global _, docById, getMacroExpansion, HELPCONTENT, blocks*/
 
 /*
      Globals locations
@@ -23,8 +23,12 @@
     
      - js/turtledefs.js
         HELPCONTENT
+    
+     - js/activity.js
+        blocks
  */
 
+/*exported HelpWidget*/
 class HelpWidget {
     static ICONSIZE = 32;
 
