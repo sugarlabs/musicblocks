@@ -307,6 +307,8 @@ const TACAT = {
     video: "ignore",
     loadFile: "ignore",
     audiofile: "ignore",
+    sampler: "ignore",
+    customsample: "ignore",
     stopvideocam: "ignore",
     tone: "media",
     tofrequency: "media",
