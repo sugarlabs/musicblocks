@@ -9,9 +9,14 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/**
- * This widget makes displays the status of selected parameters and notes as they are being played.
+/*
+  global logo, blocks, docById, _showHideAuxMenu, analyzeProject, runAnalytics, scoreToChartData,
+  getChartOptions, loading:writable, Chart
  */
+
+/* exported StatsWindow, loading */
+
+/** This widget displays the status of selected parameters and notes as they are being played. */
 class StatsWindow {
     constructor() {
         this.isOpen = true;
@@ -27,27 +32,25 @@ class StatsWindow {
         this.doAnalytics();
 
         this.widgetWindow.sendToCenter();
-    };
+    }
 
-    /**
-     * Renders and carries out analysis of the MB project.
-     */
+    /** Renders and carries out analysis of the MB project. */
     doAnalytics() {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         blocks.activeBlock = null;
-        let myChart = docById("myChart");
+        const myChart = docById("myChart");
 
-        let ctx = myChart.getContext("2d");
+        const ctx = myChart.getContext("2d");
         loading = true;
         document.body.style.cursor = "wait";
 
         let myRadarChart = null;
-        let scores = analyzeProject(blocks);
+        const scores = analyzeProject(blocks);
         runAnalytics(logo);
-        let data = scoreToChartData(scores);
+        const data = scoreToChartData(scores);
         const __callback = () => {
-            let imageData = myRadarChart.toBase64Image();
-            let img = new Image();
+            const imageData = myRadarChart.toBase64Image();
+            const img = new Image();
             img.src = imageData;
             img.width = 200;
             this.widgetWindow.getWidgetBody().appendChild(img);
@@ -55,26 +58,48 @@ class StatsWindow {
             logo.showBlocksAfterRun = false;
             document.body.style.cursor = "default";
         };
-        let options = getChartOptions(__callback);
+        const options = getChartOptions(__callback);
         myRadarChart = new Chart(ctx).Radar(data, options);
 
         this.jsonObject = document.createElement("ul");
         this.jsonObject.style.float = "left";
         this.widgetWindow.getWidgetBody().appendChild(this.jsonObject);
-    };
+    }
 
     displayInfo(stats) {
-        let lowHertz = stats["lowestNote"][2] + 0.5;
-        let highHertz = stats["highestNote"][2] + 0.5;
+        const lowHertz = stats["lowestNote"][2] + 0.5;
+        const highHertz = stats["highestNote"][2] + 0.5;
         this.jsonObject.innerHTML =
-            '<li>duples: ' + stats["duples"] + '</li>'  + 
-            '<li>triplets: ' + stats["triplets"] + '</li>'  + 
-            '<li>quintuplets: ' + stats["quintuplets"] + '</li>'  + 
-            '<li>pitch names: ' + Array.from(stats["pitchNames"]) + '</li>'  + 
-            '<li>number of notes: ' + stats["numberOfNotes"] + '</li>'  + 
-            '<li>lowest note: ' + stats["lowestNote"][0] + " , " + lowHertz.toFixed(0) + 'Hz</li>'  + 
-            '<li>highest note: ' + stats["highestNote"][0] + " , " + highHertz.toFixed(0) + 'Hz</li>'  + 
-            '<li>rests used: ' + stats["rests"] + '</li>'  + 
-            '<li>ornaments used: ' + stats["ornaments"] + '</li>'
+            "<li>duples: " +
+            stats["duples"] +
+            "</li>" +
+            "<li>triplets: " +
+            stats["triplets"] +
+            "</li>" +
+            "<li>quintuplets: " +
+            stats["quintuplets"] +
+            "</li>" +
+            "<li>pitch names: " +
+            Array.from(stats["pitchNames"]) +
+            "</li>" +
+            "<li>number of notes: " +
+            stats["numberOfNotes"] +
+            "</li>" +
+            "<li>lowest note: " +
+            stats["lowestNote"][0] +
+            " , " +
+            lowHertz.toFixed(0) +
+            "Hz</li>" +
+            "<li>highest note: " +
+            stats["highestNote"][0] +
+            " , " +
+            highHertz.toFixed(0) +
+            "Hz</li>" +
+            "<li>rests used: " +
+            stats["rests"] +
+            "</li>" +
+            "<li>ornaments used: " +
+            stats["ornaments"] +
+            "</li>";
     }
 }
