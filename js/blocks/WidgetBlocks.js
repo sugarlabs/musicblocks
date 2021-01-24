@@ -520,9 +520,9 @@ function setupWidgetBlocks() {
         }
     }
 
-    class SampleBlock extends StackClampBlock {
+    class SamplerBlock extends StackClampBlock {
         constructor() {
-            super("sample");
+            super("sampler");
             this.setPalette("widgets");
             this.parameter = true;
             this.beginnerBlock(true);
@@ -531,20 +531,21 @@ function setupWidgetBlocks() {
                 _("Upload a sample or record a sample with the mic."),
                 "documentation",
                 null,
-                "sample"
+                "sampler"
             ]);
 
             //.TRANS: the speed at music is should be played.
-            this.formBlock({ name: _("sample"), canCollapse: true });
+            this.formBlock({ name: _("sampler"), canCollapse: true });
             this.makeMacro((x, y) => [
-              [0, "sample", x, y, [null, 1, 7]],
-              [1, "settimbre", 0, 0, [0, 2, 5, 6]],
-              [2, ["audiofile", {value: ["", "", "do", 4]}], 0, 0, [1, 3, 4]],
-              [3, ["solfege", {value: "do"}], 0, 0, [2]],
-              [4, ["number", {value: 4}], 0, 0, [2]],
-              [5, "vspace", 0, 0, [1, null]],
-              [6, "hidden", 0, 0, [1, null]],
-              [7, "hiddennoflow", 0, 0, [0, null]]
+              [0, "sampler", x, y, [null, 1, 8]],
+              [1, "settimbre", 0, 0, [0, 2, 6, 7]],
+              [2, ["customsample", {value: ["", "", "do", 4]}], 0, 0, [1, 3, 4, 5]],
+              [3, ["audiofile", {value: ""}], 0, 0, [2]],
+              [4, ["solfege", {value: "do"}], 0, 0, [2]],
+              [5, ["number", {value: 4}], 0, 0, [2]],
+              [6, "vspace", 0, 0, [1, null]],
+              [7, "hidden", 0, 0, [1, null]],
+              [8, "hiddennoflow", 0, 0, [0, null]]
             ]);
         }
 
@@ -555,7 +556,7 @@ function setupWidgetBlocks() {
             logo.inSample = true;
             logo.sample = new SampleWidget();
 
-            let listenerName = "_sample_" + turtle;
+            let listenerName = "_sampler_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
@@ -1206,7 +1207,7 @@ function setupWidgetBlocks() {
     new MeterWidgetBlock().setup();
     new ModeWidgetBlock().setup();
     new TempoBlock().setup();
-    new SampleBlock().setup();
+    new SamplerBlock().setup();
     new PitchDrumMatrixBlock().setup();
     new oscilloscopeWidgetBlock().setup();
     new PitchSliderBlock().setup();
