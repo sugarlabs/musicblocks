@@ -37,7 +37,7 @@ class MeterWidget {
     static ICONSIZE = 32;
 
     /**
-     * @param {number} widgetBlock 
+     * @param {number} widgetBlock
      */
     constructor(widgetBlock) {
         this._meterBlock = logo._meterBlock;
@@ -200,7 +200,7 @@ class MeterWidget {
 
     /**
      * @private
-     * @param {string} drum 
+     * @param {string} drum
      * @returns {void}
      */
     __playDrum(drum) {
@@ -225,8 +225,8 @@ class MeterWidget {
 
     /**
      * @private
-     * @param {number} i 
-     * @param {number} ms 
+     * @param {number} i
+     * @param {number} ms
      * @returns {void}
      */
     __playOneBeat(i, ms) {
@@ -331,111 +331,22 @@ class MeterWidget {
             if (i === 0) {
                 if (strongBeats.length === 1) {
                     newStack.push([0, "onbeatdo", 100, 100, [null, 1, 2, null]]);
-                    newStack.push([
-                        1,
-                        [
-                            "number",
-                            {
-                                value: strongBeats[i] + 1
-                            }
-                        ],
-                        0,
-                        0,
-                        [0]
-                    ]);
-                    newStack.push([
-                        2,
-                        [
-                            "text",
-                            {
-                                value: "action"
-                            }
-                        ],
-                        0,
-                        0,
-                        [0]
-                    ]);
+                    newStack.push([1, ["number", { value: strongBeats[i] + 1 }], 0, 0, [0]]);
+                    newStack.push([2, ["text", { value: "action" }], 0, 0, [0]]);
                 } else {
                     newStack.push([0, "onbeatdo", 100, 100, [null, 1, 2, 3]]);
-                    newStack.push([
-                        1,
-                        [
-                            "number",
-                            {
-                                value: strongBeats[i] + 1
-                            }
-                        ],
-                        0,
-                        0,
-                        [0]
-                    ]);
-                    newStack.push([
-                        2,
-                        [
-                            "text",
-                            {
-                                value: "action"
-                            }
-                        ],
-                        0,
-                        0,
-                        [0]
-                    ]);
+                    newStack.push([1, ["number", { value: strongBeats[i] + 1 }], 0, 0, [0]]);
+                    newStack.push([2, ["text", { value: "action" }], 0, 0, [0]]);
                 }
             } else if (i === strongBeats.length - 1) {
                 newStack.push([n, "onbeatdo", 0, 0, [n - 3, n + 1, n + 2, null]]);
-                newStack.push([
-                    n + 1,
-                    [
-                        "number",
-                        {
-                            value: strongBeats[i] + 1
-                        }
-                    ],
-                    0,
-                    0,
-                    [n]
-                ]);
-                newStack.push([
-                    n + 2,
-                    [
-                        "text",
-                        {
-                            value: "action"
-                        }
-                    ],
-                    0,
-                    0,
-                    [n]
-                ]);
+                newStack.push([n + 1, ["number", { value: strongBeats[i] + 1 }], 0, 0, [n]]);
+                newStack.push([n + 2, ["text", { value: "action" }], 0, 0, [n]]);
             } else {
                 newStack.push([n, "onbeatdo", 0, 0, [n - 3, n + 1, n + 2, n + 3]]);
-                newStack.push([
-                    n + 1,
-                    [
-                        "number",
-                        {
-                            value: strongBeats[i] + 1
-                        }
-                    ],
-                    0,
-                    0,
-                    [n]
-                ]);
-                newStack.push([
-                    n + 2,
-                    [
-                        "text",
-                        {
-                            value: "action"
-                        }
-                    ],
-                    0,
-                    0,
-                    [n]
-                ]);
+                newStack.push([n + 1, ["number", { value: strongBeats[i] + 1 }], 0, 0, [n]]);
+                newStack.push([n + 2, ["text", { value: "action" }], 0, 0, [n]]);
             }
-
             n += 3;
         }
 
@@ -445,8 +356,8 @@ class MeterWidget {
 
     /**
      * @private
-     * @param {number} numberOfBeats 
-     * @param {number} beatValue 
+     * @param {number} numberOfBeats
+     * @param {number} beatValue
      * @returns {void}
      */
     _piemenuMeter(numberOfBeats, beatValue) {
@@ -509,14 +420,6 @@ class MeterWidget {
             this._strongBeats.push(false);
         }
 
-        // Always make the meter a complete circle.
-        /*
-        let n = (1 - (numberOfBeats * beatValue)) / beatValue;
-        for (let i = 0; i < n; i++) {
-            beatList.push(null);
-        }
-        */
-
         this._meterWheel.createWheel(beatList);
 
         this._beatWheel.colors = platformColor.modeWheelcolors;
@@ -535,14 +438,6 @@ class MeterWidget {
             beatList.push("x");
         }
 
-        // Always make the meter a complete circle.
-        /*
-        let n = (1 - (numberOfBeats * beatValue)) / beatValue;
-        for (let i = 0; i < n; i++) {
-            beatList.push(null);
-        }
-        */
-
         this._beatWheel.createWheel(beatList);
 
         this._playWheel.colors = [platformColor.orange];
@@ -560,14 +455,6 @@ class MeterWidget {
         for (let i = 0; i < numberOfBeats; i++) {
             beatList.push(" ");
         }
-
-        // Always make the meter a complete circle.
-        /*
-        let n = (1 - (numberOfBeats * beatValue)) / beatValue;
-        for (let i = 0; i < n; i++) {
-            playList.push(null);
-        }
-        */
 
         this._playWheel.createWheel(beatList);
 
@@ -602,8 +489,8 @@ class MeterWidget {
 
     /**
      * @private
-     * @param {number} numberOfBeats 
-     * @param {number} beatValue 
+     * @param {number} numberOfBeats
+     * @param {number} beatValue
      * @returns {void}
      */
     _setupDefaultStrongWeakBeats(numberOfBeats, beatValue) {
