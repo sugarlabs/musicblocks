@@ -882,6 +882,10 @@ function setupWidgetBlocks() {
 
         flow(args, logo, turtle, blk) {
 
+            if (logo.rhythmRuler == null) {
+                logo.rhythmRuler = new RhythmRuler();
+            }
+
             logo.rhythmRuler.Rulers = [];
             logo.rhythmRuler.Drums = [];
             logo.inRhythmRuler = true;
