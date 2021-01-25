@@ -11,25 +11,24 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-
-const FAKEBLOCKNUMBER = 100000;
-const BUTTONDIVWIDTH = 535; // 5 buttons
-const OUTERWINDOWWIDTH = 758;
-const INNERWINDOWWIDTH = 50;
-const BUTTONSIZE = 53;
-const ICONSIZE = 32;
-// Mapping between keycodes and virtual keyboard
-const BLACKKEYS = [87, 69, 82, 84, 89, 85, 73, 79];
-const WHITEKEYS = [65, 83, 68, 70, 71, 72, 74, 75, 76];
-const SPACE = 32;
-
-let saveOnKeyDown = document.onkeydown;
-let saveOnKeyUp = document.onkeyup;
-let beginnerMode = localStorage.beginnerMode;
-let unit = beginnerMode === "true" ? 8 : 16;
-let selectedNotes = [];
-
 class MusicKeyboard {
+    static FAKEBLOCKNUMBER = 100000;
+    static BUTTONDIVWIDTH = 535; // 5 buttons
+    static OUTERWINDOWWIDTH = 758;
+    static INNERWINDOWWIDTH = 50;
+    static BUTTONSIZE = 53;
+    static ICONSIZE = 32;
+    // Mapping between keycodes and virtual keyboard
+    static BLACKKEYS = [87, 69, 82, 84, 89, 85, 73, 79];
+    static WHITEKEYS = [65, 83, 68, 70, 71, 72, 74, 75, 76];
+    static SPACE = 32;
+
+    static saveOnKeyDown = document.onkeydown;
+    static saveOnKeyUp = document.onkeyup;
+    static beginnerMode = localStorage.beginnerMode;
+    static unit = MusicKeyboard.beginnerMode === "true" ? 8 : 16;
+    static selectedNotes = [];
+
     constructor() {
         let w = window.innerWidth;
         this._cellScale = w / 1200;
@@ -70,7 +69,7 @@ class MusicKeyboard {
 
     processSelected() {
         if (this._notesPlayed.length === 0) {
-            selectedNotes = [];
+            MusicKeyboard.selectedNotes = [];
             return;
         }
 
@@ -82,7 +81,7 @@ class MusicKeyboard {
         // selectedNotes is used for playback. Coincident notes are
         // grouped together. It is built from notesPlayed.
 
-        selectedNotes = [
+        MusicKeyboard.selectedNotes = [
             {
                 noteOctave: [this._notesPlayed[0].noteOctave],
                 objId: [this._notesPlayed[0].objId],
@@ -99,17 +98,17 @@ class MusicKeyboard {
                 i < this._notesPlayed.length &&
                 this._notesPlayed[i].startTime === this._notesPlayed[i - 1].startTime
             ) {
-                selectedNotes[j].noteOctave.push(this._notesPlayed[i].noteOctave);
-                selectedNotes[j].objId.push(this._notesPlayed[i].objId);
-                selectedNotes[j].duration.push(this._notesPlayed[i].duration);
-                selectedNotes[j].voice.push(this._notesPlayed[i].voice);
-                selectedNotes[j].blockNumber.push(this._notesPlayed[i].blockNumber);
+                MusicKeyboard.selectedNotes[j].noteOctave.push(this._notesPlayed[i].noteOctave);
+                MusicKeyboard.selectedNotes[j].objId.push(this._notesPlayed[i].objId);
+                MusicKeyboard.selectedNotes[j].duration.push(this._notesPlayed[i].duration);
+                MusicKeyboard.selectedNotes[j].voice.push(this._notesPlayed[i].voice);
+                MusicKeyboard.selectedNotes[j].blockNumber.push(this._notesPlayed[i].blockNumber);
                 i++;
             }
 
             j++;
             if (i < this._notesPlayed.length) {
-                selectedNotes.push({
+                MusicKeyboard.selectedNotes.push({
                     noteOctave: [this._notesPlayed[i].noteOctave],
                     objId: [this._notesPlayed[i].objId],
                     duration: [this._notesPlayed[i].duration],
@@ -131,13 +130,13 @@ class MusicKeyboard {
 
         let __startNote = (event) => {
             let i, id, ele;
-            if (WHITEKEYS.indexOf(event.keyCode) !== -1) {
-                i = WHITEKEYS.indexOf(event.keyCode);
+            if (MusicKeyboard.WHITEKEYS.indexOf(event.keyCode) !== -1) {
+                i = MusicKeyboard.WHITEKEYS.indexOf(event.keyCode);
                 id = "whiteRow" + i.toString();
-            } else if (BLACKKEYS.indexOf(event.keyCode) !== -1) {
-                i = BLACKKEYS.indexOf(event.keyCode);
+            } else if (MusicKeyboard.BLACKKEYS.indexOf(event.keyCode) !== -1) {
+                i = MusicKeyboard.BLACKKEYS.indexOf(event.keyCode);
                 id = "blackRow" + i.toString();
-            } else if (SPACE == event.keyCode) {
+            } else if (MusicKeyboard.SPACE == event.keyCode) {
                 id = "rest";
             }
 
@@ -176,7 +175,7 @@ class MusicKeyboard {
                     restDuration *= this.bpm;
                     restDuration *= this.meterArgs[1];
 
-                    restDuration = parseFloat((Math.round(restDuration * unit) / unit).toFixed(4));
+                    restDuration = parseFloat((Math.round(restDuration * MusicKeyboard.unit) / MusicKeyboard.unit).toFixed(4));
 
                     if (restDuration === 0) {
                         restDuration = 0;
@@ -205,13 +204,13 @@ class MusicKeyboard {
 
         let __endNote = (event) => {
             let i, id, ele, no;
-            if (WHITEKEYS.indexOf(event.keyCode) !== -1) {
-                i = WHITEKEYS.indexOf(event.keyCode);
+            if (MusicKeyboard.WHITEKEYS.indexOf(event.keyCode) !== -1) {
+                i = MusicKeyboard.WHITEKEYS.indexOf(event.keyCode);
                 id = "whiteRow" + i.toString();
-            } else if (BLACKKEYS.indexOf(event.keyCode) !== -1) {
-                i = BLACKKEYS.indexOf(event.keyCode);
+            } else if (MusicKeyboard.BLACKKEYS.indexOf(event.keyCode) !== -1) {
+                i = MusicKeyboard.BLACKKEYS.indexOf(event.keyCode);
                 id = "blackRow" + i.toString();
-            } else if (SPACE == event.keyCode) {
+            } else if (MusicKeyboard.SPACE == event.keyCode) {
                 id = "rest";
             }
 
@@ -233,10 +232,10 @@ class MusicKeyboard {
                 duration *= this.bpm;
                 duration *= this.meterArgs[1];
 
-                duration = parseFloat((Math.round(duration * unit) / unit).toFixed(4));
+                duration = parseFloat((Math.round(duration * MusicKeyboard.unit) / MusicKeyboard.unit).toFixed(4));
 
                 if (duration === 0) {
-                    duration = 1 / unit;
+                    duration = 1 / MusicKeyboard.unit;
                 } else if (duration < 0) {
                     duration = -duration;
                 }
@@ -331,7 +330,7 @@ class MusicKeyboard {
                 this.instrumentMapper[element.id],
                 this.noteMapper[element.id]
             );
-            if (beginnerMode === "true") {
+            if (MusicKeyboard.beginnerMode === "true") {
                 duration = parseFloat((Math.round(duration * 8) / 8).toFixed(3));
             } else {
                 duration = parseFloat((Math.round(duration * 16) / 16).toFixed(4));
@@ -369,7 +368,7 @@ class MusicKeyboard {
         this.playingNow = false;
         let w = window.innerWidth;
         this._cellScale = w / 1200;
-        let iconSize = ICONSIZE * this._cellScale;
+        let iconSize = MusicKeyboard.ICONSIZE * this._cellScale;
 
         let widgetWindow = window.widgetWindows.windowFor(this, "music keyboard");
         this.widgetWindow = widgetWindow;
@@ -381,8 +380,8 @@ class MusicKeyboard {
 
         widgetWindow.onclose = () => {
             let myNode;
-            document.onkeydown = saveOnKeyDown;
-            document.onkeyup = saveOnKeyUp;
+            document.onkeydown = MusicKeyboard.saveOnKeyDown;
+            document.onkeyup = MusicKeyboard.saveOnKeyUp;
 
             if (document.getElementById("keyboardHolder2")) {
                 document.getElementById("keyboardHolder2").style.display = "none";
@@ -399,12 +398,12 @@ class MusicKeyboard {
             }
 
             let selected = [];
-            selectedNotes = [];
+            MusicKeyboard.selectedNotes = [];
             if (this.loopTick) this.loopTick.stop();
             widgetWindow.destroy();
         };
 
-        this.playButton = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
+        this.playButton = widgetWindow.addButton("play-button.svg", MusicKeyboard.ICONSIZE, _("Play"));
 
         this.playButton.onclick = () => {
             this._logo.turtleDelay = 0;
@@ -412,28 +411,28 @@ class MusicKeyboard {
             this.playAll();
         };
 
-        widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Save")).onclick = () => {
+        widgetWindow.addButton("export-chunk.svg", MusicKeyboard.ICONSIZE, _("Save")).onclick = () => {
             this._save();
         };
 
-        widgetWindow.addButton("erase-button.svg", ICONSIZE, _("Clear")).onclick = () => {
+        widgetWindow.addButton("erase-button.svg", MusicKeyboard.ICONSIZE, _("Clear")).onclick = () => {
             this._notesPlayed = [];
-            selectedNotes = [];
+            MusicKeyboard.selectedNotes = [];
             // if (!that.keyboardShown) {
             this._createTable();
             // }
         };
 
-        widgetWindow.addButton("add2.svg", ICONSIZE, _("Add note")).onclick = () => {
+        widgetWindow.addButton("add2.svg", MusicKeyboard.ICONSIZE, _("Add note")).onclick = () => {
             this._createAddRowPieSubmenu();
         };
 
-        this.midiButton = widgetWindow.addButton("midi.svg", ICONSIZE, _("MIDI"));
+        this.midiButton = widgetWindow.addButton("midi.svg", MusicKeyboard.ICONSIZE, _("MIDI"));
         this.midiButton.onclick = () => {
             this.doMIDI();
         };
 
-        this.tickButton = widgetWindow.addButton("metronome.svg", ICONSIZE, _("Metronome"));
+        this.tickButton = widgetWindow.addButton("metronome.svg", MusicKeyboard.ICONSIZE, _("Metronome"));
         this.tickButton.onclick = () => {
             if (this.tick) {
                 this.tick = false;
@@ -472,8 +471,8 @@ class MusicKeyboard {
         this._createTable();
 
         w = Math.max(
-            Math.min(window.innerWidth, this._cellScale * OUTERWINDOWWIDTH - 20),
-            BUTTONDIVWIDTH
+            Math.min(window.innerWidth, this._cellScale * MusicKeyboard.OUTERWINDOWWIDTH - 20),
+            MusicKeyboard.BUTTONDIVWIDTH
         );
 
         //Change widget size on fullscreen mode, else
@@ -506,7 +505,7 @@ class MusicKeyboard {
     };
 
     playAll() {
-        if (selectedNotes.length <= 0) {
+        if (MusicKeyboard.selectedNotes.length <= 0) {
             return;
         }
 
@@ -522,26 +521,26 @@ class MusicKeyboard {
                 '" alt="' +
                 _("stop") +
                 '" height="' +
-                ICONSIZE +
+                MusicKeyboard.ICONSIZE +
                 '" width="' +
-                ICONSIZE +
+                MusicKeyboard.ICONSIZE +
                 '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
 
-            if (selectedNotes.length < 1) {
+            if (MusicKeyboard.selectedNotes.length < 1) {
                 return;
             }
 
             let notes = [];
             let ele, zx, res, cell, maxWidth;
-            for (let i = 0; i < selectedNotes[0].noteOctave.length; i++) {
-                if (this.keyboardShown && selectedNotes[0].objId[0] !== null) {
-                    ele = docById(selectedNotes[0].objId[i]);
+            for (let i = 0; i < MusicKeyboard.selectedNotes[0].noteOctave.length; i++) {
+                if (this.keyboardShown && MusicKeyboard.selectedNotes[0].objId[0] !== null) {
+                    ele = docById(MusicKeyboard.selectedNotes[0].objId[i]);
                     if (ele !== null) {
                         ele.style.backgroundColor = "lightgrey";
                     }
                 }
 
-                zx = selectedNotes[0].noteOctave[i];
+                zx = MusicKeyboard.selectedNotes[0].noteOctave[i];
                 res = zx;
                 if (typeof zx === "string") {
                     res = zx.replace(SHARP, "#").replace(FLAT, "b");
@@ -556,8 +555,8 @@ class MusicKeyboard {
             }
 
             this._stopOrCloseClicked = false;
-            this._playChord(notes, selectedNotes[0].duration, selectedNotes[0].voice);
-            maxWidth = Math.max.apply(Math, selectedNotes[0].duration);
+            this._playChord(notes, MusicKeyboard.selectedNotes[0].duration, MusicKeyboard.selectedNotes[0].voice);
+            maxWidth = Math.max.apply(Math, MusicKeyboard.selectedNotes[0].duration);
             this.playOne(1, maxWidth, playButtonCell);
         } else {
             if (!this.keyboardShown) {
@@ -575,9 +574,9 @@ class MusicKeyboard {
                 '" alt="' +
                 _("Play") +
                 '" height="' +
-                ICONSIZE +
+                MusicKeyboard.ICONSIZE +
                 '" width="' +
-                ICONSIZE +
+                MusicKeyboard.ICONSIZE +
                 '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
         }
     };
@@ -585,7 +584,7 @@ class MusicKeyboard {
     playOne(counter, time, playButtonCell) {
         setTimeout(() => {
             let cell, eleid, ele, notes, id, zx, res, maxWidth;
-            if (counter < selectedNotes.length) {
+            if (counter < MusicKeyboard.selectedNotes.length) {
                 if (this._stopOrCloseClicked) {
                     return;
                 }
@@ -595,9 +594,9 @@ class MusicKeyboard {
                     cell.style.backgroundColor = platformColor.selectorBackground;
                 }
 
-                if (this.keyboardShown && selectedNotes[counter - 1].objId[0] !== null) {
-                    for (let i = 0; i < selectedNotes[counter - 1].noteOctave.length; i++) {
-                        eleid = selectedNotes[counter - 1].objId[i];
+                if (this.keyboardShown && MusicKeyboard.selectedNotes[counter - 1].objId[0] !== null) {
+                    for (let i = 0; i < MusicKeyboard.selectedNotes[counter - 1].noteOctave.length; i++) {
+                        eleid = MusicKeyboard.selectedNotes[counter - 1].objId[i];
                         ele = docById(eleid);
                         if (eleid.includes("blackRow")) {
                             ele.style.backgroundColor = "black";
@@ -608,19 +607,19 @@ class MusicKeyboard {
                 }
 
                 notes = [];
-                for (let i = 0; i < selectedNotes[counter].noteOctave.length; i++) {
-                    if (this.keyboardShown && selectedNotes[counter].objId[0] !== null) {
+                for (let i = 0; i < MusicKeyboard.selectedNotes[counter].noteOctave.length; i++) {
+                    if (this.keyboardShown && MusicKeyboard.selectedNotes[counter].objId[0] !== null) {
                         id = this.idContainer.findIndex((ele) => {
-                            return ele[1] === selectedNotes[counter].objId[i];
+                            return ele[1] === MusicKeyboard.selectedNotes[counter].objId[i];
                         });
 
-                        ele = docById(selectedNotes[counter].objId[i]);
+                        ele = docById(MusicKeyboard.selectedNotes[counter].objId[i]);
                         if (ele !== null) {
                             ele.style.backgroundColor = "lightgrey";
                         }
                     }
 
-                    zx = selectedNotes[counter].noteOctave[i];
+                    zx = MusicKeyboard.selectedNotes[counter].noteOctave[i];
                     res = zx;
                     if (typeof zx === "string") {
                         res = zx.replace(SHARP, "#").replace(FLAT, "b");
@@ -631,12 +630,12 @@ class MusicKeyboard {
                 if (this.playingNow) {
                     this._playChord(
                         notes,
-                        selectedNotes[counter].duration,
-                        selectedNotes[counter].voice
+                        MusicKeyboard.selectedNotes[counter].duration,
+                        MusicKeyboard.selectedNotes[counter].voice
                     );
                 }
 
-                maxWidth = Math.max.apply(Math, selectedNotes[counter].duration);
+                maxWidth = Math.max.apply(Math, MusicKeyboard.selectedNotes[counter].duration);
                 this.playOne(counter + 1, maxWidth, playButtonCell);
             } else {
                 playButtonCell.innerHTML =
@@ -647,9 +646,9 @@ class MusicKeyboard {
                     '" alt="' +
                     _("Play") +
                     '" height="' +
-                    ICONSIZE +
+                    MusicKeyboard.ICONSIZE +
                     '" width="' +
-                    ICONSIZE +
+                    MusicKeyboard.ICONSIZE +
                     '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
                 this.playingNow = false;
                 if (!this.keyboardShown) {
@@ -841,7 +840,7 @@ class MusicKeyboard {
         let rowNote = docById("mkbNoteDurationRow");
         let cell;
 
-        for (let i = 0; i < selectedNotes.length; i++) {
+        for (let i = 0; i < MusicKeyboard.selectedNotes.length; i++) {
             cell = rowNote.cells[i];
 
             cell.onclick = (event) => {
@@ -937,7 +936,7 @@ class MusicKeyboard {
         docById("mkbInnerDiv").style.marginLeft = 0;
 
         let mkbTable = docById("mkbTable");
-        if (selectedNotes.length < 1) {
+        if (MusicKeyboard.selectedNotes.length < 1) {
             outerDiv.innerHTML = "";
             return;
         }
@@ -1013,10 +1012,10 @@ class MusicKeyboard {
             '<table  class="mkbTable" cellpadding="0px"><tr id="mkbNoteDurationRow"></tr></table>';
         let cellColor = "lightgrey";
         let maxWidth, noteMaxWidth, row, ind, dur;
-        for (let j = 0; j < selectedNotes.length; j++) {
-            maxWidth = Math.max.apply(Math, selectedNotes[j].duration);
+        for (let j = 0; j < MusicKeyboard.selectedNotes.length; j++) {
+            maxWidth = Math.max.apply(Math, MusicKeyboard.selectedNotes[j].duration);
             noteMaxWidth =
-                this._noteWidth(Math.max.apply(Math, selectedNotes[j].duration)) * 2 + "px";
+                this._noteWidth(Math.max.apply(Math, MusicKeyboard.selectedNotes[j].duration)) * 2 + "px";
             n = this.layout.length;
             for (let i = 0; i < this.layout.length; i++) {
                 row = docById("mkb" + i);
@@ -1027,10 +1026,10 @@ class MusicKeyboard {
                 cell.style.maxWidth = cell.style.width;
 
                 if (
-                    selectedNotes[j].blockNumber.indexOf(this.layout[n - i - 1].blockNumber) !== -1
+                    MusicKeyboard.selectedNotes[j].blockNumber.indexOf(this.layout[n - i - 1].blockNumber) !== -1
                 ) {
-                    ind = selectedNotes[j].blockNumber.indexOf(this.layout[n - i - 1].blockNumber);
-                    cell.setAttribute("alt", selectedNotes[j].duration[ind]);
+                    ind = MusicKeyboard.selectedNotes[j].blockNumber.indexOf(this.layout[n - i - 1].blockNumber);
+                    cell.setAttribute("alt", MusicKeyboard.selectedNotes[j].duration[ind]);
                     cell.style.backgroundColor = "black";
                     cell.style.border = "2px solid white";
                     cell.style.borderRadius = "10px";
@@ -1044,7 +1043,7 @@ class MusicKeyboard {
                 cell.setAttribute("cellColor", cellColor);
             }
 
-            dur = toFraction(Math.max.apply(Math, selectedNotes[j].duration));
+            dur = toFraction(Math.max.apply(Math, MusicKeyboard.selectedNotes[j].duration));
             row = docById("mkbNoteDurationRow");
             cell = row.insertCell();
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
@@ -1055,7 +1054,7 @@ class MusicKeyboard {
             cell.style.textAlign = "center";
             cell.innerHTML = dur[0].toString() + "/" + dur[1].toString();
             cell.setAttribute("id", "cells-" + j);
-            cell.setAttribute("start", selectedNotes[j].startTime);
+            cell.setAttribute("start", MusicKeyboard.selectedNotes[j].startTime);
             cell.setAttribute("dur", maxWidth);
             cell.style.backgroundColor = platformColor.rhythmcellcolor;
         }
@@ -1290,7 +1289,7 @@ class MusicKeyboard {
         this._notesPlayed = this._notesPlayed.reduce((prevValue, curValue) => {
             let newcurValue, newcurValue2, oldcrValue;
             if (parseInt(curValue.startTime) === start) {
-                if (beginnerMode === "true") {
+                if (MusicKeyboard.beginnerMode === "true") {
                     if (curValue.duration / divideNoteBy < 0.125) {
                         return prevValue.concat([curValue]);
                     }
@@ -1472,7 +1471,7 @@ class MusicKeyboard {
 
             let aboveBlock = -1;
             for (let i = this.layout.length; i > 0; i--) {
-                if (this.layout[i - 1].blockNumber < FAKEBLOCKNUMBER) {
+                if (this.layout[i - 1].blockNumber < MusicKeyboard.FAKEBLOCKNUMBER) {
                     aboveBlock = this.layout[i - 1].blockNumber;
                     break;
                 }
@@ -1968,7 +1967,7 @@ class MusicKeyboard {
         let parenttbl, parenttbl2, el, newel, newel2, nname, elementid, elementid2;
         for (let p = 0; p < this.layout.length; p++) {
             // If the blockNumber is null, don't add a label.
-            if (this.layout[p].noteName > FAKEBLOCKNUMBER) {
+            if (this.layout[p].noteName > MusicKeyboard.FAKEBLOCKNUMBER) {
                 parenttbl2 = document.getElementById("myrow2");
                 newel2 = document.createElement("td");
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
@@ -2022,7 +2021,7 @@ class MusicKeyboard {
                 ]);
                 newel.innerHTML =
                     "<small>(" +
-                    String.fromCharCode(WHITEKEYS[myrowId]) +
+                    String.fromCharCode(MusicKeyboard.WHITEKEYS[myrowId]) +
                     ")</small><br/>" +
                     this.layout[p].voice;
 
@@ -2051,7 +2050,7 @@ class MusicKeyboard {
                 ]);
                 newel.innerHTML =
                     "<small>(" +
-                    String.fromCharCode(WHITEKEYS[myrowId]) +
+                    String.fromCharCode(MusicKeyboard.WHITEKEYS[myrowId]) +
                     ")</small><br/>" +
                     this.layout[p].noteOctave;
 
@@ -2095,11 +2094,11 @@ class MusicKeyboard {
                 ]);
 
                 nname = this.layout[p].noteName.replace(SHARP, "").replace("#", "");
-                if (this.layout[p].blockNumber > FAKEBLOCKNUMBER) {
+                if (this.layout[p].blockNumber > MusicKeyboard.FAKEBLOCKNUMBER) {
                 } else if (SOLFEGENAMES.indexOf(nname) !== -1) {
                     newel2.innerHTML =
                         "<small>(" +
-                        String.fromCharCode(BLACKKEYS[myrow2Id]) +
+                        String.fromCharCode(MusicKeyboard.BLACKKEYS[myrow2Id]) +
                         ")</small><br/>" +
                         i18nSolfege(nname) +
                         SHARP +
@@ -2107,7 +2106,7 @@ class MusicKeyboard {
                 } else {
                     newel2.innerHTML =
                         "<small>(" +
-                        String.fromCharCode(BLACKKEYS[myrow2Id]) +
+                        String.fromCharCode(MusicKeyboard.BLACKKEYS[myrow2Id]) +
                         ")</small><br/>" +
                         this.layout[p].noteName +
                         this.layout[p].noteOctave;
@@ -2153,11 +2152,11 @@ class MusicKeyboard {
                     this.layout[p].blockNumber
                 ]);
                 nname = this.layout[p].noteName.replace(FLAT, "").replace("b", "");
-                if (this.layout[p].blockNumber > FAKEBLOCKNUMBER) {
+                if (this.layout[p].blockNumber > MusicKeyboard.FAKEBLOCKNUMBER) {
                 } else if (SOLFEGENAMES.indexOf(nname) !== -1) {
                     newel2.innerHTML =
                         "<small>(" +
-                        String.fromCharCode(BLACKKEYS[myrow2Id]) +
+                        String.fromCharCode(MusicKeyboard.BLACKKEYS[myrow2Id]) +
                         ")</small><br/>" +
                         i18nSolfege(nname) +
                         FLAT +
@@ -2165,7 +2164,7 @@ class MusicKeyboard {
                 } else {
                     newel2.innerHTML =
                         "<small>(" +
-                        String.fromCharCode(BLACKKEYS[myrow2Id]) +
+                        String.fromCharCode(MusicKeyboard.BLACKKEYS[myrow2Id]) +
                         ")</small><br/>" +
                         this.layout[p].noteName +
                         this.layout[p].noteOctave;
@@ -2197,18 +2196,18 @@ class MusicKeyboard {
                     this.layout[p].blockNumber
                 ]);
 
-                if (this.layout[p].blockNumber > FAKEBLOCKNUMBER) {
+                if (this.layout[p].blockNumber > MusicKeyboard.FAKEBLOCKNUMBER) {
                 } else if (SOLFEGENAMES.indexOf(this.layout[p].noteName) !== -1) {
                     newel.innerHTML =
                         "<small>(" +
-                        String.fromCharCode(WHITEKEYS[myrowId]) +
+                        String.fromCharCode(MusicKeyboard.WHITEKEYS[myrowId]) +
                         ")</small><br/>" +
                         i18nSolfege(this.layout[p].noteName) +
                         this.layout[p].noteOctave;
                 } else {
                     newel.innerHTML =
                         "<small>(" +
-                        String.fromCharCode(WHITEKEYS[myrowId]) +
+                        String.fromCharCode(MusicKeyboard.WHITEKEYS[myrowId]) +
                         ")</small><br/>" +
                         this.layout[p].noteName +
                         this.layout[p].noteOctave;
@@ -2255,11 +2254,11 @@ class MusicKeyboard {
     _save() {
         this.processSelected();
         console.debug("Generating action stack for: ");
-        console.debug(selectedNotes);
+        console.debug(MusicKeyboard.selectedNotes);
         let newStack = [
             [0, ["action", { collapsed: false }], 100, 100, [null, 1, 2, null]],
             [1, ["text", { value: _("action") }], 0, 0, [0]],
-            [2, "hidden", 0, 0, [0, selectedNotes.length == 0 ? null : 3]]
+            [2, "hidden", 0, 0, [0, MusicKeyboard.selectedNotes.length == 0 ? null : 3]]
         ];
 
         // This function organizes notes into groups with same voices.
@@ -2308,7 +2307,7 @@ class MusicKeyboard {
             return ans;
         };
 
-        let newNotes = this._clusterNotes(selectedNotes);
+        let newNotes = this._clusterNotes(MusicKeyboard.selectedNotes);
 
         let prevId = 2;
         let endOfStackIdx, id;
@@ -2317,8 +2316,8 @@ class MusicKeyboard {
             let selectedNotesGrp = newNotes[noteGrp];
             let isLast = noteGrp == newNotes.length - 1;
             id = newStack.length;
-            let voice = selectedNotes[selectedNotesGrp[0]].voice[0] || DEFAULTVOICE;
-            let next = isLast ? null : id + 3 + this.findLen(selectedNotesGrp, selectedNotes);
+            let voice = MusicKeyboard.selectedNotes[selectedNotesGrp[0]].voice[0] || DEFAULTVOICE;
+            let next = isLast ? null : id + 3 + this.findLen(selectedNotesGrp, MusicKeyboard.selectedNotes);
 
             newStack.push(
                 [id, "settimbre", 0, 0, [prevId, id + 1, id + 3, id + 2]],
@@ -2330,7 +2329,7 @@ class MusicKeyboard {
             endOfStackIdx = id;
 
             for (let i = 0; i < selectedNotesGrp.length; i++) {
-                let note = selectedNotes[selectedNotesGrp[i]];
+                let note = MusicKeyboard.selectedNotes[selectedNotesGrp[i]];
 
                 // Add the Note block and its value
                 let idx = newStack.length;
@@ -2509,7 +2508,7 @@ class MusicKeyboard {
             '" width="' +
             iconSize +
             '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-        cell.style.width = BUTTONSIZE + "px";
+        cell.style.width = MusicKeyboard.BUTTONSIZE + "px";
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.height = cell.style.width;
@@ -2573,7 +2572,7 @@ class MusicKeyboard {
                 this.instrumentMapper[element.id],
                 this.noteMapper[element.id]
             );
-            if (beginnerMode === "true") {
+            if (MusicKeyboard.beginnerMode === "true") {
                 duration = parseFloat((Math.round(duration * 8) / 8).toFixed(3));
             } else {
                 duration = parseFloat((Math.round(duration * 16) / 16).toFixed(4));
@@ -2664,7 +2663,7 @@ class MusicKeyboard {
         let hertzList = [];
         let drumList = [];
         let obj = null;
-        let fakeBlockNumber = FAKEBLOCKNUMBER + 1;
+        let fakeBlockNumber = MusicKeyboard.FAKEBLOCKNUMBER + 1;
 
         // Find the first non-Hertz note.
         for (let i = 0; i < noteList.length; i++) {
