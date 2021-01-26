@@ -6,14 +6,23 @@ function SampleWidget() {
     const SAMPLEHEIGHT = 160;
     const RENDERINTERVAL = 50;
 
+    const FANCYNAMES = ["𝄫", "♭", "♮", "♯", "𝄪"];
+    const ACCIDENTALNAMES = ["bb", "b", "", "#", "x"];
+    const SOLFEGENAMES = ["do", "re", "me", "fa", "sol", "la", "ti", "do"];
+    const DEFAULTACCIDENTAL = "-";
+    const DEFAULTSOLFEGE = "do";
+
+    const REFERENCESAMPLE = "electronic synth";
     const DEFAULTSAMPLE = "electronic synth";
-    const CENTERPITCHHERTZ = 262;
+    const CENTERPITCHHERTZ = 240;
+
 
     this.sampleData = "";
     this.freqArray = new Uint8Array();
     this.sampleName = DEFAULTSAMPLE;
     this.pitchCenter = 0;
-    this.octaveCenter = 0;
+    this.accidentalCenter = 2;
+    this.octaveCenter = 4;
 
     this.sampleBlock;
 
@@ -61,20 +70,41 @@ function SampleWidget() {
     this.pitchUp = function () {
         this._usePitch(this.pitchInput.value);
         this.pitchCenter++;
-        this.pitchInput.value = this.pitchCenter;
+        this.pitchCenter%=7;
+        this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
         this._updateBlocks();
     };
 
     this.pitchDown = function () {
         this._usePitch(this.pitchInput.value);
         this.pitchCenter--;
-        this.pitchInput.value = this.pitchCenter;
+        this.pitchCenter%=7;
+        this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
+        this._updateBlocks();
+    };
+
+    this.accidentalUp = function () {
+        this._useAccidental(this.accidentalInput.value);
+        if (this.accidentalCenter < 4) {
+            this.accidentalCenter++;
+        }
+        this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
+        this._updateBlocks();
+    };
+
+    this.accidentalDown = function () {
+        this._useAccidental(this.accidentalInput.value);
+        this.accidentalCenter--;
+        if (this.accidentalCenter > 0) {
+            this.accidentalCenter--;
+        }
+        this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
         this._updateBlocks();
     };
 
     this.octaveUp = function () {
         this._useOctave(this.octaveInput.value);
-        this.octavedjustment++;
+        this.octaveCenter++;
         this.octaveInput.value = this.octaveCenter;
         this._updateBlocks();
     };
@@ -88,8 +118,16 @@ function SampleWidget() {
 
 
     this._usePitch = function () {
-        this.pitchCenter = this.pitchInput.value;
-        this.pitchInput.value = this.pitchCenter;
+        let number = SOLFEGENAMES.indexOf(this.pitchInput.value);
+        this.pitchCenter = (number==-1) ? 0 : number;
+        this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
+        this._updateBlocks();
+    }
+
+    this._useAccidental = function () {
+        let number = ACCIDENTALNAMES.indexOf(this.accidentalInput.value);
+        this.accidentalCenter = (number==-1) ? 2 : number;
+        this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
         this._updateBlocks();
     }
 
@@ -174,18 +212,19 @@ function SampleWidget() {
 
         this._logo.synth.loadSynth(0, getVoiceSynthName(DEFAULTSAMPLE));
 
+        /*
         for (i=0;i<CUSTOMSAMPLES.length;i++) {
             if (CUSTOMSAMPLES[i][0] == this.sampleName) {
                 this.sampleData = CUSTOMSAMPLES[i][1];
             }
         }
+        */
 
         if (this._intervalID != null) {
             clearInterval(this._intervalID);
         }
 
         var w = window.innerWidth;
-        var iconSize = ICONSIZE;
 
         var widgetWindow = window.widgetWindows.windowFor(this, "sample");
         this.widgetWindow = widgetWindow;
@@ -231,13 +270,59 @@ function SampleWidget() {
                     '" vertical-align="middle">';
                 if (!(this.sampleName == "")) {
                     this._usePitch(this.pitchInput.value);
-                    this._logo.synth.loadSynth(0, getVoiceSynthName(this.sampleName));
+                    this._useAccidental(this.accidentalInput.value);
+                    this._useOctave(this.octaveInput.value);
+                    this._logo.synth.loadSynth(0, getVoiceSynthName(REFERENCESAMPLE));
                     let finalCenter = 0;
                     if (!isNaN(this.pitchCenter)) {
                         finalCenter = this.pitchCenter;
                     }
                     let finalpitch = Math.floor(CENTERPITCHHERTZ * Math.pow(2, finalCenter/12));
                     console.log(finalpitch);
+                    this._logo.synth.trigger(
+                        0,
+                        [finalpitch],
+                        1,
+                        REFERENCESAMPLE,
+                        null,
+                        null,
+                        false);
+                    this.isMoving = true;
+                }
+            }
+        };
+
+        let refPlayBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
+        refPlayBtn.onclick = () => {
+            if (this.isMoving) {
+                this.pause();
+                refPlayBtn.innerHTML =
+                    '<img src="header-icons/play-button.svg" title="' +
+                    _("Play") +
+                    '" alt="' +
+                    _("Play") +
+                    '" height="' +
+                    ICONSIZE +
+                    '" width="' +
+                    ICONSIZE +
+                    '" vertical-align="middle">';
+                this.isMoving = false;
+            } else {
+                this.resume();
+                refPlayBtn.innerHTML =
+                    '<img src="header-icons/pause-button.svg" title="' +
+                    _("Pause") +
+                    '" alt="' +
+                    _("Pause") +
+                    '" height="' +
+                    ICONSIZE +
+                    '" width="' +
+                    ICONSIZE +
+                    '" vertical-align="middle">';
+                if (!(this.sampleName == "")) {
+                    this._usePitch(this.pitchInput.value);
+                    this._logo.synth.loadSynth(0, getVoiceSynthName(this.sampleName));
+                    let finalpitch = CENTERPITCHHERTZ;
                     this._logo.synth.trigger(
                         0,
                         [finalpitch],
@@ -253,7 +338,7 @@ function SampleWidget() {
 
         widgetWindow.addButton(
             "load-media.svg",
-            iconSize,
+            ICONSIZE,
             _("Upload sample"),
             ""
         ).onclick = function() {
@@ -294,7 +379,7 @@ function SampleWidget() {
         this._save_lock = false;
         widgetWindow.addButton(
             "export-chunk.svg",
-            iconSize,
+            ICONSIZE,
             _("Save sample"),
             ""
         ).onclick = function() {
@@ -331,6 +416,7 @@ function SampleWidget() {
             ).onclick = ((i) => () => this.pitchUp(i))(i);
 
             this.pitchInput = widgetWindow.addInputButton(this.pitchCenter, r2.insertCell());
+            this._usePitch(this.pitchInput.value);
 
             widgetWindow.addButton(
                 "down.svg",
@@ -343,11 +429,29 @@ function SampleWidget() {
             widgetWindow.addButton(
                 "up.svg",
                 ICONSIZE,
+                _("accidental up"),
+                r1.insertCell()
+            ).onclick = ((i) => () => this.accidentalUp(i))(i);
+
+            this.accidentalInput = widgetWindow.addInputButton(this.accidentalCenter, r2.insertCell());
+            this._useAccidental(this.accidentalInput.value);
+
+            widgetWindow.addButton(
+                "down.svg",
+                ICONSIZE,
+                _("accidental down"),
+                r3.insertCell()
+            ).onclick = ((i) => () => this.accidentalDown(i))(i);
+
+            widgetWindow.addButton(
+                "up.svg",
+                ICONSIZE,
                 _("octave up"),
                 r1.insertCell()
             ).onclick = ((i) => () => this.octaveUp(i))(i);
 
             this.octaveInput = widgetWindow.addInputButton(this.octaveCenter, r2.insertCell());
+            this._useOctave(this.octaveInput.value);
 
             widgetWindow.addButton(
                 "down.svg",
