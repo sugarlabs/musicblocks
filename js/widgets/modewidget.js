@@ -74,6 +74,7 @@ class ModeWidget {
         this.widgetWindow.getWidgetBody().append(this.modeTableDiv);
 
         this.widgetWindow.onclose = () => {
+            this._playing = false;
             logo.hideMsgs();
             this.widgetWindow.destroy();
         };
