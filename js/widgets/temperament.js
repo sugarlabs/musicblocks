@@ -33,7 +33,202 @@ function TemperamentWidget() {
     /**
      * @deprecated
      */
+
+    this.init = function(logo) {
+        alert("this.init called");
+        this._logo = logo;
+
+        let w = window.innerWidth;
+        this._cellScale = w / 1200;
+        let iconSize = ICONSIZE * this._cellScale;
+
+        let widgetWindow = window.widgetWindows.windowFor(this, "temperament");
+        this.widgetWindow = widgetWindow;
+        widgetWindow.clear();
+        widgetWindow.show();
+
+        widgetWindow.getWidgetBody().append(temperamentTableDiv);
+        widgetWindow.getWidgetBody().style.height = "500px";
+        widgetWindow.getWidgetBody().style.width = "500px";
+
+        let that = this;
+
+        widgetWindow.onclose = function() {
+            that._logo.synth.setMasterVolume(0);
+            that._logo.synth.stop();
+            if (docById("wheelDiv2") != null) {
+                docById("wheelDiv2").style.display = "none";
+                that.notesCircle.removeWheel();
+            }
+            if (docById("wheelDiv3") != null) {
+                docById("wheelDiv3").style.display = "none";
+                that.wheel.removeWheel();
+            }
+            if (docById("wheelDiv4") != null) {
+                docById("wheelDiv4").style.display = "none";
+                that.wheel1.removeWheel();
+            }
+
+            this.destroy();
+        };
+
+        this._playing = false;
+
+        let buttonTable = document.createElement("table");
+        let header = buttonTable.createTHead();
+        let row = header.insertRow(0);
+        row.id = "buttonsRow";
+
+        temperamentCell = row.insertCell();
+        temperamentCell.innerHTML = this.inTemperament;
+        temperamentCell.style.width = 2 * BUTTONSIZE + "px";
+        temperamentCell.style.minWidth = temperamentCell.style.width;
+        temperamentCell.style.maxWidth = temperamentCell.style.width;
+        temperamentCell.style.height = BUTTONSIZE + "px";
+        temperamentCell.style.minHeight = temperamentCell.style.height;
+        temperamentCell.style.maxHeight = temperamentCell.style.height;
+        temperamentCell.style.textAlign = "center";
+        temperamentCell.style.backgroundColor =
+            platformColor.selectorBackground;
+
+        this.playButton = widgetWindow.addButton(
+            "play-button.svg",
+            ICONSIZE,
+            _("Play all")
+        );
+        this.playButton.onclick = function() {
+            that.playAll();
+        };
+
+        widgetWindow.addButton(
+            "export-chunk.svg",
+            ICONSIZE,
+            _("Save")
+        ).onclick = function() {
+            that._save();
+        };
+
+        let noteCell = widgetWindow.addButton(
+            "play-button.svg",
+            ICONSIZE,
+            _("Table")
+        );
+
+        let t = TEMPERAMENT[this.inTemperament];
+        this.pitchNumber = t.pitchNumber;
+        this.octaveChanged = false;
+        this.scale = this.scale[0] + " " + this.scale[1];
+        this.scaleNotes = _buildScale(this.scale);
+        this.scaleNotes = this.scaleNotes[0];
+        this.powerBase = 2;
+        let startingPitch = this._logo.synth.startingPitch;
+        let str = [];
+        let note = [];
+        this.notes = [];
+        this.frequencies = [];
+        this.cents = [];
+        this.intervals = [];
+        this.ratios = [];
+        this.ratiosNotesPair = [];
+
+        let pitchNumber;
+        for (let i = 0; i <= this.pitchNumber; i++) {
+            if (
+                isCustom(this.inTemperament) &&
+                TEMPERAMENT[this.inTemperament]["0"][1] !== undefined
+            ) {
+                //If temperament selected is custom and it is defined by user.
+                pitchNumber = i + "";
+                if (i === this.pitchNumber) {
+                    this.notes[i] = [
+                        TEMPERAMENT[this.inTemperament]["0"][1],
+                        Number(TEMPERAMENT[this.inTemperament]["0"][2]) + 1
+                    ];
+                    this.ratios[i] = this.powerBase;
+                } else {
+                    this.notes[i] = [
+                        TEMPERAMENT[this.inTemperament][pitchNumber][1],
+                        TEMPERAMENT[this.inTemperament][pitchNumber][2]
+                    ];
+                    this.ratios[i] = TEMPERAMENT[this.inTemperament][pitchNumber][0];
+                }
+                this.frequencies[i] = this._logo.synth
+                    .getCustomFrequency((this.notes[i][0] + this.notes[i][1] + "") ,this.inTemperament  )
+                    .toFixed(2);
+                this.cents[i] =
+                    1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
+                this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
+            } else {
+                if (isCustom(this.inTemperament)) {
+                    // If temperament selected is custom and it is not defined by user
+                    // then custom temperament behaves like equal temperament.
+                    t = TEMPERAMENT["equal"];
+                }
+                str[i] = getNoteFromInterval(startingPitch, t.interval[i]);
+                this.notes[i] = str[i];
+                note[i] = str[i][0];
+
+                if (
+                    str[i][0].substring(1, str[i][0].length) === FLAT ||
+                    str[i][0].substring(1, str[i][0].length) === "b"
+                ) {
+                    note[i] = str[i][0].replace(FLAT, "b");
+                } else if (
+                    str[i][0].substring(1, str[i][0].length) === SHARP ||
+                    str[i][0].substring(1, str[i][0].length) === "#"
+                ) {
+                    note[i] = str[i][0].replace(SHARP, "#");
+                }
+
+                str[i] = note[i] + str[i][1];
+                this.frequencies[i] = this._logo.synth
+                    ._getFrequency(str[i], true, this.inTemperament)
+                    .toFixed(2);
+                this.intervals[i] = t.interval[i];
+                this.ratios[i] = t[this.intervals[i]];
+                this.cents[i] =
+                    1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
+                this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
+            }
+        }
+        this.toggleNotesButton = function() {
+            if (this.circleIsVisible) {
+                noteCell.getElementsByTagName("img")[0].src =
+                    "header-icons/circle.svg";
+                noteCell.getElementsByTagName("img")[0].title = "circle";
+                noteCell.getElementsByTagName("img")[0].alt = "circle";
+            } else {
+                noteCell.getElementsByTagName("img")[0].src =
+                    "header-icons/table.svg";
+                noteCell.getElementsByTagName("img")[0].title = "table";
+                noteCell.getElementsByTagName("img")[0].alt = "table";
+            }
+        };
+
+        this._circleOfNotes();
+
+        noteCell.onclick = function(event) {
+            that.editMode = null ;            
+            if (that.circleIsVisible) {
+                that._circleOfNotes();
+            } else {
+                that._graphOfNotes();
+            }
+        };
+
+        widgetWindow.addButton(
+            "add2.svg",
+            ICONSIZE,
+            _("Add pitches")
+        ).onclick = function(event) {
+            that.edit();
+        };
+
+        widgetWindow.sendToCenter();
+    };
+
     this._addButton = function(row, icon, iconSize, label) {
+        alert("addButton called");
         let cell = row.insertCell(-1);
         cell.innerHTML =
             '&nbsp;&nbsp;<img src="header-icons/' +
@@ -2109,195 +2304,4 @@ function TemperamentWidget() {
         }
     };
 
-    this.init = function(logo) {
-        this._logo = logo;
-
-        let w = window.innerWidth;
-        this._cellScale = w / 1200;
-        let iconSize = ICONSIZE * this._cellScale;
-
-        let widgetWindow = window.widgetWindows.windowFor(this, "temperament");
-        this.widgetWindow = widgetWindow;
-        widgetWindow.clear();
-        widgetWindow.show();
-
-        widgetWindow.getWidgetBody().append(temperamentTableDiv);
-        widgetWindow.getWidgetBody().style.height = "500px";
-        widgetWindow.getWidgetBody().style.width = "500px";
-
-        let that = this;
-
-        widgetWindow.onclose = function() {
-            that._logo.synth.setMasterVolume(0);
-            that._logo.synth.stop();
-            if (docById("wheelDiv2") != null) {
-                docById("wheelDiv2").style.display = "none";
-                that.notesCircle.removeWheel();
-            }
-            if (docById("wheelDiv3") != null) {
-                docById("wheelDiv3").style.display = "none";
-                that.wheel.removeWheel();
-            }
-            if (docById("wheelDiv4") != null) {
-                docById("wheelDiv4").style.display = "none";
-                that.wheel1.removeWheel();
-            }
-
-            this.destroy();
-        };
-
-        this._playing = false;
-
-        let buttonTable = document.createElement("table");
-        let header = buttonTable.createTHead();
-        let row = header.insertRow(0);
-        row.id = "buttonsRow";
-
-        temperamentCell = row.insertCell();
-        temperamentCell.innerHTML = this.inTemperament;
-        temperamentCell.style.width = 2 * BUTTONSIZE + "px";
-        temperamentCell.style.minWidth = temperamentCell.style.width;
-        temperamentCell.style.maxWidth = temperamentCell.style.width;
-        temperamentCell.style.height = BUTTONSIZE + "px";
-        temperamentCell.style.minHeight = temperamentCell.style.height;
-        temperamentCell.style.maxHeight = temperamentCell.style.height;
-        temperamentCell.style.textAlign = "center";
-        temperamentCell.style.backgroundColor =
-            platformColor.selectorBackground;
-
-        this.playButton = widgetWindow.addButton(
-            "play-button.svg",
-            ICONSIZE,
-            _("Play all")
-        );
-        this.playButton.onclick = function() {
-            that.playAll();
-        };
-
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            ICONSIZE,
-            _("Save")
-        ).onclick = function() {
-            that._save();
-        };
-
-        let noteCell = widgetWindow.addButton(
-            "play-button.svg",
-            ICONSIZE,
-            _("Table")
-        );
-
-        let t = TEMPERAMENT[this.inTemperament];
-        this.pitchNumber = t.pitchNumber;
-        this.octaveChanged = false;
-        this.scale = this.scale[0] + " " + this.scale[1];
-        this.scaleNotes = _buildScale(this.scale);
-        this.scaleNotes = this.scaleNotes[0];
-        this.powerBase = 2;
-        let startingPitch = this._logo.synth.startingPitch;
-        let str = [];
-        let note = [];
-        this.notes = [];
-        this.frequencies = [];
-        this.cents = [];
-        this.intervals = [];
-        this.ratios = [];
-        this.ratiosNotesPair = [];
-
-        let pitchNumber;
-        for (let i = 0; i <= this.pitchNumber; i++) {
-            if (
-                isCustom(this.inTemperament) &&
-                TEMPERAMENT[this.inTemperament]["0"][1] !== undefined
-            ) {
-                //If temperament selected is custom and it is defined by user.
-                pitchNumber = i + "";
-                if (i === this.pitchNumber) {
-                    this.notes[i] = [
-                        TEMPERAMENT[this.inTemperament]["0"][1],
-                        Number(TEMPERAMENT[this.inTemperament]["0"][2]) + 1
-                    ];
-                    this.ratios[i] = this.powerBase;
-                } else {
-                    this.notes[i] = [
-                        TEMPERAMENT[this.inTemperament][pitchNumber][1],
-                        TEMPERAMENT[this.inTemperament][pitchNumber][2]
-                    ];
-                    this.ratios[i] = TEMPERAMENT[this.inTemperament][pitchNumber][0];
-                }
-                this.frequencies[i] = this._logo.synth
-                    .getCustomFrequency((this.notes[i][0] + this.notes[i][1] + "") ,this.inTemperament  )
-                    .toFixed(2);
-                this.cents[i] =
-                    1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
-                this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
-            } else {
-                if (isCustom(this.inTemperament)) {
-                    // If temperament selected is custom and it is not defined by user
-                    // then custom temperament behaves like equal temperament.
-                    t = TEMPERAMENT["equal"];
-                }
-                str[i] = getNoteFromInterval(startingPitch, t.interval[i]);
-                this.notes[i] = str[i];
-                note[i] = str[i][0];
-
-                if (
-                    str[i][0].substring(1, str[i][0].length) === FLAT ||
-                    str[i][0].substring(1, str[i][0].length) === "b"
-                ) {
-                    note[i] = str[i][0].replace(FLAT, "b");
-                } else if (
-                    str[i][0].substring(1, str[i][0].length) === SHARP ||
-                    str[i][0].substring(1, str[i][0].length) === "#"
-                ) {
-                    note[i] = str[i][0].replace(SHARP, "#");
-                }
-
-                str[i] = note[i] + str[i][1];
-                this.frequencies[i] = this._logo.synth
-                    ._getFrequency(str[i], true, this.inTemperament)
-                    .toFixed(2);
-                this.intervals[i] = t.interval[i];
-                this.ratios[i] = t[this.intervals[i]];
-                this.cents[i] =
-                    1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
-                this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
-            }
-        }
-        this.toggleNotesButton = function() {
-            if (this.circleIsVisible) {
-                noteCell.getElementsByTagName("img")[0].src =
-                    "header-icons/circle.svg";
-                noteCell.getElementsByTagName("img")[0].title = "circle";
-                noteCell.getElementsByTagName("img")[0].alt = "circle";
-            } else {
-                noteCell.getElementsByTagName("img")[0].src =
-                    "header-icons/table.svg";
-                noteCell.getElementsByTagName("img")[0].title = "table";
-                noteCell.getElementsByTagName("img")[0].alt = "table";
-            }
-        };
-
-        this._circleOfNotes();
-
-        noteCell.onclick = function(event) {
-            that.editMode = null ;            
-            if (that.circleIsVisible) {
-                that._circleOfNotes();
-            } else {
-                that._graphOfNotes();
-            }
-        };
-
-        widgetWindow.addButton(
-            "add2.svg",
-            ICONSIZE,
-            _("Add pitches")
-        ).onclick = function(event) {
-            that.edit();
-        };
-
-        widgetWindow.sendToCenter();
-    };
 }
