@@ -25,8 +25,6 @@ class TemperamentWidget {
         this.playbackForward = true;
         this.temperamentCell = null;
         this.BUTTONDIVWIDTH = 430;
-        this.OUTERWINDOWWIDTH = 685;
-        this.INNERWINDOWWIDTH = 600;
         this.BUTTONSIZE = 53;
         this.ICONSIZE = 32;
         this.temperamentTableDiv = document.createElement("div");
@@ -35,7 +33,7 @@ class TemperamentWidget {
 
     /**
      * @deprecated
-    */
+     */
     init(logo){
         alert("this.init called");
         this._logo = logo;
