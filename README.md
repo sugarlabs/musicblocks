@@ -36,6 +36,9 @@ URL [_musicblocks.sugarlabs.org_](https://musicblocks.sugarlabs.org) in your bro
 _Google Chrome_ (or _Chromium_), _Microsoft Edge_ (_Chromium-based_), _Mozilla Firefox_, and
 _Opera_ work best.
 
+To run from the latest master branch (experimental), visit
+[_sugarlabs.github.io/musicblocks_](https://sugarlabs.github.io/musicblocks).
+
 ## <a name="HOW_TO_SET_UP_A_LOCAL_SERVER"></a>How to set up a _local server_
 
 Music Blocks is written using native browser technologies. The bulk of the functionality is in
