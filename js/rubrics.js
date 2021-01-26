@@ -89,6 +89,7 @@ const TACAT = {
     timbre: "ignore",
     modewidget: "ignore",
     tempo: "ignore",
+    sampler: "ignore",
     temperament: "ignore",
     pitchdrummatrix: "ignore",
     pitchslider: "ignore",
@@ -157,6 +158,8 @@ const TACAT = {
     voicename: "tone",
     settimbre: "tone",
     settemperament: "tone",
+    audiofile: "ignore",
+    customsample: "ignore",
     // interval palette
 
     modename: "ignore",
@@ -306,9 +309,6 @@ const TACAT = {
     camera: "ignore",
     video: "ignore",
     loadFile: "ignore",
-    audiofile: "ignore",
-    sampler: "ignore",
-    customsample: "ignore",
     stopvideocam: "ignore",
     tone: "media",
     tofrequency: "media",
