@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
-*/
+ */
 
 /*
    global platformColor, docById, wheelnav, slicePath, logo, Singer, isCustom,
@@ -24,24 +24,24 @@
 
 const temperamentTableDiv = document.createElement("div");
 let temperamentCell = null;
+
 /**
  * @class
  * @classdesc pertains to setting up all features of the temperament widget and its UI features.
  *
  * Private members' names begin with underscore '_".
  */
-
-
 class TemperamentWidget {
     static BUTTONDIVWIDTH = 430;
     static OUTERWINDOWWIDTH = 685;
     static INNERWINDOWWIDTH = 600;
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
+
     /**
      * @constructor
      */
-    constructor(){
+    constructor() {
         this.inTemperament = null;
         this.lastTriggered = null;
         this.notes = [];
@@ -55,12 +55,200 @@ class TemperamentWidget {
         this.circleIsVisible = true;
         this.playbackForward = true;
     }
-    
+
+    /**
+     * Initialises the temperament widget.
+     * @returns {void}
+     */
+    init() {
+        const w = window.innerWidth;
+        this._cellScale = w / 1200;
+
+        const widgetWindow = window.widgetWindows.windowFor(this, "temperament");
+        this.widgetWindow = widgetWindow;
+        widgetWindow.clear();
+        widgetWindow.show();
+
+        widgetWindow.getWidgetBody().append(temperamentTableDiv);
+        widgetWindow.getWidgetBody().style.height = "500px";
+        widgetWindow.getWidgetBody().style.width = "500px";
+
+        widgetWindow.onclose = () => {
+            logo.synth.setMasterVolume(0);
+            logo.synth.stop();
+            if (docById("wheelDiv2") != null) {
+                docById("wheelDiv2").style.display = "none";
+                this.notesCircle.removeWheel();
+            }
+            if (docById("wheelDiv3") != null) {
+                docById("wheelDiv3").style.display = "none";
+                this.wheel.removeWheel();
+            }
+            if (docById("wheelDiv4") != null) {
+                docById("wheelDiv4").style.display = "none";
+                this.wheel1.removeWheel();
+            }
+
+            widgetWindow.destroy();
+        };
+
+        this._playing = false;
+
+        const buttonTable = document.createElement("table");
+        const header = buttonTable.createTHead();
+        const row = header.insertRow(0);
+        row.id = "buttonsRow";
+
+        temperamentCell = row.insertCell();
+        temperamentCell.innerHTML = this.inTemperament;
+        temperamentCell.style.width = 2 * TemperamentWidget.BUTTONSIZE + "px";
+        temperamentCell.style.minWidth = temperamentCell.style.width;
+        temperamentCell.style.maxWidth = temperamentCell.style.width;
+        temperamentCell.style.height = TemperamentWidget.BUTTONSIZE + "px";
+        temperamentCell.style.minHeight = temperamentCell.style.height;
+        temperamentCell.style.maxHeight = temperamentCell.style.height;
+        temperamentCell.style.textAlign = "center";
+        temperamentCell.style.backgroundColor = platformColor.selectorBackground;
+
+        this.playButton = widgetWindow.addButton(
+            "play-button.svg",
+            TemperamentWidget.ICONSIZE,
+            _("Play all")
+        );
+        this.playButton.onclick = () => {
+            this.playAll();
+        };
+
+        widgetWindow.addButton(
+            "export-chunk.svg",
+            TemperamentWidget.ICONSIZE,
+            _("Save")
+        ).onclick = () => {
+            this._save();
+        };
+
+        const noteCell = widgetWindow.addButton(
+            "play-button.svg",
+            TemperamentWidget.ICONSIZE,
+            _("Table")
+        );
+
+        let t = TEMPERAMENT[this.inTemperament];
+        this.pitchNumber = t.pitchNumber;
+        this.octaveChanged = false;
+        this.scale = this.scale[0] + " " + this.scale[1];
+        this.scaleNotes = _buildScale(this.scale);
+        this.scaleNotes = this.scaleNotes[0];
+        this.powerBase = 2;
+        const startingPitch = logo.synth.startingPitch;
+        const str = [];
+        const note = [];
+        this.notes = [];
+        this.frequencies = [];
+        this.cents = [];
+        this.intervals = [];
+        this.ratios = [];
+        this.ratiosNotesPair = [];
+
+        let pitchNumber;
+        for (let i = 0; i <= this.pitchNumber; i++) {
+            if (
+                isCustom(this.inTemperament) &&
+                TEMPERAMENT[this.inTemperament]["0"][1] !== undefined
+            ) {
+                //If temperament selected is custom and it is defined by user.
+                pitchNumber = i + "";
+                if (i === this.pitchNumber) {
+                    this.notes[i] = [
+                        TEMPERAMENT[this.inTemperament]["0"][1],
+                        Number(TEMPERAMENT[this.inTemperament]["0"][2]) + 1
+                    ];
+                    this.ratios[i] = this.powerBase;
+                } else {
+                    this.notes[i] = [
+                        TEMPERAMENT[this.inTemperament][pitchNumber][1],
+                        TEMPERAMENT[this.inTemperament][pitchNumber][2]
+                    ];
+                    this.ratios[i] = TEMPERAMENT[this.inTemperament][pitchNumber][0];
+                }
+                this.frequencies[i] = logo.synth
+                    .getCustomFrequency(
+                        this.notes[i][0] + this.notes[i][1] + "",
+                        this.inTemperament
+                    )
+                    .toFixed(2);
+                this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
+                this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
+            } else {
+                if (isCustom(this.inTemperament)) {
+                    // If temperament selected is custom and it is not defined by user
+                    // then custom temperament behaves like equal temperament.
+                    t = TEMPERAMENT["equal"];
+                }
+                str[i] = getNoteFromInterval(startingPitch, t.interval[i]);
+                this.notes[i] = str[i];
+                note[i] = str[i][0];
+
+                if (
+                    str[i][0].substring(1, str[i][0].length) === FLAT ||
+                    str[i][0].substring(1, str[i][0].length) === "b"
+                ) {
+                    note[i] = str[i][0].replace(FLAT, "b");
+                } else if (
+                    str[i][0].substring(1, str[i][0].length) === SHARP ||
+                    str[i][0].substring(1, str[i][0].length) === "#"
+                ) {
+                    note[i] = str[i][0].replace(SHARP, "#");
+                }
+
+                str[i] = note[i] + str[i][1];
+                this.frequencies[i] = logo.synth
+                    ._getFrequency(str[i], true, this.inTemperament)
+                    .toFixed(2);
+                this.intervals[i] = t.interval[i];
+                this.ratios[i] = t[this.intervals[i]];
+                this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
+                this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
+            }
+        }
+        this.toggleNotesButton = () => {
+            if (this.circleIsVisible) {
+                noteCell.getElementsByTagName("img")[0].src = "header-icons/circle.svg";
+                noteCell.getElementsByTagName("img")[0].title = "circle";
+                noteCell.getElementsByTagName("img")[0].alt = "circle";
+            } else {
+                noteCell.getElementsByTagName("img")[0].src = "header-icons/table.svg";
+                noteCell.getElementsByTagName("img")[0].title = "table";
+                noteCell.getElementsByTagName("img")[0].alt = "table";
+            }
+        };
+
+        this._circleOfNotes();
+
+        noteCell.onclick = () => {
+            this.editMode = null;
+            if (this.circleIsVisible) {
+                this._circleOfNotes();
+            } else {
+                this._graphOfNotes();
+            }
+        };
+
+        widgetWindow.addButton(
+            "add2.svg",
+            TemperamentWidget.ICONSIZE,
+            _("Add pitches")
+        ).onclick = () => {
+            this.edit();
+        };
+
+        widgetWindow.sendToCenter();
+    }
 
     /**
      * @deprecated
      */
-    _addButton (row, icon, iconSize, label) {
+    _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
         cell.innerHTML =
             '&nbsp;&nbsp;<img src="header-icons/' +
@@ -91,8 +279,9 @@ class TemperamentWidget {
         };
 
         return cell;
-    };
-/**
+    }
+
+    /**
      * Renders the circle of notes UI and all the subcomponents in the DOM widget.
      * @returns {void}
      */
@@ -176,8 +365,10 @@ class TemperamentWidget {
             const angleDiff = [];
             for (let i = 0; i < this.notesCircle.navItemCount; i++) {
                 this.notesCircle.navItems[i].fillAttr = "#c8C8C8";
-                this.notesCircle.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
-                this.notesCircle.navItems[i].titleSelectedAttr.font = "20 20px Impact, Charcoal, sans-serif";
+                this.notesCircle.navItems[i].titleAttr.font =
+                    "20 20px Impact, Charcoal, sans-serif";
+                this.notesCircle.navItems[i].titleSelectedAttr.font =
+                    "20 20px Impact, Charcoal, sans-serif";
                 angle[i] = 270 + 360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase));
                 if (i !== 0) {
                     if (i == pitchNumber - 1) {
@@ -215,8 +406,6 @@ class TemperamentWidget {
         };
 
         this.createMainWheel();
-
-        
 
         let divAppend, divAppend1, divAppend2;
         if (this.octaveChanged) {
@@ -285,9 +474,7 @@ class TemperamentWidget {
                 this.frequencies = [];
 
                 for (let i = 0; i < this.ratios.length; i++) {
-                    powers[i] =     12 *
-                        (Math.log10(this.ratios[i]) /
-                            Math.log10(this.powerBase));
+                    powers[i] = 12 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
                     this.ratios[i] = Math.pow(2, powers[i] / 12);
                     compareRatios[i] = this.ratios[i].toFixed(2);
                     this.frequencies[i] = this.ratios[i] * frequency;
@@ -303,17 +490,17 @@ class TemperamentWidget {
         docById("temperamentTable").addEventListener("click", (e) => {
             this.showNoteInfo(e);
         });
-    };
-/**
+    }
+
+    /**
      * Triggered when the a note is pressed.
-     *
      * @param {Object} event
      * @returns {void}
      */
     showNoteInfo = (event) => {
         let x, y, frequency, noteDefined;
         let cents, centsDiff, centsDiff1, min, index;
-        
+
         for (let i = 0; i < this.notesCircle.navItemCount; i++) {
             if (
                 event.target.id == "wheelnav-wheelDiv2-slice-" + i ||
@@ -402,14 +589,11 @@ class TemperamentWidget {
 
     /**
      * Triggered when the user wants to edit frequency.
-     *
      * @param {Object} event
      * @returns {void}
      */
-
     editFrequency = (event) => {
         const i = Number(event.target.dataset.message);
-        
 
         docById("noteInfo").style.width = "180px";
         docById("noteInfo").style.height = "130px";
@@ -429,7 +613,6 @@ class TemperamentWidget {
             '<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>Done</center><div>';
 
         docById("frequencySlider1").oninput = () => {
-
             docById("frequencydiv1").innerHTML = docById("frequencySlider1").value;
             const frequency = docById("frequencySlider1").value;
             const ratio = frequency / this.frequencies[0];
@@ -439,11 +622,11 @@ class TemperamentWidget {
             this.temporaryRatios[i] = ratio;
             logo.resetSynth(0);
             logo.synth.trigger(
-                0, 
-                frequency, 
-                Singer.defaultBPMFactor * 0.01, 
+                0,
+                frequency,
+                Singer.defaultBPMFactor * 0.01,
                 "electronic synth",
-                null, 
+                null,
                 null
             );
             this.createMainWheel(this.temporaryRatios);
@@ -469,12 +652,12 @@ class TemperamentWidget {
             docById("noteInfo").remove();
         };
     };
+
     /**
-     * Triggered when graph of notes UI element is stelected 
-     * displays circular graph of all the notes present.
+     * Triggered when graph of notes UI element is stelected displays circular graph of all the
+     * notes present.
      * @returns {void}
      */
-
     _graphOfNotes() {
         this.circleIsVisible = true;
         this.toggleNotesButton();
@@ -492,14 +675,7 @@ class TemperamentWidget {
         if (isCustom(this.inTemperament)) {
             menuLabels = ["Play", "Pitch Number", "Ratio", "Frequency"];
         } else {
-            menuLabels = [
-                "Play",
-                "Pitch Number",
-                "Ratio",
-                "Interval",
-                "Note",
-                "Frequency"
-            ];
+            menuLabels = ["Play", "Pitch Number", "Ratio", "Interval", "Note", "Frequency"];
             menuLabels.splice(5, 0, this.scale);
         }
         notesGraph.innerHTML =
@@ -542,8 +718,6 @@ class TemperamentWidget {
             '<tr><td colspan="7"><div id="graph"><table id="tableOfNotes"></table></div></td></tr>';
         docById("tableOfNotes").innerHTML = pitchNumberColumn;
 
-        
-        
         const notesRow = [];
         const notesCell = [];
         const ratios = [];
@@ -594,7 +768,7 @@ class TemperamentWidget {
             //Ratio
             notesCell[(i, 2)] = notesRow[i].insertCell(-1);
             notesCell[(i, 2)].innerHTML = ratios[i];
-            notesCell[(i, 2)].style.backgroundColor  = platformColor.selectorBackground;
+            notesCell[(i, 2)].style.backgroundColor = platformColor.selectorBackground;
             notesCell[(i, 2)].style.textAlign = "center";
 
             if (!isCustom(this.inTemperament)) {
@@ -644,17 +818,17 @@ class TemperamentWidget {
                 notesCell[(i, 2)].style.width = 60 + "px";
             }
         }
-    };
+    }
+
     /**
-     * Triggerred when any one of the UI edit elemnts is selected 
-     *
+     * Triggerred when any one of the UI edit elemnts is selected.
      * @returns {void}
      */
     edit() {
-        this.editMode = null ;
+        this.editMode = null;
         logo.synth.setMasterVolume(0);
         logo.synth.stop();
-        
+
         if (docById("wheelDiv2") != null) {
             docById("wheelDiv2").style.display = "none";
             this.notesCircle.removeWheel();
@@ -672,9 +846,8 @@ class TemperamentWidget {
         }
 
         docById("menu").innerHTML = menus;
-        docById("editOctave").innerHTML +=
-            '<tr><td colspan="4" id="userEdit"></td></tr>';
-        let menuItems = document.querySelectorAll("#editMenus");
+        docById("editOctave").innerHTML += '<tr><td colspan="4" id="userEdit"></td></tr>';
+        const menuItems = document.querySelectorAll("#editMenus");
         for (let i = 0; i < editMenus.length; i++) {
             menuItems[i].style.background = platformColor.selectorBackground;
             menuItems[i].style.height = 30 + "px";
@@ -716,14 +889,12 @@ class TemperamentWidget {
             menuItems[3].style.background = "#c8C8C8";
             this.octaveSpaceEdit();
         };
-    };
+    }
 
     /**
-     * Triggerred when the Equal edit option is selected,
-     *
+     * Triggerred when the Equal edit option is selected.
      * @returns {void}
      */
-
     equalEdit() {
         this.editMode = "equal";
         docById("userEdit").innerHTML = "";
@@ -736,16 +907,18 @@ class TemperamentWidget {
             this.pitchNumber +
             '"></input>';
         equalEdit.style.paddingLeft = "80px";
-        
+
         let divAppend;
         const addDivision = (preview) => {
             // Add Buttons
             divAppend = document.createElement("div");
             divAppend.id = "divAppend";
             if (preview) {
-                divAppend.innerHTML = '<div id="preview" style="float:left;">Back</div><div id="done_" style="float:right;">Done</div>';
+                divAppend.innerHTML =
+                    '<div id="preview" style="float:left;">Back</div><div id="done_" style="float:right;">Done</div>';
             } else {
-                divAppend.innerHTML = '<div id="preview" style="float:left;">Preview</div><div id="done_" style="float:right;">Done</div>';
+                divAppend.innerHTML =
+                    '<div id="preview" style="float:left;">Preview</div><div id="done_" style="float:right;">Done</div>';
             }
             divAppend.style.textAlign = "center";
             divAppend.style.marginLeft = "-80px";
@@ -765,7 +938,7 @@ class TemperamentWidget {
             divAppend2.style.marginRight = "3px";
             divAppend2.style.backgroundColor = platformColor.selectorBackground;
             divAppend2.style.width = "205px";
-        }
+        };
 
         addDivision(false);
 
@@ -787,7 +960,6 @@ class TemperamentWidget {
         this.tempRatios = [];
 
         divAppend.addEventListener("click", (event) => {
-
             let angle1, angle2, divisionAngle, power, frequency;
             pitchNumber1 = Number(docById("octaveIn").value);
             pitchNumber2 = Number(docById("octaveOut").value);
@@ -819,13 +991,14 @@ class TemperamentWidget {
                 this.typeOfEdit = "equal";
                 this.divisions = divisions;
             } else {
-                pitchNumber = divisions + Number(pitchNumber) - Math.abs(pitchNumber1 - pitchNumber2);
-                angle1 = 270 +
-                    360 *
-                        (Math.log10(this.tempRatios[pitchNumber1]) / Math.log10(this.powerBase));
-                angle2 = 270 +
-                    360 *
-                        (Math.log10(this.tempRatios[pitchNumber2]) / Math.log10(this.powerBase));
+                pitchNumber =
+                    divisions + Number(pitchNumber) - Math.abs(pitchNumber1 - pitchNumber2);
+                angle1 =
+                    270 +
+                    360 * (Math.log10(this.tempRatios[pitchNumber1]) / Math.log10(this.powerBase));
+                angle2 =
+                    270 +
+                    360 * (Math.log10(this.tempRatios[pitchNumber2]) / Math.log10(this.powerBase));
                 divisionAngle = Math.abs(angle2 - angle1) / divisions;
                 this.tempRatios.splice(pitchNumber1 + 1, Math.abs(pitchNumber1 - pitchNumber2) - 1);
                 for (let i = 0; i < divisions - 1; i++) {
@@ -889,25 +1062,25 @@ class TemperamentWidget {
                     }
 
                     this.pitchNumber = pitchNumber;
-                    this.eqTempPitchNumber = null; 
-                    this.eqTempHzs = []; 
+                    this.eqTempPitchNumber = null;
+                    this.eqTempHzs = [];
                     this.checkTemperament(compareRatios);
                     this._circleOfNotes();
                 };
 
                 docById("preview").onclick = () => {
                     this.equalEdit();
-                    this.eqTempPitchNumber = null; 
-                    this.eqTempHzs = []; 
+                    this.eqTempPitchNumber = null;
+                    this.eqTempHzs = [];
                 };
             }
         });
-    }/**
-     * Triggerred when the Ratios edit option is selected,
-     *
+    }
+
+    /**
+     * Triggerred when the Ratios edit option is selected.
      * @returns {void}
      */
-
     ratioEdit() {
         this.editMode = "ratio";
         docById("userEdit").innerHTML = "";
@@ -918,15 +1091,17 @@ class TemperamentWidget {
         ratioEdit.innerHTML +=
             'Recursion &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="recursion" value="1"></input>';
         ratioEdit.style.paddingLeft = "100px";
-        
+
         let divAppend;
         const addButtons = (preview) => {
             divAppend = document.createElement("div");
             divAppend.id = "divAppend";
             if (preview) {
-                divAppend.innerHTML = '<div id="preview" style="float:left;">Back</div><div id="done_" style="float:right;">Done</div>';
+                divAppend.innerHTML =
+                    '<div id="preview" style="float:left;">Back</div><div id="done_" style="float:right;">Done</div>';
             } else {
-                divAppend.innerHTML = '<div id="preview" style="float:left;">Preview</div><div id="done_" style="float:right;">Done</div>';
+                divAppend.innerHTML =
+                    '<div id="preview" style="float:left;">Preview</div><div id="done_" style="float:right;">Done</div>';
             }
             divAppend.style.textAlign = "center";
             divAppend.style.marginLeft = "-100px";
@@ -946,7 +1121,7 @@ class TemperamentWidget {
             divAppend2.style.marginRight = "3px";
             divAppend2.style.backgroundColor = platformColor.selectorBackground;
             divAppend2.style.width = "205px";
-        }
+        };
 
         addButtons(false);
 
@@ -1033,7 +1208,7 @@ class TemperamentWidget {
                 addButtons(true);
                 divAppend.style.marginTop = docById("wheelDiv2").style.height;
                 docById("preview").style.marginLeft = "100px";
-                
+
                 //make temperary
                 this.ratios = this.tempRatios.slice();
                 this.typeOfEdit = "nonequal";
@@ -1050,7 +1225,7 @@ class TemperamentWidget {
                     compareRatios[i] = compareRatios[i].toFixed(2);
                 }
                 this.checkTemperament(compareRatios);
-                
+
                 docById("done_").onclick = () => {
                     //Go to main Circle of Notes
                     this.ratios = this.tempRatios.slice();
@@ -1080,15 +1255,14 @@ class TemperamentWidget {
                 };
             }
         };
-    };
+    }
+
     /**
-     * Triggerred when the Arbitrary edit option is selected,
-     *
+     * Triggerred when the Arbitrary edit option is selected.
      * @returns {void}
      */
-
     arbitraryEdit() {
-        this.editMode = "arbitrary";        
+        this.editMode = "arbitrary";
         docById("userEdit").innerHTML = "";
         const arbitraryEdit = docById("userEdit");
         arbitraryEdit.innerHTML = '<br><div id="wheelDiv3" class="wheelNav"></div>';
@@ -1139,7 +1313,8 @@ class TemperamentWidget {
             for (let i = 0; i < this.wheel1.navItemCount; i++) {
                 this.wheel1.navItems[i].fillAttr = "#e0e0e0";
                 this.wheel1.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
-                this.wheel1.navItems[i].titleSelectedAttr.font = "20 20px Impact, Charcoal, sans-serif";
+                this.wheel1.navItems[i].titleSelectedAttr.font =
+                    "20 20px Impact, Charcoal, sans-serif";
                 angle[i] = 270 + 360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase));
                 if (i !== 0) {
                     if (i == this.pitchNumber - 1) {
@@ -1271,8 +1446,6 @@ class TemperamentWidget {
 
         this._createOuterWheel();
 
-        
-
         const divAppend = document.createElement("div");
         divAppend.id = "divAppend";
         divAppend.innerHTML = "Done";
@@ -1309,21 +1482,20 @@ class TemperamentWidget {
             this._circleOfNotes();
         };
     }
-/**
-     * Triggerred when in Arbritrary edit option
+
+    /**
+     * Triggerred when in Arbritrary edit option.
      * The slider with option to slide the values of frequesncies opens.
-     *
      * @returns {void}
      */
-    arbitraryEditSlider (event, angle, ratios, pitchNumber) {
+    arbitraryEditSlider(event, angle, ratios, pitchNumber) {
         const frequency = this.frequencies[0];
         const frequencies = [];
         for (let j = 0; j <= pitchNumber; j++) {
             frequencies[j] = ratios[j] * frequency;
             frequencies[j] = frequencies[j].toFixed(2);
         }
-        
-        
+
         for (let i = 0; i < pitchNumber; i++) {
             if (event.target.parentNode.id == "wheelnav-wheelDiv3-title-" + i) {
                 if (docById("noteInfo1") !== null) {
@@ -1366,10 +1538,10 @@ class TemperamentWidget {
             }
         }
     }
-/**
-     * Triggerred when in Arbritrary edit option
+
+    /**
+     * Triggerred when in Arbritrary edit option.
      * The slider with option to slide the values of frequesncies opens for a refreshed value.
-     *
      * @returns {void}
      */
     _refreshInnerWheel() {
@@ -1397,22 +1569,22 @@ class TemperamentWidget {
         const pitchNumber = this.tempRatios.length - 1;
         logo.resetSynth(0);
         logo.synth.trigger(
-            0, 
-            frequency, 
-            Singer.defaultBPMFactor * 0.01, 
-            "electronic synth", 
-            null, 
+            0,
+            frequency,
+            Singer.defaultBPMFactor * 0.01,
+            "electronic synth",
+            null,
             null
         );
         this._createInnerWheel(this.tempRatios, pitchNumber);
-    };
-/**
+    }
+
+    /**
      * Triggerred when in octave space edit option.
-     *
      * @returns {void}
      */
     octaveSpaceEdit() {
-        this.editMode = "octave";        
+        this.editMode = "octave";
         docById("userEdit").innerHTML = "";
         const len = this.ratios.length;
         const octaveRatio = this.ratios[len - 1];
@@ -1423,7 +1595,6 @@ class TemperamentWidget {
             octaveRatio +
             '" style="width:50px;"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="endNote" value="1" style="width:50px;"></input><br><br>';
         octaveSpaceEdit.style.paddingLeft = "70px";
-        
 
         const divAppend = document.createElement("div");
         divAppend.id = "divAppend";
@@ -1473,12 +1644,11 @@ class TemperamentWidget {
             this._circleOfNotes();
         };
     }
+
     /**
-     * Checks for temperament
-     *
+     * Checks for temperament.
      * @returns {void}
      */
-
     checkTemperament(ratios) {
         const intervals = [];
         let selectedTemperament;
@@ -1493,7 +1663,8 @@ class TemperamentWidget {
                     temperamentRatios[j] = t[intervals[j]];
                     temperamentRatios[j] = temperamentRatios[j].toFixed(2);
                 }
-                ratiosEqual = ratios.length == temperamentRatios.length &&
+                ratiosEqual =
+                    ratios.length == temperamentRatios.length &&
                     ratios.every((element, index) => {
                         return element === temperamentRatios[index];
                     });
@@ -1512,9 +1683,9 @@ class TemperamentWidget {
             temperamentCell.innerHTML = this.inTemperament;
         }
     }
-/**
+
+    /**
      * Triggerred when Save button is pressed. New action blocks are generated.
-     *
      * @returns {void}
      */
     _save() {
@@ -1529,7 +1700,8 @@ class TemperamentWidget {
                     notesMatch = false;
                     if (this.ratios[i] == this.ratiosNotesPair[j][0]) {
                         notesMatch = true;
-                        this.notes[i] =         this.ratiosNotesPair[j][1][0] + "(+0)" + this.ratiosNotesPair[j][1][1];
+                        this.notes[i] =
+                            this.ratiosNotesPair[j][1][0] + "(+0)" + this.ratiosNotesPair[j][1][1];
                         break;
                     }
                 }
@@ -1547,13 +1719,15 @@ class TemperamentWidget {
                     idx = centsDiff1.indexOf(min);
 
                     if (centsDiff[idx] < 0) {
-                        this.notes[i] =         this.ratiosNotesPair[idx][1][0] +
+                        this.notes[i] =
+                            this.ratiosNotesPair[idx][1][0] +
                             "(-" +
                             centsDiff1[idx].toFixed(0) +
                             ")" +
                             this.ratiosNotesPair[idx][1][1];
                     } else {
-                        this.notes[i] =         this.ratiosNotesPair[idx][1][0] +
+                        this.notes[i] =
+                            this.ratiosNotesPair[idx][1][0] +
                             "(+" +
                             centsDiff1[idx].toFixed(0) +
                             ")" +
@@ -1567,7 +1741,7 @@ class TemperamentWidget {
         OCTAVERATIO = this.powerBase;
 
         const value = logo.blocks.findUniqueTemperamentName(this.inTemperament);
-        this.inTemperament = value ; // change from temporary "custom" to "custom1" or "custom2" .. 
+        this.inTemperament = value; // change from temporary "custom" to "custom1" or "custom2" ..
         const newStack = [
             [0, "temperament1", 100, 100, [null, 1, 2, null]],
             [1, ["text", { value: value }], 0, 0, [0]],
@@ -1576,8 +1750,8 @@ class TemperamentWidget {
             [4, ["number", { value: this.frequencies[0] }], 0, 0, [2]],
             [5, ["octavespace"], 0, 0, [2, 6, 9]],
             [6, ["divide"], 0, 0, [5, 7, 8]],
-            [7,["number", { value: rationalToFraction(OCTAVERATIO)[0] }],0,0,[6]],
-            [8,["number", { value: rationalToFraction(OCTAVERATIO)[1] }],0,0,[6]],
+            [7, ["number", { value: rationalToFraction(OCTAVERATIO)[0] }], 0, 0, [6]],
+            [8, ["number", { value: rationalToFraction(OCTAVERATIO)[1] }], 0, 0, [6]],
             [9, "vspace", 0, 0, [5, 10]]
         ];
         let previousBlock = 9;
@@ -1587,7 +1761,8 @@ class TemperamentWidget {
             if (
                 this.inTemperament === "equal" ||
                 this.inTemperament === "1/3 comma meantone" ||
-                (this.typeOfEdit === "equal" &&this.divisions === this.pitchNumber)) {
+                (this.typeOfEdit === "equal" && this.divisions === this.pitchNumber)
+            ) {
                 newStack.push([
                     idx,
                     "definefrequency",
@@ -1595,13 +1770,7 @@ class TemperamentWidget {
                     0,
                     [previousBlock, idx + 1, idx + 8, idx + 12]
                 ]);
-                newStack.push([
-                    idx + 1,
-                    "multiply",
-                    0,
-                    0,
-                    [idx, idx + 2, idx + 3]
-                ]);
+                newStack.push([idx + 1, "multiply", 0, 0, [idx, idx + 2, idx + 3]]);
                 newStack.push([
                     idx + 2,
                     ["namedbox", { value: logo.synth.startingPitch }],
@@ -1609,49 +1778,13 @@ class TemperamentWidget {
                     0,
                     [idx + 1]
                 ]);
-                newStack.push([
-                    idx + 3,
-                    ["power"],
-                    0,
-                    0,
-                    [idx + 1, idx + 4, idx + 5]
-                ]);
-                newStack.push([
-                    idx + 4,
-                    ["number", { value: this.powerBase }],
-                    0,
-                    0,
-                    [idx + 3]
-                ]);
-                newStack.push([
-                    idx + 5,
-                    ["divide"],
-                    0,
-                    0,
-                    [idx + 3, idx + 6, idx + 7]
-                ]);
-                newStack.push([
-                    idx + 6,
-                    ["number", { value: i }],
-                    0,
-                    0,
-                    [idx + 5]
-                ]);
-                newStack.push([
-                    idx + 7,
-                    ["number", { value: this.pitchNumber }],
-                    0,
-                    0,
-                    [idx + 5]
-                ]);
+                newStack.push([idx + 3, ["power"], 0, 0, [idx + 1, idx + 4, idx + 5]]);
+                newStack.push([idx + 4, ["number", { value: this.powerBase }], 0, 0, [idx + 3]]);
+                newStack.push([idx + 5, ["divide"], 0, 0, [idx + 3, idx + 6, idx + 7]]);
+                newStack.push([idx + 6, ["number", { value: i }], 0, 0, [idx + 5]]);
+                newStack.push([idx + 7, ["number", { value: this.pitchNumber }], 0, 0, [idx + 5]]);
                 newStack.push([idx + 8, "vspace", 0, 0, [idx, idx + 9]]);
-                newStack.push([
-                    idx + 9,
-                    ["pitch"],
-                    0,
-                    0,
-                    [idx + 8, idx + 10, idx + 11, null]
-                ]);
+                newStack.push([idx + 9, ["pitch"], 0, 0, [idx + 8, idx + 10, idx + 11, null]]);
                 if (!isCustom(this.inTemperament)) {
                     newStack.push([
                         idx + 10,
@@ -1673,7 +1806,7 @@ class TemperamentWidget {
                         [
                             "text",
                             {
-                                value: this.notes[i].substring(0,this.notes[i].length - 1)
+                                value: this.notes[i].substring(0, this.notes[i].length - 1)
                             }
                         ],
                         0,
@@ -1703,13 +1836,7 @@ class TemperamentWidget {
                     0,
                     [previousBlock, idx + 1, idx + 6, idx + 10]
                 ]);
-                newStack.push([
-                    idx + 1,
-                    "multiply",
-                    0,
-                    0,
-                    [idx, idx + 2, idx + 3]
-                ]);
+                newStack.push([idx + 1, "multiply", 0, 0, [idx, idx + 2, idx + 3]]);
                 newStack.push([
                     idx + 2,
                     ["namedbox", { value: logo.synth.startingPitch }],
@@ -1717,13 +1844,7 @@ class TemperamentWidget {
                     0,
                     [idx + 1]
                 ]);
-                newStack.push([
-                    idx + 3,
-                    ["divide"],
-                    0,
-                    0,
-                    [idx + 1, idx + 4, idx + 5]
-                ]);
+                newStack.push([idx + 3, ["divide"], 0, 0, [idx + 1, idx + 4, idx + 5]]);
                 newStack.push([
                     idx + 4,
                     ["number", { value: rationalToFraction(this.ratios[i])[0] }],
@@ -1733,22 +1854,13 @@ class TemperamentWidget {
                 ]);
                 newStack.push([
                     idx + 5,
-                    [
-                        "number",
-                        { value: rationalToFraction(this.ratios[i])[1] }
-                    ],
+                    ["number", { value: rationalToFraction(this.ratios[i])[1] }],
                     0,
                     0,
                     [idx + 3]
                 ]);
                 newStack.push([idx + 6, "vspace", 0, 0, [idx, idx + 7]]);
-                newStack.push([
-                    idx + 7,
-                    ["pitch"],
-                    0,
-                    0,
-                    [idx + 6, idx + 8, idx + 9, null]
-                ]);
+                newStack.push([idx + 7, ["pitch"], 0, 0, [idx + 6, idx + 8, idx + 9, null]]);
 
                 if (!isCustom(this.inTemperament)) {
                     newStack.push([
@@ -1771,7 +1883,7 @@ class TemperamentWidget {
                         [
                             "text",
                             {
-                                value: this.notes[i].substring(0,this.notes[i].length - 1)
+                                value: this.notes[i].substring(0, this.notes[i].length - 1)
                             }
                         ],
                         0,
@@ -1811,7 +1923,7 @@ class TemperamentWidget {
         logo.textMsg(_("New action block generated!"));
 
         let number;
-        if (isCustom(this.inTemperament)) {   
+        if (isCustom(this.inTemperament)) {
             TEMPERAMENT[this.inTemperament] = [];
             TEMPERAMENT[this.inTemperament]["pitchNumber"] = this.pitchNumber;
             updateTemperaments();
@@ -1831,43 +1943,41 @@ class TemperamentWidget {
             logo.blocks.palettes.updatePalettes("pitch");
         }
     }
+
     /**
-     * Triggerred when play button is pressed on a single note in table
-     *Notes are displayed in sequence and can be played one after another
-     *
+     * Triggerred when play button is pressed on a single note in table.
+     * Notes are displayed in sequence and can be played one after another.
      * @returns {void}
      */
-
     playNote(pitchNumber) {
         logo.resetSynth(0);
         const duration = 1 / 2;
         let notes;
         if (docById("wheelDiv4") == null) {
             notes = this.frequencies[pitchNumber];
-            if (this.editMode=="equal" && this.eqTempHzs && this.eqTempHzs.length) 
-                notes = this.eqTempHzs[pitchNumber] ;
-            else if (this.editMode=="ratio" && this.NEqTempHzs && this.NEqTempHzs.length) 
-                notes = this.NEqTempHzs[pitchNumber] ;
+            if (this.editMode == "equal" && this.eqTempHzs && this.eqTempHzs.length)
+                notes = this.eqTempHzs[pitchNumber];
+            else if (this.editMode == "ratio" && this.NEqTempHzs && this.NEqTempHzs.length)
+                notes = this.NEqTempHzs[pitchNumber];
         } else {
             notes = this.tempRatios1[pitchNumber] * this.frequencies[0];
         }
 
         logo.synth.trigger(
             0,
-            notes, 
-            Singer.defaultBPMFactor * duration, 
+            notes,
+            Singer.defaultBPMFactor * duration,
             "electronic synth",
             null,
             null
         );
     }
+
     /**
-     * Triggerred when play button is pressed
-     *All Notes are played in sequence from the start.
-     *
+     * Triggerred when play button is pressed.
+     * All Notes are played in sequence from the start.
      * @returns {void}
      */
-
     playAll() {
         let p = 0;
         this.playbackForward = true;
@@ -1916,12 +2026,12 @@ class TemperamentWidget {
             0,
             "C Major"
         );
-        
+
         let pitchNumber = this.pitchNumber;
-        if (this.editMode == "equal" && this.eqTempPitchNumber) 
-            pitchNumber = this.eqTempPitchNumber ;
-        else if  (this.editMode == "ratio" && this.NEqTempPitchNumber) 
-            pitchNumber = this.NEqTempPitchNumber ;
+        if (this.editMode == "equal" && this.eqTempPitchNumber)
+            pitchNumber = this.eqTempPitchNumber;
+        else if (this.editMode == "ratio" && this.NEqTempPitchNumber)
+            pitchNumber = this.NEqTempPitchNumber;
         if (docById("wheelDiv4") !== null) {
             pitchNumber = this.tempRatios1.length - 1;
         }
@@ -1985,11 +2095,12 @@ class TemperamentWidget {
                 docById("pitchNumber_" + i).style.background = platformColor.labelColor;
                 if (this.playbackForward == false && i < pitchNumber) {
                     j = i + 1;
-                    docById("pitchNumber_" + j).style.background =     platformColor.selectorBackground;
+                    docById("pitchNumber_" + j).style.background = platformColor.selectorBackground;
                 } else {
                     if (i !== 0) {
                         j = i - 1;
-                        docById("pitchNumber_" + j).style.background = platformColor.selectorBackground;
+                        docById("pitchNumber_" + j).style.background =
+                            platformColor.selectorBackground;
                     }
                 }
             } else if (docById("wheelDiv4") !== null) {
@@ -2040,7 +2151,8 @@ class TemperamentWidget {
                     __playLoop(i);
                 }, Singer.defaultBPMFactor * 1000 * duration);
             } else {
-                cell.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' +
+                cell.innerHTML =
+                    '&nbsp;&nbsp;<img src="header-icons/' +
                     "play-button.svg" +
                     '" title="' +
                     _("Play") +
@@ -2061,7 +2173,8 @@ class TemperamentWidget {
                             this.notesCircle.refreshWheel();
                         } else if (this.circleIsVisible == true && docById("wheelDiv4") == null) {
                             j = i - 1;
-                            docById("pitchNumber_" + j).style.background =             platformColor.selectorBackground;
+                            docById("pitchNumber_" + j).style.background =
+                                platformColor.selectorBackground;
                         } else if (docById("wheelDiv4") !== null) {
                             this.wheel1.navItems[i - 1].fillAttr = "#e0e0e0";
                             this.wheel1.navItems[i - 1].sliceHoverAttr.fill = "#e0e0e0";
@@ -2078,199 +2191,5 @@ class TemperamentWidget {
         if (this._playing) {
             __playLoop(0);
         }
-    }
-    /**
-     * Initialises the temperament widget
-     *
-     * @returns {void}
-     */
-
-    init() {
-
-
-        const w = window.innerWidth;
-        this._cellScale = w / 1200;
-
-        const widgetWindow = window.widgetWindows.windowFor(this, "temperament");
-        this.widgetWindow = widgetWindow;
-        widgetWindow.clear();
-        widgetWindow.show();
-
-        widgetWindow.getWidgetBody().append(temperamentTableDiv);
-        widgetWindow.getWidgetBody().style.height = "500px";
-        widgetWindow.getWidgetBody().style.width = "500px";
-
-        
-
-        widgetWindow.onclose = () => {
-            logo.synth.setMasterVolume(0);
-            logo.synth.stop();
-            if (docById("wheelDiv2") != null) {
-                docById("wheelDiv2").style.display = "none";
-                this.notesCircle.removeWheel();
-            }
-            if (docById("wheelDiv3") != null) {
-                docById("wheelDiv3").style.display = "none";
-                this.wheel.removeWheel();
-            }
-            if (docById("wheelDiv4") != null) {
-                docById("wheelDiv4").style.display = "none";
-                this.wheel1.removeWheel();
-            }
-
-            widgetWindow.destroy();
-        };
-
-        this._playing = false;
-
-        const buttonTable = document.createElement("table");
-        const header = buttonTable.createTHead();
-        const row = header.insertRow(0);
-        row.id = "buttonsRow";
-
-        temperamentCell = row.insertCell();
-        temperamentCell.innerHTML = this.inTemperament;
-        temperamentCell.style.width = 2 * TemperamentWidget.BUTTONSIZE + "px";
-        temperamentCell.style.minWidth = temperamentCell.style.width;
-        temperamentCell.style.maxWidth = temperamentCell.style.width;
-        temperamentCell.style.height = TemperamentWidget.BUTTONSIZE + "px";
-        temperamentCell.style.minHeight = temperamentCell.style.height;
-        temperamentCell.style.maxHeight = temperamentCell.style.height;
-        temperamentCell.style.textAlign = "center";
-        temperamentCell.style.backgroundColor = platformColor.selectorBackground;
-
-        this.playButton = widgetWindow.addButton(
-            "play-button.svg",
-            TemperamentWidget.ICONSIZE,
-            _("Play all")
-        );
-        this.playButton.onclick = () => {
-            this.playAll();
-        };
-
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            TemperamentWidget.ICONSIZE,
-            _("Save")
-        ).onclick = () => {
-            this._save();
-        };
-
-        const noteCell = widgetWindow.addButton(
-            "play-button.svg",
-            TemperamentWidget.ICONSIZE,
-            _("Table")
-        );
-
-        let t = TEMPERAMENT[this.inTemperament];
-        this.pitchNumber = t.pitchNumber;
-        this.octaveChanged = false;
-        this.scale = this.scale[0] + " " + this.scale[1];
-        this.scaleNotes = _buildScale(this.scale);
-        this.scaleNotes = this.scaleNotes[0];
-        this.powerBase = 2;
-        const startingPitch = logo.synth.startingPitch;
-        const str = [];
-        const note = [];
-        this.notes = [];
-        this.frequencies = [];
-        this.cents = [];
-        this.intervals = [];
-        this.ratios = [];
-        this.ratiosNotesPair = [];
-
-        let pitchNumber;
-        for (let i = 0; i <= this.pitchNumber; i++) {
-            if (
-                isCustom(this.inTemperament) &&
-                TEMPERAMENT[this.inTemperament]["0"][1] !== undefined
-            ) {
-                //If temperament selected is custom and it is defined by user.
-                pitchNumber = i + "";
-                if (i === this.pitchNumber) {
-                    this.notes[i] = [
-                        TEMPERAMENT[this.inTemperament]["0"][1],
-                        Number(TEMPERAMENT[this.inTemperament]["0"][2]) + 1
-                    ];
-                    this.ratios[i] = this.powerBase;
-                } else {
-                    this.notes[i] = [
-                        TEMPERAMENT[this.inTemperament][pitchNumber][1],
-                        TEMPERAMENT[this.inTemperament][pitchNumber][2]
-                    ];
-                    this.ratios[i] = TEMPERAMENT[this.inTemperament][pitchNumber][0];
-                }
-                this.frequencies[i] = logo.synth
-                    .getCustomFrequency(
-                        this.notes[i][0] + this.notes[i][1] + "",
-                        this.inTemperament
-                        )
-                    .toFixed(2);
-                this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
-                this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
-            } else {
-                if (isCustom(this.inTemperament)) {
-                    // If temperament selected is custom and it is not defined by user
-                    // then custom temperament behaves like equal temperament.
-                    t = TEMPERAMENT["equal"];
-                }
-                str[i] = getNoteFromInterval(startingPitch, t.interval[i]);
-                this.notes[i] = str[i];
-                note[i] = str[i][0];
-
-                if (
-                    str[i][0].substring(1, str[i][0].length) === FLAT ||
-                    str[i][0].substring(1, str[i][0].length) === "b"
-                ) {
-                    note[i] = str[i][0].replace(FLAT, "b");
-                } else if (
-                    str[i][0].substring(1, str[i][0].length) === SHARP ||
-                    str[i][0].substring(1, str[i][0].length) === "#"
-                ) {
-                    note[i] = str[i][0].replace(SHARP, "#");
-                }
-
-                str[i] = note[i] + str[i][1];
-                this.frequencies[i] = logo.synth
-                    ._getFrequency(str[i], true, this.inTemperament)
-                    .toFixed(2);
-                this.intervals[i] = t.interval[i];
-                this.ratios[i] = t[this.intervals[i]];
-                this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
-                this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
-            }
-        }
-        this.toggleNotesButton = () => {
-            if (this.circleIsVisible) {
-                noteCell.getElementsByTagName("img")[0].src = "header-icons/circle.svg";
-                noteCell.getElementsByTagName("img")[0].title = "circle";
-                noteCell.getElementsByTagName("img")[0].alt = "circle";
-            } else {
-                noteCell.getElementsByTagName("img")[0].src = "header-icons/table.svg";
-                noteCell.getElementsByTagName("img")[0].title = "table";
-                noteCell.getElementsByTagName("img")[0].alt = "table";
-            }
-        };
-
-        this._circleOfNotes();
-
-        noteCell.onclick = () => {
-            this.editMode = null;            
-            if (this.circleIsVisible) {
-                this._circleOfNotes();
-            } else {
-                this._graphOfNotes();
-            }
-        };
-
-        widgetWindow.addButton(
-            "add2.svg",
-            TemperamentWidget.ICONSIZE,
-            _("Add pitches")
-        ).onclick = (event) => {
-            this.edit();
-        };
-
-        widgetWindow.sendToCenter();
     }
 }
