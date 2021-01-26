@@ -646,7 +646,7 @@ function setupToneBlocks() {
 
     class CustomSampleBlock extends LeftBlock {
         constructor() {
-            super("customsample");
+            super("customsample", _("sample"));
             this.setPalette("tone");
             this.beginnerBlock(true);
 
@@ -667,7 +667,7 @@ function setupToneBlocks() {
 
             this.makeMacro((x, y) => [
                 [0, ["customsample", {value: ["", "", "do", 4]}], x, y, [null, 1, 2, 3]],
-                [1, ["audiofile", {value: ["", ""]}], 0 ,0, [0]],
+                [1, ["audiofile", {value: null}], 0 ,0, [0]],
                 [2, ["solfege", {value: "do"}], 0, 0, [0]],
                 [3, ["number", {value: 4}], 0, 0, [0]],
             ]);
@@ -687,14 +687,21 @@ function setupToneBlocks() {
                 if (logo.blocks.blockList[blk].value === null) {
                     logo.blocks.blockList[blk].value = ["", "", "do", 4];
                 }
-                let cblk1 = logo.blocks.blockList[blk].connections[2];
+                let cblk1 = logo.blocks.blockList[blk].connections[1];
                 if (cblk1 != null) {
-                    let svalue = logo.blocks.blockList[cblk1].value;
+                    let namevalue = logo.blocks.blockList[cblk1].value[0];
+                    let datavalue = logo.blocks.blockList[cblk1].value[1];
+                    logo.blocks.blockList[blk].value[0] = namevalue;
+                    logo.blocks.blockList[blk].value[1] = datavalue;
+                }
+                let cblk2 = logo.blocks.blockList[blk].connections[2];
+                if (cblk2 != null) {
+                    let svalue = logo.blocks.blockList[cblk2].value;
                     logo.blocks.blockList[blk].value[2] = svalue;
                 }
-                let cblk2 = logo.blocks.blockList[blk].connections[3];
-                if (cblk2 != null) {
-                    let ovalue = logo.blocks.blockList[cblk2].value;
+                let cblk3 = logo.blocks.blockList[blk].connections[3];
+                if (cblk3 != null) {
+                    let ovalue = logo.blocks.blockList[cblk3].value;
                     logo.blocks.blockList[blk].value[3] = ovalue;
                 }
                 return logo.blocks.blockList[blk].value;
@@ -705,7 +712,7 @@ function setupToneBlocks() {
     class AudioFileBlock extends ValueBlock {
         constructor() {
             super("audiofile");
-            this.extraWidth = 30;
+            this.parameter = true;
             this.setPalette("tone");
             this.beginnerBlock(true);
 
@@ -718,6 +725,12 @@ function setupToneBlocks() {
             this.formBlock({
                 outType: "textout"
             });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            console.log("blk");
+            logo.blocks.updateBlockText(blk);
+            return logo.blocks.blockList[blk].value;
         }
     }
 
