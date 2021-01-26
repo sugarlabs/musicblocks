@@ -2251,13 +2251,12 @@ function Blocks(activity) {
         case "audiofile":
             try {
                 if (myBlock.value[0] === null) {
-                    label = _("audio file");
+                    label = _("audio file1");
                 } else {
-                    console.log(myBlock.value);
-                    label = myBlock.value[0].toString();
+                    label = _(myBlock.value[0].toString());
                 }
             } catch (e) {
-                label = _("audio file");
+                label = _("audio file2");
             }
             break;
         case "solfege":
@@ -3105,7 +3104,7 @@ function Blocks(activity) {
             };
 
             postProcessArg = [thisBlock, null];
-        } else if (name === "loadFile" || name === "audiofile") {
+        } else if (name === "loadFile") {
             postProcess = function(args) {
                 that.updateBlockText(args[0]);
             };
@@ -5701,7 +5700,8 @@ function Blocks(activity) {
                 postProcess = function(args) {
                     that.blockList[args[0]].value = args[1];
                     that.updateBlockText(args[0]);
-                }
+                };
+
                 this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                 break;
             default:
