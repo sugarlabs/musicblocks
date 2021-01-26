@@ -79,6 +79,7 @@ class ModeWidget {
             _("Play")
         );
         this._playButton.onclick = () => {
+            this._playing = false;
             logo.resetSynth(0);
             if (this._playingStatus()) {
                 this._playing = false;
