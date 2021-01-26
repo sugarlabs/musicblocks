@@ -336,7 +336,7 @@ class ModeWidget {
         for (let i = 0; i < 12; ++i) {
             if (this._selectedNotes[i])
                 document.getElementById("pkey_" + i).src =
-                    highlightImgs[(i + startingPosition) % 12];
+                highlightImgs[(i + startingPosition) % 12];
         }
     }
     /**
@@ -877,8 +877,12 @@ class ModeWidget {
 
         // Save a stack of pitches to be used with the matrix.
         let newStack = [
-            [0, ["action", { collapsed: true }], 100, 100, [null, 1, 2, null]],
-            [1, ["text", { value: modeName }], 0, 0, [0]]
+            [0, ["action", {
+                collapsed: true
+            }], 100, 100, [null, 1, 2, null]],
+            [1, ["text", {
+                value: modeName
+            }], 0, 0, [0]]
         ];
         let previousBlock = 0;
 
@@ -918,8 +922,12 @@ class ModeWidget {
                     [previousBlock, notenameidx, octaveidx, pitchidx + 3]
                 ]);
             }
-            newStack.push([notenameidx, ["solfege", { value: pitch }], 0, 0, [pitchidx]]);
-            newStack.push([octaveidx, ["number", { value: octave }], 0, 0, [pitchidx]]);
+            newStack.push([notenameidx, ["solfege", {
+                value: pitch
+            }], 0, 0, [pitchidx]]);
+            newStack.push([octaveidx, ["number", {
+                value: octave
+            }], 0, 0, [pitchidx]]);
             previousBlock = pitchidx;
         }
 
@@ -931,7 +939,9 @@ class ModeWidget {
         // And save a stack of pitchnumbers to be used with the define mode
         newStack = [
             [0, "definemode", 150, 120, [null, 1, 3, 2]],
-            [1, ["modename", { value: modeName }], 0, 0, [0]],
+            [1, ["modename", {
+                value: modeName
+            }], 0, 0, [0]],
             [2, "hidden", 0, 0, [0, null]]
         ];
         previousBlock = 0;
@@ -953,7 +963,9 @@ class ModeWidget {
                 newStack.push([idx, "pitchnumber", 0, 0, [previousBlock, idx + 1, idx + 2]]);
             }
 
-            newStack.push([idx + 1, ["number", { value: i }], 0, 0, [idx]]);
+            newStack.push([idx + 1, ["number", {
+                value: i
+            }], 0, 0, [idx]]);
             previousBlock = idx;
         }
 
