@@ -142,7 +142,7 @@ class MusicKeyboard {
 
             ele = docById(id);
             if (!(id in startTime)) {
-                startDate = new Date();
+                let startDate = new Date();
                 startTime[id] = startDate.getTime();
             }
 
@@ -215,7 +215,7 @@ class MusicKeyboard {
             }
 
             ele = docById(id);
-            newDate = new Date();
+            let newDate = new Date();
             this.endTime = newDate.getTime();
             duration = (this.endTime - startTime[id]) / 1000.0;
 
@@ -1781,7 +1781,7 @@ class MusicKeyboard {
         };
 
         let __hertzSelectionChanged = () => {
-            blockValue = this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
+            let blockValue = this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
             let argBlock = this._logo.blocks.blockList[block].connections[1];
             this._logo.blocks.blockList[argBlock].text.text = blockValue;
             this._logo.blocks.blockList[argBlock].value = parseInt(blockValue);
@@ -1855,7 +1855,7 @@ class MusicKeyboard {
             this.layout[index].noteOctave = octave;
             cell.innerHTML = this.layout[index].noteName + this.layout[index].noteOctave.toString();
             let temp1 = label;
-            let temp3;
+            let temp2;
             if (temp1 in FIXEDSOLFEGE1) {
                 temp2 = FIXEDSOLFEGE1[temp1].replace(SHARP, "#").replace(FLAT, "b") + octave;
             } else {
