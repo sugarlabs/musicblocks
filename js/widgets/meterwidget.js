@@ -9,12 +9,36 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/*global logo, Singer, _, last, platformColor, docById, wheelnav, slicePath, PREVIEWVOLUME, TONEBPM*/
+
+/*
+     Globals location
+     - lib/wheelnav
+         slicePath, wheelnav
+     
+     - js/utils/utils.js
+         _, last, docById
+     
+     - js/turtle-singer.js
+         Singer
+     
+     - js/utils/platformstyle.js
+         platformColor
+     
+     - js/logo.js
+         PREVIEWVOLUME, TONEBPM
+*/
+
+/*exported MeterWidget*/
 class MeterWidget {
     // A pie menu is used to show the meter and strong beats
     static BUTTONDIVWIDTH = 535;
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
 
+    /**
+     * @param {number} widgetBlock
+     */
     constructor(widgetBlock) {
         this._meterBlock = logo._meterBlock;
         this._strongBeats = [];
@@ -22,10 +46,10 @@ class MeterWidget {
         this._click_lock = false;
         this._beatValue = 1 / 4;
 
-        let w = window.innerWidth;
+        const w = window.innerWidth;
         this._cellScale = w / 1200;
 
-        let widgetWindow = window.widgetWindows.windowFor(this, "meter");
+        const widgetWindow = window.widgetWindows.windowFor(this, "meter");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
 
@@ -44,6 +68,8 @@ class MeterWidget {
             logo.hideMsgs();
             widgetWindow.destroy();
         };
+
+        widgetWindow.onmaximize = this._scale;
 
         this._click_lock = false;
         const playBtn = widgetWindow.addButton("play-button.svg", MeterWidget.ICONSIZE, _("Play"));
@@ -96,7 +122,7 @@ class MeterWidget {
         };
 
         // The pie menu goes here.
-        let meterTableDiv = this.meterDiv;
+        const meterTableDiv = this.meterDiv;
         meterTableDiv.style.display = "inline";
         meterTableDiv.style.visibility = "visible";
         meterTableDiv.style.border = "0px";
@@ -138,6 +164,7 @@ class MeterWidget {
         //TRANS.: Reset the widget layout
         widgetWindow.addButton("reload.svg", MeterWidget.ICONSIZE, _("Reset")).onclick = () => {
             //change Values of blocks in stack.
+            this._playing = false;
             const el = divInput.children[0];
             const el2 = divInput2.children[0];
 
@@ -163,24 +190,61 @@ class MeterWidget {
 
         logo.textMsg(_("Click in the circle to select strong beats for the meter."));
         widgetWindow.sendToCenter();
+        this._scale.call(this.widgetWindow);
     }
 
+    _scale() {
+        const windowHeight =
+            this.getWidgetFrame().offsetHeight - this.getDragElement().offsetHeight;
+        const svg = this.getWidgetBody().getElementsByTagName("svg")[0];
+        const scale = this.isMaximized() ? windowHeight / 400 : 1;
+        svg.style.pointerEvents = "none";
+        svg.setAttribute("height", `${400 * scale}px`);
+        svg.setAttribute("width", `${400 * scale}px`);
+        setTimeout(() => {
+            svg.style.pointerEvents = "auto";
+        }, 100);
+    }
+
+    /**
+     * @private
+     * @returns {boolean}
+     */
     _get_click_lock() {
         return this._click_lock;
     }
 
+    /**
+     * @private
+     * @param {string} drum
+     * @returns {void}
+     */
     __playDrum(drum) {
         logo.synth.trigger(0, "C4", Singer.defaultBPMFactor * this._beatValue, drum, null, null);
     }
 
+    /**
+     * @private
+     * @returns {boolean}
+     */
     __getPlayingStatus() {
         return this._playing;
     }
 
+    /**
+     * @private
+     * @returns {boolean}
+     */
     __getPauseStatus() {
         return !this._playing;
     }
 
+    /**
+     * @private
+     * @param {number} i
+     * @param {number} ms
+     * @returns {void}
+     */
     __playOneBeat(i, ms) {
         if (this.__getPauseStatus()) {
             for (let i = 0; i < this._strongBeats.length; i++) {
@@ -208,15 +272,19 @@ class MeterWidget {
         }, ms);
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _playBeat() {
-        let tur = logo.turtles.ithTurtle(0);
-        let bpmFactor =
+        const tur = logo.turtles.ithTurtle(0);
+        const bpmFactor =
             TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
         for (let i = 0; i < this._strongBeats.length; i++) {
             this._playWheel.navItems[i].navItem.hide();
         }
 
-        let noteBeatValue = bpmFactor * 1000 * this._beatValue;
+        const noteBeatValue = bpmFactor * 1000 * this._beatValue;
         this.__playOneBeat(0, noteBeatValue);
     }
 
@@ -224,7 +292,7 @@ class MeterWidget {
      * @deprecated
      */
     _addButton(row, icon, iconSize, label) {
-        let cell = row.insertCell(-1);
+        const cell = row.insertCell(-1);
         cell.innerHTML =
             '&nbsp;&nbsp;<img src="header-icons/' +
             icon +
@@ -256,12 +324,16 @@ class MeterWidget {
         return cell;
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _save() {
         // Export onbeatdo blocks for each strong beat
-        let strongBeats = [];
-        let newStack = [];
+        const strongBeats = [];
+        const newStack = [];
 
-        let numberOfBeats = this._strongBeats.length;
+        const numberOfBeats = this._strongBeats.length;
 
         for (let i = 0; i < numberOfBeats; i++) {
             if (this._strongBeats[i]) {
@@ -275,122 +347,40 @@ class MeterWidget {
             if (i === 0) {
                 if (strongBeats.length === 1) {
                     newStack.push([0, "onbeatdo", 100, 100, [null, 1, 2, null]]);
-                    newStack.push([
-                        1,
-                        [
-                            "number",
-                            {
-                                value: strongBeats[i] + 1
-                            }
-                        ],
-                        0,
-                        0,
-                        [0]
-                    ]);
-                    newStack.push([
-                        2,
-                        [
-                            "text",
-                            {
-                                value: "action"
-                            }
-                        ],
-                        0,
-                        0,
-                        [0]
-                    ]);
+                    newStack.push([1, ["number", { value: strongBeats[i] + 1 }], 0, 0, [0]]);
+                    newStack.push([2, ["text", { value: "action" }], 0, 0, [0]]);
                 } else {
                     newStack.push([0, "onbeatdo", 100, 100, [null, 1, 2, 3]]);
-                    newStack.push([
-                        1,
-                        [
-                            "number",
-                            {
-                                value: strongBeats[i] + 1
-                            }
-                        ],
-                        0,
-                        0,
-                        [0]
-                    ]);
-                    newStack.push([
-                        2,
-                        [
-                            "text",
-                            {
-                                value: "action"
-                            }
-                        ],
-                        0,
-                        0,
-                        [0]
-                    ]);
+                    newStack.push([1, ["number", { value: strongBeats[i] + 1 }], 0, 0, [0]]);
+                    newStack.push([2, ["text", { value: "action" }], 0, 0, [0]]);
                 }
             } else if (i === strongBeats.length - 1) {
                 newStack.push([n, "onbeatdo", 0, 0, [n - 3, n + 1, n + 2, null]]);
-                newStack.push([
-                    n + 1,
-                    [
-                        "number",
-                        {
-                            value: strongBeats[i] + 1
-                        }
-                    ],
-                    0,
-                    0,
-                    [n]
-                ]);
-                newStack.push([
-                    n + 2,
-                    [
-                        "text",
-                        {
-                            value: "action"
-                        }
-                    ],
-                    0,
-                    0,
-                    [n]
-                ]);
+                newStack.push([n + 1, ["number", { value: strongBeats[i] + 1 }], 0, 0, [n]]);
+                newStack.push([n + 2, ["text", { value: "action" }], 0, 0, [n]]);
             } else {
                 newStack.push([n, "onbeatdo", 0, 0, [n - 3, n + 1, n + 2, n + 3]]);
-                newStack.push([
-                    n + 1,
-                    [
-                        "number",
-                        {
-                            value: strongBeats[i] + 1
-                        }
-                    ],
-                    0,
-                    0,
-                    [n]
-                ]);
-                newStack.push([
-                    n + 2,
-                    [
-                        "text",
-                        {
-                            value: "action"
-                        }
-                    ],
-                    0,
-                    0,
-                    [n]
-                ]);
+                newStack.push([n + 1, ["number", { value: strongBeats[i] + 1 }], 0, 0, [n]]);
+                newStack.push([n + 2, ["text", { value: "action" }], 0, 0, [n]]);
             }
-
             n += 3;
         }
 
-        console.debug(newStack);
+        // console.debug(newStack);
         logo.blocks.loadNewBlocks(newStack);
     }
 
+    /**
+     * @private
+     * @param {number} numberOfBeats
+     * @param {number} beatValue
+     * @returns {void}
+     */
     _piemenuMeter(numberOfBeats, beatValue) {
         // pie menu for strong beat selection
 
-        docById("meterWheelDiv").style.display = "";
+        docById("meterWheelDiv").style.display = "flex";
+        docById("meterWheelDiv").style.justifyContent = "center";
 
         // Use advanced constructor for multiple wheelnavs in the same div.
         // The meterWheel is used to hold the strong beats.
@@ -422,7 +412,7 @@ class MeterWidget {
             numberOfBeats = 16;
         }
 
-        let labels = [
+        const labels = [
             "1",
             "2",
             "3",
@@ -447,14 +437,6 @@ class MeterWidget {
             this._strongBeats.push(false);
         }
 
-        // Always make the meter a complete circle.
-        /*
-        let n = (1 - (numberOfBeats * beatValue)) / beatValue;
-        for (let i = 0; i < n; i++) {
-            beatList.push(null);
-        }
-        */
-
         this._meterWheel.createWheel(beatList);
 
         this._beatWheel.colors = platformColor.modeWheelcolors;
@@ -472,14 +454,6 @@ class MeterWidget {
         for (let i = 0; i < numberOfBeats; i++) {
             beatList.push("x");
         }
-
-        // Always make the meter a complete circle.
-        /*
-        let n = (1 - (numberOfBeats * beatValue)) / beatValue;
-        for (let i = 0; i < n; i++) {
-            beatList.push(null);
-        }
-        */
 
         this._beatWheel.createWheel(beatList);
 
@@ -499,14 +473,6 @@ class MeterWidget {
             beatList.push(" ");
         }
 
-        // Always make the meter a complete circle.
-        /*
-        let n = (1 - (numberOfBeats * beatValue)) / beatValue;
-        for (let i = 0; i < n; i++) {
-            playList.push(null);
-        }
-        */
-
         this._playWheel.createWheel(beatList);
 
         for (let i = 0; i < numberOfBeats; i++) {
@@ -515,15 +481,15 @@ class MeterWidget {
 
         // If a meterWheel sector is selected, show the corresponding
         // beat wheel sector.
-        let __setBeat = () => {
-            let i = this._meterWheel.selectedNavItemIndex;
+        const __setBeat = () => {
+            const i = this._meterWheel.selectedNavItemIndex;
             this._strongBeats[i] = true;
             this._beatWheel.navItems[i].navItem.show();
         };
 
         // If a beatWheel sector is selected, hide it.
-        let __clearBeat = () => {
-            let i = this._beatWheel.selectedNavItemIndex;
+        const __clearBeat = () => {
+            const i = this._beatWheel.selectedNavItemIndex;
             this._beatWheel.navItems[i].navItem.hide();
             this._strongBeats[i] = false;
         };
@@ -535,10 +501,16 @@ class MeterWidget {
             this._beatWheel.navItems[i].navItem.hide();
         }
 
-        this.setupDefaultStrongWeakBeats(numberOfBeats, beatValue);
+        this._setupDefaultStrongWeakBeats(numberOfBeats, beatValue);
     }
 
-    setupDefaultStrongWeakBeats(numberOfBeats, beatValue) {
+    /**
+     * @private
+     * @param {number} numberOfBeats
+     * @param {number} beatValue
+     * @returns {void}
+     */
+    _setupDefaultStrongWeakBeats(numberOfBeats, beatValue) {
         if (beatValue == 0.25 && numberOfBeats == 4) {
             this._strongBeats[0] = true;
             this._strongBeats[2] = true;

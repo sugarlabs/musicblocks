@@ -930,6 +930,7 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
+
             if (logo.rhythmRuler == null) {
                 logo.rhythmRuler = new RhythmRuler();
             }
@@ -942,7 +943,7 @@ function setupWidgetBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
-                logo.rhythmRuler.init(logo);
+                logo.rhythmRuler = new RhythmRuler();
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
