@@ -6,7 +6,7 @@ function SampleWidget() {
     const SAMPLEHEIGHT = 160;
     const RENDERINTERVAL = 50;
 
-    const FANCYNAMES = ["𝄫", "♭", "♮", "♯", "𝄪"];
+    const TRUEACCIDENTALNAMES = ["𝄫", "♭", "♮", "♯", "𝄪"];
     const ACCIDENTALNAMES = ["bb", "b", "", "#", "x"];
     const SOLFEGENAMES = ["do", "re", "me", "fa", "sol", "la", "ti", "do"];
     const DEFAULTACCIDENTAL = "-";
@@ -14,7 +14,9 @@ function SampleWidget() {
 
     const REFERENCESAMPLE = "electronic synth";
     const DEFAULTSAMPLE = "electronic synth";
-    const CENTERPITCHHERTZ = 240;
+    const CENTERPITCHHERTZ = 200;
+
+    const MAXOCTAVE = 10;
 
 
     this.sampleData = "";
