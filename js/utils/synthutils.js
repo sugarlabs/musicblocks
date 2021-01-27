@@ -667,8 +667,6 @@ function Synth() {
                 { name: "snare drum", data: SNARE_SAMPLE }
             ]
         };
-        let data = function() {return null};
-        this.samplesManifest.voice.push({ name: "empty", data: data});
 
         if (this.samples === null) {
             this.samples = {};
@@ -703,7 +701,7 @@ function Synth() {
                 this.samples["voice"][sampleName] = sampleData;
                 return;
             }
-            console.debug("sample was not already in sample library");
+            console.debug(sampleName + " sample was not already in sample library");
             /*
             for (let customsample in CUSTOMSAMPLES) {
                 if (CUSTOMSAMPLES[customsample].includes(sampleName)) {
@@ -984,7 +982,6 @@ function Synth() {
             } else if (params != null) {
                 let center = this._parseSampleCenterNo(params[1], params[2]);
                 noteDict[center] = params[0];
-                console.log(this.samples.voice[sourceName]);
             } else {
                 noteDict["C4"] = this.samples.voice[sourceName];
             }
