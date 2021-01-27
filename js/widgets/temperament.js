@@ -447,6 +447,7 @@ class TemperamentWidget {
             divAppend1.style.width = docById("wheelDiv2").style.width;
             divAppend1.style.marginTop = docById("wheelDiv2").style.height;
             divAppend1.style.overflow = "auto";
+            divAppend1.style.cursor = "pointer";
             docById("temperamentTable").append(divAppend1);
         }
 
