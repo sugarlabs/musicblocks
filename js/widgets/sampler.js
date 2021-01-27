@@ -31,8 +31,20 @@ function SampleWidget() {
     this._updateBlocks = function (i) {
 
         let blockNumber;
+        let audioFileBlock;
+        let solfegeBlock;
+        let octaveBlock;
         if (this.sampleBlock != null) {
             blockNumber = this._logo.blocks.blockList[this.sampleBlock].connections[1];
+            audiofileBlock = this._logo.blocks.blockList[blockNumber].connections[0];
+            solfegeBlock = this._logo.blocks.blockList[blockNumber].connections[1];
+            octaveBlock = this._logo.blocks.blockList[blockNumber].connections[2];
+            /*
+            console.log(this._logo.blocks.blockList[blockNumber].value);
+            console.log(this._logo.blocks.blockList[audiofileBlock].value);
+            console.log(this._logo.blocks.blockList[solfegeBlock].value);
+            console.log(this._logo.blocks.blockList[octaveBlock].value);
+            */
             if (blockNumber != null) {
                 this._logo.blocks.blockList[blockNumber].value = [this.sampleName, this.sampleData];
                 this._logo.blocks.blockList[blockNumber].updateCache();
