@@ -926,6 +926,7 @@ class TemperamentWidget {
             divAppend.style.height = "32px";
             divAppend.style.marginTop = "40px";
             divAppend.style.overflow = "auto";
+            divAppend.style.cursor = "pointer";
             equalEdit.append(divAppend);
 
             const divAppend1 = docById("preview");
@@ -933,13 +934,15 @@ class TemperamentWidget {
             divAppend1.style.marginLeft = "3px";
             divAppend1.style.backgroundColor = platformColor.selectorBackground;
             divAppend1.style.width = "215px";
+            divAppend1.style.cursor = "pointer";
 
             const divAppend2 = docById("done_");
             divAppend2.style.height = "30px";
             divAppend2.style.marginRight = "3px";
             divAppend2.style.backgroundColor = platformColor.selectorBackground;
             divAppend2.style.width = "205px";
-        };
+            divAppend2.style.cursor = "pointer";
+        }
 
         addDivision(false);
 
