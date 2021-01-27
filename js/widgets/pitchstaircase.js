@@ -12,27 +12,22 @@
 // This widget enable us to create new pitches with help of a initial
 // pitch value by applying music ratios.
 
-/*global logo platformColor, _, SYNTHSVG, frequencyToPitch, DEFAULTVOICE */
+/* global logo platformColor, _, SYNTHSVG, frequencyToPitch, DEFAULTVOICE */
 
 /*
-     Globals location
-
-     - js/utils/musicutils.js
+   Global locations
+    - js/utils/musicutils.js
         SYNTHSVG, frequencyToPitch, DEFAULTVOICE
-     
-     - js/utils/utils.js
-         _
-     
-     - js/utils/platformstyle.js
-         platformColor
-
-     - js/logo.js
+    - js/utils/utils.js
+        _
+    - js/utils/platformstyle.js
+        platformColor
+    - js/logo.js
         logo
-
 */
 
-
 /*exported PitchStaircase */
+
 class PitchStaircase {
     static BUTTONDIVWIDTH = 476; // 8 buttons 476 = (55 + 4) * 8
     static OUTERWINDOWWIDTH = 685;
@@ -89,20 +84,20 @@ class PitchStaircase {
         };
 
         return cell;
-    };
+    }
 
     /**
      * @private
      * @returns {void}
      */
     _makeStairs() {
-        // Each row in the psc table contains separate table; each
-        // table contains a note label in the first column and a table
-        // of buttons in the second column.
+        /**
+         * Each row in the psc table contains separate table; each table contains a note label in
+         * the first column and a table of buttons in the second column.
+         */
         const pscTable = this._pscTable;
         pscTable.innerHTML = "";
         pscTable.style.textAlign = "center";
-
 
         for (let i = 0; i < this.Stairs.length; i++) {
             const pscTableRow = pscTable.insertRow();
@@ -116,7 +111,12 @@ class PitchStaircase {
             const frequency = this.Stairs[i][2];
 
             // The play button for this row.
-            const playCell = this._addButton(stepTableRow, "play-button.svg", PitchStaircase.ICONSIZE, _("Play"));
+            const playCell = this._addButton(
+                stepTableRow,
+                "play-button.svg",
+                PitchStaircase.ICONSIZE,
+                _("Play")
+            );
             playCell.className = "headcol"; // This cell is fixed horizontally.
             playCell.setAttribute("id", i);
 
@@ -124,8 +124,9 @@ class PitchStaircase {
             stepCell.setAttribute("id", frequency);
             stepCell.style.width =
                 (PitchStaircase.INNERWINDOWWIDTH *
-                    parseFloat(PitchStaircase.DEFAULTFREQUENCY / frequency) * this._cellScale) /
-                3 +
+                    parseFloat(PitchStaircase.DEFAULTFREQUENCY / frequency) *
+                    this._cellScale) /
+                    3 +
                 "px";
             stepCell.innerHTML =
                 frequency.toFixed(2) + "<br>" + this.Stairs[i][0] + this.Stairs[i][1];
@@ -163,7 +164,7 @@ class PitchStaircase {
                 this._playOne(stepCell);
             };
         }
-    };
+    }
 
     /**
      * @private
@@ -183,7 +184,7 @@ class PitchStaircase {
         this._refresh();
 
         return true;
-    };
+    }
 
     /**
      * @private
@@ -227,15 +228,16 @@ class PitchStaircase {
             return;
         }
 
-        // TODO: look to see if the same frequency is already in the list.
-
+        /**
+         * @todo look to see if the same frequency is already in the list.
+         */
         const obj = frequencyToPitch(parseFloat(frequency) / inputNum);
         let foundStep = false;
         let repeatStep = false;
         let isStepDeleted = true;
         let i;
 
-        for (let i = 0; i < this.Stairs.length; i++) {
+        for (i = 0; i < this.Stairs.length; i++) {
             if (this.Stairs[i][2] < parseFloat(frequency) / inputNum) {
                 this.Stairs.splice(i, 0, [
                     obj[0],
@@ -285,7 +287,7 @@ class PitchStaircase {
         }
 
         this._makeStairs(isStepDeleted);
-    };
+    }
 
     /**
      * @private
@@ -301,7 +303,7 @@ class PitchStaircase {
         setTimeout(() => {
             stepCell.style.backgroundColor = platformColor.selectorBackground;
         }, 1000);
-    };
+    }
 
     /**
      * @private
@@ -324,7 +326,7 @@ class PitchStaircase {
                 stepCell.style.backgroundColor = platformColor.selectorBackground;
             }
         }, 1000);
-    };
+    }
 
     /**
      * @private
@@ -332,15 +334,15 @@ class PitchStaircase {
      */
     playUpAndDown() {
         const pitchnotes = [];
-        const note = this.Stairs[this.Stairs.length - 1][0] +
-            this.Stairs[this.Stairs.length - 1][1];
+        const note =
+            this.Stairs[this.Stairs.length - 1][0] + this.Stairs[this.Stairs.length - 1][1];
         pitchnotes.push(note.replace(/♭/g, "b").replace(/♯/g, "#"));
         const last = this.Stairs.length - 1;
         const stepCell = this._stepTables[last].rows[0].cells[1];
         stepCell.style.backgroundColor = platformColor.selectorBackground;
         logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
         this._playNext(this.Stairs.length - 2, -1);
-    };
+    }
 
     /**
      * @private
@@ -393,7 +395,7 @@ class PitchStaircase {
                 this._playNext(index + next, next);
             }
         }, 1000);
-    };
+    }
 
     /**
      * @private
@@ -406,12 +408,30 @@ class PitchStaircase {
 
         logo.refreshCanvas();
         const newStack = [
-            [0, ["action", {
-                collapsed: true
-            }], 100, 100, [null, 1, 2, null]],
-            [1, ["text", {
-                value: "stair"
-            }], 0, 0, [0]]
+            [
+                0,
+                [
+                    "action",
+                    {
+                        collapsed: true
+                    }
+                ],
+                100,
+                100,
+                [null, 1, 2, null]
+            ],
+            [
+                1,
+                [
+                    "text",
+                    {
+                        value: "stair"
+                    }
+                ],
+                0,
+                0,
+                [0]
+            ]
         ];
         let previousBlock = 0;
 
@@ -451,12 +471,30 @@ class PitchStaircase {
                     0,
                     [previousBlock, noteIdx, octaveIdx, hiddenIdx]
                 ]);
-                newStack.push([noteIdx, ["notename", {
-                    value: pitch[0]
-                }], 0, 0, [pitchBlockIdx]]);
-                newStack.push([octaveIdx, ["number", {
-                    value: pitch[1]
-                }], 0, 0, [pitchBlockIdx]]);
+                newStack.push([
+                    noteIdx,
+                    [
+                        "notename",
+                        {
+                            value: pitch[0]
+                        }
+                    ],
+                    0,
+                    0,
+                    [pitchBlockIdx]
+                ]);
+                newStack.push([
+                    octaveIdx,
+                    [
+                        "number",
+                        {
+                            value: pitch[1]
+                        }
+                    ],
+                    0,
+                    0,
+                    [pitchBlockIdx]
+                ]);
             } else {
                 hertzBlockIdx = newStack.length;
                 multiplyIdx = hertzBlockIdx + 1;
@@ -483,9 +521,12 @@ class PitchStaircase {
                 ]);
                 newStack.push([
                     frequencyIdx,
-                    ["number", {
-                        value: this.Stairs[i][6].toFixed(2)
-                    }],
+                    [
+                        "number",
+                        {
+                            value: this.Stairs[i][6].toFixed(2)
+                        }
+                    ],
                     0,
                     0,
                     [multiplyIdx]
@@ -499,18 +540,24 @@ class PitchStaircase {
                 ]);
                 newStack.push([
                     numeratorIdx,
-                    ["number", {
-                        value: this.Stairs[i][4]
-                    }],
+                    [
+                        "number",
+                        {
+                            value: this.Stairs[i][4]
+                        }
+                    ],
                     0,
                     0,
                     [divideIdx]
                 ]);
                 newStack.push([
                     denominatorIdx,
-                    ["number", {
-                        value: this.Stairs[i][3]
-                    }],
+                    [
+                        "number",
+                        {
+                            value: this.Stairs[i][3]
+                        }
+                    ],
                     0,
                     0,
                     [divideIdx]
@@ -531,7 +578,7 @@ class PitchStaircase {
 
         logo.blocks.loadNewBlocks(newStack);
         logo.textMsg(_("New action block generated!"));
-    };
+    }
 
     /**
      * @private
@@ -539,7 +586,7 @@ class PitchStaircase {
      */
     _get_save_lock() {
         return this._save_lock;
-    };
+    }
 
     /**
      * @private
@@ -562,16 +609,28 @@ class PitchStaircase {
         widgetWindow.clear();
         widgetWindow.show();
 
-        widgetWindow.addButton("play-chord.svg", PitchStaircase.ICONSIZE, _("Play chord")).onclick = () => {
+        widgetWindow.addButton(
+            "play-chord.svg",
+            PitchStaircase.ICONSIZE,
+            _("Play chord")
+        ).onclick = () => {
             this._playAll();
         };
 
-        widgetWindow.addButton("play-scale.svg", PitchStaircase.ICONSIZE, _("Play scale")).onclick = () => {
+        widgetWindow.addButton(
+            "play-scale.svg",
+            PitchStaircase.ICONSIZE,
+            _("Play scale")
+        ).onclick = () => {
             this.playUpAndDown();
         };
 
         this._save_lock = false;
-        widgetWindow.addButton("export-chunk.svg", PitchStaircase.ICONSIZE, _("Save")).onclick = () => {
+        widgetWindow.addButton(
+            "export-chunk.svg",
+            PitchStaircase.ICONSIZE,
+            _("Save")
+        ).onclick = () => {
             // Debounce button
             if (!this._get_save_lock()) {
                 this._save_lock = true;
@@ -602,11 +661,19 @@ class PitchStaircase {
         docById('musicratio2').classList.add('hasKeyboard');
         */
 
-        widgetWindow.addButton("restore-button.svg", PitchStaircase.ICONSIZE, _("Undo")).onclick = () => {
+        widgetWindow.addButton(
+            "restore-button.svg",
+            PitchStaircase.ICONSIZE,
+            _("Undo")
+        ).onclick = () => {
             this._undo();
         };
 
-        widgetWindow.addButton("erase-button.svg", PitchStaircase.ICONSIZE, _("Clear")).onclick = () => {
+        widgetWindow.addButton(
+            "erase-button.svg",
+            PitchStaircase.ICONSIZE,
+            _("Clear")
+        ).onclick = () => {
             while (this._undo());
         };
 
@@ -616,7 +683,7 @@ class PitchStaircase {
         this._refresh();
 
         logo.textMsg(_("Click on a note to create a new step."));
-    };
+    }
 
     /**
      * @private
@@ -624,5 +691,5 @@ class PitchStaircase {
      */
     _refresh() {
         this._makeStairs(true);
-    };
+    }
 }
