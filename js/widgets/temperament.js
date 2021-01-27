@@ -926,7 +926,7 @@ class TemperamentWidget {
             divAppend.style.height = "32px";
             divAppend.style.marginTop = "40px";
             divAppend.style.overflow = "auto";
-            divAppend.style.cursor = "pointer";
+            divAppend.style.cursor = "32px";
             equalEdit.append(divAppend);
 
             const divAppend1 = docById("preview");
@@ -934,6 +934,7 @@ class TemperamentWidget {
             divAppend1.style.marginLeft = "3px";
             divAppend1.style.backgroundColor = platformColor.selectorBackground;
             divAppend1.style.width = "215px";
+            divAppend1.style.lineHeight = "30px";
             divAppend1.style.cursor = "pointer";
 
             const divAppend2 = docById("done_");
@@ -941,6 +942,7 @@ class TemperamentWidget {
             divAppend2.style.marginRight = "3px";
             divAppend2.style.backgroundColor = platformColor.selectorBackground;
             divAppend2.style.width = "205px";
+            divAppend2.style.lineHeight = "30px";
             divAppend2.style.cursor = "pointer";
         }
 
@@ -1112,18 +1114,23 @@ class TemperamentWidget {
             divAppend.style.height = "32px";
             divAppend.style.marginTop = "40px";
             divAppend.style.overflow = "auto";
+            divAppend.style.lineHeight = "32px";
             ratioEdit.append(divAppend);
 
             const divAppend1 = docById("preview");
             divAppend1.style.height = "30px";
             divAppend1.style.marginLeft = "3px";
             divAppend1.style.backgroundColor = platformColor.selectorBackground;
+            divAppend1.style.cursor = "pointer";
+            divAppend1.style.lineHeight = "30px";
             divAppend1.style.width = "215px";
 
             const divAppend2 = docById("done_");
             divAppend2.style.height = "30px";
             divAppend2.style.marginRight = "3px";
             divAppend2.style.backgroundColor = platformColor.selectorBackground;
+            divAppend2.style.cursor = "pointer";
+            divAppend2.style.lineHeight = "30px";
             divAppend2.style.width = "205px";
         };
 
