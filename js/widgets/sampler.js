@@ -108,7 +108,6 @@ function SampleWidget() {
 
     this.accidentalDown = function () {
         this._useAccidental(this.accidentalInput.value);
-        this.accidentalCenter--;
         if (this.accidentalCenter > 0) {
             this.accidentalCenter--;
         }
@@ -119,6 +118,9 @@ function SampleWidget() {
     this.octaveUp = function () {
         this._useOctave(this.octaveInput.value);
         this.octaveCenter++;
+        if (this.octaveCenter > MAXOCTAVE) {
+            this.octaveCenter = MAXOCTAVE;
+        }
         this.octaveInput.value = this.octaveCenter;
         this._updateBlocks();
     };
@@ -126,6 +128,9 @@ function SampleWidget() {
     this.octaveDown = function () {
         this._useOctave(this.octaveInput.value);
         this.octaveCenter--;
+        if (this.octaveCenter < 0) {
+            this.octaveCenter = 0;
+        }
         this.octaveInput.value = this.octaveCenter;
         this._updateBlocks();
     };
