@@ -24,7 +24,9 @@ function SampleWidget() {
     this.sampleData = "";
     this.freqArray = new Uint8Array();
     this.sampleName = DEFAULTSAMPLE;
-    this.pitchCenter = 0;
+    this.samplePitch = "sol";
+
+    this.pitchCenter = 9;
     this.accidentalCenter = 2;
     this.octaveCenter = 4;
 
