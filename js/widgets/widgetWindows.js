@@ -210,7 +210,6 @@ class WidgetWindow {
             this.takeFocus();
             this.onmaximize();
             e.preventDefault();
-            e.stopImmediatePropagation();
         }
     }
 
