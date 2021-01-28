@@ -210,7 +210,7 @@ function setupWidgetBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
-                logo.temperament.init(logo);
+                logo.temperament.init();
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
