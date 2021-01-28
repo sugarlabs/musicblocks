@@ -307,37 +307,19 @@ function SampleWidget() {
                     '" vertical-align="middle">';
                 this.isMoving = false;
             } else {
-                this.resume();
-                playBtn.innerHTML =
-                    '<img src="header-icons/pause-button.svg" title="' +
-                    _("Pause") +
-                    '" alt="' +
-                    _("Pause") +
-                    '" height="' +
-                    ICONSIZE +
-                    '" width="' +
-                    ICONSIZE +
-                    '" vertical-align="middle">';
                 if (!(this.sampleName == "")) {
-                    this._usePitch(this.pitchInput.value);
-                    this._useAccidental(this.accidentalInput.value);
-                    this._useOctave(this.octaveInput.value);
-                    this._logo.synth.loadSynth(0, getVoiceSynthName(REFERENCESAMPLE));
-                    let finalCenter = 0;
-                    if (!isNaN(this.pitchCenter)) {
-                        finalCenter = this.pitchCenter;
-                    }
-                    let finalpitch = Math.floor(CENTERPITCHHERTZ * Math.pow(2, finalCenter/12));
-                    console.log(finalpitch);
-                    this._logo.synth.trigger(
-                        0,
-                        [finalpitch],
-                        1,
-                        REFERENCESAMPLE,
-                        null,
-                        null,
-                        false);
-                    this.isMoving = true;
+                    this.resume();
+                    playBtn.innerHTML =
+                        '<img src="header-icons/pause-button.svg" title="' +
+                        _("Pause") +
+                        '" alt="' +
+                        _("Pause") +
+                        '" height="' +
+                        ICONSIZE +
+                        '" width="' +
+                        ICONSIZE +
+                        '" vertical-align="middle">';
+                    this._playReferencePitch();
                 }
             }
         };
@@ -358,18 +340,18 @@ function SampleWidget() {
                     '" vertical-align="middle">';
                 this.isMoving = false;
             } else {
-                this.resume();
-                refPlayBtn.innerHTML =
-                    '<img src="header-icons/pause-button.svg" title="' +
-                    _("Pause") +
-                    '" alt="' +
-                    _("Pause") +
-                    '" height="' +
-                    ICONSIZE +
-                    '" width="' +
-                    ICONSIZE +
-                    '" vertical-align="middle">';
                 if (!(this.sampleName == "")) {
+                this.resume();
+                    refPlayBtn.innerHTML =
+                        '<img src="header-icons/pause-button.svg" title="' +
+                        _("Pause") +
+                        '" alt="' +
+                        _("Pause") +
+                        '" height="' +
+                        ICONSIZE +
+                        '" width="' +
+                        ICONSIZE +
+                        '" vertical-align="middle">';
                     this._usePitch(this.pitchInput.value);
                     this._logo.synth.loadSynth(0, getVoiceSynthName(this.sampleName));
                     let finalpitch = CENTERPITCHHERTZ;
@@ -545,6 +527,31 @@ function SampleWidget() {
         }
         CUSTOMSAMPLES.push([this.sampleName, this.sampleData]);
         console.log(CUSTOMSAMPLES);
+    }
+
+    this._playReferencePitch = function() {
+        this._usePitch(this.pitchInput.value);
+        this._useAccidental(this.accidentalInput.value);
+        this._useOctave(this.octaveInput.value);
+        this._logo.synth.loadSynth(0, getVoiceSynthName(REFERENCESAMPLE));
+        let finalCenter = 0;
+
+        finalCenter += isNaN(this.octaveCenter)     ? 0 : this.octaveCenter*12;
+        finalCenter += isNaN(this.pitchCenter)      ? 0 : MAJORSCALE[this.pitchCenter];
+        finalCenter += isNaN(this.accidentalCenter) ? 0 : this.accidentalCenter-2;
+
+        let netChange = finalCenter-57;
+        let finalpitch = Math.floor(440 * Math.pow(2, netChange/12));
+        console.log(finalpitch);
+        this._logo.synth.trigger(
+            0,
+            [finalpitch],
+            0.25,
+            REFERENCESAMPLE,
+            null,
+            null,
+            false);
+        this.isMoving = true;
     }
 
 
