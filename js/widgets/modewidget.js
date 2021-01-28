@@ -11,10 +11,6 @@
 
 /*global logo, turtles, docById, _, platformColor, keySignatureToMode, MUSICALMODES, getNote, DEFAULTVOICE, last, NOTESTABLE, slicePath, wheelnav, storage*/
 
-
-/*Duplicate key A♭*/
-/*no-dupe-keys A♭*/
-
 /*
     Global locations
     - lib/wheelnav
