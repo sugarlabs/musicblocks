@@ -34,29 +34,32 @@ function SampleWidget() {
 
     this._updateBlocks = function (i) {
 
-        let blockNumber;
-        let audioFileBlock;
+        let mainSampleBlock;
+        let audiofileBlock;
         let solfegeBlock;
         let octaveBlock;
         if (this.sampleBlock != null) {
-            blockNumber = this._logo.blocks.blockList[this.sampleBlock].connections[1];
-            audiofileBlock = this._logo.blocks.blockList[blockNumber].connections[0];
-            solfegeBlock = this._logo.blocks.blockList[blockNumber].connections[1];
-            octaveBlock = this._logo.blocks.blockList[blockNumber].connections[2];
-            /*
-            console.log(this._logo.blocks.blockList[blockNumber].value);
-            console.log(this._logo.blocks.blockList[audiofileBlock].value);
-            console.log(this._logo.blocks.blockList[solfegeBlock].value);
-            console.log(this._logo.blocks.blockList[octaveBlock].value);
-            */
-            if (blockNumber != null) {
-                this._logo.blocks.blockList[blockNumber].value = [this.sampleName, this.sampleData];
-                this._logo.blocks.blockList[blockNumber].updateCache();
+            mainSampleBlock = this._logo.blocks.blockList[this.sampleBlock].connections[1];
+            if (mainSampleBlock != null) {
+                this._logo.blocks.blockList[mainSampleBlock].value = [this.sampleName, this.sampleData, this.samplePitch, this.octaveCenter];
+                this._logo.blocks.blockList[mainSampleBlock].updateCache();
 
-                numberBlockNumber = this._logo.blocks.blockList[blockNumber].connections[0];
-                if (numberBlockNumber != null) {
-                    this._logo.blocks.blockList[numberBlockNumber].value = this.pitchCenter;
-                    this._logo.blocks.blockList[numberBlockNumber].updateCache();
+                audiofileBlock = this._logo.blocks.blockList[mainSampleBlock].connections[1];
+                solfegeBlock = this._logo.blocks.blockList[mainSampleBlock].connections[2];
+                octaveBlock = this._logo.blocks.blockList[mainSampleBlock].connections[3];
+
+                if (audiofileBlock != null) {
+                    this._logo.blocks.blockList[audiofileBlock].value = [this.sampleName, this.sampleData];
+                    this._logo.blocks.blockList[audiofileBlock].updateCache();
+                }
+                if (solfegeBlock != null) {
+                    this._logo.blocks.blockList[solfegeBlock].value = this.pitchInput.value;
+                    this._logo.blocks.blockList[solfegeBlock].updateCache();
+                }
+                if (octaveBlock != null) {
+                    this._logo.blocks.blockList[octaveBlock].value = this.octaveCenter;
+                    console.log(this._logo.blocks.blockList[octaveBlock].value);
+                    this._logo.blocks.blockList[octaveBlock].updateCache();
                 }
                 this._logo.refreshCanvas();
                 saveLocally();
