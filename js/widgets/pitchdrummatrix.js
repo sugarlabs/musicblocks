@@ -28,6 +28,22 @@ save() : Saves the Drum Matrix in an array of blocks: Set
 Drum and Pitch blocks.
 */
 
+/* global platformColor, _, docById, getNote, getDrumName, getDrumIcon, getDrumSynthName, Singer, MATRIXSOLFEHEIGHT, MATRIXSOLFEWIDTH, SOLFEGECONVERSIONTABLE */
+
+/*
+   Global locations
+    - js/utils/musicutils.js
+        getNote, getDrumName, getDrumIcon, getDrumSynthName, Singer, MATRIXSOLFEHEIGHT, MATRIXSOLFEWIDTH, SOLFEGECONVERSIONTABLE
+
+    - js/utils/utils.js
+        _, docById
+
+    - js/utils/platformstyle.js
+        platformColor
+    
+*/
+
+/*exported PitchDrumMatrix */
 
 class PitchDrumMatrix {
     static BUTTONDIVWIDTH = 295; // 5 buttons
@@ -59,18 +75,42 @@ class PitchDrumMatrix {
         this._blockMap = [];
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
+
     clearBlocks() {
         this._rowBlocks = [];
         this._colBlocks = [];
     }
 
+    /**
+     * @public
+     * @param {number} pitchBlock 
+     * @return {void}
+     */
+
     addRowBlock(pitchBlock) {
         this._rowBlocks.push(pitchBlock);
     }
 
+    /**
+     * @public
+     * @param {number} drumBlock
+     * @return {void} 
+     */
+
     addColBlock(drumBlock) {
         this._colBlocks.push(drumBlock);
     }
+
+    /**
+     * @public
+     * @param {number} pitchBlock 
+     * @param {number} drumBlock 
+     * @returns {void}
+     */
 
     addNode(pitchBlock, drumBlock) {
         let obj;
@@ -83,6 +123,13 @@ class PitchDrumMatrix {
         this._blockMap.push([pitchBlock, drumBlock]);
     }
 
+    /**
+     * @public
+     * @param {number} pitchBlock
+     * @param {number} drumBlock
+     * @returns {void}
+     */
+
     removeNode(pitchBlock, drumBlock) {
         let obj;
         for (let i = 0; i < this._blockMap.length; i++) {
@@ -92,6 +139,10 @@ class PitchDrumMatrix {
             }
         }
     }
+    /**
+     * @private
+     * @returns {HTMLElement}
+     */
 
     _get_save_lock() {
         return this._save_lock;
@@ -339,6 +390,12 @@ class PitchDrumMatrix {
         return cell;
     }
 
+    /**
+     * @private
+     * @param {number} drumIdx
+     * @returns {void}
+     */
+
     _addDrum(drumIdx) {
         const drumname = this.drums[drumIdx];
         const pdmTable = docById("pdmTable");
@@ -405,6 +462,10 @@ class PitchDrumMatrix {
             '" vertical-align="middle">&nbsp;&nbsp;';
         cell.style.backgroundColor = platformColor.selectorBackground;
     }
+    /**
+     * @public
+     * @returns {void}
+     */
 
     makeClickable() {
         // Once the entire matrix is generated, this function makes it
@@ -477,6 +538,11 @@ class PitchDrumMatrix {
         }
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
+    
     _playAll() {
         // Play all of the pitch/drum combinations in the matrix.
         this._logo.synth.stop();
@@ -511,6 +577,13 @@ class PitchDrumMatrix {
         }
     }
 
+    /**
+     * @private
+     * @param {number} i 
+     * @param {number} pairs
+     * @returns {void} 
+     */
+
     _playPitchDrum(i, pairs) {
         // Find the drum cell
         const drumTable = docById("pdmDrumTable");
@@ -544,6 +617,14 @@ class PitchDrumMatrix {
             }, 1000);
         }
     }
+
+    /**
+     * @private
+     * @param {number} colIndex 
+     * @param {number} rowIndex 
+     * @param {number} playNote
+     * @returns {void} 
+     */
 
     _setCellPitchDrum(colIndex, rowIndex, playNote) {
         // Sets corresponding pitch/drum when user clicks on any cell and
@@ -599,6 +680,8 @@ class PitchDrumMatrix {
             }
         }
     }
+
+    
 
     _setPairCell(rowIndex, colIndex, cell, playNote) {
         const pdmTable = docById("pdmTable");
@@ -657,6 +740,11 @@ class PitchDrumMatrix {
             }
         }
     }
+
+    /**
+     * @private
+     * @returns {void}
+     */
 
     _save() {
         // Saves the current matrix as an action stack consisting of a
