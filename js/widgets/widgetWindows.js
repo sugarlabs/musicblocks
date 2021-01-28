@@ -21,8 +21,8 @@ window.widgetWindows = { openWindows: {}, _posCache: {} };
 
 class WidgetWindow {
     /**
-     * @param {string} key 
-     * @param {string} title 
+     * @param {string} key
+     * @param {string} title
      */
     constructor(key, title) {
         // Keep a refernce to the object within handlers
@@ -42,28 +42,14 @@ class WidgetWindow {
         this._createUIelements();
         this._setupLanguage();
 
-        // Global watcher to track the mouse
-        document.addEventListener("mousemove", (e) => {
-            if (!this._dragging) return;
-
-            const x = e.clientX - this._dx,
-                y = e.clientY - this._dy;
-
-            this.setPosition(x, y);
-        });
-
-        document.addEventListener("mousedown", (e) => {
-            if (e.target === this._frame || this._frame.contains(e.target)) {
-                this._frame.style.opacity = "1";
-                this._frame.style.zIndex = "1";
-            } else {
-                this._frame.style.opacity = ".7";
-                this._frame.style.zIndex = "0";
-            }
-        });
-
+        // Global watchers
         this._dragTopHandler = this._dragTopHandler.bind(this);
+        this._docMouseMoveHandler = this._docMouseMoveHandler.bind(this);
+        this._docMouseDownHandler = this._docMouseDownHandler.bind(this);
+
         document.addEventListener("mouseup", this._dragTopHandler, true);
+        document.addEventListener("mousemove", this._docMouseMoveHandler, true);
+        document.addEventListener("mousedown", this._docMouseDownHandler, true);
 
         if (window.widgetWindows._posCache[this._key]) {
             const _pos = window.widgetWindows._posCache[this._key];
@@ -77,8 +63,8 @@ class WidgetWindow {
 
     /**
      * @private
-     * @param {string} base 
-     * @param {string} className 
+     * @param {string} base
+     * @param {string} className
      * @param {HTMLElement} parent
      * @returns {HTMLElement}
      */
@@ -184,19 +170,49 @@ class WidgetWindow {
     }
 
     /**
-     * @param {*} e 
+     * @private
+     * @param {MouseEvent} e
+     * @returns {void}
+     */
+    _docMouseMoveHandler(e) {
+        if (!this._dragging) return;
+
+        const x = e.clientX - this._dx,
+            y = e.clientY - this._dy;
+
+        this.setPosition(x, y);
+    }
+
+    /**
+     * @private
+     * @param {MouseEvent} e
+     * @returns {void}
+     */
+    _docMouseDownHandler(e) {
+        if (e.target === this._frame || this._frame.contains(e.target)) {
+            this._frame.style.opacity = "1";
+            this._frame.style.zIndex = "1";
+        } else {
+            this._frame.style.opacity = ".7";
+            this._frame.style.zIndex = "0";
+        }
+    }
+
+    /**
+     * @private
+     * @param {MouseEvent} e
      * @returns {void}
      */
     _dragTopHandler(e) {
         this._dragging = false;
-        if (this._frame.style.top  === "64px"){
+        if (this._frame.style.top === "64px") {
             this._maximize();
             this.takeFocus();
             this.onmaximize();
             e.preventDefault();
             e.stopImmediatePropagation();
         }
-    };
+    }
 
     /**
      * @private
@@ -222,8 +238,8 @@ class WidgetWindow {
 
     /**
      * @public
-     * @param {string} initial 
-     * @param {HTMLElement} parent 
+     * @param {string} initial
+     * @param {HTMLElement} parent
      * @returns {HTMLElement}
      */
     addInputButton(initial, parent) {
@@ -234,11 +250,11 @@ class WidgetWindow {
 
     /**
      * @public
-     * @param {number} initial 
-     * @param {HTMLElement} parent 
-     * @param {number} min 
-     * @param {number} max 
-     * @param {string} classNm 
+     * @param {number} initial
+     * @param {HTMLElement} parent
+     * @param {number} min
+     * @param {number} max
+     * @param {string} classNm
      * @returns {HTMLElement}
      */
     addRangeSlider(initial, parent, min, max, classNm) {
@@ -284,10 +300,10 @@ class WidgetWindow {
 
     /**
      * @public
-     * @param {number} index 
-     * @param {string} icon 
-     * @param {number} iconSize 
-     * @param {string} label 
+     * @param {number} index
+     * @param {string} icon
+     * @param {number} iconSize
+     * @param {string} label
      * @returns {HTMLElement}
      */
     modifyButton(index, icon, iconSize, label) {
@@ -312,6 +328,8 @@ class WidgetWindow {
      */
     close() {
         document.removeEventListener("mouseup", this._dragTopHandler, true);
+        document.removeEventListener("mousemove", this._docMouseMoveHandler, true);
+        document.removeEventListener("mousedown", this._docMouseDownHandler, true);
         this.onclose();
     }
 
@@ -342,11 +360,11 @@ class WidgetWindow {
 
     /**
      * @public
-     * @param {*} icon 
-     * @param {*} iconSize 
-     * @param {*} label 
+     * @param {*} icon
+     * @param {*} iconSize
+     * @param {*} label
      * @param {HTMLElement} parent
-     * @returns {HTMLElement} 
+     * @returns {HTMLElement}
      */
     addButton(icon, iconSize, label, parent) {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
@@ -489,8 +507,8 @@ class WidgetWindow {
 
     /**
      * @public
-     * @param {number} x 
-     * @param {number} y 
+     * @param {number} x
+     * @param {number} y
      * @returns {WidgetWindow} this
      */
     setPosition(x, y) {
@@ -540,10 +558,10 @@ class WidgetWindow {
 }
 
 /**
- * 
- * @param {Object} widget 
- * @param {string} title 
- * @param {string} saveAs 
+ *
+ * @param {Object} widget
+ * @param {string} title
+ * @param {string} saveAs
  * @returns {WidgetWindow} this
  */
 window.widgetWindows.windowFor = (widget, title, saveAs) => {
@@ -573,7 +591,7 @@ window.widgetWindows.clear = (name) => {
 /**
  * @public
  * @param {string} name
- * @returns {boolean} 
+ * @returns {boolean}
  */
 window.widgetWindows.isOpen = (name) => {
     return window.widgetWindows.openWindows[name] ? true : "";
@@ -591,7 +609,7 @@ window.widgetWindows.hideAllWindows = () => {
 
 /**
  * @public
- * @param {string} name 
+ * @param {string} name
  */
 window.widgetWindows.hideWindow = (name) => {
     const win = window.widgetWindows.openWindows[name];
