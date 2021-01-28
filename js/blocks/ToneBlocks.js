@@ -666,9 +666,9 @@ function setupToneBlocks() {
             this.parameter = true;
 
             this.makeMacro((x, y) => [
-                [0, ["customsample", {value: ["", "", "do", 4]}], x, y, [null, 1, 2, 3]],
+                [0, ["customsample", {value: ["", "", "sol", 4]}], x, y, [null, 1, 2, 3]],
                 [1, ["audiofile", {value: null}], 0 ,0, [0]],
-                [2, ["solfege", {value: "do"}], 0, 0, [0]],
+                [2, ["solfege", {value: "sol"}], 0, 0, [0]],
                 [3, ["number", {value: 4}], 0, 0, [0]],
             ]);
         }
@@ -685,12 +685,16 @@ function setupToneBlocks() {
                 logo.statusFields.push([blk, "customsample"]);
             } else {
                 if (logo.blocks.blockList[blk].value === null) {
-                    logo.blocks.blockList[blk].value = ["", "", "do", 4];
+                    logo.blocks.blockList[blk].value = ["", "", "sol", 4];
                 }
                 let cblk1 = logo.blocks.blockList[blk].connections[1];
                 if (cblk1 != null) {
-                    let namevalue = logo.blocks.blockList[cblk1].value[0];
-                    let datavalue = logo.blocks.blockList[cblk1].value[1];
+                    let namevalue = "";
+                    let datavalue = "";
+                    if (logo.blocks.blockList[cblk1].value != null) {
+                        namevalue = logo.blocks.blockList[cblk1].value[0];
+                        datavalue = logo.blocks.blockList[cblk1].value[1];
+                    }
                     logo.blocks.blockList[blk].value[0] = namevalue;
                     logo.blocks.blockList[blk].value[1] = datavalue;
                 }
