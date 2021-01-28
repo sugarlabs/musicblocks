@@ -91,17 +91,35 @@ function SampleWidget() {
     this.pitchUp = function () {
         this._usePitch(this.pitchInput.value);
         this.pitchCenter++;
+        if (this.pitchCenter > 6) {
+            this.octaveCenter++;
+            if (this.octaveCenter > MAXOCTAVE) {
+                this.octaveCenter = MAXOCTAVE;
+            }
+            this.octaveInput.value = this.octaveCenter;
+        }
         this.pitchCenter%=7;
         this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
         this._updateBlocks();
+        this._playReferencePitch();
     };
 
     this.pitchDown = function () {
         this._usePitch(this.pitchInput.value);
         this.pitchCenter--;
+        if (this.pitchCenter < 0) {
+            this.pitchCenter = 6;
+            this.octaveCenter--;
+            if (this.octaveCenter < 0) {
+                this.octaveCenter = 0;
+            }
+            this.octaveInput.value = this.octaveCenter;
+        }
         this.pitchCenter%=7;
+        console.log(this.pitchCenter);
         this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
         this._updateBlocks();
+        this._playReferencePitch();
     };
 
     this.accidentalUp = function () {
@@ -111,6 +129,7 @@ function SampleWidget() {
         }
         this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
         this._updateBlocks();
+        this._playReferencePitch();
     };
 
     this.accidentalDown = function () {
@@ -120,6 +139,7 @@ function SampleWidget() {
         }
         this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
         this._updateBlocks();
+        this._playReferencePitch();
     };
 
     this.octaveUp = function () {
@@ -130,6 +150,7 @@ function SampleWidget() {
         }
         this.octaveInput.value = this.octaveCenter;
         this._updateBlocks();
+        this._playReferencePitch();
     };
 
     this.octaveDown = function () {
@@ -140,6 +161,7 @@ function SampleWidget() {
         }
         this.octaveInput.value = this.octaveCenter;
         this._updateBlocks();
+        this._playReferencePitch();
     };
 
 
