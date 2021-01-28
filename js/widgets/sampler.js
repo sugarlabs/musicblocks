@@ -224,11 +224,13 @@ function SampleWidget() {
         var that = this;
         setTimeout(function() {
             console.debug("saving the sample");
-
             that._addSample();
-
+            let value = { value: [that.sampleName, that.sampleData, that.samplePitch, that.octaveCenter]};
             var newStack = [
-                [0, ["audiofile", { value: [that.sampleName, that.sampleData]}], 0, 0, [null, null]],
+                [0, ["customsample", value], x, y, [null, 1, 2, 3]],
+                [1, ["audiofile", {value: [that.sampleName, that.sampleData]}], 0 ,0, [0]],
+                [2, ["solfege", {value: that.samplePitch}], 0, 0, [0]],
+                [3, ["number", {value: that.octaveCenter}], 0, 0, [0]]
             ];
 
             that._logo.blocks.loadNewBlocks(newStack);
