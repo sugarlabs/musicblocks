@@ -156,7 +156,6 @@ class PitchDrumMatrix {
 
         const w = window.innerWidth;
         this._cellScale = w / 1200;
-        const iconSize = PitchDrumMatrix.ICONSIZE * this._cellScale;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "pitch drum");
         this.widgetWindow = widgetWindow;
@@ -485,6 +484,7 @@ class PitchDrumMatrix {
                 cell = cellRow.cells[j];
 
                 drumRow = drumTable.rows[0];
+                // eslint-disable-next-line no-unused-vars
                 drumCell = drumRow.cells[j];
 
                 cell.onclick = (e) => {
@@ -542,7 +542,7 @@ class PitchDrumMatrix {
      * @private
      * @returns {void}
      */
-    
+
     _playAll() {
         // Play all of the pitch/drum combinations in the matrix.
         this._logo.synth.stop();
@@ -588,7 +588,7 @@ class PitchDrumMatrix {
         // Find the drum cell
         const drumTable = docById("pdmDrumTable");
         let row = drumTable.rows[0];
-        const drumCell = row.cells[i];
+        // const drumCell = row.cells[i];
 
         let pdmTable = docById("pdmTable");
         const table = docById("pdmCellTable" + i);
@@ -681,7 +681,7 @@ class PitchDrumMatrix {
         }
     }
 
-    
+
 
     _setPairCell(rowIndex, colIndex, cell, playNote) {
         const pdmTable = docById("pdmTable");
@@ -785,7 +785,7 @@ class PitchDrumMatrix {
             [0, ["action", { collapsed: true }], 100, 100, [null, 1, 2, null]],
             [1, ["text", { value: "drums" }], 0, 0, [0]]
         ];
-        const endOfStackIdx = 0;
+        // const endOfStackIdx = 0;
         let previousBlock = 0;
 
         let col;
