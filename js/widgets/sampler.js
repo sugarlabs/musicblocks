@@ -7,14 +7,16 @@ function SampleWidget() {
     const RENDERINTERVAL = 50;
 
     const TRUEACCIDENTALNAMES = ["𝄫", "♭", "♮", "♯", "𝄪"];
+    //using these characters can cause issues.
     const ACCIDENTALNAMES = ["bb", "b", "", "#", "x"];
     const SOLFEGENAMES = ["do", "re", "me", "fa", "sol", "la", "ti", "do"];
-    const DEFAULTACCIDENTAL = "-";
+    const MAJORSCALE = [0, 2, 4, 5, 7, 9, 11];
+    const DEFAULTACCIDENTAL = "";
     const DEFAULTSOLFEGE = "do";
 
     const REFERENCESAMPLE = "electronic synth";
     const DEFAULTSAMPLE = "electronic synth";
-    const CENTERPITCHHERTZ = 200;
+    const CENTERPITCHHERTZ = 130;
 
     const MAXOCTAVE = 10;
 
