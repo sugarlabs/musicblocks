@@ -261,7 +261,7 @@ const SAMPLECENTERNO = {
     "double bass": ["C4", 39]
 };
 
-CUSTOMSAMPLES = [];
+CUSTOMSAMPLES = {};
 
 const percussionInstruments = ["koto", "banjo", "dulcimer", "xylophone", "celeste"];
 const stringInstruments = ["piano", "guitar", "acoustic guitar", "electric guitar"];
@@ -702,15 +702,14 @@ function Synth() {
                 return;
             }
             console.debug(sampleName + " sample was not already in sample library");
-            /*
-            for (let customsample in CUSTOMSAMPLES) {
-                if (CUSTOMSAMPLES[customsample].includes(sampleName)) {
+
+            for (let key in CUSTOMSAMPLES) {
+                if (CUSTOMSAMPLES.hasOwnProperty(key)) {
                     console.log("loaded custom sample");
-                    this.samples["voice"][CUSTOMSAMPLES[customsample][0]] = CUSTOMSAMPLES[customsample][1];
+                    this.samples["voice"][key] = CUSTOMSAMPLES[key];
                     return;
                 }
             }
-            */
         }
     };
 

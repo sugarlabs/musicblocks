@@ -1789,8 +1789,8 @@ class Block {
                     let filename = fileChooser.files[0].name;
                     if (that.name === "audiofile") {
                         that.value = [filename, filevalue];
-                        if (!(CUSTOMSAMPLES.includes([filename, filevalue]))) {
-                            CUSTOMSAMPLES.push([filename, filevalue]);
+                        if (!(CUSTOMSAMPLES.hasOwnProperty(filename))) {
+                            CUSTOMSAMPLES[filename] = filevalue;
                             that.blocks.updateBlockText(thisBlock);
                         }
                     }
