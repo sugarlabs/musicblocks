@@ -16,21 +16,23 @@ function SampleWidget() {
 
     const REFERENCESAMPLE = "electronic synth";
     const DEFAULTSAMPLE = "electronic synth";
-    const CENTERPITCHHERTZ = 130;
+    const CENTERPITCHHERTZ = 220;
 
     const MAXOCTAVE = 10;
 
+    this.sampleBlock;
 
     this.sampleData = "";
-    this.freqArray = new Uint8Array();
     this.sampleName = DEFAULTSAMPLE;
-    this.samplePitch = "sol";
 
+    this.samplePitch = "sol";
     this.pitchCenter = 9;
+
     this.accidentalCenter = 2;
     this.octaveCenter = 4;
 
-    this.sampleBlock;
+    this.freqArray = new Uint8Array();
+
 
     this._updateBlocks = function (i) {
 
@@ -57,8 +59,7 @@ function SampleWidget() {
                     this._logo.blocks.blockList[solfegeBlock].updateCache();
                 }
                 if (octaveBlock != null) {
-                    this._logo.blocks.blockList[octaveBlock].value = this.octaveCenter;
-                    console.log(this._logo.blocks.blockList[octaveBlock].value);
+                    this._logo.blocks.blockList[octaveBlock].value = this.octaveCenter.toString();
                     this._logo.blocks.blockList[octaveBlock].updateCache();
                 }
                 this._logo.refreshCanvas();
@@ -118,7 +119,6 @@ function SampleWidget() {
         this.pitchCenter%=7;
         console.log(this.pitchCenter);
         this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
-        this._updateBlocks();
         this._playReferencePitch();
     };
 
@@ -128,7 +128,6 @@ function SampleWidget() {
             this.accidentalCenter++;
         }
         this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
-        this._updateBlocks();
         this._playReferencePitch();
     };
 
@@ -138,7 +137,6 @@ function SampleWidget() {
             this.accidentalCenter--;
         }
         this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
-        this._updateBlocks();
         this._playReferencePitch();
     };
 
@@ -149,7 +147,6 @@ function SampleWidget() {
             this.octaveCenter = MAXOCTAVE;
         }
         this.octaveInput.value = this.octaveCenter;
-        this._updateBlocks();
         this._playReferencePitch();
     };
 
@@ -160,7 +157,6 @@ function SampleWidget() {
             this.octaveCenter = 0;
         }
         this.octaveInput.value = this.octaveCenter;
-        this._updateBlocks();
         this._playReferencePitch();
     };
 
@@ -169,20 +165,17 @@ function SampleWidget() {
         let number = SOLFEGENAMES.indexOf(this.pitchInput.value);
         this.pitchCenter = (number==-1) ? 0 : number;
         this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
-        this._updateBlocks();
     }
 
     this._useAccidental = function () {
         let number = ACCIDENTALNAMES.indexOf(this.accidentalInput.value);
         this.accidentalCenter = (number==-1) ? 2 : number;
         this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
-        this._updateBlocks();
     }
 
     this._useOctave = function () {
         this.octaveCenter = this.octaveInput.value;
         this.octaveInput.value = this.octaveCenter;
-        this._updateBlocks();
     }
 
 
