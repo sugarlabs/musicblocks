@@ -12,6 +12,19 @@
 // This widget enable us to manipulate the beats per minute. It
 // behaves like a metronome and updates the master BPM block.
 
+/* global logo, _, saveLocally, getDrumSynthName */
+
+/*
+   Global locations
+    js/activity.js
+        logo, saveLocally
+    js/utils/musicutils.js
+        getDrumSynthName
+    js/utils/utils.js
+        _
+*/
+
+/*exported Tempo */
 class Tempo {
     static TEMPOSYNTH = "bottle";
     static TEMPOINTERVAL = 5;
@@ -187,7 +200,7 @@ class Tempo {
 
     __save(i) {
         setTimeout(() => {
-            console.debug("saving a BPM block for " + this.BPMs[i]);
+            // console.debug("saving a BPM block for " + this.BPMs[i]);
             const delta = i * 42;
             const newStack = [
                 [0, ["setbpm3", {}], 100 + delta, 100 + delta, [null, 1, 2, 5]],
