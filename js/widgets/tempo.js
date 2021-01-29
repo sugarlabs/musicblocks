@@ -195,6 +195,11 @@ class Tempo {
         widgetWindow.sendToCenter();
     }
 
+    /**
+     * @private
+     * @param {number} i
+     * @returns {void}
+     */
     _updateBPM(i) {
         this._intervals[i] = (60 / this.BPMs[i]) * 1000;
 
@@ -211,10 +216,18 @@ class Tempo {
         }
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     pause() {
         clearInterval(this._intervalID);
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     resume() {
         // Reset widget time since we are restarting. We will no longer keep synch with the turtles.
         const d = new Date();
@@ -234,6 +247,11 @@ class Tempo {
         }, Tempo.TEMPOINTERVAL);
     }
 
+    /**
+     * @private
+     * @param {number} i
+     * @returns {void}
+     */
     _useBPM(i) {
         this.BPMs[i] = this.BPMInputs[i].value;
         if (this.BPMs[i] > 1000) {
@@ -248,6 +266,11 @@ class Tempo {
         this.BPMInputs[i].value = this.BPMs[i];
     }
 
+    /**
+     * @public
+     * @param {number} i
+     * @returns {void}
+     */
     speedUp(i) {
         this.BPMs[i] = parseFloat(this.BPMs[i]) + Math.round(0.1 * this.BPMs[i]);
 
@@ -259,6 +282,11 @@ class Tempo {
         this.BPMInputs[i].value = this.BPMs[i];
     }
 
+    /**
+     * @public
+     * @param {number} i
+     * @returns {void}
+     */
     slowDown(i) {
         this.BPMs[i] = parseFloat(this.BPMs[i]) - Math.round(0.1 * this.BPMs[i]);
         if (this.BPMs[i] < 30) {
@@ -269,6 +297,10 @@ class Tempo {
         this.BPMInputs[i].value = this.BPMs[i];
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _draw() {
         // First thing to do is figure out where we are supposed to be based on the elapsed time.
         const d = new Date();
@@ -350,6 +382,11 @@ class Tempo {
         }
     }
 
+    /**
+     * @private
+     * @param {number} i
+     * @returns {void}
+     */
     __save(i) {
         setTimeout(() => {
             // console.debug("saving a BPM block for " + this.BPMs[i]);
@@ -367,6 +404,10 @@ class Tempo {
         }, 200 * i);
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _saveTempo() {
         // Save a BPM block for each tempo.
         for (let i = 0; i < this.BPMs.length; i++) {
@@ -374,6 +415,10 @@ class Tempo {
         }
     }
 
+    /**
+     * @private
+     * @returns {HTMLElement}
+     */
     _get_save_lock() {
         return this._save_lock;
     }
