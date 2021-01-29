@@ -13,6 +13,7 @@
 // This widget makes displays the status of selected parameters and
 // notes as they are being played.
 
+/* exported StatusMatrix */
 class StatusMatrix {
     static BUTTONDIVWIDTH = 128;
     static BUTTONSIZE = 53;
@@ -21,12 +22,12 @@ class StatusMatrix {
     static INNERWINDOWWIDTH = StatusMatrix.OUTERWINDOWWIDTH - StatusMatrix.BUTTONSIZE * 1.5;
     static FONTSCALEFACTOR = 75;
 
+    /**
+     * Initializes the status matrix. First removes the
+     * previous matrix and them make another one in DOM (document
+     * object model)
+     */
     init() {
-        let x, y; //Drop coordinates of statusDiv
-        // Initializes the status matrix. First removes the
-        // previous matrix and them make another one in DOM (document
-        // object model)
-
         this.isOpen = true;
 
         this._cellScale = window.innerWidth / 1200;
@@ -100,7 +101,7 @@ class StatusMatrix {
             cell.className = "headcol";
         }
 
-        console.debug("active turtles: " + turtles.turtleList.length);
+        // console.debug("active turtles: " + turtles.turtleList.length);
 
         // One row per field, one column per mouse (plus the labels)
         let label;
@@ -110,7 +111,7 @@ class StatusMatrix {
             cell = row.insertCell(); // i + 1);
             cell.style.fontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) + "%";
 
-            console.debug(statusField[1]);
+            // console.debug(statusField[1]);
 
             switch (statusField[1]) {
                 case "plus":
@@ -132,17 +133,15 @@ class StatusMatrix {
                     if (localStorage.languagePreference === "ja") {
                         label = _("beats per minute2");
                     } else {
-                        label = logo.blocks.blockList[statusField[0]]
-                            .protoblock.staticLabels[0];
+                        label = logo.blocks.blockList[statusField[0]].protoblock.staticLabels[0];
                     }
-                    console.debug(label);
+                    // console.debug(label);
                     break;
                 case "outputtools":
                     label = logo.blocks.blockList[statusField[0]].privateData;
                     break;
                 default:
-                    label = logo.blocks.blockList[statusField[0]].protoblock
-                        .staticLabels[0];
+                    label = logo.blocks.blockList[statusField[0]].protoblock.staticLabels[0];
                     break;
             }
 
@@ -153,11 +152,12 @@ class StatusMatrix {
             turtles.turtleList.forEach(() => {
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
-                cell.style.fontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) + "%";
+                cell.style.fontSize =
+                    Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) + "%";
                 cell.innerHTML = "";
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.textAlign = "center";
-            })
+            });
         }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -168,14 +168,15 @@ class StatusMatrix {
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
 
-            turtles.turtleList.forEach(()=>{
+            turtles.turtleList.forEach(() => {
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
-                cell.style.fontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) + "%";
+                cell.style.fontSize =
+                    Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) + "%";
                 cell.innerHTML = "";
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.textAlign = "center";
-            })
+            });
         }
         this.widgetWindow.sendToCenter();
     }
@@ -214,29 +215,22 @@ class StatusMatrix {
                         value = logo.blocks.blockList[statusField[0]].value.toFixed(0);
                         break;
                     case "mynotevalue":
-                        value = mixedNumber(
-                            logo.blocks.blockList[statusField[0]].value
-                        );
+                        value = mixedNumber(logo.blocks.blockList[statusField[0]].value);
                         break;
                     case "elapsednotes2":
                         blk = statusField[0];
                         cblk = logo.blocks.blockList[blk].connections[1];
                         noteValue = logo.parseArg(logo, t, cblk, blk, null);
                         value =
-                            mixedNumber(
-                                logo.blocks.blockList[statusField[0]].value
-                            ) +
+                            mixedNumber(logo.blocks.blockList[statusField[0]].value) +
                             " × " +
                             mixedNumber(noteValue);
                         break;
                     case "elapsednotes":
-                        value = mixedNumber(
-                            logo.blocks.blockList[statusField[0]].value
-                        );
+                        value = mixedNumber(logo.blocks.blockList[statusField[0]].value);
                         break;
                     case "namedbox":
-                        name = logo.blocks.blockList[statusField[0]]
-                            .privateData;
+                        name = logo.blocks.blockList[statusField[0]].privateData;
                         if (name in logo.boxes) {
                             value = logo.boxes[name];
                         } else {
@@ -316,6 +310,5 @@ class StatusMatrix {
         }
 
         logo.updatingStatusMatrix = false;
-    };
-
+    }
 }
