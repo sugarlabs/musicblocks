@@ -25,7 +25,13 @@ jobs:
 
       - name: Get changed files
         id: getfile
-        run: echo "::set-output name=files::$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | xargs)"
+        run: |
+          if [[ ${{ github.event_name }} == "pull_request" ]]
+          then
+            echo "::set-output name=files::$(git diff --name-status ${{ github.event.pull_request.head.sha }} ${{ github.event.pull_request.base.sha }} | xargs)"
+          else
+            echo "::set-output name=files::$(git diff --name-status ${{ github.sha }} | xargs)"
+          fi
 
       - name: Install ESLint
         run: npm install eslint
@@ -34,8 +40,15 @@ jobs:
         run: |
           for i in ${{ steps.getfile.outputs.files }}
           do
-            echo "file $i"
-            if [[ "$i" == *".js" ]]
+            if [[ "$i" == "D" ]]
+            then
+              ignore=1
+            elif [[ ( "$i" == "M" ) || ( "$i" == "A" ) || ( "$i" == "R" ) || ( "$i" == "C" ) || ( "$i" == "U" ) ]]
+            then
+              ignore=0
+            fi
+            echo "file $i $ignore"
+            if [[ "$i" == *".js" && $ignore == 0 ]]
             then
               echo "linting $i"
               npx eslint $i
