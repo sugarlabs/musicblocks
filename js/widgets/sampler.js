@@ -255,13 +255,17 @@ function SampleWidget() {
 
         this._logo.synth.loadSynth(0, getVoiceSynthName(DEFAULTSAMPLE));
 
-        /*
-        for (i=0;i<CUSTOMSAMPLES.length;i++) {
-            if (CUSTOMSAMPLES[i][0] == this.sampleName) {
-                this.sampleData = CUSTOMSAMPLES[i][1];
+
+        for (let key in CUSTOMSAMPLES) {
+            if (CUSTOMSAMPLES.hasOwnProperty(key)) {
+                if (this.sampleName == key) {
+                    this.sampleData = CUSTOMSAMPLES[key];
+                }
             }
         }
-        */
+
+        this._parseSamplePitch();
+
 
         if (this._intervalID != null) {
             clearInterval(this._intervalID);
@@ -345,7 +349,8 @@ function SampleWidget() {
                         '" width="' +
                         ICONSIZE +
                         '" vertical-align="middle">';
-                    this._usePitch(this.pitchInput.value);
+                    console.log(getVoiceSynthName(this.sampleName));
+                    console.log(CUSTOMSAMPLES);
                     this._logo.synth.loadSynth(0, getVoiceSynthName(this.sampleName));
                     let finalpitch = CENTERPITCHHERTZ;
                     this._logo.synth.trigger(
@@ -513,20 +518,17 @@ function SampleWidget() {
     };
 
     this._addSample = function() {
-        for (i=0; i < CUSTOMSAMPLES.length; i++) {
-            if (CUSTOMSAMPLES[i][0] == this.sampleName) {
-                return;
-            }
+
+        if (CUSTOMSAMPLES.hasOwnProperty(this.sampleName)) {
+            return;
         }
-        CUSTOMSAMPLES.push([this.sampleName, this.sampleData]);
-        console.log(CUSTOMSAMPLES);
+        CUSTOMSAMPLES[this.sampleName] = this.sampleData;
     }
 
     this._playReferencePitch = function() {
         this._usePitch(this.pitchInput.value);
         this._useAccidental(this.accidentalInput.value);
         this._useOctave(this.octaveInput.value);
-        this._logo.synth.loadSynth(0, getVoiceSynthName(REFERENCESAMPLE));
         let finalCenter = 0;
 
         finalCenter += isNaN(this.octaveCenter)     ? 0 : this.octaveCenter*12;
@@ -535,7 +537,6 @@ function SampleWidget() {
 
         let netChange = finalCenter-57;
         let finalpitch = Math.floor(440 * Math.pow(2, netChange/12));
-        console.log(finalpitch);
         this._logo.synth.trigger(
             0,
             [finalpitch],
@@ -545,6 +546,12 @@ function SampleWidget() {
             null,
             false);
         this.isMoving = true;
+    }
+
+    this._parseSamplePitch = function () {
+        console.log(this.samplePitch);
+        this.pitchCenter = this.samplePitch;
+
     }
 
 
