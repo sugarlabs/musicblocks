@@ -181,6 +181,10 @@ class StatusMatrix {
         this.widgetWindow.sendToCenter();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     updateAll() {
         // Update status of all of the voices in the matrix.
         logo.updatingStatusMatrix = true;
