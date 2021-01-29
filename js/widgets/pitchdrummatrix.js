@@ -63,74 +63,6 @@ class PitchDrumMatrix {
     }
 
     /**
-     * @public
-     * @returns {void}
-     */
-    clearBlocks() {
-        this._rowBlocks = [];
-        this._colBlocks = [];
-    }
-
-    /**
-     * @public
-     * @param {number} pitchBlock
-     * @return {void}
-     */
-    addRowBlock(pitchBlock) {
-        this._rowBlocks.push(pitchBlock);
-    }
-
-    /**
-     * @public
-     * @param {number} drumBlock
-     * @return {void}
-     */
-    addColBlock(drumBlock) {
-        this._colBlocks.push(drumBlock);
-    }
-
-    /**
-     * @public
-     * @param {number} pitchBlock
-     * @param {number} drumBlock
-     * @returns {void}
-     */
-    addNode(pitchBlock, drumBlock) {
-        let obj;
-        for (let i = 0; i < this._blockMap.length; i++) {
-            obj = this._blockMap[i];
-            if (obj[0] === pitchBlock && obj[1] === drumBlock) {
-                return; // node is already in the list
-            }
-        }
-        this._blockMap.push([pitchBlock, drumBlock]);
-    }
-
-    /**
-     * @public
-     * @param {number} pitchBlock
-     * @param {number} drumBlock
-     * @returns {void}
-     */
-    removeNode(pitchBlock, drumBlock) {
-        let obj;
-        for (let i = 0; i < this._blockMap.length; i++) {
-            obj = this._blockMap[i];
-            if (obj[0] === pitchBlock && obj[1] === drumBlock) {
-                this._blockMap[i] = [-1, -1]; // Mark as removed
-            }
-        }
-    }
-
-    /**
-     * @private
-     * @returns {HTMLElement}
-     */
-    _get_save_lock() {
-        return this._save_lock;
-    }
-
-    /**
      * Initializes the pitch/drum matrix. First removes the previous matrix and them make another
      * one in DOM (Document Object Model).
      */
@@ -330,6 +262,74 @@ class PitchDrumMatrix {
         };
 
         logo.textMsg(_("Click in the grid to map notes to drums."));
+    }
+
+    /**
+     * @public
+     * @returns {void}
+     */
+    clearBlocks() {
+        this._rowBlocks = [];
+        this._colBlocks = [];
+    }
+
+    /**
+     * @public
+     * @param {number} pitchBlock
+     * @return {void}
+     */
+    addRowBlock(pitchBlock) {
+        this._rowBlocks.push(pitchBlock);
+    }
+
+    /**
+     * @public
+     * @param {number} drumBlock
+     * @return {void}
+     */
+    addColBlock(drumBlock) {
+        this._colBlocks.push(drumBlock);
+    }
+
+    /**
+     * @public
+     * @param {number} pitchBlock
+     * @param {number} drumBlock
+     * @returns {void}
+     */
+    addNode(pitchBlock, drumBlock) {
+        let obj;
+        for (let i = 0; i < this._blockMap.length; i++) {
+            obj = this._blockMap[i];
+            if (obj[0] === pitchBlock && obj[1] === drumBlock) {
+                return; // node is already in the list
+            }
+        }
+        this._blockMap.push([pitchBlock, drumBlock]);
+    }
+
+    /**
+     * @public
+     * @param {number} pitchBlock
+     * @param {number} drumBlock
+     * @returns {void}
+     */
+    removeNode(pitchBlock, drumBlock) {
+        let obj;
+        for (let i = 0; i < this._blockMap.length; i++) {
+            obj = this._blockMap[i];
+            if (obj[0] === pitchBlock && obj[1] === drumBlock) {
+                this._blockMap[i] = [-1, -1]; // Mark as removed
+            }
+        }
+    }
+
+    /**
+     * @private
+     * @returns {HTMLElement}
+     */
+    _get_save_lock() {
+        return this._save_lock;
     }
 
     /**
