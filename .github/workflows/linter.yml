@@ -1,4 +1,4 @@
-name: Linter
+name: Super-Linter
 
 # Triggers the workflow on push or pull request events only for the master branch
 on:
@@ -9,15 +9,20 @@ on:
 
 jobs:
   build:
+    name: Lint updated JavaScript files
+
     runs-on: ubuntu-latest
 
     steps:
-      # Checks-out repository under $GITHUB_WORKSPACE, so job can access it
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        # Checks-out repository under $GITHUB_WORKSPACE, so job can access it
+        uses: actions/checkout@v2
+        with:
+          # Full git history is needed to get a proper list of changed files within `super-linter`
+          fetch-depth: 0
 
-      # Runs the linter
-      # - name: Super-Linter
-      #   uses: docker://github/super-linter:v3.3.0
-      #   env:
-      #     VALIDATE_ALL_CODEBASE: false
-      #     DISABLE_ERRORS: true
+      - name: Run Super-Linter
+        uses: github/super-linter@v3
+        env:
+          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_JAVASCRIPT_STANDARD: false # VALIDATE_JAVASCRIPT_ES is desired (true by default)
