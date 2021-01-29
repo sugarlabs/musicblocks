@@ -326,7 +326,7 @@ function setupWidgetBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
-                logo.timbre.init(logo);
+                logo.timbre.init();
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
