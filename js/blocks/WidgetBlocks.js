@@ -39,10 +39,10 @@ function setupWidgetBlocks() {
                     logo.errorMsg(_("Release value should be from 0-100."));
                 }
 
-                turtle.singer.attack.push(args[0] / 100);
-                turtle.singer.decay.push(args[1] / 100);
-                turtle.singer.sustain.push(args[2] / 100);
-                turtle.singer.release.push(args[3] / 100);
+                tur.singer.attack.push(args[0] / 100);
+                tur.singer.decay.push(args[1] / 100);
+                tur.singer.sustain.push(args[2] / 100);
+                tur.singer.release.push(args[3] / 100);
             }
 
             if (logo.inTimbre) {

@@ -151,11 +151,11 @@ class TimbreWidget {
         cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = platformColor.selectorBackground;
 
-        cell.onmouseover = function () {
+        cell.onmouseover = () => {
             this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         };
 
-        cell.onmouseout = function () {
+        cell.onmouseout = () => {
             this.style.backgroundColor = platformColor.selectorBackground;
         };
 
@@ -242,15 +242,13 @@ class TimbreWidget {
                 updateParams[1] = n + 2; // Denom block
                 updateParams[2] = n + 1; // Numerator block
 
-                const that = this;
-
-                const __blockRefresher = function () {
-                    blocks.blockList[last(that.vibratoEffect)].connections[2] = n;
-                    blocks.blockList[n].connections[0] = last(that.vibratoEffect);
+                const __blockRefresher = () => {
+                    blocks.blockList[last(this.vibratoEffect)].connections[2] = n;
+                    blocks.blockList[n].connections[0] = last(this.vibratoEffect);
                     blocks.blockList[divBlock].connections[0] = null;
                     blocks.clampBlocksToCheck.push([n, 0]);
-                    blocks.clampBlocksToCheck.push([that.blockNo, 0]);
-                    blocks.adjustDocks(that.blockNo, true);
+                    blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+                    blocks.adjustDocks(this.blockNo, true);
                 };
 
                 setTimeout(__blockRefresher(), 250);
@@ -398,8 +396,6 @@ class TimbreWidget {
                 '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
         }
 
-        const that = this;
-
         if (this.notesToPlay.length === 0) {
             this.notesToPlay = [
                 ["G4", 1 / 4],
@@ -409,15 +405,15 @@ class TimbreWidget {
         }
 
         const __playLoop = (i) => {
-            if (that._playing) {
-                that._playNote(that.notesToPlay[i][0], that.notesToPlay[i][1]);
+            if (this._playing) {
+                this._playNote(this.notesToPlay[i][0], this.notesToPlay[i][1]);
             }
 
             i += 1;
-            if (i < that.notesToPlay.length && that._playing) {
-                setTimeout(function () {
+            if (i < this.notesToPlay.length && this._playing) {
+                setTimeout(() => {
                     __playLoop(i);
-                }, Singer.defaultBPMFactor * 1000 * that.notesToPlay[i - 1][1]);
+                }, Singer.defaultBPMFactor * 1000 * this.notesToPlay[i - 1][1]);
             } else {
                 cell.innerHTML =
                     '&nbsp;&nbsp;<img src="header-icons/' +
@@ -431,7 +427,7 @@ class TimbreWidget {
                     '" width="' +
                     TimbreWidget.ICONSIZE +
                     '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-                that._playing = false;
+                this._playing = false;
             }
         };
 
@@ -653,16 +649,14 @@ class TimbreWidget {
         const w = window.innerWidth;
         this._cellScale = w / 1200;
 
-        const that = this;
-
         widgetWindow.getWidgetBody().append(this.timbreTableDiv);
         widgetWindow.getWidgetBody().style.height = "500px";
         widgetWindow.getWidgetBody().style.width = "600px";
         widgetWindow.getWidgetBody().style.overflowY = "auto";
 
-        widgetWindow.onclose = function () {
+        widgetWindow.onclose = () => {
             logo.hideMsgs();
-            this.destroy();
+            widgetWindow.destroy();
         };
 
         this.playButton = widgetWindow.addButton(
@@ -671,16 +665,16 @@ class TimbreWidget {
             _("Play")
         );
 
-        this.playButton.onclick = function () {
-            that._play();
+        this.playButton.onclick = () => {
+            this._play();
         };
 
         widgetWindow.addButton(
             "export-chunk.svg",
             TimbreWidget.ICONSIZE,
             _("Save")
-        ).onclick = function () {
-            that._save();
+        ).onclick = () => {
+            this._save();
         };
 
         let _unhighlightButtons; // defined later to avoid circular dependency
@@ -693,16 +687,16 @@ class TimbreWidget {
         synthButtonCell.id = "synthButtonCell";
         this.isActive["synth"] = false;
 
-        synthButtonCell.onclick = function () {
+        synthButtonCell.onclick = () => {
             _unhighlightButtons();
-            for (let i = 0; i < that.activeParams.length; i++) {
-                that.isActive[that.activeParams[i]] = false;
+            for (let i = 0; i < this.activeParams.length; i++) {
+                this.isActive[this.activeParams[i]] = false;
             }
 
-            that.isActive["synth"] = true;
+            this.isActive["synth"] = true;
 
-            if (that.osc.length === 0) {
-                that._synth();
+            if (this.osc.length === 0) {
+                this._synth();
             } else {
                 logo.errorMsg(_("Unable to use synth due to existing oscillator"));
             }
@@ -716,16 +710,16 @@ class TimbreWidget {
         oscillatorButtonCell.id = "oscillatorButtonCell";
         this.isActive["oscillator"] = false;
 
-        oscillatorButtonCell.onclick = function () {
+        oscillatorButtonCell.onclick = () => {
             _unhighlightButtons();
-            for (let i = 0; i < that.activeParams.length; i++) {
-                that.isActive[that.activeParams[i]] = false;
+            for (let i = 0; i < this.activeParams.length; i++) {
+                this.isActive[this.activeParams[i]] = false;
             }
 
-            that.isActive["oscillator"] = true;
+            this.isActive["oscillator"] = true;
 
-            if (that.osc.length === 0) {
-                const topOfClamp = blocks.blockList[that.blockNo].connections[2];
+            if (this.osc.length === 0) {
+                const topOfClamp = blocks.blockList[this.blockNo].connections[2];
                 const bottomOfClamp = blocks.findBottomBlock(topOfClamp);
 
                 const OSCILLATOROBJ = [
@@ -736,24 +730,24 @@ class TimbreWidget {
                 blocks.loadNewBlocks(OSCILLATOROBJ);
 
                 const n = blocks.blockList.length - 3;
-                that.osc.push(n);
-                that.oscParams.push(DEFAULTOSCILLATORTYPE);
-                that.oscParams.push(6);
+                this.osc.push(n);
+                this.oscParams.push(DEFAULTOSCILLATORTYPE);
+                this.oscParams.push(6);
 
-                setTimeout(that.blockConnection(3, bottomOfClamp), 500);
+                setTimeout(this.blockConnection(3, bottomOfClamp), 500);
 
-                that._oscillator(true);
+                this._oscillator(true);
             } else {
-                that._oscillator(false);
+                this._oscillator(false);
             }
 
             if (
-                that.osc.length !== 0 &&
-                (that.AMSynthesizer.length !== 0 ||
-                    that.FMSynthesizer.length !== 0 ||
-                    that.duoSynthesizer.length !== 0)
+                this.osc.length !== 0 &&
+                (this.AMSynthesizer.length !== 0 ||
+                    this.FMSynthesizer.length !== 0 ||
+                    this.duoSynthesizer.length !== 0)
             ) {
-                that._oscillator(false);
+                this._oscillator(false);
             }
         };
 
@@ -765,16 +759,16 @@ class TimbreWidget {
         envelopeButtonCell.id = "envelopeButtonCell";
         this.isActive["envelope"] = false;
 
-        envelopeButtonCell.onclick = function () {
+        envelopeButtonCell.onclick = () => {
             _unhighlightButtons();
-            for (let i = 0; i < that.activeParams.length; i++) {
-                that.isActive[that.activeParams[i]] = false;
+            for (let i = 0; i < this.activeParams.length; i++) {
+                this.isActive[this.activeParams[i]] = false;
             }
 
-            that.isActive["envelope"] = true;
+            this.isActive["envelope"] = true;
 
-            if (that.env.length === 0) {
-                const topOfClamp = blocks.blockList[that.blockNo].connections[2];
+            if (this.env.length === 0) {
+                const topOfClamp = blocks.blockList[this.blockNo].connections[2];
                 const bottomOfClamp = blocks.findBottomBlock(topOfClamp);
 
                 const ENVOBJ = [
@@ -787,17 +781,17 @@ class TimbreWidget {
                 blocks.loadNewBlocks(ENVOBJ);
 
                 const n = blocks.blockList.length - 5;
-                that.env.push(n);
-                that.ENVs.push(1);
-                that.ENVs.push(50);
-                that.ENVs.push(60);
-                that.ENVs.push(1);
+                this.env.push(n);
+                this.ENVs.push(1);
+                this.ENVs.push(50);
+                this.ENVs.push(60);
+                this.ENVs.push(1);
 
-                setTimeout(that.blockConnection(5, bottomOfClamp), 500);
+                setTimeout(this.blockConnection(5, bottomOfClamp), 500);
 
-                that._envelope(true); // create a new synth instrument
+                this._envelope(true); // create a new synth instrument
             } else {
-                that._envelope(false);
+                this._envelope(false);
             }
         };
 
@@ -809,14 +803,14 @@ class TimbreWidget {
         effectsButtonCell.id = "effectsButtonCell";
         this.isActive["effects"] = false;
 
-        effectsButtonCell.onclick = function () {
+        effectsButtonCell.onclick = () => {
             _unhighlightButtons();
-            for (let i = 0; i < that.activeParams.length; i++) {
-                that.isActive[that.activeParams[i]] = false;
+            for (let i = 0; i < this.activeParams.length; i++) {
+                this.isActive[this.activeParams[i]] = false;
             }
 
-            that.isActive["effects"] = true;
-            that._effects();
+            this.isActive["effects"] = true;
+            this._effects();
         };
 
         const filterButtonCell = widgetWindow.addButton(
@@ -827,16 +821,16 @@ class TimbreWidget {
         filterButtonCell.id = "filterButtonCell";
         this.isActive["filter"] = false;
 
-        filterButtonCell.onclick = function () {
+        filterButtonCell.onclick = () => {
             _unhighlightButtons();
-            for (let i = 0; i < that.activeParams.length; i++) {
-                that.isActive[that.activeParams[i]] = false;
+            for (let i = 0; i < this.activeParams.length; i++) {
+                this.isActive[this.activeParams[i]] = false;
             }
 
-            that.isActive["filter"] = true;
+            this.isActive["filter"] = true;
 
-            if (that.fil.length === 0) {
-                const topOfClamp = blocks.blockList[that.blockNo].connections[2];
+            if (this.fil.length === 0) {
+                const topOfClamp = blocks.blockList[this.blockNo].connections[2];
                 const bottomOfClamp = blocks.findBottomBlock(topOfClamp);
 
                 const FILTEROBJ = [
@@ -848,15 +842,15 @@ class TimbreWidget {
                 blocks.loadNewBlocks(FILTEROBJ);
 
                 const n = blocks.blockList.length - 4;
-                that.fil.push(n);
-                that.filterParams.push(DEFAULTFILTERTYPE);
-                that.filterParams.push(-12);
-                that.filterParams.push(392);
+                this.fil.push(n);
+                this.filterParams.push(DEFAULTFILTERTYPE);
+                this.filterParams.push(-12);
+                this.filterParams.push(392);
 
-                setTimeout(that.blockConnection(4, bottomOfClamp), 500);
+                setTimeout(this.blockConnection(4, bottomOfClamp), 500);
             }
 
-            that._filter();
+            this._filter();
         };
 
         const addFilterButtonCell = widgetWindow.addButton(
@@ -866,22 +860,22 @@ class TimbreWidget {
         );
         addFilterButtonCell.style.backgroundColor = "#808080";
 
-        addFilterButtonCell.onclick = function () {
-            if (that.isActive["filter"]) {
-                that._addFilter();
+        addFilterButtonCell.onclick = () => {
+            if (this.isActive["filter"]) {
+                this._addFilter();
             }
         };
 
-        addFilterButtonCell.onmouseover = function () {};
+        addFilterButtonCell.onmouseover = () => {};
 
-        addFilterButtonCell.onmouseout = function () {};
+        addFilterButtonCell.onmouseout = () => {};
 
         widgetWindow.addButton(
             "restore-button.svg",
             TimbreWidget.ICONSIZE,
             _("Undo")
-        ).onclick = function () {
-            that._undo();
+        ).onclick = () => {
+            this._undo();
         };
 
         // let cell = this._addButton(row, 'close-button.svg', TimbreWidget.ICONSIZE, _('Close'));
@@ -1046,13 +1040,11 @@ class TimbreWidget {
     }
 
     _synth() {
-        //  console.debug('heysynth');
-        const that = this;
         let blockValue = 0;
 
         docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
-        docById("synthButtonCell").onmouseover = function () {};
-        docById("synthButtonCell").onmouseout = function () {};
+        docById("synthButtonCell").onmouseover = () => {};
+        docById("synthButtonCell").onmouseout = () => {};
 
         this.timbreTableDiv.style.display = "inline";
         this.timbreTableDiv.style.visibility = "visible";
@@ -1091,21 +1083,21 @@ class TimbreWidget {
         const synthsName = docByName("synthsName");
         let synthChosen;
         for (let i = 0; i < synthsName.length; i++) {
-            synthsName[i].onclick = function () {
-                synthChosen = this.value;
+            synthsName[i].onclick = (event) => {
+                synthChosen = event.target.value;
                 let subHtmlElements = '<div id="chosen">' + synthChosen + "</div>";
-                for (let j = 0; j < that.activeParams.length; j++) {
-                    that.isActive[that.activeParams[j]] = false;
+                for (let j = 0; j < this.activeParams.length; j++) {
+                    this.isActive[this.activeParams[j]] = false;
                 }
-                that.isActive["synth"] = true;
+                this.isActive["synth"] = true;
 
                 if (synthChosen === "AMSynth") {
-                    that.isActive["amsynth"] = true;
-                    that.isActive["fmsynth"] = false;
-                    that.isActive["duosynth"] = false;
+                    this.isActive["amsynth"] = true;
+                    this.isActive["fmsynth"] = false;
+                    this.isActive["duosynth"] = false;
 
-                    if (that.AMSynthesizer.length === 0) {
-                        const topOfClamp = blocks.blockList[that.blockNo].connections[2];
+                    if (this.AMSynthesizer.length === 0) {
+                        const topOfClamp = blocks.blockList[this.blockNo].connections[2];
                         const bottomOfClamp = blocks.findBottomBlock(topOfClamp);
 
                         const AMSYNTHOBJ = [
@@ -1115,16 +1107,16 @@ class TimbreWidget {
                         blocks.loadNewBlocks(AMSYNTHOBJ);
 
                         const n = blocks.blockList.length - 2;
-                        that.AMSynthesizer.push(n);
-                        that.AMSynthParams.push(1);
+                        this.AMSynthesizer.push(n);
+                        this.AMSynthParams.push(1);
 
-                        that._changeBlock(last(that.AMSynthesizer), synthChosen, bottomOfClamp);
-                        that.amSynthParamvals["harmonicity"] = parseFloat(that.AMSynthParams[0]);
+                        this._changeBlock(last(this.AMSynthesizer), synthChosen, bottomOfClamp);
+                        this.amSynthParamvals["harmonicity"] = parseFloat(this.AMSynthParams[0]);
                         logo.synth.createSynth(
                             0,
-                            that.instrumentName,
+                            this.instrumentName,
                             "amsynth",
-                            that.amSynthParamvals
+                            this.amSynthParamvals
                         );
                     }
 
@@ -1132,45 +1124,43 @@ class TimbreWidget {
                         '<div id="wrapperS0"><div id="sS0"><span>' +
                         _("harmonicity") +
                         '</span></div><div class="insideDivSynth"><input type="range" id="myRangeS0" class="sliders" style="margin-top:20px" value="' +
-                        parseFloat(that.AMSynthParams[0]) +
+                        parseFloat(this.AMSynthParams[0]) +
                         '"><span id="myspanS0" class="rangeslidervalue">' +
-                        that.AMSynthParams[0] +
+                        this.AMSynthParams[0] +
                         "</span></div></div>";
                     subDiv.innerHTML = subHtmlElements;
 
-                    // docById('myRangeS0').value = parseFloat(that.AMSynthParams[0]);
-                    // docById('myspanS0').textContent = that.AMSynthParams[0];
+                    // docById('myRangeS0').value = parseFloat(this.AMSynthParams[0]);
+                    // docById('myspanS0').textContent = this.AMSynthParams[0];
 
-                    that.amSynthParamvals["harmonicity"] = parseFloat(that.AMSynthParams[0]);
+                    this.amSynthParamvals["harmonicity"] = parseFloat(this.AMSynthParams[0]);
 
-                    if (that.AMSynthesizer.length !== 1) {
-                        blockValue = that.AMSynthesizer.length - 1;
+                    if (this.AMSynthesizer.length !== 1) {
+                        blockValue = this.AMSynthesizer.length - 1;
                     }
 
-                    document
-                        .getElementById("wrapperS0")
-                        .addEventListener("change", function (event) {
-                            docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
-                            const elem = event.target;
-                            docById("myRangeS0").value = parseFloat(elem.value);
-                            that.amSynthParamvals["harmonicity"] = parseFloat(elem.value);
-                            docById("myspanS0").textContent = elem.value;
-                            that._update(blockValue, elem.value, 0);
-                            logo.synth.createSynth(
-                                0,
-                                that.instrumentName,
-                                "amsynth",
-                                that.amSynthParamvals
-                            );
-                            that._playNote("G4", 1 / 8);
-                        });
+                    document.getElementById("wrapperS0").addEventListener("change", (event) => {
+                        docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
+                        const elem = event.target;
+                        docById("myRangeS0").value = parseFloat(elem.value);
+                        this.amSynthParamvals["harmonicity"] = parseFloat(elem.value);
+                        docById("myspanS0").textContent = elem.value;
+                        this._update(blockValue, elem.value, 0);
+                        logo.synth.createSynth(
+                            0,
+                            this.instrumentName,
+                            "amsynth",
+                            this.amSynthParamvals
+                        );
+                        this._playNote("G4", 1 / 8);
+                    });
                 } else if (synthChosen === "FMSynth") {
-                    that.isActive["amsynth"] = false;
-                    that.isActive["fmsynth"] = true;
-                    that.isActive["duosynth"] = false;
+                    this.isActive["amsynth"] = false;
+                    this.isActive["fmsynth"] = true;
+                    this.isActive["duosynth"] = false;
 
-                    if (that.FMSynthesizer.length === 0) {
-                        const topOfClamp = blocks.blockList[that.blockNo].connections[2];
+                    if (this.FMSynthesizer.length === 0) {
+                        const topOfClamp = blocks.blockList[this.blockNo].connections[2];
                         const bottomOfClamp = blocks.findBottomBlock(topOfClamp);
 
                         const FMSYNTHOBJ = [
@@ -1180,18 +1170,18 @@ class TimbreWidget {
                         blocks.loadNewBlocks(FMSYNTHOBJ);
 
                         const n = blocks.blockList.length - 2;
-                        that.FMSynthesizer.push(n);
-                        that.FMSynthParams.push(10);
+                        this.FMSynthesizer.push(n);
+                        this.FMSynthParams.push(10);
 
-                        that._changeBlock(last(that.FMSynthesizer), synthChosen, bottomOfClamp);
-                        that.fmSynthParamvals["modulationIndex"] = parseFloat(
-                            that.FMSynthParams[0]
+                        this._changeBlock(last(this.FMSynthesizer), synthChosen, bottomOfClamp);
+                        this.fmSynthParamvals["modulationIndex"] = parseFloat(
+                            this.FMSynthParams[0]
                         );
                         logo.synth.createSynth(
                             0,
-                            that.instrumentName,
+                            this.instrumentName,
                             "fmsynth",
-                            that.fmSynthParamvals
+                            this.fmSynthParamvals
                         );
                     }
 
@@ -1199,46 +1189,44 @@ class TimbreWidget {
                         '<div id="wrapperS0"><div id="sS0"><span>' +
                         _("modulation index") +
                         '</span></div><div class="insideDivSynth"><input type="range" id="myRangeS0" class="sliders" style="margin-top:20px" value="' +
-                        parseFloat(that.FMSynthParams[0]) +
+                        parseFloat(this.FMSynthParams[0]) +
                         '"><span id="myspanS0" class="rangeslidervalue">' +
-                        that.FMSynthParams[0] +
+                        this.FMSynthParams[0] +
                         "</span></div></div>";
                     subDiv.innerHTML = subHtmlElements;
 
-                    // docById('myRangeS0').value = parseFloat(that.FMSynthParams[0]);
-                    // docById('myspanS0').textContent = that.FMSynthParams[0];
+                    // docById('myRangeS0').value = parseFloat(this.FMSynthParams[0]);
+                    // docById('myspanS0').textContent = this.FMSynthParams[0];
 
-                    that.fmSynthParamvals["modulationIndex"] = parseFloat(that.FMSynthParams[0]);
+                    this.fmSynthParamvals["modulationIndex"] = parseFloat(this.FMSynthParams[0]);
 
-                    if (that.FMSynthesizer.length !== 1) {
-                        blockValue = that.FMSynthesizer.length - 1;
+                    if (this.FMSynthesizer.length !== 1) {
+                        blockValue = this.FMSynthesizer.length - 1;
                     }
 
-                    document
-                        .getElementById("wrapperS0")
-                        .addEventListener("change", function (event) {
-                            docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
-                            const elem = event.target;
-                            docById("myRangeS0").value = parseFloat(elem.value);
-                            docById("myspanS0").textContent = elem.value;
-                            that.fmSynthParamvals["modulationIndex"] = parseFloat(elem.value);
-                            that._update(blockValue, elem.value, 0);
-                            logo.synth.createSynth(
-                                0,
-                                that.instrumentName,
-                                "fmsynth",
-                                that.fmSynthParamvals
-                            );
-                            that._playNote("G4", 1 / 8);
-                        });
+                    document.getElementById("wrapperS0").addEventListener("change", (event) => {
+                        docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
+                        const elem = event.target;
+                        docById("myRangeS0").value = parseFloat(elem.value);
+                        docById("myspanS0").textContent = elem.value;
+                        this.fmSynthParamvals["modulationIndex"] = parseFloat(elem.value);
+                        this._update(blockValue, elem.value, 0);
+                        logo.synth.createSynth(
+                            0,
+                            this.instrumentName,
+                            "fmsynth",
+                            this.fmSynthParamvals
+                        );
+                        this._playNote("G4", 1 / 8);
+                    });
                 } else if (synthChosen === "NoiseSynth") {
-                    that.isActive["amsynth"] = false;
-                    that.isActive["fmsynth"] = false;
-                    that.isActive["noisesynth"] = true;
-                    that.isActive["duosynth"] = false;
+                    this.isActive["amsynth"] = false;
+                    this.isActive["fmsynth"] = false;
+                    this.isActive["noisesynth"] = true;
+                    this.isActive["duosynth"] = false;
 
-                    if (that.NoiseSynthesizer.length === 0) {
-                        const topOfClamp = blocks.blockList[that.blockNo].connections[2];
+                    if (this.NoiseSynthesizer.length === 0) {
+                        const topOfClamp = blocks.blockList[this.blockNo].connections[2];
                         const bottomOfClamp = blocks.findBottomBlock(topOfClamp);
 
                         const NOISESYNTHOBJ = [
@@ -1248,16 +1236,16 @@ class TimbreWidget {
                         blocks.loadNewBlocks(NOISESYNTHOBJ);
 
                         const n = blocks.blockList.length - 2;
-                        that.NoiseSynthesizer.push(n);
-                        that.NoiseSynthParams.push("white");
+                        this.NoiseSynthesizer.push(n);
+                        this.NoiseSynthParams.push("white");
 
-                        that._changeBlock(last(that.NoiseSynthesizer), synthChosen, bottomOfClamp);
-                        that.noiseSynthParamvals["noise.type"] = that.NoiseSynthParams[0];
+                        this._changeBlock(last(this.NoiseSynthesizer), synthChosen, bottomOfClamp);
+                        this.noiseSynthParamvals["noise.type"] = this.NoiseSynthParams[0];
                         logo.synth.createSynth(
                             0,
-                            that.instrumentName,
+                            this.instrumentName,
                             "noisesynth",
-                            that.noiseSynthParamvals
+                            this.noiseSynthParamvals
                         );
                     }
 
@@ -1265,45 +1253,43 @@ class TimbreWidget {
                         '<div id="wrapperS0"><div id="sS0"><span>' +
                         _("modulation index") +
                         '</span></div><div class="insideDivSynth"><input type="range" id="myRangeS0" class="sliders" style="margin-top:20px" value="' +
-                        that.NoiseSynthParams[0] +
+                        this.NoiseSynthParams[0] +
                         '"><span id="myspanS0" class="rangeslidervalue">' +
-                        that.NoiseSynthParams[0] +
+                        this.NoiseSynthParams[0] +
                         "</span></div></div>";
                     subDiv.innerHTML = subHtmlElements;
 
-                    // docById('myRangeS0').value = parseFloat(that.FMSynthParams[0]);
-                    // docById('myspanS0').textContent = that.FMSynthParams[0];
+                    // docById('myRangeS0').value = parseFloat(this.FMSynthParams[0]);
+                    // docById('myspanS0').textContent = this.FMSynthParams[0];
 
-                    that.noiseSynthParamvals["noise.type"] = that.NoiseSynthParams[0];
+                    this.noiseSynthParamvals["noise.type"] = this.NoiseSynthParams[0];
 
-                    if (that.NoiseSynthesizer.length !== 1) {
-                        blockValue = that.NoiseSynthesizer.length - 1;
+                    if (this.NoiseSynthesizer.length !== 1) {
+                        blockValue = this.NoiseSynthesizer.length - 1;
                     }
 
-                    document
-                        .getElementById("wrapperS0")
-                        .addEventListener("change", function (event) {
-                            docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
-                            const elem = event.target;
-                            docById("myRangeS0").value = parseFloat(elem.value);
-                            docById("myspanS0").textContent = elem.value;
-                            that.noiseSynthParamvals["noise.type"] = parseFloat(elem.value);
-                            that._update(blockValue, elem.value, 0);
-                            logo.synth.createSynth(
-                                0,
-                                that.instrumentName,
-                                "noisesynth",
-                                that.noiseSynthParamvals
-                            );
-                            that._playNote(1 / 8);
-                        });
+                    document.getElementById("wrapperS0").addEventListener("change", (event) => {
+                        docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
+                        const elem = event.target;
+                        docById("myRangeS0").value = parseFloat(elem.value);
+                        docById("myspanS0").textContent = elem.value;
+                        this.noiseSynthParamvals["noise.type"] = parseFloat(elem.value);
+                        this._update(blockValue, elem.value, 0);
+                        logo.synth.createSynth(
+                            0,
+                            this.instrumentName,
+                            "noisesynth",
+                            this.noiseSynthParamvals
+                        );
+                        this._playNote(1 / 8);
+                    });
                 } else if (synthChosen === "DuoSynth") {
-                    that.isActive["amsynth"] = false;
-                    that.isActive["fmsynth"] = false;
-                    that.isActive["duosynth"] = true;
+                    this.isActive["amsynth"] = false;
+                    this.isActive["fmsynth"] = false;
+                    this.isActive["duosynth"] = true;
 
-                    if (that.duoSynthesizer.length === 0) {
-                        const topOfClamp = blocks.blockList[that.blockNo].connections[2];
+                    if (this.duoSynthesizer.length === 0) {
+                        const topOfClamp = blocks.blockList[this.blockNo].connections[2];
                         const bottomOfClamp = blocks.findBottomBlock(topOfClamp);
 
                         const DUOSYNTHOBJ = [
@@ -1314,20 +1300,20 @@ class TimbreWidget {
                         blocks.loadNewBlocks(DUOSYNTHOBJ);
 
                         const n = blocks.blockList.length - 3;
-                        that.duoSynthesizer.push(n);
-                        that.duoSynthParams.push(10);
-                        that.duoSynthParams.push(6);
+                        this.duoSynthesizer.push(n);
+                        this.duoSynthParams.push(10);
+                        this.duoSynthParams.push(6);
 
-                        that._changeBlock(last(that.duoSynthesizer), synthChosen, bottomOfClamp);
-                        that.duoSynthParamVals["vibratoRate"] = parseFloat(that.duoSynthParams[0]);
-                        that.duoSynthParamVals["vibratoAmount"] = parseFloat(
-                            that.duoSynthParams[1]
+                        this._changeBlock(last(this.duoSynthesizer), synthChosen, bottomOfClamp);
+                        this.duoSynthParamVals["vibratoRate"] = parseFloat(this.duoSynthParams[0]);
+                        this.duoSynthParamVals["vibratoAmount"] = parseFloat(
+                            this.duoSynthParams[1]
                         );
                         logo.synth.createSynth(
                             0,
-                            that.instrumentName,
+                            this.instrumentName,
                             "duosynth",
-                            that.duoSynthParamVals
+                            this.duoSynthParamVals
                         );
                     }
 
@@ -1335,52 +1321,52 @@ class TimbreWidget {
                         '<div id="wrapperS0"><div id="sS0"><span>' +
                         _("vibrato rate") +
                         '</span></div><div class="insideDivSynth"><input type="range" id="myRangeS0" class="sliders" style="margin-top:20px" value="' +
-                        parseFloat(that.duoSynthParams[0]) +
+                        parseFloat(this.duoSynthParams[0]) +
                         '"><span id="myspanS0" class="rangeslidervalue">' +
-                        that.duoSynthParams[0] +
+                        this.duoSynthParams[0] +
                         "</span></div></div>";
                     subHtmlElements +=
                         '<div id="wrapperS1"><div id="sS1"><span>' +
                         _("vibrato amount") +
                         '</span></div><div class="insideDivSynth"><input type="range" id="myRangeS1" class="sliders" style="margin-top:20px" value="' +
-                        parseFloat(that.duoSynthParams[1]) +
+                        parseFloat(this.duoSynthParams[1]) +
                         '"><span id="myspanS1" class="rangeslidervalue">' +
-                        that.duoSynthParams[1] +
+                        this.duoSynthParams[1] +
                         "</span></div></div>";
                     subDiv.innerHTML = subHtmlElements;
 
-                    if (that.duoSynthesizer.length !== 1) {
-                        blockValue = that.duoSynthesizer.length - 1;
+                    if (this.duoSynthesizer.length !== 1) {
+                        blockValue = this.duoSynthesizer.length - 1;
                     }
 
-                    that.duoSynthParamVals["vibratoRate"] = parseFloat(that.duoSynthParams[0]);
-                    that.duoSynthParamVals["vibratoAmount"] = parseFloat(that.duoSynthParams[1]);
+                    this.duoSynthParamVals["vibratoRate"] = parseFloat(this.duoSynthParams[0]);
+                    this.duoSynthParamVals["vibratoAmount"] = parseFloat(this.duoSynthParams[1]);
 
                     for (let i = 0; i < 2; i++) {
                         document
                             .getElementById("wrapperS" + i)
-                            .addEventListener("change", function (event) {
+                            .addEventListener("change", (event) => {
                                 docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
                                 const elem = event.target;
                                 const m = elem.id.slice(-1);
                                 docById("myRangeS" + m).value = parseFloat(elem.value);
                                 if (m === 0) {
-                                    that.duoSynthParamVals["vibratoRate"] = parseFloat(elem.value);
+                                    this.duoSynthParamVals["vibratoRate"] = parseFloat(elem.value);
                                 } else if (m === 1) {
-                                    that.duoSynthParamVals["vibratoAmount"] = parseFloat(
+                                    this.duoSynthParamVals["vibratoAmount"] = parseFloat(
                                         elem.value
                                     );
                                 }
 
                                 docById("myspanS" + m).textContent = elem.value;
-                                that._update(blockValue, elem.value, Number(m));
+                                this._update(blockValue, elem.value, Number(m));
                                 logo.synth.createSynth(
                                     0,
-                                    that.instrumentName,
+                                    this.instrumentName,
                                     "duosynth",
-                                    that.duoSynthParamVals
+                                    this.duoSynthParamVals
                                 );
-                                that._playNote("G4", 1 / 8);
+                                this._playNote("G4", 1 / 8);
                             });
                     }
                 }
@@ -1389,7 +1375,6 @@ class TimbreWidget {
     }
 
     _oscillator(newOscillator) {
-        const that = this;
         let blockValue = 0;
 
         if (this.osc.length !== 1) {
@@ -1397,8 +1382,8 @@ class TimbreWidget {
         }
 
         docById("oscillatorButtonCell").style.backgroundColor = "#C8C8C8";
-        docById("oscillatorButtonCell").onmouseover = function () {};
-        docById("oscillatorButtonCell").onmouseout = function () {};
+        docById("oscillatorButtonCell").onmouseover = () => {};
+        docById("oscillatorButtonCell").onmouseout = () => {};
 
         this.timbreTableDiv.style.display = "inline";
         this.timbreTableDiv.style.visibility = "visible";
@@ -1417,9 +1402,9 @@ class TimbreWidget {
             '<div id="wrapperOsc1"><div id="sOsc1"><span>' +
             _("partials") +
             '</span></div><div class="insideDivOsc"><input type="range" id="myRangeO0" class="sliders" style="margin-top:20px" min="0" max="20" value="' +
-            parseFloat(that.oscParams[1]) +
+            parseFloat(this.oscParams[1]) +
             '"><span id="myspanO0" class="rangeslidervalue">' +
-            that.oscParams[1] +
+            this.oscParams[1] +
             "</span></div></div>";
 
         env.innerHTML = htmlElements;
@@ -1467,27 +1452,27 @@ class TimbreWidget {
 
         myDiv.innerHTML = selectOpt;
 
-        document.getElementById("wrapperOsc0").addEventListener("change", function (event) {
+        document.getElementById("wrapperOsc0").addEventListener("change", (event) => {
             docById("oscillatorButtonCell").style.backgroundColor = "#C8C8C8";
             const elem = event.target;
-            that.oscParams[0] = elem.value;
-            that.synthVals["oscillator"]["type"] = elem.value + that.oscParams[1].toString();
-            that.synthVals["oscillator"]["source"] = elem.value;
-            that._update(blockValue, elem.value, 0);
-            logo.synth.createSynth(0, that.instrumentName, that.oscParams[0], that.synthVals);
-            that._playNote("G4", 1 / 8);
+            this.oscParams[0] = elem.value;
+            this.synthVals["oscillator"]["type"] = elem.value + this.oscParams[1].toString();
+            this.synthVals["oscillator"]["source"] = elem.value;
+            this._update(blockValue, elem.value, 0);
+            logo.synth.createSynth(0, this.instrumentName, this.oscParams[0], this.synthVals);
+            this._playNote("G4", 1 / 8);
         });
 
-        document.getElementById("wrapperOsc1").addEventListener("change", function (event) {
+        document.getElementById("wrapperOsc1").addEventListener("change", (event) => {
             docById("oscillatorButtonCell").style.backgroundColor = "#C8C8C8";
             const elem = event.target;
-            that.oscParams[1] = parseFloat(elem.value);
-            that.synthVals["oscillator"]["type"] = that.oscParams[0] + parseFloat(elem.value);
+            this.oscParams[1] = parseFloat(elem.value);
+            this.synthVals["oscillator"]["type"] = this.oscParams[0] + parseFloat(elem.value);
             docById("myRangeO0").value = parseFloat(elem.value);
             docById("myspanO0").textContent = elem.value;
-            that._update(blockValue, elem.value, 1);
-            logo.synth.createSynth(0, that.instrumentName, that.oscParams[0], that.synthVals);
-            that._playNote("G4", 1 / 8);
+            this._update(blockValue, elem.value, 1);
+            logo.synth.createSynth(0, this.instrumentName, this.oscParams[0], this.synthVals);
+            this._playNote("G4", 1 / 8);
         });
 
         docById("selOsc1").value = this.oscParams[0];
@@ -1502,7 +1487,6 @@ class TimbreWidget {
     }
 
     _envelope(newEnvelope) {
-        const that = this;
         let blockValue = 0;
 
         if (this.env.length !== 1) {
@@ -1510,8 +1494,8 @@ class TimbreWidget {
         }
 
         docById("envelopeButtonCell").style.backgroundColor = "#C8C8C8";
-        docById("envelopeButtonCell").onmouseover = function () {};
-        docById("envelopeButtonCell").onmouseout = function () {};
+        docById("envelopeButtonCell").onmouseover = () => {};
+        docById("envelopeButtonCell").onmouseout = () => {};
 
         this.timbreTableDiv.style.display = "inline";
         this.timbreTableDiv.style.visibility = "visible";
@@ -1532,11 +1516,11 @@ class TimbreWidget {
                 '</div><div class="insideDivEnv"><input type="range" id="myRange' +
                 i +
                 '" class="sliders" style="margin-top:20px" value="' +
-                parseFloat(that.ENVs[i]) +
+                parseFloat(this.ENVs[i]) +
                 '"><span id="myspan' +
                 i +
                 '" class="rangeslidervalue">' +
-                that.ENVs[i] +
+                this.ENVs[i] +
                 "</span></div></div>";
         }
 
@@ -1555,21 +1539,21 @@ class TimbreWidget {
         }
 
         for (let i = 0; i < 4; i++) {
-            document.getElementById("wrapperEnv" + i).addEventListener("change", function (event) {
+            document.getElementById("wrapperEnv" + i).addEventListener("change", (event) => {
                 docById("envelopeButtonCell").style.backgroundColor = "#C8C8C8";
                 const elem = event.target;
                 const m = elem.id.slice(-1);
                 docById("myRange" + m).value = parseFloat(elem.value);
                 docById("myspan" + m).textContent = elem.value;
-                that.synthVals["envelope"][that.adsrMap[m]] = parseFloat(elem.value) / 100;
-                that._update(blockValue, parseFloat(elem.value), m);
+                this.synthVals["envelope"][this.adsrMap[m]] = parseFloat(elem.value) / 100;
+                this._update(blockValue, parseFloat(elem.value), m);
                 logo.synth.createSynth(
                     0,
-                    that.instrumentName,
-                    that.synthVals["oscillator"]["source"],
-                    that.synthVals
+                    this.instrumentName,
+                    this.synthVals["oscillator"]["source"],
+                    this.synthVals
                 );
-                that._playNote("G4", 1 / 8);
+                this._playNote("G4", 1 / 8);
             });
         }
 
@@ -1585,8 +1569,8 @@ class TimbreWidget {
 
     _filter() {
         docById("filterButtonCell").style.backgroundColor = "#C8C8C8";
-        docById("filterButtonCell").onmouseover = function () {};
-        docById("filterButtonCell").onmouseout = function () {};
+        docById("filterButtonCell").onmouseover = () => {};
+        docById("filterButtonCell").onmouseout = () => {};
 
         this.timbreTableDiv.style.display = "inline";
         this.timbreTableDiv.style.visibility = "visible";
@@ -1729,46 +1713,46 @@ class TimbreWidget {
         }
     }
 
+    /**
+     * Adds the various listeners needed for the filter panel.
+     */
     _addFilterListeners() {
-        // Add the various listeners needed for the filter panel
-        const that = this;
-
-        const __filterNameEvent = function (event) {
+        const __filterNameEvent = (event) => {
             docById("filterButtonCell").style.backgroundColor = "#C8C8C0";
             const elem = event.target;
             const m = elem.id.slice(-1);
-            instrumentsFilters[0][that.instrumentName][m]["filterType"] = elem.value;
-            that._update(m, elem.value, 0);
-            const error = instrumentsFilters[0][that.instrumentName].filter(function (el) {
-                return el.filterType === elem.value;
-            });
+            instrumentsFilters[0][this.instrumentName][m]["filterType"] = elem.value;
+            this._update(m, elem.value, 0);
+            const error = instrumentsFilters[0][this.instrumentName].filter(
+                (el) => el.filterType === elem.value
+            );
             if (error.length > 1) {
                 logo.errorMsg(_("Filter already present."));
             }
-            that._playNote("G4", 1 / 8);
+            this._playNote("G4", 1 / 8);
         };
 
-        const __radioEvent = function (event) {
+        const __radioEvent = (event) => {
             const elem = event.target;
             const m = Number(elem.id.replace("radio", ""));
-            instrumentsFilters[0][that.instrumentName][Math.floor(m / 4)][
+            instrumentsFilters[0][this.instrumentName][Math.floor(m / 4)][
                 "filterRolloff"
-            ] = parseFloat(this.value);
-            that._update(Math.floor(m / 4), this.value, 1);
-            that._playNote("G4", 1 / 8);
+            ] = parseFloat(elem.value);
+            this._update(Math.floor(m / 4), elem.value, 1);
+            this._playNote("G4", 1 / 8);
         };
 
-        const __sliderEvent = function (event) {
+        const __sliderEvent = (event) => {
             docById("filterButtonCell").style.backgroundColor = "#C8C0C8";
             const elem = event.target;
             const m = elem.id.slice(-1);
             docById("myRangeF" + m).value = parseFloat(elem.value);
             docById("myspanF" + m).textContent = elem.value;
-            instrumentsFilters[0][that.instrumentName][m]["filterFrequency"] = parseFloat(
+            instrumentsFilters[0][this.instrumentName][m]["filterFrequency"] = parseFloat(
                 elem.value
             );
-            that._update(m, elem.value, 2);
-            that._playNote("G4", 1 / 8);
+            this._update(m, elem.value, 2);
+            this._playNote("G4", 1 / 8);
         };
 
         for (let f = 0; f < this.fil.length; f++) {
@@ -1831,7 +1815,7 @@ class TimbreWidget {
         this.fil.push(blocks.blockList.length);
 
         const selectedFilters = instrumentsFilters[0][this.instrumentName].slice();
-        const filterType = FILTERTYPES.slice().filter(function (filter) {
+        const filterType = FILTERTYPES.slice().filter((filter) => {
             for (const i in selectedFilters) {
                 if (selectedFilters[i].filterType === filter[1]) {
                     return false;
@@ -1858,8 +1842,7 @@ class TimbreWidget {
             [3, ["filtertype", { value: this.filterParams[len - 3] }], 0, 0, [0]]
         ]);
 
-        const that = this;
-        setTimeout(that.blockConnection(4, bottomOfClamp), 500);
+        setTimeout(this.blockConnection(4, bottomOfClamp), 500);
 
         this._createFilter(this.fil.length - 1, env);
         this._playNote("G4", 1 / 8);
@@ -1869,12 +1852,11 @@ class TimbreWidget {
     }
 
     _effects() {
-        const that = this;
         let blockValue = 0;
 
         docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
-        docById("effectsButtonCell").onmouseover = function () {};
-        docById("effectsButtonCell").onmouseout = function () {};
+        docById("effectsButtonCell").onmouseover = () => {};
+        docById("effectsButtonCell").onmouseout = () => {};
 
         this.timbreTableDiv.style.display = "inline";
         this.timbreTableDiv.style.visibility = "visible";
@@ -1918,17 +1900,17 @@ class TimbreWidget {
         let effectChosen;
 
         for (let i = 0; i < effectsName.length; i++) {
-            effectsName[i].onclick = function () {
-                effectChosen = this.value;
+            effectsName[i].onclick = (event) => {
+                effectChosen = event.target.value;
                 let subHtmlElements = '<div id="chosen">' + effectChosen + "</div>";
                 if (effectChosen === "Tremolo") {
-                    that.isActive["tremolo"] = true;
-                    that.isActive["chorus"] = false;
-                    that.isActive["vibrato"] = false;
-                    that.isActive["distortion"] = false;
-                    that.isActive["phaser"] = false;
+                    this.isActive["tremolo"] = true;
+                    this.isActive["chorus"] = false;
+                    this.isActive["vibrato"] = false;
+                    this.isActive["distortion"] = false;
+                    this.isActive["phaser"] = false;
 
-                    instrumentsEffects[0][that.instrumentName]["tremoloActive"] = true;
+                    instrumentsEffects[0][this.instrumentName]["tremoloActive"] = true;
 
                     for (let j = 0; j < 2; i++) {
                         subHtmlElements +=
@@ -1951,19 +1933,19 @@ class TimbreWidget {
                     docById("myRangeFx1").value = 50;
                     docById("myspanFx1").textContent = "50";
 
-                    if (that.tremoloEffect.length !== 0) {
-                        blockValue = that.tremoloEffect.length - 1;
+                    if (this.tremoloEffect.length !== 0) {
+                        blockValue = this.tremoloEffect.length - 1;
                         for (let j = 0; j < 2; j++) {
-                            docById("myRangeFx" + j).value = parseFloat(that.tremoloParams[j]);
-                            docById("myspanFx" + j).textContent = that.tremoloParams[j];
-                            that._update(blockValue, that.tremoloParams[j], j);
+                            docById("myRangeFx" + j).value = parseFloat(this.tremoloParams[j]);
+                            docById("myspanFx" + j).textContent = this.tremoloParams[j];
+                            this._update(blockValue, this.tremoloParams[j], j);
                         }
                     }
 
-                    if (that.tremoloEffect.length === 0) {
+                    if (this.tremoloEffect.length === 0) {
                         // This is the first block in the child stack
                         // of the Timbre clamp.
-                        const topOfClamp = blocks.blockList[that.blockNo].connections[2];
+                        const topOfClamp = blocks.blockList[this.blockNo].connections[2];
 
                         const n = blocks.blockList.length;
                         const TREMOLOOBJ = [
@@ -1974,17 +1956,17 @@ class TimbreWidget {
                         ];
                         blocks.loadNewBlocks(TREMOLOOBJ);
 
-                        that.tremoloEffect.push(n);
-                        that.tremoloParams.push(10);
-                        that.tremoloParams.push(50);
+                        this.tremoloEffect.push(n);
+                        this.tremoloParams.push(10);
+                        this.tremoloParams.push(50);
 
-                        setTimeout(that.clampConnection(n, 3, topOfClamp), 500);
+                        setTimeout(this.clampConnection(n, 3, topOfClamp), 500);
                     }
 
                     for (let i = 0; i < 2; i++) {
                         document
                             .getElementById("wrapperFx" + i)
-                            .addEventListener("change", function (event) {
+                            .addEventListener("change", (event) => {
                                 docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
                                 const elem = event.target;
                                 const m = elem.id.slice(-1);
@@ -1992,28 +1974,28 @@ class TimbreWidget {
                                 docById("myspanFx" + m).textContent = elem.value;
 
                                 if (m === 0) {
-                                    instrumentsEffects[0][that.instrumentName][
+                                    instrumentsEffects[0][this.instrumentName][
                                         "tremoloFrequency"
                                     ] = parseFloat(elem.value);
                                 }
 
                                 if (m === 1) {
-                                    instrumentsEffects[0][that.instrumentName]["tremoloDepth"] =
+                                    instrumentsEffects[0][this.instrumentName]["tremoloDepth"] =
                                         parseFloat(elem.value) / 100;
                                 }
 
-                                that._update(blockValue, elem.value, Number(m));
-                                that._playNote("G4", 1 / 8);
+                                this._update(blockValue, elem.value, Number(m));
+                                this._playNote("G4", 1 / 8);
                             });
                     }
                 } else if (effectChosen === "Vibrato") {
-                    that.isActive["tremolo"] = false;
-                    that.isActive["chorus"] = false;
-                    that.isActive["vibrato"] = true;
-                    that.isActive["distortion"] = false;
-                    that.isActive["phaser"] = false;
+                    this.isActive["tremolo"] = false;
+                    this.isActive["chorus"] = false;
+                    this.isActive["vibrato"] = true;
+                    this.isActive["distortion"] = false;
+                    this.isActive["phaser"] = false;
 
-                    instrumentsEffects[0][that.instrumentName]["vibratoActive"] = true;
+                    instrumentsEffects[0][this.instrumentName]["vibratoActive"] = true;
                     for (let i = 0; i < 2; i++) {
                         subHtmlElements +=
                             '<div id="wrapperFx' +
@@ -2032,16 +2014,16 @@ class TimbreWidget {
                     docById("sFx0").textContent = _("intensity");
                     docById("sFx1").textContent = _("rate");
 
-                    if (that.vibratoEffect.length > 0) {
-                        docById("myRangeFx0").value = parseFloat(that.vibratoParams[0]);
-                        docById("myspanFx0").textContent = that.vibratoParams[0];
+                    if (this.vibratoEffect.length > 0) {
+                        docById("myRangeFx0").value = parseFloat(this.vibratoParams[0]);
+                        docById("myspanFx0").textContent = this.vibratoParams[0];
                         // Scale of rate is 0 to 1, so we need to multiply by 100
-                        docById("myRangeFx1").value = 100 / parseFloat(that.vibratoParams[1]);
-                        const obj = rationalToFraction(1 / parseFloat(that.vibratoParams[1]));
-                        docById("myspanFx1").textContent = obj[0] + "/" + obj[1]; // that.vibratoParams[1];
+                        docById("myRangeFx1").value = 100 / parseFloat(this.vibratoParams[1]);
+                        const obj = rationalToFraction(1 / parseFloat(this.vibratoParams[1]));
+                        docById("myspanFx1").textContent = obj[0] + "/" + obj[1]; // this.vibratoParams[1];
                     } else {
                         // If necessary, add a vibrato block.
-                        const topOfTimbreClamp = blocks.blockList[that.blockNo].connections[2];
+                        const topOfTimbreClamp = blocks.blockList[this.blockNo].connections[2];
 
                         const vibratoBlock = blocks.blockList.length;
                         const VIBRATOOBJ = [
@@ -2055,12 +2037,12 @@ class TimbreWidget {
                         ];
                         blocks.loadNewBlocks(VIBRATOOBJ);
 
-                        that.vibratoEffect.push(vibratoBlock);
-                        that.vibratoParams.push(5);
-                        that.vibratoParams.push(16);
+                        this.vibratoEffect.push(vibratoBlock);
+                        this.vibratoParams.push(5);
+                        this.vibratoParams.push(16);
 
                         setTimeout(
-                            that.clampConnectionVspace(
+                            this.clampConnectionVspace(
                                 vibratoBlock,
                                 vibratoBlock + 2,
                                 topOfTimbreClamp
@@ -2070,51 +2052,47 @@ class TimbreWidget {
 
                         docById("myRangeFx0").value = 5;
                         docById("myspanFx0").textContent = "5";
-                        instrumentsEffects[0][that.instrumentName]["vibratoIntensity"] = 0.05;
+                        instrumentsEffects[0][this.instrumentName]["vibratoIntensity"] = 0.05;
 
                         docById("myRangeFx1").value = 100 / 16;
                         docById("myspanFx1").textContent = "1/16";
-                        instrumentsEffects[0][that.instrumentName]["vibratoFrequency"] = 1 / 16;
+                        instrumentsEffects[0][this.instrumentName]["vibratoFrequency"] = 1 / 16;
                     }
 
                     // Add the listeners for the sliders.
-                    document
-                        .getElementById("wrapperFx0")
-                        .addEventListener("change", function (event) {
-                            docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
-                            const elem = event.target;
-                            docById("myRangeFx0").value = parseFloat(elem.value);
-                            docById("myspanFx0").textContent = elem.value;
-                            instrumentsEffects[0][that.instrumentName]["vibratoIntensity"] =
-                                parseFloat(elem.value) / 100;
+                    document.getElementById("wrapperFx0").addEventListener("change", (event) => {
+                        docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
+                        const elem = event.target;
+                        docById("myRangeFx0").value = parseFloat(elem.value);
+                        docById("myspanFx0").textContent = elem.value;
+                        instrumentsEffects[0][this.instrumentName]["vibratoIntensity"] =
+                            parseFloat(elem.value) / 100;
 
-                            that._update(that.vibratoEffect.length - 1, elem.value, 0);
-                            that._playNote("G4", 1 / 8);
-                        });
+                        this._update(this.vibratoEffect.length - 1, elem.value, 0);
+                        this._playNote("G4", 1 / 8);
+                    });
 
-                    document
-                        .getElementById("wrapperFx1")
-                        .addEventListener("change", function (event) {
-                            docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
-                            const elem = event.target;
-                            docById("myRangeFx1").value = parseFloat(elem.value);
-                            const obj = oneHundredToFraction(elem.value);
-                            docById("myspanFx1").textContent = obj[0] + "/" + obj[1];
-                            const temp = parseFloat(obj[0]) / parseFloat(obj[1]);
+                    document.getElementById("wrapperFx1").addEventListener("change", (event) => {
+                        docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
+                        const elem = event.target;
+                        docById("myRangeFx1").value = parseFloat(elem.value);
+                        const obj = oneHundredToFraction(elem.value);
+                        docById("myspanFx1").textContent = obj[0] + "/" + obj[1];
+                        const temp = parseFloat(obj[0]) / parseFloat(obj[1]);
 
-                            instrumentsEffects[0][that.instrumentName]["vibratoFrequency"] = temp;
-                            that._update(that.vibratoEffect.length - 1, obj[1], 1);
-                            that._update(that.vibratoEffect.length - 1, obj[0], 2);
-                            that._playNote("G4", 1 / 8);
-                        });
+                        instrumentsEffects[0][this.instrumentName]["vibratoFrequency"] = temp;
+                        this._update(this.vibratoEffect.length - 1, obj[1], 1);
+                        this._update(this.vibratoEffect.length - 1, obj[0], 2);
+                        this._playNote("G4", 1 / 8);
+                    });
                 } else if (effectChosen === "Chorus") {
-                    that.isActive["tremolo"] = false;
-                    that.isActive["chorus"] = true;
-                    that.isActive["vibrato"] = false;
-                    that.isActive["distortion"] = false;
-                    that.isActive["phaser"] = false;
+                    this.isActive["tremolo"] = false;
+                    this.isActive["chorus"] = true;
+                    this.isActive["vibrato"] = false;
+                    this.isActive["distortion"] = false;
+                    this.isActive["phaser"] = false;
 
-                    instrumentsEffects[0][that.instrumentName]["chorusActive"] = true;
+                    instrumentsEffects[0][this.instrumentName]["chorusActive"] = true;
 
                     for (let i = 0; i < 3; i++) {
                         subHtmlElements +=
@@ -2140,17 +2118,17 @@ class TimbreWidget {
                     docById("myRangeFx2").value = 70;
                     docById("myspanFx2").textContent = "70";
 
-                    if (that.chorusEffect.length !== 0) {
-                        blockValue = that.chorusEffect.length - 1;
+                    if (this.chorusEffect.length !== 0) {
+                        blockValue = this.chorusEffect.length - 1;
                         for (let i = 0; i < 3; i++) {
-                            docById("myRangeFx" + i).value = parseFloat(that.chorusParams[i]);
-                            docById("myspanFx" + i).textContent = that.chorusParams[i];
-                            that._update(blockValue, that.chorusParams[i], i);
+                            docById("myRangeFx" + i).value = parseFloat(this.chorusParams[i]);
+                            docById("myspanFx" + i).textContent = this.chorusParams[i];
+                            this._update(blockValue, this.chorusParams[i], i);
                         }
                     }
 
-                    if (that.chorusEffect.length === 0) {
-                        const topOfClamp = blocks.blockList[that.blockNo].connections[2];
+                    if (this.chorusEffect.length === 0) {
+                        const topOfClamp = blocks.blockList[this.blockNo].connections[2];
 
                         const n = blocks.blockList.length;
                         const CHORUSOBJ = [
@@ -2162,18 +2140,18 @@ class TimbreWidget {
                         ];
                         blocks.loadNewBlocks(CHORUSOBJ);
 
-                        that.chorusEffect.push(n);
-                        that.chorusParams.push(2);
-                        that.chorusParams.push(4);
-                        that.chorusParams.push(70);
+                        this.chorusEffect.push(n);
+                        this.chorusParams.push(2);
+                        this.chorusParams.push(4);
+                        this.chorusParams.push(70);
 
-                        setTimeout(that.clampConnection(n, 4, topOfClamp), 500);
+                        setTimeout(this.clampConnection(n, 4, topOfClamp), 500);
                     }
 
                     for (let i = 0; i < 3; i++) {
                         document
                             .getElementById("wrapperFx" + i)
-                            .addEventListener("change", function (event) {
+                            .addEventListener("change", (event) => {
                                 docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
                                 const elem = event.target;
                                 const m = elem.id.slice(-1);
@@ -2181,34 +2159,34 @@ class TimbreWidget {
                                 docById("myspanFx" + m).textContent = elem.value;
 
                                 if (m === 0) {
-                                    instrumentsEffects[0][that.instrumentName][
+                                    instrumentsEffects[0][this.instrumentName][
                                         "chorusRate"
                                     ] = parseFloat(elem.value);
                                 }
 
                                 if (m === 1) {
-                                    instrumentsEffects[0][that.instrumentName][
+                                    instrumentsEffects[0][this.instrumentName][
                                         "delayTime"
                                     ] = parseFloat(elem.value);
                                 }
 
                                 if (m === 2) {
-                                    instrumentsEffects[0][that.instrumentName]["chorusDepth"] =
+                                    instrumentsEffects[0][this.instrumentName]["chorusDepth"] =
                                         parseFloat(elem.value) / 100;
                                 }
 
-                                that._update(blockValue, elem.value, Number(m));
-                                that._playNote("G4", 1 / 8);
+                                this._update(blockValue, elem.value, Number(m));
+                                this._playNote("G4", 1 / 8);
                             });
                     }
                 } else if (effectChosen === "Phaser") {
-                    that.isActive["tremolo"] = false;
-                    that.isActive["chorus"] = false;
-                    that.isActive["vibrato"] = false;
-                    that.isActive["distortion"] = false;
-                    that.isActive["phaser"] = true;
+                    this.isActive["tremolo"] = false;
+                    this.isActive["chorus"] = false;
+                    this.isActive["vibrato"] = false;
+                    this.isActive["distortion"] = false;
+                    this.isActive["phaser"] = true;
 
-                    instrumentsEffects[0][that.instrumentName]["phaserActive"] = true;
+                    instrumentsEffects[0][this.instrumentName]["phaserActive"] = true;
 
                     for (let i = 0; i < 3; i++) {
                         subHtmlElements +=
@@ -2234,17 +2212,17 @@ class TimbreWidget {
                     docById("myRangeFx2").value = 350;
                     docById("myspanFx2").textContent = "350";
 
-                    if (that.phaserEffect.length !== 0) {
-                        blockValue = that.phaserEffect.length - 1;
+                    if (this.phaserEffect.length !== 0) {
+                        blockValue = this.phaserEffect.length - 1;
                         for (let i = 0; i < 3; i++) {
-                            docById("myRangeFx" + i).value = parseFloat(that.phaserParams[i]);
-                            docById("myspanFx" + i).textContent = that.phaserParams[i];
-                            that._update(blockValue, that.phaserParams[i], i);
+                            docById("myRangeFx" + i).value = parseFloat(this.phaserParams[i]);
+                            docById("myspanFx" + i).textContent = this.phaserParams[i];
+                            this._update(blockValue, this.phaserParams[i], i);
                         }
                     }
 
-                    if (that.phaserEffect.length === 0) {
-                        const topOfClamp = blocks.blockList[that.blockNo].connections[2];
+                    if (this.phaserEffect.length === 0) {
+                        const topOfClamp = blocks.blockList[this.blockNo].connections[2];
 
                         const n = blocks.blockList.length;
                         const PHASEROBJ = [
@@ -2256,18 +2234,18 @@ class TimbreWidget {
                         ];
                         blocks.loadNewBlocks(PHASEROBJ);
 
-                        that.phaserEffect.push(n);
-                        that.phaserParams.push(5);
-                        that.phaserParams.push(3);
-                        that.phaserParams.push(350);
+                        this.phaserEffect.push(n);
+                        this.phaserParams.push(5);
+                        this.phaserParams.push(3);
+                        this.phaserParams.push(350);
 
-                        setTimeout(that.clampConnection(n, 4, topOfClamp), 500);
+                        setTimeout(this.clampConnection(n, 4, topOfClamp), 500);
                     }
 
                     for (let i = 0; i < 3; i++) {
                         document
                             .getElementById("wrapperFx" + i)
-                            .addEventListener("change", function (event) {
+                            .addEventListener("change", (event) => {
                                 docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
                                 const elem = event.target;
                                 const m = elem.id.slice(-1);
@@ -2275,35 +2253,35 @@ class TimbreWidget {
                                 docById("myspanFx" + m).textContent = elem.value;
 
                                 if (m === 0) {
-                                    instrumentsEffects[0][that.instrumentName]["rate"] = parseFloat(
+                                    instrumentsEffects[0][this.instrumentName]["rate"] = parseFloat(
                                         elem.value
                                     );
                                 }
 
                                 if (m === 1) {
-                                    instrumentsEffects[0][that.instrumentName][
+                                    instrumentsEffects[0][this.instrumentName][
                                         "octaves"
                                     ] = parseFloat(elem.value);
                                 }
 
                                 if (m === 2) {
-                                    instrumentsEffects[0][that.instrumentName][
+                                    instrumentsEffects[0][this.instrumentName][
                                         "baseFrequency"
                                     ] = parseFloat(elem.value);
                                 }
 
-                                that._update(blockValue, elem.value, Number(m));
-                                that._playNote("G4", 1 / 8);
+                                this._update(blockValue, elem.value, Number(m));
+                                this._playNote("G4", 1 / 8);
                             });
                     }
                 } else if (effectChosen === "Distortion") {
-                    that.isActive["tremolo"] = false;
-                    that.isActive["chorus"] = false;
-                    that.isActive["vibrato"] = false;
-                    that.isActive["distortion"] = true;
-                    that.isActive["phaser"] = false;
+                    this.isActive["tremolo"] = false;
+                    this.isActive["chorus"] = false;
+                    this.isActive["vibrato"] = false;
+                    this.isActive["distortion"] = true;
+                    this.isActive["phaser"] = false;
 
-                    instrumentsEffects[0][that.instrumentName]["distortionActive"] = true;
+                    instrumentsEffects[0][this.instrumentName]["distortionActive"] = true;
 
                     subHtmlElements +=
                         '<div id="wrapperFx0"><div id="sFx0"><span></span></div><div class="insideDivEffects"><input type="range" id="myRangeFx0" class="sliders" style="margin-top:20px" value="2"><span id="myspanFx0" class="rangeslidervalue">2</span></div></div>';
@@ -2314,15 +2292,15 @@ class TimbreWidget {
                     docById("myRangeFx0").value = 40;
                     docById("myspanFx0").textContent = "40";
 
-                    if (that.distortionEffect.length !== 0) {
-                        blockValue = that.distortionEffect.length - 1;
-                        docById("myRangeFx0").value = parseFloat(that.distortionParams[0]);
-                        docById("myspanFx0").textContent = that.distortionParams[0];
-                        that._update(blockValue, that.distortionParams[0], 0);
+                    if (this.distortionEffect.length !== 0) {
+                        blockValue = this.distortionEffect.length - 1;
+                        docById("myRangeFx0").value = parseFloat(this.distortionParams[0]);
+                        docById("myspanFx0").textContent = this.distortionParams[0];
+                        this._update(blockValue, this.distortionParams[0], 0);
                     }
 
-                    if (that.distortionEffect.length === 0) {
-                        const topOfClamp = blocks.blockList[that.blockNo].connections[2];
+                    if (this.distortionEffect.length === 0) {
+                        const topOfClamp = blocks.blockList[this.blockNo].connections[2];
 
                         const n = blocks.blockList.length;
                         const DISTORTIONOBJ = [
@@ -2332,24 +2310,22 @@ class TimbreWidget {
                         ];
                         blocks.loadNewBlocks(DISTORTIONOBJ);
 
-                        that.distortionEffect.push(n);
-                        that.distortionParams.push(40);
+                        this.distortionEffect.push(n);
+                        this.distortionParams.push(40);
 
-                        setTimeout(that.clampConnection(n, 2, topOfClamp), 500);
+                        setTimeout(this.clampConnection(n, 2, topOfClamp), 500);
                     }
 
-                    document
-                        .getElementById("wrapperFx0")
-                        .addEventListener("change", function (event) {
-                            docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
-                            const elem = event.target;
-                            docById("myRangeFx0").value = parseFloat(elem.value);
-                            docById("myspanFx0").textContent = elem.value;
-                            instrumentsEffects[0][that.instrumentName]["distortionAmount"] =
-                                parseFloat(elem.value) / 100;
-                            that._update(blockValue, elem.value, 0);
-                            that._playNote("G4", 1 / 8);
-                        });
+                    document.getElementById("wrapperFx0").addEventListener("change", (event) => {
+                        docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
+                        const elem = event.target;
+                        docById("myRangeFx0").value = parseFloat(elem.value);
+                        docById("myspanFx0").textContent = elem.value;
+                        instrumentsEffects[0][this.instrumentName]["distortionAmount"] =
+                            parseFloat(elem.value) / 100;
+                        this._update(blockValue, elem.value, 0);
+                        this._playNote("G4", 1 / 8);
+                    });
                 }
             };
         }
