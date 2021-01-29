@@ -1,6 +1,5 @@
-name: Super-Linter
+name: ESLint
 
-# Triggers the workflow on push or pull request events only for the master branch
 on:
   push:
     branches: [master]
@@ -9,21 +8,36 @@ on:
 
 jobs:
   build:
-    name: Lint updated JavaScript files
+    name: Lint updated JavaScript files with ESLint
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Checkout code
-        # Checks-out repository under $GITHUB_WORKSPACE, so job can access it
         uses: actions/checkout@v2
         with:
-          # Full git history is needed to get a proper list of changed files within `super-linter`
           fetch-depth: 0
+        
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
 
-      - name: Run Super-Linter
-        uses: github/super-linter@v3
-        env:
-          VALIDATE_ALL_CODEBASE: false
-          VALIDATE_JAVASCRIPT_STANDARD: false # VALIDATE_JAVASCRIPT_ES is desired (true by default)
-          VALIDATE_JSCPD: false
+      - name: Get changed files
+        id: getfile
+        run: echo "::set-output name=files::$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | xargs)"
+
+      - name: Install ESLint
+        run: npm install eslint
+
+      - name: Lint changed files using ESLint
+        run: |
+          for i in ${{ steps.getfile.outputs.files }}
+          do
+            echo "file $i"
+            if [[ "$i" == *".js" ]]
+            then
+              echo "linting $i"
+              npx eslint $i
+            fi
+          done
