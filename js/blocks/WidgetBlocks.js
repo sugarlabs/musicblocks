@@ -581,7 +581,7 @@ function setupWidgetBlocks() {
                     );
                 } else {
                     // Process queued up rhythms.
-                    logo.pitchDrumMatrix.init(logo);
+                    logo.pitchDrumMatrix.init();
                     logo.pitchDrumMatrix.makeClickable();
                 }
             };
