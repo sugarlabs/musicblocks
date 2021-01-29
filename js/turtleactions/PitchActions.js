@@ -110,22 +110,40 @@ function setupPitchActions() {
                 return noteObj;
             };
 
-            let len = tur.singer.lastNotePlayed[0].length;
+            let lastNotePlayed = tur.singer.lastNotePlayed;
+            lastNotePlayed[0] = lastNotePlayed[0].slice(0, lastNotePlayed[0].length-1)
+
+            if (tur.singer.inverted){
+                // if the last note is inverted then inverting it again to get the original note
+                let delta_temp = Singer.calculateInvert(logo, turtle, lastNotePlayed[0], lastNotePlayed[1]);
+                let transposition_temp = 2 * delta_temp;
+                lastNotePlayed = getNote(
+                    lastNotePlayed[0],
+                    lastNotePlayed[1],
+                    transposition_temp,
+                    tur.singer.keySignature,
+                    tur.singer.moveable,
+                    null,
+                    logo.errorMsg,
+                    logo.synth.inTemperament
+                );
+            }
 
             let noteObj = Singer.addScalarTransposition(
                 logo,
                 turtle,
-                tur.singer.lastNotePlayed[0].slice(0, len - 1),
-                parseInt(tur.singer.lastNotePlayed[0].slice(len - 1)),
+                lastNotePlayed[0],
+                parseInt(lastNotePlayed[1]),
                 value
             );
 
             let delta = 0;
             if (!(tur.singer.invertList.length === 0)) {
+                tur.singer.inverted = true;
                 delta += Singer.calculateInvert(logo, turtle, noteObj[0], noteObj[1]);
             }
 
-            let transposition = 2 * delta + logo.turtles.ithTurtle(turtle).transposition;
+            let transposition = 2 * delta + (logo.turtles.ithTurtle(turtle).transposition? logo.turtles.ithTurtle(turtle).transposition : 0);
 
             let noteObj1 = addPitch(noteObj[0], noteObj[1], 0);
             // Only apply the transposition to the base note of an interval
@@ -649,7 +667,10 @@ function setupPitchActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            let __listener = event => tur.singer.invertList.pop();
+            let __listener = event => {
+                tur.singer.invertList.pop();
+                tur.singer.inverted = false;
+            };
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
 

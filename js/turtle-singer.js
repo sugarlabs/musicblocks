@@ -167,6 +167,8 @@ class Singer {
         this.suppressOutput = false;
 
         this.dispatchFactor = 1;                // scale factor for turtle graphics embedded in notes
+
+        this.inverted = false;  // tracks if the notes being played are inverted
     }
 
     // ========= Class variables ==============================================
@@ -805,6 +807,8 @@ class Singer {
                 }
             }
         } else if (tur.singer.inNoteBlock.length > 0) {
+            // maybe of interest
+            tur.singer.inverted = tur.singer.invertList.length > 0;
             function addPitch(note, octave, cents, direction) {
                 let noteObj = getNote(
                     note,
