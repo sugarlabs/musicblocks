@@ -65,6 +65,7 @@ class ModeWidget {
         this.widgetWindow.getWidgetBody().append(this.modeTableDiv);
 
         this.widgetWindow.onclose = () => {
+            this._playing = false;
             logo.hideMsgs();
             this.widgetWindow.destroy();
         };
@@ -75,7 +76,6 @@ class ModeWidget {
             _("Play")
         );
         this._playButton.onclick = () => {
-            this._playing = false;
             logo.resetSynth(0);
             if (this._playingStatus()) {
                 this._playing = false;
