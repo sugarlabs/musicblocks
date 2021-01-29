@@ -46,7 +46,7 @@ class PitchSlider {
         if (!this.frequencies || !this.frequencies.length) this.frequencies = [392];
 
         const oscillators = [];
-        for (const _ in this.frequencies) {
+        for (let i = 0; i < this.frequencies.length; i++) {
             const osc = new Tone.AMSynth().toDestination();
             oscillators.push(osc);
         }
