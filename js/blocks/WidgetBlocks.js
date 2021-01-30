@@ -894,7 +894,7 @@ function setupWidgetBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             let __listener = function(event) {
-                logo.rhythmRuler = new RhythmRuler();
+                logo.rhythmRuler.init();
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
