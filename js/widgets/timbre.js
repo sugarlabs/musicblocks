@@ -39,6 +39,9 @@ class TimbreWidget {
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
 
+    /**
+     * @constructor
+     */
     constructor() {
         this.notesToPlay = [];
         this.env = [];
@@ -162,14 +165,14 @@ class TimbreWidget {
         return cell;
     }
 
+    /**
+     * @private
+     * used to update the parameters in the blocks contained in the timbre widget clamp.
+     * @param {number} i - is the index into the parameter array. (For example, there can be multiple filter blocks associated with a timbre.)
+     * @param {number} k - is the parameter to update (There can be multiple parameters per block.)
+     * @returns {void}
+     */
     _update(i, value, k) {
-        // This function is used to update the parameters in the
-        // blocks contained in the timbre widget clamp.
-        // i is the index into the parameter array. (For example, there
-        // can be multiple filter blocks associated with a timbre.)
-        // k is the parameter to update (There can be multiple
-        // parameters per block.)
-
         const updateParams = [];
 
         if (this.isActive["envelope"] === true && this.env[i] != null) {
@@ -285,6 +288,12 @@ class TimbreWidget {
         }
     }
 
+    /**
+     * @private
+     * @param {string} note - note to play
+     * @param {number} duration - duration for which to play the note
+     * @returns {void}
+     */
     _playNote(note, duration) {
         logo.synth.setMasterVolume(last(Singer.masterVolume));
 
@@ -360,6 +369,10 @@ class TimbreWidget {
         }
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _play() {
         this._playing = !this._playing;
 
@@ -436,6 +449,10 @@ class TimbreWidget {
         }
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _save() {
         // Just save a set timbre block with the current instrument name.
         const obj = [
@@ -447,6 +464,10 @@ class TimbreWidget {
         this._delta += 42;
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _undo() {
         let blockValue = 0;
 
@@ -636,6 +657,10 @@ class TimbreWidget {
         this._playNote("G4", 1 / 8);
     }
 
+    /**
+     * Initialises the timbre widget.
+     * @returns {void}
+     */
     init() {
         this._delta = 0;
 
@@ -901,6 +926,13 @@ class TimbreWidget {
         widgetWindow.sendToCenter();
     }
 
+    /**
+     * @public
+     * @param {number} n
+     * @param {number} clamp
+     * @param {number} topOfClamp
+     * @returns {void}
+     */
     clampConnection(n, clamp, topOfClamp) {
         // Connect the clamp to the Widget block.
         blocks.blockList[this.blockNo].connections[2] = n;
@@ -918,6 +950,14 @@ class TimbreWidget {
         blocks.adjustDocks(this.blockNo, true);
     }
 
+    /**
+     * @public
+     * Method pertaining to replacing blocks.
+     * @param {number} oldblk
+     * @param {number} newblk
+     * @param {number} topOfClamp
+     * @returns {void}
+     */
     clampConnectionVspace(n, vspace, topOfClamp) {
         // Connect the clamp to the Widget block.
         blocks.blockList[this.blockNo].connections[2] = n;
@@ -935,6 +975,14 @@ class TimbreWidget {
         blocks.adjustDocks(this.blockNo, true);
     }
 
+    /**
+     * @private
+     * Method pertaining to changing blocks depending on Synthesizer.
+     * @param {number} newblk
+     * @param {string} synthChosen
+     * @param {number} bottomOfClamp
+     * @returns {void}
+     */
     _changeBlock(newblk, synthChosen, bottomOfClamp) {
         let lastBlk = 0;
         if (this.AMSynthesizer.length !== 0 && synthChosen !== "AMSynth") {
@@ -953,6 +1001,13 @@ class TimbreWidget {
         }
     }
 
+    /**
+     * @private
+     * Method pertaining to replacing blocks.
+     * @param {number} oldblk
+     * @param {number} newblk
+     * @returns {void}
+     */
     _blockReplace(oldblk, newblk) {
         // Find the connections from the old block
         const c0 = blocks.blockList[oldblk].connections[0];
@@ -1005,6 +1060,13 @@ class TimbreWidget {
         logo.refreshCanvas();
     }
 
+    /**
+     * @public
+     * Method pertaining to connection of blocks.
+     * @param {number} len
+     * @param {number} bottomOfClamp
+     * @returns {void}
+     */
     blockConnection(len, bottomOfClamp) {
         const n = blocks.blockList.length - len;
         if (bottomOfClamp == null) {
@@ -1039,6 +1101,11 @@ class TimbreWidget {
         blocks.adjustDocks(this.blockNo, true);
     }
 
+    /**
+     * @private
+     * @returns {void}
+     * Method that lets you choose between an AM synth, a PM synth, or a Duo synth.
+     */
     _synth() {
         let blockValue = 0;
 
@@ -1374,6 +1441,11 @@ class TimbreWidget {
         }
     }
 
+    /**
+     * @private
+     * @returns {void}
+     * @param {boolean} newOscillator
+     */
     _oscillator(newOscillator) {
         let blockValue = 0;
 
@@ -1486,6 +1558,12 @@ class TimbreWidget {
         }
     }
 
+    /**
+     * @private
+     * @returns {void}
+     * Adds and updates filters
+     * @param {boolean} newEnvelope
+     */
     _envelope(newEnvelope) {
         let blockValue = 0;
 
@@ -1567,6 +1645,11 @@ class TimbreWidget {
         }
     }
 
+    /**
+     * @private
+     * @returns {void}
+     * Adds and updates filters
+     */
     _filter() {
         docById("filterButtonCell").style.backgroundColor = "#C8C8C8";
         docById("filterButtonCell").onmouseover = () => {};
@@ -1591,6 +1674,13 @@ class TimbreWidget {
         this._updateFilters();
     }
 
+    /**
+     * @private
+     * @returns {void}
+     * Creates filters for the given configuration.
+     * @param {number} f rolloff paramaneters
+     * @param {HTMLElement} env
+     */
     _createFilter(f, env) {
         const wrapperIDs = [f * 3, f * 3 + 1, f * 3 + 2];
         const radioIDs = [f * 4, f * 4 + 1, f * 4 + 2, f * 4 + 3];
@@ -1715,6 +1805,8 @@ class TimbreWidget {
 
     /**
      * Adds the various listeners needed for the filter panel.
+     * @private
+     * @returns {void}
      */
     _addFilterListeners() {
         const __filterNameEvent = (event) => {
@@ -1772,8 +1864,12 @@ class TimbreWidget {
         }
     }
 
+    /**
+     * @private
+     * @returns {void}
+     * Update the letious inputs on the filters panel.
+     */
     _updateFilters() {
-        // Update the letious inputs on the filters panel.
         for (let f = 0; f < this.fil.length; f++) {
             const radioIDs = [f * 4, f * 4 + 1, f * 4 + 2, f * 4 + 3];
 
@@ -1806,6 +1902,11 @@ class TimbreWidget {
         }
     }
 
+    /**
+     * @private
+     * @returns {void}
+     * lets you add addition filters to your custom timbre.
+     */
     _addFilter() {
         const env = docById("timbreTable");
         const topOfClamp = blocks.blockList[this.blockNo].connections[2];
@@ -1851,6 +1952,12 @@ class TimbreWidget {
         this._updateFilters();
     }
 
+    /**
+     * @private
+     * @returns {void}
+     * lets you add effects to your custom timbre: tremelo, vibrato, chorus, phaser, and distortion.
+     * When an effect is selected, additional controls will appear in the widget.
+     */
     _effects() {
         let blockValue = 0;
 
