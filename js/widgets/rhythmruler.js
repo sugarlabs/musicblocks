@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /**
  * @file This contains the prototype of the rhythmruler Widget
  *
@@ -42,44 +43,44 @@ class RhythmRuler {
      */
     constructor() {
     // There is one ruler per drum.
-    this.Drums = [];
-    // Rulers, one per drum, contain the subdivisions defined by rhythm blocks.
-    this.Rulers = [];
-    // Save the history of divisions so as to be able to restore them.
-    this._dissectHistory = [];
-    this._undoList = [];
+        this.Drums = [];
+        // Rulers, one per drum, contain the subdivisions defined by rhythm blocks.
+        this.Rulers = [];
+        // Save the history of divisions so as to be able to restore them.
+        this._dissectHistory = [];
+        this._undoList = [];
 
-    this._playing = false;
-    this._playingOne = false;
-    this._playingAll = false;
-    this._cellCounter = 0;
+        this._playing = false;
+        this._playingOne = false;
+        this._playingAll = false;
+        this._cellCounter = 0;
 
-    // Keep a elapsed time for each ruler to maintain sync.
-    this._elapsedTimes = [];
-    // Starting time from which we measure for sync.
-    this._startingTime = null;
+        // Keep a elapsed time for each ruler to maintain sync.
+        this._elapsedTimes = [];
+        // Starting time from which we measure for sync.
+        this._startingTime = null;
 
-    this._offsets = [];
-    this._rulerSelected = 0;
-    this._rulerPlaying = -1;
+        this._offsets = [];
+        this._rulerSelected = 0;
+        this._rulerPlaying = -1;
 
-    this._tapMode = false;
-    this._tapTimes = [];
-    this._tapCell = null;
-    this._tapEndTime = null;
+        this._tapMode = false;
+        this._tapTimes = [];
+        this._tapCell = null;
+        this._tapEndTime = null;
 
-    this._longPressStartTime = null;
-    this._inLongPress = false;
+        this._longPressStartTime = null;
+        this._inLongPress = false;
 
-    this._mouseDownCell = null;
-    this._mouseUpCell = null;
+        this._mouseDownCell = null;
+        this._mouseUpCell = null;
 
-    this._wheel = null;
+        this._wheel = null;
 
-    // Element references
-    this._dissectNumber = null;
-    this._progressBar = null;
-    this._rulers = [];
+        // Element references
+        this._dissectNumber = null;
+        this._progressBar = null;
+        this._rulers = [];
     }
 
     /**
@@ -111,11 +112,10 @@ class RhythmRuler {
             this._offsets.push(0);
         }
 
-        let w = window.innerWidth;
         this._cellScale = 1.0;
-        let iconSize = RhythmRuler.ICONSIZE;
+        const iconSize = RhythmRuler.ICONSIZE;
 
-        let widgetWindow = window.widgetWindows.windowFor(this, "rhythm maker");
+        const widgetWindow = window.widgetWindows.windowFor(this, "rhythm maker");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -129,14 +129,14 @@ class RhythmRuler {
             // docById('contextWheelDiv').style.display = 'none';
 
             // Save the new dissect history.
-            let dissectHistory = [];
-            let drums = [];
+            const dissectHistory = [];
+            const drums = [];
             for (let i = 0; i < this.Rulers.length; i++) {
                 if (this.Drums[i] === null) {
                     continue;
                 }
 
-                let history = [];
+                const history = [];
                 for (let j = 0; j < this.Rulers[i][1].length; j++) {
                     history.push(this.Rulers[i][1][j]);
                 }
@@ -148,9 +148,9 @@ class RhythmRuler {
 
             // Look for any old entries that we may have missed.
             for (let i = 0; i < this._dissectHistory.length; i++) {
-                let drum = this._dissectHistory[i][1];
+                const drum = this._dissectHistory[i][1];
                 if (drums.indexOf(drum) === -1) {
-                    let history = JSON.parse(
+                    const history = JSON.parse(
                         JSON.stringify(this._dissectHistory[i][0])
                     );
                     dissectHistory.push([history, drum]);
@@ -218,7 +218,7 @@ class RhythmRuler {
         // An input for setting the dissect number
         this._dissectNumber = widgetWindow.addInputButton("2");
 
-        this._dissectNumber.onfocus = (event) => {
+        this._dissectNumber.onfocus = () => {
             // this._piemenuNumber(['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16'], numberInput.value);
         };
 
@@ -231,7 +231,7 @@ class RhythmRuler {
             }
         };
 
-        this._dissectNumber.oninput = (event) => {
+        this._dissectNumber.oninput = () => {
             // Put a limit on the size (2 <--> 128).
             this._dissectNumber.onmouseout = () => {
                 this._dissectNumber.value = Math.max(
@@ -275,14 +275,14 @@ class RhythmRuler {
 
         // We use an outer div to scroll vertically and an inner div to
         // scroll horizontally.
-        let rhythmRulerTable = document.createElement("table");
+        const rhythmRulerTable = document.createElement("table");
         widgetWindow.getWidgetBody().append(rhythmRulerTable);
 
         let wMax = 0;
         // Each row in the ruler table contains a play button in the
         // first column and a ruler table in the second column.
         for (let i = 0; i < this.Rulers.length; i++) {
-            let rhythmRulerTableRow = rhythmRulerTable.insertRow();
+            const rhythmRulerTableRow = rhythmRulerTable.insertRow();
 
             if (beginnerMode) {
                 let w = 0;
@@ -295,7 +295,7 @@ class RhythmRuler {
                     wMax = w;
                 }
             } else {
-                let drumcell = rhythmRulerTableRow.insertCell();
+                const drumcell = rhythmRulerTableRow.insertCell();
                 drumcell.innerHTML =
                     '<img src="header-icons/play-button.svg" title="' +
                     _("Play") +
@@ -363,24 +363,24 @@ class RhythmRuler {
                 })(i);
             }
 
-            let rulerCell = rhythmRulerTableRow.insertCell();
+            const rulerCell = rhythmRulerTableRow.insertCell();
             // Create individual rulers as tables.
             rulerCell.innerHTML =
                 '<table id="rulerCellTable' + i + '"></table>';
 
-            let rulerCellTable = docById("rulerCellTable" + i);
+            const rulerCellTable = docById("rulerCellTable" + i);
             rulerCellTable.style.textAlign = "center";
             rulerCellTable.style.border = "0px";
             rulerCellTable.style.borderCollapse = "collapse";
             rulerCellTable.cellSpacing = "0px";
             rulerCellTable.cellPadding = "0px";
-            let rulerRow = rulerCellTable.insertRow();
+            const rulerRow = rulerCellTable.insertRow();
             this._rulers[i] = rulerRow;
             rulerRow.setAttribute("data-row", i);
 
             for (let j = 0; j < this.Rulers[i][0].length; j++) {
-                let noteValue = this.Rulers[i][0][j];
-                let rulerSubCell = rulerRow.insertCell(-1);
+                const noteValue = this.Rulers[i][0][j];
+                const rulerSubCell = rulerRow.insertCell(-1);
                 rulerSubCell.innerHTML = calcNoteValueToDisplay(
                     noteValue,
                     1,
@@ -446,7 +446,7 @@ class RhythmRuler {
                     continue;
                 }
 
-                let rhythmRulerTableRow = this._rulers[drum];
+                const rhythmRulerTableRow = this._rulers[drum];
                 for (let j = 0; j < this._dissectHistory[i][0].length; j++) {
                     if (this._dissectHistory[i][0][j] == undefined) {
                         continue;
@@ -457,7 +457,7 @@ class RhythmRuler {
                     if (typeof this._dissectHistory[i][0][j] === "number") {
                         cell =
                             rhythmRulerTableRow.cells[
-                            this._dissectHistory[i][0][j]
+                                this._dissectHistory[i][0][j]
                             ];
                         this.__toggleRestState(cell, false);
                     } else if (
@@ -469,7 +469,7 @@ class RhythmRuler {
                             // dissect is [cell, num]
                             cell =
                                 rhythmRulerTableRow.cells[
-                                this._dissectHistory[i][0][j][0]
+                                    this._dissectHistory[i][0][j][0]
                                 ];
                             if (cell != undefined) {
                                 this.__dissectByNumber(
@@ -478,15 +478,15 @@ class RhythmRuler {
                                     false
                                 );
                             } else {
-                                console.warn(
-                                    "Could not find cell to divide. Did the order of the rhythm blocks change?"
-                                );
+                                // console.warn(
+                                //     "Could not find cell to divide. Did the order of the rhythm blocks change?"
+                                // );
                             }
                         } else {
                             // divide is [cell, [values]]
                             cell =
                                 rhythmRulerTableRow.cells[
-                                this._dissectHistory[i][0][j][0]
+                                    this._dissectHistory[i][0][j][0]
                                 ];
                             if (cell != undefined) {
                                 this.__divideFromList(
@@ -498,7 +498,7 @@ class RhythmRuler {
                         }
                     } else {
                         // tie is [[cell, value], [cell, value]...]
-                        let history = this._dissectHistory[i][0][j];
+                        const history = this._dissectHistory[i][0][j];
                         this._mouseDownCell =
                             rhythmRulerTableRow.cells[history[0][0]];
                         this._mouseUpCell =
@@ -533,7 +533,7 @@ class RhythmRuler {
      * @returns {void}
      */
     _calculateZebraStripes(rulerno) {
-        let ruler = this._rulers[rulerno];
+        const ruler = this._rulers[rulerno];
         let evenColor;
         if (this._rulerSelected % 2 === 0) {
             evenColor = platformColor.selectorBackground;
@@ -581,7 +581,7 @@ class RhythmRuler {
         }
 
         if (this._tapMode && this._tapTimes.length > 0) {
-            let d = new Date();
+            const d = new Date();
             this._tapTimes.push(d.getTime());
             return;
         }
@@ -597,12 +597,12 @@ class RhythmRuler {
         }
 
         if (this._playing) {
-            console.warn("You cannot dissect while widget is playing.");
+            // console.warn("You cannot dissect while widget is playing.");
             return;
         } else if (this._tapMode) {
             // Tap a rhythm by clicking in a cell.
             if (this._tapCell === null) {
-                let noteValues = this.Rulers[this._rulerSelected][0];
+                const noteValues = this.Rulers[this._rulerSelected][0];
                 this._tapCell = event.target;
                 if (noteValues[this._tapCell.cellIndex] < 0) {
                     // Don't allow tapping in rests.
@@ -632,7 +632,7 @@ class RhythmRuler {
                 if (this.Drums[this._rulerSelected] === null) {
                     drum = "snare drum";
                 } else {
-                    let drumBlockNo = logo.blocks.blockList[
+                    const drumBlockNo = logo.blocks.blockList[
                         this.Drums[this._rulerSelected]
                     ].connections[1];
                     drum = logo.blocks.blockList[drumBlockNo].value;
@@ -649,11 +649,10 @@ class RhythmRuler {
                 }
 
                 setTimeout(() => {
-                    this.__startTapping(noteValues, interval);
+                    this.__startTapping(interval);
                 }, interval);
             }
         } else {
-            let noteValues = this.Rulers[this._rulerSelected][0];
             let inputNum = this._dissectNumber.value;
             if (inputNum === "" || isNaN(inputNum)) {
                 inputNum = 2;
@@ -680,7 +679,7 @@ class RhythmRuler {
      * @param {number} interval
      * @returns {void}
      */
-    __startTapping(noteValues, interval, event) {
+    __startTapping(interval, event) {
         const d = new Date();
         this._tapTimes = [d.getTime()];
         this._tapEndTime = this._tapTimes[0] + interval;
@@ -733,7 +732,7 @@ class RhythmRuler {
             typeof this._rulerSelected === "string" ||
             typeof this._rulerSelected === "number"
         ) {
-            let noteValues = this.Rulers[this._rulerSelected][0];
+            const noteValues = this.Rulers[this._rulerSelected][0];
 
             if (last(this._tapTimes) > this._tapEndTime) {
                 this._tapTimes[this._tapTimes.length - 1] = this._tapEndTime;
@@ -845,8 +844,8 @@ class RhythmRuler {
             }
 
             this._rulerSelected = cell.parentNode.getAttribute("data-row");
-            let noteValues = this.Rulers[this._rulerSelected][0];
-            let noteValue = noteValues[cell.cellIndex];
+            const noteValues = this.Rulers[this._rulerSelected][0];
+            const noteValue = noteValues[cell.cellIndex];
             let obj;
             if (noteValue < 0) {
                 obj = rationalToFraction(
@@ -891,8 +890,7 @@ class RhythmRuler {
                     this._rulerSelected = cell.parentNode.getAttribute(
                         "data-row"
                     );
-                    let noteValues = this.Rulers[this._rulerSelected][0];
-                    let noteValue = noteValues[cell.cellIndex];
+                    // const noteValues = this.Rulers[this._rulerSelected][0];
                     cell.style.backgroundColor =
                         platformColor.selectorBackground;
                 }
@@ -929,7 +927,7 @@ class RhythmRuler {
                         cell.parentNode.getAttribute("data-row")
                     );
                 } else {
-                    console.error("Rhythm Ruler: null cell found on click");
+                    // console.error("Rhythm Ruler: null cell found on click");
                 }
             }
 
@@ -986,8 +984,8 @@ class RhythmRuler {
 
         if (cell !== null && cell.parentNode !== null) {
             this._rulerSelected = cell.parentNode.getAttribute("data-row");
-            let noteValues = this.Rulers[this._rulerSelected][0];
-            let noteValue = noteValues[cell.cellIndex];
+            const noteValues = this.Rulers[this._rulerSelected][0];
+            const noteValue = noteValues[cell.cellIndex];
 
             const __mouseOverHandler = (event) => {
                 const cell = event.target;
@@ -998,8 +996,8 @@ class RhythmRuler {
                 let obj;
 
                 this._rulerSelected = cell.parentNode.getAttribute("data-row");
-                let noteValues = this.Rulers[this._rulerSelected][0];
-                let noteValue = noteValues[cell.cellIndex];
+                const noteValues = this.Rulers[this._rulerSelected][0];
+                const noteValue = noteValues[cell.cellIndex];
                 if (noteValue < 0) {
                     obj = rationalToFraction(
                         Math.abs(Math.abs(-1 / noteValue))
@@ -1081,16 +1079,16 @@ class RhythmRuler {
             return;
         }
 
-        let ruler = this._rulers[this._rulerSelected];
+        const ruler = this._rulers[this._rulerSelected];
         const newCellIndex = cell.cellIndex;
 
         if (
             typeof this._rulerSelected === "string" ||
             typeof this._rulerSelected === "number"
         ) {
-            let noteValues = this.Rulers[this._rulerSelected][0];
+            const noteValues = this.Rulers[this._rulerSelected][0];
 
-            let divisionHistory = this.Rulers[this._rulerSelected][1];
+            const divisionHistory = this.Rulers[this._rulerSelected][1];
             if (addToUndoList) {
                 this._undoList.push(["tap", this._rulerSelected]);
             }
@@ -1134,7 +1132,7 @@ class RhythmRuler {
      * @param {number} inputNum
      * @param {boolean} addToUndoList
      * @returns {void}
-     */    
+     */
 
     __dissectByNumber(cell, inputNum, addToUndoList) {
         if (typeof cell !== "object") {
@@ -1145,16 +1143,16 @@ class RhythmRuler {
             return;
         }
 
-        let ruler = this._rulers[this._rulerSelected];
+        const ruler = this._rulers[this._rulerSelected];
         const newCellIndex = cell.cellIndex;
 
         if (
             typeof this._rulerSelected === "string" ||
             typeof this._rulerSelected === "number"
         ) {
-            let noteValues = this.Rulers[this._rulerSelected][0];
+            const noteValues = this.Rulers[this._rulerSelected][0];
 
-            let noteValue = noteValues[newCellIndex];
+            const noteValue = noteValues[newCellIndex];
             if (inputNum * noteValue > 256) {
                 logo.errorMsg(
                     _("Maximum value of 256 has been exceeded.")
@@ -1164,7 +1162,7 @@ class RhythmRuler {
                 logo.hideMsgs();
             }
 
-            let divisionHistory = this.Rulers[this._rulerSelected][1];
+            const divisionHistory = this.Rulers[this._rulerSelected][1];
             if (addToUndoList) {
                 this._undoList.push(["dissect", this._rulerSelected]);
             }
@@ -1187,7 +1185,7 @@ class RhythmRuler {
             noteValues.splice(newCellIndex, 1);
 
             for (let i = 0; i < inputNum; i++) {
-                let newCell = ruler.insertCell(newCellIndex + i);
+                const newCell = ruler.insertCell(newCellIndex + i);
                 noteValues.splice(newCellIndex + i, 0, newNoteValue);
 
                 newCell.style.width = newCellWidth + "px";
@@ -1215,11 +1213,11 @@ class RhythmRuler {
      * @param {Event} event - The triggering event.
      * @param {string} ruler
      * @returns {void}
-     */    
+     */
 
     _tieRuler(event, ruler) {
         if (this._playing) {
-            console.warn("You cannot tie while widget is playing.");
+            // console.warn("You cannot tie while widget is playing.");
             return;
         } else if (this._tapMode) {
             // If we are tapping, then treat a tie as a tap.
@@ -1241,10 +1239,10 @@ class RhythmRuler {
      * @private
      * @param {boolean} addToUndoList
      * @returns {void}
-     */  
+     */
 
     __tie(addToUndoList) {
-        let ruler = this._rulers[this._rulerSelected];
+        const ruler = this._rulers[this._rulerSelected];
 
         if (this._mouseDownCell === null || this._mouseUpCell === null) {
             return;
@@ -1278,19 +1276,19 @@ class RhythmRuler {
 
             noteValues = this.Rulers[this._rulerSelected][0];
 
-            let divisionHistory = this.Rulers[this._rulerSelected][1];
+            const divisionHistory = this.Rulers[this._rulerSelected][1];
             if (addToUndoList) {
                 this._undoList.push(["tie", this._rulerSelected]);
             }
 
-            let history = [];
+            const history = [];
             for (let i = downCellIndex; i < upCellIndex + 1; i++) {
                 history.push([i, noteValues[i]]);
             }
 
             divisionHistory.push(history);
 
-            let oldNoteValue = noteValues[downCellIndex];
+            const oldNoteValue = noteValues[downCellIndex];
             let noteValue = Math.abs(1 / oldNoteValue);
 
             // Delete all the cells between down and up except the down
@@ -1328,7 +1326,7 @@ class RhythmRuler {
     /**
      * @private
      * @returns {void}
-     */  
+     */
 
     _undo () {
         // FIXME: Add undo for REST
@@ -1344,23 +1342,23 @@ class RhythmRuler {
             return;
         }
 
-        let obj = this._undoList.pop();
-        let lastRuler = obj[1];
-        let divisionHistory = this.Rulers[lastRuler][1];
+        const obj = this._undoList.pop();
+        const lastRuler = obj[1];
+        const divisionHistory = this.Rulers[lastRuler][1];
         if (divisionHistory.length === 0) {
             return;
         }
 
-        let ruler = this._rulers[lastRuler];
-        let noteValues = this.Rulers[lastRuler][0];
+        const ruler = this._rulers[lastRuler];
+        const noteValues = this.Rulers[lastRuler][0];
 
         if (obj[0] === "dissect") {
-            let inputNum = divisionHistory[divisionHistory.length - 1][1];
-            let newCellIndex = divisionHistory[divisionHistory.length - 1][0];
-            let cellWidth = ruler.cells[newCellIndex].style.width;
-            let newCellWidth = parseFloat(cellWidth) * inputNum;
-            let oldCellNoteValue = noteValues[newCellIndex];
-            let newNoteValue = oldCellNoteValue / inputNum;
+            const inputNum = divisionHistory[divisionHistory.length - 1][1];
+            const newCellIndex = divisionHistory[divisionHistory.length - 1][0];
+            const cellWidth = ruler.cells[newCellIndex].style.width;
+            const newCellWidth = parseFloat(cellWidth) * inputNum;
+            const oldCellNoteValue = noteValues[newCellIndex];
+            const newNoteValue = oldCellNoteValue / inputNum;
 
             const newCell = ruler.insertCell(newCellIndex);
             newCell.style.width = this._noteWidth(newNoteValue) + "px";
@@ -1385,19 +1383,18 @@ class RhythmRuler {
                 ruler.deleteCell(newCellIndex + 1);
             }
         } else if (obj[0] === "tap") {
-            let newCellIndex = last(divisionHistory)[0];
-            let oldNoteValues = last(divisionHistory)[1];
+            const newCellIndex = last(divisionHistory)[0];
+            const oldNoteValues = last(divisionHistory)[1];
 
             // Calculate the new note value based on the sum of the
             // oldnoteValues.
-            let oldCellNoteValue = noteValues[newCellIndex];
             let sum = 0;
             for (let i = 0; i < oldNoteValues.length; i++) {
                 sum += 1 / oldNoteValues[i];
             }
 
-            let newNoteValue = 1 / sum;
-            let newCellWidth = this._noteWidth(newNoteValue);
+            const newNoteValue = 1 / sum;
+            const newCellWidth = this._noteWidth(newNoteValue);
 
             const newCell = ruler.insertCell(newCellIndex);
             newCell.style.width = newCellWidth + "px";
@@ -1408,7 +1405,7 @@ class RhythmRuler {
 
             newCell.style.backgroundColor = platformColor.selectorBackground;
 
-            let obj = rationalToFraction(newNoteValue);
+            const obj = rationalToFraction(newNoteValue);
             newCell.innerHTML = calcNoteValueToDisplay(
                 obj[1],
                 obj[0],
@@ -1424,13 +1421,13 @@ class RhythmRuler {
                 ruler.deleteCell(newCellIndex + 1);
             }
         } else if (obj[0] === "tie") {
-            let history = last(divisionHistory);
+            const history = last(divisionHistory);
             // The old cell is the same as the first entry in the
             // history. Dissect the old cell into history.length
             // parts and restore their size and note values.
             if (history.length > 0) {
-                let oldCell = ruler.cells[history[0][0]];
-                let oldCellWidth = this._noteWidth(history[0][1]);
+                const oldCell = ruler.cells[history[0][0]];
+                const oldCellWidth = this._noteWidth(history[0][1]);
                 oldCell.style.width = oldCellWidth + "px";
                 oldCell.style.minWidth = oldCell.style.width;
                 oldCell.style.height = RhythmRuler.RULERHEIGHT + "px";
@@ -1446,7 +1443,7 @@ class RhythmRuler {
 
                 for (let i = 1; i < history.length; i++) {
                     const newCell = ruler.insertCell(history[0][0] + i);
-                    let newCellWidth = this._noteWidth(history[i][1]);
+                    const newCellWidth = this._noteWidth(history[i][1]);
                     newCell.style.width = newCellWidth + "px";
                     newCell.style.minWidth = newCell.style.width;
                     newCell.style.height = RhythmRuler.RULERHEIGHT + "px";
@@ -1469,10 +1466,10 @@ class RhythmRuler {
 
                 this.Rulers[lastRuler][0] = noteValues;
             } else {
-                console.warn("empty history encountered... skipping undo");
+                // console.warn("empty history encountered... skipping undo");
             }
         } else if (obj[0] === "rest") {
-            let newCellIndex = last(divisionHistory);
+            const newCellIndex = last(divisionHistory);
             const cell = ruler.cells[newCellIndex];
             this.__toggleRestState(cell, false);
             divisionHistory.pop();
@@ -1488,11 +1485,11 @@ class RhythmRuler {
     /**
      * @private
      * @returns {void}
-     */  
+     */
 
     _tap() {
         this._tapMode = true;
-        let iconSize = RhythmRuler.ICONSIZE;
+        const iconSize = RhythmRuler.ICONSIZE;
         this._tapButton.innerHTML =
             '<img src="header-icons/tap-active-button.svg" title="' +
             _("tap a rhythm") +
@@ -1508,7 +1505,7 @@ class RhythmRuler {
     /**
      * @private
      * @returns {void}
-     */  
+     */
 
     _clear() {
         logo.synth.stop();
@@ -1541,7 +1538,7 @@ class RhythmRuler {
     /**
      * @private
      * @returns {void}
-     */  
+     */
 
     __pause() {
 
@@ -1568,7 +1565,7 @@ class RhythmRuler {
     /**
      * @public
      * @returns {void}
-     */  
+     */
 
     playAll() {
         // External call from run button.
@@ -1590,7 +1587,7 @@ class RhythmRuler {
     /**
      * @private
      * @returns {void}
-     */  
+     */
 
     __resume() {
 
@@ -1621,13 +1618,13 @@ class RhythmRuler {
     /**
      * @private
      * @returns {void}
-     */  
+     */
 
     _playAll() {
         logo.synth.stop();
         logo.resetSynth(0);
         if (this._startingTime === null) {
-            let d = new Date();
+            const d = new Date();
             this._startingTime = d.getTime();
             for (let i = 0; i < this.Rulers.length; i++) {
                 this._offsets[i] = 0;
@@ -1643,7 +1640,7 @@ class RhythmRuler {
     /**
      * @private
      * @returns {void}
-     */  
+     */
 
     _playOne() {
         logo.synth.stop();
@@ -1654,7 +1651,7 @@ class RhythmRuler {
             this._elapsedTimes[this._rulerSelected] = 0;
             this._offsets[this._rulerSelected] = 0;
         }
-        console.debug("this._rulerSelected " + this._rulerSelected);
+        // console.debug("this._rulerSelected " + this._rulerSelected);
 
         this.__loop(0, this._rulerSelected, 0);
     }
@@ -1665,12 +1662,12 @@ class RhythmRuler {
      * @param {number} rulerNo
      * @param {number} colIndex
      * @returns {void}
-     */  
+     */
 
     __loop(noteTime, rulerNo, colIndex) {
-        let ruler = this._rulers[rulerNo];
+        const ruler = this._rulers[rulerNo];
         if (ruler === null) {
-            console.warn("Cannot find ruler " + rulerNo + ". Widget closed?");
+            // console.warn("Cannot find ruler " + rulerNo + ". Widget closed?");
             return;
         }
 
@@ -1680,15 +1677,15 @@ class RhythmRuler {
         }
 
         const cell = ruler.cells[colIndex];
-        let noteValues = this.Rulers[rulerNo][0];
-        let noteValue = noteValues[colIndex];
+        const noteValues = this.Rulers[rulerNo][0];
+        const noteValue = noteValues[colIndex];
 
         noteTime = Math.abs(1 / noteValue);
         let drum;
         if (this.Drums[rulerNo] === null) {
             drum = "snare drum";
         } else {
-            let drumblockno = logo.blocks.blockList[this.Drums[rulerNo]]
+            const drumblockno = logo.blocks.blockList[this.Drums[rulerNo]]
                 .connections[1];
             drum = logo.blocks.blockList[drumblockno].value;
         }
@@ -1740,7 +1737,7 @@ class RhythmRuler {
             cell.style.backgroundColor = platformColor.rulerHighlight; // selectorBackground;
 
             // Calculate any offset in playback.
-            let d = new Date();
+            const d = new Date();
             this._offsets[rulerNo] =
                 d.getTime() - this._startingTime - this._elapsedTimes[rulerNo];
         }
@@ -1764,20 +1761,20 @@ class RhythmRuler {
      * @private
      * @param {number} selectedRuler
      * @returns {void}
-     */  
+     */
 
     _save(selectedRuler) {
         // Deprecated -- replaced by save tuplets code
         
-        for (let name in logo.blocks.palettes.dict) {
+        for (const name in logo.blocks.palettes.dict) {
             logo.blocks.palettes.dict[name].hideMenu(true);
         }
 
         logo.refreshCanvas();
 
         setTimeout(() => {
-            let ruler = this._rulers[selectedRuler];
-            let noteValues = this.Rulers[selectedRuler][0];
+            const ruler = this._rulers[selectedRuler];
+            const noteValues = this.Rulers[selectedRuler][0];
             // Get the first word of drum's name (ignore the word 'drum' itself)
             // and add 'rhythm'.
             let stack_value;
@@ -1792,8 +1789,8 @@ class RhythmRuler {
                     " " +
                     _("rhythm");
             }
-            let delta = selectedRuler * 42;
-            let newStack = [
+            const delta = selectedRuler * 42;
+            const newStack = [
                 [
                     0,
                     ["action", { collapsed: true }],
@@ -1813,10 +1810,10 @@ class RhythmRuler {
                     sameNoteValue += 1;
                     continue;
                 } else {
-                    let idx = newStack.length;
-                    let noteValue = noteValues[i];
+                    const idx = newStack.length;
+                    const noteValue = noteValues[i];
 
-                    let obj = rationalToFraction(1 / Math.abs(noteValue));
+                    const obj = rationalToFraction(1 / Math.abs(noteValue));
 
                     newStack.push([
                         idx,
@@ -1890,20 +1887,20 @@ class RhythmRuler {
      * @private
      * @param {number} selectedRuler
      * @returns {void}
-     */ 
+     */
     
 
     _saveTuplets(selectedRuler) {
         
-        for (let name in logo.blocks.palettes.dict) {
+        for (const name in logo.blocks.palettes.dict) {
             logo.blocks.palettes.dict[name].hideMenu(true);
         }
 
         logo.refreshCanvas();
 
         setTimeout(() => {
-            let ruler = this._rulers[selectedRuler];
-            let noteValues = this.Rulers[selectedRuler][0];
+            const ruler = this._rulers[selectedRuler];
+            const noteValues = this.Rulers[selectedRuler][0];
             let stack_value;
             if (this.Drums[selectedRuler] === null) {
                 stack_value = _("rhythm");
@@ -1916,8 +1913,8 @@ class RhythmRuler {
                     " " +
                     _("rhythm");
             }
-            let delta = selectedRuler * 42;
-            let newStack = [
+            const delta = selectedRuler * 42;
+            const newStack = [
                 [
                     0,
                     ["action", { collapsed: true }],
@@ -1937,10 +1934,10 @@ class RhythmRuler {
                     sameNoteValue += 1;
                     continue;
                 } else {
-                    let idx = newStack.length;
-                    let noteValue = noteValues[i];
-                    let obj = rationalToFraction(1 / Math.abs(noteValue));
-                    let n = obj[1] / sameNoteValue;
+                    const idx = newStack.length;
+                    const noteValue = noteValues[i];
+                    const obj = rationalToFraction(1 / Math.abs(noteValue));
+                    const n = obj[1] / sameNoteValue;
                     if (Number.isInteger(n)) {
                         newStack.push([
                             idx,
@@ -2065,19 +2062,19 @@ class RhythmRuler {
      * @private
      * @param {number} selectedRuler
      * @returns {void}
-     */ 
+     */
 
     _saveTupletsMerged(noteValues) {
         
-        for (let name in logo.blocks.palettes.dict) {
+        for (const name in logo.blocks.palettes.dict) {
             logo.blocks.palettes.dict[name].hideMenu(true);
         }
 
         logo.refreshCanvas();
 
-        let stack_value = _("rhythm");
-        let delta = 42;
-        let newStack = [
+        const stack_value = _("rhythm");
+        const delta = 42;
+        const newStack = [
             [
                 0,
                 ["action", { collapsed: true }],
@@ -2097,9 +2094,9 @@ class RhythmRuler {
                 sameNoteValue += 1;
                 continue;
             } else {
-                let idx = newStack.length;
-                let noteValue = noteValues[i];
-                let obj = rationalToFraction(1 / Math.abs(noteValue));
+                const idx = newStack.length;
+                const noteValue = noteValues[i];
+                const obj = rationalToFraction(1 / Math.abs(noteValue));
                 newStack.push([
                     idx,
                     "rhythm2",
@@ -2162,7 +2159,7 @@ class RhythmRuler {
      * @private
      * @param {number} selectedRuler
      * @returns {void}
-     */ 
+     */
 
     _saveMachine (selectedRuler) {
         // We are either saving a drum machine or a voice machine.
@@ -2170,7 +2167,7 @@ class RhythmRuler {
         if (this.Drums[selectedRuler] === null) {
             drum = "snare drum";
         } else {
-            let drumBlockNo = logo.blocks.blockList[
+            const drumBlockNo = logo.blocks.blockList[
                 this.Drums[selectedRuler]
             ].connections[1];
             drum = logo.blocks.blockList[drumBlockNo].value;
@@ -2202,20 +2199,20 @@ class RhythmRuler {
      * @param {string} drum
      * @param {boolean} effect
      * @returns {void}
-     */ 
+     */
 
     _saveDrumMachine(selectedRuler, drum, effect) {
         
-        for (let name in logo.blocks.palettes.dict) {
+        for (const name in logo.blocks.palettes.dict) {
             logo.blocks.palettes.dict[name].hideMenu(true);
         }
 
         logo.refreshCanvas();
 
         setTimeout(() => {
-            let ruler = this._rulers[selectedRuler];
-            let noteValues = this.Rulers[selectedRuler][0];
-            let delta = selectedRuler * 42;
+            const ruler = this._rulers[selectedRuler];
+            const noteValues = this.Rulers[selectedRuler][0];
+            const delta = selectedRuler * 42;
 
             // Just save the action, not the drum machine itself.
             // let newStack = [[0, ['start', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, null]]];
@@ -2233,7 +2230,7 @@ class RhythmRuler {
                     _("action");
             }
 
-            let newStack = [
+            const newStack = [
                 [
                     0,
                     ["action", { collapsed: true }],
@@ -2253,10 +2250,10 @@ class RhythmRuler {
                     sameNoteValue += 1;
                     continue;
                 } else {
-                    let idx = newStack.length;
-                    let noteValue = noteValues[i];
+                    const idx = newStack.length;
+                    const noteValue = noteValues[i];
 
-                    let obj = rationalToFraction(1 / Math.abs(noteValue));
+                    const obj = rationalToFraction(1 / Math.abs(noteValue));
 
                     if (sameNoteValue === 1) {
                         // Add a note block.
@@ -2513,7 +2510,7 @@ class RhythmRuler {
      * @param {number} selectedRuler
      * @param {string} voice
      * @returns {void}
-     */ 
+     */
 
     _saveVoiceMachine(selectedRuler, voice) {
         
@@ -2524,9 +2521,9 @@ class RhythmRuler {
         logo.refreshCanvas();
 
         setTimeout(() => {
-            let ruler = this._rulers[selectedRuler];
-            let noteValues = this.Rulers[selectedRuler][0];
-            let delta = selectedRuler * 42;
+            const ruler = this._rulers[selectedRuler];
+            const noteValues = this.Rulers[selectedRuler][0];
+            const delta = selectedRuler * 42;
 
             // Just save the action, not the drum machine itself.
             // let newStack = [[0, ['start', {'collapsed': false}], 100 + delta, 100 + delta, [null, 1, null]]];
@@ -2550,7 +2547,7 @@ class RhythmRuler {
                     _("action");
             }
 
-            let newStack = [
+            const newStack = [
                 [
                     0,
                     ["action", { collapsed: true }],
@@ -2573,10 +2570,10 @@ class RhythmRuler {
                     sameNoteValue += 1;
                     continue;
                 } else {
-                    let idx = newStack.length;
-                    let noteValue = noteValues[i];
+                    const idx = newStack.length;
+                    const noteValue = noteValues[i];
 
-                    let obj = rationalToFraction(1 / Math.abs(noteValue));
+                    const obj = rationalToFraction(1 / Math.abs(noteValue));
 
                     if (sameNoteValue === 1) {
                         // Add a note block.
@@ -2891,7 +2888,7 @@ class RhythmRuler {
     /**
      * @private
      * @returns {array}
-     */ 
+     */
 
     _mergeRulers() {
         // Merge the rulers into one set of rhythms.
@@ -2899,7 +2896,7 @@ class RhythmRuler {
         let noteValues;
         for (let r = 0; r < this.Rulers.length; r++) {
             let t = 0;
-            let selectedRuler = this.Rulers[r];
+            const selectedRuler = this.Rulers[r];
             noteValues = selectedRuler[0];
             for (let i = 0; i < noteValues.length; i++) {
                 t += 1 / noteValues[i];
@@ -2928,7 +2925,7 @@ class RhythmRuler {
     /**
      * @private
      * @returns {boolean}
-     */ 
+     */
 
     _get_save_lock() {
         return this._save_lock;
@@ -2937,13 +2934,13 @@ class RhythmRuler {
     /**
      * @public
      * @returns {void}
-     */ 
+     */
 
     saveDissectHistory() {
         // Save the new dissect history.
         
-        let dissectHistory = [];
-        let drums = [];
+        const dissectHistory = [];
+        const drums = [];
         let drum;
         let history;
         for (let i = 0; i < this.Rulers.length; i++) {
@@ -2975,7 +2972,7 @@ class RhythmRuler {
         this._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
     }
 
-    _piemenuRuler(selectedRuler) {
+    _piemenuRuler() {
         return; // In progress
         /*
         // piemenu version of ruler
@@ -3024,96 +3021,6 @@ class RhythmRuler {
         */
     }
 
-    /**
-     * @private
-     * @returns {void}
-     */ 
-
-    _piemenuNumber(wheelValues, selectedValue) {
-        // input form and  wheelNav pie menu for number selection
-        docById("wheelDiv").style.display = "";
-
-        // the number selector
-        this._numberWheel = new wheelnav("wheelDiv", null, 600, 600);
-        // exit button
-        this._exitWheel = new wheelnav("_exitWheel", this._numberWheel.raphael);
-
-        let wheelLabels = [];
-        for (let i = 0; i < wheelValues.length; i++) {
-            wheelLabels.push(wheelValues[i].toString());
-        }
-
-        // spacer
-        wheelLabels.push(null);
-
-        wheelnav.cssMode = true;
-
-        this._numberWheel.keynavigateEnabled = true;
-
-        this._numberWheel.colors = ["#ffb2bc", "#ffccd6"];
-        this._numberWheel.slicePathFunction = slicePath().DonutSlice;
-        this._numberWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._numberWheel.slicePathCustom.minRadiusPercent = 0.2;
-        if (wheelValues.length > 16) {
-            this._numberWheel.slicePathCustom.maxRadiusPercent = 1.0;
-        } else {
-            this._numberWheel.slicePathCustom.maxRadiusPercent = 0.6;
-        }
-
-        this._numberWheel.sliceSelectedPathCustom = this._numberWheel.slicePathCustom;
-        this._numberWheel.sliceInitPathCustom = this._numberWheel.slicePathCustom;
-        // this._numberWheel.titleRotateAngle = 0;
-        this._numberWheel.animatetime = 300;
-        this._numberWheel.createWheel(wheelLabels);
-
-        this._exitWheel.colors = ["#808080", "#c0c0c0"];
-        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
-        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["x", " "]);
-
-        
-
-        const __selectionChanged = () => {
-            this._dissectNumber.value =
-                wheelValues[this._numberWheel.selectedNavItemIndex];
-        };
-
-        const __exitMenu = () => {
-            let d = new Date();
-            this._piemenuExitTime = d.getTime();
-            docById("wheelDiv").style.display = "none";
-            this._numberWheel.removeWheel();
-            this._exitWheel.removeWheel();
-        };
-
-        this._positionWheel();
-
-        // Navigate to a the current number value.
-        let i = wheelValues.indexOf(selectedValue);
-        if (i === -1) {
-            i = 0;
-        }
-
-        this._numberWheel.navigateWheel(i);
-
-        // Hide the widget when the selection is made.
-        for (let i = 0; i < wheelLabels.length; i++) {
-            this._numberWheel.navItems[i].navigateFunction = () => {
-                __selectionChanged();
-                __exitMenu();
-            };
-        }
-
-        // Or use the exit wheel...
-        this._exitWheel.navItems[0].navigateFunction = () => {
-            __exitMenu();
-        };
-    }
 
     /**
      * @private
@@ -3131,9 +3038,9 @@ class RhythmRuler {
         docById("wheelDiv").style.width = "300px";
 
         // Position the widget over the note block.
-        let x = this._left + 100;
-        let y = this._top;
-        let selectorWidth = 150;
+        const x = this._left + 100;
+        const y = this._top;
+        const selectorWidth = 150;
 
         docById("wheelDiv").style.left =
             Math.min(
