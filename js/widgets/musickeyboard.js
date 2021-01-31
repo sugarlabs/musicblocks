@@ -1,18 +1,37 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-undef */
-// Copyright (c) 2015 Jefferson Lee
-// Copyright (c) 2018 Ritwik Abhishek
-// Copyright (c) 2018,20 Walter Bender
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundation; either
-// version 3 of the License, or (at your option) any later version.
-//
-// You should have received a copy of the GNU Affero General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+/**
+ * @file This contains the prototype of the MusicKeyboard Widget.
+ *
+ * @copyright 2015 Jefferson Lee
+ * @copyright 2018 Ritwik Abhishek 
+ * @copyright 2018,20 Walter Bender
+ *
+ * @license
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * The GNU Affero General Public License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this
+ * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
+ * MA 02110-1335 USA.
+ */
 
+/*
+   global platformColor, docById, wheelnav, slicePath, logo, Singer, last, _, FIXEDSOLFEGE1
+   SHARP, FLAT, noteToFrequency, EIGHTHNOTEWIDTH, MATRIXSOLFEHEIGHT, MATRIXSOLFEWIDTH, 
+   i18nSolfege, toFraction, i, blocks, getNote, PREVIEWVOLUME, DEFAULTVOICE, PITCHES3, 
+   SOLFEGENAMES, PITCHES2, PITCHES, NOTESSHARP, NOTESFLAT, convertFromSolfege, SOLFEGECONVERSIONTABLE
+
+   
+ */
+
+/* exported MusicKeyboard */
+
+/**
+ * @class
+ * @classdesc pertains to setting up all features of the musickeyboard widget and its UI features.
+ *
+ * Private members' names begin with underscore '_".
+ */
 class MusicKeyboard {
     static FAKEBLOCKNUMBER = 100000;
     static BUTTONDIVWIDTH = 535; // 5 buttons
@@ -30,6 +49,10 @@ class MusicKeyboard {
     static beginnerMode = localStorage.beginnerMode;
     static unit = MusicKeyboard.beginnerMode === "true" ? 8 : 16;
     static selectedNotes = [];
+
+    /**
+     * @constructor
+     */
 
     constructor() {
         const w = window.innerWidth;
@@ -59,6 +82,10 @@ class MusicKeyboard {
         this._notesPlayed = [];
     }
 
+    /**
+     * Initialises the MusicKeyboard widget.
+     * @returns {void}
+     */
 
     init() {
         this.tick = false;
@@ -199,6 +226,12 @@ class MusicKeyboard {
         widgetWindow.sendToCenter();
     }
 
+    /**
+     * @public
+     * @param {number} rowBlock
+     * @returns {void}
+     */
+
     addRowBlock(rowBlock) {
         // In case there is a repeat block, use a unique block number
         // for each instance.
@@ -208,6 +241,11 @@ class MusicKeyboard {
 
         this._rowBlocks.push(rowBlock);
     }
+
+    /**
+     * @public
+     * @returns {void}
+     */
 
     processSelected() {
         if (this._notesPlayed.length === 0) {
@@ -262,6 +300,11 @@ class MusicKeyboard {
         }
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
+
     addKeyboardShortcuts() {
 
         let duration = 0;
@@ -271,7 +314,7 @@ class MusicKeyboard {
         const current = new Set();
 
         const __startNote = (event) => {
-            let i, id, ele;
+            let i, id;
             if (MusicKeyboard.WHITEKEYS.indexOf(event.keyCode) !== -1) {
                 i = MusicKeyboard.WHITEKEYS.indexOf(event.keyCode);
                 id = "whiteRow" + i.toString();
@@ -282,9 +325,9 @@ class MusicKeyboard {
                 id = "rest";
             }
 
-            ele = docById(id);
+            const ele = docById(id);
             if (!(id in startTime)) {
-                let startDate = new Date();
+                const startDate = new Date();
                 startTime[id] = startDate.getTime();
             }
 
@@ -346,7 +389,7 @@ class MusicKeyboard {
         };
 
         const __endNote = (event) => {
-            let i, id, ele;
+            let i, id;
             if (MusicKeyboard.WHITEKEYS.indexOf(event.keyCode) !== -1) {
                 i = MusicKeyboard.WHITEKEYS.indexOf(event.keyCode);
                 id = "whiteRow" + i.toString();
@@ -357,7 +400,7 @@ class MusicKeyboard {
                 id = "rest";
             }
 
-            ele = docById(id);
+            const ele = docById(id);
             const newDate = new Date();
             this.endTime = newDate.getTime();
             duration = (this.endTime - startTime[id]) / 1000.0;
@@ -418,6 +461,14 @@ class MusicKeyboard {
         document.onkeydown = __keyboarddown;
         document.onkeyup = __keyboardup;
     }
+
+    /**
+     * @public
+     * @param {HTMLElement} element
+     * @param {number} i
+     * @param {number} blockNumber
+     * @returns {void}
+     */
 
     loadHandler(element, i, blockNumber) {
         const temp1 = this.layout[i].noteName;
@@ -507,6 +558,11 @@ class MusicKeyboard {
     }
 
 
+    /**
+     * @public
+     * @returns {void}
+     */
+
 
     playAll() {
         if (MusicKeyboard.selectedNotes.length <= 0) {
@@ -586,9 +642,17 @@ class MusicKeyboard {
         }
     }
 
+    /**
+     * @public
+     * @param {number} counter
+     * @param {string} time
+     * @param {HTMLElement} playButtonCell
+     * @returns {void}
+     */
+
     playOne(counter, time, playButtonCell) {
         setTimeout(() => {
-            let cell, eleid, ele, notes, zx, res, maxWidth;
+            let cell, eleid, ele, zx, res, maxWidth;
             if (counter < MusicKeyboard.selectedNotes.length) {
                 if (this._stopOrCloseClicked) {
                     return;
@@ -668,6 +732,14 @@ class MusicKeyboard {
         }, time * 1000 + 125);
     }
 
+    /**
+     * @private
+     * @param {Array} notes
+     * @param {Array} noteValue
+     * @param {Array} instruments
+     * @returns {void}
+     */
+
     _playChord(notes, noteValue, instruments) {
         if (notes[0] === "R") {
             return;
@@ -695,6 +767,11 @@ class MusicKeyboard {
             }, 1);
         }
     }
+
+    /**
+     * @private
+     * @returns {void}
+     */
 
     _keysLayout() {
         this.layout = [];
@@ -769,6 +846,13 @@ class MusicKeyboard {
         }
     }
 
+    /**
+     * @private
+     * @param {number} colIndex
+     * @param {boolean} playNote
+     * @returns {void}
+     */
+
     _setNotes(colIndex, playNote) {
         const start = docById("cells-" + colIndex).getAttribute("start");
 
@@ -802,6 +886,15 @@ class MusicKeyboard {
             });
         }
     }
+
+    /**
+     * @private
+     * @param {number} j
+     * @param {number} colIndex
+     * @param {string} start
+     * @param {boolean} playNote
+     * @returns {void}
+     */
 
     _setNoteCell(j, colIndex, start, playNote) {
         const n = this.layout.length;
@@ -843,6 +936,11 @@ class MusicKeyboard {
             );
         }
     }
+
+    /**
+     * @public
+     * @returns {void}
+     */
 
     makeClickable() {
         const rowNote = docById("mkbNoteDurationRow");
@@ -909,9 +1007,20 @@ class MusicKeyboard {
         }
     }
 
+    /**
+     * @private
+     * @param {number} noteValue
+     * @returns {number}
+     */
+
     _noteWidth(noteValue) {
         return Math.max(Math.floor(EIGHTHNOTEWIDTH * (8 * noteValue) * this._cellScale), 15);
     }
+
+    /**
+     * @private
+     * @returns {void}
+     */
 
     _createTable() {
         this.processSelected();
@@ -1071,6 +1180,13 @@ class MusicKeyboard {
         innerDiv.scrollLeft = innerDiv.scrollWidth; // Force to the right.
         this.makeClickable();
     }
+
+    /**
+     * @private
+     * @param {string} cellId
+     * @param {string} start
+     * @returns {void}
+     */
 
     _createpiesubmenu(cellId, start) {
         docById("wheelDivptm").style.display = "";
@@ -1238,6 +1354,13 @@ class MusicKeyboard {
         }
     }
 
+    /**
+     * @private
+     * @param {string} start
+     * @param {number} duration
+     * @returns {void}
+     */
+
     _updateDuration(start, duration) {
         start = parseInt(start);
         duration = parseInt(duration[0]) / parseInt(duration[1]);
@@ -1251,6 +1374,14 @@ class MusicKeyboard {
         });
         this._createTable();
     }
+
+    /**
+     * @private
+     * @param {string} cellId
+     * @param {string} start
+     * @param {number} divideNoteBy
+     * @returns {void}
+     */
 
     _addNotes(cellId, start, divideNoteBy) {
         start = parseInt(start);
@@ -1281,6 +1412,12 @@ class MusicKeyboard {
         this._createTable();
     }
 
+    /**
+     * @private
+     * @param {string} start
+     * @returns {void}
+     */
+
     _deleteNotes(start) {
         start = parseInt(start);
 
@@ -1290,6 +1427,13 @@ class MusicKeyboard {
 
         this._createTable();
     }
+
+    /**
+     * @private
+     * @param {string} start
+     * @param {number} divideNoteBy
+     * @returns {void}
+     */
 
     _divideNotes(start, divideNoteBy) {
         start = parseInt(start);
@@ -1328,6 +1472,11 @@ class MusicKeyboard {
 
         this._createTable();
     }
+
+    /**
+     * @private
+     * @returns {void}
+     */
 
     _createAddRowPieSubmenu() {
         docById("wheelDivptm").style.display = "";
@@ -1508,6 +1657,13 @@ class MusicKeyboard {
         }
     }
 
+    /**
+     * @private
+     * @param {number} aboveBlock
+     * @param {number} block
+     * @returns {void}
+     */
+
     _addNotesBlockBetween(aboveBlock, block) {
         const belowBlock = last(logo.blocks.blockList[aboveBlock].connections);
         logo.blocks.blockList[aboveBlock].connections[
@@ -1528,6 +1684,11 @@ class MusicKeyboard {
         logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
         logo.blocks.refreshCanvas();
     }
+
+    /**
+     * @private
+     * @returns {void}
+     */
 
     _sortLayout() {
         this.layout.sort((a, b) => {
@@ -1583,6 +1744,12 @@ class MusicKeyboard {
         }
     }
 
+    /**
+     * @private
+     * @param {number} blockNo
+     * @returns {void}
+     */
+
     _removePitchBlock(blockNo) {
         const c0 = logo.blocks.blockList[blockNo].connections[0];
         const c1 = last(logo.blocks.blockList[blockNo].connections);
@@ -1606,6 +1773,13 @@ class MusicKeyboard {
         logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
         logo.blocks.refreshCanvas();
     }
+
+    /**
+     * @private
+     * @param {string} index
+     * @param {string} condition
+     * @returns {void}
+     */
 
     _createColumnPieSubmenu(index, condition) {
         index = parseInt(index);
@@ -1832,6 +2006,7 @@ class MusicKeyboard {
                 flag = false;
                 if (attr !== "♮") {
                     label += attr;
+                    // eslint-disable-next-line no-unused-vars
                     flag = true;
                 }
             } else {
@@ -1894,7 +2069,7 @@ class MusicKeyboard {
 
             const octave = Number(
                 this._octavesWheel.navItems[this._octavesWheel.selectedNavItemIndex].title);
-            let obj = getNote(
+            const obj = getNote(
                 labelValue,
                 octave,
                 0,
@@ -1925,6 +2100,11 @@ class MusicKeyboard {
             }
         }
     }
+
+    /**
+     * @private
+     * @returns {void}
+     */
 
     _createKeyboard() {
         document.onkeydown = null;
@@ -1974,7 +2154,7 @@ class MusicKeyboard {
         let myrowId = 0;
         let myrow2Id = 0;
 
-        let parenttbl, parenttbl2, el, newel, newel2, nname, elementid, elementid2;
+        let parenttbl, parenttbl2, el, newel, newel2, nname;
         for (let p = 0; p < this.layout.length; p++) {
             // If the blockNumber is null, don't add a label.
             if (this.layout[p].noteName > MusicKeyboard.FAKEBLOCKNUMBER) {
@@ -2264,6 +2444,11 @@ class MusicKeyboard {
         this.addKeyboardShortcuts();
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
+
     _save() {
         this.processSelected();
         // console.debug("Generating action stack for: ");
@@ -2308,7 +2493,7 @@ class MusicKeyboard {
         this.findLen = (selectedNotesGrp, selectedNotes) => {
             let ans = 0;
             for (let i = 0; i < selectedNotesGrp.length; i++) {
-                let note = selectedNotes[selectedNotesGrp[i]];
+                const note = selectedNotes[selectedNotesGrp[i]];
                 if (note.noteOctave[0] === "R") {
                     ans += 6; // rest note uses 6
                 } else if (note.noteOctave[0] === null) {
@@ -2500,6 +2685,10 @@ class MusicKeyboard {
         logo.textMsg(_("New action block generated!"));
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     clearBlocks() {
         this.noteNames = [];
         this.octaves = [];
@@ -2509,7 +2698,7 @@ class MusicKeyboard {
      * @deprecated
      */
     _addButton(row, icon, iconSize, label) {
-        let cell = row.insertCell(-1);
+        const cell = row.insertCell(-1);
         cell.innerHTML =
             '&nbsp;&nbsp;<img src="header-icons/' +
             icon +
@@ -2541,6 +2730,13 @@ class MusicKeyboard {
         return cell;
     }
 
+    /**
+     * @private
+     * @param {string} index
+     * @param {string} condition
+     * @returns {void}
+     */
+
     doMIDI() {
         let duration = 0;
         let startTime = 0;
@@ -2548,7 +2744,7 @@ class MusicKeyboard {
         this.getElement = {};
 
         for (let idx = 0; idx < this.layout.length; idx++) {
-            let key = this.layout[idx];
+            const key = this.layout[idx];
             this.getElement[key.noteName.toString() + key.noteOctave.toString()] = key.objId;
             this.getElement[FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave] =
                 key.objId; //convet solfege to alphabetic.
@@ -2666,6 +2862,12 @@ class MusicKeyboard {
         else
             logo.errorMsg(_("Failed to get MIDI access in browser."));
     };
+
+    /**
+     * @private
+     * @param {Array} noteList
+     * @returns {Array}
+     */
 
     fillChromaticGaps(noteList) {
         // Assuming list of either solfege or letter class of the form
