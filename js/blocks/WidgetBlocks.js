@@ -23,7 +23,7 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             if (args.length === 4 && typeof args[0] === "number") {
                 if (args[0] < 0 || args[0] > 100) {
@@ -101,7 +101,7 @@ function setupWidgetBlocks() {
             let rollOff;
 
             if (args.length === 3 && typeof args[1] === "number") {
-                for (let ftype in FILTERTYPES) {
+                for (const ftype in FILTERTYPES) {
                     if (FILTERTYPES[ftype][0] === args[0]) {
                         filtertype = FILTERTYPES[ftype][1];
                     } else if (FILTERTYPES[ftype][1] === args[0]) {
@@ -185,31 +185,31 @@ function setupWidgetBlocks() {
 
             logo.insideTemperament = true;
             logo.temperament.inTemperament = args[0];
-            let scale = [];
+            const scale = [];
 
             if (
                 logo.blocks.blockList[logo.blocks.blockList[blk].connections[2]]
                     .name === "pitch"
             ) {
-                let pitchBlock =
+                const pitchBlock =
                     logo.blocks.blockList[
                         logo.blocks.blockList[blk].connections[2]
                     ];
-                let note =
+                const note =
                     logo.blocks.blockList[pitchBlock.connections[1]].value;
-                let octave =
+                const octave =
                     logo.blocks.blockList[pitchBlock.connections[2]].value;
-                let setKey = logo.blocks.blockList[pitchBlock.connections[3]];
+                const setKey = logo.blocks.blockList[pitchBlock.connections[3]];
                 scale[0] = logo.blocks.blockList[setKey.connections[1]].value;
                 scale[1] = logo.blocks.blockList[setKey.connections[2]].value;
                 logo.synth.startingPitch = note + octave;
                 logo.temperament.scale = scale;
             }
 
-            let listenerName = "_temperament_" + turtle;
+            const listenerName = "_temperament_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            const __listener = function(event) {
                 logo.temperament.init();
             };
 
@@ -322,10 +322,10 @@ function setupWidgetBlocks() {
             logo.timbre.duoSynthParams = [];
             logo.timbre.notesToPlay = [];
 
-            let listenerName = "_timbre_" + turtle;
+            const listenerName = "_timbre_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            const __listener = function(event) {
                 logo.timbre.init();
             };
 
@@ -363,10 +363,10 @@ function setupWidgetBlocks() {
         flow(args, logo, turtle, blk) {
             logo.insideMeterWidget = true;
 
-            let listenerName = "_meterwidget_" + turtle;
+            const listenerName = "_meterwidget_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            const __listener = function(event) {
                 logo.meterWidget = new MeterWidget(blk);
 
                 logo.insideMeterWidget = false;
@@ -391,18 +391,19 @@ function setupWidgetBlocks() {
                 "oscilloscope"
             ]);
             this.formBlock({ name: _("oscilloscope"), canCollapse: true });
-            let addPrintTurtle = (blocks,turtle,prev,last) => {
-                let len = blocks.length;
-                let next = last ? null : len+2
+            const addPrintTurtle = (blocks,turtle,prev,last) => {
+                const len = blocks.length;
+                const next = last ? null : len+2;
                 blocks.push([len, "print", 0, 0, [prev, len + 1, next]]);
                 blocks.push([len + 1, ["text", { value: turtle.name}], 0, 0, [len, null]]);
                 return blocks;
-            }
+            };
 
             this.makeMacro((x, y) => {
                 let blocks = [[0,"oscilloscope", x, y, [null, 1, null]]];
-                for (let turtle of turtles.turtleList) {
+                for (const turtle of turtles.turtleList) {
                     if (!turtle.inTrash)
+                        // eslint-disable-next-line max-len
                         blocks = addPrintTurtle(blocks, turtle, Math.max(0, blocks.length - 2), turtle == last(turtles.turtleList));
                 }
                 blocks[0][4][2]=blocks.length;
@@ -415,10 +416,10 @@ function setupWidgetBlocks() {
             logo.oscilloscopeTurtles = [];
             logo.inOscilloscope = true;
 
-            let listenerName = "_oscilloscope_" + turtle;
+            const listenerName = "_oscilloscope_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            const __listener = function(event) {
                 logo.Oscilloscope = new Oscilloscope(logo);
                 logo.inOscilloscope = false;
             };
@@ -457,10 +458,10 @@ function setupWidgetBlocks() {
         flow(args, logo, turtle, blk) {
             logo.insideModeWidget = true;
             
-            let listenerName = "_modewidget_" + turtle;
+            const listenerName = "_modewidget_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
             
-            let __listener = function(event) {
+            const __listener = function(event) {
                 logo.modeWidget = new ModeWidget();
                 logo.insideModeWidget = false;
             };
@@ -507,10 +508,10 @@ function setupWidgetBlocks() {
             logo.tempo.BPMBlocks = [];
             logo.tempo.BPMs = [];
 
-            let listenerName = "_tempo_" + turtle;
+            const listenerName = "_tempo_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            const __listener = function(event) {
                 logo.tempo.init();
             };
 
@@ -565,10 +566,10 @@ function setupWidgetBlocks() {
             logo.pitchDrumMatrix.drums = [];
             logo.pitchDrumMatrix.clearBlocks();
 
-            let listenerName = "_pitchdrummatrix_" + turtle;
+            const listenerName = "_pitchdrummatrix_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            const __listener = function(event) {
                 if (
                     logo.pitchDrumMatrix.drums.length === 0 ||
                     logo.pitchDrumMatrix.rowLabels.length === 0
@@ -622,10 +623,10 @@ function setupWidgetBlocks() {
             logo.inPitchSlider = true;
             logo.pitchSlider.frequencies = [];
 
-            let listenerName = "_pitchslider_" + turtle;
+            const listenerName = "_pitchslider_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            const __listener = function(event) {
                 logo.pitchSlider.init(logo);
                 logo.inPitchSlider = false;
             };
@@ -754,10 +755,10 @@ function setupWidgetBlocks() {
             logo.musicKeyboard.octaves = [];
             logo.musicKeyboard._rowBlocks = [];
 
-            let listenerName = "_musickeyboard_" + turtle;
+            const listenerName = "_musickeyboard_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            const __listener = function(event) {
                 logo.musicKeyboard.init(logo);
             };
 
@@ -803,10 +804,10 @@ function setupWidgetBlocks() {
 
             logo.inPitchStaircase = true;
 
-            let listenerName = "_pitchstaircase_" + turtle;
+            const listenerName = "_pitchstaircase_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            const __listener = function(event) {
                 logo.pitchStaircase.init(logo);
                 logo.inPitchStaircase = false;
             };
@@ -890,11 +891,11 @@ function setupWidgetBlocks() {
             logo.rhythmRuler.Drums = [];
             logo.inRhythmRuler = true;
 
-            let listenerName = "_rhythmruler_" + turtle;
+            const listenerName = "_rhythmruler_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
-                logo.rhythmRuler = new RhythmRuler();
+            const __listener = function(event) {
+                logo.rhythmRuler.init();
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1033,10 +1034,10 @@ function setupWidgetBlocks() {
             logo.tupletParams = [];
             logo.addingNotesToTuplet = false;
 
-            let listenerName = "_matrix_" + turtle;
+            const listenerName = "_matrix_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            const __listener = function(event) {
                 if (
                     logo.tupletRhythms.length === 0 ||
                     logo.phraseMaker.rowLabels.length === 0
@@ -1061,7 +1062,8 @@ function setupWidgetBlocks() {
                         switch (logo.tupletRhythms[i][0]) {
                             case "notes":
                             case "simple":
-                                let tupletParam = [logo.tupletParams[logo.tupletRhythms[i][1]]];
+                                // eslint-disable-next-line no-case-declarations
+                                const tupletParam = [logo.tupletParams[logo.tupletRhythms[i][1]]];
                                 tupletParam.push([]);
                                 for (
                                     let j = 2;
@@ -1138,10 +1140,10 @@ function setupWidgetBlocks() {
 
             logo.inStatusMatrix = true;
 
-            let listenerName = "_status_" + turtle;
+            const listenerName = "_status_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
+            const __listener = function(event) {
                 logo.statusMatrix.init(logo);
                 logo.inStatusMatrix = false;
             };
