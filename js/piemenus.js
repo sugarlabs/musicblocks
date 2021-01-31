@@ -10,7 +10,45 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 //
 
-piemenuPitches = function(
+/*global logo, turtles, _, platformColor, docById, Singer,
+   slicePath, wheelnav, DEFAULTVOICE, getDrumName,, getNote, blocks, MUSICALMODES
+   last, SHARP, FLAT, PREVIEWVOLUME, DEFAULTVOLUME, MODE_PIE_MENUS, HelpWidget,
+   INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName, getMunsellColor,
+   COLORS40, frequencyToPitch, KeySignatureEnv, instruments, DOUBLESHARP, NATURAL,
+   DOUBLEFLAT, EQUIVALENTACCIDENTALS, FIXEDSOLFEGE, NOTENAMES, FIXEDSOLFEGE, NOTENAMES,
+   numberToPitch, nthDegreeToPitch, SOLFEGENAMES, _buildScale*/
+
+/*
+     Globals location
+     - lib/wheelnav
+        slicePath, wheelnav
+     - js/utils/musicutils.js
+        FLAT, SHARP, DEFAULTVOICE, getDrumName, getNote, MODE_PIE_MENUS, MUSICALMODES, INTERVALVALUES,
+        INTERVALS, getDrumSynthName, getVoiceSynthName, frequencyToPitch, DOUBLESHARP, NATURAL,
+        DOUBLEFLAT, EQUIVALENTACCIDENTALS, FIXEDSOLFEGE, NOTENAMES, FIXEDSOLFEGE, NOTENAMES, numberToPitch,
+        nthDegreeToPitch, SOLFEGENAMES, _buildScale
+     - js/utils/utils.js
+        _, last, docById
+     - js/turtle-singer.js
+        Singer
+     - js/utils/munsell.js
+        getMunsellColor, COLORS40
+     - js/widgets/help.js
+        HelpWidget
+     - js/utils/platformstyle.js
+        platformColorcl
+     - js/utils/synthutils.js
+        instruments
+     - js/activity.js
+        blocks, KeySignatureEnv
+     - js/logo.js
+        PREVIEWVOLUME, DEFAULTVOLUME
+ */
+
+/*exported piemenuModes ,piemenuPitches, piemenuCustomNotes, piemenuGrid, piemenuBlockContext,
+piemenuIntervals, piemenuVoices, piemenuBoolean, piemenuBasic, piemenuColor, piemenuNumber,
+piemenuNthModalPitch, piemenuNoteValue, piemenuAccidentals*/
+const piemenuPitches = function(
     block, noteLabels, noteValues, accidentals, note, accidental, custom) {
     let prevPitch = null;
     
@@ -180,7 +218,7 @@ piemenuPitches = function(
             const tempScale = _buildScale(NOTENAMES[i] + attrList[j] + " major")[0];
             if (tempScale[k-1] == KeySignatureEnv[0]) {
                 key = NOTENAMES[i] + attrList[j];
-                console.debug(key);
+                //console.debug(key);
                 break;
             }
         }
@@ -245,7 +283,7 @@ piemenuPitches = function(
 
         // Navigate to current octave
         block._octavesWheel.navigateWheel(8 - pitchOctave);
-        prevOctave = 8 - pitchOctave;
+        // const prevOctave = 8 - pitchOctave;
     }
     
     // Set up event handlers
@@ -255,106 +293,12 @@ piemenuPitches = function(
         "attr": accidental
     };
     
-    const __selectionChangedSolfege = function() {
-        selection["note"] =
-            that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
-        const i = noteLabels.indexOf(selection["note"]);
-        that.value = noteValues[i];
-
-        // auto selection of sharps and flats in fixed solfege
-        // handles the case of opening the pie-menu, not whilst in the pie-menu
-        // FIXEDSOLFEGE converts solfege to alphabet, needed for solfege pie-menu
-        // In case of alphabet, direct comparison is performed
-
-        if ((!KeySignatureEnv[2] && that.name == "solfege") ||
-            (that.name == "notename") &&
-            (that.connections[0] != undefined ? ["setkey", "setkey2"].indexOf(
-                that.blocks.blockList[that.connections[0]].name) === -1: true)) {
-            let i = NOTENAMES.indexOf(FIXEDSOLFEGE[selection["note"]]);
-            if (i == -1) {
-                i = NOTENAMES.indexOf(selection["note"]);
-            }
-            if (scale[i][0] == FIXEDSOLFEGE[selection["note"]] ||
-                scale[i][0] == selection["note"]) {
-                selection["attr"] = scale[i].substr(1);
-            } else {
-                selection["attr"] = EQUIVALENTACCIDENTALS[scale[i]].substr(1);
-            }
-            switch (selection["attr"]) {
-                case DOUBLEFLAT:
-                    that._accidentalsWheel.navigateWheel(4);
-                    break;
-                case FLAT:
-                    that._accidentalsWheel.navigateWheel(3);
-                    break;
-                case NATURAL:
-                    that._accidentalsWheel.navigateWheel(2);
-                    break;
-                case SHARP:
-                    that._accidentalsWheel.navigateWheel(1);
-                    break;
-                case DOUBLESHARP:
-                    that._accidentalsWheel.navigateWheel(0);
-                    break;
-                default:
-                    that._accidentalsWheel.navigateWheel(2);
-                    break;
-            }
-        }
-        that.text.text = selection["note"];
-        if (selection["attr"] !== "♮") {
-            that.text.text += selection["attr"];
-        }
-
-        // Make sure text is on top.
-        that.container.setChildIndex(that.text, that.container.children.length - 1);
-        that.updateCache();
-
-        if (hasOctaveWheel) {
-            // Set the octave of the pitch block if available
-            const octave = Number(
-                that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex
-                ].title);
-            that.blocks.setPitchOctave(that.connections[0], octave);
-        }
-
-        if (that.connections[0] !== null && ["setkey", "setkey2"].indexOf(
-            that.blocks.blockList[that.connections[0]].name) !== -1) {
-            // We may need to update the mode widget.
-            that.blocks.logo.modeBlock = that.blocks.blockList.indexOf(that);
-        }
-        __pitchPreview();
-    };
-    
-    const __selectionChangedOctave = () => {
-        const octave = Number(
-            that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex
-            ].title);
-        that.blocks.setPitchOctave(that.connections[0], octave);
-        __pitchPreview();
-    };
-    
-    const __selectionChangedAccidental = () => {
-        selection["attr"] =
-            that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex
-            ].title;
-        if (selection["attr"] !== "♮") {
-            that.value = selection["note"] + selection["attr"];
-        } else {
-            that.value = selection["note"];
-        }
-        that.text.text = that.value;
-        that.container.setChildIndex(that.text, that.container.children.length - 1);
-        that.updateCache();
-        __pitchPreview();
-    };
-    
     /*
      * Preview the selected pitch using the synth
      * @return{void}
      * @private
      */
-    let __pitchPreview = function() {
+    const __pitchPreview = function() {
         const label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
         const i = noteLabels.indexOf(label);
 
@@ -453,6 +397,100 @@ piemenuPitches = function(
             that._triggerLock = false;
         }, 1 / 8);
     };
+
+    const __selectionChangedSolfege = function() {
+        selection["note"] =
+            that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+        const i = noteLabels.indexOf(selection["note"]);
+        that.value = noteValues[i];
+
+        // auto selection of sharps and flats in fixed solfege
+        // handles the case of opening the pie-menu, not whilst in the pie-menu
+        // FIXEDSOLFEGE converts solfege to alphabet, needed for solfege pie-menu
+        // In case of alphabet, direct comparison is performed
+
+        if ((!KeySignatureEnv[2] && that.name == "solfege") ||
+            (that.name == "notename") &&
+            (that.connections[0] != undefined ? ["setkey", "setkey2"].indexOf(
+                that.blocks.blockList[that.connections[0]].name) === -1: true)) {
+            let i = NOTENAMES.indexOf(FIXEDSOLFEGE[selection["note"]]);
+            if (i == -1) {
+                i = NOTENAMES.indexOf(selection["note"]);
+            }
+            if (scale[i][0] == FIXEDSOLFEGE[selection["note"]] ||
+                scale[i][0] == selection["note"]) {
+                selection["attr"] = scale[i].substr(1);
+            } else {
+                selection["attr"] = EQUIVALENTACCIDENTALS[scale[i]].substr(1);
+            }
+            switch (selection["attr"]) {
+                case DOUBLEFLAT:
+                    that._accidentalsWheel.navigateWheel(4);
+                    break;
+                case FLAT:
+                    that._accidentalsWheel.navigateWheel(3);
+                    break;
+                case NATURAL:
+                    that._accidentalsWheel.navigateWheel(2);
+                    break;
+                case SHARP:
+                    that._accidentalsWheel.navigateWheel(1);
+                    break;
+                case DOUBLESHARP:
+                    that._accidentalsWheel.navigateWheel(0);
+                    break;
+                default:
+                    that._accidentalsWheel.navigateWheel(2);
+                    break;
+            }
+        }
+        that.text.text = selection["note"];
+        if (selection["attr"] !== "♮") {
+            that.text.text += selection["attr"];
+        }
+
+        // Make sure text is on top.
+        that.container.setChildIndex(that.text, that.container.children.length - 1);
+        that.updateCache();
+
+        if (hasOctaveWheel) {
+            // Set the octave of the pitch block if available
+            const octave = Number(
+                that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex
+                ].title);
+            that.blocks.setPitchOctave(that.connections[0], octave);
+        }
+
+        if (that.connections[0] !== null && ["setkey", "setkey2"].indexOf(
+            that.blocks.blockList[that.connections[0]].name) !== -1) {
+            // We may need to update the mode widget.
+            that.blocks.logo.modeBlock = that.blocks.blockList.indexOf(that);
+        }
+        __pitchPreview();
+    };
+    
+    const __selectionChangedOctave = () => {
+        const octave = Number(
+            that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex
+            ].title);
+        that.blocks.setPitchOctave(that.connections[0], octave);
+        __pitchPreview();
+    };
+    
+    const __selectionChangedAccidental = () => {
+        selection["attr"] =
+            that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex
+            ].title;
+        if (selection["attr"] !== "♮") {
+            that.value = selection["note"] + selection["attr"];
+        } else {
+            that.value = selection["note"];
+        }
+        that.text.text = that.value;
+        that.container.setChildIndex(that.text, that.container.children.length - 1);
+        that.updateCache();
+        __pitchPreview();
+    };
     
     // Set up handlers for pitch preview.
     for (let i = 0; i < noteValues.length; i++) {
@@ -488,7 +526,7 @@ piemenuPitches = function(
 };
 
 
-piemenuCustomNotes = function(block, noteLabels, customLabels, selectedCustom, selectedNote) {
+const piemenuCustomNotes = function(block, noteLabels, customLabels, selectedCustom, selectedNote) {
     // pie menu for customNote selection
     if (block.blocks.stageClick) {
         return;
@@ -746,7 +784,7 @@ piemenuCustomNotes = function(block, noteLabels, customLabels, selectedCustom, s
 };
 
 
-piemenuNthModalPitch = function(block, noteValues, note) {
+const piemenuNthModalPitch = function(block, noteValues, note) {
     // wheelNav pie menu for scale degree pitch selection
     
     // check if a non-integer value is connected to note argument
@@ -840,10 +878,6 @@ piemenuNthModalPitch = function(block, noteValues, note) {
         block._exitKeyPressed.bind(block)
     );
     
-    block.label.addEventListener("change", function() {
-        that._labelChanged(false, false);
-    });
-    
     // Position the widget above/below note block.
     const x = block.container.x;
     const y = block.container.y;
@@ -902,8 +936,12 @@ piemenuNthModalPitch = function(block, noteValues, note) {
     block._octavesWheel.navigateWheel(8 - pitchOctave);
     
     // Set up event handlers
-    let that = block;
+    const that = block;
     
+    block.label.addEventListener("change", function() {
+        that._labelChanged(false, false);
+    });
+
     /*
      * Change selection and set value to notevalue
      * @return{void}
@@ -1026,7 +1064,7 @@ piemenuNthModalPitch = function(block, noteValues, note) {
 };
 
 
-piemenuAccidentals = function(
+const piemenuAccidentals = function(
     block, accidentalLabels, accidentalValues, accidental) {
     // wheelNav pie menu for accidental selection
     
@@ -1165,7 +1203,7 @@ piemenuAccidentals = function(
 };
 
 
-piemenuNoteValue = function(block, noteValue) {
+const piemenuNoteValue = function(block, noteValue) {
     // input form and  wheelNav pie menu for note value selection
     
     if (block.blocks.stageClick) {
@@ -1358,7 +1396,7 @@ piemenuNoteValue = function(block, noteValue) {
         "px";
     
     const __showHide = function() {
-        const i = that._noteValueWheel.selectedNavItemIndex;
+        // const i = that._noteValueWheel.selectedNavItemIndex;
         for (let k = 0; k < WHEELVALUES.length; k++) {
             for (
                 let j = 0;
@@ -1385,8 +1423,9 @@ piemenuNoteValue = function(block, noteValue) {
         block._noteValueWheel.navigateWheel(1);
         block._tabsWheel.navigateWheel(0);
     } else {
-        for (let i = 0; i < WHEELVALUES.length; i++) {
-	    let j;
+        let i;
+        for (i = 0; i < WHEELVALUES.length; i++) {
+            let j;
             for (j = 0; j < subWheelValues[WHEELVALUES[i]].length; j++) {
                 if (subWheelValues[WHEELVALUES[i]][j] === noteValue) {
                     block._noteValueWheel.navigateWheel(i);
@@ -1428,7 +1467,7 @@ piemenuNoteValue = function(block, noteValue) {
     };
 };
 
-piemenuNumber = function(block, wheelValues, selectedValue) {
+const piemenuNumber = function(block, wheelValues, selectedValue) {
     // input form and  wheelNav pie menu for number selection
     
     if (block.blocks.stageClick) {
@@ -1773,7 +1812,7 @@ piemenuNumber = function(block, wheelValues, selectedValue) {
 };
 
 
-piemenuColor = function(block, wheelValues, selectedValue, mode) {
+const piemenuColor = function(block, wheelValues, selectedValue, mode) {
     // input form and  wheelNav pie menu for setcolor selection
     
     if (block.blocks.stageClick) {
@@ -1964,7 +2003,7 @@ piemenuColor = function(block, wheelValues, selectedValue, mode) {
 };
 
 
-piemenuBasic = function(
+const piemenuBasic = function(
     block, menuLabels, menuValues, selectedValue, colors) {
     // basic wheelNav pie menu
     
@@ -1987,7 +2026,8 @@ piemenuBasic = function(
     
     // the selectedValueh selector
     block._basicWheel = new wheelnav("wheelDiv", null, size, size);
-    
+    block._exitWheel = new wheelnav("_exitWheel", block._basicWheel.raphael);
+
     const labels = [];
     for (let i = 0; i < menuLabels.length; i++) {
         labels.push(menuLabels[i]);
@@ -2008,6 +2048,16 @@ piemenuBasic = function(
     block._basicWheel.animatetime = 0; // 300;
     block._basicWheel.createWheel(labels);
     
+    block._exitWheel.colors = platformColor.exitWheelcolors;
+    block._exitWheel.slicePathFunction = slicePath().DonutSlice;
+    block._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+    block._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+    block._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+    block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
+    block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
+    block._exitWheel.clickModeRotate = false;
+    block._exitWheel.createWheel(["×", " "]);
+
     const that = block;
     
     const __selectionChanged = function() {
@@ -2086,10 +2136,14 @@ piemenuBasic = function(
             __exitMenu();
         };
     }
+
+    block._exitWheel.navItems[0].navigateFunction = function() {
+        __exitMenu();
+    };
 };
 
 
-piemenuBoolean = function(block, booleanLabels, booleanValues, boolean) {
+const piemenuBoolean = function(block, booleanLabels, booleanValues, boolean) {
     // wheelNav pie menu for boolean selection
     
     if (block.blocks.stageClick) {
@@ -2201,7 +2255,7 @@ piemenuBoolean = function(block, booleanLabels, booleanValues, boolean) {
 };
 
 
-piemenuVoices = function(
+const piemenuVoices = function(
     block, voiceLabels, voiceValues, categories, voice, rotate) {
     // wheelNav pie menu for voice selection
     
@@ -2249,7 +2303,7 @@ piemenuVoices = function(
     block._voiceWheel.createWheel(voiceLabels);
     
     // Special case for Japanese
-    const language = localStorage.languagePreference;
+    // const language = localStorage.languagePreference;
     // if (language === 'ja') {
     for (let i = 0; i < block._voiceWheel.navItems.length; i++) {
         block._voiceWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
@@ -2398,7 +2452,7 @@ piemenuVoices = function(
 };
 
 
-piemenuIntervals = function(block, selectedInterval) {
+const piemenuIntervals = function(block, selectedInterval) {
     // pie menu for interval selection
     
     if (block.blocks.stageClick) {
@@ -2557,7 +2611,8 @@ piemenuIntervals = function(block, selectedInterval) {
     
     // navigate to a specific starting point
     const obj = selectedInterval.split(" ");
-    for (let i = 0; i < INTERVALS.length; i++) {
+    let i;
+    for (i = 0; i < INTERVALS.length; i++) {
         if (obj[0] === INTERVALS[i][1]) {
             break;
         }
@@ -2646,7 +2701,7 @@ piemenuIntervals = function(block, selectedInterval) {
 };
 
 
-piemenuModes = function(block, selectedMode) {
+const piemenuModes = function(block, selectedMode) {
     // pie menu for mode selection
     
     if (block.blocks.stageClick) {
@@ -2727,7 +2782,7 @@ piemenuModes = function(block, selectedMode) {
     block._modeGroupWheel.animatetime = 0; // 300;
     
     const xlabels = [];
-    for (modegroup in MODE_PIE_MENUS) {
+    for (const modegroup in MODE_PIE_MENUS) {
         xlabels.push(modegroup);
     }
     
@@ -3078,7 +3133,7 @@ piemenuModes = function(block, selectedMode) {
     
     const __buildModeWheel = function() {
         const i = that._modeGroupWheel.selectedNavItemIndex;
-        modeGroup = that._modeGroupWheel.navItems[i].title;
+        const modeGroup = that._modeGroupWheel.navItems[i].title;
         __buildModeNameWheel(modeGroup);
     };
     
@@ -3103,7 +3158,7 @@ piemenuModes = function(block, selectedMode) {
 /*
  * Sets up context menu for each block
  */
-piemenuBlockContext = function(block) {
+const piemenuBlockContext = function(block) {
     if (block.blocks.activeBlock === null) {
         return;
     }
@@ -3132,7 +3187,7 @@ piemenuBlockContext = function(block) {
 
     docById("contextWheelDiv").style.display = "";
 
-    labels = [
+    const labels = [
         "imgsrc:header-icons/copy-button.svg",
         "imgsrc:header-icons/extract-button.svg",
         "imgsrc:header-icons/empty-trash-button.svg",
@@ -3218,7 +3273,7 @@ piemenuBlockContext = function(block) {
     if (helpButton !== null) {
         wheel.navItems[helpButton].navigateFunction = function() {
             that.blocks.activeBlock = blockBlock;
-            const helpWidget = new HelpWidget(blocks);
+            new HelpWidget(blocks);
             docById("contextWheelDiv").style.display = "none";
         };
     }
@@ -3233,7 +3288,7 @@ piemenuBlockContext = function(block) {
  *
  * @returns {void}
  */
-piemenuGrid = function() {
+const piemenuGrid = function() {
     docById("wheelDivptm").style.display = "none";
     const x = turtles.gridButton.getBoundingClientRect().x;
     const y = turtles.gridButton.getBoundingClientRect().y;
