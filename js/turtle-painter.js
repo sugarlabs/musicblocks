@@ -15,12 +15,33 @@
  * MA 02110-1335 USA.
  */
 
+/*
+   global _, getMunsellColor, getcolor, hex2rgb, STROKECOLORS, FILLCOLORS, sugarizerCompatibility,
+   TURTLESVG, WRAP
+ */
+
+/*
+   Global locations
+   - js/utils/utils.js
+        _
+   - js/utils/munsell.js
+        getMunsellColor, getcolor
+   - js/utils/utils.js
+        hex2rgb
+   - js/artwork.js
+        STROKECOLORS, FILLCOLORS, TURTLESVG
+   - js/toolbar.js
+        WRAP
+   - js/sugarizer-compatibility.js
+        sugarizerCompatibility
+ */
+
 // constants
 const DEFAULTCOLOR = 0;
-const DEFAULTVALUE = 50;                // also used in turtles.js
-const DEFAULTCHROMA = 100;              // also used in turtles.js
+const DEFAULTVALUE = 50; // also used in turtles.js
+const DEFAULTCHROMA = 100; // also used in turtles.js
 const DEFAULTSTROKE = 5;
-const DEFAULTFONT = "sans-serif";       // also used in PenBlocks.js
+const DEFAULTFONT = "sans-serif"; // also used in PenBlocks.js
 
 /**
  * Class pertaining to visual actions for each turtle.
@@ -41,6 +62,9 @@ const DEFAULTFONT = "sans-serif";       // also used in PenBlocks.js
  * Unused methods' names begin with double underscore '__'.
  * Internal functions' names are in PascalCase.
  */
+
+/*exported Painter*/
+
 class Painter {
     /**
      * @constructor
@@ -52,7 +76,7 @@ class Painter {
 
         // Things used for what the turtle draws
         this._svgOutput = "";
-        this._svgPath = false;      // are we currently drawing a path?
+        this._svgPath = false; // are we currently drawing a path?
 
         this._color = DEFAULTCOLOR;
         this._value = DEFAULTVALUE;
@@ -207,7 +231,7 @@ class Painter {
      * @param h - height
      */
     _outOfBounds(x, y, w, h) {
-        return (x > w || x < 0 || y > h || y < 0);
+        return x > w || x < 0 || y > h || y < 0;
     }
 
     /**
@@ -281,13 +305,7 @@ class Painter {
             let radiusScaled = step * turtlesScale;
 
             const steps = Math.max(Math.floor(savedStroke, 1));
-            this._svgArc(
-                steps,
-                cx * turtlesScale,
-                cy * turtlesScale,
-                radiusScaled,
-                sa
-            );
+            this._svgArc(steps, cx * turtlesScale, cy * turtlesScale, radiusScaled, sa);
             this._svgOutput += nxScaled + "," + nyScaled + " ";
 
             this.turtle.ctx.lineTo(ox + dx, oy + dy);
@@ -310,13 +328,7 @@ class Painter {
             nyScaled = (oy + dy) * turtlesScale;
 
             radiusScaled = step * turtlesScale;
-            this._svgArc(
-                steps,
-                cx * turtlesScale,
-                cy * turtlesScale,
-                radiusScaled,
-                sa
-            );
+            this._svgArc(steps, cx * turtlesScale, cy * turtlesScale, radiusScaled, sa);
             this._svgOutput += nxScaled + "," + nyScaled + " ";
 
             this.closeSVG();
@@ -335,8 +347,7 @@ class Painter {
                 this._svgPath = true;
                 const oxScaled = ox * turtlesScale;
                 const oyScaled = oy * turtlesScale;
-                this._svgOutput +=
-                    '<path d="M ' + oxScaled + "," + oyScaled + " ";
+                this._svgOutput += '<path d="M ' + oxScaled + "," + oyScaled + " ";
             }
             const nxScaled = nx * turtlesScale;
             const nyScaled = ny * turtlesScale;
@@ -527,8 +538,7 @@ class Painter {
                 this._svgPath = true;
                 const oxScaled = ox * turtlesScale;
                 const oyScaled = oy * turtlesScale;
-                this._svgOutput +=
-                    '<path d="M ' + oxScaled + "," + oyScaled + " ";
+                this._svgOutput += '<path d="M ' + oxScaled + "," + oyScaled + " ";
             }
 
             const sweep = anticlockwise ? 0 : 1;
@@ -665,16 +675,10 @@ class Painter {
             svgColor = svgColor.substr(0, this._canvasColor.length - 4) + ");";
 
             this._svgOutput += '" style="stroke-linecap:round;fill:';
-            this._svgOutput +=
-                this._fillState ?
-                    svgColor + "fill-opacity:" + this._canvasAlpha + ";" :
-                    "none;";
-            this._svgOutput +=
-                "stroke:" +
-                svgColor +
-                "stroke-opacity:" +
-                this._canvasAlpha +
-                ";";
+            this._svgOutput += this._fillState
+                ? svgColor + "fill-opacity:" + this._canvasAlpha + ";"
+                : "none;";
+            this._svgOutput += "stroke:" + svgColor + "stroke-opacity:" + this._canvasAlpha + ";";
             const strokeScaled = this.stroke * this.turtles.scale;
             this._svgOutput += "stroke-width:" + strokeScaled + 'pt;" />';
             this._svgPath = false;
@@ -713,15 +717,14 @@ class Painter {
         const w = this.turtle.ctx.canvas.width;
         const h = this.turtle.ctx.canvas.height;
 
-        const out =
-            this._outOfBounds(
-                turtles.turtleX2screenX(nx),
-                turtles.turtleY2screenY(ny),
-                w,
-                h
-            );
+        const out = this._outOfBounds(
+            turtles.turtleX2screenX(nx),
+            turtles.turtleY2screenY(ny),
+            w,
+            h
+        );
 
-        let wrap = (this.wrap !== null)? this.wrap: WRAP;
+        const wrap = this.wrap !== null ? this.wrap : WRAP;
 
         if (this._fillState || !wrap || !out) {
             this._move(ox, oy, nx, ny, true);
@@ -883,8 +886,10 @@ class Painter {
      * @param {Number} y - y coordinate
      */
     setControlPoint1(x, y) {
+        /* eslint-disable no-undef */
         tur.painter.cp1x = x;
         tur.painter.cp1y = y;
+        /* eslint-enable no-undef */
     }
 
     /**
@@ -894,8 +899,10 @@ class Painter {
      * @param {Number} y - y coordinate
      */
     setControlPoint2(x, y) {
+        /* eslint-disable no-undef */
         tur.painter.cp2x = x;
         tur.painter.cp2y = y;
+        /* eslint-enable no-undef */
     }
 
     /**
@@ -921,6 +928,7 @@ class Painter {
 
         if (this._penDown && this._hollowState) {
             // Convert from turtle coordinates to screen coordinates
+            /* eslint-disable no-unused-vars */
             fx = turtles.turtleX2screenX(x2);
             fy = turtles.turtleY2screenY(y2);
             const ix = turtles.turtleX2screenX(this.turtle.x);
@@ -959,8 +967,7 @@ class Painter {
             }
 
             // We also need to calculate the deltas for the 'caps' at each end
-            const capAngleRadiansInitial =
-                ((degreesInitial - 90) * Math.PI) / 180.0;
+            const capAngleRadiansInitial = ((degreesInitial - 90) * Math.PI) / 180.0;
             dxi = step * Math.sin(capAngleRadiansInitial);
             dyi = -step * Math.cos(capAngleRadiansInitial);
             const capAngleRadiansFinal = ((degreesFinal - 90) * Math.PI) / 180.0;
@@ -986,10 +993,10 @@ class Painter {
             const dyScaled = dy * turtlesScale;
 
             // Control points scaled for SVG output
-            const cx1Scaled = (cx1 + dxi) * turtlesScale;
-            const cy1Scaled = (cy1 + dyi) * turtlesScale;
-            const cx2Scaled = (cx2 + dxf) * turtlesScale;
-            const cy2Scaled = (cy2 + dyf) * turtlesScale;
+            // const cx1Scaled = (cx1 + dxi) * turtlesScale;
+            // const cy1Scaled = (cy1 + dyi) * turtlesScale;
+            // const cx2Scaled = (cx2 + dxf) * turtlesScale;
+            // const cy2Scaled = (cy2 + dyf) * turtlesScale;
 
             this._svgPath = true;
 
@@ -1041,6 +1048,7 @@ class Painter {
             this._svgOutput += "M " + fxScaled + "," + fyScaled + " ";
             this.turtle.x = x2;
             this.turtle.y = y2;
+            /* eslint-enable no-unused-vars */
         } else if (this._penDown) {
             this._processColor();
             this.turtle.ctx.lineWidth = this.stroke;
@@ -1056,22 +1064,8 @@ class Painter {
             const cx2 = turtles.turtleX2screenX(cp2x);
             const cy2 = turtles.turtleY2screenY(cp2y);
 
-            this.turtle.ctx.bezierCurveTo(
-                cx1 + dxi,
-                cy1 + dyi,
-                cx2 + dxf,
-                cy2 + dyf,
-                cx,
-                cy
-            );
-            this.turtle.ctx.bezierCurveTo(
-                cx2 - dxf,
-                cy2 - dyf,
-                cx1 - dxi,
-                cy1 - dyi,
-                ax,
-                ay
-            );
+            this.turtle.ctx.bezierCurveTo(cx1 + dxi, cy1 + dyi, cx2 + dxf, cy2 + dyf, cx, cy);
+            this.turtle.ctx.bezierCurveTo(cx2 - dxf, cy2 - dyf, cx1 - dxi, cy1 - dyi, ax, ay);
             this.turtle.ctx.bezierCurveTo(cx1, cy1, cx2, cy2, fx, fy);
 
             if (!this._svgPath) {
@@ -1080,8 +1074,7 @@ class Painter {
                 const iy = turtles.turtleY2screenY(this.turtle.y);
                 const ixScaled = ix * turtlesScale;
                 const iyScaled = iy * turtlesScale;
-                this._svgOutput +=
-                    '<path d="M ' + ixScaled + "," + iyScaled + " ";
+                this._svgOutput += '<path d="M ' + ixScaled + "," + iyScaled + " ";
             }
 
             const cx1Scaled = cx1 * turtlesScale;
@@ -1167,8 +1160,8 @@ class Painter {
             turtles.gy = this.turtle.ctx.canvas.height;
         }
 
+        const i = turtles.turtleList.indexOf(this) % 10;
         if (resetPen) {
-            const i = turtles.turtleList.indexOf(this) % 10;
             this.color = i * 10;
             this.value = DEFAULTVALUE;
             this.chroma = DEFAULTCHROMA;
@@ -1188,14 +1181,8 @@ class Painter {
                 let artwork = TURTLESVG;
                 if (sugarizerCompatibility.isInsideSugarizer()) {
                     artwork = artwork
-                        .replace(
-                            /fill_color/g,
-                            sugarizerCompatibility.xoColor.fill
-                        )
-                        .replace(
-                            /stroke_color/g,
-                            sugarizerCompatibility.xoColor.stroke
-                        );
+                        .replace(/fill_color/g, sugarizerCompatibility.xoColor.fill)
+                        .replace(/stroke_color/g, sugarizerCompatibility.xoColor.stroke);
                 } else {
                     artwork = artwork
                         .replace(/fill_color/g, FILLCOLORS[i])
@@ -1205,7 +1192,7 @@ class Painter {
                 this.turtle.doTurtleShell(
                     55,
                     "data:image/svg+xml;base64," +
-                    window.btoa(unescape(encodeURIComponent(artwork)))
+                        window.btoa(unescape(encodeURIComponent(artwork)))
                 );
                 this.turtle.skinChanged = false;
             }
@@ -1232,8 +1219,7 @@ class Painter {
         this._fillState = false;
         this._hollowState = false;
 
-        this._canvasColor =
-            getMunsellColor(this.color, this.value, this.chroma);
+        this._canvasColor = getMunsellColor(this.color, this.value, this.chroma);
         if (this._canvasColor[0] === "#") {
             this._canvasColor = hex2rgb(this._canvasColor.split("#")[1]);
         }
@@ -1246,7 +1232,10 @@ class Painter {
         if (turtles.c1ctx != null) {
             turtles.c1ctx.beginPath();
             turtles.c1ctx.clearRect(
-                0, 0, 3 * this.turtle.canvas.width, 3 * this.turtle.canvas.height
+                0,
+                0,
+                3 * this.turtle.canvas.width,
+                3 * this.turtle.canvas.height
             );
         }
         this.turtle.penstrokes.image = this.turtle.canvas;
@@ -1262,10 +1251,12 @@ class Painter {
     doScrollXY(dx, dy) {
         // FIXME: how big?
 
-        const imgData =
-            this.turtle.ctx.getImageData(
-                0, 0, this.turtle.ctx.canvas.width, this.turtle.ctx.canvas.height
-            );
+        const imgData = this.turtle.ctx.getImageData(
+            0,
+            0,
+            this.turtle.ctx.canvas.width,
+            this.turtle.ctx.canvas.height
+        );
 
         const turtles = this.turtles;
         if (turtles.canvas1 == null) {
@@ -1276,34 +1267,36 @@ class Painter {
             turtles.canvas1.height = 3 * this.turtle.ctx.canvas.height;
             turtles.c1ctx = turtles.canvas1.getContext("2d");
             turtles.c1ctx.rect(
-                0, 0, 3 * this.turtle.ctx.canvas.width, 3 * this.turtle.ctx.canvas.height
+                0,
+                0,
+                3 * this.turtle.ctx.canvas.width,
+                3 * this.turtle.ctx.canvas.height
             );
             turtles.c1ctx.fillStyle = "#F9F9F9";
             turtles.c1ctx.fill();
         }
 
-        turtles.c1ctx.putImageData(
-            imgData, turtles.gx, turtles.gy
-        );
+        turtles.c1ctx.putImageData(imgData, turtles.gx, turtles.gy);
 
         turtles.gy -= dy;
         turtles.gx -= dx;
         turtles.gx =
-            2 * this.turtle.ctx.canvas.width > turtles.gx ?
-                turtles.gx : 2 * this.turtle.ctx.canvas.width;
+            2 * this.turtle.ctx.canvas.width > turtles.gx
+                ? turtles.gx
+                : 2 * this.turtle.ctx.canvas.width;
         turtles.gx = 0 > turtles.gx ? 0 : turtles.gx;
         turtles.gy =
-            2 * this.turtle.ctx.canvas.height > turtles.gy ?
-                turtles.gy : 2 * this.turtle.ctx.canvas.height;
+            2 * this.turtle.ctx.canvas.height > turtles.gy
+                ? turtles.gy
+                : 2 * this.turtle.ctx.canvas.height;
         turtles.gy = 0 > turtles.gy ? 0 : turtles.gy;
 
-        const newImgData =
-            turtles.c1ctx.getImageData(
-                turtles.gx,
-                turtles.gy,
-                this.turtle.ctx.canvas.width,
-                this.turtle.ctx.canvas.height
-            );
+        const newImgData = turtles.c1ctx.getImageData(
+            turtles.gx,
+            turtles.gy,
+            this.turtle.ctx.canvas.width,
+            this.turtle.ctx.canvas.height
+        );
 
         this.turtle.ctx.putImageData(newImgData, 0, 0);
 
