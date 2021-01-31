@@ -183,7 +183,7 @@ class MusicKeyboard {
                     docById("mkbInnerDiv").style.width = "calc(200vh - 64px)";
                 } catch (e) {
                     // Does this happen?
-                    console.debug("Error calculating InnerDiv width");
+                    // console.debug("Error calculating InnerDiv width");
                 }
 
                 widgetWindow.getWidgetBody().style.left = "70px";
@@ -1474,7 +1474,7 @@ class MusicKeyboard {
                     ]);
                     break;
                 default:
-                    console.log("Nothing to do for " + label);
+                    // console.log("Nothing to do for " + label);
             }
 
             let aboveBlock = -1;
@@ -1499,7 +1499,7 @@ class MusicKeyboard {
                     this._createTable();
                 }, 500);
             } else {
-                console.log("Could not find anywhere to insert new block.");
+                // console.log("Could not find anywhere to insert new block.");
             }
         };
 
@@ -2251,7 +2251,7 @@ class MusicKeyboard {
         for (let i = 0; i < this.idContainer.length; i++) {
             // If the blockNumber is null, don't make the key clickable.
             if (this.layout[i].blockNumber === null) {
-                console.log("skipping " + i);
+                // console.log("skipping " + i);
                 continue;
             }
             this.loadHandler(
@@ -2266,8 +2266,8 @@ class MusicKeyboard {
 
     _save() {
         this.processSelected();
-        console.debug("Generating action stack for: ");
-        console.debug(MusicKeyboard.selectedNotes);
+        // console.debug("Generating action stack for: ");
+        // console.debug(MusicKeyboard.selectedNotes);
         const newStack = [
             [0, ["action", { collapsed: false }], 100, 100, [null, 1, 2, null]],
             [1, ["text", { value: _("action") }], 0, 0, [0]],
