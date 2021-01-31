@@ -2064,8 +2064,10 @@ const piemenuBasic = function (block, menuLabels, menuValues, selectedValue, col
     block._basicWheel.slicePathCustom.maxRadiusPercent = 1.0;
     block._basicWheel.sliceSelectedPathCustom = block._basicWheel.slicePathCustom;
     block._basicWheel.sliceInitPathCustom = block._basicWheel.slicePathCustom;
-    block._basicWheel.titleRotateAngle = 0;
     block._basicWheel.animatetime = 0; // 300;
+    if (block.name !== "wrapmode"){
+        block._basicWheel.titleRotateAngle = 0;
+    }
     block._basicWheel.createWheel(labels);
 
     block._exitWheel.colors = platformColor.exitWheelcolors;

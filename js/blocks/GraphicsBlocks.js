@@ -693,6 +693,66 @@ function setupGraphicsBlocks() {
         }
     }
 
+    class WrapModeBlock extends ValueBlock {
+        constructor() {
+            super("wrapmode");
+            this.setPalette("graphics");
+            this.formBlock({ outType: "textout" });
+            this.hidden = true;
+        }
+    }
+
+    class WrapBlock extends FlowClampBlock {
+        constructor() {
+            super("wrap");
+            this.setPalette("graphics");
+            this.beginnerBlock(true);
+            this.setHelpString([
+                _(
+                    "The Wrap block enables or disables screen wrapping for the graphics actions within it."
+                ),
+                "documentation",
+                null,
+                "inverthelp"
+            ]);
+            this.formBlock({
+                name: _("wrap"),
+                args: 1,
+                defaults: 1,
+            });
+            this.makeMacro((x, y) => [
+                [0, "wrap", x, y, [null, 1, null, 2]],
+                [1, ["wrapmode", { value: 1 }], 0, 0, [0]],
+                [2, "hidden", 0, 0, [0, null]]
+            ]);
+        }
+
+        flow(args, logo, turtle, blk) {
+            if (args[1] === undefined)
+                return;
+            if (args[0] === null)
+                logo.errorMsg(NOINPUTERRORMSG, blk);
+
+            const arg0 = args[0] === null ? "on" : args[0];
+            const tur = logo.turtles.ithTurtle(turtle);
+            const listenerName = "_wrap_" + turtle;
+            tur.painter.wrap = (arg0 === "on");
+            
+            if (blk !== undefined && blk in logo.blocks.blockList) {
+                logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                const mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
+            }
+
+            const __listener = () => {
+                tur.painter.wrap = null;
+            };
+            logo.setTurtleListener(turtle, listenerName, __listener);
+            return [args[1], 1];
+        }
+    }
+
     new HeadingBlock().setup();
     new YBlock().setup();
     new XBlock().setup();
@@ -708,4 +768,6 @@ function setupGraphicsBlocks() {
     new MLeftBlock().setup();
     new BackBlock().setup();
     new ForwardBlock().setup();
+    new WrapModeBlock().setup();
+    new WrapBlock().setup();
 }

@@ -56,7 +56,8 @@ const SPECIALINPUTS = [
     "noisename",
     "customNote",
     "grid",
-    "outputtools"
+    "outputtools",
+    "wrapmode"
 ];
 const WIDENAMES = [
     "intervalname",
@@ -90,7 +91,8 @@ const PIEMENUS = [
     "noisename",
     "customNote",
     "grid",
-    "outputtools"
+    "outputtools",
+    "wrapmode"
 ];
 
 // Define block instance objects and any methods that are intra-block.
@@ -1124,6 +1126,8 @@ class Block {
                     case "grid":
                         this.value = "Cartesian";
                         break;
+                    case "wrapmode":
+                        this.value = "on";
                 }
             }
 
@@ -2948,7 +2952,8 @@ class Block {
             selectedNoise,
             selectedTemperament,
             selectedValue,
-            selectedType;
+            selectedType,
+            selectedWrap;
         if (!window.hasMouse && this.blocks.stage.y + y > 75) {
             movedStage = true;
             fromY = this.blocks.stage.y;
@@ -3329,6 +3334,26 @@ class Block {
 
             const values = labels;
             piemenuBasic(this, labels, values, selectedValue, platformColor.piemenuBasic);
+        }  else if (this.name === "wrapmode") {
+            if (this.value != null) {
+                selectedWrap = this.value;
+            } else {
+                selectedWrap = DEFAULTWRAP;
+            }
+
+            let wrapLabels = [];
+            let wrapValues = [];
+
+            const WRAPMODES = [
+                [_("on"), "on"],
+                [_("off"), "off"]
+            ]
+
+            for (let i = 0; i < WRAPMODES.length; i++) {
+                wrapLabels.push(_(WRAPMODES[i][1]));
+                wrapValues.push(WRAPMODES[i][1]);
+            }
+            piemenuBasic(this, wrapLabels, wrapValues, selectedWrap);
         } else {
             // If the number block is connected to a pitch block, then
             // use the pie menu for octaves. Other special cases as well.

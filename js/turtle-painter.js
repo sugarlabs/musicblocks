@@ -71,6 +71,7 @@ class Painter {
         this._fillState = false;
         this._hollowState = false;
         this._penDown = true;
+        this.wrap = null;
     }
 
     // ========= Setters, Getters =============================================
@@ -720,7 +721,9 @@ class Painter {
                 h
             );
 
-        if (!WRAP || !out || this._fillState) {
+        let wrap = (this.wrap !== null)? this.wrap: WRAP;
+
+        if (this._fillState || !wrap || !out) {
             this._move(ox, oy, nx, ny, true);
             turtles.refreshCanvas();
         } else {
