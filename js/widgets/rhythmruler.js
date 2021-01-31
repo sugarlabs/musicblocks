@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 /**
  * @file This contains the prototype of the rhythmruler Widget
  *
@@ -18,7 +17,7 @@
 /*
    global TONEBPM, Singer, logo, _, delayExecution, docById, calcNoteValueToDisplay, platformColor,
    beginnerMode, last, EIGHTHNOTEWIDTH, nearestBeat, rationalToFraction, DRUMNAMES, VOICENAMES,
-   EFFECTSNAMES, wheelnav, slicePath
+   EFFECTSNAMES
  */
 
 /* exported RhythmRuler */
@@ -42,7 +41,7 @@ class RhythmRuler {
      * @constructor
      */
     constructor() {
-    // There is one ruler per drum.
+        // There is one ruler per drum.
         this.Drums = [];
         // Rulers, one per drum, contain the subdivisions defined by rhythm blocks.
         this.Rulers = [];
@@ -122,7 +121,6 @@ class RhythmRuler {
 
         // For the button callbacks
 
-
         widgetWindow.onclose = () => {
             // If the piemenu was open, close it.
             // docById('wheelDiv').style.display = 'none';
@@ -150,9 +148,7 @@ class RhythmRuler {
             for (let i = 0; i < this._dissectHistory.length; i++) {
                 const drum = this._dissectHistory[i][1];
                 if (drums.indexOf(drum) === -1) {
-                    const history = JSON.parse(
-                        JSON.stringify(this._dissectHistory[i][0])
-                    );
+                    const history = JSON.parse(JSON.stringify(this._dissectHistory[i][0]));
                     dissectHistory.push([history, drum]);
                 }
             }
@@ -167,11 +163,7 @@ class RhythmRuler {
             this.widgetWindow.destroy();
         };
 
-        this._playAllCell = widgetWindow.addButton(
-            "play-button.svg",
-            iconSize,
-            _("Play all")
-        );
+        this._playAllCell = widgetWindow.addButton("play-button.svg", iconSize, _("Play all"));
         this._playAllCell.onclick = () => {
             if (this._playing) {
                 this.__pause();
@@ -234,42 +226,24 @@ class RhythmRuler {
         this._dissectNumber.oninput = () => {
             // Put a limit on the size (2 <--> 128).
             this._dissectNumber.onmouseout = () => {
-                this._dissectNumber.value = Math.max(
-                    this._dissectNumber.value,
-                    2
-                );
+                this._dissectNumber.value = Math.max(this._dissectNumber.value, 2);
             };
 
-            this._dissectNumber.value = Math.max(
-                Math.min(this._dissectNumber.value, 128),
-                2
-            );
+            this._dissectNumber.value = Math.max(Math.min(this._dissectNumber.value, 128), 2);
         };
 
-        widgetWindow.addButton(
-            "restore-button.svg",
-            iconSize,
-            _("Undo")
-        ).onclick = () => {
+        widgetWindow.addButton("restore-button.svg", iconSize, _("Undo")).onclick = () => {
             this._undo();
         };
 
         //.TRANS: user can tap out a rhythm by clicking on a ruler.
-        this._tapButton = widgetWindow.addButton(
-            "tap-button.svg",
-            iconSize,
-            _("Tap a rhythm")
-        );
+        this._tapButton = widgetWindow.addButton("tap-button.svg", iconSize, _("Tap a rhythm"));
         this._tapButton.onclick = () => {
             this._tap();
         };
 
         //.TRANS: clear all subdivisions from the ruler.
-        widgetWindow.addButton(
-            "erase-button.svg",
-            iconSize,
-            _("Clear")
-        ).onclick = () => {
+        widgetWindow.addButton("erase-button.svg", iconSize, _("Clear")).onclick = () => {
             this._clear();
         };
 
@@ -329,10 +303,7 @@ class RhythmRuler {
                                 this._startingTime = null;
                                 this._elapsedTimes[id] = 0;
                                 this._offsets[id] = 0;
-                                setTimeout(
-                                    this._calculateZebraStripes(id),
-                                    1000
-                                );
+                                setTimeout(this._calculateZebraStripes(id), 1000);
                             }
                         } else {
                             if (this._playingOne === false) {
@@ -365,8 +336,7 @@ class RhythmRuler {
 
             const rulerCell = rhythmRulerTableRow.insertCell();
             // Create individual rulers as tables.
-            rulerCell.innerHTML =
-                '<table id="rulerCellTable' + i + '"></table>';
+            rulerCell.innerHTML = '<table id="rulerCellTable' + i + '"></table>';
 
             const rulerCellTable = docById("rulerCellTable" + i);
             rulerCellTable.style.textAlign = "center";
@@ -381,11 +351,7 @@ class RhythmRuler {
             for (let j = 0; j < this.Rulers[i][0].length; j++) {
                 const noteValue = this.Rulers[i][0][j];
                 const rulerSubCell = rulerRow.insertCell(-1);
-                rulerSubCell.innerHTML = calcNoteValueToDisplay(
-                    noteValue,
-                    1,
-                    this._cellScale
-                );
+                rulerSubCell.innerHTML = calcNoteValueToDisplay(noteValue, 1, this._cellScale);
                 rulerSubCell.style.height = RhythmRuler.RULERHEIGHT + "px";
                 rulerSubCell.style.minHeight = rulerSubCell.style.height;
                 rulerSubCell.style.maxHeight = rulerSubCell.style.height;
@@ -398,46 +364,35 @@ class RhythmRuler {
                 rulerSubCell.style.lineHeight = 60 + " % ";
                 if (i % 2 === 0) {
                     if (j % 2 === 0) {
-                        rulerSubCell.style.backgroundColor =
-                            platformColor.selectorBackground;
+                        rulerSubCell.style.backgroundColor = platformColor.selectorBackground;
                     } else {
-                        rulerSubCell.style.backgroundColor =
-                            platformColor.selectorSelected;
+                        rulerSubCell.style.backgroundColor = platformColor.selectorSelected;
                     }
                 } else {
                     if (j % 2 === 0) {
-                        rulerSubCell.style.backgroundColor =
-                            platformColor.selectorSelected;
+                        rulerSubCell.style.backgroundColor = platformColor.selectorSelected;
                     } else {
-                        rulerSubCell.style.backgroundColor =
-                            platformColor.selectorBackground;
+                        rulerSubCell.style.backgroundColor = platformColor.selectorBackground;
                     }
                 }
 
-                this.__addCellEventHandlers(
-                    rulerSubCell,
-                    this._noteWidth(noteValue),
-                    noteValue
-                );
+                this.__addCellEventHandlers(rulerSubCell, this._noteWidth(noteValue), noteValue);
             }
 
             // Match the play button height to the ruler height.
             rhythmRulerTableRow.cells[0].style.width = RhythmRuler.BUTTONSIZE + "px";
             rhythmRulerTableRow.cells[0].style.minWidth = RhythmRuler.BUTTONSIZE + "px";
             rhythmRulerTableRow.cells[0].style.maxWidth = RhythmRuler.BUTTONSIZE + "px";
-            rhythmRulerTableRow.cells[0].style.height =
-                rulerRow.offsetHeight + "px";
-            rhythmRulerTableRow.cells[0].style.minHeight =
-                rulerRow.offsetHeight + "px";
-            rhythmRulerTableRow.cells[0].style.maxHeight =
-                rulerRow.offsetHeight + "px";
+            rhythmRulerTableRow.cells[0].style.height = rulerRow.offsetHeight + "px";
+            rhythmRulerTableRow.cells[0].style.minHeight = rulerRow.offsetHeight + "px";
+            rhythmRulerTableRow.cells[0].style.maxHeight = rulerRow.offsetHeight + "px";
             rhythmRulerTableRow.cells[0].style.verticalAlign = "middle";
         }
 
         // Restore dissect history.
         let cell;
         for (let drum = 0; drum < this.Drums.length; drum++) {
-            if (this.Drums[i] === null) {
+            if (drum === null) {
                 continue;
             }
 
@@ -455,22 +410,12 @@ class RhythmRuler {
                     this._rulerSelected = drum;
 
                     if (typeof this._dissectHistory[i][0][j] === "number") {
-                        cell =
-                            rhythmRulerTableRow.cells[
-                                this._dissectHistory[i][0][j]
-                            ];
+                        cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j]];
                         this.__toggleRestState(cell, false);
-                    } else if (
-                        typeof this._dissectHistory[i][0][j][0] === "number"
-                    ) {
-                        if (
-                            typeof this._dissectHistory[i][0][j][1] === "number"
-                        ) {
+                    } else if (typeof this._dissectHistory[i][0][j][0] === "number") {
+                        if (typeof this._dissectHistory[i][0][j][1] === "number") {
                             // dissect is [cell, num]
-                            cell =
-                                rhythmRulerTableRow.cells[
-                                    this._dissectHistory[i][0][j][0]
-                                ];
+                            cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j][0]];
                             if (cell != undefined) {
                                 this.__dissectByNumber(
                                     cell,
@@ -484,10 +429,7 @@ class RhythmRuler {
                             }
                         } else {
                             // divide is [cell, [values]]
-                            cell =
-                                rhythmRulerTableRow.cells[
-                                    this._dissectHistory[i][0][j][0]
-                                ];
+                            cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j][0]];
                             if (cell != undefined) {
                                 this.__divideFromList(
                                     cell,
@@ -499,10 +441,8 @@ class RhythmRuler {
                     } else {
                         // tie is [[cell, value], [cell, value]...]
                         const history = this._dissectHistory[i][0][j];
-                        this._mouseDownCell =
-                            rhythmRulerTableRow.cells[history[0][0]];
-                        this._mouseUpCell =
-                            rhythmRulerTableRow.cells[last(history)[0]];
+                        this._mouseDownCell = rhythmRulerTableRow.cells[history[0][0]];
+                        this._mouseUpCell = rhythmRulerTableRow.cells[last(history)[0]];
                         if (this._mouseUpCell != undefined) {
                             this.__tie(false);
                         }
@@ -547,25 +487,21 @@ class RhythmRuler {
             newCell.style.borderRadius = "10px";
             if (evenColor === platformColor.selectorBackground) {
                 if (i % 2 === 0) {
-                    newCell.style.backgroundColor =
-                        platformColor.selectorBackground;
+                    newCell.style.backgroundColor = platformColor.selectorBackground;
                 } else {
-                    newCell.style.backgroundColor =
-                        platformColor.selectorSelected;
+                    newCell.style.backgroundColor = platformColor.selectorSelected;
                 }
             }
 
             if (evenColor === platformColor.selectorSelected) {
                 if (i % 2 === 0) {
-                    newCell.style.backgroundColor =
-                        platformColor.selectorSelected;
+                    newCell.style.backgroundColor = platformColor.selectorSelected;
                 } else {
-                    newCell.style.backgroundColor =
-                        platformColor.selectorBackground;
+                    newCell.style.backgroundColor = platformColor.selectorBackground;
                 }
             }
         }
-    };
+    }
 
     /**
      * @private
@@ -573,7 +509,6 @@ class RhythmRuler {
      * @param {Event} event - The triggering event.
      * @returns {void}
      */
-
     _dissectRuler(event, ruler) {
         const cell = event.target;
         if (cell === null) {
@@ -616,9 +551,9 @@ class RhythmRuler {
                         '" alt="' +
                         _("tap a rhythm") +
                         '" height="' +
-                    RhythmRuler.ICONSIZE +
+                        RhythmRuler.ICONSIZE +
                         '" width="' +
-                    RhythmRuler.ICONSIZE +
+                        RhythmRuler.ICONSIZE +
                         '" vertical-align="middle">';
                     return;
                 }
@@ -632,24 +567,20 @@ class RhythmRuler {
                 if (this.Drums[this._rulerSelected] === null) {
                     drum = "snare drum";
                 } else {
-                    const drumBlockNo = logo.blocks.blockList[
-                        this.Drums[this._rulerSelected]
-                    ].connections[1];
+                    const drumBlockNo =
+                        logo.blocks.blockList[this.Drums[this._rulerSelected]].connections[1];
                     drum = logo.blocks.blockList[drumBlockNo].value;
                 }
 
-                
                 // FIXME: Should be based on meter
                 for (let i = 0; i < 4; i++) {
                     setTimeout(() => {
-                        logo.synth.trigger(
-                            0, "C4", Singer.defaultBPMFactor / 16, drum, null, null
-                        );
+                        logo.synth.trigger(0, "C4", Singer.defaultBPMFactor / 16, drum, null, null);
                     }, (interval * i) / 4);
                 }
 
                 setTimeout(() => {
-                    this.__startTapping(interval);
+                    this.__startTapping(interval, event);
                 }, interval);
             }
         } else {
@@ -708,6 +639,7 @@ class RhythmRuler {
         // Progress once per 8th note.
         __move(interval / 8, 100 / 8);
     }
+
     /**
      * @private
      * @param {Event} event - The triggering event.
@@ -728,10 +660,7 @@ class RhythmRuler {
         this._tapTimes.push(d.getTime());
 
         this._tapMode = false;
-        if (
-            typeof this._rulerSelected === "string" ||
-            typeof this._rulerSelected === "number"
-        ) {
+        if (typeof this._rulerSelected === "string" || typeof this._rulerSelected === "number") {
             const noteValues = this.Rulers[this._rulerSelected][0];
 
             if (last(this._tapTimes) > this._tapEndTime) {
@@ -783,10 +712,7 @@ class RhythmRuler {
             for (let i = 1; i < this._tapTimes.length; i++) {
                 const dtime = this._tapTimes[i] - this._tapTimes[i - 1];
                 if (i < this._tapTimes.length - 1) {
-                    obj = nearestBeat(
-                        (100 * dtime) / this._bpmFactor,
-                        minimumBeat
-                    );
+                    obj = nearestBeat((100 * dtime) / this._bpmFactor, minimumBeat);
                     if (obj[0] === 0) {
                         obj[0] = 1;
                         obj[1] = obj[1] / 2;
@@ -800,9 +726,7 @@ class RhythmRuler {
                     // Since the fractional value is noisy,
                     // ensure that the final beat make the
                     // total add up to the proper note value.
-                    obj = rationalToFraction(
-                        1 / noteValues[this._tapCell.cellIndex] - sum
-                    );
+                    obj = rationalToFraction(1 / noteValues[this._tapCell.cellIndex] - sum);
                     newNoteValues.push(obj[1] / obj[0]);
                 }
             }
@@ -820,9 +744,9 @@ class RhythmRuler {
             '" alt="' +
             _("tap a rhythm") +
             '" height="' +
-        RhythmRuler.ICONSIZE +
+            RhythmRuler.ICONSIZE +
             '" width="' +
-        RhythmRuler.ICONSIZE +
+            RhythmRuler.ICONSIZE +
             '" vertical-align="middle">';
     }
 
@@ -833,10 +757,7 @@ class RhythmRuler {
      * @param {number} noteValue
      * @returns {void}
      */
-
     __addCellEventHandlers(cell, cellWidth, noteValue) {
-        
-
         const __mouseOverHandler = (event) => {
             const cell = event.target;
             if (cell === null || cell.parentNode === null) {
@@ -848,20 +769,12 @@ class RhythmRuler {
             const noteValue = noteValues[cell.cellIndex];
             let obj;
             if (noteValue < 0) {
-                obj = rationalToFraction(
-                    Math.abs(Math.abs(-1 / noteValue))
-                );
+                obj = rationalToFraction(Math.abs(Math.abs(-1 / noteValue)));
                 cell.innerHTML =
-                    calcNoteValueToDisplay(obj[1], obj[0], this._cellScale) +
-                    " " +
-                    _("silence");
+                    calcNoteValueToDisplay(obj[1], obj[0], this._cellScale) + " " + _("silence");
             } else {
                 obj = rationalToFraction(Math.abs(Math.abs(1 / noteValue)));
-                cell.innerHTML = calcNoteValueToDisplay(
-                    obj[1],
-                    obj[0],
-                    this._cellScale
-                );
+                cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0], this._cellScale);
             }
         };
 
@@ -887,12 +800,9 @@ class RhythmRuler {
 
                 const cell = this._mouseDownCell;
                 if (cell !== null && cell.parentNode !== null) {
-                    this._rulerSelected = cell.parentNode.getAttribute(
-                        "data-row"
-                    );
+                    this._rulerSelected = cell.parentNode.getAttribute("data-row");
                     // const noteValues = this.Rulers[this._rulerSelected][0];
-                    cell.style.backgroundColor =
-                        platformColor.selectorBackground;
+                    cell.style.backgroundColor = platformColor.selectorBackground;
                 }
             }, 1500);
         };
@@ -922,10 +832,7 @@ class RhythmRuler {
             if (!this.__getLongPressStatus()) {
                 const cell = event.target;
                 if (cell !== null && cell.parentNode !== null) {
-                    this._dissectRuler(
-                        event,
-                        cell.parentNode.getAttribute("data-row")
-                    );
+                    this._dissectRuler(event, cell.parentNode.getAttribute("data-row"));
                 } else {
                     // console.error("Rhythm Ruler: null cell found on click");
                 }
@@ -937,11 +844,7 @@ class RhythmRuler {
         let obj;
         if (cellWidth > 12 && noteValue > 0) {
             obj = rationalToFraction(Math.abs(1 / noteValue));
-            cell.innerHTML = calcNoteValueToDisplay(
-                obj[1],
-                obj[0],
-                this._cellScale
-            );
+            cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0], this._cellScale);
         } else {
             cell.innerHTML = "";
 
@@ -966,11 +869,9 @@ class RhythmRuler {
      * @private
      * @returns {void}
      */
-    
-
-    __getLongPressStatus () {
+    __getLongPressStatus() {
         return this._inLongPress;
-    };
+    }
 
     /**
      * @private
@@ -978,10 +879,7 @@ class RhythmRuler {
      * @param {boolean} addToUndoList
      * @returns {void}
      */
-
     __toggleRestState(cell, addToUndoList) {
-        
-
         if (cell !== null && cell.parentNode !== null) {
             this._rulerSelected = cell.parentNode.getAttribute("data-row");
             const noteValues = this.Rulers[this._rulerSelected][0];
@@ -999,26 +897,14 @@ class RhythmRuler {
                 const noteValues = this.Rulers[this._rulerSelected][0];
                 const noteValue = noteValues[cell.cellIndex];
                 if (noteValue < 0) {
-                    obj = rationalToFraction(
-                        Math.abs(Math.abs(-1 / noteValue))
-                    );
+                    obj = rationalToFraction(Math.abs(Math.abs(-1 / noteValue)));
                     cell.innerHTML =
-                        calcNoteValueToDisplay(
-                            obj[1],
-                            obj[0],
-                            this._cellScale
-                        ) +
+                        calcNoteValueToDisplay(obj[1], obj[0], this._cellScale) +
                         " " +
                         _("silence");
                 } else {
-                    obj = rationalToFraction(
-                        Math.abs(Math.abs(1 / noteValue))
-                    );
-                    cell.innerHTML = calcNoteValueToDisplay(
-                        obj[1],
-                        obj[0],
-                        this._cellScale
-                    );
+                    obj = rationalToFraction(Math.abs(Math.abs(1 / noteValue)));
+                    cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0], this._cellScale);
                 }
             };
 
@@ -1030,11 +916,7 @@ class RhythmRuler {
             let obj;
             if (noteValue < 0) {
                 obj = rationalToFraction(Math.abs(1 / noteValue));
-                cell.innerHTML = calcNoteValueToDisplay(
-                    obj[1],
-                    obj[0],
-                    this._cellScale
-                );
+                cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0], this._cellScale);
                 cell.removeEventListener("mouseover", __mouseOverHandler);
                 cell.removeEventListener("mouseout", __mouseOutHandler);
             } else {
@@ -1051,7 +933,7 @@ class RhythmRuler {
 
             this._calculateZebraStripes(this._rulerSelected);
 
-            divisionHistory = this.Rulers[this._rulerSelected][1];
+            const divisionHistory = this.Rulers[this._rulerSelected][1];
             if (addToUndoList) {
                 this._undoList.push(["rest", this._rulerSelected]);
             }
@@ -1069,7 +951,6 @@ class RhythmRuler {
      * @param {boolean} addToUndoList
      * @returns {void}
      */
-
     __divideFromList(cell, newNoteValues, addToUndoList) {
         if (typeof cell !== "object") {
             return;
@@ -1082,10 +963,7 @@ class RhythmRuler {
         const ruler = this._rulers[this._rulerSelected];
         const newCellIndex = cell.cellIndex;
 
-        if (
-            typeof this._rulerSelected === "string" ||
-            typeof this._rulerSelected === "number"
-        ) {
+        if (typeof this._rulerSelected === "string" || typeof this._rulerSelected === "number") {
             const noteValues = this.Rulers[this._rulerSelected][0];
 
             const divisionHistory = this.Rulers[this._rulerSelected][1];
@@ -1113,11 +991,7 @@ class RhythmRuler {
                 newCell.style.minHeight = newCell.style.height;
                 newCell.style.maxHeight = newCell.style.height;
 
-                this.__addCellEventHandlers(
-                    newCell,
-                    newCellWidth,
-                    newNoteValue
-                );
+                this.__addCellEventHandlers(newCell, newCellWidth, newNoteValue);
             }
 
             this._calculateZebraStripes(this._rulerSelected);
@@ -1133,7 +1007,6 @@ class RhythmRuler {
      * @param {boolean} addToUndoList
      * @returns {void}
      */
-
     __dissectByNumber(cell, inputNum, addToUndoList) {
         if (typeof cell !== "object") {
             return;
@@ -1146,17 +1019,12 @@ class RhythmRuler {
         const ruler = this._rulers[this._rulerSelected];
         const newCellIndex = cell.cellIndex;
 
-        if (
-            typeof this._rulerSelected === "string" ||
-            typeof this._rulerSelected === "number"
-        ) {
+        if (typeof this._rulerSelected === "string" || typeof this._rulerSelected === "number") {
             const noteValues = this.Rulers[this._rulerSelected][0];
 
             const noteValue = noteValues[newCellIndex];
             if (inputNum * noteValue > 256) {
-                logo.errorMsg(
-                    _("Maximum value of 256 has been exceeded.")
-                );
+                logo.errorMsg(_("Maximum value of 256 has been exceeded."));
                 return;
             } else {
                 logo.hideMsgs();
@@ -1180,8 +1048,7 @@ class RhythmRuler {
                 parseFloat(this._noteWidth(noteValue)) -
                 parseFloat(inputNum) * parseFloat(tempwidth);
             const newCellWidth =
-                parseFloat(this._noteWidth(newNoteValue)) +
-                parseFloat(difference) / inputNum;
+                parseFloat(this._noteWidth(newNoteValue)) + parseFloat(difference) / inputNum;
             noteValues.splice(newCellIndex, 1);
 
             for (let i = 0; i < inputNum; i++) {
@@ -1194,11 +1061,7 @@ class RhythmRuler {
                 newCell.style.minHeight = newCell.style.height;
                 newCell.style.maxHeight = newCell.style.height;
 
-                this.__addCellEventHandlers(
-                    newCell,
-                    newCellWidth,
-                    newNoteValue
-                );
+                this.__addCellEventHandlers(newCell, newCellWidth, newNoteValue);
             }
 
             this._calculateZebraStripes(this._rulerSelected);
@@ -1207,14 +1070,12 @@ class RhythmRuler {
         // this._piemenuRuler(this._rulerSelected);
     }
 
-
     /**
      * @private
      * @param {Event} event - The triggering event.
      * @param {string} ruler
      * @returns {void}
      */
-
     _tieRuler(event, ruler) {
         if (this._playing) {
             // console.warn("You cannot tie while widget is playing.");
@@ -1240,7 +1101,6 @@ class RhythmRuler {
      * @param {boolean} addToUndoList
      * @returns {void}
      */
-
     __tie(addToUndoList) {
         const ruler = this._rulers[this._rulerSelected];
 
@@ -1252,10 +1112,7 @@ class RhythmRuler {
             return;
         }
 
-        if (
-            typeof this._rulerSelected === "string" ||
-            typeof this._rulerSelected === "number"
-        ) {
+        if (typeof this._rulerSelected === "string" || typeof this._rulerSelected === "number") {
             let noteValues = this.Rulers[this._rulerSelected][0];
 
             let downCellIndex = this._mouseDownCell.cellIndex;
@@ -1327,8 +1184,7 @@ class RhythmRuler {
      * @private
      * @returns {void}
      */
-
-    _undo () {
+    _undo() {
         // FIXME: Add undo for REST
         logo.synth.stop();
         this._startingTime = null;
@@ -1406,11 +1262,7 @@ class RhythmRuler {
             newCell.style.backgroundColor = platformColor.selectorBackground;
 
             const obj = rationalToFraction(newNoteValue);
-            newCell.innerHTML = calcNoteValueToDisplay(
-                obj[1],
-                obj[0],
-                this._cellScale
-            );
+            newCell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0], this._cellScale);
 
             noteValues[newCellIndex] = newNoteValue;
             noteValues.splice(newCellIndex + 1, oldNoteValues.length - 1);
@@ -1435,11 +1287,7 @@ class RhythmRuler {
                 oldCell.style.maxHeight = oldCell.style.height;
 
                 noteValues[history[0][0]] = history[0][1];
-                this.__addCellEventHandlers(
-                    oldCell,
-                    oldCellWidth,
-                    history[0][1]
-                );
+                this.__addCellEventHandlers(oldCell, oldCellWidth, history[0][1]);
 
                 for (let i = 1; i < history.length; i++) {
                     const newCell = ruler.insertCell(history[0][0] + i);
@@ -1451,17 +1299,9 @@ class RhythmRuler {
                     newCell.style.maxHeight = newCell.style.height;
 
                     noteValues.splice(history[0][0] + i, 0, history[i][1]);
-                    newCell.innerHTML = calcNoteValueToDisplay(
-                        history[i][1],
-                        1,
-                        this._cellScale
-                    );
+                    newCell.innerHTML = calcNoteValueToDisplay(history[i][1], 1, this._cellScale);
 
-                    this.__addCellEventHandlers(
-                        newCell,
-                        newCellWidth,
-                        history[i][1]
-                    );
+                    this.__addCellEventHandlers(newCell, newCellWidth, history[i][1]);
                 }
 
                 this.Rulers[lastRuler][0] = noteValues;
@@ -1481,12 +1321,10 @@ class RhythmRuler {
         // this._piemenuRuler(this._rulerSelected);
     }
 
-
     /**
      * @private
      * @returns {void}
      */
-
     _tap() {
         this._tapMode = true;
         const iconSize = RhythmRuler.ICONSIZE;
@@ -1506,7 +1344,6 @@ class RhythmRuler {
      * @private
      * @returns {void}
      */
-
     _clear() {
         logo.synth.stop();
         logo.resetSynth(0);
@@ -1521,9 +1358,9 @@ class RhythmRuler {
             '" alt="' +
             _("Play all") +
             '" height="' +
-        RhythmRuler.ICONSIZE +
+            RhythmRuler.ICONSIZE +
             '" width="' +
-        RhythmRuler.ICONSIZE +
+            RhythmRuler.ICONSIZE +
             '" vertical-align="middle">';
         for (let r = 0; r < this.Rulers.length; r++) {
             this._rulerSelected = r;
@@ -1539,18 +1376,16 @@ class RhythmRuler {
      * @private
      * @returns {void}
      */
-
     __pause() {
-
         this._playAllCell.innerHTML =
             '<img src="header-icons/play-button.svg" title="' +
             _("Play all") +
             '" alt="' +
             _("Play all") +
             '" height="' +
-        RhythmRuler.ICONSIZE +
+            RhythmRuler.ICONSIZE +
             '" width="' +
-        RhythmRuler.ICONSIZE +
+            RhythmRuler.ICONSIZE +
             '" vertical-align="middle">';
         this._playing = false;
         this._playingAll = false;
@@ -1566,7 +1401,6 @@ class RhythmRuler {
      * @public
      * @returns {void}
      */
-
     playAll() {
         // External call from run button.
         if (this._playing) {
@@ -1574,7 +1408,7 @@ class RhythmRuler {
                 this.__pause();
                 // Wait for pause to complete before restarting.
                 this._playingAll = true;
-                
+
                 setTimeout(() => {
                     this.__resume();
                 }, 1000);
@@ -1588,18 +1422,16 @@ class RhythmRuler {
      * @private
      * @returns {void}
      */
-
     __resume() {
-
         this._playAllCell.innerHTML =
             '<img src="header-icons/pause-button.svg" title="' +
             _("Pause") +
             '" alt="' +
             _("Pause") +
             '" height="' +
-        RhythmRuler.ICONSIZE +
+            RhythmRuler.ICONSIZE +
             '" width="' +
-        RhythmRuler.ICONSIZE +
+            RhythmRuler.ICONSIZE +
             '" vertical-align="middle">';
         logo.turtleDelay = 0;
         this._playingAll = true;
@@ -1619,7 +1451,6 @@ class RhythmRuler {
      * @private
      * @returns {void}
      */
-
     _playAll() {
         logo.synth.stop();
         logo.resetSynth(0);
@@ -1641,7 +1472,6 @@ class RhythmRuler {
      * @private
      * @returns {void}
      */
-
     _playOne() {
         logo.synth.stop();
         logo.resetSynth(0);
@@ -1663,7 +1493,6 @@ class RhythmRuler {
      * @param {number} colIndex
      * @returns {void}
      */
-
     __loop(noteTime, rulerNo, colIndex) {
         const ruler = this._rulers[rulerNo];
         if (ruler === null) {
@@ -1685,8 +1514,7 @@ class RhythmRuler {
         if (this.Drums[rulerNo] === null) {
             drum = "snare drum";
         } else {
-            const drumblockno = logo.blocks.blockList[this.Drums[rulerNo]]
-                .connections[1];
+            const drumblockno = logo.blocks.blockList[this.Drums[rulerNo]].connections[1];
             drum = logo.blocks.blockList[drumblockno].value;
         }
 
@@ -1717,18 +1545,27 @@ class RhythmRuler {
             }
         }
 
-        
-
         if (this._playing) {
             // Play the current note.
             if (noteValue > 0) {
                 if (foundVoice) {
                     logo.synth.trigger(
-                        0, "C4", Singer.defaultBPMFactor / noteValue, drum, null, null, false
+                        0,
+                        "C4",
+                        Singer.defaultBPMFactor / noteValue,
+                        drum,
+                        null,
+                        null,
+                        false
                     );
                 } else if (foundDrum) {
                     logo.synth.trigger(
-                        0, ["C4"], Singer.defaultBPMFactor / noteValue, drum, null, null
+                        0,
+                        ["C4"],
+                        Singer.defaultBPMFactor / noteValue,
+                        drum,
+                        null,
+                        null
                     );
                 }
             }
@@ -1738,8 +1575,7 @@ class RhythmRuler {
 
             // Calculate any offset in playback.
             const d = new Date();
-            this._offsets[rulerNo] =
-                d.getTime() - this._startingTime - this._elapsedTimes[rulerNo];
+            this._offsets[rulerNo] = d.getTime() - this._startingTime - this._elapsedTimes[rulerNo];
         }
 
         setTimeout(() => {
@@ -1762,10 +1598,9 @@ class RhythmRuler {
      * @param {number} selectedRuler
      * @returns {void}
      */
-
     _save(selectedRuler) {
         // Deprecated -- replaced by save tuplets code
-        
+
         for (const name in logo.blocks.palettes.dict) {
             logo.blocks.palettes.dict[name].hideMenu(true);
         }
@@ -1783,30 +1618,20 @@ class RhythmRuler {
             } else {
                 stack_value =
                     logo.blocks.blockList[
-                        logo.blocks.blockList[this.Drums[selectedRuler]]
-                            .connections[1]
+                        logo.blocks.blockList[this.Drums[selectedRuler]].connections[1]
                     ].value.split(" ")[0] +
                     " " +
                     _("rhythm");
             }
             const delta = selectedRuler * 42;
             const newStack = [
-                [
-                    0,
-                    ["action", { collapsed: true }],
-                    100 + delta,
-                    100 + delta,
-                    [null, 1, 2, null]
-                ],
+                [0, ["action", { collapsed: true }], 100 + delta, 100 + delta, [null, 1, 2, null]],
                 [1, ["text", { value: stack_value }], 0, 0, [0]]
             ];
             let previousBlock = 0;
             let sameNoteValue = 1;
             for (let i = 0; i < ruler.cells.length; i++) {
-                if (
-                    noteValues[i] === noteValues[i + 1] &&
-                    i < ruler.cells.length - 1
-                ) {
+                if (noteValues[i] === noteValues[i + 1] && i < ruler.cells.length - 1) {
                     sameNoteValue += 1;
                     continue;
                 } else {
@@ -1822,51 +1647,15 @@ class RhythmRuler {
                         0,
                         [previousBlock, idx + 1, idx + 2, idx + 5]
                     ]);
-                    newStack.push([
-                        idx + 1,
-                        ["number", { value: sameNoteValue }],
-                        0,
-                        0,
-                        [idx]
-                    ]);
-                    newStack.push([
-                        idx + 2,
-                        "divide",
-                        0,
-                        0,
-                        [idx, idx + 3, idx + 4]
-                    ]);
-                    newStack.push([
-                        idx + 3,
-                        ["number", { value: obj[0] }],
-                        0,
-                        0,
-                        [idx + 2]
-                    ]);
-                    newStack.push([
-                        idx + 4,
-                        ["number", { value: obj[1] }],
-                        0,
-                        0,
-                        [idx + 2]
-                    ]);
+                    newStack.push([idx + 1, ["number", { value: sameNoteValue }], 0, 0, [idx]]);
+                    newStack.push([idx + 2, "divide", 0, 0, [idx, idx + 3, idx + 4]]);
+                    newStack.push([idx + 3, ["number", { value: obj[0] }], 0, 0, [idx + 2]]);
+                    newStack.push([idx + 4, ["number", { value: obj[1] }], 0, 0, [idx + 2]]);
                     newStack.push([idx + 5, "vspace", 0, 0, [idx, idx + 6]]);
                     if (i == ruler.cells.length - 1) {
-                        newStack.push([
-                            idx + 6,
-                            "hidden",
-                            0,
-                            0,
-                            [idx + 5, null]
-                        ]);
+                        newStack.push([idx + 6, "hidden", 0, 0, [idx + 5, null]]);
                     } else {
-                        newStack.push([
-                            idx + 6,
-                            "hidden",
-                            0,
-                            0,
-                            [idx + 5, idx + 7]
-                        ]);
+                        newStack.push([idx + 6, "hidden", 0, 0, [idx + 5, idx + 7]]);
                     }
 
                     previousBlock = idx + 6;
@@ -1888,10 +1677,7 @@ class RhythmRuler {
      * @param {number} selectedRuler
      * @returns {void}
      */
-    
-
     _saveTuplets(selectedRuler) {
-        
         for (const name in logo.blocks.palettes.dict) {
             logo.blocks.palettes.dict[name].hideMenu(true);
         }
@@ -1907,30 +1693,20 @@ class RhythmRuler {
             } else {
                 stack_value =
                     logo.blocks.blockList[
-                        logo.blocks.blockList[this.Drums[selectedRuler]]
-                            .connections[1]
+                        logo.blocks.blockList[this.Drums[selectedRuler]].connections[1]
                     ].value.split(" ")[0] +
                     " " +
                     _("rhythm");
             }
             const delta = selectedRuler * 42;
             const newStack = [
-                [
-                    0,
-                    ["action", { collapsed: true }],
-                    100 + delta,
-                    100 + delta,
-                    [null, 1, 2, null]
-                ],
+                [0, ["action", { collapsed: true }], 100 + delta, 100 + delta, [null, 1, 2, null]],
                 [1, ["text", { value: stack_value }], 0, 0, [0]]
             ];
             let previousBlock = 0;
             let sameNoteValue = 1;
             for (let i = 0; i < ruler.cells.length; i++) {
-                if (
-                    noteValues[i] === noteValues[i + 1] &&
-                    i < ruler.cells.length - 1
-                ) {
+                if (noteValues[i] === noteValues[i + 1] && i < ruler.cells.length - 1) {
                     sameNoteValue += 1;
                     continue;
                 } else {
@@ -1946,41 +1722,11 @@ class RhythmRuler {
                             0,
                             [previousBlock, idx + 1, idx + 2, idx + 5]
                         ]);
-                        newStack.push([
-                            idx + 1,
-                            ["number", { value: sameNoteValue }],
-                            0,
-                            0,
-                            [idx]
-                        ]);
-                        newStack.push([
-                            idx + 2,
-                            "divide",
-                            0,
-                            0,
-                            [idx, idx + 3, idx + 4]
-                        ]);
-                        newStack.push([
-                            idx + 3,
-                            ["number", { value: obj[0] }],
-                            0,
-                            0,
-                            [idx + 2]
-                        ]);
-                        newStack.push([
-                            idx + 4,
-                            ["number", { value: n }],
-                            0,
-                            0,
-                            [idx + 2]
-                        ]);
-                        newStack.push([
-                            idx + 5,
-                            "vspace",
-                            0,
-                            0,
-                            [idx, idx + 6]
-                        ]);
+                        newStack.push([idx + 1, ["number", { value: sameNoteValue }], 0, 0, [idx]]);
+                        newStack.push([idx + 2, "divide", 0, 0, [idx, idx + 3, idx + 4]]);
+                        newStack.push([idx + 3, ["number", { value: obj[0] }], 0, 0, [idx + 2]]);
+                        newStack.push([idx + 4, ["number", { value: n }], 0, 0, [idx + 2]]);
+                        newStack.push([idx + 5, "vspace", 0, 0, [idx, idx + 6]]);
                     } else {
                         newStack.push([
                             idx,
@@ -1989,59 +1735,17 @@ class RhythmRuler {
                             0,
                             [previousBlock, idx + 1, idx + 2, idx + 5]
                         ]);
-                        newStack.push([
-                            idx + 1,
-                            ["number", { value: sameNoteValue }],
-                            0,
-                            0,
-                            [idx]
-                        ]);
-                        newStack.push([
-                            idx + 2,
-                            "divide",
-                            0,
-                            0,
-                            [idx, idx + 3, idx + 4]
-                        ]);
-                        newStack.push([
-                            idx + 3,
-                            ["number", { value: obj[0] }],
-                            0,
-                            0,
-                            [idx + 2]
-                        ]);
-                        newStack.push([
-                            idx + 4,
-                            ["number", { value: obj[1] }],
-                            0,
-                            0,
-                            [idx + 2]
-                        ]);
-                        newStack.push([
-                            idx + 5,
-                            "vspace",
-                            0,
-                            0,
-                            [idx, idx + 6]
-                        ]);
+                        newStack.push([idx + 1, ["number", { value: sameNoteValue }], 0, 0, [idx]]);
+                        newStack.push([idx + 2, "divide", 0, 0, [idx, idx + 3, idx + 4]]);
+                        newStack.push([idx + 3, ["number", { value: obj[0] }], 0, 0, [idx + 2]]);
+                        newStack.push([idx + 4, ["number", { value: obj[1] }], 0, 0, [idx + 2]]);
+                        newStack.push([idx + 5, "vspace", 0, 0, [idx, idx + 6]]);
                     }
 
                     if (i == ruler.cells.length - 1) {
-                        newStack.push([
-                            idx + 6,
-                            "hidden",
-                            0,
-                            0,
-                            [idx + 5, null]
-                        ]);
+                        newStack.push([idx + 6, "hidden", 0, 0, [idx + 5, null]]);
                     } else {
-                        newStack.push([
-                            idx + 6,
-                            "hidden",
-                            0,
-                            0,
-                            [idx + 5, idx + 7]
-                        ]);
+                        newStack.push([idx + 6, "hidden", 0, 0, [idx + 5, idx + 7]]);
                     }
 
                     previousBlock = idx + 6;
@@ -2063,9 +1767,7 @@ class RhythmRuler {
      * @param {number} selectedRuler
      * @returns {void}
      */
-
     _saveTupletsMerged(noteValues) {
-        
         for (const name in logo.blocks.palettes.dict) {
             logo.blocks.palettes.dict[name].hideMenu(true);
         }
@@ -2075,75 +1777,30 @@ class RhythmRuler {
         const stack_value = _("rhythm");
         const delta = 42;
         const newStack = [
-            [
-                0,
-                ["action", { collapsed: true }],
-                100 + delta,
-                100 + delta,
-                [null, 1, 2, null]
-            ],
+            [0, ["action", { collapsed: true }], 100 + delta, 100 + delta, [null, 1, 2, null]],
             [1, ["text", { value: stack_value }], 0, 0, [0]]
         ];
         let previousBlock = 0;
         let sameNoteValue = 1;
         for (let i = 0; i < noteValues.length; i++) {
-            if (
-                noteValues[i] === noteValues[i + 1] &&
-                i < noteValues.length - 1
-            ) {
+            if (noteValues[i] === noteValues[i + 1] && i < noteValues.length - 1) {
                 sameNoteValue += 1;
                 continue;
             } else {
                 const idx = newStack.length;
                 const noteValue = noteValues[i];
                 const obj = rationalToFraction(1 / Math.abs(noteValue));
-                newStack.push([
-                    idx,
-                    "rhythm2",
-                    0,
-                    0,
-                    [previousBlock, idx + 1, idx + 2, idx + 5]
-                ]);
-                newStack.push([
-                    idx + 1,
-                    ["number", { value: sameNoteValue }],
-                    0,
-                    0,
-                    [idx]
-                ]);
-                newStack.push([
-                    idx + 2,
-                    "divide",
-                    0,
-                    0,
-                    [idx, idx + 3, idx + 4]
-                ]);
-                newStack.push([
-                    idx + 3,
-                    ["number", { value: obj[0] }],
-                    0,
-                    0,
-                    [idx + 2]
-                ]);
-                newStack.push([
-                    idx + 4,
-                    ["number", { value: obj[1] }],
-                    0,
-                    0,
-                    [idx + 2]
-                ]);
+                newStack.push([idx, "rhythm2", 0, 0, [previousBlock, idx + 1, idx + 2, idx + 5]]);
+                newStack.push([idx + 1, ["number", { value: sameNoteValue }], 0, 0, [idx]]);
+                newStack.push([idx + 2, "divide", 0, 0, [idx, idx + 3, idx + 4]]);
+                newStack.push([idx + 3, ["number", { value: obj[0] }], 0, 0, [idx + 2]]);
+                newStack.push([idx + 4, ["number", { value: obj[1] }], 0, 0, [idx + 2]]);
                 newStack.push([idx + 5, "vspace", 0, 0, [idx, idx + 6]]);
 
                 if (i == noteValues.length - 1) {
                     newStack.push([idx + 6, "hidden", 0, 0, [idx + 5, null]]);
                 } else {
-                    newStack.push([
-                        idx + 6,
-                        "hidden",
-                        0,
-                        0,
-                        [idx + 5, idx + 7]
-                    ]);
+                    newStack.push([idx + 6, "hidden", 0, 0, [idx + 5, idx + 7]]);
                 }
 
                 previousBlock = idx + 6;
@@ -2160,16 +1817,13 @@ class RhythmRuler {
      * @param {number} selectedRuler
      * @returns {void}
      */
-
-    _saveMachine (selectedRuler) {
+    _saveMachine(selectedRuler) {
         // We are either saving a drum machine or a voice machine.
         let drum;
         if (this.Drums[selectedRuler] === null) {
             drum = "snare drum";
         } else {
-            const drumBlockNo = logo.blocks.blockList[
-                this.Drums[selectedRuler]
-            ].connections[1];
+            const drumBlockNo = logo.blocks.blockList[this.Drums[selectedRuler]].connections[1];
             drum = logo.blocks.blockList[drumBlockNo].value;
         }
 
@@ -2200,9 +1854,7 @@ class RhythmRuler {
      * @param {boolean} effect
      * @returns {void}
      */
-
     _saveDrumMachine(selectedRuler, drum, effect) {
-        
         for (const name in logo.blocks.palettes.dict) {
             logo.blocks.palettes.dict[name].hideMenu(true);
         }
@@ -2223,30 +1875,20 @@ class RhythmRuler {
             } else {
                 action_name =
                     logo.blocks.blockList[
-                        logo.blocks.blockList[this.Drums[selectedRuler]]
-                            .connections[1]
+                        logo.blocks.blockList[this.Drums[selectedRuler]].connections[1]
                     ].value.split(" ")[0] +
                     " " +
                     _("action");
             }
 
             const newStack = [
-                [
-                    0,
-                    ["action", { collapsed: true }],
-                    100 + delta,
-                    100 + delta,
-                    [null, 1, 2, null]
-                ],
+                [0, ["action", { collapsed: true }], 100 + delta, 100 + delta, [null, 1, 2, null]],
                 [1, ["text", { value: action_name }], 0, 0, [0]]
             ];
             let previousBlock = 0; // 1
             let sameNoteValue = 1;
             for (let i = 0; i < ruler.cells.length; i++) {
-                if (
-                    noteValues[i] === noteValues[i + 1] &&
-                    i < ruler.cells.length - 1
-                ) {
+                if (noteValues[i] === noteValues[i + 1] && i < ruler.cells.length - 1) {
                     sameNoteValue += 1;
                     continue;
                 } else {
@@ -2264,20 +1906,8 @@ class RhythmRuler {
                             0,
                             [previousBlock, idx + 1, idx + 4, idx + 7]
                         ]);
-                        newStack.push([
-                            idx + 1,
-                            "divide",
-                            0,
-                            0,
-                            [idx, idx + 2, idx + 3]
-                        ]);
-                        newStack.push([
-                            idx + 2,
-                            ["number", { value: obj[0] }],
-                            0,
-                            0,
-                            [idx + 1]
-                        ]);
+                        newStack.push([idx + 1, "divide", 0, 0, [idx, idx + 2, idx + 3]]);
+                        newStack.push([idx + 2, ["number", { value: obj[0] }], 0, 0, [idx + 1]]);
                         if (noteValue < 0) {
                             newStack.push([
                                 idx + 3,
@@ -2286,27 +1916,9 @@ class RhythmRuler {
                                 0,
                                 [idx + 1]
                             ]);
-                            newStack.push([
-                                idx + 4,
-                                "vspace",
-                                0,
-                                0,
-                                [idx, idx + 5]
-                            ]);
-                            newStack.push([
-                                idx + 5,
-                                "rest2",
-                                0,
-                                0,
-                                [idx + 4, idx + 6]
-                            ]);
-                            newStack.push([
-                                idx + 6,
-                                "hidden",
-                                0,
-                                0,
-                                [idx + 5, null]
-                            ]);
+                            newStack.push([idx + 4, "vspace", 0, 0, [idx, idx + 5]]);
+                            newStack.push([idx + 5, "rest2", 0, 0, [idx + 4, idx + 6]]);
+                            newStack.push([idx + 6, "hidden", 0, 0, [idx + 5, null]]);
                         } else {
                             newStack.push([
                                 idx + 3,
@@ -2315,20 +1927,8 @@ class RhythmRuler {
                                 0,
                                 [idx + 1]
                             ]);
-                            newStack.push([
-                                idx + 4,
-                                "vspace",
-                                0,
-                                0,
-                                [idx, idx + 5]
-                            ]);
-                            newStack.push([
-                                idx + 5,
-                                "playdrum",
-                                0,
-                                0,
-                                [idx + 4, idx + 6, null]
-                            ]);
+                            newStack.push([idx + 4, "vspace", 0, 0, [idx, idx + 5]]);
+                            newStack.push([idx + 5, "playdrum", 0, 0, [idx + 4, idx + 6, null]]);
                             if (effect) {
                                 newStack.push([
                                     idx + 6,
@@ -2348,21 +1948,9 @@ class RhythmRuler {
                             }
                         }
                         if (i == ruler.cells.length - 1) {
-                            newStack.push([
-                                idx + 7,
-                                "hidden",
-                                0,
-                                0,
-                                [idx, null]
-                            ]);
+                            newStack.push([idx + 7, "hidden", 0, 0, [idx, null]]);
                         } else {
-                            newStack.push([
-                                idx + 7,
-                                "hidden",
-                                0,
-                                0,
-                                [idx, idx + 8]
-                            ]);
+                            newStack.push([idx + 7, "hidden", 0, 0, [idx, idx + 8]]);
                             previousBlock = idx + 7;
                         }
                     } else {
@@ -2385,34 +1973,10 @@ class RhythmRuler {
                             ]);
                             previousBlock = idx;
                         }
-                        newStack.push([
-                            idx + 1,
-                            ["number", { value: sameNoteValue }],
-                            0,
-                            0,
-                            [idx]
-                        ]);
-                        newStack.push([
-                            idx + 2,
-                            "newnote",
-                            0,
-                            0,
-                            [idx, idx + 3, idx + 6, idx + 9]
-                        ]);
-                        newStack.push([
-                            idx + 3,
-                            "divide",
-                            0,
-                            0,
-                            [idx + 2, idx + 4, idx + 5]
-                        ]);
-                        newStack.push([
-                            idx + 4,
-                            ["number", { value: 1 }],
-                            0,
-                            0,
-                            [idx + 3]
-                        ]);
+                        newStack.push([idx + 1, ["number", { value: sameNoteValue }], 0, 0, [idx]]);
+                        newStack.push([idx + 2, "newnote", 0, 0, [idx, idx + 3, idx + 6, idx + 9]]);
+                        newStack.push([idx + 3, "divide", 0, 0, [idx + 2, idx + 4, idx + 5]]);
+                        newStack.push([idx + 4, ["number", { value: 1 }], 0, 0, [idx + 3]]);
                         if (noteValue < 0) {
                             newStack.push([
                                 idx + 5,
@@ -2421,27 +1985,9 @@ class RhythmRuler {
                                 0,
                                 [idx + 3]
                             ]);
-                            newStack.push([
-                                idx + 6,
-                                "vspace",
-                                0,
-                                0,
-                                [idx + 2, idx + 7]
-                            ]);
-                            newStack.push([
-                                idx + 7,
-                                "rest2",
-                                0,
-                                0,
-                                [idx + 6, idx + 8]
-                            ]);
-                            newStack.push([
-                                idx + 8,
-                                "hidden",
-                                0,
-                                0,
-                                [idx + 7, null]
-                            ]);
+                            newStack.push([idx + 6, "vspace", 0, 0, [idx + 2, idx + 7]]);
+                            newStack.push([idx + 7, "rest2", 0, 0, [idx + 6, idx + 8]]);
+                            newStack.push([idx + 8, "hidden", 0, 0, [idx + 7, null]]);
                         } else {
                             newStack.push([
                                 idx + 5,
@@ -2450,20 +1996,8 @@ class RhythmRuler {
                                 0,
                                 [idx + 3]
                             ]);
-                            newStack.push([
-                                idx + 6,
-                                "vspace",
-                                0,
-                                0,
-                                [idx + 2, idx + 7]
-                            ]);
-                            newStack.push([
-                                idx + 7,
-                                "playdrum",
-                                0,
-                                0,
-                                [idx + 6, idx + 8, null]
-                            ]);
+                            newStack.push([idx + 6, "vspace", 0, 0, [idx + 2, idx + 7]]);
+                            newStack.push([idx + 7, "playdrum", 0, 0, [idx + 6, idx + 8, null]]);
                             if (effect) {
                                 newStack.push([
                                     idx + 8,
@@ -2482,13 +2016,7 @@ class RhythmRuler {
                                 ]);
                             }
                         }
-                        newStack.push([
-                            idx + 9,
-                            "hidden",
-                            0,
-                            0,
-                            [idx + 2, null]
-                        ]);
+                        newStack.push([idx + 9, "hidden", 0, 0, [idx + 2, null]]);
                     }
 
                     sameNoteValue = 1;
@@ -2511,9 +2039,7 @@ class RhythmRuler {
      * @param {string} voice
      * @returns {void}
      */
-
     _saveVoiceMachine(selectedRuler, voice) {
-        
         for (const name in logo.blocks.palettes.dict) {
             logo.blocks.palettes.dict[name].hideMenu(true);
         }
@@ -2540,21 +2066,14 @@ class RhythmRuler {
             } else {
                 action_name =
                     logo.blocks.blockList[
-                        logo.blocks.blockList[this.Drums[selectedRuler]]
-                            .connections[1]
+                        logo.blocks.blockList[this.Drums[selectedRuler]].connections[1]
                     ].value.split(" ")[0] +
                     "_" +
                     _("action");
             }
 
             const newStack = [
-                [
-                    0,
-                    ["action", { collapsed: true }],
-                    100 + delta,
-                    100 + delta,
-                    [null, 1, 2, null]
-                ],
+                [0, ["action", { collapsed: true }], 100 + delta, 100 + delta, [null, 1, 2, null]],
                 [1, ["text", { value: action_name }], 0, 0, [0]]
             ];
             newStack.push([2, "settimbre", 0, 0, [0, 3, 5, 4]]);
@@ -2563,10 +2082,7 @@ class RhythmRuler {
             let previousBlock = 2;
             let sameNoteValue = 1;
             for (let i = 0; i < ruler.cells.length; i++) {
-                if (
-                    noteValues[i] === noteValues[i + 1] &&
-                    i < ruler.cells.length - 1
-                ) {
+                if (noteValues[i] === noteValues[i + 1] && i < ruler.cells.length - 1) {
                     sameNoteValue += 1;
                     continue;
                 } else {
@@ -2585,13 +2101,7 @@ class RhythmRuler {
                                 0,
                                 [previousBlock, idx + 1, idx + 4, idx + 7]
                             ]);
-                            newStack.push([
-                                idx + 1,
-                                "divide",
-                                0,
-                                0,
-                                [idx, idx + 2, idx + 3]
-                            ]);
+                            newStack.push([idx + 1, "divide", 0, 0, [idx, idx + 2, idx + 3]]);
                             newStack.push([
                                 idx + 2,
                                 ["number", { value: obj[0] }],
@@ -2606,43 +2116,13 @@ class RhythmRuler {
                                 0,
                                 [idx + 1]
                             ]);
-                            newStack.push([
-                                idx + 4,
-                                "vspace",
-                                0,
-                                0,
-                                [idx, idx + 5]
-                            ]);
-                            newStack.push([
-                                idx + 5,
-                                "rest2",
-                                0,
-                                0,
-                                [idx + 4, idx + 6]
-                            ]);
-                            newStack.push([
-                                idx + 6,
-                                "hidden",
-                                0,
-                                0,
-                                [idx + 5, null]
-                            ]);
+                            newStack.push([idx + 4, "vspace", 0, 0, [idx, idx + 5]]);
+                            newStack.push([idx + 5, "rest2", 0, 0, [idx + 4, idx + 6]]);
+                            newStack.push([idx + 6, "hidden", 0, 0, [idx + 5, null]]);
                             if (i == ruler.cells.length - 1) {
-                                newStack.push([
-                                    idx + 7,
-                                    "hidden",
-                                    0,
-                                    0,
-                                    [idx, null]
-                                ]);
+                                newStack.push([idx + 7, "hidden", 0, 0, [idx, null]]);
                             } else {
-                                newStack.push([
-                                    idx + 7,
-                                    "hidden",
-                                    0,
-                                    0,
-                                    [idx, idx + 8]
-                                ]);
+                                newStack.push([idx + 7, "hidden", 0, 0, [idx, idx + 8]]);
                                 previousBlock = idx + 7;
                             }
                         } else {
@@ -2653,13 +2133,7 @@ class RhythmRuler {
                                 0,
                                 [previousBlock, idx + 1, idx + 4, idx + 8]
                             ]);
-                            newStack.push([
-                                idx + 1,
-                                "divide",
-                                0,
-                                0,
-                                [idx, idx + 2, idx + 3]
-                            ]);
+                            newStack.push([idx + 1, "divide", 0, 0, [idx, idx + 2, idx + 3]]);
                             newStack.push([
                                 idx + 2,
                                 ["number", { value: obj[0] }],
@@ -2674,13 +2148,7 @@ class RhythmRuler {
                                 0,
                                 [idx + 1]
                             ]);
-                            newStack.push([
-                                idx + 4,
-                                "vspace",
-                                0,
-                                0,
-                                [idx, idx + 5]
-                            ]);
+                            newStack.push([idx + 4, "vspace", 0, 0, [idx, idx + 5]]);
                             newStack.push([
                                 idx + 5,
                                 "pitch",
@@ -2688,36 +2156,12 @@ class RhythmRuler {
                                 0,
                                 [idx + 4, idx + 6, idx + 7, null]
                             ]);
-                            newStack.push([
-                                idx + 6,
-                                ["notename", { value: "C" }],
-                                0,
-                                0,
-                                [idx + 5]
-                            ]);
-                            newStack.push([
-                                idx + 7,
-                                ["number", { value: 4 }],
-                                0,
-                                0,
-                                [idx + 5]
-                            ]);
+                            newStack.push([idx + 6, ["notename", { value: "C" }], 0, 0, [idx + 5]]);
+                            newStack.push([idx + 7, ["number", { value: 4 }], 0, 0, [idx + 5]]);
                             if (i == ruler.cells.length - 1) {
-                                newStack.push([
-                                    idx + 8,
-                                    "hidden",
-                                    0,
-                                    0,
-                                    [idx, null]
-                                ]);
+                                newStack.push([idx + 8, "hidden", 0, 0, [idx, null]]);
                             } else {
-                                newStack.push([
-                                    idx + 8,
-                                    "hidden",
-                                    0,
-                                    0,
-                                    [idx, idx + 9]
-                                ]);
+                                newStack.push([idx + 8, "hidden", 0, 0, [idx, idx + 9]]);
                                 previousBlock = idx + 8;
                             }
                         }
@@ -2741,13 +2185,7 @@ class RhythmRuler {
                             ]);
                             previousBlock = idx;
                         }
-                        newStack.push([
-                            idx + 1,
-                            ["number", { value: sameNoteValue }],
-                            0,
-                            0,
-                            [idx]
-                        ]);
+                        newStack.push([idx + 1, ["number", { value: sameNoteValue }], 0, 0, [idx]]);
                         if (noteValue < 0) {
                             newStack.push([
                                 idx + 2,
@@ -2756,20 +2194,8 @@ class RhythmRuler {
                                 0,
                                 [idx, idx + 3, idx + 6, idx + 9]
                             ]);
-                            newStack.push([
-                                idx + 3,
-                                "divide",
-                                0,
-                                0,
-                                [idx + 2, idx + 4, idx + 5]
-                            ]);
-                            newStack.push([
-                                idx + 4,
-                                ["number", { value: 1 }],
-                                0,
-                                0,
-                                [idx + 3]
-                            ]);
+                            newStack.push([idx + 3, "divide", 0, 0, [idx + 2, idx + 4, idx + 5]]);
+                            newStack.push([idx + 4, ["number", { value: 1 }], 0, 0, [idx + 3]]);
                             newStack.push([
                                 idx + 5,
                                 ["number", { value: -noteValue }],
@@ -2777,34 +2203,10 @@ class RhythmRuler {
                                 0,
                                 [idx + 3]
                             ]);
-                            newStack.push([
-                                idx + 6,
-                                "vspace",
-                                0,
-                                0,
-                                [idx + 2, idx + 7]
-                            ]);
-                            newStack.push([
-                                idx + 7,
-                                "rest2",
-                                0,
-                                0,
-                                [idx + 6, idx + 8]
-                            ]);
-                            newStack.push([
-                                idx + 8,
-                                "hidden",
-                                0,
-                                0,
-                                [idx + 7, null]
-                            ]);
-                            newStack.push([
-                                idx + 9,
-                                "hidden",
-                                0,
-                                0,
-                                [idx + 2, null]
-                            ]);
+                            newStack.push([idx + 6, "vspace", 0, 0, [idx + 2, idx + 7]]);
+                            newStack.push([idx + 7, "rest2", 0, 0, [idx + 6, idx + 8]]);
+                            newStack.push([idx + 8, "hidden", 0, 0, [idx + 7, null]]);
+                            newStack.push([idx + 9, "hidden", 0, 0, [idx + 2, null]]);
                         } else {
                             newStack.push([
                                 idx + 2,
@@ -2813,20 +2215,8 @@ class RhythmRuler {
                                 0,
                                 [idx, idx + 3, idx + 6, idx + 10]
                             ]);
-                            newStack.push([
-                                idx + 3,
-                                "divide",
-                                0,
-                                0,
-                                [idx + 2, idx + 4, idx + 5]
-                            ]);
-                            newStack.push([
-                                idx + 4,
-                                ["number", { value: 1 }],
-                                0,
-                                0,
-                                [idx + 3]
-                            ]);
+                            newStack.push([idx + 3, "divide", 0, 0, [idx + 2, idx + 4, idx + 5]]);
+                            newStack.push([idx + 4, ["number", { value: 1 }], 0, 0, [idx + 3]]);
                             newStack.push([
                                 idx + 5,
                                 ["number", { value: noteValue }],
@@ -2834,13 +2224,7 @@ class RhythmRuler {
                                 0,
                                 [idx + 3]
                             ]);
-                            newStack.push([
-                                idx + 6,
-                                "vspace",
-                                0,
-                                0,
-                                [idx + 2, idx + 7]
-                            ]);
+                            newStack.push([idx + 6, "vspace", 0, 0, [idx + 2, idx + 7]]);
                             newStack.push([
                                 idx + 7,
                                 "pitch",
@@ -2848,27 +2232,9 @@ class RhythmRuler {
                                 0,
                                 [idx + 6, idx + 8, idx + 9, null]
                             ]);
-                            newStack.push([
-                                idx + 8,
-                                ["notename", { value: "C" }],
-                                0,
-                                0,
-                                [idx + 7]
-                            ]);
-                            newStack.push([
-                                idx + 9,
-                                ["number", { value: 4 }],
-                                0,
-                                0,
-                                [idx + 7]
-                            ]);
-                            newStack.push([
-                                idx + 10,
-                                "hidden",
-                                0,
-                                0,
-                                [idx + 2, null]
-                            ]);
+                            newStack.push([idx + 8, ["notename", { value: "C" }], 0, 0, [idx + 7]]);
+                            newStack.push([idx + 9, ["number", { value: 4 }], 0, 0, [idx + 7]]);
+                            newStack.push([idx + 10, "hidden", 0, 0, [idx + 2, null]]);
                         }
                     }
 
@@ -2889,7 +2255,6 @@ class RhythmRuler {
      * @private
      * @returns {array}
      */
-
     _mergeRulers() {
         // Merge the rulers into one set of rhythms.
         const rList = [];
@@ -2926,7 +2291,6 @@ class RhythmRuler {
      * @private
      * @returns {boolean}
      */
-
     _get_save_lock() {
         return this._save_lock;
     }
@@ -2935,10 +2299,9 @@ class RhythmRuler {
      * @public
      * @returns {void}
      */
-
     saveDissectHistory() {
         // Save the new dissect history.
-        
+
         const dissectHistory = [];
         const drums = [];
         let drum;
@@ -2962,9 +2325,7 @@ class RhythmRuler {
         for (let i = 0; i < this._dissectHistory.length; i++) {
             drum = this._dissectHistory[i][1];
             if (drums.indexOf(drum) === -1) {
-                history = JSON.parse(
-                    JSON.stringify(this._dissectHistory[i][0])
-                );
+                history = JSON.parse(JSON.stringify(this._dissectHistory[i][0]));
                 dissectHistory.push([history, drum]);
             }
         }
@@ -3021,13 +2382,10 @@ class RhythmRuler {
         */
     }
 
-
     /**
      * @private
      * @returns {void}
      */
-    
-
     _positionWheel() {
         if (docById("wheelDiv").style.display == "none") {
             return;
