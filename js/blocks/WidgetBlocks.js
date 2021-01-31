@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 function setupWidgetBlocks() {
     class EnvelopeBlock extends FlowBlock {
         constructor() {
