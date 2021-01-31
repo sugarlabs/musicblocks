@@ -14,9 +14,25 @@
 // trash and hidden. There is a menu button that can be used to
 // restore trash.
 
+/*
+   global createjs, platformColor, BORDER, TRASHICON, last
+
+   */
+
+
+/* exported Trashcan */
+
 class Trashcan {
     static TRASHWIDTH = 120;
     static TRASHHEIGHT = 120;
+
+    /**
+     * @constructor
+     * @param {Object} stage
+     * @param {Object} canvas object
+     * @param {number} cellSize
+     * @param {Function} refreshCanvas - function to update canvas changes
+     */
 
     constructor(stage, canvas, cellSize, refreshCanvas) {
         this.isVisible = false;
@@ -41,25 +57,55 @@ class Trashcan {
         this._makeTrash();
     }
 
+    /**
+     * @public
+     * @param {Object} canvas - createjs canvas
+     * @returns {Object} createjs canvas
+     */
+
     setCanvas(canvas) {
         this._canvas = canvas;
         return this;
     }
+
+    /**
+     * @public
+     * @param {Object} stage
+     * @returns {Object} createjs stage
+     */
 
     setStage(stage) {
         this._stage = stage;
         return this;
     }
 
+    /**
+     * @public
+     * @param {number} size
+     * @returns {number} size
+     */
+
     setSize(size) {
         this._size = size;
         return this;
     }
 
+    /**
+     * @public
+     * @param { Function } refreshCanvas - function to update canvas changes
+     * @returns {Function} function to refresh canvas after view update
+     */
+
     setRefreshCanvas(refreshCanvas) {
         this._refreshCanvas = refreshCanvas;
         return this;
     }
+
+    /**
+     * @private
+     * @param {boolean} isActive
+     * @returns {void}
+     */
 
     _makeBorderHighlight(isActive) {
         const img = new Image();
@@ -99,6 +145,11 @@ class Trashcan {
             );
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
+
     _makeBorder() {
         const img = new Image();
 
@@ -118,6 +169,11 @@ class Trashcan {
                 )
             );
     }
+
+    /**
+     * @private
+     * @returns {void}
+     */
 
     _makeTrash() {
         const img = new Image();
@@ -142,15 +198,31 @@ class Trashcan {
             );
     }
 
+    /**
+     * @public
+     * @param {number} scale
+     * @returns {void}
+     */
+
     resizeEvent(scale) {
         this._scale = scale;
         this._container.x = (this._canvas.width / this._scale - Trashcan.TRASHWIDTH) / 2;
         this._container.y = this._canvas.height / this._scale - Trashcan.TRASHHEIGHT;
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
+
     hide() {
         createjs.Tween.get(this._container).to({ alpha: 0 }, 200).set({ visible: false });
     }
+
+    /**
+     * @public
+     * @returns {void}
+     */
 
     show() {
         this.stopHighlightAnimation();
@@ -158,6 +230,11 @@ class Trashcan {
             .to({ alpha: 0.0, visible: true })
             .to({ alpha: 1.0 }, 200);
     }
+
+    /**
+     * @public
+     * @returns {void}
+     */
 
     startHighlightAnimation() {
         if (this._inAnimation) {
@@ -187,6 +264,11 @@ class Trashcan {
         this._switchHighlightVisibility(true);
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
+
     stopHighlightAnimation() {
         if (!this._inAnimation) {
             return;
@@ -201,12 +283,24 @@ class Trashcan {
         this._switchHighlightVisibility(false);
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
+
     _switchHighlightVisibility(bool) {
         last(this._container.children).visible = bool;
         this._container.children[1].visible = !bool;
         this._container.visible = true;
         this._refreshCanvas();
     }
+
+    /**
+     * @public
+     * @param {number} x - x coordinate
+     * @param {number} y - y coordinate
+     * @returns {boolean}
+     */
 
     overTrashcan(x, y) {
         const tx = this._container.x;
