@@ -36,9 +36,9 @@ function format(str, data) {
 }
 
 function canvasPixelRatio() {
-    let devicePixelRatio = window.devicePixelRatio || 1;
-    let context = document.querySelector("#myCanvas").getContext("2d");
-    let backingStoreRatio =
+    const devicePixelRatio = window.devicePixelRatio || 1;
+    const context = document.querySelector("#myCanvas").getContext("2d");
+    const backingStoreRatio =
         context.webkitBackingStorePixelRatio ||
         context.mozBackingStorePixelRatio ||
         context.msBackingStorePixelRatio ||
@@ -49,7 +49,7 @@ function canvasPixelRatio() {
 }
 
 function windowHeight() {
-    let onAndroid = /Android/i.test(navigator.userAgent);
+    const onAndroid = /Android/i.test(navigator.userAgent);
     if (onAndroid) {
         return window.outerHeight;
     } else {
@@ -58,7 +58,7 @@ function windowHeight() {
 }
 
 function windowWidth() {
-    let onAndroid = /Android/i.test(navigator.userAgent);
+    const onAndroid = /Android/i.test(navigator.userAgent);
     if (onAndroid) {
         return window.outerWidth;
     } else {
@@ -97,13 +97,13 @@ function httpPost(projectName, data) {
 
 function HttpRequest(url, loadCallback, userCallback) {
     // userCallback is an optional callback-handler.
-    let req = (this.request = new XMLHttpRequest());
+    const req = (this.request = new XMLHttpRequest());
     this.handler = loadCallback;
     this.url = url;
     this.localmode = Boolean(self.location.href.search(/^file:/i) === 0);
     this.userCallback = userCallback;
 
-    let objref = this;
+    const objref = this;
     try {
         req.open("GET", url);
 
@@ -130,7 +130,7 @@ function doBrowserCheck() {
     jQuery.uaMatch = (ua) => {
         ua = ua.toLowerCase();
 
-        let match =
+        const match =
             /(chrome)[ \/]([\w.]+)/.exec(ua) ||
             /(webkit)[ \/]([\w.]+)/.exec(ua) ||
             /(opera)(?:.*version|)[ \/]([\w.]+)/.exec(ua) ||
@@ -164,10 +164,10 @@ function doBrowserCheck() {
 // Check for Internet Explorer
 
 window.onload = function () {
-    let userAgent = window.navigator.userAgent;
+    const userAgent = window.navigator.userAgent;
     console.log("run detectIE");
     // For IE 10 or older
-    let MSIE = userAgent.indexOf("MSIE ");
+    const MSIE = userAgent.indexOf("MSIE ");
     if (MSIE > 0) {
         DetectVersionOfIE = parseInt(
             userAgent.substring(MSIE + 5, userAgent.indexOf(".", MSIE)),
@@ -176,9 +176,9 @@ window.onload = function () {
     }
 
     // For IE 11
-    let IETrident = userAgent.indexOf("Trident/");
+    const IETrident = userAgent.indexOf("Trident/");
     if (IETrident > 0) {
-        let IERv = userAgent.indexOf("rv:");
+        const IERv = userAgent.indexOf("rv:");
         DetectVersionOfIE = parseInt(
             userAgent.substring(IERv + 3, userAgent.indexOf(".", IERv)),
             10
@@ -186,7 +186,7 @@ window.onload = function () {
     }
 
     // For IE 12
-    let IEEDGE = userAgent.indexOf("Edge/");
+    const IEEDGE = userAgent.indexOf("Edge/");
     if (IEEDGE > 0) {
         DetectVersionOfIE = parseInt(
             userAgent.substring(IEEDGE + 5, userAgent.indexOf(".", IEEDGE)),
@@ -233,7 +233,7 @@ function docBySelector(selector) {
 }
 
 function last(myList) {
-    let i = myList.length;
+    const i = myList.length;
     if (i === 0) {
         return null;
     } else {
@@ -243,10 +243,10 @@ function last(myList) {
 
 function getTextWidth(text, font) {
     // re-use canvas object for better performance
-    let canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
-    let context = canvas.getContext("2d");
+    const canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
+    const context = canvas.getContext("2d");
     context.font = font;
-    let metrics = context.measureText(text);
+    const metrics = context.measureText(text);
     return metrics.width;
 }
 
@@ -254,7 +254,7 @@ function doSVG(canvas, logo, turtles, width, height, scale) {
     // Aggregate SVG output from each turtle. If there is none, return an empty string.
 
     let turtleSVG = "";
-    for (let turtle in turtles.turtleList) {
+    for (const turtle in turtles.turtleList) {
         turtles.turtleList[turtle].painter.closeSVG();
         turtleSVG += turtles.turtleList[turtle].painter.svgOutput;
     }
@@ -280,7 +280,7 @@ function doSVG(canvas, logo, turtles, width, height, scale) {
 }
 
 function isSVGEmpty(turtles) {
-    for (let turtle in turtles.turtleList) {
+    for (const turtle in turtles.turtleList) {
         turtles.turtleList[turtle].painter.closeSVG();
         if (turtles.turtleList[turtle].painter.svgOutput !== "") {
             return false;
@@ -294,7 +294,7 @@ function fileExt(file) {
         return "";
     }
 
-    let parts = file.split(".");
+    const parts = file.split(".");
     if (parts.length === 1 || (parts[0] === "" && parts.length === 2)) {
         return "";
     }
@@ -303,7 +303,7 @@ function fileExt(file) {
 }
 
 function fileBasename(file) {
-    let parts = file.split(".");
+    const parts = file.split(".");
     if (parts.length === 1) {
         return parts[0];
     } else if (parts[0] === "" && parts.length === 2) {
@@ -321,7 +321,7 @@ function _(text) {
     }
 
     let replaced = text;
-    let replace = [
+    const replace = [
         ",",
         "(",
         ")",
@@ -349,7 +349,7 @@ function _(text) {
     replaced = replaced.replace(/ /g, "-");
 
     if (localStorage.kanaPreference === "kana") {
-        let lang = document.webL10n.getLanguage();
+        const lang = document.webL10n.getLanguage();
         if (lang === "ja") {
             replaced = "kana-" + replaced;
         }
@@ -388,7 +388,7 @@ function processRawPluginData(
     evalMacroDict
 ) {
     // console.debug(rawData);
-    let lineData = rawData.split("\n");
+    const lineData = rawData.split("\n");
     let cleanData = "";
 
     // We need to remove blank lines and comments and then
@@ -443,12 +443,12 @@ function processPluginData(
 ) {
     // Plugins are JSON-encoded dictionaries.
     // console.debug(pluginData);
-    let obj = JSON.parse(pluginData);
+    const obj = JSON.parse(pluginData);
 
     // Create a palette entry.
     let newPalette = false;
     if ("PALETTEPLUGINS" in obj) {
-        for (let name in obj["PALETTEPLUGINS"]) {
+        for (const name in obj["PALETTEPLUGINS"]) {
             PALETTEICONS[name] = obj["PALETTEPLUGINS"][name];
             let fillColor = "#ff0066";
             if ("PALETTEFILLCOLORS" in obj) {
@@ -518,7 +518,7 @@ function processPluginData(
 
     // Define the image blocks
     if ("IMAGES" in obj) {
-        for (let blkName in obj["IMAGES"]) {
+        for (const blkName in obj["IMAGES"]) {
             pluginsImages[blkName] = obj["IMAGES"][blkName];
         }
     }
@@ -526,7 +526,7 @@ function processPluginData(
     // Populate the flow-block dictionary, i.e., the code that is
     // eval'd by this block.
     if ("FLOWPLUGINS" in obj) {
-        for (let flow in obj["FLOWPLUGINS"]) {
+        for (const flow in obj["FLOWPLUGINS"]) {
             evalFlowDict[flow] = obj["FLOWPLUGINS"][flow];
         }
     }
@@ -534,7 +534,7 @@ function processPluginData(
     // Populate the arg-block dictionary, i.e., the code that is
     // eval'd by this block.
     if ("ARGPLUGINS" in obj) {
-        for (let arg in obj["ARGPLUGINS"]) {
+        for (const arg in obj["ARGPLUGINS"]) {
             evalArgDict[arg] = obj["ARGPLUGINS"][arg];
         }
     }
@@ -542,7 +542,7 @@ function processPluginData(
     // Populate the macro dictionary, i.e., the code that is
     // eval'd by this block.
     if ("MACROPLUGINS" in obj) {
-        for (let macro in obj["MACROPLUGINS"]) {
+        for (const macro in obj["MACROPLUGINS"]) {
             try {
                 evalMacroDict[macro] = JSON.parse(obj["MACROPLUGINS"][macro]);
             } catch (e) {
@@ -555,7 +555,7 @@ function processPluginData(
     // Populate the setter dictionary, i.e., the code that is
     // used to set a value block.
     if ("SETTERPLUGINS" in obj) {
-        for (let setter in obj["SETTERPLUGINS"]) {
+        for (const setter in obj["SETTERPLUGINS"]) {
             evalSetterDict[setter] = obj["SETTERPLUGINS"][setter];
         }
     }
@@ -567,7 +567,7 @@ function processPluginData(
     // let g = (function() { return this ? this : typeof self !== 'undefined' ? self : undefined})() || Function("return this")();
 
     if ("BLOCKPLUGINS" in obj) {
-        for (let block in obj["BLOCKPLUGINS"]) {
+        for (const block in obj["BLOCKPLUGINS"]) {
             console.debug("adding plugin block " + block);
             try {
                 eval(obj["BLOCKPLUGINS"][block]);
@@ -583,33 +583,33 @@ function processPluginData(
     }
 
     if ("PARAMETERPLUGINS" in obj) {
-        for (let parameter in obj["PARAMETERPLUGINS"]) {
+        for (const parameter in obj["PARAMETERPLUGINS"]) {
             evalParameterDict[parameter] = obj["PARAMETERPLUGINS"][parameter];
         }
     }
 
     // Code to execute when plugin is loaded
     if ("ONLOAD" in obj) {
-        for (let arg in obj["ONLOAD"]) {
+        for (const arg in obj["ONLOAD"]) {
             eval(obj["ONLOAD"][arg]);
         }
     }
 
     // Code to execute when turtle code is started
     if ("ONSTART" in obj) {
-        for (let arg in obj["ONSTART"]) {
+        for (const arg in obj["ONSTART"]) {
             evalOnStartList[arg] = obj["ONSTART"][arg];
         }
     }
 
     // Code to execute when turtle code is stopped
     if ("ONSTOP" in obj) {
-        for (let arg in obj["ONSTOP"]) {
+        for (const arg in obj["ONSTOP"]) {
             evalOnStopList[arg] = obj["ONSTOP"][arg];
         }
     }
 
-    for (let protoblock in blocks.protoBlockDict) {
+    for (const protoblock in blocks.protoBlockDict) {
         try {
             // Push the protoblocks onto their palettes.
             if (blocks.protoBlockDict[protoblock].palette === undefined) {
@@ -636,36 +636,36 @@ function processPluginData(
 }
 
 function updatePluginObj(obj) {
-    for (let name in obj["PALETTEPLUGINS"]) {
+    for (const name in obj["PALETTEPLUGINS"]) {
         pluginObjs["PALETTEPLUGINS"][name] = obj["PALETTEPLUGINS"][name];
     }
 
-    for (let name in obj["PALETTEFILLCOLORS"]) {
+    for (const name in obj["PALETTEFILLCOLORS"]) {
         pluginObjs["PALETTEFILLCOLORS"][name] = obj["PALETTEFILLCOLORS"][name];
     }
 
-    for (let name in obj["PALETTESTROKECOLORS"]) {
+    for (const name in obj["PALETTESTROKECOLORS"]) {
         pluginObjs["PALETTESTROKECOLORS"][name] = obj["PALETTESTROKECOLORS"][name];
     }
 
-    for (let name in obj["PALETTEHIGHLIGHTCOLORS"]) {
+    for (const name in obj["PALETTEHIGHLIGHTCOLORS"]) {
         pluginObjs["PALETTEHIGHLIGHTCOLORS"][name] = obj["PALETTEHIGHLIGHTCOLORS"][name];
     }
 
-    for (let flow in obj["FLOWPLUGINS"]) {
+    for (const flow in obj["FLOWPLUGINS"]) {
         pluginObjs["FLOWPLUGINS"][flow] = obj["FLOWPLUGINS"][flow];
     }
 
-    for (let arg in obj["ARGPLUGINS"]) {
+    for (const arg in obj["ARGPLUGINS"]) {
         pluginObjs["ARGPLUGINS"][arg] = obj["ARGPLUGINS"][arg];
     }
 
-    for (let block in obj["BLOCKPLUGINS"]) {
+    for (const block in obj["BLOCKPLUGINS"]) {
         pluginObjs["BLOCKPLUGINS"][block] = obj["BLOCKPLUGINS"][block];
     }
 
     if ("MACROPLUGINS" in obj) {
-        for (let macro in obj["MACROPLUGINS"]) {
+        for (const macro in obj["MACROPLUGINS"]) {
             pluginObjs["MACROPLUGINS"][macro] = obj["MACROPLUGINS"][macro];
         }
     }
@@ -681,15 +681,15 @@ function updatePluginObj(obj) {
         pluginObjs["IMAGES"] = obj["IMAGES"];
     }
 
-    for (let name in obj["ONLOAD"]) {
+    for (const name in obj["ONLOAD"]) {
         pluginObjs["ONLOAD"][name] = obj["ONLOAD"][name];
     }
 
-    for (let name in obj["ONSTART"]) {
+    for (const name in obj["ONSTART"]) {
         pluginObjs["ONSTART"][name] = obj["ONSTART"][name];
     }
 
-    for (let name in obj["ONSTOP"]) {
+    for (const name in obj["ONSTOP"]) {
         pluginObjs["ONSTOP"][name] = obj["ONSTOP"][name];
     }
 }
@@ -704,10 +704,10 @@ function preparePluginExports(obj) {
 function processMacroData(macroData, palettes, blocks, macroDict) {
     // Macros are stored in a JSON-encoded dictionary.
     if (macroData !== "{}") {
-        let obj = JSON.parse(macroData);
+        const obj = JSON.parse(macroData);
         palettes.add("myblocks", "black", "#a0a0a0");
 
-        for (let name in obj) {
+        for (const name in obj) {
             console.debug("adding " + name + " to macroDict");
             macroDict[name] = obj[name];
             blocks.addToMyPalette(name, macroDict[name]);
@@ -729,12 +729,12 @@ function prepareMacroExports(name, stack, macroDict) {
 
 // Publish to FB
 function doPublish(desc) {
-    let url = doSave();
+    const url = doSave();
     console.debug("push " + url + " to FB");
-    let descElem = docById("description");
-    let msg = desc + " " + descElem.value + " " + url;
+    const descElem = docById("description");
+    const msg = desc + " " + descElem.value + " " + url;
     console.debug("comment: " + msg);
-    let post_cb = () => {
+    const post_cb = () => {
         FB.api("/me/feed", "post", {
             message: msg
         });
@@ -748,12 +748,12 @@ function doPublish(desc) {
 // TODO: Move to camera plugin
 let hasSetupCamera = false;
 function doUseCamera(args, turtles, turtle, isVideo, cameraID, setCameraID, errorMsg) {
-    let w = 320;
-    let h = 240;
+    const w = 320;
+    const h = 240;
 
     let streaming = false;
-    let video = document.querySelector("#camVideo");
-    let canvas = document.querySelector("#camCanvas");
+    const video = document.querySelector("#camVideo");
+    const canvas = document.querySelector("#camCanvas");
     navigator.getMedia =
         navigator.getUserMedia ||
         navigator.mozGetUserMedia ||
@@ -818,7 +818,7 @@ function doUseCamera(args, turtles, turtle, isVideo, cameraID, setCameraID, erro
         canvas.width = w;
         canvas.height = h;
         canvas.getContext("2d").drawImage(video, 0, 0, w, h);
-        let data = canvas.toDataURL("image/png");
+        const data = canvas.toDataURL("image/png");
         turtles.turtleList[turtle].doShowImage(args[0], data);
     }
 }
@@ -833,17 +833,17 @@ function doStopVideoCam(cameraID, setCameraID) {
 }
 
 function hideDOMLabel() {
-    let textLabel = docById("textLabel");
+    const textLabel = docById("textLabel");
     if (textLabel !== null) {
         textLabel.style.display = "none";
     }
 
-    let numberLabel = docById("numberLabel");
+    const numberLabel = docById("numberLabel");
     if (numberLabel !== null) {
         numberLabel.style.display = "none";
     }
 
-    let piemenu = docById("wheelDiv");
+    const piemenu = docById("wheelDiv");
     if (piemenu !== null) {
         piemenu.style.display = "none";
     }
@@ -871,7 +871,7 @@ function safeSVG(label) {
 function toFixed2(d) {
     // Return number as fixed 2 precision
     if (typeof d === "number") {
-        let floor = Math.floor(d);
+        const floor = Math.floor(d);
         if (d !== floor) {
             return d.toFixed(2).toString();
         } else {
@@ -886,9 +886,9 @@ function mixedNumber(d) {
     // Return number as a mixed fraction string, e.g., "2 1/4"
 
     if (typeof d === "number") {
-        let floor = Math.floor(d);
+        const floor = Math.floor(d);
         if (d > floor) {
-            let obj = rationalToFraction(d - floor);
+            const obj = rationalToFraction(d - floor);
             if (floor === 0) {
                 return obj[0] + "/" + obj[1];
             } else {
@@ -919,7 +919,7 @@ function GCD(a, b) {
     b = Math.abs(b);
 
     while (b) {
-        let n = b;
+        const n = b;
         b = a % b;
         a = n;
     }
@@ -965,8 +965,8 @@ function rationalSum(a, b) {
     b[1] = objb0[1] * objb1[0];
 
     // Find the least common denomenator
-    let lcd = LCD(a[1], b[1]);
-    let c0 = (a[0] * lcd) / a[1] + (b[0] * lcd) / b[1];
+    const lcd = LCD(a[1], b[1]);
+    const c0 = (a[0] * lcd) / a[1] + (b[0] * lcd) / b[1];
     return [(a[0] * lcd) / a[1] + (b[0] * lcd) / b[1], lcd];
 }
 
@@ -1026,7 +1026,7 @@ function nearestBeat(d, b) {
 
     let sum = 1 / (2 * b);
     let count = 0;
-    let dd = d / 100;
+    const dd = d / 100;
     while (dd > sum) {
         sum += 1 / b;
         count += 1;
@@ -1218,13 +1218,13 @@ function rgbToHex(r, g, b) {
 }
 
 function hexToRGB(hex) {
-    let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
         ? {
-              r: parseInt(result[1], 16),
-              g: parseInt(result[2], 16),
-              b: parseInt(result[3], 16)
-          }
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        }
         : null;
 }
 
@@ -1235,10 +1235,10 @@ function hexToRGB(hex) {
  * @returns {String} - rgb values of hexcode + alpha which is 1
  */
 function hex2rgb(hex) {
-    let bigint = parseInt(hex, 16);
-    let r = (bigint >> 16) & 255;
-    let g = (bigint >> 8) & 255;
-    let b = bigint & 255;
+    const bigint = parseInt(hex, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
 
     return "rgba(" + r + "," + g + "," + b + ",1)";
 }
@@ -1256,7 +1256,7 @@ function closeWidgets() {
 }
 
 function closeBlkWidgets(name) {
-    let widgetTitle = document.getElementsByClassName("wftTitle");
+    const widgetTitle = document.getElementsByClassName("wftTitle");
     for (let i = 0; i < widgetTitle.length; i++) {
         if (widgetTitle[i].innerHTML === name) {
             window.widgetWindows.hideWindow(widgetTitle[i].innerHTML);
@@ -1288,7 +1288,7 @@ function importMembers(obj, className, modelArgs, viewArgs) {
      * @param {*[]} args - array of constructor arguments
      * @returns {void}
      */
-    let addMembers = (obj, ctype, args) => {
+    const addMembers = (obj, ctype, args) => {
         // If class type doesn't exist (no model class or no view class)
         if (ctype === undefined) {
             return;
@@ -1302,7 +1302,7 @@ function importMembers(obj, className, modelArgs, viewArgs) {
         }
 
         // Loop for all method names of class type
-        for (let name of Object.getOwnPropertyNames(ctype.prototype)) {
+        for (const name of Object.getOwnPropertyNames(ctype.prototype)) {
             // Don't add the constructor
             if (name !== "constructor") {
                 obj[name] = obj.added[name];
@@ -1310,7 +1310,7 @@ function importMembers(obj, className, modelArgs, viewArgs) {
         }
 
         // Loop for all variables of class type's instance
-        for (let name of Object.keys(obj.added)) {
+        for (const name of Object.keys(obj.added)) {
             obj[name] = obj.added[name];
 
             // Remove variable entry from obj (removing each entry right after
@@ -1323,7 +1323,7 @@ function importMembers(obj, className, modelArgs, viewArgs) {
         delete obj.added;
     };
 
-    let cname = obj.constructor.name; // class name of component object
+    const cname = obj.constructor.name; // class name of component object
 
     if (className !== "" && className !== undefined) {
         addMembers(obj, eval(className));

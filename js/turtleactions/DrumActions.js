@@ -38,7 +38,7 @@ function setupDrumActions() {
             if (drum.slice(0, 4) === "http") {
                 drumname = drum;
             } else {
-                for (let d in DRUMNAMES) {
+                for (const d in DRUMNAMES) {
                     if (DRUMNAMES[d][0] === drum) {
                         drumname = DRUMNAMES[d][1];
                         break;
@@ -61,7 +61,7 @@ function setupDrumActions() {
         static playDrum(drum, turtle, blk) {
             let drumname = Singer.DrumActions.GetDrumname(drum);
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             // If we are in a setdrum clamp, override the drum name
             if (tur.singer.drumStyle.length > 0) {
@@ -80,9 +80,9 @@ function setupDrumActions() {
                 tur.singer.inNoteBlock.push(blk);
                 tur.singer.noteDrums[last(tur.singer.inNoteBlock)].push(drumname);
 
-                let noteBeatValue = 4;
+                const noteBeatValue = 4;
 
-                let __callback =
+                const __callback =
                     () => tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
 
                 Singer.processNote(noteBeatValue, false, blk, turtle, __callback);
@@ -100,7 +100,7 @@ function setupDrumActions() {
          */
         static setDrum(drum, turtle, blk) {
             let drumname = DEFAULTDRUM;
-            for (let d in DRUMNAMES) {
+            for (const d in DRUMNAMES) {
                 if (DRUMNAMES[d][0] === drum) {
                     drumname = DRUMNAMES[d][1];
                 } else if (DRUMNAMES[d][1] === drum) {
@@ -108,20 +108,20 @@ function setupDrumActions() {
                 }
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             tur.singer.drumStyle.push(drumname);
 
-            let listenerName = "_setdrum_" + turtle;
+            const listenerName = "_setdrum_" + turtle;
             if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
-                let mouse = Mouse.getMouseFromTurtle(tur);
+                const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null)
                     mouse.MB.listeners.push(listenerName);
             }
 
-            let __listener = event => {
+            const __listener = event => {
                 tur.singer.drumStyle.pop();
                 tur.singer.pitchDrumTable = {};
             };
@@ -143,7 +143,7 @@ function setupDrumActions() {
          */
         static mapPitchToDrum(drum, turtle, blk) {
             let drumname = DEFAULTDRUM;
-            for (let d in DRUMNAMES) {
+            for (const d in DRUMNAMES) {
                 if (DRUMNAMES[d][0] === drum) {
                     drumname = DRUMNAMES[d][1];
                 } else if (DRUMNAMES[d][1] === drum) {
@@ -151,20 +151,20 @@ function setupDrumActions() {
                 }
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             tur.singer.drumStyle.push(drumname);
 
-            let listenerName = "_mapdrum_" + turtle;
+            const listenerName = "_mapdrum_" + turtle;
             if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
-                let mouse = Mouse.getMouseFromTurtle(tur);
+                const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null)
                     mouse.MB.listeners.push(listenerName);
             }
 
-            let __listener = event => tur.singer.drumStyle.pop();
+            const __listener = event => tur.singer.drumStyle.pop();
 
             logo.setTurtleListener(turtle, listenerName, __listener);
             if (logo.inRhythmRuler) {
@@ -183,7 +183,7 @@ function setupDrumActions() {
          */
         static playNoise(noise, turtle, blk) {
             let noisename = noise;
-            for (let n in NOISENAMES) {
+            for (const n in NOISENAMES) {
                 if (NOISENAMES[n][0] === noise) {
                     noisename = NOISENAMES[n][1];
                     break;
@@ -193,7 +193,7 @@ function setupDrumActions() {
                 }
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             if (tur.singer.inNoteBlock.length > 0) {
                 // Add the noise sound as if it were a drum
@@ -210,5 +210,5 @@ function setupDrumActions() {
                 return;
             }
         }
-    }
+    };
 }

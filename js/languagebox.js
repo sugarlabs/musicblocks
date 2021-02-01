@@ -132,7 +132,7 @@ class LanguageBox {
             ayc: "Actualice su navegador para cambiar su preferencia de idioma.",
             quz: "Actualice su navegador para cambiar su preferencia de idioma.",
             gug: "Actualice su navegador para cambiar su preferencia de idioma."
-        }
+        };
 
         localStorage.languagePreference = language;
         console.debug(language);

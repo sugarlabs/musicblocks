@@ -184,7 +184,7 @@ function setupMediaBlocks() {
         }
 
         flow(args, logo) {
-            for (let sound in logo.sounds) {
+            for (const sound in logo.sounds) {
                 logo.sounds[sound].stop();
             }
             logo.sounds = [];
@@ -204,8 +204,8 @@ function setupMediaBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
-            tur.painter.doClearMedia();            
+            const tur = logo.turtles.ithTurtle(turtle);
+            tur.painter.doClearMedia();
         }
     }
 
@@ -230,7 +230,7 @@ function setupMediaBlocks() {
                 return;
             }
 
-            let sound = new Howl({
+            const sound = new Howl({
                 urls: [args[0]]
             });
             logo.sounds.push(sound);
@@ -261,7 +261,7 @@ function setupMediaBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             if (args.length === 1) {
                 if (logo.meSpeak !== null) {
@@ -352,7 +352,7 @@ function setupMediaBlocks() {
             super("tone", _("hertz"));
             this.setPalette("media");
             this.piemenuValuesC1 = [220, 247, 262, 294, 330, 349, 392, 440, 494, 523,
-                                    587, 659, 698, 784, 880];
+                587, 659, 698, 784, 880];
             this.setHelpString();
             this.formBlock({
                 args: 2,
@@ -406,18 +406,18 @@ function setupMediaBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
-                let block = logo.blocks.blockList[blk];
-                let cblk1 = logo.blocks.blockList[blk].connections[1];
-                let cblk2 = logo.blocks.blockList[blk].connections[2];
+                const block = logo.blocks.blockList[blk];
+                const cblk1 = logo.blocks.blockList[blk].connections[1];
+                const cblk2 = logo.blocks.blockList[blk].connections[2];
                 if (cblk1 === null || cblk2 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     return 392;
                 }
-                let note = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                let octave = Math.floor(
+                const note = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                const octave = Math.floor(
                     calcOctave(
                         tur.singer.currentOctave,
                         logo.parseArg(logo, turtle, cblk2, blk, receivedArg),
@@ -448,7 +448,7 @@ function setupMediaBlocks() {
                     "F♯": "G♭",
                     "G♯": "A♭"
                 };
-                let block = logo.blocks.blockList[blk];
+                const block = logo.blocks.blockList[blk];
                 let cblk = block.connections[1];
                 let noteName;
                 if (cblk === null) {
@@ -473,7 +473,7 @@ function setupMediaBlocks() {
                     noteName = NOTECONVERSION[noteName];
                 }
 
-                let idx = NOTENAMES.indexOf(noteName);
+                const idx = NOTENAMES.indexOf(noteName);
                 if (idx === -1) {
                     this.errorMsg(
                         _(
@@ -501,7 +501,7 @@ function setupMediaBlocks() {
                     octave -= 1; // New octave starts on C
                 }
 
-                let i = octave * 12 + idx;
+                const i = octave * 12 + idx;
                 return 27.5 * Math.pow(1.05946309435929, i);
             }
         }
@@ -577,7 +577,7 @@ function setupMediaBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             if (args.length === 2) {
                 if (tur.singer.inNoteBlock.length > 0) {

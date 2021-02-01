@@ -73,179 +73,179 @@ class JSEditor {
      */
     _setup() {
         this.widgetWindow.onmaximize = () => {
-            let editor = this.widgetWindow.getWidgetBody().childNodes[0];
-                editor.style.width = this.widgetWindow._maximized ? "100%" : "39rem";
-                editor.style.height =
+            const editor = this.widgetWindow.getWidgetBody().childNodes[0];
+            editor.style.width = this.widgetWindow._maximized ? "100%" : "39rem";
+            editor.style.height =
                     this.widgetWindow._maximized ?
                         `calc(100vh - ${64 + 33}px` :
                         `${docById("overlayCanvas").height - 33 - 128 - 12}px`;
-        }
+        };
 
         this._editor.style.width = "39rem";
         this._editor.style.height = `${docById("overlayCanvas").height - 33 - 128 - 12}px`;
         this._editor.style.display = "flex";
         this._editor.style.flexDirection = "column";
 
-        let menubar = document.createElement("div");
-            menubar.style.width = "100%";
-            menubar.style.height = "3rem";
-            menubar.style.display = "flex";
-            menubar.style.flexDirection = "row";
-            menubar.style.justifyContent = "space-between";
-            menubar.style.background = "#1e88e5";
-            menubar.style.color = "white";
+        const menubar = document.createElement("div");
+        menubar.style.width = "100%";
+        menubar.style.height = "3rem";
+        menubar.style.display = "flex";
+        menubar.style.flexDirection = "row";
+        menubar.style.justifyContent = "space-between";
+        menubar.style.background = "#1e88e5";
+        menubar.style.color = "white";
 
-            let menuLeft = document.createElement("div");
-                menuLeft.style.height = "3rem";
-                menuLeft.style.display = "flex";
-                menuLeft.style.flexDirection = "row";
-                menuLeft.style.justifyContent = "end";
-                menuLeft.style.alignItems = "center";
+        const menuLeft = document.createElement("div");
+        menuLeft.style.height = "3rem";
+        menuLeft.style.display = "flex";
+        menuLeft.style.flexDirection = "row";
+        menuLeft.style.justifyContent = "end";
+        menuLeft.style.alignItems = "center";
 
-                let helpBtn = document.createElement("span");
-                    helpBtn.id = "js_editor_help_btn";
-                    helpBtn.classList.add("material-icons");
-                    helpBtn.style.borderRadius = "50%";
-                    helpBtn.style.padding = ".25rem";
-                    helpBtn.style.marginLeft = ".75rem";
-                    helpBtn.style.fontSize = "2rem";
-                    helpBtn.style.background = "#2196f3";
-                    helpBtn.style.cursor = "pointer";
-                    helpBtn.innerHTML = "help_outline";
-                    helpBtn.onclick = this._toggleHelp.bind(this);
-                menuLeft.appendChild(helpBtn);
+        const helpBtn = document.createElement("span");
+        helpBtn.id = "js_editor_help_btn";
+        helpBtn.classList.add("material-icons");
+        helpBtn.style.borderRadius = "50%";
+        helpBtn.style.padding = ".25rem";
+        helpBtn.style.marginLeft = ".75rem";
+        helpBtn.style.fontSize = "2rem";
+        helpBtn.style.background = "#2196f3";
+        helpBtn.style.cursor = "pointer";
+        helpBtn.innerHTML = "help_outline";
+        helpBtn.onclick = this._toggleHelp.bind(this);
+        menuLeft.appendChild(helpBtn);
 
-                let generateBtn = document.createElement("span");
-                    generateBtn.classList.add("material-icons");
-                    generateBtn.style.borderRadius = "50%";
-                    generateBtn.style.padding = ".25rem";
-                    generateBtn.style.marginLeft = ".75rem";
-                    generateBtn.style.fontSize = "2rem";
-                    generateBtn.style.background = "#2196f3";
-                    generateBtn.style.cursor = "pointer";
-                    generateBtn.innerHTML = "autorenew";
-                    generateBtn.onclick = this._generateCode.bind(this);
-                menuLeft.appendChild(generateBtn);
+        const generateBtn = document.createElement("span");
+        generateBtn.classList.add("material-icons");
+        generateBtn.style.borderRadius = "50%";
+        generateBtn.style.padding = ".25rem";
+        generateBtn.style.marginLeft = ".75rem";
+        generateBtn.style.fontSize = "2rem";
+        generateBtn.style.background = "#2196f3";
+        generateBtn.style.cursor = "pointer";
+        generateBtn.innerHTML = "autorenew";
+        generateBtn.onclick = this._generateCode.bind(this);
+        menuLeft.appendChild(generateBtn);
 
-                let runBtn = document.createElement("span");
-                    runBtn.classList.add("material-icons");
-                    runBtn.style.borderRadius = "50%";
-                    runBtn.style.padding = ".25rem";
-                    runBtn.style.marginLeft = ".75rem";
-                    runBtn.style.fontSize = "2rem";
-                    runBtn.style.background = "#2196f3";
-                    runBtn.style.cursor = "pointer";
-                    runBtn.innerHTML = "play_arrow";
-                    runBtn.onclick = this._runCode.bind(this);
-                menuLeft.appendChild(runBtn);
-            menubar.appendChild(menuLeft);
+        const runBtn = document.createElement("span");
+        runBtn.classList.add("material-icons");
+        runBtn.style.borderRadius = "50%";
+        runBtn.style.padding = ".25rem";
+        runBtn.style.marginLeft = ".75rem";
+        runBtn.style.fontSize = "2rem";
+        runBtn.style.background = "#2196f3";
+        runBtn.style.cursor = "pointer";
+        runBtn.innerHTML = "play_arrow";
+        runBtn.onclick = this._runCode.bind(this);
+        menuLeft.appendChild(runBtn);
+        menubar.appendChild(menuLeft);
 
-            let menuRight = document.createElement("div");
-                menuRight.style.height = "3rem";
-                menuRight.style.display = "flex";
-                menuRight.style.flexDirection = "row";
-                menuRight.style.justifyContent = "end";
-                menuRight.style.alignItems = "center";
+        const menuRight = document.createElement("div");
+        menuRight.style.height = "3rem";
+        menuRight.style.display = "flex";
+        menuRight.style.flexDirection = "row";
+        menuRight.style.justifyContent = "end";
+        menuRight.style.alignItems = "center";
 
-                let styleBtn = document.createElement("span");
-                    styleBtn.classList.add("material-icons");
-                    styleBtn.style.borderRadius = "50%";
-                    styleBtn.style.padding = ".25rem";
-                    styleBtn.style.marginRight = ".75rem";
-                    styleBtn.style.fontSize = "1.5rem";
-                    styleBtn.style.background = "#2196f3";
-                    styleBtn.style.cursor = "pointer";
-                    styleBtn.innerHTML = "invert_colors";
-                    styleBtn.onclick = this._changeStyle.bind(this);
-                menuRight.appendChild(styleBtn);
-            menubar.appendChild(menuRight);
+        const styleBtn = document.createElement("span");
+        styleBtn.classList.add("material-icons");
+        styleBtn.style.borderRadius = "50%";
+        styleBtn.style.padding = ".25rem";
+        styleBtn.style.marginRight = ".75rem";
+        styleBtn.style.fontSize = "1.5rem";
+        styleBtn.style.background = "#2196f3";
+        styleBtn.style.cursor = "pointer";
+        styleBtn.innerHTML = "invert_colors";
+        styleBtn.onclick = this._changeStyle.bind(this);
+        menuRight.appendChild(styleBtn);
+        menubar.appendChild(menuRight);
         this._editor.appendChild(menubar);
 
-        let editorContainer = document.createElement("div");
-            editorContainer.style.width = "100%";
-            editorContainer.style.height = "calc(100% - 11rem)";
-            editorContainer.style.position = "relative";
-            editorContainer.style.background = "#1e88e5";
-            editorContainer.style.color = "white";
+        const editorContainer = document.createElement("div");
+        editorContainer.style.width = "100%";
+        editorContainer.style.height = "calc(100% - 11rem)";
+        editorContainer.style.position = "relative";
+        editorContainer.style.background = "#1e88e5";
+        editorContainer.style.color = "white";
 
-            let codeLines = document.createElement("div");
-                codeLines.id = "editorLines";
-                codeLines.style.width = "2rem";
-                codeLines.style.height = "100%";
-                codeLines.style.position = "absolute";
-                codeLines.style.top = "0";
-                codeLines.style.left = "0";
-                codeLines.style.zIndex = "99";
-                codeLines.style.overflow = "hidden";
-                codeLines.style.boxSizing = "border-box";
-                codeLines.style.padding = ".25rem .5rem";
-                codeLines.style.fontFamily = '"PT Mono", monospace';
-                codeLines.style.fontSize = "14px";
-                codeLines.style.fontWeight = "400";
-                codeLines.style.letterSpacing = "normal";
-                codeLines.style.lineHeight = "20px";
-                codeLines.style.background = "rgba(255, 255, 255, 0.1)";
-                codeLines.style.color = "white";
-                codeLines.style.setProperty("mix-blend-mode", "difference");
-                codeLines.style.textAlign = "right";
-            editorContainer.appendChild(codeLines);
+        const codeLines = document.createElement("div");
+        codeLines.id = "editorLines";
+        codeLines.style.width = "2rem";
+        codeLines.style.height = "100%";
+        codeLines.style.position = "absolute";
+        codeLines.style.top = "0";
+        codeLines.style.left = "0";
+        codeLines.style.zIndex = "99";
+        codeLines.style.overflow = "hidden";
+        codeLines.style.boxSizing = "border-box";
+        codeLines.style.padding = ".25rem .5rem";
+        codeLines.style.fontFamily = '"PT Mono", monospace';
+        codeLines.style.fontSize = "14px";
+        codeLines.style.fontWeight = "400";
+        codeLines.style.letterSpacing = "normal";
+        codeLines.style.lineHeight = "20px";
+        codeLines.style.background = "rgba(255, 255, 255, 0.1)";
+        codeLines.style.color = "white";
+        codeLines.style.setProperty("mix-blend-mode", "difference");
+        codeLines.style.textAlign = "right";
+        editorContainer.appendChild(codeLines);
 
-            let codebox = document.createElement("div");
-                codebox.classList.add("editor");
-                codebox.classList.add("language-js");
-                codebox.style.width = "100%";
-                codebox.style.height = "100%";
-                codebox.style.position = "absolute";
-                codebox.style.top = "0";
-                codebox.style.left = "0";
-                codebox.style.boxSizing = "border-box";
-                codebox.style.padding = ".25rem .25rem .25rem 2.75rem";
-                codebox.style.fontFamily = '"PT Mono", monospace';
-                codebox.style.fontSize = "14px";
-                codebox.style.fontWeight = "400";
-                codebox.style.letterSpacing = "normal";
-                codebox.style.lineHeight = "20px";
-                codebox.style.tabSize = "4";
-                codebox.style.cursor = "text";
-            editorContainer.appendChild(codebox);
+        const codebox = document.createElement("div");
+        codebox.classList.add("editor");
+        codebox.classList.add("language-js");
+        codebox.style.width = "100%";
+        codebox.style.height = "100%";
+        codebox.style.position = "absolute";
+        codebox.style.top = "0";
+        codebox.style.left = "0";
+        codebox.style.boxSizing = "border-box";
+        codebox.style.padding = ".25rem .25rem .25rem 2.75rem";
+        codebox.style.fontFamily = '"PT Mono", monospace';
+        codebox.style.fontSize = "14px";
+        codebox.style.fontWeight = "400";
+        codebox.style.letterSpacing = "normal";
+        codebox.style.lineHeight = "20px";
+        codebox.style.tabSize = "4";
+        codebox.style.cursor = "text";
+        editorContainer.appendChild(codebox);
         this._editor.appendChild(editorContainer);
 
         codebox.onscroll = () => {
             codeLines.scrollTop = codebox.scrollTop;
         };
 
-        let consolelabel = document.createElement("div");
-            consolelabel.style.width = "100%";
-            consolelabel.style.height = "1.75rem";
-            consolelabel.style.boxSizing = "border-box";
-            consolelabel.style.borderTop = "1px solid gray";
-            consolelabel.style.borderBottom = "1px solid gray";
-            consolelabel.style.padding = ".25rem";
-            consolelabel.style.fontFamily = '"PT Mono", monospace';
-            consolelabel.style.fontSize = "14px";
-            consolelabel.style.fontWeight = "700";
-            consolelabel.style.letterSpacing = "normal";
-            consolelabel.style.lineHeight = "20px";
-            consolelabel.style.color = "indigo"
-            consolelabel.style.background = "white";
-            consolelabel.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;CONSOLE";
+        const consolelabel = document.createElement("div");
+        consolelabel.style.width = "100%";
+        consolelabel.style.height = "1.75rem";
+        consolelabel.style.boxSizing = "border-box";
+        consolelabel.style.borderTop = "1px solid gray";
+        consolelabel.style.borderBottom = "1px solid gray";
+        consolelabel.style.padding = ".25rem";
+        consolelabel.style.fontFamily = '"PT Mono", monospace';
+        consolelabel.style.fontSize = "14px";
+        consolelabel.style.fontWeight = "700";
+        consolelabel.style.letterSpacing = "normal";
+        consolelabel.style.lineHeight = "20px";
+        consolelabel.style.color = "indigo";
+        consolelabel.style.background = "white";
+        consolelabel.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;CONSOLE";
         this._editor.appendChild(consolelabel);
 
-        let editorconsole = document.createElement("div");
-            editorconsole.id = "editorConsole";
-            editorconsole.style.width = "100%";
-            editorconsole.style.height = "8.25rem";
-            editorconsole.style.overflow = "auto";
-            editorconsole.style.boxSizing = "border-box";
-            editorconsole.style.padding = ".25rem";
-            editorconsole.style.fontFamily = '"PT Mono", monospace';
-            editorconsole.style.fontSize = "14px";
-            editorconsole.style.fontWeight = "400";
-            editorconsole.style.letterSpacing = "normal";
-            editorconsole.style.lineHeight = "20px";
-            codebox.style.resize = "none !important";
-            editorconsole.style.background = "lightcyan";
-            editorconsole.style.cursor = "text";
+        const editorconsole = document.createElement("div");
+        editorconsole.id = "editorConsole";
+        editorconsole.style.width = "100%";
+        editorconsole.style.height = "8.25rem";
+        editorconsole.style.overflow = "auto";
+        editorconsole.style.boxSizing = "border-box";
+        editorconsole.style.padding = ".25rem";
+        editorconsole.style.fontFamily = '"PT Mono", monospace';
+        editorconsole.style.fontSize = "14px";
+        editorconsole.style.fontWeight = "400";
+        editorconsole.style.letterSpacing = "normal";
+        editorconsole.style.lineHeight = "20px";
+        codebox.style.resize = "none !important";
+        editorconsole.style.background = "lightcyan";
+        editorconsole.style.cursor = "text";
         this._editor.appendChild(editorconsole);
 
         const highlight = (editor) => {
@@ -260,7 +260,7 @@ class JSEditor {
         codebox.className = "editor language-js";
         this._jar.updateCode(this._code);
         this._jar.updateOptions({
-            tab: ' '.repeat(4), // default is '\t'
+            tab: " ".repeat(4), // default is '\t'
             indentOn: /[(\[]$/, // default is /{$/
             spellcheck: false,  // default is false
             addClosing: true    // default is true
@@ -361,7 +361,7 @@ class JSEditor {
      */
     _toggleHelp() {
         this._showingHelp = !this._showingHelp;
-        let helpBtn = docById("js_editor_help_btn");
+        const helpBtn = docById("js_editor_help_btn");
 
         if (this._showingHelp) {
             console.debug("Showing Help");

@@ -15,15 +15,15 @@
 // (https://github.com/walterbender/turtleart), but implemented from
 // scratch. -- Walter Bender, October 2014.
 
-let KeySignatureEnv = ['C', 'major', false];
+let KeySignatureEnv = ["C", "major", false];
 
 function Activity() {
     _THIS_IS_MUSIC_BLOCKS_ = true;
     LEADING = 0;
     _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 
-    let _ERRORMSGTIMEOUT_ = 15000;
-    let _MSGTIMEOUT_ = 60000;
+    const _ERRORMSGTIMEOUT_ = 15000;
+    const _MSGTIMEOUT_ = 60000;
     let cellSize = 55;
     let searchSuggestions = [];
     let homeButtonContainer;
@@ -33,7 +33,7 @@ function Activity() {
     let errorMsgTimeoutID = null;
     let errorMsgText = null;
     let errorMsgArrow = null;
-    let errorArtwork = {};
+    const errorArtwork = {};
 
     let cartesianBitmap = null;
     let polarBitmap = null;
@@ -44,7 +44,7 @@ function Activity() {
     let tenorBitmap = null;
     let bassBitmap = null;
 
-    let ERRORARTWORK = [
+    const ERRORARTWORK = [
         "emptybox",
         "emptyheap",
         "negroot",
@@ -213,7 +213,7 @@ function Activity() {
     ];
 
     if (_THIS_IS_MUSIC_BLOCKS_) {
-        let MUSICBLOCKS_EXTRAS = [
+        const MUSICBLOCKS_EXTRAS = [
             "Tone",
             "activity/js-export/samples/sample",
             "activity/js-export/export",
@@ -471,7 +471,7 @@ function Activity() {
         if (!blocks.visible) {
             _changeBlockVisibility();
         }
-        let leftpos = Math.floor(canvas.width / 4);
+        const leftpos = Math.floor(canvas.width / 4);
         let toppos;
         blocks.activeBlock = null;
         hideDOMLabel();
@@ -491,21 +491,21 @@ function Activity() {
         let even = true;
 
         // First start blocks
-        for (let blk in blocks.blockList) {
+        for (const blk in blocks.blockList) {
             if (!blocks.blockList[blk].trash) {
-                let myBlock = blocks.blockList[blk];
+                const myBlock = blocks.blockList[blk];
                 if (myBlock.name !== "start") {
                     continue;
                 }
 
                 if (myBlock.connections[0] == null) {
-                    let dx = x - myBlock.container.x;
-                    let dy = y - myBlock.container.y;
+                    const dx = x - myBlock.container.x;
+                    const dy = y - myBlock.container.y;
                     blocks.moveBlockRelative(blk, dx, dy);
                     blocks.findDragGroup(blk);
                     if (blocks.dragGroup.length > 0) {
                         for (let b = 0; b < blocks.dragGroup.length; b++) {
-                            let bblk = blocks.dragGroup[b];
+                            const bblk = blocks.dragGroup[b];
                             if (b !== 0) {
                                 blocks.moveBlockRelative(bblk, dx, dy);
                             }
@@ -528,21 +528,21 @@ function Activity() {
         }
 
         // The everything else
-        for (let blk in blocks.blockList) {
+        for (const blk in blocks.blockList) {
             if (!blocks.blockList[blk].trash) {
-                let myBlock = blocks.blockList[blk];
+                const myBlock = blocks.blockList[blk];
                 if (myBlock.name === "start") {
                     continue;
                 }
 
                 if (myBlock.connections[0] == null) {
-                    let dx = x - myBlock.container.x;
-                    let dy = y - myBlock.container.y;
+                    const dx = x - myBlock.container.x;
+                    const dy = y - myBlock.container.y;
                     blocks.moveBlockRelative(blk, dx, dy);
                     blocks.findDragGroup(blk);
                     if (blocks.dragGroup.length > 0) {
                         for (let b = 0; b < blocks.dragGroup.length; b++) {
-                            let bblk = blocks.dragGroup[b];
+                            const bblk = blocks.dragGroup[b];
                             if (b !== 0) {
                                 blocks.moveBlockRelative(bblk, dx, dy);
                             }
@@ -570,7 +570,7 @@ function Activity() {
         // Return mice to the center of the screen.
         for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
             console.debug("bringing turtle " + turtle + "home");
-            let savedPenState = turtles.turtleList[turtle].painter.penState;
+            const savedPenState = turtles.turtleList[turtle].painter.penState;
             turtles.turtleList[turtle].painter.penState = false;
             turtles.turtleList[turtle].painter.doSetXY(0, 0);
             turtles.turtleList[turtle].painter.doSetHeading(0);
@@ -598,17 +598,17 @@ function Activity() {
         setTimeout(function () {
             sendAllToTrash(false, true);
             setTimeout(function () {
-                let message = blocks.protoBlockDict[name].helpString;
+                const message = blocks.protoBlockDict[name].helpString;
                 if (message.length < 4) {
                     // If there is nothing specified, just
                     // load the block.
                     console.debug("CLICK: " + name);
-                    let obj = blocks.palettes.getProtoNameAndPalette(name);
-                    let protoblk = obj[0];
-                    let paletteName = obj[1];
-                    let protoName = obj[2];
+                    const obj = blocks.palettes.getProtoNameAndPalette(name);
+                    const protoblk = obj[0];
+                    const paletteName = obj[1];
+                    const protoName = obj[2];
 
-                    let protoResult = blocks.protoBlockDict.hasOwnProperty(protoName);
+                    const protoResult = blocks.protoBlockDict.hasOwnProperty(protoName);
                     if (protoResult) {
                         blocks.palettes.dict[paletteName].makeBlockFromSearch(
                             protoblk,
@@ -621,12 +621,12 @@ function Activity() {
                 } else if (typeof message[3] === "string") {
                     // If it is a string, load the macro
                     // assocuated with this block
-                    let blocksToLoad = getMacroExpansion(message[3], 0, 0);
+                    const blocksToLoad = getMacroExpansion(message[3], 0, 0);
                     console.debug("CLICK: " + blocksToLoad);
                     blocks.loadNewBlocks(blocksToLoad);
                 } else {
                     // Load the blocks.
-                    let blocksToLoad = message[3];
+                    const blocksToLoad = message[3];
                     console.debug("CLICK: " + blocksToLoad);
                     blocks.loadNewBlocks(blocksToLoad);
                 }
@@ -642,8 +642,8 @@ function Activity() {
     _saveHelpBlocks = function () {
         // Save the artwork for every help block.
         let i = 0;
-        let blockHelpList = [];
-        for (let key in blocks.protoBlockDict) {
+        const blockHelpList = [];
+        for (const key in blocks.protoBlockDict) {
             if (
                 blocks.protoBlockDict[key].helpString !== undefined &&
                 blocks.protoBlockDict[key].helpString.length !== 0
@@ -652,7 +652,7 @@ function Activity() {
             }
         }
 
-        for (let name in blockHelpList) {
+        for (const name in blockHelpList) {
             console.debug(name + " " + blockHelpList[name]);
             __saveHelpBlock(blockHelpList[name], i * 2000);
             i += 1;
@@ -774,8 +774,8 @@ function Activity() {
             }
 
             if (blocks.blockList[i].name === "start") {
-                let x = blocks.blockList[i].container.x + 110;
-                let y = blocks.blockList[i].container.y + 12;
+                const x = blocks.blockList[i].container.x + 110;
+                const y = blocks.blockList[i].container.y + 12;
                 svg += '<g transform="translate(' + x + ", " + y + ') scale(0.4 0.4)">';
 
                 parts = TURTLESVG.replace(/fill_color/g, FILLCOLORS[startCounter])
@@ -851,7 +851,7 @@ function Activity() {
             }
         };
 
-        let table = docById("myTable");
+        const table = docById("myTable");
         if (table != null) {
             table.remove();
         }
@@ -865,8 +865,8 @@ function Activity() {
         blocks.activeBlock = null;
         hideDOMLabel();
 
-        let currentDelay = logo.turtleDelay;
-        let playingWidget = false;
+        const currentDelay = logo.turtleDelay;
+        const playingWidget = false;
         logo.turtleDelay = 0;
         if (_THIS_IS_MUSIC_BLOCKS_) {
             logo.synth.resume();
@@ -879,7 +879,7 @@ function Activity() {
             }
             */
 
-            let widgetTitle = document.getElementsByClassName("wftTitle");
+            const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
                 if (widgetTitle[i].innerHTML === "tempo") {
                     if (logo.tempo.isMoving) {
@@ -950,7 +950,7 @@ function Activity() {
         blocks.activeBlock = null;
         hideDOMLabel();
 
-        let turtleCount = Object.keys(logo.stepQueue).length;
+        const turtleCount = Object.keys(logo.stepQueue).length;
         if (_THIS_IS_MUSIC_BLOCKS_) {
             logo.synth.resume();
         }
@@ -973,8 +973,8 @@ function Activity() {
     __generateSetKeyBlocks = () => {
         // Find all setkey blocks in the code
         let isSetKeyBlockPresent = 0;
-        let setKeyBlocks = [];
-        for (let i in logo.blocks.blockList) {
+        const setKeyBlocks = [];
+        for (const i in logo.blocks.blockList) {
             if (logo.blocks.blockList[i].name === "setkey2" && !logo.blocks.blockList[i].trash) {
                 isSetKeyBlockPresent = 1;
                 setKeyBlocks.push(i);
@@ -983,9 +983,9 @@ function Activity() {
 
         if (!isSetKeyBlockPresent) {
             blocks.findStacks();
-            let stacks = blocks.stackList;
+            const stacks = blocks.stackList;
             stacks.sort();
-            for (let i in stacks) {
+            for (const i in stacks) {
                 if (logo.blocks.blockList[stacks[i]].name === "start") {
                     let bottomBlock;
                     bottomBlock = logo.blocks.blockList[stacks[i]].connections[1];
@@ -1016,7 +1016,7 @@ function Activity() {
                         null
                     );
 
-                    let setKey = logo.blocks.blockList.length - 1;
+                    const setKey = logo.blocks.blockList.length - 1;
                     logo.blocks.blockList[bottomBlock].connections[0] = setKey;
 
                     if (KeySignatureEnv[2]) {
@@ -1068,7 +1068,7 @@ function Activity() {
         logo.doStopTurtles();
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            let widgetTitle = document.getElementsByClassName("wftTitle");
+            const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
                 if (widgetTitle[i].innerHTML === "tempo") {
                     if (logo.tempo.isMoving) {
@@ -1085,7 +1085,7 @@ function Activity() {
      */
     doSwitchMode = function () {
         blocks.activeBlock = null;
-        let mode = localStorage.beginnerMode;
+        const mode = localStorage.beginnerMode;
 
         const MSGPrefix =
             "<a href='#' " +
@@ -1113,9 +1113,9 @@ function Activity() {
         docById("chooseKeyDiv").style.display = "block";
         docById("moveable").style.display = "block";
 
-        let keyNameWheel = new wheelnav("chooseKeyDiv", null, 1200, 1200);
-        let keyNameWheel2 = new wheelnav("keyNameWheel2", keyNameWheel.raphael);
-        let keys = ["C", "G", "D", "A", "E", "B/C♭", "F♯/G♭", "C♯/D♭", "G♯/A♭", "D♯/E♭", "B♭", "F"];
+        const keyNameWheel = new wheelnav("chooseKeyDiv", null, 1200, 1200);
+        const keyNameWheel2 = new wheelnav("keyNameWheel2", keyNameWheel.raphael);
+        const keys = ["C", "G", "D", "A", "E", "B/C♭", "F♯/G♭", "C♯/D♭", "G♯/A♭", "D♯/E♭", "B♭", "F"];
 
         wheelnav.cssMode = true;
 
@@ -1138,11 +1138,11 @@ function Activity() {
         keyNameWheel2.slicePathCustom.maxRadiusPercent = 1;
         keyNameWheel2.sliceSelectedPathCustom = keyNameWheel2.slicePathCustom;
         keyNameWheel2.sliceInitPathCustom = keyNameWheel2.slicePathCustom;
-        let keys2 = [];
+        const keys2 = [];
 
         for (let i = 0; i < keys.length; i++) {
             if (keys[i].length > 2) {
-                let obj = keys[i].split("/");
+                const obj = keys[i].split("/");
                 keys2.push(obj[0]);
                 keys2.push(obj[1]);
             } else {
@@ -1155,7 +1155,7 @@ function Activity() {
         keyNameWheel2.animatetime = 0;
         keyNameWheel2.createWheel(keys2);
 
-        let modenameWheel = new wheelnav("modenameWheel", keyNameWheel.raphael);
+        const modenameWheel = new wheelnav("modenameWheel", keyNameWheel.raphael);
         modes = ["major", "dorian", "phrygian", "lydian", "mixolydian", "minor", "locrian"];
         modenameWheel.slicePathFunction = slicePath().DonutSlice;
         modenameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
@@ -1169,7 +1169,7 @@ function Activity() {
 
         modenameWheel.createWheel(modes);
 
-        let exitWheel = new wheelnav("exitWheel", keyNameWheel.raphael);
+        const exitWheel = new wheelnav("exitWheel", keyNameWheel.raphael);
         exitWheel.slicePathFunction = slicePath().DonutSlice;
         exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
         exitWheel.slicePathCustom.minRadiusPercent = 0.0;
@@ -1182,18 +1182,18 @@ function Activity() {
         exitWheel.animatetime = 0;
         exitWheel.createWheel(["×", " "]);
 
-        let x = event.clientX;
-        let y = event.clientY;
+        const x = event.clientX;
+        const y = event.clientY;
 
         docById("chooseKeyDiv").style.left = x - 175 + "px";
         docById("chooseKeyDiv").style.top = y + 50 + "px";
         docById("moveable").style.left = x - 110 + "px";
         docById("moveable").style.top = y + 400 + "px";
 
-        let __exitMenu = () => {
+        const __exitMenu = () => {
             docById("chooseKeyDiv").style.display = "none";
             docById("moveable").style.display = "none";
-            let ele = document.getElementsByName("moveable");
+            const ele = document.getElementsByName("moveable");
             for (let i = 0; i < ele.length; i++) {
                 if (ele[i].checked) {
                     KeySignatureEnv[2] = ele[i].value == "true" ? true : false;
@@ -1208,10 +1208,10 @@ function Activity() {
 
         exitWheel.navItems[0].navigateFunction = __exitMenu;
 
-        let __playNote = (note) => {
-            let obj = getNote(note, 4, null, note + " " + KeySignatureEnv[1], false, null, null);
+        const __playNote = (note) => {
+            const obj = getNote(note, 4, null, note + " " + KeySignatureEnv[1], false, null, null);
             obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
-            let tur = blocks.logo.turtles.ithTurtle(0);
+            const tur = blocks.logo.turtles.ithTurtle(0);
 
             if (
                 tur.singer.instrumentNames.length === 0 ||
@@ -1227,7 +1227,7 @@ function Activity() {
             blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 12, DEFAULTVOICE, null, null);
         };
 
-        let __setupActionKey = function (i) {
+        const __setupActionKey = function (i) {
             keyNameWheel.navItems[i].navigateFunction = function () {
                 for (let j = 0; j < keys2.length; j++) {
                     if (Math.floor(j / 2) != i) {
@@ -1250,7 +1250,7 @@ function Activity() {
         };
 
         let __selectionChangedKey = () => {
-            let selection = keyNameWheel.navItems[keyNameWheel.selectedNavItemIndex].title;
+            const selection = keyNameWheel.navItems[keyNameWheel.selectedNavItemIndex].title;
             keyNameWheel2.navigateWheel(2 * keyNameWheel.selectedNavItemIndex);
             if (selection === "") {
                 keyNameWheel.navigateWheel(
@@ -1265,8 +1265,8 @@ function Activity() {
             __setupActionKey(i);
         }
 
-        let __selectionChangedMode = () => {
-            let selection = modenameWheel.navItems[modenameWheel.selectedNavItemIndex].title;
+        const __selectionChangedMode = () => {
+            const selection = modenameWheel.navItems[modenameWheel.selectedNavItemIndex].title;
             if (selection === "") {
                 modenameWheel.navigateWheel(
                     (modenameWheel.selectedNavItemIndex + 1) % modenameWheel.navItems.length
@@ -1282,8 +1282,8 @@ function Activity() {
             };
         }
 
-        let __selectionChangedKey2 = function () {
-            let selection = keyNameWheel2.navItems[keyNameWheel2.selectedNavItemIndex].title;
+        const __selectionChangedKey2 = function () {
+            const selection = keyNameWheel2.navItems[keyNameWheel2.selectedNavItemIndex].title;
             KeySignatureEnv[0] = selection;
         };
 
@@ -1293,7 +1293,7 @@ function Activity() {
             };
         }
         if (localStorage.KeySignatureEnv !== undefined) {
-            let ks = localStorage.KeySignatureEnv.split(",");
+            const ks = localStorage.KeySignatureEnv.split(",");
             KeySignatureEnv[0] = ks[0];
             KeySignatureEnv[1] = ks[1];
             KeySignatureEnv[2] = ks[2] == "true" ? true : false;
@@ -1323,7 +1323,7 @@ function Activity() {
             keyNameWheel2.navItems[2 * i + 1].navItem.hide();
         }
 
-        let j = modes.indexOf(KeySignatureEnv[1]);
+        const j = modes.indexOf(KeySignatureEnv[1]);
         if (j !== -1) {
             modenameWheel.navigateWheel(j);
         }
@@ -1352,8 +1352,8 @@ function Activity() {
     function setScroller() {
         blocks.activeBlock = null;
         scrollBlockContainer = !scrollBlockContainer;
-        let enableHorizScrollIcon = docById("enableHorizScrollIcon");
-        let disableHorizScrollIcon = docById("disableHorizScrollIcon");
+        const enableHorizScrollIcon = docById("enableHorizScrollIcon");
+        const disableHorizScrollIcon = docById("disableHorizScrollIcon");
         if (scrollBlockContainer && !beginnerMode) {
             enableHorizScrollIcon.style.display = "none";
             disableHorizScrollIcon.style.display = "block";
@@ -1365,7 +1365,7 @@ function Activity() {
 
     //Load Animation handler
     doLoadAnimation = function () {
-        let messages = {
+        const messages = {
             load_messages: [
                 _("Catching mice"),
                 _("Cleaning the instruments"),
@@ -1384,7 +1384,7 @@ function Activity() {
         setInterval(changeText, 2000);
 
         function changeText() {
-            let randomLoadMessage =
+            const randomLoadMessage =
                 messages.load_messages[Math.floor(Math.random() * messages.load_messages.length)];
             document.getElementById("messageText").innerHTML = randomLoadMessage + "...";
             counter++;
@@ -1400,7 +1400,7 @@ function Activity() {
      * @returns {boolean} {if canvas is blank }
      */
     function _isCanvasBlank(canvas) {
-        let blank = document.createElement("canvas");
+        const blank = document.createElement("canvas");
         blank.width = canvas.width;
         blank.height = canvas.height;
         return canvas.toDataURL() === blank.toDataURL();
@@ -1507,7 +1507,7 @@ function Activity() {
     /*
      * Renders Cartesian/Polar/Treble/et al. grids
      */
-    let _doCartesianPolar = () => {
+    const _doCartesianPolar = () => {
 
         switch(turtles.currentGrid){
             case 1:
@@ -1539,7 +1539,7 @@ function Activity() {
                 _hideBass();
                 break;
             default:
-                console.log("Blank Grid");     
+                console.log("Blank Grid");
         }
         
         switch(turtles.gridWheel.selectedNavItemIndex){
@@ -1589,7 +1589,7 @@ function Activity() {
             delta: 0
         };
 
-        let closeAnyOpenMenusAndLabels = function () {
+        const closeAnyOpenMenusAndLabels = function () {
             if (docById("wheelDiv") != null) docById("wheelDiv").style.display = "none";
             if (docById("contextWheelDiv") != null)
                 docById("contextWheelDiv").style.display = "none";
@@ -1597,10 +1597,10 @@ function Activity() {
             if (docById("numberLabel") != null) docById("numberLabel").style.display = "none";
         };
 
-        let normalizeWheel = (event) => {
-            let PIXEL_STEP = 10;
-            let LINE_HEIGHT = 40;
-            let PAGE_HEIGHT = 800;
+        const normalizeWheel = (event) => {
+            const PIXEL_STEP = 10;
+            const LINE_HEIGHT = 40;
+            const PAGE_HEIGHT = 800;
 
             let sX = 0,
                 sY = 0, // spinX, spinY
@@ -1643,10 +1643,10 @@ function Activity() {
             return { pixelX: pX, pixelY: pY };
         };
 
-        let __wheelHandler = function (event) {
-            let data = normalizeWheel(event); // normalize over different browsers
-            let delY = data.pixelY;
-            let delX = data.pixelX;
+        const __wheelHandler = function (event) {
+            const data = normalizeWheel(event); // normalize over different browsers
+            const delY = data.pixelY;
+            const delX = data.pixelX;
             if (delY !== 0 && event.axis === event.VERTICAL_AXIS) {
                 closeAnyOpenMenusAndLabels(); // closes all wheelnavs when scrolling .
                 blocksContainer.y -= delY;
@@ -1665,7 +1665,7 @@ function Activity() {
 
         docById("myCanvas").addEventListener("wheel", __wheelHandler, false);
 
-        let __stageMouseUpHandler = function (event) {
+        const __stageMouseUpHandler = function (event) {
             stageMouseDown = false;
             moving = false;
 
@@ -1709,7 +1709,7 @@ function Activity() {
                 // if we are moving the block container, deselect the active block.
                 blocks.activeBlock = null;
 
-                let delta =
+                const delta =
                     Math.abs(event.stageX - lastCoords.x) + Math.abs(event.stageY - lastCoords.y);
 
                 if (scrollBlockContainer) {
@@ -1735,9 +1735,9 @@ function Activity() {
      * Sets up scrolling functionality in palette and across canvas
      */
     function scrollEvent(event) {
-        let data = event.wheelDelta || -event.detail;
-        let delta = Math.max(-1, Math.min(1, data));
-        let scrollSpeed = 30;
+        const data = event.wheelDelta || -event.detail;
+        const delta = Math.max(-1, Math.min(1, data));
+        const scrollSpeed = 30;
 
         if (event.clientX < cellSize) {
             //palettes.menuScrollEvent(delta, scrollSpeed);
@@ -1780,12 +1780,12 @@ function Activity() {
      * @param imagePath {path of grid to be rendered}
      */
     _createGrid = function (imagePath) {
-        let img = new Image();
+        const img = new Image();
         img.src = imagePath;
-        let container = new createjs.Container();
+        const container = new createjs.Container();
         stage.addChild(container);
 
-        let bitmap = new createjs.Bitmap(img);
+        const bitmap = new createjs.Bitmap(img);
         container.addChild(bitmap);
         bitmap.cache(0, 0, 1200, 900);
 
@@ -1806,32 +1806,32 @@ function Activity() {
      * @returns {description}
      */
     _createMsgContainer = function (fillColor, strokeColor, callback, y) {
-        let container = new createjs.Container();
+        const container = new createjs.Container();
         stage.addChild(container);
         container.x = (canvas.width - 1000) / 2;
         container.y = y;
         container.visible = false;
 
-        let img = new Image();
-        let svgData = MSGBLOCK.replace("fill_color", fillColor).replace(
+        const img = new Image();
+        const svgData = MSGBLOCK.replace("fill_color", fillColor).replace(
             "stroke_color",
             strokeColor
         );
 
         img.onload = function () {
-            let msgBlock = new createjs.Bitmap(img);
+            const msgBlock = new createjs.Bitmap(img);
             container.addChild(msgBlock);
-            let text = new createjs.Text("your message here", "20px Arial", "#000000");
+            const text = new createjs.Text("your message here", "20px Arial", "#000000");
             container.addChild(text);
             text.textAlign = "center";
             text.textBaseline = "alphabetic";
             text.x = 500;
             text.y = 30;
 
-            let bounds = container.getBounds();
+            const bounds = container.getBounds();
             container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
 
-            let hitArea = new createjs.Shape();
+            const hitArea = new createjs.Shape();
             hitArea.graphics.beginFill("#FFF").drawRect(0, 0, 1000, 42);
             hitArea.x = 0;
             hitArea.y = 0;
@@ -1860,7 +1860,7 @@ function Activity() {
      */
     _createErrorContainers = function () {
         for (let i = 0; i < ERRORARTWORK.length; i++) {
-            let name = ERRORARTWORK[i];
+            const name = ERRORARTWORK[i];
             _makeErrorArtwork(name);
         }
     };
@@ -1870,7 +1870,7 @@ function Activity() {
      * @param  name {specifies svg to be rendered}
      */
     _makeErrorArtwork = function (name) {
-        let container = new createjs.Container();
+        const container = new createjs.Container();
         stage.addChild(container);
         container.x = (canvas.width - 1000) / 2;
         container.y = 80;
@@ -1878,19 +1878,19 @@ function Activity() {
         errorArtwork[name].name = name;
         errorArtwork[name].visible = false;
 
-        let img = new Image();
+        const img = new Image();
         img.onload = function () {
-            let artwork = new createjs.Bitmap(img);
+            const artwork = new createjs.Bitmap(img);
             container.addChild(artwork);
-            let text = new createjs.Text("", "20px Sans", "#000000");
+            const text = new createjs.Text("", "20px Sans", "#000000");
             container.addChild(text);
             text.x = 70;
             text.y = 10;
 
-            let bounds = container.getBounds();
+            const bounds = container.getBounds();
             container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
 
-            let hitArea = new createjs.Shape();
+            const hitArea = new createjs.Shape();
             hitArea.graphics.beginFill("#FFF").drawRect(0, 0, bounds.width, bounds.height);
             hitArea.x = 0;
             hitArea.y = 0;
@@ -1921,9 +1921,9 @@ function Activity() {
         deprecatedBlockNames = [];
 
         for (i in blocks.protoBlockDict) {
-            let block = blocks.protoBlockDict[i];
-            let blockLabel = block.staticLabels.join(" ");
-            let artwork = block.palette.model.makeBlockInfo(0, block, block.name, block.name)[
+            const block = blocks.protoBlockDict[i];
+            const blockLabel = block.staticLabels.join(" ");
+            const artwork = block.palette.model.makeBlockInfo(0, block, block.name, block.name)[
                 "artwork64"
             ];
             if (blockLabel || block.extraSearchTerms !== undefined) {
@@ -1958,7 +1958,7 @@ function Activity() {
      */
     hideSearchWidget = function () {
         // Hide the jQuery search results widget
-        let obj = docByClass("ui-menu");
+        const obj = docByClass("ui-menu");
         if (obj.length > 0) {
             obj[0].style.visibility = "hidden";
         }
@@ -1976,7 +1976,7 @@ function Activity() {
         if (searchWidget.style.visibility === "visible") {
             hideSearchWidget();
         } else {
-            let obj = docByClass("ui-menu");
+            const obj = docByClass("ui-menu");
             if (obj.length > 0) {
                 obj[0].style.visibility = "visible";
             }
@@ -1989,7 +1989,7 @@ function Activity() {
 
             searchBlockPosition = [100, 100];
             prepSearchWidget();
-            let closeListener = (e) => {
+            const closeListener = (e) => {
                 if (
                     docById("search").style.visibility == "visible" &&
                     (e.target === docById("search") || docById("search").contains(e.target))
@@ -2024,7 +2024,7 @@ function Activity() {
      * Uses JQuery to add autocompleted search suggestions
      */
     doSearch = function () {
-        let $j = jQuery.noConflict();
+        const $j = jQuery.noConflict();
 
         $j("#search").autocomplete({
             source: searchSuggestions,
@@ -2057,14 +2057,14 @@ function Activity() {
                 )
                 .appendTo(ul);
         };
-        let searchInput = searchWidget.idInput_custom;
+        const searchInput = searchWidget.idInput_custom;
         if (!searchInput || searchInput.length <= 0) return;
 
-        let protoblk = searchWidget.protoblk;
-        let paletteName = protoblk.palette.name;
-        let protoName = protoblk.name;
+        const protoblk = searchWidget.protoblk;
+        const paletteName = protoblk.palette.name;
+        const protoName = protoblk.name;
 
-        let searchResult = blocks.protoBlockDict.hasOwnProperty(protoName);
+        const searchResult = blocks.protoBlockDict.hasOwnProperty(protoName);
 
         if (searchResult) {
             palettes.dict[paletteName].makeBlockFromSearch(
@@ -2096,7 +2096,7 @@ function Activity() {
      * Makes initial "start up" note for a brand new MB project
      */
     __makeNewNote = function (octave, solf) {
-        let newNote = [
+        const newNote = [
             [0, "newnote", 300 - blocksContainer.x, 300 - blocksContainer.y, [null, 1, 4, 8]],
             [1, "divide", 0, 0, [0, 2, 3]],
             [
@@ -2157,18 +2157,18 @@ function Activity() {
             // Connect the newly created block to the active block
             // (if it is a hidden block at the end of a new note
             // block).
-            let bottom = blocks.findBottomBlock(blocks.activeBlock);
+            const bottom = blocks.findBottomBlock(blocks.activeBlock);
             console.debug(blocks.activeBlock + " " + bottom);
             if (
                 blocks.blockList[bottom].name === "hidden" &&
                 blocks.blockList[blocks.blockList[bottom].connections[0]].name === "newnote"
             ) {
                 // The note block macro creates nine blocks.
-                let newlyCreatedBlock = blocks.blockList.length - 9;
+                const newlyCreatedBlock = blocks.blockList.length - 9;
 
                 // Set last connection of active block to the
                 // newly created block.
-                let lastConnection = blocks.blockList[bottom].connections.length - 1;
+                const lastConnection = blocks.blockList[bottom].connections.length - 1;
                 blocks.blockList[bottom].connections[lastConnection] = newlyCreatedBlock;
 
                 // Set first connection of the newly created block to
@@ -2193,7 +2193,7 @@ function Activity() {
     function __keyPressed(event) {
         if (window.widgetWindows.isOpen("JavaScript Editor") === true) return;
 
-        let that = this;
+        const that = this;
         let disableKeys;
 
         if (!keyboardEnableFlag) {
@@ -2290,7 +2290,7 @@ function Activity() {
                 logo.turtles.running();
         }
 
-        let widgetTitle = document.getElementsByClassName("wftTitle");
+        const widgetTitle = document.getElementsByClassName("wftTitle");
         let inTempoWidget = false;
         for (let i = 0; i < widgetTitle.length; i++) {
             if (widgetTitle[i].innerHTML === "tempo") {
@@ -2349,7 +2349,7 @@ function Activity() {
                     break;
             }
         } else if (event.shiftKey && !disableKeys) {
-            let solfnotes_ = _("ti la sol fa mi re do").split(" ");
+            const solfnotes_ = _("ti la sol fa mi re do").split(" ");
             switch (event.keyCode) {
                 case KEYCODE_D:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -2400,7 +2400,7 @@ function Activity() {
                     pasted();
                 }
             } else if (!disableKeys) {
-                let solfnotes_ = _("ti la sol fa mi re do").split(" ");
+                const solfnotes_ = _("ti la sol fa mi re do").split(" ");
                 switch (event.keyCode) {
                     case END:
                         textMsg("END " + _("Jumping to the bottom of the page."));
@@ -2500,7 +2500,7 @@ function Activity() {
                     case HOME:
                         textMsg("HOME " + _("Jump to home position."));
                         if (palettes.mouseOver) {
-                            let dy = Math.max(55 - palettes.buttons["rhythm"].y, 0);
+                            const dy = Math.max(55 - palettes.buttons["rhythm"].y, 0);
                             palettes.menuScrollEvent(1, dy);
                             palettes.hidePaletteIconCircles();
                         } else if (palettes.activePalette != null) {
@@ -2625,7 +2625,7 @@ function Activity() {
             console.debug("Saving locally due to resize event");
             saveLocally();
         }
-        let $j = jQuery.noConflict();
+        const $j = jQuery.noConflict();
         console.debug(
             "document.body.clientWidth and clientHeight: " +
                 document.body.clientWidth +
@@ -2672,7 +2672,7 @@ function Activity() {
             return;
         }
 
-        let smallSide = Math.min(w, h);
+        const smallSide = Math.min(w, h);
         let mobileSize;
         if (smallSide < cellSize * 9) {
             mobileSize = false;
@@ -2740,7 +2740,7 @@ function Activity() {
             turtles.turtleList[turtle].painter.doClear(false, false, true);
         }
 
-        let artcanvas = docById("overlayCanvas");
+        const artcanvas = docById("overlayCanvas");
         // Workaround for #795.5
         if (mobileSize) {
             artcanvas.width = w * 2;
@@ -2763,27 +2763,27 @@ function Activity() {
      * Repositions blocks about trash area
      */
     _restoreTrash = function () {
-        for (let name in blocks.palettes.dict) {
+        for (const name in blocks.palettes.dict) {
             blocks.palettes.dict[name].hideMenu(true);
         }
 
         blocks.activeBlock = null;
         refreshCanvas();
 
-        let dx = 0;
-        let dy = -cellSize * 3; // Reposition
+        const dx = 0;
+        const dy = -cellSize * 3; // Reposition
 
         if (blocks.trashStacks.length === 0) {
             console.debug("Trash is empty--nothing to do");
             return;
         }
 
-        let thisBlock = blocks.trashStacks.pop();
+        const thisBlock = blocks.trashStacks.pop();
 
         // Restore drag group in trash
         blocks.findDragGroup(thisBlock);
         for (let b = 0; b < blocks.dragGroup.length; b++) {
-            let blk = blocks.dragGroup[b];
+            const blk = blocks.dragGroup[b];
             // console.debug('Restoring ' + blocks.blockList[blk].name + ' from the trash.');
             blocks.blockList[blk].trash = false;
             blocks.moveBlockRelative(blk, dx, dy);
@@ -2796,21 +2796,21 @@ function Activity() {
             blocks.blockList[thisBlock].name === "start" ||
             blocks.blockList[thisBlock].name === "drum"
         ) {
-            let turtle = blocks.blockList[thisBlock].value;
+            const turtle = blocks.blockList[thisBlock].value;
             turtles.turtleList[turtle].inTrash = false;
             turtles.turtleList[turtle].container.visible = true;
         } else if (blocks.blockList[thisBlock].name === "action") {
             // We need to add a palette entry for this action.
             // But first we need to ensure we have a unqiue name,
             // as the name could have been taken in the interim.
-            let actionArg = blocks.blockList[blocks.blockList[thisBlock].connections[1]];
+            const actionArg = blocks.blockList[blocks.blockList[thisBlock].connections[1]];
             if (actionArg != null) {
-                let oldName = actionArg.value;
+                const oldName = actionArg.value;
                 // Mark the action block as still being in the
                 // trash so that its name won't be considered when
                 // looking for a unique name.
                 blocks.blockList[thisBlock].trash = true;
-                let uniqueName = blocks.findUniqueActionName(oldName);
+                const uniqueName = blocks.findUniqueActionName(oldName);
                 blocks.blockList[thisBlock].trash = false;
 
                 if (uniqueName !== actionArg) {
@@ -2838,7 +2838,7 @@ function Activity() {
                     // Check the drag group to ensure any do
                     // blocks are updated (in case of recursion).
                     for (let b = 0; b < blocks.dragGroup.length; b++) {
-                        let me = blocks.blockList[blocks.dragGroup[b]];
+                        const me = blocks.blockList[blocks.dragGroup[b]];
                         if (
                             ["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].indexOf(
                                 me.name
@@ -2861,7 +2861,7 @@ function Activity() {
                     }
                 }
 
-                let actionName = actionArg.value;
+                const actionName = actionArg.value;
                 if (actionName !== _("action")) {
                     // blocks.checkPaletteEntries('action');
                     console.debug("FIXME: Check for unique action name here");
@@ -2902,7 +2902,7 @@ function Activity() {
         // Return to home position after loading new blocks.
         blocksContainer.x = 0;
         blocksContainer.y = 0;
-        for (let name in blocks.palettes.dict) {
+        for (const name in blocks.palettes.dict) {
             blocks.palettes.dict[name].hideMenu(true);
         }
 
@@ -2910,9 +2910,9 @@ function Activity() {
         refreshCanvas();
 
         let actionBlockCounter = 0;
-        let dx = 0;
+        const dx = 0;
         const dy = cellSize * 3;
-        for (let blk in blocks.blockList) {
+        for (const blk in blocks.blockList) {
             // If this block is at the top of a stack, push it
             // onto the trashStacks list.
             if (blocks.blockList[blk].connections[0] == null) {
@@ -2921,7 +2921,7 @@ function Activity() {
 
             if (blocks.blockList[blk].name === "start" || blocks.blockList[blk].name === "drum") {
                 console.debug("start blk " + blk + " value is " + blocks.blockList[blk].value);
-                let turtle = blocks.blockList[blk].value;
+                const turtle = blocks.blockList[blk].value;
                 if (!blocks.blockList[blk].trash && turtle != null) {
                     console.debug("sending turtle " + turtle + " to trash");
                     turtles.turtleList[turtle].inTrash = true;
@@ -3161,10 +3161,10 @@ function Activity() {
             typeof flags !== "undefined"
                 ? flags
                 : {
-                      run: false,
-                      show: false,
-                      collapse: false
-                  };
+                    run: false,
+                    show: false,
+                    collapse: false
+                };
         loading = true;
         document.body.style.cursor = "wait";
         doLoadAnimation();
@@ -3191,11 +3191,11 @@ function Activity() {
             update = true;
         }, 2500);
 
-        let run = flags.run;
-        let show = flags.show;
-        let collapse = flags.collapse;
+        const run = flags.run;
+        const show = flags.show;
+        const collapse = flags.collapse;
 
-        let __functionload = function () {
+        const __functionload = function () {
             setTimeout(function () {
                 if (!collapse && firstRun) {
                     _toggleCollapsibleStacks();
@@ -3238,12 +3238,12 @@ function Activity() {
      * @param loadProject all params are from load project function
      */
     this.loadStartWrapper = async function (func, arg1, arg2, arg3) {
-        let time1 = new Date();
+        const time1 = new Date();
         await func(arg1, arg2, arg3);
 
-        let time2 = new Date();
-        let elapsedTime = time2.getTime() - time1.getTime();
-        let timeLeft = Math.max(6000 - elapsedTime);
+        const time2 = new Date();
+        const elapsedTime = time2.getTime() - time1.getTime();
+        const timeLeft = Math.max(6000 - elapsedTime);
         setTimeout(that.showContents, timeLeft);
     };
 
@@ -3288,11 +3288,11 @@ function Activity() {
         if (planet) {
             sessionData = await planet.openCurrentProject();
         } else {
-            let currentProject = storage.currentProject;
+            const currentProject = storage.currentProject;
             sessionData = storage["SESSION" + currentProject];
         }
 
-        let __afterLoad = function () {
+        const __afterLoad = function () {
             if (!turtles.running()) {
                 setTimeout(function () {
                     stage.update(event);
@@ -3371,7 +3371,7 @@ function Activity() {
 
         msgText.parent.visible = false;
         printText.classList.remove("show");
-        for (let i in errorArtwork) {
+        for (const i in errorArtwork) {
             errorArtwork[i].visible = false;
         }
 
@@ -3397,11 +3397,11 @@ function Activity() {
         }
 
         // Show and populate printText div
-        let printText = document.getElementById("printText");
+        const printText = document.getElementById("printText");
 
         printText.classList.add("show");
 
-        let printTextContent = document.getElementById("printTextContent");
+        const printTextContent = document.getElementById("printTextContent");
         printTextContent.innerHTML = msg;
 
         msgTimeoutID = setTimeout(function () {
@@ -3427,17 +3427,17 @@ function Activity() {
             blk in blocks.blockList &&
             !blocks.blockList[blk].collapsed
         ) {
-            let fromX = (canvas.width - 1000) / 2;
-            let fromY = 128;
-            let toX = blocks.blockList[blk].container.x + blocksContainer.x;
-            let toY = blocks.blockList[blk].container.y + blocksContainer.y;
+            const fromX = (canvas.width - 1000) / 2;
+            const fromY = 128;
+            const toX = blocks.blockList[blk].container.x + blocksContainer.x;
+            const toY = blocks.blockList[blk].container.y + blocksContainer.y;
 
             if (errorMsgArrow == null) {
                 errorMsgArrow = new createjs.Container();
                 stage.addChild(errorMsgArrow);
             }
 
-            let line = new createjs.Shape();
+            const line = new createjs.Shape();
             errorMsgArrow.addChild(line);
             line.graphics
                 .setStrokeStyle(4)
@@ -3446,8 +3446,8 @@ function Activity() {
                 .lineTo(toX, toY);
             stage.setChildIndex(errorMsgArrow, stage.children.length - 1);
 
-            let angle = (Math.atan2(toX - fromX, fromY - toY) / Math.PI) * 180;
-            let head = new createjs.Shape();
+            const angle = (Math.atan2(toX - fromX, fromY - toY) / Math.PI) * 180;
+            const head = new createjs.Shape();
             errorMsgArrow.addChild(head);
             head.graphics
                 .setStrokeStyle(4)
@@ -3511,9 +3511,9 @@ function Activity() {
                 break;
             default:
                 // Show and populate errorText div
-                let errorText = document.getElementById("errorText");
+                const errorText = document.getElementById("errorText");
                 errorText.classList.add("show");
-                let errorTextContent = document.getElementById("errorTextContent");
+                const errorTextContent = document.getElementById("errorTextContent");
                 errorTextContent.innerHTML = msg;
                 break;
         }
@@ -3686,10 +3686,10 @@ function Activity() {
      * consolidate the block list and remap the connections.
      */
     function prepareExport() {
-        let blockMap = [];
+        const blockMap = [];
         let hasMatrixDataBlock = false;
         for (let blk = 0; blk < blocks.blockList.length; blk++) {
-            let myBlock = blocks.blockList[blk];
+            const myBlock = blocks.blockList[blk];
             if (myBlock.trash) {
                 // Don't save blocks in the trash.
                 continue;
@@ -3698,9 +3698,9 @@ function Activity() {
             blockMap.push(blk);
         }
 
-        let data = [];
+        const data = [];
         for (let blk = 0; blk < blocks.blockList.length; blk++) {
-            let myBlock = blocks.blockList[blk];
+            const myBlock = blocks.blockList[blk];
             let args = null;
 
             if (myBlock.trash) {
@@ -3731,7 +3731,7 @@ function Activity() {
                     case "start":
                     case "drum":
                         // Find the turtle associated with this block.
-                        let turtle = turtles.turtleList[myBlock.value];
+                        const turtle = turtles.turtleList[myBlock.value];
                         if (turtle == null) {
                             args = {
                                 id: Infinity,
@@ -3763,7 +3763,7 @@ function Activity() {
                         if (blocks.customTemperamentDefined) {
                             // If temperament block is present
                             custom = {};
-                            for (let temp in TEMPERAMENT)
+                            for (const temp in TEMPERAMENT)
                                 if (!(temp in PreDefinedTemperaments))
                                     custom[temp] = TEMPERAMENT[temp];
                             args = {
@@ -3824,7 +3824,7 @@ function Activity() {
 
             connections = [];
             for (let c = 0; c < myBlock.connections.length; c++) {
-                let mapConnection = blockMap.indexOf(myBlock.connections[c]);
+                const mapConnection = blockMap.indexOf(myBlock.connections[c]);
                 if (myBlock.connections[c] == null || mapConnection === -1) {
                     connections.push(null);
                 } else {
@@ -3921,13 +3921,13 @@ function Activity() {
                 docById("buttoncontainerBOTTOM")
             );
         }
-        let btnSize = cellSize;
+        const btnSize = cellSize;
         // Lower right
         let x = this._innerWidth - 4 * btnSize - 27.5;
-        let y = this._innerHeight - 57.5;
-        let dx = btnSize;
+        const y = this._innerHeight - 57.5;
+        const dx = btnSize;
 
-        let ButtonHolder = document.createElement("div");
+        const ButtonHolder = document.createElement("div");
         ButtonHolder.setAttribute("id", "buttoncontainerBOTTOM");
         if (!removed) ButtonHolder.style.display = "none"; //  if firsttime: make visible later.
         document.body.appendChild(ButtonHolder);
@@ -4016,10 +4016,10 @@ function Activity() {
             timeout = 500;
         }
 
-        let bitmap = last(menuContainer.children);
+        const bitmap = last(menuContainer.children);
         if (bitmap != null) {
             if (animate) {
-                let r = bitmap.rotation;
+                const r = bitmap.rotation;
                 if (r % 95.5 !== 0) {
                     return;
                 }
@@ -4069,11 +4069,11 @@ function Activity() {
         buttonsVisible = !buttonsVisible;
         menuContainer.visible = buttonsVisible;
         headerContainer.visible = buttonsVisible;
-        for (let button in onscreenButtons) {
+        for (const button in onscreenButtons) {
             onscreenButtons[button].visible = buttonsVisible;
         }
 
-        for (let button in onscreenMenu) {
+        for (const button in onscreenMenu) {
             onscreenMenu[button].visible = buttonsVisible;
         }
 
@@ -4097,7 +4097,7 @@ function Activity() {
      * Makes non-toolbar buttons, e.g., the palette menu buttons
      */
     _makeButton = function (name, label, x, y) {
-        let container = document.createElement("div");
+        const container = document.createElement("div");
         container.setAttribute("id", "" + label);
 
         container.setAttribute("class", "tooltipped");
@@ -4119,7 +4119,7 @@ function Activity() {
             }
         };
 
-        let img = new Image();
+        const img = new Image();
         img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(name)));
 
         container.appendChild(img);
@@ -4156,13 +4156,13 @@ function Activity() {
      * Handles pasted strings into input fields
      */
     pasted = function () {
-        let rawData = docById("paste").value;
+        const rawData = docById("paste").value;
         let obj = "";
         if (rawData == null || rawData === "") {
             return;
         }
 
-        let cleanData = rawData.replace("\n", " ");
+        const cleanData = rawData.replace("\n", " ");
         try {
             obj = JSON.parse(cleanData);
         } catch (e) {
@@ -4170,7 +4170,7 @@ function Activity() {
             return;
         }
 
-        for (let name in blocks.palettes.dict) {
+        for (const name in blocks.palettes.dict) {
             blocks.palettes.dict[name].hideMenu(true);
         }
 
@@ -4521,7 +4521,7 @@ function Activity() {
                 // First, hide the palettes as they will need updating.
                 blocks.palettes._hideMenus(true);
 
-                let __afterLoad = function () {
+                const __afterLoad = function () {
                     document.removeEventListener("finishedLoading", __afterLoad);
                 };
 
@@ -4532,7 +4532,7 @@ function Activity() {
                 }
 
                 try {
-                    let obj = JSON.parse(data);
+                    const obj = JSON.parse(data);
                     blocks.loadNewBlocks(obj);
                 } catch (e) {
                     console.debug("loadRawProject: could not parse project data");
@@ -4567,17 +4567,17 @@ function Activity() {
             this.saveLocally = function () {
                 stage.update(event);
                 console.debug("overwriting session data");
-                let data = prepareExport();
-                let svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
+                const data = prepareExport();
+                const svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
                 try {
                     if (svgData == null || svgData === "") {
                         this.planet.ProjectStorage.saveLocally(data, null);
                     } else {
-                        let img = new Image();
-                        let t = this;
+                        const img = new Image();
+                        const t = this;
                         img.onload = function () {
-                            let bitmap = new createjs.Bitmap(img);
-                            let bounds = bitmap.getBounds();
+                            const bitmap = new createjs.Bitmap(img);
+                            const bounds = bitmap.getBounds();
                             bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
                             t.planet.ProjectStorage.saveLocally(
                                 data,
@@ -4722,7 +4722,7 @@ function Activity() {
         } else {
             __saveLocally = function () {
                 console.debug("overwriting session data (local)");
-                let data = prepareExport();
+                const data = prepareExport();
 
                 if (sugarizerCompatibility.isInsideSugarizer()) {
                     //sugarizerCompatibility.data.blocks = prepareExport();
@@ -4742,18 +4742,18 @@ function Activity() {
                 }
 
                 try {
-                    let p = storage.currentProject;
+                    const p = storage.currentProject;
                     storage["SESSION" + p] = prepareExport();
                 } catch (e) {
                     console.debug(e);
                 }
 
-                let img = new Image();
-                let svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
+                const img = new Image();
+                const svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
 
                 img.onload = function () {
-                    let bitmap = new createjs.Bitmap(img);
-                    let bounds = bitmap.getBounds();
+                    const bitmap = new createjs.Bitmap(img);
+                    const bounds = bitmap.getBounds();
                     bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
                     try {
                         storage["SESSIONIMAGE" + p] = bitmap.bitmapCache.getCacheDataURL();
@@ -4778,7 +4778,7 @@ function Activity() {
 
         initPalettes(palettes);
 
-        let __clearFunction = function () {
+        const __clearFunction = function () {
             sendAllToTrash(true, false);
             if (planet !== undefined) {
                 planet.initialiseNewProject.bind(planet);
@@ -4822,7 +4822,7 @@ function Activity() {
         }
 
         // Load custom mode saved in local storage.
-        let custommodeData = storage.custommode;
+        const custommodeData = storage.custommode;
         if (custommodeData !== undefined) {
             customMode = JSON.parse(custommodeData);
             console.debug("restoring custom mode: " + customMode);
@@ -4836,7 +4836,7 @@ function Activity() {
             "change",
             function (event) {
                 // Read file here.
-                let reader = new FileReader();
+                const reader = new FileReader();
 
                 reader.onload = function (theFile) {
                     loading = true;
@@ -4844,14 +4844,14 @@ function Activity() {
                     doLoadAnimation();
 
                     setTimeout(function () {
-                        let rawData = reader.result;
+                        const rawData = reader.result;
                         if (rawData == null || rawData === "") {
                             console.debug("rawData is " + rawData);
                             errorMsg(
                                 _("Cannot load project from the file. Please check the file type.")
                             );
                         } else {
-                            let cleanData = rawData.replace("\n", " ");
+                            const cleanData = rawData.replace("\n", " ");
                             let obj;
                             try {
                                 if (cleanData.includes("html")) {
@@ -4862,7 +4862,7 @@ function Activity() {
                                     obj = JSON.parse(cleanData);
                                 }
                                 // First, hide the palettes as they will need updating.
-                                for (let name in blocks.palettes.dict) {
+                                for (const name in blocks.palettes.dict) {
                                     blocks.palettes.dict[name].hideMenu(true);
                                 }
 
@@ -4870,7 +4870,7 @@ function Activity() {
 
                                 if (!merging) {
                                     // Wait for the old blocks to be removed.
-                                    let __listener = function (event) {
+                                    const __listener = function (event) {
                                         blocks.loadNewBlocks(obj);
                                         stage.removeAllEventListeners("trashsignal");
                                         if (planet) {
@@ -4917,12 +4917,12 @@ function Activity() {
             false
         );
 
-        let __handleFileSelect = function (event) {
+        const __handleFileSelect = function (event) {
             event.stopPropagation();
             event.preventDefault();
 
-            let files = event.dataTransfer.files;
-            let reader = new FileReader();
+            const files = event.dataTransfer.files;
+            const reader = new FileReader();
 
             reader.onload = function (theFile) {
                 loading = true;
@@ -4930,13 +4930,13 @@ function Activity() {
                 // doLoadAnimation();
 
                 setTimeout(function () {
-                    let rawData = reader.result;
+                    const rawData = reader.result;
                     if (rawData == null || rawData === "") {
                         errorMsg(
                             _("Cannot load project from the file. Please check the file type.")
                         );
                     } else {
-                        let cleanData = rawData.replace("\n", " ");
+                        const cleanData = rawData.replace("\n", " ");
                         let obj;
                         try {
                             if (cleanData.includes("html")) {
@@ -4945,18 +4945,18 @@ function Activity() {
                             } else {
                                 obj = JSON.parse(cleanData);
                             }
-                            for (let name in blocks.palettes.dict) {
+                            for (const name in blocks.palettes.dict) {
                                 blocks.palettes.dict[name].hideMenu(true);
                             }
 
                             stage.removeAllEventListeners("trashsignal");
 
-                            let __afterLoad = function () {
+                            const __afterLoad = function () {
                                 document.removeEventListener("finishedLoading", __afterLoad);
                             };
 
                             // Wait for the old blocks to be removed.
-                            let __listener = function (event) {
+                            const __listener = function (event) {
                                 blocks.loadNewBlocks(obj);
                                 stage.removeAllEventListeners("trashsignal");
 
@@ -4997,13 +4997,13 @@ function Activity() {
             }
         };
 
-        let __handleDragOver = function (event) {
+        const __handleDragOver = function (event) {
             event.stopPropagation();
             event.preventDefault();
             event.dataTransfer.dropEffect = "copy";
         };
 
-        let dropZone = docById("canvasHolder");
+        const dropZone = docById("canvasHolder");
         dropZone.addEventListener("dragover", __handleDragOver, false);
         dropZone.addEventListener("drop", __handleFileSelect, false);
 
@@ -5022,7 +5022,7 @@ function Activity() {
                 window.scroll(0, 0);
 
                 // Read file here.
-                let reader = new FileReader();
+                const reader = new FileReader();
 
                 reader.onload = function (theFile) {
                     loading = true;
@@ -5103,9 +5103,9 @@ function Activity() {
             "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(BASS)))
         );
 
-        let URL = window.location.href;
+        const URL = window.location.href;
         let projectID = null;
-        let flags = {
+        const flags = {
             run: false,
             show: false,
             collapse: false
@@ -5115,13 +5115,13 @@ function Activity() {
         _onResize(true);
 
         let urlParts;
-        let env = [];
+        const env = [];
 
         if (!sugarizerCompatibility.isInsideSugarizer() && URL.indexOf("?") > 0) {
             let args, url;
             urlParts = URL.split("?");
             if (urlParts[1].indexOf("&") > 0) {
-                let newUrlParts = urlParts[1].split("&");
+                const newUrlParts = urlParts[1].split("&");
                 for (let i = 0; i < newUrlParts.length; i++) {
                     if (newUrlParts[i].indexOf("=") > 0) {
                         args = newUrlParts[i].split("=");
@@ -5145,13 +5145,13 @@ function Activity() {
                                 break;
                             case "inurl":
                                 url = args[1];
-                                let getJSON = function (url) {
+                                const getJSON = function (url) {
                                     return new Promise(function (resolve, reject) {
-                                        let xhr = new XMLHttpRequest();
+                                        const xhr = new XMLHttpRequest();
                                         xhr.open("get", url, true);
                                         xhr.responseType = "json";
                                         xhr.onload = function () {
-                                            let status = xhr.status;
+                                            const status = xhr.status;
                                             if (status === 200) {
                                                 resolve(xhr.response);
                                             } else {
@@ -5165,7 +5165,7 @@ function Activity() {
                                 getJSON(url).then(
                                     function (data) {
                                         // console.debug('Your JSON result is:  ' + data.arg);
-                                        let n = data.arg;
+                                        const n = data.arg;
                                         env.push(parseInt(n));
                                     },
                                     function (status) {
@@ -5223,11 +5223,11 @@ function Activity() {
 
 activity = new Activity();
 
-require(['domReady!', 'activity/sugarizer-compatibility'], function (doc) {
+require(["domReady!", "activity/sugarizer-compatibility"], function (doc) {
     if (sugarizerCompatibility.isInsideSugarizer()) {
-        window.addEventListener('localized', function () {
+        window.addEventListener("localized", function () {
             sugarizerCompatibility.loadData(function () {
-                planet = document.getElementById('planet-iframe');
+                planet = document.getElementById("planet-iframe");
                 planet.onload = function () {
                     activity.domReady(doc);
                 };

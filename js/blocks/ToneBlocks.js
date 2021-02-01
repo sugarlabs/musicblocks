@@ -23,7 +23,7 @@ function setupToneBlocks() {
             let partials = 0;
 
             if (args.length === 2 && typeof args[1] === "number") {
-                for (let otype in OSCTYPES) {
+                for (const otype in OSCTYPES) {
                     if (OSCTYPES[otype][0] === args[0]) {
                         oscillatorType = OSCTYPES[otype][1];
                     } else if (OSCTYPES[otype][1] === args[0]) {
@@ -178,10 +178,10 @@ function setupToneBlocks() {
                 return;
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             if (tur.singer.inHarmonic.length > 0) {
-                let n = tur.singer.inHarmonic.length - 1;
+                const n = tur.singer.inHarmonic.length - 1;
                 tur.singer.partials[n].push(args[0]);
             } else {
                 //.TRANS: partials are weighted components in a harmonic series
@@ -222,15 +222,15 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             tur.singer.inHarmonic.push(blk);
             tur.singer.partials.push([]);
 
-            let listenerName = "_harmonic_" + turtle + "_" + blk;
+            const listenerName = "_harmonic_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = event => {
+            const __listener = event => {
                 tur.singer.inHarmonic.pop();
                 tur.singer.partials.pop();
             };
@@ -365,10 +365,10 @@ function setupToneBlocks() {
             super("phaser");
             this.setPalette("tone");
             this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5,
-                                    10, 20];
+                10, 20];
             this.piemenuValuesC2 = [1, 2, 3];
             this.piemenuValuesC3 = [220, 247, 262, 294, 330, 349, 392, 440,
-                                    494, 523, 587, 659, 698, 783, 880];
+                494, 523, 587, 659, 698, 783, 880];
             this.setHelpString([
                 _("The Phaser block adds a sweeping sound."),
                 "documentation",
@@ -507,7 +507,7 @@ function setupToneBlocks() {
 
         flow(args, logo, turtle, blk) {
             let voicename = null;
-            for (let voice in VOICENAMES) {
+            for (const voice in VOICENAMES) {
                 if (VOICENAMES[voice][0] === args[0]) {
                     voicename = VOICENAMES[voice][1];
                 } else if (VOICENAMES[voice][1] === args[0]) {
@@ -517,7 +517,7 @@ function setupToneBlocks() {
 
             // Maybe it is a drum?
             if (voicename === null) {
-                for (let drum in DRUMNAMES) {
+                for (const drum in DRUMNAMES) {
                     if (DRUMNAMES[drum][0] === args[0]) {
                         voicename = DRUMNAMES[drum][1];
                     } else if (DRUMNAMES[drum][1] === args[0]) {
@@ -526,16 +526,16 @@ function setupToneBlocks() {
                 }
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             if (voicename === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
             } else {
                 tur.singer.voices.push(voicename);
-                let listenerName = "_setvoice_" + turtle;
+                const listenerName = "_setvoice_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
-                let __listener = event => tur.singer.voices.pop();
+                const __listener = event => tur.singer.voices.pop();
 
                 logo.setTurtleListener(turtle, listenerName, __listener);
             }

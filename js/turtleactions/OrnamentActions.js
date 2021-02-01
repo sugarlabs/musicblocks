@@ -32,20 +32,20 @@ function setupOrnamentActions() {
          * @returns {void}
          */
         static setStaccato(value, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             tur.singer.staccato.push(1 / value);
 
-            let listenerName = "_staccato_" + turtle;
+            const listenerName = "_staccato_" + turtle;
             if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
-                let mouse = Mouse.getMouseFromTurtle(tur);
+                const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null)
                     mouse.MB.listeners.push(listenerName);
             }
 
-            let __listener = event => tur.singer.staccato.pop();
+            const __listener = event => tur.singer.staccato.pop();
 
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
@@ -59,7 +59,7 @@ function setupOrnamentActions() {
          * @returns {void}
          */
         static setSlur(value, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             tur.singer.staccato.push(-1 / value);
 
@@ -67,16 +67,16 @@ function setupOrnamentActions() {
                 logo.notation.notationBeginSlur(turtle);
             }
 
-            let listenerName = "_staccato_" + turtle;
+            const listenerName = "_staccato_" + turtle;
             if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
-                let mouse = Mouse.getMouseFromTurtle(tur);
+                const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null)
                     mouse.MB.listeners.push(listenerName);
             }
 
-            let __listener = event => {
+            const __listener = event => {
                 tur.singer.staccato.pop();
                 if (tur.singer.justCounting.length === 0) {
                     logo.notation.notationEndSlur(turtle);
@@ -96,22 +96,22 @@ function setupOrnamentActions() {
          * @returns {void}
          */
         static doNeighbor(interval, noteValue, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             tur.singer.inNeighbor.push(blk);
             tur.singer.neighborStepPitch.push(interval);
             tur.singer.neighborNoteValue.push(noteValue);
 
-            let listenerName = "_neighbor_" + turtle + "_" + blk;
+            const listenerName = "_neighbor_" + turtle + "_" + blk;
             if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
-                let mouse = Mouse.getMouseFromTurtle(tur);
+                const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null)
                     mouse.MB.listeners.push(listenerName);
             }
 
-            let __listener = event => {
+            const __listener = event => {
                 tur.singer.inNeighbor.pop();
                 tur.singer.neighborStepPitch.pop();
                 tur.singer.neighborNoteValue.pop();
@@ -119,5 +119,5 @@ function setupOrnamentActions() {
 
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
-    }
+    };
 }

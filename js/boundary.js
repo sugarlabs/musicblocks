@@ -49,9 +49,9 @@ class Boundary {
         this.dy = this.h - (55 + 26);
 
         const __makeBoundary = () => {
-            let img = new Image();
+            const img = new Image();
             img.onload = () => {
-                let bitmap = new createjs.Bitmap(img);
+                const bitmap = new createjs.Bitmap(img);
                 this._container.addChild(bitmap);
             };
             img.src =

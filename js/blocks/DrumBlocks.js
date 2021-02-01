@@ -257,7 +257,7 @@ function setupDrumBlocks() {
 
             let drumname = Singer.DrumActions.GetDrumname(args[0]);
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
             // If we are in a setdrum clamp, override the drum name
             if (tur.singer.drumStyle.length > 0) {
                 drumname = last(tur.singer.drumStyle);
@@ -289,7 +289,7 @@ function setupDrumBlocks() {
             ) {
                 Singer.DrumActions.playDrum(args[0], turtle, blk);
             } else {
-                console.debug('PLAY DRUM ERROR: missing context');
+                console.debug("PLAY DRUM ERROR: missing context");
                 return;
             }
 

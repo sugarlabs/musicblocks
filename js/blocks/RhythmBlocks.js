@@ -99,15 +99,15 @@ function setupRhythmBlocks() {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
             else if (args[0] <= 0)
                 logo.errorMsg(_("Note value must be greater than 0."), blk);
-            let value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
+            const value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
-            let _callback = () => {
-                let tur = logo.turtles.ithTurtle(turtle);
+            const _callback = () => {
+                const tur = logo.turtles.ithTurtle(turtle);
 
-                let queueBlock = new Queue(args[1], 1, blk, receivedArg);
+                const queueBlock = new Queue(args[1], 1, blk, receivedArg);
                 tur.parentFlowQueue.push(blk);
                 tur.queue.push(queueBlock);
-            }
+            };
 
             Singer.RhythmActions.playNote(value, "osctime", turtle, blk, _callback);
 
@@ -135,17 +135,17 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             tur.singer.swing.push(args[0]);
             tur.singer.swingTarget.push(null);
 
             tur.singer.swingCarryOver = 0;
 
-            let listenerName = "_swing_" + turtle;
+            const listenerName = "_swing_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = event => {
+            const __listener = event => {
                 if (!tur.singer.suppressOutput) {
                     tur.singer.swingTarget.pop();
                     tur.singer.swing.pop();
@@ -184,17 +184,17 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             tur.singer.swing.push(1 / args[0]);
             tur.singer.swingTarget.push(null);
 
             tur.singer.swingCarryOver = 0;
 
-            let listenerName = "_swing_" + turtle;
+            const listenerName = "_swing_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = event => {
+            const __listener = event => {
                 if (!tur.singer.suppressOutput) {
                     tur.singer.swingTarget.pop();
                     tur.singer.swing.pop();
@@ -256,9 +256,9 @@ function setupRhythmBlocks() {
                 args[0] === null || typeof args[0] !== "number" || args[0] <= 0 ||
                 args[1] === null || typeof args[1] !== "number" || args[1] <= 0
             )   logo.errorMsg(NOINPUTERRORMSG, blk);
-            let arg0 =
+            const arg0 =
                 args[0] === null || typeof args[0] !== "number" || args[0] <= 0 ? 1 / 24 : args[0];
-            let arg1 =
+            const arg1 =
                 args[1] === null || typeof args[1] !== "number" || args[1] <= 0 ? 1 / 8 : args[1];
 
             Singer.RhythmActions.addSwing(arg0, arg1, turtle, blk);
@@ -293,14 +293,14 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
-            let arg = args[0] === null ? 0 : args[0];
+            const tur = logo.turtles.ithTurtle(turtle);
+            const arg = args[0] === null ? 0 : args[0];
             tur.singer.skipFactor += arg;
 
-            let listenerName = "_skip_" + turtle;
+            const listenerName = "_skip_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = event => {
+            const __listener = event => {
                 tur.singer.skipFactor -= arg;
             };
 
@@ -413,8 +413,8 @@ function setupRhythmBlocks() {
             if (args[0] === null) logo.errorMsg(NOINPUTERRORMSG, blk);
             let arg = 1;
 
-            let tur = logo.turtles.ithTurtle(turtle);
-            let currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
+            const tur = logo.turtles.ithTurtle(turtle);
+            const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
             tur.singer.beatFactor *= currentDotFactor;
             if (arg >= 0) {
                 tur.singer.dotCount += arg;
@@ -425,17 +425,17 @@ function setupRhythmBlocks() {
                 tur.singer.dotCount += 1 / arg;
             }
 
-            let newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
+            const newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
             tur.singer.beatFactor /= newDotFactor;
 
-            let listenerName = "_dot_" + turtle;
+            const listenerName = "_dot_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = event => {
-                let currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
+            const __listener = event => {
+                const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
                 tur.singer.beatFactor *= currentDotFactor;
                 tur.singer.dotCount -= arg >= 0 ? arg : 1 / arg;
-                let newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
+                const newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
                 tur.singer.beatFactor /= newDotFactor;
             };
 
@@ -477,7 +477,7 @@ function setupRhythmBlocks() {
 
         flow(args, logo, turtle, blk) {
             if (args[0] === null) logo.errorMsg(NOINPUTERRORMSG, blk);
-            let arg = args[0] === null ? 0 : args[0];
+            const arg = args[0] === null ? 0 : args[0];
 
             Singer.RhythmActions.doRhythmicDot(arg, turtle ,blk);
 
@@ -525,7 +525,7 @@ function setupRhythmBlocks() {
                 name:
                     this.lang === "ja"
                         ? //.TRANS: Japanese only: note value block for drum
-                          _("note value drum")
+                        _("note value drum")
                         : _("note value") + " " + _("drum"),
                 args: 1,
                 canCollapse: true
@@ -730,15 +730,15 @@ function setupRhythmBlocks() {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
             else if (args[0] <= 0)
                 logo.errorMsg(_("Note value must be greater than 0."), blk);
-            let value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
+            const value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
-            let _callback = () => {
-                let tur = logo.turtles.ithTurtle(turtle);
+            const _callback = () => {
+                const tur = logo.turtles.ithTurtle(turtle);
 
-                let queueBlock = new Queue(args[1], 1, blk, receivedArg);
+                const queueBlock = new Queue(args[1], 1, blk, receivedArg);
                 tur.parentFlowQueue.push(blk);
                 tur.queue.push(queueBlock);
-            }
+            };
 
             Singer.RhythmActions.playNote(value, "note", turtle, blk, _callback);
 
@@ -794,15 +794,15 @@ function setupRhythmBlocks() {
             else if (args[0] <= 0)
                 logo.errorMsg(_("Note value must be greater than 0."), blk);
 
-            let value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
+            const value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
-            let _callback = () => {
-                let tur = logo.turtles.ithTurtle(turtle);
+            const _callback = () => {
+                const tur = logo.turtles.ithTurtle(turtle);
 
-                let queueBlock = new Queue(args[1], 1, blk, receivedArg);
+                const queueBlock = new Queue(args[1], 1, blk, receivedArg);
                 tur.parentFlowQueue.push(blk);
                 tur.queue.push(queueBlock);
-            }
+            };
 
             Singer.RhythmActions.playNote(value, "newnote", turtle, blk, _callback);
 

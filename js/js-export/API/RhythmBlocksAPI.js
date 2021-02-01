@@ -24,14 +24,14 @@
  */
 class RhythmBlocksAPI {
     async playNote(value, flow) {
-        let args = JSInterface.validateArgs("playNote", [value, flow]);
+        const args = JSInterface.validateArgs("playNote", [value, flow]);
         await this.runCommand("playNote", [args[0], "newnote", this.turIndex, MusicBlocks.BLK]);
         await args[1]();
         return this.ENDFLOWCOMMAND;
     }
 
     async playNoteMillis(value, flow) {
-        let args = JSInterface.validateArgs("playNoteMillis", [value, flow]);
+        const args = JSInterface.validateArgs("playNoteMillis", [value, flow]);
         await this.runCommand("playNote", [args[0], "osctime", this.turIndex, MusicBlocks.BLK]);
         await args[1]();
         return this.ENDFLOWCOMMAND;
@@ -42,28 +42,28 @@ class RhythmBlocksAPI {
     }
 
     async dot(value, flow) {
-        let args = JSInterface.validateArgs("dot", [value, flow]);
+        const args = JSInterface.validateArgs("dot", [value, flow]);
         await this.runCommand("doRhythmicDot", [args[0], this.turIndex]);
         await args[1]();
         return this.ENDFLOWCOMMAND;
     }
 
     async tie(flow) {
-        let args = JSInterface.validateArgs("tie", [flow]);
+        const args = JSInterface.validateArgs("tie", [flow]);
         await this.runCommand("doTie", [this.turIndex]);
         await args[1]();
         return this.ENDFLOWCOMMAND;
     }
 
     async multiplyNoteValue(factor, flow) {
-        let args = JSInterface.validateArgs("multiplyNoteValue", [factor, flow]);
+        const args = JSInterface.validateArgs("multiplyNoteValue", [factor, flow]);
         await this.runCommand("multiplyNoteValue", [args[0], this.turIndex]);
         await args[1]();
         return this.ENDFLOWCOMMAND;
     }
 
     async swing(swingValue, noteValue, flow) {
-        let args = JSInterface.validateArgs("multiplyNoteValue", [swingValue, noteValue, flow]);
+        const args = JSInterface.validateArgs("multiplyNoteValue", [swingValue, noteValue, flow]);
         await this.runCommand("addSwing", [args[0], args[1], this.turIndex]);
         await args[2]();
         return this.ENDFLOWCOMMAND;

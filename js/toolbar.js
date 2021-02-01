@@ -22,7 +22,7 @@ class Toolbar {
     }
 
     renderLogoIcon(onclick) {
-        let logoIcon = docById("mb-logo");
+        const logoIcon = docById("mb-logo");
         if (this.language === "ja") {
             logoIcon.innerHTML =
                 '<img style="width: 100%;" src="images/logo-ja.svg">';
@@ -42,8 +42,8 @@ class Toolbar {
     }
 
     renderPlayIcon(onclick) {
-        let playIcon = docById("play");
-        let stopIcon = docById("stop");
+        const playIcon = docById("play");
+        const stopIcon = docById("stop");
 
         playIcon.onclick = () => {
             onclick();
@@ -52,7 +52,7 @@ class Toolbar {
     }
 
     renderStopIcon(onclick) {
-        let stopIcon = docById("stop");
+        const stopIcon = docById("stop");
 
         stopIcon.onclick = () => {
             onclick();
@@ -61,7 +61,7 @@ class Toolbar {
     }
 
     renderNewProjectIcon(onclick) {
-        let newProjectIcon = docById("new-project");
+        const newProjectIcon = docById("new-project");
 
         newProjectIcon.onclick = () => {
             onclick();
@@ -69,7 +69,7 @@ class Toolbar {
     }
 
     renderLoadIcon(onclick) {
-        let loadIcon = docById("load");
+        const loadIcon = docById("load");
 
         loadIcon.onclick = () => {
             onclick();
@@ -78,7 +78,7 @@ class Toolbar {
 
     // let wrapTurtleTooltipData = "Wrap Turtle Off";
     renderWrapIcon() {
-        let wrapIcon = docById("wrapTurtle");
+        const wrapIcon = docById("wrapTurtle");
         let wrapButtonTooltipData = "Turtle Wrap Off";
 
         wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
@@ -113,8 +113,8 @@ class Toolbar {
         abc_onclick,
         mxml_onclick,
         blockartworksvg_onclick) {
-        let saveButton = docById("saveButton");
-        let saveButtonAdvanced = docById("saveButtonAdvanced");
+        const saveButton = docById("saveButton");
+        const saveButtonAdvanced = docById("saveButtonAdvanced");
         let saveHTML;
         let savePNG;
         let saveWAV;
@@ -233,7 +233,7 @@ class Toolbar {
                     };
                 }
 
-                let saveArtworkSVG = docById("save-blockartwork-svg");
+                const saveArtworkSVG = docById("save-blockartwork-svg");
 
                 saveArtworkSVG.onclick = () => {
                     blockartworksvg_onclick();
@@ -243,8 +243,8 @@ class Toolbar {
     }
 
     renderPlanetIcon(planet, onclick) {
-        let planetIcon = docById("planetIcon");
-        let planetIconDisabled = docById("planetIconDisabled");
+        const planetIcon = docById("planetIcon");
+        const planetIconDisabled = docById("planetIconDisabled");
 
         if (planet) {
             planetIcon.onclick = () => {
@@ -260,8 +260,8 @@ class Toolbar {
     }
 
     renderMenuIcon(onclick) {
-        let menuIcon = docById("menu");
-        let auxToolbar = docById("aux-toolbar");
+        const menuIcon = docById("menu");
+        const auxToolbar = docById("aux-toolbar");
         menuIcon.onclick = () => {
             if (auxToolbar.style.display == "" ||
                 auxToolbar.style.display == "none") {
@@ -275,11 +275,11 @@ class Toolbar {
                 menuIcon.innerHTML = "menu";
                 docById("toggleAuxBtn").className -= "blue darken-1";
             }
-        }
+        };
     }
 
     renderRunSlowlyIcon(onclick) {
-        let runSlowlyIcon = docById("runSlowlyIcon");
+        const runSlowlyIcon = docById("runSlowlyIcon");
         if (_THIS_IS_MUSIC_BLOCKS_ && beginnerMode && language === "ja") {
             runSlowlyIcon.style.display = "none";
         }
@@ -291,7 +291,7 @@ class Toolbar {
     }
 
     renderHelpIcon(onclick) {
-        let helpIcon = docById("helpIcon");
+        const helpIcon = docById("helpIcon");
 
         helpIcon.onclick = () => {
             onclick();
@@ -300,8 +300,8 @@ class Toolbar {
 
     renderModeSelectIcon(onclick) {
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            let begIcon = docById("beginnerMode");
-            let advIcon = docById("advancedMode");
+            const begIcon = docById("beginnerMode");
+            const advIcon = docById("advancedMode");
             if (begIcon.style.display === "none") {
                 advIcon.onclick = () => {
                     onclick();
@@ -315,7 +315,7 @@ class Toolbar {
     }
 
     renderRunSlowlyIcon(onclick) {
-        let runSlowlyIcon = docById("runSlowlyIcon");
+        const runSlowlyIcon = docById("runSlowlyIcon");
         if (_THIS_IS_MUSIC_BLOCKS_ && beginnerMode && this.language === "ja") {
             runSlowlyIcon.style.display = "none";
         }
@@ -327,7 +327,7 @@ class Toolbar {
     }
 
     renderRunStepIcon(onclick) {
-        let runStepByStepIcon = docById("runStepByStepIcon");
+        const runStepByStepIcon = docById("runStepByStepIcon");
         if (_THIS_IS_MUSIC_BLOCKS_ && beginnerMode && this.language === "ja") {
             runStepByStepIcon.style.display = "none";
         }
@@ -344,11 +344,11 @@ class Toolbar {
         delPlugin_onclick,
         setScroller,
         _setupBlocksContainerEvents) {
-        let displayStatsIcon = docById("displayStatsIcon");
-        let loadPluginIcon = docById("loadPluginIcon");
-        let delPluginIcon = docById("delPluginIcon");
-        let enableHorizScrollIcon = docById("enableHorizScrollIcon");
-        let disableHorizScrollIcon = docById("disableHorizScrollIcon");
+        const displayStatsIcon = docById("displayStatsIcon");
+        const loadPluginIcon = docById("loadPluginIcon");
+        const delPluginIcon = docById("delPluginIcon");
+        const enableHorizScrollIcon = docById("enableHorizScrollIcon");
+        const disableHorizScrollIcon = docById("disableHorizScrollIcon");
 
         if (!_THIS_IS_MUSIC_BLOCKS_ || !beginnerMode) {
             displayStatsIcon.onclick = () => {
@@ -389,7 +389,7 @@ class Toolbar {
     //     }
     // }
     renderMergeIcon(onclick) {
-        let mergeWithCurrentIcon = docById("mergeWithCurrentIcon");
+        const mergeWithCurrentIcon = docById("mergeWithCurrentIcon");
 
         mergeWithCurrentIcon.onclick = () => {
             onclick();
@@ -397,7 +397,7 @@ class Toolbar {
     }
 
     renderRestoreIcon(onclick) {
-        let restoreIcon = docById("restoreIcon");
+        const restoreIcon = docById("restoreIcon");
 
         restoreIcon.onclick = () => {
             onclick();
@@ -405,7 +405,7 @@ class Toolbar {
     }
 
     renderChooseKeyIcon(onclick) {
-        let chooseKeyIcon = docById("chooseKeyIcon");
+        const chooseKeyIcon = docById("chooseKeyIcon");
         docById("chooseKeyDiv").style.display = "none";
         chooseKeyIcon.onclick = () => {
             onclick();
@@ -417,99 +417,99 @@ class Toolbar {
     }
 
     renderLanguageSelectIcon(languageBox) {
-        let languageSelectIcon = docById("languageSelectIcon");
+        const languageSelectIcon = docById("languageSelectIcon");
         languageSelectIcon.onclick = () => {
-            let enUS = docById("enUS");
+            const enUS = docById("enUS");
 
             enUS.onclick = () => {
                 languageBox.enUS_onclick();
             };
 
-            let enUK = docById("enUK");
+            const enUK = docById("enUK");
 
             enUK.onclick = () => {
                 languageBox.enUK_onclick();
             };
 
-            let es = docById("es");
+            const es = docById("es");
 
             es.onclick = () => {
                 languageBox.es_onclick();
             };
 
-            let pt = docById("pt");
+            const pt = docById("pt");
 
             pt.onclick = () => {
                 languageBox.pt_onclick();
             };
 
-            let ko = docById("ko");
+            const ko = docById("ko");
 
             ko.onclick = () => {
                 languageBox.ko_onclick();
             };
 
-            let ja = docById("ja");
+            const ja = docById("ja");
 
             ja.onclick = () => {
                 languageBox.ja_onclick();
             };
 
-            let kana = docById("kana");
+            const kana = docById("kana");
 
             kana.onclick = () => {
                 languageBox.kana_onclick();
             };
 
-            let zhCN = docById("zhCN");
+            const zhCN = docById("zhCN");
 
             zhCN.onclick = () => {
                 languageBox.zhCN_onclick();
             };
 
-            let th = docById("th");
+            const th = docById("th");
 
             th.onclick = () => {
                 languageBox.th_onclick();
             };
 
-            let ayc = docById("ayc");
+            const ayc = docById("ayc");
 
             ayc.onclick = () => {
                 languageBox.ayc_onclick();
             };
 
-            let quz = docById("quz");
+            const quz = docById("quz");
 
             quz.onclick = () => {
                 languageBox.quz_onclick();
             };
 
-            let gug = docById("gug");
+            const gug = docById("gug");
 
             gug.onclick = () => {
                 languageBox.gug_onclick();
             };
 
-            let hi = docById("hi");
+            const hi = docById("hi");
 
             hi.onclick = () => {
                 languageBox.hi_onclick();
             };
 
-            let ibo = docById("ibo");
+            const ibo = docById("ibo");
 
             ibo.onclick = () => {
                 languageBox.ibo_onclick();
             };
 
-            let ar = docById("ar");
+            const ar = docById("ar");
 
             ar.onclick = () => {
                 languageBox.ar_onclick();
             };
 
-            let he = docById("he");
+            const he = docById("he");
 
             he.onclick = () => {
                 languageBox.he_onclick();
@@ -706,8 +706,8 @@ class Toolbar {
         }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            let beginnerMode = docById("beginnerMode");
-            let advancedMode = docById("advancedMode");
+            const beginnerMode = docById("beginnerMode");
+            const advancedMode = docById("advancedMode");
             if (mode || mode === "null") {
                 advancedMode.style.display = "block";
                 beginnerMode.style.display = "none";
@@ -718,9 +718,9 @@ class Toolbar {
         }
 
         for (let i = 0; i < strings.length; i++) {
-            let obj = strings[i];
-            let trans = strings_[i];
-            let elem = docById(obj[0]);
+            const obj = strings[i];
+            const trans = strings_[i];
+            const elem = docById(obj[0]);
             if (strings[i].length === 3) {
                 elem.innerHTML = obj[1];
             } else {
@@ -750,7 +750,7 @@ class Toolbar {
     closeAuxToolbar = (onclick) => {
         if (auxToolbar.style.display === "block") {
             onclick(false);
-            let menuIcon = docById("menu");
+            const menuIcon = docById("menu");
             auxToolbar.style.display = "none";
             menuIcon.innerHTML = "menu";
             docById("toggleAuxBtn").className -= "blue darken-1";

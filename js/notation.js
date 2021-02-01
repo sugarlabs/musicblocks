@@ -138,9 +138,9 @@ class Notation {
      * @returns {void}
      */
     doUpdateNotation(note, duration, turtle, insideChord, drum) {
-        let obj = durationToNoteValue(duration);
+        const obj = durationToNoteValue(duration);
 
-        let tur = this._logo.turtles.ithTurtle(turtle);
+        const tur = this._logo.turtles.ithTurtle(turtle);
 
         this._notationStaging[turtle].push([
             note,
@@ -159,7 +159,7 @@ class Notation {
                 ["R"], obj[0], obj[1], obj[2], obj[3], insideChord, false
             ]);
         } else if (["noise1", "noise2", "noise3"].indexOf(drum[0]) === -1) {
-            let drumSymbol = getDrumSymbol(drum[0]);
+            const drumSymbol = getDrumSymbol(drum[0]);
             this._notationDrumStaging[turtle].push([
                 [drumSymbol], obj[0], obj[1], obj[2], obj[3], insideChord, false
             ]);
@@ -170,7 +170,7 @@ class Notation {
         if (typeof note === "object") {
             if (turtle in this._markup) {
                 for (let i = 0; i < this._markup[turtle].length; i++) {
-                    let markup = this._markup[turtle][i];
+                    const markup = this._markup[turtle][i];
                     if (typeof markup === "number") {   // Hertz block
                         this._notationMarkup(turtle, toFixed2(markup), false);
                     } else if (markup.length > 0) {     // Print block
@@ -250,16 +250,16 @@ class Notation {
     notationMeter(turtle, count, value) {
         if (this._pickupPoint[turtle] != null) {
             // Lilypond prefers meter to be before partials.
-            let d = this._notationStaging[turtle].length - this._pickupPoint[turtle];
-            let pickup = [];
+            const d = this._notationStaging[turtle].length - this._pickupPoint[turtle];
+            const pickup = [];
 
-            for (let i in d) {
+            for (const i in d) {
                 pickup.push(this._notationStaging[turtle].pop());
             }
 
             this._notationStaging[turtle].push("meter", count, value);
 
-            for (let i in d) {
+            for (const i in d) {
                 this._notationStaging[turtle].push(pickup.pop());
             }
         } else {
@@ -288,11 +288,11 @@ class Notation {
      * @returns {void}
      */
     notationTempo(turtle, bpm, beatValue) {
-        let beat = convertFactor(beatValue);
+        const beat = convertFactor(beatValue);
         if (beat !== null) {
             this._notationStaging[turtle].push("tempo", bpm, beat);
         } else {
-            let obj = rationalToFraction(beatValue);
+            const obj = rationalToFraction(beatValue);
             // this.errorMsg(_('Lilypond cannot process tempo of ') + obj[0] + '/' + obj[1] + ' = ' + bpm);
         }
     }
@@ -310,11 +310,11 @@ class Notation {
             return;
         }
 
-        let pickupPoint = this._notationStaging[turtle].length;
+        const pickupPoint = this._notationStaging[turtle].length;
 
         // Lilypond partial must be a combination of powers of two.
-        let beat = convertFactor(factor);
-	let obj;
+        const beat = convertFactor(factor);
+        let obj;
         if (beat !== null) {
             this._notationStaging[turtle].push("pickup", beat);
             this._pickupPOW2[turtle] = true;

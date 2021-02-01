@@ -36,7 +36,7 @@
 // correct.
 
 function blockIsMacro(blkname) {
-    let protoBlock = blocks.protoBlockDict[blkname];
+    const protoBlock = blocks.protoBlockDict[blkname];
     if (protoBlock && protoBlock.macroFunc) return true;
 
     const BLOCKISMACRO = [
@@ -115,7 +115,7 @@ function blockIsMacro(blkname) {
 }
 
 function getMacroExpansion(blkname, x, y) {
-    let protoBlock = blocks.protoBlockDict[blkname];
+    const protoBlock = blocks.protoBlockDict[blkname];
     if (protoBlock && protoBlock.macroFunc) return protoBlock.macroFunc(x, y);
 
     // Some blocks are expanded on load.
@@ -716,7 +716,7 @@ function getMacroExpansion(blkname, x, y) {
         [8, "playdrum", 0, 0, [4, 9, null]],
         [9, ["drumname", { value: "kick drum" }], 0, 0, [8]],
         [10, ["action", { collapsed: false }], x, y + 200,
-         [null, 11, 12, null]],
+            [null, 11, 12, null]],
         [11, ["text", { value: "action" }], 0, 0, [10]],
         [12, "hidden", 0, 0, [10, 13]],
         [13, "setshade", 0, 0, [12, 18, 14]],
@@ -1713,7 +1713,7 @@ function getMacroExpansion(blkname, x, y) {
     };
 
     if (["namedbox", "nameddo", "namedcalc",
-         "namedarg", "nameddoArg"].indexOf(blkname) === -1 &&
+        "namedarg", "nameddoArg"].indexOf(blkname) === -1 &&
         blkname in BUILTINMACROS) {
         return BUILTINMACROS[blkname];
     } else {

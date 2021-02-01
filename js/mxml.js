@@ -21,7 +21,7 @@ saveMxmlOutput = function(logo) {
     let res = "";
     let indent = 0;
 
-    let add = function(str) {
+    const add = function(str) {
         for (let i = 0; i < indent; i++) {
             res += "    ";
         }
@@ -80,15 +80,15 @@ saveMxmlOutput = function(logo) {
         let firstMeasure = true;
         indent++;
         let divisionsLeft = divisions;
-        let notes = logo.notation.notationStaging[voice];
+        const notes = logo.notation.notationStaging[voice];
 
         console.log(notes);
-        let cnter = 0;
+        const cnter = 0;
         console.log(notes.length);
 
         for (let i = 0; i < notes.length; i += 1) {
             // obj = [note, duration, dotCount, tupletValue, roundDown, insideChord, staccato]
-            let obj = notes[i];
+            const obj = notes[i];
             if (["tie", "begin slur", "end slur"].includes(obj)) {
                 continue;
             }
@@ -143,9 +143,9 @@ saveMxmlOutput = function(logo) {
             }
 
             if (obj === "tempo") {
-                let bpm = notes[i + 1];
-                let beatMeasure = notes[i + 2];
-                let bpmAdjusted = Math.floor(bpm * (4 / beatMeasure));
+                const bpm = notes[i + 1];
+                const beatMeasure = notes[i + 2];
+                const bpmAdjusted = Math.floor(bpm * (4 / beatMeasure));
 
                 if (openedMeasureTag) {
                     add('<sound tempo="' + bpmAdjusted + '"/>');
@@ -175,7 +175,7 @@ saveMxmlOutput = function(logo) {
 
             // We only add </chord> tag to the non-first elements in a chord
             let isChordNote = false;
-            for (let p of obj[0]) {
+            for (const p of obj[0]) {
                 console.log("pitch is " + obj[0][0]);
                 console.log("type of duration note is " + obj[1]);
                 console.log("number of dots is " + obj[2]);

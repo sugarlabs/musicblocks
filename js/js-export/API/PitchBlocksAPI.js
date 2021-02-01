@@ -24,77 +24,77 @@
  */
 class PitchBlocksAPI {
     playPitch(note, octave) {
-        let args = JSInterface.validateArgs("playPitch", [note, octave]);
+        const args = JSInterface.validateArgs("playPitch", [note, octave]);
         return this.runCommand("playPitch", [args[0], args[1], 0, this.turIndex, MusicBlocks.BLK]);
     }
 
     stepPitch(value) {
-        let args = JSInterface.validateArgs("stepPitch", [value]);
+        const args = JSInterface.validateArgs("stepPitch", [value]);
         return this.runCommand("stepPitch", [args[0], this.turIndex]);
     }
 
     playNthModalPitch(number, octave) {
-        let args = JSInterface.validateArgs("playNthModalPitch", [number, octave]);
+        const args = JSInterface.validateArgs("playNthModalPitch", [number, octave]);
         return this.runCommand(
             "playNthModalPitch", [args[0], args[1], this.turIndex, MusicBlocks.BLK]
         );
     }
 
     playPitchNumber(number) {
-        let args = JSInterface.validateArgs("playPitchNumber", [number]);
+        const args = JSInterface.validateArgs("playPitchNumber", [number]);
         return this.runCommand("playPitchNumber", [args[0], this.turIndex, MusicBlocks.BLK]);
     }
 
     playHertz(value) {
-        let args = JSInterface.validateArgs("playHertz", [value]);
+        const args = JSInterface.validateArgs("playHertz", [value]);
         return this.runCommand("playHertz", [args[0], this.turIndex]);
     }
 
     async setAccidental(accidental, flow) {
-        let args = JSInterface.validateArgs("setAccidental", [accidental, flow]);
+        const args = JSInterface.validateArgs("setAccidental", [accidental, flow]);
         await this.runCommand("setAccidental", [args[0], this.turIndex, MusicBlocks.BLK]);
         await args[1]();
         return this.ENDFLOWCOMMAND;
     }
 
     async setScalarTranspose(value, flow) {
-        let args = JSInterface.validateArgs("setScalarTranspose", [value, flow]);
+        const args = JSInterface.validateArgs("setScalarTranspose", [value, flow]);
         await this.runCommand("setScalarTranspose", [args[0], this.turIndex]);
         await args[1]();
         return this.ENDFLOWCOMMAND;
     }
 
     async setSemitoneTranspose(value, flow) {
-        let args = JSInterface.validateArgs("setSemitoneTranspose", [value, flow]);
+        const args = JSInterface.validateArgs("setSemitoneTranspose", [value, flow]);
         await this.runCommand("setSemitoneTranspose", [args[0], this.turIndex]);
         await args[1]();
         return this.ENDFLOWCOMMAND;
     }
 
     setRegister(value) {
-        let args = JSInterface.validateArgs("setRegister", [value]);
+        const args = JSInterface.validateArgs("setRegister", [value]);
         return this.runCommand("setRegister", [args[0], this.turIndex]);
     }
 
     async invert(name, octave, mode, flow) {
-        let args = JSInterface.validateArgs("invert", [name, octave, mode, flow]);
+        const args = JSInterface.validateArgs("invert", [name, octave, mode, flow]);
         await this.runCommand("invert", [args[0], args[1], args[2], this.turIndex]);
         await args[3]();
         return this.ENDFLOWCOMMAND;
     }
 
     setPitchNumberOffset(pitch, octave) {
-        let args = JSInterface.validateArgs("setPitchNumberOffset", [pitch, octave]);
+        const args = JSInterface.validateArgs("setPitchNumberOffset", [pitch, octave]);
         return this.runCommand("setPitchNumberOffset", [args[0], args[1], this.turIndex]);
     }
 
     numToPitch(number) {
-        let args = JSInterface.validateArgs("numToPitch", [number]);
+        const args = JSInterface.validateArgs("numToPitch", [number]);
         return Singer.PitchActions.numToPitch(args[0], "pitch", this.turIndex);
     }
 
     numToOctave(number) {
-        let args = JSInterface.validateArgs("numToOctave", [number]);
+        const args = JSInterface.validateArgs("numToOctave", [number]);
         return Singer.PitchActions.numToPitch(args[0], "octave", this.turIndex);
     }
 

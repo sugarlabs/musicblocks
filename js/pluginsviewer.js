@@ -44,21 +44,21 @@ class PluginsViewer {
         this.page = 0;
         if (this.server) {
             try {
-                let rawData = httpGet();
-                let obj = JSON.parse(rawData);
+                const rawData = httpGet();
+                const obj = JSON.parse(rawData);
                 // console.debug('json parse: ' + obj);
                 // Look for svg
-                for (let file in obj) {
+                for (const file in obj) {
                     if (fileExt(obj[file]) === "svg") {
-                        let name = fileBasename(obj[file]);
+                        const name = fileBasename(obj[file]);
                         if (this.pluginFiles.indexOf(name) === -1) {
                             this.pluginFiles.push(name);
                         }
                     }
                 }
                 // and corresponding .json files
-                for (let file in this.pluginFiles) {
-                    let tbfile = this.pluginFiles[file] + ".json";
+                for (const file in this.pluginFiles) {
+                    const tbfile = this.pluginFiles[file] + ".json";
                     if (!tbfile in obj) {
                         this.pluginFiles.remove(this.pluginFiles[file]);
                     }
@@ -100,11 +100,11 @@ class PluginsViewer {
                         viewer.completeInit();
                         loadThumbnailContainerHandler(viewer);
                         return true;
-                    }
+                    };
                     makeViewerBitmap(viewer,NEXTBUTTON,"viewer",processNext,null);
-                }
+                };
                 makeViewerBitmap(viewer,PREVBUTTON,"viewer",processPrev,null);
-            }
+            };
             makeViewerBitmap(this,BACKGROUND,"viewer",processBackground,null);
         } else {
             this.container.visible = true;
@@ -115,15 +115,15 @@ class PluginsViewer {
     }
 
     downloadImage(p, prepareNextImage) {
-        let header = "data:image/svg+xml;utf8,";
-        let name = this.pluginFiles[p] + ".svg";
+        const header = "data:image/svg+xml;utf8,";
+        const name = this.pluginFiles[p] + ".svg";
         // console.debug('getting ' + name + ' from samples');
         let data = header + SAMPLESSVG[name];
         if (this.server) {
             data = header + httpGet(name);
         }
-        let image = new Image();
-        let viewer = this;
+        const image = new Image();
+        const viewer = this;
 
         image.onload = () => {
             bitmap = new createjs.Bitmap(data);
@@ -149,7 +149,7 @@ class PluginsViewer {
     }
 
     completeInit() {
-        let p = 0;
+        const p = 0;
         this.prepareNextImage(this, p);
     }
 
@@ -204,8 +204,8 @@ function hideCurrentPage(viewer) {
 }
 
 function showNextPage(viewer) {
-    let min = viewer.page * 16;
-    let max = Math.min(viewer.pluginFiles.length, (viewer.page + 1) * 16);
+    const min = viewer.page * 16;
+    const max = Math.min(viewer.pluginFiles.length, (viewer.page + 1) * 16);
     // Hide the current page.
     for (let p = min; p < max; p++) {
         viewer.dict[viewer.pluginFiles[p]].visible = false;
@@ -221,8 +221,8 @@ function showNextPage(viewer) {
 }
 
 function viewerClicked(viewer, event) {
-    let x = event.stageX / viewer.scale - viewer.container.x;
-    let y = event.stageY / viewer.scale - viewer.container.y;
+    const x = event.stageX / viewer.scale - viewer.container.x;
+    const y = event.stageY / viewer.scale - viewer.container.y;
     if (x > 600 && y < 55) {
         viewer.hide();
         viewer.closeViewer();
@@ -234,9 +234,9 @@ function viewerClicked(viewer, event) {
         }
     } else {
         // Select a plugin.
-        let col = Math.floor((x - 5) / 160);
-        let row = Math.floor((y - 55) / 120);
-        let p = row * 4 + col + 16 * viewer.page;
+        const col = Math.floor((x - 5) / 160);
+        const row = Math.floor((y - 55) / 120);
+        const p = row * 4 + col + 16 * viewer.page;
         if (p < viewer.pluginFiles.length) {
             viewer.hide();
             viewer.closeViewer();
@@ -246,9 +246,9 @@ function viewerClicked(viewer, event) {
 }
 
 function loadThumbnailContainerHandler(viewer) {
-    let hitArea = new createjs.Shape();
-    let w = 650;
-    let h = 590;
+    const hitArea = new createjs.Shape();
+    const w = 650;
+    const h = 590;
     let startX, startY, endX, endY;
     hitArea.graphics.beginFill("#FFF").drawRect(0, 0, w, h);
     hitArea.x = 0;
@@ -299,7 +299,7 @@ function loadThumbnailContainerHandler(viewer) {
 function makeViewerBitmap(viewer, data, name, callback, extras) {
     // Async creation of bitmap from SVG data
     // Works with Chrome, Safari, Firefox (untested on IE)
-    let img = new Image();
+    const img = new Image();
     img.onload = () => {
         bitmap = new createjs.Bitmap(img);
         callback(viewer, name, bitmap, extras);

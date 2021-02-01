@@ -35,7 +35,7 @@ function setupIntervalsActions() {
          */
         static GetModename(mode) {
             let modename = "major";
-            for (let _mode in MUSICALMODES) {
+            for (const _mode in MUSICALMODES) {
                 if (_mode === mode || _(_mode) === mode) {
                     modename = _mode;
                     break;
@@ -56,12 +56,12 @@ function setupIntervalsActions() {
          * @returns {void}
          */
         static setKey(key, mode, turtle) {
-            let modename = Singer.IntervalsActions.GetModename(mode);
+            const modename = Singer.IntervalsActions.GetModename(mode);
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
             // Check to see if there are any transpositions on the key
             if (tur.singer.transposition !== 0) {
-                let noteObj = getNote(
+                const noteObj = getNote(
                     key,
                     4,
                     tur.singer.transposition,
@@ -88,7 +88,7 @@ function setupIntervalsActions() {
          * @returns {String}
          */
         static getCurrentKey(turtle) {
-            return logo.turtles.ithTurtle(turtle).singer.keySignature.split(' ')[0];
+            return logo.turtles.ithTurtle(turtle).singer.keySignature.split(" ")[0];
         }
 
         /**
@@ -100,7 +100,7 @@ function setupIntervalsActions() {
          * @returns {String}
          */
         static getCurrentMode(turtle) {
-            return logo.turtles.ithTurtle(turtle).singer.keySignature.split(' ')[1];
+            return logo.turtles.ithTurtle(turtle).singer.keySignature.split(" ")[1];
         }
 
         /**
@@ -139,7 +139,7 @@ function setupIntervalsActions() {
          * @returns {void}
          */
         static defineMode(name, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             tur.singer.inDefineMode = true;
             tur.singer.defineMode = [];
@@ -151,23 +151,23 @@ function setupIntervalsActions() {
                 modeName = args[0].toLowerCase();
             }
 
-            let listenerName = "_definemode_" + turtle;
+            const listenerName = "_definemode_" + turtle;
             if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
-                let mouse = Mouse.getMouseFromTurtle(tur);
+                const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null)
                     mouse.MB.listeners.push(listenerName);
             }
 
-            let __listener = event => {
+            const __listener = event => {
                 MUSICALMODES[modeName] = [];
                 if (tur.singer.defineMode.indexOf(0) === -1) {
                     tur.singer.defineMode.push(0);
                     logo.errorMsg(_("Adding missing pitch number 0."));
                 }
 
-                let pitchNumbers = tur.singer.defineMode.sort((a, b) => a[0] - b[0]);
+                const pitchNumbers = tur.singer.defineMode.sort((a, b) => a[0] - b[0]);
 
                 for (let i = 0; i < pitchNumbers.length; i++) {
                     if (pitchNumbers[i] < 0 || pitchNumbers[i] > 11) {
@@ -189,7 +189,7 @@ function setupIntervalsActions() {
                     }
                 }
 
-                let cblk = logo.blocks.blockList[blk].connections[1];
+                const cblk = logo.blocks.blockList[blk].connections[1];
                 if (logo.blocks.blockList[cblk].name === "modename") {
                     logo.blocks.updateBlockText(cblk);
                 }
@@ -218,21 +218,21 @@ function setupIntervalsActions() {
                 arg = 1;
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
-            let i = arg > 0 ? Math.floor(arg) : Math.ceil(arg);
+            const i = arg > 0 ? Math.floor(arg) : Math.ceil(arg);
             tur.singer.intervals.push(i);
 
-            let listenerName = "_interval_" + turtle;
+            const listenerName = "_interval_" + turtle;
             if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
-                let mouse = Mouse.getMouseFromTurtle(tur);
+                const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null)
                     mouse.MB.listeners.push(listenerName);
             }
 
-            let __listener = event => tur.singer.intervals.pop();
+            const __listener = event => tur.singer.intervals.pop();
 
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
@@ -254,23 +254,23 @@ function setupIntervalsActions() {
                 arg = 1;
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
-            let i = arg > 0 ? Math.floor(arg) : Math.ceil(arg);
+            const i = arg > 0 ? Math.floor(arg) : Math.ceil(arg);
             if (i !== 0) {
                 tur.singer.semitoneIntervals.push([i, tur.singer.noteDirection]);
                 tur.singer.noteDirection = 0;
 
-                let listenerName = "_semitone_interval_" + turtle;
+                const listenerName = "_semitone_interval_" + turtle;
                 if (blk !== undefined && blk in blocks.blockList) {
                     logo.setDispatchBlock(blk, turtle, listenerName);
                 } else if (MusicBlocks.isRun) {
-                    let mouse = Mouse.getMouseFromTurtle(tur);
+                    const mouse = Mouse.getMouseFromTurtle(tur);
                     if (mouse !== null)
                         mouse.MB.listeners.push(listenerName);
                 }
 
-                let __listener = () => tur.singer.semitoneIntervals.pop();
+                const __listener = () => tur.singer.semitoneIntervals.pop();
 
                 logo.setTurtleListener(turtle, listenerName, __listener);
             }
@@ -291,11 +291,11 @@ function setupIntervalsActions() {
             logo.synth.startingPitch = pitch + "" + octave;
 
             logo.temperamentSelected.push(temperament);
-            let len = logo.temperamentSelected.length;
+            const len = logo.temperamentSelected.length;
 
             if (logo.temperamentSelected[len - 1] !== logo.temperamentSelected[len - 2]) {
                 logo.synth.changeInTemperament = true;
             }
         }
-    }
+    };
 }

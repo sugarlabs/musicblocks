@@ -115,7 +115,7 @@ const MULTIPALETTES = [
         "heap",
         "dictionary",
         "extras",
-	"program",
+        "program",
         "myblocks"
     ],
     ["graphics", "pen", "media", "sensors", "ensemble"]

@@ -144,9 +144,9 @@ function setupPenBlocks() {
 
         flow(args, logo, turtle) {
             if (args.length === 3) {
-                let hue = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.color;
-                let value = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.value;
-                let chroma = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.chroma;
+                const hue = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.color;
+                const value = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.value;
+                const chroma = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.chroma;
                 logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.doSetHue(args[0]);
                 logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.doSetValue(args[1]);
                 logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.doSetChroma(args[2]);
@@ -176,7 +176,7 @@ function setupPenBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            let turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
+            const turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetChroma(value);
         }
 
@@ -210,7 +210,7 @@ function setupPenBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            let turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
+            const turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetValue(value);
         }
 
@@ -245,7 +245,7 @@ function setupPenBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            let turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
+            const turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetColor(value);
         }
 
@@ -279,7 +279,7 @@ function setupPenBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            let turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
+            const turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetPensize(value);
         }
 
@@ -371,7 +371,7 @@ function setupPenBlocks() {
                 return;
             }
 
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -379,10 +379,10 @@ function setupPenBlocks() {
                 tur.painter.doStartHollowLine();
             }
 
-            let listenerName = "_hollowline_" + turtle;
+            const listenerName = "_hollowline_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = () => {
+            const __listener = () => {
                 if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
@@ -426,13 +426,13 @@ function setupPenBlocks() {
                 return;
             }
 
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
             } else {
                 if (tur.singer.suppressOutput) {
-                    let savedPenState = tur.painter.penState;
+                    const savedPenState = tur.painter.penState;
                     tur.painter.penState = false;
                     tur.painter.doStartFill();
                     tur.painter.penState = savedPenState;
@@ -441,15 +441,15 @@ function setupPenBlocks() {
                 }
             }
 
-            let listenerName = "_fill_" + turtle;
+            const listenerName = "_fill_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = () => {
+            const __listener = () => {
                 if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
                     if (tur.singer.suppressOutput) {
-                        let savedPenState = tur.painter.penState;
+                        const savedPenState = tur.painter.penState;
                         tur.painter.penState = false;
                         tur.painter.doEndFill();
                         tur.painter.penState = savedPenState;
@@ -480,7 +480,7 @@ function setupPenBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -505,7 +505,7 @@ function setupPenBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -541,7 +541,7 @@ function setupPenBlocks() {
                 return;
             }
 
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (typeof args[0] === "string") {
                 logo.errorMsg(NANERRORMSG, blk);
@@ -587,7 +587,7 @@ function setupPenBlocks() {
                 return;
             }
 
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (typeof args[0] === "string") {
                 logo.errorMsg(NANERRORMSG, blk);
@@ -604,8 +604,8 @@ function setupPenBlocks() {
             } else if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
             } else {
-                let arg = args[0] % 101;
-                let alpha = 1.0 - arg / 100;
+                const arg = args[0] % 101;
+                const alpha = 1.0 - arg / 100;
                 tur.painter.doSetPenAlpha(alpha);
             }
         }
@@ -634,7 +634,7 @@ function setupPenBlocks() {
                 return;
             }
 
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (typeof args[0] === "string") {
                 logo.errorMsg(NANERRORMSG, blk);
@@ -683,7 +683,7 @@ function setupPenBlocks() {
                 return;
             }
 
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (typeof args[0] === "string") {
                 logo.errorMsg(NANERRORMSG, blk);
@@ -729,7 +729,7 @@ function setupPenBlocks() {
                 return;
             }
 
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (typeof args[0] === "string") {
                 logo.errorMsg(NANERRORMSG, blk);
@@ -776,7 +776,7 @@ function setupPenBlocks() {
                 return;
             }
 
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (typeof args[0] === "string") {
                 logo.errorMsg(NANERRORMSG, blk);

@@ -81,7 +81,7 @@ function initBasicProtoBlocks(palettes, blocks) {
     setupEnsembleBlocks();
 
     // Push protoblocks onto their palettes.
-    for (let protoblock in blocks.protoBlockDict) {
+    for (const protoblock in blocks.protoBlockDict) {
         if (blocks.protoBlockDict[protoblock].palette != null) {
             blocks.protoBlockDict[protoblock].palette.add(
                 blocks.protoBlockDict[protoblock]

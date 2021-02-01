@@ -24,33 +24,33 @@
  */
 class IntervalsBlocksAPI {
     setKey(key, mode) {
-        let args = JSInterface.validateArgs("setKey", [key, mode]);
+        const args = JSInterface.validateArgs("setKey", [key, mode]);
         return this.runCommand("setKey", [args[0], args[1], this.turIndex]);
     }
 
     async defineMode(name, flow) {
-        let args = JSInterface.validateArgs("defineMode", [name, flow]);
+        const args = JSInterface.validateArgs("defineMode", [name, flow]);
         await this.runCommand("defineMode", [args[0], this.turIndex, MusicBlocks.BLK]);
         await args[1]();
         return this.ENDFLOWCOMMAND;
     }
 
     async setScalarInterval(value, flow) {
-        let args = JSInterface.validateArgs("setScalarInterval", [value, flow]);
+        const args = JSInterface.validateArgs("setScalarInterval", [value, flow]);
         await this.runCommand("setScalarInterval", [args[0], this.turIndex]);
         await args[1]();
         return this.ENDFLOWCOMMAND;
     }
 
     async setSemitoneInterval(value, flow) {
-        let args = JSInterface.validateArgs("setSemitoneInterval", [value, flow]);
+        const args = JSInterface.validateArgs("setSemitoneInterval", [value, flow]);
         await this.runCommand("setSemitoneInterval", [args[0], this.turIndex]);
         await args[1]();
         return this.ENDFLOWCOMMAND;
     }
 
     setTemperament(temperament, pitch, octave) {
-        let args = JSInterface.validateArgs("setTemperament", [temperament, pitch, octave]);
+        const args = JSInterface.validateArgs("setTemperament", [temperament, pitch, octave]);
         return this.runCommand("setTemperament", [args[0], args[1], args[2]]);
     }
 }
