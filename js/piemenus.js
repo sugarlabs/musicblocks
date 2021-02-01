@@ -122,7 +122,13 @@ const piemenuPitches = function(
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.createWheel(["×", " "]);
+    block._exitWheel.initWheel(["×", " "]);
+    block._exitWheel.navItems[1].enabled = false;
+    block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
+    block._exitWheel.createWheel();
     
     if (!custom) {
         block._accidentalsWheel.colors = platformColor.accidentalsWheelcolors;
@@ -627,7 +633,13 @@ const piemenuCustomNotes = function(block, noteLabels, customLabels, selectedCus
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.createWheel(["×", " "]);
+    block._exitWheel.initWheel(["×", " "]);
+    block._exitWheel.navItems[1].enabled = false;
+    block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
+    block._exitWheel.createWheel();
     
     const that = block;
     
@@ -836,7 +848,13 @@ const piemenuNthModalPitch = function(block, noteValues, note) {
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.createWheel(["×", " "]);
+    block._exitWheel.initWheel(["×", " "]);
+    block._exitWheel.navItems[1].enabled = false;
+    block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
+    block._exitWheel.createWheel();
     
     block._octavesWheel.colors = platformColor.octavesWheelcolors;
     block._octavesWheel.slicePathFunction = slicePath().DonutSlice;
@@ -1113,7 +1131,13 @@ const piemenuAccidentals = function(
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.createWheel(["×", " "]);
+    block._exitWheel.initWheel(["×", " "]);
+    block._exitWheel.navItems[1].enabled = false;
+    block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
+    block._exitWheel.createWheel();
     
     const that = block;
     
@@ -1281,7 +1305,13 @@ const piemenuNoteValue = function(block, noteValue) {
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.createWheel(["×", " "]);
+    block._exitWheel.initWheel(["×", " "]);
+    block._exitWheel.navItems[1].enabled = false;
+    block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
+    block._exitWheel.createWheel();
     
     const tabsLabels = [];
     for (let i = 0; i < WHEELVALUES.length; i++) {
@@ -1557,7 +1587,20 @@ const piemenuNumber = function(block, wheelValues, selectedValue) {
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.createWheel(["×", "-", "+"]);
+    block._exitWheel.initWheel(["×", "-", "+"]);
+    block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
+    block._exitWheel.navItems[1].sliceSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[1].sliceHoverAttr.cursor = "pointer";
+    block._exitWheel.navItems[1].titleSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[1].titleHoverAttr.cursor = "pointer";
+    block._exitWheel.navItems[2].sliceSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[2].sliceHoverAttr.cursor = "pointer";
+    block._exitWheel.navItems[2].titleSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[2].titleHoverAttr.cursor = "pointer";
+    block._exitWheel.createWheel();
     
     const that = block;
     
@@ -1893,7 +1936,13 @@ const piemenuColor = function(block, wheelValues, selectedValue, mode) {
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.createWheel(["×", " "]);
+    block._exitWheel.initWheel(["×", " "]);
+    block._exitWheel.navItems[1].enabled = false;
+    block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
+    block._exitWheel.createWheel();
     
     const that = block;
     
@@ -2056,7 +2105,13 @@ const piemenuBasic = function(
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.createWheel(["×", " "]);
+    block._exitWheel.initWheel(["×", " "]);
+    block._exitWheel.navItems[1].enabled = false;
+    block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
+    block._exitWheel.createWheel();
 
     const that = block;
     
@@ -2093,6 +2148,8 @@ const piemenuBasic = function(
     const canvasTop =
         block.blocks.canvas.offsetTop + 6 * block.blocks.blockScale;
     
+    console.log(block._exitWheel.navItems);
+    console.log(block._exitWheel);
     docById("wheelDiv").style.position = "absolute";
     docById("wheelDiv").style.height = "300px";
     docById("wheelDiv").style.width = "300px";
@@ -2320,7 +2377,13 @@ const piemenuVoices = function(
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.createWheel(["×", " "]);
+    block._exitWheel.initWheel(["×", " "]);
+    block._exitWheel.navItems[1].enabled = false;
+    block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
+    block._exitWheel.createWheel();
     
     const that = block;
     
@@ -2538,7 +2601,13 @@ const piemenuIntervals = function(block, selectedInterval) {
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.createWheel(["×", " "]);
+    block._exitWheel.initWheel(["×", " "]);
+    block._exitWheel.navItems[1].enabled = false;
+    block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
+    block._exitWheel.createWheel();
     
     const that = block;
     
@@ -2796,7 +2865,16 @@ const piemenuModes = function(block, selectedMode) {
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.createWheel(["×", "▶"]); // imgsrc:header-icons/play-button.svg']);
+    block._exitWheel.initWheel(["×", "▶"]); // imgsrc:header-icons/play-button.svg']);
+    block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
+    block._exitWheel.navItems[1].sliceSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[1].sliceHoverAttr.cursor = "pointer";
+    block._exitWheel.navItems[1].titleSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[1].titleHoverAttr.cursor = "pointer";
+    block._exitWheel.createWheel();
     
     const that = block;
     
