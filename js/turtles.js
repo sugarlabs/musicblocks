@@ -16,6 +16,17 @@
  * Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA.
  */
 
+/*
+   global createjs, platformColor, last, importMembers, setupRhythmActions, setupMeterActions,
+   setupPitchActions, setupIntervalsActions, setupToneActions, setupOrnamentActions,
+   setupVolumeActions, setupDrumActions, setupDictActions, _, Turtle, TURTLESVG, METRONOMESVG,
+   sugarizerCompatibility, FILLCOLORS, STROKECOLORS, getMunsellColor, DEFAULTVALUE, DEFAULTCHROMA,
+   jQuery, loading, docById, LEADING, CARTESIANBUTTON, piemenuGrid, CLEARBUTTON, COLLAPSEBUTTON,
+   EXPANDBUTTON, MBOUNDARY
+ */
+
+/* exported Turtles */
+
 // What is the scale factor when stage is shrunk?
 const CONTAINERSCALEFACTOR = 4;
 
@@ -104,13 +115,13 @@ class Turtles {
      */
     add(startBlock, infoDict) {
         if (startBlock != null) {
-            console.debug("adding a new turtle " + startBlock.name);
+            // console.debug("adding a new turtle " + startBlock.name);
             if (startBlock.value !== this.turtleList.length) {
                 startBlock.value = this.turtleList.length;
-                console.debug("turtle #" + startBlock.value);
+                // console.debug("turtle #" + startBlock.value);
             }
         } else {
-            console.debug("adding a new turtle: startBlock is null");
+            // console.debug("adding a new turtle: startBlock is null");
         }
 
         const blkInfoAvailable =
@@ -160,11 +171,11 @@ class Turtles {
             const scale = this.scale;
             const offset = {
                 x: turtle.container.x - event.stageX / scale,
-                y: turtle.container.y - event.stageY / scale,
+                y: turtle.container.y - event.stageY / scale
             };
 
             turtlesStage.dispatchEvent("CursorDown" + turtle.id);
-            console.debug("--> [CursorDown " + turtle.name + "]");
+            // console.debug("--> [CursorDown " + turtle.name + "]");
 
             turtle.container.removeAllEventListeners("pressmove");
             turtle.container.on("pressmove", (event) => {
@@ -180,19 +191,19 @@ class Turtles {
             });
         });
 
-        turtle.container.on("pressup", (event) => {
-            console.debug("--> [CursorUp " + turtle.name + "]");
+        turtle.container.on("pressup", () => {
+            // console.debug("--> [CursorUp " + turtle.name + "]");
             turtlesStage.dispatchEvent("CursorUp" + turtle.id);
         });
 
-        turtle.container.on("click", (event) => {
+        turtle.container.on("click", () => {
             // If turtles listen for clicks then they can be used as buttons
-            console.debug("--> [click " + turtle.name + "]");
+            // console.debug("--> [click " + turtle.name + "]");
             turtlesStage.dispatchEvent("click" + turtle.id);
         });
 
-        turtle.container.on("mouseover", (event) => {
-            console.debug("--> [mouseover " + turtle.name + "]");
+        turtle.container.on("mouseover", () => {
+            // console.debug("--> [mouseover " + turtle.name + "]");
             turtlesStage.dispatchEvent("CursorOver" + turtle.id);
 
             if (turtle.running) {
@@ -205,8 +216,8 @@ class Turtles {
             this.refreshCanvas();
         });
 
-        turtle.container.on("mouseout", (event) => {
-            console.debug("--> [mouseout " + turtle.name + "]");
+        turtle.container.on("mouseout", () => {
+            // console.debug("--> [mouseout " + turtle.name + "]");
             turtlesStage.dispatchEvent("CursorOut" + turtle.id);
 
             if (turtle.running) {
@@ -739,16 +750,16 @@ Turtles.TurtlesView = class {
             container.setAttribute("data-position", "bottom");
             jQuery.noConflict()(".tooltipped").tooltip({
                 html: true,
-                delay: 100,
+                delay: 100
             });
 
-            container.onmouseover = (event) => {
+            container.onmouseover = () => {
                 if (!loading) {
                     document.body.style.cursor = "pointer";
                 }
             };
 
-            container.onmouseout = (event) => {
+            container.onmouseout = () => {
                 if (!loading) {
                     document.body.style.cursor = "default";
                 }
@@ -779,7 +790,7 @@ Turtles.TurtlesView = class {
             turtlesStage.on("mousedown", (event) => {
                 offset = {
                     y: event.stageY - turtlesStage.y,
-                    x: event.stageX - turtlesStage.x,
+                    x: event.stageX - turtlesStage.x
                 };
             });
             turtlesStage.on("pressmove", (event) => {
@@ -847,7 +858,7 @@ Turtles.TurtlesView = class {
                 70 + LEADING + 6
             );
 
-            this._clearButton.onclick = (event) => {
+            this._clearButton.onclick = () => {
                 this.doClear();
             };
 
@@ -868,7 +879,7 @@ Turtles.TurtlesView = class {
                 70 + LEADING + 6
             );
 
-            this._collapseButton.onclick = (event) => {
+            this._collapseButton.onclick = () => {
                 // If the aux toolbar is open, close it.
                 const auxToolbar = docById("aux-toolbar");
                 if (auxToolbar.style.display === "block") {
@@ -899,7 +910,7 @@ Turtles.TurtlesView = class {
                 this._expandButton.style.visibility = "hidden";
             }
 
-            this._expandButton.onclick = (event) => {
+            this._expandButton.onclick = () => {
                 // If the aux toolbar is open, close it.
                 const auxToolbar = docById("aux-toolbar");
                 if (auxToolbar.style.display === "block") {
