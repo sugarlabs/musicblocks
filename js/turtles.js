@@ -16,6 +16,17 @@
  * Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA.
  */
 
+/*
+   global createjs, platformColor, last, importMembers, setupRhythmActions, setupMeterActions,
+   setupPitchActions, setupIntervalsActions, setupToneActions, setupOrnamentActions,
+   setupVolumeActions, setupDrumActions, setupDictActions, _, Turtle, TURTLESVG, METRONOMESVG,
+   sugarizerCompatibility, FILLCOLORS, STROKECOLORS, getMunsellColor, DEFAULTVALUE, DEFAULTCHROMA,
+   jQuery, loading, docById, LEADING, CARTESIANBUTTON, piemenuGrid, CLEARBUTTON, COLLAPSEBUTTON,
+   EXPANDBUTTON, MBOUNDARY
+ */
+
+/* exported Turtles */
+
 // What is the scale factor when stage is shrunk?
 const CONTAINERSCALEFACTOR = 4;
 
@@ -33,13 +44,6 @@ const CONTAINERSCALEFACTOR = 4;
  * This component contains properties and controls relevant to the set
  * of all turtles like maintaining the canvases on which turtles draw.
  */
-
-/* global createjs, platformColor, last, importMembers, setupRhythmActions, setupMeterActions, setupPitchActions, 
-setupIntervalsActions, setupToneActions, setupOrnamentActions, setupVolumeActions, setupDrumActions, 
-setupDictActions, _, Turtle, TURTLESVG, METRONOMESVG, sugarizerCompatibility, FILLCOLORS, STROKECOLORS, getMunsellColor, 
-DEFAULTVALUE, DEFAULTCHROMA, jQuery, loading, docById, LEADING, CARTESIANBUTTON, piemenuGrid,
-CLEARBUTTON, COLLAPSEBUTTON, EXPANDBUTTON, MBOUNDARY */
-
 class Turtles {
     /**
      * @constructor
