@@ -1,3 +1,54 @@
+/*
+   global FlowBlock, _, last, DEFAULTFILTERTYPE, FILTERTYPES, instrumentsFilters, StackClampBlock,
+   DEFAULTMODE, TemperamentWidget, TimbreWidget, DEFAULTVOICE, NOINPUTERRORMSG, instrumentsEffects,
+   MeterWidget, Oscilloscope, turtles, ModeWidget, Tempo, PitchDrumMatrix, PitchSlider,
+   beginnerMode, MusicKeyboard, PitchStaircase, RhythmRuler, PhraseMaker, StatusMatrix
+ */
+
+/*
+   Global locations
+    js/protoblocks.js
+        FlowBlock, StackClampBlock
+    js/utils/utils.js
+        _, last
+    js/utils/musicutils.js
+        DEFAULTFILTERTYPE, FILTERTYPES, DEFAULTMODE, DEFAULTVOICE
+    js/utils/synthutils.js
+        instrumentsFilters, instrumentsEffects
+    js/logo.js
+        NOINPUTERRORMSG
+    js/activity.js
+        turtles, beginnerMode
+    js/widgets/temperament.js
+        TemperamentWidget
+    js/widgets/timbre.js
+        TimbreWidget
+    js/widgets/meterwidget.js
+        MeterWidget
+    js/widgets/oscilloscope.js
+        Oscilloscope
+    js/widgets/modewidget.js
+        ModeWidget
+    js/widgets/tempo.js
+        Tempo
+    js/widgets/pitchdrummatrix.js
+        PitchDrumMatrix
+    js/widgets/pitchslider.js
+        PitchSlider
+    js/widgets/musickeyboard.js
+        MusicKeyboard
+    js/widgets/pitchstaircase.js
+        PitchStairCase
+    js/widgets/rhythmruler.js
+        RhythmRuler
+    js/widgets/phrasemaker.js
+        PhraseMaker
+    js/widgets/status.js
+        StatusMatrix
+ */
+
+/* exported setupWidgetBlocks */
+
 function setupWidgetBlocks() {
     class EnvelopeBlock extends FlowBlock {
         constructor() {
@@ -209,7 +260,7 @@ function setupWidgetBlocks() {
             const listenerName = "_temperament_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function(event) {
+            const __listener = () => {
                 logo.temperament.init();
             };
 
@@ -325,7 +376,7 @@ function setupWidgetBlocks() {
             const listenerName = "_timbre_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function(event) {
+            const __listener = () => {
                 logo.timbre.init();
             };
 
@@ -366,7 +417,7 @@ function setupWidgetBlocks() {
             const listenerName = "_meterwidget_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function(event) {
+            const __listener = () => {
                 logo.meterWidget = new MeterWidget(blk);
 
                 logo.insideMeterWidget = false;
@@ -419,7 +470,7 @@ function setupWidgetBlocks() {
             const listenerName = "_oscilloscope_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function(event) {
+            const __listener = () => {
                 logo.Oscilloscope = new Oscilloscope(logo);
                 logo.inOscilloscope = false;
             };
@@ -461,7 +512,7 @@ function setupWidgetBlocks() {
             const listenerName = "_modewidget_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
             
-            const __listener = function(event) {
+            const __listener = () => {
                 logo.modeWidget = new ModeWidget();
                 logo.insideModeWidget = false;
             };
@@ -499,7 +550,7 @@ function setupWidgetBlocks() {
             ]);
         }
 
-        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
+        flow(args, logo, turtle, blk) {
             if (logo.tempo === null) {
                 logo.tempo = new Tempo();
             }
@@ -511,7 +562,7 @@ function setupWidgetBlocks() {
             const listenerName = "_tempo_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function(event) {
+            const __listener = () => {
                 logo.tempo.init();
             };
 
@@ -569,7 +620,7 @@ function setupWidgetBlocks() {
             const listenerName = "_pitchdrummatrix_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function(event) {
+            const __listener = () => {
                 if (
                     logo.pitchDrumMatrix.drums.length === 0 ||
                     logo.pitchDrumMatrix.rowLabels.length === 0
@@ -626,7 +677,7 @@ function setupWidgetBlocks() {
             const listenerName = "_pitchslider_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function(event) {
+            const __listener = () => {
                 logo.pitchSlider.init(logo);
                 logo.inPitchSlider = false;
             };
@@ -670,7 +721,8 @@ function setupWidgetBlocks() {
             if (this.lang !== "ja") this.hidden = true;
         }
 
-        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {}
+        flow() {}
+        // flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {}
     }
 
     class MusicKeyboard2Block extends StackClampBlock {
@@ -758,8 +810,8 @@ function setupWidgetBlocks() {
             const listenerName = "_musickeyboard_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function(event) {
-                logo.musicKeyboard.init(logo);
+            const __listener = () => {
+                logo.musicKeyboard.init();
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -807,7 +859,7 @@ function setupWidgetBlocks() {
             const listenerName = "_pitchstaircase_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function(event) {
+            const __listener = () => {
                 logo.pitchStaircase.init(logo);
                 logo.inPitchStaircase = false;
             };
@@ -894,7 +946,7 @@ function setupWidgetBlocks() {
             const listenerName = "_rhythmruler_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function(event) {
+            const __listener = () => {
                 logo.rhythmRuler.init();
             };
 
@@ -1037,7 +1089,7 @@ function setupWidgetBlocks() {
             const listenerName = "_matrix_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function(event) {
+            const __listener = () => {
                 if (
                     logo.tupletRhythms.length === 0 ||
                     logo.phraseMaker.rowLabels.length === 0
@@ -1143,7 +1195,7 @@ function setupWidgetBlocks() {
             const listenerName = "_status_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function(event) {
+            const __listener = () => {
                 logo.statusMatrix.init(logo);
                 logo.inStatusMatrix = false;
             };
