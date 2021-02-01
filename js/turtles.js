@@ -705,11 +705,11 @@ Turtles.TurtlesView = class {
         let artwork = useTurtleArtwork ? TURTLESVG : METRONOMESVG;
         artwork = sugarizerCompatibility.isInsideSugarizer()
             ? artwork
-                  .replace(/fill_color/g, sugarizerCompatibility.xoColor.fill)
-                  .replace(/stroke_color/g, sugarizerCompatibility.xoColor.stroke)
+                .replace(/fill_color/g, sugarizerCompatibility.xoColor.fill)
+                .replace(/stroke_color/g, sugarizerCompatibility.xoColor.stroke)
             : artwork
-                  .replace(/fill_color/g, FILLCOLORS[i])
-                  .replace(/stroke_color/g, STROKECOLORS[i]);
+                .replace(/fill_color/g, FILLCOLORS[i])
+                .replace(/stroke_color/g, STROKECOLORS[i]);
 
         turtle.makeTurtleBitmap(artwork, this.refreshCanvas, useTurtleArtwork);
 
