@@ -26,7 +26,6 @@ const PASTEBOX =
 
 /* exported PasteBox */
 class PasteBox {
-
     /**
      * @constructor
      */
@@ -52,7 +51,7 @@ class PasteBox {
 
     /**
      * @public
-     * @param {Object} stage 
+     * @param {Object} stage
      * @returns {Object} createjs stage
      */
     setStage(stage) {
@@ -60,11 +59,11 @@ class PasteBox {
         return this;
     }
 
-        /**
-         * @public
-         * @param {Object} paste 
-         * @returns {Object} paste
-         */
+    /**
+     * @public
+     * @param {Object} paste
+     * @returns {Object} paste
+     */
     setPaste(paste) {
         this._paste = paste;
         return this;
@@ -72,7 +71,7 @@ class PasteBox {
 
     /**
      * @public
-     * @param {Object} refreshCanvas 
+     * @param {Object} refreshCanvas
      * @returns {Object} refreshCanvas
      */
     setRefreshCanvas(refreshCanvas) {
@@ -96,7 +95,7 @@ class PasteBox {
 
     /**
      * @public
-     * @param {number} scale 
+     * @param {number} scale
      * @param {number} x coordinate
      * @param {number} y coordinate
      */
