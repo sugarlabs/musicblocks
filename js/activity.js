@@ -4824,7 +4824,7 @@ function Activity() {
         // Load custom mode saved in local storage.
         const custommodeData = storage.custommode;
         if (custommodeData !== undefined) {
-            customMode = JSON.parse(custommodeData);
+            const customMode = JSON.parse(custommodeData);
             console.debug("restoring custom mode: " + customMode);
         }
 
