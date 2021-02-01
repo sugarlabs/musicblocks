@@ -10,6 +10,59 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 //
 
+/*
+   global last, _, getNoiseSynthName, getVoiceSynthName, getDrumSynthName, updateTemperaments,
+   TEMPERAMENT, getTextWidth, getModeNumbers, WESTERN2EISOLFEGENAMES, splitSolfege, i18nSolfege,
+   docById, piemenuNumber, piemenuColor, piemenuNoteValue, piemenuBasic, platformColor,
+   beginnerMode, piemenuBoolean, blockBlocks, DEFAULTTEMPERAMENT, NOISENAMES, DEFAULTNOISE, VOICENAMES,
+   OSCTYPES, DEFAULTOSCILLATORTYPE, FILTERTYPES, topBlock, DISABLEDFILLCOLOR, DEFAULTFILTERTYPE, DRUMNAMES,
+   _THIS_IS_MUSIC_BLOCKS_, TEMPERAMENTS, piemenuVoices, DEFAULTVOICE, EFFECTSNAMES, DEFAULTEFFECT,
+   DEFAULTDRUM, INVERTMODES, DEFAULTINVERT, piemenuIntervals, DEFAULTINTERVAL, createjs, EXPANDBUTTON,
+   COLLAPSEBUTTON, ProtoBlock, getNoiseName, getDrumName, splitScaleDegree, DEFAULTACCIDENTAL, DEFAULTMODE, NUMBERBLOCKDEFAULT,
+   PALETTESTROKECOLORS, PALETTEFILLCOLORS, DISABLEDSTROKECOLOR, safeSVG, ACCIDENTALLABELS, ACCIDENTALNAMES,
+   piemenuAccidentals, piemenuModes, SOLFATTRS, piemenuPitches, SOLFNOTES, EASTINDIANSOLFNOTES,
+   piemenuCustomNotes, PreDefinedTemperaments, trashcan, scrollBlockContainer, piemenuBlockContext,
+   COLLAPSETEXTY, STANDARDBLOCKHEIGHT, COLLAPSETEXTX, MEDIASAFEAREA, VALUETEXTX, TEXTY, DEGREES, NATURAL,
+   DOUBLEFLAT, DOUBLESHARP, FLAT, SHARP, RSYMBOLS, NSYMBOLS, delayExecution, TEXTX, HIGHLIGHTSTROKECOLORS,
+   PALETTEHIGHLIGHTCOLORS, hideDOMLabel, SCALENOTES
+ */
+
+/*
+   Global locations
+   - js/utils/utils.js
+        _, getTextWidth, docById, safeSVG, delayExecution, hideDOMLabel
+   - js/utils/musicutils.js
+        getNoiseSynthName, getVoiceSynthName, getDrumSynthName, updateTemperaments, TEMPERAMENT,
+        getModeNumbers, WESTERN2EISOLFEGENAMES, splitSolfege, i18nSolfege, DEFAULTTEMPERAMENT,
+        DEFAULTNOISE, OSCTYPES, DEFAULTOSCILLATORTYPE, FILTERTYPES, DEFAULTFILTERTYPE, TEMPERAMENTS,
+        DEFAULTVOICE, DEFAULTEFFECT, DEFAULTDRUM, INVERTMODES, DEFAULTINVERT, DEFAULTINTERVAL,
+        getNoiseName, getDrumName, splitScaleDegree, DEFAULTACCIDENTAL, DEFAULTMODE, SOLFNOTES
+        ACCIDENTALLABELS, ACCIDENTALNAMES, SOLFATTRS, EASTINDIANSOLFNOTES, PreDefinedTemperaments,
+        DEGREES, NATURAL, DOUBLEFLAT, DOUBLESHARP, FLAT, SHARP, RSYMBOLS, NSYMBOLS, SCALENOTES
+   - js/utils/synthutils.js
+        NOISENAMES, VOICENAMES, DRUMNAMES, EFFECTSNAMES
+   - js/turtledefs.js
+        NUMBERBLOCKDEFAULT
+   - js/artwork.js
+        EXPANDBUTTON, COLLAPSEBUTTON, PALETTESTROKECOLORS, PALETTEFILLCOLORS, COLLAPSETEXTY,
+        STANDARDBLOCKHEIGHT, COLLAPSETEXTX, MEDIASAFEAREA, VALUETEXTX, TEXTY, TEXTX, HIGHLIGHTSTROKECOLORS,
+        PALETTEHIGHLIGHTCOLORS
+   - js/protoblocks.js
+        ProtoBlock 
+   - js/js-export/export.js
+   - js/logo.js
+   - js/piemenus.js
+        piemenuNumber, piemenuColor, piemenuNoteValue, piemenuBasic, piemenuBoolean, piemenuVoices,
+        piemenuIntervals, piemenuAccidentals, piemenuModes, piemenuPitches, piemenuCustomNotes,
+        piemenuBlockContext
+   - js/activity.js
+        _THIS_IS_MUSIC_BLOCKS_, beginnerMode, _THIS_IS_MUSIC_BLOCKS_, trashcan, scrollBlockContainer
+   - js/utils/platformstyle.js
+        platformColor
+ */
+
+/* exported Block, $*/
+
 // Length of a long touch
 const TEXTWIDTH = 240; // 90
 const STRINGLEN = 9;
@@ -95,11 +148,24 @@ const PIEMENUS = [
     "wrapmode"
 ];
 
+function _blockMakeBitmap(data, callback, args) {
+    // Async creation of bitmap from SVG data.
+    // Works with Chrome, Safari, Firefox (untested on IE).
+    const img = new Image();
+
+    img.onload = function () {
+        const bitmap = new createjs.Bitmap(img);
+        callback(bitmap, args);
+    };
+
+    img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(data)));
+}
+
 // Define block instance objects and any methods that are intra-block.
 class Block {
     constructor(protoblock, blocks, overrideName) {
         if (protoblock === null) {
-            console.debug("null protoblock sent to Block");
+            // console.debug("null protoblock sent to Block");
             return;
         }
 
@@ -215,7 +281,7 @@ class Block {
 
     // Internal function for updating the cache.
     // Includes workaround for a race condition.
-    updateCache(counter) {
+    updateCache() {
         const that = this;
         return new Promise((resolve, reject) => {
             let loopCount = 0;
@@ -430,7 +496,7 @@ class Block {
         }
 
         if (this.bitmap === null) {
-            console.debug("bitmap not ready");
+            // console.debug("bitmap not ready");
             return;
         }
 
@@ -579,7 +645,6 @@ class Block {
         }
 
         if (this.container !== null) {
-            const that = this;
 
             /**
              * After new buttons are creates, they are cached and a new hit are is calculated.
@@ -588,10 +653,13 @@ class Block {
              * @returns {void}
              */
             const _postProcess = function (that) {
-                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
-                    scale / 3;
-                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale =
-                    scale / 3;
+                that.collapseButtonBitmap.scaleX
+                = that.collapseButtonBitmap.scaleY
+                = that.collapseButtonBitmap.scale
+                = scale / 3;
+                that.expandButtonBitmap.scaleX
+                = that.expandButtonBitmap.scaleY
+                = that.expandButtonBitmap.scale = scale / 3;
                 that.updateCache();
                 that._calculateBlockHitArea();
             };
@@ -848,7 +916,7 @@ class Block {
                 if (firstTime) {
                     that._loadEventHandlers();
                     if (that.image !== null) {
-                        console.log(that.name);
+                        // console.log(that.name);
                         that._addImage();
                     }
 
@@ -1057,7 +1125,7 @@ class Block {
      * @returns {void}
      */
     _finishImageLoad() {
-        const thisBlock = this.blocks.blockList.indexOf(this);
+        // const thisBlock = this.blocks.blockList.indexOf(this);
         let proto, obj, label, attr;
         // Value blocks get a modifiable text label.
         if (SPECIALINPUTS.indexOf(this.name) !== -1) {
@@ -1074,9 +1142,8 @@ class Block {
                         this.value = "5";
                         break;
                     case "customNote":
-                        const len = this.blocks.logo.synth.startingPitch.length;
-                        this.value =
-                            this.blocks.logo.synth.startingPitch.substring(0, len - 1) + "(+0)";
+                        this.value = this.blocks.logo.synth.startingPitch
+                            .substring(0, this.blocks.logo.synth.startingPitch.length - 1) + "(+0)";
                         break;
                     case "notename":
                         this.value = "G";
@@ -1240,7 +1307,6 @@ class Block {
      * @returns {void}
      */
     _generateCollapseArtwork(postProcess) {
-        const that = this;
         const thisBlock = this.blocks.blockList.indexOf(this);
 
         /**
@@ -1272,8 +1338,10 @@ class Block {
             const image = new Image();
             image.onload = function () {
                 that.collapseButtonBitmap = new createjs.Bitmap(image);
-                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
-                    that.protoblock.scale / 3;
+                that.collapseButtonBitmap.scaleX
+                = that.collapseButtonBitmap.scaleY
+                = that.collapseButtonBitmap.scale
+                = that.protoblock.scale / 3;
                 that.container.addChild(that.collapseButtonBitmap);
                 that.collapseButtonBitmap.x = 2 * that.protoblock.scale;
                 if (that.isInlineCollapsible()) {
@@ -1302,8 +1370,10 @@ class Block {
             const image = new Image();
             image.onload = function () {
                 that.expandButtonBitmap = new createjs.Bitmap(image);
-                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale =
-                    that.protoblock.scale / 3;
+                that.expandButtonBitmap.scaleX
+                = that.expandButtonBitmap.scaleY
+                = that.expandButtonBitmap.scale
+                = that.protoblock.scale / 3;
 
                 that.container.addChild(that.expandButtonBitmap);
                 that.expandButtonBitmap.visible = that.collapsed;
@@ -1779,7 +1849,7 @@ class Block {
         const fileChooser = docById("myOpenAll");
         const that = this;
 
-        const __readerAction = function (event) {
+        const __readerAction = function () {
             window.scroll(0, 0);
 
             const reader = new FileReader();
@@ -1823,8 +1893,7 @@ class Block {
             this.show();
         } else {
             // if we are inside of a collapsed note block, do nothing.
-            if (this.blocks.blockList[nblk].collapsed) {
-            } else {
+            if (!this.blocks.blockList[nblk].collapsed) {
                 this.inCollapsed = false;
                 this.show();
             }
@@ -1838,7 +1907,7 @@ class Block {
         this.blocks.findDragGroup(thisBlock);
 
         if (this.collapseBlockBitmap === null) {
-            console.debug("collapse bitmap not ready");
+            // console.debug("collapse bitmap not ready");
             return;
         }
 
@@ -1868,7 +1937,7 @@ class Block {
                     this._oscTimeLabel();
                     break;
                 default:
-                    console.debug("What do we do with a collapsed " + this.name + " block?");
+                    // console.debug("What do we do with a collapsed " + this.name + " block?");
                     break;
             }
         }
@@ -1965,7 +2034,7 @@ class Block {
 
             i += 1;
             if (i > 5) {
-                console.debug("loop?");
+                // console.debug("loop?");
                 break;
             }
 
@@ -2273,8 +2342,8 @@ class Block {
             // The last connection is flow. The second to last
             // connection is child flow.  FIX ME: This will not work
             // if there is more than one arg, e.g. n > 4.
-            let n = this.docks.length,
-                dy;
+            const n = this.docks.length;
+            let dy;
             if (collapse) {
                 dy =
                     this.blocks.blockList[thisBlock].docks[n - 1][1] -
@@ -2333,7 +2402,7 @@ class Block {
             this.text.textAlign = "center";
             this.text.x = Math.floor(this.width / 2 + 0.5);
         } else if (this.protoblock.args === 0) {
-            const bounds = this.container.getBounds();
+            // const bounds = this.container.getBounds();
             this.text.x = Math.floor(this.width - 25 + 0.5);
         } else if (this.isCollapsible()) {
             this.text.x += Math.floor(15 * blockScale);
@@ -2419,7 +2488,7 @@ class Block {
 
         this._calculateBlockHitArea();
 
-        this.container.on("mouseover", function (event) {
+        this.container.on("mouseover", function () {
             docById("contextWheelDiv").style.display = "none";
 
             if (!that.blocks.logo.runningLilypond) {
@@ -2502,7 +2571,7 @@ class Block {
                 } else {
                     if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
                         topBlk = that.blocks.findTopBlock(thisBlock);
-                        console.debug("running from " + that.blocks.blockList[topBlk].name);
+                        // console.debug("running from " + that.blocks.blockList[topBlk].name);
                         if (_THIS_IS_MUSIC_BLOCKS_) {
                             that.blocks.logo.synth.resume();
                         }
@@ -2521,7 +2590,7 @@ class Block {
             } else if (!moved) {
                 if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
                     topBlk = that.blocks.findTopBlock(thisBlock);
-                    console.debug("running from " + that.blocks.blockList[topBlk].name);
+                    // console.debug("running from " + that.blocks.blockList[topBlk].name);
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         that.blocks.logo.synth.resume();
                     }
@@ -2602,7 +2671,9 @@ class Block {
             const oldX = that.container.x;
             const oldY = that.container.y;
 
-            const dx = Math.round(event.stageX / that.blocks.getStageScale() + that.offset.x - oldX);
+            const dx = Math.round(
+                event.stageX / that.blocks.getStageScale() + that.offset.x - oldX
+            );
             let dy = Math.round(event.stageY / that.blocks.getStageScale() + that.offset.y - oldY);
 
             const finalPos = oldY + dy;
@@ -3338,16 +3409,16 @@ class Block {
             if (this.value != null) {
                 selectedWrap = this.value;
             } else {
-                selectedWrap = DEFAULTWRAP;
+                selectedWrap = "on";
             }
 
-            let wrapLabels = [];
-            let wrapValues = [];
+            const wrapLabels = [];
+            const wrapValues = [];
 
             const WRAPMODES = [
                 [_("on"), "on"],
                 [_("off"), "off"]
-            ]
+            ];
 
             for (let i = 0; i < WRAPMODES.length; i++) {
                 wrapLabels.push(_(WRAPMODES[i][1]));
@@ -3437,6 +3508,7 @@ class Block {
                         );
                         break;
                     case "pitchnumber":
+                        // eslint-disable-next-line no-case-declarations
                         let temperament;
                         for (let i = 0; i < this.blocks.blockList.length; i++) {
                             if (
@@ -3484,7 +3556,7 @@ class Block {
             }
         }
 
-        const blk = this.blocks.blockList.indexOf(this);
+        // const blk = this.blocks.blockList.indexOf(this);
         if (!this._usePiemenu()) {
             let focused = false;
 
@@ -3503,6 +3575,7 @@ class Block {
                 labelElem.classList.remove("hasKeyboard");
 
                 window.scroll(0, 0);
+                // eslint-disable-next-line no-use-before-define
                 that.label.removeEventListener("keypress", __keypress);
 
                 if (movedStage) {
@@ -3511,7 +3584,7 @@ class Block {
                 }
             };
 
-            const __input = function (event) {
+            const __input = function () {
                 that._labelChanged(false, true);
             };
 
@@ -3614,6 +3687,7 @@ class Block {
                             return this.blocks.blockList[cblk].connections[1] === dblk;
                         case "meter":
                             this._check_meter_block = cblk;
+                        // eslint-disable-next-line no-fallthrough
                         case "setbpm2":
                         case "setmasterbpm2":
                         case "stuplet":
@@ -3657,6 +3731,7 @@ class Block {
                     }
                 case "meter":
                     this._check_meter_block = cblk;
+                // eslint-disable-next-line no-fallthrough
                 case "setbpm2":
                 case "setmasterbpm2":
                 case "stuplet":
@@ -3822,6 +3897,7 @@ class Block {
                         }
                     }
                     this.value = newValue;
+                    // eslint-disable-next-line no-case-declarations
                     let label = this.value.toString();
                     if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
                         label = label.substr(0, STRINGLEN) + "...";
@@ -3905,7 +3981,7 @@ class Block {
             while (getTextWidth(nlabel, "bold 20pt Sans") > TEXTWIDTH) {
                 slen -= 1;
                 nlabel = "" + label.substr(0, slen) + "...";
-                const foo = getTextWidth(nlabel, "bold 20pt Sans");
+                // const foo = getTextWidth(nlabel, "bold 20pt Sans");
                 if (slen <= STRINGLEN) {
                     break;
                 }
@@ -3949,6 +4025,7 @@ class Block {
                         this.blocks.actionHasReturn(c),
                         this.blocks.actionHasArgs(c)
                     );
+                    // eslint-disable-next-line no-case-declarations
                     const blockPalette = this.blocks.palettes.dict["action"];
                     for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
                         const block = blockPalette.protoList[blk];
@@ -4012,6 +4089,7 @@ class Block {
                     }
                     break;
                 case "temperament1":
+                    // eslint-disable-next-line no-case-declarations
                     const temptemperament = TEMPERAMENT[oldValue];
                     delete TEMPERAMENT[oldValue];
                     TEMPERAMENT[newValue] = temptemperament;
@@ -4066,19 +4144,6 @@ function $() {
 
 window.hasMouse = false;
 // Mousemove is not emulated for touch
-document.addEventListener("mousemove", function (e) {
+document.addEventListener("mousemove", function () {
     window.hasMouse = true;
 });
-
-function _blockMakeBitmap(data, callback, args) {
-    // Async creation of bitmap from SVG data.
-    // Works with Chrome, Safari, Firefox (untested on IE).
-    const img = new Image();
-
-    img.onload = function () {
-        const bitmap = new createjs.Bitmap(img);
-        callback(bitmap, args);
-    };
-
-    img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(data)));
-}
