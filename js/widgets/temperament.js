@@ -863,7 +863,7 @@ class TemperamentWidget {
             menuItems[1].style.background = platformColor.selectorBackground;
             menuItems[2].style.background = platformColor.selectorBackground;
             menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[0].style.background = "#c8C8C8";
+            menuItems[0].style.background = "#FFFFFF";
             this.equalEdit();
         };
 
@@ -871,7 +871,7 @@ class TemperamentWidget {
             menuItems[0].style.background = platformColor.selectorBackground;
             menuItems[2].style.background = platformColor.selectorBackground;
             menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[1].style.background = "#c8C8C8";
+            menuItems[1].style.background = "#FFFFFF";
             this.ratioEdit();
         };
 
@@ -879,7 +879,7 @@ class TemperamentWidget {
             menuItems[0].style.background = platformColor.selectorBackground;
             menuItems[1].style.background = platformColor.selectorBackground;
             menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = "#c8C8C8";
+            menuItems[2].style.background = "#FFFFFF";
             this.arbitraryEdit();
         };
 
@@ -887,7 +887,7 @@ class TemperamentWidget {
             menuItems[0].style.background = platformColor.selectorBackground;
             menuItems[1].style.background = platformColor.selectorBackground;
             menuItems[2].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = "#c8C8C8";
+            menuItems[3].style.background = "#FFFFFF";
             this.octaveSpaceEdit();
         };
     }
@@ -900,7 +900,7 @@ class TemperamentWidget {
         this.editMode = "equal";
         docById("userEdit").innerHTML = "";
         const equalEdit = docById("userEdit");
-        equalEdit.style.backgroundColor = "#c8C8C8";
+        equalEdit.style.backgroundColor = "#FFFFFF";
         equalEdit.innerHTML =
             '<br>Pitch Number &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="octaveIn" value="0"></input> &nbsp;&nbsp; To &nbsp;&nbsp; <input type="text" id="octaveOut" value="0"></input><br><br>';
         equalEdit.innerHTML +=
@@ -1088,7 +1088,7 @@ class TemperamentWidget {
         this.editMode = "ratio";
         docById("userEdit").innerHTML = "";
         const ratioEdit = docById("userEdit");
-        ratioEdit.style.backgroundColor = "#c8C8C8";
+        ratioEdit.style.backgroundColor = "#FFFFFF";
         ratioEdit.innerHTML =
             '<br>Ratio &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="ratioIn" value="1"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="ratioOut" value="1"></input><br><br>';
         ratioEdit.innerHTML +=
@@ -1272,6 +1272,7 @@ class TemperamentWidget {
         const arbitraryEdit = docById("userEdit");
         arbitraryEdit.innerHTML = '<br><div id="wheelDiv3" class="wheelNav"></div>';
         arbitraryEdit.style.paddingLeft = "0px";
+        arbitraryEdit.style.backgroundColor = "#FFFFFF";
 
         const radius = 128;
         const height = 2 * radius;
@@ -1299,6 +1300,8 @@ class TemperamentWidget {
             docById("wheelDiv4").style.background = "none";
             docById("wheelDiv4").style.position = "relative";
             docById("wheelDiv4").style.zIndex = 5;
+            docById("wheelDiv4").style.marginTop = "13.5px";
+            docById("wheelDiv4").style.marginLeft = "37.5px";
             this.wheel1 = new wheelnav("wheelDiv4");
             this.wheel1.wheelRadius = 200;
             this.wheel1.navItemsEnabled = false;
@@ -1368,7 +1371,8 @@ class TemperamentWidget {
         const canvas = docById("circ1");
         canvas.style.position = "absolute";
         canvas.style.zIndex = 1;
-        canvas.style.marginTop = "-305px";
+        canvas.style.marginTop = "-310px";
+        canvas.style.marginLeft = "-5px";
         const ctx = canvas.getContext("2d");
         const centerX = canvas.width / 2;
         const centerY = canvas.height / 2;
@@ -1591,7 +1595,7 @@ class TemperamentWidget {
         const len = this.ratios.length;
         const octaveRatio = this.ratios[len - 1];
         const octaveSpaceEdit = docById("userEdit");
-        octaveSpaceEdit.style.backgroundColor = "#c8C8C8";
+        octaveSpaceEdit.style.backgroundColor = "#FFFFFF";
         octaveSpaceEdit.innerHTML =
             '<br><br>Octave Space &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="startNote" value="' +
             octaveRatio +
