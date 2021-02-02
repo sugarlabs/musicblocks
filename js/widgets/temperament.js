@@ -573,6 +573,9 @@ class TemperamentWidget {
                 docById("noteInfo").style.left = "132px";
                 docById("noteInfo").style.position = "absolute";
                 docById("noteInfo").style.zIndex = 10;
+
+                docById("close").style.cursor = "pointer";
+                
                 docById("close").onclick = () => {
                     docById("noteInfo").remove();
                 };
@@ -1527,6 +1530,8 @@ class TemperamentWidget {
                 docById("noteInfo1").style.top = "100px";
                 docById("noteInfo1").style.left = "90px";
 
+                docById("close").style.cursor = "pointer";
+                
                 docById("frequencySlider").oninput = () => {
                     this._refreshInnerWheel();
                 };
