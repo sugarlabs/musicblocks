@@ -928,6 +928,7 @@ class TemperamentWidget {
             divAppend.style.marginTop = "40px";
             divAppend.style.overflow = "auto";
             divAppend.style.cursor = "32px";
+            divAppend.style.cursor = "pointer";
             equalEdit.append(divAppend);
 
             const divAppend1 = docById("preview");
@@ -948,10 +949,6 @@ class TemperamentWidget {
         }
 
         addDivision(false);
-
-        divAppend.onmouseover = (event) => {
-            event.target.style.cursor = "pointer";
-        };
 
         let pitchNumber = this.pitchNumber;
         let pitchNumber1 = Number(docById("octaveIn").value);
@@ -1116,6 +1113,7 @@ class TemperamentWidget {
             divAppend.style.marginTop = "40px";
             divAppend.style.overflow = "auto";
             divAppend.style.lineHeight = "32px";
+            divAppend.style.cursor = "pointer";
             ratioEdit.append(divAppend);
 
             const divAppend1 = docById("preview");
@@ -1136,10 +1134,6 @@ class TemperamentWidget {
         };
 
         addButtons(false);
-
-        divAppend.onmouseover = (event) => {
-            event.target.style.cursor = "pointer";
-        };
 
         divAppend.onclick = (event) => {
             const input1 = docById("ratioIn").value;
@@ -1467,11 +1461,8 @@ class TemperamentWidget {
         divAppend.style.height = "25px";
         divAppend.style.marginTop = "40px";
         divAppend.style.overflow = "auto";
+        divAppend.style.cursor = "pointer";
         arbitraryEdit.append(divAppend);
-
-        divAppend.onmouseover = (event) => {
-            event.target.style.cursor = "pointer";
-        };
 
         divAppend.onclick = () => {
             this.ratios = this.tempRatios1.slice();
