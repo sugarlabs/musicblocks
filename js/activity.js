@@ -56,6 +56,8 @@ function Activity() {
         "nomicrophone"
     ];
 
+    let saveLocally;
+
     const that = this;
 
     _doFastButton = this._doFastButton;
