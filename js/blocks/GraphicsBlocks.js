@@ -740,6 +740,8 @@ function setupGraphicsBlocks() {
         }
     }
 
+    new WrapModeBlock().setup();
+    new WrapBlock().setup();
     new HeadingBlock().setup();
     new YBlock().setup();
     new XBlock().setup();
@@ -755,6 +757,4 @@ function setupGraphicsBlocks() {
     new MLeftBlock().setup();
     new BackBlock().setup();
     new ForwardBlock().setup();
-    new WrapModeBlock().setup();
-    new WrapBlock().setup();
 }
