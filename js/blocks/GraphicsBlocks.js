@@ -707,11 +707,12 @@ function setupGraphicsBlocks() {
             this.formBlock({
                 name: _("wrap"),
                 args: 1,
-                defaults: 1
+                defaults: ["on"],
+                argTypes: ["textin"]
             });
             this.makeMacro((x, y) => [
                 [0, "wrap", x, y, [null, 1, null, 2]],
-                [1, ["wrapmode", { value: 1 }], 0, 0, [0]],
+                [1, ["wrapmode", { value: "on" }], 0, 0, [0]],
                 [2, "hidden", 0, 0, [0, null]]
             ]);
         }
@@ -740,11 +741,12 @@ function setupGraphicsBlocks() {
         }
     }
 
-    new WrapModeBlock().setup();
-    new WrapBlock().setup();
+ 
     new HeadingBlock().setup();
     new YBlock().setup();
     new XBlock().setup();
+    new WrapModeBlock().setup();
+    new WrapBlock().setup();
     new ScrollXYBlock().setup();
     new ClearBlock().setup();
     new BezierBlock().setup();
