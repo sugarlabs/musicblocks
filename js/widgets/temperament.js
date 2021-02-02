@@ -365,10 +365,8 @@ class TemperamentWidget {
             const angleDiff = [];
             for (let i = 0; i < this.notesCircle.navItemCount; i++) {
                 this.notesCircle.navItems[i].fillAttr = "#c8C8C8";
-                this.notesCircle.navItems[i].titleAttr.font =
-                    "20 20px Impact, Charcoal, sans-serif";
-                this.notesCircle.navItems[i].titleSelectedAttr.font =
-                    "20 20px Impact, Charcoal, sans-serif";
+                this.notesCircle.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
+                this.notesCircle.navItems[i].titleSelectedAttr.font = "20 20px Impact, Charcoal, sans-serif";
                 angle[i] = 270 + 360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase));
                 if (i !== 0) {
                     if (i == pitchNumber - 1) {
@@ -729,7 +727,7 @@ class TemperamentWidget {
 
             notesCell[(i, 0)] = notesRow[i].insertCell(-1);
             notesCell[(i, 0)].innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="Play" alt="play" height="20px" width="20px" id="play_' +
+                '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="Play" alt="play" height="20px" width="20px" style="margin-top:20px;" id="play_' +
                 i +
                 '" data-id="' +
                 i +
@@ -853,6 +851,7 @@ class TemperamentWidget {
             menuItems[i].style.background = platformColor.selectorBackground;
             menuItems[i].style.height = 40 + "px";
             menuItems[i].style.textAlign = "center";
+            menuItems[i].style.cursor = "pointer";
             menuItems[i].style.fontWeight = "bold";
             menuItems[i].style.paddingRight = "5px";
         }
