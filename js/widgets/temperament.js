@@ -851,9 +851,10 @@ class TemperamentWidget {
         const menuItems = document.querySelectorAll("#editMenus");
         for (let i = 0; i < editMenus.length; i++) {
             menuItems[i].style.background = platformColor.selectorBackground;
-            menuItems[i].style.height = 30 + "px";
+            menuItems[i].style.height = 40 + "px";
             menuItems[i].style.textAlign = "center";
             menuItems[i].style.fontWeight = "bold";
+            menuItems[i].style.paddingRight = "5px";
         }
 
         menuItems[0].style.background = "#c8C8C8";
@@ -1611,17 +1612,13 @@ class TemperamentWidget {
         divAppend.id = "divAppend";
         divAppend.innerHTML = "Done";
         divAppend.style.textAlign = "center";
-        divAppend.style.paddingTop = "5px";
         divAppend.style.marginLeft = "-70px";
         divAppend.style.backgroundColor = platformColor.selectorBackground;
-        divAppend.style.height = "25px";
+        divAppend.style.height = "30px";
         divAppend.style.marginTop = "40px";
-        divAppend.style.overflow = "auto";
+        divAppend.style.lineHeight = divAppend.style.height;
+        divAppend.style.cursor = "pointer";
         octaveSpaceEdit.append(divAppend);
-
-        divAppend.onmouseover = (event) => {
-            event.target.style.cursor = "pointer";
-        };
 
         divAppend.onclick = () => {
             const startRatio = docById("startNote").value;
