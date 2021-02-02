@@ -321,51 +321,6 @@ function SampleWidget() {
             }
         };
 
-        let refPlayBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
-        refPlayBtn.onclick = () => {
-            if (this.isMoving) {
-                this.pause();
-                refPlayBtn.innerHTML =
-                    '<img src="header-icons/play-button.svg" title="' +
-                    _("Play") +
-                    '" alt="' +
-                    _("Play") +
-                    '" height="' +
-                    ICONSIZE +
-                    '" width="' +
-                    ICONSIZE +
-                    '" vertical-align="middle">';
-                this.isMoving = false;
-            } else {
-                if (!(this.sampleName == "")) {
-                this.resume();
-                    refPlayBtn.innerHTML =
-                        '<img src="header-icons/pause-button.svg" title="' +
-                        _("Pause") +
-                        '" alt="' +
-                        _("Pause") +
-                        '" height="' +
-                        ICONSIZE +
-                        '" width="' +
-                        ICONSIZE +
-                        '" vertical-align="middle">';
-                    console.log(getVoiceSynthName(this.sampleName));
-                    console.log(CUSTOMSAMPLES);
-                    this._logo.synth.loadSynth(0, getVoiceSynthName(this.sampleName));
-                    let finalpitch = CENTERPITCHHERTZ;
-                    this._logo.synth.trigger(
-                        0,
-                        [finalpitch],
-                        1,
-                        this.sampleName,
-                        null,
-                        null,
-                        false);
-                    this.isMoving = true;
-                }
-            }
-        };
-
         widgetWindow.addButton(
             "load-media.svg",
             ICONSIZE,
@@ -535,17 +490,33 @@ function SampleWidget() {
         finalCenter += isNaN(this.pitchCenter)      ? 0 : MAJORSCALE[this.pitchCenter];
         finalCenter += isNaN(this.accidentalCenter) ? 0 : this.accidentalCenter-2;
 
+
+        //Convert MIDI number to hertz, given a MIDI number of 57 is 440 Hz.
         let netChange = finalCenter-57;
-        let finalpitch = Math.floor(440 * Math.pow(2, netChange/12));
+        let reffinalpitch = Math.floor(440 * Math.pow(2, netChange/12));
+
+
         this._logo.synth.trigger(
             0,
-            [finalpitch],
+            [reffinalpitch],
             0.25,
             REFERENCESAMPLE,
             null,
             null,
             false);
         this.isMoving = true;
+
+        console.log(getVoiceSynthName(this.sampleName));
+        this._logo.synth.loadSynth(0, getVoiceSynthName(this.sampleName));
+        let finalpitch = CENTERPITCHHERTZ;
+        this._logo.synth.trigger(
+            0,
+            [finalpitch],
+            1,
+            this.sampleName,
+            null,
+            null,
+            false);
     }
 
     this._parseSamplePitch = function () {
