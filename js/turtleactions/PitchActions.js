@@ -14,13 +14,42 @@
  * You should have received a copy of the GNU Affero General Public License along with this
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
-*/
+ */
 
 /**
  * Sets up all the methods related to different actions for each block in Pitch palette.
  *
  * @returns {void}
  */
+
+/*globals logo, Singer, pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, last,
+getNote, nthDegreeToPitch, SHARP, FLAT, _, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
+numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
+keySignatureToMode, getInterval, blocks, EFFECTSNAMES, NANERRORMSG, frequencyToPitch, MusicBlocks,
+Mouse, isCustom*/
+
+/*
+   Global locations
+    - js/logo.js
+        logo, NANERRORMSG
+    - js/turtle-singer.js
+        Singer
+    - js/utils/utils.js
+        last
+    - js/activity.js
+        blocks
+    - js/utils/synthutils.js
+        EFFECTSNAMES
+    - js/js-export/export.js
+        MusicBlocks, Mouse
+    - js/utils/musicutils.js
+        pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, getNote, nthDegreeToPitch,
+        SHARP, FLAT, _, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE, numberToPitch,
+        ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
+        keySignatureToMode, getInterval, frequencyToPitch, isCustom
+*/
+
+/*exported setupPitchActions*/
 function setupPitchActions() {
     Singer.PitchActions = class {
         /**
@@ -44,7 +73,7 @@ function setupPitchActions() {
          * @param {Number|String} blk - corresponding Block object index in blocks.blockList or custom blockName
          */
         static stepPitch(value, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             // Similar to pitch but calculated from previous note played.
             if (!logo.inMatrix && !logo.inMusicKeyboard && tur.singer.inNoteBlock.length === 0) {
@@ -62,7 +91,7 @@ function setupPitchActions() {
 
             // If we are just counting notes we don't care about the pitch.
             if (tur.singer.justCounting.length > 0 && tur.singer.lastNotePlayed === null) {
-                console.debug("Just counting, so spoofing last note played.");
+                // console.debug("Just counting, so spoofing last note played.");
                 tur.singer.previousNotePlayed = ["G4", 4];
                 tur.singer.lastNotePlayed = ["G4", 4];
             }
@@ -72,9 +101,53 @@ function setupPitchActions() {
                 tur.singer.lastNotePlayed = ["G4", 4];
             }
 
-            let addPitch = (note, octave, cents, direction) => {
-                let t = transposition + tur.singer.register * 12;
-                let noteObj = getNote(
+            let lastNotePlayed = tur.singer.lastNotePlayed;
+            lastNotePlayed[0] = lastNotePlayed[0].slice(0, lastNotePlayed[0].length - 1);
+
+            if (tur.singer.inverted) {
+                // if the last note is inverted then inverting it again to get the original note
+                const delta_temp = Singer.calculateInvert(
+                    logo,
+                    turtle,
+                    lastNotePlayed[0],
+                    lastNotePlayed[1]
+                );
+                const transposition_temp = 2 * delta_temp;
+                lastNotePlayed = getNote(
+                    lastNotePlayed[0],
+                    lastNotePlayed[1],
+                    transposition_temp,
+                    tur.singer.keySignature,
+                    tur.singer.moveable,
+                    null,
+                    logo.errorMsg,
+                    logo.synth.inTemperament
+                );
+            }
+
+            const noteObj = Singer.addScalarTransposition(
+                logo,
+                turtle,
+                lastNotePlayed[0],
+                parseInt(lastNotePlayed[1]),
+                value
+            );
+
+            let delta = 0;
+            if (!(tur.singer.invertList.length === 0)) {
+                tur.singer.inverted = true;
+                delta += Singer.calculateInvert(logo, turtle, noteObj[0], noteObj[1]);
+            }
+
+            let transposition =
+                2 * delta +
+                (logo.turtles.ithTurtle(turtle).transposition
+                    ? logo.turtles.ithTurtle(turtle).transposition
+                    : 0);
+
+            const addPitch = (note, octave, cents, direction) => {
+                const t = transposition + tur.singer.register * 12;
+                const noteObj = getNote(
                     note,
                     octave,
                     t,
@@ -86,10 +159,11 @@ function setupPitchActions() {
                 );
 
                 if (tur.singer.drumStyle.length > 0) {
-                    let drumname = last(tur.singer.drumStyle);
+                    const drumname = last(tur.singer.drumStyle);
                     if (EFFECTSNAMES.indexOf(drumname) === -1) {
                         tur.singer.pitchDrumTable[noteObj[0] + noteObj[1]] = drumname;
                     } else {
+                        // eslint-disable-next-line
                         tur.singer.pitchDrumTable[noteObj[0] + noteObj[1]] = effectsname;
                     }
                 }
@@ -106,28 +180,10 @@ function setupPitchActions() {
                         tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(0);
                     }
                 }
-
                 return noteObj;
             };
-
-            let len = tur.singer.lastNotePlayed[0].length;
-
-            let noteObj = Singer.addScalarTransposition(
-                logo,
-                turtle,
-                tur.singer.lastNotePlayed[0].slice(0, len - 1),
-                parseInt(tur.singer.lastNotePlayed[0].slice(len - 1)),
-                value
-            );
-
-            let delta = 0;
-            if (!(tur.singer.invertList.length === 0)) {
-                delta += Singer.calculateInvert(logo, turtle, noteObj[0], noteObj[1]);
-            }
-
-            let transposition = 2 * delta + logo.turtles.ithTurtle(turtle).transposition;
-
-            let noteObj1 = addPitch(noteObj[0], noteObj[1], 0);
+            
+            const noteObj1 = addPitch(noteObj[0], noteObj[1], 0);
             // Only apply the transposition to the base note of an interval
             transposition = 0;
 
@@ -139,16 +195,17 @@ function setupPitchActions() {
 
                 if (logo.phraseMaker.rowLabels.length > 0) {
                     if (last(logo.phraseMaker.rowLabels) === "hertz") {
-                        let freq = pitchToFrequency(
-                            noteObj[0], noteObj[1], 0, tur.singer.keySignature
+                        const freq = pitchToFrequency(
+                            noteObj[0],
+                            noteObj[1],
+                            0,
+                            tur.singer.keySignature
                         );
                         logo.phraseMaker.rowLabels.push("hertz");
                         logo.phraseMaker.rowArgs.push(parseInt(freq));
                     } else {
                         if (SOLFEGENAMES1.indexOf(last(logo.phraseMaker.rowLabels)) !== -1) {
-                            logo.phraseMaker.rowLabels.push(
-                                SOLFEGECONVERSIONTABLE[noteObj1[0]]
-                            );
+                            logo.phraseMaker.rowLabels.push(SOLFEGECONVERSIONTABLE[noteObj1[0]]);
                         } else {
                             logo.phraseMaker.rowLabels.push(noteObj1[0]);
                         }
@@ -167,8 +224,11 @@ function setupPitchActions() {
                     logo.musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
                     if (logo.musicKeyboard.noteNames.length > 0) {
                         if (last(logo.musicKeyboard.noteNames) === "hertz") {
-                            let freq = pitchToFrequency(
-                                noteObj[0], noteObj[1], 0, tur.singer.keySignature
+                            const freq = pitchToFrequency(
+                                noteObj[0],
+                                noteObj[1],
+                                0,
+                                tur.singer.keySignature
                             );
                             logo.musicKeyboard.noteNames.push("hertz");
                             logo.musicKeyboard.octaves.push(parseInt(freq));
@@ -195,7 +255,8 @@ function setupPitchActions() {
 
             let noteObj2;
             for (let i = 0; i < tur.singer.intervals.length; i++) {
-                let ii = getInterval(tur.singer.intervals[i], tur.singer.keySignature, noteObj1[0]);
+                const ii = getInterval(tur.singer.intervals[i],
+                    tur.singer.keySignature, noteObj1[0]);
                 noteObj2 = getNote(
                     noteObj1[0],
                     noteObj1[1],
@@ -227,7 +288,7 @@ function setupPitchActions() {
                 tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(tur.singer.beatFactor);
                 tur.singer.pushedNote = true;
             } else {
-		// stand-alone block
+                // stand-alone block
                 Singer.processPitch(noteObj1[0], noteObj1[1], 0, turtle, blk);
             }
         }
@@ -241,7 +302,7 @@ function setupPitchActions() {
          * @param {Number|String} blk - corresponding Block object index in blocks.blockList or custom blockName
          */
         static playNthModalPitch(number, octave, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             //  (0, 4) --> ti 3; (-1, 4) --> la 3, (-6, 4) --> do 3
             //  (1, 4) --> do 4; ( 2, 4) --> re 4; ( 8, 4) --> do 5
@@ -249,7 +310,7 @@ function setupPitchActions() {
             // If number is a float value then round-off to the nearest integer
             number = Math.round(number);
 
-            let isNegativeArg = number < 0 ? true : false;
+            const isNegativeArg = number < 0 ? true : false;
             number = Math.abs(number);
 
             let obj;
@@ -263,8 +324,8 @@ function setupPitchActions() {
                 obj = keySignatureToMode(tur.singer.keySignature);
             }
 
-            let modeLength = MUSICALMODES[obj[1]].length;
-            let scaleDegree = Math.floor(number - 1) % modeLength + 1;
+            const modeLength = MUSICALMODES[obj[1]].length;
+            let scaleDegree = (Math.floor(number - 1) % modeLength) + 1;
 
             // Choose a reference based on the key selected.
             // This is based on the position of a note on the circle of fifths e.g C --> 1, G-->8.
@@ -311,8 +372,8 @@ function setupPitchActions() {
 
             let note;
             if (
-                blk !== undefined
-                && blk in blocks.blockList &&
+                blk !== undefined &&
+                blk in blocks.blockList &&
                 blocks.blockList[blocks.blockList[blk].connections[1]].name === "ytopitch"
             ) {
                 note = nthDegreeToPitch("C major", scaleDegree);
@@ -322,15 +383,18 @@ function setupPitchActions() {
 
             let semitones = ref;
             semitones +=
-                NOTESFLAT.indexOf(note) !== -1 ?
-                    NOTESFLAT.indexOf(note) - ref : NOTESSHARP.indexOf(note) - ref;
+                NOTESFLAT.indexOf(note) !== -1
+                    ? NOTESFLAT.indexOf(note) - ref
+                    : NOTESSHARP.indexOf(note) - ref;
             /** calculates changes in reference octave which occur a semitone before the reference key */
-            let deltaOctave = Math.floor(number / modeLength);
+            const deltaOctave = Math.floor(number / modeLength);
             /** calculates changes in octave when crossing B */
-            let deltaSemi = isNegativeArg ? (semitones > ref ? 1 : 0) : (semitones < ref ? 1 : 0);
-            let _octave = ((isNegativeArg ? -1 : 1) * (deltaOctave + deltaSemi)) + Math.floor(
-                calcOctave(tur.singer.currentOctave, octave, tur.singer.lastNotePlayed, note)
-            );
+            const deltaSemi = isNegativeArg ? (semitones > ref ? 1 : 0) : semitones < ref ? 1 : 0;
+            const _octave =
+                (isNegativeArg ? -1 : 1) * (deltaOctave + deltaSemi) +
+                Math.floor(
+                    calcOctave(tur.singer.currentOctave, octave, tur.singer.lastNotePlayed, note)
+                );
 
             return Singer.processPitch(note, _octave, 0, turtle, blk);
         }
@@ -343,7 +407,7 @@ function setupPitchActions() {
          * @param {Number|String} blk - corresponding Block object index in blocks.blockList or custom blockName
          */
         static playPitchNumber(pitchNumber, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             if (tur.singer.inDefineMode) {
                 tur.singer.defineMode.push(pitchNumber);
@@ -361,7 +425,7 @@ function setupPitchActions() {
                 }
 
                 // In number to pitch we assume A0 == 0, so add offset
-                let obj = numberToPitch(
+                const obj = numberToPitch(
                     pitchNumber + tur.singer.pitchNumberOffset,
                     logo.synth.inTemperament,
                     logo.synth.startingPitch,
@@ -380,17 +444,17 @@ function setupPitchActions() {
          * @throws {String} No Note Error
          */
         static playHertz(hertz, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
-            let obj = frequencyToPitch(hertz);
-            let note = obj[0];
-            let octave = obj[1];
-            let cents = obj[2];
+            const obj = frequencyToPitch(hertz);
+            const note = obj[0];
+            const octave = obj[1];
+            const cents = obj[2];
             let delta = 0;
 
             if (tur.singer.justMeasuring.length > 0) {
                 // TODO: account for cents
-                let noteObj = getNote(
+                const noteObj = getNote(
                     note,
                     octave,
                     0,
@@ -400,8 +464,8 @@ function setupPitchActions() {
                     logo.errorMsg
                 );
 
-                let n = tur.singer.justMeasuring.length;
-                let pitchNumber =
+                const n = tur.singer.justMeasuring.length;
+                const pitchNumber =
                     pitchToNumber(noteObj[0], noteObj[1], tur.singer.keySignature) -
                     tur.singer.pitchNumberOffset;
                 if (tur.singer.firstPitch.length < n) {
@@ -414,9 +478,9 @@ function setupPitchActions() {
                     delta += Singer.calculateInvert(logo, turtle, note, octave);
                 }
 
-                let addPitch = (note, octave, cents, frequency, direction) => {
-                    let t = 2 * delta + tur.transposition + tur.singer.register * 12;
-                    let noteObj = getNote(
+                const addPitch = (note, octave, cents, frequency, direction) => {
+                    const t = 2 * delta + tur.transposition + tur.singer.register * 12;
+                    const noteObj = getNote(
                         note,
                         octave,
                         t,
@@ -427,7 +491,7 @@ function setupPitchActions() {
                         logo.synth.inTemperament
                     );
                     if (tur.singer.drumStyle.length > 0) {
-                        let drumname = last(tur.singer.drumStyle);
+                        const drumname = last(tur.singer.drumStyle);
                         tur.singer.pitchDrumTable[noteObj[0] + noteObj[1]] = drumname;
                     }
 
@@ -438,13 +502,15 @@ function setupPitchActions() {
                     return noteObj;
                 };
 
-                let noteObj1 = addPitch(note, octave, cents, hertz);
+                const noteObj1 = addPitch(note, octave, cents, hertz);
 
                 for (let i = 0; i < tur.singer.intervals.length; i++) {
-                    let ii = getInterval(
-                        tur.singer.intervals[i], tur.singer.keySignature, noteObj1[0]
+                    const ii = getInterval(
+                        tur.singer.intervals[i],
+                        tur.singer.keySignature,
+                        noteObj1[0]
                     );
-                    let noteObj2 = getNote(
+                    const noteObj2 = getNote(
                         noteObj1[0],
                         noteObj1[1],
                         ii,
@@ -458,7 +524,7 @@ function setupPitchActions() {
                 }
 
                 for (let i = 0; i < tur.singer.semitoneIntervals.length; i++) {
-                    let noteObj2 = getNote(
+                    const noteObj2 = getNote(
                         noteObj1[0],
                         noteObj1[1],
                         tur.singer.semitoneIntervals[i][0],
@@ -469,7 +535,11 @@ function setupPitchActions() {
                         logo.synth.inTemperament
                     );
                     addPitch(
-                        noteObj2[0], noteObj2[1], cents, 0, tur.singer.semitoneIntervals[i][1]
+                        noteObj2[0],
+                        noteObj2[1],
+                        cents,
+                        0,
+                        tur.singer.semitoneIntervals[i][1]
                     );
                 }
 
@@ -496,7 +566,7 @@ function setupPitchActions() {
          */
         static setAccidental(accidental, turtle, blk) {
             let value;
-            let i = ACCIDENTALNAMES.indexOf(accidental);
+            const i = ACCIDENTALNAMES.indexOf(accidental);
             if (i === -1) {
                 switch (accidental) {
                     case _("sharp"):
@@ -513,20 +583,18 @@ function setupPitchActions() {
                 value = ACCIDENTALVALUES[i];
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
             tur.singer.transposition += tur.singer.invertList.length > 0 ? -value : value;
 
-            let listenerName = "_accidental_" + turtle + "_" + blk;
+            const listenerName = "_accidental_" + turtle + "_" + blk;
             if (blk !== undefined && blk in logo.blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
-                let mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                const mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-
-            let __listener = event => {
+            const __listener = () => {
                 tur.singer.transposition += tur.singer.invertList.length > 0 ? value : -value;
             };
 
@@ -542,22 +610,21 @@ function setupPitchActions() {
          * @returns {void}
          */
         static setScalarTranspose(transValue, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             tur.singer.scalarTransposition +=
                 tur.singer.invertList.length > 0 ? -transValue : transValue;
             tur.singer.scalarTranspositionValues.push(transValue);
 
-            let listenerName = "_scalar_transposition_" + turtle;
+            const listenerName = "_scalar_transposition_" + turtle;
             if (blk !== undefined && blk in logo.blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
-                let mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                const mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            let __listener = event => {
+            const __listener = () => {
                 transValue = tur.singer.scalarTranspositionValues.pop();
                 tur.singer.scalarTransposition +=
                     tur.singer.invertList.length > 0 ? transValue : -transValue;
@@ -575,22 +642,20 @@ function setupPitchActions() {
          * @returns {void}
          */
         static setSemitoneTranspose(transValue, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
-            tur.singer.transposition +=
-                tur.singer.invertList.length > 0 ? -transValue : transValue;
+            tur.singer.transposition += tur.singer.invertList.length > 0 ? -transValue : transValue;
             tur.singer.transpositionValues.push(transValue);
 
-            let listenerName = "_transposition_" + turtle;
+            const listenerName = "_transposition_" + turtle;
             if (blk !== undefined && blk in logo.blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
-                let mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                const mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            let __listener = event => {
+            const __listener = () => {
                 transValue = tur.singer.transpositionValues.pop();
                 tur.singer.transposition +=
                     tur.singer.invertList.length > 0 ? transValue : -transValue;
@@ -625,31 +690,36 @@ function setupPitchActions() {
 
             if (mode === _("even")) {
                 mode = "even";
-            } else if (arg2 === _("odd")) {
+            } else if (mode === _("odd")) {
                 mode = "odd";
-            } else if (arg2 === _("scalar")) {
+            } else if (mode === _("scalar")) {
                 mode = "scalar";
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             if (mode === "even" || mode === "odd" || mode === "scalar") {
-                let _octave = calcOctave(
-                    tur.singer.currentOctave, octave, tur.singer.lastNotePlayed, name
+                const _octave = calcOctave(
+                    tur.singer.currentOctave,
+                    octave,
+                    tur.singer.lastNotePlayed,
+                    name
                 );
                 tur.singer.invertList.push([name, _octave, mode]);
             }
 
-            let listenerName = "_invert_" + turtle;
+            const listenerName = "_invert_" + turtle;
             if (blk !== undefined && blk in logo.blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
-                let mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                const mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            let __listener = event => tur.singer.invertList.pop();
+            const __listener = () => {
+                tur.singer.invertList.pop();
+                tur.singer.inverted = false;
+            };
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
 
@@ -664,9 +734,8 @@ function setupPitchActions() {
          */
         static numToPitch(number, outType, turtle) {
             if (number !== null && typeof number === "number") {
-                let obj = numberToPitch(
-                    Math.floor(number) +
-                    logo.turtles.ithTurtle(turtle).singer.pitchNumberOffset
+                const obj = numberToPitch(
+                    Math.floor(number) + logo.turtles.ithTurtle(turtle).singer.pitchNumberOffset
                 );
                 if (outType === "pitch") {
                     return obj[0];
@@ -686,9 +755,9 @@ function setupPitchActions() {
          * @param {Number} turtle - Turtle index in turtles.turtleList
          */
         static setPitchNumberOffset(pitch, octave, turtle) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
-            let _octave = Math.floor(
+            const _octave = Math.floor(
                 calcOctave(tur.singer.currentOctave, octave, tur.singer.lastNotePlayed, pitch)
             );
             tur.singer.pitchNumberOffset = pitchToNumber(pitch, _octave, tur.singer.keySignature);
@@ -702,7 +771,7 @@ function setupPitchActions() {
          * @returns {Number} change/scalar change in pitch
          */
         static deltaPitch(outType, turtle) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             if (tur.singer.previousNotePlayed == null) {
                 return 0;
@@ -711,7 +780,7 @@ function setupPitchActions() {
                 let pitch = tur.singer.previousNotePlayed[0].slice(0, len - 1);
                 let octave = parseInt(tur.singer.previousNotePlayed[0].slice(len - 1));
                 let obj = [pitch, octave];
-                let previousValue = pitchToNumber(obj[0], obj[1], tur.singer.keySignature);
+                const previousValue = pitchToNumber(obj[0], obj[1], tur.singer.keySignature);
 
                 len = tur.singer.lastNotePlayed[0].length;
                 pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
@@ -727,12 +796,12 @@ function setupPitchActions() {
                     let scalarDelta = 0;
                     let i = 0;
 
-                    let _calculate = type => {
+                    const _calculate = (type) => {
                         i++;
-                        let nhalf =
-                            type === "up" ?
-                                getStepSizeUp(tur.singer.keySignature, pitch, 0, "equal") :
-                                getStepSizeDown(tur.singer.keySignature, pitch, 0, "equal")
+                        const nhalf =
+                            type === "up"
+                                ? getStepSizeUp(tur.singer.keySignature, pitch, 0, "equal")
+                                : getStepSizeDown(tur.singer.keySignature, pitch, 0, "equal");
                         delta -= nhalf;
                         scalarDelta += type === "up" ? 1 : -1;
                         obj = getNote(
@@ -747,9 +816,8 @@ function setupPitchActions() {
                         );
                         [pitch, octave] = obj;
 
-                        if (i > 100)
-                            return;
-                    }
+                        if (i > 100) return;
+                    };
 
                     if (delta > 0) {
                         while (delta > 0) {
@@ -774,25 +842,25 @@ function setupPitchActions() {
          * @returns {Number} number of semi-tones
          */
         static consonantStepSize(stepType, turtle) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             if (tur.singer.lastNotePlayed !== null) {
-                let len = tur.singer.lastNotePlayed[0].length;
+                const len = tur.singer.lastNotePlayed[0].length;
 
-                return stepType === "up" ?
-                    getStepSizeUp(
-                        tur.singer.keySignature,
-                        tur.singer.lastNotePlayed[0].slice(0, len - 1)
-                    ) :
-                    getStepSizeDown(
+                return stepType === "up"
+                    ? getStepSizeUp(
                         tur.singer.keySignature,
                         tur.singer.lastNotePlayed[0].slice(0, len - 1)
                     )
+                    : getStepSizeDown(
+                        tur.singer.keySignature,
+                        tur.singer.lastNotePlayed[0].slice(0, len - 1)
+                    );
             } else {
-                return stepType === "up" ?
-                    getStepSizeUp(tur.singer.keySignature, "G") :
-                    getStepSizeDown(tur.singer.keySignature, "G");
+                return stepType === "up"
+                    ? getStepSizeUp(tur.singer.keySignature, "G")
+                    : getStepSizeDown(tur.singer.keySignature, "G");
             }
         }
-    }
+    };
 }

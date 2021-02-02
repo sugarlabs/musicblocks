@@ -155,7 +155,7 @@ class MusicBlocks {
                 MusicBlocks._methodList[className] = [];
 
                 if (className === "Painter") {
-                    for (let methodName of Object.getOwnPropertyNames(
+                    for (const methodName of Object.getOwnPropertyNames(
                         eval(className + ".prototype")
                     )) {
                         if (methodName !== "constructor" && !methodName.startsWith("_"))
@@ -164,7 +164,7 @@ class MusicBlocks {
                     return;
                 }
 
-                for (let methodName of Object.getOwnPropertyNames(eval(className))) {
+                for (const methodName of Object.getOwnPropertyNames(eval(className))) {
                     if (methodName !== "length" && methodName !== "prototype")
                         MusicBlocks._methodList[className].push(methodName);
                 }
@@ -179,10 +179,10 @@ class MusicBlocks {
             MusicBlocks._methodList = {};
         }
 
-        for (let turtle of Mouse.AddedTurtles) {
+        for (const turtle of Mouse.AddedTurtles) {
             turtle.container.visible = false;
             turtle.inTrash = true;
-            let turIndex = turtles.turtleList.indexOf(turtle);
+            const turIndex = turtles.turtleList.indexOf(turtle);
             turtles.turtleList.splice(turIndex, 1);
         }
 
@@ -200,8 +200,8 @@ class MusicBlocks {
      */
     static run() {
         // Remove any listeners that might be still active
-        for (let mouse of Mouse.MouseList) {
-            for (let listener in mouse.turtle.listeners) {
+        for (const mouse of Mouse.MouseList) {
+            for (const listener in mouse.turtle.listeners) {
                 logo.stage.removeEventListener(listener, mouse.turtle.listeners[listener], false);
             }
             mouse.turtle.listeners = {};
@@ -228,7 +228,7 @@ class MusicBlocks {
                 if (args !== undefined) args();
             } else {
                 let cname = null;
-                for (let className in MusicBlocks._methodList) {
+                for (const className in MusicBlocks._methodList) {
                     if (MusicBlocks._methodList[className].indexOf(command) !== -1) {
                         cname = className;
                         break;
@@ -241,7 +241,7 @@ class MusicBlocks {
                     args === undefined || args === [] ? cname[command]() : cname[command](...args);
             }
 
-            let delay = this.turtle.waitTime;
+            const delay = this.turtle.waitTime;
             this.turtle.doWait(0);
             setTimeout(() => resolve(returnVal), delay);
         });
@@ -262,12 +262,12 @@ class MusicBlocks {
      */
     get ENDFLOWCOMMAND() {
         return new Promise((resolve) => {
-            let signal = this.listeners.pop();
+            const signal = this.listeners.pop();
             if (signal !== null && signal !== undefined) {
                 logo.stage.dispatchEvent(signal);
             }
 
-            let delay = this.turtle.waitTime;
+            const delay = this.turtle.waitTime;
             this.turtle.doWait(0);
             setTimeout(resolve, delay);
         });
@@ -344,7 +344,7 @@ class MusicBlocks {
     // ============================== METER ===================================
 
     set PICKUP(value) {
-        let args = JSInterface.validateArgs("PICKUP", [value]);
+        const args = JSInterface.validateArgs("PICKUP", [value]);
         Singer.MeterActions.setPickup(args[0], this.turIndex);
     }
 
@@ -393,7 +393,7 @@ class MusicBlocks {
     // ============================ INTERVALS =================================
 
     set MOVEABLEDO(moveable) {
-        let args = JSInterface.validateArgs("MOVEABLEDO", [moveable]);
+        const args = JSInterface.validateArgs("MOVEABLEDO", [moveable]);
         Singer.IntervalsActions.setMoveableDo(args[0], this.turIndex);
     }
 
@@ -412,12 +412,12 @@ class MusicBlocks {
     // ============================== VOLUME ==================================
 
     set PANNING(value) {
-        let args = JSInterface.validateArgs("PANNING", [value]);
+        const args = JSInterface.validateArgs("PANNING", [value]);
         Singer.VolumeActions.setPanning(args[0], this.turIndex);
     }
 
     set MASTERVOLUME(volume) {
-        let args = JSInterface.validateArgs("MASTERVOLUME", [volume]);
+        const args = JSInterface.validateArgs("MASTERVOLUME", [volume]);
         Singer.VolumeActions.setMasterVolume(args[0], this.turIndex);
     }
 

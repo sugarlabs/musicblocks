@@ -24,49 +24,49 @@
  */
 class MeterBlocksAPI {
     setMeter(beatCount, noteValue) {
-        let args = JSInterface.validateArgs("setMeter", [beatCount, noteValue]);
+        const args = JSInterface.validateArgs("setMeter", [beatCount, noteValue]);
         return this.runCommand("setMeter", [args[0], args[1], this.turIndex]);
     }
 
     setBPM(bpm, beatValue) {
-        let args = JSInterface.validateArgs("setBPM", [bpm, beatValue]);
+        const args = JSInterface.validateArgs("setBPM", [bpm, beatValue]);
         return this.runCommand("setBPM", [args[0], args[1], this.turIndex]);
     }
 
     setMasterBPM(bpm, beatValue) {
-        let args = JSInterface.validateArgs("setMasterBPM", [bpm, beatValue]);
+        const args = JSInterface.validateArgs("setMasterBPM", [bpm, beatValue]);
         return this.runCommand("setMasterBPM", [args[0], args[1]]);
     }
 
     onEveryNoteDo(action) {
-        let args = JSInterface.validateArgs("onEveryNoteDo", [action]);
+        const args = JSInterface.validateArgs("onEveryNoteDo", [action]);
         return this.runCommand("onEveryNoteDo", [args[0], null, null, this.turIndex]);
     }
 
     onEveryBeatDo(action) {
-        let args = JSInterface.validateArgs("onEveryBeatDo", [action]);
+        const args = JSInterface.validateArgs("onEveryBeatDo", [action]);
         return this.runCommand("onEveryBeatDo", [args[0], null, null, this.turIndex]);
     }
 
     onStrongBeatDo(beat, action) {
-        let args = JSInterface.validateArgs("onStrongBeatDo", [beat, action]);
+        const args = JSInterface.validateArgs("onStrongBeatDo", [beat, action]);
         return this.runCommand("onStrongBeatDo", [args[0], args[1], null, null, this.turIndex]);
     }
 
     onWeakBeatDo(action) {
-        let args = JSInterface.validateArgs("onWeakBeatDo", [action]);
+        const args = JSInterface.validateArgs("onWeakBeatDo", [action]);
         return this.runCommand("onWeakBeatDo", [args[0], null, null, this.turIndex]);
     }
 
     async setNoClock(flow) {
-        let args = JSInterface.validateArgs("setNoClock", [flow]);
+        const args = JSInterface.validateArgs("setNoClock", [flow]);
         await this.runCommand("setNoClock", [this.turIndex]);
         await args[0]();
         return this.ENDFLOWCOMMAND;
     }
 
     getNotesPlayed(noteValue) {
-        let args = JSInterface.validateArgs("getNotesPlayed", [noteValue]);
+        const args = JSInterface.validateArgs("getNotesPlayed", [noteValue]);
         return Singer.MeterActions.getNotesPlayed(args[0], this.turIndex);
     }
 }

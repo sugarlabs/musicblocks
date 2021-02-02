@@ -24,13 +24,13 @@ function setupNumberBlocks() {
             ) {
                 logo.statusFields.push([blk, "int"]);
             } else {
-                let cblk = logo.blocks.blockList[blk].connections[1];
+                const cblk = logo.blocks.blockList[blk].connections[1];
 
                 if (cblk === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     return 0;
                 } else {
-                    let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                    const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
 
                     try {
                         return MathUtility.doInt(a);
@@ -72,15 +72,15 @@ function setupNumberBlocks() {
             ) {
                 logo.statusFields.push([blk, "mod"]);
             } else {
-                let cblk1 = logo.blocks.blockList[blk].connections[1];
-                let cblk2 = logo.blocks.blockList[blk].connections[2];
+                const cblk1 = logo.blocks.blockList[blk].connections[1];
+                const cblk2 = logo.blocks.blockList[blk].connections[2];
 
                 if (cblk1 === null || cblk2 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     return 0;
                 } else {
-                    let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                    let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                    const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                    const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
 
                     try {
                         return MathUtility.doMod(a, b);
@@ -123,8 +123,8 @@ function setupNumberBlocks() {
             ) {
                 logo.statusFields.push([blk, "power"]);
             } else {
-                let cblk1 = logo.blocks.blockList[blk].connections[1];
-                let cblk2 = logo.blocks.blockList[blk].connections[2];
+                const cblk1 = logo.blocks.blockList[blk].connections[1];
+                const cblk2 = logo.blocks.blockList[blk].connections[2];
 
                 if (cblk1 === null || cblk2 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -134,8 +134,8 @@ function setupNumberBlocks() {
                         return 0;
                     }
                 } else {
-                    let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                    let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                    const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                    const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
 
                     try {
                         return MathUtility.doPower(a, b);
@@ -177,13 +177,13 @@ function setupNumberBlocks() {
             ) {
                 logo.statusFields.push([blk, logo.blocks.blockList[blk].name]);
             } else {
-                let cblk = logo.blocks.blockList[blk].connections[1];
+                const cblk = logo.blocks.blockList[blk].connections[1];
 
                 if (cblk === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     return 0;
                 } else {
-                    let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                    const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                     try {
                         return MathUtility.doSqrt(a);
                     } catch (e) {
@@ -228,13 +228,13 @@ function setupNumberBlocks() {
             ) {
                 logo.statusFields.push([blk, logo.blocks.blockList[blk].name]);
             } else {
-                let cblk = logo.blocks.blockList[blk].connections[1];
+                const cblk = logo.blocks.blockList[blk].connections[1];
 
                 if (cblk === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     return 0;
                 } else {
-                    let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                    const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
 
                     try {
                         return MathUtility.doAbs(a);
@@ -289,19 +289,19 @@ function setupNumberBlocks() {
             ) {
                 logo.statusFields.push([blk, "distance"]);
             } else {
-                let cblk1 = logo.blocks.blockList[blk].connections[1];
-                let cblk2 = logo.blocks.blockList[blk].connections[2];
-                let cblk3 = logo.blocks.blockList[blk].connections[3];
-                let cblk4 = logo.blocks.blockList[blk].connections[4];
+                const cblk1 = logo.blocks.blockList[blk].connections[1];
+                const cblk2 = logo.blocks.blockList[blk].connections[2];
+                const cblk3 = logo.blocks.blockList[blk].connections[3];
+                const cblk4 = logo.blocks.blockList[blk].connections[4];
 
                 if (cblk1 === null || cblk2 === null || cblk3 === null || cblk4 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     return 0;
                 } else {
-                    let x1 = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                    let y1 = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                    let x2 = logo.parseArg(logo, turtle, cblk3, blk, receivedArg);
-                    let y2 = logo.parseArg(logo, turtle, cblk4, blk, receivedArg);
+                    const x1 = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                    const y1 = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                    const x2 = logo.parseArg(logo, turtle, cblk3, blk, receivedArg);
+                    const y2 = logo.parseArg(logo, turtle, cblk4, blk, receivedArg);
 
                     try {
                         return MathUtility.doCalculateDistance(x1, y1, x2, y2);
@@ -346,8 +346,8 @@ function setupNumberBlocks() {
             ) {
                 logo.statusFields.push([blk, "divide"]);
             } else {
-                let cblk1 = logo.blocks.blockList[blk].connections[1];
-                let cblk2 = logo.blocks.blockList[blk].connections[2];
+                const cblk1 = logo.blocks.blockList[blk].connections[1];
+                const cblk2 = logo.blocks.blockList[blk].connections[2];
 
                 if (cblk1 === null || cblk2 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -357,8 +357,8 @@ function setupNumberBlocks() {
                         return 0;
                     }
                 } else {
-                    let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                    let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                    const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                    const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
 
                     try {
                         return MathUtility.doDivide(a, b);
@@ -408,8 +408,8 @@ function setupNumberBlocks() {
             ) {
                 logo.statusFields.push([blk, "multiply"]);
             } else {
-                let cblk1 = logo.blocks.blockList[blk].connections[1];
-                let cblk2 = logo.blocks.blockList[blk].connections[2];
+                const cblk1 = logo.blocks.blockList[blk].connections[1];
+                const cblk2 = logo.blocks.blockList[blk].connections[2];
 
                 if (cblk1 === null || cblk2 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -421,37 +421,37 @@ function setupNumberBlocks() {
                         return 0;
                     }
                 } else {
-                    let tur = logo.turtles.ithTurtle(turtle);
+                    const tur = logo.turtles.ithTurtle(turtle);
 
                     // We have a special case for certain keywords associated with octaves:
                     // current, next, and previous.
 
-                    let cblk0 = logo.blocks.blockList[blk].connections[0];
+                    const cblk0 = logo.blocks.blockList[blk].connections[0];
 
                     let a, b;
                     if (
                         cblk0 !== null &&
                         logo.blocks.blockList[cblk0].name === "pitch"
                     ) {
-                        let noteBlock = logo.blocks.blockList[cblk0].connections[1];
+                        const noteBlock = logo.blocks.blockList[cblk0].connections[1];
 
                         a = typeof logo.blocks.blockList[cblk1].value === "string" ?
-                                calcOctave(
-                                    tur.singer.currentOctave,
-                                    logo.blocks.blockList[cblk1].value,
-                                    tur.singer.lastNotePlayed,
-                                    logo.blocks.blockList[noteBlock].value
-                                ) :
-                                logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                            calcOctave(
+                                tur.singer.currentOctave,
+                                logo.blocks.blockList[cblk1].value,
+                                tur.singer.lastNotePlayed,
+                                logo.blocks.blockList[noteBlock].value
+                            ) :
+                            logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
 
                         b = typeof logo.blocks.blockList[cblk2].value === "string" ?
-                                calcOctave(
-                                    tur.singer.currentOctave,
-                                    logo.blocks.blockList[cblk2].value,
-                                    tur.singer.lastNotePlayed,
-                                    logo.blocks.blockList[noteBlock].value
-                                ) :
-                                logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                            calcOctave(
+                                tur.singer.currentOctave,
+                                logo.blocks.blockList[cblk2].value,
+                                tur.singer.lastNotePlayed,
+                                logo.blocks.blockList[noteBlock].value
+                            ) :
+                            logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                     } else {
                         a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                         b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
@@ -495,10 +495,10 @@ function setupNumberBlocks() {
             ) {
                 logo.statusFields.push([blk, "neg"]);
             } else {
-                let cblk = logo.blocks.blockList[blk].connections[1];
+                const cblk = logo.blocks.blockList[blk].connections[1];
 
                 if (cblk !== null) {
-                    let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                    const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
 
                     try {
                         return MathUtility.doNegate(a);
@@ -545,8 +545,8 @@ function setupNumberBlocks() {
             ) {
                 logo.statusFields.push([blk, "minus"]);
             } else {
-                let cblk1 = logo.blocks.blockList[blk].connections[1];
-                let cblk2 = logo.blocks.blockList[blk].connections[2];
+                const cblk1 = logo.blocks.blockList[blk].connections[1];
+                const cblk2 = logo.blocks.blockList[blk].connections[2];
 
                 if (cblk1 === null || cblk2 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -558,37 +558,37 @@ function setupNumberBlocks() {
                         return 0;
                     }
                 } else {
-                    let tur = logo.turtles.ithTurtle(turtle);
+                    const tur = logo.turtles.ithTurtle(turtle);
 
                     // We have a special case for certain keywords associated with octaves:
                     // current, next, and previous.
 
-                    let cblk0 = logo.blocks.blockList[blk].connections[0];
+                    const cblk0 = logo.blocks.blockList[blk].connections[0];
 
                     let a, b;
                     if (
                         cblk0 !== null &&
                         logo.blocks.blockList[cblk0].name === "pitch"
                     ) {
-                        let noteBlock = logo.blocks.blockList[cblk0].connections[1];
+                        const noteBlock = logo.blocks.blockList[cblk0].connections[1];
 
                         a = typeof logo.blocks.blockList[cblk1].value === "string" ?
-                                calcOctave(
-                                    tur.singer.currentOctave,
-                                    logo.blocks.blockList[cblk1].value,
-                                    tur.singer.lastNotePlayed,
-                                    logo.blocks.blockList[noteBlock].value
-                                ) :
-                                logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                            calcOctave(
+                                tur.singer.currentOctave,
+                                logo.blocks.blockList[cblk1].value,
+                                tur.singer.lastNotePlayed,
+                                logo.blocks.blockList[noteBlock].value
+                            ) :
+                            logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
 
                         b = typeof logo.blocks.blockList[cblk2].value === "string" ?
-                                calcOctave(
-                                    tur.singer.currentOctave,
-                                    logo.blocks.blockList[cblk2].value,
-                                    tur.singer.lastNotePlayed,
-                                    logo.blocks.blockList[noteBlock].value
-                                ) :
-                                logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                            calcOctave(
+                                tur.singer.currentOctave,
+                                logo.blocks.blockList[cblk2].value,
+                                tur.singer.lastNotePlayed,
+                                logo.blocks.blockList[noteBlock].value
+                            ) :
+                            logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                     } else {
                         a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                         b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
@@ -643,8 +643,8 @@ function setupNumberBlocks() {
             ) {
                 logo.statusFields.push([blk, "plus"]);
             } else {
-                let cblk1 = logo.blocks.blockList[blk].connections[1];
-                let cblk2 = logo.blocks.blockList[blk].connections[2];
+                const cblk1 = logo.blocks.blockList[blk].connections[1];
+                const cblk2 = logo.blocks.blockList[blk].connections[2];
 
                 if (cblk1 === null || cblk2 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -656,14 +656,14 @@ function setupNumberBlocks() {
                         return 0;
                     }
                 } else {
-                    let tur = logo.turtles.ithTurtle(turtle);
+                    const tur = logo.turtles.ithTurtle(turtle);
 
                     // We have a special case for certain keywords associated with octaves:
                     // current, next, and previous. In the case of plus, since we use it
                     // for string concatenation as well, we check to see if the block is
                     // connected to a pitch block before assuming octave.
 
-                    let cblk0 = logo.blocks.blockList[blk].connections[0];
+                    const cblk0 = logo.blocks.blockList[blk].connections[0];
 
                     let a, b;
                     if (cblk0 !== null && logo.blocks.blockList[cblk0].name === "pitch") {
@@ -682,7 +682,7 @@ function setupNumberBlocks() {
 
                             return scaledegree;
                         } else {
-                            let noteBlock = logo.blocks.blockList[cblk0].connections[1];
+                            const noteBlock = logo.blocks.blockList[cblk0].connections[1];
 
                             a = typeof logo.blocks.blockList[cblk1].value === "string" ?
                                 calcOctave(
@@ -751,8 +751,8 @@ function setupNumberBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            let cblk1 = logo.blocks.blockList[blk].connections[1];
-            let cblk2 = logo.blocks.blockList[blk].connections[2];
+            const cblk1 = logo.blocks.blockList[blk].connections[1];
+            const cblk2 = logo.blocks.blockList[blk].connections[2];
 
             let a, b;
             if (cblk1 !== null) {
@@ -808,17 +808,17 @@ function setupNumberBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            let cblk0 = logo.blocks.blockList[blk].connections[0];
-            let cblk1 = logo.blocks.blockList[blk].connections[1];
-            let cblk2 = logo.blocks.blockList[blk].connections[2];
+            const cblk0 = logo.blocks.blockList[blk].connections[0];
+            const cblk1 = logo.blocks.blockList[blk].connections[1];
+            const cblk2 = logo.blocks.blockList[blk].connections[2];
             
             if (cblk1 === null || cblk2 === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             }
 
-            let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-            let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+            const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
             let octave = undefined;
 
             // Check if connected to pitch block and read octave values
@@ -834,7 +834,7 @@ function setupNumberBlocks() {
 
             try {
                 if (octave === undefined) {
-                    let randomResult = MathUtility.doRandom(a, b, octave);
+                    const randomResult = MathUtility.doRandom(a, b, octave);
                     if (typeof randomResult === "object") {
                         return randomResult[0];
                     }

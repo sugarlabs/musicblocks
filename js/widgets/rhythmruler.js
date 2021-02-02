@@ -1,18 +1,23 @@
-// Copyright (c) 2016-19 Walter Bender
-// Copyright (c) 2016 Hemant Kasat
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundation; either
-// version 3 of the License, or (at your option) any later version.
-//
-// You should have received a copy of the GNU Affero General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+/**
+ * @file This contains the prototype of the rhythmruler Widget
+ *
+ * @copyright 2016-19 Walter Bender
+ * @copyright 2016 Hemant Kasat
+ *
+ * @license
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * The GNU Affero General Public License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this
+ * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
+ * MA 02110-1335 USA.
+ */
 
 /*
    global TONEBPM, Singer, logo, _, delayExecution, docById, calcNoteValueToDisplay, platformColor,
    beginnerMode, last, EIGHTHNOTEWIDTH, nearestBeat, rationalToFraction, DRUMNAMES, VOICENAMES,
-   EFFECTSNAMES, wheelnav, slicePath
+   EFFECTSNAMES
  */
 
 /* exported RhythmRuler */
@@ -27,24 +32,15 @@
  * - `rulerTableDiv` is for the drum buttons (fixed first col) and the ruler cells
  */
 class RhythmRuler {
-    static ROWHEIGHT = 130;
     static RULERHEIGHT = 70;
     static BUTTONSIZE = 51;
     static ICONSIZE = 32;
     static DEL = 46;
 
+    /**
+     * @constructor
+     */
     constructor() {
-        // console.debug("init RhythmRuler");
-
-        this._bpmFactor = (1000 * TONEBPM) / Singer.masterBPM;
-
-        this._playing = false;
-        this._playingOne = false;
-        this._playingAll = false;
-        this._rulerPlaying = -1;
-        this._startingTime = null;
-        this._expanded = false;
-
         // There is one ruler per drum.
         this.Drums = [];
         // Rulers, one per drum, contain the subdivisions defined by rhythm blocks.
@@ -84,6 +80,23 @@ class RhythmRuler {
         this._dissectNumber = null;
         this._progressBar = null;
         this._rulers = [];
+    }
+
+    /**
+     * Initialises the temperament widget.
+     * @returns {void}
+     */
+    init() {
+        // console.debug("init RhythmRuler");
+
+        this._bpmFactor = (1000 * TONEBPM) / Singer.masterBPM;
+
+        this._playing = false;
+        this._playingOne = false;
+        this._playingAll = false;
+        this._rulerPlaying = -1;
+        this._startingTime = null;
+        this._expanded = false;
 
         // If there are no drums, add one.
         if (this.Drums.length === 0) {
@@ -99,6 +112,7 @@ class RhythmRuler {
         }
 
         this._cellScale = 1.0;
+        const iconSize = RhythmRuler.ICONSIZE;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "rhythm maker");
         this.widgetWindow = widgetWindow;
@@ -149,11 +163,7 @@ class RhythmRuler {
             this.widgetWindow.destroy();
         };
 
-        this._playAllCell = widgetWindow.addButton(
-            "play-button.svg",
-            RhythmRuler.ICONSIZE,
-            _("Play all")
-        );
+        this._playAllCell = widgetWindow.addButton("play-button.svg", iconSize, _("Play all"));
         this._playAllCell.onclick = () => {
             if (this._playing) {
                 this.__pause();
@@ -165,10 +175,10 @@ class RhythmRuler {
         this._save_lock = false;
         widgetWindow.addButton(
             "export-chunk.svg",
-            RhythmRuler.ICONSIZE,
+            iconSize,
             _("Save rhythms")
         ).onclick = async () => {
-            // that._save(0);
+            // this._save(0);
             // Debounce button
             if (!this._get_save_lock()) {
                 this._save_lock = true;
@@ -177,7 +187,7 @@ class RhythmRuler {
                 this._saveTupletsMerged(this._mergeRulers());
 
                 // Rather than each ruler individually.
-                // that._saveTuplets(0);
+                // this._saveTuplets(0);
                 await delayExecution(1000);
                 this._save_lock = false;
             }
@@ -185,7 +195,7 @@ class RhythmRuler {
 
         widgetWindow.addButton(
             "export-drums.svg",
-            RhythmRuler.ICONSIZE,
+            iconSize,
             _("Save drum machine")
         ).onclick = async () => {
             // Debounce button
@@ -201,12 +211,11 @@ class RhythmRuler {
         this._dissectNumber = widgetWindow.addInputButton("2");
 
         this._dissectNumber.onfocus = () => {
-            // that._piemenuNumber(['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16'], numberInput.value);
+            // this._piemenuNumber(['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16'], numberInput.value);
         };
 
         this._dissectNumber.onkeydown = (event) => {
-            // 46 number is for the delete keypress
-            if (event.keyCode === 46) {
+            if (event.keyCode === RhythmRuler.DEL) {
                 this._dissectNumber.value = this._dissectNumber.value.substring(
                     0,
                     this._dissectNumber.value.length - 1
@@ -223,30 +232,18 @@ class RhythmRuler {
             this._dissectNumber.value = Math.max(Math.min(this._dissectNumber.value, 128), 2);
         };
 
-        widgetWindow.addButton(
-            "restore-button.svg",
-            RhythmRuler.ICONSIZE,
-            _("Undo")
-        ).onclick = () => {
+        widgetWindow.addButton("restore-button.svg", iconSize, _("Undo")).onclick = () => {
             this._undo();
         };
 
         //.TRANS: user can tap out a rhythm by clicking on a ruler.
-        this._tapButton = widgetWindow.addButton(
-            "tap-button.svg",
-            RhythmRuler.ICONSIZE,
-            _("Tap a rhythm")
-        );
+        this._tapButton = widgetWindow.addButton("tap-button.svg", iconSize, _("Tap a rhythm"));
         this._tapButton.onclick = () => {
             this._tap();
         };
 
         //.TRANS: clear all subdivisions from the ruler.
-        widgetWindow.addButton(
-            "erase-button.svg",
-            RhythmRuler.ICONSIZE,
-            _("Clear")
-        ).onclick = () => {
+        widgetWindow.addButton("erase-button.svg", iconSize, _("Clear")).onclick = () => {
             this._clear();
         };
 
@@ -279,9 +276,9 @@ class RhythmRuler {
                     '" alt="' +
                     _("Play") +
                     '" height="' +
-                    RhythmRuler.ICONSIZE +
+                    iconSize +
                     '" width="' +
-                    RhythmRuler.ICONSIZE +
+                    iconSize +
                     '" />';
                 drumcell.className = "headcol"; // Position fixed when scrolling horizontally
 
@@ -295,9 +292,9 @@ class RhythmRuler {
                                     '" alt="' +
                                     _("Play") +
                                     '" height="' +
-                                    RhythmRuler.ICONSIZE +
+                                    iconSize +
                                     '" width="' +
-                                    RhythmRuler.ICONSIZE +
+                                    iconSize +
                                     '" vertical-align="middle">';
                                 this._playing = false;
                                 this._playingOne = false;
@@ -324,9 +321,9 @@ class RhythmRuler {
                                     '" alt="' +
                                     _("Pause") +
                                     '" height="' +
-                                    RhythmRuler.ICONSIZE +
+                                    iconSize +
                                     '" width="' +
-                                    RhythmRuler.ICONSIZE +
+                                    iconSize +
                                     '" vertical-align="middle">';
                                 this._elapsedTimes[id] = 0;
                                 this._offsets[id] = 0;
@@ -425,12 +422,11 @@ class RhythmRuler {
                                     this._dissectHistory[i][0][j][1],
                                     false
                                 );
+                            } else {
+                                // console.warn(
+                                //     "Could not find cell to divide. Did the order of the rhythm blocks change?"
+                                // );
                             }
-                            // else {
-                            //     console.warn(
-                            //         "Could not find cell to divide. Did the order of the rhythm blocks change?"
-                            //     );
-                            // }
                         } else {
                             // divide is [cell, [values]]
                             cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j][0]];
@@ -462,10 +458,20 @@ class RhythmRuler {
         // this._piemenuRuler(this._rulerSelected);
     }
 
+    /**
+     * @private
+     * @param {number} noteValue
+     * @returns {void}
+     */
     _noteWidth(noteValue) {
         return Math.floor(EIGHTHNOTEWIDTH * (8 / Math.abs(noteValue)) * 4);
     }
 
+    /**
+     * @private
+     * @param {number} rulerno
+     * @returns {void}
+     */
     _calculateZebraStripes(rulerno) {
         const ruler = this._rulers[rulerno];
         let evenColor;
@@ -497,6 +503,12 @@ class RhythmRuler {
         }
     }
 
+    /**
+     * @private
+     * @param {string} ruler
+     * @param {Event} event - The triggering event.
+     * @returns {void}
+     */
     _dissectRuler(event, ruler) {
         const cell = event.target;
         if (cell === null) {
@@ -568,7 +580,7 @@ class RhythmRuler {
                 }
 
                 setTimeout(() => {
-                    this.__startTapping(noteValues, interval, event);
+                    this.__startTapping(interval, event);
                 }, interval);
             }
         } else {
@@ -591,7 +603,14 @@ class RhythmRuler {
         this.saveDissectHistory();
     }
 
-    __startTapping(noteValues, interval, event) {
+    /**
+     * @private
+     * @param {number} noteValues
+     * @param {Event} event - The triggering event.
+     * @param {number} interval
+     * @returns {void}
+     */
+    __startTapping(interval, event) {
         const d = new Date();
         this._tapTimes = [d.getTime()];
         this._tapEndTime = this._tapTimes[0] + interval;
@@ -621,6 +640,11 @@ class RhythmRuler {
         __move(interval / 8, 100 / 8);
     }
 
+    /**
+     * @private
+     * @param {Event} event - The triggering event.
+     * @returns {void}
+     */
     __endTapping(event) {
         const cell = event.target;
         if (cell.parentNode === null) {
@@ -683,6 +707,8 @@ class RhythmRuler {
             const newNoteValues = [];
             let sum = 0;
             let obj;
+            // let interval =
+            //     this._bpmFactor / Math.abs(noteValues[this._tapCell.cellIndex]);
             for (let i = 1; i < this._tapTimes.length; i++) {
                 const dtime = this._tapTimes[i] - this._tapTimes[i - 1];
                 if (i < this._tapTimes.length - 1) {
@@ -711,6 +737,7 @@ class RhythmRuler {
         this._tapTimes = [];
         this._tapCell = null;
         this._tapEndTime = null;
+        // let iconSize = RhythmRuler.ICONSIZE;
         this._tapButton.innerHTML =
             '<img src="header-icons/tap-button.svg" title="' +
             _("tap a rhythm") +
@@ -723,6 +750,13 @@ class RhythmRuler {
             '" vertical-align="middle">';
     }
 
+    /**
+     * @private
+     * @param {HTMLElement} cell  - The HTML element target
+     * @param {number} cellWidth
+     * @param {number} noteValue
+     * @returns {void}
+     */
     __addCellEventHandlers(cell, cellWidth, noteValue) {
         const __mouseOverHandler = (event) => {
             const cell = event.target;
@@ -762,11 +796,12 @@ class RhythmRuler {
                 // occasionally confuses tone.js during rapid clicking
                 // in the widget.
 
-                // that._logo.synth.trigger(0, 'C4', 1 / 32, 'chime', null, null);
+                // logo.synth.trigger(0, 'C4', 1 / 32, 'chime', null, null);
 
                 const cell = this._mouseDownCell;
                 if (cell !== null && cell.parentNode !== null) {
                     this._rulerSelected = cell.parentNode.getAttribute("data-row");
+                    // const noteValues = this.Rulers[this._rulerSelected][0];
                     cell.style.backgroundColor = platformColor.selectorBackground;
                 }
             }, 1500);
@@ -798,10 +833,9 @@ class RhythmRuler {
                 const cell = event.target;
                 if (cell !== null && cell.parentNode !== null) {
                     this._dissectRuler(event, cell.parentNode.getAttribute("data-row"));
+                } else {
+                    // console.error("Rhythm Ruler: null cell found on click");
                 }
-                // else {
-                //     console.error("Rhythm Ruler: null cell found on click");
-                // }
             }
 
             this._inLongPress = false;
@@ -831,10 +865,20 @@ class RhythmRuler {
         cell.addEventListener("click", __clickHandler);
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     __getLongPressStatus() {
         return this._inLongPress;
     }
 
+    /**
+     * @private
+     * @param {number} cellWidth
+     * @param {boolean} addToUndoList
+     * @returns {void}
+     */
     __toggleRestState(cell, addToUndoList) {
         if (cell !== null && cell.parentNode !== null) {
             this._rulerSelected = cell.parentNode.getAttribute("data-row");
@@ -900,6 +944,13 @@ class RhythmRuler {
         // this._piemenuRuler(this._rulerSelected);
     }
 
+    /**
+     * @private
+     * @param {HTMLElement} cell  - The HTML element target
+     * @param {number} newNoteValues
+     * @param {boolean} addToUndoList
+     * @returns {void}
+     */
     __divideFromList(cell, newNoteValues, addToUndoList) {
         if (typeof cell !== "object") {
             return;
@@ -923,6 +974,8 @@ class RhythmRuler {
             divisionHistory.push([newCellIndex, newNoteValues]);
 
             ruler.deleteCell(newCellIndex);
+
+            // let noteValue = noteValues[newCellIndex];
             // let tempwidth = this._noteWidth(newNoteValue);
             noteValues.splice(newCellIndex, 1);
 
@@ -947,6 +1000,13 @@ class RhythmRuler {
         // this._piemenuRuler(this._rulerSelected);
     }
 
+    /**
+     * @private
+     * @param {HTMLElement} cell  - The HTML element target
+     * @param {number} inputNum
+     * @param {boolean} addToUndoList
+     * @returns {void}
+     */
     __dissectByNumber(cell, inputNum, addToUndoList) {
         if (typeof cell !== "object") {
             return;
@@ -1010,6 +1070,12 @@ class RhythmRuler {
         // this._piemenuRuler(this._rulerSelected);
     }
 
+    /**
+     * @private
+     * @param {Event} event - The triggering event.
+     * @param {string} ruler
+     * @returns {void}
+     */
     _tieRuler(event, ruler) {
         if (this._playing) {
             // console.warn("You cannot tie while widget is playing.");
@@ -1030,6 +1096,11 @@ class RhythmRuler {
         // this._piemenuRuler(this._rulerSelected);
     }
 
+    /**
+     * @private
+     * @param {boolean} addToUndoList
+     * @returns {void}
+     */
     __tie(addToUndoList) {
         const ruler = this._rulers[this._rulerSelected];
 
@@ -1109,6 +1180,10 @@ class RhythmRuler {
         }
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _undo() {
         // FIXME: Add undo for REST
         logo.synth.stop();
@@ -1167,7 +1242,8 @@ class RhythmRuler {
             const newCellIndex = last(divisionHistory)[0];
             const oldNoteValues = last(divisionHistory)[1];
 
-            // Calculate the new note value based on the sum of the oldnoteValues.
+            // Calculate the new note value based on the sum of the
+            // oldnoteValues.
             let sum = 0;
             for (let i = 0; i < oldNoteValues.length; i++) {
                 sum += 1 / oldNoteValues[i];
@@ -1229,10 +1305,9 @@ class RhythmRuler {
                 }
 
                 this.Rulers[lastRuler][0] = noteValues;
+            } else {
+                // console.warn("empty history encountered... skipping undo");
             }
-            // else {
-            //     console.warn("empty history encountered... skipping undo");
-            // }
         } else if (obj[0] === "rest") {
             const newCellIndex = last(divisionHistory);
             const cell = ruler.cells[newCellIndex];
@@ -1246,20 +1321,29 @@ class RhythmRuler {
         // this._piemenuRuler(this._rulerSelected);
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _tap() {
         this._tapMode = true;
+        const iconSize = RhythmRuler.ICONSIZE;
         this._tapButton.innerHTML =
             '<img src="header-icons/tap-active-button.svg" title="' +
             _("tap a rhythm") +
             '" alt="' +
             _("tap a rhythm") +
             '" height="' +
-            RhythmRuler.ICONSIZE +
+            iconSize +
             '" width="' +
-            RhythmRuler.ICONSIZE +
+            iconSize +
             '" vertical-align="middle">';
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _clear() {
         logo.synth.stop();
         logo.resetSynth(0);
@@ -1288,6 +1372,10 @@ class RhythmRuler {
         // this._piemenuRuler(this._rulerSelected);
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     __pause() {
         this._playAllCell.innerHTML =
             '<img src="header-icons/play-button.svg" title="' +
@@ -1309,6 +1397,10 @@ class RhythmRuler {
         }
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     playAll() {
         // External call from run button.
         if (this._playing) {
@@ -1316,6 +1408,7 @@ class RhythmRuler {
                 this.__pause();
                 // Wait for pause to complete before restarting.
                 this._playingAll = true;
+
                 setTimeout(() => {
                     this.__resume();
                 }, 1000);
@@ -1325,6 +1418,10 @@ class RhythmRuler {
         }
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     __resume() {
         this._playAllCell.innerHTML =
             '<img src="header-icons/pause-button.svg" title="' +
@@ -1350,6 +1447,10 @@ class RhythmRuler {
         this._playAll();
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _playAll() {
         logo.synth.stop();
         logo.resetSynth(0);
@@ -1367,6 +1468,10 @@ class RhythmRuler {
         }
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _playOne() {
         logo.synth.stop();
         logo.resetSynth(0);
@@ -1381,6 +1486,13 @@ class RhythmRuler {
         this.__loop(0, this._rulerSelected, 0);
     }
 
+    /**
+     * @private
+     * @param {number} noteTime
+     * @param {number} rulerNo
+     * @param {number} colIndex
+     * @returns {void}
+     */
     __loop(noteTime, rulerNo, colIndex) {
         const ruler = this._rulers[rulerNo];
         if (ruler === null) {
@@ -1480,8 +1592,15 @@ class RhythmRuler {
         this._elapsedTimes[rulerNo] += Singer.defaultBPMFactor * 1000 * noteTime;
     }
 
+    /**
+     * @deprecated
+     * @private
+     * @param {number} selectedRuler
+     * @returns {void}
+     */
     _save(selectedRuler) {
         // Deprecated -- replaced by save tuplets code
+
         for (const name in logo.blocks.palettes.dict) {
             logo.blocks.palettes.dict[name].hideMenu(true);
         }
@@ -1506,30 +1625,8 @@ class RhythmRuler {
             }
             const delta = selectedRuler * 42;
             const newStack = [
-                [
-                    0,
-                    [
-                        "action",
-                        {
-                            collapsed: true
-                        }
-                    ],
-                    100 + delta,
-                    100 + delta,
-                    [null, 1, 2, null]
-                ],
-                [
-                    1,
-                    [
-                        "text",
-                        {
-                            value: stack_value
-                        }
-                    ],
-                    0,
-                    0,
-                    [0]
-                ]
+                [0, ["action", { collapsed: true }], 100 + delta, 100 + delta, [null, 1, 2, null]],
+                [1, ["text", { value: stack_value }], 0, 0, [0]]
             ];
             let previousBlock = 0;
             let sameNoteValue = 1;
@@ -1550,43 +1647,10 @@ class RhythmRuler {
                         0,
                         [previousBlock, idx + 1, idx + 2, idx + 5]
                     ]);
-                    newStack.push([
-                        idx + 1,
-                        [
-                            "number",
-                            {
-                                value: sameNoteValue
-                            }
-                        ],
-                        0,
-                        0,
-                        [idx]
-                    ]);
+                    newStack.push([idx + 1, ["number", { value: sameNoteValue }], 0, 0, [idx]]);
                     newStack.push([idx + 2, "divide", 0, 0, [idx, idx + 3, idx + 4]]);
-                    newStack.push([
-                        idx + 3,
-                        [
-                            "number",
-                            {
-                                value: obj[0]
-                            }
-                        ],
-                        0,
-                        0,
-                        [idx + 2]
-                    ]);
-                    newStack.push([
-                        idx + 4,
-                        [
-                            "number",
-                            {
-                                value: obj[1]
-                            }
-                        ],
-                        0,
-                        0,
-                        [idx + 2]
-                    ]);
+                    newStack.push([idx + 3, ["number", { value: obj[0] }], 0, 0, [idx + 2]]);
+                    newStack.push([idx + 4, ["number", { value: obj[1] }], 0, 0, [idx + 2]]);
                     newStack.push([idx + 5, "vspace", 0, 0, [idx, idx + 6]]);
                     if (i == ruler.cells.length - 1) {
                         newStack.push([idx + 6, "hidden", 0, 0, [idx + 5, null]]);
@@ -1608,6 +1672,11 @@ class RhythmRuler {
         }, 500);
     }
 
+    /**
+     * @private
+     * @param {number} selectedRuler
+     * @returns {void}
+     */
     _saveTuplets(selectedRuler) {
         for (const name in logo.blocks.palettes.dict) {
             logo.blocks.palettes.dict[name].hideMenu(true);
@@ -1631,30 +1700,8 @@ class RhythmRuler {
             }
             const delta = selectedRuler * 42;
             const newStack = [
-                [
-                    0,
-                    [
-                        "action",
-                        {
-                            collapsed: true
-                        }
-                    ],
-                    100 + delta,
-                    100 + delta,
-                    [null, 1, 2, null]
-                ],
-                [
-                    1,
-                    [
-                        "text",
-                        {
-                            value: stack_value
-                        }
-                    ],
-                    0,
-                    0,
-                    [0]
-                ]
+                [0, ["action", { collapsed: true }], 100 + delta, 100 + delta, [null, 1, 2, null]],
+                [1, ["text", { value: stack_value }], 0, 0, [0]]
             ];
             let previousBlock = 0;
             let sameNoteValue = 1;
@@ -1675,43 +1722,10 @@ class RhythmRuler {
                             0,
                             [previousBlock, idx + 1, idx + 2, idx + 5]
                         ]);
-                        newStack.push([
-                            idx + 1,
-                            [
-                                "number",
-                                {
-                                    value: sameNoteValue
-                                }
-                            ],
-                            0,
-                            0,
-                            [idx]
-                        ]);
+                        newStack.push([idx + 1, ["number", { value: sameNoteValue }], 0, 0, [idx]]);
                         newStack.push([idx + 2, "divide", 0, 0, [idx, idx + 3, idx + 4]]);
-                        newStack.push([
-                            idx + 3,
-                            [
-                                "number",
-                                {
-                                    value: obj[0]
-                                }
-                            ],
-                            0,
-                            0,
-                            [idx + 2]
-                        ]);
-                        newStack.push([
-                            idx + 4,
-                            [
-                                "number",
-                                {
-                                    value: n
-                                }
-                            ],
-                            0,
-                            0,
-                            [idx + 2]
-                        ]);
+                        newStack.push([idx + 3, ["number", { value: obj[0] }], 0, 0, [idx + 2]]);
+                        newStack.push([idx + 4, ["number", { value: n }], 0, 0, [idx + 2]]);
                         newStack.push([idx + 5, "vspace", 0, 0, [idx, idx + 6]]);
                     } else {
                         newStack.push([
@@ -1721,43 +1735,10 @@ class RhythmRuler {
                             0,
                             [previousBlock, idx + 1, idx + 2, idx + 5]
                         ]);
-                        newStack.push([
-                            idx + 1,
-                            [
-                                "number",
-                                {
-                                    value: sameNoteValue
-                                }
-                            ],
-                            0,
-                            0,
-                            [idx]
-                        ]);
+                        newStack.push([idx + 1, ["number", { value: sameNoteValue }], 0, 0, [idx]]);
                         newStack.push([idx + 2, "divide", 0, 0, [idx, idx + 3, idx + 4]]);
-                        newStack.push([
-                            idx + 3,
-                            [
-                                "number",
-                                {
-                                    value: obj[0]
-                                }
-                            ],
-                            0,
-                            0,
-                            [idx + 2]
-                        ]);
-                        newStack.push([
-                            idx + 4,
-                            [
-                                "number",
-                                {
-                                    value: obj[1]
-                                }
-                            ],
-                            0,
-                            0,
-                            [idx + 2]
-                        ]);
+                        newStack.push([idx + 3, ["number", { value: obj[0] }], 0, 0, [idx + 2]]);
+                        newStack.push([idx + 4, ["number", { value: obj[1] }], 0, 0, [idx + 2]]);
                         newStack.push([idx + 5, "vspace", 0, 0, [idx, idx + 6]]);
                     }
 
@@ -1781,6 +1762,11 @@ class RhythmRuler {
         }, 500);
     }
 
+    /**
+     * @private
+     * @param {number} selectedRuler
+     * @returns {void}
+     */
     _saveTupletsMerged(noteValues) {
         for (const name in logo.blocks.palettes.dict) {
             logo.blocks.palettes.dict[name].hideMenu(true);
@@ -1791,30 +1777,8 @@ class RhythmRuler {
         const stack_value = _("rhythm");
         const delta = 42;
         const newStack = [
-            [
-                0,
-                [
-                    "action",
-                    {
-                        collapsed: true
-                    }
-                ],
-                100 + delta,
-                100 + delta,
-                [null, 1, 2, null]
-            ],
-            [
-                1,
-                [
-                    "text",
-                    {
-                        value: stack_value
-                    }
-                ],
-                0,
-                0,
-                [0]
-            ]
+            [0, ["action", { collapsed: true }], 100 + delta, 100 + delta, [null, 1, 2, null]],
+            [1, ["text", { value: stack_value }], 0, 0, [0]]
         ];
         let previousBlock = 0;
         let sameNoteValue = 1;
@@ -1827,43 +1791,10 @@ class RhythmRuler {
                 const noteValue = noteValues[i];
                 const obj = rationalToFraction(1 / Math.abs(noteValue));
                 newStack.push([idx, "rhythm2", 0, 0, [previousBlock, idx + 1, idx + 2, idx + 5]]);
-                newStack.push([
-                    idx + 1,
-                    [
-                        "number",
-                        {
-                            value: sameNoteValue
-                        }
-                    ],
-                    0,
-                    0,
-                    [idx]
-                ]);
+                newStack.push([idx + 1, ["number", { value: sameNoteValue }], 0, 0, [idx]]);
                 newStack.push([idx + 2, "divide", 0, 0, [idx, idx + 3, idx + 4]]);
-                newStack.push([
-                    idx + 3,
-                    [
-                        "number",
-                        {
-                            value: obj[0]
-                        }
-                    ],
-                    0,
-                    0,
-                    [idx + 2]
-                ]);
-                newStack.push([
-                    idx + 4,
-                    [
-                        "number",
-                        {
-                            value: obj[1]
-                        }
-                    ],
-                    0,
-                    0,
-                    [idx + 2]
-                ]);
+                newStack.push([idx + 3, ["number", { value: obj[0] }], 0, 0, [idx + 2]]);
+                newStack.push([idx + 4, ["number", { value: obj[1] }], 0, 0, [idx + 2]]);
                 newStack.push([idx + 5, "vspace", 0, 0, [idx, idx + 6]]);
 
                 if (i == noteValues.length - 1) {
@@ -1881,6 +1812,11 @@ class RhythmRuler {
         logo.textMsg(_("New action block generated!"));
     }
 
+    /**
+     * @private
+     * @param {number} selectedRuler
+     * @returns {void}
+     */
     _saveMachine(selectedRuler) {
         // We are either saving a drum machine or a voice machine.
         let drum;
@@ -1911,6 +1847,13 @@ class RhythmRuler {
         }
     }
 
+    /**
+     * @private
+     * @param {number} selectedRuler
+     * @param {string} drum
+     * @param {boolean} effect
+     * @returns {void}
+     */
     _saveDrumMachine(selectedRuler, drum, effect) {
         for (const name in logo.blocks.palettes.dict) {
             logo.blocks.palettes.dict[name].hideMenu(true);
@@ -1939,30 +1882,8 @@ class RhythmRuler {
             }
 
             const newStack = [
-                [
-                    0,
-                    [
-                        "action",
-                        {
-                            collapsed: true
-                        }
-                    ],
-                    100 + delta,
-                    100 + delta,
-                    [null, 1, 2, null]
-                ],
-                [
-                    1,
-                    [
-                        "text",
-                        {
-                            value: action_name
-                        }
-                    ],
-                    0,
-                    0,
-                    [0]
-                ]
+                [0, ["action", { collapsed: true }], 100 + delta, 100 + delta, [null, 1, 2, null]],
+                [1, ["text", { value: action_name }], 0, 0, [0]]
             ];
             let previousBlock = 0; // 1
             let sameNoteValue = 1;
@@ -1986,27 +1907,11 @@ class RhythmRuler {
                             [previousBlock, idx + 1, idx + 4, idx + 7]
                         ]);
                         newStack.push([idx + 1, "divide", 0, 0, [idx, idx + 2, idx + 3]]);
-                        newStack.push([
-                            idx + 2,
-                            [
-                                "number",
-                                {
-                                    value: obj[0]
-                                }
-                            ],
-                            0,
-                            0,
-                            [idx + 1]
-                        ]);
+                        newStack.push([idx + 2, ["number", { value: obj[0] }], 0, 0, [idx + 1]]);
                         if (noteValue < 0) {
                             newStack.push([
                                 idx + 3,
-                                [
-                                    "number",
-                                    {
-                                        value: obj[1]
-                                    }
-                                ],
+                                ["number", { value: obj[1] }],
                                 0,
                                 0,
                                 [idx + 1]
@@ -2017,12 +1922,7 @@ class RhythmRuler {
                         } else {
                             newStack.push([
                                 idx + 3,
-                                [
-                                    "number",
-                                    {
-                                        value: obj[1]
-                                    }
-                                ],
+                                ["number", { value: obj[1] }],
                                 0,
                                 0,
                                 [idx + 1]
@@ -2032,12 +1932,7 @@ class RhythmRuler {
                             if (effect) {
                                 newStack.push([
                                     idx + 6,
-                                    [
-                                        "effectsname",
-                                        {
-                                            value: drum
-                                        }
-                                    ],
+                                    ["effectsname", { value: drum }],
                                     0,
                                     0,
                                     [idx + 5]
@@ -2045,12 +1940,7 @@ class RhythmRuler {
                             } else {
                                 newStack.push([
                                     idx + 6,
-                                    [
-                                        "drumname",
-                                        {
-                                            value: drum
-                                        }
-                                    ],
+                                    ["drumname", { value: drum }],
                                     0,
                                     0,
                                     [idx + 5]
@@ -2083,41 +1973,14 @@ class RhythmRuler {
                             ]);
                             previousBlock = idx;
                         }
-                        newStack.push([
-                            idx + 1,
-                            [
-                                "number",
-                                {
-                                    value: sameNoteValue
-                                }
-                            ],
-                            0,
-                            0,
-                            [idx]
-                        ]);
+                        newStack.push([idx + 1, ["number", { value: sameNoteValue }], 0, 0, [idx]]);
                         newStack.push([idx + 2, "newnote", 0, 0, [idx, idx + 3, idx + 6, idx + 9]]);
                         newStack.push([idx + 3, "divide", 0, 0, [idx + 2, idx + 4, idx + 5]]);
-                        newStack.push([
-                            idx + 4,
-                            [
-                                "number",
-                                {
-                                    value: 1
-                                }
-                            ],
-                            0,
-                            0,
-                            [idx + 3]
-                        ]);
+                        newStack.push([idx + 4, ["number", { value: 1 }], 0, 0, [idx + 3]]);
                         if (noteValue < 0) {
                             newStack.push([
                                 idx + 5,
-                                [
-                                    "number",
-                                    {
-                                        value: -noteValue
-                                    }
-                                ],
+                                ["number", { value: -noteValue }],
                                 0,
                                 0,
                                 [idx + 3]
@@ -2128,12 +1991,7 @@ class RhythmRuler {
                         } else {
                             newStack.push([
                                 idx + 5,
-                                [
-                                    "number",
-                                    {
-                                        value: noteValue
-                                    }
-                                ],
+                                ["number", { value: noteValue }],
                                 0,
                                 0,
                                 [idx + 3]
@@ -2143,12 +2001,7 @@ class RhythmRuler {
                             if (effect) {
                                 newStack.push([
                                     idx + 8,
-                                    [
-                                        "effectsname",
-                                        {
-                                            value: drum
-                                        }
-                                    ],
+                                    ["effectsname", { value: drum }],
                                     0,
                                     0,
                                     [idx + 7]
@@ -2156,12 +2009,7 @@ class RhythmRuler {
                             } else {
                                 newStack.push([
                                     idx + 8,
-                                    [
-                                        "drumname",
-                                        {
-                                            value: drum
-                                        }
-                                    ],
+                                    ["drumname", { value: drum }],
                                     0,
                                     0,
                                     [idx + 7]
@@ -2185,6 +2033,12 @@ class RhythmRuler {
         }, 500);
     }
 
+    /**
+     * @private
+     * @param {number} selectedRuler
+     * @param {string} voice
+     * @returns {void}
+     */
     _saveVoiceMachine(selectedRuler, voice) {
         for (const name in logo.blocks.palettes.dict) {
             logo.blocks.palettes.dict[name].hideMenu(true);
@@ -2210,53 +2064,20 @@ class RhythmRuler {
             if (this.Drums[selectedRuler] === null) {
                 action_name = _("guitar") + " " + _("action");
             } else {
-                // const action_name =
-                //     logo.blocks.blockList[
-                //         logo.blocks.blockList[this.Drums[selectedRuler]].connections[1]
-                //     ].value.split(" ")[0] +
-                //     "_" +
-                //     _("action");
+                action_name =
+                    logo.blocks.blockList[
+                        logo.blocks.blockList[this.Drums[selectedRuler]].connections[1]
+                    ].value.split(" ")[0] +
+                    "_" +
+                    _("action");
             }
 
             const newStack = [
-                [
-                    0,
-                    [
-                        "action",
-                        {
-                            collapsed: true
-                        }
-                    ],
-                    100 + delta,
-                    100 + delta,
-                    [null, 1, 2, null]
-                ],
-                [
-                    1,
-                    [
-                        "text",
-                        {
-                            value: action_name
-                        }
-                    ],
-                    0,
-                    0,
-                    [0]
-                ]
+                [0, ["action", { collapsed: true }], 100 + delta, 100 + delta, [null, 1, 2, null]],
+                [1, ["text", { value: action_name }], 0, 0, [0]]
             ];
             newStack.push([2, "settimbre", 0, 0, [0, 3, 5, 4]]);
-            newStack.push([
-                3,
-                [
-                    "voicename",
-                    {
-                        value: voice
-                    }
-                ],
-                0,
-                0,
-                [2]
-            ]);
+            newStack.push([3, ["voicename", { value: voice }], 0, 0, [2]]);
             newStack.push([4, "hidden", 0, 0, [2, null]]);
             let previousBlock = 2;
             let sameNoteValue = 1;
@@ -2283,24 +2104,14 @@ class RhythmRuler {
                             newStack.push([idx + 1, "divide", 0, 0, [idx, idx + 2, idx + 3]]);
                             newStack.push([
                                 idx + 2,
-                                [
-                                    "number",
-                                    {
-                                        value: obj[0]
-                                    }
-                                ],
+                                ["number", { value: obj[0] }],
                                 0,
                                 0,
                                 [idx + 1]
                             ]);
                             newStack.push([
                                 idx + 3,
-                                [
-                                    "number",
-                                    {
-                                        value: obj[1]
-                                    }
-                                ],
+                                ["number", { value: obj[1] }],
                                 0,
                                 0,
                                 [idx + 1]
@@ -2325,24 +2136,14 @@ class RhythmRuler {
                             newStack.push([idx + 1, "divide", 0, 0, [idx, idx + 2, idx + 3]]);
                             newStack.push([
                                 idx + 2,
-                                [
-                                    "number",
-                                    {
-                                        value: obj[0]
-                                    }
-                                ],
+                                ["number", { value: obj[0] }],
                                 0,
                                 0,
                                 [idx + 1]
                             ]);
                             newStack.push([
                                 idx + 3,
-                                [
-                                    "number",
-                                    {
-                                        value: obj[1]
-                                    }
-                                ],
+                                ["number", { value: obj[1] }],
                                 0,
                                 0,
                                 [idx + 1]
@@ -2355,30 +2156,8 @@ class RhythmRuler {
                                 0,
                                 [idx + 4, idx + 6, idx + 7, null]
                             ]);
-                            newStack.push([
-                                idx + 6,
-                                [
-                                    "notename",
-                                    {
-                                        value: "C"
-                                    }
-                                ],
-                                0,
-                                0,
-                                [idx + 5]
-                            ]);
-                            newStack.push([
-                                idx + 7,
-                                [
-                                    "number",
-                                    {
-                                        value: 4
-                                    }
-                                ],
-                                0,
-                                0,
-                                [idx + 5]
-                            ]);
+                            newStack.push([idx + 6, ["notename", { value: "C" }], 0, 0, [idx + 5]]);
+                            newStack.push([idx + 7, ["number", { value: 4 }], 0, 0, [idx + 5]]);
                             if (i == ruler.cells.length - 1) {
                                 newStack.push([idx + 8, "hidden", 0, 0, [idx, null]]);
                             } else {
@@ -2406,18 +2185,7 @@ class RhythmRuler {
                             ]);
                             previousBlock = idx;
                         }
-                        newStack.push([
-                            idx + 1,
-                            [
-                                "number",
-                                {
-                                    value: sameNoteValue
-                                }
-                            ],
-                            0,
-                            0,
-                            [idx]
-                        ]);
+                        newStack.push([idx + 1, ["number", { value: sameNoteValue }], 0, 0, [idx]]);
                         if (noteValue < 0) {
                             newStack.push([
                                 idx + 2,
@@ -2427,26 +2195,10 @@ class RhythmRuler {
                                 [idx, idx + 3, idx + 6, idx + 9]
                             ]);
                             newStack.push([idx + 3, "divide", 0, 0, [idx + 2, idx + 4, idx + 5]]);
-                            newStack.push([
-                                idx + 4,
-                                [
-                                    "number",
-                                    {
-                                        value: 1
-                                    }
-                                ],
-                                0,
-                                0,
-                                [idx + 3]
-                            ]);
+                            newStack.push([idx + 4, ["number", { value: 1 }], 0, 0, [idx + 3]]);
                             newStack.push([
                                 idx + 5,
-                                [
-                                    "number",
-                                    {
-                                        value: -noteValue
-                                    }
-                                ],
+                                ["number", { value: -noteValue }],
                                 0,
                                 0,
                                 [idx + 3]
@@ -2464,26 +2216,10 @@ class RhythmRuler {
                                 [idx, idx + 3, idx + 6, idx + 10]
                             ]);
                             newStack.push([idx + 3, "divide", 0, 0, [idx + 2, idx + 4, idx + 5]]);
-                            newStack.push([
-                                idx + 4,
-                                [
-                                    "number",
-                                    {
-                                        value: 1
-                                    }
-                                ],
-                                0,
-                                0,
-                                [idx + 3]
-                            ]);
+                            newStack.push([idx + 4, ["number", { value: 1 }], 0, 0, [idx + 3]]);
                             newStack.push([
                                 idx + 5,
-                                [
-                                    "number",
-                                    {
-                                        value: noteValue
-                                    }
-                                ],
+                                ["number", { value: noteValue }],
                                 0,
                                 0,
                                 [idx + 3]
@@ -2496,30 +2232,8 @@ class RhythmRuler {
                                 0,
                                 [idx + 6, idx + 8, idx + 9, null]
                             ]);
-                            newStack.push([
-                                idx + 8,
-                                [
-                                    "notename",
-                                    {
-                                        value: "C"
-                                    }
-                                ],
-                                0,
-                                0,
-                                [idx + 7]
-                            ]);
-                            newStack.push([
-                                idx + 9,
-                                [
-                                    "number",
-                                    {
-                                        value: 4
-                                    }
-                                ],
-                                0,
-                                0,
-                                [idx + 7]
-                            ]);
+                            newStack.push([idx + 8, ["notename", { value: "C" }], 0, 0, [idx + 7]]);
+                            newStack.push([idx + 9, ["number", { value: 4 }], 0, 0, [idx + 7]]);
                             newStack.push([idx + 10, "hidden", 0, 0, [idx + 2, null]]);
                         }
                     }
@@ -2537,6 +2251,10 @@ class RhythmRuler {
         }, 500);
     }
 
+    /**
+     * @private
+     * @returns {array}
+     */
     _mergeRulers() {
         // Merge the rulers into one set of rhythms.
         const rList = [];
@@ -2553,7 +2271,7 @@ class RhythmRuler {
             }
         }
 
-        rList.sort(function (a, b) {
+        rList.sort((a, b) => {
             return a - b;
         });
 
@@ -2569,12 +2287,21 @@ class RhythmRuler {
         return noteValues;
     }
 
+    /**
+     * @private
+     * @returns {boolean}
+     */
     _get_save_lock() {
         return this._save_lock;
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     saveDissectHistory() {
         // Save the new dissect history.
+
         const dissectHistory = [];
         const drums = [];
         let drum;
@@ -2606,10 +2333,7 @@ class RhythmRuler {
         this._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
     }
 
-    /**
-     * @deprecated
-     */
-    _piemenuRuler(/* selectedRuler */) {
+    _piemenuRuler() {
         return; // In progress
         /*
         // piemenu version of ruler
@@ -2658,89 +2382,10 @@ class RhythmRuler {
         */
     }
 
-    _piemenuNumber(wheelValues, selectedValue) {
-        // input form and  wheelNav pie menu for number selection
-        docById("wheelDiv").style.display = "";
-
-        // the number selector
-        this._numberWheel = new wheelnav("wheelDiv", null, 600, 600);
-        // exit button
-        this._exitWheel = new wheelnav("_exitWheel", this._numberWheel.raphael);
-
-        const wheelLabels = [];
-        for (let i = 0; i < wheelValues.length; i++) {
-            wheelLabels.push(wheelValues[i].toString());
-        }
-
-        // spacer
-        wheelLabels.push(null);
-
-        wheelnav.cssMode = true;
-
-        this._numberWheel.keynavigateEnabled = true;
-
-        this._numberWheel.colors = ["#ffb2bc", "#ffccd6"];
-        this._numberWheel.slicePathFunction = slicePath().DonutSlice;
-        this._numberWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._numberWheel.slicePathCustom.minRadiusPercent = 0.2;
-        if (wheelValues.length > 16) {
-            this._numberWheel.slicePathCustom.maxRadiusPercent = 1.0;
-        } else {
-            this._numberWheel.slicePathCustom.maxRadiusPercent = 0.6;
-        }
-
-        this._numberWheel.sliceSelectedPathCustom = this._numberWheel.slicePathCustom;
-        this._numberWheel.sliceInitPathCustom = this._numberWheel.slicePathCustom;
-        // this._numberWheel.titleRotateAngle = 0;
-        this._numberWheel.animatetime = 300;
-        this._numberWheel.createWheel(wheelLabels);
-
-        this._exitWheel.colors = ["#808080", "#c0c0c0"];
-        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
-        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
-        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
-        this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["x", " "]);
-
-        const __selectionChanged = () => {
-            this._dissectNumber.value = wheelValues[this._numberWheel.selectedNavItemIndex];
-        };
-
-        const __exitMenu = () => {
-            const d = new Date();
-            this._piemenuExitTime = d.getTime();
-            docById("wheelDiv").style.display = "none";
-            this._numberWheel.removeWheel();
-            this._exitWheel.removeWheel();
-        };
-
-        this._positionWheel();
-
-        // Navigate to a the current number value.
-        let i = wheelValues.indexOf(selectedValue);
-        if (i === -1) {
-            i = 0;
-        }
-
-        this._numberWheel.navigateWheel(i);
-
-        // Hide the widget when the selection is made.
-        for (let i = 0; i < wheelLabels.length; i++) {
-            this._numberWheel.navItems[i].navigateFunction = function () {
-                __selectionChanged();
-                __exitMenu();
-            };
-        }
-
-        // Or use the exit wheel...
-        this._exitWheel.navItems[0].navigateFunction = function () {
-            __exitMenu();
-        };
-    }
-
+    /**
+     * @private
+     * @returns {void}
+     */
     _positionWheel() {
         if (docById("wheelDiv").style.display == "none") {
             return;

@@ -14,7 +14,7 @@ function setupGraphicsBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            let turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
+            const turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetHeading(value);
         }
 
@@ -55,7 +55,7 @@ function setupGraphicsBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            let turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
+            const turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetXY(turtleObj.x, value);
         }
 
@@ -98,7 +98,7 @@ function setupGraphicsBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            let turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
+            const turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetXY(value, turtleObj.y);
         }
 
@@ -144,7 +144,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
@@ -162,7 +162,7 @@ function setupGraphicsBlocks() {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
                     if (tur.singer.suppressOutput) {
-                        let savedPenState =
+                        const savedPenState =
                             logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.penState;
                         logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.penState = false;
                         logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.doScrollXY(
@@ -190,7 +190,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (logo.inMatrix) {
                 // ignore clear block in matrix
@@ -198,7 +198,7 @@ function setupGraphicsBlocks() {
                 tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
             } else {
                 if (tur.singer.suppressOutput) {
-                    let savedPenState = tur.painter.penState;
+                    const savedPenState = tur.painter.penState;
                     tur.painter.penState = false;
                     tur.painter.doSetXY(0, 0);
                     tur.painter.doSetHeading(0);
@@ -234,7 +234,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
@@ -271,7 +271,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
@@ -306,7 +306,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
@@ -315,7 +315,7 @@ function setupGraphicsBlocks() {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
                     if (tur.singer.suppressOutput) {
-                        let savedPenState = tur.painter.penState;
+                        const savedPenState = tur.painter.penState;
                         tur.painter.penState = false;
                         tur.painter.doBezier(args[0], args[1]);
                         tur.painter.penState = savedPenState;
@@ -333,10 +333,10 @@ function setupGraphicsBlocks() {
             this.setPalette("graphics");
             this.beginnerBlock(true);
             this.piemenuValuesC1 = [15, 30, 45, 60, 75, 90, 105, 120, 135, 150,
-                                    165, 180, 195, 210, 225, 240, 255, 270,
-                                    285, 300, 315, 330, 345, 360];
+                165, 180, 195, 210, 225, 240, 255, 270,
+                285, 300, 315, 330, 345, 360];
             this.piemenuValuesC2 = [25, 50, 75, 100, 125, 150, 175, 200, 225,
-                                    250, 275, 300];
+                250, 275, 300];
             this.setHelpString([
                 _("The Arc block moves the mouse in a arc."),
                 "documentation",
@@ -354,7 +354,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
@@ -372,7 +372,7 @@ function setupGraphicsBlocks() {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
                     if (tur.singer.suppressOutput) {
-                        let savedPenState = tur.painter.penState;
+                        const savedPenState = tur.painter.penState;
                         tur.painter.penState = false;
                         tur.painter.doArc(args[0], args[1]);
                         tur.painter.penState = savedPenState;
@@ -391,7 +391,7 @@ function setupGraphicsBlocks() {
             this.setPalette("graphics");
             this.beginnerBlock(this.lang !== "ja");
             this.piemenuValuesC1 = [0, 30, 45, 60, 90, 120, 135, 150, 180,
-                                    210, 225, 240, 270, 300, 315, 330];
+                210, 225, 240, 270, 300, 315, 330];
 
             this.setHelpString([
                 _("The Set heading block sets the heading of the mouse."),
@@ -406,7 +406,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
                 if (typeof args[0] === "string") {
@@ -454,7 +454,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
@@ -472,7 +472,7 @@ function setupGraphicsBlocks() {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
                     if (tur.singer.suppressOutput) {
-                        let savedPenState = tur.painter.penState;
+                        const savedPenState = tur.painter.penState;
                         tur.painter.penState = false;
                         tur.painter.doSetXY(args[0], args[1]);
                         tur.painter.penState = savedPenState;
@@ -490,7 +490,7 @@ function setupGraphicsBlocks() {
             this.setPalette("graphics");
             this.beginnerBlock(true);
             this.piemenuValuesC1 = [0, 30, 60, 90, 120, 150, 180, 210, 240,
-                                    270, 300, 330];
+                270, 300, 330];
             this.setHelpString([
                 _("The Right block turns the mouse to the right."),
                 "documentation",
@@ -507,7 +507,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
                 if (typeof args[0] === "string") {
@@ -525,7 +525,7 @@ function setupGraphicsBlocks() {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
                     if (tur.singer.suppressOutput) {
-                        let savedPenState = tur.painter.penState;
+                        const savedPenState = tur.painter.penState;
                         tur.painter.penState = false;
                         tur.painter.doRight(args[0]);
                         tur.painter.penState = savedPenState;
@@ -543,7 +543,7 @@ function setupGraphicsBlocks() {
             this.setPalette("graphics");
             this.beginnerBlock(true);
             this.piemenuValuesC1 = [330, 300, 270, 240, 210, 180, 150, 120, 90,
-                                    60, 30, 0];
+                60, 30, 0];
 
             this.setHelpString([
                 _("The Left block turns the mouse to the left."),
@@ -561,7 +561,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
                 if (typeof args[0] === "string") {
@@ -579,7 +579,7 @@ function setupGraphicsBlocks() {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
                     if (tur.singer.suppressOutput) {
-                        let savedPenState = tur.painter.penState;
+                        const savedPenState = tur.painter.penState;
                         tur.painter.penState = false;
                         tur.painter.doRight(-args[0]);
                         tur.painter.penState = savedPenState;
@@ -612,7 +612,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
                 if (typeof args[0] === "string") {
@@ -630,7 +630,7 @@ function setupGraphicsBlocks() {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
                     if (tur.singer.suppressOutput) {
-                        let savedPenState = tur.painter.penState;
+                        const savedPenState = tur.painter.penState;
                         tur.painter.penState = false;
                         tur.painter.doForward(-args[0]);
                         tur.painter.penState = savedPenState;
@@ -663,7 +663,7 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
                 if (typeof args[0] === "string") {
@@ -681,7 +681,7 @@ function setupGraphicsBlocks() {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
                     if (tur.singer.suppressOutput) {
-                        let savedPenState = tur.painter.penState;
+                        const savedPenState = tur.painter.penState;
                         tur.painter.penState = false;
                         tur.painter.doForward(args[0]);
                         tur.painter.penState = savedPenState;

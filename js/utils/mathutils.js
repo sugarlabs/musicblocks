@@ -42,26 +42,26 @@ class MathUtility {
          * @param {Number} n2
          * @returns {Number} a random number between n1 and n2 (both inclusive)
          */
-        let GetRandom = (n1, n2) => {
+        const GetRandom = (n1, n2) => {
             // n1 should be <= n2
             [n1, n2] = n1 > n2 ? [n2, n1] : [n1, n2];
             return Math.floor(Math.random() * (Number(n2) - Number(n1) + 1) + Number(n1));
         };
 
-        let GetRandomSolfege = (a1, a2, octave) => {
+        const GetRandomSolfege = (a1, a2, octave) => {
             octave = octave === undefined ? 4 : octave;
 
-            let broadScale = [];
-            for (let i of [octave, octave + 1]) {
+            const broadScale = [];
+            for (const i of [octave, octave + 1]) {
                 for (let j = 0; j < SOLFEGENAMES.length; j++) {
                     broadScale.push(SOLFEGENAMES[j] + " " + i);
                 }
             }
 
-            let n1 = SOLFEGENAMES.indexOf(a1);
-            let n2 = SOLFEGENAMES.indexOf(a2);
-            let o1 = octave;
-            let o2 = n1 > n2 ? octave + 1 : octave;
+            const n1 = SOLFEGENAMES.indexOf(a1);
+            const n2 = SOLFEGENAMES.indexOf(a2);
+            const o1 = octave;
+            const o2 = n1 > n2 ? octave + 1 : octave;
 
             let n11, n22;
             for (let i = 0; i < broadScale.length; i++) {
@@ -145,8 +145,8 @@ class MathUtility {
      */
     static doPlus(a, b) {
         if (typeof a === "string" || typeof b === "string") {
-            let aString = typeof a === "string" ? a : a.toString();
-            let bString = typeof b === "string" ? b : b.toString();
+            const aString = typeof a === "string" ? a : a.toString();
+            const bString = typeof b === "string" ? b : b.toString();
 
             return aString + bString;
         } else {
@@ -282,7 +282,7 @@ class MathUtility {
         if (typeof a === "number") {
             return MathUtility.doMinus(0, a);
         } else if (typeof a === "string") {
-            let obj = a.split("");
+            const obj = a.split("");
             return obj.reverse().join("");
         } else {
             throw "NoNegError";

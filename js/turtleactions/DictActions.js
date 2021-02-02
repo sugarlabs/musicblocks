@@ -93,7 +93,7 @@ function setupDictActions() {
             } else if (target in logo.turtleDicts &&
                        target in logo.turtleDicts[target] &&
                        key in logo.turtleDicts[target][target]) {
-                    return logo.turtleDicts[target][target][key];
+                return logo.turtleDicts[target][target][key];
             } else {
                 if (target in logo.turtleDicts[turtle]) {
                     return logo.turtleDicts[turtle][target][key];

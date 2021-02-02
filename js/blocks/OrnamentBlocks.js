@@ -14,7 +14,7 @@ function setupOrnamentBlocks() {
         }
 
         arg(logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             if (
                 logo.inStatusMatrix &&
@@ -44,7 +44,7 @@ function setupOrnamentBlocks() {
         }
 
         arg(logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             if (
                 logo.inStatusMatrix &&
@@ -169,7 +169,7 @@ function setupOrnamentBlocks() {
                 arg = args[0];
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             tur.singer.glide.push(arg);
 
@@ -180,10 +180,10 @@ function setupOrnamentBlocks() {
             tur.singer.glideOverride = Singer.noteCounter(logo, turtle, args[1]);
             console.debug("length of glide " + tur.singer.glideOverride);
 
-            let listenerName = "_glide_" + turtle;
+            const listenerName = "_glide_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = event => {
+            const __listener = event => {
                 if (tur.singer.justCounting.length === 0) {
                     logo.notation.notationEndSlur(turtle);
                 }

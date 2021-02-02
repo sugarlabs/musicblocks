@@ -9,6 +9,27 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/*global logo, turtles, docById, _, platformColor, keySignatureToMode, MUSICALMODES, getNote, DEFAULTVOICE, last, NOTESTABLE, slicePath, wheelnav, storage*/
+
+/*
+    Global locations
+    - lib/wheelnav
+        slicePath, wheelnav
+    - js/utils/utils.js
+        _, last, docById
+    - js/utils/platformstyle.js
+        platformColor
+        
+    - js/utils/musicutils.js
+        keySignatureToMode, MUSICALMODES, getNote, DEFAULTVOICE, NOTESTABLE
+    - js/logo.js
+        logo
+    -js/turtle.js
+        turtles
+    
+*/
+
+/*exported ModeWidget*/
 class ModeWidget {
     static ICONSIZE = 32;
     static BUTTONSIZE = 53;
@@ -27,7 +48,6 @@ class ModeWidget {
 
         const w = window.innerWidth;
         this._cellScale = w / 1200;
-        const iconSize = ModeWidget.ICONSIZE * this._cellScale;
 
         this.widgetWindow = window.widgetWindows.windowFor(this, "custom mode");
         this.widgetWindow.clear();
@@ -45,6 +65,7 @@ class ModeWidget {
         this.widgetWindow.getWidgetBody().append(this.modeTableDiv);
 
         this.widgetWindow.onclose = () => {
+            this._playing = false;
             logo.hideMsgs();
             this.widgetWindow.destroy();
         };
@@ -199,7 +220,7 @@ class ModeWidget {
         const table = docById("modeTable");
         const n = table.rows.length - 1;
 
-        console.debug(_(currentModeName[1]));
+        // console.debug(_(currentModeName[1]));
         const name = currentModeName[0] + " " + _(currentModeName[1]);
         table.rows[n].cells[0].innerHTML = name;
         this.widgetWindow.updateTitle(name);
@@ -311,7 +332,7 @@ class ModeWidget {
         for (let i = 0; i < 12; ++i) {
             if (this._selectedNotes[i])
                 document.getElementById("pkey_" + i).src =
-                    highlightImgs[(i + startingPosition) % 12];
+                highlightImgs[(i + startingPosition) % 12];
         }
     }
     /**
@@ -534,7 +555,7 @@ class ModeWidget {
                 this._notesToPlay.push(i);
             }
         }
-        console.debug(this._notesToPlay);
+        // console.debug(this._notesToPlay);
         this._lastNotePlayed = null;
         if (this._playing) {
             this.__playNextNote(0);
@@ -800,12 +821,12 @@ class ModeWidget {
         const currentMode = JSON.stringify(this._calculateMode());
         const currentKey = keySignatureToMode(turtles.ithTurtle(0).singer.keySignature)[0];
 
-        for (let mode in MUSICALMODES) {
+        for (const mode in MUSICALMODES) {
             if (JSON.stringify(MUSICALMODES[mode]) === currentMode) {
                 // Update the value of the modename block inside of
                 // the mode widget block.
                 if (this._modeBlock != null) {
-                    for (let i in logo.blocks.blockList) {
+                    for (const i in logo.blocks.blockList) {
                         if (logo.blocks.blockList[i].name == "modename") {
                             logo.blocks.blockList[i].value = mode;
                             logo.blocks.blockList[i].text.text = _(mode);
@@ -840,8 +861,8 @@ class ModeWidget {
 
         // If the mode is not in the list, save it as the new custom mode.
         if (table.rows[n].cells[0].innerHTML === "") {
-            customMode = this._calculateMode();
-            console.debug("custom mode: " + customMode);
+            const customMode = this._calculateMode();
+            // console.debug("custom mode: " + customMode);
             storage.custommode = JSON.stringify(customMode);
         }
 
@@ -852,10 +873,13 @@ class ModeWidget {
 
         // Save a stack of pitches to be used with the matrix.
         let newStack = [
-            [0, ["action", { collapsed: true }], 100, 100, [null, 1, 2, null]],
-            [1, ["text", { value: modeName }], 0, 0, [0]]
+            [0, ["action", {
+                collapsed: true
+            }], 100, 100, [null, 1, 2, null]],
+            [1, ["text", {
+                value: modeName
+            }], 0, 0, [0]]
         ];
-        let endOfStackIdx = 0;
         let previousBlock = 0;
 
         let modeLength = this._calculateMode().length;
@@ -871,7 +895,7 @@ class ModeWidget {
             p += 1;
             const pitch = NOTESTABLE[(j + 1) % 12];
             const octave = 4;
-            console.debug(pitch + " " + octave);
+            // console.debug(pitch + " " + octave);
 
             const pitchidx = newStack.length;
             const notenameidx = pitchidx + 1;
@@ -894,23 +918,28 @@ class ModeWidget {
                     [previousBlock, notenameidx, octaveidx, pitchidx + 3]
                 ]);
             }
-            newStack.push([notenameidx, ["solfege", { value: pitch }], 0, 0, [pitchidx]]);
-            newStack.push([octaveidx, ["number", { value: octave }], 0, 0, [pitchidx]]);
+            newStack.push([notenameidx, ["solfege", {
+                value: pitch
+            }], 0, 0, [pitchidx]]);
+            newStack.push([octaveidx, ["number", {
+                value: octave
+            }], 0, 0, [pitchidx]]);
             previousBlock = pitchidx;
         }
 
         // Create a new stack for the chunk.
-        console.debug(newStack);
+        // console.debug(newStack);
         logo.blocks.loadNewBlocks(newStack);
         logo.textMsg(_("New action block generated!"));
 
         // And save a stack of pitchnumbers to be used with the define mode
         newStack = [
             [0, "definemode", 150, 120, [null, 1, 3, 2]],
-            [1, ["modename", { value: modeName }], 0, 0, [0]],
+            [1, ["modename", {
+                value: modeName
+            }], 0, 0, [0]],
             [2, "hidden", 0, 0, [0, null]]
         ];
-        endOfStackIdx = 0;
         previousBlock = 0;
 
         modeLength = this._calculateMode().length;
@@ -930,12 +959,14 @@ class ModeWidget {
                 newStack.push([idx, "pitchnumber", 0, 0, [previousBlock, idx + 1, idx + 2]]);
             }
 
-            newStack.push([idx + 1, ["number", { value: i }], 0, 0, [idx]]);
+            newStack.push([idx + 1, ["number", {
+                value: i
+            }], 0, 0, [idx]]);
             previousBlock = idx;
         }
 
         // Create a new stack for the chunk.
-        console.debug(newStack);
+        // console.debug(newStack);
         setTimeout(() => {
             logo.blocks.loadNewBlocks(newStack);
         }, 2000);

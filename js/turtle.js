@@ -640,7 +640,7 @@ Turtle.TurtleModel = class {
     rename(name) {
         this._name = name;
 
-        let startBlock = this._startBlock;
+        const startBlock = this._startBlock;
         // Use the name on the label of the start block
         if (startBlock != null) {
             startBlock.overrideName = this._name;
@@ -692,10 +692,10 @@ Turtle.TurtleView = class {
             return;
         }
 
-        let image = new Image();
+        const image = new Image();
 
         image.onload = () => {
-            let bitmap = new createjs.Bitmap(image);
+            const bitmap = new createjs.Bitmap(image);
             this.imageContainer.addChild(bitmap);
             this._media.push(bitmap);
             bitmap.scaleX = Number(size) / image.width;
@@ -722,12 +722,12 @@ Turtle.TurtleView = class {
         if (myURL === null) {
             return;
         }
-        let image = new Image();
+        const image = new Image();
         image.src = myURL;
-        let turtle = this;
+        const turtle = this;
 
         image.onload = () => {
-            let bitmap = new createjs.Bitmap(image);
+            const bitmap = new createjs.Bitmap(image);
             turtle.imageContainer.addChild(bitmap);
             turtle._media.push(bitmap);
             bitmap.scaleX = Number(size) / image.width;
@@ -753,8 +753,8 @@ Turtle.TurtleView = class {
             return;
         }
 
-        let shellSize = Number(size);
-        let image = new Image();
+        const shellSize = Number(size);
+        const image = new Image();
         image.src = myImage;
 
         image.onload = () => {
@@ -772,24 +772,24 @@ Turtle.TurtleView = class {
             this._skinChanged = true;
 
             this.container.uncache();
-            let bounds = this.container.getBounds();
+            const bounds = this.container.getBounds();
             this.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
 
             // Recalculate the hit area as well
-            let hitArea = new createjs.Shape();
+            const hitArea = new createjs.Shape();
             hitArea.graphics.beginFill("#FFF").drawRect(0, 0, bounds.width, bounds.height);
             hitArea.x = -bounds.width / 2;
             hitArea.y = -bounds.height / 2;
             this.container.hitArea = hitArea;
 
-            let startBlock = this._startBlock;
+            const startBlock = this._startBlock;
             if (startBlock != null) {
                 startBlock.container.removeChild(this._decorationBitmap);
                 this._decorationBitmap = new createjs.Bitmap(myImage);
                 startBlock.container.addChild(this._decorationBitmap);
                 this._decorationBitmap.name = "decoration";
 
-                let width = startBlock.width;
+                const width = startBlock.width;
                 // FIXME: Why is the position off? Does it need a scale factor?
                 this._decorationBitmap.x = width - (30 * startBlock.protoblock.scale) / 2;
                 this._decorationBitmap.y = (20 * startBlock.protoblock.scale) / 2;
@@ -830,11 +830,11 @@ Turtle.TurtleView = class {
             return;
         }
 
-        let textList = typeof myText !== "string" ? [myText.toString()] : myText.split("\\n");
+        const textList = typeof myText !== "string" ? [myText.toString()] : myText.split("\\n");
 
-        let textSize = size.toString() + "px " + this.painter.font;
+        const textSize = size.toString() + "px " + this.painter.font;
         for (i = 0; i < textList.length; i++) {
-            let text = new createjs.Text(textList[i], textSize, this.painter.canvasColor);
+            const text = new createjs.Text(textList[i], textSize, this.painter.canvasColor);
             text.textAlign = "left";
             text.textBaseline = "alphabetic";
             this.turtles.stage.addChild(text);
@@ -843,9 +843,9 @@ Turtle.TurtleView = class {
             text.y = this.container.y + i * size;
             text.rotation = this.orientation;
 
-            let xScaled = text.x * this.turtles.scale;
-            let yScaled = text.y * this.turtles.scale;
-            let sizeScaled = size * this.turtles.scale;
+            const xScaled = text.x * this.turtles.scale;
+            const yScaled = text.y * this.turtles.scale;
+            const sizeScaled = size * this.turtles.scale;
             this.painter.svgOutput +=
                 '<text x="' +
                 xScaled +
@@ -874,10 +874,10 @@ Turtle.TurtleView = class {
      */
     makeTurtleBitmap(data, refreshCanvas, useTurtleArtwork) {
         // Works with Chrome, Safari, Firefox (untested on IE)
-        let img = new Image();
+        const img = new Image();
 
         img.onload = () => {
-            let bitmap = new createjs.Bitmap(img);
+            const bitmap = new createjs.Bitmap(img);
 
             this._bitmap = bitmap;
             this._bitmap.regX = 27 | 0;
@@ -886,14 +886,14 @@ Turtle.TurtleView = class {
             this.container.addChild(this._bitmap);
             this._createCache();
 
-            let startBlock = this._startBlock;
+            const startBlock = this._startBlock;
             if (useTurtleArtwork && startBlock != null) {
                 startBlock.updateCache();
                 this._decorationBitmap = this._bitmap.clone();
                 startBlock.container.addChild(this._decorationBitmap);
                 this._decorationBitmap.name = "decoration";
-                let width = startBlock.width;
-                let offset = 40;
+                const width = startBlock.width;
+                const offset = 40;
 
                 this._decorationBitmap.x = width - (offset * startBlock.protoblock.scale) / 2;
                 this._decorationBitmap.y = (35 * startBlock.protoblock.scale) / 2;

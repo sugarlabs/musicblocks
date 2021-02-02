@@ -24,21 +24,21 @@
  */
 class OrnamentBlocksAPI {
     async setStaccato(value, flow) {
-        let args = JSInterface.validateArgs("setStaccato", [value, flow]);
+        const args = JSInterface.validateArgs("setStaccato", [value, flow]);
         await this.runCommand("setStaccato", [args[0], this.turIndex]);
         await args[1]();
         return this.ENDFLOWCOMMAND;
     }
 
     async setSlur(value, flow) {
-        let args = JSInterface.validateArgs("setSlur", [value, flow]);
+        const args = JSInterface.validateArgs("setSlur", [value, flow]);
         await this.runCommand("setSlur", [args[0], this.turIndex]);
         await args[1]();
         return this.ENDFLOWCOMMAND;
     }
 
     async doNeighbor(interval, noteValue, flow) {
-        let args = JSInterface.validateArgs("doNeighbor", [interval, noteValue, flow]);
+        const args = JSInterface.validateArgs("doNeighbor", [interval, noteValue, flow]);
         await this.runCommand("doNeighbor", [args[0], args[1], this.turIndex, MusicBlocks.BLK]);
         await args[2]();
         return this.ENDFLOWCOMMAND;

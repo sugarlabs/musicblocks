@@ -18,7 +18,7 @@ function setupExtrasBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            let cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return "0/1";
@@ -214,7 +214,7 @@ function setupExtrasBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            let cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = logo.blocks.blockList[blk].connections[1];
             return logo.parseArg(logo, turtle, cblk, blk, receivedArg);
         }
     }
@@ -238,13 +238,13 @@ function setupExtrasBlocks() {
         }
 
         flow(args, logo, turtle) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             if (args.length === 1) {
-                let bpmFactor =
+                const bpmFactor =
                     TONEBPM / tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
 
-                let noteBeatValue = bpmFactor / (1 / args[0]);
+                const noteBeatValue = bpmFactor / (1 / args[0]);
                 tur.singer.previousTurtleTime = tur.singer.turtleTime;
                 tur.singer.turtleTime += noteBeatValue;
                 tur.doWait(args[0]);
@@ -304,25 +304,25 @@ function setupExtrasBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = logo.blocks.blockList[blk].connections[1];
             if (logo.inOscilloscope && cblk !== null) {
-                let name = logo.blocks.blockList[cblk].value;
+                const name = logo.blocks.blockList[cblk].value;
                 let turtle = -1;
                 for (let i = 0; i < logo.turtles.turtleList.length; i++) {
                     if (!logo.turtles.turtleList[i].inTrash) {
-                        let turtleName = turtles.turtleList[i].name;
+                        const turtleName = turtles.turtleList[i].name;
                         if (turtleName === name) turtle = i;
                     }
                 }
-                if (turtle > -1 && logo.oscilloscopeTurtles.indexOf(logo.turtles.turtleList[turtle]) < 0) logo.oscilloscopeTurtles.push(logo.turtles.turtleList[turtle])
+                if (turtle > -1 && logo.oscilloscopeTurtles.indexOf(logo.turtles.turtleList[turtle]) < 0) logo.oscilloscopeTurtles.push(logo.turtles.turtleList[turtle]);
             } else if (!logo.inStatusMatrix) {
                 if (args.length === 1) {
                     if (args[0] !== null) {
-                        let tur = logo.turtles.ithTurtle(turtle);
+                        const tur = logo.turtles.ithTurtle(turtle);
 
                         if (!tur.singer.suppressOutput) {
                             if (logo.blocks.blockList[cblk].name === "grid"){
-                                let temp = new DisplayGridBlock();    
+                                const temp = new DisplayGridBlock();
                                 temp.flow(args,logo,turtle,blk);
                             } else if (args[0] === undefined) {
                                 logo.textMsg("undefined");
@@ -386,7 +386,7 @@ function setupExtrasBlocks() {
             if (!args || !args[0]){
                 args = ["Cartesian"];
             }
-            let act = logo.blocks.activity ;
+            const act = logo.blocks.activity ;
             logo.turtles.hideGrids() ;
             switch (args[0]){
                 case (_("Cartesian")) :
@@ -400,8 +400,8 @@ function setupExtrasBlocks() {
                     act._showCartesian();
                     break;
                 case (_("treble")) :
-                     act._showTreble();
-                     break;
+                    act._showTreble();
+                    break;
                 case (_("grand staff")) :
                     act._showGrand();
                     break;
@@ -409,8 +409,8 @@ function setupExtrasBlocks() {
                     act._showSoprano();
                     break;
                 case (_("alto")) :
-                     act._showAlto();
-                     break;
+                    act._showAlto();
+                    break;
                 case (_("tenor")) :
                     act._showTenor();
                     break;
