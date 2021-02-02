@@ -107,15 +107,15 @@ function Activity() {
         try {
             if (localStorage.beginnerMode === undefined) {
                 firstTimeUser = true;
-                console.debug("FIRST TIME USER");
+                // console.debug("FIRST TIME USER");
             } else if (localStorage.beginnerMode !== null) {
                 beginnerMode = localStorage.beginnerMode;
-                console.debug(
-                    "READING BEGINNERMODE FROM LOCAL STORAGE: " +
-                        beginnerMode +
-                        " " +
-                        typeof beginnerMode
-                );
+                // console.debug(
+                //     "READING BEGINNERMODE FROM LOCAL STORAGE: " +
+                //         beginnerMode +
+                //         " " +
+                //         typeof beginnerMode
+                // );
                 if (typeof beginnerMode === "string") {
                     if (beginnerMode === "false") {
                         beginnerMode = false;
@@ -123,48 +123,46 @@ function Activity() {
                 }
             }
 
-            console.debug("BEGINNERMODE is " + beginnerMode);
+            // console.debug("BEGINNERMODE is " + beginnerMode);
         } catch (e) {
-            console.debug(e);
-            console.debug("ERROR READING BEGINNER MODE");
-            console.debug("BEGINNERMODE is " + beginnerMode);
+            // console.error(e);
+            // console.debug("ERROR READING BEGINNER MODE");
         }
+        // console.debug("BEGINNERMODE is " + beginnerMode);
     } else {
         // Turtle Blocks
         beginnerMode = false;
     }
 
-    if (beginnerMode) {
-        console.debug("BEGINNER MODE");
-    } else {
-        console.debug("ADVANCED MODE");
-    }
+    // if (beginnerMode) {
+    //     console.debug("BEGINNER MODE");
+    // } else {
+    //     console.debug("ADVANCED MODE");
+    // }
 
     try {
-        console.debug("stored preference: " + localStorage.languagePreference);
-        console.debug("browser preference: " + navigator.language);
+        // console.debug("stored preference: " + localStorage.languagePreference);
+        // console.debug("browser preference: " + navigator.language);
 
         if (localStorage.languagePreference !== undefined) {
             try {
-                console.log(localStorage.languagePreference);
+                // console.debug(localStorage.languagePreference);
                 lang = localStorage.languagePreference;
                 document.webL10n.setLanguage(lang);
-                console.log("SUCCESS");
             } catch (e) {
-                console.debug(e);
+                // console.error(e);
             }
         } else {
             // document.webL10n.getLanguage();
             lang = navigator.language;
-            console.log(lang);
+            // console.debug(lang);
             if (lang.indexOf("-") !== -1) {
                 lang = lang.slice(0, lang.indexOf("-"));
                 document.webL10n.setLanguage(lang);
             }
-            console.log("ELSE");
         }
     } catch (e) {
-        console.debug(e);
+        // console.error(e);
     }
 
     MYDEFINES = [
@@ -569,7 +567,7 @@ function Activity() {
 
         // Return mice to the center of the screen.
         for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-            console.debug("bringing turtle " + turtle + "home");
+            // console.debug("bringing turtle " + turtle + "home");
             const savedPenState = turtles.turtleList[turtle].painter.penState;
             turtles.turtleList[turtle].painter.penState = false;
             turtles.turtleList[turtle].painter.doSetXY(0, 0);
@@ -600,9 +598,7 @@ function Activity() {
             setTimeout(function () {
                 const message = blocks.protoBlockDict[name].helpString;
                 if (message.length < 4) {
-                    // If there is nothing specified, just
-                    // load the block.
-                    console.debug("CLICK: " + name);
+                    // If there is nothing specified, just load the block.
                     const obj = blocks.palettes.getProtoNameAndPalette(name);
                     const protoblk = obj[0];
                     const paletteName = obj[1];
@@ -619,15 +615,12 @@ function Activity() {
                         );
                     }
                 } else if (typeof message[3] === "string") {
-                    // If it is a string, load the macro
-                    // assocuated with this block
+                    // If it is a string, load the macro assocuated with this block
                     const blocksToLoad = getMacroExpansion(message[3], 0, 0);
-                    console.debug("CLICK: " + blocksToLoad);
                     blocks.loadNewBlocks(blocksToLoad);
                 } else {
                     // Load the blocks.
                     const blocksToLoad = message[3];
-                    console.debug("CLICK: " + blocksToLoad);
                     blocks.loadNewBlocks(blocksToLoad);
                 }
 
@@ -653,7 +646,7 @@ function Activity() {
         }
 
         for (const name in blockHelpList) {
-            console.debug(name + " " + blockHelpList[name]);
+            // console.debug(name + " " + blockHelpList[name]);
             __saveHelpBlock(blockHelpList[name], i * 2000);
             i += 1;
         }
@@ -712,7 +705,7 @@ function Activity() {
                     } else if (p === 5) {
                         // Add block value to SVG between tspans
                         if (typeof blocks.blockList[i].value === "string") {
-                            console.debug(_(blocks.blockList[i].value));
+                            // console.debug(_(blocks.blockList[i].value));
                             svg += parts[p] + ">" + _(blocks.blockList[i].value) + "<";
                         } else {
                             svg += parts[p] + ">" + blocks.blockList[i].value + "<";
@@ -893,7 +886,7 @@ function Activity() {
         }
 
         if (!turtles.running()) {
-            console.debug("RUNNING");
+            // console.debug("RUNNING");
             if (!turtles.isShrunk()) {
                 blocks.hideBlocks();
                 logo.showBlocksAfterRun = true;
@@ -903,16 +896,16 @@ function Activity() {
         } else {
             if (currentDelay !== 0) {
                 // keep playing at full speed
-                console.debug("RUNNING FROM STEP");
+                // console.debug("RUNNING FROM STEP");
                 logo.step();
             } else {
                 // stop and restart
-                console.debug("STOPPING...");
+                // console.debug("STOPPING...");
                 document.getElementById("stop").style.color = "white";
                 logo.doStopTurtles();
 
                 setTimeout(function () {
-                    console.debug("AND RUNNING");
+                    // console.debug("AND RUNNING");
                     document.getElementById("stop").style.color = "#ea174c";
 
                     logo.runLogoCommands(null, env);
@@ -1061,7 +1054,7 @@ function Activity() {
         }
 
         if (onblur && _THIS_IS_MUSIC_BLOCKS_) {
-            console.debug("Ignoring hard stop due to blur");
+            // console.debug("Ignoring hard stop due to blur");
             return;
         }
 
@@ -1115,7 +1108,20 @@ function Activity() {
 
         const keyNameWheel = new wheelnav("chooseKeyDiv", null, 1200, 1200);
         const keyNameWheel2 = new wheelnav("keyNameWheel2", keyNameWheel.raphael);
-        const keys = ["C", "G", "D", "A", "E", "B/C♭", "F♯/G♭", "C♯/D♭", "G♯/A♭", "D♯/E♭", "B♭", "F"];
+        const keys = [
+            "C",
+            "G",
+            "D",
+            "A",
+            "E",
+            "B/C♭",
+            "F♯/G♭",
+            "C♯/D♭",
+            "G♯/A♭",
+            "D♯/E♭",
+            "B♭",
+            "F"
+        ];
 
         wheelnav.cssMode = true;
 
@@ -1479,7 +1485,7 @@ function Activity() {
         } else {
             // look to see if My Blocks palette is visible
             if (palettes.buttons["myblocks"].visible) {
-                console.debug(palettes.dict["myblocks"].visible);
+                // console.debug(palettes.dict["myblocks"].visible);
                 if (palettes.dict["myblocks"].visible) {
                     palettes.dict["myblocks"].promptMacrosDelete();
                 }
@@ -1508,8 +1514,7 @@ function Activity() {
      * Renders Cartesian/Polar/Treble/et al. grids
      */
     const _doCartesianPolar = () => {
-
-        switch(turtles.currentGrid){
+        switch (turtles.currentGrid) {
             case 1:
                 _hideCartesian();
                 break;
@@ -1539,10 +1544,10 @@ function Activity() {
                 _hideBass();
                 break;
             default:
-                console.log("Blank Grid");
+            // console.log("Blank Grid");
         }
-        
-        switch(turtles.gridWheel.selectedNavItemIndex){
+
+        switch (turtles.gridWheel.selectedNavItemIndex) {
             case 1:
                 this._showCartesian();
                 break;
@@ -1572,7 +1577,7 @@ function Activity() {
                 this._showBass();
                 break;
             default:
-                console.log("Blank Grid");
+            // console.log("Blank Grid");
         }
         turtles.currentGrid = turtles.gridWheel.selectedNavItemIndex;
         update = true;
@@ -2000,9 +2005,7 @@ function Activity() {
                     (e.target === docById("ui-id-1") || docById("ui-id-1").contains(e.target))
                 ) {
                     //do nothing when clicked on the menu
-                } else if (
-                    document.getElementsByTagName("tr")[2].contains(e.target)
-                ) {
+                } else if (document.getElementsByTagName("tr")[2].contains(e.target)) {
                     //do nothing when clicked on the search row
                 } else {
                     hideSearchWidget();
@@ -2067,17 +2070,15 @@ function Activity() {
         const searchResult = blocks.protoBlockDict.hasOwnProperty(protoName);
 
         if (searchResult) {
-            palettes.dict[paletteName].makeBlockFromSearch(
-                protoblk,
-                protoName,
-                function (newBlock) {
-                    blocks.moveBlock(
-                        newBlock,
-                        100 + searchBlockPosition[0] - blocksContainer.x,
-                        searchBlockPosition[1] - blocksContainer.y
-                    );
-                }
-            );
+            palettes.dict[paletteName].makeBlockFromSearch(protoblk, protoName, function (
+                newBlock
+            ) {
+                blocks.moveBlock(
+                    newBlock,
+                    100 + searchBlockPosition[0] - blocksContainer.x,
+                    searchBlockPosition[1] - blocksContainer.y
+                );
+            });
 
             // Move the position of the next newly created block.
             searchBlockPosition[0] += STANDARDBLOCKHEIGHT;
@@ -2154,11 +2155,10 @@ function Activity() {
 
         blocks.loadNewBlocks(newNote);
         if (blocks.activeBlock !== null) {
-            // Connect the newly created block to the active block
-            // (if it is a hidden block at the end of a new note
-            // block).
+            // Connect the newly created block to the active block (if it is a hidden block at the
+            // end of a new note block).
             const bottom = blocks.findBottomBlock(blocks.activeBlock);
-            console.debug(blocks.activeBlock + " " + bottom);
+            // console.debug(blocks.activeBlock + " " + bottom);
             if (
                 blocks.blockList[bottom].name === "hidden" &&
                 blocks.blockList[blocks.blockList[bottom].connections[0]].name === "newnote"
@@ -2622,28 +2622,28 @@ function Activity() {
      */
     function _onResize(force) {
         if (!force) {
-            console.debug("Saving locally due to resize event");
+            // console.debug("Saving locally due to resize event");
             saveLocally();
         }
         const $j = jQuery.noConflict();
-        console.debug(
-            "document.body.clientWidth and clientHeight: " +
-                document.body.clientWidth +
-                " " +
-                document.body.clientHeight
-        );
-        console.debug("stored values: " + this._clientWidth + " " + this._clientHeight);
+        // console.debug(
+        //     "document.body.clientWidth and clientHeight: " +
+        //         document.body.clientWidth +
+        //         " " +
+        //         document.body.clientHeight
+        // );
+        // console.debug("stored values: " + this._clientWidth + " " + this._clientHeight);
 
-        console.debug(
-            "window inner/outer width/height: " +
-                window.innerWidth +
-                ", " +
-                window.innerHeight +
-                " " +
-                window.outerWidth +
-                ", " +
-                window.outerHeight
-        );
+        // console.debug(
+        //     "window inner/outer width/height: " +
+        //         window.innerWidth +
+        //         ", " +
+        //         window.innerHeight +
+        //         " " +
+        //         window.outerWidth +
+        //         ", " +
+        //         window.outerHeight
+        // );
         let w = 0,
             h = 0;
         if (!platform.androidWebkit) {
@@ -2654,8 +2654,7 @@ function Activity() {
             h = window.outerHeight;
         }
 
-        // If the clientWidth hasn't changed, don't resize (except
-        // on init).
+        // If the clientWidth hasn't changed, don't resize (except on init).
         if (!force && this._clientWidth === document.body.clientWidth) {
             // console.debug('NO WIDTH CHANGE');
             // return;
@@ -2774,7 +2773,7 @@ function Activity() {
         const dy = -cellSize * 3; // Reposition
 
         if (blocks.trashStacks.length === 0) {
-            console.debug("Trash is empty--nothing to do");
+            // console.debug("Trash is empty--nothing to do");
             return;
         }
 
@@ -2814,12 +2813,12 @@ function Activity() {
                 blocks.blockList[thisBlock].trash = false;
 
                 if (uniqueName !== actionArg) {
-                    console.debug(
-                        "renaming action when restoring from trash. old name: " +
-                            oldName +
-                            " unique name: " +
-                            uniqueName
-                    );
+                    // console.debug(
+                    //     "renaming action when restoring from trash. old name: " +
+                    //         oldName +
+                    //         " unique name: " +
+                    //         uniqueName
+                    // );
 
                     actionArg.value = uniqueName;
 
@@ -2835,8 +2834,7 @@ function Activity() {
 
                     actionArg.container.updateCache();
 
-                    // Check the drag group to ensure any do
-                    // blocks are updated (in case of recursion).
+                    // Check the drag group to ensure any do blocks are updated (in case of recursion).
                     for (let b = 0; b < blocks.dragGroup.length; b++) {
                         const me = blocks.blockList[blocks.dragGroup[b]];
                         if (
@@ -2845,7 +2843,7 @@ function Activity() {
                             ) !== -1 &&
                             me.privateData === oldName
                         ) {
-                            console.debug("reassigning nameddo to " + uniqueName);
+                            // console.debug("reassigning nameddo to " + uniqueName);
                             me.privateData = uniqueName;
                             me.value = uniqueName;
 
@@ -2864,7 +2862,7 @@ function Activity() {
                 const actionName = actionArg.value;
                 if (actionName !== _("action")) {
                     // blocks.checkPaletteEntries('action');
-                    console.debug("FIXME: Check for unique action name here");
+                    // console.debug("FIXME: Check for unique action name here");
                 }
             }
         }
@@ -2920,10 +2918,10 @@ function Activity() {
             }
 
             if (blocks.blockList[blk].name === "start" || blocks.blockList[blk].name === "drum") {
-                console.debug("start blk " + blk + " value is " + blocks.blockList[blk].value);
+                // console.debug("start blk " + blk + " value is " + blocks.blockList[blk].value);
                 const turtle = blocks.blockList[blk].value;
                 if (!blocks.blockList[blk].trash && turtle != null) {
-                    console.debug("sending turtle " + turtle + " to trash");
+                    // console.debug("sending turtle " + turtle + " to trash");
                     turtles.turtleList[turtle].inTrash = true;
                     turtles.turtleList[turtle].container.visible = false;
                 }
@@ -2940,7 +2938,7 @@ function Activity() {
         }
 
         if (addStartBlock) {
-            console.debug("ADDING START BLOCK");
+            // console.debug("ADDING START BLOCK");
             blocks.loadNewBlocks(DATAOBJS);
             _allClear(false);
         } else if (!doNotSave) {
@@ -3111,19 +3109,19 @@ function Activity() {
         }
 
         if (merge) {
-            console.debug("MERGE LOAD");
+            // console.debug("MERGE LOAD");
             merging = true;
         } else {
-            console.debug("LOAD NEW");
+            // console.debug("LOAD NEW");
             merging = false;
         }
 
-        console.debug("Loading .tb file");
+        // console.debug("Loading .tb file");
         document.querySelector("#myOpenFile").focus();
         document.querySelector("#myOpenFile").click();
         window.scroll(0, 0);
         that.doHardStopButton();
-        console.debug("Calling all clear from doLoad");
+        // console.debug("Calling all clear from doLoad");
         _allClear(true);
     };
 
@@ -3134,10 +3132,10 @@ function Activity() {
      * @param env {specifies environment}
      */
     this.runProject = function (env) {
-        console.debug("Running Project from Event");
+        // console.debug("Running Project from Event");
         document.removeEventListener("finishedLoading", this.runProject);
         setTimeout(function () {
-            console.debug("Run");
+            // console.debug("Run");
             _changeBlockVisibility();
             that._doFastButton(env);
         }, 5000);
@@ -3150,9 +3148,9 @@ function Activity() {
      * @param  env       {specifies environment}
      */
     this.loadProject = function (projectID, flags, env) {
-        console.debug("LOAD PROJECT");
+        // console.debug("LOAD PROJECT");
         if (planet === undefined) {
-            console.debug("CANNOT ACCESS PLANET");
+            // console.error("CANNOT ACCESS PLANET");
             return;
         }
 
@@ -3161,16 +3159,16 @@ function Activity() {
             typeof flags !== "undefined"
                 ? flags
                 : {
-                    run: false,
-                    show: false,
-                    collapse: false
-                };
+                      run: false,
+                      show: false,
+                      collapse: false
+                  };
         loading = true;
         document.body.style.cursor = "wait";
         doLoadAnimation();
 
         // palettes.updatePalettes();
-        console.debug("LOADING" + planet.getCurrentProjectName());
+        // console.debug("LOADING" + planet.getCurrentProjectName());
         textMsg(planet.getCurrentProjectName());
         setTimeout(function () {
             try {
@@ -3178,8 +3176,8 @@ function Activity() {
                     that.loadStartWrapper(that._loadStart);
                 });
             } catch (e) {
-                console.debug(e);
-                console.debug("that._loadStart on error");
+                // console.error(e);
+                // console.debug("that._loadStart on error");
                 that.loadStartWrapper(that._loadStart);
             }
 
@@ -3270,7 +3268,7 @@ function Activity() {
     };
 
     this._loadStart = async function () {
-        console.debug("LOAD START");
+        // console.debug("LOAD START");
 
         // Set the flag to zero to disable keyboard
         keyboardEnableFlag = 0;
@@ -3278,7 +3276,7 @@ function Activity() {
         // where to put this?
         // palettes.updatePalettes();
         justLoadStart = function () {
-            console.debug("Loading start");
+            // console.debug("Loading start");
             blocks.loadNewBlocks(DATAOBJS);
         };
 
@@ -3296,7 +3294,7 @@ function Activity() {
             if (!turtles.running()) {
                 setTimeout(function () {
                     stage.update(event);
-                    console.debug("reset turtles after load: " + turtles.turtleList.length);
+                    // console.debug("reset turtles after load: " + turtles.turtleList.length);
 
                     for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
                         logo.turtleHeaps[turtle] = [];
@@ -3338,21 +3336,21 @@ function Activity() {
             doLoadAnimation();
             try {
                 if (sessionData === "undefined" || sessionData === "[]") {
-                    console.debug("empty session found: loading start");
+                    // console.debug("empty session found: loading start");
                     justLoadStart();
                 } else {
                     window.loadedSession = sessionData;
-                    console.debug(
-                        `restoring session: (in variable loadedSession) ${sessionData.substring(
-                            0,
-                            50
-                        )}...`
-                    );
+                    // console.debug(
+                    //     `restoring session: (in variable loadedSession) ${sessionData.substring(
+                    //         0,
+                    //         50
+                    //     )}...`
+                    // );
 
                     blocks.loadNewBlocks(JSON.parse(sessionData));
                 }
             } catch (e) {
-                console.debug(e);
+                // console.error(e);
             }
         } else {
             justLoadStart();
@@ -4258,12 +4256,12 @@ function Activity() {
      * Inits everything. The main function.
      */
     this.init = async function () {
-        console.debug(
-            "document.body.clientWidth and clientHeight: " +
-                document.body.clientWidth +
-                " " +
-                document.body.clientHeight
-        );
+        // console.debug(
+        //     "document.body.clientWidth and clientHeight: " +
+        //         document.body.clientWidth +
+        //         " " +
+        //         document.body.clientHeight
+        // );
         this._clientWidth = document.body.clientWidth;
         this._clientHeight = document.body.clientHeight;
 
@@ -4272,16 +4270,16 @@ function Activity() {
         this._outerWidth = window.outerWidth;
         this._outerHeight = window.outerHeight;
 
-        console.debug(
-            "window inner/outer width/height: " +
-                this._innerWidth +
-                ", " +
-                this._innerHeight +
-                " " +
-                this._outerWidth +
-                ", " +
-                this._outerHeight
-        );
+        // console.debug(
+        //     "window inner/outer width/height: " +
+        //         this._innerWidth +
+        //         ", " +
+        //         this._innerHeight +
+        //         " " +
+        //         this._outerWidth +
+        //         ", " +
+        //         this._outerHeight
+        // );
 
         if (sugarizerCompatibility.isInsideSugarizer()) {
             //sugarizerCompatibility.data.blocks = prepareExport();
@@ -4474,7 +4472,7 @@ function Activity() {
                 try {
                     this.iframe.contentWindow.document.getElementById("local-tab").click();
                 } catch (e) {
-                    console.debug(e);
+                    // console.error(e);
                 }
             };
 
@@ -4483,7 +4481,7 @@ function Activity() {
             };
 
             this.openPlanet = function () {
-                console.debug("SAVE LOCALLY");
+                // console.debug("SAVE LOCALLY");
                 this.saveLocally();
                 this.hideMusicBlocks();
                 this.showPlanet();
@@ -4495,7 +4493,7 @@ function Activity() {
             };
 
             this.loadProjectFromData = function (data, merge) {
-                console.debug("LOAD PROJECT FROM DATA");
+                // console.debug("LOAD PROJECT FROM DATA");
                 if (merge === undefined) {
                     merge = false;
                 }
@@ -4506,13 +4504,13 @@ function Activity() {
                 }
 
                 if (data === undefined) {
-                    console.debug("loadRawProject: data is undefined... punting");
+                    // console.debug("loadRawProject: data is undefined... punting");
                     errorMsg(_("project undefined"));
                     return;
                 }
                 textMsg(this.getCurrentProjectName());
-                console.debug("LOADING" + this.getCurrentProjectName());
-                console.debug("loadRawProject " + data);
+                // console.debug("LOADING" + this.getCurrentProjectName());
+                // console.debug("loadRawProject " + data);
                 loading = true;
                 document.body.style.cursor = "wait";
                 doLoadAnimation();
@@ -4535,7 +4533,7 @@ function Activity() {
                     const obj = JSON.parse(data);
                     blocks.loadNewBlocks(obj);
                 } catch (e) {
-                    console.debug("loadRawProject: could not parse project data");
+                    // console.debug("loadRawProject: could not parse project data");
                     errorMsg(e);
                 }
 
@@ -4550,7 +4548,7 @@ function Activity() {
             };
 
             this.newProject = function () {
-                console.debug("NEW");
+                // console.debug("NEW");
                 this.closePlanet();
                 this.initialiseNewProject();
                 that._loadStart();
@@ -4566,7 +4564,7 @@ function Activity() {
 
             this.saveLocally = function () {
                 stage.update(event);
-                console.debug("overwriting session data");
+                // console.debug("overwriting session data");
                 const data = prepareExport();
                 const svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
                 try {
@@ -4589,7 +4587,7 @@ function Activity() {
                             window.btoa(unescape(encodeURIComponent(svgData)));
                     }
                 } catch (e) {
-                    console.debug(e);
+                    // console.error(e);
                     if (
                         e.code === DOMException.QUOTA_EXCEEDED_ERR ||
                         e.message === "Not enough space to save locally"
@@ -4649,8 +4647,8 @@ function Activity() {
                     this.planet.setLoadProjectFromFile(this.loadProjectFromFile.bind(this));
                     this.planet.setOnConverterLoad(this.onConverterLoad.bind(this));
                 } catch (e) {
-                    console.debug(e);
-                    console.debug("Planet not available");
+                    // console.error(e);
+                    // console.debug("Planet not available");
                     this.planet = null;
                 }
 
@@ -4660,7 +4658,7 @@ function Activity() {
         }
 
         try {
-            console.debug("TRYING TO OPEN PLANET");
+            // console.debug("TRYING TO OPEN PLANET");
             planet = new PlanetInterface(storage);
             await planet.init();
         } catch (e) {
@@ -4703,7 +4701,7 @@ function Activity() {
         toolbar.renderRunStepIcon(_doStepButton);
         toolbar.renderAdvancedIcons(
             () => {
-                if(!logo.statsWindow) logo.statsWindow = new StatsWindow();
+                if (!logo.statsWindow) logo.statsWindow = new StatsWindow();
             },
             doOpenPlugin,
             deletePlugin,
@@ -4721,7 +4719,7 @@ function Activity() {
             saveLocally = planet.saveLocally.bind(planet);
         } else {
             __saveLocally = function () {
-                console.debug("overwriting session data (local)");
+                // console.debug("overwriting session data (local)");
                 const data = prepareExport();
 
                 if (sugarizerCompatibility.isInsideSugarizer()) {
@@ -4737,7 +4735,7 @@ function Activity() {
                         storage.allProjects = JSON.stringify(["My Project"]);
                     } catch (e) {
                         // Edge case, eg. Firefox localSorage DB corrupted
-                        console.debug(e);
+                        // console.error(e);
                     }
                 }
 
@@ -4745,7 +4743,7 @@ function Activity() {
                     const p = storage.currentProject;
                     storage["SESSION" + p] = prepareExport();
                 } catch (e) {
-                    console.debug(e);
+                    // console.error(e);
                 }
 
                 const img = new Image();
@@ -4758,7 +4756,7 @@ function Activity() {
                     try {
                         storage["SESSIONIMAGE" + p] = bitmap.bitmapCache.getCacheDataURL();
                     } catch (e) {
-                        console.debug(e);
+                        // console.error(e);
                     }
                 };
 
@@ -4825,7 +4823,7 @@ function Activity() {
         const custommodeData = storage.custommode;
         if (custommodeData !== undefined) {
             const customMode = JSON.parse(custommodeData);
-            console.debug("restoring custom mode: " + customMode);
+            // console.debug("restoring custom mode: " + customMode);
         }
 
         fileChooser.addEventListener("click", function (event) {
@@ -4846,7 +4844,7 @@ function Activity() {
                     setTimeout(function () {
                         const rawData = reader.result;
                         if (rawData == null || rawData === "") {
-                            console.debug("rawData is " + rawData);
+                            // console.debug("rawData is " + rawData);
                             errorMsg(
                                 _("Cannot load project from the file. Please check the file type.")
                             );
@@ -4880,7 +4878,7 @@ function Activity() {
 
                                     stage.addEventListener("trashsignal", __listener, false);
                                     sendAllToTrash(false, false);
-                                    console.debug("clearing on load...");
+                                    // console.debug("clearing on load...");
                                     _allClear(false);
                                     if (planet) {
                                         planet.closePlanet();
@@ -4904,7 +4902,7 @@ function Activity() {
                                         "Cannot load project from the file. Please check the file type."
                                     )
                                 );
-                                console.debug(e);
+                                // console.error(e);
                                 document.body.style.cursor = "default";
                                 loading = false;
                             }
@@ -4978,7 +4976,7 @@ function Activity() {
                             loading = false;
                             refreshCanvas();
                         } catch (e) {
-                            console.debug(e);
+                            // console.error(e);
                             errorMsg(
                                 _("Cannot load project from the file. Please check the file type.")
                             );
@@ -5127,9 +5125,9 @@ function Activity() {
                         args = newUrlParts[i].split("=");
                         switch (args[0].toLowerCase()) {
                             case "file":
-                                console.debug(
-                                    "Warning: old Music Blocks URLs will no longer work."
-                                );
+                                // console.debug(
+                                //     "Warning: old Music Blocks URLs will no longer work."
+                                // );
                                 break;
                             case "id":
                                 projectID = args[1];
@@ -5198,12 +5196,12 @@ function Activity() {
 
         if (projectID != null) {
             setTimeout(function () {
-                console.debug("loading " + projectID);
+                // console.debug("loading " + projectID);
                 that.loadStartWrapper(that.loadProject, projectID, flags, env);
             }, 200); // 2000
         } else {
             setTimeout(function () {
-                console.debug("load new Start block");
+                // console.debug("load new Start block");
                 that.loadStartWrapper(that._loadStart);
             }, 200); // 2000
         }

@@ -165,7 +165,6 @@ function doBrowserCheck() {
 
 window.onload = function () {
     const userAgent = window.navigator.userAgent;
-    console.log("run detectIE");
     // For IE 10 or older
     const MSIE = userAgent.indexOf("MSIE ");
     if (MSIE > 0) {
