@@ -214,11 +214,11 @@ class TemperamentWidget {
         this.toggleNotesButton = () => {
             if (this.circleIsVisible) {
                 noteCell.getElementsByTagName("img")[0].src = "header-icons/circle.svg";
-                noteCell.getElementsByTagName("img")[0].title = "circle";
+                noteCell.getElementsByTagName("img")[0].title = "Circle";
                 noteCell.getElementsByTagName("img")[0].alt = "circle";
             } else {
                 noteCell.getElementsByTagName("img")[0].src = "header-icons/table.svg";
-                noteCell.getElementsByTagName("img")[0].title = "table";
+                noteCell.getElementsByTagName("img")[0].title = "Table";
                 noteCell.getElementsByTagName("img")[0].alt = "table";
             }
         };
@@ -522,12 +522,12 @@ class TemperamentWidget {
                     'px;"><span class="popuptext" id="myPopup"></span></div>';
                 if (i !== 0) {
                     docById("noteInfo").innerHTML +=
-                        '<img src="header-icons/edit.svg" id="edit" title="edit" alt="edit" height=20px width=20px data-message="' +
+                        '<img src="header-icons/edit.svg" id="edit" title="Edit" alt="edit" height=20px width=20px data-message="' +
                         i +
                         '">';
                 }
                 docById("noteInfo").innerHTML +=
-                    '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px align="right"><br>';
+                    '<img src="header-icons/close-button.svg" id="close" title="Close" alt="close" height=20px width=20px align="right"><br>';
                 noteDefined = false;
                 for (let j = 0; j < this.ratiosNotesPair.length; j++) {
                     if (this.ratios[i] == this.ratiosNotesPair[j][0]) {
@@ -729,7 +729,7 @@ class TemperamentWidget {
 
             notesCell[(i, 0)] = notesRow[i].insertCell(-1);
             notesCell[(i, 0)].innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="play" alt="play" height="20px" width="20px" id="play_' +
+                '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="Play" alt="play" height="20px" width="20px" id="play_' +
                 i +
                 '" data-id="' +
                 i +
@@ -1507,7 +1507,7 @@ class TemperamentWidget {
                 docById("wheelDiv3").innerHTML +=
                     '<div class="popup" id="noteInfo1" style="width:180px; height:135px;"><span class="popuptext" id="myPopup"></span></div>';
                 docById("noteInfo1").innerHTML +=
-                    '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px align="right">';
+                    '<img src="header-icons/close-button.svg" id="close" title="Close" alt="close" height=20px width=20px align="right">';
                 docById("noteInfo1").innerHTML +=
                     '<br><center><input type="range" class="sliders" id = "frequencySlider" style="width:170px; background:white; border:0;" min="' +
                     frequencies[i] +
