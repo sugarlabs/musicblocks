@@ -5,35 +5,11 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="160.86668mm"
    height="176.20143mm"
    viewBox="0 0 160.86669 176.20143"
    version="1.1"
-   id="svg8"
-   sodipodi:docname="timbre5.svg"
-   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)">
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="1920"
-     inkscape:window-height="1051"
-     id="namedview702"
-     showgrid="false"
-     inkscape:zoom="1.3214043"
-     inkscape:cx="304.00003"
-     inkscape:cy="272.43743"
-     inkscape:window-x="-9"
-     inkscape:window-y="-9"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg8" />
+   id="svg8">
   <defs
      id="defs2">
     <marker
@@ -78,7 +54,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -723,8 +699,7 @@ S</tspan></text>
        id="tspan2176-5"
        x="137.34099"
        y="44.534233"
-       style="font-size:5.61671px;stroke-width:0.468061px">
-</tspan></text>
+       style="font-size:5.61671px;stroke-width:0.468061px" /></text>
   <rect
      style="fill:#90c100;fill-opacity:1;stroke:none;stroke-width:1.56542;stroke-linecap:round;stroke-miterlimit:1.41421;stroke-dasharray:none;stroke-opacity:1"
      id="rect2157-1"
@@ -755,8 +730,7 @@ S</tspan></text>
        id="tspan2176-3"
        x="139.08798"
        y="8.652359"
-       style="font-size:5.61671px;stroke-width:1.00013;stroke-miterlimit:4;stroke-dasharray:none">
-</tspan></text>
+       style="font-size:5.61671px;stroke-width:1.00013;stroke-miterlimit:4;stroke-dasharray:none" /></text>
   <rect
      style="fill:#90c100;fill-opacity:1;stroke:none;stroke-width:1.56542;stroke-linecap:round;stroke-miterlimit:1.41421;stroke-dasharray:none;stroke-opacity:1"
      id="rect2157-0"
@@ -811,8 +785,7 @@ S</tspan></text>
        id="tspan2176-37"
        x="139.08798"
        y="62.479294"
-       style="font-size:5.61671px;stroke-width:0.468061px">
-</tspan></text>
+       style="font-size:5.61671px;stroke-width:0.468061px" /></text>
   <ellipse
      style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.28159;stroke-linecap:round;stroke-miterlimit:1.41421;stroke-dasharray:none;stroke-opacity:1"
      id="path3905"
@@ -887,7 +860,6 @@ S</tspan></text>
      x="148.36961"
      y="71.882172"
      id="text1559"><tspan
-       sodipodi:role="line"
        id="tspan1557"
        x="148.36961"
        y="71.882172"
@@ -900,7 +872,6 @@ S</tspan></text>
      x="145.76663"
      y="55.663631"
      id="text1563"><tspan
-       sodipodi:role="line"
        id="tspan1561"
        x="145.76663"
        y="55.663631"
@@ -913,7 +884,6 @@ S</tspan></text>
      x="146.96802"
      y="39.645321"
      id="text1567"><tspan
-       sodipodi:role="line"
        id="tspan1565"
        x="146.96802"
        y="39.645321"
@@ -926,7 +896,6 @@ S</tspan></text>
      x="145.96686"
      y="23.426781"
      id="text1571"><tspan
-       sodipodi:role="line"
        id="tspan1569"
        x="145.96686"
        y="23.426781"
