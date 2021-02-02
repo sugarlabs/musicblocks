@@ -439,13 +439,13 @@ class TemperamentWidget {
             divAppend1.style.textAlign = "center";
             divAppend1.style.position = "absolute";
             divAppend1.style.zIndex = 2;
-            divAppend1.style.paddingTop = "5px";
             divAppend1.style.backgroundColor = platformColor.selectorBackground;
-            divAppend1.style.height = "25px";
+            divAppend1.style.height = "30px";
             divAppend1.style.width = docById("wheelDiv2").style.width;
             divAppend1.style.marginTop = docById("wheelDiv2").style.height;
             divAppend1.style.overflow = "auto";
             divAppend1.style.cursor = "pointer";
+            divAppend1.style.lineHeight = divAppend1.style.height; 
             docById("temperamentTable").append(divAppend1);
         }
 
@@ -1462,12 +1462,12 @@ class TemperamentWidget {
         divAppend.id = "divAppend";
         divAppend.innerHTML = "Done";
         divAppend.style.textAlign = "center";
-        divAppend.style.paddingTop = "5px";
         divAppend.style.backgroundColor = platformColor.selectorBackground;
-        divAppend.style.height = "25px";
+        divAppend.style.height = "30px";
         divAppend.style.marginTop = "40px";
         divAppend.style.overflow = "auto";
         divAppend.style.cursor = "pointer";
+        divAppend.style.lineHeight = "30px";
         arbitraryEdit.append(divAppend);
 
         divAppend.onclick = () => {
