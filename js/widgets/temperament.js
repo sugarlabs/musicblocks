@@ -445,7 +445,7 @@ class TemperamentWidget {
             divAppend1.style.marginTop = docById("wheelDiv2").style.height;
             divAppend1.style.overflow = "auto";
             divAppend1.style.cursor = "pointer";
-            divAppend1.style.lineHeight = divAppend1.style.height; 
+            divAppend1.style.lineHeight = divAppend1.style.height;
             docById("temperamentTable").append(divAppend1);
         }
 
@@ -948,7 +948,7 @@ class TemperamentWidget {
             divAppend2.style.width = "205px";
             divAppend2.style.lineHeight = "30px";
             divAppend2.style.cursor = "pointer";
-        }
+        };
 
         addDivision(false);
 
