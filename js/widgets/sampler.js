@@ -52,14 +52,17 @@ function SampleWidget() {
 
                 if (audiofileBlock != null) {
                     this._logo.blocks.blockList[audiofileBlock].value = [this.sampleName, this.sampleData];
+                    this._logo.blocks.blockList[audiofileBlock].text.text = this.sampleName;
                     this._logo.blocks.blockList[audiofileBlock].updateCache();
                 }
                 if (solfegeBlock != null) {
                     this._logo.blocks.blockList[solfegeBlock].value = this.pitchInput.value;
+                    this._logo.blocks.blockList[solfegeBlock].text.text = this.pitchInput.value;
                     this._logo.blocks.blockList[solfegeBlock].updateCache();
                 }
                 if (octaveBlock != null) {
                     this._logo.blocks.blockList[octaveBlock].value = this.octaveCenter.toString();
+                    this._logo.blocks.blockList[octaveBlock].text.text = this.octaveCenter.toString();
                     this._logo.blocks.blockList[octaveBlock].updateCache();
                 }
                 this._logo.refreshCanvas();
@@ -119,6 +122,7 @@ function SampleWidget() {
         this.pitchCenter%=7;
         console.log(this.pitchCenter);
         this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
+        this._updateBlocks();
         this._playReferencePitch();
     };
 
@@ -128,6 +132,7 @@ function SampleWidget() {
             this.accidentalCenter++;
         }
         this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
+        this._updateBlocks();
         this._playReferencePitch();
     };
 
@@ -137,6 +142,7 @@ function SampleWidget() {
             this.accidentalCenter--;
         }
         this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
+        this._updateBlocks();
         this._playReferencePitch();
     };
 
@@ -147,6 +153,7 @@ function SampleWidget() {
             this.octaveCenter = MAXOCTAVE;
         }
         this.octaveInput.value = this.octaveCenter;
+        this._updateBlocks();
         this._playReferencePitch();
     };
 
@@ -157,6 +164,7 @@ function SampleWidget() {
             this.octaveCenter = 0;
         }
         this.octaveInput.value = this.octaveCenter;
+        this._updateBlocks();
         this._playReferencePitch();
     };
 
