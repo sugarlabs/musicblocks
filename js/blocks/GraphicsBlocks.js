@@ -702,7 +702,7 @@ function setupGraphicsBlocks() {
                 ),
                 "documentation",
                 null,
-                "inverthelp"
+                "wraphelp"
             ]);
             this.formBlock({
                 name: _("wrap"),

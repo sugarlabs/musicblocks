@@ -35,6 +35,20 @@
 // numbering begins with Block 0 and all of the "connections" are
 // correct.
 
+/*
+   global _, blocks
+ */
+
+/*
+   Global locations
+   - js/utils/utils.js
+        _
+   - js/activity.js
+        blocks
+ */
+
+/* exported getMacroExpansion, blockIsMacro */
+
 function blockIsMacro(blkname) {
     const protoBlock = blocks.protoBlockDict[blkname];
     if (protoBlock && protoBlock.macroFunc) return true;
@@ -109,6 +123,7 @@ function blockIsMacro(blkname) {
         "vibratohelp",
         "waitforhelp",
         "whilehelp",
+        "wraphelp",
         "xyhelp"
     ];
     return BLOCKISMACRO.indexOf(blkname) > -1;
@@ -535,6 +550,7 @@ function getMacroExpansion(blkname, x, y) {
         [10, "hidden", 0, 0, [0, null]],
         [11, ["number", { value: 40 }], 0, 0, [0]]
     ];
+    /*
     const DISTANCEOBJ = [
         [0, "distance", x, y, [null, 1, 2, 3, 4]],
         [1, ["number", { value: 0 }], 0, 0, [0]],
@@ -542,6 +558,7 @@ function getMacroExpansion(blkname, x, y) {
         [3, "x", 0, 0, [0]],
         [4, "y", 0, 0, [0]]
     ];
+    */
     const DOHELP = [
         [0, "do", x, y, [null, 2, 3]],
         [1, ["text", { value: "part 2" }], 790, 122, [2]],
@@ -1615,6 +1632,22 @@ function getMacroExpansion(blkname, x, y) {
         [8, ["drumname", { value: "kick drum" }], 0, 0, [7]],
         [9, "hidden", 0, 0, [2, null]]
     ];
+    const WRAPHELP = [
+        [0, "newnote", x, y, [null, 1, 4, 8]],
+        [1, "divide", 0, 0, [0, 2, 3]],
+        [2, ["number", { value: 1 }], 0, 0, [1]],
+        [3, ["number", { value: 4 }], 0, 0, [1]],
+        [4, "vspace", 0, 0, [0, 5]],
+        [5, "pitch", 0, 0, [4, 6, 7, 9]],
+        [6, ["solfege", { value: "sol" }], 0, 0, [5]],
+        [7, ["number", { value: 4 }], 0, 0, [5]],
+        [8, "hidden", 0, 0, [0, null]],
+        [9, "wrap", x, y, [5, 10, 12, 11]],
+        [10, ["wrapmode", { value: 1 }], 0, 0, [9]],
+        [11, "hidden", 0, 0, [0, null]],
+        [12, "forward", 0, 0, [9, 13, null]],
+        [13, ["number", { value: 700 }], 0, 0, [12]]
+    ];
     const XYHELP = [
         [0, "forever", 0, 0, [null, 1, null]],
         [1, ["newnote", { collapsed: false }], 0, 0, [0, 2, 5, 7]],
@@ -1709,6 +1742,7 @@ function getMacroExpansion(blkname, x, y) {
         vibratohelp: VIBRATOHELP,
         waitforhelp: WAITFORHELP,
         whilehelp: WHILEHELP,
+        wraphelp: WRAPHELP,
         xyhelp: XYHELP
     };
 
