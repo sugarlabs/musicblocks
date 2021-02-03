@@ -697,6 +697,7 @@ class TemperamentWidget {
             menuItems[i].style.background = platformColor.labelColor;
             menuItems[i].style.height = 30 + "px";
             menuItems[i].style.textAlign = "center";
+            menuItems[i].style.fontSize = "0.9rem";
             menuItems[i].style.fontWeight = "bold";
             if (isCustom(this.inTemperament)) {
                 menuItems[0].style.width = 40 + "px";
@@ -725,45 +726,52 @@ class TemperamentWidget {
         const notesRow = [];
         const notesCell = [];
         const ratios = [];
-        let playImage;
 
         for (let i = 0; i <= this.pitchNumber; i++) {
             notesRow[i] = docById("notes_" + i);
+            notesRow[i].style.background = platformColor.selectorBackground;
+            notesRow[i].style.transition = "background 0.25s ease";
+            notesRow[i].onmouseover = () => {
+                notesRow[i].style.background = platformColor.paletteBackground;
+            };
+            notesRow[i].onmouseout = () => {
+                notesRow[i].style.background = platformColor.selectorBackground;
+            };
 
             notesCell[(i, 0)] = notesRow[i].insertCell(-1);
-            notesCell[(i, 0)].innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="Play" alt="play" height="20px" width="20px" style="margin-top:20px;" id="play_' +
-                i +
-                '" data-id="' +
-                i +
-                '">&nbsp;&nbsp;';
             notesCell[(i, 0)].style.width = 40 + "px";
-            notesCell[(i, 0)].style.backgroundColor = platformColor.selectorBackground;
             notesCell[(i, 0)].style.textAlign = "center";
 
-            notesCell[(i, 0)].onmouseover = (event) => {
-                event.target.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-            };
+            const img_wrap = document.createElement("div");
+            img_wrap.style.height = "2.5rem";
+            img_wrap.style.display = "grid";
+            img_wrap.style.alignItems = "center";
+            img_wrap.style.justifyContent = "center";
 
-            notesCell[(i, 0)].onmouseout = (event) => {
-                event.target.style.backgroundColor = platformColor.selectorBackground;
-            };
-
-            playImage = docById("play_" + i);
-
-            playImage.onmouseover = (event) => {
+            const play_btn = document.createElement("img");
+            play_btn.src = "header-icons/play-button.svg";
+            play_btn.id = `play_${i}`;
+            play_btn.style.height = "1.25rem";
+            play_btn.style.width = "1.25rem";
+            play_btn.style.transition = "all 0.25s ease";
+            play_btn.onmouseover = (event) => {
                 event.target.style.cursor = "pointer";
+                event.target.style.transform = "scale(1.1)";
+            };
+            play_btn.onmouseout = (event) => {
+                event.target.style.transform = "scale(1)";
+            };
+            play_btn.onclick = (event) => {
+                this.playNote(event.target.id.split("_")[1]);
             };
 
-            playImage.onclick = (event) => {
-                this.playNote(event.target.dataset.id);
-            };
+            img_wrap.appendChild(play_btn);
+            notesCell[(i, 0)].appendChild(img_wrap);
 
             //Pitch Number
             notesCell[(i, 1)] = notesRow[i].insertCell(-1);
             notesCell[(i, 1)].id = "pitchNumber_" + i;
             notesCell[(i, 1)].innerHTML = i;
-            notesCell[(i, 1)].style.backgroundColor = platformColor.selectorBackground;
             notesCell[(i, 1)].style.textAlign = "center";
 
             ratios[i] = this.ratios[i];
@@ -772,7 +780,6 @@ class TemperamentWidget {
             //Ratio
             notesCell[(i, 2)] = notesRow[i].insertCell(-1);
             notesCell[(i, 2)].innerHTML = ratios[i];
-            notesCell[(i, 2)].style.backgroundColor = platformColor.selectorBackground;
             notesCell[(i, 2)].style.textAlign = "center";
 
             if (!isCustom(this.inTemperament)) {
@@ -780,14 +787,12 @@ class TemperamentWidget {
                 notesCell[(i, 3)] = notesRow[i].insertCell(-1);
                 notesCell[(i, 3)].innerHTML = this.intervals[i];
                 notesCell[(i, 3)].style.width = 120 + "px";
-                notesCell[(i, 3)].style.backgroundColor = platformColor.selectorBackground;
                 notesCell[(i, 3)].style.textAlign = "center";
 
                 //Notes
                 notesCell[(i, 4)] = notesRow[i].insertCell(-1);
-                notesCell[(i, 4)].innerHTML = this.notes[i];
+                notesCell[(i, 4)].innerHTML = `${this.notes[i][0]}, ${this.notes[i][1]}`;
                 notesCell[(i, 4)].style.width = 50 + "px";
-                notesCell[(i, 4)].style.backgroundColor = platformColor.selectorBackground;
                 notesCell[(i, 4)].style.textAlign = "center";
 
                 //Mode
@@ -802,14 +807,12 @@ class TemperamentWidget {
                     notesCell[(i, 5)].innerHTML = "Non Scalar";
                 }
                 notesCell[(i, 5)].style.width = 100 + "px";
-                notesCell[(i, 5)].style.backgroundColor = platformColor.selectorBackground;
                 notesCell[(i, 5)].style.textAlign = "center";
             }
 
             //Frequency
             notesCell[(i, 6)] = notesRow[i].insertCell(-1);
             notesCell[(i, 6)].innerHTML = this.frequencies[i];
-            notesCell[(i, 6)].style.backgroundColor = platformColor.selectorBackground;
             notesCell[(i, 6)].style.textAlign = "center";
 
             if (isCustom(this.inTemperament)) {
