@@ -865,25 +865,25 @@ class TemperamentWidget {
         for(let i = 0;i<4;i++){
             menuItems[i].onmouseover = () => {
                 menuItems[i].style.backgroundColor = "#7bb5ee";
-            }
+            };
         }
 
         for(let i = 0;i<4;i++){
             menuItems[i].onmouseout = () => {
-                if((i==0 && this.editMode!="equal") 
+                if((i==0 && this.editMode!="equal")
                 || (i==1 && this.editMode!="ratio")
-                || (i==2 && this.editMode!="arbitrary") 
+                || (i==2 && this.editMode!="arbitrary")
                 || (i==3 && this.editMode!="octave")){
                     menuItems[i].style.backgroundColor = "#8cc6ff";
                 }
-            }
+            };
         }
 
         for(let i = 0;i<4;i++){
             menuItems[i].onclick = () => {
                 for(let j = 0;j<4;j++){
                     if(i!=j){
-                        menuItems[j].style.background = platformColor.selectorBackground;        
+                        menuItems[j].style.background = platformColor.selectorBackground;      
                     }
                     else{
                         menuItems[i].style.background = "#FFFFFF";
@@ -901,7 +901,7 @@ class TemperamentWidget {
                 else{
                     this.octaveSpaceEdit();
                 }
-            }
+            };
         }
     }
 
