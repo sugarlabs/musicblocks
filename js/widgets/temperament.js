@@ -365,8 +365,10 @@ class TemperamentWidget {
             const angleDiff = [];
             for (let i = 0; i < this.notesCircle.navItemCount; i++) {
                 this.notesCircle.navItems[i].fillAttr = "#c8C8C8";
-                this.notesCircle.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
-                this.notesCircle.navItems[i].titleSelectedAttr.font = "20 20px Impact, Charcoal, sans-serif";
+                this.notesCircle.navItems[i].titleAttr.font =
+                    "20 20px Impact, Charcoal, sans-serif";
+                this.notesCircle.navItems[i].titleSelectedAttr.font =
+                    "20 20px Impact, Charcoal, sans-serif";
                 angle[i] = 270 + 360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase));
                 if (i !== 0) {
                     if (i == pitchNumber - 1) {
@@ -575,7 +577,7 @@ class TemperamentWidget {
                 docById("noteInfo").style.zIndex = 10;
 
                 docById("close").style.cursor = "pointer";
-                
+
                 docById("close").onclick = () => {
                     docById("noteInfo").remove();
                 };
@@ -862,43 +864,41 @@ class TemperamentWidget {
         menuItems[0].style.background = "#FFFFFF";
         this.equalEdit();
 
-        for(let i = 0;i<4;i++){
+        for (let i = 0; i < 4; i++) {
             menuItems[i].onmouseover = () => {
                 menuItems[i].style.backgroundColor = "#7bb5ee";
             };
         }
 
-        for(let i = 0;i<4;i++){
+        for (let i = 0; i < 4; i++) {
             menuItems[i].onmouseout = () => {
-                if((i==0 && this.editMode!="equal")
-                || (i==1 && this.editMode!="ratio")
-                || (i==2 && this.editMode!="arbitrary")
-                || (i==3 && this.editMode!="octave")){
+                if (
+                    (i == 0 && this.editMode != "equal") ||
+                    (i == 1 && this.editMode != "ratio") ||
+                    (i == 2 && this.editMode != "arbitrary") ||
+                    (i == 3 && this.editMode != "octave")
+                ) {
                     menuItems[i].style.backgroundColor = "#8cc6ff";
                 }
             };
         }
 
-        for(let i = 0;i<4;i++){
+        for (let i = 0; i < 4; i++) {
             menuItems[i].onclick = () => {
-                for(let j = 0;j<4;j++){
-                    if(i!=j){
-                        menuItems[j].style.background = platformColor.selectorBackground;      
-                    }
-                    else{
+                for (let j = 0; j < 4; j++) {
+                    if (i != j) {
+                        menuItems[j].style.background = platformColor.selectorBackground;
+                    } else {
                         menuItems[i].style.background = "#FFFFFF";
                     }
                 }
-                if(i==0){
+                if (i == 0) {
                     this.equalEdit();
-                }
-                else if(i==1){
+                } else if (i == 1) {
                     this.ratioEdit();
-                }
-                else if(i==2){
+                } else if (i == 2) {
                     this.arbitraryEdit();
-                }
-                else{
+                } else {
                     this.octaveSpaceEdit();
                 }
             };
