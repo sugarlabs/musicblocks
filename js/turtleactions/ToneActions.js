@@ -51,10 +51,12 @@ function setupToneActions() {
             }
             if (!accounted && typeof instrument === "object"){
                 accounted = false;
+                CUSTOMSAMPLECENTERNO[instrument[0]] = [instrument[2], instrument[3]]
                 for (let voice in CUSTOMSAMPLES){
-                    if (voice === instrument[0]){
+                    if (voice === instrument[0] && CUSTOMSAMPLES.hasOwnProperty(voice)){
                         synth = CUSTOMSAMPLES[voice];
                         accounted = true;
+                        console.log("accounted");
                         break;
                     }
                 }
@@ -80,11 +82,7 @@ function setupToneActions() {
 
             if (tur.singer.instrumentNames.indexOf(synth) === -1) {
                 tur.singer.instrumentNames.push(synth);
-                if (typeof instrument === "object") {
-                    logo.synth.loadSynth(turtle, instrument);
-                } else {
                     logo.synth.loadSynth(turtle, synth);
-                }
                 if (tur.singer.synthVolume[synth] === undefined) {
                     // The electronic synthvolume will track any
                     // changes to the mater volume, e.g., the
