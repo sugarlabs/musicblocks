@@ -711,6 +711,10 @@ function setupToneBlocks() {
                     let ovalue = logo.blocks.blockList[cblk3].value;
                     logo.blocks.blockList[blk].value[3] = ovalue;
                 }
+
+                if (logo.inSample) {
+                    logo.sample.sampleBlock = blk;
+                }
                 return logo.blocks.blockList[blk].value;
             }
         }
