@@ -1633,20 +1633,15 @@ function getMacroExpansion(blkname, x, y) {
         [9, "hidden", 0, 0, [2, null]]
     ];
     const WRAPHELP = [
-        [0, "newnote", x, y, [null, 1, 4, 8]],
-        [1, "divide", 0, 0, [0, 2, 3]],
-        [2, ["number", { value: 1 }], 0, 0, [1]],
-        [3, ["number", { value: 4 }], 0, 0, [1]],
-        [4, "vspace", 0, 0, [0, 5]],
-        [5, "pitch", 0, 0, [4, 6, 7, 9]],
-        [6, ["solfege", { value: "sol" }], 0, 0, [5]],
-        [7, ["number", { value: 4 }], 0, 0, [5]],
-        [8, "hidden", 0, 0, [0, null]],
-        [9, "wrap", x, y, [5, 10, 12, 11]],
-        [10, ["wrapmode", { value: 1 }], 0, 0, [9]],
-        [11, "hidden", 0, 0, [0, null]],
-        [12, "forward", 0, 0, [9, 13, null]],
-        [13, ["number", { value: 700 }], 0, 0, [12]]
+	[0, "forward", 0, 0, [4, 1, 2]],
+	[1, ["number", { "value": 1000 }], 0, 0, [0]],
+	[2, "right", 0, 0, [0, 3, null]],
+	[3, ["number", { "value": 144 }], 0, 0, [2]],
+	[4, "repeat", 0, 0, [6, 5, 0, null]],
+	[5, ["number", { "value": 5 }], 0, 0, [4]],
+	[6, "wrap", x, y, [null, 7, 4, 8]],
+	[7, ["wrapmode", { "value": "on" }], 0, 0, [6]],
+	[8, "hidden", 0, 0, [6, null]]
     ];
     const XYHELP = [
         [0, "forever", 0, 0, [null, 1, null]],

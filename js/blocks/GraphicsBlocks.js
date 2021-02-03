@@ -693,7 +693,7 @@ function setupGraphicsBlocks() {
 
     class WrapBlock extends FlowClampBlock {
         constructor() {
-            super("wrap");
+            super("wrap", _("wrap"));
             this.setPalette("graphics");
             this.beginnerBlock(true);
             this.setHelpString([
