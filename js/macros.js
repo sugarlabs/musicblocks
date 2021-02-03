@@ -35,6 +35,20 @@
 // numbering begins with Block 0 and all of the "connections" are
 // correct.
 
+/*
+   global _, blocks
+ */
+
+/*
+   Global locations
+   - js/utils/utils.js
+        _
+   - js/activity.js
+        blocks
+ */
+
+/* exported getMacroExpansion, blockIsMacro */
+
 function blockIsMacro(blkname) {
     const protoBlock = blocks.protoBlockDict[blkname];
     if (protoBlock && protoBlock.macroFunc) return true;
@@ -536,6 +550,7 @@ function getMacroExpansion(blkname, x, y) {
         [10, "hidden", 0, 0, [0, null]],
         [11, ["number", { value: 40 }], 0, 0, [0]]
     ];
+    /*
     const DISTANCEOBJ = [
         [0, "distance", x, y, [null, 1, 2, 3, 4]],
         [1, ["number", { value: 0 }], 0, 0, [0]],
@@ -543,6 +558,7 @@ function getMacroExpansion(blkname, x, y) {
         [3, "x", 0, 0, [0]],
         [4, "y", 0, 0, [0]]
     ];
+    */
     const DOHELP = [
         [0, "do", x, y, [null, 2, 3]],
         [1, ["text", { value: "part 2" }], 790, 122, [2]],
