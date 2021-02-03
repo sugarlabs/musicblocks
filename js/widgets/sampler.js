@@ -20,7 +20,8 @@ function SampleWidget() {
 
     const MAXOCTAVE = 10;
 
-    this.sampleBlock;
+    this.timbreBlock;
+    this.sampleArray;
 
     this.sampleData = "";
     this.sampleName = DEFAULTSAMPLE;
@@ -40,10 +41,13 @@ function SampleWidget() {
         let audiofileBlock;
         let solfegeBlock;
         let octaveBlock;
-        if (this.sampleBlock != null) {
-            mainSampleBlock = this._logo.blocks.blockList[this.sampleBlock].connections[1];
+
+        this.sampleArray = [this.sampleName, this.sampleData, this.samplePitch, this.octaveCenter];
+
+        if (this.timbreBlock != null) {
+            mainSampleBlock = this._logo.blocks.blockList[this.timbreBlock].connections[1];;
             if (mainSampleBlock != null) {
-                this._logo.blocks.blockList[mainSampleBlock].value = [this.sampleName, this.sampleData, this.samplePitch, this.octaveCenter];
+                this._logo.blocks.blockList[mainSampleBlock].value = this.sampleArray;
                 this._logo.blocks.blockList[mainSampleBlock].updateCache();
 
                 audiofileBlock = this._logo.blocks.blockList[mainSampleBlock].connections[1];
@@ -65,6 +69,7 @@ function SampleWidget() {
                     this._logo.blocks.blockList[octaveBlock].text.text = this.octaveCenter.toString();
                     this._logo.blocks.blockList[octaveBlock].updateCache();
                 }
+
                 this._logo.refreshCanvas();
                 saveLocally();
             }
@@ -486,12 +491,16 @@ function SampleWidget() {
             return;
         }
         CUSTOMSAMPLES[this.sampleName] = this.sampleData;
+        CUSTOMSAMPLECENTERNO[this.sampleName] = [this.samplePitch, this.octaveCenter];
     }
 
     this._playReferencePitch = function() {
         this._usePitch(this.pitchInput.value);
         this._useAccidental(this.accidentalInput.value);
         this._useOctave(this.octaveInput.value);
+
+        this.sampleArray = [this.sampleName, this.sampleData, this.samplePitch, this.octaveCenter];
+
         let finalCenter = 0;
 
         finalCenter += isNaN(this.octaveCenter)     ? 0 : this.octaveCenter*12;
@@ -514,8 +523,8 @@ function SampleWidget() {
             false);
         this.isMoving = true;
 
-        console.log(getVoiceSynthName(this.sampleName));
-        this._logo.synth.loadSynth(0, getVoiceSynthName(this.sampleName));
+        this._logo.synth.loadSynth(0, this.sampleArray);
+
         let finalpitch = CENTERPITCHHERTZ;
         this._logo.synth.trigger(
             0,
@@ -528,7 +537,6 @@ function SampleWidget() {
     }
 
     this._parseSamplePitch = function () {
-        console.log(this.samplePitch);
         this.pitchCenter = this.samplePitch;
 
     }
