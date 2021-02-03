@@ -1521,7 +1521,7 @@ class TemperamentWidget {
                     docById("noteInfo1").remove();
                 }
                 docById("wheelDiv3").innerHTML +=
-                    '<div class="popup" id="noteInfo1" style="width:180px; height:135px;"><span class="popuptext" id="myPopup"></span></div>';
+                    '<div class="popup" id="noteInfo1" style="width:180px; height:146px;"><span class="popuptext" id="myPopup"></span></div>';
                 docById("noteInfo1").innerHTML +=
                     '<img src="header-icons/close-button.svg" id="close" title="Close" alt="close" height=20px width=20px align="right">';
                 docById("noteInfo1").innerHTML +=
@@ -1535,10 +1535,12 @@ class TemperamentWidget {
                     frequencies[i] +
                     "</span>";
                 docById("noteInfo1").innerHTML +=
-                    '<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>Done</center><div>';
+                    '<br><br><div id="done" style="background:#8cc6ff; cursor: pointer"><center>Done</center><div>';
 
                 docById("noteInfo1").style.top = "100px";
                 docById("noteInfo1").style.left = "90px";
+                docById("done").style.height = "30px";
+                docById("done").style.lineHeight = "30px";
 
                 docById("close").style.cursor = "pointer";
                 docById("frequencySlider").oninput = () => {
