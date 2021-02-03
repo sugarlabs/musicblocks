@@ -859,40 +859,50 @@ class TemperamentWidget {
             menuItems[i].style.paddingRight = "5px";
         }
 
-        menuItems[0].style.background = "#c8C8C8";
+        menuItems[0].style.background = "#FFFFFF";
         this.equalEdit();
 
-        menuItems[0].onclick = () => {
-            menuItems[1].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[0].style.background = "#FFFFFF";
-            this.equalEdit();
-        };
+        for(let i = 0;i<4;i++){
+            menuItems[i].onmouseover = () => {
+                menuItems[i].style.backgroundColor = "#7bb5ee";
+            }
+        }
 
-        menuItems[1].onclick = () => {
-            menuItems[0].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[1].style.background = "#FFFFFF";
-            this.ratioEdit();
-        };
+        for(let i = 0;i<4;i++){
+            menuItems[i].onmouseout = () => {
+                if((i==0 && this.editMode!="equal") 
+                || (i==1 && this.editMode!="ratio")
+                || (i==2 && this.editMode!="arbitrary") 
+                || (i==3 && this.editMode!="octave")){
+                    menuItems[i].style.backgroundColor = "#8cc6ff";
+                }
+            }
+        }
 
-        menuItems[2].onclick = () => {
-            menuItems[0].style.background = platformColor.selectorBackground;
-            menuItems[1].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = "#FFFFFF";
-            this.arbitraryEdit();
-        };
-
-        menuItems[3].onclick = () => {
-            menuItems[0].style.background = platformColor.selectorBackground;
-            menuItems[1].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = "#FFFFFF";
-            this.octaveSpaceEdit();
-        };
+        for(let i = 0;i<4;i++){
+            menuItems[i].onclick = () => {
+                for(let j = 0;j<4;j++){
+                    if(i!=j){
+                        menuItems[j].style.background = platformColor.selectorBackground;        
+                    }
+                    else{
+                        menuItems[i].style.background = "#FFFFFF";
+                    }
+                }
+                if(i==0){
+                    this.equalEdit();
+                }
+                else if(i==1){
+                    this.ratioEdit();
+                }
+                else if(i==2){
+                    this.arbitraryEdit();
+                }
+                else{
+                    this.octaveSpaceEdit();
+                }
+            }
+        }
     }
 
     /**
@@ -1531,7 +1541,6 @@ class TemperamentWidget {
                 docById("noteInfo1").style.left = "90px";
 
                 docById("close").style.cursor = "pointer";
-                
                 docById("frequencySlider").oninput = () => {
                     this._refreshInnerWheel();
                 };
