@@ -633,13 +633,12 @@ function setupToneBlocks() {
                     logo.rhythmRuler.Drums.push(blk);
                     logo.rhythmRuler.Rulers.push([[], []]);
                 } else if (logo.inSample) {
-                    logo.sample.sampleBlock = blk;
-                    logo.sample.sampleName = args[0][0];
-                    logo.sample.sampleData = args[0][1];
-                    logo.sample.samplePitch = args[0][2];
-                    logo.sample.octaveCenter = args[0][3];
+                  logo.sample.timbreBlock = blk;
+                  logo.sample.sampleName = args[0][0];
+                  logo.sample.sampleData = args[0][1];
+                  logo.sample.samplePitch = args[0][2];
+                  logo.sample.octaveCenter = parseInt(args[0][3]);
                 }
-
                 Singer.ToneActions.setTimbre(args[0], turtle, blk);
             }
 
@@ -712,9 +711,6 @@ function setupToneBlocks() {
                     logo.blocks.blockList[blk].value[3] = ovalue;
                 }
 
-                if (logo.inSample) {
-                    logo.sample.sampleBlock = blk;
-                }
                 return logo.blocks.blockList[blk].value;
             }
         }
