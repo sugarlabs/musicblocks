@@ -457,7 +457,7 @@ function setupWidgetBlocks() {
 
         flow(args, logo, turtle, blk) {
             logo.insideModeWidget = true;
-            
+
             const listenerName = "_modewidget_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
@@ -542,7 +542,7 @@ function setupWidgetBlocks() {
               [1, "settimbre", 0, 0, [0, 2, 6, 7]],
               [2, ["customsample", {value: ["", "", "sol", 4]}], 0, 0, [1, 3, 4, 5]],
               [3, ["audiofile", {value: null}], 0, 0, [2]],
-              [4, ["solfege", {value: "do"}], 0, 0, [2]],
+              [4, ["solfege", {value: "sol"}], 0, 0, [2]],
               [5, ["number", {value: 4}], 0, 0, [2]],
               [6, "vspace", 0, 0, [1, null]],
               [7, "hidden", 0, 0, [1, null]],
@@ -555,7 +555,8 @@ function setupWidgetBlocks() {
                 logo.sample = new SampleWidget();
             }
             logo.inSample = true;
-            logo.sample = new SampleWidget();
+
+            logo.sample.sampleBlock = null;
 
             let listenerName = "_sampler_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
