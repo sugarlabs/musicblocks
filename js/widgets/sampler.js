@@ -65,8 +65,8 @@ function SampleWidget() {
                     this._logo.blocks.blockList[solfegeBlock].updateCache();
                 }
                 if (octaveBlock != null) {
-                    this._logo.blocks.blockList[octaveBlock].value = this.octaveCenter.toString();
-                    this._logo.blocks.blockList[octaveBlock].text.text = this.octaveCenter.toString();
+                    this._logo.blocks.blockList[octaveBlock].value = this.octaveCenter;
+                    this._logo.blocks.blockList[octaveBlock].text.text = this.octaveCenter;
                     this._logo.blocks.blockList[octaveBlock].updateCache();
                 }
 
@@ -125,7 +125,6 @@ function SampleWidget() {
             this.octaveInput.value = this.octaveCenter;
         }
         this.pitchCenter%=7;
-        console.log(this.pitchCenter);
         this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
         this._updateBlocks();
         this._playReferencePitch();
@@ -276,9 +275,6 @@ function SampleWidget() {
                 }
             }
         }
-
-        this._parseSamplePitch();
-
 
         if (this._intervalID != null) {
             clearInterval(this._intervalID);
@@ -471,12 +467,14 @@ function SampleWidget() {
                 "keyup",
                 ((id) => (e) => {
                     if (e.keyCode === 13) {
-                        console.log("use pitch");
                         this._usePitch(id);
                     }
                 })
             );
         }
+
+        this._parseSamplePitch();
+        this.octaveInput.value = this.octaveCenter;
 
         this._logo.textMsg(_("Record a sample to use as an instrument."));
         this._draw();
@@ -486,20 +484,23 @@ function SampleWidget() {
     };
 
     this._addSample = function() {
-
-        if (CUSTOMSAMPLES.hasOwnProperty(this.sampleName)) {
-            return;
-        }
+        this.samplePitch = SOLFEGENAMES[this.pitchCenter] + ACCIDENTALNAMES[this.accidentalCenter];
         CUSTOMSAMPLES[this.sampleName] = this.sampleData;
         CUSTOMSAMPLECENTERNO[this.sampleName] = [this.samplePitch, this.octaveCenter];
     }
 
     this._playReferencePitch = function() {
+
         this._usePitch(this.pitchInput.value);
         this._useAccidental(this.accidentalInput.value);
         this._useOctave(this.octaveInput.value);
 
-        this.sampleArray = [this.sampleName, this.sampleData, this.samplePitch, this.octaveCenter];
+        this._addSample();
+
+        this._logo.synth.loadSynth(0, this.sampleName);
+        //this._logo.synth.createSynth(0, this.sampleName, this.sampleName, null);
+        //this._logo.synth.setVolume(0, this.sampleName, last(Singer.masterVolume));
+        //instruments[0][this.sampleName].toDestination();
 
         let finalCenter = 0;
 
@@ -512,6 +513,7 @@ function SampleWidget() {
         let netChange = finalCenter-57;
         let reffinalpitch = Math.floor(440 * Math.pow(2, netChange/12));
 
+        let finalpitch = CENTERPITCHHERTZ;
 
         this._logo.synth.trigger(
             0,
@@ -521,11 +523,7 @@ function SampleWidget() {
             null,
             null,
             false);
-        this.isMoving = true;
 
-        this._logo.synth.loadSynth(0, this.sampleArray);
-
-        let finalpitch = CENTERPITCHHERTZ;
         this._logo.synth.trigger(
             0,
             [finalpitch],
@@ -537,7 +535,14 @@ function SampleWidget() {
     }
 
     this._parseSamplePitch = function () {
-        this.pitchCenter = this.samplePitch;
+        let first_part = this.samplePitch.substring(0,2);
+        if (first_part === "sol") {
+            this.pitchCenter = 4;
+        } else {
+            this.pitchCenter = SOLFEGENAMES.indexOf(first_part);
+        }
+        this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
+        this.accidentalInput.value = " ";
 
     }
 
