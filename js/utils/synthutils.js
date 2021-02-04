@@ -700,7 +700,7 @@ function Synth() {
             for (let key in CUSTOMSAMPLES) {
                 if (CUSTOMSAMPLES.hasOwnProperty(key)) {
                     console.log("loaded custom sample");
-                    this.samples["voice"][key] = CUSTOMSAMPLES[key];
+                    this.samples.voice[key] = CUSTOMSAMPLES[key];
                     return;
                 }
             }
@@ -1149,7 +1149,7 @@ function Synth() {
     };
 
     this.loadSynth = function (turtle, sourceName) {
-        if (sourceName in instruments[turtle]) {
+        if (sourceName in instruments[turtle]){
             console.debug(sourceName + " already loaded");
         } else {
             console.debug("loading " + sourceName);

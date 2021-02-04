@@ -1578,7 +1578,6 @@ function getVoiceSynthName(name) {
         }
     }
 
-
     for (let key in CUSTOMSAMPLES) {
         if (CUSTOMSAMPLES.hasOwnProperty(key)) {
             return key;
