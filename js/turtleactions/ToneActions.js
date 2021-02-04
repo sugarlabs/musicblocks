@@ -31,6 +31,8 @@ function setupToneActions() {
          * @param {Number} blk - corresponding Block object in blocks.blockList
          */
         static setTimbre(instrument, turtle, blk) {
+
+
             const tur = logo.turtles.ithTurtle(turtle);
 
             tur.inSetTimbre = true;
@@ -51,26 +53,22 @@ function setupToneActions() {
             }
             if (!accounted && typeof instrument === "object"){
                 accounted = false;
-                CUSTOMSAMPLECENTERNO[instrument[0]] = [instrument[2], instrument[3]]
                 for (let voice in CUSTOMSAMPLES){
                     if (voice === instrument[0] && CUSTOMSAMPLES.hasOwnProperty(voice)){
-                        synth = CUSTOMSAMPLES[voice];
+                        synth = instrument[0];
+                        CUSTOMSAMPLECENTERNO[instrument[0]] = [instrument[2], instrument[3]]
                         accounted = true;
-                        console.log("accounted");
                         break;
                     }
                 }
-                if (!accounted) {
+                if ((!accounted) && !(instrument[0] == "")){
                     CUSTOMSAMPLES[instrument[0]] = instrument[1];
+                    CUSTOMSAMPLECENTERNO[instrument[0]] = [instrument[2], instrument[3]]
                     synth = instrument[0];
                 }
             }
-            /*
-            if (!accounted && typeof instrument === "object"){
-                synth = instrument[0];
-            }
-            */
-            if ((synth === undefined) || (synth === null)) {
+
+            if ((synth === undefined) || (synth === null) || (synth === "")) {
                 synth = "electronic synth";
             }
 
