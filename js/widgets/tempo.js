@@ -79,9 +79,9 @@ class Tempo {
                 this.pause();
                 pauseBtn.innerHTML =
                     '<img src="header-icons/play-button.svg" title="' +
-                    _("Pause") +
+                    _("Play") +
                     '" alt="' +
-                    _("Pause") +
+                    _("Play") +
                     '" height="' +
                     Tempo.ICONSIZE +
                     '" width="' +
@@ -92,9 +92,9 @@ class Tempo {
                 this.resume();
                 pauseBtn.innerHTML =
                     '<img src="header-icons/pause-button.svg" title="' +
-                    _("Play") +
+                    _("Pause") +
                     '" alt="' +
-                    _("Play") +
+                    _("Pause") +
                     '" height="' +
                     Tempo.ICONSIZE +
                     '" width="' +
