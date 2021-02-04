@@ -214,11 +214,11 @@ class TemperamentWidget {
         this.toggleNotesButton = () => {
             if (this.circleIsVisible) {
                 noteCell.getElementsByTagName("img")[0].src = "header-icons/circle.svg";
-                noteCell.getElementsByTagName("img")[0].title = "circle";
+                noteCell.getElementsByTagName("img")[0].title = "Circle";
                 noteCell.getElementsByTagName("img")[0].alt = "circle";
             } else {
                 noteCell.getElementsByTagName("img")[0].src = "header-icons/table.svg";
-                noteCell.getElementsByTagName("img")[0].title = "table";
+                noteCell.getElementsByTagName("img")[0].title = "Table";
                 noteCell.getElementsByTagName("img")[0].alt = "table";
             }
         };
@@ -441,12 +441,13 @@ class TemperamentWidget {
             divAppend1.style.textAlign = "center";
             divAppend1.style.position = "absolute";
             divAppend1.style.zIndex = 2;
-            divAppend1.style.paddingTop = "5px";
             divAppend1.style.backgroundColor = platformColor.selectorBackground;
-            divAppend1.style.height = "25px";
+            divAppend1.style.height = "30px";
             divAppend1.style.width = docById("wheelDiv2").style.width;
             divAppend1.style.marginTop = docById("wheelDiv2").style.height;
             divAppend1.style.overflow = "auto";
+            divAppend1.style.cursor = "pointer";
+            divAppend1.style.lineHeight = divAppend1.style.height;
             docById("temperamentTable").append(divAppend1);
         }
 
@@ -521,12 +522,12 @@ class TemperamentWidget {
                     'px;"><span class="popuptext" id="myPopup"></span></div>';
                 if (i !== 0) {
                     docById("noteInfo").innerHTML +=
-                        '<img src="header-icons/edit.svg" id="edit" title="edit" alt="edit" height=20px width=20px data-message="' +
+                        '<img src="header-icons/edit.svg" id="edit" title="Edit" alt="edit" height=20px width=20px data-message="' +
                         i +
                         '">';
                 }
                 docById("noteInfo").innerHTML +=
-                    '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px align="right"><br>';
+                    '<img src="header-icons/close-button.svg" id="close" title="Close" alt="close" height=20px width=20px align="right"><br>';
                 noteDefined = false;
                 for (let j = 0; j < this.ratiosNotesPair.length; j++) {
                     if (this.ratios[i] == this.ratiosNotesPair[j][0]) {
@@ -574,6 +575,9 @@ class TemperamentWidget {
                 docById("noteInfo").style.left = "132px";
                 docById("noteInfo").style.position = "absolute";
                 docById("noteInfo").style.zIndex = 10;
+
+                docById("close").style.cursor = "pointer";
+
                 docById("close").onclick = () => {
                     docById("noteInfo").remove();
                 };
@@ -693,6 +697,7 @@ class TemperamentWidget {
             menuItems[i].style.background = platformColor.labelColor;
             menuItems[i].style.height = 30 + "px";
             menuItems[i].style.textAlign = "center";
+            menuItems[i].style.fontSize = "0.9rem";
             menuItems[i].style.fontWeight = "bold";
             if (isCustom(this.inTemperament)) {
                 menuItems[0].style.width = 40 + "px";
@@ -721,45 +726,52 @@ class TemperamentWidget {
         const notesRow = [];
         const notesCell = [];
         const ratios = [];
-        let playImage;
 
         for (let i = 0; i <= this.pitchNumber; i++) {
             notesRow[i] = docById("notes_" + i);
+            notesRow[i].style.background = platformColor.selectorBackground;
+            notesRow[i].style.transition = "background 0.25s ease";
+            notesRow[i].onmouseover = () => {
+                notesRow[i].style.background = platformColor.paletteBackground;
+            };
+            notesRow[i].onmouseout = () => {
+                notesRow[i].style.background = platformColor.selectorBackground;
+            };
 
             notesCell[(i, 0)] = notesRow[i].insertCell(-1);
-            notesCell[(i, 0)].innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="play" alt="play" height="20px" width="20px" id="play_' +
-                i +
-                '" data-id="' +
-                i +
-                '">&nbsp;&nbsp;';
             notesCell[(i, 0)].style.width = 40 + "px";
-            notesCell[(i, 0)].style.backgroundColor = platformColor.selectorBackground;
             notesCell[(i, 0)].style.textAlign = "center";
 
-            notesCell[(i, 0)].onmouseover = (event) => {
-                event.target.style.backgroundColor = platformColor.selectorBackgroundHOVER;
-            };
+            const img_wrap = document.createElement("div");
+            img_wrap.style.height = "2.5rem";
+            img_wrap.style.display = "grid";
+            img_wrap.style.alignItems = "center";
+            img_wrap.style.justifyContent = "center";
 
-            notesCell[(i, 0)].onmouseout = (event) => {
-                event.target.style.backgroundColor = platformColor.selectorBackground;
-            };
-
-            playImage = docById("play_" + i);
-
-            playImage.onmouseover = (event) => {
+            const play_btn = document.createElement("img");
+            play_btn.src = "header-icons/play-button.svg";
+            play_btn.id = `play_${i}`;
+            play_btn.style.height = "1.25rem";
+            play_btn.style.width = "1.25rem";
+            play_btn.style.transition = "all 0.25s ease";
+            play_btn.onmouseover = (event) => {
                 event.target.style.cursor = "pointer";
+                event.target.style.transform = "scale(1.1)";
+            };
+            play_btn.onmouseout = (event) => {
+                event.target.style.transform = "scale(1)";
+            };
+            play_btn.onclick = (event) => {
+                this.playNote(event.target.id.split("_")[1]);
             };
 
-            playImage.onclick = (event) => {
-                this.playNote(event.target.dataset.id);
-            };
+            img_wrap.appendChild(play_btn);
+            notesCell[(i, 0)].appendChild(img_wrap);
 
             //Pitch Number
             notesCell[(i, 1)] = notesRow[i].insertCell(-1);
             notesCell[(i, 1)].id = "pitchNumber_" + i;
             notesCell[(i, 1)].innerHTML = i;
-            notesCell[(i, 1)].style.backgroundColor = platformColor.selectorBackground;
             notesCell[(i, 1)].style.textAlign = "center";
 
             ratios[i] = this.ratios[i];
@@ -768,7 +780,6 @@ class TemperamentWidget {
             //Ratio
             notesCell[(i, 2)] = notesRow[i].insertCell(-1);
             notesCell[(i, 2)].innerHTML = ratios[i];
-            notesCell[(i, 2)].style.backgroundColor = platformColor.selectorBackground;
             notesCell[(i, 2)].style.textAlign = "center";
 
             if (!isCustom(this.inTemperament)) {
@@ -776,14 +787,12 @@ class TemperamentWidget {
                 notesCell[(i, 3)] = notesRow[i].insertCell(-1);
                 notesCell[(i, 3)].innerHTML = this.intervals[i];
                 notesCell[(i, 3)].style.width = 120 + "px";
-                notesCell[(i, 3)].style.backgroundColor = platformColor.selectorBackground;
                 notesCell[(i, 3)].style.textAlign = "center";
 
                 //Notes
                 notesCell[(i, 4)] = notesRow[i].insertCell(-1);
-                notesCell[(i, 4)].innerHTML = this.notes[i];
+                notesCell[(i, 4)].innerHTML = `${this.notes[i][0]}, ${this.notes[i][1]}`;
                 notesCell[(i, 4)].style.width = 50 + "px";
-                notesCell[(i, 4)].style.backgroundColor = platformColor.selectorBackground;
                 notesCell[(i, 4)].style.textAlign = "center";
 
                 //Mode
@@ -798,14 +807,12 @@ class TemperamentWidget {
                     notesCell[(i, 5)].innerHTML = "Non Scalar";
                 }
                 notesCell[(i, 5)].style.width = 100 + "px";
-                notesCell[(i, 5)].style.backgroundColor = platformColor.selectorBackground;
                 notesCell[(i, 5)].style.textAlign = "center";
             }
 
             //Frequency
             notesCell[(i, 6)] = notesRow[i].insertCell(-1);
             notesCell[(i, 6)].innerHTML = this.frequencies[i];
-            notesCell[(i, 6)].style.backgroundColor = platformColor.selectorBackground;
             notesCell[(i, 6)].style.textAlign = "center";
 
             if (isCustom(this.inTemperament)) {
@@ -850,45 +857,55 @@ class TemperamentWidget {
         const menuItems = document.querySelectorAll("#editMenus");
         for (let i = 0; i < editMenus.length; i++) {
             menuItems[i].style.background = platformColor.selectorBackground;
-            menuItems[i].style.height = 30 + "px";
+            menuItems[i].style.height = 40 + "px";
             menuItems[i].style.textAlign = "center";
+            menuItems[i].style.cursor = "pointer";
             menuItems[i].style.fontWeight = "bold";
+            menuItems[i].style.paddingRight = "5px";
         }
 
-        menuItems[0].style.background = "#c8C8C8";
+        menuItems[0].style.background = "#FFFFFF";
         this.equalEdit();
 
-        menuItems[0].onclick = () => {
-            menuItems[1].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[0].style.background = "#c8C8C8";
-            this.equalEdit();
-        };
+        for (let i = 0; i < 4; i++) {
+            menuItems[i].onmouseover = () => {
+                menuItems[i].style.backgroundColor = "#7bb5ee";
+            };
+        }
 
-        menuItems[1].onclick = () => {
-            menuItems[0].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[1].style.background = "#c8C8C8";
-            this.ratioEdit();
-        };
+        for (let i = 0; i < 4; i++) {
+            menuItems[i].onmouseout = () => {
+                if (
+                    (i == 0 && this.editMode != "equal") ||
+                    (i == 1 && this.editMode != "ratio") ||
+                    (i == 2 && this.editMode != "arbitrary") ||
+                    (i == 3 && this.editMode != "octave")
+                ) {
+                    menuItems[i].style.backgroundColor = "#8cc6ff";
+                }
+            };
+        }
 
-        menuItems[2].onclick = () => {
-            menuItems[0].style.background = platformColor.selectorBackground;
-            menuItems[1].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = "#c8C8C8";
-            this.arbitraryEdit();
-        };
-
-        menuItems[3].onclick = () => {
-            menuItems[0].style.background = platformColor.selectorBackground;
-            menuItems[1].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = "#c8C8C8";
-            this.octaveSpaceEdit();
-        };
+        for (let i = 0; i < 4; i++) {
+            menuItems[i].onclick = () => {
+                for (let j = 0; j < 4; j++) {
+                    if (i != j) {
+                        menuItems[j].style.background = platformColor.selectorBackground;
+                    } else {
+                        menuItems[i].style.background = "#FFFFFF";
+                    }
+                }
+                if (i == 0) {
+                    this.equalEdit();
+                } else if (i == 1) {
+                    this.ratioEdit();
+                } else if (i == 2) {
+                    this.arbitraryEdit();
+                } else {
+                    this.octaveSpaceEdit();
+                }
+            };
+        }
     }
 
     /**
@@ -899,7 +916,7 @@ class TemperamentWidget {
         this.editMode = "equal";
         docById("userEdit").innerHTML = "";
         const equalEdit = docById("userEdit");
-        equalEdit.style.backgroundColor = "#c8C8C8";
+        equalEdit.style.backgroundColor = "#FFFFFF";
         equalEdit.innerHTML =
             '<br>Pitch Number &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="octaveIn" value="0"></input> &nbsp;&nbsp; To &nbsp;&nbsp; <input type="text" id="octaveOut" value="0"></input><br><br>';
         equalEdit.innerHTML +=
@@ -925,6 +942,8 @@ class TemperamentWidget {
             divAppend.style.height = "32px";
             divAppend.style.marginTop = "40px";
             divAppend.style.overflow = "auto";
+            divAppend.style.cursor = "32px";
+            divAppend.style.cursor = "pointer";
             equalEdit.append(divAppend);
 
             const divAppend1 = docById("preview");
@@ -932,19 +951,19 @@ class TemperamentWidget {
             divAppend1.style.marginLeft = "3px";
             divAppend1.style.backgroundColor = platformColor.selectorBackground;
             divAppend1.style.width = "215px";
+            divAppend1.style.lineHeight = "30px";
+            divAppend1.style.cursor = "pointer";
 
             const divAppend2 = docById("done_");
             divAppend2.style.height = "30px";
             divAppend2.style.marginRight = "3px";
             divAppend2.style.backgroundColor = platformColor.selectorBackground;
             divAppend2.style.width = "205px";
+            divAppend2.style.lineHeight = "30px";
+            divAppend2.style.cursor = "pointer";
         };
 
         addDivision(false);
-
-        divAppend.onmouseover = (event) => {
-            event.target.style.cursor = "pointer";
-        };
 
         let pitchNumber = this.pitchNumber;
         let pitchNumber1 = Number(docById("octaveIn").value);
@@ -1085,7 +1104,7 @@ class TemperamentWidget {
         this.editMode = "ratio";
         docById("userEdit").innerHTML = "";
         const ratioEdit = docById("userEdit");
-        ratioEdit.style.backgroundColor = "#c8C8C8";
+        ratioEdit.style.backgroundColor = "#FFFFFF";
         ratioEdit.innerHTML =
             '<br>Ratio &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="ratioIn" value="1"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="ratioOut" value="1"></input><br><br>';
         ratioEdit.innerHTML +=
@@ -1108,26 +1127,28 @@ class TemperamentWidget {
             divAppend.style.height = "32px";
             divAppend.style.marginTop = "40px";
             divAppend.style.overflow = "auto";
+            divAppend.style.lineHeight = "32px";
+            divAppend.style.cursor = "pointer";
             ratioEdit.append(divAppend);
 
             const divAppend1 = docById("preview");
             divAppend1.style.height = "30px";
             divAppend1.style.marginLeft = "3px";
             divAppend1.style.backgroundColor = platformColor.selectorBackground;
+            divAppend1.style.cursor = "pointer";
+            divAppend1.style.lineHeight = "30px";
             divAppend1.style.width = "215px";
 
             const divAppend2 = docById("done_");
             divAppend2.style.height = "30px";
             divAppend2.style.marginRight = "3px";
             divAppend2.style.backgroundColor = platformColor.selectorBackground;
+            divAppend2.style.cursor = "pointer";
+            divAppend2.style.lineHeight = "30px";
             divAppend2.style.width = "205px";
         };
 
         addButtons(false);
-
-        divAppend.onmouseover = (event) => {
-            event.target.style.cursor = "pointer";
-        };
 
         divAppend.onclick = (event) => {
             const input1 = docById("ratioIn").value;
@@ -1267,6 +1288,7 @@ class TemperamentWidget {
         const arbitraryEdit = docById("userEdit");
         arbitraryEdit.innerHTML = '<br><div id="wheelDiv3" class="wheelNav"></div>';
         arbitraryEdit.style.paddingLeft = "0px";
+        arbitraryEdit.style.backgroundColor = "#FFFFFF";
 
         const radius = 128;
         const height = 2 * radius;
@@ -1294,6 +1316,8 @@ class TemperamentWidget {
             docById("wheelDiv4").style.background = "none";
             docById("wheelDiv4").style.position = "relative";
             docById("wheelDiv4").style.zIndex = 5;
+            docById("wheelDiv4").style.marginTop = "13.5px";
+            docById("wheelDiv4").style.marginLeft = "37.5px";
             this.wheel1 = new wheelnav("wheelDiv4");
             this.wheel1.wheelRadius = 200;
             this.wheel1.navItemsEnabled = false;
@@ -1363,7 +1387,8 @@ class TemperamentWidget {
         const canvas = docById("circ1");
         canvas.style.position = "absolute";
         canvas.style.zIndex = 1;
-        canvas.style.marginTop = "-305px";
+        canvas.style.marginTop = "-310px";
+        canvas.style.marginLeft = "-5px";
         const ctx = canvas.getContext("2d");
         const centerX = canvas.width / 2;
         const centerY = canvas.height / 2;
@@ -1450,16 +1475,13 @@ class TemperamentWidget {
         divAppend.id = "divAppend";
         divAppend.innerHTML = "Done";
         divAppend.style.textAlign = "center";
-        divAppend.style.paddingTop = "5px";
         divAppend.style.backgroundColor = platformColor.selectorBackground;
-        divAppend.style.height = "25px";
+        divAppend.style.height = "30px";
         divAppend.style.marginTop = "40px";
         divAppend.style.overflow = "auto";
+        divAppend.style.cursor = "pointer";
+        divAppend.style.lineHeight = "30px";
         arbitraryEdit.append(divAppend);
-
-        divAppend.onmouseover = (event) => {
-            event.target.style.cursor = "pointer";
-        };
 
         divAppend.onclick = () => {
             this.ratios = this.tempRatios1.slice();
@@ -1502,9 +1524,9 @@ class TemperamentWidget {
                     docById("noteInfo1").remove();
                 }
                 docById("wheelDiv3").innerHTML +=
-                    '<div class="popup" id="noteInfo1" style="width:180px; height:135px;"><span class="popuptext" id="myPopup"></span></div>';
+                    '<div class="popup" id="noteInfo1" style="width:180px; height:146px;"><span class="popuptext" id="myPopup"></span></div>';
                 docById("noteInfo1").innerHTML +=
-                    '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px align="right">';
+                    '<img src="header-icons/close-button.svg" id="close" title="Close" alt="close" height=20px width=20px align="right">';
                 docById("noteInfo1").innerHTML +=
                     '<br><center><input type="range" class="sliders" id = "frequencySlider" style="width:170px; background:white; border:0;" min="' +
                     frequencies[i] +
@@ -1516,11 +1538,14 @@ class TemperamentWidget {
                     frequencies[i] +
                     "</span>";
                 docById("noteInfo1").innerHTML +=
-                    '<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>Done</center><div>';
+                    '<br><br><div id="done" style="background:#8cc6ff; cursor: pointer"><center>Done</center><div>';
 
                 docById("noteInfo1").style.top = "100px";
                 docById("noteInfo1").style.left = "90px";
+                docById("done").style.height = "30px";
+                docById("done").style.lineHeight = "30px";
 
+                docById("close").style.cursor = "pointer";
                 docById("frequencySlider").oninput = () => {
                     this._refreshInnerWheel();
                 };
@@ -1589,7 +1614,7 @@ class TemperamentWidget {
         const len = this.ratios.length;
         const octaveRatio = this.ratios[len - 1];
         const octaveSpaceEdit = docById("userEdit");
-        octaveSpaceEdit.style.backgroundColor = "#c8C8C8";
+        octaveSpaceEdit.style.backgroundColor = "#FFFFFF";
         octaveSpaceEdit.innerHTML =
             '<br><br>Octave Space &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="startNote" value="' +
             octaveRatio +
@@ -1600,17 +1625,13 @@ class TemperamentWidget {
         divAppend.id = "divAppend";
         divAppend.innerHTML = "Done";
         divAppend.style.textAlign = "center";
-        divAppend.style.paddingTop = "5px";
         divAppend.style.marginLeft = "-70px";
         divAppend.style.backgroundColor = platformColor.selectorBackground;
-        divAppend.style.height = "25px";
+        divAppend.style.height = "30px";
         divAppend.style.marginTop = "40px";
-        divAppend.style.overflow = "auto";
+        divAppend.style.lineHeight = divAppend.style.height;
+        divAppend.style.cursor = "pointer";
         octaveSpaceEdit.append(divAppend);
-
-        divAppend.onmouseover = (event) => {
-            event.target.style.cursor = "pointer";
-        };
 
         divAppend.onclick = () => {
             const startRatio = docById("startNote").value;
