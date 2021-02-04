@@ -1464,9 +1464,11 @@ class TemperamentWidget {
             docById("wheelDiv3").style.zIndex = 10;
             docById("wheelDiv3").style.marginTop = 15 + "px";
             docById("wheelDiv3").style.marginLeft = 37 + "px";
-            docById("wheelDiv3").addEventListener("mouseover", (e) => {
-                this.arbitraryEditSlider(e, angle1, ratios, pitchNumber);
-            });
+            setTimeout(() => {
+                docById("wheelDiv3").addEventListener("mouseover", (e) => {
+                    this.arbitraryEditSlider(e, angle1, ratios, pitchNumber);
+                });
+            },1500);
         };
 
         this._createOuterWheel();
