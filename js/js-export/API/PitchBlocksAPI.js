@@ -22,6 +22,9 @@
  * @class
  * @classdesc methods are imported by a importMethod function call from MusicBlocks class.
  */
+
+/*global JSInterface, MusicBlocks, Singer*/
+/* exported PitchBlocksAPI*/
 class PitchBlocksAPI {
     playPitch(note, octave) {
         const args = JSInterface.validateArgs("playPitch", [note, octave]);

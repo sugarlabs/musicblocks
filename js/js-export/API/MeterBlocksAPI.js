@@ -22,6 +22,9 @@
  * @class
  * @classdesc methods are imported by a importMethod function call from MusicBlocks class.
  */
+
+/*global JSInterface, Singer*/
+/* exported MeterBlocksAPI*/
 class MeterBlocksAPI {
     setMeter(beatCount, noteValue) {
         const args = JSInterface.validateArgs("setMeter", [beatCount, noteValue]);

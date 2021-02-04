@@ -22,6 +22,8 @@
  * @class
  * @classdesc methods are imported by a importMethod function call from MusicBlocks class.
  */
+/*global turtles, JSInterface*/
+/* exported DictBlocksAPI*/
 class DictBlocksAPI {
     getDict(dict) {
         if (dict === undefined) dict = this.turIndex;

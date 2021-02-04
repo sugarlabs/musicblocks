@@ -22,6 +22,9 @@
  * @class
  * @classdesc methods are imported by a importMethod function call from MusicBlocks class.
  */
+
+/*global JSInterface, MusicBlocks*/
+/* exported IntervalsBlocksAPI*/
 class IntervalsBlocksAPI {
     setKey(key, mode) {
         const args = JSInterface.validateArgs("setKey", [key, mode]);

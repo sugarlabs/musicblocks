@@ -22,6 +22,9 @@
  * @class
  * @classdesc methods are imported by a importMethod function call from MusicBlocks class.
  */
+
+/*global JSInterface*/
+/* exported GraphicsBlocksAPI*/
 class GraphicsBlocksAPI {
     goForward(steps) {
         const args = JSInterface.validateArgs("goForward", [steps]);

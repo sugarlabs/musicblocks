@@ -22,6 +22,8 @@
  * @class
  * @classdesc methods are imported by a importMethod function call from MusicBlocks class.
  */
+/*global MusicBlocks, JSInterface*/
+/* exported DrumBlocksAPI*/
 class DrumBlocksAPI {
     playDrum(drum) {
         const args = JSInterface.validateArgs("playDrum", [drum]);

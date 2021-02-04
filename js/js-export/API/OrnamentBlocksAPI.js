@@ -22,6 +22,9 @@
  * @class
  * @classdesc methods are imported by a importMethod function call from MusicBlocks class.
  */
+
+/*global JSInterface, MusicBlocks*/
+/* exported OrnamentBlocksAPI*/
 class OrnamentBlocksAPI {
     async setStaccato(value, flow) {
         const args = JSInterface.validateArgs("setStaccato", [value, flow]);

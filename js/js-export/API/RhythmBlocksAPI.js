@@ -22,6 +22,9 @@
  * @class
  * @classdesc methods are imported by a importMethod function call from MusicBlocks class.
  */
+
+/*global JSInterface, MusicBlocks*/
+/* exported RhythmBlocksAPI*/
 class RhythmBlocksAPI {
     async playNote(value, flow) {
         const args = JSInterface.validateArgs("playNote", [value, flow]);

@@ -22,6 +22,8 @@
  * @class
  * @classdesc methods are imported by a importMethod function call from MusicBlocks class.
  */
+/*global JSInterface, turtles, logo*/
+/* exported PenBlocksAPI*/
 class PenBlocksAPI {
     setColor(value) {
         const args = JSInterface.validateArgs("setColor", [value]);

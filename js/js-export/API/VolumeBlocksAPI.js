@@ -22,6 +22,9 @@
  * @class
  * @classdesc methods are imported by a importMethod function call from MusicBlocks class.
  */
+
+/*global JSInterface, Singer*/
+/* exported VolumeBlocksAPI*/
 class VolumeBlocksAPI {
     async doCrescendo(value, flow) {
         const args = JSInterface.validateArgs("doCrescendo", [value, flow]);
