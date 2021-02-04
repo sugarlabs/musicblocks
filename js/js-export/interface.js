@@ -21,6 +21,10 @@
  * @class
  * @classdesc contains the lists and lookups for relevant blocks, and utility methods to access them.
  */
+
+/*global JSEditor, SHARP, FLAT, NATURAL, DOUBLESHARP, DOUBLEFLAT */
+
+/*exported  JSInterface*/
 class JSInterface {
     /**
      * @static

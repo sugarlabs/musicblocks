@@ -24,6 +24,10 @@
  * @classdesc contains the barebone ASTs and utilities for generating the Abstract Syntax Tree for
  * JavaScript based Music Blocks code.
  */
+
+/* global JSInterface, last*/
+
+/* exported ASTUtils*/
 class ASTUtils {
     /**
      * @static

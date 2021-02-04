@@ -22,6 +22,8 @@
  * @class
  * @classdesc pertains to the Mouse (corresponding to Turtle) in JavaScript based Music Blocks programs.
  */
+
+/*global JSEditor, turtles, last, importMembers, logo, Singer, JSInterface*/
 class Mouse {
     /** Mouse objects in program */
     static MouseList = [];
@@ -46,6 +48,7 @@ class Mouse {
         this.turtle.initTurtle(false);
 
         this.flow = flow;
+        // eslint-disable-next-line no-use-before-define
         this.MB = new MusicBlocks(this); // associate a MusicBlocks object with each Mouse
 
         Mouse.MouseList.push(this);

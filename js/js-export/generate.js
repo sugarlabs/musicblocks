@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * @file This contains the utilities for generating code from block stacks for JS Editor widget.
  * @author Anindya Kundu
@@ -25,6 +26,9 @@
  *
  * * Internal functions' names are in PascalCase.
  */
+
+/*global JSInterface, blocks, last, ASTUtils, astring*/
+/*exported JSGenerate*/
 class JSGenerate {
     /** list of the Block index numbers of all start blocks */
     static startBlocks = [];
