@@ -275,6 +275,7 @@ class Tempo {
         this.BPMs[i] = parseFloat(this.BPMs[i]) + Math.round(0.1 * this.BPMs[i]);
 
         if (this.BPMs[i] > 1000) {
+            logo.errorMsg(_("The beats per minute must be below 1000."));
             this.BPMs[i] = 1000;
         }
 
@@ -290,6 +291,7 @@ class Tempo {
     slowDown(i) {
         this.BPMs[i] = parseFloat(this.BPMs[i]) - Math.round(0.1 * this.BPMs[i]);
         if (this.BPMs[i] < 30) {
+            logo.errorMsg(_("The beats per minute must be above 30"));
             this.BPMs[i] = 30;
         }
 
