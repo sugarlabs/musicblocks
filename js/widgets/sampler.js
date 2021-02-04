@@ -9,7 +9,7 @@ function SampleWidget() {
     const TRUEACCIDENTALNAMES = ["𝄫", "♭", "♮", "♯", "𝄪"];
     //using these characters can cause issues.
     const ACCIDENTALNAMES = ["bb", "b", "", "#", "x"];
-    const SOLFEGENAMES = ["do", "re", "me", "fa", "sol", "la", "ti", "do"];
+    const SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti", "do"];
     const MAJORSCALE = [0, 2, 4, 5, 7, 9, 11];
     const DEFAULTACCIDENTAL = "";
     const DEFAULTSOLFEGE = "do";
