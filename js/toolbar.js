@@ -136,13 +136,13 @@ class Toolbar {
                 saveButton.onclick = () => {
                     //html_onclick();
                     saveHTML = docById("save-html-beg");
-                    console.debug(saveHTML);
+                    // console.debug(saveHTML);
                     saveHTML.onclick = () => {
                         html_onclick();
                     };
 
                     savePNG = docById("save-png-beg");
-                    console.debug(savePNG);
+                    // console.debug(savePNG);
                     svgData = doSVG_onclick(
                         canvas,
                         logo,
@@ -165,12 +165,12 @@ class Toolbar {
                 };
             }
         } else {
-            console.debug("ADVANCED MODE BUTTONS");
+            // console.debug("ADVANCED MODE BUTTONS");
             saveButton.style.display = "none";
             saveButtonAdvanced.style.display = "block";
             saveButtonAdvanced.onclick = () => {
                 saveHTML = docById("save-html");
-                console.debug(saveHTML);
+                // console.debug(saveHTML);
 
                 saveHTML.onclick = () => {
                     html_onclick();
@@ -178,7 +178,7 @@ class Toolbar {
 
                 saveSVG = docById("save-svg");
                 savePNG = docById("save-png");
-                console.debug(savePNG);
+                // console.debug(savePNG);
                 svgData = doSVG_onclick(canvas, logo, turtles, canvas.width, canvas.height, 1.0);
 
                 // if there is no mouse artwork to save then grey out
