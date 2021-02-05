@@ -21,6 +21,8 @@
  *
  * Private members' names begin with underscore '_".
  */
+
+ /*global _,window,document,docById,MusicBlocks,hljs,CodeJar,JSGenerate,JS_API */
 class JSEditor {
     /**
      * @constructor
@@ -246,7 +248,7 @@ class JSEditor {
         this._editor.appendChild(editorconsole);
 
         const highlight = (editor) => {
-            editor.textContent = editor.textContent;
+            // editor.textContent = editor.textContent;
             hljs.highlightBlock(editor);
         };
 
@@ -258,7 +260,7 @@ class JSEditor {
         this._jar.updateCode(this._code);
         this._jar.updateOptions({
             tab: " ".repeat(4), // default is '\t'
-            indentOn: /[(\[]$/, // default is /{$/
+            indentOn: /[(]$/, // default is /{$/
             spellcheck: false, // default is false
             addClosing: true // default is true
         });
@@ -287,9 +289,9 @@ class JSEditor {
                 docById("editorConsole").innerHTML += "</br>";
             docById("editorConsole").innerHTML += `<span style="color: ${color}">${message}</span>`;
         } else {
-            console.error("EDITOR MISSING!");
+            // console.error("EDITOR MISSING!");
         }
-        console.log("%c" + message, `color: ${color}`);
+        // console.log("%c" + message, `color: ${color}`);
     }
 
     /**
@@ -303,7 +305,7 @@ class JSEditor {
 
         if (docById("editorConsole")) docById("editorConsole").innerHTML = "";
 
-        console.debug("Run JavaScript");
+        // console.debug("Run JavaScript");
 
         try {
             MusicBlocks.init(true);
@@ -320,7 +322,7 @@ class JSEditor {
      * @returns {void}
      */
     _generateCode() {
-        console.debug("Generate JavaScript");
+        // console.debug("Generate JavaScript");
 
         JSGenerate.run(true);
         this._code = JSGenerate.code;
@@ -356,13 +358,13 @@ class JSEditor {
         const helpBtn = docById("js_editor_help_btn");
 
         if (this._showingHelp) {
-            console.debug("Showing Help");
+            // console.debug("Showing Help");
             helpBtn.style.color = "gold";
             this._codeBck = this._code;
             this._jar.updateCode(JS_API);
             this._setLinesCount(JS_API);
         } else {
-            console.debug("Hiding Help");
+            // console.debug("Hiding Help");
             helpBtn.style.color = "white";
             this._jar.updateCode(this._codeBck);
             this._setLinesCount(this._codeBck);
