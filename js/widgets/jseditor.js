@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
-*/
+ */
 
 /**
  * @class
@@ -29,8 +29,11 @@ class JSEditor {
         this.isOpen = true;
         this._showingHelp = false;
 
-        this.widgetWindow =
-            window.widgetWindows.windowFor(this, "JavaScript Editor", "JavaScript Editor");
+        this.widgetWindow = window.widgetWindows.windowFor(
+            this,
+            "JavaScript Editor",
+            "JavaScript Editor"
+        );
         this.widgetWindow.clear();
         this.widgetWindow.show();
         this.widgetWindow.setPosition(160, 132);
@@ -47,12 +50,7 @@ class JSEditor {
 
         // setup editor window styles
         this._currentStyle = 0;
-        this._styles = [
-            "dracula",
-            "github",
-            "railscasts",
-            "vs",
-        ].map((name) => {
+        this._styles = ["dracula", "github", "railscasts", "vs"].map((name) => {
             const link = document.createElement("link");
             link.href = `././lib/codejar/styles/${name}.min.css`;
             link.rel = "stylesheet";
@@ -75,10 +73,9 @@ class JSEditor {
         this.widgetWindow.onmaximize = () => {
             const editor = this.widgetWindow.getWidgetBody().childNodes[0];
             editor.style.width = this.widgetWindow._maximized ? "100%" : "39rem";
-            editor.style.height =
-                    this.widgetWindow._maximized ?
-                        `calc(100vh - ${64 + 33}px` :
-                        `${docById("overlayCanvas").height - 33 - 128 - 12}px`;
+            editor.style.height = this.widgetWindow._maximized
+                ? `calc(100vh - ${64 + 33}px`
+                : `${docById("overlayCanvas").height - 33 - 128 - 12}px`;
         };
 
         this._editor.style.width = "39rem";
@@ -262,12 +259,11 @@ class JSEditor {
         this._jar.updateOptions({
             tab: " ".repeat(4), // default is '\t'
             indentOn: /[(\[]$/, // default is /{$/
-            spellcheck: false,  // default is false
-            addClosing: true    // default is true
+            spellcheck: false, // default is false
+            addClosing: true // default is true
         });
-        this._jar.onUpdate(code => {
-            if (!this._showingHelp)
-                this._code = code;
+        this._jar.onUpdate((code) => {
+            if (!this._showingHelp) this._code = code;
             this._setLinesCount(this._code);
         });
 
@@ -285,8 +281,7 @@ class JSEditor {
      * @returns {void}
      */
     static logConsole(message, color) {
-        if (color === undefined)
-            color = "midnightblue";
+        if (color === undefined) color = "midnightblue";
         if (docById("editorConsole")) {
             if (docById("editorConsole").innerHTML !== "")
                 docById("editorConsole").innerHTML += "</br>";
@@ -304,11 +299,9 @@ class JSEditor {
      * @returns {void}
      */
     _runCode() {
-        if (this._showingHelp)
-            return;
+        if (this._showingHelp) return;
 
-        if (docById("editorConsole"))
-            docById("editorConsole").innerHTML = "";
+        if (docById("editorConsole")) docById("editorConsole").innerHTML = "";
 
         console.debug("Run JavaScript");
 
@@ -342,8 +335,7 @@ class JSEditor {
      * @returns {void}
      */
     _setLinesCount(code) {
-        if (!docById("editorLines"))
-            return;
+        if (!docById("editorLines")) return;
 
         const linesCount = code.replace(/\n+$/, "\n").split("\n").length + 1;
         let text = "";
