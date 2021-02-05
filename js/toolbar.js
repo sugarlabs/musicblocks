@@ -8,6 +8,9 @@
 // You should have received a copy of the GNU Affero General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+/* global  _,jQuery,_THIS_IS_MUSIC_BLOCKS_,docById,canvas,logo,turtles,beginnerMode,language,stopIconColorWhenPlaying,auxToolbar,localStorage,navigator,document */
+
 let WRAP = true;
 const $j = jQuery.noConflict();
 
@@ -272,13 +275,13 @@ class Toolbar {
 
     renderRunSlowlyIcon(onclick) {
         const runSlowlyIcon = docById("runSlowlyIcon");
-        if (_THIS_IS_MUSIC_BLOCKS_ && beginnerMode && language === "ja") {
+        if (_THIS_IS_MUSIC_BLOCKS_ && beginnerMode && this.language === "ja") {
             runSlowlyIcon.style.display = "none";
         }
 
         runSlowlyIcon.onclick = () => {
             onclick();
-            docById("stop").style.color = stopIconColorWhenPlaying;
+            docById("stop").style.color = this.stopIconColorWhenPlaying;
         };
     }
 
@@ -304,18 +307,6 @@ class Toolbar {
                 };
             }
         }
-    }
-
-    renderRunSlowlyIcon(onclick) {
-        const runSlowlyIcon = docById("runSlowlyIcon");
-        if (_THIS_IS_MUSIC_BLOCKS_ && beginnerMode && this.language === "ja") {
-            runSlowlyIcon.style.display = "none";
-        }
-
-        runSlowlyIcon.onclick = () => {
-            onclick();
-            docById("stop").style.color = this.stopIconColorWhenPlaying;
-        };
     }
 
     renderRunStepIcon(onclick) {
