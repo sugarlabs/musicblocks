@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global  _,jQuery,_THIS_IS_MUSIC_BLOCKS_,docById,canvas,logo,turtles,beginnerMode,language,stopIconColorWhenPlaying,auxToolbar,localStorage,navigator,document */
+/* global  _,jQuery,_THIS_IS_MUSIC_BLOCKS_,docById,canvas,logo,turtles,beginnerMode,language,stopIconColorWhenPlaying,auxToolbar */
 
 let WRAP = true;
 const $j = jQuery.noConflict();
