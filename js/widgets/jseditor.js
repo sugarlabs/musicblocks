@@ -294,7 +294,8 @@ class JSEditor {
         } else {
             // console.error("EDITOR MISSING!");
         }
-        // console.log("%c" + message, `color: ${color}`);
+        // eslint-disable-next-line
+        console.log("%c" + message, `color: ${color}`);
     }
 
     /**
@@ -307,8 +308,6 @@ class JSEditor {
         if (this._showingHelp) return;
 
         if (docById("editorConsole")) docById("editorConsole").innerHTML = "";
-
-        // console.debug("Run JavaScript");
 
         try {
             MusicBlocks.init(true);
@@ -325,8 +324,6 @@ class JSEditor {
      * @returns {void}
      */
     _generateCode() {
-        // console.debug("Generate JavaScript");
-
         JSGenerate.run(true);
         this._code = JSGenerate.code;
         this._jar.updateCode(this._code);
@@ -361,13 +358,11 @@ class JSEditor {
         const helpBtn = docById("js_editor_help_btn");
 
         if (this._showingHelp) {
-            // console.debug("Showing Help");
             helpBtn.style.color = "gold";
             this._codeBck = this._code;
             this._jar.updateCode(JS_API);
             this._setLinesCount(JS_API);
         } else {
-            // console.debug("Hiding Help");
             helpBtn.style.color = "white";
             this._jar.updateCode(this._codeBck);
             this._setLinesCount(this._codeBck);
