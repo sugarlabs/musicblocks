@@ -11,8 +11,14 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global _, Notation, _THIS_IS_MUSIC_BLOCKS_, Synth, instruments, instrumentsFilters, instrumentsEffects, Singer, logo, Tone, p5,
-CAMERAVALUE, doUseCamera, VIDEOVALUE, last, getIntervalDirection, getIntervalNumber, mixedNumber, rationalToFraction, doStopVideoCam, StatusMatrix, turtle, blocks, getStatsFromNotation, save, delayExecution */
+/*
+   global _, Notation, _THIS_IS_MUSIC_BLOCKS_, Synth, instruments, instrumentsFilters,
+   instrumentsEffects, Singer, logo, Tone, p5, CAMERAVALUE, doUseCamera, VIDEOVALUE, last,
+   getIntervalDirection, getIntervalNumber, mixedNumber, rationalToFraction, doStopVideoCam,
+   StatusMatrix, turtle, blocks, getStatsFromNotation, save, delayExecution
+ */
+
+/* exported Queue, Logo */
 
 const DEFAULTVOLUME = 50;
 
@@ -27,22 +33,9 @@ const NANERRORMSG = "Not a number.";
 const NOINPUTERRORMSG = "Missing argument.";
 
 /**
- * Class dealing with executing the programs.
- *
  * @class
- * @classdesc This contains all the variables and the methods which
- * control the execution of the programs. Contains a method to dispatch
- * turtle commands which call methods of Turtle and Turles. Also contains
- * notation code.
+ * @classdesc Queue entry for managing running blocks.
  */
-
-/**
- * Queue entry for managing running blocks.
- *
- * @class
- */
-
-/* exported Queue */
 class Queue {
     /**
      * @constructor
@@ -59,7 +52,15 @@ class Queue {
     }
 }
 
-/* exported Logo */
+/**
+ * Class dealing with executing the programs.
+ *
+ * @class
+ * @classdesc This contains all the variables and the methods which
+ * control the execution of the programs. Contains a method to dispatch
+ * turtle commands which call methods of Turtle and Turles. Also contains
+ * notation code.
+ */
 class Logo {
     /**
      * @constructor
