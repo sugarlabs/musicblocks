@@ -25,229 +25,6 @@ class Toolbar {
     }
 
     /**
-     * Initializes the toolbar
-     * @param  {boolean} mode
-     * @returns {void}
-     */
-    init(mode) {
-        console.log(mode);
-        let strings;
-        let strings_;
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            strings = [
-                ["mb-logo", _("About Music Blocks")],
-                ["play", _("Play")],
-                ["stop", _("Stop")],
-                ["newFile", _("New project")],
-                ["load", _("Load project from file")],
-                ["saveButton", _("Save project")],
-                ["saveButtonAdvanced", _("Save project as HTML")],
-                ["planetIcon", _("Find and share projects")],
-                ["planetIconDisabled", _("Offline. Sharing is unavailable")],
-                ["toggleAuxBtn", _("Auxilary menu")],
-                ["helpIcon", _("Help")],
-                ["runSlowlyIcon", _("Run slowly")],
-                ["runStepByStepIcon", _("Run step by step")],
-                ["displayStatsIcon", _("Display statistics")],
-                ["loadPluginIcon", _("Load plugin")],
-                ["delPluginIcon", _("Delete plugin")],
-                ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
-                ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
-                ["mergeWithCurrentIcon", _("Merge with current project")],
-                ["chooseKeyIcon", _("Set Pitch Preview")],
-                ["toggleJavaScriptIcon", _("Toggle JavaScript Editor")],
-                ["restoreIcon", _("Restore")],
-                ["beginnerMode", _("Switch to beginner mode")],
-                ["advancedMode", _("Switch to advanced mode")],
-                ["languageSelectIcon", _("Select language")],
-                ["save-html-beg", _("Save project as HTML"), "innerHTML"],
-                ["save-png-beg", _("Save mouse artwork as PNG"), "innerHTML"],
-                ["save-html", _("Save project as HTML"), "innerHTML"],
-                ["save-svg", _("Save mouse artwork as SVG"), "innerHTML"],
-                ["save-png", _("Save mouse artwork as PNG"), "innerHTML"],
-                ["save-wav", _("Save music as WAV"), "innerHTML"],
-                ["save-abc", _("Save sheet music as ABC"), "innerHTML"],
-                ["save-ly", _("Save sheet music as Lilypond"), "innerHTML"],
-                ["save-mxml", _("Save sheet music as MusicXML"), "innerHTML"],
-                ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
-                ["new-project", _("Confirm"), "innerHTML"],
-                ["enUS", _("English (United States)"), "innerHTML"],
-                ["enUK", _("English (United Kingdom)"), "innerHTML"],
-                ["ja", _("日本語"), "innerHTML"],
-                ["ko", _("한국어"), "innerHTML"],
-                ["es", _("español"), "innerHTML"],
-                ["pt", _("português"), "innerHTML"],
-                ["kana", _("にほんご"), "innerHTML"],
-                ["zhCN", _("中文"), "innerHTML"],
-                ["th", _("ภาษาไทย"), "innerHTML"],
-                ["ayc", _("aymara"), "innerHTML"],
-                ["quz", _("quechua"), "innerHTML"],
-                ["gug", _("guarani"), "innerHTML"],
-                ["hi", _("हिंदी"), "innerHTML"],
-                ["ibo", _("igbo"), "innerHTML"],
-                ["ar", _("عربى"), "innerHTML"],
-                ["he", _("עִברִית"), "innerHTML"]
-            ];
-
-            // Workaround for FF
-            strings_ = [
-                _("About Music Blocks"),
-                _("Play"),
-                _("Stop"),
-                _("New project"),
-                _("Load project from file"),
-                _("Save project"),
-                _("Save project"),
-                _("Find and share projects"),
-                _("Offline. Sharing is unavailable"),
-                _("Auxilary menu"),
-                _("Help"),
-                _("Run slowly"),
-                _("Run step by step"),
-                _("Display statistics"),
-                _("Load plugin"),
-                _("Delete plugin"),
-                _("Enable horizontal scrolling"),
-                _("Disable horizontal scrolling"),
-                _("Merge with current project"),
-                _("Set Pitch Preview"),
-                _("Toggle JavaScript Editor"),
-                _("Restore"),
-                _("Switch to beginner mode"),
-                _("Switch to advanced mode"),
-                _("Select language"),
-                _("Save project as HTML"),
-                _("Save mouse artwork as SVG"),
-                _("Save mouse artwork as PNG"),
-                _("Save music as WAV"),
-                _("Save sheet music as ABC"),
-                _("Save sheet music as Lilypond"),
-                _("Save block artwork as SVG"),
-                _("Confirm"),
-                _("Select language")
-            ];
-        } else {
-            strings = [
-                ["mb-logo", _("About Turtle Blocks")],
-                ["play", _("Play")],
-                ["stop", _("Stop")],
-                ["newFile", _("New project")],
-                ["load", _("Load project from file")],
-                ["saveButton", _("Save project")],
-                ["saveButtonAdvanced", _("Save project as HTML")],
-                ["planetIcon", _("Find and share projects")],
-                ["planetIconDisabled", _("Offline. Sharing is unavailable")],
-                ["toggleAuxBtn", _("Auxilary menu")],
-                ["helpIcon", _("Help")],
-                ["runSlowlyIcon", _("Run slowly")],
-                ["runStepByStepIcon", _("Run step by step")],
-                ["displayStatsIcon", _("Display statistics")],
-                ["loadPluginIcon", _("Load plugin")],
-                ["delPluginIcon", _("Delete plugin")],
-                ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
-                ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
-                ["mergeWithCurrentIcon", _("Merge with current project")],
-                ["chooseKeyIcon", _("Set Pitch Preview")],
-                ["toggleJavaScriptIcon", _("Toggle JavaScript Editor")],
-                ["restoreIcon", _("Restore")],
-                ["languageSelectIcon", _("Select language")],
-                ["save-html-beg", _("Save project as HTML"), "innerHTML"],
-                ["save-png-beg", _("Save mouse artwork as PNG"), "innerHTML"],
-                ["save-html", _("Save project as HTML"), "innerHTML"],
-                ["save-svg", _("Save mouse artwork as SVG"), "innerHTML"],
-                ["save-png", _("Save mouse artwork as PNG"), "innerHTML"],
-                ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
-                ["new-project", _("Confirm"), "innerHTML"],
-                ["enUS", _("English (United States)"), "innerHTML"],
-                ["enUK", _("English (United Kingdom)"), "innerHTML"],
-                ["ja", _("日本語"), "innerHTML"],
-                ["ko", _("한국인"), "innerHTML"],
-                ["es", _("español"), "innerHTML"],
-                ["pt", _("português"), "innerHTML"],
-                ["kana", _("にほんご"), "innerHTML"],
-                ["zhCN", _("中文"), "innerHTML"],
-                ["th", _("ภาษาไทย"), "innerHTML"],
-                ["ayc", _("aymara"), "innerHTML"],
-                ["quz", _("quechua"), "innerHTML"],
-                ["gug", _("guarani"), "innerHTML"],
-                ["hi", _("हिंदी"), "innerHTML"],
-                ["ibo", _("igbo"), "innerHTML"],
-                ["ar", _("عربى"), "innerHTML"],
-                ["he", _("עִברִית"), "innerHTML"]
-            ];
-
-            // Workaround for FF
-            strings_ = [
-                _("About Turtle Blocks"),
-                _("Play"),
-                _("Stop"),
-                _("New project"),
-                _("Load project from file"),
-                _("Save project"),
-                _("Save project"),
-                _("Find and share projects"),
-                _("Offline. Sharing is unavailable"),
-                _("Auxilary menu"),
-                _("Help"),
-                _("Run slowly"),
-                _("Run step by step"),
-                _("Display statistics"),
-                _("Load plugin"),
-                _("Delete plugin"),
-                _("Enable horizontal scrolling"),
-                _("Disable horizontal scrolling"),
-                _("Merge with current project"),
-                _("Set Pitch Preview"),
-                _("Toggle JavaScript Editor"),
-                _("Restore"),
-                _("Select language"),
-                _("Save project as HTML"),
-                _("Save turtle artwork as SVG"),
-                _("Save turtle artwork as PNG"),
-                _("Save block artwork as SVG"),
-                _("Confirm"),
-                _("Select language")
-            ];
-        }
-
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            const beginnerMode = docById("beginnerMode");
-            const advancedMode = docById("advancedMode");
-            if (mode || mode === "null") {
-                advancedMode.style.display = "block";
-                beginnerMode.style.display = "none";
-            } else {
-                advancedMode.style.display = "none";
-                beginnerMode.style.display = "display";
-            }
-        }
-
-        for (let i = 0; i < strings.length; i++) {
-            const obj = strings[i];
-            const trans = strings_[i];
-            const elem = docById(obj[0]);
-            if (strings[i].length === 3) {
-                elem.innerHTML = obj[1];
-            } else {
-                elem.setAttribute("data-tooltip", trans);
-            }
-        }
-
-        if (!this.tooltipsDisabled) {
-            $j(".tooltipped").tooltip({
-                html: true,
-                delay: 100
-            });
-        }
-
-        $j(".materialize-iso, .dropdown-trigger").dropdown({
-            constrainWidth: false,
-            hover: false,
-            belowOrigin: true // Displays dropdown below the button
-        });
-    }
-
-    /**
      * @public
      * @param {Function} onclick
      * @returns {void}
@@ -835,7 +612,228 @@ class Toolbar {
             };
         };
     }
+    /**
+     * Initializes the toolbar
+     * @param  {boolean} mode
+     * @returns {void}
+     */
+    init(mode) {
+        console.log(mode);
+        let strings;
+        let strings_;
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            strings = [
+                ["mb-logo", _("About Music Blocks")],
+                ["play", _("Play")],
+                ["stop", _("Stop")],
+                ["newFile", _("New project")],
+                ["load", _("Load project from file")],
+                ["saveButton", _("Save project")],
+                ["saveButtonAdvanced", _("Save project as HTML")],
+                ["planetIcon", _("Find and share projects")],
+                ["planetIconDisabled", _("Offline. Sharing is unavailable")],
+                ["toggleAuxBtn", _("Auxilary menu")],
+                ["helpIcon", _("Help")],
+                ["runSlowlyIcon", _("Run slowly")],
+                ["runStepByStepIcon", _("Run step by step")],
+                ["displayStatsIcon", _("Display statistics")],
+                ["loadPluginIcon", _("Load plugin")],
+                ["delPluginIcon", _("Delete plugin")],
+                ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
+                ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
+                ["mergeWithCurrentIcon", _("Merge with current project")],
+                ["chooseKeyIcon", _("Set Pitch Preview")],
+                ["toggleJavaScriptIcon", _("Toggle JavaScript Editor")],
+                ["restoreIcon", _("Restore")],
+                ["beginnerMode", _("Switch to beginner mode")],
+                ["advancedMode", _("Switch to advanced mode")],
+                ["languageSelectIcon", _("Select language")],
+                ["save-html-beg", _("Save project as HTML"), "innerHTML"],
+                ["save-png-beg", _("Save mouse artwork as PNG"), "innerHTML"],
+                ["save-html", _("Save project as HTML"), "innerHTML"],
+                ["save-svg", _("Save mouse artwork as SVG"), "innerHTML"],
+                ["save-png", _("Save mouse artwork as PNG"), "innerHTML"],
+                ["save-wav", _("Save music as WAV"), "innerHTML"],
+                ["save-abc", _("Save sheet music as ABC"), "innerHTML"],
+                ["save-ly", _("Save sheet music as Lilypond"), "innerHTML"],
+                ["save-mxml", _("Save sheet music as MusicXML"), "innerHTML"],
+                ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
+                ["new-project", _("Confirm"), "innerHTML"],
+                ["enUS", _("English (United States)"), "innerHTML"],
+                ["enUK", _("English (United Kingdom)"), "innerHTML"],
+                ["ja", _("日本語"), "innerHTML"],
+                ["ko", _("한국어"), "innerHTML"],
+                ["es", _("español"), "innerHTML"],
+                ["pt", _("português"), "innerHTML"],
+                ["kana", _("にほんご"), "innerHTML"],
+                ["zhCN", _("中文"), "innerHTML"],
+                ["th", _("ภาษาไทย"), "innerHTML"],
+                ["ayc", _("aymara"), "innerHTML"],
+                ["quz", _("quechua"), "innerHTML"],
+                ["gug", _("guarani"), "innerHTML"],
+                ["hi", _("हिंदी"), "innerHTML"],
+                ["ibo", _("igbo"), "innerHTML"],
+                ["ar", _("عربى"), "innerHTML"],
+                ["he", _("עִברִית"), "innerHTML"]
+            ];
 
+            // Workaround for FF
+            strings_ = [
+                _("About Music Blocks"),
+                _("Play"),
+                _("Stop"),
+                _("New project"),
+                _("Load project from file"),
+                _("Save project"),
+                _("Save project"),
+                _("Find and share projects"),
+                _("Offline. Sharing is unavailable"),
+                _("Auxilary menu"),
+                _("Help"),
+                _("Run slowly"),
+                _("Run step by step"),
+                _("Display statistics"),
+                _("Load plugin"),
+                _("Delete plugin"),
+                _("Enable horizontal scrolling"),
+                _("Disable horizontal scrolling"),
+                _("Merge with current project"),
+                _("Set Pitch Preview"),
+                _("Toggle JavaScript Editor"),
+                _("Restore"),
+                _("Switch to beginner mode"),
+                _("Switch to advanced mode"),
+                _("Select language"),
+                _("Save project as HTML"),
+                _("Save mouse artwork as SVG"),
+                _("Save mouse artwork as PNG"),
+                _("Save music as WAV"),
+                _("Save sheet music as ABC"),
+                _("Save sheet music as Lilypond"),
+                _("Save block artwork as SVG"),
+                _("Confirm"),
+                _("Select language")
+            ];
+        } else {
+            strings = [
+                ["mb-logo", _("About Turtle Blocks")],
+                ["play", _("Play")],
+                ["stop", _("Stop")],
+                ["newFile", _("New project")],
+                ["load", _("Load project from file")],
+                ["saveButton", _("Save project")],
+                ["saveButtonAdvanced", _("Save project as HTML")],
+                ["planetIcon", _("Find and share projects")],
+                ["planetIconDisabled", _("Offline. Sharing is unavailable")],
+                ["toggleAuxBtn", _("Auxilary menu")],
+                ["helpIcon", _("Help")],
+                ["runSlowlyIcon", _("Run slowly")],
+                ["runStepByStepIcon", _("Run step by step")],
+                ["displayStatsIcon", _("Display statistics")],
+                ["loadPluginIcon", _("Load plugin")],
+                ["delPluginIcon", _("Delete plugin")],
+                ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
+                ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
+                ["mergeWithCurrentIcon", _("Merge with current project")],
+                ["chooseKeyIcon", _("Set Pitch Preview")],
+                ["toggleJavaScriptIcon", _("Toggle JavaScript Editor")],
+                ["restoreIcon", _("Restore")],
+                ["languageSelectIcon", _("Select language")],
+                ["save-html-beg", _("Save project as HTML"), "innerHTML"],
+                ["save-png-beg", _("Save mouse artwork as PNG"), "innerHTML"],
+                ["save-html", _("Save project as HTML"), "innerHTML"],
+                ["save-svg", _("Save mouse artwork as SVG"), "innerHTML"],
+                ["save-png", _("Save mouse artwork as PNG"), "innerHTML"],
+                ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
+                ["new-project", _("Confirm"), "innerHTML"],
+                ["enUS", _("English (United States)"), "innerHTML"],
+                ["enUK", _("English (United Kingdom)"), "innerHTML"],
+                ["ja", _("日本語"), "innerHTML"],
+                ["ko", _("한국인"), "innerHTML"],
+                ["es", _("español"), "innerHTML"],
+                ["pt", _("português"), "innerHTML"],
+                ["kana", _("にほんご"), "innerHTML"],
+                ["zhCN", _("中文"), "innerHTML"],
+                ["th", _("ภาษาไทย"), "innerHTML"],
+                ["ayc", _("aymara"), "innerHTML"],
+                ["quz", _("quechua"), "innerHTML"],
+                ["gug", _("guarani"), "innerHTML"],
+                ["hi", _("हिंदी"), "innerHTML"],
+                ["ibo", _("igbo"), "innerHTML"],
+                ["ar", _("عربى"), "innerHTML"],
+                ["he", _("עִברִית"), "innerHTML"]
+            ];
+
+            // Workaround for FF
+            strings_ = [
+                _("About Turtle Blocks"),
+                _("Play"),
+                _("Stop"),
+                _("New project"),
+                _("Load project from file"),
+                _("Save project"),
+                _("Save project"),
+                _("Find and share projects"),
+                _("Offline. Sharing is unavailable"),
+                _("Auxilary menu"),
+                _("Help"),
+                _("Run slowly"),
+                _("Run step by step"),
+                _("Display statistics"),
+                _("Load plugin"),
+                _("Delete plugin"),
+                _("Enable horizontal scrolling"),
+                _("Disable horizontal scrolling"),
+                _("Merge with current project"),
+                _("Set Pitch Preview"),
+                _("Toggle JavaScript Editor"),
+                _("Restore"),
+                _("Select language"),
+                _("Save project as HTML"),
+                _("Save turtle artwork as SVG"),
+                _("Save turtle artwork as PNG"),
+                _("Save block artwork as SVG"),
+                _("Confirm"),
+                _("Select language")
+            ];
+        }
+
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            const beginnerMode = docById("beginnerMode");
+            const advancedMode = docById("advancedMode");
+            if (mode || mode === "null") {
+                advancedMode.style.display = "block";
+                beginnerMode.style.display = "none";
+            } else {
+                advancedMode.style.display = "none";
+                beginnerMode.style.display = "display";
+            }
+        }
+
+        for (let i = 0; i < strings.length; i++) {
+            const obj = strings[i];
+            const trans = strings_[i];
+            const elem = docById(obj[0]);
+            if (strings[i].length === 3) {
+                elem.innerHTML = obj[1];
+            } else {
+                elem.setAttribute("data-tooltip", trans);
+            }
+        }
+
+        if (!this.tooltipsDisabled) {
+            $j(".tooltipped").tooltip({
+                html: true,
+                delay: 100
+            });
+        }
+
+        $j(".materialize-iso, .dropdown-trigger").dropdown({
+            constrainWidth: false,
+            hover: false,
+            belowOrigin: true // Displays dropdown below the button
+        });
+    }
     /**
      * @public
      * @param  {Object} jquery
