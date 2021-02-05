@@ -15,6 +15,10 @@
  * MA 02110-1335 USA.
  */
 
+/* global turtles, JSInterface */
+
+/* exported DictBlocksAPI */
+
 /**
  * Class pertaining to the API methods specific to Dictionary blocks for JavaScript based Music Blocks
  * programs.
