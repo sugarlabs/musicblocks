@@ -19,6 +19,12 @@
  * Action methods are in camelCase.
 */
 
+/*exported setupIntervalsActions*/
+
+/* global MUSICALMODES, _, getNote, Singer, getModeLength, logo, NOINPUTERRORMSG, blocks, 
+MusicBlocks, Mouse, args
+*/
+
 /**
  * Sets up all the methods related to different actions for each block in Intervals palette.
  *
@@ -160,7 +166,7 @@ function setupIntervalsActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 MUSICALMODES[modeName] = [];
                 if (tur.singer.defineMode.indexOf(0) === -1) {
                     tur.singer.defineMode.push(0);
@@ -232,7 +238,7 @@ function setupIntervalsActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => tur.singer.intervals.pop();
+            const __listener = () => tur.singer.intervals.pop();
 
             logo.setTurtleListener(turtle, listenerName, __listener);
         }

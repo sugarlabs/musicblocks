@@ -16,6 +16,11 @@
  * MA 02110-1335 USA.
 */
 
+/*exported setupVolumeActions*/
+
+/* global Singer, logo, blocks, MusicBlocks, Mouse, last, _, VOICENAMES, Tone,
+ _THIS_IS_MUSIC_BLOCKS_, instruments, DRUMNAMES, DEFAULTVOLUME*/
+
 /**
  * Sets up all the methods related to different actions for each block in Volume palette.
  *
@@ -58,7 +63,7 @@ function setupVolumeActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 if (tur.singer.justCounting.length === 0) {
                     logo.notation.notationEndCrescendo(turtle, last(tur.singer.crescendoDelta));
                 }
@@ -115,7 +120,7 @@ function setupVolumeActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 for (const synth in tur.singer.synthVolume) {
                     tur.singer.synthVolume[synth].pop();
                     Singer.setSynthVolume(logo, turtle, synth, last(tur.singer.synthVolume[synth]));

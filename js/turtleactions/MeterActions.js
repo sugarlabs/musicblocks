@@ -16,6 +16,12 @@
  * MA 02110-1335 USA.
 */
 
+/*exported setupMeterActions*/
+
+/* global rationalToFraction, _, blk, Singer, _blk, logo, TONEBPM, blocks, 
+MusicBlocks, Mouse, Queue, turtles, last
+*/
+
 /**
  * Sets up all the methods related to different actions for each block in Meter palette.
  *
@@ -145,7 +151,7 @@ function setupMeterActions() {
         static onEveryNoteDo(action, isflow, receivedArg, turtle, blk) {
             const tur = logo.turtles.ithTurtle(turtle);
 
-            const __listener = event => {
+            const __listener = () => {
                 if (tur.running) {
                     const queueBlock = new Queue(logo.actions[action], 1, blk);
                     tur.parentFlowQueue.push(blk);
@@ -172,19 +178,19 @@ function setupMeterActions() {
         static onEveryBeatDo(action, isflow, receivedArg, turtle, blk) {
             // Set up a listener for every beat for this turtle.
             const orgTurtle = turtle;
-            console.debug("used from: ", orgTurtle);
+            // console.debug("used from: ", orgTurtle);
             if (!turtles.turtleList[orgTurtle].companionTurtle){
                 turtle = logo.turtles.turtleList.length;
                 turtles.turtleList[orgTurtle].companionTurtle = turtle;
                 logo.turtles.addTurtle(logo.blocks.blockList[blk], {});
                 logo.prepSynths();
-                console.debug("beat Turtle: ", turtle);
+                // console.debug("beat Turtle: ", turtle);
             }
             turtle = turtles.turtleList[orgTurtle].companionTurtle;
 
             const tur = logo.turtles.ithTurtle(turtle);
 
-            const __listener = event => {
+            const __listener = () => {
                 if (tur.running) {
                     const queueBlock = new Queue(logo.actions[action], 1, blk);
                     tur.parentFlowQueue.push(blk);
@@ -225,7 +231,7 @@ function setupMeterActions() {
             const tur = logo.turtles.ithTurtle(turtle);
 
             // Set up a listener for this turtle/onbeat combo.
-            const __listener = event => {
+            const __listener = () => {
                 if (tur.running) {
                     const queueBlock = new Queue(logo.actions[action], 1, blk);
                     tur.parentFlowQueue.push(blk);
@@ -270,7 +276,7 @@ function setupMeterActions() {
             const tur = logo.turtles.ithTurtle(turtle);
 
             // Set up a listener for this turtle/offbeat combo
-            const __listener = event => {
+            const __listener = () => {
                 if (tur.running) {
                     const queueBlock = new Queue(logo.actions[action], 1, blk);
                     tur.parentFlowQueue.push(blk);
@@ -308,7 +314,7 @@ function setupMeterActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 if (tur.singer.drift > 0)
                     tur.singer.drift--;
             };
@@ -373,6 +379,7 @@ function setupMeterActions() {
         }
 
         static getBeatFactor(turtle) {
+            // eslint-disable-next-line max-len
             return Singer.RhythmActions.getNoteValue(turtle) * logo.turtles.ithTurtle(turtle).singer.noteValuePerBeat;
         }
 

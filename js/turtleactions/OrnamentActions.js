@@ -16,6 +16,10 @@
  * MA 02110-1335 USA.
 */
 
+/*exported setupOrnamentActions*/
+
+/* global Singer, logo, blocks, MusicBlocks, Mouse */
+
 /**
  * Sets up all the methods related to different actions for each block in Ornament palette.
  *
@@ -45,7 +49,7 @@ function setupOrnamentActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => tur.singer.staccato.pop();
+            const __listener = () => tur.singer.staccato.pop();
 
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
@@ -76,7 +80,7 @@ function setupOrnamentActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 tur.singer.staccato.pop();
                 if (tur.singer.justCounting.length === 0) {
                     logo.notation.notationEndSlur(turtle);
@@ -111,7 +115,7 @@ function setupOrnamentActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 tur.singer.inNeighbor.pop();
                 tur.singer.neighborStepPitch.pop();
                 tur.singer.neighborNoteValue.pop();

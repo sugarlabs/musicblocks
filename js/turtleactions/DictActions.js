@@ -19,6 +19,10 @@
  * Action methods are in camelCase.
  */
 
+/*exported setupDictActions*/
+
+/* global Turtle, _, turtles, Singer, getNote, logo, INVALIDPITCH, blk, pitchToNumber, getTargetTurtle*/
+
 /**
  * Sets up all the methods related to different actions for each block in Dictionary palette.
  *
@@ -81,7 +85,7 @@ function setupDictActions() {
                         logo.synth.inTemperament
                     );
                 } else {
-                    console.debug("Cannot find a note for mouse " + target);
+                    // console.debug("Cannot find a note for mouse " + target);
                     logo.errorMsg(INVALIDPITCH, blk);
                     obj = ["G", 4];
                 }

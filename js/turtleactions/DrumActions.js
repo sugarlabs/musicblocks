@@ -19,6 +19,12 @@
  * Action methods are in camelCase.
 */
 
+/*exported setupDrumActions*/
+
+/* global DEFAULTDRUM, _, DRUMNAMES, Singer, last, logo, DEFAULTVOLUME, blocks, 
+MusicBlocks, Mouse, NOISENAMES
+*/
+
 /**
  * Sets up all the methods related to different actions for each block in Drum palette.
  *
@@ -121,7 +127,7 @@ function setupDrumActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 tur.singer.drumStyle.pop();
                 tur.singer.pitchDrumTable = {};
             };
@@ -164,7 +170,7 @@ function setupDrumActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => tur.singer.drumStyle.pop();
+            const __listener = () => tur.singer.drumStyle.pop();
 
             logo.setTurtleListener(turtle, listenerName, __listener);
             if (logo.inRhythmRuler) {
