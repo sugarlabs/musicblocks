@@ -12,6 +12,9 @@ let WRAP = true;
 const $j = jQuery.noConflict();
 
 class Toolbar {
+    /**
+     * @constructor
+     */
     constructor() {
         this.stopIconColorWhenPlaying = "#ea174c";
         this.language = localStorage.languagePreference;
@@ -21,496 +24,13 @@ class Toolbar {
         this.tooltipsDisabled = false;
     }
 
-    renderLogoIcon(onclick) {
-        const logoIcon = docById("mb-logo");
-        if (this.language === "ja") {
-            logoIcon.innerHTML = '<img style="width: 100%;" src="images/logo-ja.svg">';
-        }
-
-        logoIcon.onmouseenter = () => {
-            document.body.style.cursor = "pointer";
-        };
-
-        logoIcon.onmouseleave = () => {
-            document.body.style.cursor = "default";
-        };
-
-        logoIcon.onclick = () => {
-            onclick();
-        };
-    }
-
-    renderPlayIcon(onclick) {
-        const playIcon = docById("play");
-        const stopIcon = docById("stop");
-
-        playIcon.onclick = () => {
-            onclick();
-            stopIcon.style.color = this.stopIconColorWhenPlaying;
-        };
-    }
-
-    renderStopIcon(onclick) {
-        const stopIcon = docById("stop");
-
-        stopIcon.onclick = () => {
-            onclick();
-            stopIcon.style.color = "white";
-        };
-    }
-
-    renderNewProjectIcon(onclick) {
-        const newProjectIcon = docById("new-project");
-
-        newProjectIcon.onclick = () => {
-            onclick();
-        };
-    }
-
-    renderLoadIcon(onclick) {
-        const loadIcon = docById("load");
-
-        loadIcon.onclick = () => {
-            onclick();
-        };
-    }
-
-    // let wrapTurtleTooltipData = "Wrap Turtle Off";
-    renderWrapIcon() {
-        const wrapIcon = docById("wrapTurtle");
-        let wrapButtonTooltipData = "Turtle Wrap Off";
-
-        wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
-        $j(".tooltipped").tooltip({
-            html: true,
-            delay: 100
-        });
-
-        wrapIcon.onclick = () => {
-            WRAP = !WRAP;
-            if (WRAP) {
-                wrapButtonTooltipData = "Turtle Wrap Off";
-            } else {
-                wrapButtonTooltipData = "Turle Wrap On";
-            }
-
-            wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
-            $j(".tooltipped").tooltip({
-                html: true,
-                delay: 100
-            });
-        };
-    }
-
-    renderSaveIcons(
-        html_onclick,
-        doSVG_onclick,
-        svg_onclick,
-        png_onclick,
-        wave_onclick,
-        ly_onclick,
-        abc_onclick,
-        mxml_onclick,
-        blockartworksvg_onclick
-    ) {
-        const saveButton = docById("saveButton");
-        const saveButtonAdvanced = docById("saveButtonAdvanced");
-        let saveHTML;
-        let savePNG;
-        let saveWAV;
-        let saveSVG;
-        let saveLY;
-        let saveABC;
-        let saveMXML;
-        let svgData;
-
-        if (beginnerMode) {
-            if (_THIS_IS_MUSIC_BLOCKS_ && this.language === "ja") {
-                saveButton.onclick = () => {
-                    html_onclick();
-                };
-            } else {
-                saveButton.style.display = "block";
-                saveButtonAdvanced.style.display = "none";
-
-                saveButton.onclick = () => {
-                    //html_onclick();
-                    saveHTML = docById("save-html-beg");
-                    console.debug(saveHTML);
-                    saveHTML.onclick = () => {
-                        html_onclick();
-                    };
-
-                    savePNG = docById("save-png-beg");
-                    console.debug(savePNG);
-                    svgData = doSVG_onclick(
-                        canvas,
-                        logo,
-                        turtles,
-                        canvas.width,
-                        canvas.height,
-                        1.0
-                    );
-
-                    if (svgData == "") {
-                        savePNG.disabled = true;
-                        savePNG.className = "grey-text inactiveLink";
-                    } else {
-                        savePNG.disabled = false;
-                        savePNG.className = "";
-                        savePNG.onclick = () => {
-                            png_onclick();
-                        };
-                    }
-                };
-            }
-        } else {
-            console.debug("ADVANCED MODE BUTTONS");
-            saveButton.style.display = "none";
-            saveButtonAdvanced.style.display = "block";
-            saveButtonAdvanced.onclick = () => {
-                saveHTML = docById("save-html");
-                console.debug(saveHTML);
-
-                saveHTML.onclick = () => {
-                    html_onclick();
-                };
-
-                saveSVG = docById("save-svg");
-                savePNG = docById("save-png");
-                console.debug(savePNG);
-                svgData = doSVG_onclick(canvas, logo, turtles, canvas.width, canvas.height, 1.0);
-
-                // if there is no mouse artwork to save then grey out
-                if (svgData == "") {
-                    saveSVG.disabled = true;
-                    savePNG.disabled = true;
-                    saveSVG.className = "grey-text inactiveLink";
-                    savePNG.className = "grey-text inactiveLink";
-                } else {
-                    saveSVG.disabled = false;
-                    savePNG.disabled = false;
-                    saveSVG.className = "";
-                    savePNG.className = "";
-
-                    saveSVG.onclick = () => {
-                        svg_onclick();
-                    };
-
-                    savePNG.onclick = () => {
-                        png_onclick();
-                    };
-                }
-
-                if (_THIS_IS_MUSIC_BLOCKS_) {
-                    saveWAV = docById("save-wav");
-
-                    saveWAV.onclick = wave_onclick;
-
-                    saveLY = docById("save-ly");
-
-                    saveLY.onclick = () => {
-                        ly_onclick();
-                    };
-
-                    saveABC = docById("save-abc");
-
-                    saveABC.onclick = () => {
-                        abc_onclick();
-                    };
-
-                    saveMXML = docById("save-mxml");
-
-                    saveMXML.onclick = () => {
-                        mxml_onclick();
-                    };
-                }
-
-                const saveArtworkSVG = docById("save-blockartwork-svg");
-
-                saveArtworkSVG.onclick = () => {
-                    blockartworksvg_onclick();
-                };
-            };
-        }
-    }
-
-    renderPlanetIcon(planet, onclick) {
-        const planetIcon = docById("planetIcon");
-        const planetIconDisabled = docById("planetIconDisabled");
-
-        if (planet) {
-            planetIcon.onclick = () => {
-                docById("toolbars").style.display = "none";
-                docById("wheelDiv").style.display = "none";
-                docById("contextWheelDiv").style.display = "none";
-                onclick();
-            };
-        } else {
-            planetIcon.style.display = "none";
-            planetIconDisabled.style.display = "block";
-        }
-    }
-
-    renderMenuIcon(onclick) {
-        const menuIcon = docById("menu");
-        const auxToolbar = docById("aux-toolbar");
-        menuIcon.onclick = () => {
-            if (auxToolbar.style.display == "" || auxToolbar.style.display == "none") {
-                onclick(false);
-                auxToolbar.style.display = "block";
-                menuIcon.innerHTML = "more_vert";
-                docById("toggleAuxBtn").className = "blue darken-1";
-            } else {
-                onclick(true);
-                auxToolbar.style.display = "none";
-                menuIcon.innerHTML = "menu";
-                docById("toggleAuxBtn").className -= "blue darken-1";
-            }
-        };
-    }
-
-    renderRunSlowlyIcon(onclick) {
-        const runSlowlyIcon = docById("runSlowlyIcon");
-        if (_THIS_IS_MUSIC_BLOCKS_ && beginnerMode && language === "ja") {
-            runSlowlyIcon.style.display = "none";
-        }
-
-        runSlowlyIcon.onclick = () => {
-            onclick();
-            docById("stop").style.color = stopIconColorWhenPlaying;
-        };
-    }
-
-    renderHelpIcon(onclick) {
-        const helpIcon = docById("helpIcon");
-
-        helpIcon.onclick = () => {
-            onclick();
-        };
-    }
-
-    renderModeSelectIcon(onclick) {
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            const begIcon = docById("beginnerMode");
-            const advIcon = docById("advancedMode");
-            if (begIcon.style.display === "none") {
-                advIcon.onclick = () => {
-                    onclick();
-                };
-            } else {
-                begIcon.onclick = () => {
-                    onclick();
-                };
-            }
-        }
-    }
-
-    renderRunSlowlyIcon(onclick) {
-        const runSlowlyIcon = docById("runSlowlyIcon");
-        if (_THIS_IS_MUSIC_BLOCKS_ && beginnerMode && this.language === "ja") {
-            runSlowlyIcon.style.display = "none";
-        }
-
-        runSlowlyIcon.onclick = () => {
-            onclick();
-            docById("stop").style.color = this.stopIconColorWhenPlaying;
-        };
-    }
-
-    renderRunStepIcon(onclick) {
-        const runStepByStepIcon = docById("runStepByStepIcon");
-        if (_THIS_IS_MUSIC_BLOCKS_ && beginnerMode && this.language === "ja") {
-            runStepByStepIcon.style.display = "none";
-        }
-
-        runStepByStepIcon.onclick = () => {
-            onclick();
-            docById("stop").style.color = this.stopIconColorWhenPlaying;
-        };
-    }
-
-    renderAdvancedIcons(
-        analytics_onclick,
-        openPlugin_onclick,
-        delPlugin_onclick,
-        setScroller,
-        _setupBlocksContainerEvents
-    ) {
-        const displayStatsIcon = docById("displayStatsIcon");
-        const loadPluginIcon = docById("loadPluginIcon");
-        const delPluginIcon = docById("delPluginIcon");
-        const enableHorizScrollIcon = docById("enableHorizScrollIcon");
-        const disableHorizScrollIcon = docById("disableHorizScrollIcon");
-
-        if (!_THIS_IS_MUSIC_BLOCKS_ || !beginnerMode) {
-            displayStatsIcon.onclick = () => {
-                analytics_onclick();
-            };
-
-            loadPluginIcon.onclick = () => {
-                openPlugin_onclick();
-            };
-
-            delPluginIcon.onclick = () => {
-                delPlugin_onclick();
-            };
-
-            enableHorizScrollIcon.onclick = () => {
-                setScroller();
-                _setupBlocksContainerEvents();
-            };
-
-            disableHorizScrollIcon.onclick = () => {
-                setScroller();
-                _setupBlocksContainerEvents();
-            };
-        } else {
-            displayStatsIcon.style.display = "none";
-            loadPluginIcon.style.display = "none";
-            delPluginIcon.style.display = "none";
-            enableHorizScrollIcon.style.display = "none";
-        }
-    }
-
-    // let scrollEnabled = false;
-    // renderEnableHorizScrollIcon(setScroller, _setupBlocksContainerEvents) {
-    //     let enableHorizScrollIcon = docById('enableHorizScrollIcon');
-    //     enableHorizScrollIcon.onclick = () => {
-    //         setScroller();
-    //         _setupBlocksContainerEvents();
-    //     }
-    // }
-    renderMergeIcon(onclick) {
-        const mergeWithCurrentIcon = docById("mergeWithCurrentIcon");
-
-        mergeWithCurrentIcon.onclick = () => {
-            onclick();
-        };
-    }
-
-    renderRestoreIcon(onclick) {
-        const restoreIcon = docById("restoreIcon");
-
-        restoreIcon.onclick = () => {
-            onclick();
-        };
-    }
-
-    renderChooseKeyIcon(onclick) {
-        const chooseKeyIcon = docById("chooseKeyIcon");
-        docById("chooseKeyDiv").style.display = "none";
-        chooseKeyIcon.onclick = () => {
-            onclick();
-        };
-    }
-
-    renderJavaScriptIcon(onclick) {
-        docById("toggleJavaScriptIcon").onclick = () => onclick();
-    }
-
-    renderLanguageSelectIcon(languageBox) {
-        const languageSelectIcon = docById("languageSelectIcon");
-        languageSelectIcon.onclick = () => {
-            const enUS = docById("enUS");
-
-            enUS.onclick = () => {
-                languageBox.enUS_onclick();
-            };
-
-            const enUK = docById("enUK");
-
-            enUK.onclick = () => {
-                languageBox.enUK_onclick();
-            };
-
-            const es = docById("es");
-
-            es.onclick = () => {
-                languageBox.es_onclick();
-            };
-
-            const pt = docById("pt");
-
-            pt.onclick = () => {
-                languageBox.pt_onclick();
-            };
-
-            const ko = docById("ko");
-
-            ko.onclick = () => {
-                languageBox.ko_onclick();
-            };
-
-            const ja = docById("ja");
-
-            ja.onclick = () => {
-                languageBox.ja_onclick();
-            };
-
-            const kana = docById("kana");
-
-            kana.onclick = () => {
-                languageBox.kana_onclick();
-            };
-
-            const zhCN = docById("zhCN");
-
-            zhCN.onclick = () => {
-                languageBox.zhCN_onclick();
-            };
-
-            const th = docById("th");
-
-            th.onclick = () => {
-                languageBox.th_onclick();
-            };
-
-            const ayc = docById("ayc");
-
-            ayc.onclick = () => {
-                languageBox.ayc_onclick();
-            };
-
-            const quz = docById("quz");
-
-            quz.onclick = () => {
-                languageBox.quz_onclick();
-            };
-
-            const gug = docById("gug");
-
-            gug.onclick = () => {
-                languageBox.gug_onclick();
-            };
-
-            const hi = docById("hi");
-
-            hi.onclick = () => {
-                languageBox.hi_onclick();
-            };
-
-            const ibo = docById("ibo");
-
-            ibo.onclick = () => {
-                languageBox.ibo_onclick();
-            };
-
-            const ar = docById("ar");
-
-            ar.onclick = () => {
-                languageBox.ar_onclick();
-            };
-
-            const he = docById("he");
-
-            he.onclick = () => {
-                languageBox.he_onclick();
-            };
-        };
-    }
-
+    /**
+     * Initializes the toolbar
+     * @param  {boolean} mode
+     * @returns {void}
+     */
     init(mode) {
+        console.log(mode);
         let strings;
         let strings_;
         if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -727,11 +247,611 @@ class Toolbar {
         });
     }
 
+    /**
+     * @public
+     * @param {Function} onclick
+     * @returns {void}
+     */
+    renderLogoIcon(onclick) {
+        const logoIcon = docById("mb-logo");
+        if (this.language === "ja") {
+            logoIcon.innerHTML = '<img style="width: 100%;" src="images/logo-ja.svg">';
+        }
+
+        logoIcon.onmouseenter = () => {
+            document.body.style.cursor = "pointer";
+        };
+
+        logoIcon.onmouseleave = () => {
+            document.body.style.cursor = "default";
+        };
+
+        logoIcon.onclick = () => {
+            onclick();
+        };
+    }
+
+    /**
+     * @public
+     * @param {Function} onclick
+     * @returns {void}
+     */
+    renderPlayIcon(onclick) {
+        const playIcon = docById("play");
+        const stopIcon = docById("stop");
+
+        playIcon.onclick = () => {
+            onclick();
+            stopIcon.style.color = this.stopIconColorWhenPlaying;
+        };
+    }
+
+    /**
+     * @public
+     * @param {Function} onclick
+     * @returns {void}
+     */
+    renderStopIcon(onclick) {
+        const stopIcon = docById("stop");
+
+        stopIcon.onclick = () => {
+            onclick();
+            stopIcon.style.color = "white";
+        };
+    }
+
+    /**
+     * @public
+     * @param {Function} onclick
+     * @returns {void}
+     */
+    renderNewProjectIcon(onclick) {
+        const newProjectIcon = docById("new-project");
+
+        newProjectIcon.onclick = () => {
+            onclick();
+        };
+    }
+
+    /**
+     * @public
+     * @param {Function} onclick
+     * @returns {void}
+     */
+    renderLoadIcon(onclick) {
+        const loadIcon = docById("load");
+
+        loadIcon.onclick = () => {
+            onclick();
+        };
+    }
+
+    /**
+     * @public
+     * @returns {void}
+     */
+    renderWrapIcon() {
+        const wrapIcon = docById("wrapTurtle");
+        let wrapButtonTooltipData = "Turtle Wrap Off";
+
+        wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
+        $j(".tooltipped").tooltip({
+            html: true,
+            delay: 100
+        });
+
+        wrapIcon.onclick = () => {
+            WRAP = !WRAP;
+            if (WRAP) {
+                wrapButtonTooltipData = "Turtle Wrap Off";
+            } else {
+                wrapButtonTooltipData = "Turle Wrap On";
+            }
+
+            wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
+            $j(".tooltipped").tooltip({
+                html: true,
+                delay: 100
+            });
+        };
+    }
+
+    /**
+     * @public
+     * @param  {Function} html_onclick
+     * @param  {Function} doSVG_onclick
+     * @param  {Function} svg_onclick
+     * @param  {Function} png_onclick
+     * @param  {Function} wave_onclick
+     * @param  {Function} ly_onclick
+     * @param  {Function} abc_onclick
+     * @param  {Function} mxml_onclick
+     * @param  {Function} blockartworksvg_onclick
+     * @returns {void}
+     */
+    renderSaveIcons(
+        html_onclick,
+        doSVG_onclick,
+        svg_onclick,
+        png_onclick,
+        wave_onclick,
+        ly_onclick,
+        abc_onclick,
+        mxml_onclick,
+        blockartworksvg_onclick
+    ) {
+        const saveButton = docById("saveButton");
+        const saveButtonAdvanced = docById("saveButtonAdvanced");
+        let saveHTML;
+        let savePNG;
+        let saveWAV;
+        let saveSVG;
+        let saveLY;
+        let saveABC;
+        let saveMXML;
+        let svgData;
+
+        if (beginnerMode) {
+            if (_THIS_IS_MUSIC_BLOCKS_ && this.language === "ja") {
+                saveButton.onclick = () => {
+                    html_onclick();
+                };
+            } else {
+                saveButton.style.display = "block";
+                saveButtonAdvanced.style.display = "none";
+
+                saveButton.onclick = () => {
+                    //html_onclick();
+                    saveHTML = docById("save-html-beg");
+                    // console.debug(saveHTML);
+                    saveHTML.onclick = () => {
+                        html_onclick();
+                    };
+
+                    savePNG = docById("save-png-beg");
+                    // console.debug(savePNG);
+                    svgData = doSVG_onclick(
+                        canvas,
+                        logo,
+                        turtles,
+                        canvas.width,
+                        canvas.height,
+                        1.0
+                    );
+
+                    if (svgData == "") {
+                        savePNG.disabled = true;
+                        savePNG.className = "grey-text inactiveLink";
+                    } else {
+                        savePNG.disabled = false;
+                        savePNG.className = "";
+                        savePNG.onclick = () => {
+                            png_onclick();
+                        };
+                    }
+                };
+            }
+        } else {
+            // console.debug("ADVANCED MODE BUTTONS");
+            saveButton.style.display = "none";
+            saveButtonAdvanced.style.display = "block";
+            saveButtonAdvanced.onclick = () => {
+                saveHTML = docById("save-html");
+                // console.debug(saveHTML);
+
+                saveHTML.onclick = () => {
+                    html_onclick();
+                };
+
+                saveSVG = docById("save-svg");
+                savePNG = docById("save-png");
+                // console.debug(savePNG);
+                svgData = doSVG_onclick(canvas, logo, turtles, canvas.width, canvas.height, 1.0);
+
+                // if there is no mouse artwork to save then grey out
+                if (svgData == "") {
+                    saveSVG.disabled = true;
+                    savePNG.disabled = true;
+                    saveSVG.className = "grey-text inactiveLink";
+                    savePNG.className = "grey-text inactiveLink";
+                } else {
+                    saveSVG.disabled = false;
+                    savePNG.disabled = false;
+                    saveSVG.className = "";
+                    savePNG.className = "";
+
+                    saveSVG.onclick = () => {
+                        svg_onclick();
+                    };
+
+                    savePNG.onclick = () => {
+                        png_onclick();
+                    };
+                }
+
+                if (_THIS_IS_MUSIC_BLOCKS_) {
+                    saveWAV = docById("save-wav");
+
+                    saveWAV.onclick = wave_onclick;
+
+                    saveLY = docById("save-ly");
+
+                    saveLY.onclick = () => {
+                        ly_onclick();
+                    };
+
+                    saveABC = docById("save-abc");
+
+                    saveABC.onclick = () => {
+                        abc_onclick();
+                    };
+
+                    saveMXML = docById("save-mxml");
+
+                    saveMXML.onclick = () => {
+                        mxml_onclick();
+                    };
+                }
+
+                const saveArtworkSVG = docById("save-blockartwork-svg");
+
+                saveArtworkSVG.onclick = () => {
+                    blockartworksvg_onclick();
+                };
+            };
+        }
+    }
+    /**
+     * @public
+     * @param  {} planet
+     * @param  {Function} onclick
+     * @returns {void}
+     */
+    renderPlanetIcon(planet, onclick) {
+        const planetIcon = docById("planetIcon");
+        const planetIconDisabled = docById("planetIconDisabled");
+        console.log(planet);
+        if (planet) {
+            planetIcon.onclick = () => {
+                docById("toolbars").style.display = "none";
+                docById("wheelDiv").style.display = "none";
+                docById("contextWheelDiv").style.display = "none";
+                onclick();
+            };
+        } else {
+            planetIcon.style.display = "none";
+            planetIconDisabled.style.display = "block";
+        }
+    }
+
+    /**
+     * @public
+     * @param {Function} onclick
+     * @returns {void}
+     */
+    renderMenuIcon(onclick) {
+        const menuIcon = docById("menu");
+        const auxToolbar = docById("aux-toolbar");
+        menuIcon.onclick = () => {
+            if (auxToolbar.style.display == "" || auxToolbar.style.display == "none") {
+                onclick(false);
+                auxToolbar.style.display = "block";
+                menuIcon.innerHTML = "more_vert";
+                docById("toggleAuxBtn").className = "blue darken-1";
+            } else {
+                onclick(true);
+                auxToolbar.style.display = "none";
+                menuIcon.innerHTML = "menu";
+                docById("toggleAuxBtn").className -= "blue darken-1";
+            }
+        };
+    }
+
+    /**
+     * @public
+     * @param {Function} onclick
+     * @returns {void}
+     */
+    renderRunSlowlyIcon(onclick) {
+        const runSlowlyIcon = docById("runSlowlyIcon");
+        if (_THIS_IS_MUSIC_BLOCKS_ && beginnerMode && language === "ja") {
+            runSlowlyIcon.style.display = "none";
+        }
+
+        runSlowlyIcon.onclick = () => {
+            onclick();
+            docById("stop").style.color = stopIconColorWhenPlaying;
+        };
+    }
+
+    /**
+     * @public
+     * @param {Function} onclick
+     * @returns {void}
+     */
+    renderHelpIcon(onclick) {
+        const helpIcon = docById("helpIcon");
+
+        helpIcon.onclick = () => {
+            onclick();
+        };
+    }
+
+    /**
+     * @public
+     * @param {Function} onclick
+     * @returns {void}
+     */
+    renderModeSelectIcon(onclick) {
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            const begIcon = docById("beginnerMode");
+            const advIcon = docById("advancedMode");
+            if (begIcon.style.display === "none") {
+                advIcon.onclick = () => {
+                    onclick();
+                };
+            } else {
+                begIcon.onclick = () => {
+                    onclick();
+                };
+            }
+        }
+    }
+
+    /**
+     * @public
+     * @param {Function} onclick
+     * @returns {void}
+     */
+    renderRunSlowlyIcon(onclick) {
+        const runSlowlyIcon = docById("runSlowlyIcon");
+        if (_THIS_IS_MUSIC_BLOCKS_ && beginnerMode && this.language === "ja") {
+            runSlowlyIcon.style.display = "none";
+        }
+
+        runSlowlyIcon.onclick = () => {
+            onclick();
+            docById("stop").style.color = this.stopIconColorWhenPlaying;
+        };
+    }
+
+    /**
+     * @public
+     * @param {Function} onclick
+     * @returns {void}
+     */
+    renderRunStepIcon(onclick) {
+        const runStepByStepIcon = docById("runStepByStepIcon");
+        if (_THIS_IS_MUSIC_BLOCKS_ && beginnerMode && this.language === "ja") {
+            runStepByStepIcon.style.display = "none";
+        }
+
+        runStepByStepIcon.onclick = () => {
+            onclick();
+            docById("stop").style.color = this.stopIconColorWhenPlaying;
+        };
+    }
+    /**
+     * @public
+     * @param  {Function} analytics_onclick
+     * @param  {Function} openPlugin_onclick
+     * @param  {Function} delPlugin_onclick
+     * @param  {Function} setScroller
+     * @param  {Function} _setupBlocksContainerEvents
+     * @returns {void}
+     */
+    renderAdvancedIcons(
+        analytics_onclick,
+        openPlugin_onclick,
+        delPlugin_onclick,
+        setScroller,
+        _setupBlocksContainerEvents
+    ) {
+        const displayStatsIcon = docById("displayStatsIcon");
+        const loadPluginIcon = docById("loadPluginIcon");
+        const delPluginIcon = docById("delPluginIcon");
+        const enableHorizScrollIcon = docById("enableHorizScrollIcon");
+        const disableHorizScrollIcon = docById("disableHorizScrollIcon");
+
+        if (!_THIS_IS_MUSIC_BLOCKS_ || !beginnerMode) {
+            displayStatsIcon.onclick = () => {
+                analytics_onclick();
+            };
+
+            loadPluginIcon.onclick = () => {
+                openPlugin_onclick();
+            };
+
+            delPluginIcon.onclick = () => {
+                delPlugin_onclick();
+            };
+
+            enableHorizScrollIcon.onclick = () => {
+                setScroller();
+                _setupBlocksContainerEvents();
+            };
+
+            disableHorizScrollIcon.onclick = () => {
+                setScroller();
+                _setupBlocksContainerEvents();
+            };
+        } else {
+            displayStatsIcon.style.display = "none";
+            loadPluginIcon.style.display = "none";
+            delPluginIcon.style.display = "none";
+            enableHorizScrollIcon.style.display = "none";
+        }
+    }
+
+    /**
+     * @public
+     * @param {Function} onclick
+     * @returns {void}
+     */
+    renderMergeIcon(onclick) {
+        const mergeWithCurrentIcon = docById("mergeWithCurrentIcon");
+
+        mergeWithCurrentIcon.onclick = () => {
+            onclick();
+        };
+    }
+
+    /**
+     * @public
+     * @param {Function} onclick
+     * @returns {void}
+     */
+    renderRestoreIcon(onclick) {
+        const restoreIcon = docById("restoreIcon");
+
+        restoreIcon.onclick = () => {
+            onclick();
+        };
+    }
+
+    /**
+     * @public
+     * @param {Function} onclick
+     * @returns {void}
+     */
+    renderChooseKeyIcon(onclick) {
+        const chooseKeyIcon = docById("chooseKeyIcon");
+        docById("chooseKeyDiv").style.display = "none";
+        chooseKeyIcon.onclick = () => {
+            onclick();
+        };
+    }
+
+    /**
+     * @public
+     * @param {Function} onclick
+     * @returns {void}
+     */
+    renderJavaScriptIcon(onclick) {
+        docById("toggleJavaScriptIcon").onclick = () => onclick();
+    }
+
+    /**
+     * @param  {Object} languageBox
+     */
+    renderLanguageSelectIcon(languageBox) {
+        console.log(languageBox);
+        const languageSelectIcon = docById("languageSelectIcon");
+        languageSelectIcon.onclick = () => {
+            const enUS = docById("enUS");
+
+            enUS.onclick = () => {
+                languageBox.enUS_onclick();
+            };
+
+            const enUK = docById("enUK");
+
+            enUK.onclick = () => {
+                languageBox.enUK_onclick();
+            };
+
+            const es = docById("es");
+
+            es.onclick = () => {
+                languageBox.es_onclick();
+            };
+
+            const pt = docById("pt");
+
+            pt.onclick = () => {
+                languageBox.pt_onclick();
+            };
+
+            const ko = docById("ko");
+
+            ko.onclick = () => {
+                languageBox.ko_onclick();
+            };
+
+            const ja = docById("ja");
+
+            ja.onclick = () => {
+                languageBox.ja_onclick();
+            };
+
+            const kana = docById("kana");
+
+            kana.onclick = () => {
+                languageBox.kana_onclick();
+            };
+
+            const zhCN = docById("zhCN");
+
+            zhCN.onclick = () => {
+                languageBox.zhCN_onclick();
+            };
+
+            const th = docById("th");
+
+            th.onclick = () => {
+                languageBox.th_onclick();
+            };
+
+            const ayc = docById("ayc");
+
+            ayc.onclick = () => {
+                languageBox.ayc_onclick();
+            };
+
+            const quz = docById("quz");
+
+            quz.onclick = () => {
+                languageBox.quz_onclick();
+            };
+
+            const gug = docById("gug");
+
+            gug.onclick = () => {
+                languageBox.gug_onclick();
+            };
+
+            const hi = docById("hi");
+
+            hi.onclick = () => {
+                languageBox.hi_onclick();
+            };
+
+            const ibo = docById("ibo");
+
+            ibo.onclick = () => {
+                languageBox.ibo_onclick();
+            };
+
+            const ar = docById("ar");
+
+            ar.onclick = () => {
+                languageBox.ar_onclick();
+            };
+
+            const he = docById("he");
+
+            he.onclick = () => {
+                languageBox.he_onclick();
+            };
+        };
+    }
+
+    /**
+     * @public
+     * @param  {Object} jquery
+     * @returns {void}
+     */
     disableTooltips = (jquery) => {
+        console.log(jquery);
         jquery(".tooltipped").tooltip("remove");
         this.tooltipsDisabled = true;
     };
 
+    /**
+     * @public
+     * @param {Function} onclick
+     * @returns {void}
+     */
     closeAuxToolbar = (onclick) => {
         if (auxToolbar.style.display === "block") {
             onclick(false);
