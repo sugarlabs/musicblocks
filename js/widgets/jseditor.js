@@ -22,7 +22,10 @@
  * Private members' names begin with underscore '_".
  */
 
- /*global _,docById,MusicBlocks,hljs,CodeJar,JSGenerate,JS_API */
+/* global docById, MusicBlocks, hljs, CodeJar, JSGenerate, JS_API */
+
+/* exported JSEditor */
+
 class JSEditor {
     /**
      * @constructor
