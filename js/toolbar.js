@@ -24,8 +24,7 @@ class Toolbar {
     renderLogoIcon(onclick) {
         const logoIcon = docById("mb-logo");
         if (this.language === "ja") {
-            logoIcon.innerHTML =
-                '<img style="width: 100%;" src="images/logo-ja.svg">';
+            logoIcon.innerHTML = '<img style="width: 100%;" src="images/logo-ja.svg">';
         }
 
         logoIcon.onmouseenter = () => {
@@ -112,7 +111,8 @@ class Toolbar {
         ly_onclick,
         abc_onclick,
         mxml_onclick,
-        blockartworksvg_onclick) {
+        blockartworksvg_onclick
+    ) {
         const saveButton = docById("saveButton");
         const saveButtonAdvanced = docById("saveButtonAdvanced");
         let saveHTML;
@@ -179,14 +179,7 @@ class Toolbar {
                 saveSVG = docById("save-svg");
                 savePNG = docById("save-png");
                 console.debug(savePNG);
-                svgData = doSVG_onclick(
-                    canvas,
-                    logo,
-                    turtles,
-                    canvas.width,
-                    canvas.height,
-                    1.0
-                );
+                svgData = doSVG_onclick(canvas, logo, turtles, canvas.width, canvas.height, 1.0);
 
                 // if there is no mouse artwork to save then grey out
                 if (svgData == "") {
@@ -263,8 +256,7 @@ class Toolbar {
         const menuIcon = docById("menu");
         const auxToolbar = docById("aux-toolbar");
         menuIcon.onclick = () => {
-            if (auxToolbar.style.display == "" ||
-                auxToolbar.style.display == "none") {
+            if (auxToolbar.style.display == "" || auxToolbar.style.display == "none") {
                 onclick(false);
                 auxToolbar.style.display = "block";
                 menuIcon.innerHTML = "more_vert";
@@ -343,7 +335,8 @@ class Toolbar {
         openPlugin_onclick,
         delPlugin_onclick,
         setScroller,
-        _setupBlocksContainerEvents) {
+        _setupBlocksContainerEvents
+    ) {
         const displayStatsIcon = docById("displayStatsIcon");
         const loadPluginIcon = docById("loadPluginIcon");
         const delPluginIcon = docById("delPluginIcon");
@@ -556,11 +549,7 @@ class Toolbar {
                 ["save-abc", _("Save sheet music as ABC"), "innerHTML"],
                 ["save-ly", _("Save sheet music as Lilypond"), "innerHTML"],
                 ["save-mxml", _("Save sheet music as MusicXML"), "innerHTML"],
-                [
-                    "save-blockartwork-svg",
-                    _("Save block artwork as SVG"),
-                    "innerHTML"
-                ],
+                ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
                 ["new-project", _("Confirm"), "innerHTML"],
                 ["enUS", _("English (United States)"), "innerHTML"],
                 ["enUK", _("English (United Kingdom)"), "innerHTML"],
@@ -647,11 +636,7 @@ class Toolbar {
                 ["save-html", _("Save project as HTML"), "innerHTML"],
                 ["save-svg", _("Save mouse artwork as SVG"), "innerHTML"],
                 ["save-png", _("Save mouse artwork as PNG"), "innerHTML"],
-                [
-                    "save-blockartwork-svg",
-                    _("Save block artwork as SVG"),
-                    "innerHTML"
-                ],
+                ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
                 ["new-project", _("Confirm"), "innerHTML"],
                 ["enUS", _("English (United States)"), "innerHTML"],
                 ["enUK", _("English (United Kingdom)"), "innerHTML"],
@@ -745,7 +730,7 @@ class Toolbar {
     disableTooltips = (jquery) => {
         jquery(".tooltipped").tooltip("remove");
         this.tooltipsDisabled = true;
-    }
+    };
 
     closeAuxToolbar = (onclick) => {
         if (auxToolbar.style.display === "block") {
@@ -755,5 +740,5 @@ class Toolbar {
             menuIcon.innerHTML = "menu";
             docById("toggleAuxBtn").className -= "blue darken-1";
         }
-    }
+    };
 }
