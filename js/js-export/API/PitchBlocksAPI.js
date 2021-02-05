@@ -13,7 +13,11 @@
  * You should have received a copy of the GNU Affero General Public License along with this
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
-*/
+ */
+
+/* global JSInterface, MusicBlocks, Singer */
+
+/* exported PitchBlocksAPI */
 
 /**
  * Class pertaining to the API methods specific to Pitch blocks for JavaScript based Music Blocks
@@ -22,9 +26,6 @@
  * @class
  * @classdesc methods are imported by a importMethod function call from MusicBlocks class.
  */
-
-/*global JSInterface, MusicBlocks, Singer*/
-/* exported PitchBlocksAPI*/
 class PitchBlocksAPI {
     playPitch(note, octave) {
         const args = JSInterface.validateArgs("playPitch", [note, octave]);
@@ -38,9 +39,12 @@ class PitchBlocksAPI {
 
     playNthModalPitch(number, octave) {
         const args = JSInterface.validateArgs("playNthModalPitch", [number, octave]);
-        return this.runCommand(
-            "playNthModalPitch", [args[0], args[1], this.turIndex, MusicBlocks.BLK]
-        );
+        return this.runCommand("playNthModalPitch", [
+            args[0],
+            args[1],
+            this.turIndex,
+            MusicBlocks.BLK
+        ]);
     }
 
     playPitchNumber(number) {

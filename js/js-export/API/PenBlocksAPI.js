@@ -13,7 +13,11 @@
  * You should have received a copy of the GNU Affero General Public License along with this
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
-*/
+ */
+
+/* global JSInterface, turtles, logo */
+
+/* exported PenBlocksAPI */
 
 /**
  * Class pertaining to the API methods specific to Pen blocks for JavaScript based Music Blocks
@@ -22,8 +26,6 @@
  * @class
  * @classdesc methods are imported by a importMethod function call from MusicBlocks class.
  */
-/*global JSInterface, turtles, logo*/
-/* exported PenBlocksAPI*/
 class PenBlocksAPI {
     setColor(value) {
         const args = JSInterface.validateArgs("setColor", [value]);

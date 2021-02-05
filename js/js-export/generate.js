@@ -15,6 +15,10 @@
  * MA 02110-1335 USA.
  */
 
+/* global JSInterface, blocks, last, ASTUtils, astring */
+
+/* exported JSGenerate */
+
 /**
  * @class
  * @classdesc
@@ -26,9 +30,6 @@
  *
  * * Internal functions' names are in PascalCase.
  */
-
-/*global JSInterface, blocks, last, ASTUtils, astring*/
-/*exported JSGenerate*/
 class JSGenerate {
     /** list of the Block index numbers of all start blocks */
     static startBlocks = [];

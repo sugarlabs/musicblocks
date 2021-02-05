@@ -14,7 +14,7 @@
  * MA 02110-1335 USA.
  */
 
-/*global JSInterface*/
+/* global JSInterface */
 
 /**
  * @static

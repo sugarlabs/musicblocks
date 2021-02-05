@@ -15,6 +15,10 @@
  * MA 02110-1335 USA.
  */
 
+/* global turtles, JSInterface */
+
+/* exported DictBlocksAPI */
+
 /**
  * Class pertaining to the API methods specific to Dictionary blocks for JavaScript based Music Blocks
  * programs.
@@ -22,8 +26,6 @@
  * @class
  * @classdesc methods are imported by a importMethod function call from MusicBlocks class.
  */
-/*global turtles, JSInterface*/
-/* exported DictBlocksAPI*/
 class DictBlocksAPI {
     getDict(dict) {
         if (dict === undefined) dict = this.turIndex;

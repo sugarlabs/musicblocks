@@ -18,12 +18,12 @@
  * Internal functions' names are in PascalCase.
  */
 
+/* global JSEditor, turtles, last, importMembers, logo, Singer, JSInterface */
+
 /**
  * @class
  * @classdesc pertains to the Mouse (corresponding to Turtle) in JavaScript based Music Blocks programs.
  */
-
-/*global JSEditor, turtles, last, importMembers, logo, Singer, JSInterface*/
 class Mouse {
     /** Mouse objects in program */
     static MouseList = [];

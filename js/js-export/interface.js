@@ -17,14 +17,14 @@
  * Private members' names begin with underscore '_".
  */
 
+/* global JSEditor, SHARP, FLAT, NATURAL, DOUBLESHARP, DOUBLEFLAT */
+
+/* exported JSInterface */
+
 /**
  * @class
  * @classdesc contains the lists and lookups for relevant blocks, and utility methods to access them.
  */
-
-/*global JSEditor, SHARP, FLAT, NATURAL, DOUBLESHARP, DOUBLEFLAT */
-
-/*exported  JSInterface*/
 class JSInterface {
     /**
      * @static
@@ -378,7 +378,7 @@ class JSInterface {
                     if (!isNaN(Number(arg))) {
                         arg = Number(arg);
                     } else {
-                        const error = "TypeMismatch error: expected \"number\" but found \"string\"";
+                        const error = 'TypeMismatch error: expected "number" but found "string"';
                         JSEditor.logConsole(error, "maroon");
                         throw error;
                     }

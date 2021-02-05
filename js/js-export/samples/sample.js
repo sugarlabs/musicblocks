@@ -13,7 +13,9 @@
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
  */
-/*exported JS_API, JS_STARTER, SAMPLE_1, SAMPLE_2*/
+
+/* exported JS_API, JS_STARTER, SAMPLE_1, SAMPLE_2 */
+
 const JS_API = `/*
 ============================================================
        API
