@@ -434,6 +434,11 @@ const SOLFATTRS = [DOUBLESHARP, SHARP, NATURAL, FLAT, DOUBLEFLAT];
 //.TRANS: ordinal number. Please keep exactly one space between each number.
 const DEGREES = _("1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th");
 
+/**
+ * @public
+ * @param  {String} keySignature
+ * @returns {String}
+ */
 function getSharpFlatPreference(keySignature) {
     const obj = keySignatureToMode(keySignature);
     const obj2 = modeMapper(obj[0], obj[1]);
@@ -448,6 +453,11 @@ function getSharpFlatPreference(keySignature) {
     }
 }
 
+/**
+ * @public
+ * @param  {Number} a
+ * @returns {Number}
+ */
 function mod12(a) {
     while (a < 0) {
         a += 12;
@@ -950,6 +960,10 @@ let TEMPERAMENTS = [
     [_("custom"), "custom", "custom"]
 ];
 
+/**
+ * @public
+ * @returns {void}
+ */
 const updateTemperaments = () => {
     TEMPERAMENTS = [...INITIALTEMPERAMENTS];
     for (const i in TEMPERAMENT) {
@@ -1232,6 +1246,11 @@ const DEFAULTACCIDENTAL = "natural" + " " + NATURAL;
 
 const customMode = MUSICALMODES["custom"];
 
+/**
+ * @public
+ * @param {String} name 
+ * @returns {String}
+ */
 function getInvertMode(name) {
     for (const interval in INVERTMODES) {
         if (
@@ -1250,14 +1269,29 @@ function getInvertMode(name) {
     return name;
 }
 
+/**
+ * @public
+ * @param {String} name 
+ * @returns {Number}
+ */
 function getIntervalNumber(name) {
     return INTERVALVALUES[name][0];
 }
 
+/**
+ * @public
+ * @param {String} name 
+ * @returns {Number}
+ */
 function getIntervalDirection(name) {
     return INTERVALVALUES[name][1];
 }
 
+/**
+ * @public
+ * @param {String} name 
+ * @returns {String}
+ */
 function getModeNumbers(name) {
     __convert = function (obj) {
         let n = 0;
@@ -1280,10 +1314,15 @@ function getModeNumbers(name) {
         }
     }
 
-    console.debug(name + " not found in MUSICALMODES");
+    // console.debug(name + " not found in MUSICALMODES");
     return "";
 }
 
+/**
+ * @public
+ * @param {String} name 
+ * @returns {Number}
+ */
 function getDrumIndex(name) {
     if (name === "") {
         console.debug("getDrumName passed blank name. Returning " + DEFAULTDRUM);
@@ -1303,6 +1342,11 @@ function getDrumIndex(name) {
     return -1;
 }
 
+/**
+ * @public
+ * @param {String} name 
+ * @returns {String}
+ */
 function getDrumName(name) {
     if (name === "") {
         name = DEFAULTDRUM;
@@ -1322,6 +1366,11 @@ function getDrumName(name) {
     return null;
 }
 
+/**
+ * @public
+ * @param {String} name 
+ * @returns {String}
+ */
 function getDrumSymbol(name) {
     if (name === "") {
         return "hh";
@@ -1339,6 +1388,11 @@ function getDrumSymbol(name) {
     return "hh";
 }
 
+/**
+ * @public
+ * @param {String} name 
+ * @returns {String}
+ */
 function getFilterTypes(name) {
     if (name === "") {
         name = DEFAULTFILTERTYPE;
@@ -1351,11 +1405,15 @@ function getFilterTypes(name) {
             return FILTERTYPES[type][1];
         }
     }
-
-    console.debug(name + " not found in FILTERTYPES");
+    // console.debug(name + " not found in FILTERTYPES");
     return DEFAULTFILTERTYPE;
 }
 
+/**
+ * @public
+ * @param {String} name 
+ * @returns {String}
+ */
 function getOscillatorTypes(name) {
     if (name === "") {
         name = null; // DEFAULTOSCILLATORTYPE;
@@ -1369,10 +1427,15 @@ function getOscillatorTypes(name) {
         }
     }
 
-    console.debug(name + " not found in OSCTYPES");
+    // console.debug(name + " not found in OSCTYPES");
     return null; // DEFAULTOSCILLATORTYPE;
 }
 
+/**
+ * @public
+ * @param {String} name 
+ * @returns {String}
+ */
 function getDrumIcon(name) {
     if (name === "") {
         name = DEFAULTDRUM;
@@ -1385,14 +1448,18 @@ function getDrumIcon(name) {
             return DRUMNAMES[i][2];
         }
     }
-
     // console.debug(name + " not found in DRUMNAMES");
     return "images/drum.svg";
 }
 
+/**
+ * @public
+ * @param {String} name 
+ * @returns {String}
+ */
 function getDrumSynthName(name) {
     if (name === null || name === undefined) {
-        console.debug("getDrumSynthName passed null name. Returning null");
+        // console.debug("getDrumSynthName passed null name. Returning null");
         return null;
     } else if (name === "") {
         name = DEFAULTDRUM;
@@ -1410,6 +1477,11 @@ function getDrumSynthName(name) {
     return DEFAULTDRUM;
 }
 
+/**
+ * @public
+ * @param {String} name 
+ * @returns {String}
+ */
 function getNoiseName(name) {
     if (name === "") {
         name = DEFAULTNOISE;
@@ -1425,10 +1497,15 @@ function getNoiseName(name) {
         }
     }
 
-    console.debug(name + " not found in NOISENAMES");
+    // console.debug(name + " not found in NOISENAMES");
     return DEFAULTNOISE;
 }
 
+/**
+ * @public
+ * @param {String} name 
+ * @returns {String}
+ */
 function getNoiseIcon(name) {
     if (name === "") {
         name = DEFAULTNOISE;
@@ -1442,10 +1519,15 @@ function getNoiseIcon(name) {
         }
     }
 
-    console.debug(name + " not found in NOISENAMES");
+    // console.debug(name + " not found in NOISENAMES");
     return "images/synth.svg";
 }
 
+/**
+ * @public
+ * @param {String} name 
+ * @returns {String}
+ */
 function getNoiseSynthName(name) {
     if (name === null || name === undefined) {
         return null;
@@ -1459,10 +1541,15 @@ function getNoiseSynthName(name) {
         }
     }
 
-    console.debug(name + " not found in NOISENAMES");
+    // console.debug(name + " not found in NOISENAMES");
     return DEFAULTNOISE;
 }
 
+/**
+ * @public
+ * @param {String} name 
+ * @returns {String}
+ */
 function getVoiceName(name) {
     if (name === "") {
         name = DEFAULTVOICE;
@@ -1480,10 +1567,15 @@ function getVoiceName(name) {
         }
     }
 
-    console.debug(name + " not found in VOICENAMES");
+    // console.debug(name + " not found in VOICENAMES");
     return DEFAULTVOICE;
 }
 
+/**
+ * @public
+ * @param {String} name 
+ * @returns {String}
+ */
 function getVoiceIcon(name) {
     if (name === "") {
         name = DEFAULTVOICE;
@@ -1497,10 +1589,15 @@ function getVoiceIcon(name) {
         }
     }
 
-    console.debug(name + " not found in VOICENAMES");
+    // console.debug(name + " not found in VOICENAMES");
     return "images/voices.svg";
 }
 
+/**
+ * @public
+ * @param {String} name 
+ * @returns {String}
+ */
 function getVoiceSynthName(name) {
     if (name === null || name === undefined) {
         return null;
@@ -1516,10 +1613,15 @@ function getVoiceSynthName(name) {
         }
     }
 
-    console.debug(name + " not found in VOICENAMES");
+    // console.debug(name + " not found in VOICENAMES");
     return DEFAULTVOICE;
 }
 
+/**
+ * @public
+ * @param {String} name 
+ * @returns {String}
+ */
 function getTemperamentName(name) {
     if (name === "") {
         name = DEFAULTTEMPERAMENT;
@@ -1533,7 +1635,7 @@ function getTemperamentName(name) {
         }
     }
 
-    console.debug(name + " not found in TEMPERAMENTS");
+    // console.debug(name + " not found in TEMPERAMENTS");
     return DEFAULTTEMPERAMENT;
 }
 
@@ -1541,11 +1643,13 @@ function getTemperamentName(name) {
  * Converts the pitch value of the last note played into different formats
  * such as hertz, letter name, pitch number, et al.
  *
+ * @private
  * @param {String} type - required format: letter class, solfege syllable,
  * solfege class, pitch class, scalar class, scale degree, nth degree,
  * staff y, pitch number, pitch in hertz
  * @param {notePlayed} note - Argument which is to be converted
  * @param {tur} turtle - Current Turtle
+ * @returns {String}
  */
 
 function _calculate_pitch_number(np, tur) {
@@ -1579,132 +1683,139 @@ function _calculate_pitch_number(np, tur) {
     }
     return pitchToNumber(obj[0], obj[1], tur.singer.keySignature) - tur.singer.pitchNumberOffset;
 }
-
+/**
+ * @public
+ * @param  {String} type
+ * @param  {String} notePlayed
+ * @param  {Object} tur
+ * @returns {String}
+ */
 function getPitchInfo(type, notePlayed, tur) {
     let np = notePlayed;
     let octave;
-    try {
-        switch (type) {
-            case "letter class":
-                if (Number(np)) {
-                    [np] = frequencyToPitch(np);
-                }
-                return np[0];
-            case "solfege syllable":
-            case "solfege class":
-                if (Number(np)) {
-                    np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
-                }
-                if (type === "solfege class") {
-                    np = np.substr(0, np.length - 1);
-                }
-                np = np.replace("#", SHARP).replace("b", FLAT);
-                if (tur.singer.moveable === false) return SOLFEGECONVERSIONTABLE[np];
-                const i = _buildScale(tur.singer.keySignature)[0].indexOf(np);
-                return SOLFEGENAMES[i];
-            case "pitch class":
-                if (Number(np)) {
-                    np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
-                }
-                const num = pitchToNumber(
-                    np.substr(0, np.length - 1),
-                    np[np.length - 1],
-                    tur.singer.keySignature
-                );
-                return (num - 3) % 12;
-            case "scalar class":
-                if (Number(np)) {
-                    np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
-                }
+    switch (type) {
+        case "letter class":
+            if (Number(np)) {
+                [np] = frequencyToPitch(np);
+            }
+            return np[0];
+        case "solfege syllable":
+        case "solfege class":
+            if (Number(np)) {
+                np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
+            }
+            if (type === "solfege class") {
                 np = np.substr(0, np.length - 1);
-                np = np.replace("#", SHARP).replace("b", FLAT);
-                const scalarClass = scaleDegreeToPitchMapping(
-                    tur.singer.keySignature,
-                    null,
-                    tur.singer.moveable,
-                    np
-                );
-                return scalarClass[0];
-            case "scale degree":
-                if (Number(np)) {
-                    np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
-                }
+            }
+            np = np.replace("#", SHARP).replace("b", FLAT);
+            if (tur.singer.moveable === false) return SOLFEGECONVERSIONTABLE[np];
+            const i = _buildScale(tur.singer.keySignature)[0].indexOf(np);
+            return SOLFEGENAMES[i];
+        case "pitch class":
+            if (Number(np)) {
+                np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
+            }
+            const num = pitchToNumber(
+                np.substr(0, np.length - 1),
+                np[np.length - 1],
+                tur.singer.keySignature
+            );
+            return (num - 3) % 12;
+        case "scalar class":
+            if (Number(np)) {
+                np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
+            }
+            np = np.substr(0, np.length - 1);
+            np = np.replace("#", SHARP).replace("b", FLAT);
+            const scalarClass = scaleDegreeToPitchMapping(
+                tur.singer.keySignature,
+                null,
+                tur.singer.moveable,
+                np
+            );
+            return scalarClass[0];
+        case "scale degree":
+            if (Number(np)) {
+                np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
+            }
+            np = np.substr(0, np.length - 1);
+            np = np.replace("#", SHARP).replace("b", FLAT);
+            const scalarClass1 = scaleDegreeToPitchMapping(
+                tur.singer.keySignature,
+                null,
+                tur.singer.moveable,
+                np
+            );
+            return scalarClass1[0] + scalarClass1[1];
+        case "nth degree":
+            if (Number(np)) {
+                np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
+            }
+            np = np.substr(0, np.length - 1);
+            np = np.replace("#", SHARP).replace("b", FLAT);
+            return _buildScale(tur.singer.keySignature)[0].indexOf(np);
+        case "staff y":
+            if (Number(np)) {
+                [np, octave] = frequencyToPitch(np);
+            } else {
+                np = notePlayed[0];
+                octave = notePlayed.length === 2 ? notePlayed[1] : notePlayed[2];
+            }
+            // these numbers are subject to staff artwork
+            return (
+                ["C", "D", "E", "F", "G", "A", "B"].indexOf(np) * YSTAFFNOTEHEIGHT +
+                (octave - 4) * YSTAFFOCTAVEHEIGHT
+            );
+        case "pitch number":
+            return _calculate_pitch_number(np, tur);
+        case "pitch in hertz":
+            return logo.synth._getFrequency(np, logo.synth.changeInTemperament);
+        case "pitch to color":
+            if (Number(np)) {
+                [np, octave] = frequencyToPitch(np);
+            } else {
                 np = np.substr(0, np.length - 1);
-                np = np.replace("#", SHARP).replace("b", FLAT);
-                const scalarClass1 = scaleDegreeToPitchMapping(
-                    tur.singer.keySignature,
-                    null,
-                    tur.singer.moveable,
-                    np
-                );
-                return scalarClass1[0] + scalarClass1[1];
-            case "nth degree":
-                if (Number(np)) {
-                    np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
-                }
-                np = np.substr(0, np.length - 1);
-                np = np.replace("#", SHARP).replace("b", FLAT);
-                return _buildScale(tur.singer.keySignature)[0].indexOf(np);
-            case "staff y":
-                if (Number(np)) {
-                    [np, octave] = frequencyToPitch(np);
-                } else {
-                    np = notePlayed[0];
-                    octave = notePlayed.length === 2 ? notePlayed[1] : notePlayed[2];
-                }
-                // these numbers are subject to staff artwork
-                return (
-                    ["C", "D", "E", "F", "G", "A", "B"].indexOf(np) * YSTAFFNOTEHEIGHT +
-                    (octave - 4) * YSTAFFOCTAVEHEIGHT
-                );
-            case "pitch number":
-                return _calculate_pitch_number(np, tur);
-            case "pitch in hertz":
-                return logo.synth._getFrequency(np, logo.synth.changeInTemperament);
-            case "pitch to color":
-                if (Number(np)) {
-                    [np, octave] = frequencyToPitch(np);
-                } else {
-                    np = np.substr(0, np.length - 1);
-                }
+            }
 
-                let color = 0;
-                if (NOTESSHARP.indexOf(np) !== -1) {
-                    color = NOTESSHARP.indexOf(np) * 8.33;
-                } else if (NOTESFLAT.indexOf(np) !== -1) {
-                    color = NOTESFLAT.indexOf(np) * 8.33;
+            let color = 0;
+            if (NOTESSHARP.indexOf(np) !== -1) {
+                color = NOTESSHARP.indexOf(np) * 8.33;
+            } else if (NOTESFLAT.indexOf(np) !== -1) {
+                color = NOTESFLAT.indexOf(np) * 8.33;
+            } else {
+                if (np.includes(DOUBLESHARP)) {
+                    np = np.replace(DOUBLESHARP, "");
+                    color = (NOTESSHARP.indexOf(np) + 2) * 8.33;
+                } else if (np.includes(DOUBLEFLAT)) {
+                    np = np.replace(DOUBLEFLAT, "");
+                    color = (NOTESFLAT.indexOf(np) - 2) * 8.33;
                 } else {
-                    if (np.includes(DOUBLESHARP)) {
-                        np = np.replace(DOUBLESHARP, "");
-                        color = (NOTESSHARP.indexOf(np) + 2) * 8.33;
-                    } else if (np.includes(DOUBLEFLAT)) {
-                        np = np.replace(DOUBLEFLAT, "");
-                        color = (NOTESFLAT.indexOf(np) - 2) * 8.33;
-                    } else {
-                        console.debug("Pitch not found: " + np);
-                    }
+                    console.debug("Pitch not found: " + np);
                 }
-                return color;
-            case "pitch to shade":
-                // The expectation is a note in Hz.
-                if (Number(np)) {
-                    [np, octave] = frequencyToPitch(np);
-                } else {
-                    // But maybe it is of the form G4?
-                    octave = np[np.length - 1];
-                    if (isNaN(octave)) {
-                        octave = 4;
-                    }
+            }
+            return color;
+        case "pitch to shade":
+            // The expectation is a note in Hz.
+            if (Number(np)) {
+                [np, octave] = frequencyToPitch(np);
+            } else {
+                // But maybe it is of the form G4?
+                octave = np[np.length - 1];
+                if (isNaN(octave)) {
+                    octave = 4;
                 }
-                return octave * 12.5;
-            default:
-                return "__INVALID_INPUT__";
-        }
-    } catch {
-        console.debug("Waiting for note to play");
+            }
+            return octave * 12.5;
+        default:
+            return "__INVALID_INPUT__";
     }
 }
 
+/**
+ * @public
+ * @param {String} keySignature
+ * @returns {String}
+ */
 function keySignatureToMode(keySignature) {
     // Convert from "A Minor" to "A" and "MINOR"
     if (keySignature === "" || keySignature == null) {
@@ -1780,18 +1891,48 @@ function keySignatureToMode(keySignature) {
     }
 }
 
+/**
+ * @public
+ * @param  {String} keySignature
+ * @param  {String} pitch
+ * @param  {Number} transposition
+ * @param  {String} temperament
+ * @returns {Number}
+ */
 function getStepSizeUp(keySignature, pitch, transposition, temperament) {
     return _getStepSize(keySignature, pitch, "up", transposition, temperament);
 }
 
+/**
+ * @public
+ * @param  {String} keySignature
+ * @param  {String} pitch
+ * @param  {Number} transposition
+ * @param  {String} temperament
+ * @returns {Number}
+ */
 function getStepSizeDown(keySignature, pitch, transposition, temperament) {
     return _getStepSize(keySignature, pitch, "down", transposition, temperament);
 }
 
+/**
+ * @public
+ * @param {String} keySignature 
+ * @returns {Number}
+ */
 function getModeLength(keySignature) {
     return _buildScale(keySignature)[1].length;
 }
 
+/**
+ * @private
+ * @param  {String} keySignature
+ * @param  {String} pitch
+ * @param {String} direction
+ * @param  {Number} transposition
+ * @param  {String} temperament
+ * @returns {Number}
+ */
 function _getStepSize(keySignature, pitch, direction, transposition, temperament) {
     // Returns how many half-steps to the next note in this key.
     if (temperament === undefined) {
@@ -1912,10 +2053,15 @@ function _getStepSize(keySignature, pitch, direction, transposition, temperament
     }
 
     // Should never get here, but just in case.
-    console.debug(thisPitch + " not found");
+    // console.debug(thisPitch + " not found");
     return 0;
 }
 
+/**
+ * @private
+ * @param {String} keySignature 
+ * @returns {Array}
+ */
 function _buildScale(keySignature) {
     // FIX ME: temporary hard-coded fix to avoid errors in pitch preview
     if (keySignature == "C♭ major") {
@@ -1990,7 +2136,15 @@ function _buildScale(keySignature) {
 }
 
 // A two-way function to get pitch according to scale degree and vice versa for a chosen mode
-
+/**
+ * A two-way function to get pitch according to scale degree and vice versa for a chosen mode
+ * @public
+ * @param {String} keySignature 
+ * @param {Number} scaleDegree 
+ * @param {Boolean} moveable 
+ * @param {String} pitch 
+ * @returns {Array}
+ */
 function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
     if (pitch === null) {
         scaleDegree -= 1;
@@ -2268,6 +2422,12 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
     }
 }
 
+/**
+ * @public
+ * @param {String} keySignature 
+ * @param {Number} scaleDegree 
+ * @returns {String}
+ */
 function nthDegreeToPitch(keySignature, scaleDegree) {
     // Returns note corresponding to scale degree in current key
     // signature. Used for moveable solfege.
@@ -2287,6 +2447,11 @@ function nthDegreeToPitch(keySignature, scaleDegree) {
 // length !== 7).
 const SOLFMAPPER = ["do", "do", "re", "re", "mi", "fa", "fa", "sol", "sol", "la", "la", "ti"];
 
+/**
+ * @public
+ * @param {String} keySignature 
+ * @returns {Array}
+ */
 function getScaleAndHalfSteps(keySignature) {
     // Determine scale and half-step pattern from key signature
     const obj = keySignatureToMode(keySignature);
@@ -2353,8 +2518,15 @@ function getScaleAndHalfSteps(keySignature) {
     return [thisScale, solfege, myKeySignature, obj[1]];
 }
 
-// Relative interval (used by the Interval Block) is based on the
-// steps within the current key and mode.
+
+/**
+ * Relative interval (used by the Interval Block) is based on the steps within the current key and mode.
+ * @public
+ * @param {Number}0 interval 
+ * @param {String} keySignature 
+ * @param {Number} pitch 
+ * @returns {Number}
+ */
 function getInterval(interval, keySignature, pitch) {
     // Step size interval based on the position (pitch) in the scale
     const obj = _buildScale(keySignature);
@@ -2478,6 +2650,12 @@ function getInterval(interval, keySignature, pitch) {
     }
 }
 
+/**
+ * @public
+ * @param {Number} pitch 
+ * @param {Number} interval 
+ * @returns {Array}
+ */
 function getNoteFromInterval(pitch, interval) {
     const len = pitch.length;
     const pitch1 = pitch.substring(0, 1);
@@ -2486,7 +2664,6 @@ function getNoteFromInterval(pitch, interval) {
     const number = pitchToNumber(note1, octave1, "C major");
     const pitches = ["C", "D", "E", "F", "G", "A", "B"];
     const priorAttrs = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];
-    let majorintervalNote;
 
     function findMajorInterval(interval) {
         //For eg. If you are asked to write a major 3rd then the
@@ -2618,6 +2795,13 @@ function getNoteFromInterval(pitch, interval) {
     }
 }
 
+/**
+ * @public
+ * @param {Number} a 
+ * @param {Number} b 
+ * @param {NUmber} scale 
+ * @returns {Number}
+ */
 function calcNoteValueToDisplay(a, b, scale) {
     const noteValue = a / b;
     let noteValueToDisplay = null;
@@ -2679,6 +2863,11 @@ function calcNoteValueToDisplay(a, b, scale) {
     return noteValueToDisplay;
 }
 
+/**
+ * @public
+ * @param {Number} duration 
+ * @returns {Array}
+ */
 function durationToNoteValue(duration) {
     // returns [note value, no. of dots, tuplet factor]
 
@@ -2722,6 +2911,11 @@ function durationToNoteValue(duration) {
     return [1, 0, [duration / j, j], roundDown];
 }
 
+/**
+ * @public
+ * @param {Number} d 
+ * @returns {Array}
+ */
 function toFraction(d) {
     // Convert float to its approximate fractional representation.
     let flip = false;
@@ -2753,6 +2947,11 @@ function toFraction(d) {
     return [top, bot];
 }
 
+/**
+ * @public
+ * @param {Number} hz 
+ * @returns {Array}
+ */
 function frequencyToPitch(hz) {
     // Calculate the pitch and octave based on frequency, rounding to
     // the nearest cent.
@@ -2783,6 +2982,14 @@ function frequencyToPitch(hz) {
     return ["?", -1, 0];
 }
 
+/**
+ * @public
+ * @param {Number} i 
+ * @param {String} temperament 
+ * @param {Number} startPitch 
+ * @param {Number} offset 
+ * @returns {Array}
+ */
 function numberToPitch(i, temperament, startPitch, offset) {
     // Calculate the pitch and octave based on index.
     // We start at A0.
@@ -2791,7 +2998,6 @@ function numberToPitch(i, temperament, startPitch, offset) {
     }
 
     let n = 0;
-    let pitchnumber;
     if (i < 0) {
         while (i < 0) {
             i += 12;
@@ -2849,6 +3055,12 @@ function numberToPitch(i, temperament, startPitch, offset) {
     }
 }
 
+
+/**
+ * @public
+ * @param {Number} i 
+ * @returns {Array}
+ */
 function numberToPitchSharp(i) {
     // numbertoPitch return only flats
     // This function will return sharps.
@@ -2871,16 +3083,35 @@ function numberToPitchSharp(i) {
     }
 }
 
+/**
+ * @public
+ * @param {Number} i 
+ * @returns {Array}
+ */
 function noteToPitchOctave(note) {
     const len = note.length;
     return [note.substring(0, len - 1), Number(last(note))];
 }
 
+/**
+ * @public
+ * @param {Number} note 
+ * @param {String} keySignature 
+ * @returns {Number}
+ */
 function noteToFrequency(note, keySignature) {
     const obj = noteToPitchOctave(note);
     return pitchToFrequency(obj[0], obj[1], 0, keySignature);
 }
 
+/**
+ * @public
+ * @param {Number} pitch 
+ * @param {Number} octave 
+ * @param {Number} cents 
+ * @param {String} keySignature 
+ * @returns {Number}
+ */
 function pitchToFrequency(pitch, octave, cents, keySignature) {
     // Calculate the frequency based on pitch and octave.
     const pitchNumber = pitchToNumber(pitch, octave, keySignature);
@@ -2892,6 +3123,13 @@ function pitchToFrequency(pitch, octave, cents, keySignature) {
     }
 }
 
+/**
+ * @public
+ * @param {Number} pitch 
+ * @param {NUmber} octave 
+ * @param {String} keySignature 
+ * @returns {Number}
+ */
 function pitchToNumber(pitch, octave, keySignature) {
     // Calculate the pitch index based on pitch and octave.
     if (pitch.toUpperCase() === "R") {
@@ -2955,6 +3193,11 @@ function pitchToNumber(pitch, octave, keySignature) {
     return octave * 12 + pitchNumber - PITCHES.indexOf("A") + transposition;
 }
 
+/**
+ * @public
+ * @param {Number} note 
+ * @returns {Boolean}
+ */
 function noteIsSolfege(note) {
     if (SOLFEGECONVERSIONTABLE[note] === undefined) {
         return true;
@@ -2963,6 +3206,11 @@ function noteIsSolfege(note) {
     }
 }
 
+/**
+ * @public
+ * @param {Number} note 
+ * @returns {Number}
+ */
 function getSolfege(note) {
     // FIXME: Use mode-specific conversion.
     if (noteIsSolfege(note)) {
@@ -2972,6 +3220,11 @@ function getSolfege(note) {
     }
 }
 
+/**
+ * @public
+ * @param {Number} note 
+ * @returns {Number}
+ */
 function i18nSolfege(note) {
     // solfnotes_ is used in the interface for i18n
     const solfnotes_ = _("ti la sol fa mi re do").split(" ");
@@ -2986,6 +3239,11 @@ function i18nSolfege(note) {
     }
 }
 
+/**
+ * @public
+ * @param {Number} value
+ * @returns {Array}
+ */
 function splitScaleDegree(value) {
     if (!value) {
         return [5, NATURAL];
@@ -2996,6 +3254,11 @@ function splitScaleDegree(value) {
     return [note, attr];
 }
 
+/**
+ * @public
+ * @param {Number} value
+ * @returns {Array}
+ */
 function splitSolfege(value) {
     // Separate the pitch from any attributes, e.g., # or b
     if (value != null && typeof value === "string") {
@@ -3025,6 +3288,12 @@ function splitSolfege(value) {
     return ["sol", ""];
 }
 
+/**
+ * @public
+ * @param {Number} notename 
+ * @param {Number} octave 
+ * @returns {Number}
+ */
 function getNumber(notename, octave) {
     // Converts a note, e.g., C, and octave to a number
     let num;
@@ -3057,6 +3326,12 @@ function getNumber(notename, octave) {
     return num;
 }
 
+/**
+ * @public
+ * @param {Number} value 
+ * @param {Number} delta 
+ * @returns {Array}
+ */
 function getNumNote(value, delta) {
     // Converts from number to note
     let num = value + delta;
@@ -3072,6 +3347,14 @@ function getNumNote(value, delta) {
     return [note, octave + 1];
 }
 
+/**
+ * @public
+ * @param {Number} currentOctave
+ * @param {String} arg
+ * @param {String} lastNotePlayed
+ * @param {Number} currentNote
+ * @returns {Number}
+ */
 calcOctave = function (currentOctave, arg, lastNotePlayed, currentNote) {
     // Calculate the octave based on the current Octave and the arg,
     // which can be a number, a 'number' as a string, 'current',
@@ -3150,6 +3433,11 @@ calcOctave = function (currentOctave, arg, lastNotePlayed, currentNote) {
     }
 };
 
+/**
+ * @public
+ * @param {Number} arg
+ * @returns {Number}
+ */
 calcOctaveInterval = function (arg) {
     // Used by intervals to determine octave to use in an interval.
     let value = 0;
@@ -3184,10 +3472,21 @@ calcOctaveInterval = function (arg) {
     return value;
 };
 
+/**
+ * @public
+ * @param {Number} value
+ * @returns {Boolean} 
+ */
 function isInt(value) {
     return !isNaN(value) && parseInt(Number(value)) === value && !isNaN(parseInt(value, 10));
 }
 
+/**
+ * @public
+ * @param {Number} a
+ * @param {Number} b
+ * @returns {String} 
+ */
 function reducedFraction(a, b) {
     greatestCommonMultiple = function (a, b) {
         return b === 0 ? a : greatestCommonMultiple(b, a % b);
@@ -3202,6 +3501,11 @@ function reducedFraction(a, b) {
     }
 }
 
+/**
+ * @public
+ * @param {Number} note 
+ * @returns {String}
+ */
 function getArticulation(note) {
     return note
         .replace("do", "")
