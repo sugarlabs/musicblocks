@@ -9,19 +9,16 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-saveMxmlOutput = function(logo) {
-    console.log("data is ");
-    console.log(logo);
+/* global saveMxmlOutput:writable,voiceNum:writable */
+/* exported saveMxmlOutput */
 
-    console.log("notationStaging is");
-    console.log(logo.notationStaging);
-
+saveMxmlOutput = function (logo) {
     // temporary until I get more things sorted out
     const ignore = ["voice two", "voice one", "one voice"];
     let res = "";
     let indent = 0;
 
-    const add = function(str) {
+    const add = function (str) {
         for (let i = 0; i < indent; i++) {
             res += "    ";
         }
@@ -37,13 +34,11 @@ saveMxmlOutput = function(logo) {
     add("<part-list>");
     indent++;
 
-    let voice;
     // Why is logo.notation.notationStaging an object and not an array?
-    Object.keys(logo.notation.notationStaging).forEach(voice => {
+    Object.keys(logo.notation.notationStaging).forEach((voice) => {
         if (logo.notation.notationStaging[voice].length === 0) {
             return;
         }
-        console.log("voice is " + voice);
         voiceNum = parseInt(voice) + 1;
         add('<score-part id="P' + voiceNum + '">');
         indent++;
@@ -55,12 +50,11 @@ saveMxmlOutput = function(logo) {
     add("</part-list>");
     indent--;
 
-    Object.keys(logo.notation.notationStaging).forEach(voice => {
+    Object.keys(logo.notation.notationStaging).forEach((voice) => {
         if (logo.notation.notationStaging[voice].length === 0) {
             return;
         }
         voiceNum = parseInt(voice) + 1;
-        console.log("hello");
         indent++;
         add('<part id="P' + voiceNum + '">');
         indent++;
@@ -81,10 +75,6 @@ saveMxmlOutput = function(logo) {
         indent++;
         let divisionsLeft = divisions;
         const notes = logo.notation.notationStaging[voice];
-
-        console.log(notes);
-        const cnter = 0;
-        console.log(notes.length);
 
         for (let i = 0; i < notes.length; i += 1) {
             // obj = [note, duration, dotCount, tupletValue, roundDown, insideChord, staccato]
@@ -162,34 +152,19 @@ saveMxmlOutput = function(logo) {
 
                 // divisions per beat == how many 1/32 notes fit in one beat?
                 newDivisions = newBeats * (1 / newBeatType / (1 / 32));
-                console.log("newDivisions is " + newDivisions);
                 i += 2;
                 beatsChanged = true;
                 continue;
             }
-            // cnter++;
-            // if(cnter > 10) break;
-            console.log(obj);
-
-            console.log("i is " + i);
 
             // We only add </chord> tag to the non-first elements in a chord
             let isChordNote = false;
             for (const p of obj[0]) {
-                console.log("pitch is " + obj[0][0]);
-                console.log("type of duration note is " + obj[1]);
-                console.log("number of dots is " + obj[2]);
-
                 let dur = 32 / obj[1];
                 for (let j = 0; j < obj[2]; j++) dur += dur / 2;
 
                 if (divisionsLeft < dur && !isChordNote) {
                     if (openedMeasureTag) {
-                        console.log(
-                            "adding closing measure tag to voice " + voiceNum
-                        );
-                        console.log("data is now");
-                        console.log(res);
                         // throw "big chungus";
                         add("</measure>");
                         currMeasure++;
@@ -218,7 +193,6 @@ saveMxmlOutput = function(logo) {
                             beatType = newBeatType;
                             divisions = newDivisions;
                             divisionsLeft = divisions;
-                            console.log("newdivisions is nows " + newDivisions);
                             add(
                                 '<measure number="' +
                                     currMeasure +
@@ -252,8 +226,6 @@ saveMxmlOutput = function(logo) {
                 } else {
                     alter = 0; // no accidental
                 }
-
-                console.log("alter is " + alter);
 
                 add("<note>");
                 indent++;
@@ -327,22 +299,14 @@ saveMxmlOutput = function(logo) {
     // Filter voices
     let mi = 1e5;
     for (let i = 0; i < res.length - 1; i++) {
-        if (
-            (res[i] === "P" || res[i] === "#") &&
-            "123456789".includes(res[i + 1])
-        ) {
+        if ((res[i] === "P" || res[i] === "#") && "123456789".includes(res[i + 1])) {
             mi = Math.min(mi, parseInt(res[i + 1]));
         }
     }
 
-    console.log("mi is " + mi);
     res = res.split("");
     for (let i = 0; i < res.length - 1; i++) {
-        if (
-            (res[i] === "P" || res[i] === "#") &&
-            "123456789".includes(res[i + 1])
-        ) {
-            console.log("replacing");
+        if ((res[i] === "P" || res[i] === "#") && "123456789".includes(res[i + 1])) {
             res[i + 1] = parseInt(res[i + 1]) - mi + 1;
         }
     }
