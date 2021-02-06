@@ -9,8 +9,9 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/*global _,modeMapper,DRUMNAMES,VOICENAMES,NOISENAMES,last,logo,INVALIDPITCH,blk,last,
-pitchNumber,stepUpCurrentNote,stepDownCurrentNote,calcOctave,calcOctaveInterval,greatestCommonMultiple,notesFlat2,i,convertFactor,modeMapper */
+/*global _,modeMapper:writable,DRUMNAMES,VOICENAMES,NOISENAMES,last,logo,INVALIDPITCH,blk,last,myKeySignature:writable,
+pitchNumber:writable,stepUpCurrentNote:writable,stepDownCurrentNote:writable,calcOctave:writable,calcOctaveInterval,
+greatestCommonMultiple:writable,notesFlat2,i:writable,convertFactor:writable,modeMapper:writable */
 
 // Scalable sinewave graphic
 const SYNTHSVG =
@@ -2036,6 +2037,35 @@ function getNumber(notename, octave) {
     return num;
 }
 
+function numberToPitch(i, temperament, startPitch, offset);
+
+/**
+ * @public
+ * @param {Number} i
+ * @returns {Array}
+ */
+function numberToPitchSharp(i) {
+    // numbertoPitch return only flats
+    // This function will return sharps.
+    if (i < 0) {
+        let n = 0;
+        while (i < 0) {
+            i += 12;
+            n += 1;
+        }
+
+        return [
+            PITCHES2[(i + PITCHES2.indexOf("A")) % 12],
+            Math.floor((i + PITCHES2.indexOf("A")) / 12) - n
+        ];
+    } else {
+        return [
+            PITCHES2[(i + PITCHES2.indexOf("A")) % 12],
+            Math.floor((i + PITCHES2.indexOf("A")) / 12)
+        ];
+    }
+}
+
 /**
  * @public
  * @param {Number} pitch
@@ -2189,7 +2219,7 @@ function getNoteFromInterval(pitch, interval) {
  * @param {Number} offset
  * @returns {Array}
  */
-function numberToPitch(i, temperament, startPitch, offset) {
+numberToPitch = function(i, temperament, startPitch, offset){
     // Calculate the pitch and octave based on index.
     // We start at A0.
     if (temperament === undefined) {
@@ -2251,33 +2281,6 @@ function numberToPitch(i, temperament, startPitch, offset) {
     } else {
         interval = TEMPERAMENT[temperament]["interval"][pitchNumber];
         return getNoteFromInterval(startPitch, interval);
-    }
-}
-
-/**
- * @public
- * @param {Number} i
- * @returns {Array}
- */
-function numberToPitchSharp(i) {
-    // numbertoPitch return only flats
-    // This function will return sharps.
-    if (i < 0) {
-        let n = 0;
-        while (i < 0) {
-            i += 12;
-            n += 1;
-        }
-
-        return [
-            PITCHES2[(i + PITCHES2.indexOf("A")) % 12],
-            Math.floor((i + PITCHES2.indexOf("A")) / 12) - n
-        ];
-    } else {
-        return [
-            PITCHES2[(i + PITCHES2.indexOf("A")) % 12],
-            Math.floor((i + PITCHES2.indexOf("A")) / 12)
-        ];
     }
 }
 
@@ -3899,17 +3902,6 @@ function noteToPitchOctave(note) {
 
 /**
  * @public
- * @param {Number} note
- * @param {String} keySignature
- * @returns {Number}
- */
-function noteToFrequency(note, keySignature) {
-    const obj = noteToPitchOctave(note);
-    return pitchToFrequency(obj[0], obj[1], 0, keySignature);
-}
-
-/**
- * @public
  * @param {Number} pitch
  * @param {Number} octave
  * @param {Number} cents
@@ -3925,6 +3917,17 @@ function pitchToFrequency(pitch, octave, cents, keySignature) {
     } else {
         return A0 * Math.pow(TWELVEHUNDRETHROOT2, pitchNumber * 100 + cents);
     }
+}
+
+/**
+ * @public
+ * @param {Number} note
+ * @param {String} keySignature
+ * @returns {Number}
+ */
+function noteToFrequency(note, keySignature) {
+    const obj = noteToPitchOctave(note);
+    return pitchToFrequency(obj[0], obj[1], 0, keySignature);
 }
 
 /**
