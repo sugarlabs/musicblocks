@@ -10,9 +10,15 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 //A dropdown for selecting language
+
+/*
+   global _, language:writable
+*/
+
+/* exported LanguageBox */
 class LanguageBox {
     language = localStorage.languagePreference;
-    
+
     constructor() {
         this._message = null;
     }
@@ -112,17 +118,14 @@ class LanguageBox {
             "onMouseOut='this.style.opacity = 1'>";
         const MSGSuffix = "</a>";
         const MSG = {
-            default: _(
-                "Refresh your browser to change your language preference."
-            ),
+            default: _("Refresh your browser to change your language preference."),
             enUS: "Refresh your browser to change your language preference.",
             enUK: "Refresh your browser to change your language preference.",
             ja: "言語を変えるには、ブラウザをこうしんしてください。",
             kana: "げんごを かえるには、ブラウザを こうしんしてください。",
             ko: "언어 기본 설정을 변경하려면 브라우저를 새로 고치십시오.",
             es: "Actualice su navegador para cambiar su preferencia de idioma.",
-            pt:
-                "Atualize seu navegador para alterar sua preferência de idioma.",
+            pt: "Atualize seu navegador para alterar sua preferência de idioma.",
             zhCN: "刷新浏览器以更改您的语言偏好",
             th: "รีเฟรชเบราเซอร์เพื่อเปลี่ยนการตั้งค่าภาษาของคุณ",
             hi: "अपनी भाषा की वरीयता बदलने के लिए अपना ब्राउज़र ताज़ा करें",
@@ -135,7 +138,7 @@ class LanguageBox {
         };
 
         localStorage.languagePreference = language;
-        console.debug(language);
+        // console.debug(language);
         if (language === "ja" && localStorage.kanaPreference === "kana") {
             this._message(MSGPrefix + MSG["kana"] + MSGSuffix);
         } else {
