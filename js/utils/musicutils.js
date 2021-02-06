@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/*global _,modeMapper,DRUMNAMES,VOICENAMES,NOISENAMES,last,logo,INVALIDPITCH,blk,last,myKeySignature,
+/*global _,modeMapper,DRUMNAMES,VOICENAMES,NOISENAMES,last,logo,INVALIDPITCH,blk,last,
 pitchNumber,stepUpCurrentNote,stepDownCurrentNote,calcOctave,calcOctaveInterval,greatestCommonMultiple,notesFlat2,i,convertFactor,modeMapper */
 
 // Scalable sinewave graphic
@@ -1190,6 +1190,12 @@ let PreDefinedTemperaments = {
     "1/4 comma meantone": true
 };
 
+
+// Approximate mapping of mode to solfege (Used by modes where the
+// length !== 7).
+const SOLFMAPPER = ["do", "do", "re", "re", "mi", "fa", "fa", "sol", "sol", "la", "la", "ti"];
+
+
 /**
  * @public
  * @param {String} keySignature
@@ -1994,6 +2000,44 @@ function pitchToNumber(pitch, octave, keySignature) {
 
 /**
  * @public
+ * @param {Number} notename
+ * @param {Number} octave
+ * @returns {Number}
+ */
+function getNumber(notename, octave) {
+    // Converts a note, e.g., C, and octave to a number
+    let num;
+    if (octave < 0) {
+        num = 0;
+    } else if (octave > 10) {
+        num = 9 * 12;
+    } else {
+        num = 12 * (octave - 1);
+    }
+
+    notename = String(notename);
+    if (notename.substring(0, 1) in NOTESTEP) {
+        num += NOTESTEP[notename.substring(0, 1)];
+        if (notename.length >= 1) {
+            let delta;
+            delta = notename.substring(1);
+            if (delta === "bb" || delta === DOUBLEFLAT) {
+                num -= 2;
+            } else if (delta === "##" || delta === "*" || delta === DOUBLESHARP) {
+                num += 2;
+            } else if (delta === "b" || delta === FLAT) {
+                num -= 1;
+            } else if (delta === "#" || delta === SHARP) {
+                num += 1;
+            }
+        }
+    }
+
+    return num;
+}
+
+/**
+ * @public
  * @param {Number} pitch
  * @param {Number} interval
  * @returns {Array}
@@ -2235,44 +2279,6 @@ function numberToPitchSharp(i) {
             Math.floor((i + PITCHES2.indexOf("A")) / 12)
         ];
     }
-}
-
-/**
- * @public
- * @param {Number} notename
- * @param {Number} octave
- * @returns {Number}
- */
-function getNumber(notename, octave) {
-    // Converts a note, e.g., C, and octave to a number
-    let num;
-    if (octave < 0) {
-        num = 0;
-    } else if (octave > 10) {
-        num = 9 * 12;
-    } else {
-        num = 12 * (octave - 1);
-    }
-
-    notename = String(notename);
-    if (notename.substring(0, 1) in NOTESTEP) {
-        num += NOTESTEP[notename.substring(0, 1)];
-        if (notename.length >= 1) {
-            let delta;
-            delta = notename.substring(1);
-            if (delta === "bb" || delta === DOUBLEFLAT) {
-                num -= 2;
-            } else if (delta === "##" || delta === "*" || delta === DOUBLESHARP) {
-                num += 2;
-            } else if (delta === "b" || delta === FLAT) {
-                num -= 1;
-            } else if (delta === "#" || delta === SHARP) {
-                num += 1;
-            }
-        }
-    }
-
-    return num;
 }
 
 /**
@@ -3577,10 +3583,6 @@ function nthDegreeToPitch(keySignature, scaleDegree) {
     scaleDegree %= scale.length - 1;
     return scale[scaleDegree];
 }
-
-// Approximate mapping of mode to solfege (Used by modes where the
-// length !== 7).
-const SOLFMAPPER = ["do", "do", "re", "re", "mi", "fa", "fa", "sol", "sol", "la", "la", "ti"];
 
 /**
  * Relative interval (used by the Interval Block) is based on the steps within the current key and mode.
