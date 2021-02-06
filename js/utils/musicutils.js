@@ -1248,7 +1248,7 @@ const customMode = MUSICALMODES["custom"];
 
 /**
  * @public
- * @param {String} name 
+ * @param {String} name
  * @returns {String}
  */
 function getInvertMode(name) {
@@ -1265,13 +1265,13 @@ function getInvertMode(name) {
         }
     }
 
-    console.debug(name + " not found in INVERTMODES");
+    // console.debug(name + " not found in INVERTMODES");
     return name;
 }
 
 /**
  * @public
- * @param {String} name 
+ * @param {String} name
  * @returns {Number}
  */
 function getIntervalNumber(name) {
@@ -1280,7 +1280,7 @@ function getIntervalNumber(name) {
 
 /**
  * @public
- * @param {String} name 
+ * @param {String} name
  * @returns {Number}
  */
 function getIntervalDirection(name) {
@@ -1289,7 +1289,7 @@ function getIntervalDirection(name) {
 
 /**
  * @public
- * @param {String} name 
+ * @param {String} name
  * @returns {String}
  */
 function getModeNumbers(name) {
@@ -1320,12 +1320,12 @@ function getModeNumbers(name) {
 
 /**
  * @public
- * @param {String} name 
+ * @param {String} name
  * @returns {Number}
  */
 function getDrumIndex(name) {
     if (name === "") {
-        console.debug("getDrumName passed blank name. Returning " + DEFAULTDRUM);
+        // console.debug("getDrumName passed blank name. Returning " + DEFAULTDRUM);
         name = DEFAULTDRUM;
     } else if (name.slice(0, 4) === "http") {
         name = DEFAULTDRUM;
@@ -1344,7 +1344,7 @@ function getDrumIndex(name) {
 
 /**
  * @public
- * @param {String} name 
+ * @param {String} name
  * @returns {String}
  */
 function getDrumName(name) {
@@ -1368,7 +1368,7 @@ function getDrumName(name) {
 
 /**
  * @public
- * @param {String} name 
+ * @param {String} name
  * @returns {String}
  */
 function getDrumSymbol(name) {
@@ -1390,7 +1390,7 @@ function getDrumSymbol(name) {
 
 /**
  * @public
- * @param {String} name 
+ * @param {String} name
  * @returns {String}
  */
 function getFilterTypes(name) {
@@ -1411,7 +1411,7 @@ function getFilterTypes(name) {
 
 /**
  * @public
- * @param {String} name 
+ * @param {String} name
  * @returns {String}
  */
 function getOscillatorTypes(name) {
@@ -1433,7 +1433,7 @@ function getOscillatorTypes(name) {
 
 /**
  * @public
- * @param {String} name 
+ * @param {String} name
  * @returns {String}
  */
 function getDrumIcon(name) {
@@ -1454,7 +1454,7 @@ function getDrumIcon(name) {
 
 /**
  * @public
- * @param {String} name 
+ * @param {String} name
  * @returns {String}
  */
 function getDrumSynthName(name) {
@@ -1479,7 +1479,7 @@ function getDrumSynthName(name) {
 
 /**
  * @public
- * @param {String} name 
+ * @param {String} name
  * @returns {String}
  */
 function getNoiseName(name) {
@@ -1503,7 +1503,7 @@ function getNoiseName(name) {
 
 /**
  * @public
- * @param {String} name 
+ * @param {String} name
  * @returns {String}
  */
 function getNoiseIcon(name) {
@@ -1525,7 +1525,7 @@ function getNoiseIcon(name) {
 
 /**
  * @public
- * @param {String} name 
+ * @param {String} name
  * @returns {String}
  */
 function getNoiseSynthName(name) {
@@ -1547,7 +1547,7 @@ function getNoiseSynthName(name) {
 
 /**
  * @public
- * @param {String} name 
+ * @param {String} name
  * @returns {String}
  */
 function getVoiceName(name) {
@@ -1573,7 +1573,7 @@ function getVoiceName(name) {
 
 /**
  * @public
- * @param {String} name 
+ * @param {String} name
  * @returns {String}
  */
 function getVoiceIcon(name) {
@@ -1595,7 +1595,7 @@ function getVoiceIcon(name) {
 
 /**
  * @public
- * @param {String} name 
+ * @param {String} name
  * @returns {String}
  */
 function getVoiceSynthName(name) {
@@ -1619,7 +1619,7 @@ function getVoiceSynthName(name) {
 
 /**
  * @public
- * @param {String} name 
+ * @param {String} name
  * @returns {String}
  */
 function getTemperamentName(name) {
@@ -1676,7 +1676,7 @@ function _calculate_pitch_number(np, tur) {
         );
     } else {
         if (tur.singer.lastNotePlayed !== null) {
-            console.debug("Cannot find a note ");
+            // console.debug("Cannot find a note ");
             logo.errorMsg(INVALIDPITCH, blk);
         }
         obj = ["G", 4];
@@ -1790,7 +1790,7 @@ function getPitchInfo(type, notePlayed, tur) {
                     np = np.replace(DOUBLEFLAT, "");
                     color = (NOTESFLAT.indexOf(np) - 2) * 8.33;
                 } else {
-                    console.debug("Pitch not found: " + np);
+                    // console.debug("Pitch not found: " + np);
                 }
             }
             return color;
@@ -1854,7 +1854,7 @@ function keySignatureToMode(keySignature) {
         parts = keySignature.split(" ");
         key = "B" + SHARP;
     } else if (NOTESSHARP.indexOf(key) === -1 && NOTESFLAT.indexOf(key) === -1) {
-        console.debug("Invalid key or missing name; reverting to C.");
+        // console.debug("Invalid key or missing name; reverting to C.");
         // Is is possible that the key was left out?
         keySignature = "C " + keySignature;
         parts = keySignature.split(" ");
@@ -1886,7 +1886,7 @@ function keySignatureToMode(keySignature) {
     if (mode in MUSICALMODES) {
         return [key, mode];
     } else {
-        console.debug("Invalid mode name: " + mode + " reverting to major.");
+        // console.debug("Invalid mode name: " + mode + " reverting to major.");
         return [key, "major"];
     }
 }
@@ -1917,7 +1917,7 @@ function getStepSizeDown(keySignature, pitch, transposition, temperament) {
 
 /**
  * @public
- * @param {String} keySignature 
+ * @param {String} keySignature
  * @returns {Number}
  */
 function getModeLength(keySignature) {
@@ -2059,7 +2059,7 @@ function _getStepSize(keySignature, pitch, direction, transposition, temperament
 
 /**
  * @private
- * @param {String} keySignature 
+ * @param {String} keySignature
  * @returns {Array}
  */
 function _buildScale(keySignature) {
@@ -2139,10 +2139,10 @@ function _buildScale(keySignature) {
 /**
  * A two-way function to get pitch according to scale degree and vice versa for a chosen mode
  * @public
- * @param {String} keySignature 
- * @param {Number} scaleDegree 
- * @param {Boolean} moveable 
- * @param {String} pitch 
+ * @param {String} keySignature
+ * @param {Number} scaleDegree
+ * @param {Boolean} moveable
+ * @param {String} pitch
  * @returns {Array}
  */
 function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
@@ -2389,7 +2389,7 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
                             finalScale.push(chosenModeScale[i]);
                         }
                     default:
-                        console.debug("No case for " + semitones[i]);
+                        // console.debug("No case for " + semitones[i]);
                         break;
                 }
             }
@@ -2424,8 +2424,8 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
 
 /**
  * @public
- * @param {String} keySignature 
- * @param {Number} scaleDegree 
+ * @param {String} keySignature
+ * @param {Number} scaleDegree
  * @returns {String}
  */
 function nthDegreeToPitch(keySignature, scaleDegree) {
@@ -2449,7 +2449,7 @@ const SOLFMAPPER = ["do", "do", "re", "re", "mi", "fa", "fa", "sol", "sol", "la"
 
 /**
  * @public
- * @param {String} keySignature 
+ * @param {String} keySignature
  * @returns {Array}
  */
 function getScaleAndHalfSteps(keySignature) {
@@ -2518,13 +2518,12 @@ function getScaleAndHalfSteps(keySignature) {
     return [thisScale, solfege, myKeySignature, obj[1]];
 }
 
-
 /**
  * Relative interval (used by the Interval Block) is based on the steps within the current key and mode.
  * @public
- * @param {Number}0 interval 
- * @param {String} keySignature 
- * @param {Number} pitch 
+ * @param {Number}0 interval
+ * @param {String} keySignature
+ * @param {Number} pitch
  * @returns {Number}
  */
 function getInterval(interval, keySignature, pitch) {
@@ -2620,7 +2619,7 @@ function getInterval(interval, keySignature, pitch) {
                     ii = scale.indexOf(pitch);
                 } else {
                     // Should never happen.
-                    console.debug(pitch + " not found");
+                    // console.debug(pitch + " not found");
                     return 0;
                 }
             }
@@ -2652,8 +2651,8 @@ function getInterval(interval, keySignature, pitch) {
 
 /**
  * @public
- * @param {Number} pitch 
- * @param {Number} interval 
+ * @param {Number} pitch
+ * @param {Number} interval
  * @returns {Array}
  */
 function getNoteFromInterval(pitch, interval) {
@@ -2797,9 +2796,9 @@ function getNoteFromInterval(pitch, interval) {
 
 /**
  * @public
- * @param {Number} a 
- * @param {Number} b 
- * @param {NUmber} scale 
+ * @param {Number} a
+ * @param {Number} b
+ * @param {NUmber} scale
  * @returns {Number}
  */
 function calcNoteValueToDisplay(a, b, scale) {
@@ -2865,7 +2864,7 @@ function calcNoteValueToDisplay(a, b, scale) {
 
 /**
  * @public
- * @param {Number} duration 
+ * @param {Number} duration
  * @returns {Array}
  */
 function durationToNoteValue(duration) {
@@ -2913,7 +2912,7 @@ function durationToNoteValue(duration) {
 
 /**
  * @public
- * @param {Number} d 
+ * @param {Number} d
  * @returns {Array}
  */
 function toFraction(d) {
@@ -2949,7 +2948,7 @@ function toFraction(d) {
 
 /**
  * @public
- * @param {Number} hz 
+ * @param {Number} hz
  * @returns {Array}
  */
 function frequencyToPitch(hz) {
@@ -2978,16 +2977,16 @@ function frequencyToPitch(hz) {
         }
     }
 
-    console.debug("Could not find note/octave/cents for " + hz);
+    // console.debug("Could not find note/octave/cents for " + hz);
     return ["?", -1, 0];
 }
 
 /**
  * @public
- * @param {Number} i 
- * @param {String} temperament 
- * @param {Number} startPitch 
- * @param {Number} offset 
+ * @param {Number} i
+ * @param {String} temperament
+ * @param {Number} startPitch
+ * @param {Number} offset
  * @returns {Array}
  */
 function numberToPitch(i, temperament, startPitch, offset) {
@@ -3055,10 +3054,9 @@ function numberToPitch(i, temperament, startPitch, offset) {
     }
 }
 
-
 /**
  * @public
- * @param {Number} i 
+ * @param {Number} i
  * @returns {Array}
  */
 function numberToPitchSharp(i) {
@@ -3085,7 +3083,7 @@ function numberToPitchSharp(i) {
 
 /**
  * @public
- * @param {Number} i 
+ * @param {Number} i
  * @returns {Array}
  */
 function noteToPitchOctave(note) {
@@ -3095,8 +3093,8 @@ function noteToPitchOctave(note) {
 
 /**
  * @public
- * @param {Number} note 
- * @param {String} keySignature 
+ * @param {Number} note
+ * @param {String} keySignature
  * @returns {Number}
  */
 function noteToFrequency(note, keySignature) {
@@ -3106,10 +3104,10 @@ function noteToFrequency(note, keySignature) {
 
 /**
  * @public
- * @param {Number} pitch 
- * @param {Number} octave 
- * @param {Number} cents 
- * @param {String} keySignature 
+ * @param {Number} pitch
+ * @param {Number} octave
+ * @param {Number} cents
+ * @param {String} keySignature
  * @returns {Number}
  */
 function pitchToFrequency(pitch, octave, cents, keySignature) {
@@ -3125,9 +3123,9 @@ function pitchToFrequency(pitch, octave, cents, keySignature) {
 
 /**
  * @public
- * @param {Number} pitch 
- * @param {NUmber} octave 
- * @param {String} keySignature 
+ * @param {Number} pitch
+ * @param {NUmber} octave
+ * @param {String} keySignature
  * @returns {Number}
  */
 function pitchToNumber(pitch, octave, keySignature) {
@@ -3185,7 +3183,7 @@ function pitchToNumber(pitch, octave, keySignature) {
         if (obj[1].indexOf(pitch.toLowerCase()) !== -1) {
             pitchNumber = obj[1].indexOf(pitch.toLowerCase());
         } else {
-            console.debug("pitch " + pitch + " not found.");
+            // console.debug("pitch " + pitch + " not found.");
             pitchNumber = 0;
         }
     }
@@ -3195,7 +3193,7 @@ function pitchToNumber(pitch, octave, keySignature) {
 
 /**
  * @public
- * @param {Number} note 
+ * @param {Number} note
  * @returns {Boolean}
  */
 function noteIsSolfege(note) {
@@ -3208,7 +3206,7 @@ function noteIsSolfege(note) {
 
 /**
  * @public
- * @param {Number} note 
+ * @param {Number} note
  * @returns {Number}
  */
 function getSolfege(note) {
@@ -3222,7 +3220,7 @@ function getSolfege(note) {
 
 /**
  * @public
- * @param {Number} note 
+ * @param {Number} note
  * @returns {Number}
  */
 function i18nSolfege(note) {
@@ -3290,8 +3288,8 @@ function splitSolfege(value) {
 
 /**
  * @public
- * @param {Number} notename 
- * @param {Number} octave 
+ * @param {Number} notename
+ * @param {Number} octave
  * @returns {Number}
  */
 function getNumber(notename, octave) {
@@ -3328,8 +3326,8 @@ function getNumber(notename, octave) {
 
 /**
  * @public
- * @param {Number} value 
- * @param {Number} delta 
+ * @param {Number} value
+ * @param {Number} delta
  * @returns {Array}
  */
 function getNumNote(value, delta) {
@@ -3427,7 +3425,7 @@ calcOctave = function (currentOctave, arg, lastNotePlayed, currentNote) {
                     return Math.floor(Number(arg));
                 }
             } catch (e) {
-                console.debug("cannot convert " + arg + " to a number");
+                // console.debug("cannot convert " + arg + " to a number");
                 return currentOctave;
             }
     }
@@ -3464,7 +3462,7 @@ calcOctaveInterval = function (arg) {
             value = -2;
             break;
         default:
-            console.debug("Interval octave must be between -2 and 2.");
+            // console.debug("Interval octave must be between -2 and 2.");
             value = 0;
             break;
     }
@@ -3475,7 +3473,7 @@ calcOctaveInterval = function (arg) {
 /**
  * @public
  * @param {Number} value
- * @returns {Boolean} 
+ * @returns {Boolean}
  */
 function isInt(value) {
     return !isNaN(value) && parseInt(Number(value)) === value && !isNaN(parseInt(value, 10));
@@ -3485,7 +3483,7 @@ function isInt(value) {
  * @public
  * @param {Number} a
  * @param {Number} b
- * @returns {String} 
+ * @returns {String}
  */
 function reducedFraction(a, b) {
     greatestCommonMultiple = function (a, b) {
@@ -3503,7 +3501,7 @@ function reducedFraction(a, b) {
 
 /**
  * @public
- * @param {String} note 
+ * @param {String} note
  * @returns {String}
  */
 function getArticulation(note) {
@@ -3526,7 +3524,7 @@ function getArticulation(note) {
 
 /**
  * @public
- * @param {Array} notes 
+ * @param {Array} notes
  * @return {Array}
  */
 function getCustomNote(notes) {
@@ -3572,7 +3570,7 @@ function getCustomNote(notes) {
 
 /**
  * @public
- * @param {String} temperament 
+ * @param {String} temperament
  * @returns {Boolean}
  */
 let isCustom = (temperament) => {
@@ -3581,7 +3579,7 @@ let isCustom = (temperament) => {
 
 /**
  * @public
- * @param {Number} note 
+ * @param {Number} note
  * @returns {Array}
  */
 function noteToObj(note) {
@@ -3596,7 +3594,7 @@ function noteToObj(note) {
 
 /**
  * @public
- * @param {String} note 
+ * @param {String} note
  * @returns {String}
  */
 function convertFromSolfege(note) {
@@ -3751,13 +3749,13 @@ function getNote(
                 // Ensure it is a valid key signature.
                 offset = thisScale.indexOf(myKeySignature);
                 if (offset === -1) {
-                    console.debug(
-                        "WARNING: Key " +
-                            myKeySignature +
-                            " not found in " +
-                            thisScale +
-                            ". Using default of C"
-                    );
+                    // console.debug(
+                    //     "WARNING: Key " +
+                    //         myKeySignature +
+                    //         " not found in " +
+                    //         thisScale +
+                    //         ". Using default of C"
+                    // );
                     offset = 0;
                     thisScale = NOTESSHARP;
                 }
@@ -3913,11 +3911,11 @@ function getNote(
 
                 note = thisScale[index];
             } else {
-                console.debug(solfegePart);
-                console.debug(halfSteps.indexOf(noteArg));
-                console.debug(
-                    "WARNING: Note [" + noteArg + "] not found in " + halfSteps + ". Returning REST"
-                );
+                // console.debug(solfegePart);
+                // console.debug(halfSteps.indexOf(noteArg));
+                // console.debug(
+                //     "WARNING: Note [" + noteArg + "] not found in " + halfSteps + ". Returning REST"
+                // );
                 if (errorMsg != undefined) {
                     errorMsg(INVALIDPITCH, null);
                 }
@@ -3969,7 +3967,7 @@ function getNote(
 
                     note = NOTESFLAT[i];
                 } else {
-                    console.debug("note not found? " + note);
+                    // console.debug("note not found? " + note);
                 }
             } else if (deltaNote < 0) {
                 if (NOTESFLAT.indexOf(note) !== -1) {
@@ -3997,7 +3995,7 @@ function getNote(
 
                     note = NOTESSHARP[i];
                 } else {
-                    console.debug("note not found? " + note);
+                    // console.debug("note not found? " + note);
                 }
             }
         }
