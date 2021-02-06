@@ -15,6 +15,41 @@
 // (https://github.com/walterbender/turtleart), but implemented from
 // scratch. -- Walter Bender, October 2014.
 
+/* global  platform, platformColor, LEADING:writable, _THIS_IS_MUSIC_BLOCKS_:writable, _THIS_IS_TURTLE_BLOCKS_:writable,
+  FB, js:writable, fjs:writable, scrollBlockContainer:writable, beginnerMode:writable, lang:writable, 
+  MYDEFINES:writable, createDefaultStack, docById, canvas:writable, TITLESTRING, fileChooser:writable, pluginChooser:writable, 
+  createHelpContent, allFilesChooser:writable, auxToolbar:writable, stage:writable, turtles:writable, blocks:writable, 
+  logo:writable, pasteBox:writable, languageBox:writable, planet:writable, p:writable, blockscale:writable, macroDict:writable, 
+  stageX:writable, stageY:writable, palettes:writable, buttonsVisible:writable, headerContainer:writable, menuButtonsVisible:writable,
+  storage:writable, currentKeyCode:writable, merging:writable, smallerContainer:writable, loading:writable, resizeDebounce:writable, 
+  searchWidget:writable, _, progressBar:writable, collapseBlocksContainer:writable, createjs, paste:writable, toolbarHeight:writable,
+  PALETTEFILLCOLORS, PALETTESTROKECOLORS, GOHOMEBUTTON, GOHOMEFADEDBUTTON, changeImage, largerContainer:writable, 
+  hideBlocksContainer:writable,  PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS, BLOCKSCALES:writable, onXO:writable, 
+  onscreenButtons:writable, firstRun:writable,  onscreenMenu:writable, _findBlocks:writable, _changeBlockVisibility:writable, 
+  hideDOMLabel, blocksContainer:writable, STANDARDBLOCKHEIGHT, boundary:writable, setHomeContainers:writable, __saveHelpBlock, 
+  sendAllToTrash:writable,  DEFAULTBLOCKSCALE, getMacroExpansion, save:writable, _saveHelpBlocks:writable, __saveHelpBlock:writable, 
+  _printBlockSVG:writable, SPECIALINPUTS, INLINECOLLAPSIBLES, EXPANDBUTTON, COLLAPSEBUTTON, TURTLESVG, FILLCOLORS, STROKECOLORS, 
+  _allClear:writable, hideMsgs:writable, hideGrids:writable, DEFAULTDELAY, TURTLESTEP, textMsg:writable, _doStepButton:writable, 
+  __generateSetKeyBlocks:writable, doSwitchMode:writable, chooseKeyMenu:writable, wheelnav, slicePath, modes:writable, getNote, 
+  SHARP, FLAT, DEFAULTVOICE, Singer, DEFAULTVOLUME, doSmallerBlocks:writable, setSmallerLargerStatus:writable, doLargerBlocks:writable, 
+  SMALLERBUTTON, SMALLERDISABLEBUTTON, BIGGERBUTTON,BIGGERDISABLEBUTTON, _showHideAuxMenu:writable, deletePlugin:writable, 
+  _hideCartesian:writable, _hidePolar:writable, _hideTreble:writable, _hideGrand:writable, _hideSoprano:writable, 
+  _hideTenor:writable, stageMouseDown:writable, update:writable, _hideAlto:writable, _hideBass:writable, MSGBLOCK, _makeErrorArtwork:writable, 
+  i:writable, searchBlockPosition:writable, deprecatedBlockNames:writable, prepSearchWidget:writable, hideSearchWidget:writable, docByClass, 
+  doSearch:writable, jQuery, showSearchWidget:writable,__makeNewNote:writable, pasted:writable, turtleContainer:writable, trashcan:writable, 
+  _setupPaletteMenu:writable, _restoreTrash:writable, _afterDelete:writable, doLoad:writable, doLoadAnimation:writable, 
+  _toggleCollapsibleStacks:writable, justLoadStart:writable, DATAOBJS, sessionData:writable,activity:writable, define, sugarizerCompatibility, 
+  require, _createGrid:writable, analyzeProject, _hideStopButton:writable, obj:writable, POLAR, CARTESIAN, ALTO,TENOR, BASS, SOPRANO, TREBLE, 
+  errorMsg:writable, pluginData:writable, dat:writable, updatePluginObj, processRawPluginData, processPluginData:writable, preparePluginExports, 
+  GRAND, __saveLocally:writable, doSVG, initBasicProtoBlocks, processMacroData, macroData:writable, _showAboutPage:writable, _showHelp:writable,
+  doOpenPlugin:writable, StatsWindow, _doMergeLoad:writable, _toggleJSWindow:writable, initPalettes, widgetWindows, LanguageBox, PasteBox, 
+  SaveInterface, _doOpenSamples:writable, Trashcan, trashContainer:writable, Turtles, Boundary:writable, Palettes, Logo, Blocks, 
+  _createMsgContainer:writable, doBrowserCheck,_makeButton:writable, menuContainer, last, _doMenuAnimation:writable, advancedModeContainer, 
+  beginnerModeContainer, HelpWidget, connections:writable, TEMPERAMENT, custom:writable , OCTAVERATIO, SHOWBLOCKSBUTTON, COLLAPSEBLOCKSBUTTON, JSEditor,
+  NOMICERRORMSG, NOSTRINGERRORMSG, EMPTYHEAPERRORMSG, NOSQRTERRORMSG, NOACTIONERRORMSG, NOBOXERRORMSG, ZERODIVIDEERRORMSG, NANERRORMSG, NOINPUTERRORMSG,
+  HIDEBLOCKSFADEDBUTTON, hideAuxMenu:writable, closeWidgets, errorText, hideArrows:writable, printText, Toolbar, _createErrorContainers, PreDefinedTemperaments,
+*/
+
 let KeySignatureEnv = ["C", "major", false];
 
 function Activity() {
