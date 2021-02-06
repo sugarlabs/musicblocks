@@ -437,118 +437,6 @@ const SOLFATTRS = [DOUBLESHARP, SHARP, NATURAL, FLAT, DOUBLEFLAT];
 //.TRANS: ordinal number. Please keep exactly one space between each number.
 const DEGREES = _("1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th");
 
-/**
- * @public
- * @param {String} keySignature
- * @returns {String}
- */
-function keySignatureToMode(keySignature) {
-    // Convert from "A Minor" to "A" and "MINOR"
-    if (keySignature === "" || keySignature == null) {
-        return ["C", "major"];
-    }
-
-    // Maqams have special names for certain keys.
-    if (keySignature.toLowerCase() in MAQAMTABLE) {
-        keySignature = MAQAMTABLE[keySignature.toLowerCase()];
-    }
-
-    let parts = keySignature.split(" ");
-
-    // A special case to test: m used for minor.
-    let minorMode = false;
-    if (parts.length === 1 && parts[0][parts[0].length - 1] === "m") {
-        minorMode = true;
-        parts[0] = parts[0].slice(0, parts[0].length - 1);
-    }
-
-    let key;
-    if (parts[0] in BTOFLAT) {
-        key = BTOFLAT[parts[0]];
-    } else if (parts[0] in STOSHARP) {
-        key = STOSHARP[parts[0]];
-    } else {
-        key = parts[0];
-    }
-
-    if (key === "C" + FLAT) {
-        // keySignature = keySignature;
-        parts = keySignature.split(" ");
-        key = "C" + FLAT;
-    } else if (key == "B" + SHARP) {
-        // keySignature = keySignature;
-        parts = keySignature.split(" ");
-        key = "B" + SHARP;
-    } else if (NOTESSHARP.indexOf(key) === -1 && NOTESFLAT.indexOf(key) === -1) {
-        // console.debug("Invalid key or missing name; reverting to C.");
-        // Is is possible that the key was left out?
-        keySignature = "C " + keySignature;
-        parts = keySignature.split(" ");
-        key = "C";
-    }
-
-    if (minorMode) {
-        return [key, "natural minor"];
-    }
-
-    // Reassemble remaining parts to get mode name
-    let mode = "";
-    for (let i = 1; i < parts.length; i++) {
-        if (parts[i] !== "") {
-            if (mode === "") {
-                mode = parts[i];
-            } else {
-                mode += " " + parts[i];
-            }
-        }
-    }
-
-    if (mode === "") {
-        mode = "major";
-    } else {
-        mode = mode.toLowerCase();
-    }
-
-    if (mode in MUSICALMODES) {
-        return [key, mode];
-    } else {
-        // console.debug("Invalid mode name: " + mode + " reverting to major.");
-        return [key, "major"];
-    }
-}
-
-/**
- * @public
- * @param  {String} keySignature
- * @returns {String}
- */
-function getSharpFlatPreference(keySignature) {
-    const obj = keySignatureToMode(keySignature);
-    const obj2 = modeMapper(obj[0], obj[1]);
-    const ks = obj2[0] + " " + obj2[1];
-
-    if (SHARPPREFERENCE.indexOf(ks) !== -1) {
-        return "sharp";
-    } else if (FLATPREFERENCE.indexOf(ks) !== -1) {
-        return "flat";
-    } else {
-        return "natural";
-    }
-}
-
-/**
- * @public
- * @param  {Number} a
- * @returns {Number}
- */
-function mod12(a) {
-    while (a < 0) {
-        a += 12;
-    }
-
-    return a % 12;
-}
-
 const SEMITONES = 12;
 const POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
 const TWELTHROOT2 = 1.0594630943592953;
@@ -1293,6 +1181,118 @@ let TEMPERAMENT = {
         ]
     }
 };
+
+/**
+ * @public
+ * @param {String} keySignature
+ * @returns {String}
+ */
+function keySignatureToMode(keySignature) {
+    // Convert from "A Minor" to "A" and "MINOR"
+    if (keySignature === "" || keySignature == null) {
+        return ["C", "major"];
+    }
+
+    // Maqams have special names for certain keys.
+    if (keySignature.toLowerCase() in MAQAMTABLE) {
+        keySignature = MAQAMTABLE[keySignature.toLowerCase()];
+    }
+
+    let parts = keySignature.split(" ");
+
+    // A special case to test: m used for minor.
+    let minorMode = false;
+    if (parts.length === 1 && parts[0][parts[0].length - 1] === "m") {
+        minorMode = true;
+        parts[0] = parts[0].slice(0, parts[0].length - 1);
+    }
+
+    let key;
+    if (parts[0] in BTOFLAT) {
+        key = BTOFLAT[parts[0]];
+    } else if (parts[0] in STOSHARP) {
+        key = STOSHARP[parts[0]];
+    } else {
+        key = parts[0];
+    }
+
+    if (key === "C" + FLAT) {
+        // keySignature = keySignature;
+        parts = keySignature.split(" ");
+        key = "C" + FLAT;
+    } else if (key == "B" + SHARP) {
+        // keySignature = keySignature;
+        parts = keySignature.split(" ");
+        key = "B" + SHARP;
+    } else if (NOTESSHARP.indexOf(key) === -1 && NOTESFLAT.indexOf(key) === -1) {
+        // console.debug("Invalid key or missing name; reverting to C.");
+        // Is is possible that the key was left out?
+        keySignature = "C " + keySignature;
+        parts = keySignature.split(" ");
+        key = "C";
+    }
+
+    if (minorMode) {
+        return [key, "natural minor"];
+    }
+
+    // Reassemble remaining parts to get mode name
+    let mode = "";
+    for (let i = 1; i < parts.length; i++) {
+        if (parts[i] !== "") {
+            if (mode === "") {
+                mode = parts[i];
+            } else {
+                mode += " " + parts[i];
+            }
+        }
+    }
+
+    if (mode === "") {
+        mode = "major";
+    } else {
+        mode = mode.toLowerCase();
+    }
+
+    if (mode in MUSICALMODES) {
+        return [key, mode];
+    } else {
+        // console.debug("Invalid mode name: " + mode + " reverting to major.");
+        return [key, "major"];
+    }
+}
+
+/**
+ * @public
+ * @param  {String} keySignature
+ * @returns {String}
+ */
+function getSharpFlatPreference(keySignature) {
+    const obj = keySignatureToMode(keySignature);
+    const obj2 = modeMapper(obj[0], obj[1]);
+    const ks = obj2[0] + " " + obj2[1];
+
+    if (SHARPPREFERENCE.indexOf(ks) !== -1) {
+        return "sharp";
+    } else if (FLATPREFERENCE.indexOf(ks) !== -1) {
+        return "flat";
+    } else {
+        return "natural";
+    }
+}
+
+/**
+ * @public
+ * @param  {Number} a
+ * @returns {Number}
+ */
+function mod12(a) {
+    while (a < 0) {
+        a += 12;
+    }
+
+    return a % 12;
+}
 
 /**
  * @public
