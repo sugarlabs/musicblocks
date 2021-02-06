@@ -10,7 +10,7 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /*global _,modeMapper:writable,DRUMNAMES,VOICENAMES,NOISENAMES,last,logo,INVALIDPITCH,blk,last,myKeySignature:writable,
-pitchNumber:writable,stepUpCurrentNote:writable,stepDownCurrentNote:writable,calcOctave:writable,calcOctaveInterval,
+pitchNumber:writable,stepUpCurrentNote:writable,stepDownCurrentNote:writable,calcOctave:writable,calcOctaveInterval:writable,
 greatestCommonMultiple:writable,notesFlat2,i:writable,convertFactor:writable,modeMapper:writable */
 
 // Scalable sinewave graphic
@@ -2282,7 +2282,7 @@ numberToPitch = function(i, temperament, startPitch, offset){
         interval = TEMPERAMENT[temperament]["interval"][pitchNumber];
         return getNoteFromInterval(startPitch, interval);
     }
-}
+};
 
 /**
  * @param  {String} noteArg
@@ -3093,13 +3093,14 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
                     case 5:
                         definedScaleDegree.push(4);
                         break;
-                    case 6:
+                    case 6: {
                         const lastAdded = definedScaleDegree[definedScaleDegree.length - 1];
                         if (lastAdded != 4) {
                             definedScaleDegree.push(4);
                         } else if (semitones[i] + chosenModeScale[i] != 7) {
                             definedScaleDegree.push(5);
                         }
+                    }
                         break;
                     case 7:
                         definedScaleDegree.push(5);
@@ -3283,13 +3284,14 @@ function getPitchInfo(type, notePlayed, tur) {
     let np = notePlayed;
     let octave;
     switch (type) {
-        case "letter class":
+        case "letter class": {
             if (Number(np)) {
                 [np] = frequencyToPitch(np);
             }
             return np[0];
+        }
         case "solfege syllable":
-        case "solfege class":
+        case "solfege class": {
             if (Number(np)) {
                 np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
             }
@@ -3300,7 +3302,8 @@ function getPitchInfo(type, notePlayed, tur) {
             if (tur.singer.moveable === false) return SOLFEGECONVERSIONTABLE[np];
             const i = _buildScale(tur.singer.keySignature)[0].indexOf(np);
             return SOLFEGENAMES[i];
-        case "pitch class":
+        }
+        case "pitch class": {
             if (Number(np)) {
                 np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
             }
@@ -3310,7 +3313,8 @@ function getPitchInfo(type, notePlayed, tur) {
                 tur.singer.keySignature
             );
             return (num - 3) % 12;
-        case "scalar class":
+        }
+        case "scalar class": {
             if (Number(np)) {
                 np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
             }
@@ -3323,7 +3327,8 @@ function getPitchInfo(type, notePlayed, tur) {
                 np
             );
             return scalarClass[0];
-        case "scale degree":
+        }
+        case "scale degree": {
             if (Number(np)) {
                 np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
             }
@@ -3336,14 +3341,16 @@ function getPitchInfo(type, notePlayed, tur) {
                 np
             );
             return scalarClass1[0] + scalarClass1[1];
-        case "nth degree":
+        }
+        case "nth degree": {
             if (Number(np)) {
                 np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
             }
             np = np.substr(0, np.length - 1);
             np = np.replace("#", SHARP).replace("b", FLAT);
             return _buildScale(tur.singer.keySignature)[0].indexOf(np);
-        case "staff y":
+        }
+        case "staff y": {
             if (Number(np)) {
                 [np, octave] = frequencyToPitch(np);
             } else {
@@ -3355,11 +3362,12 @@ function getPitchInfo(type, notePlayed, tur) {
                 ["C", "D", "E", "F", "G", "A", "B"].indexOf(np) * YSTAFFNOTEHEIGHT +
                 (octave - 4) * YSTAFFOCTAVEHEIGHT
             );
+        }
         case "pitch number":
             return _calculate_pitch_number(np, tur);
         case "pitch in hertz":
             return logo.synth._getFrequency(np, logo.synth.changeInTemperament);
-        case "pitch to color":
+        case "pitch to color": {
             if (Number(np)) {
                 [np, octave] = frequencyToPitch(np);
             } else {
@@ -3383,7 +3391,8 @@ function getPitchInfo(type, notePlayed, tur) {
                 }
             }
             return color;
-        case "pitch to shade":
+        }
+        case "pitch to shade": {
             // The expectation is a note in Hz.
             if (Number(np)) {
                 [np, octave] = frequencyToPitch(np);
@@ -3395,6 +3404,7 @@ function getPitchInfo(type, notePlayed, tur) {
                 }
             }
             return octave * 12.5;
+        }
         default:
             return "__INVALID_INPUT__";
     }
