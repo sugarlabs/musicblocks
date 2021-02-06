@@ -10,7 +10,7 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /*global _,modeMapper,DRUMNAMES,VOICENAMES,NOISENAMES,last,logo,INVALIDPITCH,blk,last,myKeySignature,
-pitchNumber,stepUpCurrentNote,stepDownCurrentNote,calcOctaveInterval,greatestCommonMultiple,notesFlat2,i,convertFactor,modeMapper */
+pitchNumber,stepUpCurrentNote,stepDownCurrentNote,calcOctave,calcOctaveInterval,greatestCommonMultiple,notesFlat2,i,convertFactor,modeMapper */
 
 // Scalable sinewave graphic
 const SYNTHSVG =
@@ -1182,6 +1182,14 @@ let TEMPERAMENT = {
     }
 };
 
+let PreDefinedTemperaments = {
+    "equal": true,
+    "just intonation": true,
+    "Pythagorean": true,
+    "1/3 comma meantone": true,
+    "1/4 comma meantone": true
+};
+
 /**
  * @public
  * @param {String} keySignature
@@ -1306,15 +1314,6 @@ const updateTemperaments = () => {
         }
     }
 };
-
-let PreDefinedTemperaments = {
-    "equal": true,
-    "just intonation": true,
-    "Pythagorean": true,
-    "1/3 comma meantone": true,
-    "1/4 comma meantone": true
-};
-
 
 
 const DEFAULTINVERT = "even";
@@ -1925,140 +1924,72 @@ function getCustomNote(notes) {
 
 /**
  * @public
- * @param {Number} i
- * @param {String} temperament
- * @param {Number} startPitch
- * @param {Number} offset
- * @returns {Array}
- */
-function numberToPitch(i, temperament, startPitch, offset) {
-    // Calculate the pitch and octave based on index.
-    // We start at A0.
-    if (temperament === undefined) {
-        temperament = "equal";
-    }
-
-    let n = 0;
-    if (i < 0) {
-        while (i < 0) {
-            i += 12;
-            n += 1; // Count octave bump ups.
-        }
-
-        if (temperament === "equal") {
-            return [
-                PITCHES[(i + PITCHES.indexOf("A")) % 12],
-                Math.floor((i + PITCHES.indexOf("A")) / 12) - n
-            ];
-        } else {
-            pitchNumber = Math.floor(i - offset);
-        }
-    } else {
-        if (temperament === "equal") {
-            return [
-                PITCHES[(i + PITCHES.indexOf("A")) % 12],
-                Math.floor((i + PITCHES.indexOf("A")) / 12)
-            ];
-        } else {
-            pitchNumber = Math.floor(i - offset);
-        }
-    }
-
-    let interval;
-    if (isCustom(temperament)) {
-        pitchNumber = pitchNumber + "";
-        if (TEMPERAMENT[temperament][pitchNumber][1] === undefined) {
-            // If custom temperament is not defined, then it will
-            // store equal temperament notes.
-            for (let j = 0; j < 12; j++) {
-                const number = "" + j;
-                interval = TEMPERAMENT["equal"]["interval"][i];
-                TEMPERAMENT[temperament][number] = [
-                    Math.pow(2, j / 12),
-                    getNoteFromInterval(startPitch, interval)[0],
-                    getNoteFromInterval(startPitch, interval)[1]
-                ];
-            }
-
-            return [
-                TEMPERAMENT[temperament][pitchNumber][1],
-                TEMPERAMENT[temperament][pitchNumber][2]
-            ];
-        } else {
-            return [
-                TEMPERAMENT[temperament][pitchNumber][1],
-                TEMPERAMENT[temperament][pitchNumber][2]
-            ];
-        }
-    } else {
-        interval = TEMPERAMENT[temperament]["interval"][pitchNumber];
-        return getNoteFromInterval(startPitch, interval);
-    }
-}
-
-/**
- * @public
- * @param {Number} i
- * @returns {Array}
- */
-function numberToPitchSharp(i) {
-    // numbertoPitch return only flats
-    // This function will return sharps.
-    if (i < 0) {
-        let n = 0;
-        while (i < 0) {
-            i += 12;
-            n += 1;
-        }
-
-        return [
-            PITCHES2[(i + PITCHES2.indexOf("A")) % 12],
-            Math.floor((i + PITCHES2.indexOf("A")) / 12) - n
-        ];
-    } else {
-        return [
-            PITCHES2[(i + PITCHES2.indexOf("A")) % 12],
-            Math.floor((i + PITCHES2.indexOf("A")) / 12)
-        ];
-    }
-}
-
-/**
- * @public
- * @param {Number} notename
- * @param {Number} octave
+ * @param {Number} pitch
+ * @param {NUmber} octave
+ * @param {String} keySignature
  * @returns {Number}
  */
-function getNumber(notename, octave) {
-    // Converts a note, e.g., C, and octave to a number
-    let num;
-    if (octave < 0) {
-        num = 0;
-    } else if (octave > 10) {
-        num = 9 * 12;
-    } else {
-        num = 12 * (octave - 1);
+function pitchToNumber(pitch, octave, keySignature) {
+    // Calculate the pitch index based on pitch and octave.
+    if (pitch.toUpperCase() === "R") {
+        return 0;
     }
+    // Check for flat, sharp, double flat, or double sharp.
+    let transposition = 0;
+    const len = pitch.length;
+    let lastOne, lastTwo;
+    if (len > 1) {
+        if (len > 2) {
+            lastTwo = pitch.slice(len - 2);
+            //Unsure why slice is not working for double flats and double sharps.
+            lastOne = pitch.substring(1, len);
+            if (lastTwo === "bb") {
+                pitch = pitch.substring(0, 1);
+                transposition -= 2;
+            } else if (lastOne === DOUBLEFLAT) {
+                pitch = pitch.substring(0, 1);
+                transposition -= 2;
+            } else if (lastTwo === "*" || lastTwo === DOUBLESHARP) {
+                pitch = pitch.substring(0, 1);
+                transposition += 2;
+            } else if (
+                lastTwo === "#b" ||
+                lastTwo === SHARP + FLAT ||
+                lastTwo === "b#" ||
+                lastTwo === FLAT + SHARP
+            ) {
+                // Not sure this could occur... but just in case.
+                pitch = pitch.slice(0, len - 2);
+            }
+        }
 
-    notename = String(notename);
-    if (notename.substring(0, 1) in NOTESTEP) {
-        num += NOTESTEP[notename.substring(0, 1)];
-        if (notename.length >= 1) {
-            let delta;
-            delta = notename.substring(1);
-            if (delta === "bb" || delta === DOUBLEFLAT) {
-                num -= 2;
-            } else if (delta === "##" || delta === "*" || delta === DOUBLESHARP) {
-                num += 2;
-            } else if (delta === "b" || delta === FLAT) {
-                num -= 1;
-            } else if (delta === "#" || delta === SHARP) {
-                num += 1;
+        if (pitch.length > 1) {
+            lastOne = pitch.slice(len - 1);
+            if (lastOne === "b" || lastOne === FLAT) {
+                pitch = pitch.slice(0, len - 1);
+                transposition -= 1;
+            } else if (lastOne === "#" || lastOne === SHARP) {
+                pitch = pitch.slice(0, len - 1);
+                transposition += 1;
             }
         }
     }
 
-    return num;
+    let pitchNumber = 0;
+    if (PITCHES.indexOf(pitch) !== -1) {
+        pitchNumber = PITCHES.indexOf(pitch.toUpperCase());
+    } else {
+        // obj[1] is the solfege mapping for the current key/mode
+        const obj = getScaleAndHalfSteps(keySignature);
+        if (obj[1].indexOf(pitch.toLowerCase()) !== -1) {
+            pitchNumber = obj[1].indexOf(pitch.toLowerCase());
+        } else {
+            // console.debug("pitch " + pitch + " not found.");
+            pitchNumber = 0;
+        }
+    }
+    // We start at A0.
+    return octave * 12 + pitchNumber - PITCHES.indexOf("A") + transposition;
 }
 
 /**
@@ -2204,6 +2135,144 @@ function getNoteFromInterval(pitch, interval) {
     } else {
         return findOtherIntervals(interval);
     }
+}
+
+/**
+ * @public
+ * @param {Number} i
+ * @param {String} temperament
+ * @param {Number} startPitch
+ * @param {Number} offset
+ * @returns {Array}
+ */
+function numberToPitch(i, temperament, startPitch, offset) {
+    // Calculate the pitch and octave based on index.
+    // We start at A0.
+    if (temperament === undefined) {
+        temperament = "equal";
+    }
+
+    let n = 0;
+    if (i < 0) {
+        while (i < 0) {
+            i += 12;
+            n += 1; // Count octave bump ups.
+        }
+
+        if (temperament === "equal") {
+            return [
+                PITCHES[(i + PITCHES.indexOf("A")) % 12],
+                Math.floor((i + PITCHES.indexOf("A")) / 12) - n
+            ];
+        } else {
+            pitchNumber = Math.floor(i - offset);
+        }
+    } else {
+        if (temperament === "equal") {
+            return [
+                PITCHES[(i + PITCHES.indexOf("A")) % 12],
+                Math.floor((i + PITCHES.indexOf("A")) / 12)
+            ];
+        } else {
+            pitchNumber = Math.floor(i - offset);
+        }
+    }
+
+    let interval;
+    if (isCustom(temperament)) {
+        pitchNumber = pitchNumber + "";
+        if (TEMPERAMENT[temperament][pitchNumber][1] === undefined) {
+            // If custom temperament is not defined, then it will
+            // store equal temperament notes.
+            for (let j = 0; j < 12; j++) {
+                const number = "" + j;
+                interval = TEMPERAMENT["equal"]["interval"][i];
+                TEMPERAMENT[temperament][number] = [
+                    Math.pow(2, j / 12),
+                    getNoteFromInterval(startPitch, interval)[0],
+                    getNoteFromInterval(startPitch, interval)[1]
+                ];
+            }
+
+            return [
+                TEMPERAMENT[temperament][pitchNumber][1],
+                TEMPERAMENT[temperament][pitchNumber][2]
+            ];
+        } else {
+            return [
+                TEMPERAMENT[temperament][pitchNumber][1],
+                TEMPERAMENT[temperament][pitchNumber][2]
+            ];
+        }
+    } else {
+        interval = TEMPERAMENT[temperament]["interval"][pitchNumber];
+        return getNoteFromInterval(startPitch, interval);
+    }
+}
+
+/**
+ * @public
+ * @param {Number} i
+ * @returns {Array}
+ */
+function numberToPitchSharp(i) {
+    // numbertoPitch return only flats
+    // This function will return sharps.
+    if (i < 0) {
+        let n = 0;
+        while (i < 0) {
+            i += 12;
+            n += 1;
+        }
+
+        return [
+            PITCHES2[(i + PITCHES2.indexOf("A")) % 12],
+            Math.floor((i + PITCHES2.indexOf("A")) / 12) - n
+        ];
+    } else {
+        return [
+            PITCHES2[(i + PITCHES2.indexOf("A")) % 12],
+            Math.floor((i + PITCHES2.indexOf("A")) / 12)
+        ];
+    }
+}
+
+/**
+ * @public
+ * @param {Number} notename
+ * @param {Number} octave
+ * @returns {Number}
+ */
+function getNumber(notename, octave) {
+    // Converts a note, e.g., C, and octave to a number
+    let num;
+    if (octave < 0) {
+        num = 0;
+    } else if (octave > 10) {
+        num = 9 * 12;
+    } else {
+        num = 12 * (octave - 1);
+    }
+
+    notename = String(notename);
+    if (notename.substring(0, 1) in NOTESTEP) {
+        num += NOTESTEP[notename.substring(0, 1)];
+        if (notename.length >= 1) {
+            let delta;
+            delta = notename.substring(1);
+            if (delta === "bb" || delta === DOUBLEFLAT) {
+                num -= 2;
+            } else if (delta === "##" || delta === "*" || delta === DOUBLESHARP) {
+                num += 2;
+            } else if (delta === "b" || delta === FLAT) {
+                num -= 1;
+            } else if (delta === "#" || delta === SHARP) {
+                num += 1;
+            }
+        }
+    }
+
+    return num;
 }
 
 /**
@@ -2781,76 +2850,6 @@ function getNote(
     } else {
         return [note, octave];
     }
-}
-
-/**
- * @public
- * @param {Number} pitch
- * @param {NUmber} octave
- * @param {String} keySignature
- * @returns {Number}
- */
-function pitchToNumber(pitch, octave, keySignature) {
-    // Calculate the pitch index based on pitch and octave.
-    if (pitch.toUpperCase() === "R") {
-        return 0;
-    }
-    // Check for flat, sharp, double flat, or double sharp.
-    let transposition = 0;
-    const len = pitch.length;
-    let lastOne, lastTwo;
-    if (len > 1) {
-        if (len > 2) {
-            lastTwo = pitch.slice(len - 2);
-            //Unsure why slice is not working for double flats and double sharps.
-            lastOne = pitch.substring(1, len);
-            if (lastTwo === "bb") {
-                pitch = pitch.substring(0, 1);
-                transposition -= 2;
-            } else if (lastOne === DOUBLEFLAT) {
-                pitch = pitch.substring(0, 1);
-                transposition -= 2;
-            } else if (lastTwo === "*" || lastTwo === DOUBLESHARP) {
-                pitch = pitch.substring(0, 1);
-                transposition += 2;
-            } else if (
-                lastTwo === "#b" ||
-                lastTwo === SHARP + FLAT ||
-                lastTwo === "b#" ||
-                lastTwo === FLAT + SHARP
-            ) {
-                // Not sure this could occur... but just in case.
-                pitch = pitch.slice(0, len - 2);
-            }
-        }
-
-        if (pitch.length > 1) {
-            lastOne = pitch.slice(len - 1);
-            if (lastOne === "b" || lastOne === FLAT) {
-                pitch = pitch.slice(0, len - 1);
-                transposition -= 1;
-            } else if (lastOne === "#" || lastOne === SHARP) {
-                pitch = pitch.slice(0, len - 1);
-                transposition += 1;
-            }
-        }
-    }
-
-    let pitchNumber = 0;
-    if (PITCHES.indexOf(pitch) !== -1) {
-        pitchNumber = PITCHES.indexOf(pitch.toUpperCase());
-    } else {
-        // obj[1] is the solfege mapping for the current key/mode
-        const obj = getScaleAndHalfSteps(keySignature);
-        if (obj[1].indexOf(pitch.toLowerCase()) !== -1) {
-            pitchNumber = obj[1].indexOf(pitch.toLowerCase());
-        } else {
-            // console.debug("pitch " + pitch + " not found.");
-            pitchNumber = 0;
-        }
-    }
-    // We start at A0.
-    return octave * 12 + pitchNumber - PITCHES.indexOf("A") + transposition;
 }
 
 /**
@@ -3955,40 +3954,6 @@ function getSolfege(note) {
 
 /**
  * @public
- * @param {Number} note
- * @returns {Number}
- */
-function i18nSolfege(note) {
-    // solfnotes_ is used in the interface for i18n
-    const solfnotes_ = _("ti la sol fa mi re do").split(" ");
-    const obj = splitSolfege(note);
-
-    const i = SOLFNOTES.indexOf(obj[0]);
-    if (i !== -1) {
-        return solfnotes_[i] + obj[1];
-    } else {
-        // Wasn't solfege so it doesn't need translation.
-        return note;
-    }
-}
-
-/**
- * @public
- * @param {Number} value
- * @returns {Array}
- */
-function splitScaleDegree(value) {
-    if (!value) {
-        return [5, NATURAL];
-    }
-
-    const note = value.slice(0, 1);
-    const attr = value.slice(1);
-    return [note, attr];
-}
-
-/**
- * @public
  * @param {Number} value
  * @returns {Array}
  */
@@ -4019,6 +3984,40 @@ function splitSolfege(value) {
     }
 
     return ["sol", ""];
+}
+
+/**
+ * @public
+ * @param {Number} note
+ * @returns {Number}
+ */
+function i18nSolfege(note) {
+    // solfnotes_ is used in the interface for i18n
+    const solfnotes_ = _("ti la sol fa mi re do").split(" ");
+    const obj = splitSolfege(note);
+
+    const i = SOLFNOTES.indexOf(obj[0]);
+    if (i !== -1) {
+        return solfnotes_[i] + obj[1];
+    } else {
+        // Wasn't solfege so it doesn't need translation.
+        return note;
+    }
+}
+
+/**
+ * @public
+ * @param {Number} value
+ * @returns {Array}
+ */
+function splitScaleDegree(value) {
+    if (!value) {
+        return [5, NATURAL];
+    }
+
+    const note = value.slice(0, 1);
+    const attr = value.slice(1);
+    return [note, attr];
 }
 
 
