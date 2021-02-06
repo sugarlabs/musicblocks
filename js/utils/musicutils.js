@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/*global _,keySignatureToMode,modeMapper,__convert,DRUMNAMES,VOICENAMES,NOISENAMES,last,logo,INVALIDPITCH,blk,last,myKeySignature,
+/*global _,modeMapper,DRUMNAMES,VOICENAMES,NOISENAMES,last,logo,INVALIDPITCH,blk,last,myKeySignature,
 pitchNumber,stepUpCurrentNote,stepDownCurrentNote,calcOctaveInterval,greatestCommonMultiple,notesFlat2,i,convertFactor,modeMapper */
 
 // Scalable sinewave graphic
@@ -1643,1310 +1643,18 @@ function getTemperamentName(name) {
 }
 
 /**
- * Converts the pitch value of the last note played into different formats
- * such as hertz, letter name, pitch number, et al.
- *
- * @private
- * @param {String} type - required format: letter class, solfege syllable,
- * solfege class, pitch class, scalar class, scale degree, nth degree,
- * staff y, pitch number, pitch in hertz
- * @param {notePlayed} note - Argument which is to be converted
- * @param {tur} turtle - Current Turtle
- * @returns {String}
- */
-
-function _calculate_pitch_number(np, tur) {
-    let obj;
-    if (tur.singer.lastNotePlayed !== null) {
-        if (typeof np === "string") {
-            obj = noteToObj(np);
-        } else {
-            // Hertz
-            obj = frequencyToPitch(np);
-        }
-    } else if (
-        tur.singer.inNoteBlock in tur.singer.notePitches &&
-        tur.singer.notePitches[last(tur.singer.inNoteBlock)].length > 0
-    ) {
-        obj = getNote(
-            tur.singer.notePitches[last(tur.singer.inNoteBlock)][0],
-            tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][0],
-            0,
-            tur.singer.keySignature,
-            tur.singer.moveable,
-            null,
-            logo.errorMsg
-        );
-    } else {
-        if (tur.singer.lastNotePlayed !== null) {
-            // console.debug("Cannot find a note ");
-            logo.errorMsg(INVALIDPITCH, blk);
-        }
-        obj = ["G", 4];
-    }
-    return pitchToNumber(obj[0], obj[1], tur.singer.keySignature) - tur.singer.pitchNumberOffset;
-}
-/**
  * @public
- * @param  {String} type
- * @param  {String} notePlayed
- * @param  {Object} tur
- * @returns {String}
- */
-function getPitchInfo(type, notePlayed, tur) {
-    let np = notePlayed;
-    let octave;
-    switch (type) {
-        case "letter class":
-            if (Number(np)) {
-                [np] = frequencyToPitch(np);
-            }
-            return np[0];
-        case "solfege syllable":
-        case "solfege class":
-            if (Number(np)) {
-                np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
-            }
-            if (type === "solfege class") {
-                np = np.substr(0, np.length - 1);
-            }
-            np = np.replace("#", SHARP).replace("b", FLAT);
-            if (tur.singer.moveable === false) return SOLFEGECONVERSIONTABLE[np];
-            const i = _buildScale(tur.singer.keySignature)[0].indexOf(np);
-            return SOLFEGENAMES[i];
-        case "pitch class":
-            if (Number(np)) {
-                np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
-            }
-            const num = pitchToNumber(
-                np.substr(0, np.length - 1),
-                np[np.length - 1],
-                tur.singer.keySignature
-            );
-            return (num - 3) % 12;
-        case "scalar class":
-            if (Number(np)) {
-                np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
-            }
-            np = np.substr(0, np.length - 1);
-            np = np.replace("#", SHARP).replace("b", FLAT);
-            const scalarClass = scaleDegreeToPitchMapping(
-                tur.singer.keySignature,
-                null,
-                tur.singer.moveable,
-                np
-            );
-            return scalarClass[0];
-        case "scale degree":
-            if (Number(np)) {
-                np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
-            }
-            np = np.substr(0, np.length - 1);
-            np = np.replace("#", SHARP).replace("b", FLAT);
-            const scalarClass1 = scaleDegreeToPitchMapping(
-                tur.singer.keySignature,
-                null,
-                tur.singer.moveable,
-                np
-            );
-            return scalarClass1[0] + scalarClass1[1];
-        case "nth degree":
-            if (Number(np)) {
-                np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
-            }
-            np = np.substr(0, np.length - 1);
-            np = np.replace("#", SHARP).replace("b", FLAT);
-            return _buildScale(tur.singer.keySignature)[0].indexOf(np);
-        case "staff y":
-            if (Number(np)) {
-                [np, octave] = frequencyToPitch(np);
-            } else {
-                np = notePlayed[0];
-                octave = notePlayed.length === 2 ? notePlayed[1] : notePlayed[2];
-            }
-            // these numbers are subject to staff artwork
-            return (
-                ["C", "D", "E", "F", "G", "A", "B"].indexOf(np) * YSTAFFNOTEHEIGHT +
-                (octave - 4) * YSTAFFOCTAVEHEIGHT
-            );
-        case "pitch number":
-            return _calculate_pitch_number(np, tur);
-        case "pitch in hertz":
-            return logo.synth._getFrequency(np, logo.synth.changeInTemperament);
-        case "pitch to color":
-            if (Number(np)) {
-                [np, octave] = frequencyToPitch(np);
-            } else {
-                np = np.substr(0, np.length - 1);
-            }
-
-            let color = 0;
-            if (NOTESSHARP.indexOf(np) !== -1) {
-                color = NOTESSHARP.indexOf(np) * 8.33;
-            } else if (NOTESFLAT.indexOf(np) !== -1) {
-                color = NOTESFLAT.indexOf(np) * 8.33;
-            } else {
-                if (np.includes(DOUBLESHARP)) {
-                    np = np.replace(DOUBLESHARP, "");
-                    color = (NOTESSHARP.indexOf(np) + 2) * 8.33;
-                } else if (np.includes(DOUBLEFLAT)) {
-                    np = np.replace(DOUBLEFLAT, "");
-                    color = (NOTESFLAT.indexOf(np) - 2) * 8.33;
-                } else {
-                    // console.debug("Pitch not found: " + np);
-                }
-            }
-            return color;
-        case "pitch to shade":
-            // The expectation is a note in Hz.
-            if (Number(np)) {
-                [np, octave] = frequencyToPitch(np);
-            } else {
-                // But maybe it is of the form G4?
-                octave = np[np.length - 1];
-                if (isNaN(octave)) {
-                    octave = 4;
-                }
-            }
-            return octave * 12.5;
-        default:
-            return "__INVALID_INPUT__";
-    }
-}
-
-/**
- * @public
- * @param {String} keySignature
- * @returns {String}
- */
-function keySignatureToMode(keySignature) {
-    // Convert from "A Minor" to "A" and "MINOR"
-    if (keySignature === "" || keySignature == null) {
-        return ["C", "major"];
-    }
-
-    // Maqams have special names for certain keys.
-    if (keySignature.toLowerCase() in MAQAMTABLE) {
-        keySignature = MAQAMTABLE[keySignature.toLowerCase()];
-    }
-
-    let parts = keySignature.split(" ");
-
-    // A special case to test: m used for minor.
-    let minorMode = false;
-    if (parts.length === 1 && parts[0][parts[0].length - 1] === "m") {
-        minorMode = true;
-        parts[0] = parts[0].slice(0, parts[0].length - 1);
-    }
-
-    let key;
-    if (parts[0] in BTOFLAT) {
-        key = BTOFLAT[parts[0]];
-    } else if (parts[0] in STOSHARP) {
-        key = STOSHARP[parts[0]];
-    } else {
-        key = parts[0];
-    }
-
-    if (key === "C" + FLAT) {
-        keySignature = keySignature;
-        parts = keySignature.split(" ");
-        key = "C" + FLAT;
-    } else if (key == "B" + SHARP) {
-        keySignature = keySignature;
-        parts = keySignature.split(" ");
-        key = "B" + SHARP;
-    } else if (NOTESSHARP.indexOf(key) === -1 && NOTESFLAT.indexOf(key) === -1) {
-        // console.debug("Invalid key or missing name; reverting to C.");
-        // Is is possible that the key was left out?
-        keySignature = "C " + keySignature;
-        parts = keySignature.split(" ");
-        key = "C";
-    }
-
-    if (minorMode) {
-        return [key, "natural minor"];
-    }
-
-    // Reassemble remaining parts to get mode name
-    let mode = "";
-    for (let i = 1; i < parts.length; i++) {
-        if (parts[i] !== "") {
-            if (mode === "") {
-                mode = parts[i];
-            } else {
-                mode += " " + parts[i];
-            }
-        }
-    }
-
-    if (mode === "") {
-        mode = "major";
-    } else {
-        mode = mode.toLowerCase();
-    }
-
-    if (mode in MUSICALMODES) {
-        return [key, mode];
-    } else {
-        // console.debug("Invalid mode name: " + mode + " reverting to major.");
-        return [key, "major"];
-    }
-}
-
-/**
- * @public
- * @param  {String} keySignature
- * @param  {String} pitch
- * @param  {Number} transposition
- * @param  {String} temperament
- * @returns {Number}
- */
-function getStepSizeUp(keySignature, pitch, transposition, temperament) {
-    return _getStepSize(keySignature, pitch, "up", transposition, temperament);
-}
-
-/**
- * @public
- * @param  {String} keySignature
- * @param  {String} pitch
- * @param  {Number} transposition
- * @param  {String} temperament
- * @returns {Number}
- */
-function getStepSizeDown(keySignature, pitch, transposition, temperament) {
-    return _getStepSize(keySignature, pitch, "down", transposition, temperament);
-}
-
-/**
- * @public
- * @param {String} keySignature
- * @returns {Number}
- */
-function getModeLength(keySignature) {
-    return _buildScale(keySignature)[1].length;
-}
-
-/**
- * @private
- * @param  {String} keySignature
- * @param  {String} pitch
- * @param {String} direction
- * @param  {Number} transposition
- * @param  {String} temperament
- * @returns {Number}
- */
-function _getStepSize(keySignature, pitch, direction, transposition, temperament) {
-    // Returns how many half-steps to the next note in this key.
-    if (temperament === undefined) {
-        temperament = "equal";
-    }
-    if (isCustom(temperament)) {
-        //Scalar = Semitone for custom Temperament.
-        return transposition;
-    }
-
-    let thisPitch = pitch;
-    const obj = _buildScale(keySignature);
-    const scale = obj[0];
-    const halfSteps = obj[1];
-
-    if (thisPitch in BTOFLAT) {
-        thisPitch = BTOFLAT[thisPitch];
-    } else if (thisPitch in STOSHARP) {
-        thisPitch = STOSHARP[thisPitch];
-    }
-
-    let ii = scale.indexOf(thisPitch);
-    if (ii !== -1) {
-        if (direction === "up") {
-            return halfSteps[ii];
-        } else {
-            if (ii > 0) {
-                return -halfSteps[ii - 1];
-            } else {
-                return -last(halfSteps);
-            }
-        }
-    }
-
-    if (ii === -1) {
-        if (thisPitch in EQUIVALENTFLATS) {
-            ii = scale.indexOf(EQUIVALENTFLATS[thisPitch]);
-        }
-    }
-
-    if (ii === -1) {
-        if (thisPitch in EQUIVALENTSHARPS) {
-            ii = scale.indexOf(EQUIVALENTSHARPS[thisPitch]);
-        }
-    }
-
-    if (ii === -1) {
-        if (thisPitch in EQUIVALENTNATURALS) {
-            ii = scale.indexOf(EQUIVALENTNATURALS[thisPitch]);
-        }
-    }
-
-    if (ii !== -1) {
-        if (direction === "up") {
-            return halfSteps[ii];
-        } else {
-            if (ii > 0) {
-                return -halfSteps[ii - 1];
-            } else {
-                return -last(halfSteps);
-            }
-        }
-    }
-
-    // Pitch is not in the consonant scale of this key, so we need to
-    // shift up or down to the next note in the key.
-    let offset = 0;
-    let i = PITCHES.indexOf(thisPitch);
-    if (i !== -1) {
-        while (scale.indexOf(thisPitch) === -1) {
-            i = PITCHES.indexOf(thisPitch);
-            if (i === -1) {
-                i = PITCHES2.indexOf(thisPitch);
-            }
-
-            if (direction === "up") {
-                i += 1;
-                thisPitch = PITCHES[i % 12];
-                offset += 1;
-            } else {
-                i -= 1;
-                if (i < 0) {
-                    i += 12;
-                }
-
-                thisPitch = PITCHES[i];
-                offset -= 1;
-            }
-        }
-
-        return offset;
-    }
-
-    i = PITCHES2.indexOf(thisPitch);
-    if (i !== -1) {
-        while (scale.indexOf(thisPitch) === -1) {
-            i = PITCHES2.indexOf(thisPitch);
-            if (i === -1) {
-                i = PITCHES.indexOf(thisPitch);
-            }
-
-            if (direction === "up") {
-                i += 1;
-                thisPitch = PITCHES2[i % 12];
-                offset += 1;
-            } else {
-                i -= 1;
-                if (i < 0) {
-                    i += 12;
-                }
-
-                thisPitch = PITCHES2[i];
-                offset -= 1;
-            }
-        }
-
-        return offset;
-    }
-
-    // Should never get here, but just in case.
-    // console.debug(thisPitch + " not found");
-    return 0;
-}
-
-/**
- * @private
- * @param {String} keySignature
+ * @param {Number} note
  * @returns {Array}
  */
-function _buildScale(keySignature) {
-    // FIX ME: temporary hard-coded fix to avoid errors in pitch preview
-    if (keySignature == "C♭ major") {
-        const scale = ["C♭", "D♭", "E♭", "F♭", "G♭", "A♭", "B♭", "C♭"];
-        return [scale, halfSteps];
-    }
-
-    let obj = keySignatureToMode(keySignature);
-    myKeySignature = obj[0];
-    if (myKeySignature == "C" + FLAT) {
-        obj = keySignatureToMode("B " + obj[1]);
-        myKeySignature = obj[0];
-    }
-
-    let halfSteps;
-    if (obj[1] === "CUSTOM") {
-        halfSteps = customMode;
+function noteToObj(note) {
+    let octave = parseInt(note.slice(note.length - 1));
+    if (isNaN(octave)) {
+        octave = 4;
     } else {
-        halfSteps = MUSICALMODES[obj[1]];
+        note = note.slice(0, note.length - 1);
     }
-
-    let thisScale;
-    if (NOTESFLAT.indexOf(myKeySignature) !== -1) {
-        if (SHARPPREFERENCE.indexOf(obj[0].toLowerCase() + " " + obj[1]) !== -1) {
-            thisScale = NOTESSHARP;
-        } else {
-            thisScale = NOTESFLAT;
-        }
-    } else {
-        if (FLATPREFERENCE.indexOf(obj[0].toLowerCase() + " " + obj[1]) !== -1) {
-            thisScale = NOTESFLAT;
-        } else {
-            thisScale = NOTESSHARP;
-        }
-    }
-
-    let idx = thisScale.indexOf(myKeySignature);
-    if (idx === -1) {
-        idx = 0;
-    }
-
-    const scale = [myKeySignature];
-    let ii = idx;
-    for (let i = 0; i < halfSteps.length; i++) {
-        ii += halfSteps[i];
-        scale.push(thisScale[ii % SEMITONES]);
-    }
-
-    // Make sure there are no repeated letter names for seven step scales
-    if (scale.length === 8) {
-        for (let n = 0; n < 7; n++) {
-            if (scale[n][0] === scale[n + 1][0]) {
-                if (scale[n] in EQUIVALENTACCIDENTALS) {
-                    scale[n] = EQUIVALENTACCIDENTALS[scale[n]];
-                } else if (scale[n] in EQUIVALENTNATURALS) {
-                    scale[n] = EQUIVALENTNATURALS[scale[n]];
-                }
-            }
-        }
-        // Two passes because we may have collisions.
-        for (let n = 0; n < 7; n++) {
-            if (scale[n][0] === scale[n + 1][0]) {
-                if (scale[n] in EQUIVALENTACCIDENTALS) {
-                    scale[n] = EQUIVALENTACCIDENTALS[scale[n]];
-                } else if (scale[n] in EQUIVALENTNATURALS) {
-                    scale[n] = EQUIVALENTNATURALS[scale[n]];
-                }
-            }
-        }
-    }
-    return [scale, halfSteps];
-}
-
-// A two-way function to get pitch according to scale degree and vice versa for a chosen mode
-/**
- * A two-way function to get pitch according to scale degree and vice versa for a chosen mode
- * @public
- * @param {String} keySignature
- * @param {Number} scaleDegree
- * @param {Boolean} moveable
- * @param {String} pitch
- * @returns {Array}
- */
-function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
-    if (pitch === null) {
-        scaleDegree -= 1;
-    }
-    // Subtract one to make it zero-based as we're working with arrays
-
-    // Info variables according to chosen mode
-    const chosenMode = keySignatureToMode(keySignature);
-    const obj1 = _buildScale(keySignature);
-    const chosenModeScale = obj1[0];
-    const chosenModePattern = obj1[1];
-
-    // Pitch numbers of the chosen mode
-    const semitones = [0];
-
-    // Scale degrees defined for chosen mode;
-    // Rest would require arbitration
-    const definedScaleDegree = [];
-
-    // Final 7 note scale combining chosen mode and arbitration
-    let finalScale = [];
-    const sd = [];
-
-    // if moveable do is present just return the major/perfect tones
-    if (moveable) {
-        finalScale = _buildScale(chosenMode[0] + " major")[0];
-
-        if (pitch === null) {
-            return finalScale[scaleDegree];
-        }
-        if (scaleDegree == null) {
-            for (const i in finalScale) {
-                if (finalScale[i][0] == pitch[0]) {
-                    sd.push(String(Number(i) + 1));
-                    if (finalScale[i] == pitch) {
-                        sd.push(NATURAL);
-                    } else {
-                        if (finalScale[i].includes(SHARP)) {
-                            sd.push(FLAT);
-                        } else if (finalScale[i].includes(FLAT)) {
-                            sd.push(FLAT);
-                        } else if (pitch.includes(SHARP)) {
-                            sd.push(SHARP);
-                        } else if (pitch.includes(FLAT)) {
-                            sd.push(FLAT);
-                        }
-                    }
-                }
-            }
-            return sd;
-        }
-    } else {
-        // For 7 note systems scale degrees have a one-one relation
-        if (chosenModePattern.length == 7) {
-            if (pitch === null) {
-                return chosenModeScale[scaleDegree];
-            }
-            if (scaleDegree == null) {
-                for (const i in chosenModeScale) {
-                    if (chosenModeScale[i][0] == pitch[0]) {
-                        sd.push(String(Number(i) + 1));
-                        if (chosenModeScale[i] == pitch) {
-                            sd.push(NATURAL);
-                        } else {
-                            if (chosenModeScale[i].includes(SHARP)) {
-                                sd.push(FLAT);
-                            } else if (chosenModeScale[i].includes(FLAT)) {
-                                sd.push(FLAT);
-                            } else if (pitch.includes(SHARP)) {
-                                sd.push(SHARP);
-                            } else if (pitch.includes(FLAT)) {
-                                sd.push(FLAT);
-                            }
-                        }
-                    }
-                }
-                return sd;
-            }
-        } else if (chosenModePattern.length < 7) {
-            // Major scale of the choosen key is used as fallback
-            const majorScale = _buildScale(chosenMode[0] + " major")[0];
-
-            // according to the choosenModePattern, calculate defined scale degrees
-            for (let i = 0; i < chosenModePattern.length; i++) {
-                switch (semitones[i]) {
-                    case 0:
-                        definedScaleDegree.push(1);
-                        break;
-                    case 1:
-                    case 2:
-                        definedScaleDegree.push(2);
-                        break;
-                    case 3:
-                    case 4:
-                        definedScaleDegree.push(3);
-                        break;
-                    case 5:
-                        definedScaleDegree.push(4);
-                        break;
-                    case 6:
-                        const lastAdded = definedScaleDegree[definedScaleDegree.length - 1];
-                        if (lastAdded != 4) {
-                            definedScaleDegree.push(4);
-                        } else if (semitones[i] + chosenModeScale[i] != 7) {
-                            definedScaleDegree.push(5);
-                        }
-                        break;
-                    case 7:
-                        definedScaleDegree.push(5);
-                        break;
-                    case 8:
-                    case 9:
-                        definedScaleDegree.push(6);
-                        break;
-                    case 10:
-                    case 11:
-                        definedScaleDegree.push(7);
-                        break;
-                    default:
-                        continue;
-                }
-
-                semitones.push(semitones[i] + chosenModePattern[i]);
-            }
-
-            // For scale degrees which are defined --> Use choosen Mode's notes
-            // For scale degrees which are undefined --> Use fallback notes
-            let k = 0;
-            for (let i = 0; i < 7; i++) {
-                if (definedScaleDegree.indexOf(i + 1) !== -1) {
-                    finalScale.push(chosenModeScale[k]);
-                    k++;
-                } else {
-                    finalScale.push(majorScale[i]);
-                }
-            }
-
-            if (pitch === null) {
-                return finalScale[scaleDegree];
-            }
-            if (scaleDegree == null) {
-                for (const i in finalScale) {
-                    if (finalScale[i][0] == pitch[0]) {
-                        sd.push(String(Number(i) + 1));
-                        if (finalScale[i] == pitch) {
-                            sd.push(NATURAL);
-                        } else {
-                            if (finalScale[i].includes(SHARP)) {
-                                sd.push(FLAT);
-                            } else if (finalScale[i].includes(FLAT)) {
-                                sd.push(FLAT);
-                            } else if (pitch.includes(SHARP)) {
-                                sd.push(SHARP);
-                            } else if (pitch.includes(FLAT)) {
-                                sd.push(FLAT);
-                            }
-                        }
-                    }
-                }
-                return sd;
-            }
-        } else {
-            // For scales with greater than 7 notes
-            // All scales degrees are defined, just prefer the perfect/major ones
-
-            for (let i = 0; i < chosenModePattern.length; i++) {
-                semitones.push(semitones[i] + chosenModePattern[i]);
-            }
-
-            for (let i = 0; i < semitones.length; i++) {
-                switch (semitones[i]) {
-                    case 0:
-                        finalScale.push(chosenModeScale[i]);
-                        break;
-                    case 1:
-                        if (semitones[i + 1] == 2) {
-                            finalScale.push(chosenModeScale[i + 1]);
-                        } else {
-                            finalScale.push(chosenModeScale[i]);
-                        }
-                        break;
-                    case 2:
-                        if (semitones[i - 1] == 1) {
-                            continue;
-                        } else {
-                            finalScale.push(chosenModeScale[i]);
-                        }
-                        break;
-                    case 3:
-                        if (semitones[i + 1] == 4) {
-                            finalScale.push(chosenModeScale[i + 1]);
-                        } else {
-                            finalScale.push(chosenModeScale[i]);
-                        }
-                        break;
-                    case 4:
-                        if (semitones[i - 1] == 3) {
-                            continue;
-                        } else {
-                            finalScale.push(chosenModeScale[i]);
-                        }
-                        break;
-                    case 5:
-                        finalScale.push(chosenModeScale[i]);
-                        break;
-                    case 6:
-                        if (
-                            (semitones[i - 1] == 5 && semitones[i + 1] != 7) ||
-                            (semitones[i - 1] != 5 && semitones[i + 1] == 7)
-                        ) {
-                            finalScale.push(chosenModeScale[i]);
-                        }
-                        break;
-                    case 7:
-                        finalScale.push(chosenModeScale[i]);
-                        break;
-                    case 8:
-                        if (semitones[i + 1] == 9) {
-                            finalScale.push(chosenModeScale[i + 1]);
-                        } else {
-                            finalScale.push(chosenModeScale[i]);
-                        }
-                        break;
-                    case 9:
-                        if (semitones[i - 1] == 8) {
-                            continue;
-                        } else {
-                            finalScale.push(chosenModeScale[i]);
-                        }
-                        break;
-                    case 10:
-                        if (semitones[i + 1] == 11) {
-                            finalScale.push(chosenModeScale[i + 1]);
-                        } else {
-                            finalScale.push(chosenModeScale[i]);
-                        }
-                        break;
-                    case 11:
-                        if (semitones[i - 1] == 10) {
-                            continue;
-                        } else {
-                            finalScale.push(chosenModeScale[i]);
-                        }
-                    default:
-                        console.debug("No case for " + semitones[i]);
-                        break;
-                }
-            }
-
-            if (pitch === null) {
-                return finalScale[scaleDegree];
-            }
-            if (scaleDegree == null) {
-                for (const i in finalScale) {
-                    if (finalScale[i][0] == pitch[0]) {
-                        sd.push(String(Number(i) + 1));
-                        if (finalScale[i] == pitch) {
-                            sd.push(NATURAL);
-                        } else {
-                            if (finalScale[i].includes(SHARP)) {
-                                sd.push(FLAT);
-                            } else if (finalScale[i].includes(FLAT)) {
-                                sd.push(FLAT);
-                            } else if (pitch.includes(SHARP)) {
-                                sd.push(SHARP);
-                            } else if (pitch.includes(FLAT)) {
-                                sd.push(FLAT);
-                            }
-                        }
-                    }
-                }
-                return sd;
-            }
-        }
-    }
-}
-
-/**
- * @public
- * @param {String} keySignature
- * @param {Number} scaleDegree
- * @returns {String}
- */
-function nthDegreeToPitch(keySignature, scaleDegree) {
-    // Returns note corresponding to scale degree in current key
-    // signature. Used for moveable solfege.
-    const scale = _buildScale(keySignature)[0];
-    // Scale degree is specified as do === 1, re === 2, etc., so we need
-    // to subtract 1 to make it zero-based.
-    // scaleDegree -= 1;
-
-    // We mod to ensure we don't run out of notes.
-    // FixMe: bump octave if we wrap.
-
-    scaleDegree %= scale.length - 1;
-    return scale[scaleDegree];
-}
-
-// Approximate mapping of mode to solfege (Used by modes where the
-// length !== 7).
-const SOLFMAPPER = ["do", "do", "re", "re", "mi", "fa", "fa", "sol", "sol", "la", "la", "ti"];
-
-/**
- * @public
- * @param {String} keySignature
- * @returns {Array}
- */
-function getScaleAndHalfSteps(keySignature) {
-    // Determine scale and half-step pattern from key signature
-    const obj = keySignatureToMode(keySignature);
-    let myKeySignature = obj[0];
-    let halfSteps;
-    if (obj[1] === "CUSTOM") {
-        halfSteps = customMode;
-    } else {
-        halfSteps = MUSICALMODES[obj[1]];
-    }
-
-    const solfege = [];
-
-    if (halfSteps.length === 7) {
-        for (let i = 0; i < halfSteps.length; i++) {
-            solfege.push(SOLFEGENAMES[i]);
-            for (let j = 1; j < halfSteps[i]; j++) {
-                solfege.push("");
-            }
-        }
-    } else if (halfSteps.length > 7) {
-        // If there are more than 7 notes, we need to add accidentals.
-        for (let i = 0; i < halfSteps.length; i++) {
-            if (solfege.indexOf(SOLFMAPPER[i]) === -1) {
-                solfege.push(SOLFMAPPER[i]);
-            } else {
-                solfege.push(SOLFMAPPER[i] + SHARP);
-            }
-
-            for (let j = 1; j < halfSteps[i]; j++) {
-                solfege.push("");
-            }
-        }
-    } else {
-        // If there are fewer than 7 notes, choose a solfege based on the mode spacing.
-        let n;
-        let solf;
-        for (let i = 0; i < halfSteps.length; i++) {
-            n = 0;
-            solf = SOLFMAPPER[solfege.length];
-            // Ensure there are no duplicates.
-            while (solfege.indexOf(solf) !== -1) {
-                n += 1;
-                solf = SOLFMAPPER[solfege.length + n];
-            }
-
-            solfege.push(solf);
-
-            for (let j = 1; j < halfSteps[i]; j++) {
-                solfege.push("");
-            }
-        }
-    }
-
-    let thisScale = NOTESSHARP;
-    if (NOTESFLAT.indexOf(myKeySignature) !== -1) {
-        thisScale = NOTESFLAT;
-    }
-
-    if (myKeySignature in EXTRATRANSPOSITIONS) {
-        myKeySignature = EXTRATRANSPOSITIONS[myKeySignature][0];
-    }
-
-    return [thisScale, solfege, myKeySignature, obj[1]];
-}
-
-/**
- * Relative interval (used by the Interval Block) is based on the steps within the current key and mode.
- * @public
- * @param {Number}0 interval
- * @param {String} keySignature
- * @param {Number} pitch
- * @returns {Number}
- */
-function getInterval(interval, keySignature, pitch) {
-    // Step size interval based on the position (pitch) in the scale
-    const obj = _buildScale(keySignature);
-    const scale = obj[0];
-    const halfSteps = obj[1];
-    // Offet is used in the case that the pitch is not in the current scale.
-    let offset = 0;
-
-    if (SOLFEGENAMES.indexOf(pitch) !== -1) {
-        pitch = FIXEDSOLFEGE[pitch];
-    }
-
-    let ii;
-    if (pitch in BTOFLAT) {
-        pitch = BTOFLAT[pitch];
-        ii = scale.indexOf(pitch);
-    } else if (pitch in STOSHARP) {
-        pitch = STOSHARP[pitch];
-        ii = scale.indexOf(pitch);
-    } else if (scale.indexOf(pitch) !== -1) {
-        ii = scale.indexOf(pitch);
-    } else {
-        ii = scale.indexOf(pitch);
-        if (ii === -1) {
-            if (pitch in EQUIVALENTFLATS) {
-                ii = scale.indexOf(EQUIVALENTFLATS[pitch]);
-            }
-        }
-
-        if (ii === -1) {
-            if (pitch in EQUIVALENTSHARPS) {
-                ii = scale.indexOf(EQUIVALENTSHARPS[pitch]);
-            }
-        }
-
-        if (ii === -1) {
-            if (pitch in EQUIVALENTNATURALS) {
-                ii = scale.indexOf(EQUIVALENTNATURALS[pitch]);
-            }
-        }
-
-        let counter = 0;
-        if (ii === -1) {
-            // Pitch is not in the consonant scale of this key, so we need to
-            // shift up or down for a close match, step up or down, and then
-            // compensate for the shift.
-            if (PITCHES.indexOf(pitch) !== -1) {
-                while (scale.indexOf(pitch) === -1) {
-                    counter += 1;
-                    if (counter > 24) {
-                        break;
-                    }
-                    let i = PITCHES.indexOf(pitch);
-                    if (interval > 0) {
-                        i += 1;
-                        pitch = PITCHES[i % 12];
-                        offset -= 1;
-                    } else {
-                        i -= 1;
-                        if (i < 0) {
-                            i += 12;
-                        }
-                        pitch = PITCHES[i];
-                        offset += 1;
-                    }
-                }
-
-                ii = scale.indexOf(pitch);
-            } else {
-                if (PITCHES2.indexOf(pitch) !== -1) {
-                    while (scale.indexOf(pitch) === -1) {
-                        counter += 1;
-                        if (counter > 24) {
-                            break;
-                        }
-                        let i = PITCHES2.indexOf(pitch);
-                        if (interval > 0) {
-                            i += 1;
-                            pitch = PITCHES2[i % 12];
-                            offset -= 1;
-                        } else {
-                            i -= 1;
-                            if (i < 0) {
-                                i += 12;
-                            }
-                            pitch = PITCHES2[i];
-                            offset += 1;
-                        }
-                    }
-
-                    ii = scale.indexOf(pitch);
-                } else {
-                    // Should never happen.
-                    // console.debug(pitch + " not found");
-                    return 0;
-                }
-            }
-        }
-    }
-
-    // What do we do with the offset? Is it ignored? Or does it count
-    // as one step in the interval?
-
-    let j = 0;
-    if (interval === 0) {
-        return 0;
-    } else if (interval > 0) {
-        for (let k = 0; k < interval; k++) {
-            j += halfSteps[(ii + k) % halfSteps.length];
-        }
-        return j;
-    } else {
-        for (let k = 0; k > interval; k--) {
-            let z = (ii + k - 1) % halfSteps.length;
-            while (z < 0) {
-                z += halfSteps.length;
-            }
-            j -= halfSteps[z];
-        }
-        return j;
-    }
-}
-
-/**
- * @public
- * @param {Number} pitch
- * @param {Number} interval
- * @returns {Array}
- */
-function getNoteFromInterval(pitch, interval) {
-    const len = pitch.length;
-    const pitch1 = pitch.substring(0, 1);
-    const note1 = pitch.substring(0, len - 1);
-    const octave1 = Number(pitch.slice(-1));
-    const number = pitchToNumber(note1, octave1, "C major");
-    const pitches = ["C", "D", "E", "F", "G", "A", "B"];
-    const priorAttrs = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];
-
-    function findMajorInterval(interval) {
-        //For eg. If you are asked to write a major 3rd then the
-        //letters must be 3 apart.
-        //Eg Ab - C or D - F. This is irrelevant of whether the first
-        //note is a sharp or flat, eg G# - B.
-        //Then need to work out if you need a sharp or flat on the
-        //second note.
-        //A Major 3rd is 4 semitones. So, Ab - C needs to be Ab - C; D
-        //- F is D- F#; G# - B is G# - B#.
-        //Same technique is used to code the findMajorInterval.
-        const halfSteps = INTERVALVALUES[interval][0];
-        const direction = INTERVALVALUES[interval][1];
-        let note = numberToPitch(number + halfSteps);
-        const num = interval.split(" ");
-        const pitchIndex = pitches.indexOf(pitch1);
-        let index = pitchIndex + Number(num[1]) - 1;
-        let octave = octave1;
-        if (index > 6) {
-            index = index - 7;
-            octave = octave1 + 1;
-        }
-        const id = pitches[index];
-        if (note[0].substring(0, 1) === id) {
-            return [note[0], octave];
-        } else if (note[0].substring(0, 1) !== id) {
-            note = numberToPitchSharp(number + halfSteps);
-            if (note[0] === id) {
-                return [note[0], octave];
-            } else {
-                const steps = getNumber(id, octave) - getNumber(note1, octave1);
-                const naturalIndex = priorAttrs.indexOf("");
-                const attr = priorAttrs[naturalIndex + halfSteps - steps];
-                note = id + attr + "";
-                return [note, octave];
-            }
-        }
-    }
-
-    function findOtherIntervals(interval) {
-        const num = interval.split(" ");
-        let majorNote;
-        let accidental;
-        let index1;
-
-        if (
-            interval === "minor 2" ||
-            interval === "minor 3" ||
-            interval === "minor 6" ||
-            interval === "minor 7"
-        ) {
-            //Major intervals lowered by a half step become minor.
-            majorNote = findMajorInterval("major " + num[1]);
-            accidental = majorNote[0].substring(1, majorNote[0].length);
-            index1 = priorAttrs.indexOf(accidental);
-            if (index1 === 0) {
-                accidental = priorAttrs[index1] + FLAT;
-            } else {
-                accidental = priorAttrs[index1 - 1];
-            }
-        }
-
-        if (
-            interval === "diminished 4" ||
-            interval === "diminished 5" ||
-            interval === "diminished 8"
-        ) {
-            //Perfect intervals lowered by a half step are called diminished.
-            majorNote = findMajorInterval("perfect " + num[1]);
-            accidental = majorNote[0].substring(1, majorNote[0].length);
-            index1 = priorAttrs.indexOf(accidental);
-            if (index1 === 0) {
-                accidental = priorAttrs[index1] + FLAT;
-            } else {
-                accidental = priorAttrs[index1 - 1];
-            }
-        }
-
-        if (
-            interval === "augmented 2" ||
-            interval === "augmented 3" ||
-            interval === "augmented 6" ||
-            interval === "augmented 7"
-        ) {
-            //Major intervals raised by a half step are called augmented.
-            majorNote = findMajorInterval("major " + num[1]);
-            accidental = majorNote[0].substring(1, majorNote[0].length);
-            index1 = priorAttrs.indexOf(accidental);
-            if (index1 === 4) {
-                accidental = priorAttrs[index1] + SHARP;
-            } else {
-                accidental = priorAttrs[index1 + 1];
-            }
-        }
-
-        if (
-            interval === "augmented 1" ||
-            interval === "augmented 4" ||
-            interval === "augmented 5" ||
-            interval === "augmented 8"
-        ) {
-            //Perfect intervals raised by a half step are called augmented.
-            majorNote = findMajorInterval("perfect " + num[1]);
-            accidental = majorNote[0].substring(1, majorNote[0].length);
-            index1 = priorAttrs.indexOf(accidental);
-            if (index1 === 4) {
-                accidental = priorAttrs[index1] + SHARP;
-            } else {
-                accidental = priorAttrs[index1 + 1];
-            }
-        }
-
-        return [majorNote[0].substring(0, 1) + accidental + "", majorNote[1]];
-    }
-
-    if (
-        interval === "major 2" ||
-        interval === "major 3" ||
-        interval === "major 6" ||
-        interval === "major 7" ||
-        interval === "perfect 4" ||
-        interval === "perfect 5" ||
-        interval === "perfect 8" ||
-        interval === "perfect 1"
-    ) {
-        return findMajorInterval(interval);
-    } else {
-        return findOtherIntervals(interval);
-    }
-}
-
-/**
- * @public
- * @param {Number} a
- * @param {Number} b
- * @param {NUmber} scale
- * @returns {Number}
- */
-function calcNoteValueToDisplay(a, b, scale) {
-    const noteValue = a / b;
-    let noteValueToDisplay = null;
-    let cellScale;
-    if (scale === undefined) {
-        cellScale = 1.0;
-    } else {
-        cellScale = scale;
-    }
-
-    if (noteValue in NSYMBOLS) {
-        noteValueToDisplay =
-            "1<br>&mdash;<br>" + noteValue.toString() + "<br>" + NSYMBOLS[noteValue];
-    } else {
-        noteValueToDisplay = reducedFraction(b, a);
-    }
-
-    let value;
-    let obj;
-    let d0, d1;
-    if (parseInt(noteValue) < noteValue) {
-        noteValueToDisplay = parseInt(noteValue * 1.5);
-        if (noteValueToDisplay in NSYMBOLS) {
-            value = b / a; // * noteValueToDisplay;
-            obj = toFraction(value);
-            Number.isInteger(obj[0]) ? (d0 = 0) : (d0 = 2);
-            Number.isInteger(obj[1]) ? (d1 = 0) : (d1 = 2);
-            noteValueToDisplay =
-                // value.toFixed(2) +
-                obj[0].toFixed(d0) +
-                "<br>&mdash;<br>" +
-                // noteValueToDisplay.toString() +
-                obj[1].toFixed(d1) +
-                "<br>" +
-                NSYMBOLS[noteValueToDisplay] +
-                ".";
-        } else {
-            noteValueToDisplay = parseInt(noteValue * 1.75);
-            if (noteValueToDisplay in NSYMBOLS) {
-                value = b / a; // * noteValueToDisplay;
-                obj = toFraction(value);
-                Number.isInteger(obj[0]) ? (d0 = 0) : (d0 = 2);
-                Number.isInteger(obj[1]) ? (d1 = 0) : (d1 = 2);
-                noteValueToDisplay =
-                    // value.toFixed(2) +
-                    obj[0].toFixed(d0) +
-                    "<br>&mdash;<br>" +
-                    // noteValueToDisplay.toString() +
-                    obj[1].toFixed(d1) +
-                    "<br>" +
-                    NSYMBOLS[noteValueToDisplay] +
-                    "..";
-            } else {
-                noteValueToDisplay = reducedFraction(b, a);
-            }
-        }
-    }
-
-    return noteValueToDisplay;
-}
-
-/**
- * @public
- * @param {Number} duration
- * @returns {Array}
- */
-function durationToNoteValue(duration) {
-    // returns [note value, no. of dots, tuplet factor]
-
-    let currentDotFactor;
-    let d;
-    // Try to find a match or a dotted match.
-    for (let dotCount = 0; dotCount < 3; dotCount++) {
-        currentDotFactor = 2 - 1 / Math.pow(2, dotCount);
-        d = duration * currentDotFactor;
-        if (POWER2.indexOf(d) !== -1) {
-            return [d, dotCount, null];
-        }
-    }
-
-    // First, round down.
-    let roundDown = duration;
-    for (let i = 1; i < POWER2.length; i++) {
-        // Rounding down
-        if (roundDown < POWER2[i]) {
-            roundDown = POWER2[i - 1];
-            break;
-        }
-    }
-
-    if (POWER2.indexOf(roundDown) === -1) {
-        roundDown = 128;
-    }
-
-    // Convert duration into parts based on POW2 factors
-    // e.g., 1 / 6 ==> [3, 2], 1 / 12 ==> [3, 4]
-    let j = 1;
-    while (Math.floor(duration / j) * j === duration) {
-        j = j * 2;
-        if (j > duration / 2) {
-            break;
-        }
-    }
-
-    j = j / 2;
-
-    return [1, 0, [duration / j, j], roundDown];
-}
-
-/**
- * @public
- * @param {Number} d
- * @returns {Array}
- */
-function toFraction(d) {
-    // Convert float to its approximate fractional representation.
-    let flip = false;
-    if (d > 1) {
-        flip = true;
-        d = 1 / d;
-    }
-
-    let df = 1.0;
-    let top = 1;
-    let bot = 1;
-
-    while (Math.abs(df - d) > 0.00000001) {
-        if (df < d) {
-            top += 1;
-        } else {
-            bot += 1;
-            top = parseInt(d * bot);
-        }
-        df = top / bot;
-    }
-
-    if (flip) {
-        const tmp = top;
-        top = bot;
-        bot = tmp;
-    }
-
-    return [top, bot];
+    return [note, octave];
 }
 
 /**
@@ -2986,593 +1694,6 @@ function frequencyToPitch(hz) {
 
 /**
  * @public
- * @param {Number} i
- * @param {String} temperament
- * @param {Number} startPitch
- * @param {Number} offset
- * @returns {Array}
- */
-function numberToPitch(i, temperament, startPitch, offset) {
-    // Calculate the pitch and octave based on index.
-    // We start at A0.
-    if (temperament === undefined) {
-        temperament = "equal";
-    }
-
-    let n = 0;
-    if (i < 0) {
-        while (i < 0) {
-            i += 12;
-            n += 1; // Count octave bump ups.
-        }
-
-        if (temperament === "equal") {
-            return [
-                PITCHES[(i + PITCHES.indexOf("A")) % 12],
-                Math.floor((i + PITCHES.indexOf("A")) / 12) - n
-            ];
-        } else {
-            pitchNumber = Math.floor(i - offset);
-        }
-    } else {
-        if (temperament === "equal") {
-            return [
-                PITCHES[(i + PITCHES.indexOf("A")) % 12],
-                Math.floor((i + PITCHES.indexOf("A")) / 12)
-            ];
-        } else {
-            pitchNumber = Math.floor(i - offset);
-        }
-    }
-
-    let interval;
-    if (isCustom(temperament)) {
-        pitchNumber = pitchNumber + "";
-        if (TEMPERAMENT[temperament][pitchNumber][1] === undefined) {
-            // If custom temperament is not defined, then it will
-            // store equal temperament notes.
-            for (let j = 0; j < 12; j++) {
-                const number = "" + j;
-                interval = TEMPERAMENT["equal"]["interval"][i];
-                TEMPERAMENT[temperament][number] = [
-                    Math.pow(2, j / 12),
-                    getNoteFromInterval(startPitch, interval)[0],
-                    getNoteFromInterval(startPitch, interval)[1]
-                ];
-            }
-
-            return [
-                TEMPERAMENT[temperament][pitchNumber][1],
-                TEMPERAMENT[temperament][pitchNumber][2]
-            ];
-        } else {
-            return [
-                TEMPERAMENT[temperament][pitchNumber][1],
-                TEMPERAMENT[temperament][pitchNumber][2]
-            ];
-        }
-    } else {
-        interval = TEMPERAMENT[temperament]["interval"][pitchNumber];
-        return getNoteFromInterval(startPitch, interval);
-    }
-}
-
-/**
- * @public
- * @param {Number} i
- * @returns {Array}
- */
-function numberToPitchSharp(i) {
-    // numbertoPitch return only flats
-    // This function will return sharps.
-    if (i < 0) {
-        let n = 0;
-        while (i < 0) {
-            i += 12;
-            n += 1;
-        }
-
-        return [
-            PITCHES2[(i + PITCHES2.indexOf("A")) % 12],
-            Math.floor((i + PITCHES2.indexOf("A")) / 12) - n
-        ];
-    } else {
-        return [
-            PITCHES2[(i + PITCHES2.indexOf("A")) % 12],
-            Math.floor((i + PITCHES2.indexOf("A")) / 12)
-        ];
-    }
-}
-
-/**
- * @public
- * @param {Number} i
- * @returns {Array}
- */
-function noteToPitchOctave(note) {
-    const len = note.length;
-    return [note.substring(0, len - 1), Number(last(note))];
-}
-
-/**
- * @public
- * @param {Number} note
- * @param {String} keySignature
- * @returns {Number}
- */
-function noteToFrequency(note, keySignature) {
-    const obj = noteToPitchOctave(note);
-    return pitchToFrequency(obj[0], obj[1], 0, keySignature);
-}
-
-/**
- * @public
- * @param {Number} pitch
- * @param {Number} octave
- * @param {Number} cents
- * @param {String} keySignature
- * @returns {Number}
- */
-function pitchToFrequency(pitch, octave, cents, keySignature) {
-    // Calculate the frequency based on pitch and octave.
-    const pitchNumber = pitchToNumber(pitch, octave, keySignature);
-
-    if (cents === 0) {
-        return A0 * Math.pow(TWELTHROOT2, pitchNumber);
-    } else {
-        return A0 * Math.pow(TWELVEHUNDRETHROOT2, pitchNumber * 100 + cents);
-    }
-}
-
-/**
- * @public
- * @param {Number} pitch
- * @param {NUmber} octave
- * @param {String} keySignature
- * @returns {Number}
- */
-function pitchToNumber(pitch, octave, keySignature) {
-    // Calculate the pitch index based on pitch and octave.
-    if (pitch.toUpperCase() === "R") {
-        return 0;
-    }
-    // Check for flat, sharp, double flat, or double sharp.
-    let transposition = 0;
-    const len = pitch.length;
-    let lastOne, lastTwo;
-    if (len > 1) {
-        if (len > 2) {
-            lastTwo = pitch.slice(len - 2);
-            //Unsure why slice is not working for double flats and double sharps.
-            lastOne = pitch.substring(1, len);
-            if (lastTwo === "bb") {
-                pitch = pitch.substring(0, 1);
-                transposition -= 2;
-            } else if (lastOne === DOUBLEFLAT) {
-                pitch = pitch.substring(0, 1);
-                transposition -= 2;
-            } else if (lastTwo === "*" || lastTwo === DOUBLESHARP) {
-                pitch = pitch.substring(0, 1);
-                transposition += 2;
-            } else if (
-                lastTwo === "#b" ||
-                lastTwo === SHARP + FLAT ||
-                lastTwo === "b#" ||
-                lastTwo === FLAT + SHARP
-            ) {
-                // Not sure this could occur... but just in case.
-                pitch = pitch.slice(0, len - 2);
-            }
-        }
-
-        if (pitch.length > 1) {
-            lastOne = pitch.slice(len - 1);
-            if (lastOne === "b" || lastOne === FLAT) {
-                pitch = pitch.slice(0, len - 1);
-                transposition -= 1;
-            } else if (lastOne === "#" || lastOne === SHARP) {
-                pitch = pitch.slice(0, len - 1);
-                transposition += 1;
-            }
-        }
-    }
-
-    let pitchNumber = 0;
-    if (PITCHES.indexOf(pitch) !== -1) {
-        pitchNumber = PITCHES.indexOf(pitch.toUpperCase());
-    } else {
-        // obj[1] is the solfege mapping for the current key/mode
-        const obj = getScaleAndHalfSteps(keySignature);
-        if (obj[1].indexOf(pitch.toLowerCase()) !== -1) {
-            pitchNumber = obj[1].indexOf(pitch.toLowerCase());
-        } else {
-            // console.debug("pitch " + pitch + " not found.");
-            pitchNumber = 0;
-        }
-    }
-    // We start at A0.
-    return octave * 12 + pitchNumber - PITCHES.indexOf("A") + transposition;
-}
-
-/**
- * @public
- * @param {Number} note
- * @returns {Boolean}
- */
-function noteIsSolfege(note) {
-    if (SOLFEGECONVERSIONTABLE[note] === undefined) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-/**
- * @public
- * @param {Number} note
- * @returns {Number}
- */
-function getSolfege(note) {
-    // FIXME: Use mode-specific conversion.
-    if (noteIsSolfege(note)) {
-        return note;
-    } else {
-        return SOLFEGECONVERSIONTABLE[note];
-    }
-}
-
-/**
- * @public
- * @param {Number} note
- * @returns {Number}
- */
-function i18nSolfege(note) {
-    // solfnotes_ is used in the interface for i18n
-    const solfnotes_ = _("ti la sol fa mi re do").split(" ");
-    const obj = splitSolfege(note);
-
-    const i = SOLFNOTES.indexOf(obj[0]);
-    if (i !== -1) {
-        return solfnotes_[i] + obj[1];
-    } else {
-        // Wasn't solfege so it doesn't need translation.
-        return note;
-    }
-}
-
-/**
- * @public
- * @param {Number} value
- * @returns {Array}
- */
-function splitScaleDegree(value) {
-    if (!value) {
-        return [5, NATURAL];
-    }
-
-    const note = value.slice(0, 1);
-    const attr = value.slice(1);
-    return [note, attr];
-}
-
-/**
- * @public
- * @param {Number} value
- * @returns {Array}
- */
-function splitSolfege(value) {
-    // Separate the pitch from any attributes, e.g., # or b
-    if (value != null && typeof value === "string") {
-        let note, attr;
-        if (SOLFNOTES.indexOf(value) !== -1) {
-            note = value;
-            attr = "";
-        } else if (value.slice(0, 3) === "sol") {
-            note = "sol";
-            if (value.length === 4) {
-                attr = value[3];
-            } else {
-                attr = value[3] + value[4];
-            }
-        } else {
-            note = value.slice(0, 2);
-            if (value.length === 3) {
-                attr = value[2];
-            } else {
-                attr = value[2] + value[3];
-            }
-        }
-
-        return [note, attr];
-    }
-
-    return ["sol", ""];
-}
-
-/**
- * @public
- * @param {Number} notename
- * @param {Number} octave
- * @returns {Number}
- */
-function getNumber(notename, octave) {
-    // Converts a note, e.g., C, and octave to a number
-    let num;
-    if (octave < 0) {
-        num = 0;
-    } else if (octave > 10) {
-        num = 9 * 12;
-    } else {
-        num = 12 * (octave - 1);
-    }
-
-    notename = String(notename);
-    if (notename.substring(0, 1) in NOTESTEP) {
-        num += NOTESTEP[notename.substring(0, 1)];
-        if (notename.length >= 1) {
-            let delta;
-            delta = notename.substring(1);
-            if (delta === "bb" || delta === DOUBLEFLAT) {
-                num -= 2;
-            } else if (delta === "##" || delta === "*" || delta === DOUBLESHARP) {
-                num += 2;
-            } else if (delta === "b" || delta === FLAT) {
-                num -= 1;
-            } else if (delta === "#" || delta === SHARP) {
-                num += 1;
-            }
-        }
-    }
-
-    return num;
-}
-
-/**
- * @public
- * @param {Number} value
- * @param {Number} delta
- * @returns {Array}
- */
-function getNumNote(value, delta) {
-    // Converts from number to note
-    let num = value + delta;
-    let octave = Math.floor(num / 12);
-    num = num % 12;
-
-    const note = NOTESTABLE[num];
-
-    if (note[num] === "ti") {
-        octave -= 1;
-    }
-
-    return [note, octave + 1];
-}
-
-/**
- * @public
- * @param {Number} currentOctave
- * @param {String} arg
- * @param {String} lastNotePlayed
- * @param {Number} currentNote
- * @returns {Number}
- */
-calcOctave = function (currentOctave, arg, lastNotePlayed, currentNote) {
-    // Calculate the octave based on the current Octave and the arg,
-    // which can be a number, a 'number' as a string, 'current',
-    // 'previous', or 'next'.
-
-    if (typeof arg === "number") {
-        return Math.max(1, Math.min(Math.floor(arg), 9));
-    }
-
-    // The relative octave for tritones are arbitrated as being in the
-    // current octave, so we need to determine the number of half
-    // steps between lastNotePlayed and currentNote.
-    let note, stepCurrentNote, stepLastNotePlayed, changedCurrent;
-
-    if (SOLFEGENAMES1.indexOf(currentNote) !== -1) {
-        note = FIXEDSOLFEGE1[currentNote];
-    } else {
-        note = currentNote;
-    }
-
-    stepCurrentNote = getNumber(note, currentOctave);
-    stepUpCurrentNote = getNumber(note, currentOctave + 1);
-    stepDownCurrentNote = getNumber(note, currentOctave - 1);
-
-    if (lastNotePlayed != null) {
-        lastNotePlayed = lastNotePlayed[0];
-        // strip off octave from end of note
-        lastNotePlayed = lastNotePlayed.substring(0, lastNotePlayed.length - 1);
-    } else {
-        lastNotePlayed = "G";
-    }
-
-    stepLastNotePlayed = getNumber(lastNotePlayed, currentOctave);
-
-    const halfSteps = Math.abs(stepLastNotePlayed - stepCurrentNote);
-    const halfStepsUp = Math.abs(stepLastNotePlayed - stepUpCurrentNote);
-    const halfStepsDown = Math.abs(stepLastNotePlayed - stepDownCurrentNote);
-
-    if (halfSteps <= 5 || isNaN(halfSteps)) {
-        changedCurrent = currentOctave;
-    }
-
-    if (halfSteps > 5 && halfStepsUp > 5 && halfStepsDown < 5) {
-        changedCurrent = Math.max(currentOctave - 1, 1);
-    }
-
-    if (halfSteps > 5 && halfStepsUp < 5 && halfStepsDown > 5) {
-        changedCurrent = Math.min(currentOctave + 1, 9);
-    }
-
-    if (halfSteps > 5 && halfStepsUp > 5 && halfStepsDown > 5) {
-        changedCurrent = currentOctave;
-    }
-
-    switch (arg) {
-        case _("current"):
-        case "current":
-            return changedCurrent;
-        case _("next"):
-        case "next":
-            return Math.min(changedCurrent + 1, 10);
-        case _("previous"):
-        case "previous":
-            return Math.max(changedCurrent - 1, 1);
-        default:
-            try {
-                if (changedCurrent) {
-                    return changedCurrent;
-                } else {
-                    return Math.floor(Number(arg));
-                }
-            } catch (e) {
-                // console.debug("cannot convert " + arg + " to a number");
-                return currentOctave;
-            }
-    }
-};
-
-/**
- * @public
- * @param {Number} arg
- * @returns {Number}
- */
-calcOctaveInterval = function (arg) {
-    // Used by intervals to determine octave to use in an interval.
-    let value = 0;
-    switch (arg) {
-        case 1:
-        case _("next"):
-        case "next":
-            value = 1;
-            break;
-        case -1:
-        case _("previous"):
-        case "previous":
-            value = -1;
-            break;
-        case _("current"):
-        case "current":
-        case 0:
-            value = 0;
-            break;
-        case 2:
-            value = 2;
-            break;
-        case -2:
-            value = -2;
-            break;
-        default:
-            // console.debug("Interval octave must be between -2 and 2.");
-            value = 0;
-            break;
-    }
-
-    return value;
-};
-
-/**
- * @public
- * @param {Number} value
- * @returns {Boolean}
- */
-function isInt(value) {
-    return !isNaN(value) && parseInt(Number(value)) === value && !isNaN(parseInt(value, 10));
-}
-
-/**
- * @public
- * @param {Number} a
- * @param {Number} b
- * @returns {String}
- */
-function reducedFraction(a, b) {
-    greatestCommonMultiple = function (a, b) {
-        return b === 0 ? a : greatestCommonMultiple(b, a % b);
-    };
-
-    const gcm = greatestCommonMultiple(a, b);
-
-    if ([1, 2, 4, 8, 16].indexOf(b / gcm) !== -1) {
-        return a / gcm + "<br>&mdash;<br>" + b / gcm + "<br>" + NSYMBOLS[b / gcm];
-    } else {
-        return a / gcm + "<br>&mdash;<br>" + b / gcm + "<br><br>";
-    }
-}
-
-/**
- * @public
- * @param {String} note
- * @returns {String}
- */
-function getArticulation(note) {
-    return note
-        .replace("do", "")
-        .replace("re", "")
-        .replace("mi", "")
-        .replace("fa", "")
-        .replace("sol", "")
-        .replace("la", "")
-        .replace("ti", "")
-        .replace("A", "")
-        .replace("B", "")
-        .replace("C", "")
-        .replace("D", "")
-        .replace("E", "")
-        .replace("F", "")
-        .replace("G", "");
-}
-
-/**
- * @public
- * @param {Array} notes
- * @return {Array}
- */
-function getCustomNote(notes) {
-    // For custom temperament notes
-    if (notes instanceof Array) {
-        notes = notes[0];
-    }
-
-    let centsInfo = "";
-    if (notes.indexOf("(") !== -1) {
-        centsInfo = notes.substring(notes.indexOf("("), notes.length);
-    }
-
-    notes = notes.replace(centsInfo, "");
-    const articulation = getArticulation(notes);
-    notes = notes.replace(articulation, "");
-
-    switch (articulation) {
-        case "bb":
-        case DOUBLEFLAT:
-            notes = notes + "𝄫" + centsInfo;
-            break;
-        case "b":
-        case FLAT:
-            notes = notes + "♭" + centsInfo;
-            break;
-        case "##":
-        case "*":
-        case "x":
-        case DOUBLESHARP:
-            notes = notes + "𝄪" + centsInfo;
-            break;
-        case "#":
-        case SHARP:
-            notes = notes + "♯" + centsInfo;
-            break;
-        default:
-            notes = notes + articulation + centsInfo;
-            break;
-    }
-    return notes;
-}
-
-/**
- * @public
  * @param {String} temperament
  * @returns {Boolean}
  */
@@ -3580,36 +1701,6 @@ let isCustom = (temperament) => {
     return !(temperament in PreDefinedTemperaments);
 };
 
-/**
- * @public
- * @param {Number} note
- * @returns {Array}
- */
-function noteToObj(note) {
-    let octave = parseInt(note.slice(note.length - 1));
-    if (isNaN(octave)) {
-        octave = 4;
-    } else {
-        note = note.slice(0, note.length - 1);
-    }
-    return [note, octave];
-}
-
-/**
- * @public
- * @param {String} note
- * @returns {String}
- */
-function convertFromSolfege(note) {
-    // Convert to common letter class
-    if (note in FIXEDSOLFEGE1) {
-        note = FIXEDSOLFEGE1[note];
-    }
-    if (note in EQUIVALENTNATURALS) {
-        note = EQUIVALENTNATURALS[note];
-    }
-    return note;
-}
 /**
  * @param  {String} noteArg
  * @param  {Number} octave
@@ -4186,6 +2277,1918 @@ function getNote(
         return [note, octave];
     }
 }
+
+/**
+ * @public
+ * @param {Number} pitch
+ * @param {NUmber} octave
+ * @param {String} keySignature
+ * @returns {Number}
+ */
+function pitchToNumber(pitch, octave, keySignature) {
+    // Calculate the pitch index based on pitch and octave.
+    if (pitch.toUpperCase() === "R") {
+        return 0;
+    }
+    // Check for flat, sharp, double flat, or double sharp.
+    let transposition = 0;
+    const len = pitch.length;
+    let lastOne, lastTwo;
+    if (len > 1) {
+        if (len > 2) {
+            lastTwo = pitch.slice(len - 2);
+            //Unsure why slice is not working for double flats and double sharps.
+            lastOne = pitch.substring(1, len);
+            if (lastTwo === "bb") {
+                pitch = pitch.substring(0, 1);
+                transposition -= 2;
+            } else if (lastOne === DOUBLEFLAT) {
+                pitch = pitch.substring(0, 1);
+                transposition -= 2;
+            } else if (lastTwo === "*" || lastTwo === DOUBLESHARP) {
+                pitch = pitch.substring(0, 1);
+                transposition += 2;
+            } else if (
+                lastTwo === "#b" ||
+                lastTwo === SHARP + FLAT ||
+                lastTwo === "b#" ||
+                lastTwo === FLAT + SHARP
+            ) {
+                // Not sure this could occur... but just in case.
+                pitch = pitch.slice(0, len - 2);
+            }
+        }
+
+        if (pitch.length > 1) {
+            lastOne = pitch.slice(len - 1);
+            if (lastOne === "b" || lastOne === FLAT) {
+                pitch = pitch.slice(0, len - 1);
+                transposition -= 1;
+            } else if (lastOne === "#" || lastOne === SHARP) {
+                pitch = pitch.slice(0, len - 1);
+                transposition += 1;
+            }
+        }
+    }
+
+    let pitchNumber = 0;
+    if (PITCHES.indexOf(pitch) !== -1) {
+        pitchNumber = PITCHES.indexOf(pitch.toUpperCase());
+    } else {
+        // obj[1] is the solfege mapping for the current key/mode
+        const obj = getScaleAndHalfSteps(keySignature);
+        if (obj[1].indexOf(pitch.toLowerCase()) !== -1) {
+            pitchNumber = obj[1].indexOf(pitch.toLowerCase());
+        } else {
+            // console.debug("pitch " + pitch + " not found.");
+            pitchNumber = 0;
+        }
+    }
+    // We start at A0.
+    return octave * 12 + pitchNumber - PITCHES.indexOf("A") + transposition;
+}
+
+/**
+ * Converts the pitch value of the last note played into different formats
+ * such as hertz, letter name, pitch number, et al.
+ *
+ * @private
+ * @param {String} type - required format: letter class, solfege syllable,
+ * solfege class, pitch class, scalar class, scale degree, nth degree,
+ * staff y, pitch number, pitch in hertz
+ * @param {notePlayed} note - Argument which is to be converted
+ * @param {tur} turtle - Current Turtle
+ * @returns {String}
+ */
+
+function _calculate_pitch_number(np, tur) {
+    let obj;
+    if (tur.singer.lastNotePlayed !== null) {
+        if (typeof np === "string") {
+            obj = noteToObj(np);
+        } else {
+            // Hertz
+            obj = frequencyToPitch(np);
+        }
+    } else if (
+        tur.singer.inNoteBlock in tur.singer.notePitches &&
+        tur.singer.notePitches[last(tur.singer.inNoteBlock)].length > 0
+    ) {
+        obj = getNote(
+            tur.singer.notePitches[last(tur.singer.inNoteBlock)][0],
+            tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][0],
+            0,
+            tur.singer.keySignature,
+            tur.singer.moveable,
+            null,
+            logo.errorMsg
+        );
+    } else {
+        if (tur.singer.lastNotePlayed !== null) {
+            // console.debug("Cannot find a note ");
+            logo.errorMsg(INVALIDPITCH, blk);
+        }
+        obj = ["G", 4];
+    }
+    return pitchToNumber(obj[0], obj[1], tur.singer.keySignature) - tur.singer.pitchNumberOffset;
+}
+
+/**
+ * @private
+ * @param {String} keySignature
+ * @returns {Array}
+ */
+function _buildScale(keySignature) {
+    // FIX ME: temporary hard-coded fix to avoid errors in pitch preview
+    if (keySignature == "C♭ major") {
+        const scale = ["C♭", "D♭", "E♭", "F♭", "G♭", "A♭", "B♭", "C♭"];
+        return [scale, halfSteps];
+    }
+
+    let obj = keySignatureToMode(keySignature);
+    myKeySignature = obj[0];
+    if (myKeySignature == "C" + FLAT) {
+        obj = keySignatureToMode("B " + obj[1]);
+        myKeySignature = obj[0];
+    }
+
+    let halfSteps;
+    if (obj[1] === "CUSTOM") {
+        halfSteps = customMode;
+    } else {
+        halfSteps = MUSICALMODES[obj[1]];
+    }
+
+    let thisScale;
+    if (NOTESFLAT.indexOf(myKeySignature) !== -1) {
+        if (SHARPPREFERENCE.indexOf(obj[0].toLowerCase() + " " + obj[1]) !== -1) {
+            thisScale = NOTESSHARP;
+        } else {
+            thisScale = NOTESFLAT;
+        }
+    } else {
+        if (FLATPREFERENCE.indexOf(obj[0].toLowerCase() + " " + obj[1]) !== -1) {
+            thisScale = NOTESFLAT;
+        } else {
+            thisScale = NOTESSHARP;
+        }
+    }
+
+    let idx = thisScale.indexOf(myKeySignature);
+    if (idx === -1) {
+        idx = 0;
+    }
+
+    const scale = [myKeySignature];
+    let ii = idx;
+    for (let i = 0; i < halfSteps.length; i++) {
+        ii += halfSteps[i];
+        scale.push(thisScale[ii % SEMITONES]);
+    }
+
+    // Make sure there are no repeated letter names for seven step scales
+    if (scale.length === 8) {
+        for (let n = 0; n < 7; n++) {
+            if (scale[n][0] === scale[n + 1][0]) {
+                if (scale[n] in EQUIVALENTACCIDENTALS) {
+                    scale[n] = EQUIVALENTACCIDENTALS[scale[n]];
+                } else if (scale[n] in EQUIVALENTNATURALS) {
+                    scale[n] = EQUIVALENTNATURALS[scale[n]];
+                }
+            }
+        }
+        // Two passes because we may have collisions.
+        for (let n = 0; n < 7; n++) {
+            if (scale[n][0] === scale[n + 1][0]) {
+                if (scale[n] in EQUIVALENTACCIDENTALS) {
+                    scale[n] = EQUIVALENTACCIDENTALS[scale[n]];
+                } else if (scale[n] in EQUIVALENTNATURALS) {
+                    scale[n] = EQUIVALENTNATURALS[scale[n]];
+                }
+            }
+        }
+    }
+    return [scale, halfSteps];
+}
+
+// A two-way function to get pitch according to scale degree and vice versa for a chosen mode
+/**
+ * A two-way function to get pitch according to scale degree and vice versa for a chosen mode
+ * @public
+ * @param {String} keySignature
+ * @param {Number} scaleDegree
+ * @param {Boolean} moveable
+ * @param {String} pitch
+ * @returns {Array}
+ */
+function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
+    if (pitch === null) {
+        scaleDegree -= 1;
+    }
+    // Subtract one to make it zero-based as we're working with arrays
+
+    // Info variables according to chosen mode
+    const chosenMode = keySignatureToMode(keySignature);
+    const obj1 = _buildScale(keySignature);
+    const chosenModeScale = obj1[0];
+    const chosenModePattern = obj1[1];
+
+    // Pitch numbers of the chosen mode
+    const semitones = [0];
+
+    // Scale degrees defined for chosen mode;
+    // Rest would require arbitration
+    const definedScaleDegree = [];
+
+    // Final 7 note scale combining chosen mode and arbitration
+    let finalScale = [];
+    const sd = [];
+
+    // if moveable do is present just return the major/perfect tones
+    if (moveable) {
+        finalScale = _buildScale(chosenMode[0] + " major")[0];
+
+        if (pitch === null) {
+            return finalScale[scaleDegree];
+        }
+        if (scaleDegree == null) {
+            for (const i in finalScale) {
+                if (finalScale[i][0] == pitch[0]) {
+                    sd.push(String(Number(i) + 1));
+                    if (finalScale[i] == pitch) {
+                        sd.push(NATURAL);
+                    } else {
+                        if (finalScale[i].includes(SHARP)) {
+                            sd.push(FLAT);
+                        } else if (finalScale[i].includes(FLAT)) {
+                            sd.push(FLAT);
+                        } else if (pitch.includes(SHARP)) {
+                            sd.push(SHARP);
+                        } else if (pitch.includes(FLAT)) {
+                            sd.push(FLAT);
+                        }
+                    }
+                }
+            }
+            return sd;
+        }
+    } else {
+        // For 7 note systems scale degrees have a one-one relation
+        if (chosenModePattern.length == 7) {
+            if (pitch === null) {
+                return chosenModeScale[scaleDegree];
+            }
+            if (scaleDegree == null) {
+                for (const i in chosenModeScale) {
+                    if (chosenModeScale[i][0] == pitch[0]) {
+                        sd.push(String(Number(i) + 1));
+                        if (chosenModeScale[i] == pitch) {
+                            sd.push(NATURAL);
+                        } else {
+                            if (chosenModeScale[i].includes(SHARP)) {
+                                sd.push(FLAT);
+                            } else if (chosenModeScale[i].includes(FLAT)) {
+                                sd.push(FLAT);
+                            } else if (pitch.includes(SHARP)) {
+                                sd.push(SHARP);
+                            } else if (pitch.includes(FLAT)) {
+                                sd.push(FLAT);
+                            }
+                        }
+                    }
+                }
+                return sd;
+            }
+        } else if (chosenModePattern.length < 7) {
+            // Major scale of the choosen key is used as fallback
+            const majorScale = _buildScale(chosenMode[0] + " major")[0];
+
+            // according to the choosenModePattern, calculate defined scale degrees
+            for (let i = 0; i < chosenModePattern.length; i++) {
+                switch (semitones[i]) {
+                    case 0:
+                        definedScaleDegree.push(1);
+                        break;
+                    case 1:
+                    case 2:
+                        definedScaleDegree.push(2);
+                        break;
+                    case 3:
+                    case 4:
+                        definedScaleDegree.push(3);
+                        break;
+                    case 5:
+                        definedScaleDegree.push(4);
+                        break;
+                    case 6:
+                        const lastAdded = definedScaleDegree[definedScaleDegree.length - 1];
+                        if (lastAdded != 4) {
+                            definedScaleDegree.push(4);
+                        } else if (semitones[i] + chosenModeScale[i] != 7) {
+                            definedScaleDegree.push(5);
+                        }
+                        break;
+                    case 7:
+                        definedScaleDegree.push(5);
+                        break;
+                    case 8:
+                    case 9:
+                        definedScaleDegree.push(6);
+                        break;
+                    case 10:
+                    case 11:
+                        definedScaleDegree.push(7);
+                        break;
+                    default:
+                        continue;
+                }
+
+                semitones.push(semitones[i] + chosenModePattern[i]);
+            }
+
+            // For scale degrees which are defined --> Use choosen Mode's notes
+            // For scale degrees which are undefined --> Use fallback notes
+            let k = 0;
+            for (let i = 0; i < 7; i++) {
+                if (definedScaleDegree.indexOf(i + 1) !== -1) {
+                    finalScale.push(chosenModeScale[k]);
+                    k++;
+                } else {
+                    finalScale.push(majorScale[i]);
+                }
+            }
+
+            if (pitch === null) {
+                return finalScale[scaleDegree];
+            }
+            if (scaleDegree == null) {
+                for (const i in finalScale) {
+                    if (finalScale[i][0] == pitch[0]) {
+                        sd.push(String(Number(i) + 1));
+                        if (finalScale[i] == pitch) {
+                            sd.push(NATURAL);
+                        } else {
+                            if (finalScale[i].includes(SHARP)) {
+                                sd.push(FLAT);
+                            } else if (finalScale[i].includes(FLAT)) {
+                                sd.push(FLAT);
+                            } else if (pitch.includes(SHARP)) {
+                                sd.push(SHARP);
+                            } else if (pitch.includes(FLAT)) {
+                                sd.push(FLAT);
+                            }
+                        }
+                    }
+                }
+                return sd;
+            }
+        } else {
+            // For scales with greater than 7 notes
+            // All scales degrees are defined, just prefer the perfect/major ones
+
+            for (let i = 0; i < chosenModePattern.length; i++) {
+                semitones.push(semitones[i] + chosenModePattern[i]);
+            }
+
+            for (let i = 0; i < semitones.length; i++) {
+                switch (semitones[i]) {
+                    case 0:
+                        finalScale.push(chosenModeScale[i]);
+                        break;
+                    case 1:
+                        if (semitones[i + 1] == 2) {
+                            finalScale.push(chosenModeScale[i + 1]);
+                        } else {
+                            finalScale.push(chosenModeScale[i]);
+                        }
+                        break;
+                    case 2:
+                        if (semitones[i - 1] == 1) {
+                            continue;
+                        } else {
+                            finalScale.push(chosenModeScale[i]);
+                        }
+                        break;
+                    case 3:
+                        if (semitones[i + 1] == 4) {
+                            finalScale.push(chosenModeScale[i + 1]);
+                        } else {
+                            finalScale.push(chosenModeScale[i]);
+                        }
+                        break;
+                    case 4:
+                        if (semitones[i - 1] == 3) {
+                            continue;
+                        } else {
+                            finalScale.push(chosenModeScale[i]);
+                        }
+                        break;
+                    case 5:
+                        finalScale.push(chosenModeScale[i]);
+                        break;
+                    case 6:
+                        if (
+                            (semitones[i - 1] == 5 && semitones[i + 1] != 7) ||
+                            (semitones[i - 1] != 5 && semitones[i + 1] == 7)
+                        ) {
+                            finalScale.push(chosenModeScale[i]);
+                        }
+                        break;
+                    case 7:
+                        finalScale.push(chosenModeScale[i]);
+                        break;
+                    case 8:
+                        if (semitones[i + 1] == 9) {
+                            finalScale.push(chosenModeScale[i + 1]);
+                        } else {
+                            finalScale.push(chosenModeScale[i]);
+                        }
+                        break;
+                    case 9:
+                        if (semitones[i - 1] == 8) {
+                            continue;
+                        } else {
+                            finalScale.push(chosenModeScale[i]);
+                        }
+                        break;
+                    case 10:
+                        if (semitones[i + 1] == 11) {
+                            finalScale.push(chosenModeScale[i + 1]);
+                        } else {
+                            finalScale.push(chosenModeScale[i]);
+                        }
+                        break;
+                    case 11:
+                        if (semitones[i - 1] == 10) {
+                            continue;
+                        } else {
+                            finalScale.push(chosenModeScale[i]);
+                        }
+                    default:
+                        console.debug("No case for " + semitones[i]);
+                        break;
+                }
+            }
+
+            if (pitch === null) {
+                return finalScale[scaleDegree];
+            }
+            if (scaleDegree == null) {
+                for (const i in finalScale) {
+                    if (finalScale[i][0] == pitch[0]) {
+                        sd.push(String(Number(i) + 1));
+                        if (finalScale[i] == pitch) {
+                            sd.push(NATURAL);
+                        } else {
+                            if (finalScale[i].includes(SHARP)) {
+                                sd.push(FLAT);
+                            } else if (finalScale[i].includes(FLAT)) {
+                                sd.push(FLAT);
+                            } else if (pitch.includes(SHARP)) {
+                                sd.push(SHARP);
+                            } else if (pitch.includes(FLAT)) {
+                                sd.push(FLAT);
+                            }
+                        }
+                    }
+                }
+                return sd;
+            }
+        }
+    }
+}
+
+/**
+ * @public
+ * @param  {String} type
+ * @param  {String} notePlayed
+ * @param  {Object} tur
+ * @returns {String}
+ */
+function getPitchInfo(type, notePlayed, tur) {
+    let np = notePlayed;
+    let octave;
+    switch (type) {
+        case "letter class":
+            if (Number(np)) {
+                [np] = frequencyToPitch(np);
+            }
+            return np[0];
+        case "solfege syllable":
+        case "solfege class":
+            if (Number(np)) {
+                np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
+            }
+            if (type === "solfege class") {
+                np = np.substr(0, np.length - 1);
+            }
+            np = np.replace("#", SHARP).replace("b", FLAT);
+            if (tur.singer.moveable === false) return SOLFEGECONVERSIONTABLE[np];
+            const i = _buildScale(tur.singer.keySignature)[0].indexOf(np);
+            return SOLFEGENAMES[i];
+        case "pitch class":
+            if (Number(np)) {
+                np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
+            }
+            const num = pitchToNumber(
+                np.substr(0, np.length - 1),
+                np[np.length - 1],
+                tur.singer.keySignature
+            );
+            return (num - 3) % 12;
+        case "scalar class":
+            if (Number(np)) {
+                np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
+            }
+            np = np.substr(0, np.length - 1);
+            np = np.replace("#", SHARP).replace("b", FLAT);
+            const scalarClass = scaleDegreeToPitchMapping(
+                tur.singer.keySignature,
+                null,
+                tur.singer.moveable,
+                np
+            );
+            return scalarClass[0];
+        case "scale degree":
+            if (Number(np)) {
+                np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
+            }
+            np = np.substr(0, np.length - 1);
+            np = np.replace("#", SHARP).replace("b", FLAT);
+            const scalarClass1 = scaleDegreeToPitchMapping(
+                tur.singer.keySignature,
+                null,
+                tur.singer.moveable,
+                np
+            );
+            return scalarClass1[0] + scalarClass1[1];
+        case "nth degree":
+            if (Number(np)) {
+                np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
+            }
+            np = np.substr(0, np.length - 1);
+            np = np.replace("#", SHARP).replace("b", FLAT);
+            return _buildScale(tur.singer.keySignature)[0].indexOf(np);
+        case "staff y":
+            if (Number(np)) {
+                [np, octave] = frequencyToPitch(np);
+            } else {
+                np = notePlayed[0];
+                octave = notePlayed.length === 2 ? notePlayed[1] : notePlayed[2];
+            }
+            // these numbers are subject to staff artwork
+            return (
+                ["C", "D", "E", "F", "G", "A", "B"].indexOf(np) * YSTAFFNOTEHEIGHT +
+                (octave - 4) * YSTAFFOCTAVEHEIGHT
+            );
+        case "pitch number":
+            return _calculate_pitch_number(np, tur);
+        case "pitch in hertz":
+            return logo.synth._getFrequency(np, logo.synth.changeInTemperament);
+        case "pitch to color":
+            if (Number(np)) {
+                [np, octave] = frequencyToPitch(np);
+            } else {
+                np = np.substr(0, np.length - 1);
+            }
+
+            let color = 0;
+            if (NOTESSHARP.indexOf(np) !== -1) {
+                color = NOTESSHARP.indexOf(np) * 8.33;
+            } else if (NOTESFLAT.indexOf(np) !== -1) {
+                color = NOTESFLAT.indexOf(np) * 8.33;
+            } else {
+                if (np.includes(DOUBLESHARP)) {
+                    np = np.replace(DOUBLESHARP, "");
+                    color = (NOTESSHARP.indexOf(np) + 2) * 8.33;
+                } else if (np.includes(DOUBLEFLAT)) {
+                    np = np.replace(DOUBLEFLAT, "");
+                    color = (NOTESFLAT.indexOf(np) - 2) * 8.33;
+                } else {
+                    // console.debug("Pitch not found: " + np);
+                }
+            }
+            return color;
+        case "pitch to shade":
+            // The expectation is a note in Hz.
+            if (Number(np)) {
+                [np, octave] = frequencyToPitch(np);
+            } else {
+                // But maybe it is of the form G4?
+                octave = np[np.length - 1];
+                if (isNaN(octave)) {
+                    octave = 4;
+                }
+            }
+            return octave * 12.5;
+        default:
+            return "__INVALID_INPUT__";
+    }
+}
+
+/**
+ * @public
+ * @param {String} keySignature
+ * @returns {String}
+ */
+function keySignatureToMode(keySignature) {
+    // Convert from "A Minor" to "A" and "MINOR"
+    if (keySignature === "" || keySignature == null) {
+        return ["C", "major"];
+    }
+
+    // Maqams have special names for certain keys.
+    if (keySignature.toLowerCase() in MAQAMTABLE) {
+        keySignature = MAQAMTABLE[keySignature.toLowerCase()];
+    }
+
+    let parts = keySignature.split(" ");
+
+    // A special case to test: m used for minor.
+    let minorMode = false;
+    if (parts.length === 1 && parts[0][parts[0].length - 1] === "m") {
+        minorMode = true;
+        parts[0] = parts[0].slice(0, parts[0].length - 1);
+    }
+
+    let key;
+    if (parts[0] in BTOFLAT) {
+        key = BTOFLAT[parts[0]];
+    } else if (parts[0] in STOSHARP) {
+        key = STOSHARP[parts[0]];
+    } else {
+        key = parts[0];
+    }
+
+    if (key === "C" + FLAT) {
+        // keySignature = keySignature;
+        parts = keySignature.split(" ");
+        key = "C" + FLAT;
+    } else if (key == "B" + SHARP) {
+        // keySignature = keySignature;
+        parts = keySignature.split(" ");
+        key = "B" + SHARP;
+    } else if (NOTESSHARP.indexOf(key) === -1 && NOTESFLAT.indexOf(key) === -1) {
+        // console.debug("Invalid key or missing name; reverting to C.");
+        // Is is possible that the key was left out?
+        keySignature = "C " + keySignature;
+        parts = keySignature.split(" ");
+        key = "C";
+    }
+
+    if (minorMode) {
+        return [key, "natural minor"];
+    }
+
+    // Reassemble remaining parts to get mode name
+    let mode = "";
+    for (let i = 1; i < parts.length; i++) {
+        if (parts[i] !== "") {
+            if (mode === "") {
+                mode = parts[i];
+            } else {
+                mode += " " + parts[i];
+            }
+        }
+    }
+
+    if (mode === "") {
+        mode = "major";
+    } else {
+        mode = mode.toLowerCase();
+    }
+
+    if (mode in MUSICALMODES) {
+        return [key, mode];
+    } else {
+        // console.debug("Invalid mode name: " + mode + " reverting to major.");
+        return [key, "major"];
+    }
+}
+
+/**
+ * @private
+ * @param  {String} keySignature
+ * @param  {String} pitch
+ * @param {String} direction
+ * @param  {Number} transposition
+ * @param  {String} temperament
+ * @returns {Number}
+ */
+function _getStepSize(keySignature, pitch, direction, transposition, temperament) {
+    // Returns how many half-steps to the next note in this key.
+    if (temperament === undefined) {
+        temperament = "equal";
+    }
+    if (isCustom(temperament)) {
+        //Scalar = Semitone for custom Temperament.
+        return transposition;
+    }
+
+    let thisPitch = pitch;
+    const obj = _buildScale(keySignature);
+    const scale = obj[0];
+    const halfSteps = obj[1];
+
+    if (thisPitch in BTOFLAT) {
+        thisPitch = BTOFLAT[thisPitch];
+    } else if (thisPitch in STOSHARP) {
+        thisPitch = STOSHARP[thisPitch];
+    }
+
+    let ii = scale.indexOf(thisPitch);
+    if (ii !== -1) {
+        if (direction === "up") {
+            return halfSteps[ii];
+        } else {
+            if (ii > 0) {
+                return -halfSteps[ii - 1];
+            } else {
+                return -last(halfSteps);
+            }
+        }
+    }
+
+    if (ii === -1) {
+        if (thisPitch in EQUIVALENTFLATS) {
+            ii = scale.indexOf(EQUIVALENTFLATS[thisPitch]);
+        }
+    }
+
+    if (ii === -1) {
+        if (thisPitch in EQUIVALENTSHARPS) {
+            ii = scale.indexOf(EQUIVALENTSHARPS[thisPitch]);
+        }
+    }
+
+    if (ii === -1) {
+        if (thisPitch in EQUIVALENTNATURALS) {
+            ii = scale.indexOf(EQUIVALENTNATURALS[thisPitch]);
+        }
+    }
+
+    if (ii !== -1) {
+        if (direction === "up") {
+            return halfSteps[ii];
+        } else {
+            if (ii > 0) {
+                return -halfSteps[ii - 1];
+            } else {
+                return -last(halfSteps);
+            }
+        }
+    }
+
+    // Pitch is not in the consonant scale of this key, so we need to
+    // shift up or down to the next note in the key.
+    let offset = 0;
+    let i = PITCHES.indexOf(thisPitch);
+    if (i !== -1) {
+        while (scale.indexOf(thisPitch) === -1) {
+            i = PITCHES.indexOf(thisPitch);
+            if (i === -1) {
+                i = PITCHES2.indexOf(thisPitch);
+            }
+
+            if (direction === "up") {
+                i += 1;
+                thisPitch = PITCHES[i % 12];
+                offset += 1;
+            } else {
+                i -= 1;
+                if (i < 0) {
+                    i += 12;
+                }
+
+                thisPitch = PITCHES[i];
+                offset -= 1;
+            }
+        }
+
+        return offset;
+    }
+
+    i = PITCHES2.indexOf(thisPitch);
+    if (i !== -1) {
+        while (scale.indexOf(thisPitch) === -1) {
+            i = PITCHES2.indexOf(thisPitch);
+            if (i === -1) {
+                i = PITCHES.indexOf(thisPitch);
+            }
+
+            if (direction === "up") {
+                i += 1;
+                thisPitch = PITCHES2[i % 12];
+                offset += 1;
+            } else {
+                i -= 1;
+                if (i < 0) {
+                    i += 12;
+                }
+
+                thisPitch = PITCHES2[i];
+                offset -= 1;
+            }
+        }
+
+        return offset;
+    }
+
+    // Should never get here, but just in case.
+    // console.debug(thisPitch + " not found");
+    return 0;
+}
+
+/**
+ * @public
+ * @param  {String} keySignature
+ * @param  {String} pitch
+ * @param  {Number} transposition
+ * @param  {String} temperament
+ * @returns {Number}
+ */
+function getStepSizeUp(keySignature, pitch, transposition, temperament) {
+    return _getStepSize(keySignature, pitch, "up", transposition, temperament);
+}
+
+/**
+ * @public
+ * @param  {String} keySignature
+ * @param  {String} pitch
+ * @param  {Number} transposition
+ * @param  {String} temperament
+ * @returns {Number}
+ */
+function getStepSizeDown(keySignature, pitch, transposition, temperament) {
+    return _getStepSize(keySignature, pitch, "down", transposition, temperament);
+}
+
+/**
+ * @public
+ * @param {String} keySignature
+ * @returns {Number}
+ */
+function getModeLength(keySignature) {
+    return _buildScale(keySignature)[1].length;
+}
+
+/**
+ * @public
+ * @param {String} keySignature
+ * @param {Number} scaleDegree
+ * @returns {String}
+ */
+function nthDegreeToPitch(keySignature, scaleDegree) {
+    // Returns note corresponding to scale degree in current key
+    // signature. Used for moveable solfege.
+    const scale = _buildScale(keySignature)[0];
+    // Scale degree is specified as do === 1, re === 2, etc., so we need
+    // to subtract 1 to make it zero-based.
+    // scaleDegree -= 1;
+
+    // We mod to ensure we don't run out of notes.
+    // FixMe: bump octave if we wrap.
+
+    scaleDegree %= scale.length - 1;
+    return scale[scaleDegree];
+}
+
+// Approximate mapping of mode to solfege (Used by modes where the
+// length !== 7).
+const SOLFMAPPER = ["do", "do", "re", "re", "mi", "fa", "fa", "sol", "sol", "la", "la", "ti"];
+
+/**
+ * @public
+ * @param {String} keySignature
+ * @returns {Array}
+ */
+function getScaleAndHalfSteps(keySignature) {
+    // Determine scale and half-step pattern from key signature
+    const obj = keySignatureToMode(keySignature);
+    let myKeySignature = obj[0];
+    let halfSteps;
+    if (obj[1] === "CUSTOM") {
+        halfSteps = customMode;
+    } else {
+        halfSteps = MUSICALMODES[obj[1]];
+    }
+
+    const solfege = [];
+
+    if (halfSteps.length === 7) {
+        for (let i = 0; i < halfSteps.length; i++) {
+            solfege.push(SOLFEGENAMES[i]);
+            for (let j = 1; j < halfSteps[i]; j++) {
+                solfege.push("");
+            }
+        }
+    } else if (halfSteps.length > 7) {
+        // If there are more than 7 notes, we need to add accidentals.
+        for (let i = 0; i < halfSteps.length; i++) {
+            if (solfege.indexOf(SOLFMAPPER[i]) === -1) {
+                solfege.push(SOLFMAPPER[i]);
+            } else {
+                solfege.push(SOLFMAPPER[i] + SHARP);
+            }
+
+            for (let j = 1; j < halfSteps[i]; j++) {
+                solfege.push("");
+            }
+        }
+    } else {
+        // If there are fewer than 7 notes, choose a solfege based on the mode spacing.
+        let n;
+        let solf;
+        for (let i = 0; i < halfSteps.length; i++) {
+            n = 0;
+            solf = SOLFMAPPER[solfege.length];
+            // Ensure there are no duplicates.
+            while (solfege.indexOf(solf) !== -1) {
+                n += 1;
+                solf = SOLFMAPPER[solfege.length + n];
+            }
+
+            solfege.push(solf);
+
+            for (let j = 1; j < halfSteps[i]; j++) {
+                solfege.push("");
+            }
+        }
+    }
+
+    let thisScale = NOTESSHARP;
+    if (NOTESFLAT.indexOf(myKeySignature) !== -1) {
+        thisScale = NOTESFLAT;
+    }
+
+    if (myKeySignature in EXTRATRANSPOSITIONS) {
+        myKeySignature = EXTRATRANSPOSITIONS[myKeySignature][0];
+    }
+
+    return [thisScale, solfege, myKeySignature, obj[1]];
+}
+
+/**
+ * Relative interval (used by the Interval Block) is based on the steps within the current key and mode.
+ * @public
+ * @param {Number}0 interval
+ * @param {String} keySignature
+ * @param {Number} pitch
+ * @returns {Number}
+ */
+function getInterval(interval, keySignature, pitch) {
+    // Step size interval based on the position (pitch) in the scale
+    const obj = _buildScale(keySignature);
+    const scale = obj[0];
+    const halfSteps = obj[1];
+    // Offet is used in the case that the pitch is not in the current scale.
+    let offset = 0;
+
+    if (SOLFEGENAMES.indexOf(pitch) !== -1) {
+        pitch = FIXEDSOLFEGE[pitch];
+    }
+
+    let ii;
+    if (pitch in BTOFLAT) {
+        pitch = BTOFLAT[pitch];
+        ii = scale.indexOf(pitch);
+    } else if (pitch in STOSHARP) {
+        pitch = STOSHARP[pitch];
+        ii = scale.indexOf(pitch);
+    } else if (scale.indexOf(pitch) !== -1) {
+        ii = scale.indexOf(pitch);
+    } else {
+        ii = scale.indexOf(pitch);
+        if (ii === -1) {
+            if (pitch in EQUIVALENTFLATS) {
+                ii = scale.indexOf(EQUIVALENTFLATS[pitch]);
+            }
+        }
+
+        if (ii === -1) {
+            if (pitch in EQUIVALENTSHARPS) {
+                ii = scale.indexOf(EQUIVALENTSHARPS[pitch]);
+            }
+        }
+
+        if (ii === -1) {
+            if (pitch in EQUIVALENTNATURALS) {
+                ii = scale.indexOf(EQUIVALENTNATURALS[pitch]);
+            }
+        }
+
+        let counter = 0;
+        if (ii === -1) {
+            // Pitch is not in the consonant scale of this key, so we need to
+            // shift up or down for a close match, step up or down, and then
+            // compensate for the shift.
+            if (PITCHES.indexOf(pitch) !== -1) {
+                while (scale.indexOf(pitch) === -1) {
+                    counter += 1;
+                    if (counter > 24) {
+                        break;
+                    }
+                    let i = PITCHES.indexOf(pitch);
+                    if (interval > 0) {
+                        i += 1;
+                        pitch = PITCHES[i % 12];
+                        offset -= 1;
+                    } else {
+                        i -= 1;
+                        if (i < 0) {
+                            i += 12;
+                        }
+                        pitch = PITCHES[i];
+                        offset += 1;
+                    }
+                }
+
+                ii = scale.indexOf(pitch);
+            } else {
+                if (PITCHES2.indexOf(pitch) !== -1) {
+                    while (scale.indexOf(pitch) === -1) {
+                        counter += 1;
+                        if (counter > 24) {
+                            break;
+                        }
+                        let i = PITCHES2.indexOf(pitch);
+                        if (interval > 0) {
+                            i += 1;
+                            pitch = PITCHES2[i % 12];
+                            offset -= 1;
+                        } else {
+                            i -= 1;
+                            if (i < 0) {
+                                i += 12;
+                            }
+                            pitch = PITCHES2[i];
+                            offset += 1;
+                        }
+                    }
+
+                    ii = scale.indexOf(pitch);
+                } else {
+                    // Should never happen.
+                    // console.debug(pitch + " not found");
+                    return 0;
+                }
+            }
+        }
+    }
+
+    // What do we do with the offset? Is it ignored? Or does it count
+    // as one step in the interval?
+
+    let j = 0;
+    if (interval === 0) {
+        return 0;
+    } else if (interval > 0) {
+        for (let k = 0; k < interval; k++) {
+            j += halfSteps[(ii + k) % halfSteps.length];
+        }
+        return j;
+    } else {
+        for (let k = 0; k > interval; k--) {
+            let z = (ii + k - 1) % halfSteps.length;
+            while (z < 0) {
+                z += halfSteps.length;
+            }
+            j -= halfSteps[z];
+        }
+        return j;
+    }
+}
+
+/**
+ * @public
+ * @param {Number} pitch
+ * @param {Number} interval
+ * @returns {Array}
+ */
+function getNoteFromInterval(pitch, interval) {
+    const len = pitch.length;
+    const pitch1 = pitch.substring(0, 1);
+    const note1 = pitch.substring(0, len - 1);
+    const octave1 = Number(pitch.slice(-1));
+    const number = pitchToNumber(note1, octave1, "C major");
+    const pitches = ["C", "D", "E", "F", "G", "A", "B"];
+    const priorAttrs = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];
+
+    function findMajorInterval(interval) {
+        //For eg. If you are asked to write a major 3rd then the
+        //letters must be 3 apart.
+        //Eg Ab - C or D - F. This is irrelevant of whether the first
+        //note is a sharp or flat, eg G# - B.
+        //Then need to work out if you need a sharp or flat on the
+        //second note.
+        //A Major 3rd is 4 semitones. So, Ab - C needs to be Ab - C; D
+        //- F is D- F#; G# - B is G# - B#.
+        //Same technique is used to code the findMajorInterval.
+        const halfSteps = INTERVALVALUES[interval][0];
+        const direction = INTERVALVALUES[interval][1];
+        let note = numberToPitch(number + halfSteps);
+        const num = interval.split(" ");
+        const pitchIndex = pitches.indexOf(pitch1);
+        let index = pitchIndex + Number(num[1]) - 1;
+        let octave = octave1;
+        if (index > 6) {
+            index = index - 7;
+            octave = octave1 + 1;
+        }
+        const id = pitches[index];
+        if (note[0].substring(0, 1) === id) {
+            return [note[0], octave];
+        } else if (note[0].substring(0, 1) !== id) {
+            note = numberToPitchSharp(number + halfSteps);
+            if (note[0] === id) {
+                return [note[0], octave];
+            } else {
+                const steps = getNumber(id, octave) - getNumber(note1, octave1);
+                const naturalIndex = priorAttrs.indexOf("");
+                const attr = priorAttrs[naturalIndex + halfSteps - steps];
+                note = id + attr + "";
+                return [note, octave];
+            }
+        }
+    }
+
+    function findOtherIntervals(interval) {
+        const num = interval.split(" ");
+        let majorNote;
+        let accidental;
+        let index1;
+
+        if (
+            interval === "minor 2" ||
+            interval === "minor 3" ||
+            interval === "minor 6" ||
+            interval === "minor 7"
+        ) {
+            //Major intervals lowered by a half step become minor.
+            majorNote = findMajorInterval("major " + num[1]);
+            accidental = majorNote[0].substring(1, majorNote[0].length);
+            index1 = priorAttrs.indexOf(accidental);
+            if (index1 === 0) {
+                accidental = priorAttrs[index1] + FLAT;
+            } else {
+                accidental = priorAttrs[index1 - 1];
+            }
+        }
+
+        if (
+            interval === "diminished 4" ||
+            interval === "diminished 5" ||
+            interval === "diminished 8"
+        ) {
+            //Perfect intervals lowered by a half step are called diminished.
+            majorNote = findMajorInterval("perfect " + num[1]);
+            accidental = majorNote[0].substring(1, majorNote[0].length);
+            index1 = priorAttrs.indexOf(accidental);
+            if (index1 === 0) {
+                accidental = priorAttrs[index1] + FLAT;
+            } else {
+                accidental = priorAttrs[index1 - 1];
+            }
+        }
+
+        if (
+            interval === "augmented 2" ||
+            interval === "augmented 3" ||
+            interval === "augmented 6" ||
+            interval === "augmented 7"
+        ) {
+            //Major intervals raised by a half step are called augmented.
+            majorNote = findMajorInterval("major " + num[1]);
+            accidental = majorNote[0].substring(1, majorNote[0].length);
+            index1 = priorAttrs.indexOf(accidental);
+            if (index1 === 4) {
+                accidental = priorAttrs[index1] + SHARP;
+            } else {
+                accidental = priorAttrs[index1 + 1];
+            }
+        }
+
+        if (
+            interval === "augmented 1" ||
+            interval === "augmented 4" ||
+            interval === "augmented 5" ||
+            interval === "augmented 8"
+        ) {
+            //Perfect intervals raised by a half step are called augmented.
+            majorNote = findMajorInterval("perfect " + num[1]);
+            accidental = majorNote[0].substring(1, majorNote[0].length);
+            index1 = priorAttrs.indexOf(accidental);
+            if (index1 === 4) {
+                accidental = priorAttrs[index1] + SHARP;
+            } else {
+                accidental = priorAttrs[index1 + 1];
+            }
+        }
+
+        return [majorNote[0].substring(0, 1) + accidental + "", majorNote[1]];
+    }
+
+    if (
+        interval === "major 2" ||
+        interval === "major 3" ||
+        interval === "major 6" ||
+        interval === "major 7" ||
+        interval === "perfect 4" ||
+        interval === "perfect 5" ||
+        interval === "perfect 8" ||
+        interval === "perfect 1"
+    ) {
+        return findMajorInterval(interval);
+    } else {
+        return findOtherIntervals(interval);
+    }
+}
+
+/**
+ * @public
+ * @param {Number} a
+ * @param {Number} b
+ * @param {NUmber} scale
+ * @returns {Number}
+ */
+function calcNoteValueToDisplay(a, b, scale) {
+    const noteValue = a / b;
+    let noteValueToDisplay = null;
+    let cellScale;
+    if (scale === undefined) {
+        cellScale = 1.0;
+    } else {
+        cellScale = scale;
+    }
+
+    if (noteValue in NSYMBOLS) {
+        noteValueToDisplay =
+            "1<br>&mdash;<br>" + noteValue.toString() + "<br>" + NSYMBOLS[noteValue];
+    } else {
+        noteValueToDisplay = reducedFraction(b, a);
+    }
+
+    let value;
+    let obj;
+    let d0, d1;
+    if (parseInt(noteValue) < noteValue) {
+        noteValueToDisplay = parseInt(noteValue * 1.5);
+        if (noteValueToDisplay in NSYMBOLS) {
+            value = b / a; // * noteValueToDisplay;
+            obj = toFraction(value);
+            Number.isInteger(obj[0]) ? (d0 = 0) : (d0 = 2);
+            Number.isInteger(obj[1]) ? (d1 = 0) : (d1 = 2);
+            noteValueToDisplay =
+                // value.toFixed(2) +
+                obj[0].toFixed(d0) +
+                "<br>&mdash;<br>" +
+                // noteValueToDisplay.toString() +
+                obj[1].toFixed(d1) +
+                "<br>" +
+                NSYMBOLS[noteValueToDisplay] +
+                ".";
+        } else {
+            noteValueToDisplay = parseInt(noteValue * 1.75);
+            if (noteValueToDisplay in NSYMBOLS) {
+                value = b / a; // * noteValueToDisplay;
+                obj = toFraction(value);
+                Number.isInteger(obj[0]) ? (d0 = 0) : (d0 = 2);
+                Number.isInteger(obj[1]) ? (d1 = 0) : (d1 = 2);
+                noteValueToDisplay =
+                    // value.toFixed(2) +
+                    obj[0].toFixed(d0) +
+                    "<br>&mdash;<br>" +
+                    // noteValueToDisplay.toString() +
+                    obj[1].toFixed(d1) +
+                    "<br>" +
+                    NSYMBOLS[noteValueToDisplay] +
+                    "..";
+            } else {
+                noteValueToDisplay = reducedFraction(b, a);
+            }
+        }
+    }
+
+    return noteValueToDisplay;
+}
+
+/**
+ * @public
+ * @param {Number} duration
+ * @returns {Array}
+ */
+function durationToNoteValue(duration) {
+    // returns [note value, no. of dots, tuplet factor]
+
+    let currentDotFactor;
+    let d;
+    // Try to find a match or a dotted match.
+    for (let dotCount = 0; dotCount < 3; dotCount++) {
+        currentDotFactor = 2 - 1 / Math.pow(2, dotCount);
+        d = duration * currentDotFactor;
+        if (POWER2.indexOf(d) !== -1) {
+            return [d, dotCount, null];
+        }
+    }
+
+    // First, round down.
+    let roundDown = duration;
+    for (let i = 1; i < POWER2.length; i++) {
+        // Rounding down
+        if (roundDown < POWER2[i]) {
+            roundDown = POWER2[i - 1];
+            break;
+        }
+    }
+
+    if (POWER2.indexOf(roundDown) === -1) {
+        roundDown = 128;
+    }
+
+    // Convert duration into parts based on POW2 factors
+    // e.g., 1 / 6 ==> [3, 2], 1 / 12 ==> [3, 4]
+    let j = 1;
+    while (Math.floor(duration / j) * j === duration) {
+        j = j * 2;
+        if (j > duration / 2) {
+            break;
+        }
+    }
+
+    j = j / 2;
+
+    return [1, 0, [duration / j, j], roundDown];
+}
+
+/**
+ * @public
+ * @param {Number} d
+ * @returns {Array}
+ */
+function toFraction(d) {
+    // Convert float to its approximate fractional representation.
+    let flip = false;
+    if (d > 1) {
+        flip = true;
+        d = 1 / d;
+    }
+
+    let df = 1.0;
+    let top = 1;
+    let bot = 1;
+
+    while (Math.abs(df - d) > 0.00000001) {
+        if (df < d) {
+            top += 1;
+        } else {
+            bot += 1;
+            top = parseInt(d * bot);
+        }
+        df = top / bot;
+    }
+
+    if (flip) {
+        const tmp = top;
+        top = bot;
+        bot = tmp;
+    }
+
+    return [top, bot];
+}
+
+/**
+ * @public
+ * @param {Number} i
+ * @param {String} temperament
+ * @param {Number} startPitch
+ * @param {Number} offset
+ * @returns {Array}
+ */
+function numberToPitch(i, temperament, startPitch, offset) {
+    // Calculate the pitch and octave based on index.
+    // We start at A0.
+    if (temperament === undefined) {
+        temperament = "equal";
+    }
+
+    let n = 0;
+    if (i < 0) {
+        while (i < 0) {
+            i += 12;
+            n += 1; // Count octave bump ups.
+        }
+
+        if (temperament === "equal") {
+            return [
+                PITCHES[(i + PITCHES.indexOf("A")) % 12],
+                Math.floor((i + PITCHES.indexOf("A")) / 12) - n
+            ];
+        } else {
+            pitchNumber = Math.floor(i - offset);
+        }
+    } else {
+        if (temperament === "equal") {
+            return [
+                PITCHES[(i + PITCHES.indexOf("A")) % 12],
+                Math.floor((i + PITCHES.indexOf("A")) / 12)
+            ];
+        } else {
+            pitchNumber = Math.floor(i - offset);
+        }
+    }
+
+    let interval;
+    if (isCustom(temperament)) {
+        pitchNumber = pitchNumber + "";
+        if (TEMPERAMENT[temperament][pitchNumber][1] === undefined) {
+            // If custom temperament is not defined, then it will
+            // store equal temperament notes.
+            for (let j = 0; j < 12; j++) {
+                const number = "" + j;
+                interval = TEMPERAMENT["equal"]["interval"][i];
+                TEMPERAMENT[temperament][number] = [
+                    Math.pow(2, j / 12),
+                    getNoteFromInterval(startPitch, interval)[0],
+                    getNoteFromInterval(startPitch, interval)[1]
+                ];
+            }
+
+            return [
+                TEMPERAMENT[temperament][pitchNumber][1],
+                TEMPERAMENT[temperament][pitchNumber][2]
+            ];
+        } else {
+            return [
+                TEMPERAMENT[temperament][pitchNumber][1],
+                TEMPERAMENT[temperament][pitchNumber][2]
+            ];
+        }
+    } else {
+        interval = TEMPERAMENT[temperament]["interval"][pitchNumber];
+        return getNoteFromInterval(startPitch, interval);
+    }
+}
+
+/**
+ * @public
+ * @param {Number} i
+ * @returns {Array}
+ */
+function numberToPitchSharp(i) {
+    // numbertoPitch return only flats
+    // This function will return sharps.
+    if (i < 0) {
+        let n = 0;
+        while (i < 0) {
+            i += 12;
+            n += 1;
+        }
+
+        return [
+            PITCHES2[(i + PITCHES2.indexOf("A")) % 12],
+            Math.floor((i + PITCHES2.indexOf("A")) / 12) - n
+        ];
+    } else {
+        return [
+            PITCHES2[(i + PITCHES2.indexOf("A")) % 12],
+            Math.floor((i + PITCHES2.indexOf("A")) / 12)
+        ];
+    }
+}
+
+/**
+ * @public
+ * @param {Number} i
+ * @returns {Array}
+ */
+function noteToPitchOctave(note) {
+    const len = note.length;
+    return [note.substring(0, len - 1), Number(last(note))];
+}
+
+/**
+ * @public
+ * @param {Number} note
+ * @param {String} keySignature
+ * @returns {Number}
+ */
+function noteToFrequency(note, keySignature) {
+    const obj = noteToPitchOctave(note);
+    return pitchToFrequency(obj[0], obj[1], 0, keySignature);
+}
+
+/**
+ * @public
+ * @param {Number} pitch
+ * @param {Number} octave
+ * @param {Number} cents
+ * @param {String} keySignature
+ * @returns {Number}
+ */
+function pitchToFrequency(pitch, octave, cents, keySignature) {
+    // Calculate the frequency based on pitch and octave.
+    const pitchNumber = pitchToNumber(pitch, octave, keySignature);
+
+    if (cents === 0) {
+        return A0 * Math.pow(TWELTHROOT2, pitchNumber);
+    } else {
+        return A0 * Math.pow(TWELVEHUNDRETHROOT2, pitchNumber * 100 + cents);
+    }
+}
+
+/**
+ * @public
+ * @param {Number} note
+ * @returns {Boolean}
+ */
+function noteIsSolfege(note) {
+    if (SOLFEGECONVERSIONTABLE[note] === undefined) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+/**
+ * @public
+ * @param {Number} note
+ * @returns {Number}
+ */
+function getSolfege(note) {
+    // FIXME: Use mode-specific conversion.
+    if (noteIsSolfege(note)) {
+        return note;
+    } else {
+        return SOLFEGECONVERSIONTABLE[note];
+    }
+}
+
+/**
+ * @public
+ * @param {Number} note
+ * @returns {Number}
+ */
+function i18nSolfege(note) {
+    // solfnotes_ is used in the interface for i18n
+    const solfnotes_ = _("ti la sol fa mi re do").split(" ");
+    const obj = splitSolfege(note);
+
+    const i = SOLFNOTES.indexOf(obj[0]);
+    if (i !== -1) {
+        return solfnotes_[i] + obj[1];
+    } else {
+        // Wasn't solfege so it doesn't need translation.
+        return note;
+    }
+}
+
+/**
+ * @public
+ * @param {Number} value
+ * @returns {Array}
+ */
+function splitScaleDegree(value) {
+    if (!value) {
+        return [5, NATURAL];
+    }
+
+    const note = value.slice(0, 1);
+    const attr = value.slice(1);
+    return [note, attr];
+}
+
+/**
+ * @public
+ * @param {Number} value
+ * @returns {Array}
+ */
+function splitSolfege(value) {
+    // Separate the pitch from any attributes, e.g., # or b
+    if (value != null && typeof value === "string") {
+        let note, attr;
+        if (SOLFNOTES.indexOf(value) !== -1) {
+            note = value;
+            attr = "";
+        } else if (value.slice(0, 3) === "sol") {
+            note = "sol";
+            if (value.length === 4) {
+                attr = value[3];
+            } else {
+                attr = value[3] + value[4];
+            }
+        } else {
+            note = value.slice(0, 2);
+            if (value.length === 3) {
+                attr = value[2];
+            } else {
+                attr = value[2] + value[3];
+            }
+        }
+
+        return [note, attr];
+    }
+
+    return ["sol", ""];
+}
+
+/**
+ * @public
+ * @param {Number} notename
+ * @param {Number} octave
+ * @returns {Number}
+ */
+function getNumber(notename, octave) {
+    // Converts a note, e.g., C, and octave to a number
+    let num;
+    if (octave < 0) {
+        num = 0;
+    } else if (octave > 10) {
+        num = 9 * 12;
+    } else {
+        num = 12 * (octave - 1);
+    }
+
+    notename = String(notename);
+    if (notename.substring(0, 1) in NOTESTEP) {
+        num += NOTESTEP[notename.substring(0, 1)];
+        if (notename.length >= 1) {
+            let delta;
+            delta = notename.substring(1);
+            if (delta === "bb" || delta === DOUBLEFLAT) {
+                num -= 2;
+            } else if (delta === "##" || delta === "*" || delta === DOUBLESHARP) {
+                num += 2;
+            } else if (delta === "b" || delta === FLAT) {
+                num -= 1;
+            } else if (delta === "#" || delta === SHARP) {
+                num += 1;
+            }
+        }
+    }
+
+    return num;
+}
+
+/**
+ * @public
+ * @param {Number} value
+ * @param {Number} delta
+ * @returns {Array}
+ */
+function getNumNote(value, delta) {
+    // Converts from number to note
+    let num = value + delta;
+    let octave = Math.floor(num / 12);
+    num = num % 12;
+
+    const note = NOTESTABLE[num];
+
+    if (note[num] === "ti") {
+        octave -= 1;
+    }
+
+    return [note, octave + 1];
+}
+
+/**
+ * @public
+ * @param {Number} currentOctave
+ * @param {String} arg
+ * @param {String} lastNotePlayed
+ * @param {Number} currentNote
+ * @returns {Number}
+ */
+calcOctave = function (currentOctave, arg, lastNotePlayed, currentNote) {
+    // Calculate the octave based on the current Octave and the arg,
+    // which can be a number, a 'number' as a string, 'current',
+    // 'previous', or 'next'.
+
+    if (typeof arg === "number") {
+        return Math.max(1, Math.min(Math.floor(arg), 9));
+    }
+
+    // The relative octave for tritones are arbitrated as being in the
+    // current octave, so we need to determine the number of half
+    // steps between lastNotePlayed and currentNote.
+    let note, stepCurrentNote, stepLastNotePlayed, changedCurrent;
+
+    if (SOLFEGENAMES1.indexOf(currentNote) !== -1) {
+        note = FIXEDSOLFEGE1[currentNote];
+    } else {
+        note = currentNote;
+    }
+
+    stepCurrentNote = getNumber(note, currentOctave);
+    stepUpCurrentNote = getNumber(note, currentOctave + 1);
+    stepDownCurrentNote = getNumber(note, currentOctave - 1);
+
+    if (lastNotePlayed != null) {
+        lastNotePlayed = lastNotePlayed[0];
+        // strip off octave from end of note
+        lastNotePlayed = lastNotePlayed.substring(0, lastNotePlayed.length - 1);
+    } else {
+        lastNotePlayed = "G";
+    }
+
+    stepLastNotePlayed = getNumber(lastNotePlayed, currentOctave);
+
+    const halfSteps = Math.abs(stepLastNotePlayed - stepCurrentNote);
+    const halfStepsUp = Math.abs(stepLastNotePlayed - stepUpCurrentNote);
+    const halfStepsDown = Math.abs(stepLastNotePlayed - stepDownCurrentNote);
+
+    if (halfSteps <= 5 || isNaN(halfSteps)) {
+        changedCurrent = currentOctave;
+    }
+
+    if (halfSteps > 5 && halfStepsUp > 5 && halfStepsDown < 5) {
+        changedCurrent = Math.max(currentOctave - 1, 1);
+    }
+
+    if (halfSteps > 5 && halfStepsUp < 5 && halfStepsDown > 5) {
+        changedCurrent = Math.min(currentOctave + 1, 9);
+    }
+
+    if (halfSteps > 5 && halfStepsUp > 5 && halfStepsDown > 5) {
+        changedCurrent = currentOctave;
+    }
+
+    switch (arg) {
+        case _("current"):
+        case "current":
+            return changedCurrent;
+        case _("next"):
+        case "next":
+            return Math.min(changedCurrent + 1, 10);
+        case _("previous"):
+        case "previous":
+            return Math.max(changedCurrent - 1, 1);
+        default:
+            try {
+                if (changedCurrent) {
+                    return changedCurrent;
+                } else {
+                    return Math.floor(Number(arg));
+                }
+            } catch (e) {
+                // console.debug("cannot convert " + arg + " to a number");
+                return currentOctave;
+            }
+    }
+};
+
+/**
+ * @public
+ * @param {Number} arg
+ * @returns {Number}
+ */
+calcOctaveInterval = function (arg) {
+    // Used by intervals to determine octave to use in an interval.
+    let value = 0;
+    switch (arg) {
+        case 1:
+        case _("next"):
+        case "next":
+            value = 1;
+            break;
+        case -1:
+        case _("previous"):
+        case "previous":
+            value = -1;
+            break;
+        case _("current"):
+        case "current":
+        case 0:
+            value = 0;
+            break;
+        case 2:
+            value = 2;
+            break;
+        case -2:
+            value = -2;
+            break;
+        default:
+            // console.debug("Interval octave must be between -2 and 2.");
+            value = 0;
+            break;
+    }
+
+    return value;
+};
+
+/**
+ * @public
+ * @param {Number} value
+ * @returns {Boolean}
+ */
+function isInt(value) {
+    return !isNaN(value) && parseInt(Number(value)) === value && !isNaN(parseInt(value, 10));
+}
+
+/**
+ * @public
+ * @param {Number} a
+ * @param {Number} b
+ * @returns {String}
+ */
+function reducedFraction(a, b) {
+    greatestCommonMultiple = function (a, b) {
+        return b === 0 ? a : greatestCommonMultiple(b, a % b);
+    };
+
+    const gcm = greatestCommonMultiple(a, b);
+
+    if ([1, 2, 4, 8, 16].indexOf(b / gcm) !== -1) {
+        return a / gcm + "<br>&mdash;<br>" + b / gcm + "<br>" + NSYMBOLS[b / gcm];
+    } else {
+        return a / gcm + "<br>&mdash;<br>" + b / gcm + "<br><br>";
+    }
+}
+
+/**
+ * @public
+ * @param {String} note
+ * @returns {String}
+ */
+function getArticulation(note) {
+    return note
+        .replace("do", "")
+        .replace("re", "")
+        .replace("mi", "")
+        .replace("fa", "")
+        .replace("sol", "")
+        .replace("la", "")
+        .replace("ti", "")
+        .replace("A", "")
+        .replace("B", "")
+        .replace("C", "")
+        .replace("D", "")
+        .replace("E", "")
+        .replace("F", "")
+        .replace("G", "");
+}
+
+/**
+ * @public
+ * @param {Array} notes
+ * @return {Array}
+ */
+function getCustomNote(notes) {
+    // For custom temperament notes
+    if (notes instanceof Array) {
+        notes = notes[0];
+    }
+
+    let centsInfo = "";
+    if (notes.indexOf("(") !== -1) {
+        centsInfo = notes.substring(notes.indexOf("("), notes.length);
+    }
+
+    notes = notes.replace(centsInfo, "");
+    const articulation = getArticulation(notes);
+    notes = notes.replace(articulation, "");
+
+    switch (articulation) {
+        case "bb":
+        case DOUBLEFLAT:
+            notes = notes + "𝄫" + centsInfo;
+            break;
+        case "b":
+        case FLAT:
+            notes = notes + "♭" + centsInfo;
+            break;
+        case "##":
+        case "*":
+        case "x":
+        case DOUBLESHARP:
+            notes = notes + "𝄪" + centsInfo;
+            break;
+        case "#":
+        case SHARP:
+            notes = notes + "♯" + centsInfo;
+            break;
+        default:
+            notes = notes + articulation + centsInfo;
+            break;
+    }
+    return notes;
+}
+
+/**
+ * @public
+ * @param {String} note
+ * @returns {String}
+ */
+function convertFromSolfege(note) {
+    // Convert to common letter class
+    if (note in FIXEDSOLFEGE1) {
+        note = FIXEDSOLFEGE1[note];
+    }
+    if (note in EQUIVALENTNATURALS) {
+        note = EQUIVALENTNATURALS[note];
+    }
+    return note;
+}
+
 
 /**
  * @public
