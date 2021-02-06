@@ -3503,7 +3503,7 @@ function reducedFraction(a, b) {
 
 /**
  * @public
- * @param {Number} note 
+ * @param {String} note 
  * @returns {String}
  */
 function getArticulation(note) {
@@ -3524,6 +3524,11 @@ function getArticulation(note) {
         .replace("G", "");
 }
 
+/**
+ * @public
+ * @param {Array} notes 
+ * @return {Array}
+ */
 function getCustomNote(notes) {
     // For custom temperament notes
     if (notes instanceof Array) {
@@ -3565,10 +3570,20 @@ function getCustomNote(notes) {
     return notes;
 }
 
+/**
+ * @public
+ * @param {String} temperament 
+ * @returns {Boolean}
+ */
 let isCustom = (temperament) => {
     return !(temperament in PreDefinedTemperaments);
 };
 
+/**
+ * @public
+ * @param {Number} note 
+ * @returns {Array}
+ */
 function noteToObj(note) {
     let octave = parseInt(note.slice(note.length - 1));
     if (isNaN(octave)) {
@@ -3579,6 +3594,11 @@ function noteToObj(note) {
     return [note, octave];
 }
 
+/**
+ * @public
+ * @param {String} note 
+ * @returns {String}
+ */
 function convertFromSolfege(note) {
     // Convert to common letter class
     if (note in FIXEDSOLFEGE1) {
@@ -3589,7 +3609,16 @@ function convertFromSolfege(note) {
     }
     return note;
 }
-
+/**
+ * @param  {String} noteArg
+ * @param  {Number} octave
+ * @param  {Number} transposition
+ * @param  {String} keySignature
+ * @param  {Boolean} movable
+ * @param  {String} direction
+ * @param  {String} errorMsg
+ * @param  {String} temperament
+ */
 function getNote(
     noteArg,
     octave,
@@ -4157,6 +4186,11 @@ function getNote(
     }
 }
 
+/**
+ * @public
+ * @param {Number} factor
+ * @returns {Number}
+ */
 convertFactor = function (factor) {
     switch (factor) {
         case 0.0625: // 1/16
@@ -4200,6 +4234,12 @@ convertFactor = function (factor) {
     }
 };
 
+/**
+ * @public
+ * @param {String} key
+ * @param {String} mode
+ * @returns {Array}
+ */
 modeMapper = function (key, mode) {
     // map common modes into their major/minor equivalent
     // console.debug(key + ' ' + mode + ' >>');
