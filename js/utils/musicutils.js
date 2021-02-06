@@ -1191,11 +1191,9 @@ let PreDefinedTemperaments = {
     "1/4 comma meantone": true
 };
 
-
 // Approximate mapping of mode to solfege (Used by modes where the
 // length !== 7).
 const SOLFMAPPER = ["do", "do", "re", "re", "mi", "fa", "fa", "sol", "sol", "la", "la", "ti"];
-
 
 /**
  * @public
@@ -1321,7 +1319,6 @@ const updateTemperaments = () => {
         }
     }
 };
-
 
 const DEFAULTINVERT = "even";
 const DEFAULTINTERVAL = "perfect" + " 5";
@@ -2219,7 +2216,7 @@ function getNoteFromInterval(pitch, interval) {
  * @param {Number} offset
  * @returns {Array}
  */
-numberToPitch = function(i, temperament, startPitch, offset){
+numberToPitch = function (i, temperament, startPitch, offset) {
     // Calculate the pitch and octave based on index.
     // We start at A0.
     if (temperament === undefined) {
@@ -2913,6 +2910,8 @@ function _calculate_pitch_number(np, tur) {
  */
 function _buildScale(keySignature) {
     // FIX ME: temporary hard-coded fix to avoid errors in pitch preview
+    let halfSteps;
+
     if (keySignature == "C♭ major") {
         const scale = ["C♭", "D♭", "E♭", "F♭", "G♭", "A♭", "B♭", "C♭"];
         return [scale, halfSteps];
@@ -2924,8 +2923,6 @@ function _buildScale(keySignature) {
         obj = keySignatureToMode("B " + obj[1]);
         myKeySignature = obj[0];
     }
-
-    let halfSteps;
     if (obj[1] === "CUSTOM") {
         halfSteps = customMode;
     } else {
@@ -3093,14 +3090,15 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
                     case 5:
                         definedScaleDegree.push(4);
                         break;
-                    case 6: {
-                        const lastAdded = definedScaleDegree[definedScaleDegree.length - 1];
-                        if (lastAdded != 4) {
-                            definedScaleDegree.push(4);
-                        } else if (semitones[i] + chosenModeScale[i] != 7) {
-                            definedScaleDegree.push(5);
+                    case 6:
+                        {
+                            const lastAdded = definedScaleDegree[definedScaleDegree.length - 1];
+                            if (lastAdded != 4) {
+                                definedScaleDegree.push(4);
+                            } else if (semitones[i] + chosenModeScale[i] != 7) {
+                                definedScaleDegree.push(5);
+                            }
                         }
-                    }
                         break;
                     case 7:
                         definedScaleDegree.push(5);
@@ -3240,7 +3238,7 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
                         }
                         break;
                     default:
-                        console.debug("No case for " + semitones[i]);
+                        // console.debug("No case for " + semitones[i]);
                         break;
                 }
             }
@@ -4035,7 +4033,6 @@ function splitScaleDegree(value) {
     return [note, attr];
 }
 
-
 /**
  * @public
  * @param {Number} value
@@ -4191,7 +4188,6 @@ function isInt(value) {
     return !isNaN(value) && parseInt(Number(value)) === value && !isNaN(parseInt(value, 10));
 }
 
-
 /**
  * @public
  * @param {String} note
@@ -4207,7 +4203,6 @@ function convertFromSolfege(note) {
     }
     return note;
 }
-
 
 /**
  * @public
