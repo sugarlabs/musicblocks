@@ -19,97 +19,173 @@
 class LanguageBox {
     language = localStorage.languagePreference;
 
+    /**
+     * @constructor
+     */
     constructor() {
         this._message = null;
     }
 
+    /**
+     * @public
+     * @param {String} message 
+     * @returns {String}
+     */
     setMessage(message) {
         this._message = message;
         return this;
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     enUS_onclick() {
         language = "enUS";
         this.hide();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     enUK_onclick() {
         language = "enUK";
         this.hide();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     ko_onclick() {
         language = "ko";
         this.hide();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     ja_onclick() {
         language = "ja";
         localStorage.kanaPreference = "kanji";
         this.hide();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     kana_onclick() {
         language = "ja";
         localStorage.kanaPreference = "kana";
         this.hide();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     es_onclick() {
         language = "es";
         this.hide();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     pt_onclick() {
         language = "pt";
         this.hide();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     zhCN_onclick() {
         language = "zhCN";
         this.hide();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     th_onclick() {
         language = "th";
         this.hide();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     hi_onclick() {
         language = "hi";
         this.hide();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     ibo_onclick() {
         language = "ibo";
         this.hide();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     ar_onclick() {
         language = "ar";
         this.hide();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     he_onclick() {
         language = "he";
         this.hide();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     ayc_onclick() {
         language = "ayc";
         this.hide();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     quz_onclick() {
         language = "quz";
         this.hide();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     gug_onclick() {
         language = "gug";
         this.hide();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     hide() {
         const MSGPrefix =
             "<a href='#' " +
