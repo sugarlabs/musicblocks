@@ -15,6 +15,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/*global showMaterialHighlight */
+
 window.platform = {
     android: /Android/i.test(navigator.userAgent),
     FF: /Firefox/i.test(navigator.userAgent),
@@ -24,7 +26,7 @@ window.platform = {
 
 platform.androidWebkit = platform.android && !platform.FF;
 platform.FFOS = platform.FF && (platform.mobile || platform.tablet) && !platform.android;
-console.debug("On platform: ", platform);
+// console.debug("On platform: ", platform);
 
 window.platformColor = {
     blockText: "#282828",
@@ -161,6 +163,16 @@ window.platformColor = {
 
 document.querySelector("meta[name=theme-color]").content = platformColor.header;
 
+/**
+ * @public
+ * @param  {Number} x
+ * @param  {Number} y
+ * @param  {Number} r
+ * @param  {Object} event
+ * @param  {Number} scale
+ * @param  {Object} stage
+ * @returns {Object}
+ */
 function showButtonHighlight(x, y, r, event, scale, stage) {
     if (platform.FFOS) return {};
     return showMaterialHighlight(x, y, r, event, scale, stage);
