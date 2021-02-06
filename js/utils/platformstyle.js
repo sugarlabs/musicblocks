@@ -15,7 +15,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/*global showMaterialHighlight,platform,platformColor */
+/* global showMaterialHighlight,platform,platformColor */
+
+/* exported showButtonHighlight */
 
 window.platform = {
     android: /Android/i.test(navigator.userAgent),
@@ -26,7 +28,6 @@ window.platform = {
 
 platform.androidWebkit = platform.android && !platform.FF;
 platform.FFOS = platform.FF && (platform.mobile || platform.tablet) && !platform.android;
-// console.debug("On platform: ", platform);
 
 window.platformColor = {
     blockText: "#282828",
