@@ -2037,7 +2037,7 @@ function getNumber(notename, octave) {
     return num;
 }
 
-function numberToPitch(i, temperament, startPitch, offset);
+let numberToPitch;
 
 /**
  * @public
