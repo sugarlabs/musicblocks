@@ -48,6 +48,11 @@
   beginnerModeContainer, HelpWidget, connections:writable, TEMPERAMENT, custom:writable , OCTAVERATIO, SHOWBLOCKSBUTTON, COLLAPSEBLOCKSBUTTON, JSEditor,
   NOMICERRORMSG, NOSTRINGERRORMSG, EMPTYHEAPERRORMSG, NOSQRTERRORMSG, NOACTIONERRORMSG, NOBOXERRORMSG, ZERODIVIDEERRORMSG, NANERRORMSG, NOINPUTERRORMSG,
   HIDEBLOCKSFADEDBUTTON, hideAuxMenu:writable, closeWidgets, errorText, hideArrows:writable, printText, Toolbar, _createErrorContainers, PreDefinedTemperaments,
+  _doFastButton:writable, currentKey:writable, turtleBlocksScale:writable, _showStopButton:writable, _doMenuButton:writable, _openAuxMenu:writable, deltaY:writable,
+  doStopButton:writable, doSave:writable, onRunTurtle:writable, onStopTurtle:writable, loadStartWrapper:writable, showContents:writable, server:writable, 
+  _doSlowButton:writable,  getCurrentKeyCode:writable, doHardStopButton:writable, _loadStart:writable, loadProject:writable, runProject:writable, clearCurrentKeyCode:writable, 
+  _setupAndroidToolbar:writable, _setupBlocksContainerEvents:writable, _loadButtonDragHandler:writable, pasteImage:writable, pasteContainer:writable, 
+  closeContextWheel:writable, pluginObjs:writable, cameraID:writable, pluginsImages:writable, mousestage:writable, swiping:writable
 */
 
 let KeySignatureEnv = ["C", "major", false];
