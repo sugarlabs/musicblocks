@@ -15,6 +15,12 @@
  * MA 02110-1335 USA.
  */
 
+/*
+   global SOLFEGENAMES
+ */
+
+/* exported MathUtility */
+
 /**
  * Utility class for managing math operations.
  *
