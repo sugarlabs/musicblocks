@@ -18,6 +18,10 @@
 
 /** This widget displays the status of selected parameters and notes as they are being played. */
 class StatsWindow {
+
+    /**
+     * @constructor
+     */
     constructor() {
         this.isOpen = true;
 
@@ -34,7 +38,11 @@ class StatsWindow {
         this.widgetWindow.sendToCenter();
     }
 
-    /** Renders and carries out analysis of the MB project. */
+    /**
+     * Renders and carries out analysis of the MB project.
+     * @public 
+     * @returns {void}
+     */
     doAnalytics() {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         blocks.activeBlock = null;
@@ -66,6 +74,11 @@ class StatsWindow {
         this.widgetWindow.getWidgetBody().appendChild(this.jsonObject);
     }
 
+    /**
+     * @public
+     * @param {Array} stats 
+     * @returns {void}
+     */
     displayInfo(stats) {
         const lowHertz = stats["lowestNote"][2] + 0.5;
         const highHertz = stats["highestNote"][2] + 0.5;
