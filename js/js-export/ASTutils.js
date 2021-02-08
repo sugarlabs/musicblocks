@@ -19,6 +19,10 @@
  * Private members' names begin with underscore '_".
  */
 
+/* global JSInterface, last */
+
+/* exported ASTUtils */
+
 /**
  * @class
  * @classdesc contains the barebone ASTs and utilities for generating the Abstract Syntax Tree for

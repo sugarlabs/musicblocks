@@ -11,15 +11,31 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/*
+   global _, Notation, _THIS_IS_MUSIC_BLOCKS_, Synth, instruments, instrumentsFilters,
+   instrumentsEffects, Singer, logo, Tone, p5, CAMERAVALUE, doUseCamera, VIDEOVALUE, last,
+   getIntervalDirection, getIntervalNumber, mixedNumber, rationalToFraction, doStopVideoCam,
+   StatusMatrix, turtle, blocks, getStatsFromNotation, save, delayExecution
+ */
+
+/*
+   exported Queue, Logo, DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY, OSCVOLUMEADJUSTMENT, TONEBPM,
+   TARGETBPM, TURTLESTEP, NOTEDIV, NOMICERRORMSG, NANERRORMSG, NOSTRINGERRORMSG, NOBOXERRORMSG,
+   NOACTIONERRORMSG, NOINPUTERRORMSG, NOSQRTERRORMSG, ZERODIVIDEERRORMSG, EMPTYHEAPERRORMSG,
+   INVALIDPITCH, POSNUMBER, NOTATIONNOTE, NOTATIONDURATION, NOTATIONDOTCOUNT, NOTATIONTUPLETVALUE,
+   NOTATIONROUNDDOWN, NOTATIONINSIDECHORD, NOTATIONSTACCATO
+ */
+
 const DEFAULTVOLUME = 50;
 const PREVIEWVOLUME = 80;
-const TONEBPM = 240;        // seems to be the default
-const TARGETBPM = 90;       // what we'd like to use for beats per minute
 const DEFAULTDELAY = 500;   // milliseconds
-const TURTLESTEP = -1;      // run in step-by-step mode
-const NOTEDIV = 8;          // number of steps to divide turtle graphics
 // The oscillator runs hot. We must scale back its volume.
 const OSCVOLUMEADJUSTMENT = 1.5;
+
+const TONEBPM = 240; // seems to be the default
+const TARGETBPM = 90; // what we'd like to use for beats per minute
+const TURTLESTEP = -1; // run in step-by-step mode
+const NOTEDIV = 8; // number of steps to divide turtle graphics
 
 const NOMICERRORMSG = "The microphone is not available.";
 const NANERRORMSG = "Not a number.";
@@ -40,6 +56,26 @@ const NOTATIONTUPLETVALUE = 3;
 const NOTATIONROUNDDOWN = 4;
 const NOTATIONINSIDECHORD = 5;  // deprecated
 const NOTATIONSTACCATO = 6;
+
+/**
+ * @class
+ * @classdesc Queue entry for managing running blocks.
+ */
+class Queue {
+    /**
+     * @constructor
+     * @param blk - block
+     * @param count - count
+     * @param parentBlk - parent block
+     * @param args - arguments
+     */
+    constructor(blk, count, parentBlk, args) {
+        this.blk = blk;
+        this.count = count;
+        this.parentBlk = parentBlk;
+        this.args = args;
+    }
+}
 
 /**
  * Class dealing with executing the programs.
@@ -91,12 +127,12 @@ class Logo {
         this.meterWidget = null;
         this.statusMatrix = null;
 
-        /** @deprecated */  this.evalFlowDict = {};
-        /** @deprecated */  this.evalArgDict = {};
-        /** @deprecated */  this.evalParameterDict = {};
-        /** @deprecated */  this.evalSetterDict = {};
-        /** @deprecated */  this.evalOnStartList = {};
-        /** @deprecated */  this.evalOnStopList = {};
+        /** @deprecated */ this.evalFlowDict = {};
+        /** @deprecated */ this.evalArgDict = {};
+        /** @deprecated */ this.evalParameterDict = {};
+        /** @deprecated */ this.evalSetterDict = {};
+        /** @deprecated */ this.evalOnStartList = {};
+        /** @deprecated */ this.evalOnStopList = {};
 
         this.eventList = {};
         this.receivedArg = null;
@@ -535,9 +571,9 @@ class Logo {
 
             tur.singer.synthVolume = {
                 "electronic synth": [DEFAULTVOLUME],
-                noise1: [DEFAULTVOLUME],
-                noise2: [DEFAULTVOLUME],
-                noise3: [DEFAULTVOLUME]
+                "noise1": [DEFAULTVOLUME],
+                "noise2": [DEFAULTVOLUME],
+                "noise3": [DEFAULTVOLUME]
             };
         }
 
@@ -576,16 +612,16 @@ class Logo {
      * @returns {void}
      */
     initMediaDevices() {
-        console.debug("INIT MICROPHONE");
+        // console.debug("INIT MICROPHONE");
         if (_THIS_IS_MUSIC_BLOCKS_) {
             let mic = new Tone.UserMedia();
             try {
                 mic.open();
             } catch (e) {
-                console.debug("MIC NOT FOUND");
-                console.debug(e.name + ": " + e.message);
+                // console.debug("MIC NOT FOUND");
+                // console.debug(e.name + ": " + e.message);
 
-                console.debug(mic);
+                // console.debug(mic);
                 this.errorMsg(NOMICERRORMSG);
                 mic = null;
             }
@@ -597,7 +633,7 @@ class Logo {
                 this.mic = new p5.AudioIn();
                 this.mic.start();
             } catch (e) {
-                console.debug(e);
+                // console.debug(e);
                 this.errorMsg(NOMICERRORMSG);
                 this.mic = null;
             }
@@ -634,8 +670,7 @@ class Logo {
     processSpeak(text) {
         let new_text = "";
         for (const i in text) {
-            if (new RegExp("^[A-Za-z,. ]$").test(text[i]))
-                new_text += text[i];
+            if (new RegExp("^[A-Za-z,. ]$").test(text[i])) new_text += text[i];
         }
 
         if (this.meSpeak !== null) {
@@ -689,8 +724,7 @@ class Logo {
         } else if (
             typeof arg1 === "object" &&
             blk !== null &&
-            this.blocks.blockList[this.blocks.blockList[blk].connections[2]]
-                .name === "loadFile"
+            this.blocks.blockList[this.blocks.blockList[blk].connections[2]].name === "loadFile"
         ) {
             if (arg1) {
                 this.turtles.turtleList[turtle].doShowText(arg0, arg1[1]);
@@ -750,7 +784,8 @@ class Logo {
             const c = this.blocks.blockList[last(tur.singer.backward)].name === "backward" ? 1 : 2;
             if (
                 this.blocks.sameGeneration(
-                    this.blocks.blockList[last(tur.singer.backward)].connections[c], blk
+                    this.blocks.blockList[last(tur.singer.backward)].connections[c],
+                    blk
                 )
             ) {
                 nextBlock = this.blocks.blockList[blk].connections[0];
@@ -798,15 +833,16 @@ class Logo {
 
         if (typeof logo.blocks.blockList[blk].protoblock.arg === "function") {
             return (logo.blocks.blockList[blk].value = logo.blocks.blockList[blk].protoblock.arg(
-                logo, turtle, blk, receivedArg
+                logo,
+                turtle,
+                blk,
+                receivedArg
             ));
         }
 
         if (logo.blocks.blockList[blk].name === "intervalname") {
             if (typeof logo.blocks.blockList[blk].value === "string") {
-                tur.singer.noteDirection = getIntervalDirection(
-                    logo.blocks.blockList[blk].value
-                );
+                tur.singer.noteDirection = getIntervalDirection(logo.blocks.blockList[blk].value);
                 return getIntervalNumber(logo.blocks.blockList[blk].value);
             } else return 0;
         } else if (logo.blocks.blockList[blk].isValueBlock()) {
@@ -820,9 +856,8 @@ class Logo {
                 case "dectofrac":
                     if (
                         logo.inStatusMatrix &&
-                        logo.blocks.blockList[
-                            logo.blocks.blockList[blk].connections[0]
-                        ].name === "print"
+                        logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name ===
+                            "print"
                     ) {
                         logo.statusFields.push([blk, "dectofrac"]);
                     } else {
@@ -846,9 +881,8 @@ class Logo {
                 case "hue":
                     if (
                         logo.inStatusMatrix &&
-                        logo.blocks.blockList[
-                            logo.blocks.blockList[blk].connections[0]
-                        ].name === "print"
+                        logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name ===
+                            "print"
                     ) {
                         logo.statusFields.push([blk, "color"]);
                     } else {
@@ -862,13 +896,13 @@ class Logo {
                     if (logo.returns[turtle].length > 0) {
                         logo.blocks.blockList[blk].value = logo.returns[turtle].pop();
                     } else {
-                        console.debug("WARNING: No return value.");
+                        // console.debug("WARNING: No return value.");
                         logo.blocks.blockList[blk].value = 0;
                     }
                     break;
 
                 default:
-                    console.error("I do not know how to " + logo.blocks.blockList[blk].name);
+                    // console.error("I do not know how to " + logo.blocks.blockList[blk].name);
                     break;
             }
 
@@ -901,13 +935,11 @@ class Logo {
         // Check to see if this note straddles a measure boundary
         const durationTime = 1 / duration;
         const beatsIntoMeasure =
-            (
-                (
-                    tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] -
-                    tur.singer.pickup -
-                    durationTime
-                ) * tur.singer.noteValuePerBeat
-            ) % tur.singer.beatsPerMeasure;
+            ((tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] -
+                tur.singer.pickup -
+                durationTime) *
+                tur.singer.noteValuePerBeat) %
+            tur.singer.beatsPerMeasure;
         const timeIntoMeasure = beatsIntoMeasure / tur.singer.noteValuePerBeat;
         const timeLeftInMeasure =
             tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat - timeIntoMeasure;
@@ -916,7 +948,7 @@ class Logo {
             const d = durationTime - timeLeftInMeasure;
             let d2 = timeLeftInMeasure;
             const b = tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat;
-            console.debug("splitting note across measure boundary.");
+            // console.debug("splitting note across measure boundary.");
             const obj = rationalToFraction(d);
 
             if (d2 > 0) {
@@ -1030,10 +1062,7 @@ class Logo {
         }
 
         // For while and until, we need to add any childflow from the parent to the queue
-        if (
-            parentLoopBlock.name === "while" ||
-            parentLoopBlock.name === "until"
-        ) {
+        if (parentLoopBlock.name === "while" || parentLoopBlock.name === "until") {
             const childFlow = last(parentLoopBlock.connections);
             if (childFlow != null) {
                 const queueBlock = new Queue(childFlow, 1, loopBlkIdx);
@@ -1065,9 +1094,9 @@ class Logo {
         this.notation.pickupPoint[turtle] = null;
         this.notation.pickupPOW2[turtle] = false;
 
-        this.turtles.ithTurtle(turtle).initTurtle(
-            this.runningLilypond || this.runningAbc || this.runningMxml
-        );
+        this.turtles
+            .ithTurtle(turtle)
+            .initTurtle(this.runningLilypond || this.runningAbc || this.runningMxml);
     }
 
     /**
@@ -1100,7 +1129,8 @@ class Logo {
             }
 
             this.synth.stop();
-            if (this.synth.recorder && this.synth.recorder.state == "recording") this.synth.recorder.stop();
+            if (this.synth.recorder && this.synth.recorder.state == "recording")
+                this.synth.recorder.stop();
         }
 
         if (this.cameraID != null) {
@@ -1119,7 +1149,7 @@ class Logo {
 
         document.body.style.cursor = "default";
         if (this.showBlocksAfterRun) {
-            console.debug("SHOW BLOCKS");
+            // console.debug("SHOW BLOCKS");
             this.blocks.showBlocks();
             document.getElementById("stop").style.color = "white";
         }
@@ -1164,20 +1194,20 @@ class Logo {
         this._prematureRestart = this._alreadyRunning;
         if (this._alreadyRunning && this._runningBlock !== null) {
             this._ignoringBlock = this._runningBlock;
-            console.debug(this._alreadyRunning + " " + this._runningBlock);
+            // console.debug(this._alreadyRunning + " " + this._runningBlock);
         } else {
             this._ignoringBlock = null;
         }
 
         if (this._lastNoteTimeout != null) {
-            console.debug("clearing lastNoteTimeout");
+            // console.debug("clearing lastNoteTimeout");
             clearTimeout(this._lastNoteTimeout);
             this._lastNoteTimeout = null;
         }
 
-        this._restoreConnections();         // restore any broken connections
+        this._restoreConnections(); // restore any broken connections
 
-        this._saveLocally();                // save the state before running
+        this._saveLocally(); // save the state before running
 
         for (const arg in this.evalOnStartList) {
             eval(this.evalOnStartList[arg]);
@@ -1186,7 +1216,7 @@ class Logo {
         this.stopTurtle = false;
 
         this.blocks.unhighlightAll();
-        this.blocks.bringToTop();           // draw under blocks
+        this.blocks.bringToTop(); // draw under blocks
 
         this._hideMsgs();
 
@@ -1326,14 +1356,14 @@ class Logo {
 
         // Make sure that there is atleast one turtle
         if (this.turtles.turtleList.length === 0) {
-            console.debug("No start block... adding a turtle");
+            // console.debug("No start block... adding a turtle");
             this.turtles.addTurtle(null);
         }
 
         // Mark all turtles as not running
         for (const turtle in this.turtles.turtleList) {
             if (this.turtles.turtleList[turtle].running) {
-                console.debug("already running...");
+                // console.debug("already running...");
             }
 
             this.turtles.turtleList[turtle].running = false;
@@ -1367,7 +1397,7 @@ class Logo {
             tur.parameterQueue = [];
 
             if (tur.running) {
-                console.debug("already running...");
+                // console.debug("already running...");
             }
 
             tur.running = true;
@@ -1377,7 +1407,9 @@ class Logo {
             // Look for a status/oscilloscope block
             for (let b = 0; b < startBlocks.length; b++) {
                 if (
-                    ["status", "oscilloscope"].indexOf(this.blocks.blockList[startBlocks[b]].name) !== -1 &&
+                    ["status", "oscilloscope"].indexOf(
+                        this.blocks.blockList[startBlocks[b]].name
+                    ) !== -1 &&
                     !this.blocks.blockList[startBlocks[b]].trash
                 ) {
                     const turtle = 0;
@@ -1389,7 +1421,7 @@ class Logo {
                     tur.parameterQueue = [];
 
                     if (tur.running) {
-                        console.debug("already running...");
+                        // console.debug("already running...");
                     }
 
                     tur.running = true;
@@ -1407,7 +1439,11 @@ class Logo {
 
                 // If there are start blocks, run them all
                 for (let b = 0; b < startBlocks.length; b++) {
-                    if (["status", "oscilloscope"].indexOf(this.blocks.blockList[startBlocks[b]].name) === -1 ) {
+                    if (
+                        ["status", "oscilloscope"].indexOf(
+                            this.blocks.blockList[startBlocks[b]].name
+                        ) === -1
+                    ) {
                         const turtle = this.blocks.blockList[startBlocks[b]].value;
                         const tur = this.turtles.ithTurtle(turtle);
 
@@ -1418,7 +1454,7 @@ class Logo {
 
                         if (!tur.inTrash) {
                             if (tur.running) {
-                                console.debug("already running...");
+                                // console.debug("already running...");
                             }
 
                             tur.running = true;
@@ -1430,7 +1466,7 @@ class Logo {
         } else {
             const tur = this.turtles.ithTurtle(turtle);
 
-            console.debug("Empty start block: " + turtle + " " + tur.singer.suppressOutput);
+            // console.debug("Empty start block: " + turtle + " " + tur.singer.suppressOutput);
 
             if (tur.singer.suppressOutput || tur.singer.suppressOutput == undefined) {
                 // this.errorMsg(NOACTIONERRORMSG, null, _('start'));
@@ -1474,9 +1510,10 @@ class Logo {
                 }
                 logo.stepQueue[turtle].push(blk);
             } else {
-                tur.delayParameters = { "blk": blk, "flow": isflow, "arg": receivedArg };
+                tur.delayParameters = { blk: blk, flow: isflow, arg: receivedArg };
                 tur.delayTimeout = setTimeout(
-                    () => logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg), delay
+                    () => logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg),
+                    delay
                 );
             }
         }
@@ -1511,7 +1548,7 @@ class Logo {
             for (let i = 1; i <= logo.blocks.blockList[blk].protoblock.args; i++) {
                 if (logo.blocks.blockList[blk].protoblock.dockTypes[i] === "in") {
                     if (logo.blocks.blockList[blk].connections[i] == null) {
-                        console.debug("skipping inflow args");
+                        // console.debug("skipping inflow args");
                     } else {
                         args.push(logo.blocks.blockList[blk].connections[i]);
                     }
@@ -1526,8 +1563,12 @@ class Logo {
                         )
                     );
                 }
-                if (logo.turtles.ithTurtle(turtle).singer.inNoteBlock.length > 0 && logo.blocks.blockList[logo.blocks.blockList[blk].connections[i]].name === "currentpitch") {
-                // Re-eval this arg after note block ends to ensure that the current pitch is uptodate.
+                if (
+                    logo.turtles.ithTurtle(turtle).singer.inNoteBlock.length > 0 &&
+                    logo.blocks.blockList[logo.blocks.blockList[blk].connections[i]].name ===
+                        "currentpitch"
+                ) {
+                    // Re-eval this arg after note block ends to ensure that the current pitch is uptodate.
                     logo.specialArgs.push([args, logo, turtle, blk, receivedArg, null, isflow]);
                 }
             }
@@ -1551,7 +1592,8 @@ class Logo {
 
                 if (
                     !logo.blocks.sameGeneration(
-                        logo.blocks.blockList[last(tur.singer.backward)].connections[c], blk
+                        logo.blocks.blockList[last(tur.singer.backward)].connections[c],
+                        blk
                     )
                 ) {
                     nextFlow = last(logo.blocks.blockList[blk].connections);
@@ -1603,7 +1645,13 @@ class Logo {
 
         if (!logo.blocks.blockList[blk].isArgBlock()) {
             const res = logo.blocks.blockList[blk].protoblock.flow(
-                args, logo, turtle, blk, receivedArg, actionArgs, isflow
+                args,
+                logo,
+                turtle,
+                blk,
+                receivedArg,
+                actionArgs,
+                isflow
             );
 
             if (res) {
@@ -1650,7 +1698,7 @@ class Logo {
                 }
             }
         } else {
-            console.debug("Ignoring block on overlapped start.");
+            // console.debug("Ignoring block on overlapped start.");
         }
 
         if (logo.statusMatrix && logo.statusMatrix.isOpen && !logo.inStatusMatrix) {
@@ -1675,7 +1723,7 @@ class Logo {
                 tur.parentFlowQueue.push(blk);
                 tur.queue.push(queueBlock);
             } else {
-                console.debug("cannot find queue for turtle " + turtle);
+                // console.debug("cannot find queue for turtle " + turtle);
             }
         }
 
@@ -1717,19 +1765,15 @@ class Logo {
             }
 
             if (
-                (
-                    tur.singer.backward.length > 0 &&
-                    logo.blocks.blockList[blk].connections[0] == null
-                ) ||
-                (
-                    tur.singer.backward.length === 0 &&
-                    last(logo.blocks.blockList[blk].connections) == null
-                )
+                (tur.singer.backward.length > 0 &&
+                    logo.blocks.blockList[blk].connections[0] == null) ||
+                (tur.singer.backward.length === 0 &&
+                    last(logo.blocks.blockList[blk].connections) == null)
             ) {
                 if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
                     // If we are at the end of the child flow, queue the unhighlighting of the parent block to the flow
                     if (tur.unhighlightQueue === undefined) {
-                        console.debug("cannot find highlight queue for turtle " + turtle);
+                        // console.debug("cannot find highlight queue for turtle " + turtle);
                     } else if (
                         tur.parentFlowQueue.length > 0 &&
                         tur.queue.length > 0 &&
@@ -1770,10 +1814,11 @@ class Logo {
                     for (let i = 0; i < tur.endOfClampSignals[b].length; i++) {
                         if (tur.endOfClampSignals[b][i] != null) {
                             if (
-                                tur.butNotThese[b] == null || tur.butNotThese[b].indexOf(i) === -1
+                                tur.butNotThese[b] == null ||
+                                tur.butNotThese[b].indexOf(i) === -1
                             ) {
                                 if (tur.singer.runningFromEvent) {
-                                    console.log("RUNNING FROM EVENT");
+                                    // console.log("RUNNING FROM EVENT");
                                 } else {
                                     logo.stage.dispatchEvent(tur.endOfClampSignals[b][i]);
                                 }
@@ -1795,8 +1840,8 @@ class Logo {
             }
 
             const comp = logo.turtles.turtleList[turtle].companionTurtle;
-            if (comp){
-                logo.turtles.turtleList[comp].running = false ;
+            if (comp) {
+                logo.turtles.turtleList[comp].running = false;
                 const interval = logo.turtles.turtleList[comp].interval;
                 if (interval) clearInterval(interval);
             }
@@ -1810,41 +1855,40 @@ class Logo {
                     tur.singer.justCounting.length === 0
                 ) {
                     if (logo.runningLilypond) {
-                        if (logo.collectingStats){
-                            console.debug("stats collection completed");
+                        if (logo.collectingStats) {
+                            // console.debug("stats collection completed");
                             logo.projectStats = getStatsFromNotation(logo);
                             logo.statsWindow.displayInfo(logo.projectStats);
-
                         } else {
-                            console.debug("saving lilypond output:");
+                            // console.debug("saving lilypond output:");
                             save.afterSaveLilypond();
                         }
                         logo.collectingStats = false;
                         logo.runningLilypond = false;
                     } else if (logo.runningAbc) {
-                        console.debug("saving abc output:");
+                        // console.debug("saving abc output:");
                         save.afterSaveAbc();
                         logo.runningAbc = false;
                     } else if (logo.runningMxml) {
-                        console.log("saving mxml output");
+                        // console.log("saving mxml output");
                         save.afterSaveMxml();
                         logo.runningMxml = false;
                     } else if (tur.singer.suppressOutput) {
-                        console.debug("finishing compiling");
+                        // console.debug("finishing compiling");
                         if (!logo.recording) {
                             logo.errorMsg(_("Playback is ready."));
                         }
                     }
 
                     // Give the last note time to play
-                    console.debug(
-                        "SETTING LAST NOTE TIMEOUT: " +
-                        logo.recording +
-                        " " +
-                        tur.singer.suppressOutput
-                    );
+                    // console.debug(
+                    //     "SETTING LAST NOTE TIMEOUT: " +
+                    //         logo.recording +
+                    //         " " +
+                    //         tur.singer.suppressOutput
+                    // );
                     logo._lastNoteTimeout = setTimeout(() => {
-                        console.debug("LAST NOTE PLAYED");
+                        // console.debug("LAST NOTE PLAYED");
                         logo._lastNoteTimeout = null;
                         tur.singer.runningFromEvent = false;
                         if (tur.singer.suppressOutput && logo.recording) {
@@ -1861,7 +1905,8 @@ class Logo {
                             // Save the session
                             logo.saveLocally();
                         }
-                        if (this.synth.recorder && this.synth.recorder.state == "recording") this.synth.recorder.stop();
+                        if (this.synth.recorder && this.synth.recorder.state == "recording")
+                            this.synth.recorder.stop();
                     }, 1000);
                 } else if (tur.singer.suppressOutput) {
                     setTimeout(() => __checkCompletionState(), 250);
@@ -1916,11 +1961,10 @@ class Logo {
                         blk !== null &&
                         logo.blocks.blockList[blk].connections[0] !== null &&
                         ["status", "oscilloscope"].indexOf(
-                            logo.blocks.blockList[
-                                logo.blocks.blockList[blk].connections[0]
-                            ].name) !== -1
+                            logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name
+                        ) !== -1
                     ) {
-                        console.debug("running status/oscilloscope block");
+                        // console.debug("running status/oscilloscope block");
                     } else {
                         logo.blocks.showBlocks();
                         logo.showBlocksAfterRun = false;
@@ -1947,14 +1991,11 @@ class Logo {
 
         const tur = this.turtles.ithTurtle(turtle);
 
-        if (tur.singer.embeddedGraphics === {})
-            return;
+        if (tur.singer.embeddedGraphics === {}) return;
 
-        if (!blk in tur.singer.embeddedGraphics)
-            return;
+        if ((!blk) in tur.singer.embeddedGraphics) return;
 
-        if (tur.singer.embeddedGraphics[blk].length === 0)
-            return;
+        if (tur.singer.embeddedGraphics[blk].length === 0) return;
 
         // If the previous note's graphics are not complete, add a slight delay before drawing any new graphics
         if (!tur.embeddedGraphicsFinished) {
@@ -1966,7 +2007,7 @@ class Logo {
         const suppressOutput = tur.singer.suppressOutput;
 
         const __pen = (turtle, name, arg, timeout) => {
-            const _penSwitch = name => {
+            const _penSwitch = (name) => {
                 switch (name) {
                     case "penup":
                         tur.painter.doPenUp();
@@ -2002,7 +2043,7 @@ class Logo {
             }
         };
 
-        const __clear = (turtle, timeout) => {
+        const __clear = () => {
             if (tur.singer.suppressOutput) {
                 const savedPenState = tur.painter.penState;
                 tur.painter.penState = false;
@@ -2071,10 +2112,7 @@ class Logo {
         const __show = (turtle, arg1, arg2, timeout) => {
             if (suppressOutput) return;
 
-            setTimeout(
-                () => this.processShow(turtle, null, arg1, arg2),
-                timeout
-            );
+            setTimeout(() => this.processShow(turtle, null, arg1, arg2), timeout);
         };
 
         const __speak = (turtle, arg, timeout) => {
@@ -2203,7 +2241,7 @@ class Logo {
         // Cheat by 0.5% so that the mouse has time to complete its work
         // let stepTime = beatValue * 1000 / NOTEDIV;
         let stepTime = ((beatValue - delay) * 995) / NOTEDIV;
-        if (stepTime < 0)   stepTime = 0;
+        if (stepTime < 0) stepTime = 0;
 
         // We do each graphics action sequentially, so we need to
         // divide stepTime by the length of the embedded graphics
@@ -2514,7 +2552,7 @@ class Logo {
                     break;
 
                 default:
-                    console.debug(name + " is not supported inside of Note Blocks");
+                    // console.debug(name + " is not supported inside of Note Blocks");
                     break;
             }
         }
@@ -2522,26 +2560,5 @@ class Logo {
         // Mark the end time of this note's graphics operations
         await delayExecution(beatValue * 1000);
         tur.embeddedGraphicsFinished = true;
-    }
-}
-
-/**
- * Queue entry for managing running blocks.
- *
- * @class
- */
-class Queue {
-    /**
-     * @constructor
-     * @param blk - block
-     * @param count - count
-     * @param parentBlk - parent block
-     * @param args - arguments
-     */
-    constructor(blk, count, parentBlk, args) {
-        this.blk = blk;
-        this.count = count;
-        this.parentBlk = parentBlk;
-        this.args = args;
     }
 }

@@ -281,8 +281,8 @@ const piemenuPitches = function (
         (block.name === "notename" &&
             (block.connections[0] != undefined
                 ? ["setkey", "setkey2"].indexOf(
-                      block.blocks.blockList[block.connections[0]].name
-                  ) === -1
+                    block.blocks.blockList[block.connections[0]].name
+                ) === -1
                 : true))
     ) {
         if (scale[6 - i][0] == FIXEDSOLFEGE[note] || scale[6 - i][0] == note) {
@@ -476,8 +476,8 @@ const piemenuPitches = function (
             (that.name == "notename" &&
                 (that.connections[0] != undefined
                     ? ["setkey", "setkey2"].indexOf(
-                          that.blocks.blockList[that.connections[0]].name
-                      ) === -1
+                        that.blocks.blockList[that.connections[0]].name
+                    ) === -1
                     : true))
         ) {
             let i = NOTENAMES.indexOf(FIXEDSOLFEGE[selection["note"]]);
@@ -2064,8 +2064,10 @@ const piemenuBasic = function (block, menuLabels, menuValues, selectedValue, col
     block._basicWheel.slicePathCustom.maxRadiusPercent = 1.0;
     block._basicWheel.sliceSelectedPathCustom = block._basicWheel.slicePathCustom;
     block._basicWheel.sliceInitPathCustom = block._basicWheel.slicePathCustom;
-    block._basicWheel.titleRotateAngle = 0;
     block._basicWheel.animatetime = 0; // 300;
+    if (block.name !== "wrapmode"){
+        block._basicWheel.titleRotateAngle = 0;
+    }
     block._basicWheel.createWheel(labels);
 
     block._exitWheel.colors = platformColor.exitWheelcolors;
@@ -2911,7 +2913,12 @@ const piemenuModes = function (block, selectedMode) {
         that._modeNameWheel.navigateWheel(i);
     };
 
+    let timeout;
+
     const __exitMenu = function () {
+        if (timeout) {
+            clearTimeout(timeout);
+        }
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
         if (that._modeNameWheel !== null) {
@@ -2957,7 +2964,7 @@ const piemenuModes = function (block, selectedMode) {
                 that._modeWheel.navigateWheel(0);
             }
 
-            setTimeout(function () {
+            timeout = setTimeout(function () {
                 __playScale(activeTabs, idx + 1);
             }, 1000 / 10); // slight delay between notes
         }
@@ -2981,6 +2988,19 @@ const piemenuModes = function (block, selectedMode) {
         for (let k = mode.length - 1; k >= 0; k--) {
             activeTabs.push(last(activeTabs) - mode[k]);
         }
+
+        docById("wheelnav-_exitWheel-title-1").style.fill = "#ffffff";
+        docById("wheelnav-_exitWheel-title-1").style.pointerEvents = "none";
+        docById("wheelnav-_exitWheel-slice-1").style.pointerEvents = "none";
+        setTimeout(function() {
+            const playButtonTitle = docById("wheelnav-_exitWheel-title-1");
+            const playButtonSlice = docById("wheelnav-_exitWheel-slice-1");
+            if (playButtonTitle && playButtonSlice){
+                playButtonTitle.style.fill = "#000000";
+                playButtonTitle.style.pointerEvents = "auto";
+                playButtonSlice.style.pointerEvents = "auto";
+            }
+        }, 20 * 1000 / 10);
 
         __playScale(activeTabs, 0);
     };
@@ -3041,7 +3061,7 @@ const piemenuModes = function (block, selectedMode) {
 
     const __buildModeWheel = function () {
         const i = that._modeGroupWheel.selectedNavItemIndex;
-        const modeGroup = that._modeGroupWheel.navItems[i].title;
+        modeGroup = that._modeGroupWheel.navItems[i].title;
         __buildModeNameWheel(modeGroup);
     };
 

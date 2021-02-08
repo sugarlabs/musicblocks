@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * @file This contains the utilities for generating code from block stacks for JS Editor widget.
  * @author Anindya Kundu
@@ -13,6 +14,10 @@
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
  */
+
+/* global JSInterface, blocks, last, ASTUtils, astring */
+
+/* exported JSGenerate */
 
 /**
  * @class

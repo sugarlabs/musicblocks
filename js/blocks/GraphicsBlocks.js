@@ -1,3 +1,24 @@
+/*
+   global last, _, ValueBlock, FlowClampBlock, FlowBlock, MusicBlocks, Mouse, NOINPUTERRORMSG,
+   NANERRORMSG, toFixed2
+ */
+
+/*
+   Global locations
+   - js/utils/utils.js
+        _
+   - js/protoblocks.js 
+    ValueBlock, FlowClampBlock
+   - js/js-export/export.js
+    MusicBlocks, Mouse
+   - js/logo.js
+    NOINPUTERRORMSG, NANERRORMSG
+   - js/utils/utils.js
+   toFixed2
+ */
+
+/*exported setupGraphicsBlocks*/
+
 function setupGraphicsBlocks() {
     class HeadingBlock extends ValueBlock {
         constructor() {
@@ -13,20 +34,21 @@ function setupGraphicsBlocks() {
             ]);
         }
 
-        setter(logo, value, turtle, blk) {
+        setter(logo, value, turtle) {
             const turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetHeading(value);
         }
 
-        updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].orientation);
+        updateParameter(logo, turtle) {
+            return toFixed2(
+                logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].orientation
+            );
         }
 
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "heading"]);
             } else {
@@ -54,20 +76,19 @@ function setupGraphicsBlocks() {
             });
         }
 
-        setter(logo, value, turtle, blk) {
+        setter(logo, value, turtle) {
             const turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetXY(turtleObj.x, value);
         }
 
-        updateParameter(logo, turtle, blk) {
+        updateParameter(logo, turtle) {
             return toFixed2(logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].y);
         }
 
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "y"]);
             } else {
@@ -97,20 +118,19 @@ function setupGraphicsBlocks() {
             });
         }
 
-        setter(logo, value, turtle, blk) {
+        setter(logo, value, turtle) {
             const turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetXY(value, turtleObj.y);
         }
 
-        updateParameter(logo, turtle, blk) {
+        updateParameter(logo, turtle) {
             return toFixed2(logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].x);
         }
 
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "x"]);
             } else {
@@ -138,8 +158,7 @@ function setupGraphicsBlocks() {
             this.formBlock({
                 args: 2,
                 defaults: [100, 0],
-                argLabels:
-                    this.lang === "ja" ? [_("x2"), _("y2")] : [_("x"), _("y")]
+                argLabels: this.lang === "ja" ? [_("x2"), _("y2")] : [_("x"), _("y")]
             });
         }
 
@@ -154,27 +173,28 @@ function setupGraphicsBlocks() {
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    logo.phraseMaker.rowLabels.push(
-                        logo.blocks.blockList[blk].name
-                    );
+                    logo.phraseMaker.rowLabels.push(logo.blocks.blockList[blk].name);
                     logo.phraseMaker.rowArgs.push([args[0], args[1]]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
                     if (tur.singer.suppressOutput) {
                         const savedPenState =
-                            logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.penState;
-                        logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.penState = false;
-                        logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.doScrollXY(
-                            args[0],
-                            args[1]
-                        );
-                        logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.penState = savedPenState;
+                            logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter
+                                .penState;
+                        logo.turtles.turtleList[
+                            logo.turtles.companionTurtle(turtle)
+                        ].painter.penState = false;
+                        logo.turtles.turtleList[
+                            logo.turtles.companionTurtle(turtle)
+                        ].painter.doScrollXY(args[0], args[1]);
+                        logo.turtles.turtleList[
+                            logo.turtles.companionTurtle(turtle)
+                        ].painter.penState = savedPenState;
                     } else {
-                        logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter.doScrollXY(
-                            args[0],
-                            args[1]
-                        );
+                        logo.turtles.turtleList[
+                            logo.turtles.companionTurtle(turtle)
+                        ].painter.doScrollXY(args[0], args[1]);
                     }
                 }
             }
@@ -216,9 +236,7 @@ function setupGraphicsBlocks() {
             super("controlpoint2");
             this.setPalette("graphics");
             this.setHelpString([
-                _(
-                    "The Control-point 2 block sets the second control point for the Bezier curve."
-                ),
+                _("The Control-point 2 block sets the second control point for the Bezier curve."),
                 "documentation",
                 ""
             ]);
@@ -228,8 +246,7 @@ function setupGraphicsBlocks() {
                 name: _("control point 2"),
                 args: 2,
                 defaults: [100, 25],
-                argLabels:
-                    this.lang === "ja" ? [_("x1"), _("y1")] : [_("x"), _("y")]
+                argLabels: this.lang === "ja" ? [_("x1"), _("y1")] : [_("x"), _("y")]
             });
         }
 
@@ -253,9 +270,7 @@ function setupGraphicsBlocks() {
             super("controlpoint1");
             this.setPalette("graphics");
             this.setHelpString([
-                _(
-                    "The Control-point 1 block sets the first control point for the Bezier curve."
-                ),
+                _("The Control-point 1 block sets the first control point for the Bezier curve."),
                 "documentation",
                 ""
             ]);
@@ -265,8 +280,7 @@ function setupGraphicsBlocks() {
                 name: _("control point 1"),
                 args: 2,
                 defaults: [100, 75],
-                argLabels:
-                    this.lang === "ja" ? [_("x1"), _("y1")] : [_("x"), _("y")]
+                argLabels: this.lang === "ja" ? [_("x1"), _("y1")] : [_("x"), _("y")]
             });
         }
 
@@ -289,19 +303,14 @@ function setupGraphicsBlocks() {
         constructor() {
             super("bezier");
             this.setPalette("graphics");
-            this.setHelpString([
-                _("The Bezier block draws a Bezier curve."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Bezier block draws a Bezier curve."), "documentation", ""]);
 
             this.formBlock({
                 //.TRANS: Bézier curves employ at least three points to define a curve
                 name: _("bezier"),
                 args: 2,
                 defaults: [0, 100],
-                argLabels:
-                    this.lang === "ja" ? [_("x1"), _("y1")] : [_("x"), _("y")]
+                argLabels: this.lang === "ja" ? [_("x1"), _("y1")] : [_("x"), _("y")]
             });
         }
 
@@ -364,9 +373,7 @@ function setupGraphicsBlocks() {
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    logo.phraseMaker.rowLabels.push(
-                        logo.blocks.blockList[blk].name
-                    );
+                    logo.phraseMaker.rowLabels.push(logo.blocks.blockList[blk].name);
                     logo.phraseMaker.rowArgs.push([args[0], args[1]]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -416,9 +423,7 @@ function setupGraphicsBlocks() {
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    logo.phraseMaker.rowLabels.push(
-                        logo.blocks.blockList[blk].name
-                    );
+                    logo.phraseMaker.rowLabels.push(logo.blocks.blockList[blk].name);
                     logo.phraseMaker.rowArgs.push(args[0]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -436,9 +441,7 @@ function setupGraphicsBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Set XY block moves the mouse to a specific position on the screen."
-                ),
+                _("The Set XY block moves the mouse to a specific position on the screen."),
                 "documentation",
                 ""
             ]);
@@ -448,8 +451,7 @@ function setupGraphicsBlocks() {
                 name: _("set xy"),
                 args: 2,
                 defaults: [0, 0],
-                argLabels:
-                    this.lang === "ja" ? [_("x1"), _("y1")] : [_("x"), _("y")]
+                argLabels: this.lang === "ja" ? [_("x1"), _("y1")] : [_("x"), _("y")]
             });
         }
 
@@ -464,9 +466,7 @@ function setupGraphicsBlocks() {
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    logo.phraseMaker.rowLabels.push(
-                        logo.blocks.blockList[blk].name
-                    );
+                    logo.phraseMaker.rowLabels.push(logo.blocks.blockList[blk].name);
                     logo.phraseMaker.rowArgs.push([args[0], args[1]]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -489,8 +489,7 @@ function setupGraphicsBlocks() {
             super("right");
             this.setPalette("graphics");
             this.beginnerBlock(true);
-            this.piemenuValuesC1 = [0, 30, 60, 90, 120, 150, 180, 210, 240,
-                270, 300, 330];
+            this.piemenuValuesC1 = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
             this.setHelpString([
                 _("The Right block turns the mouse to the right."),
                 "documentation",
@@ -517,9 +516,7 @@ function setupGraphicsBlocks() {
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    logo.phraseMaker.rowLabels.push(
-                        logo.blocks.blockList[blk].name
-                    );
+                    logo.phraseMaker.rowLabels.push(logo.blocks.blockList[blk].name);
                     logo.phraseMaker.rowArgs.push(args[0]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -542,9 +539,7 @@ function setupGraphicsBlocks() {
             super("left");
             this.setPalette("graphics");
             this.beginnerBlock(true);
-            this.piemenuValuesC1 = [330, 300, 270, 240, 210, 180, 150, 120, 90,
-                60, 30, 0];
-
+            this.piemenuValuesC1 = [330, 300, 270, 240, 210, 180, 150, 120, 90, 60, 30, 0];
             this.setHelpString([
                 _("The Left block turns the mouse to the left."),
                 "documentation",
@@ -571,9 +566,7 @@ function setupGraphicsBlocks() {
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    logo.phraseMaker.rowLabels.push(
-                        logo.blocks.blockList[blk].name
-                    );
+                    logo.phraseMaker.rowLabels.push(logo.blocks.blockList[blk].name);
                     logo.phraseMaker.rowArgs.push(args[0]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -622,9 +615,7 @@ function setupGraphicsBlocks() {
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    logo.phraseMaker.rowLabels.push(
-                        logo.blocks.blockList[blk].name
-                    );
+                    logo.phraseMaker.rowLabels.push(logo.blocks.blockList[blk].name);
                     logo.phraseMaker.rowArgs.push(args[0]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -673,9 +664,7 @@ function setupGraphicsBlocks() {
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    logo.phraseMaker.rowLabels.push(
-                        logo.blocks.blockList[blk].name
-                    );
+                    logo.phraseMaker.rowLabels.push(logo.blocks.blockList[blk].name);
                     logo.phraseMaker.rowArgs.push(args[0]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -693,9 +682,71 @@ function setupGraphicsBlocks() {
         }
     }
 
+    class WrapModeBlock extends ValueBlock {
+        constructor() {
+            super("wrapmode");
+            this.setPalette("graphics");
+            this.formBlock({ outType: "textout" });
+            this.hidden = true;
+        }
+    }
+
+    class WrapBlock extends FlowClampBlock {
+        constructor() {
+            super("wrap", _("wrap"));
+            this.setPalette("graphics");
+            this.beginnerBlock(true);
+            this.setHelpString([
+                _(
+                    "The Wrap block enables or disables screen wrapping for the graphics actions within it."
+                ),
+                "documentation",
+                null,
+                "wraphelp"
+            ]);
+            this.formBlock({
+                name: _("wrap"),
+                args: 1,
+                defaults: ["on"],
+                argTypes: ["textin"]
+            });
+            this.makeMacro((x, y) => [
+                [0, "wrap", x, y, [null, 1, null, 2]],
+                [1, ["wrapmode", { value: "on" }], 0, 0, [0]],
+                [2, "hidden", 0, 0, [0, null]]
+            ]);
+        }
+
+        flow(args, logo, turtle, blk) {
+            if (args[1] === undefined) return;
+            if (args[0] === null) logo.errorMsg(NOINPUTERRORMSG, blk);
+
+            const arg0 = args[0] === null ? "on" : args[0];
+            const tur = logo.turtles.ithTurtle(turtle);
+            const listenerName = "_wrap_" + turtle;
+            tur.painter.wrap = arg0 === "on";
+
+            if (blk !== undefined && blk in logo.blocks.blockList) {
+                logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                const mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
+            }
+
+            const __listener = () => {
+                tur.painter.wrap = null;
+            };
+            logo.setTurtleListener(turtle, listenerName, __listener);
+            return [args[1], 1];
+        }
+    }
+
+ 
     new HeadingBlock().setup();
     new YBlock().setup();
     new XBlock().setup();
+    new WrapModeBlock().setup();
+    new WrapBlock().setup();
     new ScrollXYBlock().setup();
     new ClearBlock().setup();
     new BezierBlock().setup();
