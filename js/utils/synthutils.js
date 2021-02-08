@@ -262,6 +262,7 @@ const SAMPLECENTERNO = {
 };
 
 CUSTOMSAMPLES = {};
+CUSTOMSAMPLECENTERNO = {};
 
 const percussionInstruments = ["koto", "banjo", "dulcimer", "xylophone", "celeste"];
 const stringInstruments = ["piano", "guitar", "acoustic guitar", "electric guitar"];
@@ -698,15 +699,13 @@ function Synth() {
         if (!accounted) {
             if (sampleData !== null) {
                 console.log("loaded custom sample");
-                this.samples["voice"][sampleName] = sampleData;
+                this.samples.voice[sampleName] = sampleData;
                 return;
             }
-            console.debug(sampleName + " sample was not already in sample library");
-
             for (let key in CUSTOMSAMPLES) {
                 if (CUSTOMSAMPLES.hasOwnProperty(key)) {
-                    console.log("loaded custom sample");
-                    this.samples["voice"][key] = CUSTOMSAMPLES[key];
+                    console.log("loaded already-loaded custom sample");
+                    this.samples.voice[key] = CUSTOMSAMPLES[key];
                     return;
                 }
             }
@@ -980,9 +979,12 @@ function Synth() {
             if (sourceName in SAMPLECENTERNO) {
                 console.debug(sourceName + " " + SAMPLECENTERNO[sourceName][0]);
                 noteDict[SAMPLECENTERNO[sourceName][0]] = this.samples.voice[sourceName];
+            //} else if (sourceName in CUSTOMSAMPLECENTERNO) {
+                //let center = this._parseSampleCenterNo(CUSTOMSAMPLECENTERNO[sourceName][0], CUSTOMSAMPLECENTERNO[sourceName][1]);
+                //noteDict[center] = CUSTOMSAMPLES[sourceName];
             } else if (params != null) {
-                let center = this._parseSampleCenterNo(params[1], params[2]);
-                noteDict[center] = params[0];
+                  let center = this._parseSampleCenterNo(params[1], params[2]);
+                  noteDict[center] = params[0];
             } else {
                 noteDict["C4"] = this.samples.voice[sourceName];
             }
@@ -1170,6 +1172,7 @@ function Synth() {
                 console.debug("loading " + sourceName[0]);
                 parameters = [sourceName[1], sourceName[2], sourceName[3]];
                 this.createSynth(turtle, sourceName[0], sourceName[0], parameters);
+                sourceName = sourceName[0];
             } else {
                 console.debug("loading " + sourceName);
                 this.createSynth(turtle, sourceName, sourceName, null);
@@ -1180,7 +1183,6 @@ function Synth() {
         if (sourceName in instruments[turtle]) {
             return instruments[turtle][sourceName].toDestination();
         }
-
         return null;
     };
 

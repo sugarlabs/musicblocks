@@ -31,6 +31,7 @@ function setupToneActions() {
          * @param {Number} blk - corresponding Block object in blocks.blockList
          */
         static setTimbre(instrument, turtle, blk) {
+
             const tur = logo.turtles.ithTurtle(turtle);
 
             tur.inSetTimbre = true;
@@ -52,37 +53,40 @@ function setupToneActions() {
             if (!accounted && typeof instrument === "object"){
                 accounted = false;
                 for (let voice in CUSTOMSAMPLES){
-                    if (voice === instrument[0]){
-                        synth = CUSTOMSAMPLES[voice];
+                    if (voice === instrument[0] && CUSTOMSAMPLES.hasOwnProperty(voice)){
+                        CUSTOMSAMPLECENTERNO[instrument[0]] = [instrument[2], instrument[3]]
                         accounted = true;
                         break;
                     }
                 }
-                if (!accounted) {
+                if ((!accounted) && !(instrument[0] == "")){
                     CUSTOMSAMPLES[instrument[0]] = instrument[1];
-                    synth = instrument[0];
+                    CUSTOMSAMPLECENTERNO[instrument[0]] = [instrument[2], instrument[3]]
                 }
+                synth = instrument;
             }
-            /*
-            if (!accounted && typeof instrument === "object"){
-                synth = instrument[0];
-            }
-            */
-            if ((synth === undefined) || (synth === null)) {
+
+            if ((synth === undefined) || (synth === null) || (synth === "")) {
                 synth = "electronic synth";
             }
 
-            console.log('turtle: ' + turtle + " " + synth);
+            if (typeof synth == "object") {
+                console.log('turtle: ' + turtle + " " + synth[0]);
+            } else {
+                console.log('turtle: ' + turtle + " " + synth);
+            }
 
             if (logo.inMatrix) {
                 logo.phraseMaker._instrumentName = synth;
             }
 
             if (tur.singer.instrumentNames.indexOf(synth) === -1) {
-                tur.singer.instrumentNames.push(synth);
-                if (typeof instrument === "object") {
-                    logo.synth.loadSynth(turtle, instrument);
+                if (typeof synth === "object") {
+                    tur.singer.instrumentNames.push(synth[0]);
+                    logo.synth.loadSynth(turtle, synth);
+                    synth = synth[0]
                 } else {
+                    tur.singer.instrumentNames.push(synth);
                     logo.synth.loadSynth(turtle, synth);
                 }
                 if (tur.singer.synthVolume[synth] === undefined) {
