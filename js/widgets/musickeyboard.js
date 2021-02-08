@@ -1,26 +1,37 @@
-// Copyright (c) 2015 Jefferson Lee
-// Copyright (c) 2018 Ritwik Abhishek
-// Copyright (c) 2018,20 Walter Bender
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundation; either
-// version 3 of the License, or (at your option) any later version.
-//
-// You should have received a copy of the GNU Affero General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+/**
+ * @file This contains the prototype of the MusicKeyboard Widget.
+ *
+ * @copyright 2015 Jefferson Lee
+ * @copyright 2018 Ritwik Abhishek
+ * @copyright 2018,20 Walter Bender
+ *
+ * @license
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * The GNU Affero General Public License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this
+ * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
+ * MA 02110-1335 USA.
+ */
 
 /*
-   global docById, platformColor, FIXEDSOLFEGE1, SHARP, FLAT, last, Singer, _,
-   noteToFrequency, EIGHTHNOTEWIDTH, MATRIXSOLFEHEIGHT, MATRIXSOLFEWIDTH,
-   i18nSolfege, toFraction, wheelnav, slicePath, blocks, getNote, PREVIEWVOLUME,
-   DEFAULTVOICE, PITCHES3, SOLFEGENAMES, SOLFEGECONVERSIONTABLE, NOTESSHARP,
-   NOTESFLAT, logo, convertFromSolfege, PITCHES2, PITCHES
+   global platformColor, docById, wheelnav, slicePath, logo, Singer, last, _, FIXEDSOLFEGE1
+   SHARP, FLAT, noteToFrequency, EIGHTHNOTEWIDTH, MATRIXSOLFEHEIGHT, MATRIXSOLFEWIDTH,
+   i18nSolfege, toFraction, blocks, getNote, PREVIEWVOLUME, DEFAULTVOICE, PITCHES3,
+   SOLFEGENAMES, PITCHES2, PITCHES, NOTESSHARP, NOTESFLAT, convertFromSolfege, SOLFEGECONVERSIONTABLE
+
+
  */
 
 /* exported MusicKeyboard */
 
+/**
+ * @class
+ * @classdesc pertains to setting up all features of the musickeyboard widget and its UI features.
+ *
+ * Private members' names begin with underscore '_".
+ */
 class MusicKeyboard {
     static FAKEBLOCKNUMBER = 100000;
     static BUTTONDIVWIDTH = 535; // 5 buttons
@@ -38,6 +49,10 @@ class MusicKeyboard {
     static beginnerMode = localStorage.beginnerMode;
     static unit = MusicKeyboard.beginnerMode === "true" ? 8 : 16;
     static selectedNotes = [];
+
+    /**
+    * @constructor
+    */
 
     constructor() {
         const w = window.innerWidth;
@@ -66,6 +81,173 @@ class MusicKeyboard {
         this._notesPlayed = [];
     }
 
+    /**
+     * Initialises the MusicKeyboard widget.
+     * @returns {void}
+     */
+
+    init() {
+        this.tick = false;
+        this.playingNow = false;
+        let w = window.innerWidth;
+        this._cellScale = w / 1200;
+
+        const widgetWindow = window.widgetWindows.windowFor(this, "music keyboard");
+        this.widgetWindow = widgetWindow;
+        widgetWindow.clear();
+        widgetWindow.show();
+        this._keysLayout();
+        const tur = logo.turtles.ithTurtle(0);
+        this.bpm = tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
+
+        widgetWindow.onclose = () => {
+            let myNode;
+            document.onkeydown = MusicKeyboard.saveOnKeyDown;
+            document.onkeyup = MusicKeyboard.saveOnKeyUp;
+
+            if (document.getElementById("keyboardHolder2")) {
+                document.getElementById("keyboardHolder2").style.display = "none";
+            }
+
+            myNode = document.getElementById("myrow");
+            if (myNode != null) {
+                myNode.innerHTML = "";
+            }
+
+            myNode = document.getElementById("myrow2");
+            if (myNode != null) {
+                myNode.innerHTML = "";
+            }
+
+            MusicKeyboard.selectedNotes = [];
+            if (this.loopTick) this.loopTick.stop();
+            widgetWindow.destroy();
+        };
+
+        this.playButton = widgetWindow.addButton(
+            "play-button.svg",
+            MusicKeyboard.ICONSIZE,
+            _("Play")
+        );
+
+        this.playButton.onclick = () => {
+            logo.turtleDelay = 0;
+            this.processSelected();
+            this.playAll();
+        };
+
+        widgetWindow.addButton(
+            "export-chunk.svg",
+            MusicKeyboard.ICONSIZE,
+            _("Save")
+        ).onclick = () => {
+            this._save();
+        };
+
+        widgetWindow.addButton(
+            "erase-button.svg",
+            MusicKeyboard.ICONSIZE,
+            _("Clear")
+        ).onclick = () => {
+            this._notesPlayed = [];
+            MusicKeyboard.selectedNotes = [];
+            // if (!that.keyboardShown) {
+            this._createTable();
+            // }
+        };
+
+        widgetWindow.addButton("add2.svg", MusicKeyboard.ICONSIZE, _("Add note")).onclick = () => {
+            this._createAddRowPieSubmenu();
+        };
+
+        this.midiButton = widgetWindow.addButton("midi.svg", MusicKeyboard.ICONSIZE, _("MIDI"));
+        this.midiButton.onclick = () => {
+            this.doMIDI();
+        };
+
+        this.tickButton = widgetWindow.addButton(
+            "metronome.svg",
+            MusicKeyboard.ICONSIZE,
+            _("Metronome")
+        );
+        this.tickButton.onclick = () => {
+            if (this.tick) {
+                this.tick = false;
+                this.loopTick.stop();
+            } else {
+                this.tick = true;
+                logo.synth.loadSynth(0, "cow bell");
+                this.loopTick = logo.synth.loop(
+                    0,
+                    "cow bell",
+                    "C5",
+                    1 / 64,
+                    0,
+                    this.bpm || 90,
+                    0.07
+                );
+                setTimeout(() => {
+                    logo.synth.start();
+                }, 500);
+            }
+        };
+
+        // Append keyboard and div on widget windows
+        this.keyboardDiv = document.createElement("div");
+        const attr = document.createAttribute("id");
+        attr.value = "mkbKeyboardDiv";
+        this.keyboardDiv.setAttributeNode(attr);
+        this.keyTable = document.createElement("div");
+        widgetWindow.getWidgetBody().append(this.keyboardDiv);
+        widgetWindow.getWidgetBody().append(this.keyTable);
+        widgetWindow.getWidgetBody().style.height = "550px";
+        widgetWindow.getWidgetBody().style.width = "1000px";
+
+        this._createKeyboard();
+
+        this._createTable();
+
+        w = Math.max(
+            Math.min(window.innerWidth, this._cellScale * MusicKeyboard.OUTERWINDOWWIDTH - 20),
+            MusicKeyboard.BUTTONDIVWIDTH
+        );
+
+        //Change widget size on fullscreen mode, else
+        //revert back to original size on unfullscreen mode
+        widgetWindow.onmaximize = () => {
+            if (widgetWindow._maximized) {
+                widgetWindow.getWidgetBody().style.position = "absolute";
+                widgetWindow.getWidgetBody().style.height = "calc(100vh - 64px)";
+                widgetWindow.getWidgetBody().style.width = "200vh";
+                docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
+                docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
+                try {
+                    docById("mkbInnerDiv").style.width = "calc(200vh - 64px)";
+                } catch (e) {
+                    // Does this happen?
+                    // console.debug("Error calculating InnerDiv width");
+                }
+
+                widgetWindow.getWidgetBody().style.left = "70px";
+            } else {
+                widgetWindow.getWidgetBody().style.position = "relative";
+                widgetWindow.getWidgetBody().style.left = "0px";
+                widgetWindow.getWidgetBody().style.height = "550px";
+                widgetWindow.getWidgetBody().style.width = "1000px";
+                docById("mkbOuterDiv").style.width = w + "px";
+            }
+        };
+
+        widgetWindow.sendToCenter();
+    }
+
+    /**
+     * @public
+     * @param {number} rowBlock
+     * @returns {void}
+     */
+
+
     addRowBlock(rowBlock) {
         // In case there is a repeat block, use a unique block number
         // for each instance.
@@ -76,6 +258,10 @@ class MusicKeyboard {
         this._rowBlocks.push(rowBlock);
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     processSelected() {
         if (this._notesPlayed.length === 0) {
             MusicKeyboard.selectedNotes = [];
@@ -129,6 +315,11 @@ class MusicKeyboard {
         }
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
+
     addKeyboardShortcuts() {
         let duration = 0;
         const startTime = {};
@@ -174,7 +365,7 @@ class MusicKeyboard {
                     return;
                 }
 
-                this._logo.synth.trigger(0, temp2[id], 1, this.instrumentMapper[id], null, null);
+                logo.synth.trigger(0, temp2[id], 1, this.instrumentMapper[id], null, null);
 
                 if (this.tick) {
                     let restDuration = (startTime[id] - this.endTime) / 1000.0;
@@ -259,7 +450,7 @@ class MusicKeyboard {
                         duration: parseFloat(duration)
                     });
                 } else {
-                    this._logo.synth.stopSound(0, this.instrumentMapper[id], temp2[id]);
+                    logo.synth.stopSound(0, this.instrumentMapper[id], temp2[id]);
                     this._notesPlayed.push({
                         startTime: startTime[id],
                         noteOctave: temp2[id],
@@ -287,6 +478,14 @@ class MusicKeyboard {
         document.onkeyup = __keyboardup;
     }
 
+    /**
+     * @public
+     * @param {HTMLElement} element
+     * @param {number} i
+     * @param {number} blockNumber
+     * @returns {void}
+     */
+
     loadHandler(element, i, blockNumber) {
         const temp1 = this.layout[i].noteName;
         let temp2;
@@ -312,7 +511,7 @@ class MusicKeyboard {
             startDate = new Date();
             startTime = startDate.getTime(); // Milliseconds();
             element.style.backgroundColor = platformColor.orange;
-            this._logo.synth.trigger(
+            logo.synth.trigger(
                 0,
                 this.noteMapper[element.id],
                 1,
@@ -337,7 +536,7 @@ class MusicKeyboard {
             const now = new Date();
             duration = now.getTime() - startTime;
             duration /= 1000;
-            this._logo.synth.stopSound(
+            logo.synth.stopSound(
                 0,
                 this.instrumentMapper[element.id],
                 this.noteMapper[element.id]
@@ -374,161 +573,10 @@ class MusicKeyboard {
         };
     }
 
-    init(logo) {
-        this._logo = logo;
-        this.tick = false;
-        this.playingNow = false;
-        let w = window.innerWidth;
-        this._cellScale = w / 1200;
-
-        const widgetWindow = window.widgetWindows.windowFor(this, "music keyboard");
-        this.widgetWindow = widgetWindow;
-        widgetWindow.clear();
-        widgetWindow.show();
-        this._keysLayout();
-        const tur = logo.turtles.ithTurtle(0);
-        this.bpm = tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
-
-        widgetWindow.onclose = () => {
-            let myNode;
-            document.onkeydown = MusicKeyboard.saveOnKeyDown;
-            document.onkeyup = MusicKeyboard.saveOnKeyUp;
-
-            if (document.getElementById("keyboardHolder2")) {
-                document.getElementById("keyboardHolder2").style.display = "none";
-            }
-
-            myNode = document.getElementById("myrow");
-            if (myNode != null) {
-                myNode.innerHTML = "";
-            }
-
-            myNode = document.getElementById("myrow2");
-            if (myNode != null) {
-                myNode.innerHTML = "";
-            }
-
-            MusicKeyboard.selectedNotes = [];
-            if (this.loopTick) this.loopTick.stop();
-            widgetWindow.destroy();
-        };
-
-        this.playButton = widgetWindow.addButton(
-            "play-button.svg",
-            MusicKeyboard.ICONSIZE,
-            _("Play")
-        );
-
-        this.playButton.onclick = () => {
-            this._logo.turtleDelay = 0;
-            this.processSelected();
-            this.playAll();
-        };
-
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            MusicKeyboard.ICONSIZE,
-            _("Save")
-        ).onclick = () => {
-            this._save();
-        };
-
-        widgetWindow.addButton(
-            "erase-button.svg",
-            MusicKeyboard.ICONSIZE,
-            _("Clear")
-        ).onclick = () => {
-            this._notesPlayed = [];
-            MusicKeyboard.selectedNotes = [];
-            // if (!that.keyboardShown) {
-            this._createTable();
-            // }
-        };
-
-        widgetWindow.addButton("add2.svg", MusicKeyboard.ICONSIZE, _("Add note")).onclick = () => {
-            this._createAddRowPieSubmenu();
-        };
-
-        this.midiButton = widgetWindow.addButton("midi.svg", MusicKeyboard.ICONSIZE, _("MIDI"));
-        this.midiButton.onclick = () => {
-            this.doMIDI();
-        };
-
-        this.tickButton = widgetWindow.addButton(
-            "metronome.svg",
-            MusicKeyboard.ICONSIZE,
-            _("Metronome")
-        );
-        this.tickButton.onclick = () => {
-            if (this.tick) {
-                this.tick = false;
-                this.loopTick.stop();
-            } else {
-                this.tick = true;
-                this._logo.synth.loadSynth(0, "cow bell");
-                this.loopTick = this._logo.synth.loop(
-                    0,
-                    "cow bell",
-                    "C5",
-                    1 / 64,
-                    0,
-                    this.bpm || 90,
-                    0.07
-                );
-                setTimeout(() => {
-                    this._logo.synth.start();
-                }, 500);
-            }
-        };
-
-        // Append keyboard and div on widget windows
-        this.keyboardDiv = document.createElement("div");
-        const attr = document.createAttribute("id");
-        attr.value = "mkbKeyboardDiv";
-        this.keyboardDiv.setAttributeNode(attr);
-        this.keyTable = document.createElement("div");
-        widgetWindow.getWidgetBody().append(this.keyboardDiv);
-        widgetWindow.getWidgetBody().append(this.keyTable);
-        widgetWindow.getWidgetBody().style.height = "550px";
-        widgetWindow.getWidgetBody().style.width = "1000px";
-
-        this._createKeyboard();
-
-        this._createTable();
-
-        w = Math.max(
-            Math.min(window.innerWidth, this._cellScale * MusicKeyboard.OUTERWINDOWWIDTH - 20),
-            MusicKeyboard.BUTTONDIVWIDTH
-        );
-
-        //Change widget size on fullscreen mode, else
-        //revert back to original size on unfullscreen mode
-        widgetWindow.onmaximize = () => {
-            if (widgetWindow._maximized) {
-                widgetWindow.getWidgetBody().style.position = "absolute";
-                widgetWindow.getWidgetBody().style.height = "calc(100vh - 64px)";
-                widgetWindow.getWidgetBody().style.width = "200vh";
-                docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
-                docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
-                try {
-                    docById("mkbInnerDiv").style.width = "calc(200vh - 64px)";
-                } catch (e) {
-                    // Does this happen?
-                    // console.debug("Error calculating InnerDiv width");
-                }
-
-                widgetWindow.getWidgetBody().style.left = "70px";
-            } else {
-                widgetWindow.getWidgetBody().style.position = "relative";
-                widgetWindow.getWidgetBody().style.left = "0px";
-                widgetWindow.getWidgetBody().style.height = "550px";
-                widgetWindow.getWidgetBody().style.width = "1000px";
-                docById("mkbOuterDiv").style.width = w + "px";
-            }
-        };
-
-        widgetWindow.sendToCenter();
-    }
+    /**
+     * @public
+     * @returns {void}
+     */
 
     playAll() {
         if (MusicKeyboard.selectedNotes.length <= 0) {
@@ -611,6 +659,13 @@ class MusicKeyboard {
         }
     }
 
+    /**
+     * @public
+     * @param {number} counter
+     * @param {string} time
+     * @param {HTMLElement} playButtonCell
+     * @returns {void}
+     */
     playOne(counter, time, playButtonCell) {
         setTimeout(() => {
             let cell, eleid, ele, notes, zx, res, maxWidth;
@@ -696,33 +751,46 @@ class MusicKeyboard {
         }, time * 1000 + 125);
     }
 
+    /**
+     * @private
+     * @param {Array} notes
+     * @param {Array} noteValue
+     * @param {Array} instruments
+     * @returns {void}
+     */
+
     _playChord(notes, noteValue, instruments) {
         if (notes[0] === "R") {
             return;
         }
 
         setTimeout(() => {
-            this._logo.synth.trigger(0, notes[0], noteValue[0], instruments[0], null, null);
+            logo.synth.trigger(0, notes[0], noteValue[0], instruments[0], null, null);
         }, 1);
 
         if (notes.length > 1) {
             setTimeout(() => {
-                this._logo.synth.trigger(0, notes[1], noteValue[0], instruments[1], null, null);
+                logo.synth.trigger(0, notes[1], noteValue[0], instruments[1], null, null);
             }, 1);
         }
 
         if (notes.length > 2) {
             setTimeout(() => {
-                this._logo.synth.trigger(0, notes[2], noteValue[0], instruments[2], null, null);
+                logo.synth.trigger(0, notes[2], noteValue[0], instruments[2], null, null);
             }, 1);
         }
 
         if (notes.length > 3) {
             setTimeout(() => {
-                this._logo.synth.trigger(0, notes[3], noteValue[0], instruments[3], null, null);
+                logo.synth.trigger(0, notes[3], noteValue[0], instruments[3], null, null);
             }, 1);
         }
     }
+
+    /**
+     * @private
+     * @returns {void}
+     */
 
     _keysLayout() {
         this.layout = [];
@@ -748,7 +816,7 @@ class MusicKeyboard {
                 sortableList.push({
                     frequency: noteToFrequency(
                         this.noteNames[i] + this.octaves[i],
-                        this._logo.turtles.ithTurtle(0).singer.keySignature
+                        logo.turtles.ithTurtle(0).singer.keySignature
                     ),
                     noteName: this.noteNames[i],
                     noteOctave: this.octaves[i],
@@ -797,6 +865,13 @@ class MusicKeyboard {
         }
     }
 
+    /**
+     * @private
+     * @param {number} colIndex
+     * @param {boolean} playNote
+     * @returns {void}
+     */
+
     _setNotes(colIndex, playNote) {
         const start = docById("cells-" + colIndex).getAttribute("start");
 
@@ -831,6 +906,15 @@ class MusicKeyboard {
         }
     }
 
+    /**
+     * @private
+     * @param {number} j
+     * @param {number} colIndex
+     * @param {string} start
+     * @param {boolean} playNote
+     * @returns {void}
+     */
+
     _setNoteCell(j, colIndex, start, playNote) {
         const n = this.layout.length;
         const temp1 = this.layout[n - j - 1].noteName;
@@ -861,7 +945,7 @@ class MusicKeyboard {
         });
 
         if (playNote) {
-            this._logo.synth.trigger(
+            logo.synth.trigger(
                 0,
                 temp2,
                 ele.getAttribute("alt"),
@@ -871,6 +955,11 @@ class MusicKeyboard {
             );
         }
     }
+
+    /**
+     * @public
+     * @returns {void}
+     */
 
     makeClickable() {
         const rowNote = docById("mkbNoteDurationRow");
@@ -937,9 +1026,20 @@ class MusicKeyboard {
         }
     }
 
+    /**
+     * @private
+     * @param {number} noteValue
+     * @returns {number}
+     */
+
     _noteWidth(noteValue) {
         return Math.max(Math.floor(EIGHTHNOTEWIDTH * (8 * noteValue) * this._cellScale), 15);
     }
+
+    /**
+     * @private
+     * @returns {void}
+     */
 
     _createTable() {
         this.processSelected();
@@ -1103,6 +1203,13 @@ class MusicKeyboard {
         this.makeClickable();
     }
 
+    /**
+     * @private
+     * @param {string} cellId
+     * @param {string} start
+     * @returns {void}
+     */
+
     _createpiesubmenu(cellId, start) {
         docById("wheelDivptm").style.display = "";
 
@@ -1199,13 +1306,13 @@ class MusicKeyboard {
 
         docById("wheelDivptm").style.left =
             Math.min(
-                this._logo.blocks.turtles._canvas.width - 200,
-                Math.max(0, x * this._logo.blocks.getStageScale())
+                logo.blocks.turtles._canvas.width - 200,
+                Math.max(0, x * logo.blocks.getStageScale())
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
-                this._logo.blocks.turtles._canvas.height - 250,
-                Math.max(0, y * this._logo.blocks.getStageScale())
+                logo.blocks.turtles._canvas.height - 250,
+                Math.max(0, y * logo.blocks.getStageScale())
             ) + "px";
 
         this._exitWheel.navItems[0].navigateFunction = () => {
@@ -1269,6 +1376,13 @@ class MusicKeyboard {
         }
     }
 
+    /**
+     * @private
+     * @param {string} start
+     * @param {number} duration
+     * @returns {void}
+     */
+
     _updateDuration(start, duration) {
         start = parseInt(start);
         duration = parseInt(duration[0]) / parseInt(duration[1]);
@@ -1283,6 +1397,14 @@ class MusicKeyboard {
         this._createTable();
     }
 
+
+    /**
+     * @private
+     * @param {string} cellId
+     * @param {string} start
+     * @param {number} divideNoteBy
+     * @returns {void}
+     */
     _addNotes(cellId, start, divideNoteBy) {
         start = parseInt(start);
         const cell = docById(cellId);
@@ -1312,6 +1434,12 @@ class MusicKeyboard {
         this._createTable();
     }
 
+    /**
+     * @private
+     * @param {string} start
+     * @returns {void}
+     */
+
     _deleteNotes(start) {
         start = parseInt(start);
 
@@ -1321,6 +1449,13 @@ class MusicKeyboard {
 
         this._createTable();
     }
+
+    /**
+     * @private
+     * @param {string} start
+     * @param {number} divideNoteBy
+     * @returns {void}
+     */
 
     _divideNotes(start, divideNoteBy) {
         start = parseInt(start);
@@ -1358,6 +1493,11 @@ class MusicKeyboard {
 
         this._createTable();
     }
+
+    /**
+     * @private
+     * @returns {void}
+     */
 
     _createAddRowPieSubmenu() {
         docById("wheelDivptm").style.display = "";
@@ -1416,13 +1556,13 @@ class MusicKeyboard {
         docById("wheelDivptm").style.width = "300px";
         docById("wheelDivptm").style.left =
             Math.min(
-                this._logo.blocks.turtles._canvas.width - 200,
-                Math.max(0, x * this._logo.blocks.getStageScale())
+                logo.blocks.turtles._canvas.width - 200,
+                Math.max(0, x * logo.blocks.getStageScale())
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
-                this._logo.blocks.turtles._canvas.height - 250,
-                Math.max(0, y * this._logo.blocks.getStageScale())
+                logo.blocks.turtles._canvas.height - 250,
+                Math.max(0, y * logo.blocks.getStageScale())
             ) + "px";
 
         this._exitWheel.navItems[0].navigateFunction = () => {
@@ -1440,7 +1580,7 @@ class MusicKeyboard {
                 return;
             }
             const label = VALUESLABEL[this._menuWheel.selectedNavItemIndex];
-            const newBlock = this._logo.blocks.blockList.length;
+            const newBlock = logo.blocks.blockList.length;
 
             if (label === "pitch") {
                 let i;
@@ -1492,14 +1632,14 @@ class MusicKeyboard {
 
             switch (label) {
                 case "pitch":
-                    this._logo.blocks.loadNewBlocks([
+                    logo.blocks.loadNewBlocks([
                         [0, ["pitch", {}], 0, 0, [null, 1, 2, null]],
                         [1, ["solfege", { value: rLabel }], 0, 0, [0]],
                         [2, ["number", { value: rArg }], 0, 0, [0]]
                     ]);
                     break;
                 case "hertz":
-                    this._logo.blocks.loadNewBlocks([
+                    logo.blocks.loadNewBlocks([
                         [0, ["hertz", {}], 0, 0, [null, 1, null]],
                         [1, ["number", { value: rArg }], 0, 0, [0]]
                     ]);
@@ -1539,26 +1679,38 @@ class MusicKeyboard {
         }
     }
 
+    /**
+     * @private
+     * @param {number} aboveBlock
+     * @param {number} block
+     * @returns {void}
+     */
+
     _addNotesBlockBetween(aboveBlock, block) {
-        const belowBlock = last(this._logo.blocks.blockList[aboveBlock].connections);
-        this._logo.blocks.blockList[aboveBlock].connections[
-            this._logo.blocks.blockList[aboveBlock].connections.length - 1
+        const belowBlock = last(logo.blocks.blockList[aboveBlock].connections);
+        logo.blocks.blockList[aboveBlock].connections[
+            logo.blocks.blockList[aboveBlock].connections.length - 1
         ] = block;
 
         if (belowBlock !== null) {
-            this._logo.blocks.blockList[belowBlock].connections[0] = block;
+            logo.blocks.blockList[belowBlock].connections[0] = block;
         }
 
-        this._logo.blocks.blockList[block].connections[0] = aboveBlock;
+        logo.blocks.blockList[block].connections[0] = aboveBlock;
 
-        this._logo.blocks.blockList[block].connections[
-            this._logo.blocks.blockList[block].connections.length - 1
+        logo.blocks.blockList[block].connections[
+            logo.blocks.blockList[block].connections.length - 1
         ] = belowBlock;
 
-        this._logo.blocks.adjustDocks(this.blockNo, true);
-        this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
-        this._logo.blocks.refreshCanvas();
+        logo.blocks.adjustDocks(this.blockNo, true);
+        logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+        logo.blocks.refreshCanvas();
     }
+
+    /**
+     * @private
+     * @returns {void}
+     */
 
     _sortLayout() {
         this.layout.sort((a, b) => {
@@ -1568,7 +1720,7 @@ class MusicKeyboard {
             } else {
                 aValue = noteToFrequency(
                     a.noteName + a.noteOctave,
-                    this._logo.turtles.ithTurtle(0).singer.keySignature
+                    logo.turtles.ithTurtle(0).singer.keySignature
                 );
             }
             if (b.noteName == "hertz") {
@@ -1576,7 +1728,7 @@ class MusicKeyboard {
             } else {
                 bValue = noteToFrequency(
                     b.noteName + b.noteOctave,
-                    this._logo.turtles.ithTurtle(0).singer.keySignature
+                    logo.turtles.ithTurtle(0).singer.keySignature
                 );
             }
 
@@ -1614,29 +1766,42 @@ class MusicKeyboard {
         }
     }
 
+    /**
+     * @private
+     * @param {number} blockNo
+     * @returns {void}
+     */
+
     _removePitchBlock(blockNo) {
-        const c0 = this._logo.blocks.blockList[blockNo].connections[0];
-        const c1 = last(this._logo.blocks.blockList[blockNo].connections);
-        if (this._logo.blocks.blockList[c0].name === "musickeyboard") {
-            this._logo.blocks.blockList[c0].connections[1] = c1;
+        const c0 = logo.blocks.blockList[blockNo].connections[0];
+        const c1 = last(logo.blocks.blockList[blockNo].connections);
+        if (logo.blocks.blockList[c0].name === "musickeyboard") {
+            logo.blocks.blockList[c0].connections[1] = c1;
         } else {
-            this._logo.blocks.blockList[c0].connections[
-                this._logo.blocks.blockList[c0].connections.length - 1
+            logo.blocks.blockList[c0].connections[
+                logo.blocks.blockList[c0].connections.length - 1
             ] = c1;
         }
 
         if (c1) {
-            this._logo.blocks.blockList[c1].connections[0] = c0;
+            logo.blocks.blockList[c1].connections[0] = c0;
         }
 
-        this._logo.blocks.blockList[blockNo].connections[
-            this._logo.blocks.blockList[blockNo].connections.length - 1
+        logo.blocks.blockList[blockNo].connections[
+            logo.blocks.blockList[blockNo].connections.length - 1
         ] = null;
-        this._logo.blocks.sendStackToTrash(this._logo.blocks.blockList[blockNo]);
-        this._logo.blocks.adjustDocks(this.blockNo, true);
-        this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
-        this._logo.blocks.refreshCanvas();
+        logo.blocks.sendStackToTrash(logo.blocks.blockList[blockNo]);
+        logo.blocks.adjustDocks(this.blockNo, true);
+        logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+        logo.blocks.refreshCanvas();
     }
+
+    /**
+     * @private
+     * @param {string} index
+     * @param {string} condition
+     * @returns {void}
+     */
 
     _createColumnPieSubmenu(index, condition) {
         index = parseInt(index);
@@ -1771,25 +1936,25 @@ class MusicKeyboard {
         docById("wheelDivptm").style.width = "300px";
         docById("wheelDivptm").style.left =
             Math.min(
-                this._logo.blocks.turtles._canvas.width - 200,
-                Math.max(0, x * this._logo.blocks.getStageScale())
+                logo.blocks.turtles._canvas.width - 200,
+                Math.max(0, x * logo.blocks.getStageScale())
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
-                this._logo.blocks.turtles._canvas.height - 250,
-                Math.max(0, y * this._logo.blocks.getStageScale())
+                logo.blocks.turtles._canvas.height - 250,
+                Math.max(0, y * logo.blocks.getStageScale())
             ) + "px";
 
         index = this.layout.length - index - 1;
         const block = this.layout[index].blockNumber;
 
-        let noteValue = this._logo.blocks.blockList[
-            this._logo.blocks.blockList[block].connections[1]
+        let noteValue = logo.blocks.blockList[
+            logo.blocks.blockList[block].connections[1]
         ].value;
 
         if (condition === "pitchblocks") {
-            const octaveValue = this._logo.blocks.blockList[
-                this._logo.blocks.blockList[block].connections[2]
+            const octaveValue = logo.blocks.blockList[
+                logo.blocks.blockList[block].connections[2]
             ].value;
             let accidentalsValue = 2;
 
@@ -1822,16 +1987,16 @@ class MusicKeyboard {
         const __hertzSelectionChanged = () => {
             const blockValue = this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex]
                 .title;
-            const argBlock = this._logo.blocks.blockList[block].connections[1];
-            this._logo.blocks.blockList[argBlock].text.text = blockValue;
-            this._logo.blocks.blockList[argBlock].value = parseInt(blockValue);
+            const argBlock = logo.blocks.blockList[block].connections[1];
+            logo.blocks.blockList[argBlock].text.text = blockValue;
+            logo.blocks.blockList[argBlock].value = parseInt(blockValue);
 
-            const z = this._logo.blocks.blockList[argBlock].container.children.length - 1;
-            this._logo.blocks.blockList[argBlock].container.setChildIndex(
-                this._logo.blocks.blockList[argBlock].text,
+            const z = logo.blocks.blockList[argBlock].container.children.length - 1;
+            logo.blocks.blockList[argBlock].container.setChildIndex(
+                logo.blocks.blockList[argBlock].text,
                 z
             );
-            this._logo.blocks.blockList[argBlock].updateCache();
+            logo.blocks.blockList[argBlock].updateCache();
 
             const cell = docById("labelcol" + (this.layout.length - index - 1));
             this.layout[index].noteOctave = parseInt(blockValue);
@@ -1866,24 +2031,24 @@ class MusicKeyboard {
                 labelValue = label;
             }
 
-            const noteLabelBlock = this._logo.blocks.blockList[block].connections[1];
-            this._logo.blocks.blockList[noteLabelBlock].text.text = label;
-            this._logo.blocks.blockList[noteLabelBlock].value = labelValue;
+            const noteLabelBlock = logo.blocks.blockList[block].connections[1];
+            logo.blocks.blockList[noteLabelBlock].text.text = label;
+            logo.blocks.blockList[noteLabelBlock].value = labelValue;
 
-            const z = this._logo.blocks.blockList[noteLabelBlock].container.children.length - 1;
-            this._logo.blocks.blockList[noteLabelBlock].container.setChildIndex(
-                this._logo.blocks.blockList[noteLabelBlock].text,
+            const z = logo.blocks.blockList[noteLabelBlock].container.children.length - 1;
+            logo.blocks.blockList[noteLabelBlock].container.setChildIndex(
+                logo.blocks.blockList[noteLabelBlock].text,
                 z
             );
-            this._logo.blocks.blockList[noteLabelBlock].updateCache();
+            logo.blocks.blockList[noteLabelBlock].updateCache();
 
             let octave;
             if (condition === "pitchblocks") {
                 octave = Number(
                     this._octavesWheel.navItems[this._octavesWheel.selectedNavItemIndex].title
                 );
-                this._logo.blocks.blockList[noteLabelBlock].blocks.setPitchOctave(
-                    this._logo.blocks.blockList[noteLabelBlock].connections[0],
+                logo.blocks.blockList[noteLabelBlock].blocks.setPitchOctave(
+                    logo.blocks.blockList[noteLabelBlock].connections[0],
                     octave
                 );
             }
@@ -1927,15 +2092,15 @@ class MusicKeyboard {
                 labelValue,
                 octave,
                 0,
-                this._logo.turtles.ithTurtle(0).singer.keySignature,
+                logo.turtles.ithTurtle(0).singer.keySignature,
                 false,
                 null,
-                this._logo.errorMsg,
-                this._logo.synth.inTemperament
+                logo.errorMsg,
+                logo.synth.inTemperament
             );
-            this._logo.synth.setMasterVolume(PREVIEWVOLUME);
-            Singer.setSynthVolume(this._logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
-            this._logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
+            logo.synth.setMasterVolume(PREVIEWVOLUME);
+            Singer.setSynthVolume(logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
+            logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
 
             __selectionChanged();
         };
@@ -1954,6 +2119,11 @@ class MusicKeyboard {
             }
         }
     }
+
+    /**
+     * @private
+     * @returns {void}
+     */
 
     _createKeyboard() {
         document.onkeydown = null;
@@ -2291,6 +2461,11 @@ class MusicKeyboard {
         this.addKeyboardShortcuts();
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
+
     _save() {
         this.processSelected();
         // console.debug("Generating action stack for: ");
@@ -2524,9 +2699,14 @@ class MusicKeyboard {
             }
         }
 
-        this._logo.blocks.loadNewBlocks(newStack);
-        this._logo.textMsg(_("New action block generated!"));
+        logo.blocks.loadNewBlocks(newStack);
+        logo.textMsg(_("New action block generated!"));
     }
+
+    /**
+     * @private
+     * @returns {void}
+     */
 
     clearBlocks() {
         this.noteNames = [];
@@ -2569,6 +2749,13 @@ class MusicKeyboard {
         return cell;
     }
 
+    /**
+     * @private
+     * @param {string} index
+     * @param {string} condition
+     * @returns {void}
+     */
+
     doMIDI() {
         let duration = 0;
         let startTime = 0;
@@ -2586,7 +2773,7 @@ class MusicKeyboard {
             if (!element) return;
             startTime = event.timeStamp; // Milliseconds();
             element.style.backgroundColor = platformColor.orange;
-            this._logo.synth.trigger(
+            logo.synth.trigger(
                 0,
                 this.noteMapper[element.id],
                 1,
@@ -2609,7 +2796,7 @@ class MusicKeyboard {
             const now = event.timeStamp;
             duration = now - startTime;
             duration /= 1000;
-            this._logo.synth.stopSound(
+            logo.synth.stopSound(
                 0,
                 this.instrumentMapper[element.id],
                 this.noteMapper[element.id]
@@ -2692,6 +2879,12 @@ class MusicKeyboard {
             navigator.requestMIDIAccess({ sysex: true }).then(onMIDISuccess, onMIDIFailure);
         else logo.errorMsg(_("Failed to get MIDI access in browser."));
     }
+
+    /**
+     * @private
+     * @param {Array} noteList
+     * @returns {Array}
+     */
 
     fillChromaticGaps(noteList) {
         // Assuming list of either solfege or letter class of the form
