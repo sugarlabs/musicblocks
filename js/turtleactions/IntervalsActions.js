@@ -148,7 +148,7 @@ function setupIntervalsActions() {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 modeName = "custom";
             } else {
-                modeName = args[0].toLowerCase();
+                modeName = name.toLowerCase();
             }
 
             const listenerName = "_definemode_" + turtle;

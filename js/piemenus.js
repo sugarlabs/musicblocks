@@ -3061,7 +3061,7 @@ const piemenuModes = function (block, selectedMode) {
 
     const __buildModeWheel = function () {
         const i = that._modeGroupWheel.selectedNavItemIndex;
-        const modeGroup = that._modeGroupWheel.navItems[i].title;
+        modeGroup = that._modeGroupWheel.navItems[i].title;
         __buildModeNameWheel(modeGroup);
     };
 
