@@ -161,6 +161,16 @@ function setupIntervalsActions() {
             }
 
             const __listener = event => {
+
+                if (MODE_PIE_MENUS["12"].indexOf(modeName) === -1) {
+                    const index = MODE_PIE_MENUS["12"].indexOf(" ");
+                    if (index === -1){
+                        logo.errorMsg(_("Cannot add new mode to Pie Menu."));
+                    } else {
+                        MODE_PIE_MENUS["12"][index] = modeName;
+                    }
+                }
+
                 MUSICALMODES[modeName] = [];
                 if (tur.singer.defineMode.indexOf(0) === -1) {
                     tur.singer.defineMode.push(0);
@@ -190,7 +200,7 @@ function setupIntervalsActions() {
                 }
 
                 const cblk = logo.blocks.blockList[blk].connections[1];
-                if (logo.blocks.blockList[cblk].name === "modename") {
+                if (logo.blocks.blockList[cblk].name === "text") {
                     logo.blocks.updateBlockText(cblk);
                 }
 

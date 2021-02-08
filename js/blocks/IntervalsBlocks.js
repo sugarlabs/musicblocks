@@ -580,7 +580,7 @@ function setupIntervalsBlocks() {
             });
             this.makeMacro((x, y) => [
                 [0, "definemode", x, y, [null, 1, 2, 16]],
-                [1, ["modename", { value: "custom" }], 0, 0, [0]],
+                [1, ["text", { value: "custom" }], 0, 0, [0]],
                 [2, "pitchnumber", 0, 0, [0, 3, 4]],
                 [3, ["number", { value: 0 }], 0, 0, [2]],
                 [4, "pitchnumber", 0, 0, [2, 5, 6]],

@@ -260,9 +260,6 @@ processLilypondNotes = function(lilypond, logo, turtle) {
                             " \\" +
                             mode.replace(/ /g, "_") +
                             "\n";
-                        } else {
-                            logo.errorMsg(
-                                _("Lilypond ignoring mode") + " " + mode);
                         }
                     }
                     i += 2;
