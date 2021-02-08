@@ -1199,6 +1199,7 @@ class MusicKeyboard {
         }
 
         const innerDiv = docById("mkbInnerDiv");
+        innerDiv.style.cursor = "pointer";
         innerDiv.scrollLeft = innerDiv.scrollWidth; // Force to the right.
         this.makeClickable();
     }
@@ -2143,6 +2144,7 @@ class MusicKeyboard {
         keyboardHolder2.style.left = "0px";
         keyboardHolder2.style.height = "145px";
         keyboardHolder2.style.backgroundColor = "white";
+        keyboardHolder2.style.cursor = "pointer";
         const blackRow = document.getElementsByClassName("black");
         blackRow[0].style.top = "1px";
         blackRow[0].style.borderSpacing = "0px 0px 20px";
