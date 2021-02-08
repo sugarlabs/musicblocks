@@ -487,7 +487,6 @@ function SampleWidget() {
         this.samplePitch = SOLFEGENAMES[this.pitchCenter] + ACCIDENTALNAMES[this.accidentalCenter];
         CUSTOMSAMPLES[this.sampleName] = this.sampleData;
         CUSTOMSAMPLECENTERNO[this.sampleName] = [this.samplePitch, this.octaveCenter];
-        console.log(CUSTOMSAMPLECENTERNO)
     }
 
     this._playReferencePitch = function() {

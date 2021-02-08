@@ -679,7 +679,7 @@ function Synth() {
         }
     };
 
-    this._loadSample = function(sampleName, sampleData) {
+    this._loadSample = function(sampleName) {
         let accounted = false;
         for (const type in this.samplesManifest) {
             if (this.samplesManifest.hasOwnProperty(type)) {
@@ -1100,21 +1100,13 @@ function Synth() {
     };
 
     this.__createSynth = function (turtle, instrumentName, sourceName, params) {
-        let sampleData = null;
-        let passedParams = null;
-        if (params !== null) {
-            if (typeof params == "object") {
-                sampleData = params[0];
-                passedParams = params;
-            }
-        }
-        this._loadSample(sourceName, sampleData);
+        this._loadSample(sourceName);
         if (sourceName in this.samples.voice || sourceName in this.samples.drum) {
             instruments[turtle][instrumentName] = this._createSampleSynth(
                 turtle,
                 instrumentName,
                 sourceName,
-                passedParams
+                null
             ).toDestination();
         } else if (sourceName in BUILTIN_SYNTHS) {
             instruments[turtle][instrumentName] = this._createBuiltinSynth(
@@ -1165,7 +1157,7 @@ function Synth() {
     };
 
     this.loadSynth = function (turtle, sourceName) {
-        if (sourceName in instruments[turtle]) {
+        if (sourceName in instruments[turtle]){
             console.debug(sourceName + " already loaded");
         } else {
             if (typeof sourceName === "object") {
