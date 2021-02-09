@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License along with this
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
-*/
+ */
 
 /* global _,Singer,logo,MusicBlocks,blocks,Mouse,last,turtles,TONEBPM */
 /* exported setupRhythmActions */
@@ -56,13 +56,13 @@ function setupRhythmActions() {
          */
         static playNote(value, blkName, turtle, blk, _enqueue) {
             /**
-            * We queue up the child flow of the note clamp and once all of the children are run, we
-            * trigger a _playnote_ event, then wait for the note to play. The note can be specified
-            * by pitch or synth blocks. The osctime block specifies the duration in milleseconds
-            * while the note block specifies duration as a beat value.
-            *
-            * @todo We should consider the use of the global timer in Tone.js for more accuracy.
-            */
+             * We queue up the child flow of the note clamp and once all of the children are run, we
+             * trigger a _playnote_ event, then wait for the note to play. The note can be specified
+             * by pitch or synth blocks. The osctime block specifies the duration in milleseconds
+             * while the note block specifies duration as a beat value.
+             *
+             * @todo We should consider the use of the global timer in Tone.js for more accuracy.
+             */
 
             const tur = logo.turtles.ithTurtle(turtle);
 
@@ -72,10 +72,10 @@ function setupRhythmActions() {
                 if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < tur.singer.pickup) {
                     beatValue = measureValue = 0;
                 } else {
-                    const beat = tur.singer.noteValuePerBeat * (
-                        tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] - tur.singer.pickup
-                    );
-                    beatValue = 1 + beat % tur.singer.beatsPerMeasure;
+                    const beat =
+                        tur.singer.noteValuePerBeat *
+                        (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] - tur.singer.pickup);
+                    beatValue = 1 + (beat % tur.singer.beatsPerMeasure);
                     measureValue = 1 + Math.floor(beat / tur.singer.beatsPerMeasure);
                 }
 
@@ -87,7 +87,7 @@ function setupRhythmActions() {
                  * Put the childFlow into the queue before the beat action so logo the beat action is
                  * at the end of the FILO.
                  * Note: The offbeat cannot be Beat 1.
-                */
+                 */
                 const turtleID = tur.id;
 
                 if (tur.singer.beatList.indexOf("everybeat") !== -1) {
@@ -133,8 +133,7 @@ function setupRhythmActions() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
             const __listener = () => {
@@ -202,9 +201,7 @@ function setupRhythmActions() {
                 tur.singer.noteOctaves[last(tur.singer.inNoteBlock)].push(4);
                 tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(0);
                 tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(0);
-                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(
-                    tur.singer.beatFactor
-                );
+                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(tur.singer.beatFactor);
                 tur.singer.pushedNote = true;
             }
         }
@@ -239,8 +236,7 @@ function setupRhythmActions() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
             const __listener = () => {
@@ -277,8 +273,7 @@ function setupRhythmActions() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
             const __listener = () => {
@@ -322,14 +317,18 @@ function setupRhythmActions() {
                     tur.singer.noteBeat[saveBlk] = tur.singer.tieNoteExtras[2];
                     tur.singer.noteBeatValues[saveBlk] = tur.singer.tieNoteExtras[3];
                     tur.singer.noteDrums[saveBlk] = tur.singer.tieNoteExtras[4];
-                    tur.singer.embeddedGraphics[saveBlk] = [];  // graphics will have already been rendered
+                    tur.singer.embeddedGraphics[saveBlk] = []; // graphics will have already been rendered
 
                     Singer.processNote(
-                        noteValue, blocks.blockList[saveBlk].name === "osctime", saveBlk, turtle
+                        noteValue,
+                        blocks.blockList[saveBlk].name === "osctime",
+                        saveBlk,
+                        turtle
                     );
                     const bpmFactor =
-                        TONEBPM / tur.singer.bpm.length > 0 ?
-                            last(tur.singer.bpm) : Singer.masterBPM;
+                        TONEBPM / tur.singer.bpm.length > 0
+                            ? last(tur.singer.bpm)
+                            : Singer.masterBPM;
 
                     // Wait until this note is played before continuing
                     tur.doWait(bpmFactor / noteValue);
@@ -376,11 +375,10 @@ function setupRhythmActions() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = () => tur.singer.beatFactor *= factor;
+            const __listener = () => (tur.singer.beatFactor *= factor);
 
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
@@ -413,8 +411,7 @@ function setupRhythmActions() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
             const __listener = () => {
@@ -445,8 +442,9 @@ function setupRhythmActions() {
                 tur.singer.noteValue[last(tur.singer.inNoteBlock)] !== undefined
             ) {
                 value =
-                    tur.singer.noteValue[last(tur.singer.inNoteBlock)] !== 0 ?
-                        1 / tur.singer.noteValue[last(tur.singer.inNoteBlock)] : 0;
+                    tur.singer.noteValue[last(tur.singer.inNoteBlock)] !== 0
+                        ? 1 / tur.singer.noteValue[last(tur.singer.inNoteBlock)]
+                        : 0;
             } else if (tur.singer.lastNotePlayed !== null) {
                 value = tur.singer.lastNotePlayed[1];
             } else if (
