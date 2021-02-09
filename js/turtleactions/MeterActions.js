@@ -30,10 +30,12 @@
         DRUMNAMES,NOISENAMES
      js/utils/musicutils.js
         DEFAULTDRUM
-     js/logo.js/
+     js/logo.js
         DEFAULTVOLUME,TONEBPM
      js/blocks.js
         blocks
+     js/turtles.js
+        turtles
      js/js-export/export.js
         MusicBlocks, Mouse
 */
