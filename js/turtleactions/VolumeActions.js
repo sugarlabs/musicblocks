@@ -14,11 +14,32 @@
  * You should have received a copy of the GNU Affero General Public License along with this
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
+ */
+
+/* global _,Singer,logo,MusicBlocks,blocks,Mouse,last,VOICENAMES,DRUMNAMES,_THIS_IS_MUSIC_BLOCKS_,Tone,instruments,DEFAULTVOLUME */
+/* exported setupVolumeActions */
+/*
+    Global Locations
+     js/utils/utils.js
+        _
+     js/turtleactions/RhythmActions.js
+        Singer
+     js/activity.js
+        logo,_THIS_IS_MUSIC_BLOCKS_
+     js/js-export/interface.js
+        instruments
+     js/utils/synthutils.js
+        VOICENAMES,DRUMNAMES
+     js/logo.js
+        DEFAULTVOLUME
+     js/blocks.js
+        blocks
+     js/js-export/export.js
+        MusicBlocks, Mouse
 */
 
 /**
  * Sets up all the methods related to different actions for each block in Volume palette.
- *
  * @returns {void}
  */
 function setupVolumeActions() {
@@ -54,11 +75,10 @@ function setupVolumeActions() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 if (tur.singer.justCounting.length === 0) {
                     logo.notation.notationEndCrescendo(turtle, last(tur.singer.crescendoDelta));
                 }
@@ -111,11 +131,10 @@ function setupVolumeActions() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 for (const synth in tur.singer.synthVolume) {
                     tur.singer.synthVolume[synth].pop();
                     Singer.setSynthVolume(logo, turtle, synth, last(tur.singer.synthVolume[synth]));
@@ -140,8 +159,7 @@ function setupVolumeActions() {
         static setMasterVolume(volume, turtle, blk) {
             volume = Math.max(Math.min(volume, 100), 0);
 
-            if (volume === 0)
-                logo.errorMsg(_("Setting volume to 0."), blk);
+            if (volume === 0) logo.errorMsg(_("Setting volume to 0."), blk);
 
             Singer.masterVolume.push(volume);
 
