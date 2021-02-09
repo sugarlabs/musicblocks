@@ -771,7 +771,7 @@ function setupEnsembleBlocks() {
             ]);
 
             this.formBlock({
-                outType: "textout"
+                outType: "numberout"
             });
         }
 
