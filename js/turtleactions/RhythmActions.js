@@ -16,9 +16,28 @@
  * MA 02110-1335 USA.
 */
 
+/* global _,Singer,logo,MusicBlocks,blocks,Mouse,last,turtles,TONEBPM */
+/* exported setupRhythmActions */
+/*
+    Global Locations
+     js/utils/utils.js
+        _
+     js/turtleactions/RhythmActions.js
+        Singer
+     js/activity.js
+        logo
+     js/turtles.js
+        turtles
+     js/logo.js
+        TONEBPM
+     js/blocks.js
+        blocks
+     js/js-export/export.js
+        MusicBlocks, Mouse
+*/
+
 /**
  * Sets up all the methods related to different actions for each block in Rhythm palette.
- *
  * @returns {void}
  */
 function setupRhythmActions() {
@@ -118,7 +137,7 @@ function setupRhythmActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 if (tur.singer.multipleVoices) {
                     logo.notation.notationVoices(turtle, tur.singer.inNoteBlock.length);
                 }
@@ -224,7 +243,7 @@ function setupRhythmActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
                 tur.singer.beatFactor *= currentDotFactor;
                 tur.singer.dotCount -= value >= 0 ? value : 1 / value;
@@ -262,7 +281,7 @@ function setupRhythmActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 tur.singer.tie = false;
 
                 // If tieCarryOver > 0, we have one more note to play
@@ -361,7 +380,7 @@ function setupRhythmActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => tur.singer.beatFactor *= factor;
+            const __listener = () => tur.singer.beatFactor *= factor;
 
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
@@ -398,7 +417,7 @@ function setupRhythmActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 if (!tur.singer.suppressOutput) {
                     tur.singer.swingTarget.pop();
                     tur.singer.swing.pop();
@@ -436,7 +455,6 @@ function setupRhythmActions() {
             ) {
                 value = tur.singer.noteBeat[last(tur.singer.inNoteBlock)];
             } else {
-                console.debug("Cannot find a note for turtle " + turtle);
                 value = 0;
             }
 
