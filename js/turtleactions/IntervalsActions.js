@@ -19,6 +19,28 @@
  * Action methods are in camelCase.
  */
 
+/* global _,Singer,MUSICALMODES,logo,getNote,getModeLength,NOINPUTERRORMSG,blocks,MusicBlocks,Mouse */
+/* exported setupIntervalsActions */
+/*
+    Global Locations
+     js/utils/utils.js
+        _
+     js/turtleactions/RhythmActions.js
+        Singer
+     js/activity.js
+        logo
+     js/turtleactions/IntervalsActions.js
+        getModeLength
+     js/utils/musicutils.js
+        getNote
+     js/logo.js/
+        NOINPUTERRORMSG
+     js/blocks.js
+        blocks
+     js/js-export/export.js
+        MusicBlocks, Mouse
+*/
+
 /*
    global _, logo, NOINPUTERRORMSG, Singer, blocks, MUSICALMODES, MusicBlocks, Mouse,
    MODE_PIE_MENUS, getNote, getModeLength
@@ -44,7 +66,6 @@
 
 /**
  * Sets up all the methods related to different actions for each block in Intervals palette.
- *
  * @returns {void}
  */
 function setupIntervalsActions() {
@@ -183,15 +204,6 @@ function setupIntervalsActions() {
             }
 
             const __listener = () => {
-                if (MODE_PIE_MENUS["12"].indexOf(modeName) === -1) {
-                    const index = MODE_PIE_MENUS["12"].indexOf(" ");
-                    if (index === -1) {
-                        logo.errorMsg(_("Cannot add new mode to Pie Menu."));
-                    } else {
-                        MODE_PIE_MENUS["12"][index] = modeName;
-                    }
-                }
-
                 MUSICALMODES[modeName] = [];
                 if (tur.singer.defineMode.indexOf(0) === -1) {
                     tur.singer.defineMode.push(0);
