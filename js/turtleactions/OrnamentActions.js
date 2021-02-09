@@ -14,11 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License along with this
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
+ */
+
+/* global Singer,logo,MusicBlocks,blocks,Mouse */
+/* exported setupOrnamentActions */
+/*
+    Global Locations
+     js/turtleactions/RhythmActions.js
+        Singer
+     js/activity.js
+        logo
+     js/js-export/export.js
+        MusicBlocks, Mouse
 */
 
 /**
  * Sets up all the methods related to different actions for each block in Ornament palette.
- *
  * @returns {void}
  */
 function setupOrnamentActions() {
@@ -41,11 +52,10 @@ function setupOrnamentActions() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => tur.singer.staccato.pop();
+            const __listener = () => tur.singer.staccato.pop();
 
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
@@ -72,11 +82,10 @@ function setupOrnamentActions() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 tur.singer.staccato.pop();
                 if (tur.singer.justCounting.length === 0) {
                     logo.notation.notationEndSlur(turtle);
@@ -107,11 +116,10 @@ function setupOrnamentActions() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 tur.singer.inNeighbor.pop();
                 tur.singer.neighborStepPitch.pop();
                 tur.singer.neighborNoteValue.pop();
