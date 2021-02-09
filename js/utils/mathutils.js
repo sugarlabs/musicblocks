@@ -19,6 +19,12 @@
    global SOLFEGENAMES
  */
 
+/*
+   Global location
+    js/utils/musicutils.js
+        SOLFEGENAMES
+ */
+
 /* exported MathUtility */
 
 /**
