@@ -19,9 +19,30 @@
  * Action methods are in camelCase.
  */
 
+/* global _,Turtle,turtles,Singer,getNote,logo,INVALIDPITCH,blk,pitchToNumber,getTargetTurtle */
+/* 
+    Global Locations
+     js/utils/utils.js
+        _
+     js/turtle.js
+        Turtle
+     js/activity.js
+        turtles
+     js/turtle-singer.js
+        Singer
+     js/utils/musicutils.js
+        getNote, pitchToNumber
+     js/activity.js
+        logo
+     js/logo.js
+        INVALIDPITCH
+     js/blocks/EnsembleBlocks.js
+        getTargetTurtle
+*/
+/* exported setupDictActions */
+
 /**
  * Sets up all the methods related to different actions for each block in Dictionary palette.
- *
  * @returns {void}
  */
 function setupDictActions() {
@@ -81,7 +102,6 @@ function setupDictActions() {
                         logo.synth.inTemperament
                     );
                 } else {
-                    console.debug("Cannot find a note for mouse " + target);
                     logo.errorMsg(INVALIDPITCH, blk);
                     obj = ["G", 4];
                 }
@@ -90,9 +110,11 @@ function setupDictActions() {
                     pitchToNumber(obj[0], obj[1], targetTur.singer.keySignature) -
                     targetTur.singer.pitchNumberOffset
                 );
-            } else if (target in logo.turtleDicts &&
-                       target in logo.turtleDicts[target] &&
-                       key in logo.turtleDicts[target][target]) {
+            } else if (
+                target in logo.turtleDicts &&
+                target in logo.turtleDicts[target] &&
+                key in logo.turtleDicts[target][target]
+            ) {
                 return logo.turtleDicts[target][target][key];
             } else {
                 if (target in logo.turtleDicts[turtle]) {
