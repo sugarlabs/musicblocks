@@ -14,142 +14,18 @@
 // which is a vast improvement over the Munsell Perl module
 // written by Walter Bender and Jon Orwant back in the day.
 
-function getMunsellColor(hue, value, chroma) {
-    // hue (aka color) 0-100 -> 0-39
-    // value (aka shade) 0-100 -> 0-10
-    // chroma (aka grey) 0-100 -> 0-14
-    // We linear-interpret value.
-    let h = Math.round(hue / 2.5);
-    while (h < 0) {
-        h += 40;
-    }
+/* global createjs */
 
-    h %= 40; // doesn't guarentee it will be positive.
+/*
+   Global locations
+    js/loader.js
+        createjs
+ */
 
-    let v1 = Math.floor(value / 10);
-    let v2 = v1 + 1;
-    if (v1 < 0) {
-        v1 = 0;
-        v2 = 0;
-    } else if (v1 > 10) {
-        v1 = 10;
-        v2 = 10;
-    }
+/* exported getMunsellColor, getcolor, searchColors, COLORS40 */
 
-    let p = (v2 * 10 - value) / 10;
-    if (p > 1) {
-        p = 1;
-    } else if (p < 0) {
-        p = 0;
-    }
-
-    let c = Math.round((chroma * 14) / 100);
-    if (c < 0) {
-        c = 0;
-    } else if (c > 14) {
-        c = 14;
-    }
-
-    return interpColor(
-        MUNSELL[h * 165 + v1 * 15 + c],
-        MUNSELL[h * 165 + v2 * 15 + c],
-        p
-    );
-}
-
-interpColor = function(hex1, hex2, p) {
-    if (hex1 === undefined && hex2 === undefined) {
-    } else if (hex1 === undefined) {
-        hex1 = hex2;
-    } else if (hex2 === undefined) {
-        hex2 = hex1;
-    }
-
-    if (p === 0) {
-        return hex2;
-    } else if (p === 1) {
-        return hex1;
-    } else {
-        const r1 = parseInt(hex1.substr(1, 2), 16);
-        const g1 = parseInt(hex1.substr(3, 2), 16);
-        const b1 = parseInt(hex1.substr(5, 2), 16);
-        const r2 = parseInt(hex2.substr(1, 2), 16);
-        const g2 = parseInt(hex2.substr(3, 2), 16);
-        const b2 = parseInt(hex2.substr(5, 2), 16);
-
-        const nr = Math.floor(r1 * p + r2 * (1 - p));
-        const ng = Math.floor(g1 * p + g2 * (1 - p));
-        const nb = Math.floor(b1 * p + b2 * (1 - p));
-
-        return createjs.Graphics.getRGB(nr, ng, nb, 1.0);
-    }
-};
-
-function getcolor(color) {
-    let h1 = Math.floor(color / 2.5);
-    let h2 = h1 + 1;
-    p = h2 - color / 2.5;
-
-    h1 %= 40; // doesn't guarentee it will be positive.
-    while (h1 < 0) {
-        h1 += 40;
-    }
-
-    h2 = h1 + 1;
-    if (h2 === 40) {
-        h2 = 0;
-    }
-
-    const v = Math.floor(COLORS40[h1][0] * p + COLORS40[h2][0] * (1 - p));
-    const c = Math.floor(COLORS40[h1][1] * p + COLORS40[h2][1] * (1 - p));
-    return [
-        v * 10,
-        (c * 100) / 14,
-        interpColor(COLORS40[h1][2], COLORS40[h2][2], p)
-    ];
-}
-
-// Searches for nearest match to high chroma colors, scaled from 0-100
-function searchColors(r, g, b) {
-    let nearestColor = -1;
-    let distance = 10000000;
-    for (let i = 0; i < 100; i++) {
-        const color = getcolor(i);
-        const r1 = parseInt(color[2].substr(1, 2), 16);
-        const g1 = parseInt(color[2].substr(3, 2), 16);
-        const b1 = parseInt(color[2].substr(5, 2), 16);
-        const distSquared =
-            (r1 - r) * (r1 - r) + (g1 - g) * (g1 - g) + (b1 - b) * (b1 - b);
-        if (distSquared < distance) {
-            distance = distSquared;
-            nearestColor = i;
-        }
-    }
-
-    return nearestColor;
-}
-
-function searchAllColors(r, g, b) {
-    let nearestColor = -1;
-    let distance = 10000000;
-    for (let i = 0; i < MUNSELL.length; i++) {
-        const color = MUNSELL[i];
-        const r1 = parseInt(color.substr(1, 2), 16);
-        const g1 = parseInt(color.substr(3, 2), 16);
-        const b1 = parseInt(color.substr(5, 2), 16);
-        const distSquared =
-            (r1 - r) * (r1 - r) + (g1 - g) * (g1 - g) + (b1 - b) * (b1 - b);
-        if (distSquared < distance) {
-            distance = distSquared;
-            nearestColor = i;
-        }
-    }
-
-    return nearestColor;
-}
-
-// 40 high-chroma colors [value, chroma, RGB]
-COLORS40 = [
+/** 40 high-chroma colors [value, chroma, RGB] */
+const COLORS40 = [
     [6, 24, "#ff007e"],
     [6, 24, "#ff0066"],
     [6, 24, "#ff0048"],
@@ -192,8 +68,8 @@ COLORS40 = [
     [6, 24, "#ff0098"]
 ];
 
-// 10RP 2.5R 5R 7.5R 10R ... 7.5RP -> V0 - V10 -> C0 - C28 (by 2)
-MUNSELL = [
+/** 10RP 2.5R 5R 7.5R 10R ... 7.5RP -> V0 - V10 -> C0 - C28 (by 2) */
+const MUNSELL = [
     // 10RP (0R)
     "#000000",
     "#000000",
@@ -6835,3 +6711,139 @@ MUNSELL = [
     "#ffffff",
     "#ffffff"
 ];
+
+function interpColor(hex1, hex2, p) {
+    if (hex1 === undefined && hex2 === undefined) {
+        null;
+    } else if (hex1 === undefined) {
+        hex1 = hex2;
+    } else if (hex2 === undefined) {
+        hex2 = hex1;
+    }
+
+    if (p === 0) {
+        return hex2;
+    } else if (p === 1) {
+        return hex1;
+    } else {
+        const r1 = parseInt(hex1.substr(1, 2), 16);
+        const g1 = parseInt(hex1.substr(3, 2), 16);
+        const b1 = parseInt(hex1.substr(5, 2), 16);
+        const r2 = parseInt(hex2.substr(1, 2), 16);
+        const g2 = parseInt(hex2.substr(3, 2), 16);
+        const b2 = parseInt(hex2.substr(5, 2), 16);
+
+        const nr = Math.floor(r1 * p + r2 * (1 - p));
+        const ng = Math.floor(g1 * p + g2 * (1 - p));
+        const nb = Math.floor(b1 * p + b2 * (1 - p));
+
+        return createjs.Graphics.getRGB(nr, ng, nb, 1.0);
+    }
+}
+
+function getMunsellColor(hue, value, chroma) {
+    // hue (aka color) 0-100 -> 0-39
+    // value (aka shade) 0-100 -> 0-10
+    // chroma (aka grey) 0-100 -> 0-14
+    // We linear-interpret value.
+    let h = Math.round(hue / 2.5);
+    while (h < 0) {
+        h += 40;
+    }
+
+    h %= 40; // doesn't guarentee it will be positive.
+
+    let v1 = Math.floor(value / 10);
+    let v2 = v1 + 1;
+    if (v1 < 0) {
+        v1 = 0;
+        v2 = 0;
+    } else if (v1 > 10) {
+        v1 = 10;
+        v2 = 10;
+    }
+
+    let p = (v2 * 10 - value) / 10;
+    if (p > 1) {
+        p = 1;
+    } else if (p < 0) {
+        p = 0;
+    }
+
+    let c = Math.round((chroma * 14) / 100);
+    if (c < 0) {
+        c = 0;
+    } else if (c > 14) {
+        c = 14;
+    }
+
+    return interpColor(MUNSELL[h * 165 + v1 * 15 + c], MUNSELL[h * 165 + v2 * 15 + c], p);
+}
+
+function getcolor(color) {
+    let h1 = Math.floor(color / 2.5);
+    let h2 = h1 + 1;
+    const p = h2 - color / 2.5;
+
+    h1 %= 40; // doesn't guarentee it will be positive.
+    while (h1 < 0) {
+        h1 += 40;
+    }
+
+    h2 = h1 + 1;
+    if (h2 === 40) {
+        h2 = 0;
+    }
+
+    const v = Math.floor(COLORS40[h1][0] * p + COLORS40[h2][0] * (1 - p));
+    const c = Math.floor(COLORS40[h1][1] * p + COLORS40[h2][1] * (1 - p));
+    return [v * 10, (c * 100) / 14, interpColor(COLORS40[h1][2], COLORS40[h2][2], p)];
+}
+
+/**
+ * Searches for nearest match to high chroma colors, scaled from 0-100
+ * @param {number} r - intensity of red
+ * @param {number} g - intensity of green
+ * @param {number} b - intensity of blue
+ */
+function searchColors(r, g, b) {
+    let nearestColor = -1;
+    let distance = 10000000;
+    for (let i = 0; i < 100; i++) {
+        const color = getcolor(i);
+        const r1 = parseInt(color[2].substr(1, 2), 16);
+        const g1 = parseInt(color[2].substr(3, 2), 16);
+        const b1 = parseInt(color[2].substr(5, 2), 16);
+        const distSquared = (r1 - r) * (r1 - r) + (g1 - g) * (g1 - g) + (b1 - b) * (b1 - b);
+        if (distSquared < distance) {
+            distance = distSquared;
+            nearestColor = i;
+        }
+    }
+
+    return nearestColor;
+}
+
+// /**
+//  * @deprecated
+//  * @param {number} r - intensity of red
+//  * @param {number} g - intensity of green
+//  * @param {number} b - intensity of blue
+//  */
+// function searchAllColors(r, g, b) {
+//     let nearestColor = -1;
+//     let distance = 10000000;
+//     for (let i = 0; i < MUNSELL.length; i++) {
+//         const color = MUNSELL[i];
+//         const r1 = parseInt(color.substr(1, 2), 16);
+//         const g1 = parseInt(color.substr(3, 2), 16);
+//         const b1 = parseInt(color.substr(5, 2), 16);
+//         const distSquared = (r1 - r) * (r1 - r) + (g1 - g) * (g1 - g) + (b1 - b) * (b1 - b);
+//         if (distSquared < distance) {
+//             distance = distSquared;
+//             nearestColor = i;
+//         }
+//     }
+
+//     return nearestColor;
+// }
