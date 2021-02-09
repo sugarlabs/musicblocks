@@ -16,9 +16,28 @@
  * MA 02110-1335 USA.
 */
 
+/* global _,Singer,logo,VOICENAMES,MusicBlocks,blocks,Mouse,last,instrumentsEffects,NOINPUTERRORMSG,arg */
+/* exported setupToneActions */
+/*
+    Global Locations
+     js/utils/utils.js
+        _
+     js/turtleactions/RhythmActions.js
+        Singer
+     js/activity.js
+        logo
+     js/utils/synthutils.js
+        instrumentsEffects
+     js/logo.js
+        NOINPUTERRORMSG
+     js/blocks.js
+        blocks
+     js/js-export/export.js
+        MusicBlocks, Mouse
+*/
+
 /**
  * Sets up all the methods related to different actions for each block in Tone palette.
- *
  * @returns {void}
  */
 function setupToneActions() {
@@ -74,7 +93,7 @@ function setupToneActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 tur.inSetTimbre = false;
                 tur.singer.instrumentNames.pop();
             };
@@ -115,7 +134,7 @@ function setupToneActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 tur.singer.vibratoIntensity.pop();
                 tur.singer.vibratoRate.pop();
             };
@@ -165,7 +184,7 @@ function setupToneActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 tur.singer.chorusRate.pop();
                 tur.singer.delayTime.pop();
                 tur.singer.chorusDepth.pop();
@@ -199,7 +218,7 @@ function setupToneActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 tur.singer.rate.pop();
                 tur.singer.octaves.pop();
                 tur.singer.baseFrequency.pop();
@@ -239,7 +258,7 @@ function setupToneActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 tur.singer.tremoloFrequency.pop();
                 tur.singer.tremoloDepth.pop();
             };
@@ -276,7 +295,7 @@ function setupToneActions() {
             }
 
             logo.setTurtleListener(
-                turtle, listenerName, event => tur.singer.distortionAmount.pop()
+                turtle, listenerName, () => tur.singer.distortionAmount.pop()
             );
         }
 
@@ -317,7 +336,7 @@ function setupToneActions() {
                     mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 tur.singer.inHarmonic.pop();
                 tur.singer.partials.pop();
                 logo.notation.notationEndHarmonics(turtle);

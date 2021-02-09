@@ -33,7 +33,7 @@
         getModeLength
      js/utils/musicutils.js
         getNote
-     js/logo.js/
+     js/logo.js
         NOINPUTERRORMSG
      js/blocks.js
         blocks
