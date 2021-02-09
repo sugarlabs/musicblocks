@@ -15,6 +15,18 @@
  * MA 02110-1335 USA.
  */
 
+/* global _, durationToNoteValue, last, getDrumSymbol, toFixed2, convertFactor, rationalToFraction */
+
+/*
+   Global locations
+    js/utils/utils.js
+        _, last, toFixed2, rationalToFraction
+    js/utils/musicutils.js
+        durationToNoteValue, getDrumSymbol, convertFactor
+ */
+
+/* exported Notation */
+
 /**
  * Class for managing notations (used for lilypond, abc, etc).
  *
@@ -23,9 +35,6 @@
  * store relevant information about the notations for exporting to lilypond, abc, etc. Also
  * contains the methods to modify them.
  */
-
-/* global _,durationToNoteValue,last,getDrumSymbol,toFixed2,convertFactor,rationalToFraction */
-/* exported Notation */
 class Notation {
     /**
      * @constructor
@@ -270,12 +279,14 @@ class Notation {
             const d = this._notationStaging[turtle].length - this._pickupPoint[turtle];
             const pickup = [];
 
+            // eslint-disable-next-line
             for (const i in d) {
                 pickup.push(this._notationStaging[turtle].pop());
             }
 
             this._notationStaging[turtle].push("meter", count, value);
 
+            // eslint-disable-next-line
             for (const i in d) {
                 this._notationStaging[turtle].push(pickup.pop());
             }
