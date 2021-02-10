@@ -15,6 +15,18 @@
  * MA 02110-1335 USA.
  */
 
+/* global _, durationToNoteValue, last, getDrumSymbol, toFixed2, convertFactor, rationalToFraction */
+
+/*
+   Global locations
+    js/utils/utils.js
+        _, last, toFixed2, rationalToFraction
+    js/utils/musicutils.js
+        durationToNoteValue, getDrumSymbol, convertFactor
+ */
+
+/* exported Notation */
+
 /**
  * Class for managing notations (used for lilypond, abc, etc).
  *
@@ -156,12 +168,24 @@ class Notation {
         // Otherwise, add the drum.
         if (drum.length === 0) {
             this._notationDrumStaging[turtle].push([
-                ["R"], obj[0], obj[1], obj[2], obj[3], insideChord, false
+                ["R"],
+                obj[0],
+                obj[1],
+                obj[2],
+                obj[3],
+                insideChord,
+                false
             ]);
         } else if (["noise1", "noise2", "noise3"].indexOf(drum[0]) === -1) {
             const drumSymbol = getDrumSymbol(drum[0]);
             this._notationDrumStaging[turtle].push([
-                [drumSymbol], obj[0], obj[1], obj[2], obj[3], insideChord, false
+                [drumSymbol],
+                obj[0],
+                obj[1],
+                obj[2],
+                obj[3],
+                insideChord,
+                false
             ]);
         }
 
@@ -171,9 +195,11 @@ class Notation {
             if (turtle in this._markup) {
                 for (let i = 0; i < this._markup[turtle].length; i++) {
                     const markup = this._markup[turtle][i];
-                    if (typeof markup === "number") {   // Hertz block
+                    if (typeof markup === "number") {
+                        // Hertz block
                         this._notationMarkup(turtle, toFixed2(markup), false);
-                    } else if (markup.length > 0) {     // Print block
+                    } else if (markup.length > 0) {
+                        // Print block
                         this._notationMarkup(turtle, markup, true);
                     }
                 }
@@ -189,7 +215,7 @@ class Notation {
      * @param arg
      * @returns {void}
      */
-    notationMarkup(turtle, arg) {
+    static notationMarkup(turtle, arg) {
         if (turtle in this._markup) {
             this._markup[turtle].push(arg);
         } else {
@@ -253,12 +279,14 @@ class Notation {
             const d = this._notationStaging[turtle].length - this._pickupPoint[turtle];
             const pickup = [];
 
+            // eslint-disable-next-line
             for (const i in d) {
                 pickup.push(this._notationStaging[turtle].pop());
             }
 
             this._notationStaging[turtle].push("meter", count, value);
 
+            // eslint-disable-next-line
             for (const i in d) {
                 this._notationStaging[turtle].push(pickup.pop());
             }
@@ -291,9 +319,6 @@ class Notation {
         const beat = convertFactor(beatValue);
         if (beat !== null) {
             this._notationStaging[turtle].push("tempo", bpm, beat);
-        } else {
-            const obj = rationalToFraction(beatValue);
-            // this.errorMsg(_('Lilypond cannot process tempo of ') + obj[0] + '/' + obj[1] + ' = ' + bpm);
         }
     }
 
@@ -306,7 +331,6 @@ class Notation {
      */
     notationPickup(turtle, factor) {
         if (factor === 0) {
-            console.debug("ignoring pickup of 0");
             return;
         }
 
@@ -322,10 +346,7 @@ class Notation {
             if (this._logo.runningLilypond) {
                 obj = rationalToFraction(factor);
                 this._logo.errorMsg(
-                    _("Lilypond cannot process pickup of ") +
-                    obj[0] +
-                    "/" +
-                    obj[1]
+                    _("Lilypond cannot process pickup of ") + obj[0] + "/" + obj[1]
                 );
             }
 
