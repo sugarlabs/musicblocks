@@ -13,6 +13,14 @@
 
 // Some names changed between the Python verison and the
 // JS version so look up name in the conversion dictionary.
+
+/* global setupRhythmBlockPaletteBlocks,setupRhythmBlocks,setupMeterBlocks,setupPitchBlocks,setupIntervalsBlocks,setupToneBlocks,
+ setupOrnamentBlocks,setupVolumeBlocks,setupDrumBlocks,setupWidgetBlocks,setupFlowBlocks,setupNumberBlocks,setupActionBlocks,
+ setupBoxesBlocks,setupBooleanBlocks,setupHeapBlocks,setupDictBlocks,setupExtrasBlocks,setupProgramBlocks,setupGraphicsBlocks
+ setupPenBlocks,setupMediaBlocks,setupSensorsBlocks,setupEnsembleBlocks */
+
+/* exported initBasicProtoBlocks,BACKWARDCOMPATIBILIYDICT */
+
 const BACKWARDCOMPATIBILIYDICT = {
     fullscreen: "vspace",
     fillscreen2: "fillscreen",
@@ -51,10 +59,14 @@ const BACKWARDCOMPATIBILIYDICT = {
 // Define blocks here. Note: The blocks are placed on the palettes
 // from bottom to top, i.e., the block at the top of a palette will be
 // the last block added to a palette.
-
+/**
+ * @public
+ * @param  {Object} palettes
+ * @param  {Object} blocks
+ * @returns {void}
+ */
 function initBasicProtoBlocks(palettes, blocks) {
     blocks.palettes = palettes;
-
     setupRhythmBlockPaletteBlocks();
     setupRhythmBlocks();
     setupMeterBlocks();
@@ -81,11 +93,9 @@ function initBasicProtoBlocks(palettes, blocks) {
     setupEnsembleBlocks();
 
     // Push protoblocks onto their palettes.
-    for (let protoblock in blocks.protoBlockDict) {
+    for (const protoblock in blocks.protoBlockDict) {
         if (blocks.protoBlockDict[protoblock].palette != null) {
-            blocks.protoBlockDict[protoblock].palette.add(
-                blocks.protoBlockDict[protoblock]
-            );
+            blocks.protoBlockDict[protoblock].palette.add(blocks.protoBlockDict[protoblock]);
         }
     }
 }

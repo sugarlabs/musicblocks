@@ -1,40 +1,255 @@
-// Copyright (c) 2018 Riya Lohia
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundation; either
-// version 3 of the License, or (at your option) any later version.
-//
-// You should have received a copy of the GNU Affero General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+/**
+ * @file This contains the prototype of the JavaScript Editor Widget.
+ * @author Riya Lohia
+ *
+ * @copyright 2018 Riya Lohia
+ *
+ * @license
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * The GNU Affero General Public License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this
+ * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
+ * MA 02110-1335 USA.
+ */
 
-function TemperamentWidget() {
-    const BUTTONDIVWIDTH = 430;
-    const OUTERWINDOWWIDTH = 685;
-    const INNERWINDOWWIDTH = 600;
-    const BUTTONSIZE = 53;
-    const ICONSIZE = 32;
-    let temperamentTableDiv = document.createElement("div");
-    let temperamentCell = null;
-    this.inTemperament = null;
-    this.lastTriggered = null;
-    this.notes = [];
-    this.frequencies = [];
-    this.intervals = [];
-    this.ratios = [];
-    this.scale = [];
-    this.cents = [];
-    this.scaleNotes = [];
-    this.pitchNumber = 0;
-    this.circleIsVisible = true;
-    this.playbackForward = true;
+/*
+   global platformColor, docById, wheelnav, slicePath, logo, Singer, isCustom,
+   TEMPERAMENT, OCTAVERATIO: true, rationalToFraction, _, getNoteFromInterval,
+   FLAT, SHARP, pitchToFrequency, updateTemperaments, _buildScale
+ */
+
+/* exported TemperamentWidget */
+
+const temperamentTableDiv = document.createElement("div");
+let temperamentCell = null;
+
+/**
+ * @class
+ * @classdesc pertains to setting up all features of the temperament widget and its UI features.
+ *
+ * Private members' names begin with underscore '_".
+ */
+class TemperamentWidget {
+    static BUTTONDIVWIDTH = 430;
+    static OUTERWINDOWWIDTH = 685;
+    static INNERWINDOWWIDTH = 600;
+    static BUTTONSIZE = 53;
+    static ICONSIZE = 32;
+
+    /**
+     * @constructor
+     */
+    constructor() {
+        this.inTemperament = null;
+        this.lastTriggered = null;
+        this.notes = [];
+        this.frequencies = [];
+        this.intervals = [];
+        this.ratios = [];
+        this.scale = [];
+        this.cents = [];
+        this.scaleNotes = [];
+        this.pitchNumber = 0;
+        this.circleIsVisible = true;
+        this.playbackForward = true;
+    }
+
+    /**
+     * Initialises the temperament widget.
+     * @returns {void}
+     */
+    init() {
+        const w = window.innerWidth;
+        this._cellScale = w / 1200;
+
+        const widgetWindow = window.widgetWindows.windowFor(this, "temperament");
+        this.widgetWindow = widgetWindow;
+        widgetWindow.clear();
+        widgetWindow.show();
+
+        widgetWindow.getWidgetBody().append(temperamentTableDiv);
+        widgetWindow.getWidgetBody().style.height = "500px";
+        widgetWindow.getWidgetBody().style.width = "500px";
+
+        widgetWindow.onclose = () => {
+            logo.synth.setMasterVolume(0);
+            logo.synth.stop();
+            if (docById("wheelDiv2") != null) {
+                docById("wheelDiv2").style.display = "none";
+                this.notesCircle.removeWheel();
+            }
+            if (docById("wheelDiv3") != null) {
+                docById("wheelDiv3").style.display = "none";
+                this.wheel.removeWheel();
+            }
+            if (docById("wheelDiv4") != null) {
+                docById("wheelDiv4").style.display = "none";
+                this.wheel1.removeWheel();
+            }
+
+            widgetWindow.destroy();
+        };
+
+        this._playing = false;
+
+        const buttonTable = document.createElement("table");
+        const header = buttonTable.createTHead();
+        const row = header.insertRow(0);
+        row.id = "buttonsRow";
+
+        temperamentCell = row.insertCell();
+        temperamentCell.innerHTML = this.inTemperament;
+        temperamentCell.style.width = 2 * TemperamentWidget.BUTTONSIZE + "px";
+        temperamentCell.style.minWidth = temperamentCell.style.width;
+        temperamentCell.style.maxWidth = temperamentCell.style.width;
+        temperamentCell.style.height = TemperamentWidget.BUTTONSIZE + "px";
+        temperamentCell.style.minHeight = temperamentCell.style.height;
+        temperamentCell.style.maxHeight = temperamentCell.style.height;
+        temperamentCell.style.textAlign = "center";
+        temperamentCell.style.backgroundColor = platformColor.selectorBackground;
+
+        this.playButton = widgetWindow.addButton(
+            "play-button.svg",
+            TemperamentWidget.ICONSIZE,
+            _("Play all")
+        );
+        this.playButton.onclick = () => {
+            this.playAll();
+        };
+
+        widgetWindow.addButton(
+            "export-chunk.svg",
+            TemperamentWidget.ICONSIZE,
+            _("Save")
+        ).onclick = () => {
+            this._save();
+        };
+
+        const noteCell = widgetWindow.addButton(
+            "play-button.svg",
+            TemperamentWidget.ICONSIZE,
+            _("Table")
+        );
+
+        let t = TEMPERAMENT[this.inTemperament];
+        this.pitchNumber = t.pitchNumber;
+        this.octaveChanged = false;
+        this.scale = this.scale[0] + " " + this.scale[1];
+        this.scaleNotes = _buildScale(this.scale);
+        this.scaleNotes = this.scaleNotes[0];
+        this.powerBase = 2;
+        const startingPitch = logo.synth.startingPitch;
+        const str = [];
+        const note = [];
+        this.notes = [];
+        this.frequencies = [];
+        this.cents = [];
+        this.intervals = [];
+        this.ratios = [];
+        this.ratiosNotesPair = [];
+
+        let pitchNumber;
+        for (let i = 0; i <= this.pitchNumber; i++) {
+            if (
+                isCustom(this.inTemperament) &&
+                TEMPERAMENT[this.inTemperament]["0"][1] !== undefined
+            ) {
+                //If temperament selected is custom and it is defined by user.
+                pitchNumber = i + "";
+                if (i === this.pitchNumber) {
+                    this.notes[i] = [
+                        TEMPERAMENT[this.inTemperament]["0"][1],
+                        Number(TEMPERAMENT[this.inTemperament]["0"][2]) + 1
+                    ];
+                    this.ratios[i] = this.powerBase;
+                } else {
+                    this.notes[i] = [
+                        TEMPERAMENT[this.inTemperament][pitchNumber][1],
+                        TEMPERAMENT[this.inTemperament][pitchNumber][2]
+                    ];
+                    this.ratios[i] = TEMPERAMENT[this.inTemperament][pitchNumber][0];
+                }
+                this.frequencies[i] = logo.synth
+                    .getCustomFrequency(
+                        this.notes[i][0] + this.notes[i][1] + "",
+                        this.inTemperament
+                    )
+                    .toFixed(2);
+                this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
+                this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
+            } else {
+                if (isCustom(this.inTemperament)) {
+                    // If temperament selected is custom and it is not defined by user
+                    // then custom temperament behaves like equal temperament.
+                    t = TEMPERAMENT["equal"];
+                }
+                str[i] = getNoteFromInterval(startingPitch, t.interval[i]);
+                this.notes[i] = str[i];
+                note[i] = str[i][0];
+
+                if (
+                    str[i][0].substring(1, str[i][0].length) === FLAT ||
+                    str[i][0].substring(1, str[i][0].length) === "b"
+                ) {
+                    note[i] = str[i][0].replace(FLAT, "b");
+                } else if (
+                    str[i][0].substring(1, str[i][0].length) === SHARP ||
+                    str[i][0].substring(1, str[i][0].length) === "#"
+                ) {
+                    note[i] = str[i][0].replace(SHARP, "#");
+                }
+
+                str[i] = note[i] + str[i][1];
+                this.frequencies[i] = logo.synth
+                    ._getFrequency(str[i], true, this.inTemperament)
+                    .toFixed(2);
+                this.intervals[i] = t.interval[i];
+                this.ratios[i] = t[this.intervals[i]];
+                this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
+                this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
+            }
+        }
+        this.toggleNotesButton = () => {
+            if (this.circleIsVisible) {
+                noteCell.getElementsByTagName("img")[0].src = "header-icons/circle.svg";
+                noteCell.getElementsByTagName("img")[0].title = "Circle";
+                noteCell.getElementsByTagName("img")[0].alt = "circle";
+            } else {
+                noteCell.getElementsByTagName("img")[0].src = "header-icons/table.svg";
+                noteCell.getElementsByTagName("img")[0].title = "Table";
+                noteCell.getElementsByTagName("img")[0].alt = "table";
+            }
+        };
+
+        this._circleOfNotes();
+
+        noteCell.onclick = () => {
+            this.editMode = null;
+            if (this.circleIsVisible) {
+                this._circleOfNotes();
+            } else {
+                this._graphOfNotes();
+            }
+        };
+
+        widgetWindow.addButton(
+            "add2.svg",
+            TemperamentWidget.ICONSIZE,
+            _("Add pitches")
+        ).onclick = () => {
+            this.edit();
+        };
+
+        widgetWindow.sendToCenter();
+    }
 
     /**
      * @deprecated
      */
-    this._addButton = function(row, icon, iconSize, label) {
-        let cell = row.insertCell(-1);
+    _addButton(row, icon, iconSize, label) {
+        const cell = row.insertCell(-1);
         cell.innerHTML =
             '&nbsp;&nbsp;<img src="header-icons/' +
             icon +
@@ -47,7 +262,7 @@ function TemperamentWidget() {
             '" width="' +
             iconSize +
             '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-        cell.style.width = BUTTONSIZE + "px";
+        cell.style.width = TemperamentWidget.BUTTONSIZE + "px";
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
         cell.style.height = cell.style.width;
@@ -55,18 +270,22 @@ function TemperamentWidget() {
         cell.style.maxHeight = cell.style.height;
         cell.style.backgroundColor = platformColor.selectorBackground;
 
-        cell.onmouseover = function() {
-            this.style.backgroundColor = platformColor.selectorBackgroundHOVER;
+        cell.onmouseover = (event) => {
+            event.target.style.backgroundColor = platformColor.selectorBackgroundHOVER;
         };
 
-        cell.onmouseout = function() {
-            this.style.backgroundColor = platformColor.selectorBackground;
+        cell.onmouseout = (event) => {
+            event.target.style.backgroundColor = platformColor.selectorBackground;
         };
 
         return cell;
-    };
+    }
 
-    this._circleOfNotes = function() {
+    /**
+     * Renders the circle of notes UI and all the subcomponents in the DOM widget.
+     * @returns {void}
+     */
+    _circleOfNotes() {
         this.circleIsVisible = false;
         this.toggleNotesButton();
         temperamentTableDiv.style.display = "inline";
@@ -76,15 +295,15 @@ function TemperamentWidget() {
         temperamentTableDiv.style.backgroundColor = "white";
         temperamentTableDiv.style.height = "300px";
         temperamentTableDiv.innerHTML = '<div id="temperamentTable"></div>';
-        let temperamentTable = docById("temperamentTable");
+        const temperamentTable = docById("temperamentTable");
         temperamentTable.style.position = "relative";
 
-        let radius = 150;
-        let height = 2 * radius + 60;
+        const radius = 150;
+        const height = 2 * radius + 60;
 
         let html =
             '<canvas id="circ" width = ' +
-            BUTTONDIVWIDTH +
+            TemperamentWidget.BUTTONDIVWIDTH +
             "px height = " +
             height +
             "px></canvas>";
@@ -94,13 +313,13 @@ function TemperamentWidget() {
         temperamentTable.innerHTML = html;
         temperamentTable.style.width = "300px";
 
-        let canvas = docById("circ");
+        const canvas = docById("circ");
         canvas.style.position = "absolute";
         canvas.style.zIndex = 1;
         canvas.style.background = "rgba(255, 255, 255, 0.85)";
-        let ctx = canvas.getContext("2d");
-        let centerX = canvas.width / 2;
-        let centerY = canvas.height / 2;
+        const ctx = canvas.getContext("2d");
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
 
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
@@ -114,7 +333,7 @@ function TemperamentWidget() {
         docById("wheelDiv2").style.display = "";
         docById("wheelDiv2").style.background = "none";
 
-        this.createMainWheel = function(ratios, pitchNumber) {
+        this.createMainWheel = (ratios, pitchNumber) => {
             if (ratios === undefined) {
                 ratios = this.ratios;
             }
@@ -122,7 +341,7 @@ function TemperamentWidget() {
                 pitchNumber = this.pitchNumber;
             }
 
-            let labels = [];
+            const labels = [];
             let label;
             for (let j = 0; j < pitchNumber; j++) {
                 label = j.toString();
@@ -141,18 +360,16 @@ function TemperamentWidget() {
             this.notesCircle.sliceInitPathCustom = this.notesCircle.slicePathCustom;
             this.notesCircle.initWheel(labels);
             angle = [];
-            let baseAngle = [];
-            let sliceAngle = [];
-            let angleDiff = [];
+            const baseAngle = [];
+            const sliceAngle = [];
+            const angleDiff = [];
             for (let i = 0; i < this.notesCircle.navItemCount; i++) {
                 this.notesCircle.navItems[i].fillAttr = "#c8C8C8";
                 this.notesCircle.navItems[i].titleAttr.font =
                     "20 20px Impact, Charcoal, sans-serif";
                 this.notesCircle.navItems[i].titleSelectedAttr.font =
                     "20 20px Impact, Charcoal, sans-serif";
-                angle[i] =
-                    270 +
-                    360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase));
+                angle[i] = 270 + 360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase));
                 if (i !== 0) {
                     if (i == pitchNumber - 1) {
                         angleDiff[i - 1] = angle[0] + 360 - angle[i];
@@ -162,8 +379,7 @@ function TemperamentWidget() {
                 }
                 if (i === 0) {
                     sliceAngle[i] = 360 / pitchNumber;
-                    baseAngle[i] =
-                        this.notesCircle.navAngle - sliceAngle[0] / 2;
+                    baseAngle[i] = this.notesCircle.navAngle - sliceAngle[0] / 2;
                 } else {
                     baseAngle[i] = baseAngle[i - 1] + sliceAngle[i - 1];
                     sliceAngle[i] = 2 * (angle[i] - baseAngle[i]);
@@ -185,13 +401,11 @@ function TemperamentWidget() {
 
             docById("wheelDiv2").style.position = "absolute";
             docById("wheelDiv2").style.height = height + "px";
-            docById("wheelDiv2").style.width = BUTTONDIVWIDTH + "px";
+            docById("wheelDiv2").style.width = TemperamentWidget.BUTTONDIVWIDTH + "px";
             docById("wheelDiv2").style.zIndex = 5;
         };
 
         this.createMainWheel();
-
-        let that = this;
 
         let divAppend, divAppend1, divAppend2;
         if (this.octaveChanged) {
@@ -219,7 +433,7 @@ function TemperamentWidget() {
             divAppend2.style.height = "30px";
             divAppend2.style.marginRight = "3px";
             divAppend2.style.backgroundColor = platformColor.selectorBackground;
-            divAppend2.style.width = BUTTONDIVWIDTH / 2 - 8 + "px";
+            divAppend2.style.width = TemperamentWidget.BUTTONDIVWIDTH / 2 - 8 + "px";
         } else {
             divAppend1 = document.createElement("div");
             divAppend1.id = "divAppend";
@@ -227,75 +441,74 @@ function TemperamentWidget() {
             divAppend1.style.textAlign = "center";
             divAppend1.style.position = "absolute";
             divAppend1.style.zIndex = 2;
-            divAppend1.style.paddingTop = "5px";
             divAppend1.style.backgroundColor = platformColor.selectorBackground;
-            divAppend1.style.height = "25px";
+            divAppend1.style.height = "30px";
             divAppend1.style.width = docById("wheelDiv2").style.width;
             divAppend1.style.marginTop = docById("wheelDiv2").style.height;
             divAppend1.style.overflow = "auto";
+            divAppend1.style.cursor = "pointer";
+            divAppend1.style.lineHeight = divAppend1.style.height;
             docById("temperamentTable").append(divAppend1);
         }
 
         if (divAppend1 !== undefined) {
-            divAppend1.onclick = function() {
-                let ratio = that.ratios[0];
-                that.ratios = [];
-                that.ratios[0] = ratio;
-                that.ratios[1] = that.powerBase;
-                let frequency = that.frequencies[0];
-                that.frequencies = [];
-                that.frequencies[0] = frequency;
-                that.frequencies[1] = frequency * that.powerBase;
-                that.pitchNumber = 1;
-                that.checkTemperament(that.ratios);
-                that._circleOfNotes();
+            divAppend1.onclick = () => {
+                const ratio = this.ratios[0];
+                this.ratios = [];
+                this.ratios[0] = ratio;
+                this.ratios[1] = this.powerBase;
+                const frequency = this.frequencies[0];
+                this.frequencies = [];
+                this.frequencies[0] = frequency;
+                this.frequencies[1] = frequency * this.powerBase;
+                this.pitchNumber = 1;
+                this.checkTemperament(this.ratios);
+                this._circleOfNotes();
             };
         }
 
         if (divAppend2 !== undefined) {
-            divAppend2.onclick = function() {
-                let powers = [];
-                let compareRatios = [];
-                let frequency = that.frequencies[0];
-                that.frequencies = [];
+            divAppend2.onclick = () => {
+                const powers = [];
+                const compareRatios = [];
+                const frequency = this.frequencies[0];
+                this.frequencies = [];
 
-                for (let i = 0; i < that.ratios.length; i++) {
-                    powers[i] =
-                        12 *
-                        (Math.log10(that.ratios[i]) /
-                            Math.log10(that.powerBase));
-                    that.ratios[i] = Math.pow(2, powers[i] / 12);
-                    compareRatios[i] = that.ratios[i].toFixed(2);
-                    that.frequencies[i] = that.ratios[i] * frequency;
-                    that.frequencies[i] = that.frequencies[i].toFixed(2);
+                for (let i = 0; i < this.ratios.length; i++) {
+                    powers[i] = 12 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
+                    this.ratios[i] = Math.pow(2, powers[i] / 12);
+                    compareRatios[i] = this.ratios[i].toFixed(2);
+                    this.frequencies[i] = this.ratios[i] * frequency;
+                    this.frequencies[i] = this.frequencies[i].toFixed(2);
                 }
-                that.powerBase = 2;
-                that.checkTemperament(compareRatios);
-                that.octaveChanged = false;
-                that._circleOfNotes();
+                this.powerBase = 2;
+                this.checkTemperament(compareRatios);
+                this.octaveChanged = false;
+                this._circleOfNotes();
             };
         }
 
-        docById("temperamentTable").addEventListener("click", function(e) {
-            that.showNoteInfo(e, angle);
+        docById("temperamentTable").addEventListener("click", (e) => {
+            this.showNoteInfo(e);
         });
-    };
+    }
 
-    this.showNoteInfo = function(event, angle) {
+    /**
+     * Triggered when the a note is pressed.
+     * @param {Object} event
+     * @returns {void}
+     */
+    showNoteInfo = (event) => {
         let x, y, frequency, noteDefined;
         let cents, centsDiff, centsDiff1, min, index;
-        let that = this;
+
         for (let i = 0; i < this.notesCircle.navItemCount; i++) {
             if (
                 event.target.id == "wheelnav-wheelDiv2-slice-" + i ||
                 (event.target.innerHTML == i && event.target.innerHTML !== "")
             ) {
-                x =
-                    event.clientX -
-                    docById("wheelDiv2").getBoundingClientRect().left;
-                y =
-                    event.clientY -
-                    docById("wheelDiv2").getBoundingClientRect().top;
+                x = event.clientX - docById("wheelDiv2").getBoundingClientRect().left;
+                y = event.clientY - docById("wheelDiv2").getBoundingClientRect().top;
                 frequency = this.frequencies[i];
                 if (docById("noteInfo") !== null) {
                     docById("noteInfo").remove();
@@ -309,33 +522,30 @@ function TemperamentWidget() {
                     'px;"><span class="popuptext" id="myPopup"></span></div>';
                 if (i !== 0) {
                     docById("noteInfo").innerHTML +=
-                        '<img src="header-icons/edit.svg" id="edit" title="edit" alt="edit" height=20px width=20px data-message="' +
+                        '<img src="header-icons/edit.svg" id="edit" title="Edit" alt="edit" height=20px width=20px data-message="' +
                         i +
                         '">';
                 }
                 docById("noteInfo").innerHTML +=
-                    '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px align="right"><br>';
+                    '<img src="header-icons/close-button.svg" id="close" title="Close" alt="close" height=20px width=20px align="right"><br>';
                 noteDefined = false;
                 for (let j = 0; j < this.ratiosNotesPair.length; j++) {
                     if (this.ratios[i] == this.ratiosNotesPair[j][0]) {
                         noteDefined = true;
                         docById("noteInfo").innerHTML +=
-                            '<div id="note">&nbsp; Note : ' +
-                            this.ratiosNotesPair[j][1] +
-                            "</div>";
+                            '<div id="note">&nbsp; Note : ' + this.ratiosNotesPair[j][1] + "</div>";
                         break;
                     }
                 }
                 if (noteDefined == false) {
-                    cents =
-                        1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
+                    cents = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
                     centsDiff = [];
                     centsDiff1 = [];
                     for (let j = 0; j < this.cents.length; j++) {
                         centsDiff[j] = cents - this.cents[j];
                         centsDiff1[j] = Math.abs(cents - this.cents[j]);
                     }
-                    min = centsDiff1.reduce(function(a, b) {
+                    min = centsDiff1.reduce((a, b) => {
                         return Math.min(a, b);
                     });
                     index = centsDiff1.indexOf(min);
@@ -359,30 +569,35 @@ function TemperamentWidget() {
                     }
                 }
                 docById("noteInfo").innerHTML +=
-                    '<div id="frequency">&nbsp Frequency : ' +
-                    frequency +
-                    "</div>";
+                    '<div id="frequency">&nbsp Frequency : ' + frequency + "</div>";
 
                 docById("noteInfo").style.top = "130px";
                 docById("noteInfo").style.left = "132px";
                 docById("noteInfo").style.position = "absolute";
                 docById("noteInfo").style.zIndex = 10;
-                docById("close").onclick = function() {
+
+                docById("close").style.cursor = "pointer";
+
+                docById("close").onclick = () => {
                     docById("noteInfo").remove();
                 };
 
                 if (docById("edit") !== null) {
-                    docById("edit").addEventListener("click", function(e) {
-                        that.editFrequency(e);
+                    docById("edit").addEventListener("click", (e) => {
+                        this.editFrequency(e);
                     });
                 }
             }
         }
     };
 
-    this.editFrequency = function(event) {
-        let i = Number(event.target.dataset.message);
-        let that = this;
+    /**
+     * Triggered when the user wants to edit frequency.
+     * @param {Object} event
+     * @returns {void}
+     */
+    editFrequency = (event) => {
+        const i = Number(event.target.dataset.message);
 
         docById("noteInfo").style.width = "180px";
         docById("noteInfo").style.height = "130px";
@@ -401,47 +616,53 @@ function TemperamentWidget() {
         docById("noteInfo").innerHTML +=
             '<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>Done</center><div>';
 
-        docById("frequencySlider1").oninput = function() {
-            let frequency, ratio, labels, ratioDifference;
-            docById("frequencydiv1").innerHTML = docById(
-                "frequencySlider1"
-            ).value;
-            frequency = docById("frequencySlider1").value;
-            ratio = frequency / that.frequencies[0];
-            labels = [];
-            ratioDifference = [];
-            that.temporaryRatios = that.ratios.slice();
-            that.temporaryRatios[i] = ratio;
-            that._logo.resetSynth(0);
-            that._logo.synth.trigger(
-                0, frequency, Singer.defaultBPMFactor * 0.01, "electronic synth", null, null
+        docById("frequencySlider1").oninput = () => {
+            docById("frequencydiv1").innerHTML = docById("frequencySlider1").value;
+            const frequency = docById("frequencySlider1").value;
+            const ratio = frequency / this.frequencies[0];
+            // labels = [];
+            // ratioDifference = [];
+            this.temporaryRatios = this.ratios.slice();
+            this.temporaryRatios[i] = ratio;
+            logo.resetSynth(0);
+            logo.synth.trigger(
+                0,
+                frequency,
+                Singer.defaultBPMFactor * 0.01,
+                "electronic synth",
+                null,
+                null
             );
-            that.createMainWheel(that.temporaryRatios);
+            this.createMainWheel(this.temporaryRatios);
         };
 
-        docById("done").onclick = function() {
-            let frequency1;
-            that.ratios = that.temporaryRatios.slice();
-            that.typeOfEdit = "nonequal";
-            that.createMainWheel();
-            frequency1 = that.frequencies[0];
-            that.frequencies = [];
-            for (let j = 0; j < that.ratios.length; j++) {
-                that.frequencies[j] = that.ratios[j] * frequency1;
-                that.frequencies[j] = that.frequencies[j].toFixed(2);
+        docById("done").onclick = () => {
+            this.ratios = this.temporaryRatios.slice();
+            this.typeOfEdit = "nonequal";
+            this.createMainWheel();
+            const frequency1 = this.frequencies[0];
+            this.frequencies = [];
+            for (let j = 0; j < this.ratios.length; j++) {
+                this.frequencies[j] = this.ratios[j] * frequency1;
+                this.frequencies[j] = this.frequencies[j].toFixed(2);
             }
-            that.checkTemperament(that.ratios);
+            this.checkTemperament(this.ratios);
             docById("noteInfo").remove();
         };
 
-        docById("close").onclick = function() {
-            that.temporaryRatios = that.ratios.slice();
-            that.createMainWheel();
+        docById("close").onclick = () => {
+            this.temporaryRatios = this.ratios.slice();
+            this.createMainWheel();
             docById("noteInfo").remove();
         };
     };
 
-    this._graphOfNotes = function() {
+    /**
+     * Triggered when graph of notes UI element is stelected displays circular graph of all the
+     * notes present.
+     * @returns {void}
+     */
+    _graphOfNotes() {
         this.circleIsVisible = true;
         this.toggleNotesButton();
         temperamentTableDiv.innerHTML = "";
@@ -451,21 +672,14 @@ function TemperamentWidget() {
         }
 
         temperamentTableDiv.innerHTML = '<table id="notesGraph"></table>';
-        let notesGraph = docById("notesGraph");
-        let headerNotes = notesGraph.createTHead();
-        let rowNotes = headerNotes.insertRow(0);
+        const notesGraph = docById("notesGraph");
+        const headerNotes = notesGraph.createTHead();
+        headerNotes.insertRow(0);
         let menuLabels = [];
         if (isCustom(this.inTemperament)) {
             menuLabels = ["Play", "Pitch Number", "Ratio", "Frequency"];
         } else {
-            menuLabels = [
-                "Play",
-                "Pitch Number",
-                "Ratio",
-                "Interval",
-                "Note",
-                "Frequency"
-            ];
+            menuLabels = ["Play", "Pitch Number", "Ratio", "Interval", "Note", "Frequency"];
             menuLabels.splice(5, 0, this.scale);
         }
         notesGraph.innerHTML =
@@ -478,11 +692,12 @@ function TemperamentWidget() {
 
         docById("menu").innerHTML = menus;
 
-        let menuItems = document.querySelectorAll("#menuLabels");
+        const menuItems = document.querySelectorAll("#menuLabels");
         for (let i = 0; i < menuLabels.length; i++) {
             menuItems[i].style.background = platformColor.labelColor;
             menuItems[i].style.height = 30 + "px";
             menuItems[i].style.textAlign = "center";
+            menuItems[i].style.fontSize = "0.9rem";
             menuItems[i].style.fontWeight = "bold";
             if (isCustom(this.inTemperament)) {
                 menuItems[0].style.width = 40 + "px";
@@ -508,54 +723,55 @@ function TemperamentWidget() {
             '<tr><td colspan="7"><div id="graph"><table id="tableOfNotes"></table></div></td></tr>';
         docById("tableOfNotes").innerHTML = pitchNumberColumn;
 
-        let startingPitch = this._logo.synth.startingPitch;
-        let that = this;
-        let notesRow = [];
-        let notesCell = [];
-        let noteToPlay = [];
-        let ratios = [];
-        let playImage;
+        const notesRow = [];
+        const notesCell = [];
+        const ratios = [];
 
         for (let i = 0; i <= this.pitchNumber; i++) {
             notesRow[i] = docById("notes_" + i);
+            notesRow[i].style.background = platformColor.selectorBackground;
+            notesRow[i].style.transition = "background 0.25s ease";
+            notesRow[i].onmouseover = () => {
+                notesRow[i].style.background = platformColor.paletteBackground;
+            };
+            notesRow[i].onmouseout = () => {
+                notesRow[i].style.background = platformColor.selectorBackground;
+            };
 
             notesCell[(i, 0)] = notesRow[i].insertCell(-1);
-            notesCell[(i, 0)].innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="play" alt="play" height="20px" width="20px" id="play_' +
-                i +
-                '" data-id="' +
-                i +
-                '">&nbsp;&nbsp;';
             notesCell[(i, 0)].style.width = 40 + "px";
-            notesCell[(i, 0)].style.backgroundColor =
-                platformColor.selectorBackground;
             notesCell[(i, 0)].style.textAlign = "center";
 
-            notesCell[(i, 0)].onmouseover = function() {
-                this.style.backgroundColor =
-                    platformColor.selectorBackgroundHOVER;
+            const img_wrap = document.createElement("div");
+            img_wrap.style.height = "2.5rem";
+            img_wrap.style.display = "grid";
+            img_wrap.style.alignItems = "center";
+            img_wrap.style.justifyContent = "center";
+
+            const play_btn = document.createElement("img");
+            play_btn.src = "header-icons/play-button.svg";
+            play_btn.id = `play_${i}`;
+            play_btn.style.height = "1.25rem";
+            play_btn.style.width = "1.25rem";
+            play_btn.style.transition = "all 0.25s ease";
+            play_btn.onmouseover = (event) => {
+                event.target.style.cursor = "pointer";
+                event.target.style.transform = "scale(1.1)";
+            };
+            play_btn.onmouseout = (event) => {
+                event.target.style.transform = "scale(1)";
+            };
+            play_btn.onclick = (event) => {
+                this.playNote(event.target.id.split("_")[1]);
             };
 
-            notesCell[(i, 0)].onmouseout = function() {
-                this.style.backgroundColor = platformColor.selectorBackground;
-            };
-
-            playImage = docById("play_" + i);
-
-            playImage.onmouseover = function(event) {
-                this.style.cursor = "pointer";
-            };
-
-            playImage.onclick = function(event) {
-                that.playNote(event.target.dataset.id);
-            };
+            img_wrap.appendChild(play_btn);
+            notesCell[(i, 0)].appendChild(img_wrap);
 
             //Pitch Number
             notesCell[(i, 1)] = notesRow[i].insertCell(-1);
             notesCell[(i, 1)].id = "pitchNumber_" + i;
             notesCell[(i, 1)].innerHTML = i;
-            notesCell[(i, 1)].style.backgroundColor =
-                platformColor.selectorBackground;
             notesCell[(i, 1)].style.textAlign = "center";
 
             ratios[i] = this.ratios[i];
@@ -564,8 +780,6 @@ function TemperamentWidget() {
             //Ratio
             notesCell[(i, 2)] = notesRow[i].insertCell(-1);
             notesCell[(i, 2)].innerHTML = ratios[i];
-            notesCell[(i, 2)].style.backgroundColor =
-                platformColor.selectorBackground;
             notesCell[(i, 2)].style.textAlign = "center";
 
             if (!isCustom(this.inTemperament)) {
@@ -573,16 +787,12 @@ function TemperamentWidget() {
                 notesCell[(i, 3)] = notesRow[i].insertCell(-1);
                 notesCell[(i, 3)].innerHTML = this.intervals[i];
                 notesCell[(i, 3)].style.width = 120 + "px";
-                notesCell[(i, 3)].style.backgroundColor =
-                    platformColor.selectorBackground;
                 notesCell[(i, 3)].style.textAlign = "center";
 
                 //Notes
                 notesCell[(i, 4)] = notesRow[i].insertCell(-1);
-                notesCell[(i, 4)].innerHTML = this.notes[i];
+                notesCell[(i, 4)].innerHTML = `${this.notes[i][0]}, ${this.notes[i][1]}`;
                 notesCell[(i, 4)].style.width = 50 + "px";
-                notesCell[(i, 4)].style.backgroundColor =
-                    platformColor.selectorBackground;
                 notesCell[(i, 4)].style.textAlign = "center";
 
                 //Mode
@@ -597,16 +807,12 @@ function TemperamentWidget() {
                     notesCell[(i, 5)].innerHTML = "Non Scalar";
                 }
                 notesCell[(i, 5)].style.width = 100 + "px";
-                notesCell[(i, 5)].style.backgroundColor =
-                    platformColor.selectorBackground;
                 notesCell[(i, 5)].style.textAlign = "center";
             }
 
             //Frequency
             notesCell[(i, 6)] = notesRow[i].insertCell(-1);
             notesCell[(i, 6)].innerHTML = this.frequencies[i];
-            notesCell[(i, 6)].style.backgroundColor =
-                platformColor.selectorBackground;
             notesCell[(i, 6)].style.textAlign = "center";
 
             if (isCustom(this.inTemperament)) {
@@ -619,13 +825,17 @@ function TemperamentWidget() {
                 notesCell[(i, 2)].style.width = 60 + "px";
             }
         }
-    };
+    }
 
-    this.edit = function() {
-        this.editMode = null ;
-        this._logo.synth.setMasterVolume(0);
-        this._logo.synth.stop();
-        let that = this;
+    /**
+     * Triggerred when any one of the UI edit elemnts is selected.
+     * @returns {void}
+     */
+    edit() {
+        this.editMode = null;
+        logo.synth.setMasterVolume(0);
+        logo.synth.stop();
+
         if (docById("wheelDiv2") != null) {
             docById("wheelDiv2").style.display = "none";
             this.notesCircle.removeWheel();
@@ -633,9 +843,9 @@ function TemperamentWidget() {
         temperamentTableDiv.innerHTML = "";
         temperamentTableDiv.innerHTML =
             '<table id="editOctave" width="' +
-            BUTTONDIVWIDTH +
+            TemperamentWidget.BUTTONDIVWIDTH +
             '"><tbody><tr id="menu"></tr></tbody></table>';
-        let editMenus = ["Equal", "Ratios", "Arbitrary", "Octave Space"];
+        const editMenus = ["Equal", "Ratios", "Arbitrary", "Octave Space"];
         let menus = "";
 
         for (let i = 0; i < editMenus.length; i++) {
@@ -643,57 +853,70 @@ function TemperamentWidget() {
         }
 
         docById("menu").innerHTML = menus;
-        docById("editOctave").innerHTML +=
-            '<tr><td colspan="4" id="userEdit"></td></tr>';
-        let menuItems = document.querySelectorAll("#editMenus");
+        docById("editOctave").innerHTML += '<tr><td colspan="4" id="userEdit"></td></tr>';
+        const menuItems = document.querySelectorAll("#editMenus");
         for (let i = 0; i < editMenus.length; i++) {
             menuItems[i].style.background = platformColor.selectorBackground;
-            menuItems[i].style.height = 30 + "px";
+            menuItems[i].style.height = 40 + "px";
             menuItems[i].style.textAlign = "center";
+            menuItems[i].style.cursor = "pointer";
             menuItems[i].style.fontWeight = "bold";
+            menuItems[i].style.paddingRight = "5px";
         }
 
-        menuItems[0].style.background = "#c8C8C8";
+        menuItems[0].style.background = "#FFFFFF";
         this.equalEdit();
 
-        menuItems[0].onclick = function(event) {
-            menuItems[1].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[0].style.background = "#c8C8C8";
-            that.equalEdit();
-        };
+        for (let i = 0; i < 4; i++) {
+            menuItems[i].onmouseover = () => {
+                menuItems[i].style.backgroundColor = "#7bb5ee";
+            };
+        }
 
-        menuItems[1].onclick = function(event) {
-            menuItems[0].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[1].style.background = "#c8C8C8";
-            that.ratioEdit();
-        };
+        for (let i = 0; i < 4; i++) {
+            menuItems[i].onmouseout = () => {
+                if (
+                    (i == 0 && this.editMode != "equal") ||
+                    (i == 1 && this.editMode != "ratio") ||
+                    (i == 2 && this.editMode != "arbitrary") ||
+                    (i == 3 && this.editMode != "octave")
+                ) {
+                    menuItems[i].style.backgroundColor = "#8cc6ff";
+                }
+            };
+        }
 
-        menuItems[2].onclick = function(event) {
-            menuItems[0].style.background = platformColor.selectorBackground;
-            menuItems[1].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = "#c8C8C8";
-            that.arbitraryEdit();
-        };
+        for (let i = 0; i < 4; i++) {
+            menuItems[i].onclick = () => {
+                for (let j = 0; j < 4; j++) {
+                    if (i != j) {
+                        menuItems[j].style.background = platformColor.selectorBackground;
+                    } else {
+                        menuItems[i].style.background = "#FFFFFF";
+                    }
+                }
+                if (i == 0) {
+                    this.equalEdit();
+                } else if (i == 1) {
+                    this.ratioEdit();
+                } else if (i == 2) {
+                    this.arbitraryEdit();
+                } else {
+                    this.octaveSpaceEdit();
+                }
+            };
+        }
+    }
 
-        menuItems[3].onclick = function(event) {
-            menuItems[0].style.background = platformColor.selectorBackground;
-            menuItems[1].style.background = platformColor.selectorBackground;
-            menuItems[2].style.background = platformColor.selectorBackground;
-            menuItems[3].style.background = "#c8C8C8";
-            that.octaveSpaceEdit();
-        };
-    };
-
-    this.equalEdit = function() {
+    /**
+     * Triggerred when the Equal edit option is selected.
+     * @returns {void}
+     */
+    equalEdit() {
         this.editMode = "equal";
         docById("userEdit").innerHTML = "";
-        let equalEdit = docById("userEdit");
-        equalEdit.style.backgroundColor = "#c8C8C8";
+        const equalEdit = docById("userEdit");
+        equalEdit.style.backgroundColor = "#FFFFFF";
         equalEdit.innerHTML =
             '<br>Pitch Number &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="octaveIn" value="0"></input> &nbsp;&nbsp; To &nbsp;&nbsp; <input type="text" id="octaveOut" value="0"></input><br><br>';
         equalEdit.innerHTML +=
@@ -701,11 +924,11 @@ function TemperamentWidget() {
             this.pitchNumber +
             '"></input>';
         equalEdit.style.paddingLeft = "80px";
-        let that = this;
 
-        function addDivision(preview) {
+        let divAppend;
+        const addDivision = (preview) => {
             // Add Buttons
-            let divAppend = document.createElement("div");
+            divAppend = document.createElement("div");
             divAppend.id = "divAppend";
             if (preview) {
                 divAppend.innerHTML =
@@ -719,45 +942,43 @@ function TemperamentWidget() {
             divAppend.style.height = "32px";
             divAppend.style.marginTop = "40px";
             divAppend.style.overflow = "auto";
+            divAppend.style.cursor = "32px";
+            divAppend.style.cursor = "pointer";
             equalEdit.append(divAppend);
 
-            let divAppend1 = docById("preview");
+            const divAppend1 = docById("preview");
             divAppend1.style.height = "30px";
             divAppend1.style.marginLeft = "3px";
             divAppend1.style.backgroundColor = platformColor.selectorBackground;
             divAppend1.style.width = "215px";
+            divAppend1.style.lineHeight = "30px";
+            divAppend1.style.cursor = "pointer";
 
-            let divAppend2 = docById("done_");
+            const divAppend2 = docById("done_");
             divAppend2.style.height = "30px";
             divAppend2.style.marginRight = "3px";
             divAppend2.style.backgroundColor = platformColor.selectorBackground;
             divAppend2.style.width = "205px";
-        }
+            divAppend2.style.lineHeight = "30px";
+            divAppend2.style.cursor = "pointer";
+        };
 
         addDivision(false);
-
-        divAppend.onmouseover = function() {
-            this.style.cursor = "pointer";
-        };
 
         let pitchNumber = this.pitchNumber;
         let pitchNumber1 = Number(docById("octaveIn").value);
         let pitchNumber2 = Number(docById("octaveOut").value);
         let divisions = Number(docById("divisions").value);
-        let ratio = [];
-        let compareRatios = [];
-        let ratio1 = [];
-        let ratio2 = [];
-        let ratio3 = [];
+        const ratio = [];
+        const compareRatios = [];
+        const ratio1 = [];
+        const ratio2 = [];
+        const ratio3 = [];
         let ratio4;
-        let index = [];
+        const index = [];
         this.tempRatios = [];
 
-        divAppend.addEventListener("click", function(event) {
-            that.performEqualEdit(event);
-        });
-
-        this.performEqualEdit = function(event) {
+        divAppend.addEventListener("click", (event) => {
             let angle1, angle2, divisionAngle, power, frequency;
             pitchNumber1 = Number(docById("octaveIn").value);
             pitchNumber2 = Number(docById("octaveOut").value);
@@ -772,17 +993,17 @@ function TemperamentWidget() {
                     ratio2[i] = this.tempRatios[i];
                     ratio2[i] = ratio2[i].toFixed(2);
                 }
-                ratio4 = ratio1.filter(function(val) {
+                ratio4 = ratio1.filter((val) => {
                     return ratio2.indexOf(val) == -1;
                 });
 
-                for(let i = 0; i < ratio4.length; i++) {
+                for (let i = 0; i < ratio4.length; i++) {
                     index[i] = ratio1.indexOf(ratio4[i]);
                     ratio3[i] = ratio[index[i]];
                 }
 
                 this.tempRatios = this.tempRatios.concat(ratio3);
-                this.tempRatios.sort(function(a, b) {
+                this.tempRatios.sort((a, b) => {
                     return a - b;
                 });
                 pitchNumber = this.tempRatios.length - 1;
@@ -790,30 +1011,17 @@ function TemperamentWidget() {
                 this.divisions = divisions;
             } else {
                 pitchNumber =
-                    divisions +
-                    Number(pitchNumber) -
-                    Math.abs(pitchNumber1 - pitchNumber2);
+                    divisions + Number(pitchNumber) - Math.abs(pitchNumber1 - pitchNumber2);
                 angle1 =
                     270 +
-                    360 *
-                        (Math.log10(this.tempRatios[pitchNumber1]) /
-                            Math.log10(this.powerBase));
+                    360 * (Math.log10(this.tempRatios[pitchNumber1]) / Math.log10(this.powerBase));
                 angle2 =
                     270 +
-                    360 *
-                        (Math.log10(this.tempRatios[pitchNumber2]) /
-                            Math.log10(this.powerBase));
+                    360 * (Math.log10(this.tempRatios[pitchNumber2]) / Math.log10(this.powerBase));
                 divisionAngle = Math.abs(angle2 - angle1) / divisions;
-                this.tempRatios.splice(
-                    pitchNumber1 + 1,
-                    Math.abs(pitchNumber1 - pitchNumber2) - 1
-                );
+                this.tempRatios.splice(pitchNumber1 + 1, Math.abs(pitchNumber1 - pitchNumber2) - 1);
                 for (let i = 0; i < divisions - 1; i++) {
-                    power =
-                        (Math.min(angle1, angle2) +
-                            divisionAngle * (i + 1) -
-                            270) /
-                        360;
+                    power = (Math.min(angle1, angle2) + divisionAngle * (i + 1) - 270) / 360;
                     ratio[i] = Math.pow(this.powerBase, power);
                     this.tempRatios.splice(pitchNumber1 + 1 + i, 0, ratio[i]);
                     compareRatios[i] = this.tempRatios[i];
@@ -837,16 +1045,13 @@ function TemperamentWidget() {
                 this._circleOfNotes();
             } else if (event.target.innerHTML === "Preview") {
                 //Preview Notes
-                docById("userEdit").innerHTML =
-                    '<div id="wheelDiv2" class="wheelNav"></div>';
+                docById("userEdit").innerHTML = '<div id="wheelDiv2" class="wheelNav"></div>';
                 this.createMainWheel(this.tempRatios, pitchNumber);
                 for (let i = 0; i < pitchNumber; i++) {
                     this.notesCircle.navItems[i].fillAttr = "#e0e0e0";
-                    this.notesCircle.navItems[i].sliceHoverAttr.fill =
-                        "#e0e0e0";
+                    this.notesCircle.navItems[i].sliceHoverAttr.fill = "#e0e0e0";
                     this.notesCircle.navItems[i].slicePathAttr.fill = "#e0e0e0";
-                    this.notesCircle.navItems[i].sliceSelectedAttr.fill =
-                        "#e0e0e0";
+                    this.notesCircle.navItems[i].sliceSelectedAttr.fill = "#e0e0e0";
                 }
                 this.notesCircle.refreshWheel();
                 docById("userEdit").style.paddingLeft = "0px";
@@ -855,56 +1060,60 @@ function TemperamentWidget() {
                 docById("preview").style.marginLeft = "80px";
 
                 //make temperary
-                ratios = this.tempRatios.slice();
+                this.ratios = this.tempRatios.slice();
                 frequency = this.frequencies[0];
                 this.eqTempHzs = [];
                 for (let i = 0; i <= pitchNumber; i++) {
-                    this.eqTempHzs[i] = ratios[i] * frequency;
+                    this.eqTempHzs[i] = this.ratios[i] * frequency;
                     this.eqTempHzs[i] = this.eqTempHzs[i].toFixed(2);
                 }
                 this.eqTempPitchNumber = pitchNumber;
                 this.checkTemperament(compareRatios);
 
-                docById("done_").onclick = function() {
+                docById("done_").onclick = () => {
                     //Go to main Circle of Notes
-                    that.ratios = that.tempRatios.slice();
-                    frequency = that.frequencies[0];
-                    that.frequencies = [];
+                    this.ratios = this.tempRatios.slice();
+                    frequency = this.frequencies[0];
+                    this.frequencies = [];
                     for (let i = 0; i <= pitchNumber; i++) {
-                        that.frequencies[i] = that.ratios[i] * frequency;
-                        that.frequencies[i] = that.frequencies[i].toFixed(2);
+                        this.frequencies[i] = this.ratios[i] * frequency;
+                        this.frequencies[i] = this.frequencies[i].toFixed(2);
                     }
 
-                    that.pitchNumber = pitchNumber;
-                    that.eqTempPitchNumber = null ; 
-                    that.eqTempHzs = [] ; 
-                    that.checkTemperament(compareRatios);
-                    that._circleOfNotes();
+                    this.pitchNumber = pitchNumber;
+                    this.eqTempPitchNumber = null;
+                    this.eqTempHzs = [];
+                    this.checkTemperament(compareRatios);
+                    this._circleOfNotes();
                 };
 
-                docById("preview").onclick = function() {
-                    that.equalEdit();
-                    that.eqTempPitchNumber = null ; 
-                    that.eqTempHzs = [] ; 
+                docById("preview").onclick = () => {
+                    this.equalEdit();
+                    this.eqTempPitchNumber = null;
+                    this.eqTempHzs = [];
                 };
             }
-        };
-    };
+        });
+    }
 
-    this.ratioEdit = function() {
+    /**
+     * Triggerred when the Ratios edit option is selected.
+     * @returns {void}
+     */
+    ratioEdit() {
         this.editMode = "ratio";
         docById("userEdit").innerHTML = "";
-        let ratioEdit = docById("userEdit");
-        ratioEdit.style.backgroundColor = "#c8C8C8";
+        const ratioEdit = docById("userEdit");
+        ratioEdit.style.backgroundColor = "#FFFFFF";
         ratioEdit.innerHTML =
             '<br>Ratio &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="ratioIn" value="1"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="ratioOut" value="1"></input><br><br>';
         ratioEdit.innerHTML +=
             'Recursion &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="recursion" value="1"></input>';
         ratioEdit.style.paddingLeft = "100px";
-        let that = this;
 
-        function addButtons(preview) {
-            let divAppend = document.createElement("div");
+        let divAppend;
+        const addButtons = (preview) => {
+            divAppend = document.createElement("div");
             divAppend.id = "divAppend";
             if (preview) {
                 divAppend.innerHTML =
@@ -918,172 +1127,175 @@ function TemperamentWidget() {
             divAppend.style.height = "32px";
             divAppend.style.marginTop = "40px";
             divAppend.style.overflow = "auto";
+            divAppend.style.lineHeight = "32px";
+            divAppend.style.cursor = "pointer";
             ratioEdit.append(divAppend);
 
-            let divAppend1 = docById("preview");
+            const divAppend1 = docById("preview");
             divAppend1.style.height = "30px";
             divAppend1.style.marginLeft = "3px";
             divAppend1.style.backgroundColor = platformColor.selectorBackground;
+            divAppend1.style.cursor = "pointer";
+            divAppend1.style.lineHeight = "30px";
             divAppend1.style.width = "215px";
 
-            let divAppend2 = docById("done_");
+            const divAppend2 = docById("done_");
             divAppend2.style.height = "30px";
             divAppend2.style.marginRight = "3px";
             divAppend2.style.backgroundColor = platformColor.selectorBackground;
+            divAppend2.style.cursor = "pointer";
+            divAppend2.style.lineHeight = "30px";
             divAppend2.style.width = "205px";
-        }
+        };
 
         addButtons(false);
 
-        divAppend.onmouseover = function() {
-            this.style.cursor = "pointer";
-        };
-
-        divAppend.onclick = function(event) {
-            let input1 = docById("ratioIn").value;
-            let input2 = docById("ratioOut").value;
-            let recursion = docById("recursion").value;
-            let len = that.frequencies.length;
-            let ratio1 = input1 / input2;
-            let ratio = [];
-            let frequency = [];
+        divAppend.onclick = (event) => {
+            const input1 = docById("ratioIn").value;
+            const input2 = docById("ratioOut").value;
+            const recursion = docById("recursion").value;
+            const len = this.frequencies.length;
+            const ratio1 = input1 / input2;
+            const ratio = [];
+            const frequency = [];
             let frequency1;
-            let ratioDifference = [];
-            let index = [];
-            let compareRatios = [];
-            that.tempRatios = that.ratios.slice();
+            const ratioDifference = [];
+            const index = [];
+            const compareRatios = [];
+            this.tempRatios = this.ratios.slice();
 
-            calculateRatios = function(i) {
-                if (frequency[i] < that.frequencies[len - 1]) {
-                    for (let j = 0; j < that.tempRatios.length; j++) {
-                        ratioDifference[j] = ratio[i] - that.tempRatios[j];
+            const calculateRatios = (i) => {
+                if (frequency[i] < this.frequencies[len - 1]) {
+                    for (let j = 0; j < this.tempRatios.length; j++) {
+                        ratioDifference[j] = ratio[i] - this.tempRatios[j];
                         if (ratioDifference[j] < 0) {
                             index.push(j);
-                            that.tempRatios.splice(index[i], 0, ratio[i]);
+                            this.tempRatios.splice(index[i], 0, ratio[i]);
                             break;
                         }
                         if (ratioDifference[j] == 0) {
                             index.push(j);
-                            that.tempRatios.splice(index[i], 1, ratio[i]);
+                            this.tempRatios.splice(index[i], 1, ratio[i]);
                             break;
                         }
                     }
                 } else {
                     ratio[i] = ratio[i] / 2;
-                    frequency[i] = that.frequencies[0] * ratio[i];
+                    frequency[i] = this.frequencies[0] * ratio[i];
                     calculateRatios(i);
                 }
             };
 
             for (let i = 0; i < recursion; i++) {
                 ratio[i] = Math.pow(ratio1, i + 1);
-                frequency[i] = that.frequencies[0] * ratio[i];
+                frequency[i] = this.frequencies[0] * ratio[i];
                 calculateRatios(i);
             }
-            that.tempRatios.sort(function(a, b) {
+            this.tempRatios.sort((a, b) => {
                 return a - b;
             });
-            let pitchNumber = that.tempRatios.length - 1;
+            const pitchNumber = this.tempRatios.length - 1;
 
             if (event.target.innerHTML == "Done") {
-                that.ratios = that.tempRatios.slice();
-                that.typeOfEdit = "nonequal";
-                that.pitchNumber = that.ratios.length - 1;
-                frequency1 = that.frequencies[0];
-                that.frequencies = [];
-                for (let i = 0; i <= that.pitchNumber; i++) {
-                    that.frequencies[i] = that.ratios[i] * frequency1;
-                    that.frequencies[i] = that.frequencies[i].toFixed(2);
+                this.ratios = this.tempRatios.slice();
+                this.typeOfEdit = "nonequal";
+                this.pitchNumber = this.ratios.length - 1;
+                frequency1 = this.frequencies[0];
+                this.frequencies = [];
+                for (let i = 0; i <= this.pitchNumber; i++) {
+                    this.frequencies[i] = this.ratios[i] * frequency1;
+                    this.frequencies[i] = this.frequencies[i].toFixed(2);
                 }
 
-                for (let i = 0; i < that.ratios.length; i++) {
-                    compareRatios[i] = that.ratios[i];
+                for (let i = 0; i < this.ratios.length; i++) {
+                    compareRatios[i] = this.ratios[i];
                     compareRatios[i] = compareRatios[i].toFixed(2);
                 }
 
-                that.checkTemperament(compareRatios);
-                that._circleOfNotes();
+                this.checkTemperament(compareRatios);
+                this._circleOfNotes();
             } else if (event.target.innerHTML == "Preview") {
                 //Preview Notes
-                docById("userEdit").innerHTML =
-                    '<div id="wheelDiv2" class="wheelNav"></div>';
-                that.createMainWheel(that.tempRatios, pitchNumber);
+                docById("userEdit").innerHTML = '<div id="wheelDiv2" class="wheelNav"></div>';
+                this.createMainWheel(this.tempRatios, pitchNumber);
                 for (let i = 0; i < pitchNumber; i++) {
-                    that.notesCircle.navItems[i].fillAttr = "#e0e0e0";
-                    that.notesCircle.navItems[i].sliceHoverAttr.fill =
-                        "#e0e0e0";
-                    that.notesCircle.navItems[i].slicePathAttr.fill = "#e0e0e0";
-                    that.notesCircle.navItems[i].sliceSelectedAttr.fill =
-                        "#e0e0e0";
+                    this.notesCircle.navItems[i].fillAttr = "#e0e0e0";
+                    this.notesCircle.navItems[i].sliceHoverAttr.fill = "#e0e0e0";
+                    this.notesCircle.navItems[i].slicePathAttr.fill = "#e0e0e0";
+                    this.notesCircle.navItems[i].sliceSelectedAttr.fill = "#e0e0e0";
                 }
-                that.notesCircle.refreshWheel();
+                this.notesCircle.refreshWheel();
                 docById("userEdit").style.paddingLeft = "0px";
                 addButtons(true);
                 divAppend.style.marginTop = docById("wheelDiv2").style.height;
                 docById("preview").style.marginLeft = "100px";
-                
+
                 //make temperary
-                ratios = that.tempRatios.slice();
-                that.typeOfEdit = "nonequal";
-                that.NEqTempPitchNumber = ratios.length - 1;
-                frequency1 = that.frequencies[0];
-                that.NEqTempHzs = [];
-                for (let i = 0; i <= that.NEqTempPitchNumber; i++) {
-                    that.NEqTempHzs[i] = ratios[i] * frequency1;
-                    that.NEqTempHzs[i] = that.NEqTempHzs[i].toFixed(2);
+                this.ratios = this.tempRatios.slice();
+                this.typeOfEdit = "nonequal";
+                this.NEqTempPitchNumber = this.ratios.length - 1;
+                frequency1 = this.frequencies[0];
+                this.NEqTempHzs = [];
+                for (let i = 0; i <= this.NEqTempPitchNumber; i++) {
+                    this.NEqTempHzs[i] = this.ratios[i] * frequency1;
+                    this.NEqTempHzs[i] = this.NEqTempHzs[i].toFixed(2);
                 }
 
-                for (let i = 0; i < ratios.length; i++) {
-                    compareRatios[i] = ratios[i];
+                for (let i = 0; i < this.ratios.length; i++) {
+                    compareRatios[i] = this.ratios[i];
                     compareRatios[i] = compareRatios[i].toFixed(2);
                 }
-                that.checkTemperament(compareRatios);
-                
-                docById("done_").onclick = function() {
+                this.checkTemperament(compareRatios);
+
+                docById("done_").onclick = () => {
                     //Go to main Circle of Notes
-                    that.ratios = that.tempRatios.slice();
-                    that.pitchNumber = that.ratios.length - 1;
-                    frequency1 = that.frequencies[0];
-                    that.frequencies = [];
-                    for (let i = 0; i <= that.pitchNumber; i++) {
-                        that.frequencies[i] = that.ratios[i] * frequency1;
-                        that.frequencies[i] = that.frequencies[i].toFixed(2);
+                    this.ratios = this.tempRatios.slice();
+                    this.pitchNumber = this.ratios.length - 1;
+                    frequency1 = this.frequencies[0];
+                    this.frequencies = [];
+                    for (let i = 0; i <= this.pitchNumber; i++) {
+                        this.frequencies[i] = this.ratios[i] * frequency1;
+                        this.frequencies[i] = this.frequencies[i].toFixed(2);
                     }
 
-                    for (let i = 0; i < that.ratios.length; i++) {
-                        compareRatios[i] = that.ratios[i];
+                    for (let i = 0; i < this.ratios.length; i++) {
+                        compareRatios[i] = this.ratios[i];
                         compareRatios[i] = compareRatios[i].toFixed(2);
                     }
 
-                    that.checkTemperament(compareRatios);
-                    that._circleOfNotes();
-                    that.NEqTempPitchNumber = null ;
-                    that.NEqTempHzs = [] ;
+                    this.checkTemperament(compareRatios);
+                    this._circleOfNotes();
+                    this.NEqTempPitchNumber = null;
+                    this.NEqTempHzs = [];
                 };
 
-                docById("preview").onclick = function() {
-                    that.ratioEdit();
-                    that.NEqTempPitchNumber = null ;
-                    that.NEqTempHzs = [] ;
+                docById("preview").onclick = () => {
+                    this.ratioEdit();
+                    this.NEqTempPitchNumber = null;
+                    this.NEqTempHzs = [];
                 };
             }
         };
-    };
+    }
 
-    this.arbitraryEdit = function() {
-        this.editMode = "arbitrary" ;        
+    /**
+     * Triggerred when the Arbitrary edit option is selected.
+     * @returns {void}
+     */
+    arbitraryEdit() {
+        this.editMode = "arbitrary";
         docById("userEdit").innerHTML = "";
-        let arbitraryEdit = docById("userEdit");
-        arbitraryEdit.innerHTML =
-            '<br><div id="wheelDiv3" class="wheelNav"></div>';
+        const arbitraryEdit = docById("userEdit");
+        arbitraryEdit.innerHTML = '<br><div id="wheelDiv3" class="wheelNav"></div>';
         arbitraryEdit.style.paddingLeft = "0px";
+        arbitraryEdit.style.backgroundColor = "#FFFFFF";
 
-        let radius = 128;
-        let height = 2 * radius;
+        const radius = 128;
+        const height = 2 * radius;
         let angle1 = [];
         this.tempRatios1 = this.ratios.slice();
 
-        this._createInnerWheel = function(ratios, pitchNumber) {
+        this._createInnerWheel = (ratios, pitchNumber) => {
             if (this.wheel1 !== undefined) {
                 docById("wheelDiv4").display = "none";
                 this.wheel1.removeWheel();
@@ -1094,7 +1306,7 @@ function TemperamentWidget() {
             if (pitchNumber == undefined) {
                 pitchNumber = this.pitchNumber;
             }
-            let labels = [];
+            const labels = [];
             let label;
             for (let j = 0; j < pitchNumber; j++) {
                 label = j.toString();
@@ -1104,6 +1316,8 @@ function TemperamentWidget() {
             docById("wheelDiv4").style.background = "none";
             docById("wheelDiv4").style.position = "relative";
             docById("wheelDiv4").style.zIndex = 5;
+            docById("wheelDiv4").style.marginTop = "13.5px";
+            docById("wheelDiv4").style.marginLeft = "37.5px";
             this.wheel1 = new wheelnav("wheelDiv4");
             this.wheel1.wheelRadius = 200;
             this.wheel1.navItemsEnabled = false;
@@ -1116,19 +1330,16 @@ function TemperamentWidget() {
             this.wheel1.sliceInitPathCustom = this.wheel1.slicePathCustom;
             this.wheel1.initWheel(labels);
 
-            let baseAngle = [];
-            let sliceAngle = [];
-            let angle = [];
-            let angleDiff = [];
+            const baseAngle = [];
+            const sliceAngle = [];
+            const angle = [];
+            const angleDiff = [];
             for (let i = 0; i < this.wheel1.navItemCount; i++) {
                 this.wheel1.navItems[i].fillAttr = "#e0e0e0";
-                this.wheel1.navItems[i].titleAttr.font =
-                    "20 20px Impact, Charcoal, sans-serif";
+                this.wheel1.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
                 this.wheel1.navItems[i].titleSelectedAttr.font =
                     "20 20px Impact, Charcoal, sans-serif";
-                angle[i] =
-                    270 +
-                    360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase));
+                angle[i] = 270 + 360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase));
                 if (i !== 0) {
                     if (i == this.pitchNumber - 1) {
                         angleDiff[i - 1] = angle[0] + 360 - angle[i];
@@ -1157,30 +1368,30 @@ function TemperamentWidget() {
             this.wheel1.slicePathCustom.menuRadius = menuRadius;
 
             if (docById("frequencySlider") !== null) {
-                docById("frequencySlider").oninput = function() {
-                    that._refreshInnerWheel();
+                docById("frequencySlider").oninput = () => {
+                    this._refreshInnerWheel();
                 };
             }
             this.wheel1.createWheel();
         };
-        arbitraryEdit.innerHTML +=
-            '<div id="wheelDiv4" class="wheelNav"></div>';
+        arbitraryEdit.innerHTML += '<div id="wheelDiv4" class="wheelNav"></div>';
         this._createInnerWheel();
 
         arbitraryEdit.innerHTML +=
             '<canvas id="circ1" width = ' +
-            BUTTONDIVWIDTH +
+            TemperamentWidget.BUTTONDIVWIDTH +
             "px height = " +
             height +
             "px></canvas>";
 
-        let canvas = docById("circ1");
+        const canvas = docById("circ1");
         canvas.style.position = "absolute";
         canvas.style.zIndex = 1;
-        canvas.style.marginTop = "-305px";
-        let ctx = canvas.getContext("2d");
-        let centerX = canvas.width / 2;
-        let centerY = canvas.height / 2;
+        canvas.style.marginTop = "-310px";
+        canvas.style.marginLeft = "-5px";
+        const ctx = canvas.getContext("2d");
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
 
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
@@ -1190,7 +1401,7 @@ function TemperamentWidget() {
         ctx.strokeStyle = "#003300";
         ctx.stroke();
 
-        this._createOuterWheel = function(ratios, pitchNumber) {
+        this._createOuterWheel = (ratios, pitchNumber) => {
             if (this.wheel !== undefined) {
                 docById("wheelDiv3").display = "none";
                 this.wheel.removeWheel();
@@ -1215,20 +1426,18 @@ function TemperamentWidget() {
             this.wheel.titleRotateAngle = 90;
             this.wheel.navItemsEnabled = false;
 
-            let minutes = [];
-            let angle = [];
-            let angleDiff1 = [];
-            let baseAngle1 = [];
-            let sliceAngle1 = [];
+            const minutes = [];
+            const angle = [];
+            const angleDiff1 = [];
+            const baseAngle1 = [];
+            const sliceAngle1 = [];
             angle1 = [];
             for (let i = 0; i <= pitchNumber; i++) {
                 if (i !== pitchNumber) {
                     minutes.push("|");
                 }
                 //Change angles of outer circle
-                angle[i] =
-                    270 +
-                    360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase));
+                angle[i] = 270 + 360 * (Math.log10(ratios[i]) / Math.log10(this.powerBase));
                 if (i !== 0) {
                     if (i == pitchNumber - 1) {
                         angleDiff1[i - 1] = angle[0] + 360 - angle[i];
@@ -1255,76 +1464,71 @@ function TemperamentWidget() {
             docById("wheelDiv3").style.zIndex = 10;
             docById("wheelDiv3").style.marginTop = 15 + "px";
             docById("wheelDiv3").style.marginLeft = 37 + "px";
-            docById("wheelDiv3").addEventListener("mouseover", function(e) {
-                that.arbitraryEditSlider(e, angle1, ratios, pitchNumber);
-            });
+            setTimeout(() => {
+                docById("wheelDiv3").addEventListener("mouseover", (e) => {
+                    this.arbitraryEditSlider(e, angle1, ratios, pitchNumber);
+                });
+            },1500);
         };
 
         this._createOuterWheel();
 
-        let that = this;
-
-        let divAppend = document.createElement("div");
+        const divAppend = document.createElement("div");
         divAppend.id = "divAppend";
         divAppend.innerHTML = "Done";
         divAppend.style.textAlign = "center";
-        divAppend.style.paddingTop = "5px";
         divAppend.style.backgroundColor = platformColor.selectorBackground;
-        divAppend.style.height = "25px";
+        divAppend.style.height = "30px";
         divAppend.style.marginTop = "40px";
         divAppend.style.overflow = "auto";
+        divAppend.style.cursor = "pointer";
+        divAppend.style.lineHeight = "30px";
         arbitraryEdit.append(divAppend);
 
-        divAppend.onmouseover = function() {
-            this.style.cursor = "pointer";
-        };
-
-        divAppend.onclick = function() {
-            that.ratios = that.tempRatios1.slice();
-            that.typeOfEdit = "nonequal";
-            that.pitchNumber = that.ratios.length - 1;
-            let compareRatios = [];
-            let frequency1 = that.frequencies[0];
-            that.frequencies = [];
-            for (let i = 0; i < that.ratios.length; i++) {
-                that.frequencies[i] = that.ratios[i] * frequency1;
-                that.frequencies[i] = that.frequencies[i].toFixed(2);
+        divAppend.onclick = () => {
+            this.ratios = this.tempRatios1.slice();
+            this.typeOfEdit = "nonequal";
+            this.pitchNumber = this.ratios.length - 1;
+            const compareRatios = [];
+            const frequency1 = this.frequencies[0];
+            this.frequencies = [];
+            for (let i = 0; i < this.ratios.length; i++) {
+                this.frequencies[i] = this.ratios[i] * frequency1;
+                this.frequencies[i] = this.frequencies[i].toFixed(2);
             }
 
-            for (let i = 0; i < that.ratios.length; i++) {
-                compareRatios[i] = that.ratios[i];
+            for (let i = 0; i < this.ratios.length; i++) {
+                compareRatios[i] = this.ratios[i];
                 compareRatios[i] = compareRatios[i].toFixed(2);
             }
 
-            that.checkTemperament(compareRatios);
-            that._circleOfNotes();
+            this.checkTemperament(compareRatios);
+            this._circleOfNotes();
         };
-    };
+    }
 
-    this.arbitraryEditSlider = function(event, angle, ratios, pitchNumber) {
-        let frequency = this.frequencies[0];
-        let frequencies = [];
+    /**
+     * Triggerred when in Arbritrary edit option.
+     * The slider with option to slide the values of frequesncies opens.
+     * @returns {void}
+     */
+    arbitraryEditSlider(event, angle, ratios, pitchNumber) {
+        const frequency = this.frequencies[0];
+        const frequencies = [];
         for (let j = 0; j <= pitchNumber; j++) {
             frequencies[j] = ratios[j] * frequency;
             frequencies[j] = frequencies[j].toFixed(2);
         }
-        let x, y;
-        let that = this;
+
         for (let i = 0; i < pitchNumber; i++) {
             if (event.target.parentNode.id == "wheelnav-wheelDiv3-title-" + i) {
-                x =
-                    event.clientX -
-                    docById("wheelDiv3").getBoundingClientRect().left;
-                y =
-                    event.clientY -
-                    docById("wheelDiv3").getBoundingClientRect().top;
                 if (docById("noteInfo1") !== null) {
                     docById("noteInfo1").remove();
                 }
                 docById("wheelDiv3").innerHTML +=
-                    '<div class="popup" id="noteInfo1" style="width:180px; height:135px;"><span class="popuptext" id="myPopup"></span></div>';
+                    '<div class="popup" id="noteInfo1" style="width:180px; height:146px;"><span class="popuptext" id="myPopup"></span></div>';
                 docById("noteInfo1").innerHTML +=
-                    '<img src="header-icons/close-button.svg" id="close" title="close" alt="close" height=20px width=20px align="right">';
+                    '<img src="header-icons/close-button.svg" id="close" title="Close" alt="close" height=20px width=20px align="right">';
                 docById("noteInfo1").innerHTML +=
                     '<br><center><input type="range" class="sliders" id = "frequencySlider" style="width:170px; background:white; border:0;" min="' +
                     frequencies[i] +
@@ -1336,35 +1540,42 @@ function TemperamentWidget() {
                     frequencies[i] +
                     "</span>";
                 docById("noteInfo1").innerHTML +=
-                    '<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>Done</center><div>';
+                    '<br><br><div id="done" style="background:#8cc6ff; cursor: pointer"><center>Done</center><div>';
 
                 docById("noteInfo1").style.top = "100px";
                 docById("noteInfo1").style.left = "90px";
+                docById("done").style.height = "30px";
+                docById("done").style.lineHeight = "30px";
 
-                docById("frequencySlider").oninput = function() {
-                    that._refreshInnerWheel();
+                docById("close").style.cursor = "pointer";
+                docById("frequencySlider").oninput = () => {
+                    this._refreshInnerWheel();
                 };
-                docById("done").onclick = function() {
-                    that.tempRatios1 = that.tempRatios.slice();
-                    let pitchNumber = that.tempRatios1.length - 1;
-                    that._createOuterWheel(that.tempRatios1, pitchNumber);
+                docById("done").onclick = () => {
+                    this.tempRatios1 = this.tempRatios.slice();
+                    const pitchNumber = this.tempRatios1.length - 1;
+                    this._createOuterWheel(this.tempRatios1, pitchNumber);
                 };
-                docById("close").onclick = function() {
-                    that.tempRatios = that.tempRatios1.slice();
-                    let pitchNumber = that.tempRatios.length - 1;
-                    that._createInnerWheel(that.tempRatios, pitchNumber);
+                docById("close").onclick = () => {
+                    this.tempRatios = this.tempRatios1.slice();
+                    const pitchNumber = this.tempRatios.length - 1;
+                    this._createInnerWheel(this.tempRatios, pitchNumber);
                     docById("noteInfo1").remove();
                 };
             }
         }
-    };
+    }
 
-    this._refreshInnerWheel = function() {
+    /**
+     * Triggerred when in Arbritrary edit option.
+     * The slider with option to slide the values of frequesncies opens for a refreshed value.
+     * @returns {void}
+     */
+    _refreshInnerWheel() {
         docById("frequencydiv").innerHTML = docById("frequencySlider").value;
-        let frequency = docById("frequencySlider").value;
-        let ratio = frequency / this.frequencies[0];
-        let labels = [];
-        let ratioDifference = [];
+        const frequency = docById("frequencySlider").value;
+        const ratio = frequency / this.frequencies[0];
+        const ratioDifference = [];
         this.tempRatios = this.tempRatios1.slice();
 
         let index;
@@ -1382,86 +1593,91 @@ function TemperamentWidget() {
                 break;
             }
         }
-        let pitchNumber = this.tempRatios.length - 1;
-        this._logo.resetSynth(0);
-        this._logo.synth.trigger(
-            0, frequency, Singer.defaultBPMFactor * 0.01, "electronic synth", null, null
+        const pitchNumber = this.tempRatios.length - 1;
+        logo.resetSynth(0);
+        logo.synth.trigger(
+            0,
+            frequency,
+            Singer.defaultBPMFactor * 0.01,
+            "electronic synth",
+            null,
+            null
         );
         this._createInnerWheel(this.tempRatios, pitchNumber);
-    };
+    }
 
-    this.octaveSpaceEdit = function() {
-        this.editMode = "octave" ;        
+    /**
+     * Triggerred when in octave space edit option.
+     * @returns {void}
+     */
+    octaveSpaceEdit() {
+        this.editMode = "octave";
         docById("userEdit").innerHTML = "";
-        let len = this.ratios.length;
-        let octaveRatio = this.ratios[len - 1];
-        let octaveSpaceEdit = docById("userEdit");
-        octaveSpaceEdit.style.backgroundColor = "#c8C8C8";
+        const len = this.ratios.length;
+        const octaveRatio = this.ratios[len - 1];
+        const octaveSpaceEdit = docById("userEdit");
+        octaveSpaceEdit.style.backgroundColor = "#FFFFFF";
         octaveSpaceEdit.innerHTML =
             '<br><br>Octave Space &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="startNote" value="' +
             octaveRatio +
             '" style="width:50px;"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="endNote" value="1" style="width:50px;"></input><br><br>';
         octaveSpaceEdit.style.paddingLeft = "70px";
-        let that = this;
 
-        let divAppend = document.createElement("div");
+        const divAppend = document.createElement("div");
         divAppend.id = "divAppend";
         divAppend.innerHTML = "Done";
         divAppend.style.textAlign = "center";
-        divAppend.style.paddingTop = "5px";
         divAppend.style.marginLeft = "-70px";
         divAppend.style.backgroundColor = platformColor.selectorBackground;
-        divAppend.style.height = "25px";
+        divAppend.style.height = "30px";
         divAppend.style.marginTop = "40px";
-        divAppend.style.overflow = "auto";
+        divAppend.style.lineHeight = divAppend.style.height;
+        divAppend.style.cursor = "pointer";
         octaveSpaceEdit.append(divAppend);
 
-        divAppend.onmouseover = function() {
-            this.style.cursor = "pointer";
-        };
-
-        divAppend.onclick = function() {
-            let startRatio = docById("startNote").value;
-            let endRatio = docById("endNote").value;
-            let ratio = startRatio / endRatio;
+        divAppend.onclick = () => {
+            const startRatio = docById("startNote").value;
+            const endRatio = docById("endNote").value;
+            const ratio = startRatio / endRatio;
             let msg;
             if (ratio != 2) {
-                msg =
-                    "Octave Space has changed. This changes temperament significantly";
+                msg = "Octave Space has changed. This changes temperament significantly";
                 if (!confirm(msg)) {
                     return;
                 }
             }
-            let powers = [];
-            let compareRatios = [];
-            let frequency = that.frequencies[0];
-            that.frequencies = [];
+            const powers = [];
+            const compareRatios = [];
+            const frequency = this.frequencies[0];
+            this.frequencies = [];
 
             for (let i = 0; i < len; i++) {
-                powers[i] =
-                    12 *
-                    (Math.log10(that.ratios[i]) / Math.log10(that.powerBase));
-                that.ratios[i] = Math.pow(ratio, powers[i] / 12);
-                compareRatios[i] = that.ratios[i].toFixed(2);
-                that.frequencies[i] = that.ratios[i] * frequency;
-                that.frequencies[i] = that.frequencies[i].toFixed(2);
+                powers[i] = 12 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
+                this.ratios[i] = Math.pow(ratio, powers[i] / 12);
+                compareRatios[i] = this.ratios[i].toFixed(2);
+                this.frequencies[i] = this.ratios[i] * frequency;
+                this.frequencies[i] = this.frequencies[i].toFixed(2);
             }
-            that.powerBase = ratio;
-            that.typeOfEdit = "nonequal";
-            that.checkTemperament(compareRatios);
+            this.powerBase = ratio;
+            this.typeOfEdit = "nonequal";
+            this.checkTemperament(compareRatios);
             if (ratio != 2) {
-                that.octaveChanged = true;
+                this.octaveChanged = true;
             }
-            that._circleOfNotes();
+            this._circleOfNotes();
         };
-    };
+    }
 
-    this.checkTemperament = function(ratios) {
-        let intervals = [];
+    /**
+     * Checks for temperament.
+     * @returns {void}
+     */
+    checkTemperament(ratios) {
+        const intervals = [];
         let selectedTemperament;
         let t, temperamentRatios, ratiosEqual;
 
-        for (let temperament in TEMPERAMENT) {
+        for (const temperament in TEMPERAMENT) {
             if (!isCustom(temperament)) {
                 t = TEMPERAMENT[temperament];
                 temperamentRatios = [];
@@ -1472,7 +1688,7 @@ function TemperamentWidget() {
                 }
                 ratiosEqual =
                     ratios.length == temperamentRatios.length &&
-                    ratios.every(function(element, index) {
+                    ratios.every((element, index) => {
                         return element === temperamentRatios[index];
                     });
 
@@ -1489,9 +1705,13 @@ function TemperamentWidget() {
             this.inTemperament = "custom";
             temperamentCell.innerHTML = this.inTemperament;
         }
-    };
+    }
 
-    this._save = function() {
+    /**
+     * Triggerred when Save button is pressed. New action blocks are generated.
+     * @returns {void}
+     */
+    _save() {
         let notesMatch = false;
         // let index = [];
         this.notes = [];
@@ -1504,22 +1724,19 @@ function TemperamentWidget() {
                     if (this.ratios[i] == this.ratiosNotesPair[j][0]) {
                         notesMatch = true;
                         this.notes[i] =
-                            this.ratiosNotesPair[j][1][0] +
-                            "(+0)" +
-                            this.ratiosNotesPair[j][1][1];
+                            this.ratiosNotesPair[j][1][0] + "(+0)" + this.ratiosNotesPair[j][1][1];
                         break;
                     }
                 }
                 if (!notesMatch) {
-                    cents =
-                        1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
+                    cents = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
                     centsDiff = [];
                     centsDiff1 = [];
                     for (let j = 0; j < this.cents.length; j++) {
                         centsDiff[j] = cents - this.cents[j];
                         centsDiff1[j] = Math.abs(cents - this.cents[j]);
                     }
-                    min = centsDiff1.reduce(function(a, b) {
+                    min = centsDiff1.reduce((a, b) => {
                         return Math.min(a, b);
                     });
                     idx = centsDiff1.indexOf(min);
@@ -1546,32 +1763,18 @@ function TemperamentWidget() {
         // Global value
         OCTAVERATIO = this.powerBase;
 
-        let value = this._logo.blocks.findUniqueTemperamentName(
-            this.inTemperament
-        );
-        this.inTemperament = value ; // change from temporary "custom" to "custom1" or "custom2" .. 
-        let newStack = [
+        const value = logo.blocks.findUniqueTemperamentName(this.inTemperament);
+        this.inTemperament = value; // change from temporary "custom" to "custom1" or "custom2" ..
+        const newStack = [
             [0, "temperament1", 100, 100, [null, 1, 2, null]],
             [1, ["text", { value: value }], 0, 0, [0]],
             [2, ["storein"], 0, 0, [0, 3, 4, 5]],
-            [3, ["text", { value: this._logo.synth.startingPitch }], 0, 0, [2]],
+            [3, ["text", { value: logo.synth.startingPitch }], 0, 0, [2]],
             [4, ["number", { value: this.frequencies[0] }], 0, 0, [2]],
             [5, ["octavespace"], 0, 0, [2, 6, 9]],
             [6, ["divide"], 0, 0, [5, 7, 8]],
-            [
-                7,
-                ["number", { value: rationalToFraction(OCTAVERATIO)[0] }],
-                0,
-                0,
-                [6]
-            ],
-            [
-                8,
-                ["number", { value: rationalToFraction(OCTAVERATIO)[1] }],
-                0,
-                0,
-                [6]
-            ],
+            [7, ["number", { value: rationalToFraction(OCTAVERATIO)[0] }], 0, 0, [6]],
+            [8, ["number", { value: rationalToFraction(OCTAVERATIO)[1] }], 0, 0, [6]],
             [9, "vspace", 0, 0, [5, 10]]
         ];
         let previousBlock = 9;
@@ -1581,8 +1784,7 @@ function TemperamentWidget() {
             if (
                 this.inTemperament === "equal" ||
                 this.inTemperament === "1/3 comma meantone" ||
-                (this.typeOfEdit === "equal" &&
-                    this.divisions === this.pitchNumber)
+                (this.typeOfEdit === "equal" && this.divisions === this.pitchNumber)
             ) {
                 newStack.push([
                     idx,
@@ -1591,63 +1793,21 @@ function TemperamentWidget() {
                     0,
                     [previousBlock, idx + 1, idx + 8, idx + 12]
                 ]);
-                newStack.push([
-                    idx + 1,
-                    "multiply",
-                    0,
-                    0,
-                    [idx, idx + 2, idx + 3]
-                ]);
+                newStack.push([idx + 1, "multiply", 0, 0, [idx, idx + 2, idx + 3]]);
                 newStack.push([
                     idx + 2,
-                    ["namedbox", { value: this._logo.synth.startingPitch }],
+                    ["namedbox", { value: logo.synth.startingPitch }],
                     0,
                     0,
                     [idx + 1]
                 ]);
-                newStack.push([
-                    idx + 3,
-                    ["power"],
-                    0,
-                    0,
-                    [idx + 1, idx + 4, idx + 5]
-                ]);
-                newStack.push([
-                    idx + 4,
-                    ["number", { value: this.powerBase }],
-                    0,
-                    0,
-                    [idx + 3]
-                ]);
-                newStack.push([
-                    idx + 5,
-                    ["divide"],
-                    0,
-                    0,
-                    [idx + 3, idx + 6, idx + 7]
-                ]);
-                newStack.push([
-                    idx + 6,
-                    ["number", { value: i }],
-                    0,
-                    0,
-                    [idx + 5]
-                ]);
-                newStack.push([
-                    idx + 7,
-                    ["number", { value: this.pitchNumber }],
-                    0,
-                    0,
-                    [idx + 5]
-                ]);
+                newStack.push([idx + 3, ["power"], 0, 0, [idx + 1, idx + 4, idx + 5]]);
+                newStack.push([idx + 4, ["number", { value: this.powerBase }], 0, 0, [idx + 3]]);
+                newStack.push([idx + 5, ["divide"], 0, 0, [idx + 3, idx + 6, idx + 7]]);
+                newStack.push([idx + 6, ["number", { value: i }], 0, 0, [idx + 5]]);
+                newStack.push([idx + 7, ["number", { value: this.pitchNumber }], 0, 0, [idx + 5]]);
                 newStack.push([idx + 8, "vspace", 0, 0, [idx, idx + 9]]);
-                newStack.push([
-                    idx + 9,
-                    ["pitch"],
-                    0,
-                    0,
-                    [idx + 8, idx + 10, idx + 11, null]
-                ]);
+                newStack.push([idx + 9, ["pitch"], 0, 0, [idx + 8, idx + 10, idx + 11, null]]);
                 if (!isCustom(this.inTemperament)) {
                     newStack.push([
                         idx + 10,
@@ -1669,10 +1829,7 @@ function TemperamentWidget() {
                         [
                             "text",
                             {
-                                value: this.notes[i].substring(
-                                    0,
-                                    this.notes[i].length - 1
-                                )
+                                value: this.notes[i].substring(0, this.notes[i].length - 1)
                             }
                         ],
                         0,
@@ -1702,55 +1859,31 @@ function TemperamentWidget() {
                     0,
                     [previousBlock, idx + 1, idx + 6, idx + 10]
                 ]);
-                newStack.push([
-                    idx + 1,
-                    "multiply",
-                    0,
-                    0,
-                    [idx, idx + 2, idx + 3]
-                ]);
+                newStack.push([idx + 1, "multiply", 0, 0, [idx, idx + 2, idx + 3]]);
                 newStack.push([
                     idx + 2,
-                    ["namedbox", { value: this._logo.synth.startingPitch }],
+                    ["namedbox", { value: logo.synth.startingPitch }],
                     0,
                     0,
                     [idx + 1]
                 ]);
-                newStack.push([
-                    idx + 3,
-                    ["divide"],
-                    0,
-                    0,
-                    [idx + 1, idx + 4, idx + 5]
-                ]);
+                newStack.push([idx + 3, ["divide"], 0, 0, [idx + 1, idx + 4, idx + 5]]);
                 newStack.push([
                     idx + 4,
-                    [
-                        "number",
-                        { value: rationalToFraction(this.ratios[i])[0] }
-                    ],
+                    ["number", { value: rationalToFraction(this.ratios[i])[0] }],
                     0,
                     0,
                     [idx + 3]
                 ]);
                 newStack.push([
                     idx + 5,
-                    [
-                        "number",
-                        { value: rationalToFraction(this.ratios[i])[1] }
-                    ],
+                    ["number", { value: rationalToFraction(this.ratios[i])[1] }],
                     0,
                     0,
                     [idx + 3]
                 ]);
                 newStack.push([idx + 6, "vspace", 0, 0, [idx, idx + 7]]);
-                newStack.push([
-                    idx + 7,
-                    ["pitch"],
-                    0,
-                    0,
-                    [idx + 6, idx + 8, idx + 9, null]
-                ]);
+                newStack.push([idx + 7, ["pitch"], 0, 0, [idx + 6, idx + 8, idx + 9, null]]);
 
                 if (!isCustom(this.inTemperament)) {
                     newStack.push([
@@ -1773,10 +1906,7 @@ function TemperamentWidget() {
                         [
                             "text",
                             {
-                                value: this.notes[i].substring(
-                                    0,
-                                    this.notes[i].length - 1
-                                )
+                                value: this.notes[i].substring(0, this.notes[i].length - 1)
                             }
                         ],
                         0,
@@ -1800,23 +1930,23 @@ function TemperamentWidget() {
                 previousBlock = idx + 10;
             }
         }
-        this._logo.blocks.loadNewBlocks(newStack);
-        this._logo.textMsg(_("New action block generated!"));
+        logo.blocks.loadNewBlocks(newStack);
+        logo.textMsg(_("New action block generated!"));
 
-        let len = this._logo.synth.startingPitch.length;
-        let note = this._logo.synth.startingPitch.substring(0, len - 1);
-        let octave = this._logo.synth.startingPitch.slice(-1);
-        let newStack1 = [
+        const len = logo.synth.startingPitch.length;
+        const note = logo.synth.startingPitch.substring(0, len - 1);
+        const octave = logo.synth.startingPitch.slice(-1);
+        const newStack1 = [
             [0, "settemperament", 100, 100, [null, 1, 2, 3, null]],
             [1, ["temperamentname", { value: this.inTemperament }], 0, 0, [0]],
             [2, ["notename", { value: note }], 0, 0, [0]],
             [3, ["number", { value: octave }], 0, 0, [0]]
         ];
-        this._logo.blocks.loadNewBlocks(newStack1);
-        this._logo.textMsg(_("New action block generated!"));
+        logo.blocks.loadNewBlocks(newStack1);
+        logo.textMsg(_("New action block generated!"));
 
         let number;
-        if (isCustom(this.inTemperament)) {   
+        if (isCustom(this.inTemperament)) {
             TEMPERAMENT[this.inTemperament] = [];
             TEMPERAMENT[this.inTemperament]["pitchNumber"] = this.pitchNumber;
             updateTemperaments();
@@ -1831,37 +1961,54 @@ function TemperamentWidget() {
         }
 
         if (isCustom(this.inTemperament)) {
-            this._logo.customTemperamentDefined = true;
-            this._logo.blocks.protoBlockDict["custompitch"].hidden = false;
-            this._logo.blocks.palettes.updatePalettes("pitch");
+            logo.customTemperamentDefined = true;
+            logo.blocks.protoBlockDict["custompitch"].hidden = false;
+            logo.blocks.palettes.updatePalettes("pitch");
         }
-    };
+    }
 
-    this.playNote = function(pitchNumber) {
-        this._logo.resetSynth(0);
-        let duration = 1 / 2;
+    /**
+     * Triggerred when play button is pressed on a single note in table.
+     * Notes are displayed in sequence and can be played one after another.
+     * @returns {void}
+     */
+    playNote(pitchNumber) {
+        logo.resetSynth(0);
+        const duration = 1 / 2;
         let notes;
         if (docById("wheelDiv4") == null) {
             notes = this.frequencies[pitchNumber];
-            if (this.editMode=="equal" && this.eqTempHzs && this.eqTempHzs.length) notes = this.eqTempHzs[pitchNumber] ;
-            else if (this.editMode=="ratio" && this.NEqTempHzs && this.NEqTempHzs.length) notes = this.NEqTempHzs[pitchNumber] ;
+            if (this.editMode == "equal" && this.eqTempHzs && this.eqTempHzs.length)
+                notes = this.eqTempHzs[pitchNumber];
+            else if (this.editMode == "ratio" && this.NEqTempHzs && this.NEqTempHzs.length)
+                notes = this.NEqTempHzs[pitchNumber];
         } else {
             notes = this.tempRatios1[pitchNumber] * this.frequencies[0];
         }
 
-        this._logo.synth.trigger(
-            0, notes, Singer.defaultBPMFactor * duration, "electronic synth", null, null
+        logo.synth.trigger(
+            0,
+            notes,
+            Singer.defaultBPMFactor * duration,
+            "electronic synth",
+            null,
+            null
         );
-    };
+    }
 
-    this.playAll = function() {
+    /**
+     * Triggerred when play button is pressed.
+     * All Notes are played in sequence from the start.
+     * @returns {void}
+     */
+    playAll() {
         let p = 0;
         this.playbackForward = true;
         this._playing = !this._playing;
 
-        this._logo.resetSynth(0);
+        logo.resetSynth(0);
 
-        let cell = this.playButton;
+        const cell = this.playButton;
         if (this._playing) {
             cell.innerHTML =
                 '&nbsp;&nbsp;<img src="header-icons/' +
@@ -1871,13 +2018,13 @@ function TemperamentWidget() {
                 '" alt="' +
                 _("Stop") +
                 '" height="' +
-                ICONSIZE +
+                TemperamentWidget.ICONSIZE +
                 '" width="' +
-                ICONSIZE +
+                TemperamentWidget.ICONSIZE +
                 '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
         } else {
-            this._logo.synth.setMasterVolume(0);
-            this._logo.synth.stop();
+            logo.synth.setMasterVolume(0);
+            logo.synth.stop();
             cell.innerHTML =
                 '&nbsp;&nbsp;<img src="header-icons/' +
                 "play-button.svg" +
@@ -1886,40 +2033,42 @@ function TemperamentWidget() {
                 '" alt="' +
                 _("Play") +
                 '" height="' +
-                ICONSIZE +
+                TemperamentWidget.ICONSIZE +
                 '" width="' +
-                ICONSIZE +
+                TemperamentWidget.ICONSIZE +
                 '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
         }
 
-        let duration = 1 / 2;
-        let startingPitch = this._logo.synth.startingPitch;
-        let startingPitchOcatve = Number(startingPitch.slice(-1));
-        let octave = startingPitchOcatve - 1;
-        let startPitch = pitchToFrequency(
+        const duration = 1 / 2;
+        const startingPitch = logo.synth.startingPitch;
+        const startingPitchOcatve = Number(startingPitch.slice(-1));
+        const octave = startingPitchOcatve - 1;
+        const startPitch = pitchToFrequency(
             startingPitch.substring(0, startingPitch.length - 1),
             octave,
             0,
             "C Major"
         );
-        let that = this;
+
         let pitchNumber = this.pitchNumber;
-        if (this.editMode == "equal" && this.eqTempPitchNumber) pitchNumber = this.eqTempPitchNumber ;
-        else if  (this.editMode == "ratio" && this.NEqTempPitchNumber) pitchNumber = this.NEqTempPitchNumber ;
+        if (this.editMode == "equal" && this.eqTempPitchNumber)
+            pitchNumber = this.eqTempPitchNumber;
+        else if (this.editMode == "ratio" && this.NEqTempPitchNumber)
+            pitchNumber = this.NEqTempPitchNumber;
         if (docById("wheelDiv4") !== null) {
             pitchNumber = this.tempRatios1.length - 1;
         }
 
-        __playLoop = function(i) {
+        const __playLoop = (i) => {
             let j;
             if (i === pitchNumber) {
-                that.playbackForward = false;
+                this.playbackForward = false;
             }
             if (i === 0) {
                 p++;
             }
-            if (that._playing) {
-                that._logo.synth.trigger(
+            if (this._playing) {
+                logo.synth.trigger(
                     0,
                     startPitch,
                     Singer.defaultBPMFactor * duration,
@@ -1927,69 +2076,49 @@ function TemperamentWidget() {
                     null,
                     null
                 );
-                that.playNote(i);
+                this.playNote(i);
             }
 
-            if (that.circleIsVisible == false && docById("wheelDiv4") == null) {
+            if (this.circleIsVisible == false && docById("wheelDiv4") == null) {
                 if (i === pitchNumber) {
-                    that.notesCircle.navItems[0].fillAttr = "#808080";
-                    that.notesCircle.navItems[0].sliceHoverAttr.fill =
-                        "#808080";
-                    that.notesCircle.navItems[0].slicePathAttr.fill = "#808080";
-                    that.notesCircle.navItems[0].sliceSelectedAttr.fill =
-                        "#808080";
+                    this.notesCircle.navItems[0].fillAttr = "#808080";
+                    this.notesCircle.navItems[0].sliceHoverAttr.fill = "#808080";
+                    this.notesCircle.navItems[0].slicePathAttr.fill = "#808080";
+                    this.notesCircle.navItems[0].sliceSelectedAttr.fill = "#808080";
                 } else {
-                    that.notesCircle.navItems[i].fillAttr = "#808080";
-                    that.notesCircle.navItems[i].sliceHoverAttr.fill =
-                        "#808080";
-                    that.notesCircle.navItems[i].slicePathAttr.fill = "#808080";
-                    that.notesCircle.navItems[i].sliceSelectedAttr.fill =
-                        "#808080";
+                    this.notesCircle.navItems[i].fillAttr = "#808080";
+                    this.notesCircle.navItems[i].sliceHoverAttr.fill = "#808080";
+                    this.notesCircle.navItems[i].slicePathAttr.fill = "#808080";
+                    this.notesCircle.navItems[i].sliceSelectedAttr.fill = "#808080";
                 }
 
-                if (that.playbackForward == false && i < pitchNumber) {
+                if (this.playbackForward == false && i < pitchNumber) {
                     if (i === pitchNumber - 1) {
-                        that.notesCircle.navItems[0].fillAttr = "#c8C8C8";
-                        that.notesCircle.navItems[0].sliceHoverAttr.fill =
-                            "#c8C8C8";
-                        that.notesCircle.navItems[0].slicePathAttr.fill =
-                            "#c8C8C8";
-                        that.notesCircle.navItems[0].sliceSelectedAttr.fill =
-                            "#c8C8C8";
+                        this.notesCircle.navItems[0].fillAttr = "#c8C8C8";
+                        this.notesCircle.navItems[0].sliceHoverAttr.fill = "#c8C8C8";
+                        this.notesCircle.navItems[0].slicePathAttr.fill = "#c8C8C8";
+                        this.notesCircle.navItems[0].sliceSelectedAttr.fill = "#c8C8C8";
                     } else {
-                        that.notesCircle.navItems[i + 1].fillAttr = "#c8C8C8";
-                        that.notesCircle.navItems[i + 1].sliceHoverAttr.fill =
-                            "#c8C8C8";
-                        that.notesCircle.navItems[i + 1].slicePathAttr.fill =
-                            "#c8C8C8";
-                        that.notesCircle.navItems[
-                            i + 1
-                        ].sliceSelectedAttr.fill = "#c8C8C8";
+                        this.notesCircle.navItems[i + 1].fillAttr = "#c8C8C8";
+                        this.notesCircle.navItems[i + 1].sliceHoverAttr.fill = "#c8C8C8";
+                        this.notesCircle.navItems[i + 1].slicePathAttr.fill = "#c8C8C8";
+                        this.notesCircle.navItems[i + 1].sliceSelectedAttr.fill = "#c8C8C8";
                     }
                 } else {
                     if (i !== 0) {
-                        that.notesCircle.navItems[i - 1].fillAttr = "#c8C8C8";
-                        that.notesCircle.navItems[i - 1].sliceHoverAttr.fill =
-                            "#c8C8C8";
-                        that.notesCircle.navItems[i - 1].slicePathAttr.fill =
-                            "#c8C8C8";
-                        that.notesCircle.navItems[
-                            i - 1
-                        ].sliceSelectedAttr.fill = "#c8C8C8";
+                        this.notesCircle.navItems[i - 1].fillAttr = "#c8C8C8";
+                        this.notesCircle.navItems[i - 1].sliceHoverAttr.fill = "#c8C8C8";
+                        this.notesCircle.navItems[i - 1].slicePathAttr.fill = "#c8C8C8";
+                        this.notesCircle.navItems[i - 1].sliceSelectedAttr.fill = "#c8C8C8";
                     }
                 }
 
-                that.notesCircle.refreshWheel();
-            } else if (
-                that.circleIsVisible == true &&
-                docById("wheelDiv4") == null
-            ) {
-                docById("pitchNumber_" + i).style.background =
-                    platformColor.labelColor;
-                if (that.playbackForward == false && i < pitchNumber) {
+                this.notesCircle.refreshWheel();
+            } else if (this.circleIsVisible == true && docById("wheelDiv4") == null) {
+                docById("pitchNumber_" + i).style.background = platformColor.labelColor;
+                if (this.playbackForward == false && i < pitchNumber) {
                     j = i + 1;
-                    docById("pitchNumber_" + j).style.background =
-                        platformColor.selectorBackground;
+                    docById("pitchNumber_" + j).style.background = platformColor.selectorBackground;
                 } else {
                     if (i !== 0) {
                         j = i - 1;
@@ -1999,56 +2128,49 @@ function TemperamentWidget() {
                 }
             } else if (docById("wheelDiv4") !== null) {
                 if (i === pitchNumber) {
-                    that.wheel1.navItems[0].fillAttr = "#808080";
-                    that.wheel1.navItems[0].sliceHoverAttr.fill = "#808080";
-                    that.wheel1.navItems[0].slicePathAttr.fill = "#808080";
-                    that.wheel1.navItems[0].sliceSelectedAttr.fill = "#808080";
+                    this.wheel1.navItems[0].fillAttr = "#808080";
+                    this.wheel1.navItems[0].sliceHoverAttr.fill = "#808080";
+                    this.wheel1.navItems[0].slicePathAttr.fill = "#808080";
+                    this.wheel1.navItems[0].sliceSelectedAttr.fill = "#808080";
                 } else {
-                    that.wheel1.navItems[i].fillAttr = "#808080";
-                    that.wheel1.navItems[i].sliceHoverAttr.fill = "#808080";
-                    that.wheel1.navItems[i].slicePathAttr.fill = "#808080";
-                    that.wheel1.navItems[i].sliceSelectedAttr.fill = "#808080";
+                    this.wheel1.navItems[i].fillAttr = "#808080";
+                    this.wheel1.navItems[i].sliceHoverAttr.fill = "#808080";
+                    this.wheel1.navItems[i].slicePathAttr.fill = "#808080";
+                    this.wheel1.navItems[i].sliceSelectedAttr.fill = "#808080";
                 }
 
-                if (that.playbackForward == false && i < pitchNumber) {
+                if (this.playbackForward == false && i < pitchNumber) {
                     if (i === pitchNumber - 1) {
-                        that.wheel1.navItems[0].fillAttr = "#e0e0e0";
-                        that.wheel1.navItems[0].sliceHoverAttr.fill = "#e0e0e0";
-                        that.wheel1.navItems[0].slicePathAttr.fill = "#e0e0e0";
-                        that.wheel1.navItems[0].sliceSelectedAttr.fill =
-                            "#e0e0e0";
+                        this.wheel1.navItems[0].fillAttr = "#e0e0e0";
+                        this.wheel1.navItems[0].sliceHoverAttr.fill = "#e0e0e0";
+                        this.wheel1.navItems[0].slicePathAttr.fill = "#e0e0e0";
+                        this.wheel1.navItems[0].sliceSelectedAttr.fill = "#e0e0e0";
                     } else {
-                        that.wheel1.navItems[i + 1].fillAttr = "#e0e0e0";
-                        that.wheel1.navItems[i + 1].sliceHoverAttr.fill =
-                            "#e0e0e0";
-                        that.wheel1.navItems[i + 1].slicePathAttr.fill =
-                            "#e0e0e0";
-                        that.wheel1.navItems[i + 1].sliceSelectedAttr.fill =
-                            "#e0e0e0";
+                        this.wheel1.navItems[i + 1].fillAttr = "#e0e0e0";
+                        this.wheel1.navItems[i + 1].sliceHoverAttr.fill = "#e0e0e0";
+                        this.wheel1.navItems[i + 1].slicePathAttr.fill = "#e0e0e0";
+                        this.wheel1.navItems[i + 1].sliceSelectedAttr.fill = "#e0e0e0";
                     }
                 } else {
                     if (i !== 0) {
-                        that.wheel1.navItems[i - 1].fillAttr = "#e0e0e0";
-                        that.wheel1.navItems[i - 1].sliceHoverAttr.fill =
-                            "#e0e0e0";
-                        that.wheel1.navItems[i - 1].slicePathAttr.fill =
-                            "#e0e0e0";
-                        that.wheel1.navItems[i - 1].sliceSelectedAttr.fill =
-                            "#e0e0e0";
+                        this.wheel1.navItems[i - 1].fillAttr = "#e0e0e0";
+                        this.wheel1.navItems[i - 1].sliceHoverAttr.fill = "#e0e0e0";
+                        this.wheel1.navItems[i - 1].slicePathAttr.fill = "#e0e0e0";
+                        this.wheel1.navItems[i - 1].sliceSelectedAttr.fill = "#e0e0e0";
                     }
                 }
 
-                that.wheel1.refreshWheel();
+                this.wheel1.refreshWheel();
             }
 
-            if (that.playbackForward) {
+            if (this.playbackForward) {
                 i += 1;
             } else {
                 i -= 1;
             }
 
-            if (i <= pitchNumber && i >= 0 && that._playing && p < 2) {
-                setTimeout(function() {
+            if (i <= pitchNumber && i >= 0 && this._playing && p < 2) {
+                setTimeout(() => {
                     __playLoop(i);
                 }, Singer.defaultBPMFactor * 1000 * duration);
             } else {
@@ -2060,244 +2182,37 @@ function TemperamentWidget() {
                     '" alt="' +
                     _("Play") +
                     '" height="' +
-                    ICONSIZE +
+                    TemperamentWidget.ICONSIZE +
                     '" width="' +
-                    ICONSIZE +
+                    TemperamentWidget.ICONSIZE +
                     '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
                 if (i !== -1) {
-                    setTimeout(function() {
-                        if (
-                            that.circleIsVisible == false &&
-                            docById("wheelDiv4") == null
-                        ) {
-                            that.notesCircle.navItems[i - 1].fillAttr =
-                                "#c8C8C8";
-                            that.notesCircle.navItems[
-                                i - 1
-                            ].sliceHoverAttr.fill = "#c8C8C8";
-                            that.notesCircle.navItems[
-                                i - 1
-                            ].slicePathAttr.fill = "#c8C8C8";
-                            that.notesCircle.navItems[
-                                i - 1
-                            ].sliceSelectedAttr.fill = "#c8C8C8";
-                            that.notesCircle.refreshWheel();
-                        } else if (
-                            that.circleIsVisible == true &&
-                            docById("wheelDiv4") == null
-                        ) {
+                    setTimeout(() => {
+                        if (this.circleIsVisible == false && docById("wheelDiv4") == null) {
+                            this.notesCircle.navItems[i - 1].fillAttr = "#c8C8C8";
+                            this.notesCircle.navItems[i - 1].sliceHoverAttr.fill = "#c8C8C8";
+                            this.notesCircle.navItems[i - 1].slicePathAttr.fill = "#c8C8C8";
+                            this.notesCircle.navItems[i - 1].sliceSelectedAttr.fill = "#c8C8C8";
+                            this.notesCircle.refreshWheel();
+                        } else if (this.circleIsVisible == true && docById("wheelDiv4") == null) {
                             j = i - 1;
                             docById("pitchNumber_" + j).style.background =
                                 platformColor.selectorBackground;
                         } else if (docById("wheelDiv4") !== null) {
-                            that.wheel1.navItems[i - 1].fillAttr = "#e0e0e0";
-                            that.wheel1.navItems[i - 1].sliceHoverAttr.fill =
-                                "#e0e0e0";
-                            that.wheel1.navItems[i - 1].slicePathAttr.fill =
-                                "#e0e0e0";
-                            that.wheel1.navItems[i - 1].sliceSelectedAttr.fill =
-                                "#e0e0e0";
-                            that.wheel1.refreshWheel();
+                            this.wheel1.navItems[i - 1].fillAttr = "#e0e0e0";
+                            this.wheel1.navItems[i - 1].sliceHoverAttr.fill = "#e0e0e0";
+                            this.wheel1.navItems[i - 1].slicePathAttr.fill = "#e0e0e0";
+                            this.wheel1.navItems[i - 1].sliceSelectedAttr.fill = "#e0e0e0";
+
+                            this.wheel1.refreshWheel();
                         }
                     }, Singer.defaultBPMFactor * 1000 * duration);
                 }
-                that._playing = false;
+                this._playing = false;
             }
         };
         if (this._playing) {
             __playLoop(0);
         }
-    };
-
-    this.init = function(logo) {
-        this._logo = logo;
-
-        let w = window.innerWidth;
-        this._cellScale = w / 1200;
-        let iconSize = ICONSIZE * this._cellScale;
-
-        let widgetWindow = window.widgetWindows.windowFor(this, "temperament");
-        this.widgetWindow = widgetWindow;
-        widgetWindow.clear();
-        widgetWindow.show();
-
-        widgetWindow.getWidgetBody().append(temperamentTableDiv);
-        widgetWindow.getWidgetBody().style.height = "500px";
-        widgetWindow.getWidgetBody().style.width = "500px";
-
-        let that = this;
-
-        widgetWindow.onclose = function() {
-            that._logo.synth.setMasterVolume(0);
-            that._logo.synth.stop();
-            if (docById("wheelDiv2") != null) {
-                docById("wheelDiv2").style.display = "none";
-                that.notesCircle.removeWheel();
-            }
-            if (docById("wheelDiv3") != null) {
-                docById("wheelDiv3").style.display = "none";
-                that.wheel.removeWheel();
-            }
-            if (docById("wheelDiv4") != null) {
-                docById("wheelDiv4").style.display = "none";
-                that.wheel1.removeWheel();
-            }
-
-            this.destroy();
-        };
-
-        this._playing = false;
-
-        let buttonTable = document.createElement("table");
-        let header = buttonTable.createTHead();
-        let row = header.insertRow(0);
-        row.id = "buttonsRow";
-
-        temperamentCell = row.insertCell();
-        temperamentCell.innerHTML = this.inTemperament;
-        temperamentCell.style.width = 2 * BUTTONSIZE + "px";
-        temperamentCell.style.minWidth = temperamentCell.style.width;
-        temperamentCell.style.maxWidth = temperamentCell.style.width;
-        temperamentCell.style.height = BUTTONSIZE + "px";
-        temperamentCell.style.minHeight = temperamentCell.style.height;
-        temperamentCell.style.maxHeight = temperamentCell.style.height;
-        temperamentCell.style.textAlign = "center";
-        temperamentCell.style.backgroundColor =
-            platformColor.selectorBackground;
-
-        this.playButton = widgetWindow.addButton(
-            "play-button.svg",
-            ICONSIZE,
-            _("Play all")
-        );
-        this.playButton.onclick = function() {
-            that.playAll();
-        };
-
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            ICONSIZE,
-            _("Save")
-        ).onclick = function() {
-            that._save();
-        };
-
-        let noteCell = widgetWindow.addButton(
-            "play-button.svg",
-            ICONSIZE,
-            _("Table")
-        );
-
-        let t = TEMPERAMENT[this.inTemperament];
-        this.pitchNumber = t.pitchNumber;
-        this.octaveChanged = false;
-        this.scale = this.scale[0] + " " + this.scale[1];
-        this.scaleNotes = _buildScale(this.scale);
-        this.scaleNotes = this.scaleNotes[0];
-        this.powerBase = 2;
-        let startingPitch = this._logo.synth.startingPitch;
-        let str = [];
-        let note = [];
-        this.notes = [];
-        this.frequencies = [];
-        this.cents = [];
-        this.intervals = [];
-        this.ratios = [];
-        this.ratiosNotesPair = [];
-
-        let pitchNumber;
-        for (let i = 0; i <= this.pitchNumber; i++) {
-            if (
-                isCustom(this.inTemperament) &&
-                TEMPERAMENT[this.inTemperament]["0"][1] !== undefined
-            ) {
-                //If temperament selected is custom and it is defined by user.
-                pitchNumber = i + "";
-                if (i === this.pitchNumber) {
-                    this.notes[i] = [
-                        TEMPERAMENT[this.inTemperament]["0"][1],
-                        Number(TEMPERAMENT[this.inTemperament]["0"][2]) + 1
-                    ];
-                    this.ratios[i] = this.powerBase;
-                } else {
-                    this.notes[i] = [
-                        TEMPERAMENT[this.inTemperament][pitchNumber][1],
-                        TEMPERAMENT[this.inTemperament][pitchNumber][2]
-                    ];
-                    this.ratios[i] = TEMPERAMENT[this.inTemperament][pitchNumber][0];
-                }
-                this.frequencies[i] = this._logo.synth
-                    .getCustomFrequency((this.notes[i][0] + this.notes[i][1] + "") ,this.inTemperament  )
-                    .toFixed(2);
-                this.cents[i] =
-                    1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
-                this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
-            } else {
-                if (isCustom(this.inTemperament)) {
-                    // If temperament selected is custom and it is not defined by user
-                    // then custom temperament behaves like equal temperament.
-                    t = TEMPERAMENT["equal"];
-                }
-                str[i] = getNoteFromInterval(startingPitch, t.interval[i]);
-                this.notes[i] = str[i];
-                note[i] = str[i][0];
-
-                if (
-                    str[i][0].substring(1, str[i][0].length) === FLAT ||
-                    str[i][0].substring(1, str[i][0].length) === "b"
-                ) {
-                    note[i] = str[i][0].replace(FLAT, "b");
-                } else if (
-                    str[i][0].substring(1, str[i][0].length) === SHARP ||
-                    str[i][0].substring(1, str[i][0].length) === "#"
-                ) {
-                    note[i] = str[i][0].replace(SHARP, "#");
-                }
-
-                str[i] = note[i] + str[i][1];
-                this.frequencies[i] = this._logo.synth
-                    ._getFrequency(str[i], true, this.inTemperament)
-                    .toFixed(2);
-                this.intervals[i] = t.interval[i];
-                this.ratios[i] = t[this.intervals[i]];
-                this.cents[i] =
-                    1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
-                this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
-            }
-        }
-        this.toggleNotesButton = function() {
-            if (this.circleIsVisible) {
-                noteCell.getElementsByTagName("img")[0].src =
-                    "header-icons/circle.svg";
-                noteCell.getElementsByTagName("img")[0].title = "circle";
-                noteCell.getElementsByTagName("img")[0].alt = "circle";
-            } else {
-                noteCell.getElementsByTagName("img")[0].src =
-                    "header-icons/table.svg";
-                noteCell.getElementsByTagName("img")[0].title = "table";
-                noteCell.getElementsByTagName("img")[0].alt = "table";
-            }
-        };
-
-        this._circleOfNotes();
-
-        noteCell.onclick = function(event) {
-            that.editMode = null ;            
-            if (that.circleIsVisible) {
-                that._circleOfNotes();
-            } else {
-                that._graphOfNotes();
-            }
-        };
-
-        widgetWindow.addButton(
-            "add2.svg",
-            ICONSIZE,
-            _("Add pitches")
-        ).onclick = function(event) {
-            that.edit();
-        };
-
-        widgetWindow.sendToCenter();
-    };
+    }
 }

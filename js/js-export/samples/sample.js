@@ -14,6 +14,8 @@
  * MA 02110-1335 USA.
  */
 
+/* exported JS_API, JS_STARTER, SAMPLE_1, SAMPLE_2 */
+
 const JS_API = `/*
 ============================================================
        API

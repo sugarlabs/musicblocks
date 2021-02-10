@@ -6,40 +6,70 @@ function SampleWidget() {
     const SAMPLEHEIGHT = 160;
     const RENDERINTERVAL = 50;
 
-    const FANCYNAMES = ["𝄫", "♭", "♮", "♯", "𝄪"];
+    const TRUEACCIDENTALNAMES = ["𝄫", "♭", "♮", "♯", "𝄪"];
+    //using these characters can cause issues.
     const ACCIDENTALNAMES = ["bb", "b", "", "#", "x"];
-    const SOLFEGENAMES = ["do", "re", "me", "fa", "sol", "la", "ti", "do"];
-    const DEFAULTACCIDENTAL = "-";
+    const SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti", "do"];
+    const MAJORSCALE = [0, 2, 4, 5, 7, 9, 11];
+    const DEFAULTACCIDENTAL = "";
     const DEFAULTSOLFEGE = "do";
 
     const REFERENCESAMPLE = "electronic synth";
     const DEFAULTSAMPLE = "electronic synth";
-    const CENTERPITCHHERTZ = 240;
+    const CENTERPITCHHERTZ = 220;
 
+    const MAXOCTAVE = 10;
+
+    this.timbreBlock;
+    this.sampleArray;
 
     this.sampleData = "";
-    this.freqArray = new Uint8Array();
     this.sampleName = DEFAULTSAMPLE;
-    this.pitchCenter = 0;
+
+    this.samplePitch = "sol";
+    this.pitchCenter = 9;
+
     this.accidentalCenter = 2;
     this.octaveCenter = 4;
 
-    this.sampleBlock;
+    this.freqArray = new Uint8Array();
+
 
     this._updateBlocks = function (i) {
 
-        let blockNumber;
-        if (this.sampleBlock != null) {
-            blockNumber = this._logo.blocks.blockList[this.sampleBlock].connections[1];
-            if (blockNumber != null) {
-                this._logo.blocks.blockList[blockNumber].value = [this.sampleName, this.sampleData];
-                this._logo.blocks.blockList[blockNumber].updateCache();
+        let mainSampleBlock;
+        let audiofileBlock;
+        let solfegeBlock;
+        let octaveBlock;
 
-                numberBlockNumber = this._logo.blocks.blockList[blockNumber].connections[0];
-                if (numberBlockNumber != null) {
-                    this._logo.blocks.blockList[numberBlockNumber].value = this.pitchCenter;
-                    this._logo.blocks.blockList[numberBlockNumber].updateCache();
+        this.sampleArray = [this.sampleName, this.sampleData, this.samplePitch, this.octaveCenter];
+
+        if (this.timbreBlock != null) {
+            mainSampleBlock = this._logo.blocks.blockList[this.timbreBlock].connections[1];;
+            if (mainSampleBlock != null) {
+                this._logo.blocks.blockList[mainSampleBlock].value = this.sampleArray;
+                this._logo.blocks.blockList[mainSampleBlock].updateCache();
+
+                audiofileBlock = this._logo.blocks.blockList[mainSampleBlock].connections[1];
+                solfegeBlock = this._logo.blocks.blockList[mainSampleBlock].connections[2];
+                octaveBlock = this._logo.blocks.blockList[mainSampleBlock].connections[3];
+
+                if (audiofileBlock != null) {
+                    this._logo.blocks.blockList[audiofileBlock].value = [this.sampleName, this.sampleData];
+                    this._logo.blocks.blockList[audiofileBlock].text.text = this.sampleName;
+                    this._logo.blocks.blockList[audiofileBlock].updateCache();
                 }
+                if (solfegeBlock != null) {
+                    this._logo.blocks.blockList[solfegeBlock].value = this.pitchInput.value;
+                    this._logo.blocks.blockList[solfegeBlock].text.text = this.pitchInput.value;
+                    this._logo.blocks.blockList[solfegeBlock].updateCache();
+                }
+                if (octaveBlock != null) {
+                    this._logo.blocks.blockList[octaveBlock].value = this.octaveCenter;
+                    this._logo.blocks.blockList[octaveBlock].text.text = this.octaveCenter;
+                    this._logo.blocks.blockList[octaveBlock].updateCache();
+                }
+
                 this._logo.refreshCanvas();
                 saveLocally();
             }
@@ -70,17 +100,34 @@ function SampleWidget() {
     this.pitchUp = function () {
         this._usePitch(this.pitchInput.value);
         this.pitchCenter++;
+        if (this.pitchCenter > 6) {
+            this.octaveCenter++;
+            if (this.octaveCenter > MAXOCTAVE) {
+                this.octaveCenter = MAXOCTAVE;
+            }
+            this.octaveInput.value = this.octaveCenter;
+        }
         this.pitchCenter%=7;
         this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
         this._updateBlocks();
+        this._playReferencePitch();
     };
 
     this.pitchDown = function () {
         this._usePitch(this.pitchInput.value);
         this.pitchCenter--;
+        if (this.pitchCenter < 0) {
+            this.pitchCenter = 6;
+            this.octaveCenter--;
+            if (this.octaveCenter < 0) {
+                this.octaveCenter = 0;
+            }
+            this.octaveInput.value = this.octaveCenter;
+        }
         this.pitchCenter%=7;
         this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
         this._updateBlocks();
+        this._playReferencePitch();
     };
 
     this.accidentalUp = function () {
@@ -90,30 +137,39 @@ function SampleWidget() {
         }
         this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
         this._updateBlocks();
+        this._playReferencePitch();
     };
 
     this.accidentalDown = function () {
         this._useAccidental(this.accidentalInput.value);
-        this.accidentalCenter--;
         if (this.accidentalCenter > 0) {
             this.accidentalCenter--;
         }
         this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
         this._updateBlocks();
+        this._playReferencePitch();
     };
 
     this.octaveUp = function () {
         this._useOctave(this.octaveInput.value);
         this.octaveCenter++;
+        if (this.octaveCenter > MAXOCTAVE) {
+            this.octaveCenter = MAXOCTAVE;
+        }
         this.octaveInput.value = this.octaveCenter;
         this._updateBlocks();
+        this._playReferencePitch();
     };
 
     this.octaveDown = function () {
         this._useOctave(this.octaveInput.value);
         this.octaveCenter--;
+        if (this.octaveCenter < 0) {
+            this.octaveCenter = 0;
+        }
         this.octaveInput.value = this.octaveCenter;
         this._updateBlocks();
+        this._playReferencePitch();
     };
 
 
@@ -121,20 +177,17 @@ function SampleWidget() {
         let number = SOLFEGENAMES.indexOf(this.pitchInput.value);
         this.pitchCenter = (number==-1) ? 0 : number;
         this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
-        this._updateBlocks();
     }
 
     this._useAccidental = function () {
         let number = ACCIDENTALNAMES.indexOf(this.accidentalInput.value);
         this.accidentalCenter = (number==-1) ? 2 : number;
         this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
-        this._updateBlocks();
     }
 
     this._useOctave = function () {
         this.octaveCenter = this.octaveInput.value;
         this.octaveInput.value = this.octaveCenter;
-        this._updateBlocks();
     }
 
 
@@ -176,11 +229,13 @@ function SampleWidget() {
         var that = this;
         setTimeout(function() {
             console.debug("saving the sample");
-
             that._addSample();
-
+            let value = { value: [that.sampleName, that.sampleData, that.samplePitch, that.octaveCenter]};
             var newStack = [
-                [0, ["audiofile", { value: [that.sampleName, that.sampleData]}], 0, 0, [null, null]],
+                [0, ["customsample", value], x, y, [null, 1, 2, 3]],
+                [1, ["audiofile", {value: [that.sampleName, that.sampleData]}], 0 ,0, [0]],
+                [2, ["solfege", {value: that.samplePitch}], 0, 0, [0]],
+                [3, ["number", {value: that.octaveCenter}], 0, 0, [0]]
             ];
 
             that._logo.blocks.loadNewBlocks(newStack);
@@ -212,13 +267,14 @@ function SampleWidget() {
 
         this._logo.synth.loadSynth(0, getVoiceSynthName(DEFAULTSAMPLE));
 
-        /*
-        for (i=0;i<CUSTOMSAMPLES.length;i++) {
-            if (CUSTOMSAMPLES[i][0] == this.sampleName) {
-                this.sampleData = CUSTOMSAMPLES[i][1];
+
+        for (let key in CUSTOMSAMPLES) {
+            if (CUSTOMSAMPLES.hasOwnProperty(key)) {
+                if (this.sampleName == key) {
+                    this.sampleData = CUSTOMSAMPLES[key];
+                }
             }
         }
-        */
 
         if (this._intervalID != null) {
             clearInterval(this._intervalID);
@@ -257,81 +313,19 @@ function SampleWidget() {
                     '" vertical-align="middle">';
                 this.isMoving = false;
             } else {
-                this.resume();
-                playBtn.innerHTML =
-                    '<img src="header-icons/pause-button.svg" title="' +
-                    _("Pause") +
-                    '" alt="' +
-                    _("Pause") +
-                    '" height="' +
-                    ICONSIZE +
-                    '" width="' +
-                    ICONSIZE +
-                    '" vertical-align="middle">';
                 if (!(this.sampleName == "")) {
-                    this._usePitch(this.pitchInput.value);
-                    this._useAccidental(this.accidentalInput.value);
-                    this._useOctave(this.octaveInput.value);
-                    this._logo.synth.loadSynth(0, getVoiceSynthName(REFERENCESAMPLE));
-                    let finalCenter = 0;
-                    if (!isNaN(this.pitchCenter)) {
-                        finalCenter = this.pitchCenter;
-                    }
-                    let finalpitch = Math.floor(CENTERPITCHHERTZ * Math.pow(2, finalCenter/12));
-                    console.log(finalpitch);
-                    this._logo.synth.trigger(
-                        0,
-                        [finalpitch],
-                        1,
-                        REFERENCESAMPLE,
-                        null,
-                        null,
-                        false);
-                    this.isMoving = true;
-                }
-            }
-        };
-
-        let refPlayBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
-        refPlayBtn.onclick = () => {
-            if (this.isMoving) {
-                this.pause();
-                refPlayBtn.innerHTML =
-                    '<img src="header-icons/play-button.svg" title="' +
-                    _("Play") +
-                    '" alt="' +
-                    _("Play") +
-                    '" height="' +
-                    ICONSIZE +
-                    '" width="' +
-                    ICONSIZE +
-                    '" vertical-align="middle">';
-                this.isMoving = false;
-            } else {
-                this.resume();
-                refPlayBtn.innerHTML =
-                    '<img src="header-icons/pause-button.svg" title="' +
-                    _("Pause") +
-                    '" alt="' +
-                    _("Pause") +
-                    '" height="' +
-                    ICONSIZE +
-                    '" width="' +
-                    ICONSIZE +
-                    '" vertical-align="middle">';
-                if (!(this.sampleName == "")) {
-                    this._usePitch(this.pitchInput.value);
-                    this._logo.synth.loadSynth(0, getVoiceSynthName(this.sampleName));
-                    let finalpitch = CENTERPITCHHERTZ;
-                    this._logo.synth.trigger(
-                        0,
-                        [finalpitch],
-                        1,
-                        this.sampleName,
-                        null,
-                        null,
-                        false);
-                    this.isMoving = true;
+                    this.resume();
+                    playBtn.innerHTML =
+                        '<img src="header-icons/pause-button.svg" title="' +
+                        _("Pause") +
+                        '" alt="' +
+                        _("Pause") +
+                        '" height="' +
+                        ICONSIZE +
+                        '" width="' +
+                        ICONSIZE +
+                        '" vertical-align="middle">';
+                    this._playReferencePitch();
                 }
             }
         };
@@ -473,12 +467,14 @@ function SampleWidget() {
                 "keyup",
                 ((id) => (e) => {
                     if (e.keyCode === 13) {
-                        console.log("use pitch");
                         this._usePitch(id);
                     }
                 })
             );
         }
+
+        this._parseSamplePitch();
+        this.octaveInput.value = this.octaveCenter;
 
         this._logo.textMsg(_("Record a sample to use as an instrument."));
         this._draw();
@@ -488,13 +484,68 @@ function SampleWidget() {
     };
 
     this._addSample = function() {
-        for (i=0; i < CUSTOMSAMPLES.length; i++) {
-            if (CUSTOMSAMPLES[i][0] == this.sampleName) {
-                return;
-            }
+        this.samplePitch = SOLFEGENAMES[this.pitchCenter] + ACCIDENTALNAMES[this.accidentalCenter];
+        CUSTOMSAMPLES[this.sampleName] = this.sampleData;
+        CUSTOMSAMPLECENTERNO[this.sampleName] = [this.samplePitch, this.octaveCenter];
+    }
+
+    this._playReferencePitch = function() {
+
+        this._usePitch(this.pitchInput.value);
+        this._useAccidental(this.accidentalInput.value);
+        this._useOctave(this.octaveInput.value);
+
+        this._addSample();
+
+        this.sampleArray = [this.sampleName, this.sampleData, this.samplePitch, this.octaveCenter];
+
+        this._logo.synth.loadSynth(0, this.sampleArray);
+        //this._logo.synth.createSynth(0, this.sampleName, this.sampleName, null);
+        //this._logo.synth.setVolume(0, this.sampleName, last(Singer.masterVolume));
+        //instruments[0][this.sampleName].toDestination();
+
+        let finalCenter = 0;
+
+        finalCenter += isNaN(this.octaveCenter)     ? 0 : this.octaveCenter*12;
+        finalCenter += isNaN(this.pitchCenter)      ? 0 : MAJORSCALE[this.pitchCenter];
+        finalCenter += isNaN(this.accidentalCenter) ? 0 : this.accidentalCenter-2;
+
+
+        //Convert MIDI number to hertz, given a MIDI number of 57 is 440 Hz.
+        let netChange = finalCenter-57;
+        let reffinalpitch = Math.floor(440 * Math.pow(2, netChange/12));
+
+        let finalpitch = CENTERPITCHHERTZ;
+
+        this._logo.synth.trigger(
+            0,
+            [reffinalpitch],
+            0.25,
+            REFERENCESAMPLE,
+            null,
+            null,
+            false);
+
+        this._logo.synth.trigger(
+            0,
+            [finalpitch],
+            1,
+            this.sampleName,
+            null,
+            null,
+            false);
+    }
+
+    this._parseSamplePitch = function () {
+        let first_part = this.samplePitch.substring(0,2);
+        if (first_part === "sol") {
+            this.pitchCenter = 4;
+        } else {
+            this.pitchCenter = SOLFEGENAMES.indexOf(first_part);
         }
-        CUSTOMSAMPLES.push([this.sampleName, this.sampleData]);
-        console.log(CUSTOMSAMPLES);
+        this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
+        this.accidentalInput.value = " ";
+
     }
 
 

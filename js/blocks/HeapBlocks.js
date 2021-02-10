@@ -176,7 +176,7 @@ function setupHeapBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            let cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;

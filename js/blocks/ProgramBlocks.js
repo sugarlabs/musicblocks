@@ -28,10 +28,10 @@ function setupProgramBlocks() {
             }
 
             let data = [];
-            let url = args[1];
-            let name = args[0];
+            const url = args[1];
+            const name = args[0];
             let oldHeap;
-            let xmlHttp = new XMLHttpRequest();
+            const xmlHttp = new XMLHttpRequest();
             xmlHttp.open("GET", url, false);
             xmlHttp.send();
             if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
@@ -84,11 +84,11 @@ function setupProgramBlocks() {
                 return;
             }
 
-            let name = args[0];
-            let url = args[1];
+            const name = args[0];
+            const url = args[1];
             if (name in logo.turtleHeaps) {
-                let data = JSON.stringify(logo.turtleHeaps[name]);
-                let xmlHttp = new XMLHttpRequest();
+                const data = JSON.stringify(logo.turtleHeaps[name]);
+                const xmlHttp = new XMLHttpRequest();
                 xmlHttp.open("POST", url, true);
                 xmlHttp.setRequestHeader(
                     "Content-Type",
@@ -121,7 +121,7 @@ function setupProgramBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let block = logo.blocks.blockList[blk];
+            const block = logo.blocks.blockList[blk];
             let oldHeap;
             if (turtle in logo.turtleHeaps) {
                 oldHeap = logo.turtleHeaps[turtle];
@@ -129,7 +129,7 @@ function setupProgramBlocks() {
                 oldHeap = [];
             }
 
-            let c = block.connections[1];
+            const c = block.connections[1];
             if (c != null && logo.blocks.blockList[c].name === "loadFile") {
                 if (args.length !== 1) {
                     logo.errorMsg(_("You must select a file."));
@@ -175,7 +175,7 @@ function setupProgramBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let block = logo.blocks.blockList[blk];
+            const block = logo.blocks.blockList[blk];
             let oldHeap;
             if (turtle in logo.turtleHeaps) {
                 oldHeap = logo.turtleHeaps[turtle];
@@ -183,7 +183,7 @@ function setupProgramBlocks() {
                 oldHeap = [];
             }
 
-            let c = block.connections[1];
+            const c = block.connections[1];
             if (c !== null) {
                 try {
                     logo.turtleHeaps[turtle] = JSON.parse(
@@ -227,7 +227,7 @@ function setupProgramBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let block = logo.blocks.blockList[blk];
+            const block = logo.blocks.blockList[blk];
             if (args[0] === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return;
@@ -237,24 +237,24 @@ function setupProgramBlocks() {
                 return;
             }
 
-            let a = args[0];
+            const a = args[0];
             // Not sure this can happen.
             if (!(turtle in logo.turtleDicts)) {
                 logo.turtleDicts[turtle] = {};
             }
 
-            let c = block.connections[2];
+            const c = block.connections[2];
             if (c != null && logo.blocks.blockList[c].name === "loadFile") {
                 if (args.length !== 2) {
                     logo.errorMsg(_("You must select a file."));
                 } else {
                     try {
-                        let d = JSON.parse(logo.blocks.blockList[c].value[1]);
+                        const d = JSON.parse(logo.blocks.blockList[c].value[1]);
                         // Is the dictionary the same as a turtle name?
-                        let target = getTargetTurtle(logo.turtles, a);
+                        const target = getTargetTurtle(logo.turtles, a);
                         if (target !== null) {
                             // Copy any internal entries now.
-                            let k = Object.keys(d);
+                            const k = Object.keys(d);
                             for (let i=0; i < k.length; i++) {
                                 Turtle.DictActions.setDictValue(target, turtle, k[i], d[k[i]]);
                             }
@@ -296,7 +296,7 @@ function setupProgramBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let block = logo.blocks.blockList[blk];
+            const block = logo.blocks.blockList[blk];
             if (args[0] === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return;
@@ -306,21 +306,21 @@ function setupProgramBlocks() {
                 return;
             }
 
-            let a = args[0];
+            const a = args[0];
             // Not sure this can happen.
             if (!(turtle in logo.turtleDicts)) {
                 logo.turtleDicts[turtle] = {};
             }
 
-            let c = block.connections[2];
+            const c = block.connections[2];
             if (c != null) {
                 try {
-                    let d = JSON.parse(logo.blocks.blockList[c].value);
+                    const d = JSON.parse(logo.blocks.blockList[c].value);
                     // Is the dictionary the same as a turtle name?
-                    let target = getTargetTurtle(logo.turtles, a);
+                    const target = getTargetTurtle(logo.turtles, a);
                     if (target !== null) {
                         // Copy any internal entries now.
-                        let k = Object.keys(d);
+                        const k = Object.keys(d);
                         for (let i=0; i < k.length; i++) {
                             Turtle.DictActions.setDictValue(target, turtle, k[i], d[k[i]]);
                         }
@@ -401,13 +401,13 @@ function setupProgramBlocks() {
                 return;
             }
 
-            let a = args[0];
+            const a = args[0];
             // Not sure this can happen.
             if (!(turtle in logo.turtleDicts)) {
                 logo.turtleDicts[turtle] = {};
             }
             // Is the dictionary the same as a turtle name?
-            let target = getTargetTurtle(logo.turtles, a);
+            const target = getTargetTurtle(logo.turtles, a);
             if (target === null) {
                 save.download(
                     "json",
@@ -450,7 +450,7 @@ function setupProgramBlocks() {
                 return;
             }
 
-            for (let p in logo.blocks.palettes.dict) {
+            for (const p in logo.blocks.palettes.dict) {
                 if (
                     _(logo.blocks.palettes.dict[p].name) ===
                     args[0].toLowerCase()
@@ -500,7 +500,7 @@ function setupProgramBlocks() {
             }
 
             // Disconnect the block.
-            let c = logo.blocks.blockList[args[0]].connections[0];
+            const c = logo.blocks.blockList[args[0]].connections[0];
             logo.blocks.blockList[args[0]].connections[0] = null;
             if (c !== null) {
                 for (
@@ -551,8 +551,8 @@ function setupProgramBlocks() {
                 return;
             }
 
-            let x = logo.turtles.turtleX2screenX(args[1]);
-            let y = logo.turtles.turtleY2screenY(args[2]);
+            const x = logo.turtles.turtleX2screenX(args[1]);
+            const y = logo.turtles.turtleY2screenY(args[2]);
             logo.blocks.moveBlock(args[0], x, y);
         }
     }
@@ -609,8 +609,8 @@ function setupProgramBlocks() {
             }
 
             if (logo.blocks.blockList[args[0]].name === "start") {
-                let thisTurtle = logo.blocks.blockList[args[0]].value;
-                let tur = logo.turtles.ithTurtle(thisTurtle);
+                const thisTurtle = logo.blocks.blockList[args[0]].value;
+                const tur = logo.turtles.ithTurtle(thisTurtle);
                 console.debug("run start " + thisTurtle);
 
                 logo.initTurtle(thisTurtle);
@@ -690,7 +690,7 @@ function setupProgramBlocks() {
             }
 
             // Make sure there is not another block already connected.
-            let c = logo.blocks.blockList[args[0]].connections[args[1]];
+            const c = logo.blocks.blockList[args[0]].connections[args[1]];
             if (c !== null) {
                 if (logo.blocks.blockList[c].name === "hidden") {
                     // Dock to the hidden block.
@@ -750,14 +750,14 @@ function setupProgramBlocks() {
 
         arg(logo, turtle, blk, receivedArg) {
             logo.blocks.showBlocks();   // Force blocks to be visible.
-            let blockArgs = [null];
+            const blockArgs = [null];
             if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (
                     let i = 0;
                     i < logo.blocks.blockList[blk].argClampSlots.length;
                     i++
                 ) {
-                    let t = logo.parseArg(
+                    const t = logo.parseArg(
                         logo,
                         turtle,
                         logo.blocks.blockList[blk].connections[i + 2],
@@ -767,14 +767,14 @@ function setupProgramBlocks() {
                     blockArgs.push(t);
                 }
             }
-            let cblk = logo.blocks.blockList[blk].connections[1];
-            let name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-            let blockNumber = logo.blocks.blockList.length;
+            const cblk = logo.blocks.blockList[blk].connections[1];
+            const name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+            const blockNumber = logo.blocks.blockList.length;
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
-            let x = logo.turtles.turtleX2screenX(tur.x);
-            let y = logo.turtles.turtleY2screenY(tur.y);
+            const x = logo.turtles.turtleX2screenX(tur.x);
+            const y = logo.turtles.turtleY2screenY(tur.y);
 
             // We need to wait for the new block to load before continuing
             tur.doWait(1);
@@ -806,7 +806,7 @@ function setupProgramBlocks() {
                         break;
                 }
 
-                let newNote = [
+                const newNote = [
                     [0, "newnote", x, y, [null, 1, 4, 8]],
                     [1, "divide", 0, 0, [0, 2, 3]],
                     [2, ["number", { value: 1 }], 0, 0, [1]],
@@ -821,26 +821,26 @@ function setupProgramBlocks() {
                 console.debug("BLOCKNUMBER " + blockNumber);
                 return blockNumber;
             } else if (name === _("start")) {
-                let newBlock = [[0, "start", x, y, [null, null, null]]];
+                const newBlock = [[0, "start", x, y, [null, null, null]]];
                 logo.blocks.loadNewBlocks(newBlock);
                 console.debug("BLOCKNUMBER " + blockNumber);
                 return blockNumber;
             } else if (name === _("silence")) {
                 // FIXME: others too
-                let newBlock = [[0, "rest2", x, y, [null, null]]];
+                const newBlock = [[0, "rest2", x, y, [null, null]]];
                 logo.blocks.loadNewBlocks(newBlock);
                 console.debug("BLOCKNUMBER " + blockNumber);
                 return blockNumber;
             } else {
-                let obj = logo.blocks.palettes.getProtoNameAndPalette(name);
-                let protoblk = obj[0];
-                let protoName = obj[2];
+                const obj = logo.blocks.palettes.getProtoNameAndPalette(name);
+                const protoblk = obj[0];
+                const protoName = obj[2];
                 if (protoblk === null) {
                     logo.errorMsg(_("Cannot find block") + " " + name);
                     console.debug("Cannot find block " + name);
                     return 0;
                 } else {
-                    let newBlock = [[0, protoName, x, y, [null]]];
+                    const newBlock = [[0, protoName, x, y, [null]]];
                     for (
                         let i = 1;
                         i <
@@ -936,7 +936,7 @@ function setupProgramBlocks() {
             url = args[0];
 
             function ValidURL(str) {
-                let pattern = new RegExp(
+                const pattern = new RegExp(
                     "^(https?:\\/\\/)?" + // protocol
                     "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
                     "((\\d{1,3}\\.) {3}\\d{1,3}))" + // OR ip (v4) address
@@ -954,7 +954,7 @@ function setupProgramBlocks() {
             }
 
             if (ValidURL(url)) {
-                let win = window.open(url, "_blank");
+                const win = window.open(url, "_blank");
                 if (win) {
                     // Browser has allowed it to be opened.
                     win.focus();

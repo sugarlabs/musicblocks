@@ -70,14 +70,14 @@ class ProtoBlock {
         if (this.staticLabels.length === 0) {
             return;
         }
-        let c = new createjs.Container();
-        let text = new createjs.Text(
+        const c = new createjs.Container();
+        const text = new createjs.Text(
             this.staticLabels[0],
             this.fontSize + "px Sans",
             "#000000"
         );
         c.addChild(text);
-        let b = c.getBounds();
+        const b = c.getBounds();
         this.textWidth = b.width;
         this.extraWidth += Math.max(b.width - 30, 0);
     }
@@ -99,7 +99,7 @@ class ProtoBlock {
     }
 
     zeroArgBlockGenerator() {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setTab(true);
         svg.setSlot(true);
@@ -135,7 +135,7 @@ class ProtoBlock {
     }
 
     hiddenBlockFlowGenerator() {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setSlot(true);
         svg.setTab(true);
@@ -161,7 +161,7 @@ class ProtoBlock {
     }
 
     basicBlockNoFlowGenerator() {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setSlot(true);
         svg.setTail(true);
@@ -189,7 +189,7 @@ class ProtoBlock {
     }
 
     basicBlockCollapsedGenerator() {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setCap(true);
         svg.setTail(true);
@@ -218,7 +218,7 @@ class ProtoBlock {
     }
 
     oneArgBlockGenerator() {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setTab(true);
         svg.setInnies([true]);
@@ -249,7 +249,7 @@ class ProtoBlock {
     }
 
     oneBooleanArgBlockGenerator() {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setTab(true);
         svg.setSlot(true);
@@ -284,7 +284,7 @@ class ProtoBlock {
     }
 
     twoArgBlockGenerator(expandY) {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setTab(true);
         svg.setInnies([true, true]);
@@ -326,7 +326,7 @@ class ProtoBlock {
     }
 
     threeArgBlockGenerator(expandY) {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setTab(true);
         svg.setInnies([true, true, true]);
@@ -368,7 +368,7 @@ class ProtoBlock {
     }
 
     fourArgBlockGenerator(expandY) {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setTab(true);
         svg.setInnies([true, true, true, true]);
@@ -407,7 +407,7 @@ class ProtoBlock {
     }
 
     oneArgMathBlockGenerator() {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setSlot(false);
         svg.setInnies([true]);
@@ -442,7 +442,7 @@ class ProtoBlock {
     }
 
     twoArgMathBlockGenerator(expandY) {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setSlot(false);
         svg.setInnies([true, true]);
@@ -485,7 +485,7 @@ class ProtoBlock {
     }
 
     threeArgMathBlockGenerator(expandY) {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setSlot(false);
         svg.setInnies([true, true, true]);
@@ -529,7 +529,7 @@ class ProtoBlock {
     }
 
     fourArgMathBlockGenerator(expandY) {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setSlot(false);
         svg.setInnies([true, true, true, true]);
@@ -568,7 +568,7 @@ class ProtoBlock {
     }
 
     valueBlockGenerator() {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         // Extra room for parameter label
         svg.setExpand(60 + this.extraWidth, 0, 0, 0);
@@ -599,7 +599,7 @@ class ProtoBlock {
     }
 
     mediaBlockGenerator() {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         // Extra room for graphics
         svg.setExpand(60 + this.extraWidth, 23, 0, 0);
@@ -632,7 +632,7 @@ class ProtoBlock {
     }
 
     stackClampZeroArgBlockGenerator(slots) {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setCap(true);
         svg.setTail(true);
@@ -671,7 +671,7 @@ class ProtoBlock {
     }
 
     flowClampBlockGenerator(slots) {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setTab(true);
 
@@ -711,7 +711,7 @@ class ProtoBlock {
     }
 
     flowClampOneArgBlockGenerator(slots) {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setTab(true);
         svg.setSlot(true);
@@ -754,7 +754,7 @@ class ProtoBlock {
     }
 
     flowClampTwoArgBlockGenerator(slots) {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setTab(true);
         svg.setSlot(true);
@@ -795,7 +795,7 @@ class ProtoBlock {
     }
 
     flowClampThreeArgBlockGenerator(slots) {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setTab(true);
         svg.setSlot(true);
@@ -835,7 +835,7 @@ class ProtoBlock {
     }
 
     argClampOneArgBlockGenerator(slots) {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setTab(true);
         svg.setSlot(true);
@@ -876,7 +876,7 @@ class ProtoBlock {
     }
 
     argClampOneArgMathBlockGenerator(slots) {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setInnies([true]);
         svg.setOutie(true);
@@ -918,7 +918,7 @@ class ProtoBlock {
     }
 
     argClampBlockGenerator(slots) {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setTab(true);
         svg.setSlot(true);
@@ -954,7 +954,7 @@ class ProtoBlock {
     }
 
     argClampMathBlockGenerator(slots) {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setOutie(true);
         svg.setTab(false);
@@ -995,7 +995,7 @@ class ProtoBlock {
     }
 
     flowClampBooleanArgBlockGenerator(slots) {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setTab(true);
         svg.setBoolean(true);
@@ -1038,7 +1038,7 @@ class ProtoBlock {
     }
 
     doubleFlowClampBooleanArgBlockGenerator(bottomSlots,topSlots) {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setTab(true);
         svg.setSlot(true);
@@ -1085,7 +1085,7 @@ class ProtoBlock {
     }
 
     flowClampZeroArgBlockGenerator(slots) {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setTab(true);
         svg.setSlot(true);
@@ -1122,7 +1122,7 @@ class ProtoBlock {
     }
 
     argFlowClampGenerator(slots) {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setSlot(false);
         svg.setOutie(true);
@@ -1162,7 +1162,7 @@ class ProtoBlock {
     }
 
     stackClampOneArgBlockGenerator(slots) {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setCap(true);
         svg.setTail(true);
@@ -1199,7 +1199,7 @@ class ProtoBlock {
     }
 
     booleanZeroArgBlockGenerator() {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setExpand(60 + this.extraWidth, 0, 0, 4);
 
@@ -1228,7 +1228,7 @@ class ProtoBlock {
     }
 
     booleanOneArgBlockGenerator() {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
 
@@ -1258,7 +1258,7 @@ class ProtoBlock {
     }
 
     booleanOneBooleanArgBlockGenerator() {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
 
@@ -1288,7 +1288,7 @@ class ProtoBlock {
     }
 
     booleanTwoBooleanArgBlockGenerator() {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         svg.setExpand(20 + this.extraWidth, 0, 0, 0);
 
@@ -1319,7 +1319,7 @@ class ProtoBlock {
     }
 
     booleanTwoArgBlockGenerator(expandY) {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
 
         if (expandY) {
@@ -1354,7 +1354,7 @@ class ProtoBlock {
     }
 
     parameterBlockGenerator() {
-        let svg = new SVG();
+        const svg = new SVG();
         svg.setScale(this.scale);
         // Extra room for parameter label
         svg.setExpand(70 + this.extraWidth, 0, 0, 0);
@@ -1497,7 +1497,7 @@ class BaseBlock extends ProtoBlock {
             );
 
         this.generator = function() {
-            let svg = new SVG();
+            const svg = new SVG();
             svg.setScale(this.scale);
 
             if (this._style.flows.top === "cap") svg.setCap(true);

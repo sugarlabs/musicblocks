@@ -707,42 +707,53 @@ S</tspan></text>
 6</tspan></text>
     </g>
   </g>
-  <g
-     id="g6265"
-     transform="translate(0,1.4956309)">
-    <text
-       xml:space="preserve"
-       style="font-size:6.35px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+  <text
+     xml:space="preserve"
+     style="font-size:6.35px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+     x="39.66787"
+     y="21.720165"
+     id="text3828"><tspan
+       id="tspan3826"
        x="39.66787"
-       y="20.224535"
-       id="text3828"><tspan
-         id="tspan3826"
-         x="39.66787"
-         y="20.224535"
-         style="font-size:6.35px;stroke-width:0.264583">type</tspan></text>
-    <g
-       id="g6236">
-      <rect
-         style="fill:#19ff2e;fill-opacity:1;stroke:none;stroke-width:0.794282;stroke-linecap:round;stroke-miterlimit:1.41421;stroke-dasharray:none;stroke-opacity:1"
-         id="rect2146"
-         width="34.395832"
-         height="9.260417"
-         x="80.251839"
-         y="14.02543" />
-      <text
-         style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:6.61458px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         x="92.387871"
-         y="12.416073"
-         id="text1287-6"><tspan
+       y="21.720165"
+       style="font-size:6.35px;stroke-width:0.264583">type</tspan></text>
+  <g
+     id="g6236"
+     transform="translate(0,1.4956309)">
+    <rect
+       style="fill:#19ff2e;fill-opacity:1;stroke:none;stroke-width:0.794282;stroke-linecap:round;stroke-miterlimit:1.41421;stroke-dasharray:none;stroke-opacity:1"
+       id="rect2146"
+       width="34.395832"
+       height="9.260417"
+       x="80.251839"
+       y="14.02543" />
+    <text
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:6.61458px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="92.387871"
+       y="12.416073"
+       id="text1287-6"><tspan
+         x="0"
+         y="0"
+         id="tspan192"><tspan
            id="tspan1285-7"
            x="92.387871"
            y="12.416073"
-           style="font-size:4.9389px;stroke-width:0.264583px">
-sine</tspan></text>
-      <path
-         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.0939358px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 111.26755,19.326798 -1.19745,-1.366621 h 2.39488 z"
-         id="path2180" />
-    </g>
+           style="font-size:4.9389px;stroke-width:0.264583px" /></tspan></text>
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.0939358px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 111.26755,19.326798 -1.19745,-1.366621 h 2.39488 z"
+       id="path2180" />
   </g>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+     x="83.051666"
+     y="25.142193"
+     id="text200"><tspan
+       id="tspan198"
+       x="83.051666"
+       y="25.142193"
+       style="font-size:8.46667px;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+       dy="-1.86"
+       dx="4">sine</tspan></text>
 </svg>

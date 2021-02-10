@@ -1,38 +1,53 @@
-// Copyright (c) 2020 Saksham Mrig
+/**
+ * @file This contains the prototype of the JavaScript Editor Widget.
+ * @author Saksham Mrig
+ *
+ * @copyright 2020 Saksham Mirg
+ *
+ * @license
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * The GNU Affero General Public License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with this
+ * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
+ * MA 02110-1335 USA.
+ */
 
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundation; either
-// version 3 of the License, or (at your option) any later version.
-//
-// You should have received a copy of the GNU Affero General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+/* global _, SMALLERBUTTON, BIGGERBUTTON, Tone, instruments */
 
-let oscilloscopeExecution = true;
+/* exported Oscilloscope */
 
+/**
+ * @class
+ * @classdesc pertains to setting up all features of the Oscilloscope Widget.
+ */
 class Oscilloscope {
     static ICONSIZE = 32;
     static analyserSize = 8192;
+    /**
+     * @constructor
+     * @param {Object} logo - object of Logo
+     */
     constructor(logo) {
         this._logo = logo;
         this.pitchAnalysers = {};
         this.playingNow = false;
         if (this.drawVisualIDs) {
-            for (let id of Object.keys(this.drawVisualIDs)) {
+            for (const id of Object.keys(this.drawVisualIDs)) {
                 cancelAnimationFrame(this.drawVisualIDs[id]);
             }
         }
 
         this.drawVisualIDs = {};
-        let widgetWindow = window.widgetWindows.windowFor(this, "oscilloscope");
+        const widgetWindow = window.widgetWindows.windowFor(this, "oscilloscope");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
 
         widgetWindow.onclose = () => {
-            for (let turtle of this.divisions) {
-                let turtleIdx = logo.turtles.turtleList.indexOf(turtle);
+            for (const turtle of this.divisions) {
+                const turtleIdx = logo.turtles.turtleList.indexOf(turtle);
                 cancelAnimationFrame(this.drawVisualIDs[turtleIdx]);
             }
 
@@ -40,10 +55,10 @@ class Oscilloscope {
             widgetWindow.destroy();
         };
 
-        let step = 10;
+        const step = 10;
         this.zoomFactor = 40.0;
         this.verticalOffset = 0;
-        let zoomInButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("ZOOM IN"));
+        const zoomInButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("ZOOM IN"));
 
         zoomInButton.onclick = () => {
             this.zoomFactor += step;
@@ -52,7 +67,7 @@ class Oscilloscope {
             unescape(encodeURIComponent(SMALLERBUTTON))
         )}`;
 
-        let zoomOutButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("ZOOM OUT"));
+        const zoomOutButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("ZOOM OUT"));
 
         zoomOutButton.onclick = () => {
             this.zoomFactor -= step;
@@ -66,20 +81,25 @@ class Oscilloscope {
         this.widgetWindow = widgetWindow;
         this.divisions = [];
 
-        for (let turtle of logo.oscilloscopeTurtles) {
+        for (const turtle of logo.oscilloscopeTurtles) {
             if (turtle && !turtle.inTrash) this.divisions.push(turtle);
         }
 
-        for (let turtle of this.divisions) {
-            let turtleIdx = logo.turtles.turtleList.indexOf(turtle);
+        for (const turtle of this.divisions) {
+            const turtleIdx = logo.turtles.turtleList.indexOf(turtle);
             this.reconnectSynthsToAnalyser(turtleIdx);
             this.makeCanvas(700, 400 / this.divisions.length, turtle, turtleIdx);
         }
         if (!this.playingNow) {
-            console.debug("oscilloscope running");
+            // console.debug("oscilloscope running");
         }
     }
-
+    /**
+     * Reconnects synths to analyser.
+     *
+     * @param turtle
+     * @returns {void}
+     */
     reconnectSynthsToAnalyser = (turtle) => {
         if (this.pitchAnalysers[turtle] === undefined) {
             this.pitchAnalysers[turtle] = new Tone.Analyser({
@@ -88,36 +108,43 @@ class Oscilloscope {
             });
         }
 
-        for (let synth in instruments[turtle])
+        for (const synth in instruments[turtle])
             instruments[turtle][synth].connect(this.pitchAnalysers[turtle]);
     };
-
+    /**
+     * Makes the canvas.
+     *
+     * @param {number} width
+     * @param {number} height
+     * @param turtle
+     * @param turtleIdx
+     * @returns {void}
+     */
     makeCanvas = (width, height, turtle, turtleIdx) => {
-        let canvas = document.createElement("canvas");
+        const canvas = document.createElement("canvas");
         canvas.height = height;
         canvas.width = width;
         this.widgetWindow.getWidgetBody().appendChild(canvas);
-        let canvasCtx = canvas.getContext("2d");
+        const canvasCtx = canvas.getContext("2d");
         canvasCtx.clearRect(0, 0, width, height);
 
-        let draw = () => {
+        const draw = () => {
             this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
             if (!turtle.running) return;
 
             canvasCtx.fillStyle = "rgb(200, 200, 200)";
-            let dataArray = this.pitchAnalysers[turtleIdx].getValue();
-            let bufferLength = dataArray.length;
+            const dataArray = this.pitchAnalysers[turtleIdx].getValue();
+            const bufferLength = dataArray.length;
             canvasCtx.fillRect(0, 0, width, height);
             canvasCtx.lineWidth = 2;
-            let rbga = turtle.painter._canvasColor;
+            const rbga = turtle.painter._canvasColor;
             canvasCtx.strokeStyle = rbga;
             canvasCtx.beginPath();
-            let sliceWidth = (width * this.zoomFactor) / bufferLength;
+            const sliceWidth = (width * this.zoomFactor) / bufferLength;
             let x = 0;
-            let y;
 
             for (let i = 0; i < bufferLength; i++) {
-                y = (height / 2) * (1 - dataArray[i]) + this.verticalOffset;
+                const y = (height / 2) * (1 - dataArray[i]) + this.verticalOffset;
                 if (i === 0) {
                     canvasCtx.moveTo(x, y);
                 } else {

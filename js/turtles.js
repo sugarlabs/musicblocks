@@ -16,6 +16,17 @@
  * Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA.
  */
 
+/*
+   global createjs, platformColor, last, importMembers, setupRhythmActions, setupMeterActions,
+   setupPitchActions, setupIntervalsActions, setupToneActions, setupOrnamentActions,
+   setupVolumeActions, setupDrumActions, setupDictActions, _, Turtle, TURTLESVG, METRONOMESVG,
+   sugarizerCompatibility, FILLCOLORS, STROKECOLORS, getMunsellColor, DEFAULTVALUE, DEFAULTCHROMA,
+   jQuery, loading, docById, LEADING, CARTESIANBUTTON, piemenuGrid, CLEARBUTTON, COLLAPSEBUTTON,
+   EXPANDBUTTON, MBOUNDARY
+ */
+
+/* exported Turtles */
+
 // What is the scale factor when stage is shrunk?
 const CONTAINERSCALEFACTOR = 4;
 
@@ -87,7 +98,7 @@ class Turtles {
     addTurtle(startBlock, infoDict) {
         this.add(startBlock, infoDict);
         if (this.isShrunk()) {
-            let t = last(this.turtleList);
+            const t = last(this.turtleList);
             t.container.scaleX = CONTAINERSCALEFACTOR;
             t.container.scaleY = CONTAINERSCALEFACTOR;
             t.container.scale = CONTAINERSCALEFACTOR;
@@ -104,33 +115,33 @@ class Turtles {
      */
     add(startBlock, infoDict) {
         if (startBlock != null) {
-            console.debug("adding a new turtle " + startBlock.name);
+            // console.debug("adding a new turtle " + startBlock.name);
             if (startBlock.value !== this.turtleList.length) {
                 startBlock.value = this.turtleList.length;
-                console.debug("turtle #" + startBlock.value);
+                // console.debug("turtle #" + startBlock.value);
             }
         } else {
-            console.debug("adding a new turtle: startBlock is null");
+            // console.debug("adding a new turtle: startBlock is null");
         }
 
-        let blkInfoAvailable =
+        const blkInfoAvailable =
             typeof infoDict === "object" && Object.keys(infoDict).length > 0 ? true : false;
 
         // Unique ID of turtle is time of instantiation for the first time
-        let id =
+        const id =
             blkInfoAvailable && "id" in infoDict && infoDict["id"] !== Infinity
                 ? infoDict["id"]
                 : Date.now();
 
-        let turtleName = blkInfoAvailable && "name" in infoDict ? infoDict["name"] : _("start");
+        const turtleName = blkInfoAvailable && "name" in infoDict ? infoDict["name"] : _("start");
 
         // Instantiate a new Turtle object
-        let turtle = new Turtle(id, turtleName, this, startBlock);
+        const turtle = new Turtle(id, turtleName, this, startBlock);
 
         // Add turtle model properties and store color index for turtle
         this.addTurtleStageProps(turtle, blkInfoAvailable, infoDict);
 
-        let turtlesStage = this.stage;
+        const turtlesStage = this.stage;
 
         let i = this.turtleList.length % 10; // used for turtle (mouse) skin color
         this.turtleList.push(turtle); // add new turtle to turtle list
@@ -157,14 +168,14 @@ class Turtles {
         */
 
         turtle.container.on("mousedown", (event) => {
-            let scale = this.scale;
-            let offset = {
+            const scale = this.scale;
+            const offset = {
                 x: turtle.container.x - event.stageX / scale,
-                y: turtle.container.y - event.stageY / scale,
+                y: turtle.container.y - event.stageY / scale
             };
 
             turtlesStage.dispatchEvent("CursorDown" + turtle.id);
-            console.debug("--> [CursorDown " + turtle.name + "]");
+            // console.debug("--> [CursorDown " + turtle.name + "]");
 
             turtle.container.removeAllEventListeners("pressmove");
             turtle.container.on("pressmove", (event) => {
@@ -180,19 +191,19 @@ class Turtles {
             });
         });
 
-        turtle.container.on("pressup", (event) => {
-            console.debug("--> [CursorUp " + turtle.name + "]");
+        turtle.container.on("pressup", () => {
+            // console.debug("--> [CursorUp " + turtle.name + "]");
             turtlesStage.dispatchEvent("CursorUp" + turtle.id);
         });
 
-        turtle.container.on("click", (event) => {
+        turtle.container.on("click", () => {
             // If turtles listen for clicks then they can be used as buttons
-            console.debug("--> [click " + turtle.name + "]");
+            // console.debug("--> [click " + turtle.name + "]");
             turtlesStage.dispatchEvent("click" + turtle.id);
         });
 
-        turtle.container.on("mouseover", (event) => {
-            console.debug("--> [mouseover " + turtle.name + "]");
+        turtle.container.on("mouseover", () => {
+            // console.debug("--> [mouseover " + turtle.name + "]");
             turtlesStage.dispatchEvent("CursorOver" + turtle.id);
 
             if (turtle.running) {
@@ -205,8 +216,8 @@ class Turtles {
             this.refreshCanvas();
         });
 
-        turtle.container.on("mouseout", (event) => {
-            console.debug("--> [mouseout " + turtle.name + "]");
+        turtle.container.on("mouseout", () => {
+            // console.debug("--> [mouseout " + turtle.name + "]");
             turtlesStage.dispatchEvent("CursorOut" + turtle.id);
 
             if (turtle.running) {
@@ -232,7 +243,7 @@ class Turtles {
      * @returns {void}
      */
     markAllAsStopped() {
-        for (let turtle in this.turtleList) {
+        for (const turtle in this.turtleList) {
             this.turtleList[turtle].running = false;
         }
 
@@ -423,7 +434,7 @@ Turtles.TurtlesModel = class {
             }
         }
 
-        let turtlesStage = this._stage;
+        const turtlesStage = this._stage;
 
         // Each turtle needs its own canvas
         turtle.imageContainer = new createjs.Container();
@@ -444,7 +455,7 @@ Turtles.TurtlesModel = class {
      * @returns {void}
      */
     createHitArea(turtle) {
-        let hitArea = new createjs.Shape();
+        const hitArea = new createjs.Shape();
         hitArea.graphics.beginFill("#FFF").drawEllipse(-27, -27, 55, 55);
         hitArea.x = 0;
         hitArea.y = 0;
@@ -495,7 +506,7 @@ Turtles.TurtlesModel = class {
      * @return {Boolean} - running
      */
     running() {
-        for (let turtle in this.turtleList) {
+        for (const turtle in this.turtleList) {
             if (this.turtleList[turtle].running) {
                 return true;
             }
@@ -619,7 +630,7 @@ Turtles.TurtlesView = class {
      * @returns {void}
      */
     setBackgroundColor(turtle) {
-        let color =
+        const color =
             turtle === -1 ? platformColor.background : this.turtleList[turtle].painter.canvasColor;
         this._backgroundColor = color;
         this.makeBackground();
@@ -698,11 +709,11 @@ Turtles.TurtlesView = class {
         let artwork = useTurtleArtwork ? TURTLESVG : METRONOMESVG;
         artwork = sugarizerCompatibility.isInsideSugarizer()
             ? artwork
-                  .replace(/fill_color/g, sugarizerCompatibility.xoColor.fill)
-                  .replace(/stroke_color/g, sugarizerCompatibility.xoColor.stroke)
+                .replace(/fill_color/g, sugarizerCompatibility.xoColor.fill)
+                .replace(/stroke_color/g, sugarizerCompatibility.xoColor.stroke)
             : artwork
-                  .replace(/fill_color/g, FILLCOLORS[i])
-                  .replace(/stroke_color/g, STROKECOLORS[i]);
+                .replace(/fill_color/g, FILLCOLORS[i])
+                .replace(/stroke_color/g, STROKECOLORS[i]);
 
         turtle.makeTurtleBitmap(artwork, this.refreshCanvas, useTurtleArtwork);
 
@@ -720,18 +731,18 @@ Turtles.TurtlesView = class {
      * @param setCollapsed - specify whether the background should be collapsed
      */
     makeBackground(setCollapsed) {
-        let doCollapse = setCollapsed === undefined ? false : setCollapsed;
+        const doCollapse = setCollapsed === undefined ? false : setCollapsed;
 
-        let borderContainer = this.borderContainer;
+        const borderContainer = this.borderContainer;
 
         // Remove any old background containers
         borderContainer.removeAllChildren();
 
-        let turtlesStage = this.stage;
+        const turtlesStage = this.stage;
         // We put the buttons on the stage so they will be on top
 
-        let _makeButton = (svg, label, x, y) => {
-            let container = document.createElement("div");
+        const _makeButton = (svg, label, x, y) => {
+            const container = document.createElement("div");
             container.setAttribute("id", "" + label);
 
             container.setAttribute("class", "tooltipped");
@@ -739,21 +750,21 @@ Turtles.TurtlesView = class {
             container.setAttribute("data-position", "bottom");
             jQuery.noConflict()(".tooltipped").tooltip({
                 html: true,
-                delay: 100,
+                delay: 100
             });
 
-            container.onmouseover = (event) => {
+            container.onmouseover = () => {
                 if (!loading) {
                     document.body.style.cursor = "pointer";
                 }
             };
 
-            container.onmouseout = (event) => {
+            container.onmouseout = () => {
                 if (!loading) {
                     document.body.style.cursor = "default";
                 }
             };
-            let img = new Image();
+            const img = new Image();
             img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(svg)));
 
             container.appendChild(img);
@@ -772,19 +783,19 @@ Turtles.TurtlesView = class {
         /**
          * Setup dragging of smaller canvas .
          */
-        let dragCanvas = () => {
+        const dragCanvas = () => {
             let offset;
             turtlesStage.removeAllEventListeners("pressmove");
             turtlesStage.removeAllEventListeners("mousedown");
             turtlesStage.on("mousedown", (event) => {
                 offset = {
                     y: event.stageY - turtlesStage.y,
-                    x: event.stageX - turtlesStage.x,
+                    x: event.stageX - turtlesStage.x
                 };
             });
             turtlesStage.on("pressmove", (event) => {
-                let x = event.stageX - offset.x;
-                let y = event.stageY - offset.y;
+                const x = event.stageX - offset.x;
+                const y = event.stageY - offset.y;
                 turtlesStage.x = Math.max(0, Math.min((this._w * 3) / 4, x));
                 turtlesStage.y = Math.max(55, Math.min((this._h * 3) / 4, y));
                 this.refreshCanvas();
@@ -796,7 +807,7 @@ Turtles.TurtlesView = class {
          * Scales down all 'turtles' in turtleList.
          * Removes the stage and adds it back at the top.
          */
-        let __collapse = () => {
+        const __collapse = () => {
             this.hideMenu();
             this.hideGrids();
             this.setStageScale(0.25);
@@ -824,7 +835,7 @@ Turtles.TurtlesView = class {
          * Makes 'cartesian' button by initailising 'CARTESIANBUTTON' SVG.
          * Assigns click listener function to doGrid() method.
          */
-        let __makeGridButton = () => {
+        const __makeGridButton = () => {
             this.gridButton = _makeButton(
                 CARTESIANBUTTON,
                 _("Grid"),
@@ -839,7 +850,7 @@ Turtles.TurtlesView = class {
          * Makes clear button by initailising 'CLEARBUTTON' SVG.
          * Assigns click listener function to call doClear() method.
          */
-        let __makeClearButton = () => {
+        const __makeClearButton = () => {
             this._clearButton = _makeButton(
                 CLEARBUTTON,
                 _("Clean"),
@@ -847,7 +858,7 @@ Turtles.TurtlesView = class {
                 70 + LEADING + 6
             );
 
-            this._clearButton.onclick = (event) => {
+            this._clearButton.onclick = () => {
                 this.doClear();
             };
 
@@ -860,7 +871,7 @@ Turtles.TurtlesView = class {
          * Makes collapse button by initailising 'EXPANDBUTTON' SVG.
          * Assigns click listener function to call __collapse() method.
          */
-        let __makeCollapseButton = () => {
+        const __makeCollapseButton = () => {
             this._collapseButton = _makeButton(
                 COLLAPSEBUTTON,
                 _("Collapse"),
@@ -868,11 +879,11 @@ Turtles.TurtlesView = class {
                 70 + LEADING + 6
             );
 
-            this._collapseButton.onclick = (event) => {
+            this._collapseButton.onclick = () => {
                 // If the aux toolbar is open, close it.
-                let auxToolbar = docById("aux-toolbar");
+                const auxToolbar = docById("aux-toolbar");
                 if (auxToolbar.style.display === "block") {
-                    let menuIcon = docById("menu");
+                    const menuIcon = docById("menu");
                     auxToolbar.style.display = "none";
                     menuIcon.innerHTML = "menu";
                     docById("toggleAuxBtn").className -= "blue darken-1";
@@ -888,7 +899,7 @@ Turtles.TurtlesView = class {
          * Makes expand button by initailising 'EXPANDBUTTON' SVG.
          * Assigns click listener function to remove stage and add it at posiion 0.
          */
-        let __makeExpandButton = () => {
+        const __makeExpandButton = () => {
             this._expandButton = _makeButton(
                 EXPANDBUTTON,
                 _("Expand"),
@@ -899,11 +910,11 @@ Turtles.TurtlesView = class {
                 this._expandButton.style.visibility = "hidden";
             }
 
-            this._expandButton.onclick = (event) => {
+            this._expandButton.onclick = () => {
                 // If the aux toolbar is open, close it.
-                let auxToolbar = docById("aux-toolbar");
+                const auxToolbar = docById("aux-toolbar");
                 if (auxToolbar.style.display === "block") {
-                    let menuIcon = docById("menu");
+                    const menuIcon = docById("menu");
                     auxToolbar.style.display = "none";
                     menuIcon.innerHTML = "menu";
                     docById("toggleAuxBtn").className -= "blue darken-1";
@@ -950,7 +961,7 @@ Turtles.TurtlesView = class {
         /**
          * initializes all Buttons.
          */
-        let __makeAllButtons = () => {
+        const __makeAllButtons = () => {
             let second = false;
             if (docById("buttoncontainerTOP")) {
                 jQuery.noConflict()(".tooltipped").tooltip("close");
@@ -959,7 +970,7 @@ Turtles.TurtlesView = class {
                 );
                 second = true;
             }
-            let cont = document.createElement("div");
+            const cont = document.createElement("div");
             document.body.appendChild(cont);
             cont.style.display = second ? "block" : "none";
             cont.setAttribute("id", "buttoncontainerTOP");
@@ -973,8 +984,8 @@ Turtles.TurtlesView = class {
         /**
          * Makes second boundary for graphics (mouse) container by initialising 'MBOUNDARY' SVG.
          */
-        let __makeBoundary2 = () => {
-            let img = new Image();
+        const __makeBoundary2 = () => {
+            const img = new Image();
             img.onload = () => {
                 if (this._collapsedBoundary !== null) {
                     this._collapsedBoundary.visible = false;
@@ -987,8 +998,8 @@ Turtles.TurtlesView = class {
                 this._collapsedBoundary.visible = false;
             };
 
-            let dx = this._w - 20;
-            let dy = this._h - 55 - LEADING;
+            const dx = this._w - 20;
+            const dy = this._h - 55 - LEADING;
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
@@ -1013,9 +1024,9 @@ Turtles.TurtlesView = class {
          * Makes boundary for graphics (mouse) container by initialising
          * 'MBOUNDARY' SVG.
          */
-        let __makeBoundary = () => {
+        const __makeBoundary = () => {
             this._locked = true;
-            let img = new Image();
+            const img = new Image();
             img.onload = () => {
                 if (this._expandedBoundary !== null) {
                     this._expandedBoundary.visible = false;
@@ -1028,8 +1039,8 @@ Turtles.TurtlesView = class {
                 __makeBoundary2();
             };
 
-            let dx = this._w - 5;
-            let dy = this._h - 55 - LEADING;
+            const dx = this._w - 5;
+            const dy = this._h - 55 - LEADING;
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(

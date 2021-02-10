@@ -11,6 +11,10 @@
 
 // Borrowing loosely from tasprite_factory.py in the Python version.
 
+/* global platformColor */
+
+/* exported SVG */
+
 class SVG {
     // Interface to the graphical representation of blocks, turtles,
     // palettes, etc. on screen.
@@ -77,41 +81,84 @@ class SVG {
 
     // Attribute methods
 
+    /**
+     * @public
+     * @param {number} fontSize
+     * @returns {void}
+     */
     setFontSize(fontSize) {
         this._fontSize = fontSize;
     }
 
+    /**
+     * @public
+     * @param {number} offset
+     * @returns {void}
+     */
     setLabelOffset(offset) {
         this._labelOffset = offset;
     }
 
+    /**
+     * @public
+     * @param {boolean} offset
+     * @returns {void}
+     */
     setDrawInniess(flag) {
         this._draw_inniess = flag;
     }
 
+    /**
+     * @public
+     * @returns {number}
+     */
     getWidth() {
         return this._width;
     }
 
+    /**
+     * @public
+     * @returns {number}
+     */
     getHeight() {
         return this._height;
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     clearDocks() {
         this.docks = [];
     }
 
+    /**
+     * @public
+     * @param {number} scale
+     * @returns {void}
+     */
     setScale(scale) {
         this._scale = scale;
     }
 
+    /**
+     * @public
+     * @param {number} orientation
+     * @returns {void}
+     */
     setOrientation(orientation) {
         this._orientation = orientation;
     }
 
+    /**
+     * @public
+     * @param {number} number
+     * @returns {void}
+     */
+
     setClampCount(number) {
         this._clampCount = number;
-        let n = this._clampSlots.length;
+        const n = this._clampSlots.length;
         if (n < number) {
             for (let i = 0; i < number - n; i++) {
                 this._clampSlots.push(1);
@@ -119,6 +166,12 @@ class SVG {
         }
     }
 
+    /**
+     * @public
+     * @param {number} clamp
+     * @param {number} number
+     * @returns {void}
+     */
     setClampSlots(clamp, number) {
         if (clamp > this._clampCount.length - 1) {
             this.setClampCount(clamp + 1);
@@ -126,6 +179,14 @@ class SVG {
         this._clampSlots[clamp] = number;
     }
 
+    /**
+     * @public
+     * @param {number} w
+     * @param {number} h
+     * @param {number} w2
+     * @param {number} h2
+     * @returns {void}
+     */
     setExpand(w, h, w2, h2) {
         // TODO: make this an array
         this._expandX = w;
@@ -134,35 +195,70 @@ class SVG {
         this._expandY2 = h2;
     }
 
+    /**
+     * @public
+     * @param {number} stroke_width
+     * @returns {void}
+     */
     setstrokeWidth(stroke_width) {
         this._strokeWidth = stroke_width;
         this._calc_porch_params();
     }
 
+    /**
+     * @public
+     * @param {array} colors
+     * @returns {void}
+     */
     setColors(colors) {
         this._fill = colors[0];
         this._stroke = colors[1];
     }
 
+    /**
+     * @public
+     * @param {Number} color
+     * @returns {void}
+     */
     setFillColor(color) {
         this._fill = color;
     }
 
+    /**
+     * @public
+     * @param {Number} color
+     * @returns {void}
+     */
     setStrokeColor(color) {
         this._stroke = color;
     }
 
+    /**
+     * @public
+     * @param {array} inniesArray
+     * @returns {void}
+     */
     setInnies(inniesArray) {
         for (let i = 0; i < inniesArray.length; i++) {
             this._innies.push(inniesArray[i]);
         }
     }
 
+    /**
+     * @public
+     * @param {boolean} flag
+     * @returns {void}
+     */
     setOutie(flag) {
         // Only one outie.
         this._outie = flag;
     }
 
+    /**
+     * @public
+     * @param {boolean} flag
+     * @returns {void}
+     */
     setSlot(flag) {
         this._slot = flag;
         if (flag) {
@@ -170,6 +266,11 @@ class SVG {
         }
     }
 
+    /**
+     * @public
+     * @param {boolean} flag
+     * @returns {void}
+     */
     setCap(flag) {
         this._cap = flag;
         if (flag) {
@@ -177,6 +278,11 @@ class SVG {
         }
     }
 
+    /**
+     * @public
+     * @param {boolean} flag
+     * @returns {void}
+     */
     setTab(flag) {
         this._tab = flag;
         if (flag) {
@@ -184,6 +290,11 @@ class SVG {
         }
     }
 
+    /**
+     * @public
+     * @param {boolean} flag
+     * @returns {void}
+     */
     setTail(flag) {
         this._tail = flag;
         if (flag) {
@@ -191,24 +302,48 @@ class SVG {
         }
     }
 
+    /**
+     * @public
+     * @param {boolean} flag
+     * @returns {void}
+     */
     setPorch(flag) {
         this._porch = flag;
     }
 
+    /**
+     * @public
+     * @param {boolean} flag
+     * @returns {void}
+     */
     setBoolean(flag) {
         this._bool = flag;
     }
 
+    /**
+     * @public
+     * @param {boolean} flag
+     * @returns {void}
+     */
     setElse(flag) {
         this._else = flag;
     }
 
+    /**
+     * @public
+     * @param {boolean} flag
+     * @returns {void}
+     */
     setArm(flag) {
         this._arm = flag;
     }
 
     // SVG-related helper methods
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _resetMinMax() {
         this._minX = 10000;
         this._minY = 10000;
@@ -216,6 +351,10 @@ class SVG {
         this._maxY = -10000;
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _checkMinMax() {
         if (this._x < this._minX) {
             this._minX = this._x;
@@ -231,7 +370,10 @@ class SVG {
         }
     }
 
-    _calculateXY() {
+    /**
+     * @private
+     * @returns {void}
+     */ _calculateXY() {
         let x = this._strokeWidth / 2.0;
         let y = this._strokeWidth / 2.0 + this._radius;
         this.margins[0] = x + this._strokeWidth + 0.5;
@@ -257,6 +399,10 @@ class SVG {
         return [x, y];
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _calculateWH(addstrokeWidth) {
         if (addstrokeWidth) {
             this._width = (this._maxX - this._minX + this._strokeWidth) * this._scale;
@@ -290,16 +436,36 @@ class SVG {
         this.margins[3] = Math.floor(this.margins[3] + 0.5);
     }
 
+    /**
+     * @private
+     * @param {number} x
+     * @param {number} y
+     * @returns {string}
+     */
     _newPath(x, y) {
         this._x = x;
         this._y = y;
         return '<path d="m' + x + " " + y + " ";
     }
 
+    /**
+     * @private
+     * @returns {string}
+     */
     _closePath() {
         return 'z" ';
     }
 
+    /**
+     * @public
+     * @param {number} x
+     * @param {number} y
+     * @param {number} fontSize
+     * @param {number} width
+     * @param {string} alignment
+     * @param {string} string
+     * @returns {string}
+     */
     text(x, y, fontSize, width, alignment, string) {
         this._x = x;
         this._y = y;
@@ -326,7 +492,7 @@ class SVG {
         }
 
         let yy = y;
-        let tspans = string.split("\n");
+        const tspans = string.split("\n");
         let text =
             '<text style="font-size:' +
             fontSize +
@@ -350,6 +516,12 @@ class SVG {
         return text;
     }
 
+    /**
+     * @private
+     * @param {number} x
+     * @param {number} y
+     * @returns {string}
+     */
     _lineTo(x, y) {
         this._checkMinMax();
         if (this._x === x && this._y === y) {
@@ -362,6 +534,12 @@ class SVG {
         }
     }
 
+    /**
+     * @private
+     * @param {number} dx
+     * @param {number} dy
+     * @returns {string}
+     */
     _rLineTo(dx, dy) {
         if (dx === 0 && dy === 0) {
             return "";
@@ -370,6 +548,16 @@ class SVG {
         }
     }
 
+    /**
+     * @private
+     * @param {number} x
+     * @param {number} y
+     * @param {number} r
+     * @param {number} a
+     * @param {number} l
+     * @param {number} s
+     * @returns {string}
+     */
     _arcTo(x, y, r, a, l, s) {
         this._checkMinMax();
         if (r === 0) {
@@ -382,6 +570,15 @@ class SVG {
         }
     }
 
+    /**
+     * @private
+     * @param {number} signX
+     * @param {number} signY
+     * @param {number} a
+     * @param {number} l
+     * @param {number} s
+     * @returns {string}
+     */
     _rarcTo(signX, signY, a, l, s) {
         if (this._radius === 0) {
             return "";
@@ -397,10 +594,22 @@ class SVG {
         }
     }
 
+    /**
+     * @private
+     * @param {number} signX
+     * @param {number} signY
+     * @param {number} a
+     * @param {number} l
+     * @param {number} s
+     * @param {boolean} start
+     * @param {boolean} end
+     * @param {boolean} skip
+     * @returns {string}
+     */
     _corner(signX, signY, a, l, s, start, end, skip) {
         let svg_str = "";
         if (this._radius > 0) {
-            let r2 = this._radius / 2.0;
+            const r2 = this._radius / 2.0;
             if (start) {
                 if (signX * signY === 1) {
                     svg_str += this._rLineTo(signX * r2, 0);
@@ -421,9 +630,22 @@ class SVG {
         return svg_str;
     }
 
+    /**
+     * @private
+     * @param {number} signX
+     * @param {number} signY
+     * @param {number} a
+     * @param {number} l
+     * @param {number} s
+     * @param {boolean} start
+     * @param {boolean} end
+     * @param {boolean} skip
+     * @returns {string}
+     */
+
     _iCorner(signX, signY, a, l, s, start, end) {
         let svg_str = "";
-        let r2 = this._strokeWidth + this._radius / 2.0;
+        const r2 = this._strokeWidth + this._radius / 2.0;
         if (start) {
             if (signX * signY === -1) {
                 svg_str = this._rLineTo(signX * (r2 - this._strokeWidth), 0);
@@ -443,6 +665,10 @@ class SVG {
         return svg_str;
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _doInnie() {
         this.docks.push([
             (this._x + this._strokeWidth) * this._scale,
@@ -465,6 +691,10 @@ class SVG {
         );
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _doOutie() {
         if (!this._outie) {
             return this._rLineTo(0, -this._innieY2);
@@ -484,8 +714,12 @@ class SVG {
         );
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _doSlot() {
-        let x;
+        // let x;
         if (this._slot) {
             this.docks.push([(this._x + this._slotX / 2.0) * this._scale, this._y * this._scale]);
             return (
@@ -504,6 +738,10 @@ class SVG {
         }
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _doTail() {
         if (this._outie) {
             return this._rLineTo(-this._slotX, 0);
@@ -518,6 +756,10 @@ class SVG {
         }
     }
 
+    /**
+     * @private
+     * @returns {void}
+     */
     _doTab() {
         if (this._outie) {
             return this._rLineTo(-this._slotX, 0);
@@ -535,6 +777,11 @@ class SVG {
         );
     }
 
+    /**
+     * @private
+     * @param {boolean} flag
+     * @returns {void}
+     */
     _doPorch(flag) {
         if (flag) {
             return (
@@ -551,6 +798,11 @@ class SVG {
         }
     }
 
+    /**
+     * @private
+     * @param {boolean} flag
+     * @returns {string}
+     */
     _startBoolean(xoffset, yoffset) {
         let svg = this._newPath(xoffset, yoffset); // - this._radius);
         this._radius -= this._strokeWidth;
@@ -562,6 +814,10 @@ class SVG {
         return svg;
     }
 
+    /**
+     * @private
+     * @returns {string}
+     */
     _doBoolean() {
         this.docks.push([
             (this._x - this._radius + this._strokeWidth) * this._scale,
@@ -571,6 +827,11 @@ class SVG {
         return this._rarcTo(-1, 1, 90, 0, 0) + this._rarcTo(1, 1, 90, 0, 0);
     }
 
+    /**
+     * @private
+     * @param {boolean} notnot
+     * @returns {string}
+     */
     _endBoolean(notnot) {
         let svg = "";
         if (!notnot) {
@@ -587,6 +848,11 @@ class SVG {
         return svg;
     }
 
+    /**
+     * @private
+     * @param {boolean} center
+     * @returns {string}
+     */
     _header(center) {
         // FIXME: Why are our calculations off by 2 x strokeWidth?
         return (
@@ -606,6 +872,11 @@ class SVG {
         );
     }
 
+    /**
+     * @private
+     * @param {boolean} center
+     * @returns {string}
+     */
     _transform(center) {
         let orientation = "";
         if (this._orientation !== 0) {
@@ -625,6 +896,10 @@ class SVG {
         }
     }
 
+    /**
+     * @private
+     * @returns {string}
+     */
     _footer() {
         if (this._orientation !== 0) {
             return "</g></g></svg>";
@@ -633,6 +908,10 @@ class SVG {
         }
     }
 
+    /**
+     * @private
+     * @returns {string}
+     */
     _style() {
         return (
             'style="fill:' +
@@ -654,17 +933,20 @@ class SVG {
     fourth corner (-1, -1), and finally, a left-side connector ("outie").
     In addition:
         * Minimum and maximum values are calculated for the SVG bounding box;
-        * Docking coordinates are calculated for each innies, outie, tab, and slot.
+        * Docking coordinates are calculated for each innies, outie, tab, and slot. 
     */
 
-    basicBlock() {
+    /**
+     * @public
+     * @returns {string}
+     */ basicBlock() {
         // The most common block type: used for 0, 1, 2, or 3
         // argument commands (forward, setxy, plus, sqrt, etc.)
         this._resetMinMax();
 
-        let obj = this._calculateXY();
-        let x = obj[0];
-        let y = obj[1];
+        const obj = this._calculateXY();
+        const x = obj[0];
+        const y = obj[1];
 
         this.margins[2] = 0;
         this.margins[3] = 0;
@@ -673,7 +955,7 @@ class SVG {
         svg += this._corner(1, -1, 90, 0, 1, true, true, false);
         svg += this._doSlot();
         svg += this._rLineTo(this._expandX, 0);
-        let xx = this._x;
+        const xx = this._x;
         if (!this._bool) {
             svg += this._corner(1, 1, 90, 0, 1, true, true, false);
         } else {
@@ -730,7 +1012,7 @@ class SVG {
         svg += this._style();
 
         // Add a block label
-        let tx =
+        const tx =
             this._width -
             this._scale * (this._innieX1 + this._innieX2) -
             4 * this._strokeWidth +
@@ -739,7 +1021,7 @@ class SVG {
 
         // If we have an odd number of innie slots, we need to avoid a
         // collision between the block label and the slot label.
-        let nInnies = this._innies.length;
+        const nInnies = this._innies.length;
         if (nInnies > 2 && Math.round(nInnies / 2) * 2 !== nInnies) {
             ty -= 2 * this._fontSize;
         }
@@ -780,12 +1062,16 @@ class SVG {
         return this._header(false) + svg;
     }
 
+    /**
+     * @public
+     * @returns {string}
+     */
     basicBox() {
         // Basic argument style used for numbers, text, media, parameters
         this._resetMinMax();
         this.setOutie(true);
 
-        let x = this._strokeWidth / 2.0 + this._innieX1 + this._innieX2;
+        const x = this._strokeWidth / 2.0 + this._innieX1 + this._innieX2;
         this.margins[0] = (x + this._strokeWidth + 0.5) * this._scale;
         this.margins[1] = (this._strokeWidth + 0.5) * this._scale;
         this.margins[2] = 0;
@@ -802,11 +1088,11 @@ class SVG {
         svg += this._style();
 
         // Add a block label
-        let tx =
+        const tx =
             2 * (this._innieX1 + this._innieX2) +
             4 * this._strokeWidth +
             this._labelOffset * this._scale;
-        let ty = this._height / 2 + this._fontSize / 2;
+        const ty = this._height / 2 + this._fontSize / 2;
         svg += this.text(
             tx / this._scale,
             ty / this._scale,
@@ -820,6 +1106,10 @@ class SVG {
         return this._header(false) + svg;
     }
 
+    /**
+     * @public
+     * @returns {string}
+     */
     booleanAndOr() {
         // Booleans are in a class of their own
         this._resetMinMax();
@@ -838,7 +1128,7 @@ class SVG {
 
         svg += this._rarcTo(1, -1, 90, 0, 1);
         svg += this._rLineTo(this._radius / 2.0 + this._expandX, 0);
-        let xx = this._x;
+        const xx = this._x;
         svg += this._rLineTo(0, this._radius / 2.0);
         svg += this._doBoolean();
         svg += this._rLineTo(0, this._radius * 1.5 + this._innieY2 + this._inniesSpacer);
@@ -857,12 +1147,12 @@ class SVG {
         this.margins[3] = this._strokeWidth * this._scale;
 
         // Add a block label
-        let tx =
+        const tx =
             this._width -
             this._scale * (this._innieX1 + this._innieX2) -
             4 * this._strokeWidth +
             this._labelOffset * this._scale;
-        let ty = this._height / 2 + this._fontSize / 2;
+        const ty = this._height / 2 + this._fontSize / 2;
         svg += this.text(
             tx / this._scale,
             ty / this._scale,
@@ -876,6 +1166,11 @@ class SVG {
         return this._header(false) + svg;
     }
 
+    /**
+     * @public
+     * @param {boolean} notnot
+     * @returns {string}
+     */
     booleanNot(notnot) {
         // Booleans are in a class of their own: not and not not
         this._resetMinMax();
@@ -908,7 +1203,7 @@ class SVG {
         }
 
         svg += this._rLineTo(this._radius / 2.0 + this._expandX, 0);
-        let xx = this._x;
+        const xx = this._x;
 
         if (this._innies[0]) {
             svg += this._rLineTo(0, this._radius);
@@ -956,12 +1251,12 @@ class SVG {
         this.margins[3] = this._strokeWidth * this._scale;
 
         // Add a block label
-        let tx =
+        const tx =
             this._width -
             2 * (this._innieX1 + this._innieX2) -
             4 * this._strokeWidth +
             this._labelOffset * this._scale;
-        let ty = this._height / 2 + this._fontSize / 2;
+        const ty = this._height / 2 + this._fontSize / 2;
         svg += this.text(
             tx / this._scale,
             ty / this._scale,
@@ -975,6 +1270,11 @@ class SVG {
         return this._header(false) + svg;
     }
 
+    /**
+     * @public
+     * @param {boolean} notnot
+     * @returns {string}
+     */
     booleanCompare() {
         // Booleans are in a class of their own (greater than, less than, etc)
         this._resetMinMax();
@@ -984,9 +1284,9 @@ class SVG {
             this._inniesSpacer +
             this._strokeWidth / 2.0 +
             this._expandY;
-        let xoffset = this._strokeWidth / 2.0;
+        const xoffset = this._strokeWidth / 2.0;
 
-        let yoff = this._radius * 2;
+        const yoff = this._radius * 2;
         let svg = '<g transform="matrix(1,0,0,1,0,-' + yoff + ')"> ';
 
         svg += this._newPath(xoffset, yoffset + this._radius);
@@ -1003,7 +1303,7 @@ class SVG {
         svg += this._rarcTo(1, -1, 90, 0, 1);
         svg += this._rLineTo(this._radius / 2.0 + this._expandX, 0);
         svg += this._rLineTo(0, this._radius);
-        let xx = this._x;
+        const xx = this._x;
         svg += this._doInnie();
         this.docks[1][1] -= this._radius * 2 * this._scale;
         svg += this._rLineTo(0, this._expandY);
@@ -1037,12 +1337,12 @@ class SVG {
         this.margins[2] = this._strokeWidth * this._scale;
 
         // Add a block label
-        let tx =
+        const tx =
             this._width -
             2 * (this._innieX1 + this._innieX2) -
             4 * this._strokeWidth +
             this._labelOffset * this._scale;
-        let ty = this._height / 2 + this._fontSize / 2;
+        const ty = this._height / 2 + this._fontSize / 2;
         svg += this.text(
             tx / this._scale,
             ty / this._scale,
@@ -1056,12 +1356,16 @@ class SVG {
         return this._header(false) + svg;
     }
 
+    /**
+     * @public
+     * @returns {string}
+     */
     basicClamp() {
         // Special block for clamps around stacks; includes an 'arm'
         // that extends down the left side of a stack and a bottom jaw
         // to clamp the blocks. (Used for start, action, repeat, etc.)
-        let save_cap = this._cap;
-        let save_slot = this._slot;
+        const save_cap = this._cap;
+        const save_slot = this._slot;
         this._resetMinMax();
         let x;
         let y;
@@ -1090,7 +1394,7 @@ class SVG {
         }
 
         svg += this._rLineTo(this._radius + this._strokeWidth, 0);
-        let xx = this._x;
+        const xx = this._x;
         svg += this._rLineTo(this._expandX, 0);
         svg += this._corner(1, 1, 90, 0, 1, true, true, false);
         if (this._innies[0]) {
@@ -1126,7 +1430,7 @@ class SVG {
             }
             svg += this._corner(-1, 1, 90, 0, 1, true, true, false);
             svg += this._lineTo(xx, this._y);
-            let saveOutie = this._outie;
+            const saveOutie = this._outie;
             this._outie = false;
             svg += this._doTab();
             this._outie = saveOutie;
@@ -1137,7 +1441,7 @@ class SVG {
             }
             svg += this._rLineTo(0, this._expandY2);
             svg += this._iCorner(1, 1, 90, 0, 0, true, true);
-            let saveSlot = this._slot;
+            const saveSlot = this._slot;
             this._slot = true;
             svg += this._doSlot();
             this._slot = saveSlot;
@@ -1259,18 +1563,21 @@ class SVG {
         return this._header(false) + svg;
     }
 
+    /**
+     * @public
+     * @returns {string}
+     */
     argClamp() {
         // A clamp that contains innies rather than flow blocks
         this._resetMinMax();
         let x;
-        let y;
         if (this._outie) {
             x = this._strokeWidth / 2.0 + this._innieX1 + this._innieX2;
         } else {
             x = this._strokeWidth / 2.0;
         }
 
-        y = this._strokeWidth / 2.0 + this._radius;
+        const y = this._strokeWidth / 2.0 + this._radius;
         this.margins[0] = (x + this._strokeWidth + 0.5) * this._scale;
         this.margins[1] = (this._strokeWidth + 0.5) * this._scale;
         this.margins[2] = 0;
@@ -1281,7 +1588,7 @@ class SVG {
         svg += this._doSlot();
 
         svg += this._rLineTo(this._radius + this._strokeWidth, 0);
-        let xx = this._x;
+        const xx = this._x;
         svg += this._rLineTo(this._expandX, 0);
         svg += this._corner(1, 1, 90, 0, 1, true, true, false);
         if (this._innies[0]) {
@@ -1303,7 +1610,7 @@ class SVG {
         }
         j += 1;
 
-        let ddy = this._slotSize - this._innieY2;
+        const ddy = this._slotSize - this._innieY2;
         for (let i = 1; i < this._clampSlots[0].length; i++) {
             svg += this._rLineTo(0, ddy);
             svg += this._doInnie();
@@ -1373,11 +1680,14 @@ class SVG {
         return this._header(false) + svg;
     }
 
-    untilClamp() {
+    /**
+     * @public
+     * @returns {string}
+     */ untilClamp() {
         // Until block is like clamp but docks are flipped
         this._resetMinMax();
-        let x = this._strokeWidth / 2.0;
-        let y = this._strokeWidth / 2.0 + this._radius;
+        const x = this._strokeWidth / 2.0;
+        const y = this._strokeWidth / 2.0 + this._radius;
         this.margins[0] = (x + this._strokeWidth + 0.5) * this._scale;
         this.margins[1] = (this._strokeWidth + 0.5) * this._scale;
         this.margins[2] = 0;
@@ -1387,7 +1697,7 @@ class SVG {
         svg += this._doSlot();
         svg += this._rLineTo(this._radius + this._strokeWidth, 0);
         svg += this._rLineTo(this._expandX, 0);
-        let xx = this._x;
+        const xx = this._x;
         svg += this._corner(1, 1, 90, 0, 1, true, true, true);
         svg += this._rLineTo(0, 2 * this._innieY1);
         svg += this._corner(-1, 1, 90, 0, 1, true, true, true);
@@ -1458,18 +1768,22 @@ class SVG {
         return this._header(false) + svg;
     }
 
-    statusBlock(graphic) {
+    /**
+     * @public
+     * @returns {string}
+     */
+    statusBlock() {
         // Generate a status block
         this._resetMinMax();
-        let obj = this._calculateXY();
-        let x = obj[0];
-        let y = obj[1];
+        const obj = this._calculateXY();
+        const x = obj[0];
+        const y = obj[1];
         this.margins[2] = 0;
         this.margins[3] = 0;
         let svg = this._newPath(x, y);
         svg += this._corner(1, -1, 90, 0, 1, true, true, false);
         svg += this._rLineTo(this._expandX, 0);
-        let xx = this._x;
+        const xx = this._x;
         svg += this._corner(1, 1, 90, 0, 1, true, true, false);
         svg += this._rLineTo(0, this._expandY);
         svg += this._corner(-1, 1, 90, 0, 1, true, true, false);

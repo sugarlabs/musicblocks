@@ -64,7 +64,7 @@ processLilypondNotes = function(lilypond, logo, turtle) {
 
         // Convert frequencies here.
         if (typeof note === "number") {
-            let pitchObj = frequencyToPitch(note);
+            const pitchObj = frequencyToPitch(note);
             note = pitchObj[0] + pitchObj[1];
         }
 
@@ -102,230 +102,230 @@ processLilypondNotes = function(lilypond, logo, turtle) {
         let obj = logo.notation.notationStaging[turtle][i];
         if (typeof obj === "string") {
             switch (obj) {
-            case "swing":
-                logo.notationNotes[turtle] += "\\tempo swing\n";
-                break;
-            case "tempo":
-                logo.notationNotes[turtle] +=
+                case "swing":
+                    logo.notationNotes[turtle] += "\\tempo swing\n";
+                    break;
+                case "tempo":
+                    logo.notationNotes[turtle] +=
                     "\\tempo " +
                     logo.notation.notationStaging[turtle][i + 2] +
                     " = " +
                     logo.notation.notationStaging[turtle][i + 1] +
                     "\n";
-                i += 2;
-                break;
-            case "markup":
-                logo.notationNotes[turtle] +=
+                    i += 2;
+                    break;
+                case "markup":
+                    logo.notationNotes[turtle] +=
                     "^\\markup { \\abs-fontsize #6 { " +
                     logo.notation.notationStaging[turtle][i + 1] +
                     " } } ";
-                i += 1;
-                break;
-            case "markdown":
-                logo.notationNotes[turtle] +=
+                    i += 1;
+                    break;
+                case "markdown":
+                    logo.notationNotes[turtle] +=
                     "_\\markup { " +
                     logo.notation.notationStaging[turtle][i + 1] +
                     " } ";
-                i += 1;
-                break;
-            case "break":
-                if (i > 0) {
-                    logo.notationNotes[turtle] += "\n";
-                }
-                noteCounter = 0;
-                break;
-            case "begin articulation":
-                articulation = true;
-                break;
-            case "end articulation":
-                articulation = false;
-                break;
-            case "begin crescendo":
-                logo.notationNotes[turtle] += "\\< ";
-                break;
-            case "begin decrescendo":
-                logo.notationNotes[turtle] += "\\> ";
-                break;
-            case "end crescendo":
-                logo.notationNotes[turtle] += "\\! ";
-                break;
-            case "end decrescendo":
-                logo.notationNotes[turtle] += "\\! ";
-                break;
-            case "begin slur":
+                    i += 1;
+                    break;
+                case "break":
+                    if (i > 0) {
+                        logo.notationNotes[turtle] += "\n";
+                    }
+                    noteCounter = 0;
+                    break;
+                case "begin articulation":
+                    articulation = true;
+                    break;
+                case "end articulation":
+                    articulation = false;
+                    break;
+                case "begin crescendo":
+                    logo.notationNotes[turtle] += "\\< ";
+                    break;
+                case "begin decrescendo":
+                    logo.notationNotes[turtle] += "\\> ";
+                    break;
+                case "end crescendo":
+                    logo.notationNotes[turtle] += "\\! ";
+                    break;
+                case "end decrescendo":
+                    logo.notationNotes[turtle] += "\\! ";
+                    break;
+                case "begin slur":
                 // The ( is added after the first note.
-                queueSlur = true;
-                break;
-            case "end slur":
-                logo.notationNotes[turtle] += ")  ";
-                break;
-            case "begin harmonics":
-                logo.notationNotes[turtle] += "\\harmonicsOn ";
-                break;
-            case "end harmonics":
-                logo.notationNotes[turtle] += "\\harmonicsOff ";
-                break;
-            case "tie":
-                logo.notationNotes[turtle] += "~";
-                break;
-            case "key":
-                keySignature =
+                    queueSlur = true;
+                    break;
+                case "end slur":
+                    logo.notationNotes[turtle] += ")  ";
+                    break;
+                case "begin harmonics":
+                    logo.notationNotes[turtle] += "\\harmonicsOn ";
+                    break;
+                case "end harmonics":
+                    logo.notationNotes[turtle] += "\\harmonicsOff ";
+                    break;
+                case "tie":
+                    logo.notationNotes[turtle] += "~";
+                    break;
+                case "key":
+                    keySignature =
                     logo.notation.notationStaging[turtle][i + 1] +
                     " " +
                     logo.notation.notationStaging[turtle][i + 2];
-                key = logo.notation.notationStaging[turtle][i + 1]
-                    .toLowerCase()
-                    .replace(FLAT, "es")
-                    .replace(SHARP, "is")
-                    .replace(NATURAL, "")
-                    .replace(DOUBLESHARP, "isis")
-                    .replace(DOUBLEFLAT, "eses");
-                mode = logo.notation.notationStaging[turtle][i + 2];
-                // Lilypond knows about common modes.
-                if (["major",
-                     "minor",
-                     "ionian",
-                     "dorian",
-                     "phrygian",
-                     "lydian",
-                     "mixolydian",
-                     "aeolian",
-                     "locrian"].indexOf(mode) !== -1) {
-                    logo.notationNotes[turtle] +=
-                        " \\key " + key + " \\" + mode + "\n";
-                } else {
-                    obj = getScaleAndHalfSteps(keySignature);
-                    // Check to see if it is possible to construct the mode.
-                    // freygish = #`((0 . ,NATURAL) (1 . ,FLAT) (2 . ,NATURAL)
-                    // (3 . ,NATURAL) (4 . ,NATURAL) (5 . ,FLAT) (6 . ,FLAT))
-                    let modeDef = "\n" + mode.replace(/ /g, "_") + " = #`(";
-                    let prevNote = "";
-                    let nn = -1;
-                    for (let ii = 0; ii < obj[1].length; ii++) {
-                        if (obj[1][ii] !== "") {
-                            // Are we repeating notes, e.g., Db and D?
-                            if (obj[0][ii].substr(0, 1) === prevNote) {
-                                modeDef = "";
-                                break;
-                            } else {
-                                prevNote = obj[0][ii].substr(0, 1);
-                            }
-
-                            let n = [
-                                "C",
-                                "D",
-                                "E",
-                                "F",
-                                "G",
-                                "A",
-                                "B"
-                            ].indexOf(obj[0][ii].substr(0, 1));
-
-                            // Did we skip any notes?
-                            if (n > nn) {
-                                if (n - nn > 1) {
-                                    for (let j = nn + 1; j < n; j++) {
-                                        modeDef += "(" + j + " . ,NATURAL) ";
-                                    }
-                                }
-
-                                nn = n;
-
-                                if (obj[0][ii].length === 1) {
-                                    modeDef += "(" + n + " . ,NATURAL) ";
-                                } else {
-                                    if (obj[0][ii].substr(1, 1) === FLAT) {
-                                        modeDef += "(" + n + " . ,FLAT) ";
-                                    } else {
-                                        modeDef += "(" + n + " . ,SHARP) ";
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if (modeDef !== "") {
-                        if (n < 6) {
-                            for (let j = n + 1; j < 7; j++) {
-                                modeDef += "(" + j + " . ,NATURAL) ";
-                            }
-                        }
-
-                        modeDef += ")\n";
-                        console.debug(modeDef);
-                        lilypond.freygish += modeDef;
+                    key = logo.notation.notationStaging[turtle][i + 1]
+                        .toLowerCase()
+                        .replace(FLAT, "es")
+                        .replace(SHARP, "is")
+                        .replace(NATURAL, "")
+                        .replace(DOUBLESHARP, "isis")
+                        .replace(DOUBLEFLAT, "eses");
+                    mode = logo.notation.notationStaging[turtle][i + 2];
+                    // Lilypond knows about common modes.
+                    if (["major",
+                        "minor",
+                        "ionian",
+                        "dorian",
+                        "phrygian",
+                        "lydian",
+                        "mixolydian",
+                        "aeolian",
+                        "locrian"].indexOf(mode) !== -1) {
                         logo.notationNotes[turtle] +=
+                        " \\key " + key + " \\" + mode + "\n";
+                    } else {
+                        obj = getScaleAndHalfSteps(keySignature);
+                        // Check to see if it is possible to construct the mode.
+                        // freygish = #`((0 . ,NATURAL) (1 . ,FLAT) (2 . ,NATURAL)
+                        // (3 . ,NATURAL) (4 . ,NATURAL) (5 . ,FLAT) (6 . ,FLAT))
+                        let modeDef = "\n" + mode.replace(/ /g, "_") + " = #`(";
+                        let prevNote = "";
+                        let nn = -1;
+                        for (let ii = 0; ii < obj[1].length; ii++) {
+                            if (obj[1][ii] !== "") {
+                            // Are we repeating notes, e.g., Db and D?
+                                if (obj[0][ii].substr(0, 1) === prevNote) {
+                                    modeDef = "";
+                                    break;
+                                } else {
+                                    prevNote = obj[0][ii].substr(0, 1);
+                                }
+
+                                const n = [
+                                    "C",
+                                    "D",
+                                    "E",
+                                    "F",
+                                    "G",
+                                    "A",
+                                    "B"
+                                ].indexOf(obj[0][ii].substr(0, 1));
+
+                                // Did we skip any notes?
+                                if (n > nn) {
+                                    if (n - nn > 1) {
+                                        for (let j = nn + 1; j < n; j++) {
+                                            modeDef += "(" + j + " . ,NATURAL) ";
+                                        }
+                                    }
+
+                                    nn = n;
+
+                                    if (obj[0][ii].length === 1) {
+                                        modeDef += "(" + n + " . ,NATURAL) ";
+                                    } else {
+                                        if (obj[0][ii].substr(1, 1) === FLAT) {
+                                            modeDef += "(" + n + " . ,FLAT) ";
+                                        } else {
+                                            modeDef += "(" + n + " . ,SHARP) ";
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (modeDef !== "") {
+                            if (n < 6) {
+                                for (let j = n + 1; j < 7; j++) {
+                                    modeDef += "(" + j + " . ,NATURAL) ";
+                                }
+                            }
+
+                            modeDef += ")\n";
+                            console.debug(modeDef);
+                            lilypond.freygish += modeDef;
+                            logo.notationNotes[turtle] +=
                             " \\key " +
                             key +
                             " \\" +
                             mode.replace(/ /g, "_") +
                             "\n";
-                    } else {
-                        logo.errorMsg(
-                            _("Lilypond ignoring mode") + " " + mode);
+                        } else {
+                            logo.errorMsg(
+                                _("Lilypond ignoring mode") + " " + mode);
+                        }
                     }
-                }
-                i += 2;
-                break;
-            case "meter":
-                logo.notationNotes[turtle] +=
+                    i += 2;
+                    break;
+                case "meter":
+                    logo.notationNotes[turtle] +=
                     " \\time " +
                     logo.notation.notationStaging[turtle][i + 1] +
                     "/" +
                     logo.notation.notationStaging[turtle][i + 2] +
                     "\n";
-                i += 2;
-                break;
-            case "pickup":
-                logo.notationNotes[turtle] +=
+                    i += 2;
+                    break;
+                case "pickup":
+                    logo.notationNotes[turtle] +=
                     " \\partial " +
                     logo.notation.notationStaging[turtle][i + 1] +
                     "\n";
-                i += 1;
-                break;
-            case "voice one":
-                if (multivoice) {
-                    logo.notationNotes[turtle] +=
+                    i += 1;
+                    break;
+                case "voice one":
+                    if (multivoice) {
+                        logo.notationNotes[turtle] +=
                         "}\n\\new Voice { \\voiceOne ";
-                } else {
-                    logo.notationNotes[turtle] += "<< { \\voiceOne ";
-                    multivoice = true;
-                }
-                break;
-            case "voice two":
-                if (multivoice) {
-                    logo.notationNotes[turtle] +=
+                    } else {
+                        logo.notationNotes[turtle] += "<< { \\voiceOne ";
+                        multivoice = true;
+                    }
+                    break;
+                case "voice two":
+                    if (multivoice) {
+                        logo.notationNotes[turtle] +=
                         "}\n\\new Voice { \\voiceTwo ";
-                } else {
-                    logo.notationNotes[turtle] += "<< { \\voiceTwo ";
-                    multivoice = true;
-                }
-                break;
-            case "voice three":
-                if (multivoice) {
-                    logo.notationNotes[turtle] +=
+                    } else {
+                        logo.notationNotes[turtle] += "<< { \\voiceTwo ";
+                        multivoice = true;
+                    }
+                    break;
+                case "voice three":
+                    if (multivoice) {
+                        logo.notationNotes[turtle] +=
                         "}\n\\new Voice { \\voiceThree ";
-                } else {
-                    logo.notationNotes[turtle] += "<< { \\voiceThree ";
-                    multivoice = true;
-                }
-                break;
-            case "voice four":
-                if (multivoice) {
-                    logo.notationNotes[turtle] +=
+                    } else {
+                        logo.notationNotes[turtle] += "<< { \\voiceThree ";
+                        multivoice = true;
+                    }
+                    break;
+                case "voice four":
+                    if (multivoice) {
+                        logo.notationNotes[turtle] +=
                         "}\n\\new Voice { \\voiceFour ";
-                } else {
-                    logo.notationNotes[turtle] += "<< { \\voiceFour ";
-                    multivoice = true;
-                }
-                break;
-            case "one voice":
-                logo.notationNotes[turtle] += "}\n>> \\oneVoice\n";
-                multivoice = false;
-                break;
-            default:
-                logo.notationNotes[turtle] += obj;
-                break;
+                    } else {
+                        logo.notationNotes[turtle] += "<< { \\voiceFour ";
+                        multivoice = true;
+                    }
+                    break;
+                case "one voice":
+                    logo.notationNotes[turtle] += "}\n>> \\oneVoice\n";
+                    multivoice = false;
+                    break;
+                default:
+                    logo.notationNotes[turtle] += obj;
+                    break;
             }
         } else {
             if (noteCounter % 8 === 0 && noteCounter > 0) {
@@ -417,7 +417,7 @@ processLilypondNotes = function(lilypond, logo, turtle) {
                             tupletNoteCounter *= f;
                             tupletNoteCounter += 1;
                         } else if (logo.notation.notationStaging[turtle][i + j][
-                                NOTATIONROUNDDOWN] < commonTupletNote) {
+                            NOTATIONROUNDDOWN] < commonTupletNote) {
                             f = commonTupletNote /
                                 logo.notation.notationStaging[turtle][i + j][
                                     NOTATIONROUNDDOWN];
@@ -496,7 +496,7 @@ processLilypondNotes = function(lilypond, logo, turtle) {
                 }
 
                 if (i + j - 1 < logo.notation.notationStaging[turtle].length - 1) {
-                    let nextObj = logo.notation.notationStaging[turtle][i + j];
+                    const nextObj = logo.notation.notationStaging[turtle][i + j];
                     // Workaround to a Lilypond "feature": if a slur
                     // ends on a tuplet, the closing ) must be inside
                     // the closing } of the tuplet. Same for markup.
@@ -539,7 +539,7 @@ processLilypondNotes = function(lilypond, logo, turtle) {
                 // e.g., (3/8) / (1/4) = (3/8) * 4 = 12/8 = 3/2
 
                 if (incompleteTuplet === 0) {
-                    let tupletFraction = toFraction(
+                    const tupletFraction = toFraction(
                         tupletDuration / targetDuration
                     );
                     let a = tupletFraction[0] * targetDuration;
@@ -556,7 +556,7 @@ processLilypondNotes = function(lilypond, logo, turtle) {
                         "\\tuplet " + a + "/" + b + " { ";
 
                     i += __processTuplet(logo, turtle, i,
-                                         obj[NOTATIONTUPLETVALUE][0] *
+                        obj[NOTATIONTUPLETVALUE][0] *
                                          obj[NOTATIONTUPLETVALUE][1]) - 1;
                 } else {
                     // Incomplete tuplets look like this: \tuplet 3/2 { f4 a8 }
@@ -565,9 +565,9 @@ processLilypondNotes = function(lilypond, logo, turtle) {
                     // 3 x 1/8 note in the time of a 1/4 note ==>
                     // 3/8 / 1/4 = 3/2
 
-                    let f = tupletNoteCounter / commonTupletNote /
+                    const f = tupletNoteCounter / commonTupletNote /
                         totalTupletDuration;
-                    let tupletFraction = toFraction(f);
+                    const tupletFraction = toFraction(f);
                     let a = tupletFraction[0];
                     let b = tupletFraction[1];
 		    let c;
@@ -648,19 +648,19 @@ saveLilypondOutput = function(logo) {
         "nine"
     ];
     let turtleCount = 0;
-    let clef = [];
-    let freygish = ""; // A place to store custom mode definitions
+    const clef = [];
+    const freygish = ""; // A place to store custom mode definitions
 
-    for (let t in logo.notation.notationStaging) {
+    for (const t in logo.notation.notationStaging) {
         turtleCount += 1;
     }
 
-    let startDrums = turtleCount;
-    for (let t in logo.notation.notationDrumStaging) {
+    const startDrums = turtleCount;
+    for (const t in logo.notation.notationDrumStaging) {
         // Check to see if there are any notes in the drum staging.
         let foundNotes = false;
         for (let i = 0; i < logo.notation.notationDrumStaging[t].length; i++) {
-            let obj = logo.notation.notationDrumStaging[t][i];
+            const obj = logo.notation.notationDrumStaging[t][i];
             if (typeof obj === "object" && typeof obj[0] === "object" &&
                 obj[0][0] !== "R") {
                 foundNotes = true;
@@ -682,8 +682,8 @@ saveLilypondOutput = function(logo) {
         "% You can change the MIDI instruments below to anything on this list:\n% (http://lilypond.org/doc/v2.18/documentation/notation/midi-instruments)\n\n";
 
     let c = 0;
-    let occupiedShortNames = [];
-    for (let t in logo.notation.notationStaging) {
+    const occupiedShortNames = [];
+    for (const t in logo.notation.notationStaging) {
         // console.debug('value of t: ' + t);
         let tNumber = t;
         if (typeof t === "string") {
@@ -694,7 +694,7 @@ saveLilypondOutput = function(logo) {
             let octaveTotal = 0;
             let noteCount = 0;
             for (let i = 0; i < logo.notation.notationStaging[t].length; i++) {
-                let obj = logo.notation.notationStaging[t][i];
+                const obj = logo.notation.notationStaging[t][i];
                 // console.log("obj is ");
                 // console.log(obj);
                 if (typeof obj === "object") {
@@ -704,7 +704,7 @@ saveLilypondOutput = function(logo) {
                         } else if (typeof obj[0][ii] === "string") {
                             octaveTotal += Number(obj[0][ii].substr(-1));
                         } else {
-                            let pitchObj = frequencyToPitch(obj[0][ii]);
+                            const pitchObj = frequencyToPitch(obj[0][ii]);
                             octaveTotal += pitchObj[1];
                         }
 
@@ -724,17 +724,17 @@ saveLilypondOutput = function(logo) {
                         Math.floor(0.5 + octaveTotal / noteCount)
                 );
                 switch (Math.floor(0.5 + octaveTotal / noteCount)) {
-                case 0:
-                case 1:
-                case 2:
-                    clef.push("bass_8");
-                    break;
-                case 3:
-                    clef.push("bass");
-                    break;
-                default:
-                    clef.push("treble");
-                    break;
+                    case 0:
+                    case 1:
+                    case 2:
+                        clef.push("bass_8");
+                        break;
+                    case 3:
+                        clef.push("bass");
+                        break;
+                    default:
+                        clef.push("treble");
+                        break;
                 }
             } else {
                 clef.push("treble");
@@ -767,7 +767,7 @@ saveLilypondOutput = function(logo) {
                 logo.notationOutput += "\n}\n\n";
             } else {
                 if (t in logo.turtles.turtleList) {
-                    let turtleNumber = tNumber;
+                    const turtleNumber = tNumber;
 
                     instrumentName = logo.turtles.turtleList[t].name;
                     if (
@@ -805,7 +805,7 @@ saveLilypondOutput = function(logo) {
                 let part1 = "";
                 let part2 = "";
                 let done = 0;
-                let n = instrumentName.indexOf("_");
+                const n = instrumentName.indexOf("_");
 
                 // We calculate a unique short name based on the
                 // initial characters of the long name. If there is a
@@ -887,7 +887,7 @@ saveLilypondOutput = function(logo) {
             logo.notationOutput +=
                 '   instrumentName = "' + instrumentName + '"\n';
             if (tNumber > startDrums - 1) {
-                let num = tNumber - startDrums;
+                const num = tNumber - startDrums;
                 console.debug("shortInstrumentName = d" + num);
                 logo.notationOutput +=
                     '   shortInstrumentName = "' + "d" + num + '"\n';
@@ -919,9 +919,9 @@ saveLilypondOutput = function(logo) {
 
     // Sort the staffs, treble on top, bass_8 on the bottom.
     for (let c = 0; c < CLEFS.length; c++) {
-        let i = 0;
+        const i = 0;
         let instrumentName;
-        for (let t in logo.notationNotes) {
+        for (const t in logo.notationNotes) {
             let tNumber = t;
             if (typeof t === "string") {
                 tNumber = Number(t);
@@ -930,7 +930,7 @@ saveLilypondOutput = function(logo) {
             if (clef[tNumber] === CLEFS[c]) {
                 if (logo.notation.notationStaging[t].length > 0) {
                     if (tNumber > startDrums - 1) {
-                        let instrumentName =
+                        const instrumentName =
                             _("drum") + NUMBERNAMES[tNumber - startDrums];
                     } else {
                         if (t in logo.turtles.turtleList) {
@@ -970,9 +970,9 @@ saveLilypondOutput = function(logo) {
     // Add GUITAR TAB in comments.
     logo.notationOutput += guitarOutputHead;
     for (let c = 0; c < CLEFS.length; c++) {
-        let i = 0;
+        const i = 0;
         let instrumentName;
-        for (let t in logo.notationNotes) {
+        for (const t in logo.notationNotes) {
             let tNumber = t;
             if (typeof t === "string") {
                 tNumber = Number(t);
@@ -1030,7 +1030,7 @@ saveLilypondOutput = function(logo) {
     logo.notationOutput +=
         "% Below is the code for the Music Blocks project that generated this Lilypond file.\n%{\n\n";
     // prepareExport() returns json-encoded project data.
-    let projectData = prepareExport();
+    const projectData = prepareExport();
     logo.notationOutput += projectData.replace(/]],/g, "]],\n");
     logo.notationOutput += "\n%}\n\n";
     return logo.notationOutput;

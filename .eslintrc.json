@@ -3,6 +3,13 @@
     "es6": true,
     "browser": true
   },
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "sourceType": "script",
+    "ecmaFeatures": {
+      "globalReturn": false
+    }
+  },
   "extends": ["eslint:recommended", "prettier"],
   "rules": {
     "no-console": "warn",

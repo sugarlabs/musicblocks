@@ -17,6 +17,10 @@
  * Private members' names begin with underscore '_".
  */
 
+/* global JSEditor, SHARP, FLAT, NATURAL, DOUBLESHARP, DOUBLEFLAT */
+
+/* exported JSInterface */
+
 /**
  * @class
  * @classdesc contains the lists and lookups for relevant blocks, and utility methods to access them.
@@ -347,9 +351,9 @@ class JSInterface {
 
         if (!(methodName in JSInterface._methodArgConstraints)) return args;
 
-        let constraints = JSInterface._methodArgConstraints[methodName];
-        let finalArgs = [];
-        for (let i in constraints) {
+        const constraints = JSInterface._methodArgConstraints[methodName];
+        const finalArgs = [];
+        for (const i in constraints) {
             let [arg, props] = [args[i], constraints[i]];
 
             // for multiple types
@@ -374,7 +378,7 @@ class JSInterface {
                     if (!isNaN(Number(arg))) {
                         arg = Number(arg);
                     } else {
-                        let error = `TypeMismatch error: expected "number" but found "string"`;
+                        const error = 'TypeMismatch error: expected "number" but found "string"';
                         JSEditor.logConsole(error, "maroon");
                         throw error;
                     }
@@ -388,7 +392,7 @@ class JSInterface {
                         arg = true;
                     }
                 } else {
-                    let error = `TypeMismatch error: expected "${
+                    const error = `TypeMismatch error: expected "${
                         props["type"]
                     }" but found "${typeof arg}"`;
                     JSEditor.logConsole(error, "maroon");
@@ -423,7 +427,7 @@ class JSInterface {
                         props["constraints"]["async"] &&
                         arg[Symbol.toStringTag] !== "AsyncFunction"
                     ) {
-                        let error = `${args[0]} error: expected "async" function`;
+                        const error = `${args[0]} error: expected "async" function`;
                         JSEditor.logConsole(error, "maroon");
                         throw error;
                     }
@@ -431,7 +435,7 @@ class JSInterface {
 
                 case "string":
                     if (props["constraints"]["type"] === "solfegeorletter") {
-                        let strs = arg.split(" ");
+                        const strs = arg.split(" ");
                         const solfeges = ["do", "re", "mi", "fa", "sol", "la", "ti"];
                         const letters = ["c", "d", "e", "f", "g", "a", "b"];
                         if (
@@ -487,7 +491,7 @@ class JSInterface {
                         }
                     } else if (props["constraints"]["type"] === "oneof") {
                         let index = -1;
-                        for (let i in props["constraints"]["values"]) {
+                        for (const i in props["constraints"]["values"]) {
                             if (
                                 props["constraints"]["values"][i].toLowerCase() ===
                                 arg.toLowerCase()
@@ -594,7 +598,7 @@ class JSInterface {
                             arg = "noise1";
                         }
                     } else if (props["constraints"]["type"] === "letterkey") {
-                        let strs = arg.split(" ");
+                        const strs = arg.split(" ");
                         const letters = ["c", "d", "e", "f", "g", "a", "b"];
                         if (letters.indexOf(strs[0].toLowerCase()) !== -1) {
                             arg = strs[0].toUpperCase();

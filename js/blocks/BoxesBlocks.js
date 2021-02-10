@@ -40,15 +40,15 @@ function setupBoxesBlocks() {
 
         flow(args, logo, turtle, blk) {
             // If the 2nd arg is not set, default to 1.
-            let i = args.length === 2 ? args[1] : 1;
+            const i = args.length === 2 ? args[1] : 1;
 
             if (args.length > 0) {
-                let cblk = logo.blocks.blockList[blk].connections[1];
+                const cblk = logo.blocks.blockList[blk].connections[1];
 
                 if (logo.blocks.blockList[cblk].name === "text") {
                     // Work-around to #1302
                     // Look for a namedbox with this text value.
-                    let name = logo.blocks.blockList[cblk].value;
+                    const name = logo.blocks.blockList[cblk].value;
                     if (name in logo.boxes) {
                         logo.boxes[name] = logo.boxes[name] + i;
                         return;
@@ -150,8 +150,8 @@ function setupBoxesBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            let cblk = logo.blocks.blockList[blk].connections[1];
-            let boxname = logo.parseArg(that, turtle, cblk, blk, logo.receivedArg);
+            const cblk = logo.blocks.blockList[blk].connections[1];
+            const boxname = logo.parseArg(that, turtle, cblk, blk, logo.receivedArg);
             if (boxname in logo.boxes) {
                 return logo.boxes[boxname];
             } else {
@@ -161,8 +161,8 @@ function setupBoxesBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            let cblk = logo.blocks.blockList[blk].connections[1];
-            let name = logo.parseArg(logo, turtle, cblk, blk, logo.receivedArg);
+            const cblk = logo.blocks.blockList[blk].connections[1];
+            const name = logo.parseArg(logo, turtle, cblk, blk, logo.receivedArg);
             if (name in logo.boxes) {
                 logo.boxes[name] = value;
             } else {
@@ -171,13 +171,13 @@ function setupBoxesBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            let cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             }
 
-            let name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+            const name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
             if (name in logo.boxes) {
                 return logo.boxes[name];
             } else {
@@ -207,7 +207,7 @@ function setupBoxesBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            let name = logo.blocks.blockList[blk].privateData;
+            const name = logo.blocks.blockList[blk].privateData;
             if (name in logo.boxes) {
                 return logo.boxes[name];
             } else {
@@ -217,7 +217,7 @@ function setupBoxesBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            let name = logo.blocks.blockList[blk].privateData;
+            const name = logo.blocks.blockList[blk].privateData;
             if (name in logo.boxes) {
                 logo.boxes[name] = value;
             } else {
@@ -226,7 +226,7 @@ function setupBoxesBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            let name = logo.blocks.blockList[blk].privateData;
+            const name = logo.blocks.blockList[blk].privateData;
             if (
                 logo.inStatusMatrix &&
                 logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
