@@ -24,6 +24,7 @@
       }
     ],
     "no-undef": "error",
+    "no-redeclare": [2, {"builtinGlobals": false}],
     "indent": ["warn", 4, { "SwitchCase": 1 }],
     "quotes": ["warn", "double", { "avoidEscape": true }],
     "semi": "error",
