@@ -17,13 +17,29 @@
  *
  * Utility methods are in PascalCase.
  * Action methods are in camelCase.
-*/
+ */
 
-/*exported setupDrumActions*/
-
-/* global DEFAULTDRUM, _, DRUMNAMES, Singer, last, logo, DEFAULTVOLUME, blocks, 
-MusicBlocks, Mouse, NOISENAMES
+/* global Singer,DEFAULTDRUM,DRUMNAMES,last,DEFAULTVOLUME,logo,blocks,MusicBlocks,Mouse,NOISENAMES,_ */
+/*
+    Global Locations
+     js/utils/utils.js
+        _
+     js/turtle-singer.js
+        Singer
+     js/activity.js
+        logo
+     js/utils/synthutils.js
+        DRUMNAMES,NOISENAMES
+     js/utils/musicutils.js
+        DEFAULTDRUM
+     js/logo.js/
+        DEFAULTVOLUME
+     js/blocks.js
+        blocks
+     js/js-export/export.js
+        MusicBlocks, Mouse
 */
+/* exported setupDrumActions */
 
 /**
  * Sets up all the methods related to different actions for each block in Drum palette.

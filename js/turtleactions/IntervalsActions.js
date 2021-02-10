@@ -42,7 +42,6 @@
 
 /* exported setupIntervalsActions*/
 
-
 /**
  * Sets up all the methods related to different actions for each block in Intervals palette.
  *

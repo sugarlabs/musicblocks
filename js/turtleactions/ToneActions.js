@@ -14,11 +14,27 @@
  * You should have received a copy of the GNU Affero General Public License along with this
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
+ */
+
+/* global _,Singer,logo,VOICENAMES,MusicBlocks,blocks,Mouse,last,instrumentsEffects,NOINPUTERRORMSG */
+/*
+    Global Locations
+     js/utils/utils.js
+        _
+     js/turtle-singer.js
+        Singer
+     js/activity.js
+        logo
+     js/utils/synthutils.js
+        instrumentsEffects
+     js/logo.js
+        NOINPUTERRORMSG
+     js/blocks.js
+        blocks
+     js/js-export/export.js
+        MusicBlocks, Mouse
 */
-
-/*exported setupToneActions*/
-
-/* global Singer, logo, blocks, MusicBlocks, Mouse, last, _, VOICENAMES, instrumentsEffects, NOINPUTERRORMSG, arg */
+/* exported setupToneActions */
 
 /**
  * Sets up all the methods related to different actions for each block in Tone palette.
@@ -352,7 +368,7 @@ function setupToneActions() {
 
             if (modulationIndex < 0) {
                 logo.errorMsg(_("The input cannot be negative."));
-                modulationIndex = -arg;
+                modulationIndex = -modulationIndex;
             }
 
             if (logo.inTimbre) {

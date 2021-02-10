@@ -14,11 +14,19 @@
  * You should have received a copy of the GNU Affero General Public License along with this
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
+ */
+
+/* global Singer,logo,MusicBlocks,blocks,Mouse */
+/*
+    Global Locations
+     js/turtle-singer.js
+        Singer
+     js/activity.js
+        logo
+     js/js-export/export.js
+        MusicBlocks, Mouse
 */
-
-/*exported setupOrnamentActions*/
-
-/* global Singer, logo, blocks, MusicBlocks, Mouse */
+/* exported setupOrnamentActions */
 
 /**
  * Sets up all the methods related to different actions for each block in Ornament palette.

@@ -14,13 +14,31 @@
  * You should have received a copy of the GNU Affero General Public License along with this
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
-*/
+ */
 
-/*exported setupMeterActions*/
-
-/* global rationalToFraction, _, blk, Singer, _blk, logo, TONEBPM, blocks, 
-MusicBlocks, Mouse, Queue, turtles, last
+/* global _,logo,Singer,rationalToFraction,TONEBPM,Queue,turtles,last,MusicBlocks,blocks,Mouse */
+/*
+    Global Locations
+     js/utils/utils.js
+        _,rationalToFraction
+     js/turtle-singer.js
+        Singer
+     js/activity.js
+        logo
+     js/utils/synthutils.js
+        DRUMNAMES,NOISENAMES
+     js/utils/musicutils.js
+        DEFAULTDRUM
+     js/logo.js
+        DEFAULTVOLUME,TONEBPM
+     js/blocks.js
+        blocks
+     js/activity.js
+        turtles
+     js/js-export/export.js
+        MusicBlocks, Mouse
 */
+/* exported setupMeterActions */
 
 /**
  * Sets up all the methods related to different actions for each block in Meter palette.
@@ -83,8 +101,7 @@ function setupMeterActions() {
                         " " +
                         _("beats per minute must be greater than") +
                         " " +
-                        target,
-                    blk
+                        target
                 );
                 _bpm = 30;
             } else if (_bpm > 1000) {
@@ -99,8 +116,7 @@ function setupMeterActions() {
                         " " +
                         _("beats per minute is") +
                         " " +
-                        target,
-                    _blk
+                        target
                 );
                 _bpm = 1000;
             }
@@ -379,7 +395,7 @@ function setupMeterActions() {
         }
 
         static getBeatFactor(turtle) {
-            // eslint-disable-next-line max-len
+
             return Singer.RhythmActions.getNoteValue(turtle) * logo.turtles.ithTurtle(turtle).singer.noteValuePerBeat;
         }
 
