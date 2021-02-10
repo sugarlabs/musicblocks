@@ -70,16 +70,16 @@ interpColor = function(hex1, hex2, p) {
     } else if (p === 1) {
         return hex1;
     } else {
-        let r1 = parseInt(hex1.substr(1, 2), 16);
-        let g1 = parseInt(hex1.substr(3, 2), 16);
-        let b1 = parseInt(hex1.substr(5, 2), 16);
-        let r2 = parseInt(hex2.substr(1, 2), 16);
-        let g2 = parseInt(hex2.substr(3, 2), 16);
-        let b2 = parseInt(hex2.substr(5, 2), 16);
+        const r1 = parseInt(hex1.substr(1, 2), 16);
+        const g1 = parseInt(hex1.substr(3, 2), 16);
+        const b1 = parseInt(hex1.substr(5, 2), 16);
+        const r2 = parseInt(hex2.substr(1, 2), 16);
+        const g2 = parseInt(hex2.substr(3, 2), 16);
+        const b2 = parseInt(hex2.substr(5, 2), 16);
 
-        let nr = Math.floor(r1 * p + r2 * (1 - p));
-        let ng = Math.floor(g1 * p + g2 * (1 - p));
-        let nb = Math.floor(b1 * p + b2 * (1 - p));
+        const nr = Math.floor(r1 * p + r2 * (1 - p));
+        const ng = Math.floor(g1 * p + g2 * (1 - p));
+        const nb = Math.floor(b1 * p + b2 * (1 - p));
 
         return createjs.Graphics.getRGB(nr, ng, nb, 1.0);
     }
@@ -100,8 +100,8 @@ function getcolor(color) {
         h2 = 0;
     }
 
-    let v = Math.floor(COLORS40[h1][0] * p + COLORS40[h2][0] * (1 - p));
-    let c = Math.floor(COLORS40[h1][1] * p + COLORS40[h2][1] * (1 - p));
+    const v = Math.floor(COLORS40[h1][0] * p + COLORS40[h2][0] * (1 - p));
+    const c = Math.floor(COLORS40[h1][1] * p + COLORS40[h2][1] * (1 - p));
     return [
         v * 10,
         (c * 100) / 14,
@@ -114,11 +114,11 @@ function searchColors(r, g, b) {
     let nearestColor = -1;
     let distance = 10000000;
     for (let i = 0; i < 100; i++) {
-        let color = getcolor(i);
-        let r1 = parseInt(color[2].substr(1, 2), 16);
-        let g1 = parseInt(color[2].substr(3, 2), 16);
-        let b1 = parseInt(color[2].substr(5, 2), 16);
-        let distSquared =
+        const color = getcolor(i);
+        const r1 = parseInt(color[2].substr(1, 2), 16);
+        const g1 = parseInt(color[2].substr(3, 2), 16);
+        const b1 = parseInt(color[2].substr(5, 2), 16);
+        const distSquared =
             (r1 - r) * (r1 - r) + (g1 - g) * (g1 - g) + (b1 - b) * (b1 - b);
         if (distSquared < distance) {
             distance = distSquared;
@@ -133,11 +133,11 @@ function searchAllColors(r, g, b) {
     let nearestColor = -1;
     let distance = 10000000;
     for (let i = 0; i < MUNSELL.length; i++) {
-        let color = MUNSELL[i];
-        let r1 = parseInt(color.substr(1, 2), 16);
-        let g1 = parseInt(color.substr(3, 2), 16);
-        let b1 = parseInt(color.substr(5, 2), 16);
-        let distSquared =
+        const color = MUNSELL[i];
+        const r1 = parseInt(color.substr(1, 2), 16);
+        const g1 = parseInt(color.substr(3, 2), 16);
+        const b1 = parseInt(color.substr(5, 2), 16);
+        const distSquared =
             (r1 - r) * (r1 - r) + (g1 - g) * (g1 - g) + (b1 - b) * (b1 - b);
         if (distSquared < distance) {
             distance = distSquared;

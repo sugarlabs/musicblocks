@@ -14,7 +14,7 @@ define([
     "sugar-web/activity/activity",
     "sugar-web/datastore"
 ], function(env, activity, datastore) {
-    let sugarizerCompatibility = {
+    const sugarizerCompatibility = {
         activity: activity,
         data: { allProjects: "[]" },
         env: env,
@@ -24,9 +24,9 @@ define([
         },
 
         saveLocally: function(callback) {
-            let that = this;
+            const that = this;
             activity.getDatastoreObject().setDataAsText(JSON.stringify(
-		that.data));
+                that.data));
             activity.getDatastoreObject().save(function() {
                 if (callback) {
                     callback();
@@ -42,7 +42,7 @@ define([
         },
 
         loadData: function(callback) {
-            let that = this;
+            const that = this;
             activity
                 .getDatastoreObject()
                 .loadAsText(function(error, metadata, jsonData) {
@@ -59,7 +59,7 @@ define([
         },
 
         hideLoading: function() {
-            let imageLoading = document.getElementById(
+            const imageLoading = document.getElementById(
                 "loading-image-container"
             );
             imageLoading.style.display = "none";
@@ -70,7 +70,7 @@ define([
         },
 
         getLanguage: function() {
-            let defaultSettings = {
+            const defaultSettings = {
                 name: "",
                 language:
                     typeof chrome != "undefined" &&
@@ -85,7 +85,7 @@ define([
                 return defaultSettings.language;
             }
 
-            let loadedSettings = datastore.localStorage.getValue(
+            const loadedSettings = datastore.localStorage.getValue(
                 "sugar_settings"
             );
             return loadedSettings.language;

@@ -36,6 +36,9 @@ URL [_musicblocks.sugarlabs.org_](https://musicblocks.sugarlabs.org) in your bro
 _Google Chrome_ (or _Chromium_), _Microsoft Edge_ (_Chromium-based_), _Mozilla Firefox_, and
 _Opera_ work best.
 
+To run from the latest master branch (experimental), visit
+[_sugarlabs.github.io/musicblocks_](https://sugarlabs.github.io/musicblocks).
+
 ## <a name="HOW_TO_SET_UP_A_LOCAL_SERVER"></a>How to set up a _local server_
 
 Music Blocks is written using native browser technologies. The bulk of the functionality is in
@@ -96,7 +99,7 @@ Looking for a block? Find it in the
 
 ## <a name="MODIFYING_MUSIC_BLOCKS"></a>Modifying Music Blocks
 
-The core funnctionality for Music Blocks resides in the [`js/` directory](./js/). Individual
+The core functionality for Music Blocks resides in the [`js/` directory](./js/). Individual
 modules are described in more detail in [js/README.md](./js/README.md).
 
 **NOTE:** As for any changes, please make your own copy by cloning this
@@ -132,7 +135,7 @@ Music Blocks is being built from the ground-up, to address several architectural
 run. Since Music Blocks is a fork of Turtle Blocks JS, musical functionality was added on top of it.
 However, music is fundamental to Music Blocks. Besides, the Turtle Blocks JS started initially with
 handful of features, and was written without a complex architecture. As Music Blocks got built on
-top of that, it got incremently complex, but the architecture remained simple, thus resulting in a
+top of that, it got incrementally complex, but the architecture remained simple, thus resulting in a
 monolith. Also, the functionality is tightly coupled with the interface and native client API (Web
 API).
 

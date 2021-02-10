@@ -14,6 +14,8 @@
  * MA 02110-1335 USA.
  */
 
+/* global JSInterface */
+
 /**
  * @static
  * lookup table for API method names to argument constraints
@@ -990,24 +992,24 @@ JSInterface._methodArgConstraints = {
             }
         }
     ],
-    setBezierControlPoint1: [
-        {
-            type: "number",
-            constraints: {
-                min: -100000,
-                max: 100000,
-                integer: false
-            }
-        },
-        {
-            type: "number",
-            constraints: {
-                min: -100000,
-                max: 100000,
-                integer: false
-            }
-        }
-    ],
+    // setBezierControlPoint1: [
+    //     {
+    //         type: "number",
+    //         constraints: {
+    //             min: -100000,
+    //             max: 100000,
+    //             integer: false
+    //         }
+    //     },
+    //     {
+    //         type: "number",
+    //         constraints: {
+    //             min: -100000,
+    //             max: 100000,
+    //             integer: false
+    //         }
+    //     }
+    // ],
     scrollXY: [
         {
             type: "number",

@@ -10,9 +10,31 @@
 
 // This widget displays help about a block or a button.
 
+/*global _, docById, getMacroExpansion, HELPCONTENT, blocks*/
+
+/*
+     Globals locations
+     
+     - js/utils/utils.js
+        _, docById
+     
+     - js/macros.js
+        getMacroExpansion
+    
+     - js/turtledefs.js
+        HELPCONTENT
+    
+     - js/activity.js
+        blocks
+ */
+
+/*exported HelpWidget*/
 class HelpWidget {
     static ICONSIZE = 32;
 
+    /**
+     * @param {Blocks} blocks
+     */
     constructor(blocks) {
         this.beginnerBlocks = [];
         this.advancedBlocks = [];
@@ -20,7 +42,7 @@ class HelpWidget {
         this.index = 0;
         this.isOpen = true;
 
-        let widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
+        const widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         widgetWindow.getWidgetBody().style.overflowY = "auto";
         // const canvasHeight = docById("myCanvas").getBoundingClientRect().height;
         widgetWindow.getWidgetBody().style.maxHeight = "500px";
@@ -41,8 +63,13 @@ class HelpWidget {
         setTimeout(this.widgetWindow.sendToCenter, 50);
     }
 
+    /**
+     * @private
+     * @param {Blocks} blocks
+     * @returns {void}
+     */
     _setup(blocks) {
-        let iconSize = HelpWidget.ICONSIZE;
+        const iconSize = HelpWidget.ICONSIZE;
         // Which help page are we on?
         let page = 0;
 
@@ -89,7 +116,7 @@ class HelpWidget {
             };
         } else {
             if (blocks.activeBlock.name !== null) {
-                let label = blocks.blockList[blocks.activeBlock].protoblock.staticLabels[0];
+                const label = blocks.blockList[blocks.activeBlock].protoblock.staticLabels[0];
                 this.widgetWindow.updateTitle(_(label));
             }
 
@@ -110,9 +137,9 @@ class HelpWidget {
         } else {
             // display help for this block
             if (blocks.activeBlock.name !== null) {
-                let name = blocks.blockList[blocks.activeBlock].name;
+                const name = blocks.blockList[blocks.activeBlock].name;
 
-                let advIcon =
+                const advIcon =
                     '<a\
                 class="tooltipped"\
                 data-toggle="tooltip"\
@@ -125,7 +152,7 @@ class HelpWidget {
                 ></a\
                 >';
 
-                let findIcon =
+                const findIcon =
                     '<a\
             class="tooltipped"\
             data-toggle="tooltip"\
@@ -139,16 +166,14 @@ class HelpWidget {
             ></a\
             >';
 
-                let showPaletteParamater =
-                    blocks.blockList[blocks.activeBlock].protoblock.palette.name;
                 // Each block's help entry contains a help string, the
                 // path of the help svg, an override name for the help
                 // svg file, and an optional macro name for generating
                 // the help output.
-                let message = blocks.blockList[blocks.activeBlock].protoblock.helpString;
+                const message = blocks.blockList[blocks.activeBlock].protoblock.helpString;
 
                 if (message) {
-                    let helpBody = docById("helpBodyDiv");
+                    const helpBody = docById("helpBodyDiv");
                     helpBody.style.height = "";
 
                     let body = "";
@@ -195,20 +220,23 @@ class HelpWidget {
                         helpBody.innerHTML += advIcon;
                     }
 
-                    let object = blocks.palettes.getProtoNameAndPalette(name);
+                    const object = blocks.palettes.getProtoNameAndPalette(name);
 
-                    let loadButton = docById("loadButton");
+                    const loadButton = docById("loadButton");
                     if (loadButton !== null) {
                         loadButton.onclick = () => {
                             if (message.length < 4) {
                                 // If there is nothing specified, just load the block.
-                                console.debug("CLICK: " + name);
+                                // console.debug("CLICK: " + name);
 
-                                let protoblk = object[0];
-                                let paletteName = object[1];
-                                let protoName = object[2];
+                                const protoblk = object[0];
+                                const paletteName = object[1];
+                                const protoName = object[2];
 
-                                let protoResult = blocks.protoBlockDict.hasOwnProperty(protoName);
+                                const protoResult = Object.prototype.hasOwnProperty.call(
+                                    blocks.protoBlockDict,
+                                    protoName
+                                );
                                 if (protoResult) {
                                     blocks.palettes.dict[paletteName].makeBlockFromSearch(
                                         protoblk,
@@ -221,18 +249,18 @@ class HelpWidget {
                             } else if (typeof message[3] === "string") {
                                 // If it is a string, load the macro
                                 // assocuated with this block
-                                let blocksToLoad = getMacroExpansion(message[3], 100, 100);
-                                console.debug("CLICK: " + blocksToLoad);
+                                const blocksToLoad = getMacroExpansion(message[3], 100, 100);
+                                // console.debug("CLICK: " + blocksToLoad);
                                 blocks.loadNewBlocks(blocksToLoad);
                             } else {
                                 // Load the blocks.
-                                let blocksToLoad = message[3];
-                                console.debug("CLICK: " + blocksToLoad);
+                                const blocksToLoad = message[3];
+                                // console.debug("CLICK: " + blocksToLoad);
                                 blocks.loadNewBlocks(blocksToLoad);
                             }
                         };
                     }
-                    let findIconMethod = docById("findIcon");
+                    const findIconMethod = docById("findIcon");
 
                     findIconMethod.onclick = () => {
                         blocks.palettes.showPalette(object[1]);
@@ -244,8 +272,13 @@ class HelpWidget {
         this.widgetWindow.takeFocus();
     }
 
+    /**
+     * @private
+     * @param {number} page
+     * @returns {void}
+     */
     _showPage(page) {
-        let helpBody = docById("helpBodyDiv");
+        const helpBody = docById("helpBodyDiv");
         let body = "";
         if (
             [
@@ -268,8 +301,8 @@ class HelpWidget {
         body = body + "<p>" + HELPCONTENT[page][1] + "</p>";
 
         if (HELPCONTENT[page].length > 3) {
-            let link = HELPCONTENT[page][3];
-            console.debug(page + " " + link);
+            const link = HELPCONTENT[page][3];
+            // console.debug(page + " " + link);
             body =
                 body +
                 '<p><a href="' +
@@ -280,7 +313,7 @@ class HelpWidget {
         }
 
         if ([_("Congratulations.")].indexOf(HELPCONTENT[page][0]) !== -1) {
-            let cell = docById("right-arrow");
+            const cell = docById("right-arrow");
 
             cell.onclick = () => {
                 this._prepareBlockList(blocks);
@@ -293,10 +326,14 @@ class HelpWidget {
         this.widgetWindow.takeFocus();
     }
 
-    // Prepare a list of beginner and advanced blocks and cycle through their help
-
+    /**
+     * Prepare a list of beginner and advanced blocks and cycle through their help
+     * @private
+     * @param {Blocks} blocks
+     * @returns {void}
+     */
     _prepareBlockList(blocks) {
-        for (let key in blocks.protoBlockDict) {
+        for (const key in blocks.protoBlockDict) {
             if (
                 blocks.protoBlockDict[key].beginnerModeBlock === true &&
                 blocks.protoBlockDict[key].helpString !== undefined &&
@@ -306,7 +343,7 @@ class HelpWidget {
             }
         }
 
-        for (let key in blocks.protoBlockDict) {
+        for (const key in blocks.protoBlockDict) {
             if (
                 blocks.protoBlockDict[key].beginnerModeBlock === false &&
                 blocks.protoBlockDict[key].helpString !== undefined &&
@@ -324,11 +361,17 @@ class HelpWidget {
         this._blockHelp(blocks.protoBlockDict[this.appendedBlockList[0]], blocks);
     }
 
-    // Function to display help related to a single block
-    // called recursively to cycle through help string of all blocks (Beginner Blocks First)
 
+    /**
+     * Function to display help related to a single block
+     * called recursively to cycle through help string of all blocks (Beginner Blocks First)
+     * @private
+     * @param {ProtoBlock} block 
+     * @param {Blocks} blocks 
+     * @returns {void}
+     */
     _blockHelp(block, blocks) {
-        let widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
+        const widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         this._helpDiv = document.createElement("div");
@@ -359,18 +402,13 @@ class HelpWidget {
             this._blockHelp(blocks.protoBlockDict[this.appendedBlockList[this.index]], blocks);
         };
         if (block.name !== null) {
-            let label = block.staticLabels[0];
+            const label = block.staticLabels[0];
             this.widgetWindow.updateTitle(_(label));
         }
 
-        // display help menu
-        // docById("helpBodyDiv").style.height = "325px";
-        // docById("helpBodyDiv").style.width = "400px";
-        // this._showPage(0);
-
         if (block.name !== null) {
-            let name = block.name;
-            let advIcon =
+            const name = block.name;
+            const advIcon =
                 '<a\
             class="tooltipped"\
             data-toggle="tooltip"\
@@ -383,7 +421,7 @@ class HelpWidget {
             ></a\
         >';
 
-            let findIcon =
+            const findIcon =
                 '<a\
             class="tooltipped"\
             data-toggle="tooltip"\
@@ -397,9 +435,9 @@ class HelpWidget {
             ></a\
         >';
 
-            let message = block.helpString;
+            const message = block.helpString;
 
-            let helpBody = docById("helpBodyDiv");
+            const helpBody = docById("helpBodyDiv");
             helpBody.style.height = "500px";
             helpBody.style.backgroundColor = "#e8e8e8";
             if (message) {
@@ -447,25 +485,28 @@ class HelpWidget {
                     helpBody.innerHTML += advIcon;
                 }
 
-                let findIconMethod = docById("findIcon");
+                const findIconMethod = docById("findIcon");
 
                 findIconMethod.onclick = () => {
                     block.palette.palettes.showPalette(block.palette.name);
                 };
 
-                let loadButton = docById("loadButton");
+                const loadButton = docById("loadButton");
                 if (loadButton !== null) {
                     loadButton.onclick = () => {
                         if (message.length < 4) {
                             // If there is nothing specified, just
                             // load the block.
-                            console.debug("CLICK: " + name);
-                            let obj = blocks.palettes.getProtoNameAndPalette(name);
-                            let protoblk = obj[0];
-                            let paletteName = obj[1];
-                            let protoName = obj[2];
+                            // console.debug("CLICK: " + name);
+                            const obj = blocks.palettes.getProtoNameAndPalette(name);
+                            const protoblk = obj[0];
+                            const paletteName = obj[1];
+                            const protoName = obj[2];
 
-                            let protoResult = blocks.protoBlockDict.hasOwnProperty(protoName);
+                            const protoResult = Object.prototype.hasOwnProperty.call(
+                                blocks.protoBlockDict,
+                                protoName
+                            );
                             if (protoResult) {
                                 blocks.palettes.dict[paletteName].makeBlockFromSearch(
                                     protoblk,
@@ -478,13 +519,13 @@ class HelpWidget {
                         } else if (typeof message[3] === "string") {
                             // If it is a string, load the macro
                             // assocuated with this block
-                            let blocksToLoad = getMacroExpansion(message[3], 100, 100);
-                            console.debug("CLICK: " + blocksToLoad);
+                            const blocksToLoad = getMacroExpansion(message[3], 100, 100);
+                            // console.debug("CLICK: " + blocksToLoad);
                             blocks.loadNewBlocks(blocksToLoad);
                         } else {
                             // Load the blocks.
-                            let blocksToLoad = message[3];
-                            console.debug("CLICK: " + blocksToLoad);
+                            const blocksToLoad = message[3];
+                            // console.debug("CLICK: " + blocksToLoad);
                             blocks.loadNewBlocks(blocksToLoad);
                         }
                     };
@@ -495,6 +536,9 @@ class HelpWidget {
         this.widgetWindow.takeFocus();
     }
 
+    /**
+     * @deprecated
+     */
     showPageByName(pageName) {
         for (let i = 0; i < HELPCONTENT.length; i++) {
             if (HELPCONTENT[i].includes(pageName)) {

@@ -22,12 +22,12 @@ function getTargetTurtle(turtles, targetTurtle) {
 }
 
 function _blockFindTurtle(logo, turtle, blk, receivedArg) {
-    let cblk = logo.blocks.blockList[blk].connections[1];
+    const cblk = logo.blocks.blockList[blk].connections[1];
     if (cblk === null) {
         console.log("Could not find connecting block");
         return null;
     }
-    let targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+    const targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
     if (targetTurtle === null) {
         console.log("Could not find target turtle name from arg");
         return null;
@@ -57,17 +57,17 @@ function setupEnsembleBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            let cblk1 = logo.blocks.blockList[blk].connections[1];
+            const cblk1 = logo.blocks.blockList[blk].connections[1];
             if (cblk1 === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return -1;
             }
 
-            let targetTurtle = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-            let i = getTargetTurtle(logo.turtles, targetTurtle);
+            const targetTurtle = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            const i = getTargetTurtle(logo.turtles, targetTurtle);
             if (i < 0) return -1;
 
-            let cblk2 = logo.blocks.blockList[blk].connections[2];
+            const cblk2 = logo.blocks.blockList[blk].connections[2];
             if (cblk2 === null) {
                 logo.errorMsg(NANERRORMSG, blk);
             } else {
@@ -123,7 +123,7 @@ function setupEnsembleBlocks() {
                 return;
             }
 
-            let targetTurtle = getTargetTurtle(logo.turtles, args[0]);
+            const targetTurtle = getTargetTurtle(logo.turtles, args[0]);
             if (targetTurtle === null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     logo.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
@@ -131,7 +131,7 @@ function setupEnsembleBlocks() {
                     logo.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
                 }
             } else {
-                let tur = logo.turtles.ithTurtle(targetTurtle);
+                const tur = logo.turtles.ithTurtle(targetTurtle);
 
                 tur.queue = [];
                 tur.parentFlowQueue = [];
@@ -168,7 +168,7 @@ function setupEnsembleBlocks() {
                 return;
             }
 
-            let targetTurtle = getTargetTurtle(logo.turtles, args[0]);
+            const targetTurtle = getTargetTurtle(logo.turtles, args[0]);
             if (targetTurtle === null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     logo.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
@@ -176,7 +176,7 @@ function setupEnsembleBlocks() {
                     logo.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
                 }
             } else {
-                let tur = logo.turtles.ithTurtle(targetTurtle);
+                const tur = logo.turtles.ithTurtle(targetTurtle);
 
                 if (tur.running) {
                     if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -232,7 +232,7 @@ function setupEnsembleBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            let thisTurtle = _blockFindTurtle(logo, turtle, blk, receivedArg);
+            const thisTurtle = _blockFindTurtle(logo, turtle, blk, receivedArg);
 
             if (thisTurtle) return thisTurtle.painter.color;
             return logo.turtles.turtleList[turtle].painter.color;
@@ -260,7 +260,7 @@ function setupEnsembleBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            let thisTurtle = _blockFindTurtle(logo, turtle, blk, receivedArg);
+            const thisTurtle = _blockFindTurtle(logo, turtle, blk, receivedArg);
 
             if (thisTurtle) return thisTurtle.orientation;
             return logo.turtles.turtleList[turtle].orientation;
@@ -283,7 +283,7 @@ function setupEnsembleBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let targetTurtle = getTargetTurtle(logo.turtles, args[0]);
+            const targetTurtle = getTargetTurtle(logo.turtles, args[0]);
             if (targetTurtle === null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     logo.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
@@ -320,7 +320,7 @@ function setupEnsembleBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
-            let targetTurtle = getTargetTurtle(logo.turtles, args[0]);
+            const targetTurtle = getTargetTurtle(logo.turtles, args[0]);
             if (targetTurtle !== null) {
                 logo.runFromBlock(logo, targetTurtle, args[1], isflow, receivedArg);
             } else {
@@ -416,14 +416,14 @@ function setupEnsembleBlocks() {
          * @todo FIXME
          */
         arg(logo, turtle, blk, receivedArg) {
-            let thisTurtle = _blockFindTurtle(logo, turtle, blk, receivedArg);
+            const thisTurtle = _blockFindTurtle(logo, turtle, blk, receivedArg);
 
             if (thisTurtle) {
-                let tur = logo.turtles.ithTurtle(thisTurtle);
+                const tur = logo.turtles.ithTurtle(thisTurtle);
                 return tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1];
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
             return tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1];
         }
     }
@@ -452,19 +452,19 @@ function setupEnsembleBlocks() {
 
         arg(logo, turtle, blk, receivedArg) {
             let value = null;
-            let cblk = logo.blocks.blockList[blk].connections[1];
-            let targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+            const cblk = logo.blocks.blockList[blk].connections[1];
+            const targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             for (let i = 0; i < logo.turtles.turtleList.length; i++) {
-                let thisTurtle = logo.turtles.turtleList[i];
+                const thisTurtle = logo.turtles.turtleList[i];
                 if (targetTurtle === thisTurtle.name) {
                     let obj;
                     if (thisTurtle.singer.lastNotePlayed !== null) {
-                        let len = thisTurtle.singer.lastNotePlayed[0].length;
-                        let pitch = thisTurtle.singer.lastNotePlayed[0].slice(0, len - 1);
-                        let octave = parseInt(thisTurtle.singer.lastNotePlayed[0].slice(len - 1));
+                        const len = thisTurtle.singer.lastNotePlayed[0].length;
+                        const pitch = thisTurtle.singer.lastNotePlayed[0].slice(0, len - 1);
+                        const octave = parseInt(thisTurtle.singer.lastNotePlayed[0].slice(len - 1));
 
                         obj = [pitch, octave];
                     } else if (thisTurtle.singer.notePitches.length > 0) {
@@ -501,9 +501,9 @@ function setupEnsembleBlocks() {
 
                 let obj;
                 if (tur.singer.lastNotePlayed !== null) {
-                    let len = tur.singer.lastNotePlayed[0].length;
-                    let pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
-                    let octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1));
+                    const len = tur.singer.lastNotePlayed[0].length;
+                    const pitch = tur.singer.lastNotePlayed[0].slice(0, len - 1);
+                    const octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1));
                     obj = [pitch, octave];
                 } else if (tur.singer.notePitches.length > 0) {
                     obj = getNote(
@@ -547,11 +547,11 @@ function setupEnsembleBlocks() {
 
         arg(logo, turtle, blk, receivedArg) {
             let value = null;
-            let cblk = logo.blocks.blockList[blk].connections[1];
-            let targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+            const cblk = logo.blocks.blockList[blk].connections[1];
+            const targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
 
             for (let i = 0; i < logo.turtles.turtleList.length; i++) {
-                let thisTurtle = logo.turtles.ithTurtle(i);
+                const thisTurtle = logo.turtles.ithTurtle(i);
                 if (targetTurtle === thisTurtle.name) {
                     if (
                         thisTurtle.singer.inNoteBlock.length > 0 &&
@@ -627,7 +627,7 @@ function setupEnsembleBlocks() {
                 return;
             }
 
-            let targetTurtle = getTargetTurtle(logo.turtles, args[0]);
+            const targetTurtle = getTargetTurtle(logo.turtles, args[0]);
             if (targetTurtle === null) {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     logo.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
@@ -665,8 +665,8 @@ function setupEnsembleBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            let cblk = logo.blocks.blockList[blk].connections[1];
-            let targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+            const cblk = logo.blocks.blockList[blk].connections[1];
+            const targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
             return getTargetTurtle(logo.turtles, targetTurtle) !== null;
         }
     }
@@ -689,24 +689,24 @@ function setupEnsembleBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
-            let cblk = logo.blocks.blockList[blk].connections[1];
-            let turtleName = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+            const cblk = logo.blocks.blockList[blk].connections[1];
+            const turtleName = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
 
             if (getTargetTurtle(logo.turtles, turtleName) === null) {
-                let blockNumber = logo.blocks.blockList.length;
+                const blockNumber = logo.blocks.blockList.length;
 
-                let x = logo.turtles.turtleX2screenX(logo.turtles.turtleList[turtle].x);
-                let y = logo.turtles.turtleY2screenY(logo.turtles.turtleList[turtle].y);
+                const x = logo.turtles.turtleX2screenX(logo.turtles.turtleList[turtle].x);
+                const y = logo.turtles.turtleY2screenY(logo.turtles.turtleList[turtle].y);
 
-                let newBlock = [
+                const newBlock = [
                     [0, "start", x, y, [null, 1, null]],
                     [1, "setturtlename2", 0, 0, [0, 2, null]],
                     [2, ["text", { value: turtleName }], 0, 0, [1]]
                 ];
-                let __afterLoad = () => {
+                const __afterLoad = () => {
                     console.debug("AFTERLOAD");
-                    let thisTurtle = logo.blocks.blockList[blockNumber].value;
-                    let tur = logo.turtles.ithTurtle(thisTurtle);
+                    const thisTurtle = logo.blocks.blockList[blockNumber].value;
+                    const tur = logo.turtles.ithTurtle(thisTurtle);
 
                     logo.initTurtle(thisTurtle);
                     tur.queue = [];
@@ -771,7 +771,7 @@ function setupEnsembleBlocks() {
             ]);
 
             this.formBlock({
-                outType: "textout"
+                outType: "numberout"
             });
         }
 
@@ -801,7 +801,7 @@ function setupEnsembleBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            let cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
@@ -850,7 +850,7 @@ function setupEnsembleBlocks() {
                 logo.turtles.turtleList[turtle].rename(args[1]);
                 foundTargetTurtle = true;
             } else if (typeof args[0] === "number") {
-                let i = Math.floor(args[0]);
+                const i = Math.floor(args[0]);
                 if (i >= 0 && i < logo.turtles.turtleList.length) {
                     logo.turtles.turtleList[i].rename(args[1]);
                     foundTargetTurtle = true;

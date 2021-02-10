@@ -89,6 +89,7 @@ const TACAT = {
     timbre: "ignore",
     modewidget: "ignore",
     tempo: "ignore",
+    sampler: "ignore",
     temperament: "ignore",
     pitchdrummatrix: "ignore",
     pitchslider: "ignore",
@@ -157,6 +158,8 @@ const TACAT = {
     voicename: "tone",
     settimbre: "tone",
     settemperament: "tone",
+    audiofile: "ignore",
+    customsample: "ignore",
     // interval palette
 
     modename: "ignore",
@@ -306,9 +309,6 @@ const TACAT = {
     camera: "ignore",
     video: "ignore",
     loadFile: "ignore",
-    audiofile: "ignore",
-    sampler: "ignore",
-    customsample: "ignore",
     stopvideocam: "ignore",
     tone: "media",
     tofrequency: "media",
@@ -510,7 +510,7 @@ const PALLABELS = [
 function analyzeProject(blocks) {
     // Parse block data and generate score based on rubric
 
-    let blockList = [];
+    const blockList = [];
     for (let blk = 0; blk < blocks.blockList.length; blk++) {
         if (blocks.blockList[blk].trash) {
             continue;
@@ -518,56 +518,56 @@ function analyzeProject(blocks) {
 
         // Check to see if the block is solo or has no child flow..
         switch (blocks.blockList[blk].name) {
-        case "rhythmicdot":
-        case "tie":
-        case "drift":
-        case "osctime":
-        case "sharp":
-        case "flat":
-        case "fill":
-        case "hollowline":
-        case "start":
-            if (blocks.blockList[blk].connections[1] == null) {
-                continue;
-            }
-            break;
-        case "note":
-        case "multiplybeatfactor":
-        case "duplicatenotes":
-        case "skipnotes":
-        case "setbpm":
-        case "settransposition":
-        case "staccato":
-        case "slur":
-        case "swing":
-        case "crescendo":
-        case "setnotevolume2":
-        case "vibrato":
-        case "tremolo":
-        case "dis":
-        case "chorus":
-        case "phaser":
-        case "action":
-            if (blocks.blockList[blk].connections[2] == null) {
-                continue;
-            }
-            break;
-        case "tuplet2":
-            if (blocks.blockList[blk].connections[3] == null) {
-                continue;
-            }
-            break;
-        case "invert":
-            if (blocks.blockList[blk].connections[4] == null) {
-                continue;
-            }
-            break;
-        default:
-            if (blocks.blockList[blk].connections[0] == null &&
+            case "rhythmicdot":
+            case "tie":
+            case "drift":
+            case "osctime":
+            case "sharp":
+            case "flat":
+            case "fill":
+            case "hollowline":
+            case "start":
+                if (blocks.blockList[blk].connections[1] == null) {
+                    continue;
+                }
+                break;
+            case "note":
+            case "multiplybeatfactor":
+            case "duplicatenotes":
+            case "skipnotes":
+            case "setbpm":
+            case "settransposition":
+            case "staccato":
+            case "slur":
+            case "swing":
+            case "crescendo":
+            case "setnotevolume2":
+            case "vibrato":
+            case "tremolo":
+            case "dis":
+            case "chorus":
+            case "phaser":
+            case "action":
+                if (blocks.blockList[blk].connections[2] == null) {
+                    continue;
+                }
+                break;
+            case "tuplet2":
+                if (blocks.blockList[blk].connections[3] == null) {
+                    continue;
+                }
+                break;
+            case "invert":
+                if (blocks.blockList[blk].connections[4] == null) {
+                    continue;
+                }
+                break;
+            default:
+                if (blocks.blockList[blk].connections[0] == null &&
                 last(blocks.blockList[blk].connections) == null) {
-                continue;
-            }
-            break;
+                    continue;
+                }
+                break;
         }
         blockList.push(blocks.blockList[blk].name);
     }
@@ -613,7 +613,7 @@ function analyzeProject(blocks) {
 }
 
 function scoreToChartData(scores) {
-    let normalizedScores = [];
+    const normalizedScores = [];
     let maxScore = 0;
     for (let i = 0; i < scores.length; i++) {
         if (scores[i] > maxScore) {
@@ -645,7 +645,7 @@ function scoreToChartData(scores) {
             pointHighlightFill: "#fff",
             pointHighlightStroke: "rgba(220,220,220,1)",
             data: normalizedScores
-            }]
+        }]
     };
 }
 
@@ -711,7 +711,7 @@ function getChartOptions(callback) {
     };
 }
 
-let runAnalytics = (logo) => {
+const runAnalytics = (logo) => {
     // using lilypond output to run through code and get some stats
     logo.runningLilypond = true;
     logo.notationNotes = {};
@@ -723,13 +723,13 @@ let runAnalytics = (logo) => {
     document.body.style.cursor = "wait";
     logo.collectingStats = true;
     logo.runLogoCommands();
-}
+};
 
-let getStatsFromNotation = (logo) => {
+const getStatsFromNotation = (logo) => {
     projectStats = {};
     // since we use the lilypond output to generate stats , please make sure to change these rules if
     // we ever change the lilypond notation structure.
-    let notation = logo.notation;
+    const notation = logo.notation;
     projectStats["duples"] = 0;
     projectStats["triplets"] = 0;
     projectStats["quintuplets"] = 0;
@@ -743,14 +743,14 @@ let getStatsFromNotation = (logo) => {
 
     let noteId = 0;
 
-    for (let tur in notation.notationStaging){
-        for (let it in notation.notationStaging[tur]) {
-            let item = notation.notationStaging[tur][it];
+    for (const tur in notation.notationStaging){
+        for (const it in notation.notationStaging[tur]) {
+            const item = notation.notationStaging[tur][it];
 
             if (typeof item == "object" && item[0].length){
-                for (let note of item[0]) {
+                for (const note of item[0]) {
                     projectStats["pitchNames"].add(note[0]);
-                    let freq = logo.synth._getFrequency(note);
+                    const freq = logo.synth._getFrequency(note);
                     projectStats["pitches"].push(freq);
                     if (projectStats["lowestNote"] == undefined ||
                         freq < projectStats["lowestNote"][2]) {
@@ -786,23 +786,23 @@ let getStatsFromNotation = (logo) => {
     blockList = logo.blocks.blockList;
     projectStats["rests"] = 0;
     projectStats["ornaments"] = 0;
-    for (let b  of blockList) {
+    for (const b  of blockList) {
         if (b.trash) {
             continue;
         }
         switch(b.name){
-        case "rest2" :
-            projectStats["rests"]++;
-        case "":
-        default :
+            case "rest2" :
+                projectStats["rests"]++;
+            case "":
+            default :
         }
 
         switch(b.protoblock.palette.name){
-        case("ornaments"):
-            projectStats["ornaments"]++;
-        default:
+            case("ornaments"):
+                projectStats["ornaments"]++;
+            default:
         }
     }
     console.debug(projectStats);
-    return projectStats
-}
+    return projectStats;
+};

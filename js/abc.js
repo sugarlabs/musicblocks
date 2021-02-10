@@ -65,7 +65,7 @@ processABCNotes = function(logo, turtle) {
 
         // Convert frequencies here.
         if (typeof note === "number") {
-            let pitchObj = frequencyToPitch(note);
+            const pitchObj = frequencyToPitch(note);
             note = pitchObj[0] + pitchObj[1];
         }
 
@@ -136,7 +136,7 @@ processABCNotes = function(logo, turtle) {
     let  notes, note;
 
     for (let i = 0; i < logo.notation.notationStaging[turtle].length; i++) {
-        let obj = logo.notation.notationStaging[turtle][i];
+        const obj = logo.notation.notationStaging[turtle][i];
         if (typeof obj === "string") {
             switch (obj) {
                 case "break":
@@ -257,7 +257,7 @@ processABCNotes = function(logo, turtle) {
                 let k = 0;
 
                 while (k < count) {
-                    let tupletDuration = 2 *
+                    const tupletDuration = 2 *
                         logo.notation.notationStaging[turtle][i + j][
                             NOTATIONDURATION];
 
@@ -294,7 +294,7 @@ processABCNotes = function(logo, turtle) {
 
                 // FIXME: Debug for ABC
                 if (i + j - 1 < logo.notation.notationStaging[turtle].length - 1) {
-                    let nextObj = logo.notation.notationStaging[turtle][i + j];
+                    const nextObj = logo.notation.notationStaging[turtle][i + j];
                     if (typeof nextObj === "string" && nextObj === ")") {
                         // logo.notationNotes[turtle] += '';
                         i += 1;
@@ -310,14 +310,14 @@ processABCNotes = function(logo, turtle) {
 
             if (obj[NOTATIONTUPLETVALUE] > 0) {
                 if (incompleteTuplet === 0) {
-                    let tupletFraction = toFraction(tupletDuration /
+                    const tupletFraction = toFraction(tupletDuration /
                                                     targetDuration);
                     logo.notationNotes[turtle] +=
                         "(" + tupletFraction[0] + ":" + tupletFraction[1] + "";
                     i += __processTuplet(
                         logo, turtle, i, obj[NOTATIONTUPLETVALUE]) - 1;
                 } else {
-                    let tupletFraction = toFraction(
+                    const tupletFraction = toFraction(
                         obj[NOTATIONTUPLETVALUE] / incompleteTuplet);
                     logo.notationNotes[turtle] +=
                         "(" + tupletFraction[0] + ":" + tupletFraction[1] + "";
@@ -416,23 +416,23 @@ processABCNotes = function(logo, turtle) {
 
 saveAbcOutput = function(logo) {
     let turtleCount = 0;
-    let clef = [];
+    const clef = [];
 
     logo.notationOutput = getABCHeader();
 
-    for (let t in logo.notation.notationStaging) {
+    for (const t in logo.notation.notationStaging) {
         turtleCount += 1;
     }
     console.debug("saving as abc: " + turtleCount);
 
     let c = 0;
-    for (let t in logo.notation.notationStaging) {
+    for (const t in logo.notation.notationStaging) {
         logo.notationOutput +=
             "K:" + logo.turtles.ithTurtle(t).singer.keySignature
-            .toUpperCase()
-            .replace(" ", "")
-            .replace("♭", "b")
-            .replace("♯", "#") + "\n";
+                .toUpperCase()
+                .replace(" ", "")
+                .replace("♭", "b")
+                .replace("♯", "#") + "\n";
         processABCNotes(logo, t);
         logo.notationOutput += logo.notationNotes[t];
         c += 1;

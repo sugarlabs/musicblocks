@@ -87,9 +87,9 @@ function setupMeterBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
-            let len = tur.singer.bpm.length;
+            const len = tur.singer.bpm.length;
             if (len > 0) {
                 tur.singer.bpm[len - 1] = value;
             } else {
@@ -219,7 +219,7 @@ function setupMeterBlocks() {
         }
 
         arg(logo, turtle, blk) {
-            let cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
@@ -256,7 +256,7 @@ function setupMeterBlocks() {
         }
 
         arg(logo, turtle, blk) {
-            let cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
@@ -339,8 +339,8 @@ function setupMeterBlocks() {
             ) {
                 logo.statusFields.push([blk, "elapsednotes2"]);
             } else {
-                let cblk = logo.blocks.blockList[blk].connections[1];
-                let noteValue = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                const cblk = logo.blocks.blockList[blk].connections[1];
+                const noteValue = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 return Singer.MeterActions.getNotesPlayed(noteValue, turtle);
             }
         }
@@ -466,7 +466,7 @@ function setupMeterBlocks() {
                 return [
                     [0, ["everybeatdonew",{}], x, y, [null, 1, null]],
                     [1, ["text", { "value": "action" }], 0, 0, [0]]
-                ]
+                ];
             });
         }
 
@@ -518,7 +518,7 @@ function setupMeterBlocks() {
             super("setmasterbpm2", _("master beats per minute"));
             this.setPalette("meter");
             this.piemenuValuesC1 = [42, 46, 50, 54, 58, 63, 69, 76, 84, 90, 96, 104, 112,
-                                    120, 132, 144,  160,  176,  192,  208];
+                120, 132, 144,  160,  176,  192,  208];
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -554,7 +554,7 @@ function setupMeterBlocks() {
 
             if (logo.inTempo) {
                 logo.tempo.BPMBlocks.push(blk);
-                let bpmnumberblock = logo.blocks.blockList[blk].connections[1];
+                const bpmnumberblock = logo.blocks.blockList[blk].connections[1];
                 logo.tempo.BPMs.push(
                     logo.blocks.blockList[bpmnumberblock].text.text
                 );
@@ -591,7 +591,7 @@ function setupMeterBlocks() {
 
             if (logo.inTempo) {
                 logo.tempo.BPMBlocks.push(blk);
-                let bpmnumberblock = logo.blocks.blockList[blk].connections[1];
+                const bpmnumberblock = logo.blocks.blockList[blk].connections[1];
                 logo.tempo.BPMs.push(logo.blocks.blockList[bpmnumberblock].text.text);
             }
         }
@@ -601,9 +601,9 @@ function setupMeterBlocks() {
         constructor() {
             //.TRANS: sets tempo by defniing a beat and beats per minute
             super("setbpm3", _("beats per minute"));
-            this.setPalette("meter"); 
+            this.setPalette("meter");
             this.piemenuValuesC1 = [42, 46, 50, 54, 58, 63, 69, 76, 84, 90, 96, 104, 112,
-                                    120, 132, 144,  160,  176,  192,  208];
+                120, 132, 144,  160,  176,  192,  208];
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -639,7 +639,7 @@ function setupMeterBlocks() {
 
             if (logo.inTempo) {
                 logo.tempo.BPMBlocks.push(blk);
-                let bpmnumberblock = logo.blocks.blockList[blk].connections[1];
+                const bpmnumberblock = logo.blocks.blockList[blk].connections[1];
                 logo.tempo.BPMs.push(logo.blocks.blockList[bpmnumberblock].text.text);
             }
         }
@@ -671,7 +671,7 @@ function setupMeterBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             if (
                 args.length === 3 &&
@@ -690,10 +690,10 @@ function setupMeterBlocks() {
                 logo.notation.notationTempo(turtle, args[0], args[1]);
                 tur.singer.bpm.push(bpm);
 
-                let listenerName = "_bpm_" + turtle;
+                const listenerName = "_bpm_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
-                let __listener = event => {
+                const __listener = event => {
                     tur.singer.bpm.pop();
                 };
 
@@ -725,7 +725,7 @@ function setupMeterBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             if (args.length === 2 && typeof args[0] === "number") {
                 let bpm;
@@ -741,10 +741,10 @@ function setupMeterBlocks() {
 
                 tur.singer.bpm.push(bpm);
 
-                let listenerName = "_bpm_" + turtle;
+                const listenerName = "_bpm_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
-                let __listener = function(event) {
+                const __listener = function(event) {
                     tur.singer.bpm.pop();
                 };
 
@@ -783,7 +783,7 @@ function setupMeterBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let arg0 = args[0];
+            const arg0 = args[0];
             if (args.length !== 1 || typeof args[0] !== "number") {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return;
@@ -827,8 +827,8 @@ function setupMeterBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let arg0 = args[0] === null || typeof args[0] !== "number" ? 4 : args[0];
-            let arg1 = args[1] === null || typeof args[1] !== "number" ? 1 / 4 : args[1];
+            const arg0 = args[0] === null || typeof args[0] !== "number" ? 4 : args[0];
+            const arg1 = args[1] === null || typeof args[1] !== "number" ? 1 / 4 : args[1];
 
             if (
                 args[0] === null || typeof args[0] !== "number" ||

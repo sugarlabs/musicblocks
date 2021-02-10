@@ -23,17 +23,17 @@ function setupFlowBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             tur.singer.backward.push(blk);
             // Set child to bottom block inside clamp
-            let childFlow = logo.blocks.findBottomBlock(args[0]);
-            let childFlowCount = 1;
+            const childFlow = logo.blocks.findBottomBlock(args[0]);
+            const childFlowCount = 1;
 
-            let listenerName = "_backward_" + turtle + "_" + blk;
+            const listenerName = "_backward_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let nextBlock = logo.blocks.blockList[blk].connections[2];
+            const nextBlock = logo.blocks.blockList[blk].connections[2];
             if (nextBlock === null) {
                 tur.singer.backward.pop();
             } else {
@@ -44,7 +44,7 @@ function setupFlowBlocks() {
                 }
             }
 
-            let __listener = event => tur.singer.backward.pop();
+            const __listener = event => tur.singer.backward.pop();
 
             logo.setTurtleListener(turtle, listenerName, __listener);
             return [childFlow, childFlowCount];
@@ -94,23 +94,23 @@ function setupFlowBlocks() {
                 arg0 = args[0];
             }
 
-            let factor = Math.floor(arg0);
+            const factor = Math.floor(arg0);
             if (factor < 1) {
                 logo.errorMsg(ZERODIVIDEERRORMSG, blk);
                 logo.stopTurtle = true;
             } else {
-                let tur = logo.turtles.ithTurtle(turtle);
+                const tur = logo.turtles.ithTurtle(turtle);
 
                 tur.singer.duplicateFactor *= factor;
 
                 // Queue each block in the clamp.
-                let listenerName = "_duplicate_" + turtle;
+                const listenerName = "_duplicate_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
-                let __lookForOtherTurtles = function(blk, turtle) {
-                    for (let t in logo.connectionStore) {
+                const __lookForOtherTurtles = function(blk, turtle) {
+                    for (const t in logo.connectionStore) {
                         if (t !== turtle.toString()) {
-                            for (let b in logo.connectionStore[t]) {
+                            for (const b in logo.connectionStore[t]) {
                                 if (b === blk.toString()) {
                                     return t;
                                 }
@@ -123,7 +123,7 @@ function setupFlowBlocks() {
 
                 tur.singer.inDuplicate = true;
 
-                let __listener = event => {
+                const __listener = event => {
                     tur.singer.inDuplicate = false;
                     tur.singer.duplicateFactor /= factor;
 
@@ -137,9 +137,9 @@ function setupFlowBlocks() {
 
                     // The last turtle should restore the broken connections.
                     if (__lookForOtherTurtles(blk, turtle) === null) {
-                        let n = logo.connectionStore[turtle][blk].length;
+                        const n = logo.connectionStore[turtle][blk].length;
                         for (let i = 0; i < n; i++) {
-                            let obj = logo.connectionStore[turtle][blk].pop();
+                            const obj = logo.connectionStore[turtle][blk].pop();
                             logo.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
                             if (obj[2] != null) {
                                 logo.blocks.blockList[obj[2]].connections[0] = obj[0];
@@ -163,12 +163,12 @@ function setupFlowBlocks() {
                 logo.connectionStoreLock = true;
 
                 // Check to see if another turtle has already disconnected these blocks
-                let otherTurtle = __lookForOtherTurtles(blk, turtle);
+                const otherTurtle = __lookForOtherTurtles(blk, turtle);
                 if (otherTurtle != null) {
                     // Copy the connections and queue the blocks.
                     logo.connectionStore[turtle][blk] = [];
                     for (let i = logo.connectionStore[otherTurtle][blk].length; i > 0; i--) {
-                        let obj = [
+                        const obj = [
                             logo.connectionStore[otherTurtle][blk][i - 1][0],
                             logo.connectionStore[otherTurtle][blk][i - 1][1],
                             logo.connectionStore[otherTurtle][blk][i - 1][2]
@@ -179,7 +179,7 @@ function setupFlowBlocks() {
                             child = logo.blocks.blockList[child].connections[0];
                         }
 
-                        let queueBlock = new Queue(child, factor, blk, receivedArg);
+                        const queueBlock = new Queue(child, factor, blk, receivedArg);
                         tur.parentFlowQueue.push(blk);
                         tur.queue.push(queueBlock);
                     }
@@ -187,7 +187,7 @@ function setupFlowBlocks() {
                     let child = logo.blocks.findBottomBlock(args[1]);
                     while (child != blk) {
                         if (logo.blocks.blockList[child].name !== "hidden") {
-                            let queueBlock = new Queue(child, factor, blk, receivedArg);
+                            const queueBlock = new Queue(child, factor, blk, receivedArg);
                             tur.parentFlowQueue.push(blk);
                             tur.queue.push(queueBlock);
                         }
@@ -201,9 +201,9 @@ function setupFlowBlocks() {
                     logo.connectionStore[turtle][blk] = [];
                     child = args[1];
                     while (child != null) {
-                        let lastConnection =
+                        const lastConnection =
                             logo.blocks.blockList[child].connections.length - 1;
-                        let nextBlk =
+                        const nextBlk =
                             logo.blocks.blockList[child].connections[
                                 lastConnection
                             ];
@@ -267,7 +267,7 @@ function setupFlowBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let switchBlk = last(logo.switchBlocks[turtle]);
+            const switchBlk = last(logo.switchBlocks[turtle]);
             if (switchBlk === null) {
                 logo.errorMsg(
                     _("The Case Block must be used inside of a Switch Block."),
@@ -305,7 +305,7 @@ function setupFlowBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let switchBlk = last(logo.switchBlocks[turtle]);
+            const switchBlk = last(logo.switchBlocks[turtle]);
             if (switchBlk === null) {
                 logo.errorMsg(
                     _("The Case Block must be used inside of a Switch Block."),
@@ -349,19 +349,19 @@ function setupFlowBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             logo.switchBlocks[turtle].push(blk);
             logo.switchCases[turtle][blk] = [];
 
-            let listenerName = "_switch_" + blk + "_" + turtle;
+            const listenerName = "_switch_" + blk + "_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function() {
-                let switchBlk = last(logo.switchBlocks[turtle]);
+            const __listener = function() {
+                const switchBlk = last(logo.switchBlocks[turtle]);
                 // Run the cases here.
                 let switchCase;
-                let argBlk = logo.blocks.blockList[switchBlk].connections[1];
+                const argBlk = logo.blocks.blockList[switchBlk].connections[1];
                 if (argBlk == null) {
                     switchCase = "__default__";
                 } else {
@@ -384,7 +384,7 @@ function setupFlowBlocks() {
                 }
 
                 if (caseFlow != null) {
-                    let queueBlock = new Queue(caseFlow, 1, switchBlk, null);
+                    const queueBlock = new Queue(caseFlow, 1, switchBlk, null);
                     tur.parentFlowQueue.push(switchBlk);
                     tur.queue.push(queueBlock);
                 }
@@ -448,11 +448,11 @@ function setupFlowBlocks() {
         }
 
         flow(_, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             logo.doBreak(tur);
             // Since we pop the queue, we need to unhighlight our parent
-            let parentBlk = logo.blocks.blockList[blk].connections[0];
+            const parentBlk = logo.blocks.blockList[blk].connections[0];
             if (parentBlk != null) {
                 if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
                     tur.unhighlightQueue.push(parentBlk);
@@ -482,12 +482,12 @@ function setupFlowBlocks() {
         flow(args, logo, turtle, blk) {
             if (args.length !== 1) return;
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             if (!args[0]) {
                 // Requeue.
-                let parentBlk = logo.blocks.blockList[blk].connections[0];
-                let queueBlock = new Queue(blk, 1, parentBlk);
+                const parentBlk = logo.blocks.blockList[blk].connections[0];
+                const queueBlock = new Queue(blk, 1, parentBlk);
                 tur.parentFlowQueue.push(parentBlk);
                 tur.queue.push(queueBlock);
                 tur.doWait(0.05);
@@ -496,7 +496,7 @@ function setupFlowBlocks() {
                 // time, we need to flush the queue of all but
                 // the last one, otherwise the child of the
                 // while block is executed multiple times.
-                let queueLength = tur.queue.length;
+                const queueLength = tur.queue.length;
                 let kept_one = false;
                 for (let i = queueLength - 1; i > 0; i--) {
                     if (tur.queue[i].parentBlk === blk) {
@@ -513,7 +513,7 @@ function setupFlowBlocks() {
                     logo.firstNoteTime = new Date().getTime();
                 }
 
-                let elapsedTime = (new Date().getTime() - this.firstNoteTime) / 1000;
+                const elapsedTime = (new Date().getTime() - this.firstNoteTime) / 1000;
                 tur.singer.turtleTime = elapsedTime;
                 tur.singer.previousTurtleTime = elapsedTime;
             }
@@ -544,21 +544,21 @@ function setupFlowBlocks() {
         flow(args, logo, turtle, blk) {
             if (args.length !== 2) return;
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             if (!args[0]) {
                 // We will add the outflow of the until block
                 // each time through, so we pop it off so as
                 // to not accumulate multiple copies.
-                let queueLength = tur.queue.length;
+                const queueLength = tur.queue.length;
                 if (queueLength > 0) {
                     if (tur.queue[queueLength - 1].parentBlk === blk) {
                         tur.queue.pop();
                     }
                 }
                 // Requeue
-                let parentBlk = logo.blocks.blockList[blk].connections[0];
-                let queueBlock = new Queue(blk, 1, parentBlk);
+                const parentBlk = logo.blocks.blockList[blk].connections[0];
+                const queueBlock = new Queue(blk, 1, parentBlk);
                 tur.parentFlowQueue.push(parentBlk);
                 tur.queue.push(queueBlock);
             } else {
@@ -566,7 +566,7 @@ function setupFlowBlocks() {
                 // time, we need to flush the queue of all but
                 // the last one, otherwise the child of the
                 // until block is executed multiple times.
-                let queueLength = tur.queue.length;
+                const queueLength = tur.queue.length;
                 for (let i = queueLength - 1; i > 0; i--) {
                     if (tur.queue[i].parentBlk === blk) {
                         tur.queue.pop();
@@ -606,21 +606,21 @@ function setupFlowBlocks() {
             // itself.
             if (args.length !== 2) return;
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             if (args[0]) {
                 // We will add the outflow of the while block
                 // each time through, so we pop it off so as
                 // to not accumulate multiple copies.
-                let queueLength = tur.queue.length;
+                const queueLength = tur.queue.length;
                 if (queueLength > 0) {
                     if (tur.queue[queueLength - 1].parentBlk === blk) {
                         tur.queue.pop();
                     }
                 }
 
-                let parentBlk = logo.blocks.blockList[blk].connections[0];
-                let queueBlock = new Queue(blk, 1, parentBlk);
+                const parentBlk = logo.blocks.blockList[blk].connections[0];
+                const queueBlock = new Queue(blk, 1, parentBlk);
                 tur.parentFlowQueue.push(parentBlk);
                 tur.queue.push(queueBlock);
 
@@ -631,7 +631,7 @@ function setupFlowBlocks() {
                 // we need to flush the queue of all but the
                 // last one, otherwise the child of the while
                 // block is executed multiple times.
-                let queueLength = tur.queue.length;
+                const queueLength = tur.queue.length;
                 for (let i = queueLength - 1; i > 0; i--) {
                     if (tur.queue[i].parentBlk === blk) {
                         tur.queue.pop();

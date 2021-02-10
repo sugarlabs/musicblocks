@@ -23,7 +23,7 @@ function setupSensorsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             // Pause the flow while we wait for input
             tur.doWait(120);
@@ -31,8 +31,8 @@ function setupSensorsBlocks() {
             // Display the input form.
             docById("labelDiv").innerHTML =
                 '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="input" type="text" value="" />';
-            let inputElem = docById("textLabel");
-            let cblk = logo.blocks.blockList[blk].connections[1];
+            const inputElem = docById("textLabel");
+            const cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk !== null) {
                 inputElem.placeholder = logo.blocks.blockList[cblk].value;
             }
@@ -45,10 +45,10 @@ function setupSensorsBlocks() {
             // Add a handler to continue flow after the input.
             function __keyPressed(event) {
                 if (event.keyCode === 13) { // RETURN
-                    let inputElem = docById("textLabel");
+                    const inputElem = docById("textLabel");
                     console.debug(inputElem.value);
-                    console.debug('trying a number');
-                    let value = inputElem.value;
+                    console.debug("trying a number");
+                    const value = inputElem.value;
                     if (isNaN(value)) {
                         logo.inputValues[turtle] = value;
                     } else {
@@ -127,17 +127,17 @@ function setupSensorsBlocks() {
             }
 
 
-            let values = logo.pitchAnalyser.getValue();
+            const values = logo.pitchAnalyser.getValue();
             let max = Infinity;
             let idx = 0;                                // frequency bin
             for (let i = 0; i < logo.limit; i++) {
-                let v2 = -values[i] ;
+                const v2 = -values[i] ;
                 if (v2 < max) {
                     max = v2;
                     idx = i;
                 }
             }
-            let freq = idx / (logo.pitchAnalyser.sampleTime * logo.limit * 2);
+            const freq = idx / (logo.pitchAnalyser.sampleTime * logo.limit * 2);
             return freq ;
         }
     }
@@ -179,13 +179,13 @@ function setupSensorsBlocks() {
                 logo.mic.connect(logo.volumeAnalyser);
             }
 
-            let values = logo.volumeAnalyser.getValue();
+            const values = logo.volumeAnalyser.getValue();
             let sum = 0;
             for (let k = 0; k < logo.limit; k++) {
                 sum += values[k] * values[k];
             }
 
-            let rms = Math.sqrt(sum / logo.limit);
+            const rms = Math.sqrt(sum / logo.limit);
             return Math.round(rms * 100);
         }
     }
@@ -235,7 +235,7 @@ function setupSensorsBlocks() {
             this.setPalette("sensors");
 
             this.setHelpString([
-		// TRANS: hover
+                // TRANS: hover
                 _("The Cursor out block triggers an event when the cursor is moved off of a mouse."),
                 "documentation",
                 null,
@@ -306,7 +306,7 @@ function setupSensorsBlocks() {
             let colorString = logo.turtles.turtleList[turtle].painter.canvasColor;
             if (colorString[2] === "#")
                 colorString = hex2rgb(colorString.split("#")[1]);
-            let obj = colorString.split("(")[1].split(",");
+            const obj = colorString.split("(")[1].split(",");
             return parseInt(Number(obj[0]) / 2.55);
         }
     }
@@ -333,7 +333,7 @@ function setupSensorsBlocks() {
             let colorString = logo.turtles.turtleList[turtle].painter.canvasColor;
             if (colorString[1] === "#")
                 colorString = hex2rgb(colorString.split("#")[1]);
-            let obj = colorString.split("(")[1].split(",");
+            const obj = colorString.split("(")[1].split(",");
             return parseInt(Number(obj[0]) / 2.55);
         }
     }
@@ -360,7 +360,7 @@ function setupSensorsBlocks() {
             let colorString = logo.turtles.turtleList[turtle].painter.canvasColor;
             if (colorString[0] === "#")
                 colorString = hex2rgb(colorString.split("#")[1]);
-            let obj = colorString.split("(")[1].split(",");
+            const obj = colorString.split("(")[1].split(",");
             return parseInt(Number(obj[0]) / 2.55);
         }
     }
@@ -384,15 +384,15 @@ function setupSensorsBlocks() {
         }
 
         arg(logo, turtle) {
-            let wasVisible = logo.turtles.turtleList[turtle].container.visible;
+            const wasVisible = logo.turtles.turtleList[turtle].container.visible;
             logo.turtles.turtleList[turtle].container.visible = false;
-            let x = logo.turtles.turtleList[turtle].container.x;
-            let y = logo.turtles.turtleList[turtle].container.y;
+            const x = logo.turtles.turtleList[turtle].container.x;
+            const y = logo.turtles.turtleList[turtle].container.y;
             logo.refreshCanvas();
 
-            let canvas = docById("overlayCanvas");
-            let ctx = canvas.getContext("2d");
-            let imgData = ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1)
+            const canvas = docById("overlayCanvas");
+            const ctx = canvas.getContext("2d");
+            const imgData = ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1)
                 .data;
             let color = searchColors(imgData[0], imgData[1], imgData[2]);
             if (imgData[3] === 0) {
@@ -402,7 +402,7 @@ function setupSensorsBlocks() {
                         body.style.background.lastIndexOf(")")
                     )
                     .split(/,\s*/)),
-                    (color = searchColors(color[0], color[1], color[2]));
+                (color = searchColors(color[0], color[1], color[2]));
             }
 
             if (wasVisible) {
@@ -434,7 +434,7 @@ function setupSensorsBlocks() {
         }
 
         arg(logo) {
-            let d = new Date();
+            const d = new Date();
             return (d.getTime() - logo.time) / 1000;
         }
     }
@@ -547,12 +547,12 @@ function setupSensorsBlocks() {
             ) {
                 logo.statusFields.push([blk, "toascii"]);
             } else {
-                let cblk1 = logo.blocks.blockList[blk].connections[1];
+                const cblk1 = logo.blocks.blockList[blk].connections[1];
                 if (cblk1 === null) {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     return "A";
                 }
-                let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 if (typeof a === "number") {
                     if (a < 1) return 0;
                     else return String.fromCharCode(a);
@@ -586,7 +586,7 @@ function setupSensorsBlocks() {
 
         arg(logo) {
             logo.lastKeyCode = logo.getCurrentKeyCode();
-            let val = logo.lastKeyCode;
+            const val = logo.lastKeyCode;
             logo.clearCurrentKeyCode();
             return val;
         }

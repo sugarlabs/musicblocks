@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * @file This contains the utilities for generating code from block stacks for JS Editor widget.
  * @author Anindya Kundu
@@ -13,6 +14,10 @@
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
  */
+
+/* global JSInterface, blocks, last, ASTUtils, astring */
+
+/* exported JSGenerate */
 
 /**
  * @class
@@ -63,9 +68,9 @@ class JSGenerate {
                 JSGenerate.startBlocks.push(blk);
             } else if (blocks.blockList[blk].name === "action" && !blocks.blockList[blk].trash) {
                 // does the action stack have a name?
-                let c = blocks.blockList[blk].connections[1];
+                const c = blocks.blockList[blk].connections[1];
                 // is there a block in the action clamp?
-                let b = blocks.blockList[blk].connections[2];
+                const b = blocks.blockList[blk].connections[2];
                 if (c !== null && b !== null) {
                     JSGenerate.actionBlocks.push(blk);
                 }
@@ -185,7 +190,7 @@ class JSGenerate {
         }
 
         for (const blk of JSGenerate.actionBlocks) {
-            let actionName = blocks.blockList[blocks.blockList[blk].connections[1]].value;
+            const actionName = blocks.blockList[blocks.blockList[blk].connections[1]].value;
             if (actionName === null || actionName === undefined) continue;
 
             JSGenerate.actionNames.push(actionName);

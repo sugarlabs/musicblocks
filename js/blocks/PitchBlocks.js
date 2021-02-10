@@ -244,10 +244,10 @@ function setupPitchBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
-            let obj = numberToPitch(Math.floor(value) + tur.singer.pitchNumberOffset);
+            const obj = numberToPitch(Math.floor(value) + tur.singer.pitchNumberOffset);
             tur.singer.lastNotePlayed = [obj[0] + obj[1], tur.singer.lastNotePlayed[1]];
         }
 
@@ -259,18 +259,18 @@ function setupPitchBlocks() {
             ) {
                 logo.statusFields.push([blk, "mypitch"]);
             } else {
-                let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+                const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
                 let value = null;
                 let obj;
                 if (tur.singer.lastNotePlayed !== null) {
                     if (typeof tur.singer.lastNotePlayed[0] === "string") {
-                        let len = tur.singer.lastNotePlayed[0].length;
-                        let pitch = tur.singer.lastNotePlayed[0].slice(
+                        const len = tur.singer.lastNotePlayed[0].length;
+                        const pitch = tur.singer.lastNotePlayed[0].slice(
                             0,
                             len - 1
                         );
-                        let octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1));
+                        const octave = parseInt(tur.singer.lastNotePlayed[0].slice(len - 1));
                         obj = [pitch, octave];
                     } else {
                         // Hertz?
@@ -335,7 +335,7 @@ function setupPitchBlocks() {
             ) {
                 logo.statusFields.push([blk, "pitchinhertz"]);
             } else {
-                let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+                const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
                 if (tur.singer.lastNotePlayed !== null) {
                     return logo.synth._getFrequency(
@@ -375,7 +375,7 @@ function setupPitchBlocks() {
                     .name === "outputtools"
             ) {
             } else {
-                let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+                const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
                 if (tur.singer.lastNotePlayed !== null) {
                     return tur.singer.lastNotePlayed[0];
@@ -429,8 +429,8 @@ function setupPitchBlocks() {
             ) {
                 logo.statusFields.push([blk, "outputtools"]);
             } else {
-                let cblk1 = logo.blocks.blockList[blk].connections[1];
-                let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+                const cblk1 = logo.blocks.blockList[blk].connections[1];
+                const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
                 let arg1;
                 let notePlayed;
                 if (cblk1 != null) {
@@ -466,7 +466,7 @@ function setupPitchBlocks() {
                 } else if (logo.blocks.blockList[cblk1].name === "number") {
                     // less than 55 hertz (A1)
                     if (logo.blocks.blockList[cblk1].value < 55) {
-                        let obj = numberToPitch(
+                        const obj = numberToPitch(
                             logo.blocks.blockList[cblk1].value + tur.singer.pitchNumberOffset
                         );
                         notePlayed = obj[0] + obj[1];
@@ -484,10 +484,10 @@ function setupPitchBlocks() {
                 } else {
                     if (typeof(arg1) === "string") {
                         // Is it a number encoded as a string?
-                        let foundNumber = Number(arg1);
+                        const foundNumber = Number(arg1);
                         if (isNaN(foundNumber)) {
                             // Check to see if the octave was included.
-                            let lastChar = arg1.charAt(arg1.length - 1);
+                            const lastChar = arg1.charAt(arg1.length - 1);
                             let foundOctave = "";
                             if ("12345678".indexOf(lastChar) !== -1) {
                                 foundOctave = lastChar;
@@ -531,7 +531,7 @@ function setupPitchBlocks() {
                         } else {
                             // less than 55 hertz (A1)
                             if (foundNumber < 55) {
-                                let obj = numberToPitch(
+                                const obj = numberToPitch(
                                     foundNumber + tur.singer.pitchNumberOffset
                                 );
                                 notePlayed = obj[0] + obj[1];
@@ -542,7 +542,7 @@ function setupPitchBlocks() {
                     } else if (typeof(arg1) === "number") {
                         // less than 55 hertz (A1)
                         if (logo.blocks.blockList[cblk1].value < 55) {
-                            let obj = numberToPitch(
+                            const obj = numberToPitch(
                                 logo.blocks.blockList[cblk1].value + tur.singer.pitchNumberOffset
                             );
                             notePlayed = obj[0] + obj[1];
@@ -608,8 +608,8 @@ function setupPitchBlocks() {
             if (args[0] === null || args[1] === null)
                 logo.errorMsg(NOINPUTERRORMSG, blk);
 
-            let arg0 = args[0] === null ? "C" : args[0];
-            let arg1 = args[1] === null ? 4 : args[1];
+            const arg0 = args[0] === null ? "C" : args[0];
+            const arg1 = args[1] === null ? 4 : args[1];
             Singer.PitchActions.setPitchNumberOffset(arg0, arg1, turtle);
         }
     }
@@ -633,11 +633,11 @@ function setupPitchBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            let cblk = logo.blocks.blockList[blk].connections[1];
-            let num = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+            const cblk = logo.blocks.blockList[blk].connections[1];
+            const num = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
 
             try {
-                let outType =
+                const outType =
                     logo.blocks.blockList[blk].name === "number2pitch" ? "pitch" : "octave";
                 return Singer.PitchActions.numToPitch(num, outType, turtle);
             } catch (e) {
@@ -683,8 +683,8 @@ function setupPitchBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            let cblk0 = logo.blocks.blockList[blk].connections[0];
-            let cblk1 = logo.blocks.blockList[blk].connections[1];
+            const cblk0 = logo.blocks.blockList[blk].connections[0];
+            const cblk1 = logo.blocks.blockList[blk].connections[1];
             let arg1 = null;
             if (cblk1 !== null) {
                 arg1 = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
@@ -694,20 +694,20 @@ function setupPitchBlocks() {
                     return ("G4");
                 }
                 let posY2 = arg1 + YSTAFFNOTEHEIGHT / 2;
-                let o2 = Math.floor(posY2 / YSTAFFOCTAVEHEIGHT) + 4;
+                const o2 = Math.floor(posY2 / YSTAFFOCTAVEHEIGHT) + 4;
                 posY2 %= YSTAFFOCTAVEHEIGHT;
                 let noteIdx = Math.floor(posY2 / YSTAFFNOTEHEIGHT);
                 while (noteIdx < 0) {
                     noteIdx += NOTENAMES.length;
                 }
-                let note = NOTENAMES[noteIdx];
+                const note = NOTENAMES[noteIdx];
                 return (note + o2);
             } else if (logo.blocks.blockList[cblk0].name == "pitchnumber") {
                 if (cblk1 === null) {
                     return (7);
                 }
                 let posY = arg1 + YSTAFFNOTEHEIGHT / 2;
-                let o = Math.floor(posY / YSTAFFOCTAVEHEIGHT);
+                const o = Math.floor(posY / YSTAFFOCTAVEHEIGHT);
                 posY %= YSTAFFOCTAVEHEIGHT;
                 let lc = 0;
                 for (let i = 0; i < posY / YSTAFFNOTEHEIGHT; i++) {
@@ -719,9 +719,9 @@ function setupPitchBlocks() {
                     return (5);
                 }
                 let posY1 = arg1 + YSTAFFNOTEHEIGHT / 2;
-                let o1 = Math.floor(posY1 / YSTAFFOCTAVEHEIGHT);
+                const o1 = Math.floor(posY1 / YSTAFFOCTAVEHEIGHT);
                 posY1 %= YSTAFFOCTAVEHEIGHT;
-                let lc1 = posY1 / YSTAFFNOTEHEIGHT;
+                const lc1 = posY1 / YSTAFFNOTEHEIGHT;
                 return (lc1 + (o1 * 7));
             } else if (logo.blocks.blockList[cblk0].name == "print") {
                 if (logo.inStatusMatrix) {
@@ -731,39 +731,39 @@ function setupPitchBlocks() {
                     return ("G4");
                 }
                 let posY2 = arg1 + YSTAFFNOTEHEIGHT / 2;
-                let o2 = Math.floor(posY2 / YSTAFFOCTAVEHEIGHT) + 4;
+                const o2 = Math.floor(posY2 / YSTAFFOCTAVEHEIGHT) + 4;
                 posY2 %= YSTAFFOCTAVEHEIGHT;
                 let noteIdx = Math.floor(posY2 / YSTAFFNOTEHEIGHT);
                 while (noteIdx < 0) {
                     noteIdx += NOTENAMES.length;
                 }
-                let note = NOTENAMES[noteIdx];
+                const note = NOTENAMES[noteIdx];
                 return (note + o2);
             } else if (logo.blocks.blockList[cblk0].name == "pitch") {
                 if (cblk1 === null) {
                     return ["sol", 4];
                 }
                 let posY3 = arg1 + YSTAFFNOTEHEIGHT / 2;
-                let o3 = Math.floor(posY3 / YSTAFFOCTAVEHEIGHT) + 4;
+                const o3 = Math.floor(posY3 / YSTAFFOCTAVEHEIGHT) + 4;
                 posY3 %= YSTAFFOCTAVEHEIGHT;
                 let noteIdx = Math.floor(posY3 / YSTAFFNOTEHEIGHT);
                 while (noteIdx < 0) {
                     noteIdx += SOLFEGENAMES.length;
                 }
-                let sol = SOLFEGENAMES[noteIdx];
+                const sol = SOLFEGENAMES[noteIdx];
                 return [sol, o3];
             } else {
                 if (cblk1 === null) {
                     return ("G4");
                 }
                 let posY2 = arg1 + YSTAFFNOTEHEIGHT / 2;
-                let o2 = Math.floor(posY2 / YSTAFFOCTAVEHEIGHT) + 4;
+                const o2 = Math.floor(posY2 / YSTAFFOCTAVEHEIGHT) + 4;
                 posY2 %= YSTAFFOCTAVEHEIGHT;
                 let noteIdx = Math.floor(posY2 / YSTAFFNOTEHEIGHT);
                 while (noteIdx < 0) {
                     noteIdx += NOTENAMES.length;
                 }
-                let note = NOTENAMES[noteIdx];
+                const note = NOTENAMES[noteIdx];
                 return (note + o2);
             }
         }
@@ -840,8 +840,8 @@ function setupPitchBlocks() {
                 logo.stopTurtle = true;
                 return;
             } else {
-                let note = args[0];
-                let octave = args[1];
+                const note = args[0];
+                const octave = args[1];
                 return Singer.processPitch(note, octave, 0);
             }
         }
@@ -888,9 +888,9 @@ function setupPitchBlocks() {
             if (args[0] === null || args[1] === null || args[2] === null)
                 logo.errorMsg(NOINPUTERRORMSG, blk);
 
-            let arg0 = args[0] === null ? "sol" : args[0];
-            let arg1 = args[1] === null ? 4 : args[1];
-            let arg2 = args[2] === null ? "even" : args[2];
+            const arg0 = args[0] === null ? "sol" : args[0];
+            const arg1 = args[1] === null ? 4 : args[1];
+            const arg2 = args[2] === null ? "even" : args[2];
 
             Singer.PitchActions.invert(arg0, arg1, arg2, turtle, blk);
 
@@ -913,17 +913,17 @@ function setupPitchBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (logo.blocks.blockList[blk].name === "invert") {
                 tur.singer.invertList.push([args[0], args[1], "even"]);
             } else {
                 tur.singer.invertList.push([args[0], args[1], "odd"]);
             }
-            let listenerName = "_invert_" + turtle;
+            const listenerName = "_invert_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = event => tur.singer.invertList.pop();
+            const __listener = event => tur.singer.invertList.pop();
             logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[2], 1];
@@ -983,7 +983,7 @@ function setupPitchBlocks() {
             super("settransposition");
             this.setPalette("pitch");
             this.piemenuValuesC1 = [-12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0,
-                                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+                1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
             this.setHelpString([
                 _(
                     "The Semi-tone transposition block will shift the pitches contained inside Note blocks up (or down) by half steps."
@@ -1355,13 +1355,13 @@ function setupPitchBlocks() {
             if (args[0] === undefined)
                 return;
 
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
             tur.singer.transposition += tur.singer.invertList.length > 0 ? 1 : -1;
 
-            let listenerName = "_flat_" + turtle;
+            const listenerName = "_flat_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener =
+            const __listener =
                 event => tur.singer.transposition += tur.singer.invertList.length > 0 ? -1 : 1;
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1429,9 +1429,9 @@ function setupPitchBlocks() {
                 arg = 392;
             }
 
-            let obj = frequencyToPitch(arg);
+            const obj = frequencyToPitch(arg);
 
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             if (obj[0] === "?") {
                 logo.errorMsg(INVALIDPITCH, blk);
@@ -1445,7 +1445,7 @@ function setupPitchBlocks() {
                 logo.phraseMaker.rowLabels.push(logo.blocks.blockList[blk].name);
                 logo.phraseMaker.rowArgs.push(arg.toFixed(0));
                 // convert hertz to note/octave
-                let note = obj;
+                const note = obj;
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];
             } else if (logo.inMusicKeyboard) {
                 logo.musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
@@ -1453,11 +1453,11 @@ function setupPitchBlocks() {
                 logo.musicKeyboard.octaves.push(arg);
                 logo.musicKeyboard.addRowBlock(blk);
                 // convert hertz to note/octave
-                let note = obj;
+                const note = obj;
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];
             } else if (logo.inPitchStaircase) {
-                let frequency = arg;
-                let note = obj;
+                const frequency = arg;
+                const note = obj;
                 let flag = 0;
 
                 for (let i = 0; i < logo.pitchStaircase.Stairs.length; i++) {
@@ -1566,8 +1566,8 @@ function setupPitchBlocks() {
         flow(args, logo, turtle, blk) {
             // Default value is G4 or (sol, 4)
 
-            let arg0 = args[0] !== null ? args[0] : "sol";
-            let arg1 = args[1] !== null ? args[1] : 4;
+            const arg0 = args[0] !== null ? args[0] : "sol";
+            const arg1 = args[1] !== null ? args[1] : 4;
 
             if (args[0] === null || args[1] === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -1611,8 +1611,8 @@ function setupPitchBlocks() {
         flow(args, logo, turtle, blk) {
             // Default value is G4 or (sol, 4)
 
-            let arg0 = args[0] !== null ? args[0] : "sol";
-            let arg1 = args[1] !== null ? args[1] : 4;
+            const arg0 = args[0] !== null ? args[0] : "sol";
+            const arg1 = args[1] !== null ? args[1] : 4;
 
             if (args[0] === null || args[1] === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -1741,12 +1741,12 @@ function setupPitchBlocks() {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
             }
 
-            let tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
 
             let note, octave, cents;
 
             // is the arg a scaledegree block?
-            let c = logo.blocks.blockList[blk].connections[1];
+            const c = logo.blocks.blockList[blk].connections[1];
             let cname = null;
             if (c !== null) {
                 cname = logo.blocks.blockList[c].name;
@@ -1773,12 +1773,12 @@ function setupPitchBlocks() {
                     note += attr;
                 }
 
-                let obj = keySignatureToMode(tur.singer.keySignature);
+                const obj = keySignatureToMode(tur.singer.keySignature);
                 
-                let isNegativeArg = (scaledegree <= 0) ? true : false;
+                const isNegativeArg = (scaledegree <= 0) ? true : false;
                 let sd;
                 if (isNegativeArg) {
-                    let multiplier = Math.floor(Math.abs(scaledegree) / 7);
+                    const multiplier = Math.floor(Math.abs(scaledegree) / 7);
                     sd = scaledegree + ((multiplier + 1) * 7);
                 } else {
                     sd = Math.floor(scaledegree) % 7;
@@ -1802,10 +1802,10 @@ function setupPitchBlocks() {
                     NOTESFLAT.indexOf(note) - ref : NOTESSHARP.indexOf(note) - ref;
                 
                 /** calculates changes in reference octave which occur a semitone before the reference key */
-                let deltaOctave = isNegativeArg ? Math.floor((scaledegree + 1) / 7) : Math.floor((scaledegree - 1) / 7);
+                const deltaOctave = isNegativeArg ? Math.floor((scaledegree + 1) / 7) : Math.floor((scaledegree - 1) / 7);
                 
                 /** calculates changes in octave when crossing B */
-                let deltaSemi = isNegativeArg ?
+                const deltaSemi = isNegativeArg ?
                     (semitones > ref ? 1 : 0) : (semitones < ref ? 1 : 0);
                 
                 octave = ((isNegativeArg ? -1 : 1) * (deltaOctave + deltaSemi)) + Math.floor(

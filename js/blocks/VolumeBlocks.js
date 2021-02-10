@@ -36,9 +36,9 @@ function setupVolumeBlocks() {
             ) {
                 logo.statusFields.push([blk, "synth volume"]);
             } else {
-                let cblk = logo.blocks.blockList[blk].connections[1];
+                const cblk = logo.blocks.blockList[blk].connections[1];
                 if (cblk !== null) {
-                    let targetSynth = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                    const targetSynth = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                     return Singer.VolumeActions.getSynthVolume(targetSynth, turtle);
                 }
                 return 0;
@@ -60,7 +60,7 @@ function setupVolumeBlocks() {
         }
 
         setter(logo, value, turtle, blk) {
-            let len = Singer.masterVolume.length;
+            const len = Singer.masterVolume.length;
             Singer.masterVolume[len - 1] = value;
             if (!logo.turtles.ithTurtle(turtle).singer.suppressOutput) {
                 Singer.VolumeActions.setMasterVolume(logo, value);
@@ -250,7 +250,7 @@ function setupVolumeBlocks() {
             }
 
             if (synth === null) {
-                for (let voice in VOICENAMES) {
+                for (const voice in VOICENAMES) {
                     if (VOICENAMES[voice][0] === arg0) {
                         synth = VOICENAMES[voice][1];
                         break;
@@ -262,7 +262,7 @@ function setupVolumeBlocks() {
             }
 
             if (synth === null) {
-                for (let drum in DRUMNAMES) {
+                for (const drum in DRUMNAMES) {
                     if (DRUMNAMES[drum][0].replace("-", " ") === arg0) {
                         synth = DRUMNAMES[drum][1];
                         break;
@@ -278,7 +278,7 @@ function setupVolumeBlocks() {
                 synth = "electronic synth";
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             if (tur.singer.instrumentNames.indexOf(synth) === -1) {
                 tur.singer.instrumentNames.push(synth);
@@ -295,10 +295,10 @@ function setupVolumeBlocks() {
                 Singer.setSynthVolume(logo, turtle, synth, arg1);
             }
 
-            let listenerName = "_synthvolume_" + turtle;
+            const listenerName = "_synthvolume_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = event => {
+            const __listener = event => {
                 tur.singer.synthVolume[synth].pop();
                 // Restore previous volume
                 if (
@@ -499,17 +499,17 @@ function setupVolumeBlocks() {
                 }
             }
 
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
             Singer.masterVolume.push(arg);
             if (!tur.singer.suppressOutput) {
                 Singer.setMasterVolume(logo, arg);
             }
 
-            let listenerName = "_volume_" + turtle;
+            const listenerName = "_volume_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = event => {
+            const __listener = event => {
                 Singer.masterVolume.pop();
                 // Restore previous volume
                 if (tur.singer.justCounting.length === 0 && Singer.masterVolume.length > 0) {

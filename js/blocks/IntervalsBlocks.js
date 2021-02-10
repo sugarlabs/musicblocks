@@ -77,7 +77,7 @@ function setupIntervalsBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            let cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = logo.blocks.blockList[blk].connections[1];
             //find block at end of chain
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
@@ -85,7 +85,7 @@ function setupIntervalsBlocks() {
             } else {
                 let currentblock = cblk;
                 while (true) {
-                    let blockToCheck = logo.blocks.blockList[currentblock];
+                    const blockToCheck = logo.blocks.blockList[currentblock];
                     if (blockToCheck.name === "intervalname") {
                         // Augmented or diminished only
                         if (blockToCheck.value[0] === "a") {
@@ -96,7 +96,7 @@ function setupIntervalsBlocks() {
                             return logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                         }
                     } else if (blockToCheck.name !== "doubly") {
-                        let value = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                        const value = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                         if (typeof value === "number") {
                             return value * 2;
                         } else if (typeof value === "string") {
@@ -143,45 +143,45 @@ function setupIntervalsBlocks() {
         }
 
         arg(logo, turtle, blk) {
-            let cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             }
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
-            let saveSuppressStatus = tur.singer.suppressOutput;
+            const saveSuppressStatus = tur.singer.suppressOutput;
 
             // We need to save the state of the boxes, dicts, and heap
             // although there is a potential of a boxes
             // collision with other turtles.
-            let saveBoxes = JSON.stringify(logo.boxes);
-            let saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
+            const saveBoxes = JSON.stringify(logo.boxes);
+            const saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
             // And the turtle state
-            let saveX = tur.x;
-            let saveY = tur.y;
-            let saveColor = tur.painter.color;
-            let saveValue = tur.painter.value;
-            let saveChroma = tur.painter.chroma;
-            let saveStroke = tur.painter.stroke;
-            let saveCanvasAlpha = tur.painter.canvasAlpha;
-            let saveOrientation = tur.orientation;
-            let savePenState = tur.painter.penState;
+            const saveX = tur.x;
+            const saveY = tur.y;
+            const saveColor = tur.painter.color;
+            const saveValue = tur.painter.value;
+            const saveChroma = tur.painter.chroma;
+            const saveStroke = tur.painter.stroke;
+            const saveCanvasAlpha = tur.painter.canvasAlpha;
+            const saveOrientation = tur.orientation;
+            const savePenState = tur.painter.penState;
 
             tur.singer.suppressOutput = true;
 
             tur.singer.justCounting.push(true);
             tur.singer.justMeasuring.push(true);
 
-            for (let b in tur.endOfClampSignals) {
+            for (const b in tur.endOfClampSignals) {
                 tur.butNotThese[b] = [];
-                for (let i in tur.endOfClampSignals[b]) {
+                for (const i in tur.endOfClampSignals[b]) {
                     tur.butNotThese[b].push(i);
                 }
             }
 
-            let actionArgs = [];
-            let saveNoteCount = tur.singer.notesPlayed;
+            const actionArgs = [];
+            const saveNoteCount = tur.singer.notesPlayed;
             let distance = 0;
             tur.running = true;
             logo.runFromBlockNow(logo, turtle, cblk, true, actionArgs, tur.queue.length);
@@ -240,46 +240,46 @@ function setupIntervalsBlocks() {
         }
 
         arg(logo, turtle, blk) {
-            let cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = logo.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             }
-            let tur = logo.turtles.ithTurtle(turtle);
+            const tur = logo.turtles.ithTurtle(turtle);
 
-            let saveSuppressStatus = tur.singer.suppressOutput;
+            const saveSuppressStatus = tur.singer.suppressOutput;
 
             // We need to save the state of the boxes, dicts, and heap
             // although there is a potential of a boxes
             // collision with other turtles.
-            let saveBoxes = JSON.stringify(logo.boxes);
-            let saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
-            let saveTurtleDicts = JSON.stringify(logo.turtleDicts[turtle]);
+            const saveBoxes = JSON.stringify(logo.boxes);
+            const saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
+            const saveTurtleDicts = JSON.stringify(logo.turtleDicts[turtle]);
             // And the turtle state
-            let saveX = tur.x;
-            let saveY = tur.y;
-            let saveColor = tur.painter.color;
-            let saveValue = tur.painter.value;
-            let saveChroma = tur.painter.chroma;
-            let saveStroke = tur.painter.stroke;
-            let saveCanvasAlpha = tur.painter.canvasAlpha;
-            let saveOrientation = tur.orientation;
-            let savePenState = tur.painter.penState;
+            const saveX = tur.x;
+            const saveY = tur.y;
+            const saveColor = tur.painter.color;
+            const saveValue = tur.painter.value;
+            const saveChroma = tur.painter.chroma;
+            const saveStroke = tur.painter.stroke;
+            const saveCanvasAlpha = tur.painter.canvasAlpha;
+            const saveOrientation = tur.orientation;
+            const savePenState = tur.painter.penState;
 
             tur.singer.suppressOutput = true;
 
             tur.singer.justCounting.push(true);
             tur.singer.justMeasuring.push(true);
 
-            for (let b in tur.endOfClampSignals) {
+            for (const b in tur.endOfClampSignals) {
                 tur.butNotThese[b] = [];
-                for (let i in tur.endOfClampSignals[b]) {
+                for (const i in tur.endOfClampSignals[b]) {
                     tur.butNotThese[b].push(i);
                 }
             }
 
-            let actionArgs = [];
-            let saveNoteCount = tur.singer.notesPlayed;
+            const actionArgs = [];
+            const saveNoteCount = tur.singer.notesPlayed;
             tur.running = true;
             let distance = 0;
             logo.runFromBlockNow(logo, turtle, cblk, true, actionArgs, tur.queue.length);
@@ -393,7 +393,7 @@ function setupIntervalsBlocks() {
             super("semitoneinterval");
             this.setPalette("intervals");
             this.piemenuValuesC1 = [-12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0,
-                                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+                1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
             this.setHelpString([
                 _(
                     "The Semi-tone interval block calculates a relative interval based on half steps."
@@ -794,7 +794,7 @@ function setupIntervalsBlocks() {
 
         flow(args, logo, turtle, blk) {
             if (args.length === 2) {
-                let modename = Singer.IntervalsActions.GetModename(args[1]);
+                const modename = Singer.IntervalsActions.GetModename(args[1]);
                 logo.modeBlock = blocks.blockList[blk].connections[2];
 
                 Singer.IntervalsActions.setKey(args[0], args[1], turtle, blk);

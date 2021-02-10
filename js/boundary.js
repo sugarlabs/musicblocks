@@ -14,7 +14,17 @@
 // trash and hidden. There is a menu button that can be used to
 // restore trash.
 
+/*
+   global createjs, BOUNDARY
+*/
+
+/* exported Boundary */
 class Boundary {
+
+    /**
+     * @constructor
+     * @param {Object} stage 
+     */
     constructor(stage) {
         this._container = new createjs.Container();
         this._stage = stage;
@@ -23,22 +33,46 @@ class Boundary {
     }
 
     // resizeEvent(scale) {};
-
+    
+    /**
+     * @public
+     * @param {number} w 
+     * @param {number} h 
+     * @param {number} scale 
+     * @returns {void}
+     */
     setScale(w, h, scale) {
         this.destroy();
         this.create(w, h, scale);
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     destroy() {
         if (this._container.children.length > 0) {
             this._container.removeChild(this._container.children[0]);
         }
     }
 
+    /**
+     * @public
+     * @param {number} x 
+     * @param {number} y 
+     * @returns {number}
+     */
     offScreen(x, y) {
         return x < this.x || x > this.x + this.dx || y < this.y || y > this.y + this.dy;
     }
 
+    /**
+     * @public
+     * @param {number} w 
+     * @param {number} h 
+     * @param {number} scale 
+     * @returns {void}
+     */
     create(w, h, scale) {
         this.w = w / scale;
         this.x = 55 + 13;
@@ -49,9 +83,9 @@ class Boundary {
         this.dy = this.h - (55 + 26);
 
         const __makeBoundary = () => {
-            let img = new Image();
+            const img = new Image();
             img.onload = () => {
-                let bitmap = new createjs.Bitmap(img);
+                const bitmap = new createjs.Bitmap(img);
                 this._container.addChild(bitmap);
             };
             img.src =
@@ -74,10 +108,18 @@ class Boundary {
         __makeBoundary();
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     hide() {
         this._container.visible = false;
     }
 
+    /**
+     * @public
+     * @returns {void}
+     */
     show() {
         this._container.visible = true;
     }

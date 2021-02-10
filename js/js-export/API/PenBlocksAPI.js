@@ -13,7 +13,11 @@
  * You should have received a copy of the GNU Affero General Public License along with this
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
-*/
+ */
+
+/* global JSInterface, turtles, logo */
+
+/* exported PenBlocksAPI */
 
 /**
  * Class pertaining to the API methods specific to Pen blocks for JavaScript based Music Blocks
@@ -24,38 +28,38 @@
  */
 class PenBlocksAPI {
     setColor(value) {
-        let args = JSInterface.validateArgs("setColor", [value]);
+        const args = JSInterface.validateArgs("setColor", [value]);
         // value = Math.max(0, Math.min(100, Math.floor(value)));
         return this.runCommand("doSetColor", [args[0]]);
     }
 
     setGrey(value) {
-        let args = JSInterface.validateArgs("setGrey", [value]);
+        const args = JSInterface.validateArgs("setGrey", [value]);
         // value = Math.max(0, Math.min(100, Math.floor(value)));
         return this.runCommand("doSetChroma", [args[0]]);
     }
 
     setShade(value) {
-        let args = JSInterface.validateArgs("setShade", [value]);
+        const args = JSInterface.validateArgs("setShade", [value]);
         // value = Math.max(0, Math.min(100, Math.floor(value)));
         return this.runCommand("doSetValue", [args[0]]);
     }
 
     setHue(value) {
-        let args = JSInterface.validateArgs("setHue", [value]);
+        const args = JSInterface.validateArgs("setHue", [value]);
         // value = Math.max(0, Math.min(100, Math.floor(value)));
         return this.runCommand("doSetHue", [args[0]]);
     }
 
     setTranslucency(value) {
-        let args = JSInterface.validateArgs("setTranslucency", [value]);
+        const args = JSInterface.validateArgs("setTranslucency", [value]);
         // value = Math.max(0, Math.min(100, Math.floor(value)));
         args[0] = 1.0 - args[0] / 100;
         return this.runCommand("doSetPenAlpha", [args[0]]);
     }
 
     setPensize(value) {
-        let args = JSInterface.validateArgs("setPensize", [value]);
+        const args = JSInterface.validateArgs("setPensize", [value]);
         // value = Math.max(0, Math.min(100, Math.floor(value)));
         return this.runCommand("doSetPensize", [args[0]]);
     }
@@ -91,7 +95,7 @@ class PenBlocksAPI {
     }
 
     setFont(fontname) {
-        let args = JSInterface.validateArgs("setFont", [fontname]);
+        const args = JSInterface.validateArgs("setFont", [fontname]);
         return this.runCommand("doSetFont", [args[0]]);
     }
 }

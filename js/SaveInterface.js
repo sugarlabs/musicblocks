@@ -64,7 +64,7 @@ class SaveInterface {
             ').content=title; document.title=name; document.getElementById("title").textContent=title; document.getElementsByClassName("code")[0].style.display = "none";</script></body></html>';
 
         this.timeLastSaved = -100;
-        let $j = jQuery.noConflict();
+        const $j = jQuery.noConflict();
         $j(window).bind("beforeunload", (event) => {
             let saveButton = "#saveButtonAdvanced";
             if (beginnerMode) {
@@ -122,7 +122,7 @@ class SaveInterface {
     }
 
     downloadURL(filename, dataurl) {
-        let a = document.createElement("a");
+        const a = document.createElement("a");
         a.setAttribute("href", dataurl);
         a.setAttribute("download", filename);
         document.body.appendChild(a);
@@ -150,7 +150,7 @@ class SaveInterface {
             name = this.PlanetInterface.getCurrentProjectName();
         }
 
-        let data = prepareExport();
+        const data = prepareExport();
         let image = "";
         if (this.PlanetInterface !== undefined) {
             image = this.PlanetInterface.getCurrentProjectImage();
@@ -165,7 +165,7 @@ class SaveInterface {
     }
 
     saveHTML(filename) {
-        let html = "data:text/plain;charset=utf-8," +
+        const html = "data:text/plain;charset=utf-8," +
             encodeURIComponent(this.prepareHTML());
         console.debug(filename);
         this.download("html", html, filename);
@@ -173,22 +173,22 @@ class SaveInterface {
 
     saveHTMLNoPrompt() {
         setTimeout(() => {
-                let html = "data:text/plain;charset=utf-8," +
+            const html = "data:text/plain;charset=utf-8," +
                     encodeURIComponent(this.prepareHTML());
-                if (this.PlanetInterface !== undefined) {
-                    this.downloadURL(
-                        this.PlanetInterface.getCurrentProjectName() + ".html",
-                        html);
-                } else {
-                    this.downloadURL(
-                        _("My Project").replace(" ", "_") + ".html",
-                        html);
-                }
-            },500);
+            if (this.PlanetInterface !== undefined) {
+                this.downloadURL(
+                    this.PlanetInterface.getCurrentProjectName() + ".html",
+                    html);
+            } else {
+                this.downloadURL(
+                    _("My Project").replace(" ", "_") + ".html",
+                    html);
+            }
+        },500);
     }
 
     saveSVG(filename) {
-        let svg = "data:image/svg+xml;utf8," +
+        const svg = "data:image/svg+xml;utf8," +
             doSVG(
                 this.logo.canvas,
                 this.logo,
@@ -201,12 +201,12 @@ class SaveInterface {
     }
 
     savePNG(filename) {
-        let png = docById("overlayCanvas").toDataURL("image/png");
+        const png = docById("overlayCanvas").toDataURL("image/png");
         this.download("png", png, filename);
     }
 
     saveBlockArtwork(filename) {
-        let svg = "data:image/svg+xml;utf8," + this.printBlockSVG();
+        const svg = "data:image/svg+xml;utf8," + this.printBlockSVG();
         this.download("svg", svg, filename);
     }
 
@@ -239,12 +239,12 @@ class SaveInterface {
     }
 
     afterSaveAbc(filename) {
-        let abc = encodeURIComponent(saveAbcOutput(this.logo));
+        const abc = encodeURIComponent(saveAbcOutput(this.logo));
         this.download("abc", "data:text;utf8," + abc, filename);
     }
 
     saveLilypond(filename) {
-        let lyext = "ly";
+        const lyext = "ly";
         if (filename === undefined) {
             if (this.PlanetInterface !== undefined) {
                 filename = this.PlanetInterface.getCurrentProjectName();
@@ -285,7 +285,7 @@ class SaveInterface {
         }
 
         // Load custom author saved in local storage.
-        let customAuthorData = this.storage.getItem("customAuthor");
+        const customAuthorData = this.storage.getItem("customAuthor");
         if (customAuthorData != undefined) {
             docById("author").value = JSON.parse(customAuthorData);
         } else {
@@ -313,14 +313,14 @@ class SaveInterface {
             isPDF = false;
         }
         let filename = docById("fileName").value;
-        let projectTitle = docById("title").value;
-        let projectAuthor = docById("author").value;
+        const projectTitle = docById("title").value;
+        const projectAuthor = docById("author").value;
 
         // Save the author in local storage.
         this.storage.setItem("customAuthor", JSON.stringify(projectAuthor));
 
-        let MIDICheck = docById("MIDICheck").checked;
-        let guitarCheck = docById("guitarCheck").checked;
+        const MIDICheck = docById("MIDICheck").checked;
+        const guitarCheck = docById("guitarCheck").checked;
 
         if (filename != null) {
             if (fileExt(filename) !== "ly") {
@@ -328,12 +328,12 @@ class SaveInterface {
             }
         }
 
-        let mapLilypondObj = {
+        const mapLilypondObj = {
             "My Music Blocks Creation": projectTitle,
             "Mr. Mouse": projectAuthor
         };
 
-        let lyheader = LILYPONDHEADER.replace(
+        const lyheader = LILYPONDHEADER.replace(
             /My Music Blocks Creation|Mr. Mouse/gi,
             (matched) => mapLilypondObj[matched]
         );
@@ -379,7 +379,7 @@ class SaveInterface {
     }
 
     afterSaveLilypond(filename) {
-        let ly = saveLilypondOutput(this.logo);
+        const ly = saveLilypondOutput(this.logo);
         switch (this.notationConvert) {
             case "pdf":
                 this.afterSaveLilypondPDF(ly, filename);
@@ -395,7 +395,7 @@ class SaveInterface {
         if (platform.FF) {
             console.debug('execCommand("copy") does not work on FireFox');
         } else {
-            let tmp = jQuery("<textarea />").appendTo(document.body);
+            const tmp = jQuery("<textarea />").appendTo(document.body);
             tmp.val(lydata);
             tmp.select();
             tmp[0].setSelectionRange(0, lydata.length);
