@@ -82,11 +82,16 @@ class WidgetWindow {
     _createUIelements() {
         const windows = docById("floatingWindows");
         this._frame = this._create("div", "windowFrame", windows);
-
+        this._overlayframe = this._create("div", "windowFrame", windows);
         this._drag = this._create("div", "wfTopBar", this._frame);
         this._handle = this._create("div", "wfHandle", this._drag);
         // The handle needs the events bound as it's a sibling of the dragging div
         // not a relative in either direciton.
+
+        this._drag.ondblclick = () => {
+            this._maximize();
+        };
+
         this._drag.onmousedown = this._handle.onmousedown = (e) => {
             this._dragging = true;
             if (this._maximized) {
@@ -177,6 +182,21 @@ class WidgetWindow {
     _docMouseMoveHandler(e) {
         if (!this._dragging) return;
 
+        if (this._frame.style.top === "64px") {
+            this._overlayframe.style.zIndex = "1";
+            this._overlayframe.style.width = "100vw";
+            this._overlayframe.style.height = "calc(100vh - 64px)";
+            this._overlayframe.style.left = "0";
+            this._overlayframe.style.top = "64px";
+            this._overlayframe.style.border = "0.25vw solid black";
+            this._frame.style.zIndex = "10";
+            this._overlayframe.style.backgroundColor = "rgba(255,255,255,0.75)";
+        } else {
+            this._frame.style.zIndex = "1";
+            this._overlayframe.style.backgroundColor = "rgba(255,255,255,0)";
+            this._overlayframe.style.border = "0px";
+            this._overlayframe.style.zIndex = "-1";
+        }
         const x = e.clientX - this._dx,
             y = e.clientY - this._dy;
 
@@ -223,7 +243,6 @@ class WidgetWindow {
             language = navigator.language;
         }
 
-        // console.debug("language setting is " + language);
         // For Japanese, put the toolbar on the top.
         if (language === "ja") {
             this._body.style.flexDirection = "column";
@@ -478,6 +497,7 @@ class WidgetWindow {
      */
     destroy() {
         this._frame.remove();
+        this._overlayframe.remove();
         window.widgetWindows.openWindows[this._key] = undefined;
     }
 
