@@ -87,6 +87,12 @@ class WidgetWindow {
         this._handle = this._create("div", "wfHandle", this._drag);
         // The handle needs the events bound as it's a sibling of the dragging div
         // not a relative in either direciton.
+
+        this._drag.ondblclick = () => {
+            console.log("Double Clicked");
+            this._maximize();
+        };
+
         this._drag.onmousedown = this._handle.onmousedown = (e) => {
             this._dragging = true;
             if (this._maximized) {
