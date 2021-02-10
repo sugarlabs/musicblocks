@@ -679,7 +679,7 @@ function Synth() {
         }
     };
 
-    this._loadSample = function(sampleName) {
+    this._loadSample = function(sampleName, sampleData) {
         let accounted = false;
         for (const type in this.samplesManifest) {
             if (this.samplesManifest.hasOwnProperty(type)) {

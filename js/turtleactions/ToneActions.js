@@ -32,10 +32,6 @@ function setupToneActions() {
          */
         static setTimbre(instrument, turtle, blk) {
 
-<<<<<<< HEAD
-=======
-
->>>>>>> ce53f14630ac2a7cd847975171f9bf4c0be29ba8
             const tur = logo.turtles.ithTurtle(turtle);
 
             tur.inSetTimbre = true;
@@ -58,10 +54,6 @@ function setupToneActions() {
                 accounted = false;
                 for (let voice in CUSTOMSAMPLES){
                     if (voice === instrument[0] && CUSTOMSAMPLES.hasOwnProperty(voice)){
-<<<<<<< HEAD
-=======
-                        synth = instrument[0];
->>>>>>> ce53f14630ac2a7cd847975171f9bf4c0be29ba8
                         CUSTOMSAMPLECENTERNO[instrument[0]] = [instrument[2], instrument[3]]
                         accounted = true;
                         break;
@@ -70,10 +62,6 @@ function setupToneActions() {
                 if ((!accounted) && !(instrument[0] == "")){
                     CUSTOMSAMPLES[instrument[0]] = instrument[1];
                     CUSTOMSAMPLECENTERNO[instrument[0]] = [instrument[2], instrument[3]]
-<<<<<<< HEAD
-=======
-                    synth = instrument[0];
->>>>>>> ce53f14630ac2a7cd847975171f9bf4c0be29ba8
                 }
                 synth = instrument;
             }
@@ -93,17 +81,14 @@ function setupToneActions() {
             }
 
             if (tur.singer.instrumentNames.indexOf(synth) === -1) {
-<<<<<<< HEAD
                 if (typeof synth === "object") {
                     tur.singer.instrumentNames.push(synth[0]);
                     logo.synth.loadSynth(turtle, synth);
                     synth = synth[0]
                 } else {
                     tur.singer.instrumentNames.push(synth);
-=======
-                tur.singer.instrumentNames.push(synth);
->>>>>>> ce53f14630ac2a7cd847975171f9bf4c0be29ba8
                     logo.synth.loadSynth(turtle, synth);
+                }
                 if (tur.singer.synthVolume[synth] === undefined) {
                     // The electronic synthvolume will track any
                     // changes to the mater volume, e.g., the
