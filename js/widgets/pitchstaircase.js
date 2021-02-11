@@ -608,6 +608,11 @@ class PitchStaircase {
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
+        widgetWindow.onclose = () => {
+            this.synth.stop();
+            logo.synth.setMasterVolume(0);
+            widgetWindow.destroy();
+        };
 
         widgetWindow.addButton(
             "play-chord.svg",
