@@ -984,7 +984,6 @@ function Synth() {
             } else if (params != null) {
                 let center = this._parseSampleCenterNo(params[1], params[2]);
                 noteDict[center] = params[0];
-                console.log(this.samples.voice[sourceName]);
             } else {
                 noteDict["C4"] = this.samples.voice[sourceName];
             }
