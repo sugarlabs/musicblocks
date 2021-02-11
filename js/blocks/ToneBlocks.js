@@ -637,7 +637,7 @@ function setupToneBlocks() {
                     logo.sample.sampleName = args[0][0];
                     logo.sample.sampleData = args[0][1];
                     logo.sample.samplePitch = args[0][2];
-                    logo.sample.octaveCenter = args[0][3];
+                    logo.sample.sampleOctave = args[0][3];
                 }
 
                 Singer.ToneActions.setTimbre(args[0], turtle, blk);
