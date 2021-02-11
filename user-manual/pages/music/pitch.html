@@ -1,0 +1,100 @@
+<div class="row blocks-description">
+    <div class="col-lg-12">
+        <h1 class="page-header">Pitch Blocks</h1>
+        <br/>
+        <p class="text-justify">The Pitch Palette contains blocks used to create and modify pitches used by the Note block.</p>
+        <br>
+        <table class="table table-hover content_table">
+            <tr>
+                <td><img src="./dist/img/pitch/pitch_img.png"></td>
+                <td>The Pitch block is used to specify the pitch of a note. By default, we use traditional western Solfege, i.e., Do, Re, Mi, Fa, Sol, La, Ti. You can also specify pitch by using a note name, e.g., F#. An octave specification is also required (as an argument for our pitch block) and changes integers for every cycle of C (i.e. C4 is higher than B3). When used with the Pitch-time Matrix block, a row is created for each Pitch block.</td>
+            </tr>
+            <tr>
+                <td><img src="./dist/img/pitch/step_pitch_img.png"></td>
+                <td>Step Pitch block will move up or down notes in a scale from the last played note. The step size is given in a number block.</td>
+            </tr>
+            <tr>
+                <td><img src="./dist/img/pitch/scale_degree_img.png"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><img src="./dist/img/pitch/pitch_number_img.png"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><img src="./dist/img/pitch/hertz_img.png"></td>
+                <td>Hertz block can be used to create a sound directly with a specified frequency. This in conjunction with a Number block, which corresponds to the frequency of the sound made.</td>
+            </tr>
+            <tr>
+                <td><img src="./dist/img/pitch/sharp_img.png"></td>
+                <td>Raises any contained notes by one step in a 12-step scale (pitch space). The Sharp block can be nestled inside other Sharp blocks to raise a pitch or collection of contained pitches even further (A sharp will raise the pitch by one half step).</td>
+            </tr>
+            <tr>
+                <td><img src="./dist/img/pitch/flat_img.png"></td>
+                <td>Lowers any contained notes by one step in a 12-step scale (pitch space). The Flat block can be nestled inside other Flat blocks to lower a pitch or collection of contained pitches even further (A flat will lower by one half step).</td>
+            </tr>
+            <tr>
+                <td><img src="./dist/img/pitch/octave_img.png"></td>
+                <td>Octave is the difference in pitch between two notes where one has twice the frequency of the other.  Two notes which are an octave apart always sound similar and have the same note name, while all of the notes in between sound distinctly different, and have other note names.</td>
+            </tr>
+            <tr>
+                <td><img src="./dist/img/pitch/adjust_transposition_img.png"></td>
+                <td>Transposes any contained notes by an integral step in a 12-step scale (pitch space). </td>
+            </tr>
+            <tr>
+                <td><img src="./dist/img/pitch/invert_img.png"></td>
+                <td>Inverts a pitch around another pitch.</td>
+            </tr>
+            <tr>
+                <td><img src="./dist/img/pitch/sargam_img.png"></td>
+                <td>Used in conjunction with the pitch block to set the name of the pitch, and uses indian music notations: Sa, Re, Ga, Ma, Pa, Dha, Ni.  A second selector is used for sharps and flats.</td>
+            </tr>
+            <tr>
+                <td><img src="./dist/img/pitch/sol_img.png"></td>
+                <td>Used with a pitch block to specify the name of the pitch. The Solfege block uses selectors to scroll through Do, Re, Mi, Fa, Sol, La, and Ti. A second selector is used for sharps and flats.</td>
+            </tr>
+            <tr>
+                <td><img src="./dist/img/pitch/G_img.png"></td>
+                <td>The Pitch-Name block is used to set the name of the pitch, which lets you scroll through C, D, E, F, G, A, B. It uses a second selector for sharps and flats.</td>
+            </tr>
+            <tr>
+                <td><img src="./dist/img/pitch/modename_img.png"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><img src="./dist/img/pitch/number_to_octave_img.png"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><img src="./dist/img/pitch/number_to_pitch_img.png"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><img src="./dist/img/pitch/set_pitch_number_offset_img.png"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><img src="./dist/img/pitch/MIDI_img.png"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><img src="./dist/img/pitch/mouse_pitch_number_img.png"></td>
+                <td>Mouse Pitch Number block returns the pitch number of the most recent note played.</td>
+            </tr>
+            <tr>
+                <td><img src="./dist/img/pitch/consonant_step_up_img.png"></td>
+                <td>Consonant Step Up can be used to move up notes in a scale. It calculates the number of half-steps to the next note in the current mode.</td>
+            </tr>
+            <tr>
+                <td><img src="./dist/img/pitch/consonant_step_down_img.png"></td>
+                <td>Consonant Step Down can be used to move down notes in a scale. It calculates the number of half-steps to the next note in the current mode.</td>
+            </tr>
+            <tr>
+                <td><img src="./dist/img/pitch/transposition_img.png"></td>
+                <td>Contains the current transposition (the default is 0).</td>
+            </tr>
+        </table>
+        <br/>
+        </br>
+    </div>
+</div>
