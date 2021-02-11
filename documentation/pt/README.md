@@ -44,9 +44,9 @@ foi feita no Chrome.</p>
 </table>
 <p>Você pode executá-lo em
 <a href="https://musicblocks.sugarlabs.org" rel="nofollow">https://musicblocks.sugarlabs.org</a>.</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/getting-started.png"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/getting-started.png" alt="alt tag" title="Music Blocks in a browser" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/getting-started.png"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/getting-started.png" alt="alt tag" title="Music Blocks in a browser" style="max-width:100%;"></a></p>
 <h2><a id="user-content-getting-started" class="anchor" aria-hidden="true" href="#getting-started"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Iniciando</h2>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/getting-started-block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/getting_started_blocks.svg?sanitize=true" alt="alt tag" title="default blocks" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/getting-started-block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/getting_started_blocks.svg?sanitize=true" alt="alt tag" title="default blocks" style="max-width:100%;"></a></p>
 <p>Quando você inicia o Music Blocks no seu navegador, você verá uma pilha
 de blocos representando quatro notas: <code>Do 4</code>, <code>Mi 4</code>, <code>Sol 4</code> e <code>Do 5</code>. A primeira nota é uma <code>1/2</code> nota; a segunda e terceira notas são
 <code>1/4</code> de notas; a quarta nota é uma <code>1/1</code>.</p>
@@ -91,7 +91,7 @@ etc. e também o botão para selecionar o idioma.</p>
 menu adicional aparece quando um "clique com o botão direito do mouse" é aplicado a uma pilha de
 blocos).</p>
 <p>Essas barras de ferramentas são descritas em detalhe na
-<a href="http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation-pt">Página de documentação do Turtle Blocks</a>.</p>
+<a href="http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation/pt">Página de documentação do Turtle Blocks</a>.</p>
 <h2><a id="user-content-keyboard-shortcuts" class="anchor" aria-hidden="true" href="#keyboard-shortcuts"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Atalhos do teclado</h2>
 <p>Existem vários atalhos de teclado:</p>
 <p><em>PgUp</em> e <em>PgDn</em> irá rolar a tela na vertical. É útil para
@@ -114,9 +114,9 @@ para detalhes gerais sobre como usar os blocos.</p>
 para detalhes específicos de música: <em>Ritmo</em>, <em>Metrônomo</em>, <em>Altura</em>, <em>Intervalos</em>,
 <em>Tom</em>, <em>Ornamento</em>, <em>Volume</em>, <em>Bateria</em>, e <em>Widget</em>.</p>
 <p>Todas as outras paletas são descritas no
-<a href="http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation-pt">Guia de Programação do Turtle Blocks</a>.</p>
+<a href="http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation/pt">Guia de Programação do Turtle Blocks</a>.</p>
 <h2><a id="user-content-defining-a-note" class="anchor" aria-hidden="true" href="#defining-a-note"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Definindo uma nota</h2>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/newnote_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/newnote_block.svg?sanitize=true" alt="alt tag" title="the note" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/newnote_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/newnote_block.svg?sanitize=true" alt="alt tag" title="the note" style="max-width:100%;"></a></p>
 <p>No coração do Music Blocks está o conceito de uma nota. Uma nota, definida
 pelo bloco de<em>Valor da nota</em> define um período de tempo e um conjunto de
 ações para ocorrer nesse tempo. Normalmente, a ação é executar um tom, ou séries de tons (por exemplo, um acorde). Quaisquer que sejam os blocos colocados
@@ -152,23 +152,23 @@ você pode colocar quantos blocos de <em>Tom</em> você quiser em uma nota. Eles
 vão tocar juntos como um acorde. Você também pode inserir blocos gráficos
 dentro de uma nota para criar animações sincronizadas com o som.</p>
 <h2><a id="user-content-a-quick-tour-of-selected-blocks" class="anchor" aria-hidden="true" href="#a-quick-tour-of-selected-blocks"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Um rápido passseio por blocos selecionados</h2>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/setinstrument_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/setinstrument_block.svg?sanitize=true" alt="alt tag" title="Set instrument block" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/setinstrument_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/setinstrument_block.svg?sanitize=true" alt="alt tag" title="Set instrument block" style="max-width:100%;"></a></p>
 <p>O bloco <em>Definir timbre</em>, encontrado na paleta de <em>Tom</em>, permite que você escolha um
 timbre para uma nota. No exemplo acima, um modelo de guitarra é usado para
 fazer quaisquer notas contidas no grampo do bloco soar como se
 elas estivessem sendo tocadas em uma guitarra.</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/setsynthvolume_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/setsynthvolume_block.svg?sanitize=true" alt="alt tag" title="Set synth volume" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/setsynthvolume_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/setsynthvolume_block.svg?sanitize=true" alt="alt tag" title="Set synth volume" style="max-width:100%;"></a></p>
 <p>O bloco <em>Definir volume</em>, encontrado na paleta de <em>Volume</em>, permite que você
 altere o volume, que varia de <code>0</code> (silencioso) para <code>100</code> (volume máximo), de quaisquer notas contidas no grampo do bloco.</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/setdrum_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/setdrum_block.svg?sanitize=true" alt="alt tag" title="Set drum block" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/setdrum_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/setdrum_block.svg?sanitize=true" alt="alt tag" title="Set drum block" style="max-width:100%;"></a></p>
 <p>O bloco <em>Definir bateria</em>, que dever ser empregado no grampo de um bloco de <em>Valor da Nota</em>, é usado para adicionar sons de bateria a uma nota. Encontra-se na
 paleta <em>bateria</em>.</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/repeat_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/repeat_block.svg?sanitize=true" alt="alt tag" title="Repeat" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/repeat_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/repeat_block.svg?sanitize=true" alt="alt tag" title="Repeat" style="max-width:100%;"></a></p>
 <p>O bloco <em>Repetir</em>, encontrado na paleta <em>Ritmo</em>, é usado para criar
 repetições. Seja qual for a pilha de blocos colocados dentro do seu grampo, ela será
 repetida. Pode ser usado para repetir notas individuais ou frases inteiras
 de música.</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/duplicatenotes_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/duplicatenotes_block.svg?sanitize=true" alt="alt tag" title="Duplicate block" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/duplicatenotes_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/duplicatenotes_block.svg?sanitize=true" alt="alt tag" title="Duplicate block" style="max-width:100%;"></a></p>
 <p>O bloco <em>Duplicar</em>, encontrado na paleta <em>Ritmos</em>, é usado para
 repetir quaisquer notas que estejam envolvidas. É semelhante ao uso de um bloco <em>Repetir</em>, mas
 em vez de repetir uma sequência de notas várias vezes, cada nota é
@@ -176,7 +176,7 @@ repetida por sua vez, por exemplo, duplicar x2 de<code>4 4 8</code> resultaria e
 <p>O bloco <em>Iniciar</em>, encontrado na paleta <em>Ação</em>, está vinculado ao botão<em>Executar</em>.
 Qualquer coisa no grampo do botão <em>Iniciar</em> será executada
 quando o botão é pressionado.</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/multiple_start_blocks.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/multiple_start_blocks.svg?sanitize=true" alt="alt tag" title="Start" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/multiple_start_blocks.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/multiple_start_blocks.svg?sanitize=true" alt="alt tag" title="Start" style="max-width:100%;"></a></p>
 <p>Note que você pode ter vários ratinhos e que cada ratinho é
 equivalente a uma "voz" na música. É possível tocar notas de vários tons
 em seqüência e pode até tocar várias notas do mesmo "valor
@@ -184,7 +184,7 @@ de nota", mas nenhum ratinho pode fazer o contraponto sozinho - assim como
 um ratinho não pode desenhar duas linhas ao mesmo tempo. Se você quiser
 contraponto, extraia um bloco <em>Iniciar</em> adicional, que criará
 um novo ratinho que agora pode executar uma nova voz.</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/action_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/action_block.svg?sanitize=true" alt="alt tag" title="Action-Chunk" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/action_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/action_block.svg?sanitize=true" alt="alt tag" title="Action-Chunk" style="max-width:100%;"></a></p>
 <p>O bloco <em>Ação</em>, também encontrado na paleta <em>Ação</em>, é usado para
 criar uma coleção de blocos que podem ser executados como um grupo. Sempre que você
 criar um bloco <em>Ação</em>, um novo bloco correspondente a essa ação é
@@ -197,50 +197,50 @@ ser usadas de muitas formas poderosas. Por exemplo, uma ação pode ser associad
 um evento, como uma batida ou uma ausência de batida ou um clique do mouse. Veja
 <a href="http://github.com/sugarlabs/musicblocks/tree/master/guide-pt/README.md">Guia de Programação de Music blocks</a>,
 para mais detalhes e exemplos.</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/storebox1_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/storebox1_block.svg?sanitize=true" alt="alt tag" title="storein-Box-Add One" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/storebox1_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/storebox1_block.svg?sanitize=true" alt="alt tag" title="storein-Box-Add One" style="max-width:100%;"></a></p>
 <p>O bloco <em>Armazenar em</em>, encontrado na paleta <em>Caixas</em>, é usado para armazenar um
 valor. Esse valor pode ser recuperado usando o bloco <em>Caixa</em>. O valor
 pode ser modificado usando o bloco <em>Adicionar um</em>. Esses blocos de
 maneira típica podem ser alterados de forma que as variáveis ​​são armazenadas e recuperadas.</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/forward_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/forward_block.svg?sanitize=true" alt="alt tag" title="forward" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/forward_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/forward_block.svg?sanitize=true" alt="alt tag" title="forward" style="max-width:100%;"></a></p>
 <p>O bloco <em>Para Frente</em>, encontrado na paleta <em>Ratinho</em>, é usado para desenhar linhas retas. (Note que se este bloco é usado dentro de um bloco de <em>Valor da nota</em> a linha será desenhada enquanto a nota é tocada; caso contrário, a linha é desenhada "instantaneamente".)</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/left_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/left_block.svg?sanitize=true" alt="alt tag" title="right" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/left_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/left_block.svg?sanitize=true" alt="alt tag" title="right" style="max-width:100%;"></a></p>
 <p>O bloco <em>Para a Direita</em>, encontrado na paleta <em>Ratinho</em>, é usado para girar
 a orientação do ratinho. (Note que se este bloco é usado dentro de um bloco de <em>Nota de
 valor</em> - a orientação mudará conforme a nota é reproduzida;
 caso contrário, a orientação será alterada "instantaneamente".</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/mousebutton_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/mousebutton-block.svg?sanitize=true" alt="alt tag" title="pen up-pen down" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/mousebutton_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/mousebutton-block.svg?sanitize=true" alt="alt tag" title="pen up-pen down" style="max-width:100%;"></a></p>
 <p>Os blocos <em>Caneta para Cima</em> e <em>Caneta para Baixo</em>, encontrados na paleta <em>Caneta</em>, determinam se o ratinho desenha ou não enquanto se move.</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/setshade_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/setshade_block.svg?sanitize=true" alt="alt tag" title="set shade" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/setshade_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/setshade_block.svg?sanitize=true" alt="alt tag" title="set shade" style="max-width:100%;"></a></p>
 <p>O bloco <em>Definir sombra</em>, também encontrado na paleta <em>Caneta</em>, é usado para definir
 o tom claro ou escuro da "tinta" usada na caneta do ratinho. <code>definir sombra 0</code> é preto. <code>definir sombra 100</code> é branco.</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/setcolor_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/setcolor_block.svg?sanitize=true" alt="alt tag" title="set color" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/setcolor_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/setcolor_block.svg?sanitize=true" alt="alt tag" title="set color" style="max-width:100%;"></a></p>
 <p>O bloco <em>Definir cor</em>, também encontrado na paleta <em>Caneta</em>, é usado para definir
 a cor da "tinta" usada na caneta do ratinho. <code>definir cor 0</code> é
 vermelho. <code>definir cor 70</code> é azul.</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/random_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/random_block.svg?sanitize=true" alt="alt tag" title="random" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/random_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/random_block.svg?sanitize=true" alt="alt tag" title="random" style="max-width:100%;"></a></p>
 <p>O bloco <em>Aleatório</em>, encontrado na paleta <em>Números</em>, é usado para
 gerar um número aleatório, porque às vezes ser imprevisível é
 interessante.</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/oneOf_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/oneOf_block.svg?sanitize=true" alt="alt tag" title="on of this or that" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/oneOf_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/oneOf_block.svg?sanitize=true" alt="alt tag" title="on of this or that" style="max-width:100%;"></a></p>
 <p>O bloco <em>Um dos</em>, também encontrado na paleta <em>Números</em>, é usado para
 gerar uma escolha binária, uma das "isto" ou "aquilo", porque às vezes
 ser imprevisível é interessante.</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/show_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/show_block.svg?sanitize=true" alt="alt tag" title="show media" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/show_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/show_block.svg?sanitize=true" alt="alt tag" title="show media" style="max-width:100%;"></a></p>
 <p>O bloco <em>Mostrar</em>, encontrado na paleta <em>Mídia</em>, é usado para exibir
 texto e imagens.</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/mousebutton_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/mousebutton_block.svg?sanitize=true" alt="alt tag" title="mousebutton" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/mousebutton_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/mousebutton_block.svg?sanitize=true" alt="alt tag" title="mousebutton" style="max-width:100%;"></a></p>
 <p>O bloco <em>Botão do mouse</em>, encontrado na paleta <em>Sensores</em>, retorna verdadeiro
 se o botão do mouse for clicado. O bloco do botão do mouse pode ser usado para
 criar alguma interatividade no seu programa.</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/x_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/x_block.svg?sanitize=true" alt="alt tag" title="cursorx-cursory" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/x_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/x_block.svg?sanitize=true" alt="alt tag" title="cursorx-cursory" style="max-width:100%;"></a></p>
 <p>Os blocos <em>Cursor x</em> e <em>Cursor y</em>, também encontrados na paleta <em>Sensores</em>, retornam as coordenadas X e Y do cursor. Esses blocos também podem ser usados ​​para criar programas interativos.</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/push_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/push_block.svg?sanitize=true" alt="alt tag" title="push-pop" style="max-width:100%;"></a></p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/pop_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/pop_block.svg?sanitize=true" alt="alt tag" title="push-pop" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/push_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/push_block.svg?sanitize=true" alt="alt tag" title="push-pop" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/pop_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/pop_block.svg?sanitize=true" alt="alt tag" title="push-pop" style="max-width:100%;"></a></p>
 <p>Os blocos <em>Empurrar</em> e <em>Pop</em>, encontrados na paleta <em>Pilha</em>, são usados ​​para
 armazenar e recuperar valores de/para um programa de pilha primeiro incluído, último excluído
 (first-in e last-out, FILO).</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/print_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/print_block.svg?sanitize=true" alt="alt tag" title="print" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/print_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/print_block.svg?sanitize=true" alt="alt tag" title="print" style="max-width:100%;"></a></p>
 <p>O bloco <em>Exibir</em>, encontrado na paleta <em>Extras</em>, é usado para exibir
 mensagens durante a execução do programa. É muito útil como uma ferramenta de depuração
 e também como um meio de adicionar letras à sua música - pense
@@ -248,7 +248,7 @@ karaokê.</p>
 <h2><a id="user-content-widget-palette" class="anchor" aria-hidden="true" href="#widget-palette"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Paleta de Widget</h2>
 <p>O Music Blocks tem vários Widgets que podem ser usados
 para melhorar sua experiência. A <em>matriz tempo-tom</em> é descrita aqui.</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/chords.png"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/chords.png" alt="alt tag" title="The Pitch-Time Matrix" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/chords.png"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/chords.png" alt="alt tag" title="The Pitch-Time Matrix" style="max-width:100%;"></a></p>
 <p>Muitos dos blocos nesta paleta são usados ​​para criar uma matriz de
 "tom" e "valor da nota". A matriz é uma maneira conveniente e intuitiva
 de gerar gestos musicais curtos, que podem ser regenerados como
@@ -259,12 +259,12 @@ removidas como desejado. A representação do "valor da nota" atua como uma
 "tablatura rítmica" que deve ser legível por pessoas familiarizadas
 com os conceitos de ritmo na música e por pessoas que o desconhecem (mas
 familiarizado com matemática).</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/matrix_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/matrix_block.svg?sanitize=true" alt="alt tag" title="Pitch-time Matrix blocks" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/matrix_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/matrix_block.svg?sanitize=true" alt="alt tag" title="Pitch-time Matrix blocks" style="max-width:100%;"></a></p>
 <p>O bloco grampo <em>Matriz tempo-tom</em> é usado para definir a matriz:
 uma linha na matriz é criada para cada bloco de<em>Tom</em> e as colunas são
 criadas para notas individuais, que são criadas usando bloco de <em>Ritmo</em>,
 de notas individuais ou o bloco de <em>Quiáltera</em>.</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/rhythmruler2_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/rhythmruler2_block.svg?sanitize=true" alt="alt tag" title="Rhythm block" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/rhythmruler2_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/rhythmruler2_block.svg?sanitize=true" alt="alt tag" title="Rhythm block" style="max-width:100%;"></a></p>
 <p>O bloco <em>Ritmo</em> é usado para especificar uma série de notas de mesma
 duração (por exemplo, três semínimas ou sete colcheias). O número
 de notas é o parâmetro superior e o parâmetro inferior é a duração da nota.
@@ -286,7 +286,7 @@ convertidos nos blocos de <em>Ritmo</em> correspondentes, que podem ser usados p
 criar colunas na matriz.</p>
 <p>Se você quiser vários valores de nota em uma linha, simplesmente use o
 bloco grampo <em>Repetir</em> ou bloco grampo de <em>Duplicar</em>.</p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation-pt/tuplet4_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation-pt/tuplet4_block.svg?sanitize=true" alt="alt tag" title="Simple Tuplet clamp block" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/tuplet4_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/tuplet4_block.svg?sanitize=true" alt="alt tag" title="Simple Tuplet clamp block" style="max-width:100%;"></a></p>
 <p>O bloco <em>Quiáltera</em> é a maneira de driar ritmos que não se encaixam em um
 simples espaço rítmico de "potência de dois". Uma quiáltera, matematicamente, é uma
 coleção de notas que são dimensionadas para mapear em uma
