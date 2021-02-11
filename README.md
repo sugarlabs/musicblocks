@@ -92,7 +92,7 @@ the HTTP Server is set to start listening on port 3000.
 ## <a name="USING_MUSIC_BLOCKS"></a>Using Music Blocks
 
 Once Music Blocks is running, you'll want suggestions on how to use it. Follow
-[Using Music Blocks](./documentation/README.md) and [Music Blocks Guide](./guide/README.md).
+[Using Music Blocks](./documentation/en/README.md) and [Music Blocks Guide](./guide/README.md).
 
 Looking for a block? Find it in the
 [Palette Tables](./guide/README.md#APPENDIX_1).

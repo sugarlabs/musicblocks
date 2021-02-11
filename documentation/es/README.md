@@ -20,12 +20,12 @@ Edge	      | Coming soon
 You can run it from
 [https://musicblocks.sugarlabs.org](https://musicblocks.sugarlabs.org).
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/getting-started.png "Music Blocks in a browser")
+![alt tag](../en/getting-started.png "Music Blocks in a browser")
 
 Getting Started
 ---------------
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/getting_started_blocks.svg "default blocks")
+![alt tag](./getting_started_blocks.svg "default blocks")
 
 When you first launch Music Blocks in your browser, you'll see a stack
 of blocks representing four notes: `Do 4`, `Mi 4`, `Sol 4` and `Do
@@ -133,7 +133,7 @@ All of the other palettes are described in the
 Defining a note
 ---------------
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/newnote_block.svg "the note")
+![alt tag](./newnote_block.svg "the note")
 
 At the heart of Music Blocks is the concept of a note. A note, defined
 by the *Note value* block defines a length of time and a set of
@@ -182,33 +182,33 @@ inside a note in order to create sound-sync animations.
 A quick tour of selected blocks
 -------------------------------
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/setinstrument_block.svg "Set instrument block")
+![alt tag](./setinstrument_block.svg "Set instrument block")
 
 The *Set instrument* block, found on the *Tone* palette, lets you choose a
 timbre for a note. In the above example, a guitar model is used to
 make any notes contained within the block's clamp will sound as if
 they are being played on a guitar.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/setsynthvolume_block.svg "Set synth volume")
+![alt tag](./setsynthvolume_block.svg "Set synth volume")
 
 The *Set synth volume* block, found on the *Volume* palette, lets you
 change the volume, which ranges from `0` (silent) to `100` (full
 volume), of any notes contained with the block's clamp.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/setdrum_block.svg "Set drum block")
+![alt tag](./setdrum_block.svg "Set drum block")
 
 The *Set drum* block, which is used inside of the clamp of a *Note
 value* block is used to add drum sounds to a note. It is found on the
 *Drum* palette.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/repeat_block.svg "Repeat")
+![alt tag](./repeat_block.svg "Repeat")
 
 The *Repeat* block, found on the *Flow* palette, is used to create
 loops. Whatever stack of blocks are placed inside its clamp will be
 repeated. It can be used to repeat individual notes, or entire phrases
 of music.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/duplicatenotes_block.svg "Duplicate block")
+![alt tag](./duplicatenotes_block.svg "Duplicate block")
 
 The *Duplicate* block, found on the *Rhythms* palette, is used to
 repeat any contained notes. Similar to using a *Repeat* block, but
@@ -220,7 +220,7 @@ The *Start* block, found on the *Action* palette, is tied to the *Run*
 button. Anything inside of the clamp of the *Start* button will be run
 when the button is pressed.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/multiple_start_blocks.svg "Start")
+![alt tag](./multiple_start_blocks.svg "Start")
 
 Note that you can have multiple mice and that each mouse is
 equivalent to a "voice" in music. It can play notes of various pitches
@@ -230,7 +230,7 @@ one mouse cannot draw two lines at the same time. If you want
 counterpoint, pull out an additional *Start* block, which will create
 a new mouse that can now perform a new voice.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/action_block.svg "Action-Chunk")
+![alt tag](./action_block.svg "Action-Chunk")
 
 The *Action* block, also found on the *Action* palette, is used to
 create a collection of blocks that can be run as a group. Whenever you
@@ -246,7 +246,7 @@ an event, such as an on beat or off beat or mouse click. See
 [Music Blocks Programming Guide](http://rawgithub.com/sugarlabs/musicblocks/tree/master/guide/README.md),
 for further details and examples.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/storebox1_block.svg "storein-Box-Add One")
+![alt tag](./storebox1_block.svg "storein-Box-Add One")
 
 The *Store in* block, found on the *Boxes* palette, is used to store a
 value. That value can be retrieved using the *Box* block. The value
@@ -254,70 +254,70 @@ can be modified using the *Add one* block. These blocks are the
 typical way in which variables are stored and retrieved in Music
 Blocks.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/forward_block.svg "forward")
+![alt tag](./forward_block.svg "forward")
 
 The *Forward* block, found on the *Mouse* palette, is used to draw straight lines. (Note that if this block is used inside of a *Note value* block&mdash;the line will be drawn as the note plays; otherwise the line is drawn "instantly".)
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/left_block.svg "right")
+![alt tag](./left_block.svg "right")
 
 The *Right* block, found on the *Mouse* palette, is used to rotate the
 mouse heading. (Note that if this block is used inside of a *Note
 value* block&mdash;the heading will change as the note plays;
 otherwise the heading is changed "instantly".)
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/mousebutton_block.svg "pen up-pen down")
+![alt tag](./mousebutton_block.svg "pen up-pen down")
 
 The *Pen up* and *Pen down* blocks, found on the *Pen* palette,
 determine whether or not the mouse draws as it moves.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/setshade_block.svg "set shade")
+![alt tag](./setshade_block.svg "set shade")
 
 The *Set shade* block, also found on the *Pen* palette, is used to set
 the lightness or darkness of the "ink" used in the mouse pen. `set
 shade 0` is black. `set shade 100` is white.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/setcolor_block.svg "set color")
+![alt tag](./setcolor_block.svg "set color")
 
 The *Set color* block, also found on the *Pen* palette, is used to set
 the color of the "ink" used in the mouse pen. `set color 0` is
 red. `set color 70` is blue.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/random_block.svg "random")
+![alt tag](./random_block.svg "random")
 
 The *Random* block, found on the *Numbers* palette, is used to
 generate a random number, because sometimes being unpredictable is
 nice.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/oneOf_block.svg "on of this or that")
+![alt tag](./oneOf_block.svg "on of this or that")
 
 The *One of* block, also found on the *Numbers* palette, is used to
 generate a binary choice, one of "this" or "that", because sometimes
 being unpredictable is nice.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/show_block.svg "show media")
+![alt tag](./show_block.svg "show media")
 
 The *Show* block, found on the *Media* palette, is used to display
 text and images.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/mousebutton_block.svg "mousebutton")
+![alt tag](./mousebutton_block.svg "mousebutton")
 
 The *Mouse button* block, found on the *Sensors* palette, returns true
 if the mouse button is clicked. The mouse button block can be used to
 create some interactivity in your program.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/x_block.svg "cursorx-cursory")
+![alt tag](./x_block.svg "cursorx-cursory")
 
 The *Cursor x* and *Cursor y* blocks, also found on the *Sensors* palette, return the X and Y coordinates of the cursor. These blocks can also be used to create interactive programs.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/push_block.svg "push")
+![alt tag](./push_block.svg "push")
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/pop_block.svg "pop")
+![alt tag](./pop_block.svg "pop")
 
 The *Push* and *Pop* blocks, found on the *Heap* palette, are used to
 store and retrieve values on/from a first-in, last-out (FILO) program
 heap.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/print_block.svg "print")
+![alt tag](./print_block.svg "print")
 
 The *Print* block, found on the *Extras* palette, is used to print
 messages during program execution. It is very useful as a debugging
@@ -330,7 +330,7 @@ Widget Palette
 Music Blocks has various Widgets that can be used within Music Blocks
 to enhance your experience. The *Pitch-time matrix* is described here.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/chords.png "The Pitch-Time Matrix")
+![alt tag](../en/chords.png "The Pitch-Time Matrix")
 
 Many of the blocks on this palette are used to create a matrix of
 "pitch" and "note value". The matrix is a convenient and intuitive way
@@ -343,14 +343,14 @@ removed as desired. The "note value" representation acts as a
 with the concepts of rhythm in music and those unfamiliar (but
 familiar with math).
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/matrix_block.svg "Pitch-time Matrix blocks")
+![alt tag](./matrix_block.svg "Pitch-time Matrix blocks")
 
 *Pitch-time Matrix* blocks clamp is used to define the matrix:
 A row in the matrix is created for each *Pitch* block and columns are
 created for individual notes, which are created by using *Rhythm*
 blocks, individual note blocks, or the *Tuplet* block.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/rhythmruler2_block.svg "Rhythm block")
+![alt tag](./rhythmruler2_block.svg "Rhythm block")
 
 The *Rhythm* block is used to specify a series of notes of the same
 duration (e.g., three quarter notes or seven eighth notes). The number
@@ -377,7 +377,7 @@ create columns in the matrix.
 If you would like multiple note values in a row, simply use the
 *Repeat* block clamp or *Duplicate* block clamp.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/es/tuplet4_block.svg "Simple Tuplet clamp block")
+![alt tag](./tuplet4_block.svg "Simple Tuplet clamp block")
 
 The *Tuplet* block is how we create rhythms that do not fit into a
 simple "power of two" rhythmic space. A tuplet, mathematically, is a

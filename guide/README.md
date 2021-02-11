@@ -1115,7 +1115,7 @@ graphics commands inside of *Note value* blocks
 LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/drift_block.svg
+ tag](../documentation/en/drift_block.svg
  "No-clock block")
 
 Music Blocks has an internal "conductor" maintaining the beat.  When
@@ -1186,13 +1186,13 @@ The Beat count block is the number of the current beat, eg 1, 2, 3, or 4.
 In the figure, it is used to take an action on the first beat of each measure.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/beatvalue_block.svg
+ tag](../documentation/en/beatvalue_block.svg
  "beat count")
 
 The Measure count block returns the current measure.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/measurevalue_block.svg
+ tag](../documentation/en/measurevalue_block.svg
  "measure count")
 
 Specifying beat is useful in that you can have the character of a note
@@ -1317,20 +1317,20 @@ To use the ensemble blocks, you must assign a name to each mouse, as
 we will reference each mouse by its name.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtlenameonly_block.svg
+ tag](../documentation/en/turtlenameonly_block.svg
  "mouse name")
 
 The *Mouse sync* block aligns the beat count between mice.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtlesync_block.svg
+ tag](../documentation/en/turtlesync_block.svg
  "mouse sync")
 
 The *Mouse index heap* block returns a value in the heap at a specified
 location for a specified mouse.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtleheap_block.svg
+ tag](../documentation/en/turtleheap_block.svg
  "mouse heap index")
 
 You can use the dictionary entries to data between mice. The *Get
@@ -1370,13 +1370,13 @@ Other Ensemble blocks include:
 The *Found mouse* block will return true if the specified mouse can be found.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/foundturtle_block.svg
+ tag](../documentation/en/foundturtle_block.svg
  "found mouse")
 
 The *Set mouse* block sends a stack of blocks to be run by the specified mouse.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/setturtle_block.svg
+ tag](../documentation/en/setturtle_block.svg
  "set mouse")
 
 ## <a name="CONVERTERS"></a>3.8 Converters
@@ -1386,7 +1386,7 @@ Converters are used to transform one form of inputs into other, more usable form
 Generalized shape of a converter is:
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/number2pitch_block.svg
+ tag](../documentation/en/number2pitch_block.svg
  "Generalized converter")
 
 where the right argument is converted accordingly, and output is received on the left side.
@@ -1400,7 +1400,7 @@ where the right argument is converted accordingly, and output is received on the
 ### <a name="y-to-pitch"></a>4.1 Y to Pitch
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/ytopitch_block.svg
+ tag](../documentation/en/ytopitch_block.svg
  "Y to Pitch converter")
 
 This converter takes input in the form of a number that represents Staff Y position in pixels, and processes the value such that it can be used with certain pitch blocks (pitch number, nth modal pitch, pitch) to produce notes corresponding to given Staff Y position as an argument.  
@@ -1409,7 +1409,7 @@ Additionally, the block can be plugged into a print block to view the converted 
 ### <a name="pitch-converter"></a>4.2 Pitch converter
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/outputtools_block.svg
+ tag](../documentation/en/outputtools_block.svg
  "Pitch converter block")
 
 Pitch converter offers a range of options through a pie-menu based interface and it can potentially convert or extract info out of the current playing pitch using the current pitch block as an input. 
@@ -1454,7 +1454,7 @@ Returns the Y staff position of the note being played according to staff dimensi
 ### <a name="number-2-octave"></a>4.3  Number to Octave  
   
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/number2octave_block.svg
+ tag](../documentation/en/number2octave_block.svg
  "Y to Pitch converter")
 
 This converter takes a numeric value which denotes pitch number and returns the octave corresponding to that pitch number.
@@ -1462,7 +1462,7 @@ This converter takes a numeric value which denotes pitch number and returns the 
 ### <a name="number-2-pitch"></a>4.3  Number to Pitch
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/number2pitch_block.svg
+ tag](../documentation/en/number2pitch_block.svg
  "Y to Pitch converter")
 
 This converter takes a numeric value which denotes pitch number and returns the pitch name corresponding to that pitch number. No octave is inferred.
@@ -1958,7 +1958,7 @@ catch up with the conductor. The No-clock block essentially says, do
 your own thing and don't worry about the conductor.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/f057d42544ff53dc3d71ee241b53bf6bff0ddf24/documentation/no-clock.svg
+ tag](https://rawgithub.com/sugarlabs/musicblocks/f057d42544ff53dc3d71ee241b53bf6bff0ddf24/documentation/en/no-clock.svg
  "no clock")
 
 ### <a name="pitch-drum"></a>4.6 The Pitch-Drum Matrix
