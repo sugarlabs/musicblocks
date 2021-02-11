@@ -5,41 +5,58 @@ function SampleWidget() {
     const SAMPLEWIDTH = 400;
     const SAMPLEHEIGHT = 160;
     const RENDERINTERVAL = 50;
-
-    const FANCYNAMES = ["𝄫", "♭", "♮", "♯", "𝄪"];
+    const TRUEACCIDENTALNAMES = ["𝄫", "♭", "♮", "♯", "𝄪"];
+    //using these characters can cause issues.
     const ACCIDENTALNAMES = ["bb", "b", "", "#", "x"];
-    const SOLFEGENAMES = ["do", "re", "me", "fa", "sol", "la", "ti", "do"];
-    const DEFAULTACCIDENTAL = "-";
+    const SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti", "do"];
+    const MAJORSCALE = [0, 2, 4, 5, 7, 9, 11];
+    const DEFAULTACCIDENTAL = "";
     const DEFAULTSOLFEGE = "do";
-
     const REFERENCESAMPLE = "electronic synth";
     const DEFAULTSAMPLE = "electronic synth";
-    const CENTERPITCHHERTZ = 240;
+    const CENTERPITCHHERTZ = 220;
+    const MAXOCTAVE = 10;
 
-
+    this.timbreBlock;
+    this.sampleArray;
     this.sampleData = "";
-    this.freqArray = new Uint8Array();
     this.sampleName = DEFAULTSAMPLE;
-    this.pitchCenter = 0;
+    this.samplePitch = "sol";
+    this.pitchCenter = 9;
     this.accidentalCenter = 2;
     this.octaveCenter = 4;
+    this.freqArray = new Uint8Array();
 
-    this.sampleBlock;
-
-    this._updateBlocks = function (i) {
-
-        let blockNumber;
-        if (this.sampleBlock != null) {
-            blockNumber = this._logo.blocks.blockList[this.sampleBlock].connections[1];
-            if (blockNumber != null) {
-                this._logo.blocks.blockList[blockNumber].value = [this.sampleName, this.sampleData];
-                this._logo.blocks.blockList[blockNumber].updateCache();
-
-                numberBlockNumber = this._logo.blocks.blockList[blockNumber].connections[0];
-                if (numberBlockNumber != null) {
-                    this._logo.blocks.blockList[numberBlockNumber].value = this.pitchCenter;
-                    this._logo.blocks.blockList[numberBlockNumber].updateCache();
+    this._updateBlocks = function() {
+        let mainSampleBlock;
+        let audiofileBlock;
+        let solfegeBlock;
+        let octaveBlock;
+        this.sampleArray = [this.sampleName, this.sampleData, this.samplePitch, this.octaveCenter];
+        if (this.timbreBlock != null) {
+            mainSampleBlock = this._logo.blocks.blockList[this.timbreBlock].connections[1];;
+            if (mainSampleBlock != null) {
+                this._logo.blocks.blockList[mainSampleBlock].value = this.sampleArray;
+                this._logo.blocks.blockList[mainSampleBlock].updateCache();
+                audiofileBlock = this._logo.blocks.blockList[mainSampleBlock].connections[1];
+                solfegeBlock = this._logo.blocks.blockList[mainSampleBlock].connections[2];
+                octaveBlock = this._logo.blocks.blockList[mainSampleBlock].connections[3];
+                if (audiofileBlock != null) {
+                    this._logo.blocks.blockList[audiofileBlock].value = [this.sampleName, this.sampleData];
+                    this._logo.blocks.blockList[audiofileBlock].text.text = this.sampleName;
+                    this._logo.blocks.blockList[audiofileBlock].updateCache();
                 }
+                if (solfegeBlock != null) {
+                    this._logo.blocks.blockList[solfegeBlock].value = this.pitchInput.value;
+                    this._logo.blocks.blockList[solfegeBlock].text.text = this.pitchInput.value;
+                    this._logo.blocks.blockList[solfegeBlock].updateCache();
+                }
+                if (octaveBlock != null) {
+                    this._logo.blocks.blockList[octaveBlock].value = _(this.octaveCenter.toString());
+                    this._logo.blocks.blockList[octaveBlock].text.text = this.octaveCenter.toString();
+                    this._logo.blocks.blockList[octaveBlock].updateCache();
+                }
+
                 this._logo.refreshCanvas();
                 saveLocally();
             }
@@ -70,17 +87,34 @@ function SampleWidget() {
     this.pitchUp = function () {
         this._usePitch(this.pitchInput.value);
         this.pitchCenter++;
+        if (this.pitchCenter > 6) {
+            this.octaveCenter++;
+            if (this.octaveCenter > MAXOCTAVE) {
+                this.octaveCenter = MAXOCTAVE;
+            }
+            this.octaveInput.value = this.octaveCenter;
+        }
         this.pitchCenter%=7;
         this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
         this._updateBlocks();
+        this._playReferencePitch();
     };
 
     this.pitchDown = function () {
         this._usePitch(this.pitchInput.value);
         this.pitchCenter--;
+        if (this.pitchCenter < 0) {
+            this.pitchCenter = 6;
+            this.octaveCenter--;
+            if (this.octaveCenter < 0) {
+                this.octaveCenter = 0;
+            }
+            this.octaveInput.value = this.octaveCenter;
+        }
         this.pitchCenter%=7;
         this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
         this._updateBlocks();
+        this._playReferencePitch();
     };
 
     this.accidentalUp = function () {
@@ -90,53 +124,57 @@ function SampleWidget() {
         }
         this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
         this._updateBlocks();
+        this._playReferencePitch();
     };
 
     this.accidentalDown = function () {
         this._useAccidental(this.accidentalInput.value);
-        this.accidentalCenter--;
         if (this.accidentalCenter > 0) {
             this.accidentalCenter--;
         }
         this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
         this._updateBlocks();
+        this._playReferencePitch();
     };
 
     this.octaveUp = function () {
         this._useOctave(this.octaveInput.value);
         this.octaveCenter++;
+        if (this.octaveCenter > MAXOCTAVE) {
+            this.octaveCenter = MAXOCTAVE;
+        }
         this.octaveInput.value = this.octaveCenter;
         this._updateBlocks();
+        this._playReferencePitch();
     };
 
     this.octaveDown = function () {
         this._useOctave(this.octaveInput.value);
         this.octaveCenter--;
+        if (this.octaveCenter < 0) {
+            this.octaveCenter = 0;
+        }
         this.octaveInput.value = this.octaveCenter;
         this._updateBlocks();
+        this._playReferencePitch();
     };
-
 
     this._usePitch = function () {
         let number = SOLFEGENAMES.indexOf(this.pitchInput.value);
         this.pitchCenter = (number==-1) ? 0 : number;
         this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
-        this._updateBlocks();
     }
 
     this._useAccidental = function () {
         let number = ACCIDENTALNAMES.indexOf(this.accidentalInput.value);
         this.accidentalCenter = (number==-1) ? 2 : number;
         this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
-        this._updateBlocks();
     }
 
     this._useOctave = function () {
-        this.octaveCenter = this.octaveInput.value;
+        this.octaveCenter = parseInt(this.octaveInput.value);
         this.octaveInput.value = this.octaveCenter;
-        this._updateBlocks();
     }
-
 
     this._draw = function() {
 
@@ -257,81 +295,20 @@ function SampleWidget() {
                     '" vertical-align="middle">';
                 this.isMoving = false;
             } else {
-                this.resume();
-                playBtn.innerHTML =
-                    '<img src="header-icons/pause-button.svg" title="' +
-                    _("Pause") +
-                    '" alt="' +
-                    _("Pause") +
-                    '" height="' +
-                    ICONSIZE +
-                    '" width="' +
-                    ICONSIZE +
-                    '" vertical-align="middle">';
                 if (!(this.sampleName == "")) {
-                    this._usePitch(this.pitchInput.value);
-                    this._useAccidental(this.accidentalInput.value);
-                    this._useOctave(this.octaveInput.value);
-                    this._logo.synth.loadSynth(0, getVoiceSynthName(REFERENCESAMPLE));
-                    let finalCenter = 0;
-                    if (!isNaN(this.pitchCenter)) {
-                        finalCenter = this.pitchCenter;
-                    }
-                    let finalpitch = Math.floor(CENTERPITCHHERTZ * Math.pow(2, finalCenter/12));
-                    console.log(finalpitch);
-                    this._logo.synth.trigger(
-                        0,
-                        [finalpitch],
-                        1,
-                        REFERENCESAMPLE,
-                        null,
-                        null,
-                        false);
+                    this.resume();
+                    playBtn.innerHTML =
+                        '<img src="header-icons/pause-button.svg" title="' +
+                        _("Pause") +
+                        '" alt="' +
+                        _("Pause") +
+                        '" height="' +
+                        ICONSIZE +
+                        '" width="' +
+                        ICONSIZE +
+                        '" vertical-align="middle">';
                     this.isMoving = true;
-                }
-            }
-        };
-
-        let refPlayBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
-        refPlayBtn.onclick = () => {
-            if (this.isMoving) {
-                this.pause();
-                refPlayBtn.innerHTML =
-                    '<img src="header-icons/play-button.svg" title="' +
-                    _("Play") +
-                    '" alt="' +
-                    _("Play") +
-                    '" height="' +
-                    ICONSIZE +
-                    '" width="' +
-                    ICONSIZE +
-                    '" vertical-align="middle">';
-                this.isMoving = false;
-            } else {
-                this.resume();
-                refPlayBtn.innerHTML =
-                    '<img src="header-icons/pause-button.svg" title="' +
-                    _("Pause") +
-                    '" alt="' +
-                    _("Pause") +
-                    '" height="' +
-                    ICONSIZE +
-                    '" width="' +
-                    ICONSIZE +
-                    '" vertical-align="middle">';
-                if (!(this.sampleName == "")) {
-                    this._usePitch(this.pitchInput.value);
-                    this._logo.synth.loadSynth(0, getVoiceSynthName(this.sampleName));
-                    let finalpitch = CENTERPITCHHERTZ;
-                    this._logo.synth.trigger(
-                        0,
-                        [finalpitch],
-                        1,
-                        this.sampleName,
-                        null,
-                        null,
-                        false);
-                    this.isMoving = true;
+                    this._playReferencePitch();
                 }
             }
         };
@@ -480,6 +457,11 @@ function SampleWidget() {
             );
         }
 
+        this._parseSamplePitch();
+        this.octaveInput.value = parseInt(this.octaveCenter);
+
+        this._playReferencePitch();
+
         this._logo.textMsg(_("Record a sample to use as an instrument."));
         this._draw();
         this.resume();
@@ -497,102 +479,65 @@ function SampleWidget() {
         console.log(CUSTOMSAMPLES);
     }
 
-
-    this.webaudio_tooling_obj = function () {
-        var audioContext = new AudioContext();
-        console.log("audio is starting up ...");
-
-        var BUFF_SIZE = 16384;
-
-        var audioInput = null,
-            microphone_stream = null,
-            gain_node = null,
-            script_processor_node = null,
-            script_processor_fft_node = null,
-            analyserNode = null;
-
-        if (!navigator.getUserMedia)
-                navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
-                              navigator.mozGetUserMedia || navigator.msGetUserMedia;
-
-        if (navigator.getUserMedia){
-
-            navigator.getUserMedia({audio:true},
-              function(stream) {
-                  start_microphone(stream);
-              },
-              function(e) {
-                alert('Error capturing audio.');
-              }
-            );
-
-        } else { alert('getUserMedia not supported in this browser.'); }
-
-        function show_some_data(given_typed_array, num_row_to_display, label) {
-
-            var size_buffer = given_typed_array.length;
-            var index = 0;
-            var max_index = num_row_to_display;
-
-            console.log("__________ " + label);
-
-            for (; index < max_index && index < size_buffer; index += 1) {
-
-                console.log(given_typed_array[index]);
-            }
+    this._parseSamplePitch = function () {
+        let first_part = this.samplePitch.substring(0,2);
+        if (first_part === "so") {
+            this.pitchCenter = 4;
+        } else {
+            this.pitchCenter = SOLFEGENAMES.indexOf(first_part);
         }
+        this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
+        this.accidentalInput.value = " ";
 
-        function process_microphone_buffer(event) { // invoked by event loop
+    }
 
-            var i, N, inp, microphone_output_buffer;
+    this._playReferencePitch = function() {
 
-            microphone_output_buffer = event.inputBuffer.getChannelData(0); // just mono - 1 channel for now
+        this._usePitch(this.pitchInput.value);
+        this._useAccidental(this.accidentalInput.value);
+        this._useOctave(this.octaveInput.value);
 
-            // microphone_output_buffer  <-- this buffer contains current gulp of data size BUFF_SIZE
 
-            show_some_data(microphone_output_buffer, 5, "from getChannelData");
-        }
+        let finalCenter = 0;
 
-        function start_microphone(stream){
+        finalCenter += isNaN(this.octaveCenter)     ? 0 : this.octaveCenter*12;
+        finalCenter += isNaN(this.pitchCenter)      ? 0 : MAJORSCALE[this.pitchCenter];
+        finalCenter += isNaN(this.accidentalCenter) ? 0 : this.accidentalCenter-2;
 
-          gain_node = audioContext.createGain();
-          gain_node.connect( audioContext.destination );
 
-          microphone_stream = audioContext.createMediaStreamSource(stream);
-          microphone_stream.connect(gain_node);
+        let netChange = finalCenter-57;
+        let reffinalpitch = Math.floor(440 * Math.pow(2, netChange/12));
 
-          script_processor_node = audioContext.createScriptProcessor(BUFF_SIZE, 1, 1);
-          script_processor_node.onaudioprocess = process_microphone_buffer;
+        this._logo.synth.trigger(
+            0,
+            [reffinalpitch],
+            .5,
+            REFERENCESAMPLE,
+            null,
+            null,
+            false);
 
-          microphone_stream.connect(script_processor_node);
+        this._playSample();
+    }
 
-          //enable volume control for output speakers
+    this._playSample = function () {
 
-          // setup FFT
+        this.originalSampleName = this.sampleName + "_original";
+        let sampleArray = [this.originalSampleName, this.sampleData, "la", 4];
 
-          script_processor_fft_node = audioContext.createScriptProcessor(2048, 1, 1);
-          script_processor_fft_node.connect(gain_node);
 
-          analyserNode = audioContext.createAnalyser();
-          analyserNode.smoothingTimeConstant = 0;
-          analyserNode.fftSize = 2048;
+        let finalpitch = CENTERPITCHHERTZ;
+        //this._logo.synth.loadSynth(0, this.sampleArray);
 
-          microphone_stream.connect(analyserNode);
+        Singer.ToneActions.setTimbre(sampleArray, 0, this.timbreBlock);
 
-          analyserNode.connect(script_processor_fft_node);
-
-          script_processor_fft_node.onaudioprocess = function() {
-
-            // get the average for the first channel
-            array = new Uint8Array(analyserNode.frequencyBinCount);
-            analyserNode.getByteFrequencyData(array);
-
-            // draw the spectrogram
-            if (microphone_stream.playbackState == microphone_stream.PLAYING_STATE) {
-
-                show_some_data(array, 5, "from fft");
-            }
-          };
-        }
+        this._logo.synth.trigger(
+            0,
+            [finalpitch],
+            1,
+            this.originalSampleName,
+            null,
+            null,
+            false);
     }
 }
