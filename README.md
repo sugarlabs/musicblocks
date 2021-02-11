@@ -20,9 +20,9 @@ Music Blocks is a _Visual Programming Language_ and collection of _manipulative 
 
 ## Screenshots
 
-![alt tag](./screenshots/Screenshot-1.png)
+![alt tag](./res/screenshots/Screenshot-1.png)
 
-![alt tag](./screenshots/Screenshot-2.png)
+![alt tag](./res/screenshots/Screenshot-2.png)
 
 Some background on why music and programming can be found [here](./WhyMusicBlocks.md).
 
