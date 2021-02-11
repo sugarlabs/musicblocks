@@ -633,8 +633,11 @@ function setupToneBlocks() {
                     logo.rhythmRuler.Drums.push(blk);
                     logo.rhythmRuler.Rulers.push([[], []]);
                 } else if (logo.inSample) {
-                    logo.sample.sampleBlock = blk;
+                    logo.sample.timbreBlock = blk;
                     logo.sample.sampleName = args[0][0];
+                    logo.sample.sampleData = args[0][1];
+                    logo.sample.samplePitch = args[0][2];
+                    logo.sample.octaveCenter = args[0][3];
                 }
 
                 Singer.ToneActions.setTimbre(args[0], turtle, blk);
@@ -689,10 +692,12 @@ function setupToneBlocks() {
                 }
                 let cblk1 = logo.blocks.blockList[blk].connections[1];
                 if (cblk1 != null) {
-                    let namevalue = logo.blocks.blockList[cblk1].value[0];
-                    let datavalue = logo.blocks.blockList[cblk1].value[1];
-                    logo.blocks.blockList[blk].value[0] = namevalue;
-                    logo.blocks.blockList[blk].value[1] = datavalue;
+                    if (logo.blocks.blockList[cblk1].value !== null) {
+                        let namevalue = logo.blocks.blockList[cblk1].value[0];
+                        let datavalue = logo.blocks.blockList[cblk1].value[1];
+                        logo.blocks.blockList[blk].value[0] = namevalue;
+                        logo.blocks.blockList[blk].value[1] = datavalue;
+                    }
                 }
                 let cblk2 = logo.blocks.blockList[blk].connections[2];
                 if (cblk2 != null) {
