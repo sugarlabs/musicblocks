@@ -16,6 +16,7 @@ function SampleWidget() {
     const DEFAULTSAMPLE = "electronic synth";
     const CENTERPITCHHERTZ = 220;
     const MAXOCTAVE = 10;
+    const SAMPLEWAITTIME = 500;
 
     this.timbreBlock;
     this.sampleArray;
@@ -53,7 +54,7 @@ function SampleWidget() {
                     this._logo.blocks.blockList[solfegeBlock].updateCache();
                 }
                 if (octaveBlock != null) {
-                    this._logo.blocks.blockList[octaveBlock].value = _(this.sampleOctave);
+                    this._logo.blocks.blockList[octaveBlock].value = this.sampleOctave;
                     this._logo.blocks.blockList[octaveBlock].text.text = this.sampleOctave;
                     this._logo.blocks.blockList[octaveBlock].updateCache();
                 }
@@ -470,7 +471,6 @@ function SampleWidget() {
             }
         }
         CUSTOMSAMPLES.push([this.sampleName, this.sampleData]);
-        console.log(CUSTOMSAMPLES);
     }
 
     this._parseSamplePitch = function () {
@@ -484,7 +484,6 @@ function SampleWidget() {
 
         let sol = this.samplePitch;
 
-        console.log(sol);
         let attr, lev;
         if (sol.indexOf(SHARP) != -1) {
             attr = SHARP;
@@ -504,7 +503,6 @@ function SampleWidget() {
         }
         this.accidentalCenter = lev + 2;
         this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
-        console.log(this.accidentalCenter);
 
         this.octaveCenter = parseInt(this.sampleOctave);
     }
@@ -515,7 +513,6 @@ function SampleWidget() {
           TRUEACCIDENTALNAMES[this.accidentalCenter];
 
           this.sampleOctave = this.octaveCenter.toString();
-          console.log(this.samplePitch + this.sampleOctave);
     }
 
     this._playReferencePitch = function() {
@@ -549,14 +546,13 @@ function SampleWidget() {
             null,
             false);
 
-        this._playSample();
+        this._playDelayedSample();
     }
 
     this._playSample = function () {
 
         this.originalSampleName = this.sampleName + "_original";
         let sampleArray = [this.originalSampleName, this.sampleData, "la", 4];
-
 
         let finalpitch = CENTERPITCHHERTZ;
         //this._logo.synth.loadSynth(0, this.sampleArray);
@@ -571,5 +567,18 @@ function SampleWidget() {
             null,
             null,
             false);
+    }
+
+    this._waitAndPlaySample = function () {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                this._playSample();
+                resolve('played');
+            }, SAMPLEWAITTIME);
+        });
+    }
+
+    this._playDelayedSample = async function () {
+        const result = await this._waitAndPlaySample();
     }
 }
