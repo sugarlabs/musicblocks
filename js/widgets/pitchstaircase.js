@@ -36,10 +36,12 @@ class PitchStaircase {
     static ICONSIZE = 32;
     static DEFAULTFREQUENCY = 220.0;
 
+    /**
+     * @constructor
+     */
     constructor() {
         this.Stairs = [];
         this.stairPitchBlocks = [];
-
         this._stepTables = [];
         this._musicRatio1 = null;
         this._musicRatio2 = null;
@@ -172,7 +174,6 @@ class PitchStaircase {
      */
     _undo() {
         if (this._history.length === 0) {
-            // console.debug("nothing for undo to undo");
             return false;
         }
 
@@ -224,7 +225,6 @@ class PitchStaircase {
         }
 
         if (n === this.Stairs.length) {
-            // console.debug("DID NOT FIND A MATCH " + frequency);
             return;
         }
 
@@ -436,7 +436,6 @@ class PitchStaircase {
         let previousBlock = 0;
 
         for (let i = 0; i < this.Stairs.length; i++) {
-            // console.debug(this.Stairs[i][5] + "x" + this.Stairs[i][4] + "/" + this.Stairs[i][3]);
             const frequency = this.Stairs[i][2];
             const pitch = frequencyToPitch(frequency);
 
