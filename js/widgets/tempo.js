@@ -78,7 +78,7 @@ class Tempo {
             if (this.isMoving) {
                 this.pause();
                 pauseBtn.innerHTML =
-                    '<img src="header-icons/play-button.svg" title="' +
+                    '<img src="res/header-icons/play-button.svg" title="' +
                     _("Play") +
                     '" alt="' +
                     _("Play") +
@@ -91,7 +91,7 @@ class Tempo {
             } else {
                 this.resume();
                 pauseBtn.innerHTML =
-                    '<img src="header-icons/pause-button.svg" title="' +
+                    '<img src="res/header-icons/pause-button.svg" title="' +
                     _("Pause") +
                     '" alt="' +
                     _("Pause") +

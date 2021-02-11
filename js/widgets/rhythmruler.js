@@ -271,7 +271,7 @@ class RhythmRuler {
             } else {
                 const drumcell = rhythmRulerTableRow.insertCell();
                 drumcell.innerHTML =
-                    '<img src="header-icons/play-button.svg" title="' +
+                    '<img src="res/header-icons/play-button.svg" title="' +
                     _("Play") +
                     '" alt="' +
                     _("Play") +
@@ -287,7 +287,7 @@ class RhythmRuler {
                         if (this._playing) {
                             if (this._rulerPlaying === id) {
                                 this.innerHTML =
-                                    '<img src="header-icons/play-button.svg" title="' +
+                                    '<img src="res/header-icons/play-button.svg" title="' +
                                     _("Play") +
                                     '" alt="' +
                                     _("Play") +
@@ -316,7 +316,7 @@ class RhythmRuler {
                                 this._startingTime = null;
                                 this._rulerPlaying = id;
                                 this.innerHTML =
-                                    '<img src="header-icons/pause-button.svg" title="' +
+                                    '<img src="res/header-icons/pause-button.svg" title="' +
                                     _("Pause") +
                                     '" alt="' +
                                     _("Pause") +
@@ -546,7 +546,7 @@ class RhythmRuler {
                     this._tapTimes = [];
                     this._tapEndTime = null;
                     this._tapButton.innerHTML =
-                        '<img src="header-icons/tap-button.svg" title="' +
+                        '<img src="res/header-icons/tap-button.svg" title="' +
                         _("tap a rhythm") +
                         '" alt="' +
                         _("tap a rhythm") +
@@ -739,7 +739,7 @@ class RhythmRuler {
         this._tapEndTime = null;
         // let iconSize = RhythmRuler.ICONSIZE;
         this._tapButton.innerHTML =
-            '<img src="header-icons/tap-button.svg" title="' +
+            '<img src="res/header-icons/tap-button.svg" title="' +
             _("tap a rhythm") +
             '" alt="' +
             _("tap a rhythm") +
@@ -1329,7 +1329,7 @@ class RhythmRuler {
         this._tapMode = true;
         const iconSize = RhythmRuler.ICONSIZE;
         this._tapButton.innerHTML =
-            '<img src="header-icons/tap-active-button.svg" title="' +
+            '<img src="res/header-icons/tap-active-button.svg" title="' +
             _("tap a rhythm") +
             '" alt="' +
             _("tap a rhythm") +
@@ -1353,7 +1353,7 @@ class RhythmRuler {
         this._rulerPlaying = -1;
         this._startingTime = null;
         this._playAllCell.innerHTML =
-            '<img src="header-icons/play-button.svg" title="' +
+            '<img src="res/header-icons/play-button.svg" title="' +
             _("Play all") +
             '" alt="' +
             _("Play all") +
@@ -1378,7 +1378,7 @@ class RhythmRuler {
      */
     __pause() {
         this._playAllCell.innerHTML =
-            '<img src="header-icons/play-button.svg" title="' +
+            '<img src="res/header-icons/play-button.svg" title="' +
             _("Play all") +
             '" alt="' +
             _("Play all") +
@@ -1424,7 +1424,7 @@ class RhythmRuler {
      */
     __resume() {
         this._playAllCell.innerHTML =
-            '<img src="header-icons/pause-button.svg" title="' +
+            '<img src="res/header-icons/pause-button.svg" title="' +
             _("Pause") +
             '" alt="' +
             _("Pause") +

@@ -544,13 +544,13 @@ individual notes (or 和音s if you クリック on more than one cell in a
 column). In the figure, three quarter notes are selected (black
 cells). First `レ 4`, followed by `ミ 4`, followed by `ソ 4`.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/play-button.svg "play button")
+![alt tag](../../res/header-icons/play-button.svg "play button")
 
 If you クリック on the *Play* button (found in the top row of the grid),
 you will hear a sequence of notes played (from left to right): `レ 4`,
 `ミ 4`, `ソ 4`.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/export-chunk.svg "save button")
+![alt tag](../../res/header-icons/export-chunk.svg "save button")
 
 
 Once you have a group of notes (a "チャンク") that you like, クリック on the
@@ -561,19 +561,19 @@ programmatically. (More on that below.)
 You can rearrange the selected notes in the grid and save other チャンク
 as well.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/sort.svg "sort button")
+![alt tag](../../res/header-icons/sort.svg "sort button")
 
 
 The *Sort* button will reorder the ピッチ in the matrix from highest
 to lowest and eliminate any 重に *ピッチ* blocks.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/close-button.svg "close button")
+![alt tag](../../res/header-icons/close-button.svg "close button")
 
 
 You can hide the matrix by クリックing on the *Close* button (the right-most
 button in the top row of the grid.)
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/erase-button.svg "erase button")
+![alt tag](../../res/header-icons/erase-button.svg "erase button")
 
 
 There is also an Erase button that will clear the grid.

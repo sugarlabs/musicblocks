@@ -529,26 +529,26 @@ LIVE](https://musicblocks.sugarlabs.org/index.html?id=1522885752309944&run=True)
 通过点击网格中的单元格，您应该可以听到几个单个音符（或和弦，如果你点击一个以上的单元格。
 在这个图中，三个四分之一的音符被选中（黑色格子），`Re 4`, 接着`Mi 4`,最后 `Sol 4`.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/play-button.svg "play button")
+![alt tag](../../res/header-icons/play-button.svg "play button")
 
 如果你点击 *Play* 按钮 (在格子中的第一行),你会听到一系类的音符被播放 (从左到右): `Re 4`, `Mi 4`, `Sol 4`.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/export-chunk.svg "save button")
+![alt tag](../../res/header-icons/export-chunk.svg "save button")
 
 如果你有一系列你喜欢的的音符 (一个 "chunk"), 点击 *Save* 按钮(在 *Play* 按钮的右边)。
 《音乐拼块》会用程序产生同样一系列的拼块来播放这些音符。 (以下有更多详情.)
 
 你也可以使用格子从新安排锁定的音符，保存其他的拼块。
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/sort.svg "sort button")
+![alt tag](../../res/header-icons/sort.svg "sort button")
 
 *Sort* 按钮将把所有格子里的音调根据高低从新安排，出掉多余的 *Pitch* 拼块.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/close-button.svg "close button")
+![alt tag](../../res/header-icons/close-button.svg "close button")
 
 你可以把格子藏起来，只需要按 *Close* 按钮 (在最上面的一排，最右手边的按钮)
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/erase-button.svg "erase button")
+![alt tag](../../res/header-icons/erase-button.svg "erase button")
 
 还有一个删除按钮，将清除网格。
 你可以随时重新打开矩阵（它会记住的它以前的状态）。

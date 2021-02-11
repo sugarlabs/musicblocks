@@ -338,7 +338,7 @@ class PitchDrumMatrix {
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
         cell.innerHTML =
-            '&nbsp;&nbsp;<img src="header-icons/' +
+            '&nbsp;&nbsp;<img src="res/header-icons/' +
             icon +
             '" title="' +
             label +

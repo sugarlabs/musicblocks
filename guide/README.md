@@ -1478,13 +1478,13 @@ be used within Music Blocks to enhance your experience.
 Every widget has a menu with at least two buttons.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/close-button.svg
+ tag](../res/header-icons/close-button.svg
  "close button")
 
 You can hide the widget by clicking on the *Close* button.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/grab-handle.svg
+ tag](../res/header-icons/grab-handle.svg
  "drag handle")
 
 You can move the widget by dragging it by the *Drag* handle.
@@ -1562,7 +1562,7 @@ column). In the figure, three quarter notes are selected (black
 cells). First `Re 4`, followed by `Mi 4`, followed by `Sol 4`.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/play-button.svg
+ tag](../res/header-icons/play-button.svg
  "play button")
 
 If you click on the *Play* button (found in the top row of the grid),
@@ -1570,7 +1570,7 @@ you will hear a sequence of notes played (from left to right): `Re 4`,
 `Mi 4`, `Sol 4`.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/export-chunk.svg
+ tag](../res/header-icons/export-chunk.svg
  "save button")
 
 Once you have a group of notes (a "chunk") that you like, click on the
@@ -1582,14 +1582,14 @@ You can rearrange the selected notes in the grid and save other chunks
 as well.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/sort.svg
+ tag](../res/header-icons/sort.svg
  "sort button")
 
 The *Sort* button will reorder the pitches in the matrix from highest
 to lowest and eliminate any duplicate *Pitch* blocks.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/erase-button.svg
+ tag](../res/header-icons/erase-button.svg
  "erase button")
 
 There is also an Erase button that will clear the grid.

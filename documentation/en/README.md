@@ -31,7 +31,7 @@ When you first launch Music Blocks in your browser, you'll see a stack
 of blocks representing the notes: `Sol 4`, `Mi 4`and `Sol 4`. The first two notes are `1/4` note; third note is 
 `1/2` note.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/play-button.svg "play button")
+![alt tag](../../res/header-icons/play-button.svg "play button")
 
 Try clicking on the *Start* block or click on the *Play* button. You
 should hear the notes play in succession: `Sol` `Mi` `Sol`.

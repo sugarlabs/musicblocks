@@ -469,7 +469,7 @@ column). In the figure, three quarter notes are selected (black
 cells). First `Re 4`, followed by `Mi 4`, followed by `Sol 4`.
 
 <img
-src='https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/play-button.svg'
+src='../../res/header-icons/play-button.svg'
 height="36"</img>
 
 If you click on the *Play* button (found in the top row of the grid),
@@ -477,7 +477,7 @@ you will hear a sequence of notes played (from left to right): `Re 4`,
 `Mi 4`, `Sol 4`.
 
 <img
-src='https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/export-chunk.svg'
+src='../../res/header-icons/export-chunk.svg'
 height="36"</img>
 
 Once you have a group of notes (a "chunk") that you like, click on the
@@ -489,21 +489,21 @@ You can rearrange the selected notes in the grid and safe other chunks
 as well.
 
 <img
-src='https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/sort.svg'
+src='../../res/header-icons/sort.svg'
 height="36"</img>
 
 The *Sort* button will reorder the pitches in the matrix from highest
 to lowest and eliminate any duplicate *Pitch* blocks.
 
 <img
-src='https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/close-button.svg'
+src='../../res/header-icons/close-button.svg'
 height="36"</img>
 
 Or hide the matrix by clicking on the *Close* button (the right-most
 button in the top row of the grid.)
 
 <img
-src='https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/erase-button.svg'
+src='../../res/header-icons/erase-button.svg'
 height="36"</img>
 
 There is also an Erase button that will clear the grid.

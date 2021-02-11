@@ -213,11 +213,11 @@ class TemperamentWidget {
         }
         this.toggleNotesButton = () => {
             if (this.circleIsVisible) {
-                noteCell.getElementsByTagName("img")[0].src = "header-icons/circle.svg";
+                noteCell.getElementsByTagName("img")[0].src = "res/header-icons/circle.svg";
                 noteCell.getElementsByTagName("img")[0].title = "Circle";
                 noteCell.getElementsByTagName("img")[0].alt = "circle";
             } else {
-                noteCell.getElementsByTagName("img")[0].src = "header-icons/table.svg";
+                noteCell.getElementsByTagName("img")[0].src = "res/header-icons/table.svg";
                 noteCell.getElementsByTagName("img")[0].title = "Table";
                 noteCell.getElementsByTagName("img")[0].alt = "table";
             }
@@ -251,7 +251,7 @@ class TemperamentWidget {
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
         cell.innerHTML =
-            '&nbsp;&nbsp;<img src="header-icons/' +
+            '&nbsp;&nbsp;<img src="res/header-icons/' +
             icon +
             '" title="' +
             label +
@@ -522,12 +522,12 @@ class TemperamentWidget {
                     'px;"><span class="popuptext" id="myPopup"></span></div>';
                 if (i !== 0) {
                     docById("noteInfo").innerHTML +=
-                        '<img src="header-icons/edit.svg" id="edit" title="Edit" alt="edit" height=20px width=20px data-message="' +
+                        '<img src="res/header-icons/edit.svg" id="edit" title="Edit" alt="edit" height=20px width=20px data-message="' +
                         i +
                         '">';
                 }
                 docById("noteInfo").innerHTML +=
-                    '<img src="header-icons/close-button.svg" id="close" title="Close" alt="close" height=20px width=20px align="right"><br>';
+                    '<img src="res/header-icons/close-button.svg" id="close" title="Close" alt="close" height=20px width=20px align="right"><br>';
                 noteDefined = false;
                 for (let j = 0; j < this.ratiosNotesPair.length; j++) {
                     if (this.ratios[i] == this.ratiosNotesPair[j][0]) {
@@ -1528,7 +1528,7 @@ class TemperamentWidget {
                 docById("wheelDiv3").innerHTML +=
                     '<div class="popup" id="noteInfo1" style="width:180px; height:146px;"><span class="popuptext" id="myPopup"></span></div>';
                 docById("noteInfo1").innerHTML +=
-                    '<img src="header-icons/close-button.svg" id="close" title="Close" alt="close" height=20px width=20px align="right">';
+                    '<img src="res/header-icons/close-button.svg" id="close" title="Close" alt="close" height=20px width=20px align="right">';
                 docById("noteInfo1").innerHTML +=
                     '<br><center><input type="range" class="sliders" id = "frequencySlider" style="width:170px; background:white; border:0;" min="' +
                     frequencies[i] +
@@ -2011,7 +2011,7 @@ class TemperamentWidget {
         const cell = this.playButton;
         if (this._playing) {
             cell.innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/' +
+                '&nbsp;&nbsp;<img src="res/header-icons/' +
                 "stop-button.svg" +
                 '" title="' +
                 _("Stop") +
@@ -2026,7 +2026,7 @@ class TemperamentWidget {
             logo.synth.setMasterVolume(0);
             logo.synth.stop();
             cell.innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/' +
+                '&nbsp;&nbsp;<img src="res/header-icons/' +
                 "play-button.svg" +
                 '" title="' +
                 _("Play") +
@@ -2175,7 +2175,7 @@ class TemperamentWidget {
                 }, Singer.defaultBPMFactor * 1000 * duration);
             } else {
                 cell.innerHTML =
-                    '&nbsp;&nbsp;<img src="header-icons/' +
+                    '&nbsp;&nbsp;<img src="res/header-icons/' +
                     "play-button.svg" +
                     '" title="' +
                     _("Play") +

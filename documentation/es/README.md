@@ -34,7 +34,7 @@ of blocks representing four notes: `Do 4`, `Mi 4`, `Sol 4` and `Do
 
 https://rawgithub.com/sugarlabs/
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/play-button.svg "play button")
+![alt tag](../../res/header-icons/play-button.svg "play button")
 
 Try clicking on the *Start* block or click on the *Play* button. You should hear the notes play in succession: `Do` `Mi` `Sol` `Do`.
 
