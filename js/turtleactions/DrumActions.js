@@ -19,27 +19,30 @@
  * Action methods are in camelCase.
  */
 
-/* global Singer,DEFAULTDRUM,DRUMNAMES,last,DEFAULTVOLUME,logo,blocks,MusicBlocks,Mouse,NOISENAMES,_ */
-/* exported setupDrumActions */
 /*
-    Global Locations
-     js/utils/utils.js
+   global Singer, DEFAULTDRUM, DRUMNAMES, last, DEFAULTVOLUME, logo, blocks, MusicBlocks, Mouse,
+   NOISENAMES, _
+*/
+
+/*
+   Global Locations
+    js/utils/utils.js
         _
-     js/turtleactions/RhythmActions.js
+    js/turtle-singer.js
         Singer
-     js/activity.js
-        logo
-     js/utils/synthutils.js
-        DRUMNAMES,NOISENAMES
-     js/utils/musicutils.js
+    js/activity.js
+        logo, blocks
+    js/utils/synthutils.js
+        DRUMNAMES, NOISENAMES
+    js/utils/musicutils.js
         DEFAULTDRUM
-     js/logo.js/
+    js/logo.js/
         DEFAULTVOLUME
-     js/blocks.js
-        blocks
-     js/js-export/export.js
+    js/js-export/export.js
         MusicBlocks, Mouse
 */
+
+/* exported setupDrumActions */
 
 /**
  * Sets up all the methods related to different actions for each block in Drum palette.

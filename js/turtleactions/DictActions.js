@@ -28,13 +28,11 @@
     js/turtle.js
         Turtle
     js/activity.js
-        turtles
+        turtles, logo
     js/turtle-singer.js
         Singer
     js/utils/musicutils.js
         getNote, pitchToNumber
-    js/activity.js
-        logo
     js/logo.js
         INVALIDPITCH
     js/blocks/EnsembleBlocks.js

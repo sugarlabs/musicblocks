@@ -19,47 +19,25 @@
  * Action methods are in camelCase.
  */
 
-/* global _,Singer,MUSICALMODES,logo,getNote,getModeLength,NOINPUTERRORMSG,blocks,MusicBlocks,Mouse */
-/* exported setupIntervalsActions */
 /*
-    Global Locations
-     js/utils/utils.js
-        _
-     js/turtleactions/RhythmActions.js
-        Singer
-     js/activity.js
-        logo
-     js/turtleactions/IntervalsActions.js
-        getModeLength
-     js/utils/musicutils.js
-        getNote
-     js/logo.js
-        NOINPUTERRORMSG
-     js/blocks.js
-        blocks
-     js/js-export/export.js
-        MusicBlocks, Mouse
+   global _, logo, NOINPUTERRORMSG, Singer, blocks, MUSICALMODES, MusicBlocks, Mouse, getNote,
+   getModeLength
 */
 
 /*
-   global _, logo, NOINPUTERRORMSG, Singer, blocks, MUSICALMODES, MusicBlocks, Mouse,
-   MODE_PIE_MENUS, getNote, getModeLength
- */
-
-/*
    Global locations
-   - js/utils/utils.js
+    js/utils/utils.js
         _
-   - js/logo.js
-    NOINPUTERRORMSG
-   - js/utils/musicutils.js
-    MUSICALMODES, MODE_PIE_MENUS, getNote, getModeLength
-   - js/turtle-singer.js
-    Singer
-   - js/activity.js
-    blocks, logo
-   - js/js-export/export.js
-    MusicBlocks, Mouse
+    js/logo.js
+        NOINPUTERRORMSG
+    js/utils/musicutils.js
+        MUSICALMODES, MODE_PIE_MENUS, getNote, getModeLength
+    js/turtle-singer.js
+        Singer
+    js/activity.js
+        blocks, logo
+    js/js-export/export.js
+        MusicBlocks, Mouse
  */
 
 /* exported setupIntervalsActions*/

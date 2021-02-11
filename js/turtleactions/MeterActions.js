@@ -16,29 +16,32 @@
  * MA 02110-1335 USA.
  */
 
-/* global _,logo,Singer,rationalToFraction,_blk,blk,TONEBPM,Queue,turtles,last,MusicBlocks,blocks,Mouse */
-/* exported setupMeterActions */
 /*
-    Global Locations
-     js/utils/utils.js
-        _,rationalToFraction
-     js/turtleactions/RhythmActions.js
+   global _, logo, Singer, rationalToFraction, TONEBPM, Queue, turtles, last, MusicBlocks, blocks,
+   Mouse
+*/
+
+/*
+   Global Locations
+    js/utils/utils.js
+        _, rationalToFraction, last
+    js/turtle-singer.js
         Singer
-     js/activity.js
-        logo
-     js/utils/synthutils.js
+    js/activity.js
+        logo, blocks
+    js/utils/synthutils.js
         DRUMNAMES,NOISENAMES
-     js/utils/musicutils.js
+    js/utils/musicutils.js
         DEFAULTDRUM
-     js/logo.js
-        DEFAULTVOLUME,TONEBPM
-     js/blocks.js
-        blocks
-     js/turtles.js
+    js/logo.js
+        DEFAULTVOLUME, TONEBPM, Queue
+    js/activity.js
         turtles
-     js/js-export/export.js
+    js/js-export/export.js
         MusicBlocks, Mouse
 */
+
+/* exported setupMeterActions */
 
 /**
  * Sets up all the methods related to different actions for each block in Meter palette.
@@ -89,7 +92,7 @@ function setupMeterActions() {
             logo.notation.notationPickup(turtle, tur.singer.pickup);
         }
 
-        static setBPM(bpm, beatValue, turtle) {
+        static setBPM(bpm, beatValue, turtle, blk) {
             let _bpm = (bpm * beatValue) / 0.25;
             let obj, target;
             if (_bpm < 30) {
@@ -119,7 +122,7 @@ function setupMeterActions() {
                         _("beats per minute is") +
                         " " +
                         target,
-                    _blk
+                    blk
                 );
                 _bpm = 1000;
             }
