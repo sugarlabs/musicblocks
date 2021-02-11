@@ -119,7 +119,7 @@ class PitchStaircase {
             );
             playCell.className = "headcol"; // This cell is fixed horizontally.
             playCell.setAttribute("id", i);
-
+            playCell.style.cursor = "pointer";
             const stepCell = stepTableRow.insertCell();
             stepCell.setAttribute("id", frequency);
             stepCell.style.width =
