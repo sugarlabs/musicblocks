@@ -974,7 +974,7 @@ msgstr "ファイルを ひらく"
 #: js/turtledefs.js:23
 #.TRANS: put the URL to the guide here, e.g., https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md
 msgid "guide url"
-msgstr "https://github.com/sugarlabs/musicblocks/tree/master/guide-ja/music_blocks_operation_manual.pdf"
+msgstr "https://github.com/sugarlabs/musicblocks/tree/master/guide/ja/music_blocks_operation_manual.pdf"
 
 #: js/turtledefs.js:68
 msgid "search"

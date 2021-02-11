@@ -107,7 +107,7 @@ destacando o(s) bloco(s) que você deseja copiar.</p>
 <p>Os blocos de paletas são exibidos no lado esquerdo da tela. Essas
 paletas contêm os blocos usados ​​para criar programas.</p>
 <p>Veja o
-<a href="http://github.com/sugarlabs/turtleblocksjs/tree/master/guide-pt/README.md">Guia de Programação do Turtle Blocks</a>
+<a href="http://github.com/sugarlabs/turtleblocksjs/tree/master/guide/pt/README.md">Guia de Programação do Turtle Blocks</a>
 para detalhes gerais sobre como usar os blocos.</p>
 <p>Veja o
 <a href="http://github.com/sugarlabs/musicblocks/tree/master/guidept/README.md">Guia de Programação do Turtle Blocks</a>
@@ -147,7 +147,7 @@ bemois: <code>##</code>, <code>#</code>, <code>e</code>. O bloco <em>tom-nome</e
 na medida que permite percorrer <code>C</code>, <code>D</code>, <code>E</code>, <code>F</code>, <code>G</code>, <code>A</code>,
 <code>B</code>. Ele também usa um segundo seletor para sustenidos e bemois.</p>
 <p>Como observado, e descrito com mais detalhes no
-<a href="http://github.com/sugarlabs/musicblocks/tree/master/guide-pt/README.md">Guia de Programação do Music Blocks</a>,
+<a href="http://github.com/sugarlabs/musicblocks/tree/master/guide/pt/README.md">Guia de Programação do Music Blocks</a>,
 você pode colocar quantos blocos de <em>Tom</em> você quiser em uma nota. Eles
 vão tocar juntos como um acorde. Você também pode inserir blocos gráficos
 dentro de uma nota para criar animações sincronizadas com o som.</p>
@@ -195,7 +195,7 @@ modificadas.)</p>
 <p>As ações são um elemento organizacional poderoso para o seu programa e podem
 ser usadas de muitas formas poderosas. Por exemplo, uma ação pode ser associada a
 um evento, como uma batida ou uma ausência de batida ou um clique do mouse. Veja
-<a href="http://github.com/sugarlabs/musicblocks/tree/master/guide-pt/README.md">Guia de Programação de Music blocks</a>,
+<a href="http://github.com/sugarlabs/musicblocks/tree/master/guide/pt/README.md">Guia de Programação de Music blocks</a>,
 para mais detalhes e exemplos.</p>
 <p><a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlabs/musicblocks/blob/master/documentation/pt/storebox1_block.svg"><img src="https://github.com/sugarlabs/musicblocks/raw/master/documentation/pt/storebox1_block.svg?sanitize=true" alt="alt tag" title="storein-Box-Add One" style="max-width:100%;"></a></p>
 <p>O bloco <em>Armazenar em</em>, encontrado na paleta <em>Caixas</em>, é usado para armazenar um
@@ -308,7 +308,7 @@ tentará fazer uma alteração correspondente na matriz.</p>
 <p>Observe: você pode construir uma matriz a partir de pedaços de blocos, incluindo
 o pedaço no gancho do bloco <em>Matriz tempo-tom</em>.</p>
 <p>Mais detalhes sobre todos os widgets estão disponíveis no
-<a href="http://github.com/sugarlabs/musicblocks/tree/master/guide-pt/README.md">Guia de Programação de Music Blocks</a>.</p>
+<a href="http://github.com/sugarlabs/musicblocks/tree/master/guide/pt/README.md">Guia de Programação de Music Blocks</a>.</p>
 </article>
   </div>
     </div>

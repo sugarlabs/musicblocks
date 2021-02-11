@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="71.684418mm"
+   height="54.38028mm"
+   viewBox="0 0 253.99991 192.68605"
+   id="svg5587"
+   version="1.1">
+  <defs
+     id="defs5589" />
+  <metadata
+     id="metadata5592">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <path
+     d="m 132.99991,55.68606 120,0 0,39.999999 -120,0 0,-16 0,-2 -12,0 0,6 -3.99999,0 0,-15.999999 3.99999,0 0,5.999999 12,0 0,-2 z"
+     id="path21-2-3-94"
+     style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     y="54.68605"
+     id="text23-0-6-52"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+     x="163.99992">
+    <tspan
+       x="183.99992"
+       y="80.68605"
+       id="tspan25-7-2-4">C</tspan>
+  </text>
+  <path
+     style="fill:#1d8989;fill-opacity:1;stroke:#005459;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+     id="path3194-3-8-43"
+     d="m 18.999894,71.686059 0,-7.999999 a 8,8 0 0 1 8,-8 l 8,0 0,4 20,0 0,-4 59.999996,0 7.99999,0 a 8,8 0 0 1 8.00001,8 l 0,7.999999 -8.00001,0 0,-5.999999 -7.99999,0 0,19.999999 7.99999,0 0,-6 8.00001,0 0,34.000001 -8.00001,0 0,-6 -7.99999,0 0,20 7.99999,0 0,-6 8.00001,0 0,8 a 8,8 0 0 1 -8.00001,8 l -7.99999,0 -59.999996,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 a 8,8 0 0 1 -8,-8 l 0,-8 0,-42.000001 0,-8 z" />
+  <text
+     y="54.402863"
+     x="18.89637"
+     style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3196-7-6-6">
+    <tspan
+       id="tspan3198-0-1-1"
+       y="103.40286"
+       x="112.89638">set key</tspan>
+  </text>
+  <text
+     y="56.402863"
+     x="19.409065"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3200-6-0-8">
+    <tspan
+       id="tspan3202-5-0-1"
+       y="78.902863"
+       x="113.40907">key</tspan>
+  </text>
+  <text
+     y="58.402863"
+     x="18.89637"
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3204-9-5-7">
+    <tspan
+       id="tspan3206-0-8-6"
+       y="122.90288"
+       x="112.89638">mode</tspan>
+  </text>
+  <g
+     id="g4225"
+     transform="translate(-18.000091,-155.31398)">
+    <path
+       style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1"
+       id="path21-2-3-9-1"
+       d="m 150.99998,253.00004 120,0 0,40 -120,0 0,-16 0,-2 -12,0 0,6 -4,0 0,-16 4,0 0,6 12,0 0,-2 z" />
+    <text
+       x="161.99998"
+       style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000"
+       id="text23-0-6-5-0"
+       y="252.00005">
+      <tspan
+         id="tspan25-7-2-2-6"
+         y="278.00006"
+         x="181.99998">Major</tspan>
+    </text>
+  </g>
+  <path
+     d="m 0.99998474,29.56205 0,-8 c 0,-4.18879 3.81120996,-8 7.99999996,-8 l 8.0000003,0 10,-12.0000001 10,12.0000001 18,0 88.000005,0 8,0 c 4.18879,0 8,3.81121 8,8 l 0,8 0,8 0,8 c 0,4.18879 -3.93628,9.01593 -8,8 l -8,0 -88.000005,0 -2,0 0,4 -16,0 0,-4 -2,0 -8,0 c -2.61799,0 -5.21987,1.07773 -7.07107,2.92893 -1.8512,1.85121 -2.92893,4.45308 -2.92893,7.07107 l 0,8 0,8 0,49.56196 c 0,2.61799 1.07773,5.21987 2.92893,7.07107 1.8512,1.8512 4.53124,2.29397 7.07107,2.92893 l 8,0 0,4 20,0 0,-4 16,0 0,12 0,12 0,8 c 0,4.18879 -3.93628,6.98407 -8,8 l -8,0 -18,0 -10,12 -10,-12 -8.0000003,0 c -4.18879,0 -7.99999996,-3.81121 -7.99999996,-8 l 0,-8 z"
+     id="path3660"
+     style="fill:#76C61C;fill-opacity:1;stroke:#538D38;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     y="0.56206709"
+     x="-1.4739401e-05"
+     id="text3662"
+     style="font-size:20px;font-family:Sans;text-anchor:start;fill:#000000">
+    <tspan
+       x="7.9999852"
+       y="43.562065"
+       id="tspan3664">custom mode</tspan>
+  </text>
+  <text
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3095"
+     x="35.999985"
+     y="559.12415">
+    <tspan
+       id="tspan3097"
+       y="581.62415"
+       x="146" />
+  </text>
+  <text
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3107"
+     x="35.999985"
+     y="349.12415">
+    <tspan
+       id="tspan3109"
+       y="371.62415"
+       x="130" />
+  </text>
+  <text
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3033"
+     x="35.999985"
+     y="307.12411">
+    <tspan
+       id="tspan3035"
+       y="329.62411"
+       x="138" />
+  </text>
+  <text
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3317"
+     x="17.999985"
+     y="139.12411">
+    <tspan
+       id="tspan3319"
+       y="161.62411"
+       x="160" />
+  </text>
+  <text
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"
+     id="text3095-2"
+     x="35.999985"
+     y="517.12415">
+    <tspan
+       id="tspan3097-4"
+       y="539.62415"
+       x="146" />
+  </text>
+</svg>
