@@ -16,17 +16,19 @@
  * MA 02110-1335 USA.
  */
 
-/* global Singer,logo,MusicBlocks,blocks,Mouse */
-/* exported setupOrnamentActions */
+/* global Singer, logo, MusicBlocks, blocks, Mouse */
+
 /*
-    Global Locations
-     js/turtleactions/RhythmActions.js
+   Global Locations
+    js/turtle-singer.js
         Singer
-     js/activity.js
-        logo
-     js/js-export/export.js
+    js/activity.js
+        logo, blocks
+    js/js-export/export.js
         MusicBlocks, Mouse
 */
+
+/* exported setupOrnamentActions */
 
 /**
  * Sets up all the methods related to different actions for each block in Ornament palette.

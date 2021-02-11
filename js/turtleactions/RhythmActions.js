@@ -16,25 +16,23 @@
  * MA 02110-1335 USA.
  */
 
-/* global _,Singer,logo,MusicBlocks,blocks,Mouse,last,turtles,TONEBPM */
-/* exported setupRhythmActions */
+/* global _, Singer, logo, MusicBlocks, blocks, Mouse, last, turtles, TONEBPM */
+
 /*
-    Global Locations
-     js/utils/utils.js
-        _
-     js/turtleactions/RhythmActions.js
+   Global Locations
+    js/utils/utils.js
+        _, last
+    js/turtle-singer.js
         Singer
-     js/activity.js
-        logo
-     js/turtles.js
-        turtles
-     js/logo.js
+    js/activity.js
+        logo, turtles, blocks
+    js/logo.js
         TONEBPM
-     js/blocks.js
-        blocks
-     js/js-export/export.js
+    js/js-export/export.js
         MusicBlocks, Mouse
 */
+
+/* exported setupRhythmActions */
 
 /**
  * Sets up all the methods related to different actions for each block in Rhythm palette.

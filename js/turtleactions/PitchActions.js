@@ -16,17 +16,13 @@
  * MA 02110-1335 USA.
  */
 
-/**
- * Sets up all the methods related to different actions for each block in Pitch palette.
- *
- * @returns {void}
- */
-
-/*globals logo, Singer, pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, last,
-getNote, nthDegreeToPitch, SHARP, FLAT, _, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
-numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
-keySignatureToMode, getInterval, blocks, EFFECTSNAMES, NANERRORMSG, frequencyToPitch, MusicBlocks,
-Mouse, isCustom*/
+/*
+   globals logo, Singer, pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, last, getNote,
+   nthDegreeToPitch, SHARP, FLAT, _, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
+   numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
+   keySignatureToMode, getInterval, blocks, EFFECTSNAMES, NANERRORMSG, frequencyToPitch,
+   MusicBlocks, Mouse, isCustom
+*/
 
 /*
    Global locations
@@ -50,6 +46,12 @@ Mouse, isCustom*/
 */
 
 /*exported setupPitchActions*/
+
+/**
+ * Sets up all the methods related to different actions for each block in Pitch palette.
+ *
+ * @returns {void}
+ */
 function setupPitchActions() {
     Singer.PitchActions = class {
         /**
