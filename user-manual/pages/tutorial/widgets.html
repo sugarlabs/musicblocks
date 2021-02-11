@@ -1,0 +1,621 @@
+<section id="widgets">
+    <section id="widgets_header">
+        <h1 class="page-header">Widgets</h1>
+        <p class="text-justify">
+            Content:
+        <ol>
+            <li><a href="#content1">Monitoring status</a></li>
+            <li><a href="#content2">Generating chunks of notes</a></li>
+                <ol type="a">
+                    <li><a href="#subcontent1">Pitch-Time Matrix</a></li>
+                    <li><a href="#subcontent2">The Rhythm Block</a></li>
+                    <li><a href="#subcontent3">Creating Tuplets</a></li>
+                    <li><a href="#subcontent4">What is a Tuplet?</a></li>
+                    <li><a href="#subcontent5">Using Individual Notes in the Matrix</a></li>
+                </ol>
+            <li><a href="#content3">Generating rhythms</a></li>
+            <li><a href="#content4">Musical Modes</a></li>
+            <li><a href="#content5">The Pitch-Drum Matrix</a></li>
+            <li><a href="#content6">Exploring musical proportions</a></li>
+            <li><a href="#content7">Generating arbitrary pitches</a></li>
+            <li><a href="#content8">Changing tempo</a></li>
+        </ol>
+        </p>
+    </section>
+    <br/>
+
+    <section id="content1">
+        <p class="text-justify">
+        <h2>1. Monitoring status</h2></p>
+        <div class="row">
+            <div class="col-md-4 col-xs-4 col-md-offset-1">
+                <img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_1.png">
+            </div>
+        </div>
+        <br/>
+        <div class="row">
+            <div class="col-md-4 col-xs-4 col-md-offset-1">
+                <img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_2.png">
+            </div>
+        </div>
+        <br>
+        <p class="text-justify">
+        The Status widget is a tool for inspecting the status of Music Blocks as it is running. By default, the key, BPM, and volume are displayed. Also, each note is displayed as it is played. There is one row per voice in the status table.
+        <br>
+        Additional Print blocks can be added to the Status widget to display additional music factors, e.g., duplicate, transposition, skip, staccato, slur, and graphics factors, e.g., x, y, heading, color, shade, grey, and pensize.
+        </p>
+        <br>
+        <div class="row">
+            <div class="col-md-4 col-xs-4 col-md-offset-1">
+                <img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_3.png">
+            </div>
+        </div>
+        <br>
+        <p>
+        You can do additional programming within the status block. In the example above, the volume is divided by 10 before being displayed.
+        </p>
+    </section>
+    <br/>
+
+    <section id="content2">
+        <p class="text-justify">
+        <h2>2. Generating chunks of notes</h2></p>
+    </section>
+    <br/>
+
+    <section id="subcontent1">
+        <p class="text-justify">
+        <h4>2.a. Pitch-Time Matrix</h4></p> 
+        <div class="row">
+            <div class="col-md-4 col-xs-4 col-md-offset-1">
+                <img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_4.png">
+            </div>
+        </div> 
+        <br>
+        <p>
+        Music Blocks provides a widget, the Pitch-time Matrix, as a scaffold for getting started.
+        <br>
+        Once you've launched Music Blocks in your browser, start by clicking on the Pitch-time Matrix stack that appears in the middle of the screen. (For the moment, ignore the Start block.) You'll see a grid organized vertically by pitch and horizontally by rhythm.
+        </p> 
+        <div class="row">
+            <div class="col-md-4 col-xs-4 col-md-offset-1">
+                <img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_5.png">
+            </div>
+        </div>
+        <br>
+        <p>
+        The matrix in the figure above has three Pitch blocks and one Rhythm block, which is used to create a 3 x 3 grid of pitch and time.
+        <br>
+        Note that the default matrix has five Pitch blocks, hence, you will see five rows, one for each pitch. (A sixth row at the bottom is used for specifying the rhythms associated with each note.) Also by default, there are two Rhythm blocks, which specifies six quarter notes followed by one half note. Since the Rhythm blocks are inside of a Repeat block, there are fourteen (2 x 7) columns for selecting notes.
+        </p> 
+        <br>
+        <div class="row">
+            <div class="col-md-4 col-xs-4 col-md-offset-1">
+                <img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_6.png">
+            </div>
+        </div>
+        <br/>
+        <p class="text-justify">
+            By clicking on individual cells in the grid, you should hear individual notes (or chords if you click on more than one cell in a column). In the figure, three quarter notes are selected (black cells). First <mark>Re 4</mark>, followed by <mark>Mi 4</mark>, followed by <mark>Sol 4</mark>.
+        </p>
+        <br/>
+        <div class="row">
+            <img src="./dist/img/tutorials/widgets/play.png">
+        </div>
+        <p>
+            If you click on the Play button (found in the top row of the grid), you will hear a sequence of notes played (from left to right): <mark>Re 4</mark>, <mark>Mi 4</mark>, <mark>Sol 4</mark>.
+        </p>
+        <div class="row">
+            <img src="./dist/img/tutorials/widgets/save.png">
+        </div> 
+        <p>
+           Once you have a group of notes (a "chunk") that you like, click on the Save button (just to the right of the Play button). This will create a stack of blocks that can used to play these same notes programmatically. (More on that below.)
+           <br>
+            You can rearrange the selected notes in the grid and save other chunks as well.
+        </p> 
+        <div class="row">
+            <img src="./dist/img/tutorials/widgets/sort.png">
+        </div>
+        <p>
+        The Sort button will reorder the pitches in the matrix from highest to lowest and eliminate any duplicate Pitch blocks.
+        </p> 
+        <div class="row">
+            <img src="./dist/img/tutorials/widgets/close.png">
+        </div> 
+        <p>
+        You can hide the matrix by clicking on the Close button (the right-most button in the top row of the grid.)
+        </p>
+        <div class="row">
+            <img src="./dist/img/tutorials/widgets/erase.png">
+        </div> 
+        <br/>
+        <p>
+        There is also an Erase button that will clear the grid.
+        <br/>
+        Don't worry. You can reopen the matrix at anytime (it will remember its previous state) and since you can define as many chunks as you want, feel free to experiment.
+        <br/>
+        Tip: You can put a chunk inside a Pitch-time Matrix block to generate the matrix to corresponds to that chunk.
+        </p> 
+        <div class="row">
+            <div class="col-md-4 col-xs-4 col-md-offset-1">
+                <img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_7.png">
+            </div>
+        </div> 
+        <p>
+        <br/>
+        <p class="text-justify">The chunk created when you click on the matrix is a stack of blocks. The blocks are nested: an Action block contains three Note value blocks, each of which contains a Pitch block. The Action block has a name automatically generated by the matrix, in this case, chunk. (You can rename the action by clicking on the name.). Each note has a duration (in this case 4, which represents a quarter note).
+        Try putting different numbers in and see (hear) what happens. Each note block also has a pitch block (if it were a chord, there would be multiple Pitch blocks nested inside the Note block's clamp). Each pitch block has a pitch name (Re, Mi, and Sol), and a pitch octave; in this example, the octave is 4 for each pitch. (Try changing the pitch names and the pitch octaves.)</p>
+        <br/>
+        To play the chuck, simply click on the action block (on the word action). You should hear the notes play, ordered from top to bottom.
+        </p>
+    </section>
+
+    <br id="subcontent2">
+        <p class="text-justify">
+        <h4>2.b. The Rhythm Block</h4></p>
+        <div class="row">
+            <div class="col-md-4 col-xs-4 col-md-offset-1">
+                <img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_8.png">
+            </div>
+        </div>
+        <br/>
+        <p>
+        <p class="text-justify">Rhythm blocks are used to generate rhythm patterns in the Pitch-time Matrix block. The top argument to the Rhythm block is the number of notes. The bottom argument is the duration of the note. In the top example above, three columns for quarter notes would be generated in the matrix. In the middle example, one column for an eighth note would be generated. In the bottom example, seven columns for 16th notes would be generated.</p>
+        </p>
+        <br>
+        <div class="row">
+        	<div class="col-md-4 col-xs-4 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_9.png">
+            </div>
+        </div>
+        <br/>
+        <div class="row">
+        	<div class="col-md-5 col-xs-5 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_10.png">
+            </div>
+        </div> 
+        <br>
+        <p>
+        You can use as many Rhythm blocks as you'd like inside the Pitch-time Matrix block. In the above example, two Rhythm blocks are used, resulting in three quarter notes and six eighth notes.
+        </p>
+    <br/>
+
+    <section id="subcontent3">
+        <p class="text-justify">
+        <h4>2.c. Creating Tuplets</h4></p>  
+        <div class="row">
+        	<div class="col-md-4 col-xs-4 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_11.png">
+            </div>
+        </div> 
+        <br/>
+        <div class="row">
+        	<div class="col-md-4 col-xs-4 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_12.png">
+            </div>
+        </div> 
+        <br/>
+        <p class="text-justify">
+        Tuplets are a collection of notes that get scaled to a specific duration. Using tuplets makes it easy to create groups of notes that are not based on a power of 2.</p>
+        In the example above, three quarter notes—defined in the Simple Tuplet block—are played in the time of a single quarter note. The result is three twelfth notes. (This form, which is quite common in music, is called a triplet. Other common tuplets include a quintuplet and a septuplet.)
+        <br/>
+        <div class="row">
+        	<div class="col-md-4 col-xs-4 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_13.png">
+            </div>
+        </div>
+        <br/>
+        <p class="text-justify">
+        In the example above, the three quarter notes are defined in the Rhythm block embedded in the Tuplet block. As with the Simple Tuplet example, they are played in the time of a single quarter note. The result is three twelfth notes. This more complex form allows for intermixing multiple rhythms within single tuplet.
+        </p>  
+        <div class="row">
+        	<div class="col-md-4 col-xs-4 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_14.png">
+            </div>
+        </div> 
+        <br>
+        <div class="row">
+        	<div class="col-md-5 col-xs-5 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_15.png">
+            </div>	
+        </div> 
+        <br/>
+        <p>
+        In the example above, the two Rhythm blocks are embedded in the Tuplet block, resulting in a more complex rhythm.
+        <br/>
+        Note: You can mix and match Rhythm blocks and Tuplet blocks when defining your matrix.
+        </p> 
+    </section>
+    <br/>
+
+    <section id="subcontent4">
+        <p class="text-justify">
+        <h4>2.d. What is a Tuplet?</h4></p> 
+        <div class="row">
+        	<div class="col-md-7 col-xs-7 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/TripletChart_1.png">
+            </div>
+        </div> 
+        <br>
+        <div class="row">
+        	<div class="col-md-7 col-xs-7 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/TupletChart_2.png">
+            </div>	
+        </div>     
+    </section>
+
+    <br/>
+
+    <section id="subcontent5">
+        <p class="text-justify">
+        <h4>2.e. Using Individual Notes in the Matrix</h4></p>
+        <div class="row">
+        	<div class="col-md-4 col-xs-4 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_18.png">
+            </div>	
+        </div> 
+        <br/>
+        <p>
+        You can also use individual notes when defining the grid. These blocks will expand into Rhythm blocks with the corresponding values.
+        </p>
+    </section>
+
+    <br/>
+
+    <section id="content3">
+        <p class="text-justify">
+        <h2>3. Generating rhythms</h2></p>
+        <p>The Rhythm Ruler block is used to launch a widget similar to the Pitch-time Matrix block. The widget can be used to generate rhythmic patterns.</p>
+        <div class="row">
+        	<div class="col-md-4 col-xs-4 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_19.png">
+            </div>	
+        </div>
+        <br/>
+        <p class="text-justify">
+        The argument to the Rhythm Ruler block specifies the duration that will be subdivided to generate a rhythmic pattern. By default, it is 1 / 1, e.g., a whole note.
+        The Set Drum blocks contained in the clamp of the Rhythm Ruler block indicates the number of rhythms to be defined simultaneously. By default, two rhythms are defined. The embedded Rhythm blocks define the initial subdivision of each rhythm ruler.
+        </p> 
+        <div class="row">
+        	<div class="col-md-3 col-xs-3 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_20.png">
+            </div>	
+        </div>
+        <br/>
+        <p>
+        When the Rhythm Ruler block is clicked, the Rhythm Ruler widget is opened. It contains a row for each rhythm ruler. An input in the top row of the widget is used to specify how many subdivisions will be created within a cell when it is clicked. By default, 2 subdivisions are created.
+        </p>
+        <br/>
+        <div class="row">
+        	<div class="col-md-3 col-xs-3 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_21.png">
+            </div>
+        </div>
+        <br/>
+        <p class="text-justify">
+        As shown in the above figure, the top rhythm ruler has been divided into two half-notes and the bottom rhythm ruler has been divided into three third-notes. Clicking on the Play button to the left of each row will playback the rhythm using a drum for each beat. The Play-all button on the upper-left of the widget will play back all rhythms simultaneously.
+        </p>
+        <div class="row">
+        	<div class="col-md-3 col-xs-3 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_22.png">
+            </div>	
+        </div>
+        <br/>
+        <p class="text-justify">
+        The rhythm can be further subdivided by clicking in individual cells. In the example above, two quarter-notes have been created by clicking on one of the half-notes.
+        </p>
+        <br/>
+        <div class="row">
+        	<div class="col-md-3 col-xs-3 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_23.png">
+            </div>	
+        </div>
+       <br/>
+       <p>
+       By dragging across multiple cells, they become tied. In the example above, two third-notes have been tied into one two-thirds-note.
+       </p>
+       <br/>
+        <div class="row">
+        	<div class="col-md-4 col-xs-4 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_24.png">
+            </div>	
+        </div>
+       <br/>
+       <p>
+        The Save stack button will export rhythm stacks.
+        </p>
+        <br/>
+        <div class="row">
+        	<div class="col-md-3 col-xs-3 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_25.png">
+            </div>	
+        </div>
+        <p>
+            <br/>
+        These stacks of rhythms can be used to define rhythmic patterns used with the Pitch-time Matrix block.
+        </p>
+        <br/>
+        <div class="row">
+        	<div class="col-md-8 col-xs-8 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_26.png">
+            </div>
+        </div>
+        <br>
+        <p>
+        The Save drum machine button will export Start stacks that will play the rhythms as drum machines.
+        </p>
+    </section>
+    <br/>
+
+    <section id="content4">
+        <p class="text-justify">
+        <h2>4. Musical Modes</h2></p>
+        <p class="text-justify">
+        Musical modes are used to specify the relationship between intervals (or steps) in a scale. Since Western music is based on 12 half-steps per octave, modes speficy how many half steps there are between each note in a scale.
+        By default, Music Blocks uses the Major mode, which, in the Key of C, maps to the white keys on a piano. The intervals in the Major mode are <mark>2, 2, 1, 2, 2, 2, 1</mark>. Many other common modes are built into Music Blocks, including, of course, Minor mode, which uses <mark>2, 1, 2, 2, 1, 2, 2</mark> as its intervals.
+        Note that not every mode uses 7 intervals per octave. For example, the Chromatic mode uses 11 intervals: <mark>1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1</mark>. The Japanese mode uses only 5 intervals: <mark>1, 4, 2, 3, 2]</mark>,. What is important is that the sum of the intervals in an octave is 12 half-steps.
+        </p>
+        <br/>
+        <div class="row">
+        	<div class="col-md-3 col-xs-3 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_27.png">
+            </div>	
+        </div>
+        <br/>
+        <p>
+        The Mode widget lets you explore modes and generate custom modes. You invoke the widget with the Custom mode block. The mode specified in the Set key block will be the default mode when the widget launches.
+        </p>
+        <div class="row">
+        	<div class="col-md-4 col-xs-4 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_28.png">
+            </div>	
+        </div>
+        <br/>
+        <p>
+        In the above example, the widget has been launched with Major mode (the default). Note that the notes included in the mode are indicated by the black boxes, which are arrayed in a circular pattern of tweleve half-steps to complete the octave.
+        <br/>
+        Since the intervals in the Major mode are 2, 2, 1, 2, 2, 2, 1, the notes are 0, 2, 4, 5, 7, 9,11, and 12 (one octave above 0).
+        <br/>
+        The widget controls run along the toolbar at the top. From left to right are:
+        <br/>
+        Play all, which will play a scale using the current mode;
+        <br/>
+        Save, which will save the current mode as the Custom mode and save a stack of Pitch blocks that can be used with the Pitch-time Matrix block;
+        <br/>
+        Rotate counter-clockwise, which will rotate the mode counter-clockwise (See the example below);
+        <br/>
+        Rotate clockwise, which will rotate the mode clockwise (See the example below);
+        <br/>
+        Invert, which will invert the mode (See the example below);
+        <br/>
+        Undo, which will restore the mode to the previous version; and
+        <br/>
+        Close, which will close the widget.
+        <br/>
+        You can also click on individual notes to activate or deactivate them.
+        <br/>
+        Note that the mode inside the Custom mode block is updated whenever the mode is changed inside the widget.
+        </p>
+        <br/>
+        <div class="row">
+        	<div class="col-md-4 col-xs-4 col-md-offset-1">
+           		 <img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_29.png">
+           	</div>
+        </div>
+        <br/>      
+        <p>
+        In the above example, the Major mode has been rotated clockwise, transforming it into Dorian.
+        </p>
+        <br/>
+        <div class="row">
+        	<div class="col-md-4 col-xs-4 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_30.png">
+            </div>
+        </div>
+        <br/>
+        <p>
+        In the above example, the Major mode has been rotated counter-clockwise, transforming it into Locrian.
+        </p>
+        <br/>
+        <div class="row">
+        	<div class="col-md-4 col-xs-4 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_31.png">
+            </div>	
+        </div>
+        <br/>
+        <p>
+        In the above example, the Major mode has been inverted, transforming it into Phrygian.
+        <br/>
+        Note: The build-in modes in Music Blocks can be found in musicutils.js.
+        </p>
+        <br/>
+        <div class="row">
+        	<div class="col-md-6 col-xs-6 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_32.png">
+            </div>	
+        </div>
+        <br/>
+        <p>
+        The Save button exports a stack of blocks representing the mode that can be used inside the Pitch-time Matrix block.
+        </p>
+    </section>
+    <br/>
+
+    <section id="content5">
+        <p class="text-justify">
+        <h2>5. The Pitch-Drum Matrix</h2></p>
+        <div class="row">
+        	<div class="col-md-3 col-xs-3 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_33.png">
+            </div>	
+        </div>
+        <br/>
+        <p class="text-justify">
+        The Set Drum block is used to map the enclosed pitches into drum sounds. Drum sounds are played in a monopitch using the specified drum sample. In the example above, a kick drum will be substitued for each occurance of a Re 4.</p>
+        <div class="row">
+        	<div class="col-md-3 col-xs-3 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_34.png">
+            </div>	
+        </div>
+        <br>
+        <div class="row">
+        	<div class="col-md-3 col-xs-3 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_35.png">
+            </div>	
+        </div>
+        <br>
+        <div class="row">
+        	<div class="col-md-3 col-xs-3 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_36.png">
+            </div>	
+        </div>
+        <br>
+        <div class="row">
+        	<div class="col-md-3 col-xs-3 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_37.png">
+            </div>	
+        </div>
+        <br/>
+        <p class="text-justify">As an experience for creating mapping with the Set Drum block, we provide the Drum-Pitch Matrix. You use it to map between pitches and drums. The output is a stack of Set Dum blocks.</p>
+    </section>
+    <br/>
+
+    <section id="content6">
+        <p class="text-justify">
+        <h2>6. Exploring musical proportions</h2></p>
+        <p class="text-justify">
+            The Pitch Staircase block is used to launch a widget similar to the Pitch-time Matrix, which can be used to generate different pitches using a given pitch and musical proportion.
+            <br/>
+            The Pitch blocks contained in the clamp of the Pitch Staircase block define the pitches to be initialized simultaneously. By default, one pitch is defined and it have default note "la" and octave "3".
+        </p>
+        <div class="row">
+        	<div class="col-md-3 col-xs-3 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_38.png">
+            </div>	
+        </div>
+        <br>
+        <p class="text-justify">
+          When Pitch Staircase block is clicked, the Pitch Staircase widget is initialized. The widget contains row for every Pitch block contained in the clamp of the Pitch Staircase block. The input fields in the top row of the widget specify the musical proportions used to create new pitches in the staircase. The inputs correspond to the numerator and denominator in the proportion resectively. By default the proportion is 3:2.  
+        </p>
+        <br/>
+        <div class="row">
+        	<div class="col-md-3 col-xs-3 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_39.png">
+            </div>
+        </div>
+        <div class="row">
+        	<div class="col-md-3 col-xs-3 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_40.png">
+            </div>
+        </div>
+        <br>
+        <div class="row">
+        	<div class="col-md-3 col-xs-3 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_41.png">
+            </div>
+        </div>
+        <br/>
+        <p class="text-justify">
+        Clicking on the Play button to the left of each row will playback the notes associated with that step in the stairs. The Play-all button on the upper-left of the widget will play back all the pitch steps simultaneously. A second Play-all button to the right of the stair plays in increasing order of frequency first, then in decreasing order of frequency as well, completing a scale.
+        The Save stack button will export pitch stacks. For example, in the above configuration, the output from pressing the Save stack button is shown below:
+        </p>
+        <br/>
+        <div class="row">
+        	<div class="col-md-4 col-xs-4 col-md-offset-1">
+           	 	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_42.png">
+            </div>
+        </div>
+        <br/>
+        These stacks can be used with the Pitch-time Matrix block to define the rows in the matrix.
+        </p>
+        <br/>
+        <div class="row">
+        	<div class="col-md-3 col-xs-3 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_43.png">
+            </div>
+        </div>
+    </section>
+    <br/>
+
+    <section id="content7">
+        <p class="text-justify">
+        <h2>7. Generating Arbitary Pitches</h2></p>
+        <p>
+        The Pitch Slider block is used to launch a widget that is used to generate arbitray pitches. It differs from the Pitch Staircase widget in that it is used to create frequencies that vary continuously within the range of a specified octave.
+        </p>
+        <br/>
+        <p>
+        Each Sine block contained within the clamp of the Pitch Slider block defines the initial pitch for an ocatve.
+        </p>
+        <br/>
+        <div class="row">
+        	<div class="col-md-3 col-xs-3 col-md-offset-1">
+            	<img class="initial-size" src="./dist/img/tutorials/widgets/widget_44.png">
+            </div>	
+        </div>
+        <br/>
+        <div class="row">
+        	<div class="col-md-3 col-xs-3 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_45.png">
+            </div>
+        </div>
+        <br/>
+        <p class="text-justify">
+       When the Pitch Slider block is clicked, the Pitch Slider widget is initialized. The widget will have one column for each Sine block in the clamp. Every column has a slider that can be used to move up or down in frequency, continuously or in intervals of 1/12th of the starting frequency. The mouse is used to move the frequency up and down continuously. Buttons are used for intervals. Arrow keys can also be used to move up and down, or between columns.
+        </p>
+        <br/>
+        <div class="row">
+        	<div class="col-md-3 col-xs-3 col-md-offset-1">
+            	<img class="initial-size" src="./dist/img/tutorials/widgets/widget_46.png">
+            </div>
+        </div>
+        <br/>
+        <div class="row">
+        	<div class="col-md-3 col-xs-3 col-md-offset-1">
+            	<img class="initial-size" src="./dist/img/tutorials/widgets/widget_47.png">
+            </div>
+        </div>
+        <br/>
+        <p>
+       Clicking in a column will extact the corresponding Note blocks, for example:
+        </p>
+        <br/>
+        <div class="row">
+        	<div class="col-md-4 col-xs-4 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_48.png">
+            </div>	
+        </div>
+        <br/>
+        <div class="row">
+        	<div class="col-md-4 col-xs-4 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_49.png">
+            </div>
+        </div>
+    </section>
+    <br/>
+
+    <section id="content8">
+        <p class="text-justify">
+        <h2>8. Changing tempo</h2></p>
+        <p class="text-justify">The Tempo block is used to launch a widget that enables the user to visualize Tempo, defined in beats per minute (BPM). When the Tempo block is clicked, the Tempo widget is initialized.
+        The Master Beats per Minute block contained in the clamp of the Tempo block sets the initial tempo used by the widget. This determines the speed at which the ball in the widget moves back and forth. If BPM is 60, then it will take one second for the ball to move across the widget. A round-trip would take two seconds.</p>
+        <br/>
+        <div class="row">
+        	<div class="col-md-5 col-xs-5 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_50.png">
+            </div>
+        </div>
+        <p>The top row of the widget holds the Play/pause button, the Speed up and Slow down buttons, and an input field for updating the Tempo.</p>
+        <br/>
+        <div class="row">
+        	<div class="col-md-4 col-xs-4 col-md-offset-1">
+            	<img class="full-size-100p" src="./dist/img/tutorials/widgets/widget_51.png">
+            </div>
+        </div>
+        <br>
+        <p class="text-justify">You can also update the tempo by clicking twice in spaced succession in the widget: the new BPM is determined as the time between the two clicks. For example, if there is 1/2 seconds between clicks, the new BPM will be set as 120.</p>
+    </section>
+    <br/>
+    <br/>
+</section>
+

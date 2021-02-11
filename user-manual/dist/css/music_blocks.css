@@ -1,0 +1,246 @@
+#side-menu{
+    position: fixed;
+    top: 51px;
+    border: none;
+    border-radius: 0;
+    overflow-y: auto;
+    bottom: 0;
+    overflow-x: hidden;
+    padding-bottom: 40px;
+    width: inherit;
+    background-color: #f8f8f8;
+}
+
+#sidebar_menu_div{
+    width: inherit;
+}
+
+.nav-third-level > li > ul > li a{
+    margin-left: -1em;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+.nav-third-level > li > ul > li img{
+    margin-left: 3em;
+}
+
+#blocks_menu{
+    background-color: #ddd;
+    width: 220px;
+    position: fixed;
+    margin-left: 260px;
+    z-index: 1;
+
+}
+
+#blocks_menu_content{
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-top: 35px;
+}
+
+
+#blocks_menu #blocks_menu_header {
+    background-color: #5bc0de;
+    height: 35px;
+    position: fixed;
+    width: inherit;
+    z-index: 100;
+    padding-left: 5px;
+    font-weight: 800
+}
+
+#blocks_menu #menu_header_img{
+    width: 34px;
+    height: 34px;
+    margin-right: 5%;
+}
+
+#blocks_menu > ul{
+    padding-bottom: 5px;
+}
+
+#blocks_menu #blocks_menu_header > i {
+    float: right;
+    margin-right: 5px;
+    margin-top: 3px;
+    cursor: pointer;
+}
+
+#menu_content > ul > li:hover{
+    background-color: #dcd !important;
+}
+
+.page-content-div > table img{
+    height: 60px;
+    width: 60px;
+    margin-right: 2%;
+}
+
+.blocks-description > div > table img{
+    max-height: inherit;
+    max-width: inherit;
+}
+
+.blocks-description > div > table td:first-child{
+    width: 20%;
+}
+
+#intro_table img{
+    max-height: 60px;
+    cursor: pointer;
+}
+
+#introduction_page li{
+    margin-bottom: 10px;
+}
+
+#introduction_page blockquote{
+    font-style: italic;
+    font-size: 15px;
+}
+
+#quickstart_page #animation, #desktop{
+    width: 100%;
+}
+
+#quickstart_page span{
+    font-size: 30px;
+    font-weight: inherit;
+}
+
+#quickstart_page table img{
+    max-width: 110px;
+    max-height: 110px;
+}
+
+#quickstart_page table td{
+    text-align: justify;
+}
+
+#quickstart_page audio{
+    vertical-align: middle;
+    margin-left: 5em;
+}
+
+#quickstart_page #section_2 span{
+    font-family: monospace;
+    font-size: inherit;
+    margin-left: 50px;
+    margin-bottom: 10px;
+}
+
+#quickstart_page #section_2 img, #quickstart_page #section_3 img{
+    width: 100%;
+    height: 100%;
+}
+
+#quickstart_page #section_4 table span{
+    font-size: 14px;
+    display: inherit;
+}
+
+#quickstart_page #section_5 dd li{
+    margin-left: 20px;
+}
+
+.full-size-100p{
+    width: 100%;
+    height: 100%;
+}
+
+.initial-size{
+    height: initial;
+    width: initial;
+}
+
+#hcb_solfege img{
+    width: 80%;
+    height: 80%;
+}
+
+#example_hcb audio {
+    vertical-align: middle;
+    margin-left: 5em;
+}
+
+#example_hcb #with_music_blocks audio, #with_drums audio, #with_graphics audio, #with_all audio{
+    float: right;
+}
+
+#make_sound #notevalue_section img, #pitch img, #chrods img, #rests img, #drums img{
+    width: 100%;
+    height: 100%;    
+}
+
+#graphics #content img{
+    width: 100%;
+    height: 100%;    
+}
+
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    background: red;
+    cursor: inherit;
+    display: block;
+}
+input[readonly] {
+    background-color: white !important;
+    cursor: text !important;
+}
+#hcb-examples #example-table td a:nth-child(2){
+    margin-left: 10%;
+    cursor: pointer;
+}
+
+#hcb-examples #example-table audio{
+    width: 70%;
+}
+
+#back_img{
+    background:url('../img/quick_start/desktop.png') no-repeat;
+    min-height: 400px;
+    background-size: contain
+}
+
+#workspace_describe .hover-effect:hover{
+    border: 1px solid black;
+    cursor: pointer;
+}
+
+#workspace_describe #main{
+    min-height: 45px;
+}
+
+#workspace_describe #palette, #workspace, #auxi{
+    min-height: 350px;
+}
+
+@media(min-width: 1500px){
+    #workspace_describe #main{
+        min-height: 70px;
+    }
+
+    #workspace_describe #palette, #workspace, #auxi{
+        min-height: 550px;
+    }
+}
+
+#drum-page audio{
+    vertical-align: middle;
+    margin-left: 5em;
+    margin-right: 5em;
+}

@@ -275,7 +275,7 @@ class PhraseMaker {
             logo.resetSynth(0);
             if(this.playingNow) {
                 this._playButton.innerHTML =
-                    '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
+                    '&nbsp;&nbsp;<img src="res/header-icons/play-button.svg" title="' +
                     _("Play") +
                     '" alt="' +
                     _("Play") +
@@ -286,7 +286,7 @@ class PhraseMaker {
                     '" vertical-align="middle">&nbsp;&nbsp;';
             } else {
                 this._playButton.innerHTML =
-                    '&nbsp;&nbsp;<img src="header-icons/stop-button.svg" title="' +
+                    '&nbsp;&nbsp;<img src="res/header-icons/stop-button.svg" title="' +
                     _("Stop") +
                     '" alt="' +
                     _("Stop") +
@@ -3913,7 +3913,7 @@ class PhraseMaker {
                 );
                 this.playingNow = false;
                 this._playButton.innerHTML =
-                        '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
+                        '&nbsp;&nbsp;<img src="res/header-icons/play-button.svg" title="' +
                         _("Play") +
                         '" alt="' +
                         _("Play") +

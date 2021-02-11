@@ -1,0 +1,122 @@
+<section id="make_sound">
+    <section id="make_sound_header">
+        <h1 class="page-header">Making a Sound</h1>
+        <p class="text-justify">
+            Content:
+        <ol>
+            <li><a href="#notevalue_section">Note Value Blocks</a></li>
+            <li><a href="#pitch">Pitch Blocks</a></li>
+            <li><a href="#chords">Chords</a></li>
+            <li><a href="#rests">Rests</a></li>
+            <li><a href="#drums">Drums</a></li>
+        </ol>
+        </p>
+    </section>
+    <br/>
+
+    <section id="notevalue_section">
+        <p class="text-justify">
+        <h2>1. Note Value Blocks</h2></p>
+        <p>At the heart of Music Blocks is the Note value block. The Note value block is a container for a Pitch block that specifies the duration (note value) of the pitch.</p>
+        <br/>
+        <div class="row">
+            <div class="col-md-3 col-xs-3 col-md-offset-1">
+                <img src="./dist/img/tutorials/sound/notevalue_1.png">
+            </div>
+        </div>
+        <br>
+        <p>At the top of the example above, a single (detached) Note value block is shown. The <mark>1/8</mark> is value of the note, which is, in this case, an eighth note. At the bottom, two notes that are played consecutively are shown. They are both <mark>1/8</mark> notes, making the duration of the entire sequence <mark>1/4</mark>.</p>
+        <div class="row">
+            <div class="col-md-3 col-xs-3 col-md-offset-1">
+                <img src="./dist/img/tutorials/sound/notevalue_2.png">
+            </div>
+        </div>
+        <br>
+        <p>In this example, different note values are shown. From top to bottom, they are: <mark>1/4</mark> for an quarter note, <mark>1/16</mark> for a sixteenth note, and <mark>1/2</mark> for a half note. Note that any mathematical operations can be used as input to the Note value.</p>
+        <br>
+        <p>Please refer to the following image for a visual representation of note values.</p>
+            <div class="row">
+                <div class="col-md-12 col-xs-12">
+                    <img src="./dist/img/tutorials/sound/notevalue_3.png">
+                </div>
+            </div>
+    </section>
+    <br/>
+
+    <section id="pitch">
+        <p class="text-justify">
+        <h2>2. Pitch Blocks</h2></p>
+        <p>As we have seen, Pitch blocks are used inside the <a href="#notevalue_section">Note value</a> blocks. The Pitch block specifies the pitch name and pitch octave of a note that in combination determines the frequency (and therefore pitch) at which the note is played.</p>
+        <br>
+        <div class="row">
+            <div class="col-md-3 col-xs-3 col-md-offset-1">
+                <img src="./dist/img/tutorials/sound/pitch_1.png">
+            </div>
+        </div>
+        <br>
+        <p>There are many systems you can use to specify a pitch block's name and octave. Some examples are shown above. The top Pitch block is specified using a Solfege block (Sol in Octave 6), which contains the notes Do Re Me Fa Sol La Ti. The middle block is specified using a Pitch-name block (B flat in Octave 4), which contains the notes C D E F G A B. The last block is specified using the Hertz block in conjunction with a Number block (440 Hertz) , which corresponds to the frequency of the sound made.
+        <br>
+        The octave is specified using a number block and is restricted to whole numbers. In the case where the pitch name is specified by frequency, the octave is ignored.
+        <br>
+        Note that the pitch name can also be specified using a Text block.
+        <br>
+        Please refer to the below charts for a visual representation of where notes are located on a keyboard or staff.</p>
+            <div class="row">
+                <div class="col-md-12 col-xs-12">
+                    <img src="./dist/img/tutorials/sound/pitch_2.png">
+                </div>
+            </div>
+        <br>
+            <div class="row">
+                <div class="col-md-12 col-xs-12">
+                    <img src="./dist/img/tutorials/sound/MalletChart.png">
+                </div>
+            </div>
+    </section>
+    <br/>
+
+    <section id="chords">
+        <p class="text-justify">
+        <h2>3. Chords</h2></p>
+        <div class="row">
+            <p>A chord (multiple, simultaneous pitches) can be specified by adding multiple Pitch blocks into a single Note value block, like the below example.</p>
+            <div class="row">
+                <div class="col-md-3 col-xs-3 col-md-offset-1">
+                    <img src="./dist/img/tutorials/sound/chords.png">
+                </div>
+            </div>
+        </div>
+    </section>
+    <br/>
+
+    <section id="rests">
+        <p class="text-justify">
+        <h2>4. Rests</h2></p>
+        <div class="row">
+            <p>A rest of the specified note value duration can be constructed using a Silence block in place of a pitch block.</p>
+            <div class="row">
+                <div class="col-md-3 col-xs-3 col-md-offset-1">
+                    <img src="./dist/img/tutorials/sound/rests.png">
+                </div>
+            </div>
+        </div>
+    </section>
+    <br/>
+
+    <section id="drums">
+        <p class="text-justify">
+        <h2>5. Drums</h2></p>
+        <div class="row">
+            <div class="col-md-3 col-xs-3 col-md-offset-1">
+                <img src="./dist/img/tutorials/sound/drums.png">
+            </div>
+            <br>
+            <p>Anywhere a Pitch block can be used—e.g., inside of the matrix or a Note value block—a Drum Sample block can also be used instead. Currently there about two dozen different samples from which to choose. The default drum is a kick drum.</p>
+            <br>
+            <div class="col-md-3 col-xs-3 col-md-offset-1">
+                <img src="./dist/img/tutorials/sound/drums_2.png">
+            </div>
+        </div>
+        <br/>
+    </section>
+</section>
