@@ -366,7 +366,6 @@ function MusicKeyboard() {
         this.playingNow = false;
         let w = window.innerWidth;
         this._cellScale = w / 1200;
-        const iconSize = ICONSIZE * this._cellScale;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "music keyboard");
         this.widgetWindow = widgetWindow;
@@ -480,6 +479,9 @@ function MusicKeyboard() {
                 widgetWindow.getWidgetBody().style.position = "absolute";
                 widgetWindow.getWidgetBody().style.height = "calc(100vh - 64px)";
                 widgetWindow.getWidgetBody().style.width = "200vh";
+                let outerDiv = docById("mkbOuterDiv");
+                outerDiv.style.maxHeight = "705px";
+                docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
                 docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
                 console.log(document.getElementById("mkbOuterDiv").style);
                 docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
@@ -1245,6 +1247,7 @@ function MusicKeyboard() {
     };
 
     this._addNotes = function (cellId, start, divideNoteBy) {
+        console.log("Piano Clicked");
         start = parseInt(start);
         const cell = docById(cellId);
         const dur = cell.getAttribute("dur");
