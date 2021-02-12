@@ -481,6 +481,7 @@ function MusicKeyboard() {
                 widgetWindow.getWidgetBody().style.height = "calc(100vh - 64px)";
                 widgetWindow.getWidgetBody().style.width = "200vh";
                 docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
+                console.log(document.getElementById("mkbOuterDiv").style);
                 docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
                 try {
                     docById("mkbInnerDiv").style.width = "calc(200vh - 64px)";
@@ -921,6 +922,7 @@ function MusicKeyboard() {
         let n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
 
         const outerDiv = docById("mkbOuterDiv");
+        outerDiv.style.overflowY = "hidden";
         if (this.layout.length > n) {
             outerDiv.style.height = this._cellScale * MATRIXSOLFEHEIGHT * (n + 5) + "px";
         } else {
