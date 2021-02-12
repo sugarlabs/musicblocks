@@ -38,7 +38,7 @@ class StatusMatrix {
         this.widgetWindow.show();
         // For the button callbacks
         let cell;
-        
+
         // The status table
         this._statusTable = document.createElement("table");
         this.widgetWindow.getWidgetBody().append(this._statusTable);
@@ -62,7 +62,7 @@ class StatusMatrix {
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
         // cell.style.width = StatusMatrix.BUTTONSIZE * this._cellScale*2 + "px";
         cell.style.width = "212.5px";
-        
+
         cell.innerHTML = "&nbsp;";
         // One column per mouse/turtle
         for (const turtle of turtles.turtleList) {
@@ -99,7 +99,7 @@ class StatusMatrix {
             cell.style.width = "212.5px";
             this.widgetWindow.onmaximize = () => {
                 this.isMaximized = !(this.isMaximized);
-                console.log("Maximized " + this.isMaximized);
+                console.debug("Maximized " + this.isMaximized);
                 cell.style.width = "100vw";
                 cell.style.paddingLeft = "30px";
                 cell.style.fontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR)*0.90 + "%";
