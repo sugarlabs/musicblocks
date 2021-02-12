@@ -36,7 +36,6 @@ class StatusMatrix {
         this.widgetWindow = window.widgetWindows.windowFor(this, "status", "status");
         this.widgetWindow.clear();
         this.widgetWindow.show();
-
         // For the button callbacks
         let cell;
 
@@ -58,12 +57,12 @@ class StatusMatrix {
         iconSize = Math.floor(this._cellScale * 24);
 
         cell = row.insertCell();
-        cell.style.backgroundColor = platformColor.selectorBackground;
+        cell.style.backgroundColor = "#FFFFFF";
         cell.className = "headcol";
         cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
-        cell.style.width = StatusMatrix.BUTTONSIZE * this._cellScale + "px";
+        // cell.style.width = StatusMatrix.BUTTONSIZE * this._cellScale*2 + "px";
+        cell.style.width = "212.5px";
         cell.innerHTML = "&nbsp;";
-
         // One column per mouse/turtle
         for (const turtle of turtles.turtleList) {
             if (turtle.inTrash) {
@@ -71,7 +70,7 @@ class StatusMatrix {
             }
 
             cell = row.insertCell();
-            cell.style.backgroundColor = platformColor.labelColor;
+            cell.style.backgroundColor = "#FFFFFF";
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 cell.innerHTML =
@@ -96,7 +95,8 @@ class StatusMatrix {
                     iconSize +
                     '">&nbsp;&nbsp;';
             }
-            cell.style.width = StatusMatrix.BUTTONSIZE * this._cellScale + "px";
+            cell.style.width = "212.5px";
+            // cell.style.width = StatusMatrix.BUTTONSIZE * this._cellScale*2 + "px";
             cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
             cell.className = "headcol";
         }
@@ -109,7 +109,7 @@ class StatusMatrix {
             const row = header.insertRow();
 
             cell = row.insertCell(); // i + 1);
-            cell.style.fontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) + "%";
+            cell.style.fontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR)*0.90 + "%";
 
             // console.debug(statusField[1]);
 
@@ -144,16 +144,18 @@ class StatusMatrix {
                     label = logo.blocks.blockList[statusField[0]].protoblock.staticLabels[0];
                     break;
             }
-
-            cell.innerHTML = "&nbsp;<b>" + label + "</b>";
+            let str = label;
+            str = label.charAt(0).toUpperCase() + label.slice(1);
+            // console.log(str);
+            cell.innerHTML = "&nbsp;<b>" + str + "</b>";
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
-
+            cell.style.paddingLeft = "10px";
             turtles.turtleList.forEach(() => {
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
                 cell.style.fontSize =
-                    Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) + "%";
+                    Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR)*0.90 + "%";
                 cell.innerHTML = "";
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.textAlign = "center";
@@ -163,16 +165,18 @@ class StatusMatrix {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             const row = header.insertRow();
             cell = row.insertCell();
-            cell.style.fontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) + "%";
-            cell.innerHTML = "&nbsp;<b>" + _("note") + "</b>";
+            cell.style.fontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR)*0.90 + "%";
+            const str = _("note");
+            const label = str.charAt(0).toUpperCase() + str.slice(1);
+            cell.innerHTML = "&nbsp;<b>" + label + "</b>";
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
-
+            cell.style.paddingLeft = "10px";
             turtles.turtleList.forEach(() => {
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
                 cell.style.fontSize =
-                    Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) + "%";
+                    Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR)*0.90 + "%";
                 cell.innerHTML = "";
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.textAlign = "center";
