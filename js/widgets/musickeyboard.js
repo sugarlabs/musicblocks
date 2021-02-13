@@ -358,13 +358,22 @@ function MusicKeyboard() {
                 console.log(document.getElementById("mkbOuterDiv").style);
                 docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
                 try {
-                    docById("mkbInnerDiv").style.width = "calc(200vh - 64px)";
+                    docById("mkbInnerDiv").style.width = "95.5vw";
                 } catch (e) {
                     // Does this happen?
                     console.debug("Error calculating InnerDiv width");
                 }
 
                 this.widgetWindow.getWidgetBody().style.left = "70px";
+            }
+            else{
+                let outerDiv = docById("mkbOuterDiv");
+                outerDiv.style.maxHeight = "400px";
+                this.widgetWindow.getWidgetBody().style.position = "relative";
+                this.widgetWindow.getWidgetBody().style.left = "0px";
+                this.widgetWindow.getWidgetBody().style.height = "550px";
+                this.widgetWindow.getWidgetBody().style.width = "1000px";
+                docById("mkbOuterDiv").style.width = w + "px";
             }
         };
 
@@ -495,14 +504,14 @@ function MusicKeyboard() {
                 widgetWindow.getWidgetBody().style.position = "absolute";
                 widgetWindow.getWidgetBody().style.height = "calc(100vh - 64px)";
                 widgetWindow.getWidgetBody().style.width = "200vh";
+                console.log(document.getElementById("mkbOuterDiv").style);
+                docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
                 let outerDiv = docById("mkbOuterDiv");
                 outerDiv.style.maxHeight = "705px";
                 docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
                 docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
-                console.log(document.getElementById("mkbOuterDiv").style);
-                docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
                 try {
-                    docById("mkbInnerDiv").style.width = "calc(200vh - 64px)";
+                    docById("mkbInnerDiv").style.width = "90vw";
                 } catch (e) {
                     // Does this happen?
                     console.debug("Error calculating InnerDiv width");
@@ -510,6 +519,8 @@ function MusicKeyboard() {
 
                 widgetWindow.getWidgetBody().style.left = "70px";
             } else {
+                let outerDiv = docById("mkbOuterDiv");
+                outerDiv.style.maxHeight = "400px";
                 widgetWindow.getWidgetBody().style.position = "relative";
                 widgetWindow.getWidgetBody().style.left = "0px";
                 widgetWindow.getWidgetBody().style.height = "550px";
