@@ -15,7 +15,6 @@ function MusicKeyboard() {
     const FAKEBLOCKNUMBER = 100000;
     const BUTTONDIVWIDTH = 535; // 5 buttons
     const OUTERWINDOWWIDTH = 758;
-    const INNERWINDOWWIDTH = 50;
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
     // Mapping between keycodes and virtual keyboard
@@ -184,7 +183,6 @@ function MusicKeyboard() {
                             objId: null,
                             duration: parseFloat(restDuration)
                         });
-                        //this._createTable();
                     }
                 }
                 this.endTime = undefined;
@@ -349,6 +347,25 @@ function MusicKeyboard() {
                 blockNumber: this.blockNumberMapper[element.id]
             });
             this._createTable();
+            if (this.widgetWindow._maximized) {
+                this.widgetWindow.getWidgetBody().style.position = "absolute";
+                this.widgetWindow.getWidgetBody().style.height = "calc(100vh - 64px)";
+                this.widgetWindow.getWidgetBody().style.width = "200vh";
+                let outerDiv = docById("mkbOuterDiv");
+                outerDiv.style.maxHeight = "705px";
+                docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
+                docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
+                console.log(document.getElementById("mkbOuterDiv").style);
+                docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
+                try {
+                    docById("mkbInnerDiv").style.width = "calc(200vh - 64px)";
+                } catch (e) {
+                    // Does this happen?
+                    console.debug("Error calculating InnerDiv width");
+                }
+
+                this.widgetWindow.getWidgetBody().style.left = "70px";
+            }
         };
 
         element.onmouseout = function () {
@@ -464,7 +481,6 @@ function MusicKeyboard() {
         widgetWindow.getWidgetBody().style.width = "1000px";
 
         this._createKeyboard();
-
         this._createTable();
 
         w = Math.max(
@@ -838,6 +854,7 @@ function MusicKeyboard() {
     };
 
     this.makeClickable = function () {
+        console.log("MAKE CLICKABLE");
         const rowNote = docById("mkbNoteDurationRow");
         let cell;
 
@@ -909,6 +926,7 @@ function MusicKeyboard() {
     };
 
     this._createTable = function () {
+        console.log("CREATE TABLE");
         this.processSelected();
         const mkbTableDiv = this.keyTable;
         mkbTableDiv.style.display = "inline";
@@ -1272,7 +1290,6 @@ function MusicKeyboard() {
 
             return prevValue.concat([curValue]);
         }, []);
-
         this._createTable();
     };
 
@@ -1282,7 +1299,6 @@ function MusicKeyboard() {
         this._notesPlayed = this._notesPlayed.filter(function (ele) {
             return parseInt(ele.startTime) !== start;
         });
-
         this._createTable();
     };
 
@@ -1320,7 +1336,6 @@ function MusicKeyboard() {
 
             return prevValue.concat([curValue]);
         }, []);
-
         this._createTable();
     };
 
