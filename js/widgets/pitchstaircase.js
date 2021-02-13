@@ -608,8 +608,8 @@ class PitchStaircase {
         widgetWindow.clear();
         widgetWindow.show();
         widgetWindow.onclose = () => {
-            logo.synth.stop();
             logo.synth.setMasterVolume(0);
+            logo.synth.stop();
             widgetWindow.destroy();
         };
 
