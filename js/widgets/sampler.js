@@ -5,7 +5,7 @@ function SampleWidget() {
     const SAMPLEWIDTH = 400;
     const SAMPLEHEIGHT = 160;
     const RENDERINTERVAL = 50;
-    const TRUEACCIDENTALNAMES = ["𝄫", "♭", "♮", "♯", "𝄪"];
+    const TRUEACCIDENTALNAMES = ["𝄫", "♭", "", "♯", "𝄪"];
     //using these characters can cause issues.
     const ACCIDENTALNAMES = ["bb", "b", "", "#", "x"];
     const SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti", "do"];
@@ -214,7 +214,15 @@ function SampleWidget() {
             that._addSample();
 
             var newStack = [
-                [0, ["audiofile", { value: [that.sampleName, that.sampleData]}], 0, 0, [null, null]],
+                [0, ["customsample", {value: [
+                    that.sampleName,
+                    that.sampleData,
+                    "do",
+                    4
+                ]}], 0, 0, [null, 1, 2, 3]],
+                [1, ["audiofile", {value: [that.sampleName, that.sampleData]}], 0 ,0, [0]],
+                [2, ["solfege", {value: that.samplePitch}], 0, 0, [0]],
+                [3, ["number", {value: that.sampleOctave}], 0, 0, [0]],
             ];
 
             that._logo.blocks.loadNewBlocks(newStack);
@@ -328,6 +336,7 @@ function SampleWidget() {
                     that.sampleData = rawLog;
                     that.sampleName = fileChooser.files[0].name;
                     that._addSample();
+                    that._playReferencePitch();
                     that._draw();
                 };
 
@@ -457,7 +466,7 @@ function SampleWidget() {
 
         this._playReferencePitch();
 
-        this._logo.textMsg(_("Record a sample to use as an instrument."));
+        this._logo.textMsg(_("Upload a sample and adjust its pitch center."));
         this._draw();
         this.resume();
 
@@ -474,6 +483,7 @@ function SampleWidget() {
     }
 
     this._parseSamplePitch = function () {
+
         let first_part = this.samplePitch.substring(0,2);
         if (first_part === "so") {
             this.pitchCenter = 4;
@@ -498,13 +508,15 @@ function SampleWidget() {
             attr = DOUBLESHARP;
             lev = 2
         } else {
-            attr = NATURAL;
+            attr = "";
             lev = 0
         }
         this.accidentalCenter = lev + 2;
         this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
 
-        this.octaveCenter = parseInt(this.sampleOctave);
+        this.octaveCenter = this.sampleOctave;
+        this.octaveInput.value = this.sampleOctave;
+
     }
 
     this._updateSamplePitchValues = function () {
