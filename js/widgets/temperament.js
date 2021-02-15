@@ -1468,7 +1468,7 @@ class TemperamentWidget {
                 docById("wheelDiv3").addEventListener("mouseover", (e) => {
                     this.arbitraryEditSlider(e, angle1, ratios, pitchNumber);
                 });
-            },1500);
+            }, 1500);
         };
 
         this._createOuterWheel();
@@ -2005,7 +2005,10 @@ class TemperamentWidget {
         let p = 0;
         this.playbackForward = true;
         this._playing = !this._playing;
-
+        if (!this._playing) {
+            logo.synth.setMasterVolume(0);
+            return;
+        }
         logo.resetSynth(0);
 
         const cell = this.playButton;
@@ -2060,6 +2063,7 @@ class TemperamentWidget {
         }
 
         const __playLoop = (i) => {
+            console.log("Play Loop Called for " + i);
             let j;
             if (i === pitchNumber) {
                 this.playbackForward = false;
@@ -2078,7 +2082,6 @@ class TemperamentWidget {
                 );
                 this.playNote(i);
             }
-
             if (this.circleIsVisible == false && docById("wheelDiv4") == null) {
                 if (i === pitchNumber) {
                     this.notesCircle.navItems[0].fillAttr = "#808080";
@@ -2169,46 +2172,52 @@ class TemperamentWidget {
                 i -= 1;
             }
 
-            if (i <= pitchNumber && i >= 0 && this._playing && p < 2) {
+            if (i <= pitchNumber && i >= 0 && p < 2) {
                 setTimeout(() => {
-                    __playLoop(i);
-                }, Singer.defaultBPMFactor * 1000 * duration);
-            } else {
-                cell.innerHTML =
-                    '&nbsp;&nbsp;<img src="header-icons/' +
-                    "play-button.svg" +
-                    '" title="' +
-                    _("Play") +
-                    '" alt="' +
-                    _("Play") +
-                    '" height="' +
-                    TemperamentWidget.ICONSIZE +
-                    '" width="' +
-                    TemperamentWidget.ICONSIZE +
-                    '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-                if (i !== -1) {
-                    setTimeout(() => {
-                        if (this.circleIsVisible == false && docById("wheelDiv4") == null) {
-                            this.notesCircle.navItems[i - 1].fillAttr = "#c8C8C8";
-                            this.notesCircle.navItems[i - 1].sliceHoverAttr.fill = "#c8C8C8";
-                            this.notesCircle.navItems[i - 1].slicePathAttr.fill = "#c8C8C8";
-                            this.notesCircle.navItems[i - 1].sliceSelectedAttr.fill = "#c8C8C8";
-                            this.notesCircle.refreshWheel();
-                        } else if (this.circleIsVisible == true && docById("wheelDiv4") == null) {
-                            j = i - 1;
-                            docById("pitchNumber_" + j).style.background =
-                                platformColor.selectorBackground;
-                        } else if (docById("wheelDiv4") !== null) {
-                            this.wheel1.navItems[i - 1].fillAttr = "#e0e0e0";
-                            this.wheel1.navItems[i - 1].sliceHoverAttr.fill = "#e0e0e0";
-                            this.wheel1.navItems[i - 1].slicePathAttr.fill = "#e0e0e0";
-                            this.wheel1.navItems[i - 1].sliceSelectedAttr.fill = "#e0e0e0";
+                    if (!this._playing) {
+                        cell.innerHTML =
+                            '&nbsp;&nbsp;<img src="header-icons/' +
+                            "play-button.svg" +
+                            '" title="' +
+                            _("Play") +
+                            '" alt="' +
+                            _("Play") +
+                            '" height="' +
+                            TemperamentWidget.ICONSIZE +
+                            '" width="' +
+                            TemperamentWidget.ICONSIZE +
+                            '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                        if (i !== -1) {
+                            if (this.circleIsVisible == false && docById("wheelDiv4") == null) {
+                                this.notesCircle.navItems[i - 1].fillAttr = "#c8C8C8";
+                                this.notesCircle.navItems[i - 1].sliceHoverAttr.fill =
+                                    "#c8C8C8";
+                                this.notesCircle.navItems[i - 1].slicePathAttr.fill = "#c8C8C8";
+                                this.notesCircle.navItems[i - 1].sliceSelectedAttr.fill =
+                                    "#c8C8C8";
+                                this.notesCircle.refreshWheel();
+                            } else if (
+                                this.circleIsVisible == true &&
+                                docById("wheelDiv4") == null
+                            ) {
+                                j = i - 1;
+                                docById("pitchNumber_" + j).style.background =
+                                    platformColor.selectorBackground;
+                            } else if (docById("wheelDiv4") !== null) {
+                                this.wheel1.navItems[i - 1].fillAttr = "#e0e0e0";
+                                this.wheel1.navItems[i - 1].sliceHoverAttr.fill = "#e0e0e0";
+                                this.wheel1.navItems[i - 1].slicePathAttr.fill = "#e0e0e0";
+                                this.wheel1.navItems[i - 1].sliceSelectedAttr.fill = "#e0e0e0";
 
-                            this.wheel1.refreshWheel();
+                                this.wheel1.refreshWheel();
+                            }
                         }
-                    }, Singer.defaultBPMFactor * 1000 * duration);
-                }
-                this._playing = false;
+                        this._playing = false;
+                    }
+                    else{
+                        __playLoop(i);
+                    }
+                }, Singer.defaultBPMFactor * 1000 * duration);
             }
         };
         if (this._playing) {
