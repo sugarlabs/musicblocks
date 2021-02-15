@@ -598,18 +598,18 @@ const saveLilypondOutput = function (logo) {
 
     //.TRANS Animal names used in Lilypond output
     const RODENTS = [
-        "mouse",
-        "brown rat",
-        "mole",
-        "chipmunk",
-        "red squirrel",
-        "guinea pig",
-        "capybara",
-        "coypu",
-        "black rat",
-        "grey squirrel",
-        "flying squirrel",
-        "bat"
+        _("mouse"),
+        _("brown rat"),
+        _("mole"),
+        _("chipmunk"),
+        _("red squirrel"),
+        _("guinea pig"),
+        _("capybara"),
+        _("coypu"),
+        _("black rat"),
+        _("grey squirrel"),
+        _("flying squirrel"),
+        _("bat")
     ];
 
     const CLEFS = ["treble", "bass", "bass_8", "percussion"];
