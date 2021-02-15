@@ -421,7 +421,9 @@ function MusicKeyboard() {
             // }
         };
 
-        widgetWindow.addButton("add2.svg", ICONSIZE, _("Add note")).onclick = () => {
+        const addNoteButton = widgetWindow.addButton("add2.svg", ICONSIZE, _("Add note"))
+        addNoteButton.setAttribute("id", "addnotes");
+        addNoteButton.onclick = () => {
             this._createAddRowPieSubmenu();
         };
 
@@ -1368,8 +1370,8 @@ function MusicKeyboard() {
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.createWheel(["x", " "]);
 
-        const x = 100;
-        const y = 100;
+        const x = docById("addnotes").getBoundingClientRect().x;
+        const y = docById("addnotes").getBoundingClientRect().y;
 
         docById("wheelDivptm").style.position = "absolute";
         docById("wheelDivptm").style.height = "300px";
