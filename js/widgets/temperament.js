@@ -75,7 +75,9 @@ class TemperamentWidget {
         widgetWindow.getWidgetBody().style.width = "500px";
 
         widgetWindow.onclose = () => {
-            this.closed = true;
+            if (this._playing) {
+                this.closed = true;
+            }
             logo.synth.setMasterVolume(0);
             if (docById("wheelDiv2") != null) {
                 docById("wheelDiv2").style.display = "none";
@@ -2174,11 +2176,10 @@ class TemperamentWidget {
 
             if (i <= pitchNumber && i >= 0 && p < 2) {
                 setTimeout(() => {
-                    if(this.closed){
-                        this.closed = !(this.closed);
+                    if (this.closed) {
+                        this.closed = !this.closed;
                         return;
-                    }
-                    else if ((!this._playing)) {
+                    } else if (!this._playing) {
                         cell.innerHTML =
                             '&nbsp;&nbsp;<img src="header-icons/' +
                             "play-button.svg" +
@@ -2194,24 +2195,23 @@ class TemperamentWidget {
                         if (i !== -1) {
                             if (this.circleIsVisible == false && docById("wheelDiv4") == null) {
                                 this.notesCircle.navItems[i - 1].fillAttr = "#c8C8C8";
-                                this.notesCircle.navItems[i - 1].sliceHoverAttr.fill =
-                                    "#c8C8C8";
+                                this.notesCircle.navItems[i - 1].sliceHoverAttr.fill = "#c8C8C8";
                                 this.notesCircle.navItems[i - 1].slicePathAttr.fill = "#c8C8C8";
-                                this.notesCircle.navItems[i - 1].sliceSelectedAttr.fill =
-                                    "#c8C8C8";
-                                if(i==11){
+                                this.notesCircle.navItems[i - 1].sliceSelectedAttr.fill = "#c8C8C8";
+                                if (i == 11) {
                                     //on completion of a full circle and on hitting '0' note in clockwise direction
                                     this.notesCircle.navItems[0].fillAttr = "#c8C8C8";
                                     this.notesCircle.navItems[0].sliceHoverAttr.fill = "#c8C8C8";
                                     this.notesCircle.navItems[0].slicePathAttr.fill = "#c8C8C8";
                                     this.notesCircle.navItems[0].sliceSelectedAttr.fill = "#c8C8C8";
-                                }
-                                else if(i<11){
+                                } else if (i < 11) {
                                     //in case of counter-clockwise direction, i.e., when this.playbackForward = false
                                     this.notesCircle.navItems[i + 1].fillAttr = "#c8C8C8";
-                                    this.notesCircle.navItems[i + 1].sliceHoverAttr.fill = "#c8C8C8";
+                                    this.notesCircle.navItems[i + 1].sliceHoverAttr.fill =
+                                        "#c8C8C8";
                                     this.notesCircle.navItems[i + 1].slicePathAttr.fill = "#c8C8C8";
-                                    this.notesCircle.navItems[i + 1].sliceSelectedAttr.fill = "#c8C8C8";
+                                    this.notesCircle.navItems[i + 1].sliceSelectedAttr.fill =
+                                        "#c8C8C8";
                                 }
                                 this.notesCircle.refreshWheel();
                             } else if (
@@ -2230,8 +2230,7 @@ class TemperamentWidget {
                             }
                         }
                         this._playing = false;
-                    }
-                    else{
+                    } else {
                         __playLoop(i);
                     }
                 }, Singer.defaultBPMFactor * 1000 * duration);
