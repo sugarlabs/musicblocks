@@ -758,7 +758,10 @@ function MusicKeyboard() {
             removeBlock(i);
         }
 
-        const newList = fillChromaticGaps(sortedList);
+        const sortedHertzList = sortedList.filter(note => note.noteName === "hertz");
+        const sortedNotesList = sortedList.filter(note => note.noteName !== "hertz");
+        let newList = fillChromaticGaps(sortedNotesList);
+        newList = newList.concat(sortedHertzList);
 
         for (let i = 0; i < newList.length; i++) {
             this.layout.push({
