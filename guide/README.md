@@ -2051,7 +2051,7 @@ the rows in the matrix.
 ### <a name="slider"></a>4.8 Generating Arbritary Pitches
 
 The *Pitch Slider* block is used to launch a widget that is used to
-generate arbitray pitches. It differs from the *Pitch Staircase*
+generate arbitrary pitches. It differs from the *Pitch Staircase*
 widget in that it is used to create frequencies that vary continuously
 within the range of a specified octave.
 
