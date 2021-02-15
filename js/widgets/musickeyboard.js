@@ -398,6 +398,15 @@ function MusicKeyboard() {
             selected = [];
             selectedNotes = [];
             if (this.loopTick) this.loopTick.stop();
+            docById("wheelDivptm").style.display = "none";
+            docById("wheelDivptm").style.display = "none";
+            if (this._menuWheel) this._menuWheel.removeWheel();
+            if (this._pitchWheel) this._pitchWheel.removeWheel();
+            if (this._tabsWheel) this._tabsWheel.removeWheel();
+            if (this._exitWheel) this._exitWheel.removeWheel();
+            if (this._durationWheel) this._durationWheel.removeWheel();
+            if (this._accidentalsWheel) this._accidentalsWheel.removeWheel();
+            if (this._octavesWheel) this._octavesWheel.removeWheel();
             widgetWindow.destroy();
         };
 
