@@ -2199,6 +2199,20 @@ class TemperamentWidget {
                                 this.notesCircle.navItems[i - 1].slicePathAttr.fill = "#c8C8C8";
                                 this.notesCircle.navItems[i - 1].sliceSelectedAttr.fill =
                                     "#c8C8C8";
+                                if(i==11){
+                                    //on completion of a full circle and on hitting '0' note in clockwise direction
+                                    this.notesCircle.navItems[0].fillAttr = "#c8C8C8";
+                                    this.notesCircle.navItems[0].sliceHoverAttr.fill = "#c8C8C8";
+                                    this.notesCircle.navItems[0].slicePathAttr.fill = "#c8C8C8";
+                                    this.notesCircle.navItems[0].sliceSelectedAttr.fill = "#c8C8C8";
+                                }
+                                else if(i<11){
+                                    //in case of counter-clockwise direction, i.e., when this.playbackForward = false
+                                    this.notesCircle.navItems[i + 1].fillAttr = "#c8C8C8";
+                                    this.notesCircle.navItems[i + 1].sliceHoverAttr.fill = "#c8C8C8";
+                                    this.notesCircle.navItems[i + 1].slicePathAttr.fill = "#c8C8C8";
+                                    this.notesCircle.navItems[i + 1].sliceSelectedAttr.fill = "#c8C8C8";
+                                }
                                 this.notesCircle.refreshWheel();
                             } else if (
                                 this.circleIsVisible == true &&
