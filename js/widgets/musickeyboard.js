@@ -1516,6 +1516,7 @@ function MusicKeyboard() {
 
         this._logo.blocks.adjustDocks(this.blockNo, true);
         this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+        blocks.adjustExpandableClampBlock();
         this._logo.blocks.refreshCanvas();
     };
 

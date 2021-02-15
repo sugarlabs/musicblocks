@@ -750,6 +750,7 @@ function setupWidgetBlocks() {
             }
 
             logo.inMusicKeyboard = true;
+            logo.musicKeyboard.blockNo = blk;
             logo.musicKeyboard.instruments = [];
             logo.musicKeyboard.noteNames = [];
             logo.musicKeyboard.octaves = [];
