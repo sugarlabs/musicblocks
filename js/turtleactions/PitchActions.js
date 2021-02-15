@@ -117,13 +117,13 @@ function setupPitchActions() {
                 const delta_temp = Singer.calculateInvert(
                     logo,
                     turtle,
-		    pitchName,
+                    pitchName,
                     octave
                 );
                 const transposition_temp = 2 * delta_temp;
                 let invertedNote = getNote(
-		    pitchName,
-		    octave,
+                    pitchName,
+                    octave,
                     transposition_temp,
                     tur.singer.keySignature,
                     tur.singer.moveable,
@@ -131,8 +131,8 @@ function setupPitchActions() {
                     logo.errorMsg,
                     logo.synth.inTemperament
                 );
-		pitchName = invertedNote[0];
-		octave = invertedNote[1];
+                pitchName = invertedNote[0];
+                octave = invertedNote[1];
             }
 
             const noteObj = Singer.addScalarTransposition(
