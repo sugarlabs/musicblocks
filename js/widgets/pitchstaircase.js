@@ -351,6 +351,8 @@ class PitchStaircase {
      * @returns {void}
      */
     _playNext(index, next) {
+        if (this.closed) return;
+
         if (index === this.Stairs.length) {
             setTimeout(() => {
                 for (let i = 0; i < this.Stairs.length; i++) {
@@ -609,9 +611,11 @@ class PitchStaircase {
         widgetWindow.show();
         widgetWindow.onclose = () => {
             logo.synth.setMasterVolume(0);
-            logo.synth.stop();
+            this.closed = true;
             widgetWindow.destroy();
         };
+
+        this.closed = false;
 
         widgetWindow.addButton(
             "play-chord.svg",
