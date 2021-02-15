@@ -398,6 +398,15 @@ function MusicKeyboard() {
             selected = [];
             selectedNotes = [];
             if (this.loopTick) this.loopTick.stop();
+            docById("wheelDivptm").style.display = "none";
+            docById("wheelDivptm").style.display = "none";
+            if (this._menuWheel) this._menuWheel.removeWheel();
+            if (this._pitchWheel) this._pitchWheel.removeWheel();
+            if (this._tabsWheel) this._tabsWheel.removeWheel();
+            if (this._exitWheel) this._exitWheel.removeWheel();
+            if (this._durationWheel) this._durationWheel.removeWheel();
+            if (this._accidentalsWheel) this._accidentalsWheel.removeWheel();
+            if (this._octavesWheel) this._octavesWheel.removeWheel();
             widgetWindow.destroy();
         };
 
@@ -421,7 +430,9 @@ function MusicKeyboard() {
             // }
         };
 
-        widgetWindow.addButton("add2.svg", ICONSIZE, _("Add note")).onclick = () => {
+        const addNoteButton = widgetWindow.addButton("add2.svg", ICONSIZE, _("Add note"))
+        addNoteButton.setAttribute("id", "addnotes");
+        addNoteButton.onclick = () => {
             this._createAddRowPieSubmenu();
         };
 
@@ -1323,7 +1334,7 @@ function MusicKeyboard() {
         docById("wheelDivptm").style.display = "";
         docById("wheelDivptm").style.zIndex = "300";
         const pitchLabels = ["do", "re", "mi", "fa", "sol", "la", "ti"];
-        const hertzLabels = [261, 294, 327, 348, 392, 436, 490, 523];
+        const hertzLabels = [262, 294, 327, 348, 392, 436, 490, 523];
         const VALUESLABEL = ["pitch", "hertz"];
         const VALUES = ["imgsrc: images/chime.svg", "imgsrc: images/synth.svg"];
         const valueLabel = [];
@@ -1368,8 +1379,8 @@ function MusicKeyboard() {
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.createWheel(["x", " "]);
 
-        const x = 100;
-        const y = 100;
+        const x = docById("addnotes").getBoundingClientRect().x;
+        const y = docById("addnotes").getBoundingClientRect().y;
 
         docById("wheelDivptm").style.position = "absolute";
         docById("wheelDivptm").style.height = "300px";
@@ -1516,6 +1527,7 @@ function MusicKeyboard() {
 
         this._logo.blocks.adjustDocks(this.blockNo, true);
         this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+        blocks.adjustExpandableClampBlock();
         this._logo.blocks.refreshCanvas();
     };
 
