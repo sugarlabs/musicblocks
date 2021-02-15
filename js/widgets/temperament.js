@@ -54,6 +54,7 @@ class TemperamentWidget {
         this.pitchNumber = 0;
         this.circleIsVisible = true;
         this.playbackForward = true;
+        this.closed = false;
     }
 
     /**
@@ -74,8 +75,8 @@ class TemperamentWidget {
         widgetWindow.getWidgetBody().style.width = "500px";
 
         widgetWindow.onclose = () => {
+            this.closed = true;
             logo.synth.setMasterVolume(0);
-            logo.synth.stop();
             if (docById("wheelDiv2") != null) {
                 docById("wheelDiv2").style.display = "none";
                 this.notesCircle.removeWheel();
@@ -2063,7 +2064,6 @@ class TemperamentWidget {
         }
 
         const __playLoop = (i) => {
-            console.log("Play Loop Called for " + i);
             let j;
             if (i === pitchNumber) {
                 this.playbackForward = false;
@@ -2174,7 +2174,11 @@ class TemperamentWidget {
 
             if (i <= pitchNumber && i >= 0 && p < 2) {
                 setTimeout(() => {
-                    if (!this._playing) {
+                    if(this.closed){
+                        this.closed = !(this.closed);
+                        return;
+                    }
+                    else if ((!this._playing)) {
                         cell.innerHTML =
                             '&nbsp;&nbsp;<img src="header-icons/' +
                             "play-button.svg" +
@@ -2208,7 +2212,6 @@ class TemperamentWidget {
                                 this.wheel1.navItems[i - 1].sliceHoverAttr.fill = "#e0e0e0";
                                 this.wheel1.navItems[i - 1].slicePathAttr.fill = "#e0e0e0";
                                 this.wheel1.navItems[i - 1].sliceSelectedAttr.fill = "#e0e0e0";
-
                                 this.wheel1.refreshWheel();
                             }
                         }
