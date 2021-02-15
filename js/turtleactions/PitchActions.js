@@ -104,6 +104,7 @@ function setupPitchActions() {
             }
 
             const lastNotePlayed = tur.singer.lastNotePlayed;
+
             // At this point, lastNotePlayed is a tuple of the
             // pitchname-octave and the notevalue, e.g., ["C3", 8]
             // We only care about the pitchname and octave.
@@ -116,13 +117,13 @@ function setupPitchActions() {
                 const delta_temp = Singer.calculateInvert(
                     logo,
                     turtle,
-                    pitchName,
+		    pitchName,
                     octave
                 );
                 const transposition_temp = 2 * delta_temp;
-                lastNotePlayed = getNote(
-                    pitchName,
-                    octave,
+                let invertedNote = getNote(
+		    pitchName,
+		    octave,
                     transposition_temp,
                     tur.singer.keySignature,
                     tur.singer.moveable,
@@ -130,6 +131,8 @@ function setupPitchActions() {
                     logo.errorMsg,
                     logo.synth.inTemperament
                 );
+		pitchName = invertedNote[0];
+		octave = invertedNote[1];
             }
 
             const noteObj = Singer.addScalarTransposition(
