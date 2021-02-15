@@ -10,11 +10,11 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/*global logo, turtles, _, platformColor, docById, MATRIXSOLFEHEIGHT, toFraction, Singer,
+/* global logo, turtles, _, platformColor, docById, MATRIXSOLFEHEIGHT, toFraction, Singer,
    SOLFEGECONVERSIONTABLE, slicePath, wheelnav, delayExecution, DEFAULTVOICE, getDrumName,
    MATRIXSOLFEWIDTH, getDrumIcon, noteIsSolfege, isCustom, i18nSolfege, getNote, DEFAULTDRUM,
    last, DRUMS, SHARP, FLAT, PREVIEWVOLUME, DEFAULTVOLUME, noteToFrequency, getDrumIndex, LCD,
-   calcNoteValueToDisplay, NOTESYMBOLS, EIGHTHNOTEWIDTH, saveLocally, docBySelector*/
+   calcNoteValueToDisplay, NOTESYMBOLS, EIGHTHNOTEWIDTH, saveLocally, docBySelector */
 
 /*
      Globals location
@@ -264,13 +264,17 @@ class PhraseMaker {
             widgetWindow.destroy();
         };
 
-        this._playButton = widgetWindow.addButton("play-button.svg", PhraseMaker.ICONSIZE, _("Play"));
-        
+        this._playButton = widgetWindow.addButton(
+            "play-button.svg",
+            PhraseMaker.ICONSIZE,
+            _("Play")
+        );
+
         this._playButton.onclick = () => {
             logo.turtleDelay = 0;
 
             logo.resetSynth(0);
-            if(this.playingNow) {
+            if (this.playingNow) {
                 this._playButton.innerHTML =
                     '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
                     _("Play") +
@@ -770,11 +774,7 @@ class PhraseMaker {
             this._exitWheel.removeWheel();
         };
 
-        const __subMenuChanged = () => {
-            __selectionChanged();
-        };
-
-        let __selectionChanged = () => {
+        const __selectionChanged = () => {
             label = VALUESLABEL[this._menuWheel.selectedNavItemIndex];
             let rLabel = null;
             let rArg = null;
@@ -921,6 +921,10 @@ class PhraseMaker {
             }
         };
 
+        const __subMenuChanged = () => {
+            __selectionChanged();
+        };
+
         for (let i = 0; i < valueLabel.length; i++) {
             this._menuWheel.navItems[i].navigateFunction = __subMenuChanged;
         }
@@ -1050,6 +1054,8 @@ class PhraseMaker {
             this._blockLabelsWheel2.removeWheel();
         };
 
+        let __selectionChanged;
+
         const __enterArgValue1 = () => {
             this.xblockValue[0] = this._blockLabelsWheel2.navItems[
                 this._blockLabelsWheel2.selectedNavItemIndex
@@ -1079,7 +1085,7 @@ class PhraseMaker {
             }
         }
 
-        let __selectionChanged = async (updatingArgs) => {
+        __selectionChanged = async (updatingArgs) => {
             const thisBlockName = _blockNames[this._blockLabelsWheel.selectedNavItemIndex];
             let argBlock, z;
             if (updatingArgs === undefined) {
@@ -1321,43 +1327,7 @@ class PhraseMaker {
             }
         };
 
-        const __enterArgValue = () => {
-            this.blockValue = this._pitchWheel.navItems[
-                this._pitchWheel.selectedNavItemIndex
-            ].title;
-            docById("wheelnav-_exitWheel-title-1").children[0].textContent = this.blockValue;
-            __selectionChanged(true);
-        };
-
-        if (condition === "graphicsblocks") {
-            if (blockLabel === "forward" || blockLabel === "back") {
-                for (let i = 0; i < forwardBackLabel.length; i++) {
-                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
-                }
-            } else if (blockLabel === "right" || blockLabel === "left") {
-                for (let i = 0; i < leftRightLabel.length; i++) {
-                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
-                }
-            } else if (blockLabel === "setheading") {
-                for (let i = 0; i < setHeadingLabel.length; i++) {
-                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
-                }
-            } else if (blockLabel === "setpensize") {
-                for (let i = 0; i < setPenSizeLabel.length; i++) {
-                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
-                }
-            } else {
-                for (let i = 0; i < setLabel.length; i++) {
-                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
-                }
-            }
-        } else if (condition === "synthsblocks") {
-            for (let i = 0; i < valueLabel.length; i++) {
-                this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
-            }
-        }
-
-        let __selectionChanged = async (updatingArgs) => {
+        const __selectionChanged = async (updatingArgs) => {
             let thisBlockName = "hertz";
             let label, newBlock, argBlock, z;
             if (condition === "graphicsblocks") {
@@ -1448,6 +1418,42 @@ class PhraseMaker {
             this._noteStored[blockIndex] =
                 this.rowLabels[blockIndex] + ": " + this.rowArgs[blockIndex];
         };
+
+        const __enterArgValue = () => {
+            this.blockValue = this._pitchWheel.navItems[
+                this._pitchWheel.selectedNavItemIndex
+            ].title;
+            docById("wheelnav-_exitWheel-title-1").children[0].textContent = this.blockValue;
+            __selectionChanged(true);
+        };
+
+        if (condition === "graphicsblocks") {
+            if (blockLabel === "forward" || blockLabel === "back") {
+                for (let i = 0; i < forwardBackLabel.length; i++) {
+                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
+                }
+            } else if (blockLabel === "right" || blockLabel === "left") {
+                for (let i = 0; i < leftRightLabel.length; i++) {
+                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
+                }
+            } else if (blockLabel === "setheading") {
+                for (let i = 0; i < setHeadingLabel.length; i++) {
+                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
+                }
+            } else if (blockLabel === "setpensize") {
+                for (let i = 0; i < setPenSizeLabel.length; i++) {
+                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
+                }
+            } else {
+                for (let i = 0; i < setLabel.length; i++) {
+                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
+                }
+            }
+        } else if (condition === "synthsblocks") {
+            for (let i = 0; i < valueLabel.length; i++) {
+                this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
+            }
+        }
 
         if (condition === "graphicsblocks") {
             if (blockLabel === "forward" || blockLabel === "back") {
@@ -2350,7 +2356,6 @@ class PhraseMaker {
         const tupletTimeFactor = param[0][0] / param[0][1];
         const numberOfNotes = param[1].length;
         let totalNoteInterval = 0;
-        const ptmTable = docById("ptmTable");
         let lcd;
         for (let i = 0; i < numberOfNotes; i++) {
             if (i === 0) {
@@ -3029,10 +3034,11 @@ class PhraseMaker {
         }
 
         this._blockMapHelper = [];
+        let j;
         for (let i = 0; i < downCellId; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
+            j = i;
         }
-        let j = i;
         for (let i = downCellId; i <= upCellId; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [j]]);
         }
@@ -3886,15 +3892,15 @@ class PhraseMaker {
                 );
                 this.playingNow = false;
                 this._playButton.innerHTML =
-                        '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
-                        _("Play") +
-                        '" alt="' +
-                        _("Play") +
-                        '" height="' +
-                        PhraseMaker.ICONSIZE +
-                        '" width="' +
-                        PhraseMaker.ICONSIZE +
-                        '" vertical-align="middle">&nbsp;&nbsp;';
+                    '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
+                    _("Play") +
+                    '" alt="' +
+                    _("Play") +
+                    '" height="' +
+                    PhraseMaker.ICONSIZE +
+                    '" width="' +
+                    PhraseMaker.ICONSIZE +
+                    '" vertical-align="middle">&nbsp;&nbsp;';
             } else {
                 row = this._noteValueRow;
                 cell = row.cells[this._colIndex];
@@ -4279,7 +4285,6 @@ class PhraseMaker {
             newStack[idx][4][1] = idx + 2; // divide block
             newStack[idx][4][2] = idx + 1; // vspace block
 
-            const x = idx + delta;
             let lastConnection, previousBlock, thisBlock;
 
             if (note[0][0] === "R" || note[0][0] == undefined) {
