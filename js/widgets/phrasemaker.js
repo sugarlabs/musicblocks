@@ -41,7 +41,8 @@
      
      - js/activity.js
          saveLocally(window, planet)
- */
+*/
+/* exported PhraseMaker */
 
 const MATRIXGRAPHICS = [
     "forward",
@@ -199,7 +200,6 @@ class PhraseMaker {
         for (let i = 0; i < this._blockMap[blk].length; i++) {
             obj = this._blockMap[blk][i];
             if (obj[0] === rowBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
-                console.debug("node is already in the list");
                 j += 1;
             }
         }
@@ -232,7 +232,6 @@ class PhraseMaker {
         this._noteStored = [];
         this._noteBlocks = false;
         this._rests = 0;
-        logo = logo;
 
         this.playingNow = false;
 
@@ -244,8 +243,6 @@ class PhraseMaker {
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
-
-        console.debug("notes " + this.rowLabels + " octave " + this.rowArgs);
 
         this._notesToPlay = [];
         this._matrixHasTuplets = false;
@@ -576,7 +573,6 @@ class PhraseMaker {
                         eCell = eCell.parentNode;
                     }
                     const index = eCell.getAttribute("alt").split("__")[0];
-                    const condition = eCell.getAttribute("alt").split("__")[1];
                     this._createMatrixGraphics2PieSubmenu(index, null);
                 };
 
@@ -673,7 +669,6 @@ class PhraseMaker {
         // Sort them if there are note blocks.
         if (!this.sorted) {
             setTimeout(() => {
-                console.debug("sorting");
                 this._sort();
             }, 1000);
         } else {
@@ -781,14 +776,12 @@ class PhraseMaker {
 
         let __selectionChanged = () => {
             label = VALUESLABEL[this._menuWheel.selectedNavItemIndex];
-            console.debug(label);
             let rLabel = null;
             let rArg = null;
             const blockLabel = "";
             const newBlock = logo.blocks.blockList.length;
             switch (label) {
                 case "pitch":
-                    console.debug("loading new pitch block");
                     logo.blocks.loadNewBlocks([
                         [0, ["pitch", {}], 0, 0, [null, 1, 2, null]],
                         [1, ["solfege", { value: "sol" }], 0, 0, [0]],
@@ -798,7 +791,6 @@ class PhraseMaker {
                     rArg = 4;
                     break;
                 case "hertz":
-                    console.debug("loading new Hertz block");
                     logo.blocks.loadNewBlocks([
                         [0, ["hertz", {}], 0, 0, [null, 1, null]],
                         [1, ["number", { value: 392 }], 0, 0, [0]]
@@ -807,7 +799,6 @@ class PhraseMaker {
                     rArg = 392;
                     break;
                 case "drum":
-                    console.debug("loading new playdrum block");
                     logo.blocks.loadNewBlocks([
                         [0, ["playdrum", {}], 0, 0, [null, 1, null]],
                         [1, ["drumname", { value: DEFAULTDRUM }], 0, 0, [0]]
@@ -816,7 +807,6 @@ class PhraseMaker {
                     rArg = -1;
                     break;
                 case "graphics":
-                    console.debug("loading new forward block");
                     logo.blocks.loadNewBlocks([
                         [0, ["forward", {}], 0, 0, [null, 1, null]],
                         [1, ["number", { value: 100 }], 0, 0, [0]]
@@ -825,7 +815,6 @@ class PhraseMaker {
                     rArg = 100;
                     break;
                 case "pen":
-                    console.debug("loading new setcolor block");
                     logo.blocks.loadNewBlocks([
                         [0, ["setcolor", {}], 0, 0, [null, 1, null]],
                         [1, ["number", { value: 0 }], 0, 0, [0]]
@@ -834,7 +823,6 @@ class PhraseMaker {
                     rArg = 0;
                     break;
                 default:
-                    console.debug(label + " not found");
                     break;
             }
 
@@ -848,7 +836,6 @@ class PhraseMaker {
                         blocksNo = this._mapNotesBlocks(graphicLabels[i]);
                         if (blocksNo.length >= 1) {
                             aboveBlock = last(blocksNo);
-                            console.debug(aboveBlock);
                             break;
                         }
                     }
@@ -874,7 +861,6 @@ class PhraseMaker {
             }
 
             if (aboveBlock === null) {
-                console.debug("WARNING: aboveBlock is null");
                 // Look for a pitch block.
                 blocksNo = this._mapNotesBlocks("pitch");
                 if (blocksNo.length >= 1) {
@@ -1050,7 +1036,6 @@ class PhraseMaker {
             this._pitchWheel.createWheel(setxyValueLabel);
         }
 
-        console.debug(_blockNames.indexOf(blockLabel));
         this._blockLabelsWheel.navigateWheel(_blockNames.indexOf(blockLabel));
 
         this.xblockValue = [xblockLabelValue.toString(), "x"];
@@ -1998,7 +1983,6 @@ class PhraseMaker {
 
     _sort() {
         if (this.sorted) {
-            console.debug("already sorted");
             return;
         }
 
@@ -2131,7 +2115,6 @@ class PhraseMaker {
             if (i === 0) {
                 this._sortedRowMap.push(0);
             } else if (i > 0 && obj[1] !== "hertz" && obj[1] === last(this.rowLabels)) {
-                console.debug("skipping " + obj[1] + " " + last(this.rowLabels));
                 this._sortedRowMap.push(last(this._sortedRowMap));
                 if (oldColumnBlockMap[sortedList[lastObj][3]] != undefined) {
                     setTimeout(
@@ -2151,7 +2134,6 @@ class PhraseMaker {
                 this._rowMap[i] = this._rowMap[i - 1];
                 continue;
             } else {
-                console.debug("pushing " + obj[1] + " " + last(this.rowLabels));
                 this._sortedRowMap.push(last(this._sortedRowMap) + 1);
                 lastObj = i;
             }
@@ -2189,10 +2171,8 @@ class PhraseMaker {
 
     _export() {
         const exportWindow = window.open("");
-        console.debug(exportWindow);
         const exportDocument = exportWindow.document;
         if (exportDocument === undefined) {
-            console.debug("Could not create export window");
             return;
         }
 
@@ -2682,7 +2662,6 @@ class PhraseMaker {
             }
 
             if (logo.blocks.blockList[blk] === undefined) {
-                console.debug("block " + blk + " is undefined");
                 continue;
             }
 
@@ -2690,7 +2669,6 @@ class PhraseMaker {
                 logo.blocks.blockList[blk].name === "newnote" ||
                 logo.blocks.blockList[blk].name === "repeat"
             ) {
-                console.debug("FOUND A NOTE OR REPEAT BLOCK.");
                 this._noteBlocks = true;
                 break;
             }
@@ -2856,7 +2834,6 @@ class PhraseMaker {
             bottomBlockLoop += 1;
             if (bottomBlockLoop > 2 * logo.blocks.blockList) {
                 // Could happen if the block data is malformed.
-                console.debug("infinite loop finding bottomBlock?");
                 break;
             }
 
@@ -3613,8 +3590,6 @@ class PhraseMaker {
                     }
 
                     if (rIdx === null) {
-                        console.debug("Could not find a row match.");
-                        console.debug(obj[0]);
                         continue;
                     }
 
@@ -3647,9 +3622,7 @@ class PhraseMaker {
 
                     // If we found a match, mark this cell
                     row = this._rows[r];
-                    if (row === null || typeof row === "undefined") {
-                        console.debug("COULD NOT FIND ROW " + r);
-                    } else {
+                    if (row !== null && typeof row !== "undefined") {
                         cell = row.cells[c];
                         if (cell != undefined) {
                             cell.style.backgroundColor = "black";
@@ -4104,7 +4077,6 @@ class PhraseMaker {
                 turtles.turtleList[0].painter.doSetXY(obj[1], obj[2]);
                 break;
             default:
-                console.debug("unknown graphics command " + obj[0]);
                 break;
         }
     }
@@ -4186,8 +4158,6 @@ class PhraseMaker {
                     } else {
                         logo.synth.trigger(0, note, noteValue, this._instrumentName, null, null);
                     }
-                } else {
-                    console.debug("Cannot parse note object: " + obj);
                 }
             }
         } else if (MATRIXSYNTHS.indexOf(obj[0]) !== -1) {
