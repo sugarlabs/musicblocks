@@ -2009,7 +2009,6 @@ class TemperamentWidget {
         this.playbackForward = true;
         this._playing = !this._playing;
         if (!this._playing) {
-            logo.synth.setMasterVolume(0);
             return;
         }
         logo.resetSynth(0);
