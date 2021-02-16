@@ -2233,22 +2233,20 @@ class TemperamentWidget {
                         __playLoop(i);
                     }
                 }, Singer.defaultBPMFactor * 1000 * duration);
-            }
-            else{
+            } else {
                 this._playing = false;
                 cell.innerHTML =
-                            '&nbsp;&nbsp;<img src="header-icons/' +
-                            "play-button.svg" +
-                            '" title="' +
-                            _("Play") +
-                            '" alt="' +
-                            _("Play") +
-                            '" height="' +
-                            TemperamentWidget.ICONSIZE +
-                            '" width="' +
-                            TemperamentWidget.ICONSIZE +
-                            '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-                console.log("completed");
+                    '&nbsp;&nbsp;<img src="header-icons/' +
+                    "play-button.svg" +
+                    '" title="' +
+                    _("Play") +
+                    '" alt="' +
+                    _("Play") +
+                    '" height="' +
+                    TemperamentWidget.ICONSIZE +
+                    '" width="' +
+                    TemperamentWidget.ICONSIZE +
+                    '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
             }
         };
         if (this._playing) {
