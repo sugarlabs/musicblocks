@@ -2234,6 +2234,8 @@ class TemperamentWidget {
                     '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
             }
         };
-        
+        if (this._playing) {
+            __playLoop(0);
+        }
     }
 }
