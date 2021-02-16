@@ -2234,6 +2234,22 @@ class TemperamentWidget {
                     }
                 }, Singer.defaultBPMFactor * 1000 * duration);
             }
+            else{
+                this._playing = false;
+                cell.innerHTML =
+                            '&nbsp;&nbsp;<img src="header-icons/' +
+                            "play-button.svg" +
+                            '" title="' +
+                            _("Play") +
+                            '" alt="' +
+                            _("Play") +
+                            '" height="' +
+                            TemperamentWidget.ICONSIZE +
+                            '" width="' +
+                            TemperamentWidget.ICONSIZE +
+                            '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                console.log("completed");
+            }
         };
         if (this._playing) {
             __playLoop(0);
