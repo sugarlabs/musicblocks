@@ -2027,21 +2027,6 @@ class TemperamentWidget {
                 '" width="' +
                 TemperamentWidget.ICONSIZE +
                 '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-        } else {
-            logo.synth.setMasterVolume(0);
-            logo.synth.stop();
-            cell.innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/' +
-                "play-button.svg" +
-                '" title="' +
-                _("Play") +
-                '" alt="' +
-                _("Play") +
-                '" height="' +
-                TemperamentWidget.ICONSIZE +
-                '" width="' +
-                TemperamentWidget.ICONSIZE +
-                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
         }
 
         const duration = 1 / 2;
@@ -2249,8 +2234,6 @@ class TemperamentWidget {
                     '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
             }
         };
-        if (this._playing) {
-            __playLoop(0);
-        }
+        
     }
 }
