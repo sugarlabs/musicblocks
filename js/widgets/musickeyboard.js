@@ -853,7 +853,10 @@ class MusicKeyboard {
             removeBlock(i);
         }
 
-        const newList = this.fillChromaticGaps(sortedList);
+        const sortedHertzList = sortedList.filter(note => note.noteName === "hertz");
+        const sortedNotesList = sortedList.filter(note => note.noteName !== "hertz");
+        let newList = this.fillChromaticGaps(sortedNotesList);
+        newList = newList.concat(sortedHertzList);
 
         for (let i = 0; i < newList.length; i++) {
             this.layout.push({
@@ -1504,7 +1507,7 @@ class MusicKeyboard {
         docById("wheelDivptm").style.display = "";
         docById("wheelDivptm").style.zIndex = "300";
         const pitchLabels = ["do", "re", "mi", "fa", "sol", "la", "ti"];
-        const hertzLabels = [261, 294, 327, 348, 392, 436, 490, 523];
+        const hertzLabels = [262, 294, 327, 348, 392, 436, 490, 523];
         const VALUESLABEL = ["pitch", "hertz"];
         const VALUES = ["imgsrc: images/chime.svg", "imgsrc: images/synth.svg"];
         const valueLabel = [];
@@ -1549,8 +1552,8 @@ class MusicKeyboard {
         this._exitWheel.clickModeRotate = false;
         this._exitWheel.createWheel(["x", " "]);
 
-        const x = 100;
-        const y = 100;
+        const x = docById("addnotes").getBoundingClientRect().x;
+        const y = docById("addnotes").getBoundingClientRect().y;
 
         docById("wheelDivptm").style.position = "absolute";
         docById("wheelDivptm").style.height = "300px";
@@ -1703,15 +1706,11 @@ class MusicKeyboard {
             logo.blocks.blockList[block].connections.length - 1
         ] = belowBlock;
 
-        logo.blocks.adjustDocks(this.blockNo, true);
-        logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
-        logo.blocks.refreshCanvas();
-    }
-
-    /**
-     * @private
-     * @returns {void}
-     */
+        this._logo.blocks.adjustDocks(this.blockNo, true);
+        this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+        blocks.adjustExpandableClampBlock();
+        this._logo.blocks.refreshCanvas();
+    };
 
     _sortLayout() {
         this.layout.sort((a, b) => {

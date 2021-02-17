@@ -36,10 +36,12 @@ class PitchStaircase {
     static ICONSIZE = 32;
     static DEFAULTFREQUENCY = 220.0;
 
+    /**
+     * @constructor
+     */
     constructor() {
         this.Stairs = [];
         this.stairPitchBlocks = [];
-
         this._stepTables = [];
         this._musicRatio1 = null;
         this._musicRatio2 = null;
@@ -119,7 +121,7 @@ class PitchStaircase {
             );
             playCell.className = "headcol"; // This cell is fixed horizontally.
             playCell.setAttribute("id", i);
-
+            playCell.style.cursor = "pointer";
             const stepCell = stepTableRow.insertCell();
             stepCell.setAttribute("id", frequency);
             stepCell.style.width =
@@ -172,7 +174,6 @@ class PitchStaircase {
      */
     _undo() {
         if (this._history.length === 0) {
-            // console.debug("nothing for undo to undo");
             return false;
         }
 
@@ -224,7 +225,6 @@ class PitchStaircase {
         }
 
         if (n === this.Stairs.length) {
-            // console.debug("DID NOT FIND A MATCH " + frequency);
             return;
         }
 
@@ -351,6 +351,8 @@ class PitchStaircase {
      * @returns {void}
      */
     _playNext(index, next) {
+        if (this.closed) return;
+
         if (index === this.Stairs.length) {
             setTimeout(() => {
                 for (let i = 0; i < this.Stairs.length; i++) {
@@ -436,7 +438,6 @@ class PitchStaircase {
         let previousBlock = 0;
 
         for (let i = 0; i < this.Stairs.length; i++) {
-            // console.debug(this.Stairs[i][5] + "x" + this.Stairs[i][4] + "/" + this.Stairs[i][3]);
             const frequency = this.Stairs[i][2];
             const pitch = frequencyToPitch(frequency);
 
@@ -608,6 +609,13 @@ class PitchStaircase {
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
+        widgetWindow.onclose = () => {
+            logo.synth.setMasterVolume(0);
+            this.closed = true;
+            widgetWindow.destroy();
+        };
+
+        this.closed = false;
 
         widgetWindow.addButton(
             "play-chord.svg",

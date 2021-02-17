@@ -14,11 +14,33 @@
  * You should have received a copy of the GNU Affero General Public License along with this
  * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
  * MA 02110-1335 USA.
+ */
+
+/*
+   global _, Singer, logo, VOICENAMES, MusicBlocks, blocks, Mouse, last, instrumentsEffects,
+   NOINPUTERRORMSG
 */
+
+/*
+   Global Locations
+    js/utils/utils.js
+        _, last
+    js/turtle-singer.js
+        Singer
+    js/activity.js
+        logo, blocks
+    js/utils/synthutils.js
+        VOICENAMES, instrumentsEffects
+    js/logo.js
+        NOINPUTERRORMSG
+    js/js-export/export.js
+        MusicBlocks, Mouse
+*/
+
+/* exported setupToneActions */
 
 /**
  * Sets up all the methods related to different actions for each block in Tone palette.
- *
  * @returns {void}
  */
 function setupToneActions() {
@@ -58,10 +80,12 @@ function setupToneActions() {
                     // The electronic synthvolume will track any
                     // changes to the mater volume, e.g., the
                     // articulation block.
-                    tur.singer.synthVolume[synth] =
-                        [last(tur.singer.synthVolume["electronic synth"])];
-                    tur.singer.crescendoInitialVolume[synth] =
-                        [last(tur.singer.synthVolume["electronic synth"])];
+                    tur.singer.synthVolume[synth] = [
+                        last(tur.singer.synthVolume["electronic synth"])
+                    ];
+                    tur.singer.crescendoInitialVolume[synth] = [
+                        last(tur.singer.synthVolume["electronic synth"])
+                    ];
                 }
             }
 
@@ -70,11 +94,10 @@ function setupToneActions() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 tur.inSetTimbre = false;
                 tur.singer.instrumentNames.pop();
             };
@@ -111,11 +134,10 @@ function setupToneActions() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 tur.singer.vibratoIntensity.pop();
                 tur.singer.vibratoRate.pop();
             };
@@ -161,11 +183,10 @@ function setupToneActions() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 tur.singer.chorusRate.pop();
                 tur.singer.delayTime.pop();
                 tur.singer.chorusDepth.pop();
@@ -195,11 +216,10 @@ function setupToneActions() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 tur.singer.rate.pop();
                 tur.singer.octaves.pop();
                 tur.singer.baseFrequency.pop();
@@ -235,11 +255,10 @@ function setupToneActions() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 tur.singer.tremoloFrequency.pop();
                 tur.singer.tremoloDepth.pop();
             };
@@ -271,13 +290,10 @@ function setupToneActions() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            logo.setTurtleListener(
-                turtle, listenerName, event => tur.singer.distortionAmount.pop()
-            );
+            logo.setTurtleListener(turtle, listenerName, () => tur.singer.distortionAmount.pop());
         }
 
         /**
@@ -313,11 +329,10 @@ function setupToneActions() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 tur.singer.inHarmonic.pop();
                 tur.singer.partials.pop();
                 logo.notation.notationEndHarmonics(turtle);
@@ -348,13 +363,16 @@ function setupToneActions() {
 
             if (modulationIndex < 0) {
                 logo.errorMsg(_("The input cannot be negative."));
-                modulationIndex = -arg;
+                modulationIndex = -modulationIndex;
             }
 
             if (logo.inTimbre) {
                 logo.timbre.fmSynthParamvals["modulationIndex"] = modulationIndex;
                 logo.synth.createSynth(
-                    turtle, logo.timbre.instrumentName, "fmsynth", logo.timbre.fmSynthParamvals
+                    turtle,
+                    logo.timbre.instrumentName,
+                    "fmsynth",
+                    logo.timbre.fmSynthParamvals
                 );
 
                 logo.timbre.FMSynthesizer.push(blk);
@@ -390,7 +408,10 @@ function setupToneActions() {
             if (logo.inTimbre) {
                 logo.timbre.amSynthParamvals["harmonicity"] = harmonicity;
                 logo.synth.createSynth(
-                    turtle, logo.timbre.instrumentName, "amsynth", logo.timbre.amSynthParamvals
+                    turtle,
+                    logo.timbre.instrumentName,
+                    "amsynth",
+                    logo.timbre.amSynthParamvals
                 );
 
                 logo.timbre.AMSynthesizer.push(blk);
@@ -431,7 +452,10 @@ function setupToneActions() {
                 logo.timbre.duoSynthParamVals["vibratoRate"] = synthVibratoRate;
                 logo.timbre.duoSynthParamVals["vibratoAmount"] = synthVibratoAmount;
                 logo.synth.createSynth(
-                    turtle, logo.timbre.instrumentName, "duosynth", logo.timbre.duoSynthParamVals
+                    turtle,
+                    logo.timbre.instrumentName,
+                    "duosynth",
+                    logo.timbre.duoSynthParamVals
                 );
 
                 logo.timbre.duoSynthesizer.push(blk);

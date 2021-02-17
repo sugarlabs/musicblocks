@@ -17,11 +17,35 @@
  *
  * Utility methods are in PascalCase.
  * Action methods are in camelCase.
+ */
+
+/*
+   global Singer, DEFAULTDRUM, DRUMNAMES, last, DEFAULTVOLUME, logo, blocks, MusicBlocks, Mouse,
+   NOISENAMES, _
 */
+
+/*
+   Global Locations
+    js/utils/utils.js
+        _
+    js/turtle-singer.js
+        Singer
+    js/activity.js
+        logo, blocks
+    js/utils/synthutils.js
+        DRUMNAMES, NOISENAMES
+    js/utils/musicutils.js
+        DEFAULTDRUM
+    js/logo.js/
+        DEFAULTVOLUME
+    js/js-export/export.js
+        MusicBlocks, Mouse
+*/
+
+/* exported setupDrumActions */
 
 /**
  * Sets up all the methods related to different actions for each block in Drum palette.
- *
  * @returns {void}
  */
 function setupDrumActions() {
@@ -82,8 +106,8 @@ function setupDrumActions() {
 
                 const noteBeatValue = 4;
 
-                const __callback =
-                    () => tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
+                const __callback = () =>
+                    tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
 
                 Singer.processNote(noteBeatValue, false, blk, turtle, __callback);
             }
@@ -117,11 +141,10 @@ function setupDrumActions() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 tur.singer.drumStyle.pop();
                 tur.singer.pitchDrumTable = {};
             };
@@ -160,11 +183,10 @@ function setupDrumActions() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => tur.singer.drumStyle.pop();
+            const __listener = () => tur.singer.drumStyle.pop();
 
             logo.setTurtleListener(turtle, listenerName, __listener);
             if (logo.inRhythmRuler) {

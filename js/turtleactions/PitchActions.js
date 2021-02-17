@@ -16,17 +16,13 @@
  * MA 02110-1335 USA.
  */
 
-/**
- * Sets up all the methods related to different actions for each block in Pitch palette.
- *
- * @returns {void}
- */
-
-/*globals logo, Singer, pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, last,
-getNote, nthDegreeToPitch, SHARP, FLAT, _, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
-numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
-keySignatureToMode, getInterval, blocks, EFFECTSNAMES, NANERRORMSG, frequencyToPitch, MusicBlocks,
-Mouse, isCustom*/
+/*
+   globals logo, Singer, pitchToNumber, getStepSizeUp, getStepSizeDown, calcOctave, last, getNote,
+   nthDegreeToPitch, SHARP, FLAT, _, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
+   numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP, MUSICALMODES,
+   keySignatureToMode, getInterval, blocks, EFFECTSNAMES, NANERRORMSG, frequencyToPitch,
+   MusicBlocks, Mouse, isCustom
+*/
 
 /*
    Global locations
@@ -50,6 +46,12 @@ Mouse, isCustom*/
 */
 
 /*exported setupPitchActions*/
+
+/**
+ * Sets up all the methods related to different actions for each block in Pitch palette.
+ *
+ * @returns {void}
+ */
 function setupPitchActions() {
     Singer.PitchActions = class {
         /**
@@ -101,21 +103,27 @@ function setupPitchActions() {
                 tur.singer.lastNotePlayed = ["G4", 4];
             }
 
-            let lastNotePlayed = tur.singer.lastNotePlayed;
-            lastNotePlayed[0] = lastNotePlayed[0].slice(0, lastNotePlayed[0].length - 1);
+            const lastNotePlayed = tur.singer.lastNotePlayed;
+
+            // At this point, lastNotePlayed is a tuple of the
+            // pitchname-octave and the notevalue, e.g., ["C3", 8]
+            // We only care about the pitchname and octave.
+            let pitchName = lastNotePlayed[0].slice(0, lastNotePlayed[0].length - 1);
+            let octave = parseInt(lastNotePlayed[0].slice(lastNotePlayed[0].length - 1, lastNotePlayed[0].length));
 
             if (tur.singer.inverted) {
-                // if the last note is inverted then inverting it again to get the original note
+                // If the last note is inverted then inverting it
+                // again to get the original note
                 const delta_temp = Singer.calculateInvert(
                     logo,
                     turtle,
-                    lastNotePlayed[0],
-                    lastNotePlayed[1]
+                    pitchName,
+                    octave
                 );
                 const transposition_temp = 2 * delta_temp;
-                lastNotePlayed = getNote(
-                    lastNotePlayed[0],
-                    lastNotePlayed[1],
+                let invertedNote = getNote(
+                    pitchName,
+                    octave,
                     transposition_temp,
                     tur.singer.keySignature,
                     tur.singer.moveable,
@@ -123,13 +131,15 @@ function setupPitchActions() {
                     logo.errorMsg,
                     logo.synth.inTemperament
                 );
+                pitchName = invertedNote[0];
+                octave = invertedNote[1];
             }
 
             const noteObj = Singer.addScalarTransposition(
                 logo,
                 turtle,
-                lastNotePlayed[0],
-                parseInt(lastNotePlayed[1]),
+                pitchName,
+                octave,
                 value
             );
 

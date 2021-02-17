@@ -17,11 +17,33 @@
  *
  * Utility methods are in PascalCase.
  * Action methods are in camelCase.
+ */
+
+/*
+   global _, logo, NOINPUTERRORMSG, Singer, blocks, MUSICALMODES, MusicBlocks, Mouse, getNote,
+   getModeLength
 */
+
+/*
+   Global locations
+    js/utils/utils.js
+        _
+    js/logo.js
+        NOINPUTERRORMSG
+    js/utils/musicutils.js
+        MUSICALMODES, MODE_PIE_MENUS, getNote, getModeLength
+    js/turtle-singer.js
+        Singer
+    js/activity.js
+        blocks, logo
+    js/js-export/export.js
+        MusicBlocks, Mouse
+ */
+
+/* exported setupIntervalsActions*/
 
 /**
  * Sets up all the methods related to different actions for each block in Intervals palette.
- *
  * @returns {void}
  */
 function setupIntervalsActions() {
@@ -156,11 +178,10 @@ function setupIntervalsActions() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => {
+            const __listener = () => {
                 MUSICALMODES[modeName] = [];
                 if (tur.singer.defineMode.indexOf(0) === -1) {
                     tur.singer.defineMode.push(0);
@@ -190,7 +211,7 @@ function setupIntervalsActions() {
                 }
 
                 const cblk = logo.blocks.blockList[blk].connections[1];
-                if (logo.blocks.blockList[cblk].name === "modename") {
+                if (logo.blocks.blockList[cblk].name === "text") {
                     logo.blocks.updateBlockText(cblk);
                 }
 
@@ -228,11 +249,10 @@ function setupIntervalsActions() {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = event => tur.singer.intervals.pop();
+            const __listener = () => tur.singer.intervals.pop();
 
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
@@ -266,8 +286,7 @@ function setupIntervalsActions() {
                     logo.setDispatchBlock(blk, turtle, listenerName);
                 } else if (MusicBlocks.isRun) {
                     const mouse = Mouse.getMouseFromTurtle(tur);
-                    if (mouse !== null)
-                        mouse.MB.listeners.push(listenerName);
+                    if (mouse !== null) mouse.MB.listeners.push(listenerName);
                 }
 
                 const __listener = () => tur.singer.semitoneIntervals.pop();
