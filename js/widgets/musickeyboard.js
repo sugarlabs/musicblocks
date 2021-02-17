@@ -1417,7 +1417,8 @@ function MusicKeyboard() {
             const newBlock = this._logo.blocks.blockList.length;
 
             if (label === "pitch") {
-                for (let i = 0; i < pitchLabels.length; i++) {
+                let i;
+                for (i = 0; i < pitchLabels.length; i++) {
                     if (
                         pitchLabels[i].indexOf(last(this.layout).noteName) !== -1 ||
                         last(this.layout).noteName.indexOf(pitchLabels[i]) !== -1
