@@ -1419,9 +1419,22 @@ function MusicKeyboard() {
             if (label === "pitch") {
                 let i;
                 for (i = 0; i < pitchLabels.length; i++) {
+                    let lastNote, c = this.layout.length - 1;
+                    while(c > -1) {
+                        if (this.layout[c].noteName !== "hertz"){
+                            break;
+                        }
+                        c--;
+                    }
+                    if (this.layout[c] && this.layout[c].noteName !== "hertz"){
+                        lastNote = this.layout[c].noteName;
+                    } else {
+                        lastNote = null;
+                    }
+
                     if (
-                        pitchLabels[i].indexOf(last(this.layout).noteName) !== -1 ||
-                        last(this.layout).noteName.indexOf(pitchLabels[i]) !== -1
+                        pitchLabels[i].indexOf(lastNote) !== -1 ||
+                        lastNote.indexOf(pitchLabels[i]) !== -1
                     ) {
                         break;
                     }
@@ -1539,6 +1552,8 @@ function MusicKeyboard() {
         this.layout.sort((a, b) => {
             let aValue, bValue;
             if (a.noteName == "hertz") {
+                if (b.noteName !== "hertz")
+                    return 1;
                 aValue = a.noteOctave;
             } else {
                 aValue = noteToFrequency(
@@ -1547,6 +1562,8 @@ function MusicKeyboard() {
                 );
             }
             if (b.noteName == "hertz") {
+                if (a.noteName !== "hertz")
+                    return -1;
                 bValue = b.noteOctave;
             } else {
                 bValue = noteToFrequency(
@@ -1978,7 +1995,7 @@ function MusicKeyboard() {
         let myrowId = 0;
         let myrow2Id = 0;
 
-        let parentbl, parentbl2, el, newel, newel2, nname, elementid, elementid2;
+        let parenttbl, parenttbl2, el, newel, newel2, nname, elementid, elementid2;
         for (let p = 0; p < this.layout.length; p++) {
             // If the blockNumber is null, don't add a label.
             if (this.layout[p].noteName > FAKEBLOCKNUMBER) {
