@@ -2053,6 +2053,13 @@ class TemperamentWidget {
             pitchNumber = this.tempRatios1.length - 1;
         }
 
+        const updateNotesCircle = (index,color) => {
+            this.notesCircle.navItems[index].fillAttr = color;
+            this.notesCircle.navItems[index].sliceHoverAttr.fill = color;
+            this.notesCircle.navItems[index].slicePathAttr.fill = color;
+            this.notesCircle.navItems[index].sliceSelectedAttr.fill = color;
+        };
+
         const __playLoop = (i) => {
             let j;
             if (i === pitchNumber) {
@@ -2074,44 +2081,20 @@ class TemperamentWidget {
             }
             if (this.circleIsVisible == false && docById("wheelDiv4") == null) {
                 if (i === pitchNumber) {
-                    this.notesCircle.navItems[0].fillAttr = TemperamentWidget.DARKGREY;
-                    this.notesCircle.navItems[0].sliceHoverAttr.fill = TemperamentWidget.DARKGREY;
-                    this.notesCircle.navItems[0].slicePathAttr.fill = TemperamentWidget.DARKGREY;
-                    this.notesCircle.navItems[0].sliceSelectedAttr.fill =
-                        TemperamentWidget.DARKGREY;
+                    updateNotesCircle(0,TemperamentWidget.DARKGREY);
                 } else {
-                    this.notesCircle.navItems[i].fillAttr = TemperamentWidget.DARKGREY;
-                    this.notesCircle.navItems[i].sliceHoverAttr.fill = TemperamentWidget.DARKGREY;
-                    this.notesCircle.navItems[i].slicePathAttr.fill = TemperamentWidget.DARKGREY;
-                    this.notesCircle.navItems[i].sliceSelectedAttr.fill =
-                        TemperamentWidget.DARKGREY;
+                    updateNotesCircle(i,TemperamentWidget.DARKGREY);
                 }
 
                 if (this.playbackForward == false && i < pitchNumber) {
                     if (i === pitchNumber - 1) {
-                        this.notesCircle.navItems[0].fillAttr = TemperamentWidget.GREY;
-                        this.notesCircle.navItems[0].sliceHoverAttr.fill = TemperamentWidget.GREY;
-                        this.notesCircle.navItems[0].slicePathAttr.fill = TemperamentWidget.GREY;
-                        this.notesCircle.navItems[0].sliceSelectedAttr.fill =
-                            TemperamentWidget.GREY;
+                        updateNotesCircle(0,TemperamentWidget.GREY);
                     } else {
-                        this.notesCircle.navItems[i + 1].fillAttr = TemperamentWidget.GREY;
-                        this.notesCircle.navItems[i + 1].sliceHoverAttr.fill =
-                            TemperamentWidget.GREY;
-                        this.notesCircle.navItems[i + 1].slicePathAttr.fill =
-                            TemperamentWidget.GREY;
-                        this.notesCircle.navItems[i + 1].sliceSelectedAttr.fill =
-                            TemperamentWidget.GREY;
+                        updateNotesCircle(i + 1,TemperamentWidget.GREY);
                     }
                 } else {
                     if (i !== 0) {
-                        this.notesCircle.navItems[i - 1].fillAttr = TemperamentWidget.GREY;
-                        this.notesCircle.navItems[i - 1].sliceHoverAttr.fill =
-                            TemperamentWidget.GREY;
-                        this.notesCircle.navItems[i - 1].slicePathAttr.fill =
-                            TemperamentWidget.GREY;
-                        this.notesCircle.navItems[i - 1].sliceSelectedAttr.fill =
-                            TemperamentWidget.GREY;
+                        updateNotesCircle(i - 1,TemperamentWidget.GREY);
                     }
                 }
 
@@ -2130,42 +2113,20 @@ class TemperamentWidget {
                 }
             } else if (docById("wheelDiv4") !== null) {
                 if (i === pitchNumber) {
-                    this.wheel1.navItems[0].fillAttr = TemperamentWidget.DARKGREY;
-                    this.wheel1.navItems[0].sliceHoverAttr.fill = TemperamentWidget.DARKGREY;
-                    this.wheel1.navItems[0].slicePathAttr.fill = TemperamentWidget.DARKGREY;
-                    this.wheel1.navItems[0].sliceSelectedAttr.fill = TemperamentWidget.DARKGREY;
+                    updateNotesCircle(0,TemperamentWidget.DARKGREY);
                 } else {
-                    this.wheel1.navItems[i].fillAttr = TemperamentWidget.DARKGREY;
-                    this.wheel1.navItems[i].sliceHoverAttr.fill = TemperamentWidget.DARKGREY;
-                    this.wheel1.navItems[i].slicePathAttr.fill = TemperamentWidget.DARKGREY;
-                    this.wheel1.navItems[i].sliceSelectedAttr.fill = TemperamentWidget.DARKGREY;
+                    updateNotesCircle(i,TemperamentWidget.DARKGREY);
                 }
 
                 if (this.playbackForward == false && i < pitchNumber) {
                     if (i === pitchNumber - 1) {
-                        this.wheel1.navItems[0].fillAttr = TemperamentWidget.LIGHTGREY;
-                        this.wheel1.navItems[0].sliceHoverAttr.fill = TemperamentWidget.LIGHTGREY;
-                        this.wheel1.navItems[0].slicePathAttr.fill = TemperamentWidget.LIGHTGREY;
-                        this.wheel1.navItems[0].sliceSelectedAttr.fill =
-                            TemperamentWidget.LIGHTGREY;
+                        updateNotesCircle(0,TemperamentWidget.LIGHTGREY);
                     } else {
-                        this.wheel1.navItems[i + 1].fillAttr = TemperamentWidget.LIGHTGREY;
-                        this.wheel1.navItems[i + 1].sliceHoverAttr.fill =
-                            TemperamentWidget.LIGHTGREY;
-                        this.wheel1.navItems[i + 1].slicePathAttr.fill =
-                            TemperamentWidget.LIGHTGREY;
-                        this.wheel1.navItems[i + 1].sliceSelectedAttr.fill =
-                            TemperamentWidget.LIGHTGREY;
+                        updateNotesCircle(i + 1,TemperamentWidget.LIGHTGREY);
                     }
                 } else {
                     if (i !== 0) {
-                        this.wheel1.navItems[i - 1].fillAttr = TemperamentWidget.LIGHTGREY;
-                        this.wheel1.navItems[i - 1].sliceHoverAttr.fill =
-                            TemperamentWidget.LIGHTGREY;
-                        this.wheel1.navItems[i - 1].slicePathAttr.fill =
-                            TemperamentWidget.LIGHTGREY;
-                        this.wheel1.navItems[i - 1].sliceSelectedAttr.fill =
-                            TemperamentWidget.LIGHTGREY;
+                        updateNotesCircle(i - 1,TemperamentWidget.LIGHTGREY);
                     }
                 }
 
@@ -2198,40 +2159,20 @@ class TemperamentWidget {
                             '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
                         if (i !== -1) {
                             if (this.circleIsVisible == false && docById("wheelDiv4") == null) {
-                                this.notesCircle.navItems[i - 1].fillAttr = TemperamentWidget.GREY;
-                                this.notesCircle.navItems[i - 1].sliceHoverAttr.fill =
-                                    TemperamentWidget.GREY;
-                                this.notesCircle.navItems[i - 1].slicePathAttr.fill =
-                                    TemperamentWidget.GREY;
-                                this.notesCircle.navItems[i - 1].sliceSelectedAttr.fill =
-                                    TemperamentWidget.GREY;
+                                updateNotesCircle(i - 1,TemperamentWidget.GREY);
                                 if (i == 11) {
                                     //on completion of a full circle and on hitting '0' note in clockwise direction
-                                    this.notesCircle.navItems[0].fillAttr = TemperamentWidget.GREY;
-                                    this.notesCircle.navItems[0].sliceHoverAttr.fill =
-                                        TemperamentWidget.GREY;
-                                    this.notesCircle.navItems[0].slicePathAttr.fill =
-                                        TemperamentWidget.GREY;
-                                    this.notesCircle.navItems[0].sliceSelectedAttr.fill =
-                                        TemperamentWidget.GREY;
+                                    updateNotesCircle(0,TemperamentWidget.GREY);
                                 } else if (i < 11) {
                                     //in case of counter-clockwise direction, i.e., when this.playbackForward = false
-                                    this.notesCircle.navItems[i + 1].fillAttr =
-                                        TemperamentWidget.GREY;
-                                    this.notesCircle.navItems[i + 1].sliceHoverAttr.fill =
-                                        TemperamentWidget.GREY;
-                                    this.notesCircle.navItems[i + 1].slicePathAttr.fill =
-                                        TemperamentWidget.GREY;
-                                    this.notesCircle.navItems[i + 1].sliceSelectedAttr.fill =
-                                        TemperamentWidget.GREY;
+                                    updateNotesCircle(i + 1,TemperamentWidget.GREY);
                                 }
                                 this.notesCircle.refreshWheel();
                             } else if (
                                 this.circleIsVisible == true &&
                                 docById("wheelDiv4") == null
                             ) {
-                                j = i - 1;
-                                docById("pitchNumber_" + j).style.background =
+                                docById("pitchNumber_" + (i - 1)).style.background =
                                     platformColor.selectorBackground;
                             } else if (docById("wheelDiv4") !== null) {
                                 this.wheel1.navItems[i - 1].fillAttr = TemperamentWidget.LIGHTGREY;
