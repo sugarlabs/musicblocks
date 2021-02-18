@@ -2777,6 +2777,7 @@ function MusicKeyboard() {
 
                 if (k !== (j + 1) % 12) {
                     // Fill in the gaps
+                    j = j % 12;
                     for (let l = j + 1; l < k; l++) {
                         if (l % 12 === 0) {
                             lastOctave += 1;
