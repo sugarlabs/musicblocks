@@ -70,17 +70,10 @@ function setupRhythmActions() {
                 if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < tur.singer.pickup) {
                     beatValue = measureValue = 0;
                 } else {
-<<<<<<< HEAD
-                    let beat = tur.singer.noteValuePerBeat * (
-                        tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] - tur.singer.pickup
-                    );
-                    beatValue = 1 + beat % tur.singer.beatsPerMeasure;
-=======
                     const beat =
                         tur.singer.noteValuePerBeat *
                         (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] - tur.singer.pickup);
                     beatValue = 1 + (beat % tur.singer.beatsPerMeasure);
->>>>>>> upstream/master
                     measureValue = 1 + Math.floor(beat / tur.singer.beatsPerMeasure);
                 }
 
@@ -92,13 +85,9 @@ function setupRhythmActions() {
                  * Put the childFlow into the queue before the beat action so logo the beat action is
                  * at the end of the FILO.
                  * Note: The offbeat cannot be Beat 1.
-<<<<<<< HEAD
-                */
-                let turtleID = tur.id;
-=======
+
                  */
                 const turtleID = tur.id;
->>>>>>> upstream/master
 
                 if (tur.singer.beatList.indexOf("everybeat") !== -1) {
                     _enqueue();
@@ -142,20 +131,11 @@ function setupRhythmActions() {
             if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
-<<<<<<< HEAD
-                let mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
-            }
-
-            let __listener = event => {
-=======
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
             const __listener = () => {
->>>>>>> upstream/master
                 if (tur.singer.multipleVoices) {
                     logo.notation.notationVoices(turtle, tur.singer.inNoteBlock.length);
                 }
@@ -254,22 +234,12 @@ function setupRhythmActions() {
             if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
-<<<<<<< HEAD
-                let mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
-            }
-
-            let __listener = event => {
-                let currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
-=======
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
             const __listener = () => {
                 const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
->>>>>>> upstream/master
                 tur.singer.beatFactor *= currentDotFactor;
                 tur.singer.dotCount -= value >= 0 ? value : 1 / value;
                 let newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
@@ -301,20 +271,12 @@ function setupRhythmActions() {
             if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
-<<<<<<< HEAD
-                let mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
-            }
-
-            let __listener = event => {
-=======
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
             const __listener = () => {
->>>>>>> upstream/master
+
                 tur.singer.tie = false;
 
                 // If tieCarryOver > 0, we have one more note to play
@@ -363,16 +325,10 @@ function setupRhythmActions() {
                         saveBlk,
                         turtle
                     );
-<<<<<<< HEAD
-                    let bpmFactor =
-                        TONEBPM / tur.singer.bpm.length > 0 ?
-                            last(tur.singer.bpm) : Singer.masterBPM;
-=======
                     const bpmFactor =
                         TONEBPM / tur.singer.bpm.length > 0
                             ? last(tur.singer.bpm)
                             : Singer.masterBPM;
->>>>>>> upstream/master
 
                     // Wait until this note is played before continuing
                     tur.doWait(bpmFactor / noteValue);
@@ -418,20 +374,11 @@ function setupRhythmActions() {
             if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
-<<<<<<< HEAD
-                let mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
-            }
-
-            let __listener = event => tur.singer.beatFactor *= factor;
-=======
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
             const __listener = () => (tur.singer.beatFactor *= factor);
->>>>>>> upstream/master
 
             logo.setTurtleListener(turtle, listenerName, __listener);
         }
@@ -463,20 +410,11 @@ function setupRhythmActions() {
             if (blk !== undefined && blk in blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
-<<<<<<< HEAD
-                let mouse = Mouse.getMouseFromTurtle(tur);
-                if (mouse !== null)
-                    mouse.MB.listeners.push(listenerName);
-            }
-
-            let __listener = event => {
-=======
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
             const __listener = () => {
->>>>>>> upstream/master
                 if (!tur.singer.suppressOutput) {
                     tur.singer.swingTarget.pop();
                     tur.singer.swing.pop();

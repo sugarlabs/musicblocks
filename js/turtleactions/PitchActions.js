@@ -193,24 +193,7 @@ function setupPitchActions() {
                 return noteObj;
             };
 
-            let len = tur.singer.lastNotePlayed[0].length;
-
-            let noteObj = Singer.addScalarTransposition(
-                logo,
-                turtle,
-                tur.singer.lastNotePlayed[0].slice(0, len - 1),
-                parseInt(tur.singer.lastNotePlayed[0].slice(len - 1)),
-                value
-            );
-
-            let delta = 0;
-            if (!(tur.singer.invertList.length === 0)) {
-                delta += Singer.calculateInvert(logo, turtle, noteObj[0], noteObj[1]);
-            }
-
-            let transposition = 2 * delta + logo.turtles.ithTurtle(turtle).transposition;
-
-            let noteObj1 = addPitch(noteObj[0], noteObj[1], 0);
+            const noteObj1 = addPitch(noteObj[0], noteObj[1], 0);
             // Only apply the transposition to the base note of an interval
             transposition = 0;
 

@@ -317,7 +317,6 @@ const processLilypondNotes = function (lilypond, logo, turtle) {
                             for (let j = n + 1; j < 7; j++) {
                                 modeDef += "(" + j + " . ,NATURAL) ";
                             }
-                        }
 
                             modeDef += ")\n";
                             // console.debug(modeDef);
