@@ -1427,55 +1427,41 @@ class PhraseMaker {
             __selectionChanged(true);
         };
 
+        let labelLength;
         if (condition === "graphicsblocks") {
             if (blockLabel === "forward" || blockLabel === "back") {
-                for (let i = 0; i < forwardBackLabel.length; i++) {
-                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
-                }
+                labelLength = forwardBackLabel.length;
             } else if (blockLabel === "right" || blockLabel === "left") {
-                for (let i = 0; i < leftRightLabel.length; i++) {
-                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
-                }
+                labelLength = leftRightLabel.length;
             } else if (blockLabel === "setheading") {
-                for (let i = 0; i < setHeadingLabel.length; i++) {
-                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
-                }
+                labelLength = setHeadingLabel.length;
             } else if (blockLabel === "setpensize") {
-                for (let i = 0; i < setPenSizeLabel.length; i++) {
-                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
-                }
+                labelLength = setPenSizeLabel.length;
             } else {
-                for (let i = 0; i < setLabel.length; i++) {
-                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
-                }
+                labelLength = setLabel.length;
             }
         } else if (condition === "synthsblocks") {
-            for (let i = 0; i < valueLabel.length; i++) {
-                this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
-            }
+            labelLength = valueLabel.length;
+        }
+
+        for (let i = 0; i < labelLength; i++) {
+            this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
         }
 
         if (condition === "graphicsblocks") {
             if (blockLabel === "forward" || blockLabel === "back") {
-                for (let i = 0; i < blockLabelsGraphics.length; i++) {
-                    this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
-                }
+                labelLength = blockLabelsGraphics.length;
             } else if (blockLabel === "right" || blockLabel === "left") {
-                for (let i = 0; i < blockLabelsGraphics.length; i++) {
-                    this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
-                }
+                labelLength = blockLabelsGraphics.length;
             } else if (blockLabel === "setheading") {
-                for (let i = 0; i < blockLabelsGraphics.length; i++) {
-                    this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
-                }
+                labelLength = blockLabelsGraphics.length;
             } else if (blockLabel === "setpensize") {
-                for (let i = 0; i < blockLabelsPen.length; i++) {
-                    this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
-                }
+                labelLength = blockLabelsPen.length;
             } else {
-                for (let i = 0; i < blockLabelsPen.length; i++) {
-                    this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
-                }
+                labelLength = blockLabelsPen.length;
+            }
+            for (let i = 0; i < labelLength; i++) {
+                this._blockLabelsWheel.navItems[i].navigateFunction = __selectionChanged;
             }
         }
     }
@@ -2209,24 +2195,26 @@ class PhraseMaker {
             exportLabel = exportRow.insertCell();
 
             drumName = getDrumName(this.rowLabels[i]);
+            const fontsize1 = Math.floor(this._cellScale * 14) + "px";
+            const fontsize2 = Math.floor(this._cellScale * 12) + "px";
             if (drumName != null) {
                 exportLabel.innerHTML = _(drumName);
-                exportLabel.style.fontSize = Math.floor(this._cellScale * 14) + "px";
+                exportLabel.style.fontSize = fontsize1;
             } else if (this.rowLabels[i].slice(0, 4) === "http") {
                 exportLabel.innerHTML = this.rowLabels[i];
-                exportLabel.style.fontSize = Math.floor(this._cellScale * 14) + "px";
+                exportLabel.style.fontSize = fontsize1;
             } else if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
                 exportLabel.innerHTML = this.rowArgs[i];
-                exportLabel.style.fontSize = Math.floor(this._cellScale * 14) + "px";
+                exportLabel.style.fontSize = fontsize1;
             } else if (MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1) {
                 blockLabel = logo.blocks.protoBlockDict[this.rowLabels[i]]["staticLabels"][0];
                 exportLabel.innerHTML = blockLabel + "<br>" + this.rowArgs[i];
-                exportLabel.style.fontSize = Math.floor(this._cellScale * 12) + "px";
+                exportLabel.style.fontSize = fontsize2;
             } else if (MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1) {
                 blockLabel = logo.blocks.protoBlockDict[this.rowLabels[i]]["staticLabels"][0];
                 exportLabel.innerHTML =
                     blockLabel + "<br>" + this.rowArgs[i][0] + " " + this.rowArgs[i][1];
-                exportLabel.style.fontSize = Math.floor(this._cellScale * 12) + "px";
+                exportLabel.style.fontSize = fontsize2;
             } else {
                 if (noteIsSolfege(this.rowLabels[i])) {
                     exportLabel.innerHTML =
@@ -4018,27 +4006,25 @@ class PhraseMaker {
     }
 
     _playChord(notes, noteValue) {
+        let notesIndex = 0;
         setTimeout(() => {
-            logo.synth.trigger(0, notes[0], noteValue, this._instrumentName, null, null);
+            logo.synth.trigger(0, notes[notesIndex], noteValue, this._instrumentName, null, null);
         }, 1);
 
         if (notes.length > 1) {
-            setTimeout(() => {
-                logo.synth.trigger(0, notes[1], noteValue, this._instrumentName, null, null);
-            }, 1);
+            notesIndex = 1;
         }
 
         if (notes.length > 2) {
-            setTimeout(() => {
-                logo.synth.trigger(0, notes[2], noteValue, this._instrumentName, null, null);
-            }, 1);
+            notesIndex = 2;
         }
 
         if (notes.length > 3) {
-            setTimeout(() => {
-                logo.synth.trigger(0, notes[3], noteValue, this._instrumentName, null, null);
-            }, 1);
+            notesIndex = 3;
         }
+        setTimeout(() => {
+            logo.synth.trigger(0, notes[notesIndex], noteValue, this._instrumentName, null, null);
+        }, 1);
     }
 
     _processGraphics(obj) {
