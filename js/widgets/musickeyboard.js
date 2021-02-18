@@ -19,7 +19,8 @@ function MusicKeyboard() {
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
     // Mapping between keycodes and virtual keyboard
-    const BLACKKEYS = [87, 69, 82, 84, 89, 85, 73, 79];
+    const BLACKKEYS = [81, 87, 69, 82, 84, 89, 85, 73, 79, 80];
+    const HERTZKEYS = [49, 50, 51, 52, 53, 54, 55, 56, 57, 48];
     const WHITEKEYS = [65, 83, 68, 70, 71, 72, 74, 75, 76];
     const SPACE = 32;
 
@@ -133,7 +134,11 @@ function MusicKeyboard() {
                 id = "whiteRow" + i.toString();
             } else if (BLACKKEYS.indexOf(event.keyCode) !== -1) {
                 i = BLACKKEYS.indexOf(event.keyCode);
+                if ([2, 6, 9, 13, 16, 20].indexOf(i) !== -1) return;
                 id = "blackRow" + i.toString();
+            } else if (HERTZKEYS.indexOf(event.keyCode) !== -1) {
+                i = HERTZKEYS.indexOf(event.keyCode);
+                id = "hertzRow" + i.toString();
             } else if (SPACE == event.keyCode) {
                 id = "rest";
             }
@@ -207,7 +212,11 @@ function MusicKeyboard() {
                 id = "whiteRow" + i.toString();
             } else if (BLACKKEYS.indexOf(event.keyCode) !== -1) {
                 i = BLACKKEYS.indexOf(event.keyCode);
+                if ([2, 6, 9, 13, 16, 20].indexOf(i) !== -1) return;
                 id = "blackRow" + i.toString();
+            } else if (HERTZKEYS.indexOf(event.keyCode) !== -1) {
+                i = HERTZKEYS.indexOf(event.keyCode);
+                id = "hertzRow" + i.toString();
             } else if (SPACE == event.keyCode) {
                 id = "rest";
             }
@@ -2007,6 +2016,7 @@ function MusicKeyboard() {
         this.idContainer = [];
         let myrowId = 0;
         let myrow2Id = 0;
+        let myrow3Id = 0;
 
         let parenttbl, parenttbl2, el, newel, newel2, nname, elementid, elementid2;
         for (let p = 0; p < this.displayLayout.length; p++) {
@@ -2064,9 +2074,9 @@ function MusicKeyboard() {
                     this.displayLayout[p].blockNumber
                 ]);
                 newel.innerHTML =
-                    "<small>(" +
+                    (myrowId < WHITEKEYS.length? "<small>(" +
                     String.fromCharCode(WHITEKEYS[myrowId]) +
-                    ")</small><br/>" +
+                    ")</small><br/>": "") +
                     this.displayLayout[p].voice;
 
                 this.displayLayout[p].objId = "whiteRow" + myrowId.toString();
@@ -2079,7 +2089,7 @@ function MusicKeyboard() {
                 parenttbl = document.getElementById("myrow");
                 newel = document.createElement("td");
                 newel.style.textAlign = "center";
-                newel.setAttribute("id", "whiteRow" + myrowId.toString());
+                newel.setAttribute("id", "hertzRow" + myrow3Id.toString());
                 newel.setAttribute(
                     "alt",
                     this.displayLayout[p].noteName +
@@ -2089,18 +2099,18 @@ function MusicKeyboard() {
                         this.displayLayout[p].blockNumber
                 );
                 this.idContainer.push([
-                    "whiteRow" + myrowId.toString(),
+                    "hertzRow" + myrow3Id.toString(),
                     this.displayLayout[p].blockNumber
                 ]);
                 newel.innerHTML =
-                    "<small>(" +
-                    String.fromCharCode(WHITEKEYS[myrowId]) +
-                    ")</small><br/>" +
+                    (myrow3Id < HERTZKEYS.length? "<small>(" +
+                    String.fromCharCode(HERTZKEYS[myrow3Id]) +
+                    ")</small><br/>": "") +
                     this.displayLayout[p].noteOctave;
 
-                this.displayLayout[p].objId = "whiteRow" + myrowId.toString();
+                this.displayLayout[p].objId = "hertzRow" + myrow3Id.toString();
 
-                myrowId++;
+                myrow3Id++;
                 newel.style.position = "relative";
                 newel.style.zIndex = "100";
                 parenttbl.appendChild(newel);
@@ -2138,22 +2148,12 @@ function MusicKeyboard() {
                 ]);
 
                 nname = this.displayLayout[p].noteName.replace(SHARP, "").replace("#", "");
-                if (this.displayLayout[p].blockNumber > FAKEBLOCKNUMBER) {
-                } else if (SOLFEGENAMES.indexOf(nname) !== -1) {
-                    newel2.innerHTML =
-                        "<small>(" +
-                        String.fromCharCode(BLACKKEYS[myrow2Id]) +
-                        ")</small><br/>" +
-                        i18nSolfege(nname) +
-                        SHARP +
-                        this.displayLayout[p].noteOctave;
+                if (this.displayLayout[p].blockNumber < FAKEBLOCKNUMBER) {
                 } else {
                     newel2.innerHTML =
-                        "<small>(" +
+                        (myrow2Id < BLACKKEYS.length? "<small>(" +
                         String.fromCharCode(BLACKKEYS[myrow2Id]) +
-                        ")</small><br/>" +
-                        this.displayLayout[p].noteName +
-                        this.displayLayout[p].noteOctave;
+                        ")</small><br/>": "");
                 }
 
                 this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
@@ -2243,16 +2243,16 @@ function MusicKeyboard() {
                 if (this.displayLayout[p].blockNumber > FAKEBLOCKNUMBER) {
                 } else if (SOLFEGENAMES.indexOf(this.displayLayout[p].noteName) !== -1) {
                     newel.innerHTML =
-                        "<small>(" +
+                        (myrowId < WHITEKEYS.length? "<small>(" +
                         String.fromCharCode(WHITEKEYS[myrowId]) +
-                        ")</small><br/>" +
+                        ")</small><br/>": "") +
                         i18nSolfege(this.displayLayout[p].noteName) +
                         this.displayLayout[p].noteOctave;
                 } else {
                     newel.innerHTML =
-                        "<small>(" +
+                        (myrowId < WHITEKEYS.length? "<small>(" +
                         String.fromCharCode(WHITEKEYS[myrowId]) +
-                        ")</small><br/>" +
+                        ")</small><br/>": "") +
                         this.displayLayout[p].noteName +
                         this.displayLayout[p].noteOctave;
                 }
