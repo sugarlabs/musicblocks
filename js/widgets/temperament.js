@@ -37,6 +37,9 @@ class TemperamentWidget {
     static INNERWINDOWWIDTH = 600;
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
+    static LIGHTGREY = "#e0e0e0";
+    static GREY = "#c8c8c8";
+    static DARKGREY = "#808080";
 
     /**
      * @constructor
@@ -367,7 +370,7 @@ class TemperamentWidget {
             const sliceAngle = [];
             const angleDiff = [];
             for (let i = 0; i < this.notesCircle.navItemCount; i++) {
-                this.notesCircle.navItems[i].fillAttr = "#c8C8C8";
+                this.notesCircle.navItems[i].fillAttr = TemperamentWidget.GREY;
                 this.notesCircle.navItems[i].titleAttr.font =
                     "20 20px Impact, Charcoal, sans-serif";
                 this.notesCircle.navItems[i].titleSelectedAttr.font =
@@ -1051,10 +1054,11 @@ class TemperamentWidget {
                 docById("userEdit").innerHTML = '<div id="wheelDiv2" class="wheelNav"></div>';
                 this.createMainWheel(this.tempRatios, pitchNumber);
                 for (let i = 0; i < pitchNumber; i++) {
-                    this.notesCircle.navItems[i].fillAttr = "#e0e0e0";
-                    this.notesCircle.navItems[i].sliceHoverAttr.fill = "#e0e0e0";
-                    this.notesCircle.navItems[i].slicePathAttr.fill = "#e0e0e0";
-                    this.notesCircle.navItems[i].sliceSelectedAttr.fill = "#e0e0e0";
+                    this.notesCircle.navItems[i].fillAttr = TemperamentWidget.LIGHTGREY;
+                    this.notesCircle.navItems[i].sliceHoverAttr.fill = TemperamentWidget.LIGHTGREY;
+                    this.notesCircle.navItems[i].slicePathAttr.fill = TemperamentWidget.LIGHTGREY;
+                    this.notesCircle.navItems[i].sliceSelectedAttr.fill =
+                        TemperamentWidget.LIGHTGREY;
                 }
                 this.notesCircle.refreshWheel();
                 docById("userEdit").style.paddingLeft = "0px";
@@ -1222,10 +1226,11 @@ class TemperamentWidget {
                 docById("userEdit").innerHTML = '<div id="wheelDiv2" class="wheelNav"></div>';
                 this.createMainWheel(this.tempRatios, pitchNumber);
                 for (let i = 0; i < pitchNumber; i++) {
-                    this.notesCircle.navItems[i].fillAttr = "#e0e0e0";
-                    this.notesCircle.navItems[i].sliceHoverAttr.fill = "#e0e0e0";
-                    this.notesCircle.navItems[i].slicePathAttr.fill = "#e0e0e0";
-                    this.notesCircle.navItems[i].sliceSelectedAttr.fill = "#e0e0e0";
+                    this.notesCircle.navItems[i].fillAttr = TemperamentWidget.LIGHTGREY;
+                    this.notesCircle.navItems[i].sliceHoverAttr.fill = TemperamentWidget.LIGHTGREY;
+                    this.notesCircle.navItems[i].slicePathAttr.fill = TemperamentWidget.LIGHTGREY;
+                    this.notesCircle.navItems[i].sliceSelectedAttr.fill =
+                        TemperamentWidget.LIGHTGREY;
                 }
                 this.notesCircle.refreshWheel();
                 docById("userEdit").style.paddingLeft = "0px";
@@ -1338,7 +1343,7 @@ class TemperamentWidget {
             const angle = [];
             const angleDiff = [];
             for (let i = 0; i < this.wheel1.navItemCount; i++) {
-                this.wheel1.navItems[i].fillAttr = "#e0e0e0";
+                this.wheel1.navItems[i].fillAttr = TemperamentWidget.LIGHTGREY;
                 this.wheel1.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
                 this.wheel1.navItems[i].titleSelectedAttr.font =
                     "20 20px Impact, Charcoal, sans-serif";
@@ -1425,7 +1430,7 @@ class TemperamentWidget {
             this.wheel.slicePathCustom.maxRadiusPercent = 1.0;
             this.wheel.sliceSelectedPathCustom = this.wheel.slicePathCustom;
             this.wheel.sliceInitPathCustom = this.wheel.slicePathCustom;
-            this.wheel.colors = ["#c0c0c0", "#e0e0e0"];
+            this.wheel.colors = ["#c0c0c0", TemperamentWidget.LIGHTGREY];
             this.wheel.titleRotateAngle = 90;
             this.wheel.navItemsEnabled = false;
 
@@ -2069,35 +2074,44 @@ class TemperamentWidget {
             }
             if (this.circleIsVisible == false && docById("wheelDiv4") == null) {
                 if (i === pitchNumber) {
-                    this.notesCircle.navItems[0].fillAttr = "#808080";
-                    this.notesCircle.navItems[0].sliceHoverAttr.fill = "#808080";
-                    this.notesCircle.navItems[0].slicePathAttr.fill = "#808080";
-                    this.notesCircle.navItems[0].sliceSelectedAttr.fill = "#808080";
+                    this.notesCircle.navItems[0].fillAttr = TemperamentWidget.DARKGREY;
+                    this.notesCircle.navItems[0].sliceHoverAttr.fill = TemperamentWidget.DARKGREY;
+                    this.notesCircle.navItems[0].slicePathAttr.fill = TemperamentWidget.DARKGREY;
+                    this.notesCircle.navItems[0].sliceSelectedAttr.fill =
+                        TemperamentWidget.DARKGREY;
                 } else {
-                    this.notesCircle.navItems[i].fillAttr = "#808080";
-                    this.notesCircle.navItems[i].sliceHoverAttr.fill = "#808080";
-                    this.notesCircle.navItems[i].slicePathAttr.fill = "#808080";
-                    this.notesCircle.navItems[i].sliceSelectedAttr.fill = "#808080";
+                    this.notesCircle.navItems[i].fillAttr = TemperamentWidget.DARKGREY;
+                    this.notesCircle.navItems[i].sliceHoverAttr.fill = TemperamentWidget.DARKGREY;
+                    this.notesCircle.navItems[i].slicePathAttr.fill = TemperamentWidget.DARKGREY;
+                    this.notesCircle.navItems[i].sliceSelectedAttr.fill =
+                        TemperamentWidget.DARKGREY;
                 }
 
                 if (this.playbackForward == false && i < pitchNumber) {
                     if (i === pitchNumber - 1) {
-                        this.notesCircle.navItems[0].fillAttr = "#c8C8C8";
-                        this.notesCircle.navItems[0].sliceHoverAttr.fill = "#c8C8C8";
-                        this.notesCircle.navItems[0].slicePathAttr.fill = "#c8C8C8";
-                        this.notesCircle.navItems[0].sliceSelectedAttr.fill = "#c8C8C8";
+                        this.notesCircle.navItems[0].fillAttr = TemperamentWidget.GREY;
+                        this.notesCircle.navItems[0].sliceHoverAttr.fill = TemperamentWidget.GREY;
+                        this.notesCircle.navItems[0].slicePathAttr.fill = TemperamentWidget.GREY;
+                        this.notesCircle.navItems[0].sliceSelectedAttr.fill =
+                            TemperamentWidget.GREY;
                     } else {
-                        this.notesCircle.navItems[i + 1].fillAttr = "#c8C8C8";
-                        this.notesCircle.navItems[i + 1].sliceHoverAttr.fill = "#c8C8C8";
-                        this.notesCircle.navItems[i + 1].slicePathAttr.fill = "#c8C8C8";
-                        this.notesCircle.navItems[i + 1].sliceSelectedAttr.fill = "#c8C8C8";
+                        this.notesCircle.navItems[i + 1].fillAttr = TemperamentWidget.GREY;
+                        this.notesCircle.navItems[i + 1].sliceHoverAttr.fill =
+                            TemperamentWidget.GREY;
+                        this.notesCircle.navItems[i + 1].slicePathAttr.fill =
+                            TemperamentWidget.GREY;
+                        this.notesCircle.navItems[i + 1].sliceSelectedAttr.fill =
+                            TemperamentWidget.GREY;
                     }
                 } else {
                     if (i !== 0) {
-                        this.notesCircle.navItems[i - 1].fillAttr = "#c8C8C8";
-                        this.notesCircle.navItems[i - 1].sliceHoverAttr.fill = "#c8C8C8";
-                        this.notesCircle.navItems[i - 1].slicePathAttr.fill = "#c8C8C8";
-                        this.notesCircle.navItems[i - 1].sliceSelectedAttr.fill = "#c8C8C8";
+                        this.notesCircle.navItems[i - 1].fillAttr = TemperamentWidget.GREY;
+                        this.notesCircle.navItems[i - 1].sliceHoverAttr.fill =
+                            TemperamentWidget.GREY;
+                        this.notesCircle.navItems[i - 1].slicePathAttr.fill =
+                            TemperamentWidget.GREY;
+                        this.notesCircle.navItems[i - 1].sliceSelectedAttr.fill =
+                            TemperamentWidget.GREY;
                     }
                 }
 
@@ -2116,35 +2130,42 @@ class TemperamentWidget {
                 }
             } else if (docById("wheelDiv4") !== null) {
                 if (i === pitchNumber) {
-                    this.wheel1.navItems[0].fillAttr = "#808080";
-                    this.wheel1.navItems[0].sliceHoverAttr.fill = "#808080";
-                    this.wheel1.navItems[0].slicePathAttr.fill = "#808080";
-                    this.wheel1.navItems[0].sliceSelectedAttr.fill = "#808080";
+                    this.wheel1.navItems[0].fillAttr = TemperamentWidget.DARKGREY;
+                    this.wheel1.navItems[0].sliceHoverAttr.fill = TemperamentWidget.DARKGREY;
+                    this.wheel1.navItems[0].slicePathAttr.fill = TemperamentWidget.DARKGREY;
+                    this.wheel1.navItems[0].sliceSelectedAttr.fill = TemperamentWidget.DARKGREY;
                 } else {
-                    this.wheel1.navItems[i].fillAttr = "#808080";
-                    this.wheel1.navItems[i].sliceHoverAttr.fill = "#808080";
-                    this.wheel1.navItems[i].slicePathAttr.fill = "#808080";
-                    this.wheel1.navItems[i].sliceSelectedAttr.fill = "#808080";
+                    this.wheel1.navItems[i].fillAttr = TemperamentWidget.DARKGREY;
+                    this.wheel1.navItems[i].sliceHoverAttr.fill = TemperamentWidget.DARKGREY;
+                    this.wheel1.navItems[i].slicePathAttr.fill = TemperamentWidget.DARKGREY;
+                    this.wheel1.navItems[i].sliceSelectedAttr.fill = TemperamentWidget.DARKGREY;
                 }
 
                 if (this.playbackForward == false && i < pitchNumber) {
                     if (i === pitchNumber - 1) {
-                        this.wheel1.navItems[0].fillAttr = "#e0e0e0";
-                        this.wheel1.navItems[0].sliceHoverAttr.fill = "#e0e0e0";
-                        this.wheel1.navItems[0].slicePathAttr.fill = "#e0e0e0";
-                        this.wheel1.navItems[0].sliceSelectedAttr.fill = "#e0e0e0";
+                        this.wheel1.navItems[0].fillAttr = TemperamentWidget.LIGHTGREY;
+                        this.wheel1.navItems[0].sliceHoverAttr.fill = TemperamentWidget.LIGHTGREY;
+                        this.wheel1.navItems[0].slicePathAttr.fill = TemperamentWidget.LIGHTGREY;
+                        this.wheel1.navItems[0].sliceSelectedAttr.fill =
+                            TemperamentWidget.LIGHTGREY;
                     } else {
-                        this.wheel1.navItems[i + 1].fillAttr = "#e0e0e0";
-                        this.wheel1.navItems[i + 1].sliceHoverAttr.fill = "#e0e0e0";
-                        this.wheel1.navItems[i + 1].slicePathAttr.fill = "#e0e0e0";
-                        this.wheel1.navItems[i + 1].sliceSelectedAttr.fill = "#e0e0e0";
+                        this.wheel1.navItems[i + 1].fillAttr = TemperamentWidget.LIGHTGREY;
+                        this.wheel1.navItems[i + 1].sliceHoverAttr.fill =
+                            TemperamentWidget.LIGHTGREY;
+                        this.wheel1.navItems[i + 1].slicePathAttr.fill =
+                            TemperamentWidget.LIGHTGREY;
+                        this.wheel1.navItems[i + 1].sliceSelectedAttr.fill =
+                            TemperamentWidget.LIGHTGREY;
                     }
                 } else {
                     if (i !== 0) {
-                        this.wheel1.navItems[i - 1].fillAttr = "#e0e0e0";
-                        this.wheel1.navItems[i - 1].sliceHoverAttr.fill = "#e0e0e0";
-                        this.wheel1.navItems[i - 1].slicePathAttr.fill = "#e0e0e0";
-                        this.wheel1.navItems[i - 1].sliceSelectedAttr.fill = "#e0e0e0";
+                        this.wheel1.navItems[i - 1].fillAttr = TemperamentWidget.LIGHTGREY;
+                        this.wheel1.navItems[i - 1].sliceHoverAttr.fill =
+                            TemperamentWidget.LIGHTGREY;
+                        this.wheel1.navItems[i - 1].slicePathAttr.fill =
+                            TemperamentWidget.LIGHTGREY;
+                        this.wheel1.navItems[i - 1].sliceSelectedAttr.fill =
+                            TemperamentWidget.LIGHTGREY;
                     }
                 }
 
@@ -2177,24 +2198,32 @@ class TemperamentWidget {
                             '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
                         if (i !== -1) {
                             if (this.circleIsVisible == false && docById("wheelDiv4") == null) {
-                                this.notesCircle.navItems[i - 1].fillAttr = "#c8C8C8";
-                                this.notesCircle.navItems[i - 1].sliceHoverAttr.fill = "#c8C8C8";
-                                this.notesCircle.navItems[i - 1].slicePathAttr.fill = "#c8C8C8";
-                                this.notesCircle.navItems[i - 1].sliceSelectedAttr.fill = "#c8C8C8";
+                                this.notesCircle.navItems[i - 1].fillAttr = TemperamentWidget.GREY;
+                                this.notesCircle.navItems[i - 1].sliceHoverAttr.fill =
+                                    TemperamentWidget.GREY;
+                                this.notesCircle.navItems[i - 1].slicePathAttr.fill =
+                                    TemperamentWidget.GREY;
+                                this.notesCircle.navItems[i - 1].sliceSelectedAttr.fill =
+                                    TemperamentWidget.GREY;
                                 if (i == 11) {
                                     //on completion of a full circle and on hitting '0' note in clockwise direction
-                                    this.notesCircle.navItems[0].fillAttr = "#c8C8C8";
-                                    this.notesCircle.navItems[0].sliceHoverAttr.fill = "#c8C8C8";
-                                    this.notesCircle.navItems[0].slicePathAttr.fill = "#c8C8C8";
-                                    this.notesCircle.navItems[0].sliceSelectedAttr.fill = "#c8C8C8";
+                                    this.notesCircle.navItems[0].fillAttr = TemperamentWidget.GREY;
+                                    this.notesCircle.navItems[0].sliceHoverAttr.fill =
+                                        TemperamentWidget.GREY;
+                                    this.notesCircle.navItems[0].slicePathAttr.fill =
+                                        TemperamentWidget.GREY;
+                                    this.notesCircle.navItems[0].sliceSelectedAttr.fill =
+                                        TemperamentWidget.GREY;
                                 } else if (i < 11) {
                                     //in case of counter-clockwise direction, i.e., when this.playbackForward = false
-                                    this.notesCircle.navItems[i + 1].fillAttr = "#c8C8C8";
+                                    this.notesCircle.navItems[i + 1].fillAttr =
+                                        TemperamentWidget.GREY;
                                     this.notesCircle.navItems[i + 1].sliceHoverAttr.fill =
-                                        "#c8C8C8";
-                                    this.notesCircle.navItems[i + 1].slicePathAttr.fill = "#c8C8C8";
+                                        TemperamentWidget.GREY;
+                                    this.notesCircle.navItems[i + 1].slicePathAttr.fill =
+                                        TemperamentWidget.GREY;
                                     this.notesCircle.navItems[i + 1].sliceSelectedAttr.fill =
-                                        "#c8C8C8";
+                                        TemperamentWidget.GREY;
                                 }
                                 this.notesCircle.refreshWheel();
                             } else if (
@@ -2205,10 +2234,13 @@ class TemperamentWidget {
                                 docById("pitchNumber_" + j).style.background =
                                     platformColor.selectorBackground;
                             } else if (docById("wheelDiv4") !== null) {
-                                this.wheel1.navItems[i - 1].fillAttr = "#e0e0e0";
-                                this.wheel1.navItems[i - 1].sliceHoverAttr.fill = "#e0e0e0";
-                                this.wheel1.navItems[i - 1].slicePathAttr.fill = "#e0e0e0";
-                                this.wheel1.navItems[i - 1].sliceSelectedAttr.fill = "#e0e0e0";
+                                this.wheel1.navItems[i - 1].fillAttr = TemperamentWidget.LIGHTGREY;
+                                this.wheel1.navItems[i - 1].sliceHoverAttr.fill =
+                                    TemperamentWidget.LIGHTGREY;
+                                this.wheel1.navItems[i - 1].slicePathAttr.fill =
+                                    TemperamentWidget.LIGHTGREY;
+                                this.wheel1.navItems[i - 1].sliceSelectedAttr.fill =
+                                    TemperamentWidget.LIGHTGREY;
                                 this.wheel1.refreshWheel();
                             }
                         }
