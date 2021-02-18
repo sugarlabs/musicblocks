@@ -20,15 +20,17 @@ class PitchStaircase{
     static ICONSIZE = 32;
     static DEFAULTFREQUENCY = 220.0;
 
-    constructor(){
+    /**
+     * @constructor
+     */
+    constructor() {
         this.Stairs = [];
         this.stairPitchBlocks = [];
-
         this._stepTables = [];
         this._musicRatio1 = null;
         this._musicRatio2 = null;
     }
-    
+
 
     _addButton (row, icon, iconSize, label) {
         let cell = row.insertCell(-1);
@@ -93,8 +95,8 @@ class PitchStaircase{
             let playCell = this._addButton(stepTableRow, "play-button.svg", PitchStaircase.ICONSIZE, _("Play"));
             playCell.className = "headcol"; // This cell is fixed horizontally.
             playCell.setAttribute("id", i);
-
-            let stepCell = stepTableRow.insertCell();
+            playCell.style.cursor = "pointer";
+            const stepCell = stepTableRow.insertCell();
             stepCell.setAttribute("id", frequency);
             stepCell.style.width =
                 (PitchStaircase.INNERWINDOWWIDTH * parseFloat(PitchStaircase.DEFAULTFREQUENCY / frequency) * this._cellScale) /
@@ -140,7 +142,6 @@ class PitchStaircase{
 
     _undo () {
         if (this._history.length === 0) {
-            console.debug("nothing for undo to undo");
             return false;
         }
 
@@ -187,7 +188,6 @@ class PitchStaircase{
         }
 
         if (n === this.Stairs.length) {
-            console.debug("DID NOT FIND A MATCH " + frequency);
             return;
         }
 
@@ -198,7 +198,7 @@ class PitchStaircase{
         let repeatStep = false;
         let isStepDeleted = true;
 
-        
+
         for (let i = 0; i < this.Stairs.length; i++) {
             if (this.Stairs[i][2] < parseFloat(frequency) / inputNum) {
                 this.Stairs.splice(i, 0, [
@@ -292,7 +292,15 @@ class PitchStaircase{
         this._playNext(this.Stairs.length - 2, -1);
     };
 
-    _playNext (index, next) {
+    /**
+     * @private
+     * @param {number} index
+     * @param {number} next
+     * @returns {void}
+     */
+    _playNext(index, next) {
+        if (this.closed) return;
+
         if (index === this.Stairs.length) {
             setTimeout(() => {
                 for (let i = 0; i < this.Stairs.length; i++) {
@@ -353,12 +361,8 @@ class PitchStaircase{
         let previousBlock = 0;
 
         for (let i = 0; i < this.Stairs.length; i++) {
-            console.debug(this.Stairs[i][5] + "x" + this.Stairs[i][4] + "/" + this.Stairs[i][3]);
-            let noteobj = frequencyToPitch(this.Stairs[i][2]);
-            let note = this.Stairs[i][0];
-            let octave = this.Stairs[i][1];
-            let frequency = this.Stairs[i][2];
-            let pitch = frequencyToPitch(frequency);
+            const frequency = this.Stairs[i][2];
+            const pitch = frequencyToPitch(frequency);
 
             // If cents === 0, then output a pitch block; otherwise,
             // output a hertz block <-- initial frequency x numerator
@@ -485,6 +489,13 @@ class PitchStaircase{
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
+        widgetWindow.onclose = () => {
+            logo.synth.setMasterVolume(0);
+            this.closed = true;
+            widgetWindow.destroy();
+        };
+
+        this.closed = false;
 
         widgetWindow.addButton("play-chord.svg", PitchStaircase.ICONSIZE, _("Play chord")).onclick = () => {
             this._playAll();

@@ -2,8 +2,6 @@ name: Linter
 
 # Triggers the workflow on push or pull request events only for the master branch
 on:
-  push:
-    branches: [master]
   pull_request:
     branches: [master]
 
@@ -12,8 +10,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+<<<<<<< HEAD
       # Checks-out repository under $GITHUB_WORKSPACE, so job can access it
       - uses: actions/checkout@v2
+=======
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Fetch branches
+        run: |
+          git fetch --no-tags --depth=1 origin ${{ github.base_ref }}
+          git fetch ${{ github.repositoryUrl }} ${{ github.base_ref }}:${{ github.base_ref }}
+          git checkout -b ${{ github.head_ref }}
+
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Get changed files
+        id: getfile
+        run: |
+          echo "::set-output name=files::$(git diff --name-status $(git merge-base ${{ github.head_ref }} ${{ github.base_ref }}) | xargs)"
+
+      - name: Install ESLint
+        run: npm install eslint
+>>>>>>> upstream/master
 
       # Runs the linter
       # - name: Super-Linter

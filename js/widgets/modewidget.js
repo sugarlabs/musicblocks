@@ -907,7 +907,9 @@ class ModeWidget {
         // And save a stack of pitchnumbers to be used with the define mode
         newStack = [
             [0, "definemode", 150, 120, [null, 1, 3, 2]],
-            [1, ["modename", { value: modeName }], 0, 0, [0]],
+            [1, ["text", {
+                value: modeName
+            }], 0, 0, [0]],
             [2, "hidden", 0, 0, [0, null]]
         ];
         endOfStackIdx = 0;

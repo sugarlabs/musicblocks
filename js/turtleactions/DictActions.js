@@ -19,9 +19,30 @@
  * Action methods are in camelCase.
  */
 
+/* global _, Turtle, turtles, Singer, getNote, logo, INVALIDPITCH, pitchToNumber, getTargetTurtle */
+
+/*
+   Global Locations
+    js/utils/utils.js
+        _
+    js/turtle.js
+        Turtle
+    js/activity.js
+        turtles, logo
+    js/turtle-singer.js
+        Singer
+    js/utils/musicutils.js
+        getNote, pitchToNumber
+    js/logo.js
+        INVALIDPITCH
+    js/blocks/EnsembleBlocks.js
+        getTargetTurtle
+*/
+
+/* exported setupDictActions */
+
 /**
  * Sets up all the methods related to different actions for each block in Dictionary palette.
- *
  * @returns {void}
  */
 function setupDictActions() {
@@ -33,9 +54,10 @@ function setupDictActions() {
          * @param {Number} target - target Turtle index in turtle.turtleList
          * @param {Number} turtle - Turtle index in turtle.turtleList
          * @param {String} key - key
+         * @param {Number?} blk - block index in blocks.blockList
          * @returns {String|Number}
          */
-        static _GetDict(target, turtle, key) {
+        static _GetDict(target, turtle, key, blk) {
             const targetTur = turtles.ithTurtle(target);
 
             // This is the internal turtle dictionary that includes the turtle status.
@@ -81,7 +103,6 @@ function setupDictActions() {
                         logo.synth.inTemperament
                     );
                 } else {
-                    console.debug("Cannot find a note for mouse " + target);
                     logo.errorMsg(INVALIDPITCH, blk);
                     obj = ["G", 4];
                 }
@@ -90,10 +111,12 @@ function setupDictActions() {
                     pitchToNumber(obj[0], obj[1], targetTur.singer.keySignature) -
                     targetTur.singer.pitchNumberOffset
                 );
-            } else if (target in logo.turtleDicts &&
-                       target in logo.turtleDicts[target] &&
-                       key in logo.turtleDicts[target][target]) {
-                    return logo.turtleDicts[target][target][key];
+            } else if (
+                target in logo.turtleDicts &&
+                target in logo.turtleDicts[target] &&
+                key in logo.turtleDicts[target][target]
+            ) {
+                return logo.turtleDicts[target][target][key];
             } else {
                 if (target in logo.turtleDicts[turtle]) {
                     return logo.turtleDicts[turtle][target][key];
@@ -240,15 +263,16 @@ function setupDictActions() {
          * @param {String|Number} dict - dictionary name
          * @param {String|Number} key
          * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number?} blk - block index in blocks.blockList
          * @returns {String|Number}
          */
-        static getValue(dict, key, turtle) {
+        static getValue(dict, key, turtle, blk) {
             // Not sure this can happen.
             if (!(turtle in logo.turtleDicts)) return 0;
             // Is the dictionary the same as a turtle name?
             const target = getTargetTurtle(turtles, dict);
             if (target !== null) {
-                return Turtle.DictActions._GetDict(target, turtle, key);
+                return Turtle.DictActions._GetDict(target, turtle, key, blk);
             } else if (!(dict in logo.turtleDicts[turtle])) {
                 return 0;
             }

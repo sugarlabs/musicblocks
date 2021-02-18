@@ -1820,10 +1820,10 @@ msgid "Mr. Mouse"
 msgstr "ミスター・マウス"
 
 #: js/rubrics.js:497
-#: js/lilypond.js:20
-#: js/lilypond.js:973
-#: js/lilypond.js:979
-#: js/lilypond.js:1026
+#: js/lilypond.js:601
+#: js/lilypond.js:900
+#: js/lilypond.js:906
+#: js/lilypond.js:944
 msgid "mouse"
 msgstr "ネズミ"
 
@@ -1840,47 +1840,47 @@ msgstr "ちゅうい：おとのながさは ２より おおきいです"
 msgid "synth cannot play chords."
 msgstr "この シンセでは わおんが できません。"
 
-#: js/lilypond.js:21
+#: js/lilypond.js:602
 msgid "brown rat"
 msgstr "ちゃいろの ドブネズミ"
 
-#: js/lilypond.js:22
+#: js/lilypond.js:603
 msgid "mole"
 msgstr "もぐら"
 
-#: js/lilypond.js:23
+#: js/lilypond.js:604
 msgid "chipmunk"
 msgstr "リス"
 
-#: js/lilypond.js:24
+#: js/lilypond.js:605
 msgid "red squirrel"
 msgstr "あかいリス"
 
-#: js/lilypond.js:25
+#: js/lilypond.js:606
 msgid "guinea pig"
 msgstr "ギニーピッグ"
 
-#: js/lilypond.js:26
+#: js/lilypond.js:607
 msgid "capybara"
 msgstr "カピバラ"
 
-#: js/lilypond.js:27
+#: js/lilypond.js:608
 msgid "coypu"
 msgstr "ヌートリア"
 
-#: js/lilypond.js:28
+#: js/lilypond.js:609
 msgid "black rat"
 msgstr "くろいねずみ"
 
-#: js/lilypond.js:29
+#: js/lilypond.js:610
 msgid "grey squirrel"
 msgstr "はいいろの リス"
 
-#: js/lilypond.js:30
+#: js/lilypond.js:611
 msgid "flying squirrel"
 msgstr "モモンガ"
 
-#: js/lilypond.js:31
+#: js/lilypond.js:612
 msgid "bat"
 msgstr "こうもり"
 

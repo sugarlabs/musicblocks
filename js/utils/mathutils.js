@@ -15,6 +15,18 @@
  * MA 02110-1335 USA.
  */
 
+/*
+   global SOLFEGENAMES
+ */
+
+/*
+   Global location
+    js/utils/musicutils.js
+        SOLFEGENAMES
+ */
+
+/* exported MathUtility */
+
 /**
  * Utility class for managing math operations.
  *

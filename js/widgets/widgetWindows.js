@@ -21,8 +21,8 @@ window.widgetWindows = { openWindows: {}, _posCache: {} };
 
 class WidgetWindow {
     /**
-     * @param {string} key 
-     * @param {string} title 
+     * @param {string} key
+     * @param {string} title
      */
     constructor(key, title) {
         // Keep a refernce to the object within handlers
@@ -78,8 +78,8 @@ class WidgetWindow {
 
     /**
      * @private
-     * @param {string} base 
-     * @param {string} className 
+     * @param {string} base
+     * @param {string} className
      * @param {HTMLElement} parent
      * @returns {HTMLElement}
      */
@@ -97,11 +97,16 @@ class WidgetWindow {
     _createUIelements() {
         const windows = docById("floatingWindows");
         this._frame = this._create("div", "windowFrame", windows);
-
+        this._overlayframe = this._create("div", "windowFrame", windows);
         this._drag = this._create("div", "wfTopBar", this._frame);
         this._handle = this._create("div", "wfHandle", this._drag);
         // The handle needs the events bound as it's a sibling of the dragging div
         // not a relative in either direciton.
+
+        this._drag.ondblclick = () => {
+            this._maximize();
+        };
+
         this._drag.onmousedown = this._handle.onmousedown = (e) => {
             this._dragging = true;
             if (this._maximized) {
@@ -182,6 +187,65 @@ class WidgetWindow {
 
     /**
      * @private
+     * @param {MouseEvent} e
+     * @returns {void}
+     */
+    _docMouseMoveHandler(e) {
+        if (!this._dragging) return;
+
+        if (this._frame.style.top === "64px") {
+            this._overlayframe.style.zIndex = "1";
+            this._overlayframe.style.width = "100vw";
+            this._overlayframe.style.height = "calc(100vh - 64px)";
+            this._overlayframe.style.left = "0";
+            this._overlayframe.style.top = "64px";
+            this._overlayframe.style.border = "0.25vw solid black";
+            this._frame.style.zIndex = "10";
+            this._overlayframe.style.backgroundColor = "rgba(255,255,255,0.75)";
+        } else {
+            this._frame.style.zIndex = "1";
+            this._overlayframe.style.backgroundColor = "rgba(255,255,255,0)";
+            this._overlayframe.style.border = "0px";
+            this._overlayframe.style.zIndex = "-1";
+        }
+        const x = e.clientX - this._dx,
+            y = e.clientY - this._dy;
+
+        this.setPosition(x, y);
+    }
+
+    /**
+     * @private
+     * @param {MouseEvent} e
+     * @returns {void}
+     */
+    _docMouseDownHandler(e) {
+        if (e.target === this._frame || this._frame.contains(e.target)) {
+            this._frame.style.opacity = "1";
+            this._frame.style.zIndex = "1";
+        } else {
+            this._frame.style.opacity = ".7";
+            this._frame.style.zIndex = "0";
+        }
+    }
+
+    /**
+     * @private
+     * @param {MouseEvent} e
+     * @returns {void}
+     */
+    _dragTopHandler(e) {
+        this._dragging = false;
+        if (this._frame.style.top === "64px") {
+            this._maximize();
+            this.takeFocus();
+            this.onmaximize();
+            e.preventDefault();
+        }
+    }
+
+    /**
+     * @private
      * @returns {void}
      */
     _setupLanguage() {
@@ -190,7 +254,6 @@ class WidgetWindow {
             language = navigator.language;
         }
 
-        console.debug("language setting is " + language);
         // For Japanese, put the toolbar on the top.
         if (language === "ja") {
             this._body.style.flexDirection = "column";
@@ -204,8 +267,8 @@ class WidgetWindow {
 
     /**
      * @public
-     * @param {string} initial 
-     * @param {HTMLElement} parent 
+     * @param {string} initial
+     * @param {HTMLElement} parent
      * @returns {HTMLElement}
      */
     addInputButton(initial, parent) {
@@ -216,11 +279,11 @@ class WidgetWindow {
 
     /**
      * @public
-     * @param {number} initial 
-     * @param {HTMLElement} parent 
-     * @param {number} min 
-     * @param {number} max 
-     * @param {string} classNm 
+     * @param {number} initial
+     * @param {HTMLElement} parent
+     * @param {number} min
+     * @param {number} max
+     * @param {string} classNm
      * @returns {HTMLElement}
      */
     addRangeSlider(initial, parent, min, max, classNm) {
@@ -266,10 +329,10 @@ class WidgetWindow {
 
     /**
      * @public
-     * @param {number} index 
-     * @param {string} icon 
-     * @param {number} iconSize 
-     * @param {string} label 
+     * @param {number} index
+     * @param {string} icon
+     * @param {number} iconSize
+     * @param {string} label
      * @returns {HTMLElement}
      */
     modifyButton(index, icon, iconSize, label) {
@@ -323,11 +386,11 @@ class WidgetWindow {
 
     /**
      * @public
-     * @param {*} icon 
-     * @param {*} iconSize 
-     * @param {*} label 
+     * @param {*} icon
+     * @param {*} iconSize
+     * @param {*} label
      * @param {HTMLElement} parent
-     * @returns {HTMLElement} 
+     * @returns {HTMLElement}
      */
     addButton(icon, iconSize, label, parent) {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
@@ -434,6 +497,7 @@ class WidgetWindow {
      */
     destroy() {
         this._frame.remove();
+        this._overlayframe.remove();
         window.widgetWindows.openWindows[this._key] = undefined;
     }
 
@@ -454,8 +518,8 @@ class WidgetWindow {
 
     /**
      * @public
-     * @param {number} x 
-     * @param {number} y 
+     * @param {number} x
+     * @param {number} y
      * @returns {WidgetWindow} this
      */
     setPosition(x, y) {
@@ -505,10 +569,10 @@ class WidgetWindow {
 }
 
 /**
- * 
- * @param {Object} widget 
- * @param {string} title 
- * @param {string} saveAs 
+ *
+ * @param {Object} widget
+ * @param {string} title
+ * @param {string} saveAs
  * @returns {WidgetWindow} this
  */
 window.widgetWindows.windowFor = (widget, title, saveAs) => {
@@ -538,7 +602,7 @@ window.widgetWindows.clear = (name) => {
 /**
  * @public
  * @param {string} name
- * @returns {boolean} 
+ * @returns {boolean}
  */
 window.widgetWindows.isOpen = (name) => {
     return window.widgetWindows.openWindows[name] ? true : "";
@@ -556,7 +620,7 @@ window.widgetWindows.hideAllWindows = () => {
 
 /**
  * @public
- * @param {string} name 
+ * @param {string} name
  */
 window.widgetWindows.hideWindow = (name) => {
     const win = window.widgetWindows.openWindows[name];

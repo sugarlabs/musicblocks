@@ -99,7 +99,7 @@ function setupDictBlocks() {
             const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
             const k = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
 
-            return Turtle.DictActions.getValue(a, k, turtle);
+            return Turtle.DictActions.getValue(a, k, turtle, blk);
         }
     }
 
@@ -166,7 +166,7 @@ function setupDictBlocks() {
             const a = turtles.ithTurtle(turtle).name;
             const k = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
 
-            return Turtle.DictActions.getValue(a, k, turtle);
+            return Turtle.DictActions.getValue(a, k, turtle, blk);
         }
     }
 

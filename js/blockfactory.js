@@ -11,6 +11,13 @@
 
 // Borrowing loosely from tasprite_factory.py in the Python version.
 
+/* global platformColor */
+/* Global Locations
+    js/utils/platformstyle.js
+        platformColor
+*/
+/* exported SVG */
+
 class SVG {
     // Interface to the graphical representation of blocks, turtles,
     // palettes, etc. on screen.
@@ -26,6 +33,9 @@ class SVG {
     //     inner blocks are attached
     // else -- optional second `arm' for if-then-else blocks
 
+    /**
+     * @constructor
+     */
     constructor() {
         this._x = 0;
         this._y = 0;
