@@ -71,7 +71,7 @@ class PhraseMaker {
     constructor() {
         this._stopOrCloseClicked = false;
         this._instrumentName = DEFAULTVOICE;
-
+        this.isInitial = true;
         this.paramsEffects = {
             doVibrato: false,
             doDistortion: false,
@@ -679,9 +679,11 @@ class PhraseMaker {
             this.sorted = false;
         }
 
-        logo.textMsg(_("Click on the table to add notes."));
-
-        this.widgetWindow.sendToCenter();
+        if(this.isInitial){
+            logo.textMsg(_("Click on the table to add notes."));
+            this.widgetWindow.sendToCenter();
+            this.isInitial = false;
+        }
     }
 
     _createAddRowPieSubmenu() {
