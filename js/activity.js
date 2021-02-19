@@ -1540,9 +1540,9 @@ function Activity() {
                 _hideBass();
                 break;
             default:
-                console.log("Blank Grid");     
+                console.log("Blank Grid");
         }
-        
+
         switch(turtles.gridWheel.selectedNavItemIndex){
             case 1:
                 this._showCartesian();

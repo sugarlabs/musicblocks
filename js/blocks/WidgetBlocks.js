@@ -551,7 +551,7 @@ function setupWidgetBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("Upload a sample or record a sample with the mic."),
+                _("Upload a sample and adjust its pitch center."),
                 "documentation",
                 null,
                 "sampler"

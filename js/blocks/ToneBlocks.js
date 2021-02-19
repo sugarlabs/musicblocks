@@ -654,7 +654,7 @@ function setupToneBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("Import a sound file to use as an instrument."),
+                _("Import a sound file to use as an instrument and set its pitch center."),
                 "documentation",
                 null,
                 "turtleshell"
@@ -722,7 +722,7 @@ function setupToneBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("Upload an audiofile to use."),
+                _("Upload a sound file to connect with the sample block."),
                 "documentation",
                 ""
             ]);
