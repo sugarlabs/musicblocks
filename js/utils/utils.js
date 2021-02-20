@@ -443,11 +443,11 @@ function processPluginData(
     // Plugins are JSON-encoded dictionaries.
     // console.debug(pluginData);
     const obj = JSON.parse(pluginData);
-
     // Create a palette entry.
-    let newPalette = false;
+    let newPalette = false, paletteName;
     if ("PALETTEPLUGINS" in obj) {
         for (const name in obj["PALETTEPLUGINS"]) {
+            paletteName = name;
             PALETTEICONS[name] = obj["PALETTEPLUGINS"][name];
             let fillColor = "#ff0066";
             if ("PALETTEFILLCOLORS" in obj) {
@@ -501,6 +501,8 @@ function processPluginData(
             } else {
                 console.debug("adding palette " + name);
                 palettes.add(name);
+                if (MULTIPALETTES[2].indexOf(name) === -1)
+                    MULTIPALETTES[2].push(name);
                 newPalette = true;
             }
         }
@@ -623,8 +625,8 @@ function processPluginData(
         }
     }
 
-    console.debug("updating palette " + name);
-    palettes.updatePalettes(name);
+    console.debug("updating palette " + paletteName);
+    palettes.updatePalettes(paletteName);
 
     setTimeout(() => {
         palettes.show();
