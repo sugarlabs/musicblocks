@@ -134,7 +134,7 @@ Programmers, please follow these general
 Music Blocks is being built from the ground-up, to address several architectural problems with this
 run. Since Music Blocks is a fork of Turtle Blocks JS, musical functionality was added on top of it.
 However, music is fundamental to Music Blocks. Besides, the Turtle Blocks JS started initially with
-handful of features, and was written without a complex architecture. As Music Blocks got built on
+a handful of features and was written without a complex architecture. As Music Blocks got built on
 top of that, it got incrementally complex, but the architecture remained simple, thus resulting in a
 monolith. Also, the functionality is tightly coupled with the interface and native client API (Web
 API).
