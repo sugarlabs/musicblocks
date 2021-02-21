@@ -102,12 +102,12 @@ Looking for a block? Find it in the
 The core functionality for Music Blocks resides in the [`js/` directory](./js/). Individual
 modules are described in more detail in [js/README.md](./js/README.md).
 
-**NOTE:** As for any changes, please make your own copy by cloning this
+**NOTE:** As for any changes, please make your copy by cloning this
 [repository](https://github.com/sugarlabs/musicblocks.git). Make your changes, test them, and then
 make a pull request.
 
 See [Contributing Code](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md)
-to get a general idea about this organizations guidelines. See [Contributing](#CONTRIBUTING)
+for a general idea about this organizations guidelines. See [Contributing](#CONTRIBUTING)
 section for specific details about this repository.
 
 ## <a name="REPORTING_BUGS"></a>Reporting Bugs
@@ -134,7 +134,7 @@ Programmers, please follow these general
 Music Blocks is being built from the ground-up, to address several architectural problems with this
 run. Since Music Blocks is a fork of Turtle Blocks JS, musical functionality was added on top of it.
 However, music is fundamental to Music Blocks. Besides, the Turtle Blocks JS started initially with
-handful of features, and was written without a complex architecture. As Music Blocks got built on
+a handful of features and was written without a complex architecture. As Music Blocks got built on
 top of that, it got incrementally complex, but the architecture remained simple, thus resulting in a
 monolith. Also, the functionality is tightly coupled with the interface and native client API (Web
 API).
