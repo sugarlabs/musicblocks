@@ -8,17 +8,99 @@
 // You should have received a copy of the GNU Affero General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+/*globals pluginObjs, jQuery, PALETTEICONS, PALETTEFILLCOLORS, PALETTESTROKECOLORS,
+PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS, FB, MULTIPALETTES, platformColor, pluginsImages,
+doSave*/
+
+/*
+    Global locations
+    - js/activity.js
+        pluginObjs, pluginsImages, doSave
+    - js/artwork.js
+        PALETTEICONS, PALETTEFILLCOLORS, PALETTESTROKECOLORS, PALETTEHIGHLIGHTCOLORS,
+        HIGHLIGHTSTROKECOLORS
+    - js/turtledefs.js
+        MULTIPALETTES
+    - js/utils/platformstyle.js
+        platformColor
+*/
+
+/*exported changeImage, format, canvasPixelRatio, windowHeight, windowWidth,
+  httpGet, httpPost, HttpRequest, doBrowserCheck, docByClass, docByTagName,
+  docByName, docBySelector, last, doSVG, isSVGEmpty, getTextWidth, fileExt,
+  fileBasename, toTitleCase, processRawPluginData, preparePluginExports,
+  processMacroData, prepareMacroExports, doPublish, doUseCamera, doStopVideoCam,
+  hideDOMLabel, displayMsg, safeSVG, toFixed2, mixedNumber, rationalSum,
+  nearestBeat, oneHundredToFraction, rgbToHex, hexToRGB, hex2rgb, delayExecution,
+  closeWidgets, closeBlkWidgets, importMembers*/
+
+/* eslint-disable no-console */
+
 const changeImage = (imgElement, from, to) => {
-    oldSrc = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(from)));
-    newSrc = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(to)));
+    const oldSrc = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(from)));
+    const newSrc = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(to)));
     if (imgElement.src === oldSrc) {
         imgElement.src = newSrc;
     }
 };
 
+function _(text) {
+    if (text === null) {
+        console.debug("null string passed to _");
+        return "";
+    }
+
+    let replaced = text;
+    const replace = [
+        ",",
+        "(",
+        ")",
+        "?",
+        "¿",
+        "<",
+        ">",
+        ".",
+        "\n",
+        '"',
+        ":",
+        "%s",
+        "%d",
+        "/",
+        "'",
+        ";",
+        "×",
+        "!",
+        "¡"
+    ];
+    for (let p = 0; p < replace.length; p++) {
+        replaced = replaced.replace(replace[p], "");
+    }
+
+    replaced = replaced.replace(/ /g, "-");
+
+    if (localStorage.kanaPreference === "kana") {
+        const lang = document.webL10n.getLanguage();
+        if (lang === "ja") {
+            replaced = "kana-" + replaced;
+        }
+    }
+
+    try {
+        let translation = document.webL10n.get(replaced);
+        if (translation === "") {
+            translation = text;
+        }
+        return translation;
+    } catch (e) {
+        console.debug("i18n error: " + text);
+        return text;
+    }
+}
+
 function format(str, data) {
     str = str.replace(/{([a-zA-Z0-9.]*)}/g, (match, name) => {
-        x = data;
+        let x = data;
         name.split(".").forEach((v) => {
             if (x === undefined) {
                 console.debug("Undefined value in template string", str, name, x, v);
@@ -126,14 +208,13 @@ function HttpRequest(url, loadCallback, userCallback) {
 }
 
 function doBrowserCheck() {
-    let matched, browser;
     jQuery.uaMatch = (ua) => {
         ua = ua.toLowerCase();
 
         const match =
-            /(chrome)[ \/]([\w.]+)/.exec(ua) ||
-            /(webkit)[ \/]([\w.]+)/.exec(ua) ||
-            /(opera)(?:.*version|)[ \/]([\w.]+)/.exec(ua) ||
+            /(chrome)[ /]([\w.]+)/.exec(ua) ||
+            /(webkit)[ /]([\w.]+)/.exec(ua) ||
+            /(opera)(?:.*version|)[ /]([\w.]+)/.exec(ua) ||
             /(msie) ([\w.]+)/.exec(ua) ||
             (ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua)) ||
             [];
@@ -144,8 +225,8 @@ function doBrowserCheck() {
         };
     };
 
-    matched = jQuery.uaMatch(navigator.userAgent);
-    browser = {};
+    const matched = jQuery.uaMatch(navigator.userAgent);
+    const browser = {};
 
     if (matched.browser) {
         browser[matched.browser] = true;
@@ -167,6 +248,7 @@ window.onload = function () {
     const userAgent = window.navigator.userAgent;
     // For IE 10 or older
     const MSIE = userAgent.indexOf("MSIE ");
+    let DetectVersionOfIE;
     if (MSIE > 0) {
         DetectVersionOfIE = parseInt(
             userAgent.substring(MSIE + 5, userAgent.indexOf(".", MSIE)),
@@ -313,119 +395,11 @@ function fileBasename(file) {
     }
 }
 
-function _(text) {
-    if (text === null) {
-        console.debug("null string passed to _");
-        return "";
-    }
-
-    let replaced = text;
-    const replace = [
-        ",",
-        "(",
-        ")",
-        "?",
-        "¿",
-        "<",
-        ">",
-        ".",
-        "\n",
-        '"',
-        ":",
-        "%s",
-        "%d",
-        "/",
-        "'",
-        ";",
-        "×",
-        "!",
-        "¡"
-    ];
-    for (let p = 0; p < replace.length; p++) {
-        replaced = replaced.replace(replace[p], "");
-    }
-
-    replaced = replaced.replace(/ /g, "-");
-
-    if (localStorage.kanaPreference === "kana") {
-        const lang = document.webL10n.getLanguage();
-        if (lang === "ja") {
-            replaced = "kana-" + replaced;
-        }
-    }
-
-    try {
-        let translation = document.webL10n.get(replaced);
-        if (translation === "") {
-            translation = text;
-        }
-        return translation;
-    } catch (e) {
-        console.debug("i18n error: " + text);
-        return text;
-    }
-}
-
 function toTitleCase(str) {
     if (typeof str !== "string") return;
     let tempStr = "";
     if (str.length > 1) tempStr = str.substring(1);
     return str.toUpperCase()[0] + tempStr;
-}
-
-function processRawPluginData(
-    rawData,
-    palettes,
-    blocks,
-    errorMsg,
-    evalFlowDict,
-    evalArgDict,
-    evalParameterDict,
-    evalSetterDict,
-    evalOnStartList,
-    evalOnStopList,
-    evalMacroDict
-) {
-    // console.debug(rawData);
-    const lineData = rawData.split("\n");
-    let cleanData = "";
-
-    // We need to remove blank lines and comments and then
-    // join the data back together for processing as JSON.
-    for (let i = 0; i < lineData.length; i++) {
-        if (lineData[i].length === 0) {
-            continue;
-        }
-
-        if (lineData[i][0] === "/") {
-            continue;
-        }
-
-        cleanData += lineData[i];
-    }
-
-    // Note to plugin developers: You may want to comment out this
-    // try/catch while debugging your plugin.
-    let obj;
-    try {
-        obj = processPluginData(
-            cleanData.replace(/\n/g, ""),
-            palettes,
-            blocks,
-            evalFlowDict,
-            evalArgDict,
-            evalParameterDict,
-            evalSetterDict,
-            evalOnStartList,
-            evalOnStopList,
-            evalMacroDict
-        );
-    } catch (e) {
-        obj = null;
-        errorMsg("Error loading plugin: " + e);
-    }
-
-    return obj;
 }
 
 function processPluginData(
@@ -443,11 +417,12 @@ function processPluginData(
     // Plugins are JSON-encoded dictionaries.
     // console.debug(pluginData);
     const obj = JSON.parse(pluginData);
-
     // Create a palette entry.
-    let newPalette = false;
+    let newPalette = false,
+        paletteName;
     if ("PALETTEPLUGINS" in obj) {
         for (const name in obj["PALETTEPLUGINS"]) {
+            paletteName = name;
             PALETTEICONS[name] = obj["PALETTEPLUGINS"][name];
             let fillColor = "#ff0066";
             if ("PALETTEFILLCOLORS" in obj) {
@@ -501,6 +476,7 @@ function processPluginData(
             } else {
                 console.debug("adding palette " + name);
                 palettes.add(name);
+                if (MULTIPALETTES[2].indexOf(name) === -1) MULTIPALETTES[2].push(name);
                 newPalette = true;
             }
         }
@@ -623,14 +599,69 @@ function processPluginData(
         }
     }
 
-    console.debug("updating palette " + name);
-    palettes.updatePalettes(name);
+    console.debug("updating palette " + paletteName);
+    palettes.updatePalettes(paletteName);
 
     setTimeout(() => {
         palettes.show();
     }, 2000);
 
     // Return the object in case we need to save it to local storage.
+    return obj;
+}
+
+function processRawPluginData(
+    rawData,
+    palettes,
+    blocks,
+    errorMsg,
+    evalFlowDict,
+    evalArgDict,
+    evalParameterDict,
+    evalSetterDict,
+    evalOnStartList,
+    evalOnStopList,
+    evalMacroDict
+) {
+    // console.debug(rawData);
+    const lineData = rawData.split("\n");
+    let cleanData = "";
+
+    // We need to remove blank lines and comments and then
+    // join the data back together for processing as JSON.
+    for (let i = 0; i < lineData.length; i++) {
+        if (lineData[i].length === 0) {
+            continue;
+        }
+
+        if (lineData[i][0] === "/") {
+            continue;
+        }
+
+        cleanData += lineData[i];
+    }
+
+    // Note to plugin developers: You may want to comment out this
+    // try/catch while debugging your plugin.
+    let obj;
+    try {
+        obj = processPluginData(
+            cleanData.replace(/\n/g, ""),
+            palettes,
+            blocks,
+            evalFlowDict,
+            evalArgDict,
+            evalParameterDict,
+            evalSetterDict,
+            evalOnStartList,
+            evalOnStopList,
+            evalMacroDict
+        );
+    } catch (e) {
+        obj = null;
+        errorMsg("Error loading plugin: " + e);
+    }
+
     return obj;
 }
 
@@ -762,6 +793,14 @@ function doUseCamera(args, turtles, turtle, isVideo, cameraID, setCameraID, erro
         errorMsg("Your browser does not support the webcam");
     }
 
+    function draw() {
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext("2d").drawImage(video, 0, 0, w, h);
+        const data = canvas.toDataURL("image/png");
+        turtles.turtleList[turtle].doShowImage(args[0], data);
+    }
+
     if (!hasSetupCamera) {
         navigator.getMedia(
             { video: true, audio: false },
@@ -793,7 +832,7 @@ function doUseCamera(args, turtles, turtle, isVideo, cameraID, setCameraID, erro
 
     video.addEventListener(
         "canplay",
-        (event) => {
+        () => {
             console.debug("canplay", streaming, hasSetupCamera);
             if (!streaming) {
                 video.setAttribute("width", w);
@@ -812,14 +851,6 @@ function doUseCamera(args, turtles, turtle, isVideo, cameraID, setCameraID, erro
         },
         false
     );
-
-    function draw() {
-        canvas.width = w;
-        canvas.height = h;
-        canvas.getContext("2d").drawImage(video, 0, 0, w, h);
-        const data = canvas.toDataURL("image/png");
-        turtles.turtleList[turtle].doShowImage(args[0], data);
-    }
 }
 
 function doStopVideoCam(cameraID, setCameraID) {
@@ -848,7 +879,7 @@ function hideDOMLabel() {
     }
 }
 
-function displayMsg(blocks, text) {
+function displayMsg(/*blocks, text*/) {
     /*
     let msgContainer = blocks.msgText.parent;
     msgContainer.visible = true;
@@ -879,94 +910,6 @@ function toFixed2(d) {
     } else {
         return d;
     }
-}
-
-function mixedNumber(d) {
-    // Return number as a mixed fraction string, e.g., "2 1/4"
-
-    if (typeof d === "number") {
-        const floor = Math.floor(d);
-        if (d > floor) {
-            const obj = rationalToFraction(d - floor);
-            if (floor === 0) {
-                return obj[0] + "/" + obj[1];
-            } else {
-                if (obj[0] === 1 && obj[1] === 1) {
-                    return floor + 1;
-                } else {
-                    if (obj[1] > 99) {
-                        return d.toFixed(2);
-                    } else {
-                        return floor + " " + obj[0] + "/" + obj[1];
-                    }
-                }
-            }
-        } else {
-            return d.toString() + "/1";
-        }
-    } else {
-        return d;
-    }
-}
-
-function LCD(a, b) {
-    return Math.abs((a * b) / GCD(a, b));
-}
-
-function GCD(a, b) {
-    a = Math.abs(a);
-    b = Math.abs(b);
-
-    while (b) {
-        const n = b;
-        b = a % b;
-        a = n;
-    }
-
-    return a;
-}
-
-function rationalSum(a, b) {
-    if (a === 0 || b === 0) {
-        console.debug("divide by zero?");
-        return [0, 1];
-    }
-
-    // Make sure a and b components are integers.
-    let obja0, objb0, obja1, objb1;
-    if (Math.floor(a[0]) !== a[0]) {
-        obja0 = rationalToFraction(a[0]);
-    } else {
-        obja0 = [a[0], 1];
-    }
-
-    if (Math.floor(b[0]) !== b[0]) {
-        objb0 = rationalToFraction(b[0]);
-    } else {
-        objb0 = [b[0], 1];
-    }
-
-    if (Math.floor(a[1]) !== a[1]) {
-        obja1 = rationalToFraction(a[1]);
-    } else {
-        obja1 = [a[1], 1];
-    }
-
-    if (Math.floor(b[1]) !== b[1]) {
-        objb1 = rationalToFraction(b[1]);
-    } else {
-        objb1 = [b[1], 1];
-    }
-
-    a[0] = obja0[0] * obja1[1];
-    a[1] = obja0[1] * obja1[0];
-    b[0] = objb0[0] * objb1[1];
-    b[1] = objb0[1] * objb1[0];
-
-    // Find the least common denomenator
-    const lcd = LCD(a[1], b[1]);
-    const c0 = (a[0] * lcd) / a[1] + (b[0] * lcd) / b[1];
-    return [(a[0] * lcd) / a[1] + (b[0] * lcd) / b[1], lcd];
 }
 
 function rationalToFraction(d) {
@@ -1020,6 +963,94 @@ readable-fractions/681534#681534
     }
 }
 
+function GCD(a, b) {
+    a = Math.abs(a);
+    b = Math.abs(b);
+
+    while (b) {
+        const n = b;
+        b = a % b;
+        a = n;
+    }
+
+    return a;
+}
+
+function mixedNumber(d) {
+    // Return number as a mixed fraction string, e.g., "2 1/4"
+
+    if (typeof d === "number") {
+        const floor = Math.floor(d);
+        if (d > floor) {
+            const obj = rationalToFraction(d - floor);
+            if (floor === 0) {
+                return obj[0] + "/" + obj[1];
+            } else {
+                if (obj[0] === 1 && obj[1] === 1) {
+                    return floor + 1;
+                } else {
+                    if (obj[1] > 99) {
+                        return d.toFixed(2);
+                    } else {
+                        return floor + " " + obj[0] + "/" + obj[1];
+                    }
+                }
+            }
+        } else {
+            return d.toString() + "/1";
+        }
+    } else {
+        return d;
+    }
+}
+
+function LCD(a, b) {
+    return Math.abs((a * b) / GCD(a, b));
+}
+
+function rationalSum(a, b) {
+    if (a === 0 || b === 0) {
+        console.debug("divide by zero?");
+        return [0, 1];
+    }
+
+    // Make sure a and b components are integers.
+    let obja0, objb0, obja1, objb1;
+    if (Math.floor(a[0]) !== a[0]) {
+        obja0 = rationalToFraction(a[0]);
+    } else {
+        obja0 = [a[0], 1];
+    }
+
+    if (Math.floor(b[0]) !== b[0]) {
+        objb0 = rationalToFraction(b[0]);
+    } else {
+        objb0 = [b[0], 1];
+    }
+
+    if (Math.floor(a[1]) !== a[1]) {
+        obja1 = rationalToFraction(a[1]);
+    } else {
+        obja1 = [a[1], 1];
+    }
+
+    if (Math.floor(b[1]) !== b[1]) {
+        objb1 = rationalToFraction(b[1]);
+    } else {
+        objb1 = [b[1], 1];
+    }
+
+    a[0] = obja0[0] * obja1[1];
+    a[1] = obja0[1] * obja1[0];
+    b[0] = objb0[0] * objb1[1];
+    b[1] = objb0[1] * objb1[0];
+
+    // Find the least common denomenator
+    const lcd = LCD(a[1], b[1]);
+    // const c0 = (a[0] * lcd) / a[1] + (b[0] * lcd) / b[1];
+    return [(a[0] * lcd) / a[1] + (b[0] * lcd) / b[1], lcd];
+}
+
 function nearestBeat(d, b) {
     // Find the closest beat for a given fraction.
 
@@ -1046,44 +1077,35 @@ function oneHundredToFraction(d) {
     switch (Math.floor(d)) {
         case 1:
             return [1, 64];
-            break;
         case 2:
             return [1, 48];
-            break;
         case 3:
         case 4:
         case 5:
             return [1, 32];
-            break;
         case 6:
         case 7:
         case 8:
             return [1, 16];
-            break;
         case 9:
         case 10:
         case 11:
             return [1, 12];
-            break;
         case 12:
         case 13:
         case 14:
             return [1, 8];
-            break;
         case 15:
         case 16:
         case 17:
             return [1, 6];
-            break;
         case 18:
         case 19:
             return [3, 16];
-            break;
         case 20:
         case 21:
         case 22:
             return [1, 5];
-            break;
         case 23:
         case 24:
         case 25:
@@ -1092,79 +1114,64 @@ function oneHundredToFraction(d) {
         case 28:
         case 29:
             return [1, 4];
-            break;
         case 30:
         case 31:
             return [5, 16];
-            break;
         case 32:
         case 33:
         case 34:
         case 35:
             return [1, 3];
-            break;
         case 36:
         case 37:
         case 38:
         case 39:
             return [3, 8];
-            break;
         case 40:
         case 41:
             return [2, 5];
-            break;
         case 42:
         case 43:
         case 44:
             return [7, 16];
-            break;
         case 45:
         case 46:
         case 47:
             return [15, 32];
-            break;
         case 48:
         case 49:
         case 50:
         case 51:
         case 52:
             return [1, 2];
-            break;
         case 53:
         case 54:
             return [17, 32];
-            break;
         case 56:
         case 57:
         case 58:
             return [9, 16];
-            break;
         case 59:
         case 60:
         case 61:
             return [3, 5];
-            break;
         case 62:
         case 63:
         case 64:
         case 65:
             return [5, 8];
-            break;
         case 66:
         case 67:
             return [2, 3];
-            break;
         case 68:
         case 69:
         case 70:
             return [11, 16];
-            break;
         case 71:
         case 72:
         case 73:
         case 74:
             return [23, 32];
-            break;
         case 75:
         case 76:
         case 77:
@@ -1172,43 +1179,33 @@ function oneHundredToFraction(d) {
         case 79:
         case 80:
             return [3, 4];
-            break;
         case 81:
         case 82:
             return [13, 16];
-            break;
         case 83:
         case 84:
         case 85:
         case 86:
             return [5, 6];
-            break;
         case 87:
         case 88:
         case 89:
         case 90:
             return [7, 8];
-            break;
         case 91:
         case 92:
             return [11, 12];
-            break;
         case 93:
         case 94:
         case 95:
             return [15, 16];
-            break;
         case 96:
         case 98:
             return [31, 32];
-            break;
-        case 98:
+        case 99:
             return [63, 64];
-            break;
         default:
             return [d, 100];
-
-            break;
     }
 }
 
@@ -1220,10 +1217,10 @@ function hexToRGB(hex) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
         ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        }
+              r: parseInt(result[1], 16),
+              g: parseInt(result[2], 16),
+              b: parseInt(result[3], 16)
+          }
         : null;
 }
 
@@ -1243,7 +1240,7 @@ function hex2rgb(hex) {
 }
 
 function delayExecution(duration) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         setTimeout(() => {
             resolve(true);
         }, duration);
