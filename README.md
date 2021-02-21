@@ -102,12 +102,12 @@ Looking for a block? Find it in the
 The core functionality for Music Blocks resides in the [`js/` directory](./js/). Individual
 modules are described in more detail in [js/README.md](./js/README.md).
 
-**NOTE:** As for any changes, please make your own copy by cloning this
+**NOTE:** As for any changes, please make your copy by cloning this
 [repository](https://github.com/sugarlabs/musicblocks.git). Make your changes, test them, and then
 make a pull request.
 
 See [Contributing Code](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md)
-to get a general idea about this organizations guidelines. See [Contributing](#CONTRIBUTING)
+for a general idea about this organizations guidelines. See [Contributing](#CONTRIBUTING)
 section for specific details about this repository.
 
 ## <a name="REPORTING_BUGS"></a>Reporting Bugs
