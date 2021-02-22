@@ -647,7 +647,8 @@ class PitchStaircase {
                 }, 1000);
             }
         };
-        document.getElementsByClassName("wfbWidget")[0].style.maxHeight = 10*(PitchStaircase.BUTTONSIZE) + "px";
+        document.getElementsByClassName("wfbWidget")[0].style.maxHeight =
+            10 * PitchStaircase.BUTTONSIZE + "px";
         document.getElementsByClassName("wfbWidget")[0].style.overflowY = "scroll";
         this._musicRatio1 = widgetWindow.addInputButton("3");
         widgetWindow.addDivider();
@@ -693,12 +694,13 @@ class PitchStaircase {
         logo.textMsg(_("Click on a note to create a new step."));
 
         widgetWindow.onmaximize = () => {
-            if((widgetWindow._maximized)){
-                document.getElementsByClassName("wfbWidget")[0].style.maxHeight = 16*(PitchStaircase.BUTTONSIZE) + "px";
+            if (widgetWindow._maximized) {
+                document.getElementsByClassName("wfbWidget")[0].style.maxHeight =
+                    16 * PitchStaircase.BUTTONSIZE + "px";
                 document.getElementsByClassName("wfbWidget")[0].style.overflowY = "scroll";
-            }
-            else{
-                document.getElementsByClassName("wfbWidget")[0].style.maxHeight = 10*(PitchStaircase.BUTTONSIZE) + "px";
+            } else {
+                document.getElementsByClassName("wfbWidget")[0].style.maxHeight =
+                    10 * PitchStaircase.BUTTONSIZE + "px";
                 document.getElementsByClassName("wfbWidget")[0].style.overflowY = "scroll";
             }
         };
