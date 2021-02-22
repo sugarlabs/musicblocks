@@ -1477,21 +1477,54 @@ function Activity() {
     };
 
     /*
-     * Removes loaded plugin
+     * Based on the active palette, remove a plugin palette from local storage.
      */
     deletePlugin = function () {
-        toolbar.closeAuxToolbar(_showHideAuxMenu);
-        blocks.activeBlock = null;
-        if (palettes.paletteObject !== null) {
-            palettes.paletteObject.promptPaletteDelete();
-        } else {
-            // look to see if My Blocks palette is visible
-            if (palettes.buttons["myblocks"].visible) {
-                // console.debug(palettes.dict["myblocks"].visible);
-                if (palettes.dict["myblocks"].visible) {
-                    palettes.dict["myblocks"].promptMacrosDelete();
+        if (palettes.activePalette !== null) {
+            let obj = JSON.parse(storage.plugins);
+
+            if (palettes.activePalette in obj["PALETTEPLUGINS"]) {
+                delete obj["PALETTEPLUGINS"][palettes.activePalette];
+            }
+            if (palettes.activePalette in obj["PALETTEFILLCOLORS"]) {
+                delete obj["PALETTEFILLCOLORS"][palettes.activePalette];
+            }
+            if (palettes.activePalette in obj["PALETTESTROKECOLORS"]) {
+                delete obj["PALETTESTROKECOLORS"][palettes.activePalette];
+            }
+            if (palettes.activePalette in obj["PALETTEHIGHLIGHTCOLORS"]) {
+                delete obj["PALETTEHIGHLIGHTCOLORS"][palettes.activePalette];
+            }
+            for (let i = 0; i < palettes.dict[palettes.activePalette].protoList.length; i++) {
+                let name = palettes.dict[palettes.activePalette].protoList[i]["name"];
+                if (name in obj["FLOWPLUGINS"]) {
+                    console.log("deleting " + name);
+                    delete obj["FLOWPLUGINS"][name];
+                }
+                if (name in obj["BLOCKPLUGINS"]) {
+                    console.log("deleting " + name);
+                    delete obj["BLOCKPLUGINS"][name];
+                }
+                if (name in obj["ARGPLUGINS"]) {
+                    console.log("deleting " + name);
+                    delete obj["ARGPLUGINS"][name];
                 }
             }
+            if (palettes.activePalette in obj["MACROPLUGINS"]) {
+                delete obj["MACROPLUGINS"][palettes.activePalette];
+            }
+            if (palettes.activePalette in obj["ONLOAD"]) {
+                delete obj["ONLOAD"][palettes.activePalette];
+            }
+            if (palettes.activePalette in obj["ONSTART"]) {
+                delete obj["ONSTART"][palettes.activePalette];
+            }
+            if (palettes.activePalette in obj["ONSTOP"]) {
+                delete obj["ONSTOP"][palettes.activePalette];
+            }
+
+            storage.plugins = JSON.stringify(obj);
+            textMsg(palettes.activePalette + " " + _("plugins will be removed upon restart."));
         }
     };
 

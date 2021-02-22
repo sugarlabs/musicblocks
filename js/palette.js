@@ -308,6 +308,7 @@ class Palettes {
 
         this.hideSearchWidget(true);
         this.dict[name].showMenu(true);
+        this.activePalette = name;  // used to delete plugins
     }
 
     _showMenus() {}
