@@ -25,7 +25,6 @@
     - js/logo.js
         logo
 */
-
 /*exported PitchStaircase */
 
 class PitchStaircase {
@@ -648,7 +647,8 @@ class PitchStaircase {
                 }, 1000);
             }
         };
-
+        document.getElementsByClassName("wfbWidget")[0].style.maxHeight = 10*(PitchStaircase.BUTTONSIZE) + "px";
+        document.getElementsByClassName("wfbWidget")[0].style.overflowY = "scroll";
         this._musicRatio1 = widgetWindow.addInputButton("3");
         widgetWindow.addDivider();
         this._musicRatio2 = widgetWindow.addInputButton("2");
