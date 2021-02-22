@@ -691,6 +691,17 @@ class PitchStaircase {
         this._refresh();
 
         logo.textMsg(_("Click on a note to create a new step."));
+
+        widgetWindow.onmaximize = () => {
+            if((widgetWindow._maximized)){
+                document.getElementsByClassName("wfbWidget")[0].style.maxHeight = 16*(PitchStaircase.BUTTONSIZE) + "px";
+                document.getElementsByClassName("wfbWidget")[0].style.overflowY = "scroll";
+            }
+            else{
+                document.getElementsByClassName("wfbWidget")[0].style.maxHeight = 10*(PitchStaircase.BUTTONSIZE) + "px";
+                document.getElementsByClassName("wfbWidget")[0].style.overflowY = "scroll";
+            }
+        };
     }
 
     /**
