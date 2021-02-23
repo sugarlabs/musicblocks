@@ -12,7 +12,22 @@
 // This widget enable us to create new pitches with help of a initial
 // pitch value by applying music ratios.
 
-class PitchStaircase{
+/* global logo platformColor, _, SYNTHSVG, frequencyToPitch, DEFAULTVOICE */
+
+/*
+   Global locations
+    - js/utils/musicutils.js
+        SYNTHSVG, frequencyToPitch, DEFAULTVOICE
+    - js/utils/utils.js
+        _
+    - js/utils/platformstyle.js
+        platformColor
+    - js/logo.js
+        logo
+*/
+/*exported PitchStaircase */
+
+class PitchStaircase {
     static BUTTONDIVWIDTH = 476; // 8 buttons 476 = (55 + 4) * 8
     static OUTERWINDOWWIDTH = 685;
     static INNERWINDOWWIDTH = 600;
@@ -516,7 +531,9 @@ class PitchStaircase{
                 }, 1000);
             }
         };
-
+        document.getElementsByClassName("wfbWidget")[0].style.maxHeight =
+            10 * PitchStaircase.BUTTONSIZE + "px";
+        document.getElementsByClassName("wfbWidget")[0].style.overflowY = "scroll";
         this._musicRatio1 = widgetWindow.addInputButton("3");
         widgetWindow.addDivider();
         this._musicRatio2 = widgetWindow.addInputButton("2");
@@ -550,8 +567,20 @@ class PitchStaircase{
         widgetWindow.getWidgetBody().append(this._pscTable);
         this._refresh();
 
-        this._logo.textMsg(_("Click on a note to create a new step."));
-    };
+        logo.textMsg(_("Click on a note to create a new step."));
+
+        widgetWindow.onmaximize = () => {
+            if (widgetWindow._maximized) {
+                document.getElementsByClassName("wfbWidget")[0].style.maxHeight =
+                    16 * PitchStaircase.BUTTONSIZE + "px";
+                document.getElementsByClassName("wfbWidget")[0].style.overflowY = "scroll";
+            } else {
+                document.getElementsByClassName("wfbWidget")[0].style.maxHeight =
+                    10 * PitchStaircase.BUTTONSIZE + "px";
+                document.getElementsByClassName("wfbWidget")[0].style.overflowY = "scroll";
+            }
+        };
+    }
 
     _refresh () {
         this._makeStairs(-1, true);
