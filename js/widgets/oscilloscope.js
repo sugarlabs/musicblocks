@@ -23,7 +23,7 @@
  * @classdesc pertains to setting up all features of the Oscilloscope Widget.
  */
 class Oscilloscope {
-    static ICONSIZE = 32;
+    static ICONSIZE = 40;
     static analyserSize = 8192;
     /**
      * @constructor
@@ -54,7 +54,8 @@ class Oscilloscope {
             this.pitchAnalysers = {};
             widgetWindow.destroy();
         };
-
+        document.getElementsByClassName("wfbToolbar")[0].style.backgroundColor = "#e8e8e8";
+        document.getElementsByClassName("wfbWidget")[0].style.backgroundColor = "#FFFFFF";
         const step = 10;
         this.zoomFactor = 40.0;
         this.verticalOffset = 0;
@@ -132,7 +133,7 @@ class Oscilloscope {
             this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
             if (!turtle.running) return;
 
-            canvasCtx.fillStyle = "rgb(200, 200, 200)";
+            canvasCtx.fillStyle = "#FFFFFF";
             const dataArray = this.pitchAnalysers[turtleIdx].getValue();
             const bufferLength = dataArray.length;
             canvasCtx.fillRect(0, 0, width, height);
