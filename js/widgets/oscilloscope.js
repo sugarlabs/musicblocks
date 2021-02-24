@@ -83,6 +83,9 @@ class Oscilloscope {
 
         zoomOutButton.onclick = () => {
             this.zoomFactor -= step;
+            if (this.zoomFactor < 1) {
+                this.zoomFactor = 1;
+            }
         };
 
         zoomOutButton.children[0].src = `data:image/svg+xml;base64,${window.btoa(
