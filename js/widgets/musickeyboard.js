@@ -296,13 +296,8 @@ function MusicKeyboard() {
                     docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
                     docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
                     docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
-                    try {
-                        docById("mkbInnerDiv").style.width = "95.5vw";
-                    } catch (e) {
-                        // Does this happen?
-                        // console.debug("Error calculating InnerDiv width");
-                    }
-    
+                    docById("mkbInnerDiv").style.width = "95.5vw";
+
                     this.widgetWindow.getWidgetBody().style.left = "60px";
                 } else {
                     const outerDiv = docById("mkbOuterDiv");
@@ -415,13 +410,7 @@ function MusicKeyboard() {
                 docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
                 docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
                 docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
-                try {
-                    docById("mkbInnerDiv").style.width = "95.5vw";
-                } catch (e) {
-                    // Does this happen?
-                    // console.debug("Error calculating InnerDiv width");
-                }
-
+                docById("mkbInnerDiv").style.width = "95.5vw";
                 this.widgetWindow.getWidgetBody().style.left = "60px";
             } else {
                 const outerDiv = docById("mkbOuterDiv");
@@ -469,13 +458,6 @@ function MusicKeyboard() {
                 outerDiv.style.maxHeight = "705px";
                 docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
                 docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
-                try {
-                    docById("mkbInnerDiv").style.width = "90vw";
-                } catch (e) {
-                    // Does this happen?
-                    // console.debug("Error calculating InnerDiv width");
-                }
-
                 widgetWindow.getWidgetBody().style.left = "60px";
             } else {
                 const outerDiv = docById("mkbOuterDiv");
@@ -539,21 +521,11 @@ function MusicKeyboard() {
             // if (!that.keyboardShown) {
             this._createTable();
             if (widgetWindow._maximized) {
-                widgetWindow.getWidgetBody().style.position = "absolute";
-                widgetWindow.getWidgetBody().style.height = "calc(100vh - 64px)";
-                widgetWindow.getWidgetBody().style.width = "200vh";
-                docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
                 const outerDiv = docById("mkbOuterDiv");
                 outerDiv.style.maxHeight = "705px";
                 docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
                 docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
-                try {
-                    docById("mkbInnerDiv").style.width = "90vw";
-                } catch (e) {
-                    // Does this happen?
-                    // console.debug("Error calculating InnerDiv width");
-                }
-
+                docById("mkbInnerDiv").style.width = "90vw";
                 widgetWindow.getWidgetBody().style.left = "60px";
             } else {
                 const outerDiv = docById("mkbOuterDiv");
@@ -2557,8 +2529,6 @@ function MusicKeyboard() {
 
     this._save = function () {
         this.processSelected();
-        // console.debug("Generating action stack for: ");
-        // console.debug(selectedNotes);
         const newStack = [
             [0, ["action", { collapsed: false }], 100, 100, [null, 1, 2, null]],
             [1, ["text", { value: _("action") }], 0, 0, [0]],
