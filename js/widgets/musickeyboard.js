@@ -297,7 +297,8 @@ function MusicKeyboard() {
                     docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
                     docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
                     docById("mkbInnerDiv").style.width = "95.5vw";
-
+                    const innerDiv = docById("mkbInnerDiv");
+                    innerDiv.scrollLeft = innerDiv.scrollWidth;
                     this.widgetWindow.getWidgetBody().style.left = "60px";
                 } else {
                     const outerDiv = docById("mkbOuterDiv");
@@ -458,6 +459,7 @@ function MusicKeyboard() {
                 outerDiv.style.maxHeight = "725px";
                 docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
                 docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
+                docById("mkbInnerDiv").style.width = "95.5vw";
                 widgetWindow.getWidgetBody().style.left = "60px";
             } else {
                 const outerDiv = docById("mkbOuterDiv");
