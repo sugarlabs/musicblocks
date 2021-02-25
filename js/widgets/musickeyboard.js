@@ -292,7 +292,7 @@ function MusicKeyboard() {
                     this.widgetWindow.getWidgetBody().style.height = "calc(100vh - 64px)";
                     this.widgetWindow.getWidgetBody().style.width = "200vh";
                     const outerDiv = docById("mkbOuterDiv");
-                    outerDiv.style.maxHeight = "705px";
+                    outerDiv.style.maxHeight = "725px";
                     docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
                     docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
                     docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
@@ -406,7 +406,7 @@ function MusicKeyboard() {
                 this.widgetWindow.getWidgetBody().style.height = "calc(100vh - 64px)";
                 this.widgetWindow.getWidgetBody().style.width = "200vh";
                 const outerDiv = docById("mkbOuterDiv");
-                outerDiv.style.maxHeight = "705px";
+                outerDiv.style.maxHeight = "725px";
                 docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
                 docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
                 docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
@@ -455,7 +455,7 @@ function MusicKeyboard() {
                 widgetWindow.getWidgetBody().style.width = "200vh";
                 docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
                 const outerDiv = docById("mkbOuterDiv");
-                outerDiv.style.maxHeight = "705px";
+                outerDiv.style.maxHeight = "725px";
                 docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
                 docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
                 widgetWindow.getWidgetBody().style.left = "60px";
@@ -522,7 +522,7 @@ function MusicKeyboard() {
             this._createTable();
             if (widgetWindow._maximized) {
                 const outerDiv = docById("mkbOuterDiv");
-                outerDiv.style.maxHeight = "705px";
+                outerDiv.style.maxHeight = "725px";
                 docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
                 docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
                 docById("mkbInnerDiv").style.width = "90vw";
