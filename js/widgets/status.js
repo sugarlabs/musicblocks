@@ -139,6 +139,9 @@ class StatusMatrix {
                 case "namedbox":
                     label = logo.blocks.blockList[statusField[0]].privateData;
                     break;
+                case "heap":
+                    label = _("heap");
+                    break;
                 case "bpm":
                 case "bpmfactor":
                     if (localStorage.languagePreference === "ja") {
@@ -281,6 +284,9 @@ class StatusMatrix {
                         } else {
                             value = "";
                         }
+                        break;
+                    case "heap":
+                        value = logo.blocks.blockList[statusField[0]].value;
                         break;
                     default:
                         value = logo.blocks.blockList[statusField[0]].value;
