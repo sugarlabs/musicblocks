@@ -664,7 +664,7 @@ function setupToneBlocks() {
                 outType: "textout",
                 args: 3,
                 argTypes: ["anyin", "anyin", "anyin"],
-                argLabels: [_("file"), _("solfege"), _("octave")]
+                argLabels: [_("file"), _("name"), _("octave")]
             });
             this.parameter = true;
 

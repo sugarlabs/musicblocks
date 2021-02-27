@@ -228,7 +228,7 @@ function SampleWidget() {
             ];
 
             that._logo.blocks.loadNewBlocks(newStack);
-            that._logo.textMsg(_("New sample block generated!"));
+            that._logo.textMsg(_("A new sample block was generated."));
         }, 200 * i);
     };
 
