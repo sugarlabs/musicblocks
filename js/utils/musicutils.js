@@ -9,6 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+
 // Scalable sinewave graphic
 const SYNTHSVG =
     '<?xml version="1.0" encoding="UTF-8" standalone="no"?> <svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" y="0px" xml:space="preserve" x="0px" width="SVGWIDTHpx" viewBox="0 0 SVGWIDTH 55" version="1.1" height="55px" enable-background="new 0 0 SVGWIDTH 55"><g transform="scale(XSCALE,1)"><path d="m 1.5,27.5 c 0,0 2.2,-17.5 6.875,-17.5 4.7,0.0 6.25,11.75 6.875,17.5 0.75,6.67 2.3,17.5 6.875,17.5 4.1,0.0 6.25,-13.6 6.875,-17.5 C 29.875,22.65 31.1,10 35.875,10 c 4.1,0.0 5.97,13.0 6.875,17.5 1.15,5.7 1.75,17.5 6.875,17.5 4.65,0.0 6.875,-17.5 6.875,-17.5" style="stroke:#90c100;fill-opacity:1;fill:none;stroke-width:STROKEWIDTHpx;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" /></g></svg>';
@@ -1011,10 +1012,10 @@ let TEMPERAMENTS = [
 ];
 
 const updateTemperaments = () => {
-    TEMPERAMENTS = [...INITIALTEMPERAMENTS] ;
-    for (const i in TEMPERAMENT){
-        if (!(i in PreDefinedTemperaments)){
-            TEMPERAMENTS.push([_(i),i,i]);
+    TEMPERAMENTS = [...INITIALTEMPERAMENTS];
+    for (const i in TEMPERAMENT) {
+        if (!(i in PreDefinedTemperaments)) {
+            TEMPERAMENTS.push([_(i), i, i]);
         }
     }
 };
@@ -1620,7 +1621,7 @@ function _calculate_pitch_number(np, tur) {
             obj = frequencyToPitch(np);
         }
     } else if (tur.singer.inNoteBlock in tur.singer.notePitches &&
-               tur.singer.notePitches[last(tur.singer.inNoteBlock)].length > 0
+            tur.singer.notePitches[last(tur.singer.inNoteBlock)].length > 0
     ) {
         obj = getNote(
             tur.singer.notePitches[last(tur.singer.inNoteBlock)][0],
@@ -1670,7 +1671,7 @@ function getPitchInfo(type, notePlayed, tur) {
                     np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
                 }
                 const num = pitchToNumber(
-                    np.substr(0, np.length - 1 ),
+                    np.substr(0, np.length - 1),
                     np[np.length - 1],
                     tur.singer.keySignature
                 );
@@ -1793,12 +1794,12 @@ function keySignatureToMode(keySignature) {
         keySignature = keySignature;
         parts = keySignature.split(" ");
         key = "C" + FLAT;
-    } else if (key == "B" + SHARP){
+    } else if (key == "B" + SHARP) {
         keySignature = keySignature;
         parts = keySignature.split(" ");
         key = "B" + SHARP;
     } else if (NOTESSHARP.indexOf(key) === -1 &&
-               NOTESFLAT.indexOf(key) === -1) {
+            NOTESFLAT.indexOf(key) === -1) {
         console.debug("Invalid key or missing name; reverting to C.");
         // Is is possible that the key was left out?
         keySignature = "C " + keySignature;
@@ -2063,7 +2064,6 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
     const obj1 = _buildScale(keySignature);
     const chosenModeScale = obj1[0];
     const chosenModePattern = obj1[1];
-    
     // Pitch numbers of the chosen mode
     const semitones = [0];
 
@@ -2083,7 +2083,7 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
             return finalScale[scaleDegree];
         }
         if (scaleDegree == null) {
-            for(const i in finalScale) {
+            for (const i in finalScale) {
                 if(finalScale[i][0] == pitch[0]) {
                     sd.push(String(Number(i) + 1));
                     if (finalScale[i] == pitch) {
@@ -2110,7 +2110,7 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
                 return chosenModeScale[scaleDegree];
             }
             if (scaleDegree == null) {
-                for(const i in chosenModeScale) {
+                for (const i in chosenModeScale) {
                     if(chosenModeScale[i][0] == pitch[0]) {
                         sd.push(String(Number(i) + 1));
                         if (chosenModeScale[i] == pitch) {
@@ -2133,7 +2133,6 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
         } else if (chosenModePattern.length < 7) {
             // Major scale of the choosen key is used as fallback
             const majorScale = _buildScale(chosenMode[0] + " major")[0];
-            
             // according to the choosenModePattern, calculate defined scale degrees
             for (let i = 0; i < chosenModePattern.length; i++) {
                 switch (semitones[i]) {
@@ -2152,8 +2151,9 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
                         definedScaleDegree.push(4);
                         break;
                     case 6:
+                        // eslint-disable-next-line no-case-declarations
                         const lastAdded =
-                        definedScaleDegree[definedScaleDegree.length - 1];
+                            definedScaleDegree[definedScaleDegree.length - 1];
                         if (lastAdded != 4) {
                             definedScaleDegree.push(4);
                         } else if (semitones[i] + chosenModeScale[i] != 7) {
@@ -2295,6 +2295,7 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
                         } else {
                             finalScale.push(chosenModeScale[i]);
                         }
+                    // eslint-disable-next-line no-fallthrough
                     default:
                         console.debug("No case for " + semitones[i]);
                         break;
@@ -2305,7 +2306,7 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
                 return finalScale[scaleDegree];
             }
             if (scaleDegree == null) {
-                for(const i in finalScale) {
+                for (const i in finalScale) {
                     if(finalScale[i][0] == pitch[0]) {
                         sd.push(String(Number(i) + 1));
                         if (finalScale[i] == pitch) {
@@ -2560,7 +2561,7 @@ function getNoteFromInterval(pitch, interval) {
     const number = pitchToNumber(note1, octave1, "C major");
     const pitches = ["C", "D", "E", "F", "G", "A", "B"];
     const priorAttrs = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];
-    let majorintervalNote;
+    // let majorintervalNote;
 
     function findMajorInterval(interval) {
         //For eg. If you are asked to write a major 3rd then the
@@ -2853,12 +2854,13 @@ function frequencyToPitch(hz) {
 function numberToPitch(i, temperament, startPitch, offset) {
     // Calculate the pitch and octave based on index.
     // We start at A0.
+    let pitchNumber;
     if (temperament === undefined) {
         temperament = "equal";
     }
 
     let n = 0;
-    let pitchnumber;
+    
     if (i < 0) {
         while (i < 0) {
             i += 12;
@@ -3049,7 +3051,6 @@ function splitScaleDegree(value) {
     if (!value) {
         return [5, NATURAL];
     }
-    
     const note = value.slice(0, 1);
     const attr = value.slice(1);
     return [note, attr];
@@ -3100,8 +3101,7 @@ function getNumber(notename, octave) {
     if (notename.substring(0, 1) in NOTESTEP) {
         num += NOTESTEP[notename.substring(0, 1)];
         if (notename.length >= 1) {
-            let delta;
-            delta = notename.substring(1);
+            const delta = notename.substring(1);
             if (delta === "bb" || delta === DOUBLEFLAT) {
                 num -= 2;
             } else if (
@@ -3136,7 +3136,8 @@ function getNumNote(value, delta) {
     return [note, octave + 1];
 }
 
-calcOctave = function(currentOctave, arg, lastNotePlayed, currentNote) {
+// eslint-disable-next-line no-undef
+calcOctave = function (currentOctave, arg, lastNotePlayed, currentNote) {
     // Calculate the octave based on the current Octave and the arg,
     // which can be a number, a 'number' as a string, 'current',
     // 'previous', or 'next'.
@@ -3908,7 +3909,8 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
     }
 }
 
-convertFactor = function(factor) {
+// eslint-disable-next-line no-undef
+convertFactor = function (factor) {
     switch (factor) {
         case 0.0625: // 1/16
             return "16";
@@ -3951,7 +3953,8 @@ convertFactor = function(factor) {
     }
 };
 
-modeMapper = function(key, mode) {
+// eslint-disable-next-line no-undef
+modeMapper = function (key, mode) {
     // map common modes into their major/minor equivalent
     // console.debug(key + ' ' + mode + ' >>');
     key = key.toLowerCase();
