@@ -1,40 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.1"
-   width="49.517162"
-   height="50.998993"
-   id="svg2"
-   inkscape:version="0.48.4 r9939"
-   sodipodi:docname="save.svg">
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="640"
-     inkscape:window-height="480"
-     id="namedview27"
-     showgrid="false"
-     inkscape:zoom="4.6275424"
-     inkscape:cx="24.758581"
-     inkscape:cy="25.499496"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="svg2" />
+   width="55"
+   height="55"
+   id="svg2">
   <defs
      id="defs4" />
   <metadata
@@ -50,7 +24,7 @@
     </rdf:RDF>
   </metadata>
   <g
-     transform="translate(-146.6683,-689.71929)"
+     transform="matrix(1.2154506,0,0,1.2154506,-185.64498,-841.8131)"
      id="layer1">
     <g
        transform="translate(0,-1.4025637)"
@@ -79,7 +53,7 @@
              id="g4316"
              style="fill:none;stroke:#ffffff;stroke-opacity:1">
             <path
-               d="m 26.867,38.592 c 0,1.836 -1.345,3.201 -3.441,4.047 L 6.736,49.002 V 14.84 l 16.69,-8.599 c 2.228,-0.394 3.441,0.84 3.441,2.834 v 29.517 z"
+               d="m 26.867,38.592 c 0,1.836 -1.345,3.201 -3.441,4.047 L 6.736,49.002 V 14.84 l 16.69,-8.599 c 2.228,-0.394 3.441,0.84 3.441,2.834 z"
                id="path4318"
                style="fill:none;stroke:#ffffff;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" />
           </g>
@@ -105,7 +79,7 @@
            style="fill:none;stroke:#ffffff;stroke-width:2.25;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" />
       </g>
       <g
-         transform="translate(0.12541438,0)"
+         transform="translate(0.12541438)"
          id="g3396">
         <g
            transform="matrix(1,0,0,-1,90.781727,733.42579)"
@@ -128,7 +102,7 @@
             <path
                d="m 39.363241,1033.1291 -0.05636,9.9115 -8.750608,0.067"
                id="path4776-7"
-               style="fill:none;stroke:#ffffff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+               style="fill:none;stroke:#ffffff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
           </g>
         </g>
       </g>
