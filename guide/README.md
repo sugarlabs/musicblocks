@@ -65,6 +65,7 @@ also available.
     11. [Music Keyboard](#keyboard)
     12. [Changing Temperament](#temperament)
     13. [Oscilloscope](#oscilloscope)
+    14. [Sampler](#sampler)
 5. [Beyond Music Blocks](#BEYOND-MUSIC-BLOCKS)
     1. [LilyPond](#LILYPOND)
     2. [Other exports](#EXPORTS)
@@ -2365,6 +2366,18 @@ Music Blocks has an Oscillosope Widget to visualize the music as it plays.
  "Oscilloscope")
 
 A separate wave will be displayed for each mouse.
+
+###  <a name="sampler"></a>4.14 Sampler
+
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/sampler_block.svg
+ "Sampler")
+
+You can import sound samples (.WAV files) and use them with the *Set Instrument" block. The *Sampler* widget lets you set the center pitch of your sample so that it can be tuned.
+
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/sampler1.svg
+ "Sampler Widget")
 
 ## <a name="BEYOND-MUSIC-BLOCKS"></a>5. Beyond Music Blocks
 
