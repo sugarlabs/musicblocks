@@ -1,3 +1,14 @@
+// Copyright (c) 2021 Liam Norman
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
 function SampleWidget() {
     const BUTTONDIVWIDTH = 476; // 8 buttons 476 = (55 + 4) * 8
     const BUTTONSIZE = 53;
@@ -5,9 +16,8 @@ function SampleWidget() {
     const SAMPLEWIDTH = 400;
     const SAMPLEHEIGHT = 160;
     const RENDERINTERVAL = 50;
-    const TRUEACCIDENTALNAMES = ["𝄫", "♭", "", "♯", "𝄪"];
-    //using these characters can cause issues.
-    const ACCIDENTALNAMES = ["bb", "b", "", "#", "x"];
+    const EXPORTACCIDENTALNAMES = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];  // Don't include natural when construcing the note name;
+    const ACCIDENTALNAMES = [DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP]; // but display it in the selector.
     const SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti", "do"];
     const MAJORSCALE = [0, 2, 4, 5, 7, 9, 11];
     const DEFAULTACCIDENTAL = "";
@@ -17,8 +27,6 @@ function SampleWidget() {
     const CENTERPITCHHERTZ = 220;
     const MAXOCTAVE = 10;
     const SAMPLEWAITTIME = 500;
-
-    // test
 
     this.timbreBlock;
     this.sampleArray;
@@ -522,11 +530,10 @@ function SampleWidget() {
     }
 
     this._updateSamplePitchValues = function () {
-          this.samplePitch =
-          SOLFEGENAMES[this.pitchCenter] +
-          TRUEACCIDENTALNAMES[this.accidentalCenter];
-
-          this.sampleOctave = this.octaveCenter.toString();
+        this.samplePitch =
+            SOLFEGENAMES[this.pitchCenter] +
+            EXPORTACCIDENTALNAMES[this.accidentalCenter];
+        this.sampleOctave = this.octaveCenter.toString();
     }
 
     this._playReferencePitch = function() {
