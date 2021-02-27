@@ -1,4 +1,4 @@
-// Copyright (c) 2014-19 Walter Bender
+// Copyright (c) 2014-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -2253,7 +2253,10 @@ function Blocks(activity) {
                     if (myBlock.value[0] === null) {
                         label = _("audio file1");
                     } else {
-                        label = _(myBlock.value[0].toString());
+                        label = myBlock.value[0].toString();
+                        if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+                            label = label.substr(0, STRINGLEN) + "...";
+                        }
                     }
                 } catch (e) {
                     label = _("audio file2");
