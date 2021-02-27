@@ -651,7 +651,7 @@ function setupToneBlocks() {
         constructor() {
             super("customsample", _("sample"));
             this.setPalette("tone");
-            this.beginnerBlock(true);
+            this.beginnerBlock(false);
 
             this.setHelpString([
                 _("Import a sound file to use as an instrument and set its pitch center."),
@@ -718,8 +718,9 @@ function setupToneBlocks() {
         constructor() {
             super("audiofile");
             this.parameter = true;
+	    this.extraWidth = 20;
             this.setPalette("tone");
-            this.beginnerBlock(true);
+            this.beginnerBlock(false);
 
             this.setHelpString([
                 _("Upload a sound file to connect with the sample block."),
