@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define*/
 // Copyright (c) 2016-20 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
@@ -9,6 +10,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/*global _, last, logo, DRUMNAMES, NOISENAMES, VOICENAMES, INVALIDPITCH*/
 
 // Scalable sinewave graphic
 const SYNTHSVG =
@@ -1318,7 +1320,7 @@ function getIntervalDirection(name) {
 }
 
 function getModeNumbers(name) {
-    __convert = function(obj) {
+    const __convert = function(obj) {
         let n = 0;
         let m = "";
         for (let i = 0; i < obj.length; i++) {
@@ -1635,7 +1637,7 @@ function _calculate_pitch_number(np, tur) {
     } else {
         if (tur.singer.lastNotePlayed !== null) {
             console.debug("Cannot find a note ");
-            logo.errorMsg(INVALIDPITCH, blk);
+            logo.errorMsg(INVALIDPITCH);
         }
         obj = ["G", 4];
     }
@@ -1664,12 +1666,14 @@ function getPitchInfo(type, notePlayed, tur) {
                 np = np.replace("#", SHARP).replace("b", FLAT);
                 if (tur.singer.moveable === false)
                     return SOLFEGECONVERSIONTABLE[np];
+                // eslint-disable-next-line no-case-declarations
                 const i = _buildScale(tur.singer.keySignature)[0].indexOf(np);
                 return SOLFEGENAMES[i];
             case "pitch class":
                 if (Number(np)) {
                     np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
                 }
+                // eslint-disable-next-line no-case-declarations
                 const num = pitchToNumber(
                     np.substr(0, np.length - 1),
                     np[np.length - 1],
@@ -1682,6 +1686,7 @@ function getPitchInfo(type, notePlayed, tur) {
                 }
                 np = np.substr(0, np.length - 1);
                 np = np.replace("#", SHARP).replace("b", FLAT);
+                // eslint-disable-next-line no-case-declarations
                 const scalarClass = scaleDegreeToPitchMapping(
                     tur.singer.keySignature, null, tur.singer.moveable, np
                 );
@@ -1692,6 +1697,7 @@ function getPitchInfo(type, notePlayed, tur) {
                 }
                 np = np.substr(0, np.length - 1);
                 np = np.replace("#", SHARP).replace("b", FLAT);
+                // eslint-disable-next-line no-case-declarations
                 const scalarClass1 = scaleDegreeToPitchMapping(
                     tur.singer.keySignature, null, tur.singer.moveable, np
                 );
@@ -1724,6 +1730,7 @@ function getPitchInfo(type, notePlayed, tur) {
                     np = np.substr(0, np.length - 1);
                 }
 
+                // eslint-disable-next-line no-case-declarations
                 let color = 0;
                 if (NOTESSHARP.indexOf(np) !== -1) {
                     color = NOTESSHARP.indexOf(np) * 8.33;
@@ -1791,10 +1798,12 @@ function keySignatureToMode(keySignature) {
     }
 
     if (key === "C" + FLAT) {
+        // eslint-disable-next-line no-self-assign
         keySignature = keySignature;
         parts = keySignature.split(" ");
         key = "C" + FLAT;
     } else if (key == "B" + SHARP) {
+        // eslint-disable-next-line no-self-assign
         keySignature = keySignature;
         parts = keySignature.split(" ");
         key = "B" + SHARP;
@@ -1984,7 +1993,7 @@ function _buildScale(keySignature) {
     }
 
     let obj = keySignatureToMode(keySignature);
-    myKeySignature = obj[0];
+    let myKeySignature = obj[0];
     if (myKeySignature == "C" + FLAT) {
         obj = keySignatureToMode("B " + obj[1]);
         myKeySignature = obj[0];
@@ -3149,7 +3158,7 @@ calcOctave = function (currentOctave, arg, lastNotePlayed, currentNote) {
     // The relative octave for tritones are arbitrated as being in the
     // current octave, so we need to determine the number of half
     // steps between lastNotePlayed and currentNote.
-    let note, stepCurrentNote, stepLastNotePlayed, changedCurrent;
+    let note, stepLastNotePlayed, changedCurrent;
 
     if (SOLFEGENAMES1.indexOf(currentNote) !== -1) {
         note = FIXEDSOLFEGE1[currentNote];
@@ -3157,9 +3166,9 @@ calcOctave = function (currentOctave, arg, lastNotePlayed, currentNote) {
         note = currentNote;
     }
 
-    stepCurrentNote = getNumber(note, currentOctave);
-    stepUpCurrentNote = getNumber(note, currentOctave + 1);
-    stepDownCurrentNote = getNumber(note, currentOctave - 1);
+    const stepCurrentNote = getNumber(note, currentOctave);
+    const stepUpCurrentNote = getNumber(note, currentOctave + 1);
+    const stepDownCurrentNote = getNumber(note, currentOctave - 1);
 
     if (lastNotePlayed != null) {
         lastNotePlayed = lastNotePlayed[0];
@@ -3215,7 +3224,11 @@ calcOctave = function (currentOctave, arg, lastNotePlayed, currentNote) {
     }
 };
 
+<<<<<<< HEAD
 calcOctaveInterval = function(arg) {
+=======
+const calcOctaveInterval = function (arg) {
+>>>>>>> 09d0405b... Fixing linting problems
     // Used by intervals to determine octave to use in an interval.
     let value = 0;
     switch (arg) {
@@ -3256,7 +3269,11 @@ function isInt(value) {
 }
 
 function reducedFraction(a, b) {
+<<<<<<< HEAD
     greatestCommonMultiple = function(a, b) {
+=======
+    const greatestCommonMultiple = function (a, b) {
+>>>>>>> 09d0405b... Fixing linting problems
         return b === 0 ? a : greatestCommonMultiple(b, a % b);
     };
 
@@ -3452,7 +3469,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
             note = noteArg;
         } else if (NOTESFLAT2.indexOf(noteArg) !== -1) {
             // Convert to uppercase, e.g., d♭ -> D♭.
-            note = NOTESFLAT[notesFlat2.indexOf(noteArg)];
+            note = NOTESFLAT[NOTESFLAT2.indexOf(noteArg)];
         } else {
             if (["#", SHARP, FLAT, "b"].indexOf(noteArg.substr(-1)) !== -1) {
                 sharpFlat = true;
@@ -3675,7 +3692,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
 
             if (deltaNote > 0) {
                 if (NOTESSHARP.indexOf(note) !== -1) {
-                    i = NOTESSHARP.indexOf(note);
+                    let i = NOTESSHARP.indexOf(note);
                     i += deltaNote;
                     if (i < 0) {
                         i += 12;
@@ -3687,7 +3704,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
 
                     note = NOTESSHARP[i];
                 } else if (NOTESFLAT.indexOf(note) !== -1) {
-                    i = NOTESFLAT.indexOf(note);
+                    let i = NOTESFLAT.indexOf(note);
                     i += deltaNote;
                     if (i < 0) {
                         i += 12;
@@ -3703,7 +3720,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
                 }
             } else if (deltaNote < 0) {
                 if (NOTESFLAT.indexOf(note) !== -1) {
-                    i = NOTESFLAT.indexOf(note);
+                    let i = NOTESFLAT.indexOf(note);
                     i += deltaNote;
                     if (i < 0) {
                         i += 12;
@@ -3715,7 +3732,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
 
                     note = NOTESFLAT[i];
                 } else if (NOTESSHARP.indexOf(note) !== -1) {
-                    i = NOTESSHARP.indexOf(note);
+                    let i = NOTESSHARP.indexOf(note);
                     i += deltaNote;
                     if (i < 0) {
                         i += 12;
@@ -3909,8 +3926,8 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
     }
 }
 
-// eslint-disable-next-line no-undef
-convertFactor = function (factor) {
+
+const convertFactor = function (factor) {
     switch (factor) {
         case 0.0625: // 1/16
             return "16";
@@ -3953,8 +3970,8 @@ convertFactor = function (factor) {
     }
 };
 
-// eslint-disable-next-line no-undef
-modeMapper = function (key, mode) {
+
+const modeMapper = function (key, mode) {
     // map common modes into their major/minor equivalent
     // console.debug(key + ' ' + mode + ' >>');
     key = key.toLowerCase();
