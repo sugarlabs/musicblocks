@@ -246,6 +246,7 @@ function Activity() {
             "widgets/musickeyboard",
             "widgets/timbre",
             "widgets/oscilloscope",
+	    "widgets/sampler",
             "widgets/statistics",
             "activity/lilypond",
             "activity/abc",
@@ -4879,14 +4880,14 @@ function Activity() {
                     setTimeout(function () {
                         const rawData = reader.result;
                         if (rawData == null || rawData === "") {
-                            // console.debug("rawData is " + rawData);
+                            console.debug("rawData is " + rawData);
                             errorMsg(
                                 _("Cannot load project from the file. Please check the file type.")
                             );
                         } else {
                             const cleanData = rawData.replace("\n", " ");
                             let obj;
-                            try {
+                            // try {
                                 if (cleanData.includes("html")) {
                                     obj = JSON.parse(
                                         cleanData.match('<div class="code">(.+?)</div>')[1]
@@ -4931,7 +4932,7 @@ function Activity() {
 
                                 loading = false;
                                 refreshCanvas();
-                            } catch (e) {
+                            /*} catch (e) {
                                 errorMsg(
                                     _(
                                         "Cannot load project from the file. Please check the file type."
@@ -4941,6 +4942,8 @@ function Activity() {
                                 document.body.style.cursor = "default";
                                 loading = false;
                             }
+			    */
+
                         }
                     }, 200);
                 };
@@ -4971,7 +4974,7 @@ function Activity() {
                     } else {
                         const cleanData = rawData.replace("\n", " ");
                         let obj;
-                        try {
+                        // try {
                             if (cleanData.includes("html")) {
                                 dat = cleanData.match('<div class="code">(.+?)</div>');
                                 obj = JSON.parse(dat[1]);
@@ -5010,7 +5013,7 @@ function Activity() {
 
                             loading = false;
                             refreshCanvas();
-                        } catch (e) {
+                        /*} catch (e) {
                             // console.error(e);
                             errorMsg(
                                 _("Cannot load project from the file. Please check the file type.")
@@ -5018,6 +5021,8 @@ function Activity() {
                             document.body.style.cursor = "default";
                             loading = false;
                         }
+			    */
+
                     }
                 }, 200);
             };

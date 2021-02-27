@@ -1559,6 +1559,12 @@ function getVoiceIcon(name) {
         }
     }
 
+    for (let i = 0; i < CUSTOMSAMPLES.length; i++) {
+        if (CUSTOMSAMPLES[i][0] === name || CUSTOMSAMPLES[i][1] === name) {
+            return CUSTOMSAMPLES[i][0];
+        }
+    }
+
     console.debug(name + " not found in VOICENAMES");
     return "images/voices.svg";
 }

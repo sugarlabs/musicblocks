@@ -1866,6 +1866,8 @@ class Block {
             };
             if (that.name === "media") {
                 reader.readAsDataURL(fileChooser.files[0]);
+            } else if (that.name === "audiofile") {
+                reader.readAsDataURL(fileChooser.files[0]);
             } else {
                 reader.readAsText(fileChooser.files[0]);
             }
@@ -2558,6 +2560,8 @@ class Block {
             } else if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
                 if (that.name === "media") {
                     that._doOpenMedia(thisBlock);
+                } else if (that.name === "audiofile") {
+                      that._doOpenMedia(thisBlock);
                 } else if (that.name === "loadFile") {
                     that._doOpenMedia(thisBlock);
                 } else if (SPECIALINPUTS.indexOf(that.name) !== -1) {

@@ -2248,6 +2248,17 @@ function Blocks(activity) {
                 }
                 maxLength = 10;
                 break;
+            case "audiofile":
+                try {
+                    if (myBlock.value[0] === null) {
+                        label = _("audio file1");
+                    } else {
+                        label = _(myBlock.value[0].toString());
+                    }
+                } catch (e) {
+                    label = _("audio file2");
+                }
+                break;
             case "solfege":
                 if (myBlock.value === null) myBlock.value = "sol";
                 obj = splitSolfege(myBlock.value);
@@ -5252,7 +5263,7 @@ function Blocks(activity) {
                         const value = args[1];
                         if (value.customTemperamentNotes !== undefined) {
                             TEMPERAMENT = {
-			    ...TEMPERAMENT, ...value.customTemperamentNotes
+                            ...TEMPERAMENT, ...value.customTemperamentNotes
                             };
                             for (const temp in value.customTemperamentNotes){
                                 if (!(temp in PreDefinedTemperaments)){
@@ -5668,6 +5679,14 @@ function Blocks(activity) {
                     this._makeNewBlockWithConnections("number", blockOffset, blkData[4], postProcess, thisBlock);
                     break;
                 case "loadFile":
+                    postProcess = function(args) {
+                        that.blockList[args[0]].value = args[1];
+                        that.updateBlockText(args[0]);
+                    };
+
+                    this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                    break;
+                case "audiofile":
                     postProcess = function(args) {
                         that.blockList[args[0]].value = args[1];
                         that.updateBlockText(args[0]);

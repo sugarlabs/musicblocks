@@ -261,6 +261,8 @@ const SAMPLECENTERNO = {
     "double bass": ["C4", 39]
 };
 
+CUSTOMSAMPLES = [];
+
 const percussionInstruments = ["koto", "banjo", "dulcimer", "xylophone", "celeste"];
 const stringInstruments = ["piano", "guitar", "acoustic guitar", "electric guitar"];
 
@@ -666,6 +668,9 @@ function Synth() {
             ]
         };
 
+        let data = function() {return null};
+        this.samplesManifest.voice.push({ name: "empty", data: data});
+
         if (this.samples === null) {
             this.samples = {};
             for (const type in this.samplesManifest) {
@@ -676,7 +681,8 @@ function Synth() {
         }
     };
 
-    this._loadSample = function (sampleName) {
+    this._loadSample = function (sampleName, sampleData) {
+        let accounted = false;
         for (const type in this.samplesManifest) {
             if (this.samplesManifest.hasOwnProperty(type)) {
                 for (const sample in this.samplesManifest[type]) {
@@ -685,10 +691,20 @@ function Synth() {
                         if (sampleName === name) {
                             // Load data returned from samples function.
                             this.samples[type][name] = this.samplesManifest[type][sample].data();
+                            accounted = true;
                         }
                     }
                 }
             }
+        }
+
+        if (!accounted) {
+            if (sampleData !== null) {
+                console.log("loaded custom sample");
+                this.samples["voice"][sampleName] = sampleData;
+                return;
+            }
+            console.debug("sample was not already in sample library");
         }
     };
 
@@ -954,9 +970,15 @@ function Synth() {
         let tempSynth;
         if (sourceName in this.samples.voice) {
             instrumentsSource[instrumentName] = [2, sourceName];
-            console.debug(sourceName + " " + SAMPLECENTERNO[sourceName][0]);
-            const noteDict = {};
-            noteDict[SAMPLECENTERNO[sourceName][0]] = this.samples.voice[sourceName];
+            let noteDict = {};
+            if (sourceName in SAMPLECENTERNO) {
+                noteDict[SAMPLECENTERNO[sourceName][0]] = this.samples.voice[sourceName];
+            } else if (params != null) {
+                let center = this._parseSampleCenterNo(params[1], params[2]);
+                noteDict[center] = params[0];
+            } else {
+                noteDict["C4"] = this.samples.voice[sourceName];
+            }
             tempSynth = new Tone.Sampler(noteDict);
         } else if (sourceName in this.samples.drum) {
             instrumentsSource[instrumentName] = [1, sourceName];
@@ -970,6 +992,29 @@ function Synth() {
         }
 
         return tempSynth;
+    };
+
+    this._parseSampleCenterNo = function (solfege, octave) {
+      let pitchName = "C4";
+      let solfegeDict = {do:0, re:2, mi:4, fa:5, so:7, la:9, ti:11};
+
+      let attr;
+      if (solfege.indexOf(SHARP) !==-1) {
+          attr = 1;
+      } else if (solfege.indexOf(FLAT) !== -1) {
+          attr = -1;
+      } else if (solfege.indexOf(DOUBLESHARP) !== -1) {
+          attr = 2;
+      } else if (solfege.indexOf(DOUBLEFLAT) !== -1) {
+          attr = -2;
+      } else {
+          attr = 0;
+      }
+
+      fragment = solfege.substring(0,2);
+      let chromaticNumber = solfegeDict[fragment];
+      let pitchNumber = octave * 12 + chromaticNumber + attr;
+      return pitchNumber.toString();
     };
 
     // Function using builtin synths from Tone.js
@@ -1046,13 +1091,22 @@ function Synth() {
     };
 
     this.__createSynth = function (turtle, instrumentName, sourceName, params) {
-        this._loadSample(sourceName);
+        let sampleData = null;
+        let passedParams = null;
+        if (params !== null) {
+            if (typeof params == "object") {
+                sampleData = params[0];
+                passedParams = params;
+            }
+        }
+
+        this._loadSample(sourceName, sampleData);
         if (sourceName in this.samples.voice || sourceName in this.samples.drum) {
             instruments[turtle][instrumentName] = this._createSampleSynth(
                 turtle,
                 instrumentName,
                 sourceName,
-                null
+                passedParams
             ).toDestination();
         } else if (sourceName in BUILTIN_SYNTHS) {
             instruments[turtle][instrumentName] = this._createBuiltinSynth(
@@ -1106,8 +1160,14 @@ function Synth() {
         if (sourceName in instruments[turtle]) {
             console.debug(sourceName + " already loaded");
         } else {
-            console.debug("loading " + sourceName);
-            this.createSynth(turtle, sourceName, sourceName, null);
+            if (typeof sourceName === "object") {
+                console.debug("loading " + sourceName[0]);
+                parameters = [sourceName[1], sourceName[2], sourceName[3]];
+                this.createSynth(turtle, sourceName[0], sourceName[0], parameters);
+            } else {
+                console.debug("loading " + sourceName);
+                this.createSynth(turtle, sourceName, sourceName, null);
+            }
         }
         this.setVolume(turtle, sourceName, last(Singer.masterVolume));
 
@@ -1392,7 +1452,7 @@ function Synth() {
         // Get note values as per the source of the synth.
         switch (flag) {
             case 1: // drum
-                if (instrumentName.slice(0, 4) === "http") {
+            if ((instrumentName.slice(0, 4) === "http") || (instrumentName.slice(0,21) === "data:audio/wav;base64")) {
                     tempSynth.start();
                 } else if (instrumentName.slice(0, 4) === "file") {
                     tempSynth.start();

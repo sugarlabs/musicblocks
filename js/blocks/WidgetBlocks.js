@@ -248,6 +248,55 @@ function setupWidgetBlocks() {
         }
     }
 
+    class SamplerBlock extends StackClampBlock {
+        constructor() {
+            super("sampler");
+            this.setPalette("widgets");
+            this.parameter = true;
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _("Upload a sample and adjust its pitch center."),
+                "documentation",
+                null,
+                "sampler"
+            ]);
+
+            //.TRANS: the speed at music is should be played.
+            this.formBlock({ name: _("sampler"), canCollapse: true });
+            this.makeMacro((x, y) => [
+              [0, "sampler", x, y, [null, 1, 8]],
+              [1, "settimbre", 0, 0, [0, 2, 6, 7]],
+              [2, ["customsample", {value: ["", "", "do", 4]}], 0, 0, [1, 3, 4, 5]],
+              [3, ["audiofile", {value: null}], 0, 0, [2]],
+              [4, ["solfege", {value: "do"}], 0, 0, [2]],
+              [5, ["number", {value: 4}], 0, 0, [2]],
+              [6, "vspace", 0, 0, [1, null]],
+              [7, "hidden", 0, 0, [1, null]],
+              [8, "hiddennoflow", 0, 0, [0, null]]
+            ]);
+        }
+
+        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
+            if (logo.sample === null) {
+                logo.sample = new SampleWidget();
+            }
+            logo.inSample = true;
+            logo.sample = new SampleWidget();
+
+            let listenerName = "_sampler_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            let __listener = function(event) {
+                logo.sample.init(logo);
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            return [args[0], 1];
+        }
+    }
+
     class TimbreBlock extends StackClampBlock {
         constructor() {
             super("timbre");
@@ -1158,6 +1207,7 @@ function setupWidgetBlocks() {
     new MeterWidgetBlock().setup();
     new ModeWidgetBlock().setup();
     new TempoBlock().setup();
+    new SamplerBlock().setup();
     new PitchDrumMatrixBlock().setup();
     new oscilloscopeWidgetBlock().setup();
     new PitchSliderBlock().setup();
