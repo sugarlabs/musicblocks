@@ -253,7 +253,7 @@ function setupWidgetBlocks() {
             super("sampler");
             this.setPalette("widgets");
             this.parameter = true;
-            this.beginnerBlock(true);
+            this.beginnerBlock(false);
 
             this.setHelpString([
                 _("Upload a sample and adjust its pitch center."),
