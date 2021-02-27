@@ -3420,7 +3420,9 @@ class Block {
             const wrapValues = [];
 
             const WRAPMODES = [
-                [_("on"), "on"],
+		// .TRANS: on2 should be translated as "on" as in on and off
+                [_("on2"), "on"],
+		// .TRANS: off should be translated as "off" as in on and off
                 [_("off"), "off"]
             ];
 
