@@ -246,6 +246,7 @@ function Activity() {
             "widgets/musickeyboard",
             "widgets/timbre",
             "widgets/oscilloscope",
+            "widgets/sampler",
             "widgets/statistics",
             "activity/lilypond",
             "activity/abc",

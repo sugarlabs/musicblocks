@@ -1,4 +1,4 @@
-// Copyright (c) 2014-19 Walter Bender
+// Copyright (c) 2014-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -2247,6 +2247,20 @@ function Blocks(activity) {
                     label = _("open file");
                 }
                 maxLength = 10;
+                break;
+            case "audiofile":
+                try {
+                    if (myBlock.value[0] === null) {
+                        label = _("audio file1");
+                    } else {
+                        label = myBlock.value[0].toString();
+                        if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+                            label = label.substr(0, STRINGLEN) + "...";
+                        }
+                    }
+                } catch (e) {
+                    label = _("audio file2");
+                }
                 break;
             case "solfege":
                 if (myBlock.value === null) myBlock.value = "sol";
@@ -5252,7 +5266,7 @@ function Blocks(activity) {
                         const value = args[1];
                         if (value.customTemperamentNotes !== undefined) {
                             TEMPERAMENT = {
-			    ...TEMPERAMENT, ...value.customTemperamentNotes
+                            ...TEMPERAMENT, ...value.customTemperamentNotes
                             };
                             for (const temp in value.customTemperamentNotes){
                                 if (!(temp in PreDefinedTemperaments)){
@@ -5668,6 +5682,14 @@ function Blocks(activity) {
                     this._makeNewBlockWithConnections("number", blockOffset, blkData[4], postProcess, thisBlock);
                     break;
                 case "loadFile":
+                    postProcess = function(args) {
+                        that.blockList[args[0]].value = args[1];
+                        that.updateBlockText(args[0]);
+                    };
+
+                    this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
+                    break;
+                case "audiofile":
                     postProcess = function(args) {
                         that.blockList[args[0]].value = args[1];
                         that.updateBlockText(args[0]);

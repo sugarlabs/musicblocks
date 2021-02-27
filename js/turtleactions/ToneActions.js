@@ -57,15 +57,26 @@ function setupToneActions() {
 
             tur.inSetTimbre = true;
 
+            let accounted = false;
             let synth = instrument;
             for (const voice in VOICENAMES) {
                 if (VOICENAMES[voice][0] === instrument) {
                     synth = VOICENAMES[voice][1];
+                    accounted = true;
                     break;
                 } else if (VOICENAMES[voice][1] === instrument) {
                     synth = instrument;
+                    accounted = true;
                     break;
                 }
+            }
+
+            if (!accounted && typeof instrument === "object"){
+                synth = instrument[0];
+            }
+
+            if ((synth === undefined) || (synth === null)) {
+                synth = "electronic synth";
             }
 
             if (logo.inMatrix) {
@@ -74,7 +85,11 @@ function setupToneActions() {
 
             if (tur.singer.instrumentNames.indexOf(synth) === -1) {
                 tur.singer.instrumentNames.push(synth);
-                logo.synth.loadSynth(turtle, synth);
+                if (typeof instrument === "object") {
+                    logo.synth.loadSynth(turtle, instrument);
+                } else {
+                    logo.synth.loadSynth(turtle, synth);
+                }
 
                 if (tur.singer.synthVolume[synth] === undefined) {
                     // The electronic synthvolume will track any
