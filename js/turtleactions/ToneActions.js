@@ -79,8 +79,6 @@ function setupToneActions() {
                 synth = "electronic synth";
             }
 
-	    console.log('turtle: ' + turtle + " " + synth);
-
             if (logo.inMatrix) {
                 logo.phraseMaker._instrumentName = synth;
             }
