@@ -3236,11 +3236,7 @@ calcOctave = function (currentOctave, arg, lastNotePlayed, currentNote) {
     }
 };
 
-<<<<<<< HEAD
-calcOctaveInterval = function(arg) {
-=======
 const calcOctaveInterval = function (arg) {
->>>>>>> 09d0405b... Fixing linting problems
     // Used by intervals to determine octave to use in an interval.
     let value = 0;
     switch (arg) {
@@ -3281,11 +3277,7 @@ function isInt(value) {
 }
 
 function reducedFraction(a, b) {
-<<<<<<< HEAD
-    greatestCommonMultiple = function(a, b) {
-=======
     const greatestCommonMultiple = function (a, b) {
->>>>>>> 09d0405b... Fixing linting problems
         return b === 0 ? a : greatestCommonMultiple(b, a % b);
     };
 
