@@ -246,7 +246,7 @@ function Activity() {
             "widgets/musickeyboard",
             "widgets/timbre",
             "widgets/oscilloscope",
-	    "widgets/sampler",
+            "widgets/sampler",
             "widgets/statistics",
             "activity/lilypond",
             "activity/abc",
@@ -4880,7 +4880,7 @@ function Activity() {
                     setTimeout(function () {
                         const rawData = reader.result;
                         if (rawData == null || rawData === "") {
-                            console.debug("rawData is " + rawData);
+                            // console.debug("rawData is " + rawData);
                             errorMsg(
                                 _("Cannot load project from the file. Please check the file type.")
                             );
