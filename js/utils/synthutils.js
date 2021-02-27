@@ -1452,7 +1452,7 @@ function Synth() {
         // Get note values as per the source of the synth.
         switch (flag) {
             case 1: // drum
-            if ((instrumentName.slice(0, 4) === "http") || (instrumentName.slice(0,21) === "data:audio/wav;base64")) {
+                if ((instrumentName.slice(0, 4) === "http") || (instrumentName.slice(0,21) === "data:audio/wav;base64")) {
                     tempSynth.start();
                 } else if (instrumentName.slice(0, 4) === "file") {
                     tempSynth.start();
