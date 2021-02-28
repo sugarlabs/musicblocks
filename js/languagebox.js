@@ -17,13 +17,13 @@
 
 /* exported LanguageBox */
 class LanguageBox {
-    language = localStorage.languagePreference;
 
     /**
      * @constructor
      */
     constructor() {
         this._message = null;
+        this._language = localStorage.languagePreference;
     }
 
     /**
@@ -41,7 +41,7 @@ class LanguageBox {
      * @returns {void}
      */
     enUS_onclick() {
-        language = "enUS";
+        this._language = "enUS";
         this.hide();
     }
 
@@ -50,7 +50,7 @@ class LanguageBox {
      * @returns {void}
      */
     enUK_onclick() {
-        language = "enUK";
+        this._language = "enUK";
         this.hide();
     }
 
@@ -59,7 +59,7 @@ class LanguageBox {
      * @returns {void}
      */
     ko_onclick() {
-        language = "ko";
+        this._language = "ko";
         this.hide();
     }
 
@@ -68,7 +68,7 @@ class LanguageBox {
      * @returns {void}
      */
     ja_onclick() {
-        language = "ja";
+        this._language = "ja";
         localStorage.kanaPreference = "kanji";
         this.hide();
     }
@@ -78,7 +78,7 @@ class LanguageBox {
      * @returns {void}
      */
     kana_onclick() {
-        language = "ja";
+        this._language = "ja";
         localStorage.kanaPreference = "kana";
         this.hide();
     }
@@ -88,7 +88,7 @@ class LanguageBox {
      * @returns {void}
      */
     es_onclick() {
-        language = "es";
+        this._language = "es";
         this.hide();
     }
 
@@ -97,7 +97,7 @@ class LanguageBox {
      * @returns {void}
      */
     pt_onclick() {
-        language = "pt";
+        this._language = "pt";
         this.hide();
     }
 
@@ -106,7 +106,7 @@ class LanguageBox {
      * @returns {void}
      */
     zhCN_onclick() {
-        language = "zhCN";
+        this._language = "zhCN";
         this.hide();
     }
 
@@ -115,7 +115,7 @@ class LanguageBox {
      * @returns {void}
      */
     th_onclick() {
-        language = "th";
+        this._language = "th";
         this.hide();
     }
 
@@ -124,7 +124,7 @@ class LanguageBox {
      * @returns {void}
      */
     hi_onclick() {
-        language = "hi";
+        this._language = "hi";
         this.hide();
     }
 
@@ -133,7 +133,7 @@ class LanguageBox {
      * @returns {void}
      */
     ibo_onclick() {
-        language = "ibo";
+        this._language = "ibo";
         this.hide();
     }
 
@@ -142,7 +142,7 @@ class LanguageBox {
      * @returns {void}
      */
     ar_onclick() {
-        language = "ar";
+        this._language = "ar";
         this.hide();
     }
 
@@ -151,7 +151,7 @@ class LanguageBox {
      * @returns {void}
      */
     he_onclick() {
-        language = "he";
+        this._language = "he";
         this.hide();
     }
 
@@ -160,7 +160,7 @@ class LanguageBox {
      * @returns {void}
      */
     ayc_onclick() {
-        language = "ayc";
+        this._language = "ayc";
         this.hide();
     }
 
@@ -169,7 +169,7 @@ class LanguageBox {
      * @returns {void}
      */
     quz_onclick() {
-        language = "quz";
+        this._language = "quz";
         this.hide();
     }
 
@@ -178,7 +178,7 @@ class LanguageBox {
      * @returns {void}
      */
     gug_onclick() {
-        language = "gug";
+        this._language = "gug";
         this.hide();
     }
 
@@ -213,12 +213,12 @@ class LanguageBox {
             gug: "Actualice su navegador para cambiar su preferencia de idioma."
         };
 
-        localStorage.languagePreference = language;
+        localStorage.languagePreference = this._language;
         // console.debug(language);
-        if (language === "ja" && localStorage.kanaPreference === "kana") {
+        if (this._language === "ja" && localStorage.kanaPreference === "kana") {
             this._message(MSGPrefix + MSG["kana"] + MSGSuffix);
         } else {
-            this._message(MSGPrefix + MSG[language] + MSGSuffix);
+            this._message(MSGPrefix + MSG[this._language] + MSGSuffix);
         }
     }
 }
