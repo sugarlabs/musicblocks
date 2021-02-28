@@ -2878,7 +2878,7 @@ function numberToPitch(i, temperament, startPitch, offset) {
     }
 
     let n = 0;
-    let pitchnumber;
+    let pitchNumber;
     if (i < 0) {
         while (i < 0) {
             i += 12;
@@ -3274,7 +3274,7 @@ function isInt(value) {
 }
 
 function reducedFraction(a, b) {
-    greatestCommonMultiple = function(a, b) {
+    const greatestCommonMultiple = function(a, b) {
         return b === 0 ? a : greatestCommonMultiple(b, a % b);
     };
 
@@ -3470,7 +3470,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
             note = noteArg;
         } else if (NOTESFLAT2.indexOf(noteArg) !== -1) {
             // Convert to uppercase, e.g., d♭ -> D♭.
-            note = NOTESFLAT[notesFlat2.indexOf(noteArg)];
+            note = NOTESFLAT[NOTESFLAT2.indexOf(noteArg)];
         } else {
             if (["#", SHARP, FLAT, "b"].indexOf(noteArg.substr(-1)) !== -1) {
                 sharpFlat = true;
