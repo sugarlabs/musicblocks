@@ -2359,6 +2359,13 @@ function Blocks(activity) {
                     }
                 }
                 break;
+            case "wrapmode":
+                if (myBlock.value === "on") {
+                    label = _("on2");
+                } else {
+                    label = _("off");
+                }
+                break;
             case "boolean":
                 if (myBlock.value) {
                     label = _("true");
@@ -2944,6 +2951,13 @@ function Blocks(activity) {
                             TEMPERAMENTS[i][0];
                             break;
                         }
+                    }
+                    break;
+                case "wrapmode":
+                    if (value === "on") {
+                        that.blockList[thisBlock].text.text = _("on2");
+                    } else {
+                        that.blockList[thisBlock].text.text = _("off");
                     }
                     break;
                 case "boolean":
