@@ -1317,7 +1317,7 @@ function getIntervalDirection(name) {
 }
 
 function getModeNumbers(name) {
-    __convert = function(obj) {
+    const __convert = function(obj) {
         let n = 0;
         let m = "";
         for (let i = 0; i < obj.length; i++) {
@@ -1640,7 +1640,7 @@ function _calculate_pitch_number(np, tur) {
     } else {
         if (tur.singer.lastNotePlayed !== null) {
             console.debug("Cannot find a note ");
-            logo.errorMsg(INVALIDPITCH, blk);
+            logo.errorMsg(INVALIDPITCH);
         }
         obj = ["G", 4];
     }
@@ -1989,7 +1989,7 @@ function _buildScale(keySignature) {
     }
 
     let obj = keySignatureToMode(keySignature);
-    myKeySignature = obj[0];
+    let myKeySignature = obj[0];
     if (myKeySignature == "C" + FLAT) {
         obj = keySignatureToMode("B " + obj[1]);
         myKeySignature = obj[0];
@@ -2566,7 +2566,7 @@ function getNoteFromInterval(pitch, interval) {
     const number = pitchToNumber(note1, octave1, "C major");
     const pitches = ["C", "D", "E", "F", "G", "A", "B"];
     const priorAttrs = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];
-    let majorintervalNote;
+    // let majorintervalNote;
 
     function findMajorInterval(interval) {
         //For eg. If you are asked to write a major 3rd then the
@@ -3106,8 +3106,7 @@ function getNumber(notename, octave) {
     if (notename.substring(0, 1) in NOTESTEP) {
         num += NOTESTEP[notename.substring(0, 1)];
         if (notename.length >= 1) {
-            let delta;
-            delta = notename.substring(1);
+            const delta = notename.substring(1);
             if (delta === "bb" || delta === DOUBLEFLAT) {
                 num -= 2;
             } else if (
@@ -3142,7 +3141,7 @@ function getNumNote(value, delta) {
     return [note, octave + 1];
 }
 
-calcOctave = function(currentOctave, arg, lastNotePlayed, currentNote) {
+const calcOctave = function(currentOctave, arg, lastNotePlayed, currentNote) {
     // Calculate the octave based on the current Octave and the arg,
     // which can be a number, a 'number' as a string, 'current',
     // 'previous', or 'next'.
@@ -3154,7 +3153,7 @@ calcOctave = function(currentOctave, arg, lastNotePlayed, currentNote) {
     // The relative octave for tritones are arbitrated as being in the
     // current octave, so we need to determine the number of half
     // steps between lastNotePlayed and currentNote.
-    let note, stepCurrentNote, stepLastNotePlayed, changedCurrent;
+    let note, stepLastNotePlayed, changedCurrent;
 
     if (SOLFEGENAMES1.indexOf(currentNote) !== -1) {
         note = FIXEDSOLFEGE1[currentNote];
@@ -3162,9 +3161,9 @@ calcOctave = function(currentOctave, arg, lastNotePlayed, currentNote) {
         note = currentNote;
     }
 
-    stepCurrentNote = getNumber(note, currentOctave);
-    stepUpCurrentNote = getNumber(note, currentOctave + 1);
-    stepDownCurrentNote = getNumber(note, currentOctave - 1);
+    const stepCurrentNote = getNumber(note, currentOctave);
+    const stepUpCurrentNote = getNumber(note, currentOctave + 1);
+    const stepDownCurrentNote = getNumber(note, currentOctave - 1);
 
     if (lastNotePlayed != null) {
         lastNotePlayed = lastNotePlayed[0];
@@ -3220,7 +3219,7 @@ calcOctave = function(currentOctave, arg, lastNotePlayed, currentNote) {
     }
 };
 
-calcOctaveInterval = function(arg) {
+const calcOctaveInterval = function(arg) {
     // Used by intervals to determine octave to use in an interval.
     let value = 0;
     switch (arg) {
@@ -3680,7 +3679,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
 
             if (deltaNote > 0) {
                 if (NOTESSHARP.indexOf(note) !== -1) {
-                    i = NOTESSHARP.indexOf(note);
+                    let i = NOTESSHARP.indexOf(note);
                     i += deltaNote;
                     if (i < 0) {
                         i += 12;
@@ -3692,7 +3691,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
 
                     note = NOTESSHARP[i];
                 } else if (NOTESFLAT.indexOf(note) !== -1) {
-                    i = NOTESFLAT.indexOf(note);
+                    let i = NOTESFLAT.indexOf(note);
                     i += deltaNote;
                     if (i < 0) {
                         i += 12;
@@ -3708,7 +3707,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
                 }
             } else if (deltaNote < 0) {
                 if (NOTESFLAT.indexOf(note) !== -1) {
-                    i = NOTESFLAT.indexOf(note);
+                    let i = NOTESFLAT.indexOf(note);
                     i += deltaNote;
                     if (i < 0) {
                         i += 12;
@@ -3720,7 +3719,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
 
                     note = NOTESFLAT[i];
                 } else if (NOTESSHARP.indexOf(note) !== -1) {
-                    i = NOTESSHARP.indexOf(note);
+                    let i = NOTESSHARP.indexOf(note);
                     i += deltaNote;
                     if (i < 0) {
                         i += 12;
@@ -3914,7 +3913,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
     }
 }
 
-convertFactor = function(factor) {
+const convertFactor = function(factor) {
     switch (factor) {
         case 0.0625: // 1/16
             return "16";
@@ -3957,7 +3956,7 @@ convertFactor = function(factor) {
     }
 };
 
-modeMapper = function(key, mode) {
+const modeMapper = function(key, mode) {
     // map common modes into their major/minor equivalent
     // console.debug(key + ' ' + mode + ' >>');
     key = key.toLowerCase();
