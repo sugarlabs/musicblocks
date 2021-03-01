@@ -1016,8 +1016,8 @@ function MusicKeyboard() {
             noteOctave: temp2,
             blockNumber: this.layout[n - j - 1].blockNumber,
             duration: parseFloat(ele.getAttribute("alt")),
-            objId: this.layout[n - j - 1].objId,
-            voice: this.layout[n - j - 1].voice
+            objId: this.displayLayout[n - j - 1].objId,
+            voice: this.displayLayout[n - j - 1].voice
         });
 
         this._notesPlayed.sort(function (a, b) {
