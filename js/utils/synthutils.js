@@ -554,10 +554,10 @@ function Synth() {
     };
 
     this.getCustomFrequency = (notes, customID) => {
-        const __getCustomFrequency = function (oneNote) {
+        const __getCustomFrequency = function (oneNote, startingPitch) {
             const octave = oneNote.slice(-1);
             oneNote = getCustomNote(oneNote.substring(0, oneNote.length - 1));
-            const pitch = this.startingPitch;
+            const pitch = startingPitch;
             const startPitchFrequency = pitchToFrequency(
                 pitch.substring(0, pitch.length - 1),
                 pitch.slice(-1),
@@ -583,12 +583,12 @@ function Synth() {
         };
 
         if (typeof notes === "string") {
-            return __getCustomFrequency(notes);
+            return __getCustomFrequency(notes, this.startingPitch);
         } else if (typeof notes === "object") {
             const results = [];
             for (let i = 0; i < notes.length; i++) {
                 if (typeof notes[i] === "string") {
-                    results.push(__getCustomFrequency(notes[i]));
+                    results.push(__getCustomFrequency(notes[i], this.startingPitch));
                 } else {
                     // Hertz?
                     results.push(notes[i]);
@@ -700,7 +700,7 @@ function Synth() {
 
         if (!accounted) {
             if (sampleData !== null) {
-                console.log("loaded custom sample");
+                console.debug("loaded custom sample");
                 this.samples["voice"][sampleName] = sampleData;
                 return;
             }
@@ -739,7 +739,7 @@ function Synth() {
             }
         }
         this.recorder.ondataavailable = (evt) => {
-            console.log(evt.data);
+            console.debug(evt.data);
             if (typeof evt.data === "undefined" || evt.data.size === 0) return;
             chunks.push(evt.data);
         };
@@ -1462,7 +1462,7 @@ function Synth() {
                     } catch (e) {
                         // Occasionally we see "Start time must be
                         // strictly greater than previous start time"
-                        console.log(e);
+                        console.debug(e);
                     }
                 }
                 break;
