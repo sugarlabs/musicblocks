@@ -37,6 +37,9 @@ class TemperamentWidget {
     static INNERWINDOWWIDTH = 600;
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
+    static LIGHTGREY = "#e0e0e0";
+    static GREY = "#c8c8c8";
+    static DARKGREY = "#808080";
 
     /**
      * @constructor
@@ -54,6 +57,7 @@ class TemperamentWidget {
         this.pitchNumber = 0;
         this.circleIsVisible = true;
         this.playbackForward = true;
+        this.closed = false;
     }
 
     /**
@@ -74,8 +78,10 @@ class TemperamentWidget {
         widgetWindow.getWidgetBody().style.width = "500px";
 
         widgetWindow.onclose = () => {
+            if (this._playing) {
+                this.closed = true;
+            }
             logo.synth.setMasterVolume(0);
-            logo.synth.stop();
             if (docById("wheelDiv2") != null) {
                 docById("wheelDiv2").style.display = "none";
                 this.notesCircle.removeWheel();
@@ -364,7 +370,7 @@ class TemperamentWidget {
             const sliceAngle = [];
             const angleDiff = [];
             for (let i = 0; i < this.notesCircle.navItemCount; i++) {
-                this.notesCircle.navItems[i].fillAttr = "#c8C8C8";
+                this.notesCircle.navItems[i].fillAttr = TemperamentWidget.GREY;
                 this.notesCircle.navItems[i].titleAttr.font =
                     "20 20px Impact, Charcoal, sans-serif";
                 this.notesCircle.navItems[i].titleSelectedAttr.font =
@@ -1048,10 +1054,11 @@ class TemperamentWidget {
                 docById("userEdit").innerHTML = '<div id="wheelDiv2" class="wheelNav"></div>';
                 this.createMainWheel(this.tempRatios, pitchNumber);
                 for (let i = 0; i < pitchNumber; i++) {
-                    this.notesCircle.navItems[i].fillAttr = "#e0e0e0";
-                    this.notesCircle.navItems[i].sliceHoverAttr.fill = "#e0e0e0";
-                    this.notesCircle.navItems[i].slicePathAttr.fill = "#e0e0e0";
-                    this.notesCircle.navItems[i].sliceSelectedAttr.fill = "#e0e0e0";
+                    this.notesCircle.navItems[i].fillAttr = TemperamentWidget.LIGHTGREY;
+                    this.notesCircle.navItems[i].sliceHoverAttr.fill = TemperamentWidget.LIGHTGREY;
+                    this.notesCircle.navItems[i].slicePathAttr.fill = TemperamentWidget.LIGHTGREY;
+                    this.notesCircle.navItems[i].sliceSelectedAttr.fill =
+                        TemperamentWidget.LIGHTGREY;
                 }
                 this.notesCircle.refreshWheel();
                 docById("userEdit").style.paddingLeft = "0px";
@@ -1219,10 +1226,11 @@ class TemperamentWidget {
                 docById("userEdit").innerHTML = '<div id="wheelDiv2" class="wheelNav"></div>';
                 this.createMainWheel(this.tempRatios, pitchNumber);
                 for (let i = 0; i < pitchNumber; i++) {
-                    this.notesCircle.navItems[i].fillAttr = "#e0e0e0";
-                    this.notesCircle.navItems[i].sliceHoverAttr.fill = "#e0e0e0";
-                    this.notesCircle.navItems[i].slicePathAttr.fill = "#e0e0e0";
-                    this.notesCircle.navItems[i].sliceSelectedAttr.fill = "#e0e0e0";
+                    this.notesCircle.navItems[i].fillAttr = TemperamentWidget.LIGHTGREY;
+                    this.notesCircle.navItems[i].sliceHoverAttr.fill = TemperamentWidget.LIGHTGREY;
+                    this.notesCircle.navItems[i].slicePathAttr.fill = TemperamentWidget.LIGHTGREY;
+                    this.notesCircle.navItems[i].sliceSelectedAttr.fill =
+                        TemperamentWidget.LIGHTGREY;
                 }
                 this.notesCircle.refreshWheel();
                 docById("userEdit").style.paddingLeft = "0px";
@@ -1335,7 +1343,7 @@ class TemperamentWidget {
             const angle = [];
             const angleDiff = [];
             for (let i = 0; i < this.wheel1.navItemCount; i++) {
-                this.wheel1.navItems[i].fillAttr = "#e0e0e0";
+                this.wheel1.navItems[i].fillAttr = TemperamentWidget.LIGHTGREY;
                 this.wheel1.navItems[i].titleAttr.font = "20 20px Impact, Charcoal, sans-serif";
                 this.wheel1.navItems[i].titleSelectedAttr.font =
                     "20 20px Impact, Charcoal, sans-serif";
@@ -1422,7 +1430,7 @@ class TemperamentWidget {
             this.wheel.slicePathCustom.maxRadiusPercent = 1.0;
             this.wheel.sliceSelectedPathCustom = this.wheel.slicePathCustom;
             this.wheel.sliceInitPathCustom = this.wheel.slicePathCustom;
-            this.wheel.colors = ["#c0c0c0", "#e0e0e0"];
+            this.wheel.colors = ["#c0c0c0", TemperamentWidget.LIGHTGREY];
             this.wheel.titleRotateAngle = 90;
             this.wheel.navItemsEnabled = false;
 
@@ -1468,7 +1476,7 @@ class TemperamentWidget {
                 docById("wheelDiv3").addEventListener("mouseover", (e) => {
                     this.arbitraryEditSlider(e, angle1, ratios, pitchNumber);
                 });
-            },1500);
+            }, 1500);
         };
 
         this._createOuterWheel();
@@ -2005,7 +2013,9 @@ class TemperamentWidget {
         let p = 0;
         this.playbackForward = true;
         this._playing = !this._playing;
-
+        if (!this._playing) {
+            return;
+        }
         logo.resetSynth(0);
 
         const cell = this.playButton;
@@ -2017,21 +2027,6 @@ class TemperamentWidget {
                 _("Stop") +
                 '" alt="' +
                 _("Stop") +
-                '" height="' +
-                TemperamentWidget.ICONSIZE +
-                '" width="' +
-                TemperamentWidget.ICONSIZE +
-                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-        } else {
-            logo.synth.setMasterVolume(0);
-            logo.synth.stop();
-            cell.innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/' +
-                "play-button.svg" +
-                '" title="' +
-                _("Play") +
-                '" alt="' +
-                _("Play") +
                 '" height="' +
                 TemperamentWidget.ICONSIZE +
                 '" width="' +
@@ -2059,6 +2054,13 @@ class TemperamentWidget {
             pitchNumber = this.tempRatios1.length - 1;
         }
 
+        const updateNotesCircle = (index,color) => {
+            this.notesCircle.navItems[index].fillAttr = color;
+            this.notesCircle.navItems[index].sliceHoverAttr.fill = color;
+            this.notesCircle.navItems[index].slicePathAttr.fill = color;
+            this.notesCircle.navItems[index].sliceSelectedAttr.fill = color;
+        };
+
         const __playLoop = (i) => {
             let j;
             if (i === pitchNumber) {
@@ -2078,38 +2080,22 @@ class TemperamentWidget {
                 );
                 this.playNote(i);
             }
-
             if (this.circleIsVisible == false && docById("wheelDiv4") == null) {
                 if (i === pitchNumber) {
-                    this.notesCircle.navItems[0].fillAttr = "#808080";
-                    this.notesCircle.navItems[0].sliceHoverAttr.fill = "#808080";
-                    this.notesCircle.navItems[0].slicePathAttr.fill = "#808080";
-                    this.notesCircle.navItems[0].sliceSelectedAttr.fill = "#808080";
+                    updateNotesCircle(0,TemperamentWidget.DARKGREY);
                 } else {
-                    this.notesCircle.navItems[i].fillAttr = "#808080";
-                    this.notesCircle.navItems[i].sliceHoverAttr.fill = "#808080";
-                    this.notesCircle.navItems[i].slicePathAttr.fill = "#808080";
-                    this.notesCircle.navItems[i].sliceSelectedAttr.fill = "#808080";
+                    updateNotesCircle(i,TemperamentWidget.DARKGREY);
                 }
 
                 if (this.playbackForward == false && i < pitchNumber) {
                     if (i === pitchNumber - 1) {
-                        this.notesCircle.navItems[0].fillAttr = "#c8C8C8";
-                        this.notesCircle.navItems[0].sliceHoverAttr.fill = "#c8C8C8";
-                        this.notesCircle.navItems[0].slicePathAttr.fill = "#c8C8C8";
-                        this.notesCircle.navItems[0].sliceSelectedAttr.fill = "#c8C8C8";
+                        updateNotesCircle(0,TemperamentWidget.GREY);
                     } else {
-                        this.notesCircle.navItems[i + 1].fillAttr = "#c8C8C8";
-                        this.notesCircle.navItems[i + 1].sliceHoverAttr.fill = "#c8C8C8";
-                        this.notesCircle.navItems[i + 1].slicePathAttr.fill = "#c8C8C8";
-                        this.notesCircle.navItems[i + 1].sliceSelectedAttr.fill = "#c8C8C8";
+                        updateNotesCircle(i + 1,TemperamentWidget.GREY);
                     }
                 } else {
                     if (i !== 0) {
-                        this.notesCircle.navItems[i - 1].fillAttr = "#c8C8C8";
-                        this.notesCircle.navItems[i - 1].sliceHoverAttr.fill = "#c8C8C8";
-                        this.notesCircle.navItems[i - 1].slicePathAttr.fill = "#c8C8C8";
-                        this.notesCircle.navItems[i - 1].sliceSelectedAttr.fill = "#c8C8C8";
+                        updateNotesCircle(i - 1,TemperamentWidget.GREY);
                     }
                 }
 
@@ -2128,35 +2114,20 @@ class TemperamentWidget {
                 }
             } else if (docById("wheelDiv4") !== null) {
                 if (i === pitchNumber) {
-                    this.wheel1.navItems[0].fillAttr = "#808080";
-                    this.wheel1.navItems[0].sliceHoverAttr.fill = "#808080";
-                    this.wheel1.navItems[0].slicePathAttr.fill = "#808080";
-                    this.wheel1.navItems[0].sliceSelectedAttr.fill = "#808080";
+                    updateNotesCircle(0,TemperamentWidget.DARKGREY);
                 } else {
-                    this.wheel1.navItems[i].fillAttr = "#808080";
-                    this.wheel1.navItems[i].sliceHoverAttr.fill = "#808080";
-                    this.wheel1.navItems[i].slicePathAttr.fill = "#808080";
-                    this.wheel1.navItems[i].sliceSelectedAttr.fill = "#808080";
+                    updateNotesCircle(i,TemperamentWidget.DARKGREY);
                 }
 
                 if (this.playbackForward == false && i < pitchNumber) {
                     if (i === pitchNumber - 1) {
-                        this.wheel1.navItems[0].fillAttr = "#e0e0e0";
-                        this.wheel1.navItems[0].sliceHoverAttr.fill = "#e0e0e0";
-                        this.wheel1.navItems[0].slicePathAttr.fill = "#e0e0e0";
-                        this.wheel1.navItems[0].sliceSelectedAttr.fill = "#e0e0e0";
+                        updateNotesCircle(0,TemperamentWidget.LIGHTGREY);
                     } else {
-                        this.wheel1.navItems[i + 1].fillAttr = "#e0e0e0";
-                        this.wheel1.navItems[i + 1].sliceHoverAttr.fill = "#e0e0e0";
-                        this.wheel1.navItems[i + 1].slicePathAttr.fill = "#e0e0e0";
-                        this.wheel1.navItems[i + 1].sliceSelectedAttr.fill = "#e0e0e0";
+                        updateNotesCircle(i + 1,TemperamentWidget.LIGHTGREY);
                     }
                 } else {
                     if (i !== 0) {
-                        this.wheel1.navItems[i - 1].fillAttr = "#e0e0e0";
-                        this.wheel1.navItems[i - 1].sliceHoverAttr.fill = "#e0e0e0";
-                        this.wheel1.navItems[i - 1].slicePathAttr.fill = "#e0e0e0";
-                        this.wheel1.navItems[i - 1].sliceSelectedAttr.fill = "#e0e0e0";
+                        updateNotesCircle(i - 1,TemperamentWidget.LIGHTGREY);
                     }
                 }
 
@@ -2169,11 +2140,59 @@ class TemperamentWidget {
                 i -= 1;
             }
 
-            if (i <= pitchNumber && i >= 0 && this._playing && p < 2) {
+            if (i <= pitchNumber && i >= 0 && p < 2) {
                 setTimeout(() => {
-                    __playLoop(i);
+                    if (this.closed) {
+                        this.closed = !this.closed;
+                        return;
+                    } else if (!this._playing) {
+                        cell.innerHTML =
+                            '&nbsp;&nbsp;<img src="header-icons/' +
+                            "play-button.svg" +
+                            '" title="' +
+                            _("Play") +
+                            '" alt="' +
+                            _("Play") +
+                            '" height="' +
+                            TemperamentWidget.ICONSIZE +
+                            '" width="' +
+                            TemperamentWidget.ICONSIZE +
+                            '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                        if (i !== -1) {
+                            if (this.circleIsVisible == false && docById("wheelDiv4") == null) {
+                                updateNotesCircle(i - 1,TemperamentWidget.GREY);
+                                if (i == 11) {
+                                    //on completion of a full circle and on hitting '0' note in clockwise direction
+                                    updateNotesCircle(0,TemperamentWidget.GREY);
+                                } else if (i < 11) {
+                                    //in case of counter-clockwise direction, i.e., when this.playbackForward = false
+                                    updateNotesCircle(i + 1,TemperamentWidget.GREY);
+                                }
+                                this.notesCircle.refreshWheel();
+                            } else if (
+                                this.circleIsVisible == true &&
+                                docById("wheelDiv4") == null
+                            ) {
+                                docById("pitchNumber_" + (i - 1)).style.background =
+                                    platformColor.selectorBackground;
+                            } else if (docById("wheelDiv4") !== null) {
+                                this.wheel1.navItems[i - 1].fillAttr = TemperamentWidget.LIGHTGREY;
+                                this.wheel1.navItems[i - 1].sliceHoverAttr.fill =
+                                    TemperamentWidget.LIGHTGREY;
+                                this.wheel1.navItems[i - 1].slicePathAttr.fill =
+                                    TemperamentWidget.LIGHTGREY;
+                                this.wheel1.navItems[i - 1].sliceSelectedAttr.fill =
+                                    TemperamentWidget.LIGHTGREY;
+                                this.wheel1.refreshWheel();
+                            }
+                        }
+                        this._playing = false;
+                    } else {
+                        __playLoop(i);
+                    }
                 }, Singer.defaultBPMFactor * 1000 * duration);
             } else {
+                this._playing = false;
                 cell.innerHTML =
                     '&nbsp;&nbsp;<img src="header-icons/' +
                     "play-button.svg" +
@@ -2186,29 +2205,6 @@ class TemperamentWidget {
                     '" width="' +
                     TemperamentWidget.ICONSIZE +
                     '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-                if (i !== -1) {
-                    setTimeout(() => {
-                        if (this.circleIsVisible == false && docById("wheelDiv4") == null) {
-                            this.notesCircle.navItems[i - 1].fillAttr = "#c8C8C8";
-                            this.notesCircle.navItems[i - 1].sliceHoverAttr.fill = "#c8C8C8";
-                            this.notesCircle.navItems[i - 1].slicePathAttr.fill = "#c8C8C8";
-                            this.notesCircle.navItems[i - 1].sliceSelectedAttr.fill = "#c8C8C8";
-                            this.notesCircle.refreshWheel();
-                        } else if (this.circleIsVisible == true && docById("wheelDiv4") == null) {
-                            j = i - 1;
-                            docById("pitchNumber_" + j).style.background =
-                                platformColor.selectorBackground;
-                        } else if (docById("wheelDiv4") !== null) {
-                            this.wheel1.navItems[i - 1].fillAttr = "#e0e0e0";
-                            this.wheel1.navItems[i - 1].sliceHoverAttr.fill = "#e0e0e0";
-                            this.wheel1.navItems[i - 1].slicePathAttr.fill = "#e0e0e0";
-                            this.wheel1.navItems[i - 1].sliceSelectedAttr.fill = "#e0e0e0";
-
-                            this.wheel1.refreshWheel();
-                        }
-                    }, Singer.defaultBPMFactor * 1000 * duration);
-                }
-                this._playing = false;
             }
         };
         if (this._playing) {
