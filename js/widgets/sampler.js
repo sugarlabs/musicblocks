@@ -229,7 +229,7 @@ function SampleWidget() {
                     that.sampleData,
                     "do",
                     4
-                ]}], 0, 0, [null, 1, 2, 3]],
+                ]}], 100, 100, [null, 1, 2, 3]],
                 [1, ["audiofile", {value: [that.sampleName, that.sampleData]}], 0 ,0, [0]],
                 [2, ["solfege", {value: that.samplePitch}], 0, 0, [0]],
                 [3, ["number", {value: that.sampleOctave}], 0, 0, [0]],
