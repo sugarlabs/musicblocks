@@ -3803,7 +3803,7 @@ function Activity() {
                             args = {
                                 customTemperamentNotes: custom,
                                 startingPitch: logo.synth.startingPitch,
-                                octaveSpace: OCTAVERATIO
+                                octaveSpace: octaveRatio
                             };
                         }
                         break;

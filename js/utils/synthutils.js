@@ -574,7 +574,7 @@ function Synth() {
                             return Number(
                                 TEMPERAMENT[customID][pitchNumber][0] *
                                     startPitchFrequency *
-                                    Math.pow(OCTAVERATIO, octaveDiff)
+                                    Math.pow(octaveRatio, octaveDiff)
                             );
                         }
                     }
