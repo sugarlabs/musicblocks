@@ -131,6 +131,9 @@ these issues, whilst adding buffers for future additions. We'll also be using a 
 tech-stack to develop and maintain this project given its scale. After the core is built, we'll be
 porting features from this application to it.
 
+Refer to the repository [**sugarlabs/musicblocks-2**](https://github.com/sugarlabs/musicblocks-2)
+for more information about the new project &mdash; _Music Blocks 2.0_.
+
 ### Tech Stack
 
 Music Blocks is a Web Application and is written using browser technologies &mdash; `HTML`, `CSS`
