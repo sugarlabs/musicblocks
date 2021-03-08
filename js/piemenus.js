@@ -16,7 +16,7 @@
    INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName, getMunsellColor,
    COLORS40, frequencyToPitch, KeySignatureEnv, instruments, DOUBLESHARP, NATURAL,
    DOUBLEFLAT, EQUIVALENTACCIDENTALS, FIXEDSOLFEGE, NOTENAMES, FIXEDSOLFEGE, NOTENAMES,
-   numberToPitch, nthDegreeToPitch, SOLFEGENAMES, _buildScale*/
+   numberToPitch, nthDegreeToPitch, SOLFEGENAMES, _buildScale, TEMPERAMENT*/
 
 /*
      Globals location
@@ -43,6 +43,8 @@
         blocks, KeySignatureEnv
      - js/logo.js
         PREVIEWVOLUME, DEFAULTVOLUME
+     - js/blocks.js
+        TEMPERAMENT
  */
 
 /*exported piemenuModes ,piemenuPitches, piemenuCustomNotes, piemenuGrid, piemenuBlockContext,
@@ -823,8 +825,14 @@ const piemenuCustomNotes = function (
     const __selectionChanged = function () {
         const label = that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
         const note = that._cusNoteWheel.navItems[that._cusNoteWheel.selectedNavItemIndex].title;
+        let note1;
+        if (that.blocks.logo.customTemperamentDefined){
+            note1 = TEMPERAMENT[selectedCustom].filter(ele => ele[1] === note)[0][3];
+        } else {
+            note1 = note;
+        }
 
-        that.value = note;
+        that.value = note1;
         that.text.text = note;
         let octave = 4;
 
@@ -840,7 +848,7 @@ const piemenuCustomNotes = function (
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
 
-        const obj = getNote(note, octave, 0, "C major", false, null, that.blocks.errorMsg, label);
+        const obj = getNote(note1, octave, 0, "C major", false, null, that.blocks.errorMsg, label);
         const tur = that.blocks.logo.turtles.ithTurtle(0);
 
         if (

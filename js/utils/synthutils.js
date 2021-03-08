@@ -569,7 +569,8 @@ function Synth() {
             } else {
                 for (const pitchNumber in TEMPERAMENT[customID]) {
                     if (pitchNumber !== "pitchNumber") {
-                        if (oneNote == TEMPERAMENT[customID][pitchNumber][1]) {
+                        if ((isCustom(customID) && oneNote == TEMPERAMENT[customID][pitchNumber][3])
+                            || oneNote == TEMPERAMENT[customID][pitchNumber][1]) {
                             const octaveDiff = octave - TEMPERAMENT[customID][pitchNumber][2];
                             return Number(
                                 TEMPERAMENT[customID][pitchNumber][0] *

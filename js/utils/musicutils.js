@@ -2943,7 +2943,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
         let pitchNumber = null;
         for (const number in TEMPERAMENT[temperament]) {
             if (number !== "pitchNumber") {
-                if (note === TEMPERAMENT[temperament][number][1]) {
+                if (note === TEMPERAMENT[temperament][number][3]) {
                     pitchNumber = Number(number);
                     break;
                 }
@@ -2979,7 +2979,7 @@ function getNote(noteArg, octave, transposition, keySignature, movable,
             inOctave = inOctave + 1;
         }
         pitchNumber = pitchNumber + "";
-        note = TEMPERAMENT[temperament][pitchNumber][1];
+        note = TEMPERAMENT[temperament][pitchNumber][3];
         octave = inOctave;
     } else {
         //Return E# as E#, Fb as Fb etc. for different temperament systems.

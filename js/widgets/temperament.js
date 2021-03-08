@@ -1952,7 +1952,7 @@ class TemperamentWidget {
         ];
         logo.blocks.loadNewBlocks(newStack1);
         logo.textMsg(_("New action block generated!"));
-
+            
         let number;
         if (isCustom(this.inTemperament)) {
             TEMPERAMENT[this.inTemperament] = [];
@@ -1963,7 +1963,8 @@ class TemperamentWidget {
                 TEMPERAMENT[this.inTemperament][number] = [
                     this.ratios[i],
                     this.notes[i].substring(0, this.notes[i].length - 1),
-                    this.notes[i].slice(-1)
+                    this.notes[i].slice(-1),
+                    this.notes[i].substring(0, this.notes[i].length - 1)
                 ];
             }
         }
