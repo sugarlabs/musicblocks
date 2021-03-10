@@ -524,6 +524,7 @@ function SampleWidget() {
 
 
     this.setTimbre = function () {
+        this.originalSampleName = this.sampleName + "_original";
         let sampleArray = [this.originalSampleName, this.sampleData, "la", 4];
         Singer.ToneActions.setTimbre(sampleArray, 0, this.timbreBlock);
     }
@@ -559,22 +560,20 @@ function SampleWidget() {
             null,
             false);
 
+        this.setTimbre();
         this._playDelayedSample();
     }
 
     this._playSample = function () {
         if (this.sampleName != null && this.sampleName != "") {
-            this.originalSampleName = this.sampleName + "_original";
 
             let finalpitch = CENTERPITCHHERTZ;
-
-            this.setTimbre();
 
             this._logo.synth.trigger(
                 0,
                 [finalpitch],
                 this.sampleLength/1000.0,
-                this.originalSampleName,
+                "customsample_" + this.originalSampleName,
                 null,
                 null,
                 false);
