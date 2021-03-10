@@ -67,13 +67,13 @@ class Oscilloscope {
         };
         document.getElementsByClassName("wfbToolbar")[0].style.backgroundColor = "#e8e8e8";
         document.getElementsByClassName("wfbWidget")[0].style.backgroundColor = "#FFFFFF";
-        const step = 10;
+        const step = 1.333;
         this.zoomFactor = 40.0;
         this.verticalOffset = 0;
         const zoomInButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("Zoom In"));
 
         zoomInButton.onclick = () => {
-            this.zoomFactor += step;
+            this.zoomFactor *= step;
         };
         zoomInButton.children[0].src = `data:image/svg+xml;base64,${window.btoa(
             unescape(encodeURIComponent(BIGGERBUTTON))
@@ -82,7 +82,7 @@ class Oscilloscope {
         const zoomOutButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("Zoom Out"));
 
         zoomOutButton.onclick = () => {
-            this.zoomFactor -= step;
+            this.zoomFactor /= step;
             if (this.zoomFactor < 1) {
                 this.zoomFactor = 1;
             }

@@ -246,6 +246,7 @@ function Activity() {
             "widgets/musickeyboard",
             "widgets/timbre",
             "widgets/oscilloscope",
+            "widgets/sampler",
             "widgets/statistics",
             "activity/lilypond",
             "activity/abc",
@@ -3802,7 +3803,7 @@ function Activity() {
                             args = {
                                 customTemperamentNotes: custom,
                                 startingPitch: logo.synth.startingPitch,
-                                octaveSpace: OCTAVERATIO
+                                octaveSpace: octaveRatio
                             };
                         }
                         break;

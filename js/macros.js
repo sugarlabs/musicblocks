@@ -110,6 +110,7 @@ function blockIsMacro(blkname) {
         "randomhelp",
         "registerhelp",
         "repeathelp",
+        "samplerhelp",
         "setdrumhelp",
         "settimbrehelp",
         "scalartranshelp",
@@ -1294,6 +1295,12 @@ function getMacroExpansion(blkname, x, y) {
         [9, "repeat", x, y, [null, 10, 0, null]],
         [10, ["number", { value: 4 }], 0, 0, [9]]
     ];
+    const SAMPLERHELP = [
+        [0, ["customsample", { value: ["", "" ,"do", 4] }], x, y, [null, 1, 2, 3]],
+        [1, ["audiofile", {value: ["", ""]}], 0 ,0, [0]],
+        [2, ["solfege", {value: "do"}], 0, 0, [0]],
+        [3, ["number", {value: 4}], 0, 0, [0]]
+    ];
     const SETDRUMHELP = [
         [0, ["newnote", { collapsed: false }], 0, 0, [9, 1, 4, 8]],
         [1, "divide", 0, 0, [0, 2, 3]],
@@ -1722,6 +1729,7 @@ function getMacroExpansion(blkname, x, y) {
         randomhelp: RANDOMHELP,
         registerhelp: REGISTERHELP,
         repeathelp: REPEATHELP,
+        samplerhelp: SAMPLERHELP,
         setdrumhelp: SETDRUMHELP,
         scalartranshelp: SCALARTRANSHELP,
         settimbrehelp: SETTIMBREHELP,
