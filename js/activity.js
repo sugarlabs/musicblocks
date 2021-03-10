@@ -2025,8 +2025,8 @@ function Activity() {
             searchWidget.value = null;
             //docById("searchResults").style.visibility = "visible";
             searchWidget.style.visibility = "visible";
-            searchWidget.style.left = palettes.getSearchPos()[0] * turtleBlocksScale + "px";
-            searchWidget.style.top = palettes.getSearchPos()[1] * turtleBlocksScale + "px";
+            searchWidget.style.left = palettes.getSearchPos()[0] * turtleBlocksScale * 1.5 + "px";
+            searchWidget.style.top = palettes.getSearchPos()[1] * turtleBlocksScale * 0.95 + "px";
 
             searchBlockPosition = [100, 100];
             prepSearchWidget();
