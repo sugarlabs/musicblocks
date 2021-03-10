@@ -361,7 +361,7 @@ function Activity() {
 
         searchWidget = docById("search");
         searchWidget.style.visibility = "hidden";
-        searchWidget.placeholder = _("search for blocks");
+        searchWidget.placeholder = _("Search for blocks");
 
         progressBar = docById("myProgress");
         progressBar.style.visibility = "hidden";
