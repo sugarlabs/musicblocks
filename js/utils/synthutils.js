@@ -1109,7 +1109,6 @@ function Synth() {
             ).toDestination();
             instrumentsSource[instrumentName] = [0, "poly"];
         } else if (sourceName in CUSTOMSAMPLES) {
-            console.log("got here");
             instruments[turtle][instrumentName] = this._createSampleSynth(
                 turtle,
                 instrumentName,
