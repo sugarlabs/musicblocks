@@ -286,7 +286,7 @@ available.
 ## <a name="MUSIC_BLOCKS_IN_JAPAN"></a>Music Blocks in Japan
 
 [Gakken STEAM](https://gakken-steam.jp/music_blocks/)
-[contributors-shield]: https://img.shields.io/github/contributors/Arjit222830/musicblocks?style=flat-square
-[contributors-url]: https://github.com//Arjit222830/musicblocks/graphs/contributors
+[contributors-shield]: https://img.shields.io/github/contributors/sugarblocks/musicblocks?style=flat-square
+[contributors-url]: https://github.com//sugarblocks/musicblocks/graphs/contributors
 
 [![Contributors]
