@@ -361,7 +361,7 @@ function Activity() {
 
         searchWidget = docById("search");
         searchWidget.style.visibility = "hidden";
-        searchWidget.placeholder = _("search for blocks");
+        searchWidget.placeholder = _("Search for blocks");
 
         progressBar = docById("myProgress");
         progressBar.style.visibility = "hidden";
@@ -2025,8 +2025,8 @@ function Activity() {
             searchWidget.value = null;
             //docById("searchResults").style.visibility = "visible";
             searchWidget.style.visibility = "visible";
-            searchWidget.style.left = palettes.getSearchPos()[0] * turtleBlocksScale + "px";
-            searchWidget.style.top = palettes.getSearchPos()[1] * turtleBlocksScale + "px";
+            searchWidget.style.left = palettes.getSearchPos()[0] * turtleBlocksScale * 1.5 + "px";
+            searchWidget.style.top = palettes.getSearchPos()[1] * turtleBlocksScale * 0.95 + "px";
 
             searchBlockPosition = [100, 100];
             prepSearchWidget();

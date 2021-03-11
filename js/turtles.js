@@ -974,10 +974,18 @@ Turtles.TurtlesView = class {
             document.body.appendChild(cont);
             cont.style.display = second ? "block" : "none";
             cont.setAttribute("id", "buttoncontainerTOP");
+            __makeCollapseButton();
             __makeExpandButton();
             __makeClearButton();
             __makeGridButton();
-            __makeCollapseButton();
+            jQuery.noConflict()(".tooltipped").each(function(){
+                jQuery.noConflict()(this).tooltip(
+                    {
+                        html: true,
+                        delay: 100
+                    }
+                );
+            });
             this._locked = false;
         };
 
