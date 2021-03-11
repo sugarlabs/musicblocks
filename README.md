@@ -286,3 +286,5 @@ available.
 ## <a name="MUSIC_BLOCKS_IN_JAPAN"></a>Music Blocks in Japan
 
 [Gakken STEAM](https://gakken-steam.jp/music_blocks/)
+[contributors-shield]: https://img.shields.io/github/contributors/Cesta-society/Cesta?style=flat-square
+[contributors-url]: https://github.com/Cesta-society/Cesta/graphs/contributors
