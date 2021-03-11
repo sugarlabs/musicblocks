@@ -604,7 +604,7 @@ class PitchStaircase {
         const w = window.innerWidth;
         this._cellScale = w / 1200;
 
-        const widgetWindow = window.widgetWindows.windowFor(this, "pitch staircase");
+        const widgetWindow = window.widgetWindows.windowFor(this, "pitch staircase", "pitch staircase", false);
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
