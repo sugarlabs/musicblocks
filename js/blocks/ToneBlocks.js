@@ -733,6 +733,7 @@ function setupToneBlocks() {
             this.parameter = true;
 	    this.extraWidth = 20;
             this.setPalette("tone");
+            this.hidden = true;
             this.beginnerBlock(false);
 
             this.setHelpString([
@@ -747,7 +748,7 @@ function setupToneBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            console.log("blk");
+            console.log("BLK");
             logo.blocks.updateBlockText(blk);
             return logo.blocks.blockList[blk].value;
         }

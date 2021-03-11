@@ -1073,6 +1073,7 @@ function Blocks(activity) {
                     if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
                         label = label.substr(0, STRINGLEN) + "...";
                     }
+
                     that.blockList[blk].text.text = label;
                     // that.blockList[blk]._positionText(that.blockList[blk].protoblock.scale);
                     that.blockList[blk].container.updateCache();
@@ -1129,6 +1130,7 @@ function Blocks(activity) {
 
                     const octave = this.blockList[oldBlock].value;
                     this.blockList[blk].value = octave;
+
                     this.blockList[blk].text.text = octave.toString();
                     // Make sure text is on top.
                     const z = this.blockList[blk].container.children.length - 1;
@@ -1866,7 +1868,6 @@ function Blocks(activity) {
                                 if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
                                     label = label.substr(0, STRINGLEN) + "...";
                                 }
-
                                 this.blockList[thisBlock].text.text = label;
                                 this.blockList[thisBlock].container.updateCache();
                                 this.newNameddoBlock(this.blockList[thisBlock].value, this.actionHasReturn(b), this.actionHasArgs(b));
@@ -4516,9 +4517,20 @@ function Blocks(activity) {
         }
 
         const myBlock = this.blockList[blk];
-        return (myBlock.name === "number" && myBlock.connections[0] !== null &&
-                ["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "nthmodalpitch"].indexOf(this.blockList[myBlock.connections[0]].name) !== -1 &&
-                this.blockList[myBlock.connections[0]].connections[2] === blk);
+
+        if (["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "nthmodalpitch"].indexOf(
+                this.blockList[myBlock.connections[0]].name
+            ) !== -1 &&
+            this.blockList[myBlock.connections[0]].connections[2] === blk) {
+            return true;
+        }
+
+        if (this.blockList[myBlock.connections[0]].name === "customsample" &&
+            this.blockList[myBlock.connections[0]].connections[3] === blk) {
+            return true;
+        }
+
+        return false;
     };
 
     /**
@@ -6214,6 +6226,10 @@ function Blocks(activity) {
                 this.blockList[blk].protoblock.parameter &&
                 this.blockList[blk].text !== null
             ) {
+                // The audiofile block label is handled in block.js
+                if (this.blockList[blk].name === "audiofile") {
+                    continue;
+                }
                 this.blockList[blk].text.text = "";
                 this.blockList[blk].container.updateCache();
             }
