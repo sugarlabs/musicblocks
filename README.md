@@ -287,4 +287,6 @@ available.
 
 [Gakken STEAM](https://gakken-steam.jp/music_blocks/)
 [contributors-shield]: https://img.shields.io/github/contributors/Arjit222830/musicblocks?style=flat-square
-[contributors-url]: https://github.com//musicblocks/graphs/contributors
+[contributors-url]: https://github.com//Arjit222830/musicblocks/graphs/contributors
+
+[![Contributors]
