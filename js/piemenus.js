@@ -827,7 +827,8 @@ const piemenuCustomNotes = function (
         const note = that._cusNoteWheel.navItems[that._cusNoteWheel.selectedNavItemIndex].title;
         let note1;
         if (that.blocks.logo.customTemperamentDefined){
-            note1 = TEMPERAMENT[selectedCustom].filter(ele => ele[1] === note)[0][3];
+            note1 = TEMPERAMENT[selectedCustom]
+                .filter(ele => ele[3] === note || ele[1] === note)[0][3];
         } else {
             note1 = note;
         }
