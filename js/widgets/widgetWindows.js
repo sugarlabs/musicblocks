@@ -23,6 +23,7 @@ class WidgetWindow {
     /**
      * @param {string} key
      * @param {string} title
+     * @param {boolean} fullscreen
      */
     constructor(key, title) {
         // Keep a refernce to the object within handlers
@@ -183,24 +184,32 @@ class WidgetWindow {
         if (!this._dragging) return;
 
         if (this._frame.style.top === "64px") {
-            this._overlayframe.style.zIndex = "1";
-            this._overlayframe.style.width = "100vw";
-            this._overlayframe.style.height = "calc(100vh - 64px)";
-            this._overlayframe.style.left = "0";
-            this._overlayframe.style.top = "64px";
-            this._overlayframe.style.border = "0.25vw solid black";
-            this._frame.style.zIndex = "10";
-            this._overlayframe.style.backgroundColor = "rgba(255,255,255,0.75)";
+            this._overlay(true);
         } else {
-            this._frame.style.zIndex = "1";
-            this._overlayframe.style.backgroundColor = "rgba(255,255,255,0)";
-            this._overlayframe.style.border = "0px";
-            this._overlayframe.style.zIndex = "-1";
+            this._overlay(false);
         }
         const x = e.clientX - this._dx,
             y = e.clientY - this._dy;
 
         this.setPosition(x, y);
+    }
+
+    _overlay(add) {
+        if (add) {
+            this._frame.style.zIndex = "10";
+            this._overlayframe.style.left = "0";
+            this._overlayframe.style.zIndex = "1";
+            this._overlayframe.style.top = "64px";
+            this._overlayframe.style.width = "100vw";
+            this._overlayframe.style.height = "calc(100vh - 64px)";
+            this._overlayframe.style.border = "0.25vw solid black";
+            this._overlayframe.style.backgroundColor = "rgba(255,255,255,0.75)";
+        } else {
+            this._frame.style.zIndex = "1";
+            this._overlayframe.style.border = "0px";
+            this._overlayframe.style.zIndex = "-1";
+            this._overlayframe.style.backgroundColor = "rgba(255,255,255,0)";
+        }
     }
 
     /**
@@ -225,7 +234,8 @@ class WidgetWindow {
      */
     _dragTopHandler(e) {
         this._dragging = false;
-        if (this._frame.style.top === "64px") {
+        if (this._frame.style.top === "64px"
+            && !this._maximized) {
             this._maximize();
             this.takeFocus();
             this.onmaximize();
@@ -439,6 +449,7 @@ class WidgetWindow {
             this._frame.style.top = this._savedPos[1];
             this._savedPos = null;
         }
+        this._overlay(false);
         this._frame.style.width = "auto";
         this._frame.style.height = "auto";
     }
@@ -583,7 +594,7 @@ class WidgetWindow {
  * @param {string} saveAs
  * @returns {WidgetWindow} this
  */
-window.widgetWindows.windowFor = (widget, title, saveAs) => {
+window.widgetWindows.windowFor = (widget, title, saveAs, fullscreen) => {
     let key = undefined;
     // Check for a blockNo attribute
     if (typeof widget.blockNo !== "undefined") key = widget.blockNo;
@@ -591,7 +602,7 @@ window.widgetWindows.windowFor = (widget, title, saveAs) => {
     else key = saveAs || title;
 
     if (typeof window.widgetWindows.openWindows[key] === "undefined") {
-        const win = new WidgetWindow(key, title).sendToCenter();
+        const win = new WidgetWindow(key, title, fullscreen).sendToCenter();
         window.widgetWindows.openWindows[key] = win;
     }
 
