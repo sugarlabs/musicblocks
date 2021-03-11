@@ -1,7 +1,7 @@
 [![Contributors][contributors-shield]][contributors-url]'
 
-<a href="https://github.com/badges/shields/graphs/contributors" alt="Contributors">
-    <img src="https://img.shields.io/github/contributors/badges/shields" /></a>
+<a href="https://github.com//sugarlabs/musicblocks/graphs/contributors" alt="Contributors">
+    <img src="https://img.shields.io/github/contributors/sugarlabs/musicblocks?style=flat-square" /></a>
 
 # Music Blocks
 
