@@ -38,6 +38,7 @@ function SampleWidget() {
     this.accidentalCenter = 2;
     this.octaveCenter = 4;
     this.freqArray = new Uint8Array();
+    this.sampleLength = 1000
 
     this._updateBlocks = function() {
         let mainSampleBlock;
@@ -77,23 +78,31 @@ function SampleWidget() {
 
     this.pause = function() {
         clearInterval(this._intervalID);
+        this.playBtn.innerHTML =
+            '<img src="header-icons/play-button.svg" title="' +
+            _("Play") +
+            '" alt="' +
+            _("Play") +
+            '" height="' +
+            ICONSIZE +
+            '" width="' +
+            ICONSIZE +
+            '" vertical-align="middle">';
+        this.isMoving = false;
     };
 
     this.resume = function() {
-        // Reset widget time since we are restarting.
-        // We will no longer keep synch with the turtles.
-        var d = new Date();
-
-        //this.getBrowserAudio();
-
-        //if (this._intervalID !== null) {
-        //    clearInterval(this._intervalID);
-        //}
-
-        //this._intervalID = setInterval(() => {
-        //    this._draw();
-        //}, RENDERINTERVAL);
-
+        this.playBtn.innerHTML =
+            '<img src="header-icons/pause-button.svg" title="' +
+            _("Pause") +
+            '" alt="' +
+            _("Pause") +
+            '" height="' +
+            ICONSIZE +
+            '" width="' +
+            ICONSIZE +
+            '" vertical-align="middle">';
+        this.isMoving = true;
     };
 
     this.pitchUp = function () {
@@ -264,14 +273,6 @@ function SampleWidget() {
 
         this._logo.synth.loadSynth(0, getVoiceSynthName(DEFAULTSAMPLE));
 
-        /*
-        for (i=0;i<CUSTOMSAMPLES.length;i++) {
-            if (CUSTOMSAMPLES[i][0] == this.sampleName) {
-                this.sampleData = CUSTOMSAMPLES[i][1];
-            }
-        }
-        */
-
         if (this._intervalID != null) {
             clearInterval(this._intervalID);
         }
@@ -293,11 +294,11 @@ function SampleWidget() {
             this.destroy();
         };
 
-        let playBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
-        playBtn.onclick = () => {
+        this.playBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
+        this.playBtn.onclick = () => {
             if (this.isMoving) {
                 this.pause();
-                playBtn.innerHTML =
+                this.playBtn.innerHTML =
                     '<img src="header-icons/play-button.svg" title="' +
                     _("Play") +
                     '" alt="' +
@@ -311,17 +312,6 @@ function SampleWidget() {
             } else {
                 if (!(this.sampleName == "")) {
                     this.resume();
-                    playBtn.innerHTML =
-                        '<img src="header-icons/pause-button.svg" title="' +
-                        _("Pause") +
-                        '" alt="' +
-                        _("Pause") +
-                        '" height="' +
-                        ICONSIZE +
-                        '" width="' +
-                        ICONSIZE +
-                        '" vertical-align="middle">';
-                    this.isMoving = true;
                     this._playReferencePitch();
                 }
             }
@@ -346,16 +336,12 @@ function SampleWidget() {
                     that.sampleData = rawLog;
                     that.sampleName = fileChooser.files[0].name;
                     that._addSample();
-                    that._playReferencePitch();
                     that._draw();
                 };
 
                 reader.onloadend = function() {
                     if (reader.result) {
                         value = [fileChooser.files[0].name, reader.result];
-
-
-                        that.resume();
                   } else {
                   }
               };
@@ -474,11 +460,11 @@ function SampleWidget() {
 
         this._parseSamplePitch();
 
-        this._playReferencePitch();
+        this.setTimbre();
 
         this._logo.textMsg(_("Upload a sample and adjust its pitch center."));
         this._draw();
-        this.resume();
+        this.pause();
 
         widgetWindow.sendToCenter();
     };
@@ -536,6 +522,13 @@ function SampleWidget() {
         this.sampleOctave = this.octaveCenter.toString();
     }
 
+
+    this.setTimbre = function () {
+        this.originalSampleName = this.sampleName + "_original";
+        let sampleArray = [this.originalSampleName, this.sampleData, "la", 4];
+        Singer.ToneActions.setTimbre(sampleArray, 0, this.timbreBlock);
+    }
+
     this._playReferencePitch = function() {
 
         this._usePitch(this.pitchInput.value);
@@ -561,33 +554,30 @@ function SampleWidget() {
         this._logo.synth.trigger(
             0,
             [reffinalpitch],
-            .5,
+            0.5,
             REFERENCESAMPLE,
             null,
             null,
             false);
 
+        this.setTimbre();
         this._playDelayedSample();
     }
 
     this._playSample = function () {
+        if (this.sampleName != null && this.sampleName != "") {
 
-        this.originalSampleName = this.sampleName + "_original";
-        let sampleArray = [this.originalSampleName, this.sampleData, "la", 4];
+            let finalpitch = CENTERPITCHHERTZ;
 
-        let finalpitch = CENTERPITCHHERTZ;
-        //this._logo.synth.loadSynth(0, this.sampleArray);
-
-        Singer.ToneActions.setTimbre(sampleArray, 0, this.timbreBlock);
-
-        this._logo.synth.trigger(
-            0,
-            [finalpitch],
-            1,
-            this.originalSampleName,
-            null,
-            null,
-            false);
+            this._logo.synth.trigger(
+                0,
+                [finalpitch],
+                this.sampleLength/1000.0,
+                "customsample_" + this.originalSampleName,
+                null,
+                null,
+                false);
+        }
     }
 
     this._waitAndPlaySample = function () {
@@ -595,11 +585,25 @@ function SampleWidget() {
             setTimeout(() => {
                 this._playSample();
                 resolve('played');
+                this._endPlaying();
             }, SAMPLEWAITTIME);
         });
     }
 
     this._playDelayedSample = async function () {
         const result = await this._waitAndPlaySample();
+    }
+
+    this._waitAndEndPlaying = function () {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                this.pause();
+                resolve('ended');
+            }, this.sampleLength);
+        });
+    }
+
+    this._endPlaying = async function () {
+        const result = await this._waitAndEndPlaying();
     }
 }
