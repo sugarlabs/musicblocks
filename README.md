@@ -1,4 +1,4 @@
-[![Contributors][contributors-shield]][contributors-url]
+[[contributors-shield]][contributors-url]
 
 # Music Blocks
 
@@ -288,5 +288,3 @@ available.
 [Gakken STEAM](https://gakken-steam.jp/music_blocks/)
 [contributors-shield]: https://img.shields.io/github/contributors/sugarlabs/musicblocks?style=flat-square
 [contributors-url]: https://github.com//sugarlabs/musicblocks/graphs/contributors
-
-[![Contributors]
