@@ -666,7 +666,7 @@ class TimbreWidget {
 
         this._playing = false;
 
-        const widgetWindow = window.widgetWindows.windowFor(this, "timbre");
+        const widgetWindow = window.widgetWindows.windowFor(this, "timbre", "timbre", false);
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();

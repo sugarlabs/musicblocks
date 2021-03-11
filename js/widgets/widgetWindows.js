@@ -12,10 +12,10 @@
 /*global _, docById*/
 
 /*
-     Globals location
-     - js/utils/utils.js
-         _, docById
- */
+Globals location
+- js/utils/utils.js
+_, docById
+*/
 
 window.widgetWindows = { openWindows: {}, _posCache: {} };
 
@@ -25,7 +25,7 @@ class WidgetWindow {
      * @param {string} title
      * @param {boolean} fullscreen
      */
-    constructor(key, title) {
+    constructor(key, title, fullscreen = true) {
         // Keep a refernce to the object within handlers
         this._key = key;
         this._buttons = [];
@@ -35,6 +35,7 @@ class WidgetWindow {
         this._rolled = false;
         this._savedPos = null;
         this._maximized = false;
+        this._fullscreenEnabled = fullscreen;
 
         // Drag offset for correct positioning
         this._dx = this._dy = 0;
@@ -89,9 +90,11 @@ class WidgetWindow {
         // The handle needs the events bound as it's a sibling of the dragging div
         // not a relative in either direciton.
 
-        this._drag.ondblclick = () => {
-            this._maximize();
-        };
+        if (this._fullscreenEnabled) {
+            this._drag.ondblclick = () => {
+                this._maximize();
+            };
+        }
 
         this._drag.onmousedown = this._handle.onmousedown = (e) => {
             this._dragging = true;
@@ -139,22 +142,23 @@ class WidgetWindow {
         titleEl.innerHTML = _(this._title);
         titleEl.id = this._key + "WidgetID";
 
-        const maxminButton = this._create("div", "wftButton wftMaxmin", this._drag);
-        maxminButton.onclick = maxminButton.onmousedown = (e) => {
-            if (this._maximized) {
-                this._restore();
-                this.sendToCenter();
-            } else {
-                this._maximize();
-            }
-            this.takeFocus();
-            this.onmaximize();
-            e.preventDefault();
-            e.stopImmediatePropagation();
-        };
-
-        this._maxminIcon = this._create("img", undefined, maxminButton);
-        this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
+        if (this._fullscreenEnabled) {
+            const maxminButton = this._create("div", "wftButton wftMaxmin", this._drag);
+            maxminButton.onclick = maxminButton.onmousedown = (e) => {
+                if (this._maximized) {
+                    this._restore();
+                    this.sendToCenter();
+                } else {
+                    this._maximize();
+                }
+                this.takeFocus();
+                this.onmaximize();
+                e.preventDefault();
+                e.stopImmediatePropagation();
+            };
+            this._maxminIcon = this._create("img", undefined, maxminButton);
+            this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
+        }
 
         this._body = this._create("div", "wfWinBody", this._frame);
         this._toolbar = this._create("div", "wfbToolbar", this._body);
@@ -183,7 +187,8 @@ class WidgetWindow {
     _docMouseMoveHandler(e) {
         if (!this._dragging) return;
 
-        if (this._frame.style.top === "64px") {
+        if (this._fullscreenEnabled
+            && this._frame.style.top === "64px") {
             this._overlay(true);
         } else {
             this._overlay(false);
@@ -234,7 +239,8 @@ class WidgetWindow {
      */
     _dragTopHandler(e) {
         this._dragging = false;
-        if (this._frame.style.top === "64px"
+        if (this._fullscreenEnabled
+            && this._frame.style.top === "64px"
             && !this._maximized) {
             this._maximize();
             this.takeFocus();
