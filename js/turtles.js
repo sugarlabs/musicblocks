@@ -978,9 +978,8 @@ Turtles.TurtlesView = class {
             __makeExpandButton();
             __makeClearButton();
             __makeGridButton();
-            const $j = jQuery.noConflict();
             jQuery.noConflict()(".tooltipped").each(function(){
-                $j(this).tooltip(
+                jQuery.noConflict()(this).tooltip(
                     {
                         html: true,
                         delay: 100
