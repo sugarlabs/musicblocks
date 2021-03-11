@@ -72,7 +72,8 @@ function setupToneActions() {
             }
 
             if (!accounted && typeof instrument === "object"){
-                synth = instrument[0];
+                synth = "customsample_" + instrument[0];
+                CUSTOMSAMPLES[synth] = [instrument[1], instrument[2], instrument[3]];
             }
 
             if ((synth === undefined) || (synth === null)) {
@@ -85,11 +86,7 @@ function setupToneActions() {
 
             if (tur.singer.instrumentNames.indexOf(synth) === -1) {
                 tur.singer.instrumentNames.push(synth);
-                if (typeof instrument === "object") {
-                    logo.synth.loadSynth(turtle, instrument);
-                } else {
-                    logo.synth.loadSynth(turtle, synth);
-                }
+                logo.synth.loadSynth(turtle, synth);
 
                 if (tur.singer.synthVolume[synth] === undefined) {
                     // The electronic synthvolume will track any
