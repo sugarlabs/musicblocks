@@ -1,3 +1,5 @@
+[![Contributors][contributors-shield]][contributors-url]
+
 # Music Blocks
 
 “_All musicians are subconsciously mathematicians._” — Monk
