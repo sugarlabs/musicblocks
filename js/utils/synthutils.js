@@ -990,26 +990,35 @@ function Synth() {
     };
 
     this._parseSampleCenterNo = function (solfege, octave) {
-      let pitchName = "C4";
-      let solfegeDict = {do:0, re:2, mi:4, fa:5, so:7, la:9, ti:11};
+        let pitchName = "C4";
+        const solfegeDict = {"do":0, "re":2, "mi":4, "fa":5, "sol":7, "la":9, "ti":11};
+        const letterDict = {"C":0, "D":2, "E":4, "F":5, "G":7, "A":9, "B":11};
 
-      let attr;
-      if (solfege.indexOf(SHARP) !==-1) {
-          attr = 1;
-      } else if (solfege.indexOf(FLAT) !== -1) {
-          attr = -1;
-      } else if (solfege.indexOf(DOUBLESHARP) !== -1) {
-          attr = 2;
-      } else if (solfege.indexOf(DOUBLEFLAT) !== -1) {
-          attr = -2;
-      } else {
-          attr = 0;
-      }
+        let attr = getArticulation(solfege);
+        if (attr === SHARP) {
+            attr = 1;
+        } else if (attr ===FLAT) {
+            attr = -1;
+        } else if (attr === DOUBLESHARP) {
+            attr = 2;
+        } else if (attr === DOUBLEFLAT) {
+            attr = -2;
+        } else {
+            attr = 0;
+        }
 
-      fragment = solfege.substring(0,2);
-      let chromaticNumber = solfegeDict[fragment];
-      let pitchNumber = octave * 12 + chromaticNumber + attr;
-      return pitchNumber.toString();
+        fragment = solfege.replace(attr, "")
+        let chromaticNumber = 0;
+        if (fragment in solfegeDict) {
+            chromaticNumber = solfegeDict[fragment];
+        } else if (fragment in letterDict) {
+            chromaticNumber = letterDict[fragment];
+        } else {
+            console.debug("Cannot parse " + fragment);
+        }
+        let pitchNumber = octave * 12 + chromaticNumber + attr;
+        console.log(solfege + octave + " = " + pitchNumber)
+        return pitchNumber.toString();
     };
 
     // Function using builtin synths from Tone.js
