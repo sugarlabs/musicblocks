@@ -1,4 +1,4 @@
-[contributors-shield][contributors-url]
+[![Contributors][contributors-shield]][contributors-url]
 
 # Music Blocks
 

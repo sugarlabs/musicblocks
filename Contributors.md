@@ -1,3 +1,3 @@
 # Contributors
 
-- [Arjit Bhandari](https://github.com/Arjit222830/musicblocks)
+[Arjit Bhandari](https://github.com/Arjit222830/musicblocks)
