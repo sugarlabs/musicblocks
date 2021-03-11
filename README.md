@@ -1,4 +1,6 @@
-[![Contributors][contributors-shield]][contributors-url]
+<a href="https://github.com//sugarlabs/musicblocks/graphs/contributors" alt="Contributors">
+    <img src="https://img.shields.io/github/contributors/sugarlabs/musicblocks?style=flat-square" />
+</a>
 
 # Music Blocks
 
@@ -286,5 +288,3 @@ available.
 ## <a name="MUSIC_BLOCKS_IN_JAPAN"></a>Music Blocks in Japan
 
 [Gakken STEAM](https://gakken-steam.jp/music_blocks/)
-[contributors-shield]: https://img.shields.io/github/contributors/sugarlabs/musicblocks?style=flat-square
-[contributors-url]: https://github.com//sugarlabs/musicblocks/graphs/contributors
