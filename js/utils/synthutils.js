@@ -9,6 +9,29 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/*global _, last, Tone, require, TEMPERAMENT, pitchToNumber, getNoteFromInterval, FLAT, SHARP,
+pitchToFrequency, getCustomNote, octaveRatio, isCustom, Singer, DOUBLEFLAT, DOUBLESHARP,
+DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform, getArticulation*/
+
+/*
+   Global Locations
+    - js/utils/utils.js
+        _, last
+    - js/blocks.js
+        TEMPERAMENT, octaveRatio
+    - js/utils/musicutils.js
+        pitchToNumber, getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
+        isCustom, DOUBLEFLAT, DOUBLESHARP, DEFAULTDRUM, getOscillatorTypes, numberToPitch,
+        getArticulation
+    - js/turtle-singer.js
+        Singer
+    - js/utils/platformstyle.js
+        platform
+*/
+
+/*exported NOISENAMES, VOICENAMES, DRUMNAMES, EFFECTSNAMES, CUSTOMSAMPLES,
+instrumentsEffects, instrumentsFilters, Synth*/
+
 const POLYCOUNT = 3;
 
 const NOISENAMES = [
@@ -261,7 +284,7 @@ const SAMPLECENTERNO = {
     "double bass": ["C4", 39]
 };
 
-CUSTOMSAMPLES = [];
+const CUSTOMSAMPLES = [];
 
 const percussionInstruments = ["koto", "banjo", "dulcimer", "xylophone", "celeste"];
 const stringInstruments = ["piano", "guitar", "acoustic guitar", "electric guitar"];
@@ -300,7 +323,6 @@ const instrumentsEffects = { 0: {} };
 const instrumentsFilters = { 0: {} };
 
 function Synth() {
-    console.debug("SYNTH");
     // Isolate synth functions here.
 
     const BUILTIN_SYNTHS = {
@@ -331,6 +353,7 @@ function Synth() {
     this.tone = null;
 
     Tone.Buffer.onload = function () {
+        // eslint-disable-next-line no-console
         console.debug("sample loaded");
     };
 
@@ -355,7 +378,7 @@ function Synth() {
             startPitch.slice(-1),
             "C major"
         );
-        startPitchObj = numberToPitch(number);
+        const startPitchObj = numberToPitch(number);
         startPitch = (startPitchObj[0] + startPitchObj[1]).toString();
 
         if (startPitch.substring(1, len - 1) === FLAT || startPitch.substring(1, len - 1) === "b") {
@@ -463,6 +486,7 @@ function Synth() {
             if (key.substring(1, key.length) === FLAT || key.substring(1, key.length) === "b") {
                 note = key.substring(0, 1) + "" + "b";
                 this.noteFrequencies[note] = this.noteFrequencies[key];
+                // eslint-disable-next-line no-delete-var
                 delete this.noteFrequencies[key];
             } else if (
                 key.substring(1, key.length) === SHARP ||
@@ -470,6 +494,7 @@ function Synth() {
             ) {
                 note = key.substring(0, 1) + "" + "#";
                 this.noteFrequencies[note] = this.noteFrequencies[key];
+                // eslint-disable-next-line no-delete-var
                 delete this.noteFrequencies[key];
             }
         }
@@ -502,7 +527,7 @@ function Synth() {
                 return notes;
             } else {
                 const results = [];
-                for (i = 0; i < notes.length; i++) {
+                for (let i = 0; i < notes.length; i++) {
                     if (typeof notes[i] === "string") {
                         len = notes[i].length;
                         note = notes[i].substring(0, len - 1);
@@ -565,11 +590,16 @@ function Synth() {
                 "C Major"
             );
             if (typeof oneNote === "number") {
+                // eslint-disable-next-line
                 oneNote = oneNote;
             } else {
                 for (const pitchNumber in TEMPERAMENT[customID]) {
                     if (pitchNumber !== "pitchNumber") {
-                        if (oneNote == TEMPERAMENT[customID][pitchNumber][1]) {
+                        if (
+                            (isCustom(customID) &&
+                                oneNote == TEMPERAMENT[customID][pitchNumber][3]) ||
+                            oneNote == TEMPERAMENT[customID][pitchNumber][1]
+                        ) {
                             const octaveDiff = octave - TEMPERAMENT[customID][pitchNumber][2];
                             return Number(
                                 TEMPERAMENT[customID][pitchNumber][0] *
@@ -610,6 +640,7 @@ function Synth() {
         this.tone.context.resume();
     };
 
+    /*eslint-disable no-undef*/
     this.loadSamples = function () {
         this.samplesManifest = {
             voice: [
@@ -667,10 +698,13 @@ function Synth() {
                 { name: "snare drum", data: SNARE_SAMPLE }
             ]
         };
+        /*eslint-enable no-undef*/
+        const data = function () {
+            return null;
+        };
+        this.samplesManifest.voice.push({ name: "empty", data: data });
 
-        let data = function() {return null};
-        this.samplesManifest.voice.push({ name: "empty", data: data});
-
+        /*eslint-disable no-prototype-builtins*/
         if (this.samples === null) {
             this.samples = {};
             for (const type in this.samplesManifest) {
@@ -682,7 +716,7 @@ function Synth() {
     };
 
     this._loadSample = function (sampleName) {
-        let accounted = false;
+        // let accounted = false;
         for (const type in this.samplesManifest) {
             if (this.samplesManifest.hasOwnProperty(type)) {
                 for (const sample in this.samplesManifest[type]) {
@@ -691,7 +725,7 @@ function Synth() {
                         if (sampleName === name) {
                             // Load data returned from samples function.
                             this.samples[type][name] = this.samplesManifest[type][sample].data();
-                            accounted = true;
+                            // accounted = true;
                         }
                     }
                 }
@@ -730,11 +764,21 @@ function Synth() {
             }
         }
         this.recorder.ondataavailable = (evt) => {
-            console.debug(evt.data);
+            // console.debug(evt.data);
             if (typeof evt.data === "undefined" || evt.data.size === 0) return;
             chunks.push(evt.data);
         };
-        this.recorder.onstop = (e) => {
+        const download = (uri, name) => {
+            const link = document.createElement("a");
+            link.download = name;
+            link.href = uri;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            // eslint-disable-next-line no-delete-var
+            delete link;
+        };
+        this.recorder.onstop = () => {
             if (!chunks.length) return;
             let blob;
             if (platform.FF) {
@@ -745,15 +789,6 @@ function Synth() {
             chunks = [];
             const url = URL.createObjectURL(blob);
             download(url, "");
-        };
-        let download = (uri, name) => {
-            const link = document.createElement("a");
-            link.download = name;
-            link.href = uri;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            delete link;
         };
         // this.recorder.start();
         // setTimeout(()=>{this.recorder.stop();},5000);
@@ -947,6 +982,7 @@ function Synth() {
 
     // Poly synth will be loaded as the default synth.
     this.createDefaultSynth = function (turtle) {
+        // eslint-disable-next-line no-console
         console.debug("create default poly/default/custom synth for turtle " + turtle);
         const default_synth = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT).toDestination();
         instruments[turtle]["electronic synth"] = default_synth;
@@ -957,11 +993,11 @@ function Synth() {
 
     // Function reponsible for creating the synth using the existing
     // samples: drums and voices
-    this._createSampleSynth = function (turtle, instrumentName, sourceName, params) {
+    this._createSampleSynth = function (turtle, instrumentName, sourceName) {
         let tempSynth;
         if (sourceName in this.samples.voice) {
             instrumentsSource[instrumentName] = [2, sourceName];
-            let noteDict = {};
+            const noteDict = {};
             if (sourceName in SAMPLECENTERNO) {
                 noteDict[SAMPLECENTERNO[sourceName][0]] = this.samples.voice[sourceName];
             } else {
@@ -970,19 +1006,17 @@ function Synth() {
             tempSynth = new Tone.Sampler(noteDict);
         } else if (sourceName in this.samples.drum) {
             instrumentsSource[instrumentName] = [1, sourceName];
-            console.debug(sourceName);
             tempSynth = new Tone.Player(this.samples.drum[sourceName]);
         } else if (sourceName in CUSTOMSAMPLES){
             instrumentsSource[instrumentName] = [2, sourceName];
-            let noteDict = {};
-            let params = CUSTOMSAMPLES[sourceName];
-            let center = this._parseSampleCenterNo(params[1], params[2]);
+            const noteDict = {};
+            const params = CUSTOMSAMPLES[sourceName];
+            const center = this._parseSampleCenterNo(params[1], params[2]);
             noteDict[center] = params[0];
             tempSynth = new Tone.Sampler(noteDict);
         } else {
             // default drum sample
             instrumentsSource[instrumentName] = [1, "drum"];
-            console.debug(DEFAULTDRUM);
             tempSynth = new Tone.Player(this.samples.drum[DEFAULTDRUM]);
         }
 
@@ -990,7 +1024,7 @@ function Synth() {
     };
 
     this._parseSampleCenterNo = function (solfege, octave) {
-        let pitchName = "C4";
+        // const pitchName = "C4";
         const solfegeDict = {"do":0, "re":2, "mi":4, "fa":5, "sol":7, "la":9, "ti":11};
         const letterDict = {"C":0, "D":2, "E":4, "F":5, "G":7, "A":9, "B":11};
 
@@ -1007,17 +1041,19 @@ function Synth() {
             attr = 0;
         }
 
-        fragment = solfege.replace(attr, "")
+        const fragment = solfege.replace(attr, "");
         let chromaticNumber = 0;
         if (fragment in solfegeDict) {
             chromaticNumber = solfegeDict[fragment];
         } else if (fragment in letterDict) {
             chromaticNumber = letterDict[fragment];
         } else {
+            // eslint-disable-next-line no-console
             console.debug("Cannot parse " + fragment);
         }
-        let pitchNumber = octave * 12 + chromaticNumber + attr;
-        console.log(solfege + octave + " = " + pitchNumber)
+        const pitchNumber = octave * 12 + chromaticNumber + attr;
+        // eslint-disable-next-line no-console
+        console.log(solfege + octave + " = " + pitchNumber);
         return pitchNumber.toString();
     };
 
@@ -1035,7 +1071,7 @@ function Synth() {
             case "simple 3":
             case "simple 4":
                 instrumentsSource[instrumentName] = [3, sourceName];
-                console.debug(sourceName);
+                // console.debug(sourceName);
                 builtin_synth = new Tone.Synth(synthOptions);
                 break;
             case "sine":
@@ -1043,29 +1079,29 @@ function Synth() {
             case "square":
             case "sawtooth":
                 instrumentsSource[instrumentName] = [3, sourceName];
-                console.debug(sourceName);
+                // console.debug(sourceName);
                 builtin_synth = new Tone.Synth(synthOptions);
                 break;
             case "pluck":
                 instrumentsSource[instrumentName] = [3, sourceName];
-                console.debug(sourceName);
+                // console.debug(sourceName);
                 builtin_synth = new Tone.PluckSynth(synthOptions);
                 break;
             case "poly":
                 instrumentsSource[instrumentName] = [0, "poly"];
-                console.debug("poly");
+                // console.debug("poly");
                 builtin_synth = new Tone.PolySynth(Tone.AMSynth, synthOptions.polyphony);
                 break;
             case "noise1":
             case "noise2":
             case "noise3":
                 instrumentsSource[instrumentName] = [4, sourceName];
-                console.debug(sourceName);
+                // console.debug(sourceName);
                 builtin_synth = new Tone.NoiseSynth(synthOptions);
                 break;
             default:
                 instrumentsSource[instrumentName] = [0, "poly"];
-                console.debug("poly (default)");
+                // console.debug("poly (default)");
                 builtin_synth = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT);
                 break;
         }
@@ -1160,6 +1196,7 @@ function Synth() {
     };
 
     this.loadSynth = function (turtle, sourceName) {
+        /* eslint-disable*/
         if (sourceName in instruments[turtle]) {
             if (sourceName.substring(0,13) === "customsample_") {
                 console.debug("loading custom " + sourceName);
@@ -1215,6 +1252,7 @@ function Synth() {
                 notes = notes1;
             }
             console.debug(notes);
+            /*eslint-enable*/
         }
 
         let numFilters;
@@ -1358,7 +1396,7 @@ function Synth() {
                     }
 
                     if (paramsEffects.doDistortion) {
-                        distort.dispose();
+                        distortion.dispose();
                     }
 
                     if (paramsEffects.doTremolo) {
@@ -1397,6 +1435,7 @@ function Synth() {
         paramsFilters,
         setNote
     ) {
+        // eslint-disable-next-line no-console
         console.debug(
             turtle +
                 " " +
@@ -1449,13 +1488,18 @@ function Synth() {
             flag = instrumentsSource[instrumentName][0];
             if (flag === 1 || flag === 2) {
                 const sampleName = instrumentsSource[instrumentName][1];
+                //eslint-disable-next-line no-console
+                console.debug(sampleName);
             }
         }
 
         // Get note values as per the source of the synth.
         switch (flag) {
             case 1: // drum
-                if ((instrumentName.slice(0, 4) === "http") || (instrumentName.slice(0,21) === "data:audio/wav;base64")) {
+                if (
+                    instrumentName.slice(0, 4) === "http" ||
+                    instrumentName.slice(0, 21) === "data:audio/wav;base64"
+                ) {
                     tempSynth.start();
                 } else if (instrumentName.slice(0, 4) === "file") {
                     tempSynth.start();
@@ -1465,6 +1509,7 @@ function Synth() {
                     } catch (e) {
                         // Occasionally we see "Start time must be
                         // strictly greater than previous start time"
+                        // eslint-disable-next-line no-console
                         console.debug(e);
                     }
                 }
@@ -1585,6 +1630,7 @@ function Synth() {
             synth = instruments[turtle][instrumentName];
         }
 
+        // eslint-disable-next-line no-console
         console.debug(
             "Crescendo(decibels)",
             instrumentName,
@@ -1595,6 +1641,7 @@ function Synth() {
             "t:",
             rampTime
         );
+        // eslint-disable-next-line no-console
         console.debug("Crescendo", instrumentName, ":", oldVol, "to", volume, "t:", rampTime);
 
         synth.volume.linearRampToValueAtTime(db, Tone.now() + rampTime);
@@ -1628,6 +1675,7 @@ function Synth() {
         if (instrumentName in instruments[turtle]) {
             return instruments[turtle][instrumentName].volume.value;
         } else {
+            // eslint-disable-next-line no-console
             console.debug("instrument not found");
             return 50;
         }
