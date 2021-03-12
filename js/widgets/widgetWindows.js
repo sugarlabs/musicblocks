@@ -93,6 +93,10 @@ class WidgetWindow {
         if (this._fullscreenEnabled) {
             this._drag.ondblclick = () => {
                 this._maximize();
+                this.takeFocus();
+                this.onmaximize();
+                e.preventDefault();
+                e.stopImmediatePropagation();
             };
         }
 
