@@ -424,9 +424,6 @@ function MusicKeyboard() {
             }
         };
 
-        element.onmouseout = function () {
-            // __endNote();
-        };
 
         element.onmouseup = function () {
             __endNote(this);
@@ -449,7 +446,7 @@ function MusicKeyboard() {
         const tur = logo.turtles.ithTurtle(0);
         this.bpm = tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
 
-        widgetWindow.onmaximize = function () {
+        this.widgetWindow.onmaximize = function () {
             if (widgetWindow._maximized) {
                 widgetWindow.getWidgetBody().style.position = "absolute";
                 widgetWindow.getWidgetBody().style.height = "calc(100vh - 64px)";
@@ -460,7 +457,8 @@ function MusicKeyboard() {
                 docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
                 docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
                 widgetWindow.getWidgetBody().style.left = "60px";
-            } else {
+            }
+            else {
                 const outerDiv = docById("mkbOuterDiv");
                 outerDiv.style.maxHeight = "400px";
                 widgetWindow.getWidgetBody().style.position = "relative";
