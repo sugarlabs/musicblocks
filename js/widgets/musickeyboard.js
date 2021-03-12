@@ -1437,7 +1437,7 @@ function MusicKeyboard() {
         start = parseInt(start);
         duration = parseInt(duration[0]) / parseInt(duration[1]);
         const newduration = parseFloat((Math.round(duration * 8) / 8).toFixed(3));
-        this._notesPlayed = this._notesPlayed.map(function (item) {
+        this._notesPlayed = this._notesPlayed.map((item) => {
             if (item.startTime === start) {
                 item.duration = newduration;
             }
@@ -1452,7 +1452,7 @@ function MusicKeyboard() {
         const cell = docById(cellId);
         const dur = cell.getAttribute("dur");
 
-        this._notesPlayed = this._notesPlayed.reduce(function (prevValue, curValue) {
+        this._notesPlayed = this._notesPlayed.reduce((prevValue, curValue) => {
             let oldcurValue, newcurValue;
             if (parseInt(curValue.startTime) === start) {
                 prevValue = prevValue.concat([curValue]);
@@ -1479,7 +1479,7 @@ function MusicKeyboard() {
     this._deleteNotes = function (start) {
         start = parseInt(start);
 
-        this._notesPlayed = this._notesPlayed.filter(function (ele) {
+        this._notesPlayed = this._notesPlayed.filter((ele) => {
             return parseInt(ele.startTime) !== start;
         });
 
@@ -1489,7 +1489,7 @@ function MusicKeyboard() {
     this._divideNotes = function (start, divideNoteBy) {
         start = parseInt(start);
 
-        this._notesPlayed = this._notesPlayed.reduce(function (prevValue, curValue) {
+        this._notesPlayed = this._notesPlayed.reduce((prevValue, curValue) => {
             let newcurValue, newcurValue2, oldcurValue;
             if (parseInt(curValue.startTime) === start) {
                 if (beginnerMode === "true") {
@@ -2035,7 +2035,7 @@ function MusicKeyboard() {
             const cell = docById("labelcol" + (this.layout.length - index - 1));
             this.layout[index].noteOctave = parseInt(blockValue);
             cell.innerHTML = this.layout[index].noteName + this.layout[index].noteOctave.toString();
-            this._notesPlayed.map(function (item) {
+            this._notesPlayed.map((item) => {
                 if (item.objId == this.layout[index].blockNumber) {
                     item.noteOctave = parseInt(blockValue);
                 }
