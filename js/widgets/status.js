@@ -98,12 +98,12 @@ class StatusMatrix {
             }
             cell.style.width = "212.5px";
             this.widgetWindow.onmaximize = () => {
-                this.isMaximized = !(this.isMaximized);
-                console.debug("Maximized " + this.isMaximized);
+                this.isMaximized = !this.isMaximized;
                 cell.style.width = "100vw";
                 cell.style.paddingLeft = "30px";
-                cell.style.fontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR)*0.90 + "%";
-                if(!(this.isMaximized)){
+                cell.style.fontSize =
+                    Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
+                if (!this.isMaximized) {
                     cell.style.width = "212.5px";
                 }
             };
@@ -120,7 +120,8 @@ class StatusMatrix {
             const row = header.insertRow();
 
             cell = row.insertCell(); // i + 1);
-            cell.style.fontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR)*0.90 + "%";
+            cell.style.fontSize =
+                Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
 
             // console.debug(statusField[1]);
 
@@ -169,7 +170,7 @@ class StatusMatrix {
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
                 cell.style.fontSize =
-                    Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR)*0.90 + "%";
+                    Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
                 cell.innerHTML = "";
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.textAlign = "center";
@@ -179,7 +180,8 @@ class StatusMatrix {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             const row = header.insertRow();
             cell = row.insertCell();
-            cell.style.fontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR)*0.90 + "%";
+            cell.style.fontSize =
+                Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
             const str = _("note");
             const label = str.charAt(0).toUpperCase() + str.slice(1);
             cell.innerHTML = "&nbsp;<b>" + label + "</b>";
@@ -190,7 +192,7 @@ class StatusMatrix {
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
                 cell.style.fontSize =
-                    Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR)*0.90 + "%";
+                    Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
                 cell.innerHTML = "";
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.textAlign = "center";
