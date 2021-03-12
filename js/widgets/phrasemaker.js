@@ -11,39 +11,39 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /*global logo, turtles, _, platformColor, docById, MATRIXSOLFEHEIGHT, toFraction, Singer,
-   SOLFEGECONVERSIONTABLE, slicePath, wheelnav, delayExecution, DEFAULTVOICE, getDrumName,
-   MATRIXSOLFEWIDTH, getDrumIcon, noteIsSolfege, isCustom, i18nSolfege, getNote, DEFAULTDRUM,
-   last, DRUMS, SHARP, FLAT, PREVIEWVOLUME, DEFAULTVOLUME, noteToFrequency, getDrumIndex, LCD,
-   calcNoteValueToDisplay, NOTESYMBOLS, EIGHTHNOTEWIDTH, saveLocally, docBySelector*/
+SOLFEGECONVERSIONTABLE, slicePath, wheelnav, delayExecution, DEFAULTVOICE, getDrumName,
+MATRIXSOLFEWIDTH, getDrumIcon, noteIsSolfege, isCustom, i18nSolfege, getNote, DEFAULTDRUM,
+last, DRUMS, SHARP, FLAT, PREVIEWVOLUME, DEFAULTVOLUME, noteToFrequency, getDrumIndex, LCD,
+calcNoteValueToDisplay, NOTESYMBOLS, EIGHTHNOTEWIDTH, saveLocally, docBySelector*/
 
 /*
-     Globals location
-     - lib/wheelnav
-         slicePath, wheelnav
-     
-     - js/utils/musicutils.js
-         EIGHTHNOTEWIDTH, NOTESYMBOLS, calcNoteValueToDisplay, getDrumIndex, noteToFrequency,
-         FLAT, SHARP, DRUMS, MATRIXSOLFEHEIGHT, toFraction, SOLFEGECONVERSIONTABLE, DEFAULTVOICE,
-         getDrumName, MATRIXSOLFEWIDTH, getDrumIcon, noteIsSolfege, isCustom, i18nSolfege,
-         getNote, DEFAULTDRUM
-     
-     - js/utils/utils.js
-         _, delayExecution, last, LCD, docById, docBySelector
-     
-     - js/turtle-singer.js
-         Singer
-     
-     - js/utils/platformstyle.js
-         platformColorcl
-     
-     - js/logo.js
-         PREVIEWVOLUME, DEFAULTVOLUME
-     
-     - js/activity.js
-         saveLocally(window, planet)
- */
+Globals location
+- lib/wheelnav
+    slicePath, wheelnav
 
-const MATRIXGRAPHICS = [
+- js/utils/musicutils.js
+    EIGHTHNOTEWIDTH, NOTESYMBOLS, calcNoteValueToDisplay, getDrumIndex, noteToFrequency,
+    FLAT, SHARP, DRUMS, MATRIXSOLFEHEIGHT, toFraction, SOLFEGECONVERSIONTABLE, DEFAULTVOICE,
+    getDrumName, MATRIXSOLFEWIDTH, getDrumIcon, noteIsSolfege, isCustom, i18nSolfege,
+    getNote, DEFAULTDRUM
+
+- js/utils/utils.js
+    _, delayExecution, last, LCD, docById, docBySelector
+
+- js/turtle-singer.js
+    Singer
+
+- js/utils/platformstyle.js
+    platformColorcl
+
+- js/logo.js
+    PREVIEWVOLUME, DEFAULTVOLUME
+
+- js/activity.js
+    saveLocally(window, planet)
+*/
+
+    const MATRIXGRAPHICS = [
     "forward",
     "back",
     "right",
@@ -584,7 +584,8 @@ class PhraseMaker {
                     this.rowLabels[i] + ": " + this.rowArgs[i][0] + ": " + this.rowArgs[i][1]
                 );
             } else {
-                if (noteIsSolfege(this.rowLabels[i]) && !isCustom(logo.synth.inTemperament)) {
+                if (noteIsSolfege(this.rowLabels[i])
+                    && !isCustom(logo.synth.inTemperament)) {
                     cell.innerHTML =
                         i18nSolfege(this.rowLabels[i]) + this.rowArgs[i].toString().sub();
                     noteObj = getNote(
@@ -598,8 +599,35 @@ class PhraseMaker {
                         logo.synth.inTemperament
                     );
                 } else {
-                    cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
-                    noteObj = [this.rowLabels[i], this.rowArgs[i]];
+                    if (isCustom(logo.synth.inTemperament)) {
+                        noteObj = getNote(
+                            this.rowLabels[i],
+                            this.rowArgs[i],
+                            0,
+                            turtles.ithTurtle(0).singer.keySignature,
+                            false,
+                            null,
+                            logo.errorMsg,
+                            logo.synth.inTemperament
+                        );
+                        const label = this.rowLabels[i];
+                        let note = TEMPERAMENT[logo.synth.inTemperament].filter(
+                            (ele) => {
+                                return ele[3] === label || ele[1] === label;
+                            }
+                        );
+                        if (note.length > 0) {
+                            note = note[0];
+                        }
+                        if (note[3] && note[3] !==  note[1]) {
+                            cell.innerHTML = note[1];
+                        } else {
+                            cell.innerHTML = label + this.rowArgs[i].toString().sub();
+                        }
+                    } else {
+                        cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
+                        noteObj = [this.rowLabels[i], this.rowArgs[i]];
+                    }
                 }
                 cell.setAttribute("alt", i + "__" + "pitchblocks");
 
@@ -1814,8 +1842,22 @@ class PhraseMaker {
                     logo.synth.inTemperament
                 );
             } else {
-                cell.innerHTML = this.rowLabels[index] + this.rowArgs[index].toString().sub();
-                noteObj = [this.rowLabels[index], this.rowArgs[index]];
+                if (isCustom(logo.synth.inTemperament)) {
+                    noteObj = getNote(
+                        this.rowLabels[i],
+                        this.rowArgs[i],
+                        0,
+                        turtles.ithTurtle(0).singer.keySignature,
+                        false,
+                        null,
+                        logo.errorMsg,
+                        logo.synth.inTemperament
+                    );
+                    cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
+                } else {
+                    cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
+                    noteObj = [this.rowLabels[i], this.rowArgs[i]];
+                }
             }
 
             let noteStored = null;
@@ -3598,8 +3640,8 @@ class PhraseMaker {
                     // Look in the rowBlocks for the nth match
                     for (let j = 0; j < this._rowBlocks.length; j++) {
                         /* for note blocks within repeat block
-                           their ids are added with a larger number
-                           e.g. 11 becomes 1000011 or 2000011 */
+                            their ids are added with a larger number
+                            e.g. 11 becomes 1000011 or 2000011 */
 
                         // Slice length of comparing id from end
                         // of augmented id and compare
@@ -3860,8 +3902,19 @@ class PhraseMaker {
                                     this.rowArgs[j]
                             );
                         } else {
-                            // if drum push drum name
-                            note.push(this.rowLabels[j]);
+                            if (isCustom(logo.synth.inTemperament)
+                                && TEMPERAMENT[logo.synth.inTemperament].filter(
+                                    (ele) => {
+                                        const label = this.rowLabels[j];
+                                        return ele[3] === label || ele[1] === label;
+                                    }
+                                ).length !== 0) {
+                                // custom pitch in custom temperament
+                                note.push(this.rowLabels[j] + this.rowArgs[j]);
+                            } else {
+                                // if drum push drum name
+                                note.push(this.rowLabels[j]);
+                            }
                         }
                     }
                 }
@@ -4213,7 +4266,7 @@ class PhraseMaker {
 
     _save() {
         /* Saves the current matrix as an action stack consisting of
-         * note and pitch blocks (saving as chunks is deprecated). */
+            * note and pitch blocks (saving as chunks is deprecated). */
 
         // First, hide the palettes as they will need updating.
         for (const name in logo.blocks.palettes.dict) {
