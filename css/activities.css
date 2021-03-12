@@ -68,11 +68,14 @@
 }
 
 .ui-menu {
-  position: relative;
-  background-color: rgba(255,255,255,1.0);
-  max-width: 350px;
-  font-size: 24px;
+    position: relative;
+    background-color: rgba(255,255,255,1.0);
+    max-width: 396px;
+    font-size: 18px;
+    border: 2px solid #87CEFA;
+    list-style-type: none;
 }
+  
 
 #ui-id-1 {
 	margin: 0;
@@ -85,8 +88,15 @@
 	list-style-type: none;
 }
 
+#ui-id-1 li{
+    padding-top: 5px;
+}
+
+#ui-id-1 li img{
+    margin-left: 10px;
+}
+
 #ui-id-1 li:before {
-	content:"• ";
     margin-right: 5px;
     font-size: 20px;
     font-weight: bold;
@@ -102,7 +112,7 @@
 }
 
 .scrollSearch {
-    max-height: 200px;
+    max-height: 215px;
     margin-bottom: 10px;
     overflow-x: auto;
     overflow-y: auto;

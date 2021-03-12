@@ -632,12 +632,125 @@ function setupToneBlocks() {
                     logo._currentDrumBlock = blk;
                     logo.rhythmRuler.Drums.push(blk);
                     logo.rhythmRuler.Rulers.push([[], []]);
+                } else if (logo.inSample) {
+                    logo.sample.timbreBlock = blk;
+                    if (typeof args[0] === "object") {
+                        logo.sample.timbreBlock = blk;
+                        logo.sample.sampleName = args[0][0];
+                        logo.sample.sampleData = args[0][1];
+                        if (args[0].length > 2) {
+                            logo.sample.samplePitch = args[0][2];
+                            logo.sample.sampleOctave = args[0][3];
+                        } else {
+                            logo.sample.samplePitch = "la";
+                            logo.sample.sampleOctave = 4;
+                        }
+                    } else {
+                        logo.sample.sampleName = "";
+                        logo.sample.sampleData = "";
+                        logo.sample.samplePitch = "la";
+                        logo.sample.sampleOctave = 4;
+                    }
                 }
 
                 Singer.ToneActions.setTimbre(args[0], turtle, blk);
             }
 
             return [args[1], 1];
+        }
+    }
+
+    class CustomSampleBlock extends LeftBlock {
+        constructor() {
+            super("customsample", _("sample"));
+            this.setPalette("tone");
+            this.beginnerBlock(false);
+
+            this.setHelpString([
+                _("Import a sound file to use as an instrument and set its pitch center."),
+                "documentation",
+                null,
+                "turtleshell"
+            ]);
+
+            this.formBlock({
+                outType: "textout",
+                args: 3,
+                argTypes: ["anyin", "anyin", "anyin"],
+                argLabels: [_("file"), _("name"), _("octave")]
+            });
+            this.parameter = true;
+
+            this.makeMacro((x, y) => [
+                [0, ["customsample", {value: ["", "", "do", 4]}], x, y, [null, 1, 2, 3]],
+                [1, ["audiofile", {value: null}], 0 ,0, [0]],
+                [2, ["solfege", {value: "do"}], 0, 0, [0]],
+                [3, ["number", {value: 4}], 0, 0, [0]],
+            ]);
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return logo.blocks.blockList[blk].value;
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            if (
+                logo.inStatusMatrix &&
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+            ) {
+                logo.statusFields.push([blk, "customsample"]);
+            } else {
+                if (logo.blocks.blockList[blk].value === null) {
+                    logo.blocks.blockList[blk].value = ["", "", "do", 4];
+                }
+                let cblk1 = logo.blocks.blockList[blk].connections[1];
+                if (cblk1 != null) {
+                    if (logo.blocks.blockList[cblk1].value !== null) {
+                        let namevalue = logo.blocks.blockList[cblk1].value[0];
+                        let datavalue = logo.blocks.blockList[cblk1].value[1];
+                        logo.blocks.blockList[blk].value[0] = namevalue;
+                        logo.blocks.blockList[blk].value[1] = datavalue;
+                    }
+                }
+                let cblk2 = logo.blocks.blockList[blk].connections[2];
+                if (cblk2 != null) {
+                    let svalue = logo.blocks.blockList[cblk2].value;
+                    logo.blocks.blockList[blk].value[2] = svalue;
+                }
+                let cblk3 = logo.blocks.blockList[blk].connections[3];
+                if (cblk3 != null) {
+                    let ovalue = logo.blocks.blockList[cblk3].value;
+                    logo.blocks.blockList[blk].value[3] = ovalue;
+                }
+                return logo.blocks.blockList[blk].value;
+            }
+        }
+    }
+
+    class AudioFileBlock extends ValueBlock {
+        constructor() {
+            super("audiofile");
+            this.parameter = true;
+	    this.extraWidth = 20;
+            this.setPalette("tone");
+            this.hidden = true;
+            this.beginnerBlock(false);
+
+            this.setHelpString([
+                _("Upload a sound file to connect with the sample block."),
+                "documentation",
+                ""
+            ]);
+
+            this.formBlock({
+                outType: "textout"
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            console.log("BLK");
+            logo.blocks.updateBlockText(blk);
+            return logo.blocks.blockList[blk].value;
         }
     }
 
@@ -655,6 +768,8 @@ function setupToneBlocks() {
     new PhaserBlock().setup();
     new ChorusBlock().setup();
     new VibratoBlock().setup();
+    new AudioFileBlock().setup();
+    new CustomSampleBlock().setup();
     new SetVoiceBlock().setup();
     new SynthNameBlock().setup();
     new VoiceNameBlock().setup();

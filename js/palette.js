@@ -308,6 +308,7 @@ class Palettes {
 
         this.hideSearchWidget(true);
         this.dict[name].showMenu(true);
+        this.activePalette = name;  // used to delete plugins
     }
 
     _showMenus() {}
@@ -370,7 +371,13 @@ class Palettes {
     // Palette Button event handlers
     _loadPaletteButtonHandler(name, row) {
         row.onmouseover = (evt) => {
-            document.body.style.cursor = "pointer";
+            if(name == "search"){
+                document.body.style.cursor = "text";
+            }
+            else{
+                document.body.style.cursor = "pointer";
+            }
+
         };
         row.onclick = (evt) => {
             if (name == "search") {

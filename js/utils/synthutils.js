@@ -261,6 +261,8 @@ const SAMPLECENTERNO = {
     "double bass": ["C4", 39]
 };
 
+CUSTOMSAMPLES = [];
+
 const percussionInstruments = ["koto", "banjo", "dulcimer", "xylophone", "celeste"];
 const stringInstruments = ["piano", "guitar", "acoustic guitar", "electric guitar"];
 
@@ -552,10 +554,10 @@ function Synth() {
     };
 
     this.getCustomFrequency = (notes, customID) => {
-        const __getCustomFrequency = function (oneNote) {
+        const __getCustomFrequency = function (oneNote, startingPitch) {
             const octave = oneNote.slice(-1);
             oneNote = getCustomNote(oneNote.substring(0, oneNote.length - 1));
-            const pitch = this.startingPitch;
+            const pitch = startingPitch;
             const startPitchFrequency = pitchToFrequency(
                 pitch.substring(0, pitch.length - 1),
                 pitch.slice(-1),
@@ -572,7 +574,7 @@ function Synth() {
                             return Number(
                                 TEMPERAMENT[customID][pitchNumber][0] *
                                     startPitchFrequency *
-                                    Math.pow(OCTAVERATIO, octaveDiff)
+                                    Math.pow(octaveRatio, octaveDiff)
                             );
                         }
                     }
@@ -581,12 +583,12 @@ function Synth() {
         };
 
         if (typeof notes === "string") {
-            return __getCustomFrequency(notes);
+            return __getCustomFrequency(notes, this.startingPitch);
         } else if (typeof notes === "object") {
             const results = [];
             for (let i = 0; i < notes.length; i++) {
                 if (typeof notes[i] === "string") {
-                    results.push(__getCustomFrequency(notes[i]));
+                    results.push(__getCustomFrequency(notes[i], this.startingPitch));
                 } else {
                     // Hertz?
                     results.push(notes[i]);
@@ -666,6 +668,9 @@ function Synth() {
             ]
         };
 
+        let data = function() {return null};
+        this.samplesManifest.voice.push({ name: "empty", data: data});
+
         if (this.samples === null) {
             this.samples = {};
             for (const type in this.samplesManifest) {
@@ -677,6 +682,7 @@ function Synth() {
     };
 
     this._loadSample = function (sampleName) {
+        let accounted = false;
         for (const type in this.samplesManifest) {
             if (this.samplesManifest.hasOwnProperty(type)) {
                 for (const sample in this.samplesManifest[type]) {
@@ -685,6 +691,7 @@ function Synth() {
                         if (sampleName === name) {
                             // Load data returned from samples function.
                             this.samples[type][name] = this.samplesManifest[type][sample].data();
+                            accounted = true;
                         }
                     }
                 }
@@ -723,7 +730,7 @@ function Synth() {
             }
         }
         this.recorder.ondataavailable = (evt) => {
-            console.log(evt.data);
+            console.debug(evt.data);
             if (typeof evt.data === "undefined" || evt.data.size === 0) return;
             chunks.push(evt.data);
         };
@@ -954,14 +961,24 @@ function Synth() {
         let tempSynth;
         if (sourceName in this.samples.voice) {
             instrumentsSource[instrumentName] = [2, sourceName];
-            console.debug(sourceName + " " + SAMPLECENTERNO[sourceName][0]);
-            const noteDict = {};
-            noteDict[SAMPLECENTERNO[sourceName][0]] = this.samples.voice[sourceName];
+            let noteDict = {};
+            if (sourceName in SAMPLECENTERNO) {
+                noteDict[SAMPLECENTERNO[sourceName][0]] = this.samples.voice[sourceName];
+            } else {
+                noteDict["C4"] = this.samples.voice[sourceName];
+            }
             tempSynth = new Tone.Sampler(noteDict);
         } else if (sourceName in this.samples.drum) {
             instrumentsSource[instrumentName] = [1, sourceName];
             console.debug(sourceName);
             tempSynth = new Tone.Player(this.samples.drum[sourceName]);
+        } else if (sourceName in CUSTOMSAMPLES){
+            instrumentsSource[instrumentName] = [2, sourceName];
+            let noteDict = {};
+            let params = CUSTOMSAMPLES[sourceName];
+            let center = this._parseSampleCenterNo(params[1], params[2]);
+            noteDict[center] = params[0];
+            tempSynth = new Tone.Sampler(noteDict);
         } else {
             // default drum sample
             instrumentsSource[instrumentName] = [1, "drum"];
@@ -970,6 +987,38 @@ function Synth() {
         }
 
         return tempSynth;
+    };
+
+    this._parseSampleCenterNo = function (solfege, octave) {
+        let pitchName = "C4";
+        const solfegeDict = {"do":0, "re":2, "mi":4, "fa":5, "sol":7, "la":9, "ti":11};
+        const letterDict = {"C":0, "D":2, "E":4, "F":5, "G":7, "A":9, "B":11};
+
+        let attr = getArticulation(solfege);
+        if (attr === SHARP) {
+            attr = 1;
+        } else if (attr ===FLAT) {
+            attr = -1;
+        } else if (attr === DOUBLESHARP) {
+            attr = 2;
+        } else if (attr === DOUBLEFLAT) {
+            attr = -2;
+        } else {
+            attr = 0;
+        }
+
+        fragment = solfege.replace(attr, "")
+        let chromaticNumber = 0;
+        if (fragment in solfegeDict) {
+            chromaticNumber = solfegeDict[fragment];
+        } else if (fragment in letterDict) {
+            chromaticNumber = letterDict[fragment];
+        } else {
+            console.debug("Cannot parse " + fragment);
+        }
+        let pitchNumber = octave * 12 + chromaticNumber + attr;
+        console.log(solfege + octave + " = " + pitchNumber)
+        return pitchNumber.toString();
     };
 
     // Function using builtin synths from Tone.js
@@ -1046,13 +1095,14 @@ function Synth() {
     };
 
     this.__createSynth = function (turtle, instrumentName, sourceName, params) {
+
         this._loadSample(sourceName);
         if (sourceName in this.samples.voice || sourceName in this.samples.drum) {
             instruments[turtle][instrumentName] = this._createSampleSynth(
                 turtle,
                 instrumentName,
                 sourceName,
-                null
+                params
             ).toDestination();
         } else if (sourceName in BUILTIN_SYNTHS) {
             instruments[turtle][instrumentName] = this._createBuiltinSynth(
@@ -1067,6 +1117,13 @@ function Synth() {
                 params
             ).toDestination();
             instrumentsSource[instrumentName] = [0, "poly"];
+        } else if (sourceName in CUSTOMSAMPLES) {
+            instruments[turtle][instrumentName] = this._createSampleSynth(
+                turtle,
+                instrumentName,
+                sourceName,
+                params
+            ).toDestination();
         } else {
             if (sourceName.length >= 4) {
                 if (sourceName.slice(0, 4) === "http") {
@@ -1104,7 +1161,13 @@ function Synth() {
 
     this.loadSynth = function (turtle, sourceName) {
         if (sourceName in instruments[turtle]) {
-            console.debug(sourceName + " already loaded");
+            if (sourceName.substring(0,13) === "customsample_") {
+                console.debug("loading custom " + sourceName);
+                this.createSynth(turtle, sourceName, sourceName, null);
+            } else {
+                console.debug(sourceName + " already loaded");
+            }
+
         } else {
             console.debug("loading " + sourceName);
             this.createSynth(turtle, sourceName, sourceName, null);
@@ -1392,7 +1455,7 @@ function Synth() {
         // Get note values as per the source of the synth.
         switch (flag) {
             case 1: // drum
-                if (instrumentName.slice(0, 4) === "http") {
+                if ((instrumentName.slice(0, 4) === "http") || (instrumentName.slice(0,21) === "data:audio/wav;base64")) {
                     tempSynth.start();
                 } else if (instrumentName.slice(0, 4) === "file") {
                     tempSynth.start();
@@ -1402,7 +1465,7 @@ function Synth() {
                     } catch (e) {
                         // Occasionally we see "Start time must be
                         // strictly greater than previous start time"
-                        console.log(e);
+                        console.debug(e);
                     }
                 }
                 break;

@@ -1909,7 +1909,6 @@ function setupPitchBlocks() {
     new RegisterBlock().setup();
     new SetTranspositionBlock().setup();
     new OctaveBlock().setup();
-    new CustomPitchBlock().setup();
     new DownSixthBlock().setup();
     new DownThirdBlock().setup();
     new SeventhBlock().setup();
@@ -1933,6 +1932,7 @@ function setupPitchBlocks() {
     new ScaleDegreeBlock().setup();
     new NthModalPitchBlock().setup();
     new StepPitchBlock().setup();
+    new CustomPitchBlock().setup();
     new Pitch2Block().setup();
     new PitchBlock().setup();
 }

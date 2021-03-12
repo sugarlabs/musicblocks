@@ -42,7 +42,7 @@ class HelpWidget {
         this.index = 0;
         this.isOpen = true;
 
-        const widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
+        const widgetWindow = window.widgetWindows.windowFor(this, "help", "help", false);
         widgetWindow.getWidgetBody().style.overflowY = "auto";
         // const canvasHeight = docById("myCanvas").getBoundingClientRect().height;
         widgetWindow.getWidgetBody().style.maxHeight = "500px";

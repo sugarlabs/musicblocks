@@ -15,7 +15,18 @@
  */
 
 /* global _, SMALLERBUTTON, BIGGERBUTTON, Tone, instruments */
-
+/* 
+    Globals location
+     - js/artwork.js
+         SMALLERBUTTON,BIGGERBUTTON
+     - js/utils/utils.js
+         _
+     - js/activity.js
+         Tone
+     - js/utils/synthutils.js
+         instruments
+         
+*/
 /* exported Oscilloscope */
 
 /**
@@ -23,7 +34,7 @@
  * @classdesc pertains to setting up all features of the Oscilloscope Widget.
  */
 class Oscilloscope {
-    static ICONSIZE = 32;
+    static ICONSIZE = 40;
     static analyserSize = 8192;
     /**
      * @constructor
@@ -54,27 +65,31 @@ class Oscilloscope {
             this.pitchAnalysers = {};
             widgetWindow.destroy();
         };
-
-        const step = 10;
+        document.getElementsByClassName("wfbToolbar")[0].style.backgroundColor = "#e8e8e8";
+        document.getElementsByClassName("wfbWidget")[0].style.backgroundColor = "#FFFFFF";
+        const step = 1.333;
         this.zoomFactor = 40.0;
         this.verticalOffset = 0;
-        const zoomInButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("ZOOM IN"));
+        const zoomInButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("Zoom In"));
 
         zoomInButton.onclick = () => {
-            this.zoomFactor += step;
+            this.zoomFactor *= step;
         };
         zoomInButton.children[0].src = `data:image/svg+xml;base64,${window.btoa(
-            unescape(encodeURIComponent(SMALLERBUTTON))
+            unescape(encodeURIComponent(BIGGERBUTTON))
         )}`;
 
-        const zoomOutButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("ZOOM OUT"));
+        const zoomOutButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("Zoom Out"));
 
         zoomOutButton.onclick = () => {
-            this.zoomFactor -= step;
+            this.zoomFactor /= step;
+            if (this.zoomFactor < 1) {
+                this.zoomFactor = 1;
+            }
         };
 
         zoomOutButton.children[0].src = `data:image/svg+xml;base64,${window.btoa(
-            unescape(encodeURIComponent(BIGGERBUTTON))
+            unescape(encodeURIComponent(SMALLERBUTTON))
         )}`;
 
         widgetWindow.sendToCenter();
@@ -132,7 +147,7 @@ class Oscilloscope {
             this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
             if (!turtle.running) return;
 
-            canvasCtx.fillStyle = "rgb(200, 200, 200)";
+            canvasCtx.fillStyle = "#FFFFFF";
             const dataArray = this.pitchAnalysers[turtleIdx].getValue();
             const bufferLength = dataArray.length;
             canvasCtx.fillRect(0, 0, width, height);

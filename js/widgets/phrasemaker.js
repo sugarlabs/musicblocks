@@ -2391,7 +2391,7 @@ class PhraseMaker {
 
         const noteValue = param[0][1] / param[0][0];
         // The tuplet is note value is calculated as #notes x note value
-        let noteValueToDisplay = calcNoteValueToDisplay(param[0][1], param[0][0], this._cellScale);
+        let noteValueToDisplay = calcNoteValueToDisplay(param[0][1], param[0][0]);
 
         if (noteValue > 12) {
             noteValueToDisplay =
@@ -2572,7 +2572,7 @@ class PhraseMaker {
     }
 
     addNotes(numBeats, noteValue) {
-        let noteValueToDisplay = calcNoteValueToDisplay(noteValue, 1, this._cellScale);
+        let noteValueToDisplay = calcNoteValueToDisplay(noteValue, 1);
 
         if (noteValue > 12) {
             noteValueToDisplay = '<a href="#" title="' + 1 + "/" + noteValue + '">.</a>';

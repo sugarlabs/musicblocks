@@ -21,7 +21,14 @@ function setupHeapBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            return JSON.stringify(logo.turtleHeaps[turtle]);
+            if (
+                logo.inStatusMatrix &&
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+            ) {
+                logo.statusFields.push([blk, "heap"]);
+            } else {
+                return JSON.stringify(logo.turtleHeaps[turtle]);
+            }
         }
     }
 
@@ -29,7 +36,7 @@ function setupHeapBlocks() {
         constructor() {
             super("showHeap");
             this.setPalette("heap");
-	    this.hidden = this.deprecated = true;
+            this.hidden = this.deprecated = true;
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -73,11 +80,18 @@ function setupHeapBlocks() {
             });
         }
 
-        arg(logo, turtle) {
+        arg(logo, turtle, blk) {
             if (!(turtle in logo.turtleHeaps)) {
                 logo.turtleHeaps[turtle] = [];
             }
-            return logo.turtleHeaps[turtle].length;
+            if (
+                logo.inStatusMatrix &&
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+            ) {
+                logo.statusFields.push([blk, "heapLength"]);
+            } else {
+                return logo.turtleHeaps[turtle].length;
+            }
         }
     }
 

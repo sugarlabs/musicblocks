@@ -1,4 +1,4 @@
-// Copyright (c) 2014-19 Walter Bender
+// Copyright (c) 2014-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -1068,6 +1068,7 @@ function Blocks(activity) {
                     if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
                         label = label.substr(0, STRINGLEN) + "...";
                     }
+
                     that.blockList[blk].text.text = label;
                     // that.blockList[blk]._positionText(that.blockList[blk].protoblock.scale);
                     that.blockList[blk].container.updateCache();
@@ -1142,6 +1143,7 @@ function Blocks(activity) {
 
                     const octave = this.blockList[oldBlock].value;
                     this.blockList[blk].value = octave;
+
                     this.blockList[blk].text.text = octave.toString();
                     // Make sure text is on top.
                     const z = this.blockList[blk].container.children.length - 1;
@@ -1957,7 +1959,6 @@ function Blocks(activity) {
                                 if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
                                     label = label.substr(0, STRINGLEN) + "...";
                                 }
-
                                 this.blockList[thisBlock].text.text = label;
                                 this.blockList[thisBlock].container.updateCache();
                                 this.newNameddoBlock(
@@ -2391,6 +2392,20 @@ function Blocks(activity) {
                 }
                 maxLength = 10;
                 break;
+            case "audiofile":
+                try {
+                    if (myBlock.value[0] === null) {
+                        label = _("audio file1");
+                    } else {
+                        label = myBlock.value[0].toString();
+                        if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+                            label = label.substr(0, STRINGLEN) + "...";
+                        }
+                    }
+                } catch (e) {
+                    label = _("audio file2");
+                }
+                break;
             case "solfege":
                 if (myBlock.value === null) myBlock.value = "sol";
                 obj = splitSolfege(myBlock.value);
@@ -2486,6 +2501,13 @@ function Blocks(activity) {
                         }
                         break;
                     }
+                }
+                break;
+            case "wrapmode":
+                if (myBlock.value === "on") {
+                    label = _("on2");
+                } else {
+                    label = _("off");
                 }
                 break;
             case "boolean":
@@ -3068,6 +3090,13 @@ function Blocks(activity) {
                             that.blockList[thisBlock].text.text = TEMPERAMENTS[i][0];
                             break;
                         }
+                    }
+                    break;
+                case "wrapmode":
+                    if (value === "on") {
+                        that.blockList[thisBlock].text.text = _("on2");
+                    } else {
+                        that.blockList[thisBlock].text.text = _("off");
                     }
                     break;
                 case "boolean":
@@ -4664,14 +4693,20 @@ function Blocks(activity) {
         }
 
         const myBlock = this.blockList[blk];
-        return (
-            myBlock.name === "number" &&
-            myBlock.connections[0] !== null &&
-            ["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "nthmodalpitch"].indexOf(
+
+        if (["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "nthmodalpitch"].indexOf(
                 this.blockList[myBlock.connections[0]].name
             ) !== -1 &&
-            this.blockList[myBlock.connections[0]].connections[2] === blk
-        );
+            this.blockList[myBlock.connections[0]].connections[2] === blk) {
+            return true;
+        }
+
+        if (this.blockList[myBlock.connections[0]].name === "customsample" &&
+            this.blockList[myBlock.connections[0]].connections[3] === blk) {
+            return true;
+        }
+
+        return false;
     };
 
     /**
@@ -5511,8 +5546,7 @@ function Blocks(activity) {
                         const value = args[1];
                         if (value.customTemperamentNotes !== undefined) {
                             TEMPERAMENT = {
-                                ...TEMPERAMENT,
-                                ...value.customTemperamentNotes
+                                ...TEMPERAMENT, ...value.customTemperamentNotes
                             };
                             for (const temp in value.customTemperamentNotes) {
                                 if (!(temp in PreDefinedTemperaments)) {
@@ -5522,7 +5556,7 @@ function Blocks(activity) {
                             }
                             updateTemperaments();
                             that.logo.synth.startingPitch = value.startingPitch;
-                            OCTAVERATIO = value.octaveSpace;
+                            octaveRatio = value.octaveSpace;
                             that.logo.customTemperamentDefined = true; //This is for custom pitch pie menu
 
                             // if temperament is defined "customPitch" should be available
@@ -6057,6 +6091,14 @@ function Blocks(activity) {
                         thisBlock,
                         value
                     ]);
+                    break;
+                case "audiofile":
+                    postProcess = function(args) {
+                        that.blockList[args[0]].value = args[1];
+                        that.updateBlockText(args[0]);
+                    };
+
+                    this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [thisBlock, value]);
                     break;
                 default:
                     // Check that name is in the proto list
@@ -6597,7 +6639,14 @@ function Blocks(activity) {
      */
     this.clearParameterBlocks = function () {
         for (let blk = 0; blk < this.blockList.length; blk++) {
-            if (this.blockList[blk].protoblock.parameter && this.blockList[blk].text !== null) {
+            if (
+                this.blockList[blk].protoblock.parameter &&
+                this.blockList[blk].text !== null
+            ) {
+                // The audiofile block label is handled in block.js
+                if (this.blockList[blk].name === "audiofile") {
+                    continue;
+                }
                 this.blockList[blk].text.text = "";
                 this.blockList[blk].container.updateCache();
             }
