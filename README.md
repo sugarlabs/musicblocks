@@ -1,6 +1,20 @@
 <a href="https://github.com//sugarlabs/musicblocks/graphs/contributors" alt="Contributors">
-    <img src="https://img.shields.io/github/contributors/sugarlabs/musicblocks?style=flat-square" />
+    <img src="https://img.shields.io/github/contributors/sugarlabs/musicblocks" />
 </a>
+
+<a href="#license" alt="License">
+    <img src="https://img.shields.io/github/license/sugarlabs/musicblocks" />
+</a>
+
+<a href="#issues" alt="Issues">
+    <img src="https://img.shields.io/github/issues/sugarlabs/musicblocks" />
+</a>
+
+<a href="#forks" alt="Fork">
+    <img src="https://img.shields.io/github/forks/sugarlabs/musicblocks" />
+</a>
+
+
 
 # Music Blocks
 
