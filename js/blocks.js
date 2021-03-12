@@ -5556,7 +5556,7 @@ function Blocks(activity) {
                             }
                             updateTemperaments();
                             that.logo.synth.startingPitch = value.startingPitch;
-                            octaveRatio = value.octaveSpace;
+//                             octaveRatio = value.octaveSpace;
                             that.logo.customTemperamentDefined = true; //This is for custom pitch pie menu
 
                             // if temperament is defined "customPitch" should be available
