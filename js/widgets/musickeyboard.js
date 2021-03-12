@@ -950,12 +950,12 @@ function MusicKeyboard() {
         let newList = fillChromaticGaps(sortedNotesList);
         newList = newList.concat(sortedHertzList);
 
-        for (let i = 0; i < sortedList.length; i++) {
+        for (let i = 0; i < newList.length; i++) {
             this.layout.push({
-                noteName: sortedList[i].noteName,
-                noteOctave: sortedList[i].noteOctave,
-                blockNumber: sortedList[i].blockNumber,
-                voice: sortedList[i].voice
+                noteName: newList[i].noteName,
+                noteOctave: newList[i].noteOctave,
+                blockNumber: newList[i].blockNumber,
+                voice: newList[i].voice
             });
         }
         return newList;
@@ -1016,8 +1016,8 @@ function MusicKeyboard() {
             noteOctave: temp2,
             blockNumber: this.layout[n - j - 1].blockNumber,
             duration: parseFloat(ele.getAttribute("alt")),
-            objId: this.layout[n - j - 1].objId,
-            voice: this.layout[n - j - 1].voice
+            objId: this.displayLayout[n - j - 1].objId,
+            voice: this.displayLayout[n - j - 1].voice
         });
 
         this._notesPlayed.sort(function (a, b) {
