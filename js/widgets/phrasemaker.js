@@ -3724,9 +3724,39 @@ class PhraseMaker {
 
     playAll() {
         // Play all of the notes in the matrix.
+        // let ifEmpty = this.__checkEmpty(this._notesToPlay);
+        let isEmpty = 0;
+        let check = false;
+
+        for(let i = 0;i<this._notesToPlay.length;i++){
+            if(this._notesToPlay[i][0].length==1){
+                isEmpty++;
+            }
+        }
+
+        if(isEmpty==this._notesToPlay.length){
+            check = true;
+        }
+
+        if(check){
+            this._playButton.innerHTML =
+                    '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
+                    _("Play") +
+                    '" alt="' +
+                    _("Play") +
+                    '" height="' +
+                    PhraseMaker.ICONSIZE +
+                    '" width="' +
+                    PhraseMaker.ICONSIZE +
+                    '" vertical-align="middle">&nbsp;&nbsp;';
+            logo.textMsg(_("Click on the table to add notes."));
+            return;
+        }
+
         this.playingNow = !this.playingNow;
 
         if (this.playingNow) {
+
             this.widgetWindow.modifyButton(0, "stop-button.svg", PhraseMaker.ICONSIZE, _("stop"));
 
             logo.synth.stop();
@@ -3735,14 +3765,13 @@ class PhraseMaker {
             this.collectNotesToPlay();
 
             this._notesCounter = 0;
-
+            
             // We have an array of pitches and note values.
             const note = this._notesToPlay[this._notesCounter][0];
             const pitchNotes = [];
             const synthNotes = [];
             const drumNotes = [];
             let drumName, obj;
-
             // Note can be a chord, hence it is an array.
             for (let i = 0; i < note.length; i++) {
                 if (typeof note[i] === "number") {
@@ -3825,7 +3854,7 @@ class PhraseMaker {
                     null
                 );
             }
-
+            
             this.__playNote(0, 0);
         } else {
             this._stopOrCloseClicked = true;
