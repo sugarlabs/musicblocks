@@ -12,10 +12,10 @@
 /*global _, docById*/
 
 /*
-     Globals location
-     - js/utils/utils.js
-         _, docById
- */
+Globals location
+- js/utils/utils.js
+_, docById
+*/
 
 window.widgetWindows = { openWindows: {}, _posCache: {} };
 
@@ -23,8 +23,9 @@ class WidgetWindow {
     /**
      * @param {string} key
      * @param {string} title
+     * @param {boolean} fullscreen
      */
-    constructor(key, title) {
+    constructor(key, title, fullscreen = true) {
         // Keep a refernce to the object within handlers
         this._key = key;
         this._buttons = [];
@@ -34,6 +35,7 @@ class WidgetWindow {
         this._rolled = false;
         this._savedPos = null;
         this._maximized = false;
+        this._fullscreenEnabled = fullscreen;
 
         // Drag offset for correct positioning
         this._dx = this._dy = 0;
@@ -88,9 +90,15 @@ class WidgetWindow {
         // The handle needs the events bound as it's a sibling of the dragging div
         // not a relative in either direciton.
 
-        this._drag.ondblclick = () => {
-            this._maximize();
-        };
+        if (this._fullscreenEnabled) {
+            this._drag.ondblclick = () => {
+                this._maximize();
+                this.takeFocus();
+                this.onmaximize();
+                e.preventDefault();
+                e.stopImmediatePropagation();
+            };
+        }
 
         this._drag.onmousedown = this._handle.onmousedown = (e) => {
             this._dragging = true;
@@ -138,22 +146,23 @@ class WidgetWindow {
         titleEl.innerHTML = _(this._title);
         titleEl.id = this._key + "WidgetID";
 
-        const maxminButton = this._create("div", "wftButton wftMaxmin", this._drag);
-        maxminButton.onclick = maxminButton.onmousedown = (e) => {
-            if (this._maximized) {
-                this._restore();
-                this.sendToCenter();
-            } else {
-                this._maximize();
-            }
-            this.takeFocus();
-            this.onmaximize();
-            e.preventDefault();
-            e.stopImmediatePropagation();
-        };
-
-        this._maxminIcon = this._create("img", undefined, maxminButton);
-        this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
+        if (this._fullscreenEnabled) {
+            const maxminButton = this._create("div", "wftButton wftMaxmin", this._drag);
+            maxminButton.onclick = maxminButton.onmousedown = (e) => {
+                if (this._maximized) {
+                    this._restore();
+                    this.sendToCenter();
+                } else {
+                    this._maximize();
+                }
+                this.takeFocus();
+                this.onmaximize();
+                e.preventDefault();
+                e.stopImmediatePropagation();
+            };
+            this._maxminIcon = this._create("img", undefined, maxminButton);
+            this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
+        }
 
         this._body = this._create("div", "wfWinBody", this._frame);
         this._toolbar = this._create("div", "wfbToolbar", this._body);
@@ -182,25 +191,34 @@ class WidgetWindow {
     _docMouseMoveHandler(e) {
         if (!this._dragging) return;
 
-        if (this._frame.style.top === "64px") {
-            this._overlayframe.style.zIndex = "1";
-            this._overlayframe.style.width = "100vw";
-            this._overlayframe.style.height = "calc(100vh - 64px)";
-            this._overlayframe.style.left = "0";
-            this._overlayframe.style.top = "64px";
-            this._overlayframe.style.border = "0.25vw solid black";
-            this._frame.style.zIndex = "10";
-            this._overlayframe.style.backgroundColor = "rgba(255,255,255,0.75)";
+        if (this._fullscreenEnabled
+            && this._frame.style.top === "64px") {
+            this._overlay(true);
         } else {
-            this._frame.style.zIndex = "1";
-            this._overlayframe.style.backgroundColor = "rgba(255,255,255,0)";
-            this._overlayframe.style.border = "0px";
-            this._overlayframe.style.zIndex = "-1";
+            this._overlay(false);
         }
         const x = e.clientX - this._dx,
             y = e.clientY - this._dy;
 
         this.setPosition(x, y);
+    }
+
+    _overlay(add) {
+        if (add) {
+            this._frame.style.zIndex = "10";
+            this._overlayframe.style.left = "0";
+            this._overlayframe.style.zIndex = "1";
+            this._overlayframe.style.top = "64px";
+            this._overlayframe.style.width = "100vw";
+            this._overlayframe.style.height = "calc(100vh - 64px)";
+            this._overlayframe.style.border = "0.25vw solid black";
+            this._overlayframe.style.backgroundColor = "rgba(255,255,255,0.75)";
+        } else {
+            this._frame.style.zIndex = "1";
+            this._overlayframe.style.border = "0px";
+            this._overlayframe.style.zIndex = "-1";
+            this._overlayframe.style.backgroundColor = "rgba(255,255,255,0)";
+        }
     }
 
     /**
@@ -225,7 +243,9 @@ class WidgetWindow {
      */
     _dragTopHandler(e) {
         this._dragging = false;
-        if (this._frame.style.top === "64px") {
+        if (this._fullscreenEnabled
+            && this._frame.style.top === "64px"
+            && !this._maximized) {
             this._maximize();
             this.takeFocus();
             this.onmaximize();
@@ -439,6 +459,7 @@ class WidgetWindow {
             this._frame.style.top = this._savedPos[1];
             this._savedPos = null;
         }
+        this._overlay(false);
         this._frame.style.width = "auto";
         this._frame.style.height = "auto";
     }
@@ -583,7 +604,7 @@ class WidgetWindow {
  * @param {string} saveAs
  * @returns {WidgetWindow} this
  */
-window.widgetWindows.windowFor = (widget, title, saveAs) => {
+window.widgetWindows.windowFor = (widget, title, saveAs, fullscreen) => {
     let key = undefined;
     // Check for a blockNo attribute
     if (typeof widget.blockNo !== "undefined") key = widget.blockNo;
@@ -591,7 +612,7 @@ window.widgetWindows.windowFor = (widget, title, saveAs) => {
     else key = saveAs || title;
 
     if (typeof window.widgetWindows.openWindows[key] === "undefined") {
-        const win = new WidgetWindow(key, title).sendToCenter();
+        const win = new WidgetWindow(key, title, fullscreen).sendToCenter();
         window.widgetWindows.openWindows[key] = win;
     }
 

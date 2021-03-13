@@ -183,7 +183,7 @@ class TemperamentWidget {
                         this.inTemperament
                     )
                     .toFixed(2);
-                this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
+                this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
                 this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
             } else {
                 if (isCustom(this.inTemperament)) {
@@ -213,7 +213,7 @@ class TemperamentWidget {
                     .toFixed(2);
                 this.intervals[i] = t.interval[i];
                 this.ratios[i] = t[this.intervals[i]];
-                this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
+                this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
                 this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
             }
         }
@@ -480,14 +480,16 @@ class TemperamentWidget {
                 const frequency = this.frequencies[0];
                 this.frequencies = [];
 
+                if (!isCustom(this.inTemperament)) {
+                    this.powerBase = 2;
+                }
                 for (let i = 0; i < this.ratios.length; i++) {
                     powers[i] = 12 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
-                    this.ratios[i] = Math.pow(2, powers[i] / 12);
+                    this.ratios[i] = Math.pow(this.powerBase, powers[i] / 12);
                     compareRatios[i] = this.ratios[i].toFixed(2);
                     this.frequencies[i] = this.ratios[i] * frequency;
                     this.frequencies[i] = this.frequencies[i].toFixed(2);
                 }
-                this.powerBase = 2;
                 this.checkTemperament(compareRatios);
                 this.octaveChanged = false;
                 this._circleOfNotes();
@@ -544,7 +546,7 @@ class TemperamentWidget {
                     }
                 }
                 if (noteDefined == false) {
-                    cents = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
+                    cents = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
                     centsDiff = [];
                     centsDiff1 = [];
                     for (let j = 0; j < this.cents.length; j++) {
@@ -1737,7 +1739,7 @@ class TemperamentWidget {
                     }
                 }
                 if (!notesMatch) {
-                    cents = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
+                    cents = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
                     centsDiff = [];
                     centsDiff1 = [];
                     for (let j = 0; j < this.cents.length; j++) {
@@ -1952,7 +1954,7 @@ class TemperamentWidget {
         ];
         logo.blocks.loadNewBlocks(newStack1);
         logo.textMsg(_("New action block generated!"));
-
+            
         let number;
         if (isCustom(this.inTemperament)) {
             TEMPERAMENT[this.inTemperament] = [];
@@ -1963,7 +1965,8 @@ class TemperamentWidget {
                 TEMPERAMENT[this.inTemperament][number] = [
                     this.ratios[i],
                     this.notes[i].substring(0, this.notes[i].length - 1),
-                    this.notes[i].slice(-1)
+                    this.notes[i].slice(-1),
+                    this.notes[i].substring(0, this.notes[i].length - 1)
                 ];
             }
         }

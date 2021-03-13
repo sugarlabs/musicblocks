@@ -916,7 +916,7 @@ class Block {
                 if (firstTime) {
                     that._loadEventHandlers();
                     if (that.image !== null) {
-                        // console.log(that.name);
+                        // console.debug(that.name);
                         that._addImage();
                     }
 
@@ -3762,19 +3762,6 @@ class Block {
         }
 
         return 1;
-    }
-
-    _octaveNumber() {
-        // Is this a number block being used as an octave argument?
-        return (
-            this.name === "number" &&
-            this.connections[0] !== null &&
-            ["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "nthmodalpitch"].indexOf(
-                this.blocks.blockList[this.connections[0]].name
-            ) !== -1 &&
-            this.blocks.blockList[this.connections[0]].connections[2] ===
-                this.blocks.blockList.indexOf(this)
-        );
     }
 
     _checkWidgets(closeInput) {

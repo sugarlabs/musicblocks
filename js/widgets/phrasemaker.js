@@ -11,37 +11,39 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /*global logo, turtles, _, platformColor, docById, MATRIXSOLFEHEIGHT, toFraction, Singer,
-   SOLFEGECONVERSIONTABLE, slicePath, wheelnav, delayExecution, DEFAULTVOICE, getDrumName,
-   MATRIXSOLFEWIDTH, getDrumIcon, noteIsSolfege, isCustom, i18nSolfege, getNote, DEFAULTDRUM,
-   last, DRUMS, SHARP, FLAT, PREVIEWVOLUME, DEFAULTVOLUME, noteToFrequency, getDrumIndex, LCD,
-   calcNoteValueToDisplay, NOTESYMBOLS, EIGHTHNOTEWIDTH, saveLocally, docBySelector*/
+SOLFEGECONVERSIONTABLE, slicePath, wheelnav, delayExecution, DEFAULTVOICE, getDrumName,
+MATRIXSOLFEWIDTH, getDrumIcon, noteIsSolfege, isCustom, i18nSolfege, getNote, DEFAULTDRUM,
+last, DRUMS, SHARP, FLAT, PREVIEWVOLUME, DEFAULTVOLUME, noteToFrequency, getDrumIndex, LCD,
+calcNoteValueToDisplay, NOTESYMBOLS, EIGHTHNOTEWIDTH, saveLocally, docBySelector, TEMPERAMENT*/
 
 /*
-     Globals location
-     - lib/wheelnav
-         slicePath, wheelnav
-     
-     - js/utils/musicutils.js
-         EIGHTHNOTEWIDTH, NOTESYMBOLS, calcNoteValueToDisplay, getDrumIndex, noteToFrequency,
-         FLAT, SHARP, DRUMS, MATRIXSOLFEHEIGHT, toFraction, SOLFEGECONVERSIONTABLE, DEFAULTVOICE,
-         getDrumName, MATRIXSOLFEWIDTH, getDrumIcon, noteIsSolfege, isCustom, i18nSolfege,
-         getNote, DEFAULTDRUM
-     
-     - js/utils/utils.js
-         _, delayExecution, last, LCD, docById, docBySelector
-     
-     - js/turtle-singer.js
-         Singer
-     
-     - js/utils/platformstyle.js
-         platformColorcl
-     
-     - js/logo.js
-         PREVIEWVOLUME, DEFAULTVOLUME
-     
-     - js/activity.js
-         saveLocally(window, planet)
- */
+Globals location
+- lib/wheelnav
+    slicePath, wheelnav
+
+- js/utils/musicutils.js
+    EIGHTHNOTEWIDTH, NOTESYMBOLS, calcNoteValueToDisplay, getDrumIndex, noteToFrequency,
+    FLAT, SHARP, DRUMS, MATRIXSOLFEHEIGHT, toFraction, SOLFEGECONVERSIONTABLE, DEFAULTVOICE,
+    getDrumName, MATRIXSOLFEWIDTH, getDrumIcon, noteIsSolfege, isCustom, i18nSolfege,
+    getNote, DEFAULTDRUM, TEMPERAMENT
+
+- js/utils/utils.js
+    _, delayExecution, last, LCD, docById, docBySelector
+
+- js/turtle-singer.js
+    Singer
+
+- js/utils/platformstyle.js
+    platformColorcl
+
+- js/logo.js
+    PREVIEWVOLUME, DEFAULTVOLUME
+
+- js/activity.js
+    saveLocally(window, planet)
+*/
+
+/*exported PhraseMaker*/
 
 const MATRIXGRAPHICS = [
     "forward",
@@ -199,7 +201,7 @@ class PhraseMaker {
         for (let i = 0; i < this._blockMap[blk].length; i++) {
             obj = this._blockMap[blk][i];
             if (obj[0] === rowBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
-                console.debug("node is already in the list");
+                // console.debug("node is already in the list");
                 j += 1;
             }
         }
@@ -232,7 +234,6 @@ class PhraseMaker {
         this._noteStored = [];
         this._noteBlocks = false;
         this._rests = 0;
-        logo = logo;
 
         this.playingNow = false;
 
@@ -245,6 +246,7 @@ class PhraseMaker {
         widgetWindow.clear();
         widgetWindow.show();
 
+        //eslint-disable-next-line no-console
         console.debug("notes " + this.rowLabels + " octave " + this.rowArgs);
 
         this._notesToPlay = [];
@@ -267,13 +269,17 @@ class PhraseMaker {
             widgetWindow.destroy();
         };
 
-        this._playButton = widgetWindow.addButton("play-button.svg", PhraseMaker.ICONSIZE, _("Play"));
-        
+        this._playButton = widgetWindow.addButton(
+            "play-button.svg",
+            PhraseMaker.ICONSIZE,
+            _("Play")
+        );
+
         this._playButton.onclick = () => {
             logo.turtleDelay = 0;
 
             logo.resetSynth(0);
-            if(this.playingNow) {
+            if (this.playingNow) {
                 this._playButton.innerHTML =
                     '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
                     _("Play") +
@@ -576,7 +582,7 @@ class PhraseMaker {
                         eCell = eCell.parentNode;
                     }
                     const index = eCell.getAttribute("alt").split("__")[0];
-                    const condition = eCell.getAttribute("alt").split("__")[1];
+                    // const condition = eCell.getAttribute("alt").split("__")[1];
                     this._createMatrixGraphics2PieSubmenu(index, null);
                 };
 
@@ -598,8 +604,33 @@ class PhraseMaker {
                         logo.synth.inTemperament
                     );
                 } else {
-                    cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
-                    noteObj = [this.rowLabels[i], this.rowArgs[i]];
+                    if (isCustom(logo.synth.inTemperament)) {
+                        noteObj = getNote(
+                            this.rowLabels[i],
+                            this.rowArgs[i],
+                            0,
+                            turtles.ithTurtle(0).singer.keySignature,
+                            false,
+                            null,
+                            logo.errorMsg,
+                            logo.synth.inTemperament
+                        );
+                        const label = this.rowLabels[i];
+                        let note = TEMPERAMENT[logo.synth.inTemperament].filter((ele) => {
+                            return ele[3] === label || ele[1] === label;
+                        });
+                        if (note.length > 0) {
+                            note = note[0];
+                        }
+                        if (note[3] && note[3] !== note[1]) {
+                            cell.innerHTML = note[1];
+                        } else {
+                            cell.innerHTML = label + this.rowArgs[i].toString().sub();
+                        }
+                    } else {
+                        cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
+                        noteObj = [this.rowLabels[i], this.rowArgs[i]];
+                    }
                 }
                 cell.setAttribute("alt", i + "__" + "pitchblocks");
 
@@ -673,7 +704,7 @@ class PhraseMaker {
         // Sort them if there are note blocks.
         if (!this.sorted) {
             setTimeout(() => {
-                console.debug("sorting");
+                //console.debug("sorting");
                 this._sort();
             }, 1000);
         } else {
@@ -775,20 +806,16 @@ class PhraseMaker {
             this._exitWheel.removeWheel();
         };
 
-        const __subMenuChanged = () => {
-            __selectionChanged();
-        };
-
-        let __selectionChanged = () => {
+        const __selectionChanged = () => {
             label = VALUESLABEL[this._menuWheel.selectedNavItemIndex];
-            console.debug(label);
+            //console.debug(label);
             let rLabel = null;
             let rArg = null;
             const blockLabel = "";
             const newBlock = logo.blocks.blockList.length;
             switch (label) {
                 case "pitch":
-                    console.debug("loading new pitch block");
+                    //console.debug("loading new pitch block");
                     logo.blocks.loadNewBlocks([
                         [0, ["pitch", {}], 0, 0, [null, 1, 2, null]],
                         [1, ["solfege", { value: "sol" }], 0, 0, [0]],
@@ -798,7 +825,7 @@ class PhraseMaker {
                     rArg = 4;
                     break;
                 case "hertz":
-                    console.debug("loading new Hertz block");
+                    //console.debug("loading new Hertz block");
                     logo.blocks.loadNewBlocks([
                         [0, ["hertz", {}], 0, 0, [null, 1, null]],
                         [1, ["number", { value: 392 }], 0, 0, [0]]
@@ -807,7 +834,7 @@ class PhraseMaker {
                     rArg = 392;
                     break;
                 case "drum":
-                    console.debug("loading new playdrum block");
+                    //console.debug("loading new playdrum block");
                     logo.blocks.loadNewBlocks([
                         [0, ["playdrum", {}], 0, 0, [null, 1, null]],
                         [1, ["drumname", { value: DEFAULTDRUM }], 0, 0, [0]]
@@ -816,7 +843,7 @@ class PhraseMaker {
                     rArg = -1;
                     break;
                 case "graphics":
-                    console.debug("loading new forward block");
+                    //console.debug("loading new forward block");
                     logo.blocks.loadNewBlocks([
                         [0, ["forward", {}], 0, 0, [null, 1, null]],
                         [1, ["number", { value: 100 }], 0, 0, [0]]
@@ -825,7 +852,7 @@ class PhraseMaker {
                     rArg = 100;
                     break;
                 case "pen":
-                    console.debug("loading new setcolor block");
+                    //console.debug("loading new setcolor block");
                     logo.blocks.loadNewBlocks([
                         [0, ["setcolor", {}], 0, 0, [null, 1, null]],
                         [1, ["number", { value: 0 }], 0, 0, [0]]
@@ -834,6 +861,7 @@ class PhraseMaker {
                     rArg = 0;
                     break;
                 default:
+                    //eslint-disable-next-line no-console
                     console.debug(label + " not found");
                     break;
             }
@@ -848,7 +876,7 @@ class PhraseMaker {
                         blocksNo = this._mapNotesBlocks(graphicLabels[i]);
                         if (blocksNo.length >= 1) {
                             aboveBlock = last(blocksNo);
-                            console.debug(aboveBlock);
+                            //console.debug(aboveBlock);
                             break;
                         }
                     }
@@ -874,6 +902,7 @@ class PhraseMaker {
             }
 
             if (aboveBlock === null) {
+                //eslint-disable-next-line no-console
                 console.debug("WARNING: aboveBlock is null");
                 // Look for a pitch block.
                 blocksNo = this._mapNotesBlocks("pitch");
@@ -933,6 +962,10 @@ class PhraseMaker {
                     this.pitchBlockAdded(newBlock);
                 }, 200);
             }
+        };
+
+        const __subMenuChanged = () => {
+            __selectionChanged();
         };
 
         for (let i = 0; i < valueLabel.length; i++) {
@@ -1050,7 +1083,7 @@ class PhraseMaker {
             this._pitchWheel.createWheel(setxyValueLabel);
         }
 
-        console.debug(_blockNames.indexOf(blockLabel));
+        //console.debug(_blockNames.indexOf(blockLabel));
         this._blockLabelsWheel.navigateWheel(_blockNames.indexOf(blockLabel));
 
         this.xblockValue = [xblockLabelValue.toString(), "x"];
@@ -1069,6 +1102,7 @@ class PhraseMaker {
             this.xblockValue[0] = this._blockLabelsWheel2.navItems[
                 this._blockLabelsWheel2.selectedNavItemIndex
             ].title;
+            // eslint-disable-next-line no-use-before-define
             __selectionChanged(true);
         };
 
@@ -1076,6 +1110,7 @@ class PhraseMaker {
             this.yblockValue[0] = this._pitchWheel.navItems[
                 this._pitchWheel.selectedNavItemIndex
             ].title;
+            // eslint-disable-next-line no-use-before-define
             __selectionChanged(true);
         };
 
@@ -1341,6 +1376,7 @@ class PhraseMaker {
                 this._pitchWheel.selectedNavItemIndex
             ].title;
             docById("wheelnav-_exitWheel-title-1").children[0].textContent = this.blockValue;
+            // eslint-disable-next-line no-use-before-define
             __selectionChanged(true);
         };
 
@@ -1459,7 +1495,8 @@ class PhraseMaker {
             } else if (condition === "synthsblocks") {
                 noteStored = this.rowArgs[blockIndex];
             }
-
+            //eslint-disable-next-line no-console
+            console.debug(noteStored);
             this._noteStored[blockIndex] =
                 this.rowLabels[blockIndex] + ": " + this.rowArgs[blockIndex];
         };
@@ -1814,8 +1851,22 @@ class PhraseMaker {
                     logo.synth.inTemperament
                 );
             } else {
-                cell.innerHTML = this.rowLabels[index] + this.rowArgs[index].toString().sub();
-                noteObj = [this.rowLabels[index], this.rowArgs[index]];
+                if (isCustom(logo.synth.inTemperament)) {
+                    noteObj = getNote(
+                        this.rowLabels[i],
+                        this.rowArgs[i],
+                        0,
+                        turtles.ithTurtle(0).singer.keySignature,
+                        false,
+                        null,
+                        logo.errorMsg,
+                        logo.synth.inTemperament
+                    );
+                    cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
+                } else {
+                    cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
+                    noteObj = [this.rowLabels[i], this.rowArgs[i]];
+                }
             }
 
             let noteStored = null;
@@ -1998,6 +2049,7 @@ class PhraseMaker {
 
     _sort() {
         if (this.sorted) {
+            //eslint-disable-next-line no-console
             console.debug("already sorted");
             return;
         }
@@ -2131,6 +2183,7 @@ class PhraseMaker {
             if (i === 0) {
                 this._sortedRowMap.push(0);
             } else if (i > 0 && obj[1] !== "hertz" && obj[1] === last(this.rowLabels)) {
+                //eslint-disable-next-line no-console
                 console.debug("skipping " + obj[1] + " " + last(this.rowLabels));
                 this._sortedRowMap.push(last(this._sortedRowMap));
                 if (oldColumnBlockMap[sortedList[lastObj][3]] != undefined) {
@@ -2151,6 +2204,7 @@ class PhraseMaker {
                 this._rowMap[i] = this._rowMap[i - 1];
                 continue;
             } else {
+                //eslint-disable-next-line no-console
                 console.debug("pushing " + obj[1] + " " + last(this.rowLabels));
                 this._sortedRowMap.push(last(this._sortedRowMap) + 1);
                 lastObj = i;
@@ -2189,9 +2243,10 @@ class PhraseMaker {
 
     _export() {
         const exportWindow = window.open("");
-        console.debug(exportWindow);
+        //console.debug(exportWindow);
         const exportDocument = exportWindow.document;
         if (exportDocument === undefined) {
+            //eslint-disable-next-line no-console
             console.debug("Could not create export window");
             return;
         }
@@ -2370,7 +2425,7 @@ class PhraseMaker {
         const tupletTimeFactor = param[0][0] / param[0][1];
         const numberOfNotes = param[1].length;
         let totalNoteInterval = 0;
-        const ptmTable = docById("ptmTable");
+        // const ptmTable = docById("ptmTable");
         let lcd;
         for (let i = 0; i < numberOfNotes; i++) {
             if (i === 0) {
@@ -2407,7 +2462,7 @@ class PhraseMaker {
         }
 
         // First, ensure that the matrix is set up for tuplets.
-        let firstRow, labelCell, noteRow, valueRow, noteValueRow, cell;
+        let firstRow, labelCell, noteRow, valueRow, cell;
         if (!this._matrixHasTuplets) {
             firstRow = this._rows[0];
 
@@ -2552,7 +2607,7 @@ class PhraseMaker {
         cell.style.backgroundColor = platformColor.tupletBackground;
 
         // And a span in the note value column too.
-        noteValueRow = this._noteValueRow;
+        const noteValueRow = this._noteValueRow;
         cell = noteValueRow.insertCell();
         cell.colSpan = numberOfNotes;
         cell.style.fontSize = Math.floor(this._cellScale * 75) + "%";
@@ -2682,6 +2737,7 @@ class PhraseMaker {
             }
 
             if (logo.blocks.blockList[blk] === undefined) {
+                //eslint-disable-next-line no-console
                 console.debug("block " + blk + " is undefined");
                 continue;
             }
@@ -2690,6 +2746,7 @@ class PhraseMaker {
                 logo.blocks.blockList[blk].name === "newnote" ||
                 logo.blocks.blockList[blk].name === "repeat"
             ) {
+                //eslint-disable-next-line no-console
                 console.debug("FOUND A NOTE OR REPEAT BLOCK.");
                 this._noteBlocks = true;
                 break;
@@ -2856,6 +2913,7 @@ class PhraseMaker {
             bottomBlockLoop += 1;
             if (bottomBlockLoop > 2 * logo.blocks.blockList) {
                 // Could happen if the block data is malformed.
+                //eslint-disable-next-line no-console
                 console.debug("infinite loop finding bottomBlock?");
                 break;
             }
@@ -3052,7 +3110,8 @@ class PhraseMaker {
         }
 
         this._blockMapHelper = [];
-        for (let i = 0; i < downCellId; i++) {
+        let i;
+        for (i = 0; i < downCellId; i++) {
             this._blockMapHelper.push([this._colBlocks[i], [i]]);
         }
         let j = i;
@@ -3598,8 +3657,8 @@ class PhraseMaker {
                     // Look in the rowBlocks for the nth match
                     for (let j = 0; j < this._rowBlocks.length; j++) {
                         /* for note blocks within repeat block
-                           their ids are added with a larger number
-                           e.g. 11 becomes 1000011 or 2000011 */
+                            their ids are added with a larger number
+                            e.g. 11 becomes 1000011 or 2000011 */
 
                         // Slice length of comparing id from end
                         // of augmented id and compare
@@ -3613,8 +3672,9 @@ class PhraseMaker {
                     }
 
                     if (rIdx === null) {
+                        //eslint-disable-next-line no-console
                         console.debug("Could not find a row match.");
-                        console.debug(obj[0]);
+                        //console.debug(obj[0]);
                         continue;
                     }
 
@@ -3648,6 +3708,7 @@ class PhraseMaker {
                     // If we found a match, mark this cell
                     row = this._rows[r];
                     if (row === null || typeof row === "undefined") {
+                        //eslint-disable-next-line no-console
                         console.debug("COULD NOT FIND ROW " + r);
                     } else {
                         cell = row.cells[c];
@@ -3860,8 +3921,19 @@ class PhraseMaker {
                                     this.rowArgs[j]
                             );
                         } else {
-                            // if drum push drum name
-                            note.push(this.rowLabels[j]);
+                            if (
+                                isCustom(logo.synth.inTemperament) &&
+                                TEMPERAMENT[logo.synth.inTemperament].filter((ele) => {
+                                    const label = this.rowLabels[j];
+                                    return ele[3] === label || ele[1] === label;
+                                }).length !== 0
+                            ) {
+                                // custom pitch in custom temperament
+                                note.push(this.rowLabels[j] + this.rowArgs[j]);
+                            } else {
+                                // if drum push drum name
+                                note.push(this.rowLabels[j]);
+                            }
                         }
                     }
                 }
@@ -3913,15 +3985,15 @@ class PhraseMaker {
                 );
                 this.playingNow = false;
                 this._playButton.innerHTML =
-                        '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
-                        _("Play") +
-                        '" alt="' +
-                        _("Play") +
-                        '" height="' +
-                        PhraseMaker.ICONSIZE +
-                        '" width="' +
-                        PhraseMaker.ICONSIZE +
-                        '" vertical-align="middle">&nbsp;&nbsp;';
+                    '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
+                    _("Play") +
+                    '" alt="' +
+                    _("Play") +
+                    '" height="' +
+                    PhraseMaker.ICONSIZE +
+                    '" width="' +
+                    PhraseMaker.ICONSIZE +
+                    '" vertical-align="middle">&nbsp;&nbsp;';
             } else {
                 row = this._noteValueRow;
                 cell = row.cells[this._colIndex];
@@ -4104,6 +4176,7 @@ class PhraseMaker {
                 turtles.turtleList[0].painter.doSetXY(obj[1], obj[2]);
                 break;
             default:
+                //eslint-disable-next-line no-console
                 console.debug("unknown graphics command " + obj[0]);
                 break;
         }
@@ -4187,6 +4260,7 @@ class PhraseMaker {
                         logo.synth.trigger(0, note, noteValue, this._instrumentName, null, null);
                     }
                 } else {
+                    //eslint-disable-next-line no-console
                     console.debug("Cannot parse note object: " + obj);
                 }
             }
@@ -4309,7 +4383,7 @@ class PhraseMaker {
             newStack[idx][4][1] = idx + 2; // divide block
             newStack[idx][4][2] = idx + 1; // vspace block
 
-            const x = idx + delta;
+            // const x = idx + delta;
             let lastConnection, previousBlock, thisBlock;
 
             if (note[0][0] === "R" || note[0][0] == undefined) {
