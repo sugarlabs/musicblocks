@@ -464,7 +464,7 @@ class RhythmRuler {
      * @returns {void}
      */
     _noteWidth(noteValue) {
-        return Math.floor(EIGHTHNOTEWIDTH * (8 / Math.abs(noteValue)) * 4);
+        return Math.floor(EIGHTHNOTEWIDTH * (8 / Math.abs(noteValue)) * 3);
     }
 
     /**
