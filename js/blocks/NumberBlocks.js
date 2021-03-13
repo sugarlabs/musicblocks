@@ -3,11 +3,7 @@ function setupNumberBlocks() {
         constructor() {
             super("int");
             this.setPalette("number");
-            this.setHelpString([
-                _("The Int block returns an integer."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Int block returns an integer."), "documentation", ""]);
 
             this.formBlock({
                 name: _("int"),
@@ -153,11 +149,7 @@ function setupNumberBlocks() {
         constructor() {
             super("sqrt");
             this.setPalette("number");
-            this.setHelpString([
-                _("The Sqrt block returns the square root."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Sqrt block returns the square root."), "documentation", ""]);
 
             this.formBlock({
                 name: _("sqrt"),
@@ -382,11 +374,7 @@ function setupNumberBlocks() {
             this.setPalette("number");
             this.beginnerBlock(true);
 
-            this.setHelpString([
-                _("The Multiply block is used to multiply."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Multiply block is used to multiply."), "documentation", ""]);
 
             this.fontsize = 14;
             this.formBlock({
@@ -429,29 +417,28 @@ function setupNumberBlocks() {
                     const cblk0 = logo.blocks.blockList[blk].connections[0];
 
                     let a, b;
-                    if (
-                        cblk0 !== null &&
-                        logo.blocks.blockList[cblk0].name === "pitch"
-                    ) {
+                    if (cblk0 !== null && logo.blocks.blockList[cblk0].name === "pitch") {
                         const noteBlock = logo.blocks.blockList[cblk0].connections[1];
 
-                        a = typeof logo.blocks.blockList[cblk1].value === "string" ?
-                            calcOctave(
-                                tur.singer.currentOctave,
-                                logo.blocks.blockList[cblk1].value,
-                                tur.singer.lastNotePlayed,
-                                logo.blocks.blockList[noteBlock].value
-                            ) :
-                            logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                        a =
+                            typeof logo.blocks.blockList[cblk1].value === "string"
+                                ? calcOctave(
+                                      tur.singer.currentOctave,
+                                      logo.blocks.blockList[cblk1].value,
+                                      tur.singer.lastNotePlayed,
+                                      logo.blocks.blockList[noteBlock].value
+                                  )
+                                : logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
 
-                        b = typeof logo.blocks.blockList[cblk2].value === "string" ?
-                            calcOctave(
-                                tur.singer.currentOctave,
-                                logo.blocks.blockList[cblk2].value,
-                                tur.singer.lastNotePlayed,
-                                logo.blocks.blockList[noteBlock].value
-                            ) :
-                            logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                        b =
+                            typeof logo.blocks.blockList[cblk2].value === "string"
+                                ? calcOctave(
+                                      tur.singer.currentOctave,
+                                      logo.blocks.blockList[cblk2].value,
+                                      tur.singer.lastNotePlayed,
+                                      logo.blocks.blockList[noteBlock].value
+                                  )
+                                : logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                     } else {
                         a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                         b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
@@ -519,11 +506,7 @@ function setupNumberBlocks() {
             this.setPalette("number");
             this.beginnerBlock(true);
 
-            this.setHelpString([
-                _("The Minus block is used to subtract."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Minus block is used to subtract."), "documentation", ""]);
 
             this.fontsize = 14;
             this.formBlock({
@@ -566,29 +549,28 @@ function setupNumberBlocks() {
                     const cblk0 = logo.blocks.blockList[blk].connections[0];
 
                     let a, b;
-                    if (
-                        cblk0 !== null &&
-                        logo.blocks.blockList[cblk0].name === "pitch"
-                    ) {
+                    if (cblk0 !== null && logo.blocks.blockList[cblk0].name === "pitch") {
                         const noteBlock = logo.blocks.blockList[cblk0].connections[1];
 
-                        a = typeof logo.blocks.blockList[cblk1].value === "string" ?
-                            calcOctave(
-                                tur.singer.currentOctave,
-                                logo.blocks.blockList[cblk1].value,
-                                tur.singer.lastNotePlayed,
-                                logo.blocks.blockList[noteBlock].value
-                            ) :
-                            logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                        a =
+                            typeof logo.blocks.blockList[cblk1].value === "string"
+                                ? calcOctave(
+                                      tur.singer.currentOctave,
+                                      logo.blocks.blockList[cblk1].value,
+                                      tur.singer.lastNotePlayed,
+                                      logo.blocks.blockList[noteBlock].value
+                                  )
+                                : logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
 
-                        b = typeof logo.blocks.blockList[cblk2].value === "string" ?
-                            calcOctave(
-                                tur.singer.currentOctave,
-                                logo.blocks.blockList[cblk2].value,
-                                tur.singer.lastNotePlayed,
-                                logo.blocks.blockList[noteBlock].value
-                            ) :
-                            logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                        b =
+                            typeof logo.blocks.blockList[cblk2].value === "string"
+                                ? calcOctave(
+                                      tur.singer.currentOctave,
+                                      logo.blocks.blockList[cblk2].value,
+                                      tur.singer.lastNotePlayed,
+                                      logo.blocks.blockList[noteBlock].value
+                                  )
+                                : logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                     } else {
                         a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                         b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
@@ -612,11 +594,7 @@ function setupNumberBlocks() {
             this.setPalette("number");
             this.beginnerBlock(true);
 
-            this.setHelpString([
-                _("The Plus block is used to add."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Plus block is used to add."), "documentation", ""]);
 
             this.fontsize = 14;
             this.formBlock({
@@ -667,7 +645,6 @@ function setupNumberBlocks() {
 
                     let a, b;
                     if (cblk0 !== null && logo.blocks.blockList[cblk0].name === "pitch") {
-                        
                         if (logo.blocks.blockList[cblk2].name === "accidentalname") {
                             let scaledegree;
                             if (logo.blocks.blockList[cblk1].name === "namedbox") {
@@ -684,23 +661,25 @@ function setupNumberBlocks() {
                         } else {
                             const noteBlock = logo.blocks.blockList[cblk0].connections[1];
 
-                            a = typeof logo.blocks.blockList[cblk1].value === "string" ?
-                                calcOctave(
-                                    tur.singer.currentOctave,
-                                    logo.blocks.blockList[cblk1].value,
-                                    tur.singer.lastNotePlayed,
-                                    logo.blocks.blockList[noteBlock].value
-                                ) :
-                                logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                            a =
+                                typeof logo.blocks.blockList[cblk1].value === "string"
+                                    ? calcOctave(
+                                          tur.singer.currentOctave,
+                                          logo.blocks.blockList[cblk1].value,
+                                          tur.singer.lastNotePlayed,
+                                          logo.blocks.blockList[noteBlock].value
+                                      )
+                                    : logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
 
-                            b = typeof logo.blocks.blockList[cblk2].value === "string" ?
-                                calcOctave(
-                                    tur.singer.currentOctave,
-                                    logo.blocks.blockList[cblk2].value,
-                                    tur.singer.lastNotePlayed,
-                                    logo.blocks.blockList[noteBlock].value
-                                ) :
-                                logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                            b =
+                                typeof logo.blocks.blockList[cblk2].value === "string"
+                                    ? calcOctave(
+                                          tur.singer.currentOctave,
+                                          logo.blocks.blockList[cblk2].value,
+                                          tur.singer.lastNotePlayed,
+                                          logo.blocks.blockList[noteBlock].value
+                                      )
+                                    : logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                         }
                     } else {
                         a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
@@ -811,7 +790,7 @@ function setupNumberBlocks() {
             const cblk0 = logo.blocks.blockList[blk].connections[0];
             const cblk1 = logo.blocks.blockList[blk].connections[1];
             const cblk2 = logo.blocks.blockList[blk].connections[2];
-            
+
             if (cblk1 === null || cblk2 === null) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
@@ -856,11 +835,7 @@ function setupNumberBlocks() {
             this.setPalette("number");
             this.beginnerBlock(true);
 
-            this.setHelpString([
-                _("The Number block holds a number."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Number block holds a number."), "documentation", ""]);
         }
 
         arg(logo, turtle, blk) {

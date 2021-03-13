@@ -6,9 +6,7 @@ function setupVolumeBlocks() {
             this.setPalette("volume");
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Synth volume block returns the current volume of the current synthesizer."
-                ),
+                _("The Synth volume block returns the current volume of the current synthesizer."),
                 "documentation",
                 ""
             ]);
@@ -298,11 +296,12 @@ function setupVolumeBlocks() {
             const listenerName = "_synthvolume_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = event => {
+            const __listener = (event) => {
                 tur.singer.synthVolume[synth].pop();
                 // Restore previous volume
                 if (
-                    tur.singer.justCounting.length === 0 && tur.singer.synthVolume[synth].length > 0
+                    tur.singer.justCounting.length === 0 &&
+                    tur.singer.synthVolume[synth].length > 0
                 ) {
                     Singer.setSynthVolume(logo, turtle, synth, last(tur.singer.synthVolume[synth]));
                 }
@@ -343,9 +342,7 @@ function setupVolumeBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Set synth volume block will change the volume of a particular synth,"
-                ) +
+                _("The Set synth volume block will change the volume of a particular synth,") +
                     " " +
                     _("eg guitar violin snare drum etc.") +
                     " " +
@@ -401,9 +398,7 @@ function setupVolumeBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Set Panning block sets the panning for all synthesizers."
-                ),
+                _("The Set Panning block sets the panning for all synthesizers."),
                 "documentation",
                 ""
             ]);
@@ -431,9 +426,7 @@ function setupVolumeBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Set master volume block sets the volume for all synthesizers."
-                ),
+                _("The Set master volume block sets the volume for all synthesizers."),
                 "documentation",
                 ""
             ]);
@@ -509,7 +502,7 @@ function setupVolumeBlocks() {
             const listenerName = "_volume_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = event => {
+            const __listener = (event) => {
                 Singer.masterVolume.pop();
                 // Restore previous volume
                 if (tur.singer.justCounting.length === 0 && Singer.masterVolume.length > 0) {
@@ -529,9 +522,7 @@ function setupVolumeBlocks() {
             this.setPalette("volume");
             this.piemenuValuesC1 = [-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25];
             this.setHelpString([
-                _(
-                    "The Set relative volume block changes the volume of the contained notes."
-                ),
+                _("The Set relative volume block changes the volume of the contained notes."),
                 "documentation",
                 null,
                 "articulationhelp"
@@ -550,8 +541,7 @@ function setupVolumeBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined)
-                return;
+            if (args[1] === undefined) return;
 
             let arg = args[0];
             if (arg === null || typeof arg !== "number") {
@@ -601,7 +591,10 @@ function setupVolumeBlocks() {
         flow(args, logo, turtle, blk) {
             if (args.length > 1 && args[0] !== 0) {
                 Singer.VolumeActions.doCrescendo(
-                    logo.blocks.blockList[blk].name, args[0], turtle, blk
+                    logo.blocks.blockList[blk].name,
+                    args[0],
+                    turtle,
+                    blk
                 );
 
                 return [args[1], 1];

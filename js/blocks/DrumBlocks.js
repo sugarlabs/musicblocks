@@ -6,9 +6,7 @@ function setupDrumBlocks() {
             this.formBlock({ outType: "textout" });
             this.extraWidth = 50;
             this.setHelpString([
-                _(
-                    "The Noise name block is used to select a noise synthesizer."
-                ),
+                _("The Noise name block is used to select a noise synthesizer."),
                 "documentation",
                 ""
             ]);
@@ -50,9 +48,7 @@ function setupDrumBlocks() {
             super("playnoise", _("noise"));
             this.setPalette("drum");
             this.setHelpString([
-                _(
-                    "The Play noise block will generate white, pink, or brown noise."
-                ),
+                _("The Play noise block will generate white, pink, or brown noise."),
                 "documentation",
                 ""
             ]);
@@ -91,12 +87,16 @@ function setupDrumBlocks() {
                 this.makeMacro((x, y) => [
                     [0, "playdrum", x, y, [null, 1, null]],
                     [
-                        1, [
+                        1,
+                        [
                             isDrum ? "drumname" : "effectsname",
                             {
                                 value: drumName || isDrum ? displayName || name : name
                             }
-                        ], 0, 0, [0]
+                        ],
+                        0,
+                        0,
+                        [0]
                     ]
                 ]);
             }
@@ -182,9 +182,7 @@ function setupDrumBlocks() {
                         "The Set drum block will select a drum sound to replace the pitch of any contained notes."
                     ) +
                         " " +
-                        _(
-                            "In the example above, a kick drum sound will be played instead of sol."
-                        ),
+                        _("In the example above, a kick drum sound will be played instead of sol."),
                     "documentation",
                     null,
                     "setdrumhelp"
@@ -284,8 +282,8 @@ function setupDrumBlocks() {
                 logo.musicKeyboard.addRowBlock(blk);
             } else if (
                 tur.singer.inNoteBlock.length > 0 ||
-                blocks.blockList[blk].connections[0] == null &&
-                    last(blocks.blockList[blk].connections) == null
+                (blocks.blockList[blk].connections[0] == null &&
+                    last(blocks.blockList[blk].connections) == null)
             ) {
                 Singer.DrumActions.playDrum(args[0], turtle, blk);
             } else {

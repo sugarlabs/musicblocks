@@ -6,9 +6,7 @@ function setupFlowBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Backward block runs code in reverse order (Musical retrograde)."
-                ),
+                _("The Backward block runs code in reverse order (Musical retrograde)."),
                 "documentation",
                 ""
             ]);
@@ -44,7 +42,7 @@ function setupFlowBlocks() {
                 }
             }
 
-            const __listener = event => tur.singer.backward.pop();
+            const __listener = (event) => tur.singer.backward.pop();
 
             logo.setTurtleListener(turtle, listenerName, __listener);
             return [childFlow, childFlowCount];
@@ -83,11 +81,7 @@ function setupFlowBlocks() {
             if (args[1] === undefined) return;
 
             let arg0;
-            if (
-                args[0] === null ||
-                typeof args[0] !== "number" ||
-                args[0] < 1
-            ) {
+            if (args[0] === null || typeof args[0] !== "number" || args[0] < 1) {
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 arg0 = 2;
             } else {
@@ -107,7 +101,7 @@ function setupFlowBlocks() {
                 const listenerName = "_duplicate_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
-                const __lookForOtherTurtles = function(blk, turtle) {
+                const __lookForOtherTurtles = function (blk, turtle) {
                     for (const t in logo.connectionStore) {
                         if (t !== turtle.toString()) {
                             for (const b in logo.connectionStore[t]) {
@@ -123,7 +117,7 @@ function setupFlowBlocks() {
 
                 tur.singer.inDuplicate = true;
 
-                const __listener = event => {
+                const __listener = (event) => {
                     tur.singer.inDuplicate = false;
                     tur.singer.duplicateFactor /= factor;
 
@@ -201,36 +195,24 @@ function setupFlowBlocks() {
                     logo.connectionStore[turtle][blk] = [];
                     child = args[1];
                     while (child != null) {
-                        const lastConnection =
-                            logo.blocks.blockList[child].connections.length - 1;
-                        const nextBlk =
-                            logo.blocks.blockList[child].connections[
-                                lastConnection
-                            ];
+                        const lastConnection = logo.blocks.blockList[child].connections.length - 1;
+                        const nextBlk = logo.blocks.blockList[child].connections[lastConnection];
                         // Don't disconnect a hidden block from its parent.
-                        if (
-                            nextBlk != null &&
-                            logo.blocks.blockList[nextBlk].name === "hidden"
-                        ) {
+                        if (nextBlk != null && logo.blocks.blockList[nextBlk].name === "hidden") {
                             logo.connectionStore[turtle][blk].push([
                                 nextBlk,
                                 1,
                                 logo.blocks.blockList[nextBlk].connections[1]
                             ]);
-                            child =
-                                logo.blocks.blockList[nextBlk].connections[1];
-                            logo.blocks.blockList[
-                                nextBlk
-                            ].connections[1] = null;
+                            child = logo.blocks.blockList[nextBlk].connections[1];
+                            logo.blocks.blockList[nextBlk].connections[1] = null;
                         } else {
                             logo.connectionStore[turtle][blk].push([
                                 child,
                                 lastConnection,
                                 nextBlk
                             ]);
-                            logo.blocks.blockList[child].connections[
-                                lastConnection
-                            ] = null;
+                            logo.blocks.blockList[child].connections[lastConnection] = null;
                             child = nextBlk;
                         }
 
@@ -250,9 +232,7 @@ function setupFlowBlocks() {
             super("defaultcase");
             this.setPalette("flow");
             this.setHelpString([
-                _(
-                    "The Default block is used inside of a Switch to define the default action."
-                ),
+                _("The Default block is used inside of a Switch to define the default action."),
                 "documentation",
                 null,
                 "switchhelp"
@@ -269,10 +249,7 @@ function setupFlowBlocks() {
         flow(args, logo, turtle, blk) {
             const switchBlk = last(logo.switchBlocks[turtle]);
             if (switchBlk === null) {
-                logo.errorMsg(
-                    _("The Case Block must be used inside of a Switch Block."),
-                    blk
-                );
+                logo.errorMsg(_("The Case Block must be used inside of a Switch Block."), blk);
                 logo.stopTurtle = true;
                 return;
             }
@@ -286,9 +263,7 @@ function setupFlowBlocks() {
             super("case");
             this.setPalette("flow");
             this.setHelpString([
-                _(
-                    "The Case block is used inside of a Switch to define matches."
-                ),
+                _("The Case block is used inside of a Switch to define matches."),
                 "documentation",
                 null,
                 "switchhelp"
@@ -307,10 +282,7 @@ function setupFlowBlocks() {
         flow(args, logo, turtle, blk) {
             const switchBlk = last(logo.switchBlocks[turtle]);
             if (switchBlk === null) {
-                logo.errorMsg(
-                    _("The Case Block must be used inside of a Switch Block."),
-                    blk
-                );
+                logo.errorMsg(_("The Case Block must be used inside of a Switch Block."), blk);
                 logo.stopTurtle = true;
                 return;
             }
@@ -357,7 +329,7 @@ function setupFlowBlocks() {
             const listenerName = "_switch_" + blk + "_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function() {
+            const __listener = function () {
                 const switchBlk = last(logo.switchBlocks[turtle]);
                 // Run the cases here.
                 let switchCase;
@@ -365,12 +337,7 @@ function setupFlowBlocks() {
                 if (argBlk == null) {
                     switchCase = "__default__";
                 } else {
-                    switchCase = logo.parseArg(
-                        logo,
-                        turtle,
-                        argBlk,
-                        logo.receievedArg
-                    );
+                    switchCase = logo.parseArg(logo, turtle, argBlk, logo.receievedArg);
                 }
 
                 let caseFlow = null;
@@ -653,9 +620,7 @@ function setupFlowBlocks() {
                         "Conditionals lets your program take different actions depending on the condition."
                     ) +
                         " " +
-                        _(
-                            "In this example if the mouse button is pressed a snare drum will play."
-                        ),
+                        _("In this example if the mouse button is pressed a snare drum will play."),
                     "documentation",
                     null,
                     "elifhelp"
@@ -704,9 +669,7 @@ function setupFlowBlocks() {
                         "Conditionals lets your program take different actions depending on the condition."
                     ) +
                         " " +
-                        _(
-                            "In this example if the mouse button is pressed a snare drum will play."
-                        ),
+                        _("In this example if the mouse button is pressed a snare drum will play."),
                     "documentation",
                     null,
                     "ifhelp"
@@ -717,9 +680,7 @@ function setupFlowBlocks() {
                         "Conditionals lets your program take different actions depending on the condition."
                     ) +
                         " " +
-                        _(
-                            "In this example if the mouse button is pressed a snare drum will play."
-                        ),
+                        _("In this example if the mouse button is pressed a snare drum will play."),
                     "documentation",
                     null,
                     "ifhelp"
@@ -748,9 +709,7 @@ function setupFlowBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Forever block will repeat the contained blocks forever."
-                ) +
+                _("The Forever block will repeat the contained blocks forever.") +
                     " " +
                     _(
                         "In this example of a simple drum machine a kick drum will play 1/4 notes forever."
@@ -799,14 +758,9 @@ function setupFlowBlocks() {
             if (args[1] === undefined) return;
 
             let arg;
-            if (
-                args[0] === null ||
-                typeof args[0] !== "number" ||
-                args[0] < 1
-            ) {
-                if (args[0] < 0)
-                    logo.errorMsg(POSNUMBER, blk);
-                return [null , 0];
+            if (args[0] === null || typeof args[0] !== "number" || args[0] < 1) {
+                if (args[0] < 0) logo.errorMsg(POSNUMBER, blk);
+                return [null, 0];
             } else {
                 arg = args[0];
             }
@@ -827,13 +781,13 @@ function setupFlowBlocks() {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "duplicate"]);
             } else {
-                logo.blocks.blockList[blk].value =
-                    logo.turtles.ithTurtle(turtle).singer.duplicateFactor;
+                logo.blocks.blockList[blk].value = logo.turtles.ithTurtle(
+                    turtle
+                ).singer.duplicateFactor;
             }
         }
     }

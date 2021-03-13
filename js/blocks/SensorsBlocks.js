@@ -5,9 +5,7 @@ function setupSensorsBlocks() {
             this.setPalette("sensors");
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Input block prompts for keyboard input."
-                ),
+                _("The Input block prompts for keyboard input."),
                 "documentation",
                 ""
             ]);
@@ -16,7 +14,7 @@ function setupSensorsBlocks() {
                 name: _("input"),
                 args: 1,
                 argTypes: ["anyin"],
-                defaults: [_("Input a value")],
+                defaults: [_("Input a value")]
             });
 
             if (this.lang === "ja") this.hidden = true;
@@ -44,7 +42,8 @@ function setupSensorsBlocks() {
 
             // Add a handler to continue flow after the input.
             function __keyPressed(event) {
-                if (event.keyCode === 13) { // RETURN
+                if (event.keyCode === 13) {
+                    // RETURN
                     const inputElem = docById("textLabel");
                     console.debug(inputElem.value);
                     console.debug("trying a number");
@@ -60,10 +59,10 @@ function setupSensorsBlocks() {
                     logo.clearTurtleRun(turtle);
                     docById("labelDiv").classList.remove("hasKeyboard");
                 }
-            };
+            }
 
             docById("textLabel").addEventListener("keypress", __keyPressed);
-        };
+        }
     }
 
     class InputValueBlock extends ValueBlock {
@@ -73,9 +72,7 @@ function setupSensorsBlocks() {
             this.parameter = true;
 
             this.setHelpString([
-                _(
-                    "The Input-value block stores the input."
-                ),
+                _("The Input-value block stores the input."),
                 "documentation",
                 null,
                 "input"
@@ -121,24 +118,23 @@ function setupSensorsBlocks() {
                 logo.pitchAnalyser = new Tone.Analyser({
                     type: "fft",
                     size: logo.limit,
-                    smoothing : 0
+                    smoothing: 0
                 });
                 logo.mic.connect(logo.pitchAnalyser);
             }
 
-
             const values = logo.pitchAnalyser.getValue();
             let max = Infinity;
-            let idx = 0;                                // frequency bin
+            let idx = 0; // frequency bin
             for (let i = 0; i < logo.limit; i++) {
-                const v2 = -values[i] ;
+                const v2 = -values[i];
                 if (v2 < max) {
                     max = v2;
                     idx = i;
                 }
             }
             const freq = idx / (logo.pitchAnalyser.sampleTime * logo.limit * 2);
-            return freq ;
+            return freq;
         }
     }
 
@@ -147,13 +143,11 @@ function setupSensorsBlocks() {
             super("loudness", _("loudness"));
             this.setPalette("sensors");
             this.parameter = true;
-	    // Put this block on the beginner palette except in Japanese.
+            // Put this block on the beginner palette except in Japanese.
             this.beginnerBlock(!(this.lang === "ja"));
 
             this.setHelpString([
-                _(
-                    "The Loudness block returns the volume detected by the microphone."
-                ),
+                _("The Loudness block returns the volume detected by the microphone."),
                 "documentation",
                 ""
             ]);
@@ -211,7 +205,7 @@ function setupSensorsBlocks() {
 
     class MyCursoroverBlock extends ValueBlock {
         constructor() {
-	    // TRANS: The mouse cursor is over the mouse icon
+            // TRANS: The mouse cursor is over the mouse icon
             super("mycursorover", _("cursor over"));
             this.setPalette("sensors");
 
@@ -230,13 +224,15 @@ function setupSensorsBlocks() {
 
     class MyCursoroutBlock extends ValueBlock {
         constructor() {
-	    // TRANS: The cursor is "out" -- it is no longer over the mouse.
+            // TRANS: The cursor is "out" -- it is no longer over the mouse.
             super("mycursorout", _("cursor out"));
             this.setPalette("sensors");
 
             this.setHelpString([
                 // TRANS: hover
-                _("The Cursor out block triggers an event when the cursor is moved off of a mouse."),
+                _(
+                    "The Cursor out block triggers an event when the cursor is moved off of a mouse."
+                ),
                 "documentation",
                 null,
                 "cursorouthelp"
@@ -254,7 +250,9 @@ function setupSensorsBlocks() {
             this.setPalette("sensors");
 
             this.setHelpString([
-                _("The Cursor button down block triggers an event when the curson button is press on a mouse."),
+                _(
+                    "The Cursor button down block triggers an event when the curson button is press on a mouse."
+                ),
                 "documentation",
                 null,
                 "cursordownhelp"
@@ -272,7 +270,9 @@ function setupSensorsBlocks() {
             this.setPalette("sensors");
 
             this.setHelpString([
-                _("The Cursor button up block triggers an event when the cursor button is released while over a mouse."),
+                _(
+                    "The Cursor button up block triggers an event when the cursor button is released while over a mouse."
+                ),
                 "documentation",
                 null,
                 "cursoruphelp"
@@ -290,9 +290,7 @@ function setupSensorsBlocks() {
             this.setPalette("sensors");
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Get blue block returns the blue component of the pixel under the mouse."
-                ),
+                _("The Get blue block returns the blue component of the pixel under the mouse."),
                 "documentation",
                 ""
             ]);
@@ -304,8 +302,7 @@ function setupSensorsBlocks() {
 
         arg(logo, turtle) {
             let colorString = logo.turtles.turtleList[turtle].painter.canvasColor;
-            if (colorString[2] === "#")
-                colorString = hex2rgb(colorString.split("#")[1]);
+            if (colorString[2] === "#") colorString = hex2rgb(colorString.split("#")[1]);
             const obj = colorString.split("(")[1].split(",");
             return parseInt(Number(obj[0]) / 2.55);
         }
@@ -317,9 +314,7 @@ function setupSensorsBlocks() {
             this.setPalette("sensors");
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Get green block returns the green component of the pixel under the mouse."
-                ),
+                _("The Get green block returns the green component of the pixel under the mouse."),
                 "documentation",
                 ""
             ]);
@@ -331,8 +326,7 @@ function setupSensorsBlocks() {
 
         arg(logo, turtle) {
             let colorString = logo.turtles.turtleList[turtle].painter.canvasColor;
-            if (colorString[1] === "#")
-                colorString = hex2rgb(colorString.split("#")[1]);
+            if (colorString[1] === "#") colorString = hex2rgb(colorString.split("#")[1]);
             const obj = colorString.split("(")[1].split(",");
             return parseInt(Number(obj[0]) / 2.55);
         }
@@ -344,9 +338,7 @@ function setupSensorsBlocks() {
             this.setPalette("sensors");
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Get red block returns the red component of the pixel under the mouse."
-                ),
+                _("The Get red block returns the red component of the pixel under the mouse."),
                 "documentation",
                 ""
             ]);
@@ -358,8 +350,7 @@ function setupSensorsBlocks() {
 
         arg(logo, turtle) {
             let colorString = logo.turtles.turtleList[turtle].painter.canvasColor;
-            if (colorString[0] === "#")
-                colorString = hex2rgb(colorString.split("#")[1]);
+            if (colorString[0] === "#") colorString = hex2rgb(colorString.split("#")[1]);
             const obj = colorString.split("(")[1].split(",");
             return parseInt(Number(obj[0]) / 2.55);
         }
@@ -371,9 +362,7 @@ function setupSensorsBlocks() {
             this.setPalette("sensors");
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Get pixel block returns the color of the pixel under the mouse."
-                ),
+                _("The Get pixel block returns the color of the pixel under the mouse."),
                 "documentation",
                 ""
             ]);
@@ -392,8 +381,7 @@ function setupSensorsBlocks() {
 
             const canvas = docById("overlayCanvas");
             const ctx = canvas.getContext("2d");
-            const imgData = ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1)
-                .data;
+            const imgData = ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
             let color = searchColors(imgData[0], imgData[1], imgData[2]);
             if (imgData[3] === 0) {
                 (color = body.style.background
@@ -402,7 +390,7 @@ function setupSensorsBlocks() {
                         body.style.background.lastIndexOf(")")
                     )
                     .split(/,\s*/)),
-                (color = searchColors(color[0], color[1], color[2]));
+                    (color = searchColors(color[0], color[1], color[2]));
             }
 
             if (wasVisible) {
@@ -417,7 +405,7 @@ function setupSensorsBlocks() {
             super("time", _("time"));
             this.setPalette("sensors");
             this.parameter = true;
-	    // Put this block on the beginner palette except in Japanese.
+            // Put this block on the beginner palette except in Japanese.
             this.beginnerBlock(!(this.lang === "ja"));
 
             this.setHelpString([
@@ -446,9 +434,7 @@ function setupSensorsBlocks() {
             this.beginnerBlock(true);
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Cursor Y block returns the vertical position of the mouse."
-                ),
+                _("The Cursor Y block returns the vertical position of the mouse."),
                 "documentation",
                 null,
                 "mousebuttonhelp"
@@ -471,9 +457,7 @@ function setupSensorsBlocks() {
             this.beginnerBlock(true);
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Cursor X block returns the horizontal position of the mouse."
-                ),
+                _("The Cursor X block returns the horizontal position of the mouse."),
                 "documentation",
                 null,
                 "mousebuttonhelp"
@@ -496,9 +480,7 @@ function setupSensorsBlocks() {
             this.beginnerBlock(true);
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Mouse-button block returns True if the mouse button is pressed."
-                ),
+                _("The Mouse-button block returns True if the mouse button is pressed."),
                 "documentation",
                 null,
                 "mousebuttonhelp"
@@ -542,8 +524,7 @@ function setupSensorsBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "toascii"]);
             } else {

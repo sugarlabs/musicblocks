@@ -69,7 +69,7 @@ function setupActionBlocks() {
                 const xmlHttp = new XMLHttpRequest();
                 xmlHttp.open("POST", outurl, true);
                 // Call a function when the state changes.
-                xmlHttp.onreadystatechange = function() {
+                xmlHttp.onreadystatechange = function () {
                     if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
                         alert(xmlHttp.responseText);
                     }
@@ -85,9 +85,7 @@ function setupActionBlocks() {
             super("calc");
             this.setPalette("action");
             this.setHelpString([
-                _(
-                    "The Calculate block returns a value calculated by an action."
-                ),
+                _("The Calculate block returns a value calculated by an action."),
                 "documentation",
                 ""
             ]);
@@ -135,9 +133,7 @@ function setupActionBlocks() {
             super("namedcalc");
             this.setPalette("action");
             this.setHelpString([
-                _(
-                    "The Calculate block returns a value calculated by an action."
-                ),
+                _("The Calculate block returns a value calculated by an action."),
                 "documentation",
                 ""
             ]);
@@ -199,11 +195,7 @@ function setupActionBlocks() {
             }
 
             if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
-                for (
-                    let i = 0;
-                    i < logo.blocks.blockList[blk].argClampSlots.length;
-                    i++
-                ) {
+                for (let i = 0; i < logo.blocks.blockList[blk].argClampSlots.length; i++) {
                     if (logo.blocks.blockList[blk].connections[i + 1] != null) {
                         const t = logo.parseArg(
                             logo,
@@ -246,7 +238,7 @@ function setupActionBlocks() {
                         }
                     }
 
-                    const __listener = event => tur.singer.backward.pop();
+                    const __listener = (event) => tur.singer.backward.pop();
 
                     logo.setTurtleListener(turtle, listenerName, __listener);
                 } else {
@@ -265,9 +257,7 @@ function setupActionBlocks() {
             super("namedcalcArg");
             this.setPalette("action");
             this.setHelpString([
-                _(
-                    "The Calculate block returns a value calculated by an action."
-                ),
+                _("The Calculate block returns a value calculated by an action."),
                 "documentation",
                 ""
             ]);
@@ -288,11 +278,7 @@ function setupActionBlocks() {
             const actionArgs = [];
             // logo.getBlockAtStartOfArg(blk);
             if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
-                for (
-                    let i = 0;
-                    i < logo.blocks.blockList[blk].argClampSlots.length;
-                    i++
-                ) {
+                for (let i = 0; i < logo.blocks.blockList[blk].argClampSlots.length; i++) {
                     const t = logo.parseArg(
                         logo,
                         turtle,
@@ -350,11 +336,7 @@ function setupActionBlocks() {
             }
 
             if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
-                for (
-                    let i = 0;
-                    i < logo.blocks.blockList[blk].argClampSlots.length;
-                    i++
-                ) {
+                for (let i = 0; i < logo.blocks.blockList[blk].argClampSlots.length; i++) {
                     if (logo.blocks.blockList[blk].connections[i + 2] != null) {
                         const t = logo.parseArg(
                             logo,
@@ -388,9 +370,7 @@ function setupActionBlocks() {
             super("calcArg");
             this.setPalette("action");
             this.setHelpString([
-                _(
-                    "The Calculate block returns a value calculated by an action."
-                ),
+                _("The Calculate block returns a value calculated by an action."),
                 "documentation",
                 ""
             ]);
@@ -413,11 +393,7 @@ function setupActionBlocks() {
             const actionArgs = [];
             // logo.getBlockAtStartOfArg(blk);
             if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
-                for (
-                    let i = 0;
-                    i < logo.blocks.blockList[blk].argClampSlots.length;
-                    i++
-                ) {
+                for (let i = 0; i < logo.blocks.blockList[blk].argClampSlots.length; i++) {
                     const t = logo.parseArg(
                         logo,
                         turtle,
@@ -458,9 +434,7 @@ function setupActionBlocks() {
             super("arg");
             this.setPalette("action");
             this.setHelpString([
-                _(
-                    "The Arg block contains the value of an argument passed to an action."
-                ),
+                _("The Arg block contains the value of an argument passed to an action."),
                 "documentation",
                 ""
             ]);
@@ -500,9 +474,7 @@ function setupActionBlocks() {
             super("namedarg");
             this.setPalette("action");
             this.setHelpString([
-                _(
-                    "The Arg block contains the value of an argument passed to an action."
-                ),
+                _("The Arg block contains the value of an argument passed to an action."),
                 "documentation",
                 ""
             ]);
@@ -540,7 +512,7 @@ function setupActionBlocks() {
 
     class DoBlock extends FlowBlock {
         constructor() {
-	    //.TRANS: do is the do something or take an action.
+            //.TRANS: do is the do something or take an action.
             super("do");
             this.setPalette("action");
             this.beginnerBlock(true);
@@ -548,9 +520,7 @@ function setupActionBlocks() {
             this.setHelpString([
                 _("The Do block is used to initiate an action.") +
                     " " +
-                    _(
-                        "In the example, it is used with the One of block to choose a random phase."
-                    ),
+                    _("In the example, it is used with the One of block to choose a random phase."),
                 "documentation",
                 null,
                 "dohelp"
@@ -589,18 +559,14 @@ function setupActionBlocks() {
             if (this.lang === "ja") {
                 this.extraWidth = 15;
                 this.setHelpString([
-                    _(
-                        "The Listen block is used to listen for an event such as a mouse click."
-                    ),
+                    _("The Listen block is used to listen for an event such as a mouse click."),
                     "documentation",
                     null,
                     "broadcasthelp"
                 ]);
             } else {
                 this.setHelpString([
-                    _(
-                        "The Listen block is used to listen for an event such as a mouse click."
-                    ) +
+                    _("The Listen block is used to listen for an event such as a mouse click.") +
                         " " +
                         _("When the event happens, an action is taken."),
                     "documentation",
@@ -615,10 +581,7 @@ function setupActionBlocks() {
                 args: 2,
                 argTypes: ["anyin", "anyin"],
                 //.TRANS: do1 is do (take) an action (JAPANESE ONLY)
-                argLabels: [
-                    _("event"),
-                    this.lang === "ja" ? _("do1") : _("do")
-                ],
+                argLabels: [_("event"), this.lang === "ja" ? _("do1") : _("do")],
                 defaults: [_("event"), _("action")]
             });
         }
@@ -631,7 +594,7 @@ function setupActionBlocks() {
             } else {
                 const tur = logo.turtles.ithTurtle(turtle);
 
-                const __listener = event => {
+                const __listener = (event) => {
                     if (tur.running) {
                         const queueBlock = new Queue(logo.actions[args[1]], 1, blk);
                         tur.parentFlowQueue.push(blk);
@@ -640,7 +603,11 @@ function setupActionBlocks() {
                         // Since the turtle has stopped running, we must run the stack from here
                         tur.singer.runningFromEvent = true;
                         logo.runFromBlockNow(
-                            logo, turtle, logo.actions[args[1]], false, receivedArg
+                            logo,
+                            turtle,
+                            logo.actions[args[1]],
+                            false,
+                            receivedArg
                         );
                     }
                 };
@@ -737,9 +704,7 @@ function setupActionBlocks() {
                     "The Action block is used to group together blocks so that they can be used more than once."
                 ) +
                     " " +
-                    _(
-                        "It is often used for storing a phrase of music that is repeated."
-                    ),
+                    _("It is often used for storing a phrase of music that is repeated."),
                 "documentation",
                 null,
                 "actionhelp"
@@ -823,7 +788,7 @@ function setupActionBlocks() {
                     }
                 }
 
-                const __listener = event => tur.singer.backward.pop();
+                const __listener = (event) => tur.singer.backward.pop();
 
                 logo.setTurtleListener(turtle, listenerName, __listener);
             } else {

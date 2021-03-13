@@ -92,14 +92,13 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
-            if (args[1] === undefined)
-                return;
+            if (args[1] === undefined) return;
 
             if (args[0] === null || typeof args[0] !== "number")
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-            else if (args[0] <= 0)
-                logo.errorMsg(_("Note value must be greater than 0."), blk);
-            const value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
+            else if (args[0] <= 0) logo.errorMsg(_("Note value must be greater than 0."), blk);
+            const value =
+                args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
             const _callback = () => {
                 const tur = logo.turtles.ithTurtle(turtle);
@@ -145,7 +144,7 @@ function setupRhythmBlocks() {
             const listenerName = "_swing_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = event => {
+            const __listener = (event) => {
                 if (!tur.singer.suppressOutput) {
                     tur.singer.swingTarget.pop();
                     tur.singer.swing.pop();
@@ -194,7 +193,7 @@ function setupRhythmBlocks() {
             const listenerName = "_swing_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = event => {
+            const __listener = (event) => {
                 if (!tur.singer.suppressOutput) {
                     tur.singer.swingTarget.pop();
                     tur.singer.swing.pop();
@@ -249,13 +248,17 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[2] === undefined)
-                return;
+            if (args[2] === undefined) return;
 
             if (
-                args[0] === null || typeof args[0] !== "number" || args[0] <= 0 ||
-                args[1] === null || typeof args[1] !== "number" || args[1] <= 0
-            )   logo.errorMsg(NOINPUTERRORMSG, blk);
+                args[0] === null ||
+                typeof args[0] !== "number" ||
+                args[0] <= 0 ||
+                args[1] === null ||
+                typeof args[1] !== "number" ||
+                args[1] <= 0
+            )
+                logo.errorMsg(NOINPUTERRORMSG, blk);
             const arg0 =
                 args[0] === null || typeof args[0] !== "number" || args[0] <= 0 ? 1 / 24 : args[0];
             const arg1 =
@@ -300,7 +303,7 @@ function setupRhythmBlocks() {
             const listenerName = "_skip_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = event => {
+            const __listener = (event) => {
                 tur.singer.skipFactor -= arg;
             };
 
@@ -341,8 +344,7 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined)
-                return;
+            if (args[1] === undefined) return;
 
             let factor = args[0];
             if (factor === null || typeof factor !== "number" || factor <= 0) {
@@ -363,9 +365,7 @@ function setupRhythmBlocks() {
 
             this.beginnerBlock(true);
             this.setHelpString([
-                _(
-                    "The Tie block works on pairs of notes, combining them into one note."
-                ),
+                _("The Tie block works on pairs of notes, combining them into one note."),
                 "documentation",
                 null,
                 "tiehelp"
@@ -383,8 +383,7 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[0] === undefined)
-                return;
+            if (args[0] === undefined) return;
 
             Singer.RhythmActions.doTie(turtle, blk);
 
@@ -431,7 +430,7 @@ function setupRhythmBlocks() {
             const listenerName = "_dot_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = event => {
+            const __listener = (event) => {
                 const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
                 tur.singer.beatFactor *= currentDotFactor;
                 tur.singer.dotCount -= arg >= 0 ? arg : 1 / arg;
@@ -453,9 +452,7 @@ function setupRhythmBlocks() {
             this.setHelpString([
                 _("The Dot block extends the duration of a note by 50%.") +
                     " " +
-                    _(
-                        "Eg a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat."
-                    ),
+                    _("Eg a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat."),
                 "documentation",
                 null,
                 "dothelp"
@@ -479,7 +476,7 @@ function setupRhythmBlocks() {
             if (args[0] === null) logo.errorMsg(NOINPUTERRORMSG, blk);
             const arg = args[0] === null ? 0 : args[0];
 
-            Singer.RhythmActions.doRhythmicDot(arg, turtle ,blk);
+            Singer.RhythmActions.doRhythmicDot(arg, turtle, blk);
 
             return [args[1], 1];
         }
@@ -525,7 +522,7 @@ function setupRhythmBlocks() {
                 name:
                     this.lang === "ja"
                         ? //.TRANS: Japanese only: note value block for drum
-                        _("note value drum")
+                          _("note value drum")
                         : _("note value") + " " + _("drum"),
                 args: 1,
                 canCollapse: true
@@ -723,14 +720,13 @@ function setupRhythmBlocks() {
 
         flow(args, logo, turtle, blk, receivedArg) {
             // Should never happen, but if it does, nothing to do
-            if (args[1] === undefined)
-                return;
+            if (args[1] === undefined) return;
 
             if (args[0] === null || typeof args[0] !== "number")
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-            else if (args[0] <= 0)
-                logo.errorMsg(_("Note value must be greater than 0."), blk);
-            const value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
+            else if (args[0] <= 0) logo.errorMsg(_("Note value must be greater than 0."), blk);
+            const value =
+                args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
             const _callback = () => {
                 const tur = logo.turtles.ithTurtle(turtle);
@@ -752,13 +748,9 @@ function setupRhythmBlocks() {
             this.setPalette("rhythm");
             this.beginnerBlock(true);
             this.setHelpString([
-                _(
-                    "The Note block is a container for one or more Pitch blocks."
-                ) +
+                _("The Note block is a container for one or more Pitch blocks.") +
                     " " +
-                    _(
-                        "The Note block specifies the duration (note value) of its contents."
-                    ),
+                    _("The Note block specifies the duration (note value) of its contents."),
                 "documentation",
                 null,
                 "note1"
@@ -786,15 +778,14 @@ function setupRhythmBlocks() {
 
         flow(args, logo, turtle, blk, receivedArg) {
             // Should never happen, but if it does, nothing to do
-            if (args[1] === undefined)
-                return;
+            if (args[1] === undefined) return;
 
             if (args[0] === null || typeof args[0] !== "number")
                 logo.errorMsg(NOINPUTERRORMSG, blk);
-            else if (args[0] <= 0)
-                logo.errorMsg(_("Note value must be greater than 0."), blk);
+            else if (args[0] <= 0) logo.errorMsg(_("Note value must be greater than 0."), blk);
 
-            const value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
+            const value =
+                args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
             const _callback = () => {
                 const tur = logo.turtles.ithTurtle(turtle);

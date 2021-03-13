@@ -1,13 +1,10 @@
 function setupProgramBlocks() {
-
     class LoadHeapFromAppBlock extends FlowBlock {
         constructor() {
             super("loadHeapFromApp");
             this.setPalette("program");
             this.setHelpString([
-                _(
-                    "The Load-heap-from-app block loads the heap from a web page."
-                ),
+                _("The Load-heap-from-app block loads the heap from a web page."),
                 "documentation",
                 ""
             ]);
@@ -90,10 +87,7 @@ function setupProgramBlocks() {
                 const data = JSON.stringify(logo.turtleHeaps[name]);
                 const xmlHttp = new XMLHttpRequest();
                 xmlHttp.open("POST", url, true);
-                xmlHttp.setRequestHeader(
-                    "Content-Type",
-                    "application/json;charset=UTF-8"
-                );
+                xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
                 xmlHttp.send(data);
             } else {
                 logo.errorMsg(_("Cannot find a valid heap for") + " " + name);
@@ -135,19 +129,13 @@ function setupProgramBlocks() {
                     logo.errorMsg(_("You must select a file."));
                 } else {
                     try {
-                        logo.turtleHeaps[turtle] = JSON.parse(
-                            logo.blocks.blockList[c].value[1]
-                        );
+                        logo.turtleHeaps[turtle] = JSON.parse(logo.blocks.blockList[c].value[1]);
                         if (!Array.isArray(logo.turtleHeaps[turtle])) {
                             throw "is not array";
                         }
                     } catch (e) {
                         logo.turtleHeaps[turtle] = oldHeap;
-                        logo.errorMsg(
-                            _(
-                                "The file you selected does not contain a valid heap."
-                            )
-                        );
+                        logo.errorMsg(_("The file you selected does not contain a valid heap."));
                     }
                 }
             } else {
@@ -160,11 +148,7 @@ function setupProgramBlocks() {
         constructor() {
             super("setHeap");
             this.setPalette("program");
-            this.setHelpString([
-                _("The Set-heap block loads the heap."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Set-heap block loads the heap."), "documentation", ""]);
 
             this.formBlock({
                 //.TRANS: load the heap from a JSON encoding
@@ -186,19 +170,13 @@ function setupProgramBlocks() {
             const c = block.connections[1];
             if (c !== null) {
                 try {
-                    logo.turtleHeaps[turtle] = JSON.parse(
-                        logo.blocks.blockList[c].value
-                    );
+                    logo.turtleHeaps[turtle] = JSON.parse(logo.blocks.blockList[c].value);
                     if (!Array.isArray(logo.turtleHeaps[turtle])) {
                         throw "is not array";
                     }
                 } catch (e) {
                     logo.turtleHeaps[turtle] = oldHeap;
-                    logo.errorMsg(
-                        _(
-                            "The block you selected does not contain a valid heap."
-                        )
-                    );
+                    logo.errorMsg(_("The block you selected does not contain a valid heap."));
                 }
             } else {
                 logo.errorMsg(_("The Set heap block needs a heap."));
@@ -255,7 +233,7 @@ function setupProgramBlocks() {
                         if (target !== null) {
                             // Copy any internal entries now.
                             const k = Object.keys(d);
-                            for (let i=0; i < k.length; i++) {
+                            for (let i = 0; i < k.length; i++) {
                                 Turtle.DictActions.setDictValue(target, turtle, k[i], d[k[i]]);
                             }
                         } else if (!(a in logo.turtleDicts[turtle])) {
@@ -263,9 +241,7 @@ function setupProgramBlocks() {
                         }
                     } catch (e) {
                         logo.errorMsg(
-                            _(
-                                "The file you selected does not contain a valid dictionary."
-                            )
+                            _("The file you selected does not contain a valid dictionary.")
                         );
                     }
                 }
@@ -321,18 +297,14 @@ function setupProgramBlocks() {
                     if (target !== null) {
                         // Copy any internal entries now.
                         const k = Object.keys(d);
-                        for (let i=0; i < k.length; i++) {
+                        for (let i = 0; i < k.length; i++) {
                             Turtle.DictActions.setDictValue(target, turtle, k[i], d[k[i]]);
                         }
                     } else if (!(a in logo.turtleDicts[turtle])) {
                         logo.turtleDicts[turtle][a] = foo;
                     }
                 } catch (e) {
-                    logo.errorMsg(
-                        _(
-                            "The block you selected does not contain a valid dictionary."
-                        )
-                    );
+                    logo.errorMsg(_("The block you selected does not contain a valid dictionary."));
                 }
             } else {
                 logo.errorMsg(_("The set dictionary block needs a dictionary."));
@@ -363,8 +335,7 @@ function setupProgramBlocks() {
             if (args[0] !== null && turtle in logo.turtleHeaps) {
                 save.download(
                     "json",
-                    "data:text/json;charset-utf-8," +
-                        JSON.stringify(logo.turtleHeaps[turtle]),
+                    "data:text/json;charset-utf-8," + JSON.stringify(logo.turtleHeaps[turtle]),
                     args[0]
                 );
             }
@@ -411,8 +382,7 @@ function setupProgramBlocks() {
             if (target === null) {
                 save.download(
                     "json",
-                    "data:text/json;charset-utf-8," +
-                        JSON.stringify(logo.turtleDicts[turtle][a]),
+                    "data:text/json;charset-utf-8," + JSON.stringify(logo.turtleDicts[turtle][a]),
                     args[1]
                 );
             } else {
@@ -430,11 +400,7 @@ function setupProgramBlocks() {
         constructor() {
             super("openpalette");
             this.setPalette("program");
-            this.setHelpString([
-                _("The Open palette block opens a palette."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Open palette block opens a palette."), "documentation", ""]);
 
             this.formBlock({
                 name: _("open palette"),
@@ -451,10 +417,7 @@ function setupProgramBlocks() {
             }
 
             for (const p in logo.blocks.palettes.dict) {
-                if (
-                    _(logo.blocks.palettes.dict[p].name) ===
-                    args[0].toLowerCase()
-                ) {
+                if (_(logo.blocks.palettes.dict[p].name) === args[0].toLowerCase()) {
                     logo.blocks.palettes.hide();
                     logo.blocks.palettes.dict[p].show();
                     logo.blocks.palettes.show();
@@ -503,11 +466,7 @@ function setupProgramBlocks() {
             const c = logo.blocks.blockList[args[0]].connections[0];
             logo.blocks.blockList[args[0]].connections[0] = null;
             if (c !== null) {
-                for (
-                    let i = 0;
-                    i < logo.blocks.blockList[c].connections.length;
-                    i++
-                ) {
+                for (let i = 0; i < logo.blocks.blockList[c].connections.length; i++) {
                     if (logo.blocks.blockList[c].connections[i] === args[0]) {
                         logo.blocks.blockList[c].connections[i] = null;
                     }
@@ -526,11 +485,7 @@ function setupProgramBlocks() {
         constructor() {
             super("moveblock");
             this.setPalette("program");
-            this.setHelpString([
-                _("The Move block block moves a block."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Move block block moves a block."), "documentation", ""]);
 
             this.formBlock({
                 //.TRANS: Move the position of a block on the screen.
@@ -588,10 +543,8 @@ function setupProgramBlocks() {
                 // Look for a block with logo name
                 for (let i = 0; i < logo.blocks.blockList.length; i++) {
                     if (
-                        logo.blocks.blockList[i].protoblock.staticLabels
-                            .length > 0 &&
-                        logo.blocks.blockList[i].protoblock.staticLabels[0] ===
-                            args[0]
+                        logo.blocks.blockList[i].protoblock.staticLabels.length > 0 &&
+                        logo.blocks.blockList[i].protoblock.staticLabels[0] === args[0]
                     ) {
                         args[0] = i;
                         return;
@@ -640,11 +593,7 @@ function setupProgramBlocks() {
                 //.TRANS: We can connect a block to another block.
                 name: _("connect blocks"),
                 args: 3,
-                argLabels: [
-                    _("target block"),
-                    _("connection number"),
-                    _("block number")
-                ]
+                argLabels: [_("target block"), _("connection number"), _("block number")]
             });
         }
 
@@ -656,9 +605,7 @@ function setupProgramBlocks() {
             }
 
             if (args[0] < 0 || args[0] > logo.blocks.blockList.length - 1) {
-                console.debug(
-                    args[0] + " > " + logo.blocks.blockList.length - 1
-                );
+                console.debug(args[0] + " > " + logo.blocks.blockList.length - 1);
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
@@ -670,9 +617,7 @@ function setupProgramBlocks() {
             }
 
             if (args[2] < 0 || args[2] > logo.blocks.blockList.length - 1) {
-                console.debug(
-                    args[2] + " > " + logo.blocks.blockList.length - 1
-                );
+                console.debug(args[2] + " > " + logo.blocks.blockList.length - 1);
                 logo.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
@@ -698,14 +643,8 @@ function setupProgramBlocks() {
                     args[1] = 1;
                 } else {
                     // Or disconnection the old connection.
-                    for (
-                        let i = 0;
-                        i < logo.blocks.blockList[c].connections.length;
-                        i++
-                    ) {
-                        if (
-                            logo.blocks.blockList[c].connections[i] === args[0]
-                        ) {
+                    for (let i = 0; i < logo.blocks.blockList[c].connections.length; i++) {
+                        if (logo.blocks.blockList[c].connections[i] === args[0]) {
                             logo.blocks.blockList[c].connections[i] = null;
                             return;
                         }
@@ -749,14 +688,10 @@ function setupProgramBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            logo.blocks.showBlocks();   // Force blocks to be visible.
+            logo.blocks.showBlocks(); // Force blocks to be visible.
             const blockArgs = [null];
             if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
-                for (
-                    let i = 0;
-                    i < logo.blocks.blockList[blk].argClampSlots.length;
-                    i++
-                ) {
+                for (let i = 0; i < logo.blocks.blockList[blk].argClampSlots.length; i++) {
                     const t = logo.parseArg(
                         logo,
                         turtle,
@@ -843,8 +778,7 @@ function setupProgramBlocks() {
                     const newBlock = [[0, protoName, x, y, [null]]];
                     for (
                         let i = 1;
-                        i <
-                        logo.blocks.protoBlockDict[protoblk].dockTypes.length;
+                        i < logo.blocks.protoBlockDict[protoblk].dockTypes.length;
                         i++
                     ) {
                         // FIXME: type check args
@@ -852,43 +786,21 @@ function setupProgramBlocks() {
                             if (typeof blockArgs[i] === "number") {
                                 if (
                                     ["anyin", "numberin"].indexOf(
-                                        logo.blocks.protoBlockDict[protoblk]
-                                            .dockTypes[i]
+                                        logo.blocks.protoBlockDict[protoblk].dockTypes[i]
                                     ) === -1
                                 ) {
-                                    logo.errorMsg(
-                                        _(
-                                            "Warning: block argument type mismatch"
-                                        )
-                                    );
+                                    logo.errorMsg(_("Warning: block argument type mismatch"));
                                 }
-                                newBlock.push([
-                                    i,
-                                    ["number", { value: blockArgs[i] }],
-                                    0,
-                                    0,
-                                    [0]
-                                ]);
+                                newBlock.push([i, ["number", { value: blockArgs[i] }], 0, 0, [0]]);
                             } else if (typeof blockArgs[i] === "string") {
                                 if (
                                     ["anyin", "textin"].indexOf(
-                                        logo.blocks.protoBlockDict[protoblk]
-                                            .dockTypes[i]
+                                        logo.blocks.protoBlockDict[protoblk].dockTypes[i]
                                     ) === -1
                                 ) {
-                                    logo.errorMsg(
-                                        _(
-                                            "Warning: block argument type mismatch"
-                                        )
-                                    );
+                                    logo.errorMsg(_("Warning: block argument type mismatch"));
                                 }
-                                newBlock.push([
-                                    i,
-                                    ["string", { value: blockArgs[i] }],
-                                    0,
-                                    0,
-                                    [0]
-                                ]);
+                                newBlock.push([i, ["string", { value: blockArgs[i] }], 0, 0, [0]]);
                             } else {
                                 newBlock[0][4].push(null);
                             }
@@ -912,9 +824,7 @@ function setupProgramBlocks() {
             super("openProject");
             this.setPalette("program");
             this.setHelpString([
-                _(
-                    "The Open project block is used to open a project from a web page."
-                ),
+                _("The Open project block is used to open a project from a web page."),
                 "documentation",
                 ""
             ]);

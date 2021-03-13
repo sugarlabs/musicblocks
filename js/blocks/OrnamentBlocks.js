@@ -103,9 +103,7 @@ function setupOrnamentBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Neighbor block rapidly switches between neighboring pitches."
-                ),
+                _("The Neighbor block rapidly switches between neighboring pitches."),
                 "documentation",
                 null,
                 "neighbor2help"
@@ -183,7 +181,7 @@ function setupOrnamentBlocks() {
             const listenerName = "_glide_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = event => {
+            const __listener = (event) => {
                 if (tur.singer.justCounting.length === 0) {
                     logo.notation.notationEndSlur(turtle);
                 }
@@ -217,8 +215,7 @@ function setupOrnamentBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined)
-                return;
+            if (args[1] === undefined) return;
 
             let arg = args[0];
             if (arg === null || typeof arg !== "number") {
@@ -251,8 +248,7 @@ function setupOrnamentBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined)
-                return;
+            if (args[1] === undefined) return;
 
             let arg = args[0];
             if (arg === null || typeof arg !== "number") {

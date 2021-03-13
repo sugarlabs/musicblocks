@@ -7,9 +7,7 @@ function setupMediaBlocks() {
             this.beginnerBlock(true);
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Right block returns the position of the right of the canvas."
-                ) +
+                _("The Right block returns the position of the right of the canvas.") +
                     " " +
                     _(
                         "In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
@@ -21,9 +19,7 @@ function setupMediaBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(
-                logo.turtles._canvas.width / (2.0 * logo.turtles.scale)
-            );
+            return toFixed2(logo.turtles._canvas.width / (2.0 * logo.turtles.scale));
         }
 
         arg(logo) {
@@ -39,9 +35,7 @@ function setupMediaBlocks() {
             this.beginnerBlock(true);
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Left block returns the position of the left of the canvas."
-                ) +
+                _("The Left block returns the position of the left of the canvas.") +
                     " " +
                     _(
                         "In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
@@ -53,15 +47,11 @@ function setupMediaBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(
-                -1 * (logo.turtles._canvas.width / (2.0 * logo.turtles.scale))
-            );
+            return toFixed2(-1 * (logo.turtles._canvas.width / (2.0 * logo.turtles.scale)));
         }
 
         arg(logo) {
-            return (
-                -1 * (logo.turtles._canvas.width / (2.0 * logo.turtles.scale))
-            );
+            return -1 * (logo.turtles._canvas.width / (2.0 * logo.turtles.scale));
         }
     }
 
@@ -72,9 +62,7 @@ function setupMediaBlocks() {
             this.beginnerBlock(true);
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Top block returns the position of the top of the canvas."
-                ) +
+                _("The Top block returns the position of the top of the canvas.") +
                     " " +
                     _(
                         "In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
@@ -86,9 +74,7 @@ function setupMediaBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(
-                logo.turtles._canvas.height / (2.0 * logo.turtles.scale)
-            );
+            return toFixed2(logo.turtles._canvas.height / (2.0 * logo.turtles.scale));
         }
 
         arg(logo) {
@@ -103,9 +89,7 @@ function setupMediaBlocks() {
             this.beginnerBlock(true);
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Bottom block returns the position of the bottom of the canvas."
-                ) +
+                _("The Bottom block returns the position of the bottom of the canvas.") +
                     " " +
                     _(
                         "In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
@@ -117,15 +101,11 @@ function setupMediaBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(
-                -1 * (logo.turtles._canvas.height / (2.0 * logo.turtles.scale))
-            );
+            return toFixed2(-1 * (logo.turtles._canvas.height / (2.0 * logo.turtles.scale)));
         }
 
         arg(logo) {
-            return (
-                -1 * (logo.turtles._canvas.height / (2.0 * logo.turtles.scale))
-            );
+            return -1 * (logo.turtles._canvas.height / (2.0 * logo.turtles.scale));
         }
     }
 
@@ -312,9 +292,7 @@ function setupMediaBlocks() {
             super("loadFile", "");
             this.setPalette("media");
             this.setHelpString([
-                _(
-                    "The Open file block opens a file for use with the Show block."
-                ),
+                _("The Open file block opens a file for use with the Show block."),
                 "documentation",
                 ""
             ]);
@@ -351,8 +329,23 @@ function setupMediaBlocks() {
         constructor() {
             super("tone", _("hertz"));
             this.setPalette("media");
-            this.piemenuValuesC1 = [220, 247, 262, 294, 330, 349, 392, 440, 494, 523,
-                587, 659, 698, 784, 880];
+            this.piemenuValuesC1 = [
+                220,
+                247,
+                262,
+                294,
+                330,
+                349,
+                392,
+                440,
+                494,
+                523,
+                587,
+                659,
+                698,
+                784,
+                880
+            ];
             this.setHelpString();
             this.formBlock({
                 args: 2,
@@ -383,9 +376,7 @@ function setupMediaBlocks() {
             this.setPalette("media");
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The To frequency block converts a pitch name and octave to Hertz."
-                ),
+                _("The To frequency block converts a pitch name and octave to Hertz."),
                 "documentation",
                 ""
             ]);
@@ -394,10 +385,7 @@ function setupMediaBlocks() {
                 args: 2,
                 defaults: ["G", 4],
                 argTypes: ["notein", "anyin"],
-                argLabels: [
-                    this.lang === "ja" ? _("name2") : _("name"),
-                    _("octave")
-                ]
+                argLabels: [this.lang === "ja" ? _("name2") : _("name"), _("octave")]
             });
         }
 
@@ -427,20 +415,7 @@ function setupMediaBlocks() {
                 );
                 return Math.round(pitchToFrequency(note, octave, 0, tur.singer.keySignature));
             } else {
-                const NOTENAMES = [
-                    "A",
-                    "B♭",
-                    "B",
-                    "C",
-                    "D♭",
-                    "D",
-                    "E♭",
-                    "E",
-                    "F",
-                    "G♭",
-                    "G",
-                    "A♭"
-                ];
+                const NOTENAMES = ["A", "B♭", "B", "C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭"];
                 const NOTECONVERSION = {
                     "A♯": "B♭",
                     "C♯": "D♭",
@@ -455,17 +430,10 @@ function setupMediaBlocks() {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     noteName = "G";
                 } else {
-                    noteName = logo.parseArg(
-                        logo,
-                        turtle,
-                        cblk,
-                        blk,
-                        receivedArg
-                    );
+                    noteName = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 }
 
-                if (typeof noteName !== "string")
-                    return 440 * Math.pow(2, (noteName - 69) / 12);
+                if (typeof noteName !== "string") return 440 * Math.pow(2, (noteName - 69) / 12);
 
                 noteName = noteName.replace("b", "♭");
                 noteName = noteName.replace("#", "♯");
@@ -488,9 +456,7 @@ function setupMediaBlocks() {
                     logo.errorMsg(NOINPUTERRORMSG, blk);
                     octave = 4;
                 } else {
-                    octave = Math.floor(
-                        logo.parseArg(logo, turtle, cblk, blk, receivedArg)
-                    );
+                    octave = Math.floor(logo.parseArg(logo, turtle, cblk, blk, receivedArg));
                 }
 
                 if (octave < 1) {
@@ -515,9 +481,7 @@ function setupMediaBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Shell block is used to change the appearance of the mouse."
-                ),
+                _("The Shell block is used to change the appearance of the mouse."),
                 "documentation",
                 null,
                 "turtleshell"
@@ -542,10 +506,7 @@ function setupMediaBlocks() {
                 if (typeof args[0] === "string") {
                     logo.errorMsg(NANERRORMSG, blk);
                 } else {
-                    logo.turtles.turtleList[turtle].doTurtleShell(
-                        args[0],
-                        args[1]
-                    );
+                    logo.turtles.turtleList[turtle].doTurtleShell(args[0], args[1]);
                 }
             }
         }
@@ -558,9 +519,7 @@ function setupMediaBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Show block is used to display text or images on the canvas."
-                ),
+                _("The Show block is used to display text or images on the canvas."),
                 "documentation",
                 ""
             ]);
@@ -628,11 +587,7 @@ function setupMediaBlocks() {
             this.setPalette("media");
             this.beginnerBlock(true);
 
-            this.setHelpString([
-                _("The Text block holds a text string."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Text block holds a text string."), "documentation", ""]);
 
             this.formBlock({
                 outType: "textout"

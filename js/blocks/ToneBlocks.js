@@ -36,9 +36,7 @@ function setupToneBlocks() {
 
             if (logo.inTimbre) {
                 if (logo.timbre.osc.length != 0) {
-                    logo.errorMsg(
-                        _("You are adding multiple oscillator blocks.")
-                    );
+                    logo.errorMsg(_("You are adding multiple oscillator blocks."));
                 } else {
                     logo.timbre.oscParams = [];
                     logo.synth.createSynth(
@@ -84,9 +82,7 @@ function setupToneBlocks() {
             this.piemenuValuesC1 = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             this.piemenuValuesC2 = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             this.setHelpString([
-                _(
-                    "The Duo synth block is a duo-frequency modulator used to define a timbre."
-                ),
+                _("The Duo synth block is a duo-frequency modulator used to define a timbre."),
                 "documentation",
                 null,
                 "duosynthhelp"
@@ -110,9 +106,7 @@ function setupToneBlocks() {
             this.setPalette("tone");
             this.piemenuValuesC1 = [1, 2];
             this.setHelpString([
-                _(
-                    "The AM synth block is an amplitude modulator used to define a timbre."
-                ),
+                _("The AM synth block is an amplitude modulator used to define a timbre."),
                 "documentation",
                 null,
                 "amsynthhelp"
@@ -135,9 +129,7 @@ function setupToneBlocks() {
             this.setPalette("tone");
             this.piemenuValuesC1 = [1, 5, 10, 15, 20, 25];
             this.setHelpString([
-                _(
-                    "The FM synth block is a frequency modulator used to define a timbre."
-                ),
+                _("The FM synth block is a frequency modulator used to define a timbre."),
                 "documentation",
                 null,
                 "fmsynthhelp"
@@ -186,9 +178,7 @@ function setupToneBlocks() {
             } else {
                 //.TRANS: partials are weighted components in a harmonic series
                 logo.errorMsg(
-                    _(
-                        "Partial block should be used inside of a Weighted-partials block."
-                    )
+                    _("Partial block should be used inside of a Weighted-partials block.")
                 );
             }
         }
@@ -230,7 +220,7 @@ function setupToneBlocks() {
             const listenerName = "_harmonic_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = event => {
+            const __listener = (event) => {
                 tur.singer.inHarmonic.pop();
                 tur.singer.partials.pop();
             };
@@ -247,9 +237,7 @@ function setupToneBlocks() {
             this.piemenuValuesC1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
             this.setPalette("tone");
             this.setHelpString([
-                _(
-                    "The Harmonic block will add harmonics to the contained notes."
-                ),
+                _("The Harmonic block will add harmonics to the contained notes."),
                 "documentation",
                 null,
                 "harmonichelp"
@@ -300,8 +288,9 @@ function setupToneBlocks() {
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["distortionActive"] = true;
                 logo.timbre.distortionEffect.push(blk);
                 logo.timbre.distortionParams.push(last(tur.singer.distortionAmount) * 100);
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["distortionAmount"] =
-                    distortion;
+                instrumentsEffects[turtle][logo.timbre.instrumentName][
+                    "distortionAmount"
+                ] = distortion;
             }
 
             return [args[1], 1];
@@ -350,8 +339,9 @@ function setupToneBlocks() {
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["tremoloActive"] = true;
                 logo.timbre.tremoloEffect.push(blk);
                 logo.timbre.tremoloParams.push(last(tur.singer.tremoloFrequency));
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["tremoloFrequency"] =
-                    frequency;
+                instrumentsEffects[turtle][logo.timbre.instrumentName][
+                    "tremoloFrequency"
+                ] = frequency;
                 logo.timbre.tremoloParams.push(last(tur.singer.tremoloDepth) * 100);
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["tremoloDepth"] = depth;
             }
@@ -364,11 +354,25 @@ function setupToneBlocks() {
         constructor() {
             super("phaser");
             this.setPalette("tone");
-            this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5,
-                10, 20];
+            this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 20];
             this.piemenuValuesC2 = [1, 2, 3];
-            this.piemenuValuesC3 = [220, 247, 262, 294, 330, 349, 392, 440,
-                494, 523, 587, 659, 698, 783, 880];
+            this.piemenuValuesC3 = [
+                220,
+                247,
+                262,
+                294,
+                330,
+                349,
+                392,
+                440,
+                494,
+                523,
+                587,
+                659,
+                698,
+                783,
+                880
+            ];
             this.setHelpString([
                 _("The Phaser block adds a sweeping sound."),
                 "documentation",
@@ -395,8 +399,9 @@ function setupToneBlocks() {
                 logo.timbre.phaserParams.push(last(tur.singer.octaves));
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["octaves"] = octaves;
                 logo.timbre.phaserParams.push(last(tur.signer.baseFrequency));
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["baseFrequency"] =
-                    baseFrequency;
+                instrumentsEffects[turtle][logo.timbre.instrumentName][
+                    "baseFrequency"
+                ] = baseFrequency;
             }
 
             return [args[3], 1];
@@ -535,7 +540,7 @@ function setupToneBlocks() {
                 const listenerName = "_setvoice_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
-                const __listener = event => tur.singer.voices.pop();
+                const __listener = (event) => tur.singer.voices.pop();
 
                 logo.setTurtleListener(turtle, listenerName, __listener);
             }
@@ -570,9 +575,7 @@ function setupToneBlocks() {
             super("voicename");
             this.setPalette("tone");
             this.setHelpString([
-                _(
-                    "The Set instrument block selects a voice for the synthesizer,"
-                ) +
+                _("The Set instrument block selects a voice for the synthesizer,") +
                     " " +
                     _("eg guitar piano violin or cello."),
                 "documentation",
@@ -591,17 +594,13 @@ function setupToneBlocks() {
 
             if (beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    _(
-                        "The Set instrument block selects a voice for the synthesizer,"
-                    ),
+                    _("The Set instrument block selects a voice for the synthesizer,"),
                     "documentation",
                     ""
                 ]);
             } else {
                 this.setHelpString([
-                    _(
-                        "The Set instrument block selects a voice for the synthesizer,"
-                    ) +
+                    _("The Set instrument block selects a voice for the synthesizer,") +
                         " " +
                         _("eg guitar piano violin or cello."),
                     "documentation",
@@ -669,10 +668,10 @@ function setupToneBlocks() {
             this.parameter = true;
 
             this.makeMacro((x, y) => [
-                [0, ["customsample", {value: ["", "", "do", 4]}], x, y, [null, 1, 2, 3]],
-                [1, ["audiofile", {value: null}], 0 ,0, [0]],
-                [2, ["solfege", {value: "do"}], 0, 0, [0]],
-                [3, ["number", {value: 4}], 0, 0, [0]],
+                [0, ["customsample", { value: ["", "", "do", 4] }], x, y, [null, 1, 2, 3]],
+                [1, ["audiofile", { value: null }], 0, 0, [0]],
+                [2, ["solfege", { value: "do" }], 0, 0, [0]],
+                [3, ["number", { value: 4 }], 0, 0, [0]]
             ]);
         }
 
@@ -718,7 +717,7 @@ function setupToneBlocks() {
         constructor() {
             super("audiofile");
             this.parameter = true;
-	    this.extraWidth = 20;
+            this.extraWidth = 20;
             this.setPalette("tone");
             this.beginnerBlock(false);
 

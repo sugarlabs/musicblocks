@@ -1,18 +1,11 @@
 function setupHeapBlocks() {
-
     class HeapBlock extends ValueBlock {
         constructor() {
             super("heap");
             this.setPalette("heap");
             this.beginnerBlock(true);
 
-            this.setHelpString([
-                _(
-                    "The Heap block returns the heap."
-                ),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Heap block returns the heap."), "documentation", ""]);
 
             this.formBlock({
                 name: _("heap"),
@@ -115,8 +108,7 @@ function setupHeapBlocks() {
         }
 
         arg(logo, turtle) {
-            if (turtle in logo.turtleHeaps)
-                return logo.turtleHeaps[turtle].length === 0;
+            if (turtle in logo.turtleHeaps) return logo.turtleHeaps[turtle].length === 0;
             return true;
         }
     }
@@ -127,11 +119,7 @@ function setupHeapBlocks() {
             this.setPalette("heap");
             this.beginnerBlock(true);
 
-            this.setHelpString([
-                _("The Empty-heap block empties the heap."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Empty-heap block empties the heap."), "documentation", ""]);
 
             this.formBlock({
                 //.TRANS: empty the heap
@@ -174,9 +162,7 @@ function setupHeapBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Index-heap block returns a value in the heap at a specified location."
-                ),
+                _("The Index-heap block returns a value in the heap at a specified location."),
                 "documentation",
                 ""
             ]);
@@ -233,9 +219,7 @@ function setupHeapBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Set-heap entry block sets a value in he heap at the specified location."
-                ),
+                _("The Set-heap entry block sets a value in he heap at the specified location."),
                 "documentation",
                 ""
             ]);
@@ -246,10 +230,7 @@ function setupHeapBlocks() {
                 argTypes: ["numberin", "anyin"],
                 defaults: [1, 100],
                 //.TRANS: value1 is a numeric value (JAPANESE ONLY)
-                argLabels: [
-                    _("index"),
-                    this.lang === "ja" ? _("value1") : _("value")
-                ]
+                argLabels: [_("index"), this.lang === "ja" ? _("value1") : _("value")]
             });
         }
 
@@ -307,10 +288,7 @@ function setupHeapBlocks() {
         }
 
         arg(logo, turtle) {
-            if (
-                turtle in logo.turtleHeaps &&
-                logo.turtleHeaps[turtle].length > 0
-            ) {
+            if (turtle in logo.turtleHeaps && logo.turtleHeaps[turtle].length > 0) {
                 return logo.turtleHeaps[turtle].pop();
             }
             logo.errorMsg(_("empty heap"));

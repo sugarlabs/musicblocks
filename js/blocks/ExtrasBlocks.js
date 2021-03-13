@@ -128,9 +128,7 @@ function setupExtrasBlocks() {
             super("nobackground", _("no background"));
             this.setPalette("extras");
             this.setHelpString([
-                _(
-                    "The No background block eliminates the background from the saved SVG output."
-                ),
+                _("The No background block eliminates the background from the saved SVG output."),
                 "documentation",
                 "",
                 "makehelp"
@@ -146,11 +144,7 @@ function setupExtrasBlocks() {
         constructor() {
             super("showblocks", _("show blocks"));
             this.setPalette("extras");
-            this.setHelpString([
-                _("The Show blocks block shows the blocks."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Show blocks block shows the blocks."), "documentation", ""]);
         }
 
         flow(args, logo) {
@@ -163,11 +157,7 @@ function setupExtrasBlocks() {
         constructor() {
             super("hideblocks", _("hide blocks"));
             this.setPalette("extras");
-            this.setHelpString([
-                _("The Hide blocks block hides the blocks."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Hide blocks block hides the blocks."), "documentation", ""]);
         }
 
         flow(args, logo) {
@@ -224,9 +214,7 @@ function setupExtrasBlocks() {
             super("wait", _("wait"));
             this.setPalette("extras");
             this.setHelpString([
-                _(
-                    "The Wait block pauses the program for a specified number of seconds."
-                ),
+                _("The Wait block pauses the program for a specified number of seconds."),
                 "documentation",
                 ""
             ]);
@@ -314,16 +302,20 @@ function setupExtrasBlocks() {
                         if (turtleName === name) turtle = i;
                     }
                 }
-                if (turtle > -1 && logo.oscilloscopeTurtles.indexOf(logo.turtles.turtleList[turtle]) < 0) logo.oscilloscopeTurtles.push(logo.turtles.turtleList[turtle]);
+                if (
+                    turtle > -1 &&
+                    logo.oscilloscopeTurtles.indexOf(logo.turtles.turtleList[turtle]) < 0
+                )
+                    logo.oscilloscopeTurtles.push(logo.turtles.turtleList[turtle]);
             } else if (!logo.inStatusMatrix) {
                 if (args.length === 1) {
                     if (args[0] !== null) {
                         const tur = logo.turtles.ithTurtle(turtle);
 
                         if (!tur.singer.suppressOutput) {
-                            if (logo.blocks.blockList[cblk].name === "grid"){
+                            if (logo.blocks.blockList[cblk].name === "grid") {
                                 const temp = new DisplayGridBlock();
-                                temp.flow(args,logo,turtle,blk);
+                                temp.flow(args, logo, turtle, blk);
                             } else if (args[0] === undefined) {
                                 logo.textMsg("undefined");
                             } else if (args[0] === null) {
@@ -373,51 +365,51 @@ function setupExtrasBlocks() {
             this.formBlock({
                 args: 1,
                 defaults: ["Cartesian"],
-                argTypes: ["gridin"],
+                argTypes: ["gridin"]
             });
             this.makeMacro((x, y) => [
                 [0, "displaygrid", x, y, [null, 1, null]],
-                [1, ["grid", { value: "Cartesian" }], 0, 0, [0]],
+                [1, ["grid", { value: "Cartesian" }], 0, 0, [0]]
             ]);
             this.hidden = this.deprecated = true;
         }
 
         flow(args, logo, turtle, blk) {
-            if (!args || !args[0]){
+            if (!args || !args[0]) {
                 args = ["Cartesian"];
             }
-            const act = logo.blocks.activity ;
-            logo.turtles.hideGrids() ;
-            switch (args[0]){
-                case (_("Cartesian")) :
+            const act = logo.blocks.activity;
+            logo.turtles.hideGrids();
+            switch (args[0]) {
+                case _("Cartesian"):
                     act._showCartesian();
                     break;
-                case (_("polar")) :
+                case _("polar"):
                     act._showPolar();
                     break;
-                case (_("Cartesian+polar")) :
+                case _("Cartesian+polar"):
                     act._showPolar();
                     act._showCartesian();
                     break;
-                case (_("treble")) :
+                case _("treble"):
                     act._showTreble();
                     break;
-                case (_("grand staff")) :
+                case _("grand staff"):
                     act._showGrand();
                     break;
-                case (_("mezzo-soprano")):
+                case _("mezzo-soprano"):
                     act._showSoprano();
                     break;
-                case (_("alto")) :
+                case _("alto"):
                     act._showAlto();
                     break;
-                case (_("tenor")) :
+                case _("tenor"):
                     act._showTenor();
                     break;
-                case (_("bass")) :
+                case _("bass"):
                     act._showBass();
                     break;
-                case (_("none")) :
+                case _("none"):
                     break;
             }
         }

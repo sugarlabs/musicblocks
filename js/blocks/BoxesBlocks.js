@@ -7,21 +7,15 @@ function setupBoxesBlocks() {
 
             if (beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    _(
-                        "The Add-to block is used to add to the value stored in a box."
-                    ),
+                    _("The Add-to block is used to add to the value stored in a box."),
                     "documentation",
                     ""
                 ]);
             } else {
                 this.setHelpString([
-                    _(
-                        "The Add-to block is used to add to the value stored in a box."
-                    ) +
+                    _("The Add-to block is used to add to the value stored in a box.") +
                         " " +
-                        _(
-                            "It can also be used with other blocks such as Color and Pen size."
-                        ),
+                        _("It can also be used with other blocks such as Color and Pen size."),
                     "documentation",
                     ""
                 ]);
@@ -30,10 +24,7 @@ function setupBoxesBlocks() {
             this.formBlock({
                 name: _("add"),
                 args: 2,
-                argLabels: [
-                    _("to"),
-                    this.lang === "ja" ? _("value1") : _("value")
-                ],
+                argLabels: [_("to"), this.lang === "ja" ? _("value1") : _("value")],
                 argTypes: ["anyin", "anyin"]
             });
         }
@@ -229,8 +220,7 @@ function setupBoxesBlocks() {
             const name = logo.blocks.blockList[blk].privateData;
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, logo.blocks.blockList[blk].name]);
             } else if (!logo.updatingStatusMatrix) {
@@ -288,10 +278,7 @@ function setupBoxesBlocks() {
                 argTypes: ["anyin", "anyin"],
                 defaults: [_("box"), 4],
                 //.TRANS: name1 is name as in name of box, value1 is value as in the numeric value stored in a box (JAPANESE ONLY)
-                argLabels:
-                    this.lang === "ja"
-                        ? [_("name1"), _("value1")]
-                        : [_("name"), _("value")]
+                argLabels: this.lang === "ja" ? [_("name1"), _("value1")] : [_("name"), _("value")]
             });
         }
 
@@ -315,9 +302,7 @@ function setupBoxesBlocks() {
             ]);
 
             this.formBlock({ name: _("box2") });
-            this.makeMacro((x, y) => [
-                [0, ["namedbox", { value: "box2" }], x, y, [null]]
-            ]);
+            this.makeMacro((x, y) => [[0, ["namedbox", { value: "box2" }], x, y, [null]]]);
         }
     }
 
@@ -328,9 +313,7 @@ function setupBoxesBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Store in Box2 block is used to store a value in Box2."
-                ),
+                _("The Store in Box2 block is used to store a value in Box2."),
                 "documentation",
                 null,
                 "box2help"
@@ -362,9 +345,7 @@ function setupBoxesBlocks() {
             ]);
 
             this.formBlock({ name: _("box1") });
-            this.makeMacro((x, y) => [
-                [0, ["namedbox", { value: "box1" }], x, y, [null]]
-            ]);
+            this.makeMacro((x, y) => [[0, ["namedbox", { value: "box1" }], x, y, [null]]]);
         }
     }
 
@@ -375,9 +356,7 @@ function setupBoxesBlocks() {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Store in Box1 block is used to store a value in Box1."
-                ),
+                _("The Store in Box1 block is used to store a value in Box1."),
                 "documentation",
                 null,
                 "box1help"
