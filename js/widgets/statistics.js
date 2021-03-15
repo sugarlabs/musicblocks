@@ -12,42 +12,43 @@
 /*
   global logo, blocks, docById, _showHideAuxMenu, analyzeProject, runAnalytics, scoreToChartData,
   getChartOptions, loading:writable, Chart
- */
-
-/* exported StatsWindow, loading */
+*/
+/*
+Globals location
+- js/activity.js
+    logo, blocks, _showHideAuxMenu
+- js/utils/utils.js
+    docById
+- js/rubrics.js
+    analyzeProject, runAnalytics, scoreToChartData, getChartOptions
+/* exported StatsWindow */
 
 /** This widget displays the status of selected parameters and notes as they are being played. */
 class StatsWindow {
-
     /**
      * @constructor
      */
     constructor() {
-        this.isOpen = true;
-
         this.widgetWindow = window.widgetWindows.windowFor(this, "stats", "stats");
         this.widgetWindow.clear();
         this.widgetWindow.show();
         this.widgetWindow.onclose = () => {
-            this.isOpen = false;
             blocks.showBlocks();
             this.widgetWindow.destroy();
+            logo.statsWindow = undefined;
         };
         this.doAnalytics();
-
-        this.widgetWindow.sendToCenter();
     }
 
     /**
      * Renders and carries out analysis of the MB project.
-     * @public 
+     * @public
      * @returns {void}
      */
     doAnalytics() {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
         blocks.activeBlock = null;
         const myChart = docById("myChart");
-
         const ctx = myChart.getContext("2d");
         loading = true;
         document.body.style.cursor = "wait";
@@ -62,7 +63,6 @@ class StatsWindow {
             img.src = imageData;
             img.width = 200;
             this.widgetWindow.getWidgetBody().appendChild(img);
-            blocks.hideBlocks();
             logo.showBlocksAfterRun = false;
             document.body.style.cursor = "default";
         };
@@ -71,12 +71,13 @@ class StatsWindow {
 
         this.jsonObject = document.createElement("ul");
         this.jsonObject.style.float = "left";
+        this.jsonObject.style.listStyleType = "none";
         this.widgetWindow.getWidgetBody().appendChild(this.jsonObject);
     }
 
     /**
      * @public
-     * @param {Array} stats 
+     * @param {Array} stats
      * @returns {void}
      */
     displayInfo(stats) {
