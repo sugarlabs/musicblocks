@@ -32,6 +32,7 @@ class StatsWindow {
             this.isOpen = false;
             blocks.showBlocks();
             this.widgetWindow.destroy();
+            logo.statsWindow = null;
         };
         this.doAnalytics();
 
