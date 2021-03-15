@@ -108,8 +108,8 @@ class StatsWindow {
             "<li>quintuplets: " +
             stats["quintuplets"] +
             "</li>" +
-            "<li>pitch names: " +
-            Array.from(stats["pitchNames"]) +
+            "<li style=\"white-space: pre-wrap; width: 150px\">pitch names: " +
+            Array.from(stats["pitchNames"]).join(", ") +
             "</li>" +
             "<li>number of notes: " +
             stats["numberOfNotes"] +

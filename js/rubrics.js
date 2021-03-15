@@ -745,14 +745,19 @@ const getStatsFromNotation = (logo) => {
             const item = notation.notationStaging[tur][it];
 
             if (typeof item == "object" && item[0].length){
-                for (const note of item[0]) {
-                    projectStats["pitchNames"].add(note[0]);
+                for (let note of item[0]) {
                     let freq;
                     if (isCustom(logo.synth.inTemperament)) {
                         freq = logo.synth.getCustomFrequency(note, logo.synth.inTemperament);
+                        const test = TEMPERAMENT[logo.synth.inTemperament]
+                            .filter(ele => ele[3] === note.slice(0, note.length - 1));
+                        if (test.length > 0) {
+                            note = test[0][1] + note[note.length - 1];
+                        }
                     } else {
                         freq = logo.synth._getFrequency(note);
                     }
+                    projectStats["pitchNames"].add(note.slice(0, note.length-1));
                     projectStats["pitches"].push(freq);
                     if (projectStats["lowestNote"] == undefined ||
                         freq < projectStats["lowestNote"][2]) {
