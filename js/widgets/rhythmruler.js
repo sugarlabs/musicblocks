@@ -18,8 +18,23 @@
    global TONEBPM, Singer, logo, _, delayExecution, docById, calcNoteValueToDisplay, platformColor,
    beginnerMode, last, EIGHTHNOTEWIDTH, nearestBeat, rationalToFraction, DRUMNAMES, VOICENAMES,
    EFFECTSNAMES
- */
-
+*/
+/*
+    Globals location
+    - js/logo.js
+        TONEBPM
+    - js/turtle-singer.js
+        Singer
+    - js/utils/utils.js
+        _,docById,delayExecution,last,nearestBeat,rationalToFraction
+    - js/utils/musicutils.js
+        calcNoteValueToDisplay,EIGHTHNOTEWIDTH
+    - js/utils/platformstyle.js
+        platformColor
+    - js/activity.js
+        beginnerMode
+    - js/utils/synthutils.js
+        DRUMNAMES,VOICENAMES,EFFECTSNAMES
 /* exported RhythmRuler */
 
 /**
