@@ -80,6 +80,7 @@ class RhythmRuler {
         this._dissectNumber = null;
         this._progressBar = null;
         this._rulers = [];
+        this._fullscreenScaleFactor = 3;
     }
 
     /**
@@ -162,6 +163,8 @@ class RhythmRuler {
 
             this.widgetWindow.destroy();
         };
+
+        this.widgetWindow.onmaximize = this._scale.bind(this);
 
         this._playAllCell = widgetWindow.addButton("play-button.svg", iconSize, _("Play all"));
         this._playAllCell.onclick = () => {
@@ -464,7 +467,36 @@ class RhythmRuler {
      * @returns {void}
      */
     _noteWidth(noteValue) {
-        return Math.floor(EIGHTHNOTEWIDTH * (8 / Math.abs(noteValue)) * 4);
+        const ans = Math.floor(EIGHTHNOTEWIDTH
+            * (8 / Math.abs(noteValue))
+            * (this.widgetWindow.isMaximized()? this._fullscreenScaleFactor: 3));
+        return ans;
+    }
+
+    _scale() {
+        if (this.widgetWindow.isMaximized()) {
+            const width = this.widgetWindow.getWidgetBody().getBoundingClientRect().width;
+            this._fullscreenScaleFactor =
+                Math.floor(width / (EIGHTHNOTEWIDTH * 8));
+        }
+        this._rulers.forEach((ruler) => {
+            if (this.widgetWindow.isMaximized()) {
+                Array.prototype.forEach.call(ruler.children, (child) => {
+                    child.style.width =
+                        Number(
+                            child.style.width.slice(0, child.style.width.indexOf("px")))
+                            * (this._fullscreenScaleFactor / 3) + "px";
+                    child.style.minWidth = child.style.width;
+                });
+            } else {
+                Array.prototype.forEach.call(ruler.children, (child) => {
+                    child.style.width =
+                        Math.floor(Number(child.style.width.slice(0, child.style.width.indexOf("px")))
+                        / Math.floor(this._fullscreenScaleFactor / 3)) + "px";
+                    child.style.minWidth = child.style.width;
+                });
+            }
+        });
     }
 
     /**
@@ -842,7 +874,7 @@ class RhythmRuler {
         };
 
         let obj;
-        if (cellWidth > 12 && noteValue > 0) {
+        if (cellWidth >= 18 && noteValue > 0) {
             obj = rationalToFraction(Math.abs(1 / noteValue));
             cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
         } else {
