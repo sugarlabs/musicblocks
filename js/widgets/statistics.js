@@ -35,6 +35,17 @@ class StatsWindow {
         };
         this.doAnalytics();
 
+        this.widgetWindow.onmaximize = () => {
+            this.widgetWindow.getWidgetBody().innerHTML = "";
+            if (this.widgetWindow.isMaximized()) {
+                this.widgetWindow.getWidgetBody().style.display = "flex";
+                this.widgetWindow.getWidgetBody().style.justifyContent = "space-between";
+                this.widgetWindow.getWidgetBody().style.padding = "0 2vw";
+            } else {
+                this.widgetWindow.getWidgetBody().style.padding = "0 0";
+            }
+            this.doAnalytics();
+        };
         this.widgetWindow.sendToCenter();
     }
 
@@ -60,7 +71,11 @@ class StatsWindow {
             const imageData = myRadarChart.toBase64Image();
             const img = new Image();
             img.src = imageData;
-            img.width = 200;
+            if (this.widgetWindow.isMaximized()) {
+                img.width = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 80;
+            } else {
+                img.width = 200;
+            }
             this.widgetWindow.getWidgetBody().appendChild(img);
             blocks.hideBlocks();
             logo.showBlocksAfterRun = false;
