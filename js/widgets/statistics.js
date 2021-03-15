@@ -114,12 +114,12 @@ class StatsWindow {
             "<li>number of notes: " +
             stats["numberOfNotes"] +
             "</li>" +
-            "<li>lowest note: " +
+            "<li style=\"white-space: pre-wrap; width: 150px\">lowest note: " +
             stats["lowestNote"][0] +
             " , " +
             lowHertz.toFixed(0) +
             "Hz</li>" +
-            "<li>highest note: " +
+            "<li style=\"white-space: pre-wrap; width: 150px\">highest note: " +
             stats["highestNote"][0] +
             " , " +
             highHertz.toFixed(0) +

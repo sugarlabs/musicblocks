@@ -747,7 +747,12 @@ const getStatsFromNotation = (logo) => {
             if (typeof item == "object" && item[0].length){
                 for (const note of item[0]) {
                     projectStats["pitchNames"].add(note[0]);
-                    const freq = logo.synth._getFrequency(note);
+                    let freq;
+                    if (isCustom(logo.synth.inTemperament)) {
+                        freq = logo.synth.getCustomFrequency(note, logo.synth.inTemperament);
+                    } else {
+                        freq = logo.synth._getFrequency(note);
+                    }
                     projectStats["pitches"].push(freq);
                     if (projectStats["lowestNote"] == undefined ||
                         freq < projectStats["lowestNote"][2]) {
