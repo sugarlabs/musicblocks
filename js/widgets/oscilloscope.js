@@ -14,7 +14,7 @@
  * MA 02110-1335 USA.
  */
 
-/* global _, SMALLERBUTTON, BIGGERBUTTON, Tone, instruments */
+/* global _, logo, SMALLERBUTTON, BIGGERBUTTON, Tone, instruments */
 /* 
     Globals location
      - js/artwork.js
@@ -40,8 +40,7 @@ class Oscilloscope {
      * @constructor
      * @param {Object} logo - object of Logo
      */
-    constructor(logo) {
-        this._logo = logo;
+    constructor() {
         this.pitchAnalysers = {};
         this.playingNow = false;
         if (this.drawVisualIDs) {
@@ -65,6 +64,8 @@ class Oscilloscope {
             this.pitchAnalysers = {};
             widgetWindow.destroy();
         };
+        widgetWindow.onmaximize = this._scale.bind(this);
+
         document.getElementsByClassName("wfbToolbar")[0].style.backgroundColor = "#e8e8e8";
         document.getElementsByClassName("wfbWidget")[0].style.backgroundColor = "#FFFFFF";
         const step = 1.333;
@@ -100,11 +101,7 @@ class Oscilloscope {
             if (turtle && !turtle.inTrash) this.divisions.push(turtle);
         }
 
-        for (const turtle of this.divisions) {
-            const turtleIdx = logo.turtles.turtleList.indexOf(turtle);
-            this.reconnectSynthsToAnalyser(turtleIdx);
-            this.makeCanvas(700, 400 / this.divisions.length, turtle, turtleIdx);
-        }
+        this._scale();
         if (!this.playingNow) {
             // console.debug("oscilloscope running");
         }
@@ -135,41 +132,66 @@ class Oscilloscope {
      * @param turtleIdx
      * @returns {void}
      */
-    makeCanvas = (width, height, turtle, turtleIdx) => {
+    makeCanvas = (width, height, turtle, turtleIdx, resized) => {
         const canvas = document.createElement("canvas");
         canvas.height = height;
         canvas.width = width;
+        canvas.className = "oscilloscopeCanvas";
         this.widgetWindow.getWidgetBody().appendChild(canvas);
         const canvasCtx = canvas.getContext("2d");
         canvasCtx.clearRect(0, 0, width, height);
 
         const draw = () => {
             this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
-            if (!turtle.running) return;
+            if (this.pitchAnalysers[turtleIdx] && (turtle.running || resized)) {
+                canvasCtx.fillStyle = "#FFFFFF";
+                const dataArray = this.pitchAnalysers[turtleIdx].getValue();
+                const bufferLength = dataArray.length;
+                canvasCtx.fillRect(0, 0, width, height);
+                canvasCtx.lineWidth = 2;
+                const rbga = turtle.painter._canvasColor;
+                canvasCtx.strokeStyle = rbga;
+                canvasCtx.beginPath();
+                const sliceWidth = (width * this.zoomFactor) / bufferLength;
+                let x = 0;
 
-            canvasCtx.fillStyle = "#FFFFFF";
-            const dataArray = this.pitchAnalysers[turtleIdx].getValue();
-            const bufferLength = dataArray.length;
-            canvasCtx.fillRect(0, 0, width, height);
-            canvasCtx.lineWidth = 2;
-            const rbga = turtle.painter._canvasColor;
-            canvasCtx.strokeStyle = rbga;
-            canvasCtx.beginPath();
-            const sliceWidth = (width * this.zoomFactor) / bufferLength;
-            let x = 0;
-
-            for (let i = 0; i < bufferLength; i++) {
-                const y = (height / 2) * (1 - dataArray[i]) + this.verticalOffset;
-                if (i === 0) {
-                    canvasCtx.moveTo(x, y);
-                } else {
-                    canvasCtx.lineTo(x, y);
+                for (let i = 0; i < bufferLength; i++) {
+                    const y = (height / 2) * (1 - dataArray[i]) + this.verticalOffset;
+                    if (i === 0) {
+                        canvasCtx.moveTo(x, y);
+                    } else {
+                        canvasCtx.lineTo(x, y);
+                    }
+                    x += sliceWidth;
                 }
-                x += sliceWidth;
+                canvasCtx.lineTo(canvas.width, canvas.height / 2);
+                canvasCtx.stroke();
             }
-            canvasCtx.lineTo(canvas.width, canvas.height / 2);
-            canvasCtx.stroke();
         };
         draw();
     };
+    /**
+     * @private
+     * @returns {void}
+     */
+    _scale() {
+        let width, height;
+        const canvas = document.getElementsByClassName("oscilloscopeCanvas");
+        Array.prototype.forEach.call(canvas, (ele) => {
+            this.widgetWindow.getWidgetBody().removeChild(ele);
+        });
+        if (!this.widgetWindow.isMaximized()) {
+            width = 700;
+            height = 400;
+        } else {
+            width = this.widgetWindow.getWidgetBody().getBoundingClientRect().width;
+            height = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 70;
+        }
+        document.getElementsByTagName("canvas")[0].innerHTML = "";
+        for (const turtle of this.divisions) {
+            const turtleIdx = logo.turtles.turtleList.indexOf(turtle);
+            this.reconnectSynthsToAnalyser(turtleIdx);
+            this.makeCanvas(width, height / this.divisions.length, turtle, turtleIdx, true);
+        }
+    }
 }
