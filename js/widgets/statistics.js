@@ -32,6 +32,7 @@ class StatsWindow {
             this.isOpen = false;
             blocks.showBlocks();
             this.widgetWindow.destroy();
+            logo.statsWindow = null;
         };
         this.doAnalytics();
 
@@ -107,18 +108,18 @@ class StatsWindow {
             "<li>quintuplets: " +
             stats["quintuplets"] +
             "</li>" +
-            "<li>pitch names: " +
-            Array.from(stats["pitchNames"]) +
+            "<li style=\"white-space: pre-wrap; width: 150px\">pitch names: " +
+            Array.from(stats["pitchNames"]).join(", ") +
             "</li>" +
             "<li>number of notes: " +
             stats["numberOfNotes"] +
             "</li>" +
-            "<li>lowest note: " +
+            "<li style=\"white-space: pre-wrap; width: 150px\">lowest note: " +
             stats["lowestNote"][0] +
             " , " +
             lowHertz.toFixed(0) +
             "Hz</li>" +
-            "<li>highest note: " +
+            "<li style=\"white-space: pre-wrap; width: 150px\">highest note: " +
             stats["highestNote"][0] +
             " , " +
             highHertz.toFixed(0) +

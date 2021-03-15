@@ -13,6 +13,23 @@
 
 // TODO: CLEAN UP THIS LIST
 
+/*globals _, TEMPERAMENT, last, isCustom*/
+
+/*
+Globals location
+
+- js/utils/musicutils.js
+    isCustom, TEMPERAMENT
+
+- js/utils/utils.js
+    _, last
+*/
+
+/* exported analyzeProject, scoreToChartData, getChartOptions, runAnalytics,
+getStatsFromNotation*/
+
+/* eslint-disable no-dupe-keys */
+
 // Assign each block to a bin.
 const TACAT = {
     // deprecated blocks
@@ -410,7 +427,6 @@ const TAPAL = {
     note: "notesp",
     rhythm: "notesp",
     rhythmfactor: "notesp",
-    rhythmfactor: "notesp",
     pitch: "pitchp",
     pitchchord: "pitchp",
     transpose: "pitchp",
@@ -560,8 +576,10 @@ function analyzeProject(blocks) {
                 }
                 break;
             default:
-                if (blocks.blockList[blk].connections[0] == null &&
-                last(blocks.blockList[blk].connections) == null) {
+                if (
+                    blocks.blockList[blk].connections[0] == null &&
+                    last(blocks.blockList[blk].connections) == null
+                ) {
                     continue;
                 }
                 break;
@@ -569,13 +587,13 @@ function analyzeProject(blocks) {
         blockList.push(blocks.blockList[blk].name);
     }
 
-    scores = [];
+    const scores = [];
     for (let i = 0; i < PALS.length; i++) {
         scores.push(0);
     }
 
-    cats = [];
-    pals = [];
+    const cats = [];
+    const pals = [];
 
     for (let b = 0; b < blockList.length; b++) {
         if (blockList[b] in TACAT) {
@@ -583,6 +601,7 @@ function analyzeProject(blocks) {
                 cats.push(TACAT[blockList[b]]);
             }
         } else {
+            // eslint-disable-next-line no-console
             console.debug(blockList[b] + " not in catalog");
         }
     }
@@ -633,16 +652,18 @@ function scoreToChartData(scores) {
 
     return {
         labels: PALLABELS,
-        datasets: [{
-            label: "",
-            fillColor: "rgba(220,220,220,0.4)",
-            strokeColor: "rgba(220,220,220,1)",
-            pointColor: "rgba(220,220,220,1)",
-            pointStrokeColor: "#fff",
-            pointHighlightFill: "#fff",
-            pointHighlightStroke: "rgba(220,220,220,1)",
-            data: normalizedScores
-        }]
+        datasets: [
+            {
+                label: "",
+                fillColor: "rgba(220,220,220,0.4)",
+                strokeColor: "rgba(220,220,220,1)",
+                pointColor: "rgba(220,220,220,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(220,220,220,1)",
+                data: normalizedScores
+            }
+        ]
     };
 }
 
@@ -723,8 +744,8 @@ const runAnalytics = (logo) => {
 };
 
 const getStatsFromNotation = (logo) => {
-    projectStats = {};
-    // since we use the lilypond output to generate stats , please make sure to change these rules if 
+    const projectStats = {};
+    // since we use the lilypond output to generate stats , please make sure to change these rules if
     // we ever change the lilypond notation structure.
     const notation = logo.notation;
     projectStats["duples"] = 0;
@@ -732,36 +753,51 @@ const getStatsFromNotation = (logo) => {
     projectStats["quintuplets"] = 0;
     projectStats["pitchNames"] = new Set();
     projectStats["articulation"] = {
-        begin : [],
-        end : []
+        begin: [],
+        end: []
     };
     projectStats["pitches"] = [];
     projectStats["numberOfNotes"] = 0;
 
     let noteId = 0;
 
-    for (const tur in notation.notationStaging){
+    for (const tur in notation.notationStaging) {
         for (const it in notation.notationStaging[tur]) {
             const item = notation.notationStaging[tur][it];
 
-            if (typeof item == "object" && item[0].length){
-                for (const note of item[0]) {
-                    projectStats["pitchNames"].add(note[0]);
-                    const freq = logo.synth._getFrequency(note);
-                    projectStats["pitches"].push(freq);
-                    if (projectStats["lowestNote"] == undefined ||
-                        freq < projectStats["lowestNote"][2]) {
-                        projectStats["lowestNote"] = [note,noteId,freq];
+            if (typeof item == "object" && item[0].length) {
+                for (let note of item[0]) {
+                    let freq;
+                    if (isCustom(logo.synth.inTemperament)) {
+                        freq = logo.synth.getCustomFrequency(note, logo.synth.inTemperament);
+                        const test = TEMPERAMENT[logo.synth.inTemperament].filter(
+                            (ele) => ele[3] === note.slice(0, note.length - 1)
+                        );
+                        if (test.length > 0) {
+                            note = test[0][1] + note[note.length - 1];
+                        }
+                    } else {
+                        freq = logo.synth._getFrequency(note);
                     }
-                    if (projectStats["highestNote"] == undefined ||
-                        freq > projectStats["highestNote"][2]) {
-                        projectStats["highestNote"] = [note,noteId,freq];
+                    projectStats["pitchNames"].add(note.slice(0, note.length - 1));
+                    projectStats["pitches"].push(freq);
+                    if (
+                        projectStats["lowestNote"] == undefined ||
+                        freq < projectStats["lowestNote"][2]
+                    ) {
+                        projectStats["lowestNote"] = [note, noteId, freq];
+                    }
+                    if (
+                        projectStats["highestNote"] == undefined ||
+                        freq > projectStats["highestNote"][2]
+                    ) {
+                        projectStats["highestNote"] = [note, noteId, freq];
                     }
                     projectStats["numberOfNotes"]++;
                     noteId++;
                 }
             }
-            
+
             if (item[1] == 2) {
                 projectStats["duples"]++;
             } else if (item[1] == 3) {
@@ -780,26 +816,28 @@ const getStatsFromNotation = (logo) => {
         }
     }
 
-    blockList = logo.blocks.blockList;
+    const blockList = logo.blocks.blockList;
     projectStats["rests"] = 0;
     projectStats["ornaments"] = 0;
-    for (const b  of blockList) {
+    for (const b of blockList) {
         if (b.trash) {
             continue;
         }
-        switch(b.name){
-            case "rest2" :
+        switch (b.name) {
+            case "rest2":
                 projectStats["rests"]++;
+                break;
             case "":
-            default :
+            default:
         }
 
-        switch(b.protoblock.palette.name){
-            case("ornaments"):
+        switch (b.protoblock.palette.name) {
+            case "ornaments":
                 projectStats["ornaments"]++;
+                break;
             default:
         }
     }
-    console.debug(projectStats);
+    // console.debug(projectStats);
     return projectStats;
 };
