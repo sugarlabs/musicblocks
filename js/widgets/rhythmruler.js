@@ -35,6 +35,7 @@
         beginnerMode
     - js/utils/synthutils.js
         DRUMNAMES,VOICENAMES,EFFECTSNAMES
+*/
 /* exported RhythmRuler */
 
 /**
