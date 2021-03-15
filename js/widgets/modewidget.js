@@ -70,6 +70,8 @@ class ModeWidget {
             this.widgetWindow.destroy();
         };
 
+        this.widgetWindow.onmaximize = this._scale;
+
         this._playButton = this.widgetWindow.addButton(
             "play-button.svg",
             ModeWidget.ICONSIZE,
@@ -211,6 +213,31 @@ class ModeWidget {
      * @private
      * @returns {void}
      */
+    _scale() {
+        const windowHeight =
+            this.getWidgetFrame().offsetHeight - this.getDragElement().offsetHeight;
+        const widgetBody = this.getWidgetBody();
+        const scale = this.isMaximized? windowHeight / widgetBody.offsetHeight: 1;
+        widgetBody.style.display = "flex";
+        widgetBody.style.flexDirection = "column";
+        widgetBody.style.alignItems = "center";
+        widgetBody.children[0].style.display = "flex";
+        widgetBody.children[0].style.flexDirection = "column";
+        widgetBody.children[0].style.alignItems = "center";
+
+        const svg = this.getWidgetBody().getElementsByTagName("svg")[0];
+        svg.style.pointerEvents = "none";
+        svg.setAttribute("height", `${400 * scale}px`);
+        svg.setAttribute("width", `${400 * scale}px`);
+        setTimeout(() => {
+            svg.style.pointerEvents = "auto";
+        }, 100);
+    }
+
+    /**
+     * @private
+     * @returns {void}
+     */
     _setMode() {
         // Read in the current mode to start
         const currentModeName = keySignatureToMode(turtles.ithTurtle(0).singer.keySignature);
@@ -250,8 +277,8 @@ class ModeWidget {
      */
     _showPiano() {
         const modePianoDiv = docById("modePianoDiv");
-        modePianoDiv.style.display = "inline";
         modePianoDiv.style.visibility = "visible";
+        modePianoDiv.style.position = "relative";
         modePianoDiv.style.border = "0px";
         modePianoDiv.style.top = "0px";
         modePianoDiv.style.left = "0px";
@@ -305,29 +332,29 @@ class ModeWidget {
         }
 
         modePianoDiv.innerHTML +=
-            '<img id="pkey_0" style="top:404px; left:0px; position:absolute;">';
+            '<img id="pkey_0" style="top:0px; left:0px; position:absolute;">';
         modePianoDiv.innerHTML +=
-            '<img id="pkey_1" style="top:404px; left:0px; position:absolute;">';
+            '<img id="pkey_1" style="top:0px; left:0px; position:absolute;">';
         modePianoDiv.innerHTML +=
-            '<img id="pkey_2" style="top:404px; left:0px; position:absolute;">';
+            '<img id="pkey_2" style="top:0px; left:0px; position:absolute;">';
         modePianoDiv.innerHTML +=
-            '<img id="pkey_3" style="top:404px; left:0px; position:absolute;">';
+            '<img id="pkey_3" style="top:0px; left:0px; position:absolute;">';
         modePianoDiv.innerHTML +=
-            '<img id="pkey_4" style="top:404px; left:0px; position:absolute;">';
+            '<img id="pkey_4" style="top:0px; left:0px; position:absolute;">';
         modePianoDiv.innerHTML +=
-            '<img id="pkey_5" style="top:404px; left:0px; position:absolute;">';
+            '<img id="pkey_5" style="top:0px; left:0px; position:absolute;">';
         modePianoDiv.innerHTML +=
-            '<img id="pkey_6" style="top:404px; left:0px; position:absolute;">';
+            '<img id="pkey_6" style="top:0px; left:0px; position:absolute;">';
         modePianoDiv.innerHTML +=
-            '<img id="pkey_7" style="top:404px; left:0px; position:absolute;">';
+            '<img id="pkey_7" style="top:0px; left:0px; position:absolute;">';
         modePianoDiv.innerHTML +=
-            '<img id="pkey_8" style="top:404px; left:0px; position:absolute;">';
+            '<img id="pkey_8" style="top:0px; left:0px; position:absolute;">';
         modePianoDiv.innerHTML +=
-            '<img id="pkey_9" style="top:404px; left:0px; position:absolute;">';
+            '<img id="pkey_9" style="top:0px; left:0px; position:absolute;">';
         modePianoDiv.innerHTML +=
-            '<img id="pkey_10" style="top:404px; left:0px; position:absolute;">';
+            '<img id="pkey_10" style="top:0px; left:0px; position:absolute;">';
         modePianoDiv.innerHTML +=
-            '<img id="pkey_11" style="top:404px; left:0px; position:absolute;">';
+            '<img id="pkey_11" style="top:0px; left:0px; position:absolute;">';
 
         for (let i = 0; i < 12; ++i) {
             if (this._selectedNotes[i])
