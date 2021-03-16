@@ -284,12 +284,12 @@ class RhythmRuler {
                     iconSize +
                     '" />';
                 drumcell.className = "headcol"; // Position fixed when scrolling horizontally
-
+                drumcell.style.cursor = "pointer";
                 drumcell.onclick = ((id) => {
                     return () => {
                         if (this._playing) {
                             if (this._rulerPlaying === id) {
-                                this.innerHTML =
+                                drumcell.innerHTML =
                                     '<img src="header-icons/play-button.svg" title="' +
                                     _("Play") +
                                     '" alt="' +
@@ -308,30 +308,28 @@ class RhythmRuler {
                                 this._offsets[id] = 0;
                                 setTimeout(this._calculateZebraStripes(id), 1000);
                             }
-                        } else {
-                            if (this._playingOne === false) {
-                                this._rulerSelected = id;
-                                logo.turtleDelay = 0;
-                                this._playing = true;
-                                this._playingOne = true;
-                                this._playingAll = false;
-                                this._cellCounter = 0;
-                                this._startingTime = null;
-                                this._rulerPlaying = id;
-                                this.innerHTML =
-                                    '<img src="header-icons/pause-button.svg" title="' +
-                                    _("Pause") +
-                                    '" alt="' +
-                                    _("Pause") +
-                                    '" height="' +
-                                    iconSize +
-                                    '" width="' +
-                                    iconSize +
-                                    '" vertical-align="middle">';
-                                this._elapsedTimes[id] = 0;
-                                this._offsets[id] = 0;
-                                this._playOne();
-                            }
+                        } else if (this._playingOne === false) {
+                            this._rulerSelected = id;
+                            logo.turtleDelay = 0;
+                            this._playing = true;
+                            this._playingOne = true;
+                            this._playingAll = false;
+                            this._cellCounter = 0;
+                            this._startingTime = null;
+                            this._rulerPlaying = id;
+                            this.innerHTML =
+                                '<img src="header-icons/pause-button.svg" title="' +
+                                _("Pause") +
+                                '" alt="' +
+                                _("Pause") +
+                                '" height="' +
+                                iconSize +
+                                '" width="' +
+                                iconSize +
+                                '" vertical-align="middle">';
+                            this._elapsedTimes[id] = 0;
+                            this._offsets[id] = 0;
+                            this._playOne();
                         }
                     };
                 })(i);
