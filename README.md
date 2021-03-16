@@ -1,3 +1,11 @@
+<a href="https://github.com//sugarlabs/musicblocks/graphs/contributors" alt="Contributors">
+    <img src="https://img.shields.io/github/contributors/sugarlabs/musicblocks" />
+</a>
+
+<a href="#license" alt="License">
+    <img src="https://img.shields.io/github/license/sugarlabs/musicblocks" />
+</a>
+
 # Music Blocks
 
 “_All musicians are subconsciously mathematicians._” — Monk
