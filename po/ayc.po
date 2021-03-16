@@ -1806,7 +1806,7 @@ msgstr ""
 #: js/toolbar.js:147
 #: js/toolbar.js:197
 #.TRANS: Menú auxiliar
-msgid "Auxilary menu"
+msgid "Auxiliary menu"
 msgstr ""
 
 #: js/toolbar.js:56

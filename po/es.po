@@ -1343,7 +1343,7 @@ msgstr "Desconectado. Compartir no está disponible."
 #: js/toolbar.js:110
 #: js/toolbar.js:147
 #: js/toolbar.js:197
-msgid "Auxilary menu"
+msgid "Auxiliary menu"
 msgstr "Menú auxiliar"
 
 #: js/toolbar.js:56
