@@ -15,8 +15,7 @@
 /*
    global logo, blocks, turtles, platformColor, _, docById, getNote, getDrumName, getDrumIcon,
    getDrumSynthName, Singer, MATRIXSOLFEHEIGHT, MATRIXSOLFEWIDTH, SOLFEGECONVERSIONTABLE
- */
-
+*/
 /*
    Global locations
     js/activity.js
@@ -29,7 +28,6 @@
     js/utils/platformstyle.js
         platformColor
 */
-
 /*exported PitchDrumMatrix */
 
 class PitchDrumMatrix {
@@ -45,7 +43,7 @@ class PitchDrumMatrix {
         this.rowArgs = [];
         this.drums = [];
         this._rests = 0;
-
+        this._playing = false;
         // The pitch-block number associated with a row; a drum block is
         // associated with a column. We need to keep track of which
         // intersections in the grid are populated.  The blockMap is a
@@ -75,11 +73,14 @@ class PitchDrumMatrix {
         widgetWindow.clear();
         widgetWindow.show();
 
-        widgetWindow.addButton(
+        this.playButton = widgetWindow.addButton(
             "play-button.svg",
             PitchDrumMatrix.ICONSIZE,
             _("Play")
-        ).onclick = () => {
+        );
+
+        this.playButton.onclick = () => {
+            this._playing = !(this._playing);
             logo.turtleDelay = 0;
             this._playAll();
         };
@@ -521,6 +522,35 @@ class PitchDrumMatrix {
      */
     _playAll() {
         // Play all of the pitch/drum combinations in the matrix.
+        const icon = this.playButton;
+        if(this._playing){
+            icon.innerHTML = '&nbsp;&nbsp;<img src="header-icons/' +
+            "stop-button.svg" +
+            '" title="' +
+            _("Stop") +
+            '" alt="' +
+            _("Stop") +
+            '" height="' +
+            PitchDrumMatrix.ICONSIZE +
+            '" width="' +
+            PitchDrumMatrix.ICONSIZE +
+            '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        }
+        else{
+            icon.innerHTML =
+            '&nbsp;&nbsp;<img src="header-icons/' +
+            "play-button.svg" +
+            '" title="' +
+            _("Play") +
+            '" alt="' +
+            _("Play") +
+            '" height="' +
+            PitchDrumMatrix.ICONSIZE +
+            '" width="' +
+            PitchDrumMatrix.ICONSIZE +
+            '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            return;
+        }
         logo.synth.stop();
 
         const pairs = [];
@@ -546,11 +576,49 @@ class PitchDrumMatrix {
                 pairs.push([i, -1]);
             }
         }
-
-        const ii = 0;
-        if (ii < pairs.length) {
-            this._playPitchDrum(ii, pairs);
+        let isEmpty = true;
+        for(let i = 0;i < pairs.length;i++){
+            if(pairs[i][1]!=-1){
+                isEmpty = false;
+                break;
+            }
         }
+        if(!isEmpty){
+            const ii = 0;
+            if (ii < pairs.length) {
+                this._playPitchDrum(ii, pairs);
+            }
+            setTimeout(() => {
+                icon.innerHTML =
+                '&nbsp;&nbsp;<img src="header-icons/' +
+                "play-button.svg" +
+                '" title="' +
+                _("Play") +
+                '" alt="' +
+                _("Play") +
+                '" height="' +
+                PitchDrumMatrix.ICONSIZE +
+                '" width="' +
+                PitchDrumMatrix.ICONSIZE +
+                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            },pairs.length*1000);
+        }
+        else{
+            logo.textMsg(_("Click in the grid to map notes to drums."));
+            icon.innerHTML =
+                '&nbsp;&nbsp;<img src="header-icons/' +
+                "play-button.svg" +
+                '" title="' +
+                _("Play") +
+                '" alt="' +
+                _("Play") +
+                '" height="' +
+                PitchDrumMatrix.ICONSIZE +
+                '" width="' +
+                PitchDrumMatrix.ICONSIZE +
+                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+        }
+        
     }
 
     /**
@@ -561,11 +629,29 @@ class PitchDrumMatrix {
      */
     _playPitchDrum(i, pairs) {
         // Find the drum cell
+        let pdmTable = docById("pdmTable");
+        if(!this._playing){
+            for (let j = 0; j < i; j++) {
+                pdmTable.rows[j].cells[0].style.backgroundColor = platformColor.labelColor;
+            }
+            const icon = this.playButton;
+            icon.innerHTML =
+            '&nbsp;&nbsp;<img src="header-icons/' +
+            "play-button.svg" +
+            '" title="' +
+            _("Play") +
+            '" alt="' +
+            _("Play") +
+            '" height="' +
+            PitchDrumMatrix.ICONSIZE +
+            '" width="' +
+            PitchDrumMatrix.ICONSIZE +
+            '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            return;
+        }
         const drumTable = docById("pdmDrumTable");
         let row = drumTable.rows[0];
         // const drumCell = row.cells[i];
-
-        let pdmTable = docById("pdmTable");
         const table = docById("pdmCellTable" + i);
         row = table.rows[0];
         const cell = row.cells[i];
