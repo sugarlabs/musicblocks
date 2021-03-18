@@ -15,7 +15,6 @@ function SampleWidget() {
     const ICONSIZE = 32;
     const SAMPLEWIDTH = 400;
     const SAMPLEHEIGHT = 160;
-    const RENDERINTERVAL = 50;
     const EXPORTACCIDENTALNAMES = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];  // Don't include natural when construcing the note name;
     const ACCIDENTALNAMES = [DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP]; // but display it in the selector.
     const SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti", "do"];
@@ -28,6 +27,11 @@ function SampleWidget() {
     const MAXOCTAVE = 10;
     const SAMPLEWAITTIME = 500;
 
+    //Oscilloscope constants
+    const SAMPLEINTERVAL = 5;
+    const SAMPLEANALYSERSIZE = 8192;
+    const SAMPLEOSCCOLORS = ["#3030FF", "#FF3050"];
+
     this.timbreBlock;
     this.sampleArray;
     this.sampleData = "";
@@ -37,8 +41,8 @@ function SampleWidget() {
     this.pitchCenter = 9;
     this.accidentalCenter = 2;
     this.octaveCenter = 4;
-    this.freqArray = new Uint8Array();
     this.sampleLength = 1000
+    this.pitchAnalysers = {};
 
     this._updateBlocks = function() {
         let mainSampleBlock;
@@ -77,7 +81,6 @@ function SampleWidget() {
     };
 
     this.pause = function() {
-        clearInterval(this._intervalID);
         this.playBtn.innerHTML =
             '<img src="header-icons/play-button.svg" title="' +
             _("Play") +
@@ -103,7 +106,17 @@ function SampleWidget() {
             ICONSIZE +
             '" vertical-align="middle">';
         this.isMoving = true;
-    };
+    }
+
+    this.startOscilloscope = function() {
+        if (this._intervalID !== null) {
+            clearInterval(this._intervalID);
+        }
+
+        this._intervalID = setInterval(() => {
+            this._draw();
+        }, SAMPLEINTERVAL);
+    }
 
     this.pitchUp = function () {
         this._usePitch(this.pitchInput.value);
@@ -191,38 +204,61 @@ function SampleWidget() {
         this.octaveInput.value = this.octaveCenter;
     }
 
+    this.getSampleLength = function() {
+        let str = this.sampleData;
+        let base64encoded = str.substring(str.indexOf(",") + 1);
+        let audiofile =  new Uint32Array(Uint8Array.from(window.atob(base64encoded)).buffer);
+        let length = audiofile.length;
+        if (this.sampleData.length > 1333333) {
+            this._logo.errorMsg(_("Warning: Sample is bigger than 1MB."), this.timbreBlock);
+        }
+    }
+
     this._draw = function() {
 
-      let d = new Date();
-      var canvas = this.sampleCanvas;
-      let middle = SAMPLEHEIGHT / 2 - 15;
+      let turtle = turtles[0];
+      let width = SAMPLEWIDTH;
+      let height = SAMPLEHEIGHT;
+      const canvas = this.sampleCanvas;
+      const canvasCtx = canvas.getContext("2d");
+      canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+      const numOfOscs = 2;
 
-      var ctx = canvas.getContext("2d");
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.beginPath();
-      ctx.strokeStyle = '#0000FF';
-      ctx.lineWidth = 0;
+      const drawOscilloscope = () => {
+          canvasCtx.fillStyle = "#FFFFFF";
+          canvasCtx.font = "10px Verdana";
+          canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+          canvasCtx.lineWidth = 2;
+          for (let turtleIdx in [0, 1]) {
+              const dataArray = this.pitchAnalysers[turtleIdx].getValue();
+              const bufferLength = dataArray.length;
+              const rbga = SAMPLEOSCCOLORS[turtleIdx];
+              canvasCtx.strokeStyle = rbga;
+              canvasCtx.beginPath();
+              const sliceWidth = (canvas.width) / bufferLength;
+              let x = 0;
+              let verticalOffset = (turtleIdx-0.5) * ((numOfOscs-1)/2) * canvas.height;
 
-      let period = Math.floor(this.sampleData.length / SAMPLEWIDTH);
-
-      for (let x=0; x < SAMPLEWIDTH; x++) {
-          let amplitude = 0;
-          let index = x*period+24;
-          //if (index < this.sampleData.length) {
-          //    amplitude = this.sampleData.charCodeAt(index) - 64;
-          //}
-          if (x < this.freqArray.length) {
-              amplitude = this.freqArray[x];
+              for (let i = 0; i < bufferLength; i++) {
+                  const y = (canvas.height / 2) * (1 - dataArray[i]) + verticalOffset;
+                  if (i === 0) {
+                      canvasCtx.moveTo(x, y);
+                  } else {
+                      canvasCtx.lineTo(x, y);
+                  }
+                  x += sliceWidth;
+              }
+              canvasCtx.lineTo(canvas.width, canvas.height / 2 + verticalOffset);
+              canvasCtx.stroke();
+              let oscText = "Reference tone";
+              if (turtleIdx > 0) {
+                      oscText = (this.sampleName != "")? this.sampleName : "Sample";
+              }
+              canvasCtx.fillStyle = "#000000";
+              canvasCtx.fillText(oscText, 10, (turtleIdx) * ((numOfOscs-1)/2) * canvas.height + 10);
           }
-          ctx.moveTo(x, middle - amplitude);
-          ctx.lineTo(x, middle + amplitude);
-          ctx.stroke();
-          ctx.fill();
-      }
-      ctx.closePath();
-
-      ctx.font = "10px Verdana";
-      ctx.fillText(this.sampleName, 10, 10);
+      };
+      drawOscilloscope();
     }
 
     this.__save = function() {
@@ -265,6 +301,7 @@ function SampleWidget() {
         this._firstClickTimes = null;
         this._intervals = [];
         this.isMoving = false;
+        this.pitchAnalysers = {};
         if (this._intervalID != undefined && this._intervalID != null) {
             clearInterval(this._intervalID);
         }
@@ -272,6 +309,7 @@ function SampleWidget() {
         this._intervalID = null;
 
         this._logo.synth.loadSynth(0, getVoiceSynthName(DEFAULTSAMPLE));
+        this.reconnectSynthsToAnalyser();
 
         if (this._intervalID != null) {
             clearInterval(this._intervalID);
@@ -438,6 +476,7 @@ function SampleWidget() {
                 r3.insertCell()
             ).onclick = ((i) => () => this.octaveDown(i))(i);
 
+
             this.sampleCanvas = document.createElement("canvas");
             this.sampleCanvas.style.width = SAMPLEWIDTH + "px";
             this.sampleCanvas.style.height = SAMPLEHEIGHT + "px";
@@ -461,6 +500,8 @@ function SampleWidget() {
         this._parseSamplePitch();
 
         this.setTimbre();
+
+        this.startOscilloscope();
 
         this._logo.textMsg(_("Upload a sample and adjust its pitch center."));
         this._draw();
@@ -524,9 +565,11 @@ function SampleWidget() {
 
 
     this.setTimbre = function () {
-        this.originalSampleName = this.sampleName + "_original";
-        let sampleArray = [this.originalSampleName, this.sampleData, "la", 4];
-        Singer.ToneActions.setTimbre(sampleArray, 0, this.timbreBlock);
+        if (this.sampleName != null && this.sampleName != "") {
+            this.originalSampleName = this.sampleName + "_original";
+            let sampleArray = [this.originalSampleName, this.sampleData, "la", 4];
+            Singer.ToneActions.setTimbre(sampleArray, 0, this.timbreBlock);
+        }
     }
 
     this._playReferencePitch = function() {
@@ -567,6 +610,8 @@ function SampleWidget() {
     this._playSample = function () {
         if (this.sampleName != null && this.sampleName != "") {
 
+            this.reconnectSynthsToAnalyser();
+
             let finalpitch = CENTERPITCHHERTZ;
 
             this._logo.synth.trigger(
@@ -606,4 +651,40 @@ function SampleWidget() {
     this._endPlaying = async function () {
         const result = await this._waitAndEndPlaying();
     }
+
+    this.arrayMax = function (arr) {
+        var len = arr.length, max = -Infinity;
+        while (len--) {
+            if (arr[len] > max) {
+                max = arr[len];
+            }
+        }
+        return max;
+    };
+
+    this.reconnectSynthsToAnalyser = function () {
+
+        //Make two pitchAnalysers for the ref tone and the sample.
+        for (let instrument in [0,1]) {
+            if (this.pitchAnalysers[instrument] === undefined) {
+                this.pitchAnalysers[instrument] = new Tone.Analyser({
+                    type: "waveform",
+                    size: SAMPLEANALYSERSIZE
+                });
+            }
+        }
+
+        //Connect instruments. Ref tone connects with the first pitchAnalyser.
+        for (const synth in instruments[0]) {
+            let analyser = 1;
+            if (synth === REFERENCESAMPLE) {
+                analyser = 0;
+                instruments[0][synth].connect(this.pitchAnalysers[analyser]);
+            }
+            if (synth === "customsample_" + this.originalSampleName) {
+                analyser = 1;
+                instruments[0][synth].connect(this.pitchAnalysers[analyser]);
+            }
+        }
+    };
 }
