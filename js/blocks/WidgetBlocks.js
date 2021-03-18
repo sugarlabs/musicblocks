@@ -3,7 +3,7 @@
    instrumentsEffects, StackClampBlock, Oscilloscope, DEFAULTMODE, Tempo, PitchDrumMatrix,
    PhraseMaker, StatusMatrix, RhythmRuler, beginnerMode, FILTERTYPES, instrumentsFilters,
    DEFAULTFILTERTYPE, TemperamentWidget, TimbreWidget, ModeWidget, PitchSlider, MusicKeyboard,
-   PitchStaircase
+   PitchStaircase,SampleWidget
  */
 
 /*
@@ -46,6 +46,8 @@
     MusicKeyboard
    - js/widgets/pitchstaircase.js
     PitchStaircase
+    - js/widgets/sampler.js
+    SampleWidget
  */
 
 /* exported setupWidgetBlocks */
