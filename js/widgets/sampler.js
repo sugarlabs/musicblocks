@@ -36,7 +36,7 @@ class SampleWidget {
     static SAMPLEWIDTH = 400;
     static SAMPLEHEIGHT = 160;
     static RENDERINTERVAL = 50;
-    static EXPORTACCIDENTALNAMES = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];  // Don't include natural when construcing the note name;
+    static EXPORTACCIDENTALNAMES = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP]; // Don't include natural when construcing the note name;
     static ACCIDENTALNAMES = [DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP]; // but display it in the selector.
     static SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti", "do"];
     static MAJORSCALE = [0, 2, 4, 5, 7, 9, 11];
@@ -48,7 +48,7 @@ class SampleWidget {
     static MAXOCTAVE = 10;
     static SAMPLEWAITTIME = 500;
 
-    constructor(){
+    constructor() {
         this.timbreBlock;
         this.sampleArray;
         this.sampleData = "";
@@ -61,15 +61,18 @@ class SampleWidget {
         this.freqArray = new Uint8Array();
         this.sampleLength = 1000;
     }
-    
-    _updateBlocks(){
+    /**
+     * @private
+     * @returns {void}
+     */
+    _updateBlocks() {
         let mainSampleBlock;
         let audiofileBlock;
         let solfegeBlock;
         let octaveBlock;
         this.sampleArray = [this.sampleName, this.sampleData, this.samplePitch, this.sampleOctave];
         if (this.timbreBlock != null) {
-            mainSampleBlock = logo.blocks.blockList[this.timbreBlock].connections[1];;
+            mainSampleBlock = logo.blocks.blockList[this.timbreBlock].connections[1];
             if (mainSampleBlock != null) {
                 logo.blocks.blockList[mainSampleBlock].value = this.sampleArray;
                 logo.blocks.blockList[mainSampleBlock].updateCache();
@@ -77,7 +80,10 @@ class SampleWidget {
                 solfegeBlock = logo.blocks.blockList[mainSampleBlock].connections[2];
                 octaveBlock = logo.blocks.blockList[mainSampleBlock].connections[3];
                 if (audiofileBlock != null) {
-                    logo.blocks.blockList[audiofileBlock].value= [this.sampleName, this.sampleData];
+                    logo.blocks.blockList[audiofileBlock].value = [
+                        this.sampleName,
+                        this.sampleData
+                    ];
                     logo.blocks.blockList[audiofileBlock].text.text = this.sampleName;
                     logo.blocks.blockList[audiofileBlock].updateCache();
                 }
@@ -97,8 +103,11 @@ class SampleWidget {
             }
         }
     }
-
-    pause(){
+    /**
+     * @private
+     * @returns {void}
+     */
+    pause() {
         clearInterval(this._intervalID);
         this.playBtn.innerHTML =
             '<img src="header-icons/play-button.svg" title="' +
@@ -112,7 +121,10 @@ class SampleWidget {
             '" vertical-align="middle">';
         this.isMoving = false;
     }
-
+    /**
+     * @private
+     * @returns {void}
+     */
     resume() {
         this.playBtn.innerHTML =
             '<img src="header-icons/pause-button.svg" title="' +
@@ -125,9 +137,12 @@ class SampleWidget {
             SampleWidget.ICONSIZE +
             '" vertical-align="middle">';
         this.isMoving = true;
-    };
-
-    pitchUp(){
+    }
+    /**
+     * @private
+     * @returns {void}
+     */
+    pitchUp() {
         this._usePitch(this.pitchInput.value);
         this.pitchCenter++;
         if (this.pitchCenter > 6) {
@@ -137,11 +152,14 @@ class SampleWidget {
             }
             this.octaveInput.value = this.octaveCenter;
         }
-        this.pitchCenter%=7;
+        this.pitchCenter %= 7;
         this.pitchInput.value = SampleWidget.SOLFEGENAMES[this.pitchCenter];
         this._playReferencePitch();
-    };
-
+    }
+    /**
+     * @private
+     * @returns {void}
+     */
     pitchDown() {
         this._usePitch(this.pitchInput.value);
         this.pitchCenter--;
@@ -153,11 +171,14 @@ class SampleWidget {
             }
             this.octaveInput.value = this.octaveCenter;
         }
-        this.pitchCenter%=7;
+        this.pitchCenter %= 7;
         this.pitchInput.value = SampleWidget.SOLFEGENAMES[this.pitchCenter];
         this._playReferencePitch();
-    };
-
+    }
+    /**
+     * @private
+     * @returns {void}
+     */
     accidentalUp() {
         this._useAccidental(this.accidentalInput.value);
         if (this.accidentalCenter < 4) {
@@ -165,8 +186,11 @@ class SampleWidget {
         }
         this.accidentalInput.value = SampleWidget.ACCIDENTALNAMES[this.accidentalCenter];
         this._playReferencePitch();
-    };
-
+    }
+    /**
+     * @private
+     * @returns {void}
+     */
     accidentalDown() {
         this._useAccidental(this.accidentalInput.value);
         if (this.accidentalCenter > 0) {
@@ -174,8 +198,11 @@ class SampleWidget {
         }
         this.accidentalInput.value = SampleWidget.ACCIDENTALNAMES[this.accidentalCenter];
         this._playReferencePitch();
-    };
-
+    }
+    /**
+     * @private
+     * @returns {void}
+     */
     octaveUp() {
         this._useOctave(this.octaveInput.value);
         this.octaveCenter++;
@@ -184,8 +211,11 @@ class SampleWidget {
         }
         this.octaveInput.value = this.octaveCenter;
         this._playReferencePitch();
-    };
-
+    }
+    /**
+     * @private
+     * @returns {void}
+     */
     octaveDown() {
         this._useOctave(this.octaveInput.value);
         this.octaveCenter--;
@@ -194,26 +224,38 @@ class SampleWidget {
         }
         this.octaveInput.value = this.octaveCenter;
         this._playReferencePitch();
-    };
-
+    }
+    /**
+     * @private
+     * @returns {void}
+     */
     _usePitch() {
         const number = SampleWidget.SOLFEGENAMES.indexOf(this.pitchInput.value);
-        this.pitchCenter = (number==-1) ? 0 : number;
+        this.pitchCenter = number == -1 ? 0 : number;
         this.pitchInput.value = SampleWidget.SOLFEGENAMES[this.pitchCenter];
     }
-
+    /**
+     * @private
+     * @returns {void}
+     */
     _useAccidental() {
         const number = SampleWidget.ACCIDENTALNAMES.indexOf(this.accidentalInput.value);
-        this.accidentalCenter = (number==-1) ? 2 : number;
+        this.accidentalCenter = number == -1 ? 2 : number;
         this.accidentalInput.value = SampleWidget.ACCIDENTALNAMES[this.accidentalCenter];
     }
-
+    /**
+     * @private
+     * @returns {void}
+     */
     _useOctave() {
         this.octaveCenter = parseInt(this.octaveInput.value);
         this.octaveInput.value = this.octaveCenter;
     }
-
-    _draw(){
+    /**
+     * @private
+     * @returns {void}
+     */
+    _draw() {
         const canvas = this.sampleCanvas;
         const middle = SampleWidget.SAMPLEHEIGHT / 2 - 15;
 
@@ -223,8 +265,7 @@ class SampleWidget {
         ctx.strokeStyle = "#0000FF";
         ctx.lineWidth = 0;
 
-
-        for (let x=0; x < SampleWidget.SAMPLEWIDTH; x++) {
+        for (let x = 0; x < SampleWidget.SAMPLEWIDTH; x++) {
             let amplitude = 0;
             // const index = x*period+24;
             //if (index < this.sampleData.length) {
@@ -243,7 +284,10 @@ class SampleWidget {
         ctx.font = "10px Verdana";
         ctx.fillText(this.sampleName, 10, 10);
     }
-
+    /**
+     * @private
+     * @returns {void}
+     */
     __save() {
         setTimeout(() => {
             // console.debug("saving the sample");
@@ -251,30 +295,40 @@ class SampleWidget {
             this._addSample();
 
             const newStack = [
-                [0, ["customsample", {value: [
-                    this.sampleName,
-                    this.sampleData,
-                    "do",
-                    4
-                ]}], 100, 100, [null, 1, 2, 3]],
-                [1, ["audiofile", {value: [this.sampleName, this.sampleData]}], 0 ,0, [0]],
-                [2, ["solfege", {value: this.samplePitch}], 0, 0, [0]],
-                [3, ["number", {value: this.sampleOctave}], 0, 0, [0]],
+                [
+                    0,
+                    ["customsample", { value: [this.sampleName, this.sampleData, "do", 4] }],
+                    100,
+                    100,
+                    [null, 1, 2, 3]
+                ],
+                [1, ["audiofile", { value: [this.sampleName, this.sampleData] }], 0, 0, [0]],
+                [2, ["solfege", { value: this.samplePitch }], 0, 0, [0]],
+                [3, ["number", { value: this.sampleOctave }], 0, 0, [0]]
             ];
 
             logo.blocks.loadNewBlocks(newStack);
             logo.textMsg(_("A new sample block was generated."));
         }, 200);
-    };
-
+    }
+    /**
+     * @private
+     * @returns {void}
+     */
     _saveSample() {
         this.__save();
-    };
-
+    }
+    /**
+     * @private
+     * @returns {boolean}
+     */
     _get_save_lock() {
         return this._save_lock;
-    };
-
+    }
+    /**
+     * @private
+     * @returns {void}
+     */
     init() {
         this._directions = [];
         this._widgetFirstTimes = [];
@@ -302,7 +356,6 @@ class SampleWidget {
         widgetWindow.show();
 
         // For the button callbacks
-
 
         widgetWindow.onclose = () => {
             if (this._intervalID != null) {
@@ -345,7 +398,7 @@ class SampleWidget {
             const __readerAction = () => {
                 window.scroll(0, 0);
                 const sampleFile = fileChooser.files[0];
-                const reader = new FileReader;
+                const reader = new FileReader();
                 reader.readAsDataURL(sampleFile);
 
                 reader.onload = () => {
@@ -381,7 +434,7 @@ class SampleWidget {
             if (!this._get_save_lock()) {
                 this._save_lock = true;
                 this._saveSample();
-                setTimeout( () => {
+                setTimeout(() => {
                     this._save_lock = false;
                 }, 1000);
             }
@@ -419,7 +472,6 @@ class SampleWidget {
                 r3.insertCell()
             ).onclick = ((i) => () => this.pitchDown(i))(i);
 
-
             widgetWindow.addButton(
                 "up.svg",
                 SampleWidget.ICONSIZE,
@@ -427,7 +479,10 @@ class SampleWidget {
                 r1.insertCell()
             ).onclick = ((i) => () => this.accidentalUp(i))(i);
 
-            this.accidentalInput  = widgetWindow.addInputButton(this.accidentalCenter, r2.insertCell());
+            this.accidentalInput = widgetWindow.addInputButton(
+                this.accidentalCenter,
+                r2.insertCell()
+            );
             this._useAccidental(this.accidentalInput.value);
 
             widgetWindow.addButton(
@@ -463,15 +518,12 @@ class SampleWidget {
             vCell.appendChild(this.sampleCanvas);
             vCell.setAttribute("rowspan", "3");
 
-            this.pitchInput.addEventListener(
-                "keyup",
-                ((id) => (e) => {
-                    if (e.keyCode === 13) {
-                        // console.log("use pitch");
-                        this._usePitch(id);
-                    }
-                })
-            );
+            this.pitchInput.addEventListener("keyup", (id) => (e) => {
+                if (e.keyCode === 13) {
+                    // console.log("use pitch");
+                    this._usePitch(id);
+                }
+            });
         }
 
         this._parseSamplePitch();
@@ -483,20 +535,25 @@ class SampleWidget {
         this.pause();
 
         widgetWindow.sendToCenter();
-    };
-
+    }
+    /**
+     * @private
+     * @returns {void}
+     */
     _addSample() {
-        for (let i=0; i < CUSTOMSAMPLES.length; i++) {
+        for (let i = 0; i < CUSTOMSAMPLES.length; i++) {
             if (CUSTOMSAMPLES[i][0] == this.sampleName) {
                 return;
             }
         }
         CUSTOMSAMPLES.push([this.sampleName, this.sampleData]);
     }
-
+    /**
+     * @private
+     * @returns {void}
+     */
     _parseSamplePitch() {
-
-        const first_part = this.samplePitch.substring(0,2);
+        const first_part = this.samplePitch.substring(0, 2);
         if (first_part === "so") {
             this.pitchCenter = 4;
         } else {
@@ -523,25 +580,32 @@ class SampleWidget {
 
         this.octaveCenter = this.sampleOctave;
         this.octaveInput.value = this.sampleOctave;
-
     }
-
+    /**
+     * @private
+     * @returns {void}
+     */
     _updateSamplePitchValues() {
         this.samplePitch =
-        SampleWidget.SOLFEGENAMES[this.pitchCenter] +
-        SampleWidget.EXPORTACCIDENTALNAMES[this.accidentalCenter];
+            SampleWidget.SOLFEGENAMES[this.pitchCenter] +
+            SampleWidget.EXPORTACCIDENTALNAMES[this.accidentalCenter];
         this.sampleOctave = this.octaveCenter.toString();
     }
 
-
+    /**
+     * @private
+     * @returns {void}
+     */
     setTimbre() {
         this.originalSampleName = this.sampleName + "_original";
         const sampleArray = [this.originalSampleName, this.sampleData, "la", 4];
         Singer.ToneActions.setTimbre(sampleArray, 0, this.timbreBlock);
     }
-
+    /**
+     * @private
+     * @returns {void}
+     */
     _playReferencePitch() {
-
         this._usePitch(this.pitchInput.value);
         this._useAccidental(this.accidentalInput.value);
         this._useOctave(this.octaveInput.value);
@@ -549,16 +613,14 @@ class SampleWidget {
         this._updateSamplePitchValues();
         this._updateBlocks();
 
-
         let finalCenter = 0;
 
-        finalCenter += isNaN(this.octaveCenter)     ? 0 : this.octaveCenter*12;
-        finalCenter += isNaN(this.pitchCenter)      ? 0 : SampleWidget.MAJORSCALE[this.pitchCenter];
-        finalCenter += isNaN(this.accidentalCenter) ? 0 : this.accidentalCenter-2;
+        finalCenter += isNaN(this.octaveCenter) ? 0 : this.octaveCenter * 12;
+        finalCenter += isNaN(this.pitchCenter) ? 0 : SampleWidget.MAJORSCALE[this.pitchCenter];
+        finalCenter += isNaN(this.accidentalCenter) ? 0 : this.accidentalCenter - 2;
 
-
-        const netChange = finalCenter-57;
-        const reffinalpitch = Math.floor(440 * Math.pow(2, netChange/12));
+        const netChange = finalCenter - 57;
+        const reffinalpitch = Math.floor(440 * Math.pow(2, netChange / 12));
 
         logo.synth.trigger(
             0,
@@ -567,30 +629,37 @@ class SampleWidget {
             SampleWidget.REFERENCESAMPLE,
             null,
             null,
-            false);
+            false
+        );
 
         this.setTimbre();
         this._playDelayedSample();
     }
-
+    /**
+     * @private
+     * @returns {void}
+     */
     _playSample() {
         if (this.sampleName != null && this.sampleName != "") {
-
             const finalpitch = SampleWidget.CENTERPITCHHERTZ;
 
             logo.synth.trigger(
                 0,
                 [finalpitch],
-                this.sampleLength/1000.0,
+                this.sampleLength / 1000.0,
                 "customsample_" + this.originalSampleName,
                 null,
                 null,
-                false);
+                false
+            );
         }
     }
-
+    /**
+     * @private
+     * @returns {void}
+     */
     _waitAndPlaySample() {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             setTimeout(() => {
                 this._playSample();
                 resolve("played");
@@ -602,9 +671,12 @@ class SampleWidget {
     async _playDelayedSample() {
         await this._waitAndPlaySample();
     }
-
+    /**
+     * @private
+     * @returns {void}
+     */
     _waitAndEndPlaying() {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             setTimeout(() => {
                 this.pause();
                 resolve("ended");
