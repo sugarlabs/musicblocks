@@ -111,8 +111,8 @@ class PitchDrumMatrix {
 
         this.pitchDrumDiv = document.createElement("div");
         widgetWindow.getWidgetBody().append(this.pitchDrumDiv);
-        widgetWindow.getWidgetBody().style.height = "300px";
-        widgetWindow.getWidgetBody().style.width = "300px";
+        widgetWindow.getWidgetBody().style.height = "400px";
+        widgetWindow.getWidgetBody().style.width = "400px";
 
         // The pdm table
         const pdmTableDiv = this.pitchDrumDiv;
@@ -200,10 +200,10 @@ class PitchDrumMatrix {
         const outerDiv = docById("pdmOuterDiv");
         let ow;
         if (pdmTable.rows.length + 2 > n) {
-            outerDiv.style.height = window.innerHeight / 2 + "px";
+            outerDiv.style.height = widgetWindow.getWidgetBody().style.height;
             ow = Math.max(
                 Math.min(
-                    window.innerWidth / 2,
+                    widgetWindow.getWidgetBody().style.width,
                     this._cellScale *
                         (this.drums.length * (PitchDrumMatrix.DRUMNAMEWIDTH + 2) +
                             MATRIXSOLFEWIDTH +
@@ -227,12 +227,9 @@ class PitchDrumMatrix {
         outerDiv.style.width = ow + "px";
 
         const innerDiv = docById("pdmInnerDiv");
-        const iw = Math.min(
-            ow - 100,
-            this._cellScale * this.drums.length * (PitchDrumMatrix.DRUMNAMEWIDTH + 2)
-        );
-        innerDiv.style.width = iw + "px";
-        innerDiv.style.marginLeft = PitchDrumMatrix.BUTTONSIZE * this._cellScale + "px";
+        innerDiv.style.height = widgetWindow.getWidgetBody().style.height;
+        innerDiv.style.width = widgetWindow.getWidgetBody().style.width;
+        innerDiv.style.marginLeft = "0px";
 
         pdmCell = pdmTableRow.insertCell();
         // Create table to store drum names.
@@ -257,8 +254,11 @@ class PitchDrumMatrix {
             } else {
                 widgetWindow.getWidgetBody().style.position = "relative";
                 widgetWindow.getWidgetBody().style.left = "0px";
-                widgetWindow.getWidgetBody().style.height = "300px";
-                widgetWindow.getWidgetBody().style.width = "300px";
+                widgetWindow.getWidgetBody().style.height = "400px";
+                widgetWindow.getWidgetBody().style.width = "400px";
+                const innerDiv = docById("pdmInnerDiv");
+                innerDiv.style.height = widgetWindow.getWidgetBody().style.height;
+                innerDiv.style.width = widgetWindow.getWidgetBody().style.width;
             }
         };
 
