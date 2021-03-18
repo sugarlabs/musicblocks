@@ -10,17 +10,6 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 // All things related to palettes
-
-const PROTOBLOCKSCALE = 0.75;
-const PALETTELEFTMARGIN = Math.floor(10 * PROTOBLOCKSCALE);
-const PALETTE_SCALE_FACTOR = 0.5;
-const PALETTE_WIDTH_FACTOR = 3;
-
-function paletteBlockButtonPush(blocks, name, arg) {
-    const blk = blocks.makeBlock(name, arg);
-    return blk;
-}
-
 // There are several components to the palette system:
 //
 // loadPaletteButtonHandler is the event handler for palette buttons.
@@ -32,400 +21,48 @@ function paletteBlockButtonPush(blocks, name, arg) {
 // the palette container.
 //
 // loadPaletteMenuItemHandler is the event handler for the palette menu.
-const NPALETTES = 3;
 
-class Palettes {
-    constructor() {
-        this.blocks = null;
-        this.cellSize = null;
-        this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
-        this.scrollDiff = 0;
-        this.originalSize = 55; // this is the original svg size
-        this.firstTime = true;
-        this.background = null;
-        this.mouseOver = false;
-        this.activePalette = null;
-        this.paletteObject = null;
-        this.paletteVisible = false;
-        this.pluginsDeleteStatus = false;
-        this.visible = true;
-        this.scale = 1.0;
-        this.mobile = false;
-        // Top of the palette
-        this.top = 55 + 20 + LEADING;
-        this.current = DEFAULTPALETTE;
-        this.x = []; // We track x and y for each of the multipalettes
-        this.y = [];
-        this.showSearchWidget = null;
-        this.hideSearchWidget = null;
+/* global LEADING,DEFAULTPALETTE,sugarizerCompatibility,MULTIPALETTES,platformColor,docById,PALETTEICONS,MULTIPALETTEICONS,beginnerMode
+SKIPPALETTES,toTitleCase,_,i18nSolfege,NUMBERBLOCKDEFAULT,getTextWidth,TEXTWIDTH,STRINGLEN,SVG,DEFAULTBLOCKSCALE,DISABLEDFILLCOLOR,
+safeSVG,PALETTEFILLCOLORS,PALETTESTROKECOLORS,STANDARDBLOCKHEIGHT,CLOSEICON,UPICON,DOWNICON,last,blockIsMacro,getMacroExpansion,BUILTINPALETTES */
+/*
+   Global locations
+    - js/activity.js
+        LEADING,beginnerMode
+    - js/turtledef.js
+        DEFAULTPALETTE,MULTIPALETTES,SKIPPALETTES,NUMBERBLOCKDEFAULT,MULTIPALETTEICONS,BUILTINPALETTES
+    - js/sugarizer-compatibility.js
+        sugarizerCompatibility
+    - js/utils.utils.js
+        _,docById,toTitleCase,getTextWidth,safeSVG,last
+    - js/utils/musicutils.js
+        i18nSolfege
+    - js/utils/platformstyle.js
+        platformColor
+    - js/block.js
+        TEXTWIDTH,STRINGLEN
+    - js/blockfactory.js
+        SVG
+    - js/artwork.js
+        DEFAULTBLOCKSCALE,PALETTEICONS,PALETTEFILLCOLORS,PALETTESTROKECOLORS,STANDARDBLOCKHEIGHT,CLOSEICON,UPICON,DOWNICON
+    - js/macros.js
+        blockIsMacro,getMacroExpansion
+*/
+/* exported Palettes,initPalettes */
 
-        this.pluginMacros = {}; // some macros are defined in plugins
+const PALETTE_SCALE_FACTOR = 0.5;
 
-        if (sugarizerCompatibility.isInsideSugarizer()) {
-            storage = sugarizerCompatibility.data;
-        } else {
-            storage = localStorage;
-        }
+function paletteBlockButtonPush(blocks, name, arg) {
+    const blk = blocks.makeBlock(name, arg);
+    return blk;
+}
 
-        // The collection of palettes.
-        this.dict = {};
-        this.selectorButtonsOff = []; // Select between palettes
-        this.selectorButtonsOn = []; // Select between palettes in their on state
-        this.buttons = {}; // The toolbar button for each palette.
-        this.labels = {}; // The label for each button.
-        this.pluginPalettes = []; // List of palettes not in multipalette list
-    }
-
-    init() {
-        this.halfCellSize = Math.floor(this.cellSize / 2);
-    }
-
-    init_selectors() {
-        for (let i = 0; i < MULTIPALETTES.length; i++) {
-            this._makeSelectorButton(i);
-        }
-    }
-
-    deltaY(dy) {
-        const curr = parseInt(document.getElementById("palette").style.top);
-        document.getElementById("palette").style.top = curr + dy + "px";
-    }
-
-    _makeSelectorButton(i) {
-        console.debug("makeSelectorButton " + i);
-
-        if (!document.getElementById("palette")) {
-            const element = document.createElement("div");
-            element.id = "palette";
-            element.setAttribute("class", "disable_highlighting");
-            element.setAttribute(
-                "style",
-                "position: fixed; display: none ; left :0px; top:" + this.top + "px"
-            );
-            element.innerHTML =
-                '<div style="float: left"><table width ="' +
-                1.5 * this.cellSize +
-                'px"bgcolor="white"><thead><tr></tr></thead></table><table width ="' +
-                4.5 * this.cellSize +
-                'px"bgcolor="white"><thead><tr><td style= "width:28px"></tr></thead><tbody></tbody></table></div>';
-            element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
-            document.body.appendChild(element);
-        }
-        const tr = docById("palette").children[0].children[0].children[0].children[0];
-        const td = tr.insertCell();
-        td.width = 1.5 * this.cellSize;
-        td.height = 1.5 * this.cellSize;
-        td.style.position = "relative";
-        td.appendChild(
-            makePaletteIcons(
-                PALETTEICONS[MULTIPALETTEICONS[i]]
-                    .replace("background_fill_color", platformColor.selectorBackground)
-                    .replace(/stroke_color/g, platformColor.ruleColor)
-                    .replace(/fill_color/g, platformColor.background),
-                1.5 * this.cellSize,
-                1.5 * this.cellSize
-            )
-        );
-        const cover = document.createElement("div");
-        cover.style.position = "absolute";
-        cover.style.zIndex = "10";
-        cover.style.top = "0";
-        cover.style.width = "100%";
-        cover.style.height = "1px";
-        cover.style.background = platformColor.selectorBackground;
-        td.appendChild(cover);
-        td.onmouseover = () => {
-            this.showSelection(i, tr);
-            this.makePalettes(i);
-        };
-    }
-
-    showSelection(i, tr) {
-        //selector menu design.
-        for (let j = 0; j < MULTIPALETTES.length; j++) {
-            let img;
-            if (j === i) {
-                img = makePaletteIcons(
-                    PALETTEICONS[MULTIPALETTEICONS[j]]
-                        .replace("background_fill_color", platformColor.selectorSelected)
-                        .replace(/stroke_color/g, platformColor.ruleColor)
-                        .replace(/fill_color/g, platformColor.background),
-                    this.cellSize,
-                    this.cellSize
-                );
-                tr.children[j].children[1].style.background = platformColor.selectorSelected;
-            } else {
-                img = makePaletteIcons(
-                    PALETTEICONS[MULTIPALETTEICONS[j]]
-                        .replace("background_fill_color", platformColor.selectorBackground)
-                        .replace(/stroke_color/g, platformColor.ruleColor)
-                        .replace(/fill_color/g, platformColor.background),
-                    this.cellSize,
-                    this.cellSize
-                );
-                tr.children[j].children[1].style.background = platformColor.selectorBackground;
-            }
-            tr.children[j].children[0].src = img.src;
-        }
-    }
-
-    setSize(size) {
-        this.cellSize = Math.floor(size * PALETTE_SCALE_FACTOR + 0.5);
-        return this;
-    }
-
-    setMobile(mobile) {
-        this.mobile = mobile;
-        if (mobile) {
-            this._hideMenus();
-        }
-
-        return this;
-    }
-
-    setBlocksContainer(bloc) {
-        this.blocksContainer = bloc;
-        return this;
-    }
-
-    // We need access to the macro dictionary because we load them.
-    setMacroDictionary(obj) {
-        this.macroDict = obj;
-        return this;
-    }
-
-    setSearch(show, hide) {
-        this.showSearchWidget = show;
-        this.hideSearchWidget = hide;
-        return this;
-    }
-
-    getSearchPos() {
-        return [this.cellSize, this.top + this.cellSize * 1.75];
-    }
-
-    getPluginMacroExpansion(blkname, x, y) {
-        console.debug(this.pluginMacros[blkname]);
-        const obj = this.pluginMacros[blkname];
-        if (obj != null) {
-            obj[0][2] = x;
-            obj[0][3] = y;
-        }
-
-        return obj;
-    }
-
-    countProtoBlocks(name) {
-        // How many protoblocks are in palette name?
-        let n = 0;
-        for (const b in this.blocks.protoBlockDict) {
-            if (
-                this.blocks.protoBlockDict[b].palette !== null &&
-                this.blocks.protoBlockDict[b].palette.name === name
-            ) {
-                n += 1;
-            }
-        }
-
-        return n;
-    }
-
-    getProtoNameAndPalette(name) {
-        for (const b in this.blocks.protoBlockDict) {
-            // Don't return deprecated blocks.
-            if (
-                name === this.blocks.protoBlockDict[b].name &&
-                !this.blocks.protoBlockDict[b].hidden
-            ) {
-                return [
-                    b,
-                    this.blocks.protoBlockDict[b].palette.name,
-                    this.blocks.protoBlockDict[b].name
-                ];
-            } else if (name === b && !this.blocks.protoBlockDict[b].hidden) {
-                return [
-                    b,
-                    this.blocks.protoBlockDict[b].palette.name,
-                    this.blocks.protoBlockDict[b].name
-                ];
-            }
-        }
-
-        return [null, null, null];
-    }
-
-    makePalettes(i) {
-        const palette = docById("palette");
-        let listBody = palette.children[0].children[1].children[1];
-        listBody.parentNode.removeChild(listBody);
-        listBody = palette.children[0].children[1].appendChild(document.createElement("tbody"));
-        // Make an icon/button for each palette
-        this.makeButton(
-            "search",
-            makePaletteIcons(PALETTEICONS["search"], this.cellSize, this.cellSize),
-            listBody
-        );
-        for (const name of MULTIPALETTES[i]) {
-            if (beginnerMode && SKIPPALETTES.indexOf(name) !== -1) {
-                continue;
-            }
-            if (name === "myblocks") {
-                if (this.countProtoBlocks("myblocks") === 0) continue;
-            }
-            this.makeButton(
-                name,
-                makePaletteIcons(PALETTEICONS[name], this.cellSize, this.cellSize),
-                listBody
-            );
-        }
-    }
-
-    makeButton(name, icon, listBody) {
-        const row = listBody.insertRow(-1);
-        const img = row.insertCell(-1);
-        const label = row.insertCell(-1);
-        img.appendChild(icon);
-        img.style.padding = "4px";
-        img.style.boxSizing = "content-box";
-        img.style.width = `${this.cellSize}px`;
-        img.style.height = `${this.cellSize}px`;
-        label.textContent = toTitleCase(_(name));
-        label.style.color = platformColor.paletteText;
-        label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
-        label.style.padding = "4px";
-        row.style.display = "flex";
-        row.style.flexDirection = "row";
-        row.style.alignItems = "center";
-        row.style.width = "126px";
-
-        this._loadPaletteButtonHandler(name, row);
-    }
-
-    showPalette(name) {
-        if (this.mobile) {
-            return;
-        }
-
-        this.hideSearchWidget(true);
-        this.dict[name].showMenu(true);
-        this.activePalette = name;  // used to delete plugins
-    }
-
-    _showMenus() {}
-
-    _hideMenus() {
-        // Hide the menu buttons and the palettes themselves.
-
-        this.hideSearchWidget(true);
-
-        if (docById("PaletteBody"))
-            docById("PaletteBody").parentNode.removeChild(docById("PaletteBody"));
-    }
-
-    getInfo() {
-        for (const key in this.dict) {
-            console.debug(this.dict[key].getInfo());
-        }
-    }
-
-    updatePalettes(showPalette) {
-        if (showPalette != null) {
-            // Show the action palette after adding/deleting new
-            // nameddo blocks.
-            if (showPalette in this.dict) {
-                let wasOpen = false;
-                if (docById("PaletteBody")) {
-                    wasOpen = true;
-                }
-
-                this.dict[showPalette].hideMenu();
-
-                if (wasOpen) {
-                    this.dict[showPalette].show();
-                }
-            }
-        }
-        if (this.mobile) {
-            this.hide();
-        }
-    }
-
-    hide() {
-        docById("palette").style.visibility = "hidden";
-    }
-
-    show() {
-        docById("palette").style.visibility = "visible";
-    }
-
-    setBlocks(blocks) {
-        this.blocks = blocks;
-        return this;
-    }
-
-    add(name) {
-        this.dict[name] = new Palette(this, name);
-        return this;
-    }
-
-    // Palette Button event handlers
-    _loadPaletteButtonHandler(name, row) {
-        row.onmouseover = (evt) => {
-            if(name == "search"){
-                document.body.style.cursor = "text";
-            }
-            else{
-                document.body.style.cursor = "pointer";
-            }
-
-        };
-        row.onclick = (evt) => {
-            if (name == "search") {
-                this.showSearchWidget();
-            } else {
-                this.showPalette(name);
-            }
-        };
-        row.onmouseup = (evt) => {
-            document.body.style.cursor = "default";
-        };
-        row.onmouseleave = (evt) => {
-            document.body.style.cursor = "default";
-        };
-    }
-
-    removeActionPrototype(actionName) {
-        let blockRemoved = false;
-        for (let blk = 0; blk < this.dict["action"].protoList.length; blk++) {
-            const actionBlock = this.dict["action"].protoList[blk];
-            if (
-                ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(actionBlock.name) !==
-                    -1 &&
-                actionBlock.defaults[0] === actionName
-            ) {
-                // Remove the palette protoList entry for this block.
-                this.dict["action"].remove(actionBlock, actionName);
-
-                // And remove it from the protoBlock dictionary.
-                if (this.blocks.protoBlockDict["myDo_" + actionName]) {
-                    delete this.blocks.protoBlockDict["myDo_" + actionName];
-                } else if (this.blocks.protoBlockDict["myCalc_" + actionName]) {
-                    delete this.blocks.protoBlockDict["myCalc_" + actionName];
-                } else if (this.blocks.protoBlockDict["myDoArg_" + actionName]) {
-                    delete this.blocks.protoBlockDict["myDoArg_" + actionName];
-                } else if (this.blocks.protoBlockDict["myCalcArg_" + actionName]) {
-                    delete this.blocks.protoBlockDict["myCalcArg_" + actionName];
-                }
-                blockRemoved = true;
-                break;
-            }
-        }
-
-        // Force an update if a block was removed.
-        if (blockRemoved) {
-            this.updatePalettes("action");
-        }
-    }
+function makePaletteIcons(data, width, height) {
+    const img = new Image();
+    img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(data)));
+    if (width) img.width = width;
+    if (height) img.height = height;
+    return img;
 }
 
 // Kind of a model, but it only keeps a list of SVGs
@@ -526,6 +163,7 @@ class PaletteModel {
 
         const protoBlock = this.palettes.blocks.protoBlockDict[blkname];
         if (protoBlock === null) {
+            // eslint-disable-next-line no-console
             console.debug("Could not find block " + blkname);
         }
 
@@ -676,12 +314,13 @@ class PaletteModel {
                 docks = svg.docks;
                 height = svg.getHeight();
                 break;
-            default:
+            default: {
                 const obj = protoBlock.generator();
                 artwork = obj[0];
                 docks = obj[1];
                 height = obj[3];
                 break;
+            }
         }
 
         protoBlock.scale = saveScale;
@@ -689,7 +328,7 @@ class PaletteModel {
         if (protoBlock.disabled) {
             artwork = artwork
                 .replace(/fill_color/g, DISABLEDFILLCOLOR)
-                .replace(/stroke_color/g, DISABLEDSTROKECOLOR)
+                .replace(/stroke_color/g, DISABLEDFILLCOLOR)
                 .replace("block_label", safeSVG(label));
         } else {
             artwork = artwork
@@ -818,13 +457,6 @@ class Palette {
             header.appendChild(closeDownImg);
         }
 
-        const updateScrollBtnVisibility = () => {
-            const list = docById("PaletteBody_items");
-            upBtn.style.opacity = list.scrollTop === 0 ? "0" : "0.3";
-            dnBtn.style.opacity =
-                list.scrollTop >= list.scrollHeight - list.offsetHeight ? "0" : "0.3";
-        };
-
         const buttonContainers = document.createDocumentFragment();
         const upBtn = makePaletteIcons(UPICON, this.palettes.cellSize, this.palettes.cellSize);
         const dnBtn = makePaletteIcons(DOWNICON, this.palettes.cellSize, this.palettes.cellSize);
@@ -834,6 +466,14 @@ class Palette {
         dnBtn.style.bottom = "0";
         upBtn.style.zIndex = dnBtn.style.zIndex = "10";
         upBtn.style.transition = dnBtn.style.transition = "opacity 0.5s ease";
+
+        const updateScrollBtnVisibility = () => {
+            const list = docById("PaletteBody_items");
+            upBtn.style.opacity = list.scrollTop === 0 ? "0" : "0.3";
+            dnBtn.style.opacity =
+                list.scrollTop >= list.scrollHeight - list.offsetHeight ? "0" : "0.3";
+        };
+
         updateScrollBtnVisibility();
         docById("PaletteBody_items").onscroll = updateScrollBtnVisibility;
         buttonContainers.appendChild(upBtn);
@@ -920,9 +560,8 @@ class Palette {
                     document.removeEventListener("mousemove", onMouseMove);
                     img.onmouseup = null;
 
-                    let x, y;
-                    x = parseInt(img.style.left);
-                    y = parseInt(img.style.top);
+                    const x = parseInt(img.style.left);
+                    const y = parseInt(img.style.top);
 
                     img.style.position = posit;
                     img.style.zIndex = zInd;
@@ -961,7 +600,7 @@ class Palette {
     setupGrabScroll(paletteList) {
         let posY, top;
 
-        const mouseUpGrab = (evt) => {
+        const mouseUpGrab = () => {
             paletteList.onmousemove = null;
             document.body.style.cursor = "default";
         };
@@ -1032,6 +671,7 @@ class Palette {
 
     _makeBlockFromPalette(protoblk, blkname, callback) {
         if (protoblk === null) {
+            // eslint-disable-next-line no-console
             console.debug("null protoblk?");
             return;
         }
@@ -1052,6 +692,7 @@ class Palette {
                 break;
             case "storein2":
                 // Use the name of the box in the label
+                // eslint-disable-next-line no-console
                 console.debug(
                     "storein2" + " " + protoblk.defaults[0] + " " + protoblk.staticLabels[0]
                 );
@@ -1071,6 +712,7 @@ class Palette {
                     blkname = "namedbox";
                     arg = _("box");
                 } else {
+                    // eslint-disable-next-line no-console
                     console.debug(protoblk.defaults[0]);
                     blkname = protoblk.defaults[0];
                     arg = protoblk.defaults[0];
@@ -1221,6 +863,7 @@ class Palette {
             if (macroExpansion !== null) {
                 this.palettes.blocks.loadNewBlocks(macroExpansion);
                 const thisBlock = this.palettes.blocks.blockList.length - 1;
+                // eslint-disable-next-line no-unused-vars
                 const topBlk = this.palettes.blocks.findTopBlock(thisBlock);
             } else if (this.name === "myblocks") {
                 // If we are on the myblocks palette, it is a macro.
@@ -1282,28 +925,410 @@ class Palette {
     }
 }
 
+class Palettes {
+    constructor() {
+        this.blocks = null;
+        this.cellSize = null;
+        this.scrollDiff = 0;
+        this.originalSize = 55; // this is the original svg size
+        this.firstTime = true;
+        this.background = null;
+        this.mouseOver = false;
+        this.activePalette = null;
+        this.paletteObject = null;
+        this.paletteVisible = false;
+        this.pluginsDeleteStatus = false;
+        this.visible = true;
+        this.scale = 1.0;
+        this.mobile = false;
+        // Top of the palette
+        this.top = 55 + 20 + LEADING;
+        this.current = DEFAULTPALETTE;
+        this.x = []; // We track x and y for each of the multipalettes
+        this.y = [];
+        this.showSearchWidget = null;
+        this.hideSearchWidget = null;
+
+        this.pluginMacros = {}; // some macros are defined in plugins
+
+        if (sugarizerCompatibility.isInsideSugarizer()) {
+            // eslint-disable-next-line no-undef
+            storage = sugarizerCompatibility.data;
+        } else {
+            // eslint-disable-next-line no-undef
+            storage = localStorage;
+        }
+
+        // The collection of palettes.
+        this.dict = {};
+        this.selectorButtonsOff = []; // Select between palettes
+        this.selectorButtonsOn = []; // Select between palettes in their on state
+        this.buttons = {}; // The toolbar button for each palette.
+        this.labels = {}; // The label for each button.
+        this.pluginPalettes = []; // List of palettes not in multipalette list
+    }
+
+    init() {
+        this.halfCellSize = Math.floor(this.cellSize / 0.2);
+    }
+
+    init_selectors() {
+        for (let i = 0; i < MULTIPALETTES.length; i++) {
+            this._makeSelectorButton(i);
+        }
+    }
+
+    deltaY(dy) {
+        const curr = parseInt(document.getElementById("palette").style.top);
+        document.getElementById("palette").style.top = curr + dy + "px";
+    }
+
+    _makeSelectorButton(i) {
+        // eslint-disable-next-line no-console
+        console.debug("makeSelectorButton " + i);
+
+        if (!document.getElementById("palette")) {
+            const element = document.createElement("div");
+            element.id = "palette";
+            element.setAttribute("class", "disable_highlighting");
+            element.setAttribute(
+                "style",
+                "position: fixed; display: none ; left :0px; top:" + this.top + "px"
+            );
+            element.innerHTML =
+                '<div style="float: left"><table width ="' +
+                1.5 * this.cellSize +
+                'px"bgcolor="white"><thead><tr></tr></thead></table><table width ="' +
+                4.5 * this.cellSize +
+                'px"bgcolor="white"><thead><tr><td style= "width:28px"></tr></thead><tbody></tbody></table></div>';
+            element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
+            document.body.appendChild(element);
+        }
+        const tr = docById("palette").children[0].children[0].children[0].children[0];
+        const td = tr.insertCell();
+        td.width = 1.5 * this.cellSize;
+        td.height = 1.5 * this.cellSize;
+        td.style.position = "relative";
+        td.appendChild(
+            makePaletteIcons(
+                PALETTEICONS[MULTIPALETTEICONS[i]]
+                    .replace("background_fill_color", platformColor.selectorBackground)
+                    .replace(/stroke_color/g, platformColor.ruleColor)
+                    .replace(/fill_color/g, platformColor.background),
+                1.5 * this.cellSize,
+                1.5 * this.cellSize
+            )
+        );
+        const cover = document.createElement("div");
+        cover.style.position = "absolute";
+        cover.style.zIndex = "10";
+        cover.style.top = "0";
+        cover.style.width = "100%";
+        cover.style.height = "1px";
+        cover.style.background = platformColor.selectorBackground;
+        td.appendChild(cover);
+        td.onmouseover = () => {
+            this.showSelection(i, tr);
+            this.makePalettes(i);
+        };
+    }
+
+    showSelection(i, tr) {
+        //selector menu design.
+        for (let j = 0; j < MULTIPALETTES.length; j++) {
+            let img;
+            if (j === i) {
+                img = makePaletteIcons(
+                    PALETTEICONS[MULTIPALETTEICONS[j]]
+                        .replace("background_fill_color", platformColor.selectorSelected)
+                        .replace(/stroke_color/g, platformColor.ruleColor)
+                        .replace(/fill_color/g, platformColor.background),
+                    this.cellSize,
+                    this.cellSize
+                );
+                tr.children[j].children[1].style.background = platformColor.selectorSelected;
+            } else {
+                img = makePaletteIcons(
+                    PALETTEICONS[MULTIPALETTEICONS[j]]
+                        .replace("background_fill_color", platformColor.selectorBackground)
+                        .replace(/stroke_color/g, platformColor.ruleColor)
+                        .replace(/fill_color/g, platformColor.background),
+                    this.cellSize,
+                    this.cellSize
+                );
+                tr.children[j].children[1].style.background = platformColor.selectorBackground;
+            }
+            tr.children[j].children[0].src = img.src;
+        }
+    }
+
+    setSize(size) {
+        this.cellSize = Math.floor(size * PALETTE_SCALE_FACTOR + 0.5);
+        return this;
+    }
+
+    setMobile(mobile) {
+        this.mobile = mobile;
+        if (mobile) {
+            this._hideMenus();
+        }
+
+        return this;
+    }
+
+    setBlocksContainer(bloc) {
+        this.blocksContainer = bloc;
+        return this;
+    }
+
+    // We need access to the macro dictionary because we load them.
+    setMacroDictionary(obj) {
+        this.macroDict = obj;
+        return this;
+    }
+
+    setSearch(show, hide) {
+        this.showSearchWidget = show;
+        this.hideSearchWidget = hide;
+        return this;
+    }
+
+    getSearchPos() {
+        return [this.cellSize, this.top + this.cellSize * 1.75];
+    }
+
+    getPluginMacroExpansion(blkname, x, y) {
+        // eslint-disable-next-line no-console
+        console.debug(this.pluginMacros[blkname]);
+        const obj = this.pluginMacros[blkname];
+        if (obj != null) {
+            obj[0][2] = x;
+            obj[0][3] = y;
+        }
+
+        return obj;
+    }
+
+    countProtoBlocks(name) {
+        // How many protoblocks are in palette name?
+        let n = 0;
+        for (const b in this.blocks.protoBlockDict) {
+            if (
+                this.blocks.protoBlockDict[b].palette !== null &&
+                this.blocks.protoBlockDict[b].palette.name === name
+            ) {
+                n += 1;
+            }
+        }
+
+        return n;
+    }
+
+    getProtoNameAndPalette(name) {
+        for (const b in this.blocks.protoBlockDict) {
+            // Don't return deprecated blocks.
+            if (
+                name === this.blocks.protoBlockDict[b].name &&
+                !this.blocks.protoBlockDict[b].hidden
+            ) {
+                return [
+                    b,
+                    this.blocks.protoBlockDict[b].palette.name,
+                    this.blocks.protoBlockDict[b].name
+                ];
+            } else if (name === b && !this.blocks.protoBlockDict[b].hidden) {
+                return [
+                    b,
+                    this.blocks.protoBlockDict[b].palette.name,
+                    this.blocks.protoBlockDict[b].name
+                ];
+            }
+        }
+
+        return [null, null, null];
+    }
+
+    makePalettes(i) {
+        const palette = docById("palette");
+        let listBody = palette.children[0].children[1].children[1];
+        listBody.parentNode.removeChild(listBody);
+        listBody = palette.children[0].children[1].appendChild(document.createElement("tbody"));
+        // Make an icon/button for each palette
+        this.makeButton(
+            "search",
+            makePaletteIcons(PALETTEICONS["search"], this.cellSize, this.cellSize),
+            listBody
+        );
+        for (const name of MULTIPALETTES[i]) {
+            if (beginnerMode && SKIPPALETTES.indexOf(name) !== -1) {
+                continue;
+            }
+            if (name === "myblocks") {
+                if (this.countProtoBlocks("myblocks") === 0) continue;
+            }
+            this.makeButton(
+                name,
+                makePaletteIcons(PALETTEICONS[name], this.cellSize, this.cellSize),
+                listBody
+            );
+        }
+    }
+
+    makeButton(name, icon, listBody) {
+        const row = listBody.insertRow(-1);
+        const img = row.insertCell(-1);
+        const label = row.insertCell(-1);
+        img.appendChild(icon);
+        img.style.padding = "4px";
+        img.style.boxSizing = "content-box";
+        img.style.width = `${this.cellSize}px`;
+        img.style.height = `${this.cellSize}px`;
+        label.textContent = toTitleCase(_(name));
+        label.style.color = platformColor.paletteText;
+        label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
+        label.style.padding = "4px";
+        row.style.display = "flex";
+        row.style.flexDirection = "row";
+        row.style.alignItems = "center";
+        row.style.width = "126px";
+
+        this._loadPaletteButtonHandler(name, row);
+    }
+
+    showPalette(name) {
+        if (this.mobile) {
+            return;
+        }
+
+        this.hideSearchWidget(true);
+        this.dict[name].showMenu(true);
+        this.activePalette = name; // used to delete plugins
+    }
+
+    _showMenus() {}
+
+    _hideMenus() {
+        // Hide the menu buttons and the palettes themselves.
+        this.hideSearchWidget(true);
+
+        if (docById("PaletteBody"))
+            docById("PaletteBody").parentNode.removeChild(docById("PaletteBody"));
+    }
+
+    getInfo() {
+        for (const key in this.dict) {
+            // eslint-disable-next-line no-console
+            console.debug(this.dict[key].getInfo());
+        }
+    }
+
+    updatePalettes(showPalette) {
+        if (showPalette != null) {
+            // Show the action palette after adding/deleting new
+            // nameddo blocks.
+            if (showPalette in this.dict) {
+                let wasOpen = false;
+                if (docById("PaletteBody")) {
+                    wasOpen = true;
+                }
+
+                this.dict[showPalette].hideMenu();
+
+                if (wasOpen) {
+                    this.dict[showPalette].show();
+                }
+            }
+        }
+        if (this.mobile) {
+            this.hide();
+        }
+    }
+
+    hide() {
+        docById("palette").style.visibility = "hidden";
+    }
+
+    show() {
+        docById("palette").style.visibility = "visible";
+    }
+
+    setBlocks(blocks) {
+        this.blocks = blocks;
+        return this;
+    }
+
+    add(name) {
+        this.dict[name] = new Palette(this, name);
+        return this;
+    }
+
+    // Palette Button event handlers
+    _loadPaletteButtonHandler(name, row) {
+        row.onmouseover = () => {
+            if (name == "search") {
+                document.body.style.cursor = "text";
+            } else {
+                document.body.style.cursor = "pointer";
+            }
+        };
+        row.onclick = () => {
+            if (name == "search") {
+                this.showSearchWidget();
+            } else {
+                this.showPalette(name);
+            }
+        };
+        row.onmouseup = () => {
+            document.body.style.cursor = "default";
+        };
+        row.onmouseleave = () => {
+            document.body.style.cursor = "default";
+        };
+    }
+
+    removeActionPrototype(actionName) {
+        let blockRemoved = false;
+        for (let blk = 0; blk < this.dict["action"].protoList.length; blk++) {
+            const actionBlock = this.dict["action"].protoList[blk];
+            if (
+                ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(actionBlock.name) !==
+                    -1 &&
+                actionBlock.defaults[0] === actionName
+            ) {
+                // Remove the palette protoList entry for this block.
+                this.dict["action"].remove(actionBlock, actionName);
+
+                // And remove it from the protoBlock dictionary.
+                if (this.blocks.protoBlockDict["myDo_" + actionName]) {
+                    delete this.blocks.protoBlockDict["myDo_" + actionName];
+                } else if (this.blocks.protoBlockDict["myCalc_" + actionName]) {
+                    delete this.blocks.protoBlockDict["myCalc_" + actionName];
+                } else if (this.blocks.protoBlockDict["myDoArg_" + actionName]) {
+                    delete this.blocks.protoBlockDict["myDoArg_" + actionName];
+                } else if (this.blocks.protoBlockDict["myCalcArg_" + actionName]) {
+                    delete this.blocks.protoBlockDict["myCalcArg_" + actionName];
+                }
+                blockRemoved = true;
+                break;
+            }
+        }
+
+        // Force an update if a block was removed.
+        if (blockRemoved) {
+            this.updatePalettes("action");
+        }
+    }
+}
+
 async function initPalettes(palettes) {
     // Instantiate the palettes object on first load.
-
     for (let i = 0; i < BUILTINPALETTES.length; i++) {
         palettes.add(BUILTINPALETTES[i]);
     }
 
     palettes.init_selectors();
     palettes.makePalettes(0);
+    // eslint-disable-next-line no-console
     console.debug("Time to show the palettes.");
     palettes.show();
-}
-
-const MODEUNSURE = 0;
-const MODEDRAG = 1;
-const MODESCROLL = 2;
-const DECIDEDISTANCE = 20;
-
-function makePaletteIcons(data, width, height) {
-    const img = new Image();
-    img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(data)));
-    if (width) img.width = width;
-    if (height) img.height = height;
-    return img;
 }
