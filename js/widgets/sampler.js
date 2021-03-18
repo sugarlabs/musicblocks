@@ -10,46 +10,24 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /*
-   global , _, , getVoiceSynthName, NATURAL,
+   global _, getVoiceSynthName, NATURAL,
    DOUBLEFLAT, DOUBLESHARP, FLAT, SHARP, logo,docById, Singer, saveLocally, CUSTOMSAMPLES
  */
 
 /*
    Global locations
    - js/utils/utils.js
-        _, getTextWidth, docById, safeSVG, delayExecution, hideDOMLabel
+        _, docById
    - js/utils/musicutils.js
-        getNoiseSynthName, getVoiceSynthName, getDrumSynthName, updateTemperaments, TEMPERAMENT,
-        getModeNumbers, WESTERN2EISOLFEGENAMES, splitSolfege, i18nSolfege, DEFAULTTEMPERAMENT,
-        DEFAULTNOISE, OSCTYPES, DEFAULTOSCILLATORTYPE, FILTERTYPES, DEFAULTFILTERTYPE, TEMPERAMENTS,
-        DEFAULTVOICE, DEFAULTEFFECT, DEFAULTDRUM, INVERTMODES, DEFAULTINVERT, DEFAULTINTERVAL,
-        getNoiseName, getDrumName, splitScaleDegree, DEFAULTACCIDENTAL, DEFAULTMODE, SOLFNOTES
-        ACCIDENTALLABELS, ACCIDENTALNAMES, SOLFATTRS, EASTINDIANSOLFNOTES, PreDefinedTemperaments,
-        DEGREES, NATURAL, DOUBLEFLAT, DOUBLESHARP, FLAT, SHARP, RSYMBOLS, NSYMBOLS, SCALENOTES
-   - js/utils/synthutils.js
-        NOISENAMES, VOICENAMES, DRUMNAMES, EFFECTSNAMES
-   - js/turtledefs.js
-        NUMBERBLOCKDEFAULT
-   - js/artwork.js
-        EXPANDBUTTON, COLLAPSEBUTTON, PALETTESTROKECOLORS, PALETTEFILLCOLORS, COLLAPSETEXTY,
-        STANDARDBLOCKHEIGHT, COLLAPSETEXTX, MEDIASAFEAREA, VALUETEXTX, TEXTY, TEXTX, HIGHLIGHTSTROKECOLORS,
-        PALETTEHIGHLIGHTCOLORS
-   - js/protoblocks.js
-        ProtoBlock 
-   - js/js-export/export.js
+        , getVoiceSynthName, NATURAL, DOUBLEFLAT, DOUBLESHARP, FLAT, SHARP
    - js/logo.js
         logo
-   - js/piemenus.js
-        piemenuNumber, piemenuColor, piemenuNoteValue, piemenuBasic, piemenuBoolean, piemenuVoices,
-        piemenuIntervals, piemenuAccidentals, piemenuModes, piemenuPitches, piemenuCustomNotes,
-        piemenuBlockContext
    - js/activity.js
-        _THIS_IS_MUSIC_BLOCKS_, beginnerMode, _THIS_IS_MUSIC_BLOCKS_, trashcan, scrollBlockContainer, saveLocally
-   - js/utils/platformstyle.js
-        platformColor
+        saveLocally
         -js/utils/synthutils.js
         CUSTOMSAMPLES
  */
+
 /*exported SampleWidget*/
 class SampleWidget {
     static BUTTONDIVWIDTH = 476; // 8 buttons 476 = (55 + 4) * 8
@@ -236,11 +214,10 @@ class SampleWidget {
     }
 
     _draw(){
-
-        var canvas = this.sampleCanvas;
+        const canvas = this.sampleCanvas;
         const middle = SampleWidget.SAMPLEHEIGHT / 2 - 15;
 
-        var ctx = canvas.getContext("2d");
+        const ctx = canvas.getContext("2d");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.beginPath();
         ctx.strokeStyle = "#0000FF";
@@ -268,22 +245,21 @@ class SampleWidget {
     }
 
     __save() {
-        var that = this;
         setTimeout(() => {
             // console.debug("saving the sample");
 
-            that._addSample();
+            this._addSample();
 
-            var newStack = [
+            const newStack = [
                 [0, ["customsample", {value: [
-                    that.sampleName,
-                    that.sampleData,
+                    this.sampleName,
+                    this.sampleData,
                     "do",
                     4
                 ]}], 100, 100, [null, 1, 2, 3]],
-                [1, ["audiofile", {value: [that.sampleName, that.sampleData]}], 0 ,0, [0]],
-                [2, ["solfege", {value: that.samplePitch}], 0, 0, [0]],
-                [3, ["number", {value: that.sampleOctave}], 0, 0, [0]],
+                [1, ["audiofile", {value: [this.sampleName, this.sampleData]}], 0 ,0, [0]],
+                [2, ["solfege", {value: this.samplePitch}], 0, 0, [0]],
+                [3, ["number", {value: this.sampleOctave}], 0, 0, [0]],
             ];
 
             logo.blocks.loadNewBlocks(newStack);
@@ -326,11 +302,11 @@ class SampleWidget {
         widgetWindow.show();
 
         // For the button callbacks
-        var that = this;
 
-        widgetWindow.onclose = function() {
-            if (that._intervalID != null) {
-                clearInterval(that._intervalID);
+
+        widgetWindow.onclose = () => {
+            if (this._intervalID != null) {
+                clearInterval(this._intervalID);
             }
             this.destroy();
         };
@@ -368,16 +344,16 @@ class SampleWidget {
 
             const __readerAction = () => {
                 window.scroll(0, 0);
-                var sampleFile = fileChooser.files[0];
-                var reader = new FileReader;
+                const sampleFile = fileChooser.files[0];
+                const reader = new FileReader;
                 reader.readAsDataURL(sampleFile);
 
                 reader.onload = () => {
-                    var rawLog = reader.result;
-                    that.sampleData = rawLog;
-                    that.sampleName = fileChooser.files[0].name;
-                    that._addSample();
-                    that._draw();
+                    const rawLog = reader.result;
+                    this.sampleData = rawLog;
+                    this.sampleName = fileChooser.files[0].name;
+                    this._addSample();
+                    this._draw();
                 };
 
                 reader.onloadend = () => {
@@ -402,11 +378,11 @@ class SampleWidget {
             ""
         ).onclick = () => {
             // Debounce button
-            if (!that._get_save_lock()) {
-                that._save_lock = true;
-                that._saveSample();
-                setTimeout(function() {
-                    that._save_lock = false;
+            if (!this._get_save_lock()) {
+                this._save_lock = true;
+                this._saveSample();
+                setTimeout( () => {
+                    this._save_lock = false;
                 }, 1000);
             }
         };
@@ -530,21 +506,16 @@ class SampleWidget {
 
         const sol = this.samplePitch;
 
-        let attr, lev;
+        let lev;
         if (sol.indexOf(SHARP) != -1) {
-            attr = SHARP;
             lev = 1;
         } else if (sol.indexOf(FLAT) != -1) {
-            attr = FLAT;
             lev = -1;
         } else if (sol.indexOf(DOUBLEFLAT) != -1) {
-            attr = DOUBLEFLAT;
             lev = -2;
         } else if (sol.indexOf(DOUBLESHARP) != -1) {
-            attr = DOUBLESHARP;
             lev = 2;
         } else {
-            attr = "";
             lev = 0;
         }
         this.accidentalCenter = lev + 2;
@@ -579,13 +550,11 @@ class SampleWidget {
         this._updateBlocks();
 
 
-
         let finalCenter = 0;
 
         finalCenter += isNaN(this.octaveCenter)     ? 0 : this.octaveCenter*12;
         finalCenter += isNaN(this.pitchCenter)      ? 0 : SampleWidget.MAJORSCALE[this.pitchCenter];
         finalCenter += isNaN(this.accidentalCenter) ? 0 : this.accidentalCenter-2;
-
 
 
         const netChange = finalCenter-57;
