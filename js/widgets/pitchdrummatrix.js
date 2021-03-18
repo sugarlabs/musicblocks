@@ -250,6 +250,7 @@ class PitchDrumMatrix {
                 docById("pdmOuterDiv").style.height = "calc(100vh - 80px)";
                 docById("pdmOuterDiv").style.width = "calc(200vh - 64px)";
                 docById("pdmInnerDiv").style.width = "calc(200vh - 64px)";
+                docById("pdmInnerDiv").style.height= "calc(100vh - 80px)";
                 widgetWindow.getWidgetBody().style.left = "70px";
             } else {
                 widgetWindow.getWidgetBody().style.position = "relative";
@@ -604,7 +605,9 @@ class PitchDrumMatrix {
             },pairs.length*1000);
         }
         else{
-            logo.textMsg(_("Click in the grid to map notes to drums."));
+            if(!this.widgetWindow._maximized){
+                logo.textMsg(_("Click in the grid to map notes to drums."));
+            }
             icon.innerHTML =
                 '&nbsp;&nbsp;<img src="header-icons/' +
                 "play-button.svg" +
