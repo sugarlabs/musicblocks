@@ -250,9 +250,11 @@ function SampleWidget() {
               }
               canvasCtx.lineTo(canvas.width, canvas.height / 2 + verticalOffset);
               canvasCtx.stroke();
+              //.TRANS: A sound with the pitch that the sample is set to.
               let oscText = "Reference tone";
               if (turtleIdx > 0) {
-                      oscText = (this.sampleName != "")? this.sampleName : "Sample";
+                  //.TRANS: The sound sample that the user uploads.
+                  oscText = (this.sampleName != "")? this.sampleName : "Sample";
               }
               canvasCtx.fillStyle = "#000000";
               canvasCtx.fillText(oscText, 10, (turtleIdx) * ((numOfOscs-1)/2) * canvas.height + 10);
@@ -374,7 +376,7 @@ function SampleWidget() {
                     that.sampleData = rawLog;
                     that.sampleName = fileChooser.files[0].name;
                     that._addSample();
-                    that._draw();
+                    that.getSampleLength();
                 };
 
                 reader.onloadend = function() {
