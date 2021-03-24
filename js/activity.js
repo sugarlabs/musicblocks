@@ -3980,7 +3980,7 @@ function Activity() {
 
         x += dx;
 
-        hideBlocksContainer = _makeButton(SHOWBLOCKSBUTTON, _("Show/hide blocks"), x, y, btnSize, 0);
+        hideBlocksContainer = _makeButton(SHOWBLOCKSBUTTON, _("Show/hide block"), x, y, btnSize, 0);
         that._loadButtonDragHandler(hideBlocksContainer, x, y, _changeBlockVisibility);
 
         x += dx;
