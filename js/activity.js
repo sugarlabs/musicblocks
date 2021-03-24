@@ -3954,7 +3954,7 @@ function Activity() {
             docById("buttoncontainerBOTTOM").parentNode.removeChild(
                 docById("buttoncontainerBOTTOM")
             );
-        }
+        }  
         const btnSize = cellSize;
         // Lower right
         let x = this._innerWidth - 4 * btnSize - 27.5;
@@ -3980,7 +3980,7 @@ function Activity() {
 
         x += dx;
 
-        hideBlocksContainer = _makeButton(SHOWBLOCKSBUTTON, _("Show/hide block"), x, y, btnSize, 0);
+        hideBlocksContainer = _makeButton(SHOWBLOCKSBUTTON, _("Show/hide blocks"), x, y, btnSize, 0);
         that._loadButtonDragHandler(hideBlocksContainer, x, y, _changeBlockVisibility);
 
         x += dx;
@@ -4144,6 +4144,7 @@ function Activity() {
         container.onmouseover = (event) => {
             if (!loading) {
                 document.body.style.cursor = "pointer";
+                
             }
         };
 
@@ -4159,7 +4160,7 @@ function Activity() {
         container.appendChild(img);
         container.setAttribute(
             "style",
-            "position: absolute; right:" +
+            "position: absolute;right:" +
                 (document.body.clientWidth - x) +
                 "px;  top: " +
                 y +
@@ -4177,6 +4178,7 @@ function Activity() {
      * @param hoverAction extraLongImg
      */
     this._loadButtonDragHandler = function (container, ox, oy, action, actionClick, arg) {
+       
         container.onmousedown = function (event) {
             if (!loading) {
                 document.body.style.cursor = "default";
