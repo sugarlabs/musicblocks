@@ -121,7 +121,7 @@ function setupPitchActions() {
                     octave
                 );
                 const transposition_temp = 2 * delta_temp;
-                let invertedNote = getNote(
+                const invertedNote = getNote(
                     pitchName,
                     octave,
                     transposition_temp,

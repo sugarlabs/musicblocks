@@ -4519,8 +4519,8 @@ function Blocks(activity) {
         const myBlock = this.blockList[blk];
 
         if (["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "nthmodalpitch"].indexOf(
-                this.blockList[myBlock.connections[0]].name
-            ) !== -1 &&
+            this.blockList[myBlock.connections[0]].name
+        ) !== -1 &&
             this.blockList[myBlock.connections[0]].connections[2] === blk) {
             return true;
         }
@@ -5292,7 +5292,7 @@ function Blocks(activity) {
                         const value = args[1];
                         if (value.customTemperamentNotes !== undefined) {
                             TEMPERAMENT = {
-                            ...TEMPERAMENT, ...value.customTemperamentNotes
+                                ...TEMPERAMENT, ...value.customTemperamentNotes
                             };
                             for (const temp in value.customTemperamentNotes){
                                 if (!(temp in PreDefinedTemperaments)){

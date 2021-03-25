@@ -703,23 +703,23 @@ function setupToneBlocks() {
                 if (logo.blocks.blockList[blk].value === null) {
                     logo.blocks.blockList[blk].value = ["", "", "do", 4];
                 }
-                let cblk1 = logo.blocks.blockList[blk].connections[1];
+                const cblk1 = logo.blocks.blockList[blk].connections[1];
                 if (cblk1 != null) {
                     if (logo.blocks.blockList[cblk1].value !== null) {
-                        let namevalue = logo.blocks.blockList[cblk1].value[0];
-                        let datavalue = logo.blocks.blockList[cblk1].value[1];
+                        const namevalue = logo.blocks.blockList[cblk1].value[0];
+                        const datavalue = logo.blocks.blockList[cblk1].value[1];
                         logo.blocks.blockList[blk].value[0] = namevalue;
                         logo.blocks.blockList[blk].value[1] = datavalue;
                     }
                 }
-                let cblk2 = logo.blocks.blockList[blk].connections[2];
+                const cblk2 = logo.blocks.blockList[blk].connections[2];
                 if (cblk2 != null) {
-                    let svalue = logo.blocks.blockList[cblk2].value;
+                    const svalue = logo.blocks.blockList[cblk2].value;
                     logo.blocks.blockList[blk].value[2] = svalue;
                 }
-                let cblk3 = logo.blocks.blockList[blk].connections[3];
+                const cblk3 = logo.blocks.blockList[blk].connections[3];
                 if (cblk3 != null) {
-                    let ovalue = logo.blocks.blockList[cblk3].value;
+                    const ovalue = logo.blocks.blockList[cblk3].value;
                     logo.blocks.blockList[blk].value[3] = ovalue;
                 }
                 return logo.blocks.blockList[blk].value;

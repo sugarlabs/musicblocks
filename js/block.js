@@ -2561,7 +2561,7 @@ class Block {
                 if (that.name === "media") {
                     that._doOpenMedia(thisBlock);
                 } else if (that.name === "audiofile") {
-                      that._doOpenMedia(thisBlock);
+                    that._doOpenMedia(thisBlock);
                 } else if (that.name === "loadFile") {
                     that._doOpenMedia(thisBlock);
                 } else if (SPECIALINPUTS.indexOf(that.name) !== -1) {
@@ -3420,9 +3420,9 @@ class Block {
             const wrapValues = [];
 
             const WRAPMODES = [
-		// .TRANS: on2 should be translated as "on" as in on and off
+                // .TRANS: on2 should be translated as "on" as in on and off
                 [_("on2"), "on"],
-		// .TRANS: off should be translated as "off" as in on and off
+                // .TRANS: off should be translated as "off" as in on and off
                 [_("off"), "off"]
             ];
 

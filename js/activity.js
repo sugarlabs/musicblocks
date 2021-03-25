@@ -18,9 +18,9 @@
 let KeySignatureEnv = ["C", "major", false];
 
 function Activity() {
-    _THIS_IS_MUSIC_BLOCKS_ = true;
-    LEADING = 0;
-    _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
+    let _THIS_IS_MUSIC_BLOCKS_ = true;
+    let LEADING = 0;
+    let _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 
     const _ERRORMSGTIMEOUT_ = 15000;
     const _MSGTIMEOUT_ = 60000;
@@ -58,24 +58,20 @@ function Activity() {
 
     let saveLocally;
 
-    const that = this;
-
-    _doFastButton = this._doFastButton;
-    _doSlowButton = this._doSlowButton;
-    doHardStopButton = this.doHardStopButton;
-    _setupBlocksContainerEvents = this._setupBlocksContainerEvents;
-    getCurrentKeyCode = this.getCurrentKeyCode;
-    clearCurrentKeyCode = this.clearCurrentKeyCode;
-    onStopTurtle = this.onStopTurtle;
-    onRunTurtle = this.onRunTurtle;
-    doSave = this.doSave;
-    runProject = this.runProject;
-    loadProject = this.loadProject;
-    loadStartWrapper = this.loadStartWrapper;
-    showContents = this.showContents;
-    _loadStart = this._loadStart;
-    _setupAndroidToolbar = this._setupAndroidToolbar;
-    _loadButtonDragHandler = this._loadButtonDragHandler;
+    const that=this;
+    
+    this._doSlowButton;
+    this.doHardStopButton;
+    this._setupBlocksContainerEvents;
+    this.getCurrentKeyCode;
+    this.clearCurrentKeyCode;
+    this.onStopTurtle;
+    this.onRunTurthis.doSave;this.runProject;
+    this.loadProject;
+    this.loadStartWrapper;
+    this.showContents;this._loadStart;
+    this._setupAndroidToolbar;
+    this._loadButtonDragHandler;
 
     scrollBlockContainer = false;
 
@@ -1482,7 +1478,7 @@ function Activity() {
      */
     deletePlugin = function () {
         if (palettes.activePalette !== null) {
-            let obj = JSON.parse(storage.plugins);
+            const obj = JSON.parse(storage.plugins);
 
             if (palettes.activePalette in obj["PALETTEPLUGINS"]) {
                 delete obj["PALETTEPLUGINS"][palettes.activePalette];
@@ -1497,7 +1493,7 @@ function Activity() {
                 delete obj["PALETTEHIGHLIGHTCOLORS"][palettes.activePalette];
             }
             for (let i = 0; i < palettes.dict[palettes.activePalette].protoList.length; i++) {
-                let name = palettes.dict[palettes.activePalette].protoList[i]["name"];
+                const name = palettes.dict[palettes.activePalette].protoList[i]["name"];
                 if (name in obj["FLOWPLUGINS"]) {
                     console.log("deleting " + name);
                     delete obj["FLOWPLUGINS"][name];
@@ -3195,10 +3191,10 @@ function Activity() {
             typeof flags !== "undefined"
                 ? flags
                 : {
-                      run: false,
-                      show: false,
-                      collapse: false
-                  };
+                    run: false,
+                    show: false,
+                    collapse: false
+                };
         loading = true;
         document.body.style.cursor = "wait";
         doLoadAnimation();
@@ -3954,7 +3950,7 @@ function Activity() {
             docById("buttoncontainerBOTTOM").parentNode.removeChild(
                 docById("buttoncontainerBOTTOM")
             );
-        }  
+        }
         const btnSize = cellSize;
         // Lower right
         let x = this._innerWidth - 4 * btnSize - 27.5;

@@ -38,7 +38,7 @@ function SampleWidget() {
     this.accidentalCenter = 2;
     this.octaveCenter = 4;
     this.freqArray = new Uint8Array();
-    this.sampleLength = 1000
+    this.sampleLength = 1000;
 
     this._updateBlocks = function() {
         let mainSampleBlock;
@@ -175,55 +175,55 @@ function SampleWidget() {
     };
 
     this._usePitch = function () {
-        let number = SOLFEGENAMES.indexOf(this.pitchInput.value);
+        const number = SOLFEGENAMES.indexOf(this.pitchInput.value);
         this.pitchCenter = (number==-1) ? 0 : number;
         this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
-    }
+    };
 
     this._useAccidental = function () {
-        let number = ACCIDENTALNAMES.indexOf(this.accidentalInput.value);
+        const number = ACCIDENTALNAMES.indexOf(this.accidentalInput.value);
         this.accidentalCenter = (number==-1) ? 2 : number;
         this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
-    }
+    };
 
     this._useOctave = function () {
         this.octaveCenter = parseInt(this.octaveInput.value);
         this.octaveInput.value = this.octaveCenter;
-    }
+    };
 
     this._draw = function() {
 
-      let d = new Date();
-      var canvas = this.sampleCanvas;
-      let middle = SAMPLEHEIGHT / 2 - 15;
+        const d = new Date();
+        var canvas = this.sampleCanvas;
+        const middle = SAMPLEHEIGHT / 2 - 15;
 
-      var ctx = canvas.getContext("2d");
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.beginPath();
-      ctx.strokeStyle = '#0000FF';
-      ctx.lineWidth = 0;
+        var ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+        ctx.strokeStyle = "#0000FF";
+        ctx.lineWidth = 0;
 
-      let period = Math.floor(this.sampleData.length / SAMPLEWIDTH);
+        const period = Math.floor(this.sampleData.length / SAMPLEWIDTH);
 
-      for (let x=0; x < SAMPLEWIDTH; x++) {
-          let amplitude = 0;
-          let index = x*period+24;
-          //if (index < this.sampleData.length) {
-          //    amplitude = this.sampleData.charCodeAt(index) - 64;
-          //}
-          if (x < this.freqArray.length) {
-              amplitude = this.freqArray[x];
-          }
-          ctx.moveTo(x, middle - amplitude);
-          ctx.lineTo(x, middle + amplitude);
-          ctx.stroke();
-          ctx.fill();
-      }
-      ctx.closePath();
+        for (let x=0; x < SAMPLEWIDTH; x++) {
+            let amplitude = 0;
+            const index = x*period+24;
+            //if (index < this.sampleData.length) {
+            //    amplitude = this.sampleData.charCodeAt(index) - 64;
+            //}
+            if (x < this.freqArray.length) {
+                amplitude = this.freqArray[x];
+            }
+            ctx.moveTo(x, middle - amplitude);
+            ctx.lineTo(x, middle + amplitude);
+            ctx.stroke();
+            ctx.fill();
+        }
+        ctx.closePath();
 
-      ctx.font = "10px Verdana";
-      ctx.fillText(this.sampleName, 10, 10);
-    }
+        ctx.font = "10px Verdana";
+        ctx.fillText(this.sampleName, 10, 10);
+    };
 
     this.__save = function() {
         var that = this;
@@ -250,7 +250,7 @@ function SampleWidget() {
     };
 
     this._saveSample = function() {
-            this.__save();
+        this.__save();
     };
 
     this._get_save_lock = function() {
@@ -323,9 +323,9 @@ function SampleWidget() {
             _("Upload sample"),
             ""
         ).onclick = function() {
-            let fileChooser = docById("myOpenAll");
+            const fileChooser = docById("myOpenAll");
 
-            let __readerAction = function(event) {
+            const __readerAction = function(event) {
                 window.scroll(0, 0);
                 var sampleFile = fileChooser.files[0];
                 var reader = new FileReader;
@@ -342,17 +342,17 @@ function SampleWidget() {
                 reader.onloadend = function() {
                     if (reader.result) {
                         value = [fileChooser.files[0].name, reader.result];
-                  } else {
-                  }
-              };
-              fileChooser.removeEventListener("change", __readerAction);
-          };
+                    } else {
+                    }
+                };
+                fileChooser.removeEventListener("change", __readerAction);
+            };
 
-          fileChooser.addEventListener("change", __readerAction, false);
-          fileChooser.focus();
-          fileChooser.click();
-          window.scroll(0, 0);
-        }
+            fileChooser.addEventListener("change", __readerAction, false);
+            fileChooser.focus();
+            fileChooser.click();
+            window.scroll(0, 0);
+        };
 
         this._save_lock = false;
         widgetWindow.addButton(
@@ -476,11 +476,11 @@ function SampleWidget() {
             }
         }
         CUSTOMSAMPLES.push([this.sampleName, this.sampleData]);
-    }
+    };
 
     this._parseSamplePitch = function () {
 
-        let first_part = this.samplePitch.substring(0,2);
+        const first_part = this.samplePitch.substring(0,2);
         if (first_part === "so") {
             this.pitchCenter = 4;
         } else {
@@ -488,7 +488,7 @@ function SampleWidget() {
         }
         this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
 
-        let sol = this.samplePitch;
+        const sol = this.samplePitch;
 
         let attr, lev;
         if (sol.indexOf(SHARP) != -1) {
@@ -502,10 +502,10 @@ function SampleWidget() {
             lev = -2;
         } else if (sol.indexOf(DOUBLESHARP) != -1) {
             attr = DOUBLESHARP;
-            lev = 2
+            lev = 2;
         } else {
             attr = "";
-            lev = 0
+            lev = 0;
         }
         this.accidentalCenter = lev + 2;
         this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
@@ -513,21 +513,21 @@ function SampleWidget() {
         this.octaveCenter = this.sampleOctave;
         this.octaveInput.value = this.sampleOctave;
 
-    }
+    };
 
     this._updateSamplePitchValues = function () {
         this.samplePitch =
             SOLFEGENAMES[this.pitchCenter] +
             EXPORTACCIDENTALNAMES[this.accidentalCenter];
         this.sampleOctave = this.octaveCenter.toString();
-    }
+    };
 
 
     this.setTimbre = function () {
         this.originalSampleName = this.sampleName + "_original";
-        let sampleArray = [this.originalSampleName, this.sampleData, "la", 4];
+        const sampleArray = [this.originalSampleName, this.sampleData, "la", 4];
         Singer.ToneActions.setTimbre(sampleArray, 0, this.timbreBlock);
-    }
+    };
 
     this._playReferencePitch = function() {
 
@@ -548,8 +548,8 @@ function SampleWidget() {
 
 
 
-        let netChange = finalCenter-57;
-        let reffinalpitch = Math.floor(440 * Math.pow(2, netChange/12));
+        const netChange = finalCenter-57;
+        const reffinalpitch = Math.floor(440 * Math.pow(2, netChange/12));
 
         this._logo.synth.trigger(
             0,
@@ -562,12 +562,12 @@ function SampleWidget() {
 
         this.setTimbre();
         this._playDelayedSample();
-    }
+    };
 
     this._playSample = function () {
         if (this.sampleName != null && this.sampleName != "") {
 
-            let finalpitch = CENTERPITCHHERTZ;
+            const finalpitch = CENTERPITCHHERTZ;
 
             this._logo.synth.trigger(
                 0,
@@ -578,32 +578,32 @@ function SampleWidget() {
                 null,
                 false);
         }
-    }
+    };
 
     this._waitAndPlaySample = function () {
         return new Promise(resolve => {
             setTimeout(() => {
                 this._playSample();
-                resolve('played');
+                resolve("played");
                 this._endPlaying();
             }, SAMPLEWAITTIME);
         });
-    }
+    };
 
     this._playDelayedSample = async function () {
         const result = await this._waitAndPlaySample();
-    }
+    };
 
     this._waitAndEndPlaying = function () {
         return new Promise(resolve => {
             setTimeout(() => {
                 this.pause();
-                resolve('ended');
+                resolve("ended");
             }, this.sampleLength);
         });
-    }
+    };
 
     this._endPlaying = async function () {
         const result = await this._waitAndEndPlaying();
-    }
+    };
 }
