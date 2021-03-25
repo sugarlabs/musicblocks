@@ -14,10 +14,11 @@ function SampleWidget() {
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
     const SAMPLEWIDTH = 400;
-    const SAMPLEHEIGHT = 160;
+    const SAMPLEHEIGHT = 200;
     const EXPORTACCIDENTALNAMES = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];  // Don't include natural when construcing the note name;
     const ACCIDENTALNAMES = [DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP]; // but display it in the selector.
     const SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti", "do"];
+    const PITCHNAMES = ["C", "D", "E", "F", "G", "A", "B"];
     const MAJORSCALE = [0, 2, 4, 5, 7, 9, 11];
     const DEFAULTACCIDENTAL = "";
     const DEFAULTSOLFEGE = "do";
@@ -118,90 +119,18 @@ function SampleWidget() {
         }, SAMPLEINTERVAL);
     }
 
-    this.pitchUp = function () {
-        this._usePitch(this.pitchInput.value);
-        this.pitchCenter++;
-        if (this.pitchCenter > 6) {
-            this.octaveCenter++;
-            if (this.octaveCenter > MAXOCTAVE) {
-                this.octaveCenter = MAXOCTAVE;
-            }
-            this.octaveInput.value = this.octaveCenter;
-        }
-        this.pitchCenter%=7;
-        this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
-        this._playReferencePitch();
-    };
-
-    this.pitchDown = function () {
-        this._usePitch(this.pitchInput.value);
-        this.pitchCenter--;
-        if (this.pitchCenter < 0) {
-            this.pitchCenter = 6;
-            this.octaveCenter--;
-            if (this.octaveCenter < 0) {
-                this.octaveCenter = 0;
-            }
-            this.octaveInput.value = this.octaveCenter;
-        }
-        this.pitchCenter%=7;
-        this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
-        this._playReferencePitch();
-    };
-
-    this.accidentalUp = function () {
-        this._useAccidental(this.accidentalInput.value);
-        if (this.accidentalCenter < 4) {
-            this.accidentalCenter++;
-        }
-        this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
-        this._playReferencePitch();
-    };
-
-    this.accidentalDown = function () {
-        this._useAccidental(this.accidentalInput.value);
-        if (this.accidentalCenter > 0) {
-            this.accidentalCenter--;
-        }
-        this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
-        this._playReferencePitch();
-    };
-
-    this.octaveUp = function () {
-        this._useOctave(this.octaveInput.value);
-        this.octaveCenter++;
-        if (this.octaveCenter > MAXOCTAVE) {
-            this.octaveCenter = MAXOCTAVE;
-        }
-        this.octaveInput.value = this.octaveCenter;
-        this._playReferencePitch();
-    };
-
-    this.octaveDown = function () {
-        this._useOctave(this.octaveInput.value);
-        this.octaveCenter--;
-        if (this.octaveCenter < 0) {
-            this.octaveCenter = 0;
-        }
-        this.octaveInput.value = this.octaveCenter;
-        this._playReferencePitch();
-    };
-
-    this._usePitch = function () {
-        let number = SOLFEGENAMES.indexOf(this.pitchInput.value);
+    this._usePitch = function (p) {
+        let number = SOLFEGENAMES.indexOf(p);
         this.pitchCenter = (number==-1) ? 0 : number;
-        this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
     }
 
-    this._useAccidental = function () {
-        let number = ACCIDENTALNAMES.indexOf(this.accidentalInput.value);
+    this._useAccidental = function (a) {
+        let number = ACCIDENTALNAMES.indexOf(a);
         this.accidentalCenter = (number==-1) ? 2 : number;
-        this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
     }
 
-    this._useOctave = function () {
-        this.octaveCenter = parseInt(this.octaveInput.value);
-        this.octaveInput.value = this.octaveCenter;
+    this._useOctave = function (o) {
+        this.octaveCenter = parseInt(o);
     }
 
     this.getSampleLength = function() {
@@ -331,6 +260,14 @@ function SampleWidget() {
             if (that._intervalID != null) {
                 clearInterval(that._intervalID);
             }
+            docById("wheelDivptm").style.display = "none";
+            if (!this.pitchWheel === undefined){
+                this._pitchWheel.removeWheel();
+                this._exitWheel.removeWheel();
+                this._accidentalsWheel.removeWheel();
+                this._octavesWheel.removeWheel();
+            }
+
             this.destroy();
         };
 
@@ -394,6 +331,11 @@ function SampleWidget() {
           window.scroll(0, 0);
         }
 
+        this.pitchBtn = widgetWindow.addInputButton("C4", "");
+        this.pitchBtn.onclick = () => {
+            this._createPieMenu();
+        };
+
         this._save_lock = false;
         widgetWindow.addButton(
             "export-chunk.svg",
@@ -417,89 +359,17 @@ function SampleWidget() {
         this.bodyTable = document.createElement("table");
         this.widgetWindow.getWidgetBody().appendChild(this.bodyTable);
 
-        let r1, r2, r3, vCell;
-        for (let i = 0; i < 1; i++) {
-            this._directions.push(1);
-            this._widgetFirstTimes.push(this._logo.firstNoteTime);
-
-            r1 = this.bodyTable.insertRow();
-            r2 = this.bodyTable.insertRow();
-            r3 = this.bodyTable.insertRow();
-
-            widgetWindow.addButton(
-                "up.svg",
-                ICONSIZE,
-                _("pitch up"),
-                r1.insertCell()
-            ).onclick = ((i) => () => this.pitchUp(i))(i);
-
-            this.pitchInput = widgetWindow.addInputButton(this.pitchCenter, r2.insertCell());
-            this._usePitch(this.pitchInput.value);
-
-            widgetWindow.addButton(
-                "down.svg",
-                ICONSIZE,
-                _("pitch down"),
-                r3.insertCell()
-            ).onclick = ((i) => () => this.pitchDown(i))(i);
-
-
-            widgetWindow.addButton(
-                "up.svg",
-                ICONSIZE,
-                _("accidental up"),
-                r1.insertCell()
-            ).onclick = ((i) => () => this.accidentalUp(i))(i);
-
-            this.accidentalInput = widgetWindow.addInputButton(this.accidentalCenter, r2.insertCell());
-            this._useAccidental(this.accidentalInput.value);
-
-            widgetWindow.addButton(
-                "down.svg",
-                ICONSIZE,
-                _("accidental down"),
-                r3.insertCell()
-            ).onclick = ((i) => () => this.accidentalDown(i))(i);
-
-            widgetWindow.addButton(
-                "up.svg",
-                ICONSIZE,
-                _("octave up"),
-                r1.insertCell()
-            ).onclick = ((i) => () => this.octaveUp(i))(i);
-
-            this.octaveInput = widgetWindow.addInputButton(this.octaveCenter, r2.insertCell());
-            this._useOctave(this.octaveInput.value);
-
-            widgetWindow.addButton(
-                "down.svg",
-                ICONSIZE,
-                _("octave down"),
-                r3.insertCell()
-            ).onclick = ((i) => () => this.octaveDown(i))(i);
-
-
-            this.sampleCanvas = document.createElement("canvas");
-            this.sampleCanvas.style.width = SAMPLEWIDTH + "px";
-            this.sampleCanvas.style.height = SAMPLEHEIGHT + "px";
-            this.sampleCanvas.style.margin = "1px";
-            this.sampleCanvas.style.background = "rgba(255, 255, 255, 1)";
-            vCell = r1.insertCell();
-            vCell.appendChild(this.sampleCanvas);
-            vCell.setAttribute("rowspan", "3");
-
-            this.pitchInput.addEventListener(
-                "keyup",
-                ((id) => (e) => {
-                    if (e.keyCode === 13) {
-                        console.log("use pitch");
-                        this._usePitch(id);
-                    }
-                })
-            );
-        }
+        this.sampleCanvas = document.createElement("canvas");
+        this.sampleCanvas.style.width = SAMPLEWIDTH + "px";
+        this.sampleCanvas.style.height = SAMPLEHEIGHT + "px";
+        this.sampleCanvas.style.margin = "1px";
+        this.sampleCanvas.style.background = "rgba(255, 255, 255, 1)";
+        vCell = this.bodyTable.insertRow().insertCell();
+        vCell.appendChild(this.sampleCanvas);
+        vCell.setAttribute("rowspan", "3");
 
         this._parseSamplePitch();
+        this.getPitchName();
 
         this.setTimbre();
 
@@ -529,7 +399,7 @@ function SampleWidget() {
         } else {
             this.pitchCenter = SOLFEGENAMES.indexOf(first_part);
         }
-        this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
+        //this.pitchInput.value = SOLFEGENAMES[this.pitchCenter];
 
         let sol = this.samplePitch;
 
@@ -551,10 +421,10 @@ function SampleWidget() {
             lev = 0
         }
         this.accidentalCenter = lev + 2;
-        this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
+        //this.accidentalInput.value = ACCIDENTALNAMES[this.accidentalCenter];
 
         this.octaveCenter = this.sampleOctave;
-        this.octaveInput.value = this.sampleOctave;
+        //this.octaveInput.value = this.sampleOctave;
 
     }
 
@@ -576,22 +446,14 @@ function SampleWidget() {
 
     this._playReferencePitch = function() {
 
-        this._usePitch(this.pitchInput.value);
-        this._useAccidental(this.accidentalInput.value);
-        this._useOctave(this.octaveInput.value);
-
         this._updateSamplePitchValues();
         this._updateBlocks();
-
-
 
         let finalCenter = 0;
 
         finalCenter += isNaN(this.octaveCenter)     ? 0 : this.octaveCenter*12;
         finalCenter += isNaN(this.pitchCenter)      ? 0 : MAJORSCALE[this.pitchCenter];
         finalCenter += isNaN(this.accidentalCenter) ? 0 : this.accidentalCenter-2;
-
-
 
         let netChange = finalCenter-57;
         let reffinalpitch = Math.floor(440 * Math.pow(2, netChange/12));
@@ -654,16 +516,6 @@ function SampleWidget() {
         const result = await this._waitAndEndPlaying();
     }
 
-    this.arrayMax = function (arr) {
-        var len = arr.length, max = -Infinity;
-        while (len--) {
-            if (arr[len] > max) {
-                max = arr[len];
-            }
-        }
-        return max;
-    };
-
     this.reconnectSynthsToAnalyser = function () {
 
         //Make two pitchAnalysers for the ref tone and the sample.
@@ -689,4 +541,224 @@ function SampleWidget() {
             }
         }
     };
+
+    this._createPieMenu = function () {
+        docById("wheelDivptm").style.display = "";
+
+        const accidentals = ["𝄪", "♯", "♮", "♭", "𝄫"];
+        let noteLabels = ["ti", "la", "sol", "fa", "mi", "re", "do"];
+        const drumLabels = [];
+        let label;
+        for (let i = 0; i < DRUMS.length; i++) {
+            label = _(DRUMS[i]);
+            drumLabels.push(label);
+        }
+
+        let categories;
+        const colors = [];
+
+        this._pitchWheel = new wheelnav("wheelDivptm", null, 600, 600);
+        this._exitWheel = new wheelnav("_exitWheel", this._pitchWheel.raphael);
+
+        this._accidentalsWheel = new wheelnav("_accidentalsWheel", this._pitchWheel.raphael);
+        this._octavesWheel = new wheelnav("_octavesWheel", this._pitchWheel.raphael);
+
+        wheelnav.cssMode = true;
+
+        this._pitchWheel.keynavigateEnabled = false;
+        this._pitchWheel.slicePathFunction = slicePath().DonutSlice;
+        this._pitchWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+
+        this._pitchWheel.colors = platformColor.pitchWheelcolors;
+        this._pitchWheel.slicePathCustom.minRadiusPercent = 0.2;
+        this._pitchWheel.slicePathCustom.maxRadiusPercent = 0.5;
+
+
+        this._pitchWheel.sliceSelectedPathCustom = this._pitchWheel.slicePathCustom;
+        this._pitchWheel.sliceInitPathCustom = this._pitchWheel.slicePathCustom;
+
+        this._pitchWheel.animatetime = 0; // 300;
+        this._pitchWheel.createWheel(noteLabels);
+
+        this._exitWheel.colors = platformColor.exitWheelcolors;
+        this._exitWheel.slicePathFunction = slicePath().DonutSlice;
+        this._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        this._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
+        this._exitWheel.clickModeRotate = false;
+        this._exitWheel.createWheel(["×", " "]);
+
+        const accidentalLabels = [];
+        let octaveLabels = [];
+        let block, noteValue, octaveValue, accidentalsValue;
+
+        this._accidentalsWheel.colors = platformColor.accidentalsWheelcolors;
+        this._accidentalsWheel.slicePathFunction = slicePath().DonutSlice;
+        this._accidentalsWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._accidentalsWheel.slicePathCustom.minRadiusPercent = 0.5;
+        this._accidentalsWheel.slicePathCustom.maxRadiusPercent = 0.75;
+        this._accidentalsWheel.sliceSelectedPathCustom = this._accidentalsWheel.slicePathCustom;
+        this._accidentalsWheel.sliceInitPathCustom = this._accidentalsWheel.slicePathCustom;
+
+        for (let i = 0; i < accidentals.length; i++) {
+            accidentalLabels.push(accidentals[i]);
+        }
+
+        for (let i = 0; i < 9; i++) {
+            accidentalLabels.push(null);
+            this._accidentalsWheel.colors.push(platformColor.accidentalsWheelcolorspush);
+        }
+
+        this._accidentalsWheel.animatetime = 0; // 300;
+        this._accidentalsWheel.createWheel(accidentalLabels);
+        this._accidentalsWheel.setTooltips([
+            _("double sharp"),
+            _("sharp"),
+            _("natural"),
+            _("flat"),
+            _("double flat")
+        ]);
+
+        this._octavesWheel.colors = platformColor.octavesWheelcolors;
+        this._octavesWheel.slicePathFunction = slicePath().DonutSlice;
+        this._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        this._octavesWheel.slicePathCustom.minRadiusPercent = 0.75;
+        this._octavesWheel.slicePathCustom.maxRadiusPercent = 0.95;
+        this._octavesWheel.sliceSelectedPathCustom = this._octavesWheel.slicePathCustom;
+        this._octavesWheel.sliceInitPathCustom = this._octavesWheel.slicePathCustom;
+        octaveLabels = [
+            "8",
+            "7",
+            "6",
+            "5",
+            "4",
+            "3",
+            "2",
+            "1",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ];
+        this._octavesWheel.animatetime = 0; // 300;
+        this._octavesWheel.createWheel(octaveLabels);
+
+        const x = this.pitchBtn.getBoundingClientRect().x;
+        const y = this.pitchBtn.getBoundingClientRect().y;
+
+        docById("wheelDivptm").style.position = "absolute";
+        docById("wheelDivptm").style.height = "300px";
+        docById("wheelDivptm").style.width = "300px";
+        docById("wheelDivptm").style.left =
+            Math.min(
+                logo.blocks.turtles._canvas.width - 200,
+                Math.max(0, x * logo.blocks.getStageScale())
+            ) + "px";
+        docById("wheelDivptm").style.top =
+            Math.min(
+                logo.blocks.turtles._canvas.height - 250,
+                Math.max(0, y * logo.blocks.getStageScale())
+            ) + "px";
+
+
+        octaveValue = this.octaveCenter;
+        accidentalsValue = 2;
+        console.log(this.accidentalCenter);
+        accidentalsValue = 4 - this.accidentalCenter;
+        console.log(this.pitchCenter);
+        noteValue = 6 - this.pitchCenter;
+
+        this._accidentalsWheel.navigateWheel(accidentalsValue);
+        this._octavesWheel.navigateWheel(octaveLabels.indexOf(octaveValue.toString()));
+        this._pitchWheel.navigateWheel(noteValue);
+
+        this._exitWheel.navItems[0].navigateFunction = () => {
+            docById("wheelDivptm").style.display = "none";
+            this._pitchWheel.removeWheel();
+            this._exitWheel.removeWheel();
+            this._accidentalsWheel.removeWheel();
+            this._octavesWheel.removeWheel();
+        };
+
+        const __selectionChanged = () => {
+            let label = this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
+            let attr;
+            let octave;
+
+            attr = this._accidentalsWheel.navItems[this._accidentalsWheel.selectedNavItemIndex].title;
+
+
+            octave = Number(
+                this._octavesWheel.navItems[this._octavesWheel.selectedNavItemIndex].title
+            );
+
+            this._usePitch(label);
+            this._useAccidental(attr);
+            this._useOctave(octave);
+
+            this.getPitchName();
+
+        };
+
+        const __pitchPreview = () => {
+          /*
+            let label = this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
+            let timeout = 0;
+            let attr, octave, obj, tur;
+            attr = this._accidentalsWheel.navItems[this._accidentalsWheel.selectedNavItemIndex]
+                .title;
+            if (attr !== "♮") {
+                label += attr;
+            }
+            octave = Number(
+                this._octavesWheel.navItems[this._octavesWheel.selectedNavItemIndex].title
+            );
+            obj = getNote(
+                label,
+                octave,
+                0,
+                turtles.ithTurtle(0).singer.keySignature,
+                false,
+                null,
+                logo.errorMsg,
+                logo.synth.inTemperament
+            );
+            obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
+            logo.synth.setMasterVolume(PREVIEWVOLUME);
+            Singer.setSynthVolume(logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
+            logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 4, DEFAULTVOICE, null, null);
+            */
+            __selectionChanged();
+            this._playReferencePitch();
+        };
+
+        for (let i = 0; i < noteLabels.length; i++) {
+            this._pitchWheel.navItems[i].navigateFunction = __pitchPreview;
+        }
+
+        for (let i = 0; i < accidentals.length; i++) {
+            this._accidentalsWheel.navItems[i].navigateFunction = __pitchPreview;
+        }
+
+        for (let i = 0; i < 8; i++) {
+            this._octavesWheel.navItems[i].navigateFunction = __pitchPreview;
+        }
+
+    }
+
+    this.getPitchName = function () {
+        let name = "";
+        console.log(this.pitchCenter);
+        name = PITCHNAMES[this.pitchCenter];
+        name += EXPORTACCIDENTALNAMES[this.accidentalCenter];
+        name += this.octaveCenter.toString();
+        this.pitchName = name;
+        console.log(this.pitchName);
+
+        this.pitchBtn.value = this.pitchName;
+    }
 }
