@@ -821,7 +821,7 @@ function setupWidgetBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = function () {
-                logo.musicKeyboard.init(logo);
+                logo.musicKeyboard.init();
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
