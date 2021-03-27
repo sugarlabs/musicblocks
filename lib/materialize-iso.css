@@ -4231,7 +4231,7 @@ i.left {
 .backdrop {
   position: absolute;
   opacity: 0;
-  height: 5px;
+  height: 10px;
   width: 5px;
   border-radius: 0 0 50% 50%;
   background-color: #323232;
@@ -4239,6 +4239,7 @@ i.left {
   -webkit-transform-origin: 50% 0%;
   transform-origin: 50% 0%;
   visibility: hidden;
+  top:0;
 }
 .materialize-iso .btn,
 .materialize-iso .btn-large,
