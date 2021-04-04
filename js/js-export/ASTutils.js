@@ -673,12 +673,27 @@ class ASTUtils {
                 ASTs.push(ASTUtils._getIncrementStmntAST([flow[1][0], 1], true));
             } else if (flow[0] === "decrementOne") {
                 ASTs.push(ASTUtils._getIncrementStmntAST([flow[1][0], 1], false));
+            } else if (flow[0] === "storein") {
+                ASTs.push({
+                    type: "VariableDeclaration",
+                    kind: "var",
+                    declarations: [
+                        {
+                            type: "VariableDeclarator",
+                            id: {
+                                type: "Identifier",
+                                name: flow[1][0]
+                            },
+                            init: ASTUtils._getArgsAST([flow[1][1]])[0]
+                        }
+                    ]
+                });
             } else if (flow[0].split("_").length > 1) {
                 const [instruction, idName] = flow[0].split("_");
                 if (instruction === "storein2") {
                     ASTs.push({
                         type: "VariableDeclaration",
-                        kind: "let",
+                        kind: "var",
                         declarations: [
                             {
                                 type: "VariableDeclarator",
