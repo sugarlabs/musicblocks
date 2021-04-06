@@ -13,8 +13,8 @@ function SampleWidget() {
     const BUTTONDIVWIDTH = 476; // 8 buttons 476 = (55 + 4) * 8
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
-    const SAMPLEWIDTH = 400;
-    const SAMPLEHEIGHT = 200;
+    const SAMPLEWIDTH = 800;
+    const SAMPLEHEIGHT = 300;
     const EXPORTACCIDENTALNAMES = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];  // Don't include natural when construcing the note name;
     const ACCIDENTALNAMES = [DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP]; // but display it in the selector.
     const SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti", "do"];
@@ -146,8 +146,6 @@ function SampleWidget() {
     this._draw = function() {
 
       let turtle = turtles[0];
-      let width = SAMPLEWIDTH;
-      let height = SAMPLEHEIGHT;
       const canvas = this.sampleCanvas;
       const canvasCtx = canvas.getContext("2d");
       canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
@@ -233,10 +231,10 @@ function SampleWidget() {
         this._intervals = [];
         this.isMoving = false;
         this.pitchAnalysers = {};
+
         if (this._intervalID != undefined && this._intervalID != null) {
             clearInterval(this._intervalID);
         }
-
         this._intervalID = null;
 
         this._logo.synth.loadSynth(0, getVoiceSynthName(DEFAULTSAMPLE));
@@ -248,10 +246,11 @@ function SampleWidget() {
 
         var w = window.innerWidth;
 
-        var widgetWindow = window.widgetWindows.windowFor(this, "sample");
+        const widgetWindow = window.widgetWindows.windowFor(this, "sample");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
+
 
         // For the button callbacks
         var that = this;
@@ -353,20 +352,25 @@ function SampleWidget() {
             }
         };
 
-        this.bodyTable = document.createElement("table");
-        this.widgetWindow.getWidgetBody().appendChild(this.bodyTable);
+        widgetWindow.sendToCenter();
+        this.widgetWindow = widgetWindow;
 
-        this.bodyTable = document.createElement("table");
-        this.widgetWindow.getWidgetBody().appendChild(this.bodyTable);
+        const canvas = document.createElement("canvas");
+        canvas.width = SAMPLEWIDTH;
+        canvas.height = SAMPLEHEIGHT;
+        this.widgetWindow.getWidgetBody().appendChild(canvas);
+        const canvasCtx = canvas.getContext("2d");
+        canvasCtx.clearRect(0, 0, SAMPLEWIDTH, SAMPLEHEIGHT);
+        this.sampleCanvas = canvas;
 
-        this.sampleCanvas = document.createElement("canvas");
-        this.sampleCanvas.style.width = SAMPLEWIDTH + "px";
-        this.sampleCanvas.style.height = SAMPLEHEIGHT + "px";
-        this.sampleCanvas.style.margin = "1px";
-        this.sampleCanvas.style.background = "rgba(255, 255, 255, 1)";
-        vCell = this.bodyTable.insertRow().insertCell();
-        vCell.appendChild(this.sampleCanvas);
-        vCell.setAttribute("rowspan", "3");
+        // this.sampleCanvas = document.createElement("canvas");
+        // this.sampleCanvas.width = SAMPLEWIDTH + "px";
+        // this.sampleCanvas.height = SAMPLEHEIGHT + "px";
+        // this.sampleCanvas.style.margin = "0px";
+        // this.sampleCanvas.style.background = "rgba(255, 255, 255, 1)";
+        // this.widgetWindow.getWidgetBody().appendChild(this.sampleCanvas);
+        // const canvasCtx = this.sampleCanvas.getContext("2d");
+        // canvasCtx.clearRect(0, 0, SAMPLEWIDTH, SAMPLEHEIGHT);
 
         this._parseSamplePitch();
         this.getPitchName();
@@ -667,9 +671,7 @@ function SampleWidget() {
 
         octaveValue = this.octaveCenter;
         accidentalsValue = 2;
-        console.log(this.accidentalCenter);
         accidentalsValue = 4 - this.accidentalCenter;
-        console.log(this.pitchCenter);
         noteValue = 6 - this.pitchCenter;
 
         this._accidentalsWheel.navigateWheel(accidentalsValue);
@@ -752,12 +754,10 @@ function SampleWidget() {
 
     this.getPitchName = function () {
         let name = "";
-        console.log(this.pitchCenter);
         name = PITCHNAMES[this.pitchCenter];
         name += EXPORTACCIDENTALNAMES[this.accidentalCenter];
         name += this.octaveCenter.toString();
         this.pitchName = name;
-        console.log(this.pitchName);
 
         this.pitchBtn.value = this.pitchName;
     }
