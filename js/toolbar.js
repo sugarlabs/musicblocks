@@ -313,11 +313,15 @@ class Toolbar {
      * @returns {void}
      */
     renderNewProjectIcon(onclick) {
+        
         const newProjectIcon = docById("new-project");
-
         newProjectIcon.onclick = () => {
+            //docById("toolbars").style.display = "none";
+            //docById("wheelDiv").style.display = "none";
+            //docById("contextWheelDiv").style.display = "none";
             onclick();
         };
+
     }
 
     /**
