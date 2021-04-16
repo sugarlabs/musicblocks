@@ -2920,19 +2920,12 @@ function Activity() {
      * Sets up a new "clean" MB i.e. new project instance
      */
     _afterDelete = function () {
-
-        planet.saveLocally();
-        planet.initialiseNewProject();
-        that._loadStart();
-        planet.saveLocally();
-
-        /*
-        toolbar.closeAuxToolbar(_showHideAuxMenu);
-        sendAllToTrash(true, false);
         if (planet !== undefined) {
-            planet.initialiseNewProject.bind(planet);
-        }
-        */
+            planet.saveLocally();
+            planet.initialiseNewProject();
+            that._loadStart();
+            planet.saveLocally();
+        }  
     };
 
     /**
