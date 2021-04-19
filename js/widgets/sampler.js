@@ -14,7 +14,7 @@ function SampleWidget() {
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
     const SAMPLEWIDTH = 800;
-    const SAMPLEHEIGHT = 300;
+    const SAMPLEHEIGHT = 400;
     const EXPORTACCIDENTALNAMES = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];  // Don't include natural when construcing the note name;
     const ACCIDENTALNAMES = [DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP]; // but display it in the selector.
     const SOLFEGENAMES = ["do", "re", "mi", "fa", "sol", "la", "ti", "do"];
@@ -269,6 +269,9 @@ function SampleWidget() {
 
             this.destroy();
         };
+
+        document.getElementsByClassName("wfbToolbar")[0].style.backgroundColor = "#e8e8e8";
+        document.getElementsByClassName("wfbWidget")[0].style.backgroundColor = "#FFFFFF";
 
         this.playBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
         this.playBtn.onclick = () => {
