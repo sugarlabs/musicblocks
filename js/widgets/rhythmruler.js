@@ -323,7 +323,7 @@ class RhythmRuler {
                                 this._elapsedTimes[id] = 0;
                                 this._offsets[id] = 0;
                                 setTimeout(this._calculateZebraStripes(id), 1000);
-                            }
+			    }
                         } else if (this._playingOne === false) {
                             this._rulerSelected = id;
                             logo.turtleDelay = 0;
@@ -333,7 +333,7 @@ class RhythmRuler {
                             this._cellCounter = 0;
                             this._startingTime = null;
                             this._rulerPlaying = id;
-                            this.innerHTML =
+                            drumcell.innerHTML =
                                 '<img src="header-icons/pause-button.svg" title="' +
                                 _("Pause") +
                                 '" alt="' +
