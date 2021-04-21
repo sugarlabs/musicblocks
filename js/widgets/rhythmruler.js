@@ -18,8 +18,24 @@
    global TONEBPM, Singer, logo, _, delayExecution, docById, calcNoteValueToDisplay, platformColor,
    beginnerMode, last, EIGHTHNOTEWIDTH, nearestBeat, rationalToFraction, DRUMNAMES, VOICENAMES,
    EFFECTSNAMES
- */
-
+*/
+/*
+    Globals location
+    - js/logo.js
+        TONEBPM
+    - js/turtle-singer.js
+        Singer
+    - js/utils/utils.js
+        _,docById,delayExecution,last,nearestBeat,rationalToFraction
+    - js/utils/musicutils.js
+        calcNoteValueToDisplay,EIGHTHNOTEWIDTH
+    - js/utils/platformstyle.js
+        platformColor
+    - js/activity.js
+        beginnerMode
+    - js/utils/synthutils.js
+        DRUMNAMES,VOICENAMES,EFFECTSNAMES
+*/
 /* exported RhythmRuler */
 
 /**
@@ -284,12 +300,12 @@ class RhythmRuler {
                     iconSize +
                     '" />';
                 drumcell.className = "headcol"; // Position fixed when scrolling horizontally
-
+                drumcell.style.cursor = "pointer";
                 drumcell.onclick = ((id) => {
                     return () => {
                         if (this._playing) {
                             if (this._rulerPlaying === id) {
-                                this.innerHTML =
+                                drumcell.innerHTML =
                                     '<img src="header-icons/play-button.svg" title="' +
                                     _("Play") +
                                     '" alt="' +
@@ -307,31 +323,29 @@ class RhythmRuler {
                                 this._elapsedTimes[id] = 0;
                                 this._offsets[id] = 0;
                                 setTimeout(this._calculateZebraStripes(id), 1000);
-                            }
-                        } else {
-                            if (this._playingOne === false) {
-                                this._rulerSelected = id;
-                                logo.turtleDelay = 0;
-                                this._playing = true;
-                                this._playingOne = true;
-                                this._playingAll = false;
-                                this._cellCounter = 0;
-                                this._startingTime = null;
-                                this._rulerPlaying = id;
-                                this.innerHTML =
-                                    '<img src="header-icons/pause-button.svg" title="' +
-                                    _("Pause") +
-                                    '" alt="' +
-                                    _("Pause") +
-                                    '" height="' +
-                                    iconSize +
-                                    '" width="' +
-                                    iconSize +
-                                    '" vertical-align="middle">';
-                                this._elapsedTimes[id] = 0;
-                                this._offsets[id] = 0;
-                                this._playOne();
-                            }
+			    }
+                        } else if (this._playingOne === false) {
+                            this._rulerSelected = id;
+                            logo.turtleDelay = 0;
+                            this._playing = true;
+                            this._playingOne = true;
+                            this._playingAll = false;
+                            this._cellCounter = 0;
+                            this._startingTime = null;
+                            this._rulerPlaying = id;
+                            drumcell.innerHTML =
+                                '<img src="header-icons/pause-button.svg" title="' +
+                                _("Pause") +
+                                '" alt="' +
+                                _("Pause") +
+                                '" height="' +
+                                iconSize +
+                                '" width="' +
+                                iconSize +
+                                '" vertical-align="middle">';
+                            this._elapsedTimes[id] = 0;
+                            this._offsets[id] = 0;
+                            this._playOne();
                         }
                     };
                 })(i);
@@ -467,32 +481,35 @@ class RhythmRuler {
      * @returns {void}
      */
     _noteWidth(noteValue) {
-        const ans = Math.floor(EIGHTHNOTEWIDTH
-            * (8 / Math.abs(noteValue))
-            * (this.widgetWindow.isMaximized()? this._fullscreenScaleFactor: 3));
+        const ans = Math.floor(
+            EIGHTHNOTEWIDTH *
+                (8 / Math.abs(noteValue)) *
+                (this.widgetWindow.isMaximized() ? this._fullscreenScaleFactor : 3)
+        );
         return ans;
     }
 
     _scale() {
         if (this.widgetWindow.isMaximized()) {
             const width = this.widgetWindow.getWidgetBody().getBoundingClientRect().width;
-            this._fullscreenScaleFactor =
-                Math.floor(width / (EIGHTHNOTEWIDTH * 8));
+            this._fullscreenScaleFactor = Math.floor(width / (EIGHTHNOTEWIDTH * 8));
         }
         this._rulers.forEach((ruler) => {
             if (this.widgetWindow.isMaximized()) {
                 Array.prototype.forEach.call(ruler.children, (child) => {
                     child.style.width =
-                        Number(
-                            child.style.width.slice(0, child.style.width.indexOf("px")))
-                            * (this._fullscreenScaleFactor / 3) + "px";
+                        Number(child.style.width.slice(0, child.style.width.indexOf("px"))) *
+                            (this._fullscreenScaleFactor / 3) +
+                        "px";
                     child.style.minWidth = child.style.width;
                 });
             } else {
                 Array.prototype.forEach.call(ruler.children, (child) => {
                     child.style.width =
-                        Math.floor(Number(child.style.width.slice(0, child.style.width.indexOf("px")))
-                        / Math.floor(this._fullscreenScaleFactor / 3)) + "px";
+                        Math.floor(
+                            Number(child.style.width.slice(0, child.style.width.indexOf("px"))) /
+                                Math.floor(this._fullscreenScaleFactor / 3)
+                        ) + "px";
                     child.style.minWidth = child.style.width;
                 });
             }
@@ -802,8 +819,7 @@ class RhythmRuler {
             let obj;
             if (noteValue < 0) {
                 obj = rationalToFraction(Math.abs(Math.abs(-1 / noteValue)));
-                cell.innerHTML =
-                    calcNoteValueToDisplay(obj[1], obj[0]) + " " + _("silence");
+                cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]) + " " + _("silence");
             } else {
                 obj = rationalToFraction(Math.abs(Math.abs(1 / noteValue)));
                 cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
@@ -930,10 +946,7 @@ class RhythmRuler {
                 const noteValue = noteValues[cell.cellIndex];
                 if (noteValue < 0) {
                     obj = rationalToFraction(Math.abs(Math.abs(-1 / noteValue)));
-                    cell.innerHTML =
-                        calcNoteValueToDisplay(obj[1], obj[0]) +
-                        " " +
-                        _("silence");
+                    cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]) + " " + _("silence");
                 } else {
                     obj = rationalToFraction(Math.abs(Math.abs(1 / noteValue)));
                     cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
@@ -1256,10 +1269,7 @@ class RhythmRuler {
             newCell.style.maxHeight = newCell.style.height;
 
             newCell.style.backgroundColor = platformColor.selectorBackground;
-            newCell.innerHTML = calcNoteValueToDisplay(
-                oldCellNoteValue / inputNum,
-                1
-            );
+            newCell.innerHTML = calcNoteValueToDisplay(oldCellNoteValue / inputNum, 1);
 
             noteValues[newCellIndex] = oldCellNoteValue / inputNum;
             noteValues.splice(newCellIndex + 1, inputNum - 1);
