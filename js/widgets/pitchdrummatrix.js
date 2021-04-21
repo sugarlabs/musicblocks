@@ -550,6 +550,7 @@ class PitchDrumMatrix {
                 '" width="' +
                 PitchDrumMatrix.ICONSIZE +
                 '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+	    this._playing = false;
             return;
         }
         logo.synth.stop();
@@ -590,6 +591,7 @@ class PitchDrumMatrix {
                 this._playPitchDrum(ii, pairs);
             }
             setTimeout(() => {
+		this._playing = false;
                 icon.innerHTML =
                     '&nbsp;&nbsp;<img src="header-icons/' +
                     "play-button.svg" +
