@@ -688,14 +688,12 @@ table {
     left: 0px;
     top: 0px;
     right: 5em;
-    overflow-y: auto;
-    overflow-x: none;
     background: rgba(255, 255, 255, 0.85);
 }
 
 #pdmInnerDiv {
     overflow-x:auto;
-    margin-left: 53px;
+    overflow-y: auto;
 }
 
 #mkbDiv {
