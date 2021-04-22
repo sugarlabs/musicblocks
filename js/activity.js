@@ -2921,7 +2921,15 @@ function Activity() {
      */
     _afterDelete = function () {
         toolbar.closeAuxToolbar(_showHideAuxMenu);
-        sendAllToTrash(true, false);
+
+        if(turtles.running()){
+            that.doHardStopButton();
+        }
+
+        setTimeout(() => {
+            sendAllToTrash(true, false);
+        },1000);
+        
         if (planet !== undefined) {
             planet.initialiseNewProject.bind(planet);
         }
