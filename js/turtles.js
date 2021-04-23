@@ -114,14 +114,12 @@ class Turtles {
      * @returns {void}
      */
     add(startBlock, infoDict) {
-        if (startBlock != null) {
+        if (startBlock !== null) {
             // console.debug("adding a new turtle " + startBlock.name);
             if (startBlock.value !== this.turtleList.length) {
                 startBlock.value = this.turtleList.length;
                 // console.debug("turtle #" + startBlock.value);
             }
-        } else {
-            // console.debug("adding a new turtle: startBlock is null");
         }
 
         const blkInfoAvailable =
@@ -145,6 +143,11 @@ class Turtles {
 
         let i = this.turtleList.length % 10; // used for turtle (mouse) skin color
         this.turtleList.push(turtle); // add new turtle to turtle list
+
+        if (startBlock === null) {
+            // Hidden start block for when there are no start blocks
+            return
+        }
 
         if (startBlock.name === "start") {
             this.createArtwork(turtle, i, true);
@@ -533,6 +536,20 @@ Turtles.TurtlesModel = class {
             }
         }
         return i;
+    }
+
+    /**
+     * @returns number of turtles
+     * (excluding turtles in the trash and companion turtles)
+     */
+    turtleCount() {
+        let count = 0;
+        for (let t = 0; t < this._turtleList.length; t++) {
+            if (this.companionTurtle(t) === t && !this._turtleList[t].inTrash) {
+                count += 1;
+            }
+        }
+        return count;
     }
 };
 

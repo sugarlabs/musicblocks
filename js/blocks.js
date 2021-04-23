@@ -6139,7 +6139,7 @@ function Blocks(activity) {
      * @returns {void}
      */
     this.sendStackToTrash = function(myBlock) {
-        // First, hide the palettes as they will need updating.
+        // First, hide the palettes as they may need updating.
         for (const name in this.palettes.dict) {
             this.palettes.dict[name].hideMenu(true);
         }
@@ -6169,44 +6169,13 @@ function Blocks(activity) {
             this.addDefaultBlock(parentExpandableBlk, thisBlock);
         }
 
-        if (myBlock.name === "start" || myBlock.name === "drum") {
-            turtle = myBlock.value;
-            let turtleNotInTrash = 0;
-            for (let i = 0; i < this.turtles.turtleList.length; i++) {
-                if (!this.turtles.turtleList[i].inTrash) {
-                    // Don't count companion turtle.
-                    if (this.turtles.turtleList[i].companionTurtle === undefined) {
-                        turtleNotInTrash += 1;
-                    }
-                }
-            }
-
-            if (turtle != null && turtleNotInTrash > 1) {
-                console.debug("putting turtle " + turtle + " in the trash");
-                const comp = this.turtles.turtleList[turtle].companionTurtle;
-                if (comp){
-                    if (turtleNotInTrash > 2){
-                        this.turtles.turtleList[comp].inTrash = true;
-                        this.turtles.turtleList[comp].container.visible = false;
-                        this.turtles.turtleList[turtle].inTrash = true;
-                        this.turtles.turtleList[turtle].container.visible = false;
-                    }
-                } else {
-                    this.turtles.turtleList[turtle].inTrash = true;
-                    this.turtles.turtleList[turtle].container.visible = false;
-                }
-            } else {
-                this.errorMsg(_("You must always have at least one start block."));
-                console.debug("null turtle");
-                return;
-            }
-        } else if (myBlock.name === "action") {
+        if (myBlock.name === "action") {
             if (!myBlock.trash) {
                 this.deleteActionBlock(myBlock);
             }
         }
 
-        // put drag group in trash
+        // Put the drag group in trash.
         this.findDragGroup(thisBlock);
         for (let b = 0; b < this.dragGroup.length; b++) {
             const blk = this.dragGroup[b];

@@ -1372,7 +1372,9 @@ class Logo {
         (2) Execute the stack. (A bit complicated due to lots of corner cases)
         ===========================================================================
         */
-        if (startHere != null) {
+        if (this.turtles.turtleCount() === 0) {
+            this.errorMsg(NOACTIONERRORMSG, null, _('start'));
+        } else if (startHere != null) {
             // If a block to start from was passed, find its associated
             // turtle, i.e., which turtle should we use?
             let turtle = 0;
@@ -1462,18 +1464,7 @@ class Logo {
                 }
             }, delayStart);
         } else {
-            const tur = this.turtles.ithTurtle(turtle);
-
-            // console.debug("Empty start block: " + turtle + " " + tur.singer.suppressOutput);
-
-            if (tur.singer.suppressOutput || tur.singer.suppressOutput == undefined) {
-                // this.errorMsg(NOACTIONERRORMSG, null, _('start'));
-                tur.singer.suppressOutput = false;
-                this._checkingCompletionState = false;
-
-                // Reset cursor
-                document.body.style.cursor = "default";
-            }
+            document.body.style.cursor = "default";
         }
 
         this.refreshCanvas();
