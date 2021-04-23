@@ -127,6 +127,8 @@ class PitchDrumMatrix {
             widgetWindow.destroy();
         };
 
+        this.widgetWindow.onmaximize = this._scale;
+
         // We use an outer div to scroll vertically and an inner div to scroll horizontally.
         pdmTableDiv.innerHTML =
             '<div id="pdmOuterDiv"><div id="pdmInnerDiv"><table cellpadding="0px" id="pdmTable"></table></div></div>';
@@ -513,6 +515,31 @@ class PitchDrumMatrix {
                 }
             }
         }
+    }
+
+     /**
+     * @private
+     * @returns {void}
+     */
+      _scale() {
+        const windowHeight =
+            this.getWidgetFrame().offsetHeight - this.getDragElement().offsetHeight;
+        const widgetBody = this.getWidgetBody();
+        const scale = this.isMaximized? windowHeight / widgetBody.offsetHeight: 1;
+        widgetBody.style.display = "flex";
+        widgetBody.style.flexDirection = "column";
+        widgetBody.style.alignItems = "center";
+        widgetBody.children[0].style.display = "flex";
+        widgetBody.children[0].style.flexDirection = "column";
+        widgetBody.children[0].style.alignItems = "center";
+
+        const svg = this.getWidgetBody().getElementsByTagName("svg")[0];
+        svg.style.pointerEvents = "none";
+        svg.setAttribute("height", `${400 * scale}px`);
+        svg.setAttribute("width", `${400 * scale}px`);
+        setTimeout(() => {
+            svg.style.pointerEvents = "auto";
+        }, 100);
     }
 
     /**
