@@ -4618,7 +4618,7 @@ function Blocks(activity) {
 
         // Copy the selectedStack.
         this.selectedBlocksObj = JSON.parse(
-            JSON.stringify(this._copyBlocksToObj())
+            JSON.stringify(this._copyBlocksToObj(false))
         );
 
         // Reset paste offset.
@@ -4675,36 +4675,60 @@ function Blocks(activity) {
      */
     this.saveStack = function() {
         console.debug(this.selectedStack);
-        if (this.selectedStack == null) {
+        if (this.selectedStack === null) {
             return;
         }
 
-        const blockObjs = this._copyBlocksToObj();
-        // The first block is an action block. Its first connection is
-        // the block containing its label.
-        const nameBlk = blockObjs[0][4][1];
+        const blockObjs = this._copyBlocksToObj(true);
+        // If the first block is an action block, the its first
+        // connection is the block containing its label.
+        let name = "---";
+        if (["temperament1", "definemode", "action"].indexOf(blockObjs[0][1]) !== -1) {
+            const nameBlk = blockObjs[0][4][1];
+            if (nameBlk == null) {
+                console.debug("action not named... skipping");
+            } else {
+                if (typeof blockObjs[nameBlk][1][1] === "string") {
+                    name = blockObjs[nameBlk][1][1];
+                } else if (typeof blockObjs[nameBlk][1][1] === "number") {
+                    name = blockObjs[nameBlk][1][1].toString();
+                } else {
+                    name = blockObjs[nameBlk][1][1]["value"];
+                }
 
-        let name;
-        if (nameBlk == null) {
-            console.debug("action not named... skipping");
+            }
         } else {
-            if (typeof blockObjs[nameBlk][1][1] === "string") {
-                name = blockObjs[nameBlk][1][1];
-            } else if (typeof blockObjs[nameBlk][1][1] === "number") {
-                name = blockObjs[nameBlk][1][1].toString();
-            } else {
-                name = blockObjs[nameBlk][1][1]["value"];
+            // Look for "show", "turtleshell", or "customsample".
+            for (let i = 0; i < blockObjs.length; i++) {
+                if (["show", "turtleshell", "customsample"].indexOf(blockObjs[i][1]) !== -1) {
+                    switch(blockObjs[i][1]) {
+                        case "show":
+                            name =  _("show") + "-" + MathUtility.doRandom(0, 1000);
+                            break;
+                        case "turtleshell":
+                            name =  _("avatar") + "-" + MathUtility.doRandom(0, 1000);
+                            break;
+                        case "sample":
+                            name =  _("sample") + "-" + MathUtility.doRandom(0, 1000);
+                            break;
+                        default:
+                            name =  blockObjs[i][1] + "-" + MathUtility.doRandom(0, 1000);
+                            break;
+                    }
+                    break;
+                }
             }
-            storage.macros = prepareMacroExports(name, blockObjs, this.macroDict);
-            if (sugarizerCompatibility.isInsideSugarizer()) {
-                sugarizerCompatibility.saveLocally(function() {
-                    this.addToMyPalette(name, blockObjs);
-                    // this.palettes.updatePalettes('myblocks');
-                });
-            } else {
+        }
+
+        storage.macros = prepareMacroExports(name, blockObjs, this.macroDict);
+        if (sugarizerCompatibility.isInsideSugarizer()) {
+            sugarizerCompatibility.saveLocally(function() {
                 this.addToMyPalette(name, blockObjs);
-                this.palettes.updatePalettes("myblocks");
-            }
+                // this.palettes.updatePalettes('myblocks');
+            });
+        } else {
+            this.addToMyPalette(name, blockObjs);
+            this.palettes.updatePalettes("myblocks");
         }
     };
 
@@ -4713,7 +4737,8 @@ function Blocks(activity) {
      * @public
      * @returns blockObj
      */
-    this._copyBlocksToObj = function() {
+    this._copyBlocksToObj = function(saveStack) {
+        // If saveStack then don't override media or audiofile blocks.
         const blockObjs = [];
         const blockMap = {};
         let x;
@@ -4734,7 +4759,12 @@ function Blocks(activity) {
             if (myBlock.isValueBlock()) {
                 switch (myBlock.name) {
                     case "media":
-                        blockItem = [b, [myBlock.name, null], x, y, []];
+                    case "audiofile":
+                        if (saveStack) {
+                            blockItem = [b, [myBlock.name, { value: myBlock.value }], x, y, []];
+                        } else {
+                            blockItem = [b, [myBlock.name, null], x, y, []];
+                        }
                         break;
                     case "namedbox":
                     case "namedarg":
@@ -4757,7 +4787,7 @@ function Blocks(activity) {
         for (let b = 0; b < this.dragGroup.length; b++) {
             myBlock = this.blockList[this.dragGroup[b]];
             for (let c = 0; c < myBlock.connections.length; c++) {
-                if (myBlock.connections[c] == null) {
+                if (myBlock.connections[c] === null) {
                     blockObjs[b][4].push(null);
                 } else {
                     blockObjs[b][4].push(blockMap[myBlock.connections[c]]);

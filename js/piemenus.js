@@ -3131,7 +3131,7 @@ const piemenuBlockContext = function (block) {
     ];
 
     const topBlock = block.blocks.findTopBlock(blockBlock);
-    if (block.name === "action") {
+    if (["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].indexOf(block.name) !== -1) {
         labels.push("imgsrc:header-icons/save-blocks-button.svg");
     }
     const message = block.blocks.blockList[block.blocks.activeBlock].protoblock.helpString;
@@ -3159,7 +3159,7 @@ const piemenuBlockContext = function (block) {
     wheel.navItems[1].setTooltip(_("Extract"));
     wheel.navItems[2].setTooltip(_("Move to trash"));
     wheel.navItems[3].setTooltip(_("Close"));
-    if (block.blocks.blockList[topBlock].name === "action") {
+    if (["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].indexOf(block.blocks.blockList[topBlock].name) !== -1) {
         wheel.navItems[4].setTooltip(_("Save stack"));
     }
 
@@ -3197,7 +3197,7 @@ const piemenuBlockContext = function (block) {
         docById("contextWheelDiv").style.display = "none";
     };
 
-    if (block.name === "action") {
+    if (["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].indexOf(block.name) !== -1) {
         wheel.navItems[4].navigateFunction = function () {
             that.blocks.activeBlock = blockBlock;
             that.blocks.prepareStackForCopy();
