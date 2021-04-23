@@ -35,6 +35,8 @@ function GlobalTag(Planet) {
 	_('Sensors'),
 	//.TRANS: On the Planet, we use labels to tag projects.
 	_('Effects'),
+	//.TRANS: On the Planet, we use labels to tag projects.
+	_('Code Snippet'),
     ];
 
     this.id = null;
