@@ -147,14 +147,27 @@ function SampleWidget() {
 
       let turtle = turtles[0];
       const canvas = this.sampleCanvas;
+      const rect = this.widgetWindow._frame.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      // Updating the canvas width and height
+      // every frame can cause the window to gradually shrink or grow.
+      if (canvas.width < w - 100) {
+          canvas.width = w - 100
+      }
+      if (canvas.height < h - 100) {
+          canvas.height = h - 100
+      }
       const canvasCtx = canvas.getContext("2d");
-      canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+      canvasCtx.clearRect(0, 0, w, h);
       const numOfOscs = 2;
 
       const drawOscilloscope = () => {
+
           canvasCtx.fillStyle = "#FFFFFF";
           canvasCtx.font = "10px Verdana";
-          canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+          canvasCtx.fillRect(0, 0, w, h);
           canvasCtx.lineWidth = 2;
           for (let turtleIdx in [0, 1]) {
               const dataArray = this.pitchAnalysers[turtleIdx].getValue();
@@ -162,12 +175,12 @@ function SampleWidget() {
               const rbga = SAMPLEOSCCOLORS[turtleIdx];
               canvasCtx.strokeStyle = rbga;
               canvasCtx.beginPath();
-              const sliceWidth = (canvas.width) / bufferLength;
+              const sliceWidth = (w) / bufferLength;
               let x = 0;
-              let verticalOffset = (turtleIdx-0.5) * ((numOfOscs-1)/2) * canvas.height;
+              let verticalOffset = (turtleIdx-0.5) * ((numOfOscs-1)/2) * h;
 
               for (let i = 0; i < bufferLength; i++) {
-                  const y = (canvas.height / 2) * (1 - dataArray[i]) + verticalOffset;
+                  const y = (h / 2) * (1 - dataArray[i]) + verticalOffset;
                   if (i === 0) {
                       canvasCtx.moveTo(x, y);
                   } else {
@@ -175,7 +188,7 @@ function SampleWidget() {
                   }
                   x += sliceWidth;
               }
-              canvasCtx.lineTo(canvas.width, canvas.height / 2 + verticalOffset);
+              canvasCtx.lineTo(w, h / 2 + verticalOffset);
               canvasCtx.stroke();
               //.TRANS: A sound with the pitch that the sample is set to.
               let oscText = "Reference tone";
@@ -184,7 +197,7 @@ function SampleWidget() {
                   oscText = (this.sampleName != "")? this.sampleName : "Sample";
               }
               canvasCtx.fillStyle = "#000000";
-              canvasCtx.fillText(oscText, 10, (turtleIdx) * ((numOfOscs-1)/2) * canvas.height + 10);
+              canvasCtx.fillText(oscText, 10, (turtleIdx) * ((numOfOscs-1)/2) * h + 10);
           }
       };
       drawOscilloscope();
@@ -270,8 +283,8 @@ function SampleWidget() {
             this.destroy();
         };
 
-        document.getElementsByClassName("wfbToolbar")[0].style.backgroundColor = "#e8e8e8";
-        document.getElementsByClassName("wfbWidget")[0].style.backgroundColor = "#FFFFFF";
+        //document.getElementsByClassName("wfbToolbar")[0].style.backgroundColor = "#e8e8e8";
+        //document.getElementsByClassName("wfbWidget")[0].style.backgroundColor = "#FFFFFF";
 
         this.playBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
         this.playBtn.onclick = () => {
@@ -388,6 +401,7 @@ function SampleWidget() {
 
         widgetWindow.sendToCenter();
     };
+
 
     this._addSample = function() {
         for (i=0; i < CUSTOMSAMPLES.length; i++) {
