@@ -1112,7 +1112,28 @@ function Blocks(activity) {
 
                 this._makeNewBlockWithConnections("text", 0, [parentblk], postProcess, [parentblk, oldBlock]);
             }
-        } else if (this.blockList[parentblk].name === "pitch") {
+        } else if (this.blockList[parentblk].name === "temperament1") {
+            cblk = this.blockList[parentblk].connections[1];
+            if (cblk == null) {
+                const that = this;
+                const postProcess = function(args) {
+                    const parentblk = args[0];
+                    const oldBlock = args[1];
+
+                    const blk = that.blockList.length - 1;
+                    that.blockList[parentblk].connections[1] = blk;
+
+                    that.blockList[blk].value = that.blockList[oldBlock].value;
+
+                    that.blockList[blk].text.text = that.blockList[oldBlock].text.text;
+                    that.blockList[blk].container.updateCache();
+
+                    that.adjustDocks(parentblk, true);
+                };
+
+                this._makeNewBlockWithConnections("text", 0, [parentblk], postProcess, [parentblk, oldBlock]);
+            }
+        }else if (this.blockList[parentblk].name === "pitch") {
             cblk = this.blockList[parentblk].connections[2];
             if (cblk == null) {
                 /**
