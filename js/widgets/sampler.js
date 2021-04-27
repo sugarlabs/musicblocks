@@ -109,16 +109,6 @@ function SampleWidget() {
         this.isMoving = true;
     }
 
-    this.startOscilloscope = function() {
-        if (this._intervalID !== null) {
-            clearInterval(this._intervalID);
-        }
-
-        this._intervalID = setInterval(() => {
-            this._draw();
-        }, SAMPLEINTERVAL);
-    }
-
     this._usePitch = function (p) {
         let number = SOLFEGENAMES.indexOf(p);
         this.pitchCenter = (number==-1) ? 0 : number;
@@ -143,6 +133,7 @@ function SampleWidget() {
         }
     }
 
+    /*
     this._draw = function() {
 
       let turtle = turtles[0];
@@ -202,6 +193,7 @@ function SampleWidget() {
       };
       drawOscilloscope();
     }
+    */
 
     this.__save = function() {
         var that = this;
@@ -241,26 +233,26 @@ function SampleWidget() {
         this._widgetFirstTimes = [];
         this._widgetNextTimes = [];
         this._firstClickTimes = null;
-        this._intervals = [];
         this.isMoving = false;
         this.pitchAnalysers = {};
-
-        if (this._intervalID != undefined && this._intervalID != null) {
-            clearInterval(this._intervalID);
-        }
-        this._intervalID = null;
 
         this._logo.synth.loadSynth(0, getVoiceSynthName(DEFAULTSAMPLE));
         this.reconnectSynthsToAnalyser();
 
-        if (this._intervalID != null) {
-            clearInterval(this._intervalID);
+        this.pitchAnalysers = {};
+
+
+        this.running = true;
+        if (this.drawVisualIDs) {
+            for (const id of Object.keys(this.drawVisualIDs)) {
+                cancelAnimationFrame(this.drawVisualIDs[id]);
+            }
         }
 
-        var w = window.innerWidth;
-
+        this.drawVisualIDs = {};
         const widgetWindow = window.widgetWindows.windowFor(this, "sample");
         this.widgetWindow = widgetWindow;
+        this.divisions = [];
         widgetWindow.clear();
         widgetWindow.show();
 
@@ -268,10 +260,15 @@ function SampleWidget() {
         // For the button callbacks
         var that = this;
 
-        widgetWindow.onclose = function() {
-            if (that._intervalID != null) {
-                clearInterval(that._intervalID);
+        widgetWindow.onclose = () => {
+            if (this.drawVisualIDs) {
+                for (const id of Object.keys(this.drawVisualIDs)) {
+                    cancelAnimationFrame(this.drawVisualIDs[id]);
+                }
             }
+
+            this.running = false;
+
             docById("wheelDivptm").style.display = "none";
             if (!this.pitchWheel === undefined){
                 this._pitchWheel.removeWheel();
@@ -279,9 +276,11 @@ function SampleWidget() {
                 this._accidentalsWheel.removeWheel();
                 this._octavesWheel.removeWheel();
             }
-
-            this.destroy();
+            this.pitchAnalysers = {};
+            widgetWindow.destroy();
         };
+
+        widgetWindow.onmaximize = this._scale.bind(this);
 
         //document.getElementsByClassName("wfbToolbar")[0].style.backgroundColor = "#e8e8e8";
         //document.getElementsByClassName("wfbWidget")[0].style.backgroundColor = "#FFFFFF";
@@ -371,32 +370,14 @@ function SampleWidget() {
         widgetWindow.sendToCenter();
         this.widgetWindow = widgetWindow;
 
-        const canvas = document.createElement("canvas");
-        canvas.width = SAMPLEWIDTH;
-        canvas.height = SAMPLEHEIGHT;
-        this.widgetWindow.getWidgetBody().appendChild(canvas);
-        const canvasCtx = canvas.getContext("2d");
-        canvasCtx.clearRect(0, 0, SAMPLEWIDTH, SAMPLEHEIGHT);
-        this.sampleCanvas = canvas;
-
-        // this.sampleCanvas = document.createElement("canvas");
-        // this.sampleCanvas.width = SAMPLEWIDTH + "px";
-        // this.sampleCanvas.height = SAMPLEHEIGHT + "px";
-        // this.sampleCanvas.style.margin = "0px";
-        // this.sampleCanvas.style.background = "rgba(255, 255, 255, 1)";
-        // this.widgetWindow.getWidgetBody().appendChild(this.sampleCanvas);
-        // const canvasCtx = this.sampleCanvas.getContext("2d");
-        // canvasCtx.clearRect(0, 0, SAMPLEWIDTH, SAMPLEHEIGHT);
+        this._scale();
 
         this._parseSamplePitch();
         this.getPitchName();
 
         this.setTimbre();
 
-        this.startOscilloscope();
-
         this._logo.textMsg(_("Upload a sample and adjust its pitch center."));
-        this._draw();
         this.pause();
 
         widgetWindow.sendToCenter();
@@ -778,4 +759,78 @@ function SampleWidget() {
 
         this.pitchBtn.value = this.pitchName;
     }
+
+    this._scale = function () {
+        let width, height;
+        const canvas = document.getElementsByClassName("samplerCanvas");
+        Array.prototype.forEach.call(canvas, (ele) => {
+            this.widgetWindow.getWidgetBody().removeChild(ele);
+        });
+        if (!this.widgetWindow.isMaximized()) {
+            width = SAMPLEWIDTH;
+            height = SAMPLEHEIGHT;
+        } else {
+            width = this.widgetWindow.getWidgetBody().getBoundingClientRect().width;
+            height = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 70;
+        }
+        document.getElementsByTagName("canvas")[0].innerHTML = "";
+        this.makeCanvas(width, height, 0, true);
+        this.reconnectSynthsToAnalyser();
+    }
+
+    this.makeCanvas = function(width, height, turtleIdx, resized) {
+        const turtle = 0;
+        const canvas = document.createElement("canvas");
+        canvas.height = height;
+        canvas.width = width;
+        canvas.className = "samplerCanvas";
+        this.widgetWindow.getWidgetBody().appendChild(canvas);
+        const canvasCtx = canvas.getContext("2d");
+        canvasCtx.clearRect(0, 0, width, height);
+
+        const draw = () => {
+            this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
+            if (this.pitchAnalysers[turtleIdx] && (this.running || resized)) {
+                canvasCtx.fillStyle = "#FFFFFF";
+                canvasCtx.font = "10px Verdana";
+                this.verticalOffset = -canvas.height / 4;
+                this.zoomFactor = 40.0;
+                canvasCtx.fillRect(0, 0, width, height);
+
+                let oscText = "Sample";
+                if (turtleIdx > 0) {
+                    //.TRANS: The sound sample that the user uploads.
+                    oscText = (this.sampleName != "")? this.sampleName : "Sample";
+                }
+                canvasCtx.fillStyle = "#000000";
+                canvasCtx.fillText("Reference tone", 10, 10);
+                canvasCtx.fillText(oscText, 10, (canvas.height / 2) + 10);
+
+                for (let turtleIdx = 0; turtleIdx < 2; turtleIdx+= 1) {
+                    const dataArray = this.pitchAnalysers[turtleIdx].getValue();
+                    const bufferLength = dataArray.length;
+                    canvasCtx.lineWidth = 2;
+                    const rbga = SAMPLEOSCCOLORS[turtleIdx];
+                    canvasCtx.strokeStyle = rbga;
+                    canvasCtx.beginPath();
+                    const sliceWidth = (width * this.zoomFactor) / bufferLength;
+                    let x = 0;
+
+                    for (let i = 0; i < bufferLength; i++) {
+                        const y = (height / 2) * (1 - dataArray[i]) + this.verticalOffset;
+                        if (i === 0) {
+                            canvasCtx.moveTo(x, y);
+                        } else {
+                            canvasCtx.lineTo(x, y);
+                        }
+                        x += sliceWidth;
+                    }
+                    canvasCtx.lineTo(canvas.width, canvas.height / 2);
+                    canvasCtx.stroke();
+                    this.verticalOffset = canvas.height / 4
+                }
+            }
+        };
+        draw();
+    };
 }
