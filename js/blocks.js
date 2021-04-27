@@ -4517,16 +4517,21 @@ function Blocks(activity) {
         }
 
         const myBlock = this.blockList[blk];
-
-        if (["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "nthmodalpitch"].indexOf(
+        if (
+            myBlock.connections[0] !== null &&
+            ["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "nthmodalpitch"].indexOf(
                 this.blockList[myBlock.connections[0]].name
             ) !== -1 &&
-            this.blockList[myBlock.connections[0]].connections[2] === blk) {
+            this.blockList[myBlock.connections[0]].connections[2] === blk
+        ) {
             return true;
         }
 
-        if (this.blockList[myBlock.connections[0]].name === "customsample" &&
-            this.blockList[myBlock.connections[0]].connections[3] === blk) {
+        if (
+            myBlock.connections[0] !== null &&
+            this.blockList[myBlock.connections[0]].name === "customsample" &&
+            this.blockList[myBlock.connections[0]].connections[3] === blk
+        ) {
             return true;
         }
 
