@@ -842,8 +842,16 @@ function setupActionBlocks() {
 
             this.formBlock({
                 name: _("define temperament"),
-                args: 1
+                args: 1,
+                argLabels: [""],
+                defaults: ["custom"],
+                argTypes: ["text"]
             });
+            this.makeMacro((x, y) => [
+                [0, "temperament1", x, y, [null, 1, 2, null]],
+                [1, ["text", { value: "custom" }], 0, 0, [0]],
+                [2, "hidden", 0, 0, [0, null]]
+            ]);
             this.hidden = true;
         }
 
