@@ -72,8 +72,12 @@ function setupToneActions() {
             }
 
             if (!accounted && typeof instrument === "object"){
-                synth = "customsample_" + instrument[0];
-                CUSTOMSAMPLES[synth] = [instrument[1], instrument[2], instrument[3]];
+                if (instrument[0] != "") {
+                    synth = "customsample_" + instrument[0];
+                    CUSTOMSAMPLES[synth] = [instrument[1], instrument[2], instrument[3]];
+                } else {
+                    synth = "electronic synth";
+                }
             }
 
             if ((synth === undefined) || (synth === null)) {
