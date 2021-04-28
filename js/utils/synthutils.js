@@ -10,7 +10,7 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /*global _, last, Tone, require, TEMPERAMENT, pitchToNumber, getNoteFromInterval, FLAT, SHARP,
-pitchToFrequency, getCustomNote, octaveRatio, isCustom, Singer, DOUBLEFLAT, DOUBLESHARP,
+pitchToFrequency, getCustomNote, getOctaveRatio, isCustom, Singer, DOUBLEFLAT, DOUBLESHARP,
 DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform, getArticulation*/
 
 /*
@@ -18,11 +18,11 @@ DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform, getArticulation*/
     - js/utils/utils.js
         _, last
     - js/blocks.js
-        TEMPERAMENT, octaveRatio
+        TEMPERAMENT
     - js/utils/musicutils.js
         pitchToNumber, getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
         isCustom, DOUBLEFLAT, DOUBLESHARP, DEFAULTDRUM, getOscillatorTypes, numberToPitch,
-        getArticulation
+        getArticulation, getOctaveRatio
     - js/turtle-singer.js
         Singer
     - js/utils/platformstyle.js
@@ -604,7 +604,7 @@ function Synth() {
                             return Number(
                                 TEMPERAMENT[customID][pitchNumber][0] *
                                     startPitchFrequency *
-                                    Math.pow(octaveRatio, octaveDiff)
+                                    Math.pow(getOctaveRatio(), octaveDiff)
                             );
                         }
                     }

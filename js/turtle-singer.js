@@ -20,7 +20,7 @@
    isCustom, getStepSizeUp, getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
    _THIS_IS_MUSIC_BLOCKS_, logo, noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, noteToFrequency, TEMPERAMENT,
-   octaveRatio, rationalToFraction, stage
+   getOctaveRatio, rationalToFraction, stage
  */
 
 /*
@@ -30,7 +30,7 @@
     js/utils/musicutils.js
         frequencyToPitch, pitchToFrequency, getNote, isCustom, getStepSizeUp, getStepSizeDown,
         numberToPitch, pitchToNumber, noteIsSolfege, getSolfege, SOLFEGENAMES1,
-        SOLFEGECONVERSIONTABLE, getInterval, noteToFrequency, TEMPERAMENT, octaveRatio
+        SOLFEGECONVERSIONTABLE, getInterval, noteToFrequency, TEMPERAMENT, getOctaveRatio
     js/utils/utils.js
         rationalSum, _, rationalToFraction
     js/activity.js
@@ -1740,7 +1740,7 @@ class Singer {
                             ratio[k] = notesFrequency[k] / frequency;
                             number[k] = (
                                 pitchNumber *
-                                (Math.log10(ratio[k]) / Math.log10(octaveRatio))
+                                    (Math.log10(ratio[k]) / Math.log10(getOctaveRatio()))
                             ).toFixed(0);
                             numerator[k] = rationalToFraction(ratio[k])[0];
                             denominator[k] = rationalToFraction(ratio[k])[1];

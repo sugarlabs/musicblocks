@@ -16,8 +16,9 @@
 
 /*
    global platformColor, docById, wheelnav, slicePath, logo, Singer, isCustom,
-   TEMPERAMENT, octaveRatio: true, rationalToFraction, _, getNoteFromInterval,
-   FLAT, SHARP, pitchToFrequency, updateTemperaments, _buildScale
+   TEMPERAMENT, setOctaveRatio, setOctaveRatio, rationalToFraction, _,
+   getNoteFromInterval, FLAT, SHARP, pitchToFrequency, updateTemperaments,
+   _buildScale
  */
 
 /* exported TemperamentWidget */
@@ -1771,7 +1772,7 @@ class TemperamentWidget {
         }
 
         // Global value
-        octaveRatio = this.powerBase;
+        setOctaveRatio(this.powerBase);
 
         const value = logo.blocks.findUniqueTemperamentName(this.inTemperament);
         this.inTemperament = value; // change from temporary "custom" to "custom1" or "custom2" ..
@@ -1783,8 +1784,8 @@ class TemperamentWidget {
             [4, ["number", { value: this.frequencies[0] }], 0, 0, [2]],
             [5, ["octavespace"], 0, 0, [2, 6, 9]],
             [6, ["divide"], 0, 0, [5, 7, 8]],
-            [7, ["number", { value: rationalToFraction(octaveRatio)[0] }], 0, 0, [6]],
-            [8, ["number", { value: rationalToFraction(octaveRatio)[1] }], 0, 0, [6]],
+            [7, ["number", { value: rationalToFraction(getOctaveRatio())[0] }], 0, 0, [6]],
+            [8, ["number", { value: rationalToFraction(getOctaveRatio())[1] }], 0, 0, [6]],
             [9, "vspace", 0, 0, [5, 10]]
         ];
         let previousBlock = 9;

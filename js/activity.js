@@ -1,4 +1,4 @@
-// Copyright (c) 2014-20 Walter Bender
+// Copyright (c) 2014-21 Walter Bender
 // Copyright (c) Yash Khandelwal, GSoC'15
 // Copyright (c) 2016 Tymon Radzik
 //
@@ -3803,7 +3803,7 @@ function Activity() {
                             args = {
                                 customTemperamentNotes: custom,
                                 startingPitch: logo.synth.startingPitch,
-                                octaveSpace: octaveRatio
+                                octaveSpace: getOctaveRatio()
                             };
                         }
                         break;

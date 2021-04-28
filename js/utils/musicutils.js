@@ -1,4 +1,4 @@
-// Copyright (c) 2016-20 Walter Bender
+// Copyright (c) 2016-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -24,7 +24,7 @@
  */
 
 /* exported SYNTHSVG, RSYMBOLS, NOTENAMES, NOTENAMES1, WESTERN2EISOLFEGENAMES, PITCHES1,
-PITCHES3, SCALENOTES, EASTINDIANSOLFNOTES, DRUMS, GRAPHICS, SOLFATTRS, DEGREES, octaveRatio,
+PITCHES3, SCALENOTES, EASTINDIANSOLFNOTES, DRUMS, GRAPHICS, SOLFATTRS, DEGREES,
 RHYTHMRULERHEIGHT, SLIDERHEIGHT, SLIDERWIDTH, MATRIXLABELCOLOR, MATRIXNOTECELLCOLOR,
 MATRIXTUPLETCELLCOLOR, MATRIXRHYTHMCELLCOLOR, MATRIXBUTTONCOLORHOVER, MATRIXNOTECELLCOLORHOVER,
 MATRIXSOLFEWIDTH, EIGHTHNOTEWIDTH, MATRIXBUTTONHEIGHT, MATRIXBUTTONHEIGHT2, MATRIXSOLFEHEIGHT,
@@ -36,7 +36,7 @@ getOscillatorTypes, getDrumIcon, getDrumSynthName, getNoiseName, getNoiseIcon, g
 getVoiceName, getVoiceIcon, getVoiceSynthName, getTemperamentName, getStepSizeUp, getStepSizeDown,
 getModeLength, nthDegreeToPitch, getInterval, calcNoteValueToDisplay, durationToNoteValue,
 noteToFrequency, getSolfege, splitScaleDegree, getNumNote, calcOctave, calcOctaveInterval,
-isInt, convertFromSolfege, getPitchInfo, MATRIXBUTTONCOLOR, i18nSolfege, convertFactor*/
+isInt, convertFromSolfege, getPitchInfo, MATRIXBUTTONCOLOR, i18nSolfege, convertFactor, getOctaveRatio, setOctaveRatio*/
 
 // Scalable sinewave graphic
 const SYNTHSVG =
@@ -1213,6 +1213,14 @@ let TEMPERAMENT = {
             "perfect 8"
         ]
     }
+};
+
+const setOctaveRatio = (newOctaveRatio) => {
+    octaveRatio = newOctaveRatio;
+};
+
+const getOctaveRatio = () => {
+    return octaveRatio;
 };
 
 const updateTemperaments = () => {
