@@ -72,6 +72,7 @@ const COLLAPSIBLES = [
     "drum",
     "start",
     "action",
+    "temperament1",
     "matrix",
     "pitchdrummatrix",
     "rhythmruler2",
@@ -1419,6 +1420,13 @@ class Block {
                     case "start":
                         that.collapseText = new createjs.Text(
                             _("start"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
+                    case "temperament1":
+                        that.collapseText = new createjs.Text(
+                            _("temperament"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
