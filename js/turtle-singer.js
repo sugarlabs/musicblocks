@@ -19,7 +19,7 @@
    global DEFAULTVOLUME, TARGETBPM, TONEBPM, frequencyToPitch, last, pitchToFrequency, getNote,
    isCustom, getStepSizeUp, getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
    _THIS_IS_MUSIC_BLOCKS_, logo, noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
-   getInterval, instrumentsEffects, instrumentsFilters, _, noteToFrequency, TEMPERAMENT,
+   getInterval, instrumentsEffects, instrumentsFilters, _, noteToFrequency, getTemperament,
    getOctaveRatio, rationalToFraction, stage
  */
 
@@ -30,7 +30,7 @@
     js/utils/musicutils.js
         frequencyToPitch, pitchToFrequency, getNote, isCustom, getStepSizeUp, getStepSizeDown,
         numberToPitch, pitchToNumber, noteIsSolfege, getSolfege, SOLFEGENAMES1,
-        SOLFEGECONVERSIONTABLE, getInterval, noteToFrequency, TEMPERAMENT, getOctaveRatio
+        SOLFEGECONVERSIONTABLE, getInterval, noteToFrequency, getTemperament, getOctaveRatio
     js/utils/utils.js
         rationalSum, _, rationalToFraction
     js/activity.js
@@ -1729,7 +1729,7 @@ class Singer {
                         0,
                         null
                     );
-                    const pitchNumber = TEMPERAMENT[logo.synth.inTemperament].pitchNumber;
+                    const pitchNumber = getTemperament(logo.synth.inTemperament).pitchNumber;
                     const ratio = [];
                     const number = [];
                     const numerator = [];

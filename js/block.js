@@ -1,4 +1,4 @@
-// Copyright (c) 2014-20 Walter Bender
+﻿// Copyright (c) 2014-20 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -12,11 +12,11 @@
 
 /*
    global last, _, getNoiseSynthName, getVoiceSynthName, getDrumSynthName, updateTemperaments,
-   TEMPERAMENT, getTextWidth, getModeNumbers, WESTERN2EISOLFEGENAMES, splitSolfege, i18nSolfege,
+   getTemperamentKeys, getTextWidth, getModeNumbers, WESTERN2EISOLFEGENAMES, splitSolfege, i18nSolfege,
    docById, piemenuNumber, piemenuColor, piemenuNoteValue, piemenuBasic, platformColor,
    beginnerMode, piemenuBoolean, blockBlocks, DEFAULTTEMPERAMENT, NOISENAMES, DEFAULTNOISE, VOICENAMES,
    OSCTYPES, DEFAULTOSCILLATORTYPE, FILTERTYPES, topBlock, DISABLEDFILLCOLOR, DEFAULTFILTERTYPE, DRUMNAMES,
-   _THIS_IS_MUSIC_BLOCKS_, TEMPERAMENTS, piemenuVoices, DEFAULTVOICE, EFFECTSNAMES, DEFAULTEFFECT,
+   _THIS_IS_MUSIC_BLOCKS_, getTemperamentsList, piemenuVoices, DEFAULTVOICE, EFFECTSNAMES, DEFAULTEFFECT,
    DEFAULTDRUM, INVERTMODES, DEFAULTINVERT, piemenuIntervals, DEFAULTINTERVAL, createjs, EXPANDBUTTON,
    COLLAPSEBUTTON, ProtoBlock, getNoiseName, getDrumName, splitScaleDegree, DEFAULTACCIDENTAL, DEFAULTMODE, NUMBERBLOCKDEFAULT,
    PALETTESTROKECOLORS, PALETTEFILLCOLORS, DISABLEDSTROKECOLOR, safeSVG, ACCIDENTALLABELS, ACCIDENTALNAMES,
@@ -24,7 +24,8 @@
    piemenuCustomNotes, PreDefinedTemperaments, trashcan, scrollBlockContainer, piemenuBlockContext,
    COLLAPSETEXTY, STANDARDBLOCKHEIGHT, COLLAPSETEXTX, MEDIASAFEAREA, VALUETEXTX, TEXTY, DEGREES, NATURAL,
    DOUBLEFLAT, DOUBLESHARP, FLAT, SHARP, RSYMBOLS, NSYMBOLS, delayExecution, TEXTX, HIGHLIGHTSTROKECOLORS,
-   PALETTEHIGHLIGHTCOLORS, hideDOMLabel, SCALENOTES
+   PALETTEHIGHLIGHTCOLORS, hideDOMLabel, SCALENOTES, getTemperament, addTemperamentToDictionary,
+   deleteTemperamentFromList
  */
 
 /*
@@ -32,13 +33,15 @@
    - js/utils/utils.js
         _, getTextWidth, docById, safeSVG, delayExecution, hideDOMLabel
    - js/utils/musicutils.js
-        getNoiseSynthName, getVoiceSynthName, getDrumSynthName, updateTemperaments, TEMPERAMENT,
+        getNoiseSynthName, getVoiceSynthName, getDrumSynthName, updateTemperaments,
         getModeNumbers, WESTERN2EISOLFEGENAMES, splitSolfege, i18nSolfege, DEFAULTTEMPERAMENT,
-        DEFAULTNOISE, OSCTYPES, DEFAULTOSCILLATORTYPE, FILTERTYPES, DEFAULTFILTERTYPE, TEMPERAMENTS,
+        DEFAULTNOISE, OSCTYPES, DEFAULTOSCILLATORTYPE, FILTERTYPES, DEFAULTFILTERTYPE,
         DEFAULTVOICE, DEFAULTEFFECT, DEFAULTDRUM, INVERTMODES, DEFAULTINVERT, DEFAULTINTERVAL,
         getNoiseName, getDrumName, splitScaleDegree, DEFAULTACCIDENTAL, DEFAULTMODE, SOLFNOTES
         ACCIDENTALLABELS, ACCIDENTALNAMES, SOLFATTRS, EASTINDIANSOLFNOTES, PreDefinedTemperaments,
-        DEGREES, NATURAL, DOUBLEFLAT, DOUBLESHARP, FLAT, SHARP, RSYMBOLS, NSYMBOLS, SCALENOTES
+        DEGREES, NATURAL, DOUBLEFLAT, DOUBLESHARP, FLAT, SHARP, RSYMBOLS, NSYMBOLS, SCALENOTES,
+        getTemperamentsList, getTemperament, getTemperamentKeys, addTemperamentToDictionary,
+        deleteTemperamentFromList
    - js/utils/synthutils.js
         NOISENAMES, VOICENAMES, DRUMNAMES, EFFECTSNAMES
    - js/turtledefs.js
@@ -3077,7 +3080,7 @@ class Block {
                     piemenuPitches(this, solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
                 }
             } else {
-                const noteLabels = TEMPERAMENT;
+                const noteLabels = getTemperamentKeys();
 
                 const customLabels = [];
                 for (const lab in noteLabels)
@@ -3095,7 +3098,7 @@ class Block {
                 if (this.value != null) {
                     selectedNote = this.value;
                 } else {
-                    selectedNote = TEMPERAMENT[selectedCustom]["0"][1];
+                    selectedNote = getTemperament(selectedCustom)["0"][1];
                 }
 
                 piemenuCustomNotes(this, noteLabels, customLabels, selectedCustom, selectedNote);
@@ -3347,19 +3350,20 @@ class Block {
 
             const temperamentLabels = [];
             const temperamentValues = [];
-            for (let i = 0; i < TEMPERAMENTS.length; i++) {
+            const temperamentsList = getTemperamentsList();
+            for (let i = 0; i < temperamentsList.length; i++) {
                 // Skip custom temperament in Beginner Mode.
-                if (beginnerMode && TEMPERAMENTS[i][1] === "custom") {
+                if (beginnerMode && temperamentsList[i][1] === "custom") {
                     continue;
                 }
 
-                if (TEMPERAMENTS[i][0].length === 0) {
-                    temperamentLabels.push(TEMPERAMENTS[i][2]);
+                if (temperamentsList[i][0].length === 0) {
+                    temperamentLabels.push(temperamentsList[i][2]);
                 } else {
-                    temperamentLabels.push(TEMPERAMENTS[i][0]);
+                    temperamentLabels.push(temperamentsList[i][0]);
                 }
 
-                temperamentValues.push(TEMPERAMENTS[i][1]);
+                temperamentValues.push(temperamentsList[i][1]);
             }
 
             piemenuBasic(
@@ -3420,9 +3424,9 @@ class Block {
             const wrapValues = [];
 
             const WRAPMODES = [
-		// .TRANS: on2 should be translated as "on" as in on and off
+                // .TRANS: on2 should be translated as "on" as in on and off
                 [_("on2"), "on"],
-		// .TRANS: off should be translated as "off" as in on and off
+                // .TRANS: off should be translated as "off" as in on and off
                 [_("off"), "off"]
             ];
 
@@ -3538,7 +3542,7 @@ class Block {
                             );
                         } else {
                             const pitchNumbers = [];
-                            for (let i = 0; i < TEMPERAMENT[temperament]["pitchNumber"]; i++) {
+                            for (let i = 0; i < getTemperament(temperament)["pitchNumber"]; i++) {
                                 pitchNumbers.push(i);
                             }
                             piemenuNumber(this, pitchNumbers, this.value);
@@ -3882,12 +3886,20 @@ class Block {
                     // In case of custom temperament
                     uniqueValue = this.blocks.findUniqueCustomName(newValue);
                     newValue = uniqueValue;
-                    for (const pitchNumber in TEMPERAMENT["custom"]) {
+                    // eslint-disable-next-line no-case-declarations
+                    let customTemperament = getTemperament("custom");
+                    // eslint-disable-next-line no-case-declarations
+                    let modifiedTemperament = false;
+                    for (const pitchNumber in customTemperament) {
                         if (pitchNumber !== "pitchNumber") {
-                            if (oldValue == TEMPERAMENT["custom"][pitchNumber][1]) {
-                                TEMPERAMENT["custom"][pitchNumber][1] = newValue;
+                            if (oldValue === customTemperament[pitchNumber][1]) {
+                                customTemperament[pitchNumber][1] = newValue;
+                                modifiedTemperament = true;
                             }
                         }
+                    }
+                    if (modifiedTemperament) {
+                        addTemperamentToDictionary("custom", modifiedTemperament);
                     }
                     this.value = newValue;
                     // eslint-disable-next-line no-case-declarations
@@ -4083,9 +4095,9 @@ class Block {
                     break;
                 case "temperament1":
                     // eslint-disable-next-line no-case-declarations
-                    const temptemperament = TEMPERAMENT[oldValue];
-                    delete TEMPERAMENT[oldValue];
-                    TEMPERAMENT[newValue] = temptemperament;
+                    const temptemperament = getTemperament(oldValue);
+                    deleteTemperamentFromList(oldValue);
+                    addTemperamentToDictionary(newValue, temptemperament);
                     updateTemperaments();
                     break;
                 default:

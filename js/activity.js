@@ -3796,10 +3796,13 @@ function Activity() {
                     case "temperament1":
                         if (blocks.customTemperamentDefined) {
                             // If temperament block is present
-                            custom = {};
-                            for (const temp in TEMPERAMENT)
+                            // eslint-disable-next-line no-case-declarations
+                            let custom = {};
+                            // eslint-disable-next-line no-case-declarations
+                            let temperaments = getTemperamentKeys();
+                            for (const temp in temperaments)
                                 if (!(temp in PreDefinedTemperaments))
-                                    custom[temp] = TEMPERAMENT[temp];
+                                    custom[temp] = getTemperament(temp);
                             args = {
                                 customTemperamentNotes: custom,
                                 startingPitch: logo.synth.startingPitch,

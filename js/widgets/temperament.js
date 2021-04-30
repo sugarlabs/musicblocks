@@ -16,9 +16,9 @@
 
 /*
    global platformColor, docById, wheelnav, slicePath, logo, Singer, isCustom,
-   TEMPERAMENT, setOctaveRatio, setOctaveRatio, rationalToFraction, _,
+   getTemperament, setOctaveRatio, setOctaveRatio, rationalToFraction, _,
    getNoteFromInterval, FLAT, SHARP, pitchToFrequency, updateTemperaments,
-   _buildScale
+   _buildScale, getTemperamentKeys
  */
 
 /* exported TemperamentWidget */
@@ -140,7 +140,7 @@ class TemperamentWidget {
             _("Table")
         );
 
-        let t = TEMPERAMENT[this.inTemperament];
+        let t = getTemperament(this.inTemperament);
         this.pitchNumber = t.pitchNumber;
         this.octaveChanged = false;
         this.scale = this.scale[0] + " " + this.scale[1];
@@ -161,22 +161,22 @@ class TemperamentWidget {
         for (let i = 0; i <= this.pitchNumber; i++) {
             if (
                 isCustom(this.inTemperament) &&
-                TEMPERAMENT[this.inTemperament]["0"][1] !== undefined
+                    getTemperament(this.inTemperament)["0"][1] !== undefined
             ) {
                 //If temperament selected is custom and it is defined by user.
                 pitchNumber = i + "";
                 if (i === this.pitchNumber) {
                     this.notes[i] = [
-                        TEMPERAMENT[this.inTemperament]["0"][1],
-                        Number(TEMPERAMENT[this.inTemperament]["0"][2]) + 1
+                        getTemperament(this.inTemperament)["0"][1],
+                        Number(getTemperament(this.inTemperament)["0"][2]) + 1
                     ];
                     this.ratios[i] = this.powerBase;
                 } else {
                     this.notes[i] = [
-                        TEMPERAMENT[this.inTemperament][pitchNumber][1],
-                        TEMPERAMENT[this.inTemperament][pitchNumber][2]
+                        getTemperament(this.inTemperament)[pitchNumber][1],
+                        getTemperament(this.inTemperament)[pitchNumber][2]
                     ];
-                    this.ratios[i] = TEMPERAMENT[this.inTemperament][pitchNumber][0];
+                    this.ratios[i] = getTemperament(this.inTemperament)[pitchNumber][0];
                 }
                 this.frequencies[i] = logo.synth
                     .getCustomFrequency(
@@ -190,7 +190,7 @@ class TemperamentWidget {
                 if (isCustom(this.inTemperament)) {
                     // If temperament selected is custom and it is not defined by user
                     // then custom temperament behaves like equal temperament.
-                    t = TEMPERAMENT["equal"];
+                    t = getTemperament("equal");
                 }
                 str[i] = getNoteFromInterval(startingPitch, t.interval[i]);
                 this.notes[i] = str[i];
@@ -1688,9 +1688,9 @@ class TemperamentWidget {
         let selectedTemperament;
         let t, temperamentRatios, ratiosEqual;
 
-        for (const temperament in TEMPERAMENT) {
+        for (const temperament in getTemperamentKeys()) {
             if (!isCustom(temperament)) {
-                t = TEMPERAMENT[temperament];
+                t = getTemperament(temperament);
                 temperamentRatios = [];
                 for (let j = 0; j < t.interval.length; j++) {
                     intervals[j] = t.interval[j];

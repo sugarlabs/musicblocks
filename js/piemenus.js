@@ -16,7 +16,7 @@
    INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName, getMunsellColor,
    COLORS40, frequencyToPitch, KeySignatureEnv, instruments, DOUBLESHARP, NATURAL,
    DOUBLEFLAT, EQUIVALENTACCIDENTALS, FIXEDSOLFEGE, NOTENAMES, FIXEDSOLFEGE, NOTENAMES,
-   numberToPitch, nthDegreeToPitch, SOLFEGENAMES, _buildScale, TEMPERAMENT*/
+   numberToPitch, nthDegreeToPitch, SOLFEGENAMES, _buildScale, getTemperament*/
 
 /*
      Globals location
@@ -26,7 +26,8 @@
         FLAT, SHARP, DEFAULTVOICE, getDrumName, getNote, MODE_PIE_MENUS, MUSICALMODES, INTERVALVALUES,
         INTERVALS, getDrumSynthName, getVoiceSynthName, frequencyToPitch, DOUBLESHARP, NATURAL,
         DOUBLEFLAT, EQUIVALENTACCIDENTALS, FIXEDSOLFEGE, NOTENAMES, FIXEDSOLFEGE, NOTENAMES, numberToPitch,
-        nthDegreeToPitch, SOLFEGENAMES, _buildScale
+        nthDegreeToPitch, SOLFEGENAMES, _buildScale, getTemperament
+
      - js/utils/utils.js
         _, last, docById
      - js/turtle-singer.js
@@ -43,8 +44,6 @@
         blocks, KeySignatureEnv
      - js/logo.js
         PREVIEWVOLUME, DEFAULTVOLUME
-     - js/blocks.js
-        TEMPERAMENT
  */
 
 /*exported piemenuModes ,piemenuPitches, piemenuCustomNotes, piemenuGrid, piemenuBlockContext,
@@ -827,7 +826,7 @@ const piemenuCustomNotes = function (
         const note = that._cusNoteWheel.navItems[that._cusNoteWheel.selectedNavItemIndex].title;
         let note1;
         if (that.blocks.logo.customTemperamentDefined){
-            note1 = TEMPERAMENT[selectedCustom]
+            note1 = getTemperament(selectedCustom)
                 .filter(ele => ele[3] === note || ele[1] === note)[0][3];
         } else {
             note1 = note;

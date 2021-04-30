@@ -19,7 +19,7 @@
 Globals location
 
 - js/utils/musicutils.js
-    isCustom, TEMPERAMENT
+    isCustom, getTemperament
 
 - js/utils/utils.js
     _, last
@@ -770,7 +770,7 @@ const getStatsFromNotation = (logo) => {
                     let freq;
                     if (isCustom(logo.synth.inTemperament)) {
                         freq = logo.synth.getCustomFrequency(note, logo.synth.inTemperament);
-                        const test = TEMPERAMENT[logo.synth.inTemperament].filter(
+                        const test = getTemperament(logo.synth.inTemperament).filter(
                             (ele) => ele[3] === note.slice(0, note.length - 1)
                         );
                         if (test.length > 0) {

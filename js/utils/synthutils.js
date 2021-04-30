@@ -9,28 +9,29 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/*global _, last, Tone, require, TEMPERAMENT, pitchToNumber, getNoteFromInterval, FLAT, SHARP,
+/*
+global _, last, Tone, require, getTemperament, pitchToNumber, getNoteFromInterval, FLAT, SHARP,
 pitchToFrequency, getCustomNote, getOctaveRatio, isCustom, Singer, DOUBLEFLAT, DOUBLESHARP,
-DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform, getArticulation*/
+DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform, getArticulation
+*/
 
 /*
    Global Locations
     - js/utils/utils.js
         _, last
-    - js/blocks.js
-        TEMPERAMENT
     - js/utils/musicutils.js
         pitchToNumber, getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
         isCustom, DOUBLEFLAT, DOUBLESHARP, DEFAULTDRUM, getOscillatorTypes, numberToPitch,
-        getArticulation, getOctaveRatio
+        getArticulation, getOctaveRatio, getTemperament
     - js/turtle-singer.js
         Singer
     - js/utils/platformstyle.js
         platform
 */
 
-/*exported NOISENAMES, VOICENAMES, DRUMNAMES, EFFECTSNAMES, CUSTOMSAMPLES,
-instrumentsEffects, instrumentsFilters, Synth*/
+/* exported NOISENAMES, VOICENAMES, DRUMNAMES, EFFECTSNAMES, CUSTOMSAMPLES,
+instrumentsEffects, instrumentsFilters, Synth
+*/
 
 const POLYCOUNT = 3;
 
@@ -371,7 +372,7 @@ function Synth() {
 
     this.temperamentChanged = function (temperament, startingPitch) {
         let startPitch = startingPitch;
-        const t = TEMPERAMENT[temperament];
+        const t = getTemperament(temperament);
         const len = startPitch.length;
         const number = pitchToNumber(
             startPitch.substring(0, len - 1),
@@ -593,16 +594,16 @@ function Synth() {
                 // eslint-disable-next-line
                 oneNote = oneNote;
             } else {
-                for (const pitchNumber in TEMPERAMENT[customID]) {
+                for (const pitchNumber in getTemperament(customID)) {
                     if (pitchNumber !== "pitchNumber") {
                         if (
                             (isCustom(customID) &&
-                                oneNote == TEMPERAMENT[customID][pitchNumber][3]) ||
-                            oneNote == TEMPERAMENT[customID][pitchNumber][1]
+                             oneNote == getTemperament(customID)[pitchNumber][3]) ||
+				oneNote == getTemperament(customID)[pitchNumber][1]
                         ) {
-                            const octaveDiff = octave - TEMPERAMENT[customID][pitchNumber][2];
+                            const octaveDiff = octave - getTemperament(customID)[pitchNumber][2];
                             return Number(
-                                TEMPERAMENT[customID][pitchNumber][0] *
+                                getTemperament(customID)[pitchNumber][0] *
                                     startPitchFrequency *
                                     Math.pow(getOctaveRatio(), octaveDiff)
                             );

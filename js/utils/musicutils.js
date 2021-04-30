@@ -29,14 +29,16 @@ RHYTHMRULERHEIGHT, SLIDERHEIGHT, SLIDERWIDTH, MATRIXLABELCOLOR, MATRIXNOTECELLCO
 MATRIXTUPLETCELLCOLOR, MATRIXRHYTHMCELLCOLOR, MATRIXBUTTONCOLORHOVER, MATRIXNOTECELLCOLORHOVER,
 MATRIXSOLFEWIDTH, EIGHTHNOTEWIDTH, MATRIXBUTTONHEIGHT, MATRIXBUTTONHEIGHT2, MATRIXSOLFEHEIGHT,
 NOTESYMBOLS, SELECTORSTRINGS, ACCIDENTALLABELS, ACCIDENTALNAMES, ACCIDENTALVALUES, INTERVALS,
-MODE_PIE_MENUS, TEMPERAMENT, updateTemperaments, DEFAULTINVERT, DEFAULTINTERVAL, DEFAULTEFFECT,
+MODE_PIE_MENUS, updateTemperaments, DEFAULTINVERT, DEFAULTINTERVAL, DEFAULTEFFECT,
 DEFAULTMODE, DEFAULTOSCILLATORTYPE, DEFAULTACCIDENTAL, getInvertMode, getIntervalNumber,
 getIntervalDirection, getModeNumbers, getDrumIndex, getDrumName, getDrumSymbol, getFilterTypes,
 getOscillatorTypes, getDrumIcon, getDrumSynthName, getNoiseName, getNoiseIcon, getNoiseSynthName,
 getVoiceName, getVoiceIcon, getVoiceSynthName, getTemperamentName, getStepSizeUp, getStepSizeDown,
 getModeLength, nthDegreeToPitch, getInterval, calcNoteValueToDisplay, durationToNoteValue,
 noteToFrequency, getSolfege, splitScaleDegree, getNumNote, calcOctave, calcOctaveInterval,
-isInt, convertFromSolfege, getPitchInfo, MATRIXBUTTONCOLOR, i18nSolfege, convertFactor, getOctaveRatio, setOctaveRatio*/
+isInt, convertFromSolfege, getPitchInfo, MATRIXBUTTONCOLOR, i18nSolfege, convertFactor,
+getOctaveRatio, setOctaveRatio, getTemperamentsList, addTemperamentToList, getTemperament,
+deleteTemperamentFromList, addTemperamentToDictionary */
 
 // Scalable sinewave graphic
 const SYNTHSVG =
@@ -1219,9 +1221,51 @@ const setOctaveRatio = (newOctaveRatio) => {
     octaveRatio = newOctaveRatio;
 };
 
+
 const getOctaveRatio = () => {
     return octaveRatio;
 };
+
+
+const getTemperamentsList = () => {
+    return TEMPERAMENTS;
+};
+
+
+const getTemperament = (entry) => {
+    return TEMPERAMENT[entry];
+};
+
+
+const getTemperamentKeys = () => {
+    let keys = []
+    for (let k in TEMPERAMENT) {
+	keys.push(k)
+    }
+
+    return keys;
+};
+
+
+const addTemperamentToList = (newEntry) => {
+    for (let i = 0; i < TEMPERAMENTS.length; i++) {
+        if (PreDefinedTemperaments[i] === newEntry) {
+            return;
+        }
+    }
+    TEMPERAMENTS.push(newEntry);
+};
+
+
+const deleteTemperamentFromList = (oldEntry) => {
+    delete TEMPERAMENT[oldEntry];
+};
+
+
+const addTemperamentToDictionary = (entryName, entryValue) => {
+    TEMPERAMENT[entryName] = entryValue;
+};
+
 
 const updateTemperaments = () => {
     TEMPERAMENTS = [...INITIALTEMPERAMENTS];
