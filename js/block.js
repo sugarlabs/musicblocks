@@ -67,7 +67,7 @@
 const TEXTWIDTH = 240; // 90
 const STRINGLEN = 9;
 const LONGPRESSTIME = 1500;
-const INLINECOLLAPSIBLES = ["newnote", "interval", "osctime"];
+const INLINECOLLAPSIBLES = ["newnote", "interval", "osctime","definemode"];
 const COLLAPSIBLES = [
     "drum",
     "start",
@@ -86,7 +86,8 @@ const COLLAPSIBLES = [
     "musickeyboard",
     "temperament",
     "interval",
-    "osctime"
+    "osctime",
+    "definemode"
 ];
 const NOHIT = ["hidden", "hiddennoflow"];
 const SPECIALINPUTS = [
@@ -1539,6 +1540,13 @@ class Block {
                     case "temperament":
                         that.collapseText = new createjs.Text(
                             _("temperament"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
+                    case "definemode":
+                        that.collapseText = new createjs.Text(
+                            _("mode"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );

@@ -614,6 +614,7 @@ function setupIntervalsBlocks() {
                 //.TRANS: define a custom mode
                 name: _("define mode"),
                 args: 1,
+                canCollapse: true,
                 argTypes: ["textin"],
                 defaults: _("custom")
             });
