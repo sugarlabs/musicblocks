@@ -779,21 +779,33 @@ const getStatsFromNotation = (logo) => {
                     } else {
                         freq = logo.synth._getFrequency(note);
                     }
-                    projectStats["pitchNames"].add(note.slice(0, note.length - 1));
-                    projectStats["pitches"].push(freq);
-                    if (
-                        projectStats["lowestNote"] == undefined ||
-                        freq < projectStats["lowestNote"][2]
-                    ) {
-                        projectStats["lowestNote"] = [note, noteId, freq];
+                    if (note.slice(0, note.length - 1) === "") {
+                        projectStats["pitchNames"].add("R");
+                    } else {
+                        projectStats["pitchNames"].add(note.slice(0, note.length - 1));
                     }
-                    if (
-                        projectStats["highestNote"] == undefined ||
-                        freq > projectStats["highestNote"][2]
-                    ) {
-                        projectStats["highestNote"] = [note, noteId, freq];
+
+                    projectStats["pitches"].push(freq);
+                    if (projectStats["lowestNote"] == undefined) {
+                        if (!isNaN(freq)) {
+                            projectStats["lowestNote"] = [note, noteId, freq];
+                        }
+                    } else {
+                        if (freq < projectStats["lowestNote"][2]) {
+                            projectStats["lowestNote"] = [note, noteId, freq];
+                        }
+                    }
+                    if (projectStats["highestNote"] == undefined) {
+                        if (!isNaN(freq)) {
+                            projectStats["highestNote"] = [note, noteId, freq];
+                        }
+                    } else {
+                        if (freq > projectStats["highestNote"][2]) {
+                            projectStats["highestNote"] = [note, noteId, freq];
+                        }
                     }
                     projectStats["numberOfNotes"]++;
+
                     noteId++;
                 }
             }
