@@ -1,6 +1,19 @@
+// Copyright (c) 2019 Bottersnike
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
 /*
-   global last, _, ValueBlock, FlowClampBlock, FlowBlock, MusicBlocks, Mouse, NOINPUTERRORMSG,
-   NANERRORMSG, toFixed2
+   global
+
+   last, _, ValueBlock, FlowClampBlock, FlowBlock, MusicBlocks, Mouse,
+   NOINPUTERRORMSG, NANERRORMSG, toFixed2
  */
 
 /*
@@ -17,14 +30,14 @@
    toFixed2
  */
 
-/*exported setupGraphicsBlocks*/
+/* exported setupGraphicsBlocks */
 
-function setupGraphicsBlocks() {
+function setupGraphicsBlocks(activity) {
     class HeadingBlock extends ValueBlock {
         constructor() {
             //.TRANS: orientation or compass direction
             super("heading", _("heading"));
-            this.setPalette("graphics");
+            this.setPalette("graphics", activity);
             this.beginnerBlock(true);
             this.parameter = true;
             this.setHelpString([
@@ -35,24 +48,24 @@ function setupGraphicsBlocks() {
         }
 
         setter(logo, value, turtle) {
-            const turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
+            const turtleObj = activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetHeading(value);
         }
 
         updateParameter(logo, turtle) {
             return toFixed2(
-                logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].orientation
+                activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].orientation
             );
         }
 
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "heading"]);
             } else {
-                return logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].orientation;
+                return activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].orientation;
             }
         }
     }
@@ -61,7 +74,7 @@ function setupGraphicsBlocks() {
         constructor() {
             //.TRANS: y coordinate
             super("y");
-            this.setPalette("graphics");
+            this.setPalette("graphics", activity);
             this.beginnerBlock(true);
             this.parameter = true;
             this.setHelpString([
@@ -77,23 +90,23 @@ function setupGraphicsBlocks() {
         }
 
         setter(logo, value, turtle) {
-            const turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
+            const turtleObj = activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetXY(turtleObj.x, value);
         }
 
         updateParameter(logo, turtle) {
-            return toFixed2(logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].y);
+            return toFixed2(activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].y);
         }
 
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "y"]);
             } else {
-                return logo.turtles.screenY2turtleY(
-                    logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].container.y
+                return activity.turtles.screenY2turtleY(
+                    activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].container.y
                 );
             }
         }
@@ -103,7 +116,7 @@ function setupGraphicsBlocks() {
         constructor() {
             //.TRANS: x coordinate
             super("x");
-            this.setPalette("graphics");
+            this.setPalette("graphics", activity);
             this.beginnerBlock(true);
             this.parameter = true;
             this.setHelpString([
@@ -119,23 +132,23 @@ function setupGraphicsBlocks() {
         }
 
         setter(logo, value, turtle) {
-            const turtleObj = logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)];
+            const turtleObj = activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)];
             turtleObj.painter.doSetXY(value, turtleObj.y);
         }
 
         updateParameter(logo, turtle) {
-            return toFixed2(logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].x);
+            return toFixed2(activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].x);
         }
 
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "x"]);
             } else {
-                return logo.turtles.screenX2turtleX(
-                    logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].container.x
+                return activity.turtles.screenX2turtleX(
+                    activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].container.x
                 );
             }
         }
@@ -145,7 +158,7 @@ function setupGraphicsBlocks() {
         constructor() {
             //.TRANS: scroll canvas image by x, y position
             super("scrollxy", _("scroll xy"));
-            this.setPalette("graphics");
+            this.setPalette("graphics", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -163,37 +176,37 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
-                    logo.errorMsg(NANERRORMSG, blk);
+                    activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {
                     logo.phraseMaker.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    logo.phraseMaker.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
                     logo.phraseMaker.rowArgs.push([args[0], args[1]]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
                     if (tur.singer.suppressOutput) {
                         const savedPenState =
-                            logo.turtles.turtleList[logo.turtles.companionTurtle(turtle)].painter
+                            activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].painter
                                 .penState;
-                        logo.turtles.turtleList[
-                            logo.turtles.companionTurtle(turtle)
+                        activity.turtles.turtleList[
+                            activity.turtles.companionTurtle(turtle)
                         ].painter.penState = false;
-                        logo.turtles.turtleList[
-                            logo.turtles.companionTurtle(turtle)
+                        activity.turtles.turtleList[
+                            activity.turtles.companionTurtle(turtle)
                         ].painter.doScrollXY(args[0], args[1]);
-                        logo.turtles.turtleList[
-                            logo.turtles.companionTurtle(turtle)
+                        activity.turtles.turtleList[
+                            activity.turtles.companionTurtle(turtle)
                         ].painter.penState = savedPenState;
                     } else {
-                        logo.turtles.turtleList[
-                            logo.turtles.companionTurtle(turtle)
+                        activity.turtles.turtleList[
+                            activity.turtles.companionTurtle(turtle)
                         ].painter.doScrollXY(args[0], args[1]);
                     }
                 }
@@ -205,12 +218,12 @@ function setupGraphicsBlocks() {
         constructor() {
             //.TRANS: erase the screen and return the mice to the center position
             super("clear", _("clear"));
-            this.setPalette("graphics");
+            this.setPalette("graphics", activity);
             this.setHelpString();
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (logo.inMatrix) {
                 // ignore clear block in matrix
@@ -234,7 +247,7 @@ function setupGraphicsBlocks() {
     class ControlPoint2Block extends FlowBlock {
         constructor() {
             super("controlpoint2");
-            this.setPalette("graphics");
+            this.setPalette("graphics", activity);
             this.setHelpString([
                 _("The Control-point 2 block sets the second control point for the Bezier curve."),
                 "documentation",
@@ -251,11 +264,11 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
-                    logo.errorMsg(NANERRORMSG, blk);
+                    activity.errorMsg(NANERRORMSG, blk);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
@@ -268,7 +281,7 @@ function setupGraphicsBlocks() {
     class ControlPoint1Block extends FlowBlock {
         constructor() {
             super("controlpoint1");
-            this.setPalette("graphics");
+            this.setPalette("graphics", activity);
             this.setHelpString([
                 _("The Control-point 1 block sets the first control point for the Bezier curve."),
                 "documentation",
@@ -285,11 +298,11 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
-                    logo.errorMsg(NANERRORMSG, blk);
+                    activity.errorMsg(NANERRORMSG, blk);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
@@ -302,7 +315,7 @@ function setupGraphicsBlocks() {
     class BezierBlock extends FlowBlock {
         constructor() {
             super("bezier");
-            this.setPalette("graphics");
+            this.setPalette("graphics", activity);
             this.setHelpString([_("The Bezier block draws a Bezier curve."), "documentation", ""]);
 
             this.formBlock({
@@ -315,11 +328,11 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
-                    logo.errorMsg(NANERRORMSG, blk);
+                    activity.errorMsg(NANERRORMSG, blk);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
@@ -339,7 +352,7 @@ function setupGraphicsBlocks() {
     class ArcBlock extends FlowBlock {
         constructor() {
             super("arc");
-            this.setPalette("graphics");
+            this.setPalette("graphics", activity);
             this.beginnerBlock(true);
             this.piemenuValuesC1 = [15, 30, 45, 60, 75, 90, 105, 120, 135, 150,
                 165, 180, 195, 210, 225, 240, 255, 270,
@@ -363,17 +376,17 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
-                    logo.errorMsg(NANERRORMSG, blk);
+                    activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {
                     logo.phraseMaker.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    logo.phraseMaker.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
                     logo.phraseMaker.rowArgs.push([args[0], args[1]]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -395,7 +408,7 @@ function setupGraphicsBlocks() {
         constructor() {
             //.TRANS: set compass heading
             super("setheading", _("set heading"));
-            this.setPalette("graphics");
+            this.setPalette("graphics", activity);
             this.beginnerBlock(this.lang !== "ja");
             this.piemenuValuesC1 = [0, 30, 45, 60, 90, 120, 135, 150, 180,
                 210, 225, 240, 270, 300, 315, 330];
@@ -413,17 +426,17 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
                 if (typeof args[0] === "string") {
-                    logo.errorMsg(NANERRORMSG, blk);
+                    activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {
                     logo.phraseMaker.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    logo.phraseMaker.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
                     logo.phraseMaker.rowArgs.push(args[0]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -437,7 +450,7 @@ function setupGraphicsBlocks() {
     class SetXYBlock extends FlowBlock {
         constructor() {
             super("setxy");
-            this.setPalette("graphics");
+            this.setPalette("graphics", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -456,17 +469,17 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
                 if (typeof args[0] === "string" || typeof args[1] === "string") {
-                    logo.errorMsg(NANERRORMSG, blk);
+                    activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {
                     logo.phraseMaker.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    logo.phraseMaker.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
                     logo.phraseMaker.rowArgs.push([args[0], args[1]]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -487,7 +500,7 @@ function setupGraphicsBlocks() {
     class RightBlock extends FlowBlock {
         constructor() {
             super("right");
-            this.setPalette("graphics");
+            this.setPalette("graphics", activity);
             this.beginnerBlock(true);
             this.piemenuValuesC1 = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
             this.setHelpString([
@@ -506,17 +519,17 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
                 if (typeof args[0] === "string") {
-                    logo.errorMsg(NANERRORMSG, blk);
+                    activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {
                     logo.phraseMaker.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    logo.phraseMaker.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
                     logo.phraseMaker.rowArgs.push(args[0]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -537,7 +550,7 @@ function setupGraphicsBlocks() {
     class MLeftBlock extends FlowBlock {
         constructor() {
             super("left");
-            this.setPalette("graphics");
+            this.setPalette("graphics", activity);
             this.beginnerBlock(true);
             this.piemenuValuesC1 = [330, 300, 270, 240, 210, 180, 150, 120, 90, 60, 30, 0];
             this.setHelpString([
@@ -556,17 +569,17 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
                 if (typeof args[0] === "string") {
-                    logo.errorMsg(NANERRORMSG, blk);
+                    activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {
                     logo.phraseMaker.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    logo.phraseMaker.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
                     logo.phraseMaker.rowArgs.push(args[0]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -588,7 +601,7 @@ function setupGraphicsBlocks() {
         constructor() {
             //.TRANS: move backward (in the opposite direction of the current heading)
             super("back", _("back"));
-            this.setPalette("graphics");
+            this.setPalette("graphics", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -605,17 +618,17 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
                 if (typeof args[0] === "string") {
-                    logo.errorMsg(NANERRORMSG, blk);
+                    activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {
                     logo.phraseMaker.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    logo.phraseMaker.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
                     logo.phraseMaker.rowArgs.push(args[0]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -637,7 +650,7 @@ function setupGraphicsBlocks() {
         constructor() {
             //.TRANS: move forward (in the direction of the current heading)
             super("forward", _("forward"));
-            this.setPalette("graphics");
+            this.setPalette("graphics", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -654,17 +667,17 @@ function setupGraphicsBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(logo.turtles.companionTurtle(turtle));
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
                 if (typeof args[0] === "string") {
-                    logo.errorMsg(NANERRORMSG, blk);
+                    activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {
                     logo.phraseMaker.addRowBlock(blk);
                     if (logo.pitchBlocks.indexOf(blk) === -1) {
                         logo.pitchBlocks.push(blk);
                     }
-                    logo.phraseMaker.rowLabels.push(logo.blocks.blockList[blk].name);
+                    logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
                     logo.phraseMaker.rowArgs.push(args[0]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -685,7 +698,7 @@ function setupGraphicsBlocks() {
     class WrapModeBlock extends ValueBlock {
         constructor() {
             super("wrapmode");
-            this.setPalette("graphics");
+            this.setPalette("graphics", activity);
             this.formBlock({ outType: "textout" });
             this.hidden = true;
         }
@@ -694,7 +707,7 @@ function setupGraphicsBlocks() {
     class WrapBlock extends FlowClampBlock {
         constructor() {
             super("wrap", _("wrap"));
-            this.setPalette("graphics");
+            this.setPalette("graphics", activity);
             this.beginnerBlock(true);
             this.setHelpString([
                 _(
@@ -719,14 +732,14 @@ function setupGraphicsBlocks() {
 
         flow(args, logo, turtle, blk) {
             if (args[1] === undefined) return;
-            if (args[0] === null) logo.errorMsg(NOINPUTERRORMSG, blk);
+            if (args[0] === null) activity.errorMsg(NOINPUTERRORMSG, blk);
 
             const arg0 = args[0] === null ? "on" : args[0];
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
             const listenerName = "_wrap_" + turtle;
             tur.painter.wrap = arg0 === "on";
 
-            if (blk !== undefined && blk in logo.blocks.blockList) {
+            if (blk !== undefined && blk in activity.blocks.blockList) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
@@ -742,21 +755,21 @@ function setupGraphicsBlocks() {
     }
 
  
-    new HeadingBlock().setup();
-    new YBlock().setup();
-    new XBlock().setup();
-    new WrapModeBlock().setup();
-    new WrapBlock().setup();
-    new ScrollXYBlock().setup();
-    new ClearBlock().setup();
-    new BezierBlock().setup();
-    new ControlPoint2Block().setup();
-    new ControlPoint1Block().setup();
-    new ArcBlock().setup();
-    new SetHeadingBlock().setup();
-    new SetXYBlock().setup();
-    new RightBlock().setup();
-    new MLeftBlock().setup();
-    new BackBlock().setup();
-    new ForwardBlock().setup();
+    new HeadingBlock().setup(activity);
+    new YBlock().setup(activity);
+    new XBlock().setup(activity);
+    new WrapModeBlock().setup(activity);
+    new WrapBlock().setup(activity);
+    new ScrollXYBlock().setup(activity);
+    new ClearBlock().setup(activity);
+    new BezierBlock().setup(activity);
+    new ControlPoint2Block().setup(activity);
+    new ControlPoint1Block().setup(activity);
+    new ArcBlock().setup(activity);
+    new SetHeadingBlock().setup(activity);
+    new SetXYBlock().setup(activity);
+    new RightBlock().setup(activity);
+    new MLeftBlock().setup(activity);
+    new BackBlock().setup(activity);
+    new ForwardBlock().setup(activity);
 }

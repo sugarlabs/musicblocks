@@ -1,8 +1,29 @@
-function setupNumberBlocks() {
+// Copyright (c) 2019 Bottersnike
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+/*
+   global
+
+   _, ValueBlock, LeftBlock, NOINPUTERRORMSG, MathUtility,
+   NANERRORMSG, toFixed2, NOSQRTERRORMSG, ZERODIVIDEERRORMSG,
+   calcOctave
+ */
+
+/* exported setupNumberBlocks */
+
+function setupNumberBlocks(activity) {
     class IntBlock extends LeftBlock {
         constructor() {
             super("int");
-            this.setPalette("number");
+            this.setPalette("number", activity);
             this.setHelpString([
                 _("The Int block returns an integer."),
                 "documentation",
@@ -20,14 +41,14 @@ function setupNumberBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "int"]);
             } else {
-                const cblk = logo.blocks.blockList[blk].connections[1];
+                const cblk = activity.blocks.blockList[blk].connections[1];
 
                 if (cblk === null) {
-                    logo.errorMsg(NOINPUTERRORMSG, blk);
+                    activity.errorMsg(NOINPUTERRORMSG, blk);
                     return 0;
                 } else {
                     const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
@@ -36,7 +57,7 @@ function setupNumberBlocks() {
                         return MathUtility.doInt(a);
                     } catch (e) {
                         this.stopTurtle = true;
-                        logo.errorMsg(NANERRORMSG, blk);
+                        activity.errorMsg(NANERRORMSG, blk);
                         return 0;
                     }
                 }
@@ -47,7 +68,7 @@ function setupNumberBlocks() {
     class ModBlock extends LeftBlock {
         constructor() {
             super("mod");
-            this.setPalette("number");
+            this.setPalette("number", activity);
             this.setHelpString([
                 _("The Mod block returns the remainder from a division."),
                 "documentation",
@@ -62,21 +83,21 @@ function setupNumberBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.blocks.blockList[blk].value);
+            return toFixed2(activity.blocks.blockList[blk].value);
         }
 
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "mod"]);
             } else {
-                const cblk1 = logo.blocks.blockList[blk].connections[1];
-                const cblk2 = logo.blocks.blockList[blk].connections[2];
+                const cblk1 = activity.blocks.blockList[blk].connections[1];
+                const cblk2 = activity.blocks.blockList[blk].connections[2];
 
                 if (cblk1 === null || cblk2 === null) {
-                    logo.errorMsg(NOINPUTERRORMSG, blk);
+                    activity.errorMsg(NOINPUTERRORMSG, blk);
                     return 0;
                 } else {
                     const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
@@ -86,7 +107,7 @@ function setupNumberBlocks() {
                         return MathUtility.doMod(a, b);
                     } catch (e) {
                         logo.stopTurtle = true;
-                        logo.errorMsg(NANERRORMSG, blk);
+                        activity.errorMsg(NANERRORMSG, blk);
                         return 0;
                     }
                 }
@@ -97,7 +118,7 @@ function setupNumberBlocks() {
     class PowerBlock extends LeftBlock {
         constructor() {
             super("power");
-            this.setPalette("number");
+            this.setPalette("number", activity);
             this.setHelpString([
                 _("The Power block calculates a power function."),
                 "documentation",
@@ -113,21 +134,21 @@ function setupNumberBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.blocks.blockList[blk].value);
+            return toFixed2(activity.blocks.blockList[blk].value);
         }
 
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "power"]);
             } else {
-                const cblk1 = logo.blocks.blockList[blk].connections[1];
-                const cblk2 = logo.blocks.blockList[blk].connections[2];
+                const cblk1 = activity.blocks.blockList[blk].connections[1];
+                const cblk2 = activity.blocks.blockList[blk].connections[2];
 
                 if (cblk1 === null || cblk2 === null) {
-                    logo.errorMsg(NOINPUTERRORMSG, blk);
+                    activity.errorMsg(NOINPUTERRORMSG, blk);
                     if (cblk1 !== null) {
                         return logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                     } else {
@@ -141,7 +162,7 @@ function setupNumberBlocks() {
                         return MathUtility.doPower(a, b);
                     } catch (e) {
                         logo.stopTurtle = true;
-                        logo.errorMsg(NANERRORMSG, blk);
+                        activity.errorMsg(NANERRORMSG, blk);
                         return 0;
                     }
                 }
@@ -152,7 +173,7 @@ function setupNumberBlocks() {
     class SqrtBlock extends LeftBlock {
         constructor() {
             super("sqrt");
-            this.setPalette("number");
+            this.setPalette("number", activity);
             this.setHelpString([
                 _("The Sqrt block returns the square root."),
                 "documentation",
@@ -167,20 +188,20 @@ function setupNumberBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.blocks.blockList[blk].value);
+            return toFixed2(activity.blocks.blockList[blk].value);
         }
 
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
-                logo.statusFields.push([blk, logo.blocks.blockList[blk].name]);
+                logo.statusFields.push([blk, activity.blocks.blockList[blk].name]);
             } else {
-                const cblk = logo.blocks.blockList[blk].connections[1];
+                const cblk = activity.blocks.blockList[blk].connections[1];
 
                 if (cblk === null) {
-                    logo.errorMsg(NOINPUTERRORMSG, blk);
+                    activity.errorMsg(NOINPUTERRORMSG, blk);
                     return 0;
                 } else {
                     const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
@@ -189,9 +210,9 @@ function setupNumberBlocks() {
                     } catch (e) {
                         logo.stopTurtle = true;
                         if (e === "NanError") {
-                            logo.errorMsg(NANERRORMSG, blk);
+                            activity.errorMsg(NANERRORMSG, blk);
                         } else if (e === "NoSqrtError") {
-                            logo.errorMsg(NOSQRTERRORMSG, blk);
+                            activity.errorMsg(NOSQRTERRORMSG, blk);
                             return MathUtility.doSqrt(-a);
                         }
                         return 0;
@@ -204,7 +225,7 @@ function setupNumberBlocks() {
     class AbsBlock extends LeftBlock {
         constructor() {
             super("abs");
-            this.setPalette("number");
+            this.setPalette("number", activity);
             this.setHelpString([
                 _("The Abs block returns the absolute value."),
                 "documentation",
@@ -218,20 +239,20 @@ function setupNumberBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.blocks.blockList[blk].value);
+            return toFixed2(activity.blocks.blockList[blk].value);
         }
 
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
-                logo.statusFields.push([blk, logo.blocks.blockList[blk].name]);
+                logo.statusFields.push([blk, activity.blocks.blockList[blk].name]);
             } else {
-                const cblk = logo.blocks.blockList[blk].connections[1];
+                const cblk = activity.blocks.blockList[blk].connections[1];
 
                 if (cblk === null) {
-                    logo.errorMsg(NOINPUTERRORMSG, blk);
+                    activity.errorMsg(NOINPUTERRORMSG, blk);
                     return 0;
                 } else {
                     const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
@@ -240,7 +261,7 @@ function setupNumberBlocks() {
                         return MathUtility.doAbs(a);
                     } catch (e) {
                         this.stopTurtle = true;
-                        logo.errorMsg(NANERRORMSG, blk);
+                        activity.errorMsg(NANERRORMSG, blk);
                         return 0;
                     }
                 }
@@ -251,7 +272,7 @@ function setupNumberBlocks() {
     class DistanceBlock extends LeftBlock {
         constructor() {
             super("distance");
-            this.setPalette("number");
+            this.setPalette("number", activity);
             this.setHelpString([
                 _(
                     "The Distance block returns the distance between two points. For example, between the mouse and the center of the screen."
@@ -279,23 +300,23 @@ function setupNumberBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.blocks.blockList[blk].value);
+            return toFixed2(activity.blocks.blockList[blk].value);
         }
 
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "distance"]);
             } else {
-                const cblk1 = logo.blocks.blockList[blk].connections[1];
-                const cblk2 = logo.blocks.blockList[blk].connections[2];
-                const cblk3 = logo.blocks.blockList[blk].connections[3];
-                const cblk4 = logo.blocks.blockList[blk].connections[4];
+                const cblk1 = activity.blocks.blockList[blk].connections[1];
+                const cblk2 = activity.blocks.blockList[blk].connections[2];
+                const cblk3 = activity.blocks.blockList[blk].connections[3];
+                const cblk4 = activity.blocks.blockList[blk].connections[4];
 
                 if (cblk1 === null || cblk2 === null || cblk3 === null || cblk4 === null) {
-                    logo.errorMsg(NOINPUTERRORMSG, blk);
+                    activity.errorMsg(NOINPUTERRORMSG, blk);
                     return 0;
                 } else {
                     const x1 = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
@@ -306,7 +327,7 @@ function setupNumberBlocks() {
                     try {
                         return MathUtility.doCalculateDistance(x1, y1, x2, y2);
                     } catch (e) {
-                        logo.errorMsg(NANERRORMSG, blk);
+                        activity.errorMsg(NANERRORMSG, blk);
                         return 0;
                     }
                 }
@@ -317,7 +338,7 @@ function setupNumberBlocks() {
     class DivideBlock extends LeftBlock {
         constructor() {
             super("divide");
-            this.setPalette("number");
+            this.setPalette("number", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -336,21 +357,21 @@ function setupNumberBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            return activity.blocks.blockList[blk].value;
         }
 
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "divide"]);
             } else {
-                const cblk1 = logo.blocks.blockList[blk].connections[1];
-                const cblk2 = logo.blocks.blockList[blk].connections[2];
+                const cblk1 = activity.blocks.blockList[blk].connections[1];
+                const cblk2 = activity.blocks.blockList[blk].connections[2];
 
                 if (cblk1 === null || cblk2 === null) {
-                    logo.errorMsg(NOINPUTERRORMSG, blk);
+                    activity.errorMsg(NOINPUTERRORMSG, blk);
                     if (cblk1 !== null) {
                         return logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                     } else {
@@ -365,9 +386,9 @@ function setupNumberBlocks() {
                     } catch (e) {
                         logo.stopTurtle = true;
                         if (e === "NanError") {
-                            logo.errorMsg(NANERRORMSG, blk);
+                            activity.errorMsg(NANERRORMSG, blk);
                         } else if (e === "DivByZeroError") {
-                            logo.errorMsg(ZERODIVIDEERRORMSG, blk);
+                            activity.errorMsg(ZERODIVIDEERRORMSG, blk);
                         }
                         return 0;
                     }
@@ -379,7 +400,7 @@ function setupNumberBlocks() {
     class MultiplyBlock extends LeftBlock {
         constructor() {
             super("multiply");
-            this.setPalette("number");
+            this.setPalette("number", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -398,21 +419,21 @@ function setupNumberBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.blocks.blockList[blk].value);
+            return toFixed2(activity.blocks.blockList[blk].value);
         }
 
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "multiply"]);
             } else {
-                const cblk1 = logo.blocks.blockList[blk].connections[1];
-                const cblk2 = logo.blocks.blockList[blk].connections[2];
+                const cblk1 = activity.blocks.blockList[blk].connections[1];
+                const cblk2 = activity.blocks.blockList[blk].connections[2];
 
                 if (cblk1 === null || cblk2 === null) {
-                    logo.errorMsg(NOINPUTERRORMSG, blk);
+                    activity.errorMsg(NOINPUTERRORMSG, blk);
                     if (cblk1 !== null) {
                         return logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                     } else if (cblk2 !== null) {
@@ -421,35 +442,35 @@ function setupNumberBlocks() {
                         return 0;
                     }
                 } else {
-                    const tur = logo.turtles.ithTurtle(turtle);
+                    const tur = activity.turtles.ithTurtle(turtle);
 
                     // We have a special case for certain keywords associated with octaves:
                     // current, next, and previous.
 
-                    const cblk0 = logo.blocks.blockList[blk].connections[0];
+                    const cblk0 = activity.blocks.blockList[blk].connections[0];
 
                     let a, b;
                     if (
                         cblk0 !== null &&
-                        logo.blocks.blockList[cblk0].name === "pitch"
+                        activity.blocks.blockList[cblk0].name === "pitch"
                     ) {
-                        const noteBlock = logo.blocks.blockList[cblk0].connections[1];
+                        const noteBlock = activity.blocks.blockList[cblk0].connections[1];
 
-                        a = typeof logo.blocks.blockList[cblk1].value === "string" ?
+                        a = typeof activity.blocks.blockList[cblk1].value === "string" ?
                             calcOctave(
                                 tur.singer.currentOctave,
-                                logo.blocks.blockList[cblk1].value,
+                                activity.blocks.blockList[cblk1].value,
                                 tur.singer.lastNotePlayed,
-                                logo.blocks.blockList[noteBlock].value
+                                activity.blocks.blockList[noteBlock].value
                             ) :
                             logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
 
-                        b = typeof logo.blocks.blockList[cblk2].value === "string" ?
+                        b = typeof activity.blocks.blockList[cblk2].value === "string" ?
                             calcOctave(
                                 tur.singer.currentOctave,
-                                logo.blocks.blockList[cblk2].value,
+                                activity.blocks.blockList[cblk2].value,
                                 tur.singer.lastNotePlayed,
-                                logo.blocks.blockList[noteBlock].value
+                                activity.blocks.blockList[noteBlock].value
                             ) :
                             logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                     } else {
@@ -461,7 +482,7 @@ function setupNumberBlocks() {
                         return MathUtility.doMultiply(a, b);
                     } catch (e) {
                         logo.stopTurtle = true;
-                        logo.errorMsg(NANERRORMSG, blk);
+                        activity.errorMsg(NANERRORMSG, blk);
                         return 0;
                     }
                 }
@@ -472,7 +493,7 @@ function setupNumberBlocks() {
     class NegBlock extends LeftBlock {
         constructor() {
             super("neg");
-            this.setPalette("number");
+            this.setPalette("number", activity);
             this.setHelpString();
 
             this.fontsize = 14;
@@ -485,17 +506,17 @@ function setupNumberBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            return activity.blocks.blockList[blk].value;
         }
 
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "neg"]);
             } else {
-                const cblk = logo.blocks.blockList[blk].connections[1];
+                const cblk = activity.blocks.blockList[blk].connections[1];
 
                 if (cblk !== null) {
                     const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
@@ -506,7 +527,7 @@ function setupNumberBlocks() {
                         return a;
                     }
                 } else {
-                    logo.errorMsg(NOINPUTERRORMSG, blk);
+                    activity.errorMsg(NOINPUTERRORMSG, blk);
                     return 0;
                 }
             }
@@ -516,7 +537,7 @@ function setupNumberBlocks() {
     class MinusBlock extends LeftBlock {
         constructor() {
             super("minus");
-            this.setPalette("number");
+            this.setPalette("number", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -535,21 +556,21 @@ function setupNumberBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.blocks.blockList[blk].value);
+            return toFixed2(activity.blocks.blockList[blk].value);
         }
 
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "minus"]);
             } else {
-                const cblk1 = logo.blocks.blockList[blk].connections[1];
-                const cblk2 = logo.blocks.blockList[blk].connections[2];
+                const cblk1 = activity.blocks.blockList[blk].connections[1];
+                const cblk2 = activity.blocks.blockList[blk].connections[2];
 
                 if (cblk1 === null || cblk2 === null) {
-                    logo.errorMsg(NOINPUTERRORMSG, blk);
+                    activity.errorMsg(NOINPUTERRORMSG, blk);
                     if (cblk1 !== null) {
                         return logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                     } else if (cblk2 !== null) {
@@ -558,35 +579,35 @@ function setupNumberBlocks() {
                         return 0;
                     }
                 } else {
-                    const tur = logo.turtles.ithTurtle(turtle);
+                    const tur = activity.turtles.ithTurtle(turtle);
 
                     // We have a special case for certain keywords associated with octaves:
                     // current, next, and previous.
 
-                    const cblk0 = logo.blocks.blockList[blk].connections[0];
+                    const cblk0 = activity.blocks.blockList[blk].connections[0];
 
                     let a, b;
                     if (
                         cblk0 !== null &&
-                        logo.blocks.blockList[cblk0].name === "pitch"
+                        activity.blocks.blockList[cblk0].name === "pitch"
                     ) {
-                        const noteBlock = logo.blocks.blockList[cblk0].connections[1];
+                        const noteBlock = activity.blocks.blockList[cblk0].connections[1];
 
-                        a = typeof logo.blocks.blockList[cblk1].value === "string" ?
+                        a = typeof activity.blocks.blockList[cblk1].value === "string" ?
                             calcOctave(
                                 tur.singer.currentOctave,
-                                logo.blocks.blockList[cblk1].value,
+                                activity.blocks.blockList[cblk1].value,
                                 tur.singer.lastNotePlayed,
-                                logo.blocks.blockList[noteBlock].value
+                                activity.blocks.blockList[noteBlock].value
                             ) :
                             logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
 
-                        b = typeof logo.blocks.blockList[cblk2].value === "string" ?
+                        b = typeof activity.blocks.blockList[cblk2].value === "string" ?
                             calcOctave(
                                 tur.singer.currentOctave,
-                                logo.blocks.blockList[cblk2].value,
+                                activity.blocks.blockList[cblk2].value,
                                 tur.singer.lastNotePlayed,
-                                logo.blocks.blockList[noteBlock].value
+                                activity.blocks.blockList[noteBlock].value
                             ) :
                             logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                     } else {
@@ -598,7 +619,7 @@ function setupNumberBlocks() {
                         return MathUtility.doMinus(a, b);
                     } catch (e) {
                         logo.stopTurtle = true;
-                        logo.errorMsg(NANERRORMSG, blk);
+                        activity.errorMsg(NANERRORMSG, blk);
                         return 0;
                     }
                 }
@@ -609,7 +630,7 @@ function setupNumberBlocks() {
     class PlusBlock extends LeftBlock {
         constructor() {
             super("plus");
-            this.setPalette("number");
+            this.setPalette("number", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -629,25 +650,25 @@ function setupNumberBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            if (typeof logo.blocks.blockList[blk].value === "string") {
-                return logo.blocks.blockList[blk].value;
+            if (typeof activity.blocks.blockList[blk].value === "string") {
+                return activity.blocks.blockList[blk].value;
             } else {
-                return toFixed2(logo.blocks.blockList[blk].value);
+                return toFixed2(activity.blocks.blockList[blk].value);
             }
         }
 
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "plus"]);
             } else {
-                const cblk1 = logo.blocks.blockList[blk].connections[1];
-                const cblk2 = logo.blocks.blockList[blk].connections[2];
+                const cblk1 = activity.blocks.blockList[blk].connections[1];
+                const cblk2 = activity.blocks.blockList[blk].connections[2];
 
                 if (cblk1 === null || cblk2 === null) {
-                    logo.errorMsg(NOINPUTERRORMSG, blk);
+                    activity.errorMsg(NOINPUTERRORMSG, blk);
                     if (cblk1 !== null) {
                         return logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                     } else if (cblk2 !== null) {
@@ -656,49 +677,49 @@ function setupNumberBlocks() {
                         return 0;
                     }
                 } else {
-                    const tur = logo.turtles.ithTurtle(turtle);
+                    const tur = activity.turtles.ithTurtle(turtle);
 
                     // We have a special case for certain keywords associated with octaves:
                     // current, next, and previous. In the case of plus, since we use it
                     // for string concatenation as well, we check to see if the block is
                     // connected to a pitch block before assuming octave.
 
-                    const cblk0 = logo.blocks.blockList[blk].connections[0];
+                    const cblk0 = activity.blocks.blockList[blk].connections[0];
 
                     let a, b;
-                    if (cblk0 !== null && logo.blocks.blockList[cblk0].name === "pitch") {
+                    if (cblk0 !== null && activity.blocks.blockList[cblk0].name === "pitch") {
                         
-                        if (logo.blocks.blockList[cblk2].name === "accidentalname") {
+                        if (activity.blocks.blockList[cblk2].name === "accidentalname") {
                             let scaledegree;
-                            if (logo.blocks.blockList[cblk1].name === "namedbox") {
-                                scaledegree = logo.boxes[logo.blocks.blockList[cblk1].overrideName];
+                            if (activity.blocks.blockList[cblk1].name === "namedbox") {
+                                scaledegree = logo.boxes[activity.blocks.blockList[cblk1].overrideName];
                             } else {
-                                scaledegree = logo.blocks.blockList[cblk1].value;
+                                scaledegree = activity.blocks.blockList[cblk1].value;
                             }
 
-                            let attr = logo.blocks.blockList[cblk2].value.split(" ");
+                            let attr = activity.blocks.blockList[cblk2].value.split(" ");
                             attr = attr[attr.length - 1];
                             scaledegree += attr;
 
                             return scaledegree;
                         } else {
-                            const noteBlock = logo.blocks.blockList[cblk0].connections[1];
+                            const noteBlock = activity.blocks.blockList[cblk0].connections[1];
 
-                            a = typeof logo.blocks.blockList[cblk1].value === "string" ?
+                            a = typeof activity.blocks.blockList[cblk1].value === "string" ?
                                 calcOctave(
                                     tur.singer.currentOctave,
-                                    logo.blocks.blockList[cblk1].value,
+                                    activity.blocks.blockList[cblk1].value,
                                     tur.singer.lastNotePlayed,
-                                    logo.blocks.blockList[noteBlock].value
+                                    activity.blocks.blockList[noteBlock].value
                                 ) :
                                 logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
 
-                            b = typeof logo.blocks.blockList[cblk2].value === "string" ?
+                            b = typeof activity.blocks.blockList[cblk2].value === "string" ?
                                 calcOctave(
                                     tur.singer.currentOctave,
-                                    logo.blocks.blockList[cblk2].value,
+                                    activity.blocks.blockList[cblk2].value,
                                     tur.singer.lastNotePlayed,
-                                    logo.blocks.blockList[noteBlock].value
+                                    activity.blocks.blockList[noteBlock].value
                                 ) :
                                 logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                         }
@@ -716,7 +737,7 @@ function setupNumberBlocks() {
     class OneOfBlock extends LeftBlock {
         constructor() {
             super("oneOf");
-            this.setPalette("number");
+            this.setPalette("number", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -743,16 +764,16 @@ function setupNumberBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            if (typeof logo.blocks.blockList[blk].value === "string") {
-                return logo.blocks.blockList[blk].value;
+            if (typeof activity.blocks.blockList[blk].value === "string") {
+                return activity.blocks.blockList[blk].value;
             } else {
-                return toFixed2(logo.blocks.blockList[blk].value);
+                return toFixed2(activity.blocks.blockList[blk].value);
             }
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            const cblk1 = logo.blocks.blockList[blk].connections[1];
-            const cblk2 = logo.blocks.blockList[blk].connections[2];
+            const cblk1 = activity.blocks.blockList[blk].connections[1];
+            const cblk2 = activity.blocks.blockList[blk].connections[2];
 
             let a, b;
             if (cblk1 !== null) {
@@ -763,7 +784,7 @@ function setupNumberBlocks() {
             }
 
             if (cblk1 === null || cblk2 === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 if (cblk1 !== null) {
                     return a;
                 } else if (cblk2 !== null) {
@@ -780,7 +801,7 @@ function setupNumberBlocks() {
     class RandomBlock extends LeftBlock {
         constructor() {
             super("random");
-            this.setPalette("number");
+            this.setPalette("number", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -800,20 +821,20 @@ function setupNumberBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            if (typeof logo.blocks.blockList[blk].value === "string") {
-                return logo.blocks.blockList[blk].value;
+            if (typeof activity.blocks.blockList[blk].value === "string") {
+                return activity.blocks.blockList[blk].value;
             } else {
-                return toFixed2(logo.blocks.blockList[blk].value);
+                return toFixed2(activity.blocks.blockList[blk].value);
             }
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            const cblk0 = logo.blocks.blockList[blk].connections[0];
-            const cblk1 = logo.blocks.blockList[blk].connections[1];
-            const cblk2 = logo.blocks.blockList[blk].connections[2];
+            const cblk0 = activity.blocks.blockList[blk].connections[0];
+            const cblk1 = activity.blocks.blockList[blk].connections[1];
+            const cblk2 = activity.blocks.blockList[blk].connections[2];
             
             if (cblk1 === null || cblk2 === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             }
 
@@ -823,12 +844,12 @@ function setupNumberBlocks() {
 
             // Check if connected to pitch block and read octave values
             if (cblk0 !== null) {
-                let par = logo.blocks.blockList[cblk0];
+                let par = activity.blocks.blockList[cblk0];
                 while (par.name === "hspace") {
-                    par = logo.blocks.blockList[par.connections[0]];
+                    par = activity.blocks.blockList[par.connections[0]];
                 }
                 if (par.name === "pitch") {
-                    octave = logo.blocks.blockList[par.connections[2]].value;
+                    octave = activity.blocks.blockList[par.connections[2]].value;
                 }
             }
 
@@ -844,7 +865,7 @@ function setupNumberBlocks() {
                 }
             } catch (e) {
                 logo.stopTurtle = true;
-                logo.errorMsg(NANERRORMSG, blk);
+                activity.errorMsg(NANERRORMSG, blk);
                 return 0;
             }
         }
@@ -853,7 +874,7 @@ function setupNumberBlocks() {
     class NumberBlock extends ValueBlock {
         constructor() {
             super("number");
-            this.setPalette("number");
+            this.setPalette("number", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -865,26 +886,27 @@ function setupNumberBlocks() {
 
         arg(logo, turtle, blk) {
             try {
-                return Number(logo.blocks.blockList[blk].value);
+                return Number(activity.blocks.blockList[blk].value);
             } catch (e) {
+                // eslint-disable-next-line no-console
                 console.debug(e);
                 return 0;
             }
         }
     }
 
-    new DistanceBlock().setup();
-    new IntBlock().setup();
-    new ModBlock().setup();
-    new PowerBlock().setup();
-    new SqrtBlock().setup();
-    new AbsBlock().setup();
-    new DivideBlock().setup();
-    new MultiplyBlock().setup();
-    new NegBlock().setup();
-    new MinusBlock().setup();
-    new PlusBlock().setup();
-    new OneOfBlock().setup();
-    new RandomBlock().setup();
-    new NumberBlock().setup();
+    new DistanceBlock().setup(activity);
+    new IntBlock().setup(activity);
+    new ModBlock().setup(activity);
+    new PowerBlock().setup(activity);
+    new SqrtBlock().setup(activity);
+    new AbsBlock().setup(activity);
+    new DivideBlock().setup(activity);
+    new MultiplyBlock().setup(activity);
+    new NegBlock().setup(activity);
+    new MinusBlock().setup(activity);
+    new PlusBlock().setup(activity);
+    new OneOfBlock().setup(activity);
+    new RandomBlock().setup(activity);
+    new NumberBlock().setup(activity);
 }

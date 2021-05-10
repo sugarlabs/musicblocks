@@ -1,8 +1,28 @@
-function setupDrumBlocks() {
+// Copyright (c) 2019 Bottersnike
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+/*
+   global
+
+   _, last, Singer, FlowBlock, ValueBlock, FlowClampBlock,
+   DEFAULTDRUM, DEFAULTEFFECT, NOINPUTERRORMSG, DEFAULTNOISE
+*/
+
+/* exported setupDrumBlocks */
+
+function setupDrumBlocks(activity) {
     class NoiseNameBlock extends ValueBlock {
         constructor() {
             super("noisename");
-            this.setPalette("drum");
+            this.setPalette("drum", activity);
             this.formBlock({ outType: "textout" });
             this.extraWidth = 50;
             this.setHelpString([
@@ -18,7 +38,7 @@ function setupDrumBlocks() {
     class DrumNameBlock extends ValueBlock {
         constructor() {
             super("drumname");
-            this.setPalette("drum");
+            this.setPalette("drum", activity);
             this.formBlock({ outType: "textout" });
             this.extraWidth = 50;
             this.setHelpString([
@@ -33,7 +53,7 @@ function setupDrumBlocks() {
     class EffectsNameBlock extends ValueBlock {
         constructor() {
             super("effectsname");
-            this.setPalette("drum");
+            this.setPalette("drum", activity);
             this.formBlock({ outType: "textout" });
             this.extraWidth = 50;
             this.setHelpString([
@@ -48,7 +68,7 @@ function setupDrumBlocks() {
     class PlayNoiseBlock extends FlowBlock {
         constructor() {
             super("playnoise", _("noise"));
-            this.setPalette("drum");
+            this.setPalette("drum", activity);
             this.setHelpString([
                 _(
                     "The Play noise block will generate white, pink, or brown noise."
@@ -70,7 +90,7 @@ function setupDrumBlocks() {
         flow(args, logo, turtle, blk) {
             let arg = args[0];
             if (args.length !== 1 || arg == null || typeof arg !== "string") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg = "noise1";
             }
 
@@ -86,7 +106,7 @@ function setupDrumBlocks() {
                 } else {
                     super(name, _(displayName));
                 }
-                this.setPalette("drum");
+                this.setPalette("drum", activity);
                 this.formBlock({ args: 1 });
                 this.makeMacro((x, y) => [
                     [0, "playdrum", x, y, [null, 1, null]],
@@ -102,36 +122,36 @@ function setupDrumBlocks() {
             }
         }
 
-        new PlayDrumMacroBlock("duck").setup();
-        new PlayDrumMacroBlock("cat").setup();
-        new PlayDrumMacroBlock("cricket").setup();
-        new PlayDrumMacroBlock("dog").setup();
-        new PlayDrumMacroBlock("bottle").setup();
-        new PlayDrumMacroBlock("bubbles").setup();
+        new PlayDrumMacroBlock("duck").setup(activity);
+        new PlayDrumMacroBlock("cat").setup(activity);
+        new PlayDrumMacroBlock("cricket").setup(activity);
+        new PlayDrumMacroBlock("dog").setup(activity);
+        new PlayDrumMacroBlock("bottle").setup(activity);
+        new PlayDrumMacroBlock("bubbles").setup(activity);
         // Legacy typo
-        new PlayDrumMacroBlock("chine", "chime", true).setup();
-        new PlayDrumMacroBlock("clang").setup();
-        new PlayDrumMacroBlock("clap").setup();
-        new PlayDrumMacroBlock("slap").setup();
-        new PlayDrumMacroBlock("crash").setup();
-        new PlayDrumMacroBlock("splash").setup();
-        new PlayDrumMacroBlock("cowbell", "cow bell", true).setup();
-        new PlayDrumMacroBlock("ridebell", "ride bell", true).setup();
-        new PlayDrumMacroBlock("fingercymbals", "finger cymbals", true).setup();
-        new PlayDrumMacroBlock("trianglebell", "triangle bell", true).setup();
-        new PlayDrumMacroBlock("hihat", "hi hat", true).setup();
-        new PlayDrumMacroBlock("darbuka", "darbuka drum", true).setup();
-        new PlayDrumMacroBlock("cup", "cup drum", true).setup();
-        new PlayDrumMacroBlock("floortom", "floor tom", true, "floor tom tom").setup();
-        new PlayDrumMacroBlock("tom", "tom tom", true).setup();
-        new PlayDrumMacroBlock("kick", "kick drum", true).setup();
-        new PlayDrumMacroBlock("snare", "snare drum", true).setup();
+        new PlayDrumMacroBlock("chine", "chime", true).setup(activity);
+        new PlayDrumMacroBlock("clang").setup(activity);
+        new PlayDrumMacroBlock("clap").setup(activity);
+        new PlayDrumMacroBlock("slap").setup(activity);
+        new PlayDrumMacroBlock("crash").setup(activity);
+        new PlayDrumMacroBlock("splash").setup(activity);
+        new PlayDrumMacroBlock("cowbell", "cow bell", true).setup(activity);
+        new PlayDrumMacroBlock("ridebell", "ride bell", true).setup(activity);
+        new PlayDrumMacroBlock("fingercymbals", "finger cymbals", true).setup(activity);
+        new PlayDrumMacroBlock("trianglebell", "triangle bell", true).setup(activity);
+        new PlayDrumMacroBlock("hihat", "hi hat", true).setup(activity);
+        new PlayDrumMacroBlock("darbuka", "darbuka drum", true).setup(activity);
+        new PlayDrumMacroBlock("cup", "cup drum", true).setup(activity);
+        new PlayDrumMacroBlock("floortom", "floor tom", true, "floor tom tom").setup(activity);
+        new PlayDrumMacroBlock("tom", "tom tom", true).setup(activity);
+        new PlayDrumMacroBlock("kick", "kick drum", true).setup(activity);
+        new PlayDrumMacroBlock("snare", "snare drum", true).setup(activity);
     }
 
     class MapDrumBlock extends FlowClampBlock {
         constructor() {
             super("mapdrum");
-            this.setPalette("drum");
+            this.setPalette("drum", activity);
             this.setHelpString([
                 _("Replace every instance of a pitch with a drum sound."),
                 "documentation",
@@ -164,10 +184,10 @@ function setupDrumBlocks() {
     class SetDrumBlock extends FlowClampBlock {
         constructor() {
             super("setdrum");
-            this.setPalette("drum");
+            this.setPalette("drum", activity);
             this.beginnerBlock(true);
 
-            if (beginnerMode && this.lang === "ja") {
+            if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
                     _(
                         "The Set drum block will select a drum sound to replace the pitch of any contained notes."
@@ -219,7 +239,7 @@ function setupDrumBlocks() {
     class PlayEffectBlock extends FlowBlock {
         constructor() {
             super("playeffect", _("sound effect"));
-            this.setPalette("drum");
+            this.setPalette("drum", activity);
             this.beginnerBlock(true);
             this.formBlock({ args: 1, argTypes: ["anyin"] });
             this.makeMacro((x, y) => [
@@ -232,7 +252,7 @@ function setupDrumBlocks() {
     class PlayDrumBlock extends FlowBlock {
         constructor() {
             super("playdrum", _("drum"));
-            this.setPalette("drum");
+            this.setPalette("drum", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -251,13 +271,13 @@ function setupDrumBlocks() {
         flow(args, logo, turtle, blk) {
             let arg = args[0];
             if (args.length !== 1 || arg == null || typeof arg !== "string") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg = DEFAULTDRUM;
             }
 
             let drumname = Singer.DrumActions.GetDrumname(args[0]);
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
             // If we are in a setdrum clamp, override the drum name
             if (tur.singer.drumStyle.length > 0) {
                 drumname = last(tur.singer.drumStyle);
@@ -284,11 +304,12 @@ function setupDrumBlocks() {
                 logo.musicKeyboard.addRowBlock(blk);
             } else if (
                 tur.singer.inNoteBlock.length > 0 ||
-                blocks.blockList[blk].connections[0] == null &&
-                    last(blocks.blockList[blk].connections) == null
+                activity.blocks.blockList[blk].connections[0] == null &&
+                    last(activity.blocks.blockList[blk].connections) == null
             ) {
                 Singer.DrumActions.playDrum(args[0], turtle, blk);
             } else {
+                // eslint-disable-next-line no-console
                 console.debug("PLAY DRUM ERROR: missing context");
                 return;
             }
@@ -301,13 +322,13 @@ function setupDrumBlocks() {
         }
     }
 
-    new NoiseNameBlock().setup();
-    new DrumNameBlock().setup();
-    new EffectsNameBlock().setup();
-    new PlayNoiseBlock().setup();
+    new NoiseNameBlock().setup(activity);
+    new DrumNameBlock().setup(activity);
+    new EffectsNameBlock().setup(activity);
+    new PlayNoiseBlock().setup(activity);
     _createPlayDrumMacros();
-    new MapDrumBlock().setup();
-    new SetDrumBlock().setup();
-    new PlayEffectBlock().setup();
-    new PlayDrumBlock().setup();
+    new MapDrumBlock().setup(activity);
+    new SetDrumBlock().setup(activity);
+    new PlayEffectBlock().setup(activity);
+    new PlayDrumBlock().setup(activity);
 }

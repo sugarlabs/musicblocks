@@ -1,9 +1,29 @@
-function setupMediaBlocks() {
+// Copyright (c) 2019 Bottersnike
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+/*
+   global
+
+   _, ValueBlock, LeftBlock, FlowBlock, NOINPUTERRORMSG, NANERRORMSG,
+   toFixed2, Howl, last, calcOctave, pitchToFrequency
+ */
+
+/* exported setupMediaBlocks */
+
+function setupMediaBlocks(activity) {
     class RightPosBlock extends ValueBlock {
         constructor() {
             //.TRANS: right side of the screen
             super("rightpos", _("right (screen)"));
-            this.setPalette("media");
+            this.setPalette("media", activity);
             this.beginnerBlock(true);
             this.parameter = true;
             this.setHelpString([
@@ -20,14 +40,14 @@ function setupMediaBlocks() {
             ]);
         }
 
-        updateParameter(logo, turtle, blk) {
+        updateParameter() {
             return toFixed2(
-                logo.turtles._canvas.width / (2.0 * logo.turtles.scale)
+                activity.turtles._canvas.width / (2.0 * activity.turtles.scale)
             );
         }
 
-        arg(logo) {
-            return logo.turtles._canvas.width / (2.0 * logo.turtles.scale);
+        arg() {
+            return activity.turtles._canvas.width / (2.0 * activity.turtles.scale);
         }
     }
 
@@ -35,7 +55,7 @@ function setupMediaBlocks() {
         constructor() {
             //.TRANS: left side of the screen
             super("leftpos", _("left (screen)"));
-            this.setPalette("media");
+            this.setPalette("media", activity);
             this.beginnerBlock(true);
             this.parameter = true;
             this.setHelpString([
@@ -52,15 +72,15 @@ function setupMediaBlocks() {
             ]);
         }
 
-        updateParameter(logo, turtle, blk) {
+        updateParameter() {
             return toFixed2(
-                -1 * (logo.turtles._canvas.width / (2.0 * logo.turtles.scale))
+                -1 * (activity.turtles._canvas.width / (2.0 * activity.turtles.scale))
             );
         }
 
-        arg(logo) {
+        arg() {
             return (
-                -1 * (logo.turtles._canvas.width / (2.0 * logo.turtles.scale))
+                -1 * (activity.turtles._canvas.width / (2.0 * activity.turtles.scale))
             );
         }
     }
@@ -68,7 +88,7 @@ function setupMediaBlocks() {
     class TopPosBlock extends ValueBlock {
         constructor() {
             super("toppos", _("top (screen)"));
-            this.setPalette("media");
+            this.setPalette("media", activity);
             this.beginnerBlock(true);
             this.parameter = true;
             this.setHelpString([
@@ -85,21 +105,21 @@ function setupMediaBlocks() {
             ]);
         }
 
-        updateParameter(logo, turtle, blk) {
+        updateParameter() {
             return toFixed2(
-                logo.turtles._canvas.height / (2.0 * logo.turtles.scale)
+                activity.turtles._canvas.height / (2.0 * activity.turtles.scale)
             );
         }
 
-        arg(logo) {
-            return logo.turtles._canvas.height / (2.0 * logo.turtles.scale);
+        arg() {
+            return activity.turtles._canvas.height / (2.0 * activity.turtles.scale);
         }
     }
 
     class BottomPosBlock extends ValueBlock {
         constructor() {
             super("bottompos", _("bottom (screen)"));
-            this.setPalette("media");
+            this.setPalette("media", activity);
             this.beginnerBlock(true);
             this.parameter = true;
             this.setHelpString([
@@ -116,15 +136,15 @@ function setupMediaBlocks() {
             ]);
         }
 
-        updateParameter(logo, turtle, blk) {
+        updateParameter() {
             return toFixed2(
-                -1 * (logo.turtles._canvas.height / (2.0 * logo.turtles.scale))
+                -1 * (activity.turtles._canvas.height / (2.0 * activity.turtles.scale))
             );
         }
 
-        arg(logo) {
+        arg() {
             return (
-                -1 * (logo.turtles._canvas.height / (2.0 * logo.turtles.scale))
+                -1 * (activity.turtles._canvas.height / (2.0 * activity.turtles.scale))
             );
         }
     }
@@ -132,7 +152,7 @@ function setupMediaBlocks() {
     class WidthBlock extends ValueBlock {
         constructor() {
             super("width", _("width"));
-            this.setPalette("media");
+            this.setPalette("media", activity);
             this.beginnerBlock(true);
             this.parameter = true;
             this.setHelpString([
@@ -142,19 +162,19 @@ function setupMediaBlocks() {
             ]);
         }
 
-        updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.turtles._canvas.width / logo.turtles.scale);
+        updateParameter() {
+            return toFixed2(activity.turtles._canvas.width / activity.turtles.scale);
         }
 
-        arg(logo) {
-            return logo.turtles._canvas.width / logo.turtles.scale;
+        arg() {
+            return activity.turtles._canvas.width / activity.turtles.scale;
         }
     }
 
     class HeightBlock extends ValueBlock {
         constructor() {
             super("height", _("height"));
-            this.setPalette("media");
+            this.setPalette("media", activity);
             this.beginnerBlock(true);
             this.parameter = true;
             this.setHelpString([
@@ -164,12 +184,12 @@ function setupMediaBlocks() {
             ]);
         }
 
-        updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.turtles._canvas.height / logo.turtles.scale);
+        updateParameter() {
+            return toFixed2(activity.turtles._canvas.height / activity.turtles.scale);
         }
 
-        arg(logo) {
-            return logo.turtles._canvas.height / logo.turtles.scale;
+        arg() {
+            return activity.turtles._canvas.height / activity.turtles.scale;
         }
     }
 
@@ -177,7 +197,7 @@ function setupMediaBlocks() {
         constructor() {
             //.TRANS: stops playback of an audio recording
             super("stopplayback", _("stop play"));
-            this.setPalette("media");
+            this.setPalette("media", activity);
             this.setHelpString();
 
             this.hidden = true;
@@ -195,7 +215,7 @@ function setupMediaBlocks() {
         constructor() {
             //.TRANS: Erases the images and text
             super("erasemedia", _("erase media"));
-            this.setPalette("media");
+            this.setPalette("media", activity);
             this.setHelpString([
                 _("The Erase Media block erases text and images."),
                 "documentation",
@@ -203,8 +223,8 @@ function setupMediaBlocks() {
             ]);
         }
 
-        flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+        flow(args, logo, turtle) {
+            const tur = activity.turtles.ithTurtle(turtle);
             tur.painter.doClearMedia();
         }
     }
@@ -213,7 +233,7 @@ function setupMediaBlocks() {
         constructor() {
             //.TRANS: play an audio recording
             super("playback", _("play back"));
-            this.setPalette("media");
+            this.setPalette("media", activity);
             this.setHelpString();
             this.formBlock({
                 args: 1,
@@ -226,7 +246,7 @@ function setupMediaBlocks() {
 
         flow(args, logo, turtle, blk) {
             if (args[0] === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
@@ -242,7 +262,7 @@ function setupMediaBlocks() {
         // Eliminating until we find a better option.
         constructor() {
             super("speak", _("speak"));
-            this.setPalette("media");
+            this.setPalette("media", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -261,7 +281,7 @@ function setupMediaBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (args.length === 1) {
                 if (logo.meSpeak !== null) {
@@ -280,7 +300,7 @@ function setupMediaBlocks() {
     class CameraBlock extends ValueBlock {
         constructor() {
             super("camera");
-            this.setPalette("media");
+            this.setPalette("media", activity);
             this.setHelpString([
                 _("The Camera block connects a webcam to the Show block."),
                 "documentation",
@@ -295,7 +315,7 @@ function setupMediaBlocks() {
     class VideoBlock extends ValueBlock {
         constructor() {
             super("video");
-            this.setPalette("media");
+            this.setPalette("media", activity);
             this.setHelpString([
                 _("The Video block selects video for use with the Show block."),
                 "documentation",
@@ -310,7 +330,7 @@ function setupMediaBlocks() {
     class LoadFileBlock extends ValueBlock {
         constructor() {
             super("loadFile", "");
-            this.setPalette("media");
+            this.setPalette("media", activity);
             this.setHelpString([
                 _(
                     "The Open file block opens a file for use with the Show block."
@@ -324,15 +344,16 @@ function setupMediaBlocks() {
             this.parameter = false;
         }
 
-        arg(logo, turtle, blk, receivedArg) {
-            return logo.blocks.blockList[blk].value;
+        // eslint-disable-next-line no-unused-vars
+        arg(logo, turtle, blk) {
+            return activity.blocks.blockList[blk].value;
         }
     }
 
     class StopVideoCamBlock extends FlowBlock {
         constructor() {
             super("stopvideocam", _("stop media"));
-            this.setPalette("media");
+            this.setPalette("media", activity);
             this.setHelpString([
                 _("The Stop media block stops audio or video playback."),
                 "documentation",
@@ -350,7 +371,7 @@ function setupMediaBlocks() {
     class ToneBlock extends FlowBlock {
         constructor() {
             super("tone", _("hertz"));
-            this.setPalette("media");
+            this.setPalette("media", activity);
             this.piemenuValuesC1 = [220, 247, 262, 294, 330, 349, 392, 440, 494, 523,
                 587, 659, 698, 784, 880];
             this.setHelpString();
@@ -380,7 +401,7 @@ function setupMediaBlocks() {
         constructor() {
             //.TRANS: translate a note into hertz, e.g., A4 -> 440HZ
             super("tofrequency", _("note to frequency"));
-            this.setPalette("media");
+            this.setPalette("media", activity);
             this.parameter = true;
             this.setHelpString([
                 _(
@@ -402,18 +423,17 @@ function setupMediaBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return toFixed2(logo.blocks.blockList[blk].value);
+            return toFixed2(activity.blocks.blockList[blk].value);
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                const block = logo.blocks.blockList[blk];
-                const cblk1 = logo.blocks.blockList[blk].connections[1];
-                const cblk2 = logo.blocks.blockList[blk].connections[2];
+            if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                const cblk1 = activity.blocks.blockList[blk].connections[1];
+                const cblk2 = activity.blocks.blockList[blk].connections[2];
                 if (cblk1 === null || cblk2 === null) {
-                    logo.errorMsg(NOINPUTERRORMSG, blk);
+                    activity.errorMsg(NOINPUTERRORMSG, blk);
                     return 392;
                 }
                 const note = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
@@ -448,11 +468,11 @@ function setupMediaBlocks() {
                     "F♯": "G♭",
                     "G♯": "A♭"
                 };
-                const block = logo.blocks.blockList[blk];
+                const block = activity.blocks.blockList[blk];
                 let cblk = block.connections[1];
                 let noteName;
                 if (cblk === null) {
-                    logo.errorMsg(NOINPUTERRORMSG, blk);
+                    activity.errorMsg(NOINPUTERRORMSG, blk);
                     noteName = "G";
                 } else {
                     noteName = logo.parseArg(
@@ -485,7 +505,7 @@ function setupMediaBlocks() {
                 cblk = block.connections[2];
                 let octave;
                 if (cblk === null) {
-                    logo.errorMsg(NOINPUTERRORMSG, blk);
+                    activity.errorMsg(NOINPUTERRORMSG, blk);
                     octave = 4;
                 } else {
                     octave = Math.floor(
@@ -511,7 +531,7 @@ function setupMediaBlocks() {
         constructor() {
             //.TRANS: Avatar is the image used to determine the appearance of the mouse.
             super("turtleshell", _("avatar"));
-            this.setPalette("media");
+            this.setPalette("media", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -540,9 +560,9 @@ function setupMediaBlocks() {
         flow(args, logo, turtle, blk) {
             if (args.length === 2) {
                 if (typeof args[0] === "string") {
-                    logo.errorMsg(NANERRORMSG, blk);
+                    activity.errorMsg(NANERRORMSG, blk);
                 } else {
-                    logo.turtles.turtleList[turtle].doTurtleShell(
+                    activity.turtles.turtleList[turtle].doTurtleShell(
                         args[0],
                         args[1]
                     );
@@ -554,7 +574,7 @@ function setupMediaBlocks() {
     class ShowBlock extends FlowBlock {
         constructor() {
             super("show");
-            this.setPalette("media");
+            this.setPalette("media", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -577,7 +597,7 @@ function setupMediaBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (args.length === 2) {
                 if (tur.singer.inNoteBlock.length > 0) {
@@ -594,7 +614,7 @@ function setupMediaBlocks() {
     class MediaBlock extends ValueBlock {
         constructor() {
             super("media");
-            this.setPalette("media");
+            this.setPalette("media", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -625,7 +645,7 @@ function setupMediaBlocks() {
         constructor() {
             super("text");
             this.extraWidth = 30;
-            this.setPalette("media");
+            this.setPalette("media", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -640,24 +660,24 @@ function setupMediaBlocks() {
         }
     }
 
-    new RightPosBlock().setup();
-    new LeftPosBlock().setup();
-    new TopPosBlock().setup();
-    new BottomPosBlock().setup();
-    new WidthBlock().setup();
-    new HeightBlock().setup();
-    new CameraBlock().setup();
-    new StopPlaybackBlock().setup();
-    new PlaybackBlock().setup();
-    new SpeakBlock().setup();
-    new VideoBlock().setup();
-    new LoadFileBlock().setup();
-    new StopVideoCamBlock().setup();
-    new ToneBlock().setup();
-    new ToFrequencyBlock().setup();
-    new TurtleShellBlock().setup();
-    new ClearMediaBlock().setup();
-    new ShowBlock().setup();
-    new MediaBlock().setup();
-    new TextBlock().setup();
+    new RightPosBlock().setup(activity);
+    new LeftPosBlock().setup(activity);
+    new TopPosBlock().setup(activity);
+    new BottomPosBlock().setup(activity);
+    new WidthBlock().setup(activity);
+    new HeightBlock().setup(activity);
+    new CameraBlock().setup(activity);
+    new StopPlaybackBlock().setup(activity);
+    new PlaybackBlock().setup(activity);
+    new SpeakBlock().setup(activity);
+    new VideoBlock().setup(activity);
+    new LoadFileBlock().setup(activity);
+    new StopVideoCamBlock().setup(activity);
+    new ToneBlock().setup(activity);
+    new ToFrequencyBlock().setup(activity);
+    new TurtleShellBlock().setup(activity);
+    new ClearMediaBlock().setup(activity);
+    new ShowBlock().setup(activity);
+    new MediaBlock().setup(activity);
+    new TextBlock().setup(activity);
 }

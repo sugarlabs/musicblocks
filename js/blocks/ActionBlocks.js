@@ -1,8 +1,28 @@
-function setupActionBlocks() {
+// Copyright (c) 2019 Bottersnike
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+/*
+   global
+
+   _, FlowBlock, LeftBlock, FlowClampBlock, StackClampBlock, ValueBlock,
+   Queue, NOACTIONERRORMSG, NOINPUTERRORMSG
+*/
+
+/* exported setupActionBlocks */
+
+function setupActionBlocks(activity) {
     class ReturnBlock extends FlowBlock {
         constructor() {
             super("return");
-            this.setPalette("action");
+            this.setPalette("action", activity);
             this.setHelpString([
                 _("The Return block will return a value from an action."),
                 "documentation",
@@ -26,7 +46,7 @@ function setupActionBlocks() {
     class ReturnToURLBlock extends FlowBlock {
         constructor() {
             super("returnToUrl");
-            this.setPalette("action");
+            this.setPalette("action", activity);
             this.setHelpString([
                 _("The Return to URL block will return a value to a webpage."),
                 "documentation",
@@ -83,7 +103,7 @@ function setupActionBlocks() {
     class CalcBlock extends LeftBlock {
         constructor() {
             super("calc");
-            this.setPalette("action");
+            this.setPalette("action", activity);
             this.setHelpString([
                 _(
                     "The Calculate block returns a value calculated by an action."
@@ -103,27 +123,27 @@ function setupActionBlocks() {
 
         arg(logo, turtle, blk, receivedArg) {
             let actionArgs = [];
-            const cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = activity.blocks.blockList[blk].connections[1];
             if (cblk === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             } else {
                 const name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 actionArgs = receivedArg;
                 // logo.getBlockAtStartOfArg(blk);
                 if (name in logo.actions) {
-                    logo.turtles.turtleList[turtle].running = true;
+                    activity.turtles.turtleList[turtle].running = true;
                     logo.runFromBlockNow(
                         logo,
                         turtle,
                         logo.actions[name],
                         true,
                         actionArgs,
-                        logo.turtles.turtleList[turtle].queue.length
+                        activity.turtles.turtleList[turtle].queue.length
                     );
                     return logo.returns[turtle].shift();
                 } else {
-                    logo.errorMsg(NOACTIONERRORMSG, blk, name);
+                    activity.errorMsg(NOACTIONERRORMSG, blk, name);
                     return 0;
                 }
             }
@@ -133,7 +153,7 @@ function setupActionBlocks() {
     class NamedCalcBlock extends ValueBlock {
         constructor() {
             super("namedcalc");
-            this.setPalette("action");
+            this.setPalette("action", activity);
             this.setHelpString([
                 _(
                     "The Calculate block returns a value calculated by an action."
@@ -149,24 +169,24 @@ function setupActionBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
-            const name = logo.blocks.blockList[blk].privateData;
+            const name = activity.blocks.blockList[blk].privateData;
             let actionArgs = [];
 
             actionArgs = receivedArg;
             // logo.getBlockAtStartOfArg(blk);
             if (name in logo.actions) {
-                logo.turtles.turtleList[turtle].running = true;
+                activity.turtles.turtleList[turtle].running = true;
                 logo.runFromBlockNow(
                     logo,
                     turtle,
                     logo.actions[name],
                     true,
                     actionArgs,
-                    logo.turtles.turtleList[turtle].queue.length
+                    activity.turtles.turtleList[turtle].queue.length
                 );
                 return logo.returns[turtle].shift();
             } else {
-                logo.errorMsg(NOACTIONERRORMSG, blk, name);
+                activity.errorMsg(NOACTIONERRORMSG, blk, name);
                 return 0;
             }
         }
@@ -175,7 +195,7 @@ function setupActionBlocks() {
     class NamedDoArgBlock extends FlowClampBlock {
         constructor() {
             super("nameddoArg");
-            this.setPalette("action");
+            this.setPalette("action", activity);
             this.setHelpString([
                 _("The Do block is used to initiate an action."),
                 "documentation",
@@ -193,22 +213,22 @@ function setupActionBlocks() {
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs) {
-            const name = logo.blocks.blockList[blk].privateData;
+            const name = activity.blocks.blockList[blk].privateData;
             while (actionArgs.length > 0) {
                 actionArgs.pop();
             }
 
-            if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
+            if (activity.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (
                     let i = 0;
-                    i < logo.blocks.blockList[blk].argClampSlots.length;
+                    i < activity.blocks.blockList[blk].argClampSlots.length;
                     i++
                 ) {
-                    if (logo.blocks.blockList[blk].connections[i + 1] != null) {
+                    if (activity.blocks.blockList[blk].connections[i + 1] != null) {
                         const t = logo.parseArg(
                             logo,
                             turtle,
-                            logo.blocks.blockList[blk].connections[i + 1],
+                            activity.blocks.blockList[blk].connections[i + 1],
                             blk,
                             receivedArg
                         );
@@ -219,7 +239,7 @@ function setupActionBlocks() {
                 }
             }
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (name in logo.actions) {
                 if (tur.singer.justCounting.length === 0) {
@@ -228,14 +248,14 @@ function setupActionBlocks() {
 
                 let childFlow;
                 if (tur.singer.backward.length > 0) {
-                    childFlow = logo.blocks.findBottomBlock(logo.actions[name]);
-                    const actionBlk = logo.blocks.findTopBlock(logo.actions[name]);
+                    childFlow = activity.blocks.findBottomBlock(logo.actions[name]);
+                    const actionBlk = activity.blocks.findTopBlock(logo.actions[name]);
                     tur.singer.backward.push(actionBlk);
 
                     const listenerName = "_backward_action_" + turtle + "_" + blk;
                     logo.setDispatchBlock(blk, turtle, listenerName);
 
-                    const nextBlock = logo.blocks.blockList[actionBlk].connections[2];
+                    const nextBlock = activity.blocks.blockList[actionBlk].connections[2];
                     if (nextBlock === null) {
                         tur.singer.backward.pop();
                     } else {
@@ -246,6 +266,7 @@ function setupActionBlocks() {
                         }
                     }
 
+                    // eslint-disable-next-line no-unused-vars
                     const __listener = event => tur.singer.backward.pop();
 
                     logo.setTurtleListener(turtle, listenerName, __listener);
@@ -255,7 +276,7 @@ function setupActionBlocks() {
 
                 return [childFlow, 1];
             } else {
-                logo.errorMsg(NOACTIONERRORMSG, blk, name);
+                activity.errorMsg(NOACTIONERRORMSG, blk, name);
             }
         }
     }
@@ -263,7 +284,7 @@ function setupActionBlocks() {
     class NamedCalcArgBlock extends LeftBlock {
         constructor() {
             super("namedcalcArg");
-            this.setPalette("action");
+            this.setPalette("action", activity);
             this.setHelpString([
                 _(
                     "The Calculate block returns a value calculated by an action."
@@ -284,19 +305,19 @@ function setupActionBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            const name = logo.blocks.blockList[blk].privateData;
+            const name = activity.blocks.blockList[blk].privateData;
             const actionArgs = [];
             // logo.getBlockAtStartOfArg(blk);
-            if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
+            if (activity.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (
                     let i = 0;
-                    i < logo.blocks.blockList[blk].argClampSlots.length;
+                    i < activity.blocks.blockList[blk].argClampSlots.length;
                     i++
                 ) {
                     const t = logo.parseArg(
                         logo,
                         turtle,
-                        logo.blocks.blockList[blk].connections[i + 1],
+                        activity.blocks.blockList[blk].connections[i + 1],
                         blk,
                         receivedArg
                     );
@@ -305,18 +326,18 @@ function setupActionBlocks() {
             }
             if (name in logo.actions) {
                 // Just run the stack.
-                logo.turtles.turtleList[turtle].running = true;
+                activity.turtles.turtleList[turtle].running = true;
                 logo.runFromBlockNow(
                     logo,
                     turtle,
                     logo.actions[name],
                     true,
                     actionArgs,
-                    logo.turtles.turtleList[turtle].queue.length
+                    activity.turtles.turtleList[turtle].queue.length
                 );
                 return logo.returns[turtle].pop();
             } else {
-                logo.errorMsg(NOACTIONERRORMSG, blk, name);
+                activity.errorMsg(NOACTIONERRORMSG, blk, name);
                 return 0;
             }
         }
@@ -325,7 +346,7 @@ function setupActionBlocks() {
     class DoArgBlock extends FlowClampBlock {
         constructor() {
             super("doArg");
-            this.setPalette("action");
+            this.setPalette("action", activity);
             this.setHelpString([
                 _("The Do block is used to initiate an action."),
                 "documentation",
@@ -349,17 +370,17 @@ function setupActionBlocks() {
                 actionArgs.pop();
             }
 
-            if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
+            if (activity.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (
                     let i = 0;
-                    i < logo.blocks.blockList[blk].argClampSlots.length;
+                    i < activity.blocks.blockList[blk].argClampSlots.length;
                     i++
                 ) {
-                    if (logo.blocks.blockList[blk].connections[i + 2] != null) {
+                    if (activity.blocks.blockList[blk].connections[i + 2] != null) {
                         const t = logo.parseArg(
                             logo,
                             turtle,
-                            logo.blocks.blockList[blk].connections[i + 2],
+                            activity.blocks.blockList[blk].connections[i + 2],
                             blk,
                             receivedArg
                         );
@@ -372,12 +393,12 @@ function setupActionBlocks() {
 
             if (args.length >= 1) {
                 if (args[0] in logo.actions) {
-                    if (logo.turtles.ithTurtle(turtle).singer.justCounting.length === 0) {
+                    if (activity.turtles.ithTurtle(turtle).singer.justCounting.length === 0) {
                         logo.notation.notationLineBreak(turtle);
                     }
                     return [logo.actions[args[0]], 1];
                 } else {
-                    logo.errorMsg(NOACTIONERRORMSG, blk, args[0]);
+                    activity.errorMsg(NOACTIONERRORMSG, blk, args[0]);
                 }
             }
         }
@@ -386,7 +407,7 @@ function setupActionBlocks() {
     class CalcArgBlock extends LeftBlock {
         constructor() {
             super("calcArg");
-            this.setPalette("action");
+            this.setPalette("action", activity);
             this.setHelpString([
                 _(
                     "The Calculate block returns a value calculated by an action."
@@ -412,41 +433,41 @@ function setupActionBlocks() {
         arg(logo, turtle, blk, receivedArg) {
             const actionArgs = [];
             // logo.getBlockAtStartOfArg(blk);
-            if (logo.blocks.blockList[blk].argClampSlots.length > 0) {
+            if (activity.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (
                     let i = 0;
-                    i < logo.blocks.blockList[blk].argClampSlots.length;
+                    i < activity.blocks.blockList[blk].argClampSlots.length;
                     i++
                 ) {
                     const t = logo.parseArg(
                         logo,
                         turtle,
-                        logo.blocks.blockList[blk].connections[i + 2],
+                        activity.blocks.blockList[blk].connections[i + 2],
                         blk,
                         receivedArg
                     );
                     actionArgs.push(t);
                 }
             }
-            const cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = activity.blocks.blockList[blk].connections[1];
             if (cblk === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             } else {
                 const name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (name in logo.actions) {
-                    logo.turtles.turtleList[turtle].running = true;
+                    activity.turtles.turtleList[turtle].running = true;
                     logo.runFromBlockNow(
                         logo,
                         turtle,
                         logo.actions[name],
                         true,
                         actionArgs,
-                        logo.turtles.turtleList[turtle].queue.length
+                        activity.turtles.turtleList[turtle].queue.length
                     );
                     return logo.returns[turtle].pop();
                 } else {
-                    logo.errorMsg(NOACTIONERRORMSG, blk, name);
+                    activity.errorMsg(NOACTIONERRORMSG, blk, name);
                     return 0;
                 }
             }
@@ -456,7 +477,7 @@ function setupActionBlocks() {
     class ArgBlock extends LeftBlock {
         constructor() {
             super("arg");
-            this.setPalette("action");
+            this.setPalette("action", activity);
             this.setHelpString([
                 _(
                     "The Arg block contains the value of an argument passed to an action."
@@ -475,9 +496,9 @@ function setupActionBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            const cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = activity.blocks.blockList[blk].connections[1];
             if (cblk === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             } else {
                 const name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
@@ -486,19 +507,19 @@ function setupActionBlocks() {
                     const value = action_args[Number(name) - 1];
                     return value;
                 } else {
-                    logo.errorMsg(_("Invalid argument"), blk);
+                    activity.errorMsg(_("Invalid argument"), blk);
                     return 0;
                 }
             }
 
-            // return [0, 0, logo.blocks.blockList[blk].value];
+            // return [0, 0, activity.blocks.blockList[blk].value];
         }
     }
 
     class NamedArgBlock extends LeftBlock {
         constructor() {
             super("namedarg");
-            this.setPalette("action");
+            this.setPalette("action", activity);
             this.setHelpString([
                 _(
                     "The Arg block contains the value of an argument passed to an action."
@@ -516,13 +537,13 @@ function setupActionBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            const name = logo.blocks.blockList[blk].privateData;
+            const name = activity.blocks.blockList[blk].privateData;
             const actionArgs = receivedArg;
 
             // If an action block with an arg is clicked,
             // the arg will have no value.
             if (actionArgs === null) {
-                logo.errorMsg(_("Invalid argument"), blk);
+                activity.errorMsg(_("Invalid argument"), blk);
                 return 0;
             }
 
@@ -530,19 +551,18 @@ function setupActionBlocks() {
                 const value = actionArgs[Number(name) - 1];
                 return value;
             } else {
-                logo.errorMsg(_("Invalid argument"), blk);
+                activity.errorMsg(_("Invalid argument"), blk);
                 return 0;
             }
-
-            return logo.blocks.blockList[blk].value;
+            // return activity.blocks.blockList[blk].value;
         }
     }
 
     class DoBlock extends FlowBlock {
         constructor() {
-	    //.TRANS: do is the do something or take an action.
+            //.TRANS: do is the do something or take an action.
             super("do");
-            this.setPalette("action");
+            this.setPalette("action", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -568,22 +588,23 @@ function setupActionBlocks() {
             if (args.length === 0) return;
 
             if (args[0] in logo.actions) {
-                if (logo.turtles.ithTurtle(turtle).singer.justCounting.length === 0) {
+                if (activity.turtles.ithTurtle(turtle).singer.justCounting.length === 0) {
                     logo.notation.notationLineBreak(turtle);
                 }
 
                 return [logo.actions[args[0]], 1];
             }
 
+            // eslint-disable-next-line no-console
             console.debug("action " + args[0] + " not found");
-            logo.errorMsg(NOACTIONERRORMSG, blk, args[0]);
+            activity.errorMsg(NOACTIONERRORMSG, blk, args[0]);
         }
     }
 
     class ListenBlock extends FlowBlock {
         constructor() {
             super("listen");
-            this.setPalette("action");
+            this.setPalette("action", activity);
             this.beginnerBlock(true);
 
             if (this.lang === "ja") {
@@ -627,10 +648,11 @@ function setupActionBlocks() {
             if (args.length !== 2) return;
 
             if (!(args[1] in logo.actions)) {
-                logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
+                activity.errorMsg(NOACTIONERRORMSG, blk, args[1]);
             } else {
-                const tur = logo.turtles.ithTurtle(turtle);
+                const tur = activity.turtles.ithTurtle(turtle);
 
+                // eslint-disable-next-line no-unused-vars
                 const __listener = event => {
                     if (tur.running) {
                         const queueBlock = new Queue(logo.actions[args[1]], 1, blk);
@@ -654,7 +676,7 @@ function setupActionBlocks() {
     class DispatchBlock extends FlowBlock {
         constructor() {
             super("dispatch");
-            this.setPalette("action");
+            this.setPalette("action", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -682,14 +704,14 @@ function setupActionBlocks() {
                 const event = new Event(args[0]);
                 logo.eventList[args[0]] = event;
             }
-            logo.stage.dispatchEvent(args[0]);
+            activity.stage.dispatchEvent(args[0]);
         }
     }
 
     class StartBlock extends StackClampBlock {
         constructor() {
             super("start");
-            this.setPalette("action");
+            this.setPalette("action", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -729,7 +751,7 @@ function setupActionBlocks() {
     class ActionBlock extends StackClampBlock {
         constructor() {
             super("action");
-            this.setPalette("action");
+            this.setPalette("action", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -764,22 +786,23 @@ function setupActionBlocks() {
             if (args.length === 0) return;
 
             if (args[0] in logo.actions) {
-                if (logo.turtles.ithTurtle(turtle).singer.justCounting.length === 0) {
+                if (activity.turtles.ithTurtle(turtle).singer.justCounting.length === 0) {
                     logo.notation.notationLineBreak(turtle);
                 }
 
                 return [logo.actions[args[0]], 1];
             }
 
+            // eslint-disable-next-line no-console
             console.debug("action " + args[0] + " not found");
-            logo.errorMsg(NOACTIONERRORMSG, blk, args[0]);
+            activity.errorMsg(NOACTIONERRORMSG, blk, args[0]);
         }
     }
 
     class NamedDoBlock extends FlowBlock {
         constructor() {
             super("nameddo");
-            this.setPalette("action");
+            this.setPalette("action", activity);
             this.setHelpString([
                 _("The Do block is used to initiate an action."),
                 "documentation",
@@ -792,12 +815,12 @@ function setupActionBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const name = logo.blocks.blockList[blk].privateData;
+            const name = activity.blocks.blockList[blk].privateData;
             if (!(name in logo.actions)) {
-                logo.errorMsg(NOACTIONERRORMSG, blk, name);
+                activity.errorMsg(NOACTIONERRORMSG, blk, name);
             }
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (tur.singer.justCounting.length === 0) {
                 logo.notation.notationLineBreak(turtle);
@@ -805,14 +828,14 @@ function setupActionBlocks() {
 
             let childFlow;
             if (tur.singer.backward.length > 0) {
-                childFlow = logo.blocks.findBottomBlock(logo.actions[name]);
-                const actionBlk = logo.blocks.findTopBlock(logo.actions[name]);
+                childFlow = activity.blocks.findBottomBlock(logo.actions[name]);
+                const actionBlk = activity.blocks.findTopBlock(logo.actions[name]);
                 tur.singer.backward.push(actionBlk);
 
                 const listenerName = "_backward_action_" + turtle + "_" + blk;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
-                const nextBlock = logo.blocks.blockList[actionBlk].connections[2];
+                const nextBlock = activity.blocks.blockList[actionBlk].connections[2];
                 if (nextBlock === null) {
                     tur.singer.backward.pop();
                 } else {
@@ -823,6 +846,7 @@ function setupActionBlocks() {
                     }
                 }
 
+                // eslint-disable-next-line no-unused-vars
                 const __listener = event => tur.singer.backward.pop();
 
                 logo.setTurtleListener(turtle, listenerName, __listener);
@@ -837,7 +861,7 @@ function setupActionBlocks() {
     class Temperament1Block extends StackClampBlock {
         constructor() {
             super("temperament1");
-            this.setPalette("action");
+            this.setPalette("action", activity);
             this.setHelpString();
 
             this.formBlock({
@@ -858,22 +882,22 @@ function setupActionBlocks() {
         flow() {}
     }
 
-    new ReturnBlock().setup();
-    new ReturnToURLBlock().setup();
-    new CalcBlock().setup();
-    new NamedCalcBlock().setup();
-    new NamedDoArgBlock().setup();
-    new NamedCalcArgBlock().setup();
-    new DoArgBlock().setup();
-    new CalcArgBlock().setup();
-    new ArgBlock().setup();
-    new NamedArgBlock().setup();
-    new DoBlock().setup();
-    new ListenBlock().setup();
-    new DispatchBlock().setup();
-    new StartDrumBlock().setup();
-    new StartBlock().setup();
-    new ActionBlock().setup();
-    new NamedDoBlock().setup();
-    new Temperament1Block().setup();
+    new ReturnBlock().setup(activity);
+    new ReturnToURLBlock().setup(activity);
+    new CalcBlock().setup(activity);
+    new NamedCalcBlock().setup(activity);
+    new NamedDoArgBlock().setup(activity);
+    new NamedCalcArgBlock().setup(activity);
+    new DoArgBlock().setup(activity);
+    new CalcArgBlock().setup(activity);
+    new ArgBlock().setup(activity);
+    new NamedArgBlock().setup(activity);
+    new DoBlock().setup(activity);
+    new ListenBlock().setup(activity);
+    new DispatchBlock().setup(activity);
+    new StartDrumBlock().setup(activity);
+    new StartBlock().setup(activity);
+    new ActionBlock().setup(activity);
+    new NamedDoBlock().setup(activity);
+    new Temperament1Block().setup(activity);
 }

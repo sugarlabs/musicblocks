@@ -1,11 +1,31 @@
-function setupBoxesBlocks() {
+// Copyright (c) 2019 Bottersnike
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+/*
+   global
+
+   _, FlowBlock, ValueBlock, LeftBlock, NOINPUTERRORMSG, SOLFEGENAMES,
+   NOBOXERRORMSG
+*/
+
+/* exported setupBoxesBlocks */
+
+function setupBoxesBlocks(activity) {
     class IncrementBlock extends FlowBlock {
         constructor(name) {
             super(name || "increment");
-            this.setPalette("boxes");
+            this.setPalette("boxes", activity);
             this.beginnerBlock(true);
 
-            if (beginnerMode && this.lang === "ja") {
+            if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
                     _(
                         "The Add-to block is used to add to the value stored in a box."
@@ -43,12 +63,12 @@ function setupBoxesBlocks() {
             const i = args.length === 2 ? args[1] : 1;
 
             if (args.length > 0) {
-                const cblk = logo.blocks.blockList[blk].connections[1];
+                const cblk = activity.blocks.blockList[blk].connections[1];
 
-                if (logo.blocks.blockList[cblk].name === "text") {
+                if (activity.blocks.blockList[cblk].name === "text") {
                     // Work-around to #1302
                     // Look for a namedbox with this text value.
-                    const name = logo.blocks.blockList[cblk].value;
+                    const name = activity.blocks.blockList[cblk].value;
                     if (name in logo.boxes) {
                         logo.boxes[name] = logo.boxes[name] + i;
                         return;
@@ -58,8 +78,8 @@ function setupBoxesBlocks() {
                 let value = args[0] + i;
 
                 // A special case for solfege stored in boxes.
-                if (logo.blocks.blockList[cblk].name === "namedbox") {
-                    let j = SOLFEGENAMES.indexOf(logo.blocks.blockList[cblk].value);
+                if (activity.blocks.blockList[cblk].name === "namedbox") {
+                    let j = SOLFEGENAMES.indexOf(activity.blocks.blockList[cblk].value);
                     if (j !== -1) {
                         j = j >= SOLFEGENAMES.length ? 0 : j;
                         value = SOLFEGENAMES[j + i];
@@ -67,9 +87,9 @@ function setupBoxesBlocks() {
                 }
 
                 try {
-                    logo.blocks.blockSetter(logo, cblk, value, turtle);
+                    activity.blocks.blockSetter(logo, cblk, value, turtle);
                 } catch (e) {
-                    logo.errorMsg(_("Block does not support incrementing."), cblk);
+                    activity.errorMsg(_("Block does not support incrementing."), cblk);
                 }
             }
         }
@@ -78,7 +98,7 @@ function setupBoxesBlocks() {
     class IncrementOneBlock extends IncrementBlock {
         constructor() {
             super("incrementOne");
-            this.setPalette("boxes");
+            this.setPalette("boxes", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -104,7 +124,7 @@ function setupBoxesBlocks() {
     class DecrementOneBlock extends IncrementBlock {
         constructor() {
             super("decrementOne");
-            this.setPalette("boxes");
+            this.setPalette("boxes", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -130,7 +150,7 @@ function setupBoxesBlocks() {
     class BoxBlock extends LeftBlock {
         constructor() {
             super("box");
-            this.setPalette("boxes");
+            this.setPalette("boxes", activity);
             this.parameter = true;
             this.setHelpString([
                 _("The Box block returns the value stored in a box."),
@@ -150,30 +170,30 @@ function setupBoxesBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            const cblk = logo.blocks.blockList[blk].connections[1];
-            const boxname = logo.parseArg(that, turtle, cblk, blk, logo.receivedArg);
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            const boxname = logo.parseArg(logo, turtle, cblk, blk, logo.receivedArg);
             if (boxname in logo.boxes) {
                 return logo.boxes[boxname];
             } else {
-                logo.errorMsg(NOBOXERRORMSG, blk, boxname);
+                activity.errorMsg(NOBOXERRORMSG, blk, boxname);
                 return 0;
             }
         }
 
         setter(logo, value, turtle, blk) {
-            const cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = activity.blocks.blockList[blk].connections[1];
             const name = logo.parseArg(logo, turtle, cblk, blk, logo.receivedArg);
             if (name in logo.boxes) {
                 logo.boxes[name] = value;
             } else {
-                logo.errorMsg(NOBOXERRORMSG, blk, name);
+                activity.errorMsg(NOBOXERRORMSG, blk, name);
             }
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            const cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = activity.blocks.blockList[blk].connections[1];
             if (cblk === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             }
 
@@ -181,7 +201,7 @@ function setupBoxesBlocks() {
             if (name in logo.boxes) {
                 return logo.boxes[name];
             } else {
-                logo.errorMsg(NOBOXERRORMSG, blk, name);
+                activity.errorMsg(NOBOXERRORMSG, blk, name);
                 return 0;
             }
         }
@@ -190,7 +210,7 @@ function setupBoxesBlocks() {
     class NamedBoxBlock extends ValueBlock {
         constructor() {
             super("namedbox");
-            this.setPalette("boxes");
+            this.setPalette("boxes", activity);
             this.beginnerBlock(true);
             this.parameter = true;
             this.setHelpString([
@@ -207,37 +227,37 @@ function setupBoxesBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            const name = logo.blocks.blockList[blk].privateData;
+            const name = activity.blocks.blockList[blk].privateData;
             if (name in logo.boxes) {
                 return logo.boxes[name];
             } else {
-                logo.errorMsg(NOBOXERRORMSG, blk, name);
+                activity.errorMsg(NOBOXERRORMSG, blk, name);
                 return 0;
             }
         }
 
         setter(logo, value, turtle, blk) {
-            const name = logo.blocks.blockList[blk].privateData;
+            const name = activity.blocks.blockList[blk].privateData;
             if (name in logo.boxes) {
                 logo.boxes[name] = value;
             } else {
-                logo.errorMsg(NOBOXERRORMSG, blk, name);
+                activity.errorMsg(NOBOXERRORMSG, blk, name);
             }
         }
 
-        arg(logo, turtle, blk, receivedArg) {
-            const name = logo.blocks.blockList[blk].privateData;
+        arg(logo, turtle, blk) {
+            const name = activity.blocks.blockList[blk].privateData;
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]]
                     .name === "print"
             ) {
-                logo.statusFields.push([blk, logo.blocks.blockList[blk].name]);
+                logo.statusFields.push([blk, activity.blocks.blockList[blk].name]);
             } else if (!logo.updatingStatusMatrix) {
                 if (name in logo.boxes) {
                     return logo.boxes[name];
                 } else {
-                    logo.errorMsg(NOBOXERRORMSG, blk, name);
+                    activity.errorMsg(NOBOXERRORMSG, blk, name);
                     return 0;
                 }
             }
@@ -247,7 +267,7 @@ function setupBoxesBlocks() {
     class StoreIn2Block extends FlowBlock {
         constructor() {
             super("storein2");
-            this.setPalette("boxes");
+            this.setPalette("boxes", activity);
             this.beginnerBlock(true);
             this.setHelpString([
                 _("The Store in block will store a value in a box."),
@@ -265,14 +285,14 @@ function setupBoxesBlocks() {
 
         flow(args, logo, turtle, blk) {
             if (args.length !== 1) return;
-            logo.boxes[logo.blocks.blockList[blk].privateData] = args[0];
+            logo.boxes[activity.blocks.blockList[blk].privateData] = args[0];
         }
     }
 
     class StoreInBlock extends FlowBlock {
         constructor() {
             super("storein");
-            this.setPalette("boxes");
+            this.setPalette("boxes", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -304,7 +324,7 @@ function setupBoxesBlocks() {
     class Box2Block extends ValueBlock {
         constructor() {
             super("box2");
-            this.setPalette("boxes");
+            this.setPalette("boxes", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -324,7 +344,7 @@ function setupBoxesBlocks() {
     class StoreBox2Block extends FlowBlock {
         constructor() {
             super("storebox2");
-            this.setPalette("boxes");
+            this.setPalette("boxes", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -351,7 +371,7 @@ function setupBoxesBlocks() {
     class Box1Block extends ValueBlock {
         constructor() {
             super("box1");
-            this.setPalette("boxes");
+            this.setPalette("boxes", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -371,7 +391,7 @@ function setupBoxesBlocks() {
     class StoreBox1Block extends FlowBlock {
         constructor() {
             super("storebox1");
-            this.setPalette("boxes");
+            this.setPalette("boxes", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -395,15 +415,15 @@ function setupBoxesBlocks() {
         }
     }
 
-    new DecrementOneBlock().setup();
-    new IncrementOneBlock().setup();
-    new IncrementBlock().setup();
-    new BoxBlock().setup();
-    new NamedBoxBlock().setup();
-    new StoreIn2Block().setup();
-    new StoreInBlock().setup();
-    new Box2Block().setup();
-    new StoreBox2Block().setup();
-    new Box1Block().setup();
-    new StoreBox1Block().setup();
+    new DecrementOneBlock().setup(activity);
+    new IncrementOneBlock().setup(activity);
+    new IncrementBlock().setup(activity);
+    new BoxBlock().setup(activity);
+    new NamedBoxBlock().setup(activity);
+    new StoreIn2Block().setup(activity);
+    new StoreInBlock().setup(activity);
+    new Box2Block().setup(activity);
+    new StoreBox2Block().setup(activity);
+    new Box1Block().setup(activity);
+    new StoreBox1Block().setup(activity);
 }

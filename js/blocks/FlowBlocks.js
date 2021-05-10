@@ -1,8 +1,28 @@
-function setupFlowBlocks() {
+// Copyright (c) 2019 Bottersnike
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+/*
+   global
+
+   _, last, ZERODIVIDEERRORMSG, Queue, FlowBlock, ValueBlock,
+   FlowClampBlock, NOINPUTERRORMSG, POSNUMBER, BaseBlock
+*/
+
+/* exported setupFlowBlocks */
+
+function setupFlowBlocks(activity) {
     class BackwardBlock extends FlowClampBlock {
         constructor() {
             super("backward");
-            this.setPalette("flow");
+            this.setPalette("flow", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -23,17 +43,17 @@ function setupFlowBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.backward.push(blk);
             // Set child to bottom block inside clamp
-            const childFlow = logo.blocks.findBottomBlock(args[0]);
+            const childFlow = activity.blocks.findBottomBlock(args[0]);
             const childFlowCount = 1;
 
             const listenerName = "_backward_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const nextBlock = logo.blocks.blockList[blk].connections[2];
+            const nextBlock = activity.blocks.blockList[blk].connections[2];
             if (nextBlock === null) {
                 tur.singer.backward.pop();
             } else {
@@ -44,6 +64,7 @@ function setupFlowBlocks() {
                 }
             }
 
+            // eslint-disable-next-line no-unused-vars
             const __listener = event => tur.singer.backward.pop();
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -54,7 +75,7 @@ function setupFlowBlocks() {
     class DuplicateBlock extends FlowClampBlock {
         constructor() {
             super("duplicatenotes");
-            this.setPalette("flow");
+            this.setPalette("flow", activity);
             this.piemenuValuesC1 = [2, 3, 4, 5, 6, 7, 8];
             this.setHelpString([
                 _("The Duplicate block will run each block multiple times.") +
@@ -88,7 +109,7 @@ function setupFlowBlocks() {
                 typeof args[0] !== "number" ||
                 args[0] < 1
             ) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg0 = 2;
             } else {
                 arg0 = args[0];
@@ -96,10 +117,10 @@ function setupFlowBlocks() {
 
             const factor = Math.floor(arg0);
             if (factor < 1) {
-                logo.errorMsg(ZERODIVIDEERRORMSG, blk);
+                activity.errorMsg(ZERODIVIDEERRORMSG, blk);
                 logo.stopTurtle = true;
             } else {
-                const tur = logo.turtles.ithTurtle(turtle);
+                const tur = activity.turtles.ithTurtle(turtle);
 
                 tur.singer.duplicateFactor *= factor;
 
@@ -123,6 +144,7 @@ function setupFlowBlocks() {
 
                 tur.singer.inDuplicate = true;
 
+                // eslint-disable-next-line no-unused-vars
                 const __listener = event => {
                     tur.singer.inDuplicate = false;
                     tur.singer.duplicateFactor /= factor;
@@ -130,6 +152,7 @@ function setupFlowBlocks() {
                     // Check for a race condition.
                     // FIXME: Do something about the race condition.
                     if (logo.connectionStoreLock) {
+                        // eslint-disable-next-line no-console
                         console.debug("LOCKED");
                     }
 
@@ -140,9 +163,9 @@ function setupFlowBlocks() {
                         const n = logo.connectionStore[turtle][blk].length;
                         for (let i = 0; i < n; i++) {
                             const obj = logo.connectionStore[turtle][blk].pop();
-                            logo.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
+                            activity.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
                             if (obj[2] != null) {
-                                logo.blocks.blockList[obj[2]].connections[0] = obj[0];
+                                activity.blocks.blockList[obj[2]].connections[0] = obj[0];
                             }
                         }
                     } else {
@@ -157,6 +180,7 @@ function setupFlowBlocks() {
                 // Test for race condition.
                 // FIXME: Do something about the race condition.
                 if (logo.connectionStoreLock) {
+                    // eslint-disable-next-line no-console
                     console.debug("LOCKED");
                 }
 
@@ -175,8 +199,8 @@ function setupFlowBlocks() {
                         ];
                         logo.connectionStore[turtle][blk].push(obj);
                         let child = obj[0];
-                        if (logo.blocks.blockList[child].name === "hidden") {
-                            child = logo.blocks.blockList[child].connections[0];
+                        if (activity.blocks.blockList[child].name === "hidden") {
+                            child = activity.blocks.blockList[child].connections[0];
                         }
 
                         const queueBlock = new Queue(child, factor, blk, receivedArg);
@@ -184,15 +208,15 @@ function setupFlowBlocks() {
                         tur.queue.push(queueBlock);
                     }
                 } else {
-                    let child = logo.blocks.findBottomBlock(args[1]);
+                    let child = activity.blocks.findBottomBlock(args[1]);
                     while (child != blk) {
-                        if (logo.blocks.blockList[child].name !== "hidden") {
+                        if (activity.blocks.blockList[child].name !== "hidden") {
                             const queueBlock = new Queue(child, factor, blk, receivedArg);
                             tur.parentFlowQueue.push(blk);
                             tur.queue.push(queueBlock);
                         }
 
-                        child = logo.blocks.blockList[child].connections[0];
+                        child = activity.blocks.blockList[child].connections[0];
                     }
 
                     // Break the connections between blocks in the clamp so
@@ -202,24 +226,24 @@ function setupFlowBlocks() {
                     child = args[1];
                     while (child != null) {
                         const lastConnection =
-                            logo.blocks.blockList[child].connections.length - 1;
+                            activity.blocks.blockList[child].connections.length - 1;
                         const nextBlk =
-                            logo.blocks.blockList[child].connections[
+                            activity.blocks.blockList[child].connections[
                                 lastConnection
                             ];
                         // Don't disconnect a hidden block from its parent.
                         if (
                             nextBlk != null &&
-                            logo.blocks.blockList[nextBlk].name === "hidden"
+                            activity.blocks.blockList[nextBlk].name === "hidden"
                         ) {
                             logo.connectionStore[turtle][blk].push([
                                 nextBlk,
                                 1,
-                                logo.blocks.blockList[nextBlk].connections[1]
+                                activity.blocks.blockList[nextBlk].connections[1]
                             ]);
                             child =
-                                logo.blocks.blockList[nextBlk].connections[1];
-                            logo.blocks.blockList[
+                                activity.blocks.blockList[nextBlk].connections[1];
+                            activity.blocks.blockList[
                                 nextBlk
                             ].connections[1] = null;
                         } else {
@@ -228,14 +252,14 @@ function setupFlowBlocks() {
                                 lastConnection,
                                 nextBlk
                             ]);
-                            logo.blocks.blockList[child].connections[
+                            activity.blocks.blockList[child].connections[
                                 lastConnection
                             ] = null;
                             child = nextBlk;
                         }
 
                         if (child != null) {
-                            logo.blocks.blockList[child].connections[0] = null;
+                            activity.blocks.blockList[child].connections[0] = null;
                         }
                     }
                 }
@@ -248,7 +272,7 @@ function setupFlowBlocks() {
     class DefaultCaseBlock extends FlowClampBlock {
         constructor() {
             super("defaultcase");
-            this.setPalette("flow");
+            this.setPalette("flow", activity);
             this.setHelpString([
                 _(
                     "The Default block is used inside of a Switch to define the default action."
@@ -269,7 +293,7 @@ function setupFlowBlocks() {
         flow(args, logo, turtle, blk) {
             const switchBlk = last(logo.switchBlocks[turtle]);
             if (switchBlk === null) {
-                logo.errorMsg(
+                activity.errorMsg(
                     _("The Case Block must be used inside of a Switch Block."),
                     blk
                 );
@@ -284,7 +308,7 @@ function setupFlowBlocks() {
     class CaseBlock extends FlowClampBlock {
         constructor() {
             super("case");
-            this.setPalette("flow");
+            this.setPalette("flow", activity);
             this.setHelpString([
                 _(
                     "The Case block is used inside of a Switch to define matches."
@@ -307,7 +331,7 @@ function setupFlowBlocks() {
         flow(args, logo, turtle, blk) {
             const switchBlk = last(logo.switchBlocks[turtle]);
             if (switchBlk === null) {
-                logo.errorMsg(
+                activity.errorMsg(
                     _("The Case Block must be used inside of a Switch Block."),
                     blk
                 );
@@ -322,7 +346,7 @@ function setupFlowBlocks() {
     class SwitchBlock extends FlowClampBlock {
         constructor() {
             super("switch");
-            this.setPalette("flow");
+            this.setPalette("flow", activity);
             this.setHelpString([
                 _("The Switch block will run the code in the matching Case."),
                 "documentation",
@@ -349,7 +373,7 @@ function setupFlowBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             logo.switchBlocks[turtle].push(blk);
             logo.switchCases[turtle][blk] = [];
@@ -361,7 +385,7 @@ function setupFlowBlocks() {
                 const switchBlk = last(logo.switchBlocks[turtle]);
                 // Run the cases here.
                 let switchCase;
-                const argBlk = logo.blocks.blockList[switchBlk].connections[1];
+                const argBlk = activity.blocks.blockList[switchBlk].connections[1];
                 if (argBlk == null) {
                     switchCase = "__default__";
                 } else {
@@ -403,7 +427,7 @@ function setupFlowBlocks() {
     class ClampBlock extends FlowClampBlock {
         constructor() {
             super("clamp");
-            this.setPalette("flow");
+            this.setPalette("flow", activity);
             this.setHelpString();
 
             this.hidden = true;
@@ -424,7 +448,7 @@ function setupFlowBlocks() {
     class BreakBlock extends BaseBlock {
         constructor() {
             super("break");
-            this.setPalette("flow");
+            this.setPalette("flow", activity);
             this.setHelpString([
                 _("The Stop block will stop a loop") +
                     ": " +
@@ -448,11 +472,11 @@ function setupFlowBlocks() {
         }
 
         flow(_, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             logo.doBreak(tur);
             // Since we pop the queue, we need to unhighlight our parent
-            const parentBlk = logo.blocks.blockList[blk].connections[0];
+            const parentBlk = activity.blocks.blockList[blk].connections[0];
             if (parentBlk != null) {
                 if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
                     tur.unhighlightQueue.push(parentBlk);
@@ -464,7 +488,7 @@ function setupFlowBlocks() {
     class WaitForBlock extends FlowBlock {
         constructor() {
             super("waitFor");
-            this.setPalette("flow");
+            this.setPalette("flow", activity);
             this.setHelpString([
                 _("The Waitfor block will wait until the condition is true."),
                 "documentation",
@@ -482,11 +506,11 @@ function setupFlowBlocks() {
         flow(args, logo, turtle, blk) {
             if (args.length !== 1) return;
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (!args[0]) {
                 // Requeue.
-                const parentBlk = logo.blocks.blockList[blk].connections[0];
+                const parentBlk = activity.blocks.blockList[blk].connections[0];
                 const queueBlock = new Queue(blk, 1, parentBlk);
                 tur.parentFlowQueue.push(parentBlk);
                 tur.queue.push(queueBlock);
@@ -523,7 +547,7 @@ function setupFlowBlocks() {
     class UntilBlock extends FlowClampBlock {
         constructor() {
             super("until");
-            this.setPalette("flow");
+            this.setPalette("flow", activity);
             this.setHelpString([
                 _("The Until block will repeat until the condition is true."),
                 "documentation",
@@ -544,7 +568,7 @@ function setupFlowBlocks() {
         flow(args, logo, turtle, blk) {
             if (args.length !== 2) return;
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (!args[0]) {
                 // We will add the outflow of the until block
@@ -557,7 +581,7 @@ function setupFlowBlocks() {
                     }
                 }
                 // Requeue
-                const parentBlk = logo.blocks.blockList[blk].connections[0];
+                const parentBlk = activity.blocks.blockList[blk].connections[0];
                 const queueBlock = new Queue(blk, 1, parentBlk);
                 tur.parentFlowQueue.push(parentBlk);
                 tur.queue.push(queueBlock);
@@ -582,7 +606,7 @@ function setupFlowBlocks() {
     class WhileBlock extends FlowClampBlock {
         constructor() {
             super("while");
-            this.setPalette("flow");
+            this.setPalette("flow", activity);
             this.setHelpString([
                 _("The While block will repeat while the condition is true."),
                 "documentation",
@@ -606,7 +630,7 @@ function setupFlowBlocks() {
             // itself.
             if (args.length !== 2) return;
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (args[0]) {
                 // We will add the outflow of the while block
@@ -619,7 +643,7 @@ function setupFlowBlocks() {
                     }
                 }
 
-                const parentBlk = logo.blocks.blockList[blk].connections[0];
+                const parentBlk = activity.blocks.blockList[blk].connections[0];
                 const queueBlock = new Queue(blk, 1, parentBlk);
                 tur.parentFlowQueue.push(parentBlk);
                 tur.queue.push(queueBlock);
@@ -644,10 +668,10 @@ function setupFlowBlocks() {
     class IfThenElseBlock extends FlowClampBlock {
         constructor() {
             super("ifthenelse");
-            this.setPalette("flow");
+            this.setPalette("flow", activity);
             this.beginnerBlock(true);
 
-            if (beginnerMode && this.lang === "ja") {
+            if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
                     _(
                         "Conditionals lets your program take different actions depending on the condition."
@@ -695,10 +719,10 @@ function setupFlowBlocks() {
     class IfBlock extends FlowClampBlock {
         constructor() {
             super("if");
-            this.setPalette("flow");
+            this.setPalette("flow", activity);
             this.beginnerBlock(true);
 
-            if (beginnerMode && this.lang === "ja") {
+            if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
                     _(
                         "Conditionals lets your program take different actions depending on the condition."
@@ -744,7 +768,7 @@ function setupFlowBlocks() {
     class ForeverBlock extends FlowClampBlock {
         constructor() {
             super("forever");
-            this.setPalette("flow");
+            this.setPalette("flow", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -768,14 +792,14 @@ function setupFlowBlocks() {
         flow(args, logo, turtle) {
             if (args.length !== 1) return;
 
-            return [args[0], logo.turtles.ithTurtle(turtle).singer.suppressOutput ? 20 : -1];
+            return [args[0], activity.turtles.ithTurtle(turtle).singer.suppressOutput ? 20 : -1];
         }
     }
 
     class RepeatBlock extends FlowClampBlock {
         constructor() {
             super("repeat");
-            this.setPalette("flow");
+            this.setPalette("flow", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -805,7 +829,7 @@ function setupFlowBlocks() {
                 args[0] < 1
             ) {
                 if (args[0] < 0)
-                    logo.errorMsg(POSNUMBER, blk);
+                    activity.errorMsg(POSNUMBER, blk);
                 return [null , 0];
             } else {
                 arg = args[0];
@@ -819,7 +843,7 @@ function setupFlowBlocks() {
         constructor() {
             //.TRANS: factor used in determining how many duplications to make
             super("duplicatefactor", _("duplicate factor"));
-            this.setPalette("flow");
+            this.setPalette("flow", activity);
             this.setHelpString();
             this.hidden = true;
         }
@@ -827,13 +851,13 @@ function setupFlowBlocks() {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]]
                     .name === "print"
             ) {
                 logo.statusFields.push([blk, "duplicate"]);
             } else {
-                logo.blocks.blockList[blk].value =
-                    logo.turtles.ithTurtle(turtle).singer.duplicateFactor;
+                activity.blocks.blockList[blk].value =
+                    activity.turtles.ithTurtle(turtle).singer.duplicateFactor;
             }
         }
     }
@@ -841,7 +865,7 @@ function setupFlowBlocks() {
     class HiddenNoFlowBlock extends FlowBlock {
         constructor() {
             super("hiddennoflow");
-            this.setPalette("flow");
+            this.setPalette("flow", activity);
             this.setHelpString();
             this.dockTypes[this.dockTypes.length - 1] = "unavailable";
             this.size = 0;
@@ -854,7 +878,7 @@ function setupFlowBlocks() {
     class HiddenBlock extends FlowBlock {
         constructor() {
             super("hidden");
-            this.setPalette("flow");
+            this.setPalette("flow", activity);
             this.setHelpString();
             this.size = 0;
             this.hidden = true;
@@ -863,21 +887,21 @@ function setupFlowBlocks() {
         flow() {}
     }
 
-    new BackwardBlock().setup();
-    new DuplicateBlock().setup();
-    new DefaultCaseBlock().setup();
-    new CaseBlock().setup();
-    new SwitchBlock().setup();
-    new ClampBlock().setup();
-    new BreakBlock().setup();
-    new WaitForBlock().setup();
-    new UntilBlock().setup();
-    new WhileBlock().setup();
-    new IfThenElseBlock().setup();
-    new IfBlock().setup();
-    new ForeverBlock().setup();
-    new RepeatBlock().setup();
-    new DuplicateFactorBlock().setup();
-    new HiddenNoFlowBlock().setup();
-    new HiddenBlock().setup();
+    new BackwardBlock().setup(activity);
+    new DuplicateBlock().setup(activity);
+    new DefaultCaseBlock().setup(activity);
+    new CaseBlock().setup(activity);
+    new SwitchBlock().setup(activity);
+    new ClampBlock().setup(activity);
+    new BreakBlock().setup(activity);
+    new WaitForBlock().setup(activity);
+    new UntilBlock().setup(activity);
+    new WhileBlock().setup(activity);
+    new IfThenElseBlock().setup(activity);
+    new IfBlock().setup(activity);
+    new ForeverBlock().setup(activity);
+    new RepeatBlock().setup(activity);
+    new DuplicateFactorBlock().setup(activity);
+    new HiddenNoFlowBlock().setup(activity);
+    new HiddenBlock().setup(activity);
 }

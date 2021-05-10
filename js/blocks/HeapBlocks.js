@@ -1,9 +1,28 @@
-function setupHeapBlocks() {
+// Copyright (c) 2019 Bottersnike
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+/*
+   global
+
+   _, ValueBlock, LeftBlock, FlowBlock, NOINPUTERRORMSG, NANERRORMSG
+ */
+
+/* exported setupHeapBlocks */
+
+function setupHeapBlocks(activity) {
 
     class HeapBlock extends ValueBlock {
         constructor() {
             super("heap");
-            this.setPalette("heap");
+            this.setPalette("heap", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -20,10 +39,10 @@ function setupHeapBlocks() {
             });
         }
 
-        arg(logo, turtle, blk, receivedArg) {
+        arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "heap"]);
             } else {
@@ -35,7 +54,7 @@ function setupHeapBlocks() {
     class ShowHeapBlock extends FlowBlock {
         constructor() {
             super("showHeap");
-            this.setPalette("heap");
+            this.setPalette("heap", activity);
             this.hidden = this.deprecated = true;
             this.beginnerBlock(true);
 
@@ -57,14 +76,14 @@ function setupHeapBlocks() {
             if (!(turtle in logo.turtleHeaps)) {
                 logo.turtleHeaps[turtle] = [];
             }
-            logo.textMsg(JSON.stringify(logo.turtleHeaps[turtle]));
+            activity.textMsg(JSON.stringify(logo.turtleHeaps[turtle]));
         }
     }
 
     class HeapLengthBlock extends ValueBlock {
         constructor() {
             super("heapLength");
-            this.setPalette("heap");
+            this.setPalette("heap", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -86,7 +105,7 @@ function setupHeapBlocks() {
             }
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "heapLength"]);
             } else {
@@ -98,7 +117,7 @@ function setupHeapBlocks() {
     class HeapEmptyBlock extends ValueBlock {
         constructor() {
             super("heapEmpty");
-            this.setPalette("heap");
+            this.setPalette("heap", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -124,7 +143,7 @@ function setupHeapBlocks() {
     class EmptyHeapBlock extends FlowBlock {
         constructor() {
             super("emptyHeap");
-            this.setPalette("heap");
+            this.setPalette("heap", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -147,7 +166,7 @@ function setupHeapBlocks() {
     class ReverseHeapBlock extends FlowBlock {
         constructor() {
             super("reverseHeap");
-            this.setPalette("heap");
+            this.setPalette("heap", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -170,7 +189,7 @@ function setupHeapBlocks() {
     class IndexHeapBlock extends LeftBlock {
         constructor() {
             super("indexHeap");
-            this.setPalette("heap");
+            this.setPalette("heap", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -190,9 +209,9 @@ function setupHeapBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            const cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = activity.blocks.blockList[blk].connections[1];
             if (cblk === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             }
             let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
@@ -206,12 +225,12 @@ function setupHeapBlocks() {
                     a = logo.turtleHeaps[turtle].length;
                 } else if (a < 1) {
                     a = 1;
-                    logo.errorMsg(_("Index must be > 0."));
+                    activity.errorMsg(_("Index must be > 0."));
                 }
 
                 if (a > 1000) {
                     a = 1000;
-                    logo.errorMsg(_("Maximum heap size is 1000."));
+                    activity.errorMsg(_("Maximum heap size is 1000."));
                 }
 
                 // If index > heap length, grow the heap.
@@ -221,7 +240,7 @@ function setupHeapBlocks() {
 
                 return logo.turtleHeaps[turtle][a - 1];
             }
-            logo.errorMsg(NANERRORMSG, blk);
+            activity.errorMsg(NANERRORMSG, blk);
             return 0;
         }
     }
@@ -229,7 +248,7 @@ function setupHeapBlocks() {
     class SetHeapEntryBlock extends FlowBlock {
         constructor() {
             super("setHeapEntry");
-            this.setPalette("heap");
+            this.setPalette("heap", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -255,12 +274,12 @@ function setupHeapBlocks() {
 
         flow(args, logo, turtle, blk) {
             if (args[0] === null || args[1] === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
             if (typeof args[0] !== "number" || typeof args[1] !== "number") {
-                logo.errorMsg(NANERRORMSG, blk);
+                activity.errorMsg(NANERRORMSG, blk);
                 return;
             }
 
@@ -270,12 +289,12 @@ function setupHeapBlocks() {
 
             let idx = Math.floor(args[0]);
             if (idx < 1) {
-                logo.errorMsg(_("Index must be > 0."));
+                activity.errorMsg(_("Index must be > 0."));
                 idx = 1;
             }
 
             if (idx > 1000) {
-                logo.errorMsg(_("Maximum heap size is 1000."));
+                activity.errorMsg(_("Maximum heap size is 1000."));
                 idx = 1000;
             }
 
@@ -291,7 +310,7 @@ function setupHeapBlocks() {
     class PopBlock extends ValueBlock {
         constructor() {
             super("pop");
-            this.setPalette("heap");
+            this.setPalette("heap", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -313,7 +332,7 @@ function setupHeapBlocks() {
             ) {
                 return logo.turtleHeaps[turtle].pop();
             }
-            logo.errorMsg(_("empty heap"));
+            activity.errorMsg(_("empty heap"));
             return 0;
         }
     }
@@ -321,7 +340,7 @@ function setupHeapBlocks() {
     class PushBlock extends FlowBlock {
         constructor() {
             super("push");
-            this.setPalette("heap");
+            this.setPalette("heap", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -341,7 +360,7 @@ function setupHeapBlocks() {
 
         flow(args, logo, turtle, blk) {
             if (args[0] === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
@@ -353,14 +372,14 @@ function setupHeapBlocks() {
         }
     }
 
-    new HeapBlock().setup();
-    new ShowHeapBlock().setup();
-    new HeapLengthBlock().setup();
-    new HeapEmptyBlock().setup();
-    new EmptyHeapBlock().setup();
-    new ReverseHeapBlock().setup();
-    new IndexHeapBlock().setup();
-    new SetHeapEntryBlock().setup();
-    new PopBlock().setup();
-    new PushBlock().setup();
+    new HeapBlock().setup(activity);
+    new ShowHeapBlock().setup(activity);
+    new HeapLengthBlock().setup(activity);
+    new HeapEmptyBlock().setup(activity);
+    new EmptyHeapBlock().setup(activity);
+    new ReverseHeapBlock().setup(activity);
+    new IndexHeapBlock().setup(activity);
+    new SetHeapEntryBlock().setup(activity);
+    new PopBlock().setup(activity);
+    new PushBlock().setup(activity);
 }

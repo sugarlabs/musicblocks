@@ -1,8 +1,29 @@
-function setupToneBlocks() {
+// Copyright (c) 2019 Bottersnike
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+/*
+   global
+
+   _, FlowBlock, NOINPUTERRORMSG, ValueBlock, FlowClampBlock,
+   LeftBlock, DEFAULTOSCILLATORTYPE, OSCTYPES, Singer,
+   instrumentsEffects, last, VOICENAMES, DRUMNAMES, DEFAULTVOICE
+ */
+
+/* exported setupToneBlocks */
+
+function setupToneBlocks(activity) {
     class OscillatorBlock extends FlowBlock {
         constructor() {
             super("oscillator", _("oscillator"));
-            this.setPalette("tone");
+            this.setPalette("tone", activity);
             this.setHelpString();
             this.formBlock({
                 args: 2,
@@ -36,7 +57,7 @@ function setupToneBlocks() {
 
             if (logo.inTimbre) {
                 if (logo.timbre.osc.length != 0) {
-                    logo.errorMsg(
+                    activity.errorMsg(
                         _("You are adding multiple oscillator blocks.")
                     );
                 } else {
@@ -59,7 +80,7 @@ function setupToneBlocks() {
     class FillerTypeBlock extends ValueBlock {
         constructor() {
             super("filtertype");
-            this.setPalette("tone");
+            this.setPalette("tone", activity);
             this.setHelpString();
             this.formBlock({ outType: "textout" });
             this.hidden = true;
@@ -69,7 +90,7 @@ function setupToneBlocks() {
     class OscillatorTypeBlock extends ValueBlock {
         constructor() {
             super("oscillatortype");
-            this.setPalette("tone");
+            this.setPalette("tone", activity);
             this.setHelpString();
             this.formBlock({ outType: "textout" });
             this.hidden = true;
@@ -80,7 +101,7 @@ function setupToneBlocks() {
         constructor() {
             //.TRANS: a duo synthesizer combines a synth with a sequencer
             super("duosynth", _("duo synth"));
-            this.setPalette("tone");
+            this.setPalette("tone", activity);
             this.piemenuValuesC1 = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             this.piemenuValuesC2 = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             this.setHelpString([
@@ -107,7 +128,7 @@ function setupToneBlocks() {
         constructor() {
             //.TRANS: AM (amplitude modulation) synthesizer
             super("amsynth", _("AM synth"));
-            this.setPalette("tone");
+            this.setPalette("tone", activity);
             this.piemenuValuesC1 = [1, 2];
             this.setHelpString([
                 _(
@@ -132,7 +153,7 @@ function setupToneBlocks() {
         constructor() {
             //.TRANS: FM (frequency modulation) synthesizer
             super("fmsynth", _("FM synth"));
-            this.setPalette("tone");
+            this.setPalette("tone", activity);
             this.piemenuValuesC1 = [1, 5, 10, 15, 20, 25];
             this.setHelpString([
                 _(
@@ -156,7 +177,7 @@ function setupToneBlocks() {
     class PartialBlock extends FlowBlock {
         constructor() {
             super("partial", _("partial"));
-            this.setPalette("tone");
+            this.setPalette("tone", activity);
             this.setHelpString([
                 _(
                     "The Partial block is used to specify a weight for a specific partical harmonic."
@@ -173,19 +194,19 @@ function setupToneBlocks() {
         flow(args, logo, turtle) {
             if (typeof args[0] !== "number" || args[0] > 1 || args[0] < 0) {
                 //.TRANS: partials are weighted components in a harmonic series
-                logo.errorMsg(_("Partial weight must be between 0 and 1."));
+                activity.errorMsg(_("Partial weight must be between 0 and 1."));
                 logo.stopTurtle = true;
                 return;
             }
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (tur.singer.inHarmonic.length > 0) {
                 const n = tur.singer.inHarmonic.length - 1;
                 tur.singer.partials[n].push(args[0]);
             } else {
                 //.TRANS: partials are weighted components in a harmonic series
-                logo.errorMsg(
+                activity.errorMsg(
                     _(
                         "Partial block should be used inside of a Weighted-partials block."
                     )
@@ -197,7 +218,7 @@ function setupToneBlocks() {
     class HarmonicBlock extends FlowClampBlock {
         constructor() {
             super("harmonic");
-            this.setPalette("tone");
+            this.setPalette("tone", activity);
             this.setHelpString([
                 _(
                     "The Weighted partials block is used to specify the partials associated with a timbre."
@@ -222,7 +243,7 @@ function setupToneBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.inHarmonic.push(blk);
             tur.singer.partials.push([]);
@@ -230,6 +251,7 @@ function setupToneBlocks() {
             const listenerName = "_harmonic_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
+            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 tur.singer.inHarmonic.pop();
                 tur.singer.partials.pop();
@@ -245,7 +267,7 @@ function setupToneBlocks() {
         constructor() {
             super("harmonic2");
             this.piemenuValuesC1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-            this.setPalette("tone");
+            this.setPalette("tone", activity);
             this.setHelpString([
                 _(
                     "The Harmonic block will add harmonics to the contained notes."
@@ -277,7 +299,7 @@ function setupToneBlocks() {
     class DisBlock extends FlowClampBlock {
         constructor() {
             super("dis");
-            this.setPalette("tone");
+            this.setPalette("tone", activity);
             this.piemenuValuesC1 = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             this.setHelpString([
                 _("The Distortion block adds distortion to the pitch."),
@@ -296,12 +318,14 @@ function setupToneBlocks() {
         flow(args, logo, turtle, blk) {
             Singer.ToneActions.doDistortion(args[0], turtle, blk);
 
+            const tur = activity.turtles.ithTurtle(turtle);
+
             if (logo.inTimbre) {
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["distortionActive"] = true;
                 logo.timbre.distortionEffect.push(blk);
                 logo.timbre.distortionParams.push(last(tur.singer.distortionAmount) * 100);
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["distortionAmount"] =
-                    distortion;
+                    args[0];
             }
 
             return [args[1], 1];
@@ -311,7 +335,7 @@ function setupToneBlocks() {
     class TremoloBlock extends FlowClampBlock {
         constructor() {
             super("tremolo");
-            this.setPalette("tone");
+            this.setPalette("tone", activity);
             this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 20];
             this.piemenuValuesC2 = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             this.beginnerBlock(true);
@@ -335,8 +359,8 @@ function setupToneBlocks() {
                     _("depth")
                 ]
             });
-            this.formBlock((x, y) => [
-                [0, "tremolo", 0, 0, [null, 1, 2, null, 3]],
+            this.makeMacro((x, y) => [
+                [0, "tremolo", x, y, [null, 1, 2, null, 3]],
                 [1, ["number", { value: 10 }], 0, 0, [0]],
                 [2, ["number", { value: 50 }], 0, 0, [0]],
                 [3, "hidden", 0, 0, [0, null]]
@@ -346,14 +370,16 @@ function setupToneBlocks() {
         flow(args, logo, turtle, blk) {
             Singer.ToneActions.doTremolo(args[0], args[1], turtle, blk);
 
+            const tur = activity.turtles.ithTurtle(turtle);
+    
             if (logo.inTimbre) {
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["tremoloActive"] = true;
                 logo.timbre.tremoloEffect.push(blk);
                 logo.timbre.tremoloParams.push(last(tur.singer.tremoloFrequency));
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["tremoloFrequency"] =
-                    frequency;
+                    args[0];
                 logo.timbre.tremoloParams.push(last(tur.singer.tremoloDepth) * 100);
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["tremoloDepth"] = depth;
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["tremoloDepth"] = args[1];
             }
 
             return [args[2], 1];
@@ -363,7 +389,7 @@ function setupToneBlocks() {
     class PhaserBlock extends FlowClampBlock {
         constructor() {
             super("phaser");
-            this.setPalette("tone");
+            this.setPalette("tone", activity);
             this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5,
                 10, 20];
             this.piemenuValuesC2 = [1, 2, 3];
@@ -386,17 +412,18 @@ function setupToneBlocks() {
 
         flow(args, logo, turtle, blk) {
             Singer.ToneActions.doPhaser(args[0], args[1], args[2], turtle, blk);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (logo.inTimbre) {
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["phaserActive"] = true;
                 logo.timbre.phaserEffect.push(blk);
                 logo.timbre.phaserParams.push(last(tur.singer.rate));
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["rate"] = rate;
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["rate"] = args[0];
                 logo.timbre.phaserParams.push(last(tur.singer.octaves));
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["octaves"] = octaves;
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["octaves"] = args[1];
                 logo.timbre.phaserParams.push(last(tur.signer.baseFrequency));
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["baseFrequency"] =
-                    baseFrequency;
+                    args[2];
             }
 
             return [args[3], 1];
@@ -406,7 +433,7 @@ function setupToneBlocks() {
     class ChorusBlock extends FlowClampBlock {
         constructor() {
             super("chorus");
-            this.setPalette("tone");
+            this.setPalette("tone", activity);
             this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
             this.piemenuValuesC2 = [2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 9, 10];
             this.piemenuValuesC3 = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
@@ -430,16 +457,17 @@ function setupToneBlocks() {
 
         flow(args, logo, turtle, blk) {
             Singer.ToneActions.doChorus(args[0], args[1], args[2], turtle, blk);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (logo.inTimbre) {
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["chorusActive"] = true;
                 logo.timbre.chorusEffect.push(blk);
                 logo.timbre.chorusParams.push(last(tur.singer.chorusRate));
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["chorusRate"] = chorusRate;
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["chorusRate"] = args[0];
                 logo.timbre.chorusParams.push(last(tur.singer.delayTime));
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["delayTime"] = delayTime;
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["delayTime"] = args[1];
                 logo.timbre.chorusParams.push(last(tur.singer.chorusDepth) * 100);
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["chorusDepth"] = chorusDepth;
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["chorusDepth"] = args[2];
             }
 
             return [args[3], 1];
@@ -449,7 +477,7 @@ function setupToneBlocks() {
     class VibratoBlock extends FlowClampBlock {
         constructor() {
             super("vibrato");
-            this.setPalette("tone");
+            this.setPalette("tone", activity);
             this.piemenuValuesC1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
             this.beginnerBlock(true);
 
@@ -488,7 +516,7 @@ function setupToneBlocks() {
     class SetVoiceBlock extends FlowClampBlock {
         constructor() {
             super("setvoice");
-            this.setPalette("tone");
+            this.setPalette("tone", activity);
             this.setHelpString();
             this.formBlock({
                 //.TRANS: select synthesizer
@@ -526,15 +554,16 @@ function setupToneBlocks() {
                 }
             }
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (voicename === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
             } else {
                 tur.singer.voices.push(voicename);
                 const listenerName = "_setvoice_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
+                // eslint-disable-next-line no-unused-vars
                 const __listener = event => tur.singer.voices.pop();
 
                 logo.setTurtleListener(turtle, listenerName, __listener);
@@ -547,7 +576,7 @@ function setupToneBlocks() {
     class SynthNameBlock extends ValueBlock {
         constructor() {
             super("synthname", _("synth name"));
-            this.setPalette("tone");
+            this.setPalette("tone", activity);
             this.setHelpString();
             this.formBlock({ outType: "textout" });
             this.hidden = this.deprecated = true;
@@ -556,11 +585,11 @@ function setupToneBlocks() {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "synthname"]);
             } else {
-                return last(logo.turtles.ithTurtle(turtle).singer.instrumentNames);
+                return last(activity.turtles.ithTurtle(turtle).singer.instrumentNames);
             }
         }
     }
@@ -568,7 +597,7 @@ function setupToneBlocks() {
     class VoiceNameBlock extends ValueBlock {
         constructor() {
             super("voicename");
-            this.setPalette("tone");
+            this.setPalette("tone", activity);
             this.setHelpString([
                 _(
                     "The Set instrument block selects a voice for the synthesizer,"
@@ -586,10 +615,10 @@ function setupToneBlocks() {
     class SetTimbreBlock extends FlowClampBlock {
         constructor() {
             super("settimbre");
-            this.setPalette("tone");
+            this.setPalette("tone", activity);
             this.beginnerBlock(true);
 
-            if (beginnerMode && this.lang === "ja") {
+            if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
                     _(
                         "The Set instrument block selects a voice for the synthesizer,"
@@ -626,7 +655,7 @@ function setupToneBlocks() {
 
         flow(args, logo, turtle, blk) {
             if (args[0] === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
             } else {
                 if (logo.inRhythmRuler) {
                     logo._currentDrumBlock = blk;
@@ -663,7 +692,7 @@ function setupToneBlocks() {
     class CustomSampleBlock extends LeftBlock {
         constructor() {
             super("customsample", _("sample"));
-            this.setPalette("tone");
+            this.setPalette("tone", activity);
             this.beginnerBlock(false);
 
             this.setHelpString([
@@ -690,39 +719,39 @@ function setupToneBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            return activity.blocks.blockList[blk].value;
         }
 
-        arg(logo, turtle, blk, receivedArg) {
+        arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "customsample"]);
             } else {
-                if (logo.blocks.blockList[blk].value === null) {
-                    logo.blocks.blockList[blk].value = ["", "", "do", 4];
+                if (activity.blocks.blockList[blk].value === null) {
+                    activity.blocks.blockList[blk].value = ["", "", "do", 4];
                 }
-                let cblk1 = logo.blocks.blockList[blk].connections[1];
+                const cblk1 = activity.blocks.blockList[blk].connections[1];
                 if (cblk1 != null) {
-                    if (logo.blocks.blockList[cblk1].value !== null) {
-                        let namevalue = logo.blocks.blockList[cblk1].value[0];
-                        let datavalue = logo.blocks.blockList[cblk1].value[1];
-                        logo.blocks.blockList[blk].value[0] = namevalue;
-                        logo.blocks.blockList[blk].value[1] = datavalue;
+                    if (activity.blocks.blockList[cblk1].value !== null) {
+                        const namevalue = activity.blocks.blockList[cblk1].value[0];
+                        const datavalue = activity.blocks.blockList[cblk1].value[1];
+                        activity.blocks.blockList[blk].value[0] = namevalue;
+                        activity.blocks.blockList[blk].value[1] = datavalue;
                     }
                 }
-                let cblk2 = logo.blocks.blockList[blk].connections[2];
+                const cblk2 = activity.blocks.blockList[blk].connections[2];
                 if (cblk2 != null) {
-                    let svalue = logo.blocks.blockList[cblk2].value;
-                    logo.blocks.blockList[blk].value[2] = svalue;
+                    const svalue = activity.blocks.blockList[cblk2].value;
+                    activity.blocks.blockList[blk].value[2] = svalue;
                 }
-                let cblk3 = logo.blocks.blockList[blk].connections[3];
+                const cblk3 = activity.blocks.blockList[blk].connections[3];
                 if (cblk3 != null) {
-                    let ovalue = logo.blocks.blockList[cblk3].value;
-                    logo.blocks.blockList[blk].value[3] = ovalue;
+                    const ovalue = activity.blocks.blockList[cblk3].value;
+                    activity.blocks.blockList[blk].value[3] = ovalue;
                 }
-                return logo.blocks.blockList[blk].value;
+                return activity.blocks.blockList[blk].value;
             }
         }
     }
@@ -731,8 +760,8 @@ function setupToneBlocks() {
         constructor() {
             super("audiofile");
             this.parameter = true;
-	    this.extraWidth = 20;
-            this.setPalette("tone");
+            this.extraWidth = 20;
+            this.setPalette("tone", activity);
             this.hidden = true;
             this.beginnerBlock(false);
 
@@ -748,30 +777,29 @@ function setupToneBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            console.log("BLK");
-            logo.blocks.updateBlockText(blk);
-            return logo.blocks.blockList[blk].value;
+            activity.blocks.updateBlockText(blk);
+            return activity.blocks.blockList[blk].value;
         }
     }
 
-    new OscillatorBlock().setup();
-    new FillerTypeBlock().setup();
-    new OscillatorTypeBlock().setup();
-    new DuoSynthBlock().setup();
-    new AMSynth().setup();
-    new FMSynth().setup();
-    new PartialBlock().setup();
-    new HarmonicBlock().setup();
-    new Harmonic2Block().setup();
-    new DisBlock().setup();
-    new TremoloBlock().setup();
-    new PhaserBlock().setup();
-    new ChorusBlock().setup();
-    new VibratoBlock().setup();
-    new AudioFileBlock().setup();
-    new CustomSampleBlock().setup();
-    new SetVoiceBlock().setup();
-    new SynthNameBlock().setup();
-    new VoiceNameBlock().setup();
-    new SetTimbreBlock().setup();
+    new OscillatorBlock().setup(activity);
+    new FillerTypeBlock().setup(activity);
+    new OscillatorTypeBlock().setup(activity);
+    new DuoSynthBlock().setup(activity);
+    new AMSynth().setup(activity);
+    new FMSynth().setup(activity);
+    new PartialBlock().setup(activity);
+    new HarmonicBlock().setup(activity);
+    new Harmonic2Block().setup(activity);
+    new DisBlock().setup(activity);
+    new TremoloBlock().setup(activity);
+    new PhaserBlock().setup(activity);
+    new ChorusBlock().setup(activity);
+    new VibratoBlock().setup(activity);
+    new AudioFileBlock().setup(activity);
+    new CustomSampleBlock().setup(activity);
+    new SetVoiceBlock().setup(activity);
+    new SynthNameBlock().setup(activity);
+    new VoiceNameBlock().setup(activity);
+    new SetTimbreBlock().setup(activity);
 }

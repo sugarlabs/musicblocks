@@ -1,17 +1,29 @@
+// Copyright (c) 2019 Bottersnike
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
 /*
-   global turtles, last, _, FlowBlock, NOINPUTERRORMSG, MeterWidget, DEFAULTVOICE,
-   instrumentsEffects, StackClampBlock, Oscilloscope, DEFAULTMODE, Tempo, PitchDrumMatrix,
-   PhraseMaker, StatusMatrix, RhythmRuler, beginnerMode, FILTERTYPES, instrumentsFilters,
-   DEFAULTFILTERTYPE, TemperamentWidget, TimbreWidget, ModeWidget, PitchSlider, MusicKeyboard,
-   PitchStaircase
+   global
+
+   last, _, FlowBlock, NOINPUTERRORMSG, MeterWidget,
+   DEFAULTVOICE, instrumentsEffects, StackClampBlock, Oscilloscope,
+   DEFAULTMODE, Tempo, PitchDrumMatrix, PhraseMaker, StatusMatrix,
+   RhythmRuler, FILTERTYPES, instrumentsFilters, DEFAULTFILTERTYPE,
+   TemperamentWidget, TimbreWidget, ModeWidget, PitchSlider,
+   MusicKeyboard, PitchStaircase, SampleWidget
  */
 
 /*
    Global locations
    - js/utils/utils.js
         _
-   - js/activity.js
-    beginnerMode
    - js/logo.js
     NOINPUTERRORMSG
    - js/widgets/meterwidget.js
@@ -50,12 +62,12 @@
 
 /* exported setupWidgetBlocks */
 
-function setupWidgetBlocks() {
+function setupWidgetBlocks(activity) {
     class EnvelopeBlock extends FlowBlock {
         constructor() {
             //.TRANS: sound envelope (ADSR)
             super("envelope", _("envelope"));
-            this.setPalette("widgets");
+            this.setPalette("widgets", activity);
             this.setHelpString();
             this.formBlock({
                 args: 4,
@@ -75,20 +87,20 @@ function setupWidgetBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (args.length === 4 && typeof args[0] === "number") {
                 if (args[0] < 0 || args[0] > 100) {
-                    logo.errorMsg(_("Attack value should be from 0 to 100."));
+                    activity.errorMsg(_("Attack value should be from 0 to 100."));
                 }
                 if (args[1] < 0 || args[1] > 100) {
-                    logo.errorMsg(_("Decay value should be from 0 to 100."));
+                    activity.errorMsg(_("Decay value should be from 0 to 100."));
                 }
                 if (args[2] < 0 || args[2] > 100) {
-                    logo.errorMsg(_("Sustain value should be from 0 to 100."));
+                    activity.errorMsg(_("Sustain value should be from 0 to 100."));
                 }
                 if (args[3] < 0 || args[3] > 100) {
-                    logo.errorMsg(_("Release value should be from 0-100."));
+                    activity.errorMsg(_("Release value should be from 0-100."));
                 }
 
                 tur.singer.attack.push(args[0] / 100);
@@ -104,7 +116,7 @@ function setupWidgetBlocks() {
                 logo.timbre.synthVals["envelope"]["release"] = last(tur.singer.release);
 
                 if (logo.timbre.env.length != 0) {
-                    logo.errorMsg(_("You are adding multiple envelope blocks."));
+                    activity.errorMsg(_("You are adding multiple envelope blocks."));
                 } else {
                     // Create the synth for the instrument.
                     logo.synth.createSynth(
@@ -128,7 +140,7 @@ function setupWidgetBlocks() {
         constructor() {
             //.TRANS: a filter removes some unwanted components from a signal
             super("filter", _("filter"));
-            this.setPalette("widgets");
+            this.setPalette("widgets", activity);
             this.setHelpString();
             this.formBlock({
                 args: 3,
@@ -161,7 +173,7 @@ function setupWidgetBlocks() {
 
                 if ([-12, -24, -48, -96].indexOf(args[1]) === -1) {
                     //.TRANS: rolloff is the steepness of a change in frequency.
-                    logo.errorMsg(
+                    activity.errorMsg(
                         _("Rolloff value should be either -12, -24, -48, or -96 decibels/octave.")
                     );
                 }
@@ -192,7 +204,7 @@ function setupWidgetBlocks() {
     class TemperamentBlock extends StackClampBlock {
         constructor() {
             super("temperament");
-            this.setPalette("widgets");
+            this.setPalette("widgets", activity);
             this.setHelpString([
                 _("The Temperament tool is used to define custom tuning."),
                 "documentation",
@@ -226,13 +238,17 @@ function setupWidgetBlocks() {
             logo.temperament.inTemperament = args[0];
             const scale = [];
 
-            if (logo.blocks.blockList[logo.blocks.blockList[blk].connections[2]].name === "pitch") {
-                const pitchBlock = logo.blocks.blockList[logo.blocks.blockList[blk].connections[2]];
-                const note = logo.blocks.blockList[pitchBlock.connections[1]].value;
-                const octave = logo.blocks.blockList[pitchBlock.connections[2]].value;
-                const setKey = logo.blocks.blockList[pitchBlock.connections[3]];
-                scale[0] = logo.blocks.blockList[setKey.connections[1]].value;
-                scale[1] = logo.blocks.blockList[setKey.connections[2]].value;
+            if (
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[2]].name ===
+                "pitch"
+            ) {
+                const pitchBlock =
+                    activity.blocks.blockList[activity.blocks.blockList[blk].connections[2]];
+                const note = activity.blocks.blockList[pitchBlock.connections[1]].value;
+                const octave = activity.blocks.blockList[pitchBlock.connections[2]].value;
+                const setKey = activity.blocks.blockList[pitchBlock.connections[3]];
+                scale[0] = activity.blocks.blockList[setKey.connections[1]].value;
+                scale[1] = activity.blocks.blockList[setKey.connections[2]].value;
                 logo.synth.startingPitch = note + octave;
                 logo.temperament.scale = scale;
             }
@@ -241,7 +257,7 @@ function setupWidgetBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = function () {
-                logo.temperament.init();
+                logo.temperament.init(activity);
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -251,7 +267,7 @@ function setupWidgetBlocks() {
     class SamplerBlock extends StackClampBlock {
         constructor() {
             super("sampler");
-            this.setPalette("widgets");
+            this.setPalette("widgets", activity);
             this.parameter = true;
             this.beginnerBlock(false);
 
@@ -265,30 +281,31 @@ function setupWidgetBlocks() {
             //.TRANS: the speed at music is should be played.
             this.formBlock({ name: _("sampler"), canCollapse: true });
             this.makeMacro((x, y) => [
-              [0, "sampler", x, y, [null, 1, 8]],
-              [1, "settimbre", 0, 0, [0, 2, 6, 7]],
-              [2, ["customsample", {value: ["", "", "do", 4]}], 0, 0, [1, 3, 4, 5]],
-              [3, ["audiofile", {value: null}], 0, 0, [2]],
-              [4, ["solfege", {value: "do"}], 0, 0, [2]],
-              [5, ["number", {value: 4}], 0, 0, [2]],
-              [6, "vspace", 0, 0, [1, null]],
-              [7, "hidden", 0, 0, [1, null]],
-              [8, "hiddennoflow", 0, 0, [0, null]]
+                [0, "sampler", x, y, [null, 1, 8]],
+                [1, "settimbre", 0, 0, [0, 2, 6, 7]],
+                [2, ["customsample", { value: ["", "", "do", 4] }], 0, 0, [1, 3, 4, 5]],
+                [3, ["audiofile", { value: null }], 0, 0, [2]],
+                [4, ["solfege", { value: "do" }], 0, 0, [2]],
+                [5, ["number", { value: 4 }], 0, 0, [2]],
+                [6, "vspace", 0, 0, [1, null]],
+                [7, "hidden", 0, 0, [1, null]],
+                [8, "hiddennoflow", 0, 0, [0, null]]
             ]);
         }
 
-        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
+        flow(args, logo, turtle, blk) {
             if (logo.sample === null) {
                 logo.sample = new SampleWidget();
             }
             logo.inSample = true;
             logo.sample = new SampleWidget();
 
-            let listenerName = "_sampler_" + turtle;
+            const listenerName = "_sampler_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            let __listener = function(event) {
-                logo.sample.init(logo);
+            // eslint-disable-next-line no-unused-vars
+            const __listener = function (event) {
+                logo.sample.init(activity);
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -300,7 +317,7 @@ function setupWidgetBlocks() {
     class TimbreBlock extends StackClampBlock {
         constructor() {
             super("timbre");
-            this.setPalette("widgets");
+            this.setPalette("widgets", activity);
             this.setHelpString();
 
             this.formBlock({
@@ -356,7 +373,7 @@ function setupWidgetBlocks() {
                 logo.timbre.instrumentName = args[0];
             } else {
                 logo.timbre.instrumentName = DEFAULTVOICE;
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
             }
 
             instrumentsEffects[turtle][logo.timbre.instrumentName] = {};
@@ -396,7 +413,7 @@ function setupWidgetBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = function () {
-                logo.timbre.init();
+                logo.timbre.init(activity);
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -408,7 +425,7 @@ function setupWidgetBlocks() {
     class MeterWidgetBlock extends StackClampBlock {
         constructor() {
             super("meterwidget");
-            this.setPalette("widgets");
+            this.setPalette("widgets", activity);
             this.setHelpString([
                 _("The Meter block opens a tool to select strong beats for the meter."),
                 "documentation",
@@ -435,7 +452,7 @@ function setupWidgetBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = function () {
-                logo.meterWidget = new MeterWidget(blk);
+                logo.meterWidget = new MeterWidget(activity, blk);
 
                 logo.insideMeterWidget = false;
             };
@@ -449,7 +466,7 @@ function setupWidgetBlocks() {
     class oscilloscopeWidgetBlock extends StackClampBlock {
         constructor() {
             super("oscilloscope");
-            this.setPalette("widgets");
+            this.setPalette("widgets", activity);
             this.setHelpString([
                 _("The oscilloscope block opens a tool to visualize waveforms."),
                 "documentation",
@@ -467,14 +484,14 @@ function setupWidgetBlocks() {
 
             this.makeMacro((x, y) => {
                 let blocks = [[0, "oscilloscope", x, y, [null, 1, null]]];
-                for (const turtle of turtles.turtleList) {
+                for (const turtle of activity.turtles.turtleList) {
                     if (!turtle.inTrash)
                         // eslint-disable-next-line max-len
                         blocks = addPrintTurtle(
                             blocks,
                             turtle,
                             Math.max(0, blocks.length - 2),
-                            turtle == last(turtles.turtleList)
+                            turtle == last(activity.turtles.turtleList)
                         );
                 }
                 blocks[0][4][2] = blocks.length;
@@ -491,7 +508,7 @@ function setupWidgetBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = function () {
-                logo.Oscilloscope = new Oscilloscope(logo);
+                logo.Oscilloscope = new Oscilloscope(activity);
                 logo.inOscilloscope = false;
             };
 
@@ -504,7 +521,7 @@ function setupWidgetBlocks() {
     class ModeWidgetBlock extends StackClampBlock {
         constructor() {
             super("modewidget");
-            this.setPalette("widgets");
+            this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -533,7 +550,7 @@ function setupWidgetBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = function () {
-                logo.modeWidget = new ModeWidget();
+                logo.modeWidget = new ModeWidget(activity);
                 logo.insideModeWidget = false;
             };
 
@@ -546,7 +563,7 @@ function setupWidgetBlocks() {
     class TempoBlock extends StackClampBlock {
         constructor() {
             super("tempo");
-            this.setPalette("widgets");
+            this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -583,7 +600,7 @@ function setupWidgetBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = function () {
-                logo.tempo.init();
+                logo.tempo.init(activity);
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -595,7 +612,7 @@ function setupWidgetBlocks() {
     class PitchDrumMatrixBlock extends StackClampBlock {
         constructor() {
             super("pitchdrummatrix");
-            this.setPalette("widgets");
+            this.setPalette("widgets", activity);
             this.setHelpString([
                 _("The Pitch drum matrix is used to map pitches to drum sounds."),
                 "documentation",
@@ -643,7 +660,7 @@ function setupWidgetBlocks() {
                     logo.pitchDrumMatrix.drums.length === 0 ||
                     logo.pitchDrumMatrix.rowLabels.length === 0
                 ) {
-                    logo.errorMsg(
+                    activity.errorMsg(
                         _(
                             "You must have at least one pitch block and one drum block in the matrix."
                         ),
@@ -651,7 +668,7 @@ function setupWidgetBlocks() {
                     );
                 } else {
                     // Process queued up rhythms.
-                    logo.pitchDrumMatrix.init();
+                    logo.pitchDrumMatrix.init(activity);
                     logo.pitchDrumMatrix.makeClickable();
                 }
             };
@@ -665,7 +682,7 @@ function setupWidgetBlocks() {
     class PitchSliderBlock extends StackClampBlock {
         constructor() {
             super("pitchslider");
-            this.setPalette("widgets");
+            this.setPalette("widgets", activity);
             this.beginnerBlock(true);
             this.setHelpString([
                 _("The Pitch slider tool to is used to generate pitches at selected frequencies."),
@@ -694,7 +711,7 @@ function setupWidgetBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = function () {
-                logo.pitchSlider.init(logo);
+                logo.pitchSlider.init(activity);
                 logo.inPitchSlider = false;
             };
 
@@ -707,7 +724,7 @@ function setupWidgetBlocks() {
     class ChromaticBlock extends StackClampBlock {
         constructor() {
             super("chromatic");
-            this.setPalette("widgets");
+            this.setPalette("widgets", activity);
             this.setHelpString();
             this.formBlock({
                 name: _("chromatic keyboard"),
@@ -737,7 +754,7 @@ function setupWidgetBlocks() {
     class MusicKeyboard2Block extends StackClampBlock {
         constructor() {
             super("musickeyboard2");
-            this.setPalette("widgets");
+            this.setPalette("widgets", activity);
             this.setHelpString();
             this.formBlock({ name: _("music keyboard"), canCollapse: true });
             this.makeMacro((x, y) => [
@@ -777,10 +794,10 @@ function setupWidgetBlocks() {
     class MusicKeyboardBlock extends StackClampBlock {
         constructor() {
             super("musickeyboard");
-            this.setPalette("widgets");
+            this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
-            if (beginnerMode && this.lang === "ja") {
+            if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
                     _(
                         "The Music keyboard block opens a piano keyboard that can be used to create notes."
@@ -807,7 +824,7 @@ function setupWidgetBlocks() {
 
         flow(args, logo, turtle, blk) {
             if (logo.musicKeyboard === null) {
-                logo.musicKeyboard = new MusicKeyboard();
+                logo.musicKeyboard = new MusicKeyboard(activity);
             }
 
             logo.inMusicKeyboard = true;
@@ -833,7 +850,7 @@ function setupWidgetBlocks() {
     class PitchStaircaseBlock extends StackClampBlock {
         constructor() {
             super("pitchstaircase");
-            this.setPalette("widgets");
+            this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -868,7 +885,7 @@ function setupWidgetBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = function () {
-                logo.pitchStaircase.init(logo);
+                logo.pitchStaircase.init(activity);
                 logo.inPitchStaircase = false;
             };
 
@@ -881,7 +898,7 @@ function setupWidgetBlocks() {
     class RhythmRuler3Block extends StackClampBlock {
         constructor() {
             super("rhythmruler3");
-            this.setPalette("widgets");
+            this.setPalette("widgets", activity);
             this.setHelpString();
             //.TRANS: widget for subdividing a measure into distinct rhythmic elements
             this.formBlock({ name: _("rhythm maker"), canCollapse: true });
@@ -899,14 +916,14 @@ function setupWidgetBlocks() {
                 [8, "hidden", 0, 0, [1, null]],
                 [9, "hiddennoflow", 0, 0, [0, null]]
             ]);
-            this.hidden = !beginnerMode;
+            this.hidden = !activity.beginnerMode;
         }
     }
 
     class RhythmRuler2Block extends StackClampBlock {
         constructor() {
             super("rhythmruler2");
-            this.setPalette("widgets");
+            this.setPalette("widgets", activity);
 
             this.setHelpString([
                 _("The Rhythm Maker block opens a tool to create drum machines."),
@@ -936,7 +953,7 @@ function setupWidgetBlocks() {
                 [16, "hidden", 0, 0, [9, null]],
                 [17, "hiddennoflow", 0, 0, [0, null]]
             ]);
-            this.hidden = beginnerMode;
+            this.hidden = activity.beginnerMode;
         }
 
         flow(args, logo, turtle, blk) {
@@ -952,7 +969,7 @@ function setupWidgetBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = function () {
-                logo.rhythmRuler.init();
+                logo.rhythmRuler.init(activity);
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -964,7 +981,7 @@ function setupWidgetBlocks() {
     class MatrixGMajorBlock extends FlowBlock {
         constructor() {
             super("matrixgmajor", _("G major scale"));
-            this.setPalette("widgets");
+            this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
             this.makeMacro((x, y) => [
@@ -992,7 +1009,7 @@ function setupWidgetBlocks() {
     class MatrixCMajorBlock extends FlowBlock {
         constructor() {
             super("matrixcmajor", _("C major scale"));
-            this.setPalette("widgets");
+            this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
             this.makeMacro((x, y) => [
@@ -1020,7 +1037,7 @@ function setupWidgetBlocks() {
     class MatrixBlock extends StackClampBlock {
         constructor() {
             super("matrix");
-            this.setPalette("widgets");
+            this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -1094,7 +1111,7 @@ function setupWidgetBlocks() {
 
             const __listener = function () {
                 if (logo.tupletRhythms.length === 0 || logo.phraseMaker.rowLabels.length === 0) {
-                    logo.errorMsg(
+                    activity.errorMsg(
                         _(
                             "You must have at least one pitch block and one rhythm block in the matrix."
                         ),
@@ -1104,7 +1121,7 @@ function setupWidgetBlocks() {
                     // Process queued up rhythms.
                     logo.phraseMaker.blockNo = blk;
                     logo.phraseMaker.sorted = false;
-                    logo.phraseMaker.init(logo);
+                    logo.phraseMaker.init(activity);
 
                     for (let i = 0; i < logo.tupletRhythms.length; i++) {
                         // We have two cases: (1) notes in a tuplet;
@@ -1145,7 +1162,7 @@ function setupWidgetBlocks() {
     class StatusBlock extends StackClampBlock {
         constructor() {
             super("status");
-            this.setPalette("widgets");
+            this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -1181,7 +1198,7 @@ function setupWidgetBlocks() {
                 logo.statusMatrix = new StatusMatrix();
             }
 
-            logo.statusMatrix.init(logo);
+            logo.statusMatrix.init(activity);
             logo.statusFields = [];
 
             logo.inStatusMatrix = true;
@@ -1190,7 +1207,7 @@ function setupWidgetBlocks() {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = function () {
-                logo.statusMatrix.init(logo);
+                logo.statusMatrix.init(activity);
                 logo.inStatusMatrix = false;
             };
 
@@ -1200,25 +1217,25 @@ function setupWidgetBlocks() {
         }
     }
 
-    new EnvelopeBlock().setup();
-    new FilterBlock().setup();
-    new TemperamentBlock().setup();
-    new TimbreBlock().setup();
-    new MeterWidgetBlock().setup();
-    new ModeWidgetBlock().setup();
-    new TempoBlock().setup();
-    new SamplerBlock().setup();
-    new PitchDrumMatrixBlock().setup();
-    new oscilloscopeWidgetBlock().setup();
-    new PitchSliderBlock().setup();
-    new ChromaticBlock().setup();
-    new MusicKeyboard2Block().setup();
-    new MusicKeyboardBlock().setup();
-    new PitchStaircaseBlock().setup();
-    new RhythmRuler3Block().setup();
-    new RhythmRuler2Block().setup();
-    new MatrixGMajorBlock().setup();
-    new MatrixCMajorBlock().setup();
-    new MatrixBlock().setup();
-    new StatusBlock().setup();
+    new EnvelopeBlock().setup(activity);
+    new FilterBlock().setup(activity);
+    new TemperamentBlock().setup(activity);
+    new TimbreBlock().setup(activity);
+    new MeterWidgetBlock().setup(activity);
+    new ModeWidgetBlock().setup(activity);
+    new TempoBlock().setup(activity);
+    new SamplerBlock().setup(activity);
+    new PitchDrumMatrixBlock().setup(activity);
+    new oscilloscopeWidgetBlock().setup(activity);
+    new PitchSliderBlock().setup(activity);
+    new ChromaticBlock().setup(activity);
+    new MusicKeyboard2Block().setup(activity);
+    new MusicKeyboardBlock().setup(activity);
+    new PitchStaircaseBlock().setup(activity);
+    new RhythmRuler3Block().setup(activity);
+    new RhythmRuler2Block().setup(activity);
+    new MatrixGMajorBlock().setup(activity);
+    new MatrixCMajorBlock().setup(activity);
+    new MatrixBlock().setup(activity);
+    new StatusBlock().setup(activity);
 }

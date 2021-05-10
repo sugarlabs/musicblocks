@@ -1,6 +1,19 @@
+// Copyright (c) 2019 Bottersnike
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
 /*
-   global last, _, ValueBlock, FlowClampBlock, FlowBlock, NOINPUTERRORMSG, LeftBlock, Singer,
-   beginnerMode, blocks
+   global
+
+   last, _, ValueBlock, FlowClampBlock, FlowBlock, NOINPUTERRORMSG,
+   LeftBlock, Singer
  */
 
 /*
@@ -13,17 +26,15 @@
     NOINPUTERRORMSG
    - js/turtle-singer.js
     Singer
-   - js/activity.js
-    beginnerMode, blocks
  */
 
-/*exported setupIntervalsBlocks*/
+/* exported setupIntervalsBlocks */
 
-function setupIntervalsBlocks() {
+function setupIntervalsBlocks(activity) {
     class SetTemperamentBlock extends FlowBlock {
         constructor() {
             super("settemperament", _("set temperament"));
-            this.setPalette("intervals");
+            this.setPalette("intervals", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -54,7 +65,7 @@ function setupIntervalsBlocks() {
     class TemperamentNameBlock extends ValueBlock {
         constructor() {
             super("temperamentname");
-            this.setPalette("tone");
+            this.setPalette("tone", activity);
             this.setHelpString([
                 _("The Temperament name block is used to select a tuning method."),
                 "documentation",
@@ -69,7 +80,7 @@ function setupIntervalsBlocks() {
     class ModeNameBlock extends ValueBlock {
         constructor() {
             super("modename");
-            this.setPalette("intervals");
+            this.setPalette("intervals", activity);
             this.setHelpString();
             this.formBlock({ outType: "textout" });
             this.extraWidth = 50;
@@ -81,7 +92,7 @@ function setupIntervalsBlocks() {
         constructor() {
             // TRANS: doubly means to apply an augmentation or diminishment twice
             super("doubly", _("doubly"));
-            this.setPalette("intervals");
+            this.setPalette("intervals", activity);
             this.setHelpString([
                 _("The Doubly block will double the size of an interval."),
                 "documentation",
@@ -96,16 +107,16 @@ function setupIntervalsBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            const cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = activity.blocks.blockList[blk].connections[1];
             //find block at end of chain
             if (cblk === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             } else {
                 let currentblock = cblk;
                 let condition = true;
                 while (condition) {
-                    const blockToCheck = logo.blocks.blockList[currentblock];
+                    const blockToCheck = activity.blocks.blockList[currentblock];
                     if (blockToCheck.name === "intervalname") {
                         // Augmented or diminished only
                         if (blockToCheck.value[0] === "a") {
@@ -126,7 +137,7 @@ function setupIntervalsBlocks() {
                         }
                     }
 
-                    currentblock = logo.blocks.blockList[currentblock].connections[1];
+                    currentblock = activity.blocks.blockList[currentblock].connections[1];
                     if (currentblock === null) {
                         condition = false;
                         return 0;
@@ -139,7 +150,7 @@ function setupIntervalsBlocks() {
     class IntervalNameBlock extends ValueBlock {
         constructor() {
             super("intervalname");
-            this.setPalette("intervals");
+            this.setPalette("intervals", activity);
             this.setHelpString();
             this.extraWidth = 50;
             this.formBlock({ outType: "numberout" });
@@ -149,7 +160,7 @@ function setupIntervalsBlocks() {
     class MeasureIntervalSemitonesBlock extends LeftBlock {
         constructor() {
             super("measureintervalsemitones");
-            this.setPalette("intervals");
+            this.setPalette("intervals", activity);
             this.setHelpString([
                 _(
                     "The Semi-tone interval block measures the distance between two notes in semi-tones."
@@ -165,12 +176,12 @@ function setupIntervalsBlocks() {
         }
 
         arg(logo, turtle, blk) {
-            const cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = activity.blocks.blockList[blk].connections[1];
             if (cblk === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             }
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             const saveSuppressStatus = tur.singer.suppressOutput;
 
@@ -214,7 +225,7 @@ function setupIntervalsBlocks() {
                 tur.singer.lastPitch.pop();
             } else {
                 distance = 0;
-                logo.errorMsg(_("You must use two pitch blocks when measuring an interval."));
+                activity.errorMsg(_("You must use two pitch blocks when measuring an interval."));
             }
 
             tur.singer.notesPlayed = saveNoteCount;
@@ -247,7 +258,7 @@ function setupIntervalsBlocks() {
     class MeasureIntervalScalarBlock extends LeftBlock {
         constructor() {
             super("measureintervalscalar");
-            this.setPalette("intervals");
+            this.setPalette("intervals", activity);
             this.setHelpString([
                 _(
                     "The Scalar interval block measures the distance between two notes in the current key and mode."
@@ -263,12 +274,12 @@ function setupIntervalsBlocks() {
         }
 
         arg(logo, turtle, blk) {
-            const cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = activity.blocks.blockList[blk].connections[1];
             if (cblk === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             }
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             const saveSuppressStatus = tur.singer.suppressOutput;
 
@@ -318,7 +329,7 @@ function setupIntervalsBlocks() {
                 tur.singer.lastPitch.pop();
             } else {
                 distance = 0;
-                logo.errorMsg(_("You must use two pitch blocks when measuring an interval."));
+                activity.errorMsg(_("You must use two pitch blocks when measuring an interval."));
             }
 
             tur.singer.notesPlayed = saveNoteCount;
@@ -355,7 +366,7 @@ function setupIntervalsBlocks() {
                     (isDown ? "down" : "") + type + value,
                     _((isDown ? "down " : "") + type) + " " + value
                 );
-                this.setPalette("intervals");
+                this.setPalette("intervals", activity);
                 this.setHelpString();
                 this.makeMacro((x, y) => [
                     [0, "semitoneinterval", x, y, [null, 1, 6, 7]],
@@ -373,27 +384,27 @@ function setupIntervalsBlocks() {
         // DEPRECATED: no verbose macros required, only major 3rd for reference
 
         // for (let i = 2; i <= 8; i++)
-        //     new SemitoneIntervalMacroBlock("diminished", i).setup();
+        //     new SemitoneIntervalMacroBlock("diminished", i).setup(activity);
         // for (let i = 1; i <= 8; i++)
-        //     new SemitoneIntervalMacroBlock("augmented", i).setup();
+        //     new SemitoneIntervalMacroBlock("augmented", i).setup(activity);
         // for (let i in [8, 5, 4])
-        //     new SemitoneIntervalMacroBlock("perfect", i).setup();
-        // new SemitoneIntervalMacroBlock("minor", 6, true).setup();
-        // new SemitoneIntervalMacroBlock("minor", 3, true).setup();
+        //     new SemitoneIntervalMacroBlock("perfect", i).setup(activity);
+        // new SemitoneIntervalMacroBlock("minor", 6, true).setup(activity);
+        // new SemitoneIntervalMacroBlock("minor", 3, true).setup(activity);
         // for (let i in [7, 6, 3, 2])
-        //     new SemitoneIntervalMacroBlock("minor", i).setup();
-        // new SemitoneIntervalMacroBlock("major", 6, true).setup();
+        //     new SemitoneIntervalMacroBlock("minor", i).setup(activity);
+        // new SemitoneIntervalMacroBlock("major", 6, true).setup(activity);
 
-        new SemitoneIntervalMacroBlock("major", 3, false).setup();
+        new SemitoneIntervalMacroBlock("major", 3, false).setup(activity);
 
         // for (let i in [7, 6, 3, 2])
-        //     new SemitoneIntervalMacroBlock("major", i).setup();
+        //     new SemitoneIntervalMacroBlock("major", i).setup(activity);
     }
 
     class PerfectBlock extends FlowClampBlock {
         constructor() {
             super("perfect");
-            this.setPalette("intervals");
+            this.setPalette("intervals", activity);
             this.setHelpString();
             this.formBlock({
                 name: _("perfect"),
@@ -407,7 +418,7 @@ function setupIntervalsBlocks() {
     class SemitoneIntervalBlock extends FlowClampBlock {
         constructor() {
             super("semitoneinterval");
-            this.setPalette("intervals");
+            this.setPalette("intervals", activity);
             this.piemenuValuesC1 = [
                 -12,
                 -11,
@@ -477,7 +488,7 @@ function setupIntervalsBlocks() {
     //     class ChordIntervalMacroBlock extends FlowBlock {
     //         constructor(name, display, value1, value2) {
     //             super(name, _(display));
-    //             this.setPalette("intervals");
+    //             this.setPalette("intervals", activity);
     //             this.beginnerBlock(true);
     //             this.setHelpString();
     //             this.makeMacro((x, y) => [
@@ -511,7 +522,7 @@ function setupIntervalsBlocks() {
     //                 (down ? "down" : "") + name + "interval",
     //                 _((down ? "down " : "") + name)
     //             );
-    //             this.setPalette("intervals");
+    //             this.setPalette("intervals", activity);
     //             this.beginnerBlock(value === 2 || value === 5);
     //             this.setHelpString();
     //             this.makeMacro((x, y) => [
@@ -534,37 +545,37 @@ function setupIntervalsBlocks() {
     //         lang === "ja" ? _("chord5") : _("chord") + " V",
     //         3,
     //         2
-    //     ).setup();
+    //     ).setup(activity);
     //     new ChordIntervalMacroBlock(
     //         "chordIV",
     //         lang === "ja" ? _("chord4") : _("chord") + " IV",
     //         5,
     //         2
-    //     ).setup();
+    //     ).setup(activity);
     //     new ChordIntervalMacroBlock(
     //         "chordI",
     //         lang === "ja" ? _("chord1") : _("chord") + " I",
     //         4,
     //         2
-    //     ).setup();
+    //     ).setup(activity);
 
     //     //.TRANS: down <n>th means the note is <n - 1> scale degrees below current note
     //     //.TRANS: <n>th means the note is the <n - 1> scale degrees above current note
-    //     new IntervalMacroBlock("sixth", -5, true).setup();
-    //     new IntervalMacroBlock("third", -2, true).setup();
-    //     new IntervalMacroBlock("seventh", 6, true).setup();
-    //     new IntervalMacroBlock("sixth", 5, true).setup();
-    //     new IntervalMacroBlock("fifth", 4, true).setup();
-    //     new IntervalMacroBlock("fourth", 3, true).setup();
-    //     new IntervalMacroBlock("third", 2, true).setup();
-    //     new IntervalMacroBlock("second", 1, true).setup();
-    //     new IntervalMacroBlock("unison", 0, true).setup();
+    //     new IntervalMacroBlock("sixth", -5, true).setup(activity);
+    //     new IntervalMacroBlock("third", -2, true).setup(activity);
+    //     new IntervalMacroBlock("seventh", 6, true).setup(activity);
+    //     new IntervalMacroBlock("sixth", 5, true).setup(activity);
+    //     new IntervalMacroBlock("fifth", 4, true).setup(activity);
+    //     new IntervalMacroBlock("fourth", 3, true).setup(activity);
+    //     new IntervalMacroBlock("third", 2, true).setup(activity);
+    //     new IntervalMacroBlock("second", 1, true).setup(activity);
+    //     new IntervalMacroBlock("unison", 0, true).setup(activity);
     // }
 
     class ScalarIntervalBlock extends FlowClampBlock {
         constructor() {
             super("interval");
-            this.setPalette("intervals");
+            this.setPalette("intervals", activity);
             this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.setHelpString([
                 _(
@@ -601,7 +612,7 @@ function setupIntervalsBlocks() {
     class DefineModeBlock extends FlowClampBlock {
         constructor() {
             super("definemode");
-            this.setPalette("intervals");
+            this.setPalette("intervals", activity);
             this.setHelpString([
                 _(
                     "The Define mode block allows you define a custom mode by specifiying pitch numbers."
@@ -650,7 +661,7 @@ function setupIntervalsBlocks() {
     class MoveableBlock extends FlowBlock {
         constructor() {
             super("movable", _("moveable Do")); // legacy typo
-            this.setPalette("intervals");
+            this.setPalette("intervals", activity);
             this.beginnerBlock(true);
             this.setHelpString([
                 _(
@@ -686,7 +697,7 @@ function setupIntervalsBlocks() {
         constructor() {
             //.TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
             super("modelength", _("mode length"));
-            this.setPalette("intervals");
+            this.setPalette("intervals", activity);
             this.beginnerBlock(true);
             this.parameter = true;
             this.setHelpString([
@@ -699,13 +710,13 @@ function setupIntervalsBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            return activity.blocks.blockList[blk].value;
         }
 
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "modelength"]);
             } else {
@@ -718,19 +729,19 @@ function setupIntervalsBlocks() {
         constructor() {
             //.TRANS: the mode in music is 'major', 'minor', etc.
             super("currentmode", _("current mode"));
-            this.setPalette("intervals");
+            this.setPalette("intervals", activity);
             this.parameter = true;
             this.setHelpString();
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            return activity.blocks.blockList[blk].value;
         }
 
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "currentmode"]);
             } else {
@@ -743,19 +754,19 @@ function setupIntervalsBlocks() {
         constructor() {
             //.TRANS: the key is a group of pitches with which a music composition is created
             super("key", _("current key"));
-            this.setPalette("intervals");
+            this.setPalette("intervals", activity);
             this.parameter = true;
             this.setHelpString();
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            return activity.blocks.blockList[blk].value;
         }
 
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "key"]);
             } else {
@@ -767,7 +778,7 @@ function setupIntervalsBlocks() {
     class SetKeyBlock extends FlowBlock {
         constructor() {
             super("setkey", _("set key"));
-            this.setPalette("intervals");
+            this.setPalette("intervals", activity);
             this.beginnerBlock(true);
 
             this.setHelpString();
@@ -782,7 +793,7 @@ function setupIntervalsBlocks() {
 
         flow(args, logo, turtle) {
             if (args.length === 1) {
-                logo.turtles.ithTurtle(turtle).singer.keySignature = args[0];
+                activity.turtles.ithTurtle(turtle).singer.keySignature = args[0];
             }
         }
     }
@@ -791,10 +802,10 @@ function setupIntervalsBlocks() {
         constructor() {
             //.TRANS: set the key and mode, e.g. C Major
             super("setkey2", _("set key"));
-            this.setPalette("intervals");
+            this.setPalette("intervals", activity);
             this.beginnerBlock(true);
 
-            if (beginnerMode && this.lang === "ja") {
+            if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
                     _("The Set key block is used to set the key and mode,"),
                     "documentation",
@@ -829,36 +840,36 @@ function setupIntervalsBlocks() {
         flow(args, logo, turtle, blk) {
             if (args.length === 2) {
                 const modename = Singer.IntervalsActions.GetModename(args[1]);
-                logo.modeBlock = blocks.blockList[blk].connections[2];
+                logo.modeBlock = activity.blocks.blockList[blk].connections[2];
 
                 Singer.IntervalsActions.setKey(args[0], args[1], turtle, blk);
 
                 if (logo.insideModeWidget) {
                     // Ensure logo the mode for Turtle 0 is set, since it is used by the mode widget
-                    logo.turtles.ithTurtle(0).singer.keySignature = args[0] + " " + modename;
+                    activity.turtles.ithTurtle(0).singer.keySignature = args[0] + " " + modename;
                     logo.notation.notationKey(0, args[0], modename);
                 }
             }
         }
     }
 
-    new SetTemperamentBlock().setup();
-    new TemperamentNameBlock().setup();
-    new ModeNameBlock().setup();
-    new DoublyBlock().setup();
-    new IntervalNameBlock().setup();
-    new MeasureIntervalSemitonesBlock().setup();
-    new MeasureIntervalScalarBlock().setup();
+    new SetTemperamentBlock().setup(activity);
+    new TemperamentNameBlock().setup(activity);
+    new ModeNameBlock().setup(activity);
+    new DoublyBlock().setup(activity);
+    new IntervalNameBlock().setup(activity);
+    new MeasureIntervalSemitonesBlock().setup(activity);
+    new MeasureIntervalScalarBlock().setup(activity);
     makeSemitoneIntervalMacroBlocks();
-    new PerfectBlock().setup();
-    new SemitoneIntervalBlock().setup();
+    new PerfectBlock().setup(activity);
+    new SemitoneIntervalBlock().setup(activity);
     // makeIntervalMacroBlocks();
-    new ScalarIntervalBlock().setup();
-    new DefineModeBlock().setup();
-    new MoveableBlock().setup();
-    new ModeLengthBlock().setup();
-    new CurrentModeBlock().setup();
-    new KeyBlock().setup();
-    new SetKeyBlock().setup();
-    new SetKey2Block().setup();
+    new ScalarIntervalBlock().setup(activity);
+    new DefineModeBlock().setup(activity);
+    new MoveableBlock().setup(activity);
+    new ModeLengthBlock().setup(activity);
+    new CurrentModeBlock().setup(activity);
+    new KeyBlock().setup(activity);
+    new SetKeyBlock().setup(activity);
+    new SetKey2Block().setup(activity);
 }

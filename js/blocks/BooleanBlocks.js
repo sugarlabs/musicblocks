@@ -1,8 +1,27 @@
-function setupBooleanBlocks() {
+// Copyright (c) 2019 Bottersnike
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+/*
+   global
+
+   _, BooleanBlock, NOINPUTERRORMSG
+*/
+
+/* exported setupBooleanBlocks */
+
+function setupBooleanBlocks(activity) {
     class NotBlock extends BooleanBlock {
         constructor() {
             super("not");
-            this.setPalette("boolean");
+            this.setPalette("boolean", activity);
             this.setHelpString([
                 _("The Not block is the logical not operator."),
                 "documentation",
@@ -17,7 +36,7 @@ function setupBooleanBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            if (logo.blocks.blockList[blk].value) {
+            if (activity.blocks.blockList[blk].value) {
                 return _("true");
             } else {
                 return _("false");
@@ -25,17 +44,18 @@ function setupBooleanBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            const cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = activity.blocks.blockList[blk].connections[1];
             if (cblk === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
             const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
             try {
                 return !a;
             } catch (e) {
+                // eslint-disable-next-line no-console
                 console.debug(e);
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
         }
@@ -44,7 +64,7 @@ function setupBooleanBlocks() {
     class AndBlock extends BooleanBlock {
         constructor() {
             super("and");
-            this.setPalette("boolean");
+            this.setPalette("boolean", activity);
             this.setHelpString([
                 _("The And block is the logical and operator."),
                 "documentation",
@@ -59,7 +79,7 @@ function setupBooleanBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            if (logo.blocks.blockList[blk].value) {
+            if (activity.blocks.blockList[blk].value) {
                 return _("true");
             } else {
                 return _("false");
@@ -67,10 +87,10 @@ function setupBooleanBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            const cblk1 = logo.blocks.blockList[blk].connections[1];
-            const cblk2 = logo.blocks.blockList[blk].connections[2];
+            const cblk1 = activity.blocks.blockList[blk].connections[1];
+            const cblk2 = activity.blocks.blockList[blk].connections[2];
             if (cblk1 === null || cblk2 === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             } else {
                 const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
@@ -83,7 +103,7 @@ function setupBooleanBlocks() {
     class OrBlock extends BooleanBlock {
         constructor() {
             super("or");
-            this.setPalette("boolean");
+            this.setPalette("boolean", activity);
             this.setHelpString([
                 _("The Or block is the logical or operator."),
                 "documentation",
@@ -98,7 +118,7 @@ function setupBooleanBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            if (logo.blocks.blockList[blk].value) {
+            if (activity.blocks.blockList[blk].value) {
                 return _("true");
             } else {
                 return _("false");
@@ -106,10 +126,10 @@ function setupBooleanBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            const cblk1 = logo.blocks.blockList[blk].connections[1];
-            const cblk2 = logo.blocks.blockList[blk].connections[2];
+            const cblk1 = activity.blocks.blockList[blk].connections[1];
+            const cblk2 = activity.blocks.blockList[blk].connections[2];
             if (cblk1 === null || cblk2 === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             } else {
                 const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
@@ -122,7 +142,7 @@ function setupBooleanBlocks() {
     class XorBlock extends BooleanBlock {
         constructor() {
             super("xor");
-            this.setPalette("boolean");
+            this.setPalette("boolean", activity);
             this.setHelpString([
                 _("The XOR block is the logical XOR operator."),
                 "documentation",
@@ -137,7 +157,7 @@ function setupBooleanBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            if (logo.blocks.blockList[blk].value) {
+            if (activity.blocks.blockList[blk].value) {
                 return _("true");
             } else {
                 return _("false");
@@ -145,10 +165,10 @@ function setupBooleanBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            const cblk1 = logo.blocks.blockList[blk].connections[1];
-            const cblk2 = logo.blocks.blockList[blk].connections[2];
+            const cblk1 = activity.blocks.blockList[blk].connections[1];
+            const cblk2 = activity.blocks.blockList[blk].connections[2];
             if (cblk1 === null || cblk2 === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             } else {
                 const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
@@ -161,7 +181,7 @@ function setupBooleanBlocks() {
     class GreaterBlock extends BooleanBlock {
         constructor() {
             super("greater");
-            this.setPalette("boolean");
+            this.setPalette("boolean", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -181,7 +201,7 @@ function setupBooleanBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            if (logo.blocks.blockList[blk].value) {
+            if (activity.blocks.blockList[blk].value) {
                 return _("true");
             } else {
                 return _("false");
@@ -189,10 +209,10 @@ function setupBooleanBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            const cblk1 = logo.blocks.blockList[blk].connections[1];
-            const cblk2 = logo.blocks.blockList[blk].connections[2];
+            const cblk1 = activity.blocks.blockList[blk].connections[1];
+            const cblk2 = activity.blocks.blockList[blk].connections[2];
             if (cblk1 === null || cblk2 === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
 
@@ -201,8 +221,9 @@ function setupBooleanBlocks() {
             try {
                 return Number(a) > Number(b);
             } catch (e) {
+                // eslint-disable-next-line no-console
                 console.debug(e);
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
         }
@@ -211,7 +232,7 @@ function setupBooleanBlocks() {
     class LessBlock extends BooleanBlock {
         constructor() {
             super("less");
-            this.setPalette("boolean");
+            this.setPalette("boolean", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -231,7 +252,7 @@ function setupBooleanBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            if (logo.blocks.blockList[blk].value) {
+            if (activity.blocks.blockList[blk].value) {
                 return _("true");
             } else {
                 return _("false");
@@ -239,10 +260,10 @@ function setupBooleanBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            const cblk1 = logo.blocks.blockList[blk].connections[1];
-            const cblk2 = logo.blocks.blockList[blk].connections[2];
+            const cblk1 = activity.blocks.blockList[blk].connections[1];
+            const cblk2 = activity.blocks.blockList[blk].connections[2];
             if (cblk1 === null || cblk2 === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
             const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
@@ -250,8 +271,9 @@ function setupBooleanBlocks() {
             try {
                 return Number(a) < Number(b);
             } catch (e) {
+                // eslint-disable-next-line no-console
                 console.debug(e);
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
         }
@@ -260,7 +282,7 @@ function setupBooleanBlocks() {
     class EqualBlock extends BooleanBlock {
         constructor() {
             super("equal");
-            this.setPalette("boolean");
+            this.setPalette("boolean", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -278,7 +300,7 @@ function setupBooleanBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            if (logo.blocks.blockList[blk].value) {
+            if (activity.blocks.blockList[blk].value) {
                 return _("true");
             } else {
                 return _("false");
@@ -286,10 +308,10 @@ function setupBooleanBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            const cblk1 = logo.blocks.blockList[blk].connections[1];
-            const cblk2 = logo.blocks.blockList[blk].connections[2];
+            const cblk1 = activity.blocks.blockList[blk].connections[1];
+            const cblk2 = activity.blocks.blockList[blk].connections[2];
             if (cblk1 === null || cblk2 === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
             const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
@@ -297,8 +319,9 @@ function setupBooleanBlocks() {
             try {
                 return a === b;
             } catch (e) {
+                // eslint-disable-next-line no-console
                 console.debug(e);
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return false;
             }
         }
@@ -307,7 +330,7 @@ function setupBooleanBlocks() {
     class StaticBooleanBlock extends BooleanBlock {
         constructor() {
             super("boolean");
-            this.setPalette("boolean");
+            this.setPalette("boolean", activity);
             this.setHelpString([
                 _("The Boolean block is used to specify true or false."),
                 "documentation",
@@ -316,22 +339,22 @@ function setupBooleanBlocks() {
         }
 
         arg(logo, turtle, blk) {
-            if (typeof logo.blocks.blockList[blk].value === "string") {
+            if (typeof activity.blocks.blockList[blk].value === "string") {
                 return (
-                    logo.blocks.blockList[blk].value === _("true") ||
-                    logo.blocks.blockList[blk].value === "true"
+                    activity.blocks.blockList[blk].value === _("true") ||
+                    activity.blocks.blockList[blk].value === "true"
                 );
             }
-            return logo.blocks.blockList[blk].value;
+            return activity.blocks.blockList[blk].value;
         }
     }
 
-    new NotBlock().setup();
-    new XorBlock().setup();
-    new AndBlock().setup();
-    new OrBlock().setup();
-    new GreaterBlock().setup();
-    new LessBlock().setup();
-    new EqualBlock().setup();
-    new StaticBooleanBlock().setup();
+    new NotBlock().setup(activity);
+    new XorBlock().setup(activity);
+    new AndBlock().setup(activity);
+    new OrBlock().setup(activity);
+    new GreaterBlock().setup(activity);
+    new LessBlock().setup(activity);
+    new EqualBlock().setup(activity);
+    new StaticBooleanBlock().setup(activity);
 }
