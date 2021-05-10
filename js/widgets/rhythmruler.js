@@ -1,7 +1,7 @@
 /**
  * @file This contains the prototype of the rhythmruler Widget
  *
- * @copyright 2016-19 Walter Bender
+ * @copyright 2016-21 Walter Bender
  * @copyright 2016 Hemant Kasat
  *
  * @license
@@ -15,9 +15,12 @@
  */
 
 /*
-   global TONEBPM, Singer, logo, _, delayExecution, docById, calcNoteValueToDisplay, platformColor,
-   beginnerMode, last, EIGHTHNOTEWIDTH, nearestBeat, rationalToFraction, DRUMNAMES, VOICENAMES,
-   EFFECTSNAMES
+   global
+
+   TONEBPM, Singer, _, delayExecution, docById,
+   calcNoteValueToDisplay, platformColor, beginnerMode, last,
+   EIGHTHNOTEWIDTH, nearestBeat, rationalToFraction, DRUMNAMES,
+   VOICENAMES, EFFECTSNAMES
 */
 /*
     Globals location
@@ -26,15 +29,13 @@
     - js/turtle-singer.js
         Singer
     - js/utils/utils.js
-        _,docById,delayExecution,last,nearestBeat,rationalToFraction
+        _, docById, delayExecution, last, nearestBeat, rationalToFraction
     - js/utils/musicutils.js
-        calcNoteValueToDisplay,EIGHTHNOTEWIDTH
+        calcNoteValueToDisplay, EIGHTHNOTEWIDTH
     - js/utils/platformstyle.js
         platformColor
-    - js/activity.js
-        beginnerMode
     - js/utils/synthutils.js
-        DRUMNAMES,VOICENAMES,EFFECTSNAMES
+        DRUMNAMES, VOICENAMES, EFFECTSNAMES
 */
 /* exported RhythmRuler */
 
@@ -103,8 +104,8 @@ class RhythmRuler {
      * Initialises the temperament widget.
      * @returns {void}
      */
-    init() {
-        // console.debug("init RhythmRuler");
+    init(activity) {
+        this.activity = activity;
 
         this._bpmFactor = (1000 * TONEBPM) / Singer.masterBPM;
 
@@ -175,7 +176,7 @@ class RhythmRuler {
             this._playing = false;
             this._playingOne = false;
             this._playingAll = false;
-            logo.hideMsgs();
+            this.activity.hideMsgs();
 
             this.widgetWindow.destroy();
         };
@@ -323,10 +324,10 @@ class RhythmRuler {
                                 this._elapsedTimes[id] = 0;
                                 this._offsets[id] = 0;
                                 setTimeout(this._calculateZebraStripes(id), 1000);
-			    }
+                            }
                         } else if (this._playingOne === false) {
                             this._rulerSelected = id;
-                            logo.turtleDelay = 0;
+                            this.activity.logo.turtleDelay = 0;
                             this._playing = true;
                             this._playingOne = true;
                             this._playingAll = false;
@@ -471,7 +472,7 @@ class RhythmRuler {
             }
         }
 
-        logo.textMsg(_("Click on the ruler to divide it."));
+        this.activity.textMsg(_("Click on the ruler to divide it."));
         // this._piemenuRuler(this._rulerSelected);
     }
 
@@ -616,15 +617,23 @@ class RhythmRuler {
                 if (this.Drums[this._rulerSelected] === null) {
                     drum = "snare drum";
                 } else {
-                    const drumBlockNo =
-                        logo.blocks.blockList[this.Drums[this._rulerSelected]].connections[1];
-                    drum = logo.blocks.blockList[drumBlockNo].value;
+                    const drumBlockNo = this.activity.blocks.blockList[
+                        this.Drums[this._rulerSelected]
+                    ].connections[1];
+                    drum = this.activity.blocks.blockList[drumBlockNo].value;
                 }
 
                 // FIXME: Should be based on meter
                 for (let i = 0; i < 4; i++) {
                     setTimeout(() => {
-                        logo.synth.trigger(0, "C4", Singer.defaultBPMFactor / 16, drum, null, null);
+                        this.activity.logo.synth.trigger(
+                            0,
+                            "C4",
+                            Singer.defaultBPMFactor / 16,
+                            drum,
+                            null,
+                            null
+                        );
                     }, (interval * i) / 4);
                 }
 
@@ -844,7 +853,7 @@ class RhythmRuler {
                 // occasionally confuses tone.js during rapid clicking
                 // in the widget.
 
-                // logo.synth.trigger(0, 'C4', 1 / 32, 'chime', null, null);
+                // this.activity.logo.synth.trigger(0, 'C4', 1 / 32, 'chime', null, null);
 
                 const cell = this._mouseDownCell;
                 if (cell !== null && cell.parentNode !== null) {
@@ -1069,10 +1078,10 @@ class RhythmRuler {
 
             const noteValue = noteValues[newCellIndex];
             if (inputNum * noteValue > 256) {
-                logo.errorMsg(_("Maximum value of 256 has been exceeded."));
+                this.activity.logo.errorMsg(_("Maximum value of 256 has been exceeded."));
                 return;
             } else {
-                logo.hideMsgs();
+                this.activity.hideMsgs();
             }
 
             const divisionHistory = this.Rulers[this._rulerSelected][1];
@@ -1231,7 +1240,7 @@ class RhythmRuler {
      */
     _undo() {
         // FIXME: Add undo for REST
-        logo.synth.stop();
+        this.activity.logo.synth.stop();
         this._startingTime = null;
         this._playing = false;
         this._playingAll = false;
@@ -1386,8 +1395,8 @@ class RhythmRuler {
      * @returns {void}
      */
     _clear() {
-        logo.synth.stop();
-        logo.resetSynth(0);
+        this.activity.logo.synth.stop();
+        this.activity.logo.resetSynth(0);
         this._playing = false;
         this._playingAll = false;
         this._playingOne = false;
@@ -1474,7 +1483,7 @@ class RhythmRuler {
             '" width="' +
             RhythmRuler.ICONSIZE +
             '" vertical-align="middle">';
-        logo.turtleDelay = 0;
+        this.activity.logo.turtleDelay = 0;
         this._playingAll = true;
         this._playing = true;
         this._playingOne = false;
@@ -1493,8 +1502,8 @@ class RhythmRuler {
      * @returns {void}
      */
     _playAll() {
-        logo.synth.stop();
-        logo.resetSynth(0);
+        this.activity.logo.synth.stop();
+        this.activity.logo.resetSynth(0);
         if (this._startingTime === null) {
             const d = new Date();
             this._startingTime = d.getTime();
@@ -1514,8 +1523,8 @@ class RhythmRuler {
      * @returns {void}
      */
     _playOne() {
-        logo.synth.stop();
-        logo.resetSynth(0);
+        this.activity.logo.synth.stop();
+        this.activity.logo.resetSynth(0);
         if (this._startingTime === null) {
             const d = new Date();
             this._startingTime = d.getTime();
@@ -1555,8 +1564,8 @@ class RhythmRuler {
         if (this.Drums[rulerNo] === null) {
             drum = "snare drum";
         } else {
-            const drumblockno = logo.blocks.blockList[this.Drums[rulerNo]].connections[1];
-            drum = logo.blocks.blockList[drumblockno].value;
+            const drumblockno = this.activity.blocks.blockList[this.Drums[rulerNo]].connections[1];
+            drum = this.activity.blocks.blockList[drumblockno].value;
         }
 
         let foundDrum = false;
@@ -1590,7 +1599,7 @@ class RhythmRuler {
             // Play the current note.
             if (noteValue > 0) {
                 if (foundVoice) {
-                    logo.synth.trigger(
+                    this.activity.logo.synth.trigger(
                         0,
                         "C4",
                         Singer.defaultBPMFactor / noteValue,
@@ -1600,7 +1609,7 @@ class RhythmRuler {
                         false
                     );
                 } else if (foundDrum) {
-                    logo.synth.trigger(
+                    this.activity.logo.synth.trigger(
                         0,
                         ["C4"],
                         Singer.defaultBPMFactor / noteValue,
@@ -1642,11 +1651,11 @@ class RhythmRuler {
     _save(selectedRuler) {
         // Deprecated -- replaced by save tuplets code
 
-        for (const name in logo.blocks.palettes.dict) {
-            logo.blocks.palettes.dict[name].hideMenu(true);
+        for (const name in this.activity.palettes.dict) {
+            this.activity.palettes.dict[name].hideMenu(true);
         }
 
-        logo.refreshCanvas();
+        this.activity.refreshCanvas();
 
         setTimeout(() => {
             const ruler = this._rulers[selectedRuler];
@@ -1658,8 +1667,8 @@ class RhythmRuler {
                 stack_value = _("snare drum") + " " + _("rhythm");
             } else {
                 stack_value =
-                    logo.blocks.blockList[
-                        logo.blocks.blockList[this.Drums[selectedRuler]].connections[1]
+                    this.activity.blocks.blockList[
+                        this.activity.blocks.blockList[this.Drums[selectedRuler]].connections[1]
                     ].value.split(" ")[0] +
                     " " +
                     _("rhythm");
@@ -1704,7 +1713,7 @@ class RhythmRuler {
                 }
             }
 
-            logo.blocks.loadNewBlocks(newStack);
+            this.activity.blocks.loadNewBlocks(newStack);
             if (selectedRuler > this.Rulers.length - 2) {
                 return;
             } else {
@@ -1719,11 +1728,11 @@ class RhythmRuler {
      * @returns {void}
      */
     _saveTuplets(selectedRuler) {
-        for (const name in logo.blocks.palettes.dict) {
-            logo.blocks.palettes.dict[name].hideMenu(true);
+        for (const name in this.activity.palettes.dict) {
+            this.activity.palettes.dict[name].hideMenu(true);
         }
 
-        logo.refreshCanvas();
+        this.activity.refreshCanvas();
 
         setTimeout(() => {
             const ruler = this._rulers[selectedRuler];
@@ -1733,8 +1742,8 @@ class RhythmRuler {
                 stack_value = _("rhythm");
             } else {
                 stack_value =
-                    logo.blocks.blockList[
-                        logo.blocks.blockList[this.Drums[selectedRuler]].connections[1]
+                    this.activity.blocks.blockList[
+                        this.activity.blocks.blockList[this.Drums[selectedRuler]].connections[1]
                     ].value.split(" ")[0] +
                     " " +
                     _("rhythm");
@@ -1794,7 +1803,7 @@ class RhythmRuler {
                 }
             }
 
-            logo.blocks.loadNewBlocks(newStack);
+            this.activity.blocks.loadNewBlocks(newStack);
             if (selectedRuler > this.Rulers.length - 2) {
                 return;
             } else {
@@ -1809,11 +1818,11 @@ class RhythmRuler {
      * @returns {void}
      */
     _saveTupletsMerged(noteValues) {
-        for (const name in logo.blocks.palettes.dict) {
-            logo.blocks.palettes.dict[name].hideMenu(true);
+        for (const name in this.activity.palettes.dict) {
+            this.activity.palettes.dict[name].hideMenu(true);
         }
 
-        logo.refreshCanvas();
+        this.activity.refreshCanvas();
 
         const stack_value = _("rhythm");
         const delta = 42;
@@ -1849,8 +1858,8 @@ class RhythmRuler {
             }
         }
 
-        logo.blocks.loadNewBlocks(newStack);
-        logo.textMsg(_("New action block generated!"));
+        this.activity.blocks.loadNewBlocks(newStack);
+        this.activity.textMsg(_("New action block generated!"));
     }
 
     /**
@@ -1864,8 +1873,9 @@ class RhythmRuler {
         if (this.Drums[selectedRuler] === null) {
             drum = "snare drum";
         } else {
-            const drumBlockNo = logo.blocks.blockList[this.Drums[selectedRuler]].connections[1];
-            drum = logo.blocks.blockList[drumBlockNo].value;
+            const drumBlockNo = this.activity.blocks.blockList[this.Drums[selectedRuler]]
+                .connections[1];
+            drum = this.activity.blocks.blockList[drumBlockNo].value;
         }
 
         for (let d = 0; d < DRUMNAMES.length; d++) {
@@ -1896,11 +1906,11 @@ class RhythmRuler {
      * @returns {void}
      */
     _saveDrumMachine(selectedRuler, drum, effect) {
-        for (const name in logo.blocks.palettes.dict) {
-            logo.blocks.palettes.dict[name].hideMenu(true);
+        for (const name in this.activity.palettes.dict) {
+            this.activity.palettes.dict[name].hideMenu(true);
         }
 
-        logo.refreshCanvas();
+        this.activity.refreshCanvas();
 
         setTimeout(() => {
             const ruler = this._rulers[selectedRuler];
@@ -1915,8 +1925,8 @@ class RhythmRuler {
                 action_name = _("snare drum") + " " + _("action");
             } else {
                 action_name =
-                    logo.blocks.blockList[
-                        logo.blocks.blockList[this.Drums[selectedRuler]].connections[1]
+                    this.activity.blocks.blockList[
+                        this.activity.blocks.blockList[this.Drums[selectedRuler]].connections[1]
                     ].value.split(" ")[0] +
                     " " +
                     _("action");
@@ -2064,8 +2074,8 @@ class RhythmRuler {
                 }
             }
 
-            logo.blocks.loadNewBlocks(newStack);
-            logo.textMsg(_("New action block generated!"));
+            this.activity.blocks.loadNewBlocks(newStack);
+            this.activity.textMsg(_("New action block generated!"));
             if (selectedRuler > this.Rulers.length - 2) {
                 return;
             } else {
@@ -2081,11 +2091,11 @@ class RhythmRuler {
      * @returns {void}
      */
     _saveVoiceMachine(selectedRuler, voice) {
-        for (const name in logo.blocks.palettes.dict) {
-            logo.blocks.palettes.dict[name].hideMenu(true);
+        for (const name in this.activity.palettes.dict) {
+            this.activity.palettes.dict[name].hideMenu(true);
         }
 
-        logo.refreshCanvas();
+        this.activity.refreshCanvas();
 
         setTimeout(() => {
             const ruler = this._rulers[selectedRuler];
@@ -2106,8 +2116,8 @@ class RhythmRuler {
                 action_name = _("guitar") + " " + _("action");
             } else {
                 action_name =
-                    logo.blocks.blockList[
-                        logo.blocks.blockList[this.Drums[selectedRuler]].connections[1]
+                    this.activity.blocks.blockList[
+                        this.activity.blocks.blockList[this.Drums[selectedRuler]].connections[1]
                     ].value.split(" ")[0] +
                     "_" +
                     _("action");
@@ -2283,7 +2293,7 @@ class RhythmRuler {
                 }
             }
 
-            logo.blocks.loadNewBlocks(newStack);
+            this.activity.blocks.loadNewBlocks(newStack);
             if (selectedRuler > this.Rulers.length - 2) {
                 return;
             } else {
@@ -2442,10 +2452,8 @@ class RhythmRuler {
         const selectorWidth = 150;
 
         docById("wheelDiv").style.left =
-            Math.min(
-                Math.max(x - (300 - selectorWidth) / 2, 0),
-                logo.blocks.turtles._canvas.width - 300
-            ) + "px";
+            Math.min(Math.max(x - (300 - selectorWidth) / 2, 0), this.activity.canvas.width - 300) +
+            "px";
         if (y - 300 < 0) {
             docById("wheelDiv").style.top = y + 60 + "px";
         } else {

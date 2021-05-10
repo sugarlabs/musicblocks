@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Walter Bender
+// Copyright (c) 2019-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -9,7 +9,11 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/*global logo, Singer, _, last, platformColor, docById, wheelnav, slicePath, PREVIEWVOLUME, TONEBPM*/
+/* global
+
+   Singer, _, last, platformColor, docById, wheelnav, slicePath,
+   PREVIEWVOLUME, TONEBPM
+*/
 
 /*
      Globals location
@@ -39,8 +43,9 @@ class MeterWidget {
     /**
      * @param {number} widgetBlock
      */
-    constructor(widgetBlock) {
-        this._meterBlock = logo._meterBlock;
+    constructor(activity, widgetBlock) {
+        this.activity = activity;
+        this._meterBlock = this.activity.logo._meterBlock;
         this._strongBeats = [];
         this._playing = false;
         this._click_lock = false;
@@ -53,11 +58,11 @@ class MeterWidget {
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
 
-        logo.synth.setMasterVolume(PREVIEWVOLUME);
-        logo.synth.loadSynth(0, "kick drum");
-        Singer.setSynthVolume(logo, 0, "kick drum", PREVIEWVOLUME);
-        logo.synth.loadSynth(0, "snare drum");
-        Singer.setSynthVolume(logo, 0, "snare drum", PREVIEWVOLUME);
+        this.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
+        this.activity.logo.synth.loadSynth(0, "kick drum");
+        Singer.setSynthVolume(this.activity.logo, 0, "kick drum", PREVIEWVOLUME);
+        this.activity.logo.synth.loadSynth(0, "snare drum");
+        Singer.setSynthVolume(this.activity.logo, 0, "snare drum", PREVIEWVOLUME);
 
         // For the button callbacks
         this.meterDiv = document.createElement("table");
@@ -65,7 +70,7 @@ class MeterWidget {
 
         widgetWindow.onclose = () => {
             this._playing = false;
-            logo.hideMsgs();
+            this.activity.hideMsgs();
             widgetWindow.destroy();
         };
 
@@ -102,8 +107,8 @@ class MeterWidget {
                         MeterWidget.ICONSIZE +
                         '" vertical-align="middle">&nbsp;&nbsp;';
                     this._playing = true;
-                    logo.turtleDelay = 0;
-                    logo.resetSynth(0);
+                    this.activity.logo.turtleDelay = 0;
+                    this.activity.logo.resetSynth(0);
                     this._playBeat();
                 }
             }
@@ -131,12 +136,12 @@ class MeterWidget {
         // Grab the number of beats and beat value from the meter block.
         let v1, c1, c2, c3;
         if (this._meterBlock !== null) {
-            c1 = logo.blocks.blockList[this._meterBlock].connections[1];
-            v1 = c1 !== null ? logo.blocks.blockList[c1].value : 4;
-            c2 = logo.blocks.blockList[this._meterBlock].connections[2];
-            c3 = logo.blocks.blockList[c2].connections[2];
+            c1 = this.activity.blocks.blockList[this._meterBlock].connections[1];
+            v1 = c1 !== null ? this.activity.blocks.blockList[c1].value : 4;
+            c2 = this.activity.blocks.blockList[this._meterBlock].connections[2];
+            c3 = this.activity.blocks.blockList[c2].connections[2];
             if (c2 !== null) {
-                this._beatValue = logo.blocks.blockList[c2].value;
+                this._beatValue = this.activity.blocks.blockList[c2].value;
             }
 
             this._piemenuMeter(v1, this._beatValue);
@@ -171,8 +176,8 @@ class MeterWidget {
             divInput.children[0].value = Math.min(el.max, Math.max(el.min, el.value));
             divInput2.children[0].value = Math.min(el2.max, Math.max(el2.min, el2.value));
 
-            const bnBlk = logo.blocks.blockList[c1]; // number of beats
-            const bvBlk = logo.blocks.blockList[c3]; // beat value
+            const bnBlk = this.activity.blocks.blockList[c1]; // number of beats
+            const bvBlk = this.activity.blocks.blockList[c3]; // beat value
 
             const bnValue = divInput.children[0].value;
             const bvValue = divInput2.children[0].value;
@@ -185,10 +190,10 @@ class MeterWidget {
             bvBlk.text.text = bvValue;
             bvBlk.container.setChildIndex(bvBlk.text, bvBlk.container.children.length - 1);
 
-            logo.runLogoCommands(widgetBlock);
+            this.activity.logo.runLogoCommands(widgetBlock);
         };
 
-        logo.textMsg(_("Click in the circle to select strong beats for the meter."));
+        this.activity.textMsg(_("Click in the circle to select strong beats for the meter."));
         widgetWindow.sendToCenter();
         this._scale.call(this.widgetWindow);
     }
@@ -220,7 +225,7 @@ class MeterWidget {
      * @returns {void}
      */
     __playDrum(drum) {
-        logo.synth.trigger(0, "C4", Singer.defaultBPMFactor * this._beatValue, drum, null, null);
+        this.activity.logo.synth.trigger(0, "C4", Singer.defaultBPMFactor * this._beatValue, drum, null, null);
     }
 
     /**
@@ -277,7 +282,7 @@ class MeterWidget {
      * @returns {void}
      */
     _playBeat() {
-        const tur = logo.turtles.ithTurtle(0);
+        const tur = this.activity.turtles.ithTurtle(0);
         const bpmFactor =
             TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
         for (let i = 0; i < this._strongBeats.length; i++) {
@@ -367,7 +372,7 @@ class MeterWidget {
         }
 
         // console.debug(newStack);
-        logo.blocks.loadNewBlocks(newStack);
+        this.activity.blocks.loadNewBlocks(newStack);
     }
 
     /**

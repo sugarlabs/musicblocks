@@ -1,6 +1,6 @@
 // Copyright (c) 2015 Jefferson Lee
 // Copyright (c) 2018 Ritwik Abhishek
-// Copyright (c) 2018,20 Walter Bender
+// Copyright (c) 2018-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -11,31 +11,36 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global docById,platformColor,FIXEDSOLFEGE,FIXEDSOLFEGE1,SHARP,FLAT,last,Singer,_,noteToFrequency,
-   EIGHTHNOTEWIDTH,MATRIXSOLFEHEIGHT,i18nSolfege,MATRIXSOLFEWIDTH,toFraction,wheelnav,slicePath,blocks,getNote,PREVIEWVOLUME,
-   DEFAULTVOICE,PITCHES3,SOLFEGENAMES,SOLFEGECONVERSIONTABLE,NOTESSHARP,NOTESFLAT,PITCHES,PITCHES2,convertFromSolfege,logo */
+/*
+   global
+
+   docById, platformColor, FIXEDSOLFEGE, FIXEDSOLFEGE1, SHARP, FLAT,
+   last, Singer, _, noteToFrequency, EIGHTHNOTEWIDTH,
+   MATRIXSOLFEHEIGHT, i18nSolfege, MATRIXSOLFEWIDTH, toFraction,
+   wheelnav, slicePath, getNote, PREVIEWVOLUME, DEFAULTVOICE,
+   PITCHES3, SOLFEGENAMES, SOLFEGECONVERSIONTABLE, NOTESSHARP,
+   NOTESFLAT, PITCHES, PITCHES2, convertFromSolfege, */
 /*
    Global Locations
     - lib/wheelnav
         slicePath, wheelnav
     - js/utils/utils.js
-        _,docById,last
+        _, docById, last
     - js/turtle-singer.js
         Singer
     - js/utils/musicutils.js
-        noteToFrequency,getNote,FIXEDSOLFEGE,FIXEDSOLFEGE1,SHARP,FLAT,EIGHTHNOTEWIDTH,MATRIXSOLFEHEIGHT,i18nSolfege,MATRIXSOLFEWIDTH,
-        toFraction,DEFAULTVOICE,PITCHES,PITCHES2,PITCHES3,SOLFEGENAMES,SOLFEGECONVERSIONTABLE,NOTESSHARP,
-        NOTESFLAT,convertFromSolfege
+        noteToFrequency, getNote, FIXEDSOLFEGE, FIXEDSOLFEGE1, SHARP, FLAT,
+        EIGHTHNOTEWIDTH, MATRIXSOLFEHEIGHT, i18nSolfege, MATRIXSOLFEWIDTH,
+        toFraction, DEFAULTVOICE, PITCHES, PITCHES2, PITCHES3, SOLFEGENAMES,
+        SOLFEGECONVERSIONTABLE, NOTESSHARP, NOTESFLAT, convertFromSolfege
     - js/utils/platformstyle.js
         platformColor
-    - js/activity.js
-        blocks
     - js/logo.js
         PREVIEWVOLUME
 */
 /* exported MusicKeyboard */
 
-function MusicKeyboard() {
+function MusicKeyboard(activity) {
     const FAKEBLOCKNUMBER = 100000;
     const BUTTONDIVWIDTH = 535; // 5 buttons
     const OUTERWINDOWWIDTH = 758;
@@ -51,6 +56,7 @@ function MusicKeyboard() {
     const saveOnKeyUp = document.onkeyup;
 
     const w = window.innerWidth;
+    this.activity = activity;
     this._cellScale = w / 1200;
 
     const beginnerMode = localStorage.beginnerMode;
@@ -191,7 +197,14 @@ function MusicKeyboard() {
                     return;
                 }
 
-                this._logo.synth.trigger(0, temp2[id], 1, this.instrumentMapper[id], null, null);
+                this.activity.logo.synth.trigger(
+                    0,
+                    temp2[id],
+                    1,
+                    this.instrumentMapper[id],
+                    null,
+                    null
+                );
 
                 if (this.tick) {
                     let restDuration = (startTime[id] - this.endTime) / 1000.0;
@@ -276,7 +289,7 @@ function MusicKeyboard() {
                         duration: parseFloat(duration)
                     });
                 } else {
-                    this._logo.synth.stopSound(0, this.instrumentMapper[id], temp2[id]);
+                    this.activity.logo.synth.stopSound(0, this.instrumentMapper[id], temp2[id]);
                     this._notesPlayed.push({
                         startTime: startTime[id],
                         noteOctave: temp2[id],
@@ -350,7 +363,7 @@ function MusicKeyboard() {
             startDate = new Date();
             startTime = startDate.getTime(); // Milliseconds();
             element.style.backgroundColor = platformColor.orange;
-            this._logo.synth.trigger(
+            this.activity.logo.synth.trigger(
                 0,
                 this.noteMapper[element.id],
                 1,
@@ -375,7 +388,7 @@ function MusicKeyboard() {
             const now = new Date();
             duration = now.getTime() - startTime;
             duration /= 1000;
-            this._logo.synth.stopSound(
+            this.activity.logo.synth.stopSound(
                 0,
                 this.instrumentMapper[element.id],
                 this.noteMapper[element.id]
@@ -424,14 +437,12 @@ function MusicKeyboard() {
             }
         };
 
-
         element.onmouseup = function () {
             __endNote(this);
         };
     };
 
-    this.init = function (logo) {
-        this._logo = logo;
+    this.init = function () {
         this.tick = false;
         this.playingNow = false;
         let w = window.innerWidth;
@@ -443,7 +454,7 @@ function MusicKeyboard() {
         widgetWindow.clear();
         widgetWindow.show();
         this.displayLayout = this._keysLayout();
-        const tur = logo.turtles.ithTurtle(0);
+        const tur = this.activity.turtles.ithTurtle(0);
         this.bpm = tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
 
         this.widgetWindow.onmaximize = function () {
@@ -457,8 +468,7 @@ function MusicKeyboard() {
                 docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
                 docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
                 widgetWindow.getWidgetBody().style.left = "60px";
-            }
-            else {
+            } else {
                 const outerDiv = docById("mkbOuterDiv");
                 outerDiv.style.maxHeight = "400px";
                 widgetWindow.getWidgetBody().style.position = "relative";
@@ -505,7 +515,7 @@ function MusicKeyboard() {
         this.playButton = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
 
         this.playButton.onclick = () => {
-            this._logo.turtleDelay = 0;
+            this.activity.logo.turtleDelay = 0;
             this.processSelected();
             this.playAll();
         };
@@ -555,8 +565,8 @@ function MusicKeyboard() {
                 this.loopTick.stop();
             } else {
                 this.tick = true;
-                this._logo.synth.loadSynth(0, "cow bell");
-                this.loopTick = this._logo.synth.loop(
+                this.activity.logo.synth.loadSynth(0, "cow bell");
+                this.loopTick = this.activity.logo.synth.loop(
                     0,
                     "cow bell",
                     "C5",
@@ -566,7 +576,7 @@ function MusicKeyboard() {
                     0.07
                 );
                 setTimeout(() => {
-                    this._logo.synth.start();
+                    this.activity.logo.synth.start();
                 }, 500);
             }
         };
@@ -758,24 +768,45 @@ function MusicKeyboard() {
         }
 
         setTimeout(() => {
-            this._logo.synth.trigger(0, notes[0], noteValue[0], instruments[0], null, null);
+            this.activity.logo.synth.trigger(0, notes[0], noteValue[0], instruments[0], null, null);
         }, 1);
 
         if (notes.length > 1) {
             setTimeout(() => {
-                this._logo.synth.trigger(0, notes[1], noteValue[0], instruments[1], null, null);
+                this.activity.logo.synth.trigger(
+                    0,
+                    notes[1],
+                    noteValue[0],
+                    instruments[1],
+                    null,
+                    null
+                );
             }, 1);
         }
 
         if (notes.length > 2) {
             setTimeout(() => {
-                this._logo.synth.trigger(0, notes[2], noteValue[0], instruments[2], null, null);
+                this.activity.logo.synth.trigger(
+                    0,
+                    notes[2],
+                    noteValue[0],
+                    instruments[2],
+                    null,
+                    null
+                );
             }, 1);
         }
 
         if (notes.length > 3) {
             setTimeout(() => {
-                this._logo.synth.trigger(0, notes[3], noteValue[0], instruments[3], null, null);
+                this.activity.logo.synth.trigger(
+                    0,
+                    notes[3],
+                    noteValue[0],
+                    instruments[3],
+                    null,
+                    null
+                );
             }, 1);
         }
     };
@@ -945,7 +976,7 @@ function MusicKeyboard() {
                 sortableList.push({
                     frequency: noteToFrequency(
                         this.noteNames[i] + this.octaves[i],
-                        this._logo.turtles.ithTurtle(0).singer.keySignature
+                        this.activity.turtles.ithTurtle(0).singer.keySignature
                     ),
                     noteName: this.noteNames[i],
                     noteOctave: this.octaves[i],
@@ -1063,7 +1094,7 @@ function MusicKeyboard() {
         });
 
         if (playNote) {
-            this._logo.synth.trigger(
+            this.activity.logo.synth.trigger(
                 0,
                 temp2,
                 ele.getAttribute("alt"),
@@ -1402,13 +1433,13 @@ function MusicKeyboard() {
 
         docById("wheelDivptm").style.left =
             Math.min(
-                this._logo.blocks.turtles._canvas.width - 200,
-                Math.max(0, x * this._logo.blocks.getStageScale())
+                this.activity.blocks.turtles._canvas.width - 200,
+                Math.max(0, x * this.activity.blocks.getStageScale())
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
-                this._logo.blocks.turtles._canvas.height - 250,
-                Math.max(0, y * this._logo.blocks.getStageScale())
+                this.activity.blocks.turtles._canvas.height - 250,
+                Math.max(0, y * this.activity.blocks.getStageScale())
             ) + "px";
 
         this._exitWheel.navItems[0].navigateFunction = () => {
@@ -1620,13 +1651,13 @@ function MusicKeyboard() {
         docById("wheelDivptm").style.width = "300px";
         docById("wheelDivptm").style.left =
             Math.min(
-                this._logo.blocks.turtles._canvas.width - 200,
-                Math.max(0, x * this._logo.blocks.getStageScale())
+                this.activity.blocks.turtles._canvas.width - 200,
+                Math.max(0, x * this.activity.blocks.getStageScale())
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
-                this._logo.blocks.turtles._canvas.height - 250,
-                Math.max(0, y * this._logo.blocks.getStageScale())
+                this.activity.blocks.turtles._canvas.height - 250,
+                Math.max(0, y * this.activity.blocks.getStageScale())
             ) + "px";
 
         this._exitWheel.navItems[0].navigateFunction = () => {
@@ -1644,7 +1675,7 @@ function MusicKeyboard() {
                 return;
             }
             const label = VALUESLABEL[this._menuWheel.selectedNavItemIndex];
-            const newBlock = this._logo.blocks.blockList.length;
+            const newBlock = this.activity.blocks.blockList.length;
 
             if (label === "pitch") {
                 let i;
@@ -1710,14 +1741,14 @@ function MusicKeyboard() {
 
             switch (label) {
                 case "pitch":
-                    this._logo.blocks.loadNewBlocks([
+                    this.activity.blocks.loadNewBlocks([
                         [0, ["pitch", {}], 0, 0, [null, 1, 2, null]],
                         [1, ["solfege", { value: rLabel }], 0, 0, [0]],
                         [2, ["number", { value: rArg }], 0, 0, [0]]
                     ]);
                     break;
                 case "hertz":
-                    this._logo.blocks.loadNewBlocks([
+                    this.activity.blocks.loadNewBlocks([
                         [0, ["hertz", {}], 0, 0, [null, 1, null]],
                         [1, ["number", { value: rArg }], 0, 0, [0]]
                     ]);
@@ -1777,25 +1808,25 @@ function MusicKeyboard() {
     };
 
     this._addNotesBlockBetween = function (aboveBlock, block) {
-        const belowBlock = last(this._logo.blocks.blockList[aboveBlock].connections);
-        this._logo.blocks.blockList[aboveBlock].connections[
-            this._logo.blocks.blockList[aboveBlock].connections.length - 1
+        const belowBlock = last(this.activity.blocks.blockList[aboveBlock].connections);
+        this.activity.blocks.blockList[aboveBlock].connections[
+            this.activity.blocks.blockList[aboveBlock].connections.length - 1
         ] = block;
 
         if (belowBlock !== null) {
-            this._logo.blocks.blockList[belowBlock].connections[0] = block;
+            this.activity.blocks.blockList[belowBlock].connections[0] = block;
         }
 
-        this._logo.blocks.blockList[block].connections[0] = aboveBlock;
+        this.activity.blocks.blockList[block].connections[0] = aboveBlock;
 
-        this._logo.blocks.blockList[block].connections[
-            this._logo.blocks.blockList[block].connections.length - 1
+        this.activity.blocks.blockList[block].connections[
+            this.activity.blocks.blockList[block].connections.length - 1
         ] = belowBlock;
 
-        this._logo.blocks.adjustDocks(this.blockNo, true);
-        this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
-        blocks.adjustExpandableClampBlock();
-        this._logo.blocks.refreshCanvas();
+        this.activity.blocks.adjustDocks(this.blockNo, true);
+        this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+        this.activity.blocks.adjustExpandableClampBlock();
+        this.activity.blocks.refreshCanvas();
     };
 
     this._sortLayout = function () {
@@ -1807,7 +1838,7 @@ function MusicKeyboard() {
             } else {
                 aValue = noteToFrequency(
                     a.noteName + a.noteOctave,
-                    this._logo.turtles.ithTurtle(0).singer.keySignature
+                    this.activity.turtles.ithTurtle(0).singer.keySignature
                 );
             }
             if (b.noteName == "hertz") {
@@ -1816,7 +1847,7 @@ function MusicKeyboard() {
             } else {
                 bValue = noteToFrequency(
                     b.noteName + b.noteOctave,
-                    this._logo.turtles.ithTurtle(0).singer.keySignature
+                    this.activity.turtles.ithTurtle(0).singer.keySignature
                 );
             }
 
@@ -1855,33 +1886,35 @@ function MusicKeyboard() {
     };
 
     this._removePitchBlock = function (blockNo) {
-        const c0 = this._logo.blocks.blockList[blockNo].connections[0];
-        const c1 = last(this._logo.blocks.blockList[blockNo].connections);
-        if (this._logo.blocks.blockList[c0].name === "musickeyboard") {
-            this._logo.blocks.blockList[c0].connections[1] = c1;
+        const c0 = this.activity.blocks.blockList[blockNo].connections[0];
+        const c1 = last(this.activity.blocks.blockList[blockNo].connections);
+        if (this.activity.blocks.blockList[c0].name === "musickeyboard") {
+            this.activity.blocks.blockList[c0].connections[1] = c1;
         } else {
-            this._logo.blocks.blockList[c0].connections[
-                this._logo.blocks.blockList[c0].connections.length - 1
+            this.activity.blocks.blockList[c0].connections[
+                this.activity.blocks.blockList[c0].connections.length - 1
             ] = c1;
         }
 
         if (c1) {
-            this._logo.blocks.blockList[c1].connections[0] = c0;
+            this.activity.blocks.blockList[c1].connections[0] = c0;
         }
 
-        this._logo.blocks.blockList[blockNo].connections[
-            this._logo.blocks.blockList[blockNo].connections.length - 1
+        this.activity.blocks.blockList[blockNo].connections[
+            this.activity.blocks.blockList[blockNo].connections.length - 1
         ] = null;
-        this._logo.blocks.sendStackToTrash(this._logo.blocks.blockList[blockNo]);
-        this._logo.blocks.adjustDocks(this.blockNo, true);
-        this._logo.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
-        this._logo.blocks.refreshCanvas();
+        this.activity.blocks.sendStackToTrash(this.activity.blocks.blockList[blockNo]);
+        this.activity.blocks.adjustDocks(this.blockNo, true);
+        this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+        this.activity.blocks.refreshCanvas();
     };
 
     this._createColumnPieSubmenu = function (index, condition) {
         index = parseInt(index);
         if (
-            blocks.blockList[this.layout[this.layout.length - index - 1].blockNumber] === undefined
+            this.activity.blocks.blockList[
+                this.layout[this.layout.length - index - 1].blockNumber
+            ] === undefined
         ) {
             return;
         }
@@ -2011,25 +2044,25 @@ function MusicKeyboard() {
         docById("wheelDivptm").style.width = "300px";
         docById("wheelDivptm").style.left =
             Math.min(
-                this._logo.blocks.turtles._canvas.width - 200,
-                Math.max(0, x * this._logo.blocks.getStageScale())
+                this.activity.blocks.turtles._canvas.width - 200,
+                Math.max(0, x * this.activity.blocks.getStageScale())
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
-                this._logo.blocks.turtles._canvas.height - 250,
-                Math.max(0, y * this._logo.blocks.getStageScale())
+                this.activity.blocks.turtles._canvas.height - 250,
+                Math.max(0, y * this.activity.blocks.getStageScale())
             ) + "px";
 
         index = this.layout.length - index - 1;
         const block = this.layout[index].blockNumber;
 
-        let noteValue = this._logo.blocks.blockList[
-            this._logo.blocks.blockList[block].connections[1]
+        let noteValue = this.activity.blocks.blockList[
+            this.activity.blocks.blockList[block].connections[1]
         ].value;
 
         if (condition === "pitchblocks") {
-            const octaveValue = this._logo.blocks.blockList[
-                this._logo.blocks.blockList[block].connections[2]
+            const octaveValue = this.activity.blocks.blockList[
+                this.activity.blocks.blockList[block].connections[2]
             ].value;
             let accidentalsValue = 2;
 
@@ -2060,16 +2093,16 @@ function MusicKeyboard() {
         const __hertzSelectionChanged = () => {
             const blockValue = this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex]
                 .title;
-            const argBlock = this._logo.blocks.blockList[block].connections[1];
-            this._logo.blocks.blockList[argBlock].text.text = blockValue;
-            this._logo.blocks.blockList[argBlock].value = parseInt(blockValue);
+            const argBlock = this.activity.blocks.blockList[block].connections[1];
+            this.activity.blocks.blockList[argBlock].text.text = blockValue;
+            this.activity.blocks.blockList[argBlock].value = parseInt(blockValue);
 
-            const z = this._logo.blocks.blockList[argBlock].container.children.length - 1;
-            this._logo.blocks.blockList[argBlock].container.setChildIndex(
-                this._logo.blocks.blockList[argBlock].text,
+            const z = this.activity.blocks.blockList[argBlock].container.children.length - 1;
+            this.activity.blocks.blockList[argBlock].container.setChildIndex(
+                this.activity.blocks.blockList[argBlock].text,
                 z
             );
-            this._logo.blocks.blockList[argBlock].updateCache();
+            this.activity.blocks.blockList[argBlock].updateCache();
 
             const cell = docById("labelcol" + (this.layout.length - index - 1));
             this.layout[index].noteOctave = parseInt(blockValue);
@@ -2104,24 +2137,24 @@ function MusicKeyboard() {
                 labelValue = label;
             }
 
-            const noteLabelBlock = this._logo.blocks.blockList[block].connections[1];
-            this._logo.blocks.blockList[noteLabelBlock].text.text = label;
-            this._logo.blocks.blockList[noteLabelBlock].value = labelValue;
+            const noteLabelBlock = this.activity.blocks.blockList[block].connections[1];
+            this.activity.blocks.blockList[noteLabelBlock].text.text = label;
+            this.activity.blocks.blockList[noteLabelBlock].value = labelValue;
 
-            const z = this._logo.blocks.blockList[noteLabelBlock].container.children.length - 1;
-            this._logo.blocks.blockList[noteLabelBlock].container.setChildIndex(
-                this._logo.blocks.blockList[noteLabelBlock].text,
+            const z = this.activity.blocks.blockList[noteLabelBlock].container.children.length - 1;
+            this.activity.blocks.blockList[noteLabelBlock].container.setChildIndex(
+                this.activity.blocks.blockList[noteLabelBlock].text,
                 z
             );
-            this._logo.blocks.blockList[noteLabelBlock].updateCache();
+            this.activity.blocks.blockList[noteLabelBlock].updateCache();
 
             let octave;
             if (condition === "pitchblocks") {
                 octave = Number(
                     this._octavesWheel.navItems[this._octavesWheel.selectedNavItemIndex].title
                 );
-                this._logo.blocks.blockList[noteLabelBlock].blocks.setPitchOctave(
-                    this._logo.blocks.blockList[noteLabelBlock].connections[0],
+                this.activity.blocks.blockList[noteLabelBlock].blocks.setPitchOctave(
+                    this.activity.blocks.blockList[noteLabelBlock].connections[0],
                     octave
                 );
             }
@@ -2165,15 +2198,15 @@ function MusicKeyboard() {
                 labelValue,
                 octave,
                 0,
-                this._logo.turtles.ithTurtle(0).singer.keySignature,
+                this.activity.turtles.ithTurtle(0).singer.keySignature,
                 false,
                 null,
-                this._logo.errorMsg,
-                this._logo.synth.inTemperament
+                this.activity.logo.errorMsg,
+                this.activity.logo.synth.inTemperament
             );
-            this._logo.synth.setMasterVolume(PREVIEWVOLUME);
-            Singer.setSynthVolume(this._logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
-            this._logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
+            this.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
+            Singer.setSynthVolume(this.activity.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
+            this.activity.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
 
             __selectionChanged();
         };
@@ -2511,7 +2544,6 @@ function MusicKeyboard() {
         for (let i = 0; i < this.idContainer.length; i++) {
             // If the blockNumber is null, don't make the key clickable.
             if (this.displayLayout[i].blockNumber === null) {
-                // console.log("skipping " + i);
                 continue;
             }
             this.loadHandler(
@@ -2754,8 +2786,8 @@ function MusicKeyboard() {
             }
         }
 
-        this._logo.blocks.loadNewBlocks(newStack);
-        this._logo.textMsg(_("New action block generated!"));
+        this.activity.blocks.loadNewBlocks(newStack);
+        this.activity.textMsg(_("New action block generated!"));
     };
 
     this.clearBlocks = function () {
@@ -2816,7 +2848,7 @@ function MusicKeyboard() {
             if (!element) return;
             startTime = event.timeStamp; // Milliseconds();
             element.style.backgroundColor = platformColor.orange;
-            this._logo.synth.trigger(
+            this.activity.logo.synth.trigger(
                 0,
                 this.noteMapper[element.id],
                 1,
@@ -2839,7 +2871,7 @@ function MusicKeyboard() {
             const now = event.timeStamp;
             duration = now - startTime;
             duration /= 1000;
-            this._logo.synth.stopSound(
+            this.activity.logo.synth.stopSound(
                 0,
                 this.instrumentMapper[element.id],
                 this.noteMapper[element.id]
@@ -2898,7 +2930,7 @@ function MusicKeyboard() {
             // re-init widget
             if (this.midiON) {
                 this.midiButton.style.background = "#00FF00";
-                // logo.textMsg(_("MIDI device present."));
+                // textMsg(_("MIDI device present."));
                 return;
             }
             midiAccess.inputs.forEach((input) => {
@@ -2906,20 +2938,22 @@ function MusicKeyboard() {
             });
             if (midiAccess.inputs.size) {
                 this.midiButton.style.background = "#00FF00";
-                // logo.textMsg(_("MIDI device present."));
+                // textMsg(_("MIDI device present."));
                 this.midiON = true;
             } else {
-                logo.textMsg(_("No MIDI device found."));
+                activity.textMsg(_("No MIDI device found."));
             }
         };
 
         const onMIDIFailure = () => {
-            logo.errorMsg(_("Failed to get MIDI access in browser."));
+            this.activity.errorMsg(_("Failed to get MIDI access in browser."));
             this.midiON = false;
         };
 
-        if (navigator.requestMIDIAccess)
+        if (navigator.requestMIDIAccess) {
             navigator.requestMIDIAccess({ sysex: true }).then(onMIDISuccess, onMIDIFailure);
-        else logo.errorMsg(_("Failed to get MIDI access in browser."));
+        } else {
+            this.activity.errorMsg(_("Failed to get MIDI access in browser."));
+        }
     };
 }

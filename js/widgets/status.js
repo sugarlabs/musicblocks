@@ -27,7 +27,8 @@ class StatusMatrix {
      * previous matrix and them make another one in DOM (document
      * object model)
      */
-    init() {
+    init(activity) {
+        this.activity = activity;
         this.isOpen = true;
         this.isMaximized = false;
         this._cellScale = window.innerWidth / 1200;
@@ -65,7 +66,7 @@ class StatusMatrix {
 
         cell.innerHTML = "&nbsp;";
         // One column per mouse/turtle
-        for (const turtle of turtles.turtleList) {
+        for (const turtle of this.activity.turtles.turtleList) {
             if (turtle.inTrash) {
                 continue;
             }
@@ -116,7 +117,7 @@ class StatusMatrix {
 
         // One row per field, one column per mouse (plus the labels)
         let label;
-        for (const statusField of logo.statusFields) {
+        for (const statusField of this.activity.logo.statusFields) {
             const row = header.insertRow();
 
             cell = row.insertCell(); // i + 1);
@@ -138,7 +139,7 @@ class StatusMatrix {
                     label = "";
                     break;
                 case "namedbox":
-                    label = logo.blocks.blockList[statusField[0]].privateData;
+                    label = this.activity.blocks.blockList[statusField[0]].privateData;
                     break;
                 case "heap":
                     label = _("heap");
@@ -148,15 +149,17 @@ class StatusMatrix {
                     if (localStorage.languagePreference === "ja") {
                         label = _("beats per minute2");
                     } else {
-                        label = logo.blocks.blockList[statusField[0]].protoblock.staticLabels[0];
+                        label = this.activity.blocks.blockList[statusField[0]].protoblock
+                            .staticLabels[0];
                     }
                     // console.debug(label);
                     break;
                 case "outputtools":
-                    label = logo.blocks.blockList[statusField[0]].privateData;
+                    label = this.activity.blocks.blockList[statusField[0]].privateData;
                     break;
                 default:
-                    label = logo.blocks.blockList[statusField[0]].protoblock.staticLabels[0];
+                    label = this.activity.blocks.blockList[statusField[0]].protoblock
+                        .staticLabels[0];
                     break;
             }
             let str = label;
@@ -166,7 +169,7 @@ class StatusMatrix {
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
             cell.style.paddingLeft = "10px";
-            turtles.turtleList.forEach(() => {
+            this.activity.turtles.turtleList.forEach(() => {
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
                 cell.style.fontSize =
@@ -188,7 +191,7 @@ class StatusMatrix {
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
             cell.style.paddingLeft = "10px";
-            turtles.turtleList.forEach(() => {
+            this.activity.turtles.turtleList.forEach(() => {
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
                 cell.style.fontSize =
@@ -207,13 +210,13 @@ class StatusMatrix {
      */
     updateAll() {
         // Update status of all of the voices in the matrix.
-        logo.updatingStatusMatrix = true;
+        this.activity.logo.updatingStatusMatrix = true;
 
         let activeTurtles = 0;
         let cell;
         let t = 0;
-        for (const turtle of turtles.turtleList) {
-            const tur = turtles.ithTurtle(t);
+        for (const turtle of this.activity.turtles.turtleList) {
+            const tur = this.activity.turtles.ithTurtle(t);
 
             if (turtle.inTrash) {
                 continue;
@@ -227,36 +230,42 @@ class StatusMatrix {
             let noteValue;
             let freq;
             let i = 0;
-            for (const statusField of logo.statusFields) {
-                saveStatus = logo.inStatusMatrix;
-                logo.inStatusMatrix = false;
+            for (const statusField of this.activity.logo.statusFields) {
+                saveStatus = this.activity.logo.inStatusMatrix;
+                this.activity.logo.inStatusMatrix = false;
 
-                logo.parseArg(logo, t, statusField[0]);
-                switch (logo.blocks.blockList[statusField[0]].name) {
+                this.activity.logo.parseArg(this.activity.logo, t, statusField[0]);
+                switch (this.activity.blocks.blockList[statusField[0]].name) {
                     case "x":
                     case "y":
                     case "heading":
-                        value = logo.blocks.blockList[statusField[0]].value.toFixed(0);
+                        value = this.activity.blocks.blockList[statusField[0]].value.toFixed(0);
                         break;
                     case "mynotevalue":
-                        value = mixedNumber(logo.blocks.blockList[statusField[0]].value);
+                        value = mixedNumber(this.activity.blocks.blockList[statusField[0]].value);
                         break;
                     case "elapsednotes2":
                         blk = statusField[0];
-                        cblk = logo.blocks.blockList[blk].connections[1];
-                        noteValue = logo.parseArg(logo, t, cblk, blk, null);
+                        cblk = this.activity.blocks.blockList[blk].connections[1];
+                        noteValue = this.activity.logo.parseArg(
+                            this.activity.logo,
+                            t,
+                            cblk,
+                            blk,
+                            null
+                        );
                         value =
-                            mixedNumber(logo.blocks.blockList[statusField[0]].value) +
+                            mixedNumber(this.activity.blocks.blockList[statusField[0]].value) +
                             " × " +
                             mixedNumber(noteValue);
                         break;
                     case "elapsednotes":
-                        value = mixedNumber(logo.blocks.blockList[statusField[0]].value);
+                        value = mixedNumber(this.activity.blocks.blockList[statusField[0]].value);
                         break;
                     case "namedbox":
-                        name = logo.blocks.blockList[statusField[0]].privateData;
-                        if (name in logo.boxes) {
-                            value = logo.boxes[name];
+                        name = this.activity.blocks.blockList[statusField[0]].privateData;
+                        if (name in this.activity.logo.boxes) {
+                            value = this.activity.logo.boxes[name];
                         } else {
                             value = "";
                         }
@@ -275,9 +284,9 @@ class StatusMatrix {
                                 if (j > 0) {
                                     value += " ";
                                 }
-                                freq = logo.synth.getFrequency(
+                                freq = this.activity.logo.synth.getFrequency(
                                     notes[j],
-                                    logo.synth.changeInTemperament
+                                    this.activity.logo.synth.changeInTemperament
                                 );
                                 if (typeof freq === "number") {
                                     value += freq.toFixed(2);
@@ -288,14 +297,14 @@ class StatusMatrix {
                         }
                         break;
                     case "heap":
-                        value = logo.blocks.blockList[statusField[0]].value;
+                        value = this.activity.blocks.blockList[statusField[0]].value;
                         break;
                     default:
-                        value = logo.blocks.blockList[statusField[0]].value;
+                        value = this.activity.blocks.blockList[statusField[0]].value;
                         break;
                 }
 
-                logo.inStatusMatrix = saveStatus;
+                this.activity.logo.inStatusMatrix = saveStatus;
 
                 cell = this._statusTable.rows[i + 1].cells[activeTurtles + 1];
                 if (cell != null) {
@@ -336,6 +345,6 @@ class StatusMatrix {
             t++;
         }
 
-        logo.updatingStatusMatrix = false;
+        this.activity.logo.updatingStatusMatrix = false;
     }
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2020 Walter Bender
+// Copyright (c) 2016-2021 Walter Bender
 // Copyright (c) 2016 Hemant Kasat
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -12,7 +12,11 @@
 // This widget enable us to create new pitches with help of a initial
 // pitch value by applying music ratios.
 
-/* global logo platformColor, _, SYNTHSVG, frequencyToPitch, DEFAULTVOICE */
+/*
+   global
+
+   platformColor, _, SYNTHSVG, frequencyToPitch, DEFAULTVOICE
+ */
 
 /*
    Global locations
@@ -22,10 +26,8 @@
         _
     - js/utils/platformstyle.js
         platformColor
-    - js/logo.js
-        logo
 */
-/*exported PitchStaircase */
+/* exported PitchStaircase */
 
 class PitchStaircase {
     static BUTTONDIVWIDTH = 476; // 8 buttons 476 = (55 + 4) * 8
@@ -297,7 +299,7 @@ class PitchStaircase {
         // The frequency is stored in the stepCell.
         stepCell.style.backgroundColor = platformColor.selectorBackground;
         const frequency = Number(stepCell.getAttribute("id"));
-        logo.synth.trigger(0, frequency, 1, DEFAULTVOICE, null, null);
+        this.activity.logo.synth.trigger(0, frequency, 1, DEFAULTVOICE, null, null);
 
         setTimeout(() => {
             stepCell.style.backgroundColor = platformColor.selectorBackground;
@@ -316,7 +318,7 @@ class PitchStaircase {
             pitchnotes.push(note.replace(/♭/g, "b").replace(/♯/g, "#"));
             const stepCell = this._stepTables[i].rows[0].cells[1];
             stepCell.style.backgroundColor = platformColor.selectorBackground;
-            logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
+            this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
         }
 
         setTimeout(() => {
@@ -339,7 +341,7 @@ class PitchStaircase {
         const last = this.Stairs.length - 1;
         const stepCell = this._stepTables[last].rows[0].cells[1];
         stepCell.style.backgroundColor = platformColor.selectorBackground;
-        logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
+        this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
         this._playNext(this.Stairs.length - 2, -1);
     }
 
@@ -391,7 +393,7 @@ class PitchStaircase {
 
             const stepCell = this._stepTables[index].rows[0].cells[1];
             stepCell.style.backgroundColor = platformColor.selectorBackground;
-            logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
+            this.activity.logo.synth.trigger(0, pitchnotes, 1, DEFAULTVOICE, null, null);
             if (index < this.Stairs.length || index > -1) {
                 this._playNext(index + next, next);
             }
@@ -403,11 +405,11 @@ class PitchStaircase {
      * @returns {void}
      */
     _save() {
-        for (const name in logo.blocks.palettes.dict) {
-            logo.blocks.palettes.dict[name].hideMenu(true);
+        for (const name in this.activity.palettes.dict) {
+            this.activity.palettes.dict[name].hideMenu(true);
         }
 
-        logo.refreshCanvas();
+        this.activity.refreshCanvas();
         const newStack = [
             [
                 0,
@@ -576,8 +578,8 @@ class PitchStaircase {
             previousBlock = hiddenIdx;
         }
 
-        logo.blocks.loadNewBlocks(newStack);
-        logo.textMsg(_("New action block generated!"));
+        this.activity.blocks.loadNewBlocks(newStack);
+        this.activity.textMsg(_("New action block generated!"));
     }
 
     /**
@@ -592,7 +594,9 @@ class PitchStaircase {
      * @private
      * @returns {void}
      */
-    init() {
+    init(activity) {
+        this.activity = activity;
+
         for (let i = 0; i < this.Stairs.length; i++) {
             this.Stairs[i].push(this.Stairs[i][2]); // initial frequency
             this.Stairs[i].push(this.Stairs[i][2]); // parent frequency
@@ -609,7 +613,7 @@ class PitchStaircase {
         widgetWindow.clear();
         widgetWindow.show();
         widgetWindow.onclose = () => {
-            logo.synth.setMasterVolume(0);
+            this.activity.logo.synth.setMasterVolume(0);
             this.closed = true;
             widgetWindow.destroy();
         };
@@ -691,7 +695,7 @@ class PitchStaircase {
         widgetWindow.getWidgetBody().append(this._pscTable);
         this._refresh();
 
-        logo.textMsg(_("Click on a note to create a new step."));
+        this.activity.textMsg(_("Click on a note to create a new step."));
 
         widgetWindow.onmaximize = () => {
             if (widgetWindow._maximized) {

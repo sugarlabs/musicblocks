@@ -1,4 +1,4 @@
-// Copyright (c) 2016-20 Walter Bender
+// Copyright (c) 2016-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -10,11 +10,13 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /*
-  global logo, blocks, docById, _showHideAuxMenu, analyzeProject, runAnalytics, scoreToChartData,
-  getChartOptions, loading:writable, Chart
+   global
+
+   docById, analyzeProject, runAnalytics, scoreToChartData,
+   getChartOptions, Chart
  */
 
-/* exported StatsWindow, loading */
+/* exported StatsWindow */
 
 /** This widget displays the status of selected parameters and notes as they are being played. */
 class StatsWindow {
@@ -22,7 +24,8 @@ class StatsWindow {
     /**
      * @constructor
      */
-    constructor() {
+    constructor(activity) {
+        this.activity = activity;
         this.isOpen = true;
 
         this.widgetWindow = window.widgetWindows.windowFor(this, "stats", "stats");
@@ -30,9 +33,9 @@ class StatsWindow {
         this.widgetWindow.show();
         this.widgetWindow.onclose = () => {
             this.isOpen = false;
-            blocks.showBlocks();
+            this.activity.blocks.showBlocks();
             this.widgetWindow.destroy();
-            logo.statsWindow = null;
+            this.activity.logo.statsWindow = null;
         };
         this.doAnalytics();
 
@@ -56,17 +59,16 @@ class StatsWindow {
      * @returns {void}
      */
     doAnalytics() {
-        toolbar.closeAuxToolbar(_showHideAuxMenu);
-        blocks.activeBlock = null;
+        this.activity.blocks.activeBlock = null;
         const myChart = docById("myChart");
 
         const ctx = myChart.getContext("2d");
-        loading = true;
+        this.activity.loading = true;
         document.body.style.cursor = "wait";
 
         let myRadarChart = null;
-        const scores = analyzeProject(blocks);
-        runAnalytics(logo);
+        const scores = analyzeProject(this.activity);
+        runAnalytics(this.activity);
         const data = scoreToChartData(scores);
         const __callback = () => {
             const imageData = myRadarChart.toBase64Image();
@@ -78,8 +80,8 @@ class StatsWindow {
                 img.width = 200;
             }
             this.widgetWindow.getWidgetBody().appendChild(img);
-            blocks.hideBlocks();
-            logo.showBlocksAfterRun = false;
+            this.activity.blocks.hideBlocks();
+            this.activity.showBlocksAfterRun = false;
             document.body.style.cursor = "default";
         };
         const options = getChartOptions(__callback);

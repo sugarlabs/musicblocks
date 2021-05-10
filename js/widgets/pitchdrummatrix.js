@@ -1,4 +1,4 @@
-// Copyright (c) 2016-20 Walter Bender
+// Copyright (c) 2016-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -13,22 +13,23 @@
 // and drum sounds.
 
 /*
-   global logo, blocks, turtles, platformColor, _, docById, getNote, getDrumName, getDrumIcon,
-   getDrumSynthName, Singer, MATRIXSOLFEHEIGHT, MATRIXSOLFEWIDTH, SOLFEGECONVERSIONTABLE
+   global
+
+   platformColor, _, docById, getNote, getDrumName, getDrumIcon,
+   getDrumSynthName, Singer, MATRIXSOLFEHEIGHT, MATRIXSOLFEWIDTH,
+   SOLFEGECONVERSIONTABLE
 */
 /*
    Global locations
-    js/activity.js
-        logo, blocks, turtles
-    js/utils/musicutils.js
-        getNote, getDrumName, getDrumIcon, getDrumSynthName, Singer, MATRIXSOLFEHEIGHT,
-        MATRIXSOLFEWIDTH, SOLFEGECONVERSIONTABLE
-    js/utils/utils.js
+   js/utils/musicutils.js
+        getNote, getDrumName, getDrumIcon, getDrumSynthName, Singer,
+        MATRIXSOLFEHEIGHT, MATRIXSOLFEWIDTH, SOLFEGECONVERSIONTABLE
+   js/utils/utils.js
         _, docById
     js/utils/platformstyle.js
         platformColor
 */
-/*exported PitchDrumMatrix */
+/* exported PitchDrumMatrix */
 
 class PitchDrumMatrix {
     static BUTTONDIVWIDTH = 295; // 5 buttons
@@ -64,7 +65,8 @@ class PitchDrumMatrix {
      * Initializes the pitch/drum matrix. First removes the previous matrix and them make another
      * one in DOM (Document Object Model).
      */
-    init() {
+    init(activity) {
+        this.activity = activity;
         const w = window.innerWidth;
         this._cellScale = w / 1200;
 
@@ -81,7 +83,7 @@ class PitchDrumMatrix {
 
         this.playButton.onclick = () => {
             this._playing = !this._playing;
-            logo.turtleDelay = 0;
+            this.activity.logo.turtleDelay = 0;
             this._playAll();
         };
 
@@ -124,7 +126,7 @@ class PitchDrumMatrix {
         // For the button callbacks
         widgetWindow.onclose = () => {
             pdmTableDiv.style.visibility = "hidden";
-            logo.hideMsgs();
+            this.activity.hideMsgs();
             widgetWindow.destroy();
         };
 
@@ -263,7 +265,7 @@ class PitchDrumMatrix {
             }
         };
 
-        logo.textMsg(_("Click in the grid to map notes to drums."));
+        this.activity.textMsg(_("Click in the grid to map notes to drums."));
     }
 
     /**
@@ -550,10 +552,10 @@ class PitchDrumMatrix {
                 '" width="' +
                 PitchDrumMatrix.ICONSIZE +
                 '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-	    this._playing = false;
+            this._playing = false;
             return;
         }
-        logo.synth.stop();
+        this.activity.logo.synth.stop();
 
         const pairs = [];
 
@@ -591,7 +593,7 @@ class PitchDrumMatrix {
                 this._playPitchDrum(ii, pairs);
             }
             setTimeout(() => {
-		this._playing = false;
+                this._playing = false;
                 icon.innerHTML =
                     '&nbsp;&nbsp;<img src="header-icons/' +
                     "play-button.svg" +
@@ -607,7 +609,7 @@ class PitchDrumMatrix {
             }, pairs.length * 1000);
         } else {
             if (!this.widgetWindow._maximized) {
-                logo.textMsg(_("Click in the grid to map notes to drums."));
+                this.activity.textMsg(_("Click in the grid to map notes to drums."));
             }
             icon.innerHTML =
                 '&nbsp;&nbsp;<img src="header-icons/' +
@@ -759,16 +761,16 @@ class PitchDrumMatrix {
             solfegeHTML,
             -1,
             0,
-            turtles.ithTurtle(0).singer.keySignature,
+            this.activity.turtles.ithTurtle(0).singer.keySignature,
             false,
             null,
-            logo.errorMsg
+            this.activity.errorMsg
         );
         const note = noteObj[0] + noteObj[1];
 
         if (playNote) {
             const waitTime = Singer.defaultBPMFactor * 1000 * 0.25;
-            logo.synth.trigger(
+            this.activity.logo.synth.trigger(
                 0,
                 note.replace(/♭/g, "b").replace(/♯/g, "#"),
                 0.125,
@@ -778,7 +780,7 @@ class PitchDrumMatrix {
             );
 
             setTimeout(() => {
-                logo.synth.trigger(0, "C2", 0.125, drumName, null, null);
+                this.activity.logo.synth.trigger(0, "C2", 0.125, drumName, null, null);
             }, waitTime);
         }
     }
@@ -811,10 +813,10 @@ class PitchDrumMatrix {
         // set drum and pitch blocks.
 
         // First, hide the palettes as they will need updating.
-        for (const name in blocks.palettes.dict) {
-            blocks.palettes.dict[name].hideMenu(true);
+        for (const name in this.activity.blocks.palettes.dict) {
+            this.activity.blocks.palettes.dict[name].hideMenu(true);
         }
-        logo.refreshCanvas();
+        this.activity.refreshCanvas();
 
         const pairs = [];
 
@@ -878,10 +880,10 @@ class PitchDrumMatrix {
                 solfegeHTML,
                 -1,
                 0,
-                turtles.ithTurtle(0).singer.keySignature,
+                this.activity.turtles.ithTurtle(0).singer.keySignature,
                 false,
                 null,
-                logo.errorMsg
+                this.activity.errorMsg
             );
             pitch = noteObj[0];
             octave = noteObj[1];
@@ -923,6 +925,6 @@ class PitchDrumMatrix {
 
         // Create a new stack for the chunk.
         // console.debug(newStack);
-        blocks.loadNewBlocks(newStack);
+        this.activity.blocks.loadNewBlocks(newStack);
     }
 }

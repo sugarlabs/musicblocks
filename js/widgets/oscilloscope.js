@@ -14,7 +14,11 @@
  * MA 02110-1335 USA.
  */
 
-/* global _, logo, SMALLERBUTTON, BIGGERBUTTON, Tone, instruments */
+/*
+   global
+
+   _, SMALLERBUTTON, BIGGERBUTTON, Tone, instruments
+ */
 /* 
     Globals location
      - js/artwork.js
@@ -38,9 +42,10 @@ class Oscilloscope {
     static analyserSize = 8192;
     /**
      * @constructor
-     * @param {Object} logo - object of Logo
+     * @param {Object} activity - The activity object
      */
-    constructor() {
+    constructor(activity) {
+        this.activity = activity;
         this.pitchAnalysers = {};
         this.playingNow = false;
         if (this.drawVisualIDs) {
@@ -57,7 +62,7 @@ class Oscilloscope {
 
         widgetWindow.onclose = () => {
             for (const turtle of this.divisions) {
-                const turtleIdx = logo.turtles.turtleList.indexOf(turtle);
+                const turtleIdx = this.activity.turtles.turtleList.indexOf(turtle);
                 cancelAnimationFrame(this.drawVisualIDs[turtleIdx]);
             }
 
@@ -97,7 +102,7 @@ class Oscilloscope {
         this.widgetWindow = widgetWindow;
         this.divisions = [];
 
-        for (const turtle of logo.oscilloscopeTurtles) {
+        for (const turtle of this.activity.logo.oscilloscopeTurtles) {
             if (turtle && !turtle.inTrash) this.divisions.push(turtle);
         }
 
@@ -189,7 +194,7 @@ class Oscilloscope {
         }
         document.getElementsByTagName("canvas")[0].innerHTML = "";
         for (const turtle of this.divisions) {
-            const turtleIdx = logo.turtles.turtleList.indexOf(turtle);
+            const turtleIdx = this.activity.turtles.turtleList.indexOf(turtle);
             this.reconnectSynthsToAnalyser(turtleIdx);
             this.makeCanvas(width, height / this.divisions.length, turtle, turtleIdx, true);
         }
