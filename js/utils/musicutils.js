@@ -9,7 +9,11 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/*global _, last, logo, DRUMNAMES, NOISENAMES, VOICENAMES, INVALIDPITCH, CUSTOMSAMPLES*/
+/*
+   global
+
+   _, last, logo, DRUMNAMES, NOISENAMES, VOICENAMES, INVALIDPITCH, CUSTOMSAMPLES
+*/
 
 /*
    Global Locations
@@ -23,22 +27,34 @@
         INVALIDPITCH
  */
 
-/* exported SYNTHSVG, RSYMBOLS, NOTENAMES, NOTENAMES1, WESTERN2EISOLFEGENAMES, PITCHES1,
-PITCHES3, SCALENOTES, EASTINDIANSOLFNOTES, DRUMS, GRAPHICS, SOLFATTRS, DEGREES,
-RHYTHMRULERHEIGHT, SLIDERHEIGHT, SLIDERWIDTH, MATRIXLABELCOLOR, MATRIXNOTECELLCOLOR,
-MATRIXTUPLETCELLCOLOR, MATRIXRHYTHMCELLCOLOR, MATRIXBUTTONCOLORHOVER, MATRIXNOTECELLCOLORHOVER,
-MATRIXSOLFEWIDTH, EIGHTHNOTEWIDTH, MATRIXBUTTONHEIGHT, MATRIXBUTTONHEIGHT2, MATRIXSOLFEHEIGHT,
-NOTESYMBOLS, SELECTORSTRINGS, ACCIDENTALLABELS, ACCIDENTALNAMES, ACCIDENTALVALUES, INTERVALS,
-MODE_PIE_MENUS, updateTemperaments, DEFAULTINVERT, DEFAULTINTERVAL, DEFAULTEFFECT,
-DEFAULTMODE, DEFAULTOSCILLATORTYPE, DEFAULTACCIDENTAL, getInvertMode, getIntervalNumber,
-getIntervalDirection, getModeNumbers, getDrumIndex, getDrumName, getDrumSymbol, getFilterTypes,
-getOscillatorTypes, getDrumIcon, getDrumSynthName, getNoiseName, getNoiseIcon, getNoiseSynthName,
-getVoiceName, getVoiceIcon, getVoiceSynthName, getTemperamentName, getStepSizeUp, getStepSizeDown,
-getModeLength, nthDegreeToPitch, getInterval, calcNoteValueToDisplay, durationToNoteValue,
-noteToFrequency, getSolfege, splitScaleDegree, getNumNote, calcOctave, calcOctaveInterval,
-isInt, convertFromSolfege, getPitchInfo, MATRIXBUTTONCOLOR, i18nSolfege, convertFactor,
-getOctaveRatio, setOctaveRatio, getTemperamentsList, addTemperamentToList, getTemperament,
-deleteTemperamentFromList, addTemperamentToDictionary */
+/*
+  exported
+
+  SYNTHSVG, RSYMBOLS, NOTENAMES, NOTENAMES1, WESTERN2EISOLFEGENAMES,
+  PITCHES1, PITCHES3, SCALENOTES, EASTINDIANSOLFNOTES, DRUMS,
+  GRAPHICS, SOLFATTRS, DEGREES, RHYTHMRULERHEIGHT, SLIDERHEIGHT,
+  SLIDERWIDTH, MATRIXLABELCOLOR, MATRIXNOTECELLCOLOR,
+  MATRIXTUPLETCELLCOLOR, MATRIXRHYTHMCELLCOLOR,
+  MATRIXBUTTONCOLORHOVER, MATRIXNOTECELLCOLORHOVER, MATRIXSOLFEWIDTH,
+  EIGHTHNOTEWIDTH, MATRIXBUTTONHEIGHT, MATRIXBUTTONHEIGHT2,
+  MATRIXSOLFEHEIGHT, NOTESYMBOLS, SELECTORSTRINGS, ACCIDENTALLABELS,
+  ACCIDENTALNAMES, ACCIDENTALVALUES, INTERVALS, MODE_PIE_MENUS,
+  updateTemperaments, DEFAULTINVERT, DEFAULTINTERVAL, DEFAULTEFFECT,
+  DEFAULTMODE, DEFAULTOSCILLATORTYPE, DEFAULTACCIDENTAL,
+  getInvertMode, getIntervalNumber, getIntervalDirection,
+  getModeNumbers, getDrumIndex, getDrumName, getDrumSymbol,
+  getFilterTypes, getOscillatorTypes, getDrumIcon, getDrumSynthName,
+  getNoiseName, getNoiseIcon, getNoiseSynthName, getVoiceName,
+  getVoiceIcon, getVoiceSynthName, getTemperamentKeys,
+  getTemperamentName, getStepSizeUp, getStepSizeDown, getModeLength,
+  nthDegreeToPitch, getInterval, calcNoteValueToDisplay,
+  durationToNoteValue, noteToFrequency, getSolfege, splitScaleDegree,
+  getNumNote, calcOctave, calcOctaveInterval, isInt,
+  convertFromSolfege, getPitchInfo, MATRIXBUTTONCOLOR, i18nSolfege,
+  convertFactor, getOctaveRatio, setOctaveRatio, getTemperamentsList,
+  addTemperamentToList, getTemperament, deleteTemperamentFromList,
+  addTemperamentToDictionary, buildScale
+*/
 
 // Scalable sinewave graphic
 const SYNTHSVG =
@@ -966,7 +982,7 @@ const PreDefinedTemperaments = {
     "1/4 comma meantone": true
 };
 
-let TEMPERAMENT = {
+const TEMPERAMENT = {
     "equal": {
         "perfect 1": Math.pow(2, 0 / 12),
         "minor 2": Math.pow(2, 1 / 12),
@@ -1238,9 +1254,9 @@ const getTemperament = (entry) => {
 
 
 const getTemperamentKeys = () => {
-    let keys = []
-    for (let k in TEMPERAMENT) {
-	keys.push(k)
+    const keys = [];
+    for (const k in TEMPERAMENT) {
+        keys.push(k);
     }
 
     return keys;
@@ -1583,6 +1599,10 @@ function getVoiceSynthName(name) {
     // console.debug(name + " not found in VOICENAMES");
     return DEFAULTVOICE;
 }
+
+const isCustomTemperament = (temperament) => {
+    return !(temperament in PreDefinedTemperaments);
+};
 
 function getTemperamentName(name) {
     if (name === "") {
@@ -2152,10 +2172,6 @@ function getSharpFlatPreference(keySignature) {
     }
 }
 
-const isCustom = (temperament) => {
-    return !(temperament in PreDefinedTemperaments);
-};
-
 function getCustomNote(notes) {
     // For custom temperament notes
     if (notes instanceof Array) {
@@ -2490,7 +2506,7 @@ function numberToPitch(i, temperament, startPitch, offset) {
     }
 
     let interval;
-    if (isCustom(temperament)) {
+    if (isCustomTemperament(temperament)) {
         pitchNumber = pitchNumber + "";
         if (TEMPERAMENT[temperament][pitchNumber][1] === undefined) {
             // If custom temperament is not defined, then it will
@@ -2816,8 +2832,6 @@ function getNote(
 
                 note = thisScale[index];
             } else {
-                // console.debug(solfegePart);
-                // console.debug(halfSteps.indexOf(noteArg));
                 // eslint-disable-next-line no-console
                 console.debug(
                     "WARNING: Note [" + noteArg + "] not found in " + halfSteps + ". Returning REST"
@@ -2956,19 +2970,30 @@ function getNote(
                 note = EQUIVALENTFLATS[note];
             }
         }
-    } else if (isCustom(temperament)) {
+    } else if (isCustomTemperament(temperament)) {
         note = getCustomNote(noteArg);
         let pitchNumber = null;
         for (const number in TEMPERAMENT[temperament]) {
             if (number !== "pitchNumber") {
                 if (note === TEMPERAMENT[temperament][number][3]) {
-                    pitchNumber = Number(number);
+                    if (typeof(number) === "string") {
+                        pitchNumber = Number(number);
+                    } else {
+                        pitchNumber = number;
+                    }
+                    break;
+                } else if (note === TEMPERAMENT[temperament][number][1]) {
+                    if (typeof(number) === "string") {
+                        pitchNumber = Number(number);
+                    } else {
+                        pitchNumber = number;
+                    }
                     break;
                 }
             }
         }
 
-        if (pitchNumber === null) {
+        if (pitchNumber === null || pitchNumber === "null") {
             return getNote(
                 noteArg,
                 octave,
@@ -2977,6 +3002,8 @@ function getNote(
                 movable,
                 direction,
                 errorMsg
+                // No temperament arg is passed so the note will not
+                // be processed as a custom temperament.
             );
         }
 
@@ -3004,10 +3031,14 @@ function getNote(
             inOctave = inOctave + 1;
         }
         pitchNumber = pitchNumber + "";
-        note = TEMPERAMENT[temperament][pitchNumber][3];
+        if (TEMPERAMENT[temperament][pitchNumber].length > 3) {
+            note = TEMPERAMENT[temperament][pitchNumber][3];
+        } else {
+            note = TEMPERAMENT[temperament][pitchNumber][1];
+        }
         octave = inOctave;
     } else {
-        //Return E# as E#, Fb as Fb etc. for different temperament systems.
+        // Return E# as E#, Fb as Fb etc. for different temperament systems.
         articulation = getArticulation(noteArg);
         noteArg = noteArg.replace(articulation, "");
 
@@ -3136,7 +3167,7 @@ function _calculate_pitch_number(np, tur) {
     return pitchToNumber(obj[0], obj[1], tur.singer.keySignature) - tur.singer.pitchNumberOffset;
 }
 
-function _buildScale(keySignature) {
+function buildScale(keySignature) {
     // FIX ME: temporary hard-coded fix to avoid errors in pitch preview
     if (keySignature == "C♭ major") {
         const scale = ["C♭", "D♭", "E♭", "F♭", "G♭", "A♭", "B♭", "C♭"];
@@ -3214,13 +3245,13 @@ function _getStepSize(keySignature, pitch, direction, transposition, temperament
     if (temperament === undefined) {
         temperament = "equal";
     }
-    if (isCustom(temperament)) {
+    if (isCustomTemperament(temperament)) {
         //Scalar = Semitone for custom Temperament.
         return transposition;
     }
 
     let thisPitch = pitch;
-    const obj = _buildScale(keySignature);
+    const obj = buildScale(keySignature);
     const scale = obj[0];
     const halfSteps = obj[1];
 
@@ -3343,7 +3374,7 @@ function getStepSizeDown(keySignature, pitch, transposition, temperament) {
 }
 
 function getModeLength(keySignature) {
-    return _buildScale(keySignature)[1].length;
+    return buildScale(keySignature)[1].length;
 }
 
 // A two-way function to get pitch according to scale degree and vice versa for a chosen mode
@@ -3356,7 +3387,7 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
 
     // Info variables according to chosen mode
     const chosenMode = keySignatureToMode(keySignature);
-    const obj1 = _buildScale(keySignature);
+    const obj1 = buildScale(keySignature);
     const chosenModeScale = obj1[0];
     const chosenModePattern = obj1[1];
 
@@ -3373,7 +3404,7 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
 
     // if moveable do is present just return the major/perfect tones
     if (moveable) {
-        finalScale = _buildScale(chosenMode[0] + " major")[0];
+        finalScale = buildScale(chosenMode[0] + " major")[0];
 
         if (pitch === null) {
             return finalScale[scaleDegree];
@@ -3428,7 +3459,7 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
             }
         } else if (chosenModePattern.length < 7) {
             // Major scale of the choosen key is used as fallback
-            const majorScale = _buildScale(chosenMode[0] + " major")[0];
+            const majorScale = buildScale(chosenMode[0] + " major")[0];
 
             // according to the choosenModePattern, calculate defined scale degrees
             for (let i = 0; i < chosenModePattern.length; i++) {
@@ -3628,7 +3659,7 @@ function scaleDegreeToPitchMapping(keySignature, scaleDegree, moveable, pitch) {
 function nthDegreeToPitch(keySignature, scaleDegree) {
     // Returns note corresponding to scale degree in current key
     // signature. Used for moveable solfege.
-    const scale = _buildScale(keySignature)[0];
+    const scale = buildScale(keySignature)[0];
     // Scale degree is specified as do === 1, re === 2, etc., so we need
     // to subtract 1 to make it zero-based.
     // scaleDegree -= 1;
@@ -3644,7 +3675,7 @@ function nthDegreeToPitch(keySignature, scaleDegree) {
 // steps within the current key and mode.
 function getInterval(interval, keySignature, pitch) {
     // Step size interval based on the position (pitch) in the scale
-    const obj = _buildScale(keySignature);
+    const obj = buildScale(keySignature);
     const scale = obj[0];
     const halfSteps = obj[1];
     // Offet is used in the case that the pitch is not in the current scale.
@@ -4206,7 +4237,7 @@ function getPitchInfo(type, notePlayed, tur) {
                 }
                 np = np.replace("#", SHARP).replace("b", FLAT);
                 if (tur.singer.moveable === false) return SOLFEGECONVERSIONTABLE[np];
-                return SOLFEGENAMES[_buildScale(tur.singer.keySignature)[0].indexOf(np)];
+                return SOLFEGENAMES[buildScale(tur.singer.keySignature)[0].indexOf(np)];
             case "pitch class":
                 if (Number(np)) {
                     np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
@@ -4258,7 +4289,7 @@ function getPitchInfo(type, notePlayed, tur) {
                 }
                 np = np.substr(0, np.length - 1);
                 np = np.replace("#", SHARP).replace("b", FLAT);
-                return _buildScale(tur.singer.keySignature)[0].indexOf(np);
+                return buildScale(tur.singer.keySignature)[0].indexOf(np);
             case "staff y":
                 if (Number(np)) {
                     [np, octave] = frequencyToPitch(np);

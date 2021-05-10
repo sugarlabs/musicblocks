@@ -1,4 +1,4 @@
-// Copyright (c) 2014-19 Walter Bender
+// Copyright (c) 2014-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -9,14 +9,16 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/*globals pluginObjs, jQuery, PALETTEICONS, PALETTEFILLCOLORS, PALETTESTROKECOLORS,
-PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS, FB, MULTIPALETTES, platformColor, pluginsImages,
-doSave*/
+/*
+   globals
+
+   jQuery, PALETTEICONS, PALETTEFILLCOLORS, PALETTESTROKECOLORS,
+   PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS, MULTIPALETTES,
+   platformColor
+*/
 
 /*
     Global locations
-    - js/activity.js
-        pluginObjs, pluginsImages, doSave
     - js/artwork.js
         PALETTEICONS, PALETTEFILLCOLORS, PALETTESTROKECOLORS, PALETTEHIGHLIGHTCOLORS,
         HIGHLIGHTSTROKECOLORS
@@ -26,14 +28,19 @@ doSave*/
         platformColor
 */
 
-/*exported changeImage, format, canvasPixelRatio, windowHeight, windowWidth,
-  httpGet, httpPost, HttpRequest, doBrowserCheck, docByClass, docByTagName,
-  docByName, docBySelector, last, doSVG, isSVGEmpty, getTextWidth, fileExt,
-  fileBasename, toTitleCase, processRawPluginData, preparePluginExports,
-  processMacroData, prepareMacroExports, doPublish, doUseCamera, doStopVideoCam,
-  hideDOMLabel, displayMsg, safeSVG, toFixed2, mixedNumber, rationalSum,
-  nearestBeat, oneHundredToFraction, rgbToHex, hexToRGB, hex2rgb, delayExecution,
-  closeWidgets, closeBlkWidgets, importMembers*/
+/* exported
+
+   changeImage, format, canvasPixelRatio, windowHeight, windowWidth,
+   httpGet, httpPost, HttpRequest, doBrowserCheck, docByClass,
+   docByTagName, docByName, docBySelector, last, doSVG, isSVGEmpty,
+   getTextWidth, fileExt, fileBasename, toTitleCase,
+   processRawPluginData, preparePluginExports, processMacroData,
+   prepareMacroExports, doPublish, doUseCamera, doStopVideoCam,
+   hideDOMLabel, displayMsg, safeSVG, toFixed2, mixedNumber,
+   rationalSum, nearestBeat, oneHundredToFraction, rgbToHex, hexToRGB,
+   hex2rgb, delayExecution, closeWidgets, closeBlkWidgets,
+   importMembers
+*/
 
 /* eslint-disable no-console */
 
@@ -402,20 +409,8 @@ function toTitleCase(str) {
     return str.toUpperCase()[0] + tempStr;
 }
 
-function processPluginData(
-    pluginData,
-    palettes,
-    blocks,
-    evalFlowDict,
-    evalArgDict,
-    evalParameterDict,
-    evalSetterDict,
-    evalOnStartList,
-    evalOnStopList,
-    evalMacroDict
-) {
+function processPluginData(activity, pluginData) {
     // Plugins are JSON-encoded dictionaries.
-    // console.debug(pluginData);
     const obj = JSON.parse(pluginData);
     // Create a palette entry.
     let newPalette = false,
@@ -471,11 +466,11 @@ function processPluginData(
                 strokeHighlightColor
             ];
 
-            if (name in palettes.buttons) {
+            if (name in activity.palettes.buttons) {
                 console.debug("palette " + name + " already exists");
             } else {
                 console.debug("adding palette " + name);
-                palettes.add(name);
+                activity.palettes.add(name);
                 if (MULTIPALETTES[2].indexOf(name) === -1) MULTIPALETTES[2].push(name);
                 newPalette = true;
             }
@@ -485,7 +480,7 @@ function processPluginData(
     if (newPalette) {
         try {
             console.debug("CALLING makePalettes");
-            palettes.makePalettes(1);
+            activity.palettes.makePalettes(1);
         } catch (e) {
             console.debug("makePalettes: " + e);
         }
@@ -494,7 +489,7 @@ function processPluginData(
     // Define the image blocks
     if ("IMAGES" in obj) {
         for (const blkName in obj["IMAGES"]) {
-            pluginsImages[blkName] = obj["IMAGES"][blkName];
+            activity.pluginsImages[blkName] = obj["IMAGES"][blkName];
         }
     }
 
@@ -502,7 +497,7 @@ function processPluginData(
     // eval'd by this block.
     if ("FLOWPLUGINS" in obj) {
         for (const flow in obj["FLOWPLUGINS"]) {
-            evalFlowDict[flow] = obj["FLOWPLUGINS"][flow];
+            activity.logo.evalFlowDict[flow] = obj["FLOWPLUGINS"][flow];
         }
     }
 
@@ -510,7 +505,7 @@ function processPluginData(
     // eval'd by this block.
     if ("ARGPLUGINS" in obj) {
         for (const arg in obj["ARGPLUGINS"]) {
-            evalArgDict[arg] = obj["ARGPLUGINS"][arg];
+            activity.logo.evalArgDict[arg] = obj["ARGPLUGINS"][arg];
         }
     }
 
@@ -519,7 +514,7 @@ function processPluginData(
     if ("MACROPLUGINS" in obj) {
         for (const macro in obj["MACROPLUGINS"]) {
             try {
-                evalMacroDict[macro] = JSON.parse(obj["MACROPLUGINS"][macro]);
+                activity.palettes.pluginMacros[macro] = JSON.parse(obj["MACROPLUGINS"][macro]);
             } catch (e) {
                 console.debug("could not parse macro " + macro);
                 console.debug(obj["MACROPLUGINS"][macro]);
@@ -531,7 +526,7 @@ function processPluginData(
     // used to set a value block.
     if ("SETTERPLUGINS" in obj) {
         for (const setter in obj["SETTERPLUGINS"]) {
-            evalSetterDict[setter] = obj["SETTERPLUGINS"][setter];
+            activity.logo.evalSetterDict[setter] = obj["SETTERPLUGINS"][setter];
         }
     }
 
@@ -559,7 +554,7 @@ function processPluginData(
 
     if ("PARAMETERPLUGINS" in obj) {
         for (const parameter in obj["PARAMETERPLUGINS"]) {
-            evalParameterDict[parameter] = obj["PARAMETERPLUGINS"][parameter];
+            activity.logo.evalParameterDict[parameter] = obj["PARAMETERPLUGINS"][parameter];
         }
     }
 
@@ -573,26 +568,27 @@ function processPluginData(
     // Code to execute when turtle code is started
     if ("ONSTART" in obj) {
         for (const arg in obj["ONSTART"]) {
-            evalOnStartList[arg] = obj["ONSTART"][arg];
+            activity.logo.evalOnStartList[arg] = obj["ONSTART"][arg];
         }
     }
 
     // Code to execute when turtle code is stopped
     if ("ONSTOP" in obj) {
         for (const arg in obj["ONSTOP"]) {
-            evalOnStopList[arg] = obj["ONSTOP"][arg];
+            activity.logo.evalOnStopList[arg] = obj["ONSTOP"][arg];
         }
     }
 
-    for (const protoblock in blocks.protoBlockDict) {
+    for (const protoblock in activity.blocks.protoBlockDict) {
         try {
             // Push the protoblocks onto their palettes.
-            if (blocks.protoBlockDict[protoblock].palette === undefined) {
+            if (activity.blocks.protoBlockDict[protoblock].palette === undefined) {
                 console.debug("Cannot find palette for protoblock " + protoblock);
-            } else if (blocks.protoBlockDict[protoblock].palette === null) {
+            } else if (activity.blocks.protoBlockDict[protoblock].palette === null) {
                 console.debug("Cannot find palette for protoblock " + protoblock);
             } else {
-                blocks.protoBlockDict[protoblock].palette.add(blocks.protoBlockDict[protoblock]);
+                activity.blocks.protoBlockDict[protoblock].palette.add(
+                    activity.blocks.protoBlockDict[protoblock]);
             }
         } catch (e) {
             console.debug(e);
@@ -600,30 +596,17 @@ function processPluginData(
     }
 
     console.debug("updating palette " + paletteName);
-    palettes.updatePalettes(paletteName);
+    activity.palettes.updatePalettes(paletteName);
 
     setTimeout(() => {
-        palettes.show();
+        activity.palettes.show();
     }, 2000);
 
     // Return the object in case we need to save it to local storage.
     return obj;
 }
 
-function processRawPluginData(
-    rawData,
-    palettes,
-    blocks,
-    errorMsg,
-    evalFlowDict,
-    evalArgDict,
-    evalParameterDict,
-    evalSetterDict,
-    evalOnStartList,
-    evalOnStopList,
-    evalMacroDict
-) {
-    // console.debug(rawData);
+function processRawPluginData(activity, rawData) {
     const lineData = rawData.split("\n");
     let cleanData = "";
 
@@ -643,92 +626,82 @@ function processRawPluginData(
 
     // Note to plugin developers: You may want to comment out this
     // try/catch while debugging your plugin.
+    console.log(cleanData);
     let obj;
     try {
-        obj = processPluginData(
-            cleanData.replace(/\n/g, ""),
-            palettes,
-            blocks,
-            evalFlowDict,
-            evalArgDict,
-            evalParameterDict,
-            evalSetterDict,
-            evalOnStartList,
-            evalOnStopList,
-            evalMacroDict
-        );
+        obj = processPluginData(activity, cleanData.replace(/\n/g, ""));
     } catch (e) {
         obj = null;
-        errorMsg("Error loading plugin: " + e);
+        activity.errorMsg("Error loading plugin: " + e);
     }
 
     return obj;
 }
 
-function updatePluginObj(obj) {
+function updatePluginObj(activity, obj) {
     for (const name in obj["PALETTEPLUGINS"]) {
-        pluginObjs["PALETTEPLUGINS"][name] = obj["PALETTEPLUGINS"][name];
+        activity.pluginObjs["PALETTEPLUGINS"][name] = obj["PALETTEPLUGINS"][name];
     }
 
     for (const name in obj["PALETTEFILLCOLORS"]) {
-        pluginObjs["PALETTEFILLCOLORS"][name] = obj["PALETTEFILLCOLORS"][name];
+        activity.pluginObjs["PALETTEFILLCOLORS"][name] = obj["PALETTEFILLCOLORS"][name];
     }
 
     for (const name in obj["PALETTESTROKECOLORS"]) {
-        pluginObjs["PALETTESTROKECOLORS"][name] = obj["PALETTESTROKECOLORS"][name];
+        activity.pluginObjs["PALETTESTROKECOLORS"][name] = obj["PALETTESTROKECOLORS"][name];
     }
 
     for (const name in obj["PALETTEHIGHLIGHTCOLORS"]) {
-        pluginObjs["PALETTEHIGHLIGHTCOLORS"][name] = obj["PALETTEHIGHLIGHTCOLORS"][name];
+        activity.pluginObjs["PALETTEHIGHLIGHTCOLORS"][name] = obj["PALETTEHIGHLIGHTCOLORS"][name];
     }
 
     for (const flow in obj["FLOWPLUGINS"]) {
-        pluginObjs["FLOWPLUGINS"][flow] = obj["FLOWPLUGINS"][flow];
+        activity.pluginObjs["FLOWPLUGINS"][flow] = obj["FLOWPLUGINS"][flow];
     }
 
     for (const arg in obj["ARGPLUGINS"]) {
-        pluginObjs["ARGPLUGINS"][arg] = obj["ARGPLUGINS"][arg];
+        activity.pluginObjs["ARGPLUGINS"][arg] = obj["ARGPLUGINS"][arg];
     }
 
     for (const block in obj["BLOCKPLUGINS"]) {
-        pluginObjs["BLOCKPLUGINS"][block] = obj["BLOCKPLUGINS"][block];
+        activity.pluginObjs["BLOCKPLUGINS"][block] = obj["BLOCKPLUGINS"][block];
     }
 
     if ("MACROPLUGINS" in obj) {
         for (const macro in obj["MACROPLUGINS"]) {
-            pluginObjs["MACROPLUGINS"][macro] = obj["MACROPLUGINS"][macro];
+            activity.pluginObjs["MACROPLUGINS"][macro] = obj["MACROPLUGINS"][macro];
         }
     }
 
     if ("GLOBALS" in obj) {
-        if (!("GLOBALS" in pluginObjs)) {
-            pluginObjs["GLOBALS"] = "";
+        if (!("GLOBALS" in activity.pluginObjs)) {
+            activity.pluginObjs["GLOBALS"] = "";
         }
-        pluginObjs["GLOBALS"] += obj["GLOBALS"];
+        activity.pluginObjs["GLOBALS"] += obj["GLOBALS"];
     }
 
     if ("IMAGES" in obj) {
-        pluginObjs["IMAGES"] = obj["IMAGES"];
+        activity.pluginObjs["IMAGES"] = obj["IMAGES"];
     }
 
     for (const name in obj["ONLOAD"]) {
-        pluginObjs["ONLOAD"][name] = obj["ONLOAD"][name];
+        activity.pluginObjs["ONLOAD"][name] = obj["ONLOAD"][name];
     }
 
     for (const name in obj["ONSTART"]) {
-        pluginObjs["ONSTART"][name] = obj["ONSTART"][name];
+        activity.pluginObjs["ONSTART"][name] = obj["ONSTART"][name];
     }
 
     for (const name in obj["ONSTOP"]) {
-        pluginObjs["ONSTOP"][name] = obj["ONSTOP"][name];
+        activity.pluginObjs["ONSTOP"][name] = obj["ONSTOP"][name];
     }
 }
 
-function preparePluginExports(obj) {
+function preparePluginExports(activity, obj) {
     // add obj to plugin dictionary and return as JSON encoded text
-    updatePluginObj(obj);
+    updatePluginObj(activity, obj);
 
-    return JSON.stringify(pluginObjs);
+    return JSON.stringify(activity.pluginObjs);
 }
 
 function processMacroData(macroData, palettes, blocks, macroDict) {
@@ -756,25 +729,6 @@ function prepareMacroExports(name, stack, macroDict) {
 }
 
 // Some block-specific code
-
-// Publish to FB
-function doPublish(desc) {
-    const url = doSave();
-    console.debug("push " + url + " to FB");
-    const descElem = docById("description");
-    const msg = desc + " " + descElem.value + " " + url;
-    console.debug("comment: " + msg);
-    const post_cb = () => {
-        FB.api("/me/feed", "post", {
-            message: msg
-        });
-    };
-
-    FB.login(post_cb, {
-        scope: "publish_actions"
-    });
-}
-
 // TODO: Move to camera plugin
 let hasSetupCamera = false;
 function doUseCamera(args, turtles, turtle, isVideo, cameraID, setCameraID, errorMsg) {
@@ -1217,10 +1171,10 @@ function hexToRGB(hex) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
         ? {
-              r: parseInt(result[1], 16),
-              g: parseInt(result[2], 16),
-              b: parseInt(result[3], 16)
-          }
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        }
         : null;
 }
 

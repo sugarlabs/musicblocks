@@ -1,4 +1,4 @@
-// Copyright (c) 2016-19 Walter Bender
+// Copyright (c) 2016-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -10,9 +10,13 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /*
-global _, last, Tone, require, getTemperament, pitchToNumber, getNoteFromInterval, FLAT, SHARP,
-pitchToFrequency, getCustomNote, getOctaveRatio, isCustom, Singer, DOUBLEFLAT, DOUBLESHARP,
-DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform, getArticulation
+   global
+
+   _, last, Tone, require, getTemperament, pitchToNumber,
+   getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
+   getOctaveRatio, isCustomTemperament, Singer, DOUBLEFLAT, DOUBLESHARP,
+   DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
+   getArticulation
 */
 
 /*
@@ -21,7 +25,7 @@ DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform, getArticulation
         _, last
     - js/utils/musicutils.js
         pitchToNumber, getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
-        isCustom, DOUBLEFLAT, DOUBLESHARP, DEFAULTDRUM, getOscillatorTypes, numberToPitch,
+        isCustomTemperament, DOUBLEFLAT, DOUBLESHARP, DEFAULTDRUM, getOscillatorTypes, numberToPitch,
         getArticulation, getOctaveRatio, getTemperament
     - js/turtle-singer.js
         Singer
@@ -29,8 +33,11 @@ DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform, getArticulation
         platform
 */
 
-/* exported NOISENAMES, VOICENAMES, DRUMNAMES, EFFECTSNAMES, CUSTOMSAMPLES,
-instrumentsEffects, instrumentsFilters, Synth
+/*
+   exported
+
+   NOISENAMES, VOICENAMES, DRUMNAMES, EFFECTSNAMES, CUSTOMSAMPLES,
+   instrumentsEffects, instrumentsFilters, Synth
 */
 
 const POLYCOUNT = 3;
@@ -590,20 +597,18 @@ function Synth() {
                 0,
                 "C Major"
             );
-            if (typeof oneNote === "number") {
-                // eslint-disable-next-line
-                oneNote = oneNote;
-            } else {
-                for (const pitchNumber in getTemperament(customID)) {
+            if (typeof(oneNote) !== "number") {
+                const thisTemperament = getTemperament(customID);
+                for (const pitchNumber in thisTemperament) {
                     if (pitchNumber !== "pitchNumber") {
                         if (
-                            (isCustom(customID) &&
-                             oneNote == getTemperament(customID)[pitchNumber][3]) ||
-				oneNote == getTemperament(customID)[pitchNumber][1]
+                            (isCustomTemperament(customID) &&
+                             oneNote === thisTemperament[pitchNumber][3]) ||
+                                oneNote === thisTemperament[pitchNumber][1]
                         ) {
-                            const octaveDiff = octave - getTemperament(customID)[pitchNumber][2];
+                            const octaveDiff = octave - thisTemperament[pitchNumber][2];
                             return Number(
-                                getTemperament(customID)[pitchNumber][0] *
+                                thisTemperament[pitchNumber][0] *
                                     startPitchFrequency *
                                     Math.pow(getOctaveRatio(), octaveDiff)
                             );
@@ -611,6 +616,7 @@ function Synth() {
                     }
                 }
             }
+            return oneNote;
         };
 
         if (typeof notes === "string") {
@@ -625,7 +631,6 @@ function Synth() {
                     results.push(notes[i]);
                 }
             }
-
             return results;
         } else {
             // Hertz?
@@ -1197,13 +1202,13 @@ function Synth() {
     };
 
     this.loadSynth = function (turtle, sourceName) {
-        /* eslint-disable*/
+        /* eslint-disable */
         if (sourceName in instruments[turtle]) {
             if (sourceName.substring(0,13) === "customsample_") {
                 console.debug("loading custom " + sourceName);
                 this.createSynth(turtle, sourceName, sourceName, null);
-            } else {
-                console.debug(sourceName + " already loaded");
+            // } else {
+            //     console.debug(sourceName + " already loaded");
             }
 
         } else {
@@ -1220,7 +1225,7 @@ function Synth() {
     };
 
     this._performNotes = function (synth, notes, beatValue, paramsEffects, paramsFilters, setNote) {
-        if (this.inTemperament !== "equal" && !isCustom(this.inTemperament)) {
+        if (this.inTemperament !== "equal" && !isCustomTemperament(this.inTemperament)) {
             if (typeof notes === "number") {
                 notes = notes;
             } else {
@@ -1246,14 +1251,17 @@ function Synth() {
             }
         }
 
-        if (isCustom(this.inTemperament)) {
+        if (isCustomTemperament(this.inTemperament)) {
             const notes1 = notes;
-            notes = this.getCustomFrequency(notes, this.inTemperament);
-            if (notes === undefined) {
+            console.log(notes);
+            if (notes.search("[+]") !== -1) {
+                notes = this.getCustomFrequency(notes, this.inTemperament);
+            }
+            if (notes === undefined || notes === "undefined") {
                 notes = notes1;
             }
             console.debug(notes);
-            /*eslint-enable*/
+            /* eslint-enable */
         }
 
         let numFilters;
@@ -1371,7 +1379,7 @@ function Synth() {
                     }
 
                     neighbor = new Tone.Part(function (time, value) {
-                        synth.triggerAttackRelease(value.note, value.duration, time);
+                        synth.triggerAttackRelease(value.note, value.duration, Tone.now() + time);
                     }, obj).start();
                 }
             }
@@ -1489,7 +1497,7 @@ function Synth() {
             flag = instrumentsSource[instrumentName][0];
             if (flag === 1 || flag === 2) {
                 const sampleName = instrumentsSource[instrumentName][1];
-                //eslint-disable-next-line no-console
+                // eslint-disable-next-line no-console
                 console.debug(sampleName);
             }
         }
@@ -1501,12 +1509,12 @@ function Synth() {
                     instrumentName.slice(0, 4) === "http" ||
                     instrumentName.slice(0, 21) === "data:audio/wav;base64"
                 ) {
-                    tempSynth.start();
+                    tempSynth.start(Tone.now() + 0.0);
                 } else if (instrumentName.slice(0, 4) === "file") {
-                    tempSynth.start();
+                    tempSynth.start(Tone.now() + 0.0);
                 } else {
                     try {
-                        tempSynth.start();
+                        tempSynth.start(Tone.now() + 0.0);
                     } catch (e) {
                         // Occasionally we see "Start time must be
                         // strictly greater than previous start time"
@@ -1540,7 +1548,7 @@ function Synth() {
                 );
                 break;
             case 4:
-                tempSynth.triggerAttackRelease(beatValue);
+                tempSynth.triggerAttackRelease("c2", beatValue);
                 break;
             case 0: // default synth
             default:
@@ -1587,11 +1595,12 @@ function Synth() {
     this.loop = function (turtle, instrumentName, note, duration, start, bpm, velocity) {
         const synthA = instruments[turtle][instrumentName];
         const flag = instrumentsSource[instrumentName][0];
+        const now = Tone.now();
         const loopA = new Tone.Loop((time) => {
             if (flag == 1) {
                 this.setVolume(turtle, instrumentName, velocity * 100);
                 instruments[turtle][instrumentName].start();
-            } else synthA.triggerAttackRelease(note, duration, time, velocity);
+            } else synthA.triggerAttackRelease(note, duration, now + time, velocity);
         }, 60 / bpm).start(start);
         return loopA;
     };
