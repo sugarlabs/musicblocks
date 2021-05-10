@@ -4000,14 +4000,14 @@ function Activity() {
         initBasicProtoBlocks(this);
 
         // Load any macros saved in local storage.
-        // this.storage.macros = null;
+        this.storage.macros = null;
         this.macroData = this.storage.macros;
         if (this.macroData !== null) {
             processMacroData(this.macroData, this.palettes, this.blocks, this.macroDict);
         }
 
         // Load any plugins saved in local storage.
-        // this.storage.plugins = null;
+        this.storage.plugins = null;
         this.pluginData = this.storage.plugins;
         if (this.pluginData !== null && this.pluginData !== "null") {
             updatePluginObj(this, processPluginData(this, this.pluginData));
