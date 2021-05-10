@@ -16,14 +16,12 @@
  * MA 02110-1335 USA.
  */
 
-/* global Singer, logo, MusicBlocks, blocks, Mouse */
+/* global Singer, MusicBlocks, Mouse */
 
 /*
    Global Locations
     js/turtle-singer.js
         Singer
-    js/activity.js
-        logo, blocks
     js/js-export/export.js
         MusicBlocks, Mouse
 */
@@ -34,7 +32,7 @@
  * Sets up all the methods related to different actions for each block in Ornament palette.
  * @returns {void}
  */
-function setupOrnamentActions() {
+function setupOrnamentActions(activity) {
     Singer.OrnamentActions = class {
         /**
          * Shortens the length of the actual note while maintaining the specified rhythmic value of the notes.
@@ -45,13 +43,13 @@ function setupOrnamentActions() {
          * @returns {void}
          */
         static setStaccato(value, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.staccato.push(1 / value);
 
             const listenerName = "_staccato_" + turtle;
-            if (blk !== undefined && blk in blocks.blockList) {
-                logo.setDispatchBlock(blk, turtle, listenerName);
+            if (blk !== undefined && blk in activity.blocks.blockList) {
+                activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
@@ -59,7 +57,7 @@ function setupOrnamentActions() {
 
             const __listener = () => tur.singer.staccato.pop();
 
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            activity.logo.setTurtleListener(turtle, listenerName, __listener);
         }
 
         /**
@@ -71,17 +69,17 @@ function setupOrnamentActions() {
          * @returns {void}
          */
         static setSlur(value, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.staccato.push(-1 / value);
 
             if (tur.singer.justCounting.length === 0) {
-                logo.notation.notationBeginSlur(turtle);
+                activity.logo.notation.notationBeginSlur(turtle);
             }
 
             const listenerName = "_staccato_" + turtle;
-            if (blk !== undefined && blk in blocks.blockList) {
-                logo.setDispatchBlock(blk, turtle, listenerName);
+            if (blk !== undefined && blk in activity.blocks.blockList) {
+                activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
@@ -90,11 +88,11 @@ function setupOrnamentActions() {
             const __listener = () => {
                 tur.singer.staccato.pop();
                 if (tur.singer.justCounting.length === 0) {
-                    logo.notation.notationEndSlur(turtle);
+                    activity.logo.notation.notationEndSlur(turtle);
                 }
             };
 
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            activity.logo.setTurtleListener(turtle, listenerName, __listener);
         }
 
         /**
@@ -107,15 +105,15 @@ function setupOrnamentActions() {
          * @returns {void}
          */
         static doNeighbor(interval, noteValue, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.inNeighbor.push(blk);
             tur.singer.neighborStepPitch.push(interval);
             tur.singer.neighborNoteValue.push(noteValue);
 
             const listenerName = "_neighbor_" + turtle + "_" + blk;
-            if (blk !== undefined && blk in blocks.blockList) {
-                logo.setDispatchBlock(blk, turtle, listenerName);
+            if (blk !== undefined && blk in activity.blocks.blockList) {
+                activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
@@ -127,7 +125,7 @@ function setupOrnamentActions() {
                 tur.singer.neighborNoteValue.pop();
             };
 
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            activity.logo.setTurtleListener(turtle, listenerName, __listener);
         }
     };
 }

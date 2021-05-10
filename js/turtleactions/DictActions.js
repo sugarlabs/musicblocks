@@ -3,7 +3,7 @@
  * @author Anindya Kundu
  * @author Walter Bender
  *
- * @copyright 2014-2020 Walter Bender
+ * @copyright 2014-2021 Walter Bender
  * @copyright 2020 Anindya Kundu
  *
  * @license
@@ -19,7 +19,12 @@
  * Action methods are in camelCase.
  */
 
-/* global _, Turtle, turtles, Singer, getNote, logo, INVALIDPITCH, pitchToNumber, getTargetTurtle */
+/*
+   global
+
+   _, Turtle, Singer, getNote, INVALIDPITCH, pitchToNumber,
+   getTargetTurtle
+ */
 
 /*
    Global Locations
@@ -27,8 +32,6 @@
         _
     js/turtle.js
         Turtle
-    js/activity.js
-        turtles, logo
     js/turtle-singer.js
         Singer
     js/utils/musicutils.js
@@ -45,7 +48,7 @@
  * Sets up all the methods related to different actions for each block in Dictionary palette.
  * @returns {void}
  */
-function setupDictActions() {
+function setupDictActions(activity) {
     Turtle.DictActions = class {
         /**
          * Utility function to get Turtle properties associated with target (used by get value).
@@ -58,7 +61,7 @@ function setupDictActions() {
          * @returns {String|Number}
          */
         static _GetDict(target, turtle, key, blk) {
-            const targetTur = turtles.ithTurtle(target);
+            const targetTur = activity.turtles.ithTurtle(target);
 
             // This is the internal turtle dictionary that includes the turtle status.
             if (key === _("color")) {
@@ -74,9 +77,9 @@ function setupDictActions() {
             } else if (key === _("heading")) {
                 return targetTur.painter.heading;
             } else if (key === "x") {
-                return turtles.screenX2turtleX(targetTur.container.x);
+                return activity.turtles.screenX2turtleX(targetTur.container.x);
             } else if (key === "y") {
-                return turtles.screenY2turtleY(targetTur.container.y);
+                return activity.turtles.screenY2turtleY(targetTur.container.y);
             } else if (key === _("notes played")) {
                 return targetTur.singer.notesPlayed[0] / targetTur.singer.notesPlayed[1];
             } else if (key === _("note value")) {
@@ -99,11 +102,11 @@ function setupDictActions() {
                         targetTur.singer.keySignature,
                         targetTur.singer.moveable,
                         null,
-                        logo.errorMsg,
-                        logo.synth.inTemperament
+                        activity.errorMsg,
+                        activity.logo.synth.inTemperament
                     );
                 } else {
-                    logo.errorMsg(INVALIDPITCH, blk);
+                    activity.errorMsg(INVALIDPITCH, blk);
                     obj = ["G", 4];
                 }
 
@@ -112,14 +115,14 @@ function setupDictActions() {
                     targetTur.singer.pitchNumberOffset
                 );
             } else if (
-                target in logo.turtleDicts &&
-                target in logo.turtleDicts[target] &&
-                key in logo.turtleDicts[target][target]
+                target in activity.logo.turtleDicts &&
+                target in activity.logo.turtleDicts[target] &&
+                key in activity.logo.turtleDicts[target][target]
             ) {
-                return logo.turtleDicts[target][target][key];
+                return activity.logo.turtleDicts[target][target][key];
             } else {
-                if (target in logo.turtleDicts[turtle]) {
-                    return logo.turtleDicts[turtle][target][key];
+                if (target in activity.logo.turtleDicts[turtle]) {
+                    return activity.logo.turtleDicts[turtle][target][key];
                 }
             }
             return 0;
@@ -136,7 +139,7 @@ function setupDictActions() {
          * @returns {void}
          */
         static SetDictValue(target, turtle, key, value) {
-            const targetTur = turtles.ithTurtle(target);
+            const targetTur = activity.turtles.ithTurtle(target);
 
             // This is the internal turtle dictionary that includes the turtle status.
             if (key === _("color")) {
@@ -152,16 +155,16 @@ function setupDictActions() {
             } else if (key === _("heading")) {
                 targetTur.painter.doSetHeading(value);
             } else if (key === "y") {
-                const x = turtles.screenX2turtleX(targetTur.container.x);
+                const x = activity.turtles.screenX2turtleX(targetTur.container.x);
                 targetTur.painter.doSetXY(x, value);
             } else if (key === "x") {
-                const y = turtles.screenY2turtleY(targetTur.container.y);
+                const y = activity.turtles.screenY2turtleY(targetTur.container.y);
                 targetTur.painter.doSetXY(value, y);
             } else {
-                if (!(target in logo.turtleDicts[turtle])) {
-                    logo.turtleDicts[turtle][target] = {};
+                if (!(target in activity.logo.turtleDicts[turtle])) {
+                    activity.logo.turtleDicts[turtle][target] = {};
                 }
-                logo.turtleDicts[turtle][target][key] = value;
+                activity.logo.turtleDicts[turtle][target][key] = value;
             }
         }
 
@@ -174,7 +177,7 @@ function setupDictActions() {
          * @returns {String}
          */
         static SerializeDict(target, turtle) {
-            const targetTur = turtles.ithTurtle(target);
+            const targetTur = activity.turtles.ithTurtle(target);
 
             // This is the internal turtle dictionary that includes the turtle status.
             const this_dict = {};
@@ -184,12 +187,12 @@ function setupDictActions() {
             this_dict[_("pen size")] = targetTur.painter.stroke;
             this_dict[_("font")] = targetTur.painter.font;
             this_dict[_("heading")] = targetTur.painter.orientation;
-            this_dict["y"] = turtles.screenY2turtleY(targetTur.container.y);
-            this_dict["x"] = turtles.screenX2turtleX(targetTur.container.x);
+            this_dict["y"] = activity.turtles.screenY2turtleY(targetTur.container.y);
+            this_dict["x"] = activity.turtles.screenX2turtleX(targetTur.container.x);
 
-            if (target in logo.turtleDicts[turtle]) {
-                for (const key in logo.turtleDicts[turtle][target]) {
-                    this_dict[key] = logo.turtleDicts[turtle][target][key];
+            if (target in activity.logo.turtleDicts[turtle]) {
+                for (const key in activity.logo.turtleDicts[turtle][target]) {
+                    this_dict[key] = activity.logo.turtleDicts[turtle][target][key];
                 }
             }
             return JSON.stringify(this_dict);
@@ -205,16 +208,16 @@ function setupDictActions() {
          */
         static getDict(dict, turtle) {
             // Not sure this can happen.
-            if (!(turtle in logo.turtleDicts)) logo.turtleDicts[turtle] = {};
+            if (!(turtle in activity.logo.turtleDicts)) activity.logo.turtleDicts[turtle] = {};
 
             // Is the dictionary the same as a turtle name?
-            const target = getTargetTurtle(turtles, dict);
+            const target = getTargetTurtle(activity.turtles, dict);
             if (target !== null) {
                 return Turtle.DictActions.SerializeDict(target, turtle);
             }
 
             return JSON.stringify(
-                dict in logo.turtleDicts[turtle] ? logo.turtleDicts[turtle][dict] : {}
+                dict in activity.logo.turtleDicts[turtle] ? activity.logo.turtleDicts[turtle][dict] : {}
             );
         }
 
@@ -227,7 +230,7 @@ function setupDictActions() {
          * @returns {void}
          */
         static showDict(dict, turtle) {
-            logo.textMsg(Turtle.DictActions.getDict(dict, turtle));
+            activity.textMsg(Turtle.DictActions.getDict(dict, turtle));
         }
 
         /**
@@ -242,17 +245,17 @@ function setupDictActions() {
          */
         static setValue(dict, key, value, turtle) {
             // Not sure this can happen.
-            if (!(turtle in logo.turtleDicts)) return 0;
+            if (!(turtle in activity.logo.turtleDicts)) return 0;
 
             // Is the dictionary the same as a turtle name?
-            const target = getTargetTurtle(turtles, dict);
+            const target = getTargetTurtle(activity.turtles, dict);
             if (target !== null) {
                 Turtle.DictActions.SetDictValue(target, turtle, key, value);
             } else {
-                if (!(dict in logo.turtleDicts[turtle])) {
-                    logo.turtleDicts[turtle][dict] = {};
+                if (!(dict in activity.logo.turtleDicts[turtle])) {
+                    activity.logo.turtleDicts[turtle][dict] = {};
                 }
-                logo.turtleDicts[turtle][dict][key] = value;
+                activity.logo.turtleDicts[turtle][dict][key] = value;
             }
         }
 
@@ -268,16 +271,16 @@ function setupDictActions() {
          */
         static getValue(dict, key, turtle, blk) {
             // Not sure this can happen.
-            if (!(turtle in logo.turtleDicts)) return 0;
+            if (!(turtle in activity.logo.turtleDicts)) return 0;
             // Is the dictionary the same as a turtle name?
-            const target = getTargetTurtle(turtles, dict);
+            const target = getTargetTurtle(activity.turtles, dict);
             if (target !== null) {
                 return Turtle.DictActions._GetDict(target, turtle, key, blk);
-            } else if (!(dict in logo.turtleDicts[turtle])) {
+            } else if (!(dict in activity.logo.turtleDicts[turtle])) {
                 return 0;
             }
 
-            return logo.turtleDicts[turtle][dict][key];
+            return activity.logo.turtleDicts[turtle][dict][key];
         }
     };
 }

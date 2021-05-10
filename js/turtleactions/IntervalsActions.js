@@ -20,7 +20,7 @@
  */
 
 /*
-   global _, logo, NOINPUTERRORMSG, Singer, blocks, MUSICALMODES, MusicBlocks, Mouse, getNote,
+   global _, NOINPUTERRORMSG, Singer, MUSICALMODES, MusicBlocks, Mouse, getNote,
    getModeLength
 */
 
@@ -34,8 +34,6 @@
         MUSICALMODES, MODE_PIE_MENUS, getNote, getModeLength
     js/turtle-singer.js
         Singer
-    js/activity.js
-        blocks, logo
     js/js-export/export.js
         MusicBlocks, Mouse
  */
@@ -46,7 +44,7 @@
  * Sets up all the methods related to different actions for each block in Intervals palette.
  * @returns {void}
  */
-function setupIntervalsActions() {
+function setupIntervalsActions(activity) {
     Singer.IntervalsActions = class {
         /**
          * Utility function that returns appropriate object key in MUSICMODES corresponding to passed parameter.
@@ -80,7 +78,7 @@ function setupIntervalsActions() {
         static setKey(key, mode, turtle) {
             const modename = Singer.IntervalsActions.GetModename(mode);
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
             // Check to see if there are any transpositions on the key
             if (tur.singer.transposition !== 0) {
                 const noteObj = getNote(
@@ -90,14 +88,14 @@ function setupIntervalsActions() {
                     tur.singer.keySignature,
                     false,
                     null,
-                    logo.errorMsg,
-                    logo.synth.inTemperament
+                    activity.errorMsg,
+                    activity.logo.synth.inTemperament
                 );
                 tur.singer.keySignature = noteObj[0] + " " + modename;
-                logo.notation.notationKey(turtle, noteObj[0], modename);
+                activity.logo.notation.notationKey(turtle, noteObj[0], modename);
             } else {
                 tur.singer.keySignature = key + " " + modename;
-                logo.notation.notationKey(turtle, key, modename);
+                activity.logo.notation.notationKey(turtle, key, modename);
             }
         }
 
@@ -110,7 +108,7 @@ function setupIntervalsActions() {
          * @returns {String}
          */
         static getCurrentKey(turtle) {
-            return logo.turtles.ithTurtle(turtle).singer.keySignature.split(" ")[0];
+            return activity.turtles.ithTurtle(turtle).singer.keySignature.split(" ")[0];
         }
 
         /**
@@ -122,7 +120,7 @@ function setupIntervalsActions() {
          * @returns {String}
          */
         static getCurrentMode(turtle) {
-            return logo.turtles.ithTurtle(turtle).singer.keySignature.split(" ")[1];
+            return activity.turtles.ithTurtle(turtle).singer.keySignature.split(" ")[1];
         }
 
         /**
@@ -134,7 +132,7 @@ function setupIntervalsActions() {
          * @returns {Number}
          */
         static getModeLength(turtle) {
-            return getModeLength(logo.turtles.ithTurtle(turtle).singer.keySignature);
+            return getModeLength(activity.turtles.ithTurtle(turtle).singer.keySignature);
         }
 
         /**
@@ -147,7 +145,7 @@ function setupIntervalsActions() {
          * @returns {void}
          */
         static setMoveableDo(moveable, turtle) {
-            logo.turtles.ithTurtle(turtle).singer.moveable = moveable;
+            activity.turtles.ithTurtle(turtle).singer.moveable = moveable;
         }
 
         /**
@@ -161,21 +159,21 @@ function setupIntervalsActions() {
          * @returns {void}
          */
         static defineMode(name, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.inDefineMode = true;
             tur.singer.defineMode = [];
             let modeName;
             if (name === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 modeName = "custom";
             } else {
                 modeName = name.toLowerCase();
             }
 
             const listenerName = "_definemode_" + turtle;
-            if (blk !== undefined && blk in blocks.blockList) {
-                logo.setDispatchBlock(blk, turtle, listenerName);
+            if (blk !== undefined && blk in activity.blocks.blockList) {
+                activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
@@ -185,21 +183,21 @@ function setupIntervalsActions() {
                 MUSICALMODES[modeName] = [];
                 if (tur.singer.defineMode.indexOf(0) === -1) {
                     tur.singer.defineMode.push(0);
-                    logo.errorMsg(_("Adding missing pitch number 0."));
+                    activity.errorMsg(_("Adding missing pitch number 0."));
                 }
 
                 const pitchNumbers = tur.singer.defineMode.sort((a, b) => a[0] - b[0]);
 
                 for (let i = 0; i < pitchNumbers.length; i++) {
                     if (pitchNumbers[i] < 0 || pitchNumbers[i] > 11) {
-                        logo.errorMsg(
+                        activity.errorMsg(
                             _("Ignoring pitch numbers less than zero or greater than eleven.")
                         );
                         continue;
                     }
 
                     if (i > 0 && pitchNumbers[i] === pitchNumbers[i - 1]) {
-                        logo.errorMsg(_("Ignoring duplicate pitch numbers."));
+                        activity.errorMsg(_("Ignoring duplicate pitch numbers."));
                         continue;
                     }
 
@@ -210,15 +208,15 @@ function setupIntervalsActions() {
                     }
                 }
 
-                const cblk = logo.blocks.blockList[blk].connections[1];
-                if (logo.blocks.blockList[cblk].name === "text") {
-                    logo.blocks.updateBlockText(cblk);
+                const cblk = activity.blocks.blockList[blk].connections[1];
+                if (activity.blocks.blockList[cblk].name === "text") {
+                    activity.blocks.updateBlockText(cblk);
                 }
 
                 tur.singer.inDefineMode = false;
             };
 
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            activity.logo.setTurtleListener(turtle, listenerName, __listener);
         }
 
         /**
@@ -235,18 +233,18 @@ function setupIntervalsActions() {
         static setScalarInterval(value, turtle, blk) {
             let arg = value;
             if (arg === null || typeof arg !== "number") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg = 1;
             }
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             const i = arg > 0 ? Math.floor(arg) : Math.ceil(arg);
             tur.singer.intervals.push(i);
 
             const listenerName = "_interval_" + turtle;
-            if (blk !== undefined && blk in blocks.blockList) {
-                logo.setDispatchBlock(blk, turtle, listenerName);
+            if (blk !== undefined && blk in activity.blocks.blockList) {
+                activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
@@ -254,7 +252,7 @@ function setupIntervalsActions() {
 
             const __listener = () => tur.singer.intervals.pop();
 
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            activity.logo.setTurtleListener(turtle, listenerName, __listener);
         }
 
         /**
@@ -270,11 +268,11 @@ function setupIntervalsActions() {
         static setSemitoneInterval(value, turtle, blk) {
             let arg = value;
             if (arg === null || typeof arg !== "number") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg = 1;
             }
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             const i = arg > 0 ? Math.floor(arg) : Math.ceil(arg);
             if (i !== 0) {
@@ -282,8 +280,8 @@ function setupIntervalsActions() {
                 tur.singer.noteDirection = 0;
 
                 const listenerName = "_semitone_interval_" + turtle;
-                if (blk !== undefined && blk in blocks.blockList) {
-                    logo.setDispatchBlock(blk, turtle, listenerName);
+                if (blk !== undefined && blk in activity.blocks.blockList) {
+                    activity.logo.setDispatchBlock(blk, turtle, listenerName);
                 } else if (MusicBlocks.isRun) {
                     const mouse = Mouse.getMouseFromTurtle(tur);
                     if (mouse !== null) mouse.MB.listeners.push(listenerName);
@@ -291,7 +289,7 @@ function setupIntervalsActions() {
 
                 const __listener = () => tur.singer.semitoneIntervals.pop();
 
-                logo.setTurtleListener(turtle, listenerName, __listener);
+                activity.logo.setTurtleListener(turtle, listenerName, __listener);
             }
         }
 
@@ -306,14 +304,14 @@ function setupIntervalsActions() {
          * @returns {void}
          */
         static setTemperament(temperament, pitch, octave) {
-            logo.synth.inTemperament = temperament;
-            logo.synth.startingPitch = pitch + "" + octave;
+            activity.logo.synth.inTemperament = temperament;
+            activity.logo.synth.startingPitch = pitch + "" + octave;
 
-            logo.temperamentSelected.push(temperament);
-            const len = logo.temperamentSelected.length;
+            activity.logo.temperamentSelected.push(temperament);
+            const len = activity.logo.temperamentSelected.length;
 
-            if (logo.temperamentSelected[len - 1] !== logo.temperamentSelected[len - 2]) {
-                logo.synth.changeInTemperament = true;
+            if (activity.logo.temperamentSelected[len - 1] !== activity.logo.temperamentSelected[len - 2]) {
+                activity.logo.synth.changeInTemperament = true;
             }
         }
     };

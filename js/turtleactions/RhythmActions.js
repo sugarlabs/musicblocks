@@ -3,7 +3,7 @@
  * @author Anindya Kundu
  * @author Walter Bender
  *
- * @copyright 2014-2020 Walter Bender
+ * @copyright 2014-2021 Walter Bender
  * @copyright 2020 Anindya Kundu
  *
  * @license
@@ -16,7 +16,7 @@
  * MA 02110-1335 USA.
  */
 
-/* global _, Singer, logo, MusicBlocks, blocks, Mouse, last, turtles, TONEBPM */
+/* global _, Singer, MusicBlocks, Mouse, last, TONEBPM */
 
 /*
    Global Locations
@@ -24,8 +24,6 @@
         _, last
     js/turtle-singer.js
         Singer
-    js/activity.js
-        logo, turtles, blocks
     js/logo.js
         TONEBPM
     js/js-export/export.js
@@ -38,7 +36,7 @@
  * Sets up all the methods related to different actions for each block in Rhythm palette.
  * @returns {void}
  */
-function setupRhythmActions() {
+function setupRhythmActions(activity) {
     Singer.RhythmActions = class {
         /**
          * "note" block, "milliseconds" block.
@@ -62,7 +60,7 @@ function setupRhythmActions() {
              * @todo We should consider the use of the global timer in Tone.js for more accuracy.
              */
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             // Use the outer most note when nesting to determine the beat and triggering
             if (tur.singer.inNoteBlock.length === 0) {
@@ -90,15 +88,15 @@ function setupRhythmActions() {
 
                 if (tur.singer.beatList.indexOf("everybeat") !== -1) {
                     _enqueue();
-                    logo.stage.dispatchEvent("__everybeat_" + turtleID + "__");
+                    activity.stage.dispatchEvent("__everybeat_" + turtleID + "__");
                 }
 
                 if (tur.singer.beatList.indexOf(beatValue) !== -1) {
                     _enqueue();
-                    logo.stage.dispatchEvent("__beat_" + beatValue + "_" + turtleID + "__");
+                    activity.stage.dispatchEvent("__beat_" + beatValue + "_" + turtleID + "__");
                 } else if (beatValue > 1 && tur.singer.beatList.indexOf("offbeat") !== -1) {
                     _enqueue();
-                    logo.stage.dispatchEvent("__offbeat_" + turtleID + "__");
+                    activity.stage.dispatchEvent("__offbeat_" + turtleID + "__");
                 }
 
                 const thisBeat =
@@ -108,14 +106,14 @@ function setupRhythmActions() {
                         _enqueue();
                         const eventName =
                             "__beat_" + tur.singer.factorList[f] + "_" + turtleID + "__";
-                        logo.stage.dispatchEvent(eventName);
+                        activity.stage.dispatchEvent(eventName);
                     }
                 }
             }
 
             // A note can contain multiple pitch blocks to create a chord. The chord is accumuated in
             // arrays, which are used when we play the note
-            logo.clearNoteParams(tur, blk, []);
+            activity.logo.clearNoteParams(tur, blk, []);
 
             const noteBeatValue = blkName === "newnote" ? 1 / value : value;
 
@@ -127,8 +125,8 @@ function setupRhythmActions() {
                 1 / (noteBeatValue * tur.singer.beatFactor);
 
             const listenerName = "_playnote_" + turtle;
-            if (blk !== undefined && blk in blocks.blockList) {
-                logo.setDispatchBlock(blk, turtle, listenerName);
+            if (blk !== undefined && blk in activity.blocks.blockList) {
+                activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
@@ -136,7 +134,7 @@ function setupRhythmActions() {
 
             const __listener = () => {
                 if (tur.singer.multipleVoices) {
-                    logo.notation.notationVoices(turtle, tur.singer.inNoteBlock.length);
+                    activity.logo.notation.notationVoices(turtle, tur.singer.inNoteBlock.length);
                 }
 
                 if (tur.singer.inNoteBlock.length > 0) {
@@ -151,7 +149,7 @@ function setupRhythmActions() {
                         );
                     }
 
-                    Singer.processNote(
+                    Singer.processNote(activity,
                         1 / tur.singer.noteValue[last(tur.singer.inNoteBlock)],
                         blkName === "osctime",
                         last(tur.singer.inNoteBlock),
@@ -172,16 +170,16 @@ function setupRhythmActions() {
                 tur.singer.inNoteBlock.splice(-1, 1);
 
                 if (tur.singer.multipleVoices && tur.singer.inNoteBlock.length === 0) {
-                    logo.notation.notationVoices(turtle, 0);
+                    activity.logo.notation.notationVoices(turtle, 0);
                     tur.singer.multipleVoices = false;
                 }
 
                 /** @todo FIXME: broken when nesting */
-                logo.pitchBlocks = [];
-                logo.drumBlocks = [];
+                activity.logo.pitchBlocks = [];
+                activity.logo.drumBlocks = [];
             };
 
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            activity.logo.setTurtleListener(turtle, listenerName, __listener);
         }
 
         /**
@@ -192,7 +190,7 @@ function setupRhythmActions() {
          * @returns {void}
          */
         static playRest(turtle) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.notePitches[last(tur.singer.inNoteBlock)].push("rest");
@@ -214,13 +212,13 @@ function setupRhythmActions() {
          * @returns {void}
          */
         static doRhythmicDot(value, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
             const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
             tur.singer.beatFactor *= currentDotFactor;
             if (value >= 0) {
                 tur.singer.dotCount += value;
             } else if (value === -1) {
-                logo.errorMsg(_("An argument of -1 results in a note value of 0."), blk);
+                activity.errorMsg(_("An argument of -1 results in a note value of 0."), blk);
                 value = 0;
             } else {
                 tur.singer.dotCount += 1 / value;
@@ -230,8 +228,8 @@ function setupRhythmActions() {
             tur.singer.beatFactor /= newDotFactor;
 
             const listenerName = "_dot_" + turtle;
-            if (blk !== undefined && blk in blocks.blockList) {
-                logo.setDispatchBlock(blk, turtle, listenerName);
+            if (blk !== undefined && blk in activity.blocks.blockList) {
+                activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
@@ -245,7 +243,7 @@ function setupRhythmActions() {
                 tur.singer.beatFactor /= newDotFactor;
             };
 
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            activity.logo.setTurtleListener(turtle, listenerName, __listener);
         }
 
         /**
@@ -257,7 +255,7 @@ function setupRhythmActions() {
          * @returns {void}
          */
         static doTie(turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             // Tie notes together in pairs
             tur.singer.tie = true;
@@ -267,8 +265,8 @@ function setupRhythmActions() {
             tur.singer.tieFirstDrums = [];
 
             const listenerName = "_tie_" + turtle;
-            if (blk !== undefined && blk in blocks.blockList) {
-                logo.setDispatchBlock(blk, turtle, listenerName);
+            if (blk !== undefined && blk in activity.blocks.blockList) {
+                activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
@@ -288,7 +286,7 @@ function setupRhythmActions() {
                                 i < tur.singer.notePitches[last(tur.singer.inNoteBlock)].length;
                                 i++
                             ) {
-                                logo.notation.notationRemoveTie(turtle);
+                                activity.logo.notation.notationRemoveTie(turtle);
                             }
                         }
                     }
@@ -318,8 +316,9 @@ function setupRhythmActions() {
                     tur.singer.embeddedGraphics[saveBlk] = []; // graphics will have already been rendered
 
                     Singer.processNote(
+                        activity,
                         noteValue,
-                        blocks.blockList[saveBlk].name === "osctime",
+                        activity.blocks.blockList[saveBlk].name === "osctime",
                         saveBlk,
                         turtle
                     );
@@ -344,14 +343,14 @@ function setupRhythmActions() {
                     delete tur.singer.embeddedGraphics[saveBlk];
 
                     // Remove duplicate note
-                    logo.notation.notationStaging[turtle].pop();
+                    activity.logo.notation.notationStaging[turtle].pop();
                 }
 
                 tur.singer.tieNotePitches = [];
                 tur.singer.tieNoteExtras = [];
             };
 
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            activity.logo.setTurtleListener(turtle, listenerName, __listener);
         }
 
         /**
@@ -364,13 +363,13 @@ function setupRhythmActions() {
          * @returns {void}
          */
         static multiplyNoteValue(factor, turtle, blk) {
-            const tur = turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.beatFactor /= factor;
 
             const listenerName = "_multiplybeat_" + turtle;
-            if (blk !== undefined && blk in blocks.blockList) {
-                logo.setDispatchBlock(blk, turtle, listenerName);
+            if (blk !== undefined && blk in activity.blocks.blockList) {
+                activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
@@ -378,7 +377,7 @@ function setupRhythmActions() {
 
             const __listener = () => (tur.singer.beatFactor *= factor);
 
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            activity.logo.setTurtleListener(turtle, listenerName, __listener);
         }
 
         /**
@@ -393,10 +392,10 @@ function setupRhythmActions() {
          * @returns {void}
          */
         static addSwing(swingValue, noteValue, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (tur.singer.suppressOutput) {
-                logo.notation.notationSwing(turtle);
+                activity.logo.notation.notationSwing(turtle);
             } else {
                 tur.singer.swing.push(1 / swingValue);
                 tur.singer.swingTarget.push(1 / noteValue);
@@ -405,8 +404,8 @@ function setupRhythmActions() {
             tur.singer.swingCarryOver = 0;
 
             const listenerName = "_swing_" + turtle;
-            if (blk !== undefined && blk in blocks.blockList) {
-                logo.setDispatchBlock(blk, turtle, listenerName);
+            if (blk !== undefined && blk in activity.blocks.blockList) {
+                activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
@@ -421,7 +420,7 @@ function setupRhythmActions() {
                 tur.singer.swingCarryOver = 0;
             };
 
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            activity.logo.setTurtleListener(turtle, listenerName, __listener);
         }
 
         /**
@@ -432,7 +431,7 @@ function setupRhythmActions() {
          * @returns {Number} note value
          */
         static getNoteValue(turtle) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             let value = 0;
             if (

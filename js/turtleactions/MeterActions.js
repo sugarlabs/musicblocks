@@ -3,7 +3,7 @@
  * @author Anindya Kundu
  * @author Walter Bender
  *
- * @copyright 2014-2020 Walter Bender
+ * @copyright 2014-2021 Walter Bender
  * @copyright 2020 Anindya Kundu
  *
  * @license
@@ -17,8 +17,7 @@
  */
 
 /*
-   global _, logo, Singer, rationalToFraction, TONEBPM, Queue, turtles, last, MusicBlocks, blocks,
-   Mouse
+   global _, Singer, rationalToFraction, TONEBPM, Queue, last, MusicBlocks, Mouse
 */
 
 /*
@@ -27,16 +26,12 @@
         _, rationalToFraction, last
     js/turtle-singer.js
         Singer
-    js/activity.js
-        logo, blocks
     js/utils/synthutils.js
         DRUMNAMES,NOISENAMES
     js/utils/musicutils.js
         DEFAULTDRUM
     js/logo.js
         DEFAULTVOLUME, TONEBPM, Queue
-    js/activity.js
-        turtles
     js/js-export/export.js
         MusicBlocks, Mouse
 */
@@ -47,7 +42,7 @@
  * Sets up all the methods related to different actions for each block in Meter palette.
  * @returns {void}
  */
-function setupMeterActions() {
+function setupMeterActions(activity) {
     Singer.MeterActions = class {
         /**
          * @param {Number} beatCount
@@ -56,7 +51,7 @@ function setupMeterActions() {
          * @returns {void}
          */
         static setMeter(beatCount, noteValue, turtle) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.beatsPerMeasure = beatCount <= 0 ? 4 : beatCount;
             tur.singer.noteValuePerBeat = noteValue <= 0 ? 4 : 1 / noteValue;
@@ -78,7 +73,7 @@ function setupMeterActions() {
                 tur.singer.defaultStrongBeats = true;
             }
 
-            logo.notation.notationMeter(
+            activity.logo.notation.notationMeter(
                 turtle,
                 tur.singer.beatsPerMeasure,
                 tur.singer.noteValuePerBeat
@@ -86,10 +81,10 @@ function setupMeterActions() {
         }
 
         static setPickup(value, turtle) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.pickup = Math.max(0, value);
-            logo.notation.notationPickup(turtle, tur.singer.pickup);
+            activity.logo.notation.notationPickup(turtle, tur.singer.pickup);
         }
 
         static setBPM(bpm, beatValue, turtle, blk) {
@@ -98,7 +93,7 @@ function setupMeterActions() {
             if (_bpm < 30) {
                 obj = rationalToFraction(beatValue);
                 target = (30 * 0.25) / beatValue;
-                logo.errorMsg(
+                activity.errorMsg(
                     obj[0] +
                         "/" +
                         obj[1] +
@@ -112,7 +107,7 @@ function setupMeterActions() {
             } else if (_bpm > 1000) {
                 obj = rationalToFraction(beatValue);
                 target = (1000 * 0.25) / beatValue;
-                logo.errorMsg(
+                activity.errorMsg(
                     _("maximum") +
                         " " +
                         obj[0] +
@@ -127,7 +122,7 @@ function setupMeterActions() {
                 _bpm = 1000;
             }
 
-            logo.turtles.ithTurtle(turtle).singer.bpm.push(_bpm);
+            activity.turtles.ithTurtle(turtle).singer.bpm.push(_bpm);
         }
 
         static setMasterBPM(bpm, beatValue, blk) {
@@ -136,7 +131,7 @@ function setupMeterActions() {
             if (_bpm < 30) {
                 obj = rationalToFraction(beatValue);
                 target = (30 * 0.25) / beatValue;
-                logo.errorMsg(
+                activity.errorMsg(
                     obj[0] +
                         "/" +
                         obj[1] +
@@ -150,7 +145,7 @@ function setupMeterActions() {
             } else if (_bpm > 1000) {
                 obj = rationalToFraction(beatValue);
                 target = (1000 * 0.25) / beatValue;
-                logo.errorMsg(
+                activity.errorMsg(
                     _("maximum") +
                         " " +
                         obj[0] +
@@ -171,32 +166,38 @@ function setupMeterActions() {
         }
 
         static onEveryNoteDo(action, isflow, receivedArg, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             const __listener = () => {
                 if (tur.running) {
-                    const queueBlock = new Queue(logo.actions[action], 1, blk);
+                    const queueBlock = new Queue(activity.logo.actions[action], 1, blk);
                     tur.parentFlowQueue.push(blk);
                     tur.queue.push(queueBlock);
                 } else {
                     // Since the turtle has stopped running, we need to run the stack from here
                     if (isflow) {
-                        logo.runFromBlockNow(
-                            logo,
+                        activity.logo.runFromBlockNow(
+                            activity.logo,
                             turtle,
-                            logo.actions[action],
+                            activity.logo.actions[action],
                             isflow,
                             receivedArg
                         );
                     } else {
-                        logo.runFromBlock(logo, turtle, logo.actions[action], isflow, receivedArg);
+                        activity.logo.runFromBlock(
+                            activity.logo,
+                            turtle,
+                            activity.logo.actions[action],
+                            isflow,
+                            receivedArg
+                        );
                     }
                 }
             };
 
             const turtleID = tur.id;
             const eventName = "__everybeat_" + turtleID + "__";
-            logo.setTurtleListener(turtle, eventName, __listener);
+            activity.logo.setTurtleListener(turtle, eventName, __listener);
 
             tur.singer.beatList.push("everybeat");
         }
@@ -204,33 +205,39 @@ function setupMeterActions() {
         static onEveryBeatDo(action, isflow, receivedArg, turtle, blk) {
             // Set up a listener for every beat for this turtle.
             const orgTurtle = turtle;
-            if (!turtles.turtleList[orgTurtle].companionTurtle) {
-                turtle = logo.turtles.turtleList.length;
-                turtles.turtleList[orgTurtle].companionTurtle = turtle;
-                logo.turtles.addTurtle(logo.blocks.blockList[blk], {});
-                logo.prepSynths();
+            if (!activity.turtles.turtleList[orgTurtle].companionTurtle) {
+                turtle = activity.turtles.turtleList.length;
+                activity.turtles.turtleList[orgTurtle].companionTurtle = turtle;
+                activity.turtles.addTurtle(activity.blocks.blockList[blk], {});
+                activity.logo.prepSynths();
             }
-            turtle = turtles.turtleList[orgTurtle].companionTurtle;
+            turtle = activity.turtles.turtleList[orgTurtle].companionTurtle;
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             const __listener = () => {
                 if (tur.running) {
-                    const queueBlock = new Queue(logo.actions[action], 1, blk);
+                    const queueBlock = new Queue(activity.logo.actions[action], 1, blk);
                     tur.parentFlowQueue.push(blk);
                     tur.queue.push(queueBlock);
                 } else {
                     // Since the turtle has stopped running, we need to run the stack from here
                     if (isflow) {
-                        logo.runFromBlockNow(
-                            logo,
+                        activity.logo.runFromBlockNow(
+                            activity.logo,
                             turtle,
-                            logo.actions[action],
+                            activity.logo.actions[action],
                             isflow,
                             receivedArg
                         );
                     } else {
-                        logo.runFromBlock(logo, turtle, logo.actions[action], isflow, receivedArg);
+                        activity.logo.runFromBlock(
+                            activity.logo,
+                            turtle,
+                            activity.logo.actions[action],
+                            isflow,
+                            receivedArg
+                        );
                     }
                 }
             };
@@ -240,10 +247,10 @@ function setupMeterActions() {
             tur.parentFlowQueue = [];
             tur.unhighlightQueue = [];
             tur.parameterQueue = [];
-            logo.initTurtle(turtle);
-            logo.setTurtleListener(turtle, eventName, __listener);
+            activity.logo.initTurtle(turtle);
+            activity.logo.setTurtleListener(turtle, eventName, __listener);
 
-            const turOrg = logo.turtles.ithTurtle(orgTurtle);
+            const turOrg = activity.turtles.ithTurtle(orgTurtle);
             let duration =
                 60 / (turOrg.singer.bpm.length > 0 ? last(turOrg.singer.bpm) : Singer.masterBPM);
             // Consider meter when calculating duration.
@@ -251,38 +258,47 @@ function setupMeterActions() {
             if (tur.interval !== undefined) {
                 clearInterval(tur.interval);
             }
-            logo.stage.dispatchEvent(eventName);
-            tur.interval = setInterval(() => logo.stage.dispatchEvent(eventName), duration * 1000);
+            activity.stage.dispatchEvent(eventName);
+            tur.interval = setInterval(
+                () => activity.stage.dispatchEvent(eventName),
+                duration * 1000
+            );
         }
 
         static onStrongBeatDo(beat, action, isflow, receivedArg, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             // Set up a listener for this turtle/onbeat combo.
             const __listener = () => {
                 if (tur.running) {
-                    const queueBlock = new Queue(logo.actions[action], 1, blk);
+                    const queueBlock = new Queue(activity.logo.actions[action], 1, blk);
                     tur.parentFlowQueue.push(blk);
                     tur.queue.push(queueBlock);
                 } else {
                     // Since the turtle has stopped running, we need to run the stack from here
                     if (isflow) {
-                        logo.runFromBlockNow(
-                            logo,
+                        activity.logo.runFromBlockNow(
+                            activity.logo,
                             turtle,
-                            logo.actions[action],
+                            activity.logo.actions[action],
                             isflow,
                             receivedArg
                         );
                     } else {
-                        logo.runFromBlock(logo, turtle, logo.actions[action], isflow, receivedArg);
+                        activity.logo.runFromBlock(
+                            activity.logo,
+                            turtle,
+                            activity.logo.actions[action],
+                            isflow,
+                            receivedArg
+                        );
                     }
                 }
             };
 
             const turtleID = tur.id;
             const eventName = "__beat_" + beat + "_" + turtleID + "__";
-            logo.setTurtleListener(turtle, eventName, __listener);
+            activity.logo.setTurtleListener(turtle, eventName, __listener);
 
             //remove any default strong beats other than "everybeat " or  "offbeat"
             if (tur.singer.defaultStrongBeats) {
@@ -306,45 +322,51 @@ function setupMeterActions() {
         }
 
         static onWeakBeatDo(action, isflow, receivedArg, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             // Set up a listener for this turtle/offbeat combo
             const __listener = () => {
                 if (tur.running) {
-                    const queueBlock = new Queue(logo.actions[action], 1, blk);
+                    const queueBlock = new Queue(activity.logo.actions[action], 1, blk);
                     tur.parentFlowQueue.push(blk);
                     tur.queue.push(queueBlock);
                 } else {
                     // Since the turtle has stopped running, we need to run the stack from here
                     if (isflow) {
-                        logo.runFromBlockNow(
-                            logo,
+                        activity.logo.runFromBlockNow(
+                            activity.logo,
                             turtle,
-                            logo.actions[action],
+                            activity.logo.actions[action],
                             isflow,
                             receivedArg
                         );
                     } else {
-                        logo.runFromBlock(logo, turtle, logo.actions[action], isflow, receivedArg);
+                        activity.logo.runFromBlock(
+                            activity.logo,
+                            turtle,
+                            activity.logo.actions[action],
+                            isflow,
+                            receivedArg
+                        );
                     }
                 }
             };
 
             const turtleID = tur.id;
             const eventName = "__offbeat_" + turtleID + "__";
-            logo.setTurtleListener(turtle, eventName, __listener);
+            activity.logo.setTurtleListener(turtle, eventName, __listener);
 
-            logo.turtles.ithTurtle(turtle).singer.beatList.push("offbeat");
+            activity.turtles.ithTurtle(turtle).singer.beatList.push("offbeat");
         }
 
         static setNoClock(turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.drift++;
 
             const listenerName = "_drift_" + turtle;
-            if (blk !== undefined && blk in blocks.blockList) {
-                logo.setDispatchBlock(blk, turtle, listenerName);
+            if (blk !== undefined && blk in activity.blocks.blockList) {
+                activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
@@ -354,23 +376,23 @@ function setupMeterActions() {
                 if (tur.singer.drift > 0) tur.singer.drift--;
             };
 
-            logo.setTurtleListener(turtle, listenerName, __listener);
+            activity.logo.setTurtleListener(turtle, listenerName, __listener);
         }
 
         static getNotesPlayed(noteValue, turtle) {
             if (noteValue === null || noteValue === 0) return 0;
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
             return tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] / noteValue;
         }
 
         static getWholeNotesPlayed(turtle) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
             return tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1];
         }
 
         static getBeatCount(turtle) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < tur.singer.pickup) return 0;
 
@@ -383,7 +405,7 @@ function setupMeterActions() {
         }
 
         static getMeasureCount(turtle) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] < tur.singer.pickup) return 0;
 
@@ -397,7 +419,7 @@ function setupMeterActions() {
         }
 
         static getBPM(turtle) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (tur.singer.bpm.length > 0) {
                 return last(tur.singer.bpm);
@@ -409,12 +431,12 @@ function setupMeterActions() {
         static getBeatFactor(turtle) {
             return (
                 Singer.RhythmActions.getNoteValue(turtle) *
-                logo.turtles.ithTurtle(turtle).singer.noteValuePerBeat
+                activity.turtles.ithTurtle(turtle).singer.noteValuePerBeat
             );
         }
 
         static getCurrentMeter(turtle) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
             return tur.singer.beatsPerMeasure + ":" + tur.singer.noteValuePerBeat;
         }
     };
