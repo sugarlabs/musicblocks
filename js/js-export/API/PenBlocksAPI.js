@@ -15,7 +15,7 @@
  * MA 02110-1335 USA.
  */
 
-/* global JSInterface, turtles, logo */
+/* global JSInterface, globalActivity */
 
 /* exported PenBlocksAPI */
 
@@ -76,7 +76,7 @@ class PenBlocksAPI {
         await this.runCommand("doStartFill");
         await flow();
         await this.runCommand("doEndFill");
-        turtles.refreshCanvas();
+        globalActivity.turtles.refreshCanvas();
 
         return this.ENDFLOW;
     }
@@ -85,13 +85,13 @@ class PenBlocksAPI {
         await this.runCommand("doStartHollowLine");
         await flow();
         await this.runCommand("doEndHollowLine");
-        turtles.refreshCanvas();
+        globalActivity.turtles.refreshCanvas();
 
         return this.ENDFLOW;
     }
 
     fillBackground() {
-        return this.runCommand("_anonymous", () => logo.turtles.setBackgroundColor(this.turIndex));
+        return this.runCommand("_anonymous", () => globalActivity.logo.turtles.setBackgroundColor(this.turIndex));
     }
 
     setFont(fontname) {
