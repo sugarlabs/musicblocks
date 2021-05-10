@@ -1773,10 +1773,23 @@ class TemperamentWidget {
         // Global value
         octaveRatio = this.powerBase;
 
+        const len = logo.synth.startingPitch.length;
+        const note = logo.synth.startingPitch.substring(0, len - 1);
+        const octave = logo.synth.startingPitch.slice(-1);
+        const newStack1 = [
+            [0, "settemperament", 150, 150, [null, 1, 2, 3, null]],
+            [1, ["temperamentname", { value: this.inTemperament }], 0, 0, [0]],
+            [2, ["notename", { value: note }], 0, 0, [0]],
+            [3, ["number", { value: octave }], 0, 0, [0]]
+        ];
+        logo.blocks.loadNewBlocks(newStack1);
+
         const value = logo.blocks.findUniqueTemperamentName(this.inTemperament);
         this.inTemperament = value; // change from temporary "custom" to "custom1" or "custom2" ..
         const newStack = [
-            [0, "temperament1", 100, 100, [null, 1, 2, null]],
+            [0, ["temperament1", {
+                collapsed: true
+            }], 150, 100, [null, 1, 2, null]],
             [1, ["text", { value: value }], 0, 0, [0]],
             [2, ["storein"], 0, 0, [0, 3, 4, 5]],
             [3, ["text", { value: logo.synth.startingPitch }], 0, 0, [2]],
@@ -1940,20 +1953,11 @@ class TemperamentWidget {
                 previousBlock = idx + 10;
             }
         }
-        logo.blocks.loadNewBlocks(newStack);
-        logo.textMsg(_("New action block generated!"));
-
-        const len = logo.synth.startingPitch.length;
-        const note = logo.synth.startingPitch.substring(0, len - 1);
-        const octave = logo.synth.startingPitch.slice(-1);
-        const newStack1 = [
-            [0, "settemperament", 100, 100, [null, 1, 2, 3, null]],
-            [1, ["temperamentname", { value: this.inTemperament }], 0, 0, [0]],
-            [2, ["notename", { value: note }], 0, 0, [0]],
-            [3, ["number", { value: octave }], 0, 0, [0]]
-        ];
-        logo.blocks.loadNewBlocks(newStack1);
-        logo.textMsg(_("New action block generated!"));
+        setTimeout(() => {
+            logo.blocks.loadNewBlocks(newStack);
+            logo.textMsg(_("New action block generated!"));
+        },500);
+        
             
         let number;
         if (isCustom(this.inTemperament)) {
