@@ -18,7 +18,7 @@
  * Internal functions' names are in PascalCase.
  */
 
-/* global JSEditor, turtles, last, importMembers, logo, Singer, JSInterface */
+/* global JSEditor, last, importMembers, Singer, JSInterface, globalActivity */
 
 /**
  * @class
@@ -34,14 +34,15 @@ class Mouse {
 
     /**
      * @constructor
+     * @param {Obj} Activity - object that contains activity
      * @param {Function} flow - flow function associated with the Mouse
      */
     constructor(flow) {
-        if (Mouse.MouseList.length < turtles.turtleList.length) {
-            this.turtle = turtles.turtleList[Mouse.MouseList.length];
+        if (Mouse.MouseList.length < globalActivity.turtles.turtleList.length) {
+            this.turtle = globalActivity.turtles.turtleList[Mouse.MouseList.length];
         } else {
-            turtles.addTurtle();
-            this.turtle = last(turtles.turtleList);
+            globalActivity.turtles.addTurtle();
+            this.turtle = last(globalActivity.turtles.turtleList);
             Mouse.AddedTurtles.push(this.turtle);
         }
 
@@ -95,7 +96,7 @@ class MusicBlocks {
     constructor(mouse) {
         this.mouse = mouse;
         this.turtle = mouse.turtle;
-        this.turIndex = turtles.turtleList.indexOf(this.turtle);
+        this.turIndex = globalActivity.turtles.turtleList.indexOf(this.turtle);
 
         this.listeners = [];
 
@@ -185,8 +186,8 @@ class MusicBlocks {
         for (const turtle of Mouse.AddedTurtles) {
             turtle.container.visible = false;
             turtle.inTrash = true;
-            const turIndex = turtles.turtleList.indexOf(turtle);
-            turtles.turtleList.splice(turIndex, 1);
+            const turIndex = globalActivity.turtles.turtleList.indexOf(turtle);
+            globalActivity.turtles.turtleList.splice(turIndex, 1);
         }
 
         MusicBlocks._blockNo = -1;
@@ -205,13 +206,14 @@ class MusicBlocks {
         // Remove any listeners that might be still active
         for (const mouse of Mouse.MouseList) {
             for (const listener in mouse.turtle.listeners) {
-                logo.stage.removeEventListener(listener, mouse.turtle.listeners[listener], false);
+                globalActivity.logo.stage.removeEventListener(
+                    listener, mouse.turtle.listeners[listener], false);
             }
             mouse.turtle.listeners = {};
         }
 
-        logo.prepSynths();
-        logo.firstNoteTime = null;
+        globalActivity.logo.prepSynths();
+        globalActivity.logo.firstNoteTime = null;
 
         Mouse.MouseList.forEach((mouse) => mouse.run());
     }
@@ -267,7 +269,7 @@ class MusicBlocks {
         return new Promise((resolve) => {
             const signal = this.listeners.pop();
             if (signal !== null && signal !== undefined) {
-                logo.stage.dispatchEvent(signal);
+                globalActivity.stage.dispatchEvent(signal);
             }
 
             const delay = this.turtle.waitTime;
@@ -293,14 +295,14 @@ class MusicBlocks {
 
     print(message) {
         JSEditor.logConsole(
-            `Mouse "${this.turtle.name}" (${turtles.turtleList.indexOf(this.turtle)}): ${message}`
+            `Mouse "${this.turtle.name}" (${globalActivity.turtles.turtleList.indexOf(this.turtle)}): ${message}`
         );
         if (message === undefined) {
-            logo.textMsg("undefined");
+            globalActivity.textMsg("undefined");
         } else if (message === null) {
-            logo.textMsg("null");
+            globalActivity.textMsg("null");
         } else {
-            logo.textMsg(message.toString());
+            globalActivity.textMsg(message.toString());
         }
     }
 
@@ -309,11 +311,11 @@ class MusicBlocks {
     // ============================== GRAPHICS ================================
 
     get X() {
-        return turtles.screenX2turtleX(this.turtle.container.x);
+        return globalActivity.turtles.screenX2turtleX(this.turtle.container.x);
     }
 
     get Y() {
-        return turtles.screenY2turtleY(this.turtle.container.y);
+        return globalActivity.turtles.screenY2turtleY(this.turtle.container.y);
     }
 
     get HEADING() {
