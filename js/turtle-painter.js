@@ -73,6 +73,7 @@ class Painter {
     constructor(turtle) {
         this.turtle = turtle;
         this.turtles = turtle.turtles;
+        this.activity = turtle.activity;
 
         // Things used for what the turtle draws
         this._svgOutput = "";
@@ -645,7 +646,7 @@ class Painter {
             this.doRight(adeg);
         }
 
-        this.turtles.refreshCanvas();
+        this.activity.refreshCanvas();
     }
 
     /**
@@ -728,7 +729,7 @@ class Painter {
 
         if (this._fillState || !wrap || !out) {
             this._move(ox, oy, nx, ny, true);
-            turtles.refreshCanvas();
+            this.activity.refreshCanvas();
         } else {
             const stepUnit = 5;
             let xIncrease, yIncrease;
@@ -775,7 +776,7 @@ class Painter {
                 steps -= stepUnit;
             }
 
-            turtles.refreshCanvas();
+            this.activity.refreshCanvas();
         }
     }
 
@@ -824,7 +825,7 @@ class Painter {
         const ny = Number(y);
 
         this._move(ox, oy, nx, ny, true);
-        this.turtles.refreshCanvas();
+        this.activity.refreshCanvas();
     }
 
     /**
@@ -1239,7 +1240,7 @@ class Painter {
             );
         }
         this.turtle.penstrokes.image = this.turtle.canvas;
-        turtles.refreshCanvas();
+        this.activity.refreshCanvas();
     }
 
     /**
@@ -1324,7 +1325,7 @@ class Painter {
             }
         }
 
-        turtles.refreshCanvas();
+        this.activity.refreshCanvas();
     }
 
     /**

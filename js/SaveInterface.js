@@ -9,15 +9,23 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-class SaveInterface {
-    constructor(PlanetInterface) {
-        this.PlanetInterface = PlanetInterface;
-        this.logo = null;
-        this.turtles = null;
-        this.storage = null;
-        this.planet = null;
-        this.printBlockSVG = null;
+/*
+   globals
 
+   _, TITLESTRING, GUIDEURL, jQuery, docById, docByClass, doSVG,
+   fileExt, ABCHEADER, LILYPONDHEADER, platform, saveAbcOutput,
+   saveLilypondOutput, saveMxmlOutput
+ */
+
+/*
+  exported
+
+  SaveInterface
+ */
+
+class SaveInterface {
+    constructor(activity) {
+        this.activity = activity;
         this.filename = null;
         this.notationConvert = "";
         this.timeLastSaved = -100;
@@ -44,7 +52,9 @@ class SaveInterface {
             _("Music Blocks Guide") +
             "</a>." +
             "</p><p>" +
-            _("To run this project, open Music Blocks in a web browser and drag and drop this file into the browser window.") +
+            _(
+                "To run this project, open Music Blocks in a web browser and drag and drop this file into the browser window."
+            ) +
             " " +
             _("Alternatively, open the file in Music Blocks using the Load project button.") +
             '</p></div><div class="moreinfo-div"> <div class="tbcode"><h4>' +
@@ -67,11 +77,14 @@ class SaveInterface {
         const $j = jQuery.noConflict();
         $j(window).bind("beforeunload", (event) => {
             let saveButton = "#saveButtonAdvanced";
-            if (beginnerMode) {
+            if (this.activity.beginnerMode) {
                 saveButton = "#saveButton";
             }
 
-            if (this.PlanetInterface.getTimeLastSaved() !== this.timeLastSaved && this.PlanetInterface !== undefined) {
+            if (
+                this.PlanetInterface.getTimeLastSaved() !== this.timeLastSaved &&
+                this.PlanetInterface !== undefined
+            ) {
                 event.preventDefault();
                 event.returnValue = "";
                 // Will trigger when exit/reload cancelled.
@@ -84,13 +97,11 @@ class SaveInterface {
     download(extension, dataurl, defaultfilename) {
         let filename = null;
         if (defaultfilename === undefined || defaultfilename === null) {
-            if (this.PlanetInterface === undefined) {
+            if (this.activity.PlanetInterface === undefined) {
                 defaultfilename = _("My Project");
             } else {
-                defaultfilename = this.PlanetInterface.getCurrentProjectName();
+                defaultfilename = this.activity.PlanetInterface.getCurrentProjectName();
             }
-
-            console.debug(defaultfilename);
 
             if (fileExt(defaultfilename) != extension) {
                 defaultfilename += "." + extension;
@@ -108,8 +119,10 @@ class SaveInterface {
             filename = defaultfilename;
         }
 
-        console.debug(filename);
+        // eslint-disable-next-line no-console
+        console.debug("saving to " + filename);
         if (filename === null) {
+            // eslint-disable-next-line no-console
             console.debug("save cancelled");
             return;
         }
@@ -130,30 +143,25 @@ class SaveInterface {
         document.body.removeChild(a);
     }
 
-    setVariables(vars) {
-        for (let i = 0; i < vars.length; i++) {
-            this[vars[i][0]] = vars[i][1];
-        }
-    }
-
-    //Save Functions - n.b. include filename parameter - can be left blank / undefined
+    // Save Functions - n.b. include filename parameter - can be left blank / undefined
     prepareHTML() {
         let file = this.htmlSaveTemplate;
         let description = _("No description provided");
-        if (this.PlanetInterface !== undefined) {
-            description = this.PlanetInterface.getCurrentProjectDescription();
+        if (this.activity.PlanetInterface !== undefined) {
+            description = this.activity.PlanetInterface.getCurrentProjectDescription();
         }
 
-        //let author = ''; //currently we're using anonymous for authors - not storing names
+        // let author = '';
+        // Currently we're using anonymous for authors - not storing names.
         let name = _("My Project");
-        if (this.PlanetInterface !== undefined) {
-            name = this.PlanetInterface.getCurrentProjectName();
+        if (this.activity.PlanetInterface !== undefined) {
+            name = this.activity.PlanetInterface.getCurrentProjectName();
         }
 
-        const data = prepareExport();
+        const data = this.activity.prepareExport();
         let image = "";
-        if (this.PlanetInterface !== undefined) {
-            image = this.PlanetInterface.getCurrentProjectImage();
+        if (this.activity.PlanetInterface !== undefined) {
+            image = this.activity.PlanetInterface.getCurrentProjectImage();
         }
 
         file = file
@@ -164,102 +172,92 @@ class SaveInterface {
         return file;
     }
 
-    saveHTML(filename) {
-        const html = "data:text/plain;charset=utf-8," +
-            encodeURIComponent(this.prepareHTML());
-        console.debug(filename);
-        this.download("html", html, filename);
+    saveHTML(activity) {
+        const html =
+            "data:text/plain;charset=utf-8," + encodeURIComponent(activity.save.prepareHTML());
+        activity.save.download("html", html, null);
     }
 
-    saveHTMLNoPrompt() {
+    saveHTMLNoPrompt(activity) {
         setTimeout(() => {
-            const html = "data:text/plain;charset=utf-8," +
-                    encodeURIComponent(this.prepareHTML());
-            if (this.PlanetInterface !== undefined) {
-                this.downloadURL(
-                    this.PlanetInterface.getCurrentProjectName() + ".html",
-                    html);
+            const html =
+                "data:text/plain;charset=utf-8," + encodeURIComponent(activity.save.prepareHTML());
+            if (activity.PlanetInterface !== undefined) {
+                activity.save.downloadURL(
+                    activity.PlanetInterface.getCurrentProjectName() + ".html",
+                    html
+                );
             } else {
-                this.downloadURL(
-                    _("My Project").replace(" ", "_") + ".html",
-                    html);
+                activity.save.downloadURL(_("My Project").replace(" ", "_") + ".html", html);
             }
-        },500);
+        }, 500);
     }
 
-    saveSVG(filename) {
-        const svg = "data:image/svg+xml;utf8," +
+    saveSVG(activity) {
+        const svg =
+            "data:image/svg+xml;utf8," +
             doSVG(
-                this.logo.canvas,
-                this.logo,
-                this.logo.turtles,
-                this.logo.canvas.width,
-                this.logo.canvas.height,
+                activity.canvas,
+                activity.logo,
+                activity.turtles,
+                activity.canvas.width,
+                activity.canvas.height,
                 1.0
             );
-        this.download("svg", svg, filename);
+        activity.save.download("svg", svg, null);
     }
 
-    savePNG(filename) {
+    savePNG(activity) {
         const png = docById("overlayCanvas").toDataURL("image/png");
-        this.download("png", png, filename);
+        activity.save.download("png", png, null);
     }
 
-    saveBlockArtwork(filename) {
-        const svg = "data:image/svg+xml;utf8," + this.printBlockSVG();
-        this.download("svg", svg, filename);
+    saveBlockArtwork(activity) {
+        const svg = "data:image/svg+xml;utf8," + activity.printBlockSVG();
+        activity.save.download("svg", svg, null);
     }
 
-    saveWAV(filename) {
+    saveWAV(activity) {
         document.body.style.cursor = "wait";
-        this.filename = filename;
-        this.logo.recording = true;
-        console.debug("DURING SAVE WAV");
-        this.logo.synth.setupRecorder();
-        this.logo.synth.recorder.start();
-        this.logo.runLogoCommands();
-        this.logo.textMsg(_("Your recording is in progress."));
+        activity.logo.recording = true;
+        activity.logo.synth.setupRecorder();
+        activity.logo.synth.recorder.start();
+        activity.logo.runLogoCommands();
+        activity.textMsg(_("Your recording is in progress."));
     }
 
-    saveAbc(filename) {
+    saveAbc(activity) {
         document.body.style.cursor = "wait";
-        this.filename = filename;
-        console.debug("Saving .abc file");
         //Suppress music and turtle output when generating
         // Abc output.
-        this.logo.runningAbc = true;
-        this.logo.notationOutput = ABCHEADER;
-        this.logo.notationNotes = {};
-        for (let t = 0; t < this.turtles.turtleList.length; t++) {
-            this.logo.notation.notationStaging[t] = [];
-            this.logo.notation.notationDrumStaging[t] = [];
-            this.turtles.turtleList[t].painter.doClear(true, true, true);
+        activity.logo.runningAbc = true;
+        activity.logo.notationOutput = ABCHEADER;
+        activity.logo.notationNotes = {};
+        for (let t = 0; t < activity.turtles.turtleList.length; t++) {
+            activity.logo.notation.notationStaging[t] = [];
+            activity.logo.notation.notationDrumStaging[t] = [];
+            activity.turtles.turtleList[t].painter.doClear(true, true, true);
         }
-        this.logo.runLogoCommands();
+        activity.logo.runLogoCommands();
     }
 
-    afterSaveAbc(filename) {
-        const abc = encodeURIComponent(saveAbcOutput(this.logo));
-        this.download("abc", "data:text;utf8," + abc, filename);
+    afterSaveAbc() {
+        const abc = encodeURIComponent(saveAbcOutput(this.activity));
+        this.activity.save.download("abc", "data:text;utf8," + abc, null);
     }
 
-    saveLilypond(filename) {
+    saveLilypond(activity) {
         const lyext = "ly";
-        if (filename === undefined) {
-            if (this.PlanetInterface !== undefined) {
-                filename = this.PlanetInterface.getCurrentProjectName();
-            } else {
-                filename = _("My Project");
-            }
+        let filename = _("My Project");
+        if (activity.PlanetInterface !== undefined) {
+            filename = activity.PlanetInterface.getCurrentProjectName();
         }
 
         if (fileExt(filename) != lyext) {
             filename += "." + lyext;
         }
 
-        console.debug("Saving .ly file");
         docById("lilypondModal").style.display = "block";
-        let projectTitle, projectAuthor, MIDICheck, guitarCheck;
 
         //.TRANS: File name prompt for save as Lilypond
         docById("fileNameText").textContent = _("File name");
@@ -270,22 +268,19 @@ class SaveInterface {
         //.TRANS: MIDI prompt for save as Lilypond
         docById("MIDIText").textContent = _("Include MIDI output?");
         //.TRANS: Guitar prompt for save as Lilypond
-        docById("guitarText").textContent = _(
-            "Include guitar tablature output?"
-        );
+        docById("guitarText").textContent = _("Include guitar tablature output?");
         //.TRANS: Lilypond is a scripting language for generating sheet music
         docById("submitLilypond").textContent = _("Save as Lilypond");
         docById("fileName").value = filename;
-        if (this.PlanetInterface !== undefined) {
-            docById("title").value =
-                this.PlanetInterface.getCurrentProjectName();
+        if (activity.PlanetInterface !== undefined) {
+            docById("title").value = activity.PlanetInterface.getCurrentProjectName();
         } else {
             //.TRANS: default project title when saving as Lilypond
             docById("title").value = _("My Project");
         }
 
         // Load custom author saved in local storage.
-        const customAuthorData = this.storage.getItem("customAuthor");
+        const customAuthorData = activity.storage.getItem("customAuthor");
         if (customAuthorData != undefined) {
             docById("author").value = JSON.parse(customAuthorData);
         } else {
@@ -294,7 +289,7 @@ class SaveInterface {
         }
 
         docById("submitLilypond").onclick = () => {
-            this.saveLYFile(false);
+            activity.save.saveLYFile(false);
         };
         // if (this.planet){
         //     docById('submitPDF').onclick = function(){this.saveLYFile(true);}.bind(this);
@@ -303,7 +298,7 @@ class SaveInterface {
         //     docById('submitPDF').disabled = true;
         // }
         docByClass("close")[0].onclick = () => {
-            this.logo.runningLilypond = false;
+            activity.logo.runningLilypond = false;
             docById("lilypondModal").style.display = "none";
         };
     }
@@ -317,7 +312,7 @@ class SaveInterface {
         const projectAuthor = docById("author").value;
 
         // Save the author in local storage.
-        this.storage.setItem("customAuthor", JSON.stringify(projectAuthor));
+        this.activity.storage.setItem("customAuthor", JSON.stringify(projectAuthor));
 
         const MIDICheck = docById("MIDICheck").checked;
         const guitarCheck = docById("guitarCheck").checked;
@@ -339,47 +334,47 @@ class SaveInterface {
         );
 
         if (MIDICheck) {
-            MIDIOutput =
+            this.activity.logo.MIDIOutput =
                 "% MIDI SECTION\n% MIDI Output included! \n\n\\midi {\n   \\tempo 4=90\n}\n\n\n}\n\n";
         } else {
-            MIDIOutput =
+            this.activity.logo.MIDIOutput =
                 "% MIDI SECTION\n% Delete the %{ and %} below to include MIDI output.\n%{\n\\midi {\n   \\tempo 4=90\n}\n%}\n\n}\n\n";
         }
 
         if (guitarCheck) {
-            guitarOutputHead =
+            this.activity.logo.guitarOutputHead =
                 '\n\n% GUITAR TAB SECTION\n% Guitar tablature output included!\n\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
-            guitarOutputEnd = "      >>\n\n";
+            this.activity.logo.guitarOutputEnd = "      >>\n\n";
         } else {
-            guitarOutputHead =
+            this.activity.logo.guitarOutputHead =
                 '\n\n% GUITAR TAB SECTION\n% Delete the %{ and %} below to include guitar tablature output.\n%{\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
-            guitarOutputEnd = "      >>\n%}\n";
+            this.activity.logo.guitarOutputEnd = "      >>\n%}\n";
         }
 
         // Suppress music and turtle output when generating
         // Lilypond output.
-        this.logo.runningLilypond = true;
+        this.activity.logo.runningLilypond = true;
         if (isPDF) {
             this.notationConvert = "pdf";
         } else {
             this.notationConvert = "";
         }
-        this.logo.notationOutput = lyheader;
-        this.logo.notationNotes = {};
-        for (let t = 0; t < this.turtles.turtleList.length; t++) {
-            this.logo.notation.notationStaging[t] = [];
-            this.logo.notation.notationDrumStaging[t] = [];
-            this.turtles.turtleList[t].painter.doClear(true, true, true);
+        this.activity.logo.notationOutput = lyheader;
+        this.activity.logo.notationNotes = {};
+        for (let t = 0; t < this.activity.turtles.turtleList.length; t++) {
+            this.activity.logo.notation.notationStaging[t] = [];
+            this.activity.logo.notation.notationDrumStaging[t] = [];
+            this.activity.turtles.turtleList[t].painter.doClear(true, true, true);
         }
         document.body.style.cursor = "wait";
-        this.logo.runLogoCommands();
+        this.activity.logo.runLogoCommands();
 
         // Close the dialog box after hitting button.
         docById("lilypondModal").style.display = "none";
     }
 
     afterSaveLilypond(filename) {
-        const ly = saveLilypondOutput(this.logo);
+        const ly = saveLilypondOutput(this.activity);
         switch (this.notationConvert) {
             case "pdf":
                 this.afterSaveLilypondPDF(ly, filename);
@@ -393,6 +388,7 @@ class SaveInterface {
 
     afterSaveLilypondLY(lydata, filename) {
         if (platform.FF) {
+            // eslint-disable-next-line no-console
             console.debug('execCommand("copy") does not work on FireFox');
         } else {
             const tmp = jQuery("<textarea />").appendTo(document.body);
@@ -401,15 +397,15 @@ class SaveInterface {
             tmp[0].setSelectionRange(0, lydata.length);
             document.execCommand("copy");
             tmp.remove();
-            textMsg(
+            this.activity.textMsg(
                 _("The Lilypond code is copied to clipboard. You can paste it here: ") +
-                "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> "
-                + "or "
-                + "<a href='http://lilybin.com/' target='_blank'>http://lilybin.com</a>.");
+                    "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> " +
+                    "or " +
+                    "<a href='http://lilybin.com/' target='_blank'>http://lilybin.com</a>."
+            );
         }
 
-        this.download(
-            "ly", "data:text;utf8," + encodeURIComponent(lydata), filename);
+        this.download("ly", "data:text;utf8," + encodeURIComponent(lydata), filename);
     }
 
     afterSaveLilypondPDF(lydata, filename) {
@@ -417,34 +413,30 @@ class SaveInterface {
         window.Converter.ly2pdf(lydata, (success, dataurl) => {
             document.body.style.cursor = "default";
             if (!success) {
+                // eslint-disable-next-line no-console
                 console.debug("Error: " + dataurl);
                 //TODO: Error message box
             } else {
-                save.download("pdf", dataurl, filename);
+                this.activity.save.download("pdf", dataurl, filename);
             }
         });
     }
 
+    // eslint-disable-next-line no-unused-vars
     saveMxml(filename) {
-        this.logo.runningMxml = true;
-        for (let t = 0; t < this.turtles.turtleList.length; t++) {
-            this.logo.notation.notationStaging[t] = [];
-            this.logo.notation.notationDrumStaging[t] = [];
-            this.turtles.turtleList[t].painter.doClear(true, true, true);
+        this.activity.logo.runningMxml = true;
+        for (let t = 0; t < this.activity.turtles.turtleList.length; t++) {
+            this.activity.logo.notation.notationStaging[t] = [];
+            this.activity.logo.notation.notationDrumStaging[t] = [];
+            this.activity.turtles.turtleList[t].painter.doClear(true, true, true);
         }
 
-        this.logo.runLogoCommands();
-        // this.download('musicxml', 'data:text;utf8,'+data);
+        this.activity.logo.runLogoCommands();
     }
 
     afterSaveMxml(filename) {
-        let data = saveMxmlOutput(this.logo);
-        data = saveMxmlOutput(this.logo);
-
-        console.log("data is:");
-        console.log(data);
-        this.download(
-            "xml", "data:text;utf8," + encodeURIComponent(data), filename);
-        this.logo.runningMxml = false;
+        const data = saveMxmlOutput(this.activity.logo);
+        this.download("xml", "data:text;utf8," + encodeURIComponent(data), filename);
+        this.activity.logo.runningMxml = false;
     }
 }

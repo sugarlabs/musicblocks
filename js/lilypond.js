@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2020 Walter Bender
+// Copyright (c) 2014-2021 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -9,9 +9,14 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/*global _, toFraction, last, SHARP, FLAT, frequencyToPitch, NATURAL, DOUBLESHARP, DOUBLEFLAT,
-getScaleAndHalfSteps, NOTATIONTUPLETVALUE, NOTATIONNOTE, NOTATIONDURATION, NOTATIONROUNDDOWN,
-NOTATIONSTACCATO, NOTATIONDOTCOUNT, prepareExport*/
+/*
+   global
+
+   _, toFraction, last, SHARP, FLAT, frequencyToPitch, NATURAL,
+   DOUBLESHARP, DOUBLEFLAT, getScaleAndHalfSteps, NOTATIONTUPLETVALUE,
+   NOTATIONNOTE, NOTATIONDURATION, NOTATIONROUNDDOWN, NOTATIONSTACCATO,
+   NOTATIONDOTCOUNT
+ */
 
 /*
      Globals location
@@ -27,14 +32,9 @@ NOTATIONSTACCATO, NOTATIONDOTCOUNT, prepareExport*/
      - js/logo.js
         NOTATIONNOTE, NOTATIONTUPLETVALUE, NOTATIONDURATION, NOTATIONROUNDDOWN, NOTATIONSTACCATO,
         NOTATIONDOTCOUNT
-
-     - js/activity.js
-        prepareExport
  */
 
 /* exported saveLilypondOutput */
-
-let MIDIOutput, guitarOutputHead, guitarOutputEnd;
 
 // This header is prepended to the Lilypond output.
 const LILYPONDHEADER =
@@ -594,7 +594,7 @@ const processLilypondNotes = function (lilypond, logo, turtle) {
     }
 };
 
-const saveLilypondOutput = function (logo) {
+const saveLilypondOutput = function (activity) {
 
     //.TRANS Animal names used in Lilypond output
     const RODENTS = [
@@ -630,24 +630,24 @@ const saveLilypondOutput = function (logo) {
     const clef = []; // eslint-disable-next-line no-unused-vars
     const freygish = ""; // A place to store custom mode definitions
 
-    turtleCount += Object.keys(logo.notation.notationStaging).length;
+    turtleCount += Object.keys(activity.logo.notation.notationStaging).length;
 
     const startDrums = turtleCount;
-    for (const t in logo.notation.notationDrumStaging) {
+    for (const t in activity.logo.notation.notationDrumStaging) {
         // Check to see if there are any notes in the drum staging.
         let foundNotes = false;
-        for (let i = 0; i < logo.notation.notationDrumStaging[t].length; i++) {
-            const obj = logo.notation.notationDrumStaging[t][i];
+        for (let i = 0; i < activity.logo.notation.notationDrumStaging[t].length; i++) {
+            const obj = activity.logo.notation.notationDrumStaging[t][i];
             if (typeof obj === "object" && typeof obj[0] === "object" && obj[0][0] !== "R") {
                 foundNotes = true;
             }
         }
 
         if (foundNotes) {
-            logo.notation.notationStaging[turtleCount.toString()] =
-                logo.notation.notationDrumStaging[t];
+            activity.logo.notation.notationStaging[turtleCount.toString()] =
+                activity.logo.notation.notationDrumStaging[t];
         } else {
-            logo.notation.notationStaging[turtleCount.toString()] = [];
+            activity.logo.notation.notationStaging[turtleCount.toString()] = [];
         }
         turtleCount += 1;
     }
@@ -655,23 +655,23 @@ const saveLilypondOutput = function (logo) {
     // eslint-disable-next-line no-console
     console.debug("saving as lilypond: " + turtleCount);
 
-    logo.notationOutput +=
+    activity.logo.notationOutput +=
         "% You can change the MIDI instruments below to anything on this list:\n% (http://lilypond.org/doc/v2.18/documentation/notation/midi-instruments)\n\n";
 
     let c = 0;
     const occupiedShortNames = [];
-    for (const t in logo.notation.notationStaging) {
+    for (const t in activity.logo.notation.notationStaging) {
         // console.debug('value of t: ' + t);
         let tNumber = t;
         if (typeof t === "string") {
             tNumber = Number(t);
         }
 
-        if (logo.notation.notationStaging[t].length > 0) {
+        if (activity.logo.notation.notationStaging[t].length > 0) {
             let octaveTotal = 0;
             let noteCount = 0;
-            for (let i = 0; i < logo.notation.notationStaging[t].length; i++) {
-                const obj = logo.notation.notationStaging[t][i];
+            for (let i = 0; i < activity.logo.notation.notationStaging[t].length; i++) {
+                const obj = activity.logo.notation.notationStaging[t][i];
                 // console.log("obj is ");
                 // console.log(obj);
                 if (typeof obj === "object") {
@@ -715,10 +715,10 @@ const saveLilypondOutput = function (logo) {
             }
 
             this.freygish = "";
-            processLilypondNotes(this, logo, t);
+            processLilypondNotes(this, activity.logo, t);
 
             if (this.freygish !== "") {
-                logo.notationOutput += this.freygish;
+                activity.logo.notationOutput += this.freygish;
             }
 
             let instrumentName = "";
@@ -727,21 +727,21 @@ const saveLilypondOutput = function (logo) {
             if (tNumber > startDrums - 1) {
                 instrumentName = _("drum") + NUMBERNAMES[tNumber - startDrums];
                 instrumentName = instrumentName.replace(/ /g, "").replace(".", "");
-                logo.notationOutput += instrumentName + " = {\n";
-                logo.notationOutput += "\\drummode {\n";
-                logo.notationOutput += logo.notationNotes[t];
+                activity.logo.notationOutput += instrumentName + " = {\n";
+                activity.logo.notationOutput += "\\drummode {\n";
+                activity.logo.notationOutput += activity.logo.notationNotes[t];
                 // Add bar to last turtle's output.
                 if (c === turtleCount - 1) {
-                    logo.notationOutput += ' \\bar "|."';
+                    activity.logo.notationOutput += ' \\bar "|."';
                 }
 
-                logo.notationOutput += "\n}\n";
-                logo.notationOutput += "\n}\n\n";
+                activity.logo.notationOutput += "\n}\n";
+                activity.logo.notationOutput += "\n}\n\n";
             } else {
-                if (t in logo.turtles.turtleList) {
+                if (t in activity.turtles.turtleList) {
                     // const turtleNumber = tNumber;
 
-                    instrumentName = logo.turtles.turtleList[t].name;
+                    instrumentName = activity.turtles.turtleList[t].name;
                     if (instrumentName === _("start") || instrumentName === _("start drum")) {
                         instrumentName = RODENTS[tNumber % 12];
                     } else if (instrumentName === tNumber.toString()) {
@@ -756,15 +756,15 @@ const saveLilypondOutput = function (logo) {
                 instrumentName = instrumentName.replace(/ /g, "").replace(".", "");
 
                 // console.log("L604: " + instrumentName);
-                logo.notationOutput += instrumentName + " = {\n";
-                logo.notationOutput += logo.notationNotes[t];
+                activity.logo.notationOutput += instrumentName + " = {\n";
+                activity.logo.notationOutput += activity.logo.notationNotes[t];
 
                 // Add bar to last turtle's output.
                 if (c === turtleCount - 1) {
-                    logo.notationOutput += ' \\bar "|."';
+                    activity.logo.notationOutput += ' \\bar "|."';
                 }
 
-                logo.notationOutput += "\n}\n\n";
+                activity.logo.notationOutput += "\n}\n\n";
 
                 let final = "";
                 let firstPart = "";
@@ -840,27 +840,27 @@ const saveLilypondOutput = function (logo) {
                 // console.debug("shortInstrumentName: " + shortInstrumentName);
             }
 
-            logo.notationOutput += instrumentName.replace(/ /g, "").replace(".", "") + "Voice = ";
+            activity.logo.notationOutput += instrumentName.replace(/ /g, "").replace(".", "") + "Voice = ";
             if (tNumber > startDrums - 1) {
-                logo.notationOutput += "\\new DrumStaff \\with {\n";
+                activity.logo.notationOutput += "\\new DrumStaff \\with {\n";
             } else {
-                logo.notationOutput += "\\new Staff \\with {\n";
+                activity.logo.notationOutput += "\\new Staff \\with {\n";
             }
-            logo.notationOutput += '   \\clef "' + last(clef) + '"\n';
-            logo.notationOutput += '   instrumentName = "' + instrumentName + '"\n';
+            activity.logo.notationOutput += '   \\clef "' + last(clef) + '"\n';
+            activity.logo.notationOutput += '   instrumentName = "' + instrumentName + '"\n';
             if (tNumber > startDrums - 1) {
                 const num = tNumber - startDrums;
                 // console.debug("shortInstrumentName = d" + num);
-                logo.notationOutput += '   shortInstrumentName = "' + "d" + num + '"\n';
-                logo.notationOutput += '   midiInstrument = "snare drum"\n';
+                activity.logo.notationOutput += '   shortInstrumentName = "' + "d" + num + '"\n';
+                activity.logo.notationOutput += '   midiInstrument = "snare drum"\n';
             } else {
-                logo.notationOutput += '   shortInstrumentName = "' + shortInstrumentName + '"\n';
-                logo.notationOutput += '   midiInstrument = "acoustic grand"\n';
+                activity.logo.notationOutput += '   shortInstrumentName = "' + shortInstrumentName + '"\n';
+                activity.logo.notationOutput += '   midiInstrument = "acoustic grand"\n';
             }
             // Automatic note splitting
-            // logo.notationOutput += '\n   \\remove "Note_heads_engraver"\n   \\consists "Completion_heads_engraver"\n   \\remove "Rest_engraver"\n   \\consists "Completion_rest_engraver"\n'
+            // activity.logo.notationOutput += '\n   \\remove "Note_heads_engraver"\n   \\consists "Completion_heads_engraver"\n   \\remove "Rest_engraver"\n   \\consists "Completion_rest_engraver"\n'
 
-            logo.notationOutput +=
+            activity.logo.notationOutput +=
                 '\n} { \\clef "' +
                 last(clef) +
                 '" \\' +
@@ -874,28 +874,28 @@ const saveLilypondOutput = function (logo) {
     }
 
     // Begin the SCORE section.
-    logo.notationOutput += "\n\\score {\n";
-    logo.notationOutput += "   <<\n";
+    activity.logo.notationOutput += "\n\\score {\n";
+    activity.logo.notationOutput += "   <<\n";
 
     // Sort the staffs, treble on top, bass_8 on the bottom.
     for (let c = 0; c < CLEFS.length; c++) {
         // const i = 0;
         let instrumentName;
-        for (const t in logo.notationNotes) {
+        for (const t in activity.logo.notationNotes) {
             let tNumber = t;
             if (typeof t === "string") {
                 tNumber = Number(t);
             }
 
             if (clef[tNumber] === CLEFS[c]) {
-                if (logo.notation.notationStaging[t].length > 0) {
+                if (activity.logo.notation.notationStaging[t].length > 0) {
                     if (tNumber > startDrums - 1) {
                         instrumentName = _("drum") + NUMBERNAMES[tNumber - startDrums];
                     } else {
-                        if (t in logo.turtles.turtleList) {
-                            instrumentName = logo.turtles.turtleList[t].name;
-                        } else if (tNumber in logo.turtles.turtleList) {
-                            instrumentName = logo.turtles.turtleList[tNumber].name;
+                        if (t in activity.turtles.turtleList) {
+                            instrumentName = activity.turtles.turtleList[t].name;
+                        } else if (tNumber in activity.turtles.turtleList) {
+                            instrumentName = activity.turtles.turtleList[tNumber].name;
                         } else {
                             instrumentName = _("mouse");
                         }
@@ -914,32 +914,32 @@ const saveLilypondOutput = function (logo) {
                     }
 
                     instrumentName = instrumentName.replace(/ /g, "").replace(".", "");
-                    logo.notationOutput += "      \\" + instrumentName + "Voice\n";
+                    activity.logo.notationOutput += "      \\" + instrumentName + "Voice\n";
                 }
             }
         }
     }
 
     // Add GUITAR TAB in comments.
-    logo.notationOutput += guitarOutputHead;
+    activity.logo.notationOutput += activity.logo.guitarOutputHead;
     for (let c = 0; c < CLEFS.length; c++) {
         const i = 0;
         let instrumentName;
-        for (const t in logo.notationNotes) {
+        for (const t in activity.logo.notationNotes) {
             let tNumber = t;
             if (typeof t === "string") {
                 tNumber = Number(t);
             }
 
             if (clef[i] === CLEFS[c]) {
-                if (logo.notation.notationStaging[t].length > 0) {
+                if (activity.logo.notation.notationStaging[t].length > 0) {
                     if (tNumber > startDrums - 1) {
                         instrumentName = _("drum") + NUMBERNAMES[tNumber - startDrums];
                     } else {
-                        if (t in logo.turtles.turtleList) {
-                            instrumentName = logo.turtles.turtleList[t].name;
-                        } else if (tNumber in logo.turtles.turtleList) {
-                            instrumentName = logo.turtles.turtleList[tNumber].name;
+                        if (t in activity.turtles.turtleList) {
+                            instrumentName = activity.turtles.turtleList[t].name;
+                        } else if (tNumber in activity.turtles.turtleList) {
+                            instrumentName = activity.turtles.turtleList[tNumber].name;
                         } else {
                             instrumentName = _("mouse");
                         }
@@ -952,7 +952,7 @@ const saveLilypondOutput = function (logo) {
                     }
 
                     instrumentName = instrumentName.replace(/ /g, "").replace(".", "");
-                    logo.notationOutput +=
+                    activity.logo.notationOutput +=
                         '         \\context TabVoice = "' +
                         instrumentName +
                         '" \\' +
@@ -964,19 +964,19 @@ const saveLilypondOutput = function (logo) {
     }
 
     // Close the SCORE sections.
-    logo.notationOutput += guitarOutputEnd;
-    logo.notationOutput += "\n   >>\n   \\layout {}\n\n";
+    activity.logo.notationOutput += activity.logo.guitarOutputEnd;
+    activity.logo.notationOutput += "\n   >>\n   \\layout {}\n\n";
 
     // Add MIDI OUTPUT in comments.
-    logo.notationOutput += MIDIOutput;
+    activity.logo.notationOutput += activity.logo.MIDIOutput;
 
     // ADD TURTLE BLOCKS CODE HERE
-    logo.notationOutput += "% MUSIC BLOCKS CODE\n";
-    logo.notationOutput +=
+    activity.logo.notationOutput += "% MUSIC BLOCKS CODE\n";
+    activity.logo.notationOutput +=
         "% Below is the code for the Music Blocks project that generated this Lilypond file.\n%{\n\n";
     // prepareExport() returns json-encoded project data.
-    const projectData = prepareExport();
-    logo.notationOutput += projectData.replace(/]],/g, "]],\n");
-    logo.notationOutput += "\n%}\n\n";
-    return logo.notationOutput;
+    const projectData = activity.prepareExport();
+    activity.logo.notationOutput += projectData.replace(/]],/g, "]],\n");
+    activity.logo.notationOutput += "\n%}\n\n";
+    return activity.logo.notationOutput;
 };

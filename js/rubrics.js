@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2020 Walter Bender
+// Copyright (c) 2015-2021 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -13,20 +13,25 @@
 
 // TODO: CLEAN UP THIS LIST
 
-/*globals _, TEMPERAMENT, last, isCustom*/
+/*
+   globals
+
+   _, last, isCustomTemperament, getTemperament
+ */
 
 /*
 Globals location
 
 - js/utils/musicutils.js
-    isCustom, getTemperament
+    isCustomTemperament, getTemperament
 
 - js/utils/utils.js
     _, last
 */
 
 /* exported analyzeProject, scoreToChartData, getChartOptions, runAnalytics,
-getStatsFromNotation*/
+   getStatsFromNotation
+*/
 
 /* eslint-disable no-dupe-keys */
 
@@ -520,8 +525,9 @@ const PALLABELS = [
     _("mice")
 ];
 
-function analyzeProject(blocks) {
+function analyzeProject(activity) {
     // Parse block data and generate score based on rubric
+    const blocks = activity.blocks;
 
     const blockList = [];
     for (let blk = 0; blk < blocks.blockList.length; blk++) {
@@ -729,25 +735,27 @@ function getChartOptions(callback) {
     };
 }
 
-const runAnalytics = (logo) => {
-    // using lilypond output to run through code and get some stats
+const runAnalytics = (activity) => {
+    const logo = activity.logo;
+    const turtles = activity.turtles;
+    // Using lilypond output to run through code and get some stats.
     logo.runningLilypond = true;
     logo.notationNotes = {};
-    for (let turtle = 0; turtle < logo.turtles.turtleList.length; turtle++) {
+    for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
         logo.notation.notationStaging[turtle] = [];
         logo.notation.notationDrumStaging[turtle] = [];
-        logo.turtles.turtleList[turtle].painter.doClear(true, true, true);
+        turtles.turtleList[turtle].painter.doClear(true, true, true);
     }
     document.body.style.cursor = "wait";
     logo.collectingStats = true;
     logo.runLogoCommands();
 };
 
-const getStatsFromNotation = (logo) => {
+const getStatsFromNotation = (activity) => {
     const projectStats = {};
     // since we use the lilypond output to generate stats , please make sure to change these rules if
     // we ever change the lilypond notation structure.
-    const notation = logo.notation;
+    const notation = activity.logo.notation;
     projectStats["duples"] = 0;
     projectStats["triplets"] = 0;
     projectStats["quintuplets"] = 0;
@@ -768,16 +776,17 @@ const getStatsFromNotation = (logo) => {
             if (typeof item == "object" && item[0].length) {
                 for (let note of item[0]) {
                     let freq;
-                    if (isCustom(logo.synth.inTemperament)) {
-                        freq = logo.synth.getCustomFrequency(note, logo.synth.inTemperament);
-                        const test = getTemperament(logo.synth.inTemperament).filter(
+                    if (isCustomTemperament(activity.logo.synth.inTemperament)) {
+                        freq = activity.logo.synth.getCustomFrequency(
+                            note, activity.logo.synth.inTemperament);
+                        const test = getTemperament(activity.logo.synth.inTemperament).filter(
                             (ele) => ele[3] === note.slice(0, note.length - 1)
                         );
                         if (test.length > 0) {
                             note = test[0][1] + note[note.length - 1];
                         }
                     } else {
-                        freq = logo.synth._getFrequency(note);
+                        freq = activity.logo.synth._getFrequency(note);
                     }
                     projectStats["pitchNames"].add(note.slice(0, note.length - 1));
                     projectStats["pitches"].push(freq);
@@ -816,7 +825,7 @@ const getStatsFromNotation = (logo) => {
         }
     }
 
-    const blockList = logo.blocks.blockList;
+    const blockList = activity.blocks.blockList;
     projectStats["rests"] = 0;
     projectStats["ornaments"] = 0;
     for (const b of blockList) {

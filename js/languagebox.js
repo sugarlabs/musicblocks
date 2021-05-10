@@ -1,4 +1,4 @@
-// Copyright (c) 2018,19 Walter Bender
+// Copyright (c) 2018-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -12,28 +12,19 @@
 //A dropdown for selecting language
 
 /*
-   global _, language:writable
+   global _
 */
 
 /* exported LanguageBox */
+
 class LanguageBox {
 
     /**
      * @constructor
      */
-    constructor() {
-        this._message = null;
-        this._language = localStorage.languagePreference;
-    }
-
-    /**
-     * @public
-     * @param {String} message 
-     * @returns {String}
-     */
-    setMessage(message) {
-        this._message = message;
-        return this;
+    constructor(activity) {
+        this.activity = activity;
+        this._language = activity.storage.languagePreference;
     }
 
     /**
@@ -69,7 +60,7 @@ class LanguageBox {
      */
     ja_onclick() {
         this._language = "ja";
-        localStorage.kanaPreference = "kanji";
+        this.activity.storage.kanaPreference = "kanji";
         this.hide();
     }
 
@@ -79,7 +70,7 @@ class LanguageBox {
      */
     kana_onclick() {
         this._language = "ja";
-        localStorage.kanaPreference = "kana";
+        this.activity.storage.kanaPreference = "kana";
         this.hide();
     }
 
@@ -213,12 +204,12 @@ class LanguageBox {
             gug: "Actualice su navegador para cambiar su preferencia de idioma."
         };
 
-        localStorage.languagePreference = this._language;
-        // console.debug(language);
-        if (this._language === "ja" && localStorage.kanaPreference === "kana") {
-            this._message(MSGPrefix + MSG["kana"] + MSGSuffix);
+        this.activity.storage.languagePreference = this._language;
+
+        if (this._language === "ja" && this.activity.storage.kanaPreference === "kana") {
+            this.activity.textMsg(MSGPrefix + MSG["kana"] + MSGSuffix);
         } else {
-            this._message(MSGPrefix + MSG[this._language] + MSGSuffix);
+            this.activity.textMsg(MSGPrefix + MSG[this._language] + MSGSuffix);
         }
     }
 }

@@ -16,6 +16,12 @@
  * Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA.
  */
 
+/*
+   globals
+
+   createjs, DEFAULTVOLUME, delayExecution, importMembers, Painter, Singer, 
+ */
+/* exported Turtle */
 /**
  * Class pertaining to each turtle.
  *
@@ -43,12 +49,13 @@ class Turtle {
      * @param {Object} turtles - Turtles object (common to all turtles)
      * @param {Number} startBlock - start block id
      */
-    constructor(id, name, turtles, startBlock) {
+    constructor(activity, id, name, turtles, startBlock) {
         // Import members of model and view (arguments only for model)
-        importMembers(this, "", [id, name, turtles, startBlock]);
+        importMembers(this, "", [activity, id, name, turtles, startBlock]);
 
-        this.singer = new Singer(this);     // for music logic
-        this.painter = new Painter(this);   // for drawing logic
+        this.activity = activity;
+        this.singer = new Singer(this); // for music logic
+        this.painter = new Painter(this); // for drawing logic
 
         this._waitTime = 0;
         this.embeddedGraphicsFinished = true;
@@ -56,7 +63,7 @@ class Turtle {
         // Widget-related attributes
         this.inSetTimbre = false;
 
-        this._blinkFinished = true;         // whether not blinking or blinking
+        this._blinkFinished = true; // whether not blinking or blinking
     }
 
     /**
@@ -107,12 +114,13 @@ class Turtle {
      */
     async updateCache() {
         if (this.bounds == null) {
+            // eslint-disable-next-line no-console
             console.debug("Block container for " + this.name + " not yet ready.");
             await delayExecution(300);
             this.updateCache();
         } else {
             this.container.updateCache();
-            this.turtles.refreshCanvas();
+            this.activity.refreshCanvas();
         }
     }
 
@@ -127,7 +135,7 @@ class Turtle {
             this._blinkTimeout = null;
 
             this.container.visible = true;
-            this.turtles.refreshCanvas();
+            this.activity.refreshCanvas();
             this._blinkFinished = true;
         }
     }
@@ -136,7 +144,8 @@ class Turtle {
      * Causes turtle to blink (toggle turtle's visibility) every 100 ms.
      */
     async blink(duration, volume) {
-        // suppress blinking when using cursorout and cursorover sensors to prevent multiple triggers.
+        // Suppress blinking when using cursorout and cursorover
+        // sensors to prevent multiple triggers.
         if ("CursorOver" + this.id in this.listeners || "CursorOut" + this.id in this.listeners)
             return;
 
@@ -151,11 +160,11 @@ class Turtle {
         this._blinkFinished = false;
 
         this.container.visible = false;
-        this.turtles.refreshCanvas();
+        this.activity.refreshCanvas();
         this._blinkTimeout = await delayExecution(100);
         this._blinkFinished = true;
         this.container.visible = true;
-        this.turtles.refreshCanvas();
+        this.activity.refreshCanvas();
     }
 
     /**
@@ -275,7 +284,7 @@ class Turtle {
         this.singer.defaultStrongBeats = false;
 
         this.singer.pickup = 0;
-        this.singer.beatsPerMeasure = 4;        // default is 4/4 time
+        this.singer.beatsPerMeasure = 4; // default is 4/4 time
         this.singer.noteValuePerBeat = 4;
         this.singer.currentBeat = 0;
         this.singer.currentMeasure = 0;
@@ -290,7 +299,7 @@ class Turtle {
 
         this.singer.runningFromEvent = false;
 
-        logo.turtleDicts[turtles.turtleList.indexOf(this)] = [];
+        this.activity.logo.turtleDicts[this.activity.turtles.turtleList.indexOf(this)] = [];
     }
 
     // ================================ CONTROLLER ============================
@@ -602,34 +611,36 @@ Turtle.TurtleModel = class {
      * @param {String} name - name of Turtle
      * @param {Object} turtles - Turtles object (common to all turtles)
      */
-    constructor(id, name, turtles, startBlock) {
-        this._id = id;              // unique ID of turtle
-        this._name = name;          // name of the turtle
-        this._turtles = turtles;    // object handling behavior of all turtles
+    constructor(activity, id, name, turtles, startBlock) {
+        this.activity = activity;
+        this._id = id; // unique ID of turtle
+        this._name = name; // name of the turtle
+        this._turtles = turtles; // object handling behavior of all turtles
 
-        this._startBlock = startBlock;  // Which start block is associated with this turtle?
-        this._queue = [];           // Queue of blocks this turtle is executing
+        this._startBlock = startBlock; // Which start block is associated with this turtle?
+        this._queue = []; // Queue of blocks this turtle is executing
         this._parentFlowQueue = [];
         this._unhighlightQueue = [];
         this._parameterQueue = [];
 
-        this._listeners = {};       // Event listeners
+        this._listeners = {}; // Event listeners
         // When we leave a clamp block, we need to dispatch a signal
         this.endOfClampSignals = {};
-        // Don't dispatch these signals (when exiting note counter or interval measure)
+        // Don't dispatch these signals (when exiting note counter or
+        // interval measure).
         this.butNotThese = {};
 
         // Used to halt runtime during input
         this.delayTimeout = {};
         this.delayParameters = {};
 
-        this._media = [];           // media (text, images) we need to remove on clear
+        this._media = []; // media (text, images) we need to remove on clear
 
-        this._x = 0;    // x coordinate
-        this._y = 0;    // y coordinate
+        this._x = 0; // x coordinate
+        this._y = 0; // y coordinate
 
-        this._running = false;      // is the turtle running?
-        this._trash = false;        // in the trash?
+        this._running = false; // is the turtle running?
+        this._trash = false; // in the trash?
     }
 
     /**
@@ -656,9 +667,10 @@ Turtle.TurtleModel = class {
  *
  * @class
  * @classdesc This is the prototype of the View for the Turtle component.
- * It should make changes to the view, while using members of the Model through Turtle
- * (controller). An action may require updating the state (of the Model), which it can do by
- * calling methods of the Model, also through Turtle (controller).
+ * It should make changes to the view, while using members of the Model
+ * through Turtle (controller). An action may require updating the state
+ * (of the Model), which it can do by calling methods of the Model, also
+ * through Turtle (controller).
  */
 Turtle.TurtleView = class {
     /**
@@ -668,13 +680,13 @@ Turtle.TurtleView = class {
         // createjs object of start block (decoration)
         this._decorationBitmap = null;
 
-        this._container = null;         // createjs container
-        this._bitmap = null;            // createjs bitmap
+        this._container = null; // createjs container
+        this._bitmap = null; // createjs bitmap
         this._imageContainer = null;
         this._penstrokes = null;
 
-        this._skinChanged = false;      // should we reskin the turtle on clear?
-        this._orientation = 0;          // orientation of the turtle sprite
+        this._skinChanged = false; // should we reskin the turtle on clear?
+        this._orientation = 0; // orientation of the turtle sprite
 
         this._canvas = document.getElementById("overlayCanvas");
         this._ctx = this._canvas.getContext("2d");
@@ -706,7 +718,7 @@ Turtle.TurtleView = class {
             bitmap.regX = image.width / 2;
             bitmap.regY = image.height / 2;
             bitmap.rotation = this.orientation;
-            this.turtles.refreshCanvas();
+            this.activity.refreshCanvas();
         };
 
         image.src = myImage;
@@ -738,7 +750,7 @@ Turtle.TurtleView = class {
             bitmap.regX = image.width / 2;
             bitmap.regY = image.height / 2;
             bitmap.rotation = turtle.orientation;
-            turtle.turtles.refreshCanvas();
+            turtle.activity.refreshCanvas();
         };
     }
 
@@ -802,7 +814,7 @@ Turtle.TurtleView = class {
                 startBlock.updateCache();
             }
 
-            this.turtles.refreshCanvas();
+            this.activity.refreshCanvas();
         };
     }
 
@@ -833,7 +845,7 @@ Turtle.TurtleView = class {
         const textList = typeof myText !== "string" ? [myText.toString()] : myText.split("\\n");
 
         const textSize = size.toString() + "px " + this.painter.font;
-        for (i = 0; i < textList.length; i++) {
+        for (let i = 0; i < textList.length; i++) {
             const text = new createjs.Text(textList[i], textSize, this.painter.canvasColor);
             text.textAlign = "left";
             text.textBaseline = "alphabetic";
@@ -861,7 +873,7 @@ Turtle.TurtleView = class {
                 myText +
                 "</text>";
 
-            this.turtles.refreshCanvas();
+            this.activity.refreshCanvas();
         }
     }
 
@@ -872,7 +884,7 @@ Turtle.TurtleView = class {
      * @param {Function} refreshCanvas - callback to refresh canvas
      * @returns {void}
      */
-    makeTurtleBitmap(data, refreshCanvas, useTurtleArtwork) {
+    makeTurtleBitmap(data, activity, useTurtleArtwork) {
         // Works with Chrome, Safari, Firefox (untested on IE)
         const img = new Image();
 
@@ -902,7 +914,7 @@ Turtle.TurtleView = class {
                 startBlock.updateCache();
             }
 
-            refreshCanvas();
+            activity.refreshCanvas();
         };
 
         img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(data)));

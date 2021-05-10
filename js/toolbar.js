@@ -10,8 +10,7 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /*
-   global _, jQuery, _THIS_IS_MUSIC_BLOCKS_, docById, canvas, logo, turtles, beginnerMode,
-   auxToolbar
+   global _, jQuery, _THIS_IS_MUSIC_BLOCKS_, docById, doSVG
  */
 
 /* exported Toolbar */
@@ -37,7 +36,8 @@ class Toolbar {
      * @param  {boolean} mode
      * @returns {void}
      */
-    init(mode) {
+    init(activity) {
+        this.activity = activity;
         let strings;
         let strings_;
         if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -220,7 +220,7 @@ class Toolbar {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             const beginnerMode = docById("beginnerMode");
             const advancedMode = docById("advancedMode");
-            if (mode || mode === "null") {
+            if (this.activity.beginnerMode) { // || mode === "null") {
                 advancedMode.style.display = "block";
                 beginnerMode.style.display = "none";
             } else {
@@ -274,7 +274,7 @@ class Toolbar {
         };
 
         logoIcon.onclick = () => {
-            onclick();
+            onclick(this.activity);
         };
     }
 
@@ -288,7 +288,7 @@ class Toolbar {
         const stopIcon = docById("stop");
 
         playIcon.onclick = () => {
-            onclick();
+            onclick(this.activity);
             stopIcon.style.color = this.stopIconColorWhenPlaying;
         };
     }
@@ -302,7 +302,7 @@ class Toolbar {
         const stopIcon = docById("stop");
 
         stopIcon.onclick = () => {
-            onclick();
+            onclick(this.activity);
             stopIcon.style.color = "white";
         };
     }
@@ -316,7 +316,7 @@ class Toolbar {
         const newProjectIcon = docById("new-project");
 
         newProjectIcon.onclick = () => {
-            onclick();
+            onclick(this.activity);
         };
     }
 
@@ -329,7 +329,7 @@ class Toolbar {
         const loadIcon = docById("load");
 
         loadIcon.onclick = () => {
-            onclick();
+            onclick(this.activity);
         };
     }
 
@@ -353,7 +353,7 @@ class Toolbar {
             if (WRAP) {
                 wrapButtonTooltipData = "Turtle Wrap Off";
             } else {
-                wrapButtonTooltipData = "Turle Wrap On";
+                wrapButtonTooltipData = "Turtle Wrap On";
             }
 
             wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
@@ -399,31 +399,28 @@ class Toolbar {
         let saveMXML;
         let svgData;
 
-        if (beginnerMode) {
+        if (this.activity.beginnerMode) {
             if (_THIS_IS_MUSIC_BLOCKS_ && this.language === "ja") {
                 saveButton.onclick = () => {
-                    html_onclick();
+                    html_onclick(this.activity);
                 };
             } else {
                 saveButton.style.display = "block";
                 saveButtonAdvanced.style.display = "none";
 
                 saveButton.onclick = () => {
-                    //html_onclick();
                     saveHTML = docById("save-html-beg");
-                    // console.debug(saveHTML);
                     saveHTML.onclick = () => {
-                        html_onclick();
+                        html_onclick(this.activity);
                     };
 
                     savePNG = docById("save-png-beg");
-                    // console.debug(savePNG);
-                    svgData = doSVG_onclick(
-                        canvas,
-                        logo,
-                        turtles,
-                        canvas.width,
-                        canvas.height,
+                    svgData = doSVG(
+                        this.activity.canvas,
+                        this.activity.logo,
+                        this.activity.turtles,
+                        this.activity.canvas.width,
+                        this.activity.canvas.height,
                         1.0
                     );
 
@@ -434,7 +431,7 @@ class Toolbar {
                         savePNG.disabled = false;
                         savePNG.className = "";
                         savePNG.onclick = () => {
-                            png_onclick();
+                            png_onclick(this.activity);
                         };
                     }
                 };
@@ -448,15 +445,20 @@ class Toolbar {
                 // console.debug(saveHTML);
 
                 saveHTML.onclick = () => {
-                    html_onclick();
+                    html_onclick(this.activity);
                 };
 
                 saveSVG = docById("save-svg");
                 savePNG = docById("save-png");
-                // console.debug(savePNG);
-                svgData = doSVG_onclick(canvas, logo, turtles, canvas.width, canvas.height, 1.0);
+                svgData = doSVG(
+                    this.activity.canvas,
+                    this.activity.logo,
+                    this.activity.turtles,
+                    this.activity.canvas.width,
+                    this.activity.canvas.height,
+                    1.0);
 
-                // if there is no mouse artwork to save then grey out
+                // If there is no mouse artwork to save then grey out.
                 if (svgData == "") {
                     saveSVG.disabled = true;
                     savePNG.disabled = true;
@@ -469,11 +471,11 @@ class Toolbar {
                     savePNG.className = "";
 
                     saveSVG.onclick = () => {
-                        svg_onclick();
+                        svg_onclick(this.activity);
                     };
 
                     savePNG.onclick = () => {
-                        png_onclick();
+                        png_onclick(this.activity);
                     };
                 }
 
@@ -485,26 +487,26 @@ class Toolbar {
                     saveLY = docById("save-ly");
 
                     saveLY.onclick = () => {
-                        ly_onclick();
+                        ly_onclick(this.activity);
                     };
 
                     saveABC = docById("save-abc");
 
                     saveABC.onclick = () => {
-                        abc_onclick();
+                        abc_onclick(this.activity);
                     };
 
                     saveMXML = docById("save-mxml");
 
                     saveMXML.onclick = () => {
-                        mxml_onclick();
+                        mxml_onclick(this.activity);
                     };
                 }
 
                 const saveArtworkSVG = docById("save-blockartwork-svg");
 
                 saveArtworkSVG.onclick = () => {
-                    blockartworksvg_onclick();
+                    blockartworksvg_onclick(this.activity);
                 };
             };
         }
@@ -524,7 +526,7 @@ class Toolbar {
                 docById("toolbars").style.display = "none";
                 docById("wheelDiv").style.display = "none";
                 docById("contextWheelDiv").style.display = "none";
-                onclick();
+                onclick(this.activity);
             };
         } else {
             planetIcon.style.display = "none";
@@ -542,12 +544,12 @@ class Toolbar {
         const auxToolbar = docById("aux-toolbar");
         menuIcon.onclick = () => {
             if (auxToolbar.style.display == "" || auxToolbar.style.display == "none") {
-                onclick(false);
+                onclick(this.activity, false);
                 auxToolbar.style.display = "block";
                 menuIcon.innerHTML = "more_vert";
                 docById("toggleAuxBtn").className = "blue darken-1";
             } else {
-                onclick(true);
+                onclick(this.activity, true);
                 auxToolbar.style.display = "none";
                 menuIcon.innerHTML = "menu";
                 docById("toggleAuxBtn").className -= "blue darken-1";
@@ -562,12 +564,12 @@ class Toolbar {
      */
     renderRunSlowlyIcon(onclick) {
         const runSlowlyIcon = docById("runSlowlyIcon");
-        if (_THIS_IS_MUSIC_BLOCKS_ && beginnerMode && this.language === "ja") {
+        if (_THIS_IS_MUSIC_BLOCKS_ && this.activity.beginnerMode && this.language === "ja") {
             runSlowlyIcon.style.display = "none";
         }
 
         runSlowlyIcon.onclick = () => {
-            onclick();
+            onclick(this.activity);
             docById("stop").style.color = this.stopIconColorWhenPlaying;
         };
     }
@@ -581,7 +583,7 @@ class Toolbar {
         const helpIcon = docById("helpIcon");
 
         helpIcon.onclick = () => {
-            onclick();
+            onclick(this.activity);
         };
     }
 
@@ -596,11 +598,11 @@ class Toolbar {
             const advIcon = docById("advancedMode");
             if (begIcon.style.display === "none") {
                 advIcon.onclick = () => {
-                    onclick();
+                    onclick(this.activity);
                 };
             } else {
                 begIcon.onclick = () => {
-                    onclick();
+                    onclick(this.activity);
                 };
             }
         }
@@ -613,12 +615,12 @@ class Toolbar {
      */
     renderRunStepIcon(onclick) {
         const runStepByStepIcon = docById("runStepByStepIcon");
-        if (_THIS_IS_MUSIC_BLOCKS_ && beginnerMode && this.language === "ja") {
+        if (_THIS_IS_MUSIC_BLOCKS_ && this.activity.beginnerMode && this.language === "ja") {
             runStepByStepIcon.style.display = "none";
         }
 
         runStepByStepIcon.onclick = () => {
-            onclick();
+            onclick(this.activity);
             docById("stop").style.color = this.stopIconColorWhenPlaying;
         };
     }
@@ -628,15 +630,13 @@ class Toolbar {
      * @param  {Function} openPlugin_onclick
      * @param  {Function} delPlugin_onclick
      * @param  {Function} setScroller
-     * @param  {Function} _setupBlocksContainerEvents
      * @returns {void}
      */
     renderAdvancedIcons(
         analytics_onclick,
         openPlugin_onclick,
         delPlugin_onclick,
-        setScroller,
-        _setupBlocksContainerEvents
+        setScroller
     ) {
         const displayStatsIcon = docById("displayStatsIcon");
         const loadPluginIcon = docById("loadPluginIcon");
@@ -644,27 +644,25 @@ class Toolbar {
         const enableHorizScrollIcon = docById("enableHorizScrollIcon");
         const disableHorizScrollIcon = docById("disableHorizScrollIcon");
 
-        if (!_THIS_IS_MUSIC_BLOCKS_ || !beginnerMode) {
+        if (!this.activity.beginnerMode) {
             displayStatsIcon.onclick = () => {
-                analytics_onclick();
+                analytics_onclick(this.activity);
             };
 
             loadPluginIcon.onclick = () => {
-                openPlugin_onclick();
+                openPlugin_onclick(this.activity);
             };
 
             delPluginIcon.onclick = () => {
-                delPlugin_onclick();
+                delPlugin_onclick(this.activity);
             };
 
             enableHorizScrollIcon.onclick = () => {
-                setScroller();
-                _setupBlocksContainerEvents();
+                setScroller(this.activity);
             };
 
             disableHorizScrollIcon.onclick = () => {
-                setScroller();
-                _setupBlocksContainerEvents();
+                setScroller(this.activity);
             };
         } else {
             displayStatsIcon.style.display = "none";
@@ -683,7 +681,7 @@ class Toolbar {
         const mergeWithCurrentIcon = docById("mergeWithCurrentIcon");
 
         mergeWithCurrentIcon.onclick = () => {
-            onclick();
+            onclick(this.activity);
         };
     }
 
@@ -696,7 +694,7 @@ class Toolbar {
         const restoreIcon = docById("restoreIcon");
 
         restoreIcon.onclick = () => {
-            onclick();
+            onclick(this.activity);
         };
     }
 
@@ -709,7 +707,7 @@ class Toolbar {
         const chooseKeyIcon = docById("chooseKeyIcon");
         docById("chooseKeyDiv").style.display = "none";
         chooseKeyIcon.onclick = () => {
-            onclick();
+            onclick(this.activity);
         };
     }
 
@@ -719,7 +717,7 @@ class Toolbar {
      * @returns {void}
      */
     renderJavaScriptIcon(onclick) {
-        docById("toggleJavaScriptIcon").onclick = () => onclick();
+        docById("toggleJavaScriptIcon").onclick = () => onclick(this.activity);
     }
 
     /**
@@ -733,97 +731,97 @@ class Toolbar {
             const enUS = docById("enUS");
 
             enUS.onclick = () => {
-                languageBox.enUS_onclick();
+                languageBox.enUS_onclick(this.activity);
             };
 
             const enUK = docById("enUK");
 
             enUK.onclick = () => {
-                languageBox.enUK_onclick();
+                languageBox.enUK_onclick(this.activity);
             };
 
             const es = docById("es");
 
             es.onclick = () => {
-                languageBox.es_onclick();
+                languageBox.es_onclick(this.activity);
             };
 
             const pt = docById("pt");
 
             pt.onclick = () => {
-                languageBox.pt_onclick();
+                languageBox.pt_onclick(this.activity);
             };
 
             const ko = docById("ko");
 
             ko.onclick = () => {
-                languageBox.ko_onclick();
+                languageBox.ko_onclick(this.activity);
             };
 
             const ja = docById("ja");
 
             ja.onclick = () => {
-                languageBox.ja_onclick();
+                languageBox.ja_onclick(this.activity);
             };
 
             const kana = docById("kana");
 
             kana.onclick = () => {
-                languageBox.kana_onclick();
+                languageBox.kana_onclick(this.activity);
             };
 
             const zhCN = docById("zhCN");
 
             zhCN.onclick = () => {
-                languageBox.zhCN_onclick();
+                languageBox.zhCN_onclick(this.activity);
             };
 
             const th = docById("th");
 
             th.onclick = () => {
-                languageBox.th_onclick();
+                languageBox.th_onclick(this.activity);
             };
 
             const ayc = docById("ayc");
 
             ayc.onclick = () => {
-                languageBox.ayc_onclick();
+                languageBox.ayc_onclick(this.activity);
             };
 
             const quz = docById("quz");
 
             quz.onclick = () => {
-                languageBox.quz_onclick();
+                languageBox.quz_onclick(this.activity);
             };
 
             const gug = docById("gug");
 
             gug.onclick = () => {
-                languageBox.gug_onclick();
+                languageBox.gug_onclick(this.activity);
             };
 
             const hi = docById("hi");
 
             hi.onclick = () => {
-                languageBox.hi_onclick();
+                languageBox.hi_onclick(this.activity);
             };
 
             const ibo = docById("ibo");
 
             ibo.onclick = () => {
-                languageBox.ibo_onclick();
+                languageBox.ibo_onclick(this.activity);
             };
 
             const ar = docById("ar");
 
             ar.onclick = () => {
-                languageBox.ar_onclick();
+                languageBox.ar_onclick(this.activity);
             };
 
             const he = docById("he");
 
             he.onclick = () => {
-                languageBox.he_onclick();
+                languageBox.he_onclick(this.activity);
             };
         };
     }
@@ -844,8 +842,9 @@ class Toolbar {
      * @returns {void}
      */
     closeAuxToolbar = (onclick) => {
+        const auxToolbar = docById("aux-toolbar");
         if (auxToolbar.style.display === "block") {
-            onclick(false);
+            onclick(this.activity, false);
             const menuIcon = docById("menu");
             auxToolbar.style.display = "none";
             menuIcon.innerHTML = "menu";

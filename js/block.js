@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014-20 Walter Bender
+﻿// Copyright (c) 2014-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -11,22 +11,31 @@
 //
 
 /*
-   global last, _, getNoiseSynthName, getVoiceSynthName, getDrumSynthName, updateTemperaments,
-   getTemperamentKeys, getTextWidth, getModeNumbers, WESTERN2EISOLFEGENAMES, splitSolfege, i18nSolfege,
-   docById, piemenuNumber, piemenuColor, piemenuNoteValue, piemenuBasic, platformColor,
-   beginnerMode, piemenuBoolean, blockBlocks, DEFAULTTEMPERAMENT, NOISENAMES, DEFAULTNOISE, VOICENAMES,
-   OSCTYPES, DEFAULTOSCILLATORTYPE, FILTERTYPES, topBlock, DISABLEDFILLCOLOR, DEFAULTFILTERTYPE, DRUMNAMES,
-   _THIS_IS_MUSIC_BLOCKS_, getTemperamentsList, piemenuVoices, DEFAULTVOICE, EFFECTSNAMES, DEFAULTEFFECT,
-   DEFAULTDRUM, INVERTMODES, DEFAULTINVERT, piemenuIntervals, DEFAULTINTERVAL, createjs, EXPANDBUTTON,
-   COLLAPSEBUTTON, ProtoBlock, getNoiseName, getDrumName, splitScaleDegree, DEFAULTACCIDENTAL, DEFAULTMODE, NUMBERBLOCKDEFAULT,
-   PALETTESTROKECOLORS, PALETTEFILLCOLORS, DISABLEDSTROKECOLOR, safeSVG, ACCIDENTALLABELS, ACCIDENTALNAMES,
-   piemenuAccidentals, piemenuModes, SOLFATTRS, piemenuPitches, SOLFNOTES, EASTINDIANSOLFNOTES,
-   piemenuCustomNotes, PreDefinedTemperaments, trashcan, scrollBlockContainer, piemenuBlockContext,
-   COLLAPSETEXTY, STANDARDBLOCKHEIGHT, COLLAPSETEXTX, MEDIASAFEAREA, VALUETEXTX, TEXTY, DEGREES, NATURAL,
-   DOUBLEFLAT, DOUBLESHARP, FLAT, SHARP, RSYMBOLS, NSYMBOLS, delayExecution, TEXTX, HIGHLIGHTSTROKECOLORS,
-   PALETTEHIGHLIGHTCOLORS, hideDOMLabel, SCALENOTES, getTemperament, addTemperamentToDictionary,
-   deleteTemperamentFromList
- */
+   global
+
+   _, ACCIDENTALLABELS, ACCIDENTALNAMES, addTemperamentToDictionary,
+   blockBlocks, COLLAPSEBUTTON, COLLAPSETEXTX, COLLAPSETEXTY,
+   createjs, DEFAULTACCIDENTAL, DEFAULTDRUM, DEFAULTEFFECT,
+   DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
+   DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT,
+   DEFAULTVOICE, DEGREES, delayExecution, deleteTemperamentFromList,
+   DISABLEDFILLCOLOR, DISABLEDSTROKECOLOR, docById, DOUBLEFLAT,
+   DOUBLESHARP, DRUMNAMES, EASTINDIANSOLFNOTES, EFFECTSNAMES,
+   EXPANDBUTTON, FILTERTYPES, FLAT, getDrumName, getDrumSynthName,
+   getModeNumbers, getNoiseName, getNoiseSynthName, getTemperament,
+   getTemperamentKeys, getTemperamentsList, getTextWidth,
+   getVoiceSynthName, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
+   i18nSolfege, INVERTMODES, isCustomTemperament, last, MEDIASAFEAREA,
+   NATURAL, NOISENAMES, NSYMBOLS, NUMBERBLOCKDEFAULT, OSCTYPES,
+   PALETTEFILLCOLORS, PALETTEHIGHLIGHTCOLORS, PALETTESTROKECOLORS,
+   piemenuAccidentals, piemenuBasic, piemenuBlockContext,
+   piemenuBoolean, piemenuColor, piemenuCustomNotes, piemenuIntervals,
+   piemenuModes, piemenuNoteValue, piemenuNumber, piemenuPitches,
+   piemenuVoices, platformColor, ProtoBlock, RSYMBOLS, safeSVG,
+   SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
+   splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
+   _THIS_IS_MUSIC_BLOCKS_, topBlock, updateTemperaments, VALUETEXTX,
+   VOICENAMES, WESTERN2EISOLFEGENAMES */
 
 /*
    Global locations
@@ -59,7 +68,7 @@
         piemenuIntervals, piemenuAccidentals, piemenuModes, piemenuPitches, piemenuCustomNotes,
         piemenuBlockContext
    - js/activity.js
-        _THIS_IS_MUSIC_BLOCKS_, beginnerMode, _THIS_IS_MUSIC_BLOCKS_, trashcan, scrollBlockContainer
+        _THIS_IS_MUSIC_BLOCKS_
    - js/utils/platformstyle.js
         platformColor
  */
@@ -173,9 +182,12 @@ class Block {
         }
 
         this.protoblock = protoblock;
-        this.name = protoblock.name;
-        this.overrideName = overrideName;
         this.blocks = blocks;
+        this.overrideName = overrideName;
+
+        this.name = protoblock.name;
+        this.activity = this.blocks.activity;
+
         this.collapsed = false; // Is this collapsible block collapsed?
         this.inCollapsed = false; // Is this block in a collapsed stack?
         this.trash = false; // Is this block in the trash?
@@ -187,6 +199,7 @@ class Block {
         this.privateData = null; // A block may have some private data,
         // e.g., nameboxes use this field to store
         // the box name associated with the block.
+        this.customID = null; // Used by custom temperaments.
         this.image = protoblock.image; // The file path of the image.
         this.imageBitmap = null;
         this.controller = null; // Note blocks get a controller
@@ -254,7 +267,7 @@ class Block {
                     if (counter !== undefined) {
                         loopCount = counter;
                     }
-                    if (loopCount > 3) {
+                    if (loopCount > 5) {
                         throw new Error("COULD NOT CREATE CACHE");
                     }
 
@@ -295,7 +308,7 @@ class Block {
                         loopCount = counter;
                     }
 
-                    if (loopCount > 3) {
+                    if (loopCount > 5) {
                         throw new Error("COULD NOT UPDATE CACHE");
                     }
 
@@ -304,7 +317,7 @@ class Block {
                         await that.pause(200);
                     } else {
                         that.container.updateCache();
-                        that.blocks.refreshCanvas();
+                        that.activity.refreshCanvas();
                         resolve();
                     }
                 } catch (e) {
@@ -616,9 +629,9 @@ class Block {
 
             if (this.name === "start" || this.name === "drum") {
                 // Rescale the decoration on the start blocks.
-                for (let t = 0; t < this.blocks.turtles.turtleList.length; t++) {
-                    if (this.blocks.turtles.turtleList[t].startBlock === this) {
-                        this.blocks.turtles.turtleList[t].resizeDecoration(
+                for (let t = 0; t < this.activity.turtles.turtleList.length; t++) {
+                    if (this.activity.turtles.turtleList[t].startBlock === this) {
+                        this.activity.turtles.turtleList[t].resizeDecoration(
                             scale,
                             this.bitmap.image.width
                         );
@@ -648,7 +661,6 @@ class Block {
         }
 
         if (this.container !== null) {
-
             /**
              * After new buttons are creates, they are cached and a new hit are is calculated.
              * @private
@@ -656,13 +668,10 @@ class Block {
              * @returns {void}
              */
             const _postProcess = function (that) {
-                that.collapseButtonBitmap.scaleX
-                = that.collapseButtonBitmap.scaleY
-                = that.collapseButtonBitmap.scale
-                = scale / 3;
-                that.expandButtonBitmap.scaleX
-                = that.expandButtonBitmap.scaleY
-                = that.expandButtonBitmap.scale = scale / 3;
+                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
+                    scale / 3;
+                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale =
+                    scale / 3;
                 that.updateCache();
                 that._calculateBlockHitArea();
             };
@@ -900,7 +909,7 @@ class Block {
             that.highlightBitmap.x = 0;
             that.highlightBitmap.y = 0;
             that.highlightBitmap.name = "bmp_highlight_" + thisBlock;
-            if (!that.blocks.logo.runningLilypond) {
+            if (!that.activity.logo.runningLilypond) {
                 that.highlightBitmap.cursor = "pointer";
             }
             // Hide highlight bitmap to start.
@@ -913,7 +922,7 @@ class Block {
             }
 
             const __callback = function (that, firstTime) {
-                that.blocks.refreshCanvas();
+                that.activity.refreshCanvas();
                 const thisBlock = that.blocks.blockList.indexOf(that);
 
                 if (firstTime) {
@@ -962,7 +971,7 @@ class Block {
             that.disconnectedHighlightBitmap.x = 0;
             that.disconnectedHighlightBitmap.y = 0;
             that.disconnectedHighlightBitmap.name = "bmp_disconnect_hightlight_" + thisBlock;
-            if (!that.blocks.logo.runningLilypond) {
+            if (!that.activity.logo.runningLilypond) {
                 that.disconnectedHighlightBitmap.cursor = "pointer";
             }
             // Hide disconnected bitmap to start.
@@ -998,7 +1007,7 @@ class Block {
             that.disconnectedBitmap.x = 0;
             that.disconnectedBitmap.y = 0;
             that.disconnectedBitmap.name = "bmp_disconnect_" + thisBlock;
-            if (!that.blocks.logo.runningLilypond) {
+            if (!that.activity.logo.runningLilypond) {
                 that.disconnectedBitmap.cursor = "pointer";
             }
             // Hide disconnected bitmap to start.
@@ -1038,7 +1047,7 @@ class Block {
             that.bitmap.y = 0;
             that.bitmap.name = "bmp_" + thisBlock;
             that.bitmap.cursor = "pointer";
-            that.blocks.refreshCanvas();
+            that.activity.refreshCanvas();
             let artwork;
             if (that.protoblock.disabled) {
                 artwork = that.artwork
@@ -1145,8 +1154,11 @@ class Block {
                         this.value = "5";
                         break;
                     case "customNote":
-                        this.value = this.blocks.logo.synth.startingPitch
-                            .substring(0, this.blocks.logo.synth.startingPitch.length - 1) + "(+0)";
+                        this.value =
+                            this.activity.logo.synth.startingPitch.substring(
+                                0,
+                                this.activity.logo.synth.startingPitch.length - 1
+                            ) + "(+0)";
                         break;
                     case "notename":
                         this.value = "G";
@@ -1262,7 +1274,7 @@ class Block {
                 this.postProcess = null;
             }
 
-            // this.blocks.refreshCanvas();
+            // this.activity.refreshCanvas();
             this.blocks.cleanupAfterLoad(this.name);
         } else {
             // Some blocks, e.g., Start blocks and Action blocks can
@@ -1300,7 +1312,7 @@ class Block {
             }
         }
 
-        this.blocks.refreshCanvas();
+        this.activity.refreshCanvas();
     }
 
     /**
@@ -1322,7 +1334,7 @@ class Block {
                 postProcess(that);
             }
 
-            that.blocks.refreshCanvas();
+            that.activity.refreshCanvas();
             that.blocks.cleanupAfterLoad(that.name);
             if (that.trash) {
                 that.collapseText.visible = false;
@@ -1341,10 +1353,8 @@ class Block {
             const image = new Image();
             image.onload = function () {
                 that.collapseButtonBitmap = new createjs.Bitmap(image);
-                that.collapseButtonBitmap.scaleX
-                = that.collapseButtonBitmap.scaleY
-                = that.collapseButtonBitmap.scale
-                = that.protoblock.scale / 3;
+                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
+                    that.protoblock.scale / 3;
                 that.container.addChild(that.collapseButtonBitmap);
                 that.collapseButtonBitmap.x = 2 * that.protoblock.scale;
                 if (that.isInlineCollapsible()) {
@@ -1373,10 +1383,8 @@ class Block {
             const image = new Image();
             image.onload = function () {
                 that.expandButtonBitmap = new createjs.Bitmap(image);
-                that.expandButtonBitmap.scaleX
-                = that.expandButtonBitmap.scaleY
-                = that.expandButtonBitmap.scale
-                = that.protoblock.scale / 3;
+                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale =
+                    that.protoblock.scale / 3;
 
                 that.container.addChild(that.expandButtonBitmap);
                 that.expandButtonBitmap.visible = that.collapsed;
@@ -1576,7 +1584,7 @@ class Block {
             that.collapseBlockBitmap.name = "collapse_" + thisBlock;
             that.container.addChild(that.collapseBlockBitmap);
             that.collapseBlockBitmap.visible = that.collapsed;
-            that.blocks.refreshCanvas();
+            that.activity.refreshCanvas();
 
             const artwork = that.collapseArtwork;
             _blockMakeBitmap(
@@ -1610,7 +1618,7 @@ class Block {
         }
 
         this.updateCache();
-        this.blocks.refreshCanvas();
+        this.activity.refreshCanvas();
     }
 
     /**
@@ -1720,7 +1728,7 @@ class Block {
             }
 
             this.updateCache();
-            this.blocks.refreshCanvas();
+            this.activity.refreshCanvas();
         }
     }
 
@@ -1998,7 +2006,7 @@ class Block {
 
         this.updateCache();
         this.unhighlight();
-        this.blocks.refreshCanvas();
+        this.activity.refreshCanvas();
     }
 
     _intervalLabel() {
@@ -2375,7 +2383,7 @@ class Block {
             this.blocks.adjustExpandableClampBlock();
         }
 
-        this.blocks.refreshCanvas();
+        this.activity.refreshCanvas();
     }
 
     /**
@@ -2496,13 +2504,13 @@ class Block {
         this.container.on("mouseover", function () {
             docById("contextWheelDiv").style.display = "none";
 
-            if (!that.blocks.logo.runningLilypond) {
+            if (!that.activity.logo.runningLilypond) {
                 document.body.style.cursor = "pointer";
             }
 
             that.blocks.highlight(thisBlock, true);
             that.blocks.activeBlock = thisBlock;
-            // that.blocks.refreshCanvas();
+            // that.activity.refreshCanvas();
         });
 
         let haveClick = false;
@@ -2522,14 +2530,14 @@ class Block {
                     piemenuBlockContext(that);
                     return;
                 } else if ("shiftKey" in event.nativeEvent && event.nativeEvent.shiftKey) {
-                    if (that.blocks.turtles.running()) {
-                        that.blocks.logo.doStopTurtles();
+                    if (that.activity.turtles.running()) {
+                        that.activity.logo.doStopTurtles();
 
                         setTimeout(() => {
-                            that.blocks.logo.runLogoCommands(topBlock);
+                            that.activity.logo.runLogoCommands(topBlock);
                         }, 250);
                     } else {
-                        that.blocks.logo.runLogoCommands(topBlock);
+                        that.activity.logo.runLogoCommands(topBlock);
                     }
 
                     return;
@@ -2557,14 +2565,14 @@ class Block {
 
             let topBlk;
 
-            const dx = event.stageX / that.blocks.getStageScale() - that.container.x;
-            if (!moved && that.isCollapsible() && dx < 30 / that.blocks.getStageScale()) {
+            const dx = event.stageX / that.activity.getStageScale() - that.container.x;
+            if (!moved && that.isCollapsible() && dx < 30 / that.activity.getStageScale()) {
                 that.collapseToggle();
             } else if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
                 if (that.name === "media") {
                     that._doOpenMedia(thisBlock);
                 } else if (that.name === "audiofile") {
-                      that._doOpenMedia(thisBlock);
+                    that._doOpenMedia(thisBlock);
                 } else if (that.name === "loadFile") {
                     that._doOpenMedia(thisBlock);
                 } else if (SPECIALINPUTS.indexOf(that.name) !== -1) {
@@ -2578,38 +2586,38 @@ class Block {
                 } else {
                     if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
                         topBlk = that.blocks.findTopBlock(thisBlock);
-                        // console.debug("running from " + that.blocks.blockList[topBlk].name);
+
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            that.blocks.logo.synth.resume();
+                            that.activity.logo.synth.resume();
                         }
 
-                        if (that.blocks.turtles.running()) {
-                            that.blocks.logo.doStopTurtles();
+                        if (that.activity.turtles.running()) {
+                            that.activity.logo.doStopTurtles();
 
                             setTimeout(() => {
-                                that.blocks.logo.runLogoCommands(topBlk);
+                                that.activity.logo.runLogoCommands(topBlk);
                             }, 250);
                         } else {
-                            that.blocks.logo.runLogoCommands(topBlk);
+                            that.activity.logo.runLogoCommands(topBlk);
                         }
                     }
                 }
             } else if (!moved) {
                 if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
                     topBlk = that.blocks.findTopBlock(thisBlock);
-                    // console.debug("running from " + that.blocks.blockList[topBlk].name);
+
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        that.blocks.logo.synth.resume();
+                        that.activity.logo.synth.resume();
                     }
 
-                    if (that.blocks.turtles.running()) {
-                        that.blocks.logo.doStopTurtles();
+                    if (that.activity.turtles.running()) {
+                        that.activity.logo.doStopTurtles();
 
                         setTimeout(() => {
-                            that.blocks.logo.runLogoCommands(topBlk);
+                            that.activity.logo.runLogoCommands(topBlk);
                         }, 250);
                     } else {
-                        that.blocks.logo.runLogoCommands(topBlk);
+                        that.activity.logo.runLogoCommands(topBlk);
                     }
                 }
             }
@@ -2628,23 +2636,23 @@ class Block {
             }, LONGPRESSTIME);
 
             // Always show the trash when there is a block selected,
-            trashcan.show();
+            that.activity.trashcan.show();
 
             // Raise entire stack to the top.
             that.blocks.raiseStackToTop(thisBlock);
 
             // And possibly the collapse button.
             if (that.collapseContainer != null) {
-                that.blocks.stage.setChildIndex(
+                that.activity.stage.setChildIndex(
                     that.collapseContainer,
-                    that.blocks.stage.children.length - 1
+                    that.activity.stage.children.length - 1
                 );
             }
 
             moved = false;
             that.original = {
-                x: event.stageX / that.blocks.getStageScale(),
-                y: event.stageY / that.blocks.getStageScale()
+                x: event.stageX / that.activity.getStageScale(),
+                y: event.stageY / that.activity.getStageScale()
             };
 
             that.offset = {
@@ -2668,8 +2676,10 @@ class Block {
                 // Make it eaiser to select text on mobile.
                 setTimeout(() => {
                     moved =
-                        Math.abs(event.stageX / that.blocks.getStageScale() - that.original.x) +
-                            Math.abs(event.stageY / that.blocks.getStageScale() - that.original.y) >
+                        Math.abs(event.stageX / that.activity.getStageScale() - that.original.x) +
+                            Math.abs(
+                                event.stageY / that.activity.getStageScale() - that.original.y
+                            ) >
                             20 && !window.hasMouse;
                     getInput = !moved;
                 }, 200);
@@ -2679,19 +2689,21 @@ class Block {
             const oldY = that.container.y;
 
             const dx = Math.round(
-                event.stageX / that.blocks.getStageScale() + that.offset.x - oldX
+                event.stageX / that.activity.getStageScale() + that.offset.x - oldX
             );
-            let dy = Math.round(event.stageY / that.blocks.getStageScale() + that.offset.y - oldY);
+            let dy = Math.round(
+                event.stageY / that.activity.getStageScale() + that.offset.y - oldY
+            );
 
             const finalPos = oldY + dy;
-            if (that.blocks.stage.y === 0 && finalPos < 45) {
+            if (that.activity.stage.y === 0 && finalPos < 45) {
                 dy += 45 - finalPos;
             }
 
             // scroll when reached edges.
-            if (event.stageX < 10 && scrollBlockContainer)
+            if (event.stageX < 10 && that.activity.scrollBlockContainer)
                 that.blocks.moveAllBlocksExcept(that, 10, 0);
-            else if (event.stageX > window.innerWidth - 10 && scrollBlockContainer)
+            else if (event.stageX > window.innerWidth - 10 && that.activity.scrollBlockContainer)
                 that.blocks.moveAllBlocksExcept(that, -10, 0);
             else if (event.stageY > window.innerHeight - 10)
                 that.blocks.moveAllBlocksExcept(that, 0, -10);
@@ -2711,14 +2723,14 @@ class Block {
 
             // If we are over the trash, warn the user.
             if (
-                trashcan.overTrashcan(
-                    event.stageX / that.blocks.getStageScale(),
-                    event.stageY / that.blocks.getStageScale()
+                that.activity.trashcan.overTrashcan(
+                    event.stageX / that.activity.getStageScale(),
+                    event.stageY / that.activity.getStageScale()
                 )
             ) {
-                trashcan.startHighlightAnimation();
+                that.activity.trashcan.startHighlightAnimation();
             } else {
-                trashcan.stopHighlightAnimation();
+                that.activity.trashcan.stopHighlightAnimation();
             }
 
             if (that.isValueBlock() && that.name !== "media") {
@@ -2737,7 +2749,7 @@ class Block {
                 }
             }
 
-            that.blocks.refreshCanvas();
+            that.activity.refreshCanvas();
         });
 
         this.container.on("mouseout", function (event) {
@@ -2783,12 +2795,12 @@ class Block {
      */
     _mouseoutCallback(event, moved, haveClick, hideDOM) {
         const thisBlock = this.blocks.blockList.indexOf(this);
-        if (!this.blocks.logo.runningLilypond) {
+        if (!this.activity.logo.runningLilypond) {
             document.body.style.cursor = "default";
         }
 
         // Always hide the trash when there is no block selected.
-        trashcan.hide();
+        this.activity.trashcan.hide();
 
         if (this.blocks.longPressTimeout != null) {
             clearTimeout(this.blocks.longPressTimeout);
@@ -2799,12 +2811,12 @@ class Block {
         if (moved) {
             // Check if block is in the trash.
             if (
-                trashcan.overTrashcan(
-                    event.stageX / this.blocks.getStageScale(),
-                    event.stageY / this.blocks.getStageScale()
+                this.activity.trashcan.overTrashcan(
+                    event.stageX / this.activity.getStageScale(),
+                    event.stageY / this.activity.getStageScale()
                 )
             ) {
-                if (trashcan.isVisible) {
+                if (this.activity.trashcan.isVisible) {
                     this.blocks.sendStackToTrash(this);
                 }
             } else {
@@ -2841,8 +2853,8 @@ class Block {
             // Did the mouse move out off the block? If so, hide the
             // label DOM element.
             if (
-                event.stageX / this.blocks.getStageScale() < this.container.x ||
-                event.stageX / this.blocks.getStageScale() > this.container.x + this.width ||
+                event.stageX / this.activity.getStageScale() < this.container.x ||
+                event.stageX / this.activity.getStageScale() > this.container.x + this.width ||
                 event.stageY < this.container.y ||
                 event.stageY > this.container.y + this.hitHeight
             ) {
@@ -2855,7 +2867,7 @@ class Block {
                 }
 
                 this.blocks.unhighlight(null);
-                this.blocks.refreshCanvas();
+                this.activity.refreshCanvas();
             }
 
             this.blocks.activeBlock = null;
@@ -2974,9 +2986,9 @@ class Block {
                     dx = (25 * this.protoblock.scale) / 2;
                 }
 
-                for (let t = 0; t < this.blocks.turtles.turtleList.length; t++) {
-                    if (this.blocks.turtles.turtleList[t].startBlock === this) {
-                        this.blocks.turtles.turtleList[t].decorationBitmap.x =
+                for (let t = 0; t < this.activity.turtles.turtleList.length; t++) {
+                    if (this.activity.turtles.turtleList[t].startBlock === this) {
+                        this.activity.turtles.turtleList[t].decorationBitmap.x =
                             this.width - dx - (30 * this.protoblock.scale) / 2;
                         break;
                     }
@@ -3009,8 +3021,8 @@ class Block {
         const x = this.container.x;
         const y = this.container.y;
 
-        const canvasLeft = this.blocks.canvas.offsetLeft + 28 * this.blocks.blockScale;
-        const canvasTop = this.blocks.canvas.offsetTop + 6 * this.blocks.blockScale;
+        const canvasLeft = this.activity.canvas.offsetLeft + 28 * this.blocks.blockScale;
+        const canvasTop = this.activity.canvas.offsetTop + 6 * this.blocks.blockScale;
 
         const selectorWidth = 150;
 
@@ -3032,10 +3044,10 @@ class Block {
             selectedValue,
             selectedType,
             selectedWrap;
-        if (!window.hasMouse && this.blocks.stage.y + y > 75) {
+        if (!window.hasMouse && this.activity.stage.y + y > 75) {
             movedStage = true;
-            fromY = this.blocks.stage.y;
-            this.blocks.stage.y = -y + 75;
+            fromY = this.activity.stage.y;
+            this.activity.stage.y = -y + 75;
         }
 
         // A place in the DOM to put modifiable labels (textareas).
@@ -3070,9 +3082,10 @@ class Block {
                 piemenuPitches(this, scalenotes_, SCALENOTES, SOLFATTRS, obj[0], obj[1]);
             }
         } else if (this.name === "customNote") {
-            if (!this.blocks.logo.customTemperamentDefined) {
-                // If custom temperament is not defined by user,
-                // then custom temperament is supposed to be equal temperament.
+            if (!this.activity.logo.customTemperamentDefined) {
+                // If custom temperament is not defined by user, then
+                // custom temperament is supposed to be equal
+                // temperament.
                 obj = splitSolfege(this.value);
                 const solfnotes_ = _("ti la sol fa mi re do").split(" ");
 
@@ -3080,22 +3093,23 @@ class Block {
                     piemenuPitches(this, solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
                 }
             } else {
-                const noteLabels = getTemperamentKeys();
-
+                const keys = getTemperamentKeys();
+                const noteLabels = {};
                 const customLabels = [];
-                for (const lab in noteLabels)
-                    if (!(lab in PreDefinedTemperaments)) {
-                        customLabels.push(lab);
+                for (let i = 0; i < keys.length; i++) {
+                    noteLabels[keys[i]] = getTemperament(keys[i]);
+                    if (isCustomTemperament(keys[i])) {
+                        customLabels.push(keys[i]);
                     }
-
+                }
                 let selectedCustom;
-                if (this.customID != null) {
+                if (this.customID !== null) {
                     selectedCustom = this.customID;
                 } else {
                     selectedCustom = customLabels[0];
                 }
 
-                if (this.value != null) {
+                if (this.value !== null) {
                     selectedNote = this.value;
                 } else {
                     selectedNote = getTemperament(selectedCustom)["0"][1];
@@ -3291,7 +3305,7 @@ class Block {
             const categoriesList = [];
             for (let i = 0; i < VOICENAMES.length; i++) {
                 // Skip custom voice in Beginner Mode.
-                if (beginnerMode && VOICENAMES[i][1] === "custom") {
+                if (this.activity.beginnerMode && VOICENAMES[i][1] === "custom") {
                     continue;
                 }
 
@@ -3353,7 +3367,7 @@ class Block {
             const temperamentsList = getTemperamentsList();
             for (let i = 0; i < temperamentsList.length; i++) {
                 // Skip custom temperament in Beginner Mode.
-                if (beginnerMode && temperamentsList[i][1] === "custom") {
+                if (this.activity.beginnerMode && temperamentsList[i][1] === "custom") {
                     continue;
                 }
 
@@ -3405,7 +3419,7 @@ class Block {
         } else if (this.name === "outputtools") {
             selectedValue = this.privateData;
             let labels;
-            if (beginnerMode) {
+            if (this.activity.beginnerMode) {
                 labels = this.protoblock.extraSearchTerms.slice(0, 5);
             } else {
                 labels = this.protoblock.extraSearchTerms;
@@ -3413,7 +3427,7 @@ class Block {
 
             const values = labels;
             piemenuBasic(this, labels, values, selectedValue, platformColor.piemenuBasic);
-        }  else if (this.name === "wrapmode") {
+        } else if (this.name === "wrapmode") {
             if (this.value != null) {
                 selectedWrap = this.value;
             } else {
@@ -3589,8 +3603,8 @@ class Block {
                 that.label.removeEventListener("keypress", __keypress);
 
                 if (movedStage) {
-                    that.blocks.stage.y = fromY;
-                    that.blocks.updateStage();
+                    that.activity.stage.y = fromY;
+                    that.activity.stage.update();
                 }
             };
 
@@ -3616,11 +3630,13 @@ class Block {
             });
 
             this.label.style.left =
-                Math.round((x + this.blocks.stage.x) * this.blocks.getStageScale() + canvasLeft) +
-                "px";
+                Math.round(
+                    (x + this.activity.stage.x) * this.activity.getStageScale() + canvasLeft
+                ) + "px";
             this.label.style.top =
-                Math.round((y + this.blocks.stage.y) * this.blocks.getStageScale() + canvasTop) +
-                "px";
+                Math.round(
+                    (y + this.activity.stage.y) * this.activity.getStageScale() + canvasTop
+                ) + "px";
             this.label.style.width =
                 Math.round((selectorWidth * this.blocks.blockScale * this.protoblock.scale) / 2) +
                 "px";
@@ -3887,7 +3903,7 @@ class Block {
                     uniqueValue = this.blocks.findUniqueCustomName(newValue);
                     newValue = uniqueValue;
                     // eslint-disable-next-line no-case-declarations
-                    let customTemperament = getTemperament("custom");
+                    const customTemperament = getTemperament("custom");
                     // eslint-disable-next-line no-case-declarations
                     let modifiedTemperament = false;
                     for (const pitchNumber in customTemperament) {
@@ -3943,8 +3959,8 @@ class Block {
 
             if (isNaN(this.value)) {
                 const thisBlock = this.blocks.blockList.indexOf(this);
-                this.blocks.errorMsg(newValue + ": " + _("Not a number"), thisBlock);
-                this.blocks.refreshCanvas();
+                this.activity.errorMsg(newValue + ": " + _("Not a number"), thisBlock);
+                this.activity.refreshCanvas();
                 this.value = oldValue;
             }
         } else {
@@ -4089,7 +4105,7 @@ class Block {
                 case "playdrum":
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         if (newValue.slice(0, 4) === "http") {
-                            this.blocks.logo.synth.loadSynth(0, newValue);
+                            this.activity.logo.synth.loadSynth(0, newValue);
                         }
                     }
                     break;
@@ -4111,13 +4127,13 @@ class Block {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             // Load the synth for the selected drum.
             if (this.name === "drumname") {
-                this.blocks.logo.synth.loadSynth(0, getDrumSynthName(this.value));
+                this.activity.logo.synth.loadSynth(0, getDrumSynthName(this.value));
             } else if (this.name === "effectsname") {
-                this.blocks.logo.synth.loadSynth(0, getDrumSynthName(this.value));
+                this.activity.logo.synth.loadSynth(0, getDrumSynthName(this.value));
             } else if (this.name === "voicename") {
-                this.blocks.logo.synth.loadSynth(0, getVoiceSynthName(this.value));
+                this.activity.logo.synth.loadSynth(0, getVoiceSynthName(this.value));
             } else if (this.name === "noisename") {
-                this.blocks.logo.synth.loadSynth(0, getNoiseSynthName(this.value));
+                this.activity.logo.synth.loadSynth(0, getNoiseSynthName(this.value));
             }
         }
     }

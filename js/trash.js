@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2019 Walter Bender
+// Copyright (c) 2014-2021 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -24,17 +24,10 @@ class Trashcan {
 
     /**
      * @constructor
-     * @param {Object} stage
-     * @param {Object} canvas object
-     * @param {number} cellSize
-     * @param {Function} refreshCanvas - function to update canvas changes
      */
-    constructor(stage, canvas, cellSize, refreshCanvas) {
+    constructor(activity) {
+        this.activity = activity;
         this.isVisible = false;
-        this._canvas = canvas;
-        this._stage = stage;
-        this._size = cellSize;
-        this._refreshCanvas = refreshCanvas;
         this._scale = 1;
         this._iconsize = 55; // default value
         this._container = new createjs.Container();
@@ -46,50 +39,10 @@ class Trashcan {
         this._animationLevel = 0;
         this.animationTime = 500;
 
-        this._stage.addChild(this._container);
-        this._stage.setChildIndex(this._container, 0);
+        this.activity.trashContainer.addChild(this._container);
+        this.activity.trashContainer.setChildIndex(this._container, 0);
         this.resizeEvent(1);
         this._makeTrash();
-    }
-
-    /**
-     * @public
-     * @param {Object} canvas - createjs canvas
-     * @returns {Object} createjs canvas
-     */
-    setCanvas(canvas) {
-        this._canvas = canvas;
-        return this;
-    }
-
-    /**
-     * @public
-     * @param {Object} stage
-     * @returns {Object} createjs stage
-     */
-    setStage(stage) {
-        this._stage = stage;
-        return this;
-    }
-
-    /**
-     * @public
-     * @param {number} size
-     * @returns {number} size
-     */
-    setSize(size) {
-        this._size = size;
-        return this;
-    }
-
-    /**
-     * @public
-     * @param { Function } refreshCanvas - function to update canvas changes
-     * @returns {Function} function to refresh canvas after view update
-     */
-    setRefreshCanvas(refreshCanvas) {
-        this._refreshCanvas = refreshCanvas;
-        return this;
     }
 
     /**
@@ -102,8 +55,8 @@ class Trashcan {
 
         img.onload = () => {
             this._borderHighlightBitmap = new createjs.Bitmap(img);
-            this._borderHighlightBitmap.scaleX = this._size / this._iconsize;
-            this._borderHighlightBitmap.scaleY = this._size / this._iconsize;
+            this._borderHighlightBitmap.scaleX = this.activity.cellSize / this._iconsize;
+            this._borderHighlightBitmap.scaleY = this.activity.cellSize / this._iconsize;
             if (!this._isHighlightInitialized) {
                 this._container.visible = false;
                 this._isHighlightInitialized = true;
@@ -144,8 +97,8 @@ class Trashcan {
 
         img.onload = () => {
             const border = new createjs.Bitmap(img);
-            border.scaleX = this._size / this._iconsize;
-            border.scaleY = this._size / this._iconsize;
+            border.scaleX = this.activity.cellSize / this._iconsize;
+            border.scaleY = this.activity.cellSize / this._iconsize;
             this._container.addChild(border);
             this._makeBorderHighlight(false);
         };
@@ -170,10 +123,10 @@ class Trashcan {
             const bitmap = new createjs.Bitmap(img);
             this._container.addChild(bitmap);
             this._iconsize = bitmap.getBounds().width;
-            bitmap.scaleX = this._size / this._iconsize;
-            bitmap.scaleY = this._size / this._iconsize;
-            bitmap.x = ((Trashcan.TRASHWIDTH - this._size) / 2) * bitmap.scaleX;
-            bitmap.y = ((Trashcan.TRASHHEIGHT - this._size) / 2) * bitmap.scaleY;
+            bitmap.scaleX = this.activity.cellSize / this._iconsize;
+            bitmap.scaleY = this.activity.cellSize / this._iconsize;
+            bitmap.x = ((Trashcan.TRASHWIDTH - this.activity.cellSize) / 2) * bitmap.scaleX;
+            bitmap.y = ((Trashcan.TRASHHEIGHT - this.activity.cellSize) / 2) * bitmap.scaleY;
             this._makeBorder();
         };
 
@@ -193,8 +146,8 @@ class Trashcan {
      */
     resizeEvent(scale) {
         this._scale = scale;
-        this._container.x = (this._canvas.width / this._scale - Trashcan.TRASHWIDTH) / 2;
-        this._container.y = this._canvas.height / this._scale - Trashcan.TRASHHEIGHT;
+        this._container.x = (this.activity.canvas.width / this._scale - Trashcan.TRASHWIDTH) / 2;
+        this._container.y = this.activity.canvas.height / this._scale - Trashcan.TRASHHEIGHT;
     }
 
     /**
@@ -232,7 +185,7 @@ class Trashcan {
             if (this._animationLevel >= this.animationTime) {
                 this.isVisible = true;
                 this._makeBorderHighlight(true); // Make it active.
-                this._refreshCanvas();
+                this.activity.refreshCanvas();
                 clearInterval(this._animationInterval); // Autostop animation.
                 return;
             }
@@ -242,7 +195,7 @@ class Trashcan {
                 10
             );
             this._makeBorderHighlight(false);
-            this._refreshCanvas();
+            this.activity.refreshCanvas();
         }, 20);
 
         this._switchHighlightVisibility(true);
@@ -274,7 +227,7 @@ class Trashcan {
         last(this._container.children).visible = bool;
         this._container.children[1].visible = !bool;
         this._container.visible = true;
-        this._refreshCanvas();
+        this.activity.refreshCanvas();
     }
 
     /**

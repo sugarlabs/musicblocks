@@ -10,23 +10,26 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /*
-   global BACKWARDCOMPATIBILIYDICT, COLLAPSIBLES, DEFAULTACCIDENTAL,
+   global
+
+   BACKWARDCOMPATIBILIYDICT, COLLAPSIBLES, DEFAULTACCIDENTAL,
    DEFAULTBLOCKSCALE, DEFAULTDRUM, DEFAULTEFFECT, DEFAULTFILTER,
    DEFAULTFILTERTYPE, DEFAULTINTERVAL, DEFAULTINVERT, DEFAULTMODE,
-   DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT, DEFAULTVOICE,
-   INLINECOLLAPSIBLES, NATURAL, NUMBERBLOCKDEFAULT, SPECIALINPUTS,
-   STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH, _THIS_IS_MUSIC_BLOCKS_,
-   WESTERN2EISOLFEGENAMES, WIDENAMES, _, addTemperamentToDictionary,
-   addTemperamentToList, Block, canvas, closeBlkWidgets, createjs,
-   delayExecution, getDrumSynthName, getNoiseName, getNoiseSynthName,
-   getTemperamentsList, getTextWidth, getVoiceSynthName, i18nSolfege,
-   last, MathUtility, mixedNumber, piemenuBlockContext,
-   prepareMacroExports, ProtoBlock, setOctaveRatio, splitScaleDegree,
-   splitSolfege, sugarizerCompatibility, updateTemperaments
+   DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT,
+   DEFAULTVOICE, INLINECOLLAPSIBLES, NATURAL, NUMBERBLOCKDEFAULT,
+   SPECIALINPUTS, STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
+   _THIS_IS_MUSIC_BLOCKS_, WESTERN2EISOLFEGENAMES, WIDENAMES, _,
+   addTemperamentToDictionary, Block, closeBlkWidgets, createjs,
+   delayExecution, deleteTemperamentFromList, getDrumSynthName,
+   getNoiseName, getNoiseSynthName, getTemperamentsList, getTextWidth,
+   getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,
+   piemenuBlockContext, prepareMacroExports, ProtoBlock,
+   setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments
 */
+
 /* Global locations
    - js/activity.js
-        canvas, createjs
+        createjs
    - js/block.js
         Block
    - js/piemenus.js
@@ -39,7 +42,7 @@
         _, last, closeBlkWidgets, mixedNumber, prepareMacroExports,
         getTextWidth, delayExecution
    - js/utils/musicutils.js
-        addTemperamentToDictionary, addTemperamentToList,
+        addTemperamentToDictionary,
         getDrumSynthName, getNoiseName, getNoiseSynthName,
         getTemperamentsList, getVoiceSynthName, i18nSolfege,
         setOctaveRatio, splitScaleDegree, splitSolfege,
@@ -72,19 +75,13 @@ const PITCHBLOCKS = ["pitch", "steppitch", "hertz", "pitchnumber", "nthmodalpitc
  * @returns {void}
  */
 function Blocks(activity) {
-    if (sugarizerCompatibility.isInsideSugarizer()) {
-        storage = sugarizerCompatibility.data;
-    } else {
-        storage = localStorage;
-    }
-
     this.activity = activity;
-    this.canvas = null;
-    this.stage = null;
-    this.refreshCanvas = null;
-    this.trashcan = null;
-    this.updateStage = null;
-    this.getStageScale = null;
+    this.storage = this.activity.storage;
+    this.trashcan = this.activity.trashcan;
+    this.turtles = this.activity.turtles;
+    this.boundary = this.activity.boundary;
+    this.macroDict = this.activity.macroDict;
+
     // Did the user right cick?
     this.stageClick = false;
 
@@ -119,8 +116,6 @@ function Blocks(activity) {
     this._sizeCounter = 0;
     this._searchCounter = 0;
 
-    // We need a reference to the palettes.
-    this.palettes = null;
     // Which block, if any, is highlighted?
     this.highlightedBlock = null;
     // Which block, if any, is active?
@@ -179,72 +174,6 @@ function Blocks(activity) {
     };
 
     /**
-     * We need access to the canvas.
-     * @param - canvas
-     * @public
-     * @returns this
-     */
-    this.setCanvas = function (canvas) {
-        this.canvas = canvas;
-        return this;
-    };
-
-    /**
-     * We need access to the stage.
-     * @param - stage - staging area
-     * @public
-     * @returns this
-     */
-    this.setStage = function (stage) {
-        this.stage = stage;
-        return this;
-    };
-
-    /**
-     * We need to be able to refreshe the canvas.
-     * @param - refreshCanvas - new variable
-     * @public
-     * @returns this
-     */
-    this.setRefreshCanvas = function (refreshCanvas) {
-        this.refreshCanvas = refreshCanvas;
-        return this;
-    };
-
-    /**
-     * We need to access the trashcan.
-     * @param - trashcan - new variable
-     * @public
-     * @returns this
-     */
-    this.setTrashcan = function (trashcan) {
-        this.trashcan = trashcan;
-        return this;
-    };
-
-    /**
-     * We need to be able to update the stage.
-     * @param - updateStage - new variable
-     * @public
-     * @returns this
-     */
-    this.setUpdateStage = function (updateStage) {
-        this.updateStage = updateStage;
-        return this;
-    };
-
-    /**
-     * We need to access the stage scale.
-     * @param - getStageScale - new variable
-     * @public
-     * @returns this
-     */
-    this.setGetStageScale = function (getStageScale) {
-        this.getStageScale = getStageScale;
-        return this;
-    };
-
-    /**
      * Change the scale of the blocks (and the protoblocks on the palette).
      * @param - scale -new variable
      * @public
@@ -277,81 +206,15 @@ function Blocks(activity) {
 
         // We reset the protoblock scale on the palettes, but don't
         // modify the palettes themselves.
-        for (palette in this.palettes.dict) {
-            for (blk = 0; blk < this.palettes.dict[palette].protoList.length; blk++) {
-                this.palettes.dict[palette].protoList[blk].scale = scale;
+        for (palette in this.activity.palettes.dict) {
+            for (blk = 0; blk < this.activity.palettes.dict[palette].protoList.length; blk++) {
+                this.activity.palettes.dict[palette].protoList[blk].scale = scale;
             }
         }
 
         // Force a refresh.
         await delayExecution(500);
-        this.refreshCanvas();
-    };
-
-    /**
-     * We need to access the message object.
-     * @param - msgText -new variable
-     * @public
-     * @returns {void}
-     */
-    this.setMsgText = function (msgText) {
-        this.msgText = msgText;
-    };
-
-    /**
-     * We need to access the error message object.
-     * @param - errorMsg -new variable
-     * @public
-     * @returns this
-     */
-    this.setErrorMsg = function (errorMsg) {
-        this.errorMsg = errorMsg;
-        return this;
-    };
-
-    /**
-     * We need to access the macro dictionary to add data to it.
-     * @param - obj - object
-     * @public
-     * @returns this
-     */
-    this.setMacroDictionary = function (obj) {
-        this.macroDict = obj;
-        return this;
-    };
-
-    /**
-     * We need access to the turtles list because we associate a turtle
-     * with each start block.
-     * @param - turtles
-     * @public
-     * @returns this
-     */
-    this.setTurtles = function (turtles) {
-        this.turtles = turtles;
-        return this;
-    };
-
-    /**
-     * We need to access "Logo interpreter" when we click on blocks.
-     * @param - logo
-     * @public
-     * @returns this
-     */
-    this.setLogo = function (logo) {
-        this.logo = logo;
-        return this;
-    };
-
-    /**
-     * We need to access the right-click (and long press) context menu.
-     * @param - contextMenu
-     * @public
-     * @returns this
-     */
-    this.setContextMenu = function (contextMenu) {
-        this.contextMenu = contextMenu;
-        return this;
+        this.activity.refreshCanvas();
     };
 
     /**
@@ -360,8 +223,8 @@ function Blocks(activity) {
      * @public
      * @returns this
      */
-
     this.setScale = function (scale) {
+        // Deprecated?
         // this.blockScale = scale;
         return this;
     };
@@ -1150,7 +1013,7 @@ function Blocks(activity) {
                             that.actionHasReturn(parentblk),
                             that.actionHasArgs(parentblk)
                         );
-                        const blockPalette = that.palettes.dict["action"];
+                        const blockPalette = that.activity.palettes.dict["action"];
                         for (let b = 0; b < blockPalette.protoList.length; b++) {
                             const protoblock = blockPalette.protoList[b];
                             if (
@@ -1161,9 +1024,9 @@ function Blocks(activity) {
                                     blockPalette.remove(protoblock, that.blockList[oldBlock].value);
                                     delete that
                                         .protoBlockDict["myDo_" + that.blockList[oldBlock].value];
-                                    // that.palettes.hide();
-                                    that.palettes.updatePalettes("action");
-                                    // that.palettes.show();
+                                    // that.activity.palettes.hide();
+                                    that.activity.palettes.updatePalettes("action");
+                                    // that.activity.palettes.show();
                                 }, 50); // 500
 
                                 break;
@@ -1325,7 +1188,7 @@ function Blocks(activity) {
                  */
                 const postProcess = function (args) {
                     const parentblk = args[0];
-                    const oldBlock = args[1];
+                    // const oldBlock = args[1];
 
                     const blk = that.blockList.length - 1;
                     that.blockList[parentblk].connections[1] = blk;
@@ -1535,7 +1398,7 @@ function Blocks(activity) {
     this.reInitWidget = async function (topBlock, timeout) {
         await delayExecution(timeout);
         if (!this.blockList[topBlock].trash) {
-            this.logo.runLogoCommands(topBlock);
+            this.activity.logo.runLogoCommands(topBlock);
         }
     };
 
@@ -1976,7 +1839,7 @@ function Blocks(activity) {
                             name = this.blockList[connection].value;
                             if (this.protoBlockDict["myDo_" + name] != undefined) {
                                 delete this.protoBlockDict["myDo_" + name];
-                                this.palettes.dict["action"].hideMenu(true);
+                                this.activity.palettes.dict["action"].hideMenu(true);
                             }
 
                             this.newNameddoBlock(
@@ -1984,7 +1847,7 @@ function Blocks(activity) {
                                 this.actionHasReturn(newBlock),
                                 this.actionHasArgs(newBlock)
                             );
-                            const blockPalette = this.palettes.dict["action"];
+                            const blockPalette = this.activity.palettes.dict["action"];
                             for (let b = 0; b < blockPalette.protoList.length; b++) {
                                 const protoblock = blockPalette.protoList[b];
                                 if (
@@ -1999,11 +1862,11 @@ function Blocks(activity) {
                                     delete this.protoBlockDict[
                                         "myDo_" + this.blockList[connection].value
                                     ];
-                                    this.palettes.hide();
-                                    this.palettes.updatePalettes("action");
+                                    this.activity.palettes.hide();
+                                    this.activity.palettes.updatePalettes("action");
 
                                     await delayExecution(500);
-                                    this.palettes.show();
+                                    this.activity.palettes.show();
                                     break;
                                 }
                             }
@@ -2019,7 +1882,7 @@ function Blocks(activity) {
                             this.newStorein2Block(myBlock.value);
                             this.newNamedboxBlock(myBlock.value);
                             await delayExecution(50);
-                            this.palettes.updatePalettes("boxes");
+                            this.activity.palettes.updatePalettes("boxes");
                         }
                     }
                 } else if (myBlock.protoblock.style === "argclamparg") {
@@ -2219,7 +2082,7 @@ function Blocks(activity) {
         }
 
         this.adjustExpandableClampBlock();
-        this.refreshCanvas();
+        this.activity.refreshCanvas();
     };
 
     /**
@@ -2377,7 +2240,7 @@ function Blocks(activity) {
             this.raiseStackToTop(this._adjustTheseStacks[blk]);
         }
 
-        this.refreshCanvas();
+        this.activity.refreshCanvas();
     };
 
     /**
@@ -2390,7 +2253,7 @@ function Blocks(activity) {
         for (let blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].connections[0] == null) {
                 if (this.blockList[blk].offScreen(this.boundary)) {
-                    this._setHomeButtonContainers(true, false);
+                    this.activity.setHomeContainers(true);
                     // Just highlight the button.
                     // this.boundary.show();
                     onScreen = false;
@@ -2400,7 +2263,7 @@ function Blocks(activity) {
         }
 
         if (onScreen) {
-            this._setHomeButtonContainers(false, true);
+            this.activity.setHomeContainers(false);
             this.boundary.hide();
         }
     };
@@ -2981,7 +2844,7 @@ function Blocks(activity) {
     this._expandTwoArgs = function () {
         this._findTwoArgs();
         this._adjustExpandableTwoArgBlock(this._expandablesList);
-        this.refreshCanvas();
+        this.activity.refreshCanvas();
     };
 
     /**
@@ -3002,7 +2865,7 @@ function Blocks(activity) {
         }
 
         this.adjustExpandableClampBlock();
-        this.refreshCanvas();
+        this.activity.refreshCanvas();
     };
 
     /**
@@ -3167,7 +3030,7 @@ function Blocks(activity) {
         // If we drag in a synth block, we need to load the synth.
         if (["sine", "sawtooth", "triangle", "square"].indexOf(name) !== -1) {
             if (_THIS_IS_MUSIC_BLOCKS_) {
-                this.logo.synth.loadSynth(0, name);
+                this.activity.logo.synth.loadSynth(0, name);
             }
         }
 
@@ -3207,7 +3070,7 @@ function Blocks(activity) {
 
         // We need a container for the block graphics.
         myBlock.container = new createjs.Container();
-        this.stage.addChild(myBlock.container);
+        this.activity.blocksContainer.addChild(myBlock.container);
         myBlock.container.snapToPixelEnabled = true;
         myBlock.container.x = 0;
         myBlock.container.y = 0;
@@ -3242,6 +3105,7 @@ function Blocks(activity) {
                     that.blockList[thisBlock].text.text = _(value);
                     break;
                 case "noisename":
+                    // FIXME: where do we use this?
                     label = getNoiseName(value);
                     break;
                 case "temperamentname":
@@ -3301,10 +3165,10 @@ function Blocks(activity) {
         } else if (name === "scaledegree2") {
             postProcessArg = [thisBlock, "5"];
         } else if (name === "customNote") {
-            const len = this.logo.synth.startingPitch.length;
+            const len = this.activity.logo.synth.startingPitch.length;
             postProcessArg = [
                 thisBlock,
-                this.logo.synth.startingPitch.substring(0, len - 1) + "(+0)"
+                this.activity.logo.synth.startingPitch.substring(0, len - 1) + "(+0)"
             ];
         } else if (name === "notename") {
             postProcessArg = [thisBlock, "G"];
@@ -3378,7 +3242,7 @@ function Blocks(activity) {
             postProcessArg = [thisBlock, NUMBERBLOCKDEFAULT];
         } else if (name === "loudness" || name === "pitchness") {
             postProcess = function () {
-                that.logo.initMediaDevices();
+                that.activity.logo.initMediaDevices();
             };
         } else if (name === "media") {
             postProcess = function (args) {
@@ -3443,8 +3307,8 @@ function Blocks(activity) {
 
             postProcessArg = [thisBlock, arg];
         } else if (name === "newnote") {
+            // eslint-disable-next-line no-unused-vars
             postProcess = function (args) {};
-
             postProcessArg = [thisBlock, null];
         } else {
             postProcess = null;
@@ -3531,9 +3395,9 @@ function Blocks(activity) {
                 if (value !== _("action")) {
                     // TODO: are there return or arg blocks?
                     this.newNameddoBlock(value, false, false);
-                    // this.palettes.hide();
-                    this.palettes.updatePalettes("action");
-                    // this.palettes.show();
+                    // this.activity.palettes.hide();
+                    this.activity.palettes.updatePalettes("action");
+                    // this.activity.palettes.show();
                 }
             }
 
@@ -3641,7 +3505,7 @@ function Blocks(activity) {
         // Generate and position the block bitmaps and labels
         this.updateBlockPositions();
         this.adjustDocks(blk, true);
-        this.refreshCanvas();
+        this.activity.refreshCanvas();
 
         return blk;
     };
@@ -3725,7 +3589,7 @@ function Blocks(activity) {
      */
     this.setActionProtoVisiblity = function (state) {
         // By default, the nameddo protoblock is hidden.
-        const actionsPalette = this.palettes.dict["action"];
+        const actionsPalette = this.activity.palettes.dict["action"];
         let stateChanged = false;
         for (let blockId = 0; blockId < actionsPalette.protoList.length; blockId++) {
             const block = actionsPalette.protoList[blockId];
@@ -3739,9 +3603,9 @@ function Blocks(activity) {
 
         // Force an update if the name has changed.
         if (stateChanged) {
-            // this.palettes.hide();
-            this.palettes.updatePalettes("action");
-            // this.palettes.show();
+            // this.activity.palettes.hide();
+            this.activity.palettes.updatePalettes("action");
+            // this.activity.palettes.show();
         }
     };
 
@@ -3856,7 +3720,7 @@ function Blocks(activity) {
                 ) {
                     if (this.blockList[blk].value.slice(0, 4) === "http") {
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.logo.synth.loadSynth(0, this.blockList[blk].value);
+                            this.activity.logo.synth.loadSynth(0, this.blockList[blk].value);
                         }
                     }
                 }
@@ -4108,7 +3972,7 @@ function Blocks(activity) {
         }
 
         // Update the palette
-        const actionsPalette = this.palettes.dict["action"];
+        const actionsPalette = this.activity.palettes.dict["action"];
         let nameChanged = false;
         for (let blockId = 0; blockId < actionsPalette.protoList.length; blockId++) {
             const block = actionsPalette.protoList[blockId];
@@ -4124,9 +3988,9 @@ function Blocks(activity) {
 
         // Force an update if the name has changed.
         if (nameChanged) {
-            // this.palettes.hide();
-            this.palettes.updatePalettes("action");
-            // this.palettes.show();
+            // this.activity.palettes.hide();
+            this.activity.palettes.updatePalettes("action");
+            // this.activity.palettes.show();
         }
     };
 
@@ -4155,7 +4019,7 @@ function Blocks(activity) {
         // console.debug('new storein block ' + name);
         const myStoreinBlock = new ProtoBlock("storein");
         this.protoBlockDict["myStorein_" + name] = myStoreinBlock;
-        myStoreinBlock.palette = this.palettes.dict["boxes"];
+        myStoreinBlock.palette = this.activity.palettes.dict["boxes"];
         myStoreinBlock.defaults.push(name);
         myStoreinBlock.defaults.push(NUMBERBLOCKDEFAULT);
         myStoreinBlock.staticLabels.push(_("store in"), _("name"), _("value"));
@@ -4166,7 +4030,7 @@ function Blocks(activity) {
 
         if (name !== "box") {
             // Add the new block to the top of the palette.
-            this.palettes.dict["boxes"].add(myStoreinBlock, true);
+            this.activity.palettes.dict["boxes"].add(myStoreinBlock, true);
         }
     };
 
@@ -4191,7 +4055,7 @@ function Blocks(activity) {
 
         const myStorein2Block = new ProtoBlock("storein2");
         this.protoBlockDict["yourStorein2_" + name] = myStorein2Block;
-        myStorein2Block.palette = this.palettes.dict["boxes"];
+        myStorein2Block.palette = this.activity.palettes.dict["boxes"];
         myStorein2Block.defaults.push(name);
         myStorein2Block.staticLabels.push(name);
         myStorein2Block.adjustWidthToLabel();
@@ -4200,7 +4064,7 @@ function Blocks(activity) {
 
         if (name !== "box") {
             // Add the new block to the top of the palette.
-            this.palettes.dict["boxes"].add(myStorein2Block, true);
+            this.activity.palettes.dict["boxes"].add(myStorein2Block, true);
         }
     };
 
@@ -4225,7 +4089,7 @@ function Blocks(activity) {
 
         const myBoxBlock = new ProtoBlock("namedbox");
         this.protoBlockDict["myBox_" + name] = myBoxBlock;
-        myBoxBlock.palette = this.palettes.dict["boxes"];
+        myBoxBlock.palette = this.activity.palettes.dict["boxes"];
         myBoxBlock.defaults.push(name);
         myBoxBlock.staticLabels.push(name);
         myBoxBlock.parameterBlock();
@@ -4252,7 +4116,7 @@ function Blocks(activity) {
 
         const myNamedArgBlock = new ProtoBlock("namedarg");
         this.protoBlockDict["myArg_" + blkname] = myNamedArgBlock;
-        myNamedArgBlock.palette = this.palettes.dict["action"];
+        myNamedArgBlock.palette = this.activity.palettes.dict["action"];
         myNamedArgBlock.defaults.push(name);
         myNamedArgBlock.staticLabels.push("arg " + name);
         myNamedArgBlock.parameterBlock();
@@ -4266,7 +4130,7 @@ function Blocks(activity) {
         // Force regeneration of palette after adding new block.
         // Add delay to avoid race condition.
         await delayExecution(100);
-        this.palettes.updatePalettes("action");
+        this.activity.palettes.updatePalettes("action");
     };
 
     /**
@@ -4319,12 +4183,12 @@ function Blocks(activity) {
         } else if (this.protoBlockDict["myDo_" + name] === undefined) {
             const myDoBlock = new ProtoBlock("nameddo");
             this.protoBlockDict["myDo_" + name] = myDoBlock;
-            myDoBlock.palette = this.palettes.dict["action"];
+            myDoBlock.palette = this.activity.palettes.dict["action"];
             myDoBlock.defaults.push(name);
             myDoBlock.staticLabels.push(name);
             myDoBlock.zeroArgBlock();
             myDoBlock.palette.add(myDoBlock, true);
-            this.palettes.updatePalettes();
+            this.activity.palettes.updatePalettes();
             return true;
         }
 
@@ -4341,7 +4205,7 @@ function Blocks(activity) {
         if (this.protoBlockDict["myCalc_" + name] === undefined) {
             const myCalcBlock = new ProtoBlock("namedcalc");
             this.protoBlockDict["myCalc_" + name] = myCalcBlock;
-            myCalcBlock.palette = this.palettes.dict["action"];
+            myCalcBlock.palette = this.activity.palettes.dict["action"];
             myCalcBlock.defaults.push(name);
             myCalcBlock.staticLabels.push(name);
             myCalcBlock.zeroArgBlock();
@@ -4363,7 +4227,7 @@ function Blocks(activity) {
         if (this.protoBlockDict["myDoArg_" + name] === undefined) {
             const myDoArgBlock = new ProtoBlock("nameddoArg");
             this.protoBlockDict["myDoArg_" + name] = myDoArgBlock;
-            myDoArgBlock.palette = this.palettes.dict["action"];
+            myDoArgBlock.palette = this.activity.palettes.dict["action"];
             myDoArgBlock.defaults.push(name);
             myDoArgBlock.staticLabels.push(name);
             myDoArgBlock.zeroArgBlock();
@@ -4385,7 +4249,7 @@ function Blocks(activity) {
         if (this.protoBlockDict["myCalcArg_" + name] === undefined) {
             const myCalcArgBlock = new ProtoBlock("namedcalcArg");
             this.protoBlockDict["myCalcArg_" + name] = myCalcArgBlock;
-            myCalcArgBlock.palette = this.palettes.dict["action"];
+            myCalcArgBlock.palette = this.activity.palettes.dict["action"];
             myCalcArgBlock.defaults.push(name);
             myCalcArgBlock.staticLabels.push(name);
             myCalcArgBlock.zeroArgBlock();
@@ -5047,16 +4911,14 @@ function Blocks(activity) {
         }
 
         // First, hide the palettes as they will need updating.
-        for (const name in this.palettes.dict) {
-            this.palettes.dict[name].hideMenu(true);
+        for (const name in this.activity.palettes.dict) {
+            this.activity.palettes.dict[name].hideMenu(true);
         }
 
         // Reposition the paste location relative to the stage position.
-        // eslint-disable-next-line no-console
-        console.debug(this.selectedBlocksObj);
         if (this.selectedBlocksObj != null) {
-            this.selectedBlocksObj[0][2] = 175 - this.stage.x + this.pasteDx;
-            this.selectedBlocksObj[0][3] = 75 - this.stage.y + this.pasteDy;
+            this.selectedBlocksObj[0][2] = 175 - this.activity.blocksContainer.x + this.pasteDx;
+            this.selectedBlocksObj[0][3] = 75 - this.activity.blocksContainer.y + this.pasteDy;
             this.pasteDx += 21;
             this.pasteDy += 21;
             this.loadNewBlocks(this.selectedBlocksObj);
@@ -5117,16 +4979,9 @@ function Blocks(activity) {
             }
         }
 
-        storage.macros = prepareMacroExports(name, blockObjs, this.macroDict);
-        if (sugarizerCompatibility.isInsideSugarizer()) {
-            sugarizerCompatibility.saveLocally(function () {
-                this.addToMyPalette(name, blockObjs);
-                // this.palettes.updatePalettes('myblocks');
-            });
-        } else {
-            this.addToMyPalette(name, blockObjs);
-            this.palettes.updatePalettes("myblocks");
-        }
+        this.storage.macros = prepareMacroExports(name, blockObjs, this.macroDict);
+        this.addToMyPalette(name, blockObjs);
+        this.activity.palettes.updatePalettes("myblocks");
     };
 
     /**
@@ -5145,8 +5000,8 @@ function Blocks(activity) {
         for (let b = 0; b < this.dragGroup.length; b++) {
             const myBlock = this.blockList[this.dragGroup[b]];
             if (b === 0) {
-                x = 75 - this.stage.x;
-                y = 75 - this.stage.y;
+                x = 75 - this.activity.blocksContainer.x;
+                y = 75 - this.activity.blocksContainer.y;
             } else {
                 x = 0;
                 y = 0;
@@ -5218,11 +5073,11 @@ function Blocks(activity) {
         this.protoBlockDict[blkName] = myBlock;
         // eslint-disable-next-line no-console
         console.debug("Adding " + name + " to myblocks palette");
-        if (!("myblocks" in this.palettes.dict)) {
-            this.palettes.add("myblocks");
+        if (!("myblocks" in this.activity.palettes.dict)) {
+            this.activity.palettes.add("myblocks");
         }
 
-        myBlock.palette = this.palettes.dict["myblocks"];
+        myBlock.palette = this.activity.palettes.dict["myblocks"];
         myBlock.zeroArgBlock();
         myBlock.staticLabels.push(_(name));
         this.protoBlockDict[blkName].palette.add(this.protoBlockDict[blkName]);
@@ -5505,7 +5360,7 @@ function Blocks(activity) {
         }
 
         if (updatePalettes) {
-            this.palettes.updatePalettes("action");
+            this.activity.palettes.updatePalettes("action");
         }
 
         // This section of the code attempts to repair imported
@@ -5785,6 +5640,7 @@ function Blocks(activity) {
             let text;
             let collapsed = false;
             if (COLLAPSIBLES.indexOf(name) !== -1) {
+                // FIXME -- where do we use this?
                 collapsed = blkInfo[1]["collapsed"];
             }
 
@@ -5841,22 +5697,26 @@ function Blocks(activity) {
                     break;
                 case "temperament1":
                     postProcess = function (args) {
-                        const thisBlock = args[0];
                         const value = args[1];
-                        if (value.customTemperamentNotes !== undefined) {
-                            for (const key in value.customTemperamentNotes) {
-                                addTemperamentToDictionary(key, value.customTemperamentNotes[key]);
-                                addTemperamentToList(key);
-                            }
-                            updateTemperaments();
-                            that.logo.synth.startingPitch = value.startingPitch;
-                            setOctaveRatio(value.octaveSpace);
-                            that.logo.customTemperamentDefined = true; //This is for custom pitch pie menu
-
-                            // if temperament is defined "customPitch" should be available
-                            that.logo.blocks.protoBlockDict["custompitch"].hidden = false;
-                            that.logo.blocks.palettes.updatePalettes("pitch");
+                        let customName = "custom";
+                        if (value.customName !== undefined) {
+                            customName = value.customName;
                         }
+                        if (value.customTemperamentNotes !== undefined) {
+                            deleteTemperamentFromList(customName);
+                            addTemperamentToDictionary(customName, value.customTemperamentNotes);
+                            updateTemperaments();
+                        }
+                        // Is this correct?
+                        if (value.startingPitch !== undefined) {
+                            that.activity.logo.synth.startingPitch = value.startingPitch;
+                        }
+                        if (value.octaveSpace !== undefined) {
+                            setOctaveRatio(value.octaveSpace);
+                        }
+                        that.activity.logo.customTemperamentDefined = true;
+                        that.protoBlockDict["custompitch"].hidden = false;
+                        that.activity.palettes.updatePalettes("pitch");
                     };
                     this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [
                         thisBlock,
@@ -6162,7 +6022,7 @@ function Blocks(activity) {
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         // Load the synth for this drum
                         if (value === null) value = DEFAULTDRUM;
-                        this.logo.synth.loadSynth(0, getDrumSynthName(value));
+                        that.activity.logo.synth.loadSynth(0, getDrumSynthName(value));
                     }
                     break;
                 case "effectsname":
@@ -6181,7 +6041,7 @@ function Blocks(activity) {
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         // Load the synth for this drum
                         if (value === null) value = DEFAULTEFFECT;
-                        this.logo.synth.loadSynth(0, getDrumSynthName(value));
+                        that.activity.logo.synth.loadSynth(0, getDrumSynthName(value));
                     }
                     break;
                 case "voicename":
@@ -6209,7 +6069,7 @@ function Blocks(activity) {
                             if (value === null) {
                                 value = DEFAULTVOICE;
                             }
-                            this.logo.synth.loadSynth(0, getVoiceSynthName(value));
+                            this.activity.logo.synth.loadSynth(0, getVoiceSynthName(value));
                         } catch (e) {
                             // eslint-disable-next-line no-console
                             console.debug(e);
@@ -6235,7 +6095,7 @@ function Blocks(activity) {
                             if (value === null) {
                                 value = DEFAULTNOISE;
                             }
-                            this.logo.synth.loadSynth(0, getNoiseSynthName(value));
+                            this.activity.logo.synth.loadSynth(0, getNoiseSynthName(value));
                         } catch (e) {
                             // eslint-disable-next-line no-console
                             console.debug(e);
@@ -6245,7 +6105,7 @@ function Blocks(activity) {
                 case "loudness":
                 case "pitchness":
                     this._makeNewBlockWithConnections(name, blockOffset, blkData[4], null, []);
-                    this.logo.initMediaDevices();
+                    this.activity.logo.initMediaDevices();
                     break;
                 case "media":
                     // Load a thumbnail into a media blocks.
@@ -6526,10 +6386,10 @@ function Blocks(activity) {
                     if (
                         blkData[2] < 0 ||
                         blkData[3] < 0 ||
-                        blkData[2] > canvas.width ||
-                        blkData[3] > canvas.height
+                        blkData[2] > this.activity.canvas.width ||
+                        blkData[3] > this.activity.canvas.height
                     ) {
-                        this._setHomeButtonContainers(true, false);
+                        this.activity.setHomeContainers(true);
                     }
                 }
             }
@@ -6542,6 +6402,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
+    // eslint-disable-next-line no-unused-vars
     this.cleanupAfterLoad = async function (name) {
         this._loadCounter -= 1;
         if (this._loadCounter > 0) {
@@ -6560,7 +6421,7 @@ function Blocks(activity) {
 
         this.blocksToCollapse = [];
 
-        this.refreshCanvas();
+        this.activity.refreshCanvas();
 
         // Do a final check on the action and boxes palettes.
         let updatePalettes = false;
@@ -6583,7 +6444,7 @@ function Blocks(activity) {
         }
 
         if (updatePalettes) {
-            this.palettes.updatePalettes("action");
+            this.activity.palettes.updatePalettes("action");
         }
 
         updatePalettes = false;
@@ -6613,11 +6474,9 @@ function Blocks(activity) {
             // Do this update on a slight delay so as not to collide with
             // the actions update.
             await delayExecution(150);
-            this.palettes.updatePalettes("boxes");
+            this.activity.palettes.updatePalettes("boxes");
         }
 
-        // eslint-disable-next-line no-console
-        console.debug("Finished block loading");
         document.body.style.cursor = "default";
         document.getElementById("load-container").style.display = "none";
         const myCustomEvent = new Event("finishedLoading");
@@ -6718,13 +6577,13 @@ function Blocks(activity) {
         const topBlk = this.findTopBlock(blk);
         this.findDragGroup(topBlk);
 
-        let z = this.stage.children.length - 1;
+        let z = this.activity.blocksContainer.children.length - 1;
         for (let b = 0; b < this.dragGroup.length; b++) {
-            this.stage.setChildIndex(this.blockList[this.dragGroup[b]].container, z);
+            this.activity.blocksContainer.setChildIndex(this.blockList[this.dragGroup[b]].container, z);
             z -= 1;
         }
 
-        this.refreshCanvas;
+        this.activity.refreshCanvas;
     };
 
     /**
@@ -6820,7 +6679,7 @@ function Blocks(activity) {
             const timeout = this.deleteActionTimeout;
             await delayExecution(timeout);
             this.deleteActionTimeout -= 50;
-            this.palettes.removeActionPrototype(actionName);
+            this.activity.palettes.removeActionPrototype(actionName);
         }
     };
 
@@ -6832,11 +6691,11 @@ function Blocks(activity) {
      */
     this.sendStackToTrash = function (myBlock) {
         // First, hide the palettes as they may need updating.
-        for (const name in this.palettes.dict) {
-            this.palettes.dict[name].hideMenu(true);
+        for (const name in this.activity.palettes.dict) {
+            this.activity.palettes.dict[name].hideMenu(true);
         }
 
-        this.refreshCanvas();
+        this.activity.refreshCanvas();
 
         const thisBlock = this.blockList.indexOf(myBlock);
 
@@ -6875,7 +6734,7 @@ function Blocks(activity) {
             this.blockList[blk].hide();
             const title = this.blockList[blk].protoblock.staticLabels[0];
             closeBlkWidgets(_(title));
-            this.refreshCanvas();
+            this.activity.refreshCanvas();
         }
 
         // Adjust the stack from which we just deleted blocks.
@@ -6909,7 +6768,7 @@ function Blocks(activity) {
             }
 
             this._cleanupStacks();
-            this.refreshCanvas();
+            this.activity.refreshCanvas();
         }
     };
 
@@ -6929,7 +6788,7 @@ function Blocks(activity) {
                 this.blockList[blk].container.updateCache();
             }
         }
-        this.refreshCanvas();
+        this.activity.refreshCanvas();
     };
 
     /***
@@ -6969,7 +6828,7 @@ function Blocks(activity) {
             }
 
             this.blockList[blk].container.updateCache();
-            this.refreshCanvas();
+            this.activity.refreshCanvas();
         }
     };
 
@@ -7000,20 +6859,20 @@ function Blocks(activity) {
      * @returnss {void}
      */
     this.hideBlocks = function () {
-        this.palettes.hide();
+        this.activity.palettes.hide();
         this.hide();
-        this.refreshCanvas();
+        this.activity.refreshCanvas();
     };
 
     /***
      * Shows all the blocks.
      *
-     * @returnss {void}
+     * @returns {void}
      */
     this.showBlocks = function () {
-        this.palettes.show();
+        this.activity.palettes.show();
         this.show();
         this.bringToTop();
-        this.refreshCanvas();
+        this.activity.refreshCanvas();
     };
 }

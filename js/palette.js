@@ -1,4 +1,4 @@
-// Copyright (c) 2014-19 Walter Bender
+// Copyright (c) 2014-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -9,10 +9,22 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/*
+   global
+
+   _, docById, LEADING, DEFAULTPALETTE, MULTIPALETTES, platformColor,
+   PALETTEICONS, MULTIPALETTEICONS, SKIPPALETTES, toTitleCase,
+   i18nSolfege, NUMBERBLOCKDEFAULT, TEXTWIDTH, STRINGLEN,
+   DEFAULTBLOCKSCALE, SVG, DISABLEDFILLCOLOR, DISABLEDSTROKECOLOR,
+   PALETTEFILLCOLORS, PALETTESTROKECOLORS, last, getTextWidth,
+   STANDARDBLOCKHEIGHT, CLOSEICON, UPICON, DOWNICON, BUILTINPALETTES,
+   safeSVG, blockIsMacro, getMacroExpansion
+*/
+
+/* exported Palettes, initPalettes */
+
 // All things related to palettes
 
-const PROTOBLOCKSCALE = 0.75;
-const PALETTELEFTMARGIN = Math.floor(10 * PROTOBLOCKSCALE);
 const PALETTE_SCALE_FACTOR = 0.5;
 const PALETTE_WIDTH_FACTOR = 3;
 
@@ -32,12 +44,20 @@ function paletteBlockButtonPush(blocks, name, arg) {
 // the palette container.
 //
 // loadPaletteMenuItemHandler is the event handler for the palette menu.
-const NPALETTES = 3;
+
+function makePaletteIcons(data, width, height) {
+    const img = new Image();
+    img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(data)));
+    if (width) img.width = width;
+    if (height) img.height = height;
+    return img;
+}
 
 class Palettes {
-    constructor() {
-        this.blocks = null;
-        this.cellSize = null;
+    constructor(activity) {
+        this.activity = activity;
+        // this.blocks = null;
+        this.cellSize = Math.floor(this.activity.cellSize * PALETTE_SCALE_FACTOR + 0.5);
         this.paletteWidth = 55 * PALETTE_WIDTH_FACTOR;
         this.scrollDiff = 0;
         this.originalSize = 55; // this is the original svg size
@@ -56,16 +76,8 @@ class Palettes {
         this.current = DEFAULTPALETTE;
         this.x = []; // We track x and y for each of the multipalettes
         this.y = [];
-        this.showSearchWidget = null;
-        this.hideSearchWidget = null;
 
         this.pluginMacros = {}; // some macros are defined in plugins
-
-        if (sugarizerCompatibility.isInsideSugarizer()) {
-            storage = sugarizerCompatibility.data;
-        } else {
-            storage = localStorage;
-        }
 
         // The collection of palettes.
         this.dict = {};
@@ -92,6 +104,7 @@ class Palettes {
     }
 
     _makeSelectorButton(i) {
+        // eslint-disable-next-line no-console
         console.debug("makeSelectorButton " + i);
 
         if (!document.getElementById("palette")) {
@@ -195,8 +208,8 @@ class Palettes {
     }
 
     setSearch(show, hide) {
-        this.showSearchWidget = show;
-        this.hideSearchWidget = hide;
+        this.activity.showSearchWidget = show;
+        this.activity.hideSearchWidget = hide;
         return this;
     }
 
@@ -205,6 +218,7 @@ class Palettes {
     }
 
     getPluginMacroExpansion(blkname, x, y) {
+        // eslint-disable-next-line no-console
         console.debug(this.pluginMacros[blkname]);
         const obj = this.pluginMacros[blkname];
         if (obj != null) {
@@ -218,10 +232,10 @@ class Palettes {
     countProtoBlocks(name) {
         // How many protoblocks are in palette name?
         let n = 0;
-        for (const b in this.blocks.protoBlockDict) {
+        for (const b in this.activity.blocks.protoBlockDict) {
             if (
-                this.blocks.protoBlockDict[b].palette !== null &&
-                this.blocks.protoBlockDict[b].palette.name === name
+                this.activity.blocks.protoBlockDict[b].palette !== null &&
+                this.activity.blocks.protoBlockDict[b].palette.name === name
             ) {
                 n += 1;
             }
@@ -231,22 +245,22 @@ class Palettes {
     }
 
     getProtoNameAndPalette(name) {
-        for (const b in this.blocks.protoBlockDict) {
+        for (const b in this.activity.blocks.protoBlockDict) {
             // Don't return deprecated blocks.
             if (
-                name === this.blocks.protoBlockDict[b].name &&
-                !this.blocks.protoBlockDict[b].hidden
+                name === this.activity.blocks.protoBlockDict[b].name &&
+                !this.activity.blocks.protoBlockDict[b].hidden
             ) {
                 return [
                     b,
-                    this.blocks.protoBlockDict[b].palette.name,
-                    this.blocks.protoBlockDict[b].name
+                    this.activity.blocks.protoBlockDict[b].palette.name,
+                    this.activity.blocks.protoBlockDict[b].name
                 ];
-            } else if (name === b && !this.blocks.protoBlockDict[b].hidden) {
+            } else if (name === b && !this.activity.blocks.protoBlockDict[b].hidden) {
                 return [
                     b,
-                    this.blocks.protoBlockDict[b].palette.name,
-                    this.blocks.protoBlockDict[b].name
+                    this.activity.blocks.protoBlockDict[b].palette.name,
+                    this.activity.blocks.protoBlockDict[b].name
                 ];
             }
         }
@@ -266,7 +280,7 @@ class Palettes {
             listBody
         );
         for (const name of MULTIPALETTES[i]) {
-            if (beginnerMode && SKIPPALETTES.indexOf(name) !== -1) {
+            if (this.activity.beginnerMode && SKIPPALETTES.indexOf(name) !== -1) {
                 continue;
             }
             if (name === "myblocks") {
@@ -306,7 +320,7 @@ class Palettes {
             return;
         }
 
-        this.hideSearchWidget(true);
+        this.activity.hideSearchWidget(true);
         this.dict[name].showMenu(true);
         this.activePalette = name;  // used to delete plugins
     }
@@ -316,7 +330,7 @@ class Palettes {
     _hideMenus() {
         // Hide the menu buttons and the palettes themselves.
 
-        this.hideSearchWidget(true);
+        this.activity.hideSearchWidget(true);
 
         if (docById("PaletteBody"))
             docById("PaletteBody").parentNode.removeChild(docById("PaletteBody"));
@@ -324,6 +338,7 @@ class Palettes {
 
     getInfo() {
         for (const key in this.dict) {
+            // eslint-disable-next-line no-console
             console.debug(this.dict[key].getInfo());
         }
     }
@@ -364,13 +379,15 @@ class Palettes {
     }
 
     add(name) {
+        // eslint-disable-next-line no-use-before-define
         this.dict[name] = new Palette(this, name);
         return this;
     }
 
     // Palette Button event handlers
     _loadPaletteButtonHandler(name, row) {
-        row.onmouseover = (evt) => {
+        // eslint-disable-next-line no-unused-vars
+        row.onmouseover = (event) => {
             if(name == "search"){
                 document.body.style.cursor = "text";
             }
@@ -379,17 +396,23 @@ class Palettes {
             }
 
         };
-        row.onclick = (evt) => {
+
+        // eslint-disable-next-line no-unused-vars
+        row.onclick = (event) => {
             if (name == "search") {
-                this.showSearchWidget();
+                this.activity.showSearchWidget();
             } else {
                 this.showPalette(name);
             }
         };
-        row.onmouseup = (evt) => {
+
+        // eslint-disable-next-line no-unused-vars
+        row.onmouseup = (event) => {
             document.body.style.cursor = "default";
         };
-        row.onmouseleave = (evt) => {
+
+        // eslint-disable-next-line no-unused-vars
+        row.onmouseleave = (event) => {
             document.body.style.cursor = "default";
         };
     }
@@ -407,14 +430,14 @@ class Palettes {
                 this.dict["action"].remove(actionBlock, actionName);
 
                 // And remove it from the protoBlock dictionary.
-                if (this.blocks.protoBlockDict["myDo_" + actionName]) {
-                    delete this.blocks.protoBlockDict["myDo_" + actionName];
-                } else if (this.blocks.protoBlockDict["myCalc_" + actionName]) {
-                    delete this.blocks.protoBlockDict["myCalc_" + actionName];
-                } else if (this.blocks.protoBlockDict["myDoArg_" + actionName]) {
-                    delete this.blocks.protoBlockDict["myDoArg_" + actionName];
-                } else if (this.blocks.protoBlockDict["myCalcArg_" + actionName]) {
-                    delete this.blocks.protoBlockDict["myCalcArg_" + actionName];
+                if (this.activity.blocks.protoBlockDict["myDo_" + actionName]) {
+                    delete this.activity.blocks.protoBlockDict["myDo_" + actionName];
+                } else if (this.activity.blocks.protoBlockDict["myCalc_" + actionName]) {
+                    delete this.activity.blocks.protoBlockDict["myCalc_" + actionName];
+                } else if (this.activity.blocks.protoBlockDict["myDoArg_" + actionName]) {
+                    delete this.activity.blocks.protoBlockDict["myDoArg_" + actionName];
+                } else if (this.activity.blocks.protoBlockDict["myCalcArg_" + actionName]) {
+                    delete this.activity.blocks.protoBlockDict["myCalcArg_" + actionName];
                 }
                 blockRemoved = true;
                 break;
@@ -433,6 +456,7 @@ class PaletteModel {
     constructor(palette, palettes, name) {
         this.palette = palette;
         this.palettes = palettes;
+        this.activity = palettes.activity;
         this.name = name;
         this.blocks = [];
     }
@@ -524,8 +548,9 @@ class PaletteModel {
                 break;
         }
 
-        const protoBlock = this.palettes.blocks.protoBlockDict[blkname];
+        const protoBlock = this.activity.blocks.protoBlockDict[blkname];
         if (protoBlock === null) {
+            // eslint-disable-next-line no-console
             console.debug("Could not find block " + blkname);
         }
 
@@ -658,7 +683,7 @@ class PaletteModel {
         switch (protoBlock.name) {
             case "namedbox":
             case "namedarg":
-                // so the label will fit
+                // So the label will fit...
                 svg = new SVG();
                 svg.setScale(protoBlock.scale);
                 svg.setExpand(60, 0, 0, 0);
@@ -668,7 +693,7 @@ class PaletteModel {
                 height = svg.getHeight();
                 break;
             case "nameddo":
-                // so the label will fit
+                // So the label will fit...
                 svg = new SVG();
                 svg.setScale(protoBlock.scale);
                 svg.setExpand(60, 0, 0, 0);
@@ -677,6 +702,7 @@ class PaletteModel {
                 height = svg.getHeight();
                 break;
             default:
+                // eslint-disable-next-line no-case-declarations
                 const obj = protoBlock.generator();
                 artwork = obj[0];
                 docks = obj[1];
@@ -725,6 +751,7 @@ class PaletteModel {
 class Palette {
     constructor(palettes, name) {
         this.palettes = palettes;
+        this.activity = palettes.activity;
         this.name = name;
         this.model = new PaletteModel(this, palettes, name);
         this.visible = false;
@@ -820,7 +847,9 @@ class Palette {
 
         const updateScrollBtnVisibility = () => {
             const list = docById("PaletteBody_items");
+            // eslint-disable-next-line no-use-before-define
             upBtn.style.opacity = list.scrollTop === 0 ? "0" : "0.3";
+            // eslint-disable-next-line no-use-before-define
             dnBtn.style.opacity =
                 list.scrollTop >= list.scrollHeight - list.offsetHeight ? "0" : "0.3";
         };
@@ -844,8 +873,8 @@ class Palette {
     }
 
     _hideMenuItems() {
-        if (this.name === "search" && this.palettes.hideSearchWidget !== null) {
-            this.palettes.hideSearchWidget(true);
+        if (this.name === "search" && this.activity.hideSearchWidget !== null) {
+            this.activity.hideSearchWidget(true);
         }
         if (docById("PaletteBody")) docById("palette").removeChild(docById("PaletteBody"));
     }
@@ -915,14 +944,14 @@ class Palette {
                 document.addEventListener("touchmove", onMouseMove);
                 document.addEventListener("mousemove", onMouseMove);
 
+                const that = this;
                 const up = (event) => {
                     document.body.style.cursor = "default";
                     document.removeEventListener("mousemove", onMouseMove);
                     img.onmouseup = null;
 
-                    let x, y;
-                    x = parseInt(img.style.left);
-                    y = parseInt(img.style.top);
+                    const x = parseInt(img.style.left);
+                    const y = parseInt(img.style.top);
 
                     img.style.position = posit;
                     img.style.zIndex = zInd;
@@ -931,13 +960,13 @@ class Palette {
 
                     if (!x || !y) return;
 
-                    this._makeBlockFromProtoblock(
+                    that._makeBlockFromProtoblock(
                         protoListScope[blk],
                         true,
                         b.modname,
                         event,
-                        x - this.palettes.blocksContainer.x,
-                        y - this.palettes.blocksContainer.y
+                        x - that.activity.blocksContainer.x,
+                        y - that.activity.blocksContainer.y
                     );
                 };
 
@@ -961,23 +990,27 @@ class Palette {
     setupGrabScroll(paletteList) {
         let posY, top;
 
-        const mouseUpGrab = (evt) => {
+        // eslint-disable-next-line no-unused-vars
+        const mouseUpGrab = (event) => {
             paletteList.onmousemove = null;
             document.body.style.cursor = "default";
         };
-        const mouseMoveGrab = (evt) => {
-            const dy = evt.clientY - posY;
+
+        const mouseMoveGrab = (event) => {
+            const dy = event.clientY - posY;
             paletteList.scrollTop = top - dy;
             document.body.style.cursor = "grabbing";
         };
-        const mouseDownGrab = (evt) => {
-            posY = evt.clientY;
+
+        const mouseDownGrab = (event) => {
+            posY = event.clientY;
             top = paletteList.scrollTop;
 
             paletteList.onmousemove = mouseMoveGrab;
             paletteList.onmouseup = mouseUpGrab;
             paletteList.onmouseleave = mouseUpGrab;
         };
+
         paletteList.onmousedown = mouseDownGrab;
     }
 
@@ -1027,11 +1060,12 @@ class Palette {
 
     makeBlockFromSearch(protoblk, blkname, callback) {
         this._makeBlockFromPalette(protoblk, blkname, callback);
-        this.palettes.hideSearchWidget();
+        this.activity.hideSearchWidget();
     }
 
     _makeBlockFromPalette(protoblk, blkname, callback) {
         if (protoblk === null) {
+            // eslint-disable-next-line no-console
             console.debug("null protoblk?");
             return;
         }
@@ -1052,6 +1086,7 @@ class Palette {
                 break;
             case "storein2":
                 // Use the name of the box in the label
+                // eslint-disable-next-line no-console
                 console.debug(
                     "storein2" + " " + protoblk.defaults[0] + " " + protoblk.staticLabels[0]
                 );
@@ -1071,6 +1106,7 @@ class Palette {
                     blkname = "namedbox";
                     arg = _("box");
                 } else {
+                    // eslint-disable-next-line no-console
                     console.debug(protoblk.defaults[0]);
                     blkname = protoblk.defaults[0];
                     arg = protoblk.defaults[0];
@@ -1153,13 +1189,13 @@ class Palette {
                 break;
         }
 
-        const lastBlock = this.palettes.blocks.blockList.length;
+        const lastBlock = this.activity.blocks.blockList.length;
 
         if (
             ["namedbox", "nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(
                 protoblk.name
             ) === -1 &&
-            blockIsMacro(blkname)
+                blockIsMacro(this.activity, blkname)
         ) {
             this._makeBlockFromProtoblock(protoblk, true, blkname, null, 100, 100);
             callback(lastBlock);
@@ -1172,7 +1208,7 @@ class Palette {
             this._makeBlockFromProtoblock(protoblk, true, blkname, null, 100, 100);
             callback(lastBlock);
         } else {
-            const newBlock = paletteBlockButtonPush(this.palettes.blocks, newBlk, arg);
+            const newBlock = paletteBlockButtonPush(this.activity.blocks, newBlk, arg);
             callback(newBlock);
         }
     }
@@ -1182,17 +1218,17 @@ class Palette {
 
         const __myCallback = (newBlock) => {
             // Move the drag group under the cursor.
-            this.palettes.blocks.findDragGroup(newBlock);
-            for (const i in this.palettes.blocks.dragGroup) {
-                this.palettes.blocks.moveBlockRelative(
-                    this.palettes.blocks.dragGroup[i],
+            this.activity.blocks.findDragGroup(newBlock);
+            for (const i in this.activity.blocks.dragGroup) {
+                this.activity.blocks.moveBlockRelative(
+                    this.activity.blocks.dragGroup[i],
                     saveX,
                     saveY
                 );
             }
             // Dock with other blocks if needed
-            this.palettes.blocks.blockMoved(newBlock);
-            this.palettes.blocks.checkBounds();
+            this.activity.blocks.blockMoved(newBlock);
+            this.activity.blocks.checkBounds();
         };
 
         if (moved) {
@@ -1205,7 +1241,7 @@ class Palette {
                     protoblk.name
                 ) === -1
             ) {
-                macroExpansion = getMacroExpansion(blkname, saveX, saveY);
+                macroExpansion = getMacroExpansion(this.activity, blkname, saveX, saveY);
                 if (macroExpansion === null) {
                     // Maybe it is a plugin macro?
                     if (blkname in this.palettes.pluginMacros) {
@@ -1219,9 +1255,7 @@ class Palette {
             }
 
             if (macroExpansion !== null) {
-                this.palettes.blocks.loadNewBlocks(macroExpansion);
-                const thisBlock = this.palettes.blocks.blockList.length - 1;
-                const topBlk = this.palettes.blocks.findTopBlock(thisBlock);
+                this.activity.blocks.loadNewBlocks(macroExpansion);
             } else if (this.name === "myblocks") {
                 // If we are on the myblocks palette, it is a macro.
                 const macroName = blkname.replace("macro_", "");
@@ -1267,13 +1301,13 @@ class Palette {
                 // before loading.
                 obj[0][2] = saveX;
                 obj[0][3] = saveY;
-                this.palettes.blocks.loadNewBlocks(obj);
+                this.activity.blocks.loadNewBlocks(obj);
 
                 // Ensure collapse state of new stack is set properly.
-                const thisBlock = this.palettes.blocks.blockList.length - 1;
-                const topBlk = this.palettes.blocks.findTopBlock(thisBlock);
+                const thisBlock = this.activity.blocks.blockList.length - 1;
+                const topBlk = this.activity.blocks.findTopBlock(thisBlock);
                 setTimeout(() => {
-                    this.palettes.blocks.blockList[topBlk].collapseToggle();
+                    this.activity.blocks.blockList[topBlk].collapseToggle();
                 }, 500);
             } else {
                 newBlock = this._makeBlockFromPalette(protoblk, blkname, __myCallback);
@@ -1291,19 +1325,7 @@ async function initPalettes(palettes) {
 
     palettes.init_selectors();
     palettes.makePalettes(0);
+    // eslint-disable-next-line no-console
     console.debug("Time to show the palettes.");
     palettes.show();
-}
-
-const MODEUNSURE = 0;
-const MODEDRAG = 1;
-const MODESCROLL = 2;
-const DECIDEDISTANCE = 20;
-
-function makePaletteIcons(data, width, height) {
-    const img = new Image();
-    img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(data)));
-    if (width) img.width = width;
-    if (height) img.height = height;
-    return img;
 }
