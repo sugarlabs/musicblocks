@@ -120,6 +120,7 @@ class Logo {
         /** @deprecated */ this.evalSetterDict = {};
         /** @deprecated */ this.evalOnStartList = {};
         /** @deprecated */ this.evalOnStopList = {};
+	this.pluginReturnValue = null;
 
         this.eventList = {};
         this.receivedArg = null;
@@ -686,7 +687,15 @@ class Logo {
                     break;
 
                 default:
-                    // console.error("I do not know how to " + logo.blockList[blk].name);
+                    // Is it a plugin?
+                    if (logo.blockList[blk].name in logo.evalArgDict) {
+                        // eslint-disable-next-line no-console
+                        console.log("running eval on " + logo.blockList[blk].name);
+                        eval(logo.evalArgDict[logo.blockList[blk].name]);
+                    } else {
+                        // eslint-disable-next-line no-console
+                        console.error("I do not know how to " + logo.blockList[blk].name);
+                    }
                     break;
             }
 
@@ -1438,15 +1447,26 @@ class Logo {
         }
 
         if (!logo.blockList[blk].isArgBlock()) {
-            const res = logo.blockList[blk].protoblock.flow(
-                args,
-                logo,
-                turtle,
-                blk,
-                receivedArg,
-                actionArgs,
-                isflow
-            );
+	    let res = null;
+            // Is it a plugin?
+            if (logo.blockList[blk].name in logo.evalFlowDict) {
+                // eslint-disable-next-line no-console
+                console.log("running eval on " + logo.blockList[blk].name);
+		logo.pluginReturnValue = null;
+                eval(logo.evalFlowDict[logo.blockList[blk].name]);
+		// Clamp blocks will return the child flow.
+		res = logo.pluginReturnValue;
+            } else {
+                res = logo.blockList[blk].protoblock.flow(
+                    args,
+                    logo,
+                    turtle,
+                    blk,
+                    receivedArg,
+                    actionArgs,
+                    isflow
+                );
+            }
 
             if (res) {
                 const [cf, cfc, ret] = res;
@@ -1454,9 +1474,10 @@ class Logo {
                 if (cfc !== undefined) childFlowCount = cfc;
                 if (ret) return ret;
             }
+
         } else {
-            // Could be an arg block, so we need to print its value
             if (
+                // Could be an arg block, so we need to print its value
                 logo.blockList[blk].isArgBlock() ||
                 ["anyout", "numberout", "textout", "booleanout"].indexOf(
                     logo.blockList[blk].protoblock.dockTypes[0]
