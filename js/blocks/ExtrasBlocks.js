@@ -403,7 +403,7 @@ function setupExtrasBlocks(activity) {
                 args = ["Cartesian"];
             }
             const act = activity.blocks.activity;
-            activity.turtles.hideGrids();
+            activity.hideGrids();
             switch (args[0]) {
                 case _("Cartesian"):
                     act._showCartesian();
