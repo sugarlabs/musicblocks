@@ -816,7 +816,7 @@ Turtles.TurtlesView = class {
          */
         const __collapse = () => {
             this.hideMenu();
-            this.hideGrids();
+            this.activity.hideGrids();
             this.setStageScale(0.25);
             this._collapsedBoundary.visible = true;
             this._expandedBoundary.visible = false;
