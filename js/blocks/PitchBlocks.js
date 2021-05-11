@@ -1101,8 +1101,7 @@ function setupPitchBlocks(activity) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 logo.stopTurtle = true;
             } else {
-                note = args[0];
-                octave = args[1];
+		return Singer.PitchActions.playPitch(args[0], args[1], 0, turtle, blk);
             }
         }
     }
