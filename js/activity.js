@@ -43,7 +43,7 @@
    exported
 
    Activity, LEADING, _THIS_IS_MUSIC_BLOCKS_, _THIS_IS_TURTLE_BLOCKS_,
-   globalActivity
+   globalActivity, hideArrows
  */
 
 const LEADING = 0;
@@ -3023,9 +3023,10 @@ function Activity() {
         this.refreshCanvas();
     };
 
+    // Accessed from index.html
     const hideArrows = function () {
         globalActivity._hideArrows();
-    }
+    };
 
     this._hideArrows = function () {
         if (this.errorMsgArrow !== null) {
