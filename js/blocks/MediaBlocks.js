@@ -13,7 +13,7 @@
    global
 
    _, ValueBlock, LeftBlock, FlowBlock, NOINPUTERRORMSG, NANERRORMSG,
-   toFixed2, Howl, last, calcOctave, pitchToFrequency
+   toFixed2, Howl, last, calcOctave, pitchToFrequency, doStopVideoCam
  */
 
 /* exported setupMediaBlocks */
@@ -362,7 +362,7 @@ function setupMediaBlocks(activity) {
         }
 
         flow(args, logo) {
-            if (cameraID != null) {
+            if (logo.cameraID != null) {
                 doStopVideoCam(logo.cameraID, logo.setCameraID);
             }
         }

@@ -392,8 +392,6 @@ function Activity() {
         // Stacks of blocks saved in local storage
         this.macroDict = {};
 
-        this.cameraID = null;
-
         // default values
         this.DEFAULTDELAY = 500; // milleseconds
         this.TURTLESTEP = -1; // Run in step-by-step mode
