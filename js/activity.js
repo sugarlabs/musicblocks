@@ -3012,7 +3012,7 @@ function Activity() {
         }
         this.errorMsgText.parent.visible = false;
         this.errorText.classList.remove("show");
-        this.hideArrows();
+        this._hideArrows();
 
         this.msgText.parent.visible = false;
         this.printText.classList.remove("show");
@@ -3023,7 +3023,11 @@ function Activity() {
         this.refreshCanvas();
     };
 
-    this.hideArrows = function () {
+    const hideArrows = function () {
+        globalActivity._hideArrows();
+    }
+
+    this._hideArrows = function () {
         if (this.errorMsgArrow !== null) {
             this.errorMsgArrow.removeAllChildren();
             this.refreshCanvas();
