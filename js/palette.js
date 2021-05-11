@@ -196,17 +196,6 @@ class Palettes {
         return this;
     }
 
-    setBlocksContainer(bloc) {
-        this.blocksContainer = bloc;
-        return this;
-    }
-
-    // We need access to the macro dictionary because we load them.
-    setMacroDictionary(obj) {
-        this.macroDict = obj;
-        return this;
-    }
-
     setSearch(show, hide) {
         this.activity.showSearchWidget = show;
         this.activity.hideSearchWidget = hide;
@@ -1262,8 +1251,8 @@ class Palette {
 
                 // We need to copy the macro data so it is not overwritten.
                 const obj = [];
-                for (let b = 0; b < this.palettes.macroDict[macroName].length; b++) {
-                    const valueEntry = this.palettes.macroDict[macroName][b][1];
+                for (let b = 0; b < this.activity.macroDict[macroName].length; b++) {
+                    const valueEntry = this.activity.macroDict[macroName][b][1];
                     let newValue = [];
                     if (typeof valueEntry === "string") {
                         newValue = valueEntry;
@@ -1288,11 +1277,11 @@ class Palette {
                     }
 
                     newBlock = [
-                        this.palettes.macroDict[macroName][b][0],
+                        this.activity.macroDict[macroName][b][0],
                         newValue,
-                        this.palettes.macroDict[macroName][b][2],
-                        this.palettes.macroDict[macroName][b][3],
-                        this.palettes.macroDict[macroName][b][4]
+                        this.activity.macroDict[macroName][b][2],
+                        this.activity.macroDict[macroName][b][3],
+                        this.activity.macroDict[macroName][b][4]
                     ];
                     obj.push(newBlock);
                 }

@@ -3998,7 +3998,7 @@ function Activity() {
         initBasicProtoBlocks(this);
 
         // Load any macros saved in local storage.
-        this.storage.macros = null;
+        // this.storage.macros = null;
         this.macroData = this.storage.macros;
         if (this.macroData !== null) {
             processMacroData(this.macroData, this.palettes, this.blocks, this.macroDict);
