@@ -478,8 +478,8 @@ function setupSensorsBlocks(activity) {
             return activity.blocks.blockList[blk].value;
         }
 
-        arg(logo) {
-            return logo.getStageY();
+        arg() {
+            return activity.getStageY();
         }
     }
 
@@ -503,8 +503,8 @@ function setupSensorsBlocks(activity) {
             return activity.blocks.blockList[blk].value;
         }
 
-        arg(logo) {
-            return logo.getStageX();
+        arg() {
+            return activity.getStageX();
         }
     }
 
@@ -533,8 +533,8 @@ function setupSensorsBlocks(activity) {
             }
         }
 
-        arg(logo) {
-            return logo.getStageMouseDown();
+        arg() {
+            return activity.getStageMouseDown();
         }
     }
 
