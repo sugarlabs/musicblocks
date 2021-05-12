@@ -114,13 +114,14 @@ class Logo {
         this.meterWidget = null;
         this.statusMatrix = null;
 
-        /** @deprecated */ this.evalFlowDict = {};
-        /** @deprecated */ this.evalArgDict = {};
-        /** @deprecated */ this.evalParameterDict = {};
-        /** @deprecated */ this.evalSetterDict = {};
-        /** @deprecated */ this.evalOnStartList = {};
-        /** @deprecated */ this.evalOnStopList = {};
-	this.pluginReturnValue = null;
+        this.evalFlowDict = {};
+        this.evalArgDict = {};
+        this.evalParameterDict = {};
+        this.evalSetterDict = {};
+        this.evalOnStartList = {};
+        this.evalOnStopList = {};
+        this.pluginVars = {};
+        this.pluginReturnValue = null;
 
         this.eventList = {};
         this.receivedArg = null;
@@ -1447,15 +1448,15 @@ class Logo {
         }
 
         if (!logo.blockList[blk].isArgBlock()) {
-	    let res = null;
+            let res = null;
             // Is it a plugin?
             if (logo.blockList[blk].name in logo.evalFlowDict) {
                 // eslint-disable-next-line no-console
                 console.log("running eval on " + logo.blockList[blk].name);
-		logo.pluginReturnValue = null;
+                logo.pluginReturnValue = null;
                 eval(logo.evalFlowDict[logo.blockList[blk].name]);
-		// Clamp blocks will return the child flow.
-		res = logo.pluginReturnValue;
+                // Clamp blocks will return the child flow.
+                res = logo.pluginReturnValue;
             } else {
                 res = logo.blockList[blk].protoblock.flow(
                     args,
