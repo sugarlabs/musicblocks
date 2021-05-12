@@ -16,51 +16,51 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 //* globals *//
-var accelerometer = {'x': null, 'y': null, 'z': null};
-function saveAccelerometerData(event) {
-    accelerometer['x'] = event.accelerationIncludingGravity.x;
-    accelerometer['y'] = event.accelerationIncludingGravity.y;
-    accelerometer['z'] = event.accelerationIncludingGravity.z;
+globalActivity.logo.pluginVars['accelerometer'] = {'x': null, 'y': null, 'z': null};
+const saveAccelerometerData = function (event) {
+    globalActivity.logo.pluginVars['accelerometer']['x'] = event.accelerationIncludingGravity.x;
+    globalActivity.logo.pluginVars['accelerometer']['y'] = event.accelerationIncludingGravity.y;
+    globalActivity.logo.pluginVars['accelerometer']['z'] = event.accelerationIncludingGravity.z;
 };
 if (window.DeviceMotionEvent) {
-    window.addEventListener("devicemotion", saveAccelerometerData, false);
+    window.addEventListener('devicemotion', saveAccelerometerData, false);
 }
-else{
-    console.log("DeviceMotionEvent is not supported (no accelerometer)");
+else {
+    globalActivity.errorMsg('DeviceMotionEvent is not supported (no accelerometer)');
 }
+
+//* arg-globals *//
+const accelBlock = globalActivity.blocks.blockList[blk];
 
 //* arg:accelerometerx *//
-var block = logo.blocks.blockList[blk];
-block.value = accelerometer['x'];
+accelBlock.value = globalActivity.logo.pluginVars['accelerometer']['x'];
 
 //* arg:accelerometery *//
-var block = logo.blocks.blockList[blk];
-block.value = accelerometer['y'];
+accelBlock.value = globalActivity.logo.pluginVars['accelerometer']['y'];
 
 //* arg:accelerometerz *//
-var block = logo.blocks.blockList[blk];
-block.value = accelerometer['z'];
+accelBlock.value = globalActivity.logo.pluginVars['accelerometer']['z'];
 
 //* block:accelerometerx *//
-var accelerometerXBlk = new ProtoBlock('accelerometerx');
-accelerometerXBlk.palette = palettes.dict['sensors'];
-blocks.protoBlockDict['accelerometerx'] = accelerometerXBlk;
+const accelerometerXBlk = new ProtoBlock('accelerometerx');
+accelerometerXBlk.palette = globalActivity.palettes.dict['sensors'];
+globalActivity.blocks.protoBlockDict['accelerometerx'] = accelerometerXBlk;
 accelerometerXBlk.staticLabels.push(_('motion x'));
 accelerometerXBlk.adjustWidthToLabel();
 accelerometerXBlk.parameterBlock();
 
 //* block:accelerometery *//
-var accelerometerYBlk = new ProtoBlock('accelerometery');
-accelerometerYBlk.palette = palettes.dict['sensors'];
-blocks.protoBlockDict['accelerometery'] = accelerometerYBlk;
+const accelerometerYBlk = new ProtoBlock('accelerometery');
+accelerometerYBlk.palette = globalActivity.palettes.dict['sensors'];
+globalActivity.blocks.protoBlockDict['accelerometery'] = accelerometerYBlk;
 accelerometerYBlk.staticLabels.push(_('motion y'));
 accelerometerYBlk.adjustWidthToLabel();
 accelerometerYBlk.parameterBlock();
 
 //* block:accelerometerz *//
-var accelerometerZBlk = new ProtoBlock('accelerometerz');
-accelerometerZBlk.palette = palettes.dict['sensors'];
-blocks.protoBlockDict['accelerometerz'] = accelerometerZBlk;
+const accelerometerZBlk = new ProtoBlock('accelerometerz');
+accelerometerZBlk.palette = globalActivity.palettes.dict['sensors'];
+globalActivity.blocks.protoBlockDict['accelerometerz'] = accelerometerZBlk;
 accelerometerZBlk.staticLabels.push(_('motion z'));
 accelerometerZBlk.adjustWidthToLabel();
 accelerometerZBlk.parameterBlock();
