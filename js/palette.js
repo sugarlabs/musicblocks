@@ -888,10 +888,15 @@ class Palette {
             const itemCell = itemRow.insertCell();
             let img = makePaletteIcons(b.artwork);
 
-            // Use artwork.js strings as images for:
-            // cameraPALETTE, videoPALETTE, mediaPALETTE
             if (b.image) {
-                img = makePaletteIcons(eval(b.blkname + "PALETTE"));
+                if (["media", "camera", "video"].indexOf(b.blkname) !== -1) {
+                    // Use artwork.js strings as images for:
+                    // cameraPALETTE, videoPALETTE, mediaPALETTE
+                    img = makePaletteIcons(eval(b.blkname + "PALETTE"));
+                } else {
+                    // or use the plugin image...
+                    img = makePaletteIcons(this.activity.pluginsImages[b.blkname]);
+                }
             }
 
             img.onmouseover = () => (document.body.style.cursor = "pointer");

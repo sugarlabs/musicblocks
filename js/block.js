@@ -847,7 +847,13 @@ class Block {
             that.updateCache();
         };
 
-        image.src = this.image;
+        if (this.image.search("xmlns") !== -1) {
+            image.src =
+                "data:image/svg+xml;base64," +
+                window.btoa(unescape(encodeURIComponent(this.image)));
+        } else {
+            image.src = this.image;
+        }
     }
 
     /**
@@ -928,7 +934,6 @@ class Block {
                 if (firstTime) {
                     that._loadEventHandlers();
                     if (that.image !== null) {
-                        // console.debug(that.name);
                         that._addImage();
                     }
 

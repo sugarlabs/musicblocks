@@ -30,16 +30,15 @@
 
 /* exported
 
-   changeImage, format, canvasPixelRatio, windowHeight, windowWidth,
-   httpGet, httpPost, HttpRequest, doBrowserCheck, docByClass,
-   docByTagName, docByName, docBySelector, last, doSVG, isSVGEmpty,
-   getTextWidth, fileExt, fileBasename, toTitleCase,
-   processRawPluginData, preparePluginExports, processMacroData,
-   prepareMacroExports, doPublish, doUseCamera, doStopVideoCam,
-   hideDOMLabel, displayMsg, safeSVG, toFixed2, mixedNumber,
-   rationalSum, nearestBeat, oneHundredToFraction, rgbToHex, hexToRGB,
-   hex2rgb, delayExecution, closeWidgets, closeBlkWidgets,
-   importMembers
+   canvasPixelRatio, changeImage, closeBlkWidgets, closeWidgets,
+   delayExecution, displayMsg, doBrowserCheck, docByClass, docByName,
+   docBySelector, docByTagName, doPublish, doStopVideoCam, doSVG,
+   doUseCamera, fileBasename, fileExt, format, getTextWidth, hex2rgb,
+   hexToRGB, hideDOMLabel, httpGet, httpPost, HttpRequest,
+   importMembers, isSVGEmpty, last, mixedNumber, nearestBeat,
+   oneHundredToFraction, prepareMacroExports, preparePluginExports,
+   processMacroData, processRawPluginData, rationalSum, rgbToHex,
+   safeSVG, toFixed2, toTitleCase, windowHeight, windowWidth
 */
 
 /* eslint-disable no-console */
@@ -414,7 +413,7 @@ function processPluginData(activity, pluginData) {
     const obj = JSON.parse(pluginData);
     // Create a palette entry.
     let newPalette = false,
-        paletteName;
+        paletteName = null;
     if ("PALETTEPLUGINS" in obj) {
         for (const name in obj["PALETTEPLUGINS"]) {
             paletteName = name;
@@ -423,7 +422,6 @@ function processPluginData(activity, pluginData) {
             if ("PALETTEFILLCOLORS" in obj) {
                 if (name in obj["PALETTEFILLCOLORS"]) {
                     fillColor = obj["PALETTEFILLCOLORS"][name];
-                    // console.debug(fillColor);
                 }
             }
 
@@ -433,7 +431,6 @@ function processPluginData(activity, pluginData) {
             if ("PALETTESTROKECOLORS" in obj) {
                 if (name in obj["PALETTESTROKECOLORS"]) {
                     strokeColor = obj["PALETTESTROKECOLORS"][name];
-                    // console.debug(strokeColor);
                 }
             }
 
@@ -443,7 +440,6 @@ function processPluginData(activity, pluginData) {
             if ("PALETTEHIGHLIGHTCOLORS" in obj) {
                 if (name in obj["PALETTEHIGHLIGHTCOLORS"]) {
                     highlightColor = obj["PALETTEHIGHLIGHTCOLORS"][name];
-                    // console.debug(highlightColor);
                 }
             }
 
@@ -453,7 +449,6 @@ function processPluginData(activity, pluginData) {
             if ("HIGHLIGHTSTROKECOLORS" in obj) {
                 if (name in obj["HIGHLIGHTSTROKECOLORS"]) {
                     strokeHighlightColor = obj["HIGHLIGHTSTROKECOLORS"][name];
-                    // console.debug(highlightColor);
                 }
             }
 
@@ -479,7 +474,7 @@ function processPluginData(activity, pluginData) {
 
     if (newPalette) {
         try {
-            console.debug("CALLING makePalettes");
+            console.debug("Calling makePalettes");
             activity.palettes.makePalettes(1);
         } catch (e) {
             console.debug("makePalettes: " + e);
@@ -595,8 +590,10 @@ function processPluginData(activity, pluginData) {
         }
     }
 
-    console.debug("updating palette " + paletteName);
-    activity.palettes.updatePalettes(paletteName);
+    if (paletteName !== null) {
+        console.debug("updating palette " + paletteName);
+        activity.palettes.updatePalettes(paletteName);
+    }
 
     setTimeout(() => {
         activity.palettes.show();
@@ -626,7 +623,6 @@ function processRawPluginData(activity, rawData) {
 
     // Note to plugin developers: You may want to comment out this
     // try/catch while debugging your plugin.
-    console.log(cleanData);
     let obj;
     try {
         obj = processPluginData(activity, cleanData.replace(/\n/g, ""));
@@ -634,7 +630,6 @@ function processRawPluginData(activity, rawData) {
         obj = null;
         activity.errorMsg("Error loading plugin: " + e);
     }
-
     return obj;
 }
 
