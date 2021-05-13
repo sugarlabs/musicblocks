@@ -41,8 +41,6 @@
    safeSVG, toFixed2, toTitleCase, windowHeight, windowWidth
 */
 
-/* eslint-disable no-console */
-
 const changeImage = (imgElement, from, to) => {
     const oldSrc = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(from)));
     const newSrc = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(to)));
@@ -53,7 +51,7 @@ const changeImage = (imgElement, from, to) => {
 
 function _(text) {
     if (text === null) {
-        console.debug("null string passed to _");
+        // console.debug("null string passed to _");
         return "";
     }
 
@@ -99,7 +97,7 @@ function _(text) {
         }
         return translation;
     } catch (e) {
-        console.debug("i18n error: " + text);
+        // console.debug("i18n error: " + text);
         return text;
     }
 }
@@ -109,6 +107,7 @@ function format(str, data) {
         let x = data;
         name.split(".").forEach((v) => {
             if (x === undefined) {
+                // eslint-disable-next-line no-console
                 console.debug("Undefined value in template string", str, name, x, v);
             }
 
@@ -202,7 +201,10 @@ function HttpRequest(url, loadCallback, userCallback) {
         req.send("");
     } catch (e) {
         if (self.console) {
+            // eslint-disable-next-line no-console
             console.debug("Failed to load resource from " + url + ": Network error.");
+            // eslint-disable-next-line no-console
+            console.debug(e);
         }
 
         if (typeof userCallback === "function") {
@@ -462,8 +464,10 @@ function processPluginData(activity, pluginData) {
             ];
 
             if (name in activity.palettes.buttons) {
+                // eslint-disable-next-line no-console
                 console.debug("palette " + name + " already exists");
             } else {
+                // eslint-disable-next-line no-console
                 console.debug("adding palette " + name);
                 activity.palettes.add(name);
                 if (MULTIPALETTES[2].indexOf(name) === -1) MULTIPALETTES[2].push(name);
@@ -474,9 +478,10 @@ function processPluginData(activity, pluginData) {
 
     if (newPalette) {
         try {
-            console.debug("Calling makePalettes");
+            // console.debug("Calling makePalettes");
             activity.palettes.makePalettes(1);
         } catch (e) {
+            // eslint-disable-next-line no-console
             console.debug("makePalettes: " + e);
         }
     }
@@ -511,8 +516,10 @@ function processPluginData(activity, pluginData) {
             try {
                 activity.palettes.pluginMacros[macro] = JSON.parse(obj["MACROPLUGINS"][macro]);
             } catch (e) {
+                // eslint-disable-next-line no-console
                 console.debug("could not parse macro " + macro);
-                console.debug(obj["MACROPLUGINS"][macro]);
+                // eslint-disable-next-line no-console
+                console.debug(e);
             }
         }
     }
@@ -533,10 +540,12 @@ function processPluginData(activity, pluginData) {
 
     if ("BLOCKPLUGINS" in obj) {
         for (const block in obj["BLOCKPLUGINS"]) {
+            // eslint-disable-next-line no-console
             console.debug("adding plugin block " + block);
             try {
                 eval(obj["BLOCKPLUGINS"][block]);
             } catch (e) {
+                // eslint-disable-next-line no-console
                 console.debug("Failed to load plugin for " + block + ": " + e);
             }
         }
@@ -578,20 +587,23 @@ function processPluginData(activity, pluginData) {
         try {
             // Push the protoblocks onto their palettes.
             if (activity.blocks.protoBlockDict[protoblock].palette === undefined) {
+                // eslint-disable-next-line no-console
                 console.debug("Cannot find palette for protoblock " + protoblock);
             } else if (activity.blocks.protoBlockDict[protoblock].palette === null) {
+                // eslint-disable-next-line no-console
                 console.debug("Cannot find palette for protoblock " + protoblock);
             } else {
                 activity.blocks.protoBlockDict[protoblock].palette.add(
                     activity.blocks.protoBlockDict[protoblock]);
             }
         } catch (e) {
+            // eslint-disable-next-line no-console
             console.debug(e);
         }
     }
 
     if (paletteName !== null) {
-        console.debug("updating palette " + paletteName);
+        // console.debug("updating palette " + paletteName);
         activity.palettes.updatePalettes(paletteName);
     }
 
@@ -707,7 +719,7 @@ function processMacroData(macroData, palettes, blocks, macroDict) {
         palettes.add("myblocks", "black", "#a0a0a0");
 
         for (const name in obj) {
-            console.debug("adding " + name + " to macroDict");
+            // console.debug("adding " + name + " to macroDict");
             macroDict[name] = obj[name];
             blocks.addToMyPalette(name, macroDict[name]);
         }
@@ -766,7 +778,7 @@ function doUseCamera(args, turtles, turtle, isVideo, cameraID, setCameraID, erro
             },
             (error) => {
                 errorMsg("Could not connect to camera");
-                console.debug("Could not connect to camera", error);
+                console.debug(error);
             }
         );
     } else {
@@ -783,7 +795,7 @@ function doUseCamera(args, turtles, turtle, isVideo, cameraID, setCameraID, erro
     video.addEventListener(
         "canplay",
         () => {
-            console.debug("canplay", streaming, hasSetupCamera);
+            // console.debug("canplay", streaming, hasSetupCamera);
             if (!streaming) {
                 video.setAttribute("width", w);
                 video.setAttribute("height", h);
@@ -960,7 +972,7 @@ function LCD(a, b) {
 
 function rationalSum(a, b) {
     if (a === 0 || b === 0) {
-        console.debug("divide by zero?");
+        // console.debug("divide by zero?");
         return [0, 1];
     }
 
