@@ -352,6 +352,7 @@ function setupNumberBlocks(activity) {
             this.formBlock({
                 name: this.lang === "ja" ? "➗" : "/",
                 args: 2,
+                argTypes: ["anyin", "anyin"],
                 defaults: [1, 4]
             });
         }
@@ -378,9 +379,14 @@ function setupNumberBlocks(activity) {
                         return 0;
                     }
                 } else {
-                    const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                    const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-
+                    let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                    let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                    if (typeof(a) === "string" && parseInt(a)) {
+                        a = parseInt(a);
+                    }
+                    if (typeof(b) === "string" && parseInt(a)) {
+                        b = parseInt(b);
+                    }
                     try {
                         return MathUtility.doDivide(a, b);
                     } catch (e) {
@@ -479,6 +485,12 @@ function setupNumberBlocks(activity) {
                     }
 
                     try {
+                        if (typeof(a) === "string" && parseInt(a)) {
+                            a = parseInt(a);
+                        }
+                        if (typeof(b) === "string" && parseInt(a)) {
+                            b = parseInt(b);
+                        }
                         return MathUtility.doMultiply(a, b);
                     } catch (e) {
                         logo.stopTurtle = true;
