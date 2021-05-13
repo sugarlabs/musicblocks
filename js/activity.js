@@ -2730,7 +2730,7 @@ function Activity() {
      */
     const doOpenSamples = function (that) {
         that._doOpenSamples();
-    }
+    };
 
     this._doOpenSamples = function () {
         if (docById("palette").style.display !== "none") docById("palette").style.display = "none";
