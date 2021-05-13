@@ -340,12 +340,11 @@ function setupExtrasBlocks(activity) {
                                 // eslint-disable-next-line no-use-before-define
                                 const temp = new DisplayGridBlock();
                                 temp.flow(args, logo, turtle, blk);
-                            } else if (args[0] === undefined) {
-                                activity.textMsg("undefined");
-                            } else if (args[0] === null) {
-                                activity.textMsg("null");
                             } else {
-                                activity.textMsg(args[0].toString());
+                                const tur = activity.turtles.ithTurtle(turtle);
+                                if (tur.singer.inNoteBlock.length > 0) {
+                                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
+                                }
                             }
                         } else if (logo.runningLilypond) {
                             if (tur.singer.inNoteBlock.length > 0) {
