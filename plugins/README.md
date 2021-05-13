@@ -16,7 +16,7 @@ How to load plugins
 
 The Load Plugin button is found on the Secondary Toolbar (click the "hamburger" menu if it is not expanded) you will see this option:
 
-![Load Plugin Button](https://github.com/sugarlabs/turtleblocksjs/raw/master/documentation/load-plugin-button.png)
+![Load Plugin Button](https://github.com/sugarlabs/musicblocks/raw/master/documentation/load-plugin-button.png)
 
 Click it and a file chooser will appear. 
 
