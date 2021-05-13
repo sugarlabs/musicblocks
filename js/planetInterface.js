@@ -29,16 +29,17 @@ function PlanetInterface(activity) {
 
     this.hideMusicBlocks = function () {
         this.activity.hideSearchWidget();
-        this.activity.widgetWindows.hideAllWindows();
+        window.widgetWindows.hideAllWindows();
 
         this.activity.logo.doStopTurtles();
         docById("helpElem").style.visibility = "hidden";
         document.querySelector(".canvasHolder").classList.add("hide");
         document.querySelector("#canvas").style.display = "none";
         document.querySelector("#theme-color").content = "#8bc34a";
+        const that = this;
         setTimeout(function () {
             // Time to release the mouse
-            this.activity.stage.enableDOMEvents(false);
+            that.activity.stage.enableDOMEvents(false);
         }, 250);
         window.scroll(0, 0);
     };
@@ -49,7 +50,7 @@ function PlanetInterface(activity) {
         document.getElementById("palette").style.display = "block";
 
         this.activity.prepSearchWidget();
-        this.activity.widgetWindows.showWindows();
+        window.widgetWindows.showWindows();
 
         document.querySelector(".canvasHolder").classList.remove("hide");
         document.querySelector("#canvas").style.display = "";
@@ -77,7 +78,7 @@ function PlanetInterface(activity) {
 
     this.openPlanet = function () {
         this.saveLocally();
-        this.activity.hideMusicBlocks();
+        this.hideMusicBlocks();
         this.showPlanet();
     };
 
