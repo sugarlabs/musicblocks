@@ -7,27 +7,33 @@ How to get plugins
 You can find plugins in the [official app repository](https://github.com/sugarlabs/turtleblocksjs/tree/master/plugins).
 The plugins are identified by the extension <code>**.json**</code>
 You need to download the plugins for load it.
-[(In this guide I will use this plugin)](https://github.com/sugarlabs/turtleblocksjs/blob/master/plugins/translate.json)
+[(This guide will use this plugin)](https://github.com/sugarlabs/turtleblocksjs/blob/master/plugins/maths.json)
 
 ![Nutrition Plugin](https://github.com/sugarlabs/turtleblocksjs/raw/master/screenshots/foodplugin.png "The Nutrition plugin")
 
 How to load plugins
 -------------------
 
-On the Settings Palette found on the Option Toolbar (click it if it is
-not expanded) you will see this option:
+The Load Plugin button is found on the Secondary Toolbar (click the "hamburger" menu if it is not expanded) you will see this option:
 
-<img src='http://people.sugarlabs.org/walter/plugin-button.svg'>
+![Load Plugin Button](https://github.com/sugarlabs/turtleblocksjs/raw/master/documentation/load-plugin-button.png)
 
 Click it and a file chooser will appear. 
 
-In the file chooser select a plugin file (they have <code>**.json**</code> file suffixes) and click 'Open'.
+In the file chooser select a plugin file (they have
+<code>**.json**</code> file suffixes) and click 'Open'.
 
-The file will open and load new blocks into the palettes. Many plugins define their own palettes, so you will likely see a new palette button at the bottom of the column of buttons on the left side of the screen. (In the case of the translate plugin, new blocks will be added to a new palette, *mashape*) <img
-src='http://people.sugarlabs.org/walter/mashape.svg'>
+The file will open and load new blocks into the palettes. Many plugins
+define their own palettes, so you will likely see a new palette button
+at the bottom of the column of buttons on the left side of the
+screen. (In the case of the maths plugin, new blocks will be added to
+a new palette, *maths*).
 
 The plugin is saved in the browser local storage so you don't need to
-reload it every time you run TurtleJS.
+reload it every time you run Music Blocks.
+
+Note that you can delete a plugin by opening the plugin palette and then
+clicking on the Delete Plugin button.
 
 How to make a plugin
 ====================
@@ -42,15 +48,13 @@ available to the user.
 Prerequisites
 -------------
 
-* It facilitates debugging if you must have turtleblocksjs up and
-  running. Use the following command to run it from your cloned
-  repository: <pre><code>python -m SimpleHTTPServer</code></pre>
+* It facilitates debugging if you have Music Blocks up and
+  running. You can use the <code>npm run serve</code> command to launch
+  a local instance of Music Blocks.
 
-* To define the Turtle `blocks` in your plugin, you will need to know
-  how to program in Javascript. The blocks are defined in a dictionary
-  element. To understand better, check the [code of
-  basicblocks.js]
-  (https://github.com/sugarlabs/turtleblocksjs/blob/master/js/basicblocks.js)
+* To define the `blocks` in your plugin, you will need to know
+  how to program in JavaScript. The blocks are defined in a dictionary
+  element. (See [Guide for Adding Blocks](https://github.com/sugarlabs/musicblocks/blob/master/js/guide_addingblocks.md) for more details.)
 
 * We provide a tool to help you compile psuedo-code into JSON (see the
   section on Pluginify below). But you may also want to at least
@@ -72,19 +76,26 @@ Plugins are a dictionary of JSON-encoded components that incorporates:
 a flow-block dictionary, an arg-block dictionary, a block dictionary,
 a globals dictionary, a palette dictionary, and color dictionaries.
 
-* `flow-block`: commands that are evaluated when
-  a flow block is run;
-* `arg-block`: commands that are evaluated when
-  an arg block is run;
+* `flow-block`: commands that are evaluated when a flow block is run;
+
+* `arg-block`: commands that are evaluated when an arg block is run;
+
 * `block`: new blocks defined in the plugin;
-* `globals`: globals that you can reference throughout
-  your code (Please use a unique name for your globals -- by convention, we
-  have been prepending the plugin name to global variables, e.g.,
-  weatherSecretKey for the secretKey used in the weather plugin.);
-* `palette`: icons (in SVG format) associated with the
-  palette;
+
+* `globals`: globals that you can reference throughout your code. We
+  discourage the used of globals, but we do provide a dictionary
+  object where you can add objects you may want to share among the
+  blocks that use your plugin. (If you do use a global, please use a
+  unique name -- by convention, we have been prepending the plugin
+  name to global variables, e.g., weatherSecretKey for the secret key
+  used in the weather plugin.);
+
+* `palette`: icons (in SVG format) associated with the palette;
+
 * `fill-colors`: hex color of the blocks;
+
 * `stroke-colors`: hex color for stroke of the blocks;
+
 * `highlight-colors`: hex color of the blocks when they are
   highlighted.
 
@@ -124,7 +135,7 @@ Pluginify
 
 You can use
 [pluginify.py](https://github.com/sugarlabs/turtleblocksjs/blob/master/pluginify.py)
-to convert a `.rtp` (Readable Turtleblocks Plugin) to a `.json`
+to convert a `.rtp` (Readable Turtle Blocks Plugin) to a `.json`
 plugin.
 
 Writing plugins directly in JSON is tedious. To make the job easier
@@ -164,13 +175,32 @@ Valid blocks styles in turtleblocksjs:
 * `booleanTwoArgBlock`: E.g., greater, less, equal.
 * `parameterBlock`: E.g., color, shade, pensize
 
-To use the block styles to create your blocks, let us go through [an example](https://github.com/sugarlabs/turtleblocksjs/blob/master/plugins/translate.json#L38)
+To use the block styles to create your blocks, let us go through [an example](https://github.com/sugarlabs/turtleblocksjs/blob/master/plugins/maths.json#L22)
 
-```"translate":"var TranslateBlock = new ProtoBlock(\"translate\"); TranslateBlock.palette = palettes.dict[\"mashape\"]; blocks.protoBlockDict[\"translate\"] = TranslateBlock; TranslateBlock.oneArgMathBlock(); TranslateBlock.docks[0][2] = \"textout\"; TranslateBlock.docks[1][2] = \"textin\"; TranslateBlock.defaults.push(\"Hello\"); TranslateBlock.staticLabels.push(\"translate\");",```
+```
+//* block-globals *//
+const simpleOneArgBlock = function (name, label, defaultValue) {
+    if (label === undefined) { var label = name; }
+    const block = new ProtoBlock(name);
+    block.palette = globalActivity.palettes.dict['maths'];
+    globalActivity.blocks.protoBlockDict[name] = block;
+    block.staticLabels.push(label);
+    block.adjustWidthToLabel();
+    block.oneArgMathBlock();
+    if (defaultValue === undefined) {
+        block.defaults.push(1.0);
+    } else {
+        block.defaults.push(defaultValue);
+    }
+};
 
-See the line ```TranslateBlock.oneArgMathBlock();``` That is how you define the block style `oneArgMathBlock` to `TranslateBlock`. To define your own block, use any of the style methods listed above.
+//* block:sin *//
+simpleOneArgBlock('sin', 'sin', '3.14159');
+//* arg:sin *//
+mathBlock.value = Math.sin(logo.parseArg(logo, turtle, conns[1]));
+```
 
 Example plugins
 ---------------
 
-[translate.json](https://github.com/sugarlabs/turtleblocksjs/blob/master/plugins/translate.json), [weather.json](https://github.com/sugarlabs/turtleblocksjs/blob/master/plugins/weather.json), [maths.rtp](https://github.com/sugarlabs/turtleblocksjs/blob/master/plugins/maths.rtp)
+[nutrition.json](https://github.com/sugarlabs/turtleblocksjs/blob/master/plugins/nutrition.json), [roti.json](https://github.com/sugarlabs/turtleblocksjs/blob/master/plugins/roti.json), [maths.rtp](https://github.com/sugarlabs/turtleblocksjs/blob/master/plugins/maths.rtp)
