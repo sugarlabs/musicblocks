@@ -4031,7 +4031,6 @@ function Activity() {
         }
 
         // Load any plugins saved in local storage.
-        this.storage.plugins = null;
         this.pluginData = this.storage.plugins;
         if (this.pluginData !== null && this.pluginData !== "null") {
             updatePluginObj(this, processPluginData(this, this.pluginData));
