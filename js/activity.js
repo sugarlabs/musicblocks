@@ -2996,7 +2996,19 @@ function Activity() {
      */
     const _afterDelete = function (that) {
         that.toolbar.closeAuxToolbar(showHideAuxMenu);
-        that.sendAllToTrash(true, false);
+
+        if (that.turtles.running()) {
+            that._doHardStopButton();
+        }
+
+        setTimeout(() => {
+            // Don't create the new blocks in sendAllToTrash so as to
+            // avoid clearing the screen of any graphics. Do it here
+            // instead.
+            that.sendAllToTrash(false, false);
+            that.blocks.loadNewBlocks(DATAOBJS);
+        }, 1000);
+
         if (that.planet !== undefined) {
             that.planet.initialiseNewProject.bind(that.planet);
         }
