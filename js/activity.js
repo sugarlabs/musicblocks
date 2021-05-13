@@ -2728,6 +2728,10 @@ function Activity() {
     /*
      * Opens samples on planet after closing all sub menus.
      */
+    const doOpenSamples = function (that) {
+        that._doOpenSamples();
+    }
+
     this._doOpenSamples = function () {
         if (docById("palette").style.display !== "none") docById("palette").style.display = "none";
         this.toolbar.closeAuxToolbar(showHideAuxMenu);
@@ -2801,7 +2805,7 @@ function Activity() {
         activity._loadProject(projectID, flags, env);
     };
 
-    const _loadStart = async function (that) {
+    const loadStart = async function (that) {
         const __afterLoad = function () {
             if (!that.turtles.running()) {
                 setTimeout(function () {
@@ -2903,12 +2907,12 @@ function Activity() {
         setTimeout(function () {
             try {
                 that.planet.openProjectFromPlanet(projectID, function () {
-                    that.loadStartWrapper(_loadStart);
+                    that.loadStartWrapper(loadStart);
                 });
             } catch (e) {
                 // eslint-disable-next-line no-console
                 console.error(e);
-                that.loadStartWrapper(_loadStart);
+                that.loadStartWrapper(loadStart);
             }
 
             that.planet.initialiseNewProject();
@@ -2995,22 +2999,27 @@ function Activity() {
      * Sets up a new "clean" MB i.e. new project instance
      */
     const _afterDelete = function (that) {
-        that.toolbar.closeAuxToolbar(showHideAuxMenu);
-
         if (that.turtles.running()) {
             that._doHardStopButton();
         }
 
-        setTimeout(() => {
-            // Don't create the new blocks in sendAllToTrash so as to
-            // avoid clearing the screen of any graphics. Do it here
-            // instead.
-            that.sendAllToTrash(false, false);
-            that.blocks.loadNewBlocks(DATAOBJS);
-        }, 1000);
+        // Use the planet New Project mechanism if it is available,
+        // but only if the current project has a name.
+        if (that.planet !== undefined && that.planet.getCurrentProjectName() !== _("My Project")) {
+            that.planet.saveLocally();
+            that.planet.initialiseNewProject();
+            loadStart(that);
+            that.planet.saveLocally();
+        } else {
+            that.toolbar.closeAuxToolbar(showHideAuxMenu);
 
-        if (that.planet !== undefined) {
-            that.planet.initialiseNewProject.bind(that.planet);
+            setTimeout(() => {
+                // Don't create the new blocks in sendAllToTrash so as to
+                // avoid clearing the screen of any graphics. Do it here
+                // instead.
+                that.sendAllToTrash(false, false);
+                that.blocks.loadNewBlocks(DATAOBJS);
+            }, 1000);
         }
     };
 
@@ -3988,7 +3997,7 @@ function Activity() {
             this.save.saveMxml.bind(this.save),
             this.save.saveBlockArtwork.bind(this.save)
         );
-        this.toolbar.renderPlanetIcon(this.planet, this._doOpenSamples);
+        this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
         this.toolbar.renderMenuIcon(showHideAuxMenu);
         this.toolbar.renderHelpIcon(showHelp);
         this.toolbar.renderModeSelectIcon(doSwitchMode);
@@ -4404,7 +4413,7 @@ function Activity() {
             }, 200); // 2000
         } else {
             setTimeout(function () {
-                that.loadStartWrapper(_loadStart);
+                that.loadStartWrapper(loadStart);
             }, 200); // 2000
         }
 
