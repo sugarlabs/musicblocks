@@ -778,6 +778,7 @@ function doUseCamera(args, turtles, turtle, isVideo, cameraID, setCameraID, erro
             },
             (error) => {
                 errorMsg("Could not connect to camera");
+                // eslint-disable-next-line no-console
                 console.debug(error);
             }
         );
