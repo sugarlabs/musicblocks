@@ -79,11 +79,12 @@
 const TEXTWIDTH = 240; // 90
 const STRINGLEN = 9;
 const LONGPRESSTIME = 1500;
-const INLINECOLLAPSIBLES = ["newnote", "interval", "osctime"];
+const INLINECOLLAPSIBLES = ["newnote", "interval", "osctime", "definemode"];
 const COLLAPSIBLES = [
     "drum",
     "start",
     "action",
+    "temperament1",
     "matrix",
     "pitchdrummatrix",
     "rhythmruler2",
@@ -1440,6 +1441,13 @@ class Block {
                             platformColor.blockText
                         );
                         break;
+                    case "temperament1":
+                        that.collapseText = new createjs.Text(
+                            _("temperament"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
                     case "start":
                         that.collapseText = new createjs.Text(
                             _("start"),
@@ -1555,6 +1563,13 @@ class Block {
                     case "temperament":
                         that.collapseText = new createjs.Text(
                             _("temperament"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
+                    case "definemode":
+                        that.collapseText = new createjs.Text(
+                            _("mode"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );

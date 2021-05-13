@@ -1549,11 +1549,25 @@ function TemperamentWidget() {
         }
 
         setOctaveRatio(this.powerBase);
+
+        const len = this._logo.synth.startingPitch.length;
+        const note = this._logo.synth.startingPitch.substring(0, len - 1);
+        const octave = this._logo.synth.startingPitch.slice(-1);
+        const newStack1 = [
+            [0, "settemperament", 150, 150, [null, 1, 2, 3, null]],
+            [1, ["temperamentname", { value: this.inTemperament }], 0, 0, [0]],
+            [2, ["notename", { value: note }], 0, 0, [0]],
+            [3, ["number", { value: octave }], 0, 0, [0]]
+        ];
+        this.activity.blocks.loadNewBlocks(newStack1);
+
         const value = this.activity.blocks.findUniqueTemperamentName(this.inTemperament);
         // Change from temporary "custom" to "custom1" or "custom2" ...
         this.inTemperament = value;
         const newStack = [
-            [0, "temperament1", 100, 100, [null, 1, 2, null]],
+            [0, ["temperament1", {
+                collapsed: true
+            }], 150, 100, [null, 1, 2, null]],
             [1, ["text", { value: value }], 0, 0, [0]],
             [2, ["storein"], 0, 0, [0, 3, 4, 5]],
             [3, ["text", { value: this._logo.synth.startingPitch }], 0, 0, [2]],
@@ -1717,20 +1731,12 @@ function TemperamentWidget() {
                 previousBlock = idx + 10;
             }
         }
-        this.activity.blocks.loadNewBlocks(newStack);
-        this.activity.textMsg(_("New action block generated!"));
 
-        const len = this._logo.synth.startingPitch.length;
-        const note = this._logo.synth.startingPitch.substring(0, len - 1);
-        const octave = this._logo.synth.startingPitch.slice(-1);
-        const newStack1 = [
-            [0, "settemperament", 100, 100, [null, 1, 2, 3, null]],
-            [1, ["temperamentname", { value: this.inTemperament }], 0, 0, [0]],
-            [2, ["notename", { value: note }], 0, 0, [0]],
-            [3, ["number", { value: octave }], 0, 0, [0]]
-        ];
-        this.activity.blocks.loadNewBlocks(newStack1);
-        this.activity.textMsg(_("New action block generated!"));
+        const that = this;
+        setTimeout(() => {
+            that.activity.blocks.loadNewBlocks(newStack);
+            that.activity.textMsg(_("New action block generated!"));
+        }, 500);
 
         if (isCustomTemperament(this.inTemperament)) {
             deleteTemperamentFromList(this.inTemperament);

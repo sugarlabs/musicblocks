@@ -929,7 +929,7 @@ class ModeWidget {
                         collapsed: true
                     }
                 ],
-                100,
+                150,
                 100,
                 [null, 1, 2, null]
             ],
@@ -1018,7 +1018,9 @@ class ModeWidget {
 
         // And save a stack of pitchnumbers to be used with the define mode
         newStack = [
-            [0, "definemode", 150, 120, [null, 1, 3, 2]],
+            [0, ["definemode", {
+                collapsed: true
+            }], 150, 150, [null, 1, 3, 2]],
             [
                 1,
                 [

@@ -867,6 +867,7 @@ function setupActionBlocks(activity) {
             this.formBlock({
                 name: _("define temperament"),
                 args: 1,
+                canCollapse: true,
                 argLabels: [""],
                 defaults: ["custom"],
                 argTypes: ["text"]
