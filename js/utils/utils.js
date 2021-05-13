@@ -630,6 +630,7 @@ function processRawPluginData(activity, rawData) {
         obj = null;
         activity.errorMsg("Error loading plugin: " + e);
     }
+
     return obj;
 }
 
