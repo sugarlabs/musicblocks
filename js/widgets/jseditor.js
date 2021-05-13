@@ -30,7 +30,8 @@ class JSEditor {
     /**
      * @constructor
      */
-    constructor() {
+    constructor(activity) {
+        this.activity = activity;
         this.isOpen = true;
         this._showingHelp = false;
 

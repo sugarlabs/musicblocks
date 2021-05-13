@@ -1,8 +1,29 @@
-function setupExtrasBlocks() {
+// Copyright (c) 2019 Bottersnike
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+/*
+   global
+
+   _, last, FlowBlock, ValueBlock, LeftBlock, NOINPUTERRORMSG,
+   NANERRORMSG, mixedNumber, TONEBPM, DEFAULTDELAY, Singer,
+   StackClampBlock, platformColor
+*/
+
+/* exported setupExtrasBlocks */
+
+function setupExtrasBlocks(activity) {
     class FloatToStringBlock extends LeftBlock {
         constructor() {
             super("float2string", _("fraction"));
-            this.setPalette("extras");
+            this.setPalette("extras", activity);
             this.setHelpString([
                 _("Convert a float to a fraction") + " 0.5 -> 1/2",
                 "documentation",
@@ -18,9 +39,9 @@ function setupExtrasBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            const cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = activity.blocks.blockList[blk].connections[1];
             if (cblk === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return "0/1";
             } else {
                 let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
@@ -31,7 +52,7 @@ function setupExtrasBlocks() {
                     }
                     return mixedNumber(a);
                 }
-                logo.errorMsg(NANERRORMSG, blk);
+                activity.errorMsg(NANERRORMSG, blk);
                 return "0/1";
             }
         }
@@ -40,7 +61,7 @@ function setupExtrasBlocks() {
     class SaveABCBlock extends FlowBlock {
         constructor() {
             super("saveabc");
-            this.setPalette("extras");
+            this.setPalette("extras", activity);
             this.setHelpString();
 
             this.formBlock({
@@ -55,7 +76,7 @@ function setupExtrasBlocks() {
 
         flow(args) {
             if (args.length === 1) {
-                save.afterSaveAbc(args[0]);
+                activity.save.afterSaveAbc(args[0]);
             }
         }
     }
@@ -63,7 +84,7 @@ function setupExtrasBlocks() {
     class SaveLilypondBlock extends FlowBlock {
         constructor() {
             super("savelilypond");
-            this.setPalette("extras");
+            this.setPalette("extras", activity);
             this.setHelpString();
 
             this.formBlock({
@@ -78,7 +99,7 @@ function setupExtrasBlocks() {
 
         flow(args) {
             if (args.length === 1) {
-                save.afterSaveLilypond(args[0]);
+                activity.save.afterSaveLilypond(args[0]);
             }
         }
     }
@@ -86,7 +107,7 @@ function setupExtrasBlocks() {
     class SaveSVGBlock extends FlowBlock {
         constructor() {
             super("savesvg");
-            this.setPalette("extras");
+            this.setPalette("extras", activity);
             this.setHelpString();
 
             this.formBlock({
@@ -101,7 +122,7 @@ function setupExtrasBlocks() {
 
         flow(args, logo, turtle, blk) {
             if (args[0] === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
@@ -113,12 +134,12 @@ function setupExtrasBlocks() {
                         '" width="' +
                         logo.canvas.width +
                         '" fill="' +
-                        body.style.background +
+                        platformColor.background +
                         '"/> ' +
                         logo.svgOutput;
                 }
 
-                save.saveSVG(args[0]);
+                activity.save.saveSVG(args[0]);
             }
         }
     }
@@ -126,11 +147,9 @@ function setupExtrasBlocks() {
     class NoBackgroundBlock extends FlowBlock {
         constructor() {
             super("nobackground", _("no background"));
-            this.setPalette("extras");
+            this.setPalette("extras", activity);
             this.setHelpString([
-                _(
-                    "The No background block eliminates the background from the saved SVG output."
-                ),
+                _("The No background block eliminates the background from the saved SVG output."),
                 "documentation",
                 "",
                 "makehelp"
@@ -145,16 +164,12 @@ function setupExtrasBlocks() {
     class ShowBlocksBlock extends FlowBlock {
         constructor() {
             super("showblocks", _("show blocks"));
-            this.setPalette("extras");
-            this.setHelpString([
-                _("The Show blocks block shows the blocks."),
-                "documentation",
-                ""
-            ]);
+            this.setPalette("extras", activity);
+            this.setHelpString([_("The Show blocks block shows the blocks."), "documentation", ""]);
         }
 
         flow(args, logo) {
-            logo.blocks.showBlocks();
+            activity.blocks.showBlocks();
             logo.turtleDelay = DEFAULTDELAY;
         }
     }
@@ -162,16 +177,12 @@ function setupExtrasBlocks() {
     class HideBlocksBlock extends FlowBlock {
         constructor() {
             super("hideblocks", _("hide blocks"));
-            this.setPalette("extras");
-            this.setHelpString([
-                _("The Hide blocks block hides the blocks."),
-                "documentation",
-                ""
-            ]);
+            this.setPalette("extras", activity);
+            this.setHelpString([_("The Hide blocks block hides the blocks."), "documentation", ""]);
         }
 
         flow(args, logo) {
-            blocks.hideBlocks();
+            activity.blocks.hideBlocks();
             logo.showBlocksAfterRun = false;
             logo.turtleDelay = 0;
         }
@@ -180,7 +191,7 @@ function setupExtrasBlocks() {
     class VSpaceBlock extends FlowBlock {
         constructor() {
             super("vspace", "↓");
-            this.setPalette("extras");
+            this.setPalette("extras", activity);
             this.setHelpString([
                 _("The Space block is used to add space between blocks."),
                 "documentation",
@@ -198,7 +209,7 @@ function setupExtrasBlocks() {
     class HSpaceBlock extends LeftBlock {
         constructor() {
             super("hspace", "←");
-            this.setPalette("extras");
+            this.setPalette("extras", activity);
             this.setHelpString([
                 _("The Space block is used to add space between blocks."),
                 "documentation",
@@ -214,7 +225,7 @@ function setupExtrasBlocks() {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            const cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = activity.blocks.blockList[blk].connections[1];
             return logo.parseArg(logo, turtle, cblk, blk, receivedArg);
         }
     }
@@ -222,11 +233,9 @@ function setupExtrasBlocks() {
     class WaitBlock extends FlowBlock {
         constructor() {
             super("wait", _("wait"));
-            this.setPalette("extras");
+            this.setPalette("extras", activity);
             this.setHelpString([
-                _(
-                    "The Wait block pauses the program for a specified number of seconds."
-                ),
+                _("The Wait block pauses the program for a specified number of seconds."),
                 "documentation",
                 ""
             ]);
@@ -238,7 +247,7 @@ function setupExtrasBlocks() {
         }
 
         flow(args, logo, turtle) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (args.length === 1) {
                 const bpmFactor =
@@ -255,7 +264,7 @@ function setupExtrasBlocks() {
     class CommentBlock extends FlowBlock {
         constructor() {
             super("comment");
-            this.setPalette("extras");
+            this.setPalette("extras", activity);
             this.setHelpString([
                 _(
                     "The Comment block prints a comment at the top of the screen when the program is running in slow mode."
@@ -274,9 +283,11 @@ function setupExtrasBlocks() {
 
         flow(args, logo, turtle) {
             if (args[0] !== null) {
-                console.debug(args[0].toString());
-                if (!logo.turtles.ithTurtle(turtle).singer.suppressOutput && logo.turtleDelay > 0) {
-                    logo.textMsg(args[0].toString());
+                if (
+                    !activity.turtles.ithTurtle(turtle).singer.suppressOutput &&
+                    logo.turtleDelay > 0
+                ) {
+                    activity.textMsg(args[0].toString());
                 }
             }
         }
@@ -285,8 +296,8 @@ function setupExtrasBlocks() {
     class PrintBlock extends FlowBlock {
         constructor() {
             super("print", _("print"));
-            if (beginnerMode) this.setPalette("media");
-            else this.setPalette("extras");
+            if (activity.beginnerMode) this.setPalette("media", activity);
+            else this.setPalette("extras", activity);
 
             this.beginnerBlock(true);
 
@@ -304,32 +315,36 @@ function setupExtrasBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = activity.blocks.blockList[blk].connections[1];
             if (logo.inOscilloscope && cblk !== null) {
-                const name = logo.blocks.blockList[cblk].value;
+                const name = activity.blocks.blockList[cblk].value;
                 let turtle = -1;
-                for (let i = 0; i < logo.turtles.turtleList.length; i++) {
-                    if (!logo.turtles.turtleList[i].inTrash) {
-                        const turtleName = turtles.turtleList[i].name;
+                for (let i = 0; i < activity.turtles.turtleList.length; i++) {
+                    if (!activity.turtles.turtleList[i].inTrash) {
+                        const turtleName = activity.turtles.turtleList[i].name;
                         if (turtleName === name) turtle = i;
                     }
                 }
-                if (turtle > -1 && logo.oscilloscopeTurtles.indexOf(logo.turtles.turtleList[turtle]) < 0) logo.oscilloscopeTurtles.push(logo.turtles.turtleList[turtle]);
+                if (
+                    turtle > -1 &&
+                    logo.oscilloscopeTurtles.indexOf(activity.turtles.turtleList[turtle]) < 0
+                )
+                    logo.oscilloscopeTurtles.push(activity.turtles.turtleList[turtle]);
             } else if (!logo.inStatusMatrix) {
                 if (args.length === 1) {
                     if (args[0] !== null) {
-                        const tur = logo.turtles.ithTurtle(turtle);
+                        const tur = activity.turtles.ithTurtle(turtle);
 
                         if (!tur.singer.suppressOutput) {
-                            if (logo.blocks.blockList[cblk].name === "grid"){
+                            if (activity.blocks.blockList[cblk].name === "grid") {
+                                // eslint-disable-next-line no-use-before-define
                                 const temp = new DisplayGridBlock();
-                                temp.flow(args,logo,turtle,blk);
-                            } else if (args[0] === undefined) {
-                                logo.textMsg("undefined");
-                            } else if (args[0] === null) {
-                                logo.textMsg("null");
+                                temp.flow(args, logo, turtle, blk);
                             } else {
-                                logo.textMsg(args[0].toString());
+                                const tur = activity.turtles.ithTurtle(turtle);
+                                if (tur.singer.inNoteBlock.length > 0) {
+                                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
+                                }
                             }
                         } else if (logo.runningLilypond) {
                             if (tur.singer.inNoteBlock.length > 0) {
@@ -345,7 +360,7 @@ function setupExtrasBlocks() {
     class DrumBlock extends StackClampBlock {
         constructor() {
             super("drum");
-            this.setPalette("extras");
+            this.setPalette("extras", activity);
             this.setHelpString();
 
             this.formBlock({ name: _("start drum"), canCollapse: true });
@@ -361,7 +376,7 @@ function setupExtrasBlocks() {
     class DisplayGridBlock extends FlowBlock {
         constructor() {
             super("displaygrid", _("display grid"));
-            this.setPalette("extras");
+            this.setPalette("extras", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -373,51 +388,51 @@ function setupExtrasBlocks() {
             this.formBlock({
                 args: 1,
                 defaults: ["Cartesian"],
-                argTypes: ["gridin"],
+                argTypes: ["gridin"]
             });
             this.makeMacro((x, y) => [
                 [0, "displaygrid", x, y, [null, 1, null]],
-                [1, ["grid", { value: "Cartesian" }], 0, 0, [0]],
+                [1, ["grid", { value: "Cartesian" }], 0, 0, [0]]
             ]);
             this.hidden = this.deprecated = true;
         }
 
-        flow(args, logo, turtle, blk) {
-            if (!args || !args[0]){
+        flow(args) {
+            if (!args || !args[0]) {
                 args = ["Cartesian"];
             }
-            const act = logo.blocks.activity ;
-            logo.turtles.hideGrids() ;
-            switch (args[0]){
-                case (_("Cartesian")) :
+            const act = activity.blocks.activity;
+            activity.hideGrids();
+            switch (args[0]) {
+                case _("Cartesian"):
                     act._showCartesian();
                     break;
-                case (_("polar")) :
+                case _("polar"):
                     act._showPolar();
                     break;
-                case (_("Cartesian+polar")) :
+                case _("Cartesian+polar"):
                     act._showPolar();
                     act._showCartesian();
                     break;
-                case (_("treble")) :
+                case _("treble"):
                     act._showTreble();
                     break;
-                case (_("grand staff")) :
+                case _("grand staff"):
                     act._showGrand();
                     break;
-                case (_("mezzo-soprano")):
+                case _("mezzo-soprano"):
                     act._showSoprano();
                     break;
-                case (_("alto")) :
+                case _("alto"):
                     act._showAlto();
                     break;
-                case (_("tenor")) :
+                case _("tenor"):
                     act._showTenor();
                     break;
-                case (_("bass")) :
+                case _("bass"):
                     act._showBass();
                     break;
-                case (_("none")) :
+                case _("none"):
                     break;
             }
         }
@@ -426,7 +441,7 @@ function setupExtrasBlocks() {
     class GridBlock extends ValueBlock {
         constructor() {
             super("grid");
-            this.setPalette("extras");
+            this.setPalette("extras", activity);
             this.setHelpString();
             this.formBlock({ outType: "gridout" });
         }
@@ -436,7 +451,7 @@ function setupExtrasBlocks() {
     class NOPValueBlock extends ValueBlock {
         constructor() {
             super("nopValueBlock", _("unknown"));
-            this.setPalette("extras");
+            this.setPalette("extras", activity);
             this.setHelpString();
             this.formBlock({ outType: "anyout" });
             this.hidden = true;
@@ -446,7 +461,7 @@ function setupExtrasBlocks() {
     class NOPOneArgMathBlock extends LeftBlock {
         constructor() {
             super("nopOneArgMathBlock", _("unknown"));
-            this.setPalette("extras");
+            this.setPalette("extras", activity);
             this.setHelpString();
             this.formBlock({
                 args: 1,
@@ -460,7 +475,7 @@ function setupExtrasBlocks() {
     class NOPTwoArgMathBlock extends LeftBlock {
         constructor() {
             super("nopOneArgMathBlock", _("unknown"));
-            this.setPalette("extras");
+            this.setPalette("extras", activity);
             this.setHelpString();
             this.formBlock({
                 args: 2,
@@ -474,7 +489,7 @@ function setupExtrasBlocks() {
     class NOPZeroArgBlock extends FlowBlock {
         constructor() {
             super("nopZeroArgBlock", _("unknown"));
-            this.setPalette("extras");
+            this.setPalette("extras", activity);
             this.setHelpString();
             this.hidden = true;
         }
@@ -483,7 +498,7 @@ function setupExtrasBlocks() {
     class NOPOneArgBlock extends FlowBlock {
         constructor() {
             super("nopOneArgBlock", _("unknown"));
-            this.setPalette("extras");
+            this.setPalette("extras", activity);
             this.setHelpString();
             this.formBlock({ args: 1, argTypes: ["anyin"] });
             this.hidden = true;
@@ -493,7 +508,7 @@ function setupExtrasBlocks() {
     class NOPTwoArgBlock extends FlowBlock {
         constructor() {
             super("nopTwoArgBlock", _("unknown"));
-            this.setPalette("extras");
+            this.setPalette("extras", activity);
             this.setHelpString();
             this.formBlock({ args: 2, argTypes: ["anyin", "anyin"] });
             this.hidden = true;
@@ -503,7 +518,7 @@ function setupExtrasBlocks() {
     class NOPThreeArgBlock extends FlowBlock {
         constructor() {
             super("nopThreeArgBlock", _("unknown"));
-            this.setPalette("extras");
+            this.setPalette("extras", activity);
             this.setHelpString();
             this.formBlock({ args: 3, argTypes: ["anyin", "anyin", "anyin"] });
             this.hidden = true;
@@ -513,7 +528,7 @@ function setupExtrasBlocks() {
     class NOPFourArgBlock extends FlowBlock {
         constructor() {
             super("nopFourArgBlock", _("unknown"));
-            this.setPalette("extras");
+            this.setPalette("extras", activity);
             this.setHelpString();
             this.formBlock({
                 args: 4,
@@ -523,28 +538,28 @@ function setupExtrasBlocks() {
         }
     }
 
-    new SaveABCBlock().setup();
-    new SaveLilypondBlock().setup();
-    new SaveSVGBlock().setup();
-    new NoBackgroundBlock().setup();
-    new ShowBlocksBlock().setup();
-    new HideBlocksBlock().setup();
-    new FloatToStringBlock().setup();
-    new DrumBlock().setup();
-    new DisplayGridBlock().setup();
-    new GridBlock().setup();
-    new VSpaceBlock().setup();
-    new HSpaceBlock().setup();
-    new WaitBlock().setup();
-    new CommentBlock().setup();
-    new PrintBlock().setup();
+    new SaveABCBlock().setup(activity);
+    new SaveLilypondBlock().setup(activity);
+    new SaveSVGBlock().setup(activity);
+    new NoBackgroundBlock().setup(activity);
+    new ShowBlocksBlock().setup(activity);
+    new HideBlocksBlock().setup(activity);
+    new FloatToStringBlock().setup(activity);
+    new DrumBlock().setup(activity);
+    new DisplayGridBlock().setup(activity);
+    new GridBlock().setup(activity);
+    new VSpaceBlock().setup(activity);
+    new HSpaceBlock().setup(activity);
+    new WaitBlock().setup(activity);
+    new CommentBlock().setup(activity);
+    new PrintBlock().setup(activity);
     // NOP blocks
-    new NOPValueBlock().setup();
-    new NOPOneArgMathBlock().setup();
-    new NOPTwoArgMathBlock().setup();
-    new NOPZeroArgBlock().setup();
-    new NOPOneArgBlock().setup();
-    new NOPTwoArgBlock().setup();
-    new NOPThreeArgBlock().setup();
-    new NOPFourArgBlock().setup();
+    new NOPValueBlock().setup(activity);
+    new NOPOneArgMathBlock().setup(activity);
+    new NOPTwoArgMathBlock().setup(activity);
+    new NOPZeroArgBlock().setup(activity);
+    new NOPOneArgBlock().setup(activity);
+    new NOPTwoArgBlock().setup(activity);
+    new NOPThreeArgBlock().setup(activity);
+    new NOPFourArgBlock().setup(activity);
 }

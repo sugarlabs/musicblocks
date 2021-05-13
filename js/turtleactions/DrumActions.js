@@ -3,7 +3,7 @@
  * @author Anindya Kundu
  * @author Walter Bender
  *
- * @copyright 2014-2020 Walter Bender
+ * @copyright 2014-2021 Walter Bender
  * @copyright 2020 Anindya Kundu
  *
  * @license
@@ -20,8 +20,10 @@
  */
 
 /*
-   global Singer, DEFAULTDRUM, DRUMNAMES, last, DEFAULTVOLUME, logo, blocks, MusicBlocks, Mouse,
-   NOISENAMES, _
+   global
+
+   Singer, DEFAULTDRUM, DRUMNAMES, last, DEFAULTVOLUME, MusicBlocks,
+   Mouse, NOISENAMES, _
 */
 
 /*
@@ -30,8 +32,6 @@
         _
     js/turtle-singer.js
         Singer
-    js/activity.js
-        logo, blocks
     js/utils/synthutils.js
         DRUMNAMES, NOISENAMES
     js/utils/musicutils.js
@@ -48,7 +48,7 @@
  * Sets up all the methods related to different actions for each block in Drum palette.
  * @returns {void}
  */
-function setupDrumActions() {
+function setupDrumActions(activity) {
     Singer.DrumActions = class {
         /**
          * Utility function that returns appropriate object key in DRUMNAMES corresponding to passed parameter.
@@ -85,7 +85,7 @@ function setupDrumActions() {
         static playDrum(drum, turtle, blk) {
             let drumname = Singer.DrumActions.GetDrumname(drum);
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             // If we are in a setdrum clamp, override the drum name
             if (tur.singer.drumStyle.length > 0) {
@@ -100,7 +100,7 @@ function setupDrumActions() {
                 }
             } else {
                 // Play a stand-alone drum block as a quarter note.
-                logo.clearNoteParams(tur, blk, []);
+                activity.logo.clearNoteParams(tur, blk, []);
                 tur.singer.inNoteBlock.push(blk);
                 tur.singer.noteDrums[last(tur.singer.inNoteBlock)].push(drumname);
 
@@ -109,7 +109,7 @@ function setupDrumActions() {
                 const __callback = () =>
                     tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
 
-                Singer.processNote(noteBeatValue, false, blk, turtle, __callback);
+                Singer.processNote(activity, noteBeatValue, false, blk, turtle, __callback);
             }
 
             tur.singer.pushedNote = true;
@@ -132,13 +132,13 @@ function setupDrumActions() {
                 }
             }
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.drumStyle.push(drumname);
 
             const listenerName = "_setdrum_" + turtle;
-            if (blk !== undefined && blk in blocks.blockList) {
-                logo.setDispatchBlock(blk, turtle, listenerName);
+            if (blk !== undefined && blk in activity.blocks.blockList) {
+                activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
@@ -149,11 +149,11 @@ function setupDrumActions() {
                 tur.singer.pitchDrumTable = {};
             };
 
-            logo.setTurtleListener(turtle, listenerName, __listener);
-            if (logo.inRhythmRuler) {
-                logo._currentDrumBlock = blk;
-                logo.rhythmRuler.Drums.push(blk);
-                logo.rhythmRuler.Rulers.push([[], []]);
+            activity.logo.setTurtleListener(turtle, listenerName, __listener);
+            if (activity.logo.inRhythmRuler) {
+                activity.logo._currentDrumBlock = blk;
+                activity.logo.rhythmRuler.Drums.push(blk);
+                activity.logo.rhythmRuler.Rulers.push([[], []]);
             }
         }
 
@@ -174,13 +174,13 @@ function setupDrumActions() {
                 }
             }
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.drumStyle.push(drumname);
 
             const listenerName = "_mapdrum_" + turtle;
-            if (blk !== undefined && blk in blocks.blockList) {
-                logo.setDispatchBlock(blk, turtle, listenerName);
+            if (blk !== undefined && blk in activity.blocks.blockList) {
+                activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (MusicBlocks.isRun) {
                 const mouse = Mouse.getMouseFromTurtle(tur);
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
@@ -188,11 +188,11 @@ function setupDrumActions() {
 
             const __listener = () => tur.singer.drumStyle.pop();
 
-            logo.setTurtleListener(turtle, listenerName, __listener);
-            if (logo.inRhythmRuler) {
-                logo._currentDrumBlock = blk;
-                logo.rhythmRuler.Drums.push(blk);
-                logo.rhythmRuler.Rulers.push([[], []]);
+            activity.logo.setTurtleListener(turtle, listenerName, __listener);
+            if (activity.logo.inRhythmRuler) {
+                activity.logo._currentDrumBlock = blk;
+                activity.logo.rhythmRuler.Drums.push(blk);
+                activity.logo.rhythmRuler.Rulers.push([[], []]);
             }
         }
 
@@ -215,7 +215,7 @@ function setupDrumActions() {
                 }
             }
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (tur.singer.inNoteBlock.length > 0) {
                 // Add the noise sound as if it were a drum
@@ -228,7 +228,7 @@ function setupDrumActions() {
 
                 tur.singer.pushedNote = true;
             } else {
-                logo.errorMsg(_("Noise Block: Did you mean to use a Note block?"), blk);
+                activity.errorMsg(_("Noise Block: Did you mean to use a Note block?"), blk);
                 return;
             }
         }

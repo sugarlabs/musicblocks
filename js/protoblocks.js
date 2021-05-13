@@ -1,4 +1,4 @@
-// Copyright (c) 2014-19 Walter Bender
+// Copyright (c) 2014-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -8,6 +8,19 @@
 // You should have received a copy of the GNU Affero General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+/*
+   global
+
+   createjs, SVG, DEFAULTBLOCKSCALE, STANDARDBLOCKHEIGHT
+*/
+
+/*
+   exported
+
+   ProtoBlock, ValueBlock, BooleanBlock, BooleanSensorBlock,
+   LeftBlock, FlowClampBlock, StackClampBlock
+*/
 
 // The ProtoBlock class is defined in this file. Protoblocks are the
 // prototypes from which Blocks are created.
@@ -1415,8 +1428,8 @@ class BaseBlock extends ProtoBlock {
         this.lang = localStorage.languagePreference || navigator.language;
     }
 
-    setPalette(palette) {
-        this.palette = palettes.dict[palette];
+    setPalette(palette, activity) {
+        this.palette = activity.palettes.dict[palette];
     }
 
     setHelpString(help) {
@@ -1455,8 +1468,7 @@ class BaseBlock extends ProtoBlock {
             this.expandable = true;
 
         this.args = this._style.flows.labels.length + this._style.args;
-        if (this.size === 0) {
-        } else {
+        if (this.size !== 0) {
             this.size = 1 + this._style.flows.labels.length;
         }
         if (this._style.argTypes[0] === "booleanin") this.size++;
@@ -1643,15 +1655,16 @@ class BaseBlock extends ProtoBlock {
         this.beginnerModeBlock = value;
     }
 
-    setup() {
-        blocks.protoBlockDict[this.name] = this;
+    setup(activity) {
+        activity.blocks.protoBlockDict[this.name] = this;
 
-        if (beginnerMode && !this.beginnerModeBlock) {
+        if (activity.beginnerMode && !this.beginnerModeBlock) {
             this.hidden = true;
         }
 
         if (this._style.name) this.adjustWidthToLabel();
         if (!this.palette)
+            // eslint-disable-next-line no-console
             console.warn("Block " + this.name + " was not added to a palette!");
         else this.palette.add(this);
     }

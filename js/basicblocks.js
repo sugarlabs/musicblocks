@@ -1,4 +1,4 @@
-// Copyright (c) 2014-20 Walter Bender
+// Copyright (c) 2014-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -14,12 +14,24 @@
 // Some names changed between the Python verison and the
 // JS version so look up name in the conversion dictionary.
 
-/* global setupRhythmBlockPaletteBlocks,setupRhythmBlocks,setupMeterBlocks,setupPitchBlocks,setupIntervalsBlocks,setupToneBlocks,
- setupOrnamentBlocks,setupVolumeBlocks,setupDrumBlocks,setupWidgetBlocks,setupFlowBlocks,setupNumberBlocks,setupActionBlocks,
- setupBoxesBlocks,setupBooleanBlocks,setupHeapBlocks,setupDictBlocks,setupExtrasBlocks,setupProgramBlocks,setupGraphicsBlocks
- setupPenBlocks,setupMediaBlocks,setupSensorsBlocks,setupEnsembleBlocks */
+/*
+   global
 
-/* exported initBasicProtoBlocks,BACKWARDCOMPATIBILIYDICT */
+   setupRhythmBlockPaletteBlocks, setupRhythmBlocks, setupMeterBlocks,
+   setupPitchBlocks, setupIntervalsBlocks, setupToneBlocks,
+   setupOrnamentBlocks, setupVolumeBlocks, setupDrumBlocks,
+   setupWidgetBlocks, setupFlowBlocks, setupNumberBlocks,
+   setupActionBlocks, setupBoxesBlocks, setupBooleanBlocks,
+   setupHeapBlocks, setupDictBlocks, setupExtrasBlocks,
+   setupProgramBlocks, setupGraphicsBlocks setupPenBlocks,
+   setupMediaBlocks, setupSensorsBlocks, setupEnsembleBlocks
+ */
+
+/*
+   exported
+
+   initBasicProtoBlocks, BACKWARDCOMPATIBILIYDICT
+ */
 
 const BACKWARDCOMPATIBILIYDICT = {
     fullscreen: "vspace",
@@ -65,37 +77,39 @@ const BACKWARDCOMPATIBILIYDICT = {
  * @param  {Object} blocks
  * @returns {void}
  */
-function initBasicProtoBlocks(palettes, blocks) {
-    blocks.palettes = palettes;
-    setupRhythmBlockPaletteBlocks();
-    setupRhythmBlocks();
-    setupMeterBlocks();
-    setupPitchBlocks();
-    setupIntervalsBlocks();
-    setupToneBlocks();
-    setupOrnamentBlocks();
-    setupVolumeBlocks();
-    setupDrumBlocks();
-    setupWidgetBlocks();
-    setupFlowBlocks();
-    setupNumberBlocks();
-    setupActionBlocks();
-    setupBoxesBlocks();
-    setupBooleanBlocks();
-    setupHeapBlocks();
-    setupDictBlocks();
-    setupExtrasBlocks();
-    setupProgramBlocks();
-    setupGraphicsBlocks();
-    setupPenBlocks();
-    setupMediaBlocks();
-    setupSensorsBlocks();
-    setupEnsembleBlocks();
+function initBasicProtoBlocks(activity) {
+    activity.blocks.palettes = activity.palettes;
+    setupRhythmBlockPaletteBlocks(activity);
+    setupRhythmBlocks(activity);
+    setupMeterBlocks(activity);
+    setupPitchBlocks(activity);
+    setupIntervalsBlocks(activity);
+    setupToneBlocks(activity);
+    setupOrnamentBlocks(activity);
+    setupVolumeBlocks(activity);
+    setupDrumBlocks(activity);
+    setupWidgetBlocks(activity);
+    setupFlowBlocks(activity);
+    setupNumberBlocks(activity);
+    setupActionBlocks(activity);
+    setupBoxesBlocks(activity);
+    setupBooleanBlocks(activity);
+    setupHeapBlocks(activity);
+    setupDictBlocks(activity);
+    setupExtrasBlocks(activity);
+    setupProgramBlocks(activity);
+    setupGraphicsBlocks(activity);
+    setupPenBlocks(activity);
+    setupMediaBlocks(activity);
+    setupSensorsBlocks(activity);
+    setupEnsembleBlocks(activity);
 
     // Push protoblocks onto their palettes.
-    for (const protoblock in blocks.protoBlockDict) {
-        if (blocks.protoBlockDict[protoblock].palette != null) {
-            blocks.protoBlockDict[protoblock].palette.add(blocks.protoBlockDict[protoblock]);
+    for (const protoblock in activity.blocks.protoBlockDict) {
+        if (activity.blocks.protoBlockDict[protoblock].palette != null) {
+            activity.blocks.protoBlockDict[protoblock].palette.add(
+                activity.blocks.protoBlockDict[protoblock]
+            );
         }
     }
 }

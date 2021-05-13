@@ -1,21 +1,41 @@
-function setupMeterBlocks() {
+// Copyright (c) 2019 Bottersnike
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+/*
+   global
+
+   _, ValueBlock, LeftBlock, FlowBlock, NOINPUTERRORMSG, Singer,
+   NOACTIONERRORMSG, TONEBPM, FlowClampBlock
+ */
+
+/* exported setupMeterBlocks */
+
+function setupMeterBlocks(activity) {
     class CurrentMeterBlock extends ValueBlock {
         constructor() {
             //.TRANS: musical meter (time signature), e.g., 4:4
             super("currentmeter", _("current meter"));
-            this.setPalette("meter");
+            this.setPalette("meter", activity);
             this.parameter = true;
             this.setHelpString();
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            return activity.blocks.blockList[blk].value;
         }
 
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "currentmeter"]);
             } else {
@@ -28,7 +48,7 @@ function setupMeterBlocks() {
         constructor() {
             //.TRANS: number of beats per minute
             super("beatfactor", _("beat factor"));
-            this.setPalette("meter");
+            this.setPalette("meter", activity);
             this.parameter = true;
             this.setHelpString([
                 _(
@@ -40,17 +60,17 @@ function setupMeterBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            return activity.blocks.blockList[blk].value;
         }
 
-        setter(logo, value, turtle, blk) {
-            logo.turtles.ithTurtle(turtle).singer.beatFactor = value;
+        setter(logo, value, turtle) {
+            activity.turtles.ithTurtle(turtle).singer.beatFactor = value;
         }
 
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]]
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]]
                     .name === "print"
             ) {
                 logo.statusFields.push([blk, "beatfactor"]);
@@ -63,7 +83,7 @@ function setupMeterBlocks() {
     class BPMFactorBlock extends ValueBlock {
         constructor() {
             super("bpmfactor");
-            this.setPalette("meter");
+            this.setPalette("meter", activity);
             this.parameter = true;
             this.setHelpString([
                 _(
@@ -83,11 +103,11 @@ function setupMeterBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            return activity.blocks.blockList[blk].value;
         }
 
-        setter(logo, value, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+        setter(logo, value, turtle) {
+            const tur = activity.turtles.ithTurtle(turtle);
 
             const len = tur.singer.bpm.length;
             if (len > 0) {
@@ -100,7 +120,7 @@ function setupMeterBlocks() {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "bpm"]);
             } else {
@@ -113,7 +133,7 @@ function setupMeterBlocks() {
         constructor() {
             //.TRANS: count of current musical measure in meter
             super("measurevalue", _("measure count"));
-            this.setPalette("meter");
+            this.setPalette("meter", activity);
             this.parameter = true;
             this.setHelpString([
                 _("The Measure count block returns the current measure."),
@@ -123,13 +143,13 @@ function setupMeterBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            return activity.blocks.blockList[blk].value;
         }
 
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "measurevalue"]);
             } else {
@@ -142,10 +162,10 @@ function setupMeterBlocks() {
         constructor() {
             //.TRANS: count of current beat in the meter
             super("beatvalue", _("beat count"));
-            this.setPalette("meter");
+            this.setPalette("meter", activity);
             this.beginnerBlock(true);
             this.parameter = true;
-            if (beginnerMode && this.lang === "ja") {
+            if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
                     _(
                         "The Beat count block is the number of the current beat,"
@@ -177,13 +197,13 @@ function setupMeterBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            return activity.blocks.blockList[blk].value;
         }
 
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "beatvalue"]);
             } else {
@@ -196,7 +216,7 @@ function setupMeterBlocks() {
         constructor() {
             //.TRANS: count the number of notes
             super("notecounter", _("sum note values"));
-            this.setPalette("meter");
+            this.setPalette("meter", activity);
             this.parameter = true;
             this.setHelpString([
                 _(
@@ -215,13 +235,13 @@ function setupMeterBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            return activity.blocks.blockList[blk].value;
         }
 
         arg(logo, turtle, blk) {
-            const cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = activity.blocks.blockList[blk].connections[1];
             if (cblk === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             } else {
                 return Singer.noteCounter(logo, turtle, cblk);
@@ -233,7 +253,7 @@ function setupMeterBlocks() {
         constructor() {
             //.TRANS: count the number of notes
             super("notecounter2", _("note counter"));
-            this.setPalette("meter");
+            this.setPalette("meter", activity);
             this.parameter = true;
             this.setHelpString([
                 _(
@@ -252,13 +272,13 @@ function setupMeterBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            return activity.blocks.blockList[blk].value;
         }
 
         arg(logo, turtle, blk) {
-            const cblk = logo.blocks.blockList[blk].connections[1];
+            const cblk = activity.blocks.blockList[blk].connections[1];
             if (cblk === null) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             } else {
                 return Singer.numberOfNotes(logo, turtle, cblk);
@@ -270,7 +290,7 @@ function setupMeterBlocks() {
         constructor() {
             //.TRANS: number of whole notes that have been played
             super("elapsednotes", _("whole notes played"));
-            this.setPalette("meter");
+            this.setPalette("meter", activity);
             this.parameter = true;
             this.beginnerBlock(true);
             this.setHelpString([
@@ -284,13 +304,13 @@ function setupMeterBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            return activity.blocks.blockList[blk].value;
         }
 
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "elapsednotes"]);
             } else {
@@ -303,7 +323,7 @@ function setupMeterBlocks() {
         constructor() {
             //.TRANS: number of notes that have been played
             super("elapsednotes2", _("notes played"));
-            this.setPalette("meter");
+            this.setPalette("meter", activity);
             this.beginnerBlock(true);
             this.setHelpString([
                 _(
@@ -329,17 +349,17 @@ function setupMeterBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            return activity.blocks.blockList[blk].value;
         }
 
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "elapsednotes2"]);
             } else {
-                const cblk = logo.blocks.blockList[blk].connections[1];
+                const cblk = activity.blocks.blockList[blk].connections[1];
                 const noteValue = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 return Singer.MeterActions.getNotesPlayed(noteValue, turtle);
             }
@@ -349,7 +369,7 @@ function setupMeterBlocks() {
     class DriftBlock extends FlowClampBlock {
         constructor() {
             super("drift");
-            this.setPalette("meter");
+            this.setPalette("meter", activity);
             this.setHelpString([
                 _(
                     "The No clock block decouples the notes from the master clock."
@@ -381,7 +401,7 @@ function setupMeterBlocks() {
         constructor() {
             // .TRANS: on musical 'offbeat' do some action
             super("offbeatdo", _("on weak beat do"));
-            this.setPalette("meter");
+            this.setPalette("meter", activity);
             this.setHelpString([
                 _(
                     "The On-weak-beat block let you specify actions to take on weak (off) beats."
@@ -399,7 +419,7 @@ function setupMeterBlocks() {
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
             if (!(args[0] in logo.actions)) {
-                logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
+                activity.errorMsg(NOACTIONERRORMSG, blk, args[1]);
             } else {
                 Singer.MeterActions.onWeakBeatDo(args[0], isflow, receivedArg, turtle, blk);
             }
@@ -410,7 +430,7 @@ function setupMeterBlocks() {
         constructor() {
             // .TRANS: 'on' musical 'beat' 'do' some action
             super("onbeatdo", _("on strong beat"));
-            this.setPalette("meter");
+            this.setPalette("meter", activity);
             this.piemenuValuesC1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
             this.setHelpString([
                 _(
@@ -431,7 +451,7 @@ function setupMeterBlocks() {
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
             if (args.length === 2) {
                 if (!(args[1] in logo.actions)) {
-                    logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
+                    activity.errorMsg(NOACTIONERRORMSG, blk, args[1]);
                 } else {
                     Singer.MeterActions.onStrongBeatDo(
                         args[0], args[1], isflow, receivedArg, turtle, blk
@@ -444,7 +464,7 @@ function setupMeterBlocks() {
         constructor() {
             // .TRANS: on every beat, do some action
             super("everybeatdonew", _("on every beat do"));
-            this.setPalette("meter");
+            this.setPalette("meter", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -472,7 +492,7 @@ function setupMeterBlocks() {
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
             if (!(args[0] in logo.actions)) {
-                logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
+                activity.errorMsg(NOACTIONERRORMSG, blk, args[1]);
             } else {
                 Singer.MeterActions.onEveryBeatDo(args[0], isflow, receivedArg, turtle, blk);
             }
@@ -483,7 +503,7 @@ function setupMeterBlocks() {
         constructor() {
             // .TRANS: on every note played, do some action
             super("everybeatdo", _("on every note do"));
-            this.setPalette("meter");
+            this.setPalette("meter", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
@@ -505,7 +525,7 @@ function setupMeterBlocks() {
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
             // Set up a listener for every beat for this turtle.
             if (!(args[0] in logo.actions)) {
-                logo.errorMsg(NOACTIONERRORMSG, blk, args[1]);
+                activity.errorMsg(NOACTIONERRORMSG, blk, args[1]);
             } else {
                 Singer.MeterActions.onEveryNoteDo(args[0], isflow, receivedArg, turtle, blk);
             }
@@ -516,7 +536,7 @@ function setupMeterBlocks() {
         constructor() {
             //.TRANS: sets tempo by defniing a beat and beats per minute
             super("setmasterbpm2", _("master beats per minute"));
-            this.setPalette("meter");
+            this.setPalette("meter", activity);
             this.piemenuValuesC1 = [42, 46, 50, 54, 58, 63, 69, 76, 84, 90, 96, 104, 112,
                 120, 132, 144,  160,  176,  192,  208];
             this.beginnerBlock(true);
@@ -554,9 +574,9 @@ function setupMeterBlocks() {
 
             if (logo.inTempo) {
                 logo.tempo.BPMBlocks.push(blk);
-                const bpmnumberblock = logo.blocks.blockList[blk].connections[1];
+                const bpmnumberblock = activity.blocks.blockList[blk].connections[1];
                 logo.tempo.BPMs.push(
-                    logo.blocks.blockList[bpmnumberblock].text.text
+                    activity.blocks.blockList[bpmnumberblock].text.text
                 );
             }
         }
@@ -565,7 +585,7 @@ function setupMeterBlocks() {
     class SetMasterBPMBlock extends FlowBlock {
         constructor() {
             super("setmasterbpm", _("master beats per minute"));
-            this.setPalette("meter");
+            this.setPalette("meter", activity);
             this.setHelpString();
             this.formBlock({
                 args: 1,
@@ -577,10 +597,10 @@ function setupMeterBlocks() {
         flow(args, logo, turtle, blk) {
             if (args.length === 1 && typeof args[0] === "number") {
                 if (args[0] < 30) {
-                    logo.errorMsg(_("Beats per minute must be > 30."), blk);
+                    activity.errorMsg(_("Beats per minute must be > 30."), blk);
                     Singer.masterBPM = 30;
                 } else if (args[0] > 1000) {
-                    logo.errorMsg(_("Maximum beats per minute is 1000."), blk);
+                    activity.errorMsg(_("Maximum beats per minute is 1000."), blk);
                     Singer.masterBPM = 1000;
                 } else {
                     Singer.masterBPM = args[0];
@@ -591,8 +611,8 @@ function setupMeterBlocks() {
 
             if (logo.inTempo) {
                 logo.tempo.BPMBlocks.push(blk);
-                const bpmnumberblock = logo.blocks.blockList[blk].connections[1];
-                logo.tempo.BPMs.push(logo.blocks.blockList[bpmnumberblock].text.text);
+                const bpmnumberblock = activity.blocks.blockList[blk].connections[1];
+                logo.tempo.BPMs.push(activity.blocks.blockList[bpmnumberblock].text.text);
             }
         }
     }
@@ -601,7 +621,7 @@ function setupMeterBlocks() {
         constructor() {
             //.TRANS: sets tempo by defniing a beat and beats per minute
             super("setbpm3", _("beats per minute"));
-            this.setPalette("meter");
+            this.setPalette("meter", activity);
             this.piemenuValuesC1 = [42, 46, 50, 54, 58, 63, 69, 76, 84, 90, 96, 104, 112,
                 120, 132, 144,  160,  176,  192,  208];
             this.beginnerBlock(true);
@@ -639,8 +659,8 @@ function setupMeterBlocks() {
 
             if (logo.inTempo) {
                 logo.tempo.BPMBlocks.push(blk);
-                const bpmnumberblock = logo.blocks.blockList[blk].connections[1];
-                logo.tempo.BPMs.push(logo.blocks.blockList[bpmnumberblock].text.text);
+                const bpmnumberblock = activity.blocks.blockList[blk].connections[1];
+                logo.tempo.BPMs.push(activity.blocks.blockList[bpmnumberblock].text.text);
             }
         }
     }
@@ -648,7 +668,7 @@ function setupMeterBlocks() {
     class SetBPM2Block extends FlowClampBlock {
         constructor() {
             super("setbpm2");
-            this.setPalette("meter");
+            this.setPalette("meter", activity);
             this.setHelpString();
 
             this.formBlock({
@@ -671,7 +691,7 @@ function setupMeterBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (
                 args.length === 3 &&
@@ -680,10 +700,10 @@ function setupMeterBlocks() {
             ) {
                 let bpm = (args[0] * args[1]) / 0.25;
                 if (args[0] < 30) {
-                    logo.errorMsg(_("Beats per minute must be > 30."));
+                    activity.errorMsg(_("Beats per minute must be > 30."));
                     bpm = 30;
                 } else if (args[0] > 1000) {
-                    logo.errorMsg(_("Maximum beats per minute is 1000."));
+                    activity.errorMsg(_("Maximum beats per minute is 1000."));
                     bpm = 1000;
                 }
 
@@ -693,6 +713,7 @@ function setupMeterBlocks() {
                 const listenerName = "_bpm_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
+                // eslint-disable-next-line no-unused-vars
                 const __listener = event => {
                     tur.singer.bpm.pop();
                 };
@@ -707,7 +728,7 @@ function setupMeterBlocks() {
     class SetBPMBlock extends FlowClampBlock {
         constructor() {
             super("setbpm");
-            this.setPalette("meter");
+            this.setPalette("meter", activity);
             this.setHelpString();
 
             this.formBlock({
@@ -725,15 +746,15 @@ function setupMeterBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (args.length === 2 && typeof args[0] === "number") {
                 let bpm;
                 if (args[0] < 30) {
-                    logo.errorMsg(_("Beats per minute must be > 30."), blk);
+                    activity.errorMsg(_("Beats per minute must be > 30."), blk);
                     bpm = 30;
                 } else if (args[0] > 1000) {
-                    logo.errorMsg(_("Maximum beats per minute is 1000."), blk);
+                    activity.errorMsg(_("Maximum beats per minute is 1000."), blk);
                     bpm = 1000;
                 } else {
                     bpm = args[0];
@@ -744,6 +765,7 @@ function setupMeterBlocks() {
                 const listenerName = "_bpm_" + turtle;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
+                // eslint-disable-next-line no-unused-vars
                 const __listener = function(event) {
                     tur.singer.bpm.pop();
                 };
@@ -759,7 +781,7 @@ function setupMeterBlocks() {
         constructor() {
             //.TRANS: anacrusis
             super("pickup", _("pickup"));
-            this.setPalette("meter");
+            this.setPalette("meter", activity);
             this.setHelpString([
                 _(
                     "The Pickup block is used to accommodate any notes that come in before the beat."
@@ -785,11 +807,11 @@ function setupMeterBlocks() {
         flow(args, logo, turtle, blk) {
             const arg0 = args[0];
             if (args.length !== 1 || typeof args[0] !== "number") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
-            Singer.MeterActions.setPickup(arg0, turtle);
+            Singer.MeterActions.setPickup(arg0, turtle, activity);
         }
     }
 
@@ -797,7 +819,7 @@ function setupMeterBlocks() {
         constructor() {
             //.TRANS: musical meter (time signature), e.g., 4:4
             super("meter", _("meter"));
-            this.setPalette("meter");
+            this.setPalette("meter", activity);
             this.piemenuValuesC1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
             this.beginnerBlock(true);
 
@@ -834,7 +856,7 @@ function setupMeterBlocks() {
                 args[0] === null || typeof args[0] !== "number" ||
                 args[1] === null || typeof args[1] !== "number"
             ) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
             }
 
             if (logo.insideMeterWidget) logo._meterBlock = blk;
@@ -844,25 +866,25 @@ function setupMeterBlocks() {
         }
     }
 
-    new CurrentMeterBlock().setup();
-    new BeatFactorBlock().setup();
-    new BPMFactorBlock().setup();
-    new MeasureValueBlock().setup();
-    new BeatValueBlock().setup();
-    new NoteCounterBlock().setup();
-    new NoteCounterBlock2().setup();
-    new ElapsedNotesBlock().setup();
-    new ElapsedNotes2Block().setup();
-    new DriftBlock().setup();
-    new OffBeatDoBlock().setup();
-    new OnBeatDoBlock().setup();
-    new EveryBeatDoBlockNew().setup();
-    new EveryBeatDoBlock().setup();
-    new SetMasterBPM2Block().setup();
-    new SetMasterBPMBlock().setup();
-    new SetBPM3Block().setup();
-    new SetBPM2Block().setup();
-    new SetBPMBlock().setup();
-    new PickupBlock().setup();
-    new MeterBlock().setup();
+    new CurrentMeterBlock().setup(activity);
+    new BeatFactorBlock().setup(activity);
+    new BPMFactorBlock().setup(activity);
+    new MeasureValueBlock().setup(activity);
+    new BeatValueBlock().setup(activity);
+    new NoteCounterBlock().setup(activity);
+    new NoteCounterBlock2().setup(activity);
+    new ElapsedNotesBlock().setup(activity);
+    new ElapsedNotes2Block().setup(activity);
+    new DriftBlock().setup(activity);
+    new OffBeatDoBlock().setup(activity);
+    new OnBeatDoBlock().setup(activity);
+    new EveryBeatDoBlockNew().setup(activity);
+    new EveryBeatDoBlock().setup(activity);
+    new SetMasterBPM2Block().setup(activity);
+    new SetMasterBPMBlock().setup(activity);
+    new SetBPM3Block().setup(activity);
+    new SetBPM2Block().setup(activity);
+    new SetBPMBlock().setup(activity);
+    new PickupBlock().setup(activity);
+    new MeterBlock().setup(activity);
 }

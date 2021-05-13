@@ -1,11 +1,31 @@
+// Copyright (c) 2019 Bottersnike
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+/*
+   global
+
+   _, last, FlowBlock, NOINPUTERRORMSG, TONEBPM, Singer,
+   FlowClampBlock, DEFAULTDRUM
+ */
+
+/* exported setupRhythmBlockPaletteBlocks */
+
 const language = localStorage.languagePreference || navigator.language;
 const rhythmBlockPalette = language === "ja" ? "rhythm" : "widgets";
 
-function setupRhythmBlockPaletteBlocks() {
+function setupRhythmBlockPaletteBlocks(activity) {
     class RhythmBlock extends FlowBlock {
         constructor(name) {
             super(name || "rhythm");
-            this.setPalette(rhythmBlockPalette);
+            this.setPalette(rhythmBlockPalette, activity);
             this.setHelpString();
             this.formBlock({
                 name:
@@ -22,32 +42,23 @@ function setupRhythmBlockPaletteBlocks() {
             this.hidden = this.deprecated = true;
         }
 
-        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
-
+        flow(args, logo, turtle, blk) {
             let noteBeatValue, arg0, arg1;
-            if (
-                args[0] === null ||
-                typeof args[0] !== "number" ||
-                args[0] < 1
-            ) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+            if (args[0] === null || typeof args[0] !== "number" || args[0] < 1) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg0 = 3;
             } else {
                 arg0 = args[0];
             }
 
-            if (
-                args[1] === null ||
-                typeof args[1] !== "number" ||
-                args[1] <= 0
-            ) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+            if (args[1] === null || typeof args[1] !== "number" || args[1] <= 0) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg1 = 1 / 4;
             } else {
                 arg1 = args[1];
             }
 
-            if (logo.blocks.blockList[blk].name === "rhythm2") {
+            if (activity.blocks.blockList[blk].name === "rhythm2") {
                 noteBeatValue = 1 / arg1;
             } else {
                 noteBeatValue = arg1;
@@ -59,7 +70,7 @@ function setupRhythmBlockPaletteBlocks() {
                 }
 
                 for (let i = 0; i < args[0]; i++) {
-                    Singer.processNote(noteBeatValue, false, blk, turtle);
+                    Singer.processNote(activity, noteBeatValue, false, blk, turtle);
                 }
             } else if (logo.inRhythmRuler) {
                 // We don't check for balance since we want to support
@@ -67,7 +78,7 @@ function setupRhythmBlockPaletteBlocks() {
                 if (logo.rhythmRulerMeasure === null) {
                     logo.rhythmRulerMeasure = arg0 * arg1;
                 } else if (logo.rhythmRulerMeasure != arg0 * arg1) {
-                    logo.textMsg(_("polyphonic rhythm"));
+                    activity.textMsg(_("polyphonic rhythm"));
                 }
 
                 // Since there maybe more than one instance of the
@@ -86,13 +97,11 @@ function setupRhythmBlockPaletteBlocks() {
 
                 if (drumIndex !== -1) {
                     for (let i = 0; i < arg0; i++) {
-                        logo.rhythmRuler.Rulers[drumIndex][0].push(
-                            noteBeatValue
-                        );
+                        logo.rhythmRuler.Rulers[drumIndex][0].push(noteBeatValue);
                     }
                 }
             } else {
-                const tur = logo.turtles.ithTurtle(turtle);
+                const tur = activity.turtles.ithTurtle(turtle);
 
                 if (tur.singer.drumStyle.length > 0) {
                     // Play rhythm block as if it were a drum
@@ -112,22 +121,17 @@ function setupRhythmBlockPaletteBlocks() {
 
                 const beatValue = bpmFactor / noteBeatValue;
 
-                const __rhythmPlayNote = function(
-                    thisBeat,
-                    blk,
-                    turtle,
-                    callback,
-                    timeout
-                ) {
+                const __rhythmPlayNote = function (thisBeat, blk, turtle, callback, timeout) {
                     setTimeout(
-                        () => Singer.processNote(thisBeat, false, blk, turtle, callback), timeout
+                        () => Singer.processNote(activity, thisBeat, false, blk, turtle, callback),
+                        timeout
                     );
                 };
                 let __callback;
 
                 for (let i = 0; i < arg0; i++) {
                     if (i === arg0 - 1) {
-                        __callback = function() {
+                        __callback = function () {
                             delete tur.singer.noteDrums[blk];
                             tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
                         };
@@ -135,13 +139,7 @@ function setupRhythmBlockPaletteBlocks() {
                         __callback = null;
                     }
 
-                    __rhythmPlayNote(
-                        noteBeatValue,
-                        blk,
-                        turtle,
-                        __callback,
-                        i * beatValue * 1000
-                    );
+                    __rhythmPlayNote(noteBeatValue, blk, turtle, __callback, i * beatValue * 1000);
                 }
 
                 tur.doWait((arg0 - 1) * beatValue);
@@ -152,9 +150,9 @@ function setupRhythmBlockPaletteBlocks() {
     class Rhythm2Block extends RhythmBlock {
         constructor() {
             super("rhythm2");
-            this.setPalette(rhythmBlockPalette);
+            this.setPalette(rhythmBlockPalette, activity);
             this.beginnerBlock(true);
-	    this.piemenuValuesC1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+            this.piemenuValuesC1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
             this.setHelpString([
                 _("The Rhythm block is used to generate rhythm patterns."),
                 "documentation",
@@ -167,8 +165,7 @@ function setupRhythmBlockPaletteBlocks() {
                     this.lang === "ja"
                         ? //.TRANS: translate "rhythm1" as rhythm
                         _("rhythm1")
-                        :
-                        _("rhythm"),
+                        : _("rhythm"),
                 args: 2,
                 defaults: [3, 4],
                 argLabels: [_("number of notes"), _("note value")],
@@ -188,7 +185,7 @@ function setupRhythmBlockPaletteBlocks() {
     class SixtyFourthNoteBlock extends FlowBlock {
         constructor() {
             super("sixtyfourthNote", _("1/64 note") + " 𝅘𝅥𝅱");
-            this.setPalette(rhythmBlockPalette);
+            this.setPalette(rhythmBlockPalette, activity);
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "rhythm2", x, y, [null, 1, 2, 5]],
@@ -204,7 +201,7 @@ function setupRhythmBlockPaletteBlocks() {
     class ThirtySecondNoteBlock extends FlowBlock {
         constructor() {
             super("thirtysecondNote", _("1/32 note") + " 𝅘𝅥𝅰");
-            this.setPalette(rhythmBlockPalette);
+            this.setPalette(rhythmBlockPalette, activity);
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "rhythm2", x, y, [null, 1, 2, 5]],
@@ -220,7 +217,7 @@ function setupRhythmBlockPaletteBlocks() {
     class SixteenthNoteBlock extends FlowBlock {
         constructor() {
             super("sixteenthNote", _("1/16 note") + " 𝅘𝅥𝅯");
-            this.setPalette(rhythmBlockPalette);
+            this.setPalette(rhythmBlockPalette, activity);
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "rhythm2", x, y, [null, 1, 2, 5]],
@@ -236,7 +233,7 @@ function setupRhythmBlockPaletteBlocks() {
     class EighthNoteBlock extends FlowBlock {
         constructor() {
             super("eighthNote", _("eighth note") + " ♪");
-            this.setPalette(rhythmBlockPalette);
+            this.setPalette(rhythmBlockPalette, activity);
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "rhythm2", x, y, [null, 1, 2, 5]],
@@ -252,7 +249,7 @@ function setupRhythmBlockPaletteBlocks() {
     class QuarterNoteBlock extends FlowBlock {
         constructor() {
             super("quarterNote", _("quarter note") + " ♩");
-            this.setPalette(rhythmBlockPalette);
+            this.setPalette(rhythmBlockPalette, activity);
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "rhythm2", x, y, [null, 1, 2, 5]],
@@ -268,7 +265,7 @@ function setupRhythmBlockPaletteBlocks() {
     class HalfNoteBlock extends FlowBlock {
         constructor() {
             super("halfNote", _("half note") + " 𝅗𝅥");
-            this.setPalette(rhythmBlockPalette);
+            this.setPalette(rhythmBlockPalette, activity);
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "rhythm2", x, y, [null, 1, 2, 5]],
@@ -284,7 +281,7 @@ function setupRhythmBlockPaletteBlocks() {
     class WholeNoteBlock extends FlowBlock {
         constructor() {
             super("wholeNote", _("whole note") + " 𝅝");
-            this.setPalette(rhythmBlockPalette);
+            this.setPalette(rhythmBlockPalette, activity);
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "rhythm2", x, y, [null, 1, 2, 5]],
@@ -300,7 +297,7 @@ function setupRhythmBlockPaletteBlocks() {
     class Tuplet2Block extends FlowClampBlock {
         constructor(name) {
             super(name || "tuplet2");
-            this.setPalette(rhythmBlockPalette);
+            this.setPalette(rhythmBlockPalette, activity);
             this.setHelpString();
             this.formBlock({
                 //.TRANS: A tuplet is a note value divided into irregular time values.
@@ -312,17 +309,17 @@ function setupRhythmBlockPaletteBlocks() {
             this.hidden = true;
         }
 
-        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
+        flow(args, logo, turtle, blk) {
             if (logo.inMatrix) {
-                if (logo.blocks.blockList[blk].name === "tuplet3") {
+                if (activity.blocks.blockList[blk].name === "tuplet3") {
                     logo.tupletParams.push([
                         args[0],
-                        (1 / args[1]) * logo.turtles.ithTurtle(turtle).singer.beatFactor
+                        (1 / args[1]) * activity.turtles.ithTurtle(turtle).singer.beatFactor
                     ]);
                 } else {
                     logo.tupletParams.push([
                         args[0],
-                        args[1] * logo.turtles.ithTurtle(turtle).singer.beatFactor
+                        args[1] * activity.turtles.ithTurtle(turtle).singer.beatFactor
                     ]);
                 }
 
@@ -333,7 +330,8 @@ function setupRhythmBlockPaletteBlocks() {
             const listenerName = "_tuplet_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function(event) {
+            // eslint-disable-next-line no-unused-vars
+            const __listener = function (event) {
                 if (logo.inMatrix) {
                     logo.tuplet = false;
                     logo.addingNotesToTuplet = false;
@@ -349,7 +347,7 @@ function setupRhythmBlockPaletteBlocks() {
     class Tuplet3Block extends Tuplet2Block {
         constructor() {
             super("tuplet3");
-            this.setPalette(rhythmBlockPalette);
+            this.setPalette(rhythmBlockPalette, activity);
             this.setHelpString();
             this.formBlock({
                 name: _("tuplet"),
@@ -379,7 +377,7 @@ function setupRhythmBlockPaletteBlocks() {
     class Tuplet4Block extends FlowClampBlock {
         constructor() {
             super("tuplet4");
-            this.setPalette(rhythmBlockPalette);
+            this.setPalette(rhythmBlockPalette, activity);
             this.setHelpString([
                 _(
                     "The Tuplet block is used to generate a group of notes played in a condensed amount of time."
@@ -418,19 +416,15 @@ function setupRhythmBlockPaletteBlocks() {
             ]);
         }
 
-        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
+        flow(args, logo, turtle, blk) {
             if (args[1] === undefined) {
                 // nothing to do
                 return;
             }
 
             let arg;
-            if (
-                args[0] === null ||
-                typeof args[0] !== "number" ||
-                args[0] <= 0
-            ) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+            if (args[0] === null || typeof args[0] !== "number" || args[0] <= 0) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg = 1 / 2;
             } else {
                 arg = args[0];
@@ -444,14 +438,16 @@ function setupRhythmBlockPaletteBlocks() {
             logo.tuplet = true;
             logo.addingNotesToTuplet = false;
             logo.tupletParams.push([
-                1, (1 / arg) * logo.turtles.ithTurtle(turtle).singer.beatFactor
+                1,
+                (1 / arg) * activity.turtles.ithTurtle(turtle).singer.beatFactor
             ]);
 
             const listenerName = "_tuplet_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = event => {
-                const tur = logo.turtles.ithTurtle(turtle);
+            // eslint-disable-next-line no-unused-vars
+            const __listener = (event) => {
+                const tur = activity.turtles.ithTurtle(turtle);
 
                 logo.tuplet = false;
                 logo.addingNotesToTuplet = false;
@@ -459,9 +455,7 @@ function setupRhythmBlockPaletteBlocks() {
                     const beatValues = [];
 
                     for (let i = 0; i < logo.tupletRhythms.length; i++) {
-                        const tupletParam = [
-                            logo.tupletParams[logo.tupletRhythms[i][1]]
-                        ];
+                        const tupletParam = [logo.tupletParams[logo.tupletRhythms[i][1]]];
                         tupletParam.push([]);
                         let tupletBeats = 0;
                         for (let j = 2; j < logo.tupletRhythms[i].length; j++) {
@@ -469,9 +463,7 @@ function setupRhythmBlockPaletteBlocks() {
                             tupletParam[1].push(logo.tupletRhythms[i][j]);
                         }
 
-                        const factor =
-                            tupletParam[0][0] /
-                            (tupletParam[0][1] * tupletBeats);
+                        const factor = tupletParam[0][0] / (tupletParam[0][1] * tupletBeats);
                         for (let j = 2; j < logo.tupletRhythms[i].length; j++) {
                             beatValues.push(logo.tupletRhythms[i][j] / factor);
                         }
@@ -487,46 +479,47 @@ function setupRhythmBlockPaletteBlocks() {
                     tur.singer.inNoteBlock.push(blk);
 
                     const bpmFactor =
-                        TONEBPM / tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
+                        TONEBPM / tur.singer.bpm.length > 0
+                            ? last(tur.singer.bpm)
+                            : Singer.masterBPM;
 
                     let totalBeats = 0;
 
-                    __tupletPlayNote = function(
-                        thisBeat,
-                        blk,
-                        turtle,
-                        callback,
-                        timeout
-                    ) {
+                    const __tupletPlayNote = function (thisBeat, blk, turtle, callback, timeout) {
                         setTimeout(
-                            () => Singer.processNote(thisBeat, false, blk, turtle, callback),
+                            () =>
+                                Singer.processNote(
+                                    activity,
+                                    thisBeat,
+                                    false,
+                                    blk,
+                                    turtle,
+                                    callback
+                                ),
                             timeout
                         );
                     };
 
                     let timeout = 0;
+                    let beatValue;
+                    let __callback = null;
                     for (let i = 0; i < beatValues.length; i++) {
                         const thisBeat = beatValues[i];
-                        const beatValue = bpmFactor / thisBeat;
+                        beatValue = bpmFactor / thisBeat;
 
                         if (i === beatValues.length - 1) {
                             __callback = () => {
                                 delete tur.singer.noteDrums[blk];
                                 tur.singer.inNoteBlock.splice(
-                                    tur.singer.inNoteBlock.indexOf(blk), 1
+                                    tur.singer.inNoteBlock.indexOf(blk),
+                                    1
                                 );
                             };
                         } else {
                             __callback = null;
                         }
 
-                        __tupletPlayNote(
-                            thisBeat,
-                            blk,
-                            turtle,
-                            __callback,
-                            timeout
-                        );
+                        __tupletPlayNote(thisBeat, blk, turtle, __callback, timeout);
 
                         timeout += beatValue * 1000;
                         totalBeats += beatValue;
@@ -546,7 +539,7 @@ function setupRhythmBlockPaletteBlocks() {
         constructor() {
             //.TRANS: A tuplet divided into 7 time values.
             super("stuplet7", _("septuplet"));
-            this.setPalette(rhythmBlockPalette);
+            this.setPalette(rhythmBlockPalette, activity);
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "stuplet", x, y, [null, 1, 2, 5]],
@@ -563,7 +556,7 @@ function setupRhythmBlockPaletteBlocks() {
         constructor() {
             //.TRANS: A tuplet divided into 5 time values.
             super("stuplet5", _("quintuplet"));
-            this.setPalette(rhythmBlockPalette);
+            this.setPalette(rhythmBlockPalette, activity);
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "stuplet", x, y, [null, 1, 2, 5]],
@@ -580,7 +573,7 @@ function setupRhythmBlockPaletteBlocks() {
         constructor() {
             //.TRANS: A tuplet divided into 3 time values.
             super("stuplet3", _("triplet"));
-            this.setPalette(rhythmBlockPalette);
+            this.setPalette(rhythmBlockPalette, activity);
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "stuplet", x, y, [null, 1, 2, 5]],
@@ -596,14 +589,12 @@ function setupRhythmBlockPaletteBlocks() {
     class STupletBlock extends FlowBlock {
         constructor() {
             super("stuplet", _("simple tuplet"));
-            this.setPalette(rhythmBlockPalette);
-	    this.piemenuValuesC1 = [3, 5, 7, 11];
+            this.setPalette(rhythmBlockPalette, activity);
+            this.piemenuValuesC1 = [3, 5, 7, 11];
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "Tuplets are a collection of notes that get scaled to a specific duration."
-                ) +
+                _("Tuplets are a collection of notes that get scaled to a specific duration.") +
                     " " +
                     _(
                         "Using tuplets makes it easy to create groups of notes that are not based on a power of 2."
@@ -628,31 +619,23 @@ function setupRhythmBlockPaletteBlocks() {
             ]);
         }
 
-        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
+        flow(args, logo, turtle, blk) {
             let arg0, arg1;
-            if (
-                args[0] === null ||
-                typeof args[0] !== "number" ||
-                args[0] <= 0
-            ) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+            if (args[0] === null || typeof args[0] !== "number" || args[0] <= 0) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg0 = 3;
             } else {
                 arg0 = args[0];
             }
 
-            if (
-                args[1] === null ||
-                typeof args[1] !== "number" ||
-                args[1] <= 0
-            ) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+            if (args[1] === null || typeof args[1] !== "number" || args[1] <= 0) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg1 = 1 / 2;
             } else {
                 arg1 = args[1];
             }
 
-            const noteBeatValue = (1 / arg1) * logo.turtles.ithTurtle(turtle).singer.beatFactor;
+            const noteBeatValue = (1 / arg1) * activity.turtles.ithTurtle(turtle).singer.beatFactor;
             if (logo.inMatrix || logo.tuplet) {
                 logo.phraseMaker.addColBlock(blk, arg0);
                 if (logo.tuplet) {
@@ -663,18 +646,18 @@ function setupRhythmBlockPaletteBlocks() {
                             logo.addingNotesToTuplet = true;
                         }
 
-                        Singer.processNote(noteBeatValue, false, blk, turtle);
+                        Singer.processNote(activity, noteBeatValue, false, blk, turtle);
                     }
                 } else {
                     logo.tupletParams.push([1, noteBeatValue]);
                     const obj = ["simple", 0];
                     for (let i = 0; i < arg0; i++) {
-                        obj.push((1 / arg1) * logo.turtles.ithTurtle(turtle).singer.beatFactor);
+                        obj.push((1 / arg1) * activity.turtles.ithTurtle(turtle).singer.beatFactor);
                     }
                     logo.tupletRhythms.push(obj);
                 }
             } else {
-                const tur = logo.turtles.ithTurtle(turtle);
+                const tur = activity.turtles.ithTurtle(turtle);
 
                 // Play rhythm block as if it were a drum
                 if (tur.singer.drumStyle.length > 0) {
@@ -690,21 +673,17 @@ function setupRhythmBlockPaletteBlocks() {
 
                 const beatValue = bpmFactor / noteBeatValue / arg0;
 
-                __rhythmPlayNote = function(
-                    thisBeat,
-                    blk,
-                    turtle,
-                    callback,
-                    timeout
-                ) {
+                const __rhythmPlayNote = function (thisBeat, blk, turtle, callback, timeout) {
                     setTimeout(
-                        () => Singer.processNote(thisBeat, false, blk, turtle, callback), timeout
+                        () => Singer.processNote(activity, thisBeat, false, blk, turtle, callback),
+                        timeout
                     );
                 };
 
+                let __callback = null;
                 for (let i = 0; i < arg0; i++) {
                     if (i === arg0 - 1) {
-                        __callback = function() {
+                        __callback = function () {
                             delete tur.singer.noteDrums[blk];
                             tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
                         };
@@ -726,20 +705,20 @@ function setupRhythmBlockPaletteBlocks() {
         }
     }
 
-    new RhythmBlock().setup();
-    new Rhythm2Block().setup();
-    new SixtyFourthNoteBlock().setup();
-    new ThirtySecondNoteBlock().setup();
-    new SixteenthNoteBlock().setup();
-    new EighthNoteBlock().setup();
-    new QuarterNoteBlock().setup();
-    new HalfNoteBlock().setup();
-    new WholeNoteBlock().setup();
-    new Tuplet2Block().setup();
-    new Tuplet3Block().setup();
-    new Tuplet4Block().setup();
-    new SeptupletBlock().setup();
-    new QuintupletBlock().setup();
-    new TripletBlock().setup();
-    new STupletBlock().setup();
+    new RhythmBlock().setup(activity);
+    new Rhythm2Block().setup(activity);
+    new SixtyFourthNoteBlock().setup(activity);
+    new ThirtySecondNoteBlock().setup(activity);
+    new SixteenthNoteBlock().setup(activity);
+    new EighthNoteBlock().setup(activity);
+    new QuarterNoteBlock().setup(activity);
+    new HalfNoteBlock().setup(activity);
+    new WholeNoteBlock().setup(activity);
+    new Tuplet2Block().setup(activity);
+    new Tuplet3Block().setup(activity);
+    new Tuplet4Block().setup(activity);
+    new SeptupletBlock().setup(activity);
+    new QuintupletBlock().setup(activity);
+    new TripletBlock().setup(activity);
+    new STupletBlock().setup(activity);
 }

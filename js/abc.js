@@ -1,4 +1,4 @@
-// Copyright (c) 2017-20 Walter Bender
+// Copyright (c) 2017-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -9,19 +9,30 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/*
+   global
+
+   frequencyToPitch, NOTATIONNOTE, NOTATIONTUPLETVALUE, NOTATIONDURATION,
+   NOTATIONROUNDDOWN, NOTATIONINSIDECHORD, NOTATIONDOTCOUNT,
+   NOTATIONSTACCATO, toFraction
+*/
+
+/* exported saveAbcOutput */
+
 // This header is prepended to the Abc output.
 const ABCHEADER = "X:1\nT:Music Blocks composition\nC:Mr. Mouse\nL:1/16\nM:C\n";
-getABCHeader = function() {
+
+const getABCHeader = function() {
     return ABCHEADER;
 };
 
-processABCNotes = function(logo, turtle) {
+const processABCNotes = function(logo, turtle) {
     // obj = [instructions] or
     // obj = [[notes], duration, dotCount, tupletValue, roundDown,
     //        insideChord, staccato]
     logo.notationNotes[turtle] = "";
 
-    function __convertDuration(duration) {
+    const __convertDuration = function(duration) {
         let returnString = "";
         switch (duration) {
             case 64:
@@ -51,9 +62,9 @@ processABCNotes = function(logo, turtle) {
         }
 
         return returnString;
-    }
+    };
 
-    function __toABCnote(note) {
+    const __toABCnote = function (note) {
         // beams -- no space between notes
         // ties use ()
         // % comment
@@ -126,14 +137,14 @@ processABCNotes = function(logo, turtle) {
         }
 
         return note.toUpperCase();
-    }
+    };
 
     let counter = 0;
     let queueSlur = false;
     let articulation = false;
     let targetDuration = 0;
     let tupletDuration = 0;
-    let  notes, note;
+    let notes, note;
 
     for (let i = 0; i < logo.notation.notationStaging[turtle].length; i++) {
         const obj = logo.notation.notationStaging[turtle][i];
@@ -252,14 +263,14 @@ processABCNotes = function(logo, turtle) {
                 }
             }
 
-            function __processTuplet(logo, turtle, i, count) {
+            const __processTuplet = function (logo, turtle, i, count) {
                 let j = 0;
                 let k = 0;
 
                 while (k < count) {
-                    const tupletDuration = 2 *
-                        logo.notation.notationStaging[turtle][i + j][
-                            NOTATIONDURATION];
+                    // const tupletDuration = 2 *
+                    //     logo.notation.notationStaging[turtle][i + j][
+                    //         NOTATIONDURATION];
 
                     if (typeof notes === "object") {
                         if (notes.length > 1) {
@@ -286,6 +297,7 @@ processABCNotes = function(logo, turtle) {
                         j++; // Jump to next note.
                         k++; // Increment notes in tuplet.
                     } else {
+                        // eslint-disable-next-line no-console
                         console.debug("ignoring " + notes);
                         j++; // Jump to next note.
                         k++; // Increment notes in tuplet.
@@ -306,7 +318,7 @@ processABCNotes = function(logo, turtle) {
                 }
 
                 return j;
-            }
+            };
 
             if (obj[NOTATIONTUPLETVALUE] > 0) {
                 if (incompleteTuplet === 0) {
@@ -414,30 +426,28 @@ processABCNotes = function(logo, turtle) {
     }
 };
 
-saveAbcOutput = function(logo) {
-    let turtleCount = 0;
-    const clef = [];
+const saveAbcOutput = function(activity) {
+    // let turtleCount = 0;
 
-    logo.notationOutput = getABCHeader();
+    activity.logo.notationOutput = getABCHeader();
 
-    for (const t in logo.notation.notationStaging) {
-        turtleCount += 1;
-    }
-    console.debug("saving as abc: " + turtleCount);
+    // for (const t in activity.logo.notation.notationStaging) {
+    //     turtleCount += 1;
+    // }
+    // eslint-disable-next-line no-console
+    // console.debug("saving as abc: " + turtleCount);
 
-    let c = 0;
-    for (const t in logo.notation.notationStaging) {
-        logo.notationOutput +=
-            "K:" + logo.turtles.ithTurtle(t).singer.keySignature
+    for (const t in activity.logo.notation.notationStaging) {
+        activity.logo.notationOutput +=
+            "K:" + activity.turtles.ithTurtle(t).singer.keySignature
                 .toUpperCase()
                 .replace(" ", "")
                 .replace("♭", "b")
                 .replace("♯", "#") + "\n";
-        processABCNotes(logo, t);
-        logo.notationOutput += logo.notationNotes[t];
-        c += 1;
+        processABCNotes(activity.logo, t);
+        activity.logo.notationOutput += activity.logo.notationNotes[t];
     }
 
-    logo.notationOutput += "\n";
-    return logo.notationOutput;
+    activity.logo.notationOutput += "\n";
+    return activity.logo.notationOutput;
 };

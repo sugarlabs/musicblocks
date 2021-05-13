@@ -1,4 +1,4 @@
-// Copyright (c) 2014-19 Walter Bender
+// Copyright (c) 2014-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -29,54 +29,12 @@ class PasteBox {
     /**
      * @constructor
      */
-    constructor() {
-        this._canvas = null;
-        this._stage = null;
-        this._refreshCanvas = null;
-        this._paste = null;
+    constructor(activity) {
+        this.activity = activity;
         this._container = null;
         this.save = null;
         this.close = null;
         this._scale = 1;
-    }
-    /**
-     * @public
-     * @param {Object} canvas object
-     * @returns {Object} createjs canvas
-     */
-    setCanvas(canvas) {
-        this._canvas = canvas;
-        return this;
-    }
-
-    /**
-     * @public
-     * @param {Object} stage
-     * @returns {Object} createjs stage
-     */
-    setStage(stage) {
-        this._stage = stage;
-        return this;
-    }
-
-    /**
-     * @public
-     * @param {Object} paste
-     * @returns {Object} paste
-     */
-    setPaste(paste) {
-        this._paste = paste;
-        return this;
-    }
-
-    /**
-     * @public
-     * @param {Object} refreshCanvas
-     * @returns {Object} refreshCanvas
-     */
-    setRefreshCanvas(refreshCanvas) {
-        this._refreshCanvas = refreshCanvas;
-        return this;
     }
 
     /**
@@ -86,7 +44,7 @@ class PasteBox {
     hide() {
         if (this._container != null) {
             this._container.visible = false;
-            this._refreshCanvas();
+            this.activity.refreshCanvas();
             // paste.visible = false;
             docById("paste").value = "";
             docById("paste").style.visibility = "hidden";
@@ -104,7 +62,7 @@ class PasteBox {
             this._scale = scale;
 
             this._container = new createjs.Container();
-            this._stage.addChild(this._container);
+            this.activity.stage.addChild(this._container);
             this._container.x = x;
             this._container.y = y;
 
@@ -112,20 +70,20 @@ class PasteBox {
                 that._container.addChild(bitmap);
                 that._loadClearContainerHandler();
                 that._container.visible = true;
-                that._refreshCanvas();
+                that.activity.refreshCanvas();
             };
 
             this._makeBoxBitmap(PASTEBOX, "box", __processBackground, null);
         }
     }
-
+    
     /**
      * @public
      * @returns {void}
      */
     show() {
         this._container.visible = true;
-        this._refreshCanvas();
+        this.activity.refreshCanvas();
         // this._paste.visibile = true;
         docById("paste").style.visibility = "visible";
     }

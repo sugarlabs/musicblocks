@@ -1,9 +1,30 @@
-function setupVolumeBlocks() {
+// Copyright (c) 2019 Bottersnike
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+/*
+   global
+
+   _, FlowBlock, NOINPUTERRORMSG, ValueBlock, FlowClampBlock,
+   LeftBlock, Singer, DEFAULTVOLUME, NANERRORMSG, last, VOICENAMES,
+   DRUMNAMES, DEFAULTVOICE, DEFAULTDRUM
+ */
+
+/* exported setupVolumeBlocks */
+
+function setupVolumeBlocks(activity) {
     class SynthVolumeBlock extends LeftBlock {
         constructor() {
             //.TRANS: the volume for this synth
             super("synthvolumefactor", _("synth volume"));
-            this.setPalette("volume");
+            this.setPalette("volume", activity);
             this.parameter = true;
             this.setHelpString([
                 _(
@@ -26,17 +47,17 @@ function setupVolumeBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            return activity.blocks.blockList[blk].value;
         }
 
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "synth volume"]);
             } else {
-                const cblk = logo.blocks.blockList[blk].connections[1];
+                const cblk = activity.blocks.blockList[blk].connections[1];
                 if (cblk !== null) {
                     const targetSynth = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                     return Singer.VolumeActions.getSynthVolume(targetSynth, turtle);
@@ -50,7 +71,7 @@ function setupVolumeBlocks() {
         constructor() {
             //.TRANS: the volume at which notes are played
             super("notevolumefactor", _("master volume"));
-            this.setPalette("volume");
+            this.setPalette("volume", activity);
             this.parameter = true;
             this.setHelpString([
                 _("The Master volume block returns the master volume."),
@@ -59,22 +80,22 @@ function setupVolumeBlocks() {
             ]);
         }
 
-        setter(logo, value, turtle, blk) {
+        setter(logo, value, turtle) {
             const len = Singer.masterVolume.length;
             Singer.masterVolume[len - 1] = value;
-            if (!logo.turtles.ithTurtle(turtle).singer.suppressOutput) {
+            if (!activity.turtles.ithTurtle(turtle).singer.suppressOutput) {
                 Singer.VolumeActions.setMasterVolume(logo, value);
             }
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            return activity.blocks.blockList[blk].value;
         }
 
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "volume"]);
             } else {
@@ -86,7 +107,7 @@ function setupVolumeBlocks() {
     class PPPBlock extends FlowBlock {
         constructor() {
             super("ppp", "ppp");
-            this.setPalette("volume");
+            this.setPalette("volume", activity);
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "setsynthvolume2", x, y, [null, 1, 2, null, 3]],
@@ -100,7 +121,7 @@ function setupVolumeBlocks() {
     class PPBlock extends FlowBlock {
         constructor() {
             super("pp", "pp");
-            this.setPalette("volume");
+            this.setPalette("volume", activity);
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "setsynthvolume2", x, y, [null, 1, 2, null, 3]],
@@ -114,7 +135,7 @@ function setupVolumeBlocks() {
     class PBlock extends FlowBlock {
         constructor() {
             super("p", "p");
-            this.setPalette("volume");
+            this.setPalette("volume", activity);
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "setsynthvolume2", x, y, [null, 1, 2, null, 3]],
@@ -128,7 +149,7 @@ function setupVolumeBlocks() {
     class MPBlock extends FlowBlock {
         constructor() {
             super("mp", "mp");
-            this.setPalette("volume");
+            this.setPalette("volume", activity);
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "setsynthvolume2", x, y, [null, 1, 2, null, 3]],
@@ -142,7 +163,7 @@ function setupVolumeBlocks() {
     class MFBlock extends FlowBlock {
         constructor() {
             super("mf", "mf");
-            this.setPalette("volume");
+            this.setPalette("volume", activity);
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "setsynthvolume2", x, y, [null, 1, 2, null, 3]],
@@ -156,7 +177,7 @@ function setupVolumeBlocks() {
     class FBlock extends FlowBlock {
         constructor() {
             super("f", "f");
-            this.setPalette("volume");
+            this.setPalette("volume", activity);
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "setsynthvolume2", x, y, [null, 1, 2, null, 3]],
@@ -170,7 +191,7 @@ function setupVolumeBlocks() {
     class FFBlock extends FlowBlock {
         constructor() {
             super("ff", "ff");
-            this.setPalette("volume");
+            this.setPalette("volume", activity);
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "setsynthvolume2", x, y, [null, 1, 2, null, 3]],
@@ -184,7 +205,7 @@ function setupVolumeBlocks() {
     class FFFBlock extends FlowBlock {
         constructor() {
             super("fff", "fff");
-            this.setPalette("volume");
+            this.setPalette("volume", activity);
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "setsynthvolume2", x, y, [null, 1, 2, null, 3]],
@@ -198,7 +219,7 @@ function setupVolumeBlocks() {
     class SetSynthVolume2Block extends FlowBlock {
         constructor() {
             super("setsynthvolume2", _("set synth volume"));
-            this.setPalette("volume");
+            this.setPalette("volume", activity);
             this.setHelpString();
             this.formBlock({
                 args: 2,
@@ -218,14 +239,14 @@ function setupVolumeBlocks() {
 
             let arg0, arg1;
             if (args[0] === null || typeof args[0] !== "string") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg0 = "electronic synth";
             } else {
                 arg0 = args[0];
             }
 
             if (args[1] === null || typeof args[1] !== "number") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg1 = 50;
             } else {
                 if (args[1] < 0) {
@@ -237,7 +258,7 @@ function setupVolumeBlocks() {
                 }
 
                 if (arg1 === 0) {
-                    logo.errorMsg(_("Setting volume to 0."), blk);
+                    activity.errorMsg(_("Setting volume to 0."), blk);
                 }
             }
 
@@ -274,11 +295,11 @@ function setupVolumeBlocks() {
             }
 
             if (synth === null) {
-                logo.errorMsg(_("Synth not found"), blk);
+                activity.errorMsg(_("Synth not found"), blk);
                 synth = "electronic synth";
             }
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (tur.singer.instrumentNames.indexOf(synth) === -1) {
                 tur.singer.instrumentNames.push(synth);
@@ -298,6 +319,7 @@ function setupVolumeBlocks() {
             const listenerName = "_synthvolume_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
+            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 tur.singer.synthVolume[synth].pop();
                 // Restore previous volume
@@ -318,7 +340,7 @@ function setupVolumeBlocks() {
         constructor() {
             //.TRANS: set the loudness level
             super("setdrumvolume", _("set drum volume"));
-            this.setPalette("volume");
+            this.setPalette("volume", activity);
             this.beginnerBlock(true);
 
             this.formBlock({
@@ -338,7 +360,7 @@ function setupVolumeBlocks() {
     class SetSynthVolumeBlock extends FlowBlock {
         constructor() {
             super("setsynthvolume", _("set synth volume"));
-            this.setPalette("volume");
+            this.setPalette("volume", activity);
             this.piemenuValuesC2 = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             this.beginnerBlock(true);
 
@@ -372,19 +394,19 @@ function setupVolumeBlocks() {
         flow(args, logo, turtle, blk) {
             let arg0 = args[0];
             if (arg0 === null || typeof arg0 !== "string") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg0 = "electronic synth";
             }
 
             let arg1;
             if (args[1] === null || typeof args[1] !== "number") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg1 = 50;
             } else {
                 arg1 = Math.max(Math.min(args[1], 100), 0);
 
                 if (arg1 === 0) {
-                    logo.errorMsg(_("Setting volume to 0."), blk);
+                    activity.errorMsg(_("Setting volume to 0."), blk);
                 }
             }
 
@@ -396,7 +418,7 @@ function setupVolumeBlocks() {
         constructor() {
             //.TRANS: set the distribution of volume
             super("setpanning", _("set panning"));
-            this.setPalette("volume");
+            this.setPalette("volume", activity);
             this.piemenuValuesC1 = [100, 80, 60, 40, 20, 0, -20, -40, -60, -80, -100];
             this.beginnerBlock(true);
 
@@ -414,7 +436,7 @@ function setupVolumeBlocks() {
         flow(args, logo, turtle, blk) {
             if (args.length === 1) {
                 if (typeof args[0] !== "number") {
-                    logo.errorMsg(NANERRORMSG, blk);
+                    activity.errorMsg(NANERRORMSG, blk);
                 } else {
                     Singer.VolumeActions.setPanning(args[0], turtle);
                 }
@@ -426,7 +448,7 @@ function setupVolumeBlocks() {
         constructor() {
             //.TRANS: set the loudness level
             super("setnotevolume", _("set master volume"));
-            this.setPalette("volume");
+            this.setPalette("volume", activity);
             this.piemenuValuesC1 = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             this.beginnerBlock(true);
 
@@ -444,7 +466,7 @@ function setupVolumeBlocks() {
         flow(args, logo, turtle, blk) {
             if (args.length === 1) {
                 if (typeof args[0] !== "number") {
-                    logo.errorMsg(NANERRORMSG, blk);
+                    activity.errorMsg(NANERRORMSG, blk);
                 } else {
                     Singer.VolumeActions.setMasterVolume(args[0], turtle, blk);
                 }
@@ -455,7 +477,7 @@ function setupVolumeBlocks() {
     class SetNoteVolume2Block extends FlowClampBlock {
         constructor() {
             super("setnotevolume2");
-            this.setPalette("volume");
+            this.setPalette("volume", activity);
             this.setHelpString();
             this.formBlock({
                 //.TRANS: set the loudness level
@@ -483,7 +505,7 @@ function setupVolumeBlocks() {
 
             let arg;
             if (args[0] === null || typeof args[0] !== "number") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg = 50;
             } else {
                 if (args[0] < 0) {
@@ -495,11 +517,11 @@ function setupVolumeBlocks() {
                 }
 
                 if (arg === 0) {
-                    logo.errorMsg(_("Setting volume to 0."), blk);
+                    activity.errorMsg(_("Setting volume to 0."), blk);
                 }
             }
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             Singer.masterVolume.push(arg);
             if (!tur.singer.suppressOutput) {
@@ -509,6 +531,7 @@ function setupVolumeBlocks() {
             const listenerName = "_volume_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
+            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 Singer.masterVolume.pop();
                 // Restore previous volume
@@ -526,7 +549,7 @@ function setupVolumeBlocks() {
     class ArticulationBlock extends FlowClampBlock {
         constructor() {
             super("articulation");
-            this.setPalette("volume");
+            this.setPalette("volume", activity);
             this.piemenuValuesC1 = [-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25];
             this.setHelpString([
                 _(
@@ -555,7 +578,7 @@ function setupVolumeBlocks() {
 
             let arg = args[0];
             if (arg === null || typeof arg !== "number") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg = 0;
             }
 
@@ -568,7 +591,7 @@ function setupVolumeBlocks() {
     class DecrescendoBlock extends FlowClampBlock {
         constructor(name) {
             super(name || "decrescendo");
-            this.setPalette("volume");
+            this.setPalette("volume", activity);
             this.piemenuValuesC1 = [1, 2, 3, 4, 5, 10, 15, 20];
             this.beginnerBlock(true);
 
@@ -601,7 +624,7 @@ function setupVolumeBlocks() {
         flow(args, logo, turtle, blk) {
             if (args.length > 1 && args[0] !== 0) {
                 Singer.VolumeActions.doCrescendo(
-                    logo.blocks.blockList[blk].name, args[0], turtle, blk
+                    activity.blocks.blockList[blk].name, args[0], turtle, blk
                 );
 
                 return [args[1], 1];
@@ -612,7 +635,7 @@ function setupVolumeBlocks() {
     class CrescendoBlock extends DecrescendoBlock {
         constructor() {
             super("crescendo");
-            this.setPalette("volume");
+            this.setPalette("volume", activity);
             this.piemenuValuesC1 = [1, 2, 3, 4, 5, 10, 15, 20];
             this.beginnerBlock(true);
 
@@ -643,23 +666,23 @@ function setupVolumeBlocks() {
         }
     }
 
-    new MasterVolumeBlock().setup();
-    new SynthVolumeBlock().setup();
-    new PPPBlock().setup();
-    new PPBlock().setup();
-    new PBlock().setup();
-    new MPBlock().setup();
-    new MFBlock().setup();
-    new FBlock().setup();
-    new FFBlock().setup();
-    new FFFBlock().setup();
-    new SetSynthVolume2Block().setup();
-    new SetDrumVolumeBlock().setup();
-    new SetSynthVolumeBlock().setup();
-    new setPanBlock().setup();
-    new SetNoteVolumeBlock().setup();
-    new SetNoteVolume2Block().setup();
-    new ArticulationBlock().setup();
-    new DecrescendoBlock().setup();
-    new CrescendoBlock().setup();
+    new MasterVolumeBlock().setup(activity);
+    new SynthVolumeBlock().setup(activity);
+    new PPPBlock().setup(activity);
+    new PPBlock().setup(activity);
+    new PBlock().setup(activity);
+    new MPBlock().setup(activity);
+    new MFBlock().setup(activity);
+    new FBlock().setup(activity);
+    new FFBlock().setup(activity);
+    new FFFBlock().setup(activity);
+    new SetSynthVolume2Block().setup(activity);
+    new SetDrumVolumeBlock().setup(activity);
+    new SetSynthVolumeBlock().setup(activity);
+    new setPanBlock().setup(activity);
+    new SetNoteVolumeBlock().setup(activity);
+    new SetNoteVolume2Block().setup(activity);
+    new ArticulationBlock().setup(activity);
+    new DecrescendoBlock().setup(activity);
+    new CrescendoBlock().setup(activity);
 }

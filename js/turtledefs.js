@@ -10,6 +10,27 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 //
 
+/*
+   global
+
+   _, ADVANCEDBUTTON, BIGGERBUTTON, CARTESIANBUTTON, CLEARBUTTON,
+   COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, GOHOMEBUTTON, HELPBUTTON,
+   HIDEBLOCKSBUTTON, LANGUAGEBUTTON, LOADBUTTON, MENUBUTTON,
+   NEWBUTTON, PLANETBUTTON, PLUGINSDELETEBUTTON, RESTORETRASHBUTTON,
+   RHYTHMPALETTEICON, RUNBUTTON, SAVEBUTTON, SCROLLUNLOCKBUTTON,
+   SHORTCUTSBUTTON, SLOWBUTTON, SMALLERBUTTON, STATSBUTTON,
+   STEPBUTTON, STOPTURTLEBUTTON, WRAPTURTLEBUTTON
+*/
+
+/* exported
+
+   createDefaultStack, createHelpContent, LOGOJA1, NUMBERBLOCKDEFAULT,
+   DEFAULTPALETTE, BUILTINPALETTES, MULTIPALETTES, SKIPPALETTES,
+   MULTIPALETTEICONS, MULTIPALETTENAMES, HELPCONTENT, DATAOBJS,
+   BUILTINPALETTESFORL23N, getMainToolbarButtonNames,
+   getAuxToolbarButtonNames
+ */
+
 const LOGOJA1 =
     '<?xml version="1.0" encoding="UTF-8" standalone="no"?> <svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="14.227637mm" height="14.552083mm" viewBox="0 0 14.227637 14.552083" version="1.1" id="svg1917"> <defs id="defs1911" /> <metadata id="metadata1914"> <rdf:RDF> <cc:Work rdf:about=""> <dc:format>image/svg+xml</dc:format> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" /> <dc:title></dc:title> </cc:Work> </rdf:RDF> </metadata> <g id="layer1" transform="matrix(0.24123394,0,0,0.24123394,-22.428724,-13.126892)"> <g transform="matrix(0.35277777,0,0,-0.35277777,5.3347636,163.32003)" id="g1838"> <g transform="translate(399.8154,296.855)" id="g22"> <path id="path24" style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" d="m 0,0 c -1.236,-9.538 -8.742,-20.454 -20.52,-32.751 0.991,-3.791 2.1,-7.838 3.358,-12.192 1.198,-4.11 2.348,-8.111 3.463,-12.016 2.369,0.184 4.918,0.165 7.649,-0.097 10.995,-1.077 18.478,-8.518 21.847,-18.174 v 59.419 C 15.797,-4.727 9.248,4.822 -0.186,9.196 0.341,6.208 0.4,3.052 0,0" /> </g> <g transform="translate(405.3779,180.7212)" id="g26"> <path id="path28" style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" d="m 0,0 c -1.713,-1.584 -3.497,-2.963 -5.33,-4.162 1.183,-14.957 -1.662,-25.43 -7.801,-33.201 -1.713,-2.171 -3.537,-3.994 -5.437,-5.509 h 1.25 c 15.217,0 27.552,12.336 27.552,27.552 V 16.066 C 8.287,10.16 4.924,4.564 0,0" /> </g> <g transform="translate(382.1484,308.4634)" id="g30"> <path id="path32" style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" d="M 0,0 C -8.555,0.407 -10.788,-9.805 -5.019,-35.432 14.11,-16.584 12.704,-0.609 0,0" /> </g> <g transform="translate(339.479,150.1611)" id="g34"> <path id="path36" style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" d="m 0,0 c 0,8.541 6.922,15.464 15.463,15.464 8.543,0 15.465,-6.923 15.465,-15.464 0,-2.427 -0.576,-4.714 -1.572,-6.759 2.039,-2.401 6.344,-3.426 12.302,0.96 5.713,4.215 9.417,14.465 10.009,27.95 -18.905,-6.227 -40.507,2.477 -48.891,12.44 -10.596,12.629 -19.691,49.994 17.168,74.23 3.465,2.281 6.617,4.548 9.463,6.81 -1.48,5.411 -2.819,10.841 -3.905,16.419 -2.211,11.291 -1.32,20.057 1.446,26.386 h -90.446 c -15.217,0 -27.552,-12.336 -27.552,-27.553 V 15.24 c 0,-15.216 12.335,-27.552 27.552,-27.552 H 6.133 C 2.413,-9.488 0,-5.032 0,0" /> </g> <g transform="translate(380.792,227.7183)" id="g38"> <path id="path40" style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" d="m 0,0 c -11.295,-6.08 -9.406,-22.011 -3.695,-23.773 6.563,-2.019 4.549,-7.577 -0.506,-7.577 -5.041,0 -14.13,2.025 -16.152,14.643 -1.518,9.483 3.521,22.383 17.019,27.144 -2.009,6.225 -3.992,12.284 -5.842,18.3 -2.576,-2.472 -5.291,-4.997 -8.146,-7.569 -17.368,-15.672 -23.229,-36.353 -10.602,-54.541 9.433,-13.583 25.072,-14.185 37.86,-8.148 -0.549,5.492 -1.533,11.283 -3.027,17.249 C 4.759,-15.656 2.391,-7.639 0,0" /> </g> <g transform="translate(402.3506,194.3457)" id="g42"> <path id="path44" style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none" d="M 0,0 C 12.566,12.577 2.91,36.234 -13.439,35.569 -9.396,20.879 -6.159,7.796 -4.168,-3.619 -2.699,-2.504 -1.296,-1.278 0,0" /> </g> <g transform="translate(388.9111,229.9146)" id="g46"> <path id="path48" style="fill:#64a6f9;fill-opacity:1;fill-rule:nonzero;stroke:none" d="M 0,0 C 16.35,0.665 26.006,-22.992 13.439,-35.569 12.144,-36.847 10.74,-38.073 9.271,-39.188 7.28,-27.772 4.043,-14.689 0,0 m -36.043,-35.569 c -12.627,18.188 -6.767,38.868 10.602,54.541 2.855,2.572 5.57,5.097 8.146,7.569 1.85,-6.016 3.833,-12.075 5.842,-18.3 -13.498,-4.762 -18.537,-17.661 -17.019,-27.144 2.022,-12.618 11.111,-14.643 16.152,-14.643 5.055,0 7.069,5.558 0.506,7.577 -5.711,1.762 -7.6,17.693 3.695,23.773 2.39,-7.639 4.759,-15.656 6.909,-24.272 1.494,-5.967 2.478,-11.757 3.026,-17.249 -12.787,-6.037 -28.426,-5.435 -37.859,8.148 M -6.763,78.549 C 5.941,77.94 7.348,61.965 -11.781,43.117 c -5.77,25.627 -3.536,35.839 5.018,35.432 M 3.336,-86.556 c 6.139,7.771 8.983,18.244 7.801,33.201 1.833,1.198 3.617,2.578 5.33,4.162 4.924,4.564 8.287,10.159 10.234,16.066 V -8.29 C 23.332,1.367 15.85,8.807 4.854,9.884 c -2.731,0.262 -5.28,0.282 -7.649,0.097 -1.115,3.905 -2.265,7.907 -3.463,12.016 -1.258,4.355 -2.367,8.401 -3.357,12.192 11.777,12.298 19.283,23.214 20.519,32.751 0.401,3.052 0.341,6.208 -0.185,9.196 -3.317,1.818 -7.103,2.73 -11.571,2.65 h -21.632 c -2.766,-6.329 -3.658,-15.198 -1.446,-26.489 1.086,-5.578 2.425,-11.008 3.905,-16.42 -2.846,-2.262 -5.998,-4.528 -9.463,-6.809 -36.859,-24.236 -27.764,-61.601 -17.168,-74.23 8.384,-9.963 29.986,-18.667 48.891,-12.441 -0.592,-13.484 -4.297,-23.734 -10.009,-27.949 -5.958,-4.386 -10.263,-3.361 -12.302,-0.961 0.996,2.045 1.572,4.332 1.572,6.76 0,8.541 -6.922,15.464 -15.465,15.464 -8.541,0 -15.463,-6.923 -15.463,-15.464 0,-5.032 2.221,-9.627 5.942,-12.452 h 41.195 c 1.9,1.516 3.918,3.477 5.631,5.649" /> </g> <g transform="translate(257.4902,211.418)" id="g50"> <path id="path52" style="fill:#d8e9fd;fill-opacity:1;fill-rule:nonzero;stroke:none" d="m 0,0 2.389,0.612 c 16.112,4.117 18.275,13.571 17.013,19.984 l 13.727,3.51 21.672,-84.727 -16.712,-4.276 -14.923,58.354 -20.171,-5.16 z" /> </g> <g transform="translate(280.3423,284.8091)" id="g54"> <path id="path56" style="fill:#64a6f9;fill-opacity:1;fill-rule:nonzero;stroke:none" d="m 0,0 c 0,11.978 8.763,13.014 12.028,13.014 7.052,0 12.651,-4.146 12.651,-11.615 0,-6.325 -4.096,-9.537 -7.673,-11.975 -4.875,-3.421 -7.412,-5.078 -8.243,-6.792 h 15.966 v -6.426 H -0.413 c 0.258,4.299 0.57,8.81 8.553,14.615 6.636,4.823 9.28,6.69 9.28,10.839 0,2.435 -1.555,5.236 -5.08,5.236 C 7.259,6.896 7.105,2.697 7.051,0 Z" /> </g> <g transform="translate(321.2446,245.8525)" id="g58"> <path id="path60" style="fill:#f1d01e;fill-opacity:1;fill-rule:nonzero;stroke:none" d="m 0,0 1.446,-0.413 c 2.765,-0.789 7.907,-1.975 9.634,4.08 0.489,1.71 0.921,6.217 -4.144,7.661 -6.319,1.805 -8.031,-4.184 -8.499,-5.829 l -8.554,2.442 c 2.501,8.751 9.221,13.597 19.75,10.588 6.252,-1.784 13.575,-7.293 10.753,-17.163 -1.353,-4.738 -5.157,-6.854 -8.129,-7.287 l -0.038,-0.132 c 1.513,-0.931 6.215,-4.905 3.941,-12.865 -2.52,-8.825 -10.821,-13.213 -20.229,-10.527 -4.411,1.261 -15.971,5.634 -11.801,20.241 l 9.016,-2.576 -0.082,-0.048 c -0.715,-2.501 -1.672,-8.347 4.514,-10.112 3.683,-1.05 7.62,0.526 9.104,5.726 1.823,6.38 -4.286,8.411 -8.563,9.631 z" /> </g> <g transform="translate(362.2236,150.3657)" id="g62"> <path id="path64" style="fill:#c50018;fill-opacity:1;fill-rule:nonzero;stroke:none" d="m 0,0 c 0,-4.129 -3.348,-7.474 -7.475,-7.474 -4.129,0 -7.476,3.345 -7.476,7.474 0,4.129 3.347,7.478 7.476,7.478 C -3.348,7.478 0,4.129 0,0" /> </g> </g> </g> </svg>';
 
@@ -29,6 +50,8 @@ if (GUIDEURL === "guide url" || GUIDEURL === "") {
 
 const NUMBERBLOCKDEFAULT = 4;
 const DEFAULTPALETTE = "rhythm";
+let HELPCONTENT;
+let DATAOBJS;
 let TITLESTRING = _(
     "Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way."
 );
@@ -172,6 +195,7 @@ function createDefaultStack() {
         language = navigator.language;
     }
 
+    // eslint-disable-next-line no-console
     console.debug("language setting is " + language);
     if (language === "ja") {
         DATAOBJS = [
@@ -262,7 +286,7 @@ function createDefaultStack() {
     }
 }
 
-function createHelpContent() {
+function createHelpContent(activity) {
     let language = localStorage.languagePreference;
     if (language === undefined) {
         language = navigator.language;
@@ -276,7 +300,7 @@ function createHelpContent() {
     TITLESTRING = _(
         "Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way."
     );
-    if (beginnerMode) {
+    if (activity.beginnerMode) {
         HELPCONTENT = [
             [
                 _("Welcome to Music Blocks"),

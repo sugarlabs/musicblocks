@@ -1,9 +1,29 @@
-function setupRhythmBlocks() {
+// Copyright (c) 2019 Bottersnike
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+/*
+   global
+
+   _, FlowBlock, NOINPUTERRORMSG, Singer, ValueBlock, mixedNumber,
+   FlowClampBlock, DEFAULTDRUM, Queue, i18nSolfege
+ */
+
+/* exported setupRhythmBlocks */
+
+function setupRhythmBlocks(activity) {
     class MyNoteValueBlock extends ValueBlock {
         constructor() {
             //.TRANS: the value (e.g., 1/4 note) of the note being played.
             super("mynotevalue", _("note value"));
-            this.setPalette("rhythm");
+            this.setPalette("rhythm", activity);
             this.parameter = true;
             this.beginnerBlock(true);
             this.setHelpString([
@@ -17,17 +37,17 @@ function setupRhythmBlocks() {
         }
 
         updateParameter(logo, turtle, blk) {
-            return mixedNumber(logo.blocks.blockList[blk].value);
+            return mixedNumber(activity.blocks.blockList[blk].value);
         }
 
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                blocks.blockList[blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "mynotevalue"]);
             } else {
-                return Singer.RhythmActions.getNoteValue(logo.turtles.companionTurtle(turtle));
+                return Singer.RhythmActions.getNoteValue(activity.turtles.companionTurtle(turtle));
             }
         }
     }
@@ -35,24 +55,24 @@ function setupRhythmBlocks() {
     class SkipFactorBlock extends ValueBlock {
         constructor() {
             super("skipfactor", "skip factor");
-            this.setPalette("rhythm");
+            this.setPalette("rhythm", activity);
             this.setHelpString();
             this.parameter = true;
             this.hidden = true;
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            return activity.blocks.blockList[blk].value;
         }
 
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "skip"]);
             } else {
-                return logo.turtles.ithTurtle(turtle).singer.skipFactor;
+                return activity.turtles.ithTurtle(turtle).singer.skipFactor;
             }
         }
     }
@@ -60,7 +80,7 @@ function setupRhythmBlocks() {
     class MillisecondsBlock extends FlowClampBlock {
         constructor() {
             super("osctime");
-            this.setPalette("rhythm");
+            this.setPalette("rhythm", activity);
             this.setHelpString([
                 _(
                     "The Milliseconds block is similar to a Note block except that it uses time (in MS) to specify the note duration."
@@ -96,13 +116,13 @@ function setupRhythmBlocks() {
                 return;
 
             if (args[0] === null || typeof args[0] !== "number")
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
             else if (args[0] <= 0)
-                logo.errorMsg(_("Note value must be greater than 0."), blk);
+                activity.errorMsg(_("Note value must be greater than 0."), blk);
             const value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
             const _callback = () => {
-                const tur = logo.turtles.ithTurtle(turtle);
+                const tur = activity.turtles.ithTurtle(turtle);
 
                 const queueBlock = new Queue(args[1], 1, blk, receivedArg);
                 tur.parentFlowQueue.push(blk);
@@ -118,7 +138,7 @@ function setupRhythmBlocks() {
     class SwingBlock extends FlowClampBlock {
         constructor() {
             super("swing");
-            this.setPalette("rhythm");
+            this.setPalette("rhythm", activity);
             this.setHelpString();
 
             this.formBlock({
@@ -135,7 +155,7 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.swing.push(args[0]);
             tur.singer.swingTarget.push(null);
@@ -145,6 +165,7 @@ function setupRhythmBlocks() {
             const listenerName = "_swing_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
+            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 if (!tur.singer.suppressOutput) {
                     tur.singer.swingTarget.pop();
@@ -163,7 +184,7 @@ function setupRhythmBlocks() {
     class NewSwingBlock extends FlowClampBlock {
         constructor() {
             super("newswing");
-            this.setPalette("rhythm");
+            this.setPalette("rhythm", activity);
             this.setHelpString();
 
             this.formBlock({
@@ -184,7 +205,7 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.swing.push(1 / args[0]);
             tur.singer.swingTarget.push(null);
@@ -194,6 +215,7 @@ function setupRhythmBlocks() {
             const listenerName = "_swing_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
+            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 if (!tur.singer.suppressOutput) {
                     tur.singer.swingTarget.pop();
@@ -212,7 +234,7 @@ function setupRhythmBlocks() {
     class NewSwing2Block extends FlowClampBlock {
         constructor() {
             super("newswing2");
-            this.setPalette("rhythm");
+            this.setPalette("rhythm", activity);
             this.setHelpString([
                 _(
                     "The Swing block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note."
@@ -255,7 +277,7 @@ function setupRhythmBlocks() {
             if (
                 args[0] === null || typeof args[0] !== "number" || args[0] <= 0 ||
                 args[1] === null || typeof args[1] !== "number" || args[1] <= 0
-            )   logo.errorMsg(NOINPUTERRORMSG, blk);
+            )   activity.errorMsg(NOINPUTERRORMSG, blk);
             const arg0 =
                 args[0] === null || typeof args[0] !== "number" || args[0] <= 0 ? 1 / 24 : args[0];
             const arg1 =
@@ -270,7 +292,7 @@ function setupRhythmBlocks() {
     class SkipNotesBlock extends FlowClampBlock {
         constructor() {
             super("skipnotes");
-            this.setPalette("rhythm");
+            this.setPalette("rhythm", activity);
             this.setHelpString([
                 _("The Skip notes block will cause notes to be skipped."),
                 "documentation",
@@ -293,13 +315,14 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
             const arg = args[0] === null ? 0 : args[0];
             tur.singer.skipFactor += arg;
 
             const listenerName = "_skip_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
+            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 tur.singer.skipFactor -= arg;
             };
@@ -313,7 +336,7 @@ function setupRhythmBlocks() {
     class MultiplyBeatFactorBlock extends FlowClampBlock {
         constructor() {
             super("multiplybeatfactor");
-            this.setPalette("rhythm");
+            this.setPalette("rhythm", activity);
             this.setHelpString([
                 _(
                     "The Multiply note value block changes the duration of notes by changing their note values."
@@ -346,7 +369,7 @@ function setupRhythmBlocks() {
 
             let factor = args[0];
             if (factor === null || typeof factor !== "number" || factor <= 0) {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 factor = 2;
             }
 
@@ -359,7 +382,7 @@ function setupRhythmBlocks() {
     class TieBlock extends FlowClampBlock {
         constructor() {
             super("tie");
-            this.setPalette("rhythm");
+            this.setPalette("rhythm", activity);
 
             this.beginnerBlock(true);
             this.setHelpString([
@@ -395,7 +418,7 @@ function setupRhythmBlocks() {
     class RhythmicDotBlock extends FlowClampBlock {
         constructor() {
             super("rhythmicdot");
-            this.setPalette("rhythm");
+            this.setPalette("rhythm", activity);
             this.setHelpString();
 
             this.formBlock({
@@ -410,16 +433,16 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[0] === null) logo.errorMsg(NOINPUTERRORMSG, blk);
+            if (args[0] === null) activity.errorMsg(NOINPUTERRORMSG, blk);
             let arg = 1;
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
             const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
             tur.singer.beatFactor *= currentDotFactor;
             if (arg >= 0) {
                 tur.singer.dotCount += arg;
             } else if (arg === -1) {
-                logo.errorMsg(_("An argument of -1 results in a note value of 0."), blk);
+                activity.errorMsg(_("An argument of -1 results in a note value of 0."), blk);
                 arg = 0;
             } else {
                 tur.singer.dotCount += 1 / arg;
@@ -431,6 +454,7 @@ function setupRhythmBlocks() {
             const listenerName = "_dot_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
+            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
                 tur.singer.beatFactor *= currentDotFactor;
@@ -448,7 +472,7 @@ function setupRhythmBlocks() {
     class RhythmicDot2Block extends FlowClampBlock {
         constructor() {
             super("rhythmicdot2");
-            this.setPalette("rhythm");
+            this.setPalette("rhythm", activity);
             this.piemenuValuesC1 = [1, 2, 3];
             this.setHelpString([
                 _("The Dot block extends the duration of a note by 50%.") +
@@ -476,7 +500,7 @@ function setupRhythmBlocks() {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[0] === null) logo.errorMsg(NOINPUTERRORMSG, blk);
+            if (args[0] === null) activity.errorMsg(NOINPUTERRORMSG, blk);
             const arg = args[0] === null ? 0 : args[0];
 
             Singer.RhythmActions.doRhythmicDot(arg, turtle ,blk);
@@ -488,7 +512,7 @@ function setupRhythmBlocks() {
     class Rest2Block extends FlowBlock {
         constructor() {
             super("rest2", _("silence"));
-            this.setPalette("rhythm");
+            this.setPalette("rhythm", activity);
             this.beginnerBlock(true);
             this.setHelpString([
                 _(
@@ -518,7 +542,7 @@ function setupRhythmBlocks() {
     class Note4Block extends FlowClampBlock {
         constructor() {
             super("note4");
-            this.setPalette("rhythm");
+            this.setPalette("rhythm", activity);
             this.beginnerBlock(true);
 
             this.formBlock({
@@ -542,13 +566,13 @@ function setupRhythmBlocks() {
             ]);
         }
 
-        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {}
+        flow() {}
     }
 
     class _NoteValueBlock extends FlowClampBlock {
         constructor(name, value) {
             super(name);
-            this.setPalette("rhythm");
+            this.setPalette("rhythm", activity);
             this.setHelpString();
 
             this.formBlock({
@@ -558,7 +582,7 @@ function setupRhythmBlocks() {
             });
         }
 
-        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {}
+        flow() {}
     }
 
     class Note3Block extends _NoteValueBlock {
@@ -577,7 +601,7 @@ function setupRhythmBlocks() {
             ]);
         }
 
-        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {}
+        flow() {}
     }
 
     class Note5Block extends _NoteValueBlock {
@@ -596,7 +620,7 @@ function setupRhythmBlocks() {
             ]);
         }
 
-        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {}
+        flow() {}
     }
 
     class Note7Block extends _NoteValueBlock {
@@ -616,7 +640,7 @@ function setupRhythmBlocks() {
             ]);
         }
 
-        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {}
+        flow() {}
     }
 
     class Note8Block extends _NoteValueBlock {
@@ -636,7 +660,7 @@ function setupRhythmBlocks() {
             ]);
         }
 
-        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {}
+        flow() {}
     }
 
     class Note6Block extends _NoteValueBlock {
@@ -655,7 +679,7 @@ function setupRhythmBlocks() {
             ]);
         }
 
-        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {}
+        flow() {}
     }
 
     class Note2Block extends _NoteValueBlock {
@@ -675,7 +699,7 @@ function setupRhythmBlocks() {
             ]);
         }
 
-        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {}
+        flow() {}
     }
 
     class Note1Block extends _NoteValueBlock {
@@ -695,13 +719,13 @@ function setupRhythmBlocks() {
             ]);
         }
 
-        flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {}
+        flow() {}
     }
 
     class NoteBlock extends FlowClampBlock {
         constructor() {
             super("note");
-            this.setPalette("rhythm");
+            this.setPalette("rhythm", activity);
             this.setHelpString();
 
             this.formBlock({
@@ -727,13 +751,13 @@ function setupRhythmBlocks() {
                 return;
 
             if (args[0] === null || typeof args[0] !== "number")
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
             else if (args[0] <= 0)
-                logo.errorMsg(_("Note value must be greater than 0."), blk);
+                activity.errorMsg(_("Note value must be greater than 0."), blk);
             const value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
             const _callback = () => {
-                const tur = logo.turtles.ithTurtle(turtle);
+                const tur = activity.turtles.ithTurtle(turtle);
 
                 const queueBlock = new Queue(args[1], 1, blk, receivedArg);
                 tur.parentFlowQueue.push(blk);
@@ -749,7 +773,7 @@ function setupRhythmBlocks() {
     class NewNoteBlock extends FlowClampBlock {
         constructor() {
             super("newnote");
-            this.setPalette("rhythm");
+            this.setPalette("rhythm", activity);
             this.beginnerBlock(true);
             this.setHelpString([
                 _(
@@ -790,14 +814,14 @@ function setupRhythmBlocks() {
                 return;
 
             if (args[0] === null || typeof args[0] !== "number")
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
             else if (args[0] <= 0)
-                logo.errorMsg(_("Note value must be greater than 0."), blk);
+                activity.errorMsg(_("Note value must be greater than 0."), blk);
 
             const value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
             const _callback = () => {
-                const tur = logo.turtles.ithTurtle(turtle);
+                const tur = activity.turtles.ithTurtle(turtle);
 
                 const queueBlock = new Queue(args[1], 1, blk, receivedArg);
                 tur.parentFlowQueue.push(blk);
@@ -813,7 +837,7 @@ function setupRhythmBlocks() {
     class DefineFrequencyBlock extends FlowClampBlock {
         constructor() {
             super("definefrequency");
-            this.setPalette("rhythm");
+            this.setPalette("rhythm", activity);
             this.setHelpString();
 
             this.formBlock({
@@ -827,7 +851,7 @@ function setupRhythmBlocks() {
     class OctaveSpaceBlock extends FlowBlock {
         constructor() {
             super("octavespace", _("octave space"));
-            this.setPalette("rhythm");
+            this.setPalette("rhythm", activity);
             this.setHelpString();
 
             this.formBlock({
@@ -837,28 +861,28 @@ function setupRhythmBlocks() {
         }
     }
 
-    new MyNoteValueBlock().setup();
-    new SkipFactorBlock().setup();
-    new MillisecondsBlock().setup();
-    new SwingBlock().setup();
-    new NewSwingBlock().setup();
-    new NewSwing2Block().setup();
-    new SkipNotesBlock().setup();
-    new MultiplyBeatFactorBlock().setup();
-    new TieBlock().setup();
-    new RhythmicDotBlock().setup();
-    new RhythmicDot2Block().setup();
-    new Rest2Block().setup();
-    new Note4Block().setup();
-    new Note3Block().setup();
-    new Note5Block().setup();
-    new Note8Block().setup();
-    new Note7Block().setup();
-    new Note6Block().setup();
-    new Note2Block().setup();
-    new Note1Block().setup();
-    new NoteBlock().setup();
-    new NewNoteBlock().setup();
-    new DefineFrequencyBlock().setup();
-    new OctaveSpaceBlock().setup();
+    new MyNoteValueBlock().setup(activity);
+    new SkipFactorBlock().setup(activity);
+    new MillisecondsBlock().setup(activity);
+    new SwingBlock().setup(activity);
+    new NewSwingBlock().setup(activity);
+    new NewSwing2Block().setup(activity);
+    new SkipNotesBlock().setup(activity);
+    new MultiplyBeatFactorBlock().setup(activity);
+    new TieBlock().setup(activity);
+    new RhythmicDotBlock().setup(activity);
+    new RhythmicDot2Block().setup(activity);
+    new Rest2Block().setup(activity);
+    new Note4Block().setup(activity);
+    new Note3Block().setup(activity);
+    new Note5Block().setup(activity);
+    new Note8Block().setup(activity);
+    new Note7Block().setup(activity);
+    new Note6Block().setup(activity);
+    new Note2Block().setup(activity);
+    new Note1Block().setup(activity);
+    new NoteBlock().setup(activity);
+    new NewNoteBlock().setup(activity);
+    new DefineFrequencyBlock().setup(activity);
+    new OctaveSpaceBlock().setup(activity);
 }

@@ -9,12 +9,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/*global _, docById*/
+/* global _, docById */
 
 /*
 Globals location
 - js/utils/utils.js
-_, docById
+  _, docById
 */
 
 window.widgetWindows = { openWindows: {}, _posCache: {} };
@@ -91,7 +91,7 @@ class WidgetWindow {
         // not a relative in either direciton.
 
         if (this._fullscreenEnabled) {
-            this._drag.ondblclick = () => {
+            this._drag.ondblclick = (e) => {
                 this._maximize();
                 this.takeFocus();
                 this.onmaximize();

@@ -16,70 +16,114 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 //* arg-globals *//
-var block = logo.blocks.blockList[blk];
-var conns = block.connections;
+const mathBlock = globalActivity.logo.blockList[blk];
+const conns = mathBlock.connections;
 
 //* block-globals *//
-var simpleOneArgBlock = function (name, label) {
+const simpleOneArgBlock = function (name, label, defaultValue) {
     if (label === undefined) { var label = name; }
-    var block = new ProtoBlock(name);
-    block.palette = palettes.dict['maths'];
-    blocks.protoBlockDict[name] = block;
+    const block = new ProtoBlock(name);
+    block.palette = globalActivity.palettes.dict['maths'];
+    globalActivity.blocks.protoBlockDict[name] = block;
     block.staticLabels.push(label);
     block.adjustWidthToLabel();
     block.oneArgMathBlock();
-    block.defaults.push(1);
+    if (defaultValue === undefined) {
+        block.defaults.push(1.0);
+    } else {
+        block.defaults.push(defaultValue);
+    }
 };
 
-var staticBlock = function (name, label) {
-    var block = new ProtoBlock(name);
-    block.palette = palettes.dict['maths'];
-    blocks.protoBlockDict[name] = block;
+const simpleTwoArgBlock = function (name, labels, defaultValues) {
+    const block = new ProtoBlock(name);
+    block.palette = globalActivity.palettes.dict['maths'];
+    globalActivity.blocks.protoBlockDict[name] = block;
+    for (let i = 0; i < labels.length; i++) {
+        block.staticLabels.push(labels[i]);
+    }
+    block.adjustWidthToLabel();
+    block.twoArgMathBlock();
+    for (let i = 0; i < defaultValues.length; i++) {
+        block.defaults.push(defaultValues[i]);
+    }
+};
+
+const staticBlock = function (name, label) {
+    const block = new ProtoBlock(name);
+    block.palette = globalActivity.palettes.dict['maths'];
+    globalActivity.blocks.protoBlockDict[name] = block;
     block.staticLabels.push(label);
     block.adjustWidthToLabel();
     block.parameterBlock();
 };
 
 //* block:power *//
-var block = new ProtoBlock('power');
-block.palette = palettes.dict['maths'];
-blocks.protoBlockDict['power'] = block;
-block.staticLabels.push(_('power'), _('base'), _('exp'));
-block.twoArgMathBlock();
-block.defaults.push(10, 2);
+simpleTwoArgBlock('power', [_('power'), _('base'), _('exp')], [10, 2]);
 //* arg:power *//
 var base = logo.parseArg(logo, turtle, conns[1]);
 var exp  = logo.parseArg(logo, turtle, conns[2]);
-block.value = Math.pow(base, exp);
+mathBlock.value = Math.pow(base, exp);
 
-//* block:sin *// simpleOneArgBlock('sin');
-//* arg:sin *// block.value = Math.sin(logo.parseArg(logo, turtle, conns[1]));
-//* block:cos *// simpleOneArgBlock('cos');
-//* arg:cos *// block.value = Math.cos(logo.parseArg(logo, turtle, conns[1]));
-//* block:tan *// simpleOneArgBlock('tan');
-//* arg:tan *// block.value = Math.tan(logo.parseArg(logo, turtle, conns[1]));
+//* block:sin *//
+simpleOneArgBlock('sin', 'sin', '3.14159');
+//* arg:sin *//
+mathBlock.value = Math.sin(logo.parseArg(logo, turtle, conns[1]));
 
-//* block:asin *// simpleOneArgBlock('asin');
-//* arg:asin *// block.value = Math.asin(logo.parseArg(logo, turtle, conns[1]));
-//* block:acos *// simpleOneArgBlock('acos');
-//* arg:acos *// block.value = Math.acos(logo.parseArg(logo, turtle, conns[1]));
-//* block:atan *// simpleOneArgBlock('atan');
-//* arg:atan *// block.value = Math.atan(logo.parseArg(logo, turtle, conns[1]));
+//* block:cos *//
+simpleOneArgBlock('cos', 'cos', '3.14159');
+//* arg:cos *//
+mathBlock.value = Math.cos(logo.parseArg(logo, turtle, conns[1]));
 
-//* block:floor *// simpleOneArgBlock(_('floor'));
-//* arg:floor *// block.value = Math.floor(logo.parseArg(logo, turtle, conns[1]));
-//* block:ceiling *// simpleOneArgBlock(_('ceiling'));
-//* arg:ceiling *// block.value = Math.ceil(logo.parseArg(logo, turtle, conns[1]));
+//* block:tan *//
+simpleOneArgBlock('tan', 'tan', '3.14159');
+//* arg:tan *//
+mathBlock.value = Math.tan(logo.parseArg(logo, turtle, conns[1]));
 
-//* block:degrees *// simpleOneArgBlock(_('degrees'), _('to degrees'));
-//* arg:degrees *// block.value = logo.parseArg(logo, turtle, conns[1]) * (180/Math.PI);
-//* block:radians *// simpleOneArgBlock(_('radians'), _('to radians'));
-//* arg:radians *// block.value = logo.parseArg(logo, turtle, conns[1]) * (Math.PI/180);
+//* block:asin *//
+simpleOneArgBlock('asin', 'asin', 0);
+//* arg:asin *//
+mathBlock.value = Math.asin(logo.parseArg(logo, turtle, conns[1]));
 
-//* block:pi *// staticBlock('pi', 'π');
-//* arg:pi *// block.value = Math.PI;
-//* block:e *// staticBlock('e', 'e');
-//* arg:e *// block.value = Math.E;
+//* block:acos *//
+simpleOneArgBlock('acos', 'acos', 0);
+//* arg:acos *//
+mathBlock.value = Math.acos(logo.parseArg(logo, turtle, conns[1]));
+
+//* block:atan *//
+simpleOneArgBlock('atan', 'atan', 1);
+//* arg:atan *//
+mathBlock.value = Math.atan(logo.parseArg(logo, turtle, conns[1]));
+
+//* block:floor *//
+simpleOneArgBlock('floor', _('floor'), 0.5);
+//* arg:floor *//
+mathBlock.value = Math.floor(logo.parseArg(logo, turtle, conns[1]));
+
+//* block:ceiling *//
+simpleOneArgBlock('ceiling', _('ceiling'), 0.5);
+//* arg:ceiling *//
+mathBlock.value = Math.ceil(logo.parseArg(logo, turtle, conns[1]));
+
+//* block:degrees *//
+simpleOneArgBlock('degrees', _('to degrees'), 3.14159);
+//* arg:degrees *//
+mathBlock.value = logo.parseArg(logo, turtle, conns[1]) * (180/Math.PI);
+
+//* block:radians *//
+simpleOneArgBlock('radians', _('to radians'), 180);
+//* arg:radians *//
+mathBlock.value = logo.parseArg(logo, turtle, conns[1]) * (Math.PI/180);
+
+//* block:pi *//
+staticBlock('pi', 'π');
+//* arg:pi *//
+mathBlock.value = Math.PI;
+
+//* block:e *//
+staticBlock('e', 'e');
+//* arg:e *//
+mathBlock.value = Math.E;
 
 //* palette-icon:maths *//
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -108,8 +152,12 @@ block.value = Math.pow(base, exp);
        id="path7"
        style="fill:none;stroke:#FF6EA1;stroke-width:1.51425433" /></g></svg>
 
-//* palette-fill:maths *// #FF6EA1
-//* palette-stroke:maths *// #FF2C76
-//* palette-highlight:maths *// #FF5293
-//* palette-stroke-highlight:maths *// #FFCDDF
+//* palette-fill:maths *//
+#FF6EA1
+//* palette-stroke:maths *//
+#FF2C76
+//* palette-highlight:maths *//
+#FF5293
+//* palette-stroke-highlight:maths *//
+#FFCDDF
 

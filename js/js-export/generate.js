@@ -15,7 +15,7 @@
  * MA 02110-1335 USA.
  */
 
-/* global JSInterface, blocks, last, ASTUtils, astring */
+/* global globalActivity, JSInterface, last, ASTUtils, astring */
 
 /* exported JSGenerate */
 
@@ -30,6 +30,7 @@
  *
  * * Internal functions' names are in PascalCase.
  */
+
 class JSGenerate {
     /** list of the Block index numbers of all start blocks */
     static startBlocks = [];
@@ -61,16 +62,22 @@ class JSGenerate {
         JSGenerate.actionTrees = [];
         JSGenerate.actionNames = [];
 
-        blocks.findStacks();
+        globalActivity.blocks.findStacks();
 
-        for (const blk of blocks.stackList) {
-            if (blocks.blockList[blk].name === "start" && !blocks.blockList[blk].trash) {
+        for (const blk of globalActivity.blocks.stackList) {
+            if (
+                globalActivity.blocks.blockList[blk].name === "start" &&
+                !globalActivity.blocks.blockList[blk].trash
+            ) {
                 JSGenerate.startBlocks.push(blk);
-            } else if (blocks.blockList[blk].name === "action" && !blocks.blockList[blk].trash) {
+            } else if (
+                globalActivity.blocks.blockList[blk].name === "action" &&
+                !globalActivity.blocks.blockList[blk].trash
+            ) {
                 // does the action stack have a name?
-                const c = blocks.blockList[blk].connections[1];
+                const c = globalActivity.blocks.blockList[blk].connections[1];
                 // is there a block in the action clamp?
-                const b = blocks.blockList[blk].connections[2];
+                const b = globalActivity.blocks.blockList[blk].connections[2];
                 if (c !== null && b !== null) {
                     JSGenerate.actionBlocks.push(blk);
                 }
@@ -102,7 +109,7 @@ class JSGenerate {
 
                 const args = [];
                 for (let i = 1; i <= argLen; i++) {
-                    let arg = blocks.blockList[blk.connections[i]];
+                    let arg = globalActivity.blocks.blockList[blk.connections[i]];
                     if (arg === undefined) {
                         args.push(null);
                         continue;
@@ -119,7 +126,7 @@ class JSGenerate {
 
                     // ignore horizontal spacers
                     while (arg.name === "hspace") {
-                        arg = blocks.blockList[arg.connections[1]];
+                        arg = globalActivity.blocks.blockList[arg.connections[1]];
                     }
 
                     if (arg.protoblock.style === "value") {
@@ -151,7 +158,7 @@ class JSGenerate {
             if (level === undefined) level = 0;
 
             let nextBlk = blk.connections[blk.connections.length - 2 - level];
-            nextBlk = blocks.blockList[nextBlk];
+            nextBlk = globalActivity.blocks.blockList[nextBlk];
             while (nextBlk !== undefined) {
                 // ignore vertical spacers and hidden blocks
                 if (nextBlk.name !== "hidden" && nextBlk.name !== "vspace") {
@@ -175,7 +182,7 @@ class JSGenerate {
                 }
 
                 if (nextBlk.connections.length > 0) {
-                    nextBlk = blocks.blockList[last(nextBlk.connections)];
+                    nextBlk = globalActivity.blocks.blockList[last(nextBlk.connections)];
                     if (nextBlk === undefined) break;
                 } else {
                     break;
@@ -186,15 +193,19 @@ class JSGenerate {
         }
 
         for (const blk of JSGenerate.startBlocks) {
-            JSGenerate.startTrees.push(GenerateStackTree(blocks.blockList[blk], []));
+            JSGenerate.startTrees.push(GenerateStackTree(globalActivity.blocks.blockList[blk], []));
         }
 
         for (const blk of JSGenerate.actionBlocks) {
-            const actionName = blocks.blockList[blocks.blockList[blk].connections[1]].value;
+            const actionName =
+                globalActivity.blocks.blockList[globalActivity.blocks.blockList[blk].connections[1]]
+                    .value;
             if (actionName === null || actionName === undefined) continue;
 
             JSGenerate.actionNames.push(actionName);
-            JSGenerate.actionTrees.push(GenerateStackTree(blocks.blockList[blk], []));
+            JSGenerate.actionTrees.push(
+                GenerateStackTree(globalActivity.blocks.blockList[blk], [])
+            );
         }
     }
 
@@ -341,6 +352,7 @@ class JSGenerate {
      * * Serializes the Abstract Syntax Tree into JavaScript code
      *
      * @static
+     * @param {Object} activity - the Activity object
      * @param {Boolean} printStacksTree - whether to print the stacks tree in the browser console
      * @param {Boolean} printCode - whether to print the generated code in the browser console
      * @returns {void}

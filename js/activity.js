@@ -1,6 +1,5 @@
-// Copyright (c) 2014-20 Walter Bender
+// Copyright (c) 2014-21 Walter Bender
 // Copyright (c) Yash Khandelwal, GSoC'15
-// Copyright (c) 2016 Tymon Radzik
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -15,34 +14,194 @@
 // (https://github.com/walterbender/turtleart), but implemented from
 // scratch. -- Walter Bender, October 2014.
 
-let KeySignatureEnv = ["C", "major", false];
+/*
+   globals
+
+   _, ALTO, analyzeProject, BASS, BIGGERBUTTON, BIGGERDISABLEBUTTON,
+   Blocks, Boundary, CARTESIAN, changeImage, closeWidgets,
+   COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
+   createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
+   DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
+   docById, doSVG, EMPTYHEAPERRORMSG, EXPANDBUTTON, FILLCOLORS,
+   getMacroExpansion, getOctaveRatio, getTemperament, GOHOMEBUTTON,
+   GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
+   hideDOMLabel, initBasicProtoBlocks, initPalettes,
+   INLINECOLLAPSIBLES, jQuery, JSEditor, LanguageBox, Logo, MSGBLOCK,
+   NANERRORMSG, NOACTIONERRORMSG, NOBOXERRORMSG, NOINPUTERRORMSG,
+   NOMICERRORMSG, NOSQRTERRORMSG, NOSTRINGERRORMSG, PALETTEFILLCOLORS,
+   PALETTESTROKECOLORS, PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
+   Palettes, PasteBox, PlanetInterface, platform, platformColor,
+   piemenuKey, POLAR, preparePluginExports, processMacroData,
+   processPluginData, processRawPluginData, require, SaveInterface,
+   SHOWBLOCKSBUTTON, SMALLERBUTTON, SMALLERDISABLEBUTTON, SOPRANO,
+   SPECIALINPUTS, STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
+   TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, Turtles, TURTLESVG,
+   updatePluginObj, ZERODIVIDEERRORMSG
+ */
+
+/*
+   exported
+
+   Activity, LEADING, _THIS_IS_MUSIC_BLOCKS_, _THIS_IS_TURTLE_BLOCKS_,
+   globalActivity, hideArrows
+ */
+
+const LEADING = 0;
+const BLOCKSCALES = [1, 1.5, 2, 3, 4];
+const _THIS_IS_MUSIC_BLOCKS_ = true;
+const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
+
+const _ERRORMSGTIMEOUT_ = 15000;
+const _MSGTIMEOUT_ = 60000;
+
+let MYDEFINES = [
+    "utils/platformstyle",
+    "easeljs.min",
+    "tweenjs.min",
+    "preloadjs.min",
+    "howler",
+    "p5.min",
+    "p5.sound.min",
+    "p5.dom.min",
+    // 'mespeak',
+    "Chart",
+    "utils/utils",
+    "activity/artwork",
+    "widgets/status",
+    "widgets/help",
+    "utils/munsell",
+    "activity/toolbar",
+    "activity/trash",
+    "activity/boundary",
+    "activity/palette",
+    "activity/protoblocks",
+    "activity/blocks",
+    "activity/block",
+    "activity/turtledefs",
+    "activity/notation",
+    "activity/logo",
+    "activity/turtle",
+    "activity/turtles",
+    "activity/turtle-singer",
+    "activity/turtle-painter",
+    "activity/languagebox",
+    "activity/basicblocks",
+    "activity/blockfactory",
+    "activity/piemenus",
+    "activity/planetInterface",
+    "activity/rubrics",
+    "activity/macros",
+    "activity/SaveInterface",
+    "utils/musicutils",
+    "utils/synthutils",
+    "utils/mathutils",
+    "activity/pastebox",
+    "prefixfree.min"
+];
+
+if (_THIS_IS_MUSIC_BLOCKS_) {
+    const MUSICBLOCKS_EXTRAS = [
+        "Tone",
+        "activity/js-export/samples/sample",
+        "activity/js-export/export",
+        "activity/js-export/interface",
+        "activity/js-export/constraints",
+        "activity/js-export/ASTutils",
+        "activity/js-export/generate",
+        "activity/js-export/API/GraphicsBlocksAPI",
+        "activity/js-export/API/PenBlocksAPI",
+        "activity/js-export/API/RhythmBlocksAPI",
+        "activity/js-export/API/MeterBlocksAPI",
+        "activity/js-export/API/PitchBlocksAPI",
+        "activity/js-export/API/IntervalsBlocksAPI",
+        "activity/js-export/API/ToneBlocksAPI",
+        "activity/js-export/API/OrnamentBlocksAPI",
+        "activity/js-export/API/VolumeBlocksAPI",
+        "activity/js-export/API/DrumBlocksAPI",
+        "activity/js-export/API/DictBlocksAPI",
+        "widgets/widgetWindows",
+        "widgets/jseditor",
+        "widgets/modewidget",
+        "widgets/meterwidget",
+        "widgets/phrasemaker",
+        "widgets/pitchdrummatrix",
+        "widgets/rhythmruler",
+        "widgets/pitchstaircase",
+        "widgets/temperament",
+        "widgets/tempo",
+        "widgets/pitchslider",
+        "widgets/musickeyboard",
+        "widgets/timbre",
+        "widgets/oscilloscope",
+        "widgets/sampler",
+        "widgets/statistics",
+        "activity/lilypond",
+        "activity/abc",
+        "activity/mxml",
+        "activity/turtleactions/RhythmActions",
+        "activity/turtleactions/MeterActions",
+        "activity/turtleactions/PitchActions",
+        "activity/turtleactions/IntervalsActions",
+        "activity/turtleactions/ToneActions",
+        "activity/turtleactions/OrnamentActions",
+        "activity/turtleactions/VolumeActions",
+        "activity/turtleactions/DrumActions",
+        "activity/turtleactions/DictActions",
+        "activity/blocks/RhythmBlocks",
+        "activity/blocks/MeterBlocks",
+        "activity/blocks/PitchBlocks",
+        "activity/blocks/IntervalsBlocks",
+        "activity/blocks/ToneBlocks",
+        "activity/blocks/OrnamentBlocks",
+        "activity/blocks/VolumeBlocks",
+        "activity/blocks/DrumBlocks",
+        "activity/blocks/WidgetBlocks",
+        "activity/blocks/RhythmBlockPaletteBlocks",
+        "activity/blocks/ActionBlocks",
+        "activity/blocks/FlowBlocks",
+        "activity/blocks/NumberBlocks",
+        "activity/blocks/BoxesBlocks",
+        "activity/blocks/BooleanBlocks",
+        "activity/blocks/HeapBlocks",
+        "activity/blocks/DictBlocks",
+        "activity/blocks/ExtrasBlocks",
+        "activity/blocks/ProgramBlocks",
+        "activity/blocks/GraphicsBlocks",
+        "activity/blocks/PenBlocks",
+        "activity/blocks/MediaBlocks",
+        "activity/blocks/SensorsBlocks",
+        "activity/blocks/EnsembleBlocks"
+    ];
+    MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
+}
+
+// Create a global variable from the Activity obj to provide access to
+// blocks, logo, palettes, and turtles for plugins and js-export.
+let globalActivity;
 
 function Activity() {
-    _THIS_IS_MUSIC_BLOCKS_ = true;
-    LEADING = 0;
-    _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
+    globalActivity = this;
 
-    const _ERRORMSGTIMEOUT_ = 15000;
-    const _MSGTIMEOUT_ = 60000;
-    let cellSize = 55;
-    let searchSuggestions = [];
-    let homeButtonContainer;
+    this.KeySignatureEnv = ["C", "major", false];
+    this.cellSize = 55;
+    this.searchSuggestions = [];
+    this.homeButtonContainer;
 
-    let msgTimeoutID = null;
-    let msgText = null;
-    let errorMsgTimeoutID = null;
-    let errorMsgText = null;
-    let errorMsgArrow = null;
-    const errorArtwork = {};
+    this.msgTimeoutID = null;
+    this.msgText = null;
+    this.errorMsgTimeoutID = null;
+    this.errorMsgText = null;
+    this.errorMsgArrow = null;
+    this.errorArtwork = {};
 
-    let cartesianBitmap = null;
-    let polarBitmap = null;
-    let trebleBitmap = null;
-    let grandBitmap = null;
-    let sopranoBitmap = null;
-    let altoBitmap = null;
-    let tenorBitmap = null;
-    let bassBitmap = null;
+    this.cartesianBitmap = null;
+    this.polarBitmap = null;
+    this.trebleBitmap = null;
+    this.grandBitmap = null;
+    this.sopranoBitmap = null;
+    this.altoBitmap = null;
+    this.tenorBitmap = null;
+    this.bassBitmap = null;
 
     const ERRORARTWORK = [
         "emptybox",
@@ -56,255 +215,68 @@ function Activity() {
         "nomicrophone"
     ];
 
-    let saveLocally;
+    this.saveLocally = null;
+    this.scrollBlockContainer = false;
+    this.blockRefreshCanvas = false;
+    this.statsWindow = null;
 
-    const that = this;
+    this.firstTimeUser = false;
+    this.beginnerMode = false;
 
-    _doFastButton = this._doFastButton;
-    _doSlowButton = this._doSlowButton;
-    doHardStopButton = this.doHardStopButton;
-    _setupBlocksContainerEvents = this._setupBlocksContainerEvents;
-    getCurrentKeyCode = this.getCurrentKeyCode;
-    clearCurrentKeyCode = this.clearCurrentKeyCode;
-    onStopTurtle = this.onStopTurtle;
-    onRunTurtle = this.onRunTurtle;
-    doSave = this.doSave;
-    runProject = this.runProject;
-    loadProject = this.loadProject;
-    loadStartWrapper = this.loadStartWrapper;
-    showContents = this.showContents;
-    _loadStart = this._loadStart;
-    _setupAndroidToolbar = this._setupAndroidToolbar;
-    _loadButtonDragHandler = this._loadButtonDragHandler;
+    // Flag to disable keyboard during loading of MB
+    this.keyboardEnableFlag;
+    this.inTempoWidget = false;
+    this.projectID = null;
+    this.storage = localStorage;
 
-    scrollBlockContainer = false;
-
-    if (_THIS_IS_TURTLE_BLOCKS_) {
-        function facebookInit() {
-            window.fbAsyncInit = function () {
-                FB.init({ appId: "1496189893985945", xfbml: true, version: "v2.1" });
-
-                // ADD ADDITIONAL FACEBOOK CODE HERE
-            };
-        }
-
-        try {
-            (function (d, s, id) {
-                js, (fjs = d.getElementsByTagName(s)[0]);
-                if (d.getElementById(id)) {
-                    return;
-                }
-
-                js = d.createElement(s);
-                js.id = id;
-                js.src = "https://connect.facebook.net/en_US/sdk.js";
-                fjs.parentNode.insertBefore(js, fjs);
-            })(document, "script", "facebook-jssdk");
-        } catch (e) {}
-    }
-
-    let firstTimeUser = false;
     if (_THIS_IS_MUSIC_BLOCKS_) {
-        beginnerMode = true;
+        this.beginnerMode = true;
         try {
-            if (localStorage.beginnerMode === undefined) {
-                firstTimeUser = true;
-                // console.debug("FIRST TIME USER");
-            } else if (localStorage.beginnerMode !== null) {
-                beginnerMode = localStorage.beginnerMode;
-                // console.debug(
-                //     "READING BEGINNERMODE FROM LOCAL STORAGE: " +
-                //         beginnerMode +
-                //         " " +
-                //         typeof beginnerMode
-                // );
-                if (typeof beginnerMode === "string") {
-                    if (beginnerMode === "false") {
-                        beginnerMode = false;
+            if (this.storage.beginnerMode === undefined) {
+                this.firstTimeUser = true;
+            } else if (this.storage.beginnerMode !== null) {
+                this.beginnerMode = this.storage.beginnerMode;
+                if (typeof this.beginnerMode === "string") {
+                    if (this.beginnerMode === "false") {
+                        this.beginnerMode = false;
                     }
                 }
             }
-
-            // console.debug("BEGINNERMODE is " + beginnerMode);
         } catch (e) {
-            // console.error(e);
-            // console.debug("ERROR READING BEGINNER MODE");
+            // eslint-disable-next-line no-console
+            console.error(e);
         }
-        // console.debug("BEGINNERMODE is " + beginnerMode);
-    } else {
-        // Turtle Blocks
-        beginnerMode = false;
     }
 
-    // if (beginnerMode) {
-    //     console.debug("BEGINNER MODE");
-    // } else {
-    //     console.debug("ADVANCED MODE");
-    // }
-
     try {
-        // console.debug("stored preference: " + localStorage.languagePreference);
-        // console.debug("browser preference: " + navigator.language);
-
-        if (localStorage.languagePreference !== undefined) {
-            try {
-                // console.debug(localStorage.languagePreference);
-                lang = localStorage.languagePreference;
-                document.webL10n.setLanguage(lang);
-            } catch (e) {
-                // console.error(e);
-            }
+        let lang = "en";
+        if (this.storage.languagePreference !== undefined) {
+            lang = this.storage.languagePreference;
+            document.webL10n.setLanguage(lang);
         } else {
-            // document.webL10n.getLanguage();
             lang = navigator.language;
-            // console.debug(lang);
             if (lang.indexOf("-") !== -1) {
                 lang = lang.slice(0, lang.indexOf("-"));
                 document.webL10n.setLanguage(lang);
             }
         }
     } catch (e) {
-        // console.error(e);
-    }
-
-    MYDEFINES = [
-        "activity/sugarizer-compatibility",
-        "utils/platformstyle",
-        "easeljs.min",
-        "tweenjs.min",
-        "preloadjs.min",
-        "howler",
-        "p5.min",
-        "p5.sound.min",
-        "p5.dom.min",
-        // 'mespeak',
-        "Chart",
-        "utils/utils",
-        "activity/artwork",
-        "widgets/status",
-        "widgets/help",
-        "utils/munsell",
-        "activity/toolbar",
-        "activity/trash",
-        "activity/boundary",
-        "activity/palette",
-        "activity/protoblocks",
-        "activity/blocks",
-        "activity/block",
-        "activity/turtledefs",
-        "activity/notation",
-        "activity/logo",
-        "activity/turtle",
-        "activity/turtles",
-        "activity/turtle-singer",
-        "activity/turtle-painter",
-        "activity/languagebox",
-        "activity/basicblocks",
-        "activity/blockfactory",
-        "activity/piemenus",
-        "activity/rubrics",
-        "activity/macros",
-        "activity/SaveInterface",
-        "utils/musicutils",
-        "utils/synthutils",
-        "utils/mathutils",
-        "activity/pastebox",
-        "prefixfree.min"
-    ];
-
-    if (_THIS_IS_MUSIC_BLOCKS_) {
-        const MUSICBLOCKS_EXTRAS = [
-            "Tone",
-            "activity/js-export/samples/sample",
-            "activity/js-export/export",
-            "activity/js-export/interface",
-            "activity/js-export/constraints",
-            "activity/js-export/ASTutils",
-            "activity/js-export/generate",
-            "activity/js-export/API/GraphicsBlocksAPI",
-            "activity/js-export/API/PenBlocksAPI",
-            "activity/js-export/API/RhythmBlocksAPI",
-            "activity/js-export/API/MeterBlocksAPI",
-            "activity/js-export/API/PitchBlocksAPI",
-            "activity/js-export/API/IntervalsBlocksAPI",
-            "activity/js-export/API/ToneBlocksAPI",
-            "activity/js-export/API/OrnamentBlocksAPI",
-            "activity/js-export/API/VolumeBlocksAPI",
-            "activity/js-export/API/DrumBlocksAPI",
-            "activity/js-export/API/DictBlocksAPI",
-            "widgets/widgetWindows",
-            "widgets/jseditor",
-            "widgets/modewidget",
-            "widgets/meterwidget",
-            "widgets/phrasemaker",
-            "widgets/pitchdrummatrix",
-            "widgets/rhythmruler",
-            "widgets/pitchstaircase",
-            "widgets/temperament",
-            "widgets/tempo",
-            "widgets/pitchslider",
-            "widgets/musickeyboard",
-            "widgets/timbre",
-            "widgets/oscilloscope",
-            "widgets/sampler",
-            "widgets/statistics",
-            "activity/lilypond",
-            "activity/abc",
-            "activity/mxml",
-            "activity/turtleactions/RhythmActions",
-            "activity/turtleactions/MeterActions",
-            "activity/turtleactions/PitchActions",
-            "activity/turtleactions/IntervalsActions",
-            "activity/turtleactions/ToneActions",
-            "activity/turtleactions/OrnamentActions",
-            "activity/turtleactions/VolumeActions",
-            "activity/turtleactions/DrumActions",
-            "activity/turtleactions/DictActions",
-            "activity/blocks/RhythmBlocks",
-            "activity/blocks/MeterBlocks",
-            "activity/blocks/PitchBlocks",
-            "activity/blocks/IntervalsBlocks",
-            "activity/blocks/ToneBlocks",
-            "activity/blocks/OrnamentBlocks",
-            "activity/blocks/VolumeBlocks",
-            "activity/blocks/DrumBlocks",
-            "activity/blocks/WidgetBlocks",
-            "activity/blocks/RhythmBlockPaletteBlocks",
-            "activity/blocks/ActionBlocks",
-            "activity/blocks/FlowBlocks",
-            "activity/blocks/NumberBlocks",
-            "activity/blocks/BoxesBlocks",
-            "activity/blocks/BooleanBlocks",
-            "activity/blocks/HeapBlocks",
-            "activity/blocks/DictBlocks",
-            "activity/blocks/ExtrasBlocks",
-            "activity/blocks/ProgramBlocks",
-            "activity/blocks/GraphicsBlocks",
-            "activity/blocks/PenBlocks",
-            "activity/blocks/MediaBlocks",
-            "activity/blocks/SensorsBlocks",
-            "activity/blocks/EnsembleBlocks"
-        ];
-        MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
+        // eslint-disable-next-line no-console
+        console.error(e);
     }
 
     /**
      * Initialises major variables and renders default stack.
      */
     this.setupDependencies = function () {
-        // blocks = new Blocks(this);
         createDefaultStack();
-        createHelpContent();
-        // facebookInit();
+        createHelpContent(this);
         window.scroll(0, 0);
 
         /*
         try {
             meSpeak.loadConfig('lib/mespeak_config.json');
-             lang = document.webL10n.getLanguage();
-            if (sugarizerCompatibility.isInsideSugarizer()) {
-                lang = sugarizerCompatibility.getLanguage();
-            }
+            lang = document.webL10n.getLanguage();
 
             if (['es', 'ca', 'de', 'el', 'eo', 'fi', 'fr', 'hu', 'it', 'kn', 'la', 'lv', 'nl', 'pl', 'pt', 'ro', 'sk', 'sv', 'tr', 'zh'].indexOf(lang) !== -1) {
                 meSpeak.loadVoice('lib/voices/' + lang + '.json');
@@ -312,69 +284,68 @@ function Activity() {
                 meSpeak.loadVoice('lib/voices/en/en.json');
             }
         } catch (e) {
+            // eslint-disable-next-line no-console
             console.debug(e);
         }
         */
 
         document.title = TITLESTRING;
-
-        canvas = docById("myCanvas");
+        this.canvas = docById("myCanvas");
 
         // Set up a file chooser for the doOpen function.
-        fileChooser = docById("myOpenFile");
+        this.fileChooser = docById("myOpenFile");
         // Set up a file chooser for the doOpenPlugin function.
-        pluginChooser = docById("myOpenPlugin");
-        // The file chooser for all files.
-        allFilesChooser = docById("myOpenAll");
-        auxToolbar = docById("aux-toolbar");
+        this.pluginChooser = docById("myOpenPlugin");
+        // The file chooser for all files
+        this.allFilesChooser = docById("myOpenAll");
+        this.auxToolbar = docById("aux-toolbar");
+        // Error message containers
+        this.errorText = docById("errorText");
+        this.errorTextContent = docById("errorTextContent");
+        // Show and populate the printText div.
+        this.printText = docById("printText");
+        this.printTextContent = docById("printTextContent");
 
         // Are we running off of a server?
-        server = true;
-        turtleBlocksScale = 1;
-        mousestage = null;
-        stage = null;
-        turtles = null;
-        palettes = null;
-        blocks = null;
-        logo = null;
-        pasteBox = null;
-        languageBox = null;
-        planet = null;
+        this.server = true;
+        this.turtleBlocksScale = 1;
+        this.mousestage = null;
+        this.stage = null;
+        this.turtles = null;
+        this.palettes = null;
+        this.blocks = null;
+        this.logo = null;
+        this.pasteBox = null;
+        this.languageBox = null;
+        this.planet = null;
         window.converter = null;
-        storage = null;
-        buttonsVisible = true;
-        headerContainer = null;
-        swiping = false;
-        menuButtonsVisible = false;
-        scrollBlockContainer = false;
-        currentKeyCode = 0;
-        pasteContainer = null;
-        pasteImage = null;
-        merging = false;
-        loading = false;
+        this.buttonsVisible = true;
+        this.headerContainer = null;
+        this.swiping = false;
+        this.menuButtonsVisible = false;
+        this.scrollBlockContainer = false;
+        this.currentKeyCode = 0;
+        this.merging = false;
+        this.loading = false;
         // On-screen buttons
-        smallerContainer = null;
-        largerContainer = null;
-        resizeDebounce = false;
-        hideBlocksContainer = null;
-        collapseBlocksContainer = null;
+        this.smallerContainer = null;
+        this.largerContainer = null;
+        this.resizeDebounce = false;
+        this.hideBlocksContainer = null;
+        this.collapseBlocksContainer = null;
 
-        searchWidget = docById("search");
-        searchWidget.style.visibility = "hidden";
-        searchWidget.placeholder = _("Search for blocks");
+        this.searchWidget = docById("search");
+        this.searchWidget.style.visibility = "hidden";
+        this.searchWidget.placeholder = _("Search for blocks");
 
-        progressBar = docById("myProgress");
-        progressBar.style.visibility = "hidden";
+        this.progressBar = docById("myProgress");
+        this.progressBar.style.visibility = "hidden";
 
         new createjs.DOMElement(docById("paste"));
-        paste = docById("paste");
-        paste.style.visibility = "hidden";
+        this.paste = docById("paste");
+        this.paste.style.visibility = "hidden";
 
-        closeContextWheel = function () {
-            // docById('contextWheelDiv').style.display = 'none';
-        };
-
-        toolbarHeight = document.getElementById("toolbars").offsetHeight;
+        this.toolbarHeight = document.getElementById("toolbars").offsetHeight;
     };
 
     /*
@@ -397,23 +368,14 @@ function Activity() {
      */
     this.doPluginsAndPaletteCols = function () {
         // Calculate the palette colors.
-        /*
-        for ( p in PALETTECOLORS) {
-            PALETTEFILLCOLORS[p] = getMunsellColor(PALETTECOLORS[p][0], PALETTECOLORS[p][1], PALETTECOLORS[p][2]);
-            PALETTESTROKECOLORS[p] = getMunsellColor(PALETTECOLORS[p][0], PALETTECOLORS[p][1] - 30, PALETTECOLORS[p][2]);
-            PALETTEHIGHLIGHTCOLORS[p] = getMunsellColor(PALETTECOLORS[p][0], PALETTECOLORS[p][1] + 10, PALETTECOLORS[p][2]);
-            HIGHLIGHTSTROKECOLORS[p] = getMunsellColor(PALETTECOLORS[p][0], PALETTECOLORS[p][1] - 50, PALETTECOLORS[p][2]);
-        }
-        */
-
-        for (p in platformColor.paletteColors) {
+        for (const p in platformColor.paletteColors) {
             PALETTEFILLCOLORS[p] = platformColor.paletteColors[p][0];
             PALETTESTROKECOLORS[p] = platformColor.paletteColors[p][1];
             PALETTEHIGHLIGHTCOLORS[p] = platformColor.paletteColors[p][2];
             HIGHLIGHTSTROKECOLORS[p] = platformColor.paletteColors[p][1];
         }
 
-        pluginObjs = {
+        this.pluginObjs = {
             PALETTEPLUGINS: {},
             PALETTEFILLCOLORS: {},
             PALETTESTROKECOLORS: {},
@@ -428,93 +390,93 @@ function Activity() {
         };
 
         // Stacks of blocks saved in local storage
-        macroDict = {};
-
-        cameraID = null;
+        this.macroDict = {};
 
         // default values
-        const DEFAULTDELAY = 500; // milleseconds
-        const TURTLESTEP = -1; // Run in step-by-step mode
-
-        BLOCKSCALES = [1, 1.5, 2, 3, 4];
-        blockscale = BLOCKSCALES.indexOf(DEFAULTBLOCKSCALE);
-        if (blockscale === -1) {
-            blockscale = 1;
+        this.DEFAULTDELAY = 500; // milleseconds
+        this.TURTLESTEP = -1; // Run in step-by-step mode
+        this.blockscale = BLOCKSCALES.indexOf(DEFAULTBLOCKSCALE);
+        if (this.blockscale === -1) {
+            this.blockscale = 1;
         }
 
         // Used to track mouse state for mouse button block
-        stageMouseDown = false;
-        stageX = 0;
-        stageY = 0;
+        this.stageMouseDown = false;
+        this.stageX = 0;
+        this.stageY = 0;
 
-        onXO =
+        // OLPC hardware
+        const onXO =
             (screen.width === 1200 && screen.height === 900) ||
             (screen.width === 900 && screen.height === 1200);
 
-        cellSize = 55;
+        this.cellSize = 55;
         if (onXO) {
-            cellSize = 75;
+            this.cellSize = 75;
         }
 
-        onscreenButtons = [];
-        onscreenMenu = [];
+        this.onscreenButtons = [];
+        this.onscreenMenu = [];
 
-        firstRun = true;
+        this.firstRun = true;
 
-        pluginsImages = {};
+        this.pluginsImages = {};
     };
 
     /**
      * Recenters blocks by finding their position on the screen and moving them accordingly.
      */
-    _findBlocks = function () {
-        // _showHideAuxMenu(false);
-        if (!blocks.visible) {
-            _changeBlockVisibility();
-        }
-        const leftpos = Math.floor(canvas.width / 4);
-        let toppos;
-        blocks.activeBlock = null;
-        hideDOMLabel();
-        blocks.showBlocks();
-        blocksContainer.x = 0;
-        blocksContainer.y = 0;
+    const findBlocks = function (activity) {
+        activity._findBlocks();
+    };
 
-        if (auxToolbar.style.display === "block") {
-            toppos = 90 + toolbarHeight;
+    this._findBlocks = function () {
+        if (!this.blocks.visible) {
+            this._changeBlockVisibility();
+        }
+        this.blocks.activeBlock = null;
+        hideDOMLabel();
+        this.blocks.showBlocks();
+        this.blocksContainer.x = 0;
+        this.blocksContainer.y = 0;
+
+        let toppos;
+        if (this.auxToolbar.style.display === "block") {
+            toppos = 90 + this.toolbarHeight;
         } else {
             toppos = 90;
         }
+        const leftpos = Math.floor(this.canvas.width / 4);
 
-        palettes.updatePalettes();
-        let x = Math.floor(leftpos * turtleBlocksScale);
-        let y = Math.floor(toppos * turtleBlocksScale);
+        this.palettes.updatePalettes();
+        let x = Math.floor(leftpos * this.turtleBlocksScale);
+        let y = Math.floor(toppos * this.turtleBlocksScale);
         let even = true;
 
         // First start blocks
-        for (const blk in blocks.blockList) {
-            if (!blocks.blockList[blk].trash) {
-                const myBlock = blocks.blockList[blk];
+        for (const blk in this.blocks.blockList) {
+            if (!this.blocks.blockList[blk].trash) {
+                const myBlock = this.blocks.blockList[blk];
                 if (myBlock.name !== "start") {
                     continue;
                 }
 
-                if (myBlock.connections[0] == null) {
+                if (myBlock.connections[0] === null) {
                     const dx = x - myBlock.container.x;
                     const dy = y - myBlock.container.y;
-                    blocks.moveBlockRelative(blk, dx, dy);
-                    blocks.findDragGroup(blk);
-                    if (blocks.dragGroup.length > 0) {
-                        for (let b = 0; b < blocks.dragGroup.length; b++) {
-                            const bblk = blocks.dragGroup[b];
+                    this.blocks.moveBlockRelative(blk, dx, dy);
+                    this.blocks.findDragGroup(blk);
+                    if (this.blocks.dragGroup.length > 0) {
+                        for (let b = 0; b < this.blocks.dragGroup.length; b++) {
+                            const bblk = this.blocks.dragGroup[b];
                             if (b !== 0) {
-                                blocks.moveBlockRelative(bblk, dx, dy);
+                                this.blocks.moveBlockRelative(bblk, dx, dy);
                             }
                         }
                     }
 
-                    x += Math.floor(150 * turtleBlocksScale);
-                    if (x > (canvas.width * 7) / 8 / turtleBlocksScale) {
+                    x += Math.floor(150 * this.turtleBlocksScale);
+                    if (x > (this.canvas.width * 7) / 8 / this.turtleBlocksScale) {
                         even = !even;
                         if (even) {
                             x = Math.floor(leftpos);
@@ -529,28 +491,28 @@ function Activity() {
         }
 
         // The everything else
-        for (const blk in blocks.blockList) {
-            if (!blocks.blockList[blk].trash) {
-                const myBlock = blocks.blockList[blk];
+        for (const blk in this.blocks.blockList) {
+            if (!this.blocks.blockList[blk].trash) {
+                const myBlock = this.blocks.blockList[blk];
                 if (myBlock.name === "start") {
                     continue;
                 }
 
-                if (myBlock.connections[0] == null) {
+                if (myBlock.connections[0] === null) {
                     const dx = x - myBlock.container.x;
                     const dy = y - myBlock.container.y;
-                    blocks.moveBlockRelative(blk, dx, dy);
-                    blocks.findDragGroup(blk);
-                    if (blocks.dragGroup.length > 0) {
-                        for (let b = 0; b < blocks.dragGroup.length; b++) {
-                            const bblk = blocks.dragGroup[b];
+                    this.blocks.moveBlockRelative(blk, dx, dy);
+                    this.blocks.findDragGroup(blk);
+                    if (this.blocks.dragGroup.length > 0) {
+                        for (let b = 0; b < this.blocks.dragGroup.length; b++) {
+                            const bblk = this.blocks.dragGroup[b];
                             if (b !== 0) {
-                                blocks.moveBlockRelative(bblk, dx, dy);
+                                this.blocks.moveBlockRelative(bblk, dx, dy);
                             }
                         }
                     }
-                    x += 150 * turtleBlocksScale;
-                    if (x > (canvas.width * 7) / 8 / turtleBlocksScale) {
+                    x += 150 * this.turtleBlocksScale;
+                    if (x > (this.canvas.width * 7) / 8 / this.turtleBlocksScale) {
                         even = !even;
                         if (even) {
                             x = Math.floor(leftpos);
@@ -565,17 +527,16 @@ function Activity() {
         }
 
         // Blocks are all home, so reset go-home-button.
-        setHomeContainers(false, true);
-        boundary.hide();
+        this.setHomeContainers(false);
+        this.boundary.hide();
 
         // Return mice to the center of the screen.
-        for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-            // console.debug("bringing turtle " + turtle + "home");
-            const savedPenState = turtles.turtleList[turtle].painter.penState;
-            turtles.turtleList[turtle].painter.penState = false;
-            turtles.turtleList[turtle].painter.doSetXY(0, 0);
-            turtles.turtleList[turtle].painter.doSetHeading(0);
-            turtles.turtleList[turtle].painter.penState = savedPenState;
+        for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+            const savedPenState = this.turtles.turtleList[turtle].painter.penState;
+            this.turtles.turtleList[turtle].painter.penState = false;
+            this.turtles.turtleList[turtle].painter.doSetXY(0, 0);
+            this.turtles.turtleList[turtle].painter.doSetHeading(0);
+            this.turtles.turtleList[turtle].painter.penState = savedPenState;
         }
     };
 
@@ -583,120 +544,123 @@ function Activity() {
      * @param zero {hides container}
      * @param one {shows container}
      */
-    setHomeContainers = function (zero, one) {
-        if (homeButtonContainer === null) {
+    this.setHomeContainers = function (homeState) {
+        if (this.homeButtonContainer === null) {
             return;
         }
-        if (zero) changeImage(homeButtonContainer.children[0], GOHOMEFADEDBUTTON, GOHOMEBUTTON);
-        else changeImage(homeButtonContainer.children[0], GOHOMEBUTTON, GOHOMEFADEDBUTTON);
+
+        if (homeState) {
+            changeImage(this.homeButtonContainer.children[0], GOHOMEFADEDBUTTON, GOHOMEBUTTON);
+        } else {
+            changeImage(this.homeButtonContainer.children[0], GOHOMEBUTTON, GOHOMEFADEDBUTTON);
+        }
     };
 
-    __saveHelpBlock = function (name, delay) {
+    this.__saveHelpBlock = function (name, delay) {
         // Save the artwork for an individual help block.
         // (1) clear the block list
         // (2) generate the help blocks
         // (3) save the blocks as svg
+
+        const that = this;
         setTimeout(function () {
-            sendAllToTrash(false, true);
+            that.sendAllToTrash(false, true);
             setTimeout(function () {
-                const message = blocks.protoBlockDict[name].helpString;
+                const message = that.blocks.protoBlockDict[name].helpString;
                 if (message.length < 4) {
                     // If there is nothing specified, just load the block.
-                    const obj = blocks.palettes.getProtoNameAndPalette(name);
+                    const obj = that.palettes.getProtoNameAndPalette(name);
                     const protoblk = obj[0];
                     const paletteName = obj[1];
                     const protoName = obj[2];
-
-                    const protoResult = blocks.protoBlockDict.hasOwnProperty(protoName);
-                    if (protoResult) {
-                        blocks.palettes.dict[paletteName].makeBlockFromSearch(
+                    // eslint-disable-next-line no-prototype-builtins
+                    if (this.blocks.protoBlockDict.hasOwnProperty(protoName)) {
+                        that.palettes.dict[paletteName].makeBlockFromSearch(
                             protoblk,
                             protoName,
                             function (newBlock) {
-                                blocks.moveBlock(newBlock, 0, 0);
+                                that.blocks.moveBlock(newBlock, 0, 0);
                             }
                         );
                     }
                 } else if (typeof message[3] === "string") {
                     // If it is a string, load the macro assocuated with this block
-                    const blocksToLoad = getMacroExpansion(message[3], 0, 0);
-                    blocks.loadNewBlocks(blocksToLoad);
+                    const blocksToLoad = getMacroExpansion(this, message[3], 0, 0);
+                    that.blocks.loadNewBlocks(blocksToLoad);
                 } else {
-                    // Load the blocks.
+                    // Load the this.blocks.
                     const blocksToLoad = message[3];
-                    blocks.loadNewBlocks(blocksToLoad);
+                    that.blocks.loadNewBlocks(blocksToLoad);
                 }
 
                 setTimeout(function () {
-                    // save.saveBlockArtwork(message[3]);
-                    save.saveBlockArtwork(name + "_block.svg");
+                    this.save.saveBlockArtwork(name + "_block.svg");
                 }, 500);
             }, 500);
         }, delay + 1000);
     };
 
-    _saveHelpBlocks = function () {
+    this._saveHelpBlocks = function () {
         // Save the artwork for every help block.
-        let i = 0;
         const blockHelpList = [];
-        for (const key in blocks.protoBlockDict) {
+        for (const key in this.blocks.protoBlockDict) {
             if (
-                blocks.protoBlockDict[key].helpString !== undefined &&
-                blocks.protoBlockDict[key].helpString.length !== 0
+                this.blocks.protoBlockDict[key].helpString !== undefined &&
+                this.blocks.protoBlockDict[key].helpString.length !== 0
             ) {
                 blockHelpList.push(key);
             }
         }
 
+        let i = 0;
         for (const name in blockHelpList) {
-            // console.debug(name + " " + blockHelpList[name]);
-            __saveHelpBlock(blockHelpList[name], i * 2000);
+            this.__saveHelpBlock(blockHelpList[name], i * 2000);
             i += 1;
         }
 
-        sendAllToTrash(true, true);
+        this.sendAllToTrash(true, true);
     };
 
     /**
      * @returns {SVG} returns SVG of blocks
      */
-    _printBlockSVG = function () {
-        blocks.activeBlock = null;
+    this.printBlockSVG = function () {
+        this.blocks.activeBlock = null;
         let startCounter = 0;
         let svg = "";
         let xMax = 0;
         let yMax = 0;
         let parts;
-        for (let i = 0; i < blocks.blockList.length; i++) {
-            if (blocks.blockList[i].ignore()) {
+        for (let i = 0; i < this.blocks.blockList.length; i++) {
+            if (this.blocks.blockList[i].ignore()) {
                 continue;
             }
 
-            if (blocks.blockList[i].container.x + blocks.blockList[i].width > xMax) {
-                xMax = blocks.blockList[i].container.x + blocks.blockList[i].width;
+            if (this.blocks.blockList[i].container.x + this.blocks.blockList[i].width > xMax) {
+                xMax = this.blocks.blockList[i].container.x + this.blocks.blockList[i].width;
             }
 
-            if (blocks.blockList[i].container.y + blocks.blockList[i].height > yMax) {
-                yMax = blocks.blockList[i].container.y + blocks.blockList[i].height;
+            if (this.blocks.blockList[i].container.y + this.blocks.blockList[i].height > yMax) {
+                yMax = this.blocks.blockList[i].container.y + this.blocks.blockList[i].height;
             }
 
-            if (blocks.blockList[i].collapsed) {
-                parts = blocks.blockCollapseArt[i].split("><");
+            if (this.blocks.blockList[i].collapsed) {
+                parts = this.blocks.blockCollapseArt[i].split("><");
             } else {
-                parts = blocks.blockArt[i].split("><");
+                parts = this.blocks.blockArt[i].split("><");
             }
 
-            if (blocks.blockList[i].isCollapsible()) {
+            if (this.blocks.blockList[i].isCollapsible()) {
                 svg += "<g>";
             }
 
             svg +=
                 '<g transform="translate(' +
-                blocks.blockList[i].container.x +
+                this.blocks.blockList[i].container.x +
                 ", " +
-                blocks.blockList[i].container.y +
+                this.blocks.blockList[i].container.y +
                 ')">';
-            if (SPECIALINPUTS.indexOf(blocks.blockList[i].name) !== -1) {
+            if (SPECIALINPUTS.indexOf(this.blocks.blockList[i].name) !== -1) {
                 for (let p = 1; p < parts.length; p++) {
                     // FIXME: This is fragile.
                     if (p === 1) {
@@ -707,11 +671,10 @@ function Activity() {
                         svg += parts[p].replace("filter:url(#dropshadow);", "") + "><";
                     } else if (p === 5) {
                         // Add block value to SVG between tspans
-                        if (typeof blocks.blockList[i].value === "string") {
-                            // console.debug(_(blocks.blockList[i].value));
-                            svg += parts[p] + ">" + _(blocks.blockList[i].value) + "<";
+                        if (typeof this.blocks.blockList[i].value === "string") {
+                            svg += parts[p] + ">" + _(this.blocks.blockList[i].value) + "<";
                         } else {
-                            svg += parts[p] + ">" + blocks.blockList[i].value + "<";
+                            svg += parts[p] + ">" + this.blocks.blockList[i].value + "<";
                         }
                     } else if (p === parts.length - 2) {
                         svg += parts[p] + ">";
@@ -742,21 +705,21 @@ function Activity() {
 
             svg += "</g>";
 
-            if (blocks.blockList[i].isCollapsible()) {
+            if (this.blocks.blockList[i].isCollapsible()) {
                 let y;
-                if (INLINECOLLAPSIBLES.indexOf(blocks.blockList[i].name) !== -1) {
-                    y = blocks.blockList[i].container.y + 4;
+                if (INLINECOLLAPSIBLES.indexOf(this.blocks.blockList[i].name) !== -1) {
+                    y = this.blocks.blockList[i].container.y + 4;
                 } else {
-                    y = blocks.blockList[i].container.y + 12;
+                    y = this.blocks.blockList[i].container.y + 12;
                 }
 
                 svg +=
                     '<g transform="translate(' +
-                    blocks.blockList[i].container.x +
+                    this.blocks.blockList[i].container.x +
                     ", " +
                     y +
                     ') scale(0.5 0.5)">';
-                if (blocks.blockList[i].collapsed) {
+                if (this.blocks.blockList[i].collapsed) {
                     parts = EXPANDBUTTON.split("><");
                 } else {
                     parts = COLLAPSEBUTTON.split("><");
@@ -769,9 +732,9 @@ function Activity() {
                 svg += "</g>";
             }
 
-            if (blocks.blockList[i].name === "start") {
-                const x = blocks.blockList[i].container.x + 110;
-                const y = blocks.blockList[i].container.y + 12;
+            if (this.blocks.blockList[i].name === "start") {
+                const x = this.blocks.blockList[i].container.x + 110;
+                const y = this.blocks.blockList[i].container.y + 12;
                 svg += '<g transform="translate(' + x + ", " + y + ') scale(0.4 0.4)">';
 
                 parts = TURTLESVG.replace(/fill_color/g, FILLCOLORS[startCounter])
@@ -790,7 +753,7 @@ function Activity() {
                 svg += "</g>";
             }
 
-            if (blocks.blockList[i].isCollapsible()) {
+            if (this.blocks.blockList[i].isCollapsible()) {
                 svg += "</g>";
             }
         }
@@ -810,29 +773,29 @@ function Activity() {
     /*
      * Clears "canvas"
      */
-    _allClear = function (noErase) {
-        blocks.activeBlock = null;
+    this._allClear = function (noErase) {
+        this.blocks.activeBlock = null;
         hideDOMLabel();
 
-        logo.boxes = {};
-        logo.time = 0;
-        hideMsgs();
-        hideGrids();
-        turtles.setBackgroundColor(-1);
-        logo.svgOutput = "";
-        logo.notationOutput = "";
-        for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-            logo.turtleHeaps[turtle] = [];
-            logo.turtleDicts[turtle] = {};
-            logo.notation.notationStaging[turtle] = [];
-            logo.notation.notationDrumStaging[turtle] = [];
+        this.logo.boxes = {};
+        this.logo.time = 0;
+        this.hideMsgs();
+        this.hideGrids();
+        this.turtles.setBackgroundColor(-1);
+        this.logo.svgOutput = "";
+        this.logo.notationOutput = "";
+        for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+            this.logo.turtleHeaps[turtle] = [];
+            this.logo.turtleDicts[turtle] = {};
+            this.logo.notation.notationStaging[turtle] = [];
+            this.logo.notation.notationDrumStaging[turtle] = [];
             if (noErase === undefined || !noErase) {
-                turtles.turtleList[turtle].painter.doClear(true, true, true);
+                this.turtles.turtleList[turtle].painter.doClear(true, true, true);
             }
         }
 
-        blocksContainer.x = 0;
-        blocksContainer.y = 0;
+        this.blocksContainer.x = 0;
+        this.blocksContainer.y = 0;
 
         // Code specific to cleaning up music blocks
         Element.prototype.remove = function () {
@@ -848,199 +811,116 @@ function Activity() {
         };
 
         const table = docById("myTable");
-        if (table != null) {
+        if (table !== null) {
             table.remove();
         }
     };
 
     /**
-     * Sets up play button functionality; runs music blocks.
+     * Sets up play button functionality; runs Music Blocks.
      * @param env {specifies environment}
      */
+    const doFastButton = function (activity, env) {
+        activity._doFastButton(env);
+    };
+
     this._doFastButton = function (env) {
-        blocks.activeBlock = null;
+        this.blocks.activeBlock = null;
         hideDOMLabel();
 
-        const currentDelay = logo.turtleDelay;
-        const playingWidget = false;
-        logo.turtleDelay = 0;
+        const currentDelay = this.logo.turtleDelay;
+        this.logo.turtleDelay = 0;
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            logo.synth.resume();
-
-            /*
-            // We were using the run button to play a widget, not
-            // the turtles.
-            if (playingWidget) {
-                return;
-            }
-            */
-
+            this.logo.synth.resume();
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
                 if (widgetTitle[i].innerHTML === "tempo") {
-                    if (logo.tempo.isMoving) {
-                        logo.tempo.pause();
+                    if (this.logo.tempo.isMoving) {
+                        this.logo.tempo.pause();
                     }
 
-                    logo.tempo.resume();
+                    this.logo.tempo.resume();
                     break;
                 }
             }
         }
 
-        if (!turtles.running()) {
-            // console.debug("RUNNING");
-            if (!turtles.isShrunk()) {
-                blocks.hideBlocks();
-                logo.showBlocksAfterRun = true;
+        if (!this.turtles.running()) {
+            if (!this.turtles.isShrunk()) {
+                this.blocks.hideBlocks();
+                this.showBlocksAfterRun = true;
             }
 
-            logo.runLogoCommands(null, env);
+            this.logo.runLogoCommands(null, env);
         } else {
             if (currentDelay !== 0) {
-                // keep playing at full speed
-                // console.debug("RUNNING FROM STEP");
-                logo.step();
+                // Keep playing at full speed.
+                this.logo.step();
             } else {
-                // stop and restart
-                // console.debug("STOPPING...");
+                // Stop and restart.
                 document.getElementById("stop").style.color = "white";
-                logo.doStopTurtles();
+                this.logo.doStopTurtles();
 
+                const that = this;
                 setTimeout(function () {
-                    // console.debug("AND RUNNING");
                     document.getElementById("stop").style.color = "#ea174c";
-
-                    logo.runLogoCommands(null, env);
+                    that.logo.runLogoCommands(null, env);
                 }, 500);
             }
         }
     };
 
     /*
-     * Runs music blocks at a slower rate
+     * Runs Music Blocks at a slower rate.
      */
+    const doSlowButton = function (activity) {
+        activity._doSlowButton();
+    };
+
     this._doSlowButton = function () {
-        blocks.activeBlock = null;
+        this.blocks.activeBlock = null;
         hideDOMLabel();
 
-        logo.turtleDelay = DEFAULTDELAY;
+        this.logo.turtleDelay = DEFAULTDELAY;
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            logo.synth.resume();
+            this.logo.synth.resume();
         }
 
-        if (false) {
-            // _THIS_IS_MUSIC_BLOCKS_ && docById('ptmDiv').style.visibility === 'visible') {
-            logo.phraseMaker.playAll();
-        } else if (!turtles.running()) {
-            logo.runLogoCommands();
+        if (!this.turtles.running()) {
+            this.logo.runLogoCommands();
         } else {
-            logo.step();
+            this.logo.step();
         }
     };
 
     /*
-     * Runs music blocks step by step
+     * Runs music blocks step by step.
      */
-    _doStepButton = function () {
-        blocks.activeBlock = null;
-        hideDOMLabel();
-
-        const turtleCount = Object.keys(logo.stepQueue).length;
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            logo.synth.resume();
-        }
-
-        if (turtleCount === 0 || logo.turtleDelay !== TURTLESTEP) {
-            // Either we haven't set up a queue or we are
-            // switching modes.
-            logo.turtleDelay = TURTLESTEP;
-            // Queue and take first step.
-            if (!turtles.running()) {
-                logo.runLogoCommands();
-            }
-            logo.step();
-        } else {
-            logo.turtleDelay = TURTLESTEP;
-            logo.step();
-        }
+    const doStepButton = function (activity) {
+        activity._doStepButton();
     };
 
-    __generateSetKeyBlocks = () => {
-        // Find all setkey blocks in the code
-        let isSetKeyBlockPresent = 0;
-        const setKeyBlocks = [];
-        for (const i in logo.blocks.blockList) {
-            if (logo.blocks.blockList[i].name === "setkey2" && !logo.blocks.blockList[i].trash) {
-                isSetKeyBlockPresent = 1;
-                setKeyBlocks.push(i);
-            }
+    this._doStepButton = function () {
+        this.blocks.activeBlock = null;
+        hideDOMLabel();
+
+        const turtleCount = Object.keys(this.logo.stepQueue).length;
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            this.logo.synth.resume();
         }
 
-        if (!isSetKeyBlockPresent) {
-            blocks.findStacks();
-            const stacks = blocks.stackList;
-            stacks.sort();
-            for (const i in stacks) {
-                if (logo.blocks.blockList[stacks[i]].name === "start") {
-                    let bottomBlock;
-                    bottomBlock = logo.blocks.blockList[stacks[i]].connections[1];
-                    let connectionsSetKey;
-                    let movable;
-                    if (KeySignatureEnv[2]) {
-                        blocks._makeNewBlockWithConnections(
-                            "movable",
-                            0,
-                            [stacks[i], null, null],
-                            null,
-                            null
-                        );
-                        movable = logo.blocks.blockList.length - 1;
-                        blocks._makeNewBlockWithConnections("boolean", 0, [movable], null, null);
-                        logo.blocks.blockList[movable].connections[1] =
-                            logo.blocks.blockList.length - 1;
-                        connectionsSetKey = [movable, null, null, bottomBlock];
-                    } else {
-                        connectionsSetKey = [stacks[i], null, null, bottomBlock];
-                    }
-
-                    blocks._makeNewBlockWithConnections(
-                        "setkey2",
-                        0,
-                        connectionsSetKey,
-                        null,
-                        null
-                    );
-
-                    const setKey = logo.blocks.blockList.length - 1;
-                    logo.blocks.blockList[bottomBlock].connections[0] = setKey;
-
-                    if (KeySignatureEnv[2]) {
-                        logo.blocks.blockList[stacks[i]].connections[1] = movable;
-                        logo.blocks.blockList[movable].connections[2] = setKey;
-                    } else {
-                        logo.blocks.blockList[stacks[i]].connections[1] = setKey;
-                    }
-
-                    blocks.adjustExpandableClampBlock();
-
-                    blocks._makeNewBlockWithConnections("notename", 0, [setKey], null, null);
-                    logo.blocks.blockList[setKey].connections[1] = logo.blocks.blockList.length - 1;
-                    logo.blocks.blockList[logo.blocks.blockList.length - 1].value =
-                        KeySignatureEnv[0];
-                    blocks._makeNewBlockWithConnections("modename", 0, [setKey], null, null);
-                    logo.blocks.blockList[setKey].connections[2] = logo.blocks.blockList.length - 1;
-                    logo.blocks.blockList[logo.blocks.blockList.length - 1].value =
-                        KeySignatureEnv[1];
-                    textMsg(
-                        _("You have chosen key ") +
-                            KeySignatureEnv[0] +
-                            " " +
-                            KeySignatureEnv[1] +
-                            _(" for your pitch preview.")
-                    );
-                }
+        if (turtleCount === 0 || this.logo.turtleDelay !== this.TURTLESTEP) {
+            // Either we haven't set up a queue or we are
+            // switching modes.
+            this.logo.turtleDelay = this.TURTLESTEP;
+            // Queue and take first step.
+            if (!this.turtles.running()) {
+                this.logo.runLogoCommands();
             }
+            this.logo.step();
+        } else {
+            this.logo.turtleDelay = this.TURTLESTEP;
+            this.logo.step();
         }
     };
 
@@ -1048,8 +928,12 @@ function Activity() {
      * Stops running of music blocks; stops all mid-way synths.
      * @param onblur {when object loses focus}
      */
-    this.doHardStopButton = function (onblur) {
-        blocks.activeBlock = null;
+    const doHardStopButton = function (activity, onblur) {
+        activity._doHardStopButton(onblur);
+    };
+
+    this._doHardStopButton = function (onblur) {
+        this.blocks.activeBlock = null;
         hideDOMLabel();
 
         if (onblur === undefined) {
@@ -1057,18 +941,17 @@ function Activity() {
         }
 
         if (onblur && _THIS_IS_MUSIC_BLOCKS_) {
-            // console.debug("Ignoring hard stop due to blur");
             return;
         }
 
-        logo.doStopTurtles();
+        this.logo.doStopTurtles();
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
                 if (widgetTitle[i].innerHTML === "tempo") {
-                    if (logo.tempo.isMoving) {
-                        logo.tempo.pause();
+                    if (this.logo.tempo.isMoving) {
+                        this.logo.tempo.pause();
                     }
                     break;
                 }
@@ -1079,9 +962,13 @@ function Activity() {
     /*
      * Switches between beginner/advanced mode
      */
-    doSwitchMode = function () {
-        blocks.activeBlock = null;
-        const mode = localStorage.beginnerMode;
+    const doSwitchMode = function (activity) {
+        activity._doSwitchMode();
+    };
+
+    this._doSwitchMode = function () {
+        this.blocks.activeBlock = null;
+        const mode = this.storage.beginnerMode;
 
         const MSGPrefix =
             "<a href='#' " +
@@ -1091,289 +978,44 @@ function Activity() {
         const MSGSuffix = "</a>";
 
         if (mode === null || mode === undefined || mode === "true") {
-            textMsg(
+            this.textMsg(
                 _(MSGPrefix + _("Refresh your browser to change to advanced mode.") + MSGSuffix)
             );
-            localStorage.setItem("beginnerMode", false);
+            this.storage.setItem("beginnerMode", false);
         } else {
-            textMsg(
+            this.textMsg(
                 _(MSGPrefix + _("Refresh your browser to change to beginner mode.") + MSGSuffix)
             );
-            localStorage.setItem("beginnerMode", true);
+            this.storage.setItem("beginnerMode", true);
         }
 
-        refreshCanvas();
+        this.refreshCanvas();
     };
-
-    chooseKeyMenu = () => {
-        docById("chooseKeyDiv").style.display = "block";
-        docById("moveable").style.display = "block";
-
-        const keyNameWheel = new wheelnav("chooseKeyDiv", null, 1200, 1200);
-        const keyNameWheel2 = new wheelnav("keyNameWheel2", keyNameWheel.raphael);
-        const keys = [
-            "C",
-            "G",
-            "D",
-            "A",
-            "E",
-            "B/C♭",
-            "F♯/G♭",
-            "C♯/D♭",
-            "G♯/A♭",
-            "D♯/E♭",
-            "B♭",
-            "F"
-        ];
-
-        wheelnav.cssMode = true;
-
-        keyNameWheel.slicePathFunction = slicePath().DonutSlice;
-        keyNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        keyNameWheel.slicePathCustom.minRadiusPercent = 0.5;
-        keyNameWheel.slicePathCustom.maxRadiusPercent = 0.8;
-        keyNameWheel.sliceSelectedPathCustom = keyNameWheel.slicePathCustom;
-        keyNameWheel.sliceInitPathCustom = keyNameWheel.slicePathCustom;
-        keyNameWheel.titleRotateAngle = 0;
-        keyNameWheel.colors = platformColor.pitchWheelcolors;
-        keyNameWheel.animatetime = 0;
-
-        keyNameWheel.createWheel(keys);
-
-        keyNameWheel2.colors = platformColor.pitchWheelcolors;
-        keyNameWheel2.slicePathFunction = slicePath().DonutSlice;
-        keyNameWheel2.slicePathCustom = slicePath().DonutSliceCustomization();
-        keyNameWheel2.slicePathCustom.minRadiusPercent = 0.8;
-        keyNameWheel2.slicePathCustom.maxRadiusPercent = 1;
-        keyNameWheel2.sliceSelectedPathCustom = keyNameWheel2.slicePathCustom;
-        keyNameWheel2.sliceInitPathCustom = keyNameWheel2.slicePathCustom;
-        const keys2 = [];
-
-        for (let i = 0; i < keys.length; i++) {
-            if (keys[i].length > 2) {
-                const obj = keys[i].split("/");
-                keys2.push(obj[0]);
-                keys2.push(obj[1]);
-            } else {
-                keys2.push("");
-                keys2.push("");
-            }
-        }
-
-        keyNameWheel2.navAngle = -7.45;
-        keyNameWheel2.animatetime = 0;
-        keyNameWheel2.createWheel(keys2);
-
-        const modenameWheel = new wheelnav("modenameWheel", keyNameWheel.raphael);
-        modes = ["major", "dorian", "phrygian", "lydian", "mixolydian", "minor", "locrian"];
-        modenameWheel.slicePathFunction = slicePath().DonutSlice;
-        modenameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        modenameWheel.slicePathCustom.minRadiusPercent = 0.2;
-        modenameWheel.slicePathCustom.maxRadiusPercent = 0.5;
-        modenameWheel.sliceSelectedPathCustom = modenameWheel.slicePathCustom;
-        modenameWheel.sliceInitPathCustom = modenameWheel.slicePathCustom;
-        modenameWheel.titleRotateAngle = 0;
-        modenameWheel.colors = platformColor.modeGroupWheelcolors;
-        modenameWheel.animatetime = 0;
-
-        modenameWheel.createWheel(modes);
-
-        const exitWheel = new wheelnav("exitWheel", keyNameWheel.raphael);
-        exitWheel.slicePathFunction = slicePath().DonutSlice;
-        exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-        exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
-        exitWheel.sliceSelectedPathCustom = exitWheel.slicePathCustom;
-        exitWheel.sliceInitPathCustom = exitWheel.slicePathCustom;
-        exitWheel.titleRotateAngle = 0;
-        exitWheel.clickModeRotate = false;
-        exitWheel.colors = platformColor.exitWheelcolors;
-        exitWheel.animatetime = 0;
-        exitWheel.createWheel(["×", " "]);
-
-        const x = event.clientX;
-        const y = event.clientY;
-
-        docById("chooseKeyDiv").style.left = x - 175 + "px";
-        docById("chooseKeyDiv").style.top = y + 50 + "px";
-        docById("moveable").style.left = x - 110 + "px";
-        docById("moveable").style.top = y + 400 + "px";
-
-        const __exitMenu = () => {
-            docById("chooseKeyDiv").style.display = "none";
-            docById("moveable").style.display = "none";
-            const ele = document.getElementsByName("moveable");
-            for (let i = 0; i < ele.length; i++) {
-                if (ele[i].checked) {
-                    KeySignatureEnv[2] = ele[i].value == "true" ? true : false;
-                }
-            }
-            keyNameWheel.removeWheel();
-            keyNameWheel2.removeWheel();
-            modenameWheel.removeWheel();
-            localStorage.KeySignatureEnv = KeySignatureEnv;
-            __generateSetKeyBlocks();
-        };
-
-        exitWheel.navItems[0].navigateFunction = __exitMenu;
-
-        const __playNote = (note) => {
-            const obj = getNote(note, 4, null, note + " " + KeySignatureEnv[1], false, null, null);
-            obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
-            const tur = blocks.logo.turtles.ithTurtle(0);
-
-            if (
-                tur.singer.instrumentNames.length === 0 ||
-                tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
-            ) {
-                tur.singer.instrumentNames.push(DEFAULTVOICE);
-                blocks.logo.synth.createDefaultSynth(0);
-                blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
-            }
-
-            blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
-            Singer.setSynthVolume(blocks.logo, 0, DEFAULTVOICE, DEFAULTVOLUME);
-            blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 12, DEFAULTVOICE, null, null);
-        };
-
-        const __setupActionKey = function (i) {
-            keyNameWheel.navItems[i].navigateFunction = function () {
-                for (let j = 0; j < keys2.length; j++) {
-                    if (Math.floor(j / 2) != i) {
-                        keyNameWheel2.navItems[j].navItem.hide();
-                    } else {
-                        if (keys[i].length > 2) {
-                            keyNameWheel2.navItems[j].navItem.show();
-                        }
-                    }
-                }
-                __selectionChangedKey();
-                if ((i >= 0 && i < 5) || (i > 9 && i < 12)) {
-                    __playNote(KeySignatureEnv[0]);
-                } else {
-                    let selection = keyNameWheel.navItems[keyNameWheel.selectedNavItemIndex].title;
-                    selection = selection.split("/");
-                    __playNote(selection[0]);
-                }
-            };
-        };
-
-        let __selectionChangedKey = () => {
-            const selection = keyNameWheel.navItems[keyNameWheel.selectedNavItemIndex].title;
-            keyNameWheel2.navigateWheel(2 * keyNameWheel.selectedNavItemIndex);
-            if (selection === "") {
-                keyNameWheel.navigateWheel(
-                    (keyNameWheel.selectedNavItemIndex + 1) % keyNameWheel.navItems.length
-                );
-            } else if (selection.length <= 2) {
-                KeySignatureEnv[0] = selection;
-            }
-        };
-
-        for (let i = 0; i < keys.length; i++) {
-            __setupActionKey(i);
-        }
-
-        const __selectionChangedMode = () => {
-            const selection = modenameWheel.navItems[modenameWheel.selectedNavItemIndex].title;
-            if (selection === "") {
-                modenameWheel.navigateWheel(
-                    (modenameWheel.selectedNavItemIndex + 1) % modenameWheel.navItems.length
-                );
-            } else {
-                KeySignatureEnv[1] = selection;
-            }
-        };
-
-        for (let i = 0; i < modes.length; i++) {
-            modenameWheel.navItems[i].navigateFunction = function () {
-                __selectionChangedMode();
-            };
-        }
-
-        const __selectionChangedKey2 = function () {
-            const selection = keyNameWheel2.navItems[keyNameWheel2.selectedNavItemIndex].title;
-            KeySignatureEnv[0] = selection;
-        };
-
-        for (let i = 0; i < keys2.length; i++) {
-            keyNameWheel2.navItems[i].navigateFunction = function () {
-                __selectionChangedKey2();
-            };
-        }
-        if (localStorage.KeySignatureEnv !== undefined) {
-            const ks = localStorage.KeySignatureEnv.split(",");
-            KeySignatureEnv[0] = ks[0];
-            KeySignatureEnv[1] = ks[1];
-            KeySignatureEnv[2] = ks[2] == "true" ? true : false;
-        } else {
-            KeySignatureEnv = ["C", "major", false];
-        }
-        let i = keys.indexOf(KeySignatureEnv[0]);
-        if (i == -1) {
-            i = keys2.indexOf(KeySignatureEnv[0]);
-            if (i != -1) {
-                keyNameWheel.navigateWheel(Math.floor(i / 2));
-                keyNameWheel2.navigateWheel(i);
-                for (let j = 0; j < keys2.length; j++) {
-                    keyNameWheel2.navItems[j].navItem.hide();
-                    if (i % 2 == 0) {
-                        keyNameWheel2.navItems[i].navItem.show();
-                        keyNameWheel2.navItems[i + 1].navItem.show();
-                    } else {
-                        keyNameWheel2.navItems[i].navItem.show();
-                        keyNameWheel2.navItems[i - 1].navItem.show();
-                    }
-                }
-            }
-        } else {
-            keyNameWheel.navigateWheel(i);
-            keyNameWheel2.navItems[2 * i].navItem.hide();
-            keyNameWheel2.navItems[2 * i + 1].navItem.hide();
-        }
-
-        const j = modes.indexOf(KeySignatureEnv[1]);
-        if (j !== -1) {
-            modenameWheel.navigateWheel(j);
-        }
-    };
-
-    // DEPRECATED
-    doStopButton = function () {
-        blocks.activeBlock = null;
-        logo.doStopTurtles();
-    };
-
-    // function doMuteButton() {
-    //     logo.setMasterVolume(0);
-    // };
-
-    // function _hideBoxes() {
-    //     blocks.activeBlock = null;
-    //     hideDOMLabel();
-
-    //     pasteBox.hide();
-    // };
 
     /*
      * Initialises the functionality of the horizScrollIcon
      */
-    function setScroller() {
-        blocks.activeBlock = null;
-        scrollBlockContainer = !scrollBlockContainer;
+    const setScroller = function (activity) {
+        activity._setScroller();
+        activity._setupBlocksContainerEvents();
+    };
+
+    this._setScroller = function () {
+        this.blocks.activeBlock = null;
+        this.scrollBlockContainer = !this.scrollBlockContainer;
         const enableHorizScrollIcon = docById("enableHorizScrollIcon");
         const disableHorizScrollIcon = docById("disableHorizScrollIcon");
-        if (scrollBlockContainer && !beginnerMode) {
+        if (this.scrollBlockContainer && !this.beginnerMode) {
             enableHorizScrollIcon.style.display = "none";
             disableHorizScrollIcon.style.display = "block";
         } else {
             enableHorizScrollIcon.style.display = "block";
             disableHorizScrollIcon.style.display = "none";
         }
-    }
+    };
 
-    //Load Animation handler
-    doLoadAnimation = function () {
+    // Load animation handler.
+    this.doLoadAnimation = function () {
         const messages = {
             load_messages: [
                 _("Catching mice"),
@@ -1389,8 +1031,8 @@ function Activity() {
         };
 
         document.getElementById("load-container").style.display = "block";
+
         let counter = 0;
-        setInterval(changeText, 2000);
 
         function changeText() {
             const randomLoadMessage =
@@ -1401,189 +1043,198 @@ function Activity() {
                 counter = 0;
             }
         }
-    };
 
-    /**
-     * Checks if the canvas is blank.
-     * @param canvas {compares existing canvas with a new blank canvas}
-     * @returns {boolean} {if canvas is blank }
-     */
-    function _isCanvasBlank(canvas) {
-        const blank = document.createElement("canvas");
-        blank.width = canvas.width;
-        blank.height = canvas.height;
-        return canvas.toDataURL() === blank.toDataURL();
-    }
+        setInterval(changeText, 2000);
+    };
 
     /*
      * Increases block size
      */
-    doLargerBlocks = function () {
-        blocks.activeBlock = null;
+    const doLargerBlocks = function (activity) {
+        activity._doLargerBlocks();
+    };
 
-        // hideDOMLabel();
+    this._doLargerBlocks = function () {
+        this.blocks.activeBlock = null;
 
-        if (!resizeDebounce) {
-            if (blockscale < BLOCKSCALES.length - 1) {
-                resizeDebounce = true;
-                blockscale += 1;
-                blocks.setBlockScale(BLOCKSCALES[blockscale]);
+        if (!this.resizeDebounce) {
+            if (this.blockscale < BLOCKSCALES.length - 1) {
+                this.resizeDebounce = true;
+                this.blockscale += 1;
+                this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
+
+                const that = this;
                 setTimeout(function () {
-                    resizeDebounce = false;
+                    that.resizeDebounce = false;
                 }, 3000);
             }
 
-            setSmallerLargerStatus();
+            this.setSmallerLargerStatus();
         }
     };
 
     /*
      * Decreases block size
      */
-    doSmallerBlocks = function () {
-        blocks.activeBlock = null;
+    const doSmallerBlocks = function (activity) {
+        activity._doSmallerBlocks();
+    };
 
-        // hideDOMLabel();
+    this._doSmallerBlocks = function () {
+        this.blocks.activeBlock = null;
 
-        if (!resizeDebounce) {
-            if (blockscale > 0) {
-                resizeDebounce = true;
-                blockscale -= 1;
-                blocks.setBlockScale(BLOCKSCALES[blockscale]);
+        if (!this.resizeDebounce) {
+            if (this.blockscale > 0) {
+                this.resizeDebounce = true;
+                this.blockscale -= 1;
+                this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
             }
+
+            const that = this;
             setTimeout(function () {
-                resizeDebounce = false;
+                that.resizeDebounce = false;
             }, 3000);
         }
 
-        setSmallerLargerStatus();
+        this.setSmallerLargerStatus();
     };
 
     /*
      * If either the block size has reached its minimum or maximum
      * then the icons to make them smaller/bigger will be hidden
      */
-    setSmallerLargerStatus = function () {
-        if (BLOCKSCALES[blockscale] < DEFAULTBLOCKSCALE) {
-            changeImage(smallerContainer.children[0], SMALLERBUTTON, SMALLERDISABLEBUTTON);
+    this.setSmallerLargerStatus = function () {
+        if (BLOCKSCALES[this.blockscale] < DEFAULTBLOCKSCALE) {
+            changeImage(this.smallerContainer.children[0], SMALLERBUTTON, SMALLERDISABLEBUTTON);
         } else {
-            changeImage(smallerContainer.children[0], SMALLERDISABLEBUTTON, SMALLERBUTTON);
+            changeImage(this.smallerContainer.children[0], SMALLERDISABLEBUTTON, SMALLERBUTTON);
         }
 
-        if (BLOCKSCALES[blockscale] === 4) {
-            changeImage(largerContainer.children[0], BIGGERBUTTON, BIGGERDISABLEBUTTON);
+        if (BLOCKSCALES[this.blockscale] === 4) {
+            changeImage(this.largerContainer.children[0], BIGGERBUTTON, BIGGERDISABLEBUTTON);
         } else {
-            changeImage(largerContainer.children[0], BIGGERDISABLEBUTTON, BIGGERBUTTON);
+            changeImage(this.largerContainer.children[0], BIGGERDISABLEBUTTON, BIGGERBUTTON);
         }
     };
 
     /*
      * Based on the active palette, remove a plugin palette from local storage.
      */
-    deletePlugin = function () {
-        if (palettes.activePalette !== null) {
-            let obj = JSON.parse(storage.plugins);
+    const deletePlugin = function (activity) {
+        activity._deletePlugin();
+    };
 
-            if (palettes.activePalette in obj["PALETTEPLUGINS"]) {
-                delete obj["PALETTEPLUGINS"][palettes.activePalette];
+    this._deletePlugin = function () {
+        if (this.palettes.activePalette !== null) {
+            const obj = JSON.parse(this.storage.plugins);
+
+            if (this.palettes.activePalette in obj["PALETTEPLUGINS"]) {
+                delete obj["PALETTEPLUGINS"][this.palettes.activePalette];
             }
-            if (palettes.activePalette in obj["PALETTEFILLCOLORS"]) {
-                delete obj["PALETTEFILLCOLORS"][palettes.activePalette];
+            if (this.palettes.activePalette in obj["PALETTEFILLCOLORS"]) {
+                delete obj["PALETTEFILLCOLORS"][this.palettes.activePalette];
             }
-            if (palettes.activePalette in obj["PALETTESTROKECOLORS"]) {
-                delete obj["PALETTESTROKECOLORS"][palettes.activePalette];
+            if (this.palettes.activePalette in obj["PALETTESTROKECOLORS"]) {
+                delete obj["PALETTESTROKECOLORS"][this.palettes.activePalette];
             }
-            if (palettes.activePalette in obj["PALETTEHIGHLIGHTCOLORS"]) {
-                delete obj["PALETTEHIGHLIGHTCOLORS"][palettes.activePalette];
+            if (this.palettes.activePalette in obj["PALETTEHIGHLIGHTCOLORS"]) {
+                delete obj["PALETTEHIGHLIGHTCOLORS"][this.palettes.activePalette];
             }
-            for (let i = 0; i < palettes.dict[palettes.activePalette].protoList.length; i++) {
-                let name = palettes.dict[palettes.activePalette].protoList[i]["name"];
+            for (
+                let i = 0;
+                i < this.palettes.dict[this.palettes.activePalette].protoList.length;
+                i++
+            ) {
+                const name = this.palettes.dict[this.palettes.activePalette].protoList[i]["name"];
                 if (name in obj["FLOWPLUGINS"]) {
+                    // eslint-disable-next-line no-console
                     console.log("deleting " + name);
                     delete obj["FLOWPLUGINS"][name];
                 }
                 if (name in obj["BLOCKPLUGINS"]) {
+                    // eslint-disable-next-line no-console
                     console.log("deleting " + name);
                     delete obj["BLOCKPLUGINS"][name];
                 }
                 if (name in obj["ARGPLUGINS"]) {
+                    // eslint-disable-next-line no-console
                     console.log("deleting " + name);
                     delete obj["ARGPLUGINS"][name];
                 }
             }
-            if (palettes.activePalette in obj["MACROPLUGINS"]) {
-                delete obj["MACROPLUGINS"][palettes.activePalette];
+            if (this.palettes.activePalette in obj["MACROPLUGINS"]) {
+                delete obj["MACROPLUGINS"][this.palettes.activePalette];
             }
-            if (palettes.activePalette in obj["ONLOAD"]) {
-                delete obj["ONLOAD"][palettes.activePalette];
+            if (this.palettes.activePalette in obj["ONLOAD"]) {
+                delete obj["ONLOAD"][this.palettes.activePalette];
             }
-            if (palettes.activePalette in obj["ONSTART"]) {
-                delete obj["ONSTART"][palettes.activePalette];
+            if (this.palettes.activePalette in obj["ONSTART"]) {
+                delete obj["ONSTART"][this.palettes.activePalette];
             }
-            if (palettes.activePalette in obj["ONSTOP"]) {
-                delete obj["ONSTOP"][palettes.activePalette];
+            if (this.palettes.activePalette in obj["ONSTOP"]) {
+                delete obj["ONSTOP"][this.palettes.activePalette];
             }
 
-            storage.plugins = JSON.stringify(obj);
-            textMsg(palettes.activePalette + " " + _("plugins will be removed upon restart."));
+            this.storage.plugins = JSON.stringify(obj);
+            this.textMsg(
+                this.palettes.activePalette + " " + _("plugins will be removed upon restart.")
+            );
         }
     };
 
     /*
      * Hides all grids (Cartesian/polar/treble/et al.)
      */
-    hideGrids = function () {
-        turtles.setGridLabel(_("show Cartesian"));
-        _hideCartesian();
-        _hidePolar();
+    this.hideGrids = function () {
+        this.turtles.setGridLabel(_("show Cartesian"));
+        this._hideCartesian();
+        this._hidePolar();
         if (_THIS_IS_MUSIC_BLOCKS_) {
-            _hideTreble();
-            _hideGrand();
-            _hideSoprano();
-            _hideAlto();
-            _hideTenor();
-            _hideBass();
+            this._hideTreble();
+            this._hideGrand();
+            this._hideSoprano();
+            this._hideAlto();
+            this._hideTenor();
+            this._hideBass();
         }
     };
 
     /*
      * Renders Cartesian/Polar/Treble/et al. grids
      */
-    const _doCartesianPolar = () => {
-        switch (turtles.currentGrid) {
+    this._doCartesianPolar = () => {
+        switch (this.turtles.currentGrid) {
             case 1:
-                _hideCartesian();
+                this._hideCartesian();
                 break;
             case 2:
-                _hideCartesian();
-                _hidePolar();
+                this._hideCartesian();
+                this._hidePolar();
                 break;
             case 3:
-                _hidePolar();
+                this._hidePolar();
                 break;
             case 4:
-                _hideTreble();
+                this._hideTreble();
                 break;
             case 5:
-                _hideGrand();
+                this._hideGrand();
                 break;
             case 6:
-                _hideSoprano();
+                this._hideSoprano();
                 break;
             case 7:
-                _hideAlto();
+                this._hideAlto();
                 break;
             case 8:
-                _hideTenor();
+                this._hideTenor();
                 break;
             case 9:
-                _hideBass();
+                this._hideBass();
                 break;
-            default:
-            // console.log("Blank Grid");
         }
 
-        switch (turtles.gridWheel.selectedNavItemIndex) {
+        switch (this.turtles.gridWheel.selectedNavItemIndex) {
             case 1:
                 this._showCartesian();
                 break;
@@ -1612,30 +1263,30 @@ function Activity() {
             case 9:
                 this._showBass();
                 break;
-            default:
-            // console.log("Blank Grid");
         }
-        turtles.currentGrid = turtles.gridWheel.selectedNavItemIndex;
-        update = true;
+        this.turtles.currentGrid = this.turtles.gridWheel.selectedNavItemIndex;
+        this.update = true;
     };
 
     /*
      * Sets up block actions with regards to different mouse events
      */
     this._setupBlocksContainerEvents = function () {
-        let moving = false;
+        const moving = false;
         let lastCoords = {
             x: 0,
             y: 0,
             delta: 0
         };
 
+        const that = this;
+
         const closeAnyOpenMenusAndLabels = function () {
-            if (docById("wheelDiv") != null) docById("wheelDiv").style.display = "none";
-            if (docById("contextWheelDiv") != null)
+            if (docById("wheelDiv") !== null) docById("wheelDiv").style.display = "none";
+            if (docById("contextWheelDiv") !== null)
                 docById("contextWheelDiv").style.display = "none";
-            if (docById("textLabel") != null) docById("textLabel").style.display = "none";
-            if (docById("numberLabel") != null) docById("numberLabel").style.display = "none";
+            if (docById("textLabel") !== null) docById("textLabel").style.display = "none";
+            if (docById("numberLabel") !== null) docById("numberLabel").style.display = "none";
         };
 
         const normalizeWheel = (event) => {
@@ -1666,7 +1317,7 @@ function Activity() {
             if ("deltaX" in event) pX = event.deltaX;
 
             if ((pX || pY) && event.deltaMode) {
-                if (event.deltaMode == 1) {
+                if (event.deltaMode === 1) {
                     // ff uses deltamode = 1
                     pX *= LINE_HEIGHT;
                     pY *= LINE_HEIGHT;
@@ -1690,46 +1341,46 @@ function Activity() {
             const delX = data.pixelX;
             if (delY !== 0 && event.axis === event.VERTICAL_AXIS) {
                 closeAnyOpenMenusAndLabels(); // closes all wheelnavs when scrolling .
-                blocksContainer.y -= delY;
+                that.blocksContainer.y -= delY;
             }
             // horizontal scroll
-            if (scrollBlockContainer) {
+            if (that.scrollBlockContainer) {
                 if (delX !== 0 && event.axis === event.HORIZONTAL_AXIS) {
                     closeAnyOpenMenusAndLabels();
-                    blocksContainer.x -= delX;
+                    that.blocksContainer.x -= delX;
                 }
             } else {
                 event.preventDefault();
             }
-            refreshCanvas();
+            that.refreshCanvas();
         };
 
         docById("myCanvas").addEventListener("wheel", __wheelHandler, false);
 
         const __stageMouseUpHandler = function (event) {
-            stageMouseDown = false;
-            moving = false;
+            that.stageMouseDown = false;
+            that.moving = false;
 
-            if (stage.getObjectUnderPoint() === null && lastCoords.delta < 4) {
-                stageX = event.stageX;
-                stageY = event.stageY;
+            if (that.stage.getObjectUnderPoint() === null && lastCoords.delta < 4) {
+                that.stageX = event.stageX;
+                that.stageY = event.stageY;
             }
         };
 
-        stage.on("stagemousemove", function (event) {
-            stageX = event.stageX;
-            stageY = event.stageY;
+        this.stage.on("stagemousemove", function (event) {
+            that.stageX = event.stageX;
+            that.stageY = event.stageY;
         });
 
-        stage.on("stagemousedown", function (event) {
-            stageMouseDown = true;
-            if ((stage.getObjectUnderPoint() !== null) | turtles.running()) {
-                stage.removeAllEventListeners("stagemouseup");
-                stage.on("stagemouseup", __stageMouseUpHandler);
+        this.stage.on("stagemousedown", function (event) {
+            that.stageMouseDown = true;
+            if ((that.stage.getObjectUnderPoint() !== null) | that.turtles.running()) {
+                that.stage.removeAllEventListeners("stagemouseup");
+                that.stage.on("stagemouseup", __stageMouseUpHandler);
                 return;
             }
 
-            moving = true;
+            that.moving = true;
             lastCoords = {
                 x: event.stageX,
                 y: event.stageY,
@@ -1738,100 +1389,77 @@ function Activity() {
 
             hideDOMLabel();
 
-            stage.removeAllEventListeners("stagemousemove");
-            stage.on("stagemousemove", function (event) {
-                stageX = event.stageX;
-                stageY = event.stageY;
+            that.stage.removeAllEventListeners("stagemousemove");
+            that.stage.on("stagemousemove", function (event) {
+                that.stageX = event.stageX;
+                that.stageY = event.stageY;
 
                 if (!moving) {
                     return;
                 }
 
                 // if we are moving the block container, deselect the active block.
-                blocks.activeBlock = null;
+                that.blocks.activeBlock = null;
 
                 const delta =
                     Math.abs(event.stageX - lastCoords.x) + Math.abs(event.stageY - lastCoords.y);
 
-                if (scrollBlockContainer) {
-                    blocksContainer.x += event.stageX - lastCoords.x;
+                if (that.scrollBlockContainer) {
+                    that.blocksContainer.x += event.stageX - lastCoords.x;
                 }
 
-                blocksContainer.y += event.stageY - lastCoords.y;
+                that.blocksContainer.y += event.stageY - lastCoords.y;
                 lastCoords = {
                     x: event.stageX,
                     y: event.stageY,
                     delta: lastCoords.delta + delta
                 };
 
-                refreshCanvas();
+                that.refreshCanvas();
             });
 
-            stage.removeAllEventListeners("stagemouseup");
-            stage.on("stagemouseup", __stageMouseUpHandler);
+            that.stage.removeAllEventListeners("stagemouseup");
+            that.stage.on("stagemouseup", __stageMouseUpHandler);
         });
     };
 
     /*
      * Sets up scrolling functionality in palette and across canvas
      */
-    function scrollEvent(event) {
-        const data = event.wheelDelta || -event.detail;
-        const delta = Math.max(-1, Math.min(1, data));
-        const scrollSpeed = 30;
+    this.getStageScale = function () {
+        return this.turtleBlocksScale;
+    };
 
-        if (event.clientX < cellSize) {
-            //palettes.menuScrollEvent(delta, scrollSpeed);
-            //palettes.hidePaletteIconCircles();
-        } else {
-            // let palette = palettes.findPalette(
-            //     event.clientX / turtleBlocksScale,
-            //     event.clientY / turtleBlocksScale
-            // );
-            // if (palette) {
-            //     // if we are moving the palettes, deselect the active block.
-            //     blocks.activeBlock = null;
-            //     //palette.scrollEvent(delta, scrollSpeed);
-            // }
-        }
-    }
+    this.getStageX = function () {
+        return this.turtles.screenX2turtleX(this.stageX / this.turtleBlocksScale);
+    };
 
-    function getStageScale() {
-        return turtleBlocksScale;
-    }
+    this.getStageY = function () {
+        return this.turtles.screenY2turtleY(
+            (this.stageY - this.toolbarHeight) / this.turtleBlocksScale
+        );
+    };
 
-    function getStageX() {
-        return turtles.screenX2turtleX(stageX / turtleBlocksScale);
-    }
-
-    function getStageY() {
-        return turtles.screenY2turtleY((stageY - toolbarHeight) / turtleBlocksScale);
-    }
-
-    function getStageMouseDown() {
-        return stageMouseDown;
-    }
-
-    // function setCameraID(id) {
-    //     cameraID = id;
-    // };
+    this.getStageMouseDown = function () {
+        return this.stageMouseDown;
+    };
 
     /**
      * Renders grid.
      * @param imagePath {path of grid to be rendered}
      */
-    _createGrid = function (imagePath) {
+    this._createGrid = function (imagePath) {
         const img = new Image();
         img.src = imagePath;
         const container = new createjs.Container();
-        stage.addChild(container);
+        this.stage.addChild(container);
 
         const bitmap = new createjs.Bitmap(img);
         container.addChild(bitmap);
         bitmap.cache(0, 0, 1200, 900);
 
-        bitmap.x = (canvas.width - 1200) / 2;
-        bitmap.y = (canvas.height - 900) / 2;
+        bitmap.x = (this.canvas.width - 1200) / 2;
+        bitmap.y = (this.canvas.height - 900) / 2;
         bitmap.scaleX = bitmap.scaleY = bitmap.scale = 1;
         bitmap.visible = false;
         bitmap.updateCache();
@@ -1846,10 +1474,10 @@ function Activity() {
      * @param  y           {position on canvas}
      * @returns {description}
      */
-    _createMsgContainer = function (fillColor, strokeColor, callback, y) {
+    this._createMsgContainer = function (fillColor, strokeColor, callback, y) {
         const container = new createjs.Container();
-        stage.addChild(container);
-        container.x = (canvas.width - 1000) / 2;
+        this.stage.addChild(container);
+        container.x = (this.canvas.width - 1000) / 2;
         container.y = y;
         container.visible = false;
 
@@ -1858,6 +1486,8 @@ function Activity() {
             "stroke_color",
             strokeColor
         );
+
+        const that = this;
 
         img.onload = function () {
             const msgBlock = new createjs.Bitmap(img);
@@ -1878,19 +1508,20 @@ function Activity() {
             hitArea.y = 0;
             container.hitArea = hitArea;
 
+            // eslint-disable-next-line no-unused-vars
             container.on("click", function (event) {
                 container.visible = false;
                 // On the possibility that there was an error
                 // arrow associated with this container
-                if (errorMsgArrow != null) {
-                    errorMsgArrow.removeAllChildren(); // Hide the error arrow.
+                if (that.errorMsgArrow !== null) {
+                    that.errorMsgArrow.removeAllChildren(); // Hide the error arrow.
                 }
 
-                update = true;
+                that.update = true;
             });
 
             callback(text);
-            blocks.setMsgText(text);
+            that.msgText = text;
         };
 
         img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(svgData)));
@@ -1899,10 +1530,10 @@ function Activity() {
     /*
      * Some error messages have special artwork.
      */
-    _createErrorContainers = function () {
+    this._createErrorContainers = function () {
         for (let i = 0; i < ERRORARTWORK.length; i++) {
             const name = ERRORARTWORK[i];
-            _makeErrorArtwork(name);
+            this._makeErrorArtwork(name);
         }
     };
 
@@ -1910,14 +1541,14 @@ function Activity() {
      * Renders error message with appropriate artwork.
      * @param  name {specifies svg to be rendered}
      */
-    _makeErrorArtwork = function (name) {
+    this._makeErrorArtwork = function (name) {
         const container = new createjs.Container();
-        stage.addChild(container);
-        container.x = (canvas.width - 1000) / 2;
+        this.stage.addChild(container);
+        container.x = (this.canvas.width - 1000) / 2;
         container.y = 80;
-        errorArtwork[name] = container;
-        errorArtwork[name].name = name;
-        errorArtwork[name].visible = false;
+        this.errorArtwork[name] = container;
+        this.errorArtwork[name].name = name;
+        this.errorArtwork[name].visible = false;
 
         const img = new Image();
         img.onload = function () {
@@ -1937,14 +1568,16 @@ function Activity() {
             hitArea.y = 0;
             container.hitArea = hitArea;
 
+            const that = this;
+            // eslint-disable-next-line no-unused-vars
             container.on("click", function (event) {
                 container.visible = false;
                 // On the possibility that there was an error
                 // arrow associated with this container
-                if (errorMsgArrow != null) {
-                    errorMsgArrow.removeAllChildren(); // Hide the error arrow.
+                if (that.errorMsgArrow !== null) {
+                    that.errorMsgArrow.removeAllChildren(); // Hide the error arrow.
                 }
-                update = true;
+                that.update = true;
             });
         };
 
@@ -1954,24 +1587,24 @@ function Activity() {
     /*
       Prepare a list of blocks for the search bar autocompletion.
      */
-    prepSearchWidget = function () {
+    this.prepSearchWidget = function () {
         //searchWidget.style.visibility = "hidden";
-        searchBlockPosition = [100, 100];
+        this.searchBlockPosition = [100, 100];
 
-        searchSuggestions = [];
-        deprecatedBlockNames = [];
+        this.searchSuggestions = [];
+        this.deprecatedBlockNames = [];
 
-        for (i in blocks.protoBlockDict) {
-            const block = blocks.protoBlockDict[i];
+        for (const i in this.blocks.protoBlockDict) {
+            const block = this.blocks.protoBlockDict[i];
             const blockLabel = block.staticLabels.join(" ");
             const artwork = block.palette.model.makeBlockInfo(0, block, block.name, block.name)[
                 "artwork64"
             ];
             if (blockLabel || block.extraSearchTerms !== undefined) {
                 if (block.deprecated) {
-                    deprecatedBlockNames.push(blockLabel);
+                    this.deprecatedBlockNames.push(blockLabel);
                 } else {
-                    searchSuggestions.push({
+                    this.searchSuggestions.push({
                         label: blockLabel,
                         value: block.name,
                         specialDict: block,
@@ -1979,7 +1612,7 @@ function Activity() {
                     });
                     if (block.extraSearchTerms !== undefined) {
                         for (let i = 0; i < block.extraSearchTerms.length; i++) {
-                            searchSuggestions.push({
+                            this.searchSuggestions.push({
                                 label: block.extraSearchTerms[i],
                                 value: block.name,
                                 specialDict: block,
@@ -1991,60 +1624,63 @@ function Activity() {
             }
         }
 
-        searchSuggestions = searchSuggestions.reverse();
+        this.searchSuggestions = this.searchSuggestions.reverse();
     };
 
     /*
      * Hides search widget
      */
-    hideSearchWidget = function () {
+    this.hideSearchWidget = function () {
         // Hide the jQuery search results widget
         const obj = docByClass("ui-menu");
         if (obj.length > 0) {
             obj[0].style.visibility = "hidden";
         }
 
-        searchWidget.style.visibility = "hidden";
-        searchWidget.idInput_custom = "";
+        this.searchWidget.style.visibility = "hidden";
+        this.searchWidget.idInput_custom = "";
     };
 
     /*
      * Shows search widget
      */
-    showSearchWidget = function () {
-        //bring to top;
-        searchWidget.style.zIndex = 1;
-        if (searchWidget.style.visibility === "visible") {
-            hideSearchWidget();
+    this.showSearchWidget = function () {
+        // Bring widget to top.
+        this.searchWidget.style.zIndex = 1;
+        if (this.searchWidget.style.visibility === "visible") {
+            this.hideSearchWidget();
         } else {
             const obj = docByClass("ui-menu");
             if (obj.length > 0) {
                 obj[0].style.visibility = "visible";
             }
 
-            searchWidget.value = null;
-            //docById("searchResults").style.visibility = "visible";
-            searchWidget.style.visibility = "visible";
-            searchWidget.style.left = palettes.getSearchPos()[0] * turtleBlocksScale * 1.5 + "px";
-            searchWidget.style.top = palettes.getSearchPos()[1] * turtleBlocksScale * 0.95 + "px";
+            this.searchWidget.value = null;
+            this.searchWidget.style.visibility = "visible";
+            this.searchWidget.style.left =
+                this.palettes.getSearchPos()[0] * this.turtleBlocksScale * 1.5 + "px";
+            this.searchWidget.style.top =
+                this.palettes.getSearchPos()[1] * this.turtleBlocksScale * 0.95 + "px";
 
-            searchBlockPosition = [100, 100];
-            prepSearchWidget();
+            this.searchBlockPosition = [100, 100];
+            this.prepSearchWidget();
+
+            const that = this;
             const closeListener = (e) => {
                 if (
-                    docById("search").style.visibility == "visible" &&
+                    docById("search").style.visibility === "visible" &&
                     (e.target === docById("search") || docById("search").contains(e.target))
                 ) {
                     //do nothing when clicked in the input field
                 } else if (
-                    docById("ui-id-1").style.display == "block" &&
+                    docById("ui-id-1").style.display === "block" &&
                     (e.target === docById("ui-id-1") || docById("ui-id-1").contains(e.target))
                 ) {
                     //do nothing when clicked on the menu
                 } else if (document.getElementsByTagName("tr")[2].contains(e.target)) {
                     //do nothing when clicked on the search row
                 } else {
-                    hideSearchWidget();
+                    that.hideSearchWidget();
                     document.removeEventListener("mousedown", closeListener);
                 }
             };
@@ -2053,8 +1689,8 @@ function Activity() {
             // Give the browser time to update before selecting
             // focus.
             setTimeout(function () {
-                searchWidget.focus();
-                doSearch();
+                that.searchWidget.focus();
+                that.doSearch();
             }, 500);
         }
     };
@@ -2062,21 +1698,22 @@ function Activity() {
     /*
      * Uses JQuery to add autocompleted search suggestions
      */
-    doSearch = function () {
+    this.doSearch = function () {
         const $j = jQuery.noConflict();
 
+        const that = this;
         $j("#search").autocomplete({
-            source: searchSuggestions,
+            source: that.searchSuggestions,
             select: function (event, ui) {
                 event.preventDefault();
-                searchWidget.value = ui.item.label;
-                searchWidget.idInput_custom = ui.item.value;
-                searchWidget.protoblk = ui.item.specialDict;
-                doSearch();
+                that.searchWidget.value = ui.item.label;
+                that.searchWidget.idInput_custom = ui.item.value;
+                that.searchWidget.protoblk = ui.item.specialDict;
+                that.doSearch();
             },
             focus: function (event, ui) {
                 event.preventDefault();
-                searchWidget.value = ui.item.label;
+                that.searchWidget.value = ui.item.label;
             }
         });
 
@@ -2096,45 +1733,52 @@ function Activity() {
                 )
                 .appendTo(ul);
         };
-        const searchInput = searchWidget.idInput_custom;
+        const searchInput = this.searchWidget.idInput_custom;
         if (!searchInput || searchInput.length <= 0) return;
 
-        const protoblk = searchWidget.protoblk;
+        const protoblk = this.searchWidget.protoblk;
         const paletteName = protoblk.palette.name;
         const protoName = protoblk.name;
 
-        const searchResult = blocks.protoBlockDict.hasOwnProperty(protoName);
-
-        if (searchResult) {
-            palettes.dict[paletteName].makeBlockFromSearch(protoblk, protoName, function (
-                newBlock
-            ) {
-                blocks.moveBlock(
-                    newBlock,
-                    100 + searchBlockPosition[0] - blocksContainer.x,
-                    searchBlockPosition[1] - blocksContainer.y
-                );
-            });
+        // eslint-disable-next-line no-prototype-builtins
+        if (this.blocks.protoBlockDict.hasOwnProperty(protoName)) {
+            this.palettes.dict[paletteName].makeBlockFromSearch(
+                protoblk,
+                protoName,
+                function (newBlock) {
+                    that.blocks.moveBlock(
+                        newBlock,
+                        100 + that.searchBlockPosition[0] - that.blocksContainer.x,
+                        that.searchBlockPosition[1] - that.blocksContainer.y
+                    );
+                }
+            );
 
             // Move the position of the next newly created block.
-            searchBlockPosition[0] += STANDARDBLOCKHEIGHT;
-            searchBlockPosition[1] += STANDARDBLOCKHEIGHT;
-        } else if (deprecatedBlockNames.indexOf(searchInput) > -1) {
-            blocks.errorMsg(_("This block is deprecated."));
+            this.searchBlockPosition[0] += STANDARDBLOCKHEIGHT;
+            this.searchBlockPosition[1] += STANDARDBLOCKHEIGHT;
+        } else if (this.deprecatedBlockNames.indexOf(searchInput) > -1) {
+            this.blocks.errorMsg(_("This block is deprecated."));
         } else {
-            blocks.errorMsg(_("Block cannot be found."));
+            this.blocks.errorMsg(_("Block cannot be found."));
         }
 
-        searchWidget.value = "";
-        update = true;
+        this.searchWidget.value = "";
+        this.update = true;
     };
 
     /*
      * Makes initial "start up" note for a brand new MB project
      */
-    __makeNewNote = function (octave, solf) {
+    this.__makeNewNote = function (octave, solf) {
         const newNote = [
-            [0, "newnote", 300 - blocksContainer.x, 300 - blocksContainer.y, [null, 1, 4, 8]],
+            [
+                0,
+                "newnote",
+                300 - this.blocksContainer.x,
+                300 - this.blocksContainer.y,
+                [null, 1, 4, 8]
+            ],
             [1, "divide", 0, 0, [0, 2, 3]],
             [
                 2,
@@ -2189,56 +1833,52 @@ function Activity() {
             [8, "hidden", 0, 0, [0, null]]
         ];
 
-        blocks.loadNewBlocks(newNote);
-        if (blocks.activeBlock !== null) {
+        this.blocks.loadNewBlocks(newNote);
+        if (this.blocks.activeBlock !== null) {
             // Connect the newly created block to the active block (if it is a hidden block at the
             // end of a new note block).
-            const bottom = blocks.findBottomBlock(blocks.activeBlock);
-            // console.debug(blocks.activeBlock + " " + bottom);
+            const bottom = this.blocks.findBottomBlock(this.blocks.activeBlock);
             if (
-                blocks.blockList[bottom].name === "hidden" &&
-                blocks.blockList[blocks.blockList[bottom].connections[0]].name === "newnote"
+                this.blocks.blockList[bottom].name === "hidden" &&
+                this.blocks.blockList[this.blocks.blockList[bottom].connections[0]].name ===
+                    "newnote"
             ) {
                 // The note block macro creates nine blocks.
-                const newlyCreatedBlock = blocks.blockList.length - 9;
+                const newlyCreatedBlock = this.blocks.blockList.length - 9;
 
                 // Set last connection of active block to the
                 // newly created block.
-                const lastConnection = blocks.blockList[bottom].connections.length - 1;
-                blocks.blockList[bottom].connections[lastConnection] = newlyCreatedBlock;
+                const lastConnection = this.blocks.blockList[bottom].connections.length - 1;
+                this.blocks.blockList[bottom].connections[lastConnection] = newlyCreatedBlock;
 
                 // Set first connection of the newly created block to
                 // the active block.
-                blocks.blockList[newlyCreatedBlock].connections[0] = bottom;
+                this.blocks.blockList[newlyCreatedBlock].connections[0] = bottom;
                 // Adjust the dock positions to realign the stack.
-                blocks.adjustDocks(bottom, true);
+                this.blocks.adjustDocks(bottom, true);
             }
         }
 
         // Set new hidden block at the end of the newly created
         // note block to the active block.
-        blocks.activeBlock = blocks.blockList.length - 1;
+        this.blocks.activeBlock = this.blocks.blockList.length - 1;
     };
 
     /*
      * Handles keyboard shortcuts in MB
      */
-    // Flag to disable keyboard during loading of MB
-    let keyboardEnableFlag;
-
-    function __keyPressed(event) {
+    this.__keyPressed = function (event) {
         if (window.widgetWindows.isOpen("JavaScript Editor") === true) return;
 
-        const that = this;
         let disableKeys;
 
-        if (!keyboardEnableFlag) {
+        if (!this.keyboardEnableFlag) {
             return;
         }
         if (docById("labelDiv").classList.contains("hasKeyboard")) {
             return;
         }
-        if (_THIS_IS_MUSIC_BLOCKS_ && keyboardEnableFlag) {
+        if (_THIS_IS_MUSIC_BLOCKS_ && this.keyboardEnableFlag) {
             if (
                 docById("BPMInput") !== null &&
                 docById("BPMInput").classList.contains("hasKeyboard")
@@ -2275,20 +1915,19 @@ function Activity() {
             }
         }
 
-        const BACKSPACE = 8;
+        // const BACKSPACE = 8;
         const TAB = 9;
 
         if (event.keyCode === TAB) {
-            // || event.keyCode === BACKSPACE) {
             // Prevent browser from grabbing TAB key
             event.preventDefault();
             return false;
         }
 
         const ESC = 27;
-        const ALT = 18;
-        const CTRL = 17;
-        const SHIFT = 16;
+        // const ALT = 18;
+        // const CTRL = 17;
+        // const SHIFT = 16;
         const RETURN = 13;
         const SPACE = 32;
         const HOME = 36;
@@ -2314,23 +1953,22 @@ function Activity() {
         if (_THIS_IS_MUSIC_BLOCKS_) {
             disableKeys =
                 docById("lilypondModal").style.display === "block" ||
-                searchWidget.style.visibility === "visible" ||
+                this.searchWidget.style.visibility === "visible" ||
                 docById("planet-iframe").style.display === "" ||
                 docById("paste").style.visibility === "visible" ||
                 docById("wheelDiv").style.display === "" ||
-                logo.turtles.running();
+                this.turtles.running();
         } else {
             disableKeys =
-                searchWidget.style.visibility === "visible" ||
+                this.searchWidget.style.visibility === "visible" ||
                 docById("paste").style.visibility === "visible" ||
-                logo.turtles.running();
+                this.turtles.running();
         }
 
         const widgetTitle = document.getElementsByClassName("wftTitle");
-        let inTempoWidget = false;
         for (let i = 0; i < widgetTitle.length; i++) {
             if (widgetTitle[i].innerHTML === "tempo") {
-                inTempoWidget = true;
+                this.inTempoWidget = true;
                 break;
             }
         }
@@ -2338,50 +1976,50 @@ function Activity() {
         if (event.altKey && !disableKeys) {
             switch (event.keyCode) {
                 case 66: // 'B'
-                    textMsg("Alt-B " + _("Saving block artwork"));
-                    save.saveBlockArtwork();
+                    this.textMsg("Alt-B " + _("Saving block artwork"));
+                    this.save.saveBlockArtwork();
                     break;
                 case 67: // 'C'
-                    textMsg("Alt-C " + _("Copy"));
-                    blocks.prepareStackForCopy();
+                    this.textMsg("Alt-C " + _("Copy"));
+                    this.blocks.prepareStackForCopy();
                     break;
                 case 68: // 'D'
-                    palettes.dict["myblocks"].promptMacrosDelete();
+                    this.palettes.dict["myblocks"].promptMacrosDelete();
                     break;
                 case 69: // 'E'
-                    textMsg("Alt-E " + _("Erase"));
-                    _allClear(false);
+                    this.textMsg("Alt-E " + _("Erase"));
+                    this._allClear(false);
                     break;
                 case 82: // 'R'
-                    textMsg("Alt-R " + _("Play"));
-                    that._doFastButton();
+                    this.textMsg("Alt-R " + _("Play"));
+                    this._doFastButton();
                     break;
                 case 83: // 'S'
-                    textMsg("Alt-S " + _("Stop"));
-                    logo.doStopTurtles();
+                    this.textMsg("Alt-S " + _("Stop"));
+                    this.logo.doStopTurtles();
                     break;
                 case 86: // 'V'
-                    textMsg("Alt-V " + _("Paste"));
-                    blocks.pasteStack();
+                    this.textMsg("Alt-V " + _("Paste"));
+                    this.blocks.pasteStack();
                     break;
                 case 72: // 'H' save block help
-                    textMsg("Alt-H " + _("Save block help"));
-                    _saveHelpBlocks();
+                    this.textMsg("Alt-H " + _("Save block help"));
+                    this._saveHelpBlocks();
                     break;
             }
         } else if (event.ctrlKey) {
             switch (event.keyCode) {
                 case V:
-                    textMsg("Ctl-V " + _("Paste"));
-                    pasteBox.createBox(turtleBlocksScale, 200, 200);
-                    pasteBox.show();
+                    this.textMsg("Ctl-V " + _("Paste"));
+                    this.pasteBox.createBox(this.turtleBlocksScale, 200, 200);
+                    this.pasteBox.show();
                     docById("paste").style.left =
-                        (pasteBox.getPos()[0] + 10) * turtleBlocksScale + "px";
+                        (this.pasteBox.getPos()[0] + 10) * this.turtleBlocksScale + "px";
                     docById("paste").style.top =
-                        (pasteBox.getPos()[1] + 10) * turtleBlocksScale + "px";
+                        (this.pasteBox.getPos()[1] + 10) * this.turtleBlocksScale + "px";
                     docById("paste").focus();
                     docById("paste").style.visibility = "visible";
-                    update = true;
+                    this.update = true;
                     break;
             }
         } else if (event.shiftKey && !disableKeys) {
@@ -2389,240 +2027,240 @@ function Activity() {
             switch (event.keyCode) {
                 case KEYCODE_D:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        textMsg("D " + solfnotes_[6]);
-                        __makeNewNote(5, "do");
+                        this.textMsg("D " + solfnotes_[6]);
+                        this.__makeNewNote(5, "do");
                     }
                     break;
                 case KEYCODE_R:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        textMsg("R " + solfnotes_[5]);
-                        __makeNewNote(5, "re");
+                        this.textMsg("R " + solfnotes_[5]);
+                        this.__makeNewNote(5, "re");
                     }
                     break;
                 case KEYCODE_M:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        textMsg("M " + solfnotes_[4]);
-                        __makeNewNote(5, "mi");
+                        this.textMsg("M " + solfnotes_[4]);
+                        this.__makeNewNote(5, "mi");
                     }
                     break;
                 case KEYCODE_F:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        textMsg("F " + solfnotes_[3]);
-                        __makeNewNote(5, "fa");
+                        this.textMsg("F " + solfnotes_[3]);
+                        this.__makeNewNote(5, "fa");
                     }
                     break;
                 case KEYCODE_S:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        textMsg("S " + solfnotes_[2]);
-                        __makeNewNote(5, "sol");
+                        this.textMsg("S " + solfnotes_[2]);
+                        this.__makeNewNote(5, "sol");
                     }
                     break;
                 case KEYCODE_L:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        textMsg("L " + solfnotes_[1]);
-                        __makeNewNote(5, "la");
+                        this.textMsg("L " + solfnotes_[1]);
+                        this.__makeNewNote(5, "la");
                     }
                     break;
                 case KEYCODE_T:
                     if (_THIS_IS_MUSIC_BLOCKS_) {
-                        textMsg("T " + solfnotes_[0]);
-                        __makeNewNote(5, "ti");
+                        this.textMsg("T " + solfnotes_[0]);
+                        this.__makeNewNote(5, "ti");
                     }
                     break;
             }
         } else {
             if (docById("paste").style.visibility === "visible" && event.keyCode === RETURN) {
                 if (docById("paste").value.length > 0) {
-                    pasted();
+                    this.pasted();
                 }
             } else if (!disableKeys) {
                 const solfnotes_ = _("ti la sol fa mi re do").split(" ");
                 switch (event.keyCode) {
                     case END:
-                        textMsg("END " + _("Jumping to the bottom of the page."));
-                        blocksContainer.y = -blocks.bottomMostBlock() + logo.canvas.height / 2;
-                        stage.update();
+                        this.textMsg("END " + _("Jumping to the bottom of the page."));
+                        this.blocksContainer.y =
+                            -this.blocks.bottomMostBlock() + this.canvas.height / 2;
+                        this.stage.update();
                         break;
                     case PAGE_UP:
-                        textMsg("PAGE_UP " + _("Scrolling up."));
-                        blocksContainer.y += logo.canvas.height / 2;
-                        stage.update();
+                        this.textMsg("PAGE_UP " + _("Scrolling up."));
+                        this.blocksContainer.y += this.canvas.height / 2;
+                        this.stage.update();
                         break;
                     case PAGE_DOWN:
-                        textMsg("PAGE_DOWN " + _("Scrolling down."));
-                        blocksContainer.y -= logo.canvas.height / 2;
-                        stage.update();
+                        this.textMsg("PAGE_DOWN " + _("Scrolling down."));
+                        this.blocksContainer.y -= this.canvas.height / 2;
+                        this.stage.update();
                         break;
                     case DEL:
-                        textMsg("DEL " + _("Extracting block"));
-                        blocks.extract();
+                        this.textMsg("DEL " + _("Extracting block"));
+                        this.blocks.extract();
                         break;
                     case KEYCODE_UP:
-                        if (inTempoWidget) {
-                            logo.tempo.speedUp(0);
+                        if (this.inTempoWidget) {
+                            this.logo.tempo.speedUp(0);
                         } else {
-                            if (blocks.activeBlock != null) {
-                                textMsg("UP ARROW " + _("Moving block up."));
-                                blocks.moveStackRelative(
-                                    blocks.activeBlock,
+                            if (this.blocks.activeBlock !== null) {
+                                this.textMsg("UP ARROW " + _("Moving block up."));
+                                this.blocks.moveStackRelative(
+                                    this.blocks.activeBlock,
                                     0,
                                     -STANDARDBLOCKHEIGHT / 2
                                 );
-                                blocks.blockMoved(blocks.activeBlock);
-                                blocks.adjustDocks(blocks.activeBlock, true);
-                            } else if (palettes.activePalette != null) {
-                                palettes.activePalette.scrollEvent(STANDARDBLOCKHEIGHT, 1);
+                                this.blocks.blockMoved(this.blocks.activeBlock);
+                                this.blocks.adjustDocks(this.blocks.activeBlock, true);
+                            } else if (this.palettes.activePalette !== null) {
+                                this.palettes.activePalette.scrollEvent(STANDARDBLOCKHEIGHT, 1);
                             } else {
-                                blocksContainer.y += 20;
+                                this.blocksContainer.y += 20;
                             }
-                            stage.update();
+                            this.stage.update();
                         }
                         break;
                     case KEYCODE_DOWN:
-                        if (inTempoWidget) {
-                            logo.tempo.slowDown(0);
+                        if (this.inTempoWidget) {
+                            this.logo.tempo.slowDown(0);
                         } else {
-                            if (blocks.activeBlock != null) {
-                                textMsg("DOWN ARROW " + _("Moving block down."));
-                                blocks.moveStackRelative(
-                                    blocks.activeBlock,
+                            if (this.blocks.activeBlock !== null) {
+                                this.textMsg("DOWN ARROW " + _("Moving block down."));
+                                this.blocks.moveStackRelative(
+                                    this.blocks.activeBlock,
                                     0,
                                     STANDARDBLOCKHEIGHT / 2
                                 );
-                                blocks.blockMoved(blocks.activeBlock);
-                                blocks.adjustDocks(blocks.activeBlock, true);
-                            } else if (palettes.activePalette != null) {
-                                palettes.activePalette.scrollEvent(-STANDARDBLOCKHEIGHT, 1);
+                                this.blocks.blockMoved(this.blocks.activeBlock);
+                                this.blocks.adjustDocks(this.blocks.activeBlock, true);
+                            } else if (this.palettes.activePalette !== null) {
+                                this.palettes.activePalette.scrollEvent(-STANDARDBLOCKHEIGHT, 1);
                             } else {
-                                blocksContainer.y -= 20;
+                                this.blocksContainer.y -= 20;
                             }
-                            stage.update();
+                            this.stage.update();
                         }
                         break;
                     case KEYCODE_LEFT:
-                        if (!inTempoWidget) {
-                            if (blocks.activeBlock != null) {
-                                textMsg("LEFT ARROW " + _("Moving block left."));
-                                blocks.moveStackRelative(
-                                    blocks.activeBlock,
+                        if (!this.inTempoWidget) {
+                            if (this.blocks.activeBlock !== null) {
+                                this.textMsg("LEFT ARROW " + _("Moving block left."));
+                                this.blocks.moveStackRelative(
+                                    this.blocks.activeBlock,
                                     -STANDARDBLOCKHEIGHT / 2,
                                     0
                                 );
-                                blocks.blockMoved(blocks.activeBlock);
-                                blocks.adjustDocks(blocks.activeBlock, true);
-                            } else if (scrollBlockContainer) {
-                                blocksContainer.x += 20;
+                                this.blocks.blockMoved(this.blocks.activeBlock);
+                                this.blocks.adjustDocks(this.blocks.activeBlock, true);
+                            } else if (this.scrollBlockContainer) {
+                                this.blocksContainer.x += 20;
                             }
-                            stage.update();
+                            this.stage.update();
                         }
                         break;
                     case KEYCODE_RIGHT:
-                        if (!inTempoWidget) {
-                            if (blocks.activeBlock != null) {
-                                textMsg("RIGHT ARROW " + _("Moving block right."));
-                                blocks.moveStackRelative(
-                                    blocks.activeBlock,
+                        if (!this.inTempoWidget) {
+                            if (this.blocks.activeBlock !== null) {
+                                this.textMsg("RIGHT ARROW " + _("Moving block right."));
+                                this.blocks.moveStackRelative(
+                                    this.blocks.activeBlock,
                                     STANDARDBLOCKHEIGHT / 2,
                                     0
                                 );
-                                blocks.blockMoved(blocks.activeBlock);
-                                blocks.adjustDocks(blocks.activeBlock, true);
-                            } else if (scrollBlockContainer) {
-                                blocksContainer.x -= 20;
+                                this.blocks.blockMoved(this.blocks.activeBlock);
+                                this.blocks.adjustDocks(this.blocks.activeBlock, true);
+                            } else if (this.scrollBlockContainer) {
+                                this.blocksContainer.x -= 20;
                             }
-                            stage.update();
+                            this.stage.update();
                         }
                         break;
                     case HOME:
-                        textMsg("HOME " + _("Jump to home position."));
-                        if (palettes.mouseOver) {
-                            const dy = Math.max(55 - palettes.buttons["rhythm"].y, 0);
-                            palettes.menuScrollEvent(1, dy);
-                            palettes.hidePaletteIconCircles();
-                        } else if (palettes.activePalette != null) {
-                            palettes.activePalette.scrollEvent(
-                                -palettes.activePalette.scrollDiff,
+                        this.textMsg("HOME " + _("Jump to home position."));
+                        if (this.palettes.mouseOver) {
+                            const dy = Math.max(55 - this.palettes.buttons["rhythm"].y, 0);
+                            this.palettes.menuScrollEvent(1, dy);
+                            this.palettes.hidePaletteIconCircles();
+                        } else if (this.palettes.activePalette !== null) {
+                            this.palettes.activePalette.scrollEvent(
+                                -this.palettes.activePalette.scrollDiff,
                                 1
                             );
                         } else {
                             // Bring all the blocks "home".
-                            _findBlocks();
+                            this._findBlocks();
                         }
-                        stage.update();
+                        this.stage.update();
                         break;
                     case TAB:
                         break;
                     case SPACE:
-                        if (turtleContainer.scaleX == 1) {
-                            turtles.setStageScale(0.5);
+                        if (this.turtleContainer.scaleX === 1) {
+                            this.turtles.setStageScale(0.5);
                         } else {
-                            turtles.setStageScale(1);
+                            this.turtles.setStageScale(1);
                         }
                         break;
                     case ESC:
-                        if (searchWidget.style.visibility === "visible") {
-                            textMsg("ESC " + _("Hide blocks"));
-                            searchWidget.style.visibility = "hidden";
-                        } else {
-                            // toggle full screen
-                            // _toggleToolbar();
+                        if (this.searchWidget.style.visibility === "visible") {
+                            this.textMsg("ESC " + _("Hide blocks"));
+                            this.searchWidget.style.visibility = "hidden";
                         }
                         break;
                     case RETURN:
-                        textMsg("Return " + _("Play"));
-                        if (inTempoWidget) {
-                            if (logo.tempo.isMoving) {
-                                logo.tempo.pause();
+                        this.textMsg("Return " + _("Play"));
+                        if (this.inTempoWidget) {
+                            if (this.logo.tempo.isMoving) {
+                                this.logo.tempo.pause();
                             }
-                            logo.tempo.resume();
+                            this.logo.tempo.resume();
                         }
                         if (
-                            blocks.activeBlock == null ||
-                            SPECIALINPUTS.indexOf(blocks.blockList[blocks.activeBlock].name) === -1
+                            this.blocks.activeBlock === null ||
+                            SPECIALINPUTS.indexOf(
+                                this.blocks.blockList[this.blocks.activeBlock].name
+                            ) === -1
                         ) {
-                            logo.runLogoCommands();
+                            this.logo.runLogoCommands();
                         }
                         break;
                     case KEYCODE_D:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            textMsg("d " + solfnotes_[6]);
-                            __makeNewNote(4, "do");
+                            this.textMsg("d " + solfnotes_[6]);
+                            this.__makeNewNote(4, "do");
                         }
                         break;
                     case KEYCODE_R:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            textMsg("r " + solfnotes_[5]);
-                            __makeNewNote(4, "re");
+                            this.textMsg("r " + solfnotes_[5]);
+                            this.__makeNewNote(4, "re");
                         }
                         break;
                     case KEYCODE_M:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            textMsg("m " + solfnotes_[4]);
-                            __makeNewNote(4, "mi");
+                            this.textMsg("m " + solfnotes_[4]);
+                            this.__makeNewNote(4, "mi");
                         }
                         break;
                     case KEYCODE_F:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            textMsg("f " + solfnotes_[3]);
-                            __makeNewNote(4, "fa");
+                            this.textMsg("f " + solfnotes_[3]);
+                            this.__makeNewNote(4, "fa");
                         }
                         break;
                     case KEYCODE_S:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            textMsg("s " + solfnotes_[2]);
-                            __makeNewNote(4, "sol");
+                            this.textMsg("s " + solfnotes_[2]);
+                            this.__makeNewNote(4, "sol");
                         }
                         break;
                     case KEYCODE_L:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            textMsg("l " + solfnotes_[1]);
-                            __makeNewNote(4, "la");
+                            this.textMsg("l " + solfnotes_[1]);
+                            this.__makeNewNote(4, "la");
                         }
                         break;
                     case KEYCODE_T:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
-                            textMsg("t " + solfnotes_[0]);
-                            __makeNewNote(4, "ti");
+                            this.textMsg("t " + solfnotes_[0]);
+                            this.__makeNewNote(4, "ti");
                         }
                         break;
                     default:
@@ -2632,23 +2270,23 @@ function Activity() {
 
             // Always store current key so as not to mask it from
             // the keyboard block.
-            currentKeyCode = event.keyCode;
+            this.currentKeyCode = event.keyCode;
         }
-    }
+    };
 
     /**
      * @returns currentKeyCode
      */
     this.getCurrentKeyCode = function () {
-        return currentKeyCode;
+        return this.currentKeyCode;
     };
 
     /*
      * Sets current key code to 0
      */
     this.clearCurrentKeyCode = function () {
-        currentKey = "";
-        currentKeyCode = 0;
+        this.currentKey = "";
+        this.currentKeyCode = 0;
     };
 
     /*
@@ -2656,30 +2294,14 @@ function Activity() {
      * Detects width/height changes and closes any menus before actual resize.
      * Repositions containers/palette/home buttons
      */
-    function _onResize(force) {
+    this._onResize = function (force) {
         if (!force) {
-            // console.debug("Saving locally due to resize event");
-            saveLocally();
+            if (this.saveLocally !== null) {
+                this.saveLocally();
+            }
         }
-        const $j = jQuery.noConflict();
-        // console.debug(
-        //     "document.body.clientWidth and clientHeight: " +
-        //         document.body.clientWidth +
-        //         " " +
-        //         document.body.clientHeight
-        // );
-        // console.debug("stored values: " + this._clientWidth + " " + this._clientHeight);
 
-        // console.debug(
-        //     "window inner/outer width/height: " +
-        //         window.innerWidth +
-        //         ", " +
-        //         window.innerHeight +
-        //         " " +
-        //         window.outerWidth +
-        //         ", " +
-        //         window.outerHeight
-        // );
+        const $j = jQuery.noConflict();
         let w = 0,
             h = 0;
         if (!platform.androidWebkit) {
@@ -2688,12 +2310,6 @@ function Activity() {
         } else {
             w = window.outerWidth;
             h = window.outerHeight;
-        }
-
-        // If the clientWidth hasn't changed, don't resize (except on init).
-        if (!force && this._clientWidth === document.body.clientWidth) {
-            // console.debug('NO WIDTH CHANGE');
-            // return;
         }
 
         this._clientWidth = document.body.clientWidth;
@@ -2709,70 +2325,73 @@ function Activity() {
 
         const smallSide = Math.min(w, h);
         let mobileSize;
-        if (smallSide < cellSize * 9) {
+        if (smallSide < this.cellSize * 9) {
             mobileSize = false;
-            if (w < cellSize * 10) {
-                turtleBlocksScale = smallSide / (cellSize * 11);
+            /*
+            if (w < this.cellSize * 10) {
+                this.turtleBlocksScale = smallSide / (this.cellSize * 11);
             } else {
-                turtleBlocksScale = Math.max(smallSide / (cellSize * 11), 0.75);
+                this.turtleBlocksScale = Math.max(smallSide / (this.cellSize * 11), 0.75);
             }
+            */
         } else {
             mobileSize = false;
+            /*
             if (w / 1200 > h / 900) {
-                turtleBlocksScale = w / 1200;
+                this.turtleBlocksScale = w / 1200;
             } else {
-                turtleBlocksScale = h / 900;
+                this.turtleBlocksScale = h / 900;
             }
+            */
         }
 
-        turtleBlocksScale = 1.0;
+        this.turtleBlocksScale = 1.0;
 
-        stage.scaleX = turtleBlocksScale;
-        stage.scaleY = turtleBlocksScale;
+        this.stage.scaleX = this.turtleBlocksScale;
+        this.stage.scaleY = this.turtleBlocksScale;
 
-        stage.canvas.width = w;
-        stage.canvas.height = h;
+        this.stage.canvas.width = w;
+        this.stage.canvas.height = h;
 
-        turtles.doScale(w, h, turtleBlocksScale);
+        this.turtles.doScale(w, h, this.turtleBlocksScale);
+        this.blocks.setScale(this.turtleBlocksScale);
 
-        blocks.setScale(turtleBlocksScale);
-        boundary.setScale(w, h, turtleBlocksScale);
-
-        trashcan.resizeEvent(turtleBlocksScale);
+        this.boundary.setScale(w, h, this.turtleBlocksScale);
+        this.trashcan.resizeEvent(this.turtleBlocksScale);
 
         // We need to reposition the palette buttons
-        _setupPaletteMenu(turtleBlocksScale);
+        this._setupPaletteMenu();
 
         // Reposition coordinate grids.
-        cartesianBitmap.x = canvas.width / (2 * turtleBlocksScale) - 600;
-        cartesianBitmap.y = canvas.height / (2 * turtleBlocksScale) - 450;
-        polarBitmap.x = canvas.width / (2 * turtleBlocksScale) - 600;
-        polarBitmap.y = canvas.height / (2 * turtleBlocksScale) - 450;
-        trebleBitmap.x = canvas.width / (2 * turtleBlocksScale) - 600;
-        trebleBitmap.y = canvas.height / (2 * turtleBlocksScale) - 450;
-        grandBitmap.x = canvas.width / (2 * turtleBlocksScale) - 600;
-        grandBitmap.y = canvas.height / (2 * turtleBlocksScale) - 450;
-        sopranoBitmap.x = canvas.width / (2 * turtleBlocksScale) - 600;
-        sopranoBitmap.y = canvas.height / (2 * turtleBlocksScale) - 450;
-        altoBitmap.x = canvas.width / (2 * turtleBlocksScale) - 600;
-        altoBitmap.y = canvas.height / (2 * turtleBlocksScale) - 450;
-        tenorBitmap.x = canvas.width / (2 * turtleBlocksScale) - 600;
-        tenorBitmap.y = canvas.height / (2 * turtleBlocksScale) - 450;
-        bassBitmap.x = canvas.width / (2 * turtleBlocksScale) - 600;
-        bassBitmap.y = canvas.height / (2 * turtleBlocksScale) - 450;
-        update = true;
+        this.cartesianBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.cartesianBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+        this.polarBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.polarBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+        this.trebleBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.trebleBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+        this.grandBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+        this.sopranoBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.sopranoBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+        this.altoBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.altoBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+        this.tenorBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.tenorBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+        this.bassBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.bassBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+        this.update = true;
 
         // Hide tooltips on mobile
         if (platform.mobile) {
             // palettes.setMobile(true);
             // palettes.hide();
-            toolbar.disableTooltips($j);
+            this.toolbar.disableTooltips($j);
         } else {
-            palettes.setMobile(false);
+            this.palettes.setMobile(false);
         }
 
-        for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-            turtles.turtleList[turtle].painter.doClear(false, false, true);
+        for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+            this.turtles.turtleList[turtle].painter.doClear(false, false, true);
         }
 
         const artcanvas = docById("overlayCanvas");
@@ -2785,11 +2404,12 @@ function Activity() {
             artcanvas.height = h;
         }
 
-        blocks.checkBounds();
-    }
+        this.blocks.checkBounds();
+    };
 
+    const that = this;
     window.onresize = function () {
-        _onResize(false);
+        that._onResize(false);
     };
 
     /*
@@ -2797,89 +2417,86 @@ function Activity() {
      * Hides palettes before update
      * Repositions blocks about trash area
      */
-    _restoreTrash = function () {
-        for (const name in blocks.palettes.dict) {
-            blocks.palettes.dict[name].hideMenu(true);
+    const restoreTrash = function (activity) {
+        activity._restoreTrash();
+    };
+
+    this._restoreTrash = function () {
+        for (const name in this.palettes.dict) {
+            this.palettes.dict[name].hideMenu(true);
         }
 
-        blocks.activeBlock = null;
-        refreshCanvas();
+        this.blocks.activeBlock = null;
+        this.refreshCanvas();
 
         const dx = 0;
-        const dy = -cellSize * 3; // Reposition
+        const dy = -this.cellSize * 3; // Reposition
 
-        if (blocks.trashStacks.length === 0) {
-            // console.debug("Trash is empty--nothing to do");
+        if (this.blocks.trashStacks.length === 0) {
             return;
         }
 
-        const thisBlock = blocks.trashStacks.pop();
+        const thisBlock = this.blocks.trashStacks.pop();
 
         // Restore drag group in trash
-        blocks.findDragGroup(thisBlock);
-        for (let b = 0; b < blocks.dragGroup.length; b++) {
-            const blk = blocks.dragGroup[b];
-            // console.debug('Restoring ' + blocks.blockList[blk].name + ' from the trash.');
-            blocks.blockList[blk].trash = false;
-            blocks.moveBlockRelative(blk, dx, dy);
-            blocks.blockList[blk].show();
+        this.blocks.findDragGroup(thisBlock);
+        for (let b = 0; b < this.blocks.dragGroup.length; b++) {
+            const blk = this.blocks.dragGroup[b];
+            this.blocks.blockList[blk].trash = false;
+            this.blocks.moveBlockRelative(blk, dx, dy);
+            this.blocks.blockList[blk].show();
         }
 
-        blocks.raiseStackToTop(thisBlock);
+        this.blocks.raiseStackToTop(thisBlock);
 
         if (
-            blocks.blockList[thisBlock].name === "start" ||
-            blocks.blockList[thisBlock].name === "drum"
+            this.blocks.blockList[thisBlock].name === "start" ||
+            this.blocks.blockList[thisBlock].name === "drum"
         ) {
-            const turtle = blocks.blockList[thisBlock].value;
-            turtles.turtleList[turtle].inTrash = false;
-            turtles.turtleList[turtle].container.visible = true;
-        } else if (blocks.blockList[thisBlock].name === "action") {
+            const turtle = this.blocks.blockList[thisBlock].value;
+            this.turtles.turtleList[turtle].inTrash = false;
+            this.turtles.turtleList[turtle].container.visible = true;
+        } else if (this.blocks.blockList[thisBlock].name === "action") {
             // We need to add a palette entry for this action.
             // But first we need to ensure we have a unqiue name,
             // as the name could have been taken in the interim.
-            const actionArg = blocks.blockList[blocks.blockList[thisBlock].connections[1]];
-            if (actionArg != null) {
+            const actionArg = this.blocks.blockList[
+                this.blocks.blockList[thisBlock].connections[1]
+            ];
+            if (actionArg !== null) {
+                let label;
                 const oldName = actionArg.value;
                 // Mark the action block as still being in the
                 // trash so that its name won't be considered when
                 // looking for a unique name.
-                blocks.blockList[thisBlock].trash = true;
-                const uniqueName = blocks.findUniqueActionName(oldName);
-                blocks.blockList[thisBlock].trash = false;
+                this.blocks.blockList[thisBlock].trash = true;
+                const uniqueName = this.blocks.findUniqueActionName(oldName);
+                this.blocks.blockList[thisBlock].trash = false;
 
                 if (uniqueName !== actionArg) {
-                    // console.debug(
-                    //     "renaming action when restoring from trash. old name: " +
-                    //         oldName +
-                    //         " unique name: " +
-                    //         uniqueName
-                    // );
-
                     actionArg.value = uniqueName;
 
-                    let label = actionArg.value.toString();
+                    label = actionArg.value.toString();
                     if (label.length > 8) {
                         label = label.substr(0, 7) + "...";
                     }
                     actionArg.text.text = label;
 
-                    if (actionArg.label != null) {
+                    if (actionArg.label !== null) {
                         actionArg.label.value = uniqueName;
                     }
 
                     actionArg.container.updateCache();
 
                     // Check the drag group to ensure any do blocks are updated (in case of recursion).
-                    for (let b = 0; b < blocks.dragGroup.length; b++) {
-                        const me = blocks.blockList[blocks.dragGroup[b]];
+                    for (let b = 0; b < this.blocks.dragGroup.length; b++) {
+                        const me = this.blocks.blockList[this.blocks.dragGroup[b]];
                         if (
                             ["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].indexOf(
                                 me.name
                             ) !== -1 &&
                             me.privateData === oldName
                         ) {
-                            // console.debug("reassigning nameddo to " + uniqueName);
                             me.privateData = uniqueName;
                             me.value = uniqueName;
 
@@ -2894,36 +2511,60 @@ function Activity() {
                         }
                     }
                 }
-
-                const actionName = actionArg.value;
-                if (actionName !== _("action")) {
-                    // blocks.checkPaletteEntries('action');
-                    // console.debug("FIXME: Check for unique action name here");
-                }
             }
         }
 
-        blocks.refreshCanvas();
+        this.refreshCanvas();
+    };
+
+    /*
+     * Open aux menu
+     */
+    this._openAuxMenu = function () {
+        if (!this.turtles.running() && this.toolbarHeight === 0) {
+            this._showHideAuxMenu(false);
+        }
+    };
+
+    /*
+     * Toggles Aux menu visibility and positioning
+     */
+    const showHideAuxMenu = function (activity, resize) {
+        activity._showHideAuxMenu(resize);
+    };
+
+    this._showHideAuxMenu = function (resize) {
+        const cellsize = 55;
+        let dy;
+        if (!resize && this.toolbarHeight === 0) {
+            dy = cellsize + LEADING + 5;
+            this.toolbarHeight = dy;
+
+            this.palettes.deltaY(dy);
+            this.turtles.deltaY(dy);
+
+            this.blocksContainer.y += dy;
+            this.blocks.checkBounds();
+        } else {
+            dy = this.toolbarHeight;
+            this.toolbarHeight = 0;
+
+            this.palettes.deltaY(-dy);
+            this.turtles.deltaY(-dy);
+
+            this.blocksContainer.y -= dy;
+        }
+
+        this.refreshCanvas();
     };
 
     /*
      * Hides aux menu
      */
-    hideAuxMenu = function () {
-        if (toolbarHeight > 0) {
-            _showHideAuxMenu(false);
-            menuButtonsVisible = false;
-        }
-    };
-
-    /*
-     * Sets up a new "clean" MB i.e. new project instance
-     */
-    _afterDelete = function () {
-        toolbar.closeAuxToolbar(_showHideAuxMenu);
-        sendAllToTrash(true, false);
-        if (planet !== undefined) {
-            planet.initialiseNewProject.bind(planet);
+    this.hideAuxMenu = function () {
+        if (this.toolbarHeight > 0) {
+            this._showHideAuxMenu(false);
+            this.menuButtonsVisible = false;
         }
     };
 
@@ -2932,106 +2573,111 @@ function Activity() {
      * @param {boolean} addStartBlock {if true adds a new start block to new project instance}
      * @param {boolean} doNotSave     {if true discards any changes to project}
      */
-    sendAllToTrash = function (addStartBlock, doNotSave) {
+    this.sendAllToTrash = function (addStartBlock, doNotSave) {
         // Return to home position after loading new blocks.
-        blocksContainer.x = 0;
-        blocksContainer.y = 0;
-        for (const name in blocks.palettes.dict) {
-            blocks.palettes.dict[name].hideMenu(true);
+        this.blocksContainer.x = 0;
+        this.blocksContainer.y = 0;
+        for (const name in this.blocks.palettes.dict) {
+            this.palettes.dict[name].hideMenu(true);
         }
 
         hideDOMLabel();
-        refreshCanvas();
+        this.refreshCanvas();
 
         let actionBlockCounter = 0;
         const dx = 0;
-        const dy = cellSize * 3;
-        for (const blk in blocks.blockList) {
+        const dy = this.cellSize * 3;
+        for (const blk in this.blocks.blockList) {
             // If this block is at the top of a stack, push it
             // onto the trashStacks list.
-            if (blocks.blockList[blk].connections[0] == null) {
-                blocks.trashStacks.push(blk);
+            if (this.blocks.blockList[blk].connections[0] === null) {
+                this.blocks.trashStacks.push(blk);
             }
 
-            if (blocks.blockList[blk].name === "start" || blocks.blockList[blk].name === "drum") {
-                // console.debug("start blk " + blk + " value is " + blocks.blockList[blk].value);
-                const turtle = blocks.blockList[blk].value;
-                if (!blocks.blockList[blk].trash && turtle != null) {
-                    // console.debug("sending turtle " + turtle + " to trash");
-                    turtles.turtleList[turtle].inTrash = true;
-                    turtles.turtleList[turtle].container.visible = false;
+            if (
+                this.blocks.blockList[blk].name === "start" ||
+                this.blocks.blockList[blk].name === "drum"
+            ) {
+                const turtle = this.blocks.blockList[blk].value;
+                if (!this.blocks.blockList[blk].trash && turtle !== null) {
+                    this.turtles.turtleList[turtle].inTrash = true;
+                    this.turtles.turtleList[turtle].container.visible = false;
                 }
-            } else if (blocks.blockList[blk].name === "action") {
-                if (!blocks.blockList[blk].trash) {
-                    blocks.deleteActionBlock(blocks.blockList[blk]);
+            } else if (this.blocks.blockList[blk].name === "action") {
+                if (!this.blocks.blockList[blk].trash) {
+                    this.blocks.deleteActionBlock(this.blocks.blockList[blk]);
                     actionBlockCounter += 1;
                 }
             }
 
-            blocks.blockList[blk].trash = true;
-            blocks.moveBlockRelative(blk, dx, dy);
-            blocks.blockList[blk].hide();
+            this.blocks.blockList[blk].trash = true;
+            this.blocks.moveBlockRelative(blk, dx, dy);
+            this.blocks.blockList[blk].hide();
         }
 
         if (addStartBlock) {
-            // console.debug("ADDING START BLOCK");
-            blocks.loadNewBlocks(DATAOBJS);
-            _allClear(false);
+            this.blocks.loadNewBlocks(DATAOBJS);
+            this._allClear(false);
         } else if (!doNotSave) {
             // Overwrite session data too.
-            saveLocally();
+            this.saveLocally();
         }
 
         // Wait for palette to clear (#891)
         // We really need to signal when each palette item is deleted
+        const that = this;
         setTimeout(function () {
-            stage.dispatchEvent("trashsignal");
+            that.stage.dispatchEvent("trashsignal");
         }, 100 * actionBlockCounter); // 1000
 
-        update = true;
+        this.update = true;
 
         // Close any open widgets.
         closeWidgets();
     };
 
-    // function _changePaletteVisibility() {
-    //     if (palettes.visible) {
-    //         palettes.hide();
-    //     } else {
-    //         palettes.show();
-    //         palettes.bringToTop();
-    //     }
-    // };
-
     /*
      * Toggles block/palette visibility
      */
-    _changeBlockVisibility = function () {
+    const changeBlockVisibility = function (activity) {
+        activity._changeBlockVisibility();
+    };
+
+    this._changeBlockVisibility = function () {
         hideDOMLabel();
 
-        if (blocks.visible) {
-            blocks.hideBlocks();
-            logo.showBlocksAfterRun = false;
-            palettes.hide();
-            changeImage(hideBlocksContainer.children[0], SHOWBLOCKSBUTTON, HIDEBLOCKSFADEDBUTTON);
+        if (this.blocks.visible) {
+            this.blocks.hideBlocks();
+            this.showBlocksAfterRun = false;
+            this.palettes.hide();
+            changeImage(
+                this.hideBlocksContainer.children[0],
+                SHOWBLOCKSBUTTON,
+                HIDEBLOCKSFADEDBUTTON
+            );
         } else {
-            changeImage(hideBlocksContainer.children[0], HIDEBLOCKSFADEDBUTTON, SHOWBLOCKSBUTTON);
-            blocks.showBlocks();
-            palettes.show();
+            changeImage(
+                this.hideBlocksContainer.children[0],
+                HIDEBLOCKSFADEDBUTTON,
+                SHOWBLOCKSBUTTON
+            );
+            this.blocks.showBlocks();
+            this.palettes.show();
         }
-
-        // Combine block and palette visibility into one button.
-        // _changePaletteVisibility();
     };
 
     /*
      * Toggles collapsible stacks (if collapsed stacks expand and vice versa)
      */
-    _toggleCollapsibleStacks = function () {
+    const toggleCollapsibleStacks = function (activity) {
+        activity._toggleCollapsibleStacks();
+    };
+
+    this._toggleCollapsibleStacks = function () {
         hideDOMLabel();
 
-        if (blocks.visible) {
-            blocks.toggleCollapsibles();
+        if (this.blocks.visible) {
+            this.blocks.toggleCollapsibles();
         }
     };
 
@@ -3040,15 +2686,6 @@ function Activity() {
      */
     this.onStopTurtle = function () {
         // TODO: plugin support
-        /*
-        if (stopTurtleContainer === null) {
-            return;
-        }
-
-        if (stopTurtleContainer.visible) {
-            _hideStopButton();
-        }
-        */
     };
 
     /*
@@ -3056,123 +2693,104 @@ function Activity() {
      */
     this.onRunTurtle = function () {
         // TODO: plugin support
-        // If the stop button is hidden, show it.
-        /*
-        if (stopTurtleContainer === null) {
-            return;
-        }
-
-        if (!stopTurtleContainer.visible) {
-            _showStopButton();
-        }
-        */
     };
 
     /*
      * Updates all canvas elements
      */
-    let blockRefreshCanvas = false;
-    function refreshCanvas() {
-        if (blockRefreshCanvas) {
+    this.refreshCanvas = function () {
+        if (this.blockRefreshCanvas) {
             return;
         }
 
-        blockRefreshCanvas = true;
+        this.blockRefreshCanvas = true;
+
+        const that = this;
         setTimeout(function () {
-            blockRefreshCanvas = false;
+            that.blockRefreshCanvas = false;
         }, 5);
 
-        stage.update(event);
-        update = true;
-    }
+        this.stage.update(event);
+        this.update = true;
+    };
 
     /*
      * This set makes it so the stage only re-renders when an
      * event handler indicates a change has happened.
      */
     this.__tick = function (event) {
-        if (update || createjs.Tween.hasActiveTweens()) {
-            update = false; // Only update once
-            stage.update(event);
+        if (this.update || createjs.Tween.hasActiveTweens()) {
+            this.update = false; // Only update once
+            this.stage.update(event);
         }
     };
 
     /*
-     * Opens samples on planet after closing all sub menus
+     * Opens samples on planet after closing all sub menus.
      */
-    _doOpenSamples = function () {
-        if (docById("palette").style.display != "none") docById("palette").style.display = "none";
-        toolbar.closeAuxToolbar(_showHideAuxMenu);
-        planet.openPlanet();
-        if (docById("buttoncontainerBOTTOM").style.display != "none")
+    const doOpenSamples = function (that) {
+        that._doOpenSamples();
+    };
+
+    this._doOpenSamples = function () {
+        if (docById("palette").style.display !== "none") docById("palette").style.display = "none";
+        this.toolbar.closeAuxToolbar(showHideAuxMenu);
+        this.planet.openPlanet();
+        if (docById("buttoncontainerBOTTOM").style.display !== "none")
             docById("buttoncontainerBOTTOM").style.display = "none";
-        if (docById("buttoncontainerTOP").style.display != "none")
+        if (docById("buttoncontainerTOP").style.display !== "none")
             docById("buttoncontainerTOP").style.display = "none";
-    };
-
-    /*
-     * Saves project
-     * If beginner, assigns default "My Project" title to html file
-     * If advanced, assigns custom title to html file
-     */
-    this.doSave = function () {
-        toolbar.closeAuxToolbar(_showHideAuxMenu);
-        if (beginnerMode) {
-            save.saveHTML(_("My Project"));
-        }
     };
 
     /*
      * Uploads MB file to Planet
      */
-    doUploadToPlanet = function () {
-        planet.openPlanet();
+    this.doUploadToPlanet = function () {
+        this.planet.openPlanet();
     };
 
-    // function doShareOnFacebook() {
-    //     alert('Facebook Sharing : disabled'); // remove when add fb share link
-    //     // add code for facebook share link
-    // };
+    /*
+     * Opens piemenu for selecting master key signature
+     */
+    const chooseKeyMenu = function (that) {
+        piemenuKey(that);
+    };
 
     /*
      * @param merge {if specified the selected file's blocks merge into current project}
      *  Loads/merges existing MB file
      */
-    doLoad = function (merge) {
-        toolbar.closeAuxToolbar(_showHideAuxMenu);
+    const doLoad = function (that, merge) {
+        that.toolbar.closeAuxToolbar(showHideAuxMenu);
         if (merge === undefined) {
             merge = false;
         }
 
         if (merge) {
-            // console.debug("MERGE LOAD");
-            merging = true;
+            that.merging = true;
         } else {
-            // console.debug("LOAD NEW");
-            merging = false;
+            that.merging = false;
         }
 
-        // console.debug("Loading .tb file");
         document.querySelector("#myOpenFile").focus();
         document.querySelector("#myOpenFile").click();
         window.scroll(0, 0);
-        that.doHardStopButton();
-        // console.debug("Calling all clear from doLoad");
-        _allClear(true);
+        doHardStopButton(that);
+        that._allClear(true);
     };
 
-    window.prepareExport = prepareExport;
+    window.prepareExport = this.prepareExport;
 
     /**
      * Runs music blocks project.
      * @param env {specifies environment}
      */
     this.runProject = function (env) {
-        // console.debug("Running Project from Event");
         document.removeEventListener("finishedLoading", this.runProject);
+
+        const that = this;
         setTimeout(function () {
-            // console.debug("Run");
-            _changeBlockVisibility();
+            that._changeBlockVisibility();
             that._doFastButton(env);
         }, 5000);
     };
@@ -3183,46 +2801,126 @@ function Activity() {
      * @param  flags     {parameteres}
      * @param  env       {specifies environment}
      */
-    this.loadProject = function (projectID, flags, env) {
-        // console.debug("LOAD PROJECT");
-        if (planet === undefined) {
-            // console.error("CANNOT ACCESS PLANET");
+    const loadProject = function (activity, projectID, flags, env) {
+        activity._loadProject(projectID, flags, env);
+    };
+
+    const loadStart = async function (that) {
+        const __afterLoad = function () {
+            if (!that.turtles.running()) {
+                setTimeout(function () {
+                    that.stage.update(event);
+                    for (let turtle = 0; turtle < that.turtles.turtleList.length; turtle++) {
+                        that.logo.turtleHeaps[turtle] = [];
+                        that.logo.turtleDicts[turtle] = {};
+                        that.logo.notation.notationStaging[turtle] = [];
+                        that.logo.notation.notationDrumStaging[turtle] = [];
+                        that.turtles.turtleList[turtle].painter.doClear(true, true, false);
+                    }
+                    const imgUrl =
+                        "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+IDxzdmcgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIiB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgaWQ9InN2ZzExMjEiIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDM0LjEzMTI0OSAxNC41NTIwODkiIGhlaWdodD0iNTUuMDAwMDE5IiB3aWR0aD0iMTI5Ij4gPGRlZnMgaWQ9ImRlZnMxMTE1Ij4gPGNsaXBQYXRoIGlkPSJjbGlwUGF0aDQzMzciIGNsaXBQYXRoVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4gPHJlY3QgeT0iNTUyIiB4PSI1ODgiIGhlaWdodD0iMTQzNiIgd2lkdGg9IjE5MDAiIGlkPSJyZWN0NDMzOSIgc3R5bGU9ImZpbGw6I2EzYjVjNDtmaWxsLW9wYWNpdHk6MTtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MTU7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDwvY2xpcFBhdGg+IDwvZGVmcz4gPG1ldGFkYXRhIGlkPSJtZXRhZGF0YTExMTgiPiA8cmRmOlJERj4gPGNjOldvcmsgcmRmOmFib3V0PSIiPiA8ZGM6Zm9ybWF0PmltYWdlL3N2Zyt4bWw8L2RjOmZvcm1hdD4gPGRjOnR5cGUgcmRmOnJlc291cmNlPSJodHRwOi8vcHVybC5vcmcvZGMvZGNtaXR5cGUvU3RpbGxJbWFnZSIgLz4gPGRjOnRpdGxlPjwvZGM6dGl0bGU+IDwvY2M6V29yaz4gPC9yZGY6UkRGPiA8L21ldGFkYXRhPiA8ZyB0cmFuc2Zvcm09Im1hdHJpeCgxLjA4Njc4MiwwLDAsMS4wODY3ODIsLTEuNTQ3MzI0NSwtMS4zMDU3OTkpIiBpZD0iZzE4MTIiPiA8ZWxsaXBzZSB0cmFuc2Zvcm09Im1hdHJpeCgwLjAxMDQ2MDk5LDAsMCwwLjAxMDQ2MDk5LDEuMDE2NzM4OSwtNi4yMDQ4NTI5KSIgY2xpcC1wYXRoPSJ1cmwoI2NsaXBQYXRoNDMzNykiIHJ5PSI3NjgiIHJ4PSI3NDgiIGN5PSIxNDc2IiBjeD0iMTU0MCIgaWQ9InBhdGg0MzMzIiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDojYTNiNWM0O2ZpbGwtb3BhY2l0eToxO3N0cm9rZTpub25lO3N0cm9rZS13aWR0aDoxNTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPGVsbGlwc2Ugcnk9IjEuNzgyNjg1OSIgcng9IjEuNjkzOTIxNiIgY3k9IjguODM0MzUzNCIgY3g9IjE2LjQ0NjczOSIgaWQ9InBhdGg0MjU2IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDojYzlkYWQ4O2ZpbGwtb3BhY2l0eToxO3N0cm9rZTojYzlkYWQ4O3N0cm9rZS13aWR0aDowLjEwNDYwOTk7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDMyOCIgZD0ibSAxNy42MzAyNjYsMTMuNDg3MDkgMC4zMjU0NywwLjM5MjA0NCAwLjM0NzY2LDAuMjczNjkgMC4zMTA2NzYsMC4xMTA5NTUgMC4yMzY3MDUsLTAuMDUxNzggMC4xNDA1NDQsLTAuMTg0OTI2IDAuMTk5NzIsMC4wODEzNyAwLjE1NTMzOCwwLjA0NDM4IDAuNjEzOTU0LC0wLjQyMTYzMiAwLjQyMTYzMSwtMC4yNTE0OTkgYyAwLDAgMC44ODc2NDUsLTAuMDA3NCAxLjYwNTE1NywtMC41NTQ3NzcgMC43MTc1MTMsLTAuNTQ3MzgxIDAuNDk1NjAyLC0wLjY1MDkzOSAwLjQ5NTYwMiwtMC42NTA5MzkgbCAtMC4wMzY5OSwtMC40MjkwMjkgLTAuNTM5OTg0LC0wLjcxNzUxMyAtMC41NTQ3NzcsLTAuNTY5NTcxIC0wLjIyOTMwOSwtMC4xNDc5NDEgYyAwLDAgLTAuMDIyMTksLTAuMDQ0MzggLTAuMDczOTcsLTAuMDQ0MzggLTAuMDUxNzgsMCAtMC4yNDQxMDMsLTAuMDczOTcgLTAuNTE3NzkzLDAuMDQ0MzggLTAuMjczNjkxLDAuMTE4MzUzIC0wLjQ2NjAxNCwwLjE3MDEzMiAtMC44NDMyNjMsMC4zODQ2NDYgLTAuMzc3MjQ4LDAuMjE0NTE0IC0wLjcxMDExNSwwLjQyMTYzMSAtMC44MzU4NjUsMC40OTU2MDIgLTAuMTI1NzUsMC4wNzM5NyAtMC43NDcxLDAuNDI5MDI4IC0wLjc0NzEsMC40MjkwMjggbCAtMC4wOTYxNiwwLjY1ODMzNiB6IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDojZjhmOGY4O2ZpbGwtb3BhY2l0eToxO2ZpbGwtcnVsZTpldmVub2RkO3N0cm9rZTpub25lO3N0cm9rZS13aWR0aDowLjAxMDQ2MDk5cHg7c3Ryb2tlLWxpbmVjYXA6YnV0dDtzdHJva2UtbGluZWpvaW46bWl0ZXI7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggaWQ9InBhdGg0MzMwIiBkPSJtIDE4LjA4MTQ4NSwxMy4xMTcyMzkgYyAwLDAgMS4wMTcyMDIsMC4yMTk4MDggMS40OTA2MTMsLTAuMTM1MjUgMC42ODI1NSwtMC42NzQwOTcgMS42NTU4OTMsLTEuMTU0NzMxIDEuODcwMzU1LC0xLjc0NTMwOCAwLjEwODI1NywtMC4yOTgxMTYgMC4wOTI2NSwtMC4zNzIzNzcgLTAuMDgwMTgsLTAuNjM3MTkxIC0wLjc4NDA4NSwtMS4xMTY5NTIzIC0yLjE4NjAyMywwLjQ4MzU2MyAtMi4xODYwMjMsMC40ODM1NjMgbCAtMS4yMjA1MTEsMS4wNDI5ODMgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2M5ZGFkODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI4MSIgZD0ibSAxOC45MjM2MzgsMTEuOTExMTY2IGMgMCwwIC0yLjI2MjA3MywwLjM2MDA3MyAtMS4yNDU4MDcsMS42MzE0MjYgMS4wMTYyNjgsMS4yNzEzNTQgMS4zMzE1OSwwLjQ2ODQxNSAxLjMzMTU5LDAuNDY4NDE1IDAsMCAwLjIzNzM2NCwwLjI4NDAyMSAwLjU1MDIyMSwtMC4wMTI4OSAwLjMxMjg1NywtMC4yOTY5MSAwLjgwMTY1NywtMC40ODY1NjMgMC44MDE2NTcsLTAuNDg2NTYzIDAsMCAwLjgzMzQxOSwtMC4wODE1OCAxLjcyODg1MSwtMC42NDAzNDUgMC44OTU0MzIsLTAuNTU4NzY5IDAuMDI1NDUsLTEuNDk0NjQ0IDAuMDI1NDUsLTEuNDk0NjQ0IDAsMCAtMC43MDQwMDIsLTAuOTE0MzA1IC0xLjE5MTE1OCwtMS4wNjIwMDQgLTAuNDg3MTU1LC0wLjE0NzY5OSAtMS4yNjAyMDYsLTAuMjA1OTYzIC0xLjI2MDIwNiwtMC4yMDU5NjMgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6bm9uZTtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNTkyNiIgZD0ibSAxNi44ODkxNjUsMy45OTA3MDY3IGMgLTAuMjA1OTI1LDAuMDA5MDIgLTAuNDkwNTg0LDAuMDE2NDUyIC0wLjY4MjQzNCwwLjA5NDMwNiAtMC4zNjM1MSwwLjExMzE2MjUgLTAuNzg0MDE5LDAuMzA2NTkxNiAtMS4xMDIwMzksMC40MTQ1MTk3IEMgMTQuODA1NzA3LDQuNjAwOTk5MyAxNC41MjgzODMsNC44Njc1ODQxIDE0LjQ0MjUxNSw0Ljc3MDc2NzYgMTQuMzE0ODUsNC42MjY4MjQ0IDE0LjIyNDM1Myw0LjU5NTM2MyAxNC4wNDU2ODksNC40OTc1NTkgMTMuODAxNzgxLDQuMzk5NTA1IDEzLjg3Mzc3Myw0LjQ0NDgyNzIgMTMuNjYwODY2LDQuMzg2MzI4MyAxMy41MTM2ODEsNC4zNDU4ODcxIDEzLjQ0ODI5LDQuMjg4Mjk1OCAxMy4wNDc5NTQsNC4zMDIzNTY3IGMgLTAuMjE2MDg3LDAuMDA3NTkgLTAuNDczNTEsMC4wMDgwNCAtMC42NjAwODEsMC4wODk3MjUgLTAuMzc0NjE1LDAuMTY0MDE3OCAtMC4yOTksMC4yNDg0NzU3IC0wLjUzODU3MiwwLjQ5MDAyNTIgLTAuMTY1MTA4LDAuMTY2NDcwOSAtMC4yMjMwMjksMC41NzQ5ODMxIC0wLjI4MjA0MSwwLjgxODg1OCAtMC4wNjkzOSwwLjI4Njc3NzYgLTAuMDU0NywwLjYwMTAzOTMgLTAuMDIwMzEsMC45Njc0MDMxIDAuMDI3NjEsMC4yOTQxOTY1IDAuMDkxNzMsMC40OTczOTM5IDAuMjQ5Mzg4LDAuNzU5MDYzIDAuMTM1MDg0LDAuMjI0MTk4OSAwLjMyNDU2MSwwLjI4MzU4MjggMC41NDY1OSwwLjQ5NzI4OTMgMC4wNzc3NCwwLjA3NDgzIDAuMzY4Mzk4LC0wLjAzODk2NSAwLjQ4NDg4LC0wLjAxNTEwNCAwLjEwODcwOSwwLjAyMjI3IC0wLjA0ODE3LDAuMjE2NzA4OCAtMC4wNTMyLDAuMjQ1MzgzNCAtMC4wNTM4LDAuMjM5NTE2OSAtMC4xMTA1MDMsMC4wODc3NzEgLTAuMDgwNiwwLjYyNzQyNjEgMC4zNDgxMjMsMi4wMjY2ODkyIDEuMDA1MDg5LC0xLjA2NzI2NDcgMC4zMjY2NDksMC42Njg2MTk0IC0wLjA1Mjk4LDAuMTM1NTY0IC0wLjQzNzU5NCwwLjM4ODgwNjggLTAuNTAzMzY4LDAuNTg2ODUzOCAtMC4wMTI2NywwLjE2NTEwOSAwLjE5NzgzNSwwLjE5NDA4IDAuMzE4OTk3LDAuMTc4MDQ5IDAuMDYyNjYsMC40ODAzOTUgMC4xMjQ5ODIsMS4wNDIwNDggMC41MjIyNDIsMS4zNzI0MzkgMC4xMjAxNzcsMC4xMDY0MDIgMC4yODY2NTIsMC4wOTQ0NyAwLjQyOTMxNywwLjEyNjQ0MyAwLjIyMTY0MSwwLjI2ODEyOCAwLjQ0ODY2OCwwLjU1NzA2NiAwLjc4NDA4NywwLjY4OTc3NCAwLjI4Mzg0NSwwLjE0ODQzNSAwLjYyNDkxMywwLjA1MSAwLjg5NjEzOCwwLjIzMzA2NSAwLjcxMjkyNSwwLjM2MDkwMSAxLjU5NDM3LDAuMjI3NDI0IDIuMjQwMzA3LC0wLjIxNDM2NyAwLjIzOTczNiwtMC4wMjU4NCAwLjUwMTI0MywwLjA1MTE5IDAuNzUxMzkxLDAuMDIyMjIgMC41NzU4OTgsLTAuMDIwMDYgMS4xNjcyMDcsLTAuMjQwMDA1IDEuNTIzOTYyLC0wLjcxMTUwMiAwLjA3MjksLTAuMDY2IDAuMTAyMDgxLC0wLjE3ODE0IDAuMTY4ODAzLC0wLjI0MDYzNSAwLjA2NjE2LDAuMDgzMyAwLjIwMTA3OSwwLjE2NTI4OSAwLjI4NTY1MywwLjA1NTAyIDAuMTkzMDcyLC0wLjI1MzQzNiAwLjIyMzQxMywtMC41OTUxMDQgMC4zMjcxNDUsLTAuODgyNTU5IDAuMDg2NTgsMC4wMzY0MSAwLjA4NDIsMC4yNjU3MzQgMC4xOTA4MiwwLjE3NTk2OCAwLjA4ODU4LC0wLjI3NzUxIDAuMjMxMDU1LC0wLjU4OTU1NCAwLjE1NzQ4NywtMC44NzUxMDMgQyAyMS4wOTQ5NjgsOS44NjQxNTE0IDIwLjk5NDc5OSw5LjcxMDk4NzkgMjAuOTU5NzUxLDkuNjcwOTkxNCAyMS4wNjk3Myw5LjY2NDkyMTQgMjEuMzkyMTQ2LDkuNjA3NDEyNCAyMS4zNjQyMjYsOS40MzQyNzkgMjEuMjg0OTAyLDkuMjY0MDY1MSAyMC45MzAzMjQsOS4wNTgwODkzIDIwLjc4MTQ3LDguOTYzNjg5MyAyMC42Mjc0ODksNy4wODIzNjI5IDIwLjgzMTk0MSw3Ljk3MzAwNDMgMjAuMzc0NDc1LDYuNTcyMTY2OCAyMC4yODY2OTMsNi4yOTYzNjYgMjAuMTc5NTgyLDYuMDI1MzkwOCAyMC4wMzkxNDksNS43NjczNzc4IDE5LjgxNDE1NSw1LjM1NDAwNzYgMTkuNTAzNjMsNC45NzM5MDc1IDE5LjA1MDAzMSw0LjY2MDUzMjggMTguNjk0MTU3LDQuNDg2NjE1NyAxOC43NzkxNjcsNC40MTI0NTc4IDE4LjQxNjMxOSw0LjI4NDIxMTggMTguMDQwOTE2LDQuMTE0ODkzIDE3LjkyMzEyNiw0LjExNDQyOTQgMTcuNzA2MjE3LDQuMDQ5NTUxNCAxNy40MjE5OTMsNC4wMDQyMzgyIDE3LjE3NjIyNiwzLjk5MzQ2MTEgMTYuODg5MTY1LDMuOTkwNzA2NyBaIG0gLTAuNDE2Nzc3LDMuNzcwMjM0NSBjIDAuMjU4MDA1LDAuMDA5NzYgMC40MjkyNTksMC4yNTQ4MTQgMC41Mjc1MDEsMC40Njg0NDEgLTAuMDQ2NTEsMC4xMjA5MTIzIC0wLjIxNzYxMywwLjE4MDMzMTggLTAuMzE0MzE2LDAuMjcwODAwNSAtMC4wNTIyNywwLjAzMDg5OCAtMC4xOTUwNTcsMC4xNDE5ODI5IC0wLjA3Mzk3LDAuMTc2MjU4MyAwLjE2NzU3NCwtMC4wMDgwMSAwLjM0MTEyNSwtMC4xMDE3NzYgMC41MDIzNjMsLTAuMDgxMjUzIDAuMDM4OCwwLjMxMzY5MjcgMC4wMTAzOCwwLjcyNTUwMzEgLTAuMjk1OTM5LDAuOTAyMTQ5NSAtMC4zMTY4ODQsMC4wODI4MjcgLTAuNTYyMDUzLC0wLjIxMjE0MTYgLTAuNjc2ODI5LC0wLjQ3MTYxOCAtMC4xNDcwOTYsLTAuMzY2NjkwMiAtMC4xODU5MzQsLTAuODQyODQzMSAwLjA3NjUxLC0xLjE2Njk5ODggMC4wNjUzMSwtMC4wNjgyNjggMC4xNjAwMTEsLTAuMTA2MzQ3NSAwLjI1NDY3OCwtMC4wOTc3OCB6IG0gMi44NTkyNDQsMi41NzU3ODc4IGMgLTAuMDc2NzMsMC4xODQ3NTggLTAuMjMwNjU5LDAuMzMwMTU2IC0wLjQwNzAxMSwwLjQxMzI1MiAtMC4wNTUzOSwwLjE1MDcwNSAwLjA0MDA0LDAuMzU0MzggMC4wMjk3LDAuNDgzMjM0IC0wLjA0OTA3LC0wLjE2MDM1NyAtMC4wMDE2LC0wLjM2MTQyNiAtMC4xMDg4NzUsLTAuNDk2NzU3IC0wLjA3MDE4LC0wLjAyMjcxIC0wLjE0Nzc0NywtMC4wMjgxIC0wLjIxMTc0MSwtMC4wNzIwNiAwLjIxMjc5NCwwLjExNzcxNyAwLjQ5NTYxLDAuMDM5MjQgMC42MDQ3NjYsLTAuMTgyMDk0IDAuMDI5MzQsLTAuMDM3NjIgMC4wODE1OSwtMC4xNDU1NzUgMC4wOTMxNiwtMC4xNDU1NzEgeiBtIC0wLjk2NTM3MiwwLjE0MTk4OCBjIDAuMDQ1NjYsMC4wMzQwOSAwLjIwNDg5NywwLjE2Mjg1NyAwLjA3NzQ0LDAuMDY3ODUgLTAuMDE2NDEsLTAuMDExMzggLTAuMDkwMTksLTAuMDcwODYgLTAuMDc3NDQsLTAuMDY3ODUgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2M5ZGFkODtmaWxsLW9wYWNpdHk6MTtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wNTIzMDQ5NTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggaWQ9InBhdGg0MjU3IiBkPSJtIDE4LjU2MjI5Miw0LjM0MDY1NDMgYyAwLDAgLTAuMDE4MjMsLTAuMTI2MDkyNSAwLjA1NTAzLC0wLjI2MzA5MTEgMC4xMDcwNjUsLTAuMjAwMjExOCAwLjM2NDA0MywtMC40MDk5NDg1IDAuNjYxOTUxLC0wLjU5NjUyOTEgMC4zOTA1NzksLTAuMjQ0NjIwMiAwLjg3ODEwNSwtMC40MDE1NzcyIDEuNDU3NjUzLDAuMDM1OTg1IDAuMTUwMzMxLDAuMTEzNTAwOCAwLjI3NTEyLDAuMzU2MTg0OSAwLjQzNjUyLDAuNTQ2MjQ1OCAwLDAgMC40NDM4MjIsMC41MzI1ODcxIDAuMDU5MTgsMS43OTAwODI5IEMgMjAuODQ3OTc4LDcuMTEwODQ1IDIwLjI0MTQyLDYuNTMzODc1NCAyMC4yNDE0Miw2LjUzMzg3NTQgWiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2M5ZGFkODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI1OSIgZD0ibSAxNS41NDQ5NjIsNC4zMTU2Mjk4IGMgMC42NzQwMTYsMC44NjIwMTcgMi4yMjQ5NDUsMy4zNjQ2NDY3IDIuNTUyNDgxLDIuMTM1NzQ3MSAwLjIwOTIyLC0wLjkxMDEwNjEgMC4wMTUzMiwtMi4zMDI1OTczIDAuMDE1MzIsLTIuMzAyNTk3MyAwLDAgLTEuMjUyMDM4LC0wLjQ2NTg4NTcgLTIuNTY3ODAyLDAuMTY2ODUwMiB6IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDojODk5YmIwO2ZpbGwtb3BhY2l0eToxO2ZpbGwtcnVsZTpldmVub2RkO3N0cm9rZTojODk5YmIwO3N0cm9rZS13aWR0aDowLjEwNDYwOTk7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI3NiIgZD0ibSAxNC41NTMyNiw5LjMxOTI1NjMgYyAwLDAgLTAuMTY3Mzc2LDAuMDUyMzA1IDEuMDk4NDA0LDAuMzM0NzUxNyAxLjI2NTc4LDAuMjgyNDQ2NyAxLjYyMTQ1MywtMC42Njk1MDM0IDEuNjIxNDUzLC0wLjY2OTUwMzQgMCwwIDEuMDM1NjM4LC0xLjUxNjg0MzYgMi4xNDQ1MDMsLTAuMzAzMzY4NyAwLDAgMC4yODI0NDcsMC4zMDMzNjg3IDAuNzg0NTc1LDAuMjkyOTA3NyAwLDAgMC4zMTM4MjksLTAuMTc3ODM2OCAwLjU3NTM1NCwtMC4wMTA0NjEgMC4yNjE1MjUsMC4xNjczNzU5IDAuNDkxNjY3LDAuMzI0MjkwNyAwLjQ5MTY2NywwLjMyNDI5MDcgMCwwIDAuMzg3MDU2LDAuMzY2MTM0NyAtMC4yOTI5MDgsMC4zNTU2NzM3IDAsMCAwLjQyODksMC4xMDQ2MDk5IC0wLjA4MzY5LDEuMzM5MDA3IGwgLTAuMTQ2NDU0LC0wLjMzNDc1MiBjIDAsMCAtMC4yMDkyMiwxLjQwMTc3MyAtMC41NzUzNTQsMC44NjgyNjIgMCwwIC0wLjE2ODU2NywwLjI4NDA0MiAtMC41NDkzMzUsMC41MzgxMTEgLTAuNDYxNzA0LDAuMzA4MDczIC0xLjIwMDYyLDAuNTc5MDM0IC0xLjg4Mjg0NiwwLjMzNTM4MiAwLDAgLTAuOTI5NDM2LDEuMDIzNTYzIC0yLjUxMjQwMiwwLjEyMTEyNSAwLDAgLTAuODcxNzI4LDAuMTY2NTUyIC0xLjQ1NzU0MywtMC44MTY3ODEgMCwwIC0wLjgwNTQ5NiwwLjE5ODc1OSAtMC45NTE5NSwtMS40OTU5MjIgMCwwIC0wLjY3OTk2NSwwLjA0MTg0IC0wLjA0MTg0LC0wLjU0Mzk3MSAwLjYzODEyLC0wLjU4NTgxNTUgMS4yMDMwMTQsLTAuNDYwMjgzNiAxLjIwMzAxNCwtMC40NjAyODM2IHoiIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOiNmOGY4Zjg7ZmlsbC1vcGFjaXR5OjE7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOm5vbmU7c3Ryb2tlLXdpZHRoOjAuMDEwNDYwOTlweDtzdHJva2UtbGluZWNhcDpidXR0O3N0cm9rZS1saW5lam9pbjptaXRlcjtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQzNjUiIGQ9Im0gMTMuNTM4NTQ0LDUuMzE3OTI3NiBjIC0wLjAxNjk4LDAuMDAzMzMgLTAuMjk1NDI5LDAuMDA0MTEgLTAuNTQyNjE0LC0wLjEyODc4OTQgLTAuMTI2Mjk4LC0wLjA2NzkwNiAtMC4yNDcwMjYsLTAuMTI3MDA2OSAtMC4yOTEyNywtMC4xODU5ODA3IC0wLjAzNTY0LC0wLjA0NzUwOCAwLjAwNDEsLTAuMTExNDU4NyAtMC4wNjY4NSwtMC4wNTMwMjIgLTAuOTQ5ODUyLDAuNzgyODExNiAtMC40ODU4NjcsMi4wNDg5MTU3IDAuMzkxNTE4LDIuMzgxNzQ5OSAwLDAgMC4xNjgwMywtMC45MzA1MDIgMS4wODQ1NzEsLTEuOTg3ODA1NyIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2Y4ZjhmODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggaWQ9InBhdGg0MzY3IiBkPSJtIDE4Ljk2OTEyOSw0LjU1MTQ2OTcgYyAwLDAgMC45NjE2MTUsMC42ODA1MjcxIDEuMTk4MzIsMS42MTI1NTQzIDAsMCAxLjE1MzkzOSwtMS43MzA5MDY4IC0wLjA3Mzk3LC0yLjQyNjIyODIgMCwwIC0wLjIwNzExOCwwLjc5ODg4IC0xLjEyNDM1MSwwLjgxMzY3MzkgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2Y4ZjhmODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDIxNSIgZD0ibSAxMi44Mzg2ODUsMTAuMjA5MDE4IGMgMC4xNDQzOTksMS43NjE2ODIgMC45Mzg2MDEsMS40NzI4ODIgMC45Mzg2MDEsMS40NzI4ODIgMC42MzUzNiwxLjAxMDggMS40Mjk1NjEsMC44MjMwOCAxLjQyOTU2MSwwLjgyMzA4IDEuMzcxODAyLDAuODM3NTIyIDIuNTI3MDAzLC0wLjEwMTA3OSAyLjUyNzAwMywtMC4xMDEwNzkgMS45MzQ5NjMsMC4zMTc2OCAyLjQxMTQ4MywtMC45MjQxNjIgMi40MTE0ODMsLTAuOTI0MTYyIDAuMzc1NDQxLDAuNTc3NjAxIDAuNjA2NDgxLC0wLjgwODY0MSAwLjYwNjQ4MSwtMC44MDg2NDEgMC4wNTc3NiwtMC4xMTU1MiAwLjE0NDQwMSwwLjM0NjU2IDAuMTQ0NDAxLDAuMzQ2NTYgMC40NjIwNzksLTEuMjEyOTYwNSAwLjA4MzI0LC0xLjM3NzgzMyAwLjA4MzI0LC0xLjM3NzgzMyAxLjAxMDgwMSwwLjAyODg4IC0wLjIwMzYyNiwtMC43MDI4NzQgLTAuMjAzNjI2LC0wLjcwMjg3NCAtMC4wMjU1MywtMS4wNTkwNjU0IC0wLjAyNTA4LC0xLjMyOTIxMzEgLTAuMzkwMDU0LC0yLjMzMzQzNzggMC44MDk3OTcsMC4yMTYzODc3IDAuODExMDU3LC0wLjk2MDY1ODkgMC45NDkxNywtMS4yMjk3ODc3IDAuMTk5OTE5LC0wLjUzOTAyNDUgLTAuMDM1NiwtMS41MDQ0OTA0IC0wLjY3OTY0MSwtMS45MTk1MzIzIC0wLjI2NTQxMSwtMC4xNzEwMzg3IC0wLjYwMDIsLTAuMjQ4NjAwOSAtMS4wMDI0ODYsLTAuMTY0MzE5OCAtMC4zMDI3NTUsMC4xMzkwMTI4IC0wLjY5MjU0LDAuMzk0OTg5NSAtMC45MDc2MjgsMC42MDg2NjE5IC0wLjE5MzYxMywwLjE5MjMzOTUgLTAuMjE5NjQ5LDAuMzAzMjExNCAtMC4xOTU0NDIsMC40MTU1NTciIHN0eWxlPSJmaWxsOm5vbmU7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOiM1MDUwNTA7c3Ryb2tlLXdpZHRoOjAuMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggaWQ9InBhdGg0MjI3IiBkPSJtIDEyLjgzODY4NSwxMC4yMTE0OTUgYyAwLDAgLTAuOTA5NzIxLDAuMDk4NiAwLjI1OTkyLC0wLjgxMTExNzkgMCwwIDAuNDkwOTYsLTAuNDE4NzYwOCAxLjQ3Mjg4MSwtMC4wNTc3NiIgc3R5bGU9ImZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQyMjkiIGQ9Ik0gMTIuOTA0OTA0LDkuNTY1NTUzIEMgMTIuNTA1NjUzLDguNzczODU0OCAxMi42NzA3OTcsOC4xNjU2MDM3IDEyLjg1MDI0NCw3Ljk1ODI5NCIgc3R5bGU9ImZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQyMDEiIGQ9Im0gMTQuNTgxMzAzLDQuODIyNzY5MiBjIDAsMCAxLjc5NTc0OSwtMS40NTE3MDY2IDMuOTY3MjA3LC0wLjUxNTAzMDkiIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOm5vbmU7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOiM1MDUwNTA7c3Ryb2tlLXdpZHRoOjAuMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiBkPSJNIDEyLjkxMzUyNyw3Ljg5OTY1ODEgQyAxMC44OTQzNTYsOC4zNTIwMTQzIDExLjE2ODQwMiw0LjI1NDUyNDcgMTIuNzY0OTUyLDQuMzAyNTA3MyAxMy4zODM1NjksNC4yODU3MzczIDE0LjA5NzQyNCw0LjI2Nzg1NSAxNC42NTY4MSw1LjAwMTUxMyIgaWQ9InBhdGg0MjA3IiAvPiA8cGF0aCBpZD0icGF0aDQyMzMiIGQ9Im0gMTguMzQwMzMxLDEwLjQ1NDQ5OSBjIDAsMCAwLjY2NDI0LDAuNzIyIDEuMDEwODAxLC0wLjE3MzI4IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDpub25lO2ZpbGwtcnVsZTpldmVub2RkO3N0cm9rZTojNTA1MDUwO3N0cm9rZS13aWR0aDowLjEwNDYwOTk7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDIzNSIgZD0ibSAxOC44ODkwNTIsMTAuNzI4ODU5IDAuMDcyMiwwLjU2MzE2IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDpub25lO2ZpbGwtcnVsZTpldmVub2RkO3N0cm9rZTojNTA1MDUwO3N0cm9rZS13aWR0aDowLjEwNDYwOTk7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI1MSIgZD0ibSAxNC4xMzQ4Miw1LjM0NDA4MDEgYyAtMC4xNzgzOTEsMCAtMC42MzI5NDYsMC4wMDY5OCAtMC45OTQxOTIsLTAuMDg2ODE2IEMgMTIuOTA4NzMsNS4xOTcwNTE5IDEyLjcxNTI4NCw1LjA5NTMxMjUgMTIuNjU4MDI2LDQuOTIzNTM3OCIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQzMDEiIGQ9Im0gMTIuNjcyOTA2LDExLjI0OTk1OSBjIDAsMCAtMS4yMTMxMTMsMC44ODAyNDcgLTAuNzI0OTA5LDEuNTQ1OTgxIGwgMC41OTkxNiwwLjUzMjU4NiAwLjgyMTA3MiwwLjQ0MzgyMyAxLjIyNzkwNywwLjA2NjU3IDAuODA2Mjc3LC0wLjE0Nzk0MSAwLjQxNDIzNCwtMC4xODQ5MjYgMC40NDM4MjIsMC4zNzcyNSAwLjM5OTQ0MSwwLjAxNDc5IDAuMjI5MzA4LC0wLjExMDk1NiAwLjY4NzkyNCwtMC4yNzM2OTEgMC4zNjI0NTYsLTAuMjg0Nzg2IDAuMjA3MTE3LC0wLjMxNDM3MyAtMC4wMjk1OSwtMC4zNDAyNjQgYyAwLDAgLTAuMzg0NjQ2LC0xLjE2MTMzNSAtMC43OTg4OCwtMS4zNDYyNjEgMCwwIC0wLjUzMjU4NywtMC41NzY5NjkgLTEuMjcyMjkxLC0wLjA4MTM3IDAsMCAtMS4xMTY5NTIsMC4zNjk4NTIgLTIuMDg1OTY0LDAuMDQ0MzggLTAuOTY5MDEyLC0wLjMyNTQ3IC0xLjI4NzA4NSwwLjA1OTE4IC0xLjI4NzA4NSwwLjA1OTE4IHoiIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOiNmOGY4Zjg7ZmlsbC1vcGFjaXR5OjE7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOm5vbmU7c3Ryb2tlLXdpZHRoOjAuMDEwNDYwOTlweDtzdHJva2UtbGluZWNhcDpidXR0O3N0cm9rZS1saW5lam9pbjptaXRlcjtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQzMjUiIGQ9Im0gMTEuODUzMTgsMTIuNDgxMDk0IGMgMCwwIDEuMjIwNTExLC0wLjcwMjcxOSAzLjA2OTc3LC0wLjE4NDkyNyAwLDAgMC45MTcyMzQsMC4xNjI3MzYgMS41MDg5OTYsLTAuMDY2NTcgMC41OTE3NjQsLTAuMjI5MzA5IDAuNzkxNDgzLDAuMjczNjkgMC43OTE0ODMsMC4yNzM2OSAwLDAgMC40NjYwMTQsMC44NDMyNjIgMC4zOTk0NCwwLjkwMjQzOCBsIDAuMTc3NTI5LC0wLjA1MTc4IDAuMjY2MjkzLC0wLjM0MDI2NCAwLjA3Mzk3LC0wLjI1ODg5NyAtMC4xNDA1NDMsLTAuNDI5MDI4IC0wLjI3MzY5MSwtMC41NzY5NjggLTAuMzEwNjc2LC0wLjQ0MzgyMiAtMC4yNTE0OTksLTAuMTg0OTI3IC0wLjQyMTYzMSwtMC4xODQ5MjUgLTAuNDA2ODM4LDAuMDI5NTkgLTAuNjA2NTU2LDAuMjUxNDk5IGMgMCwwIC0xLjAyODE4OSwwLjI4ODQ4NSAtMi4yNDg3LC0wLjE4NDkyNSAwLDAgLTAuOTAyNDM4LC0wLjE2MjczNiAtMS41MTYzOTIsMC45ODM4MDYgbCAtMC4xMTgzNTMsMC4zOTk0MzkgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2M5ZGFkODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI3OSIgZD0ibSAxNi44MzM2NzIsMTMuNzg1MjE3IGMgMC4xNTM0MjMsLTAuMTAyOTY3IDEuNDU0MTIyLC0wLjQwNTE0NCAxLjI3MTUzLC0xLjEwNzA1MiAtMC4xODI1OSwtMC43MDE5MDYgLTAuODEwNDg4LC0yLjE4MzA4IC0xLjk2Mjc0OSwtMS42MjExNTEgLTEuMTUyMjY0LDAuNTYxOTMyIC0yLjQyODI3MSwwLjA0NDIyIC0yLjQyODI3MSwwLjA0NDIyIDAsMCAtMC41MDI1NzUsLTAuMTkxMTk4IC0wLjkxNzEzNywwLjA0NDc1IC0wLjQxNDU2MiwwLjIzNTk1MSAtMC44MzU2OTEsMC42MjQyODUgLTAuOTY5NjcsMS4yNjM4MzYgLTAuMTMzOTgyLDAuNjM5NTU3IDEuNTU5NzQ1LDEuMzQxOTkxIDEuNTU5NzQ1LDEuMzQxOTkxIDAsMCAxLjYyODU2NywwLjIzODgxMyAyLjM5NTY5MywtMC4yNzYwMzUgMCwwIDAuNjI5NzI5LDAuNjk3NzcxIDEuMDUwODU5LDAuMzA5NDM3IHoiIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOm5vbmU7ZmlsbC1vcGFjaXR5OjE7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOiM1MDUwNTA7c3Ryb2tlLXdpZHRoOjAuMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggZD0ibSAxNy4xMTQwMTYsOC41MDk4MjQxIGEgMC45NDk4OTcwOCwwLjU4NjQwNTg3IDc4LjA3ODA2MiAwIDEgLTAuMzQwNjEzLDEuMDQwNjk1NSAwLjk0OTg5NzA4LDAuNTg2NDA1ODcgNzguMDc4MDYyIDAgMSAtMC43NzY1NjIsLTAuNjc4NzU2IDAuOTQ5ODk3MDgsMC41ODY0MDU4NyA3OC4wNzgwNjIgMCAxIDAuMjM5NTYsLTEuMTI5MDIxNiAwLjk0OTg5NzA4LDAuNTg2NDA1ODcgNzguMDc4MDYyIDAgMSAwLjgwNzczNiwwLjUzMTgzNzIgbCAtMC41MDM4NzgsMC4zNTYzODM5IHoiIGlkPSJwYXRoNDI2NSIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6IzUwNTA1MDtmaWxsLW9wYWNpdHk6MTtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5NDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZSIgLz4gPHBhdGggZD0iTSAyMC40MTM5NzcsOC4wMzE1OTA2IEEgMC44NTY3NjMyNSwwLjUyODkxMDk1IDc4LjA3ODA2MiAwIDEgMjAuMTA2NzYsOC45NzAyNDk4IDAuODU2NzYzMjUsMC41Mjg5MTA5NSA3OC4wNzgwNjIgMCAxIDE5LjQwNjMzNiw4LjM1ODA0MzEgMC44NTY3NjMyNSwwLjUyODkxMDk1IDc4LjA3ODA2MiAwIDEgMTkuNjIyNDA3LDcuMzM5NzE3NiAwLjg1Njc2MzI1LDAuNTI4OTEwOTUgNzguMDc4MDYyIDAgMSAyMC4zNTA5NDgsNy44MTk0MTA4IGwgLTAuNDU0NDc0LDAuMzIxNDQxNiB6IiBpZD0icGF0aDQyNjUtMiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6IzUwNTA1MDtmaWxsLW9wYWNpdHk6MTtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5NDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZSIgLz4gPHBhdGggaWQ9InBhdGg1NzIwIiBkPSJtIDIxLjEzNDgzMiw3LjY5NjM2MzQgYyAtMC4xMTIzMTgsLTAuMDI3NzU3IC0wLjI2MjQ5NywtMC4wODEwNTQgLTAuMzMzNzMxLC0wLjExODQzODMgLTAuMTQ0MDA1LC0wLjA3NTU3MyAtMC4yOTkzMjksLTAuMjY5ODY1MyAtMC4yOTkzMjksLTAuMzc0NDI2IDAsLTAuMDk2NjA3IC0wLjE5MzI5OCwtMC44NDY4MTQgLTAuMjk0MTMzLC0xLjE0MTU1OTcgQyAxOS45MTc4NSw1LjIxNDg4MjcgMTkuNDI2NzM2LDQuNjc1ODIwNSAxOC44MDY4MDgsNC41MjQzNDIzIDE4LjU3NDU0Myw0LjQ2NzU4OTMgMTguMzc3OTYsNC4zNzc3MTcyIDE4LjM3Nzk2LDQuMzI4Mjg1MSBjIDAsLTAuMTE2NTg3NCAwLjUxODc4NywtMC4zNzIwNTkgMC43NTU1ODcsLTAuMzcyMDgxOCAwLjIyNTEyOSwtMi4wOWUtNSAwLjU1MTc3MywwLjE5NTUxMDUgMC43NTQwMDcsMC40NTEzNTU2IDAuMDg5NTgsMC4xMTMzMjYgMC4zMzY4NDMsMC41NTg3ODc0IDAuNTQ5NDc2LDAuOTg5OTE0MSAwLjYzMDg5MSwxLjI3OTE3MTkgMS4xMjc0NjQsMS45Njg0NzM4IDEuNTY3NTYzLDIuMTc1OTYzMyAwLjIxNzMwOCwwLjEwMjQ1MTggMC4yMjYxMTYsMC4xMTE5NDIgMC4xMzA4ODEsMC4xNDEwMjE1IC0wLjE1OTgzNSwwLjA0ODgwNCAtMC43NzQ5NSwwLjAzNzY4MSAtMS4wMDA2NDIsLTAuMDE4MDk0IHoiIHN0eWxlPSJmaWxsOiMwMDAwMDA7ZmlsbC1vcGFjaXR5OjA7c3Ryb2tlLXdpZHRoOjAuMDUyMzA0OTU7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lIiAvPiA8cGF0aCBpZD0icGF0aDQyNDUiIGQ9Im0gMTUuNTQ0Mzg3LDQuMzE0MzcwOSBjIDAsMCAxLjU1NTIyNiwyLjEwODgwNTMgMi4wNzgyNzYsMi4yNzYxODExIDAuNTIzMDQ5LDAuMTY3Mzc1OSAwLjU1MDA5OSwtMS4yNjczOTM5IDAuNTUwMDk5LC0xLjI2NzM5MzkgMCwwIDAuMDEwNDYsLTAuODA1NDk2MiAtMC4wMzEzOCwtMS4xNjExNyIgc3R5bGU9ImZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQyNDkiIGQ9Im0gMTguOTQ0Mzc3LDQuNTQ1NjI2MiBjIDAuMjUwMTgyLDAuMDI5NjUgMC44NTMyMzUsLTAuMDU1OTAzIDEuMTM0NjY1LC0wLjc3MjM2OTQiIHN0eWxlPSJmaWxsOm5vbmU7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOiM1MDUwNTA7c3Ryb2tlLXdpZHRoOjAuMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHRleHQgaWQ9InRleHQ0MjQ1IiB5PSIyLjA1MTI3MTQiIHg9IjExLjU1NzI5OSIgc3R5bGU9ImZvbnQtc3R5bGU6bm9ybWFsO2ZvbnQtd2VpZ2h0Om5vcm1hbDtmb250LXNpemU6MC4xMjU1MzE4OHB4O2xpbmUtaGVpZ2h0OjAlO2ZvbnQtZmFtaWx5OnNhbnMtc2VyaWY7bGV0dGVyLXNwYWNpbmc6MHB4O3dvcmQtc3BhY2luZzowcHg7ZmlsbDojMDAwMDAwO2ZpbGwtb3BhY2l0eToxO3N0cm9rZTpub25lO3N0cm9rZS13aWR0aDowLjAxMDQ2MDk5cHg7c3Ryb2tlLWxpbmVjYXA6YnV0dDtzdHJva2UtbGluZWpvaW46bWl0ZXI7c3Ryb2tlLW9wYWNpdHk6MSIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHRzcGFuIHN0eWxlPSJmb250LXNpemU6MC40MTg0Mzk2cHg7bGluZS1oZWlnaHQ6MS4yNTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4IiB5PSIyLjA1MTI3MTQiIHg9IjExLjU1NzI5OSIgaWQ9InRzcGFuNDI0NyI+wqA8L3RzcGFuPjwvdGV4dD4gPC9nPiA8L3N2Zz4=";
+                    // eslint-disable-next-line no-console
+                    console.log(
+                        "%cMusic Blocks",
+                        "font-size: 24px; font-weight: bold; font-family: sans-serif; padding:20px 0 0 110px; background: url(" +
+                            imgUrl +
+                            ") no-repeat;"
+                    );
+                    // eslint-disable-next-line no-console
+                    console.log(
+                        "%cMusic Blocks is a collection of tools for exploring fundamental musical concepts in a fun way.",
+                        "font-size: 16px; font-family: sans-serif; font-weight: bold;"
+                    );
+
+                    // Set flag to 1 to enable keyboard after MB finishes loading
+                    that.keyboardEnableFlag = 1;
+                }, 1000);
+            }
+
+            document.removeEventListener("finishedLoading", __afterLoad);
+        };
+
+        // Set the flag to zero to disable keyboard
+        that.keyboardEnableFlag = 0;
+
+        that.sessionData = null;
+
+        // Try restarting where we were when we hit save.
+        if (that.planet) {
+            that.sessionData = await that.planet.openCurrentProject();
+        } else {
+            const currentProject = that.storage.currentProject;
+            that.sessionData = that.storage["SESSION" + currentProject];
+        }
+
+        // After we have finished loading the project, clear all
+        // to ensure a clean start.
+        if (document.addEventListener) {
+            document.addEventListener("finishedLoading", __afterLoad);
+        } else {
+            document.attachEvent("finishedLoading", __afterLoad);
+        }
+
+        if (that.sessionData) {
+            that.doLoadAnimation();
+            try {
+                if (that.sessionData === "undefined" || that.sessionData === "[]") {
+                    that.justLoadStart();
+                } else {
+                    window.loadedSession = that.sessionData;
+                    that.blocks.loadNewBlocks(JSON.parse(that.sessionData));
+                }
+            } catch (e) {
+                // eslint-disable-next-line no-console
+                console.error(e);
+            }
+        } else {
+            that.justLoadStart();
+        }
+
+        that.update = true;
+    };
+
+    // eslint-disable-next-line no-unused-vars
+    this._loadProject = function (projectID, flags, env) {
+        if (this.planet === undefined) {
             return;
         }
 
-        //set default value of run
+        // Set default value of run.
         flags =
             typeof flags !== "undefined"
                 ? flags
                 : {
-                      run: false,
-                      show: false,
-                      collapse: false
-                  };
-        loading = true;
+                    run: false,
+                    show: false,
+                    collapse: false
+                };
+        this.loading = true;
         document.body.style.cursor = "wait";
-        doLoadAnimation();
+        this.doLoadAnimation();
 
         // palettes.updatePalettes();
-        // console.debug("LOADING" + planet.getCurrentProjectName());
-        textMsg(planet.getCurrentProjectName());
+        this.textMsg(this.planet.getCurrentProjectName());
+
+        const that = this;
         setTimeout(function () {
             try {
-                planet.openProjectFromPlanet(projectID, function () {
-                    that.loadStartWrapper(that._loadStart);
+                that.planet.openProjectFromPlanet(projectID, function () {
+                    that.loadStartWrapper(loadStart);
                 });
             } catch (e) {
-                // console.error(e);
-                // console.debug("that._loadStart on error");
-                that.loadStartWrapper(that._loadStart);
+                // eslint-disable-next-line no-console
+                console.error(e);
+                that.loadStartWrapper(loadStart);
             }
 
-            planet.initialiseNewProject();
+            that.planet.initialiseNewProject();
             // Restore default cursor
-            loading = false;
+            that.loading = false;
 
             document.body.style.cursor = "default";
-            update = true;
+            that.update = true;
         }, 2500);
 
         const run = flags.run;
@@ -3231,31 +2929,30 @@ function Activity() {
 
         const __functionload = function () {
             setTimeout(function () {
-                if (!collapse && firstRun) {
-                    _toggleCollapsibleStacks();
+                if (!collapse && that.firstRun) {
+                    that._toggleCollapsibleStacks();
                 }
 
-                if (run && firstRun) {
-                    for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-                        turtles.turtleList[turtle].painter.doClear(true, true, false);
+                if (run && that.firstRun) {
+                    for (let turtle = 0; turtle < that.turtles.turtleList.length; turtle++) {
+                        that.turtles.turtleList[turtle].painter.doClear(true, true, false);
                     }
 
-                    textMsg(_("Click the run button to run the project."));
-                    // that.runProject(env);
+                    that.textMsg(_("Click the run button to run the project."));
 
                     if (show) {
-                        _changeBlockVisibility();
+                        that._changeBlockVisibility();
                     }
 
                     if (!collapse) {
-                        _toggleCollapsibleStacks();
+                        that._toggleCollapsibleStacks();
                     }
                 } else if (!show) {
-                    _changeBlockVisibility();
+                    that._changeBlockVisibility();
                 }
 
                 document.removeEventListener("finishedLoading", __functionload);
-                firstRun = false;
+                that.firstRun = false;
             }, 1000);
         };
 
@@ -3273,12 +2970,12 @@ function Activity() {
      */
     this.loadStartWrapper = async function (func, arg1, arg2, arg3) {
         const time1 = new Date();
-        await func(arg1, arg2, arg3);
+        await func(this, arg1, arg2, arg3);
 
         const time2 = new Date();
         const elapsedTime = time2.getTime() - time1.getTime();
         const timeLeft = Math.max(6000 - elapsedTime);
-        setTimeout(that.showContents, timeLeft);
+        setTimeout(this.showContents, timeLeft);
     };
 
     /*
@@ -3290,199 +2987,134 @@ function Activity() {
         docById("palette").style.display = "block";
         // docById('canvas').style.display = 'none';
         docById("hideContents").style.display = "block";
-
-        /*
-        // Warn the user -- chrome only -- if the browser level is
-        // not set to 100%
-        if (window.innerWidth !== window.outerWidth) {
-            blocks.errorMsg(_('Please set browser zoom level to 100%'));
-            console.debug('zoom level is not 100%: ' + window.innerWidth + ' !== ' + window.outerWidth);
-        }
-        */
         docById("buttoncontainerBOTTOM").style.display = "block";
         docById("buttoncontainerTOP").style.display = "block";
     };
 
-    this._loadStart = async function () {
-        // console.debug("LOAD START");
+    this.justLoadStart = function () {
+        this.blocks.loadNewBlocks(DATAOBJS);
+    };
 
-        // Set the flag to zero to disable keyboard
-        keyboardEnableFlag = 0;
-
-        // where to put this?
-        // palettes.updatePalettes();
-        justLoadStart = function () {
-            // console.debug("Loading start");
-            blocks.loadNewBlocks(DATAOBJS);
-        };
-
-        sessionData = null;
-
-        // Try restarting where we were when we hit save.
-        if (planet) {
-            sessionData = await planet.openCurrentProject();
-        } else {
-            const currentProject = storage.currentProject;
-            sessionData = storage["SESSION" + currentProject];
+    /*
+     * Sets up a new "clean" MB i.e. new project instance
+     */
+    const _afterDelete = function (that) {
+        if (that.turtles.running()) {
+            that._doHardStopButton();
         }
 
-        const __afterLoad = function () {
-            if (!turtles.running()) {
-                setTimeout(function () {
-                    stage.update(event);
-                    // console.debug("reset turtles after load: " + turtles.turtleList.length);
-
-                    for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
-                        logo.turtleHeaps[turtle] = [];
-                        logo.turtleDicts[turtle] = {};
-                        logo.notation.notationStaging[turtle] = [];
-                        logo.notation.notationDrumStaging[turtle] = [];
-                        turtles.turtleList[turtle].painter.doClear(true, true, false);
-                    }
-                    const imgUrl =
-                        "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+IDxzdmcgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIiB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgaWQ9InN2ZzExMjEiIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDM0LjEzMTI0OSAxNC41NTIwODkiIGhlaWdodD0iNTUuMDAwMDE5IiB3aWR0aD0iMTI5Ij4gPGRlZnMgaWQ9ImRlZnMxMTE1Ij4gPGNsaXBQYXRoIGlkPSJjbGlwUGF0aDQzMzciIGNsaXBQYXRoVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4gPHJlY3QgeT0iNTUyIiB4PSI1ODgiIGhlaWdodD0iMTQzNiIgd2lkdGg9IjE5MDAiIGlkPSJyZWN0NDMzOSIgc3R5bGU9ImZpbGw6I2EzYjVjNDtmaWxsLW9wYWNpdHk6MTtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MTU7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDwvY2xpcFBhdGg+IDwvZGVmcz4gPG1ldGFkYXRhIGlkPSJtZXRhZGF0YTExMTgiPiA8cmRmOlJERj4gPGNjOldvcmsgcmRmOmFib3V0PSIiPiA8ZGM6Zm9ybWF0PmltYWdlL3N2Zyt4bWw8L2RjOmZvcm1hdD4gPGRjOnR5cGUgcmRmOnJlc291cmNlPSJodHRwOi8vcHVybC5vcmcvZGMvZGNtaXR5cGUvU3RpbGxJbWFnZSIgLz4gPGRjOnRpdGxlPjwvZGM6dGl0bGU+IDwvY2M6V29yaz4gPC9yZGY6UkRGPiA8L21ldGFkYXRhPiA8ZyB0cmFuc2Zvcm09Im1hdHJpeCgxLjA4Njc4MiwwLDAsMS4wODY3ODIsLTEuNTQ3MzI0NSwtMS4zMDU3OTkpIiBpZD0iZzE4MTIiPiA8ZWxsaXBzZSB0cmFuc2Zvcm09Im1hdHJpeCgwLjAxMDQ2MDk5LDAsMCwwLjAxMDQ2MDk5LDEuMDE2NzM4OSwtNi4yMDQ4NTI5KSIgY2xpcC1wYXRoPSJ1cmwoI2NsaXBQYXRoNDMzNykiIHJ5PSI3NjgiIHJ4PSI3NDgiIGN5PSIxNDc2IiBjeD0iMTU0MCIgaWQ9InBhdGg0MzMzIiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDojYTNiNWM0O2ZpbGwtb3BhY2l0eToxO3N0cm9rZTpub25lO3N0cm9rZS13aWR0aDoxNTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPGVsbGlwc2Ugcnk9IjEuNzgyNjg1OSIgcng9IjEuNjkzOTIxNiIgY3k9IjguODM0MzUzNCIgY3g9IjE2LjQ0NjczOSIgaWQ9InBhdGg0MjU2IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDojYzlkYWQ4O2ZpbGwtb3BhY2l0eToxO3N0cm9rZTojYzlkYWQ4O3N0cm9rZS13aWR0aDowLjEwNDYwOTk7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDMyOCIgZD0ibSAxNy42MzAyNjYsMTMuNDg3MDkgMC4zMjU0NywwLjM5MjA0NCAwLjM0NzY2LDAuMjczNjkgMC4zMTA2NzYsMC4xMTA5NTUgMC4yMzY3MDUsLTAuMDUxNzggMC4xNDA1NDQsLTAuMTg0OTI2IDAuMTk5NzIsMC4wODEzNyAwLjE1NTMzOCwwLjA0NDM4IDAuNjEzOTU0LC0wLjQyMTYzMiAwLjQyMTYzMSwtMC4yNTE0OTkgYyAwLDAgMC44ODc2NDUsLTAuMDA3NCAxLjYwNTE1NywtMC41NTQ3NzcgMC43MTc1MTMsLTAuNTQ3MzgxIDAuNDk1NjAyLC0wLjY1MDkzOSAwLjQ5NTYwMiwtMC42NTA5MzkgbCAtMC4wMzY5OSwtMC40MjkwMjkgLTAuNTM5OTg0LC0wLjcxNzUxMyAtMC41NTQ3NzcsLTAuNTY5NTcxIC0wLjIyOTMwOSwtMC4xNDc5NDEgYyAwLDAgLTAuMDIyMTksLTAuMDQ0MzggLTAuMDczOTcsLTAuMDQ0MzggLTAuMDUxNzgsMCAtMC4yNDQxMDMsLTAuMDczOTcgLTAuNTE3NzkzLDAuMDQ0MzggLTAuMjczNjkxLDAuMTE4MzUzIC0wLjQ2NjAxNCwwLjE3MDEzMiAtMC44NDMyNjMsMC4zODQ2NDYgLTAuMzc3MjQ4LDAuMjE0NTE0IC0wLjcxMDExNSwwLjQyMTYzMSAtMC44MzU4NjUsMC40OTU2MDIgLTAuMTI1NzUsMC4wNzM5NyAtMC43NDcxLDAuNDI5MDI4IC0wLjc0NzEsMC40MjkwMjggbCAtMC4wOTYxNiwwLjY1ODMzNiB6IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDojZjhmOGY4O2ZpbGwtb3BhY2l0eToxO2ZpbGwtcnVsZTpldmVub2RkO3N0cm9rZTpub25lO3N0cm9rZS13aWR0aDowLjAxMDQ2MDk5cHg7c3Ryb2tlLWxpbmVjYXA6YnV0dDtzdHJva2UtbGluZWpvaW46bWl0ZXI7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggaWQ9InBhdGg0MzMwIiBkPSJtIDE4LjA4MTQ4NSwxMy4xMTcyMzkgYyAwLDAgMS4wMTcyMDIsMC4yMTk4MDggMS40OTA2MTMsLTAuMTM1MjUgMC42ODI1NSwtMC42NzQwOTcgMS42NTU4OTMsLTEuMTU0NzMxIDEuODcwMzU1LC0xLjc0NTMwOCAwLjEwODI1NywtMC4yOTgxMTYgMC4wOTI2NSwtMC4zNzIzNzcgLTAuMDgwMTgsLTAuNjM3MTkxIC0wLjc4NDA4NSwtMS4xMTY5NTIzIC0yLjE4NjAyMywwLjQ4MzU2MyAtMi4xODYwMjMsMC40ODM1NjMgbCAtMS4yMjA1MTEsMS4wNDI5ODMgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2M5ZGFkODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI4MSIgZD0ibSAxOC45MjM2MzgsMTEuOTExMTY2IGMgMCwwIC0yLjI2MjA3MywwLjM2MDA3MyAtMS4yNDU4MDcsMS42MzE0MjYgMS4wMTYyNjgsMS4yNzEzNTQgMS4zMzE1OSwwLjQ2ODQxNSAxLjMzMTU5LDAuNDY4NDE1IDAsMCAwLjIzNzM2NCwwLjI4NDAyMSAwLjU1MDIyMSwtMC4wMTI4OSAwLjMxMjg1NywtMC4yOTY5MSAwLjgwMTY1NywtMC40ODY1NjMgMC44MDE2NTcsLTAuNDg2NTYzIDAsMCAwLjgzMzQxOSwtMC4wODE1OCAxLjcyODg1MSwtMC42NDAzNDUgMC44OTU0MzIsLTAuNTU4NzY5IDAuMDI1NDUsLTEuNDk0NjQ0IDAuMDI1NDUsLTEuNDk0NjQ0IDAsMCAtMC43MDQwMDIsLTAuOTE0MzA1IC0xLjE5MTE1OCwtMS4wNjIwMDQgLTAuNDg3MTU1LC0wLjE0NzY5OSAtMS4yNjAyMDYsLTAuMjA1OTYzIC0xLjI2MDIwNiwtMC4yMDU5NjMgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6bm9uZTtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNTkyNiIgZD0ibSAxNi44ODkxNjUsMy45OTA3MDY3IGMgLTAuMjA1OTI1LDAuMDA5MDIgLTAuNDkwNTg0LDAuMDE2NDUyIC0wLjY4MjQzNCwwLjA5NDMwNiAtMC4zNjM1MSwwLjExMzE2MjUgLTAuNzg0MDE5LDAuMzA2NTkxNiAtMS4xMDIwMzksMC40MTQ1MTk3IEMgMTQuODA1NzA3LDQuNjAwOTk5MyAxNC41MjgzODMsNC44Njc1ODQxIDE0LjQ0MjUxNSw0Ljc3MDc2NzYgMTQuMzE0ODUsNC42MjY4MjQ0IDE0LjIyNDM1Myw0LjU5NTM2MyAxNC4wNDU2ODksNC40OTc1NTkgMTMuODAxNzgxLDQuMzk5NTA1IDEzLjg3Mzc3Myw0LjQ0NDgyNzIgMTMuNjYwODY2LDQuMzg2MzI4MyAxMy41MTM2ODEsNC4zNDU4ODcxIDEzLjQ0ODI5LDQuMjg4Mjk1OCAxMy4wNDc5NTQsNC4zMDIzNTY3IGMgLTAuMjE2MDg3LDAuMDA3NTkgLTAuNDczNTEsMC4wMDgwNCAtMC42NjAwODEsMC4wODk3MjUgLTAuMzc0NjE1LDAuMTY0MDE3OCAtMC4yOTksMC4yNDg0NzU3IC0wLjUzODU3MiwwLjQ5MDAyNTIgLTAuMTY1MTA4LDAuMTY2NDcwOSAtMC4yMjMwMjksMC41NzQ5ODMxIC0wLjI4MjA0MSwwLjgxODg1OCAtMC4wNjkzOSwwLjI4Njc3NzYgLTAuMDU0NywwLjYwMTAzOTMgLTAuMDIwMzEsMC45Njc0MDMxIDAuMDI3NjEsMC4yOTQxOTY1IDAuMDkxNzMsMC40OTczOTM5IDAuMjQ5Mzg4LDAuNzU5MDYzIDAuMTM1MDg0LDAuMjI0MTk4OSAwLjMyNDU2MSwwLjI4MzU4MjggMC41NDY1OSwwLjQ5NzI4OTMgMC4wNzc3NCwwLjA3NDgzIDAuMzY4Mzk4LC0wLjAzODk2NSAwLjQ4NDg4LC0wLjAxNTEwNCAwLjEwODcwOSwwLjAyMjI3IC0wLjA0ODE3LDAuMjE2NzA4OCAtMC4wNTMyLDAuMjQ1MzgzNCAtMC4wNTM4LDAuMjM5NTE2OSAtMC4xMTA1MDMsMC4wODc3NzEgLTAuMDgwNiwwLjYyNzQyNjEgMC4zNDgxMjMsMi4wMjY2ODkyIDEuMDA1MDg5LC0xLjA2NzI2NDcgMC4zMjY2NDksMC42Njg2MTk0IC0wLjA1Mjk4LDAuMTM1NTY0IC0wLjQzNzU5NCwwLjM4ODgwNjggLTAuNTAzMzY4LDAuNTg2ODUzOCAtMC4wMTI2NywwLjE2NTEwOSAwLjE5NzgzNSwwLjE5NDA4IDAuMzE4OTk3LDAuMTc4MDQ5IDAuMDYyNjYsMC40ODAzOTUgMC4xMjQ5ODIsMS4wNDIwNDggMC41MjIyNDIsMS4zNzI0MzkgMC4xMjAxNzcsMC4xMDY0MDIgMC4yODY2NTIsMC4wOTQ0NyAwLjQyOTMxNywwLjEyNjQ0MyAwLjIyMTY0MSwwLjI2ODEyOCAwLjQ0ODY2OCwwLjU1NzA2NiAwLjc4NDA4NywwLjY4OTc3NCAwLjI4Mzg0NSwwLjE0ODQzNSAwLjYyNDkxMywwLjA1MSAwLjg5NjEzOCwwLjIzMzA2NSAwLjcxMjkyNSwwLjM2MDkwMSAxLjU5NDM3LDAuMjI3NDI0IDIuMjQwMzA3LC0wLjIxNDM2NyAwLjIzOTczNiwtMC4wMjU4NCAwLjUwMTI0MywwLjA1MTE5IDAuNzUxMzkxLDAuMDIyMjIgMC41NzU4OTgsLTAuMDIwMDYgMS4xNjcyMDcsLTAuMjQwMDA1IDEuNTIzOTYyLC0wLjcxMTUwMiAwLjA3MjksLTAuMDY2IDAuMTAyMDgxLC0wLjE3ODE0IDAuMTY4ODAzLC0wLjI0MDYzNSAwLjA2NjE2LDAuMDgzMyAwLjIwMTA3OSwwLjE2NTI4OSAwLjI4NTY1MywwLjA1NTAyIDAuMTkzMDcyLC0wLjI1MzQzNiAwLjIyMzQxMywtMC41OTUxMDQgMC4zMjcxNDUsLTAuODgyNTU5IDAuMDg2NTgsMC4wMzY0MSAwLjA4NDIsMC4yNjU3MzQgMC4xOTA4MiwwLjE3NTk2OCAwLjA4ODU4LC0wLjI3NzUxIDAuMjMxMDU1LC0wLjU4OTU1NCAwLjE1NzQ4NywtMC44NzUxMDMgQyAyMS4wOTQ5NjgsOS44NjQxNTE0IDIwLjk5NDc5OSw5LjcxMDk4NzkgMjAuOTU5NzUxLDkuNjcwOTkxNCAyMS4wNjk3Myw5LjY2NDkyMTQgMjEuMzkyMTQ2LDkuNjA3NDEyNCAyMS4zNjQyMjYsOS40MzQyNzkgMjEuMjg0OTAyLDkuMjY0MDY1MSAyMC45MzAzMjQsOS4wNTgwODkzIDIwLjc4MTQ3LDguOTYzNjg5MyAyMC42Mjc0ODksNy4wODIzNjI5IDIwLjgzMTk0MSw3Ljk3MzAwNDMgMjAuMzc0NDc1LDYuNTcyMTY2OCAyMC4yODY2OTMsNi4yOTYzNjYgMjAuMTc5NTgyLDYuMDI1MzkwOCAyMC4wMzkxNDksNS43NjczNzc4IDE5LjgxNDE1NSw1LjM1NDAwNzYgMTkuNTAzNjMsNC45NzM5MDc1IDE5LjA1MDAzMSw0LjY2MDUzMjggMTguNjk0MTU3LDQuNDg2NjE1NyAxOC43NzkxNjcsNC40MTI0NTc4IDE4LjQxNjMxOSw0LjI4NDIxMTggMTguMDQwOTE2LDQuMTE0ODkzIDE3LjkyMzEyNiw0LjExNDQyOTQgMTcuNzA2MjE3LDQuMDQ5NTUxNCAxNy40MjE5OTMsNC4wMDQyMzgyIDE3LjE3NjIyNiwzLjk5MzQ2MTEgMTYuODg5MTY1LDMuOTkwNzA2NyBaIG0gLTAuNDE2Nzc3LDMuNzcwMjM0NSBjIDAuMjU4MDA1LDAuMDA5NzYgMC40MjkyNTksMC4yNTQ4MTQgMC41Mjc1MDEsMC40Njg0NDEgLTAuMDQ2NTEsMC4xMjA5MTIzIC0wLjIxNzYxMywwLjE4MDMzMTggLTAuMzE0MzE2LDAuMjcwODAwNSAtMC4wNTIyNywwLjAzMDg5OCAtMC4xOTUwNTcsMC4xNDE5ODI5IC0wLjA3Mzk3LDAuMTc2MjU4MyAwLjE2NzU3NCwtMC4wMDgwMSAwLjM0MTEyNSwtMC4xMDE3NzYgMC41MDIzNjMsLTAuMDgxMjUzIDAuMDM4OCwwLjMxMzY5MjcgMC4wMTAzOCwwLjcyNTUwMzEgLTAuMjk1OTM5LDAuOTAyMTQ5NSAtMC4zMTY4ODQsMC4wODI4MjcgLTAuNTYyMDUzLC0wLjIxMjE0MTYgLTAuNjc2ODI5LC0wLjQ3MTYxOCAtMC4xNDcwOTYsLTAuMzY2NjkwMiAtMC4xODU5MzQsLTAuODQyODQzMSAwLjA3NjUxLC0xLjE2Njk5ODggMC4wNjUzMSwtMC4wNjgyNjggMC4xNjAwMTEsLTAuMTA2MzQ3NSAwLjI1NDY3OCwtMC4wOTc3OCB6IG0gMi44NTkyNDQsMi41NzU3ODc4IGMgLTAuMDc2NzMsMC4xODQ3NTggLTAuMjMwNjU5LDAuMzMwMTU2IC0wLjQwNzAxMSwwLjQxMzI1MiAtMC4wNTUzOSwwLjE1MDcwNSAwLjA0MDA0LDAuMzU0MzggMC4wMjk3LDAuNDgzMjM0IC0wLjA0OTA3LC0wLjE2MDM1NyAtMC4wMDE2LC0wLjM2MTQyNiAtMC4xMDg4NzUsLTAuNDk2NzU3IC0wLjA3MDE4LC0wLjAyMjcxIC0wLjE0Nzc0NywtMC4wMjgxIC0wLjIxMTc0MSwtMC4wNzIwNiAwLjIxMjc5NCwwLjExNzcxNyAwLjQ5NTYxLDAuMDM5MjQgMC42MDQ3NjYsLTAuMTgyMDk0IDAuMDI5MzQsLTAuMDM3NjIgMC4wODE1OSwtMC4xNDU1NzUgMC4wOTMxNiwtMC4xNDU1NzEgeiBtIC0wLjk2NTM3MiwwLjE0MTk4OCBjIDAuMDQ1NjYsMC4wMzQwOSAwLjIwNDg5NywwLjE2Mjg1NyAwLjA3NzQ0LDAuMDY3ODUgLTAuMDE2NDEsLTAuMDExMzggLTAuMDkwMTksLTAuMDcwODYgLTAuMDc3NDQsLTAuMDY3ODUgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2M5ZGFkODtmaWxsLW9wYWNpdHk6MTtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wNTIzMDQ5NTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggaWQ9InBhdGg0MjU3IiBkPSJtIDE4LjU2MjI5Miw0LjM0MDY1NDMgYyAwLDAgLTAuMDE4MjMsLTAuMTI2MDkyNSAwLjA1NTAzLC0wLjI2MzA5MTEgMC4xMDcwNjUsLTAuMjAwMjExOCAwLjM2NDA0MywtMC40MDk5NDg1IDAuNjYxOTUxLC0wLjU5NjUyOTEgMC4zOTA1NzksLTAuMjQ0NjIwMiAwLjg3ODEwNSwtMC40MDE1NzcyIDEuNDU3NjUzLDAuMDM1OTg1IDAuMTUwMzMxLDAuMTEzNTAwOCAwLjI3NTEyLDAuMzU2MTg0OSAwLjQzNjUyLDAuNTQ2MjQ1OCAwLDAgMC40NDM4MjIsMC41MzI1ODcxIDAuMDU5MTgsMS43OTAwODI5IEMgMjAuODQ3OTc4LDcuMTEwODQ1IDIwLjI0MTQyLDYuNTMzODc1NCAyMC4yNDE0Miw2LjUzMzg3NTQgWiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2M5ZGFkODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI1OSIgZD0ibSAxNS41NDQ5NjIsNC4zMTU2Mjk4IGMgMC42NzQwMTYsMC44NjIwMTcgMi4yMjQ5NDUsMy4zNjQ2NDY3IDIuNTUyNDgxLDIuMTM1NzQ3MSAwLjIwOTIyLC0wLjkxMDEwNjEgMC4wMTUzMiwtMi4zMDI1OTczIDAuMDE1MzIsLTIuMzAyNTk3MyAwLDAgLTEuMjUyMDM4LC0wLjQ2NTg4NTcgLTIuNTY3ODAyLDAuMTY2ODUwMiB6IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDojODk5YmIwO2ZpbGwtb3BhY2l0eToxO2ZpbGwtcnVsZTpldmVub2RkO3N0cm9rZTojODk5YmIwO3N0cm9rZS13aWR0aDowLjEwNDYwOTk7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI3NiIgZD0ibSAxNC41NTMyNiw5LjMxOTI1NjMgYyAwLDAgLTAuMTY3Mzc2LDAuMDUyMzA1IDEuMDk4NDA0LDAuMzM0NzUxNyAxLjI2NTc4LDAuMjgyNDQ2NyAxLjYyMTQ1MywtMC42Njk1MDM0IDEuNjIxNDUzLC0wLjY2OTUwMzQgMCwwIDEuMDM1NjM4LC0xLjUxNjg0MzYgMi4xNDQ1MDMsLTAuMzAzMzY4NyAwLDAgMC4yODI0NDcsMC4zMDMzNjg3IDAuNzg0NTc1LDAuMjkyOTA3NyAwLDAgMC4zMTM4MjksLTAuMTc3ODM2OCAwLjU3NTM1NCwtMC4wMTA0NjEgMC4yNjE1MjUsMC4xNjczNzU5IDAuNDkxNjY3LDAuMzI0MjkwNyAwLjQ5MTY2NywwLjMyNDI5MDcgMCwwIDAuMzg3MDU2LDAuMzY2MTM0NyAtMC4yOTI5MDgsMC4zNTU2NzM3IDAsMCAwLjQyODksMC4xMDQ2MDk5IC0wLjA4MzY5LDEuMzM5MDA3IGwgLTAuMTQ2NDU0LC0wLjMzNDc1MiBjIDAsMCAtMC4yMDkyMiwxLjQwMTc3MyAtMC41NzUzNTQsMC44NjgyNjIgMCwwIC0wLjE2ODU2NywwLjI4NDA0MiAtMC41NDkzMzUsMC41MzgxMTEgLTAuNDYxNzA0LDAuMzA4MDczIC0xLjIwMDYyLDAuNTc5MDM0IC0xLjg4Mjg0NiwwLjMzNTM4MiAwLDAgLTAuOTI5NDM2LDEuMDIzNTYzIC0yLjUxMjQwMiwwLjEyMTEyNSAwLDAgLTAuODcxNzI4LDAuMTY2NTUyIC0xLjQ1NzU0MywtMC44MTY3ODEgMCwwIC0wLjgwNTQ5NiwwLjE5ODc1OSAtMC45NTE5NSwtMS40OTU5MjIgMCwwIC0wLjY3OTk2NSwwLjA0MTg0IC0wLjA0MTg0LC0wLjU0Mzk3MSAwLjYzODEyLC0wLjU4NTgxNTUgMS4yMDMwMTQsLTAuNDYwMjgzNiAxLjIwMzAxNCwtMC40NjAyODM2IHoiIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOiNmOGY4Zjg7ZmlsbC1vcGFjaXR5OjE7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOm5vbmU7c3Ryb2tlLXdpZHRoOjAuMDEwNDYwOTlweDtzdHJva2UtbGluZWNhcDpidXR0O3N0cm9rZS1saW5lam9pbjptaXRlcjtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQzNjUiIGQ9Im0gMTMuNTM4NTQ0LDUuMzE3OTI3NiBjIC0wLjAxNjk4LDAuMDAzMzMgLTAuMjk1NDI5LDAuMDA0MTEgLTAuNTQyNjE0LC0wLjEyODc4OTQgLTAuMTI2Mjk4LC0wLjA2NzkwNiAtMC4yNDcwMjYsLTAuMTI3MDA2OSAtMC4yOTEyNywtMC4xODU5ODA3IC0wLjAzNTY0LC0wLjA0NzUwOCAwLjAwNDEsLTAuMTExNDU4NyAtMC4wNjY4NSwtMC4wNTMwMjIgLTAuOTQ5ODUyLDAuNzgyODExNiAtMC40ODU4NjcsMi4wNDg5MTU3IDAuMzkxNTE4LDIuMzgxNzQ5OSAwLDAgMC4xNjgwMywtMC45MzA1MDIgMS4wODQ1NzEsLTEuOTg3ODA1NyIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2Y4ZjhmODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggaWQ9InBhdGg0MzY3IiBkPSJtIDE4Ljk2OTEyOSw0LjU1MTQ2OTcgYyAwLDAgMC45NjE2MTUsMC42ODA1MjcxIDEuMTk4MzIsMS42MTI1NTQzIDAsMCAxLjE1MzkzOSwtMS43MzA5MDY4IC0wLjA3Mzk3LC0yLjQyNjIyODIgMCwwIC0wLjIwNzExOCwwLjc5ODg4IC0xLjEyNDM1MSwwLjgxMzY3MzkgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2Y4ZjhmODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDIxNSIgZD0ibSAxMi44Mzg2ODUsMTAuMjA5MDE4IGMgMC4xNDQzOTksMS43NjE2ODIgMC45Mzg2MDEsMS40NzI4ODIgMC45Mzg2MDEsMS40NzI4ODIgMC42MzUzNiwxLjAxMDggMS40Mjk1NjEsMC44MjMwOCAxLjQyOTU2MSwwLjgyMzA4IDEuMzcxODAyLDAuODM3NTIyIDIuNTI3MDAzLC0wLjEwMTA3OSAyLjUyNzAwMywtMC4xMDEwNzkgMS45MzQ5NjMsMC4zMTc2OCAyLjQxMTQ4MywtMC45MjQxNjIgMi40MTE0ODMsLTAuOTI0MTYyIDAuMzc1NDQxLDAuNTc3NjAxIDAuNjA2NDgxLC0wLjgwODY0MSAwLjYwNjQ4MSwtMC44MDg2NDEgMC4wNTc3NiwtMC4xMTU1MiAwLjE0NDQwMSwwLjM0NjU2IDAuMTQ0NDAxLDAuMzQ2NTYgMC40NjIwNzksLTEuMjEyOTYwNSAwLjA4MzI0LC0xLjM3NzgzMyAwLjA4MzI0LC0xLjM3NzgzMyAxLjAxMDgwMSwwLjAyODg4IC0wLjIwMzYyNiwtMC43MDI4NzQgLTAuMjAzNjI2LC0wLjcwMjg3NCAtMC4wMjU1MywtMS4wNTkwNjU0IC0wLjAyNTA4LC0xLjMyOTIxMzEgLTAuMzkwMDU0LC0yLjMzMzQzNzggMC44MDk3OTcsMC4yMTYzODc3IDAuODExMDU3LC0wLjk2MDY1ODkgMC45NDkxNywtMS4yMjk3ODc3IDAuMTk5OTE5LC0wLjUzOTAyNDUgLTAuMDM1NiwtMS41MDQ0OTA0IC0wLjY3OTY0MSwtMS45MTk1MzIzIC0wLjI2NTQxMSwtMC4xNzEwMzg3IC0wLjYwMDIsLTAuMjQ4NjAwOSAtMS4wMDI0ODYsLTAuMTY0MzE5OCAtMC4zMDI3NTUsMC4xMzkwMTI4IC0wLjY5MjU0LDAuMzk0OTg5NSAtMC45MDc2MjgsMC42MDg2NjE5IC0wLjE5MzYxMywwLjE5MjMzOTUgLTAuMjE5NjQ5LDAuMzAzMjExNCAtMC4xOTU0NDIsMC40MTU1NTciIHN0eWxlPSJmaWxsOm5vbmU7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOiM1MDUwNTA7c3Ryb2tlLXdpZHRoOjAuMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggaWQ9InBhdGg0MjI3IiBkPSJtIDEyLjgzODY4NSwxMC4yMTE0OTUgYyAwLDAgLTAuOTA5NzIxLDAuMDk4NiAwLjI1OTkyLC0wLjgxMTExNzkgMCwwIDAuNDkwOTYsLTAuNDE4NzYwOCAxLjQ3Mjg4MSwtMC4wNTc3NiIgc3R5bGU9ImZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQyMjkiIGQ9Ik0gMTIuOTA0OTA0LDkuNTY1NTUzIEMgMTIuNTA1NjUzLDguNzczODU0OCAxMi42NzA3OTcsOC4xNjU2MDM3IDEyLjg1MDI0NCw3Ljk1ODI5NCIgc3R5bGU9ImZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQyMDEiIGQ9Im0gMTQuNTgxMzAzLDQuODIyNzY5MiBjIDAsMCAxLjc5NTc0OSwtMS40NTE3MDY2IDMuOTY3MjA3LC0wLjUxNTAzMDkiIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOm5vbmU7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOiM1MDUwNTA7c3Ryb2tlLXdpZHRoOjAuMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiBkPSJNIDEyLjkxMzUyNyw3Ljg5OTY1ODEgQyAxMC44OTQzNTYsOC4zNTIwMTQzIDExLjE2ODQwMiw0LjI1NDUyNDcgMTIuNzY0OTUyLDQuMzAyNTA3MyAxMy4zODM1NjksNC4yODU3MzczIDE0LjA5NzQyNCw0LjI2Nzg1NSAxNC42NTY4MSw1LjAwMTUxMyIgaWQ9InBhdGg0MjA3IiAvPiA8cGF0aCBpZD0icGF0aDQyMzMiIGQ9Im0gMTguMzQwMzMxLDEwLjQ1NDQ5OSBjIDAsMCAwLjY2NDI0LDAuNzIyIDEuMDEwODAxLC0wLjE3MzI4IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDpub25lO2ZpbGwtcnVsZTpldmVub2RkO3N0cm9rZTojNTA1MDUwO3N0cm9rZS13aWR0aDowLjEwNDYwOTk7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDIzNSIgZD0ibSAxOC44ODkwNTIsMTAuNzI4ODU5IDAuMDcyMiwwLjU2MzE2IiBzdHlsZT0iZGlzcGxheTppbmxpbmU7ZmlsbDpub25lO2ZpbGwtcnVsZTpldmVub2RkO3N0cm9rZTojNTA1MDUwO3N0cm9rZS13aWR0aDowLjEwNDYwOTk7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI1MSIgZD0ibSAxNC4xMzQ4Miw1LjM0NDA4MDEgYyAtMC4xNzgzOTEsMCAtMC42MzI5NDYsMC4wMDY5OCAtMC45OTQxOTIsLTAuMDg2ODE2IEMgMTIuOTA4NzMsNS4xOTcwNTE5IDEyLjcxNTI4NCw1LjA5NTMxMjUgMTIuNjU4MDI2LDQuOTIzNTM3OCIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6IzUwNTA1MDtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQzMDEiIGQ9Im0gMTIuNjcyOTA2LDExLjI0OTk1OSBjIDAsMCAtMS4yMTMxMTMsMC44ODAyNDcgLTAuNzI0OTA5LDEuNTQ1OTgxIGwgMC41OTkxNiwwLjUzMjU4NiAwLjgyMTA3MiwwLjQ0MzgyMyAxLjIyNzkwNywwLjA2NjU3IDAuODA2Mjc3LC0wLjE0Nzk0MSAwLjQxNDIzNCwtMC4xODQ5MjYgMC40NDM4MjIsMC4zNzcyNSAwLjM5OTQ0MSwwLjAxNDc5IDAuMjI5MzA4LC0wLjExMDk1NiAwLjY4NzkyNCwtMC4yNzM2OTEgMC4zNjI0NTYsLTAuMjg0Nzg2IDAuMjA3MTE3LC0wLjMxNDM3MyAtMC4wMjk1OSwtMC4zNDAyNjQgYyAwLDAgLTAuMzg0NjQ2LC0xLjE2MTMzNSAtMC43OTg4OCwtMS4zNDYyNjEgMCwwIC0wLjUzMjU4NywtMC41NzY5NjkgLTEuMjcyMjkxLC0wLjA4MTM3IDAsMCAtMS4xMTY5NTIsMC4zNjk4NTIgLTIuMDg1OTY0LDAuMDQ0MzggLTAuOTY5MDEyLC0wLjMyNTQ3IC0xLjI4NzA4NSwwLjA1OTE4IC0xLjI4NzA4NSwwLjA1OTE4IHoiIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOiNmOGY4Zjg7ZmlsbC1vcGFjaXR5OjE7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOm5vbmU7c3Ryb2tlLXdpZHRoOjAuMDEwNDYwOTlweDtzdHJva2UtbGluZWNhcDpidXR0O3N0cm9rZS1saW5lam9pbjptaXRlcjtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQzMjUiIGQ9Im0gMTEuODUzMTgsMTIuNDgxMDk0IGMgMCwwIDEuMjIwNTExLC0wLjcwMjcxOSAzLjA2OTc3LC0wLjE4NDkyNyAwLDAgMC45MTcyMzQsMC4xNjI3MzYgMS41MDg5OTYsLTAuMDY2NTcgMC41OTE3NjQsLTAuMjI5MzA5IDAuNzkxNDgzLDAuMjczNjkgMC43OTE0ODMsMC4yNzM2OSAwLDAgMC40NjYwMTQsMC44NDMyNjIgMC4zOTk0NCwwLjkwMjQzOCBsIDAuMTc3NTI5LC0wLjA1MTc4IDAuMjY2MjkzLC0wLjM0MDI2NCAwLjA3Mzk3LC0wLjI1ODg5NyAtMC4xNDA1NDMsLTAuNDI5MDI4IC0wLjI3MzY5MSwtMC41NzY5NjggLTAuMzEwNjc2LC0wLjQ0MzgyMiAtMC4yNTE0OTksLTAuMTg0OTI3IC0wLjQyMTYzMSwtMC4xODQ5MjUgLTAuNDA2ODM4LDAuMDI5NTkgLTAuNjA2NTU2LDAuMjUxNDk5IGMgMCwwIC0xLjAyODE4OSwwLjI4ODQ4NSAtMi4yNDg3LC0wLjE4NDkyNSAwLDAgLTAuOTAyNDM4LC0wLjE2MjczNiAtMS41MTYzOTIsMC45ODM4MDYgbCAtMC4xMTgzNTMsMC4zOTk0MzkgeiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6I2M5ZGFkODtmaWxsLW9wYWNpdHk6MTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4O3N0cm9rZS1saW5lY2FwOmJ1dHQ7c3Ryb2tlLWxpbmVqb2luOm1pdGVyO3N0cm9rZS1vcGFjaXR5OjEiIC8+IDxwYXRoIGlkPSJwYXRoNDI3OSIgZD0ibSAxNi44MzM2NzIsMTMuNzg1MjE3IGMgMC4xNTM0MjMsLTAuMTAyOTY3IDEuNDU0MTIyLC0wLjQwNTE0NCAxLjI3MTUzLC0xLjEwNzA1MiAtMC4xODI1OSwtMC43MDE5MDYgLTAuODEwNDg4LC0yLjE4MzA4IC0xLjk2Mjc0OSwtMS42MjExNTEgLTEuMTUyMjY0LDAuNTYxOTMyIC0yLjQyODI3MSwwLjA0NDIyIC0yLjQyODI3MSwwLjA0NDIyIDAsMCAtMC41MDI1NzUsLTAuMTkxMTk4IC0wLjkxNzEzNywwLjA0NDc1IC0wLjQxNDU2MiwwLjIzNTk1MSAtMC44MzU2OTEsMC42MjQyODUgLTAuOTY5NjcsMS4yNjM4MzYgLTAuMTMzOTgyLDAuNjM5NTU3IDEuNTU5NzQ1LDEuMzQxOTkxIDEuNTU5NzQ1LDEuMzQxOTkxIDAsMCAxLjYyODU2NywwLjIzODgxMyAyLjM5NTY5MywtMC4yNzYwMzUgMCwwIDAuNjI5NzI5LDAuNjk3NzcxIDEuMDUwODU5LDAuMzA5NDM3IHoiIHN0eWxlPSJkaXNwbGF5OmlubGluZTtmaWxsOm5vbmU7ZmlsbC1vcGFjaXR5OjE7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOiM1MDUwNTA7c3Ryb2tlLXdpZHRoOjAuMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHBhdGggZD0ibSAxNy4xMTQwMTYsOC41MDk4MjQxIGEgMC45NDk4OTcwOCwwLjU4NjQwNTg3IDc4LjA3ODA2MiAwIDEgLTAuMzQwNjEzLDEuMDQwNjk1NSAwLjk0OTg5NzA4LDAuNTg2NDA1ODcgNzguMDc4MDYyIDAgMSAtMC43NzY1NjIsLTAuNjc4NzU2IDAuOTQ5ODk3MDgsMC41ODY0MDU4NyA3OC4wNzgwNjIgMCAxIDAuMjM5NTYsLTEuMTI5MDIxNiAwLjk0OTg5NzA4LDAuNTg2NDA1ODcgNzguMDc4MDYyIDAgMSAwLjgwNzczNiwwLjUzMTgzNzIgbCAtMC41MDM4NzgsMC4zNTYzODM5IHoiIGlkPSJwYXRoNDI2NSIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6IzUwNTA1MDtmaWxsLW9wYWNpdHk6MTtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5NDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZSIgLz4gPHBhdGggZD0iTSAyMC40MTM5NzcsOC4wMzE1OTA2IEEgMC44NTY3NjMyNSwwLjUyODkxMDk1IDc4LjA3ODA2MiAwIDEgMjAuMTA2NzYsOC45NzAyNDk4IDAuODU2NzYzMjUsMC41Mjg5MTA5NSA3OC4wNzgwNjIgMCAxIDE5LjQwNjMzNiw4LjM1ODA0MzEgMC44NTY3NjMyNSwwLjUyODkxMDk1IDc4LjA3ODA2MiAwIDEgMTkuNjIyNDA3LDcuMzM5NzE3NiAwLjg1Njc2MzI1LDAuNTI4OTEwOTUgNzguMDc4MDYyIDAgMSAyMC4zNTA5NDgsNy44MTk0MTA4IGwgLTAuNDU0NDc0LDAuMzIxNDQxNiB6IiBpZD0icGF0aDQyNjUtMiIgc3R5bGU9ImRpc3BsYXk6aW5saW5lO2ZpbGw6IzUwNTA1MDtmaWxsLW9wYWNpdHk6MTtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5NDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZSIgLz4gPHBhdGggaWQ9InBhdGg1NzIwIiBkPSJtIDIxLjEzNDgzMiw3LjY5NjM2MzQgYyAtMC4xMTIzMTgsLTAuMDI3NzU3IC0wLjI2MjQ5NywtMC4wODEwNTQgLTAuMzMzNzMxLC0wLjExODQzODMgLTAuMTQ0MDA1LC0wLjA3NTU3MyAtMC4yOTkzMjksLTAuMjY5ODY1MyAtMC4yOTkzMjksLTAuMzc0NDI2IDAsLTAuMDk2NjA3IC0wLjE5MzI5OCwtMC44NDY4MTQgLTAuMjk0MTMzLC0xLjE0MTU1OTcgQyAxOS45MTc4NSw1LjIxNDg4MjcgMTkuNDI2NzM2LDQuNjc1ODIwNSAxOC44MDY4MDgsNC41MjQzNDIzIDE4LjU3NDU0Myw0LjQ2NzU4OTMgMTguMzc3OTYsNC4zNzc3MTcyIDE4LjM3Nzk2LDQuMzI4Mjg1MSBjIDAsLTAuMTE2NTg3NCAwLjUxODc4NywtMC4zNzIwNTkgMC43NTU1ODcsLTAuMzcyMDgxOCAwLjIyNTEyOSwtMi4wOWUtNSAwLjU1MTc3MywwLjE5NTUxMDUgMC43NTQwMDcsMC40NTEzNTU2IDAuMDg5NTgsMC4xMTMzMjYgMC4zMzY4NDMsMC41NTg3ODc0IDAuNTQ5NDc2LDAuOTg5OTE0MSAwLjYzMDg5MSwxLjI3OTE3MTkgMS4xMjc0NjQsMS45Njg0NzM4IDEuNTY3NTYzLDIuMTc1OTYzMyAwLjIxNzMwOCwwLjEwMjQ1MTggMC4yMjYxMTYsMC4xMTE5NDIgMC4xMzA4ODEsMC4xNDEwMjE1IC0wLjE1OTgzNSwwLjA0ODgwNCAtMC43NzQ5NSwwLjAzNzY4MSAtMS4wMDA2NDIsLTAuMDE4MDk0IHoiIHN0eWxlPSJmaWxsOiMwMDAwMDA7ZmlsbC1vcGFjaXR5OjA7c3Ryb2tlLXdpZHRoOjAuMDUyMzA0OTU7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjQ7c3Ryb2tlLWRhc2hhcnJheTpub25lIiAvPiA8cGF0aCBpZD0icGF0aDQyNDUiIGQ9Im0gMTUuNTQ0Mzg3LDQuMzE0MzcwOSBjIDAsMCAxLjU1NTIyNiwyLjEwODgwNTMgMi4wNzgyNzYsMi4yNzYxODExIDAuNTIzMDQ5LDAuMTY3Mzc1OSAwLjU1MDA5OSwtMS4yNjczOTM5IDAuNTUwMDk5LC0xLjI2NzM5MzkgMCwwIDAuMDEwNDYsLTAuODA1NDk2MiAtMC4wMzEzOCwtMS4xNjExNyIgc3R5bGU9ImZpbGw6bm9uZTtmaWxsLXJ1bGU6ZXZlbm9kZDtzdHJva2U6bm9uZTtzdHJva2Utd2lkdGg6MC4xMDQ2MDk5O3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDo0O3N0cm9rZS1kYXNoYXJyYXk6bm9uZTtzdHJva2Utb3BhY2l0eToxIiAvPiA8cGF0aCBpZD0icGF0aDQyNDkiIGQ9Im0gMTguOTQ0Mzc3LDQuNTQ1NjI2MiBjIDAuMjUwMTgyLDAuMDI5NjUgMC44NTMyMzUsLTAuMDU1OTAzIDEuMTM0NjY1LC0wLjc3MjM2OTQiIHN0eWxlPSJmaWxsOm5vbmU7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOiM1MDUwNTA7c3Ryb2tlLXdpZHRoOjAuMTA0NjA5OTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDtzdHJva2UtZGFzaGFycmF5Om5vbmU7c3Ryb2tlLW9wYWNpdHk6MSIgLz4gPHRleHQgaWQ9InRleHQ0MjQ1IiB5PSIyLjA1MTI3MTQiIHg9IjExLjU1NzI5OSIgc3R5bGU9ImZvbnQtc3R5bGU6bm9ybWFsO2ZvbnQtd2VpZ2h0Om5vcm1hbDtmb250LXNpemU6MC4xMjU1MzE4OHB4O2xpbmUtaGVpZ2h0OjAlO2ZvbnQtZmFtaWx5OnNhbnMtc2VyaWY7bGV0dGVyLXNwYWNpbmc6MHB4O3dvcmQtc3BhY2luZzowcHg7ZmlsbDojMDAwMDAwO2ZpbGwtb3BhY2l0eToxO3N0cm9rZTpub25lO3N0cm9rZS13aWR0aDowLjAxMDQ2MDk5cHg7c3Ryb2tlLWxpbmVjYXA6YnV0dDtzdHJva2UtbGluZWpvaW46bWl0ZXI7c3Ryb2tlLW9wYWNpdHk6MSIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHRzcGFuIHN0eWxlPSJmb250LXNpemU6MC40MTg0Mzk2cHg7bGluZS1oZWlnaHQ6MS4yNTtzdHJva2Utd2lkdGg6MC4wMTA0NjA5OXB4IiB5PSIyLjA1MTI3MTQiIHg9IjExLjU1NzI5OSIgaWQ9InRzcGFuNDI0NyI+wqA8L3RzcGFuPjwvdGV4dD4gPC9nPiA8L3N2Zz4=";
-                    console.log(
-                        "%cMusic Blocks",
-                        "font-size: 24px; font-weight: bold; font-family: sans-serif; padding:20px 0 0 110px; background: url(" +
-                            imgUrl +
-                            ") no-repeat;"
-                    );
-                    console.log(
-                        "%cMusic Blocks is a collection of tools for exploring fundamental musical concepts in a fun way.",
-                        "font-size: 16px; font-family: sans-serif; font-weight: bold;"
-                    );
-
-                    // Set flag to 1 to enable keyboard after MB finishes loading
-                    keyboardEnableFlag = 1;
-                }, 1000);
-            }
-
-            document.removeEventListener("finishedLoading", __afterLoad);
-        };
-
-        // After we have finished loading the project, clear all
-        // to ensure a clean start.
-        if (document.addEventListener) {
-            document.addEventListener("finishedLoading", __afterLoad);
+        // Use the planet New Project mechanism if it is available,
+        // but only if the current project has a name.
+        if (that.planet !== undefined && that.planet.getCurrentProjectName() !== _("My Project")) {
+            that.planet.saveLocally();
+            that.planet.initialiseNewProject();
+            loadStart(that);
+            that.planet.saveLocally();
         } else {
-            document.attachEvent("finishedLoading", __afterLoad);
+            that.toolbar.closeAuxToolbar(showHideAuxMenu);
+
+            setTimeout(() => {
+                // Don't create the new blocks in sendAllToTrash so as to
+                // avoid clearing the screen of any graphics. Do it here
+                // instead.
+                that.sendAllToTrash(false, false);
+                that.blocks.loadNewBlocks(DATAOBJS);
+            }, 1000);
         }
-
-        if (sessionData) {
-            doLoadAnimation();
-            try {
-                if (sessionData === "undefined" || sessionData === "[]") {
-                    // console.debug("empty session found: loading start");
-                    justLoadStart();
-                } else {
-                    window.loadedSession = sessionData;
-                    // console.debug(
-                    //     `restoring session: (in variable loadedSession) ${sessionData.substring(
-                    //         0,
-                    //         50
-                    //     )}...`
-                    // );
-
-                    blocks.loadNewBlocks(JSON.parse(sessionData));
-                }
-            } catch (e) {
-                // console.error(e);
-            }
-        } else {
-            justLoadStart();
-        }
-
-        update = true;
     };
 
     /*
      * Hides all message containers
      */
-    hideMsgs = function () {
-        errorMsgText.parent.visible = false;
-        errorText.classList.remove("show");
-        hideArrows();
+    this.hideMsgs = function () {
+        // FIXME: When running before everything is set up.
+        if (this.errorMsgText === null) {
+            return;
+        }
+        this.errorMsgText.parent.visible = false;
+        this.errorText.classList.remove("show");
+        this._hideArrows();
 
-        msgText.parent.visible = false;
-        printText.classList.remove("show");
-        for (const i in errorArtwork) {
-            errorArtwork[i].visible = false;
+        this.msgText.parent.visible = false;
+        this.printText.classList.remove("show");
+        for (const i in this.errorArtwork) {
+            this.errorArtwork[i].visible = false;
         }
 
-        refreshCanvas();
+        this.refreshCanvas();
     };
 
-    hideArrows = function () {
-        if (errorMsgArrow != null) {
-            errorMsgArrow.removeAllChildren();
-            refreshCanvas();
+    // Accessed from index.html
+    const hideArrows = function () {
+        globalActivity._hideArrows();
+    };
+
+    this._hideArrows = function () {
+        if (this.errorMsgArrow !== null) {
+            this.errorMsgArrow.removeAllChildren();
+            this.refreshCanvas();
         }
     };
 
-    textMsg = function (msg) {
-        if (msgTimeoutID !== null) {
-            clearTimeout(msgTimeoutID);
-            msgTimeoutID = null;
+    this.textMsg = function (msg) {
+        if (this.msgTimeoutID !== null) {
+            clearTimeout(this.msgTimeoutID);
+            this.msgTimeoutID = null;
         }
 
-        if (msgText == null) {
+        if (this.msgText === null) {
             // The container may not be ready yet, so do nothing.
             return;
         }
 
-        // Show and populate printText div
-        const printText = document.getElementById("printText");
+        this.printText.classList.add("show");
+        this.printTextContent.innerHTML = msg;
 
-        printText.classList.add("show");
-
-        const printTextContent = document.getElementById("printTextContent");
-        printTextContent.innerHTML = msg;
-
-        msgTimeoutID = setTimeout(function () {
-            printText.classList.remove("show");
-            msgTimeoutID = null;
+        const that = this;
+        this.msgTimeoutID = setTimeout(function () {
+            that.printText.classList.remove("show");
+            that.msgTimeoutID = null;
         }, _MSGTIMEOUT_);
     };
 
-    errorMsg = function (msg, blk, text, timeout) {
-        if (errorMsgTimeoutID != null) {
-            clearTimeout(errorMsgTimeoutID);
+    this.errorMsg = function (msg, blk, text, timeout) {
+        if (this.errorMsgTimeoutID !== null) {
+            clearTimeout(this.errorMsgTimeoutID);
         }
 
-        // hide the button, as the program is going to be terminated
-        _hideStopButton();
-
-        // the container may not be ready yet, so do nothing
-        if (errorMsgText == null) return;
+        // The container may not be ready yet, so do nothing.
+        if (this.errorMsgText === null) {
+            return;
+        }
 
         if (
             blk !== undefined &&
-            blk != null &&
-            blk in blocks.blockList &&
-            !blocks.blockList[blk].collapsed
+            blk !== null &&
+            blk in this.blocks.blockList &&
+            !this.blocks.blockList[blk].collapsed
         ) {
-            const fromX = (canvas.width - 1000) / 2;
+            const fromX = (this.canvas.width - 1000) / 2;
             const fromY = 128;
-            const toX = blocks.blockList[blk].container.x + blocksContainer.x;
-            const toY = blocks.blockList[blk].container.y + blocksContainer.y;
+            const toX = this.blocks.blockList[blk].container.x + this.blocksContainer.x;
+            const toY = this.blocks.blockList[blk].container.y + this.blocksContainer.y;
 
-            if (errorMsgArrow == null) {
-                errorMsgArrow = new createjs.Container();
-                stage.addChild(errorMsgArrow);
+            if (this.errorMsgArrow === null) {
+                this.errorMsgArrow = new createjs.Container();
+                this.stage.addChild(this.errorMsgArrow);
             }
 
             const line = new createjs.Shape();
-            errorMsgArrow.addChild(line);
+            this.errorMsgArrow.addChild(line);
             line.graphics
                 .setStrokeStyle(4)
                 .beginStroke("#ff0031")
                 .moveTo(fromX, fromY)
                 .lineTo(toX, toY);
-            stage.setChildIndex(errorMsgArrow, stage.children.length - 1);
+            this.stage.setChildIndex(this.errorMsgArrow, this.stage.children.length - 1);
 
             const angle = (Math.atan2(toX - fromX, fromY - toY) / Math.PI) * 180;
             const head = new createjs.Shape();
-            errorMsgArrow.addChild(head);
+            this.errorMsgArrow.addChild(head);
             head.graphics
                 .setStrokeStyle(4)
                 .beginStroke("#ff0031")
@@ -3496,59 +3128,84 @@ function Activity() {
 
         switch (msg) {
             case NOMICERRORMSG:
-                errorArtwork["nomicrophone"].visible = true;
-                stage.setChildIndex(errorArtwork["nomicrophone"], stage.children.length - 1);
+                this.errorArtwork["nomicrophone"].visible = true;
+                this.stage.setChildIndex(
+                    this.errorArtwork["nomicrophone"],
+                    this.stage.children.length - 1
+                );
                 break;
             case NOSTRINGERRORMSG:
-                errorArtwork["notastring"].visible = true;
-                stage.setChildIndex(errorArtwork["notastring"], stage.children.length - 1);
+                this.errorArtwork["notastring"].visible = true;
+                this.stage.setChildIndex(
+                    this.errorArtwork["notastring"],
+                    this.stage.children.length - 1
+                );
                 break;
             case EMPTYHEAPERRORMSG:
-                errorArtwork["emptyheap"].visible = true;
-                stage.setChildIndex(errorArtwork["emptyheap"], stage.children.length - 1);
+                this.errorArtwork["emptyheap"].visible = true;
+                this.stage.setChildIndex(
+                    this.errorArtwork["emptyheap"],
+                    this.stage.children.length - 1
+                );
                 break;
             case NOSQRTERRORMSG:
-                errorArtwork["negroot"].visible = true;
-                stage.setChildIndex(errorArtwork["negroot"], stage.children.length - 1);
+                this.errorArtwork["negroot"].visible = true;
+                this.stage.setChildIndex(
+                    this.errorArtwork["negroot"],
+                    this.stage.children.length - 1
+                );
                 break;
             case NOACTIONERRORMSG:
-                if (text == null) {
+                if (text === null) {
                     text = "foo";
                 }
 
-                errorArtwork["nostack"].children[1].text = text;
-                errorArtwork["nostack"].visible = true;
-                errorArtwork["nostack"].updateCache();
-                stage.setChildIndex(errorArtwork["nostack"], stage.children.length - 1);
+                this.errorArtwork["nostack"].children[1].text = text;
+                this.errorArtwork["nostack"].visible = true;
+                this.errorArtwork["nostack"].updateCache();
+                this.stage.setChildIndex(
+                    this.errorArtwork["nostack"],
+                    this.stage.children.length - 1
+                );
                 break;
             case NOBOXERRORMSG:
-                if (text == null) {
+                if (text === null) {
                     text = "foo";
                 }
 
-                errorArtwork["emptybox"].children[1].text = text;
-                errorArtwork["emptybox"].visible = true;
-                errorArtwork["emptybox"].updateCache();
-                stage.setChildIndex(errorArtwork["emptybox"], stage.children.length - 1);
+                this.errorArtwork["emptybox"].children[1].text = text;
+                this.errorArtwork["emptybox"].visible = true;
+                this.errorArtwork["emptybox"].updateCache();
+                this.stage.setChildIndex(
+                    this.errorArtwork["emptybox"],
+                    this.stage.children.length - 1
+                );
                 break;
             case ZERODIVIDEERRORMSG:
-                errorArtwork["zerodivide"].visible = true;
-                stage.setChildIndex(errorArtwork["zerodivide"], stage.children.length - 1);
+                this.errorArtwork["zerodivide"].visible = true;
+                this.stage.setChildIndex(
+                    this.errorArtwork["zerodivide"],
+                    this.stage.children.length - 1
+                );
                 break;
             case NANERRORMSG:
-                errorArtwork["notanumber"].visible = true;
-                stage.setChildIndex(errorArtwork["notanumber"], stage.children.length - 1);
+                this.errorArtwork["notanumber"].visible = true;
+                this.stage.setChildIndex(
+                    this.errorArtwork["notanumber"],
+                    this.stage.children.length - 1
+                );
                 break;
             case NOINPUTERRORMSG:
-                errorArtwork["noinput"].visible = true;
-                stage.setChildIndex(errorArtwork["noinput"], stage.children.length - 1);
+                this.errorArtwork["noinput"].visible = true;
+                this.stage.setChildIndex(
+                    this.errorArtwork["noinput"],
+                    this.stage.children.length - 1
+                );
                 break;
             default:
                 // Show and populate errorText div
-                const errorText = document.getElementById("errorText");
-                errorText.classList.add("show");
-                const errorTextContent = document.getElementById("errorTextContent");
-                errorTextContent.innerHTML = msg;
+                this.errorText.classList.add("show");
+                this.errorTextContent.innerHTML = msg;
                 break;
         }
 
@@ -3558,172 +3215,168 @@ function Activity() {
         }
 
         if (myTimeout > 0) {
-            errorMsgTimeoutID = setTimeout(function () {
-                hideMsgs();
+            const that = this;
+            this.errorMsgTimeoutID = setTimeout(function () {
+                that.hideMsgs();
             }, myTimeout);
         }
 
-        refreshCanvas();
+        this.refreshCanvas();
     };
 
     /*
      * Hides cartesian grid
      */
-    _hideCartesian = function () {
-        cartesianBitmap.visible = false;
-        cartesianBitmap.updateCache();
-        update = true;
+    this._hideCartesian = function () {
+        this.cartesianBitmap.visible = false;
+        this.cartesianBitmap.updateCache();
+        this.update = true;
     };
 
     /*
      * Shows cartesian grid
      */
     this._showCartesian = function () {
-        cartesianBitmap.visible = true;
-        cartesianBitmap.updateCache();
-        update = true;
+        this.cartesianBitmap.visible = true;
+        this.cartesianBitmap.updateCache();
+        this.update = true;
     };
 
     /*
      * Hides polar grid
      */
-    _hidePolar = function () {
-        polarBitmap.visible = false;
-        polarBitmap.updateCache();
-        update = true;
+    this._hidePolar = function () {
+        this.polarBitmap.visible = false;
+        this.polarBitmap.updateCache();
+        this.update = true;
     };
 
     /*
      * Shows polar grid
      */
     this._showPolar = function () {
-        polarBitmap.visible = true;
-        polarBitmap.updateCache();
-        update = true;
+        this.polarBitmap.visible = true;
+        this.polarBitmap.updateCache();
+        this.update = true;
     };
 
     /*
      * Hides musical treble staff
      */
-    _hideTreble = function () {
-        trebleBitmap.visible = false;
-        trebleBitmap.updateCache();
-        update = true;
+    this._hideTreble = function () {
+        this.trebleBitmap.visible = false;
+        this.trebleBitmap.updateCache();
+        this.update = true;
     };
 
     /*
      * Shows musical treble staff
      */
     this._showTreble = function () {
-        trebleBitmap.visible = true;
-        trebleBitmap.updateCache();
-        update = true;
+        this.trebleBitmap.visible = true;
+        this.trebleBitmap.updateCache();
+        this.update = true;
     };
 
     /*
      * Hides musical grand staff
      */
-    _hideGrand = function () {
-        grandBitmap.visible = false;
-        grandBitmap.updateCache();
-        update = true;
+    this._hideGrand = function () {
+        this.grandBitmap.visible = false;
+        this.grandBitmap.updateCache();
+        this.update = true;
     };
 
     /*
      * Shows musical grand staff
      */
     this._showGrand = function () {
-        grandBitmap.visible = true;
-        grandBitmap.updateCache();
-        update = true;
+        this.grandBitmap.visible = true;
+        this.grandBitmap.updateCache();
+        this.update = true;
     };
 
     /*
      * Hides musical soprano staff
      */
-    _hideSoprano = function () {
-        sopranoBitmap.visible = false;
-        sopranoBitmap.updateCache();
-        update = true;
+    this._hideSoprano = function () {
+        this.sopranoBitmap.visible = false;
+        this.sopranoBitmap.updateCache();
+        this.update = true;
     };
 
     /*
      * Shows musical soprano staff
      */
     this._showSoprano = function () {
-        sopranoBitmap.visible = true;
-        sopranoBitmap.updateCache();
-        update = true;
+        this.sopranoBitmap.visible = true;
+        this.sopranoBitmap.updateCache();
+        this.update = true;
     };
 
     /*
      * Hides musical alto staff
      */
-    _hideAlto = function () {
-        altoBitmap.visible = false;
-        altoBitmap.updateCache();
-        update = true;
+    this._hideAlto = function () {
+        this.altoBitmap.visible = false;
+        this.altoBitmap.updateCache();
+        this.update = true;
     };
 
     /*
      * Shows musical alto staff
      */
     this._showAlto = function () {
-        altoBitmap.visible = true;
-        altoBitmap.updateCache();
-        update = true;
+        this.altoBitmap.visible = true;
+        this.altoBitmap.updateCache();
+        this.update = true;
     };
 
     /*
      * Hides musical tenor staff
      */
-    _hideTenor = function () {
-        tenorBitmap.visible = false;
-        tenorBitmap.updateCache();
-        update = true;
+    this._hideTenor = function () {
+        this.tenorBitmap.visible = false;
+        this.tenorBitmap.updateCache();
+        this.update = true;
     };
 
     /*
      * Shows musical tenor staff
      */
     this._showTenor = function () {
-        tenorBitmap.visible = true;
-        tenorBitmap.updateCache();
-        update = true;
+        this.tenorBitmap.visible = true;
+        this.tenorBitmap.updateCache();
+        this.update = true;
     };
 
     /*
      * Hides musical bass staff
      */
-    _hideBass = function () {
-        bassBitmap.visible = false;
-        bassBitmap.updateCache();
-        update = true;
+    this._hideBass = function () {
+        this.bassBitmap.visible = false;
+        this.bassBitmap.updateCache();
+        this.update = true;
     };
 
     /*
      * Shows musical bass staff
      */
     this._showBass = function () {
-        bassBitmap.visible = true;
-        bassBitmap.updateCache();
-        update = true;
+        this.bassBitmap.visible = true;
+        this.bassBitmap.updateCache();
+        this.update = true;
     };
-
-    // function pasteStack() {
-    //     closeSubMenus();
-    //     blocks.pasteStack();
-    // };
 
     /*
      * We don't save blocks in the trash, so we need to
      * consolidate the block list and remap the connections.
      */
-    function prepareExport() {
+    this.prepareExport = function () {
         const blockMap = [];
-        let hasMatrixDataBlock = false;
-        for (let blk = 0; blk < blocks.blockList.length; blk++) {
-            const myBlock = blocks.blockList[blk];
+        this.hasMatrixDataBlock = false;
+        for (let blk = 0; blk < this.blocks.blockList.length; blk++) {
+            const myBlock = this.blocks.blockList[blk];
             if (myBlock.trash) {
                 // Don't save blocks in the trash.
                 continue;
@@ -3733,8 +3386,8 @@ function Activity() {
         }
 
         const data = [];
-        for (let blk = 0; blk < blocks.blockList.length; blk++) {
-            const myBlock = blocks.blockList[blk];
+        for (let blk = 0; blk < this.blocks.blockList.length; blk++) {
+            const myBlock = this.blocks.blockList[blk];
             let args = null;
 
             if (myBlock.trash) {
@@ -3765,8 +3418,9 @@ function Activity() {
                     case "start":
                     case "drum":
                         // Find the turtle associated with this block.
-                        const turtle = turtles.turtleList[myBlock.value];
-                        if (turtle == null) {
+                        // eslint-disable-next-line no-case-declarations
+                        const turtle = this.turtles.turtleList[myBlock.value];
+                        if (turtle === null) {
                             args = {
                                 id: Infinity,
                                 collapsed: false,
@@ -3794,16 +3448,22 @@ function Activity() {
                         }
                         break;
                     case "temperament1":
-                        if (blocks.customTemperamentDefined) {
-                            // If temperament block is present
-                            custom = {};
-                            for (const temp in TEMPERAMENT)
-                                if (!(temp in PreDefinedTemperaments))
-                                    custom[temp] = TEMPERAMENT[temp];
+                        if (this.blocks.customTemperamentDefined) {
+                            // If a define temperament block is
+                            // present, find the value of the arg
+                            // block to get the name of the custom
+                            // temperament.
+                            let customName = "custom";
+                            if (myBlock.connections[1] !== null) {
+                                customName = this.blocks.blockList[myBlock.connections[1]].value;
+                            }
+                            // eslint-disable-next-line no-console
+                            console.log(customName);
                             args = {
-                                customTemperamentNotes: custom,
-                                startingPitch: logo.synth.startingPitch,
-                                octaveSpace: octaveRatio
+                                customName: customName,
+                                customTemperamentNotes: getTemperament(customName),
+                                startingPitch: this.logo.synth.startingPitch,
+                                octaveSpace: getOctaveRatio()
                             };
                         }
                         break;
@@ -3849,24 +3509,24 @@ function Activity() {
                             notes: window.savedMatricesNotes,
                             count: window.savedMatricesCount
                         };
-                        hasMatrixDataBlock = true;
+                        this.hasMatrixDataBlock = true;
                         break;
                     default:
                         break;
                 }
             }
 
-            connections = [];
+            const connections = [];
             for (let c = 0; c < myBlock.connections.length; c++) {
                 const mapConnection = blockMap.indexOf(myBlock.connections[c]);
-                if (myBlock.connections[c] == null || mapConnection === -1) {
+                if (myBlock.connections[c] === null || mapConnection === -1) {
                     connections.push(null);
                 } else {
                     connections.push(mapConnection);
                 }
             }
 
-            if (args == null) {
+            if (args === null) {
                 data.push([
                     blockMap.indexOf(blk),
                     myBlock.name,
@@ -3886,60 +3546,27 @@ function Activity() {
         }
 
         return JSON.stringify(data);
-    }
+    };
 
     /*
      * Opens plugin by clicking on the plugin open chooser in the DOM (.json).
      */
-    doOpenPlugin = function () {
-        toolbar.closeAuxToolbar(_showHideAuxMenu);
-        pluginChooser.focus();
-        pluginChooser.click();
+    const doOpenPlugin = function (activity) {
+        activity._doOpenPlugin();
     };
 
-    _hideStopButton = function () {
-        /*
-        if (stopTurtleContainer === null) {
-            return;
-        }
-
-        stopTurtleContainer.visible = false;
-        hardStopTurtleContainer.visible = true;
-        */
+    this._doOpenPlugin = function () {
+        this.toolbar.closeAuxToolbar(showHideAuxMenu);
+        this.pluginChooser.focus();
+        this.pluginChooser.click();
     };
-
-    _showStopButton = function () {
-        /*
-        if (stopTurtleContainer === null) {
-            return;
-        }
-
-        stopTurtleContainer.visible = true;
-        hardStopTurtleContainer.visible = false;
-        */
-    };
-
-    // function blinkPasteButton(bitmap) {
-    //     function handleComplete() {
-    //         createjs.Tween.get(bitmap).to({
-    //             alpha: 1,
-    //             visible: true
-    //         }, 500);
-    //     };
-
-    //     createjs.Tween.get(bitmap).to({
-    //         alpha: 0,
-    //         visible: false
-    //     }, 1000).call(
-    //         handleComplete);
-    // };
 
     /*
      * Specifies that loading an MB project should merge it
      * within the existing project
      */
-    _doMergeLoad = function () {
-        doLoad(true);
+    const _doMergeLoad = function (that) {
+        doLoad(that, true);
     };
 
     /*
@@ -3947,7 +3574,7 @@ function Activity() {
      * e.g. Home, Collapse, Expand
      * These menu items are on the canvas, not the toolbar.
      */
-    _setupPaletteMenu = function (turtleBlocksScale) {
+    this._setupPaletteMenu = function () {
         let removed = false;
         if (docById("buttoncontainerBOTTOM")) {
             removed = true;
@@ -3955,7 +3582,7 @@ function Activity() {
                 docById("buttoncontainerBOTTOM")
             );
         }
-        const btnSize = cellSize;
+        const btnSize = this.cellSize;
         // Lower right
         let x = this._innerWidth - 4 * btnSize - 27.5;
         const y = this._innerHeight - 57.5;
@@ -3963,10 +3590,12 @@ function Activity() {
 
         const ButtonHolder = document.createElement("div");
         ButtonHolder.setAttribute("id", "buttoncontainerBOTTOM");
-        if (!removed) ButtonHolder.style.display = "none"; //  if firsttime: make visible later.
+        if (!removed) {
+            ButtonHolder.style.display = "none"; //  if firsttime: make visible later.
+        }
         document.body.appendChild(ButtonHolder);
 
-        homeButtonContainer = _makeButton(
+        this.homeButtonContainer = this._makeButton(
             GOHOMEFADEDBUTTON,
             _("Home") + " [" + _("Home").toUpperCase() + "]",
             x,
@@ -3974,18 +3603,26 @@ function Activity() {
             btnSize,
             0
         );
-        that._loadButtonDragHandler(homeButtonContainer, x, y, _findBlocks);
 
-        boundary.hide();
+        this._loadButtonDragHandler(this.homeButtonContainer, findBlocks, this);
 
-        x += dx;
-
-        hideBlocksContainer = _makeButton(SHOWBLOCKSBUTTON, _("Show/hide block"), x, y, btnSize, 0);
-        that._loadButtonDragHandler(hideBlocksContainer, x, y, _changeBlockVisibility);
+        this.boundary.hide();
 
         x += dx;
 
-        collapseBlocksContainer = _makeButton(
+        this.hideBlocksContainer = this._makeButton(
+            SHOWBLOCKSBUTTON,
+            _("Show/hide block"),
+            x,
+            y,
+            btnSize,
+            0
+        );
+        this._loadButtonDragHandler(this.hideBlocksContainer, changeBlockVisibility, this);
+
+        x += dx;
+
+        this.collapseBlocksContainer = this._makeButton(
             COLLAPSEBLOCKSBUTTON,
             _("Expand/collapse blocks"),
             x,
@@ -3993,147 +3630,74 @@ function Activity() {
             btnSize,
             0
         );
-        that._loadButtonDragHandler(collapseBlocksContainer, x, y, _toggleCollapsibleStacks);
+        this._loadButtonDragHandler(this.collapseBlocksContainer, toggleCollapsibleStacks, this);
 
         x += dx;
 
-        smallerContainer = _makeButton(SMALLERBUTTON, _("Decrease block size"), x, y, btnSize, 0);
-        that._loadButtonDragHandler(smallerContainer, x, y, doSmallerBlocks);
+        this.smallerContainer = this._makeButton(
+            SMALLERBUTTON,
+            _("Decrease block size"),
+            x,
+            y,
+            btnSize,
+            0
+        );
+        this._loadButtonDragHandler(this.smallerContainer, doSmallerBlocks, this);
 
         x += dx;
 
-        largerContainer = _makeButton(BIGGERBUTTON, _("Increase block size"), x, y, btnSize, 0);
-        that._loadButtonDragHandler(largerContainer, x, y, doLargerBlocks);
+        this.largerContainer = this._makeButton(
+            BIGGERBUTTON,
+            _("Increase block size"),
+            x,
+            y,
+            btnSize,
+            0
+        );
+        that._loadButtonDragHandler(this.largerContainer, doLargerBlocks, this);
     };
 
     /**
      * Toggles display of javaScript editor widget.
      */
-    _toggleJSWindow = () => {
-        new JSEditor();
+    const toggleJSWindow = (activity) => {
+        new JSEditor(activity);
+    };
+
+    const doAnalytics = function (activity) {
+        activity.statsWindow = new StatsWindow(activity);
     };
 
     /*
      * Shows help page
      */
-    _showHelp = function () {
+    const showHelp = function (activity) {
+        activity._showHelp();
+    };
+
+    this._showHelp = function () {
         // Will show welcome page by default.
-        new HelpWidget(null);
+        new HelpWidget(this, false);
     };
 
     /*
      * Shows about page
      */
-    _showAboutPage = function () {
+    const showAboutPage = function (activity) {
+        activity._showAboutPage();
+    };
+
+    this._showAboutPage = function () {
         // Will show welcome page by default.
-        new HelpWidget(null);
-    };
-
-    /*
-     * REDUNDANT
-     */
-    _doMenuButton = function () {
-        _doMenuAnimation(true);
-    };
-
-    /*
-     * REDUNDANT
-     */
-    _doMenuAnimation = function (arg) {
-        let animate = arg;
-        if (arg === undefined) {
-            animate = true;
-        }
-
-        let timeout = 50;
-        if (animate) {
-            timeout = 500;
-        }
-
-        const bitmap = last(menuContainer.children);
-        if (bitmap != null) {
-            if (animate) {
-                const r = bitmap.rotation;
-                if (r % 95.5 !== 0) {
-                    return;
-                }
-
-                createjs.Tween.get(bitmap)
-                    .to({
-                        rotation: r
-                    })
-                    .to(
-                        {
-                            rotation: r + 95.5
-                        },
-                        500
-                    );
-            } else {
-                bitmap.rotation += 95.5;
-            }
-        } else {
-            // Race conditions during load
-            setTimeout(_doMenuAnimation, 50);
-        }
-
-        setTimeout(function () {
-            if (menuButtonsVisible) {
-                menuButtonsVisible = false;
-            } else {
-                menuButtonsVisible = true;
-                if (_THIS_IS_MUSIC_BLOCKS_) {
-                    if (beginnerMode) {
-                        advancedModeContainer.visible = false;
-                    } else {
-                        beginnerModeContainer.visible = true;
-                        that.setScrollerButton();
-                    }
-                } else {
-                    that.setScrollerButton();
-                }
-            }
-            update = true;
-        }, timeout);
-    };
-
-    /*
-     * REDUNDANT
-     */
-    _toggleToolbar = function () {
-        buttonsVisible = !buttonsVisible;
-        menuContainer.visible = buttonsVisible;
-        headerContainer.visible = buttonsVisible;
-        for (const button in onscreenButtons) {
-            onscreenButtons[button].visible = buttonsVisible;
-        }
-
-        for (const button in onscreenMenu) {
-            onscreenMenu[button].visible = buttonsVisible;
-        }
-
-        if (buttonsVisible) {
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                if (beginnerMode) {
-                    advancedModeContainer.visible = false;
-                } else {
-                    beginnerModeContainer.visible = true;
-                    that.setScrollerButton();
-                }
-            } else {
-                that.setScrollerButton();
-            }
-        }
-
-        update = true;
+        new HelpWidget(this, false);
     };
 
     /*
      * Makes non-toolbar buttons, e.g., the palette menu buttons
      */
-    _makeButton = function (name, label, x, y) {
+    this._makeButton = function (name, label, x, y) {
         const container = document.createElement("div");
         container.setAttribute("id", "" + label);
-
         container.setAttribute("class", "tooltipped");
         container.setAttribute("data-tooltip", label);
         container.setAttribute("data-position", "top");
@@ -4141,14 +3705,18 @@ function Activity() {
             html: true,
             delay: 100
         });
+
+        const that = this;
+        // eslint-disable-next-line no-unused-vars
         container.onmouseover = (event) => {
-            if (!loading) {
+            if (!that.loading) {
                 document.body.style.cursor = "pointer";
             }
         };
 
+        // eslint-disable-next-line no-unused-vars
         container.onmouseout = (event) => {
-            if (!loading) {
+            if (!that.loading) {
                 document.body.style.cursor = "default";
             }
         };
@@ -4172,27 +3740,26 @@ function Activity() {
     /**
      * Handles button dragging, long hovering and prevents multiple button presses.
      * @param container longAction
-     * @param ox extraLongAction,
-     * @param oy longImg,
      * @param hoverAction extraLongImg
      */
-    this._loadButtonDragHandler = function (container, ox, oy, action, actionClick, arg) {
+    this._loadButtonDragHandler = function (container, actionClick, arg) {
+        const that = this;
+        // eslint-disable-next-line no-unused-vars
         container.onmousedown = function (event) {
-            if (!loading) {
+            if (!that.loading) {
                 document.body.style.cursor = "default";
             }
-            action();
-            if (actionClick) actionClick(arg);
+            actionClick(arg);
         };
     };
 
     /*
      * Handles pasted strings into input fields
      */
-    pasted = function () {
+    this.pasted = function () {
         const rawData = docById("paste").value;
         let obj = "";
-        if (rawData == null || rawData === "") {
+        if (rawData === null || rawData === "") {
             return;
         }
 
@@ -4200,18 +3767,18 @@ function Activity() {
         try {
             obj = JSON.parse(cleanData);
         } catch (e) {
-            errorMsg(_("Could not parse JSON input."));
+            this.errorMsg(_("Could not parse JSON input."));
             return;
         }
 
-        for (const name in blocks.palettes.dict) {
-            blocks.palettes.dict[name].hideMenu(true);
+        for (const name in this.palettes.dict) {
+            this.palettes.dict[name].hideMenu(true);
         }
 
-        refreshCanvas();
+        this.refreshCanvas();
 
-        blocks.loadNewBlocks(obj);
-        pasteBox.hide();
+        this.blocks.loadNewBlocks(obj);
+        this.pasteBox.hide();
     };
 
     /**
@@ -4219,132 +3786,123 @@ function Activity() {
      * Repositions elements on screen by a certain amount (dy).
      * @param dy how much of a change in y
      */
-    deltaY = function (dy) {
-        toolbarHeight += dy;
-        for (let i = 0; i < onscreenButtons.length; i++) {
-            onscreenButtons[i].y += dy;
+    this.deltaY = function (dy) {
+        this.toolbarHeight += dy;
+        for (let i = 0; i < this.onscreenButtons.length; i++) {
+            this.onscreenButtons[i].y += dy;
         }
 
-        for (let i = 0; i < onscreenMenu.length; i++) {
-            onscreenMenu[i].y += dy;
+        for (let i = 0; i < this.onscreenMenu.length; i++) {
+            this.onscreenMenu[i].y += dy;
         }
 
-        palettes.deltaY(dy);
-        turtles.deltaY(dy);
+        this.palettes.deltaY(dy);
+        this.turtles.deltaY(dy);
 
-        // menuContainer.y += dy;
-        blocksContainer.y += dy;
-        refreshCanvas();
-    };
-
-    /*
-     * Open aux menu
-     */
-    _openAuxMenu = function () {
-        if (!turtles.running() && toolbarHeight === 0) {
-            _showHideAuxMenu(false);
-        }
-    };
-
-    /*
-     * Toggles Aux menu visibility and positioning
-     */
-    _showHideAuxMenu = function (resize) {
-        let cellsize = 55,
-            dy;
-        if (!resize && toolbarHeight === 0) {
-            dy = cellsize + LEADING + 5;
-            toolbarHeight = dy;
-
-            palettes.deltaY(dy);
-            turtles.deltaY(dy);
-
-            blocksContainer.y += dy;
-            blocks.checkBounds();
-        } else {
-            dy = toolbarHeight;
-            toolbarHeight = 0;
-
-            palettes.deltaY(-dy);
-            turtles.deltaY(-dy);
-
-            blocksContainer.y -= dy;
-        }
-
-        refreshCanvas();
+        // this.menuContainer.y += dy;
+        this.blocksContainer.y += dy;
+        this.refreshCanvas();
     };
 
     /*
      * Ran once dom is ready and editable
      * Sets up dependencies and vars
      */
+    // eslint-disable-next-line no-unused-vars
     this.domReady = async function (doc) {
-        saveLocally = undefined;
+        this.saveLocally = undefined;
 
         // Do we need to update the stage?
-        update = true;
+        this.update = true;
 
         // Get things started
         await this.init();
+    };
+
+    this.__saveLocally = function () {
+        const data = this.prepareExport();
+
+        if (this.storage.currentProject === undefined) {
+            try {
+                this.storage.currentProject = "My Project";
+                this.storage.allProjects = JSON.stringify(["My Project"]);
+            } catch (e) {
+                // Edge case, eg. Firefox localSorage DB corrupted
+                // eslint-disable-next-line no-console
+                console.error(e);
+            }
+        }
+
+        let p = "";
+        try {
+            p = this.storage.currentProject;
+            this.storage["SESSION" + p] = data;
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error(e);
+        }
+
+        const img = new Image();
+        const svgData = doSVG(
+            this.canvas,
+            this.logo,
+            this.turtles,
+            320,
+            240,
+            320 / this.canvas.width
+        );
+
+        img.onload = function () {
+            const bitmap = new createjs.Bitmap(img);
+            const bounds = bitmap.getBounds();
+            bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+            try {
+                that.storage["SESSIONIMAGE" + p] = bitmap.bitmapCache.getCacheDataURL();
+            } catch (e) {
+                // eslint-disable-next-line no-console
+                console.error(e);
+            }
+        };
+
+        img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(svgData)));
     };
 
     /*
      * Inits everything. The main function.
      */
     this.init = async function () {
-        // console.debug(
-        //     "document.body.clientWidth and clientHeight: " +
-        //         document.body.clientWidth +
-        //         " " +
-        //         document.body.clientHeight
-        // );
         this._clientWidth = document.body.clientWidth;
         this._clientHeight = document.body.clientHeight;
-
         this._innerWidth = window.innerWidth;
         this._innerHeight = window.innerHeight;
         this._outerWidth = window.outerWidth;
         this._outerHeight = window.outerHeight;
 
-        // console.debug(
-        //     "window inner/outer width/height: " +
-        //         this._innerWidth +
-        //         ", " +
-        //         this._innerHeight +
-        //         " " +
-        //         this._outerWidth +
-        //         ", " +
-        //         this._outerHeight
-        // );
-
-        if (sugarizerCompatibility.isInsideSugarizer()) {
-            //sugarizerCompatibility.data.blocks = prepareExport();
-            storage = sugarizerCompatibility.data;
-        } else {
-            storage = localStorage;
-        }
-
         docById("loader").className = "loader";
 
         /*
-         * run browser check before implementing onblur --> stop MB functionality
-         * (This is being done to stop MB to lose focus when increasing/decreasing volume on Firefox)
+         * Run browser check before implementing onblur -->
+         * stop MB functionality
+         * (This is being done to stop MB to lose focus when
+         * increasing/decreasing volume on Firefox)
          */
 
         doBrowserCheck();
 
+        const that = this;
+
         if (!jQuery.browser.mozilla) {
             window.onblur = function () {
-                that.doHardStopButton(true);
+                doHardStopButton(that, true);
             };
         }
 
-        stage = new createjs.Stage(canvas);
-        createjs.Touch.enable(stage);
+        this.stage = new createjs.Stage(this.canvas);
+        createjs.Touch.enable(this.stage);
 
         // createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
         // createjs.Ticker.framerate = 15;
-        // createjs.Ticker.addEventListener('tick', stage);
+        // createjs.Ticker.addEventListener('tick', this.stage);
         // createjs.Ticker.addEventListener('tick', that.__tick);
 
         let mouseEvents = 0;
@@ -4359,25 +3917,25 @@ function Activity() {
             that.__tick();
         });
 
-        _createMsgContainer(
+        this._createMsgContainer(
             "#ffffff",
             "#7a7a7a",
             function (text) {
-                msgText = text;
+                that.msgText = text;
             },
             130
         );
 
-        _createMsgContainer(
+        this._createMsgContainer(
             "#ffcbc4",
             "#ff0031",
             function (text) {
-                errorMsgText = text;
+                that.errorMsgText = text;
             },
             130
         );
 
-        _createErrorContainers();
+        this._createErrorContainers();
 
         /* Z-Order (top to bottom):
          *   menus
@@ -4387,501 +3945,127 @@ function Activity() {
          *   turtles
          *   logo (drawing)
          */
-        blocksContainer = new createjs.Container();
-        trashContainer = new createjs.Container();
-        turtleContainer = new createjs.Container();
-        stage.addChild(turtleContainer);
-        stage.addChild(trashContainer, blocksContainer);
-        that._setupBlocksContainerEvents();
+        this.blocksContainer = new createjs.Container();
+        this.trashContainer = new createjs.Container();
+        this.turtleContainer = new createjs.Container();
+        this.stage.addChild(this.turtleContainer);
+        this.stage.addChild(this.trashContainer);
+        this.stage.addChild(this.blocksContainer);
+        this._setupBlocksContainerEvents();
 
-        trashcan = new Trashcan(trashContainer, canvas, cellSize, refreshCanvas);
+        this.trashcan = new Trashcan(this);
+        this.turtles = new Turtles(this);
+        this.boundary = new Boundary(this.blocksContainer);
+        this.blocks = new Blocks(this);
+        this.palettes = new Palettes(this);
+        this.palettes.init();
+        this.logo = new Logo(this);
 
-        // Put the boundary in the turtles container so it scrolls with the blocks.
-        turtles = new Turtles();
-        turtles.masterStage = stage;
-        turtles.stage = turtleContainer;
-        turtles.canvas = canvas;
-        turtles.hideMenu = hideAuxMenu;
-        turtles.doClear = _allClear;
-        turtles.hideGrids = hideGrids;
-        turtles.doGrid = _doCartesianPolar;
-        turtles.refreshCanvas = refreshCanvas;
+        this.pasteBox = new PasteBox(this);
+        this.languageBox = new LanguageBox(this);
 
-        // Put the boundary in the blocks container so it scrolls with the blocks.
-
-        boundary = new Boundary(blocksContainer);
-
-        blocks = new Blocks(this);
-        blocks
-            .setCanvas(canvas)
-            .setStage(blocksContainer)
-            .setRefreshCanvas(refreshCanvas)
-            .setTrashcan(trashcan)
-            .setUpdateStage(stage.update)
-            .setGetStageScale(getStageScale)
-            .setTurtles(turtles)
-            .setErrorMsg(errorMsg)
-            .setHomeContainers(setHomeContainers, boundary);
-
-        palettes = new Palettes();
-        palettes
-            .setBlocksContainer(blocksContainer)
-            .setSize(cellSize)
-            .setSearch(showSearchWidget, hideSearchWidget)
-            .setBlocks(blocks)
-            .init();
-
-        // initPalettes(palettes);
-
-        logo = new Logo();
-        logo.canvas = canvas;
-        logo.blocks = blocks;
-        logo.turtles = turtles;
-        logo.stage = turtleContainer;
-        logo.refreshCanvas = refreshCanvas;
-        logo.textMsg = textMsg;
-        logo.errorMsg = errorMsg;
-        logo.hideMsgs = hideMsgs;
-        logo.onStopTurtle = that.onStopTurtle;
-        logo.onRunTurtle = that.onRunTurtle;
-        logo.getStageX = getStageX;
-        logo.getStageY = getStageY;
-        logo.getStageMouseDown = getStageMouseDown;
-        logo.getCurrentKeyCode = that.getCurrentKeyCode;
-        logo.clearCurrentKeyCode = that.clearCurrentKeyCode;
-        // logo.meSpeak = meSpeak;
-
-        blocks.setLogo(logo);
-
-        pasteBox = new PasteBox();
-        pasteBox.setCanvas(canvas).setStage(stage).setRefreshCanvas(refreshCanvas).setPaste(paste);
-
-        languageBox = new LanguageBox();
-        languageBox.setMessage(textMsg);
-
-        // show help on startup if first time uer
-        if (firstTimeUser) {
-            _showHelp();
-        }
-
-        function PlanetInterface(storage) {
-            this.planet = null;
-            this.iframe = null;
-            this.mainCanvas = null;
-
-            this.hideMusicBlocks = function () {
-                hideSearchWidget();
-                widgetWindows.hideAllWindows();
-
-                logo.doStopTurtles();
-                docById("helpElem").style.visibility = "hidden";
-                document.querySelector(".canvasHolder").classList.add("hide");
-                document.querySelector("#canvas").style.display = "none";
-                document.querySelector("#theme-color").content = "#8bc34a";
-                setTimeout(function () {
-                    // Time to release the mouse
-                    stage.enableDOMEvents(false);
-                }, 250);
-                window.scroll(0, 0);
-            };
-
-            this.showMusicBlocks = function () {
-                document.title = planet.getCurrentProjectName();
-                document.getElementById("toolbars").style.display = "block";
-                document.getElementById("palette").style.display = "block";
-
-                prepSearchWidget();
-                widgetWindows.showWindows();
-
-                document.querySelector(".canvasHolder").classList.remove("hide");
-                document.querySelector("#canvas").style.display = "";
-                document.querySelector("#theme-color").content = platformColor.header;
-                stage.enableDOMEvents(true);
-                window.scroll(0, 0);
-                docById("buttoncontainerBOTTOM").style.display = "block";
-                docById("buttoncontainerTOP").style.display = "block";
-            };
-
-            this.showPlanet = function () {
-                this.planet.open(this.mainCanvas.toDataURL("image/png"));
-                this.iframe.style.display = "block";
-                try {
-                    this.iframe.contentWindow.document.getElementById("local-tab").click();
-                } catch (e) {
-                    // console.error(e);
-                }
-            };
-
-            this.hidePlanet = function () {
-                this.iframe.style.display = "none";
-            };
-
-            this.openPlanet = function () {
-                // console.debug("SAVE LOCALLY");
-                this.saveLocally();
-                this.hideMusicBlocks();
-                this.showPlanet();
-            };
-
-            this.closePlanet = function () {
-                this.hidePlanet();
-                this.showMusicBlocks();
-            };
-
-            this.loadProjectFromData = function (data, merge) {
-                // console.debug("LOAD PROJECT FROM DATA");
-                if (merge === undefined) {
-                    merge = false;
-                }
-
-                this.closePlanet();
-                if (!merge) {
-                    sendAllToTrash(false, true);
-                }
-
-                if (data === undefined) {
-                    // console.debug("loadRawProject: data is undefined... punting");
-                    errorMsg(_("project undefined"));
-                    return;
-                }
-                textMsg(this.getCurrentProjectName());
-                // console.debug("LOADING" + this.getCurrentProjectName());
-                // console.debug("loadRawProject " + data);
-                loading = true;
-                document.body.style.cursor = "wait";
-                doLoadAnimation();
-                _allClear(false);
-
-                // First, hide the palettes as they will need updating.
-                blocks.palettes._hideMenus(true);
-
-                const __afterLoad = function () {
-                    document.removeEventListener("finishedLoading", __afterLoad);
-                };
-
-                if (document.addEventListener) {
-                    document.addEventListener("finishedLoading", __afterLoad);
-                } else {
-                    document.attachEvent("finishedLoading", __afterLoad);
-                }
-
-                try {
-                    const obj = JSON.parse(data);
-                    blocks.loadNewBlocks(obj);
-                } catch (e) {
-                    // console.debug("loadRawProject: could not parse project data");
-                    errorMsg(e);
-                }
-
-                loading = false;
-                document.body.style.cursor = "default";
-            };
-
-            this.loadProjectFromFile = function () {
-                document.querySelector("#myOpenFile").focus();
-                document.querySelector("#myOpenFile").click();
-                window.scroll(0, 0);
-            };
-
-            this.newProject = function () {
-                // console.debug("NEW");
-                this.closePlanet();
-                this.initialiseNewProject();
-                that._loadStart();
-                this.saveLocally();
-            };
-
-            this.initialiseNewProject = function (name) {
-                this.planet.ProjectStorage.initialiseNewProject(name);
-                sendAllToTrash();
-                refreshCanvas();
-                blocks.trashStacks = [];
-            };
-
-            this.saveLocally = function () {
-                stage.update(event);
-                // console.debug("overwriting session data");
-                const data = prepareExport();
-                const svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
-                try {
-                    if (svgData == null || svgData === "") {
-                        this.planet.ProjectStorage.saveLocally(data, null);
-                    } else {
-                        const img = new Image();
-                        const t = this;
-                        img.onload = function () {
-                            const bitmap = new createjs.Bitmap(img);
-                            const bounds = bitmap.getBounds();
-                            bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-                            t.planet.ProjectStorage.saveLocally(
-                                data,
-                                bitmap.bitmapCache.getCacheDataURL()
-                            );
-                        };
-                        img.src =
-                            "data:image/svg+xml;base64," +
-                            window.btoa(unescape(encodeURIComponent(svgData)));
-                    }
-                } catch (e) {
-                    // console.error(e);
-                    if (
-                        e.code === DOMException.QUOTA_EXCEEDED_ERR ||
-                        e.message === "Not enough space to save locally"
-                    )
-                        textMsg(
-                            _(
-                                "Error: Unable to save because you ran out of local storage. Try deleting some saved projects."
-                            )
-                        );
-                    else throw e;
-                }
-                //if (sugarizerCompatibility.isInsideSugarizer()) {
-                //    sugarizerCompatibility.saveLocally();
-                //}
-            };
-
-            this.openCurrentProject = async function () {
-                return await this.planet.ProjectStorage.getCurrentProjectData();
-            };
-
-            this.openProjectFromPlanet = function (id, error) {
-                this.planet.openProjectFromPlanet(id, error);
-            };
-
-            this.onConverterLoad = function () {
-                window.Converter = this.planet.Converter;
-            };
-
-            this.getCurrentProjectName = function () {
-                return this.planet.ProjectStorage.getCurrentProjectName();
-            };
-
-            this.getCurrentProjectDescription = function () {
-                return this.planet.ProjectStorage.getCurrentProjectDescription();
-            };
-
-            this.getCurrentProjectImage = function () {
-                return this.planet.ProjectStorage.getCurrentProjectImage();
-            };
-
-            this.getTimeLastSaved = function () {
-                return this.planet.ProjectStorage.TimeLastSaved;
-            };
-
-            this.init = async function () {
-                this.iframe = document.getElementById("planet-iframe");
-                try {
-                    await this.iframe.contentWindow.makePlanet(
-                        _THIS_IS_MUSIC_BLOCKS_,
-                        storage,
-                        window._
-                    );
-                    this.planet = this.iframe.contentWindow.p;
-                    this.planet.setLoadProjectFromData(this.loadProjectFromData.bind(this));
-                    this.planet.setPlanetClose(this.closePlanet.bind(this));
-                    this.planet.setLoadNewProject(this.newProject.bind(this));
-                    this.planet.setLoadProjectFromFile(this.loadProjectFromFile.bind(this));
-                    this.planet.setOnConverterLoad(this.onConverterLoad.bind(this));
-                } catch (e) {
-                    // console.error(e);
-                    // console.debug("Planet not available");
-                    this.planet = null;
-                }
-
-                window.Converter = this.planet.Converter;
-                this.mainCanvas = canvas;
-            };
+        // Show help on startup if first-time user.
+        if (this.firstTimeUser) {
+            this._showHelp();
         }
 
         try {
-            // console.debug("TRYING TO OPEN PLANET");
-            planet = new PlanetInterface(storage);
-            await planet.init();
+            this.planet = new PlanetInterface(this);
+            await this.planet.init();
         } catch (e) {
-            planet = undefined;
+            this.planet = undefined;
         }
 
-        save = new SaveInterface(planet);
-        save.setVariables([
-            ["logo", logo],
-            ["turtles", turtles],
-            ["storage", storage],
-            ["printBlockSVG", _printBlockSVG],
-            ["planet", planet]
-        ]);
+        this.save = new SaveInterface(this);
 
-        toolbar = new Toolbar();
-        toolbar.init(beginnerMode);
+        this.toolbar = new Toolbar();
+        this.toolbar.init(this);
 
-        toolbar.renderLogoIcon(_showAboutPage);
-        toolbar.renderPlayIcon(that._doFastButton);
-        toolbar.renderStopIcon(that.doHardStopButton);
-        toolbar.renderNewProjectIcon(_afterDelete);
-        toolbar.renderLoadIcon(doLoad);
-        toolbar.renderSaveIcons(
-            save.saveHTML.bind(save),
+        this.toolbar.renderLogoIcon(showAboutPage);
+        this.toolbar.renderPlayIcon(doFastButton);
+        this.toolbar.renderStopIcon(doHardStopButton);
+        this.toolbar.renderNewProjectIcon(_afterDelete);
+        this.toolbar.renderLoadIcon(doLoad);
+        this.toolbar.renderSaveIcons(
+            this.save.saveHTML.bind(this.save),
             doSVG,
-            save.saveSVG.bind(save),
-            save.savePNG.bind(save),
-            save.saveWAV.bind(save),
-            save.saveLilypond.bind(save),
-            save.saveAbc.bind(save),
-            save.saveMxml.bind(save),
-            save.saveBlockArtwork.bind(save)
+            this.save.saveSVG.bind(this.save),
+            this.save.savePNG.bind(this.save),
+            this.save.saveWAV.bind(this.save),
+            this.save.saveLilypond.bind(this.save),
+            this.save.saveAbc.bind(this.save),
+            this.save.saveMxml.bind(this.save),
+            this.save.saveBlockArtwork.bind(this.save)
         );
-        toolbar.renderPlanetIcon(planet, _doOpenSamples);
-        toolbar.renderMenuIcon(_showHideAuxMenu);
-        toolbar.renderHelpIcon(_showHelp);
-        toolbar.renderModeSelectIcon(doSwitchMode);
-        toolbar.renderRunSlowlyIcon(that._doSlowButton);
-        toolbar.renderRunStepIcon(_doStepButton);
-        toolbar.renderAdvancedIcons(
-            () => {
-                if (!logo.statsWindow) logo.statsWindow = new StatsWindow();
-            },
-            doOpenPlugin,
-            deletePlugin,
-            setScroller,
-            that._setupBlocksContainerEvents
-        );
-        toolbar.renderMergeIcon(_doMergeLoad);
-        toolbar.renderRestoreIcon(_restoreTrash);
-        toolbar.renderChooseKeyIcon(chooseKeyMenu);
-        toolbar.renderJavaScriptIcon(_toggleJSWindow);
-        toolbar.renderLanguageSelectIcon(languageBox);
-        toolbar.renderWrapIcon();
+        this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
+        this.toolbar.renderMenuIcon(showHideAuxMenu);
+        this.toolbar.renderHelpIcon(showHelp);
+        this.toolbar.renderModeSelectIcon(doSwitchMode);
+        this.toolbar.renderRunSlowlyIcon(doSlowButton);
+        this.toolbar.renderRunStepIcon(doStepButton);
+        this.toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin, setScroller);
+        this.toolbar.renderMergeIcon(_doMergeLoad);
+        this.toolbar.renderRestoreIcon(restoreTrash);
+        this.toolbar.renderChooseKeyIcon(chooseKeyMenu);
+        this.toolbar.renderJavaScriptIcon(toggleJSWindow);
+        this.toolbar.renderLanguageSelectIcon(this.languageBox);
+        this.toolbar.renderWrapIcon();
 
-        if (planet !== undefined) {
-            saveLocally = planet.saveLocally.bind(planet);
+        initPalettes(this.palettes);
+
+        if (this.planet !== undefined) {
+            this.saveLocally = this.planet.saveLocally.bind(this.planet);
         } else {
-            __saveLocally = function () {
-                // console.debug("overwriting session data (local)");
-                const data = prepareExport();
-
-                if (sugarizerCompatibility.isInsideSugarizer()) {
-                    //sugarizerCompatibility.data.blocks = prepareExport();
-                    storage = sugarizerCompatibility.data;
-                } else {
-                    storage = localStorage;
-                }
-
-                if (storage.currentProject === undefined) {
-                    try {
-                        storage.currentProject = "My Project";
-                        storage.allProjects = JSON.stringify(["My Project"]);
-                    } catch (e) {
-                        // Edge case, eg. Firefox localSorage DB corrupted
-                        // console.error(e);
-                    }
-                }
-
-                try {
-                    const p = storage.currentProject;
-                    storage["SESSION" + p] = prepareExport();
-                } catch (e) {
-                    // console.error(e);
-                }
-
-                const img = new Image();
-                const svgData = doSVG(canvas, logo, turtles, 320, 240, 320 / canvas.width);
-
-                img.onload = function () {
-                    const bitmap = new createjs.Bitmap(img);
-                    const bounds = bitmap.getBounds();
-                    bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-                    try {
-                        storage["SESSIONIMAGE" + p] = bitmap.bitmapCache.getCacheDataURL();
-                    } catch (e) {
-                        // console.error(e);
-                    }
-                };
-
-                img.src =
-                    "data:image/svg+xml;base64," +
-                    window.btoa(unescape(encodeURIComponent(svgData)));
-                if (sugarizerCompatibility.isInsideSugarizer()) {
-                    sugarizerCompatibility.saveLocally();
-                }
-            };
-
-            saveLocally = __saveLocally;
+            this.saveLocally = this.__saveLocally;
         }
 
-        window.saveLocally = saveLocally;
-        logo.saveLocally = saveLocally;
+        window.saveLocally = this.saveLocally;
 
-        initPalettes(palettes);
-
-        const __clearFunction = function () {
-            sendAllToTrash(true, false);
-            if (planet !== undefined) {
-                planet.initialiseNewProject.bind(planet);
-            }
-        };
-
-        // FIXME: Third arg indicates beginner mode
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            initBasicProtoBlocks(palettes, blocks, beginnerMode);
-        } else {
-            initBasicProtoBlocks(palettes, blocks);
-        }
+        initBasicProtoBlocks(this);
 
         // Load any macros saved in local storage.
-        macroData = storage.macros;
-        if (macroData != null) {
-            processMacroData(macroData, palettes, blocks, macroDict);
+        // this.storage.macros = null;
+        this.macroData = this.storage.macros;
+        if (this.macroData !== null) {
+            processMacroData(this.macroData, this.palettes, this.blocks, this.macroDict);
         }
 
-        // Blocks and palettes need access to the macros dictionary.
-        blocks.setMacroDictionary(macroDict);
-        palettes.setMacroDictionary(macroDict);
-
         // Load any plugins saved in local storage.
-        pluginData = storage.plugins;
-        if (pluginData != null) {
-            updatePluginObj(
-                processPluginData(
-                    pluginData,
-                    palettes,
-                    blocks,
-                    logo.evalFlowDict,
-                    logo.evalArgDict,
-                    logo.evalParameterDict,
-                    logo.evalSetterDict,
-                    logo.evalOnStartList,
-                    logo.evalOnStopList,
-                    palettes.pluginMacros
-                )
-            );
+        this.storage.plugins = null;
+        this.pluginData = this.storage.plugins;
+        if (this.pluginData !== null && this.pluginData !== "null") {
+            updatePluginObj(this, processPluginData(this, this.pluginData));
         }
 
         // Load custom mode saved in local storage.
-        const custommodeData = storage.custommode;
+        const custommodeData = this.storage.custommode;
         if (custommodeData !== undefined) {
+            // FIX ME
             const customMode = JSON.parse(custommodeData);
-            // console.debug("restoring custom mode: " + customMode);
         }
 
-        fileChooser.addEventListener("click", function (event) {
-            this.value = null;
+        // eslint-disable-next-line no-unused-vars
+        this.fileChooser.addEventListener("click", function (event) {
+            that.value = null;
         });
 
-        fileChooser.addEventListener(
+        this.fileChooser.addEventListener(
             "change",
+            // eslint-disable-next-line no-unused-vars
             function (event) {
                 // Read file here.
                 const reader = new FileReader();
 
+                // eslint-disable-next-line no-unused-vars
                 reader.onload = function (theFile) {
-                    loading = true;
+                    that.loading = true;
                     document.body.style.cursor = "wait";
-                    doLoadAnimation();
+                    that.doLoadAnimation();
 
                     setTimeout(function () {
                         const rawData = reader.result;
-                        if (rawData == null || rawData === "") {
-                            // console.debug("rawData is " + rawData);
-                            errorMsg(
+                        if (rawData === null || rawData === "") {
+                            that.errorMsg(
                                 _("Cannot load project from the file. Please check the file type.")
                             );
                         } else {
@@ -4896,57 +4080,58 @@ function Activity() {
                                     obj = JSON.parse(cleanData);
                                 }
                                 // First, hide the palettes as they will need updating.
-                                for (const name in blocks.palettes.dict) {
-                                    blocks.palettes.dict[name].hideMenu(true);
+                                for (const name in that.palettes.dict) {
+                                    that.palettes.dict[name].hideMenu(true);
                                 }
 
-                                stage.removeAllEventListeners("trashsignal");
+                                that.stage.removeAllEventListeners("trashsignal");
 
-                                if (!merging) {
+                                if (!that.merging) {
                                     // Wait for the old blocks to be removed.
+                                    // eslint-disable-next-line no-unused-vars
                                     const __listener = function (event) {
-                                        blocks.loadNewBlocks(obj);
-                                        stage.removeAllEventListeners("trashsignal");
-                                        if (planet) {
-                                            planet.saveLocally();
+                                        that.blocks.loadNewBlocks(obj);
+                                        that.stage.removeAllEventListeners("trashsignal");
+                                        if (that.planet) {
+                                            that.planet.saveLocally();
                                         }
                                     };
 
-                                    stage.addEventListener("trashsignal", __listener, false);
-                                    sendAllToTrash(false, false);
-                                    // console.debug("clearing on load...");
-                                    _allClear(false);
-                                    if (planet) {
-                                        planet.closePlanet();
-                                        planet.initialiseNewProject(
-                                            fileChooser.files[0].name.substr(
+                                    that.stage.addEventListener("trashsignal", __listener, false);
+                                    that.sendAllToTrash(false, false);
+                                    that._allClear(false);
+                                    if (that.planet) {
+                                        that.planet.closePlanet();
+                                        that.planet.initialiseNewProject(
+                                            that.fileChooser.files[0].name.substr(
                                                 0,
-                                                fileChooser.files[0].name.lastIndexOf(".")
+                                                that.fileChooser.files[0].name.lastIndexOf(".")
                                             )
                                         );
                                     }
                                 } else {
-                                    merging = false;
-                                    blocks.loadNewBlocks(obj);
+                                    that.merging = false;
+                                    that.blocks.loadNewBlocks(obj);
                                 }
 
-                                loading = false;
-                                refreshCanvas();
+                                that.loading = false;
+                                that.refreshCanvas();
                             } catch (e) {
-                                errorMsg(
+                                that.errorMsg(
                                     _(
                                         "Cannot load project from the file. Please check the file type."
                                     )
                                 );
-                                // console.error(e);
+                                // eslint-disable-next-line no-console
+                                console.error(e);
                                 document.body.style.cursor = "default";
-                                loading = false;
+                                that.loading = false;
                             }
                         }
                     }, 200);
                 };
 
-                reader.readAsText(fileChooser.files[0]);
+                reader.readAsText(that.fileChooser.files[0]);
             },
             false
         );
@@ -4958,15 +4143,16 @@ function Activity() {
             const files = event.dataTransfer.files;
             const reader = new FileReader();
 
+            // eslint-disable-next-line no-unused-vars
             reader.onload = function (theFile) {
-                loading = true;
+                that.loading = true;
                 document.body.style.cursor = "wait";
                 // doLoadAnimation();
 
                 setTimeout(function () {
                     const rawData = reader.result;
-                    if (rawData == null || rawData === "") {
-                        errorMsg(
+                    if (rawData === null || rawData === "") {
+                        that.errorMsg(
                             _("Cannot load project from the file. Please check the file type.")
                         );
                     } else {
@@ -4974,25 +4160,27 @@ function Activity() {
                         let obj;
                         try {
                             if (cleanData.includes("html")) {
-                                dat = cleanData.match('<div class="code">(.+?)</div>');
-                                obj = JSON.parse(dat[1]);
+                                obj = JSON.parse(
+                                    cleanData.match('<div class="code">(.+?)</div>')[1]
+                                );
                             } else {
                                 obj = JSON.parse(cleanData);
                             }
-                            for (const name in blocks.palettes.dict) {
-                                blocks.palettes.dict[name].hideMenu(true);
+                            for (const name in this.blocks.palettes.dict) {
+                                that.palettes.dict[name].hideMenu(true);
                             }
 
-                            stage.removeAllEventListeners("trashsignal");
+                            that.stage.removeAllEventListeners("trashsignal");
 
                             const __afterLoad = function () {
                                 document.removeEventListener("finishedLoading", __afterLoad);
                             };
 
                             // Wait for the old blocks to be removed.
+                            // eslint-disable-next-line no-unused-vars
                             const __listener = function (event) {
-                                blocks.loadNewBlocks(obj);
-                                stage.removeAllEventListeners("trashsignal");
+                                that.blocks.loadNewBlocks(obj);
+                                that.stage.removeAllEventListeners("trashsignal");
 
                                 if (document.addEventListener) {
                                     document.addEventListener("finishedLoading", __afterLoad);
@@ -5001,23 +4189,24 @@ function Activity() {
                                 }
                             };
 
-                            stage.addEventListener("trashsignal", __listener, false);
-                            sendAllToTrash(false, false);
-                            if (planet !== undefined) {
-                                planet.initialiseNewProject(
+                            that.stage.addEventListener("trashsignal", __listener, false);
+                            that.sendAllToTrash(false, false);
+                            if (that.planet !== undefined) {
+                                that.planet.initialiseNewProject(
                                     files[0].name.substr(0, files[0].name.lastIndexOf("."))
                                 );
                             }
 
-                            loading = false;
-                            refreshCanvas();
+                            that.loading = false;
+                            that.refreshCanvas();
                         } catch (e) {
-                            // console.error(e);
-                            errorMsg(
+                            // eslint-disable-next-line no-console
+                            console.error(e);
+                            that.errorMsg(
                                 _("Cannot load project from the file. Please check the file type.")
                             );
                             document.body.style.cursor = "default";
-                            loading = false;
+                            that.loading = false;
                         }
                     }
                 }, 200);
@@ -5041,61 +4230,52 @@ function Activity() {
         dropZone.addEventListener("dragover", __handleDragOver, false);
         dropZone.addEventListener("drop", __handleFileSelect, false);
 
-        allFilesChooser.addEventListener("click", function (event) {
+        // eslint-disable-next-line no-unused-vars
+        this.allFilesChooser.addEventListener("click", function (event) {
             this.value = null;
         });
 
-        pluginChooser.addEventListener("click", function (event) {
+        // eslint-disable-next-line no-unused-vars
+        this.pluginChooser.addEventListener("click", function (event) {
             window.scroll(0, 0);
             this.value = null;
         });
 
-        pluginChooser.addEventListener(
+        this.pluginChooser.addEventListener(
             "change",
+            // eslint-disable-next-line no-unused-vars
             function (event) {
                 window.scroll(0, 0);
 
                 // Read file here.
                 const reader = new FileReader();
 
+                // eslint-disable-next-line no-unused-vars
                 reader.onload = function (theFile) {
-                    loading = true;
+                    that.loading = true;
                     document.body.style.cursor = "wait";
                     //doLoadAnimation();
 
                     setTimeout(function () {
-                        obj = processRawPluginData(
-                            reader.result,
-                            palettes,
-                            blocks,
-                            errorMsg,
-                            logo.evalFlowDict,
-                            logo.evalArgDict,
-                            logo.evalParameterDict,
-                            logo.evalSetterDict,
-                            logo.evalOnStartList,
-                            logo.evalOnStopList,
-                            palettes.pluginMacros
-                        );
+                        const obj = processRawPluginData(that, reader.result);
                         // Save plugins to local storage.
-                        if (obj != null) {
-                            // console.debug(pluginObj);
-                            storage.plugins = preparePluginExports(obj); // preparePluginExports(obj));
+                        if (obj !== null) {
+                            that.storage.plugins = preparePluginExports(that, obj);
                         }
 
                         // Refresh the palettes.
                         setTimeout(function () {
-                            if (palettes.visible) {
-                                palettes.hide();
+                            if (that.palettes.visible) {
+                                that.palettes.hide();
                             }
                         }, 1000);
 
                         document.body.style.cursor = "default";
-                        loading = false;
+                        that.loading = false;
                     }, 200);
                 };
 
-                reader.readAsText(pluginChooser.files[0]);
+                reader.readAsText(that.pluginChooser.files[0]);
             },
             false
         );
@@ -5104,41 +4284,40 @@ function Activity() {
         // createjs.LoadQueue(true, null, true);
 
         // Enable touch interactions if supported on the current device.
-        createjs.Touch.enable(stage, false, true);
+        createjs.Touch.enable(this.stage, false, true);
 
         // Keep tracking the mouse even when it leaves the canvas.
-        stage.mouseMoveOutside = true;
+        this.stage.mouseMoveOutside = true;
 
         // Enabled mouse over and mouse out events.
-        stage.enableMouseOver(10); // default is 20
+        this.stage.enableMouseOver(10); // default is 20
 
-        cartesianBitmap = _createGrid(
+        this.cartesianBitmap = this._createGrid(
             "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(CARTESIAN)))
         );
-        polarBitmap = _createGrid(
+        this.polarBitmap = this._createGrid(
             "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(POLAR)))
         );
-        trebleBitmap = _createGrid(
+        this.trebleBitmap = this._createGrid(
             "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(TREBLE)))
         );
-        grandBitmap = _createGrid(
+        this.grandBitmap = this._createGrid(
             "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND)))
         );
-        sopranoBitmap = _createGrid(
+        this.sopranoBitmap = this._createGrid(
             "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(SOPRANO)))
         );
-        altoBitmap = _createGrid(
+        this.altoBitmap = this._createGrid(
             "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(ALTO)))
         );
-        tenorBitmap = _createGrid(
+        this.tenorBitmap = this._createGrid(
             "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(TENOR)))
         );
-        bassBitmap = _createGrid(
+        this.bassBitmap = this._createGrid(
             "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(BASS)))
         );
 
         const URL = window.location.href;
-        let projectID = null;
         const flags = {
             run: false,
             show: false,
@@ -5146,12 +4325,12 @@ function Activity() {
         };
 
         // Scale the canvas relative to the screen size.
-        _onResize(true);
+        this._onResize(true);
 
         let urlParts;
         const env = [];
 
-        if (!sugarizerCompatibility.isInsideSugarizer() && URL.indexOf("?") > 0) {
+        if (URL.indexOf("?") > 0) {
             let args, url;
             urlParts = URL.split("?");
             if (urlParts[1].indexOf("&") > 0) {
@@ -5161,12 +4340,9 @@ function Activity() {
                         args = newUrlParts[i].split("=");
                         switch (args[0].toLowerCase()) {
                             case "file":
-                                // console.debug(
-                                //     "Warning: old Music Blocks URLs will no longer work."
-                                // );
                                 break;
                             case "id":
-                                projectID = args[1];
+                                this.projectID = args[1];
                                 break;
                             case "run":
                                 if (args[1].toLowerCase() === "true") flags.run = true;
@@ -5179,6 +4355,7 @@ function Activity() {
                                 break;
                             case "inurl":
                                 url = args[1];
+                                // eslint-disable-next-line no-case-declarations
                                 const getJSON = function (url) {
                                     return new Promise(function (resolve, reject) {
                                         const xhr = new XMLHttpRequest();
@@ -5198,10 +4375,10 @@ function Activity() {
 
                                 getJSON(url).then(
                                     function (data) {
-                                        // console.debug('Your JSON result is:  ' + data.arg);
                                         const n = data.arg;
                                         env.push(parseInt(n));
                                     },
+                                    // eslint-disable-next-line no-unused-vars
                                     function (status) {
                                         alert(
                                             "Something went wrong reading JSON-encoded project data."
@@ -5213,7 +4390,7 @@ function Activity() {
                                 url = args[1];
                                 break;
                             default:
-                                errorMsg(_("Invalid parameters"));
+                                this.errorMsg(_("Invalid parameters"));
                                 break;
                         }
                     }
@@ -5225,56 +4402,58 @@ function Activity() {
 
                 //ID is the only arg that can stand alone
                 if (args[0].toLowerCase() === "id") {
-                    projectID = args[1];
+                    this.projectID = args[1];
                 }
             }
         }
 
-        if (projectID != null) {
+        if (this.projectID !== null) {
             setTimeout(function () {
-                // console.debug("loading " + projectID);
-                that.loadStartWrapper(that.loadProject, projectID, flags, env);
+                that.loadStartWrapper(loadProject, that.projectID, flags, env);
             }, 200); // 2000
         } else {
             setTimeout(function () {
-                // console.debug("load new Start block");
-                that.loadStartWrapper(that._loadStart);
+                that.loadStartWrapper(loadStart);
             }, 200); // 2000
         }
 
-        prepSearchWidget();
+        this.prepSearchWidget();
 
+        /*
         document.addEventListener("mousewheel", scrollEvent, false);
         document.addEventListener("DOMMouseScroll", scrollEvent, false);
+        */
 
-        document.onkeydown = __keyPressed;
-        _hideStopButton();
-        if (planet !== undefined) {
-            planet.planet.setAnalyzeProject(analyzeProject);
+        const activity = this;
+        document.onkeydown = function () {
+            activity.__keyPressed(event);
+        };
+
+        if (this.planet !== undefined) {
+            this.planet.planet.setAnalyzeProject(analyzeProject);
         }
     };
 }
 
-activity = new Activity();
+const activity = new Activity();
 
-require(["domReady!", "activity/sugarizer-compatibility"], function (doc) {
-    if (sugarizerCompatibility.isInsideSugarizer()) {
-        window.addEventListener("localized", function () {
-            sugarizerCompatibility.loadData(function () {
-                planet = document.getElementById("planet-iframe");
-                planet.onload = function () {
-                    activity.domReady(doc);
-                };
-            });
-        });
-
-        document.webL10n.setLanguage(sugarizerCompatibility.getLanguage());
+require(["domReady!"], function (doc) {
+    // FIXME: Firefox needs a pause before loading dependencies.
+    window.platform = {
+        FF: /Firefox/i.test(navigator.userAgent)
+    };
+    if (platform.FF) {
+        setTimeout(function () {
+            activity.setupDependencies();
+            activity.domReady(doc);
+        }, 2500);
     } else {
         activity.setupDependencies();
         activity.domReady(doc);
     }
 });
 
+// eslint-disable-next-line no-unused-vars
 define(MYDEFINES, function (compatibility) {
     activity.setupDependencies();
     activity.doContextMenus();

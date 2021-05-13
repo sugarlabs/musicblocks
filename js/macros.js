@@ -36,21 +36,19 @@
 // correct.
 
 /*
-   global _, blocks
+   global _
  */
 
 /*
    Global locations
    - js/utils/utils.js
         _
-   - js/activity.js
-        blocks
  */
 
 /* exported getMacroExpansion, blockIsMacro */
 
-function blockIsMacro(blkname) {
-    const protoBlock = blocks.protoBlockDict[blkname];
+function blockIsMacro(activity, blkname) {
+    const protoBlock = activity.blocks.protoBlockDict[blkname];
     if (protoBlock && protoBlock.macroFunc) return true;
 
     const BLOCKISMACRO = [
@@ -130,8 +128,8 @@ function blockIsMacro(blkname) {
     return BLOCKISMACRO.indexOf(blkname) > -1;
 }
 
-function getMacroExpansion(blkname, x, y) {
-    const protoBlock = blocks.protoBlockDict[blkname];
+function getMacroExpansion(activity, blkname, x, y) {
+    const protoBlock = activity.blocks.protoBlockDict[blkname];
     if (protoBlock && protoBlock.macroFunc) return protoBlock.macroFunc(x, y);
 
     // Some blocks are expanded on load.

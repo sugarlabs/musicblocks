@@ -1,4 +1,4 @@
-// Copyright (c) 2016-19 Walter Bender
+// Copyright (c) 2016-21 Walter Bender
 // Copyright (c) 2016 Hemant Kasat
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -12,19 +12,20 @@
 // This widget enable us to manipulate the beats per minute. It
 // behaves like a metronome and updates the master BPM block.
 
-/* global logo, _, saveLocally, getDrumSynthName */
+/*
+   global
+   _, getDrumSynthName
+ */
 
 /*
    Global locations
-    js/activity.js
-        logo, saveLocally
     js/utils/musicutils.js
         getDrumSynthName
     js/utils/utils.js
         _
 */
 
-/*exported Tempo */
+/* exported Tempo */
 class Tempo {
     static TEMPOSYNTH = "bottle";
     static TEMPOINTERVAL = 5;
@@ -43,7 +44,8 @@ class Tempo {
         this.tempoCanvases = [];
     }
 
-    init() {
+    init(activity) {
+        this.activity = activity;
         this._directions = [];
         this._widgetFirstTimes = [];
         this._widgetNextTimes = [];
@@ -55,7 +57,7 @@ class Tempo {
         }
 
         this._intervalID = null;
-        logo.synth.loadSynth(0, getDrumSynthName(Tempo.TEMPOSYNTH));
+        this.activity.logo.synth.loadSynth(0, getDrumSynthName(Tempo.TEMPOSYNTH));
 
         if (this._intervalID != null) {
             clearInterval(this._intervalID);
@@ -125,7 +127,7 @@ class Tempo {
         let r1, r2, r3, tcCell;
         for (let i = 0; i < this.BPMs.length; i++) {
             this._directions.push(1);
-            this._widgetFirstTimes.push(logo.firstNoteTime);
+            this._widgetFirstTimes.push(this.activity.logo.firstNoteTime);
             if (this.BPMs[i] <= 0) {
                 this.BPMs[i] = 30;
             }
@@ -189,7 +191,7 @@ class Tempo {
             );
         }
 
-        logo.textMsg(_("Adjust the tempo with the buttons."));
+        this.activity.textMsg(_("Adjust the tempo with the buttons."));
         this.resume();
 
         widgetWindow.sendToCenter();
@@ -205,13 +207,13 @@ class Tempo {
 
         let blockNumber;
         if (this.BPMBlocks[i] != null) {
-            blockNumber = logo.blocks.blockList[this.BPMBlocks[i]].connections[1];
+            blockNumber = this.activity.blocks.blockList[this.BPMBlocks[i]].connections[1];
             if (blockNumber != null) {
-                logo.blocks.blockList[blockNumber].value = parseFloat(this.BPMs[i]);
-                logo.blocks.blockList[blockNumber].text.text = this.BPMs[i];
-                logo.blocks.blockList[blockNumber].updateCache();
-                logo.refreshCanvas();
-                saveLocally();
+                this.activity.blocks.blockList[blockNumber].value = parseFloat(this.BPMs[i]);
+                this.activity.blocks.blockList[blockNumber].text.text = this.BPMs[i];
+                this.activity.blocks.blockList[blockNumber].updateCache();
+                this.activity.refreshCanvas();
+                this.activity.saveLocally();
             }
         }
     }
@@ -256,10 +258,10 @@ class Tempo {
         this.BPMs[i] = this.BPMInputs[i].value;
         if (this.BPMs[i] > 1000) {
             this.BPMs[i] = 1000;
-            logo.errorMsg(_("The beats per minute must be between 30 and 1000."));
+            this.activity.errorMsg(_("The beats per minute must be between 30 and 1000."));
         } else if (this.BPMs[i] < 30) {
             this.BPMs[i] = 30;
-            logo.errorMsg(_("The beats per minute must be between 30 and 1000."));
+            this.activity.errorMsg(_("The beats per minute must be between 30 and 1000."));
         }
 
         this._updateBPM(i);
@@ -275,7 +277,7 @@ class Tempo {
         this.BPMs[i] = parseFloat(this.BPMs[i]) + Math.round(0.1 * this.BPMs[i]);
 
         if (this.BPMs[i] > 1000) {
-            logo.errorMsg(_("The beats per minute must be below 1000."));
+            this.activity.errorMsg(_("The beats per minute must be below 1000."));
             this.BPMs[i] = 1000;
         }
 
@@ -291,7 +293,7 @@ class Tempo {
     slowDown(i) {
         this.BPMs[i] = parseFloat(this.BPMs[i]) - Math.round(0.1 * this.BPMs[i]);
         if (this.BPMs[i] < 30) {
-            logo.errorMsg(_("The beats per minute must be above 30"));
+            this.activity.errorMsg(_("The beats per minute must be above 30"));
             this.BPMs[i] = 30;
         }
 
@@ -323,7 +325,7 @@ class Tempo {
             // Are we done yet?
             if (d.getTime() > this._widgetNextTimes[i]) {
                 // Play a tone.
-                logo.synth.trigger(0, ["C2"], 0.0625, Tempo.TEMPOSYNTH, null, null, false);
+                this.activity.logo.synth.trigger(0, ["C2"], 0.0625, Tempo.TEMPOSYNTH, null, null, false);
                 this._widgetNextTimes[i] += this._intervals[i];
 
                 // Ensure we are at the edge.
@@ -401,8 +403,8 @@ class Tempo {
                 [4, ["number", { value: 4 }], 0, 0, [2]],
                 [5, ["vspace", {}], 0, 0, [0, null]]
             ];
-            logo.blocks.loadNewBlocks(newStack);
-            logo.textMsg(_("New action block generated!"));
+            this.activity.blocks.loadNewBlocks(newStack);
+            this.activity.textMsg(_("New action block generated!"));
         }, 200 * i);
     }
 

@@ -1,24 +1,44 @@
-function setupOrnamentBlocks() {
+// Copyright (c) 2019 Bottersnike
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+
+/*
+   global
+
+   _, ValueBlock, NOINPUTERRORMSG, NANERRORMSG, last, Singer,
+   FlowClampBlock
+ */
+
+/* exported setupOrnamentBlocks */
+
+function setupOrnamentBlocks(activity) {
     class StaccatoFactorBlock extends ValueBlock {
         constructor() {
             //.TRANS: the duration of a note played as staccato
             super("staccatofactor", _("staccato factor"));
             this.parameter = true;
-            this.setPalette("ornament");
+            this.setPalette("ornament", activity);
             this.setHelpString();
             this.hidden = true;
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            return activity.blocks.blockList[blk].value;
         }
 
         arg(logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "staccato"]);
             } else if (tur.singer.staccato.length > 0) {
@@ -33,22 +53,22 @@ function setupOrnamentBlocks() {
         constructor() {
             //.TRANS: the degree of overlap of notes played as legato
             super("slurfactor", _("slur factor"));
-            this.setPalette("ornament");
+            this.setPalette("ornament", activity);
             this.setHelpString();
             this.parameter = true;
             this.hidden = true;
         }
 
         updateParameter(logo, turtle, blk) {
-            return logo.blocks.blockList[blk].value;
+            return activity.blocks.blockList[blk].value;
         }
 
         arg(logo, turtle, blk) {
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             if (
                 logo.inStatusMatrix &&
-                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
             ) {
                 logo.statusFields.push([blk, "slur"]);
             } else if (tur.singer.staccato.length > 0) {
@@ -62,7 +82,7 @@ function setupOrnamentBlocks() {
     class NeighborBlock extends FlowClampBlock {
         constructor(name) {
             super(name || "neighbor");
-            this.setPalette("ornament");
+            this.setPalette("ornament", activity);
             this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.setHelpString();
             this.formBlock({
@@ -85,7 +105,7 @@ function setupOrnamentBlocks() {
 
         flow(args, logo, turtle, blk) {
             if (typeof args[0] !== "number" || typeof args[1] !== "number") {
-                logo.errorMsg(NANERRORMSG, blk);
+                activity.errorMsg(NANERRORMSG, blk);
                 logo.stopTurtle = true;
                 return;
             }
@@ -132,7 +152,7 @@ function setupOrnamentBlocks() {
     class GlideBlock extends FlowClampBlock {
         constructor() {
             super("glide");
-            this.setPalette("ornament");
+            this.setPalette("ornament", activity);
             this.setHelpString();
             this.formBlock({
                 //.TRANS: glide (glissando) is a blended overlap successive notes
@@ -163,13 +183,13 @@ function setupOrnamentBlocks() {
 
             let arg;
             if (args[0] === null || typeof args[0] !== "number") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg = 1 / 16;
             } else {
                 arg = args[0];
             }
 
-            const tur = logo.turtles.ithTurtle(turtle);
+            const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.glide.push(arg);
 
@@ -178,11 +198,13 @@ function setupOrnamentBlocks() {
             }
 
             tur.singer.glideOverride = Singer.noteCounter(logo, turtle, args[1]);
+            // eslint-disable-next-line no-console
             console.debug("length of glide " + tur.singer.glideOverride);
 
             const listenerName = "_glide_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
+            // eslint-disable-next-line no-unused-vars
             const __listener = event => {
                 if (tur.singer.justCounting.length === 0) {
                     logo.notation.notationEndSlur(turtle);
@@ -200,7 +222,7 @@ function setupOrnamentBlocks() {
     class SlurBlock extends FlowClampBlock {
         constructor(name) {
             super(name || "slur");
-            this.setPalette("ornament");
+            this.setPalette("ornament", activity);
             this.setHelpString();
             this.formBlock({
                 //.TRANS: slur or legato is an overlap successive notes
@@ -222,7 +244,7 @@ function setupOrnamentBlocks() {
 
             let arg = args[0];
             if (arg === null || typeof arg !== "number") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg = 1 / 16;
             }
 
@@ -235,7 +257,7 @@ function setupOrnamentBlocks() {
     class StaccatoBlock extends FlowClampBlock {
         constructor(name) {
             super(name || "staccato");
-            this.setPalette("ornament");
+            this.setPalette("ornament", activity);
             this.setHelpString();
             this.formBlock({
                 name: _("staccato"),
@@ -256,7 +278,7 @@ function setupOrnamentBlocks() {
 
             let arg = args[0];
             if (arg === null || typeof arg !== "number") {
-                logo.errorMsg(NOINPUTERRORMSG, blk);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg = 1 / 32;
             }
 
@@ -329,13 +351,13 @@ function setupOrnamentBlocks() {
         }
     }
 
-    new StaccatoFactorBlock().setup();
-    new SlurFactorBlock().setup();
-    new NeighborBlock().setup();
-    new Neighbor2Block().setup();
-    new GlideBlock().setup();
-    new SlurBlock().setup();
-    new StaccatoBlock().setup();
-    new NewSlurBlock().setup();
-    new NewStaccatoBlock().setup();
+    new StaccatoFactorBlock().setup(activity);
+    new SlurFactorBlock().setup(activity);
+    new NeighborBlock().setup(activity);
+    new Neighbor2Block().setup(activity);
+    new GlideBlock().setup(activity);
+    new SlurBlock().setup(activity);
+    new StaccatoBlock().setup(activity);
+    new NewSlurBlock().setup(activity);
+    new NewStaccatoBlock().setup(activity);
 }

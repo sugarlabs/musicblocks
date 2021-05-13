@@ -10,8 +10,10 @@
 
 // This widget displays help about a block or a button.
 
-/*global _, docById, getMacroExpansion, HELPCONTENT, blocks*/
+/* global
 
+   _, docById, getMacroExpansion, HELPCONTENT,
+*/
 /*
      Globals locations
      
@@ -23,9 +25,6 @@
     
      - js/turtledefs.js
         HELPCONTENT
-    
-     - js/activity.js
-        blocks
  */
 
 /*exported HelpWidget*/
@@ -33,9 +32,10 @@ class HelpWidget {
     static ICONSIZE = 32;
 
     /**
-     * @param {Blocks} blocks
+     * @param {Activity} activity
      */
-    constructor(blocks) {
+    constructor(activity, useActiveBlock) {
+        this.activity = activity;
         this.beginnerBlocks = [];
         this.advancedBlocks = [];
         this.appendedBlockList = [];
@@ -57,7 +57,7 @@ class HelpWidget {
         this._helpDiv = document.createElement("div");
 
         // Give the DOM time to create the div.
-        setTimeout(() => this._setup(blocks), 0);
+        setTimeout(() => this._setup(useActiveBlock), 0);
 
         // Position center
         setTimeout(this.widgetWindow.sendToCenter, 50);
@@ -65,10 +65,10 @@ class HelpWidget {
 
     /**
      * @private
-     * @param {Blocks} blocks
+     * @param {useActiveBlock} Show help for the active block.
      * @returns {void}
      */
-    _setup(blocks) {
+    _setup(useActiveBlock) {
         const iconSize = HelpWidget.ICONSIZE;
         // Which help page are we on?
         let page = 0;
@@ -83,7 +83,7 @@ class HelpWidget {
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
 
         let leftArrow, rightArrow;
-        if (blocks === null) {
+        if (!useActiveBlock) {
             this.widgetWindow.updateTitle(_("Take a tour"));
             rightArrow = document.getElementById("right-arrow");
             rightArrow.style.display = "block";
@@ -115,8 +115,9 @@ class HelpWidget {
                 this._showPage(page);
             };
         } else {
-            if (blocks.activeBlock.name !== null) {
-                const label = blocks.blockList[blocks.activeBlock].protoblock.staticLabels[0];
+            if (this.activity.blocks.activeBlock.name !== null) {
+                const label = this.activity.blocks.blockList[this.activity.blocks.activeBlock]
+                    .protoblock.staticLabels[0];
                 this.widgetWindow.updateTitle(_(label));
             }
 
@@ -129,15 +130,15 @@ class HelpWidget {
             leftArrow.classList.remove("hover");
         }
 
-        if (blocks === null) {
+        if (!useActiveBlock) {
             // display help menu
             docById("helpBodyDiv").style.height = "325px";
             docById("helpBodyDiv").style.width = "400px";
             this._showPage(0);
         } else {
             // display help for this block
-            if (blocks.activeBlock.name !== null) {
-                const name = blocks.blockList[blocks.activeBlock].name;
+            if (this.activity.blocks.activeBlock.name !== null) {
+                const name = this.activity.blocks.blockList[this.activity.blocks.activeBlock].name;
 
                 const advIcon =
                     '<a\
@@ -170,7 +171,8 @@ class HelpWidget {
                 // path of the help svg, an override name for the help
                 // svg file, and an optional macro name for generating
                 // the help output.
-                const message = blocks.blockList[blocks.activeBlock].protoblock.helpString;
+                const message = this.activity.blocks.blockList[this.activity.blocks.activeBlock]
+                    .protoblock.helpString;
 
                 if (message) {
                     const helpBody = docById("helpBodyDiv");
@@ -216,11 +218,14 @@ class HelpWidget {
                     helpBody.innerHTML = body;
                     helpBody.innerHTML += findIcon;
 
-                    if (!blocks.blockList[blocks.activeBlock].protoblock.beginnerModeBlock) {
+                    if (
+                        !this.activity.blocks.blockList[this.activity.blocks.activeBlock].protoblock
+                            .beginnerModeBlock
+                    ) {
                         helpBody.innerHTML += advIcon;
                     }
 
-                    const object = blocks.palettes.getProtoNameAndPalette(name);
+                    const object = this.activity.blocks.palettes.getProtoNameAndPalette(name);
 
                     const loadButton = docById("loadButton");
                     if (loadButton !== null) {
@@ -234,36 +239,34 @@ class HelpWidget {
                                 const protoName = object[2];
 
                                 const protoResult = Object.prototype.hasOwnProperty.call(
-                                    blocks.protoBlockDict,
+                                    this.activity.blocks.protoBlockDict,
                                     protoName
                                 );
                                 if (protoResult) {
-                                    blocks.palettes.dict[paletteName].makeBlockFromSearch(
-                                        protoblk,
-                                        protoName,
-                                        (newBlock) => {
-                                            blocks.moveBlock(newBlock, 100, 100);
-                                        }
-                                    );
+                                    this.activity.blocks.palettes.dict[
+                                        paletteName
+                                    ].makeBlockFromSearch(protoblk, protoName, (newBlock) => {
+                                        this.activity.blocks.moveBlock(newBlock, 100, 100);
+                                    });
                                 }
                             } else if (typeof message[3] === "string") {
                                 // If it is a string, load the macro
                                 // assocuated with this block
                                 const blocksToLoad = getMacroExpansion(message[3], 100, 100);
                                 // console.debug("CLICK: " + blocksToLoad);
-                                blocks.loadNewBlocks(blocksToLoad);
+                                this.activity.blocks.loadNewBlocks(blocksToLoad);
                             } else {
                                 // Load the blocks.
                                 const blocksToLoad = message[3];
                                 // console.debug("CLICK: " + blocksToLoad);
-                                blocks.loadNewBlocks(blocksToLoad);
+                                this.activity.blocks.loadNewBlocks(blocksToLoad);
                             }
                         };
                     }
                     const findIconMethod = docById("findIcon");
 
                     findIconMethod.onclick = () => {
-                        blocks.palettes.showPalette(object[1]);
+                        this.activity.blocks.palettes.showPalette(object[1]);
                     };
                 }
             }
@@ -316,7 +319,7 @@ class HelpWidget {
             const cell = docById("right-arrow");
 
             cell.onclick = () => {
-                this._prepareBlockList(blocks);
+                this._prepareBlockList();
             };
         }
 
@@ -329,25 +332,24 @@ class HelpWidget {
     /**
      * Prepare a list of beginner and advanced blocks and cycle through their help
      * @private
-     * @param {Blocks} blocks
      * @returns {void}
      */
-    _prepareBlockList(blocks) {
-        for (const key in blocks.protoBlockDict) {
+    _prepareBlockList() {
+        for (const key in this.activity.blocks.protoBlockDict) {
             if (
-                blocks.protoBlockDict[key].beginnerModeBlock === true &&
-                blocks.protoBlockDict[key].helpString !== undefined &&
-                blocks.protoBlockDict[key].helpString.length !== 0
+                this.activity.blocks.protoBlockDict[key].beginnerModeBlock === true &&
+                this.activity.blocks.protoBlockDict[key].helpString !== undefined &&
+                this.activity.blocks.protoBlockDict[key].helpString.length !== 0
             ) {
                 this.beginnerBlocks.push(key);
             }
         }
 
-        for (const key in blocks.protoBlockDict) {
+        for (const key in this.activity.blocks.protoBlockDict) {
             if (
-                blocks.protoBlockDict[key].beginnerModeBlock === false &&
-                blocks.protoBlockDict[key].helpString !== undefined &&
-                blocks.protoBlockDict[key].helpString.length !== 0
+                this.activity.blocks.protoBlockDict[key].beginnerModeBlock === false &&
+                this.activity.blocks.protoBlockDict[key].helpString !== undefined &&
+                this.activity.blocks.protoBlockDict[key].helpString.length !== 0
             ) {
                 this.advancedBlocks.push(key);
             }
@@ -358,19 +360,17 @@ class HelpWidget {
         this.appendedBlockList.push(...this.beginnerBlocks);
         this.appendedBlockList.push(...this.advancedBlocks);
 
-        this._blockHelp(blocks.protoBlockDict[this.appendedBlockList[0]], blocks);
+        this._blockHelp(this.activity.blocks.protoBlockDict[this.appendedBlockList[0]]);
     }
-
 
     /**
      * Function to display help related to a single block
      * called recursively to cycle through help string of all blocks (Beginner Blocks First)
      * @private
-     * @param {ProtoBlock} block 
-     * @param {Blocks} blocks 
+     * @param {ProtoBlock} block
      * @returns {void}
      */
-    _blockHelp(block, blocks) {
+    _blockHelp(block) {
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
@@ -389,7 +389,9 @@ class HelpWidget {
             if (this.index !== this.appendedBlockList.length - 1) {
                 this.index += 1;
             }
-            this._blockHelp(blocks.protoBlockDict[this.appendedBlockList[this.index]], blocks);
+            this._blockHelp(
+                this.activity.blocks.protoBlockDict[this.appendedBlockList[this.index]]
+            );
         };
 
         cell = docById("left-arrow");
@@ -399,7 +401,9 @@ class HelpWidget {
                 this.index -= 1;
             }
 
-            this._blockHelp(blocks.protoBlockDict[this.appendedBlockList[this.index]], blocks);
+            this._blockHelp(
+                this.activity.blocks.protoBlockDict[this.appendedBlockList[this.index]]
+            );
         };
         if (block.name !== null) {
             const label = block.staticLabels[0];
@@ -498,21 +502,21 @@ class HelpWidget {
                             // If there is nothing specified, just
                             // load the block.
                             // console.debug("CLICK: " + name);
-                            const obj = blocks.palettes.getProtoNameAndPalette(name);
+                            const obj = this.activity.blocks.palettes.getProtoNameAndPalette(name);
                             const protoblk = obj[0];
                             const paletteName = obj[1];
                             const protoName = obj[2];
 
                             const protoResult = Object.prototype.hasOwnProperty.call(
-                                blocks.protoBlockDict,
+                                this.activity.blocks.protoBlockDict,
                                 protoName
                             );
                             if (protoResult) {
-                                blocks.palettes.dict[paletteName].makeBlockFromSearch(
+                                this.activity.blocks.palettes.dict[paletteName].makeBlockFromSearch(
                                     protoblk,
                                     protoName,
                                     (newBlock) => {
-                                        blocks.moveBlock(newBlock, 100, 100);
+                                        this.activity.blocks.moveBlock(newBlock, 100, 100);
                                     }
                                 );
                             }
@@ -521,12 +525,12 @@ class HelpWidget {
                             // assocuated with this block
                             const blocksToLoad = getMacroExpansion(message[3], 100, 100);
                             // console.debug("CLICK: " + blocksToLoad);
-                            blocks.loadNewBlocks(blocksToLoad);
+                            this.activity.blocks.loadNewBlocks(blocksToLoad);
                         } else {
                             // Load the blocks.
                             const blocksToLoad = message[3];
                             // console.debug("CLICK: " + blocksToLoad);
-                            blocks.loadNewBlocks(blocksToLoad);
+                            this.activity.blocks.loadNewBlocks(blocksToLoad);
                         }
                     };
                 }

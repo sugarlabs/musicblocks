@@ -2,7 +2,7 @@
  * @file This contains the encapsulation related to notations (used for lilypond, abc, etc/).
  * @author Walter Bender
  *
- * @copyright 2014-2020 Walter Bender
+ * @copyright 2014-2021 Walter Bender
  * @copyright 2020 Anindya Kundu
  *
  * @license
@@ -15,7 +15,11 @@
  * MA 02110-1335 USA.
  */
 
-/* global _, durationToNoteValue, last, getDrumSymbol, toFixed2, convertFactor, rationalToFraction */
+/* global
+
+   _, durationToNoteValue, last, getDrumSymbol, toFixed2,
+   convertFactor, rationalToFraction
+ */
 
 /*
    Global locations
@@ -40,8 +44,8 @@ class Notation {
      * @constructor
      * @param {Object} logo - object of Logo
      */
-    constructor(logo) {
-        this._logo = logo;
+    constructor(activity) {
+        this.activity = activity;
 
         // _notationStaging is used to aggregate all of the notes played in a performance
         this._notationStaging = {};
@@ -152,7 +156,7 @@ class Notation {
     doUpdateNotation(note, duration, turtle, insideChord, drum) {
         const obj = durationToNoteValue(duration);
 
-        const tur = this._logo.turtles.ithTurtle(turtle);
+        const tur = this.activity.turtles.ithTurtle(turtle);
 
         this._notationStaging[turtle].push([
             note,
@@ -343,16 +347,16 @@ class Notation {
             this._notationStaging[turtle].push("pickup", beat);
             this._pickupPOW2[turtle] = true;
         } else {
-            if (this._logo.runningLilypond) {
+            if (this.activity.logo.runningLilypond) {
                 obj = rationalToFraction(factor);
-                this._logo.errorMsg(
+                this.activity.errorMsg(
                     _("Lilypond cannot process pickup of ") + obj[0] + "/" + obj[1]
                 );
             }
 
             obj = rationalToFraction(1 - factor);
             for (let i = 0; i < obj[0]; i++) {
-                this._logo.updateNotation(["R"], obj[1], turtle, false, "");
+                this.activity.logo.updateNotation(["R"], obj[1], turtle, false, "");
             }
         }
 

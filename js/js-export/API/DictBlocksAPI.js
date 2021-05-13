@@ -15,7 +15,7 @@
  * MA 02110-1335 USA.
  */
 
-/* global turtles, JSInterface */
+/* global globalActivity, JSInterface */
 
 /* exported DictBlocksAPI */
 
@@ -40,13 +40,13 @@ class DictBlocksAPI {
     }
 
     setValue(key, value, dict) {
-        if (dict === undefined) dict = turtles.ithTurtle(this.turIndex).name;
+        if (dict === undefined) dict = globalActivity.turtles.ithTurtle(this.turIndex).name;
         const args = JSInterface.validateArgs("setValue", [key, value, dict]);
         return this.runCommand("setValue", [args[2], args[0], args[1], this.turIndex]);
     }
 
     getValue(key, dict) {
-        if (dict === undefined) dict = turtles.ithTurtle(this.turIndex).name;
+        if (dict === undefined) dict = globalActivity.turtles.ithTurtle(this.turIndex).name;
         const args = JSInterface.validateArgs("getValue", [key, dict]);
         return this.runCommand("getValue", [args[1], args[0], this.turIndex]);
     }

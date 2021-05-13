@@ -1,4 +1,4 @@
-// Copyright (c) 2014-20 Walter Bender
+// Copyright (c) 2014-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -10,13 +10,18 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 //
 
-/*global logo, turtles, _, platformColor, docById, Singer,
-   slicePath, wheelnav, DEFAULTVOICE, getDrumName,, getNote, blocks, MUSICALMODES
-   last, SHARP, FLAT, PREVIEWVOLUME, DEFAULTVOLUME, MODE_PIE_MENUS, HelpWidget,
-   INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName, getMunsellColor,
-   COLORS40, frequencyToPitch, KeySignatureEnv, instruments, DOUBLESHARP, NATURAL,
-   DOUBLEFLAT, EQUIVALENTACCIDENTALS, FIXEDSOLFEGE, NOTENAMES, FIXEDSOLFEGE, NOTENAMES,
-   numberToPitch, nthDegreeToPitch, SOLFEGENAMES, _buildScale, TEMPERAMENT*/
+/*
+   global
+
+   _, platformColor, docById, Singer, slicePath, wheelnav,
+   DEFAULTVOICE, getDrumName, getNote, MUSICALMODES last, SHARP, FLAT,
+   PREVIEWVOLUME, DEFAULTVOLUME, MODE_PIE_MENUS, HelpWidget,
+   INTERVALVALUES, INTERVALS, getDrumSynthName, getVoiceSynthName,
+   getMunsellColor, COLORS40, frequencyToPitch, instruments,
+   DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
+   FIXEDSOLFEGE, NOTENAMES, FIXEDSOLFEGE, NOTENAMES, numberToPitch,
+   nthDegreeToPitch, SOLFEGENAMES, buildScale
+*/
 
 /*
      Globals location
@@ -26,7 +31,8 @@
         FLAT, SHARP, DEFAULTVOICE, getDrumName, getNote, MODE_PIE_MENUS, MUSICALMODES, INTERVALVALUES,
         INTERVALS, getDrumSynthName, getVoiceSynthName, frequencyToPitch, DOUBLESHARP, NATURAL,
         DOUBLEFLAT, EQUIVALENTACCIDENTALS, FIXEDSOLFEGE, NOTENAMES, FIXEDSOLFEGE, NOTENAMES, numberToPitch,
-        nthDegreeToPitch, SOLFEGENAMES, _buildScale
+        nthDegreeToPitch, SOLFEGENAMES, buildScale
+
      - js/utils/utils.js
         _, last, docById
      - js/turtle-singer.js
@@ -39,17 +45,13 @@
         platformColorcl
      - js/utils/synthutils.js
         instruments
-     - js/activity.js
-        blocks, KeySignatureEnv
      - js/logo.js
         PREVIEWVOLUME, DEFAULTVOLUME
-     - js/blocks.js
-        TEMPERAMENT
  */
 
-/*exported piemenuModes ,piemenuPitches, piemenuCustomNotes, piemenuGrid, piemenuBlockContext,
+/*exported piemenuModes, piemenuPitches, piemenuCustomNotes, piemenuGrid, piemenuBlockContext,
 piemenuIntervals, piemenuVoices, piemenuBoolean, piemenuBasic, piemenuColor, piemenuNumber,
-piemenuNthModalPitch, piemenuNoteValue, piemenuAccidentals*/
+piemenuNthModalPitch, piemenuNoteValue, piemenuAccidentals, piemenuKey*/
 const piemenuPitches = function (
     block,
     noteLabels,
@@ -202,8 +204,8 @@ const piemenuPitches = function (
     const x = block.container.x;
     const y = block.container.y;
 
-    const canvasLeft = block.blocks.canvas.offsetLeft + 28 * block.blocks.blockScale;
-    const canvasTop = block.blocks.canvas.offsetTop + 6 * block.blocks.blockScale;
+    const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
+    const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
     docById("wheelDiv").style.height = "300px";
@@ -213,8 +215,9 @@ const piemenuPitches = function (
             block.blocks.turtles._canvas.width - 300,
             Math.max(
                 0,
-                Math.round((x + block.blocks.stage.x) * block.blocks.getStageScale() + canvasLeft) -
-                    200
+                Math.round(
+                    (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+                ) - 200
             )
         ) + "px";
     docById("wheelDiv").style.top =
@@ -222,8 +225,9 @@ const piemenuPitches = function (
             block.blocks.turtles._canvas.height - 350,
             Math.max(
                 0,
-                Math.round((y + block.blocks.stage.y) * block.blocks.getStageScale() + canvasTop) -
-                    200
+                Math.round(
+                    (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+                ) - 200
             )
         ) + "px";
 
@@ -253,14 +257,14 @@ const piemenuPitches = function (
 
     const ROTATION = { A: 2, B: 1, C: 0, D: 6, E: 5, F: 4, G: 3 };
 
-    const k = OFFSET[KeySignatureEnv[1]];
+    const k = OFFSET[block.activity.KeySignatureEnv[1]];
 
     let key;
     const attrList = ["", SHARP, FLAT];
     for (const j in attrList) {
         for (const i in NOTENAMES) {
-            const tempScale = _buildScale(NOTENAMES[i] + attrList[j] + " major")[0];
-            if (tempScale[k - 1] == KeySignatureEnv[0]) {
+            const tempScale = buildScale(NOTENAMES[i] + attrList[j] + " major")[0];
+            if (tempScale[k - 1] == block.activity.KeySignatureEnv[0]) {
                 key = NOTENAMES[i] + attrList[j];
                 break;
             }
@@ -269,7 +273,7 @@ const piemenuPitches = function (
             break;
         }
     }
-    let scale = _buildScale(key + " major")[0];
+    let scale = buildScale(key + " major")[0];
     scale = scale.splice(0, scale.length - 1);
 
     for (let j = 0; j < ROTATION[key[0]]; j++) {
@@ -279,7 +283,7 @@ const piemenuPitches = function (
     // auto selection of sharps and flats in fixed solfege
     // handles the case of opening the pie-menu, not whilst in the pie-menu
     if (
-        (!KeySignatureEnv[2] && block.name === "solfege") ||
+        (!block.activity.KeySignatureEnv[2] && block.name === "solfege") ||
         (block.name === "notename" &&
             (block.connections[0] != undefined
                 ? ["setkey", "setkey2"].indexOf(
@@ -406,7 +410,8 @@ const piemenuPitches = function (
             that.blocks.setPitchOctave(that.connections[0], octave);
         }
 
-        const keySignature = KeySignatureEnv[0] + " " + KeySignatureEnv[1];
+        const keySignature =
+            block.activity.KeySignatureEnv[0] + " " + block.activity.KeySignatureEnv[1];
 
         let obj;
         if (that.name == "scaledegree2") {
@@ -420,8 +425,8 @@ const piemenuPitches = function (
                 keySignature,
                 true,
                 null,
-                that.blocks.errorMsg,
-                that.blocks.logo.synth.inTemperament
+                that.activity.errorMsg,
+                that.activity.logo.synth.inTemperament
             );
         } else {
             obj = getNote(
@@ -429,33 +434,33 @@ const piemenuPitches = function (
                 octave,
                 0,
                 keySignature,
-                KeySignatureEnv[2],
+                block.activity.KeySignatureEnv[2],
                 null,
-                that.blocks.errorMsg,
-                that.blocks.logo.synth.inTemperament
+                that.activity.errorMsg,
+                that.activity.logo.synth.inTemperament
             );
         }
         if (!custom) {
             obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
         }
 
-        const tur = that.blocks.logo.turtles.ithTurtle(0);
+        const tur = that.activity.turtles.ithTurtle(0);
 
         if (
             tur.singer.instrumentNames.length === 0 ||
             tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
-            that.blocks.logo.synth.createDefaultSynth(0);
-            that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
+            that.activity.logo.synth.createDefaultSynth(0);
+            that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
 
-        that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
-        Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
+        that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
+        Singer.setSynthVolume(that.activity.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
 
         if (!that._triggerLock) {
             that._triggerLock = true;
-            that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
+            that.activity.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
         }
 
         setTimeout(function () {
@@ -474,7 +479,7 @@ const piemenuPitches = function (
         // In case of alphabet, direct comparison is performed
 
         if (
-            (!KeySignatureEnv[2] && that.name == "solfege") ||
+            (!block.activity.KeySignatureEnv[2] && that.name == "solfege") ||
             (that.name == "notename" &&
                 (that.connections[0] != undefined
                     ? ["setkey", "setkey2"].indexOf(
@@ -537,7 +542,7 @@ const piemenuPitches = function (
             ["setkey", "setkey2"].indexOf(that.blocks.blockList[that.connections[0]].name) !== -1
         ) {
             // We may need to update the mode widget.
-            that.blocks.logo.modeBlock = that.blocks.blockList.indexOf(that);
+            that.activity.logo.modeBlock = that.blocks.blockList.indexOf(that);
         }
         __pitchPreview();
     };
@@ -694,8 +699,9 @@ const piemenuCustomNotes = function (
     for (const t of customLabels) {
         max = max > noteLabels[t]["pitchNumber"] ? max : noteLabels[t]["pitchNumber"];
     }
+
     for (const t of customLabels) {
-        for (let k = noteLabels[t].length - 1; k >= 0; k--) {
+        for (const k in noteLabels[t]) {
             if (k !== "pitchNumber") {
                 labels.push(noteLabels[t][k][1]);
                 blockCustom++;
@@ -732,8 +738,8 @@ const piemenuCustomNotes = function (
     const x = block.container.x;
     const y = block.container.y;
 
-    const canvasLeft = block.blocks.canvas.offsetLeft + 28 * block.blocks.blockScale;
-    const canvasTop = block.blocks.canvas.offsetTop + 6 * block.blocks.blockScale;
+    const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
+    const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
     docById("wheelDiv").style.height = "400px";
@@ -743,8 +749,9 @@ const piemenuCustomNotes = function (
             block.blocks.turtles._canvas.width - 400,
             Math.max(
                 0,
-                Math.round((x + block.blocks.stage.x) * block.blocks.getStageScale() + canvasLeft) -
-                    200
+                Math.round(
+                    (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+                ) - 200
             )
         ) + "px";
     docById("wheelDiv").style.top =
@@ -752,8 +759,9 @@ const piemenuCustomNotes = function (
             block.blocks.turtles._canvas.height - 450,
             Math.max(
                 0,
-                Math.round((y + block.blocks.stage.y) * block.blocks.getStageScale() + canvasTop) -
-                    200
+                Math.round(
+                    (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+                ) - 200
             )
         ) + "px";
 
@@ -814,8 +822,9 @@ const piemenuCustomNotes = function (
         }
     }
 
-    if (typeof j == "number")
+    if (typeof j === "number" && !isNaN(j)) {
         block._cusNoteWheel.navigateWheel(max * customLabels.indexOf(selectedCustom) + j);
+    }
 
     const __exitMenu = function () {
         that._piemenuExitTime = new Date().getTime();
@@ -825,15 +834,7 @@ const piemenuCustomNotes = function (
     const __selectionChanged = function () {
         const label = that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
         const note = that._cusNoteWheel.navItems[that._cusNoteWheel.selectedNavItemIndex].title;
-        let note1;
-        if (that.blocks.logo.customTemperamentDefined){
-            note1 = TEMPERAMENT[selectedCustom]
-                .filter(ele => ele[3] === note || ele[1] === note)[0][3];
-        } else {
-            note1 = note;
-        }
-
-        that.value = note1;
+        that.value = note;
         that.text.text = note;
         let octave = 4;
 
@@ -849,31 +850,28 @@ const piemenuCustomNotes = function (
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
 
-        const obj = getNote(note1, octave, 0, "C major", false, null, that.blocks.errorMsg, label);
-        const tur = that.blocks.logo.turtles.ithTurtle(0);
+        const obj = getNote(note, octave, 0, "C major", false, null, that.activity.errorMsg, label);
+        const tur = that.activity.turtles.ithTurtle(0);
 
         if (
             tur.singer.instrumentNames.length === 0 ||
             tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
-            that.blocks.logo.synth.createDefaultSynth(0);
-            that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
+            that.activity.logo.synth.createDefaultSynth(0);
+            that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
 
-        that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
-        Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
+        that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
+        Singer.setSynthVolume(that.activity.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
 
         if (!that._triggerLock) {
-            //preview :
             that._triggerLock = true;
-            let no = [obj[0] + obj[1]];
-            const notes1 = no;
-            no = that.blocks.logo.synth.getCustomFrequency(no, that.customID);
-            if (no === undefined) {
-                no = notes1;
+            // Get the frequency of the custom note for the preview.
+            const no = that.activity.logo.synth.getCustomFrequency([note + obj[1]], that.customID);
+            if (no !== undefined && no !== "undefined") {
+                instruments[0][DEFAULTVOICE].triggerAttackRelease(no, 1 / 8);
             }
-            instruments[0][DEFAULTVOICE].triggerAttackRelease(no, 1 / 8);
         }
 
         setTimeout(function () {
@@ -993,16 +991,20 @@ const piemenuNthModalPitch = function (block, noteValues, note) {
     const x = block.container.x;
     const y = block.container.y;
 
-    const canvasLeft = block.blocks.canvas.offsetLeft + 28 * block.blocks.blockScale;
-    const canvasTop = block.blocks.canvas.offsetTop + 6 * block.blocks.blockScale;
+    const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
+    const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
     docById("wheelDiv").style.height = "300px";
     docById("wheelDiv").style.width = "300px";
 
     const selectorWidth = 150;
-    const left = Math.round((x + block.blocks.stage.x) * block.blocks.getStageScale() + canvasLeft);
-    const top = Math.round((y + block.blocks.stage.y) * block.blocks.getStageScale() + canvasTop);
+    const left = Math.round(
+        (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+    );
+    const top = Math.round(
+        (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+    );
     block.label.style.left = left + "px";
     block.label.style.top = top + "px";
 
@@ -1097,31 +1099,32 @@ const piemenuNthModalPitch = function (block, noteValues, note) {
         let note;
 
         // Use C major as of now; fix block to use current keySignature once that feature is in place
-        const keySignature = KeySignatureEnv[0] + " " + KeySignatureEnv[1];
+        const keySignature =
+            block.activity.KeySignatureEnv[0] + " " + block.activity.KeySignatureEnv[1];
         if (noteValues[i] >= 0) {
             note = nthDegreeToPitch(keySignature, noteValues[i]);
         } else {
             note = nthDegreeToPitch(keySignature, 7 + noteValues[i]);
         }
 
-        const tur = that.blocks.logo.turtles.ithTurtle(0);
+        const tur = that.activity.turtles.ithTurtle(0);
 
         if (
             tur.singer.instrumentNames.length === 0 ||
             tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
-            that.blocks.logo.synth.createDefaultSynth(0);
-            that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
+            that.activity.logo.synth.createDefaultSynth(0);
+            that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
 
-        that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
-        Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
+        that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
+        Singer.setSynthVolume(that.activity.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
 
         //Play sample note and prevent extra sounds from playing
         if (!that._triggerLock) {
             that._triggerLock = true;
-            that.blocks.logo.synth.trigger(
+            that.activity.logo.synth.trigger(
                 0,
                 [note.replace(SHARP, "#").replace(FLAT, "b") + octave],
                 1 / 8,
@@ -1239,8 +1242,8 @@ const piemenuAccidentals = function (block, accidentalLabels, accidentalValues, 
     const x = block.container.x;
     const y = block.container.y;
 
-    const canvasLeft = block.blocks.canvas.offsetLeft + 28 * block.blocks.blockScale;
-    const canvasTop = block.blocks.canvas.offsetTop + 6 * block.blocks.blockScale;
+    const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
+    const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
     docById("wheelDiv").style.height = "300px";
@@ -1250,8 +1253,9 @@ const piemenuAccidentals = function (block, accidentalLabels, accidentalValues, 
             block.blocks.turtles._canvas.width - 300,
             Math.max(
                 0,
-                Math.round((x + block.blocks.stage.x) * block.blocks.getStageScale() + canvasLeft) -
-                    200
+                Math.round(
+                    (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+                ) - 200
             )
         ) + "px";
     docById("wheelDiv").style.top =
@@ -1259,8 +1263,9 @@ const piemenuAccidentals = function (block, accidentalLabels, accidentalValues, 
             block.blocks.turtles._canvas.height - 350,
             Math.max(
                 0,
-                Math.round((y + block.blocks.stage.y) * block.blocks.getStageScale() + canvasTop) -
-                    200
+                Math.round(
+                    (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+                ) - 200
             )
         ) + "px";
 
@@ -1434,16 +1439,20 @@ const piemenuNoteValue = function (block, noteValue) {
     const x = block.container.x;
     const y = block.container.y;
 
-    const canvasLeft = block.blocks.canvas.offsetLeft + 28 * block.blocks.blockScale;
-    const canvasTop = block.blocks.canvas.offsetTop + 6 * block.blocks.blockScale;
+    const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
+    const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
     docById("wheelDiv").style.height = "300px";
     docById("wheelDiv").style.width = "300px";
 
     const selectorWidth = 150;
-    const left = Math.round((x + block.blocks.stage.x) * block.blocks.getStageScale() + canvasLeft);
-    const top = Math.round((y + block.blocks.stage.y) * block.blocks.getStageScale() + canvasTop);
+    const left = Math.round(
+        (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+    );
+    const top = Math.round(
+        (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+    );
     block.label.style.left = left + "px";
     block.label.style.top = top + "px";
 
@@ -1669,16 +1678,20 @@ const piemenuNumber = function (block, wheelValues, selectedValue) {
     const x = block.container.x;
     const y = block.container.y;
 
-    const canvasLeft = block.blocks.canvas.offsetLeft + 28 * block.blocks.blockScale;
-    const canvasTop = block.blocks.canvas.offsetTop + 6 * block.blocks.blockScale;
+    const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
+    const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
     docById("wheelDiv").style.height = "300px";
     docById("wheelDiv").style.width = "300px";
 
     const selectorWidth = 150;
-    const left = Math.round((x + block.blocks.stage.x) * block.blocks.getStageScale() + canvasLeft);
-    const top = Math.round((y + block.blocks.stage.y) * block.blocks.getStageScale() + canvasTop);
+    const left = Math.round(
+        (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+    );
+    const top = Math.round(
+        (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+    );
     block.label.style.left = left + "px";
     block.label.style.top = top + "px";
 
@@ -1769,24 +1782,24 @@ const piemenuNumber = function (block, wheelValues, selectedValue) {
         const i = wheelLabels.indexOf(label);
         const actualPitch = numberToPitch(wheelValues[i] + 3);
 
-        const tur = that.blocks.logo.turtles.ithTurtle(0);
+        const tur = that.activity.turtles.ithTurtle(0);
 
         if (
             tur.singer.instrumentNames.length === 0 ||
             tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
-            that.blocks.logo.synth.createDefaultSynth(0);
-            that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
+            that.activity.logo.synth.createDefaultSynth(0);
+            that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
 
-        that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
-        Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
+        that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
+        Singer.setSynthVolume(that.activity.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
 
         actualPitch[0] = actualPitch[0].replace(SHARP, "#").replace(FLAT, "b");
         if (!that._triggerLock) {
             that._triggerLock = true;
-            that.blocks.logo.synth.trigger(
+            that.activity.logo.synth.trigger(
                 0,
                 actualPitch[0] + (actualPitch[1] + 3),
                 1 / 8,
@@ -1808,24 +1821,24 @@ const piemenuNumber = function (block, wheelValues, selectedValue) {
         const i = wheelLabels.indexOf(label);
         const actualPitch = frequencyToPitch(wheelValues[i]);
 
-        const tur = that.blocks.logo.turtles.ithTurtle(0);
+        const tur = that.activity.turtles.ithTurtle(0);
 
         if (
             tur.singer.instrumentNames.length === 0 ||
             tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
-            that.blocks.logo.synth.createDefaultSynth(0);
-            that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
+            that.activity.logo.synth.createDefaultSynth(0);
+            that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
 
-        that.blocks.logo.synth.setMasterVolume(PREVIEWVOLUME);
-        Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
+        that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
+        Singer.setSynthVolume(that.activity.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
 
         actualPitch[0] = actualPitch[0].replace(SHARP, "#").replace(FLAT, "b");
         if (!that._triggerLock) {
             that._triggerLock = true;
-            that.blocks.logo.synth.trigger(
+            that.activity.logo.synth.trigger(
                 0,
                 actualPitch[0] + actualPitch[1],
                 1 / 8,
@@ -1978,16 +1991,20 @@ const piemenuColor = function (block, wheelValues, selectedValue, mode) {
     const x = block.container.x;
     const y = block.container.y;
 
-    const canvasLeft = block.blocks.canvas.offsetLeft + 28 * block.blocks.blockScale;
-    const canvasTop = block.blocks.canvas.offsetTop + 6 * block.blocks.blockScale;
+    const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
+    const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
     docById("wheelDiv").style.height = "300px";
     docById("wheelDiv").style.width = "300px";
 
     const selectorWidth = 150;
-    const left = Math.round((x + block.blocks.stage.x) * block.blocks.getStageScale() + canvasLeft);
-    const top = Math.round((y + block.blocks.stage.y) * block.blocks.getStageScale() + canvasTop);
+    const left = Math.round(
+        (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+    );
+    const top = Math.round(
+        (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+    );
     block.label.style.left = left + "px";
     block.label.style.top = top + "px";
 
@@ -2074,7 +2091,7 @@ const piemenuBasic = function (block, menuLabels, menuValues, selectedValue, col
     block._basicWheel.sliceSelectedPathCustom = block._basicWheel.slicePathCustom;
     block._basicWheel.sliceInitPathCustom = block._basicWheel.slicePathCustom;
     block._basicWheel.animatetime = 0; // 300;
-    if (block.name !== "wrapmode"){
+    if (block.name !== "wrapmode") {
         block._basicWheel.titleRotateAngle = 0;
     }
     block._basicWheel.createWheel(labels);
@@ -2123,8 +2140,8 @@ const piemenuBasic = function (block, menuLabels, menuValues, selectedValue, col
     const x = block.container.x;
     const y = block.container.y;
 
-    const canvasLeft = block.blocks.canvas.offsetLeft + 28 * block.blocks.blockScale;
-    const canvasTop = block.blocks.canvas.offsetTop + 6 * block.blocks.blockScale;
+    const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
+    const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
     docById("wheelDiv").style.height = "300px";
@@ -2134,8 +2151,9 @@ const piemenuBasic = function (block, menuLabels, menuValues, selectedValue, col
             block.blocks.turtles._canvas.width - 300,
             Math.max(
                 0,
-                Math.round((x + block.blocks.stage.x) * block.blocks.getStageScale() + canvasLeft) -
-                    200
+                Math.round(
+                    (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+                ) - 200
             )
         ) + "px";
     docById("wheelDiv").style.top =
@@ -2143,8 +2161,9 @@ const piemenuBasic = function (block, menuLabels, menuValues, selectedValue, col
             block.blocks.turtles._canvas.height - 350,
             Math.max(
                 0,
-                Math.round((y + block.blocks.stage.y) * block.blocks.getStageScale() + canvasTop) -
-                    200
+                Math.round(
+                    (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+                ) - 200
             )
         ) + "px";
 
@@ -2224,8 +2243,8 @@ const piemenuBoolean = function (block, booleanLabels, booleanValues, boolean) {
     const x = block.container.x;
     const y = block.container.y;
 
-    const canvasLeft = block.blocks.canvas.offsetLeft + 28 * block.blocks.blockScale;
-    const canvasTop = block.blocks.canvas.offsetTop + 6 * block.blocks.blockScale;
+    const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
+    const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
     docById("wheelDiv").style.height = "300px";
@@ -2235,8 +2254,9 @@ const piemenuBoolean = function (block, booleanLabels, booleanValues, boolean) {
             block.blocks.turtles._canvas.width - 300,
             Math.max(
                 0,
-                Math.round((x + block.blocks.stage.x) * block.blocks.getStageScale() + canvasLeft) -
-                    200
+                Math.round(
+                    (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+                ) - 200
             )
         ) + "px";
     docById("wheelDiv").style.top =
@@ -2244,8 +2264,9 @@ const piemenuBoolean = function (block, booleanLabels, booleanValues, boolean) {
             block.blocks.turtles._canvas.height - 350,
             Math.max(
                 0,
-                Math.round((y + block.blocks.stage.y) * block.blocks.getStageScale() + canvasTop) -
-                    200
+                Math.round(
+                    (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+                ) - 200
             )
         ) + "px";
 
@@ -2349,9 +2370,9 @@ const piemenuVoices = function (block, voiceLabels, voiceValues, categories, voi
         that.text.text = label;
 
         if (getDrumName(that.value) === null) {
-            that.blocks.logo.synth.loadSynth(0, getVoiceSynthName(that.value));
+            that.activity.logo.synth.loadSynth(0, getVoiceSynthName(that.value));
         } else {
-            that.blocks.logo.synth.loadSynth(0, getDrumSynthName(that.value));
+            that.activity.logo.synth.loadSynth(0, getDrumSynthName(that.value));
         }
 
         // Make sure text is on top.
@@ -2370,7 +2391,7 @@ const piemenuVoices = function (block, voiceLabels, voiceValues, categories, voi
         const voice = voiceValues[i];
         let timeout = 0;
 
-        const tur = that.blocks.logo.turtles.ithTurtle(0);
+        const tur = that.activity.turtles.ithTurtle(0);
 
         if (
             tur.singer.instrumentNames.length === 0 ||
@@ -2378,19 +2399,19 @@ const piemenuVoices = function (block, voiceLabels, voiceValues, categories, voi
         ) {
             tur.singer.instrumentNames.push(voice);
             if (voice === DEFAULTVOICE) {
-                that.blocks.logo.synth.createDefaultSynth(0);
+                that.activity.logo.synth.createDefaultSynth(0);
             }
 
-            that.blocks.logo.synth.loadSynth(0, voice);
+            that.activity.logo.synth.loadSynth(0, voice);
             // give the synth time to load
             timeout = 500;
         }
 
         setTimeout(function () {
-            that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
-            Singer.setSynthVolume(that.blocks.logo, 0, voice, DEFAULTVOLUME);
-            that.blocks.logo.synth.trigger(0, "G4", 1 / 4, voice, null, null, false);
-            that.blocks.logo.synth.start();
+            that.activity.logo.synth.setMasterVolume(DEFAULTVOLUME);
+            Singer.setSynthVolume(that.activity.logo, 0, voice, DEFAULTVOLUME);
+            that.activity.logo.synth.trigger(0, "G4", 1 / 4, voice, null, null, false);
+            that.activity.logo.synth.start();
         }, timeout);
 
         __selectionChanged();
@@ -2400,8 +2421,8 @@ const piemenuVoices = function (block, voiceLabels, voiceValues, categories, voi
     const x = block.container.x;
     const y = block.container.y;
 
-    const canvasLeft = block.blocks.canvas.offsetLeft + 28 * block.blocks.blockScale;
-    const canvasTop = block.blocks.canvas.offsetTop + 6 * block.blocks.blockScale;
+    const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
+    const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
     docById("wheelDiv").style.height = "400px";
@@ -2411,8 +2432,9 @@ const piemenuVoices = function (block, voiceLabels, voiceValues, categories, voi
             block.blocks.turtles._canvas.width - 400,
             Math.max(
                 0,
-                Math.round((x + block.blocks.stage.x) * block.blocks.getStageScale() + canvasLeft) -
-                    200
+                Math.round(
+                    (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+                ) - 200
             )
         ) + "px";
     docById("wheelDiv").style.top =
@@ -2420,8 +2442,9 @@ const piemenuVoices = function (block, voiceLabels, voiceValues, categories, voi
             block.blocks.turtles._canvas.height - 450,
             Math.max(
                 0,
-                Math.round((y + block.blocks.stage.y) * block.blocks.getStageScale() + canvasTop) -
-                    200
+                Math.round(
+                    (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+                ) - 200
             )
         ) + "px";
 
@@ -2533,8 +2556,8 @@ const piemenuIntervals = function (block, selectedInterval) {
     const x = block.container.x;
     const y = block.container.y;
 
-    const canvasLeft = block.blocks.canvas.offsetLeft + 28 * block.blocks.blockScale;
-    const canvasTop = block.blocks.canvas.offsetTop + 6 * block.blocks.blockScale;
+    const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
+    const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
     docById("wheelDiv").style.height = "400px";
@@ -2544,8 +2567,9 @@ const piemenuIntervals = function (block, selectedInterval) {
             block.blocks.turtles._canvas.width - 400,
             Math.max(
                 0,
-                Math.round((x + block.blocks.stage.x) * block.blocks.getStageScale() + canvasLeft) -
-                    200
+                Math.round(
+                    (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+                ) - 200
             )
         ) + "px";
     docById("wheelDiv").style.top =
@@ -2553,8 +2577,9 @@ const piemenuIntervals = function (block, selectedInterval) {
             block.blocks.turtles._canvas.height - 450,
             Math.max(
                 0,
-                Math.round((y + block.blocks.stage.y) * block.blocks.getStageScale() + canvasTop) -
-                    200
+                Math.round(
+                    (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+                ) - 200
             )
         ) + "px";
 
@@ -2628,24 +2653,24 @@ const piemenuIntervals = function (block, selectedInterval) {
         const obj = getNote("C", 4, INTERVALVALUES[that.value][0], "C major", false, null, null);
         obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
 
-        const tur = that.blocks.logo.turtles.ithTurtle(0);
+        const tur = that.activity.turtles.ithTurtle(0);
 
         if (
             tur.singer.instrumentNames.length === 0 ||
             tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
-            that.blocks.logo.synth.createDefaultSynth(0);
-            that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
+            that.activity.logo.synth.createDefaultSynth(0);
+            that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
 
-        that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
-        Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, DEFAULTVOLUME);
+        that.activity.logo.synth.setMasterVolume(DEFAULTVOLUME);
+        Singer.setSynthVolume(that.activity.logo, 0, DEFAULTVOICE, DEFAULTVOLUME);
 
         if (!that._triggerLock) {
             that._triggerLock = true;
 
-            that.blocks.logo.synth.trigger(
+            that.activity.logo.synth.trigger(
                 0,
                 ["C4", obj[0] + obj[1]],
                 1 / 8,
@@ -2946,20 +2971,20 @@ const piemenuModes = function (block, selectedMode) {
         const obj = getNote(key, 4, i + o, key + " chromatic", false, null, null);
         obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
 
-        const tur = that.blocks.logo.turtles.ithTurtle(0);
+        const tur = that.activity.turtles.ithTurtle(0);
 
         if (
             tur.singer.instrumentNames.length === 0 ||
             tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
-            that.blocks.logo.synth.createDefaultSynth(0);
-            that.blocks.logo.synth.loadSynth(0, DEFAULTVOICE);
+            that.activity.logo.synth.createDefaultSynth(0);
+            that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
 
-        that.blocks.logo.synth.setMasterVolume(DEFAULTVOLUME);
-        Singer.setSynthVolume(that.blocks.logo, 0, DEFAULTVOICE, DEFAULTVOLUME);
-        that.blocks.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 12, DEFAULTVOICE, null, null);
+        that.activity.logo.synth.setMasterVolume(DEFAULTVOLUME);
+        Singer.setSynthVolume(that.activity.logo, 0, DEFAULTVOICE, DEFAULTVOLUME);
+        that.activity.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 12, DEFAULTVOICE, null, null);
     };
 
     const __playScale = function (activeTabs, idx) {
@@ -3001,15 +3026,15 @@ const piemenuModes = function (block, selectedMode) {
         docById("wheelnav-_exitWheel-title-1").style.fill = "#ffffff";
         docById("wheelnav-_exitWheel-title-1").style.pointerEvents = "none";
         docById("wheelnav-_exitWheel-slice-1").style.pointerEvents = "none";
-        setTimeout(function() {
+        setTimeout(function () {
             const playButtonTitle = docById("wheelnav-_exitWheel-title-1");
             const playButtonSlice = docById("wheelnav-_exitWheel-slice-1");
-            if (playButtonTitle && playButtonSlice){
+            if (playButtonTitle && playButtonSlice) {
                 playButtonTitle.style.fill = "#000000";
                 playButtonTitle.style.pointerEvents = "auto";
                 playButtonSlice.style.pointerEvents = "auto";
             }
-        }, 20 * 1000 / 10);
+        }, (20 * 1000) / 10);
 
         __playScale(activeTabs, 0);
     };
@@ -3018,8 +3043,8 @@ const piemenuModes = function (block, selectedMode) {
     const x = block.container.x;
     const y = block.container.y;
 
-    const canvasLeft = block.blocks.canvas.offsetLeft + 28 * block.blocks.blockScale;
-    const canvasTop = block.blocks.canvas.offsetTop + 6 * block.blocks.blockScale;
+    const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
+    const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
     docById("wheelDiv").style.height = "600px";
@@ -3031,8 +3056,9 @@ const piemenuModes = function (block, selectedMode) {
             block.blocks.turtles._canvas.width - 600,
             Math.max(
                 0,
-                Math.round((x + block.blocks.stage.x) * block.blocks.getStageScale() + canvasLeft) -
-                    200
+                Math.round(
+                    (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+                ) - 200
             )
         ) + "px";
     docById("wheelDiv").style.top =
@@ -3040,8 +3066,9 @@ const piemenuModes = function (block, selectedMode) {
             block.blocks.turtles._canvas.height - 650,
             Math.max(
                 0,
-                Math.round((y + block.blocks.stage.y) * block.blocks.getStageScale() + canvasTop) -
-                    200
+                Math.round(
+                    (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+                ) - 200
             )
         ) + "px";
 
@@ -3109,15 +3136,15 @@ const piemenuBlockContext = function (block) {
     const x = block.blocks.blockList[blockBlock].container.x;
     const y = block.blocks.blockList[blockBlock].container.y;
 
-    const canvasLeft = block.blocks.canvas.offsetLeft + 28 * block.blocks.getStageScale();
-    const canvasTop = block.blocks.canvas.offsetTop + 6 * block.blocks.getStageScale();
+    const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.activity.getStageScale();
+    const canvasTop = block.activity.canvas.offsetTop + 6 * block.activity.getStageScale();
 
     docById("contextWheelDiv").style.left =
-        Math.round((x + block.blocks.stage.x) * block.blocks.getStageScale() + canvasLeft) -
+        Math.round((x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft) -
         150 +
         "px";
     docById("contextWheelDiv").style.top =
-        Math.round((y + block.blocks.stage.y) * block.blocks.getStageScale() + canvasTop) -
+        Math.round((y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop) -
         150 +
         "px";
 
@@ -3131,7 +3158,11 @@ const piemenuBlockContext = function (block) {
     ];
 
     const topBlock = block.blocks.findTopBlock(blockBlock);
-    if (["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].indexOf(block.name) !== -1) {
+    if (
+        ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].indexOf(
+            block.name
+        ) !== -1
+    ) {
         labels.push("imgsrc:header-icons/save-blocks-button.svg");
     }
     const message = block.blocks.blockList[block.blocks.activeBlock].protoblock.helpString;
@@ -3159,7 +3190,11 @@ const piemenuBlockContext = function (block) {
     wheel.navItems[1].setTooltip(_("Extract"));
     wheel.navItems[2].setTooltip(_("Move to trash"));
     wheel.navItems[3].setTooltip(_("Close"));
-    if (["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].indexOf(block.blocks.blockList[topBlock].name) !== -1) {
+    if (
+        ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].indexOf(
+            block.blocks.blockList[topBlock].name
+        ) !== -1
+    ) {
         wheel.navItems[4].setTooltip(_("Save stack"));
     }
 
@@ -3197,7 +3232,11 @@ const piemenuBlockContext = function (block) {
         docById("contextWheelDiv").style.display = "none";
     };
 
-    if (["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].indexOf(block.name) !== -1) {
+    if (
+        ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].indexOf(
+            block.name
+        ) !== -1
+    ) {
         wheel.navItems[4].navigateFunction = function () {
             that.blocks.activeBlock = blockBlock;
             that.blocks.prepareStackForCopy();
@@ -3208,7 +3247,7 @@ const piemenuBlockContext = function (block) {
     if (helpButton !== null) {
         wheel.navItems[helpButton].navigateFunction = function () {
             that.blocks.activeBlock = blockBlock;
-            new HelpWidget(blocks);
+            new HelpWidget(that, true);
             docById("contextWheelDiv").style.display = "none";
         };
     }
@@ -3223,25 +3262,20 @@ const piemenuBlockContext = function (block) {
  *
  * @returns {void}
  */
-const piemenuGrid = function () {
+const piemenuGrid = function (activity) {
     docById("wheelDivptm").style.display = "none";
-    const x = turtles.gridButton.getBoundingClientRect().x;
-    const y = turtles.gridButton.getBoundingClientRect().y;
+    const x = activity.turtles.gridButton.getBoundingClientRect().x;
+    const y = activity.turtles.gridButton.getBoundingClientRect().y;
     docById("wheelDivptm").style.position = "absolute";
     docById("wheelDivptm").style.height = "400px";
     docById("wheelDivptm").style.width = "400px";
     docById("wheelDivptm").style.left =
-        Math.min(
-            logo.blocks.turtles._canvas.width - 200,
-            Math.max(0, x * logo.blocks.getStageScale())
-        ) -
+        Math.min(activity.turtles._canvas.width - 200, Math.max(0, x * activity.getStageScale())) -
         350 +
         "px";
     docById("wheelDivptm").style.top =
-        Math.min(
-            logo.blocks.turtles._canvas.height - 250,
-            Math.max(0, y * logo.blocks.getStageScale())
-        ) + "px";
+        Math.min(activity.turtles._canvas.height - 250, Math.max(0, y * activity.getStageScale())) +
+        "px";
     docById("wheelDivptm").style.display = "";
 
     const grids = [
@@ -3271,47 +3305,379 @@ const piemenuGrid = function () {
         "Bass",
         "Blank"
     ];
-    turtles.gridWheel = new wheelnav("wheelDivptm", null, 300, 300);
-    turtles._exitWheel = new wheelnav("_exitWheel", turtles.gridWheel.raphael);
+    activity.turtles.gridWheel = new wheelnav("wheelDivptm", null, 300, 300);
+    activity.turtles._exitWheel = new wheelnav("_exitWheel", activity.turtles.gridWheel.raphael);
 
-    turtles.gridWheel.keynavigateEnabled = false;
-    turtles.gridWheel.slicePathFunction = slicePath().DonutSlice;
-    turtles.gridWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-    turtles.gridWheel.colors = platformColor.gridWheelcolors.wheel;
-    turtles.gridWheel.slicePathCustom.minRadiusPercent = 0.3;
-    turtles.gridWheel.slicePathCustom.maxRadiusPercent = 1;
-    turtles.gridWheel.sliceSelectedPathCustom = turtles.gridWheel.slicePathCustom;
-    turtles.gridWheel.sliceInitPathCustom = turtles.gridWheel.slicePathCustom;
-    turtles.gridWheel.animatetime = 0; // 300;
-    turtles.gridWheel.clickModeRotate = false;
+    activity.turtles.gridWheel.keynavigateEnabled = false;
+    activity.turtles.gridWheel.slicePathFunction = slicePath().DonutSlice;
+    activity.turtles.gridWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+    activity.turtles.gridWheel.colors = platformColor.gridWheelcolors.wheel;
+    activity.turtles.gridWheel.slicePathCustom.minRadiusPercent = 0.3;
+    activity.turtles.gridWheel.slicePathCustom.maxRadiusPercent = 1;
+    activity.turtles.gridWheel.sliceSelectedPathCustom = activity.turtles.gridWheel.slicePathCustom;
+    activity.turtles.gridWheel.sliceInitPathCustom = activity.turtles.gridWheel.slicePathCustom;
+    activity.turtles.gridWheel.animatetime = 0; // 300;
+    activity.turtles.gridWheel.clickModeRotate = false;
     const { fill, stroke } = platformColor.gridWheelcolors.selected;
-    turtles.gridWheel.sliceHoverAttr = { fill, stroke, "stroke-width": 2 };
-    turtles.gridWheel.sliceSelectedAttr = { fill, stroke, "stroke-width": 2 };
+    activity.turtles.gridWheel.sliceHoverAttr = { fill, stroke, "stroke-width": 2 };
+    activity.turtles.gridWheel.sliceSelectedAttr = { fill, stroke, "stroke-width": 2 };
 
-    turtles.gridWheel.clockwise = false;
-    turtles.gridWheel.initWheel(grids);
-    turtles.gridWheel.navItems[gridLabels.length - 1].enabled = false;
-    turtles.gridWheel.createWheel();
-    turtles.gridWheel.navigateWheel(turtles.currentGrid ? turtles.currentGrid : 0);
+    activity.turtles.gridWheel.clockwise = false;
+    activity.turtles.gridWheel.initWheel(grids);
+    activity.turtles.gridWheel.navItems[gridLabels.length - 1].enabled = false;
+    activity.turtles.gridWheel.createWheel();
+    activity.turtles.gridWheel.navigateWheel(
+        activity.turtles.currentGrid ? activity.turtles.currentGrid : 0
+    );
 
     for (let i = 0; i < gridLabels.length; i++) {
-        turtles.gridWheel.navItems[i].navigateFunction = turtles.doGrid;
-        turtles.gridWheel.navItems[i].setTooltip(gridLabels[i]);
+        activity.turtles.gridWheel.navItems[i].navigateFunction = activity.turtles.doGrid;
+        activity.turtles.gridWheel.navItems[i].setTooltip(gridLabels[i]);
     }
 
-    turtles._exitWheel.colors = platformColor.exitWheelcolors;
-    turtles._exitWheel.slicePathFunction = slicePath().DonutSlice;
-    turtles._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-    turtles._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-    turtles._exitWheel.slicePathCustom.maxRadiusPercent = 0.3;
-    turtles._exitWheel.sliceSelectedPathCustom = turtles._exitWheel.slicePathCustom;
-    turtles._exitWheel.sliceInitPathCustom = turtles._exitWheel.slicePathCustom;
-    turtles._exitWheel.clickModeRotate = false;
-    turtles._exitWheel.createWheel(["×", " "]);
+    activity.turtles._exitWheel.colors = platformColor.exitWheelcolors;
+    activity.turtles._exitWheel.slicePathFunction = slicePath().DonutSlice;
+    activity.turtles._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+    activity.turtles._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+    activity.turtles._exitWheel.slicePathCustom.maxRadiusPercent = 0.3;
+    activity.turtles._exitWheel.sliceSelectedPathCustom =
+        activity.turtles._exitWheel.slicePathCustom;
+    activity.turtles._exitWheel.sliceInitPathCustom = activity.turtles._exitWheel.slicePathCustom;
+    activity.turtles._exitWheel.clickModeRotate = false;
+    activity.turtles._exitWheel.createWheel(["×", " "]);
 
-    turtles._exitWheel.navItems[0].navigateFunction = () => {
+    activity.turtles._exitWheel.navItems[0].navigateFunction = () => {
         docById("wheelDivptm").style.display = "none";
-        turtles.gridWheel.removeWheel();
-        turtles._exitWheel.removeWheel();
+        activity.turtles.gridWheel.removeWheel();
+        activity.turtles._exitWheel.removeWheel();
     };
+};
+
+const piemenuKey = (activity) => {
+    docById("chooseKeyDiv").style.display = "block";
+    docById("moveable").style.display = "block";
+
+    const keyNameWheel = new wheelnav("chooseKeyDiv", null, 1200, 1200);
+    const keyNameWheel2 = new wheelnav("keyNameWheel2", keyNameWheel.raphael);
+    const keys = ["C", "G", "D", "A", "E", "B/C♭", "F♯/G♭", "C♯/D♭", "G♯/A♭", "D♯/E♭", "B♭", "F"];
+
+    wheelnav.cssMode = true;
+
+    keyNameWheel.slicePathFunction = slicePath().DonutSlice;
+    keyNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+    keyNameWheel.slicePathCustom.minRadiusPercent = 0.5;
+    keyNameWheel.slicePathCustom.maxRadiusPercent = 0.8;
+    keyNameWheel.sliceSelectedPathCustom = keyNameWheel.slicePathCustom;
+    keyNameWheel.sliceInitPathCustom = keyNameWheel.slicePathCustom;
+    keyNameWheel.titleRotateAngle = 0;
+    keyNameWheel.colors = platformColor.pitchWheelcolors;
+    keyNameWheel.animatetime = 0;
+
+    keyNameWheel.createWheel(keys);
+
+    keyNameWheel2.colors = platformColor.pitchWheelcolors;
+    keyNameWheel2.slicePathFunction = slicePath().DonutSlice;
+    keyNameWheel2.slicePathCustom = slicePath().DonutSliceCustomization();
+    keyNameWheel2.slicePathCustom.minRadiusPercent = 0.8;
+    keyNameWheel2.slicePathCustom.maxRadiusPercent = 1;
+    keyNameWheel2.sliceSelectedPathCustom = keyNameWheel2.slicePathCustom;
+    keyNameWheel2.sliceInitPathCustom = keyNameWheel2.slicePathCustom;
+
+    const keys2 = [];
+    for (let i = 0; i < keys.length; i++) {
+        if (keys[i].length > 2) {
+            const obj = keys[i].split("/");
+            keys2.push(obj[0]);
+            keys2.push(obj[1]);
+        } else {
+            keys2.push("");
+            keys2.push("");
+        }
+    }
+
+    keyNameWheel2.navAngle = -7.45;
+    keyNameWheel2.animatetime = 0;
+    keyNameWheel2.createWheel(keys2);
+
+    const modenameWheel = new wheelnav("modenameWheel", keyNameWheel.raphael);
+    const modes = ["major", "dorian", "phrygian", "lydian", "mixolydian", "minor", "locrian"];
+    modenameWheel.slicePathFunction = slicePath().DonutSlice;
+    modenameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+    modenameWheel.slicePathCustom.minRadiusPercent = 0.2;
+    modenameWheel.slicePathCustom.maxRadiusPercent = 0.5;
+    modenameWheel.sliceSelectedPathCustom = modenameWheel.slicePathCustom;
+    modenameWheel.sliceInitPathCustom = modenameWheel.slicePathCustom;
+    modenameWheel.titleRotateAngle = 0;
+    modenameWheel.colors = platformColor.modeGroupWheelcolors;
+    modenameWheel.animatetime = 0;
+    modenameWheel.createWheel(modes);
+
+    const exitWheel = new wheelnav("exitWheel", keyNameWheel.raphael);
+    exitWheel.slicePathFunction = slicePath().DonutSlice;
+    exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+    exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+    exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+    exitWheel.sliceSelectedPathCustom = exitWheel.slicePathCustom;
+    exitWheel.sliceInitPathCustom = exitWheel.slicePathCustom;
+    exitWheel.titleRotateAngle = 0;
+    exitWheel.clickModeRotate = false;
+    exitWheel.colors = platformColor.exitWheelcolors;
+    exitWheel.animatetime = 0;
+    exitWheel.createWheel(["×", " "]);
+
+    const x = event.clientX;
+    const y = event.clientY;
+
+    docById("chooseKeyDiv").style.left = x - 175 + "px";
+    docById("chooseKeyDiv").style.top = y + 50 + "px";
+    docById("moveable").style.left = x - 110 + "px";
+    docById("moveable").style.top = y + 400 + "px";
+
+    const __generateSetKeyBlocks = () => {
+        // Find all setkey blocks in the code.
+        let isSetKeyBlockPresent = false;
+        const setKeyBlocks = [];
+        for (const i in activity.blocks.blockList) {
+            if (
+                activity.blocks.blockList[i].name === "setkey2" &&
+                !activity.blocks.blockList[i].trash
+            ) {
+                isSetKeyBlockPresent = true;
+                setKeyBlocks.push(i);
+            }
+        }
+
+        if (!isSetKeyBlockPresent) {
+            activity.blocks.findStacks();
+            const stacks = activity.blocks.stackList;
+            stacks.sort();
+            let connectionsSetKey;
+            let movable;
+            for (const i in stacks) {
+                if (activity.logo.blocks.blockList[stacks[i]].name === "start") {
+                    const bottomBlock = activity.blocks.blockList[stacks[i]].connections[1];
+                    if (activity.KeySignatureEnv[2]) {
+                        activity.blocks._makeNewBlockWithConnections(
+                            "movable",
+                            0,
+                            [stacks[i], null, null],
+                            null,
+                            null
+                        );
+                        movable = activity.logo.blocks.blockList.length - 1;
+                        activity.blocks._makeNewBlockWithConnections(
+                            "boolean",
+                            0,
+                            [movable],
+                            null,
+                            null
+                        );
+                        activity.blocks.blockList[movable].connections[1] =
+                            activity.blocks.blockList.length - 1;
+                        connectionsSetKey = [movable, null, null, bottomBlock];
+                    } else {
+                        connectionsSetKey = [stacks[i], null, null, bottomBlock];
+                    }
+
+                    activity.blocks._makeNewBlockWithConnections(
+                        "setkey2",
+                        0,
+                        connectionsSetKey,
+                        null,
+                        null
+                    );
+
+                    const setKey = activity.blocks.blockList.length - 1;
+                    activity.blocks.blockList[bottomBlock].connections[0] = setKey;
+
+                    if (activity.KeySignatureEnv[2]) {
+                        activity.blocks.blockList[stacks[i]].connections[1] = movable;
+                        activity.blocks.blockList[movable].connections[2] = setKey;
+                    } else {
+                        activity.blocks.blockList[stacks[i]].connections[1] = setKey;
+                    }
+
+                    activity.blocks.adjustExpandableClampBlock();
+
+                    activity.blocks._makeNewBlockWithConnections(
+                        "notename",
+                        0,
+                        [setKey],
+                        null,
+                        null
+                    );
+                    activity.blocks.blockList[setKey].connections[1] =
+                        activity.blocks.blockList.length - 1;
+                    activity.blocks.blockList[activity.blocks.blockList.length - 1].value =
+                        activity.KeySignatureEnv[0];
+                    activity.blocks._makeNewBlockWithConnections(
+                        "modename",
+                        0,
+                        [setKey],
+                        null,
+                        null
+                    );
+                    activity.blocks.blockList[setKey].connections[2] =
+                        activity.blocks.blockList.length - 1;
+                    activity.blocks.blockList[activity.blocks.blockList.length - 1].value =
+                        activity.KeySignatureEnv[1];
+                    activity.textMsg(
+                        _("You have chosen key ") +
+                            activity.KeySignatureEnv[0] +
+                            " " +
+                            activity.KeySignatureEnv[1] +
+                            _(" for your pitch preview.")
+                    );
+                }
+            }
+        }
+    };
+
+    const __exitMenu = () => {
+        docById("chooseKeyDiv").style.display = "none";
+        docById("moveable").style.display = "none";
+        const ele = document.getElementsByName("moveable");
+        for (let i = 0; i < ele.length; i++) {
+            if (ele[i].checked) {
+                activity.KeySignatureEnv[2] = ele[i].value == "true" ? true : false;
+            }
+        }
+        keyNameWheel.removeWheel();
+        keyNameWheel2.removeWheel();
+        modenameWheel.removeWheel();
+        activity.storage.KeySignatureEnv = activity.KeySignatureEnv;
+        __generateSetKeyBlocks();
+    };
+
+    exitWheel.navItems[0].navigateFunction = __exitMenu;
+
+    const __playNote = (note) => {
+        const obj = getNote(
+            note,
+            4,
+            null,
+            note + " " + activity.KeySignatureEnv[1],
+            false,
+            null,
+            null
+        );
+        obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
+
+        const tur = activity.logo.turtles.ithTurtle(0);
+        if (
+            tur.singer.instrumentNames.length === 0 ||
+            tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+        ) {
+            tur.singer.instrumentNames.push(DEFAULTVOICE);
+            activity.logo.synth.createDefaultSynth(0);
+            activity.logo.synth.loadSynth(0, DEFAULTVOICE);
+        }
+
+        activity.logo.synth.setMasterVolume(DEFAULTVOLUME);
+        Singer.setSynthVolume(activity.logo, 0, DEFAULTVOICE, DEFAULTVOLUME);
+        activity.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 12, DEFAULTVOICE, null, null);
+    };
+
+    const __selectionChangedKey = () => {
+        const selection = keyNameWheel.navItems[keyNameWheel.selectedNavItemIndex].title;
+        keyNameWheel2.navigateWheel(2 * keyNameWheel.selectedNavItemIndex);
+        if (selection === "") {
+            keyNameWheel.navigateWheel(
+                (keyNameWheel.selectedNavItemIndex + 1) % keyNameWheel.navItems.length
+            );
+        } else if (selection.length <= 2) {
+            activity.KeySignatureEnv[0] = selection;
+        }
+    };
+
+    const __setupActionKey = function (i) {
+        keyNameWheel.navItems[i].navigateFunction = function () {
+            for (let j = 0; j < keys2.length; j++) {
+                if (Math.floor(j / 2) != i) {
+                    keyNameWheel2.navItems[j].navItem.hide();
+                } else {
+                    if (keys[i].length > 2) {
+                        keyNameWheel2.navItems[j].navItem.show();
+                    }
+                }
+            }
+            __selectionChangedKey();
+            if ((i >= 0 && i < 5) || (i > 9 && i < 12)) {
+                __playNote(activity.KeySignatureEnv[0]);
+            } else {
+                let selection = keyNameWheel.navItems[keyNameWheel.selectedNavItemIndex].title;
+                selection = selection.split("/");
+                __playNote(selection[0]);
+            }
+        };
+    };
+
+    for (let i = 0; i < keys.length; i++) {
+        __setupActionKey(i);
+    }
+
+    const __selectionChangedMode = () => {
+        const selection = modenameWheel.navItems[modenameWheel.selectedNavItemIndex].title;
+        if (selection === "") {
+            modenameWheel.navigateWheel(
+                (modenameWheel.selectedNavItemIndex + 1) % modenameWheel.navItems.length
+            );
+        } else {
+            activity.KeySignatureEnv[1] = selection;
+        }
+    };
+
+    for (let i = 0; i < modes.length; i++) {
+        modenameWheel.navItems[i].navigateFunction = function () {
+            __selectionChangedMode();
+        };
+    }
+
+    const __selectionChangedKey2 = function () {
+        const selection = keyNameWheel2.navItems[keyNameWheel2.selectedNavItemIndex].title;
+        activity.KeySignatureEnv[0] = selection;
+    };
+
+    for (let i = 0; i < keys2.length; i++) {
+        keyNameWheel2.navItems[i].navigateFunction = function () {
+            __selectionChangedKey2();
+        };
+    }
+
+    if (activity.storage.KeySignatureEnv !== undefined) {
+        const ks = activity.storage.KeySignatureEnv.split(",");
+        activity.KeySignatureEnv[0] = ks[0];
+        activity.KeySignatureEnv[1] = ks[1];
+        activity.KeySignatureEnv[2] = ks[2] == "true" ? true : false;
+    } else {
+        activity.KeySignatureEnv = ["C", "major", false];
+    }
+
+    let i = keys.indexOf(activity.KeySignatureEnv[0]);
+    if (i === -1) {
+        i = keys2.indexOf(activity.KeySignatureEnv[0]);
+        if (i !== -1) {
+            keyNameWheel.navigateWheel(Math.floor(i / 2));
+            keyNameWheel2.navigateWheel(i);
+            for (let j = 0; j < keys2.length; j++) {
+                keyNameWheel2.navItems[j].navItem.hide();
+                if (i % 2 == 0) {
+                    keyNameWheel2.navItems[i].navItem.show();
+                    keyNameWheel2.navItems[i + 1].navItem.show();
+                } else {
+                    keyNameWheel2.navItems[i].navItem.show();
+                    keyNameWheel2.navItems[i - 1].navItem.show();
+                }
+            }
+        }
+    } else {
+        keyNameWheel.navigateWheel(i);
+        keyNameWheel2.navItems[2 * i].navItem.hide();
+        keyNameWheel2.navItems[2 * i + 1].navItem.hide();
+    }
+
+    const j = modes.indexOf(activity.KeySignatureEnv[1]);
+    if (j !== -1) {
+        modenameWheel.navigateWheel(j);
+    }
 };

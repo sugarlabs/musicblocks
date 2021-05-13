@@ -20,8 +20,8 @@
    global createjs, platformColor, last, importMembers, setupRhythmActions, setupMeterActions,
    setupPitchActions, setupIntervalsActions, setupToneActions, setupOrnamentActions,
    setupVolumeActions, setupDrumActions, setupDictActions, _, Turtle, TURTLESVG, METRONOMESVG,
-   sugarizerCompatibility, FILLCOLORS, STROKECOLORS, getMunsellColor, DEFAULTVALUE, DEFAULTCHROMA,
-   jQuery, loading, docById, LEADING, CARTESIANBUTTON, piemenuGrid, CLEARBUTTON, COLLAPSEBUTTON,
+   FILLCOLORS, STROKECOLORS, getMunsellColor, DEFAULTVALUE, DEFAULTCHROMA,
+   jQuery, docById, LEADING, CARTESIANBUTTON, piemenuGrid, CLEARBUTTON, COLLAPSEBUTTON,
    EXPANDBUTTON, MBOUNDARY
  */
 
@@ -48,27 +48,11 @@ class Turtles {
     /**
      * @constructor
      */
-    constructor() {
-        // Import members of model and view (no arguments for model or view)
-        importMembers(this);
+    constructor(activity) {
+        // Import members of model and view (arguments only for model)
+        importMembers(this, "", [activity]);
         // Inititalize all actions related to blocks executed by Turtle objects
         this.initActions();
-
-        this._refreshCanvas = null; // function to refresh canvas
-    }
-
-    /**
-     * @param {Function} refreshCanvas - function to refresh canvas after view update
-     */
-    set refreshCanvas(refreshCanvas) {
-        this._refreshCanvas = refreshCanvas;
-    }
-
-    /**
-     * @returns {Function} function to refresh canvas after view update
-     */
-    get refreshCanvas() {
-        return this._refreshCanvas;
     }
 
     /**
@@ -77,15 +61,15 @@ class Turtles {
      * @returns {void}
      */
     initActions() {
-        setupRhythmActions();
-        setupMeterActions();
-        setupPitchActions();
-        setupIntervalsActions();
-        setupToneActions();
-        setupOrnamentActions();
-        setupVolumeActions();
-        setupDrumActions();
-        setupDictActions();
+        setupRhythmActions(this.activity);
+        setupMeterActions(this.activity);
+        setupPitchActions(this.activity);
+        setupIntervalsActions(this.activity);
+        setupToneActions(this.activity);
+        setupOrnamentActions(this.activity);
+        setupVolumeActions(this.activity);
+        setupDrumActions(this.activity);
+        setupDictActions(this.activity);
     }
 
     /**
@@ -134,7 +118,7 @@ class Turtles {
         const turtleName = blkInfoAvailable && "name" in infoDict ? infoDict["name"] : _("start");
 
         // Instantiate a new Turtle object
-        const turtle = new Turtle(id, turtleName, this, startBlock);
+        const turtle = new Turtle(this.activity, id, turtleName, this, startBlock);
 
         // Add turtle model properties and store color index for turtle
         this.addTurtleStageProps(turtle, blkInfoAvailable, infoDict);
@@ -146,7 +130,7 @@ class Turtles {
 
         if (startBlock === null) {
             // Hidden start block for when there are no start blocks
-            return
+            return;
         }
 
         if (startBlock.name === "start") {
@@ -190,7 +174,7 @@ class Turtles {
                 turtle.container.y = event.stageY / scale + offset.y;
                 turtle.x = this.screenX2turtleX(turtle.container.x);
                 turtle.y = this.screenY2turtleY(turtle.container.y);
-                this.refreshCanvas();
+                this.activity.refreshCanvas();
             });
         });
 
@@ -216,7 +200,7 @@ class Turtles {
             turtle.container.scaleX *= 1.2;
             turtle.container.scaleY = turtle.container.scaleX;
             turtle.container.scale = turtle.container.scaleX;
-            this.refreshCanvas();
+            this.activity.refreshCanvas();
         });
 
         turtle.container.on("mouseout", () => {
@@ -230,14 +214,13 @@ class Turtles {
             turtle.container.scaleX /= 1.2;
             turtle.container.scaleY = turtle.container.scaleX;
             turtle.container.scale = turtle.container.scaleX;
-            this.refreshCanvas();
+            this.activity.refreshCanvas();
         });
 
         document.getElementById("loader").className = "";
 
         this.addTurtleGraphicProps(turtle, blkInfoAvailable, infoDict);
-
-        this.refreshCanvas();
+        this.activity.refreshCanvas();
     }
 
     /**
@@ -250,7 +233,7 @@ class Turtles {
             this.turtleList[turtle].running = false;
         }
 
-        this.refreshCanvas();
+        this.activity.refreshCanvas();
     }
 
     // ================================ MODEL =================================
@@ -392,7 +375,8 @@ Turtles.TurtlesModel = class {
     /**
      * @constructor
      */
-    constructor() {
+    constructor(activity) {
+        this.activity = activity;
         this._masterStage = null; // createjs stage
         this._stage = null; // createjs container for turtle
 
@@ -407,6 +391,14 @@ Turtles.TurtlesModel = class {
 
         // createjs border container
         this._borderContainer = new createjs.Container();
+
+        this._masterStage = this.activity.stage;
+        this._stage = this.activity.turtleContainer;
+        this._stage.addChild(this._borderContainer);
+        this._canvas = this.activity.canvas;
+        this._hideMenu = this.activity.hideAuxMenu;
+        this._hideGrids = this.activity.hideGrids;
+        this._doGrid = this.activity._doCartesianPolar;
 
         // List of all of the turtles, one for each start block
         this._turtleList = [];
@@ -602,7 +594,7 @@ Turtles.TurtlesView = class {
     setStageScale(scale) {
         this.stage.scaleX = scale;
         this.stage.scaleY = scale;
-        this.refreshCanvas();
+        this.activity.refreshCanvas();
     }
 
     /**
@@ -651,7 +643,7 @@ Turtles.TurtlesView = class {
             turtle === -1 ? platformColor.background : this.turtleList[turtle].painter.canvasColor;
         this._backgroundColor = color;
         this.makeBackground();
-        this.refreshCanvas();
+        this.activity.refreshCanvas();
     }
 
     /**
@@ -724,15 +716,11 @@ Turtles.TurtlesView = class {
      */
     createArtwork(turtle, i, useTurtleArtwork) {
         let artwork = useTurtleArtwork ? TURTLESVG : METRONOMESVG;
-        artwork = sugarizerCompatibility.isInsideSugarizer()
-            ? artwork
-                .replace(/fill_color/g, sugarizerCompatibility.xoColor.fill)
-                .replace(/stroke_color/g, sugarizerCompatibility.xoColor.stroke)
-            : artwork
-                .replace(/fill_color/g, FILLCOLORS[i])
-                .replace(/stroke_color/g, STROKECOLORS[i]);
+        artwork = artwork
+            .replace(/fill_color/g, FILLCOLORS[i])
+            .replace(/stroke_color/g, STROKECOLORS[i]);
 
-        turtle.makeTurtleBitmap(artwork, this.refreshCanvas, useTurtleArtwork);
+        turtle.makeTurtleBitmap(artwork, this.activity, useTurtleArtwork);
 
         turtle.painter.color = i * 10;
         turtle.painter.canvasColor = getMunsellColor(
@@ -748,6 +736,8 @@ Turtles.TurtlesView = class {
      * @param setCollapsed - specify whether the background should be collapsed
      */
     makeBackground(setCollapsed) {
+        const activity = this.activity;
+
         const doCollapse = setCollapsed === undefined ? false : setCollapsed;
 
         const borderContainer = this.borderContainer;
@@ -771,13 +761,13 @@ Turtles.TurtlesView = class {
             });
 
             container.onmouseover = () => {
-                if (!loading) {
+                if (!activity.loading) {
                     document.body.style.cursor = "pointer";
                 }
             };
 
             container.onmouseout = () => {
-                if (!loading) {
+                if (!activity.loading) {
                     document.body.style.cursor = "default";
                 }
             };
@@ -815,7 +805,7 @@ Turtles.TurtlesView = class {
                 const y = event.stageY - offset.y;
                 turtlesStage.x = Math.max(0, Math.min((this._w * 3) / 4, x));
                 turtlesStage.y = Math.max(55, Math.min((this._h * 3) / 4, y));
-                this.refreshCanvas();
+                activity.refreshCanvas();
             });
         };
 
@@ -826,7 +816,7 @@ Turtles.TurtlesView = class {
          */
         const __collapse = () => {
             this.hideMenu();
-            this.hideGrids();
+            this.activity.hideGrids();
             this.setStageScale(0.25);
             this._collapsedBoundary.visible = true;
             this._expandedBoundary.visible = false;
@@ -845,7 +835,7 @@ Turtles.TurtlesView = class {
             this.masterStage.addChild(turtlesStage);
             dragCanvas();
 
-            this.refreshCanvas();
+            this.activity.refreshCanvas();
         };
 
         /**
@@ -860,12 +850,15 @@ Turtles.TurtlesView = class {
                 70 + LEADING + 6
             );
 
-            this.gridButton.onclick = piemenuGrid;
+            const that = this;
+            this.gridButton.onclick  = () => {
+                piemenuGrid(that.activity);
+            };
         };
 
         /**
          * Makes clear button by initailising 'CLEARBUTTON' SVG.
-         * Assigns click listener function to call doClear() method.
+         * Assigns click listener function to call allClear() method.
          */
         const __makeClearButton = () => {
             this._clearButton = _makeButton(
@@ -876,7 +869,7 @@ Turtles.TurtlesView = class {
             );
 
             this._clearButton.onclick = () => {
-                this.doClear();
+                this.activity._allClear();
             };
 
             if (doCollapse) {

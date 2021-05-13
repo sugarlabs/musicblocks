@@ -1,4 +1,4 @@
-// Copyright (c) 2016-19 Walter Bender
+// Copyright (c) 2016-21 Walter Bender
 // Copyright (c) 2016 Hemant Kasat
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -13,12 +13,10 @@
 // from given frequency to nextoctave frequency(two times the given frequency)
 // in continuous manner.
 
-/* global _, Tone, logo */
+/* global _, Tone */
 
 /*
    Global locations
-    js/activity.js
-        logo, Tone
     js/utils/utils.js
         _
 */
@@ -41,7 +39,8 @@ class PitchSlider {
      * Intializes the pitch/slider
      * @returns {void}
      */
-    init() {
+    init(activity) {
+        this.activity = activity;
         if (window.widgetWindows.openWindows["slider"]) return;
         if (!this.frequencies || !this.frequencies.length) this.frequencies = [392];
 
@@ -134,7 +133,7 @@ class PitchSlider {
             MakeToolbar(id);
         }
 
-        logo.textMsg(_("Click on the slider to create a note block."));
+        this.activity.textMsg(_("Click on the slider to create a note block."));
         setTimeout(this.widgetWindow.sendToCenter, 0);
     }
 
@@ -144,11 +143,11 @@ class PitchSlider {
      * @returns {void}
      */
     _save(frequency) {
-        for (const name in logo.blocks.palettes.dict) {
-            logo.blocks.palettes.dict[name].hideMenu(true);
+        for (const name in this.activity.blocks.palettes.dict) {
+            this.activity.blocks.palettes.dict[name].hideMenu(true);
         }
 
-        logo.refreshCanvas();
+        this.activity.refreshCanvas();
 
         const newStack = [
             [0, "note", 100 + this._delta, 100 + this._delta, [null, 1, 2, null]],
@@ -165,6 +164,6 @@ class PitchSlider {
         newStack.push([frequencyIdx, ["number", { value: frequency }], 0, 0, [hertzIdx]]);
         newStack.push([hiddenIdx, "hidden", 0, 0, [hertzIdx, null]]);
 
-        logo.blocks.loadNewBlocks(newStack);
+        this.activity.blocks.loadNewBlocks(newStack);
     }
 }

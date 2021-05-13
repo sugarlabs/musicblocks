@@ -171,7 +171,8 @@ def pluginify(data):
 
         if type_ == 'image':
             # TODO: Detect if its png
-            IMAGES[name] = 'data:image/svg+xml;utf8,' + value
+            # Assume for now it is SVG.
+            IMAGES[name] = value  # 'data:image/svg+xml;utf8,' + value
 
     if IMAGES:
         outp['IMAGES'] = IMAGES
