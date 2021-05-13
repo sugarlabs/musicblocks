@@ -715,16 +715,21 @@ function preparePluginExports(activity, obj) {
 function processMacroData(macroData, palettes, blocks, macroDict) {
     // Macros are stored in a JSON-encoded dictionary.
     if (macroData !== "{}") {
-        const obj = JSON.parse(macroData);
-        palettes.add("myblocks", "black", "#a0a0a0");
+        try {
+            const obj = JSON.parse(macroData);
+            palettes.add("myblocks", "black", "#a0a0a0");
 
-        for (const name in obj) {
-            // console.debug("adding " + name + " to macroDict");
-            macroDict[name] = obj[name];
-            blocks.addToMyPalette(name, macroDict[name]);
+            for (const name in obj) {
+                // console.debug("adding " + name + " to macroDict");
+                macroDict[name] = obj[name];
+                blocks.addToMyPalette(name, macroDict[name]);
+            }
+
+            palettes.makePalettes(1);
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.debug(e);
         }
-
-        palettes.makePalettes(1);
     }
 }
 
