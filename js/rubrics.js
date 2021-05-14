@@ -530,13 +530,13 @@ function analyzeProject(activity) {
     const blocks = activity.blocks;
 
     const blockList = [];
-    for (let blk = 0; blk < blocks.blockList.length; blk++) {
-        if (blocks.blockList[blk].trash) {
+    for (let blk = 0; blk < activity.blocks.blockList.length; blk++) {
+        if (activity.blocks.blockList[blk].trash) {
             continue;
         }
 
         // Check to see if the block is solo or has no child flow..
-        switch (blocks.blockList[blk].name) {
+        switch (activity.blocks.blockList[blk].name) {
             case "rhythmicdot":
             case "tie":
             case "drift":
@@ -546,7 +546,7 @@ function analyzeProject(activity) {
             case "fill":
             case "hollowline":
             case "start":
-                if (blocks.blockList[blk].connections[1] == null) {
+                if (activity.blocks.blockList[blk].connections[1] == null) {
                     continue;
                 }
                 break;
@@ -567,30 +567,30 @@ function analyzeProject(activity) {
             case "chorus":
             case "phaser":
             case "action":
-                if (blocks.blockList[blk].connections[2] == null) {
+                if (activity.blocks.blockList[blk].connections[2] == null) {
                     continue;
                 }
                 break;
             case "tuplet2":
-                if (blocks.blockList[blk].connections[3] == null) {
+                if (activity.blocks.blockList[blk].connections[3] == null) {
                     continue;
                 }
                 break;
             case "invert":
-                if (blocks.blockList[blk].connections[4] == null) {
+                if (activity.blocks.blockList[blk].connections[4] == null) {
                     continue;
                 }
                 break;
             default:
                 if (
-                    blocks.blockList[blk].connections[0] == null &&
-                    last(blocks.blockList[blk].connections) == null
+                    activity.blocks.blockList[blk].connections[0] == null &&
+                    last(activity.blocks.blockList[blk].connections) == null
                 ) {
                     continue;
                 }
                 break;
         }
-        blockList.push(blocks.blockList[blk].name);
+        blockList.push(activity.blocks.blockList[blk].name);
     }
 
     const scores = [];
