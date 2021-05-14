@@ -412,7 +412,14 @@ function toTitleCase(str) {
 
 function processPluginData(activity, pluginData) {
     // Plugins are JSON-encoded dictionaries.
-    const obj = JSON.parse(pluginData);
+    let obj;
+    try {
+        obj = JSON.parse(pluginData);
+    } catch (e) {
+        // eslint-disable-next-line no-console
+        console.log(e);
+        return null;
+    }
     // Create a palette entry.
     let newPalette = false,
         paletteName = null;
