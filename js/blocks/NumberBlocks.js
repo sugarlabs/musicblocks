@@ -739,8 +739,10 @@ function setupNumberBlocks(activity) {
                         a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                         b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                     }
-
-                    return MathUtility.doPlus(a, b);
+                    
+                    if (a && b) {
+                        return MathUtility.doPlus(a, b);
+                    }
                 }
             }
         }
