@@ -43,7 +43,7 @@
    exported
 
    Activity, LEADING, _THIS_IS_MUSIC_BLOCKS_, _THIS_IS_TURTLE_BLOCKS_,
-   globalActivity, hideArrows
+   globalActivity, hideArrows, doAnalyzeProject
  */
 
 const LEADING = 0;
@@ -4444,7 +4444,7 @@ require(["domReady!"], function (doc) {
     setTimeout(function () {
         activity.setupDependencies();
         activity.domReady(doc);
-    }, 2500);
+    }, 5000);
 });
 
 // eslint-disable-next-line no-unused-vars
