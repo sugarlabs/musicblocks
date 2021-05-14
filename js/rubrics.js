@@ -527,7 +527,6 @@ const PALLABELS = [
 
 function analyzeProject(activity) {
     // Parse block data and generate score based on rubric
-    const blocks = activity.blocks;
 
     const blockList = [];
     for (let blk = 0; blk < activity.blocks.blockList.length; blk++) {
@@ -856,6 +855,7 @@ const getStatsFromNotation = (activity) => {
                 break;
             default:
         }
+	g533
     }
     // console.debug(projectStats);
     return projectStats;

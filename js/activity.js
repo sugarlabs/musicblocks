@@ -4429,7 +4429,7 @@ function Activity() {
         };
 
         if (this.planet !== undefined) {
-            this.planet.planet.setAnalyzeProject(analyzeProject);
+            this.planet.planet.setAnalyzeProject(analyzeProject, this);
         }
     };
 }
@@ -4437,19 +4437,10 @@ function Activity() {
 const activity = new Activity();
 
 require(["domReady!"], function (doc) {
-    // FIXME: Firefox needs a pause before loading dependencies.
-    window.platform = {
-        FF: /Firefox/i.test(navigator.userAgent)
-    };
-    if (platform.FF) {
-        setTimeout(function () {
-            activity.setupDependencies();
-            activity.domReady(doc);
-        }, 2500);
-    } else {
+    setTimeout(function () {
         activity.setupDependencies();
         activity.domReady(doc);
-    }
+    }, 2500);
 });
 
 // eslint-disable-next-line no-unused-vars
