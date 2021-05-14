@@ -39,7 +39,7 @@ function Publisher(Planet) {
             blocks.blockList.push(block);
         }
         //convert blocks to score.
-        let score = Planet.analyzeProject(Planet.activity);
+        let score = Planet.analyzeProject();
 
         //0("rhythm"),1("pitch"),2("tone"),3("mouse"),4("pen"),5("number"),
         //6("flow"),7("action"),8("sensors"),9("media"),10("mice")

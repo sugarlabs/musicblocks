@@ -179,6 +179,10 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
 // blocks, logo, palettes, and turtles for plugins and js-export.
 let globalActivity;
 
+const doAnalyzeProject = function() {
+    return analyzeProject(globalActivity);
+};
+
 function Activity() {
     globalActivity = this;
 
@@ -4429,7 +4433,7 @@ function Activity() {
         };
 
         if (this.planet !== undefined) {
-            this.planet.planet.setAnalyzeProject(analyzeProject, this);
+            this.planet.planet.setAnalyzeProject(doAnalyzeProject);
         }
     };
 }
