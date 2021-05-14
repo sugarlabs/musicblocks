@@ -740,7 +740,7 @@ function setupNumberBlocks(activity) {
                         b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                     }
                     
-                    if(a && b){
+                    if (a && b) {
                         return MathUtility.doPlus(a, b);
                     }
                 }
