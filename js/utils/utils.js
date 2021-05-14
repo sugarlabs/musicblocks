@@ -654,6 +654,10 @@ function processRawPluginData(activity, rawData) {
 }
 
 function updatePluginObj(activity, obj) {
+    if (obj === null) {
+        return;
+    }
+
     for (const name in obj["PALETTEPLUGINS"]) {
         activity.pluginObjs["PALETTEPLUGINS"][name] = obj["PALETTEPLUGINS"][name];
     }
