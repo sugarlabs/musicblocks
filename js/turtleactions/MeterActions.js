@@ -195,9 +195,21 @@ function setupMeterActions(activity) {
             const tur = activity.turtles.ithTurtle(turtle);
 
             const __listener = () => {
-                const queueBlock = new Queue(activity.logo.actions[action], 1, blk);
-                tur.parentFlowQueue.push(blk);
-                tur.queue.push(queueBlock);
+                if (tur.running) {
+                    const queueBlock = new Queue(activity.logo.actions[action], 1, blk);
+                    tur.parentFlowQueue.push(blk);
+                    tur.queue.push(queueBlock);
+                } else {
+                    // Since the turtle has stopped running, we need
+                    // to run the stack from here.
+                    activity.logo.runFromBlockNow(
+                        activity.logo,
+                        turtle,
+                        activity.logo.actions[action],
+                        isflow,
+                        receivedArg
+                    );
+                }
             };
 
             const eventName = "__everybeat_" + turtle + "__";
@@ -228,30 +240,9 @@ function setupMeterActions(activity) {
 
             // Set up a listener for this turtle/onbeat combo.
             const __listener = () => {
-                if (tur.running) {
-                    const queueBlock = new Queue(activity.logo.actions[action], 1, blk);
-                    tur.parentFlowQueue.push(blk);
-                    tur.queue.push(queueBlock);
-                } else {
-                    // Since the turtle has stopped running, we need to run the stack from here
-                    if (isflow) {
-                        activity.logo.runFromBlockNow(
-                            activity.logo,
-                            turtle,
-                            activity.logo.actions[action],
-                            isflow,
-                            receivedArg
-                        );
-                    } else {
-                        activity.logo.runFromBlock(
-                            activity.logo,
-                            turtle,
-                            activity.logo.actions[action],
-                            isflow,
-                            receivedArg
-                        );
-                    }
-                }
+                const queueBlock = new Queue(activity.logo.actions[action], 1, blk);
+                tur.parentFlowQueue.push(blk);
+                tur.queue.push(queueBlock);
             };
 
             const turtleID = tur.id;
