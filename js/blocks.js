@@ -218,18 +218,6 @@ function Blocks(activity) {
     };
 
     /**
-     * The scale of the graphics is determined by screen size.
-     * @param - scale -new variable
-     * @public
-     * @returns this
-     */
-    this.setScale = function (scale) {
-        // Deprecated?
-        // this.blockScale = scale;
-        return this;
-    };
-
-    /**
      * Extract the blocks
      * @public
      * @returns {void}
@@ -3093,7 +3081,6 @@ function Blocks(activity) {
         postProcess = function (args) {
             const thisBlock = args[0];
             const value = args[1];
-            let label;
             that.blockList[thisBlock].value = value;
             switch (that.blockList[thisBlock].name) {
                 case "drumname":
@@ -3102,11 +3089,8 @@ function Blocks(activity) {
                 case "oscillatortype":
                 case "invertmode":
                 case "filtertype":
-                    that.blockList[thisBlock].text.text = _(value);
-                    break;
                 case "noisename":
-                    // FIXME: where do we use this?
-                    label = getNoiseName(value);
+                    that.blockList[thisBlock].text.text = _(value);
                     break;
                 case "temperamentname":
                     // eslint-disable-next-line no-case-declarations
@@ -4980,7 +4964,7 @@ function Blocks(activity) {
         }
 
         this.storage.macros = prepareMacroExports(name, blockObjs, this.macroDict);
-        this.addToMyPalette(name, blockObjs);
+        this.addToMyPalette(name);
         this.activity.palettes.updatePalettes("myblocks");
     };
 
@@ -5066,8 +5050,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.addToMyPalette = function (name, obj) {
-        // FIXME: where is obj used?
+    this.addToMyPalette = function (name) {
         const myBlock = new ProtoBlock("macro_" + name);
         const blkName = "macro_" + name;
         this.protoBlockDict[blkName] = myBlock;
@@ -5638,12 +5621,13 @@ function Blocks(activity) {
             let name = blkInfo[0];
             let value;
             let text;
+            /*
             let collapsed = false;
             if (COLLAPSIBLES.indexOf(name) !== -1) {
                 // FIXME -- where do we use this?
                 collapsed = blkInfo[1]["collapsed"];
             }
-
+            */
             if (blkInfo[1] == null) {
                 value = null;
                 text = "";
@@ -6579,7 +6563,8 @@ function Blocks(activity) {
 
         let z = this.activity.blocksContainer.children.length - 1;
         for (let b = 0; b < this.dragGroup.length; b++) {
-            this.activity.blocksContainer.setChildIndex(this.blockList[this.dragGroup[b]].container, z);
+            this.activity.blocksContainer.setChildIndex(
+                this.blockList[this.dragGroup[b]].container, z);
             z -= 1;
         }
 
@@ -6720,7 +6705,23 @@ function Blocks(activity) {
             this.addDefaultBlock(parentExpandableBlk, thisBlock);
         }
 
-        if (myBlock.name === "action") {
+        if (myBlock.name === "start" || myBlock.name === "drum") {
+            const turtle = myBlock.value;
+            if (turtle != null) {
+                // eslint-disable-next-line no-console
+                console.debug("putting turtle " + turtle + " in the trash");
+                const comp = this.turtles.turtleList[turtle].companionTurtle;
+                if (comp) {
+                    this.turtles.turtleList[comp].inTrash = true;
+                    this.turtles.turtleList[comp].container.visible = false;
+                    this.turtles.turtleList[turtle].inTrash = true;
+                    this.turtles.turtleList[turtle].container.visible = false;
+                } else {
+                    this.turtles.turtleList[turtle].inTrash = true;
+                    this.turtles.turtleList[turtle].container.visible = false;
+                }
+            }
+        } else if (myBlock.name === "action") {
             if (!myBlock.trash) {
                 this.deleteActionBlock(myBlock);
             }

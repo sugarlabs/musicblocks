@@ -457,7 +457,7 @@ function Activity() {
         let y = Math.floor(toppos * this.turtleBlocksScale);
         let even = true;
 
-        // First start blocks
+        // First the start blocks...
         for (const blk in this.blocks.blockList) {
             if (!this.blocks.blockList[blk].trash) {
                 const myBlock = this.blocks.blockList[blk];
@@ -494,7 +494,7 @@ function Activity() {
             }
         }
 
-        // The everything else
+        // ...then everything else.
         for (const blk in this.blocks.blockList) {
             if (!this.blocks.blockList[blk].trash) {
                 const myBlock = this.blocks.blockList[blk];
@@ -588,11 +588,11 @@ function Activity() {
                         );
                     }
                 } else if (typeof message[3] === "string") {
-                    // If it is a string, load the macro assocuated with this block
+                    // If it is a string, load the macro associated with this block.
                     const blocksToLoad = getMacroExpansion(this, message[3], 0, 0);
                     that.blocks.loadNewBlocks(blocksToLoad);
                 } else {
-                    // Load the this.blocks.
+                    // Load the block.
                     const blocksToLoad = message[3];
                     that.blocks.loadNewBlocks(blocksToLoad);
                 }
@@ -801,7 +801,7 @@ function Activity() {
         this.blocksContainer.x = 0;
         this.blocksContainer.y = 0;
 
-        // Code specific to cleaning up music blocks
+        // Code specific to cleaning up Music Blocks
         Element.prototype.remove = function () {
             this.parentElement.removeChild(this);
         };
@@ -875,7 +875,7 @@ function Activity() {
     };
 
     /*
-     * Runs Music Blocks at a slower rate.
+     * Runs Music Blocks at a slower rate
      */
     const doSlowButton = function (activity) {
         activity._doSlowButton();
@@ -898,7 +898,7 @@ function Activity() {
     };
 
     /*
-     * Runs music blocks step by step.
+     * Runs music blocks step by step
      */
     const doStepButton = function (activity) {
         activity._doStepButton();
@@ -1104,8 +1104,8 @@ function Activity() {
     };
 
     /*
-     * If either the block size has reached its minimum or maximum
-     * then the icons to make them smaller/bigger will be hidden
+     * If either the block size has reached its minimum or maximum,
+     * then the icons to make them smaller/bigger will be hidden.
      */
     this.setSmallerLargerStatus = function () {
         if (BLOCKSCALES[this.blockscale] < DEFAULTBLOCKSCALE) {
@@ -1542,7 +1542,7 @@ function Activity() {
     };
 
     /**
-     * Renders error message with appropriate artwork.
+     * Renders error message with appropriate artwork
      * @param  name {specifies svg to be rendered}
      */
     this._makeErrorArtwork = function (name) {
@@ -1635,7 +1635,7 @@ function Activity() {
      * Hides search widget
      */
     this.hideSearchWidget = function () {
-        // Hide the jQuery search results widget
+        // Hide the jQuery search results widget.
         const obj = docByClass("ui-menu");
         if (obj.length > 0) {
             obj[0].style.visibility = "hidden";
@@ -1839,8 +1839,8 @@ function Activity() {
 
         this.blocks.loadNewBlocks(newNote);
         if (this.blocks.activeBlock !== null) {
-            // Connect the newly created block to the active block (if it is a hidden block at the
-            // end of a new note block).
+            // Connect the newly created block to the active block (if
+            // it is a hidden block at the end of a new note block).
             const bottom = this.blocks.findBottomBlock(this.blocks.activeBlock);
             if (
                 this.blocks.blockList[bottom].name === "hidden" &&
@@ -2358,7 +2358,6 @@ function Activity() {
         this.stage.canvas.height = h;
 
         this.turtles.doScale(w, h, this.turtleBlocksScale);
-        this.blocks.setScale(this.turtleBlocksScale);
 
         this.boundary.setScale(w, h, this.turtleBlocksScale);
         this.trashcan.resizeEvent(this.turtleBlocksScale);
