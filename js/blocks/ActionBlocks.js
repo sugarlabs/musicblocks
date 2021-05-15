@@ -659,8 +659,14 @@ function setupActionBlocks(activity) {
                         tur.parentFlowQueue.push(blk);
                         tur.queue.push(queueBlock);
                     } else {
-                        // Since the turtle has stopped running, we must run the stack from here
+                        // Since the turtle has stopped running, we
+                        // must run the stack from here.
                         tur.singer.runningFromEvent = true;
+                        // First, we need to reset the turtle's
+                        // elapsed time since it has been falling behind.
+                        const elapsedTime = (new Date().getTime() - activity.logo.firstNoteTime) / 1000;
+                        tur.singer.turtleTime = elapsedTime;
+
                         logo.runFromBlockNow(
                             logo, turtle, logo.actions[args[1]], false, receivedArg
                         );
