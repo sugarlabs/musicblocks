@@ -16,7 +16,7 @@
  */
 
 /*
-   global _, getMunsellColor, getcolor, hex2rgb, STROKECOLORS, FILLCOLORS, sugarizerCompatibility,
+   global _, getMunsellColor, getcolor, hex2rgb, STROKECOLORS, FILLCOLORS,
    TURTLESVG, WRAP
  */
 
@@ -32,8 +32,6 @@
         STROKECOLORS, FILLCOLORS, TURTLESVG
    - js/toolbar.js
         WRAP
-   - js/sugarizer-compatibility.js
-        sugarizerCompatibility
  */
 
 // constants
@@ -1180,15 +1178,9 @@ class Painter {
 
             if (this.turtle.skinChanged) {
                 let artwork = TURTLESVG;
-                if (sugarizerCompatibility.isInsideSugarizer()) {
-                    artwork = artwork
-                        .replace(/fill_color/g, sugarizerCompatibility.xoColor.fill)
-                        .replace(/stroke_color/g, sugarizerCompatibility.xoColor.stroke);
-                } else {
-                    artwork = artwork
-                        .replace(/fill_color/g, FILLCOLORS[i])
-                        .replace(/stroke_color/g, STROKECOLORS[i]);
-                }
+                artwork = artwork
+                    .replace(/fill_color/g, FILLCOLORS[i])
+                    .replace(/stroke_color/g, STROKECOLORS[i]);
 
                 this.turtle.doTurtleShell(
                     55,
