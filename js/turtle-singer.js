@@ -21,10 +21,10 @@
    DEFAULTVOLUME, TARGETBPM, TONEBPM, frequencyToPitch, last,
    pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp,
    getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
-   _THIS_IS_MUSIC_BLOCKS_, noteIsSolfege, getSolfege, SOLFEGENAMES1,
-   SOLFEGECONVERSIONTABLE, getInterval, instrumentsEffects,
-   instrumentsFilters, _, noteToFrequency, getTemperament,
-   getOctaveRatio, rationalToFraction
+   noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
+   getInterval, instrumentsEffects, instrumentsFilters, _,
+   noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
+   _THIS_IS_MUSIC_BLOCKS_
  */
 
 /*
@@ -37,10 +37,10 @@
         SOLFEGECONVERSIONTABLE, getInterval, noteToFrequency, getTemperament, getOctaveRatio
     js/utils/utils.js
         rationalSum, _, rationalToFraction
-    js/activity.js
-        _THIS_IS_MUSIC_BLOCKS_
     js/utils/synthutils.js
         instrumentsEffects, instrumentsFilters
+    js/activity.js
+        _THIS_IS_MUSIC_BLOCKS_
  */
 
 /* exported Singer */
@@ -343,6 +343,7 @@ class Singer {
         if (lastNote === firstNote) return 0;
 
         const activity = logo.activity;
+
         // Rather than just counting the semitones, we need to count
         // the steps in the current key needed to get from firstNote
         // pitch to lastNote pitch
@@ -1304,13 +1305,15 @@ class Singer {
                 activity.logo.firstNoteTime = new Date().getTime();
             }
 
-            // Calculate a lag: In case this turtle has fallen behind, we need to catch up
+            // Calculate a lag: In case this turtle has fallen behind,
+            // we need to catch up.
             const elapsedTime = (new Date().getTime() - activity.logo.firstNoteTime) / 1000;
-            // When we are "drifting", we don't bother with lag
+
+            // When we are "drifting", we don't bother with lag.
             const turtleLag =
                 tur.singer.drift === 0 ? Math.max(elapsedTime - tur.singer.turtleTime, 0) : 0;
 
-            // Delay running graphics from second note in tie
+            // Delay running graphics from second note in tie.
             let tieDelay = tur.singer.tie ? tur.singer.tieCarryOver : 0;
 
             // If we are in a tie, depending upon parity, we either
