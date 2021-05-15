@@ -2672,9 +2672,9 @@ class Block {
 
             // And possibly the collapse button.
             if (that.collapseContainer != null) {
-                that.activity.stage.setChildIndex(
+                that.activity.blocksContainer.setChildIndex(
                     that.collapseContainer,
-                    that.activity.stage.children.length - 1
+                    that.activity.blocksContainer.children.length - 1
                 );
             }
 
@@ -2725,7 +2725,7 @@ class Block {
             );
 
             const finalPos = oldY + dy;
-            if (that.activity.stage.y === 0 && finalPos < 45) {
+            if (that.activity.blocksContainer.y === 0 && finalPos < 45) {
                 dy += 45 - finalPos;
             }
 
@@ -3073,10 +3073,10 @@ class Block {
             selectedValue,
             selectedType,
             selectedWrap;
-        if (!window.hasMouse && this.activity.stage.y + y > 75) {
+        if (!window.hasMouse && this.activity.blocksContainer.y + y > 75) {
             movedStage = true;
-            fromY = this.activity.stage.y;
-            this.activity.stage.y = -y + 75;
+            fromY = this.activity.blocksContainer.y;
+            this.activity.blocksContainer.y = -y + 75;
         }
 
         // A place in the DOM to put modifiable labels (textareas).
@@ -3632,8 +3632,8 @@ class Block {
                 that.label.removeEventListener("keypress", __keypress);
 
                 if (movedStage) {
-                    that.activity.stage.y = fromY;
-                    that.activity.stage.update();
+                    that.activity.blocksContainer.y = fromY;
+                    that.activity.blocksContainer.update();
                 }
             };
 
@@ -3660,11 +3660,11 @@ class Block {
 
             this.label.style.left =
                 Math.round(
-                    (x + this.activity.stage.x) * this.activity.getStageScale() + canvasLeft
+                    (x + this.activity.blocksContainer.x) * this.activity.getStageScale() + canvasLeft
                 ) + "px";
             this.label.style.top =
                 Math.round(
-                    (y + this.activity.stage.y) * this.activity.getStageScale() + canvasTop
+                    (y + this.activity.blocksContainer.y) * this.activity.getStageScale() + canvasTop
                 ) + "px";
             this.label.style.width =
                 Math.round((selectorWidth * this.blocks.blockScale * this.protoblock.scale) / 2) +
