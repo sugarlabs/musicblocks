@@ -662,6 +662,9 @@ function setupFlowBlocks(activity) {
                     }
                 }
             }
+
+            // Queue the child flow.
+            return [args[1], 1];
         }
     }
 
