@@ -12,18 +12,26 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /*
-   global _, Notation, _THIS_IS_MUSIC_BLOCKS_, Synth, instruments, instrumentsFilters,
-   instrumentsEffects, Singer, logo, Tone, p5, CAMERAVALUE, doUseCamera, VIDEOVALUE, last,
-   getIntervalDirection, getIntervalNumber, mixedNumber, rationalToFraction, doStopVideoCam,
-   StatusMatrix, getStatsFromNotation, delayExecution
- */
+   global
+
+   _, Notation, Synth, instruments, instrumentsFilters,
+   instrumentsEffects, Singer, Tone, p5, CAMERAVALUE, doUseCamera,
+   VIDEOVALUE, last, getIntervalDirection, getIntervalNumber,
+   mixedNumber, rationalToFraction, doStopVideoCam, StatusMatrix,
+   getStatsFromNotation, delayExecution, _THIS_IS_MUSIC_BLOCKS_
+*/
 
 /*
-   exported Queue, Logo, DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY, OSCVOLUMEADJUSTMENT, TONEBPM,
-   TARGETBPM, TURTLESTEP, NOTEDIV, NOMICERRORMSG, NANERRORMSG, NOSTRINGERRORMSG, NOBOXERRORMSG,
-   NOACTIONERRORMSG, NOINPUTERRORMSG, NOSQRTERRORMSG, ZERODIVIDEERRORMSG, EMPTYHEAPERRORMSG,
-   INVALIDPITCH, POSNUMBER, NOTATIONNOTE, NOTATIONDURATION, NOTATIONDOTCOUNT, NOTATIONTUPLETVALUE,
-   NOTATIONROUNDDOWN, NOTATIONINSIDECHORD, NOTATIONSTACCATO
+   exported
+
+   Queue, Logo, DEFAULTVOLUME, PREVIEWVOLUME, DEFAULTDELAY,
+   OSCVOLUMEADJUSTMENT, TONEBPM, TARGETBPM, TURTLESTEP, NOTEDIV,
+   NOMICERRORMSG, NANERRORMSG, NOSTRINGERRORMSG, NOBOXERRORMSG,
+   NOACTIONERRORMSG, NOINPUTERRORMSG, NOSQRTERRORMSG,
+   ZERODIVIDEERRORMSG, EMPTYHEAPERRORMSG, INVALIDPITCH, POSNUMBER,
+   NOTATIONNOTE, NOTATIONDURATION, NOTATIONDOTCOUNT,
+   NOTATIONTUPLETVALUE, NOTATIONROUNDDOWN, NOTATIONINSIDECHORD,
+   NOTATIONSTACCATO
  */
 
 const DEFAULTVOLUME = 50;
@@ -37,6 +45,8 @@ const TARGETBPM = 90; // what we'd like to use for beats per minute
 const TURTLESTEP = -1; // run in step-by-step mode
 const NOTEDIV = 8; // number of steps to divide turtle graphics
 
+// These error messages don't need translation since they are
+// converted into artwork w/o text.
 const NOMICERRORMSG = "The microphone is not available.";
 const NANERRORMSG = "Not a number.";
 const NOSTRINGERRORMSG = "Not a string.";
@@ -46,8 +56,9 @@ const NOINPUTERRORMSG = "Missing argument.";
 const NOSQRTERRORMSG = "Cannot take square root of negative number.";
 const ZERODIVIDEERRORMSG = "Cannot divide by zero.";
 const EMPTYHEAPERRORMSG = "empty heap.";
-const INVALIDPITCH = _("Not a valid pitch name");
 const POSNUMBER = "Argument must be a positive number";
+
+const INVALIDPITCH = _("Not a valid pitch name");
 
 const NOTATIONNOTE = 0;
 const NOTATIONDURATION = 1;
