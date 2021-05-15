@@ -344,6 +344,8 @@ function setupExtrasBlocks(activity) {
                                 const tur = activity.turtles.ithTurtle(turtle);
                                 if (tur.singer.inNoteBlock.length > 0) {
                                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
+                                } else {
+                                    activity.textMsg(args[0].toString());
                                 }
                             }
                         } else if (logo.runningLilypond) {
