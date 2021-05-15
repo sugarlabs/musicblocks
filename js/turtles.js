@@ -123,7 +123,7 @@ class Turtles {
         // Add turtle model properties and store color index for turtle
         this.addTurtleStageProps(turtle, blkInfoAvailable, infoDict);
 
-        const turtlesStage = this.stage;
+        const turtlesStage = this.activity.stage;
 
         let i = this.turtleList.length % 10; // used for turtle (mouse) skin color
         this.turtleList.push(turtle); // add new turtle to turtle list
