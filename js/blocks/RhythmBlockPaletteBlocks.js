@@ -159,7 +159,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 null,
                 "rhythm2"
             ]);
-
+            this.extraWidth = 10;
             this.formBlock({
                 name:
                     this.lang === "ja"
@@ -386,7 +386,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 null,
                 "tuplet4"
             ]);
-            this.extraWidth = 20;
+            this.extraWidth = 30;
             this.formBlock({
                 name: _("tuplet"),
                 args: 1,
