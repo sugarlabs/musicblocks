@@ -1379,7 +1379,7 @@ function Synth() {
                     }
 
                     neighbor = new Tone.Part(function (time, value) {
-                        synth.triggerAttackRelease(value.note, value.duration, Tone.now() + time);
+                        synth.triggerAttackRelease(value.note, value.duration, time);
                     }, obj).start();
                 }
             }
