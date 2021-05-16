@@ -274,9 +274,13 @@ function TemperamentWidget() {
                 const frequency = that.frequencies[0];
                 that.frequencies = [];
 
+                if (!isCustomTemperament(that.inTemperament)) {
+                    that.powerBase = 2;
+                }
+
                 for (let i = 0; i < that.ratios.length; i++) {
                     powers[i] = 12 * (Math.log10(that.ratios[i]) / Math.log10(that.powerBase));
-                    that.ratios[i] = Math.pow(2, powers[i] / 12);
+                    that.ratios[i] = Math.pow(that.powerBase, powers[i] / 12);
                     compareRatios[i] = that.ratios[i].toFixed(2);
                     that.frequencies[i] = that.ratios[i] * frequency;
                     that.frequencies[i] = that.frequencies[i].toFixed(2);
@@ -341,7 +345,7 @@ function TemperamentWidget() {
                     }
                 }
                 if (noteDefined == false) {
-                    const cents = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
+                    const cents = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
                     const centsDiff = [];
                     const centsDiff1 = [];
                     for (let j = 0; j < this.cents.length; j++) {
@@ -1518,7 +1522,7 @@ function TemperamentWidget() {
                 }
 
                 if (!notesMatch) {
-                    const cents = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
+                    const cents = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
                     const centsDiff = [];
                     const centsDiff1 = [];
                     for (let j = 0; j < this.cents.length; j++) {
@@ -2104,7 +2108,7 @@ function TemperamentWidget() {
                         this.inTemperament
                     )
                     .toFixed(2);
-                this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
+                this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
                 this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
             } else {
                 if (isCustomTemperament(this.inTemperament)) {
@@ -2135,7 +2139,7 @@ function TemperamentWidget() {
                     .toFixed(2);
                 this.intervals[i] = t.interval[i];
                 this.ratios[i] = t[this.intervals[i]];
-                this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(2));
+                this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
                 this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
             }
         }
