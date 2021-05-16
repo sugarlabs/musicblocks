@@ -49,9 +49,14 @@
         PREVIEWVOLUME, DEFAULTVOLUME
  */
 
-/*exported piemenuModes, piemenuPitches, piemenuCustomNotes, piemenuGrid, piemenuBlockContext,
-piemenuIntervals, piemenuVoices, piemenuBoolean, piemenuBasic, piemenuColor, piemenuNumber,
-piemenuNthModalPitch, piemenuNoteValue, piemenuAccidentals, piemenuKey*/
+/*
+   exported
+
+   piemenuModes, piemenuPitches, piemenuCustomNotes, piemenuGrid,
+   piemenuBlockContext, piemenuIntervals, piemenuVoices, piemenuBoolean,
+   piemenuBasic, piemenuColor, piemenuNumber, piemenuNthModalPitch,
+   piemenuNoteValue, piemenuAccidentals, piemenuKey
+*/
 const piemenuPitches = function (
     block,
     noteLabels,
@@ -216,7 +221,7 @@ const piemenuPitches = function (
             Math.max(
                 0,
                 Math.round(
-                    (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -226,7 +231,7 @@ const piemenuPitches = function (
             Math.max(
                 0,
                 Math.round(
-                    (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
                 ) - 200
             )
         ) + "px";
@@ -750,7 +755,7 @@ const piemenuCustomNotes = function (
             Math.max(
                 0,
                 Math.round(
-                    (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -760,7 +765,7 @@ const piemenuCustomNotes = function (
             Math.max(
                 0,
                 Math.round(
-                    (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
                 ) - 200
             )
         ) + "px";
@@ -1000,10 +1005,10 @@ const piemenuNthModalPitch = function (block, noteValues, note) {
 
     const selectorWidth = 150;
     const left = Math.round(
-        (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+        (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
     );
     const top = Math.round(
-        (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+        (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
     );
     block.label.style.left = left + "px";
     block.label.style.top = top + "px";
@@ -1254,7 +1259,7 @@ const piemenuAccidentals = function (block, accidentalLabels, accidentalValues, 
             Math.max(
                 0,
                 Math.round(
-                    (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -1264,7 +1269,7 @@ const piemenuAccidentals = function (block, accidentalLabels, accidentalValues, 
             Math.max(
                 0,
                 Math.round(
-                    (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
                 ) - 200
             )
         ) + "px";
@@ -1448,10 +1453,10 @@ const piemenuNoteValue = function (block, noteValue) {
 
     const selectorWidth = 150;
     const left = Math.round(
-        (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+        (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
     );
     const top = Math.round(
-        (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+        (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
     );
     block.label.style.left = left + "px";
     block.label.style.top = top + "px";
@@ -1687,10 +1692,10 @@ const piemenuNumber = function (block, wheelValues, selectedValue) {
 
     const selectorWidth = 150;
     const left = Math.round(
-        (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+        (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
     );
     const top = Math.round(
-        (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+        (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
     );
     block.label.style.left = left + "px";
     block.label.style.top = top + "px";
@@ -2000,10 +2005,10 @@ const piemenuColor = function (block, wheelValues, selectedValue, mode) {
 
     const selectorWidth = 150;
     const left = Math.round(
-        (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+        (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
     );
     const top = Math.round(
-        (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+        (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
     );
     block.label.style.left = left + "px";
     block.label.style.top = top + "px";
@@ -2152,7 +2157,7 @@ const piemenuBasic = function (block, menuLabels, menuValues, selectedValue, col
             Math.max(
                 0,
                 Math.round(
-                    (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -2162,7 +2167,7 @@ const piemenuBasic = function (block, menuLabels, menuValues, selectedValue, col
             Math.max(
                 0,
                 Math.round(
-                    (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
                 ) - 200
             )
         ) + "px";
@@ -2255,7 +2260,7 @@ const piemenuBoolean = function (block, booleanLabels, booleanValues, boolean) {
             Math.max(
                 0,
                 Math.round(
-                    (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -2265,7 +2270,7 @@ const piemenuBoolean = function (block, booleanLabels, booleanValues, boolean) {
             Math.max(
                 0,
                 Math.round(
-                    (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
                 ) - 200
             )
         ) + "px";
@@ -2433,7 +2438,7 @@ const piemenuVoices = function (block, voiceLabels, voiceValues, categories, voi
             Math.max(
                 0,
                 Math.round(
-                    (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -2443,7 +2448,7 @@ const piemenuVoices = function (block, voiceLabels, voiceValues, categories, voi
             Math.max(
                 0,
                 Math.round(
-                    (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
                 ) - 200
             )
         ) + "px";
@@ -2568,7 +2573,7 @@ const piemenuIntervals = function (block, selectedInterval) {
             Math.max(
                 0,
                 Math.round(
-                    (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -2578,7 +2583,7 @@ const piemenuIntervals = function (block, selectedInterval) {
             Math.max(
                 0,
                 Math.round(
-                    (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
                 ) - 200
             )
         ) + "px";
@@ -3057,7 +3062,7 @@ const piemenuModes = function (block, selectedMode) {
             Math.max(
                 0,
                 Math.round(
-                    (x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft
+                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -3067,7 +3072,7 @@ const piemenuModes = function (block, selectedMode) {
             Math.max(
                 0,
                 Math.round(
-                    (y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop
+                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
                 ) - 200
             )
         ) + "px";
