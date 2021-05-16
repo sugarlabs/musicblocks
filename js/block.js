@@ -2553,9 +2553,11 @@ class Block {
                 if ("button" in event.nativeEvent && event.nativeEvent.button == 2) {
                     that.blocks.stageClick = true;
                     docById("wheelDiv").style.display = "none";
+                    that.blocks.activeBlock = thisBlock;
                     piemenuBlockContext(that);
                     return;
                 } else if ("ctrlKey" in event.nativeEvent && event.nativeEvent.ctrlKey) {
+                    that.blocks.activeBlock = thisBlock;
                     piemenuBlockContext(that);
                     return;
                 } else if ("shiftKey" in event.nativeEvent && event.nativeEvent.shiftKey) {

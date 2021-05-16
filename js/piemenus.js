@@ -3140,11 +3140,11 @@ const piemenuBlockContext = function (block) {
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.activity.getStageScale();
 
     docById("contextWheelDiv").style.left =
-        Math.round((x + block.activity.stage.x) * block.activity.getStageScale() + canvasLeft) -
+        Math.round((x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft) -
         150 +
         "px";
     docById("contextWheelDiv").style.top =
-        Math.round((y + block.activity.stage.y) * block.activity.getStageScale() + canvasTop) -
+        Math.round((y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop) -
         150 +
         "px";
 
@@ -3165,7 +3165,9 @@ const piemenuBlockContext = function (block) {
     ) {
         labels.push("imgsrc:header-icons/save-blocks-button.svg");
     }
+
     const message = block.blocks.blockList[block.blocks.activeBlock].protoblock.helpString;
+
     let helpButton;
     if (message) {
         labels.push("imgsrc:header-icons/help-button.svg");
@@ -3212,7 +3214,6 @@ const piemenuBlockContext = function (block) {
         that.blocks.pasteStack();
         pasteDx += 21;
         pasteDy += 21;
-        // docById('contextWheelDiv').style.display = 'none';
     };
 
     wheel.navItems[1].navigateFunction = function () {
