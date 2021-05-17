@@ -3946,7 +3946,7 @@ class Block {
                         }
                     }
                     if (modifiedTemperament) {
-                        addTemperamentToDictionary("custom", modifiedTemperament);
+                        addTemperamentToDictionary("custom", customTemperament);
                     }
                     this.value = newValue;
                     // eslint-disable-next-line no-case-declarations
