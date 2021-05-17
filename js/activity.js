@@ -1578,7 +1578,7 @@ function Activity() {
                 container.visible = false;
                 // On the possibility that there was an error
                 // arrow associated with this container
-                if (that.errorMsgArrow !== null) {
+                if (that.errorMsgArrow !== null && that.errorMsgArrow !== undefined) {
                     that.errorMsgArrow.removeAllChildren(); // Hide the error arrow.
                 }
                 that.update = true;
