@@ -2520,7 +2520,7 @@ msgstr "ねいろサンプルを アップロードして、 おとの たかさ
 #: js/WidgetBlocks.js:282
 #.TRANS: the speed at music is should be played.
 msgid "sampler"
-msgstr "音色サンプラー"
+msgstr "サンプラー"
 
 #: js/WidgetBlocks.js:327
 #: js/WidgetBlocks.js:332
@@ -5406,13 +5406,13 @@ msgstr "しゅうりょう"
 #: js/temperament.js:933
 #: js/temperament.js:1346
 msgid "done"
-msgstr ""
+msgstr "おわった"
 
 #: js/temperament.js:474
 #: js/temperament.js:479
 #: js/temperament.js:909
 msgid "ratio"
-msgstr ""
+msgstr "ひりつ"
 
 #: js/temperament.js:480
 msgid "interval"
@@ -5432,20 +5432,20 @@ msgstr "へいきん おんりつ"
 
 #: js/temperament.js:647
 msgid "ratios"
-msgstr ""
+msgstr "ひりつ"
 
 #: js/temperament.js:647
 msgid "arbitrary"
-msgstr ""
+msgstr "じゆういし"
 
 #: js/temperament.js:716
 msgid "number of divisions"
-msgstr ""
+msgstr "ぶんぱいの かず"
 
 #: js/temperament.js:738
 #: js/temperament.js:931
 msgid "preview"
-msgstr ""
+msgstr "ためす"
 
 #: js/temperament.js:912
 msgid "recursion"

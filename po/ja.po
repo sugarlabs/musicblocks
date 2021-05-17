@@ -2520,7 +2520,7 @@ msgstr ""
 #: js/WidgetBlocks.js:282
 #.TRANS: the speed at music is should be played.
 msgid "sampler"
-msgstr ""
+msgstr "サンプラー"
 
 #: js/WidgetBlocks.js:327
 #: js/WidgetBlocks.js:332
@@ -5406,13 +5406,13 @@ msgstr "とじる"
 #: js/temperament.js:933
 #: js/temperament.js:1346
 msgid "done"
-msgstr ""
+msgstr "終った"
 
 #: js/temperament.js:474
 #: js/temperament.js:479
 #: js/temperament.js:909
 msgid "ratio"
-msgstr ""
+msgstr "比率"
 
 #: js/temperament.js:480
 msgid "interval"
@@ -5432,20 +5432,20 @@ msgstr "平均律"
 
 #: js/temperament.js:647
 msgid "ratios"
-msgstr ""
+msgstr "比率"
 
 #: js/temperament.js:647
 msgid "arbitrary"
-msgstr ""
+msgstr "自由意思"
 
 #: js/temperament.js:716
 msgid "number of divisions"
-msgstr ""
+msgstr "分配の数"
 
 #: js/temperament.js:738
 #: js/temperament.js:931
 msgid "preview"
-msgstr ""
+msgstr "試す"
 
 #: js/temperament.js:912
 msgid "recursion"
