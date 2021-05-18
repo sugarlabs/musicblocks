@@ -374,7 +374,7 @@ function setupExtrasBlocks(activity) {
         }
     }
 
-    //DEPRECATED grid: now used with print block.
+    // DEPRECATED grid: now used with print block.
     class DisplayGridBlock extends FlowBlock {
         constructor() {
             super("displaygrid", _("display grid"));
@@ -407,34 +407,44 @@ function setupExtrasBlocks(activity) {
             activity.hideGrids();
             switch (args[0]) {
                 case _("Cartesian"):
+                case "Cartesian":
                     act._showCartesian();
                     break;
                 case _("polar"):
+                case "polar":
                     act._showPolar();
                     break;
                 case _("Cartesian+polar"):
+                case "Cartesian+polar":
                     act._showPolar();
                     act._showCartesian();
                     break;
                 case _("treble"):
+                case "treble":
                     act._showTreble();
                     break;
                 case _("grand staff"):
+                case "grand staff":
                     act._showGrand();
                     break;
                 case _("mezzo-soprano"):
+                case "mezzo-soprano":
                     act._showSoprano();
                     break;
                 case _("alto"):
+                case "alto":
                     act._showAlto();
                     break;
                 case _("tenor"):
+                case "tenor":
                     act._showTenor();
                     break;
                 case _("bass"):
+                case "bass":
                     act._showBass();
                     break;
                 case _("none"):
+                case "none":
                     break;
             }
         }

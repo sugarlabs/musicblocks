@@ -1254,6 +1254,8 @@ class Block {
                 label = getNoiseName(this.value);
             } else if (this.name === "outputtools") {
                 label = this.overrideName;
+            } else if (this.name === "grid") {
+                label = _(this.value);
             } else {
                 if (this.value !== null) {
                     label = this.value.toString();
