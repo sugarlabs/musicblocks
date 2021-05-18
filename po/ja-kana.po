@@ -5386,7 +5386,7 @@ msgstr "ギター"
 
 #: js/temperament.js:215
 msgid "back to 2:1 octave space"
-msgstr ""
+msgstr "2:1 オクターヴ・スペースに もどる"
 
 #: js/temperament.js:319
 msgid "edit"
@@ -5420,7 +5420,7 @@ msgstr ""
 
 #: js/temperament.js:608
 msgid "non scalar"
-msgstr ""
+msgstr "おんかい ないではない"
 
 #: js/temperament.js:647
 #: js/musicutils.js:706
@@ -5449,7 +5449,7 @@ msgstr "ためす"
 
 #: js/temperament.js:912
 msgid "recursion"
-msgstr ""
+msgstr "はんぷく"
 
 #: js/temperament.js:1442
 msgid "The octave ratio has changed. This changes temperament significantly."
