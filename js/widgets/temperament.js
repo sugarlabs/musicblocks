@@ -837,7 +837,7 @@ function TemperamentWidget() {
                 this.typeOfEdit = "nonequal";
             }
 
-            if (event.target.innerHTML === "done") {
+            if (event.target.innerHTML === _("done")) {
                 // Go to main "Circle of Notes"
                 this.ratios = this.tempRatios.slice();
                 const frequency = this.frequencies[0];
@@ -850,7 +850,7 @@ function TemperamentWidget() {
                 this.pitchNumber = pitchNumber;
                 this.checkTemperament(compareRatios);
                 this._circleOfNotes();
-            } else if (event.target.innerHTML === "Preview") {
+            } else if (event.target.innerHTML === _("preview")) {
                 //Preview Notes
                 docById("userEdit").innerHTML = '<div id="wheelDiv2" class="wheelNav"></div>';
                 this.createMainWheel(this.tempRatios, pitchNumber);
@@ -1008,7 +1008,7 @@ function TemperamentWidget() {
             });
             const pitchNumber = that.tempRatios.length - 1;
 
-            if (event.target.innerHTML == "done") {
+            if (event.target.innerHTML === _("done")) {
                 that.ratios = that.tempRatios.slice();
                 that.typeOfEdit = "nonequal";
                 that.pitchNumber = that.ratios.length - 1;
@@ -1026,7 +1026,7 @@ function TemperamentWidget() {
 
                 that.checkTemperament(compareRatios);
                 that._circleOfNotes();
-            } else if (event.target.innerHTML == "Preview") {
+            } else if (event.target.innerHTML === _("preview")) {
                 //Preview Notes
                 docById("userEdit").innerHTML = '<div id="wheelDiv2" class="wheelNav"></div>';
                 that.createMainWheel(that.tempRatios, pitchNumber);
@@ -1277,7 +1277,7 @@ function TemperamentWidget() {
 
         const divAppend = document.createElement("div");
         divAppend.id = "divAppend";
-        divAppend.innerHTML = "done";
+        divAppend.innerHTML = _("done");
         divAppend.style.textAlign = "center";
         divAppend.style.paddingTop = "5px";
         divAppend.style.backgroundColor = platformColor.selectorBackground;
@@ -1423,7 +1423,7 @@ function TemperamentWidget() {
 
         const divAppend = document.createElement("div");
         divAppend.id = "divAppend";
-        divAppend.innerHTML = "done";
+        divAppend.innerHTML = _("done");
         divAppend.style.textAlign = "center";
         divAppend.style.paddingTop = "5px";
         divAppend.style.marginLeft = "-70px";
