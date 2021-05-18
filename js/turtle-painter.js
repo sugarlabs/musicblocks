@@ -1192,7 +1192,10 @@ class Painter {
         }
 
         this.turtle.container.rotation = this.turtle.orientation;
-        this.turtle.bitmap.rotation = this.turtle.orientation;
+        // Sometimes the bitmap is not yet available due to a race condition.
+        if (this.turtle._bitmap !== null) {
+            this.turtle._bitmap.rotation = this.turtle.orientation;
+        }
         this.turtle.updateCache();
 
         this.doClearMedia();
