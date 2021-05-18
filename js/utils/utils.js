@@ -412,11 +412,15 @@ function toTitleCase(str) {
 
 function processPluginData(activity, pluginData) {
     // Plugins are JSON-encoded dictionaries.
+    if (pluginData === undefined) {
+        return null;
+    }
     let obj;
     try {
         obj = JSON.parse(pluginData);
     } catch (e) {
         // eslint-disable-next-line no-console
+        console.log(pluginData);
         console.log(e);
         return null;
     }
@@ -647,6 +651,8 @@ function processRawPluginData(activity, rawData) {
         obj = processPluginData(activity, cleanData.replace(/\n/g, ""));
     } catch (e) {
         obj = null;
+        console.log(rawData);
+        console.log(cleanData);
         activity.errorMsg("Error loading plugin: " + e);
     }
 
@@ -725,7 +731,7 @@ function preparePluginExports(activity, obj) {
 
 function processMacroData(macroData, palettes, blocks, macroDict) {
     // Macros are stored in a JSON-encoded dictionary.
-    if (macroData !== "{}") {
+    if (macroData !== undefined && macroData !== "{}") {
         try {
             const obj = JSON.parse(macroData);
             palettes.add("myblocks", "black", "#a0a0a0");
@@ -739,6 +745,7 @@ function processMacroData(macroData, palettes, blocks, macroDict) {
             palettes.makePalettes(1);
         } catch (e) {
             // eslint-disable-next-line no-console
+            console.log(macroData);
             console.debug(e);
         }
     }
