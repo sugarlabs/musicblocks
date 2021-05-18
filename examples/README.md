@@ -104,7 +104,7 @@
 
 | Example | Description |
 | --- | --- |
-| crabcanon-plot.html | Musical Offering by JS Bach, featured in GÃ¶del, Escher, Bach by Douglas Hofstader, is an example of a crab canon is an arrangement of two musical lines that are complementary and backward, similar to a palindrome. This version includes a note plotter that makes the palindromic nature of the music apparent. |
+| crabcanon-plot.html | Musical Offering by JS Bach, featured in Gödel, Escher, Bach by Douglas Hofstader, is an example of a crab canon is an arrangement of two musical lines that are complementary and backward, similar to a palindrome. This version includes a note plotter that makes the palindromic nature of the music apparent. |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -268,7 +268,7 @@
 
 | Example | Description |
 | --- | --- |
-| Romanian-folk-song.tb | Romanian Folk Dance is a short piano piece composed by Bela Bartok. |
+| Romanian-folk-song.tb | Romanian Folk Dance is a short piano piece composed by Béla Bartók. |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -300,7 +300,7 @@
 
 | Example | Description |
 | --- | --- |
-| bartok-fib-color.html | Bartok Fibonacci rhythm progression with added variations in timbre (cello and violin) and pitch. |
+| bartok-fib-color.html | Fibonacci rhythm progression by Bartók, with added variations in timbre (cello and violin) and pitch |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
