@@ -3930,7 +3930,9 @@ class Block {
                     }
                     break;
                 case "pitch":
-                    // In case of custom temperament
+                    // In case of custom temperament, rename the entry
+                    // in the temperament dictionary. NOTE: only works
+                    // if the custom temperament has not been renamed.
                     uniqueValue = this.blocks.findUniqueCustomName(newValue);
                     newValue = uniqueValue;
                     // eslint-disable-next-line no-case-declarations
