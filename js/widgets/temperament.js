@@ -1174,7 +1174,7 @@ function TemperamentWidget() {
 
             if (docById("frequencySlider") !== null) {
                 docById("frequencySlider").oninput = function () {
-                    this._refreshInnerWheel();
+                    that._refreshInnerWheel();
                 };
             }
             this.wheel1.createWheel();
