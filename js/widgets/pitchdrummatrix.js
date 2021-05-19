@@ -521,11 +521,11 @@ class PitchDrumMatrix {
         }
     }
 
-     /**
+    /**
      * @private
      * @returns {void}
      */
-      _scale() {
+    _scale() {
         const windowHeight =
             this.getWidgetFrame().offsetHeight - this.getDragElement().offsetHeight;
         const widgetBody = this.getWidgetBody();
