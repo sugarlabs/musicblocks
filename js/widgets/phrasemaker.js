@@ -75,7 +75,7 @@ class PhraseMaker {
     constructor() {
         this._stopOrCloseClicked = false;
         this._instrumentName = DEFAULTVOICE;
-
+        this.isInitial = true;
         this.paramsEffects = {
             doVibrato: false,
             doDistortion: false,
@@ -204,7 +204,6 @@ class PhraseMaker {
         for (let i = 0; i < this._blockMap[blk].length; i++) {
             obj = this._blockMap[blk][i];
             if (obj[0] === rowBlock && obj[1][0] === rhythmBlock && obj[1][1] === n) {
-                // console.debug("node is already in the list");
                 j += 1;
             }
         }
@@ -717,16 +716,17 @@ class PhraseMaker {
         // Sort them if there are note blocks.
         if (!this.sorted) {
             setTimeout(() => {
-                //console.debug("sorting");
                 this._sort();
             }, 1000);
         } else {
             this.sorted = false;
         }
 
-        this.activity.textMsg(_("Click on the table to add notes."));
-
-        this.widgetWindow.sendToCenter();
+        if (this.isInitial) {
+            this.activity.textMsg(_("Click on the table to add notes."));
+            this.widgetWindow.sendToCenter();
+            this.inInitial = false;
+        }
     }
 
     _createAddRowPieSubmenu() {
@@ -805,12 +805,12 @@ class PhraseMaker {
         docById("wheelDivptm").style.left =
             Math.min(
                 this.activity.turtles._canvas.width - 200,
-                Math.max(0, x * this.activity.blocks.getStageScale())
+                Math.max(0, x * this.activity.getStageScale())
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
                 this.activity.turtles._canvas.height - 250,
-                Math.max(0, y * this.activity.blocks.getStageScale())
+                Math.max(0, y * this.activity.getStageScale())
             ) + "px";
 
         this._exitWheel.navItems[0].navigateFunction = () => {
@@ -821,14 +821,12 @@ class PhraseMaker {
 
         const __selectionChanged = () => {
             label = VALUESLABEL[this._menuWheel.selectedNavItemIndex];
-            //console.debug(label);
             let rLabel = null;
             let rArg = null;
             const blockLabel = "";
             const newBlock = this.activity.blocks.blockList.length;
             switch (label) {
                 case "pitch":
-                    //console.debug("loading new pitch block");
                     this.activity.blocks.loadNewBlocks([
                         [0, ["pitch", {}], 0, 0, [null, 1, 2, null]],
                         [1, ["solfege", { value: "sol" }], 0, 0, [0]],
@@ -838,7 +836,6 @@ class PhraseMaker {
                     rArg = 4;
                     break;
                 case "hertz":
-                    //console.debug("loading new Hertz block");
                     this.activity.blocks.loadNewBlocks([
                         [0, ["hertz", {}], 0, 0, [null, 1, null]],
                         [1, ["number", { value: 392 }], 0, 0, [0]]
@@ -847,7 +844,6 @@ class PhraseMaker {
                     rArg = 392;
                     break;
                 case "drum":
-                    //console.debug("loading new playdrum block");
                     this.activity.blocks.loadNewBlocks([
                         [0, ["playdrum", {}], 0, 0, [null, 1, null]],
                         [1, ["drumname", { value: DEFAULTDRUM }], 0, 0, [0]]
@@ -856,7 +852,6 @@ class PhraseMaker {
                     rArg = -1;
                     break;
                 case "graphics":
-                    //console.debug("loading new forward block");
                     this.activity.blocks.loadNewBlocks([
                         [0, ["forward", {}], 0, 0, [null, 1, null]],
                         [1, ["number", { value: 100 }], 0, 0, [0]]
@@ -865,7 +860,6 @@ class PhraseMaker {
                     rArg = 100;
                     break;
                 case "pen":
-                    //console.debug("loading new setcolor block");
                     this.activity.blocks.loadNewBlocks([
                         [0, ["setcolor", {}], 0, 0, [null, 1, null]],
                         [1, ["number", { value: 0 }], 0, 0, [0]]
@@ -889,7 +883,6 @@ class PhraseMaker {
                         blocksNo = this._mapNotesBlocks(graphicLabels[i]);
                         if (blocksNo.length >= 1) {
                             aboveBlock = last(blocksNo);
-                            //console.debug(aboveBlock);
                             break;
                         }
                     }
@@ -915,8 +908,6 @@ class PhraseMaker {
             }
 
             if (aboveBlock === null) {
-                //eslint-disable-next-line no-console
-                console.debug("WARNING: aboveBlock is null");
                 // Look for a pitch block.
                 blocksNo = this._mapNotesBlocks("pitch");
                 if (blocksNo.length >= 1) {
@@ -951,24 +942,24 @@ class PhraseMaker {
             this.sorted = false;
             this.init(this.activity);
             let tupletParam;
-            for (let i = 0; i < this.activity.tupletRhythms.length; i++) {
-                switch (this.activity.tupletRhythms[i][0]) {
+            for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
+                switch (this.activity.logo.tupletRhythms[i][0]) {
                     case "simple":
                     case "notes":
                         tupletParam = [
-                            this.activity.tupletParams[this.activity.tupletRhythms[i][1]]
+                            this.activity.logo.tupletParams[this.activity.logo.tupletRhythms[i][1]]
                         ];
                         tupletParam.push([]);
-                        for (let j = 2; j < this.activity.tupletRhythms[i].length; j++) {
-                            tupletParam[1].push(this.activity.tupletRhythms[i][j]);
+                        for (let j = 2; j < this.activity.logo.tupletRhythms[i].length; j++) {
+                            tupletParam[1].push(this.activity.logo.tupletRhythms[i][j]);
                         }
 
                         this.addTuplet(tupletParam);
                         break;
                     default:
                         this.addNotes(
-                            this.activity.tupletRhythms[i][1],
-                            this.activity.tupletRhythms[i][2]
+                            this.activity.logo.tupletRhythms[i][1],
+                            this.activity.logo.tupletRhythms[i][2]
                         );
                         break;
                 }
@@ -1076,12 +1067,12 @@ class PhraseMaker {
         docById("wheelDivptm").style.left =
             Math.min(
                 this.activity.turtles._canvas.width - 200,
-                Math.max(0, x * this.activity.blocks.getStageScale())
+                Math.max(0, x * this.activity.getStageScale())
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
                 this.activity.turtles._canvas.height - 250,
-                Math.max(0, y * this.activity.blocks.getStageScale())
+                Math.max(0, y * this.activity.getStageScale())
             ) + "px";
 
         let thisBlock = this.columnBlocksMap[blockIndex][0];
@@ -1105,7 +1096,6 @@ class PhraseMaker {
             this._pitchWheel.createWheel(setxyValueLabel);
         }
 
-        //console.debug(_blockNames.indexOf(blockLabel));
         this._blockLabelsWheel.navigateWheel(_blockNames.indexOf(blockLabel));
 
         this.xblockValue = [xblockLabelValue.toString(), "x"];
@@ -1346,12 +1336,12 @@ class PhraseMaker {
         docById("wheelDivptm").style.left =
             Math.min(
                 this.activity.turtles._canvas.width - 200,
-                Math.max(0, x * this.activity.blocks.getStageScale())
+                Math.max(0, x * this.activity.getStageScale())
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
                 this.activity.turtles._canvas.height - 250,
-                Math.max(0, y * this.activity.blocks.getStageScale())
+                Math.max(0, y * this.activity.getStageScale())
             ) + "px";
 
         let thisBlock = this.columnBlocksMap[blockIndex][0];
@@ -1406,32 +1396,25 @@ class PhraseMaker {
             __selectionChanged(true);
         };
 
+        let labelLength;
         if (condition === "graphicsblocks") {
             if (blockLabel === "forward" || blockLabel === "back") {
-                for (let i = 0; i < forwardBackLabel.length; i++) {
-                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
-                }
+                labelLength = forwardBackLabel.length;
             } else if (blockLabel === "right" || blockLabel === "left") {
-                for (let i = 0; i < leftRightLabel.length; i++) {
-                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
-                }
+                labelLength = leftRightLabel.length;
             } else if (blockLabel === "setheading") {
-                for (let i = 0; i < setHeadingLabel.length; i++) {
-                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
-                }
+                labelLength = setHeadingLabel.length;
             } else if (blockLabel === "setpensize") {
-                for (let i = 0; i < setPenSizeLabel.length; i++) {
-                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
-                }
+                labelLength = setPenSizeLabel.length;
             } else {
-                for (let i = 0; i < setLabel.length; i++) {
-                    this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
-                }
+                labelLength = setLabel.length;
             }
         } else if (condition === "synthsblocks") {
-            for (let i = 0; i < valueLabel.length; i++) {
-                this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
-            }
+            labelLength = valueLabel.length;
+        }
+
+        for (let i = 0; i < labelLength; i++) {
+            this._pitchWheel.navItems[i].navigateFunction = __enterArgValue;
         }
 
         let __selectionChanged = async (updatingArgs) => {
@@ -1522,8 +1505,6 @@ class PhraseMaker {
             } else if (condition === "synthsblocks") {
                 noteStored = this.rowArgs[blockIndex];
             }
-            //eslint-disable-next-line no-console
-            console.debug(noteStored);
             this._noteStored[blockIndex] =
                 this.rowLabels[blockIndex] + ": " + this.rowArgs[blockIndex];
         };
@@ -1691,12 +1672,12 @@ class PhraseMaker {
         docById("wheelDivptm").style.left =
             Math.min(
                 this.activity.turtles._canvas.width - 200,
-                Math.max(0, x * this.activity.blocks.getStageScale())
+                Math.max(0, x * this.activity.getStageScale())
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
                 this.activity.turtles._canvas.height - 250,
-                Math.max(0, y * this.activity.blocks.getStageScale())
+                Math.max(0, y * this.activity.getStageScale())
             ) + "px";
 
         if (!this._noteBlocks) {
@@ -2089,8 +2070,6 @@ class PhraseMaker {
 
     _sort() {
         if (this.sorted) {
-            //eslint-disable-next-line no-console
-            console.debug("already sorted");
             return;
         }
 
@@ -2288,7 +2267,6 @@ class PhraseMaker {
 
     _export() {
         const exportWindow = window.open("");
-        //console.debug(exportWindow);
         const exportDocument = exportWindow.document;
         if (exportDocument === undefined) {
             //eslint-disable-next-line no-console
@@ -2795,8 +2773,6 @@ class PhraseMaker {
                 this.activity.blocks.blockList[blk].name === "newnote" ||
                 this.activity.blocks.blockList[blk].name === "repeat"
             ) {
-                //eslint-disable-next-line no-console
-                console.debug("FOUND A NOTE OR REPEAT BLOCK.");
                 this._noteBlocks = true;
                 break;
             }
@@ -2968,8 +2944,6 @@ class PhraseMaker {
             bottomBlockLoop += 1;
             if (bottomBlockLoop > 2 * this.activity.blocks.blockList) {
                 // Could happen if the block data is malformed.
-                //eslint-disable-next-line no-console
-                console.debug("infinite loop finding bottomBlock?");
                 break;
             }
 
@@ -3420,12 +3394,12 @@ class PhraseMaker {
         docById("wheelDivptm").style.left =
             Math.min(
                 this.activity.turtles._canvas.width - 200,
-                Math.max(0, x * this.activity.blocks.getStageScale())
+                Math.max(0, x * this.activity.getStageScale())
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
                 this.activity.canvas.height - 250,
-                Math.max(0, y * this.activity.blocks.getStageScale())
+                Math.max(0, y * this.activity.getStageScale())
             ) + "px";
 
         this._exitWheel.navItems[0].navigateFunction = () => {
@@ -3737,9 +3711,6 @@ class PhraseMaker {
                     }
 
                     if (rIdx === null) {
-                        //eslint-disable-next-line no-console
-                        console.debug("Could not find a row match.");
-                        //console.debug(obj[0]);
                         continue;
                     }
 
@@ -3772,10 +3743,7 @@ class PhraseMaker {
 
                     // If we found a match, mark this cell
                     row = this._rows[r];
-                    if (row === null || typeof row === "undefined") {
-                        //eslint-disable-next-line no-console
-                        console.debug("COULD NOT FIND ROW " + r);
-                    } else {
+                    if (row !== null && typeof row !== "undefined") {
                         cell = row.cells[c];
                         if (cell != undefined) {
                             cell.style.backgroundColor = "black";
