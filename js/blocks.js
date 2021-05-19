@@ -6564,7 +6564,9 @@ function Blocks(activity) {
         let z = this.activity.blocksContainer.children.length - 1;
         for (let b = 0; b < this.dragGroup.length; b++) {
             this.activity.blocksContainer.setChildIndex(
-                this.blockList[this.dragGroup[b]].container, z);
+                this.blockList[this.dragGroup[b]].container,
+                z
+            );
             z -= 1;
         }
 
