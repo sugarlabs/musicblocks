@@ -1433,13 +1433,13 @@ function MusicKeyboard(activity) {
 
         docById("wheelDivptm").style.left =
             Math.min(
-                this.activity.blocks.turtles._canvas.width - 200,
-                Math.max(0, x * this.activity.blocks.getStageScale())
+                this.activity.canvas.width - 200,
+                Math.max(0, x * this.activity.getStageScale())
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
-                this.activity.blocks.turtles._canvas.height - 250,
-                Math.max(0, y * this.activity.blocks.getStageScale())
+                this.activity.canvas.height - 250,
+                Math.max(0, y * this.activity.getStageScale())
             ) + "px";
 
         this._exitWheel.navItems[0].navigateFunction = () => {
@@ -1651,13 +1651,13 @@ function MusicKeyboard(activity) {
         docById("wheelDivptm").style.width = "300px";
         docById("wheelDivptm").style.left =
             Math.min(
-                this.activity.blocks.turtles._canvas.width - 200,
-                Math.max(0, x * this.activity.blocks.getStageScale())
+                this.activity.canvas.width - 200,
+                Math.max(0, x * this.activity.getStageScale())
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
-                this.activity.blocks.turtles._canvas.height - 250,
-                Math.max(0, y * this.activity.blocks.getStageScale())
+                this.activity.canvas.height - 250,
+                Math.max(0, y * this.activity.getStageScale())
             ) + "px";
 
         this._exitWheel.navItems[0].navigateFunction = () => {
@@ -2044,13 +2044,13 @@ function MusicKeyboard(activity) {
         docById("wheelDivptm").style.width = "300px";
         docById("wheelDivptm").style.left =
             Math.min(
-                this.activity.blocks.turtles._canvas.width - 200,
-                Math.max(0, x * this.activity.blocks.getStageScale())
+                this.activity.canvas.width - 200,
+                Math.max(0, x * this.activity.getStageScale())
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
-                this.activity.blocks.turtles._canvas.height - 250,
-                Math.max(0, y * this.activity.blocks.getStageScale())
+                this.activity.canvas.height - 250,
+                Math.max(0, y * this.activity.getStageScale())
             ) + "px";
 
         index = this.layout.length - index - 1;

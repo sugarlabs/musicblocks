@@ -804,12 +804,12 @@ class PhraseMaker {
         docById("wheelDivptm").style.width = "300px";
         docById("wheelDivptm").style.left =
             Math.min(
-                this.activity.turtles._canvas.width - 200,
+                this.activity.canvas.width - 200,
                 Math.max(0, x * this.activity.getStageScale())
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
-                this.activity.turtles._canvas.height - 250,
+                this.activity.canvas.height - 250,
                 Math.max(0, y * this.activity.getStageScale())
             ) + "px";
 
@@ -1066,12 +1066,12 @@ class PhraseMaker {
         docById("wheelDivptm").style.width = "300px";
         docById("wheelDivptm").style.left =
             Math.min(
-                this.activity.turtles._canvas.width - 200,
+                this.activity.canvas.width - 200,
                 Math.max(0, x * this.activity.getStageScale())
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
-                this.activity.turtles._canvas.height - 250,
+                this.activity.canvas.height - 250,
                 Math.max(0, y * this.activity.getStageScale())
             ) + "px";
 
@@ -1335,12 +1335,12 @@ class PhraseMaker {
         docById("wheelDivptm").style.width = "300px";
         docById("wheelDivptm").style.left =
             Math.min(
-                this.activity.turtles._canvas.width - 200,
+                this.activity.canvas.width - 200,
                 Math.max(0, x * this.activity.getStageScale())
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
-                this.activity.turtles._canvas.height - 250,
+                this.activity.canvas.height - 250,
                 Math.max(0, y * this.activity.getStageScale())
             ) + "px";
 
@@ -1671,12 +1671,12 @@ class PhraseMaker {
         docById("wheelDivptm").style.width = "300px";
         docById("wheelDivptm").style.left =
             Math.min(
-                this.activity.turtles._canvas.width - 200,
+                this.activity.canvas.width - 200,
                 Math.max(0, x * this.activity.getStageScale())
             ) + "px";
         docById("wheelDivptm").style.top =
             Math.min(
-                this.activity.turtles._canvas.height - 250,
+                this.activity.canvas.height - 250,
                 Math.max(0, y * this.activity.getStageScale())
             ) + "px";
 
@@ -3393,7 +3393,7 @@ class PhraseMaker {
 
         docById("wheelDivptm").style.left =
             Math.min(
-                this.activity.turtles._canvas.width - 200,
+                this.activity.canvas.width - 200,
                 Math.max(0, x * this.activity.getStageScale())
             ) + "px";
         docById("wheelDivptm").style.top =
