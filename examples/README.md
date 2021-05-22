@@ -305,3 +305,8 @@
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Music, Math, Art, Example | 7 | 0 | 0 | A, B, C, G, F, E, D | 59 | A3, 221Hz | C5, 524Hz |
+
+| Example | Description |
+| --- | --- |
+| musical-dimensions.html | Interactive game: Test your listening skills by finding cards that match in (or differ by) instrument, pitch and note value. |
+
