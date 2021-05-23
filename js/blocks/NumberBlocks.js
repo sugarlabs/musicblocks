@@ -740,8 +740,16 @@ function setupNumberBlocks(activity) {
                         b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                     }
                     
-                    if (a && b) {
+                    if (!isNaN(a) && !isNaN(b)) {
                         return MathUtility.doPlus(a, b);
+                    } else {
+                        activity.errorMsg(NOINPUTERRORMSG, blk);
+                        if (!isNaN(a)) {
+                            return(a);
+                        } else if (!isNaN(b)) {
+                            return(b);
+                        }
+                        return (0)
                     }
                 }
             }
