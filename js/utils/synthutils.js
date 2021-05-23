@@ -1267,7 +1267,13 @@ function Synth() {
         let numFilters;
         const temp_filters = [];
         if (paramsEffects === null && paramsFilters === null) {
-            synth.triggerAttackRelease(notes, beatValue);
+            // See https://github.com/sugarlabs/musicblocks/issues/2951
+            try {
+                synth.triggerAttackRelease(notes, beatValue, Tone.now() + 0.001);
+            } catch(e) {
+                // eslint-disable-next-line no-console
+                console.debug(e);
+            }
         } else {
             if (paramsFilters !== null && paramsFilters !== undefined) {
                 numFilters = paramsFilters.length; // no. of filters
