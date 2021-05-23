@@ -743,13 +743,21 @@ function setupNumberBlocks(activity) {
                     if (!isNaN(a) && !isNaN(b)) {
                         return MathUtility.doPlus(a, b);
                     } else {
-                        activity.errorMsg(NOINPUTERRORMSG, blk);
-                        if (!isNaN(a)) {
-                            return(a);
-                        } else if (!isNaN(b)) {
-                            return(b);
+                        try {
+                            return(MathUtility.doPlus(a, b));
+                        } catch (e) {
+                            activity.errorMsg(NOINPUTERRORMSG, blk);
+                            // eslint-disable-next-line no-console
+                            console.debug(a + " " + b);
+                            // eslint-disable-next-line no-console
+                            console.debug(e);
+                            if (!isNaN(a)) {
+                                return(a);
+                            } else if (!isNaN(b)) {
+                                return(b);
+                            }
+                            return (0)
                         }
-                        return (0)
                     }
                 }
             }
