@@ -1269,7 +1269,7 @@ function Synth() {
         if (paramsEffects === null && paramsFilters === null) {
             // See https://github.com/sugarlabs/musicblocks/issues/2951
             try {
-                synth.triggerAttackRelease(notes, beatValue, Tone.now() + 0.001);
+                synth.triggerAttackRelease(notes, beatValue, Tone.now() + 0.0);
             } catch(e) {
                 // eslint-disable-next-line no-console
                 console.debug(e);
