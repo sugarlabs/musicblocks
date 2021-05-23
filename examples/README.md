@@ -310,3 +310,7 @@
 | --- | --- |
 | musical-dimensions.html | Interactive game: Test your listening skills by finding cards that match in (or differ by) instrument, pitch and note value. |
 
+| Example | Description |
+| --- | --- |
+| test-suite.html | Smoke test for many Music Blocks functions. |
+
