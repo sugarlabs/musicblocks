@@ -1,3 +1,17 @@
+# Music examples
+
+| Example | Description |
+| --- | --- |
+| Hot-Cross-Buns-First-Form-Discovery-START.tb | minw |
+
+| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Music, Examples | 0 | 0 | 0 | B, A, G | 34 | G4, 392Hz | B4, 494Hz |
+
+| Example | Description |
+| --- | --- |
+| Hot-Cross-Buns.html | An example of using graphics embedded inside of Note Value blocks to visualize beat. | Music, Examples | 3 | 0 | 0 | B, A, G | 340 | G4, 392Hz | G5, 784Hz |
+
 | Example | Description |
 | --- | --- |
 | hotdog.tb | "Mississippi Hotdog": a simple example of a repeated phrase |
@@ -16,51 +30,11 @@
 
 | Example | Description |
 | --- | --- |
-| jeopardy-theme.html | with artwork from the Simsons |
-
-| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Music | 5 | 0 | 0 | E, A, C, B, G, F, D, R | 69 | C3, 131Hz | C♯5, 555Hz |
-
-| Example | Description |
-| --- | --- |
-| la-bamba.html | La Bamba is a Mexican folk song, originally from the state of Veracruz, best known from a 1958 adaptation by Ritchie Valens. |
-
-| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Examples | 10 | 0 | 0 | C, E, G, F, A, D, B | 319 | G2, 98Hz | B6, 1976Hz |
-
-| Example | Description |
-| --- | --- |
-| modifiedbach.tb | A short excerpt from Bach |
-
-| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Examples | 0 | 0 | 0 | B, D, C, R, A, G, E, F | 34 | E3, 165Hz | D4, 294Hz |
-
-| Example | Description |
-| --- | --- |
-| modifiedbach2.tb | Simple two-voice example from Bach |
-
-| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Examples | 0 | 0 | 0 | A, D, E, R, F, G, B, C | 34 | C♯4, 278Hz | B♭5, 933Hz |
-
-| Example | Description |
-| --- | --- |
 | note-values.tb | Example of varying note values. |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Music, Examples | 1 | 0 | 0 | G, R | 37 | G4, 392Hz | G4, 392Hz |
-
-| Example | Description |
-| --- | --- |
-| old-macdonald.tb | Old MacDonald had a Farm with sprites and lyrics |
-
-| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Media, Examples | 6 | 0 | 0 | F, C, D, R, A, G | 167 | C4, 262Hz | A4, 441Hz |
 
 | Example | Description |
 | --- | --- |
@@ -96,30 +70,6 @@
 
 | Example | Description |
 | --- | --- |
-| chopsticks.html | "Chopsticks" is a simple, widely known waltz for the piano. Written in 1877, it is the only published piece[1] by the British composer Euphemia Allen. |
-
-| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Examples | 0 | 0 | 0 | G, F, E, B, D, A, C | 196 | C4, 262Hz | C5, 524Hz |
-
-| Example | Description |
-| --- | --- |
-| crabcanon-plot.html | Musical Offering by JS Bach, featured in Gödel, Escher, Bach by Douglas Hofstader, is an example of a crab canon is an arrangement of two musical lines that are complementary and backward, similar to a palindrome. This version includes a note plotter that makes the palindromic nature of the music apparent. |
-
-| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Examples | 22 | 0 | 0 | A, C, E, F, G, R, D, B | 186 | E3, 165Hz | D5, 588Hz |
-
-| Example | Description |
-| --- | --- |
-| crabcanon.html | A crab canon is an arrangement of two musical lines that are complementary and backward. This is example from J. S. Bach, which uses the backward **block** in its implementation. |
-
-| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Examples | 22 | 0 | 0 | A, C, E, F, G, R, D, B | 186 | E3, 165Hz | D5, 588Hz |
-
-| Example | Description |
-| --- | --- |
 | fifths-and-sixths.html | Simple progression of fifths and sixths |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
@@ -149,6 +99,104 @@
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Music, Examples | 0 | 0 | 0 | C, D, E, F, G, A, B | 15 | C4, 262Hz | C5, 524Hz |
+
+| Example | Description |
+| --- | --- |
+| swing.html | Simple swing rhythm with a bit of randomness(one of this or that) in the note selection |
+
+| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Music, Examples | 0 | 0 | 0 | D, E, G, A, B | 28 | D4, 294Hz | 494Hz |
+
+| Example | Description |
+| --- | --- |
+| triads.tb | A sequence of triads ranging from consonance to dissonance |
+
+| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Music, Examples | 0 | 0 | 0 | C, D, G, E, A, B | 90 | C4, 262HZ | B4, 494Hz |
+
+| Example | Description |
+| --- | --- |
+| Newton-color-model.tb | Sir Isaac Newton designed a mapping between musical pitch and color. |
+
+| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Music, Math, Examples | 0 | 0 | 0 | C, D, E, F, G, A, B | 8 | C4, 262Hz | C5, 524Hz |
+
+| Example | Description |
+| --- | --- |
+| ascending-notes-colour-spiral.tb | Mapping pitch into a spiral graphic |
+
+| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Music, Math, Example | 0 | 0 | 0 | C, D, E, F, G, A, B | 25 | C4, 262Hz | F7, 2794Hz |
+
+# Transcriptions
+
+| Example | Description |
+| --- | --- |
+| jeopardy-theme.html | with artwork from the Simsons |
+
+| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Music | 5 | 0 | 0 | E, A, C, B, G, F, D, R | 69 | C3, 131Hz | C♯5, 555Hz |
+
+| Example | Description |
+| --- | --- |
+| la-bamba.html | La Bamba is a Mexican folk song, originally from the state of Veracruz, best known from a 1958 adaptation by Ritchie Valens. |
+
+| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Music, Examples | 10 | 0 | 0 | C, E, G, F, A, D, B | 319 | G2, 98Hz | B6, 1976Hz |
+
+| Example | Description |
+| --- | --- |
+| modifiedbach.tb | A short excerpt from Bach |
+
+| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Music, Examples | 0 | 0 | 0 | B, D, C, R, A, G, E, F | 34 | E3, 165Hz | D4, 294Hz |
+
+| Example | Description |
+| --- | --- |
+| modifiedbach2.tb | Simple two-voice example from Bach |
+
+| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Music, Examples | 0 | 0 | 0 | A, D, E, R, F, G, B, C | 34 | C♯4, 278Hz | B♭5, 933Hz |
+
+| Example | Description |
+| --- | --- |
+| old-macdonald.tb | Old MacDonald had a Farm with sprites and lyrics |
+
+| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Music, Media, Examples | 6 | 0 | 0 | F, C, D, R, A, G | 167 | C4, 262Hz | A4, 441Hz |
+
+| Example | Description |
+| --- | --- |
+| chopsticks.html | "Chopsticks" is a simple, widely known waltz for the piano. Written in 1877, it is the only published piece[1] by the British composer Euphemia Allen. |
+
+| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Music, Examples | 0 | 0 | 0 | G, F, E, B, D, A, C | 196 | C4, 262Hz | C5, 524Hz |
+
+| Example | Description |
+| --- | --- |
+| crabcanon-plot.html | Musical Offering by JS Bach, featured in Gödel, Escher, Bach by Douglas Hofstader, is an example of a crab canon is an arrangement of two musical lines that are complementary and backward, similar to a palindrome. This version includes a note plotter that makes the palindromic nature of the music apparent. |
+
+| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Music, Examples | 22 | 0 | 0 | A, C, E, F, G, R, D, B | 186 | E3, 165Hz | D5, 588Hz |
+
+| Example | Description |
+| --- | --- |
+| crabcanon.html | A crab canon is an arrangement of two musical lines that are complementary and backward. This is example from J. S. Bach, which uses the backward **block** in its implementation. |
+
+| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Music, Examples | 22 | 0 | 0 | A, C, E, F, G, R, D, B | 186 | E3, 165Hz | D5, 588Hz |
 
 | Example | Description |
 | --- | --- |
@@ -184,22 +232,6 @@
 
 | Example | Description |
 | --- | --- |
-| swing.html | Simple swing rhythm with a bit of randomness(one of this or that) in the note selection |
-
-| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Examples | 0 | 0 | 0 | D, E, G, A, B | 28 | D4, 294Hz | 494Hz |
-
-| Example | Description |
-| --- | --- |
-| triads.tb | A sequence of triads ranging from consonance to dissonance |
-
-| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Examples | 0 | 0 | 0 | C, D, G, E, A, B | 90 | C4, 262HZ | B4, 494Hz |
-
-| Example | Description |
-| --- | --- |
 | twinkle-twinkle.html | Twinkle Twinkle Little Star composed from "chunks" of note. |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
@@ -213,14 +245,6 @@
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Music, Examples | 25 | 0 | 0 | R, E, G, C, B, A, F, D | 179 | R, NaNHz | R, NaNHz |
-
-| Example | Description |
-| --- | --- |
-| 12-bar-blues.tb | The twelve-bar blues or blues changes is one of the most prominent chord progressions in popular music. The blues progression has a distinctive form in lyrics, phrase, chord structure, and duration. In its basic form, it is predominantly based on the I, IV, and V chords of a key. The blues can be played in any key. (Wikipedia) In this example, we vary the color based on pitch number and the pen width based on beat value. |
-
-| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Art, Examples | 0 | 0 | 0 | D, G, A, C, B, F | 144 | D3, 147Hz | C♯5, 555Hz |
 
 | Example | Description |
 | --- | --- |
@@ -240,18 +264,6 @@
 
 | Example | Description |
 | --- | --- |
-| Hot-Cross-Buns-First-Form-Discovery-START.tb | minw |
-
-| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Examples | 0 | 0 | 0 | B, A, G | 34 | G4, 392Hz | B4, 494Hz |
-
-| Example | Description |
-| --- | --- |
-| Hot-Cross-Buns.html | An example of using graphics embedded inside of Note Value blocks to visualize beat. | Music, Examples | 3 | 0 | 0 | B, A, G | 340 | G4, 392Hz | G5, 784Hz |
-
-| Example | Description |
-| --- | --- |
 | Linus-and-Lucy.html | "Linus and Lucy" is a popular jazz piano composition written by Vince Guaraldi, appearing in many of the Peanuts animated television specials. Named for the fictional siblings Linus and Lucy van Pelt, it was released in 1964 on the Vince Guaraldi Trio's album Jazz Impressions of a Boy Named Charlie Brown. (Wikipedia) |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
@@ -260,27 +272,11 @@
 
 | Example | Description |
 | --- | --- |
-| Newton-color-model.tb | Sir Isaac Newton designed a mapping between musical pitch and color. |
-
-| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Math, Examples | 0 | 0 | 0 | C, D, E, F, G, A, B | 8 | C4, 262Hz | C5, 524Hz |
-
-| Example | Description |
-| --- | --- |
 | Romanian-folk-song.tb | Romanian Folk Dance is a short piano piece composed by Béla Bartók. |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Music, Math | 1 | 0 | 0 | A, F, G, D, E, B, C | 356 | G4, 392Hz | A6, 1761Hz |
-
-| Example | Description |
-| --- | --- |
-| ascending-notes-colour-spiral.tb | Mapping pitch into a spiral graphic |
-
-| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Music, Math, Example | 0 | 0 | 0 | C, D, E, F, G, A, B | 25 | C4, 262Hz | F7, 2794Hz |
 
 | Example | Description |
 | --- | --- |
@@ -306,11 +302,22 @@
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Music, Math, Art, Example | 7 | 0 | 0 | A, B, C, G, F, E, D | 59 | A3, 221Hz | C5, 524Hz |
 
+# Games
+
 | Example | Description |
 | --- | --- |
 | musical-dimensions.html | Interactive game: Test your listening skills by finding cards that match in (or differ by) instrument, pitch and note value. |
 
 | Example | Description |
 | --- | --- |
-| test-suite.html | Smoke test for many Music Blocks functions. |
+| deducto.html | Interactive game: Determine the hidden musical pattern. |
 
+| Example | Description |
+| --- | --- |
+| mouse-trap.html | Interactive game: Catch the mice by following the musical apattern. |
+
+# Utilities
+
+| Example | Description |
+| --- | --- |
+| test-suite.html | Smoke test for many Music Blocks functions. |
