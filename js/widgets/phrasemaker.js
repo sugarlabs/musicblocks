@@ -626,11 +626,14 @@ class PhraseMaker {
                             this.activity.logo.synth.inTemperament
                         );
                         const label = this.rowLabels[i];
-                        let note = getTemperament(this.activity.logo.synth.inTemperament).filter(
-                            (ele) => {
-                                return ele[3] === label || ele[1] === label;
+                        const notes = getTemperament(this.activity.logo.synth.inTemperament);
+                        let note = [];
+                        for (let n in notes) {
+                            if (notes[n][1] === label) {
+                                let note = notes[n];
+                                break;
                             }
-                        );
+                        }
                         if (note.length > 0) {
                             note = note[0];
                         }
@@ -3955,16 +3958,20 @@ class PhraseMaker {
                             );
                         } else {
                             if (
-                                isCustomTemperament(this.activity.logo.synth.inTemperament) &&
-                                    getTemperament(this.activity.logo.synth.inTemperament).filter(
-                                    (ele) => {
-                                        const label = this.rowLabels[j];
-                                        return ele[3] === label || ele[1] === label;
+                                isCustomTemperament(this.activity.logo.synth.inTemperament)) {
+                                const notes = getTemperament(this.activity.logo.synth.inTemperament);
+                                const label = this.rowLabels[j];
+                                let customNote = [];
+                                for (let n in notes) {
+                                    if (notes[n][1] === label) {
+                                        customNote = notes[n];
+                                        break;
                                     }
-                                ).length !== 0
-                            ) {
-                                // custom pitch in custom temperament
-                                note.push(this.rowLabels[j] + this.rowArgs[j]);
+                                }
+                                if (customNote.length > 0) {
+                                    // custom pitch in custom temperament
+                                    note.push(this.rowLabels[j] + this.rowArgs[j]);
+                                }
                             } else {
                                 // if drum push drum name
                                 note.push(this.rowLabels[j]);
