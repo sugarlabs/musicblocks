@@ -173,7 +173,7 @@ class TimbreWidget {
      * @param {number} k - is the parameter to update (There can be multiple parameters per block.)
      * @returns {void}
      */
-    _update(i, value, k) {
+    _update = async (i, value, k) => {
         const updateParams = [];
 
         if (this.isActive["envelope"] === true && this.env[i] != null) {
@@ -267,7 +267,8 @@ class TimbreWidget {
                     this.activity.blocks.adjustDocks(this.blockNo, true);
                 };
 
-                setTimeout(__blockRefresher(), 250);
+                await delayExecution(500);
+                __blockRefresher();
             }
         }
 
@@ -315,7 +316,6 @@ class TimbreWidget {
      */
     _playNote(note, duration) {
         this.activity.logo.synth.setMasterVolume(last(Singer.masterVolume));
-
         const timbreEffects = instrumentsEffects[0][this.instrumentName];
         const paramsEffects = {
             doVibrato: false,
@@ -780,7 +780,7 @@ class TimbreWidget {
         oscillatorButtonCell.id = "oscillatorButtonCell";
         this.isActive["oscillator"] = false;
 
-        oscillatorButtonCell.onclick = () => {
+        oscillatorButtonCell.onclick = async () => {
             _unhighlightButtons();
             for (let i = 0; i < this.activeParams.length; i++) {
                 this.isActive[this.activeParams[i]] = false;
@@ -799,12 +799,14 @@ class TimbreWidget {
                 ];
                 this.activity.blocks.loadNewBlocks(OSCILLATOROBJ);
 
+                await delayExecution(100);
                 const n = this.activity.blocks.blockList.length - 3;
                 this.osc.push(n);
                 this.oscParams.push(DEFAULTOSCILLATORTYPE);
                 this.oscParams.push(6);
 
-                setTimeout(this.blockConnection(3, bottomOfClamp), 500);
+                await delayExecution(500);
+                this.blockConnection(3, bottomOfClamp);
 
                 this._oscillator(true);
             } else {
@@ -829,7 +831,7 @@ class TimbreWidget {
         envelopeButtonCell.id = "envelopeButtonCell";
         this.isActive["envelope"] = false;
 
-        envelopeButtonCell.onclick = () => {
+        envelopeButtonCell.onclick = async () => {
             _unhighlightButtons();
             for (let i = 0; i < this.activeParams.length; i++) {
                 this.isActive[this.activeParams[i]] = false;
@@ -850,6 +852,7 @@ class TimbreWidget {
                 ];
                 this.activity.blocks.loadNewBlocks(ENVOBJ);
 
+                await delayExecution(100);
                 const n = this.activity.blocks.blockList.length - 5;
                 this.env.push(n);
                 this.ENVs.push(1);
@@ -857,7 +860,8 @@ class TimbreWidget {
                 this.ENVs.push(60);
                 this.ENVs.push(1);
 
-                setTimeout(this.blockConnection(5, bottomOfClamp), 500);
+                await delayExecution(500);
+                this.blockConnection(5, bottomOfClamp);
 
                 this._envelope(true); // create a new synth instrument
             } else {
@@ -891,7 +895,7 @@ class TimbreWidget {
         filterButtonCell.id = "filterButtonCell";
         this.isActive["filter"] = false;
 
-        filterButtonCell.onclick = () => {
+        filterButtonCell.onclick = async () => {
             _unhighlightButtons();
             for (let i = 0; i < this.activeParams.length; i++) {
                 this.isActive[this.activeParams[i]] = false;
@@ -911,13 +915,15 @@ class TimbreWidget {
                 ];
                 this.activity.blocks.loadNewBlocks(FILTEROBJ);
 
+                await delayExecution(100);
                 const n = this.activity.blocks.blockList.length - 4;
                 this.fil.push(n);
                 this.filterParams.push(DEFAULTFILTERTYPE);
                 this.filterParams.push(-12);
                 this.filterParams.push(392);
 
-                setTimeout(this.blockConnection(4, bottomOfClamp), 500);
+                await delayExecution(500);
+                this.blockConnection(4, bottomOfClamp);
             }
 
             this._filter();
@@ -973,12 +979,13 @@ class TimbreWidget {
 
     /**
      * @public
+     * Method pertaining to adjusting the timbre block clamp after adding blocks.
      * @param {number} n
      * @param {number} clamp
      * @param {number} topOfClamp
      * @returns {void}
      */
-    clampConnection(n, clamp, topOfClamp) {
+    clampConnection = async (n, clamp, topOfClamp) => {
         // Connect the clamp to the Widget block.
         this.activity.blocks.blockList[this.blockNo].connections[2] = n;
         this.activity.blocks.blockList[n].connections[0] = this.blockNo;
@@ -992,18 +999,21 @@ class TimbreWidget {
         // Adjust the clamp sizes and positions.
         this.activity.blocks.clampBlocksToCheck.push([n, 0]);
         this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+
+        await delayExecution(500);
+        this.activity.blocks.adjustExpandableClampBlock();
         this.activity.blocks.adjustDocks(this.blockNo, true);
     }
 
     /**
      * @public
-     * Method pertaining to replacing blocks.
+     * Method pertaining to adjusting timbre block clamp and effects block clamp sizes after adding blocks.
      * @param {number} oldblk
      * @param {number} newblk
      * @param {number} topOfClamp
      * @returns {void}
      */
-    clampConnectionVspace(n, vspace, topOfClamp) {
+    clampConnectionVspace = async (n, vspace, topOfClamp) => {
         // Connect the clamp to the Widget block.
         this.activity.blocks.blockList[this.blockNo].connections[2] = n;
         this.activity.blocks.blockList[n].connections[0] = this.blockNo;
@@ -1017,6 +1027,9 @@ class TimbreWidget {
         // Adjust the clamp sizes and positions.
         this.activity.blocks.clampBlocksToCheck.push([n, 0]);
         this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+
+        await delayExecution(500);
+        this.activity.blocks.adjustExpandableClampBlock();
         this.activity.blocks.adjustDocks(this.blockNo, true);
     }
 
@@ -1109,12 +1122,12 @@ class TimbreWidget {
 
     /**
      * @public
-     * Method pertaining to connection of blocks.
+     * Method pertaining to adjusting block connections
      * @param {number} len
      * @param {number} bottomOfClamp
      * @returns {void}
      */
-    blockConnection(len, bottomOfClamp) {
+    blockConnection = async (len, bottomOfClamp) => {
         const n = this.activity.blocks.blockList.length - len;
         if (bottomOfClamp == null) {
             this.activity.blocks.blockList[this.blockNo].connections[2] = n;
@@ -1149,7 +1162,11 @@ class TimbreWidget {
         }
 
         this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
+
+        await delayExecution(1000);
+        this.activity.blocks.adjustExpandableClampBlock();
         this.activity.blocks.adjustDocks(this.blockNo, true);
+        this.activity.refreshCanvas();
     }
 
     /**
@@ -1157,7 +1174,7 @@ class TimbreWidget {
      * @returns {void}
      * Method that lets you choose between an AM synth, a PM synth, or a Duo synth.
      */
-    _synth() {
+    _synth = () => {
         let blockValue = 0;
 
         docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
@@ -1201,7 +1218,7 @@ class TimbreWidget {
         const synthsName = docByName("synthsName");
         let synthChosen;
         for (let i = 0; i < synthsName.length; i++) {
-            synthsName[i].onclick = (event) => {
+            synthsName[i].onclick = async (event) => {
                 synthChosen = event.target.value;
                 let subHtmlElements = '<div id="chosen">' + synthChosen + "</div>";
                 for (let j = 0; j < this.activeParams.length; j++) {
@@ -1225,6 +1242,7 @@ class TimbreWidget {
                         ];
                         this.activity.blocks.loadNewBlocks(AMSYNTHOBJ);
 
+                        await delayExecution(100);
                         const n = this.activity.blocks.blockList.length - 2;
                         this.AMSynthesizer.push(n);
                         this.AMSynthParams.push(1);
@@ -1289,6 +1307,7 @@ class TimbreWidget {
                         ];
                         this.activity.blocks.loadNewBlocks(FMSYNTHOBJ);
 
+                        await delayExecution(100);
                         const n = this.activity.blocks.blockList.length - 2;
                         this.FMSynthesizer.push(n);
                         this.FMSynthParams.push(10);
@@ -1356,6 +1375,7 @@ class TimbreWidget {
                         ];
                         this.activity.blocks.loadNewBlocks(NOISESYNTHOBJ);
 
+                        await delayExecution(100);
                         const n = this.activity.blocks.blockList.length - 2;
                         this.NoiseSynthesizer.push(n);
                         this.NoiseSynthParams.push("white");
@@ -1421,6 +1441,7 @@ class TimbreWidget {
                         ];
                         this.activity.blocks.loadNewBlocks(DUOSYNTHOBJ);
 
+                        await delayExecution(100);
                         const n = this.activity.blocks.blockList.length - 3;
                         this.duoSynthesizer.push(n);
                         this.duoSynthParams.push(10);
@@ -1977,7 +1998,7 @@ class TimbreWidget {
      * @returns {void}
      * lets you add addition filters to your custom timbre.
      */
-    _addFilter() {
+    _addFilter = async () => {
         const env = docById("timbreTable");
         const topOfClamp = this.activity.blocks.blockList[this.blockNo].connections[2];
         const bottomOfClamp = this.activity.blocks.findBottomBlock(topOfClamp);
@@ -2013,7 +2034,8 @@ class TimbreWidget {
             [3, ["filtertype", { value: this.filterParams[len - 3] }], 0, 0, [0]]
         ]);
 
-        setTimeout(this.blockConnection(4, bottomOfClamp), 500);
+        await delayExecution(500);
+        this.blockConnection(4, bottomOfClamp);
 
         this._createFilter(this.fil.length - 1, env);
         this._playNote("G4", 1 / 8);
@@ -2028,7 +2050,7 @@ class TimbreWidget {
      * lets you add effects to your custom timbre: tremelo, vibrato, chorus, phaser, and distortion.
      * When an effect is selected, additional controls will appear in the widget.
      */
-    _effects() {
+    _effects = () => {
         let blockValue = 0;
 
         docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
@@ -2077,7 +2099,7 @@ class TimbreWidget {
         let effectChosen;
 
         for (let i = 0; i < effectsName.length; i++) {
-            effectsName[i].onclick = (event) => {
+            effectsName[i].onclick = async (event) => {
                 effectChosen = event.target.value;
                 let subHtmlElements = '<div id="chosen">' + effectChosen + "</div>";
                 if (effectChosen === "Tremolo") {
@@ -2138,7 +2160,8 @@ class TimbreWidget {
                         this.tremoloParams.push(10);
                         this.tremoloParams.push(50);
 
-                        setTimeout(this.clampConnection(n, 3, topOfClamp), 500);
+                        await delayExecution(500);
+                        this.clampConnection(n, 3, topOfClamp);
                     }
 
                     for (let i = 0; i < 2; i++) {
@@ -2220,13 +2243,11 @@ class TimbreWidget {
                         this.vibratoParams.push(5);
                         this.vibratoParams.push(16);
 
-                        setTimeout(
-                            this.clampConnectionVspace(
-                                vibratoBlock,
-                                vibratoBlock + 2,
-                                topOfTimbreClamp
-                            ),
-                            500
+                        await delayExecution(500);
+                        this.clampConnectionVspace(
+                            vibratoBlock,
+                            vibratoBlock + 2,
+                            topOfTimbreClamp
                         );
 
                         docById("myRangeFx0").value = 5;
@@ -2290,12 +2311,18 @@ class TimbreWidget {
                     docById("sFx0").textContent = _("rate");
                     docById("myRangeFx0").value = 2;
                     docById("myspanFx0").textContent = "2";
+                    instrumentsEffects[0][this.instrumentName]["chorusRate"] = 2;
+
                     docById("sFx1").textContent = _("delay (MS)");
                     docById("myRangeFx1").value = 4;
                     docById("myspanFx1").textContent = "4";
+                    instrumentsEffects[0][this.instrumentName]["delayTime"] = 4;
+
+
                     docById("sFx2").textContent = _("depth");
                     docById("myRangeFx2").value = 70;
                     docById("myspanFx2").textContent = "70";
+                    instrumentsEffects[0][this.instrumentName]["chorusDepth"] = 4;
 
                     if (this.chorusEffect.length !== 0) {
                         blockValue = this.chorusEffect.length - 1;
@@ -2325,7 +2352,8 @@ class TimbreWidget {
                         this.chorusParams.push(4);
                         this.chorusParams.push(70);
 
-                        setTimeout(this.clampConnection(n, 4, topOfClamp), 500);
+                        await delayExecution(500);
+                        this.clampConnection(n, 4, topOfClamp);
                     }
 
                     for (let i = 0; i < 3; i++) {
@@ -2420,7 +2448,8 @@ class TimbreWidget {
                         this.phaserParams.push(3);
                         this.phaserParams.push(350);
 
-                        setTimeout(this.clampConnection(n, 4, topOfClamp), 500);
+                        await delayExecution(500);
+                        this.clampConnection(n, 4, topOfClamp);
                     }
 
                     for (let i = 0; i < 3; i++) {
@@ -2495,7 +2524,8 @@ class TimbreWidget {
                         this.distortionEffect.push(n);
                         this.distortionParams.push(40);
 
-                        setTimeout(this.clampConnection(n, 2, topOfClamp), 500);
+                        await delayExecution(500);
+                        this.clampConnection(n, 2, topOfClamp);
                     }
 
                     document.getElementById("wrapperFx0").addEventListener("change", (event) => {
