@@ -12,15 +12,13 @@
 /*
    global
 
-   _, last, logo, DRUMNAMES, NOISENAMES, VOICENAMES, INVALIDPITCH, CUSTOMSAMPLES
+   _, last, DRUMNAMES, NOISENAMES, VOICENAMES, INVALIDPITCH, CUSTOMSAMPLES
 */
 
 /*
    Global Locations
     js/utils/utils.js
         _, last
-    js/activity.js
-        logo
     js/utils/synthutils.js
         VOICENAMES, DRUMNAMES, NOISENAMES
     js/logo.js
@@ -3134,7 +3132,7 @@ function getNote(
  * @param {tur} turtle - Current Turtle
  */
 
-function _calculate_pitch_number(np, tur) {
+function _calculate_pitch_number(activity, np, tur) {
     let obj;
     if (tur.singer.lastNotePlayed !== null) {
         if (typeof np === "string") {
@@ -3154,13 +3152,13 @@ function _calculate_pitch_number(np, tur) {
             tur.singer.keySignature,
             tur.singer.moveable,
             null,
-            logo.errorMsg
+            activity.errorMsg
         );
     } else {
         if (tur.singer.lastNotePlayed !== null) {
             // eslint-disable-next-line no-console
             console.debug("Cannot find a note ");
-            logo.errorMsg(INVALIDPITCH);
+            activity.errorMsg(INVALIDPITCH);
         }
         obj = ["G", 4];
     }
@@ -4217,7 +4215,7 @@ const convertFactor = function (factor) {
     }
 };
 
-function getPitchInfo(type, notePlayed, tur) {
+function getPitchInfo(activity, type, notePlayed, tur) {
     let np = notePlayed;
     let octave;
     try {
@@ -4303,9 +4301,9 @@ function getPitchInfo(type, notePlayed, tur) {
                     (octave - 4) * YSTAFFOCTAVEHEIGHT
                 );
             case "pitch number":
-                return _calculate_pitch_number(np, tur);
+                return _calculate_pitch_number(activity, np, tur);
             case "pitch in hertz":
-                return logo.synth._getFrequency(np, logo.synth.changeInTemperament);
+                return activity.logo.synth._getFrequency(np, activity.logo.synth.changeInTemperament);
             case "pitch to color":
                 if (Number(np)) {
                     [np, octave] = frequencyToPitch(np);

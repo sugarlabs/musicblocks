@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2020 Walter Bender
+// Copyright (c) 2014-2021 Walter Bender
 // Copyright (c) 2015 Yash Khandelwal
 // Copyright (c) 2020 Anindya Kundu
 //

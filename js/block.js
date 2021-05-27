@@ -314,7 +314,7 @@ class Block {
                         throw new Error("COULD NOT UPDATE CACHE");
                     }
 
-                    if (that.bounds == null) {
+                    if (that.bounds === null) {
                         updateBounds(loopCount + 1);
                         await that.pause(200);
                     } else {

@@ -583,7 +583,7 @@ function setupPitchBlocks(activity) {
                         notePlayed = arg1;
                     }
                 }
-                return getPitchInfo(activity.blocks.blockList[blk].privateData, notePlayed, tur);
+                return getPitchInfo(activity, activity.blocks.blockList[blk].privateData, notePlayed, tur);
             }
         }
     }
