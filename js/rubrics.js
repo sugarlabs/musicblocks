@@ -855,7 +855,6 @@ const getStatsFromNotation = (activity) => {
                 break;
             default:
         }
-	g533
     }
     // console.debug(projectStats);
     return projectStats;

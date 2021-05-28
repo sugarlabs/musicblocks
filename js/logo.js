@@ -928,7 +928,7 @@ class Logo {
                 const comp = this.activity.turtles.turtleList[turtle].companionTurtle;
                 if (comp) {
                     this.activity.turtles.turtleList[comp].running = false;
-                    const interval = logo.activity.turtles.turtleList[comp].interval;
+                    const interval = this.activity.turtles.turtleList[comp].interval;
                     if (interval) clearInterval(interval);
                 }
             }
