@@ -788,19 +788,12 @@ function setupPitchBlocks(activity) {
                     return ["sol", 4];
                 }
 
-                if (tur.singer.moveable) {
-                    // Calculate the offset relative to the current key.
-                    let lc = noteIdx - NOTENAMES.indexOf(obj[0][0]);
-                    if (lc < 0) {
-                        lc += modeLength;
-                    }
-                    return [thisScale[lc], o2];
-                } else {
-                    while (noteIdx < 0) {
-                        noteIdx += SOLFEGENAMES.length;
-                    }
-                    return [SOLFEGENAMES[noteIdx], o2];
+                // Calculate the offset relative to the current key.
+                let lc = noteIdx - NOTENAMES.indexOf(obj[0][0]);
+                if (lc < 0) {
+                    lc += modeLength;
                 }
+                return [thisScale[lc], o2];
             } else {
                 if (cblk1 === null) {
                     return "G4";
