@@ -340,18 +340,7 @@ function setupPitchActions(activity) {
             const isNegativeArg = number < 0 ? true : false;
             number = Math.abs(number);
 
-            let obj;
-            if (
-                blk !== undefined &&
-                blk in activity.blocks.blockList &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[1]].name ===
-                    "ytopitch"
-            ) {
-                obj = keySignatureToMode("C major");
-            } else {
-                obj = keySignatureToMode(tur.singer.keySignature);
-            }
-
+            const obj = keySignatureToMode(tur.singer.keySignature);
             const modeLength = MUSICALMODES[obj[1]].length;
             let scaleDegree = (Math.floor(number - 1) % modeLength) + 1;
 
@@ -398,18 +387,7 @@ function setupPitchActions(activity) {
 
             scaleDegree = isNegativeArg ? modeLength - scaleDegree : scaleDegree;
 
-            let note;
-            if (
-                blk !== undefined &&
-                blk in activity.blocks.blockList &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[1]].name ===
-                    "ytopitch"
-            ) {
-                note = nthDegreeToPitch("C major", scaleDegree);
-            } else {
-                note = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
-            }
-
+            const note = nthDegreeToPitch(tur.singer.keySignature, scaleDegree);
             let semitones = ref;
             semitones +=
                 NOTESFLAT.indexOf(note) !== -1

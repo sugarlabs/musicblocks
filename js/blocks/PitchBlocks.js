@@ -708,18 +708,28 @@ function setupPitchBlocks(activity) {
         arg(logo, turtle, blk, receivedArg) {
             const cblk0 = activity.blocks.blockList[blk].connections[0];
             const cblk1 = activity.blocks.blockList[blk].connections[1];
-            let arg1 = null;
+
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
+            const obj = keySignatureToMode(tur.singer.keySignature);
+            const modeLength = MUSICALMODES[obj[1]].length;
+
+            let arg1 = 0;
             if (cblk1 !== null) {
                 arg1 = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
             }
+
+            let posY = arg1 + YSTAFFNOTEHEIGHT / 2;
+            posY %= YSTAFFOCTAVEHEIGHT;
+            const o = Math.floor(posY / YSTAFFOCTAVEHEIGHT);
+            const o2 = o + 4;
+            let lc = 0;
+            let noteIdx = Math.floor(posY / YSTAFFNOTEHEIGHT);
+
             if (cblk0 === null) {
                 if (cblk1 === null) {
                     return "G4";
                 }
-                let posY2 = arg1 + YSTAFFNOTEHEIGHT / 2;
-                const o2 = Math.floor(posY2 / YSTAFFOCTAVEHEIGHT) + 4;
-                posY2 %= YSTAFFOCTAVEHEIGHT;
-                let noteIdx = Math.floor(posY2 / YSTAFFNOTEHEIGHT);
+                let noteIdx = Math.floor(posY / YSTAFFNOTEHEIGHT);
                 while (noteIdx < 0) {
                     noteIdx += NOTENAMES.length;
                 }
@@ -729,23 +739,23 @@ function setupPitchBlocks(activity) {
                 if (cblk1 === null) {
                     return 7;
                 }
-                let posY = arg1 + YSTAFFNOTEHEIGHT / 2;
-                const o = Math.floor(posY / YSTAFFOCTAVEHEIGHT);
-                posY %= YSTAFFOCTAVEHEIGHT;
                 let lc = 0;
                 for (let i = 0; i < posY / YSTAFFNOTEHEIGHT; i++) {
-                    lc += MUSICALMODES["major"][i];
+                    lc += MUSICALMODES[obj[1]][i];  // Use the current mode.
                 }
                 return lc + 12 * o;
             } else if (activity.blocks.blockList[cblk0].name == "nthmodalpitch") {
                 if (cblk1 === null) {
                     return 5;
                 }
-                let posY1 = arg1 + YSTAFFNOTEHEIGHT / 2;
-                const o1 = Math.floor(posY1 / YSTAFFOCTAVEHEIGHT);
-                posY1 %= YSTAFFOCTAVEHEIGHT;
-                const lc1 = posY1 / YSTAFFNOTEHEIGHT;
-                return lc1 + o1 * 7;
+                let lc = Math.floor(posY / YSTAFFNOTEHEIGHT);
+                // Calculate the offset relative to the current key.
+                const idx = NOTENAMES.indexOf(obj[0][0]);
+                lc -= idx;
+                if (lc < 0) {
+                    lc += modeLength;
+                }
+                return lc + o * modeLength;
             } else if (activity.blocks.blockList[cblk0].name == "print") {
                 if (logo.inStatusMatrix) {
                     logo.statusFields.push([blk, "ytopitch"]);
@@ -753,10 +763,6 @@ function setupPitchBlocks(activity) {
                 if (cblk1 === null) {
                     return "G4";
                 }
-                let posY2 = arg1 + YSTAFFNOTEHEIGHT / 2;
-                const o2 = Math.floor(posY2 / YSTAFFOCTAVEHEIGHT) + 4;
-                posY2 %= YSTAFFOCTAVEHEIGHT;
-                let noteIdx = Math.floor(posY2 / YSTAFFNOTEHEIGHT);
                 while (noteIdx < 0) {
                     noteIdx += NOTENAMES.length;
                 }
@@ -766,23 +772,15 @@ function setupPitchBlocks(activity) {
                 if (cblk1 === null) {
                     return ["sol", 4];
                 }
-                let posY3 = arg1 + YSTAFFNOTEHEIGHT / 2;
-                const o3 = Math.floor(posY3 / YSTAFFOCTAVEHEIGHT) + 4;
-                posY3 %= YSTAFFOCTAVEHEIGHT;
-                let noteIdx = Math.floor(posY3 / YSTAFFNOTEHEIGHT);
                 while (noteIdx < 0) {
                     noteIdx += SOLFEGENAMES.length;
                 }
                 const sol = SOLFEGENAMES[noteIdx];
-                return [sol, o3];
+                return [sol, o2];
             } else {
                 if (cblk1 === null) {
                     return "G4";
                 }
-                let posY2 = arg1 + YSTAFFNOTEHEIGHT / 2;
-                const o2 = Math.floor(posY2 / YSTAFFOCTAVEHEIGHT) + 4;
-                posY2 %= YSTAFFOCTAVEHEIGHT;
-                let noteIdx = Math.floor(posY2 / YSTAFFNOTEHEIGHT);
                 while (noteIdx < 0) {
                     noteIdx += NOTENAMES.length;
                 }
@@ -1101,7 +1099,7 @@ function setupPitchBlocks(activity) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 logo.stopTurtle = true;
             } else {
-		return Singer.PitchActions.playPitch(args[0], args[1], 0, turtle, blk);
+                return Singer.PitchActions.playPitch(args[0], args[1], 0, turtle, blk);
             }
         }
     }
