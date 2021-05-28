@@ -712,6 +712,7 @@ function setupPitchBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
             const obj = keySignatureToMode(tur.singer.keySignature);
             const modeLength = MUSICALMODES[obj[1]].length;
+            const thisScale = buildScale(tur.singer.keySignature)[0];
 
             let arg1 = 0;
             if (cblk1 !== null) {
@@ -739,16 +740,31 @@ function setupPitchBlocks(activity) {
                 if (cblk1 === null) {
                     return 7;
                 }
-                let lc = 0;
-                for (let i = 0; i < posY / YSTAFFNOTEHEIGHT; i++) {
-                    lc += MUSICALMODES[obj[1]][i];  // Use the current mode.
+
+                let lc = noteIdx;
+                // Calculate the offset relative to the current key.
+                const idx = NOTENAMES.indexOf(obj[0][0]);
+                lc -= idx;
+                if (lc < 0) {
+                    lc += modeLength;
                 }
+
+                const thisNote = thisScale[lc];
+
+                // Now that we have the note, look for its pitch number.
+                lc = NOTESSHARP.indexOf(thisNote);
+                if (lc === -1) {
+                    lc = NOTESFLAT.indexOf(thisNote);
+                }
+
+                // Since we are using the staff, it is OK to assume 12
+                // half-steps per octave.
                 return lc + 12 * o;
             } else if (activity.blocks.blockList[cblk0].name == "nthmodalpitch") {
                 if (cblk1 === null) {
                     return 5;
                 }
-                let lc = Math.floor(posY / YSTAFFNOTEHEIGHT);
+                let lc = noteIdx;
                 // Calculate the offset relative to the current key.
                 const idx = NOTENAMES.indexOf(obj[0][0]);
                 lc -= idx;
