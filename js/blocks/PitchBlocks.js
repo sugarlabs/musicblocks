@@ -764,10 +764,9 @@ function setupPitchBlocks(activity) {
                 if (cblk1 === null) {
                     return 5;
                 }
-                let lc = noteIdx;
+
                 // Calculate the offset relative to the current key.
-                const idx = NOTENAMES.indexOf(obj[0][0]);
-                lc -= idx;
+                let lc = noteIdx - NOTENAMES.indexOf(obj[0][0]);
                 if (lc < 0) {
                     lc += modeLength;
                 }
@@ -788,11 +787,20 @@ function setupPitchBlocks(activity) {
                 if (cblk1 === null) {
                     return ["sol", 4];
                 }
-                while (noteIdx < 0) {
-                    noteIdx += SOLFEGENAMES.length;
+
+                if (tur.singer.moveable) {
+                    // Calculate the offset relative to the current key.
+                    let lc = noteIdx - NOTENAMES.indexOf(obj[0][0]);
+                    if (lc < 0) {
+                        lc += modeLength;
+                    }
+                    return [thisScale[lc], o2];
+                } else {
+                    while (noteIdx < 0) {
+                        noteIdx += SOLFEGENAMES.length;
+                    }
+                    return [SOLFEGENAMES[noteIdx], o2];
                 }
-                const sol = SOLFEGENAMES[noteIdx];
-                return [sol, o2];
             } else {
                 if (cblk1 === null) {
                     return "G4";
@@ -1799,7 +1807,7 @@ function setupPitchBlocks(activity) {
 
             let note, octave, cents;
 
-            // is the arg a scaledegree block?
+            // Is the arg a scaledegree block?
             const c = activity.blocks.blockList[blk].connections[1];
             let cname = null;
             if (c !== null) {
