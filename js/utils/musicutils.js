@@ -28,11 +28,11 @@
 /*
   exported
 
-  SYNTHSVG, RSYMBOLS, NOTENAMES, NOTENAMES1, WESTERN2EISOLFEGENAMES,
-  PITCHES1, PITCHES3, SCALENOTES, EASTINDIANSOLFNOTES, DRUMS,
-  GRAPHICS, SOLFATTRS, DEGREES, RHYTHMRULERHEIGHT, SLIDERHEIGHT,
-  SLIDERWIDTH, MATRIXLABELCOLOR, MATRIXNOTECELLCOLOR,
-  MATRIXTUPLETCELLCOLOR, MATRIXRHYTHMCELLCOLOR,
+  SYNTHSVG, RSYMBOLS, NOTENAMES, ALLNOTENAMES, NOTENAMES1,
+  WESTERN2EISOLFEGENAMES, PITCHES1, PITCHES3, SCALENOTES,
+  EASTINDIANSOLFNOTES, DRUMS, GRAPHICS, SOLFATTRS, DEGREES,
+  RHYTHMRULERHEIGHT, SLIDERHEIGHT, SLIDERWIDTH, MATRIXLABELCOLOR,
+  MATRIXNOTECELLCOLOR, MATRIXTUPLETCELLCOLOR, MATRIXRHYTHMCELLCOLOR,
   MATRIXBUTTONCOLORHOVER, MATRIXNOTECELLCOLORHOVER, MATRIXSOLFEWIDTH,
   EIGHTHNOTEWIDTH, MATRIXBUTTONHEIGHT, MATRIXBUTTONHEIGHT2,
   MATRIXSOLFEHEIGHT, NOTESYMBOLS, SELECTORSTRINGS, ACCIDENTALLABELS,
@@ -228,6 +228,43 @@ const SOLFEGENAMES1 = [
     "ti"
 ];
 const NOTENAMES = ["C", "D", "E", "F", "G", "A", "B"];
+const ALLNOTENAMES = [
+    "C",
+    "C#",
+    "Cx",
+    "Dbb",
+    "Db",
+    "D",
+    "D#",
+    "Dx",
+    "Ebb",
+    "Eb",
+    "E",
+    "E#",
+    "Ex",
+    "Fbb",
+    "Fb",
+    "F",
+    "F#",
+    "Fx",
+    "Gbb",
+    "Gb",
+    "G",
+    "G#",
+    "Gx",
+    "Abb",
+    "Ab",
+    "A",
+    "A#",
+    "Ax",
+    "Bbb",
+    "Bb",
+    "B",
+    "B#",
+    "Bx",
+    "Cbb",
+    "Cb"
+];
 const NOTENAMES1 = [
     "C",
     "C" + SHARP,
@@ -1200,20 +1237,20 @@ const TEMPERAMENT = {
         ]
     },
     "custom": {
-        "0": Math.pow(2, 0 / 12),
-        "1": Math.pow(2, 1 / 12),
-        "2": Math.pow(2, 2 / 12),
-        "3": Math.pow(2, 3 / 12),
-        "4": Math.pow(2, 4 / 12),
-        "5": Math.pow(2, 5 / 12),
-        "6": Math.pow(2, 6 / 12),
-        "7": Math.pow(2, 7 / 12),
-        "8": Math.pow(2, 8 / 12),
-        "9": Math.pow(2, 9 / 12),
-        "10": Math.pow(2, 10 / 12),
-        "11": Math.pow(2, 11 / 12),
-        "pitchNumber": 12,
-        "interval": [
+        0: Math.pow(2, 0 / 12),
+        1: Math.pow(2, 1 / 12),
+        2: Math.pow(2, 2 / 12),
+        3: Math.pow(2, 3 / 12),
+        4: Math.pow(2, 4 / 12),
+        5: Math.pow(2, 5 / 12),
+        6: Math.pow(2, 6 / 12),
+        7: Math.pow(2, 7 / 12),
+        8: Math.pow(2, 8 / 12),
+        9: Math.pow(2, 9 / 12),
+        10: Math.pow(2, 10 / 12),
+        11: Math.pow(2, 11 / 12),
+        pitchNumber: 12,
+        interval: [
             "perfect 1",
             "minor 2",
             "major 2",
@@ -1235,21 +1272,17 @@ const setOctaveRatio = (newOctaveRatio) => {
     octaveRatio = newOctaveRatio;
 };
 
-
 const getOctaveRatio = () => {
     return octaveRatio;
 };
-
 
 const getTemperamentsList = () => {
     return TEMPERAMENTS;
 };
 
-
 const getTemperament = (entry) => {
     return TEMPERAMENT[entry];
 };
-
 
 const getTemperamentKeys = () => {
     const keys = [];
@@ -1260,7 +1293,6 @@ const getTemperamentKeys = () => {
     return keys;
 };
 
-
 const addTemperamentToList = (newEntry) => {
     for (let i = 0; i < TEMPERAMENTS.length; i++) {
         if (PreDefinedTemperaments[i] === newEntry) {
@@ -1270,16 +1302,13 @@ const addTemperamentToList = (newEntry) => {
     TEMPERAMENTS.push(newEntry);
 };
 
-
 const deleteTemperamentFromList = (oldEntry) => {
     delete TEMPERAMENT[oldEntry];
 };
 
-
 const addTemperamentToDictionary = (entryName, entryValue) => {
     TEMPERAMENT[entryName] = entryValue;
 };
-
 
 const updateTemperaments = () => {
     TEMPERAMENTS = [...INITIALTEMPERAMENTS];
@@ -2974,14 +3003,14 @@ function getNote(
         for (const number in TEMPERAMENT[temperament]) {
             if (number !== "pitchNumber") {
                 if (note === TEMPERAMENT[temperament][number][3]) {
-                    if (typeof(number) === "string") {
+                    if (typeof number === "string") {
                         pitchNumber = Number(number);
                     } else {
                         pitchNumber = number;
                     }
                     break;
                 } else if (note === TEMPERAMENT[temperament][number][1]) {
-                    if (typeof(number) === "string") {
+                    if (typeof number === "string") {
                         pitchNumber = Number(number);
                     } else {
                         pitchNumber = number;
@@ -4237,7 +4266,8 @@ function getPitchInfo(activity, type, notePlayed, tur) {
                 if (tur.singer.moveable === false) return SOLFEGECONVERSIONTABLE[np];
                 return SOLFEGENAMES[buildScale(tur.singer.keySignature)[0].indexOf(np)];
             case "pitch class":
-                if (Number(np)) {
+                // If it is a frequency, convert it to a pitch/octave.
+                if (!isNaN(Number(np))) {
                     np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
                 }
                 return (
@@ -4303,7 +4333,10 @@ function getPitchInfo(activity, type, notePlayed, tur) {
             case "pitch number":
                 return _calculate_pitch_number(activity, np, tur);
             case "pitch in hertz":
-                return activity.logo.synth._getFrequency(np, activity.logo.synth.changeInTemperament);
+                return activity.logo.synth._getFrequency(
+                    np,
+                    activity.logo.synth.changeInTemperament
+                );
             case "pitch to color":
                 if (Number(np)) {
                     [np, octave] = frequencyToPitch(np);

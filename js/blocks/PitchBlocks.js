@@ -17,7 +17,7 @@
    INVALIDPITCH, pitchToNumber, LeftBlock, SHARP, FLAT, DOUBLEFLAT,
    DOUBLESHARP, NATURAL, FIXEDSOLFEGE, SOLFEGENAMES, SOLFEGENAMES1,
    NOTENAMES, NOTENAMES1, getPitchInfo, YSTAFFOCTAVEHEIGHT,
-   YSTAFFNOTEHEIGHT, MUSICALMODES, keySignatureToMode,
+   YSTAFFNOTEHEIGHT, MUSICALMODES, keySignatureToMode, ALLNOTENAMES,
    nthDegreeToPitch, A0, C8, calcOctave, SOLFEGECONVERSIONTABLE,
    NOTESFLAT, NOTESSHARP, NOTESTEP, scaleDegreeToPitchMapping
  */
@@ -546,7 +546,16 @@ function setupPitchBlocks(activity) {
                                 } else {
                                     notePlayed += foundOctave;
                                 }
-                            } else if (NOTENAMES.indexOf(arg1) !== -1) {
+                            } else if (NOTENAMES1.indexOf(arg1) !== -1) {
+                                if (foundOctave.length === 0) {
+                                    notePlayed =
+                                        arg1 +
+                                        (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
+                                } else {
+                                    notePlayed = arg1 + foundOctave;
+                                }
+                            } else if (ALLNOTENAMES.indexOf(arg1) !== -1) {
+                                // Why would the accidental be "b or #"?
                                 if (foundOctave.length === 0) {
                                     notePlayed =
                                         arg1 +
