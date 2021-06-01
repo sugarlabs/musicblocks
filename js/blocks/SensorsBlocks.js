@@ -604,9 +604,9 @@ function setupSensorsBlocks(activity) {
         }
 
         arg(logo) {
-            logo.lastKeyCode = logo.getCurrentKeyCode();
+            logo.lastKeyCode = activity.getCurrentKeyCode();
             const val = logo.lastKeyCode;
-            logo.clearCurrentKeyCode();
+            activity.clearCurrentKeyCode();
             return val;
         }
     }
