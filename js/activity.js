@@ -4166,7 +4166,7 @@ function Activity() {
                             } else {
                                 obj = JSON.parse(cleanData);
                             }
-                            for (const name in this.blocks.palettes.dict) {
+                            for (const name in that.blocks.palettes.dict) {
                                 that.palettes.dict[name].hideMenu(true);
                             }
 
