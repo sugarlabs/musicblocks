@@ -393,17 +393,21 @@ function setupPitchBlocks(activity) {
         }
 
         arg(logo, turtle, blk) {
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
             if (
                 !logo.inStatusMatrix ||
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name !==
                     "outputtools"
             ) {
-                const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
-
                 if (tur.singer.lastNotePlayed !== null) {
                     return tur.singer.lastNotePlayed[0];
                 }
             }
+
+            if (tur.singer.lastNotePlayed === null) {
+                return "G4";
+            }
+            return tur.singer.lastNotePlayed[0];
         }
     }
 

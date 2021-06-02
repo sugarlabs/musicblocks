@@ -4256,6 +4256,8 @@ function getPitchInfo(activity, type, notePlayed, tur) {
                 return np[0];
             case "solfege syllable":
             case "solfege class":
+                // Remove the octave.
+                np = np.substr(0, np.length - 1);
                 if (Number(np)) {
                     np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
                 }
@@ -4263,7 +4265,9 @@ function getPitchInfo(activity, type, notePlayed, tur) {
                     np = np.substr(0, np.length - 1);
                 }
                 np = np.replace("#", SHARP).replace("b", FLAT);
-                if (tur.singer.moveable === false) return SOLFEGECONVERSIONTABLE[np];
+                if (tur.singer.moveable === false) {
+                    return SOLFEGECONVERSIONTABLE[np];
+                }
                 return SOLFEGENAMES[buildScale(tur.singer.keySignature)[0].indexOf(np)];
             case "pitch class":
                 // If it is a frequency, convert it to a pitch/octave.
