@@ -55,7 +55,7 @@ let DATAOBJS;
 let TITLESTRING = _(
     "Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way."
 );
-const VERSION = "3.5";
+const VERSION = "3.5.1";
 
 // We don't include 'extras' since we want to be able to delete
 // plugins from the extras palette.
