@@ -2534,8 +2534,13 @@ function numberToPitch(i, temperament, startPitch, offset) {
 
     let interval;
     if (isCustomTemperament(temperament)) {
-        pitchNumber = pitchNumber + "";
-        if (TEMPERAMENT[temperament][pitchNumber][1] === undefined) {
+        // The index may be outside of the octave.
+        const octaveLength = TEMPERAMENT[temperament]["pitchNumber"];
+        const pitchIdx = pitchNumber % octaveLength;
+        const octaveFactor = Math.floor(pitchNumber / octaveLength);
+
+        pitchNumber = pitchIdx + "";
+        if (TEMPERAMENT[temperament][pitchNumber] === undefined) {
             // If custom temperament is not defined, then it will
             // store equal temperament notes.
             for (let j = 0; j < 12; j++) {
@@ -2553,10 +2558,9 @@ function numberToPitch(i, temperament, startPitch, offset) {
                 TEMPERAMENT[temperament][pitchNumber][2]
             ];
         } else {
-            return [
-                TEMPERAMENT[temperament][pitchNumber][1],
-                TEMPERAMENT[temperament][pitchNumber][2]
-            ];
+            // Add in octave factor from above.
+            const o = Number(TEMPERAMENT[temperament][pitchNumber][2]) + octaveFactor;
+            return [TEMPERAMENT[temperament][pitchNumber][1], o];
         }
     } else {
         interval = TEMPERAMENT[temperament]["interval"][pitchNumber];
