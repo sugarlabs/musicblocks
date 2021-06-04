@@ -958,7 +958,7 @@ function MusicKeyboard(activity) {
         for (let i = 0; i < this.noteNames.length; i++) {
             if (this.noteNames[i] === "drum") {
                 sortableList.push({
-                    frequency: 1000000, // for sorting purposes
+                    frequency: 1000000 + sortableList.length, // for sorting purposes
                     noteName: this.noteNames[i],
                     noteOctave: this.octaves[i],
                     blockNumber: this._rowBlocks[i],
@@ -997,20 +997,23 @@ function MusicKeyboard(activity) {
             if (unique.indexOf(item.noteName + item.noteOctave) === -1) {
                 unique.push(item.noteName + item.noteOctave);
                 return true;
+            } else if (item.noteName === "drum") {
+                unique.push(item.noteName + item.noteOctave);
+                return true;
             }
 
             this.remove.push(item.blockNumber);
             return false;
         });
 
-        function removeBlock(i) {
+        function removeBlock(that, i) {
             setTimeout(() => {
-                this._removePitchBlock(this.remove[i]);
+                that._removePitchBlock(that.remove[i]);
             }, 200);
         }
 
         for (let i = 0; i < this.remove.length; i++) {
-            removeBlock(i);
+            removeBlock(this, i);
         }
 
         const sortedHertzList = sortedList.filter((note) => note.noteName === "hertz");
@@ -1826,7 +1829,7 @@ function MusicKeyboard(activity) {
         this.activity.blocks.adjustDocks(this.blockNo, true);
         this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
         this.activity.blocks.adjustExpandableClampBlock();
-        this.activity.blocks.refreshCanvas();
+        this.activity.refreshCanvas();
     };
 
     this._sortLayout = function () {
@@ -1906,7 +1909,7 @@ function MusicKeyboard(activity) {
         this.activity.blocks.sendStackToTrash(this.activity.blocks.blockList[blockNo]);
         this.activity.blocks.adjustDocks(this.blockNo, true);
         this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
-        this.activity.blocks.refreshCanvas();
+        this.activity.refreshCanvas();
     };
 
     this._createColumnPieSubmenu = function (index, condition) {
