@@ -757,6 +757,7 @@ function setupWidgetBlocks(activity) {
             this.setPalette("widgets", activity);
             this.setHelpString();
             this.formBlock({ name: _("music keyboard"), canCollapse: true });
+            this.beginnerBlock(this.lang !== "ja");
             this.makeMacro((x, y) => [
                 [0, "setbpm3", 0, 0, [12, 1, 2, 5]],
                 [1, ["number", { value: 90 }], 0, 0, [0]],
