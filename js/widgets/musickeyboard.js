@@ -767,6 +767,7 @@ function MusicKeyboard(activity) {
             return;
         }
 
+        console.log(notes);
         setTimeout(() => {
             this.activity.logo.synth.trigger(0, notes[0], noteValue[0], instruments[0], null, null);
         }, 1);
@@ -1073,6 +1074,8 @@ function MusicKeyboard(activity) {
         let temp2;
         if (temp1 === "hertz") {
             temp2 = this.layout[n - j - 1].noteOctave;
+        } else if (temp1 === "drum") {
+            temp2 = "c2";
         } else if (temp1 in FIXEDSOLFEGE1) {
             temp2 =
                 FIXEDSOLFEGE1[temp1].replace(SHARP, "#").replace(FLAT, "b") +
