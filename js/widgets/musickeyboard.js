@@ -2576,7 +2576,7 @@ function MusicKeyboard(activity) {
         this._clusterNotes = (selectedNotes) => {
             let i = 0;
             const newNotes = [];
-            let prevNote = "electronic synth";
+            let prevNote = DEFAULTVOICE;
             while (i < selectedNotes.length) {
                 if (i === 0) {
                     newNotes.push([i]);
@@ -2585,6 +2585,9 @@ function MusicKeyboard(activity) {
                     }
                 } else if (selectedNotes[i].noteOctave[0] === "drumnull") {
                     // Don't trigger a new group with a drum block.
+                    newNotes[newNotes.length - 1].push(i);
+                } else if (selectedNotes[i].noteOctave[0] === "R") {
+                    // Don't trigger a new group with a rest
                     newNotes[newNotes.length - 1].push(i);
                 } else if (selectedNotes[i].voice[0] != prevNote) {
                     newNotes.push([i]);
@@ -2623,7 +2626,11 @@ function MusicKeyboard(activity) {
             const selectedNotesGrp = newNotes[noteGrp];
             const isLast = noteGrp == newNotes.length - 1;
             id = newStack.length;
-            const voice = selectedNotes[selectedNotesGrp[0]].voice[0] || DEFAULTVOICE;
+            let voice = selectedNotes[selectedNotesGrp[0]].voice[0] || DEFAULTVOICE;
+            // Don't use a drum name with set timbre.
+            if (selectedNotes[selectedNotesGrp[0]].noteOctave[0] === "drumnull") {
+                voice = DEFAULTVOICE;
+            }
             const next = isLast ? null : id + 3 + this.findLen(selectedNotesGrp, selectedNotes);
 
             newStack.push(
