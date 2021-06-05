@@ -2605,7 +2605,7 @@ function MusicKeyboard(activity) {
                 const note = selectedNotes[selectedNotesGrp[i]];
                 if (note.noteOctave[0] === "R") {
                     ans += 6; // rest note uses 6
-                } else if (note.noteOctave[0] === null) {
+                } else if (note.noteOctave[0] === "drumnull") {
                     ans += 7; // drum note uses 7
                 } else {
                     ans += 5 + 3 * note.noteOctave.length; // notes with pitches
@@ -2788,7 +2788,6 @@ function MusicKeyboard(activity) {
                 }
             }
         }
-
         this.activity.blocks.loadNewBlocks(newStack);
         this.activity.textMsg(_("New action block generated!"));
     };
