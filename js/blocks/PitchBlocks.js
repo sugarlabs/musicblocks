@@ -15,7 +15,7 @@
    _, ValueBlock, NOINPUTERRORMSG, NANERRORMSG, last, FlowBlock,
    FlowClampBlock, Singer, numberToPitch, frequencyToPitch, getNote,
    INVALIDPITCH, pitchToNumber, LeftBlock, SHARP, FLAT, DOUBLEFLAT,
-   DOUBLESHARP, NATURAL, FIXEDSOLFEGE, SOLFEGENAMES, SOLFEGENAMES1,
+   DOUBLESHARP, NATURAL, FIXEDSOLFEGE, SOLFEGENAMES1, buildScale,
    NOTENAMES, NOTENAMES1, getPitchInfo, YSTAFFOCTAVEHEIGHT,
    YSTAFFNOTEHEIGHT, MUSICALMODES, keySignatureToMode, ALLNOTENAMES,
    nthDegreeToPitch, A0, C8, calcOctave, SOLFEGECONVERSIONTABLE,
@@ -596,7 +596,12 @@ function setupPitchBlocks(activity) {
                         notePlayed = arg1;
                     }
                 }
-                return getPitchInfo(activity, activity.blocks.blockList[blk].privateData, notePlayed, tur);
+                return getPitchInfo(
+                    activity,
+                    activity.blocks.blockList[blk].privateData,
+                    notePlayed,
+                    tur
+                );
             }
         }
     }
@@ -702,7 +707,7 @@ function setupPitchBlocks(activity) {
     }
 
     class StaffYToPitch extends LeftBlock {
-        constructor(name, displayName) {
+        constructor() {
             super("ytopitch", _("y to pitch"));
             this.setPalette("pitch", activity);
             this.setHelpString([
@@ -733,17 +738,15 @@ function setupPitchBlocks(activity) {
             }
 
             let posY = arg1 + YSTAFFNOTEHEIGHT / 2;
-            posY %= YSTAFFOCTAVEHEIGHT;
             const o = Math.floor(posY / YSTAFFOCTAVEHEIGHT);
+            posY %= YSTAFFOCTAVEHEIGHT;
             const o2 = o + 4;
-            let lc = 0;
             let noteIdx = Math.floor(posY / YSTAFFNOTEHEIGHT);
 
             if (cblk0 === null) {
                 if (cblk1 === null) {
                     return "G4";
                 }
-                let noteIdx = Math.floor(posY / YSTAFFNOTEHEIGHT);
                 while (noteIdx < 0) {
                     noteIdx += NOTENAMES.length;
                 }
