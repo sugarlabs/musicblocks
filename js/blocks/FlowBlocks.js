@@ -301,7 +301,9 @@ function setupFlowBlocks(activity) {
                 return;
             }
 
-            logo.switchCases[turtle][switchBlk].push(["__default__", args[0]]);
+            const i = logo.switchCases[turtle][switchBlk].length;
+            // logo.switchCases[turtle][switchBlk].push(["__default__", args[0]]);
+            logo.switchCases[turtle][switchBlk][i - 1].push(["__default__", args[0]]);
         }
     }
 
@@ -339,7 +341,9 @@ function setupFlowBlocks(activity) {
                 return;
             }
 
-            logo.switchCases[turtle][switchBlk].push([args[0], args[1]]);
+            const i = logo.switchCases[turtle][switchBlk].length;
+            // logo.switchCases[turtle][switchBlk].push([args[0], args[1]]);
+            logo.switchCases[turtle][switchBlk][i - 1].push([args[0], args[1]]);
         }
     }
 
@@ -376,7 +380,11 @@ function setupFlowBlocks(activity) {
             const tur = activity.turtles.ithTurtle(turtle);
 
             logo.switchBlocks[turtle].push(blk);
-            logo.switchCases[turtle][blk] = [];
+            if (blk in logo.switchCases[turtle]) {
+                logo.switchCases[turtle][blk].push([]);
+            } else {
+                logo.switchCases[turtle][blk] = [[]];
+            }
 
             const listenerName = "_switch_" + blk + "_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
@@ -398,12 +406,12 @@ function setupFlowBlocks(activity) {
                 }
 
                 let caseFlow = null;
-                for (let i = 0; i < logo.switchCases[turtle][switchBlk].length; i++) {
-                    if (logo.switchCases[turtle][switchBlk][i][0] === switchCase) {
-                        caseFlow = logo.switchCases[turtle][switchBlk][i][1];
+                for (let i = 0; i < last(logo.switchCases[turtle][switchBlk]).length; i++) {
+                    if (last(logo.switchCases[turtle][switchBlk])[i][0] === switchCase) {
+                        caseFlow = last(logo.switchCases[turtle][switchBlk])[i][1];
                         break;
-                    } else if (logo.switchCases[turtle][switchBlk][i][0] === "__default__") {
-                        caseFlow = logo.switchCases[turtle][switchBlk][i][1];
+                    } else if (last(logo.switchCases[turtle][switchBlk])[i][0] === "__default__") {
+                        caseFlow = last(logo.switchCases[turtle][switchBlk])[i][1];
                     }
                 }
 
@@ -414,7 +422,7 @@ function setupFlowBlocks(activity) {
                 }
 
                 // Clean up afterward.
-                logo.switchCases[turtle][switchBlk] = [];
+                logo.switchCases[turtle][switchBlk].pop();
                 logo.switchBlocks[turtle].pop();
             };
 
