@@ -316,58 +316,59 @@ class TimbreWidget {
      */
     _playNote(note, duration) {
         this.activity.logo.synth.setMasterVolume(last(Singer.masterVolume));
-        const timbreEffects = instrumentsEffects[0][this.instrumentName];
-        const paramsEffects = {
-            doVibrato: false,
-            doDistortion: false,
-            doTremolo: false,
-            doPhaser: false,
-            doChorus: false,
-            vibratoIntensity: 0,
-            vibratoFrequency: 0,
-            distortionAmount: 0,
-            tremoloFrequency: 0,
-            tremoloDepth: 0,
-            rate: 0,
-            octaves: 0,
-            baseFrequency: 0,
-            chorusRate: 0,
-            delayTime: 0,
-            chorusDepth: 0
-        };
-
-        if (timbreEffects["vibratoActive"]) {
-            paramsEffects.vibratoFrequency = timbreEffects["vibratoFrequency"];
-            paramsEffects.vibratoIntensity = timbreEffects["vibratoIntensity"];
-            paramsEffects.doVibrato = true;
-        }
-
-        if (timbreEffects["distortionActive"]) {
-            paramsEffects.distortionAmount = timbreEffects["distortionAmount"];
-            paramsEffects.doDistortion = true;
-        }
-
-        if (timbreEffects["tremoloActive"]) {
-            paramsEffects.tremoloFrequency = timbreEffects["tremoloFrequency"];
-            paramsEffects.tremoloDepth = timbreEffects["tremoloDepth"];
-            paramsEffects.doTremolo = true;
-        }
-
-        if (timbreEffects["phaserActive"]) {
-            paramsEffects.rate = timbreEffects["rate"];
-            paramsEffects.octaves = timbreEffects["octaves"];
-            paramsEffects.baseFrequency = timbreEffects["baseFrequency"];
-            paramsEffects.doPhaser = true;
-        }
-
-        if (timbreEffects["chorusActive"]) {
-            paramsEffects.chorusRate = timbreEffects["chorusRate"];
-            paramsEffects.delayTime = timbreEffects["delayTime"];
-            paramsEffects.chorusDepth = timbreEffects["chorusDepth"];
-            paramsEffects.doChorus = true;
-        }
 
         if (this.instrumentName in instrumentsFilters[0]) {
+            const timbreEffects = instrumentsEffects[0][this.instrumentName];
+            const paramsEffects = {
+                doVibrato: false,
+                doDistortion: false,
+                doTremolo: false,
+                doPhaser: false,
+                doChorus: false,
+                vibratoIntensity: 0,
+                vibratoFrequency: 0,
+                distortionAmount: 0,
+                tremoloFrequency: 0,
+                tremoloDepth: 0,
+                rate: 0,
+                octaves: 0,
+                baseFrequency: 0,
+                chorusRate: 0,
+                delayTime: 0,
+                chorusDepth: 0
+            };
+
+            if (timbreEffects["vibratoActive"]) {
+                paramsEffects.vibratoFrequency = timbreEffects["vibratoFrequency"];
+                paramsEffects.vibratoIntensity = timbreEffects["vibratoIntensity"];
+                paramsEffects.doVibrato = true;
+            }
+
+            if (timbreEffects["distortionActive"]) {
+                paramsEffects.distortionAmount = timbreEffects["distortionAmount"];
+                paramsEffects.doDistortion = true;
+            }
+
+            if (timbreEffects["tremoloActive"]) {
+                paramsEffects.tremoloFrequency = timbreEffects["tremoloFrequency"];
+                paramsEffects.tremoloDepth = timbreEffects["tremoloDepth"];
+                paramsEffects.doTremolo = true;
+            }
+
+            if (timbreEffects["phaserActive"]) {
+                paramsEffects.rate = timbreEffects["rate"];
+                paramsEffects.octaves = timbreEffects["octaves"];
+                paramsEffects.baseFrequency = timbreEffects["baseFrequency"];
+                paramsEffects.doPhaser = true;
+            }
+
+            if (timbreEffects["chorusActive"]) {
+                paramsEffects.chorusRate = timbreEffects["chorusRate"];
+                paramsEffects.delayTime = timbreEffects["delayTime"];
+                paramsEffects.chorusDepth = timbreEffects["chorusDepth"];
+                paramsEffects.doChorus = true;
+            }
+
             this.activity.logo.synth.trigger(
                 0,
                 note,
@@ -377,12 +378,14 @@ class TimbreWidget {
                 instrumentsFilters[0][this.instrumentName]
             );
         } else {
+            // Not sure why the instrument would not be found, but is
+            // sometimes happens. (See ##2963)
             this.activity.logo.synth.trigger(
                 0,
                 note,
                 Singer.defaultBPMFactor * duration,
                 this.instrumentName,
-                paramsEffects,
+                null,
                 null
             );
         }
