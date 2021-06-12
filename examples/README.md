@@ -132,6 +132,10 @@
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Music, Math, Example | 0 | 0 | 0 | C, D, E, F, G, A, B | 25 | C4, 262Hz | F7, 2794Hz |
 
+| Example | Description |
+| --- | --- |
+| silly-canons.html | An interactive exploration of canons based on Frere Jacques |
+
 # Transcriptions
 
 | Example | Description |
