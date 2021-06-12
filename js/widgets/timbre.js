@@ -127,6 +127,14 @@ class TimbreWidget {
         this.blockNo = null; // index no. of the timbre widget block
         this.instrumentName = "custom";
 
+        if (!(this.instrumentName in instrumentsFilters[0])) {
+            instrumentsFilters[0][this.instrumentName] = [];
+        }
+
+        if (!(this.instrumentName in instrumentsEffects[0])) {
+            instrumentsEffects[0][this.instrumentName] = [];
+        }
+
         this.timbreTableDiv = document.createElement("div");
     }
 
@@ -1882,11 +1890,6 @@ class TimbreWidget {
 
         selectOpt += "</select>";
         myDiv.innerHTML = selectOpt;
-
-        // Make sure there is an instruments filter for the filter.
-        if (!(this.instrumentName in instrumentsFilters[0])) {
-            instrumentsFilters[0][this.instrumentName] = [];
-        }
 
         if (instrumentsFilters[0][this.instrumentName].length - 1 < f) {
             instrumentsFilters[0][this.instrumentName].push({
