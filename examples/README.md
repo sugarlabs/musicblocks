@@ -316,7 +316,7 @@
 
 | Example | Description |
 | --- | --- |
-| bartok-fib-color.html | Fibonacci rhythm progression by Bartók, with added variations in timbre (cello and violin) and pitch |
+| Bartok-fib-color.html | Fibonacci rhythm progression by Bartók, with added variations in timbre (cello and violin) and pitch |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -328,7 +328,11 @@
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Music | 0 | 0 | 0 | C, D, F, E, R, G, A | 52 | C4 , 262Hz | A4 , 441Hz |
+| Music | 0 | 0 | 0 | C, D, F, E, R, G, A | 52 | C4, 262Hz | A4, 441Hz |
+
+| Example | Description |
+| --- | --- |
+| Minuet-in-Reverse | From Haydn's Symphony 47 |
 
 # Games
 
