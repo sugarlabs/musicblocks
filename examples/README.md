@@ -352,6 +352,46 @@
 
 | Example | Description |
 | --- | --- |
+| Music-Blocks-demo.html | An interactive tour of Music Blocks written in Music Blocks. (This is an example of self-modifying code.) |
+
+| Example | Description |
+| --- | --- |
+| random-jazz-flute.html | A jazz progression that proceeds randomly |
+
+| Example | Description |
+| --- | --- |
+| polygons.html | Regular polygons with embedded notes |
+
+| Example | Description |
+| --- | --- |
+| nautilus.html | Recursive implemention of Fibonacci nautilus graphic and tone progression |
+
+| Example | Description |
+| --- | --- |
+| harmony-in-C.html | Two-part harmony |
+
+| Example | Description |
+| --- | --- |
+| scales-with-fifths.html | Cycle through scales and fifths |
+
+| Example | Description |
+| --- | --- |
+| intervals-with-events.html | generate random intervals by clicking on the mouse |
+
+| Example | Description |
+| --- | --- |
+| equal-temperament-calculation.html | Calculate an octave tuned to equal temperament by using 2^(1/12) |
+
+| Example | Description |
+| --- | --- |
+| Twinkle-Twinkle-with-Pythagorean-tuning.html | Listen to the difference tuning makes |
+
+| Example | Description |
+| --- | --- |
+| el.html | Experimentation with the *One of this or that* block.
+
+| Example | Description |
+| --- | --- |
 | stocks.html | Generated from a Python script, this project is a musical representation of the price of a stock over time |
 
 # Utilities
