@@ -2,7 +2,7 @@
 
 | Example | Description |
 | --- | --- |
-| Hot-Cross-Buns-First-Form-Discovery-START.tb | minw |
+| Hot-Cross-Buns-First-Form-Discovery-START.html | Rearrange the blocks to make variants of Hot Cross Buns |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -10,11 +10,15 @@
 
 | Example | Description |
 | --- | --- |
+| Frere-Jacques-first-form-discovery.html | Rearrange blocks to create variations of Frere Jacques |
+
+| Example | Description |
+| --- | --- |
 | Hot-Cross-Buns.html | An example of using graphics embedded inside of Note Value blocks to visualize beat. | Music, Examples | 3 | 0 | 0 | B, A, G | 340 | G4, 392Hz | G5, 784Hz |
 
 | Example | Description |
 | --- | --- |
-| hotdog.tb | "Mississippi Hotdog": a simple example of a repeated phrase |
+| Mississippi-Hotdog.html | "Mississippi Hotdog": a simple example of a repeated phrase |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -22,7 +26,7 @@
 
 | Example | Description |
 | --- | --- |
-| interactive-scales.tb | Interactive scales: while the cursor is in the top half of the screen, the pitch increases; while the cursor is in the bottom half of the screen, the pitch decreases. |
+| interactive-scales.html | Interactive scales: while the cursor is in the top half of the screen, the pitch increases; while the cursor is in the bottom half of the screen, the pitch decreases. |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -30,7 +34,7 @@
 
 | Example | Description |
 | --- | --- |
-| note-values.tb | Example of varying note values. |
+| note-values.html| Example of varying note values. |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -38,7 +42,7 @@
 
 | Example | Description |
 | --- | --- |
-| polyrhythm.tb | Polyphonic drum rhythms |
+| polyrhythms.html | Polyphonic drum rhythms |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -46,7 +50,7 @@
 
 | Example | Description |
 | --- | --- |
-| rhythm-test.tb | Variations of rhythm |
+| rhythm-test.html | Variations of rhythm |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -86,7 +90,7 @@
 
 | Example | Description |
 | --- | --- |
-| scale-degree.tb | Using scale degree to generate chromatic scales with varying note values. |
+| scale-degree.html | Using scale degree to generate chromatic scales with varying note values. |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -110,7 +114,7 @@
 
 | Example | Description |
 | --- | --- |
-| triads.tb | A sequence of triads ranging from consonance to dissonance |
+| triads.html | A sequence of triads ranging from consonance to dissonance |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -118,7 +122,7 @@
 
 | Example | Description |
 | --- | --- |
-| Newton-color-model.tb | Sir Isaac Newton designed a mapping between musical pitch and color. |
+| Newton-color-model.html | Sir Isaac Newton designed a mapping between musical pitch and color. |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -126,7 +130,7 @@
 
 | Example | Description |
 | --- | --- |
-| ascending-notes-colour-spiral.tb | Mapping pitch into a spiral graphic |
+| ascending-notes-color-spiral.html | Mapping pitch into a spiral graphic |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -136,11 +140,23 @@
 | --- | --- |
 | silly-canons.html | An interactive exploration of canons based on Frere Jacques |
 
+| Example | Description |
+| --- | --- |
+| drum-machine.html | Starting point for programming an interactive drum machine |
+
 # Transcriptions
 
 | Example | Description |
 | --- | --- |
-| jeopardy-theme.html | with artwork from the Simsons |
+| Frere-Jacques.html | Frere Jacques |
+
+| Example | Description |
+| --- | --- |
+| Frere-Jacques-with-events.html | Frere Jacques canon triggered by broadcasting events |
+
+| Example | Description |
+| --- | --- |
+| Jeopardy-Theme.html | with artwork from the Simsons |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -156,7 +172,7 @@
 
 | Example | Description |
 | --- | --- |
-| modifiedbach.tb | A short excerpt from Bach |
+| modified-Bach.html | A short excerpt from Bach with two voices |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -164,7 +180,7 @@
 
 | Example | Description |
 | --- | --- |
-| modifiedbach2.tb | Simple two-voice example from Bach |
+| modified-Bach-2.html | Simple two-voice example from Bach |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -172,7 +188,7 @@
 
 | Example | Description |
 | --- | --- |
-| old-macdonald.tb | Old MacDonald had a Farm with sprites and lyrics |
+| Old-MacDonald-had-a-farm.html | Old MacDonald had a Farm with sprites and lyrics |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -204,7 +220,7 @@
 
 | Example | Description |
 | --- | --- |
-| shlomit-I-berio.tb | Duet by the composer Luciano Berio |
+| Shlomit.html | Duet for violins by the composer Luciano Berio |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -212,7 +228,7 @@
 
 | Example | Description |
 | --- | --- |
-| silent-night-plot.tb | A two-part version of Silent Night (German: Stille Nacht, heilige Nacht), a popular Christmas carol, composed in 1818 by Franz Xaver Gruber. The two voices are plotted on a graph to reveal pitch and not duration. FIXME: Volume goes below zero. |
+| silent-night.html | "Silent Night" (German: Stille Nacht, heilige Nacht) is a popular Christmas carol, composed in 1818 by Franz Xaver Gruber |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -220,7 +236,7 @@
 
 | Example | Description |
 | --- | --- |
-| silent-night.tb | "Silent Night" (German: Stille Nacht, heilige Nacht) is a popular Christmas carol, composed in 1818 by Franz Xaver Gruber |
+| silent-night-plot.html | A two-part version of Silent Night (German: Stille Nacht, heilige Nacht), a popular Christmas carol, composed in 1818 by Franz Xaver Gruber. The two voices are plotted on a graph to reveal pitch and not duration. FIXME: Volume goes below zero. |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -228,7 +244,7 @@
 
 | Example | Description |
 | --- | --- |
-| simple-crab-canon.tb | A simple crab canon(two parts, one plying backward while the other plays forward) by Bach |
+| simple-crab-canon.html | A simple crab canon(two parts, one plying backward while the other plays forward) by Bach |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -244,7 +260,7 @@
 
 | Example | Description |
 | --- | --- |
-| Holly-Jolly-Christmas.tb | "A Holly Jolly Christmas" is a Christmas song written by Johnny Marks and most famously performed by Burl Ives. MB Project created by a student for Google Code-in. Great work! |
+| Holly-Jolly-Christmas.html | "A Holly Jolly Christmas" is a Christmas song written by Johnny Marks and most famously performed by Burl Ives. MB Project created by a student for Google Code-in. Great work! |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -252,7 +268,7 @@
 
 | Example | Description |
 | --- | --- |
-| All-you-need-is-love-example-start.tb | Rearrange the blocks to reproduce All You Need is Love by the Beatles. Once you are done, try making your own variations. |
+| All-You-Need-is-Love-example.html| Rearrange the blocks to reproduce All You Need is Love by the Beatles. Once you are done, try making your own variations. |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -260,7 +276,7 @@
 
 | Example | Description |
 | --- | --- |
-| Doraemon-theme.tb | Doraemon's Song is the opening theme song for the Doraemon anime that aired from 1979 to 2005 on TV Asahi. |
+| Doraemon-theme.html | Doraemon's Song is the opening theme song for the Doraemon anime that aired from 1979 to 2005 on TV Asahi. |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -276,7 +292,7 @@
 
 | Example | Description |
 | --- | --- |
-| Romanian-folk-song.tb | Romanian Folk Dance is a short piano piece composed by Béla Bartók. |
+| Romanian-folk-song.html | Romanian Folk Dance is a short piano piece composed by Béla Bartók. |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -284,7 +300,7 @@
 
 | Example | Description |
 | --- | --- |
-| bach-tonal-inversion-contrapunctus-XI-a.tb | The Art of Fugue is an incomplete work of unspecified instrumentation by Johann Sebastian Bach (1685-1750). |
+| Bach-tonal-inversion-contrapunctus-XI-a.html | The Art of Fugue is an incomplete work of unspecified instrumentation by Johann Sebastian Bach (1685-1750). |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -292,7 +308,7 @@
 
 | Example | Description |
 | --- | --- |
-| bach-tonal-inversion-contrapunctus-XI-b.tb | Another example from Bach. |
+| Bach-tonal-inversion-contrapunctus-XI-b.html | Another example from Bach. |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -305,6 +321,14 @@
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Music, Math, Art, Example | 7 | 0 | 0 | A, B, C, G, F, E, D | 59 | A3, 221Hz | C5, 524Hz |
+
+| Example | Description |
+| --- | --- |
+| ut-queant-laxis.html | A Gregorian chant. Also known as Hymnus in loannem by Horatian Sapphics |
+
+| Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Music | 0 | 0 | 0 | C, D, F, E, R, G, A | 52 | C4 , 262Hz | A4 , 441Hz |
 
 # Games
 
@@ -319,6 +343,12 @@
 | Example | Description |
 | --- | --- |
 | mouse-trap.html | Interactive game: Catch the mice by following the musical apattern. |
+
+# Misc.
+
+| Example | Description |
+| --- | --- |
+| stocks.html | Generated from a Python script, this project is a musical representation of the price of a stock over time |
 
 # Utilities
 
