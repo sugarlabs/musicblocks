@@ -348,6 +348,10 @@
 | --- | --- |
 | mouse-trap.html | Interactive game: Catch the mice by following the musical apattern. |
 
+| Example | Description |
+| --- | --- |
+| spiralaterals.html | Interacive game: Match the pattern of intervals as the mouse creates patterns |
+
 # Misc.
 
 | Example | Description |
