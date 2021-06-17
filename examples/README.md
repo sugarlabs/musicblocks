@@ -334,11 +334,19 @@
 | --- | --- |
 | Minuet-in-Reverse | From Haydn's Symphony 47 |
 
+| Example | Description |
+| --- | --- |
+| In-C.html | In C is a musical piece composed by Terry Riley in 1964 for an indefinite number of performers. |
+
 # Games
 
 | Example | Description |
 | --- | --- |
 | musical-dimensions.html | Interactive game: Test your listening skills by finding cards that match in (or differ by) instrument, pitch and note value. |
+
+| Example | Description |
+| --- | --- |
+| Racko.html | Put the pitches into ascending order |
 
 | Example | Description |
 | --- | --- |
@@ -393,6 +401,14 @@
 | Example | Description |
 | --- | --- |
 | el.html | Experimentation with the *One of this or that* block.
+
+| Example | Description |
+| --- | --- |
+| Galton-music.html | Modeled after a Galton box, a Gaussian distribution of tones is generated. |
+
+| Example | Description |
+| --- | --- |
+| record-player.html | Record and playback a sequence of notes on a "vinyl". |
 
 | Example | Description |
 | --- | --- |
