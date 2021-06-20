@@ -135,7 +135,7 @@ class TimbreWidget {
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
         cell.innerHTML =
-            '&nbsp;&nbsp;<img src="res/header-icons/' +
+            '&nbsp;&nbsp;<img src="header-icons/' +
             icon +
             '" title="' +
             label +
@@ -381,7 +381,7 @@ class TimbreWidget {
         const cell = this.playButton;
         if (this._playing) {
             cell.innerHTML =
-                '&nbsp;&nbsp;<img src="res/header-icons/' +
+                '&nbsp;&nbsp;<img src="header-icons/' +
                 "stop-button.svg" +
                 '" title="' +
                 _("stop") +
@@ -396,7 +396,7 @@ class TimbreWidget {
             logo.synth.setMasterVolume(0);
             logo.synth.stop();
             cell.innerHTML =
-                '&nbsp;&nbsp;<img src="res/header-icons/' +
+                '&nbsp;&nbsp;<img src="header-icons/' +
                 "play-button.svg" +
                 '" title="' +
                 _("Play") +
@@ -429,7 +429,7 @@ class TimbreWidget {
                 }, Singer.defaultBPMFactor * 1000 * this.notesToPlay[i - 1][1]);
             } else {
                 cell.innerHTML =
-                    '&nbsp;&nbsp;<img src="res/header-icons/' +
+                    '&nbsp;&nbsp;<img src="header-icons/' +
                     "play-button.svg" +
                     '" title="' +
                     _("Play") +

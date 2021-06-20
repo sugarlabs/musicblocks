@@ -21,7 +21,7 @@
   },
   "default_locale": "en"
   "screenshots": [{
-      "src": "res/screenshots/Screenshot-1.png",
+      "src": "screenshots/Screenshot-1.png",
       "sizes": "1440x715",
       "type": "image/png"
   }]

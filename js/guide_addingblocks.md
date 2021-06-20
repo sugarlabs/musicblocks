@@ -181,9 +181,9 @@ both responsible for movement;sos
 ## References
 Sample block artwork
 
-![pitch name](../documentation/en/pitchname.svg)
+![pitch name](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/pitchname.svg)
 
-![note value](../documentation/en/notevalue.svg)
+![note value](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/notevalue.svg)
 
 Valid blocks styles in turtleblocksjs:
 * `zeroArgBlock`: E.g., penup, pendown

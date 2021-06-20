@@ -86,7 +86,7 @@ class StatusMatrix {
                     '">&nbsp;&nbsp;';
             } else {
                 cell.innerHTML =
-                    '&nbsp;&nbsp;<img src="res/header-icons/turtle-button.svg" title="' +
+                    '&nbsp;&nbsp;<img src="header-icons/turtle-button.svg" title="' +
                     turtle.name +
                     '" alt="' +
                     turtle.name +

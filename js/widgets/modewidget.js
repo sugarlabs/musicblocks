@@ -81,7 +81,7 @@ class ModeWidget {
                 this._playing = false;
 
                 this._playButton.innerHTML =
-                    '&nbsp;&nbsp;<img src="res/header-icons/play-button.svg" title="' +
+                    '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
                     _("Play all") +
                     '" alt="' +
                     _("Play all") +
@@ -94,7 +94,7 @@ class ModeWidget {
                 this._playing = true;
 
                 this._playButton.innerHTML =
-                    '&nbsp;&nbsp;<img src="res/header-icons/stop-button.svg" title="' +
+                    '&nbsp;&nbsp;<img src="header-icons/stop-button.svg" title="' +
                     _("Stop") +
                     '" alt="' +
                     _("Stop") +
@@ -177,7 +177,7 @@ class ModeWidget {
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
         cell.innerHTML =
-            '&nbsp;&nbsp;<img src="res/header-icons/' +
+            '&nbsp;&nbsp;<img src="header-icons/' +
             icon +
             '" title="' +
             label +
@@ -612,7 +612,7 @@ class ModeWidget {
                         note_key.src = highlightImgs[0];
                     }
                     this._playButton.innerHTML =
-                        '&nbsp;&nbsp;<img src="res/header-icons/play-button.svg" title="' +
+                        '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
                         _("Play all") +
                         '" alt="' +
                         _("Play all") +
@@ -674,7 +674,7 @@ class ModeWidget {
                     // Did we just play the last note?
                     this._playing = false;
                     this._playButton.innerHTML =
-                        '&nbsp;&nbsp;<img src="res/header-icons/play-button.svg" title="' +
+                        '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
                         _("Play all") +
                         '" alt="' +
                         _("Play all") +

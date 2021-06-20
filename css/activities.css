@@ -755,12 +755,12 @@ table {
 
 #right-arrow {
     left: 445px;
-    background: url('../res/header-icons/right-arrow.png');
+    background: url('../header-icons/right-arrow.png');
 }
 
 #left-arrow {
     left: 5px;
-    background: url('../res/header-icons/left-arrow.png');
+    background: url('../header-icons/left-arrow.png');
 }
 
 #right-arrow, #left-arrow {
@@ -796,7 +796,7 @@ table {
     right: 410px;
     width:18px;
     height: 18px;
-    background: url('../res/header-icons/close.png');
+    background: url('../header-icons/close.png');
     background-size: 18px;
     cursor: pointer;
 }
@@ -804,7 +804,7 @@ table {
 .drag-button {
     position: absolute;
     right: 20px;
-    background: url('../res/header-icons/move.png');
+    background: url('../header-icons/move.png');
     background-size: 22px;
     height: 22px;
     width: 22px;

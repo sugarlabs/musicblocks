@@ -80,7 +80,7 @@ class MeterWidget {
                 this._click_lock = true;
                 if (this.__getPlayingStatus()) {
                     playBtn.innerHTML =
-                        '&nbsp;&nbsp;<img src="res/header-icons/play-button.svg" title="' +
+                        '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
                         _("Play all") +
                         '" alt="' +
                         _("Play all") +
@@ -92,7 +92,7 @@ class MeterWidget {
                     this._playing = false;
                 } else {
                     playBtn.innerHTML =
-                        '&nbsp;&nbsp;<img src="res/header-icons/stop-button.svg" title="' +
+                        '&nbsp;&nbsp;<img src="header-icons/stop-button.svg" title="' +
                         _("Stop") +
                         '" alt="' +
                         _("Stop") +
@@ -294,7 +294,7 @@ class MeterWidget {
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
         cell.innerHTML =
-            '&nbsp;&nbsp;<img src="res/header-icons/' +
+            '&nbsp;&nbsp;<img src="header-icons/' +
             icon +
             '" title="' +
             label +
