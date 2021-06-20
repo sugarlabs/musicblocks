@@ -2738,7 +2738,7 @@ const piemenuModes = function (block, selectedMode) {
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.initWheel(["×", "▶"]); // imgsrc:res/header-icons/play-button.svg']);
+    block._exitWheel.initWheel(["×", "▶"]); // imgsrc:header-icons/play-button.svg']);
     block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
@@ -3115,20 +3115,20 @@ const piemenuBlockContext = function (block) {
     docById("contextWheelDiv").style.display = "";
 
     const labels = [
-        "imgsrc:res/header-icons/copy-button.svg",
-        "imgsrc:res/header-icons/extract-button.svg",
-        "imgsrc:res/header-icons/empty-trash-button.svg",
-        "imgsrc:res/header-icons/cancel-button.svg"
+        "imgsrc:header-icons/copy-button.svg",
+        "imgsrc:header-icons/extract-button.svg",
+        "imgsrc:header-icons/empty-trash-button.svg",
+        "imgsrc:header-icons/cancel-button.svg"
     ];
 
     const topBlock = block.blocks.findTopBlock(blockBlock);
     if (block.name === "action") {
-        labels.push("imgsrc:res/header-icons/save-blocks-button.svg");
+        labels.push("imgsrc:header-icons/save-blocks-button.svg");
     }
     const message = block.blocks.blockList[block.blocks.activeBlock].protoblock.helpString;
     let helpButton;
     if (message) {
-        labels.push("imgsrc:res/header-icons/help-button.svg");
+        labels.push("imgsrc:header-icons/help-button.svg");
         helpButton = labels.length - 1;
     } else {
         helpButton = null;

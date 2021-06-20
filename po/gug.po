@@ -2749,7 +2749,7 @@ msgstr "eipe’a ñongatuha"
 
 #: js/turtledefs.js:23
 #.TRANS: put the URL to the guide here, e.g., https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md
-#.TRANS: https://github.com/sugarlabs/musicblocks/tree/master/guide/es/README.md
+#.TRANS: https://github.com/sugarlabs/musicblocks/tree/master/guide-es/README.md
 msgid "guide url"
 msgstr ""
 

@@ -512,7 +512,7 @@ function MusicKeyboard() {
 
         if (this.playingNow) {
             playButtonCell.innerHTML =
-                '&nbsp;&nbsp;<img src="res/header-icons/' +
+                '&nbsp;&nbsp;<img src="header-icons/' +
                 "stop-button.svg" +
                 '" title="' +
                 _("stop") +
@@ -565,7 +565,7 @@ function MusicKeyboard() {
 
             this._stopOrCloseClicked = true;
             playButtonCell.innerHTML =
-                '&nbsp;&nbsp;<img src="res/header-icons/' +
+                '&nbsp;&nbsp;<img src="header-icons/' +
                 "play-button.svg" +
                 '" title="' +
                 _("Play") +
@@ -637,7 +637,7 @@ function MusicKeyboard() {
                 this.playOne(counter + 1, maxWidth, playButtonCell);
             } else {
                 playButtonCell.innerHTML =
-                    '&nbsp;&nbsp;<img src="res/header-icons/' +
+                    '&nbsp;&nbsp;<img src="header-icons/' +
                     "play-button.svg" +
                     '" title="' +
                     _("Play") +
@@ -2495,7 +2495,7 @@ function MusicKeyboard() {
     this._addButton = function (row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
         cell.innerHTML =
-            '&nbsp;&nbsp;<img src="res/header-icons/' +
+            '&nbsp;&nbsp;<img src="header-icons/' +
             icon +
             '" title="' +
             label +

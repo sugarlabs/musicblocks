@@ -153,7 +153,7 @@ class WidgetWindow {
         };
 
         this._maxminIcon = this._create("img", undefined, maxminButton);
-        this._maxminIcon.setAttribute("src", "res/header-icons/icon-expand.svg");
+        this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
 
         this._body = this._create("div", "wfWinBody", this._frame);
         this._toolbar = this._create("div", "wfbToolbar", this._body);
@@ -326,7 +326,7 @@ class WidgetWindow {
      */
     modifyButton(index, icon, iconSize, label) {
         this._buttons[index].innerHTML =
-            '<img src="res/header-icons/' +
+            '<img src="header-icons/' +
             icon +
             '" title="' +
             label +
@@ -387,7 +387,7 @@ class WidgetWindow {
     addButton(icon, iconSize, label, parent) {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
         el.innerHTML =
-            '<img src="res/header-icons/' +
+            '<img src="header-icons/' +
             icon +
             '" title="' +
             label +
@@ -431,7 +431,7 @@ class WidgetWindow {
      * @returns {void}
      */
     _restore() {
-        this._maxminIcon.setAttribute("src", "res/header-icons/icon-expand.svg");
+        this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
         this._maximized = false;
 
         if (this._savedPos) {
