@@ -767,7 +767,6 @@ function MusicKeyboard(activity) {
             return;
         }
 
-        console.log(notes);
         setTimeout(() => {
             this.activity.logo.synth.trigger(0, notes[0], noteValue[0], instruments[0], null, null);
         }, 1);
@@ -1031,6 +1030,7 @@ function MusicKeyboard(activity) {
                 voice: newList[i].voice
             });
         }
+
         return newList;
     };
 
@@ -2314,6 +2314,7 @@ function MusicKeyboard(activity) {
                 ]);
 
                 this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
+                this.layout[p].objId = "blackRow" + myrow2Id.toString();
 
                 myrow2Id++;
                 newel2.innerHTML = "";
@@ -2419,6 +2420,7 @@ function MusicKeyboard(activity) {
                 }
 
                 this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
+                this.layout[p].objId = "blackRow" + myrow2Id.toString();
 
                 myrow2Id++;
                 newel2.style.position = "relative";
@@ -2478,6 +2480,7 @@ function MusicKeyboard(activity) {
                 }
 
                 this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
+                this.layout[p].objId = "blackRow" + myrow2Id.toString();
 
                 myrow2Id++;
                 newel2.style.position = "relative";
@@ -2526,6 +2529,7 @@ function MusicKeyboard(activity) {
                 }
 
                 this.displayLayout[p].objId = "whiteRow" + myrowId.toString();
+                this.layout[p].objId = "whiteRow" + myrowId.toString();
 
                 myrowId++;
                 newel.style.position = "relative";
@@ -2925,16 +2929,13 @@ function MusicKeyboard(activity) {
         //                 [2] : velocity ,(currently not used).
 
         const onMIDIMessage = (event) => {
-	    this.activity.textMsg(event);
-	    console.log(event);
             const pitchOctave = numberToPitch(event.data[1]);
             const pitch1 = pitchOctave[0];
             const pitch2 = pitchOctave[1];
             const octave = pitchOctave[2];
             const key =
                 this.getElement[pitch1 + "" + octave] || this.getElement[pitch2 + "" + octave];
-	    console.log(pitchOctave + " " + pitch1 + " " + pitch2 + " " + octave + " " + key);
-            if (event.data[0] === 144 && event.data[2] !== 0) {
+            if (event.data[0] == 144 && event.data[2] != 0) {
                 __startNote(event, docById(key));
             } else {
                 __endNote(event, docById(key));
@@ -2965,10 +2966,6 @@ function MusicKeyboard(activity) {
             this.midiON = false;
         };
 
-        if (navigator.requestMIDIAccess) {
-            navigator.requestMIDIAccess({ sysex: true }).then(onMIDISuccess, onMIDIFailure);
-        } else {
-            this.activity.errorMsg(_("Failed to get MIDI access in browser."));
-        }
+        navigator.requestMIDIAccess({ sysex: true }).then(onMIDISuccess, onMIDIFailure);
     };
 }
