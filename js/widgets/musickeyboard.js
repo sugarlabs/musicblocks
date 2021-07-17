@@ -2925,13 +2925,16 @@ function MusicKeyboard(activity) {
         //                 [2] : velocity ,(currently not used).
 
         const onMIDIMessage = (event) => {
+	    this.activity.textMsg(event);
+	    console.log(event);
             const pitchOctave = numberToPitch(event.data[1]);
             const pitch1 = pitchOctave[0];
             const pitch2 = pitchOctave[1];
             const octave = pitchOctave[2];
             const key =
                 this.getElement[pitch1 + "" + octave] || this.getElement[pitch2 + "" + octave];
-            if (event.data[0] == 144 && event.data[2] != 0) {
+	    console.log(pitchOctave + " " + pitch1 + " " + pitch2 + " " + octave + " " + key);
+            if (event.data[0] === 144 && event.data[2] !== 0) {
                 __startNote(event, docById(key));
             } else {
                 __endNote(event, docById(key));
@@ -2942,7 +2945,7 @@ function MusicKeyboard(activity) {
             // re-init widget
             if (this.midiON) {
                 this.midiButton.style.background = "#00FF00";
-                // textMsg(_("MIDI device present."));
+                this.activity.textMsg(_("MIDI device present."));
                 return;
             }
             midiAccess.inputs.forEach((input) => {
@@ -2950,10 +2953,10 @@ function MusicKeyboard(activity) {
             });
             if (midiAccess.inputs.size) {
                 this.midiButton.style.background = "#00FF00";
-                // textMsg(_("MIDI device present."));
+                this.activity.textMsg(_("MIDI device present."));
                 this.midiON = true;
             } else {
-                activity.textMsg(_("No MIDI device found."));
+                this.activity.textMsg(_("No MIDI device found."));
             }
         };
 

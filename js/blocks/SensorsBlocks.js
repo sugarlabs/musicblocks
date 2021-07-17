@@ -407,7 +407,7 @@ function setupSensorsBlocks(activity) {
             activity.turtles.turtleList[turtle].container.visible = false;
             const x = activity.turtles.turtleList[turtle].container.x;
             const y = activity.turtles.turtleList[turtle].container.y;
-            logo.refreshCanvas();
+            activity.refreshCanvas();
 
             const canvas = docById("overlayCanvas");
             const ctx = canvas.getContext("2d");

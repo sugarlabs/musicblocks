@@ -350,6 +350,10 @@
 
 | Example | Description |
 | --- | --- |
+| worm-game.html | Use the mouse button to steer away from the line. |
+
+| Example | Description |
+| --- | --- |
 | deducto.html | Interactive game: Determine the hidden musical pattern. |
 
 | Example | Description |
