@@ -881,27 +881,21 @@ class Painter {
     /**
      * Sets control point 1 for bezier curve.
      *
-     * @param {Number} x - x coordinate
-     * @param {Number} y - y coordinate
+     * @param {List} [x coordinate, y coordinate]
      */
-    setControlPoint1(x, y) {
-        /* eslint-disable no-undef */
-        tur.painter.cp1x = x;
-        tur.painter.cp1y = y;
-        /* eslint-enable no-undef */
+    setControlPoint1(vector) {
+        this.cp1x = vector[0];
+        this.cp1y = vector[1];
     }
 
     /**
      * Sets control point 2 for bezier curve.
      *
-     * @param {Number} x - x coordinate
-     * @param {Number} y - y coordinate
+     * @param {List} [x coordinate, y coordinate]
      */
-    setControlPoint2(x, y) {
-        /* eslint-disable no-undef */
-        tur.painter.cp2x = x;
-        tur.painter.cp2y = y;
-        /* eslint-enable no-undef */
+    setControlPoint2(vector) {
+        this.cp2x = vector[0];
+        this.cp2y = vector[1];
     }
 
     /**
