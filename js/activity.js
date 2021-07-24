@@ -1608,12 +1608,82 @@ function Activity() {
                 if (block.deprecated) {
                     this.deprecatedBlockNames.push(blockLabel);
                 } else {
-                    this.searchSuggestions.push({
-                        label: blockLabel,
-                        value: block.name,
-                        specialDict: block,
-                        artwork: artwork
-                    });
+                    if (blockLabel.length === 0) {
+                        // Swap in a preferred name when there is no label.
+                        let label = _(block.name); 
+                        switch(block.name) {
+                        case "scaledegree2":
+                            label = _("scale degree");
+                            break;
+                        case "voicename":
+                            label = _("voice name");
+                            break;
+                        case "invertmode":
+                            label = _("invert mode");
+                            break;
+                        case "outputtools":
+                            label = _("output tools");
+                            break;
+                        case "customNote":
+                            label = _("custom note");
+                            break;
+                        case "accidentalname":
+                            label = _("accidental name");
+                            break;
+                        case "eastindiansolfege":
+                            label = _("east indian solfege");
+                            break;
+                        case "notename":
+                            label = _("note name");
+                            break;
+                        case "temperamentname":
+                            label = _("temperament name");
+                            break;
+                        case "modename":
+                            label = _("mode name");
+                            break;
+                        case "intervalname":
+                            label = _("interval name");
+                            break;
+                        case "filtertype":
+                            label = _("filter type");
+                            break;
+                        case "oscillatortype":
+                            label = _("oscillator type");
+                            break;
+                        case "audiofile":
+                            label = _("audio file");
+                            break;
+                        case "noisename":
+                            label = _("noise name");
+                            break;
+                        case "drumname":
+                            label = _("drum name");
+                            break;
+                        case "effectsname":
+                            label = _("effects name");
+                            break;
+                        case "wrapmode":
+                            label = _("wrap mode");
+                            break;
+                        case "loadFile":
+                            label = _("load file");
+                            break;
+                        }
+                        this.searchSuggestions.push({
+                            label: label,
+                            value: block.name,
+                            specialDict: block,
+                            artwork: artwork
+                        });
+                    } else {
+                        this.searchSuggestions.push({
+                            label: blockLabel,
+                            value: block.name,
+                            specialDict: block,
+                            artwork: artwork
+                        });
+                    }
                     if (block.extraSearchTerms !== undefined) {
                         for (let i = 0; i < block.extraSearchTerms.length; i++) {
                             this.searchSuggestions.push({
