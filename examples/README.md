@@ -346,6 +346,10 @@
 
 | Example | Description |
 | --- | --- |
+| hide-and-seek.html | Find the mouse. The beats per minute increases as you get "warmer". |
+
+| Example | Description |
+| --- | --- |
 | Racko.html | Put the pitches into ascending order |
 
 | Example | Description |
