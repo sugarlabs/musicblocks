@@ -1866,7 +1866,7 @@ function Blocks(activity) {
                         // We may need to add new storein and namedo
                         // blocks to the palette.
                         if (newConnection === 1 && myBlock.value !== "box") {
-                            this.newStoreinBlock(myBlock.value);
+                            // this.newStoreinBlock(myBlock.value);
                             this.newStorein2Block(myBlock.value);
                             this.newNamedboxBlock(myBlock.value);
                             await delayExecution(50);
@@ -3983,6 +3983,8 @@ function Blocks(activity) {
      * @param - name - new variable
      * @public
      * @returns {void}
+     * Deprecated -- there is no need to add this block to the palette. The
+     * short-from storein2 block covers all of the use cases.
      */
     this.newStoreinBlock = function (name) {
         if (name == null) {
@@ -5265,7 +5267,7 @@ function Blocks(activity) {
                     name = blkData[1][1]["value"];
                 }
 
-                this.newStoreinBlock(name);
+                // this.newStoreinBlock(name);
                 this.newStorein2Block(name);
                 this.newNamedboxBlock(name);
                 updatePalettes = true;
@@ -6444,7 +6446,7 @@ function Blocks(activity) {
                             this.protoBlockDict["myStorein_" + name] == undefined ||
                             this.protoBlockDict["yourStorein2_" + name] == undefined
                         ) {
-                            this.newStoreinBlock(this.blockList[c].value);
+                            // this.newStoreinBlock(this.blockList[c].value);
                             this.newStorein2Block(this.blockList[c].value);
                             this.newNamedboxBlock(this.blockList[c].value);
                             updatePalettes = true;
