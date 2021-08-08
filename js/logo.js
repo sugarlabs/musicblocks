@@ -765,7 +765,9 @@ class Logo {
                 }
 
                 let obj2 = rationalToFraction(d2);
-                this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
+                if (obj2[0] !== 0) {
+                    this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
+                }
                 if (i > 0 || obj[0] > 0) {
                     if (note[0] !== "R") {
                         // Don't tie rests
@@ -778,7 +780,9 @@ class Logo {
                 // Add any measures we straddled
                 while (i > 0) {
                     i -= 1;
-                    this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
+                    if (obj2[0] !== 0) {
+                        this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
+                    }
                     if (obj[0] > 0) {
                         if (note[0] !== "R") {
                             // Don't tie rests
@@ -790,7 +794,9 @@ class Logo {
             }
 
             if (obj[0] > 0) {
-                this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum, false);
+                if (obj[0] !== 0) {
+                    this.updateNotation(note, obj[1] / obj[0], turtle, insideChord, drum, false);
+                }
             }
         } else {
             // .. otherwise proceed as normal

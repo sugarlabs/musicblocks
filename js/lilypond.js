@@ -117,7 +117,7 @@ const processLilypondNotes = function (lilypond, logo, turtle) {
                     }
                 }
 
-                if (obj[NOTATIONSTACCATO]) {
+                if (notes[NOTATIONSTACCATO]) {
                     logo.notationNotes[turtle] += " \\staccato ";
                 }
 

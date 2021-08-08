@@ -4120,7 +4120,7 @@ class Block {
                         // If the label was the name of a storein, update the
                         // associated box this.blocks and the palette buttons.
                         if (this.value !== "box") {
-                            this.blocks.newStoreinBlock(this.value);
+                            // this.blocks.newStoreinBlock(this.value);
                             this.blocks.newStorein2Block(this.value);
                             this.blocks.newNamedboxBlock(this.value);
                         }
