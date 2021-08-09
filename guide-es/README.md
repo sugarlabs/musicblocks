@@ -6,7 +6,7 @@ interesados en música y gráficos. Se amplía la Tortugaarte en que
 tiene una colección de funciones relacionadas con el tono y el ritmo.
 
 La [guía de la
-Tortugaarte](https://github.com/sugarlabs/turtleblocksjs/blob/master/guide/README.md)
+Tortugaarte](https://github.com/sugarlabs/turtleblocksjs/blob/master/guide-es/README.md)
 es un buen lugar para comenzar a aprender acerca de la lo esencial. En
 esta guía, se ilustran las características de la música que recorren
 la lector a través de numerosos ejemplos.
