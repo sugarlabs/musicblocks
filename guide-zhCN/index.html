@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <style type="text/css">
-    	ol { counter-reset: item }
-		li { display: block }
-		li:before { content: counters(item, ".") " "; counter-increment: item }
+        ol { counter-reset: item }
+        li { display: block }
+        li:before { content: counters(item, ".") " "; counter-increment: item }
     </style>
   </head>
   <body>
@@ -153,7 +153,7 @@
 在上面的程序例子， 我们执行 &quot;chunk&quot; 的行动拼块, 接着我们两次执行 &quot;chunk1&quot; , 然后又执行 &quot;chunk&quot;.</p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/chunk6.svg" alt="alt tag" title="creating a song using chunks"></p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/chunk7.svg" alt="alt tag" title="usage of Repeat block in a song"></p>
-<p>假如我们有更多拼块，我们就可以创造一个歌曲. 
+<p>假如我们有更多拼块，我们就可以创造一个歌曲.
 (你可以猜猜程序的后果吗? 你对我们制造的歌曲熟悉吗?)</p>
 <h3 id="-a-name-transformation-a-3-2-"><a name="TRANSFORMATION"></a>3.2 音乐转变</h3>
 <p>《音乐拼块》拥有不同的方式改变音调，节奏和其他声音的特征.</p>
@@ -169,7 +169,7 @@
 注意 <em>Mouse Pitch Number</em> 拼块会给回上一个音符的音调号码。</p>
 <h4 id="-a-name-sharps-and-flats-a-3-2-2-"><a name="SHARPS-AND-FLATS"></a>3.2.2 升号和降号</h4>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform1.svg" alt="alt tag" title="Using Sharp and Flat blocks"></p>
-<p><em>Sharp</em> 和 <em>Flat</em> 拼块可以包住 <em>Pitch</em> 拼块, <em>Note value</em> 拼块, 或 <a href="#CHUNKS">行动拼块</a>. 
+<p><em>Sharp</em> 和 <em>Flat</em> 拼块可以包住 <em>Pitch</em> 拼块, <em>Note value</em> 拼块, 或 <a href="#CHUNKS">行动拼块</a>.
 一个 “sharp” 会把音调提高半步， 而一个 ”flat“ 会把音调降低半步。
 在上面左边的例子里， 只有 ”Ｍi“ 的 <em>Pitch</em> 拼块音调降低半步; 在上面右边的例子里, 两个 <em>Pitch</em> 拼块音调提高半步。</p>
 <h4 id="-a-name-adjust-transposition-a-3-2-3-"><a name="ADJUST-TRANSPOSITION"></a>3.2.3 移调法</h4>
@@ -181,7 +181,7 @@
 <p>在上面的例子，我们把上次设计的歌曲程序提高一个八度。</p>
 <h4 id="-a-name-dotted-a-3-2-4-"><a name="DOTTED"></a>3.2.4 附点音符</h4>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform4.svg" alt="alt tag" title="Creating dotted notes using the Dot block"></p>
-<p>你可以使用 <em>Dot</em> 拼块来 ”dot&quot; 音符. 
+<p>你可以使用 <em>Dot</em> 拼块来 ”dot&quot; 音符.
 一个被点到的音符把音符的时间加长50%。
 例如，一个被点到的四分音符会播放一个拍的 3/8(1/4 + 1/8)， 而一个被点到的音符会播放一个拍的 3/16 (1/8 + 1/16).</p>
 <p>你也可以换音符播放的时间来代替一个被点到的音符，例如把音符播放时间定为 3/8 (一个被点到的四分音符).
@@ -203,14 +203,14 @@
 不搭配的音符不会被影响。</p>
 <p>在例子里， <code>re5</code> 就会变成一个 <code>1/6</code> 音符，而 <code>mi5</code> 就会变成一个 <code>1/12</code> 音符 (<code>1/8 + 1/24 === 1/6</code> and <code>1/8 - 1/24 === 1／12</code>)。
 注意这两个音符播放的总共时间还是一样的。</p>
-<p>“Tie” 拼块改变两个音符,把音符组合起来. 
+<p>“Tie” 拼块改变两个音符,把音符组合起来.
 (这两个音符音调可以一样，但是节奏可以不同。)</p>
 <p><img src="https://rawgit.com/sugarlabs/musicblocks/master/charts/TiesChart.svg" alt="alt tag" title="using notes with ties"></p>
 <h4 id="-a-name-more-transformations-a-3-2-8-"><a name="MORE-TRANSFORMATIONS"></a>3.2.8 定住，转变，断奏，模糊声音</h4>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform8.svg" alt="alt tag" title="Set volume, Crescendo, Staccato, and Slur blocks"></p>
 <p><em>Set volume</em> 拼块可以改变音符的声量.
 声量开始定位 50; 范围是 0 (无声) 至 100 (最大声量).</p>
-<p><em>Crescendo</em> 拼块可以增加 (或减少) 里面每一个音符的声量. 
+<p><em>Crescendo</em> 拼块可以增加 (或减少) 里面每一个音符的声量.
 例如， 一个有 3 个音符的系列在一个定位 “5” 价值的 <em>Crescendo</em> 拼块，最后的音符的声量就会比开始的声量多 15％ 。</p>
 <p><em>Staccato</em> 拼块会减少音符的播放时间;在保持音符的节奏价值，使它们更尖锐.</p>
 <p><em>Slur</em> 拼块增加音符的播放时间，让它播放比定位更长的时间，保持音符的节奏价值，把它和下一个音符稍微混合在一起。</p>
@@ -230,9 +230,9 @@
 <h4 id="-a-name-inversion-a-3-2-11-"><a name= "INVERSION"></a>3.2.11 倒位</h4>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform13.svg" alt="alt tag" title="inversion"></p>
 <p><em>Invert</em> 拼块会绕着一个被定住的音符，倒立另一系列的音符。
-<em>Invert</em> 拼块包含两个方式 － <em>odd</em> 和 <em>even</em>. 
+<em>Invert</em> 拼块包含两个方式 － <em>odd</em> 和 <em>even</em>.
 <em>Even</em> 把回转点的定位加 <code>1/4</code> 半步，允许两个音符之间有一个可以回转的点。</p>
-<p>在 <em>invert (even)</em> 的例子, <code>D4</code> 绕着 <code>G4</code> 倒位，结果产生一个 <code>C5</code>. 
+<p>在 <em>invert (even)</em> 的例子, <code>D4</code> 绕着 <code>G4</code> 倒位，结果产生一个 <code>C5</code>.
 在 <em>invert (odd)</em> 的例子, <code>D4</code> 绕着 <code>G4</code> 和 <code>G♯4</code> 中间的一个点，结果产生一个 <code>C♯5</code>。</p>
 <h4 id="-a-name-backwards-a-3-2-12-"><a name="BACKWARDS"></a>3.2.12 反向播放音乐</h4>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform11.svg" alt="alt tag" title="Backward block"></p>
@@ -245,7 +245,7 @@ LIVE</a></p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform12.svg" alt="alt tag" title="setting voice and keys using Set Voice block"></p>
 <p><em>Set Voice</em> 拼块为里面的拼块的发声器选择一个 <a href="#VOICES">音色</a>，如小提琴或大提琴。</p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/transform10.svg" alt="alt tag" title="Set Key block"></p>
-<p><em>Set Key</em> 拼块可以改换音乐音符的模式, 如把 <code>Do</code>, <code>Re</code>, <code>Mi</code>, 变成音符名字如在 C Major 里的， <code>C</code>, <code>D</code>, <code>E</code>. 
+<p><em>Set Key</em> 拼块可以改换音乐音符的模式, 如把 <code>Do</code>, <code>Re</code>, <code>Mi</code>, 变成音符名字如在 C Major 里的， <code>C</code>, <code>D</code>, <code>E</code>.
 模式包括 Ｍajor,Minor,Chromatic 和一群比较罕见的模式，如 Bebop, Geez, Maqam, 等.
 这个拼块能根据使用者选择的音乐模式，让使用者得到 《音乐拼块》 的 &quot;movable Do&quot;。</p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/drum4.svg" alt="alt tag" title="increasing sequence of drum beats over time"></p>
@@ -345,11 +345,11 @@ LIVE</a></p>
 <h4 id="-a-name-pitch-time-a-4-2-1-"><a name="pitch-time"></a>4.2.1 音调-时间矩阵</h4>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/matrix1.svg" alt="alt tag" title="Pitch-time Matrix"></p>
 <p>《音乐拼块》拥有一个拼块 <em>Pitch-time Matrix</em>, 作为开始写程序的蓝图。</p>
-<p>在浏览器中启动《音乐拼块》后，点击开始在屏幕中间出现的 <em>Pitch-time Matrix</em> 堆栈。(暂时忽视 <em>Start</em> 拼块) 
+<p>在浏览器中启动《音乐拼块》后，点击开始在屏幕中间出现的 <em>Pitch-time Matrix</em> 堆栈。(暂时忽视 <em>Start</em> 拼块)
 你会看到一个网格按节奏纵向组织，和按节奏横向组织。</p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/matrix2.svg" alt="alt tag" title="Pitch and Rhythm block matrix"></p>
 <p>上图中的矩阵有三个 <em> Pitch </em> 块和一个 <em>Rhythm</em> 块，用于创建一个3 x 3 音高和时间的网格。</p>
-<p>请注意，原本矩阵有五个 <em> Pitch </em> 块，因此，你会看见五行，每个音调一行。 
+<p>请注意，原本矩阵有五个 <em> Pitch </em> 块，因此，你会看见五行，每个音调一行。
 （底部第六行用于指定与每个音符关联的节奏）。
 也在原本情况下，有两个 <em>Rhythm</em> 块，它指定了六分之四音符之后是一半音符。
 由于 <em>Rhythm</em> 块在 <em>Repeat</em> 块里面，有14（2 x 7）列供选择音符。</p>
@@ -378,13 +378,13 @@ LIVE</a></p>
 每个音符有一个持续时间（在这种情况下是4，代表四分音符）。
 你可以尝试把不同的数字放进去，看看（听到）会发生什么。
 每个音符块也有一个音调块（如果它是一个和弦，就会有多个 <em>Pitch</em> 块嵌套在音符块的夹子内）。
-每音调块有一个音调名称（<code>Re</code>，<code>Mi</code>和<code>Sol</code>）和一个音调八度; 在这个例子中，每个音高的八度是4。 
+每音调块有一个音调名称（<code>Re</code>，<code>Mi</code>和<code>Sol</code>）和一个音调八度; 在这个例子中，每个音高的八度是4。
 （尝试改变音高名称和音高八度）。</p>
 <p>播放拼块，只需点击动作拼块（在单词上行动）。
 你应该听到从上到下排列的音符演奏。</p>
 <h4 id="-a-name-the-rhythm-block-a-4-2-2-"><a name="THE-RHYTHM-BLOCK"></a>4.2.2 音律拼块</h4>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/matrix6.svg" alt="alt tag" title="the Rhythm block"></p>
-<p><em>Rhythm</em> 块用于生成节奏模式 <em>Pitch-Time Matrix</em> 块。 
+<p><em>Rhythm</em> 块用于生成节奏模式 <em>Pitch-Time Matrix</em> 块。
 <em>Rhythm</em> 块的最高参数是音符的数量，底部的参数是的持续时间。
 注意：在上面的例子中，三个四分音符列将在矩阵中生成。
 在中间的例子中，一列八分音符会被产生。
@@ -393,7 +393,7 @@ LIVE</a></p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/matrix8.svg" alt="alt tag" title="resulting notes in tabular format"></p>
 <p>You can use as many <em>Rhythm</em> blocks as you&#39;d like inside the</p>
 <ul>
-<li>block. In the above example, two 
+<li>block. In the above example, two
 blocks are used, resulting in three quarter notes and six eighth
 notes.</li>
 </ul>
@@ -405,7 +405,7 @@ notes.</li>
 <p>连音符是可以缩放到特定的音符集合持续时间。
 使用连音符可以很容易地创建一组不是基于 2 的音符。</p>
 <p>在上面的例子中，三个四分音符（定义在 <em>Simple Tuplet</em> 拼块）在四分之一时间播放。
-注意：结果是三个十二分音符。 
+注意：结果是三个十二分音符。
 （这个形式，这是在音乐中相当的常见，被称为 <em>triplet</em> 。
 其他常见的连音符包括 <em>quintuplet</em> 和 <em>septuplet</em>。）</p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/matrix11.svg" alt="alt tag" title="usage of tuplet"></p>
@@ -456,11 +456,11 @@ notes.</li>
 <h3 id="-a-name-modes-a-4-4-"><a name="modes"></a>4.4 音乐模式</h3>
 <p>音乐模式被用来指定 [间隔]（#INTERVALS-AND-ARTICULATION）（或步骤）。
 因为西方音乐基于12个半步每个八度，模式指定了每个规模之间有多少个半步。</p>
-<p>原本情况下，音乐块使用 <em>Major</em> 模式，在 [Key]（#SETTING）中C，映射到钢琴上的白键。 
+<p>原本情况下，音乐块使用 <em>Major</em> 模式，在 [Key]（#SETTING）中C，映射到钢琴上的白键。
 <em>Major</em> 模式是 “2,2,1,2,2,2,1”。
 其他许多常见的模式是内置《音乐拼块》，当然包括 <em>Minor</em> 模式，使用 &#39;2，1，2，2，1，2，2&#39; 作为它的区间。</p>
 <p>请注意，并非每个模式都使用每个八度的7个音程。
-例如，<em>Chromatic</em> 模式使用11个区间：“1,1,1,1,1,1,1,1,1,1,1,1&#39;。 
+例如，<em>Chromatic</em> 模式使用11个区间：“1,1,1,1,1,1,1,1,1,1,1,1&#39;。
 <em>Japanese</em> 模式只使用5个间隔：<code>1，4，2，3，2]，</code>。
 重要的是间隔的总和在一个八度是12个半步.</p>
 <p><img src="https://rawgithub.com/sugarlabs/musicblocks/master/guide/mode1.svg" alt="alt tag" title="mode widget"></p>
@@ -534,7 +534,7 @@ stair plays in increasing order of frequency first, then in
 decreasing order of frequency as well, completing a scale.</p>
 <p>The <em>Save stack</em> button will export pitch stacks. For example, in the above
 configuration, the output  from pressing the <em>Save stack</em> button is shown below:</p>
-<p>点击每行左边的 <em>Play</em> 按钮将会播放与在楼梯的那个步骤相关的音符。 
+<p>点击每行左边的 <em>Play</em> 按钮将会播放与在楼梯的那个步骤相关的音符。
 <em>Play-all</em> 小部件左上角的按钮将同时播放所有音高步骤。
 第二个 <em>Play-all</em> 按钮按照频率的先后顺序播放，然后进入频率下降的顺序，完成一个规模。</p>
 <p><em>Save Stack</em> 按钮将导出音高堆栈。
