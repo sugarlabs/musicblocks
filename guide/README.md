@@ -4,9 +4,11 @@ Music Blocks is a programming environment for children interested in
 music and graphics. It expands upon Turtle Blocks by adding a
 collection of features relating to pitch and rhythm.
 
-The Turtle Blocks guide is a good place to start learning about the
-basics. In this guide, we illustrate the musical features by walking
-the reader through numerous examples.
+The [Turtle Blocks
+guide](https://github.com/sugarlabs/turtleblocksjs/blob/master/guide/README.md)
+is a good place to start learning about the basics. In this guide, we
+illustrate the musical features by walking the reader through numerous
+examples.
 
 A short [Guide to
 Debugging](http://github.com/sugarlabs/musicblocks/tree/master/Debugging.md). is
