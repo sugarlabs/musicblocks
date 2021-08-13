@@ -6,7 +6,7 @@ collection of features relating to pitch and rhythm.
 
 The Turtle Blocks guide is a good place to start learning about the
 basics. In this guide, we illustrate the musical features by walking
-the reader through numerous examples.
+the reader through numerous examples. Recommended to read [Guide to Programming with Turtle Art.](github.com/sugarlabs/turtleblocksjs/blob/master/guide/README.md)
 
 A short [Guide to
 Debugging](http://github.com/sugarlabs/musicblocks/tree/master/Debugging.md). is
