@@ -30,6 +30,8 @@ like:
 
 ![alt tag](./screenshots/Screenshot-2.png)
 
+You can either visit to the website to have hands on experience about its working, from here http://sugarlabs.org/
+
 Some background on why music and programming can be found
 [here](./WhyMusicBlocks.md).
 
