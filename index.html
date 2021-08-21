@@ -102,12 +102,13 @@
                 }
             }
         </script>
+       <script type="text/javascript" src="js\activity.js">
+         $.noConflict();
 
-        <script type="text/javascript">
-            $(document).ready(function() {
-                function doSearch() {}
-            });
-        </script>
+        jQuery(document).ready(function($) {
+        doSearch();
+    });
+     </script>
     </head>
 
     <!-- #96D3F3-->
