@@ -30,8 +30,10 @@ like:
 
 ![alt tag](./screenshots/Screenshot-2.png)
 
-You can either visit to the website to have hands on experience about its working, from here  https://musicblocks.sugarlabs.org 
-Some background on why music and programming can be found
+Visit the Music Blocks website for a hands on experience:
+[https://musicblocks.sugarlabs.org](https://musicblocks.sugarlabs.org).
+
+Some background on why we combine music and programming can be found
 [here](./WhyMusicBlocks.md).
 
 **Refer to the following sections to get familiar with this application:**
@@ -357,3 +359,19 @@ is available.
 ## <a name="MUSIC_BLOCKS_IN_JAPAN"></a>Music Blocks in Japan
 
 [Gakken STEAM](https://gakken-steam.jp/music_blocks/)
+
+## License
+
+Music Blocks is licensed under the
+[AGPL](https://www.gnu.org/licenses/agpl-3.0.en.html), which means it
+will always be free to copy, modify, and hopefully improve. We respect
+your privacy: while Music Blocks stores your session information in
+your browser's local storage, it does not and will never access these
+data for purpoes other than to restore your session. Music Blocks will
+never share these data with any third parties.
+
+There is a Planet where you can share your projects with others and
+remix projects created by other Music Blocks users. Use of the Planet
+is anonymous and not required in order to enjoy Music Blocks.
+
+Have fun, play hard, and learn.
