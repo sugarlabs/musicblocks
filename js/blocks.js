@@ -881,7 +881,7 @@ function Blocks(activity) {
 
             // Find the dock position in the connected block.
             let foundMatch = false;
-            let b;
+
             for (let b = 0; b < this.blockList[cblk].connections.length; b++) {
                 if (this.blockList[cblk].connections[b] === blk) {
                     foundMatch = true;
@@ -3188,7 +3188,7 @@ function Blocks(activity) {
 
             postProcessArg = [thisBlock, DEFAULTMODE];
         } else if (name === "accidentalname") {
-            postProcess = function (args) {
+            postProcess = (args) => {
                 const b = args[0];
                 const v = args[1];
                 that.blockList[b].value = v;
