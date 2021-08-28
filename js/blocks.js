@@ -160,7 +160,7 @@ function Blocks(activity) {
      * @public
      * @returns this.inLongPress
      */
-    this.getLongPressStatus = function () {
+    this.getLongPressStatus = () => {
         return this.inLongPress;
     };
 
@@ -169,7 +169,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.clearLongPress = function () {
+    this.clearLongPress = () => {
         this.inLongPress = false;
     };
 
@@ -179,26 +179,25 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.setBlockScale = async function (scale) {
+    this.setBlockScale = async (scale) => {
         // eslint-disable-next-line no-console
         console.debug("New block scale is " + scale);
         this.blockScale = scale;
 
-        let blk;
-        let stack;
+
         let palette;
         // Regenerate all of the artwork at the new scale.
-        for (blk = 0; blk < this.blockList.length; blk++) {
+        for (let blk = 0; blk < this.blockList.length; blk++) {
             this.blockList[blk].resize(scale);
         }
 
         this.findStacks();
-        for (stack = 0; stack < this.stackList.length; stack++) {
+        for (let stack = 0; stack < this.stackList.length; stack++) {
             this.adjustDocks(this.stackList[stack], true);
         }
 
         // Make sure trash is still hidden.
-        for (blk = 0; blk < this.blockList.length; blk++) {
+        for (let blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].trash) {
                 this.blockList[blk].hide();
             }
@@ -207,7 +206,7 @@ function Blocks(activity) {
         // We reset the protoblock scale on the palettes, but don't
         // modify the palettes themselves.
         for (palette in this.activity.palettes.dict) {
-            for (blk = 0; blk < this.activity.palettes.dict[palette].protoList.length; blk++) {
+            for (let blk = 0; blk < this.activity.palettes.dict[palette].protoList.length; blk++) {
                 this.activity.palettes.dict[palette].protoList[blk].scale = scale;
             }
         }
@@ -222,7 +221,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.extract = function () {
+    this.extract = () => {
         if (this.activeBlock != null) {
             // Don't extract silence blocks.
             if (this.blockList[this.activeBlock].name !== "rest2") {
@@ -238,7 +237,7 @@ function Blocks(activity) {
      * @private
      * @returns {void}
      */
-    this._extractBlock = async function (blk, adjustDock) {
+    this._extractBlock = async (blk, adjustDock) => {
         // Remove a single block from within a stack.
         const blkObj = this.blockList[blk];
 
@@ -306,7 +305,7 @@ function Blocks(activity) {
      * @public
      * @returns maxy
      */
-    this.bottomMostBlock = function () {
+    this.bottomMostBlock = () => {
         let maxy = -1000;
         for (const blk in this.blockList) {
             if (this.blockList[blk].container.y > maxy) {
@@ -323,7 +322,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.toggleCollapsibles = function () {
+    this.toggleCollapsibles = () => {
         let allCollapsed = true;
         let someCollapsed = false;
         let blk;
@@ -380,7 +379,7 @@ function Blocks(activity) {
      * @public
      * @returns this
      */
-    this.setHomeContainers = function (setContainers, boundary) {
+    this.setHomeContainers = (setContainers, boundary) => {
         this._setHomeButtonContainers = setContainers;
         this.boundary = boundary;
         return this;
@@ -392,7 +391,7 @@ function Blocks(activity) {
      * @private
      * @returns boolean
      */
-    this._actionBlock = function (name) {
+    this._actionBlock = (name) => {
         return ["do", "doArg", "calc", "calcArg"].indexOf(name) !== -1;
     };
 
@@ -402,7 +401,7 @@ function Blocks(activity) {
      * @private
      * @returns boolean
      */
-    this._namedActionBlock = function (name) {
+    this._namedActionBlock = (name) => {
         return ["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].indexOf(name) !== -1;
     };
 
@@ -411,7 +410,7 @@ function Blocks(activity) {
      * @private
      * @returns {void}
      */
-    this._adjustBlockPositions = function () {
+    this._adjustBlockPositions = () => {
         if (this.dragGroup.length < 2) {
             return;
         }
@@ -427,7 +426,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.adjustExpandableClampBlock = function () {
+    this.adjustExpandableClampBlock = () => {
         if (this.clampBlocksToCheck.length === 0) {
             return;
         }
@@ -456,7 +455,7 @@ function Blocks(activity) {
          * @private
          * @returns {void}
          */
-        const __clampAdjuster = function (blk, myBlock, clamp) {
+        const __clampAdjuster = (blk, myBlock, clamp) => {
             // First we need to count up the number of (and size of) the
             // blocks inside the clamp; The child flow is usually the
             // second-to-last argument.
@@ -502,7 +501,7 @@ function Blocks(activity) {
      * @private
      * @returns depth
      */
-    this._getNestingDepth = function (blk) {
+    this._getNestingDepth = (blk) => {
         let rank = 0;
         while (blk !== null) {
             blk = this.insideExpandableBlock(blk);
@@ -517,7 +516,7 @@ function Blocks(activity) {
      * @private
      * @returns block size
      */
-    this._getBlockSize = function (blk) {
+    this._getBlockSize = (blk) => {
         const myBlock = this.blockList[blk];
         // Special case for collapsed note blocks.
         if (["newnote", "interval", "osctime"].indexOf(myBlock.name) !== -1 && myBlock.collapsed) {
@@ -533,7 +532,7 @@ function Blocks(activity) {
      * @private
      * @returns {void}
      */
-    this._adjustArgClampBlock = function (argBlocksToCheck) {
+    this._adjustArgClampBlock = (argBlocksToCheck) => {
         if (argBlocksToCheck.length === 0) {
             return;
         }
@@ -579,7 +578,7 @@ function Blocks(activity) {
      * @private
      * @returns {void}
      */
-    this._adjustExpandableTwoArgBlock = function (argBlocksToCheck) {
+    this._adjustExpandableTwoArgBlock = (argBlocksToCheck) => {
         if (argBlocksToCheck.length === 0) {
             return;
         }
@@ -609,7 +608,7 @@ function Blocks(activity) {
      * @private
      * @returns void
      */
-    this._addRemoveVspaceBlock = function (blk) {
+    this._addRemoveVspaceBlock = (blk) => {
         const myBlock = this.blockList[blk];
 
         const c = myBlock.connections[myBlock.connections.length - 2];
@@ -626,7 +625,7 @@ function Blocks(activity) {
          * @private
          * @returns number of vspace blocks found below this block
          */
-        const __howManyVSpaceBlocksBelow = function (blk) {
+        const __howManyVSpaceBlocksBelow = (blk) => {
             const nextBlock = last(that.blockList[blk].connections);
             if (nextBlock && that.blockList[nextBlock].name === "vspace") {
                 return 1 + __howManyVSpaceBlocksBelow(nextBlock);
@@ -660,7 +659,7 @@ function Blocks(activity) {
              * @private
              * @returns {void}
              */
-            const __vspaceAdjuster = function (args) {
+            const __vspaceAdjuster = (args) => {
                 let thisBlock = args[0];
                 let nextBlock = args[1];
                 const vspace = args[2];
@@ -717,7 +716,7 @@ function Blocks(activity) {
      * @private
      * @returns int
      */
-    this._getStackSize = function (blk) {
+    this._getStackSize = (blk) => {
         // How many block units in this stack?
         let size = 0;
         this._sizeCounter += 1;
@@ -809,7 +808,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.adjustDocks = function (blk, resetLoopCounter) {
+    this.adjustDocks = (blk, resetLoopCounter) => {
         const myBlock = this.blockList[blk];
 
         // For when we come in from makeBlock
@@ -882,9 +881,9 @@ function Blocks(activity) {
 
             // Find the dock position in the connected block.
             let foundMatch = false;
-            let b;
-            for (b = 0; b < this.blockList[cblk].connections.length; b++) {
-                if (this.blockList[cblk].connections[b] === blk) {
+            let matchingBlock;
+            for (matchingBlock = 0; matchingBlock < this.blockList[cblk].connections.length; matchingBlock++) {
+                if (this.blockList[cblk].connections[matchingBlock] === blk) {
                     foundMatch = true;
                     break;
                 }
@@ -895,14 +894,14 @@ function Blocks(activity) {
                 // eslint-disable-next-line no-console
                 console.debug(
                     "Did not find match for " +
-                        myBlock.name +
-                        " (" +
-                        blk +
-                        ") and " +
-                        this.blockList[cblk].name +
-                        " (" +
-                        cblk +
-                        ")"
+                    myBlock.name +
+                    " (" +
+                    blk +
+                    ") and " +
+                    this.blockList[cblk].name +
+                    " (" +
+                    cblk +
+                    ")"
                 );
                 // eslint-disable-next-line no-console
                 console.debug(myBlock.connections);
@@ -911,7 +910,7 @@ function Blocks(activity) {
                 break;
             }
 
-            const cdock = this.blockList[cblk].docks[b];
+            const cdock = this.blockList[cblk].docks[matchingBlock];
             let dx;
             let dy;
             let nx;
@@ -964,7 +963,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.addDefaultBlock = function (parentblk, oldBlock, skipOldBlock) {
+    this.addDefaultBlock = (parentblk, oldBlock, skipOldBlock) => {
         if (parentblk == null) {
             return;
         }
@@ -980,7 +979,7 @@ function Blocks(activity) {
                  * @public
                  * @returns {void}
                  */
-                const postProcess = function (args) {
+                const postProcess = (args) => {
                     const parentblk = args[0];
                     const oldBlock = args[1];
 
@@ -1174,7 +1173,7 @@ function Blocks(activity) {
                  * @public
                  * @returns {void}
                  */
-                const postProcess = function (args) {
+                const postProcess = (args) => {
                     const parentblk = args[0];
                     // const oldBlock = args[1];
 
@@ -1225,7 +1224,7 @@ function Blocks(activity) {
      * @private
      * @returns {void}
      */
-    this._deletePitchBlocks = function (thisBlock) {
+    this._deletePitchBlocks = (thisBlock) => {
         // Find the top of the stack
         let c = this.blockList[thisBlock].connections[0];
         if (c === null) {
@@ -1292,7 +1291,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.deleteNextDefault = function (thisBlock) {
+    this.deleteNextDefault = (thisBlock) => {
         if (thisBlock == undefined) {
             return;
         }
@@ -1338,7 +1337,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.deletePreviousDefault = function (thisBlock) {
+    this.deletePreviousDefault = (thisBlock) => {
         let thisBlockobj = this.blockList[thisBlock];
         if (this._blockInStack(thisBlock, ["rest2"])) {
             this._deletePitchBlocks(thisBlock);
@@ -1383,7 +1382,7 @@ function Blocks(activity) {
 
     // To make everything cleaner, use this function to reinit widget
     // when its widget windows is open.
-    this.reInitWidget = async function (topBlock, timeout) {
+    this.reInitWidget = async (topBlock, timeout) => {
         await delayExecution(timeout);
         if (!this.blockList[topBlock].trash) {
             this.activity.logo.runLogoCommands(topBlock);
@@ -1396,7 +1395,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.blockMoved = async function (thisBlock) {
+    this.blockMoved = async (thisBlock) => {
         /**
          * When a block is moved, we have to check the following:
          * (0) Is it inside of a expandable block?
@@ -1653,7 +1652,7 @@ function Blocks(activity) {
                     // the slot size.
                     if (
                         ["doArg", "calcArg", "makeblock"].indexOf(this.blockList[newBlock].name) !==
-                            -1 &&
+                        -1 &&
                         newConnection === 1
                     ) {
                         // pass
@@ -1702,7 +1701,7 @@ function Blocks(activity) {
                 if (this.blockList[newBlock].isArgClamp()) {
                     if (
                         ["doArg", "calcArg", "makeblock"].indexOf(this.blockList[newBlock].name) !==
-                            -1 &&
+                        -1 &&
                         newConnection === 1
                     ) {
                         // If it is the action name then treat it like
@@ -2080,7 +2079,7 @@ function Blocks(activity) {
      * @private
      * @returns boolean
      */
-    this._testConnectionType = function (type1, type2) {
+    this._testConnectionType = (type1, type2) => {
         // Can these two blocks dock?
         if (type1 === "in" && type2 === "out") {
             return true;
@@ -2202,7 +2201,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.updateBlockPositions = function () {
+    this.updateBlockPositions = () => {
         for (let blk = 0; blk < this.blockList.length; blk++) {
             this._moveBlock(blk, this.blockList[blk].container.x, this.blockList[blk].container.y);
         }
@@ -2213,7 +2212,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.bringToTop = function () {
+    this.bringToTop = () => {
         this._adjustTheseStacks = [];
         let blk;
 
@@ -2224,7 +2223,7 @@ function Blocks(activity) {
             }
         }
 
-        for (blk = 0; blk < this._adjustTheseStacks.length; blk++) {
+        for (let blk = 0; blk < this._adjustTheseStacks.length; blk++) {
             this.raiseStackToTop(this._adjustTheseStacks[blk]);
         }
 
@@ -2236,7 +2235,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.checkBounds = function () {
+    this.checkBounds = () => {
         let onScreen = true;
         for (let blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].connections[0] == null) {
@@ -2261,7 +2260,7 @@ function Blocks(activity) {
      * @public
      * @returns{void}
      */
-    this.moveBlock = function (blk, x, y) {
+    this.moveBlock = (blk, x, y) => {
         this._moveBlock(blk, x, y);
         this.adjustDocks(blk, true);
     };
@@ -2274,7 +2273,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this._moveBlock = function (blk, x, y) {
+    this._moveBlock = (blk, x, y) => {
         const myBlock = this.blockList[blk];
         if (myBlock.container != null) {
             // Round position so font renders clearly.
@@ -2296,7 +2295,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.moveBlockRelative = function (blk, dx, dy) {
+    this.moveBlockRelative = (blk, dx, dy) => {
         this.inLongPress = false;
 
         const myBlock = this.blockList[blk];
@@ -2320,7 +2319,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.moveStackRelative = function (blk, dx, dy) {
+    this.moveStackRelative = (blk, dx, dy) => {
         this.findDragGroup(blk);
         if (this.dragGroup.length > 0) {
             for (let b = 0; b < this.dragGroup.length; b++) {
@@ -2337,7 +2336,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.moveAllBlocksExcept = function (blk, dx, dy) {
+    this.moveAllBlocksExcept = (blk, dx, dy) => {
         for (const block in this.blockList) {
             const topBlock = this.blockList[this.findTopBlock(block)];
             if (topBlock !== blk) this.moveBlockRelative(block, dx, dy);
@@ -2351,7 +2350,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.updateBlockText = function (blk) {
+    this.updateBlockText = (blk) => {
         const myBlock = this.blockList[blk];
         let maxLength = 8;
         if (myBlock.text == null) {
@@ -2532,7 +2531,7 @@ function Blocks(activity) {
      * @public
      * @returns blk
      */
-    this.findTopBlock = function (blk) {
+    this.findTopBlock = (blk) => {
         // Find the top block in a stack.
         if (blk == null) {
             return null;
@@ -2556,14 +2555,14 @@ function Blocks(activity) {
             // eslint-disable-next-line no-console
             console.debug(
                 "WARNING: CORRUPTED BLOCK DATA. Block " +
-                    myBlock.name +
-                    " (" +
-                    blk +
-                    ") is connected to the same block " +
-                    this.blockList[myBlock.connections[0]].name +
-                    " (" +
-                    myBlock.connections[0] +
-                    ") twice."
+                myBlock.name +
+                " (" +
+                blk +
+                ") is connected to the same block " +
+                this.blockList[myBlock.connections[0]].name +
+                " (" +
+                myBlock.connections[0] +
+                ") twice."
             );
             return blk;
         }
@@ -2593,7 +2592,7 @@ function Blocks(activity) {
      * @public
      * @returns boolean
      */
-    this.sameGeneration = function (firstBlk, childBlk) {
+    this.sameGeneration = (firstBlk, childBlk) => {
         if (firstBlk == null || childBlk == null) {
             return false;
         }
@@ -2637,7 +2636,7 @@ function Blocks(activity) {
      * @private
      * @returns boolean
      */
-    this._blockInStack = function (thisBlock, names) {
+    this._blockInStack = (thisBlock, names) => {
         // Is there a block of any of these names in this stack?
         let counter = 0;
         while (thisBlock != null) {
@@ -2669,7 +2668,7 @@ function Blocks(activity) {
      * @public
      * @returns blk
      */
-    this.findBottomBlock = function (blk) {
+    this.findBottomBlock = (blk) => {
         // Find the bottom block in a stack.
         if (blk == null) {
             return null;
@@ -2707,7 +2706,7 @@ function Blocks(activity) {
      * c = 0
      * @returns c
      */
-    this._countBlocksInStack = function (blk) {
+    this._countBlocksInStack = (blk) => {
         let c = 0;
         if (blk !== null) {
             c += 1;
@@ -2726,7 +2725,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.findStacks = function () {
+    this.findStacks = () => {
         this.stackList = [];
         for (let i = 0; i < this.blockList.length; i++) {
             if (this.blockList[i].connections[0] == null) {
@@ -2740,7 +2739,7 @@ function Blocks(activity) {
      * @private
      * @returns {void}
      */
-    this._findClamps = function () {
+    this._findClamps = () => {
         this._expandablesList = [];
         this.findStacks(); // We start by finding the stacks
         for (let i = 0; i < this.stackList.length; i++) {
@@ -2756,7 +2755,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this._findTwoArgs = function () {
+    this._findTwoArgs = () => {
         this._expandablesList = [];
         for (let i = 0; i < this.blockList.length; i++) {
             if (this.blockList[i].isArgBlock() && this.blockList[i].isExpandableBlock()) {
@@ -2772,7 +2771,7 @@ function Blocks(activity) {
      * @private
      * @returns{void}
      */
-    this._searchForArgFlow = function () {
+    this._searchForArgFlow = () => {
         for (let blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].isArgFlowClampBlock()) {
                 this._searchCounter = 0;
@@ -2788,7 +2787,7 @@ function Blocks(activity) {
      * @private
      * @returns {void}
      */
-    this._searchForExpandables = function (blk) {
+    this._searchForExpandables = (blk) => {
         let c;
         while (blk != null && this.blockList[blk] != null && !this.blockList[blk].isValueBlock()) {
             // More checks for malformed or corrupted block data.
@@ -2829,7 +2828,7 @@ function Blocks(activity) {
      * @private
      * @returns {void}
      */
-    this._expandTwoArgs = function () {
+    this._expandTwoArgs = () => {
         this._findTwoArgs();
         this._adjustExpandableTwoArgBlock(this._expandablesList);
         this.activity.refreshCanvas();
@@ -2840,7 +2839,7 @@ function Blocks(activity) {
      * @private
      * @returns {void}
      */
-    this._expandClamps = function () {
+    this._expandClamps = () => {
         this._findClamps();
         this.clampBlocksToCheck = [];
         for (let i = 0; i < this._expandablesList.length; i++) {
@@ -2865,7 +2864,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.changeDisabledStatus = function (name, flag) {
+    this.changeDisabledStatus = (name, flag) => {
         for (const blk in this.blockList) {
             const myBlock = this.blockList[blk];
             if (myBlock.name === name) {
@@ -2880,7 +2879,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.unhighlightAll = function () {
+    this.unhighlightAll = () => {
         for (const blk in this.blockList) {
             this.unhighlight(blk);
         }
@@ -2891,7 +2890,7 @@ function Blocks(activity) {
      * @public
      * return {void}
      */
-    this.unhighlight = function (blk) {
+    this.unhighlight = (blk) => {
         if (!this.visible) {
             return;
         }
@@ -2917,7 +2916,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.highlight = function (blk, unhighlight) {
+    this.highlight = (blk, unhighlight) => {
         if (!this.visible) {
             return;
         }
@@ -2936,7 +2935,7 @@ function Blocks(activity) {
      * @public
      * return {void}
      */
-    this.hide = function () {
+    this.hide = () => {
         for (const blk in this.blockList) {
             this.blockList[blk].hide();
         }
@@ -2948,7 +2947,7 @@ function Blocks(activity) {
      * @public
      * return {void}
      */
-    this.show = function () {
+    this.show = () => {
         for (const blk in this.blockList) {
             this.blockList[blk].show();
         }
@@ -2965,13 +2964,13 @@ function Blocks(activity) {
      * @private
      * @returns {void}
      */
-    this._makeNewBlockWithConnections = function (
+    this._makeNewBlockWithConnections = (
         name,
         blockOffset,
         connections,
         postProcess,
         postProcessArg
-    ) {
+    ) => {
         const myBlock = this.makeNewBlock(name, postProcess, postProcessArg);
         if (myBlock === null) {
             // eslint-disable-next-line no-console
@@ -2999,7 +2998,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.makeNewBlock = function (name, postProcess, postProcessArg) {
+    this.makeNewBlock = (name, postProcess, postProcessArg) => {
         // Create a new block
         // if (!name in this.protoBlockDict) {
         // Should never happen: nop blocks should be substituted
@@ -3075,10 +3074,10 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.makeBlock = function (name, arg) {
+    this.makeBlock = (name, arg) => {
         let postProcess;
         const that = this;
-        postProcess = function (args) {
+        postProcess = (args) => {
             const thisBlock = args[0];
             const value = args[1];
             that.blockList[thisBlock].value = value;
@@ -3128,14 +3127,14 @@ function Blocks(activity) {
         let postProcessArg = null;
         let thisBlock = this.blockList.length;
         if (name === "start") {
-            postProcess = function (thisBlock) {
+            postProcess = (thisBlock) => {
                 that.blockList[thisBlock].value = that.turtles.turtleList.length;
                 that.turtles.addTurtle(that.blockList[thisBlock]);
             };
 
             postProcessArg = thisBlock;
         } else if (name === "outputtools") {
-            postProcess = function (args) {
+            postProcess = (args) => {
                 that.blockList[thisBlock].value = null;
                 that.blockList[thisBlock].privateData = args[1];
             };
@@ -3169,7 +3168,7 @@ function Blocks(activity) {
         } else if (name === "noisename") {
             postProcessArg = [thisBlock, DEFAULTNOISE];
         } else if (name === "eastindiansolfege") {
-            postProcess = function (args) {
+            postProcess = (args) => {
                 const b = args[0];
                 const v = args[1];
                 that.blockList[b].value = v;
@@ -3179,7 +3178,7 @@ function Blocks(activity) {
 
             postProcessArg = [thisBlock, "sol"];
         } else if (name === "modename") {
-            postProcess = function (args) {
+            postProcess = (args) => {
                 const b = args[0];
                 const v = args[1];
                 that.blockList[b].value = v;
@@ -3200,7 +3199,7 @@ function Blocks(activity) {
 
             postProcessArg = [thisBlock, DEFAULTACCIDENTAL];
         } else if (name === "intervalname") {
-            postProcess = function (args) {
+            postProcess = (args) => {
                 const b = args[0];
                 const v = args[1];
                 that.blockList[b].value = v;
@@ -3215,7 +3214,7 @@ function Blocks(activity) {
         } else if (name === "invertmode") {
             postProcessArg = [thisBlock, DEFAULTINVERT];
         } else if (name === "number") {
-            postProcess = function (args) {
+            postProcess = (args) => {
                 const b = args[0];
                 const v = Number(args[1]);
                 that.blockList[b].value = v;
@@ -3229,7 +3228,7 @@ function Blocks(activity) {
                 that.activity.logo.initMediaDevices();
             };
         } else if (name === "media") {
-            postProcess = function (args) {
+            postProcess = (args) => {
                 const b = args[0];
                 const v = args[1];
                 that.blockList[b].value = v;
@@ -3242,7 +3241,7 @@ function Blocks(activity) {
 
             postProcessArg = [thisBlock, null];
         } else if (name === "camera") {
-            postProcess = function (args) {
+            postProcess = (args) => {
                 const b = args[0];
                 const v = args[1];
                 that.blockList[b].value = CAMERAVALUE;
@@ -3255,7 +3254,7 @@ function Blocks(activity) {
 
             postProcessArg = [thisBlock, null];
         } else if (name === "video") {
-            postProcess = function (args) {
+            postProcess = (args) => {
                 const b = args[0];
                 const v = args[1];
                 that.blockList[b].value = VIDEOVALUE;
@@ -3268,7 +3267,7 @@ function Blocks(activity) {
 
             postProcessArg = [thisBlock, null];
         } else if (name === "loadFile") {
-            postProcess = function (args) {
+            postProcess = (args) => {
                 that.updateBlockText(args[0]);
             };
 
@@ -3284,7 +3283,7 @@ function Blocks(activity) {
                 "namedarg"
             ].indexOf(name) !== -1
         ) {
-            postProcess = function (args) {
+            postProcess = (args) => {
                 that.blockList[thisBlock].value = null;
                 that.blockList[thisBlock].privateData = args[1];
             };
@@ -3292,7 +3291,7 @@ function Blocks(activity) {
             postProcessArg = [thisBlock, arg];
         } else if (name === "newnote") {
             // eslint-disable-next-line no-unused-vars
-            postProcess = function (args) {};
+            postProcess = (args) => { };
             postProcessArg = [thisBlock, null];
         } else {
             postProcess = null;
@@ -3325,7 +3324,7 @@ function Blocks(activity) {
                         break;
                     }
                 } else if (name === "storein2") {
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const c = that.blockList[thisBlock].connections[0];
                         if (args[1] === _("store in box")) {
                             that.blockList[c].privateData = _("box");
@@ -3391,7 +3390,7 @@ function Blocks(activity) {
                     // eslint-disable-next-line no-console
                     console.debug("cannot set default value");
                 } else if (typeof value === "string") {
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const b = args[0];
                         const v = args[1];
                         that.blockList[b].value = v;
@@ -3408,7 +3407,7 @@ function Blocks(activity) {
 
                     this.makeNewBlock("text", postProcess, [thisBlock, value]);
                 } else {
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const b = args[0];
                         const v = Number(args[1]);
                         that.blockList[b].value = v;
@@ -3418,7 +3417,7 @@ function Blocks(activity) {
                     this.makeNewBlock("number", postProcess, [thisBlock, value]);
                 }
             } else if (myBlock.docks[i + 1][2] === "textin") {
-                postProcess = function (args) {
+                postProcess = (args) => {
                     const b = args[0];
                     const v = args[1];
                     that.blockList[b].value = v;
@@ -3434,7 +3433,7 @@ function Blocks(activity) {
 
                 this.makeNewBlock("text", postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === "solfegein") {
-                postProcess = function (args) {
+                postProcess = (args) => {
                     const b = args[0];
                     const v = args[1];
                     that.blockList[b].value = v;
@@ -3444,7 +3443,7 @@ function Blocks(activity) {
 
                 this.makeNewBlock("solfege", postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === "notein") {
-                postProcess = function (args) {
+                postProcess = (args) => {
                     const b = args[0];
                     const v = args[1];
                     that.blockList[b].value = v;
@@ -3454,7 +3453,7 @@ function Blocks(activity) {
 
                 this.makeNewBlock("notename", postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === "mediain") {
-                postProcess = function (args) {
+                postProcess = (args) => {
                     const b = args[0];
                     const v = args[1];
                     that.blockList[b].value = v;
@@ -3465,12 +3464,12 @@ function Blocks(activity) {
 
                 this.makeNewBlock("media", postProcess, [thisBlock, value]);
             } else if (myBlock.docks[i + 1][2] === "filein") {
-                postProcess = function (blk) {
+                postProcess = (blk) => {
                     that.updateBlockText(blk);
                 };
                 this.makeNewBlock("loadFile", postProcess, thisBlock);
             } else {
-                postProcess = function (args) {
+                postProcess = (args) => {
                     const b = args[0];
                     const v = args[1];
                     that.blockList[b].value = v;
@@ -3500,7 +3499,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.findDragGroup = function (blk) {
+    this.findDragGroup = (blk) => {
         if (blk == null) {
             // eslint-disable-next-line no-console
             console.debug("null block passed to findDragGroup");
@@ -3518,7 +3517,7 @@ function Blocks(activity) {
      * @private
      * @returns {void}
      */
-    this._calculateDragGroup = function (blk) {
+    this._calculateDragGroup = (blk) => {
         this.dragLoopCounter += 1;
         if (this.dragLoopCount > this.blockList.length) {
             // eslint-disable-next-line no-console
@@ -3571,7 +3570,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.setActionProtoVisiblity = function (state) {
+    this.setActionProtoVisiblity = (state) => {
         // By default, the nameddo protoblock is hidden.
         const actionsPalette = this.activity.palettes.dict["action"];
         let stateChanged = false;
@@ -3599,7 +3598,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.findUniqueActionName = function (name, actionBlk) {
+    this.findUniqueActionName = (name, actionBlk) => {
         // If we have a stack named 'action', make the protoblock visible.
         if (name === _("action")) {
             this.setActionProtoVisiblity(true);
@@ -3637,7 +3636,7 @@ function Blocks(activity) {
      * @public
      * @returns value
      */
-    this.findUniqueCustomName = function (name) {
+    this.findUniqueCustomName = (name) => {
         const noteNames = [];
         for (let blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].name === "text" && !this.blockList[blk].trash) {
@@ -3663,7 +3662,7 @@ function Blocks(activity) {
      * @public
      * @returns value
      */
-    this.findUniqueTemperamentName = function (name) {
+    this.findUniqueTemperamentName = (name) => {
         const temperamentNames = [];
         for (let blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].name === "text" && !this.blockList[blk].trash) {
@@ -3692,7 +3691,7 @@ function Blocks(activity) {
      * @private
      * @returns {void}
      */
-    this._findDrumURLs = function () {
+    this._findDrumURLs = () => {
         for (let blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].name === "text" || this.blockList[blk].name === "string") {
                 const c = this.blockList[blk].connections[0];
@@ -3719,7 +3718,7 @@ function Blocks(activity) {
      * @public
      * return {void}
      */
-    this.renameBoxes = function (oldName, newName) {
+    this.renameBoxes = (oldName, newName) => {
         if (oldName === newName || oldName === _("box")) {
             return;
         }
@@ -3750,7 +3749,7 @@ function Blocks(activity) {
      * @public
      * return {void}
      */
-    this.renameStoreinBoxes = function (oldName, newName) {
+    this.renameStoreinBoxes = (oldName, newName) => {
         if (oldName === newName || oldName === _("box")) {
             return;
         }
@@ -3799,7 +3798,7 @@ function Blocks(activity) {
      * @public
      * return {void}
      */
-    this.renameStorein2Boxes = function (oldName, newName) {
+    this.renameStorein2Boxes = (oldName, newName) => {
         if (oldName === newName || oldName === _("box")) {
             return;
         }
@@ -3834,7 +3833,7 @@ function Blocks(activity) {
      * @public
      * return {void}
      */
-    this.renameNamedboxes = function (oldName, newName) {
+    this.renameNamedboxes = (oldName, newName) => {
         if (oldName === newName || oldName === _("box")) {
             return;
         }
@@ -3870,7 +3869,7 @@ function Blocks(activity) {
      * @public
      * return {void}
      */
-    this.renameDos = function (oldName, newName, skipBlock) {
+    this.renameDos = (oldName, newName, skipBlock) => {
         if (oldName === newName) {
             return;
         }
@@ -3930,7 +3929,7 @@ function Blocks(activity) {
      * @private
      * @returns 'do', 'doArg', 'calc', 'calcArg
      */
-    this.renameNameddos = function (oldName, newName) {
+    this.renameNameddos = (oldName, newName) => {
         if (oldName === newName) {
             return;
         }
@@ -3962,7 +3961,7 @@ function Blocks(activity) {
             const block = actionsPalette.protoList[blockId];
             if (
                 ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(block.name) !==
-                    -1 /** && block.defaults[0] !== _('action') */ &&
+                -1 /** && block.defaults[0] !== _('action') */ &&
                 block.defaults[0] === oldName
             ) {
                 block.defaults[0] = newName;
@@ -3986,7 +3985,7 @@ function Blocks(activity) {
      * Deprecated -- there is no need to add this block to the palette. The
      * short-from storein2 block covers all of the use cases.
      */
-    this.newStoreinBlock = function (name) {
+    this.newStoreinBlock = (name) => {
         if (name == null) {
             // eslint-disable-next-line no-console
             console.debug("null name passed to newStoreinBlock");
@@ -4026,7 +4025,7 @@ function Blocks(activity) {
      * @public
      * return {void}
      */
-    this.newStorein2Block = function (name) {
+    this.newStorein2Block = (name) => {
         if (name == null) {
             // eslint-disable-next-line no-console
             console.debug("null name passed to newStorein2Block");
@@ -4060,7 +4059,7 @@ function Blocks(activity) {
      * @public
      * return {void}
      */
-    this.newNamedboxBlock = function (name) {
+    this.newNamedboxBlock = (name) => {
         if (name == null) {
             // eslint-disable-next-line no-console
             console.debug("null name passed to newNamedboxBlock");
@@ -4093,7 +4092,7 @@ function Blocks(activity) {
      * @private
      * @returns {void}
      */
-    this._newLocalArgBlock = async function (name) {
+    this._newLocalArgBlock = async (name) => {
         // name === 1, 2, 3, ...
         const blkname = "arg_" + name;
         if ("myArg_" + blkname in this.protoBlockDict) {
@@ -4125,7 +4124,7 @@ function Blocks(activity) {
      * @private
      * @returns {void}
      */
-    this._removeNamedoEntries = function (name) {
+    this._removeNamedoEntries = (name) => {
         // Delete any old palette entries.
         // eslint-disable-next-line no-console
         // console.debug('DELETE: removing old palette entries for ' + name);
@@ -4154,7 +4153,7 @@ function Blocks(activity) {
      * @public
      * @returns boolean
      */
-    this.newNameddoBlock = function (name, hasReturn, hasArgs) {
+    this.newNameddoBlock = (name, hasReturn, hasArgs) => {
         if (name === _("action")) {
             // 'action' already has its associated palette entries.
             return false;
@@ -4187,7 +4186,7 @@ function Blocks(activity) {
      * @public
      * @returns boolean
      */
-    this.newNamedcalcBlock = function (name) {
+    this.newNamedcalcBlock = (name) => {
         if (this.protoBlockDict["myCalc_" + name] === undefined) {
             const myCalcBlock = new ProtoBlock("namedcalc");
             this.protoBlockDict["myCalc_" + name] = myCalcBlock;
@@ -4209,7 +4208,7 @@ function Blocks(activity) {
      * @public
      * return boolean
      */
-    this.newNameddoArgBlock = function (name) {
+    this.newNameddoArgBlock = (name) => {
         if (this.protoBlockDict["myDoArg_" + name] === undefined) {
             const myDoArgBlock = new ProtoBlock("nameddoArg");
             this.protoBlockDict["myDoArg_" + name] = myDoArgBlock;
@@ -4231,7 +4230,7 @@ function Blocks(activity) {
      * @public
      * return boolean
      */
-    this.newNamedcalcArgBlock = function (name) {
+    this.newNamedcalcArgBlock = (name) => {
         if (this.protoBlockDict["myCalcArg_" + name] === undefined) {
             const myCalcArgBlock = new ProtoBlock("namedcalcArg");
             this.protoBlockDict["myCalcArg_" + name] = myCalcArgBlock;
@@ -4247,7 +4246,7 @@ function Blocks(activity) {
         return false;
     };
 
-    this._insideArgClamp = function (blk) {
+    this._insideArgClamp = (blk) => {
         // Returns a containing arg clamp block or null
         if (this.blockList[blk] == null) {
             // race condition?
@@ -4273,7 +4272,7 @@ function Blocks(activity) {
      * @public
      * @returns list of clamp blocks
      */
-    this.findNestedClampBlocks = function (blk, clampList) {
+    this.findNestedClampBlocks = (blk, clampList) => {
         if (this.blockList[blk] == null) {
             // eslint-disable-next-line no-console
             console.debug("null block in blockList? " + blk);
@@ -4305,7 +4304,7 @@ function Blocks(activity) {
      * @public
      * @returns expandable block
      */
-    this.insideExpandableBlock = function (blk) {
+    this.insideExpandableBlock = (blk) => {
         if (this.blockList[blk] == null) {
             // race condition?
             // eslint-disable-next-line no-console
@@ -4339,7 +4338,7 @@ function Blocks(activity) {
      * @public
      * @returns note block
      */
-    this._insideNoteBlock = function (blk) {
+    this._insideNoteBlock = (blk) => {
         if (this.blockList[blk] == null) {
             // eslint-disable-next-line no-console
             console.debug("null block in blockList? " + blk);
@@ -4374,7 +4373,7 @@ function Blocks(activity) {
      * @public
      * @returns boolean
      */
-    this.findBlockInstance = function (blkName) {
+    this.findBlockInstance = (blkName) => {
         // Returns true if block of name blkName is loaded.
         for (let blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].name === blkName && !this.blockList[blk].trash) {
@@ -4391,7 +4390,7 @@ function Blocks(activity) {
      * @public
      * @returns null or collapsible block
      */
-    this.insideInlineCollapsibleBlock = function (blk) {
+    this.insideInlineCollapsibleBlock = (blk) => {
         if (blk === null) {
             return null;
         }
@@ -4420,7 +4419,7 @@ function Blocks(activity) {
      * @public
      * @returns note block
      */
-    this.findNoteBlock = function (blk) {
+    this.findNoteBlock = (blk) => {
         if (blk === null) {
             return null;
         }
@@ -4444,7 +4443,7 @@ function Blocks(activity) {
      * @public
      * @returns null or blk
      */
-    this.findNestedIntervalBlock = function (blk) {
+    this.findNestedIntervalBlock = (blk) => {
         if (blk === null) {
             return null;
         }
@@ -4468,7 +4467,7 @@ function Blocks(activity) {
      * @public
      * @returns null or blk
      */
-    this.findFirstPitchBlock = function (blk) {
+    this.findFirstPitchBlock = (blk) => {
         if (blk === null) {
             return null;
         }
@@ -4489,7 +4488,7 @@ function Blocks(activity) {
      * @public
      * @returns 4
      */
-    this.findPitchOctave = function (blk) {
+    this.findPitchOctave = (blk) => {
         if (blk === null) {
             return 4;
         }
@@ -4519,7 +4518,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.setPitchOctave = function (blk, octave) {
+    this.setPitchOctave = (blk, octave) => {
         if (blk === null) {
             return;
         }
@@ -4549,7 +4548,7 @@ function Blocks(activity) {
      * @public
      * @returns boolean
      */
-    this.intervalModifierNumber = function (blk) {
+    this.intervalModifierNumber = (blk) => {
         if (blk === null) {
             return false;
         }
@@ -4588,7 +4587,7 @@ function Blocks(activity) {
      * @public
      * @returns boolean
      */
-    this.octaveModifierNumber = function (blk) {
+    this.octaveModifierNumber = (blk) => {
         if (blk === null) {
             return false;
         }
@@ -4625,7 +4624,7 @@ function Blocks(activity) {
      * @public
      * @returns boolean
      */
-    this.noteValueNumber = function (blk, c) {
+    this.noteValueNumber = (blk, c) => {
         if (blk === null) {
             return false;
         }
@@ -4687,7 +4686,7 @@ function Blocks(activity) {
      * @public
      * @returns 1
      */
-    this.noteValueValue = function (blk) {
+    this.noteValueValue = (blk) => {
         if (blk === null) {
             return 1;
         }
@@ -4752,7 +4751,7 @@ function Blocks(activity) {
      * @public
      * @returns boolean
      */
-    this.octaveNumber = function (blk) {
+    this.octaveNumber = (blk) => {
         if (blk === null) {
             return false;
         }
@@ -4785,7 +4784,7 @@ function Blocks(activity) {
      * @public
      * @returns void
      */
-    this.meter_block_changed = function (blk) {
+    this.meter_block_changed = (blk) => {
         if (blk === null || this.blockList[blk].name !== "meter") {
             return;
         }
@@ -4853,7 +4852,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.prepareStackForCopy = function () {
+    this.prepareStackForCopy = () => {
         if (this.activeBlock == null) {
             this.errorMsg(_("There is no block selected."));
             // eslint-disable-next-line no-console
@@ -4876,7 +4875,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.triggerLongPress = function () {
+    this.triggerLongPress = () => {
         if (this.longPressTimeout != null) {
             clearTimeout(this.longPressTimeout);
             this.longPressTimeout = null;
@@ -4891,7 +4890,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.pasteStack = function () {
+    this.pasteStack = () => {
         if (this.selectedStack == null) {
             return;
         }
@@ -4917,7 +4916,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.saveStack = function () {
+    this.saveStack = () => {
         // eslint-disable-next-line no-console
         console.debug(this.selectedStack);
         if (this.selectedStack === null) {
@@ -4975,7 +4974,7 @@ function Blocks(activity) {
      * @public
      * @returns blockObj
      */
-    this._copyBlocksToObj = function (saveStack) {
+    this._copyBlocksToObj = (saveStack) => {
         // If saveStack then don't override media or audiofile blocks.
         const blockObjs = [];
         const blockMap = {};
@@ -5052,7 +5051,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.addToMyPalette = function (name) {
+    this.addToMyPalette = (name) => {
         const myBlock = new ProtoBlock("macro_" + name);
         const blkName = "macro_" + name;
         this.protoBlockDict[blkName] = myBlock;
@@ -5074,7 +5073,7 @@ function Blocks(activity) {
      * @public
      * @returns boolean
      */
-    this.findBlockInstance = function (blkName) {
+    this.findBlockInstance = (blkName) => {
         for (let blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].name === blkName && !this.blockList[blk].trash) {
                 return true;
@@ -5089,7 +5088,7 @@ function Blocks(activity) {
      * @public
      * return {void}
      */
-    this.loadNewBlocks = function (blockObjs) {
+    this.loadNewBlocks = (blockObjs) => {
         // Playback Queue has been deprecated, but some old projects
         // may still have playback blocks appended, which we will
         // remove.
@@ -5428,10 +5427,10 @@ function Blocks(activity) {
                             // eslint-disable-next-line no-console
                             console.debug(
                                 "last connection of " +
-                                    name +
-                                    " is " +
-                                    nextName +
-                                    ": adding hidden block"
+                                name +
+                                " is " +
+                                nextName +
+                                ": adding hidden block"
                             );
                             // If the next block is not a hidden block, add one.
                             blockObjs[b][4][len - 1] = blockObjsLength + extraBlocksLength;
@@ -5564,10 +5563,10 @@ function Blocks(activity) {
                             // eslint-disable-next-line no-console
                             console.debug(
                                 "last connection of " +
-                                    name +
-                                    " is " +
-                                    nextName +
-                                    ": adding hidden block"
+                                name +
+                                " is " +
+                                nextName +
+                                ": adding hidden block"
                             );
                             // If the next block is not a hidden block, add one.
                             blockObjs[b][4][2] = blockObjsLength + extraBlocksLength;
@@ -5682,7 +5681,7 @@ function Blocks(activity) {
                     );
                     break;
                 case "temperament1":
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const value = args[1];
                         let customName = "custom";
                         if (value.customName !== undefined) {
@@ -5711,7 +5710,7 @@ function Blocks(activity) {
                     break;
                 case "storein2":
                     // Named boxes and dos need private data.
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const thisBlock = args[0];
                         const value = args[1];
                         that.blockList[thisBlock].privateData = value;
@@ -5732,7 +5731,7 @@ function Blocks(activity) {
                     ]);
                     break;
                 case "namedbox":
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const thisBlock = args[0];
                         const value = args[1];
                         that.blockList[thisBlock].privateData = value;
@@ -5757,7 +5756,7 @@ function Blocks(activity) {
                 case "namedarg":
                 case "namedcalc":
                 case "nameddo":
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const thisBlock = args[0];
                         const value = args[1];
                         that.blockList[thisBlock].privateData = value;
@@ -5771,7 +5770,7 @@ function Blocks(activity) {
                     break;
                 case "doArg":
                     // Arg clamps may need extra slots added.
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const thisBlock = args[0];
                         const extraSlots = args[1].length - 4;
                         if (extraSlots > 0) {
@@ -5803,7 +5802,7 @@ function Blocks(activity) {
                     );
                     break;
                 case "nameddoArg":
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const thisBlock = args[0];
                         const value = args[1];
                         that.blockList[thisBlock].privateData = value;
@@ -5838,7 +5837,7 @@ function Blocks(activity) {
                     );
                     break;
                 case "calcArg":
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const thisBlock = args[0];
                         const extraSlots = args[1].length - 3;
                         if (extraSlots > 0) {
@@ -5870,7 +5869,7 @@ function Blocks(activity) {
                     );
                     break;
                 case "namedcalcArg":
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const thisBlock = args[0];
                         const value = args[1];
                         that.blockList[thisBlock].privateData = value;
@@ -5905,7 +5904,7 @@ function Blocks(activity) {
                     );
                     break;
                 case "makeblock":
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const thisBlock = args[0];
                         const extraSlots = args[1].length - 3;
                         if (extraSlots > 0) {
@@ -5937,7 +5936,7 @@ function Blocks(activity) {
                     break;
                 // Value blocks need a default value set.
                 case "number":
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const thisBlock = args[0];
                         const value = args[1];
                         that.blockList[thisBlock].value = Number(value);
@@ -5950,7 +5949,7 @@ function Blocks(activity) {
                     ]);
                     break;
                 case "outputtools":
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const thisBlock = args[0];
                         const value = args[1];
                         that.blockList[thisBlock].privateData = value;
@@ -5980,7 +5979,7 @@ function Blocks(activity) {
                 case "intervalname":
                 case "grid":
                 case "boolean":
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const thisBlock = args[0];
                         const value = args[1];
                         that.blockList[thisBlock].value = value;
@@ -5993,7 +5992,7 @@ function Blocks(activity) {
                     ]);
                     break;
                 case "drumname":
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const thisBlock = args[0];
                         const value = args[1];
                         that.blockList[thisBlock].value = value;
@@ -6012,7 +6011,7 @@ function Blocks(activity) {
                     }
                     break;
                 case "effectsname":
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const thisBlock = args[0];
                         const value = args[1];
                         that.blockList[thisBlock].value = value;
@@ -6031,7 +6030,7 @@ function Blocks(activity) {
                     }
                     break;
                 case "voicename":
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const thisBlock = args[0];
                         let value = args[1];
                         if (
@@ -6063,7 +6062,7 @@ function Blocks(activity) {
                     }
                     break;
                 case "noisename":
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const thisBlock = args[0];
                         const value = args[1];
                         that.blockList[thisBlock].value = value;
@@ -6095,7 +6094,7 @@ function Blocks(activity) {
                     break;
                 case "media":
                     // Load a thumbnail into a media blocks.
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const thisBlock = args[0];
                         const value = args[1];
                         that.blockList[thisBlock].value = value;
@@ -6111,7 +6110,7 @@ function Blocks(activity) {
                     ]);
                     break;
                 case "camera":
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const thisBlock = args[0];
                         // const value = args[1];
                         that.blockList[thisBlock].value = CAMERAVALUE;
@@ -6123,7 +6122,7 @@ function Blocks(activity) {
                     ]);
                     break;
                 case "video":
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         const thisBlock = args[0];
                         // const value = args[1];
                         that.blockList[thisBlock].value = VIDEOVALUE;
@@ -6139,7 +6138,7 @@ function Blocks(activity) {
                 // backward compatibility with Python projects.
                 case "red":
                 case "black":
-                    postProcess = function (thisBlock) {
+                    postProcess = (thisBlock) => {
                         that.blockList[thisBlock].value = 0;
                         that.updateBlockText(thisBlock);
                     };
@@ -6153,7 +6152,7 @@ function Blocks(activity) {
                     );
                     break;
                 case "white":
-                    postProcess = function (thisBlock) {
+                    postProcess = (thisBlock) => {
                         that.blockList[thisBlock].value = 100;
                         that.updateBlockText(thisBlock);
                     };
@@ -6167,7 +6166,7 @@ function Blocks(activity) {
                     );
                     break;
                 case "orange":
-                    postProcess = function (thisBlock) {
+                    postProcess = (thisBlock) => {
                         that.blockList[thisBlock].value = 10;
                         that.updateBlockText(thisBlock);
                     };
@@ -6181,7 +6180,7 @@ function Blocks(activity) {
                     );
                     break;
                 case "yellow":
-                    postProcess = function (thisBlock) {
+                    postProcess = (thisBlock) => {
                         that.blockList[thisBlock].value = 20;
                         that.updateBlockText(thisBlock);
                     };
@@ -6195,7 +6194,7 @@ function Blocks(activity) {
                     );
                     break;
                 case "green":
-                    postProcess = function (thisBlock) {
+                    postProcess = (thisBlock) => {
                         that.blockList[thisBlock].value = 40;
                         that.updateBlockText(thisBlock);
                     };
@@ -6209,7 +6208,7 @@ function Blocks(activity) {
                     );
                     break;
                 case "blue":
-                    postProcess = function (thisBlock) {
+                    postProcess = (thisBlock) => {
                         that.blockList[thisBlock].value = 70;
                         that.updateBlockText(thisBlock);
                     };
@@ -6223,7 +6222,7 @@ function Blocks(activity) {
                     );
                     break;
                 case "loadFile":
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         that.blockList[args[0]].value = args[1];
                         that.updateBlockText(args[0]);
                     };
@@ -6234,7 +6233,7 @@ function Blocks(activity) {
                     ]);
                     break;
                 case "audiofile":
-                    postProcess = function (args) {
+                    postProcess = (args) => {
                         that.blockList[args[0]].value = args[1];
                         that.updateBlockText(args[0]);
                     };
@@ -6247,7 +6246,7 @@ function Blocks(activity) {
                 default:
                     // Check that name is in the proto list
                     if (!(name in this.protoBlockDict) || this.protoBlockDict[name] == null) {
-                        const postProcessUnknownBlock = function (args) {
+                        const postProcessUnknownBlock = (args) => {
                             // save original block name
                             that.blockList[args[0]].privateData = args[1];
                         };
@@ -6297,7 +6296,7 @@ function Blocks(activity) {
                                         if (this.protoBlockDict[blockObjs[c][1][0]] !== undefined) {
                                             if (
                                                 this.protoBlockDict[blockObjs[c][1][0]].dockTypes[
-                                                    cc
+                                                cc
                                                 ] !== "out"
                                             ) {
                                                 flowBlock = false;
@@ -6389,7 +6388,7 @@ function Blocks(activity) {
      * @returns {void}
      */
     // eslint-disable-next-line no-unused-vars
-    this.cleanupAfterLoad = async function (name) {
+    this.cleanupAfterLoad = async (name) => {
         this._loadCounter -= 1;
         if (this._loadCounter > 0) {
             return;
@@ -6474,7 +6473,7 @@ function Blocks(activity) {
      * @private
      * @returns {void}
      */
-    this._cleanupStacks = function () {
+    this._cleanupStacks = () => {
         // Sort the blocks from inside to outside.
         let blocksToCheck = [];
         for (let b = 0; b < this._checkArgClampBlocks.length; b++) {
@@ -6518,7 +6517,7 @@ function Blocks(activity) {
      * @public
      * @returns boolean
      */
-    this.actionHasReturn = function (blk) {
+    this.actionHasReturn = (blk) => {
         if (this.blockList[blk].name !== "action") {
             return false;
         }
@@ -6537,7 +6536,7 @@ function Blocks(activity) {
      * @public
      * @returns boolean
      */
-    this.actionHasArgs = function (blk) {
+    this.actionHasArgs = (blk) => {
         if (this.blockList[blk].name !== "action") {
             return false;
         }
@@ -6559,7 +6558,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.raiseStackToTop = function (blk) {
+    this.raiseStackToTop = (blk) => {
         const topBlk = this.findTopBlock(blk);
         this.findDragGroup(topBlk);
 
@@ -6581,7 +6580,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.deleteActionBlock = async function (myBlock) {
+    this.deleteActionBlock = async (myBlock) => {
         const actionArg = this.blockList[myBlock.connections[1]];
         if (actionArg) {
             const actionName = actionArg.value;
@@ -6678,7 +6677,7 @@ function Blocks(activity) {
      * @public
      * @returns {void}
      */
-    this.sendStackToTrash = function (myBlock) {
+    this.sendStackToTrash = (myBlock) => {
         // First, hide the palettes as they may need updating.
         for (const name in this.activity.palettes.dict) {
             this.activity.palettes.dict[name].hideMenu(true);
@@ -6782,7 +6781,7 @@ function Blocks(activity) {
      *
      * @returnss {void}
      */
-    this.clearParameterBlocks = function () {
+    this.clearParameterBlocks = () => {
         for (let blk = 0; blk < this.blockList.length; blk++) {
             if (this.blockList[blk].protoblock.parameter && this.blockList[blk].text !== null) {
                 // The audiofile block label is handled in block.js
@@ -6804,7 +6803,7 @@ function Blocks(activity) {
      * @param blk
      * @returnss {void}
      */
-    this.updateParameterBlock = function (logo, turtle, blk) {
+    this.updateParameterBlock = (logo, turtle, blk) => {
         const name = this.blockList[blk].name;
 
         if (this.blockList[blk].protoblock.parameter && this.blockList[blk].text !== null) {
@@ -6846,7 +6845,7 @@ function Blocks(activity) {
      * @param turtle
      * @returnss {void}
      */
-    this.blockSetter = function (logo, blk, value, turtle) {
+    this.blockSetter = (logo, blk, value, turtle) => {
         if (typeof this.blockList[blk].protoblock.setter === "function") {
             this.blockList[blk].protoblock.setter(logo, value, turtle, blk);
         } else {
@@ -6863,7 +6862,7 @@ function Blocks(activity) {
      *
      * @returnss {void}
      */
-    this.hideBlocks = function () {
+    this.hideBlocks = () => {
         this.activity.palettes.hide();
         this.hide();
         this.activity.refreshCanvas();
@@ -6874,7 +6873,7 @@ function Blocks(activity) {
      *
      * @returns {void}
      */
-    this.showBlocks = function () {
+    this.showBlocks = () => {
         this.activity.palettes.show();
         this.show();
         this.bringToTop();
