@@ -881,9 +881,9 @@ function Blocks(activity) {
 
             // Find the dock position in the connected block.
             let foundMatch = false;
-            let b;
-            for (let b = 0; b < this.blockList[cblk].connections.length; b++) {
-                if (this.blockList[cblk].connections[b] === blk) {
+            let matchingBlock;
+            for (matchingBlock = 0; matchingBlock < this.blockList[cblk].connections.length; matchingBlock++) {
+                if (this.blockList[cblk].connections[matchingBlock] === blk) {
                     foundMatch = true;
                     break;
                 }
@@ -910,7 +910,7 @@ function Blocks(activity) {
                 break;
             }
 
-            const cdock = this.blockList[cblk].docks[b];
+            const cdock = this.blockList[cblk].docks[matchingBlock];
             let dx;
             let dy;
             let nx;
