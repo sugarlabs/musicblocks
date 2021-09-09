@@ -769,6 +769,7 @@ function setupEnsembleBlocks(activity) {
             super("setturtlecolor", _("set mouse color"));
             this.setPalette("ensemble", activity);
             this.beginnerBlock(true);
+            this.piemenuValuesC1 = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90];
 
             this.setHelpString([
                 _("The Set-mouse-color block is used to set the color of a mouse."),
@@ -790,22 +791,18 @@ function setupEnsembleBlocks(activity) {
                 return;
             }
 
-            let i;
+            let fillColor;
+            let strokeColor;
             if (typeof args[0] === "number") {
-                i = args[0];
-                // We need to force i to be between 0 and 99.
-                if (i < 0) {
-                    i = 0;
-                } else if (i > 99) {
-                    i = 99;
-                }
-                i = Math.floor(i / 10);
+                fillColor = getMunsellColor(args[0], 50, 100);
+                strokeColor = getMunsellColor(args[0], 70, 80);
             } else {
-                i = 0;
+                fillColor = getMunsellColor(0, 50, 100);
+                strokeColor = getMunsellColor(0, 70, 80);
             }
             let artwork = TURTLESVG
-                .replace(/fill_color/g, FILLCOLORS[i])
-                .replace(/stroke_color/g, STROKECOLORS[i]);
+                .replace(/fill_color/g, fillColor)
+                .replace(/stroke_color/g, strokeColor);
 
             activity.turtles.turtleList[turtle].doTurtleShell(55, "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(artwork))));
         }

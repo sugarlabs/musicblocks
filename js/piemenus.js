@@ -1904,7 +1904,7 @@ const piemenuColor = function (block, wheelValues, selectedValue, mode) {
     block._numberWheel.keynavigateEnabled = false;
 
     block._numberWheel.colors = [];
-    if (mode === "setcolor") {
+    if (mode === "setcolor" || mode === "setturtlecolor") {
         for (let i = 0; i < wheelValues.length; i++) {
             block._numberWheel.colors.push(COLORS40[Math.floor(wheelValues[i] / 2.5)][2]);
         }

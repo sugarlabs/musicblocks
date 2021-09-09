@@ -3552,6 +3552,7 @@ class Block {
                 );
             } else if (this._usePieNumberC1()) {
                 switch (this.blocks.blockList[this.connections[0]].name) {
+                    case "setturtlecolor":
                     case "setcolor":
                     case "sethue":
                     case "setshade":
