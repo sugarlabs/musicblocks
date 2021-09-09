@@ -766,12 +766,12 @@ function setupEnsembleBlocks(activity) {
 
     class SetTurtleColorBlock extends FlowBlock {
         constructor() {
-            super("setturtlecolor", _("set color"));
+            super("setturtlecolor", _("set mouse color"));
             this.setPalette("ensemble", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Set-color block is used to set the color of a mouse."),
+                _("The Set-mouse-color block is used to set the color of a mouse."),
                 "documentation",
                 null,
                 "clickhelp"
