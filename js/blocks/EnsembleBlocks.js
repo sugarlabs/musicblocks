@@ -13,7 +13,8 @@
    global
 
    _, last, FlowBlock, ValueBlock, FlowClampBlock, LeftBlock, BooleanBlock,
-   NOINPUTERRORMSG, NANERRORMSG, INVALIDPITCH, getNote, pitchToNumber
+   NOINPUTERRORMSG, NANERRORMSG, INVALIDPITCH, getNote, pitchToNumber,
+   TURTLESVG, FILLCOLORS, STROKECOLORS
 */
 
 /* exported setupEnsembleBlocks, getTargetTurtle */
@@ -763,6 +764,54 @@ function setupEnsembleBlocks(activity) {
         }
     }
 
+    class SetTurtleColorBlock extends FlowBlock {
+        constructor() {
+            super("setturtlecolor", _("set color"));
+            this.setPalette("ensemble", activity);
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _("The Set-color block is used to set the color of a mouse."),
+                "documentation",
+                null,
+                "clickhelp"
+            ]);
+
+            this.formBlock({
+                args: 1,
+                argTypes: ["anyin"],
+                defaults: [0]
+            });
+        }
+
+        flow(args, logo, turtle, blk) {
+            if (args[0] === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return;
+            }
+
+            let i;
+            if (typeof args[0] === "number") {
+                i = args[0];
+                // We need to force i to be between 0 and 99.
+                if (i < 0) {
+                    i = 0;
+                } else if (i > 99) {
+                    i = 99;
+                }
+                i = Math.floor(i / 10);
+            } else {
+                i = 0;
+            }
+            let artwork = TURTLESVG
+                .replace(/fill_color/g, FILLCOLORS[i])
+                .replace(/stroke_color/g, STROKECOLORS[i]);
+
+            activity.turtles.turtleList[turtle].doTurtleShell(55, "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(artwork))));
+        }
+    }
+
+
     class TurtleNameBlock extends ValueBlock {
         constructor() {
             super("turtlename", _("mouse name"));
@@ -955,6 +1004,7 @@ function setupEnsembleBlocks(activity) {
     new FoundTurtleBlock().setup(activity);
     new NewTurtleBlock().setup(activity);
     new TurtleNameBlock().setup(activity);
+    new SetTurtleColorBlock().setup(activity);
     new SetTurtleNameBlock().setup(activity);
     new SetTurtleName2Block().setup(activity);
 }
