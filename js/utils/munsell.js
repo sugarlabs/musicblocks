@@ -6797,7 +6797,7 @@ function getcolor(color) {
 
     const v = Math.floor(COLORS40[h1][0] * p + COLORS40[h2][0] * (1 - p));
     const c = Math.floor(COLORS40[h1][1] * p + COLORS40[h2][1] * (1 - p));
-    return [v * 10, (c * 100) / 14, interpColor(COLORS40[h1][2], COLORS40[h2][2], p)];
+    return [v * 10, c * 100 / 28, interpColor(COLORS40[h1][2], COLORS40[h2][2], p)];
 }
 
 /**
