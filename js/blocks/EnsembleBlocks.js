@@ -791,6 +791,11 @@ function setupEnsembleBlocks(activity) {
                 return;
             }
 
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
+            const heading = tur.orientation;
+            // Heading needs to be set to 0 when we update the graphic.
+            tur.painter.doSetHeading(0);
+
             let fillColor;
             let strokeColor;
             if (typeof args[0] === "number") {
@@ -804,7 +809,10 @@ function setupEnsembleBlocks(activity) {
                 .replace(/fill_color/g, fillColor)
                 .replace(/stroke_color/g, strokeColor);
 
-            activity.turtles.turtleList[turtle].doTurtleShell(55, "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(artwork))));
+            tur.doTurtleShell(55, "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(artwork))));
+
+            // Restore the heading.
+            tur.painter.doSetHeading(heading);
         }
     }
 
