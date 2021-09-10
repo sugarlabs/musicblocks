@@ -12,6 +12,12 @@
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.0.1\n"
 
+msgid "set mouse color"
+msgstr "ネズミ色を設定"
+
+msgid "The Set-mouse-color block is used to set the color of a mouse."
+msgstr "「ネズミ色を設定」ブロックは ネズミの色を選ぶことに使います。"
+
 #: js/block.js:1414
 #: js/block.js:4018
 #: js/block.js:4036
