@@ -9,6 +9,12 @@
 "Language: es\n"
 "X-Generator: Poedit 1.7.4\n"
 
+msgid "set mouse color"
+msgstr "fijar color del ratón"
+
+msgid "The Set-mouse-color block is used to set the color of a mouse."
+msgstr "El bloque fijar color del ratón se usa para fijar el color de un ratón."
+
 #: js/block.js:1414
 #: js/block.js:4018
 #: js/block.js:4036
