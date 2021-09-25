@@ -794,7 +794,9 @@ function setupEnsembleBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
             const heading = tur.orientation;
             // Heading needs to be set to 0 when we update the graphic.
-            tur.painter.doSetHeading(0);
+	    if (heading != 0) {
+                 tur.painter.doSetHeading(0);
+            }
 
             let fillColor;
             let strokeColor;
@@ -812,7 +814,9 @@ function setupEnsembleBlocks(activity) {
             tur.doTurtleShell(55, "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(artwork))));
 
             // Restore the heading.
-            tur.painter.doSetHeading(heading);
+	    if (heading != 0) {
+                tur.painter.doSetHeading(heading);
+            }
         }
     }
 

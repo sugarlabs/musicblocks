@@ -957,6 +957,7 @@ const MUSICALMODES = {
     "in": [1, 4, 2, 1, 4],
     "minyo": [3, 2, 2, 3, 2],
     "fibonacci": [1, 1, 2, 3, 5],
+    "alt pentatonic": [2, 3, 2, 2, 3],
 
     // User definition overrides this constant
     "custom": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]

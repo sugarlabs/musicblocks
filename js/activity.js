@@ -3582,6 +3582,11 @@ function Activity() {
                         };
                         this.hasMatrixDataBlock = true;
                         break;
+                    case "wrapmode":
+                        args = {
+                            value: myBlock.value
+                        };
+                        break;
                     default:
                         break;
                 }

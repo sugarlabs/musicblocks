@@ -6232,6 +6232,17 @@ function Blocks(activity) {
                         value
                     ]);
                     break;
+                case "wrapmode":
+                    postProcess = (args) => {
+                        that.blockList[args[0]].value = args[1];
+                        that.updateBlockText(args[0]);
+                    };
+
+                    this._makeNewBlockWithConnections(name, blockOffset, blkData[4], postProcess, [
+                        thisBlock,
+                        value
+                    ]);
+                    break;
                 case "audiofile":
                     postProcess = (args) => {
                         that.blockList[args[0]].value = args[1];
