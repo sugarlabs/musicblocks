@@ -393,6 +393,10 @@
 | --- | --- |
 | spiralaterals.html | Interacive game: Match the pattern of intervals as the mouse creates patterns |
 
+| Example | Description |
+| --- | --- |
+| snoopy-invaders.html | Interactive game: Charlie Brown throws a ball to the invading Snoopys, each of whom plays a different drum sound when they catch the ball. |
+
 # Misc.
 
 | Example | Description |
