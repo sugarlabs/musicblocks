@@ -2141,7 +2141,7 @@ class PhraseMaker {
                 drumIndex = getDrumIndex(this.rowLabels[i]);
                 sortableList.push([
                     // -drumIndex,
-                    -1000 * i,
+                    -1 * i,
                     this.rowLabels[i],
                     this.rowArgs[i],
                     i,
