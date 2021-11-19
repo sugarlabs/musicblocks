@@ -6466,12 +6466,14 @@ function Blocks(activity) {
             }
         }
 
+	/*
         if (updatePalettes) {
             // Do this update on a slight delay so as not to collide with
             // the actions update.
             await delayExecution(150);
             this.activity.palettes.updatePalettes("boxes");
         }
+        */
 
         document.body.style.cursor = "default";
         document.getElementById("load-container").style.display = "none";
