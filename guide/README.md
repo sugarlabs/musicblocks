@@ -1323,6 +1323,13 @@ we will reference each mouse by its name.
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtlenameonly_block.svg
  "mouse name")
 
+Use the *Mouse count* block in combination with the *Nth mouse name*
+block to iterate through all of the mice.
+
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtleiteration.svg
+ "mouse iteration")
+
 The *Mouse sync* block aligns the beat count between mice.
 
 ![alt
