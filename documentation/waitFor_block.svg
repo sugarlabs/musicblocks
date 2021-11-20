@@ -48,7 +48,7 @@
        transform="scale(1.5)">
       <path
          id="path1940"
-         style="fill:#ff664b;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         style="fill:#AABB00;fill-opacity:1;stroke:#748400;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
          d="m 0.5,10.5 a 7,7 90 0 1 7,-7 h 1 v -1 -2 h 114.5957 v 16 4 H 8.5 v -2 -1 h -1 a 7,7 90 0 1 -7,-7 z" />
       <text
          id="text1944"
