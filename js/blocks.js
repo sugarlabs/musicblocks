@@ -187,19 +187,19 @@ function Blocks(activity) {
 
         let palette;
         // Regenerate all of the artwork at the new scale.
-        for (let blk = 0; blk < this.blockList.length; blk++) {
-            this.blockList[blk].resize(scale);
+        for (blk in this.blockList) {
+            blk.resize(scale);
         }
 
         this.findStacks();
-        for (let stack = 0; stack < this.stackList.length; stack++) {
-            this.adjustDocks(this.stackList[stack], true);
+        for (stack in this.stackList) {
+            this.adjustDocks(stack, true);
         }
 
         // Make sure trash is still hidden.
-        for (let blk = 0; blk < this.blockList.length; blk++) {
-            if (this.blockList[blk].trash) {
-                this.blockList[blk].hide();
+        for (blk in this.blockList.length) {
+            if (blk.trash) {
+                blk.hide();
             }
         }
 
