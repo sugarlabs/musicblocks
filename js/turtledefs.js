@@ -316,7 +316,7 @@ function createHelpContent(activity) {
                     " " +
                     _("Let us start our tour!"),
                 "data:image/svg+xml;base64," +
-                    window.btoa(unescape(encodeURIComponent(LOGODEFAULT)))
+                    window.btoa(unescape(encodeURIComponent(MOUSEPALETTEICON)))
             ],
             [
                 _("Play"),
@@ -532,7 +532,7 @@ function createHelpContent(activity) {
                     " " +
                     _("Let us start our tour!"),
                 "data:image/svg+xml;base64," +
-                    window.btoa(unescape(encodeURIComponent(LOGODEFAULT)))
+                    window.btoa(unescape(encodeURIComponent(MOUSEPALETTEICON)))
             ],
             [
                 _("Run fast"),
