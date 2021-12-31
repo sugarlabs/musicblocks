@@ -18,7 +18,7 @@
    instrumentsEffects, Singer, Tone, p5, CAMERAVALUE, doUseCamera,
    VIDEOVALUE, last, getIntervalDirection, getIntervalNumber,
    mixedNumber, rationalToFraction, doStopVideoCam, StatusMatrix,
-   getStatsFromNotation, delayExecution, _THIS_IS_MUSIC_BLOCKS_
+   getStatsFromNotation, delayExecution
 */
 
 /*
@@ -213,11 +213,9 @@ class Logo {
         this.customTemperamentDefined = false;
         this.specialArgs = [];
 
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            // Load the default synthesizer
-            this.synth = new Synth();
-            this.synth.changeInTemperament = false;
-        }
+        // Load the default synthesizer
+        this.synth = new Synth();
+        this.synth.changeInTemperament = false;
 
         // Mode widget
         this.modeBlock = null;
@@ -400,32 +398,17 @@ class Logo {
      * @returns {void}
      */
     initMediaDevices() {
-        // console.debug("INIT MICROPHONE");
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            let mic = new Tone.UserMedia();
-            try {
-                mic.open();
-            } catch (e) {
-                // console.debug("MIC NOT FOUND");
-                // console.debug(e.name + ": " + e.message);
-
-                // console.debug(mic);
-                this.activity.errorMsg(NOMICERRORMSG);
-                mic = null;
-            }
-
-            this.mic = mic;
-            this.limit = 16384;
-        } else {
-            try {
-                this.mic = new p5.AudioIn();
-                this.mic.start();
-            } catch (e) {
-                // console.debug(e);
-                this.activity.errorMsg(NOMICERRORMSG);
-                this.mic = null;
-            }
+        let mic = new Tone.UserMedia();
+        try {
+            mic.open();
+        } catch (e) {
+            // console.debug(e.name + ": " + e.message);
+            this.activity.errorMsg(NOMICERRORMSG);
+            mic = null;
         }
+
+        this.mic = mic;
+        this.limit = 16384;
     }
 
     /**
@@ -926,23 +909,21 @@ class Logo {
 
         this.sounds = [];
 
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            for (const turtle in this.activity.turtles.turtleList) {
-                for (const instrumentName in instruments[turtle]) {
-                    this.synth.stopSound(turtle, instrumentName);
-                }
-                const comp = this.activity.turtles.turtleList[turtle].companionTurtle;
-                if (comp) {
-                    this.activity.turtles.turtleList[comp].running = false;
-                    const interval = this.activity.turtles.turtleList[comp].interval;
-                    if (interval) clearInterval(interval);
-                }
+        for (const turtle in this.activity.turtles.turtleList) {
+            for (const instrumentName in instruments[turtle]) {
+                this.synth.stopSound(turtle, instrumentName);
             }
-
-            this.synth.stop();
-            if (this.synth.recorder && this.synth.recorder.state == "recording")
-                this.synth.recorder.stop();
+            const comp = this.activity.turtles.turtleList[turtle].companionTurtle;
+            if (comp) {
+                this.activity.turtles.turtleList[comp].running = false;
+                const interval = this.activity.turtles.turtleList[comp].interval;
+                if (interval) clearInterval(interval);
+            }
         }
+
+        this.synth.stop();
+        if (this.synth.recorder && this.synth.recorder.state == "recording")
+            this.synth.recorder.stop();
 
         if (this.cameraID != null) {
             doStopVideoCam(this.cameraID, this.setCameraID);
@@ -1042,9 +1023,7 @@ class Logo {
         Singer.masterBPM = TARGETBPM;
         Singer.defaultBPMFactor = TONEBPM / TARGETBPM;
         Singer.masterVolume = [DEFAULTVOLUME];
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            this.synth.changeInTemperament = false;
-        }
+        this.synth.changeInTemperament = false;
 
         this._checkingCompletionState = false;
 
@@ -1052,9 +1031,7 @@ class Logo {
             turtle.embeddedGraphicsFinished = true;
         }
 
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            this.prepSynths();
-        }
+        this.prepSynths();
 
         this.notation.notationStaging = {};
         this.notation.notationDrumStaging = {};

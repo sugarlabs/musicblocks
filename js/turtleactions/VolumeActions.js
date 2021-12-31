@@ -18,7 +18,7 @@
 
 /*
    global _, Singer, MusicBlocks, Mouse, last, VOICENAMES, DRUMNAMES,
-   _THIS_IS_MUSIC_BLOCKS_, Tone, instruments, DEFAULTVOLUME
+   Tone, instruments, DEFAULTVOLUME
 */
 
 /*
@@ -27,8 +27,6 @@
         _, last
     js/turtle-singer.js
         Singer
-    js/activity.js
-        _THIS_IS_MUSIC_BLOCKS_
     js/js-export/interface.js
         instruments
     js/utils/synthutils.js
@@ -199,10 +197,8 @@ function setupVolumeActions(activity) {
                 tur.singer.panner.pan.value = value;
             }
 
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                for (const synth in instruments[turtle]) {
-                    instruments[turtle][synth].connect(tur.singer.panner);
-                }
+            for (const synth in instruments[turtle]) {
+                instruments[turtle][synth].connect(tur.singer.panner);
             }
         }
 

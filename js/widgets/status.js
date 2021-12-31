@@ -13,6 +13,8 @@
 // This widget makes displays the status of selected parameters and
 // notes as they are being played.
 
+/* global _, _THIS_IS_TURTLE_BLOCKS_ */
+
 /* exported StatusMatrix */
 class StatusMatrix {
     static BUTTONDIVWIDTH = 128;
@@ -74,7 +76,7 @@ class StatusMatrix {
             cell = row.insertCell();
             cell.style.backgroundColor = "#FFFFFF";
 
-            if (_THIS_IS_MUSIC_BLOCKS_) {
+            if (!_THIS_IS_TURTLE_BLOCKS_) {
                 cell.innerHTML =
                     '&nbsp;&nbsp;<img src="images/mouse.svg" title="' +
                     turtle.name +
@@ -180,7 +182,7 @@ class StatusMatrix {
             });
         }
 
-        if (_THIS_IS_MUSIC_BLOCKS_) {
+        if (!_THIS_IS_TURTLE_BLOCKS_) {
             const row = header.insertRow();
             cell = row.insertCell();
             cell.style.fontSize =
@@ -315,7 +317,7 @@ class StatusMatrix {
 
             let obj;
             let note;
-            if (_THIS_IS_MUSIC_BLOCKS_) {
+            if (!_THIS_IS_TURTLE_BLOCKS_) {
                 note = "";
                 value = "";
                 if (tur.singer.noteStatus != null) {

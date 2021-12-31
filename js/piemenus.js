@@ -20,7 +20,7 @@
    getMunsellColor, COLORS40, frequencyToPitch, instruments,
    DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
    FIXEDSOLFEGE, NOTENAMES, FIXEDSOLFEGE, NOTENAMES, numberToPitch,
-   nthDegreeToPitch, SOLFEGENAMES, buildScale
+   nthDegreeToPitch, SOLFEGENAMES, buildScale, _THIS_IS_TURTLE_BLOCKS_
 */
 
 /*
@@ -3284,33 +3284,53 @@ const piemenuGrid = function (activity) {
         "px";
     docById("wheelDivptm").style.display = "";
 
-    const grids = [
-        "imgsrc: images/grid/blank.svg",
-        "imgsrc: images/grid/Cartesian.svg",
-        "imgsrc: images/grid/Cartesian polar.svg",
-        "imgsrc: images/grid/Polar.svg",
-        "imgsrc: images/grid/Treble.svg",
-        "imgsrc: images/grid/Grand.svg",
-        "imgsrc: images/grid/Mezzo-soprano.svg",
-        "imgsrc: images/grid/Alto.svg",
-        "imgsrc: images/grid/Tenor.svg",
-        "imgsrc: images/grid/Bass.svg",
-        ""
-    ];
+    let grids, gridLabels;
+    if (_THIS_IS_TURTLE_BLOCKS_) {
+	grids = [
+            "imgsrc: images/grid/blank.svg",
+            "imgsrc: images/grid/Cartesian.svg",
+            "imgsrc: images/grid/Cartesian polar.svg",
+            "imgsrc: images/grid/Polar.svg",
+            ""
+	];
 
-    const gridLabels = [
-        "Blank",
-        "Cartesian",
-        "Cartesian Polar",
-        "Polar",
-        "Treble",
-        "Grand",
-        "Mezzo Soprano",
-        "Alto",
-        "Tenor",
-        "Bass",
-        "Blank"
-    ];
+	gridLabels = [
+            "Blank",
+            "Cartesian",
+            "Cartesian Polar",
+            "Polar",
+            "Blank"
+	];
+    } else {
+	grids = [
+            "imgsrc: images/grid/blank.svg",
+            "imgsrc: images/grid/Cartesian.svg",
+            "imgsrc: images/grid/Cartesian polar.svg",
+            "imgsrc: images/grid/Polar.svg",
+            "imgsrc: images/grid/Treble.svg",
+            "imgsrc: images/grid/Grand.svg",
+            "imgsrc: images/grid/Mezzo-soprano.svg",
+            "imgsrc: images/grid/Alto.svg",
+            "imgsrc: images/grid/Tenor.svg",
+            "imgsrc: images/grid/Bass.svg",
+            ""
+	];
+
+	gridLabels = [
+            "Blank",
+            "Cartesian",
+            "Cartesian Polar",
+            "Polar",
+            "Treble",
+            "Grand",
+            "Mezzo Soprano",
+            "Alto",
+            "Tenor",
+            "Bass",
+            "Blank"
+	];
+    }
+
     activity.turtles.gridWheel = new wheelnav("wheelDivptm", null, 300, 300);
     activity.turtles._exitWheel = new wheelnav("_exitWheel", activity.turtles.gridWheel.raphael);
 

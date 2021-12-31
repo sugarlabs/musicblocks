@@ -23,8 +23,7 @@
    getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _,
-   noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
-   _THIS_IS_MUSIC_BLOCKS_
+   noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction
  */
 
 /*
@@ -39,8 +38,6 @@
         rationalSum, _, rationalToFraction
     js/utils/synthutils.js
         instrumentsEffects, instrumentsFilters
-    js/activity.js
-        _THIS_IS_MUSIC_BLOCKS_
  */
 
 /* exported Singer */
@@ -644,12 +641,10 @@ class Singer {
         const activity = logo.activity;
         volume = Math.min(Math.max(volume, 0), 100);
 
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            logo.synth.setMasterVolume(volume);
-            for (const turtle of activity.turtles.turtleList) {
-                for (const synth in turtle.singer.synthVolume) {
-                    turtle.singer.synthVolume[synth].push(volume);
-                }
+        logo.synth.setMasterVolume(volume);
+        for (const turtle of activity.turtles.turtleList) {
+            for (const synth in turtle.singer.synthVolume) {
+                turtle.singer.synthVolume[synth].push(volume);
             }
         }
     }
@@ -667,17 +662,15 @@ class Singer {
     static setSynthVolume(logo, turtle, synth, volume) {
         volume = Math.min(Math.max(volume, 0), 100);
 
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            switch (synth) {
-                case "noise1":
-                case "noise2":
-                case "noise3":
-                    // Noise is very very loud
-                    logo.synth.setVolume(turtle, synth, volume / 25);
-                    break;
-                default:
-                    logo.synth.setVolume(turtle, synth, volume);
-            }
+        switch (synth) {
+            case "noise1":
+            case "noise2":
+            case "noise3":
+                // Noise is very very loud
+                logo.synth.setVolume(turtle, synth, volume / 25);
+                break;
+            default:
+                logo.synth.setVolume(turtle, synth, volume);
         }
     }
 
@@ -1851,7 +1844,7 @@ class Singer {
                         }
 
                         if (duration > 0) {
-                            if (_THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
+                            if (!forceSilence) {
                                 // Parameters related to effects
                                 const paramsEffects = {
                                     doVibrato: doVibrato,
@@ -2085,7 +2078,7 @@ class Singer {
                         }
 
                         if (newBeatValue > 0) {
-                            if (_THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
+                            if (forceSilence) {
                                 for (let i = 0; i < drums.length; i++) {
                                     if (tur.singer.drumStyle.length > 0) {
                                         if (!tur.singer.suppressOutput) {
@@ -2126,7 +2119,7 @@ class Singer {
                 }
 
                 if (!tur.singer.suppressOutput) {
-                    if (_THIS_IS_MUSIC_BLOCKS_ && !forceSilence) {
+                    if (!forceSilence) {
                         activity.logo.synth.start();
                     }
                 }

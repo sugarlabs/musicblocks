@@ -13,13 +13,16 @@
    global
 
    _, last, FlowBlock, NOINPUTERRORMSG, TONEBPM, Singer,
-   FlowClampBlock, DEFAULTDRUM
+   FlowClampBlock, DEFAULTDRUM, _THIS_IS_TURTLE_BLOCKS_ 
  */
 
 /* exported setupRhythmBlockPaletteBlocks */
 
 const language = localStorage.languagePreference || navigator.language;
-const rhythmBlockPalette = language === "ja" ? "rhythm" : "widgets";
+let rhythmBlockPalette = language === "ja" ? "rhythm" : "widgets";
+if (_THIS_IS_TURTLE_BLOCKS_) {
+    rhythmBlockPalette = "rhythm";
+}
 
 function setupRhythmBlockPaletteBlocks(activity) {
     class RhythmBlock extends FlowBlock {
@@ -591,7 +594,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
             super("stuplet", _("simple tuplet"));
             this.setPalette(rhythmBlockPalette, activity);
             this.piemenuValuesC1 = [3, 5, 7, 11];
-            this.beginnerBlock(true);
+            this.beginnerBlock(!_THIS_IS_TURTLE_BLOCKS_);
 
             this.setHelpString([
                 _("Tuplets are a collection of notes that get scaled to a specific duration.") +

@@ -429,101 +429,22 @@ function setupMediaBlocks(activity) {
         arg(logo, turtle, blk, receivedArg) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (activity._THIS_IS_MUSIC_BLOCKS_) {
-                const cblk1 = activity.blocks.blockList[blk].connections[1];
-                const cblk2 = activity.blocks.blockList[blk].connections[2];
-                if (cblk1 === null || cblk2 === null) {
-                    activity.errorMsg(NOINPUTERRORMSG, blk);
-                    return 392;
-                }
-                const note = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                const octave = Math.floor(
-                    calcOctave(
-                        tur.singer.currentOctave,
-                        logo.parseArg(logo, turtle, cblk2, blk, receivedArg),
-                        tur.singer.lastNotePlayed,
-                        note
-                    )
-                );
-                return Math.round(pitchToFrequency(note, octave, 0, tur.singer.keySignature));
-            } else {
-                const NOTENAMES = [
-                    "A",
-                    "B♭",
-                    "B",
-                    "C",
-                    "D♭",
-                    "D",
-                    "E♭",
-                    "E",
-                    "F",
-                    "G♭",
-                    "G",
-                    "A♭"
-                ];
-                const NOTECONVERSION = {
-                    "A♯": "B♭",
-                    "C♯": "D♭",
-                    "D♯": "E♭",
-                    "F♯": "G♭",
-                    "G♯": "A♭"
-                };
-                const block = activity.blocks.blockList[blk];
-                let cblk = block.connections[1];
-                let noteName;
-                if (cblk === null) {
-                    activity.errorMsg(NOINPUTERRORMSG, blk);
-                    noteName = "G";
-                } else {
-                    noteName = logo.parseArg(
-                        logo,
-                        turtle,
-                        cblk,
-                        blk,
-                        receivedArg
-                    );
-                }
-
-                if (typeof noteName !== "string")
-                    return 440 * Math.pow(2, (noteName - 69) / 12);
-
-                noteName = noteName.replace("b", "♭");
-                noteName = noteName.replace("#", "♯");
-                if (noteName in NOTECONVERSION) {
-                    noteName = NOTECONVERSION[noteName];
-                }
-
-                const idx = NOTENAMES.indexOf(noteName);
-                if (idx === -1) {
-                    this.errorMsg(
-                        _(
-                            "Note name must be one of A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭."
-                        )
-                    );
-                    return 440;
-                }
-                cblk = block.connections[2];
-                let octave;
-                if (cblk === null) {
-                    activity.errorMsg(NOINPUTERRORMSG, blk);
-                    octave = 4;
-                } else {
-                    octave = Math.floor(
-                        logo.parseArg(logo, turtle, cblk, blk, receivedArg)
-                    );
-                }
-
-                if (octave < 1) {
-                    octave = 1;
-                }
-
-                if (idx > 2) {
-                    octave -= 1; // New octave starts on C
-                }
-
-                const i = octave * 12 + idx;
-                return 27.5 * Math.pow(1.05946309435929, i);
+            const cblk1 = activity.blocks.blockList[blk].connections[1];
+            const cblk2 = activity.blocks.blockList[blk].connections[2];
+            if (cblk1 === null || cblk2 === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return 392;
             }
+            const note = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            const octave = Math.floor(
+                calcOctave(
+                    tur.singer.currentOctave,
+                    logo.parseArg(logo, turtle, cblk2, blk, receivedArg),
+                    tur.singer.lastNotePlayed,
+                    note
+                )
+            );
+            return Math.round(pitchToFrequency(note, octave, 0, tur.singer.keySignature));
         }
     }
 

@@ -34,8 +34,8 @@
    piemenuVoices, platformColor, ProtoBlock, RSYMBOLS, safeSVG,
    SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
-   _THIS_IS_MUSIC_BLOCKS_, topBlock, updateTemperaments, VALUETEXTX,
-   VOICENAMES, WESTERN2EISOLFEGENAMES
+   topBlock, updateTemperaments, VALUETEXTX,
+   VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_
  */
 
 /*
@@ -68,8 +68,6 @@
         piemenuNumber, piemenuColor, piemenuNoteValue, piemenuBasic, piemenuBoolean, piemenuVoices,
         piemenuIntervals, piemenuAccidentals, piemenuModes, piemenuPitches, piemenuCustomNotes,
         piemenuBlockContext
-   - js/activity.js
-        _THIS_IS_MUSIC_BLOCKS_
    - js/utils/platformstyle.js
         platformColor
  */
@@ -2106,10 +2104,8 @@ class Block {
                         this.blocks.blockList[c2].name === "number"
                     ) {
                         v = this.blocks.blockList[c1].value + "/" + this.blocks.blockList[c2].value;
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            if (this.blocks.blockList[c2].value in NSYMBOLS) {
-                                v += NSYMBOLS[this.blocks.blockList[c2].value];
-                            }
+                        if (this.blocks.blockList[c2].value in NSYMBOLS) {
+                            v += NSYMBOLS[this.blocks.blockList[c2].value];
                         }
                     }
                 }
@@ -2148,11 +2144,9 @@ class Block {
                     this.blocks.blockList[c2].name === "number"
                 ) {
                     v = this.blocks.blockList[c1].value + "/" + this.blocks.blockList[c2].value;
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        vi = this.blocks.blockList[c2].value;
-                        if (vi in NSYMBOLS) {
-                            v += NSYMBOLS[vi];
-                        }
+                    vi = this.blocks.blockList[c2].value;
+                    if (vi in NSYMBOLS) {
+                        v += NSYMBOLS[vi];
                     }
                 }
             }
@@ -2162,18 +2156,16 @@ class Block {
         c = this.blocks.findFirstPitchBlock(c);
         const p = this._getPitch(c);
         if (c === null) {
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                if (vi !== null) {
-                    if (vi in NSYMBOLS) {
-                        v = v.replace(NSYMBOLS[vi], RSYMBOLS[vi]);
-                    }
+            if (vi !== null) {
+                if (vi in NSYMBOLS) {
+                    v = v.replace(NSYMBOLS[vi], RSYMBOLS[vi]);
                 }
             }
             this.collapseText.text = _("silence") + " | " + v;
         } else if (p === "" && v === "") {
             this.collapseText.text = _("note value");
         } else {
-            if (_THIS_IS_MUSIC_BLOCKS_ && p === _("silence")) {
+            if (p === _("silence")) {
                 if (vi !== null) {
                     if (vi in NSYMBOLS) {
                         v = v.replace(NSYMBOLS[vi], RSYMBOLS[vi]);
@@ -2620,9 +2612,7 @@ class Block {
                     if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
                         topBlk = that.blocks.findTopBlock(thisBlock);
 
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            that.activity.logo.synth.resume();
-                        }
+                        that.activity.logo.synth.resume();
 
                         if (that.activity.turtles.running()) {
                             that.activity.logo.doStopTurtles();
@@ -2639,9 +2629,7 @@ class Block {
                 if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
                     topBlk = that.blocks.findTopBlock(thisBlock);
 
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        that.activity.logo.synth.resume();
-                    }
+                    that.activity.logo.synth.resume();
 
                     if (that.activity.turtles.running()) {
                         that.activity.logo.doStopTurtles();
@@ -3434,18 +3422,28 @@ class Block {
         } else if (this.name === "grid") {
             selectedValue = this.value;
 
-            const gridLabels = [
-                _("Cartesian"),
-                _("polar"),
-                _("Cartesian+polar"),
-                _("treble"),
-                _("grand staff"),
-                _("mezzo-soprano"),
-                _("alto"),
-                _("tenor"),
-                _("bass"),
-                _("none")
-            ];
+	    let gridLabels = [];
+	    if (_THIS_IS_TURTLE_BLOCKS_) {
+		gridLabels = [
+                    _("Cartesian"),
+                    _("polar"),
+                    _("Cartesian+polar"),
+                    _("none")
+		];
+            } else {
+		gridLabels = [
+                    _("Cartesian"),
+                    _("polar"),
+                    _("Cartesian+polar"),
+                    _("treble"),
+                    _("grand staff"),
+                    _("mezzo-soprano"),
+                    _("alto"),
+                    _("tenor"),
+                    _("bass"),
+                    _("none")
+		];
+            }
             const gridValues = gridLabels;
 
             piemenuBasic(this, gridLabels, gridValues, selectedValue, platformColor.piemenuBasic);
@@ -4139,10 +4137,8 @@ class Block {
                     break;
                 case "setdrum":
                 case "playdrum":
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        if (newValue.slice(0, 4) === "http") {
-                            this.activity.logo.synth.loadSynth(0, newValue);
-                        }
+                    if (newValue.slice(0, 4) === "http") {
+                        this.activity.logo.synth.loadSynth(0, newValue);
                     }
                     break;
                 case "temperament1":
@@ -4160,17 +4156,15 @@ class Block {
         // We are done changing the label, so unlock.
         this._labelLock = false;
 
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            // Load the synth for the selected drum.
-            if (this.name === "drumname") {
-                this.activity.logo.synth.loadSynth(0, getDrumSynthName(this.value));
-            } else if (this.name === "effectsname") {
-                this.activity.logo.synth.loadSynth(0, getDrumSynthName(this.value));
-            } else if (this.name === "voicename") {
-                this.activity.logo.synth.loadSynth(0, getVoiceSynthName(this.value));
-            } else if (this.name === "noisename") {
-                this.activity.logo.synth.loadSynth(0, getNoiseSynthName(this.value));
-            }
+        // Load the synth for the selected drum.
+        if (this.name === "drumname") {
+            this.activity.logo.synth.loadSynth(0, getDrumSynthName(this.value));
+        } else if (this.name === "effectsname") {
+            this.activity.logo.synth.loadSynth(0, getDrumSynthName(this.value));
+        } else if (this.name === "voicename") {
+            this.activity.logo.synth.loadSynth(0, getVoiceSynthName(this.value));
+        } else if (this.name === "noisename") {
+            this.activity.logo.synth.loadSynth(0, getNoiseSynthName(this.value));
         }
     }
 }

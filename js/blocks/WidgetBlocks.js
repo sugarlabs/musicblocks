@@ -17,7 +17,7 @@
    DEFAULTMODE, Tempo, PitchDrumMatrix, PhraseMaker, StatusMatrix,
    RhythmRuler, FILTERTYPES, instrumentsFilters, DEFAULTFILTERTYPE,
    TemperamentWidget, TimbreWidget, ModeWidget, PitchSlider,
-   MusicKeyboard, PitchStaircase, SampleWidget
+   MusicKeyboard, PitchStaircase, SampleWidget, _THIS_IS_TURTLE_BLOCKS_
  */
 
 /*
@@ -1218,25 +1218,27 @@ function setupWidgetBlocks(activity) {
         }
     }
 
-    new EnvelopeBlock().setup(activity);
-    new FilterBlock().setup(activity);
-    new TemperamentBlock().setup(activity);
-    new TimbreBlock().setup(activity);
-    new MeterWidgetBlock().setup(activity);
-    new ModeWidgetBlock().setup(activity);
-    new TempoBlock().setup(activity);
-    new SamplerBlock().setup(activity);
-    new PitchDrumMatrixBlock().setup(activity);
-    new oscilloscopeWidgetBlock().setup(activity);
-    new PitchSliderBlock().setup(activity);
-    new ChromaticBlock().setup(activity);
-    new MusicKeyboard2Block().setup(activity);
-    new MusicKeyboardBlock().setup(activity);
-    new PitchStaircaseBlock().setup(activity);
-    new RhythmRuler3Block().setup(activity);
-    new RhythmRuler2Block().setup(activity);
-    new MatrixGMajorBlock().setup(activity);
-    new MatrixCMajorBlock().setup(activity);
-    new MatrixBlock().setup(activity);
+    if (!_THIS_IS_TURTLE_BLOCKS_) {
+        new EnvelopeBlock().setup(activity);
+        new FilterBlock().setup(activity);
+        new TemperamentBlock().setup(activity);
+        new TimbreBlock().setup(activity);
+        new MeterWidgetBlock().setup(activity);
+        new ModeWidgetBlock().setup(activity);
+        new TempoBlock().setup(activity);
+        new SamplerBlock().setup(activity);
+        new PitchDrumMatrixBlock().setup(activity);
+        new oscilloscopeWidgetBlock().setup(activity);
+        new PitchSliderBlock().setup(activity);
+        new ChromaticBlock().setup(activity);
+        new MusicKeyboard2Block().setup(activity);
+        new MusicKeyboardBlock().setup(activity);
+        new PitchStaircaseBlock().setup(activity);
+        new RhythmRuler3Block().setup(activity);
+        new RhythmRuler2Block().setup(activity);
+        new MatrixGMajorBlock().setup(activity);
+        new MatrixCMajorBlock().setup(activity);
+        new MatrixBlock().setup(activity);
+    }
     new StatusBlock().setup(activity);
 }
