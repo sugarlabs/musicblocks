@@ -65,7 +65,9 @@ function setupGraphicsBlocks(activity) {
             ) {
                 logo.statusFields.push([blk, "heading"]);
             } else {
-                return activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].orientation;
+                return activity.turtles.turtleList[
+                    activity.turtles.companionTurtle(turtle)
+                ].orientation;
             }
         }
     }
@@ -95,7 +97,9 @@ function setupGraphicsBlocks(activity) {
         }
 
         updateParameter(logo, turtle) {
-            return toFixed2(activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].y);
+            return toFixed2(activity.turtles.turtleList[
+                activity.turtles.companionTurtle(turtle)
+            ].y);
         }
 
         arg(logo, turtle, blk) {
@@ -106,7 +110,9 @@ function setupGraphicsBlocks(activity) {
                 logo.statusFields.push([blk, "y"]);
             } else {
                 return activity.turtles.screenY2turtleY(
-                    activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].container.y
+                    activity.turtles.turtleList[
+                        activity.turtles.companionTurtle(turtle)
+                    ].container.y
                 );
             }
         }
@@ -137,7 +143,9 @@ function setupGraphicsBlocks(activity) {
         }
 
         updateParameter(logo, turtle) {
-            return toFixed2(activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].x);
+            return toFixed2(activity.turtles.turtleList[
+                activity.turtles.companionTurtle(turtle)
+            ].x);
         }
 
         arg(logo, turtle, blk) {
@@ -148,7 +156,9 @@ function setupGraphicsBlocks(activity) {
                 logo.statusFields.push([blk, "x"]);
             } else {
                 return activity.turtles.screenX2turtleX(
-                    activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].container.x
+                    activity.turtles.turtleList[
+                        activity.turtles.companionTurtle(turtle)
+                    ].container.x
                 );
             }
         }
@@ -193,8 +203,9 @@ function setupGraphicsBlocks(activity) {
                 } else {
                     if (tur.singer.suppressOutput) {
                         const savedPenState =
-                            activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].painter
-                                .penState;
+                              activity.turtles.turtleList[
+                                  activity.turtles.companionTurtle(turtle)
+                              ].painter.penState;
                         activity.turtles.turtleList[
                             activity.turtles.companionTurtle(turtle)
                         ].painter.penState = false;
