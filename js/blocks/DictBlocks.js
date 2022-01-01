@@ -217,7 +217,9 @@ function setupDictBlocks(activity) {
                 return;
             }
 
-            Turtle.DictActions.setValue(activity.turtles.ithTurtle(turtle).name, ...args, turtle);
+            Turtle.DictActions.setValue(
+                activity.turtles.ithTurtle(turtle).name, ...args, turtle
+            );
         }
     }
 

@@ -704,7 +704,8 @@ function setupNumberBlocks(activity) {
                         if (activity.blocks.blockList[cblk2].name === "accidentalname") {
                             let scaledegree;
                             if (activity.blocks.blockList[cblk1].name === "namedbox") {
-                                scaledegree = logo.boxes[activity.blocks.blockList[cblk1].overrideName];
+                                scaledegree =
+                                    logo.boxes[activity.blocks.blockList[cblk1].overrideName];
                             } else {
                                 scaledegree = activity.blocks.blockList[cblk1].value;
                             }
@@ -756,7 +757,7 @@ function setupNumberBlocks(activity) {
                             } else if (!isNaN(b)) {
                                 return(b);
                             }
-                            return (0)
+                            return (0);
                         }
                     }
                 }

@@ -14,7 +14,7 @@
 
    _, last, FlowBlock, ValueBlock, FlowClampBlock, LeftBlock, BooleanBlock,
    NOINPUTERRORMSG, NANERRORMSG, INVALIDPITCH, getNote, pitchToNumber,
-   TURTLESVG, FILLCOLORS, STROKECOLORS, _THIS_IS_TURTLE_BLOCKS_
+   TURTLESVG, _THIS_IS_TURTLE_BLOCKS_, getMunsellColor
 */
 
 /* exported setupEnsembleBlocks, getTargetTurtle */
@@ -794,8 +794,8 @@ function setupEnsembleBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
             const heading = tur.orientation;
             // Heading needs to be set to 0 when we update the graphic.
-	    if (heading != 0) {
-                 tur.painter.doSetHeading(0);
+            if (heading != 0) {
+                tur.painter.doSetHeading(0);
             }
 
             let fillColor;
@@ -807,14 +807,14 @@ function setupEnsembleBlocks(activity) {
                 fillColor = getMunsellColor(0, 50, 100);
                 strokeColor = getMunsellColor(0, 70, 80);
             }
-            let artwork = TURTLESVG
+            const artwork = TURTLESVG
                 .replace(/fill_color/g, fillColor)
                 .replace(/stroke_color/g, strokeColor);
 
             tur.doTurtleShell(55, "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(artwork))));
 
             // Restore the heading.
-	    if (heading != 0) {
+            if (heading != 0) {
                 tur.painter.doSetHeading(heading);
             }
         }

@@ -15,7 +15,7 @@
    global
 
    _, Notation, Synth, instruments, instrumentsFilters,
-   instrumentsEffects, Singer, Tone, p5, CAMERAVALUE, doUseCamera,
+   instrumentsEffects, Singer, Tone, CAMERAVALUE, doUseCamera,
    VIDEOVALUE, last, getIntervalDirection, getIntervalNumber,
    mixedNumber, rationalToFraction, doStopVideoCam, StatusMatrix,
    getStatsFromNotation, delayExecution
@@ -764,7 +764,14 @@ class Logo {
                 while (i > 0) {
                     i -= 1;
                     if (obj2[0] !== 0) {
-                        this.updateNotation(note, obj2[1] / obj2[0], turtle, insideChord, drum, false);
+                        this.updateNotation(
+                            note,
+                            obj2[1] / obj2[0],
+                            turtle,
+                            insideChord,
+                            drum,
+                            false
+                        );
                     }
                     if (obj[0] > 0) {
                         if (note[0] !== "R") {

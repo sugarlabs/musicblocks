@@ -882,7 +882,11 @@ function Blocks(activity) {
             // Find the dock position in the connected block.
             let foundMatch = false;
             let matchingBlock;
-            for (matchingBlock = 0; matchingBlock < this.blockList[cblk].connections.length; matchingBlock++) {
+            for (
+                matchingBlock = 0;
+                matchingBlock < this.blockList[cblk].connections.length;
+                matchingBlock++
+            ) {
                 if (this.blockList[cblk].connections[matchingBlock] === blk) {
                     foundMatch = true;
                     break;
@@ -6295,7 +6299,7 @@ function Blocks(activity) {
                                         if (this.protoBlockDict[blockObjs[c][1][0]] !== undefined) {
                                             if (
                                                 this.protoBlockDict[blockObjs[c][1][0]].dockTypes[
-                                                cc
+                                                    cc
                                                 ] !== "out"
                                             ) {
                                                 flowBlock = false;
@@ -6454,7 +6458,7 @@ function Blocks(activity) {
             }
         }
 
-	/*
+        /*
         if (updatePalettes) {
             // Do this update on a slight delay so as not to collide with
             // the actions update.

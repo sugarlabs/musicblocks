@@ -343,7 +343,9 @@ function setupExtrasBlocks(activity) {
                             } else {
                                 const tur = activity.turtles.ithTurtle(turtle);
                                 if (tur.singer.inNoteBlock.length > 0) {
-                                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
+                                    tur.singer.embeddedGraphics[
+                                        last(tur.singer.inNoteBlock)
+                                    ].push(blk);
                                 } else {
                                     activity.textMsg(args[0].toString());
                                 }

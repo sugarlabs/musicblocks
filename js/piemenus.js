@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 // Copyright (c) 2014-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
@@ -3286,23 +3287,23 @@ const piemenuGrid = function (activity) {
 
     let grids, gridLabels;
     if (_THIS_IS_TURTLE_BLOCKS_) {
-	grids = [
+        grids = [
             "imgsrc: images/grid/blank.svg",
             "imgsrc: images/grid/Cartesian.svg",
             "imgsrc: images/grid/Cartesian polar.svg",
             "imgsrc: images/grid/Polar.svg",
             ""
-	];
+        ];
 
-	gridLabels = [
+        gridLabels = [
             "Blank",
             "Cartesian",
             "Cartesian Polar",
             "Polar",
             "Blank"
-	];
+        ];
     } else {
-	grids = [
+        grids = [
             "imgsrc: images/grid/blank.svg",
             "imgsrc: images/grid/Cartesian.svg",
             "imgsrc: images/grid/Cartesian polar.svg",
@@ -3314,9 +3315,9 @@ const piemenuGrid = function (activity) {
             "imgsrc: images/grid/Tenor.svg",
             "imgsrc: images/grid/Bass.svg",
             ""
-	];
+        ];
 
-	gridLabels = [
+        gridLabels = [
             "Blank",
             "Cartesian",
             "Cartesian Polar",
@@ -3328,7 +3329,7 @@ const piemenuGrid = function (activity) {
             "Tenor",
             "Bass",
             "Blank"
-	];
+        ];
     }
 
     activity.turtles.gridWheel = new wheelnav("wheelDivptm", null, 300, 300);

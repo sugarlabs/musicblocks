@@ -421,6 +421,7 @@ function processPluginData(activity, pluginData) {
     } catch (e) {
         // eslint-disable-next-line no-console
         console.log(pluginData);
+        // eslint-disable-next-line no-console
         console.log(e);
         return null;
     }
@@ -651,7 +652,9 @@ function processRawPluginData(activity, rawData) {
         obj = processPluginData(activity, cleanData.replace(/\n/g, ""));
     } catch (e) {
         obj = null;
+        // eslint-disable-next-line no-console
         console.log(rawData);
+        // eslint-disable-next-line no-console
         console.log(cleanData);
         activity.errorMsg("Error loading plugin: " + e);
     }
@@ -746,6 +749,7 @@ function processMacroData(macroData, palettes, blocks, macroDict) {
         } catch (e) {
             // eslint-disable-next-line no-console
             console.log(macroData);
+            // eslint-disable-next-line no-console
             console.debug(e);
         }
     }

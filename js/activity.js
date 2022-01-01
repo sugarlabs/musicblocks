@@ -1599,65 +1599,65 @@ function Activity() {
                 } else {
                     if (blockLabel.length === 0) {
                         // Swap in a preferred name when there is no label.
-                        let label = _(block.name); 
+                        let label = _(block.name);
                         switch(block.name) {
-                        case "scaledegree2":
-                            label = _("scale degree");
-                            break;
-                        case "voicename":
-                            label = _("voice name");
-                            break;
-                        case "invertmode":
-                            label = _("invert mode");
-                            break;
-                        case "outputtools":
-                            label = _("output tools");
-                            break;
-                        case "customNote":
-                            label = _("custom note");
-                            break;
-                        case "accidentalname":
-                            label = _("accidental name");
-                            break;
-                        case "eastindiansolfege":
-                            label = _("east indian solfege");
-                            break;
-                        case "notename":
-                            label = _("note name");
-                            break;
-                        case "temperamentname":
-                            label = _("temperament name");
-                            break;
-                        case "modename":
-                            label = _("mode name");
-                            break;
-                        case "intervalname":
-                            label = _("interval name");
-                            break;
-                        case "filtertype":
-                            label = _("filter type");
-                            break;
-                        case "oscillatortype":
-                            label = _("oscillator type");
-                            break;
-                        case "audiofile":
-                            label = _("audio file");
-                            break;
-                        case "noisename":
-                            label = _("noise name");
-                            break;
-                        case "drumname":
-                            label = _("drum name");
-                            break;
-                        case "effectsname":
-                            label = _("effects name");
-                            break;
-                        case "wrapmode":
-                            label = _("wrap mode");
-                            break;
-                        case "loadFile":
-                            label = _("load file");
-                            break;
+                            case "scaledegree2":
+                                label = _("scale degree");
+                                break;
+                            case "voicename":
+                                label = _("voice name");
+                                break;
+                            case "invertmode":
+                                label = _("invert mode");
+                                break;
+                            case "outputtools":
+                                label = _("output tools");
+                                break;
+                            case "customNote":
+                                label = _("custom note");
+                                break;
+                            case "accidentalname":
+                                label = _("accidental name");
+                                break;
+                            case "eastindiansolfege":
+                                label = _("east indian solfege");
+                                break;
+                            case "notename":
+                                label = _("note name");
+                                break;
+                            case "temperamentname":
+                                label = _("temperament name");
+                                break;
+                            case "modename":
+                                label = _("mode name");
+                                break;
+                            case "intervalname":
+                                label = _("interval name");
+                                break;
+                            case "filtertype":
+                                label = _("filter type");
+                                break;
+                            case "oscillatortype":
+                                label = _("oscillator type");
+                                break;
+                            case "audiofile":
+                                label = _("audio file");
+                                break;
+                            case "noisename":
+                                label = _("noise name");
+                                break;
+                            case "drumname":
+                                label = _("drum name");
+                                break;
+                            case "effectsname":
+                                label = _("effects name");
+                                break;
+                            case "wrapmode":
+                                label = _("wrap mode");
+                                break;
+                            case "loadFile":
+                                label = _("load file");
+                                break;
                         }
                         this.searchSuggestions.push({
                             label: label,
@@ -1933,8 +1933,6 @@ function Activity() {
     this.__keyPressed = function (event) {
         if (window.widgetWindows.isOpen("JavaScript Editor") === true) return;
 
-        let disableKeys;
-
         if (!this.keyboardEnableFlag) {
             return;
         }
@@ -2013,7 +2011,7 @@ function Activity() {
         const KEYCODE_L = 76; // la
         const KEYCODE_T = 84; // ti
 
-        disableKeys =
+        const disableKeys =
             docById("lilypondModal").style.display === "block" ||
             this.searchWidget.style.visibility === "visible" ||
             docById("planet-iframe").style.display === "" ||
@@ -3098,6 +3096,7 @@ function Activity() {
     };
 
     // Accessed from index.html
+    // eslint-disable-next-line no-unused-vars
     const hideArrows = function () {
         globalActivity._hideArrows();
     };
@@ -4098,6 +4097,7 @@ function Activity() {
         const custommodeData = this.storage.custommode;
         if (custommodeData !== undefined) {
             // FIX ME
+            // eslint-disable-next-line no-unused-vars
             const customMode = JSON.parse(custommodeData);
         }
 
