@@ -310,7 +310,10 @@ function setupIntervalsActions(activity) {
             activity.logo.temperamentSelected.push(temperament);
             const len = activity.logo.temperamentSelected.length;
 
-            if (activity.logo.temperamentSelected[len - 1] !== activity.logo.temperamentSelected[len - 2]) {
+            if (
+                activity.logo.temperamentSelected[len - 1]
+                    !== activity.logo.temperamentSelected[len - 2]
+            ) {
                 activity.logo.synth.changeInTemperament = true;
             }
         }

@@ -217,7 +217,8 @@ function setupDictActions(activity) {
             }
 
             return JSON.stringify(
-                dict in activity.logo.turtleDicts[turtle] ? activity.logo.turtleDicts[turtle][dict] : {}
+                dict in activity.logo.turtleDicts[turtle]
+                    ? activity.logo.turtleDicts[turtle][dict] : {}
             );
         }
 
