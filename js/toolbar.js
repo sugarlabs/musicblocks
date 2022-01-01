@@ -10,7 +10,7 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /*
-   global _, jQuery, _THIS_IS_MUSIC_BLOCKS_, docById, doSVG
+   global _, jQuery, _THIS_IS_TURTLE_BLOCKS_, docById, doSVG
  */
 
 /* exported Toolbar */
@@ -40,7 +40,7 @@ class Toolbar {
         this.activity = activity;
         let strings;
         let strings_;
-        if (_THIS_IS_MUSIC_BLOCKS_) {
+        if (!_THIS_IS_TURTLE_BLOCKS_) {
             strings = [
                 ["mb-logo", _("About Music Blocks")],
                 ["play", _("Play")],
@@ -157,6 +157,8 @@ class Toolbar {
                 ["chooseKeyIcon", _("Set Pitch Preview")],
                 ["toggleJavaScriptIcon", _("Toggle JavaScript Editor")],
                 ["restoreIcon", _("Restore")],
+                ["beginnerMode", _("Switch to beginner mode")],
+                ["advancedMode", _("Switch to advanced mode")],
                 ["languageSelectIcon", _("Select language")],
                 ["save-html-beg", _("Save project as HTML"), "innerHTML"],
                 ["save-png-beg", _("Save mouse artwork as PNG"), "innerHTML"],
@@ -191,7 +193,7 @@ class Toolbar {
                 _("New project"),
                 _("Load project from file"),
                 _("Save project"),
-                _("Save project"),
+                _("Save project as HTML"),
                 _("Find and share projects"),
                 _("Offline. Sharing is unavailable"),
                 _("Auxiliary menu"),
@@ -207,26 +209,43 @@ class Toolbar {
                 _("Set Pitch Preview"),
                 _("Toggle JavaScript Editor"),
                 _("Restore"),
+                _("Switch to beginner mode"),
+                _("Switch to advanced mode"),
                 _("Select language"),
                 _("Save project as HTML"),
-                _("Save turtle artwork as SVG"),
-                _("Save turtle artwork as PNG"),
+                _("Save mouse artwork as PNG"),
+                _("Save project as HTML"),
+                _("Save mouse artwork as SVG"),
+                _("Save mouse artwork as PNG"),
                 _("Save block artwork as SVG"),
                 _("Confirm"),
-                _("Select language")
+                _("English (United States)"),
+                _("English (United Kingdom)"),
+                _("日本語"),
+                _("한국인"),
+                _("español"),
+                _("português"),
+                _("にほんご"),
+                _("中文"),
+                _("ภาษาไทย"),
+                _("aymara"),
+                _("quechua"),
+                _("guarani"),
+                _("हिंदी"),
+                _("igbo"),
+                _("عربى"),
+                _("עִברִית")
             ];
         }
 
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            const beginnerMode = docById("beginnerMode");
-            const advancedMode = docById("advancedMode");
-            if (this.activity.beginnerMode) { // || mode === "null") {
-                advancedMode.style.display = "block";
-                beginnerMode.style.display = "none";
-            } else {
-                advancedMode.style.display = "none";
-                beginnerMode.style.display = "display";
-            }
+        const beginnerMode = docById("beginnerMode");
+        const advancedMode = docById("advancedMode");
+        if (this.activity.beginnerMode) { // || mode === "null") {
+            advancedMode.style.display = "block";
+            beginnerMode.style.display = "none";
+        } else {
+            advancedMode.style.display = "none";
+            beginnerMode.style.display = "display";
         }
 
         for (let i = 0; i < strings.length; i++) {
@@ -400,7 +419,7 @@ class Toolbar {
         let svgData;
 
         if (this.activity.beginnerMode) {
-            if (_THIS_IS_MUSIC_BLOCKS_ && this.language === "ja") {
+            if (this.language === "ja") {
                 saveButton.onclick = () => {
                     html_onclick(this.activity);
                 };
@@ -479,7 +498,7 @@ class Toolbar {
                     };
                 }
 
-                if (_THIS_IS_MUSIC_BLOCKS_) {
+                if (!_THIS_IS_TURTLE_BLOCKS_) {
                     saveWAV = docById("save-wav");
 
                     saveWAV.onclick = wave_onclick;
@@ -564,7 +583,7 @@ class Toolbar {
      */
     renderRunSlowlyIcon(onclick) {
         const runSlowlyIcon = docById("runSlowlyIcon");
-        if (_THIS_IS_MUSIC_BLOCKS_ && this.activity.beginnerMode && this.language === "ja") {
+        if (this.activity.beginnerMode && this.language === "ja") {
             runSlowlyIcon.style.display = "none";
         }
 
@@ -593,18 +612,16 @@ class Toolbar {
      * @returns {void}
      */
     renderModeSelectIcon(onclick) {
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            const begIcon = docById("beginnerMode");
-            const advIcon = docById("advancedMode");
-            if (begIcon.style.display === "none") {
-                advIcon.onclick = () => {
-                    onclick(this.activity);
-                };
-            } else {
-                begIcon.onclick = () => {
-                    onclick(this.activity);
-                };
-            }
+        const begIcon = docById("beginnerMode");
+        const advIcon = docById("advancedMode");
+        if (begIcon.style.display === "none") {
+            advIcon.onclick = () => {
+                onclick(this.activity);
+            };
+        } else {
+            begIcon.onclick = () => {
+                onclick(this.activity);
+            };
         }
     }
 
@@ -615,7 +632,7 @@ class Toolbar {
      */
     renderRunStepIcon(onclick) {
         const runStepByStepIcon = docById("runStepByStepIcon");
-        if (_THIS_IS_MUSIC_BLOCKS_ && this.activity.beginnerMode && this.language === "ja") {
+        if (this.activity.beginnerMode && this.language === "ja") {
             runStepByStepIcon.style.display = "none";
         }
 

@@ -42,14 +42,13 @@
 /*
    exported
 
-   Activity, LEADING, _THIS_IS_MUSIC_BLOCKS_, _THIS_IS_TURTLE_BLOCKS_,
+   Activity, LEADING, _THIS_IS_TURTLE_BLOCKS_,
    globalActivity, hideArrows, doAnalyzeProject
  */
 
 const LEADING = 0;
 const BLOCKSCALES = [1, 1.5, 2, 3, 4];
-const _THIS_IS_MUSIC_BLOCKS_ = true;
-const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
+const _THIS_IS_TURTLE_BLOCKS_ = false;
 
 const _ERRORMSGTIMEOUT_ = 15000;
 const _MSGTIMEOUT_ = 60000;
@@ -96,31 +95,65 @@ let MYDEFINES = [
     "utils/synthutils",
     "utils/mathutils",
     "activity/pastebox",
-    "prefixfree.min"
+    "prefixfree.min",
+    "Tone",
+    "activity/js-export/samples/sample",
+    "activity/js-export/export",
+    "activity/js-export/interface",
+    "activity/js-export/constraints",
+    "activity/js-export/ASTutils",
+    "activity/js-export/generate",
+    "activity/js-export/API/GraphicsBlocksAPI",
+    "activity/js-export/API/PenBlocksAPI",
+    "activity/js-export/API/RhythmBlocksAPI",
+    "activity/js-export/API/MeterBlocksAPI",
+    "activity/js-export/API/PitchBlocksAPI",
+    "activity/js-export/API/IntervalsBlocksAPI",
+    "activity/js-export/API/ToneBlocksAPI",
+    "activity/js-export/API/OrnamentBlocksAPI",
+    "activity/js-export/API/VolumeBlocksAPI",
+    "activity/js-export/API/DrumBlocksAPI",
+    "activity/js-export/API/DictBlocksAPI",
+    "activity/turtleactions/RhythmActions",
+    "activity/turtleactions/MeterActions",
+    "activity/turtleactions/PitchActions",
+    "activity/turtleactions/IntervalsActions",
+    "activity/turtleactions/ToneActions",
+    "activity/turtleactions/OrnamentActions",
+    "activity/turtleactions/VolumeActions",
+    "activity/turtleactions/DrumActions",
+    "activity/turtleactions/DictActions",
+    "activity/blocks/RhythmBlocks",
+    "activity/blocks/MeterBlocks",
+    "activity/blocks/PitchBlocks",
+    "activity/blocks/IntervalsBlocks",
+    "activity/blocks/ToneBlocks",
+    "activity/blocks/OrnamentBlocks",
+    "activity/blocks/VolumeBlocks",
+    "activity/blocks/DrumBlocks",
+    "activity/blocks/WidgetBlocks",
+    "activity/blocks/RhythmBlockPaletteBlocks",
+    "activity/blocks/ActionBlocks",
+    "activity/blocks/FlowBlocks",
+    "activity/blocks/NumberBlocks",
+    "activity/blocks/BoxesBlocks",
+    "activity/blocks/BooleanBlocks",
+    "activity/blocks/HeapBlocks",
+    "activity/blocks/DictBlocks",
+    "activity/blocks/ExtrasBlocks",
+    "activity/blocks/ProgramBlocks",
+    "activity/blocks/GraphicsBlocks",
+    "activity/blocks/PenBlocks",
+    "activity/blocks/MediaBlocks",
+    "activity/blocks/SensorsBlocks",
+    "activity/blocks/EnsembleBlocks",
+    "widgets/widgetWindows",
+    "widgets/statistics",
+    "widgets/jseditor"
 ];
 
-if (_THIS_IS_MUSIC_BLOCKS_) {
+if (!_THIS_IS_TURTLE_BLOCKS_) {
     const MUSICBLOCKS_EXTRAS = [
-        "Tone",
-        "activity/js-export/samples/sample",
-        "activity/js-export/export",
-        "activity/js-export/interface",
-        "activity/js-export/constraints",
-        "activity/js-export/ASTutils",
-        "activity/js-export/generate",
-        "activity/js-export/API/GraphicsBlocksAPI",
-        "activity/js-export/API/PenBlocksAPI",
-        "activity/js-export/API/RhythmBlocksAPI",
-        "activity/js-export/API/MeterBlocksAPI",
-        "activity/js-export/API/PitchBlocksAPI",
-        "activity/js-export/API/IntervalsBlocksAPI",
-        "activity/js-export/API/ToneBlocksAPI",
-        "activity/js-export/API/OrnamentBlocksAPI",
-        "activity/js-export/API/VolumeBlocksAPI",
-        "activity/js-export/API/DrumBlocksAPI",
-        "activity/js-export/API/DictBlocksAPI",
-        "widgets/widgetWindows",
-        "widgets/jseditor",
         "widgets/modewidget",
         "widgets/meterwidget",
         "widgets/phrasemaker",
@@ -134,43 +167,9 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         "widgets/timbre",
         "widgets/oscilloscope",
         "widgets/sampler",
-        "widgets/statistics",
         "activity/lilypond",
         "activity/abc",
-        "activity/mxml",
-        "activity/turtleactions/RhythmActions",
-        "activity/turtleactions/MeterActions",
-        "activity/turtleactions/PitchActions",
-        "activity/turtleactions/IntervalsActions",
-        "activity/turtleactions/ToneActions",
-        "activity/turtleactions/OrnamentActions",
-        "activity/turtleactions/VolumeActions",
-        "activity/turtleactions/DrumActions",
-        "activity/turtleactions/DictActions",
-        "activity/blocks/RhythmBlocks",
-        "activity/blocks/MeterBlocks",
-        "activity/blocks/PitchBlocks",
-        "activity/blocks/IntervalsBlocks",
-        "activity/blocks/ToneBlocks",
-        "activity/blocks/OrnamentBlocks",
-        "activity/blocks/VolumeBlocks",
-        "activity/blocks/DrumBlocks",
-        "activity/blocks/WidgetBlocks",
-        "activity/blocks/RhythmBlockPaletteBlocks",
-        "activity/blocks/ActionBlocks",
-        "activity/blocks/FlowBlocks",
-        "activity/blocks/NumberBlocks",
-        "activity/blocks/BoxesBlocks",
-        "activity/blocks/BooleanBlocks",
-        "activity/blocks/HeapBlocks",
-        "activity/blocks/DictBlocks",
-        "activity/blocks/ExtrasBlocks",
-        "activity/blocks/ProgramBlocks",
-        "activity/blocks/GraphicsBlocks",
-        "activity/blocks/PenBlocks",
-        "activity/blocks/MediaBlocks",
-        "activity/blocks/SensorsBlocks",
-        "activity/blocks/EnsembleBlocks"
+        "activity/mxml"
     ];
     MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
 }
@@ -233,23 +232,21 @@ function Activity() {
     this.projectID = null;
     this.storage = localStorage;
 
-    if (_THIS_IS_MUSIC_BLOCKS_) {
-        this.beginnerMode = true;
-        try {
-            if (this.storage.beginnerMode === undefined) {
-                this.firstTimeUser = true;
-            } else if (this.storage.beginnerMode !== null) {
-                this.beginnerMode = this.storage.beginnerMode;
-                if (typeof this.beginnerMode === "string") {
-                    if (this.beginnerMode === "false") {
-                        this.beginnerMode = false;
-                    }
+    this.beginnerMode = true;
+    try {
+        if (this.storage.beginnerMode === undefined) {
+            this.firstTimeUser = true;
+        } else if (this.storage.beginnerMode !== null) {
+            this.beginnerMode = this.storage.beginnerMode;
+            if (typeof this.beginnerMode === "string") {
+                if (this.beginnerMode === "false") {
+                    this.beginnerMode = false;
                 }
             }
-        } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error(e);
         }
+    } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
     }
 
     try {
@@ -834,18 +831,16 @@ function Activity() {
 
         const currentDelay = this.logo.turtleDelay;
         this.logo.turtleDelay = 0;
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            this.logo.synth.resume();
-            const widgetTitle = document.getElementsByClassName("wftTitle");
-            for (let i = 0; i < widgetTitle.length; i++) {
-                if (widgetTitle[i].innerHTML === "tempo") {
-                    if (this.logo.tempo.isMoving) {
-                        this.logo.tempo.pause();
-                    }
-
-                    this.logo.tempo.resume();
-                    break;
+        this.logo.synth.resume();
+        const widgetTitle = document.getElementsByClassName("wftTitle");
+        for (let i = 0; i < widgetTitle.length; i++) {
+            if (widgetTitle[i].innerHTML === "tempo") {
+                if (this.logo.tempo.isMoving) {
+                    this.logo.tempo.pause();
                 }
+
+                this.logo.tempo.resume();
+                break;
             }
         }
 
@@ -886,9 +881,7 @@ function Activity() {
         hideDOMLabel();
 
         this.logo.turtleDelay = DEFAULTDELAY;
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            this.logo.synth.resume();
-        }
+        this.logo.synth.resume();
 
         if (!this.turtles.running()) {
             this.logo.runLogoCommands();
@@ -909,9 +902,7 @@ function Activity() {
         hideDOMLabel();
 
         const turtleCount = Object.keys(this.logo.stepQueue).length;
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            this.logo.synth.resume();
-        }
+        this.logo.synth.resume();
 
         if (turtleCount === 0 || this.logo.turtleDelay !== this.TURTLESTEP) {
             // Either we haven't set up a queue or we are
@@ -944,21 +935,19 @@ function Activity() {
             onblur = false;
         }
 
-        if (onblur && _THIS_IS_MUSIC_BLOCKS_) {
+        if (onblur && !_THIS_IS_TURTLE_BLOCKS_) {
             return;
         }
 
         this.logo.doStopTurtles();
 
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            const widgetTitle = document.getElementsByClassName("wftTitle");
-            for (let i = 0; i < widgetTitle.length; i++) {
-                if (widgetTitle[i].innerHTML === "tempo") {
-                    if (this.logo.tempo.isMoving) {
-                        this.logo.tempo.pause();
-                    }
-                    break;
+        const widgetTitle = document.getElementsByClassName("wftTitle");
+        for (let i = 0; i < widgetTitle.length; i++) {
+            if (widgetTitle[i].innerHTML === "tempo") {
+                if (this.logo.tempo.isMoving) {
+                    this.logo.tempo.pause();
                 }
+                break;
             }
         }
     };
@@ -1193,7 +1182,7 @@ function Activity() {
         this.turtles.setGridLabel(_("show Cartesian"));
         this._hideCartesian();
         this._hidePolar();
-        if (_THIS_IS_MUSIC_BLOCKS_) {
+        if (!_THIS_IS_TURTLE_BLOCKS_) {
             this._hideTreble();
             this._hideGrand();
             this._hideSoprano();
@@ -1952,7 +1941,7 @@ function Activity() {
         if (docById("labelDiv").classList.contains("hasKeyboard")) {
             return;
         }
-        if (_THIS_IS_MUSIC_BLOCKS_ && this.keyboardEnableFlag) {
+        if (this.keyboardEnableFlag) {
             if (
                 docById("BPMInput") !== null &&
                 docById("BPMInput").classList.contains("hasKeyboard")
@@ -2024,20 +2013,13 @@ function Activity() {
         const KEYCODE_L = 76; // la
         const KEYCODE_T = 84; // ti
 
-        if (_THIS_IS_MUSIC_BLOCKS_) {
-            disableKeys =
-                docById("lilypondModal").style.display === "block" ||
-                this.searchWidget.style.visibility === "visible" ||
-                docById("planet-iframe").style.display === "" ||
-                docById("paste").style.visibility === "visible" ||
-                docById("wheelDiv").style.display === "" ||
-                this.turtles.running();
-        } else {
-            disableKeys =
-                this.searchWidget.style.visibility === "visible" ||
-                docById("paste").style.visibility === "visible" ||
-                this.turtles.running();
-        }
+        disableKeys =
+            docById("lilypondModal").style.display === "block" ||
+            this.searchWidget.style.visibility === "visible" ||
+            docById("planet-iframe").style.display === "" ||
+            docById("paste").style.visibility === "visible" ||
+            docById("wheelDiv").style.display === "" ||
+            this.turtles.running();
 
         const widgetTitle = document.getElementsByClassName("wftTitle");
         for (let i = 0; i < widgetTitle.length; i++) {
@@ -2100,43 +2082,43 @@ function Activity() {
             const solfnotes_ = _("ti la sol fa mi re do").split(" ");
             switch (event.keyCode) {
                 case KEYCODE_D:
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                    if (!_THIS_IS_TURTLE_BLOCKS_) {
                         this.textMsg("D " + solfnotes_[6]);
                         this.__makeNewNote(5, "do");
                     }
                     break;
                 case KEYCODE_R:
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                    if (!_THIS_IS_TURTLE_BLOCKS_) {
                         this.textMsg("R " + solfnotes_[5]);
                         this.__makeNewNote(5, "re");
                     }
                     break;
                 case KEYCODE_M:
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                    if (!_THIS_IS_TURTLE_BLOCKS_) {
                         this.textMsg("M " + solfnotes_[4]);
                         this.__makeNewNote(5, "mi");
                     }
                     break;
                 case KEYCODE_F:
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                    if (!_THIS_IS_TURTLE_BLOCKS_) {
                         this.textMsg("F " + solfnotes_[3]);
                         this.__makeNewNote(5, "fa");
                     }
                     break;
                 case KEYCODE_S:
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                    if (!_THIS_IS_TURTLE_BLOCKS_) {
                         this.textMsg("S " + solfnotes_[2]);
                         this.__makeNewNote(5, "sol");
                     }
                     break;
                 case KEYCODE_L:
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                    if (!_THIS_IS_TURTLE_BLOCKS_) {
                         this.textMsg("L " + solfnotes_[1]);
                         this.__makeNewNote(5, "la");
                     }
                     break;
                 case KEYCODE_T:
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
+                    if (!_THIS_IS_TURTLE_BLOCKS_) {
                         this.textMsg("T " + solfnotes_[0]);
                         this.__makeNewNote(5, "ti");
                     }
@@ -2296,43 +2278,43 @@ function Activity() {
                         }
                         break;
                     case KEYCODE_D:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                        if (!_THIS_IS_TURTLE_BLOCKS_) {
                             this.textMsg("d " + solfnotes_[6]);
                             this.__makeNewNote(4, "do");
                         }
                         break;
                     case KEYCODE_R:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                        if (!_THIS_IS_TURTLE_BLOCKS_) {
                             this.textMsg("r " + solfnotes_[5]);
                             this.__makeNewNote(4, "re");
                         }
                         break;
                     case KEYCODE_M:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                        if (!_THIS_IS_TURTLE_BLOCKS_) {
                             this.textMsg("m " + solfnotes_[4]);
                             this.__makeNewNote(4, "mi");
                         }
                         break;
                     case KEYCODE_F:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                        if (!_THIS_IS_TURTLE_BLOCKS_) {
                             this.textMsg("f " + solfnotes_[3]);
                             this.__makeNewNote(4, "fa");
                         }
                         break;
                     case KEYCODE_S:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                        if (!_THIS_IS_TURTLE_BLOCKS_) {
                             this.textMsg("s " + solfnotes_[2]);
                             this.__makeNewNote(4, "sol");
                         }
                         break;
                     case KEYCODE_L:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                        if (!_THIS_IS_TURTLE_BLOCKS_) {
                             this.textMsg("l " + solfnotes_[1]);
                             this.__makeNewNote(4, "la");
                         }
                         break;
                     case KEYCODE_T:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
+                        if (!_THIS_IS_TURTLE_BLOCKS_) {
                             this.textMsg("t " + solfnotes_[0]);
                             this.__makeNewNote(4, "ti");
                         }

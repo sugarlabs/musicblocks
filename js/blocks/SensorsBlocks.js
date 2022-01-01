@@ -133,7 +133,7 @@ function setupSensorsBlocks(activity) {
         }
 
         arg(logo) {
-            if (logo.mic === null || activity._THIS_IS_TURTLE_BLOCKS_) {
+            if (logo.mic === null) {
                 return 440;
             }
             if (logo.pitchAnalyser === null) {
@@ -185,9 +185,6 @@ function setupSensorsBlocks(activity) {
         arg(logo) {
             if (logo.mic === null) {
                 return 0;
-            }
-            if (activity._THIS_IS_TURTLE_BLOCKS_) {
-                return Math.round(logo.mic.getLevel() * 1000);
             }
             if (logo.volumeAnalyser === null) {
                 logo.volumeAnalyser = new Tone.Analyser({

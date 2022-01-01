@@ -18,10 +18,10 @@
    DEFAULTNOISE, DEFAULTOSCILLATORTYPE, DEFAULTTEMPERAMENT,
    DEFAULTVOICE, INLINECOLLAPSIBLES, NATURAL, NUMBERBLOCKDEFAULT,
    SPECIALINPUTS, STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
-   _THIS_IS_MUSIC_BLOCKS_, WESTERN2EISOLFEGENAMES, WIDENAMES, _,
-   addTemperamentToDictionary, Block, closeBlkWidgets, createjs,
-   delayExecution, deleteTemperamentFromList, getDrumSynthName,
-   getNoiseName, getNoiseSynthName, getTemperamentsList, getTextWidth,
+   WESTERN2EISOLFEGENAMES, WIDENAMES, _, addTemperamentToDictionary,
+   Block, closeBlkWidgets, createjs, delayExecution,
+   deleteTemperamentFromList, getDrumSynthName, getNoiseName,
+   getNoiseSynthName, getTemperamentsList, getTextWidth,
    getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,
    piemenuBlockContext, prepareMacroExports, ProtoBlock,
    setOctaveRatio, splitScaleDegree, splitSolfege, updateTemperaments
@@ -3016,9 +3016,7 @@ function Blocks(activity) {
         // Deprecated
         // If we drag in a synth block, we need to load the synth.
         if (["sine", "sawtooth", "triangle", "square"].indexOf(name) !== -1) {
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                this.activity.logo.synth.loadSynth(0, name);
-            }
+            this.activity.logo.synth.loadSynth(0, name);
         }
 
         if (
@@ -3702,9 +3700,7 @@ function Blocks(activity) {
                     ) !== -1
                 ) {
                     if (this.blockList[blk].value.slice(0, 4) === "http") {
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.activity.logo.synth.loadSynth(0, this.blockList[blk].value);
-                        }
+                        this.activity.logo.synth.loadSynth(0, this.blockList[blk].value);
                     }
                 }
             }
@@ -6004,11 +6000,9 @@ function Blocks(activity) {
                         value
                     ]);
 
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        // Load the synth for this drum
-                        if (value === null) value = DEFAULTDRUM;
-                        that.activity.logo.synth.loadSynth(0, getDrumSynthName(value));
-                    }
+                    // Load the synth for this drum
+                    if (value === null) value = DEFAULTDRUM;
+                    that.activity.logo.synth.loadSynth(0, getDrumSynthName(value));
                     break;
                 case "effectsname":
                     postProcess = (args) => {
@@ -6023,11 +6017,9 @@ function Blocks(activity) {
                         value
                     ]);
 
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        // Load the synth for this drum
-                        if (value === null) value = DEFAULTEFFECT;
-                        that.activity.logo.synth.loadSynth(0, getDrumSynthName(value));
-                    }
+                    // Load the synth for this drum
+                    if (value === null) value = DEFAULTEFFECT;
+                    that.activity.logo.synth.loadSynth(0, getDrumSynthName(value));
                     break;
                 case "voicename":
                     postProcess = (args) => {
@@ -6048,17 +6040,15 @@ function Blocks(activity) {
                         value
                     ]);
 
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        // Load the synth for this voice
-                        try {
-                            if (value === null) {
-                                value = DEFAULTVOICE;
-                            }
-                            this.activity.logo.synth.loadSynth(0, getVoiceSynthName(value));
-                        } catch (e) {
-                            // eslint-disable-next-line no-console
-                            console.debug(e);
+                    // Load the synth for this voice
+                    try {
+                        if (value === null) {
+                            value = DEFAULTVOICE;
                         }
+                        this.activity.logo.synth.loadSynth(0, getVoiceSynthName(value));
+                    } catch (e) {
+                        // eslint-disable-next-line no-console
+                        console.debug(e);
                     }
                     break;
                 case "noisename":
@@ -6074,17 +6064,15 @@ function Blocks(activity) {
                         value
                     ]);
 
-                    if (_THIS_IS_MUSIC_BLOCKS_) {
-                        // Load the synth for this noise
-                        try {
-                            if (value === null) {
-                                value = DEFAULTNOISE;
-                            }
-                            this.activity.logo.synth.loadSynth(0, getNoiseSynthName(value));
-                        } catch (e) {
-                            // eslint-disable-next-line no-console
-                            console.debug(e);
+                    // Load the synth for this noise
+                    try {
+                        if (value === null) {
+                            value = DEFAULTNOISE;
                         }
+                        this.activity.logo.synth.loadSynth(0, getNoiseSynthName(value));
+                    } catch (e) {
+                        // eslint-disable-next-line no-console
+                        console.debug(e);
                     }
                     break;
                 case "loudness":

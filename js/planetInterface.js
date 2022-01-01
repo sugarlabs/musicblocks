@@ -14,7 +14,7 @@
 // scratch. -- Walter Bender, October 2014.
 
 /*
-   globals _, docById, platformColor, doSVG, createjs, _THIS_IS_MUSIC_BLOCKS_
+   globals _, docById, platformColor, doSVG, createjs, _THIS_IS_TURTLE_BLOCKS_
  */
 
 /*
@@ -228,7 +228,7 @@ function PlanetInterface(activity) {
         this.iframe = document.getElementById("planet-iframe");
         try {
             await this.iframe.contentWindow.makePlanet(
-                _THIS_IS_MUSIC_BLOCKS_,
+                !_THIS_IS_TURTLE_BLOCKS_,
                 this.activity.storage,
                 window._
             );

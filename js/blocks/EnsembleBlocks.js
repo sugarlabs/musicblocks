@@ -14,7 +14,7 @@
 
    _, last, FlowBlock, ValueBlock, FlowClampBlock, LeftBlock, BooleanBlock,
    NOINPUTERRORMSG, NANERRORMSG, INVALIDPITCH, getNote, pitchToNumber,
-   TURTLESVG, FILLCOLORS, STROKECOLORS
+   TURTLESVG, FILLCOLORS, STROKECOLORS, _THIS_IS_TURTLE_BLOCKS_
 */
 
 /* exported setupEnsembleBlocks, getTargetTurtle */
@@ -148,7 +148,7 @@ function setupEnsembleBlocks(activity) {
 
             const targetTurtle = getTargetTurtle(activity.turtles, args[0]);
             if (targetTurtle === null) {
-                if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                if (!_THIS_IS_TURTLE_BLOCKS_) {
                     activity.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
                 } else {
                     activity.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
@@ -195,7 +195,7 @@ function setupEnsembleBlocks(activity) {
 
             const targetTurtle = getTargetTurtle(activity.turtles, args[0]);
             if (targetTurtle === null) {
-                if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                if (!_THIS_IS_TURTLE_BLOCKS_) {
                     activity.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
                 } else {
                     activity.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
@@ -204,7 +204,7 @@ function setupEnsembleBlocks(activity) {
                 const tur = activity.turtles.ithTurtle(targetTurtle);
 
                 if (tur.running) {
-                    if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                    if (!_THIS_IS_TURTLE_BLOCKS_) {
                         activity.errorMsg(_("Mouse is already running."), blk);
                     } else {
                         activity.errorMsg(_("Turtle is already running."), blk);
@@ -311,7 +311,7 @@ function setupEnsembleBlocks(activity) {
         flow(args, logo, turtle, blk) {
             const targetTurtle = getTargetTurtle(activity.turtles, args[0]);
             if (targetTurtle === null) {
-                if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                if (!_THIS_IS_TURTLE_BLOCKS_) {
                     activity.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
                 } else {
                     activity.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
@@ -350,7 +350,7 @@ function setupEnsembleBlocks(activity) {
             if (targetTurtle !== null) {
                 logo.runFromBlock(logo, targetTurtle, args[1], isflow, receivedArg);
             } else {
-                if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                if (!_THIS_IS_TURTLE_BLOCKS_) {
                     activity.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
                 } else {
                     activity.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
@@ -522,7 +522,7 @@ function setupEnsembleBlocks(activity) {
             }
 
             if (value === null) {
-                if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                if (!_THIS_IS_TURTLE_BLOCKS_) {
                     activity.errorMsg(_("Cannot find mouse") + " " + targetTurtle, blk);
                 } else {
                     activity.errorMsg(_("Cannot find turtle") + " " + targetTurtle, blk);
@@ -609,7 +609,7 @@ function setupEnsembleBlocks(activity) {
             }
 
             if (value === null) {
-                if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                if (!_THIS_IS_TURTLE_BLOCKS_) {
                     activity.errorMsg(_("Cannot find mouse") + " " + targetTurtle, blk);
                 } else {
                     activity.errorMsg(_("Cannot find turtle") + " " + targetTurtle, blk);
@@ -659,7 +659,7 @@ function setupEnsembleBlocks(activity) {
 
             const targetTurtle = getTargetTurtle(activity.turtles, args[0]);
             if (targetTurtle === null) {
-                if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                if (!_THIS_IS_TURTLE_BLOCKS_) {
                     activity.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
                 } else {
                     activity.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
@@ -899,7 +899,7 @@ function setupEnsembleBlocks(activity) {
                 if (a >= 0 && a < activity.turtles.turtleList.length) {
                     return activity.turtles.turtleList[a].name;
                 } else {
-                    if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                    if (!_THIS_IS_TURTLE_BLOCKS_) {
                         activity.errorMsg(_("Cannot find mouse"));
                     } else {
                         activity.errorMsg(_("Cannot find turtle"));
@@ -953,7 +953,7 @@ function setupEnsembleBlocks(activity) {
             }
 
             if (!foundTargetTurtle) {
-                if (activity._THIS_IS_MUSIC_BLOCKS_) {
+                if (!_THIS_IS_TURTLE_BLOCKS_) {
                     activity.errorMsg(_("Cannot find mouse") + " " + args[0], blk);
                 } else {
                     activity.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
