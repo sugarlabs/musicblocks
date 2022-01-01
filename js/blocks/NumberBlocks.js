@@ -903,7 +903,7 @@ function setupNumberBlocks(activity) {
 
     class NumberBlock extends ValueBlock {
         constructor() {
-            super("number");
+            super("number", _("number"));
             this.setPalette("number", activity);
             this.beginnerBlock(true);
 

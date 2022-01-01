@@ -329,7 +329,7 @@ function setupBooleanBlocks(activity) {
 
     class StaticBooleanBlock extends BooleanBlock {
         constructor() {
-            super("boolean");
+            super("boolean", _("boolean"));
             this.setPalette("boolean", activity);
             this.setHelpString([
                 _("The Boolean block is used to specify true or false."),
