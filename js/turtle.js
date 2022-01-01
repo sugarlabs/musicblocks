@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /**
  * @file This contains the prototype of the Turtle component.
  * @author Walter Bender
@@ -143,6 +144,7 @@ class Turtle {
     /**
      * Causes turtle to blink (toggle turtle's visibility) every 100 ms.
      */
+    // eslint-disable-next-line no-unused-vars
     async blink(duration, volume) {
         // Suppress blinking when using cursorout and cursorover
         // sensors to prevent multiple triggers.

@@ -92,7 +92,6 @@ const processLilypondNotes = function (lilypond, logo, turtle) {
     let keySignature;
     let key;
     let mode;
-    let obj;
     let note;
     let notes;
 

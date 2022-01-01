@@ -3422,16 +3422,16 @@ class Block {
         } else if (this.name === "grid") {
             selectedValue = this.value;
 
-	    let gridLabels = [];
-	    if (_THIS_IS_TURTLE_BLOCKS_) {
-		gridLabels = [
+            let gridLabels = [];
+            if (_THIS_IS_TURTLE_BLOCKS_) {
+                gridLabels = [
                     _("Cartesian"),
                     _("polar"),
                     _("Cartesian+polar"),
                     _("none")
-		];
+                ];
             } else {
-		gridLabels = [
+                gridLabels = [
                     _("Cartesian"),
                     _("polar"),
                     _("Cartesian+polar"),
@@ -3442,7 +3442,7 @@ class Block {
                     _("tenor"),
                     _("bass"),
                     _("none")
-		];
+                ];
             }
             const gridValues = gridLabels;
 
@@ -3663,11 +3663,13 @@ class Block {
 
             this.label.style.left =
                 Math.round(
-                    (x + this.activity.blocksContainer.x) * this.activity.getStageScale() + canvasLeft
+                    (x + this.activity.blocksContainer.x) * this.activity.getStageScale()
+                        + canvasLeft
                 ) + "px";
             this.label.style.top =
                 Math.round(
-                    (y + this.activity.blocksContainer.y) * this.activity.getStageScale() + canvasTop
+                    (y + this.activity.blocksContainer.y) * this.activity.getStageScale()
+                        + canvasTop
                 ) + "px";
             this.label.style.width =
                 Math.round((selectorWidth * this.blocks.blockScale * this.protoblock.scale) / 2) +
