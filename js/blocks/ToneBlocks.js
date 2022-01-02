@@ -596,7 +596,7 @@ function setupToneBlocks(activity) {
 
     class VoiceNameBlock extends ValueBlock {
         constructor() {
-            super("voicename");
+            super("voicename", _("set instrument"));
             this.setPalette("tone", activity);
             this.setHelpString([
                 _(
@@ -758,7 +758,7 @@ function setupToneBlocks(activity) {
 
     class AudioFileBlock extends ValueBlock {
         constructor() {
-            super("audiofile");
+            super("audiofile", _("audio file"));
             this.parameter = true;
             this.extraWidth = 20;
             this.setPalette("tone", activity);

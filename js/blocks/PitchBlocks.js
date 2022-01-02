@@ -413,7 +413,7 @@ function setupPitchBlocks(activity) {
 
     class OutputToolsBlocks extends LeftBlock {
         constructor() {
-            super("outputtools");
+            super("outputtools", _("pitch converter"));
             this.setPalette("pitch", activity);
             this.beginnerBlock(true);
             this.extraWidth = 50;
@@ -825,7 +825,7 @@ function setupPitchBlocks(activity) {
 
     class AccidentalNameBlock extends ValueBlock {
         constructor() {
-            super("accidentalname");
+            super("accidentalname", _("accidental selector"));
             this.setPalette("pitch", activity);
             this.setHelpString([
                 _(
@@ -841,7 +841,7 @@ function setupPitchBlocks(activity) {
 
     class EastIndianSolfegeBlock extends ValueBlock {
         constructor() {
-            super("eastindiansolfege");
+            super("eastindiansolfege", _("east indian solfege"));
             this.setPalette("pitch", activity);
             this.setHelpString([
                 _("Pitch can be specified in terms of ni dha pa ma ga re sa."),
@@ -855,7 +855,7 @@ function setupPitchBlocks(activity) {
 
     class NoteNameBlock extends ValueBlock {
         constructor() {
-            super("notename");
+            super("notename", _("note name"));
             this.setPalette("pitch", activity);
             this.setHelpString([
                 _("Pitch can be specified in terms of C D E F G A B."),
@@ -869,7 +869,7 @@ function setupPitchBlocks(activity) {
 
     class SolfegeBlock extends ValueBlock {
         constructor() {
-            super("solfege");
+            super("solfege", _("solfede"));
             this.setPalette("pitch", activity);
             this.setHelpString([
                 _("Pitch can be specified in terms of do re mi fa sol la ti."),
@@ -1707,7 +1707,7 @@ function setupPitchBlocks(activity) {
     class ScaleDegree2Block extends ValueBlock {
         constructor() {
             //.TRANS: a numeric mapping of the notes in an octave based on the musical mode
-            super("scaledegree2");
+            super("scaledegree2", _("scale degree"));
             this.setPalette("pitch", activity);
             this.extraWidth = 10;
             this.setHelpString([
