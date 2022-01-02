@@ -869,7 +869,7 @@ function setupPitchBlocks(activity) {
 
     class SolfegeBlock extends ValueBlock {
         constructor() {
-            super("solfege", _("solfede"));
+            super("solfege", _("solfege"));
             this.setPalette("pitch", activity);
             this.setHelpString([
                 _("Pitch can be specified in terms of do re mi fa sol la ti."),
