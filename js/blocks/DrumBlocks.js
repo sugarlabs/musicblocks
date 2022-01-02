@@ -21,7 +21,7 @@
 function setupDrumBlocks(activity) {
     class NoiseNameBlock extends ValueBlock {
         constructor() {
-            super("noisename");
+            super("noisename", _("noise name"));
             this.setPalette("drum", activity);
             this.formBlock({ outType: "textout" });
             this.extraWidth = 50;
@@ -37,7 +37,7 @@ function setupDrumBlocks(activity) {
 
     class DrumNameBlock extends ValueBlock {
         constructor() {
-            super("drumname");
+            super("drumname", _("drum name"));
             this.setPalette("drum", activity);
             this.formBlock({ outType: "textout" });
             this.extraWidth = 50;
@@ -52,7 +52,7 @@ function setupDrumBlocks(activity) {
 
     class EffectsNameBlock extends ValueBlock {
         constructor() {
-            super("effectsname");
+            super("effectsname", _("effects name"));
             this.setPalette("drum", activity);
             this.formBlock({ outType: "textout" });
             this.extraWidth = 50;

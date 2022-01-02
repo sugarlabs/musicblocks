@@ -64,7 +64,7 @@ function setupIntervalsBlocks(activity) {
 
     class TemperamentNameBlock extends ValueBlock {
         constructor() {
-            super("temperamentname");
+            super("temperamentname", _("temperament name"));
             this.setPalette("tone", activity);
             this.setHelpString([
                 _("The Temperament name block is used to select a tuning method."),

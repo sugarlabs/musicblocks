@@ -299,7 +299,7 @@ function setupMediaBlocks(activity) {
 
     class CameraBlock extends ValueBlock {
         constructor() {
-            super("camera");
+            super("camera", _("camera"));
             this.setPalette("media", activity);
             this.setHelpString([
                 _("The Camera block connects a webcam to the Show block."),
@@ -314,7 +314,7 @@ function setupMediaBlocks(activity) {
 
     class VideoBlock extends ValueBlock {
         constructor() {
-            super("video");
+            super("video", _("video"));
             this.setPalette("media", activity);
             this.setHelpString([
                 _("The Video block selects video for use with the Show block."),
@@ -329,7 +329,7 @@ function setupMediaBlocks(activity) {
 
     class LoadFileBlock extends ValueBlock {
         constructor() {
-            super("loadFile", "");
+            super("loadFile", _("open file"));
             this.setPalette("media", activity);
             this.setHelpString([
                 _(
@@ -534,7 +534,7 @@ function setupMediaBlocks(activity) {
 
     class MediaBlock extends ValueBlock {
         constructor() {
-            super("media");
+            super("media", _("media"));
             this.setPalette("media", activity);
             this.beginnerBlock(true);
 
@@ -564,7 +564,7 @@ function setupMediaBlocks(activity) {
 
     class TextBlock extends ValueBlock {
         constructor() {
-            super("text");
+            super("text", _("text"));
             this.extraWidth = 30;
             this.setPalette("media", activity);
             this.beginnerBlock(true);

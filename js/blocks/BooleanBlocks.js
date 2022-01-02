@@ -336,6 +336,9 @@ function setupBooleanBlocks(activity) {
                 "documentation",
                 ""
             ]);
+            this.formBlock({
+                name: "boolean"
+            });
         }
 
         arg(logo, turtle, blk) {
