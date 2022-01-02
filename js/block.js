@@ -1097,7 +1097,11 @@ class Block {
             }
         } else if (this.protoblock.staticLabels.length > 0 && !this.protoblock.image) {
             // Label should be defined inside _().
-            block_label = this.protoblock.staticLabels[0];
+            if (SPECIALINPUTS.indexOf(this.name) !== -1) {
+                block_label = "";
+            } else {
+                block_label = this.protoblock.staticLabels[0];
+            }
         }
 
         while (this.protoblock.staticLabels.length < this.protoblock.args + 1) {
