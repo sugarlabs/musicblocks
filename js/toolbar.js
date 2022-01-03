@@ -10,7 +10,7 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /*
-   global _, jQuery, _THIS_IS_TURTLE_BLOCKS_, docById, doSVG
+   global _, jQuery, _THIS_IS_MUSIC_BLOCKS_, docById, doSVG
  */
 
 /* exported Toolbar */
@@ -40,7 +40,7 @@ class Toolbar {
         this.activity = activity;
         let strings;
         let strings_;
-        if (!_THIS_IS_TURTLE_BLOCKS_) {
+        if (_THIS_IS_MUSIC_BLOCKS_) {
             strings = [
                 ["mb-logo", _("About Music Blocks")],
                 ["play", _("Play")],
@@ -498,7 +498,7 @@ class Toolbar {
                     };
                 }
 
-                if (!_THIS_IS_TURTLE_BLOCKS_) {
+                if (_THIS_IS_MUSIC_BLOCKS_) {
                     saveWAV = docById("save-wav");
 
                     saveWAV.onclick = wave_onclick;

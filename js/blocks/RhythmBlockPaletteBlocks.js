@@ -13,7 +13,8 @@
    global
 
    _, last, FlowBlock, NOINPUTERRORMSG, TONEBPM, Singer,
-   FlowClampBlock, DEFAULTDRUM, _THIS_IS_TURTLE_BLOCKS_ 
+   FlowClampBlock, DEFAULTDRUM, _THIS_IS_MUSIC_BLOCKS_,
+   _THIS_IS_TURTLE_BLOCKS_ 
  */
 
 /* exported setupRhythmBlockPaletteBlocks */
@@ -594,7 +595,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
             super("stuplet", _("simple tuplet"));
             this.setPalette(rhythmBlockPalette, activity);
             this.piemenuValuesC1 = [3, 5, 7, 11];
-            this.beginnerBlock(!_THIS_IS_TURTLE_BLOCKS_);
+            this.beginnerBlock(_THIS_IS_MUSIC_BLOCKS_);
 
             this.setHelpString([
                 _("Tuplets are a collection of notes that get scaled to a specific duration.") +

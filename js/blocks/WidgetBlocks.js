@@ -17,7 +17,7 @@
    DEFAULTMODE, Tempo, PitchDrumMatrix, PhraseMaker, StatusMatrix,
    RhythmRuler, FILTERTYPES, instrumentsFilters, DEFAULTFILTERTYPE,
    TemperamentWidget, TimbreWidget, ModeWidget, PitchSlider,
-   MusicKeyboard, PitchStaircase, SampleWidget, _THIS_IS_TURTLE_BLOCKS_
+   MusicKeyboard, PitchStaircase, SampleWidget, _THIS_IS_MUSIC_BLOCKS_
  */
 
 /*
@@ -1218,7 +1218,7 @@ function setupWidgetBlocks(activity) {
         }
     }
 
-    if (!_THIS_IS_TURTLE_BLOCKS_) {
+    if (_THIS_IS_MUSIC_BLOCKS_) {
         new EnvelopeBlock().setup(activity);
         new FilterBlock().setup(activity);
         new TemperamentBlock().setup(activity);
