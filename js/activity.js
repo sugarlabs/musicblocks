@@ -1,4 +1,4 @@
-// Copyright (c) 2014-21 Walter Bender
+// Copyright (c) 2014-22 Walter Bender
 // Copyright (c) Yash Khandelwal, GSoC'15
 //
 // This program is free software; you can redistribute it and/or
@@ -4064,7 +4064,9 @@ function Activity() {
         this.toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin, setScroller);
         this.toolbar.renderMergeIcon(_doMergeLoad);
         this.toolbar.renderRestoreIcon(restoreTrash);
-        this.toolbar.renderChooseKeyIcon(chooseKeyMenu);
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            this.toolbar.renderChooseKeyIcon(chooseKeyMenu);
+        }
         this.toolbar.renderJavaScriptIcon(toggleJSWindow);
         this.toolbar.renderLanguageSelectIcon(this.languageBox);
         this.toolbar.renderWrapIcon();

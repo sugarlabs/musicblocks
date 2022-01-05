@@ -154,7 +154,6 @@ class Toolbar {
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
                 ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
-                ["chooseKeyIcon", _("Set Pitch Preview")],
                 ["toggleJavaScriptIcon", _("Toggle JavaScript Editor")],
                 ["restoreIcon", _("Restore")],
                 ["beginnerMode", _("Switch to beginner mode")],
@@ -206,7 +205,6 @@ class Toolbar {
                 _("Enable horizontal scrolling"),
                 _("Disable horizontal scrolling"),
                 _("Merge with current project"),
-                _("Set Pitch Preview"),
                 _("Toggle JavaScript Editor"),
                 _("Restore"),
                 _("Switch to beginner mode"),
@@ -721,11 +719,13 @@ class Toolbar {
      * @returns {void}
      */
     renderChooseKeyIcon(onclick) {
-        const chooseKeyIcon = docById("chooseKeyIcon");
-        docById("chooseKeyDiv").style.display = "none";
-        chooseKeyIcon.onclick = () => {
-            onclick(this.activity);
-        };
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            const chooseKeyIcon = docById("chooseKeyIcon");
+            docById("chooseKeyDiv").style.display = "none";
+            chooseKeyIcon.onclick = () => {
+                onclick(this.activity);
+            };
+        }
     }
 
     /**
