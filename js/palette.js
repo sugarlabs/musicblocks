@@ -834,30 +834,6 @@ class Palette {
             header.appendChild(closeDownImg);
         }
 
-        // const updateScrollBtnVisibility = () => {
-        //     const list = docById("PaletteBody_items");
-        //     // eslint-disable-next-line no-use-before-define
-        //     upBtn.style.opacity = list.scrollTop === 0 ? "0" : "0.3";
-        //     // eslint-disable-next-line no-use-before-define
-        //     dnBtn.style.opacity =
-        //         list.scrollTop >= list.scrollHeight - list.offsetHeight ? "0" : "0.3";
-        // };
-
-        // const buttonContainers = document.createDocumentFragment();
-        // const upBtn = makePaletteIcons(UPICON, this.palettes.cellSize, this.palettes.cellSize);
-        // const dnBtn = makePaletteIcons(DOWNICON, this.palettes.cellSize, this.palettes.cellSize);
-        // upBtn.style.position = dnBtn.style.position = "absolute";
-        // upBtn.style.right = dnBtn.style.right = "8px";
-        // upBtn.style.top = "42px";
-        // dnBtn.style.bottom = "0";
-        // upBtn.style.zIndex = dnBtn.style.zIndex = "10";
-        // upBtn.style.transition = dnBtn.style.transition = "opacity 0.5s ease";
-        // updateScrollBtnVisibility();
-        // docById("PaletteBody_items").onscroll = updateScrollBtnVisibility;
-        // buttonContainers.appendChild(upBtn);
-        // buttonContainers.appendChild(dnBtn);
-        // palBody.appendChild(buttonContainers);
-
         this._showMenuItems();
     }
 
