@@ -13,7 +13,7 @@
    global
 
    last, _, ValueBlock, FlowClampBlock, FlowBlock, MusicBlocks, Mouse,
-   NOINPUTERRORMSG, NANERRORMSG, toFixed2
+   NOINPUTERRORMSG, NANERRORMSG, toFixed2, _THIS_IS_MUSIC_BLOCKS_
  */
 
 /*
@@ -40,11 +40,19 @@ function setupGraphicsBlocks(activity) {
             this.setPalette("graphics", activity);
             this.beginnerBlock(true);
             this.parameter = true;
-            this.setHelpString([
-                _("The Heading block returns the orientation of the mouse."),
-                "documentation",
-                ""
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
+                    _("The Heading block returns the orientation of the mouse."),
+                    "documentation",
+                    ""
+                ]);
+            } else {
+                this.setHelpString([
+                    _("The Heading block returns the orientation of the turtle."),
+                    "documentation",
+                    ""
+                ]);
+            }
         }
 
         setter(logo, value, turtle) {
@@ -79,12 +87,21 @@ function setupGraphicsBlocks(activity) {
             this.setPalette("graphics", activity);
             this.beginnerBlock(true);
             this.parameter = true;
-            this.setHelpString([
-                _("The Y block returns the vertical position of the mouse."),
-                "documentation",
-                null,
-                "xyhelp"
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
+                    _("The Y block returns the vertical position of the mouse."),
+                    "documentation",
+                    null,
+                    "xyhelp"
+                ]);
+            } else {
+                this.setHelpString([
+                    _("The Y block returns the vertical position of the turtle."),
+                    "documentation",
+                    null,
+                    "xyhelp"
+                ]);
+            }
 
             this.formBlock({
                 name: this.lang === "ja" ? _("y3") : _("y")
@@ -125,12 +142,21 @@ function setupGraphicsBlocks(activity) {
             this.setPalette("graphics", activity);
             this.beginnerBlock(true);
             this.parameter = true;
-            this.setHelpString([
-                _("The X block returns the horizontal position of the mouse."),
-                "documentation",
-                null,
-                "xyhelp"
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
+                    _("The X block returns the horizontal position of the mouse."),
+                    "documentation",
+                    null,
+                    "xyhelp"
+                ]);
+            } else {
+                this.setHelpString([
+                    _("The X block returns the horizontal position of the turtlee."),
+                    "documentation",
+                    null,
+                    "xyhelp"
+                ]);
+            }
 
             this.formBlock({
                 name: this.lang === "ja" ? _("x3") : _("x")
@@ -370,12 +396,21 @@ function setupGraphicsBlocks(activity) {
                 285, 300, 315, 330, 345, 360];
             this.piemenuValuesC2 = [25, 50, 75, 100, 125, 150, 175, 200, 225,
                 250, 275, 300];
-            this.setHelpString([
-                _("The Arc block moves the mouse in a arc."),
-                "documentation",
-                null,
-                "archelp"
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
+                    _("The Arc block moves the mouse in a arc."),
+                    "documentation",
+                    null,
+                    "archelp"
+                ]);
+            } else {
+                this.setHelpString([
+                    _("The Arc block moves the turtle in a arc."),
+                    "documentation",
+                    null,
+                    "archelp"
+                ]);
+            }
 
             this.formBlock({
                 //.TRANS: draws a part of the circumference of a circle
@@ -424,11 +459,19 @@ function setupGraphicsBlocks(activity) {
             this.piemenuValuesC1 = [0, 30, 45, 60, 90, 120, 135, 150, 180,
                 210, 225, 240, 270, 300, 315, 330];
 
-            this.setHelpString([
-                _("The Set heading block sets the heading of the mouse."),
-                "documentation",
-                ""
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
+                    _("The Set heading block sets the heading of the mouse."),
+                    "documentation",
+                    ""
+                ]);
+            } else {
+                this.setHelpString([
+                    _("The Set heading block sets the heading of the turtlee."),
+                    "documentation",
+                    ""
+                ]);
+            }
 
             this.formBlock({
                 args: 1,
@@ -464,11 +507,19 @@ function setupGraphicsBlocks(activity) {
             this.setPalette("graphics", activity);
             this.beginnerBlock(true);
 
-            this.setHelpString([
-                _("The Set XY block moves the mouse to a specific position on the screen."),
-                "documentation",
-                ""
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
+                    _("The Set XY block moves the mouse to a specific position on the screen."),
+                    "documentation",
+                    ""
+                ]);
+            } else {
+                this.setHelpString([
+                    _("The Set XY block moves the turtle to a specific position on the screen."),
+                    "documentation",
+                    ""
+                ]);
+            }
 
             this.formBlock({
                 //.TRANS: set xy (Cartesian) position
@@ -514,12 +565,21 @@ function setupGraphicsBlocks(activity) {
             this.setPalette("graphics", activity);
             this.beginnerBlock(true);
             this.piemenuValuesC1 = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
-            this.setHelpString([
-                _("The Right block turns the mouse to the right."),
-                "documentation",
-                null,
-                "forwardhelp"
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
+                    _("The Right block turns the mouse to the right."),
+                    "documentation",
+                    null,
+                    "forwardhelp"
+                ]);
+            } else {
+                this.setHelpString([
+                    _("The Right block turns the turtle to the right."),
+                    "documentation",
+                    null,
+                    "forwardhelp"
+                ]);
+            }
 
             this.formBlock({
                 //.TRANS: right1 and right are when turning right (clockwise)
@@ -564,12 +624,21 @@ function setupGraphicsBlocks(activity) {
             this.setPalette("graphics", activity);
             this.beginnerBlock(true);
             this.piemenuValuesC1 = [330, 300, 270, 240, 210, 180, 150, 120, 90, 60, 30, 0];
-            this.setHelpString([
-                _("The Left block turns the mouse to the left."),
-                "documentation",
-                null,
-                "forwardhelp"
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
+                    _("The Left block turns the mouse to the left."),
+                    "documentation",
+                    null,
+                    "forwardhelp"
+                ]);
+            } else {
+                this.setHelpString([
+                    _("The Left block turns the turtle to the left."),
+                    "documentation",
+                    null,
+                    "forwardhelp"
+                ]);
+            }
 
             this.formBlock({
                 //.TRANS: left and left1 are when turning left (counter-clockwise)
@@ -614,13 +683,21 @@ function setupGraphicsBlocks(activity) {
             super("back", _("back"));
             this.setPalette("graphics", activity);
             this.beginnerBlock(true);
-
-            this.setHelpString([
-                _("The Back block moves the mouse backward."),
-                "documentation",
-                null,
-                "forwardhelp"
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
+                    _("The Back block moves the mouse backward."),
+                    "documentation",
+                    null,
+                    "forwardhelp"
+                ]);
+            } else {
+                this.setHelpString([
+                    _("The Back block moves the turtle backward."),
+                    "documentation",
+                    null,
+                    "forwardhelp"
+                ]);
+            }
 
             this.formBlock({
                 args: 1,
@@ -664,12 +741,21 @@ function setupGraphicsBlocks(activity) {
             this.setPalette("graphics", activity);
             this.beginnerBlock(true);
 
-            this.setHelpString([
-                _("The Forward block moves the mouse forward."),
-                "documentation",
-                null,
-                "forwardhelp"
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
+                    _("The Forward block moves the mouse forward."),
+                    "documentation",
+                    null,
+                    "forwardhelp"
+                ]);
+            } else {
+                this.setHelpString([
+                    _("The Forward block moves the turtle forward."),
+                    "documentation",
+                    null,
+                    "forwardhelp"
+                ]);
+            }
 
             this.formBlock({
                 args: 1,

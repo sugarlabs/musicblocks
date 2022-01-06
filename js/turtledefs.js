@@ -518,11 +518,11 @@ function createHelpContent(activity) {
                     ": " +
                     _("Save your project to a file.") +
                     "<br/><br/>" +
-                    _("Save mouse artwork as SVG") +
+                    _("Save turtle artwork as SVG") +
                     ": " +
                     _("Save graphics from your project to as SVG.") +
                     "<br/><br/>" +
-                    _("Save mouse artwork as PNG") +
+                    _("Save turtle artwork as PNG") +
                     ": " +
                     _("Save graphics from your project as PNG.") +
                     "<br/><br/>" +

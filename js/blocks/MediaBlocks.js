@@ -13,7 +13,8 @@
    global
 
    _, ValueBlock, LeftBlock, FlowBlock, NOINPUTERRORMSG, NANERRORMSG,
-   toFixed2, Howl, last, calcOctave, pitchToFrequency, doStopVideoCam
+   toFixed2, Howl, last, calcOctave, pitchToFrequency, doStopVideoCam,
+   _THIS_IS_MUSIC_BLOCKS_
  */
 
 /* exported setupMediaBlocks */
@@ -26,20 +27,34 @@ function setupMediaBlocks(activity) {
             this.setPalette("media", activity);
             this.beginnerBlock(true);
             this.parameter = true;
-            this.setHelpString([
-                _(
-                    "The Right block returns the position of the right of the canvas."
-                ) +
-                    " " +
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
                     _(
-                        "In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
+                        "The Right block returns the position of the right of the canvas."
+                    ) +
+                        " " +
+                        _(
+                            "In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
+                        ),
+                    "documentation",
+                    null,
+                    "lrhelp"
+                ]);
+            } else {
+                this.setHelpString([
+                    _(
+                        "The Right block returns the position of the right of the canvas."
+                    ) +
+                        " " +
+                    _(
+                        "In this example, the turtle moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
                     ),
-                "documentation",
-                null,
-                "lrhelp"
-            ]);
+                    "documentation",
+                    null,
+                    "lrhelp"
+                ]);
+            }
         }
-
         updateParameter() {
             return toFixed2(
                 activity.turtles._canvas.width / (2.0 * activity.turtles.scale)
@@ -58,18 +73,33 @@ function setupMediaBlocks(activity) {
             this.setPalette("media", activity);
             this.beginnerBlock(true);
             this.parameter = true;
-            this.setHelpString([
-                _(
-                    "The Left block returns the position of the left of the canvas."
-                ) +
-                    " " +
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
                     _(
-                        "In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
-                    ),
-                "documentation",
-                null,
-                "lrhelp"
-            ]);
+                        "The Left block returns the position of the left of the canvas."
+                    ) +
+                        " " +
+                        _(
+                            "In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
+                        ),
+                    "documentation",
+                    null,
+                    "lrhelp"
+                ]);
+            } else {
+                this.setHelpString([
+                    _(
+                        "The Left block returns the position of the left of the canvas."
+                    ) +
+                        " " +
+                        _(
+                            "In this example, the turtle moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
+                        ),
+                    "documentation",
+                    null,
+                    "lrhelp"
+                ]);
+            }
         }
 
         updateParameter() {
@@ -91,18 +121,33 @@ function setupMediaBlocks(activity) {
             this.setPalette("media", activity);
             this.beginnerBlock(true);
             this.parameter = true;
-            this.setHelpString([
-                _(
-                    "The Top block returns the position of the top of the canvas."
-                ) +
-                    " " +
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
                     _(
-                        "In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
-                    ),
-                "documentation",
-                null,
-                "bottomposhelp"
-            ]);
+                        "The Top block returns the position of the top of the canvas."
+                    ) +
+                        " " +
+                        _(
+                            "In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
+                        ),
+                    "documentation",
+                    null,
+                    "bottomposhelp"
+                ]);
+            } else {
+                this.setHelpString([
+                    _(
+                        "The Top block returns the position of the top of the canvas."
+                    ) +
+                        " " +
+                        _(
+                            "In this example, the turtle moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
+                        ),
+                    "documentation",
+                    null,
+                    "bottomposhelp"
+                ]);
+            }
         }
 
         updateParameter() {
@@ -122,18 +167,33 @@ function setupMediaBlocks(activity) {
             this.setPalette("media", activity);
             this.beginnerBlock(true);
             this.parameter = true;
-            this.setHelpString([
-                _(
-                    "The Bottom block returns the position of the bottom of the canvas."
-                ) +
-                    " " +
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
                     _(
-                        "In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
-                    ),
-                "documentation",
-                null,
-                "bottomposhelp"
-            ]);
+                        "The Bottom block returns the position of the bottom of the canvas."
+                    ) +
+                        " " +
+                        _(
+                            "In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
+                        ),
+                    "documentation",
+                    null,
+                    "bottomposhelp"
+                ]);
+            } else {
+                this.setHelpString([
+                    _(
+                        "The Bottom block returns the position of the bottom of the canvas."
+                    ) +
+                        " " +
+                        _(
+                            "In this example, the turtle moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
+                        ),
+                    "documentation",
+                    null,
+                    "bottomposhelp"
+                ]);
+            }
         }
 
         updateParameter() {
@@ -455,15 +515,25 @@ function setupMediaBlocks(activity) {
             this.setPalette("media", activity);
             this.beginnerBlock(true);
 
-            this.setHelpString([
-                _(
-                    "The Shell block is used to change the appearance of the mouse."
-                ),
-                "documentation",
-                null,
-                "turtleshell"
-            ]);
-
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
+                    _(
+                        "The Avatar block is used to change the appearance of the mouse."
+                    ),
+                    "documentation",
+                    null,
+                    "turtleshell"
+                ]);
+            } else {
+                this.setHelpString([
+                    _(
+                        "The Avatar block is used to change the appearance of the turtle."
+                    ),
+                    "documentation",
+                    null,
+                    "turtleshell"
+                ]);
+            }
             this.formBlock({
                 args: 2,
                 defaults: [55, null],

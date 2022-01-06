@@ -62,22 +62,42 @@ function _blockFindTurtle(activity, turtle, blk, receivedArg) {
 function setupEnsembleBlocks(activity) {
     class TurtleHeapBlock extends LeftBlock {
         constructor() {
-            super("turtleheap", _("mouse index heap"));
-            this.setPalette("ensemble", activity);
-            this.setHelpString([
-                _(
-                    "The Mouse index heap block returns a value in the heap at a specified location for a specified mouse."
-                ),
-                "documentation",
-                ""
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                super("turtleheap", _("mouse index heap"));
+                this.setHelpString([
+                    _(
+                        "The Mouse index heap block returns a value in the heap at a specified location for a specified mouse."
+                    ),
+                    "documentation",
+                    ""
+                ]);
 
-            this.formBlock({
-                args: 2,
-                defaults: [_("Mr. Mouse"), 1],
-                argTypes: ["anyin", "numberin"],
-                argLabels: [_("mouse name"), _("index")]
-            });
+                this.formBlock({
+                    args: 2,
+                    defaults: [_("Mr. Mouse"), 1],
+                    argTypes: ["anyin", "numberin"],
+                    argLabels: [_("mouse name"), _("index")]
+                });
+            } else {
+                super("turtleheap", _("turtle index heap"));
+                this.setHelpString([
+                    _(
+                        "The Turtle index heap block returns a value in the heap at a specified location for a specified turtle."
+                    ),
+                    "documentation",
+                    ""
+                ]);
+
+                this.formBlock({
+                    args: 2,
+                    //.TRANS: Yertle is the name of a turtle.
+                    defaults: [_("Yertle"), 1],
+                    argTypes: ["anyin", "numberin"],
+                    argLabels: [_("turtle name"), _("index")]
+                });
+            }
+
+            this.setPalette("ensemble", activity);
         }
 
         arg(logo, turtle, blk, receivedArg) {
@@ -125,19 +145,35 @@ function setupEnsembleBlocks(activity) {
 
     class StopTurtleBlock extends FlowBlock {
         constructor() {
-            super("stopTurtle", _("stop mouse"));
-            this.setPalette("ensemble", activity);
-            this.setHelpString([
-                _("The Stop mouse block stops the specified mouse."),
-                "documentation",
-                ""
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                super("stopTurtle", _("stop mouse"));
+                this.setHelpString([
+                    _("The Stop mouse block stops the specified mouse."),
+                    "documentation",
+                    ""
+                ]);
 
-            this.formBlock({
-                args: 1,
-                defaults: [_("Mr. Mouse")],
-                argTypes: ["anyin"]
-            });
+                this.formBlock({
+                    args: 1,
+                    defaults: [_("Mr. Mouse")],
+                    argTypes: ["anyin"]
+                });
+            } else {
+                super("stopTurtle", _("stop turtle"));
+                this.setHelpString([
+                    _("The Stop turtle block stops the specified turtle."),
+                    "documentation",
+                    ""
+                ]);
+
+                this.formBlock({
+                    args: 1,
+                    defaults: [_("Yertle")],
+                    argTypes: ["anyin"]
+                });
+            }
+
+            this.setPalette("ensemble", activity);
         }
 
         flow(args, logo, turtle, blk) {
@@ -170,19 +206,35 @@ function setupEnsembleBlocks(activity) {
 
     class StartTurtleBlock extends FlowBlock {
         constructor() {
-            super("startTurtle", _("start mouse"));
-            this.setPalette("ensemble", activity);
-            this.setHelpString([
-                _("The Start mouse block starts the specified mouse."),
-                "documentation",
-                ""
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                super("startTurtle", _("start mouse"));
+                this.setPalette("ensemble", activity);
+                this.setHelpString([
+                    _("The Start mouse block starts the specified mouse."),
+                    "documentation",
+                    ""
+                ]);
 
-            this.formBlock({
-                args: 1,
-                defaults: [_("Mr. Mouse")],
-                argTypes: ["anyin"]
-            });
+                this.formBlock({
+                    args: 1,
+                    defaults: [_("Mr. Mouse")],
+                    argTypes: ["anyin"]
+                });
+            } else {
+                super("startTurtle", _("start turtle"));
+                this.setPalette("ensemble", activity);
+                this.setHelpString([
+                    _("The Start turtle block starts the specified turtle."),
+                    "documentation",
+                    ""
+                ]);
+
+                this.formBlock({
+                    args: 1,
+                    defaults: [_("Yertle")],
+                    argTypes: ["anyin"]
+                });
+            }
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
@@ -239,20 +291,38 @@ function setupEnsembleBlocks(activity) {
 
     class TurtleColorBlock extends LeftBlock {
         constructor() {
-            //.TRANS: pen color for this mouse
-            super("turtlecolor", _("mouse color"));
-            this.setPalette("ensemble", activity);
-            this.setHelpString([
-                _("The Mouse color block returns the pen color of the specified mouse."),
-                "documentation",
-                ""
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                //.TRANS: pen color for this mouse
+                super("turtlecolor", _("mouse color"));
+                this.setHelpString([
+                    _("The Mouse color block returns the pen color of the specified mouse."),
+                    "documentation",
+                    ""
+                ]);
 
-            this.formBlock({
-                args: 1,
-                argTypes: ["anyin"],
-                defaults: [_("Mr. Mouse")]
-            });
+                this.formBlock({
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Mr. Mouse")]
+                });
+            } else {
+                //.TRANS: pen color for this turtle
+                super("turtlecolor", _("turtle color"));
+                this.setHelpString([
+                    _("The Turtle color block returns the pen color of the specified turtle."),
+                    "documentation",
+                    ""
+                ]);
+
+                this.formBlock({
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Yertle")]
+                });
+            }
+
+            this.setPalette("ensemble", activity);
+
             // Replaced by the dictionary get value block.
             this.hidden = this.deprecated = true;
         }
@@ -267,20 +337,38 @@ function setupEnsembleBlocks(activity) {
 
     class TurtleHeadingBlock extends LeftBlock {
         constructor() {
-            //.TRANS: heading (compass direction) for this mouse
-            super("turtleheading", _("mouse heading"));
-            this.setPalette("ensemble", activity);
-            this.setHelpString([
-                _("The Mouse heading block returns the heading of the specified mouse."),
-                "documentation",
-                ""
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                //.TRANS: heading (compass direction) for this mouse
+                super("turtleheading", _("mouse heading"));
+                this.setHelpString([
+                    _("The Mouse heading block returns the heading of the specified mouse."),
+                    "documentation",
+                    ""
+                ]);
 
-            this.formBlock({
-                args: 1,
-                argTypes: ["anyin"],
-                defaults: [_("Mr. Mouse")]
-            });
+                this.formBlock({
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Mr. Mouse")]
+                });
+            } else {
+                //.TRANS: heading (compass direction) for this turtle
+                super("turtleheading", _("turtle heading"));
+                this.setHelpString([
+                    _("The Turtle heading block returns the heading of the specified turtle."),
+                    "documentation",
+                    ""
+                ]);
+
+                this.formBlock({
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Yertle")]
+                });
+            }
+
+            this.setPalette("ensemble", activity);
+
             // Replaced by the dictionary get value block.
             this.hidden = this.deprecated = true;
         }
@@ -295,17 +383,31 @@ function setupEnsembleBlocks(activity) {
 
     class SetXYTurtleBlock extends FlowBlock {
         constructor() {
-            //.TRANS: set xy position for this mouse
-            super("setxyturtle", _("set mouse"));
-            this.setPalette("ensemble", activity);
-            this.setHelpString();
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                //.TRANS: set xy position for this mouse
+                super("setxyturtle", _("set mouse"));
+                this.setHelpString();
 
-            this.formBlock({
-                args: 3,
-                defaults: [_("Mr. Mouse"), 0, 0],
-                argTypes: ["anyin", "numberin", "numberin"],
-                argLabels: [this.lang === "ja" ? _("name1") : _("name"), _("x"), _("y")]
-            });
+                this.formBlock({
+                    args: 3,
+                    defaults: [_("Mr. Mouse"), 0, 0],
+                    argTypes: ["anyin", "numberin", "numberin"],
+                    argLabels: [this.lang === "ja" ? _("name1") : _("name"), _("x"), _("y")]
+                });
+            } else {
+                //.TRANS: set xy position for this turtle
+                super("setxyturtle", _("set turtle"));
+                this.setHelpString();
+
+                this.formBlock({
+                    args: 3,
+                    defaults: [_("Yertle"), 0, 0],
+                    argTypes: ["anyin", "numberin", "numberin"],
+                    argLabels: [this.lang === "ja" ? _("name1") : _("name"), _("x"), _("y")]
+                });
+            }
+
+            this.setPalette("ensemble", activity);
         }
 
         flow(args, logo, turtle, blk) {
@@ -330,19 +432,35 @@ function setupEnsembleBlocks(activity) {
     class SetTurtleBlock extends FlowClampBlock {
         constructor() {
             super("setturtle");
-            this.setPalette("ensemble", activity);
-            this.setHelpString([
-                _("The Set mouse block sends a stack of blocks to be run by the specified mouse."),
-                "documentation",
-                ""
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
+                    _("The Set mouse block sends a stack of blocks to be run by the specified mouse."),
+                    "documentation",
+                    ""
+                ]);
 
-            this.formBlock({
-                name: _("set mouse"),
-                args: 1,
-                defaults: [_("Mr. Mouse")],
-                argTypes: ["anyin"]
-            });
+                this.formBlock({
+                    name: _("set mouse"),
+                    args: 1,
+                    defaults: [_("Mr. Mouse")],
+                    argTypes: ["anyin"]
+                });
+            } else {
+                this.setHelpString([
+                    _("The Set turtle block sends a stack of blocks to be run by the specified turtle."),
+                    "documentation",
+                    ""
+                ]);
+
+                this.formBlock({
+                    name: _("set turtle"),
+                    args: 1,
+                    defaults: [_("Yertle")],
+                    argTypes: ["anyin"]
+                });
+            }
+
+            this.setPalette("ensemble", activity);
         }
 
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
@@ -361,20 +479,37 @@ function setupEnsembleBlocks(activity) {
 
     class YTurtleBlock extends LeftBlock {
         constructor() {
-            //.TRANS: y position for this mouse
-            super("yturtle", _("mouse y"));
-            this.setPalette("ensemble", activity);
-            this.setHelpString([
-                _("The Y mouse block returns the Y position of the specified mouse."),
-                "documentation",
-                ""
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                //.TRANS: y position for this mouse
+                super("yturtle", _("mouse y"));
+                this.setHelpString([
+                    _("The Y mouse block returns the Y position of the specified mouse."),
+                    "documentation",
+                    ""
+                ]);
 
-            this.formBlock({
-                args: 1,
-                argTypes: ["anyin"],
-                defaults: [_("Mr. Mouse")]
-            });
+                this.formBlock({
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Mr. Mouse")]
+                });
+            } else {
+                //.TRANS: y position for this turtle
+                super("yturtle", _("turtle y"));
+                this.setHelpString([
+                    _("The Y turtle block returns the Y position of the specified turtle."),
+                    "documentation",
+                    ""
+                ]);
+
+                this.formBlock({
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Yertle")]
+                });
+            }
+
+            this.setPalette("ensemble", activity);
         }
 
         arg(logo, turtle, blk, receivedArg) {
@@ -390,20 +525,37 @@ function setupEnsembleBlocks(activity) {
 
     class XTurtleBlock extends LeftBlock {
         constructor() {
-            //.TRANS: x position for this mouse
-            super("xturtle", _("mouse x"));
-            this.setPalette("ensemble", activity);
-            this.setHelpString([
-                _("The X mouse block returns the X position of the specified mouse."),
-                "documentation",
-                ""
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                //.TRANS: x position for this mouse
+                super("xturtle", _("mouse x"));
+                this.setHelpString([
+                    _("The X mouse block returns the X position of the specified mouse."),
+                    "documentation",
+                    ""
+                ]);
 
-            this.formBlock({
-                args: 1,
-                argTypes: ["anyin"],
-                defaults: [_("Mr. Mouse")]
-            });
+                this.formBlock({
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Mr. Mouse")]
+                });
+            } else {
+                //.TRANS: x position for this turtle
+                super("xturtle", _("turtle x"));
+                this.setHelpString([
+                    _("The X turtle block returns the X position of the specified turtle."),
+                    "documentation",
+                    ""
+                ]);
+
+                this.formBlock({
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Yertle")]
+                });
+            }
+
+            this.setPalette("ensemble", activity);
         }
 
         arg(logo, turtle, blk, receivedArg) {
@@ -420,22 +572,42 @@ function setupEnsembleBlocks(activity) {
 
     class TurtleElapsedNotesBlock extends LeftBlock {
         constructor() {
-            //.TRANS: notes played by this mouse
-            super("turtleelapsednotes", _("mouse notes played"));
-            this.setPalette("ensemble", activity);
-            this.setHelpString([
-                _(
-                    "The Mouse elapse notes block returns the number of notes played by the specified mouse."
-                ),
-                "documentation",
-                ""
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                //.TRANS: notes played by this mouse
+                super("turtleelapsednotes", _("mouse notes played"));
+                this.setHelpString([
+                    _(
+                        "The Mouse elapse notes block returns the number of notes played by the specified mouse."
+                    ),
+                    "documentation",
+                    ""
+                ]);
 
-            this.formBlock({
-                args: 1,
-                argTypes: ["anyin"],
-                defaults: [_("Mr. Mouse")]
-            });
+                this.formBlock({
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Mr. Mouse")]
+                });
+            } else {
+                //.TRANS: notes played by this turtle
+                super("turtleelapsednotes", _("turtle notes played"));
+                this.setHelpString([
+                    _(
+                        "The Turtle elapse notes block returns the number of notes played by the specified turtle."
+                    ),
+                    "documentation",
+                    ""
+                ]);
+
+                this.formBlock({
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Yertle")]
+                });
+            }
+
+            this.setPalette("ensemble", activity);
+
             // Replaced by the dictionary get value block.
             this.hidden = this.deprecated = true;
         }
@@ -458,22 +630,42 @@ function setupEnsembleBlocks(activity) {
 
     class TurtlePitchBlock extends LeftBlock {
         constructor() {
-            //.TRANS: convert current note for this turtle to piano key (1-88)
-            super("turtlepitch", _("mouse pitch number"));
-            this.setPalette("ensemble", activity);
-            this.setHelpString([
-                _(
-                    "The Mouse pitch block returns the current pitch number being played by the specified mouse."
-                ),
-                "documentation",
-                ""
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                //.TRANS: convert current note for this turtle to piano key (1-88)
+                super("turtlepitch", _("mouse pitch number"));
+                this.setHelpString([
+                    _(
+                        "The Mouse pitch block returns the current pitch number being played by the specified mouse."
+                    ),
+                    "documentation",
+                    ""
+                ]);
 
-            this.formBlock({
-                args: 1,
-                argTypes: ["anyin"],
-                defaults: [_("Mr. Mouse")]
-            });
+                this.formBlock({
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Mr. Mouse")]
+                });
+            } else {
+                //.TRANS: convert current note for this turtle to piano key (1-88)
+                super("turtlepitch", _("turtle pitch number"));
+                this.setHelpString([
+                    _(
+                        "The Turrle pitch block returns the current pitch number being played by the specified turtle."
+                    ),
+                    "documentation",
+                    ""
+                ]);
+
+                this.formBlock({
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Yertle")]
+                });
+            }
+
+            this.setPalette("ensemble", activity);
+
             // Replaced by the dictionary get value block.
             this.hidden = this.deprecated = true;
         }
@@ -562,15 +754,30 @@ function setupEnsembleBlocks(activity) {
 
     class TurtleNoteBlock extends LeftBlock {
         constructor(name, displayName) {
-            super(name || "turtlenote", displayName || _("mouse note value"));
-            this.setPalette("ensemble", activity);
-            this.setHelpString();
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                //.TRANS: note value is the duration of the note played by this mouse
+                super(name || "turtlenote", displayName || _("mouse note value"));
+                this.setHelpString();
 
-            this.formBlock({
-                args: 1,
-                argTypes: ["anyin"],
-                defaults: [_("Mr. Mouse")]
-            });
+                this.formBlock({
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Mr. Mouse")]
+                });
+            } else {
+                //.TRANS: note value is the duration of the note played by this turtle
+                super(name || "turtlenote", displayName || _("turtle note value"));
+                this.setHelpString();
+
+                this.formBlock({
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Yertle")]
+                });
+            }
+
+            this.setPalette("ensemble", activity);
+
             // Replaced by the dictionary get value block.
             this.hidden = this.deprecated = true;
         }
@@ -622,13 +829,7 @@ function setupEnsembleBlocks(activity) {
     class TurtleNote2Block extends TurtleNoteBlock {
         constructor() {
             super("turtlenote2", _("mouse note value"));
-            this.setHelpString([
-                _(
-                    "The Mouse note block returns the current note value being played by the specified mouse."
-                ),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString();
             // Replaced by the dictionary get value block.
             this.hidden = this.deprecated = true;
         }
@@ -636,19 +837,37 @@ function setupEnsembleBlocks(activity) {
 
     class TurtleSyncBlock extends FlowBlock {
         constructor() {
-            super("turtlesync", _("mouse sync"));
-            this.setPalette("ensemble", activity);
-            this.setHelpString([
-                _("The Mouse sync block aligns the beat count between mice."),
-                "documentation",
-                ""
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                //.TRANS: sync is short for synchronization
+                super("turtlesync", _("mouse sync"));
+                this.setHelpString([
+                    _("The Mouse sync block aligns the beat count between mice."),
+                    "documentation",
+                    ""
+                ]);
 
-            this.formBlock({
-                args: 1,
-                argTypes: ["anyin"],
-                defaults: [_("Mr. Mouse")]
-            });
+                this.formBlock({
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Mr. Mouse")]
+                });
+            } else {
+                //.TRANS: sync is short for synchronization
+                super("turtlesync", _("turtle sync"));
+                this.setHelpString([
+                    _("The Turtle sync block aligns the beat count between turtles."),
+                    "documentation",
+                    ""
+                ]);
+
+                this.formBlock({
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Yertle")]
+                });
+            }
+
+            this.setPalette("ensemble", activity);
         }
 
         flow(args, logo, turtle, blk) {
@@ -675,23 +894,41 @@ function setupEnsembleBlocks(activity) {
     class FoundTurtleBlock extends BooleanBlock {
         constructor() {
             super("foundturtle");
-            this.setPalette("ensemble", activity);
-            // this.extraWidth = 20;
-            this.setHelpString([
-                _("The Found mouse block will return true if the specified mouse can be found."),
-                "documentation",
-                ""
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
+                    _("The Found mouse block will return true if the specified mouse can be found."),
+                    "documentation",
+                    ""
+                ]);
 
-            this.formBlock({
-                name: _("found mouse"),
-                flows: {
-                    left: "bool"
-                },
-                args: 1,
-                argTypes: ["anyin"],
-                defaults: [_("Mr. Mouse")]
-            });
+                this.formBlock({
+                    name: _("found mouse"),
+                    flows: {
+                        left: "bool"
+                    },
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Mr. Mouse")]
+                });
+            } else {
+                this.setHelpString([
+                    _("The Found turtle block will return true if the specified turtle can be found."),
+                    "documentation",
+                    ""
+                ]);
+
+                this.formBlock({
+                    name: _("found turtle"),
+                    flows: {
+                        left: "bool"
+                    },
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Yertle")]
+                });
+            }
+
+            this.setPalette("ensemble", activity);
         }
 
         arg(logo, turtle, blk, receivedArg) {
@@ -703,19 +940,35 @@ function setupEnsembleBlocks(activity) {
 
     class NewTurtleBlock extends FlowBlock {
         constructor() {
-            super("newturtle", _("new mouse"));
-            this.setPalette("ensemble", activity);
-            this.setHelpString([
-                _("The New mouse block will create a new mouse."),
-                "documentation",
-                ""
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                super("newturtle", _("new mouse"));
+                this.setHelpString([
+                    _("The New mouse block will create a new mouse."),
+                    "documentation",
+                    ""
+                ]);
 
-            this.formBlock({
-                args: 1,
-                argTypes: ["anyin"],
-                defaults: [_("Mr. Mouse")]
-            });
+                this.formBlock({
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Mr. Mouse")]
+                });
+            } else {
+                super("newturtle", _("new turtle"));
+                this.setHelpString([
+                    _("The New turtle block will create a new turtle."),
+                    "documentation",
+                    ""
+                ]);
+
+                this.formBlock({
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Yertle")]
+                });
+            }
+
+            this.setPalette("ensemble", activity);
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
@@ -766,17 +1019,29 @@ function setupEnsembleBlocks(activity) {
 
     class SetTurtleColorBlock extends FlowBlock {
         constructor() {
-            super("setturtlecolor", _("set mouse color"));
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                super("setturtlecolor", _("set mouse color"));
+
+                this.setHelpString([
+                    _("The Set-mouse-color block is used to set the color of a mouse."),
+                    "documentation",
+                    null,
+                    "clickhelp"
+                ]);
+            } else {
+                super("setturtlecolor", _("set turtle color"));
+
+                this.setHelpString([
+                    _("The Set-turtle-color block is used to set the color of a turtle."),
+                    "documentation",
+                    null,
+                    "clickhelp"
+                ]);
+            }
+
             this.setPalette("ensemble", activity);
             this.beginnerBlock(true);
             this.piemenuValuesC1 = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90];
-
-            this.setHelpString([
-                _("The Set-mouse-color block is used to set the color of a mouse."),
-                "documentation",
-                null,
-                "clickhelp"
-            ]);
 
             this.formBlock({
                 args: 1,
@@ -823,16 +1088,28 @@ function setupEnsembleBlocks(activity) {
 
     class TurtleNameBlock extends ValueBlock {
         constructor() {
-            super("turtlename", _("mouse name"));
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                super("turtlename", _("mouse name"));
+
+                this.setHelpString([
+                    _("The Mouse-name block returns the name of a mouse."),
+                    "documentation",
+                    null,
+                    "clickhelp"
+                ]);
+            } else {
+                super("turtlename", _("turtle name"));
+
+                this.setHelpString([
+                    _("The Turtle-name block returns the name of a turtle."),
+                    "documentation",
+                    null,
+                    "clickhelp"
+                ]);
+            }
+
             this.setPalette("ensemble", activity);
             this.beginnerBlock(true);
-
-            this.setHelpString([
-                _("The Mouse-name block returns the name of a mouse."),
-                "documentation",
-                null,
-                "clickhelp"
-            ]);
 
             this.formBlock({
                 outType: "textout"
@@ -846,16 +1123,28 @@ function setupEnsembleBlocks(activity) {
 
     class NumberOfTurtlesBlock extends ValueBlock {
         constructor() {
-            super("turtlecount", _("mouse count"));
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                super("turtlecount", _("mouse count"));
+
+                this.setHelpString([
+                    _("The Mouse-count block returns the number of mice."),
+                    "documentation",
+                    null,
+                    "clickhelp"
+                ]);
+            } else {
+                super("turtlecount", _("turtle count"));
+
+                this.setHelpString([
+                    _("The Turtle-count block returns the number of turtles."),
+                    "documentation",
+                    null,
+                    "clickhelp"
+                ]);
+            }
+
             this.setPalette("ensemble", activity);
             this.hidden = this.lang === "ja";
-
-            this.setHelpString([
-                _("The Mouse-count block returns the number of mice."),
-                "documentation",
-                null,
-                "clickhelp"
-            ]);
 
             this.formBlock({
                 outType: "numberout"
@@ -869,16 +1158,28 @@ function setupEnsembleBlocks(activity) {
 
     class NthTurtleNameBlock extends LeftBlock {
         constructor() {
-            super("nthturtle", _("nth mouse name"));
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                super("nthturtle", _("nth mouse name"));
+
+                this.setHelpString([
+                    _("The Nth-Mouse name block returns the name of the nth mouse."),
+                    "documentation",
+                    null,
+                    "clickhelp"
+                ]);
+            } else {
+                super("nthturtle", _("nth turtle name"));
+
+                this.setHelpString([
+                    _("The Nth-Turtlee name block returns the name of the nth turtle."),
+                    "documentation",
+                    null,
+                    "clickhelp"
+                ]);
+            }
+
             this.setPalette("ensemble", activity);
             this.hidden = this.lang === "ja";
-
-            this.setHelpString([
-                _("The Nth-Mouse name block returns the name of the nth mice."),
-                "documentation",
-                null,
-                "clickhelp"
-            ]);
 
             this.formBlock({
                 outType: "textout",
@@ -919,13 +1220,22 @@ function setupEnsembleBlocks(activity) {
             this.setPalette("ensemble", activity);
             this.setHelpString();
 
-            this.formBlock({
-                args: 2,
-                defaults: [-1, _("Mr. Mouse")],
-                argTypes: ["anyin", "anyin"],
-                argLabels: [_("source"), _("target")]
-            });
-            this.hidden = true;
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.formBlock({
+                    args: 2,
+                    defaults: [-1, _("Mr. Mouse")],
+                    argTypes: ["anyin", "anyin"],
+                    argLabels: [_("source"), _("target")]
+                });
+            } else {
+                this.formBlock({
+                    args: 2,
+                    defaults: [-1, _("Yertle")],
+                    argTypes: ["anyin", "anyin"],
+                    argLabels: [_("source"), _("target")]
+                });
+            }
+            this.hidden = this.deprecated = true;
         }
 
         flow(args, logo, turtle, blk) {
@@ -970,18 +1280,33 @@ function setupEnsembleBlocks(activity) {
             this.setPalette("ensemble", activity);
             this.beginnerBlock(true);
 
-            this.setHelpString([
-                _("The Set-name block is used to name a mouse."),
-                "documentation",
-                null,
-                "clickhelp"
-            ]);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
+                    _("The Set-name block is used to name a mouse."),
+                    "documentation",
+                    null,
+                    "clickhelp"
+                ]);
 
-            this.formBlock({
-                args: 1,
-                argTypes: ["anyin"],
-                defaults: [_("Mr. Mouse")]
-            });
+                this.formBlock({
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Mr. Mouse")]
+                });
+            } else {
+                this.setHelpString([
+                    _("The Set-name block is used to name a turtle."),
+                    "documentation",
+                    null,
+                    "clickhelp"
+                ]);
+
+                this.formBlock({
+                    args: 1,
+                    argTypes: ["anyin"],
+                    defaults: [_("Yertle")]
+                });
+            }
         }
 
         flow(args, logo, turtle, blk) {
