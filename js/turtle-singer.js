@@ -1792,36 +1792,6 @@ class Singer {
                         if (obj[0] / obj[1] > 2) {
                             activity.errorMsg(_("Warning: Note value greater than 2."), blk);
                         }
-
-                        // if (tur.singer.justCounting.length === 0) {
-                        //     if (notes.length === 0) {
-                        //         console.debug("notes to play: R " + obj[0] + "/" + obj[1]);
-                        //     } else {
-                        //         console.debug(
-                        //             "notes to play: " +
-                        //                 notes +
-                        //                 " " +
-                        //                 obj[0] +
-                        //                 "/" +
-                        //                 obj[1] +
-                        //                 notesInfo
-                        //         );
-                        //     }
-                        // } else {
-                        //     if (notes.length === 0) {
-                        //         console.debug("notes to count: R " + obj[0] + "/" + obj[1]);
-                        //     } else {
-                        //         console.debug(
-                        //             "notes to count: " +
-                        //                 notes +
-                        //                 " " +
-                        //                 obj[0] +
-                        //                 "/" +
-                        //                 obj[1] +
-                        //                 notesInfo
-                        //         );
-                        //     }
-                        // }
                     }
 
                     if (!tur.singer.suppressOutput) {
@@ -2047,19 +2017,6 @@ class Singer {
 
                     // If it is > 0, we already counted this note (e.g. pitch & drum combination)
                     if (tur.singer.notePitches[thisBlk].length === 0) {
-                        // const obj = rationalToFraction(1 / noteBeatValue);
-                        // if (obj[0] > 0) {
-                        //     if (tur.singer.justCounting.length === 0) {
-                        //         console.debug(
-                        //             "drums to play " + notes + " " + obj[0] + "/" + obj[1]
-                        //         );
-                        //     } else {
-                        //         console.debug(
-                        //             "drums to count " + notes + " " + obj[0] + "/" + obj[1]
-                        //         );
-                        //     }
-                        // }
-
                         if (!tur.singer.suppressOutput) {
                             tur.blink(duration, last(Singer.masterVolume));
                         }
@@ -2078,7 +2035,7 @@ class Singer {
                         }
 
                         if (newBeatValue > 0) {
-                            if (forceSilence) {
+                            if (!forceSilence) {
                                 for (let i = 0; i < drums.length; i++) {
                                     if (tur.singer.drumStyle.length > 0) {
                                         if (!tur.singer.suppressOutput) {
@@ -2173,14 +2130,12 @@ class Singer {
                     const _ar = runAgainBlockParam;
                     const blockN = _ar[3];
 
-                    //update args for pitch in hertz and current pitch and then redo the flow block they are attatched to(print/storein etc).
+                    // Update args for pitch in hertz and current pitch and then redo the flow block they are attatched to(print/storein etc).
 
                     const args = [];
                     for (let i = 1; i <= activity.blocks.blockList[blockN].protoblock.args; i++) {
                         if (activity.blocks.blockList[blockN].protoblock.dockTypes[i] === "in") {
-                            if (activity.blocks.blockList[blockN].connections[i] == null) {
-                                // console.debug("skipping inflow args");
-                            } else {
+                            if (activity.blocks.blockList[blockN].connections[i] !== null) {
                                 args.push(activity.blocks.blockList[blockN].connections[i]);
                             }
                         } else {
@@ -2195,7 +2150,7 @@ class Singer {
                             );
                         }
                     }
-                    //args, logo, turtle, blk, receivedArg, null, isflow
+                    // args, logo, turtle, blk, receivedArg, null, isflow
                     if (typeof activity.blocks.blockList[blockN].protoblock.flow === "function") {
                         activity.blocks.blockList[blockN].protoblock.flow(
                             args,
