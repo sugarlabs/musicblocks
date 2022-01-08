@@ -24,9 +24,7 @@ function setupProgramBlocks(activity) {
             super("loadHeapFromApp");
             this.setPalette("program", activity);
             this.setHelpString([
-                _(
-                    "The Load-heap-from-app block loads the heap from a web page."
-                ),
+                _("The Load-heap-from-app block loads the heap from a web page."),
                 "documentation",
                 ""
             ]);
@@ -170,9 +168,7 @@ function setupProgramBlocks(activity) {
                     } catch (e) {
                         logo.turtleHeaps[turtle] = oldHeap;
                         activity.errorMsg(
-                            _(
-                                "The file you selected does not contain a valid heap."
-                            )
+                            _("The file you selected does not contain a valid heap.")
                         );
                     }
                 }
@@ -221,9 +217,7 @@ function setupProgramBlocks(activity) {
                 } catch (e) {
                     logo.turtleHeaps[turtle] = oldHeap;
                     activity.errorMsg(
-                        _(
-                            "The block you selected does not contain a valid heap."
-                        )
+                        _("The block you selected does not contain a valid heap.")
                     );
                 }
             } else {
@@ -289,9 +283,7 @@ function setupProgramBlocks(activity) {
                         }
                     } catch (e) {
                         activity.errorMsg(
-                            _(
-                                "The file you selected does not contain a valid dictionary."
-                            )
+                            _("The file you selected does not contain a valid dictionary.")
                         );
                     }
                 }
@@ -355,9 +347,7 @@ function setupProgramBlocks(activity) {
                     }
                 } catch (e) {
                     activity.errorMsg(
-                        _(
-                            "The block you selected does not contain a valid dictionary."
-                        )
+                        _("The block you selected does not contain a valid dictionary.")
                     );
                 }
             } else {
@@ -588,9 +578,7 @@ function setupProgramBlocks(activity) {
             super("runblock");
             this.setPalette("program", activity);
             this.setHelpString([
-                _(
-                    "The Run block block runs a block. It accepts two types of arguments: block number or block name."
-                ),
+                _("The Run block block runs a block. It accepts two types of arguments: block number or block name."),
                 "documentation",
                 ""
             ]);
@@ -893,9 +881,7 @@ function setupProgramBlocks(activity) {
                                     ) === -1
                                 ) {
                                     activity.errorMsg(
-                                        _(
-                                            "Warning: block argument type mismatch"
-                                        )
+                                        _("Warning: block argument type mismatch")
                                     );
                                 }
                                 newBlock.push([
@@ -913,9 +899,7 @@ function setupProgramBlocks(activity) {
                                     ) === -1
                                 ) {
                                     activity.errorMsg(
-                                        _(
-                                            "Warning: block argument type mismatch"
-                                        )
+                                        _("Warning: block argument type mismatch")
                                     );
                                 }
                                 newBlock.push([
@@ -949,9 +933,7 @@ function setupProgramBlocks(activity) {
             super("openProject");
             this.setPalette("program", activity);
             this.setHelpString([
-                _(
-                    "The Open project block is used to open a project from a web page."
-                ),
+                _("The Open project block is used to open a project from a web page."),
                 "documentation",
                 ""
             ]);

@@ -357,7 +357,7 @@ class Toolbar {
      */
     renderWrapIcon() {
         const wrapIcon = docById("wrapTurtle");
-        let wrapButtonTooltipData = "Turtle Wrap Off";
+        let wrapButtonTooltipData = _("Turtle Wrap Off");
 
         wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
         $j(".tooltipped").tooltip({
@@ -368,9 +368,9 @@ class Toolbar {
         wrapIcon.onclick = () => {
             WRAP = !WRAP;
             if (WRAP) {
-                wrapButtonTooltipData = "Turtle Wrap Off";
+                wrapButtonTooltipData = _("Turtle Wrap Off");
             } else {
-                wrapButtonTooltipData = "Turtle Wrap On";
+                wrapButtonTooltipData = _("Turtle Wrap On");
             }
 
             wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);

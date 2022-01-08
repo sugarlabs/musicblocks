@@ -26,9 +26,7 @@ function setupDictBlocks(activity) {
             this.hidden = this.deprecated = true;
 
             this.setHelpString([
-                _(
-                    "The Show-dictionary block displays the contents of the dictionary at the top of the screen."
-                ),
+                _("The Show-dictionary block displays the contents of the dictionary at the top of the screen."),
                 "documentation",
                 ""
             ]);

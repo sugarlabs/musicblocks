@@ -27,9 +27,7 @@ function setupVolumeBlocks(activity) {
             this.setPalette("volume", activity);
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Synth volume block returns the current volume of the current synthesizer."
-                ),
+                _("The Synth volume block returns the current volume of the current synthesizer."),
                 "documentation",
                 ""
             ]);
@@ -365,9 +363,7 @@ function setupVolumeBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Set synth volume block will change the volume of a particular synth,"
-                ) +
+                _("The Set synth volume block will change the volume of a particular synth,") +
                     " " +
                     _("eg guitar violin snare drum etc.") +
                     " " +
@@ -423,9 +419,7 @@ function setupVolumeBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Set Panning block sets the panning for all synthesizers."
-                ),
+                _("The Set Panning block sets the panning for all synthesizers."),
                 "documentation",
                 ""
             ]);
@@ -453,9 +447,7 @@ function setupVolumeBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Set master volume block sets the volume for all synthesizers."
-                ),
+                _("The Set master volume block sets the volume for all synthesizers."),
                 "documentation",
                 ""
             ]);
@@ -552,9 +544,7 @@ function setupVolumeBlocks(activity) {
             this.setPalette("volume", activity);
             this.piemenuValuesC1 = [-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25];
             this.setHelpString([
-                _(
-                    "The Set relative volume block changes the volume of the contained notes."
-                ),
+                _("The Set relative volume block changes the volume of the contained notes."),
                 "documentation",
                 null,
                 "articulationhelp"
@@ -596,13 +586,9 @@ function setupVolumeBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
-                ) +
+                _("The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played.") +
                     " " +
-                    _(
-                        "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
-                    ),
+                    _("For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."),
                 "documentation",
                 null,
                 "crescendohelp"
@@ -640,13 +626,9 @@ function setupVolumeBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
-                ) +
+                _("The Crescendo block will increase the volume of the contained notes by a specified amount for every note played.") +
                     " " +
-                    _(
-                        "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
-                    ),
+                    _("For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."),
                 "documentation",
                 null,
                 "crescendohelp"

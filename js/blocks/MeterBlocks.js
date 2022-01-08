@@ -51,9 +51,7 @@ function setupMeterBlocks(activity) {
             this.setPalette("meter", activity);
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Beat factor block returns the ratio of the note value to meter note value."
-                ),
+                _("The Beat factor block returns the ratio of the note value to meter note value."),
                 "documentation",
                 ""
             ]);
@@ -86,9 +84,7 @@ function setupMeterBlocks(activity) {
             this.setPalette("meter", activity);
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Beats per minute block returns the current beats per minute."
-                ),
+                _("The Beats per minute block returns the current beats per minute."),
                 "documentation",
                 ""
             ]);
@@ -167,28 +163,20 @@ function setupMeterBlocks(activity) {
             this.parameter = true;
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    _(
-                        "The Beat count block is the number of the current beat,"
-                    ) +
+                    _("The Beat count block is the number of the current beat,") +
                         " " +
-                        _(
-                            "In the figure, it is used to take an action on the first beat of each measure."
-                        ),
+                        _("In the figure, it is used to take an action on the first beat of each measure."),
                     "documentation",
                     null,
                     "everybeathelp"
                 ]);
             } else {
                 this.setHelpString([
-                    _(
-                        "The Beat count block is the number of the current beat,"
-                    ) +
+                    _("The Beat count block is the number of the current beat,") +
                         " " +
                         _("eg 1, 2, 3, or 4.") +
                         " " +
-                        _(
-                            "In the figure, it is used to take an action on the first beat of each measure."
-                        ),
+                        _("In the figure, it is used to take an action on the first beat of each measure."),
                     "documentation",
                     null,
                     "beatvaluehelp"
@@ -219,9 +207,7 @@ function setupMeterBlocks(activity) {
             this.setPalette("meter", activity);
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Note counter block can be used to count the number of contained notes."
-                ),
+                _("The Note counter block can be used to count the number of contained notes."),
                 "documentation",
                 null,
                 "notecounterhelp"
@@ -256,9 +242,7 @@ function setupMeterBlocks(activity) {
             this.setPalette("meter", activity);
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Note counter block can be used to count the number of contained notes."
-                ),
+                _("The Note counter block can be used to count the number of contained notes."),
                 "documentation",
                 null,
                 "notecounterhelp"

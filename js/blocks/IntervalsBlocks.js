@@ -38,9 +38,7 @@ function setupIntervalsBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Set temperament block is used to choose the tuning system used by Music Blocks."
-                ),
+                _("The Set temperament block is used to choose the tuning system used by Music Blocks."),
                 "documentation",
                 ""
             ]);
@@ -162,9 +160,7 @@ function setupIntervalsBlocks(activity) {
             super("measureintervalsemitones");
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _(
-                    "The Semi-tone interval block measures the distance between two notes in semi-tones."
-                ),
+                _("The Semi-tone interval block measures the distance between two notes in semi-tones."),
                 "documentation",
                 ""
             ]);
@@ -260,9 +256,7 @@ function setupIntervalsBlocks(activity) {
             super("measureintervalscalar");
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _(
-                    "The Scalar interval block measures the distance between two notes in the current key and mode."
-                ),
+                _("The Scalar interval block measures the distance between two notes in the current key and mode."),
                 "documentation",
                 ""
             ]);
@@ -447,9 +441,7 @@ function setupIntervalsBlocks(activity) {
                 12
             ];
             this.setHelpString([
-                _(
-                    "The Semi-tone interval block calculates a relative interval based on half steps."
-                ) +
+                _("The Semi-tone interval block calculates a relative interval based on half steps.") +
                     " " +
                     _("In the figure, we add sol# to sol."),
                 "documentation",
@@ -578,9 +570,7 @@ function setupIntervalsBlocks(activity) {
             this.setPalette("intervals", activity);
             this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.setHelpString([
-                _(
-                    "The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode."
-                ) +
+                _("The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode.") +
                     " " +
                     _("In the figure, we add la to sol."),
                 "documentation",
@@ -614,9 +604,7 @@ function setupIntervalsBlocks(activity) {
             super("definemode");
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _(
-                    "The Define mode block allows you define a custom mode by specifiying pitch numbers."
-                ),
+                _("The Define mode block allows you define a custom mode by specifiying pitch numbers."),
                 "documentation",
                 null,
                 "definemode"
@@ -665,13 +653,9 @@ function setupIntervalsBlocks(activity) {
             this.setPalette("intervals", activity);
             this.beginnerBlock(true);
             this.setHelpString([
-                _(
-                    "When Moveable do is false, the solfege note names are always tied to specific pitches,"
-                ) +
+                _("When Moveable do is false, the solfege note names are always tied to specific pitches,") +
                     " " +
-                    _(
-                        'eg "do" is always "C-natural"); when Moveable do is true, the solfege note names are assigned to scale degrees ("do" is always the first degree of the major scale).'
-                    ),
+                    _('eg "do" is always "C-natural" when Moveable do is true, the solfege note names are assigned to scale degrees "do" is always the first degree of the major scale.'),
                 "documentation",
                 null,
                 "movablehelp"

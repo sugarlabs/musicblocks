@@ -266,9 +266,7 @@ function setupExtrasBlocks(activity) {
             super("comment");
             this.setPalette("extras", activity);
             this.setHelpString([
-                _(
-                    "The Comment block prints a comment at the top of the screen when the program is running in slow mode."
-                ),
+                _("The Comment block prints a comment at the top of the screen when the program is running in slow mode."),
                 "documentation",
                 ""
             ]);

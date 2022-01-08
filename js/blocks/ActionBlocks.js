@@ -105,9 +105,7 @@ function setupActionBlocks(activity) {
             super("calc");
             this.setPalette("action", activity);
             this.setHelpString([
-                _(
-                    "The Calculate block returns a value calculated by an action."
-                ),
+                _("The Calculate block returns a value calculated by an action."),
                 "documentation",
                 ""
             ]);
@@ -155,9 +153,7 @@ function setupActionBlocks(activity) {
             super("namedcalc");
             this.setPalette("action", activity);
             this.setHelpString([
-                _(
-                    "The Calculate block returns a value calculated by an action."
-                ),
+                _("The Calculate block returns a value calculated by an action."),
                 "documentation",
                 ""
             ]);
@@ -286,9 +282,7 @@ function setupActionBlocks(activity) {
             super("namedcalcArg");
             this.setPalette("action", activity);
             this.setHelpString([
-                _(
-                    "The Calculate block returns a value calculated by an action."
-                ),
+                _("The Calculate block returns a value calculated by an action."),
                 "documentation",
                 ""
             ]);
@@ -409,9 +403,7 @@ function setupActionBlocks(activity) {
             super("calcArg");
             this.setPalette("action", activity);
             this.setHelpString([
-                _(
-                    "The Calculate block returns a value calculated by an action."
-                ),
+                _("The Calculate block returns a value calculated by an action."),
                 "documentation",
                 ""
             ]);
@@ -479,9 +471,7 @@ function setupActionBlocks(activity) {
             super("arg");
             this.setPalette("action", activity);
             this.setHelpString([
-                _(
-                    "The Arg block contains the value of an argument passed to an action."
-                ),
+                _("The Arg block contains the value of an argument passed to an action."),
                 "documentation",
                 ""
             ]);
@@ -521,9 +511,7 @@ function setupActionBlocks(activity) {
             super("namedarg");
             this.setPalette("action", activity);
             this.setHelpString([
-                _(
-                    "The Arg block contains the value of an argument passed to an action."
-                ),
+                _("The Arg block contains the value of an argument passed to an action."),
                 "documentation",
                 ""
             ]);
@@ -610,18 +598,14 @@ function setupActionBlocks(activity) {
             if (this.lang === "ja") {
                 this.extraWidth = 15;
                 this.setHelpString([
-                    _(
-                        "The Listen block is used to listen for an event such as a mouse click."
-                    ),
+                    _("The Listen block is used to listen for an event such as a mouse click."),
                     "documentation",
                     null,
                     "broadcasthelp"
                 ]);
             } else {
                 this.setHelpString([
-                    _(
-                        "The Listen block is used to listen for an event such as a mouse click."
-                    ) +
+                    _("The Listen block is used to listen for an event such as a mouse click.") +
                         " " +
                         _("When the event happens, an action is taken."),
                     "documentation",
@@ -763,13 +747,9 @@ function setupActionBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Action block is used to group together blocks so that they can be used more than once."
-                ) +
+                _("The Action block is used to group together blocks so that they can be used more than once.") +
                     " " +
-                    _(
-                        "It is often used for storing a phrase of music that is repeated."
-                    ),
+                    _("It is often used for storing a phrase of music that is repeated."),
                 "documentation",
                 null,
                 "actionhelp"

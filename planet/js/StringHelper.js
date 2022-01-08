@@ -54,9 +54,14 @@ function StringHelper(Planet) {
         ["projectviewer-reportsubmit-title",_("Report Project")],
         ["projectviewer-report-close",_("Close")],
         ["projectviewer-download-file",_("Download as File"),"data-tooltip"],
-        ["projectviewer-open-mb",_("Open in Music Blocks"),"data-tooltip"],
         ["projectviewer-merge-mb",_("Merge with current project"),"data-tooltip"]
     ]
+    if (Planet.IsMusicBlocks) {
+        this.strings.append(["projectviewer-open-mb",_("Open in Music Blocks"),"data-tooltip"]);
+    } else {
+        this.strings.append(["projectviewer-open-tb",_("Open in Turtle Blocks"),"data-tooltip"]);
+    }
+
 
     this.init = function(){
         for (let i = 0; i<this.strings.length; i++){

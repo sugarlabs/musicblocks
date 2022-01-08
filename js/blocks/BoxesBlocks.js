@@ -27,21 +27,15 @@ function setupBoxesBlocks(activity) {
 
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    _(
-                        "The Add-to block is used to add to the value stored in a box."
-                    ),
+                    _("The Add-to block is used to add to the value stored in a box."),
                     "documentation",
                     ""
                 ]);
             } else {
                 this.setHelpString([
-                    _(
-                        "The Add-to block is used to add to the value stored in a box."
-                    ) +
+                    _("The Add-to block is used to add to the value stored in a box.") +
                         " " +
-                        _(
-                            "It can also be used with other blocks such as Color and Pen size."
-                        ),
+                        _("It can also be used with other blocks such as Color and Pen size."),
                     "documentation",
                     ""
                 ]);
@@ -348,9 +342,7 @@ function setupBoxesBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Store in Box2 block is used to store a value in Box2."
-                ),
+                _("The Store in Box2 block is used to store a value in Box2."),
                 "documentation",
                 null,
                 "box2help"
@@ -395,9 +387,7 @@ function setupBoxesBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Store in Box1 block is used to store a value in Box1."
-                ),
+                _("The Store in Box1 block is used to store a value in Box1."),
                 "documentation",
                 null,
                 "box1help"

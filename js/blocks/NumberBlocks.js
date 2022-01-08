@@ -274,9 +274,7 @@ function setupNumberBlocks(activity) {
             super("distance");
             this.setPalette("number", activity);
             this.setHelpString([
-                _(
-                    "The Distance block returns the distance between two points. For example, between the mouse and the center of the screen."
-                ),
+                _("The Distance block returns the distance between two points. For example, between the mouse and the center of the screen."),
                 "documentation",
                 ""
             ]);

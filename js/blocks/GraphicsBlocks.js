@@ -151,7 +151,7 @@ function setupGraphicsBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    _("The X block returns the horizontal position of the turtlee."),
+                    _("The X block returns the horizontal position of the turtle."),
                     "documentation",
                     null,
                     "xyhelp"
@@ -467,7 +467,7 @@ function setupGraphicsBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Set heading block sets the heading of the turtlee."),
+                    _("The Set heading block sets the heading of the turtle."),
                     "documentation",
                     ""
                 ]);
@@ -807,9 +807,7 @@ function setupGraphicsBlocks(activity) {
             this.setPalette("graphics", activity);
             this.beginnerBlock(true);
             this.setHelpString([
-                _(
-                    "The Wrap block enables or disables screen wrapping for the graphics actions within it."
-                ),
+                _("The Wrap block enables or disables screen wrapping for the graphics actions within it."),
                 "documentation",
                 null,
                 "wraphelp"

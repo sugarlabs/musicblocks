@@ -185,9 +185,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
     MULTIPALETTEICONS = ["artwork", "logic", "music"];
     MULTIPALETTENAMES = [_("artwork"), _("logic"), _("music")];
 } else {
-    TITLESTRING = _(
-        "Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way."
-    );
+    TITLESTRING = _("Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way.");
 
     // We don't include "extras" since we want to be able to delete
     // plugins from the extras palette.
@@ -576,13 +574,9 @@ function createHelpContent(activity) {
     if (_THIS_IS_MUSIC_BLOCKS_) {
         HELPCONTENT.push([
             _("Palette buttons"),
-            _(
-                "This toolbar contains the palette buttons including Rhythm Pitch Tone Action and more."
-            ) +
+            _("This toolbar contains the palette buttons including Rhythm Pitch Tone Action and more.") +
                 " " +
-                _(
-                    "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-                ),
+                _("Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."),
             "data:image/svg+xml;base64," +
                 window.btoa(unescape(encodeURIComponent(RHYTHMPALETTEICON)))
         ]);
@@ -595,9 +589,7 @@ function createHelpContent(activity) {
     ]);
     HELPCONTENT.push([
         _("Clean"),
-        _(
-            "Clear the screen and return the mice to their initial positions."
-        ),
+        _("Clear the screen and return the mice to their initial positions."),
         "data:image/svg+xml;base64," +
             window.btoa(unescape(encodeURIComponent(CLEARBUTTON)))
     ]);
@@ -641,9 +633,7 @@ function createHelpContent(activity) {
     ]);
     HELPCONTENT.push([
         _("Expand/collapse option toolbar"),
-        _(
-            "Click this button to expand or collapse the auxillary toolbar."
-        ),
+        _("Click this button to expand or collapse the auxillary toolbar."),
         "data:image/svg+xml;base64," +
             window.btoa(unescape(encodeURIComponent(MENUBUTTON)))
     ]);
@@ -718,9 +708,7 @@ function createHelpContent(activity) {
     if (_THIS_IS_MUSIC_BLOCKS_) {
         HELPCONTENT.push([
             _("Keyboard shortcuts"),
-            _(
-                "You can type d to create a do block and r to create a re block etc."
-            ),
+            _("You can type d to create a do block and r to create a re block etc."),
             "data:image/svg+xml;base64," +
                 window.btoa(unescape(encodeURIComponent(SHORTCUTSBUTTON)))
         ]);
@@ -773,13 +761,9 @@ function createHelpContent(activity) {
         ]);
         HELPCONTENT.push([
             _("About"),
-            _(
-                "Music Blocks is an open source collection of tools for exploring musical concepts."
-            ) +
+            _("Music Blocks is an open source collection of tools for exploring musical concepts.") +
                 " " +
-                _(
-                    "A full list of contributors can be found in the Music Blocks GitHub repository."
-                ) +
+                _("A full list of contributors can be found in the Music Blocks GitHub repository.") +
                 " " +
                 _("Music Blocks is licensed under the AGPL.") +
                 " " +

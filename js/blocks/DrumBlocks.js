@@ -26,9 +26,7 @@ function setupDrumBlocks(activity) {
             this.formBlock({ outType: "textout" });
             this.extraWidth = 50;
             this.setHelpString([
-                _(
-                    "The Noise name block is used to select a noise synthesizer."
-                ),
+                _("The Noise name block is used to select a noise synthesizer."),
                 "documentation",
                 ""
             ]);
@@ -70,9 +68,7 @@ function setupDrumBlocks(activity) {
             super("playnoise", _("noise"));
             this.setPalette("drum", activity);
             this.setHelpString([
-                _(
-                    "The Play noise block will generate white, pink, or brown noise."
-                ),
+                _("The Play noise block will generate white, pink, or brown noise."),
                 "documentation",
                 ""
             ]);
@@ -189,22 +185,16 @@ function setupDrumBlocks(activity) {
 
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    _(
-                        "The Set drum block will select a drum sound to replace the pitch of any contained notes."
-                    ),
+                    _("The Set drum block will select a drum sound to replace the pitch of any contained notes."),
                     "documentation",
                     null,
                     "rhythmruler2"
                 ]);
             } else {
                 this.setHelpString([
-                    _(
-                        "The Set drum block will select a drum sound to replace the pitch of any contained notes."
-                    ) +
+                    _("The Set drum block will select a drum sound to replace the pitch of any contained notes.") +
                         " " +
-                        _(
-                            "In the example above, a kick drum sound will be played instead of sol."
-                        ),
+                        _("In the example above, a kick drum sound will be played instead of sol."),
                     "documentation",
                     null,
                     "setdrumhelp"

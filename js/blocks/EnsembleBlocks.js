@@ -65,9 +65,7 @@ function setupEnsembleBlocks(activity) {
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 super("turtleheap", _("mouse index heap"));
                 this.setHelpString([
-                    _(
-                        "The Mouse index heap block returns a value in the heap at a specified location for a specified mouse."
-                    ),
+                    _("The Mouse index heap block returns a value in the heap at a specified location for a specified mouse."),
                     "documentation",
                     ""
                 ]);
@@ -81,9 +79,7 @@ function setupEnsembleBlocks(activity) {
             } else {
                 super("turtleheap", _("turtle index heap"));
                 this.setHelpString([
-                    _(
-                        "The Turtle index heap block returns a value in the heap at a specified location for a specified turtle."
-                    ),
+                    _("The Turtle index heap block returns a value in the heap at a specified location for a specified turtle."),
                     "documentation",
                     ""
                 ]);
@@ -574,11 +570,9 @@ function setupEnsembleBlocks(activity) {
         constructor() {
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 //.TRANS: notes played by this mouse
-                super("turtleelapsednotes", _("mouse notes played"));
+                super("turtlelapsednotes", _("mouse notes played"));
                 this.setHelpString([
-                    _(
-                        "The Mouse elapse notes block returns the number of notes played by the specified mouse."
-                    ),
+                    _("The Mouse elapse notes block returns the number of notes played by the specified mouse."),
                     "documentation",
                     ""
                 ]);
@@ -590,11 +584,9 @@ function setupEnsembleBlocks(activity) {
                 });
             } else {
                 //.TRANS: notes played by this turtle
-                super("turtleelapsednotes", _("turtle notes played"));
+                super("turtlelapsednotes", _("turtle notes played"));
                 this.setHelpString([
-                    _(
-                        "The Turtle elapse notes block returns the number of notes played by the specified turtle."
-                    ),
+                    _("The Turtle elapse notes block returns the number of notes played by the specified turtle."),
                     "documentation",
                     ""
                 ]);
@@ -634,9 +626,7 @@ function setupEnsembleBlocks(activity) {
                 //.TRANS: convert current note for this turtle to piano key (1-88)
                 super("turtlepitch", _("mouse pitch number"));
                 this.setHelpString([
-                    _(
-                        "The Mouse pitch block returns the current pitch number being played by the specified mouse."
-                    ),
+                    _("The Mouse pitch block returns the current pitch number being played by the specified mouse."),
                     "documentation",
                     ""
                 ]);
@@ -650,9 +640,7 @@ function setupEnsembleBlocks(activity) {
                 //.TRANS: convert current note for this turtle to piano key (1-88)
                 super("turtlepitch", _("turtle pitch number"));
                 this.setHelpString([
-                    _(
-                        "The Turrle pitch block returns the current pitch number being played by the specified turtle."
-                    ),
+                    _("The Turrle pitch block returns the current pitch number being played by the specified turtle."),
                     "documentation",
                     ""
                 ]);
@@ -1171,7 +1159,7 @@ function setupEnsembleBlocks(activity) {
                 super("nthturtle", _("nth turtle name"));
 
                 this.setHelpString([
-                    _("The Nth-Turtlee name block returns the name of the nth turtle."),
+                    _("The Nth-Turtle name block returns the name of the nth turtle."),
                     "documentation",
                     null,
                     "clickhelp"

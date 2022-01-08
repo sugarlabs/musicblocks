@@ -185,9 +185,7 @@ function setupBooleanBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Greater-than block returns True if the top number is greater than the bottom number."
-                ),
+                _("The Greater-than block returns True if the top number is greater than the bottom number."),
                 "documentation",
                 ""
             ]);
@@ -236,9 +234,7 @@ function setupBooleanBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Less-than block returns True if the top number is less than the bottom number."
-                ),
+                _("The Less-than block returns True if the top number is less than the bottom number."),
                 "documentation",
                 ""
             ]);

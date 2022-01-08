@@ -168,9 +168,7 @@ function setupPitchBlocks(activity) {
             this.setPalette("pitch", activity);
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Scalar step down block returns the number of semi-tones down to the previous note in the current key and mode."
-                ),
+                _("The Scalar step down block returns the number of semi-tones down to the previous note in the current key and mode."),
                 "documentation",
                 ""
             ]);
@@ -192,9 +190,7 @@ function setupPitchBlocks(activity) {
             this.setPalette("pitch", activity);
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Scalar step up block returns the number of semi-tones up to the next note in the current key and mode."
-                ),
+                _("The Scalar step up block returns the number of semi-tones up to the next note in the current key and mode."),
                 "documentation",
                 ""
             ]);
@@ -216,9 +212,7 @@ function setupPitchBlocks(activity) {
             this.setPalette("pitch", activity);
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Change in pitch block is the difference (in half steps) between the current pitch being played and the previous pitch played."
-                ),
+                _("The Change in pitch block is the difference (in half steps) between the current pitch being played and the previous pitch played."),
                 "documentation",
                 null,
                 "deltapitchhelp"
@@ -258,9 +252,7 @@ function setupPitchBlocks(activity) {
             this.parameter = true;
             this.hidden = true;
             this.setHelpString([
-                _(
-                    "The Pitch number block is the value of the pitch of the note currently being played."
-                ),
+                _("The Pitch number block is the value of the pitch of the note currently being played."),
                 "documentation",
                 null,
                 "everybeathelp"
@@ -338,9 +330,7 @@ function setupPitchBlocks(activity) {
             this.parameter = true;
             this.hidden = true;
             this.setHelpString([
-                _(
-                    "The Pitch in Hertz block is the value in Hertz of the pitch of the note currently being played."
-                ),
+                _("The Pitch in Hertz block is the value in Hertz of the pitch of the note currently being played."),
                 "documentation",
                 ""
             ]);
@@ -379,9 +369,7 @@ function setupPitchBlocks(activity) {
             this.parameter = true;
             this.formBlock({ outType: "pitchout" });
             this.setHelpString([
-                _(
-                    "The Current Pitch block is used with the Pitch Converter block. In the example above, current pitch, sol 4, is displayed as 392 hertz."
-                ),
+                _("The Current Pitch block is used with the Pitch Converter block. In the example above, current pitch, sol 4, is displayed as 392 hertz."),
                 "documentation",
                 null,
                 "currentpitchhelp"
@@ -418,9 +406,7 @@ function setupPitchBlocks(activity) {
             this.beginnerBlock(true);
             this.extraWidth = 50;
             this.setHelpString([
-                _(
-                    "This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."
-                ),
+                _("This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."),
                 "documentation",
                 null,
                 "outputtoolshelp"
@@ -625,9 +611,7 @@ function setupPitchBlocks(activity) {
             super("setpitchnumberoffset", _("set pitch number offset"));
             this.setPalette("pitch", activity);
             this.setHelpString([
-                _(
-                    "The Set pitch number offset block is used to set the offset for mapping pitch numbers to pitch and octave."
-                ),
+                _("The Set pitch number offset block is used to set the offset for mapping pitch numbers to pitch and octave."),
                 "documentation",
                 null,
                 "pitchnumberhelp"
@@ -711,9 +695,7 @@ function setupPitchBlocks(activity) {
             super("ytopitch", _("y to pitch"));
             this.setPalette("pitch", activity);
             this.setHelpString([
-                _(
-                    "Y to pitch block will convert a staff y position to corresponding pitch notation."
-                ),
+                _("Y to pitch block will convert a staff y position to corresponding pitch notation."),
                 "documentation",
                 ""
             ]);
@@ -828,9 +810,7 @@ function setupPitchBlocks(activity) {
             super("accidentalname", _("accidental selector"));
             this.setPalette("pitch", activity);
             this.setHelpString([
-                _(
-                    "The Accidental selector block is used to choose between double-sharp, sharp, natural, flat, and double-flat."
-                ),
+                _("The Accidental selector block is used to choose between double-sharp, sharp, natural, flat, and double-flat."),
                 "documentation",
                 ""
             ]);
@@ -1010,9 +990,7 @@ function setupPitchBlocks(activity) {
             this.setPalette("pitch", activity);
             this.piemenuValuesC1 = [-3, -2, -1, 0, 1, 2, 3];
             this.setHelpString([
-                _(
-                    "The Register block provides an easy way to modify the register (octave) of the notes that follow it."
-                ),
+                _("The Register block provides an easy way to modify the register (octave) of the notes that follow it."),
                 "documentation",
                 null,
                 "registerhelp"
@@ -1062,9 +1040,7 @@ function setupPitchBlocks(activity) {
                 12
             ];
             this.setHelpString([
-                _(
-                    "The Semi-tone transposition block will shift the pitches contained inside Note blocks up (or down) by half steps."
-                ) +
+                _("The Semi-tone transposition block will shift the pitches contained inside Note blocks up (or down) by half steps.") +
                     " " +
                     _("In the example shown above, sol is shifted up to sol#."),
                 "documentation",
@@ -1315,9 +1291,7 @@ function setupPitchBlocks(activity) {
             this.setPalette("pitch", activity);
             this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.setHelpString([
-                _(
-                    "The Scalar transposition block will shift the pitches contained inside Note blocks up (or down) the scale."
-                ) +
+                _("The Scalar transposition block will shift the pitches contained inside Note blocks up (or down) the scale.") +
                     " " +
                     _("In the example shown above, sol is shifted up to la."),
                 "documentation",
@@ -1481,9 +1455,7 @@ function setupPitchBlocks(activity) {
             this.setPalette("pitch", activity);
             this.beginnerBlock(true);
             this.setHelpString([
-                _(
-                    "The Hertz block (in combination with a Number block) will play a sound at the specified frequency."
-                ),
+                _("The Hertz block (in combination with a Number block) will play a sound at the specified frequency."),
                 "documentation",
                 null,
                 "note3"
@@ -1582,9 +1554,7 @@ function setupPitchBlocks(activity) {
             this.setPalette("pitch", activity);
             this.beginnerBlock(true);
             this.setHelpString([
-                _(
-                    "The Pitch Number block will play a pitch associated by its number, e.g. 0 for C and 7 for G."
-                ),
+                _("The Pitch Number block will play a pitch associated by its number, e.g. 0 for C and 7 for G."),
                 "documentation",
                 null,
                 "note5"
@@ -1619,13 +1589,9 @@ function setupPitchBlocks(activity) {
             super("scaledegree", _("nth modal pitch"));
             this.setPalette("pitch", activity);
             this.setHelpString([
-                _(
-                    "n^th Modal Pitch takes the pattern of pitches in semitones for a mode and makes each point a degree of the mode,"
-                ) +
+                _("n^th Modal Pitch takes the pattern of pitches in semitones for a mode and makes each point a degree of the mode,") +
                     " " +
-                    _(
-                        "starting from 1 and regardless of tonal framework (i.e. not always 8 notes in the octave)"
-                    ),
+                    _("starting from 1 and regardless of tonal framework (i.e. not always 8 notes in the octave)"),
                 "documentation",
                 ""
             ]);
@@ -1666,13 +1632,9 @@ function setupPitchBlocks(activity) {
             this.setPalette("pitch", activity);
             this.piemenuValuesC1 = [7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7];
             this.setHelpString([
-                _(
-                    "N^th Modal Pitch takes a number as an input as the n^th degree for the given mode. 0 is the first position, 1 is the second, -1 is the note before the first etc."
-                ) +
+                _("N^th Modal Pitch takes a number as an input as the n^th degree for the given mode. 0 is the first position, 1 is the second, -1 is the note before the first etc.") +
                     " " +
-                    _(
-                        "The pitches change according to the mode specified without any need for respellings."
-                    ),
+                    _("The pitches change according to the mode specified without any need for respellings."),
                 "documentation",
                 ""
             ]);
@@ -1711,13 +1673,9 @@ function setupPitchBlocks(activity) {
             this.setPalette("pitch", activity);
             this.extraWidth = 10;
             this.setHelpString([
-                _(
-                    "Scale Degree is a common convention in music. Scale Degree offers seven possible positions in the scale (1-7) and can be modified via accidentals."
-                ) +
+                _("Scale Degree is a common convention in music. Scale Degree offers seven possible positions in the scale (1-7) and can be modified via accidentals.") +
                     " " +
-                    _(
-                        "Scale Degree 1 is always the first pitch in a given scale, regardless of octave."
-                    ),
+                    _("Scale Degree 1 is always the first pitch in a given scale, regardless of octave."),
                 "documentation",
                 ""
             ]);
@@ -1744,9 +1702,7 @@ function setupPitchBlocks(activity) {
             this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.beginnerBlock(true);
             this.setHelpString([
-                _(
-                    "The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,"
-                ) +
+                _("The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,") +
                     " " +
                     _("eg if the last note played was sol, Scalar Step 1 will play la."),
                 "documentation",
@@ -1783,9 +1739,7 @@ function setupPitchBlocks(activity) {
             this.setPalette("pitch", activity);
             this.beginnerBlock(true);
             this.setHelpString([
-                _(
-                    "The Pitch block specifies the pitch name and octave of a note that together determine the frequency of the note."
-                ),
+                _("The Pitch block specifies the pitch name and octave of a note that together determine the frequency of the note."),
                 "documentation",
                 null,
                 "note1"

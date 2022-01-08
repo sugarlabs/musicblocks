@@ -383,9 +383,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
             super("tuplet4");
             this.setPalette(rhythmBlockPalette, activity);
             this.setHelpString([
-                _(
-                    "The Tuplet block is used to generate a group of notes played in a condensed amount of time."
-                ),
+                _("The Tuplet block is used to generate a group of notes played in a condensed amount of time."),
                 "documentation",
                 null,
                 "tuplet4"
@@ -600,9 +598,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
             this.setHelpString([
                 _("Tuplets are a collection of notes that get scaled to a specific duration.") +
                     " " +
-                    _(
-                        "Using tuplets makes it easy to create groups of notes that are not based on a power of 2."
-                    ),
+                    _("Using tuplets makes it easy to create groups of notes that are not based on a power of 2."),
                 "documentation",
                 null,
                 "matrix"

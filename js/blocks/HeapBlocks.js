@@ -26,9 +26,7 @@ function setupHeapBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Heap block returns the heap."
-                ),
+                _("The Heap block returns the heap."),
                 "documentation",
                 ""
             ]);
@@ -59,9 +57,7 @@ function setupHeapBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Show-heap block displays the contents of the heap at the top of the screen."
-                ),
+                _("The Show-heap block displays the contents of the heap at the top of the screen."),
                 "documentation",
                 ""
             ]);
@@ -193,9 +189,7 @@ function setupHeapBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Index-heap block returns a value in the heap at a specified location."
-                ),
+                _("The Index-heap block returns a value in the heap at a specified location."),
                 "documentation",
                 ""
             ]);
@@ -252,9 +246,7 @@ function setupHeapBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Set-heap entry block sets a value in he heap at the specified location."
-                ),
+                _("The Set-heap entry block sets a value in he heap at the specified location."),
                 "documentation",
                 ""
             ]);

@@ -26,9 +26,7 @@ function setupSensorsBlocks(activity) {
             this.setPalette("sensors", activity);
             this.parameter = true;
             this.setHelpString([
-                _(
-                    "The Input block prompts for keyboard input."
-                ),
+                _("The Input block prompts for keyboard input."),
                 "documentation",
                 ""
             ]);
@@ -92,9 +90,7 @@ function setupSensorsBlocks(activity) {
             this.parameter = true;
 
             this.setHelpString([
-                _(
-                    "The Input-value block stores the input."
-                ),
+                _("The Input-value block stores the input."),
                 "documentation",
                 null,
                 "input"
@@ -170,9 +166,7 @@ function setupSensorsBlocks(activity) {
             this.beginnerBlock(!(this.lang === "ja"));
 
             this.setHelpString([
-                _(
-                    "The Loudness block returns the volume detected by the microphone."
-                ),
+                _("The Loudness block returns the volume detected by the microphone."),
                 "documentation",
                 ""
             ]);
@@ -353,17 +347,13 @@ function setupSensorsBlocks(activity) {
             this.parameter = true;
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _(
-                        "The Get blue block returns the blue component of the pixel under the mouse."
-                    ),
+                    _("The Get blue block returns the blue component of the pixel under the mouse."),
                     "documentation",
                     ""
                 ]);
             } else {
                 this.setHelpString([
-                    _(
-                        "The Get blue block returns the blue component of the pixel under the turtle."
-                    ),
+                    _("The Get blue block returns the blue component of the pixel under the turtle."),
                     "documentation",
                     ""
                 ]);
@@ -390,17 +380,13 @@ function setupSensorsBlocks(activity) {
             this.parameter = true;
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _(
-                        "The Get green block returns the green component of the pixel under the mouse."
-                    ),
+                    _("The Get green block returns the green component of the pixel under the mouse."),
                     "documentation",
                     ""
                 ]);
             } else {
                 this.setHelpString([
-                    _(
-                        "The Get green block returns the green component of the pixel under the turtle."
-                    ),
+                    _("The Get green block returns the green component of the pixel under the turtle."),
                     "documentation",
                     ""
                 ]);
@@ -427,17 +413,13 @@ function setupSensorsBlocks(activity) {
             this.parameter = true;
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _(
-                        "The Get red block returns the red component of the pixel under the mouse."
-                    ),
+                    _("The Get red block returns the red component of the pixel under the mouse."),
                     "documentation",
                     ""
                 ]);
             } else {
                 this.setHelpString([
-                    _(
-                        "The Get red block returns the red component of the pixel under the turtle."
-                    ),
+                    _("The Get red block returns the red component of the pixel under the turtle."),
                     "documentation",
                     ""
                 ]);
@@ -464,17 +446,13 @@ function setupSensorsBlocks(activity) {
             this.parameter = true;
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _(
-                        "The Get pixel block returns the color of the pixel under the mouse."
-                    ),
+                    _("The Get pixel block returns the color of the pixel under the mouse."),
                     "documentation",
                     ""
                 ]);
             } else {
                 this.setHelpString([
-                    _(
-                        "The Get pixel block returns the color of the pixel under the turtle."
-                    ),
+                    _("The Get pixel block returns the color of the pixel under the turtle."),
                     "documentation",
                     ""
                 ]);
@@ -523,9 +501,7 @@ function setupSensorsBlocks(activity) {
             this.beginnerBlock(!(this.lang === "ja"));
 
             this.setHelpString([
-                _(
-                    "The Time block returns the number of seconds that the program has been running."
-                ),
+                _("The Time block returns the number of seconds that the program has been running."),
                 "documentation",
                 ""
             ]);
@@ -547,25 +523,12 @@ function setupSensorsBlocks(activity) {
             this.setPalette("sensors", activity);
             this.beginnerBlock(true);
             this.parameter = true;
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                this.setHelpString([
-                    _(
-                        "The Cursor Y block returns the vertical position of the mouse."
-                    ),
-                    "documentation",
-                    null,
-                    "mousebuttonhelp"
-                ]);
-            } else {
-                this.setHelpString([
-                    _(
-                        "The Cursor Y block returns the vertical position of the turtle."
-                    ),
-                    "documentation",
-                    null,
-                    "mousebuttonhelp"
-                ]);
-            }
+            this.setHelpString([
+                _("The Cursor Y block returns the vertical position of the mouse."),
+                "documentation",
+                null,
+                "mousebuttonhelp"
+            ]);
         }
 
         updateParameter(logo, turtle, blk) {
@@ -583,25 +546,12 @@ function setupSensorsBlocks(activity) {
             this.setPalette("sensors", activity);
             this.beginnerBlock(true);
             this.parameter = true;
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                this.setHelpString([
-                    _(
-                        "The Cursor X block returns the horizontal position of the mouse."
-                    ),
-                    "documentation",
-                    null,
-                    "mousebuttonhelp"
-                ]);
-            } else {
-                this.setHelpString([
-                    _(
-                        "The Cursor X block returns the horizontal position of the turtle."
-                    ),
-                    "documentation",
-                    null,
-                    "mousebuttonhelp"
-                ]);
-            }
+            this.setHelpString([
+                _("The Cursor X block returns the horizontal position of the mouse."),
+                "documentation",
+                null,
+                "mousebuttonhelp"
+            ]);
         }
 
         updateParameter(logo, turtle, blk) {
@@ -617,9 +567,7 @@ function setupSensorsBlocks(activity) {
         constructor() {
             super("mousebutton", _("mouse button"));
             this.setHelpString([
-                _(
-                    "The Mouse-button block returns True if the mouse button is pressed."
-                ),
+                _("The Mouse-button block returns True if the mouse button is pressed."),
                 "documentation",
                 null,
                 "mousebuttonhelp"

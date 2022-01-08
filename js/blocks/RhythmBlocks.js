@@ -27,9 +27,7 @@ function setupRhythmBlocks(activity) {
             this.parameter = true;
             this.beginnerBlock(true);
             this.setHelpString([
-                _(
-                    "The Note value block is the value of the duration of the note currently being played."
-                ),
+                _("The Note value block is the value of the duration of the note currently being played."),
                 "documentation",
                 null,
                 "everybeathelp"
@@ -82,9 +80,7 @@ function setupRhythmBlocks(activity) {
             super("osctime");
             this.setPalette("rhythm", activity);
             this.setHelpString([
-                _(
-                    "The Milliseconds block is similar to a Note block except that it uses time (in MS) to specify the note duration."
-                ),
+                _("The Milliseconds block is similar to a Note block except that it uses time (in MS) to specify the note duration."),
                 "documentation",
                 null,
                 "osctimehelp"
@@ -236,9 +232,7 @@ function setupRhythmBlocks(activity) {
             super("newswing2");
             this.setPalette("rhythm", activity);
             this.setHelpString([
-                _(
-                    "The Swing block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note."
-                ),
+                _("The Swing block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note."),
                 "documentation",
                 null,
                 "swinghelp"
@@ -338,9 +332,7 @@ function setupRhythmBlocks(activity) {
             super("multiplybeatfactor");
             this.setPalette("rhythm", activity);
             this.setHelpString([
-                _(
-                    "The Multiply note value block changes the duration of notes by changing their note values."
-                ),
+                _("The Multiply note value block changes the duration of notes by changing their note values."),
                 "documentation",
                 null,
                 "multiplybeathelp"
@@ -386,9 +378,7 @@ function setupRhythmBlocks(activity) {
 
             this.beginnerBlock(true);
             this.setHelpString([
-                _(
-                    "The Tie block works on pairs of notes, combining them into one note."
-                ),
+                _("The Tie block works on pairs of notes, combining them into one note."),
                 "documentation",
                 null,
                 "tiehelp"
@@ -477,9 +467,7 @@ function setupRhythmBlocks(activity) {
             this.setHelpString([
                 _("The Dot block extends the duration of a note by 50%.") +
                     " " +
-                    _(
-                        "Eg a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat."
-                    ),
+                    _("Eg a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat."),
                 "documentation",
                 null,
                 "dothelp"
@@ -515,9 +503,7 @@ function setupRhythmBlocks(activity) {
             this.setPalette("rhythm", activity);
             this.beginnerBlock(true);
             this.setHelpString([
-                _(
-                    "A rest of the specified note value duration can be constructed using a Silence block."
-                ),
+                _("A rest of the specified note value duration can be constructed using a Silence block."),
                 "documentation",
                 null,
                 "rest2"
@@ -776,13 +762,9 @@ function setupRhythmBlocks(activity) {
             this.setPalette("rhythm", activity);
             this.beginnerBlock(true);
             this.setHelpString([
-                _(
-                    "The Note block is a container for one or more Pitch blocks."
-                ) +
+                _("The Note block is a container for one or more Pitch blocks.") +
                     " " +
-                    _(
-                        "The Note block specifies the duration (note value) of its contents."
-                    ),
+                    _("The Note block specifies the duration (note value) of its contents."),
                 "documentation",
                 null,
                 "note1"

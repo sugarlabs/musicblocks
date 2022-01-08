@@ -525,9 +525,7 @@ function setupWidgetBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale)."
-                ),
+                _("The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale)."),
                 "documentation",
                 ""
             ]);
@@ -661,9 +659,7 @@ function setupWidgetBlocks(activity) {
                     logo.pitchDrumMatrix.rowLabels.length === 0
                 ) {
                     activity.errorMsg(
-                        _(
-                            "You must have at least one pitch block and one drum block in the matrix."
-                        ),
+                        _("You must have at least one pitch block and one drum block in the matrix."),
                         blk
                     );
                 } else {
@@ -800,18 +796,14 @@ function setupWidgetBlocks(activity) {
 
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    _(
-                        "The Music keyboard block opens a piano keyboard that can be used to create notes."
-                    ),
+                    _("The Music keyboard block opens a piano keyboard that can be used to create notes."),
                     "documentation",
                     null,
                     "musickeyboardja"
                 ]);
             } else {
                 this.setHelpString([
-                    _(
-                        "The Music keyboard block opens a piano keyboard that can be used to create notes."
-                    ),
+                    _("The Music keyboard block opens a piano keyboard that can be used to create notes."),
                     "documentation",
                     null,
                     "musickeyboard2"
@@ -1113,9 +1105,7 @@ function setupWidgetBlocks(activity) {
             const __listener = function () {
                 if (logo.tupletRhythms.length === 0 || logo.phraseMaker.rowLabels.length === 0) {
                     activity.errorMsg(
-                        _(
-                            "You must have at least one pitch block and one rhythm block in the matrix."
-                        ),
+                        _("You must have at least one pitch block and one rhythm block in the matrix."),
                         blk
                     );
                 } else {
@@ -1167,9 +1157,7 @@ function setupWidgetBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
-                    "The Status block opens a tool for inspecting the status of Music Blocks as it is running."
-                ),
+                _("The Status block opens a tool for inspecting the status of Music Blocks as it is running."),
                 "documentation",
                 null,
                 "status"

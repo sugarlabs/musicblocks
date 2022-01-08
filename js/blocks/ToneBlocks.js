@@ -105,9 +105,7 @@ function setupToneBlocks(activity) {
             this.piemenuValuesC1 = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             this.piemenuValuesC2 = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             this.setHelpString([
-                _(
-                    "The Duo synth block is a duo-frequency modulator used to define a timbre."
-                ),
+                _("The Duo synth block is a duo-frequency modulator used to define a timbre."),
                 "documentation",
                 null,
                 "duosynthhelp"
@@ -131,9 +129,7 @@ function setupToneBlocks(activity) {
             this.setPalette("tone", activity);
             this.piemenuValuesC1 = [1, 2];
             this.setHelpString([
-                _(
-                    "The AM synth block is an amplitude modulator used to define a timbre."
-                ),
+                _("The AM synth block is an amplitude modulator used to define a timbre."),
                 "documentation",
                 null,
                 "amsynthhelp"
@@ -156,9 +152,7 @@ function setupToneBlocks(activity) {
             this.setPalette("tone", activity);
             this.piemenuValuesC1 = [1, 5, 10, 15, 20, 25];
             this.setHelpString([
-                _(
-                    "The FM synth block is a frequency modulator used to define a timbre."
-                ),
+                _("The FM synth block is a frequency modulator used to define a timbre."),
                 "documentation",
                 null,
                 "fmsynthhelp"
@@ -179,9 +173,7 @@ function setupToneBlocks(activity) {
             super("partial", _("partial"));
             this.setPalette("tone", activity);
             this.setHelpString([
-                _(
-                    "The Partial block is used to specify a weight for a specific partical harmonic."
-                ),
+                _("The Partial block is used to specify a weight for a specific partical harmonic."),
                 "documentation",
                 ""
             ]);
@@ -207,9 +199,7 @@ function setupToneBlocks(activity) {
             } else {
                 //.TRANS: partials are weighted components in a harmonic series
                 activity.errorMsg(
-                    _(
-                        "Partial block should be used inside of a Weighted-partials block."
-                    )
+                    _("Partial block should be used inside of a Weighted-partials block.")
                 );
             }
         }
@@ -220,9 +210,7 @@ function setupToneBlocks(activity) {
             super("harmonic");
             this.setPalette("tone", activity);
             this.setHelpString([
-                _(
-                    "The Weighted partials block is used to specify the partials associated with a timbre."
-                ),
+                _("The Weighted partials block is used to specify the partials associated with a timbre."),
                 "documentation",
                 ""
             ]);
@@ -269,9 +257,7 @@ function setupToneBlocks(activity) {
             this.piemenuValuesC1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
             this.setPalette("tone", activity);
             this.setHelpString([
-                _(
-                    "The Harmonic block will add harmonics to the contained notes."
-                ),
+                _("The Harmonic block will add harmonics to the contained notes."),
                 "documentation",
                 null,
                 "harmonichelp"
@@ -599,9 +585,7 @@ function setupToneBlocks(activity) {
             super("voicename", _("set instrument"));
             this.setPalette("tone", activity);
             this.setHelpString([
-                _(
-                    "The Set instrument block selects a voice for the synthesizer,"
-                ) +
+                _("The Set instrument block selects a voice for the synthesizer,") +
                     " " +
                     _("eg guitar piano violin or cello."),
                 "documentation",
@@ -620,17 +604,13 @@ function setupToneBlocks(activity) {
 
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    _(
-                        "The Set instrument block selects a voice for the synthesizer,"
-                    ),
+                    _("The Set instrument block selects a voice for the synthesizer,"),
                     "documentation",
                     ""
                 ]);
             } else {
                 this.setHelpString([
-                    _(
-                        "The Set instrument block selects a voice for the synthesizer,"
-                    ) +
+                    _("The Set instrument block selects a voice for the synthesizer,") +
                         " " +
                         _("eg guitar piano violin or cello."),
                     "documentation",

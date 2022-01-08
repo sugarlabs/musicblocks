@@ -9,9 +9,14 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+
 function GlobalPlanet(Planet) {
     this.ProjectViewer = null;
-    this.offlineHTML = '<div class="container center-align">' + _('Feature unavailable - cannot connect to server. Reload Music Blocks to try again.') + '</div>';
+    if (Planet.IsMusicBlocks) {
+        this.offlineHTML = '<div class="container center-align">' + _('Feature unavailable - cannot connect to server. Reload Music Blocks to try again.') + '</div>';
+    } else {
+        this.offlineHTML = '<div class="container center-align">' + _('Feature unavailable - cannot connect to server. Reload Turtle Blocks to try again.') + '</div>';
+    }
     this.noProjects = '<div class="container center-align">' + _('No results found.') + '</div>';
     this.tags = [];
     this.specialTags = null;
