@@ -32,7 +32,7 @@
    getAuxToolbarButtonNames
  */
 
-const VERSION = "3.5.2.3";
+const VERSION = "3.5.2.4";
 let LOGODEFAULT;
 let LOGOJA1 = LOGODEFAULT;
 let LOGOJA = LOGODEFAULT;
@@ -435,7 +435,7 @@ function createHelpContent(activity) {
         HELPCONTENT = [
             [
                 _("Welcome to Turtle Blocks"),
-                TITLESTRING,
+                _("Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."),
                 "data:image/svg+xml;base64," +
                     window.btoa(unescape(encodeURIComponent(LOGO)))
             ],
@@ -458,7 +458,7 @@ function createHelpContent(activity) {
         HELPCONTENT = [
             [
                 _("Welcome to Music Blocks"),
-                TITLESTRING,
+                _("Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way."),
                 "data:image/svg+xml;base64," +
                     window.btoa(unescape(encodeURIComponent(LOGO)))
             ],
