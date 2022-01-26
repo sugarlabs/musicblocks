@@ -397,6 +397,10 @@
 | --- | --- |
 | snoopy-invaders.html | Interactive game: Charlie Brown throws a ball to the invading Snoopys, each of whom plays a different drum sound when they catch the ball. |
 
+| Example | Description |
+| --- | --- |
+| musical-mastermind.html | Interactive game: Similar to the class game Mastermind, discover the notes in a short musical phrase. |
+
 # Misc.
 
 | Example | Description |
