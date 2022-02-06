@@ -82,6 +82,10 @@
 
 | Example | Description |
 | --- | --- |
+| elephant-ride.html | A piano exercise with graphics "on every note" displayed on a grand scale. |
+
+| Example | Description |
+| --- | --- |
 | hot-cross-buns-graphics.html | An example of using graphics embedded inside of Note Value **blocks** to visualize beat. |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
