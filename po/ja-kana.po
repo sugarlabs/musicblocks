@@ -1340,7 +1340,7 @@ msgstr "クリックをすると、 ふつうの スピードで プログラム
 
 #: js/turtledefs.js:450
 msgid "Stop the turtle."
-msgstr ""
+msgstr "タートルをとめる"
 
 #: js/turtledefs.js:452
 #: js/turtledefs.js:485
@@ -1579,38 +1579,38 @@ msgstr "もっとくわしく しるには"
 
 #: js/turtledefs.js:725
 msgid "A detailed guide to Turtle Blocks is available."
-msgstr ""
+msgstr "インターネットから、 タートル・ブロックスの さらに くわしい ガイドページを みることが できる。 つぎの リンクさきを ひらいて みよう。"
 
 #: js/turtledefs.js:729
 msgid "Turtle Blocks Guide"
-msgstr ""
+msgstr "タートル・ブロックス ガイド"
 
 #: js/turtledefs.js:732
 #: js/turtledefs.js:763
 #: js/help.js:291
 msgid "About"
-msgstr "ミュージック・ブロックスに ついて"
+msgstr "タートル・ブロックスに ついて"
 
 #: js/turtledefs.js:733
 msgid "Turtle Blocks is an open source collection of tools for exploring musical concepts."
-msgstr ""
+msgstr "タートル・ブロックスは、 おんがくの コンセプトを たんきゅうするために つくられた、 オープンソースの ツールだ。"
 
 #: js/turtledefs.js:735
 msgid "A full list of contributors can be found in the Turtle Blocks GitHub repository."
-msgstr ""
+msgstr "タートル・ブロックスに かかわってきた ひとの いちらんは、 GitHub（ギットハブ） の リポジトリで みることができる。"
 
 #: js/turtledefs.js:737
 msgid "Turtle Blocks is licensed under the AGPL."
-msgstr ""
+msgstr "タートル・ブロックスの プログラムは、 だれでもじゆうに みたり、へんこうしたり することが できる。 "
 
 #: js/turtledefs.js:739
 #: js/turtledefs.js:770
 msgid "The current version is"
-msgstr " ミュージック・ブロックスの さいしんバージョンは"
+msgstr "タートル・ブロックスの さいしんバージョンは"
 
 #: js/turtledefs.js:745
 msgid "Turtle Blocks GitHub repository"
-msgstr ""
+msgstr "タートル・ブロックスのリポジトリ"
 
 #: js/turtledefs.js:748
 #: js/turtledefs.js:779
@@ -1621,7 +1621,7 @@ msgstr "おめでとうございます！"
 
 #: js/turtledefs.js:749
 msgid "You have finished the tour. Please enjoy Turtle Blocks!"
-msgstr ""
+msgstr "ミスター・マウスの ツアーは ここでおわり。 タートル・ブロックスを じゆうに たのしもう。"
 
 #: js/turtledefs.js:756
 msgid "A detailed guide to Music Blocks is available."
@@ -1642,7 +1642,7 @@ msgstr "ミュージック・ブロックスに かかわってきた ひとの 
 
 #: js/turtledefs.js:768
 msgid "Music Blocks is licensed under the AGPL."
-msgstr " ミュージック・ブロックスの プログラムは、 だれでもじゆうに みたり、へんこうしたり することが できる。 "
+msgstr "ミュージック・ブロックスの プログラムは、 だれでもじゆうに みたり、へんこうしたり することが できる。 "
 
 #: js/turtledefs.js:776
 msgid "Music Blocks GitHub repository"
@@ -1654,7 +1654,7 @@ msgstr "ミスター・マウスの ツアーは ここでおわり。 ミュー
 
 #: js/activity.js:341
 msgid "Search for blocks"
-msgstr "ブロックを けんさく"
+msgstr "ブロックをさがす"
 
 #: js/activity.js:976
 msgid "Refresh your browser to change to advanced mode."
@@ -1702,7 +1702,7 @@ msgstr "キーボードで おんがくを つくっているよ"
 
 #: js/activity.js:1174
 msgid "plugins will be removed upon restart."
-msgstr ""
+msgstr "プラグインは さいせいするときえるよ"
 
 #: js/activity.js:1183
 msgid "show Cartesian"
