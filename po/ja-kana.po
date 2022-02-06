@@ -1654,7 +1654,7 @@ msgstr "ミスター・マウスの ツアーは ここでおわり。 ミュー
 
 #: js/activity.js:341
 msgid "Search for blocks"
-msgstr ""
+msgstr "ブロックを けんさく"
 
 #: js/activity.js:976
 msgid "Refresh your browser to change to advanced mode."

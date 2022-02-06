@@ -1579,11 +1579,11 @@ msgstr "もっとくわしく知るには"
 
 #: js/turtledefs.js:725
 msgid "A detailed guide to Turtle Blocks is available."
-msgstr ""
+msgstr "インターネットから、ミュージック・ブロックスのさらにくわしいガイドページを見ることができる。次のリンク先を開いてみよう。"
 
 #: js/turtledefs.js:729
 msgid "Turtle Blocks Guide"
-msgstr ""
+msgstr "ミュージック・ブロックスガイド"
 
 #: js/turtledefs.js:732
 #: js/turtledefs.js:763
@@ -1593,15 +1593,15 @@ msgstr "ミュージック・ブロックスについて"
 
 #: js/turtledefs.js:733
 msgid "Turtle Blocks is an open source collection of tools for exploring musical concepts."
-msgstr ""
+msgstr "ミュージック・ブロックスは、音楽のコンセプトをたんきゅうするためにつくられた、オープンソースのツールだ。"
 
 #: js/turtledefs.js:735
 msgid "A full list of contributors can be found in the Turtle Blocks GitHub repository."
-msgstr ""
+msgstr "ミュージック・ブロックスにかかわってきた人のいちらんは、GitHub（ギットハブ）のリポジトリで見ることができる。"
 
 #: js/turtledefs.js:737
 msgid "Turtle Blocks is licensed under the AGPL."
-msgstr ""
+msgstr "ミュージック・ブロックスのプログラムは、だれでも自由にみることができる。"
 
 #: js/turtledefs.js:739
 #: js/turtledefs.js:770
@@ -1654,7 +1654,7 @@ msgstr "ミスター・マウスのツアーはここで終わり。ミュージ
 
 #: js/activity.js:341
 msgid "Search for blocks"
-msgstr ""
+msgstr "ブロックを検索"
 
 #: js/activity.js:976
 msgid "Refresh your browser to change to advanced mode."
@@ -2805,7 +2805,7 @@ msgstr ""
 #: js/EnsembleBlocks.js:306
 #.TRANS: pen color for this turtle
 msgid "turtle color"
-msgstr ""
+msgstr "タートルの色"
 
 #: js/EnsembleBlocks.js:308
 msgid "The Turtle color block returns the pen color of the specified turtle."
@@ -2823,7 +2823,7 @@ msgstr ""
 #: js/EnsembleBlocks.js:352
 #.TRANS: heading (compass direction) for this turtle
 msgid "turtle heading"
-msgstr ""
+msgstr "タートルの進む角度"
 
 #: js/EnsembleBlocks.js:354
 msgid "The Turtle heading block returns the heading of the specified turtle."
@@ -2870,7 +2870,7 @@ msgstr "yざひょう（たて）"
 #: js/EnsembleBlocks.js:452
 #.TRANS: set xy position for this turtle
 msgid "set turtle"
-msgstr ""
+msgstr "タートルを設定"
 
 #: js/EnsembleBlocks.js:433
 msgid "The Set mouse block sends a stack of blocks to be run by the specified mouse."
@@ -2892,7 +2892,7 @@ msgstr ""
 #: js/EnsembleBlocks.js:494
 #.TRANS: y position for this turtle
 msgid "turtle y"
-msgstr "ネズミののy座標"
+msgstr "タートルのy座標"
 
 #: js/EnsembleBlocks.js:496
 msgid "The Y turtle block returns the Y position of the specified turtle."
@@ -2910,7 +2910,7 @@ msgstr ""
 #: js/EnsembleBlocks.js:540
 #.TRANS: x position for this turtle
 msgid "turtle x"
-msgstr "ネズミのx座標"
+msgstr "タートルのx座標"
 
 #: js/EnsembleBlocks.js:542
 msgid "The X turtle block returns the X position of the specified turtle."
@@ -2928,7 +2928,7 @@ msgstr ""
 #: js/EnsembleBlocks.js:587
 #.TRANS: notes played by this turtle
 msgid "turtle notes played"
-msgstr ""
+msgstr "タートルの演奏した音符の数"
 
 #: js/EnsembleBlocks.js:589
 msgid "The Turtle elapse notes block returns the number of notes played by the specified turtle."
@@ -2946,7 +2946,7 @@ msgstr ""
 #: js/EnsembleBlocks.js:641
 #.TRANS: convert current note for this turtle to piano key (1-88)
 msgid "turtle pitch number"
-msgstr ""
+msgstr "タートルの音高数字"
 
 #: js/EnsembleBlocks.js:643
 msgid "The Turrle pitch block returns the current pitch number being played by the specified turtle."
@@ -2961,7 +2961,7 @@ msgstr "ネズミの音価"
 #: js/EnsembleBlocks.js:757
 #.TRANS: note value is the duration of the note played by this turtle
 msgid "turtle note value"
-msgstr ""
+msgstr "タートルの音価"
 
 #: js/EnsembleBlocks.js:830
 #.TRANS: sync is short for synchronization
@@ -2975,7 +2975,7 @@ msgstr ""
 #: js/EnsembleBlocks.js:844
 #.TRANS: sync is short for synchronization
 msgid "turtle sync"
-msgstr ""
+msgstr "タートルを同期させる"
 
 #: js/EnsembleBlocks.js:846
 msgid "The Turtle sync block aligns the beat count between turtles."
@@ -2995,7 +2995,7 @@ msgstr ""
 
 #: js/EnsembleBlocks.js:909
 msgid "found turtle"
-msgstr "ネズミ見つかった"
+msgstr "タートル見つかった"
 
 #: js/EnsembleBlocks.js:932
 msgid "new mouse"
@@ -3007,7 +3007,7 @@ msgstr ""
 
 #: js/EnsembleBlocks.js:945
 msgid "new turtle"
-msgstr "新しいネズミ"
+msgstr "新しいタートル"
 
 #: js/EnsembleBlocks.js:947
 msgid "The New turtle block will create a new turtle."
@@ -3023,7 +3023,7 @@ msgstr "「ネズミ色を設定」ブロックは ネズミの色を選ぶこ�
 
 #: js/EnsembleBlocks.js:1020
 msgid "set turtle color"
-msgstr ""
+msgstr "タートル色を設定"
 
 #: js/EnsembleBlocks.js:1023
 msgid "The Set-turtle-color block is used to set the color of a turtle."
@@ -3047,7 +3047,7 @@ msgstr "「何匹のネズミ」のブロックはネズミを数えって数字
 
 #: js/EnsembleBlocks.js:1124
 msgid "turtle count"
-msgstr ""
+msgstr "何匹のタートル"
 
 #: js/EnsembleBlocks.js:1127
 msgid "The Turtle-count block returns the number of turtles."
@@ -3063,7 +3063,7 @@ msgstr ""
 
 #: js/EnsembleBlocks.js:1159
 msgid "nth turtle name"
-msgstr ""
+msgstr "何匹目のタートルの名前"
 
 #: js/EnsembleBlocks.js:1162
 msgid "The Nth-Turtle name block returns the name of the nth turtle."
@@ -3090,7 +3090,7 @@ msgstr "<h2>文字ブロック</h2><br>ネズミに指定した名前をつけ�
 
 #: js/EnsembleBlocks.js:1286
 msgid "The Set-name block is used to name a turtle."
-msgstr ""
+msgstr "<h2>文字ブロック</h2><br>タートルに指定した名前をつけることができる。"
 
 #: js/BooleanBlocks.js:26
 msgid "The Not block is the logical not operator."
@@ -3158,7 +3158,7 @@ msgstr "<br>図の例では、右向きに進み続けるネズミがカンバ�
 #: js/MediaBlocks.js:43
 #: js/MediaBlocks.js:81
 msgid "In this example, the turtle moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
-msgstr ""
+msgstr "<br>図の例では、右向きに進み続けるタートルがカンバスの右からはみ出ると、カンバスの左から出てくる。"
 
 #: js/MediaBlocks.js:64
 #.TRANS: left side of the screen
@@ -3187,7 +3187,7 @@ msgstr "<br>図の例では、上向きに進み続けるネズミがカンバ�
 #: js/MediaBlocks.js:121
 #: js/MediaBlocks.js:159
 msgid "In this example, the turtle moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
-msgstr ""
+msgstr "<br>図の例では、上向きに進み続けるタートルがカンバスの上からはみ出ると、カンバスの下から出てくる。"
 
 #: js/MediaBlocks.js:142
 msgid "bottom (screen)"
@@ -4673,7 +4673,7 @@ msgstr "<h2>いどうブロック</h2><br>ネズミの位置を、指定した�
 
 #: js/GraphicsBlocks.js:408
 msgid "The Arc block moves the turtle in a arc."
-msgstr ""
+msgstr "<h2>いどうブロック</h2><br>タートルの位置を、指定した大きさと角度の円をえがいていどうさせる。角度のすうちは、プラスだと右回り、マイナスだと左回りになる。"
 
 #: js/GraphicsBlocks.js:417
 #.TRANS: draws a part of the circumference of a circle
@@ -4699,7 +4699,7 @@ msgstr "<h2>いどうブロック</h2><br>ネズミの向きを、指定した�
 
 #: js/GraphicsBlocks.js:470
 msgid "The Set heading block sets the heading of the turtle."
-msgstr ""
+msgstr "<h2>いどうブロック</h2><br>タートルの向きを、指定したすうちの角度に変える。"
 
 #: js/GraphicsBlocks.js:512
 msgid "The Set XY block moves the mouse to a specific position on the screen."
@@ -4707,7 +4707,7 @@ msgstr "<h2>いどうブロック</h2><br>ネズミの位置を、指定した�
 
 #: js/GraphicsBlocks.js:518
 msgid "The Set XY block moves the turtle to a specific position on the screen."
-msgstr ""
+msgstr "<h2>いどうブロック</h2><br>タートルの位置を、指定したざひょうにいどうさせる。<br><br>★ざひょうとは<br>物の位置を表すためのすうちのこと。ミュージック・ブロックスでは、２つ１組みのすうち（ざひょう）を使う。画面上のタートルの位置は、ほうがん用紙のマス目のように、よこ方向の目もり（xざひょう）とたて方向の目もり（ｙざひょう）を使って表す。"
 
 #: js/GraphicsBlocks.js:526
 #.TRANS: set xy (Cartesian) position
@@ -4720,7 +4720,7 @@ msgstr "<h2>いどうブロック</h2><br>ネズミの向きを、指定した�
 
 #: js/GraphicsBlocks.js:577
 msgid "The Right block turns the turtle to the right."
-msgstr ""
+msgstr "<h2>いどうブロック</h2><br>タートルの向きを、指定したすうちの角度で右回りに回転させる。"
 
 #: js/GraphicsBlocks.js:586
 #.TRANS: right1 and right are when turning right (clockwise)
@@ -4740,7 +4740,7 @@ msgstr "<h2>いどうブロック</h2><br>ネズミの向きを、指定した�
 
 #: js/GraphicsBlocks.js:636
 msgid "The Left block turns the turtle to the left."
-msgstr ""
+msgstr "<h2>いどうブロック</h2><br>タートルの向きを、指定したすうちの角度で左回りに回転させる。"
 
 #: js/GraphicsBlocks.js:645
 #.TRANS: left and left1 are when turning left (counter-clockwise)
@@ -4769,7 +4769,7 @@ msgstr "<h2>いどうブロック</h2><br>指定したすうち分、ネズミ�
 
 #: js/GraphicsBlocks.js:695
 msgid "The Back block moves the turtle backward."
-msgstr ""
+msgstr "<h2>いどうブロック</h2><br>指定したすうち分、タートルを後ろにもどす。体の向きは変えない。"
 
 #: js/GraphicsBlocks.js:740
 #: plugins/rodi.rtp:71
@@ -4784,7 +4784,7 @@ msgstr "<h2>いどうブロック</h2><br>指定したすうち分、ネズミ�
 
 #: js/GraphicsBlocks.js:753
 msgid "The Forward block moves the turtle forward."
-msgstr ""
+msgstr "<h2>いどうブロック</h2><br>指定したすうち分、タートルを前に進める。"
 
 #: js/GraphicsBlocks.js:806
 #: js/GraphicsBlocks.js:816
