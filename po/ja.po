@@ -2660,7 +2660,10 @@ msgstr "音律を明確にする"
 
 #: js/EnsembleBlocks.js:66
 msgid "mouse index heap"
-msgstr ""
+msgstr "ネズミヒープに番号をふる"
+
+msgid "turtle index heap"
+msgstr "タートルヒープに番号をふる"
 
 #: js/EnsembleBlocks.js:68
 msgid "The Mouse index heap block returns a value in the heap at a specified location for a specified mouse."
