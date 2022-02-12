@@ -57,9 +57,9 @@ function StringHelper(Planet) {
         ["projectviewer-merge-mb",_("Merge with current project"),"data-tooltip"]
     ]
     if (Planet.IsMusicBlocks) {
-        this.strings.append(["projectviewer-open-mb",_("Open in Music Blocks"),"data-tooltip"]);
+        this.strings.push(["projectviewer-open-mb",_("Open in Music Blocks"),"data-tooltip"]);
     } else {
-        this.strings.append(["projectviewer-open-tb",_("Open in Turtle Blocks"),"data-tooltip"]);
+        this.strings.push(["projectviewer-open-tb",_("Open in Turtle Blocks"),"data-tooltip"]);
     }
 
 
