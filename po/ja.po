@@ -4501,7 +4501,7 @@ msgstr "<em>変化記号</em>ブロックは <em>シャープ(嬰)</em>と<em>�
 #: js/PitchBlocks.js:1345
 #.TRANS: An accidental is a modification to a pitch, e.g., sharp or flat.
 msgid "accidental override"
-msgstr ""
+msgstr "変化記号無視"
 
 #: js/PitchBlocks.js:1458
 msgid "The Hertz block (in combination with a Number block) will play a sound at the specified frequency."
@@ -4792,7 +4792,7 @@ msgstr "<h2>いどうブロック</h2><br>指定したすうち分、タート�
 #: js/GraphicsBlocks.js:806
 #: js/GraphicsBlocks.js:816
 msgid "wrap"
-msgstr ""
+msgstr "巻きつける"
 
 #: js/GraphicsBlocks.js:810
 msgid "The Wrap block enables or disables screen wrapping for the graphics actions within it."
