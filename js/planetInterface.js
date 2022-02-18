@@ -62,7 +62,8 @@ function PlanetInterface(activity) {
     };
 
     this.showPlanet = function () {
-        this.planet.open(this.mainCanvas.toDataURL("image/png"));
+        const png = docById("overlayCanvas").toDataURL("image/png");
+        this.planet.open(png);  // this.mainCanvas.toDataURL("image/png"));
         this.iframe.style.display = "block";
         try {
             this.iframe.contentWindow.document.getElementById("local-tab").click();
