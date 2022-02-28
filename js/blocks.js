@@ -187,17 +187,17 @@ function Blocks(activity) {
 
         let palette;
         // Regenerate all of the artwork at the new scale.
-        for (let blk = 0; blk < this.blockList.length; blk++) {
+        for (let blk in this.blockList) {
             this.blockList[blk].resize(scale);
         }
 
         this.findStacks();
-        for (let stack = 0; stack < this.stackList.length; stack++) {
+        for (let stack in this.stackList) {
             this.adjustDocks(this.stackList[stack], true);
         }
 
         // Make sure trash is still hidden.
-        for (let blk = 0; blk < this.blockList.length; blk++) {
+        for (let blk in this.blockList) {
             if (this.blockList[blk].trash) {
                 this.blockList[blk].hide();
             }
@@ -552,7 +552,7 @@ function Blocks(activity) {
         const slotList = myBlock.argClampSlots;
 
         // Determine the size of each argument.
-        for (let i = 0; i < slotList.length; i++) {
+        for (let i in slotList) {
             const c = myBlock.connections[ci + i];
             let size = 1; // Minimum size
             if (c != null) {
@@ -861,7 +861,7 @@ function Blocks(activity) {
             start = myBlock.connections.length - 1;
         }
 
-        for (let c = start; c < myBlock.connections.length; c++) {
+        for (let c = start in myBlock.connections.length) {
             // Get the dock position for this connection.
             const bdock = myBlock.docks[c];
 
