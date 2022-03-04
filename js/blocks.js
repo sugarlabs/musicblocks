@@ -861,7 +861,7 @@ function Blocks(activity) {
             start = myBlock.connections.length - 1;
         }
 
-        for (let c = start in myBlock.connections.length) {
+        for (let c = start; c < myBlock.connections.length; c++) {
             // Get the dock position for this connection.
             const bdock = myBlock.docks[c];
 
