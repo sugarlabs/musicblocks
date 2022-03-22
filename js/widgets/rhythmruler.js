@@ -875,7 +875,7 @@ class RhythmRuler {
                 const elapseTime = d.getTime() - this._longPressStartTime;
                 if (elapseTime > 1500) {
                     this._inLongPress = true;
-                    this.__toggleRestState(this, true);
+		    this.__toggleRestState(cell, true);
                 }
             }
 
@@ -937,7 +937,7 @@ class RhythmRuler {
      * @returns {void}
      */
     __toggleRestState(cell, addToUndoList) {
-        if (cell !== null && cell.parentNode !== null) {
+        if (cell !== null && cell.parentNode !== null && cell.parentNode !== undefined) {
             this._rulerSelected = cell.parentNode.getAttribute("data-row");
             const noteValues = this.Rulers[this._rulerSelected][0];
             const noteValue = noteValues[cell.cellIndex];
