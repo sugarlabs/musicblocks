@@ -1453,17 +1453,26 @@ input.timbreName {
  }
 
  .popupMsg {
-    width: 1000px;
-    height: 30px;
+    /* width: 1000px; */
+    width:70%;
+    /* height: 30px; */
+    height: 4%;
+    /* margin:20px auto;
+    
+    position:relative;
+    border-radius:5px; */
+    /* padding:5px; */
     position: absolute;
     top: 130px;
     left: 50%;
     margin-left: -500px;
-    padding-top: 2px;
+    padding-top: 12px;
     border-radius: 8px;
-    background-color: white;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 19px;
+    background-color: #a8f0c6;
+    /* font-family: Arial, Helvetica, sans-serif; */
+    font-family:'Trebuchet MS', sans-serif;
+    /* font-size: 19px; */
+    font-size:1.7em;
     text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1479,7 +1488,7 @@ input.timbreName {
  }
 
  #printText {
-    border: 2px solid rgb(150, 150, 150);
+    border: 2px solid #a8f0c6;
     z-index: 100;
   }
 
