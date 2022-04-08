@@ -75,7 +75,7 @@ function setupDictActions(activity) {
             } else if (key === _("font")) {
                 return targetTur.painter.font;
             } else if (key === _("heading")) {
-                return targetTur.painter.turtle._orientation;
+                return targetTur.painter.turtle.orientation;
             } else if (key === "x") {
                 return activity.turtles.screenX2turtleX(targetTur.container.x);
             } else if (key === "y") {
