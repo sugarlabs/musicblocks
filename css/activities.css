@@ -1468,9 +1468,12 @@ input.timbreName {
     margin-left: -500px;
     padding-top: 12px;
     border-radius: 8px;
-    background-color: #a8f0c6;
+    color:#A9A9A9;
+    background-color: rgb(140, 198, 255);
     /* font-family: Arial, Helvetica, sans-serif; */
     font-family:'Trebuchet MS', sans-serif;
+    
+    /* link:#A9A9A9 ; */
     /* font-size: 19px; */
     font-size:1.7em;
     text-align: center;
@@ -1478,7 +1481,25 @@ input.timbreName {
     text-overflow: ellipsis;
     cursor: pointer;
     visibility: hidden;
-}
+    
+    /* unvisited link */
+  
+ }
+  /* visited link */
+  a:visited {
+    color: #696969;
+  }
+  
+  /* mouse over link */
+  a:hover {
+    color: #505050;
+  }
+  
+  /* selected link */
+  a:active {
+    color: #505050;
+  }
+
 
 #palette td ,thead ,tr ,table {
     border-collapse: collapse;
@@ -1488,7 +1509,7 @@ input.timbreName {
  }
 
  #printText {
-    border: 2px solid #a8f0c6;
+    border: 2px solid rgb(140, 198, 255);
     z-index: 100;
   }
 
@@ -1501,7 +1522,7 @@ input.timbreName {
     visibility: visible;
   }
 
- #printTextContent, #errorTextContent {
+ #printTextContent, #errorTextContent { 
     display: inline-block;
     width: 940px;
     vertical-align: 7px;
