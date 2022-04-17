@@ -1453,16 +1453,16 @@ input.timbreName {
  }
 
  .popupMsg {
-    /* width: 1000px; */
-    width:70%;
-    /* height: 30px; */
-    height: 4%;
-    /* margin:20px auto;
+    width: 1000px;
+    /* width:70%; */
+    height: 50px;
+    /* height: 4%; */
+    margin:20px auto;
     
     position:relative;
-    border-radius:5px; */
-    /* padding:5px; */
-    position: absolute;
+    border-radius:5px; 
+     padding:5px 5px 5px 5px;
+    /* position: absolute; */
     top: 130px;
     left: 50%;
     margin-left: -500px;
@@ -1487,17 +1487,17 @@ input.timbreName {
  }
   /* visited link */
   a:visited {
-    color: #696969;
+    color: #282828;
   }
   
   /* mouse over link */
   a:hover {
-    color: #505050;
+    color: #282828;
   }
   
   /* selected link */
   a:active {
-    color: #505050;
+    color: #282828;
   }
 
 
