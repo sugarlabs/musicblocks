@@ -1453,16 +1453,15 @@ input.timbreName {
  }
 
  .popupMsg {
-    width: 1000px;
-    height: 30px;
+    width: 50%;
+    height: 3%;
     position: absolute;
     top: 130px;
-    left: 50%;
-    margin-left: -500px;
-    padding-top: 2px;
+    left: 25%;
+    padding-top: 8px;
     border-radius: 8px;
-    background-color: white;
-    font-family: Arial, Helvetica, sans-serif;
+    background-color: #8CC6FF;
+    font-family: "Roboto", sans-serif;
     font-size: 19px;
     text-align: center;
     overflow: hidden;
@@ -1470,6 +1469,10 @@ input.timbreName {
     cursor: pointer;
     visibility: hidden;
 }
+
+ .popupMsg a {
+    color: #5c5c5c
+ }
 
 #palette td ,thead ,tr ,table {
     border-collapse: collapse;
@@ -1494,7 +1497,7 @@ input.timbreName {
 
  #printTextContent, #errorTextContent {
     display: inline-block;
-    width: 940px;
+    width: calc(100% - 60px);
     vertical-align: 7px;
   }
 
