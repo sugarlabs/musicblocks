@@ -365,7 +365,7 @@ function TemperamentWidget() {
                             this.ratiosNotesPair[index][1] +
                             "(- " +
                             centsDiff1[index].toFixed(2) +
-                            ")" +
+                            "%)" +
                             "</div>";
                     } else {
                         docById("noteInfo").innerHTML +=
@@ -375,7 +375,7 @@ function TemperamentWidget() {
                             this.ratiosNotesPair[index][1] +
                             "(+ " +
                             centsDiff1[index].toFixed(2) +
-                            ")" +
+                            "%)" +
                             "</div>";
                     }
                 }
@@ -1516,7 +1516,7 @@ function TemperamentWidget() {
                     if (this.ratios[i] == this.ratiosNotesPair[j][0]) {
                         notesMatch = true;
                         this.notes[i] =
-                            this.ratiosNotesPair[j][1][0] + "(+0)" + this.ratiosNotesPair[j][1][1];
+                            this.ratiosNotesPair[j][1][0] + "(+0%)" + this.ratiosNotesPair[j][1][1];
                         break;
                     }
                 }
@@ -1538,14 +1538,14 @@ function TemperamentWidget() {
                             this.ratiosNotesPair[index][1][0] +
                             "(-" +
                             centsDiff1[index].toFixed(0) +
-                            ")" +
+                            "%)" +
                             this.ratiosNotesPair[index][1][1];
                     } else {
                         this.notes[i] =
                             this.ratiosNotesPair[index][1][0] +
                             "(+" +
                             centsDiff1[index].toFixed(0) +
-                            ")" +
+                            "%)" +
                             this.ratiosNotesPair[index][1][1];
                     }
                 }
@@ -1634,7 +1634,7 @@ function TemperamentWidget() {
                         [
                             "text",
                             {
-                                value: this.notes[i].substring(0, this.notes[i].length - 1)
+                                value: (this.notes[i].substring(0, this.notes[i].length - 1))
                             }
                         ],
                         0,
