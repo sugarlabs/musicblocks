@@ -1097,7 +1097,7 @@ function setupPitchBlocks(activity) {
             this.setPalette("pitch", activity);
             this.makeMacro((x, y) => [
                 [0, "pitch", x, y, [null, 1, 2, null]],
-                [1, ["customNote", { value: "C(+0)" }], 0, 0, [0]],
+                [1, ["customNote", { value: "C(+0%)" }], 0, 0, [0]],
                 [2, ["number", { value: 4 }], 0, 0, [0]]
             ]);
             this.hidden = true;
