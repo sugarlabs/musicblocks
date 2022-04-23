@@ -381,25 +381,25 @@ class Block {
         return false;
     }
 
-    offScreen(boundary) {
-        return !this.trash && boundary.offScreen(this.container.x, this.container.y);
-    }
+    //changed to arrow 
+    offScreen = boundary =>
+        !this.trash && boundary.offScreen(this.container.x, this.container.y);
 
     copySize() {
         this.size = this.protoblock.size;
     }
 
-    getInfo() {
-        return this.name + " block";
-    }
+    //Changed to arrow
+    getInfo = () =>
+        this.name + " block";
 
-    isCollapsible() {
-        return COLLAPSIBLES.indexOf(this.name) !== -1;
-    }
+    //Changed to arrow
+    isCollapsible = () =>
+        COLLAPSIBLES.indexOf(this.name) !== -1;
 
-    isInlineCollapsible() {
-        return INLINECOLLAPSIBLES.indexOf(this.name) !== -1;
-    }
+    //Changed to arrow 
+    isInlineCollapsible = () =>
+        INLINECOLLAPSIBLES.indexOf(this.name) !== -1;
 
     /**
      * Show the highlight artwork.
@@ -629,7 +629,8 @@ class Block {
 
             if (this.name === "start" || this.name === "drum") {
                 // Rescale the decoration on the start blocks.
-                for (let t = 0; t < this.activity.turtles.turtleList.length; t++) {
+                //Updated for syntax
+                for (let t of this.activity.turtle.turtleList.length) {
                     if (this.activity.turtles.turtleList[t].startBlock === this) {
                         this.activity.turtles.turtleList[t].resizeDecoration(
                             scale,
@@ -737,7 +738,8 @@ class Block {
                 case "nameddoArg":
                     obj = this.protoblock.generator(this.argClampSlots);
                     this.size = 2;
-                    for (let i = 0; i < this.argClampSlots.length; i++) {
+                    //CHANGED
+                    for (let i of this.argClampSlots.length) {
                         this.size += this.argClampSlots[i];
                     }
                     this.docks = [];
@@ -758,18 +760,21 @@ class Block {
 
         switch (this.name) {
             case "nameddoArg":
-                for (let i = 1; i < obj[1].length - 1; i++) {
+                //CHANGED
+                for (let i of obj[1].length - 1) {
                     this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
-                }
+                } this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
                 this.docks.push([obj[1][2][0], obj[1][2][1], "in"]);
                 break;
             case "namedcalcArg":
-                for (let i = 1; i < obj[1].length; i++) {
-                    this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
+                //CHANGEd
+                for (let i of obj[1].length) {
+                    this.docks.push(obj[1][i][0], obj[1][i][1], "anyin");
                 }
                 break;
             case "doArg":
                 this.docks.push([obj[1][1][0], obj[1][1][1], this.protoblock.dockTypes[1]]);
+                //CANNOT BE CHANGED
                 for (let i = 2; i < obj[1].length - 1; i++) {
                     this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
                 }
@@ -778,6 +783,7 @@ class Block {
             case "makeblock":
             case "calcArg":
                 this.docks.push([obj[1][1][0], obj[1][1][1], this.protoblock.dockTypes[1]]);
+                //CANNOT BE CHANGED
                 for (let i = 2; i < obj[1].length; i++) {
                     this.docks.push([obj[1][i][0], obj[1][i][1], "anyin"]);
                 }
@@ -788,7 +794,8 @@ class Block {
 
         // Save new artwork and dock positions.
         this.artwork = obj[0];
-        for (let i = 0; i < this.docks.length; i++) {
+        //CHANGED
+        for (let i of this.docks.length) {
             this.docks[i][0] = obj[1][i][0];
             this.docks[i][1] = obj[1][i][1];
         }
@@ -830,8 +837,9 @@ class Block {
             const bitmap = new createjs.Bitmap(image);
             // Don't override the image on a media block.
             if (that.name === "media") {
-                for (let i = 0; i < that.container.children.length; i++) {
-                    if (that.container.children[i].name === "media") {
+                //CHANGED
+                for (let i of that.container.children.length) {
+                    if (that.container.children[i].name == "media") {
                         return;
                     }
                 }
@@ -998,7 +1006,8 @@ class Block {
                     .replace("block_label", safeSVG(block_label));
             }
 
-            for (let i = 1; i < that.protoblock.staticLabels.length; i++) {
+            //CHANGED
+            for (let i in that.protoblock.staticLabels.length) {
                 artwork = artwork.replace("arg_label_" + i, that.protoblock.staticLabels[i]);
             }
 
@@ -1036,8 +1045,8 @@ class Block {
                     .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
                     .replace("block_label", safeSVG(block_label));
             }
-
-            for (let i = 1; i < that.protoblock.staticLabels.length; i++) {
+            //CHANGED
+            for (let i = 1 of that.protoblock.staticLabels.length) {
                 artwork = artwork.replace("arg_label_" + i, that.protoblock.staticLabels[i]);
             }
 
@@ -1069,8 +1078,8 @@ class Block {
                     .replace(/stroke_color/g, HIGHLIGHTSTROKECOLORS[that.protoblock.palette.name])
                     .replace("block_label", safeSVG(block_label));
             }
-
-            for (let i = 1; i < that.protoblock.staticLabels.length; i++) {
+            //CHANGED
+            for (let i of that.protoblock.staticLabels.length) {
                 artwork = artwork.replace("arg_label_" + i, that.protoblock.staticLabels[i]);
             }
 
@@ -1114,7 +1123,8 @@ class Block {
 
             const obj = this.protoblock.generator();
             this.artwork = obj[0];
-            for (let i = 0; i < obj[1].length; i++) {
+            //CHANGED
+            for (let i of obj[1].length) {
                 this.docks.push([obj[1][i][0], obj[1][i][1], this.protoblock.dockTypes[i]]);
             }
 
@@ -1134,8 +1144,8 @@ class Block {
                 .replace(/stroke_color/g, PALETTESTROKECOLORS[this.protoblock.palette.name])
                 .replace("block_label", safeSVG(block_label));
         }
-
-        for (let i = 1; i < this.protoblock.staticLabels.length; i++) {
+        //CHANGED
+        for (let i of this.protoblock.staticLabels.length) {
             artwork = artwork.replace("arg_label_" + i, this.protoblock.staticLabels[i]);
         }
 
@@ -1766,58 +1776,58 @@ class Block {
     }
 
     // Utility functions
-    isValueBlock() {
-        return this.protoblock.style === "value";
-    }
 
-    isNoHitBlock() {
-        return NOHIT.indexOf(this.name) !== -1;
-    }
+    //Changed to arrow
+    isValueBlock = () =>
+        this.protoblock.style === "value";
 
-    isArgBlock() {
-        return this.protoblock.style === "value" || this.protoblock.style === "arg";
-    }
+    //Changed to arrow
+    isNoHitBlock = () =>
+        NOHIT.indexOf(this.name) !== -1;
 
-    isTwoArgBlock() {
-        return this.protoblock.style === "twoarg";
-    }
+    //Changed to arrow
+    isArgBlock = () =>
+        this.protoblock.style === "value" || this.protoblock.style === "arg";
 
-    isTwoArgBooleanBlock() {
-        return ["equal", "greater", "less"].indexOf(this.name) !== -1;
-    }
+    //Changed to arrow
+    isTwoArgBlock = () =>
+        this.protoblock.style === "twoarg";
 
-    isClampBlock() {
-        return (
+    //Changed to arrow
+    isTwoArgBooleanBlock = () =>
+        ["equal", "greater", "less"].indexOf(this.name) !== -1;
+
+    //Changed to arrow 
+    isClampBlock = () =>
             this.protoblock.style === "clamp" ||
             this.isDoubleClampBlock() ||
-            this.isArgFlowClampBlock()
-        );
-    }
+            this.isArgFlowClampBlock();
 
-    isArgFlowClampBlock() {
-        return this.protoblock.style === "argflowclamp";
-    }
+    //Changed to arrow
+    isArgFlowClampBlock = () =>
+        this.protoblock.style === "argflowclamp";
 
-    isLeftClampBlock() {
-        return this.protoblock.isLeftClamp;
-    }
+    //Changed to arrow
+    isLeftClampBlock = () =>
+        this.protoblock.isLeftClamp;
 
-    isDoubleClampBlock() {
-        return this.protoblock.style === "doubleclamp";
-    }
+    //Changed to arrow
+    isDoubleClampBlock = () =>
+        this.protoblock.style === "doubleclamp";
 
-    isNoRunBlock() {
-        return this.name === "action";
-    }
+    //Changed to arrow
+    isNoRunBlock = () =>
+        this.name === "action";
 
-    isArgClamp() {
-        return this.protoblock.style === "argclamp" || this.protoblock.style === "argclamparg";
-    }
+    //Changed to arrow
+    isArgClamp = () =>
+        this.protoblock.style === "argclamp" || this.protoblock.style === "argclamparg";
 
-    isExpandableBlock() {
-        return this.protoblock.expandable;
-    }
+    //Changed to arrow 
+    isExpandableBlock = () =>
+        this.protoblock.expandable;
 
+    
     getBlockId() {
         // Generate a UID based on the block index into the blockList.
         const number = blockBlocks.blockList.indexOf(this);
@@ -1825,7 +1835,8 @@ class Block {
     }
 
     removeChildBitmap(name) {
-        for (let child = 0; child < this.container.children.length; child++) {
+        //CHANGED
+        for (let child of this.container.children.length) {
             if (this.container.children[child].name === name) {
                 this.container.removeChild(this.container.children[child]);
                 break;
@@ -2023,6 +2034,7 @@ class Block {
         } else {
             // Set collapsed state of all of the blocks in the drag group.
             if (this.blocks.dragGroup.length > 0) {
+                //CANNOT BE CHANGED
                 for (let b = 1; b < this.blocks.dragGroup.length; b++) {
                     const blk = this.blocks.dragGroup[b];
                     if (this.collapsed) {
@@ -2047,7 +2059,8 @@ class Block {
         // block.
         const degrees = DEGREES.split(" ");
         const intervalLabels = {};
-        for (let i = 0; i < degrees.length; i++) {
+        //CHANGED
+        for (let i of degrees.length) {
             intervalLabels[i] = degrees[i];
         }
 
@@ -2088,6 +2101,7 @@ class Block {
         }
 
         let itext = "";
+        //CANNOT BE CHANGED
         for (let i = intervals.length; i > 0; i--) {
             itext += " " + intervals[i - 1];
         }
@@ -2344,7 +2358,8 @@ class Block {
         // Set collapsed state of note value arg blocks...
         if (this.connections[1] !== null) {
             this.blocks.findDragGroup(this.connections[1]);
-            for (let b = 0; b < this.blocks.dragGroup.length; b++) {
+            //CHANGED
+            for (let b of this.blocks.dragGroup.length) {
                 const blk = this.blocks.dragGroup[b];
                 this.blocks.blockList[blk].container.visible = collapse;
                 if (collapse) {
@@ -2358,7 +2373,8 @@ class Block {
         // and the blocks inside the clamp.
         if (this.connections[2] !== null) {
             this.blocks.findDragGroup(this.connections[2]);
-            for (let b = 0; b < this.blocks.dragGroup.length; b++) {
+            //CHANGED
+            for (let b of this.blocks.dragGroup.length) {
                 const blk = this.blocks.dragGroup[b];
                 // Look to see if the local parent block is collapsed.
                 const parent = this.blocks.insideInlineCollapsibleBlock(blk);
@@ -2395,7 +2411,8 @@ class Block {
             }
 
             this.blocks.findDragGroup(this.connections[3]);
-            for (let b = 0; b < this.blocks.dragGroup.length; b++) {
+            //CHANGED
+            for (let b of this.blocks.dragGroup.length) {
                 this.blocks.moveBlockRelative(this.blocks.dragGroup[b], 0, dy);
             }
 
@@ -2766,7 +2783,8 @@ class Block {
             // ...and move any connected blocks.
             that.blocks.findDragGroup(thisBlock);
             if (that.blocks.dragGroup.length > 0) {
-                for (let b = 0; b < that.blocks.dragGroup.length; b++) {
+                //CHANGED
+                for (let b of that.blocks.dragGroup.length) {
                     const blk = that.blocks.dragGroup[b];
                     if (b !== 0) {
                         that.blocks.moveBlockRelative(blk, dx, dy);
@@ -3002,7 +3020,8 @@ class Block {
 
     _ensureDecorationOnTop() {
         // Find the turtle decoration and move it to the top.
-        for (let child = 0; child < this.container.children.length; child++) {
+        //CHANGED
+        for (let child of this.container.children.length) {
             if (this.container.children[child].name === "decoration") {
                 // Drum block in collapsed state is less wide.
                 // Deprecated
@@ -3010,8 +3029,8 @@ class Block {
                 if (this.name === "drum" && this.collapsed) {
                     dx = (25 * this.protoblock.scale) / 2;
                 }
-
-                for (let t = 0; t < this.activity.turtles.turtleList.length; t++) {
+                //CHANGED
+                for (let t of this.activity.turtles.turtleList.length) {
                     if (this.activity.turtles.turtleList[t].startBlock === this) {
                         this.activity.turtles.turtleList[t].decorationBitmap.x =
                             this.width - dx - (30 * this.protoblock.scale) / 2;
@@ -3121,7 +3140,8 @@ class Block {
                 const keys = getTemperamentKeys();
                 const noteLabels = {};
                 const customLabels = [];
-                for (let i = 0; i < keys.length; i++) {
+                // CHANGED
+                for (let i of keys.length) {
                     noteLabels[keys[i]] = getTemperament(keys[i]);
                     if (isCustomTemperament(keys[i])) {
                         customLabels.push(keys[i]);
@@ -3210,8 +3230,8 @@ class Block {
 
             const invertLabels = [];
             const invertValues = [];
-
-            for (let i = 0; i < INVERTMODES.length; i++) {
+            //CHANGED
+            for (let i of INVERTMODES.length) {
                 invertLabels.push(_(INVERTMODES[i][1]));
                 invertValues.push(INVERTMODES[i][1]);
             }
@@ -3230,7 +3250,8 @@ class Block {
             const drumValues = [];
             const categories = [];
             const categoriesList = [];
-            for (let i = 0; i < DRUMNAMES.length; i++) {
+            //CHANGED
+            for (let i of DRUMNAMES.length) {
                 if (EFFECTSNAMES.indexOf(DRUMNAMES[i][1]) === -1) {
                     const label = _(DRUMNAMES[i][1]);
                     if (getTextWidth(label, "bold 30pt Sans") > 400) {
@@ -3261,7 +3282,8 @@ class Block {
             const effectValues = [];
             const effectcategories = [];
             const effectcategoriesList = [];
-            for (let i = 0; i < DRUMNAMES.length; i++) {
+            //CHANGED
+            for (let i of DRUMNAMES.length) {
                 if (EFFECTSNAMES.indexOf(DRUMNAMES[i][1]) !== -1) {
                     const label = _(DRUMNAMES[i][1]);
                     if (getTextWidth(label, "Bold 30pt Sans") > 400) {
@@ -3290,7 +3312,8 @@ class Block {
 
             const filterLabels = [];
             const filterValues = [];
-            for (let i = 0; i < FILTERTYPES.length; i++) {
+            //CHANGED
+            for (let i of FILTERTYPES.length) {
                 filterLabels.push(_(FILTERTYPES[i][0]));
                 filterValues.push(FILTERTYPES[i][1]);
             }
@@ -3311,7 +3334,8 @@ class Block {
 
             const oscLabels = [];
             const oscValues = [];
-            for (let i = 0; i < OSCTYPES.length; i++) {
+            //CHANGED
+            for (let i of OSCTYPES.length) {
                 oscLabels.push(_(OSCTYPES[i][1]));
                 oscValues.push(OSCTYPES[i][1]);
             }
@@ -3328,7 +3352,8 @@ class Block {
             const voiceValues = [];
             const categories = [];
             const categoriesList = [];
-            for (let i = 0; i < VOICENAMES.length; i++) {
+            //CHANGED
+            for (let i of VOICENAMES.length) {
                 // Skip custom voice in Beginner Mode.
                 if (this.activity.beginnerMode && VOICENAMES[i][1] === "custom") {
                     continue;
@@ -3362,7 +3387,8 @@ class Block {
             const noiseValues = [];
             const categories = [];
             const categoriesList = [];
-            for (let i = 0; i < NOISENAMES.length; i++) {
+            //CHANGED
+            for (let i of NOISENAMES.length) {
                 const label = NOISENAMES[i][0];
                 if (getTextWidth(label, "bold 30pt Sans") > 600) {
                     noiseLabels.push(label.substr(0, 16) + "...");
@@ -3390,7 +3416,8 @@ class Block {
             const temperamentLabels = [];
             const temperamentValues = [];
             const temperamentsList = getTemperamentsList();
-            for (let i = 0; i < temperamentsList.length; i++) {
+            //CHANGED
+            for (let i of temperamentsList.length) {
                 // Skip custom temperament in Beginner Mode.
                 if (this.activity.beginnerMode && temperamentsList[i][1] === "custom") {
                     continue;
@@ -3478,8 +3505,8 @@ class Block {
                 // .TRANS: off should be translated as "off" as in on and off
                 [_("off"), "off"]
             ];
-
-            for (let i = 0; i < WRAPMODES.length; i++) {
+            //CHANGED
+            for (let i of WRAPMODES.length) {
                 wrapLabels.push(_(WRAPMODES[i][1]));
                 wrapValues.push(WRAPMODES[i][1]);
             }
@@ -3512,7 +3539,8 @@ class Block {
                     values = [8, 7, 6, 5, 4, 3, 2, 1];
                 } else {
                     values = [];
-                    for (let i = 0; i < Math.min(d, 16); i++) {
+                    //CHANGED. OKAY?
+                    for (let i of Math.min(d, 16)) {
                         values.push(i + 1);
                     }
                 }
@@ -3570,7 +3598,8 @@ class Block {
                     case "pitchnumber":
                         // eslint-disable-next-line no-case-declarations
                         let temperament;
-                        for (let i = 0; i < this.blocks.blockList.length; i++) {
+                        //CHANGED
+                        for (let i of this.blocks.blockList.length) {
                             if (
                                 this.blocks.blockList[i].name === "settemperament" &&
                                 this.blocks.blockList[i].connections[0] !== null
@@ -3592,7 +3621,8 @@ class Block {
                             );
                         } else {
                             const pitchNumbers = [];
-                            for (let i = 0; i < getTemperament(temperament)["pitchNumber"]; i++) {
+                            //CHANGED
+                            for (let i of getTemperament(temperament)["pitchNumber"]) {
                                 pitchNumbers.push(i);
                             }
                             piemenuNumber(this, pitchNumbers, this.value);
@@ -3830,7 +3860,8 @@ class Block {
         const widgetTitle = document.getElementsByClassName("wftTitle");
         let lockInit = false;
         if (closeInput === false) {
-            for (let i = 0; i < widgetTitle.length; i++) {
+            //CHANGED
+            for (let i of widgetTitle.length) {
                 if (lockInit === false) {
                     switch (widgetTitle[i].innerHTML) {
                         case "oscilloscope":
@@ -4088,7 +4119,8 @@ class Block {
                     );
                     // eslint-disable-next-line no-case-declarations
                     const blockPalette = this.blocks.palettes.dict["action"];
-                    for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
+                    //CHANGED
+                    for (let blk of blockPalette.protoList.length) {
                         const block = blockPalette.protoList[blk];
                         if (oldValue === _("action")) {
                             if (block.name === "nameddo" && block.defaults.length === 0) {
@@ -4182,8 +4214,8 @@ class Block {
  */
 function $() {
     const elements = new Array();
-
-    for (let i = 0; i < arguments.length; i++) {
+    //CHANGED
+    for (let i of arguments.length) {
         let element = arguments[i];
         if (typeof element === "string") {
             element = docById(element);
