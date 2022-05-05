@@ -3191,12 +3191,18 @@ function _calculate_pitch_number(activity, np, tur) {
             activity.errorMsg
         );
     } else {
-        if (tur.singer.lastNotePlayed !== null) {
-            // eslint-disable-next-line no-console
-            console.debug("Cannot find a note ");
+        try {
+            if (typeof np === "string") {
+                obj = noteToObj(np);
+            } else {
+                // Hertz
+                obj = frequencyToPitch(np);
+            }
+
+        } catch(e) {
             activity.errorMsg(INVALIDPITCH);
+            obj = ["G", 4];
         }
-        obj = ["G", 4];
     }
     return pitchToNumber(obj[0], obj[1], tur.singer.keySignature) - tur.singer.pitchNumberOffset;
 }
