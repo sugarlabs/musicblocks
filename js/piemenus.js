@@ -21,7 +21,8 @@
    getMunsellColor, COLORS40, frequencyToPitch, instruments,
    DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
    FIXEDSOLFEGE, NOTENAMES, FIXEDSOLFEGE, NOTENAMES, numberToPitch,
-   nthDegreeToPitch, SOLFEGENAMES, buildScale, _THIS_IS_TURTLE_BLOCKS_
+   nthDegreeToPitch, SOLFEGENAMES, buildScale, _THIS_IS_TURTLE_BLOCKS_,
+   CHORDNAMES
 */
 
 /*
@@ -2309,13 +2310,7 @@ const piemenuChords = function (block, selectedChord) {
     // the chord selector
     block._chordWheel = new wheelnav("wheelDiv", null, 800, 800);
 
-    const chordLabels = [
-        _("major"),
-        _("minor"),
-        _("dominant seventh"),
-        _("minor seventh"),
-        _("major seventh")
-    ];
+    const chordLabels = CHORDNAMES;
 
     wheelnav.cssMode = true;
 

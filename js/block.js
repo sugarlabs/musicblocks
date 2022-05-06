@@ -34,7 +34,7 @@
    piemenuVoices, piemenuChords, platformColor, ProtoBlock, RSYMBOLS,
    safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
-   topBlock, updateTemperaments, VALUETEXTX,
+   topBlock, updateTemperaments, VALUETEXTX, DEFAULTCHORD,
    VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_
  */
 
@@ -1191,7 +1191,7 @@ class Block {
                         this.value = DEFAULTMODE;
                         break;
                     case "chordname":
-                        this.value = _("major");
+                        this.value = DEFAULTCHORD;
                         break;
                     case "accidentalname":
                         this.value = DEFAULTACCIDENTAL;
@@ -3191,7 +3191,7 @@ class Block {
             if (this.value != null) {
                 selectedChord = this.value;
             } else {
-                selectedChord = _("major");
+                selectedChord = DEFAULTCHORD;
             }
 
             piemenuChords(this, selectedChord);
