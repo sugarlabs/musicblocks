@@ -486,7 +486,7 @@ function setupIntervalsBlocks(activity) {
         }
     }
 
-    class ChordIntervalBlock extends FlowBlock {
+    class ChordIntervalBlock extends FlowClampBlock {
         constructor() {
             super("chordinterval");
             this.setPalette("intervals", activity);
@@ -504,7 +504,7 @@ function setupIntervalsBlocks(activity) {
                 defaults: [DEFAULTCHORD]
             });
             this.makeMacro((x, y) => [
-                [0, "chordinterval", x, y, [null, 1, null]],
+                [0, "chordinterval", x, y, [null, 1, null, null]],
                 [1, ["chordname", { value: DEFAULTCHORD }], 0, 0, [0]]
             ]);
         }
@@ -519,6 +519,7 @@ function setupIntervalsBlocks(activity) {
                     CHORDVALUES[i][ii], turtle, blk
                 );
             }
+            return [args[1], 1];
         }
     }
     
