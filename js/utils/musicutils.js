@@ -51,7 +51,8 @@
   convertFromSolfege, getPitchInfo, MATRIXBUTTONCOLOR, i18nSolfege,
   convertFactor, getOctaveRatio, setOctaveRatio, getTemperamentsList,
   addTemperamentToList, getTemperament, deleteTemperamentFromList,
-  addTemperamentToDictionary, buildScale
+  addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
+  DEFAULTCHORD
 */
 
 // Scalable sinewave graphic
@@ -777,6 +778,25 @@ const ACCIDENTALNAMES = [
 ];
 
 const ACCIDENTALVALUES = [2, 1, 0, -1, -2];
+
+const CHORDNAMES = [
+    _("major"),
+    _("minor"),
+    _("dominant seventh"),
+    _("minor seventh"),
+    _("major seventh")
+];
+
+const DEFAULTCHORD = CHORDNAMES[0];
+
+// This list must follow the order of the CHORDNAMES list.
+const CHORDVALUES = [
+    [4, 7],
+    [3, 7],
+    [4, 7, 10],
+    [3, 7, 10],
+    [4, 7, 11]
+];
 
 const INVERTMODES = [
     [_("even"), "even"],
