@@ -86,6 +86,17 @@ function setupIntervalsBlocks(activity) {
         }
     }
 
+    class ChordNameBlock extends ValueBlock {
+        constructor() {
+            super("chordname");
+            this.setPalette("intervals", activity);
+            this.setHelpString();
+            this.formBlock({ outType: "textout" });
+            this.extraWidth = 50;
+            this.hidden = true;
+        }
+    }
+
     class DoublyBlock extends LeftBlock {
         constructor() {
             // TRANS: doubly means to apply an augmentation or diminishment twice
@@ -474,6 +485,52 @@ function setupIntervalsBlocks(activity) {
         }
     }
 
+    class ChordIntervalBlock extends FlowBlock {
+        constructor() {
+            super("chordinterval");
+            this.setPalette("intervals", activity);
+            this.setHelpString([
+                _("The Chord block calculates common chords.") +
+                    " " +
+                    _("In the figure, we generate a C-major chord."),
+                "documentation",
+                ""
+            ]);
+            this.formBlock({
+                name: _("chord"),
+                args: 1,
+                argTypes: ["textin"],
+                defaults: [_("major")]
+            });
+            this.makeMacro((x, y) => [
+                [0, "chordinterval", x, y, [null, 1, null]],
+                [1, ["chordname", { value: _("major") }], 0, 0, [0]]
+            ]);
+        }
+
+        flow(args, logo, turtle, blk) {
+            if (args[0] === _("major")) {
+                Singer.IntervalsActions.setSemitoneInterval(4, turtle, blk);
+                Singer.IntervalsActions.setSemitoneInterval(7, turtle, blk);
+            } else if (args[0] === _("minor")) {
+                Singer.IntervalsActions.setSemitoneInterval(3, turtle, blk);
+                Singer.IntervalsActions.setSemitoneInterval(7, turtle, blk);
+            } else if (args[0] === _("dominant seventh")) {
+                Singer.IntervalsActions.setSemitoneInterval(4, turtle, blk);
+                Singer.IntervalsActions.setSemitoneInterval(7, turtle, blk);
+                Singer.IntervalsActions.setSemitoneInterval(10, turtle, blk);
+            } else if (args[0] === _("minor seventh")) {
+                Singer.IntervalsActions.setSemitoneInterval(3, turtle, blk);
+                Singer.IntervalsActions.setSemitoneInterval(7, turtle, blk);
+                Singer.IntervalsActions.setSemitoneInterval(10, turtle, blk);
+            } else if (args[0] === _("major seventh")) {
+                Singer.IntervalsActions.setSemitoneInterval(4, turtle, blk);
+                Singer.IntervalsActions.setSemitoneInterval(7, turtle, blk);
+                Singer.IntervalsActions.setSemitoneInterval(11, turtle, blk);
+            }
+        }
+    }
+    
     // DEPRECATED: verbose macros, no longer needed
 
     // function makeIntervalMacroBlocks() {
@@ -840,6 +897,7 @@ function setupIntervalsBlocks(activity) {
 
     new SetTemperamentBlock().setup(activity);
     new TemperamentNameBlock().setup(activity);
+    new ChordNameBlock().setup(activity);
     new ModeNameBlock().setup(activity);
     new DoublyBlock().setup(activity);
     new IntervalNameBlock().setup(activity);
@@ -847,6 +905,7 @@ function setupIntervalsBlocks(activity) {
     new MeasureIntervalScalarBlock().setup(activity);
     makeSemitoneIntervalMacroBlocks();
     new PerfectBlock().setup(activity);
+    new ChordIntervalBlock().setup(activity);
     new SemitoneIntervalBlock().setup(activity);
     // makeIntervalMacroBlocks();
     new ScalarIntervalBlock().setup(activity);

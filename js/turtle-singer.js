@@ -686,7 +686,6 @@ class Singer {
      */
     static processPitch(activity, note, octave, cents, turtle, blk) {
         const tur = activity.turtles.ithTurtle(turtle);
-
         let noteObj = Singer.addScalarTransposition(
             activity.logo,
             turtle,
@@ -1061,7 +1060,6 @@ class Singer {
      */
     static processNote(activity, noteValue, isOsc, blk, turtle, callback) {
         const tur = activity.turtles.ithTurtle(turtle);
-
         const bpmFactor =
             TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 

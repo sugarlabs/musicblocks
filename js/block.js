@@ -31,8 +31,8 @@
    piemenuAccidentals, piemenuBasic, piemenuBlockContext,
    piemenuBoolean, piemenuColor, piemenuCustomNotes, piemenuIntervals,
    piemenuModes, piemenuNoteValue, piemenuNumber, piemenuPitches,
-   piemenuVoices, platformColor, ProtoBlock, RSYMBOLS, safeSVG,
-   SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
+   piemenuVoices, piemenuChords, platformColor, ProtoBlock, RSYMBOLS,
+   safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
    topBlock, updateTemperaments, VALUETEXTX,
    VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_
@@ -109,6 +109,7 @@ const SPECIALINPUTS = [
     "notename",
     "voicename",
     "modename",
+    "chordname",
     "drumname",
     "effectsname",
     "filtertype",
@@ -131,8 +132,8 @@ const WIDENAMES = [
     "effectsname",
     "voicename",
     "modename",
+    "chordname",
     "temperamentname",
-    "modename",
     "noisename",
     "outputtools"
 ];
@@ -152,6 +153,7 @@ const PIEMENUS = [
     "oscillatortype",
     "intervalname",
     "modename",
+    "chordname",
     "temperamentname",
     "noisename",
     "customNote",
@@ -1187,6 +1189,9 @@ class Block {
                         break;
                     case "modename":
                         this.value = DEFAULTMODE;
+                        break;
+                    case "chordname":
+                        this.value = _("major");
                         break;
                     case "accidentalname":
                         this.value = DEFAULTACCIDENTAL;
@@ -3059,6 +3064,7 @@ class Block {
             selectedAttr,
             selectedAccidental,
             selectedMode,
+            selectedChord,
             selectedInvert,
             selectedInterval,
             selectedDrum,
@@ -3181,6 +3187,14 @@ class Block {
             }
 
             piemenuModes(this, selectedMode);
+        } else if (this.name === "chordname") {
+            if (this.value != null) {
+                selectedChord = this.value;
+            } else {
+                selectedChord = _("major");
+            }
+
+            piemenuChords(this, selectedChord);
         } else if (this.name === "accidentalname") {
             if (this.value != null) {
                 selectedAccidental = this.value;
