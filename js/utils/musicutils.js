@@ -779,9 +779,6 @@ const ACCIDENTALNAMES = [
 
 const ACCIDENTALVALUES = [2, 1, 0, -1, -2];
 
-Common three note chords: major (0,4,7), minor (0,3,7), augmented (0,4,8), and diminished (0,3,6)
-Common four note chords: major seventh (0,4,7,11), minor seventh (0,3,7,10), dominant seventh (0,4,7,10), minor-major seventh (0,3,7,11), (fully-)diminished seventh (0,3,6,9), half-diminished seventh (0,3,6,10)
-
 const CHORDNAMES = [
     _("major"),
     _("minor"),
