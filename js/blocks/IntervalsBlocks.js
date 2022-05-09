@@ -504,12 +504,15 @@ function setupIntervalsBlocks(activity) {
                 defaults: [DEFAULTCHORD]
             });
             this.makeMacro((x, y) => [
-                [0, "chordinterval", x, y, [null, 1, null, null]],
-                [1, ["chordname", { value: DEFAULTCHORD }], 0, 0, [0]]
+                [0, "chordinterval", x, y, [null, 1, null, 2]],
+                [1, ["chordname", { value: DEFAULTCHORD }], 0, 0, [0]],
+                [2, "hidden", 0, 0, [0, null]]
             ]);
         }
 
         flow(args, logo, turtle, blk) {
+            if (args[1] === undefined) return;
+
             let i = CHORDNAMES.indexOf(args[0]);
             if (i == -1) {
                 i = CHORDNAMES.indexOf(DEFAULTCHORD);
