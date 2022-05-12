@@ -1632,6 +1632,9 @@ function Activity() {
                             case "modename":
                                 label = _("mode name");
                                 break;
+                            case "chordname":
+                                label = _("chord name");
+                                break;
                             case "intervalname":
                                 label = _("interval name");
                                 break;

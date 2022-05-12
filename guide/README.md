@@ -862,6 +862,28 @@ double diminishment.
 The *Semi-tone interval measure* block can be used to measure the
 number of half-steps between two pitched.
 
+#### <a name= "CHORDS"></a>Chords
+
+A chord is a group of notes that are played together (often used for
+harmony in music). There are triads (three notes), tetrachords (four
+notes), and even five-, six-, and seven-note chords.
+
+The *Chord* block builds a chord from a base note.
+
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/chordinterval_block.svg
+ "Chord Block")
+
+We support many basic chords:
+
+| chord | intervals | example |
+| --- |
+| major | 1 4 7 | C major C - E - G |
+| minor | 1 3 7 | C minor C - Eb - G |
+| dominant 7 | 1 4 7 10 | C7 C - E - G - Bb |
+| minor 7 | 1 3 7 10 | Cmin7 C - Eb - G - Bb |
+| major 7 | 1 4 7 11 | Cmaj7 C - E - G - B |
+
 #### <a name= "INVERSION"></a>3.2.12 Inversion
 
 The *Invert* block will rotate a series of notes around a target

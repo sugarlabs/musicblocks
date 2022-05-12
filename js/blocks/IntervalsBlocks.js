@@ -13,7 +13,7 @@
    global
 
    last, _, ValueBlock, FlowClampBlock, FlowBlock, NOINPUTERRORMSG,
-   LeftBlock, Singer
+   LeftBlock, Singer, CHORDNAMES, CHORDVALUES, DEFAULTCHORD
  */
 
 /*
@@ -29,6 +29,7 @@
  */
 
 /* exported setupIntervalsBlocks */
+
 
 function setupIntervalsBlocks(activity) {
     class SetTemperamentBlock extends FlowBlock {
@@ -78,6 +79,17 @@ function setupIntervalsBlocks(activity) {
     class ModeNameBlock extends ValueBlock {
         constructor() {
             super("modename");
+            this.setPalette("intervals", activity);
+            this.setHelpString();
+            this.formBlock({ outType: "textout" });
+            this.extraWidth = 50;
+            this.hidden = true;
+        }
+    }
+
+    class ChordNameBlock extends ValueBlock {
+        constructor() {
+            super("chordname");
             this.setPalette("intervals", activity);
             this.setHelpString();
             this.formBlock({ outType: "textout" });
@@ -474,95 +486,46 @@ function setupIntervalsBlocks(activity) {
         }
     }
 
-    // DEPRECATED: verbose macros, no longer needed
+    class ChordIntervalBlock extends FlowClampBlock {
+        constructor() {
+            super("chordinterval");
+            this.setPalette("intervals", activity);
+            this.setHelpString([
+                _("The Chord block calculates common chords.") +
+                    " " +
+                    _("In the figure, we generate a C-major chord."),
+                "documentation",
+                ""
+            ]);
+            this.formBlock({
+                name: _("chord"),
+                args: 1,
+                argTypes: ["textin"],
+                defaults: [DEFAULTCHORD]
+            });
+            this.makeMacro((x, y) => [
+                [0, "chordinterval", x, y, [null, 1, null, 2]],
+                [1, ["chordname", { value: DEFAULTCHORD }], 0, 0, [0]],
+                [2, "hidden", 0, 0, [0, null]]
+            ]);
+        }
 
-    // function makeIntervalMacroBlocks() {
-    //     class ChordIntervalMacroBlock extends FlowBlock {
-    //         constructor(name, display, value1, value2) {
-    //             super(name, _(display));
-    //             this.setPalette("intervals", activity);
-    //             this.beginnerBlock(true);
-    //             this.setHelpString();
-    //             this.makeMacro((x, y) => [
-    //                 [0, "interval", x, y, [null, 1, 3, 2]],
-    //                 [1, ["number", { value: value1 }], 0, 0, [0]],
-    //                 [2, "hidden", 0, 0, [0, null]],
-    //                 [3, "interval", 0, 0, [0, 4, 6, 5]],
-    //                 [4, ["number", { value: value2 }], 0, 0, [3]],
-    //                 [5, "hidden", 0, 0, [3, null]],
-    //                 [
-    //                     6,
-    //                     ["newnote", { collapsed: false }],
-    //                     0,
-    //                     0,
-    //                     [3, 7, 10, 14]
-    //                 ],
-    //                 [7, "divide", 0, 0, [6, 8, 9]],
-    //                 [8, ["number", { value: 1 }], 0, 0, [7]],
-    //                 [9, ["number", { value: 1 }], 0, 0, [7]],
-    //                 [10, "vspace", 0, 0, [6, 11]],
-    //                 [11, "pitch", 0, 0, [10, 12, 13, null]],
-    //                 [12, ["solfege", { value: "do" }], 0, 0, [11]],
-    //                 [13, ["number", { value: 4 }], 0, 0, [11]],
-    //                 [14, "hidden", 0, 0, [6, null]]
-    //             ]);
-    //         }
-    //     }
-    //     class IntervalMacroBlock extends FlowBlock {
-    //         constructor(name, value, down) {
-    //             super(
-    //                 (down ? "down" : "") + name + "interval",
-    //                 _((down ? "down " : "") + name)
-    //             );
-    //             this.setPalette("intervals", activity);
-    //             this.beginnerBlock(value === 2 || value === 5);
-    //             this.setHelpString();
-    //             this.makeMacro((x, y) => [
-    //                 [0, "interval", x, y, [null, 1, 6, 8]],
-    //                 [1, down ? "minus" : "plus", 0, 0, [0, 2, 3]],
-    //                 [2, ["number", { value: value }], 0, 0, [1]],
-    //                 [3, "multiply", 0, 0, [1, 4, 5]],
-    //                 [4, ["number", { value: 0 }], 0, 0, [3]],
-    //                 [5, "modelength", 0, 0, [3]],
-    //                 [6, "vspace", 0, 0, [0, 7]],
-    //                 [7, "vspace", 0, 0, [6, null]],
-    //                 [8, "hidden", 0, 0, [0, null]]
-    //             ]);
-    //         }
-    //     }
-    //     let lang = localStorage.languagePreference || navigator.language;
+        flow(args, logo, turtle, blk) {
+            if (args[1] === undefined) return;
 
-    //     new ChordIntervalMacroBlock(
-    //         "chordV",
-    //         lang === "ja" ? _("chord5") : _("chord") + " V",
-    //         3,
-    //         2
-    //     ).setup(activity);
-    //     new ChordIntervalMacroBlock(
-    //         "chordIV",
-    //         lang === "ja" ? _("chord4") : _("chord") + " IV",
-    //         5,
-    //         2
-    //     ).setup(activity);
-    //     new ChordIntervalMacroBlock(
-    //         "chordI",
-    //         lang === "ja" ? _("chord1") : _("chord") + " I",
-    //         4,
-    //         2
-    //     ).setup(activity);
-
-    //     //.TRANS: down <n>th means the note is <n - 1> scale degrees below current note
-    //     //.TRANS: <n>th means the note is the <n - 1> scale degrees above current note
-    //     new IntervalMacroBlock("sixth", -5, true).setup(activity);
-    //     new IntervalMacroBlock("third", -2, true).setup(activity);
-    //     new IntervalMacroBlock("seventh", 6, true).setup(activity);
-    //     new IntervalMacroBlock("sixth", 5, true).setup(activity);
-    //     new IntervalMacroBlock("fifth", 4, true).setup(activity);
-    //     new IntervalMacroBlock("fourth", 3, true).setup(activity);
-    //     new IntervalMacroBlock("third", 2, true).setup(activity);
-    //     new IntervalMacroBlock("second", 1, true).setup(activity);
-    //     new IntervalMacroBlock("unison", 0, true).setup(activity);
-    // }
+            let i = CHORDNAMES.indexOf(args[0]);
+            if (i == -1) {
+                i = CHORDNAMES.indexOf(DEFAULTCHORD);
+            }
+            for (let ii = 0; ii < CHORDVALUES[i].length; ii++) {
+                Singer.IntervalsActions.setSemitoneInterval(
+                    CHORDVALUES[i][ii], turtle, blk
+                );
+            }
+            return [args[1], 1];
+        }
+    }
+    
 
     class ScalarIntervalBlock extends FlowClampBlock {
         constructor() {
@@ -840,6 +803,7 @@ function setupIntervalsBlocks(activity) {
 
     new SetTemperamentBlock().setup(activity);
     new TemperamentNameBlock().setup(activity);
+    new ChordNameBlock().setup(activity);
     new ModeNameBlock().setup(activity);
     new DoublyBlock().setup(activity);
     new IntervalNameBlock().setup(activity);
@@ -847,6 +811,7 @@ function setupIntervalsBlocks(activity) {
     new MeasureIntervalScalarBlock().setup(activity);
     makeSemitoneIntervalMacroBlocks();
     new PerfectBlock().setup(activity);
+    new ChordIntervalBlock().setup(activity);
     new SemitoneIntervalBlock().setup(activity);
     // makeIntervalMacroBlocks();
     new ScalarIntervalBlock().setup(activity);

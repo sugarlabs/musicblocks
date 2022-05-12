@@ -21,7 +21,8 @@
    getMunsellColor, COLORS40, frequencyToPitch, instruments,
    DOUBLESHARP, NATURAL, DOUBLEFLAT, EQUIVALENTACCIDENTALS,
    FIXEDSOLFEGE, NOTENAMES, FIXEDSOLFEGE, NOTENAMES, numberToPitch,
-   nthDegreeToPitch, SOLFEGENAMES, buildScale, _THIS_IS_TURTLE_BLOCKS_
+   nthDegreeToPitch, SOLFEGENAMES, buildScale, _THIS_IS_TURTLE_BLOCKS_,
+   CHORDNAMES
 */
 
 /*
@@ -56,7 +57,7 @@
    piemenuModes, piemenuPitches, piemenuCustomNotes, piemenuGrid,
    piemenuBlockContext, piemenuIntervals, piemenuVoices, piemenuBoolean,
    piemenuBasic, piemenuColor, piemenuNumber, piemenuNthModalPitch,
-   piemenuNoteValue, piemenuAccidentals, piemenuKey
+   piemenuNoteValue, piemenuAccidentals, piemenuKey, piemenuChords
 */
 const piemenuPitches = function (
     block,
@@ -2203,7 +2204,7 @@ const piemenuBoolean = function (block, booleanLabels, booleanValues, boolean) {
 
     docById("wheelDiv").style.display = "";
 
-    // the booleanh selector
+    // the boolean selector
     block._booleanWheel = new wheelnav("wheelDiv", null, 600, 600);
 
     const labels = [];
@@ -2295,6 +2296,108 @@ const piemenuBoolean = function (block, booleanLabels, booleanValues, boolean) {
         __exitMenu();
     };
 };
+
+
+const piemenuChords = function (block, selectedChord) {
+    // wheelNav pie menu for chord selection
+
+    if (block.blocks.stageClick) {
+        return;
+    }
+
+    docById("wheelDiv").style.display = "";
+
+    // the chord selector
+    block._chordWheel = new wheelnav("wheelDiv", null, 800, 800);
+
+    const chordLabels = CHORDNAMES;
+
+    wheelnav.cssMode = true;
+
+    block._chordWheel.keynavigateEnabled = false;
+    
+    block._chordWheel.colors = platformColor.modeWheelcolors;
+    block._chordWheel.slicePathFunction = slicePath().DonutSlice;
+    block._chordWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+    block._chordWheel.slicePathCustom.minRadiusPercent = 0.2;
+    block._chordWheel.slicePathCustom.maxRadiusPercent = 1;
+    block._chordWheel.sliceSelectedPathCustom = block._chordWheel.slicePathCustom;
+    block._chordWheel.sliceInitPathCustom = block._chordWheel.slicePathCustom;
+    block._chordWheel.titleRotateAngle = 0;
+    block._chordWheel.animatetime = 0;
+    block._chordWheel.createWheel(chordLabels);
+
+    for (let i = 0; i < block._chordWheel.navItems.length; i++) {
+        block._chordWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
+        block._chordWheel.navItems[i].titleSelectedAttr.font = "30 30px sans-serif";
+    }
+
+    const that = block;
+
+    const __selectionChanged = function () {
+        const label = that._chordWheel.navItems[that._chordWheel.selectedNavItemIndex].title;
+        that.value = label;
+        that.text.text = label;
+
+        // Make sure text is on top.
+        that.container.setChildIndex(that.text, that.container.children.length - 1);
+        that.updateCache();
+    };
+
+    const __exitMenu = function () {
+        that._piemenuExitTime = new Date().getTime();
+        docById("wheelDiv").style.display = "none";
+        that._chordWheel.removeWheel();
+    };
+
+    // Position the widget over the note block.
+    const x = block.container.x;
+    const y = block.container.y;
+
+    const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
+    const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
+
+    docById("wheelDiv").style.position = "absolute";
+    docById("wheelDiv").style.height = "300px";
+    docById("wheelDiv").style.width = "300px";
+    docById("wheelDiv").style.left =
+        Math.min(
+            block.blocks.turtles._canvas.width - 300,
+            Math.max(
+                0,
+                Math.round(
+                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
+                ) - 200
+            )
+        ) + "px";
+    docById("wheelDiv").style.top =
+        Math.min(
+            block.blocks.turtles._canvas.height - 350,
+            Math.max(
+                0,
+                Math.round(
+                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
+                ) - 200
+            )
+        ) + "px";
+
+    // Navigate to a the current chord value.
+    let i = chordLabels.indexOf(selectedChord);
+    if (i === -1) {
+        i = 0;
+    }
+
+    block._chordWheel.navigateWheel(i);
+
+    // Hide the widget when the selection is made.
+    for (let i = 0; i < chordLabels.length; i++) {
+        block._chordWheel.navItems[i].navigateFunction = function () {
+            __selectionChanged();
+            __exitMenu();
+        };
+    }
+};
+
 
 const piemenuVoices = function (block, voiceLabels, voiceValues, categories, voice, rotate) {
     // wheelNav pie menu for voice selection
