@@ -877,7 +877,7 @@ The *Chord* block builds a chord from a base note.
 We support many basic chords:
 
 | chord | intervals | example |
-| --- |
+| :---: | :-------: | :-----: |
 | major | 1 4 7 | C major C - E - G |
 | minor | 1 3 7 | C minor C - Eb - G |
 | dominant 7 | 1 4 7 10 | C7 C - E - G - Bb |
