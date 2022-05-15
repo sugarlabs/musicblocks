@@ -354,6 +354,19 @@ msgstr "ダブルフラット"
 msgid "unison"
 msgstr "ユニゾン（同度）"
 
+
+#.TRANS: dominant seventh is a music term related to chords
+msgid "dominant seventh"
+msgstr "セブンス"
+
+#.TRANS: minor seventh is a music term related to chords
+msgid "minor seventh"
+msgstr "マイナー・セブンス"
+
+#.TRANS: major seventh is a music term related to chords
+msgid "major seventh"
+msgstr "メジャー・セブンス"
+
 #: js/piemenus.js:2804
 #: js/piemenus.js:2877
 #: js/musicutils.js:588
