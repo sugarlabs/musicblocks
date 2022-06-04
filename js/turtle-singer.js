@@ -1022,25 +1022,77 @@ class Singer {
                 tur.singer.currentCalculatedOctave = 4;
             }
 
-            const noteObj = getNote(
-                note,
-                octave,
-                0,
-                tur.singer.keySignature,
-                tur.singer.moveable,
-                null,
-                activity.errorMsg
-            );
-
             tur.singer.inNoteBlock.push(blk);
-            tur.singer.notePitches[last(tur.singer.inNoteBlock)].push(noteObj[0]);
-            tur.singer.noteOctaves[last(tur.singer.inNoteBlock)].push(noteObj[1]);
-            tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(cents);
-            tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(
-                cents === 0
-                    ? 0
-                    : pitchToFrequency(noteObj[0], noteObj[1], cents, tur.singer.keySignature)
-            );
+
+            tur.singer.inverted = tur.singer.invertList.length > 0;
+            const addPitch = (note, octave, cents, direction) => {
+                // Apply transpositions
+                const transposition = 2 * delta + tur.singer.transposition;
+
+                const noteObj = getNote(
+                    note,
+                    octave,
+                    // FIXME: should not be hardwired to 12
+                    transposition + tur.singer.register * 12,
+                    tur.singer.keySignature,
+                    tur.singer.moveable,
+                    direction,
+                    activity.errorMsg,
+                    activity.logo.synth.inTemperament
+                );
+
+                if (tur.singer.drumStyle.length > 0) {
+                    const drumname = last(tur.singer.drumStyle);
+                    tur.singer.pitchDrumTable[noteObj[0] + noteObj[1]] = drumname;
+                }
+
+                tur.singer.notePitches[last(tur.singer.inNoteBlock)].push(noteObj[0]);
+                tur.singer.noteOctaves[last(tur.singer.inNoteBlock)].push(noteObj[1]);
+                tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(cents);
+                tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(
+                    cents === 0
+                        ? 0
+                        : pitchToFrequency(noteObj[0], noteObj[1], cents, tur.singer.keySignature)
+                );
+
+                return noteObj;
+            };
+
+            const noteObj1 = addPitch(note, octave, cents);
+
+            for (let i = 0; i < tur.singer.intervals.length; i++) {
+                const noteObj2 = getNote(
+                    noteObj1[0],
+                    noteObj1[1],
+                    getInterval(tur.singer.intervals[i], tur.singer.keySignature, noteObj1[0]),
+                    tur.singer.keySignature,
+                    tur.singer.moveable,
+                    null,
+                    activity.errorMsg,
+                    activity.logo.synth.inTemperament
+                );
+                addPitch(noteObj2[0], noteObj2[1], cents);
+            }
+
+            for (let i = 0; i < tur.singer.semitoneIntervals.length; i++) {
+                const noteObj2 = getNote(
+                    noteObj1[0],
+                    noteObj1[1],
+                    tur.singer.semitoneIntervals[i][0],
+                    tur.singer.keySignature,
+                    tur.singer.moveable,
+                    null,
+                    activity.errorMsg,
+                    activity.logo.synth.inTemperament
+                );
+                addPitch(noteObj2[0], noteObj2[1], cents, tur.singer.semitoneIntervals[i][1]);
+            }
+
+            if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(tur.singer.beatFactor);
+            }
+
+            tur.singer.pushedNote = true;
 
             Singer.processNote(activity, 4, false, blk, turtle, () => {
                 tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
