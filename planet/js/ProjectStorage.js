@@ -210,10 +210,15 @@ function ProjectStorage(Planet) {
 
     this.restore = async function() {
         let currentData = await this.get(this.LocalStorageKey);
-        if(typeof currentData === "string"){
-            this.data = JSON.parse(currentData);
-        } else {
-            this.data = currentData;
+        try {
+            if(typeof currentData === "string"){
+                this.data = JSON.parse(currentData);
+            } else {
+                this.data = currentData;
+            }
+        } catch (e) {
+            console.log(e);
+            return null;
         }
     };
 
