@@ -181,10 +181,12 @@ following resources:
 
 - [HTML tutorial - w3schools.com](https://www.w3schools.com/html/default.asp)
 - [HTML reference - MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/HTML)
+- [Free HTML tutorial - Scaler](https://www.scaler.com/topics/html/)
 - [CSS tutorial - w3schools.com](https://www.w3schools.com/css/default.asp)
 - [CSS reference - MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/CSS)
 - [JavaScript tutorial - w3schools.com](https://www.w3schools.com/js/default.asp)
 - [JavaScript reference - MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+
 
 Programmers, please follow these general [guidelines for
 contributions](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md).
