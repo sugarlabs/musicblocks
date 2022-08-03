@@ -3228,8 +3228,7 @@ function _calculate_pitch_number(activity, np, tur) {
                 // Hertz
                 obj = frequencyToPitch(np);
             }
-
-        } catch(e) {
+        } catch (e) {
             activity.errorMsg(INVALIDPITCH);
             obj = ["G", 4];
         }
@@ -3329,33 +3328,33 @@ function _getStepSize(keySignature, pitch, direction, transposition, temperament
         thisPitch = BTOFLAT[thisPitch];
     } else if (thisPitch in STOSHARP) {
         thisPitch = STOSHARP[thisPitch];
-    } 
+    }
 
-    function logicalEquals(s1,s2) {
-            // console.debug(s1,s2);
-        if(s1==s2) {
+    function logicalEquals(s1, s2) {
+        // console.debug(s1,s2);
+        if (s1 == s2) {
             return true;
-        } else if(s1=="E♯"&&s2=="F") {
+        } else if (s1 == "E♯" && s2 == "F") {
             return true;
-        } else if(s1=="E"&&s2=="F♭") {
+        } else if (s1 == "E" && s2 == "F♭") {
             return true;
-        } else if(s1=="F"&&s2=="E♯") {
+        } else if (s1 == "F" && s2 == "E♯") {
             return true;
-        } else if(s1=="F♭"&&s2=="E") {
+        } else if (s1 == "F♭" && s2 == "E") {
             return true;
-        } else if(s1=="B♯"&&s2=="C") {
+        } else if (s1 == "B♯" && s2 == "C") {
             return true;
-        } else if(s1=="B"&&s2=="C♭") {
+        } else if (s1 == "B" && s2 == "C♭") {
             return true;
-        } else if(s1=="C"&&s2=="B♯") {
+        } else if (s1 == "C" && s2 == "B♯") {
             return true;
-        } else if(s1=="C♭"&&s2=="B") {
+        } else if (s1 == "C♭" && s2 == "B") {
             return true;
         }
         return false;
-      }
+    }
 
-    let ii = scale.findIndex(scale => logicalEquals(scale, pitch)); //indexOf() replaced by findIndex()
+    let ii = scale.findIndex((scale) => logicalEquals(scale, pitch)); //indexOf() replaced by findIndex()
     // let ii = scale.indexOf(thisPitch);
     if (ii !== -1) {
         if (direction === "up") {
