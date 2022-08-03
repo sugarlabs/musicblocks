@@ -3329,9 +3329,37 @@ function _getStepSize(keySignature, pitch, direction, transposition, temperament
         thisPitch = BTOFLAT[thisPitch];
     } else if (thisPitch in STOSHARP) {
         thisPitch = STOSHARP[thisPitch];
-    }
+    } 
 
-    let ii = scale.indexOf(thisPitch);
+        function logicalEquals(s1,s2) {
+            // console.debug(s1,s2);
+        if(s1==s2)
+        {
+            return true;
+        }
+        else if(s1=="E♯"&&s2=="F")
+        {
+            return true;
+        }
+        else if(s1=="E"&&s2=="F♭")
+        {
+            return true;
+        }
+        
+        else if(s1=="F"&&s2=="E♯")
+        {
+            return true;
+        }
+        else if(s1=="F♭"&&s2=="E")
+        {
+            return true;
+        }
+        
+        return false;
+      }
+
+    let ii = scale.findIndex(scale => logicalEquals(scale, pitch)); //indexOf() replaced by findIndex()
+    // let ii = scale.indexOf(thisPitch);
     if (ii !== -1) {
         if (direction === "up") {
             return halfSteps[ii];
