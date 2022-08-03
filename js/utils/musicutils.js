@@ -3331,30 +3331,27 @@ function _getStepSize(keySignature, pitch, direction, transposition, temperament
         thisPitch = STOSHARP[thisPitch];
     } 
 
-        function logicalEquals(s1,s2) {
+    function logicalEquals(s1,s2) {
             // console.debug(s1,s2);
-        if(s1==s2)
-        {
+        if(s1==s2) {
+            return true;
+        } else if(s1=="E♯"&&s2=="F") {
+            return true;
+        } else if(s1=="E"&&s2=="F♭") {
+            return true;
+        } else if(s1=="F"&&s2=="E♯") {
+            return true;
+        } else if(s1=="F♭"&&s2=="E") {
+            return true;
+        } else if(s1=="B♯"&&s2=="C") {
+            return true;
+        } else if(s1=="B"&&s2=="C♭") {
+            return true;
+        } else if(s1=="C"&&s2=="B♯") {
+            return true;
+        } else if(s1=="C♭"&&s2=="B") {
             return true;
         }
-        else if(s1=="E♯"&&s2=="F")
-        {
-            return true;
-        }
-        else if(s1=="E"&&s2=="F♭")
-        {
-            return true;
-        }
-        
-        else if(s1=="F"&&s2=="E♯")
-        {
-            return true;
-        }
-        else if(s1=="F♭"&&s2=="E")
-        {
-            return true;
-        }
-        
         return false;
       }
 
