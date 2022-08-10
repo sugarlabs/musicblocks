@@ -2410,6 +2410,14 @@ You can import sound samples (.WAV files) and use them with the *Set Instrument"
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/sampler1.svg
  "Sampler Widget")
 
+You can then use the *Sample* block as you would any input to the *Set
+Instrument* block.
+
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/sampler2.svg
+ "Sampler Widget")
+
+
 ## <a name="BEYOND-MUSIC-BLOCKS"></a>5. Beyond Music Blocks
 
 [Previous Section (4. Widgets)](#WIDGETS) | [Back to Table of Contents](#TOC)
