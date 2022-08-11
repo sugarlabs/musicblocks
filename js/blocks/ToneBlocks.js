@@ -738,7 +738,8 @@ function setupToneBlocks(activity) {
 
     class AudioFileBlock extends ValueBlock {
         constructor() {
-            super("audiofile", _("audio file"));
+	    // The block name is replaced by a pathname.
+            super("audiofile", "");
             this.parameter = true;
             this.extraWidth = 20;
             this.setPalette("tone", activity);
