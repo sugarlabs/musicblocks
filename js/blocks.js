@@ -2376,7 +2376,7 @@ function Blocks(activity) {
             case "audiofile":
                 try {
                     if (myBlock.value[0] === null) {
-                        label = _("audio file1");
+                        label = _("audio file");
                     } else {
                         label = myBlock.value[0].toString();
                         if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
@@ -2384,7 +2384,7 @@ function Blocks(activity) {
                         }
                     }
                 } catch (e) {
-                    label = _("audio file2");
+                    label = _("audio file");
                 }
                 break;
             case "solfege":
