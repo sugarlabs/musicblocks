@@ -598,7 +598,6 @@ flats, so they are skipped. D major has two sharps, `F#` and `C#`. The
 
 Scale Degree with *Set Key* is a very powerful tool for expression. It
 is also very common in music pedagogy. However, because the number
-
 values 1-7 are hard wired into this system, it is a tool that works
 best to express seven-pitch tonal frameworks (e.g. major, minor, and
 other common seven pitch scales). For musical ideas where a more
