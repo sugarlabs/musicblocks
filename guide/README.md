@@ -117,10 +117,9 @@ At the heart of Music Blocks is the *Note value* block. The *Note
 value* block is a container for a [*Pitch* block](#PITCH) that
 specifies the duration (note value) of the pitch.
 
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/note1.svg
- "A single Note value block (top) and two consecutive Note value
- blocks (bottom)")
+[![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/note1.svg)]
+ (https://rawgithub.com/sugarlabs/musicblocks/master/guide/note1.svg)
 
 At the top of the example above, a single (detached) *Note value*
 block is shown. The `1/8` is value of the note, which is, in this
@@ -598,6 +597,7 @@ flats, so they are skipped. D major has two sharps, `F#` and `C#`. The
 
 Scale Degree with *Set Key* is a very powerful tool for expression. It
 is also very common in music pedagogy. However, because the number
+
 values 1-7 are hard wired into this system, it is a tool that works
 best to express seven-pitch tonal frameworks (e.g. major, minor, and
 other common seven pitch scales). For musical ideas where a more
