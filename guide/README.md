@@ -1273,14 +1273,14 @@ where the right argument is converted accordingly, and output is received on the
 
 ![alt tag](treble.svg "Treble clef staff")
 
-### <a name="y-to-pitch"></a>4.1 Y to Pitch
+### <a name="y-to-pitch"></a>3.8.1 Y to Pitch
 
 ![alt tag](./ytopitch_block.svg "Y to Pitch converter")
 
 This converter takes input in the form of a number that represents Staff Y position in pixels, and processes the value such that it can be used with certain pitch blocks (pitch number, nth modal pitch, pitch) to produce notes corresponding to given Staff Y position as an argument.  
 Additionally, the block can be plugged into a print block to view the converted note value.
 
-### <a name="pitch-converter"></a>4.2 Pitch converter
+### <a name="pitch-converter"></a>3.8.2 Pitch converter
 
 ![alt tag](./outputtools_block.svg "Pitch converter block")
 
@@ -1321,13 +1321,13 @@ Value of the pitch of the note currently being played. It is different from Pitc
 #### **9. Staff Y:**
 Returns the Y staff position of the note being played according to staff dimensions. It takes into account only the letter class, no accidental info is processed.
 
-### <a name="number-2-octave"></a>4.3  Number to Octave  
+### <a name="number-2-octave"></a>3.8.3 Number to Octave  
   
 ![alt tag](./number2octave_block.svg "Y to Pitch converter")
 
 This converter takes a numeric value which denotes pitch number and returns the octave corresponding to that pitch number.
 
-### <a name="number-2-pitch"></a>4.3  Number to Pitch
+### <a name="number-2-pitch"></a>3.8.4 Number to Pitch
 
 ![alt tag](./number2pitch_block.svg "Y to Pitch converter")
 
