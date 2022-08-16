@@ -117,7 +117,8 @@ At the heart of Music Blocks is the *Note value* block. The *Note
 value* block is a container for a [*Pitch* block](#PITCH) that
 specifies the duration (note value) of the pitch.
 
-![alt tag](./note1.svg)
+![alt tag](./note1.svg "A single Note value block (top) and two consecutive Note value
+ blocks (bottom)")
 
 At the top of the example above, a single (detached) *Note value*
 block is shown. The `1/8` is value of the note, which is, in this
