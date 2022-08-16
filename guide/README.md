@@ -117,7 +117,8 @@ At the heart of Music Blocks is the *Note value* block. The *Note
 value* block is a container for a [*Pitch* block](#PITCH) that
 specifies the duration (note value) of the pitch.
 
-![alt tag](./note1.svg "A single Note value block (top) and two consecutive Note value
+![alt 
+tag](./note1.svg "A single Note value block (top) and two consecutive Note value
  blocks (bottom)")
 
 At the top of the example above, a single (detached) *Note value*
@@ -128,10 +129,7 @@ At the bottom, two notes that are played consecutively are shown. They
 are both `1/8` notes, making the duration of the entire sequence
 `1/4`.
 
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/note2.svg
- "A quarter note, a sixteenth note, and a half note Note value
- blocks")
+![alt tag](./note2.svg "A quarter note, a sixteenth note, and a half note Note value blocks")
 
 In this example, different note values are shown. From top to bottom,
 they are: `1/4` for an quarter note, `1/16` for a sixteenth note, and
@@ -140,15 +138,11 @@ they are: `1/4` for an quarter note, `1/16` for a sixteenth note, and
 Note that any mathematical operations can be used as input to the
 *Note value*.
 
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/piemenu1.svg
- "A pie menu for selecting note values.")
+![alt tag](./piemenu1.svg "A pie menu for selecting note values.")
 
 As a convenience, a pie menu is used for selecting common note values.
 
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/charts/NotationRestChart.svg
- "A chart of note values and their corresponding note value blocks")
+![alt tag](./NotationRestChart.svg "A chart of note values and their corresponding note value blocks")
 
 Please refer to the above picture for a visual representation of note
 values.
@@ -160,8 +154,7 @@ As we have seen, *Pitch* blocks are used inside the
 pitch name and pitch octave of a note that in combination determines
 the frequency (and therefore pitch) at which the note is played.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/note3.svg
- "Specifying a pitch block's name and octave")
+![alt tag](./note3.svg "Specifying a pitch block's name and octave")
 
 There are many systems you can use to specify a *pitch* block's name
 and octave. Some examples are shown above.
@@ -209,29 +202,21 @@ The octave of the last block is specified using a *next* text block
 
 Note that the pitch name can also be specified using a *Text* block. 
 
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/piemenu2.svg
- "A pie menu for selecting pitch.")
+![alt tag](./piemenu2.svg "A pie menu for selecting pitch.")
 
 As a convenience, a pie menu is used for selecting pitch, accidental,
 and octave.
 
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/charts/KeyboardChart.svg
- "Note layout chart for keyboard")
+![alt tag](./KeyboardChart.svg "Note layout chart for keyboard")
 
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/charts/MalletChart.svg
- "Note layout chart for mallet")
+![alt tag](./MalletChart.svg "Note layout chart for mallet")
 
 Please refer to the above charts for a visual representation of where
 notes are located on a keyboard or staff.
 
 ### <a name="CHORDS"></a>2.3 Chords
 
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/note4.svg
- "Forming a chord")
+![alt tag](./note4.svg "Forming a chord")
 
 A chord (multiple, simultaneous pitches) can be specified by adding
 multiple *Pitch* blocks into a single *Note value* block, like the
@@ -239,27 +224,21 @@ above example.
 
 ### <a name="RESTS"></a>2.4 Rests
 
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/silence.svg
- "Silence blocks create rests")
+![alt tag](./silence.svg "Silence blocks create rests")
 
 A rest of the specified note value duration can be constructed using a
 *Silence* block in place of a *Pitch* block.
 
 ### <a name="DRUMS"></a>2.5 Drums
 
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/drum1.svg
- "Using Drum Sample block")
+![alt tag](./drum1.svg "Using Drum Sample block")
 
 Anywhere a *Pitch* block can be used&mdash;e.g., inside of the matrix
 or a *Note value* block&mdash;a *Drum Sample* block can also be used
 instead. Currently there about two dozen different samples from which
 to choose. The default drum is a kick drum.
 
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/note5.svg
- "Multiple Drum Sample blocks in combinations")
+![alt tag](./note5.svg "Multiple Drum Sample blocks in combinations")
 
 Just as in the [chord](#CHORD) example above, you can use multiple
 *Drum* blocks within a single *Note value* blocks, and combine them
@@ -277,9 +256,7 @@ get started.
 
 ### <a name="CHUNKS"></a>3.1 Chunks
 
-![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/chunk-2.svg
- "working of action stack")
+![alt tag](./chunk-2.svg "working of action stack")
 
 ![alt
  tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/chunk-1.svg
