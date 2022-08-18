@@ -220,11 +220,11 @@ As a convenience, a pie menu is used for selecting pitch, accidental,
 and octave.
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/charts/KeyboardChart.svg
+ tag](./charts/KeyboardChart.svg
  "Note layout chart for keyboard")
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/charts/MalletChart.svg
+ tag](./charts/MalletChart.svg
  "Note layout chart for mallet")
 
 Please refer to the above charts for a visual representation of where
