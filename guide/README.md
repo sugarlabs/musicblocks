@@ -148,10 +148,9 @@ Note that any mathematical operations can be used as input to the
 
 As a convenience, a pie menu is used for selecting common note values.
 
-![alt 
- tag](./NotationRestChart.svg 
- "A chart of note values and their
-  corresponding note value blocks")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/charts/NotationRestChart.svg
+ "A chart of note values and their corresponding note value blocks")
 
 Please refer to the above picture for a visual representation of note
 values.
@@ -220,12 +219,12 @@ Note that the pitch name can also be specified using a *Text* block.
 As a convenience, a pie menu is used for selecting pitch, accidental,
 and octave.
 
-![alt 
- tag](./KeyboardChart.svg 
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/charts/KeyboardChart.svg
  "Note layout chart for keyboard")
 
-![alt 
- tag](./MalletChart.svg 
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/charts/MalletChart.svg
  "Note layout chart for mallet")
 
 Please refer to the above charts for a visual representation of where
