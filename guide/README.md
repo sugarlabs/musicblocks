@@ -607,7 +607,7 @@ Because some users may want to explicitly spell out all of the pitches
 regardless of the chosen key, we allow them to use Scale Degree with
 the *Movable Do* block (remember, Scale Degree works like Movable=La
 by default). Please see [this
-code](./2-spelling-systems-for-Scale-Degree.html)
+code](https://rawgithub.com/sugarlabs/musicblocks/master/examples/2-spelling-systems-for-Scale-Degree.html)
 as an example.
 
 The following chart describes the behavior of different blocks
@@ -634,9 +634,11 @@ combines math and musical modifiers. When combining numbers and
 accidentals, it recreates the same functionality as the *Scale Degree*
 block.
 
-![Scale Degree Improv Example](./scale-degree-improv.svg "Scale Degree Improv")
+![Scale Degree Improv Example]
+(./scale-degree-improv.svg "Scale Degree Improv")
 
-[Scale Degree Improv](./Scale-Degree-Improv.html)
+[Scale Degree Improv]
+(https://rawgit.com/sugarlabs/musicblocks/master/examples/Scale-Degree-Improv.html)
 
 #### <a name="DOTTED"></a>3.2.6 Dotted Notes
 
@@ -662,7 +664,8 @@ The chart below shows two common examples, dotted quarter and dotted
 eighth, and how to achieve them with either the dot block or by direct
 calculation into a note's note value.
 
-![alt tag](./DotsChart.svg "using dotted notes")
+![alt tag]
+(https://rawgit.com/sugarlabs/musicblocks/master/charts/DotsChart.svg "using dotted notes")
 
 #### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.7 Changing Note(s) duration via Mathematical Operations
 
@@ -711,7 +714,9 @@ unchanged.
 Tie also works on pairs of notes, combining them into one note. (The
 notes must be identical in pitch, but can vary in rhythm.)
 
-![alt tag](./TiesChart.svg "using notes with ties")
+![alt
+ tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/TiesChart.svg
+ "using notes with ties")
 
 #### <a name="MORE-TRANSFORMATIONS"></a>3.2.10 Set Volume, Crescendo, Staccato, and Slur
 
@@ -806,7 +811,9 @@ notes), and even five-, six-, and seven-note chords.
 
 The *Chord* block builds a chord from a base note.
 
-![alt tag](./chordinterval_block.svg "Chord Block")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/chordinterval_block.svg
+ "Chord Block")
 
 We support many basic chords:
 
@@ -1036,7 +1043,9 @@ graphics commands inside of *Note value* blocks
 [RUN
 LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
 
-![alt tag](./drift_block.svg "No-clock block")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/drift_block.svg
+ "No-clock block")
 
 Music Blocks has an internal "conductor" maintaining the beat.  When
 the Run button is clicked, the program begins and an internal master
@@ -1095,11 +1104,15 @@ before the beat.
 The Beat count block is the number of the current beat, eg 1, 2, 3, or 4. 
 In the figure, it is used to take an action on the first beat of each measure.
 
-![alt tag](./beatvalue_block.svg "beat count")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/beatvalue_block.svg
+ "beat count")
 
 The Measure count block returns the current measure.
 
-![alt tag](./measurevalue_block.svg "measure count")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/measurevalue_block.svg
+ "measure count")
 
 Specifying beat is useful in that you can have the character of a note
 vary depending upon the beat. In the example below, the volume of
@@ -1209,21 +1222,29 @@ current pen color, pitch number, etc.
 To use the ensemble blocks, you must assign a name to each mouse, as
 we will reference each mouse by its name.
 
-![alt tag](./turtlenameonly_block.svg "mouse name")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtlenameonly_block.svg
+ "mouse name")
 
 Use the *Mouse count* block in combination with the *Nth mouse name*
 block to iterate through all of the mice.
 
-![alt tag](./turtleiteration.svg "mouse iteration")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtleiteration.svg
+ "mouse iteration")
 
 The *Mouse sync* block aligns the beat count between mice.
 
-![alt tag](./turtlesync_block.svg "mouse sync")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtlesync_block.svg
+ "mouse sync")
 
 The *Mouse index heap* block returns a value in the heap at a specified
 location for a specified mouse.
 
-![alt tag](./turtleheap_block.svg "mouse heap index")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtleheap_block.svg
+ "mouse heap index")
 
 You can use the dictionary entries to data between mice. The *Get
 value* block lets you specify a mouse name and the value you want to
@@ -1253,11 +1274,15 @@ Other Ensemble blocks include:
 
 The *Found mouse* block will return true if the specified mouse can be found.
 
-![alt tag](./foundturtle_block.svg "found mouse")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/foundturtle_block.svg
+ "found mouse")
 
 The *Set mouse* block sends a stack of blocks to be run by the specified mouse.
 
-![alt tag](./setturtle_block.svg "set mouse")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/setturtle_block.svg
+ "set mouse")
 
 ## <a name="CONVERTERS"></a>3.8 Converters
 
@@ -1265,7 +1290,9 @@ Converters are used to transform one form of inputs into other, more usable form
 
 Generalized shape of a converter is:
 
-![alt tag](./number2pitch_block.svg "Generalized converter")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/number2pitch_block.svg
+ "Generalized converter")
 
 where the right argument is converted accordingly, and output is received on the left side.
 
@@ -1275,14 +1302,18 @@ where the right argument is converted accordingly, and output is received on the
 
 ### <a name="y-to-pitch"></a>3.8.1 Y to Pitch
 
-![alt tag](./ytopitch_block.svg "Y to Pitch converter")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/ytopitch_block.svg
+ "Y to Pitch converter")
 
 This converter takes input in the form of a number that represents Staff Y position in pixels, and processes the value such that it can be used with certain pitch blocks (pitch number, nth modal pitch, pitch) to produce notes corresponding to given Staff Y position as an argument.  
 Additionally, the block can be plugged into a print block to view the converted note value.
 
 ### <a name="pitch-converter"></a>3.8.2 Pitch converter
 
-![alt tag](./outputtools_block.svg "Pitch converter block")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/outputtools_block.svg
+ "Pitch converter block")
 
 Pitch converter offers a range of options through a pie-menu based interface and it can potentially convert or extract info out of the current playing pitch using the current pitch block as an input. 
 It can also take custom input in form or solfege, hertz, pitch number etc.
@@ -1323,13 +1354,17 @@ Returns the Y staff position of the note being played according to staff dimensi
 
 ### <a name="number-2-octave"></a>3.8.3 Number to Octave  
   
-![alt tag](./number2octave_block.svg "Y to Pitch converter")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/number2octave_block.svg
+ "Y to Pitch converter")
 
 This converter takes a numeric value which denotes pitch number and returns the octave corresponding to that pitch number.
 
 ### <a name="number-2-pitch"></a>3.8.4 Number to Pitch
 
-![alt tag](./number2pitch_block.svg "Y to Pitch converter")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/number2pitch_block.svg
+ "Y to Pitch converter")
 
 This converter takes a numeric value which denotes pitch number and returns the pitch name corresponding to that pitch number. No octave is inferred.
 
@@ -1342,11 +1377,15 @@ be used within Music Blocks to enhance your experience.
 
 Every widget has a menu with at least two buttons.
 
-![alt tag](./close-button.svg "close button")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/close-button.svg
+ "close button")
 
 You can hide the widget by clicking on the *Close* button.
 
-![alt tag](./grab-handle.svg "drag handle")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/grab-handle.svg
+ "drag handle")
 
 You can move the widget by dragging it by the *Drag* handle.
 
@@ -1411,13 +1450,17 @@ individual notes (or chords if you click on more than one cell in a
 column). In the figure, three quarter notes are selected (black
 cells). First `Re 4`, followed by `Mi 4`, followed by `Sol 4`.
 
-![alt tag](./play-button.svg "play button")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/play-button.svg
+ "play button")
 
 If you click on the *Play* button (found in the top row of the grid),
 you will hear a sequence of notes played (from left to right): `Re 4`,
 `Mi 4`, `Sol 4`.
 
-![alt tag](./export-chunk.svg "save button")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/export-chunk.svg
+ "save button")
 
 Once you have a group of notes (a "chunk") that you like, click on the
 *Save* button (just to the right of the *Play* button). This will
@@ -1427,12 +1470,16 @@ programmatically. (More on that below.)
 You can rearrange the selected notes in the grid and save other chunks
 as well.
 
-![alt tag](./sort.svg "sort button")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/sort.svg
+ "sort button")
 
 The *Sort* button will reorder the pitches in the matrix from highest
 to lowest and eliminate any duplicate *Pitch* blocks.
 
-![alt tag](./erase-button.svg "erase button")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/erase-button.svg
+ "erase button")
 
 There is also an Erase button that will clear the grid.
 
@@ -1518,9 +1565,13 @@ defining your matrix.
 
 #### <a name="WHAT-IS-TUPLET"></a>4.2.4 What is a Tuplet?
 
-![alt tag](./TupletChart.svg "tuplet chart")
+![alt
+ tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/TupletChart.svg
+ "tuplet chart")
 
-![alt tag](./TripletChart.svg "triplet chart")
+![alt
+ tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/TripletChart.svg
+ "triplet chart")
 
 #### <a name="INDIVIDUAL-NOTES"></a>4.2.5 Using Individual Notes in the Phrase Maker
 
@@ -1741,7 +1792,9 @@ all of the notes in the theme music might be consumed by trying to
 catch up with the conductor. The No-clock block essentially says, do
 your own thing and don't worry about the conductor.
 
-![alt tag](./no-clock.svg "no clock")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/f057d42544ff53dc3d71ee241b53bf6bff0ddf24/documentation/no-clock.svg
+ "no clock")
 
 ### <a name="pitch-drum"></a>4.6 The Pitch-Drum Matrix
 
@@ -2075,8 +2128,10 @@ A separate wave will be displayed for each mouse.
 
 ###  <a name="sampler"></a>4.14 Sampler
 
-![alt tag](./sampler_block.svg "Sampler")
-
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/sampler_block.svg
+ "Sampler")
+ 
 You can import sound samples (.WAV files) and use them with the *Set Instrument" block. The *Sampler* widget lets you set the center pitch of your sample so that it can be tuned.
 
 ![alt tag](./sampler1.svg "Sampler Widget")
