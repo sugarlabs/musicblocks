@@ -117,8 +117,10 @@ At the heart of Music Blocks is the *Note value* block. The *Note
 value* block is a container for a [*Pitch* block](#PITCH) that
 specifies the duration (note value) of the pitch.
 
-![alt tag](./note1.svg "A single Note value block (top) and two
- consecutive Note value blocks (bottom)")
+![alt
+ tag](./note1.svg
+ "A single Note value block (top) and two consecutive Note value
+  blocks (bottom)")
 
 At the top of the example above, a single (detached) *Note value*
 block is shown. The `1/8` is value of the note, which is, in this
@@ -128,7 +130,9 @@ At the bottom, two notes that are played consecutively are shown. They
 are both `1/8` notes, making the duration of the entire sequence
 `1/4`.
 
-![alt tag](./note2.svg "A quarter note, a sixteenth note, and a half
+![alt 
+ tag](./note2.svg 
+ "A quarter note, a sixteenth note, and a half
  note Note value blocks")
 
 In this example, different note values are shown. From top to bottom,
@@ -138,12 +142,16 @@ they are: `1/4` for an quarter note, `1/16` for a sixteenth note, and
 Note that any mathematical operations can be used as input to the
 *Note value*.
 
-![alt tag](./piemenu1.svg "A pie menu for selecting note values.")
+![alt 
+ tag](./piemenu1.svg 
+ "A pie menu for selecting note values.")
 
 As a convenience, a pie menu is used for selecting common note values.
 
-![alt tag](./NotationRestChart.svg "A chart of note values and their
- corresponding note value blocks")
+![alt 
+ tag](./NotationRestChart.svg 
+ "A chart of note values and their
+  corresponding note value blocks")
 
 Please refer to the above picture for a visual representation of note
 values.
@@ -155,7 +163,9 @@ As we have seen, *Pitch* blocks are used inside the
 pitch name and pitch octave of a note that in combination determines
 the frequency (and therefore pitch) at which the note is played.
 
-![alt tag](./note3.svg "Specifying a pitch block's name and octave")
+![alt 
+ tag](./note3.svg 
+ "Specifying a pitch block's name and octave")
 
 There are many systems you can use to specify a *pitch* block's name
 and octave. Some examples are shown above.
@@ -203,21 +213,29 @@ The octave of the last block is specified using a *next* text block
 
 Note that the pitch name can also be specified using a *Text* block. 
 
-![alt tag](./piemenu2.svg "A pie menu for selecting pitch.")
+![alt 
+ tag](./piemenu2.svg 
+ "A pie menu for selecting pitch.")
 
 As a convenience, a pie menu is used for selecting pitch, accidental,
 and octave.
 
-![alt tag](./KeyboardChart.svg "Note layout chart for keyboard")
+![alt 
+ tag](./KeyboardChart.svg 
+ "Note layout chart for keyboard")
 
-![alt tag](./MalletChart.svg "Note layout chart for mallet")
+![alt 
+ tag](./MalletChart.svg 
+ "Note layout chart for mallet")
 
 Please refer to the above charts for a visual representation of where
 notes are located on a keyboard or staff.
 
 ### <a name="CHORDS"></a>2.3 Chords
 
-![alt tag](./note4.svg "Forming a chord")
+![alt 
+ tag](./note4.svg 
+ "Forming a chord")
 
 A chord (multiple, simultaneous pitches) can be specified by adding
 multiple *Pitch* blocks into a single *Note value* block, like the
@@ -225,21 +243,27 @@ above example.
 
 ### <a name="RESTS"></a>2.4 Rests
 
-![alt tag](./silence.svg "Silence blocks create rests")
+![alt
+ tag](./silence.svg
+ "Silence blocks create rests")
 
 A rest of the specified note value duration can be constructed using a
 *Silence* block in place of a *Pitch* block.
 
 ### <a name="DRUMS"></a>2.5 Drums
 
-![alt tag](./drum1.svg "Using Drum Sample block")
+![alt
+ tag](./drum1.svg 
+ "Using Drum Sample block")
 
 Anywhere a *Pitch* block can be used&mdash;e.g., inside of the matrix
 or a *Note value* block&mdash;a *Drum Sample* block can also be used
 instead. Currently there about two dozen different samples from which
 to choose. The default drum is a kick drum.
 
-![alt tag](./note5.svg "Multiple Drum Sample blocks in combinations")
+![alt 
+ tag](./note5.svg 
+ "Multiple Drum Sample blocks in combinations")
 
 Just as in the [chord](#CHORD) example above, you can use multiple
 *Drum* blocks within a single *Note value* blocks, and combine them
@@ -257,9 +281,13 @@ get started.
 
 ### <a name="CHUNKS"></a>3.1 Chunks
 
-![alt tag](./chunk-2.svg "working of action stack")
+![alt 
+ tag](./chunk-2.svg 
+ "working of action stack")
 
-![alt tag](./chunk-1.svg "using chunk inside Start block")
+![alt
+ tag](./chunk-1.svg 
+ "using chunk inside Start block")
 
 Every time you create a new *Action* stack, Music Blocks creates a new
 block specific to, and linked with, that stack. (The new block is
@@ -291,23 +319,35 @@ inside the *Start* block (the *Chunk* block) will be executed. You can
 add more chunks after this one inside the *Start* block to execute
 them sequentially.
 
-![alt tag](./chunk-3.svg "usage of multiple Chunk blocks")
+![alt
+ tag](./chunk-3.svg
+ "usage of multiple Chunk blocks")
 
-![alt tag](./chunk-4.svg "usage of Repeat block")
+![alt
+ tag](./chunk-4.svg
+ "usage of Repeat block")
 
 You can [repeat](#REPETITION) chunks either by using multiple *Chunk*
 blocks or using a *Repeat* block.
 
-![alt tag](./chunk-6.svg "multiple action stacks")
+![alt
+ tag](./chunk-6.svg 
+ "multiple action stacks")
 
-![alt tag](./chunk-5.svg "mixing and matching chunks")
+![alt 
+ tag](./chunk-5.svg 
+ "mixing and matching chunks")
 
 You can also mix and match chunks. Here we play the action block with
 name `chunk0`, followed by `chunk1` twice, and then `chunk0` again.
 
-![alt tag](./chunk-8.svg "creating a song using chunks")
+![alt
+ tag](./chunk-8.svg
+ "creating a song using chunks")
 
-![alt tag](./chunk-7.svg "usage of Repeat block in a song")
+![alt
+ tag](./chunk-7.svg 
+ "usage of Repeat block in a song")
 
 A few more chunks and we can make a song. (Can you read the block
 notation well enough to guess the outcome? Are you familiar with the
@@ -319,7 +359,9 @@ There are many ways to transform pitch, rhythm, and other sonic qualities.
 
 #### <a name="STEP-PITCH"></a>3.2.1 Step Pitch Block
 
-![alt tag](./transform0.svg "Using the Step Pitch block")
+![alt
+ tag](./transform0.svg 
+ "Using the Step Pitch block")
 
 The *Step Pitch* block will move up or down notes in a scale from the
 last played note. In the example above, *Step Pitch* blocks are used
@@ -346,7 +388,9 @@ modes).
 
 #### <a name="SHARPS-AND-FLATS"></a>3.2.2 Sharps And Flats
 
-![alt tag](./transform1.svg "Using Sharp and Flat blocks")
+![alt
+ tag](./transform1.svg 
+ "Using Sharp and Flat blocks")
 
 The *Accidental* block can be wrapped around *Pitch* blocks, *Note
 value* blocks, or [chunks](#CHUNKS). A sharp will raise the pitch by
@@ -357,7 +401,9 @@ also use a double-sharp or double-flat accidental.)
 
 #### <a name="ADJUST-TRANSPOSITION"></a>3.2.3 Adjusting Transposition
 
-![alt tag](./transform2.svg "Adjusting transpositions")
+![alt
+ tag](./transform2.svg 
+ "Adjusting transpositions")
 
 There are several ways to transpose a pitch: by semi-tone or scalar
 steps. The *Semi-tone-transposition* block (above left) can be used to
@@ -378,13 +424,17 @@ As a convenience, a number of standard scalar transpositions are
 provided: *Unison*, *Second*, *Third*, ..., *Seventh*, *Down third*,
 and *Down sixth*, as well as a transposition for *Octave*.
 
-![alt tag](./transform3.svg "raising an octave using
+![alt
+ tag](./transform3.svg
+ "raising an octave using
  semi-tone-transposition")
 
 In the example above, we take the song we programmed previously and
 raise it by one octave.
 
-![alt tag](./transform18.svg "The Register block")
+![alt 
+ tag](./transform18.svg 
+ "The Register block")
 
 The *Register* block provides an easy way to modify the register
 (octave) of the notes that follow it. In the example above it is first
@@ -642,7 +692,8 @@ block.
 
 #### <a name="DOTTED"></a>3.2.6 Dotted Notes
 
-![alt tag](./transform4.svg "Creating dotted notes using the Dot
+![alt 
+ tag](./transform4.svg "Creating dotted notes using the Dot
  block")
 
 You can "dot" notes using the *Dot* block. A dotted note extends the
@@ -664,12 +715,14 @@ The chart below shows two common examples, dotted quarter and dotted
 eighth, and how to achieve them with either the dot block or by direct
 calculation into a note's note value.
 
-![alt tag]
+![alt
+  tag]
 (https://rawgit.com/sugarlabs/musicblocks/master/charts/DotsChart.svg "using dotted notes")
 
 #### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.7 Changing Note(s) duration via Mathematical Operations
 
-![alt tag](./transform5.svg "Changing note duration for a note or notes")
+![alt
+ tag](./transform5.svg "Changing note duration for a note or notes")
 
 You can also multiply (or divide) the note value, which will change
 the duration of the notes by changing their note values. Multiplying
@@ -678,7 +731,8 @@ a `1/16` note (i.e. `1/2 * 1/8 = 1/16`) . Multiplying the note value
 of an `1/8` note by `2/1` (which has the effect of dividing by `1/2`)
 will result in the equivalent of a `1/4` note.
 
-![alt tag](./drum4.svg "increasing sequence of drum beats over time")
+![alt
+  tag](./drum4.svg "increasing sequence of drum beats over time")
 
 In the above example, the sequence of [drum](#DRUMS) note values is
 decreased over time, at each repetition.
@@ -687,7 +741,8 @@ decreased over time, at each repetition.
 
 #### <a name="REPETITION"></a>3.2.8 Repeating Notes
 
-![alt tag](./transform6.svg "repeating notes")
+![alt
+  tag](./transform6.svg "repeating notes")
 
 There are several ways to repeat notes. The *Repeat* block will play a
 sequence of notes multiple times; the *Duplicate* block will repeat each
