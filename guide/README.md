@@ -117,8 +117,8 @@ At the heart of Music Blocks is the *Note value* block. The *Note
 value* block is a container for a [*Pitch* block](#PITCH) that
 specifies the duration (note value) of the pitch.
 
-![alt tag](./note1.svg "A single Note value block (top) and two
- consecutive Note value blocks (bottom)")
+![alt
+ tag](./note1.svg "A single Note value block (top) and two consecutive Note valueblocks (bottom)")
 
 At the top of the example above, a single (detached) *Note value*
 block is shown. The `1/8` is value of the note, which is, in this
@@ -128,8 +128,8 @@ At the bottom, two notes that are played consecutively are shown. They
 are both `1/8` notes, making the duration of the entire sequence
 `1/4`.
 
-![alt tag](./note2.svg "A quarter note, a sixteenth note, and a half
- note Note value blocks")
+![alt 
+ tag](./note2.svg "A quarter note, a sixteenth note, and a half note Note value blocks")
 
 In this example, different note values are shown. From top to bottom,
 they are: `1/4` for an quarter note, `1/16` for a sixteenth note, and
@@ -138,12 +138,14 @@ they are: `1/4` for an quarter note, `1/16` for a sixteenth note, and
 Note that any mathematical operations can be used as input to the
 *Note value*.
 
-![alt tag](./piemenu1.svg "A pie menu for selecting note values.")
+![alt 
+ tag](./piemenu1.svg "A pie menu for selecting note values.")
 
 As a convenience, a pie menu is used for selecting common note values.
 
-![alt tag](./NotationRestChart.svg "A chart of note values and their
- corresponding note value blocks")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/charts/NotationRestChart.svg
+ "A chart of note values and their corresponding note value blocks")
 
 Please refer to the above picture for a visual representation of note
 values.
@@ -155,7 +157,8 @@ As we have seen, *Pitch* blocks are used inside the
 pitch name and pitch octave of a note that in combination determines
 the frequency (and therefore pitch) at which the note is played.
 
-![alt tag](./note3.svg "Specifying a pitch block's name and octave")
+![alt 
+ tag](./note3.svg "Specifying a pitch block's name and octave")
 
 There are many systems you can use to specify a *pitch* block's name
 and octave. Some examples are shown above.
@@ -203,21 +206,27 @@ The octave of the last block is specified using a *next* text block
 
 Note that the pitch name can also be specified using a *Text* block. 
 
-![alt tag](./piemenu2.svg "A pie menu for selecting pitch.")
+![alt 
+ tag](./piemenu2.svg "A pie menu for selecting pitch.")
 
 As a convenience, a pie menu is used for selecting pitch, accidental,
 and octave.
 
-![alt tag](./KeyboardChart.svg "Note layout chart for keyboard")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/charts/KeyboardChart.svg
+ "Note layout chart for keyboard")
 
-![alt tag](./MalletChart.svg "Note layout chart for mallet")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/charts/MalletChart.svg
+ "Note layout chart for mallet")
 
 Please refer to the above charts for a visual representation of where
 notes are located on a keyboard or staff.
 
 ### <a name="CHORDS"></a>2.3 Chords
 
-![alt tag](./note4.svg "Forming a chord")
+![alt 
+ tag](./note4.svg "Forming a chord")
 
 A chord (multiple, simultaneous pitches) can be specified by adding
 multiple *Pitch* blocks into a single *Note value* block, like the
@@ -225,21 +234,24 @@ above example.
 
 ### <a name="RESTS"></a>2.4 Rests
 
-![alt tag](./silence.svg "Silence blocks create rests")
+![alt
+ tag](./silence.svg "Silence blocks create rests")
 
 A rest of the specified note value duration can be constructed using a
 *Silence* block in place of a *Pitch* block.
 
 ### <a name="DRUMS"></a>2.5 Drums
 
-![alt tag](./drum1.svg "Using Drum Sample block")
+![alt
+ tag](./drum1.svg "Using Drum Sample block")
 
 Anywhere a *Pitch* block can be used&mdash;e.g., inside of the matrix
 or a *Note value* block&mdash;a *Drum Sample* block can also be used
 instead. Currently there about two dozen different samples from which
 to choose. The default drum is a kick drum.
 
-![alt tag](./note5.svg "Multiple Drum Sample blocks in combinations")
+![alt 
+ tag](./note5.svg "Multiple Drum Sample blocks in combinations")
 
 Just as in the [chord](#CHORD) example above, you can use multiple
 *Drum* blocks within a single *Note value* blocks, and combine them
@@ -257,9 +269,11 @@ get started.
 
 ### <a name="CHUNKS"></a>3.1 Chunks
 
-![alt tag](./chunk-2.svg "working of action stack")
+![alt 
+ tag](./chunk-2.svg "working of action stack")
 
-![alt tag](./chunk-1.svg "using chunk inside Start block")
+![alt
+ tag](./chunk-1.svg "using chunk inside Start block")
 
 Every time you create a new *Action* stack, Music Blocks creates a new
 block specific to, and linked with, that stack. (The new block is
@@ -291,23 +305,29 @@ inside the *Start* block (the *Chunk* block) will be executed. You can
 add more chunks after this one inside the *Start* block to execute
 them sequentially.
 
-![alt tag](./chunk-3.svg "usage of multiple Chunk blocks")
+![alt
+ tag](./chunk-3.svg "usage of multiple Chunk blocks")
 
-![alt tag](./chunk-4.svg "usage of Repeat block")
+![alt
+ tag](./chunk-4.svg "usage of Repeat block")
 
 You can [repeat](#REPETITION) chunks either by using multiple *Chunk*
 blocks or using a *Repeat* block.
 
-![alt tag](./chunk-6.svg "multiple action stacks")
+![alt
+ tag](./chunk-6.svg "multiple action stacks")
 
-![alt tag](./chunk-5.svg "mixing and matching chunks")
+![alt 
+ tag](./chunk-5.svg "mixing and matching chunks")
 
 You can also mix and match chunks. Here we play the action block with
 name `chunk0`, followed by `chunk1` twice, and then `chunk0` again.
 
-![alt tag](./chunk-8.svg "creating a song using chunks")
+![alt
+ tag](./chunk-8.svg "creating a song using chunks")
 
-![alt tag](./chunk-7.svg "usage of Repeat block in a song")
+![alt
+ tag](./chunk-7.svg "usage of Repeat block in a song")
 
 A few more chunks and we can make a song. (Can you read the block
 notation well enough to guess the outcome? Are you familiar with the
@@ -319,7 +339,8 @@ There are many ways to transform pitch, rhythm, and other sonic qualities.
 
 #### <a name="STEP-PITCH"></a>3.2.1 Step Pitch Block
 
-![alt tag](./transform0.svg "Using the Step Pitch block")
+![alt
+ tag](./transform0.svg "Using the Step Pitch block")
 
 The *Step Pitch* block will move up or down notes in a scale from the
 last played note. In the example above, *Step Pitch* blocks are used
@@ -346,7 +367,8 @@ modes).
 
 #### <a name="SHARPS-AND-FLATS"></a>3.2.2 Sharps And Flats
 
-![alt tag](./transform1.svg "Using Sharp and Flat blocks")
+![alt
+ tag](./transform1.svg "Using Sharp and Flat blocks")
 
 The *Accidental* block can be wrapped around *Pitch* blocks, *Note
 value* blocks, or [chunks](#CHUNKS). A sharp will raise the pitch by
@@ -357,7 +379,8 @@ also use a double-sharp or double-flat accidental.)
 
 #### <a name="ADJUST-TRANSPOSITION"></a>3.2.3 Adjusting Transposition
 
-![alt tag](./transform2.svg "Adjusting transpositions")
+![alt
+ tag](./transform2.svg "Adjusting transpositions")
 
 There are several ways to transpose a pitch: by semi-tone or scalar
 steps. The *Semi-tone-transposition* block (above left) can be used to
@@ -378,13 +401,14 @@ As a convenience, a number of standard scalar transpositions are
 provided: *Unison*, *Second*, *Third*, ..., *Seventh*, *Down third*,
 and *Down sixth*, as well as a transposition for *Octave*.
 
-![alt tag](./transform3.svg "raising an octave using
- semi-tone-transposition")
+![alt
+ tag](./transform3.svg "raising an octave using semi-tone-transposition")
 
 In the example above, we take the song we programmed previously and
 raise it by one octave.
 
-![alt tag](./transform18.svg "The Register block")
+![alt 
+ tag](./transform18.svg "The Register block")
 
 The *Register* block provides an easy way to modify the register
 (octave) of the notes that follow it. In the example above it is first
@@ -607,7 +631,7 @@ Because some users may want to explicitly spell out all of the pitches
 regardless of the chosen key, we allow them to use Scale Degree with
 the *Movable Do* block (remember, Scale Degree works like Movable=La
 by default). Please see [this
-code](./2-spelling-systems-for-Scale-Degree.html)
+code](https://rawgithub.com/sugarlabs/musicblocks/master/examples/2-spelling-systems-for-Scale-Degree.html)
 as an example.
 
 The following chart describes the behavior of different blocks
@@ -634,14 +658,16 @@ combines math and musical modifiers. When combining numbers and
 accidentals, it recreates the same functionality as the *Scale Degree*
 block.
 
-![Scale Degree Improv Example](./scale-degree-improv.svg "Scale Degree Improv")
+![Scale Degree Improv Example]
+(./scale-degree-improv.svg "Scale Degree Improv")
 
-[Scale Degree Improv](./Scale-Degree-Improv.html)
+[Scale Degree Improv]
+(https://rawgit.com/sugarlabs/musicblocks/master/examples/Scale-Degree-Improv.html)
 
 #### <a name="DOTTED"></a>3.2.6 Dotted Notes
 
-![alt tag](./transform4.svg "Creating dotted notes using the Dot
- block")
+![alt 
+ tag](./transform4.svg "Creating dotted notes using the Dot block")
 
 You can "dot" notes using the *Dot* block. A dotted note extends the
 rhythmic duration of a note by 50%. E.g., a dotted quarter note will
@@ -662,11 +688,14 @@ The chart below shows two common examples, dotted quarter and dotted
 eighth, and how to achieve them with either the dot block or by direct
 calculation into a note's note value.
 
-![alt tag](./DotsChart.svg "using dotted notes")
+![alt
+  tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/DotsChart.svg 
+  "using dotted notes")
 
 #### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.7 Changing Note(s) duration via Mathematical Operations
 
-![alt tag](./transform5.svg "Changing note duration for a note or notes")
+![alt
+ tag](./transform5.svg "Changing note duration for a note or notes")
 
 You can also multiply (or divide) the note value, which will change
 the duration of the notes by changing their note values. Multiplying
@@ -675,7 +704,8 @@ a `1/16` note (i.e. `1/2 * 1/8 = 1/16`) . Multiplying the note value
 of an `1/8` note by `2/1` (which has the effect of dividing by `1/2`)
 will result in the equivalent of a `1/4` note.
 
-![alt tag](./drum4.svg "increasing sequence of drum beats over time")
+![alt
+  tag](./drum4.svg "increasing sequence of drum beats over time")
 
 In the above example, the sequence of [drum](#DRUMS) note values is
 decreased over time, at each repetition.
@@ -684,7 +714,8 @@ decreased over time, at each repetition.
 
 #### <a name="REPETITION"></a>3.2.8 Repeating Notes
 
-![alt tag](./transform6.svg "repeating notes")
+![alt
+  tag](./transform6.svg "repeating notes")
 
 There are several ways to repeat notes. The *Repeat* block will play a
 sequence of notes multiple times; the *Duplicate* block will repeat each
@@ -696,7 +727,8 @@ Re, Sol, Sol, Re, Sol, Sol, Re, Sol`; on the right the result would be
 
 #### <a name="SWINGING"></a>3.2.9 Swinging Notes and Tied Notes
 
-![alt tag](./transform7.svg "swinging notes and tied notes")
+![alt 
+ tag](./transform7.svg "swinging notes and tied notes")
 
 The *Swing* block works on pairs of notes (specified by note value),
 adding some duration (specified by swing value) to the first note and
@@ -711,12 +743,14 @@ unchanged.
 Tie also works on pairs of notes, combining them into one note. (The
 notes must be identical in pitch, but can vary in rhythm.)
 
-![alt tag](./TiesChart.svg "using notes with ties")
+![alt
+ tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/TiesChart.svg
+ "using notes with ties")
 
 #### <a name="MORE-TRANSFORMATIONS"></a>3.2.10 Set Volume, Crescendo, Staccato, and Slur
 
-![alt tag](./transform8.svg "Set master volume, set synth volume, set
- relative volume, crescendo")
+![alt 
+ tag](./transform8.svg "Set master volume, set synth volume, set relative volume, crescendo")
 
 The *Set master volume* block will change the master volume. The
 default is `50`; the range is `0` (silence) to `100` (full volume).
@@ -745,7 +779,8 @@ than the original value for volume.
 NOTE: The *Crescendo* block does not alter the volume of a note as it
 is being played. Music Blocks does not yet have this functionality.
 
-![alt tag](./transform17.svg "Staccato, and Slur blocks")
+![alt 
+ tag](./transform17.svg "Staccato, and Slur blocks")
 
 The *Staccato* block shortens the length of the actual
 note&mdash;making them tighter bursts&mdash;while maintaining the
@@ -757,7 +792,8 @@ maintaining the specified rhythmic value of the notes.
 
 #### <a name="INTERVALS"></a>3.2.11 Intervals
 
-![alt tag](./transform9.svg "Scalar interval block")
+![alt 
+ tag](./transform9.svg "Scalar interval block")
 
 The *Scalar interval* block calculates a relative interval based on
 the current mode, skipping all notes outside of the mode. For example,
@@ -775,7 +811,8 @@ of scalar steps between two pitched.
 
 Absolute (or semi-tone) intervals are based on half-steps.
 
-![alt tag](./transform14.svg "Using absolute intervals")
+![alt 
+ tag](./transform14.svg "Using absolute intervals")
 
 The *Augmented* block calculates an absolute interval (in half-steps),
 e.g., an augmented fifth, and adds the additional pitches to a
@@ -806,7 +843,9 @@ notes), and even five-, six-, and seven-note chords.
 
 The *Chord* block builds a chord from a base note.
 
-![alt tag](./chordinterval_block.svg "Chord Block")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/chordinterval_block.svg
+ "Chord Block")
 
 We support many basic chords:
 
@@ -829,7 +868,8 @@ a `1/4` step, enabling rotation around a point between two notes. In
 "scalar" mode, the scalar interval is preserved around the point of
 rotation.
 
-![alt tag](./transform13.svg "inversion")
+![alt
+ tag](./transform13.svg "inversion")
 
 NOTE: The initial `C5` pitch (as a half note) remains unchanged (in
 all of the examples) as it is outside of the invert block.
@@ -849,13 +889,15 @@ This operation can also be visualized on a pitch clock. The arrows on
 the following diagram point from the starting pitch, around the axis
 of the reference pitch, to its destination ending pitch.
 
-![alt tag](./even-invert-chart.svg "even invert chart")
+![alt
+ tag](./even-invert-chart.svg "even invert chart")
 
 In standard notation the result of this *even* inversion operation is
 depicted in the second measure of the following example. The first
 measure is the original reference.
 
-![alt tag](./invert-even.png "even invert example")
+![alt
+ tag](./invert-even.png "even invert example")
 
 Underneath the *even* inversion in the example code is an *odd*
 inversion for the same two notes of `F5` and `D5` around the same
@@ -872,7 +914,8 @@ This operation can be visualized on a pitch clock similar to *even*
 inversion except offset in-between `C5` and `C♯5` (i.e. quarter step
 *above* `C5`).
 
-![alt tag](./odd-invert-chart.svg "odd invert chart")
+![alt
+ tag](./odd-invert-chart.svg "odd invert chart")
 
 In standard notation the result of this *odd* inversion operation is
 depicted in second measure of the following example. The first measure
@@ -883,7 +926,8 @@ contained in the operation it would be changed to `C♯5` (i.e. `C5` is
 inversion around `C5` and `odd` would be 0.5 half steps *above* the
 axis of rotation).
 
-![alt tag](./invert-odd.png "odd invert example")
+![alt
+ tag](./invert-odd.png "odd invert example")
 
 Scalar inversion
 
@@ -901,13 +945,15 @@ This operation can be visualized on a pitch clock similar to *odd* and
 chosen key) are skipped. NOTE: The scalar pitches are shown in bold in
 the following pitch clock diagram.
 
-![alt tag](./scalar-invert-chart.svg "scalar invert chart")
+![alt
+ tag](./scalar-invert-chart.svg "scalar invert chart")
 
 In standard notation the result of *scalar* inversion operation is
 depicted in the second measure of the following example. The first
 measure is the original reference.
 
-![alt tag](./invert-scalar.png "scalar invert example")
+![alt
+ tag](./invert-scalar.png "scalar invert example")
 
 In the *invert (even)* example above, notes are inverted around `C5`.
 In the *invert (odd)* example, notes are inverted around a point
@@ -917,7 +963,8 @@ half-steps.
 
 #### <a name="BACKWARDS"></a>3.2.13 Backwards
 
-![alt tag](./transform11.svg "Backward block")
+![alt
+ tag](./transform11.svg "Backward block")
 
 The *Backward* block will play the contained notes in reverse order
 (retrograde). In the example above, the notes in `chunk` are played as
@@ -935,13 +982,14 @@ notes.
 
 #### <a name= "SETTING"></a>3.2.14 Setting Voice and Keys
 
-![alt tag](./transform12.svg "setting voice and keys using Set Voice
- block")
+![alt
+ tag](./transform12.svg "setting voice and keys using Set Voice block")
 
 The *Set Voice* block selects a [voice](#VOICES) for the synthesizer for any
 contained blocks, e.g., violin or cello.
 
-![alt tag](./transform10.svg "Set Key block")
+![alt
+ tag](./transform10.svg "Set Key block")
 
 The *Set Key* block will change the key and mode of the mapping
 between solfege, e.g., `Do`, `Re`, `Mi`, to note names, e.g., `C`,
@@ -951,7 +999,8 @@ This block allows users to access "movable Do" within Music Blocks,
 where the mapping of solfege to particular pitch changes depending on
 the user's specified tonality.
 
-![alt tag](./transform19.svg "Define mode block")
+![alt
+ tag](./transform19.svg "Define mode block")
 
 The *Define mode* block can be used to define a custom mode by
 defining the number and size of the steps within an octave. You can
@@ -959,8 +1008,8 @@ use your custom mode with the *Set key* block.
 
 #### <a name="VIBRATO"></a>3.2.15 Vibrato, Tremelo, et al.
 
-![alt tag](./transform15.svg "Vibrato, tremelo, chorus, distortion,
- neighbor, and phaser blocks")
+![alt
+ tag](./transform15.svg "Vibrato, tremelo, chorus, distortion, neighbor, and phaser blocks")
 
 The *Vibrato* Block adds a rapid variation in pitch to any contained
 notes. The intensity of the variation ranges from `1` to `100` (cents),
@@ -975,27 +1024,31 @@ Each *Start* block runs as a separate voice in Music Blocks. (When
 you click on the Run button, all of the *Start* blocks are run
 concurrently.)
 
-![alt tag](./voices1.svg "use of voices")
+![alt
+ tag](./voices1.svg "use of voices")
 
 If we put our song into an action...
 
-![alt tag](./voices2.svg "running the song using multiple Start
- blocks")
+![alt
+ tag](./voices2.svg "running the song using multiple Start blocks")
 
 ...we can run it from multiple *Start* blocks.
 
-![alt tag](./voices3.svg "shifting the octaves up and down")
+![alt
+ tag](./voices3.svg "shifting the octaves up and down")
 
 It gets more interesting if we shift up and down octaves.
 
-![alt tag](./voices4.svg "playing the various voices offset in time")
+![alt
+ tag](./voices4.svg "playing the various voices offset in time")
 
 And even more interesting if we bring the various voices offset in time.
 
 [RUN
 LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523026536194324&run=True)
 
-![alt tag](./voices5.svg "queuing the various voices using events")
+![alt
+ tag](./voices5.svg "queuing the various voices using events")
 
 An alternative to use a preprogrammed delay is to use the *Broadcast*
 block to bring in multiple voices. In the example above, after each
@@ -1003,7 +1056,8 @@ section of the song is played, a new event is broadcasted, bringing in
 a new voice. Note the use of the *Mouse Sync* block. This ensures that
 the multiple voices are synced to the same master clock.
 
-![alt tag](./drum3.svg "usage of kick drum")
+![alt
+ tag](./drum3.svg "usage of kick drum")
 
 A special *Start drum* version of the *Start* block is available for
 laying down a drum track. Any *Pitch* blocks encounted while starting
@@ -1013,9 +1067,11 @@ kick drum.
 
 ### <a name="GRAPHICS"></a>3.4 Adding graphics
 
-![alt tag](./graphics1.svg "adding graphics")
+![alt
+ tag](./graphics1.svg "adding graphics")
 
-![alt tag](./graphics2.svg "color range")
+![alt
+ tag](./graphics2.svg "color range")
 
 Turtle graphics can be combined with the music blocks. By placing
 graphics blocks, e.g., *Forward* and *Right*, inside of *Note value*
@@ -1028,7 +1084,8 @@ the inner repeat loop.
 [RUN
 LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523494709674021&run=True)
 
-![alt tag](./graphics3.svg "synchronizing graphics and music")
+![alt
+ tag](./graphics3.svg "synchronizing graphics and music")
 
 Another example of graphics synchronized to the music by placing the
 graphics commands inside of *Note value* blocks
@@ -1036,7 +1093,9 @@ graphics commands inside of *Note value* blocks
 [RUN
 LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
 
-![alt tag](./drift_block.svg "No-clock block")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/drift_block.svg
+ "No-clock block")
 
 Music Blocks has an internal "conductor" maintaining the beat.  When
 the Run button is clicked, the program begins and an internal master
@@ -1064,21 +1123,25 @@ might be consumed by trying to catch up with the conductor. The
 *No-clock* block essentially says, do your own thing and don't worry
 about the conductor.
 
-![alt tag](./fibonacci3.svg "usage of No-clock block")
+![alt
+ tag](./fibonacci3.svg "usage of No-clock block")
 
 In this example, because the computation and graphics are more
 complex, a *No-clock* block is used to decouple the graphics from the
 master clock. The "No-clock* block prioritizes the sequence of
 actions over the specified rhythm.
 
-![alt tag](./graphics4.png "rhythm sequence")
+![alt
+ tag](./graphics4.png "rhythm sequence")
 
-![alt tag](./tree-example.svg "another example of the No-clock block")
+![alt
+ tag](./tree-example.svg "another example of the No-clock block")
 
 Another example of embedding graphics into notes: in case, a recursive
 tree drawing, where the pitch goes up as the branches assend.
 
-![alt tag](./tree.svg "tree graphic")
+![alt
+ tag](./tree.svg "tree graphic")
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523029986215035&run=True)
 
@@ -1090,29 +1153,36 @@ it is set to 4:4).
 The *Pickup* block can be used to accommodate any notes that come in
 before the beat.
 
-![alt tag](./beat1.svg "meter and pickup")
+![alt
+ tag](./beat1.svg "meter and pickup")
 
 The Beat count block is the number of the current beat, eg 1, 2, 3, or 4. 
 In the figure, it is used to take an action on the first beat of each measure.
 
-![alt tag](./beatvalue_block.svg "beat count")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/beatvalue_block.svg
+ "beat count")
 
 The Measure count block returns the current measure.
 
-![alt tag](./measurevalue_block.svg "measure count")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/measurevalue_block.svg
+ "measure count")
 
 Specifying beat is useful in that you can have the character of a note
 vary depending upon the beat. In the example below, the volume of
 notes on Beat `1` and Beat `3` are increased, while the volume of off
 beats is decreased.
 
-![alt tag](./beat2.svg "on-beat-do")
+![alt
+ tag](./beat2.svg "on-beat-do")
 
 The *On-Beat-Do* and *Off-Beat-Do* blocks let you specify actions to
 take on specific beats. (Note that the action is run before any blocks
 inside the note block associated with the beat are run.)
 
-![alt tag](./graphics5.svg "using beat to synchronize graphics")
+![alt
+ tag](./graphics5.svg "using beat to synchronize graphics")
 
 Another approach to graphics is to use modulate them based on the
 beat. In the example above, we call the same graphics action for each
@@ -1122,14 +1192,16 @@ size is set to `50` and the volume to `75`. On Beat `3`, the pen size is set
 to `25` and the volume to `50`. On off beats, the pen size is set to `5` and
 the volumne to `5`. The resultant graphic is shown below.
 
-![alt tag](./graphics6.svg "graphics modulated by beat")
+![alt
+ tag](./graphics6.svg "graphics modulated by beat")
 
 ### <a name="INTERACTIONS"></a>3.6 Interactions
 
 There are many ways to interactive with Music Blocks, including
 tracking the mouse position to impact some aspect of the music.
 
-![alt tag](./interactive.svg "interactions")
+![alt
+ tag](./interactive.svg "interactions")
 
 For example, we can launch the phrases (chunks) interactively. We use
 the mouse position to generate a suffix: `0`, `1`, `2`, or `3`,
@@ -1139,7 +1211,8 @@ upper-left quadrant, `chunk2`; and upper-right quadrant, `chunk3`.
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523028011868930&run=True)
 
-![alt tag](./interactive2.svg "creation of a two-key piano")
+![alt
+ tag](./interactive2.svg "creation of a two-key piano")
 
 In the example above, a simple two-key piano is created by associating
 *click* events on two different turtles with individual notes. Can you
@@ -1147,7 +1220,8 @@ make an 8-key piano?
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523107390715125&run=True)
 
-![alt tag](./interactive3.svg "adding randomness to your music")
+![alt
+ tag](./interactive3.svg "adding randomness to your music")
 
 You can also add a bit of randomness to your music. In the top example
 above, the *One-of* block is used to randomly assign either `Do` or
@@ -1163,7 +1237,8 @@ than the typical paint program in that you can not only paint music (a
 la Vidsizer) and playback your painting as a composition (a la
 Hyperscore), but also generate *Note* blocks from your composition.
 
-![alt tag](./hyperscore.svg "musical paint")
+![alt
+ tag](./hyperscore.svg "musical paint")
 
 The program works by first creating an array from the heap that
 corresponds to a 20x12 grid of notes on the screen: 20 columns,
@@ -1209,55 +1284,71 @@ current pen color, pitch number, etc.
 To use the ensemble blocks, you must assign a name to each mouse, as
 we will reference each mouse by its name.
 
-![alt tag](./turtlenameonly_block.svg "mouse name")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtlenameonly_block.svg
+ "mouse name")
 
 Use the *Mouse count* block in combination with the *Nth mouse name*
 block to iterate through all of the mice.
 
-![alt tag](./turtleiteration.svg "mouse iteration")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtleiteration.svg
+ "mouse iteration")
 
 The *Mouse sync* block aligns the beat count between mice.
 
-![alt tag](./turtlesync_block.svg "mouse sync")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtlesync_block.svg
+ "mouse sync")
 
 The *Mouse index heap* block returns a value in the heap at a specified
 location for a specified mouse.
 
-![alt tag](./turtleheap_block.svg "mouse heap index")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/turtleheap_block.svg
+ "mouse heap index")
 
 You can use the dictionary entries to data between mice. The *Get
 value* block lets you specify a mouse name and the value you want to
 access. For example, you can access a mouse's pen attributes, such as
 color, shade, and grey values.
 
-![alt tag](./dictionary-pen.svg "mouse pen attributes")
+![alt
+ tag](./dictionary-pen.svg "mouse pen attributes")
 
 You can also access the mouse's graphics attributes, such as x, y, and
 heading. You can also set attributes of a mouse using the *Set value*
 block. In the example, a mouse's heading is set to 90.
 
-![alt tag](./dictionary-graphics.svg "mouse graphics attributes")
+![alt
+ tag](./dictionary-graphics.svg "mouse graphics attributes")
 
 Some music status is also available through the dictionary. You can
 access a mouse's "current pitch", "pitch number", "note value", the
 number of "notes played".
 
-![alt tag](./dictionary-music.svg "mouse music attributes")
+![alt
+ tag](./dictionary-music.svg "mouse music attributes")
 
 The dictionary can be used to share other things too. Just set a
 *key/value* pair with one mouse and access it from another.
 
-![alt tag](./dictionary-key.svg "sharing key/value pairs")
+![alt
+ tag](./dictionary-key.svg "sharing key/value pairs")
 
 Other Ensemble blocks include:
 
 The *Found mouse* block will return true if the specified mouse can be found.
 
-![alt tag](./foundturtle_block.svg "found mouse")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/foundturtle_block.svg
+ "found mouse")
 
 The *Set mouse* block sends a stack of blocks to be run by the specified mouse.
 
-![alt tag](./setturtle_block.svg "set mouse")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/setturtle_block.svg
+ "set mouse")
 
 ## <a name="CONVERTERS"></a>3.8 Converters
 
@@ -1265,31 +1356,39 @@ Converters are used to transform one form of inputs into other, more usable form
 
 Generalized shape of a converter is:
 
-![alt tag](./number2pitch_block.svg "Generalized converter")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/number2pitch_block.svg
+ "Generalized converter")
 
 where the right argument is converted accordingly, and output is received on the left side.
 
 **Note:** Before an introduction of the different types of converters, a little intoduction on Y staff in Music Blocks. Staff is a set of horizontal lines and spaces and different positions along Y axis represents different notes. [C, D, E, F, G, A, B]
 
-![alt tag](treble.svg "Treble clef staff")
+![alt
+ tag](treble.svg "Treble clef staff")
 
 ### <a name="y-to-pitch"></a>3.8.1 Y to Pitch
 
-![alt tag](./ytopitch_block.svg "Y to Pitch converter")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/ytopitch_block.svg
+ "Y to Pitch converter")
 
 This converter takes input in the form of a number that represents Staff Y position in pixels, and processes the value such that it can be used with certain pitch blocks (pitch number, nth modal pitch, pitch) to produce notes corresponding to given Staff Y position as an argument.  
 Additionally, the block can be plugged into a print block to view the converted note value.
 
 ### <a name="pitch-converter"></a>3.8.2 Pitch converter
 
-![alt tag](./outputtools_block.svg "Pitch converter block")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/outputtools_block.svg
+ "Pitch converter block")
 
 Pitch converter offers a range of options through a pie-menu based interface and it can potentially convert or extract info out of the current playing pitch using the current pitch block as an input. 
 It can also take custom input in form or solfege, hertz, pitch number etc.
 
 All these options are provided in the form of a pie-menu which can be accessed simply by clicking on the converter.
 
-![alt tag](./pitchconverter.svg "Pitch converter block")
+![alt
+ tag](./pitchconverter.svg "Pitch converter block")
 
 Below explained is the utility of every conversion option:
 
@@ -1323,13 +1422,17 @@ Returns the Y staff position of the note being played according to staff dimensi
 
 ### <a name="number-2-octave"></a>3.8.3 Number to Octave  
   
-![alt tag](./number2octave_block.svg "Y to Pitch converter")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/number2octave_block.svg
+ "Y to Pitch converter")
 
 This converter takes a numeric value which denotes pitch number and returns the octave corresponding to that pitch number.
 
 ### <a name="number-2-pitch"></a>3.8.4 Number to Pitch
 
-![alt tag](./number2pitch_block.svg "Y to Pitch converter")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/number2pitch_block.svg
+ "Y to Pitch converter")
 
 This converter takes a numeric value which denotes pitch number and returns the pitch name corresponding to that pitch number. No octave is inferred.
 
@@ -1342,19 +1445,25 @@ be used within Music Blocks to enhance your experience.
 
 Every widget has a menu with at least two buttons.
 
-![alt tag](./close-button.svg "close button")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/close-button.svg
+ "close button")
 
 You can hide the widget by clicking on the *Close* button.
 
-![alt tag](./grab-handle.svg "drag handle")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/grab-handle.svg
+ "drag handle")
 
 You can move the widget by dragging it by the *Drag* handle.
 
 ### <a name="status"></a>4.1 Status
 
-![alt tag](./status1.svg "given Music block")
+![alt
+ tag](./status1.svg "given Music block")
 
-![alt tag](./status2.svg "status in tabular form")
+![alt
+ tag](./status2.svg "status in tabular form")
 
 The *Status widget* is a tool for inspecting the status of Music
 Blocks as it is running. By default, the key, BPM, and volume are
@@ -1367,7 +1476,8 @@ skip, [staccato](#MORE-TRANSFORMATIONS),
 [slur](#MORE-TRANSFORMATIONS), and [graphics](#GRAPHICS) factors,
 e.g., x, y, heading, color, shade, grey, and pensize.
 
-![alt tag](./status3.svg "additional programming within the Status
+![alt
+ tag](./status3.svg "additional programming within the Status
  block")
 
 You can do additional programming within the status block. In the
@@ -1381,7 +1491,8 @@ notes at a much faster speed.
 
 #### <a name="pitch-time"></a>4.2.1 The Phrase Maker
 
-![alt tag](./matrix1.svg "phrase maker")
+![alt
+ tag](./matrix1.svg "phrase maker")
 
 Music Blocks provides a widget, the *Phrase maker*, as a scaffold
 for getting started.
@@ -1391,7 +1502,8 @@ on the *Phrase maker* stack that appears in the middle of the
 screen. (For the moment, ignore the *Start* block.) You'll see a grid
 organized vertically by pitch and horizontally by rhythm.
 
-![alt tag](./matrix2.svg "Pitch and Rhythm block matrix")
+![alt
+ tag](./matrix2.svg "Pitch and Rhythm block matrix")
 
 The matrix in the figure above has three *Pitch* blocks and one
 *Rhythm* block, which is used to create a 3 x 3 grid of pitch and
@@ -1404,20 +1516,25 @@ the bottom is used for specifying the rhythms associated with each
 note.) Also by default, there are two *Rhythm* blocks, which specifies
 six quarter `(1/4)` notes followed by one half `(1/2)` note.
 
-![alt tag](./matrix3.svg "matrix")
+![alt
+ tag](./matrix3.svg "matrix")
 
 By clicking on individual cells in the grid, you should hear
 individual notes (or chords if you click on more than one cell in a
 column). In the figure, three quarter notes are selected (black
 cells). First `Re 4`, followed by `Mi 4`, followed by `Sol 4`.
 
-![alt tag](./play-button.svg "play button")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/play-button.svg
+ "play button")
 
 If you click on the *Play* button (found in the top row of the grid),
 you will hear a sequence of notes played (from left to right): `Re 4`,
 `Mi 4`, `Sol 4`.
 
-![alt tag](./export-chunk.svg "save button")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/export-chunk.svg
+ "save button")
 
 Once you have a group of notes (a "chunk") that you like, click on the
 *Save* button (just to the right of the *Play* button). This will
@@ -1427,12 +1544,16 @@ programmatically. (More on that below.)
 You can rearrange the selected notes in the grid and save other chunks
 as well.
 
-![alt tag](./sort.svg "sort button")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/sort.svg
+ "sort button")
 
 The *Sort* button will reorder the pitches in the matrix from highest
 to lowest and eliminate any duplicate *Pitch* blocks.
 
-![alt tag](./erase-button.svg "erase button")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/erase-button.svg
+ "erase button")
 
 There is also an Erase button that will clear the grid.
 
@@ -1443,7 +1564,8 @@ want, feel free to experiment.
 Tip: You can put a chunk inside a *Phrase maker* block to generate
 the matrix to corresponds to that chunk.
 
-![alt tag](./matrix4.svg "usage of octave for a pitch")
+![alt
+ tag](./matrix4.svg "usage of octave for a pitch")
 
 The chunk created when you click on the matrix is a stack of
 blocks. The blocks are nested: an *Action* block contains three *Note
@@ -1463,7 +1585,8 @@ action). You should hear the notes play, ordered from top to bottom.
 
 #### <a name="THE-RHYTHM-BLOCK"></a>4.2.2 The Rhythm Block
 
-![alt tag](./matrix6.svg "the Rhythm block")
+![alt
+ tag](./matrix6.svg "the Rhythm block")
 
 *Rhythm* blocks are used to generate rhythm patterns in the
 *Phrase maker* block. The top argument to the *Rhythm* block
@@ -1473,9 +1596,11 @@ would be generated in the matrix. In the middle example, one column
 for an eighth note would be generated. In the bottom example, seven
 columns for 16th notes would be generated.
 
-![alt tag](./matrix7.svg "usage of Rhythm block")
+![alt
+ tag](./matrix7.svg "usage of Rhythm block")
 
-![alt tag](./matrix8.svg "resulting notes in tabular format")
+![alt
+ tag](./matrix8.svg "resulting notes in tabular format")
 
 You can use as many *Rhythm* blocks as you'd like inside the
 *Phrase maker* block. In the above example, two *Rhythm*
@@ -1484,9 +1609,11 @@ notes.
 
 #### <a name="CREATING-TUPLETS"></a>4.2.3 Creating Tuplets
 
-![alt tag](./matrix9.svg "simple tuplet")
+![alt
+ tag](./matrix9.svg "simple tuplet")
 
-![alt tag](./matrix10.svg "tuplet and rhythmic note values")
+![alt
+ tag](./matrix10.svg "tuplet and rhythmic note values")
 
 Tuplets are a collection of notes that get scaled to a specific
 duration. Using tuplets makes it easy to create groups of notes that
@@ -1498,7 +1625,8 @@ note. The result is three twelfth notes. (This form, which is quite
 common in music, is called a *triplet*. Other common tuplets include a
 *quintuplet* and a *septuplet*.)
 
-![alt tag](./matrix11.svg "usage of tuplet")
+![alt
+ tag](./matrix11.svg "usage of tuplet")
 
 In the example above, the three quarter notes are defined in the
 *Rhythm* block embedded in the *Tuplet* block. As with the *Simple
@@ -1506,9 +1634,11 @@ Tuplet* example, they are played in the time of a single quarter
 note. The result is three twelfth notes. This more complex form allows
 for intermixing multiple rhythms within single tuplet.
 
-![alt tag](./matrix12.svg "embedding rhythm and Tuplet block")
+![alt
+ tag](./matrix12.svg "embedding rhythm and Tuplet block")
 
-![alt tag](./matrix13.svg "tuplet and rhythmic note values")
+![alt
+ tag](./matrix13.svg "tuplet and rhythmic note values")
 
 In the example above, the two *Rhythm* blocks are embedded in the
 *Tuplet* block, resulting in a more complex rhythm.
@@ -1518,20 +1648,26 @@ defining your matrix.
 
 #### <a name="WHAT-IS-TUPLET"></a>4.2.4 What is a Tuplet?
 
-![alt tag](./TupletChart.svg "tuplet chart")
+![alt
+ tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/TupletChart.svg
+ "tuplet chart")
 
-![alt tag](./TripletChart.svg "triplet chart")
+![alt
+ tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/TripletChart.svg
+ "triplet chart")
 
 #### <a name="INDIVIDUAL-NOTES"></a>4.2.5 Using Individual Notes in the Phrase Maker
 
-![alt tag](./matrix14.svg)
+![alt
+ tag](./matrix14.svg)
 
 You can also use individual notes when defining the grid. These blocks
 will expand into *Rhythm* blocks with the corresponding values.
 
 #### <a name="USING-A-SCALE"></a>4.2.6 Using a Scale of Pitches in the Phrase Maker
 
-![alt tag](./matrix15.svg)
+![alt
+ tag](./matrix15.svg)
 
 You can use the *Scalar step* block to generate a scale of pitches in
 the matrix. In the example above, the pitches comprising the G major
@@ -1547,7 +1683,8 @@ The *Rhythm Maker* block is used to launch a widget similar to the
 *Phrase maker* block. The widget can be used to generate rhythmic
 patterns.
 
-![alt tag](./rhythm1.svg "generating rhythms")
+![alt
+ tag](./rhythm1.svg "generating rhythms")
 
 The argument to the *Rhythm Maker* block specifies the duration that
 will be subdivided to generate a rhythmic pattern. By default, it is 1
@@ -1558,7 +1695,8 @@ block indicates the number of rhythms to be defined simultaneously. By
 default, two rhythm "rulers" are defined. The embedded *Rhythm* blocks define
 the initial subdivision of each rhythm ruler.
 
-![alt tag](./rhythm2.svg "rhythm maker")
+![alt
+ tag](./rhythm2.svg "rhythm maker")
 
 When the *Rhythm Maker* block is clicked, the *Rhythm Maker* widget is
 opened. It contains a row for each rhythm ruler. An input in the top
@@ -1566,7 +1704,8 @@ row of the widget is used to specify how many subdivisions will be
 created within a cell when it is clicked. By default, 2 subdivisions
 are created.
 
-![alt tag](./rhythm3.svg "usage of rhythm maker")
+![alt
+ tag](./rhythm3.svg "usage of rhythm maker")
 
 As shown in the above figure, the top rhythm ruler has been divided
 into two half-notes and the bottom rhythm ruler has been divided into
@@ -1575,27 +1714,32 @@ will playback the rhythm using a drum for each beat. The *Play-all*
 button on the upper-left of the widget will play back all rhythms
 simultaneously.
 
-![alt tag](./rhythm4.svg "divide cells in rhythm maker")
+![alt
+ tag](./rhythm4.svg "divide cells in rhythm maker")
 
 The rhythm can be further subdivided by clicking in individual
 cells. In the example above, two quarter-notes have been created by
 clicking on one of the half-notes.
 
-![alt tag](./rhythm8.svg "tie cells in Rhythm Maker")
+![alt
+ tag](./rhythm8.svg "tie cells in Rhythm Maker")
 
 By dragging across multiple cells, they become tied. In the example
 above, two third-notes have been tied into one two-thirds-note.
 
-![alt tag](./rhythm5.svg "save stack button")
+![alt
+ tag](./rhythm5.svg "save stack button")
 
 The *Save stack* button will export rhythm stacks.
 
-![alt tag](./rhythm6.svg "stacks of rhythms" )
+![alt
+ tag](./rhythm6.svg "stacks of rhythms" )
 
 These stacks of rhythms can be used to define rhythmic patterns used
 with the *Phrase maker* block.
 
-![alt tag](./rhythm7.svg "save drum machine button")
+![alt
+ tag](./rhythm7.svg "save drum machine button")
 
 The *Save drum machine* button will export *Start* stacks that will
 play the rhythms as drum machines.
@@ -1631,14 +1775,16 @@ in an octave is 12 half-steps.
 The *Mode length* block will return the number of intervals (scalar
 steps) in the current mode.
 
-![alt tag](./mode1.svg "mode widget")
+![alt
+ tag](./mode1.svg "mode widget")
 
 The *Mode* widget lets you explore modes and generate custom
 modes. You invoke the widget with the *Custom mode* block. The mode
 specified in the *Set key* block will be the default mode when the
 widget launches.
 
-![alt tag](./mode2.svg "launching widget with Major mode")
+![alt
+ tag](./mode2.svg "launching widget with Major mode")
 
 In the above example, the widget has been launched with *Major* mode
 (the default). Note that the notes included in the mode are indicated
@@ -1674,38 +1820,44 @@ You can also click on individual notes to activate or deactivate them.
 Note that the mode inside the *Custom mode* block is updated whenever
 the mode is changed inside the widget.
 
-![alt tag](./mode3.svg "creating Dorian mode")
+![alt
+ tag](./mode3.svg "creating Dorian mode")
 
 In the above example, the *Major* mode has been rotated counter-clockwise,
 transforming it into *Dorian*.
 
-![alt tag](./mode4.svg "creating Locrian mode")
+![alt
+ tag](./mode4.svg "creating Locrian mode")
 
 In the above example, the *Major* mode has been rotated
 clockwise, transforming it into *Locrian*.
 
-![alt tag](./mode5.svg "creating Phrygian mode")
+![alt
+ tag](./mode5.svg "creating Phrygian mode")
 
 In the above example, the *Major* mode has been inverted, transforming
 it into *Phrygian*.
 
 Note: The build-in modes in Music Blocks can be found in [musicutils.js](https://github.com/sugarlabs/musicblocks/blob/master/js/musicutils.js#L68).
 
-![alt tag](./mode6.svg "phrase maker block")
+![alt
+ tag](./mode6.svg "phrase maker block")
 
 The *Save* button exports a stack of blocks representing the mode that
 can be used inside the *Phrase maker* block.
 
 ### <a name="meters"></a>4.5 Meters
 
-![alt tag](./meter1.svg "meter widget block")
+![alt
+ tag](./meter1.svg "meter widget block")
 
 The *Meter Widget* block is used to explore strong and weak
 beats. Launch the widget with the meter you want to explore. (In the
 example, the meter is 4 beats per measure, where each beat is one
 quarter note.)
 
-![alt tag](./meter2.svg "Meter Widget")
+![alt
+ tag](./meter2.svg "Meter Widget")
 
 Inside the widget, you can click on a sector to indicate a strong
 beat. (Clicking on the *X* will revert the beat to a weak beat.) In
@@ -1714,7 +1866,8 @@ the figure, the first and third beats are strong.
 The *Play* button will play the beat, using a snare drum for strong
 beats and a kick drum for weak beats.
 
-![alt tag](./meter3.svg "on strong beat do blocks")
+![alt
+ tag](./meter3.svg "on strong beat do blocks")
 
 The *Save* button will export *On strong beat do* blocks for each strong beat.
 
@@ -1741,24 +1894,31 @@ all of the notes in the theme music might be consumed by trying to
 catch up with the conductor. The No-clock block essentially says, do
 your own thing and don't worry about the conductor.
 
-![alt tag](./no-clock.svg "no clock")
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/f057d42544ff53dc3d71ee241b53bf6bff0ddf24/documentation/no-clock.svg
+ "no clock")
 
 ### <a name="pitch-drum"></a>4.6 The Pitch-Drum Matrix
 
-![alt tag](./drum2.svg "Pitch-drum matrix")
+![alt 
+ tag](./drum2.svg "Pitch-drum matrix")
 
 The *Set Drum* block is used to map the enclosed pitches into drum
 sounds. Drum sounds are played in a monopitch using the specified drum
 sample. In the example above, a `kick drum` will be substitued for
 each occurance of a `Re` `4`.
 
-![alt tag](./drum5a.svg "pitch-drum matrix 1")
+![alt
+ tag](./drum5a.svg "pitch-drum matrix 1")
 
-![alt tag](./drum5.svg "table for pitch-drum matrix")
+![alt
+ tag](./drum5.svg "table for pitch-drum matrix")
 
-![alt tag](./drum6.svg "table for pitch-drum matrix")
+![alt
+ tag](./drum6.svg "table for pitch-drum matrix")
 
-![alt tag](./drum7.svg "pitch-drum matrix 1")
+![alt
+ tag](./drum7.svg "pitch-drum matrix 1")
 
 As an experience for creating mapping with the *Set Drum* block, we
 provide the *Drum-Pitch* Matrix. You use it to map between pitches and
@@ -1774,7 +1934,8 @@ The *Pitch* blocks contained in the clamp of the *Pitch Staircase*
 block define the pitches to be initialized simultaneously. By default,
 one pitch is defined and it have default note "la" and octave "3".
 
-![alt tag](./pitchstaircase0.svg "generating arbitrary pitches")
+![alt
+ tag](./pitchstaircase0.svg "generating arbitrary pitches")
 
 When *Pitch Staircase* block is clicked, the *Pitch Staircase* widget is
 initialized. The widget contains row for every *Pitch* block contained
@@ -1784,13 +1945,16 @@ pitches in the staircase. The inputs correspond to the numerator and
 denominator in the proportion resectively. By default the proportion
 is 3:2.
 
-![alt tag](./pitchstaircase1.svg "notes associated with the step in
+![alt
+ tag](./pitchstaircase1.svg "notes associated with the step in
  the stairs")
 
-![alt tag](./pitchstaircase2.svg "notes associated with the step in
+![alt
+ tag](./pitchstaircase2.svg "notes associated with the step in
  the stairs")
 
-![alt tag](./pitchstaircase3.svg "notes associated with the step in
+![alt
+ tag](./pitchstaircase3.svg "notes associated with the step in
  the stairs")
 
 Clicking on the *Play* button to the left of each row will playback
@@ -1804,12 +1968,14 @@ The *Save stack* button will export pitch stacks. For example, in the
 above configuration, the output from pressing the *Save stack* button
 is shown below:
 
-![alt tag](./pitchstaircase4.svg "Pitch Stair block")
+![alt
+ tag](./pitchstaircase4.svg "Pitch Stair block")
 
 These stacks can be used with the *Phrase maker* block to define
 the rows in the matrix.
 
-![alt tag](./pitchstaircase5.svg "Pitch Stair block")
+![alt
+ tag](./pitchstaircase5.svg "Pitch Stair block")
 
 ### <a name="slider"></a>4.8 Generating Arbritary Pitches
 
@@ -1821,9 +1987,11 @@ within the range of a specified octave.
 Each *Sine* block contained within the clamp of the *Pitch Slider* block defines the initial pitch
 for an ocatve.
 
-![alt tag](./pitchslider0.svg "Pitch Slider")
+![alt
+ tag](./pitchslider0.svg "Pitch Slider")
 
-![alt tag](./pitchslider1.svg "Pitch Slider-One Column")
+![alt
+ tag](./pitchslider1.svg "Pitch Slider-One Column")
 
 When the *Pitch Slider* block is clicked, the *Pitch Slider* widget is
 initialized. The widget will have one column for each *Sine* block in
@@ -1833,17 +2001,22 @@ starting frequency. The mouse is used to move the frequency up and
 down continuously. Buttons are used for intervals. Arrow keys can also
 be used to move up and down, or between columns.
 
-![alt tag](./pitchslider0a.svg "Pitch Slider Block")
+![alt
+ tag](./pitchslider0a.svg "Pitch Slider Block")
 
-![alt tag](./pitchslider2.svg "Pitch Slider-Two Column")
+![alt
+ tag](./pitchslider2.svg "Pitch Slider-Two Column")
 
 Clicking in a column will extact the corresponding *Note* blocks, for example:
 
-![alt tag](./pitchslider3.svg "Pitch Slider-Two Columns Adjusting")
+![alt
+ tag](./pitchslider3.svg "Pitch Slider-Two Columns Adjusting")
 
-![alt tag](./pitchslider4.svg " Pitch Slider block")
+![alt
+ tag](./pitchslider4.svg " Pitch Slider block")
 
-![alt tag](./pitchslider5.svg " Pitch Slider block")
+![alt
+ tag](./pitchslider5.svg " Pitch Slider block")
 
 ### <a name="tempo"></a>4.9 Changing Tempo
 
@@ -1857,13 +2030,15 @@ determines the speed at which the ball in the widget moves back and
 forth. If BPM is `60`, then it will take one second for the ball to move
 across the widget. A round-trip would take two seconds.
 
-![alt tag](./tempo0.svg "changing tempo")
+![alt
+ tag](./tempo0.svg "changing tempo")
 
 The top row of the widget holds the *Play/pause* button, the *Speed
 up* and *Slow down* buttons, and an input field for updating the
 Tempo.
 
-![alt tag](./tempo1.svg "changing tempo")
+![alt
+ tag](./tempo1.svg "changing tempo")
 
 You can also update the tempo by clicking twice in spaced succession
 in the widget: the new beats per minute (BPM) is determined as the
@@ -1875,7 +2050,8 @@ between clicks, the new BPM will be set as `120`.
 While Music Blocks comes with many built-in instruments, it is also
 possible to create custom timbres with unique sound qualities.
 
-![alt tag](./timbre1.svg "the Timbre widget")
+![alt
+ tag](./timbre1.svg "the Timbre widget")
 
 The *Timbre* block can be used to launch the *Timbre* widget, which
 lets you add synthesizers, oscillators, effects, and filters to create
@@ -1885,7 +2061,8 @@ The name of the custom timbre is defined by the argment passed to the
 block (by default, `custom`). This name is passed to the *Set timbre*
 block in order to use your custom timbre.
 
-![alt tag](./timbre2.svg "the Timbre widget toolbar")
+![alt
+ tag](./timbre2.svg "the Timbre widget toolbar")
 
 The *Timbre* widget has a number of different panels, each of which is
 used to set the parameters of the components that define your custom
@@ -1895,7 +2072,8 @@ timbre.
 custom timbre. By default, it will play `Sol`, `Mi`, `Sol` using the
 combination of filters you define.
 
-![alt tag](./timbre1a.svg "the notes inside Timbre block")
+![alt
+ tag](./timbre1a.svg "the notes inside Timbre block")
 
 You can also put notes in the *Timbre* block to use for testing your
 sound. In the example above, a scale will be used for the test.
@@ -1903,31 +2081,37 @@ sound. In the example above, a scale will be used for the test.
 * The *Save* button, which will save your custom timbre for use in
 your program.
 
-![alt tag](./timbre3.svg "select synth")
+![alt
+ tag](./timbre3.svg "select synth")
 
 * The *Synth* button, which lets you choose between an AM synth, a PM
 synth, or a Duo synth.
 
-![alt tag](./timbre4.svg "select osc")
+![alt
+ tag](./timbre4.svg "select osc")
 
 * The *Oscillator* button, which lets you choose between a sine wave,
 square wave, triangle wave, or sawtooth wave. You can also change
 the number of partials.
 
-![alt tag](./timbre5.svg "set envelope")
+![alt
+ tag](./timbre5.svg "set envelope")
 
 * The *Envelope* button, which lets you change the shape of the sound
 envelope, with controls for attack, decay, sustain, and release.
 
-![alt tag](./timbre6.svg "select effect")
+![alt
+ tag](./timbre6.svg "select effect")
 
-![alt tag](./timbre6a.svg "tremolo")
+![alt
+ tag](./timbre6a.svg "tremolo")
 
 * The *Effects* button, which lets you add effects to your custom
 timbre: tremelo, vibrato, chorus, phaser, and distortion. When an
 effect is selected, additional controls will appear in the widget.
 
-![alt tag](./timbre7.svg "select filter")
+![alt
+ tag](./timbre7.svg "select filter")
 
 * The *Filter* button, which lets you choose between a number of
 different filter types.
@@ -1949,9 +2133,11 @@ keyboard.
 When there are no *Pitch* blocks inside the widget clamp, a keyboard with
 all keys between C4 and G5 is created.
 
-![alt tag](./keyboard1.svg "keyboard block without clamp")
+![alt
+ tag](./keyboard1.svg "keyboard block without clamp")
 
-![alt tag](./keyboard2.svg "keyboard widget without clamp")
+![alt
+ tag](./keyboard2.svg "keyboard widget without clamp")
 
 When there are *Pitch* blocks inside the widget clamp, a keyboard with
 only those pitches is created.
@@ -1971,7 +2157,8 @@ The metronome feature will generate a beat to enable candence.
 making it narrower or wider than pure. It is also possible to change
 and create different tuning systems.
 
-![alt tag](./temperament1.svg "the Temperament block")
+![alt
+ tag](./temperament1.svg "the Temperament block")
 
 The *Temperament* block is used to launch a widget that enables the
 user to visualize and edit notes within an octave.
@@ -1982,7 +2169,8 @@ temperament* block in order to play the notes in selected temperament
 system. *Starting Pitch* is the argument of pitch block inside
 temperament block. In the above example, starting pitch is `C4`.
 
-![alt tag](./temperament2.svg "the Temperament widget")
+![alt
+ tag](./temperament2.svg "the Temperament widget")
 
 In the above example, selected temperament is *Just Intonation*. Notes
 within an octave can be viewed in the form of circle. These circles
@@ -1995,7 +2183,8 @@ respective circle. In the above example, circle (pitch number) `2` is
 `D4`. The frequency of note can be changed through edit button (left
 hand side corner of note information popup).
 
-![alt tag](./temperament3.svg "the Temperament widget")
+![alt
+ tag](./temperament3.svg "the Temperament widget")
 
 Information regarding notes can also be viewed in the form of a
 *table* as shown in the above example. The table will show all the
@@ -2023,18 +2212,22 @@ representation of notes.
 
 The *Add* button is used to edit notes through different tools:
 
-![alt tag](./temperament4.svg "Equal Edit tool")
+![alt
+ tag](./temperament4.svg "Equal Edit tool")
 
-![alt tag](./temperament4a.svg "Temperament widget with new element")
+![alt
+ tag](./temperament4a.svg "Temperament widget with new element")
 
 The `Equal` edit tool is used to make *equal divisions* between two
 pitch numbers.  In the above example, two equal divisions are made
 between pitch numbers `0` and `1` and the resultant number of notes
 within an octave are changed from 12 to 13.
 
-![alt tag](./temperament5.svg "Ratio Edit tool")
+![alt
+ tag](./temperament5.svg "Ratio Edit tool")
 
-![alt tag](./temperament5a.svg "Temperament widget with new element")
+![alt
+ tag](./temperament5a.svg "Temperament widget with new element")
 
 The `Ratio` tool is used to add notes of specified ratios in such a
 way that the resultant pitches wrap inside a single octave. Recursion
@@ -2044,7 +2237,8 @@ number of notes within an octave are changed from 12 to 14. Frequency
 of first pitch is (Starting Pitch Frequency) * (16/13) and second
 pitch is (Starting Pitch Frequency) * (16/13)².
 
-![alt tag](./temperament6.svg "Arbitrary Edit tool")
+![alt
+ tag](./temperament6.svg "Arbitrary Edit tool")
 
 The `Arbitrary` edit tool is used to add a note in an arbitrary
 position. In this panel, whenever the user hovers over the outer
@@ -2053,7 +2247,8 @@ note according to a chosen frequency. In the above example, a new note
 will be added somewhere between pitch numbers `2` and `3` by adjusting
 the frequency slider.
 
-![alt tag](./temperament7.svg "Octave Space Edit tool")
+![alt
+ tag](./temperament7.svg "Octave Space Edit tool")
 
 The `Octave Space` tool is used to edit the octave ratio. The standard
 octave space is 2:1. In the above example, octave space will be
@@ -2067,24 +2262,30 @@ The *Close* button will close the widget.
 
 Music Blocks has an Oscillosope Widget to visualize the music as it plays.
 
-![alt tag](./oscilloscope1.svg "Oscilloscope")
+![alt
+ tag](./oscilloscope1.svg "Oscilloscope")
 
-![alt tag](./oscilloscope2.svg "Oscilloscope")
+![alt
+ tag](./oscilloscope2.svg "Oscilloscope")
 
 A separate wave will be displayed for each mouse.
 
 ###  <a name="sampler"></a>4.14 Sampler
 
-![alt tag](./sampler_block.svg "Sampler")
-
+![alt
+ tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/sampler_block.svg
+ "Sampler")
+ 
 You can import sound samples (.WAV files) and use them with the *Set Instrument" block. The *Sampler* widget lets you set the center pitch of your sample so that it can be tuned.
 
-![alt tag](./sampler1.svg "Sampler Widget")
+![alt
+ tag](./sampler1.svg "Sampler Widget")
 
 You can then use the *Sample* block as you would any input to the *Set
 Instrument* block.
 
-![alt tag](./sampler2.svg "Sampler Widget")
+![alt
+ tag](./sampler2.svg "Sampler Widget")
 
 ## <a name="BEYOND-MUSIC-BLOCKS"></a>5. Beyond Music Blocks
 
@@ -2097,7 +2298,8 @@ point the learner towards other powerful tools.
 
 One such tool is [Lilypond](http://lilypond.org), a music engraving program.
 
-![alt tag](./lilypond1.svg "adding Save as Lilypond block")
+![alt
+ tag](./lilypond1.svg "adding Save as Lilypond block")
 
 The *Save as Lilypond* option from the Save menu will transcribe your
 composition (Only available in Advanced Mode).
@@ -2106,7 +2308,8 @@ Note that if you use a *Print* block inside of a note, Lilypond will
 create a "markup" or annotation for that note. It is a simple way to
 add lyrics to your score.
 
-![alt tag](./lilypond2.svg "Save as Lilypond icon")
+![alt
+ tag](./lilypond2.svg "Save as Lilypond icon")
 
 ```
 \version "2.18.2"
@@ -2128,7 +2331,8 @@ e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
 }
 ```
 
-![alt tag](./hotdog.png "sheet music")
+![alt
+ tag](./hotdog.png "sheet music")
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523043053377623&run=True)
 
