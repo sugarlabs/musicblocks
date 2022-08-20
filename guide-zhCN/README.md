@@ -71,8 +71,7 @@
 ### <a name="NOTE-VALUE"></a>
 2.1 《音乐拼块》最有用的拼块是《音符长度》。《音符长度》里面有一个[音调拼块](#PITCH)和音符的长度。
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/note1.svg
-"一个《音符长度拼块》(在上面) 和两个连接的拼块(在下面)")
+![alt tag](/note1.svg "一个《音符长度拼块》(在上面) 和两个连接的拼块(在下面)")
 
 上面的例子有一个“音符拼块”。“1/8”是价值或长度，在这种情况下是一个八分音符
 
