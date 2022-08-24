@@ -1838,16 +1838,9 @@ class Singer {
                     // const notesInfo = "";
 
                     const obj = rationalToFraction(1 / noteBeatValue);
-                    
-                    // if (obj[0] > 0) {
-                    //     if (obj[0] / obj[1] > 2) {
-                    //         // activity.errorMsg(_("Warning: Note value greater than 2."), blk);
 
                     //         //-> Removed the WARNING to play a note longer than 2 whole 
                     //         //   notes since some samples are very long.
-
-                    //     }
-                    // }
 
                     if (!tur.singer.suppressOutput) {
                         tur.blink(duration, last(Singer.masterVolume));
