@@ -34,7 +34,7 @@ of blocks representing four notes: `Do 4`, `Mi 4`, `Sol 4` and `Do
 
 https://rawgithub.com/sugarlabs/
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/play-button.svg "play button")
+![alt tag](../header-icons/play-button.svg "play button")
 
 Try clicking on the *Start* block or click on the *Play* button. You should hear the notes play in succession: `Do` `Mi` `Sol` `Do`.
 
@@ -243,7 +243,7 @@ modified.)
 Actions are a powerful organizational element for your program and can
 be used in many powerful ways, e.g., an action can be associated with
 an event, such as an on beat or off beat or mouse click. See
-[Music Blocks Programming Guide](http://rawgithub.com/sugarlabs/musicblocks/tree/master/guide/README.md),
+[Music Blocks Programming Guide](../guide/README.md),
 for further details and examples.
 
 ![alt tag](./storebox1_block.svg "storein-Box-Add One")
@@ -330,7 +330,7 @@ Widget Palette
 Music Blocks has various Widgets that can be used within Music Blocks
 to enhance your experience. The *Pitch-time matrix* is described here.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/chords.png "The Pitch-Time Matrix")
+![alt tag](../documentation/chords.png "The Pitch-Time Matrix")
 
 Many of the blocks on this palette are used to create a matrix of
 "pitch" and "note value". The matrix is a convenient and intuitive way
@@ -404,7 +404,7 @@ Note: You can construct a matrix from a chuck of blocks by including
 the chunk in the clamp of the *Pitch-time Marix* block.
 
 More details about all of the widgets are available in the
-[Music Blocks Programming Guide](http://rawgithub.com/sugarlabs/musicblocks/tree/master/guide/README.md).
+[Music Blocks Programming Guide](../guide/README.md).
 
 Creating help artwork
 ---------------------
