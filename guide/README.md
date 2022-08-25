@@ -2273,7 +2273,7 @@ A separate wave will be displayed for each mouse.
 ###  <a name="sampler"></a>4.14 Sampler
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/sampler_block.svg
+ tag](../documentation/sampler_block.svg
  "Sampler")
  
 You can import sound samples (.WAV files) and use them with the *Set Instrument" block. The *Sampler* widget lets you set the center pitch of your sample so that it can be tuned.
