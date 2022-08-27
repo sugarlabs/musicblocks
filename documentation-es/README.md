@@ -20,12 +20,12 @@ Edge	      | Coming soon
 You can run it from
 [https://musicblocks.sugarlabs.org](https://musicblocks.sugarlabs.org).
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/getting-started.png "Music Blocks in a browser")
+![alt tag](../documentation/getting-started.png "Music Blocks in a browser")
 
 Getting Started
 ---------------
 
-![alt tag](./getting_started_blocks.svg "default blocks")
+![alt tag](../documentation/getting_started_blocks.svg "default blocks")
 
 When you first launch Music Blocks in your browser, you'll see a stack
 of blocks representing four notes: `Do 4`, `Mi 4`, `Sol 4` and `Do
@@ -34,7 +34,7 @@ of blocks representing four notes: `Do 4`, `Mi 4`, `Sol 4` and `Do
 
 https://rawgithub.com/sugarlabs/
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/play-button.svg "play button")
+![alt tag](../header-icons/play-button.svg "play button")
 
 Try clicking on the *Start* block or click on the *Play* button. You should hear the notes play in succession: `Do` `Mi` `Sol` `Do`.
 
@@ -182,7 +182,7 @@ inside a note in order to create sound-sync animations.
 A quick tour of selected blocks
 -------------------------------
 
-![alt tag](./setinstrument_block.svg "Set instrument block")
+![alt tag](../documentation-pt/setinstrument_block.svg "Set instrument block")
 
 The *Set instrument* block, found on the *Tone* palette, lets you choose a
 timbre for a note. In the above example, a guitar model is used to
@@ -220,7 +220,7 @@ The *Start* block, found on the *Action* palette, is tied to the *Run*
 button. Anything inside of the clamp of the *Start* button will be run
 when the button is pressed.
 
-![alt tag](./multiple_start_blocks.svg "Start")
+![alt tag](../documentation/multiple_start_blocks.svg "Start")
 
 Note that you can have multiple mice and that each mouse is
 equivalent to a "voice" in music. It can play notes of various pitches
@@ -243,7 +243,7 @@ modified.)
 Actions are a powerful organizational element for your program and can
 be used in many powerful ways, e.g., an action can be associated with
 an event, such as an on beat or off beat or mouse click. See
-[Music Blocks Programming Guide](http://rawgithub.com/sugarlabs/musicblocks/tree/master/guide/README.md),
+[Music Blocks Programming Guide](../guide/README.md),
 for further details and examples.
 
 ![alt tag](./storebox1_block.svg "storein-Box-Add One")
@@ -330,7 +330,7 @@ Widget Palette
 Music Blocks has various Widgets that can be used within Music Blocks
 to enhance your experience. The *Pitch-time matrix* is described here.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/chords.png "The Pitch-Time Matrix")
+![alt tag](../documentation/widget.png "The Pitch-Time Matrix")
 
 Many of the blocks on this palette are used to create a matrix of
 "pitch" and "note value". The matrix is a convenient and intuitive way
@@ -404,7 +404,7 @@ Note: You can construct a matrix from a chuck of blocks by including
 the chunk in the clamp of the *Pitch-time Marix* block.
 
 More details about all of the widgets are available in the
-[Music Blocks Programming Guide](http://rawgithub.com/sugarlabs/musicblocks/tree/master/guide/README.md).
+[Music Blocks Programming Guide](../guide/README.md).
 
 Creating help artwork
 ---------------------
