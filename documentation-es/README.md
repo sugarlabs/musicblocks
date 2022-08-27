@@ -25,7 +25,7 @@ You can run it from
 Getting Started
 ---------------
 
-![alt tag](./getting_started_blocks.svg "default blocks")
+![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation-es/getting_started_blocks.svg "default blocks")
 
 When you first launch Music Blocks in your browser, you'll see a stack
 of blocks representing four notes: `Do 4`, `Mi 4`, `Sol 4` and `Do
