@@ -25,7 +25,7 @@ You can run it from
 Getting Started
 ---------------
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/documentation-es/getting_started_blocks.svg "default blocks")
+![alt tag](../documentation/getting_started_blocks.svg "default blocks")
 
 When you first launch Music Blocks in your browser, you'll see a stack
 of blocks representing four notes: `Do 4`, `Mi 4`, `Sol 4` and `Do
@@ -182,7 +182,7 @@ inside a note in order to create sound-sync animations.
 A quick tour of selected blocks
 -------------------------------
 
-![alt tag](./setinstrument_block.svg "Set instrument block")
+![alt tag](../documentation-pt/setinstrument_block.svg "Set instrument block")
 
 The *Set instrument* block, found on the *Tone* palette, lets you choose a
 timbre for a note. In the above example, a guitar model is used to
