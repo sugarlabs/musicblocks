@@ -1869,8 +1869,7 @@ catch up with the conductor. The No-clock block essentially says, do
 your own thing and don't worry about the conductor.
 
 ![alt
- tag](.../f057d42544ff53dc3d71ee241b53bf6bff0ddf24/documentation/no-clock.svg
- "no clock")
+ tag](../documentation/no-clock.svg "no clock")
 
 ### <a name="pitch-drum"></a>4.6 The Pitch-Drum Matrix
 
