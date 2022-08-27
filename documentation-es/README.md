@@ -220,7 +220,7 @@ The *Start* block, found on the *Action* palette, is tied to the *Run*
 button. Anything inside of the clamp of the *Start* button will be run
 when the button is pressed.
 
-![alt tag](./multiple_start_blocks.svg "Start")
+![alt tag](../documentation/multiple_start_blocks.svg "Start")
 
 Note that you can have multiple mice and that each mouse is
 equivalent to a "voice" in music. It can play notes of various pitches
@@ -330,7 +330,7 @@ Widget Palette
 Music Blocks has various Widgets that can be used within Music Blocks
 to enhance your experience. The *Pitch-time matrix* is described here.
 
-![alt tag](../documentation/chords.png "The Pitch-Time Matrix")
+![alt tag](../documentation/widget.png "The Pitch-Time Matrix")
 
 Many of the blocks on this palette are used to create a matrix of
 "pitch" and "note value". The matrix is a convenient and intuitive way
