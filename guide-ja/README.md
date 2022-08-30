@@ -87,7 +87,7 @@
 *音価*ブロックの数値を数字・計算のブロックでいろいろな算数ができますよ。
 
 ![alt
- tag](https://rawgithub.com/sugarlabs/musicblocks/master/charts/NotationRestChart.svg
+ tag](../charts/NotationRestChart.svg
  "音価とその音価の音価ブロックの図表です。")
 
 上の図表を使って音価とその音価のブロックを閲覧してください。
@@ -116,8 +116,8 @@
 
 ピッチの名前は*文事*ブロックでもインプットができますよ。 
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/charts/KeyboardChart.svg "音符のピッチとピアノ・キーボード図")
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/charts/MalletChart.svg "音符のピッチとマレット・パーカッション（打楽器）図")
+![alt tag](../charts/KeyboardChart.svg "音符のピッチとピアノ・キーボード図")
+![alt tag](../charts/MalletChart.svg "音符のピッチとマレット・パーカッション（打楽器）図")
 ピッチブロックはピアノ・キーボード、マレット・パーカッション、音楽譜とどういう関係あるか上の図を使ってください。
 
 ### <a name="和音"></a>2.3 和音
@@ -229,7 +229,7 @@ most recent note played.
 "付点音符"のリズムの音符が*付点音符*ブロックでできます。付点音符の音符はその入っている音価を50%で増します(50%で増します)。例えば、付点音符の4分音符が三つの8分音符の長さで鳴らします。計算は1/4 + 1/8＝「3/4」。付点音符の8分音符が3/16の音価で (1/8 + 1/16)鳴らします。
 
 付点音符を使う代わりに音価の数値を変えて付点音符と同じ長さもできますよ。例えば、4分音符の符点音符の長さが欲しかったら、1/4の代わりに3/8のインプットをして4分音符の付点音符と同じ長さで鳴らします。
-![alt tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/DotsChart.svg "4分音符の付点音符の使い方です。")
+![alt tag](../charts/DotsChart.svg "4分音符の付点音符の使い方です。")
 
 #### <a name="かけることと割ること"></a>3.2.5 演算で音価をかけ割ること
 
@@ -267,7 +267,7 @@ note.
 
 タイ・ブロックに入っている音符のピッチは同じじゃないと効果がありません。タイ・ブロックに入っている音符の音価は違ってもOKです。
 
-![alt tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/TiesChart.svg "タイ・ブロックの使う方法")
+![alt tag](../charts/TiesChart.svg "タイ・ブロックの使う方法")
 
 #### <a name="他の転化"></a>3.2.8 音量、クレシェンド、スタッカート、スラーのブロックの関係
 
@@ -541,13 +541,13 @@ individual notes (or 和音s if you クリック on more than one cell in a
 column). In the figure, three quarter notes are selected (black
 cells). First `レ 4`, followed by `ミ 4`, followed by `ソ 4`.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/play-button.svg "play button")
+![alt tag](../header-icons/play-button.svg "play button")
 
 If you クリック on the *Play* button (found in the top row of the grid),
 you will hear a sequence of notes played (from left to right): `レ 4`,
 `ミ 4`, `ソ 4`.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/export-chunk.svg "save button")
+![alt tag](../header-icons/export-chunk.svg "save button")
 
 
 Once you have a group of notes (a "チャンク") that you like, クリック on the
@@ -558,19 +558,19 @@ programmatically. (More on that below.)
 You can rearrange the selected notes in the grid and save other チャンク
 as well.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/sort.svg "sort button")
+![alt tag](../header-icons/sort.svg "sort button")
 
 
 The *Sort* button will reorder the ピッチ in the matrix from highest
 to lowest and eliminate any 重に *ピッチ* blocks.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/close-button.svg "close button")
+![alt tag](../header-icons/close-button.svg "close button")
 
 
 You can hide the matrix by クリックing on the *Close* button (the right-most
 button in the top row of the grid.)
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/erase-button.svg "erase button")
+![alt tag](../header-icons/erase-button.svg "erase button")
 
 
 There is also an Erase button that will clear the grid.
@@ -657,9 +657,9 @@ defining your matrix.
 
 #### <a name="タプルとは"></a>4.2.4 What is a tuplet?
 
-![alt tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/TupletChart.svg "tuplet chart")
+![alt tag](../charts/TupletChart.svg "tuplet chart")
 
-![alt tag](https://rawgit.com/sugarlabs/musicblocks/master/charts/TripletChart.svg "triplet chart")
+![alt tag](../charts/TripletChart.svg "triplet chart")
 
 #### <a name="INDIVIDUAL-NOTES"></a>4.2.5 Using individual notes in the matrix
 
