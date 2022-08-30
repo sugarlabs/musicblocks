@@ -457,8 +457,30 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 | | | For example: Transposing C-D-E-F by 4 (fifth) will give us G-A-B-C
 | | | To transpose an octave: shift by the mode length (7 in major scales) up or down. |
 
-**Set Key** 
+#### <a name="Set Key"></a>3.2.5 Set Key
+
 ![alt tag](./setkey1.svg "scalar transposition")
+
+
+The Set key block is used to set the key and mode, eg C Major. 
+It allows you to change both the mode and key of how solfege is mapped to the notes.
+
+**Standard Notation of Set Key**
+
+<img width="189" alt="image" src="https://user-images.githubusercontent.com/75945709/184471821-137fd558-2805-4a06-a961-6cbc1505f4be.png">
+
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1661845969838913&run=True)
+
+The *Set Key* block will change the key and mode of the mapping
+between solfege, e.g., `Do`, `Re`, `Mi`, to note names, e.g., `C`,
+`D`, `E`, when in C Major. Modes include Major and Minor, Chromatic,
+and a number of more exotic modes, such as Bebop, Geez, Maqam, etc.
+This block allows users to access "movable Do" within Music Blocks,
+where the mapping of solfege to particular pitch changes depending on
+the user's specified tonality.
+
+You can find set key block in the left palette ->  Intervals and then can be used as shown in the above diagram.
+In this block to the right, we have two joining points for key {A, B, C, D, E, F, G} and mode {major, minor, lydian, etc.} which can be used to set the key and mode as per requirement.
 
 | Music Blocks for Set Key and Movable Do | 
 | --- |
