@@ -413,7 +413,7 @@ The *Register* block provides an easy way to modify the register
 used to bump the `Mi 4` note up by one octave and then to bump the
 `Sol 4` note down by one octave.
 
-#### <a name="PITCH-MOVEMENT"></a>3.2.5 Summary of Pitch Movements
+#### <a name="PITCH-MOVEMENT"></a>3.2.4 Summary of Pitch Movements
 
 | Representation | Pitch Movement | Properties |
 | --- | --- | --- |
@@ -528,7 +528,7 @@ In this block to the right, we have two joining points for key {A, B, C, D, E, F
 | --- |
 | ![alt tag](./pitchmovement6.png "moveable do") |
 
-#### <a name="FIXED-AND-MOVABLE-PITCH-SYSTEMS"></a>3.2.5 Pitch Systems: Fixed and Movable and Subsystems
+#### <a name="FIXED-AND-MOVABLE-PITCH-SYSTEMS"></a>3.2.6 Pitch Systems: Fixed and Movable and Subsystems
 
 Music Blocks allows users to express and explore musical ideas in a
 variety of different systems. The main systems of expression are fixed
@@ -687,7 +687,7 @@ block.
 [Scale Degree Improv]
 (https://rawgit.com/sugarlabs/musicblocks/master/examples/Scale-Degree-Improv.html)
 
-#### <a name="DOTTED"></a>3.2.6 Dotted Notes
+#### <a name="DOTTED"></a>3.2.7 Dotted Notes
 
 ![alt 
  tag](./transform4.svg "Creating dotted notes using the Dot block")
@@ -714,7 +714,7 @@ calculation into a note's note value.
 ![alt
   tag](../charts/DotsChart.svg "using dotted notes")
 
-#### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.7 Changing Note(s) duration via Mathematical Operations
+#### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.8 Changing Note(s) duration via Mathematical Operations
 
 ![alt
  tag](./transform5.svg "Changing note duration for a note or notes")
@@ -734,7 +734,7 @@ decreased over time, at each repetition.
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
 
-#### <a name="REPETITION"></a>3.2.8 Repeating Notes
+#### <a name="REPETITION"></a>3.2.9 Repeating Notes
 
 ![alt
   tag](./transform6.svg "repeating notes")
@@ -747,7 +747,7 @@ In the example, on the left, the result would be `Sol, Re, Sol, Sol,
 Re, Sol, Sol, Re, Sol, Sol, Re, Sol`; on the right the result would be
 `Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol`.
 
-#### <a name="SWINGING"></a>3.2.9 Swinging Notes and Tied Notes
+#### <a name="SWINGING"></a>3.2.10 Swinging Notes and Tied Notes
 
 ![alt 
  tag](./transform7.svg "swinging notes and tied notes")
@@ -768,7 +768,7 @@ notes must be identical in pitch, but can vary in rhythm.)
 ![alt
  tag](../charts/TiesChart.svg "using notes with ties")
 
-#### <a name="MORE-TRANSFORMATIONS"></a>3.2.10 Set Volume, Crescendo, Staccato, and Slur
+#### <a name="MORE-TRANSFORMATIONS"></a>3.2.11 Set Volume, Crescendo, Staccato, and Slur
 
 ![alt 
  tag](./transform8.svg "Set master volume, set synth volume, set relative volume, crescendo")
@@ -811,7 +811,7 @@ The *Slur* block lengthens the sustain of notes&mdash;running longer than
 the noted duration and blending it into the next note&mdash;while
 maintaining the specified rhythmic value of the notes.
 
-#### <a name="INTERVALS"></a>3.2.11 Intervals
+#### <a name="INTERVALS"></a>3.2.12 Intervals
 
 ![alt 
  tag](./transform9.svg "Scalar interval block")
@@ -877,7 +877,7 @@ We support many basic chords:
 | minor 7 | 1 3 7 10 | Cmin7 C - Eb - G - Bb |
 | major 7 | 1 4 7 11 | Cmaj7 C - E - G - B |
 
-#### <a name= "INVERSION"></a>3.2.12 Inversion
+#### <a name= "INVERSION"></a>3.2.13 Inversion
 
 The *Invert* block will rotate a series of notes around a target
 note. There are three different modes of the *Invert* block: *even*,
@@ -981,7 +981,7 @@ midway between `C5` and `C♯5`.  In the *invert (scalar)* example,
 notes are inverted around `C5`, by scalar steps rather than
 half-steps.
 
-#### <a name="BACKWARDS"></a>3.2.13 Backwards
+#### <a name="BACKWARDS"></a>3.2.14 Backwards
 
 ![alt
  tag](./transform11.svg "Backward block")
@@ -1000,7 +1000,7 @@ Note that all of the blocks inside a *Backward* block are reverse, so
 use this feature with caution if you include logic intermixed with
 notes.
 
-#### <a name= "SETTING"></a>3.2.14 Setting Voice and Keys
+#### <a name= "SETTING"></a>3.2.15 Setting Voice and Keys
 
 ![alt
  tag](./transform12.svg "setting voice and keys using Set Voice block")
@@ -1026,7 +1026,7 @@ The *Define mode* block can be used to define a custom mode by
 defining the number and size of the steps within an octave. You can
 use your custom mode with the *Set key* block.
 
-#### <a name="VIBRATO"></a>3.2.15 Vibrato, Tremelo, et al.
+#### <a name="VIBRATO"></a>3.2.16 Vibrato, Tremelo, et al.
 
 ![alt
  tag](./transform15.svg "Vibrato, tremelo, chorus, distortion, neighbor, and phaser blocks")
