@@ -457,6 +457,9 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 | | | For example: Transposing C-D-E-F by 4 (fifth) will give us G-A-B-C
 | | | To transpose an octave: shift by the mode length (7 in major scales) up or down. |
 
+**Set Key** 
+![alt tag](./setkey1.svg "scalar transposition")
+
 | Music Blocks for Set Key and Movable Do | 
 | --- |
 | ![alt tag](./pitchmovement3.svg "scalar transposition") |
