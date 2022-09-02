@@ -473,26 +473,22 @@ It allows you to change both the mode and key of how solfege is mapped to the no
 | Set Key Value | Notes Pattern | Modes Pattern |
 | --- | --- | --- |
 | C Major | C, D, E, F, G, A, B, C | 2 2 1 2 2 2 1 |
-| F# Major | C, D, E, F, G, A, B, C | 2 2 1 2 2 2 1 |
-| A♭ Major | C, D, E, F, G, A, B, C | 2 2 1 2 2 2 1 |
-| C Dorian | C, D, E, F, G, A, B, C | 2 1 2 2 2 1 2 |
-| F# Dorian | C, D, E, F, G, A, B, C | 2 1 2 2 2 1 2 |
-| A♭ Dorian | C, D, E, F, G, A, B, C | 2 1 2 2 2 1 2 |
-| C Phrygian | C, D, E, F, G, A, B, C | 1 2 2 2 1 2 2 |
-| F# Phrygian | C, D, E, F, G, A, B, C | 1 2 2 2 1 2 2 |
-| A♭ Phrygian | C, D, E, F, G, A, B, C | 1 2 2 2 1 2 2 |
-| C Mixolydian | C, D, E, F, G, A, B, C | 2 2 2 1 2 2 1 |
-| F# Mixolydian | C, D, E, F, G, A, B, C | 2 2 2 1 2 2 1 |
-| A♭ Mixolydian | C, D, E, F, G, A, B, C | 2 2 2 1 2 2 1 |
-| C Lydian | C, D, E, F, G, A, B, C | 2 2 1 2 2 1 2 |
-| F# Lydian | C, D, E, F, G, A, B, C | 2 2 1 2 2 1 2 |
-| A♭ Lydian | C, D, E, F, G, A, B, C | 2 2 1 2 2 1 2 |
-| C Minor | C, D, E, F, G, A, B, C | 2 1 2 2 1 2 2 |
-| F# Minor | C, D, E, F, G, A, B, C | 2 1 2 2 1 2 2 |
-| A♭ Minor | C, D, E, F, G, A, B, C | 2 1 2 2 1 2 2 |
-| C Locrian | C, D, E, F, G, A, B, C | 1 2 2 1 2 2 2 |
-| F# Locrian | C, D, E, F, G, A, B, C | 1 2 2 1 2 2 2 |
-| A♭ Locrian | C, D, E, F, G, A, B, C | 1 2 2 1 2 2 2 |
+| F# Major | F#, G#, A#, B, C#, D#, F, F# | 2 2 1 2 2 2 1 |
+| A♭ Major | Ab, Bb, C, Db, Eb, F, G, Ab | 2 2 1 2 2 2 1 |
+| E Major | E, F#, G#, A, B, C#, D#, E | 2 2 1 2 2 2 1 |
+| A# Major | Bb, C, D, Eb, F, G, A, Bb | 2 2 1 2 2 2 1 |
+| --- | --- | --- |
+| C Dorian | C, D, Eb, F, G, A, Bb, C | 2 1 2 2 2 1 2 |
+| F# Dorian | F#, G#, A, B, C#, D#, E, F# | 2 1 2 2 2 1 2 |
+| A♭ Dorian | G#, A#, B, C#, D#, F, F#, G# | 2 1 2 2 2 1 2 |
+| E Dorian | E, F#, G, A, B, C#, D, E | 2 1 2 2 2 1 2 |
+| A# Dorian | Bb, C, Db, Eb, F, G, Ab, Bb | 2 1 2 2 2 1 2 |
+| --- | --- | --- |
+| C Phrygian | C, Db, Eb, F, G, Ab, Bb, C | 1 2 2 2 1 2 2 |
+| F# Phrygian | F#, G, A, B, C#, D, E, F# | 1 2 2 2 1 2 2 |
+| A♭ Phrygian | G#, A, B, C#, D#, E, F#, G# | 1 2 2 2 1 2 2 |
+| E Phrygian | E, F, G, A, B, C, D, E | 1 2 2 2 1 2 2 |
+| A# Phrygian | Bb, Cb, Db, Eb, F, Gb, Ab, Bb | 1 2 2 2 1 2 2 |
 
 **Set Key & Movable Do**
 
