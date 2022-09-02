@@ -470,6 +470,32 @@ It allows you to change both the mode and key of how solfege is mapped to the no
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1662103714150464&run=True)
 
+| Set Key Value | Notes Pattern | Modes Pattern |
+| --- | --- | --- |
+| C Major | C, D, E, F, G, A, B, C | 2 2 1 2 2 2 1 |
+| F# Major | C, D, E, F, G, A, B, C | 2 2 1 2 2 2 1 |
+| A♭ Major | C, D, E, F, G, A, B, C | 2 2 1 2 2 2 1 |
+| C Dorian | C, D, E, F, G, A, B, C | 2 1 2 2 2 1 2 |
+| F# Dorian | C, D, E, F, G, A, B, C | 2 1 2 2 2 1 2 |
+| A♭ Dorian | C, D, E, F, G, A, B, C | 2 1 2 2 2 1 2 |
+| C Phrygian | C, D, E, F, G, A, B, C | 1 2 2 2 1 2 2 |
+| F# Phrygian | C, D, E, F, G, A, B, C | 1 2 2 2 1 2 2 |
+| A♭ Phrygian | C, D, E, F, G, A, B, C | 1 2 2 2 1 2 2 |
+| C Mixolydian | C, D, E, F, G, A, B, C | 2 2 2 1 2 2 1 |
+| F# Mixolydian | C, D, E, F, G, A, B, C | 2 2 2 1 2 2 1 |
+| A♭ Mixolydian | C, D, E, F, G, A, B, C | 2 2 2 1 2 2 1 |
+| C Lydian | C, D, E, F, G, A, B, C | 2 2 1 2 2 1 2 |
+| F# Lydian | C, D, E, F, G, A, B, C | 2 2 1 2 2 1 2 |
+| A♭ Lydian | C, D, E, F, G, A, B, C | 2 2 1 2 2 1 2 |
+| C Minor | C, D, E, F, G, A, B, C | 2 1 2 2 1 2 2 |
+| F# Minor | C, D, E, F, G, A, B, C | 2 1 2 2 1 2 2 |
+| A♭ Minor | C, D, E, F, G, A, B, C | 2 1 2 2 1 2 2 |
+| C Locrian | C, D, E, F, G, A, B, C | 1 2 2 1 2 2 2 |
+| F# Locrian | C, D, E, F, G, A, B, C | 1 2 2 1 2 2 2 |
+| A♭ Locrian | C, D, E, F, G, A, B, C | 1 2 2 1 2 2 2 |
+
+**Set Key & Movable Do**
+
 The *Set Key* block will change the key and mode of the mapping
 between solfege, e.g., `Do`, `Re`, `Mi`, to note names, e.g., `C`,
 `D`, `E`, when in C Major. Modes include Major and Minor, Chromatic,
@@ -1011,14 +1037,6 @@ contained blocks, e.g., violin or cello.
 
 ![alt
  tag](./transform10.svg "Set Key block")
-
-The *Set Key* block will change the key and mode of the mapping
-between solfege, e.g., `Do`, `Re`, `Mi`, to note names, e.g., `C`,
-`D`, `E`, when in C Major. Modes include Major and Minor, Chromatic,
-and a number of more exotic modes, such as Bebop, Geez, Maqam, etc.
-This block allows users to access "movable Do" within Music Blocks,
-where the mapping of solfege to particular pitch changes depending on
-the user's specified tonality.
 
 ![alt
  tag](./transform19.svg "Define mode block")
