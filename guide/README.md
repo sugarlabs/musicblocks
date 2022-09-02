@@ -465,9 +465,9 @@ It allows you to change both the mode and key of how solfege is mapped to the no
 
 **Standard Notation of Set Key**
 
-<img width="189" alt="image" src="https://user-images.githubusercontent.com/75945709/184471821-137fd558-2805-4a06-a961-6cbc1505f4be.png">
+![alt tag](./setkey.png "Standard Notation Set Key")
 
-[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1661845969838913&run=True)
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1662103714150464&run=True)
 
 The *Set Key* block will change the key and mode of the mapping
 between solfege, e.g., `Do`, `Re`, `Mi`, to note names, e.g., `C`,
