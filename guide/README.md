@@ -463,7 +463,6 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 The Set key block is used to set the key and mode, eg C Major. 
 It allows you to change both the mode and key of how solfege is mapped to the notes.
 
-**Standard Notation of Set Key**
 
 | Standard Notation for Set Key |
 | --- |
