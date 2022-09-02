@@ -470,6 +470,8 @@ It allows you to change both the mode and key of how solfege is mapped to the no
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1662103714150464&run=True)
 
+In set key , mode determines the pattern of notes and key determines where the pattern starts. In the following table it is shown how notes and modes pattern changes with changing value of set key value.
+
 | Set Key Value | Notes Pattern | Modes Pattern |
 | --- | --- | --- |
 | C Major | C, D, E, F, G, A, B, C | 2 2 1 2 2 2 1 |
