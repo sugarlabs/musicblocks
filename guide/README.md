@@ -465,7 +465,9 @@ It allows you to change both the mode and key of how solfege is mapped to the no
 
 **Standard Notation of Set Key**
 
-![alt tag](./setkey.png "Standard Notation Set Key")
+| Standard Notation for Scalar Transpose |
+| --- |
+| ![alt tag](./setkey.png "Standard Notation Set Key") |
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1662103714150464&run=True)
 
