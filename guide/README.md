@@ -460,13 +460,14 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 | Set Key Example |
 | --- |
 | ![set key](./setkey1.svg "set key example") |
-| The example above demonstrates traveling up and down the major
- scale by moving an octave up from the starting note,
- do, one note at a time and then back down the same way. |
 
 
 The *Set key* block is used to set the key and mode, e.g, C Major. 
 It is used to change both the mode and key of the current scale. (The current scale is used to define the mapping of Solfege to notes and also the number of half steps take by the the Scalar step block.
+
+The example above demonstrates traveling up and down the major
+ scale by moving an octave up from the starting note,
+ do, one note at a time and then back down the same way.
 
 
 | Standard Notation for Set Key Example |
