@@ -457,50 +457,62 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 
 #### <a name="Set Key"></a>3.2.5 Set Key
 
-![alt tag](./setkey1.svg "scalar transposition")
-
-
-The Set key block is used to set the key and mode, eg C Major. 
-It allows you to change both the mode and key of how solfege is mapped to the notes.
-
-
-| Standard Notation for Set Key |
+| Set Key Example |
 | --- |
-| ![alt tag](./setkey2.png "Standard Notation Set Key") |
+| ![set key](./setkey1.svg "set key example") |
+| The example above demonstrates traveling up and down the major
+ scale by moving an octave up from the starting note,
+ do, one note at a time and then back down the same way. |
+
+
+The *Set key* block is used to set the key and mode, e.g, C Major. 
+It is used to change both the mode and key of the current scale. (The current scale is used to define the mapping of Solfege to notes and also the number of half steps take by the the Scalar step block.
+
+
+| Standard Notation for Set Key Example |
+| --- |
+| ![set key notation](./setkey2.png "Standard Notation Set Key") |
+
+
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1662103714150464&run=True)
 
-In set key , mode determines the pattern of notes and key determines where the pattern starts. In the following table it is shown how notes and modes pattern changes with changing value of set key value.
+When using the *Set key* block, the mode argument is used to define the pattern of half steps and the key argument is used to define the starting position of the pattern. For example, when mode = "major" and key = "C", the pattern of half steps is 2 2 1 2 2 2 1 and the first note in the scale from which the pattern is applied is "C".
 
-| Set Key Value | Notes Pattern | Modes Pattern |
-| --- | --- | --- |
-| C Major | C, D, E, F, G, A, B, C | 2 2 1 2 2 2 1 |
-| F# Major | F#, G#, A#, B, C#, D#, F, F# | 2 2 1 2 2 2 1 |
-| A♭ Major | Ab, Bb, C, Db, Eb, F, G, Ab | 2 2 1 2 2 2 1 |
-| E Major | E, F#, G#, A, B, C#, D#, E | 2 2 1 2 2 2 1 |
-| A# Major | Bb, C, D, Eb, F, G, A, Bb | 2 2 1 2 2 2 1 |
-| --- | --- | --- |
-| C Dorian | C, D, Eb, F, G, A, Bb, C | 2 1 2 2 2 1 2 |
-| F# Dorian | F#, G#, A, B, C#, D#, E, F# | 2 1 2 2 2 1 2 |
-| A♭ Dorian | G#, A#, B, C#, D#, F, F#, G# | 2 1 2 2 2 1 2 |
-| E Dorian | E, F#, G, A, B, C#, D, E | 2 1 2 2 2 1 2 |
-| A# Dorian | Bb, C, Db, Eb, F, G, Ab, Bb | 2 1 2 2 2 1 2 |
-| --- | --- | --- |
-| C Phrygian | C, Db, Eb, F, G, Ab, Bb, C | 1 2 2 2 1 2 2 |
-| F# Phrygian | F#, G, A, B, C#, D, E, F# | 1 2 2 2 1 2 2 |
-| A♭ Phrygian | G#, A, B, C#, D#, E, F#, G# | 1 2 2 2 1 2 2 |
-| E Phrygian | E, F, G, A, B, C, D, E | 1 2 2 2 1 2 2 |
-| A# Phrygian | Bb, Cb, Db, Eb, F, Gb, Ab, Bb | 1 2 2 2 1 2 2 |
+Examples are shown in the following table.
+
+| Key | Mode | Notes Pattern | Modes Pattern |
+| --- | --- | --- | --- |
+| C | Major | C, D, E, F, G, A, B, C | 2 2 1 2 2 2 1 |
+| F# | Major | F#, G#, A#, B, C#, D#, F, F# | 2 2 1 2 2 2 1 |
+| A♭ | Major | Ab, Bb, C, Db, Eb, F, G, Ab | 2 2 1 2 2 2 1 |
+| E | Major | E, F#, G#, A, B, C#, D#, E | 2 2 1 2 2 2 1 |
+| A# | Major | Bb, C, D, Eb, F, G, A, Bb | 2 2 1 2 2 2 1 |
+| --- | --- | --- | --- |
+| C | Dorian | C, D, Eb, F, G, A, Bb, C | 2 1 2 2 2 1 2 |
+| F# | Dorian | F#, G#, A, B, C#, D#, E, F# | 2 1 2 2 2 1 2 |
+| A♭ | Dorian | G#, A#, B, C#, D#, F, F#, G# | 2 1 2 2 2 1 2 |
+| E | Dorian | E, F#, G, A, B, C#, D, E | 2 1 2 2 2 1 2 |
+| A# | Dorian | Bb, C, Db, Eb, F, G, Ab, Bb | 2 1 2 2 2 1 2 |
+| --- | --- | --- | --- |
+| C | Phrygian | C, Db, Eb, F, G, Ab, Bb, C | 1 2 2 2 1 2 2 |
+| F# | Phrygian | F#, G, A, B, C#, D, E, F# | 1 2 2 2 1 2 2 |
+| A♭ | Phrygian | G#, A, B, C#, D#, E, F#, G# | 1 2 2 2 1 2 2 |
+| E | Phrygian | E, F, G, A, B, C, D, E | 1 2 2 2 1 2 2 |
+| A# | Phrygian | Bb, Cb, Db, Eb, F, Gb, Ab, Bb | 1 2 2 2 1 2 2 |
+
+**Set Key & Scalar Step**
+
+The set key block helps us in selecting the scale and half-steps goes over all the scales
+while scalar step on the other hand will walk only through those nodes that are selected 
+for the representation of the music.
 
 **Set Key & Movable Do**
 
 The *Set Key* block will change the key and mode of the mapping
-between solfege, e.g., `Do`, `Re`, `Mi`, to note names, e.g., `C`,
-`D`, `E`, when in C Major. Modes include Major and Minor, Chromatic,
-and a number of more exotic modes, such as Bebop, Geez, Maqam, etc.
-This block allows users to access "movable Do" within Music Blocks,
-where the mapping of solfege to particular pitch changes depending on
-the user's specified tonality.
+between solfege, e.g., `Do`, `Re`, `Mi`, to note names, e.g., `F#`,
+`G#`, `A#`, when in F# Major.  It only impacts the mapping of solfege 
+when the *movable Do* block is set to True.
 
 You can find set key block in the left palette ->  Intervals and then can be used as shown in the above diagram.
 In this block to the right, we have two joining points for key {A, B, C, D, E, F, G} and mode {major, minor, lydian, etc.} which can be used to set the key and mode as per requirement.
@@ -1035,6 +1047,14 @@ contained blocks, e.g., violin or cello.
 
 ![alt
  tag](./transform10.svg "Set Key block")
+
+The *Set Key* block will change the key and mode of the mapping
+between solfege, e.g., `Do`, `Re`, `Mi`, to note names, e.g., `C`,
+`D`, `E`, when in C Major. Modes include Major and Minor, Chromatic,
+and a number of more exotic modes, such as Bebop, Geez, Maqam, etc.
+This block allows users to access "movable Do" within Music Blocks,
+where the mapping of solfege to particular pitch changes depending on
+the user's specified tonality.
 
 ![alt
  tag](./transform19.svg "Define mode block")
