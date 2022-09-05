@@ -463,7 +463,8 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 
 
 The *Set key* block is used to set the key and mode, e.g, C Major. 
-It is used to change both the mode and key of the current scale. (The current scale is used to define the mapping of Solfege to notes and also the number of half steps take by the the Scalar step block.
+It is used to change both the mode and key of the current scale. (The current scale is used to define the mapping of Solfege to notes and also the number of half steps take by the the *Scalar step* block.)
+When starting at C, the pattern of a Major mode steps past sharps and flats, consequently there are no sharps or flats in the example.
 
 The example above demonstrates traveling up and down the major
  scale by moving an octave up from the starting note,
@@ -482,31 +483,29 @@ When using the *Set key* block, the mode argument is used to define the pattern 
 
 Examples are shown in the following table.
 
-| Key | Mode | Notes Pattern | Modes Pattern |
+| Key | Mode | Modes Pattern | Notes Pattern |
 | --- | --- | --- | --- |
-| C | Major | C, D, E, F, G, A, B, C | 2 2 1 2 2 2 1 |
-| F# | Major | F#, G#, A#, B, C#, D#, F, F# | 2 2 1 2 2 2 1 |
-| A♭ | Major | Ab, Bb, C, Db, Eb, F, G, Ab | 2 2 1 2 2 2 1 |
-| E | Major | E, F#, G#, A, B, C#, D#, E | 2 2 1 2 2 2 1 |
-| A# | Major | Bb, C, D, Eb, F, G, A, Bb | 2 2 1 2 2 2 1 |
+| C | Major | 2 2 1 2 2 2 1 | C, D, E, F, G, A, B, C |
+| F# | Major | 2 2 1 2 2 2 1 | F#, G#, A#, B, C#, D#, F, F# |
+| A♭ | Major | 2 2 1 2 2 2 1 | Ab, Bb, C, Db, Eb, F, G, Ab |
+| E | Major | 2 2 1 2 2 2 1 | E, F#, G#, A, B, C#, D#, E |
+| A# | Major | 2 2 1 2 2 2 1 | Bb, C, D, Eb, F, G, A, Bb |
 | --- | --- | --- | --- |
-| C | Dorian | C, D, Eb, F, G, A, Bb, C | 2 1 2 2 2 1 2 |
-| F# | Dorian | F#, G#, A, B, C#, D#, E, F# | 2 1 2 2 2 1 2 |
-| A♭ | Dorian | G#, A#, B, C#, D#, F, F#, G# | 2 1 2 2 2 1 2 |
-| E | Dorian | E, F#, G, A, B, C#, D, E | 2 1 2 2 2 1 2 |
-| A# | Dorian | Bb, C, Db, Eb, F, G, Ab, Bb | 2 1 2 2 2 1 2 |
+| C | Dorian | 2 1 2 2 2 1 2 | C, D, Eb, F, G, A, Bb, C |
+| F# | Dorian | 2 1 2 2 2 1 2 | F#, G#, A, B, C#, D#, E, F# |
+| A♭ | Dorian | 2 1 2 2 2 1 2 | G#, A#, B, C#, D#, F, F#, G# |
+| E | Dorian | 2 1 2 2 2 1 2 | E, F#, G, A, B, C#, D, E |
+| A# | Dorian | 2 1 2 2 2 1 2 | Bb, C, Db, Eb, F, G, Ab, Bb |
 | --- | --- | --- | --- |
-| C | Phrygian | C, Db, Eb, F, G, Ab, Bb, C | 1 2 2 2 1 2 2 |
-| F# | Phrygian | F#, G, A, B, C#, D, E, F# | 1 2 2 2 1 2 2 |
-| A♭ | Phrygian | G#, A, B, C#, D#, E, F#, G# | 1 2 2 2 1 2 2 |
-| E | Phrygian | E, F, G, A, B, C, D, E | 1 2 2 2 1 2 2 |
-| A# | Phrygian | Bb, Cb, Db, Eb, F, Gb, Ab, Bb | 1 2 2 2 1 2 2 |
+| C | Phrygian | 1 2 2 2 1 2 2 | C, Db, Eb, F, G, Ab, Bb, C |
+| F# | Phrygian | 1 2 2 2 1 2 2 | F#, G, A, B, C#, D, E, F# |
+| A♭ | Phrygian | 1 2 2 2 1 2 2 | G#, A, B, C#, D#, E, F#, G# |
+| E | Phrygian | 1 2 2 2 1 2 2 | E, F, G, A, B, C, D, E |
+| A# | Phrygian | 1 2 2 2 1 2 2 | Bb, Cb, Db, Eb, F, Gb, Ab, Bb |
 
 **Set Key & Scalar Step**
 
-The set key block helps us in selecting the scale and half-steps goes over all the scales
-while scalar step on the other hand will walk only through those nodes that are selected 
-for the representation of the music.
+The *Set key* block is used to select a subset of notes in the given temperament. (By default, Music Blocks uses equal temperament 12. The key and mode determine which of these notes will be used.)
 
 **Set Key & Movable Do**
 
