@@ -30,17 +30,18 @@ also available.
       2. [Sharps and Flats](#SHARPS-AND-FLATS)
       3. [Adjusting Transposition](#ADJUST-TRANSPOSITION)
       4. [Summary of Pitch Movements](#PITCH-MOVEMENT)
-      5. [Fixed and Movable Pitch Systems](#FIXED-AND-MOVABLE-PITCH-SYSTEMS)
-      6. [Dotted Notes](#DOTTED)
-      7. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
-      8. [Repeating Notes](#REPETITION)
-      9. [Swinging Notes and Tied Notes](#SWINGING)
-      10. [Set Volume, Crescendo, Staccato, and Slur Blocks](#MORE-TRANSFORMATIONS)
-      11. [Intervals](#INTERVALS)
-      12. [Inversion](#INVERSION)
-      13. [Backwards](#BACKWARDS)
-      14. [Setting Voice and Keys](#SETTING)
-      15. [Vibrato, Tremelo, et al.](#VIBRATO)
+      5. [Set Key](#SET-KEY)
+      6. [Fixed and Movable Pitch Systems](#FIXED-AND-MOVABLE-PITCH-SYSTEMS)
+      7. [Dotted Notes](#DOTTED)
+      8. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
+      9. [Repeating Notes](#REPETITION)
+      10. [Swinging Notes and Tied Notes](#SWINGING)
+      11. [Set Volume, Crescendo, Staccato, and Slur Blocks](#MORE-TRANSFORMATIONS)
+      12. [Intervals](#INTERVALS)
+      13. [Inversion](#INVERSION)
+      14. [Backwards](#BACKWARDS)
+      15. [Setting Voice and Keys](#SETTING)
+      16. [Vibrato, Tremelo, et al.](#VIBRATO)
    3. [Voices](#VOICES)
    4. [Graphics](#GRAPHICS)
    5. [Beat](#BEAT)
@@ -413,7 +414,7 @@ The *Register* block provides an easy way to modify the register
 used to bump the `Mi 4` note up by one octave and then to bump the
 `Sol 4` note down by one octave.
 
-#### <a name="PITCH-MOVEMENT"></a>3.2.5 Summary of Pitch Movements
+#### <a name="PITCH-MOVEMENT"></a>3.2.4 Summary of Pitch Movements
 
 | Representation | Pitch Movement | Properties |
 | --- | --- | --- |
@@ -454,6 +455,74 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 | | | Scalar transposition can transform your original key to a new key by counting the notes between the keys. |
 | | | For example: Transposing C-D-E-F by 4 (fifth) will give us G-A-B-C
 | | | To transpose an octave: shift by the mode length (7 in major scales) up or down. |
+
+#### <a name="SET-KEY"></a>3.2.5 Set Key
+
+The *Set key* block is used to change both the mode and key of the
+current scale. (The current scale is used to define the mapping of
+Solfege to notes and also the number of half steps take by the the
+*Scalar step* block.) For example, by setting the key to C Major, the
+scale is defined by starting at C and applying the pattern of half
+steps defined by a Major mode. In this case, the pattern of steps
+skips past all of the sharps and flats. (On a piano, C Major is just
+the white keays).
+
+When using the *Set key* block, the mode argument is used to define
+the pattern of half steps and the key argument is used to define the
+starting position of the pattern. For example, when mode = "major" and
+key = "C", the pattern of half steps is 2 2 1 2 2 2 1 and the first
+note in the scale from which the pattern is applied is "C".
+
+| Set Key Example |
+| --- |
+| ![set key](./setkey1.svg "set key example") |
+
+Using the example above, one can modify the arguments to *Set key* in
+order to move up and down one octave in a scale. The example shows C
+Major scale, but it could be used for any combination of key and mode.
+
+| Standard Notation for Set Key Example |
+| --- |
+| ![set key notation](./setkey2.png "Standard Notation Set Key") |
+
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1662103714150464&run=True)
+
+Examples are shown in the following table.
+
+| Key | Mode | Modes Pattern | Notes Pattern |
+| --- | --- | --- | --- |
+| C | Major | 2 2 1 2 2 2 1 | C, D, E, F, G, A, B, C |
+| F# | Major | 2 2 1 2 2 2 1 | F#, G#, A#, B, C#, D#, F, F# |
+| A♭ | Major | 2 2 1 2 2 2 1 | Ab, Bb, C, Db, Eb, F, G, Ab |
+| E | Major | 2 2 1 2 2 2 1 | E, F#, G#, A, B, C#, D#, E |
+| A# | Major | 2 2 1 2 2 2 1 | Bb, C, D, Eb, F, G, A, Bb |
+| --- | --- | --- | --- |
+| C | Dorian | 2 1 2 2 2 1 2 | C, D, Eb, F, G, A, Bb, C |
+| F# | Dorian | 2 1 2 2 2 1 2 | F#, G#, A, B, C#, D#, E, F# |
+| A♭ | Dorian | 2 1 2 2 2 1 2 | G#, A#, B, C#, D#, F, F#, G# |
+| E | Dorian | 2 1 2 2 2 1 2 | E, F#, G, A, B, C#, D, E |
+| A# | Dorian | 2 1 2 2 2 1 2 | Bb, C, Db, Eb, F, G, Ab, Bb |
+| --- | --- | --- | --- |
+| C | Phrygian | 1 2 2 2 1 2 2 | C, Db, Eb, F, G, Ab, Bb, C |
+| F# | Phrygian | 1 2 2 2 1 2 2 | F#, G, A, B, C#, D, E, F# |
+| A♭ | Phrygian | 1 2 2 2 1 2 2 | G#, A, B, C#, D#, E, F#, G# |
+| E | Phrygian | 1 2 2 2 1 2 2 | E, F, G, A, B, C, D, E |
+| A# | Phrygian | 1 2 2 2 1 2 2 | Bb, Cb, Db, Eb, F, Gb, Ab, Bb |
+
+**Set Key & Scalar Step**
+
+The *Set key* block is used to select a subset of notes in the given
+temperament. (By default, Music Blocks uses equal temperament 12. The
+key and mode determine which of these notes will be used.)
+
+**Set Key & Movable Do**
+
+The *Set Key* block will change the key and mode of the mapping
+between solfege, e.g., `Do`, `Re`, `Mi`, to note names, e.g., `F#`,
+`G#`, `A#`, when in F# Major.  It only impacts the mapping of solfege 
+when the *movable Do* block is set to True.
+
+You can find the *Set key* block on the *Intervals* palette.
 
 | Music Blocks for Set Key and Movable Do | 
 | --- |
@@ -503,7 +572,7 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 | --- |
 | ![alt tag](./pitchmovement6.png "moveable do") |
 
-#### <a name="FIXED-AND-MOVABLE-PITCH-SYSTEMS"></a>3.2.5 Pitch Systems: Fixed and Movable and Subsystems
+#### <a name="FIXED-AND-MOVABLE-PITCH-SYSTEMS"></a>3.2.6 Pitch Systems: Fixed and Movable and Subsystems
 
 Music Blocks allows users to express and explore musical ideas in a
 variety of different systems. The main systems of expression are fixed
@@ -662,7 +731,7 @@ block.
 [Scale Degree Improv]
 (https://rawgit.com/sugarlabs/musicblocks/master/examples/Scale-Degree-Improv.html)
 
-#### <a name="DOTTED"></a>3.2.6 Dotted Notes
+#### <a name="DOTTED"></a>3.2.7 Dotted Notes
 
 ![alt 
  tag](./transform4.svg "Creating dotted notes using the Dot block")
@@ -689,7 +758,7 @@ calculation into a note's note value.
 ![alt
   tag](../charts/DotsChart.svg "using dotted notes")
 
-#### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.7 Changing Note(s) duration via Mathematical Operations
+#### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.8 Changing Note(s) duration via Mathematical Operations
 
 ![alt
  tag](./transform5.svg "Changing note duration for a note or notes")
@@ -709,7 +778,7 @@ decreased over time, at each repetition.
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
 
-#### <a name="REPETITION"></a>3.2.8 Repeating Notes
+#### <a name="REPETITION"></a>3.2.9 Repeating Notes
 
 ![alt
   tag](./transform6.svg "repeating notes")
@@ -722,7 +791,7 @@ In the example, on the left, the result would be `Sol, Re, Sol, Sol,
 Re, Sol, Sol, Re, Sol, Sol, Re, Sol`; on the right the result would be
 `Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol`.
 
-#### <a name="SWINGING"></a>3.2.9 Swinging Notes and Tied Notes
+#### <a name="SWINGING"></a>3.2.10 Swinging Notes and Tied Notes
 
 ![alt 
  tag](./transform7.svg "swinging notes and tied notes")
@@ -743,7 +812,7 @@ notes must be identical in pitch, but can vary in rhythm.)
 ![alt
  tag](../charts/TiesChart.svg "using notes with ties")
 
-#### <a name="MORE-TRANSFORMATIONS"></a>3.2.10 Set Volume, Crescendo, Staccato, and Slur
+#### <a name="MORE-TRANSFORMATIONS"></a>3.2.11 Set Volume, Crescendo, Staccato, and Slur
 
 ![alt 
  tag](./transform8.svg "Set master volume, set synth volume, set relative volume, crescendo")
@@ -786,7 +855,7 @@ The *Slur* block lengthens the sustain of notes&mdash;running longer than
 the noted duration and blending it into the next note&mdash;while
 maintaining the specified rhythmic value of the notes.
 
-#### <a name="INTERVALS"></a>3.2.11 Intervals
+#### <a name="INTERVALS"></a>3.2.12 Intervals
 
 ![alt 
  tag](./transform9.svg "Scalar interval block")
@@ -852,7 +921,7 @@ We support many basic chords:
 | minor 7 | 1 3 7 10 | Cmin7 C - Eb - G - Bb |
 | major 7 | 1 4 7 11 | Cmaj7 C - E - G - B |
 
-#### <a name= "INVERSION"></a>3.2.12 Inversion
+#### <a name= "INVERSION"></a>3.2.13 Inversion
 
 The *Invert* block will rotate a series of notes around a target
 note. There are three different modes of the *Invert* block: *even*,
@@ -956,7 +1025,7 @@ midway between `C5` and `C♯5`.  In the *invert (scalar)* example,
 notes are inverted around `C5`, by scalar steps rather than
 half-steps.
 
-#### <a name="BACKWARDS"></a>3.2.13 Backwards
+#### <a name="BACKWARDS"></a>3.2.14 Backwards
 
 ![alt
  tag](./transform11.svg "Backward block")
@@ -975,7 +1044,7 @@ Note that all of the blocks inside a *Backward* block are reverse, so
 use this feature with caution if you include logic intermixed with
 notes.
 
-#### <a name= "SETTING"></a>3.2.14 Setting Voice and Keys
+#### <a name= "SETTING"></a>3.2.15 Setting Voice and Keys
 
 ![alt
  tag](./transform12.svg "setting voice and keys using Set Voice block")
@@ -1001,7 +1070,7 @@ The *Define mode* block can be used to define a custom mode by
 defining the number and size of the steps within an octave. You can
 use your custom mode with the *Set key* block.
 
-#### <a name="VIBRATO"></a>3.2.15 Vibrato, Tremelo, et al.
+#### <a name="VIBRATO"></a>3.2.16 Vibrato, Tremelo, et al.
 
 ![alt
  tag](./transform15.svg "Vibrato, tremelo, chorus, distortion, neighbor, and phaser blocks")
