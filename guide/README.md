@@ -465,7 +465,7 @@ Solfege to notes and also the number of half steps take by the the
 scale is defined by starting at C and applying the pattern of half
 steps defined by a Major mode. In this case, the pattern of steps
 skips past all of the sharps and flats. (On a piano, C Major is just
-the white keays).
+the white keys).
 
 When using the *Set key* block, the mode argument is used to define
 the pattern of half steps and the key argument is used to define the
