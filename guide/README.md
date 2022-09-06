@@ -478,8 +478,9 @@ note in the scale from which the pattern is applied is "C".
 | ![set key](./setkey1.svg "set key example") |
 
 Using the example above, one can modify the arguments to *Set key* in
-order to move up and down one octave in a scale. The example shows C
-Major scale, but it could be used for any combination of key and mode.
+order to move up and down one octave in a scale. The example shows G
+Major scale, which has an F#, but it could be used for any combination
+of key and mode.
 
 | Standard Notation for Set Key Example |
 | --- |
