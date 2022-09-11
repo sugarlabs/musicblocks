@@ -460,9 +460,9 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 
 The *Set key* block is used to change both the mode and key of the
 current scale. (The current scale is used to define the mapping of
-Solfege to notes and also the number of half steps take by the the
+Solfege [when set Movable Do = True] to notes and also the number of half steps take by the the
 *Scalar step* block.) For example, by setting the key to C Major, the
-scale is defined by starting at C and applying the pattern of half
+scale is defined by starting at C (or Do) and applying the pattern of half
 steps defined by a Major mode. In this case, the pattern of steps
 skips past all of the sharps and flats. (On a piano, C Major is just
 the white keys).
@@ -488,33 +488,60 @@ of key and mode.
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1662103714150464&run=True)
 
-Examples are shown in the following table.
+Various examples for Major modes are shown in the following table.
 
-| Key | Mode | Modes Pattern | Notes Pattern |
+| Key | Mode | Mode Pattern in Half Steps | Pitch Pattern |
 | --- | --- | --- | --- |
-| C | Major | 2 2 1 2 2 2 1 | C, D, E, F, G, A, B, C |
-| F# | Major | 2 2 1 2 2 2 1 | F#, G#, A#, B, C#, D#, F, F# |
-| A♭ | Major | 2 2 1 2 2 2 1 | Ab, Bb, C, Db, Eb, F, G, Ab |
-| E | Major | 2 2 1 2 2 2 1 | E, F#, G#, A, B, C#, D#, E |
-| A# | Major | 2 2 1 2 2 2 1 | Bb, C, D, Eb, F, G, A, Bb |
+| C  | Major | 2 2 1 2 2 2 1 | C, D, E, F, G, A, B, C |
+| G  | Major | 2 2 1 2 2 2 1 | G, A, B, C, D, E, F#, G |
+| D  | Major | 2 2 1 2 2 2 1 | D, E, F#, G, A, B, C#, D |
+| F  | Major | 2 2 1 2 2 2 1 | F, G, A, B♭, C, D, E, F |
+| B♭ | Major | 2 2 1 2 2 2 1 | B♭, C, D, E♭, F, G, A, B♭ |
+
+The next table is the same sets of various keys (starting pitches),
+but the mode is set to "Dorian" instead of Major.
+
+| Key | Mode | Mode Pattern in Half Steps | Pitch Pattern |
 | --- | --- | --- | --- |
-| C | Dorian | 2 1 2 2 2 1 2 | C, D, Eb, F, G, A, Bb, C |
-| F# | Dorian | 2 1 2 2 2 1 2 | F#, G#, A, B, C#, D#, E, F# |
-| A♭ | Dorian | 2 1 2 2 2 1 2 | G#, A#, B, C#, D#, F, F#, G# |
-| E | Dorian | 2 1 2 2 2 1 2 | E, F#, G, A, B, C#, D, E |
-| A# | Dorian | 2 1 2 2 2 1 2 | Bb, C, Db, Eb, F, G, Ab, Bb |
+| C  | Dorian | 2 1 2 2 2 1 2 | C, D, E♭, F, G, A, B♭, C |
+| G  | Dorian | 2 1 2 2 2 1 2 | G, A, B♭, C, D, E, F, G |
+| D  | Dorian | 2 1 2 2 2 1 2 | D, E, F, G, A, B, C, D |
+| F  | Dorian | 2 1 2 2 2 1 2 | F, G, A♭, B♭, C, D, E♭, F |
+| B♭ | Dorian | 2 1 2 2 2 1 2 | B♭, C, D♭, E♭, F, G, A♭, B♭ |
+
+This last table is the same set of keys as the above two tables, but
+the mode is set to "Phrygian".
+
+| Key | Mode | Mode Pattern in Half Steps | Pitch Pattern |
 | --- | --- | --- | --- |
-| C | Phrygian | 1 2 2 2 1 2 2 | C, Db, Eb, F, G, Ab, Bb, C |
-| F# | Phrygian | 1 2 2 2 1 2 2 | F#, G, A, B, C#, D, E, F# |
-| A♭ | Phrygian | 1 2 2 2 1 2 2 | G#, A, B, C#, D#, E, F#, G# |
-| E | Phrygian | 1 2 2 2 1 2 2 | E, F, G, A, B, C, D, E |
-| A# | Phrygian | 1 2 2 2 1 2 2 | Bb, Cb, Db, Eb, F, Gb, Ab, Bb |
+| C  | Phrygian | 1 2 2 2 1 2 2 | C, D♭, E♭, F, G, A♭, B♭, C |
+| G  | Phrygian | 1 2 2 2 1 2 2 | G, A♭, B♭, C, D, E♭, F, G |
+| D  | Phrygian | 1 2 2 2 1 2 2 | D, E♭, F, G, A, B♭, C, D |
+| F  | Phrygian | 1 2 2 2 1 2 2 | F, G♭, A♭, B♭, C, D♭, E♭, F |
+| B♭ | Phrygian | 1 2 2 2 1 2 2 | B♭, C♭, D♭, E♭, F, G♭, A♭, B♭ |
+
+Notice how in all the examples, the sets with the same mode results in
+the same "Mode Pattern of Half Steps", but the resultant "Pitch
+Pattern" is different. Also, notice how G Dorian and F Major have the
+same set of pitches in "Pitch Pattern" (they both have B♭ and no other
+sharps or flats). C Dorian, D Phrygian, and B♭ Major all have the same
+set of pitches as well (all three have B♭ and E♭).
+
+If these lists were expanded further, there would be many more such
+examples. These are because these modes (Major, Dorian, and Phrygian)
+all have essentially the same modal pattern; the starting point is
+just shifted slightly for each: Dorian could be thought of starting
+from the second scale degree of Major and Phrygian from the third, for
+example. Not all modes have this relationship to Major. The ones that
+do are: Ionian (Major), Dorian, Phrygian, Lydian, Myxolydian, Aeolian
+(Minor), and Locrian.
 
 **Set Key & Scalar Step**
 
 The *Set key* block is used to select a subset of notes in the given
-temperament. (By default, Music Blocks uses equal temperament 12. The
-key and mode determine which of these notes will be used.)
+temperament. (By default, Music Blocks uses equal temperament of 12
+equal divisions of the octave. The key and mode determine which of
+these notes will be used.)
 
 **Set Key & Movable Do**
 
@@ -599,7 +626,7 @@ of the context.
 An example of a movable system is Scale Degree. Pitches are expressed
 as `1`, `2`, `3`, `4`, `5`, `6`, and `7`. For C major, these pitches
 are `C`, `D`, `E`, `F`, `G`, `A`, and `B`. For G (natural) minor,
-these pitches are `G`, `A`, `Bb`, `C`, `D`, `Eb`, and `F`. For D
+these pitches are `G`, `A`, `B♭`, `C`, `D`, `E♭`, and `F`. For D
 dorian, these pitches are `D`, `E`, `F`, `G`, `A`, `B`, and `C`. In
 all three examples, the pitches are determined by the tonal context.
 
@@ -917,9 +944,9 @@ We support many basic chords:
 | chord | intervals | example |
 | :---: | :-------: | :-----: |
 | major | 1 4 7 | C major C - E - G |
-| minor | 1 3 7 | C minor C - Eb - G |
-| dominant 7 | 1 4 7 10 | C7 C - E - G - Bb |
-| minor 7 | 1 3 7 10 | Cmin7 C - Eb - G - Bb |
+| minor | 1 3 7 | C minor C - E♭ - G |
+| dominant 7 | 1 4 7 10 | C7 C - E - G - B♭ |
+| minor 7 | 1 3 7 10 | Cmin7 C - E♭ - G - B♭ |
 | major 7 | 1 4 7 11 | Cmaj7 C - E - G - B |
 
 #### <a name= "INVERSION"></a>3.2.13 Inversion
