@@ -495,37 +495,37 @@ Various examples for Major modes are shown in the following table.
 | C  | Major | 2 2 1 2 2 2 1 | C, D, E, F, G, A, B, C |
 | G  | Major | 2 2 1 2 2 2 1 | G, A, B, C, D, E, F#, G |
 | D  | Major | 2 2 1 2 2 2 1 | D, E, F#, G, A, B, C#, D |
-| F  | Major | 2 2 1 2 2 2 1 | F, G, A, Bb, C, D, E, F |
-| Bb | Major | 2 2 1 2 2 2 1 | Bb, C, D, Eb, F, G, A, Bb |
+| F  | Major | 2 2 1 2 2 2 1 | F, G, A, B♭, C, D, E, F |
+| B♭ | Major | 2 2 1 2 2 2 1 | B♭, C, D, E♭, F, G, A, B♭ |
 
 The next table is the same sets of various keys (starting pitches),
 but the mode is set to "Dorian" instead of Major.
 
 | Key | Mode | Mode Pattern in Half Steps | Pitch Pattern |
 | --- | --- | --- | --- |
-| C  | Dorian | 2 1 2 2 2 1 2 | C, D, Eb, F, G, A, Bb, C |
-| G  | Dorian | 2 1 2 2 2 1 2 | G, A, Bb, C, D, E, F, G |
+| C  | Dorian | 2 1 2 2 2 1 2 | C, D, E♭, F, G, A, B♭, C |
+| G  | Dorian | 2 1 2 2 2 1 2 | G, A, B♭, C, D, E, F, G |
 | D  | Dorian | 2 1 2 2 2 1 2 | D, E, F, G, A, B, C, D |
-| F  | Dorian | 2 1 2 2 2 1 2 | F, G, Ab, Bb, C, D, Eb, F |
-| Bb | Dorian | 2 1 2 2 2 1 2 | Bb, C, Db, Eb, F, G, Ab, Bb |
+| F  | Dorian | 2 1 2 2 2 1 2 | F, G, A♭, B♭, C, D, E♭, F |
+| B♭ | Dorian | 2 1 2 2 2 1 2 | B♭, C, D♭, E♭, F, G, A♭, B♭ |
 
 This last table is the same set of keys as the above two tables, but
 the mode is set to "Phrygian".
 
 | Key | Mode | Mode Pattern in Half Steps | Pitch Pattern |
 | --- | --- | --- | --- |
-| C  | Phrygian | 1 2 2 2 1 2 2 | C, Db, Eb, F, G, Ab, Bb, C |
-| G  | Phrygian | 1 2 2 2 1 2 2 | G, Ab, Bb, C, D, Eb, F, G |
-| D  | Phrygian | 1 2 2 2 1 2 2 | D, Eb, F, G, A, Bb, C, D |
-| F  | Phrygian | 1 2 2 2 1 2 2 | F, Gb, Ab, Bb, C, Db, Eb, F |
-| Bb | Phrygian | 1 2 2 2 1 2 2 | Bb, Cb, Db, Eb, F, Gb, Ab, Bb |
+| C  | Phrygian | 1 2 2 2 1 2 2 | C, D♭, E♭, F, G, A♭, B♭, C |
+| G  | Phrygian | 1 2 2 2 1 2 2 | G, A♭, B♭, C, D, E♭, F, G |
+| D  | Phrygian | 1 2 2 2 1 2 2 | D, E♭, F, G, A, B♭, C, D |
+| F  | Phrygian | 1 2 2 2 1 2 2 | F, G♭, A♭, B♭, C, D♭, E♭, F |
+| B♭ | Phrygian | 1 2 2 2 1 2 2 | B♭, C♭, D♭, E♭, F, G♭, A♭, B♭ |
 
 Notice how in all the examples, the sets with the same mode results in
 the same "Mode Pattern of Half Steps", but the resultant "Pitch
 Pattern" is different. Also, notice how G Dorian and F Major have the
-same set of pitches in "Pitch Pattern" (they both have Bb and no other
-sharps or flats). C Dorian, D Phrygian, and Bb Major all have the same
-set of pitches as well (all three have Bb and Eb).
+same set of pitches in "Pitch Pattern" (they both have B♭ and no other
+sharps or flats). C Dorian, D Phrygian, and B♭ Major all have the same
+set of pitches as well (all three have B♭ and E♭).
 
 If these lists were expanded further, there would be many more such
 examples. These are because these modes (Major, Dorian, and Phrygian)
@@ -539,8 +539,9 @@ do are: Ionian (Major), Dorian, Phrygian, Lydian, Myxolydian, Aeolian
 **Set Key & Scalar Step**
 
 The *Set key* block is used to select a subset of notes in the given
-temperament. (By default, Music Blocks uses equal temperament of 12 equal divisions of the octave. The
-key and mode determine which of these notes will be used.)
+temperament. (By default, Music Blocks uses equal temperament of 12
+equal divisions of the octave. The key and mode determine which of
+these notes will be used.)
 
 **Set Key & Movable Do**
 
@@ -625,7 +626,7 @@ of the context.
 An example of a movable system is Scale Degree. Pitches are expressed
 as `1`, `2`, `3`, `4`, `5`, `6`, and `7`. For C major, these pitches
 are `C`, `D`, `E`, `F`, `G`, `A`, and `B`. For G (natural) minor,
-these pitches are `G`, `A`, `Bb`, `C`, `D`, `Eb`, and `F`. For D
+these pitches are `G`, `A`, `B♭`, `C`, `D`, `E♭`, and `F`. For D
 dorian, these pitches are `D`, `E`, `F`, `G`, `A`, `B`, and `C`. In
 all three examples, the pitches are determined by the tonal context.
 
@@ -943,9 +944,9 @@ We support many basic chords:
 | chord | intervals | example |
 | :---: | :-------: | :-----: |
 | major | 1 4 7 | C major C - E - G |
-| minor | 1 3 7 | C minor C - Eb - G |
-| dominant 7 | 1 4 7 10 | C7 C - E - G - Bb |
-| minor 7 | 1 3 7 10 | Cmin7 C - Eb - G - Bb |
+| minor | 1 3 7 | C minor C - E♭ - G |
+| dominant 7 | 1 4 7 10 | C7 C - E - G - B♭ |
+| minor 7 | 1 3 7 10 | Cmin7 C - E♭ - G - B♭ |
 | major 7 | 1 4 7 11 | Cmaj7 C - E - G - B |
 
 #### <a name= "INVERSION"></a>3.2.13 Inversion
