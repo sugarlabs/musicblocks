@@ -164,7 +164,7 @@ function setupActionBlocks(activity) {
             });
         }
 
-        flow(args, logo, turtle, blk, receivedArg) {
+        arg(logo, turtle, blk, receivedArg) {
             const name = activity.blocks.blockList[blk].privateData;
             let actionArgs = [];
 
