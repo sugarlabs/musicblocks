@@ -17,7 +17,7 @@
  * Private members' names begin with underscore '_".
  */
 
-/* global JSEditor, SHARP, FLAT, NATURAL, DOUBLESHARP, DOUBLEFLAT */
+/* global JSEditor, SHARP, FLAT, NATURAL, DOUBLESHARP, DOUBLEFLAT, DEFAULTVOICE */
 
 /* exported JSInterface */
 
@@ -550,9 +550,9 @@ class JSInterface {
                             arg = arg.toLowerCase();
                         } else {
                             JSEditor.logConsole(
-                                `${arg} in "${methodName}" reset to ${"electronic synth"}`
+                                `${arg} in "${methodName}" reset to ${DEFAULTVOICE}`
                             );
-                            arg = "electronic synth";
+                            arg = DEFAULTVOICE;
                         }
                     } else if (props["constraints"]["type"] === "drum") {
                         const drums = [

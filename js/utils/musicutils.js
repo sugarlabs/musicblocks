@@ -52,7 +52,7 @@
   convertFactor, getOctaveRatio, setOctaveRatio, getTemperamentsList,
   addTemperamentToList, getTemperament, deleteTemperamentFromList,
   addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
-  DEFAULTCHORD
+  DEFAULTCHORD, DEFAULTVOICE
 */
 
 // Scalable sinewave graphic

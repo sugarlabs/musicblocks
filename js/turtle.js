@@ -20,7 +20,8 @@
 /*
    globals
 
-   createjs, DEFAULTVOLUME, delayExecution, importMembers, Painter, Singer, 
+   createjs, DEFAULTVOLUME, delayExecution, importMembers, Painter, Singer,
+   DEFAULTVOICE
  */
 /* exported Turtle */
 /**
@@ -238,10 +239,10 @@ class Turtle {
         this.singer.inDuplicate = false;
         this.singer.skipFactor = 1;
         this.singer.skipIndex = 0;
-        this.singer.instrumentNames = ["electronic synth"];
+        this.singer.instrumentNames = [DEFAULTVOICE];
         this.singer.inCrescendo = [];
         this.singer.crescendoDelta = [];
-        this.singer.crescendoInitialVolume = { "electronic synth": [DEFAULTVOLUME] };
+        this.singer.crescendoInitialVolume = { DEFAULTVOICE: [DEFAULTVOLUME] };
         this.singer.intervals = [];
         this.singer.semitoneIntervals = [];
         this.singer.staccato = [];

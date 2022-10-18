@@ -18,7 +18,7 @@
    instrumentsEffects, Singer, Tone, CAMERAVALUE, doUseCamera,
    VIDEOVALUE, last, getIntervalDirection, getIntervalNumber,
    mixedNumber, rationalToFraction, doStopVideoCam, StatusMatrix,
-   getStatsFromNotation, delayExecution
+   getStatsFromNotation, delayExecution, DEFAULTVOICE
 */
 
 /*
@@ -332,7 +332,7 @@ class Logo {
             }
 
             // Make sure there is a default synth for each turtle
-            if (!("electronic synth" in instruments[turtle])) {
+            if (!(DEFAULTVOICE in instruments[turtle])) {
                 this.synth.createDefaultSynth(turtle);
             }
 
@@ -361,6 +361,7 @@ class Logo {
                 "noise2": [DEFAULTVOLUME],
                 "noise3": [DEFAULTVOLUME]
             };
+	    tur.singer.synthVolume[DEFAULTVOICE] = [DEFAULTVOLUME];
         }
 
         Singer.setMasterVolume(this, DEFAULTVOLUME);
@@ -378,7 +379,7 @@ class Logo {
      * @returns {void}
      */
     resetSynth(turtle) {
-        if (!("electronic synth" in instruments[turtle])) {
+        if (!(DEFAULTVOICE in instruments[turtle])) {
             this.synth.createDefaultSynth(turtle);
         }
 

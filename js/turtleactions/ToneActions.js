@@ -20,7 +20,7 @@
    global
 
    _, Singer, VOICENAMES, MusicBlocks, Mouse, last, instrumentsEffects,
-   NOINPUTERRORMSG, CUSTOMSAMPLES
+   NOINPUTERRORMSG, CUSTOMSAMPLES, DEFAULTVOICE
 */
 
 /*
@@ -76,12 +76,12 @@ function setupToneActions(activity) {
                     synth = "customsample_" + instrument[0];
                     CUSTOMSAMPLES[synth] = [instrument[1], instrument[2], instrument[3]];
                 } else {
-                    synth = "electronic synth";
+                    synth = DEFAULTVOICE;
                 }
             }
 
             if (synth === undefined || synth === null) {
-                synth = "electronic synth";
+                synth = DEFAULTVOICE;
             }
 
             if (activity.logo.inMatrix) {
@@ -94,13 +94,13 @@ function setupToneActions(activity) {
 
                 if (tur.singer.synthVolume[synth] === undefined) {
                     // The electronic synthvolume will track any
-                    // changes to the mater volume, e.g., the
+                    // changes to the master volume, e.g., the
                     // articulation block.
                     tur.singer.synthVolume[synth] = [
-                        last(tur.singer.synthVolume["electronic synth"])
+                        last(tur.singer.synthVolume[DEFAULTVOICE])
                     ];
                     tur.singer.crescendoInitialVolume[synth] = [
-                        last(tur.singer.synthVolume["electronic synth"])
+                        last(tur.singer.synthVolume[DEFAULTVOICE])
                     ];
                 }
             }

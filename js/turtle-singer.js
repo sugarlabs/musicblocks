@@ -22,7 +22,7 @@
    pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp,
    getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
-   getInterval, instrumentsEffects, instrumentsFilters, _,
+   getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
    noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction
  */
 
@@ -129,7 +129,7 @@ class Singer {
         this.instrumentNames = [];
         this.inCrescendo = [];
         this.crescendoDelta = [];
-        this.crescendoInitialVolume = { "electronic synth": [DEFAULTVOLUME] };
+        this.crescendoInitialVolume = { DEFAULTVOICE: [DEFAULTVOLUME] };
         this.intervals = []; // relative interval (based on scale degree)
         this.semitoneIntervals = []; // absolute interval (based on semitones)
         this.staccato = [];
@@ -1254,14 +1254,14 @@ class Singer {
                 Singer.setSynthVolume(
                     activity.logo,
                     turtle,
-                    "electronic synth",
+                    DEFAULTVOICE,
                     last(tur.singer.synthVolume[synth])
                 );
             }
         } else if (tur.singer.crescendoDelta.length > 0) {
             if (
-                last(tur.singer.synthVolume["electronic synth"]) ===
-                    last(tur.singer.crescendoInitialVolume["electronic synth"]) &&
+                last(tur.singer.synthVolume[DEFAULTVOICE]) ===
+                    last(tur.singer.crescendoInitialVolume[DEFAULTVOICE]) &&
                 tur.singer.justCounting.length === 0
             ) {
                 activity.logo.notation.notationBeginCrescendo(
@@ -2032,7 +2032,7 @@ class Singer {
                                                     turtle,
                                                     notes[d],
                                                     beatValue,
-                                                    "electronic synth",
+                                                    DEFAULTVOICE,
                                                     paramsEffects,
                                                     null,
                                                     false
