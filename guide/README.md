@@ -1077,8 +1077,20 @@ notes.
 ![alt
  tag](./transform12.svg "setting voice and keys using Set Voice block")
 
-The *Set Voice* block selects a [voice](#VOICES) for the synthesizer for any
-contained blocks, e.g., violin or cello.
+The default instrument is an electronic synthesizer, so by default,
+that is the used when playing notes. You can override the default for
+a group of notes by using the *Set Instrument* block. It will select a
+[voice](#VOICES) for the synthesizer for any contained blocks, e.g.,
+violin or cello.
+
+![alt
+ tag](../documentation/setdefaultinstrument_block.svg "Set Default Instrument")
+
+You can also override the default using the *Set default instrument*
+block. In the example above, the default instrument is set to piano,
+so any note that is not inside of a *Set instrument* block will be
+played using the piano synthesizer. The first note in this example is
+piano; the second note is guitar; and the thrid is piano.
 
 ![alt
  tag](./transform10.svg "Set Key block")
