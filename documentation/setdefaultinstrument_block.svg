@@ -895,22 +895,4 @@
            id="tspan450">4</tspan></text>
     </g>
   </g>
-  <g
-     transform="translate(226,81.421537)"
-     id="g466">
-    <g
-       transform="scale(1.5)"
-       id="g464">
-      <path
-         d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-         style="fill:#ff664b;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path458" />
-      <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
-         id="text462"><tspan
-           x="13"
-           y="14"
-           id="tspan460">text</tspan></text>
-    </g>
-  </g>
 </svg>
