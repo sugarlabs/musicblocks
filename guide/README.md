@@ -1072,16 +1072,16 @@ Note that all of the blocks inside a *Backward* block are reverse, so
 use this feature with caution if you include logic intermixed with
 notes.
 
-#### <a name= "SETTING"></a>3.2.15 Setting Voice and Keys
+#### <a name= "SETTING"></a>3.2.15 Setting Instrument and Keys
 
 ![alt
  tag](./transform12.svg "setting voice and keys using Set Voice block")
 
 The default instrument is an electronic synthesizer, so by default,
-that is the used when playing notes. You can override the default for
-a group of notes by using the *Set Instrument* block. It will select a
-[voice](#VOICES) for the synthesizer for any contained blocks, e.g.,
-violin or cello.
+that is the instrument used when playing notes. You can override this
+default for a group of notes by using the *Set Instrument* block. It
+will select a [voice](#VOICES) for the synthesizer for any contained
+blocks, e.g., violin.
 
 ![alt
  tag](../documentation/setdefaultinstrument_block.svg "Set Default Instrument")
