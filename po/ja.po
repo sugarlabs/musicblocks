@@ -5380,6 +5380,12 @@ msgstr "音色をせってい"
 msgid "The Set instrument block selects a voice for the synthesizer,"
 msgstr "<h2>音色をせっていブロック</h2><br>中に入っている「音符（おんぷ）ブロック」の音色を設定する。音色は、ギターやピアノなどの中から選ぶことができる。<br><br> "
 
+msgid "set default instrument"
+msgstr "音色標準を設定"
+
+msgid "The set default instrument block changes the default instrument from electronic synth to the instrument of your choice."
+msgstr "「音色標準を設定」ブロックは音色のデフォルトを「シンセサイザー」からお好みの楽器に設定します。"
+
 #: js/ToneBlocks.js:590
 #: js/ToneBlocks.js:615
 msgid "eg guitar piano violin or cello."

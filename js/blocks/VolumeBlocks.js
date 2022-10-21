@@ -238,7 +238,7 @@ function setupVolumeBlocks(activity) {
             let arg0, arg1;
             if (args[0] === null || typeof args[0] !== "string") {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = "electronic synth";
+                arg0 = DEFAULTVOICE;
             } else {
                 arg0 = args[0];
             }
@@ -262,8 +262,8 @@ function setupVolumeBlocks(activity) {
 
             let synth = null;
 
-            if (arg0 === "electronic synth" || arg0 === _("electronic synth")) {
-                synth = "electronic synth";
+            if (arg0 === DEFAULTVOICE || arg0 === _(DEFAULTVOICE)) {
+                synth = DEFAULTVOICE;
             } else if (arg0 === "custom" || args[0] === _("custom")) {
                 synth = "custom";
             }
@@ -294,7 +294,7 @@ function setupVolumeBlocks(activity) {
 
             if (synth === null) {
                 activity.errorMsg(_("Synth not found"), blk);
-                synth = "electronic synth";
+                synth = DEFAULTVOICE;
             }
 
             const tur = activity.turtles.ithTurtle(turtle);
@@ -391,7 +391,7 @@ function setupVolumeBlocks(activity) {
             let arg0 = args[0];
             if (arg0 === null || typeof arg0 !== "string") {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
-                arg0 = "electronic synth";
+                arg0 = DEFAULTVOICE;
             }
 
             let arg1;

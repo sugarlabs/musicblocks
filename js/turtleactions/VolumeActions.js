@@ -18,7 +18,7 @@
 
 /*
    global _, Singer, MusicBlocks, Mouse, last, VOICENAMES, DRUMNAMES,
-   Tone, instruments, DEFAULTVOLUME
+   Tone, instruments, DEFAULTVOLUME, DEFAULTVOICE
 */
 
 /*
@@ -213,8 +213,8 @@ function setupVolumeActions(activity) {
         static setSynthVolume(synthname, volume, turtle) {
             let synth = null;
 
-            if (synthname === "electronic synth" || synthname === _("electronic synth")) {
-                synth = "electronic synth";
+            if (synthname === DEFAULTVOICE || synthname === _(DEFAULTVOICE)) {
+                synth = DEFAULTVOICE;
             } else if (synthname === "custom" || synthname === _("custom")) {
                 synth = "custom";
             }
@@ -245,7 +245,7 @@ function setupVolumeActions(activity) {
 
             if (synth === null) {
                 activity.errorMsg(synth + "not found");
-                synth = "electronic synth";
+                synth = DEFAULTVOICE;
             }
 
             const tur = activity.turtles.ithTurtle(turtle);

@@ -5357,6 +5357,12 @@ msgstr "nombre del sintetizador"
 msgid "set instrument"
 msgstr "fijar instrumento"
 
+msgid "set default instrument"
+msgstr "fijar instrumento predeterminado"
+
+msgid "The set default instrument block changes the default instrument from electronic synth to the instrument of your choice."
+msgstr "El bloque fijar instrumentos predeterminado establecido cambia el instrumento predeterminado de sintetizador electrónico al instrumento de su elección."
+
 #: js/ToneBlocks.js:588
 #: js/ToneBlocks.js:607
 #: js/ToneBlocks.js:613

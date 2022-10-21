@@ -5381,6 +5381,12 @@ msgstr "ねいろを せってい"
 msgid "The Set instrument block selects a voice for the synthesizer,"
 msgstr "<h2>ねいろをせってい ブロック</h2>なかに はいっている 「おんぷブロック」 の ねいろを せっていする。"
 
+msgid "set default instrument"
+msgstr "ねいろひょうじゅんを せってい"
+
+msgid "The set default instrument block changes the default instrument from electronic synth to the instrument of your choice."
+msgstr "「ねいろひょうじゅんを せってい」ブロックは ねいろの デフォルトを 「シンセサイザー」から おこのみの がっきに せっていします。"
+
 #: js/ToneBlocks.js:590
 #: js/ToneBlocks.js:615
 msgid "eg guitar piano violin or cello."

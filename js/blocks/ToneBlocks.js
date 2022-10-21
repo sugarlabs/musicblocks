@@ -580,6 +580,41 @@ function setupToneBlocks(activity) {
         }
     }
 
+    class SetDefaultVoiceBlock extends FlowBlock {
+        constructor() {
+            super("setdefaultvoice", _("set default instrument"));
+            this.setPalette("tone", activity);
+            this.setHelpString([
+                _("The set default instrument block changes the default instrument from electronic synth to the instrument of your choice."),
+                "documentation",
+                ""
+            ]);
+            this.makeMacro((x, y) => [
+                [0, "setdefaultvoice", x, y, [null, 1, null]],
+                [1, ["voicename", { value: DEFAULTVOICE }], 0, 0, [0]]
+            ]);
+
+            this.formBlock({
+                args: 1,
+                argTypes: ["anyin"],
+                defaults: [DEFAULTVOICE]
+            });
+        }
+
+        flow(args, logo, turtle, blk) {
+            const tur = activity.turtles.ithTurtle(turtle);
+            if (args[0] === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+            } else {
+                if (tur.singer.instrumentNames.length === 0) {
+                    tur.singer.instrumentNames = [args[0]];
+                } else {
+                    tur.singer.instrumentNames[0] = args[0];
+                }
+            }
+        }
+    }
+
     class VoiceNameBlock extends ValueBlock {
         constructor() {
             super("voicename", _("set instrument"));
@@ -738,7 +773,7 @@ function setupToneBlocks(activity) {
 
     class AudioFileBlock extends ValueBlock {
         constructor() {
-	    // The block name is replaced by a pathname.
+            // The block name is replaced by a pathname.
             super("audiofile", "");
             this.parameter = true;
             this.extraWidth = 20;
@@ -779,6 +814,7 @@ function setupToneBlocks(activity) {
     new VibratoBlock().setup(activity);
     new AudioFileBlock().setup(activity);
     new CustomSampleBlock().setup(activity);
+    new SetDefaultVoiceBlock().setup(activity);
     new SetVoiceBlock().setup(activity);
     new SynthNameBlock().setup(activity);
     new VoiceNameBlock().setup(activity);

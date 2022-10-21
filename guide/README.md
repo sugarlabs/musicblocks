@@ -40,8 +40,9 @@ also available.
       12. [Intervals](#INTERVALS)
       13. [Inversion](#INVERSION)
       14. [Backwards](#BACKWARDS)
-      15. [Setting Voice and Keys](#SETTING)
-      16. [Vibrato, Tremelo, et al.](#VIBRATO)
+      15. [Setting Voice](#SETTINGVOICE)
+      16. [Setting Key and Mode](#SETTINGKEY)
+      17. [Vibrato, Tremelo, et al.](#VIBRATO)
    3. [Voices](#VOICES)
    4. [Graphics](#GRAPHICS)
    5. [Beat](#BEAT)
@@ -1072,13 +1073,27 @@ Note that all of the blocks inside a *Backward* block are reverse, so
 use this feature with caution if you include logic intermixed with
 notes.
 
-#### <a name= "SETTING"></a>3.2.15 Setting Voice and Keys
+#### <a name= "SETTINGVOICE"></a>3.2.15 Setting Instrument
 
 ![alt
  tag](./transform12.svg "setting voice and keys using Set Voice block")
 
-The *Set Voice* block selects a [voice](#VOICES) for the synthesizer for any
-contained blocks, e.g., violin or cello.
+The default instrument is an electronic synthesizer, so by default,
+that is the instrument used when playing notes. You can override this
+default for a group of notes by using the *Set Instrument* block. It
+will select a [voice](#VOICES) for the synthesizer for any contained
+blocks, e.g., violin.
+
+![alt
+ tag](../documentation/setdefaultinstrument_block.svg "Set Default Instrument")
+
+You can also override the default using the *Set default instrument*
+block. In the example above, the default instrument is set to piano,
+so any note that is not inside of a *Set instrument* block will be
+played using the piano synthesizer. The first note in this example is
+piano; the second note is guitar; and the thrid is piano.
+
+#### <a name= "SETTINGKEY"></a>3.2.16 Setting Key and Mode
 
 ![alt
  tag](./transform10.svg "Set Key block")
@@ -1098,7 +1113,7 @@ The *Define mode* block can be used to define a custom mode by
 defining the number and size of the steps within an octave. You can
 use your custom mode with the *Set key* block.
 
-#### <a name="VIBRATO"></a>3.2.16 Vibrato, Tremelo, et al.
+#### <a name="VIBRATO"></a>3.2.17 Vibrato, Tremelo, et al.
 
 ![alt
  tag](./transform15.svg "Vibrato, tremelo, chorus, distortion, neighbor, and phaser blocks")
