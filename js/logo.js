@@ -1953,7 +1953,7 @@ class Logo {
 
         const __print = (arg, timeout) => {
             if (suppressOutput) return;
-
+            if (arg === undefined) return
             setTimeout(() => this.activity.textMsg(arg.toString()), timeout);
         };
 
