@@ -4335,6 +4335,13 @@ function getPitchInfo(activity, type, notePlayed, tur) {
                 if (tur.singer.moveable === false) {
                     return SOLFEGECONVERSIONTABLE[np];
                 }
+                if (buildScale(tur.singer.keySignature)[0].indexOf(np) === -1) {
+                    if (np in EQUIVALENTFLATS) {
+                        np = EQUIVALENTFLATS[np]
+                    } else if (np in EQUIVALENTSHARPS) {
+                        np = EQUIVALENTSHARPS[np]
+                    }
+                }
                 return SOLFEGENAMES[buildScale(tur.singer.keySignature)[0].indexOf(np)];
             case "pitch class":
                 // If it is a frequency, convert it to a pitch/octave.
@@ -4393,7 +4400,18 @@ function getPitchInfo(activity, type, notePlayed, tur) {
                 if (Number(np)) {
                     [np, octave] = frequencyToPitch(np);
                 } else {
-                    np = notePlayed[0];
+                    // First, remove the octave
+                    np = np.substr(0, np.length - 1);
+                    np = np.replace("#", SHARP).replace("b", FLAT);
+                    // Try to map to the current scale
+                    if (buildScale(tur.singer.keySignature)[0].indexOf(np) === -1) {
+                        if (np in EQUIVALENTFLATS) {
+                            np = EQUIVALENTFLATS[np]
+                        } else if (np in EQUIVALENTSHARPS) {
+                            np = EQUIVALENTSHARPS[np]
+                        }
+                    }
+                    np = np[0];
                     octave = notePlayed.length === 2 ? notePlayed[1] : notePlayed[2];
                 }
                 // these numbers are subject to staff artwork
