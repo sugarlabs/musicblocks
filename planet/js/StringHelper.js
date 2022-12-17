@@ -59,7 +59,7 @@ function StringHelper(Planet) {
     if (Planet.IsMusicBlocks) {
         this.strings.push(["projectviewer-open-mb",_("Open in Music Blocks"),"data-tooltip"]);
     } else {
-        this.strings.push(["projectviewer-open-tb",_("Open in Turtle Blocks"),"data-tooltip"]);
+        this.strings.push(["projectviewer-open-mb",_("Open in Turtle Blocks"),"data-tooltip"]);
     }
 
 

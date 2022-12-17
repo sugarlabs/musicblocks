@@ -4317,14 +4317,14 @@ function getPitchInfo(activity, type, currentNote, tur) {
     let octave;
     let obj;
     if (Number(currentNote)) {
-	// If it is a frequency, convert it to a pitch/octave.
+        // If it is a frequency, convert it to a pitch/octave.
         obj = frequencyToPitch(currentNote);
-	pitch = obj[0];
-	octave = obj[1];
+        pitch = obj[0];
+        octave = obj[1];
     } else {
-	// Turn the note into pitch and octave.
-	pitch = currentNote.substr(0, currentNote.length - 1);
-	octave = currentNote[currentNote.length - 1];
+        // Turn the note into pitch and octave.
+        pitch = currentNote.substr(0, currentNote.length - 1);
+        octave = currentNote[currentNote.length - 1];
     }
     // Map the pitch to the current scale.
     pitch = pitch.replace("#", SHARP).replace("b", FLAT);
@@ -4343,7 +4343,7 @@ function getPitchInfo(activity, type, currentNote, tur) {
             case "solfege syllable":
             case "solfege class":
                 if (type === "solfege class") {
-		    // Remove sharps and flats.
+                    // Remove sharps and flats.
                     pitch = pitch.replace(SHARP).replace(FLAT);
                 }
                 if (tur.singer.moveable === false) {
@@ -4360,7 +4360,7 @@ function getPitchInfo(activity, type, currentNote, tur) {
                     pitch
                 )[0];
             case "scale degree":
-	        obj = scaleDegreeToPitchMapping(
+                obj = scaleDegreeToPitchMapping(
                         tur.singer.keySignature,
                         null,
                         tur.singer.moveable,
