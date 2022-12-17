@@ -4311,156 +4311,96 @@ const convertFactor = function (factor) {
     }
 };
 
-function getPitchInfo(activity, type, notePlayed, tur) {
-    let np = notePlayed;
+function getPitchInfo(activity, type, currentNote, tur) {
+    // A variety of conversions.
+    let pitch;
     let octave;
+    let obj;
+    if (Number(currentNote)) {
+	// If it is a frequency, convert it to a pitch/octave.
+        obj = frequencyToPitch(currentNote);
+	pitch = obj[0];
+	octave = obj[1];
+    } else {
+	// Turn the note into pitch and octave.
+	pitch = currentNote.substr(0, currentNote.length - 1);
+	octave = currentNote[currentNote.length - 1];
+    }
+    // Map the pitch to the current scale.
+    pitch = pitch.replace("#", SHARP).replace("b", FLAT);
+    if (buildScale(tur.singer.keySignature)[0].indexOf(pitch) === -1) {
+        if (pitch in EQUIVALENTFLATS) {
+            pitch = EQUIVALENTFLATS[pitch]
+        } else if (pitch in EQUIVALENTSHARPS) {
+            pitch = EQUIVALENTSHARPS[pitch]
+        }
+    }
+
     try {
         switch (type) {
             case "letter class":
-                if (Number(np)) {
-                    [np] = frequencyToPitch(np);
-                }
-                return np[0];
+                return pitch[0];
             case "solfege syllable":
             case "solfege class":
-                // Remove the octave.
-                np = np.substr(0, np.length - 1);
-                if (Number(np)) {
-                    np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
-                }
                 if (type === "solfege class") {
-                    np = np.substr(0, np.length - 1);
+		    // Remove sharps and flats.
+                    pitch = pitch.replace(SHARP).replace(FLAT);
                 }
-                np = np.replace("#", SHARP).replace("b", FLAT);
                 if (tur.singer.moveable === false) {
-                    return SOLFEGECONVERSIONTABLE[np];
+                    return SOLFEGECONVERSIONTABLE[pitch];
                 }
-                if (buildScale(tur.singer.keySignature)[0].indexOf(np) === -1) {
-                    if (np in EQUIVALENTFLATS) {
-                        np = EQUIVALENTFLATS[np]
-                    } else if (np in EQUIVALENTSHARPS) {
-                        np = EQUIVALENTSHARPS[np]
-                    }
-                }
-                return SOLFEGENAMES[buildScale(tur.singer.keySignature)[0].indexOf(np)];
+                return SOLFEGENAMES[buildScale(tur.singer.keySignature)[0].indexOf(pitch)];
             case "pitch class":
-                // If it is a frequency, convert it to a pitch/octave.
-                if (!isNaN(Number(np))) {
-                    np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
-                }
-                return (
-                    (pitchToNumber(
-                        np.substr(0, np.length - 1),
-                        np[np.length - 1],
-                        tur.singer.keySignature
-                    ) -
-                        3) %
-                    12
-                );
+                return ((pitchToNumber(pitch, octave, tur.singer.keySignature) - 3) % 12);
             case "scalar class":
-                if (Number(np)) {
-                    np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
-                }
-                np = np.substr(0, np.length - 1);
-                np = np.replace("#", SHARP).replace("b", FLAT);
                 return scaleDegreeToPitchMapping(
                     tur.singer.keySignature,
                     null,
                     tur.singer.moveable,
-                    np
+                    pitch
                 )[0];
             case "scale degree":
-                if (Number(np)) {
-                    np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
-                }
-                np = np.substr(0, np.length - 1);
-                np = np.replace("#", SHARP).replace("b", FLAT);
-                return (
-                    scaleDegreeToPitchMapping(
+	        obj = scaleDegreeToPitchMapping(
                         tur.singer.keySignature,
                         null,
                         tur.singer.moveable,
-                        np
-                    )[0] +
-                    scaleDegreeToPitchMapping(
-                        tur.singer.keySignature,
-                        null,
-                        tur.singer.moveable,
-                        np
-                    )[1]
-                );
+                        pitch
+                    )
+                return (obj[0] + obj[1]);
             case "nth degree":
-                if (Number(np)) {
-                    np = frequencyToPitch(np)[0] + frequencyToPitch(np)[1];
-                }
-                np = np.substr(0, np.length - 1);
-                np = np.replace("#", SHARP).replace("b", FLAT);
-                return buildScale(tur.singer.keySignature)[0].indexOf(np);
+                return buildScale(tur.singer.keySignature)[0].indexOf(pitch);
             case "staff y":
-                if (Number(np)) {
-                    [np, octave] = frequencyToPitch(np);
-                } else {
-                    // First, remove the octave
-                    np = np.substr(0, np.length - 1);
-                    np = np.replace("#", SHARP).replace("b", FLAT);
-                    // Try to map to the current scale
-                    if (buildScale(tur.singer.keySignature)[0].indexOf(np) === -1) {
-                        if (np in EQUIVALENTFLATS) {
-                            np = EQUIVALENTFLATS[np]
-                        } else if (np in EQUIVALENTSHARPS) {
-                            np = EQUIVALENTSHARPS[np]
-                        }
-                    }
-                    np = np[0];
-                    octave = notePlayed.length === 2 ? notePlayed[1] : notePlayed[2];
-                }
                 // these numbers are subject to staff artwork
                 return (
-                    ["C", "D", "E", "F", "G", "A", "B"].indexOf(np) * YSTAFFNOTEHEIGHT +
+                    ["C", "D", "E", "F", "G", "A", "B"].indexOf(pitch[0]) * YSTAFFNOTEHEIGHT +
                     (octave - 4) * YSTAFFOCTAVEHEIGHT
                 );
             case "pitch number":
-                return _calculate_pitch_number(activity, np, tur);
+                return _calculate_pitch_number(activity, pitch, tur);
             case "pitch in hertz":
                 return activity.logo.synth._getFrequency(
-                    np,
+                    pitch + octave,
                     activity.logo.synth.changeInTemperament
                 );
             case "pitch to color":
-                if (Number(np)) {
-                    [np, octave] = frequencyToPitch(np);
+                if (NOTESSHARP.indexOf(pitch) !== -1) {
+                    return NOTESSHARP.indexOf(pitch) * 8.33;
+                } else if (NOTESFLAT.indexOf(pitch) !== -1) {
+                    return NOTESFLAT.indexOf(pitch) * 8.33;
                 } else {
-                    np = np.substr(0, np.length - 1);
-                }
-
-                if (NOTESSHARP.indexOf(np) !== -1) {
-                    return NOTESSHARP.indexOf(np) * 8.33;
-                } else if (NOTESFLAT.indexOf(np) !== -1) {
-                    return NOTESFLAT.indexOf(np) * 8.33;
-                } else {
-                    if (np.includes(DOUBLESHARP)) {
-                        np = np.replace(DOUBLESHARP, "");
-                        return (NOTESSHARP.indexOf(np) + 2) * 8.33;
-                    } else if (np.includes(DOUBLEFLAT)) {
-                        np = np.replace(DOUBLEFLAT, "");
-                        return (NOTESFLAT.indexOf(np) - 2) * 8.33;
+                    if (pitch.includes(DOUBLESHARP)) {
+                        pitch = pitch.replace(DOUBLESHARP, "");
+                        return (NOTESSHARP.indexOf(pitch) + 2) * 8.33;
+                    } else if (pitch.includes(DOUBLEFLAT)) {
+                        pitch = pitch.replace(DOUBLEFLAT, "");
+                        return (NOTESFLAT.indexOf(pitch) - 2) * 8.33;
                     } else {
                         // eslint-disable-next-line no-console
-                        console.debug("Pitch not found: " + np);
+                        console.debug("Pitch not found: " + pitch);
                     }
                 }
                 return 0;
             case "pitch to shade":
-                // The expectation is a note in Hz.
-                if (Number(np)) {
-                    [np, octave] = frequencyToPitch(np);
-                } else {
-                    // But maybe it is of the form G4?
-                    octave = np[np.length - 1];
-                    if (isNaN(octave)) {
-                        octave = 4;
-                    }
-                }
                 return octave * 12.5;
             default:
                 return "__INVALID_INPUT__";
