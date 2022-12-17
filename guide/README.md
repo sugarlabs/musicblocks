@@ -1437,7 +1437,7 @@ This converter takes a numeric value which denotes pitch number and returns the 
 This converter takes a numeric value which denotes pitch number and returns the pitch name corresponding to that pitch number. No octave is inferred.
 
 | Converter Name | Description |
-| --- |
+| --- | --- |
 | letter class | Converts pitch to letter (as defined above). G maps to G. G♯ maps to G. |
 | solfege syllable | Converts pitch to solfege (as defined above). G maps to sol. |
 | solfege class | Converts pitch to solfege class (as defined above). G maps to sol. G♯ maps to sol.|
