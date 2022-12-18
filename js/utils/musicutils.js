@@ -4326,6 +4326,22 @@ function getPitchInfo(activity, type, currentNote, tur) {
         pitch = currentNote.substr(0, currentNote.length - 1);
         octave = currentNote[currentNote.length - 1];
     }
+    // Remap double sharps/double flats.
+    if (pitch.includes(DOUBLESHARP)) {
+        pitch = pitch.replace(DOUBLESHARP, "");
+        if (pitch === "B") {
+            pitch = "C" + SHARP;
+        } else {
+            pitch = NOTESSHARP[NOTESSHARP.indexOf(pitch) + 2];
+        }
+    } else if (pitch.includes(DOUBLEFLAT)) {
+        pitch = pitch.replace(DOUBLEFLAT, "");
+        if (pitch === "C") {
+            pitch = "B" + FLAT;
+        } else {
+            pitch = NOTESFLAT[NOTESFLAT.indexOf(pitch) - 2];
+        }
+    }
     // Map the pitch to the current scale.
     pitch = pitch.replace("#", SHARP).replace("b", FLAT);
     if (buildScale(tur.singer.keySignature)[0].indexOf(pitch) === -1) {
@@ -4387,18 +4403,9 @@ function getPitchInfo(activity, type, currentNote, tur) {
                     return NOTESSHARP.indexOf(pitch) * 8.33;
                 } else if (NOTESFLAT.indexOf(pitch) !== -1) {
                     return NOTESFLAT.indexOf(pitch) * 8.33;
-                } else {
-                    if (pitch.includes(DOUBLESHARP)) {
-                        pitch = pitch.replace(DOUBLESHARP, "");
-                        return (NOTESSHARP.indexOf(pitch) + 2) * 8.33;
-                    } else if (pitch.includes(DOUBLEFLAT)) {
-                        pitch = pitch.replace(DOUBLEFLAT, "");
-                        return (NOTESFLAT.indexOf(pitch) - 2) * 8.33;
-                    } else {
-                        // eslint-disable-next-line no-console
-                        console.debug("Pitch not found: " + pitch);
-                    }
                 }
+                // eslint-disable-next-line no-console
+                console.debug("Pitch not found: " + pitch);
                 return 0;
             case "pitch to shade":
                 return octave * 12.5;
