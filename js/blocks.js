@@ -1642,7 +1642,7 @@ function Blocks(activity) {
         if (newBlock != null) {
             const n = this._countBlocksInStack(this.findTopBlock(newBlock));
             if (n > LONGSTACK) {
-                this.errorMsg(_("Consider breaking this stack into parts."));
+                this.activity.errorMsg(_("Consider breaking this stack into parts."));
             }
 
             // We found a match.
@@ -4870,7 +4870,7 @@ function Blocks(activity) {
      */
     this.prepareStackForCopy = () => {
         if (this.activeBlock == null) {
-            this.errorMsg(_("There is no block selected."));
+            this.activity.errorMsg(_("There is no block selected."));
             // eslint-disable-next-line no-console
             console.debug("No active block to copy.");
             return;
