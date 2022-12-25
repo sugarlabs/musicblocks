@@ -25,30 +25,33 @@ also available.
    5. [Drums](#DRUMS)
 3. [Programming with Music](#PROGRAMMING-WITH-MUSIC)
    1. [Actions](#ACTIONS)
-   2. [Musical Transformations](#TRANSFORMATION)
+   2. [Pitch Transformations](#PITCH-TRANSFORMATION)
       1. [Step Pitch Block](#STEP-PITCH)
       2. [Sharps and Flats](#SHARPS-AND-FLATS)
       3. [Adjusting Transposition](#ADJUST-TRANSPOSITION)
       4. [Summary of Pitch Movements](#PITCH-MOVEMENT)
       5. [Set Key](#SET-KEY)
       6. [Fixed and Movable Pitch Systems](#FIXED-AND-MOVABLE-PITCH-SYSTEMS)
-      7. [Dotted Notes](#DOTTED)
-      8. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
-      9. [Repeating Notes](#REPETITION)
-      10. [Swinging Notes and Tied Notes](#SWINGING)
-      11. [Set Volume, Crescendo, Staccato, and Slur Blocks](#MORE-TRANSFORMATIONS)
-      12. [Intervals](#INTERVALS)
-      13. [Inversion](#INVERSION)
-      14. [Backwards](#BACKWARDS)
-      15. [Setting Voice](#SETTINGVOICE)
-      16. [Setting Key and Mode](#SETTINGKEY)
-      17. [Vibrato, Tremelo, et al.](#VIBRATO)
-   3. [Voices](#VOICES)
-   4. [Graphics](#GRAPHICS)
-   5. [Beat](#BEAT)
-   6. [Interactions](#INTERACTIONS)
-   7. [Ensemble](#ENSEMBLE)
-   8. [Converters](#CONVERTERS)
+      7. [Intervals](#INTERVALS)
+      8. [Inversion](#INVERSION)
+      9. [Converters](#CONVERTERS)
+   3. [Note Value Transformations](#NOTE-VALUE-TRANSFORMATION)
+      1. [Dotted Notes](#DOTTED)
+      2. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
+      3. [Repeating Notes](#REPETITION)
+      4. [Swinging Notes and Tied Notes](#SWINGING)
+      5. [Beat](#BEAT)
+      6. [Staccato and Slur Blocks](#BEAT-TRANSFORMATIONS)
+      7. [Backwards](#BACKWARDS)
+   4. [Other Transformations](#OTHER-TRANSFORMATION)
+      1. [Set Volume and Crescendo Blocks](#VOLUME-TRANSFORMATIONS)
+      2. [Setting Voice](#SETTINGVOICE)
+      3. [Setting Key and Mode](#SETTINGKEY)
+      4. [Vibrato, Tremelo, et al.](#VIBRATO)
+   5. [Voices](#VOICES)
+   6. [Graphics](#GRAPHICS)
+   7. [Interactions](#INTERACTIONS)
+   8. [Ensemble](#ENSEMBLE)
 4. [Widgets](#WIDGETS)
     1. [Monitoring Status](#status)
     2. [Generating groups of Notes](#pitch-time)
@@ -313,7 +316,7 @@ A few more chunks and we can make a song. (Can you read the block
 notation well enough to guess the outcome? Are you familiar with the
 song we created?)
 
-### <a name="TRANSFORMATION"></a>3.2 Musical Transformations
+### <a name="PITCH-TRANSFORMATION"></a>3.2 Pitch Transformations
 
 There are many ways to transform pitch, rhythm, and other sonic qualities.
 
@@ -732,122 +735,7 @@ block.
 
 [Scale Degree Improv](https://rawgit.com/sugarlabs/musicblocks/master/examples/Scale-Degree-Improv.html)
 
-#### <a name="DOTTED"></a>3.2.7 Dotted Notes
-
-![dot](./transform4.svg "Creating dotted notes using the Dot block")
-
-You can "dot" notes using the *Dot* block. A dotted note extends the
-rhythmic duration of a note by 50%. E.g., a dotted quarter note will
-play for `3/8` `(i.e. 1/4 + 1/8)` of a beat. A dotted eighth note will
-play for `3/16` `(i.e. 1/8 + 1/16)` of a beat. A double dot extends
-the duration by `75%` `(i.e. 50% + [50% of 50%])`. For example, a
-double-dotted quarter note will play for `7/16` `(i.e. 1/4 + 1/8 +
-1/16)` of a beat (which is the same as `4/16 + 2/16 + 1/16 = 7/16`).
-
-The dot block is useful as an expression of musical rhythm--it is
-convenient and helps to organize musical ideas (e.g. many melodies use
-dots as the basis of their rhythmic motifs), however you can achieve
-the same rhythmic result as dot by putting the calculation directly
-into note value as well. For example, indicating `3/8` instead of
-`1/4` will result in a dotted quarter note.
-
-The chart below shows two common examples, dotted quarter and dotted
-eighth, and how to achieve them with either the dot block or by direct
-calculation into a note's note value.
-
-![dotted note](../charts/DotsChart.svg "using dotted notes")
-
-#### <a name="MULTIPLY-AND-DIVIDE"></a>3.2.8 Changing Note(s) duration via Mathematical Operations
-
-![duration](./transform5.svg "Changing note duration for a note or notes")
-
-You can also multiply (or divide) the note value, which will change
-the duration of the notes by changing their note values. Multiplying
-the note value of an `1/8` note by `1/2` is the equivalent of playing
-a `1/16` note (i.e. `1/2 * 1/8 = 1/16`) . Multiplying the note value
-of an `1/8` note by `2/1` (which has the effect of dividing by `1/2`)
-will result in the equivalent of a `1/4` note.
-
-![drums](./drum4.svg "speeding up drum beats over time")
-
-In the above example, the sequence of [drum](#DRUMS) note values is
-decreased over time, at each repetition.
-
-[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
-
-#### <a name="REPETITION"></a>3.2.9 Repeating Notes
-
-![repeat](./transform6.svg "repeating notes")
-
-There are several ways to repeat notes. The *Repeat* block will play a
-sequence of notes multiple times; the *Duplicate* block will repeat each
-note in a sequence.
-
-In the example, on the left, the result would be `Sol, Re, Sol, Sol,
-Re, Sol, Sol, Re, Sol, Sol, Re, Sol`; on the right the result would be
-`Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol`.
-
-#### <a name="SWINGING"></a>3.2.10 Swinging Notes and Tied Notes
-
-![swing](./transform7.svg "swinging notes and tied notes")
-
-The *Swing* block works on pairs of notes (specified by note value),
-adding some duration (specified by swing value) to the first note and
-taking the same amount from the second note. Notes that do not match
-note value are unchanged.
-
-In the example, `re5` would be played as a `1/6` note and `mi5` would
-be played as a `1/12` note (`1/8 + 1/24 === 1/6` and `1/8 - 1/24 ===
-1/12`). Observe that the total duration of the pair of notes is
-unchanged.
-
-Tie also works on pairs of notes, combining them into one note. (The
-notes must be identical in pitch, but can vary in rhythm.)
-
-![ties](../charts/TiesChart.svg "using notes with ties")
-
-#### <a name="MORE-TRANSFORMATIONS"></a>3.2.11 Set Volume, Crescendo, Staccato, and Slur
-
-![volume](./transform8.svg "Set master volume, set synth volume, set relative volume, crescendo")
-
-The *Set master volume* block will change the master volume. The
-default is `50`; the range is `0` (silence) to `100` (full volume).
-
-The *Set synth volume* block will change the volume of a particular
-synth, e.g., `violin`, `snare drum`, etc. The default volume is `50`;
-the range is `0` (silence) to `100` (full volume). In the example, the
-*synth name* block is used to select the current synth.
-
-As a convenience, a number of standard volume blocks are provided:
-from loudest to quietest, there is *fff*, *ff* *f*, *mf*, *mp*, *p*,
-*pp*, and *ppp*. In musical terms "f" means "forte" or loud, "p" means
-"piano" or soft, and "m" means "mezzo" or middle.
-
-The *Set Relative Volume* block modifies the clamped note's volume
-according to the input value of the block in an added (or subtracted
-when negative) percentage with respect to the original volume. For
-example, `100` would mean doubling the current volume.
-
-The *Crescendo* block will increase (or decrease) the volume of the
-contained notes by a specified amount for every note played. For
-example, if you have 3 notes in sequence contained in a *Crescendo*
-block with a value of `5`, the final note will be at 15% more 
-than the original value for volume.
-
-NOTE: The *Crescendo* block does not alter the volume of a note as it
-is being played. Music Blocks does not yet have this functionality.
-
-![slur](./transform17.svg "Staccato, and Slur blocks")
-
-The *Staccato* block shortens the length of the actual
-note&mdash;making them tighter bursts&mdash;while maintaining the
-specified rhythmic value of the notes.
-
-The *Slur* block lengthens the sustain of notes&mdash;running longer than
-the noted duration and blending it into the next note&mdash;while
-maintaining the specified rhythmic value of the notes.
-
-#### <a name="INTERVALS"></a>3.2.12 Intervals
+#### <a name="INTERVALS"></a>3.2.7 Intervals
 
 ![interval](./transform9.svg "Scalar interval block")
 
@@ -910,7 +798,7 @@ We support many basic chords:
 | minor 7 | 1 3 7 10 | Cmin7 C - E♭ - G - B♭ |
 | major 7 | 1 4 7 11 | Cmaj7 C - E - G - B |
 
-#### <a name= "INVERSION"></a>3.2.13 Inversion
+#### <a name= "INVERSION"></a>3.2.8 Inversion
 
 The *Invert* block will rotate a series of notes around a target
 note. There are three different modes of the *Invert* block: *even*,
@@ -1007,7 +895,235 @@ midway between `C5` and `C♯5`.  In the *invert (scalar)* example,
 notes are inverted around `C5`, by scalar steps rather than
 half-steps.
 
-#### <a name="BACKWARDS"></a>3.2.14 Backwards
+## <a name="CONVERTERS"></a>3.2.9 Converters
+
+Converters are used to transform one form of inputs into other, more usable form of outputs. This section of the guide will talk about the various conversion options Music Blocks has to offer.
+
+Generalized shape of a converter is:
+
+![converter](../documentation/number2pitch_block.svg "Generalized converter")
+
+where the right argument is converted accordingly, and output is received on the left side.
+
+**Note:** Before an introduction of the different types of converters, a little intoduction on Y staff in Music Blocks. Staff is a set of horizontal lines and spaces and different positions along Y axis represents different notes. [C, D, E, F, G, A, B]
+
+![staff](treble.svg "Treble clef staff")
+
+### <a name="y-to-pitch"></a>3.2.9.1 Y to Pitch
+
+![y pos](../documentation/ytopitch_block.svg "Y to Pitch converter")
+
+This converter takes input in the form of a number that represents Staff Y position in pixels, and processes the value such that it can be used with certain pitch blocks (pitch number, nth modal pitch, pitch) to produce notes corresponding to given Staff Y position as an argument.  
+
+Additionally, the block can be plugged into a print block to view the converted note value.
+
+### <a name="pitch-converter"></a>3.2.9.2 Pitch converter
+
+![pitch converter](../documentation/outputtools_block.svg "Pitch converter block")
+
+Pitch converter offers a range of options through a pie-menu based interface and it can potentially convert or extract info out of the current playing pitch using the current pitch block as an input. 
+It can also take custom input in form or solfege, hertz, pitch number etc.
+
+All these options are provided in the form of a pie-menu which can be accessed simply by clicking on the converter.
+
+![pitch converter](./pitchconverter.svg "Pitch converter block")
+
+Below explained is the utility of every conversion option:
+
+#### **1. Letter class:**
+Prints the alphabet data of the note being played e.g A, B, C, D, E, F, G. It doesn't print any info regarding accidentals.
+
+#### **2. Solfege Syllable:**
+Similar to Letter class, returns the data in form of solfege e.g do, re, mi.
+It too, gives no info regarding accidentals.
+
+#### **3. Pitch class:**
+Returns a number between 0 to 11, corresponding to the note played, where C is 0 and B is 11. Each increase in the number signifies an increase by one semitone.
+
+#### **4. Scalar class:**
+Returns a number between 1-7 corresponding to the scale degree of the note being played, with reference to the chosen mode. Provides no info regarding accidentals.
+
+#### **5. Scale Degree:**
+Intuitively, returns the scale degree of the note being played with reference to the chosen mode. It can also be thought of as Scalar class with accidentals.
+
+#### **6. N^th Degree:**
+Zero-based index of the degree of note being played in the chosen mode.
+
+#### **7. Pitch in Hertz:**
+Returns the value in hertz of the pitch of the note being currently played.
+
+#### **8. Pitch Number:**
+Value of the pitch of the note currently being played. It is different from Pitch class in the way that it can go below 0 and above 11 depending upon the octave.
+
+#### **9. Staff Y:**
+Returns the Y staff position of the note being played according to staff dimensions. It takes into account only the letter class, no accidental info is processed.
+
+### <a name="number-2-octave"></a>3.2.9.3 Number to Octave  
+  
+![pitch converter](../documentation/number2octave_block.svg "Y to Pitch converter")
+
+This converter takes a numeric value which denotes pitch number and returns the octave corresponding to that pitch number.
+
+### <a name="number-2-pitch"></a>3.2.9.4 Number to Pitch
+
+![pitch converter](../documentation/number2pitch_block.svg "Y to Pitch converter")
+
+This converter takes a numeric value which denotes pitch number and returns the pitch name corresponding to that pitch number. No octave is inferred.
+
+| Converter Name | Description |
+| --- | --- |
+| letter class | Converts pitch to letter (as defined above). G maps to G. G♯ maps to G. |
+| solfege syllable | Converts pitch to solfege (as defined above). G maps to sol. |
+| solfege class | Converts pitch to solfege class (as defined above). G maps to sol. G♯ maps to sol.|
+| pitch class | Converts pitch to pitch class (as defined above). G maps to 7. |
+| scalar class | Converts pitch to scalar class (as defined above). G maps to 5. |
+| scale degree | Converts pitch to scale degree (as defined above). G maps to 5. |
+| nth degree | Converts pitch to nth degree (as defined above). G maps to 4. |
+| staff y | Maps the current pitch to a y value that corresponds to a position on the staff. G4 maps to 50. |
+| pitch number | Converts pitch to pitch number (as defined above). G maps to 7. |
+| pitch in hertz | Converts pitch to hertz. G4 maps to 392Hz. |
+| pitch to color | Converts pitch to a color value (0-100). C maps to 0, G maps to 58.3, etc. |
+| pitch to shade | Coverts the octave value of the current pitch to a shade. Octave 4 maps to 50. |
+
+### <a name="NOTE-VALUE-TRANSFORMATION"></a>3.3 Note Value Transformations
+
+#### <a name="DOTTED"></a>3.3.1 Dotted Notes
+
+![dot](./transform4.svg "Creating dotted notes using the Dot block")
+
+You can "dot" notes using the *Dot* block. A dotted note extends the
+rhythmic duration of a note by 50%. E.g., a dotted quarter note will
+play for `3/8` `(i.e. 1/4 + 1/8)` of a beat. A dotted eighth note will
+play for `3/16` `(i.e. 1/8 + 1/16)` of a beat. A double dot extends
+the duration by `75%` `(i.e. 50% + [50% of 50%])`. For example, a
+double-dotted quarter note will play for `7/16` `(i.e. 1/4 + 1/8 +
+1/16)` of a beat (which is the same as `4/16 + 2/16 + 1/16 = 7/16`).
+
+The dot block is useful as an expression of musical rhythm--it is
+convenient and helps to organize musical ideas (e.g. many melodies use
+dots as the basis of their rhythmic motifs), however you can achieve
+the same rhythmic result as dot by putting the calculation directly
+into note value as well. For example, indicating `3/8` instead of
+`1/4` will result in a dotted quarter note.
+
+The chart below shows two common examples, dotted quarter and dotted
+eighth, and how to achieve them with either the dot block or by direct
+calculation into a note's note value.
+
+![dotted note](../charts/DotsChart.svg "using dotted notes")
+
+#### <a name="MULTIPLY-AND-DIVIDE"></a>3.3.2 Changing Note(s) duration via Mathematical Operations
+
+![duration](./transform5.svg "Changing note duration for a note or notes")
+
+You can also multiply (or divide) the note value, which will change
+the duration of the notes by changing their note values. Multiplying
+the note value of an `1/8` note by `1/2` is the equivalent of playing
+a `1/16` note (i.e. `1/2 * 1/8 = 1/16`) . Multiplying the note value
+of an `1/8` note by `2/1` (which has the effect of dividing by `1/2`)
+will result in the equivalent of a `1/4` note.
+
+![drums](./drum4.svg "speeding up drum beats over time")
+
+In the above example, the sequence of [drum](#DRUMS) note values is
+decreased over time, at each repetition.
+
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
+
+#### <a name="REPETITION"></a>3.3.3 Repeating Notes
+
+![repeat](./transform6.svg "repeating notes")
+
+There are several ways to repeat notes. The *Repeat* block will play a
+sequence of notes multiple times; the *Duplicate* block will repeat each
+note in a sequence.
+
+In the example, on the left, the result would be `Sol, Re, Sol, Sol,
+Re, Sol, Sol, Re, Sol, Sol, Re, Sol`; on the right the result would be
+`Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol`.
+
+#### <a name="SWINGING"></a>3.3.4 Swinging Notes and Tied Notes
+
+![swing](./transform7.svg "swinging notes and tied notes")
+
+The *Swing* block works on pairs of notes (specified by note value),
+adding some duration (specified by swing value) to the first note and
+taking the same amount from the second note. Notes that do not match
+note value are unchanged.
+
+In the example, `re5` would be played as a `1/6` note and `mi5` would
+be played as a `1/12` note (`1/8 + 1/24 === 1/6` and `1/8 - 1/24 ===
+1/12`). Observe that the total duration of the pair of notes is
+unchanged.
+
+Tie also works on pairs of notes, combining them into one note. (The
+notes must be identical in pitch, but can vary in rhythm.)
+
+![ties](../charts/TiesChart.svg "using notes with ties")
+
+#### <a name="BEAT"></a>3.3.5 Beat
+
+The beat of the music is determined by the *Meter* block (by default,
+it is set to 4:4).
+
+The *Pickup* block can be used to accommodate any notes that come in
+before the beat.
+
+![meter](./beat1.svg "meter and pickup")
+
+The Beat count block is the number of the current beat, eg 1, 2, 3, or 4. 
+In the figure, it is used to take an action on the first beat of each measure.
+
+![beat count](..documentation/beatvalue_block.svg "beat count")
+
+The Measure count block returns the current measure.
+
+![measure count](../documentation/measurevalue_block.svg "measure count")
+
+Specifying beat is useful in that you can have the character of a note
+vary depending upon the beat. In the example below, the volume of
+notes on Beat `1` and Beat `3` are increased, while the volume of off
+beats is decreased.
+
+![on-every-note-do](../documentation/arc_block.svg)
+
+The *On-Every-Note-Do* block lets you specify an action to take
+whenever a note is played. In the example above, the note value is
+used to determine the portion of an arc to draw, i.e., a 1/4 note
+draws a 1/4 circle, a 1/2 note draw 1/2 circle, and a whole note draws
+a full circle.
+
+![on beat](./beat2.svg "on-beat-do")
+
+The *On-Beat-Do* and *Off-Beat-Do* blocks let you specify actions to
+take on specific beats. (Note that the action is run before any blocks
+inside the note block associated with the beat are run.)
+
+![graphics](./graphics5.svg "using beat to synchronize graphics")
+
+Another approach to graphics is to use modulate them based on the
+beat. In the example above, we call the same graphics action for each
+note, but the parameters associated with the action, such as pen
+width, are dependent upon which beat we are on. On Beat 1, the pen
+size is set to `50` and the volume to `75`. On Beat `3`, the pen size is set
+to `25` and the volume to `50`. On off beats, the pen size is set to `5` and
+the volumne to `5`. The resultant graphic is shown below.
+
+![graphics](./graphics6.svg "graphics modulated by beat")
+
+#### <a name="BEAT-TRANSFORMATIONS"></a>3.3.6 Staccato and Slur
+
+![slur](./transform17.svg "Staccato, and Slur blocks")
+
+The *Staccato* block shortens the length of the actual
+note&mdash;making them tighter bursts&mdash;while maintaining the
+specified rhythmic value of the notes.
+
+The *Slur* block lengthens the sustain of notes&mdash;running longer than
+the noted duration and blending it into the next note&mdash;while
+maintaining the specified rhythmic value of the notes.
+
+#### <a name="BACKWARDS"></a>3.3.7 Backwards
 
 ![backwards](./transform11.svg "Backward block")
 
@@ -1025,7 +1141,40 @@ Note that all of the blocks inside a *Backward* block are reverse, so
 use this feature with caution if you include logic intermixed with
 notes.
 
-#### <a name= "SETTINGVOICE"></a>3.2.15 Setting Instrument
+### <a name="OTHER-TRANSFORMATION"></a>3.4 Other Transformations
+
+#### <a name="VOLUME-TRANSFORMATIONS"></a>3.4.1 Set Volume and Crescendo
+
+![volume](./transform8.svg "Set master volume, set synth volume, set relative volume, crescendo")
+
+The *Set master volume* block will change the master volume. The
+default is `50`; the range is `0` (silence) to `100` (full volume).
+
+The *Set synth volume* block will change the volume of a particular
+synth, e.g., `violin`, `snare drum`, etc. The default volume is `50`;
+the range is `0` (silence) to `100` (full volume). In the example, the
+*synth name* block is used to select the current synth.
+
+As a convenience, a number of standard volume blocks are provided:
+from loudest to quietest, there is *fff*, *ff* *f*, *mf*, *mp*, *p*,
+*pp*, and *ppp*. In musical terms "f" means "forte" or loud, "p" means
+"piano" or soft, and "m" means "mezzo" or middle.
+
+The *Set Relative Volume* block modifies the clamped note's volume
+according to the input value of the block in an added (or subtracted
+when negative) percentage with respect to the original volume. For
+example, `100` would mean doubling the current volume.
+
+The *Crescendo* block will increase (or decrease) the volume of the
+contained notes by a specified amount for every note played. For
+example, if you have 3 notes in sequence contained in a *Crescendo*
+block with a value of `5`, the final note will be at 15% more 
+than the original value for volume.
+
+NOTE: The *Crescendo* block does not alter the volume of a note as it
+is being played. Music Blocks does not yet have this functionality.
+
+#### <a name= "SETTINGVOICE"></a>3.4.2 Setting Instrument
 
 ![set voice](./transform12.svg "setting voice and keys using Set Voice block")
 
@@ -1043,7 +1192,7 @@ so any note that is not inside of a *Set instrument* block will be
 played using the piano synthesizer. The first note in this example is
 piano; the second note is guitar; and the thrid is piano.
 
-#### <a name= "SETTINGKEY"></a>3.2.16 Setting Key and Mode
+#### <a name= "SETTINGKEY"></a>3.4.3 Setting Key and Mode
 
 ![set key](./transform10.svg "Set Key block")
 
@@ -1061,7 +1210,7 @@ The *Define mode* block can be used to define a custom mode by
 defining the number and size of the steps within an octave. You can
 use your custom mode with the *Set key* block.
 
-#### <a name="VIBRATO"></a>3.2.17 Vibrato, Tremelo, et al.
+#### <a name="VIBRATO"></a>3.4.4 Vibrato, Tremelo, et al.
 
 ![effects](./transform15.svg "Vibrato, tremelo, chorus, distortion, neighbor, and phaser blocks")
 
@@ -1072,7 +1221,7 @@ the rate of the variation.
 
 The other effects blocks also modulate pitch over time. Give them a try.
 
-### <a name="VOICES"></a>3.3 Voices
+### <a name="VOICES"></a>3.5 Voices
 
 Each *Start* block runs as a separate voice in Music Blocks. (When
 you click on the Run button, all of the *Start* blocks are run
@@ -1113,7 +1262,7 @@ from a drum will be played as `C2` with the default drum sample. In
 the example above, all of the notes in `chunk` will be played with a
 kick drum.
 
-### <a name="GRAPHICS"></a>3.4 Adding graphics
+### <a name="GRAPHICS"></a>3.6 Adding graphics
 
 ![graphics](./graphics1.svg "adding graphics")
 
@@ -1184,49 +1333,7 @@ tree drawing, where the pitch goes up as the branches assend.
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523029986215035&run=True)
 
-### <a name="BEAT"></a>3.5 Beat
-
-The beat of the music is determined by the *Meter* block (by default,
-it is set to 4:4).
-
-The *Pickup* block can be used to accommodate any notes that come in
-before the beat.
-
-![meter](./beat1.svg "meter and pickup")
-
-The Beat count block is the number of the current beat, eg 1, 2, 3, or 4. 
-In the figure, it is used to take an action on the first beat of each measure.
-
-![beat count](..documentation/beatvalue_block.svg "beat count")
-
-The Measure count block returns the current measure.
-
-![measure count](../documentation/measurevalue_block.svg "measure count")
-
-Specifying beat is useful in that you can have the character of a note
-vary depending upon the beat. In the example below, the volume of
-notes on Beat `1` and Beat `3` are increased, while the volume of off
-beats is decreased.
-
-![on beat](./beat2.svg "on-beat-do")
-
-The *On-Beat-Do* and *Off-Beat-Do* blocks let you specify actions to
-take on specific beats. (Note that the action is run before any blocks
-inside the note block associated with the beat are run.)
-
-![graphics](./graphics5.svg "using beat to synchronize graphics")
-
-Another approach to graphics is to use modulate them based on the
-beat. In the example above, we call the same graphics action for each
-note, but the parameters associated with the action, such as pen
-width, are dependent upon which beat we are on. On Beat 1, the pen
-size is set to `50` and the volume to `75`. On Beat `3`, the pen size is set
-to `25` and the volume to `50`. On off beats, the pen size is set to `5` and
-the volumne to `5`. The resultant graphic is shown below.
-
-![graphics](./graphics6.svg "graphics modulated by beat")
-
-### <a name="INTERACTIONS"></a>3.6 Interactions
+### <a name="INTERACTIONS"></a>3.7 Interactions
 
 There are many ways to interactive with Music Blocks, including
 tracking the mouse position to impact some aspect of the music.
@@ -1298,7 +1405,7 @@ the link below, takes musical paint in a novel direction.
 [RUN
 LIVE](https://walterbender.github.io/musicblocks/index.html?id=1523896294964170&run=True&run=True)
 
-## <a name="ENSEMBLE"></a>3.7 Ensemble
+## <a name="ENSEMBLE"></a>3.8 Ensemble
 
 Much of music involves multiple instruments (voices or "mice" in Music
 Blocks) playing together. There are a number of special blocks that
@@ -1360,96 +1467,6 @@ The *Found mouse* block will return true if the specified mouse can be found.
 The *Set mouse* block sends a stack of blocks to be run by the specified mouse.
 
 ![set](../documentation/setturtle_block.svg "set mouse")
-
-## <a name="CONVERTERS"></a>3.8 Converters
-
-Converters are used to transform one form of inputs into other, more usable form of outputs. This section of the guide will talk about the various conversion options Music Blocks has to offer.
-
-Generalized shape of a converter is:
-
-![converter](../documentation/number2pitch_block.svg "Generalized converter")
-
-where the right argument is converted accordingly, and output is received on the left side.
-
-**Note:** Before an introduction of the different types of converters, a little intoduction on Y staff in Music Blocks. Staff is a set of horizontal lines and spaces and different positions along Y axis represents different notes. [C, D, E, F, G, A, B]
-
-![staff](treble.svg "Treble clef staff")
-
-### <a name="y-to-pitch"></a>3.8.1 Y to Pitch
-
-![y pos](../documentation/ytopitch_block.svg "Y to Pitch converter")
-
-This converter takes input in the form of a number that represents Staff Y position in pixels, and processes the value such that it can be used with certain pitch blocks (pitch number, nth modal pitch, pitch) to produce notes corresponding to given Staff Y position as an argument.  
-
-Additionally, the block can be plugged into a print block to view the converted note value.
-
-### <a name="pitch-converter"></a>3.8.2 Pitch converter
-
-![pitch converter](../documentation/outputtools_block.svg "Pitch converter block")
-
-Pitch converter offers a range of options through a pie-menu based interface and it can potentially convert or extract info out of the current playing pitch using the current pitch block as an input. 
-It can also take custom input in form or solfege, hertz, pitch number etc.
-
-All these options are provided in the form of a pie-menu which can be accessed simply by clicking on the converter.
-
-![pitch converter](./pitchconverter.svg "Pitch converter block")
-
-Below explained is the utility of every conversion option:
-
-#### **1. Letter class:**
-Prints the alphabet data of the note being played e.g A, B, C, D, E, F, G. It doesn't print any info regarding accidentals.
-
-#### **2. Solfege Syllable:**
-Similar to Letter class, returns the data in form of solfege e.g do, re, mi.
-It too, gives no info regarding accidentals.
-
-#### **3. Pitch class:**
-Returns a number between 0 to 11, corresponding to the note played, where C is 0 and B is 11. Each increase in the number signifies an increase by one semitone.
-
-#### **4. Scalar class:**
-Returns a number between 1-7 corresponding to the scale degree of the note being played, with reference to the chosen mode. Provides no info regarding accidentals.
-
-#### **5. Scale Degree:**
-Intuitively, returns the scale degree of the note being played with reference to the chosen mode. It can also be thought of as Scalar class with accidentals.
-
-#### **6. N^th Degree:**
-Zero-based index of the degree of note being played in the chosen mode.
-
-#### **7. Pitch in Hertz:**
-Returns the value in hertz of the pitch of the note being currently played.
-
-#### **8. Pitch Number:**
-Value of the pitch of the note currently being played. It is different from Pitch class in the way that it can go below 0 and above 11 depending upon the octave.
-
-#### **9. Staff Y:**
-Returns the Y staff position of the note being played according to staff dimensions. It takes into account only the letter class, no accidental info is processed.
-
-### <a name="number-2-octave"></a>3.8.3 Number to Octave  
-  
-![pitch converter](../documentation/number2octave_block.svg "Y to Pitch converter")
-
-This converter takes a numeric value which denotes pitch number and returns the octave corresponding to that pitch number.
-
-### <a name="number-2-pitch"></a>3.8.4 Number to Pitch
-
-![pitch converter](../documentation/number2pitch_block.svg "Y to Pitch converter")
-
-This converter takes a numeric value which denotes pitch number and returns the pitch name corresponding to that pitch number. No octave is inferred.
-
-| Converter Name | Description |
-| --- | --- |
-| letter class | Converts pitch to letter (as defined above). G maps to G. G♯ maps to G. |
-| solfege syllable | Converts pitch to solfege (as defined above). G maps to sol. |
-| solfege class | Converts pitch to solfege class (as defined above). G maps to sol. G♯ maps to sol.|
-| pitch class | Converts pitch to pitch class (as defined above). G maps to 7. |
-| scalar class | Converts pitch to scalar class (as defined above). G maps to 5. |
-| scale degree | Converts pitch to scale degree (as defined above). G maps to 5. |
-| nth degree | Converts pitch to nth degree (as defined above). G maps to 4. |
-| staff y | Maps the current pitch to a y value that corresponds to a position on the staff. G4 maps to 50. |
-| pitch number | Converts pitch to pitch number (as defined above). G maps to 7. |
-| pitch in hertz | Converts pitch to hertz. G4 maps to 392Hz. |
-| pitch to color | Converts pitch to a color value (0-100). C maps to 0, G maps to 58.3, etc. |
-| pitch to shade | Coverts the octave value of the current pitch to a shade. Octave 4 maps to 50. |
 
 ## <a name="WIDGETS"></a>Widgets
 
