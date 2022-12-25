@@ -10,17 +10,15 @@ is a good place to start learning about the basics. In this guide, we
 illustrate the musical features by walking the reader through numerous
 examples.
 
-A short [Guide to
-Debugging](http://github.com/sugarlabs/musicblocks/tree/master/Debugging.md). is
-also available.
+A short [Guide to Debugging](http://github.com/sugarlabs/musicblocks/tree/master/Debugging.md) is also available.
 
-## <a name="TOC"></a> Table of Contents
+## <a name="TOC"></a>TOC
 
 1. [Getting Started](#GETTING-STARTED)
 2. [Making Sounds](#NOTES)
    1. [Note Value Blocks](#NOTE-VALUE)
    2. [Pitch Blocks](#PITCH)
-   3. [Chords](#CHORDS)
+   3. [Multiple pitches](#MULTI-PITCH)
    4. [Rests](#RESTS)
    5. [Drums](#DRUMS)
 3. [Programming with Music](#PROGRAMMING-WITH-MUSIC)
@@ -218,13 +216,13 @@ and octave.
 Please refer to the above charts for a visual representation of where
 notes are located on a keyboard or staff.
 
-### <a name="CHORDS"></a>2.3 Chords
+### <a name="MULTI-PITCH"></a>2.3 Multiple Pitches
 
-![chord](./note4.svg "Forming a chord")
+![multiple pitch](./note4.svg "Playing multiple pitches in one note")
 
-A chord (multiple, simultaneous pitches) can be specified by adding
-multiple *Pitch* blocks into a single *Note value* block, like the
-above example.
+Multiple, simultaneous pitches can be specified by adding multiple
+*Pitch* blocks into a single *Note value* block, like the above
+example.
 
 ### <a name="RESTS"></a>2.4 Rests
 
