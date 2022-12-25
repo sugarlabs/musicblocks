@@ -2410,7 +2410,7 @@ Looking for a block? The tables below (one for beginner mode and one for advance
 ### Advanced mode
 
 | Music | | | Programming | | | Graphics | |
-| :---: | :---: | :---: :---: | :---: | :---: | :---: | :---: | :---: |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | _Palette_ | _Blocks_ | | _Palette_ | _Blocks_ | | _Palette_ | _Blocks_ |
 | **Rhythm** | note value sol4 | | **Flow** | repeat | | **Graphics** | forward |
 | | note value G4 | | | forever | | | back |
