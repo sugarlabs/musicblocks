@@ -1089,14 +1089,6 @@ vary depending upon the beat. In the example below, the volume of
 notes on Beat `1` and Beat `3` are increased, while the volume of off
 beats is decreased.
 
-![on-every-note-do](../documentation/arc_block.svg)
-
-The *On-Every-Note-Do* block lets you specify an action to take
-whenever a note is played. In the example above, the note value is
-used to determine the portion of an arc to draw, i.e., a 1/4 note
-draws a 1/4 circle, a 1/2 note draw 1/2 circle, and a whole note draws
-a full circle.
-
 ![on beat](./beat2.svg "on-beat-do")
 
 The *On-Beat-Do* and *Off-Beat-Do* blocks let you specify actions to
@@ -1114,6 +1106,14 @@ to `25` and the volume to `50`. On off beats, the pen size is set to `5` and
 the volumne to `5`. The resultant graphic is shown below.
 
 ![graphics](./graphics6.svg "graphics modulated by beat")
+
+![on-every-note-do](../documentation/arc_block.svg)
+
+The *On-Every-Note-Do* block lets you specify an action to take
+whenever a note is played. In the example above, the note value is
+used to determine the portion of an arc to draw, i.e., a 1/4 note
+draws a 1/4 circle, a 1/2 note draw 1/2 circle, and a whole note draws
+a full circle.
 
 #### <a name="BEAT-TRANSFORMATIONS">3.3.6 Staccato and Slur</a>
 
