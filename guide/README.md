@@ -61,21 +61,21 @@ A short [Guide to Debugging](http://github.com/sugarlabs/musicblocks/tree/master
        4. [What is a Tuplet?](#424-what-is-a-tuplet)
        5. [Using Individual Notes](#425-using-individual-notes)
        6. [Using a Scale of Pitches](#426-using-a-scale-of-pitches)
-    3. [Generating Rhythms](#43-generating-rhythms)
+    3. [Generating Rhythms (or How to Make a Drum Machine)](#43-generating-rhythms)
     4. [Musical Modes](#44-musical-modes)
-    5. [Meters](#45-meters)
+    5. [Changing Meter](#45-meters)
     6. [The Pitch-Drum Matrix](#46-the-pitch-drum-matrix)
     7. [Exploring Musical Proportions](#47-exploring-musical-proportions)
     8. [Generating Arbitrary Pitches](#48-generating-arbitrary-pitches)
     9. [Changing Tempo](#49-changing-tempo)
-    10. [Custom Timbres](#410-custom-timbres)
+    10. [Creating Custom Timbres](#410-custom-timbres)
     11. [The Music Keyboard](#411-the-music-keyboard)
     12. [Changing Temperament](#412-changing-temperament)
     13. [The Oscilloscope](#413-the-oscilloscope)
     14. [The Sampler](#414-the-sampler)
 5. [Beyond Music Blocks](#5-beyond-music-blocks)
-    1. [LilyPond](#51-lilypond)
-    2. [Other exports](#52-other-exports)
+    1. [LilyPond (or How to Generate Sheet Music)](#51-lilypond)
+    2. [Other Exports](#52-other-exports)
     3. [The JavaScript Editor](#53-the-javascript-editor)
 6. [Appendix](#6-appendix)
     1. [Beginner Palette Tables](#61-beginner-palettes)
@@ -1498,9 +1498,7 @@ Every widget has a menu with at least two buttons.
 
 You can hide the widget by clicking on the *Close* button.
 
-![widget](../header-icons/grab-handle.svg "drag handle")
-
-You can move the widget by dragging it by the *Drag* handle.
+You can move the widget by dragging its containing the window.
 
 ### <a name="status">4.1 Status</a>
 
