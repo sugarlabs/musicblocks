@@ -16,67 +16,70 @@ A short [Guide to Debugging](http://github.com/sugarlabs/musicblocks/tree/master
 
 1. [Getting Started](#1-getting-started)
 2. [Making Sounds](#2-making-sounds)
-   1. [Note Value Blocks](#NOTE-VALUE)
-   2. [Pitch Blocks](#PITCH)
-   3. [Multiple pitches](#MULTI-PITCH)
-   4. [Rests](#RESTS)
-   5. [Drums](#DRUMS)
+   1. [Note Value Blocks](#21-note-value-blocks)
+   2. [Pitch Blocks](#22-pitch-blocks)
+   3. [Multiple pitches](#23-multiple-pitches)
+   4. [Rests](#24-rests)
+   5. [Drums](#25-drums)
 3. [Programming with Music](#3-programming-with-music)
    1. [Actions](#31-actions)
    2. [Pitch Transformations](#32-pitch-transformations)
-      1. [Step Pitch Block](#STEP-PITCH)
-      2. [Sharps and Flats](#SHARPS-AND-FLATS)
-      3. [Adjusting Transposition](#ADJUST-TRANSPOSITION)
-      4. [Summary of Pitch Movements](#PITCH-MOVEMENT)
-      5. [Set Key](#SET-KEY)
-      6. [Fixed and Movable Pitch Systems](#FIXED-AND-MOVABLE-PITCH-SYSTEMS)
-      7. [Intervals](#INTERVALS)
-      8. [Inversion](#INVERSION)
-      9. [Converters](#CONVERTERS)
+      1. [Step Pitch Block](#321-step-pitch-block)
+      2. [Sharps and Flats](#322-sharps-and-flats)
+      3. [Adjusting Transposition](#323-adjusting-transposition)
+      4. [Summary of Pitch Movements](#324-summary-of-pitch-movements)
+      5. [Set Key](#325-set-key)
+      6. [Fixed and Movable Pitch Systems](#326-fixed-and-movable-pitch-systems)
+      7. [Intervals](#327-intervals)
+         1. [Absolute Intervals](#3271-absolute-intervals)
+	 2. [Chords](3272-chords)
+      8. [Inversion](#328-inversion)
+      9. [Converters](#329-converters)
    3. [Note Value Transformations](#33-note-value-transformations)
-      1. [Dotted Notes](#DOTTED)
-      2. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
-      3. [Repeating Notes](#REPETITION)
-      4. [Swinging Notes and Tied Notes](#SWINGING)
-      5. [Beat](#BEAT)
-      6. [Staccato and Slur Blocks](#BEAT-TRANSFORMATIONS)
-      7. [Backwards](#BACKWARDS)
+      1. [Dotted Notes](#331-dotted-notes)
+      2. [Speeding Up and Slowing Down Notes via Mathematical Operations](#332-speeding-up-and-slowing-down-notes-via-mathematical-operations)
+      3. [Repeating Notes](#333-repeating-notes)
+      4. [Swinging Notes and Tied Notes](#334-swinging-notes-and-tied-notes)
+      5. [Beat](#335-beat)
+      6. [Staccato and Slur Blocks](#336-staccato-and-slur)
+      7. [Backwards](#337-backwards)
    4. [Other Transformations](#34-other-transformations)
-      1. [Set Volume and Crescendo Blocks](#VOLUME-TRANSFORMATIONS)
-      2. [Setting Voice](#SETTINGVOICE)
-      3. [Setting Key and Mode](#SETTINGKEY)
-      4. [Vibrato, Tremelo, et al.](#VIBRATO)
+      1. [Set Volume and Crescendo Blocks](#341-set-volume-and-crescendo)
+      2. [Setting Instrument](#342-setting-instrument)
+      3. [Setting Key and Mode](#343-setting-key-and-mode)
+      4. [Vibrato, Tremelo, et al.](#344-vibrato-tremelo-et-al)
    5. [Voices](#35-voices)
    6. [Graphics](#36-adding-graphics)
    7. [Interactions](#37-interactions)
    8. [Ensemble](#38-ensemble)
 4. [Widgets](#4-widgets)
-    1. [Monitoring Status](#status)
-    2. [Generating groups of Notes](#pitch-time)
-       1. [Phrase Maker](#pitch-time) 
-       2. [The Rhythm Block](#THE-RHYTHM-BLOCK) 
-       3. [Creating Tuplets](#CREATING-TUPLETS)
-       4. [What is a Tuplet?](#WHAT-IS-TUPLET)
-       5. [Using Individual Notes in the Phrase Maker](#INDIVIDUAL-NOTES)
-       6. [Using a Scale of Pitches in the Phrase Maker](#USING-A-SCALE)
-    3. [Generating Rhythms](#rhythms)
-    4. [Musical Modes](#modes)
-    5. [Meters](#meters)
-    6. [The Pitch-Drum Matrix](#pitch-drum)
-    7. [Exploring Musical Proportions](#stairs)
-    8. [Generating Arbitrary Pitches](#slider)
-    9. [Changing Tempo](#tempo)
-    10. [Custom Timbres](#timbre)
-    11. [Music Keyboard](#keyboard)
-    12. [Changing Temperament](#temperament)
-    13. [Oscilloscope](#oscilloscope)
-    14. [Sampler](#sampler)
+    1. [Monitoring Status](#41-status)
+    2. [Generating groups of Notes](#42-generating-chunks-of-notes)
+       1. [The Phrase Maker](#421-the-phrase-maker)
+       2. [The Rhythm Block](#422-the-rhythm-block) 
+       3. [Creating Tuplets](#423-creating-tuplets)
+       4. [What is a Tuplet?](#424-what-is-tuplet)
+       5. [Using Individual Notes](#425-using-individual-notes)
+       6. [Using a Scale of Pitches](#426-using-a-scale-of-pitches)
+    3. [Generating Rhythms](#43-generating-rhythms)
+    4. [Musical Modes](#44-musical-modes)
+    5. [Meters](#45-meters)
+    6. [The Pitch-Drum Matrix](#46-the-pitch-drum-matrix)
+    7. [Exploring Musical Proportions](#47-exploring-musical-proportions)
+    8. [Generating Arbitrary Pitches](#48-generating-arbitrary-pitches)
+    9. [Changing Tempo](#49-changing-tempo)
+    10. [Custom Timbres](#410-custom-timbres)
+    11. [The Music Keyboard](#411-the-music-keyboard)
+    12. [Changing Temperament](#412-changing-temperament)
+    13. [The Oscilloscope](#413-the-oscilloscope)
+    14. [The Sampler](#414-the-sampler)
 5. [Beyond Music Blocks](#5-beyond-music-blocks)
-    1. [LilyPond](#LILYPOND)
-    2. [Other exports](#EXPORTS)
-    3. [JavaScript](#JAVASCRIPT)
-
-[APPENDIX: Palette Tables](#APPENDIX_1)
+    1. [LilyPond](#51-lilypond)
+    2. [Other exports](#52-other-exports)
+    3. [The JavaScript Editor](#53-the-javascript-editor)
+6. [Appendix](6-appendix)
+    1. [Beginner Palette Tables](61-beginner-palettes)
+    2. [Advanced Palette Tables](62-advanced-palettes)
 
 Many of the examples given in the guide have links to code you can
 run. Look for `RUN LIVE` links.
@@ -114,7 +117,7 @@ Music Blocks incorporates many common elements of music, such as
 [pitch](#PITCH), [rhythm](#rhythms), [volume](#MORE-TRANSFORMATIONS),
 and, to some degree, [timbre and texture](#VOICES).
 
-### <a name="NOTE-VALUE"></a>2.1 Note Value Blocks
+### <a name="NOTE-VALUE">2.1 Note Value Blocks</a>
 
 At the heart of Music Blocks is the *Note value* block. The *Note
 value* block is a container for a [*Pitch* block](#PITCH) that
@@ -149,7 +152,7 @@ As a convenience, a pie menu is used for selecting common note values.
 Please refer to the above picture for a visual representation of note
 values.
 
-### <a name="PITCH"></a>2.2 Pitch Blocks
+### <a name="PITCH">2.2 Pitch Blocks</a>
 
 As we have seen, *Pitch* blocks are used inside the
 [*Note value*](#NOTE-VALUE) blocks. The *Pitch* block specifies the
@@ -216,7 +219,7 @@ and octave.
 Please refer to the above charts for a visual representation of where
 notes are located on a keyboard or staff.
 
-### <a name="MULTI-PITCH"></a>2.3 Multiple Pitches
+### <a name="MULTI-PITCH">2.3 Multiple Pitches</a>
 
 ![multiple pitch](./note4.svg "Playing multiple pitches in one note")
 
@@ -224,14 +227,14 @@ Multiple, simultaneous pitches can be specified by adding multiple
 *Pitch* blocks into a single *Note value* block, like the above
 example.
 
-### <a name="RESTS"></a>2.4 Rests
+### <a name="RESTS">2.4 Rests</a>
 
 ![silence block](./silence.svg "Silence blocks create rests")
 
 A rest of the specified note value duration can be constructed using a
 *Silence* block in place of a *Pitch* block.
 
-### <a name="DRUMS"></a>2.5 Drums
+### <a name="DRUMS">2.5 Drums</a>
 
 ![drum](./drum1.svg "Using Drum Sample block")
 
@@ -318,7 +321,7 @@ song we created?)
 
 There are many ways to transform pitch, rhythm, and other sonic qualities.
 
-#### <a name="STEP-PITCH"></a>3.2.1 Step Pitch Block
+#### <a name="STEP-PITCH">3.2.1 Step Pitch Block</a>
 
 ![step pitch](./transform0.svg "Using the Step Pitch block")
 
@@ -344,7 +347,7 @@ In this example, we are using the *Mode length* block, which returns
 the number of scalar steps in the current mode (7 for Major and Minor
 modes).
 
-#### <a name="SHARPS-AND-FLATS"></a>3.2.2 Sharps And Flats
+#### <a name="SHARPS-AND-FLATS">3.2.2 Sharps And Flats</a>
 
 ![sharp and flat](./transform1.svg "Using Sharp and Flat blocks")
 
@@ -355,7 +358,7 @@ the left, just the *Pitch* block `Mi` is lowered by one half step; on
 the right, both *Pitch* blocks are raised by one half step. (You can
 also use a double-sharp or double-flat accidental.)
 
-#### <a name="ADJUST-TRANSPOSITION"></a>3.2.3 Adjusting Transposition
+#### <a name="ADJUST-TRANSPOSITION">3.2.3 Adjusting Transposition</a>
 
 ![transposition](./transform2.svg "Adjusting transpositions")
 
@@ -390,7 +393,7 @@ The *Register* block provides an easy way to modify the register
 used to bump the `Mi 4` note up by one octave and then to bump the
 `Sol 4` note down by one octave.
 
-#### <a name="PITCH-MOVEMENT"></a>3.2.4 Summary of Pitch Movements
+#### <a name="PITCH-MOVEMENT">3.2.4 Summary of Pitch Movements</a>
 
 | Representation | Pitch Movement | Properties |
 | --- | --- | --- |
@@ -432,7 +435,7 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 | | | For example: Transposing C-D-E-F by 4 (fifth) will give us G-A-B-C
 | | | To transpose an octave: shift by the mode length (7 in major scales) up or down. |
 
-#### <a name="SET-KEY"></a>3.2.5 Set Key
+#### <a name="SET-KEY">3.2.5 Set Key</a>
 
 The *Set key* block is used to change both the mode and key of the
 current scale. (The current scale is used to define the mapping of
@@ -576,7 +579,7 @@ You can find the *Set key* block on the *Intervals* palette.
 | --- |
 | ![moveable do](./pitchmovement6.png "moveable do") |
 
-#### <a name="FIXED-AND-MOVABLE-PITCH-SYSTEMS"></a>3.2.6 Pitch Systems: Fixed and Movable and Subsystems
+#### <a name="FIXED-AND-MOVABLE-PITCH-SYSTEMS">3.2.6 Fixed and Movable Pitch Systems</a>
 
 Music Blocks allows users to express and explore musical ideas in a
 variety of different systems. The main systems of expression are fixed
@@ -733,7 +736,7 @@ block.
 
 [Scale Degree Improv](https://rawgit.com/sugarlabs/musicblocks/master/examples/Scale-Degree-Improv.html)
 
-#### <a name="INTERVALS"></a>3.2.7 Intervals
+#### <a name="INTERVALS">3.2.7 Intervals</a>
 
 ![interval](./transform9.svg "Scalar interval block")
 
@@ -749,7 +752,7 @@ on the *Intervals* palette: *Unison*, *Second*, *Third*, ...,
 The *Scalar interval measure* block can be used to measure the number
 of scalar steps between two pitched.
 
-#### <a name= "ABSOLUTE-INTERVALS"></a>Absolute Intervals
+#### <a name= "ABSOLUTE-INTERVALS">3.2.7.1 Absolute Intervals</a>
 
 Absolute (or semi-tone) intervals are based on half-steps.
 
@@ -776,7 +779,7 @@ double diminishment.
 The *Semi-tone interval measure* block can be used to measure the
 number of half-steps between two pitched.
 
-#### <a name= "CHORDS"></a>Chords
+#### <a name= "CHORDS">3.2.7.2 Chords</a>
 
 A chord is a group of notes that are played together (often used for
 harmony in music). There are triads (three notes), tetrachords (four
@@ -796,7 +799,7 @@ We support many basic chords:
 | minor 7 | 1 3 7 10 | Cmin7 C - E♭ - G - B♭ |
 | major 7 | 1 4 7 11 | Cmaj7 C - E - G - B |
 
-#### <a name= "INVERSION"></a>3.2.8 Inversion
+#### <a name= "INVERSION">3.2.8 Inversion</a>
 
 The *Invert* block will rotate a series of notes around a target
 note. There are three different modes of the *Invert* block: *even*,
@@ -893,7 +896,7 @@ midway between `C5` and `C♯5`.  In the *invert (scalar)* example,
 notes are inverted around `C5`, by scalar steps rather than
 half-steps.
 
-#### <a name="CONVERTERS"></a>3.2.9 Converters
+#### <a name="CONVERTERS">3.2.9 Converters</a>
 
 Converters are used to transform one form of inputs into other, more usable form of outputs. This section of the guide will talk about the various conversion options Music Blocks has to offer.
 
@@ -907,7 +910,7 @@ where the right argument is converted accordingly, and output is received on the
 
 ![staff](treble.svg "Treble clef staff")
 
-### <a name="y-to-pitch"></a>3.2.9.1 Y to Pitch
+### <a name="y-to-pitch">3.2.9.1 Y to Pitch</a>
 
 ![y pos](../documentation/ytopitch_block.svg "Y to Pitch converter")
 
@@ -915,7 +918,7 @@ This converter takes input in the form of a number that represents Staff Y posit
 
 Additionally, the block can be plugged into a print block to view the converted note value.
 
-### <a name="pitch-converter"></a>3.2.9.2 Pitch converter
+### <a name="pitch-converter">3.2.9.2 Pitch converter</a>
 
 ![pitch converter](../documentation/outputtools_block.svg "Pitch converter block")
 
@@ -956,13 +959,13 @@ Value of the pitch of the note currently being played. It is different from Pitc
 #### **9. Staff Y:**
 Returns the Y staff position of the note being played according to staff dimensions. It takes into account only the letter class, no accidental info is processed.
 
-### <a name="number-2-octave"></a>3.2.9.3 Number to Octave  
+### <a name="number-2-octave">3.2.9.3 Number to Octave  </a>
   
 ![pitch converter](../documentation/number2octave_block.svg "Y to Pitch converter")
 
 This converter takes a numeric value which denotes pitch number and returns the octave corresponding to that pitch number.
 
-### <a name="number-2-pitch"></a>3.2.9.4 Number to Pitch
+### <a name="number-2-pitch">3.2.9.4 Number to Pitch</a>
 
 ![pitch converter](../documentation/number2pitch_block.svg "Y to Pitch converter")
 
@@ -985,7 +988,7 @@ This converter takes a numeric value which denotes pitch number and returns the 
 
 ### <a name="NOTE-VALUE-TRANSFORMATION">3.3 Note Value Transformations</a>
 
-#### <a name="DOTTED"></a>3.3.1 Dotted Notes
+#### <a name="DOTTED">3.3.1 Dotted Notes</a>
 
 ![dot](./transform4.svg "Creating dotted notes using the Dot block")
 
@@ -1010,7 +1013,7 @@ calculation into a note's note value.
 
 ![dotted note](../charts/DotsChart.svg "using dotted notes")
 
-#### <a name="MULTIPLY-AND-DIVIDE"></a>3.3.2 Changing Note(s) duration via Mathematical Operations
+#### <a name="MULTIPLY-AND-DIVIDE">3.3.2 Speeding Up and Slowing Down Notes via Mathematical Operations</a>
 
 ![duration](./transform5.svg "Changing note duration for a note or notes")
 
@@ -1028,7 +1031,7 @@ decreased over time, at each repetition.
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
 
-#### <a name="REPETITION"></a>3.3.3 Repeating Notes
+#### <a name="REPETITION">3.3.3 Repeating Notes</a>
 
 ![repeat](./transform6.svg "repeating notes")
 
@@ -1040,7 +1043,7 @@ In the example, on the left, the result would be `Sol, Re, Sol, Sol,
 Re, Sol, Sol, Re, Sol, Sol, Re, Sol`; on the right the result would be
 `Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol`.
 
-#### <a name="SWINGING"></a>3.3.4 Swinging Notes and Tied Notes
+#### <a name="SWINGING">3.3.4 Swinging Notes and Tied Notes</a>
 
 ![swing](./transform7.svg "swinging notes and tied notes")
 
@@ -1059,7 +1062,7 @@ notes must be identical in pitch, but can vary in rhythm.)
 
 ![ties](../charts/TiesChart.svg "using notes with ties")
 
-#### <a name="BEAT"></a>3.3.5 Beat
+#### <a name="BEAT">3.3.5 Beat</a>
 
 The beat of the music is determined by the *Meter* block (by default,
 it is set to 4:4).
@@ -1109,7 +1112,7 @@ the volumne to `5`. The resultant graphic is shown below.
 
 ![graphics](./graphics6.svg "graphics modulated by beat")
 
-#### <a name="BEAT-TRANSFORMATIONS"></a>3.3.6 Staccato and Slur
+#### <a name="BEAT-TRANSFORMATIONS">3.3.6 Staccato and Slur</a>
 
 ![slur](./transform17.svg "Staccato, and Slur blocks")
 
@@ -1121,7 +1124,7 @@ The *Slur* block lengthens the sustain of notes&mdash;running longer than
 the noted duration and blending it into the next note&mdash;while
 maintaining the specified rhythmic value of the notes.
 
-#### <a name="BACKWARDS"></a>3.3.7 Backwards
+#### <a name="BACKWARDS">3.3.7 Backwards</a>
 
 ![backwards](./transform11.svg "Backward block")
 
@@ -1141,7 +1144,7 @@ notes.
 
 ### <a name="OTHER-TRANSFORMATION">3.4 Other Transformations</a>
 
-#### <a name="VOLUME-TRANSFORMATIONS"></a>3.4.1 Set Volume and Crescendo
+#### <a name="VOLUME-TRANSFORMATIONS">3.4.1 Set Volume and Crescendo</a>
 
 ![volume](./transform8.svg "Set master volume, set synth volume, set relative volume, crescendo")
 
@@ -1172,7 +1175,7 @@ than the original value for volume.
 NOTE: The *Crescendo* block does not alter the volume of a note as it
 is being played. Music Blocks does not yet have this functionality.
 
-#### <a name= "SETTINGVOICE"></a>3.4.2 Setting Instrument
+#### <a name= "SETTINGVOICE">3.4.2 Setting Instrument</a>
 
 ![set voice](./transform12.svg "setting voice and keys using Set Voice block")
 
@@ -1483,7 +1486,7 @@ You can hide the widget by clicking on the *Close* button.
 
 You can move the widget by dragging it by the *Drag* handle.
 
-### <a name="status"></a>4.1 Status
+### <a name="status">4.1 Status</a>
 
 ![widget](./status1.svg "given Music block")
 
@@ -1512,7 +1515,7 @@ quarter notes played) before being displayed.
 Using the Phrase Maker, it is possible to generate chunks of
 notes at a much faster speed.
 
-#### <a name="pitch-time"></a>4.2.1 The Phrase Maker
+#### <a name="pitch-time">4.2.1 The Phrase Maker</a>
 
 ![widget](./matrix1.svg "phrase maker")
 
@@ -1594,7 +1597,7 @@ the pitch names and the pitch octaves.)
 To play the chuck, simply click on the action block (on the word
 action). You should hear the notes play, ordered from top to bottom.
 
-#### <a name="THE-RHYTHM-BLOCK"></a>4.2.2 The Rhythm Block
+#### <a name="THE-RHYTHM-BLOCK">4.2.2 The Rhythm Block</a>
 
 ![widget](./matrix6.svg "the Rhythm block")
 
@@ -1615,7 +1618,7 @@ You can use as many *Rhythm* blocks as you'd like inside the
 blocks are used, resulting in three quarter notes and six eighth
 notes.
 
-#### <a name="CREATING-TUPLETS"></a>4.2.3 Creating Tuplets
+#### <a name="CREATING-TUPLETS">4.2.3 Creating Tuplets</a>
 
 ![widget](./matrix9.svg "simple tuplet")
 
@@ -1649,20 +1652,20 @@ In the example above, the two *Rhythm* blocks are embedded in the
 Note: You can mix and match *Rhythm* blocks and *Tuplet* blocks when
 defining your matrix.
 
-#### <a name="WHAT-IS-TUPLET"></a>4.2.4 What is a Tuplet?
+#### <a name="WHAT-IS-TUPLET">4.2.4 What is a Tuplet?</a>
 
 ![tuplet](../charts/TupletChart.svg "tuplet chart")
 
 ![tuplet](../charts/TripletChart.svg "triplet chart")
 
-#### <a name="INDIVIDUAL-NOTES"></a>4.2.5 Using Individual Notes in the Phrase Maker
+#### <a name="INDIVIDUAL-NOTES">4.2.5 Using Individual Notes</a>
 
 ![widget](./matrix14.svg)
 
 You can also use individual notes when defining the grid. These blocks
 will expand into *Rhythm* blocks with the corresponding values.
 
-#### <a name="USING-A-SCALE"></a>4.2.6 Using a Scale of Pitches in the Phrase Maker
+#### <a name="USING-A-SCALE">4.2.6 Using a Scale of Pitches</a>
 
 ![widget](./matrix15.svg)
 
@@ -1674,7 +1677,7 @@ put the highest note on top, the first pitch is the `Sol` in `Octave
 inside the *Repeat*, working our way down to `Sol` in `Octave
 4`. Another detail to note is the use of the *Mode length* block.
 
-### <a name="rhythms"></a>4.3 Generating Rhythms
+### <a name="rhythms">4.3 Generating Rhythms</a>
 
 The *Rhythm Maker* block is used to launch a widget similar to the
 *Phrase maker* block. The widget can be used to generate rhythmic
@@ -1742,7 +1745,7 @@ from left to right across the screen. Each click of the mouse will
 define another beat within the cell. If you don't like your rhythm,
 use the *Undo* button and try again.
 
-### <a name="modes"></a>4.4 Musical Modes
+### <a name="modes">4.4 Musical Modes</a>
 
 Musical modes are used to specify the relationship between
 [intervals](#INTERVALS-AND-ARTICULATION) (or steps) in a scale. Since
@@ -1829,7 +1832,7 @@ Note: The build-in modes in Music Blocks can be found in [musicutils.js](https:/
 The *Save* button exports a stack of blocks representing the mode that
 can be used inside the *Phrase maker* block.
 
-### <a name="meters"></a>4.5 Meters
+### <a name="meters">4.5 Meters</a>
 
 ![widget](./meter1.svg "meter widget block")
 
@@ -1851,7 +1854,7 @@ beats and a kick drum for weak beats.
 
 The *Save* button will export *On strong beat do* blocks for each strong beat.
 
-### <a name="pitch-drum"></a>4.6 The Pitch-Drum Matrix
+### <a name="pitch-drum">4.6 The Pitch-Drum Matrix</a>
 
 ![alt 
  tag](./drum2.svg "Pitch-drum matrix")
@@ -1873,7 +1876,7 @@ As an experience for creating mapping with the *Set Drum* block, we
 provide the *Drum-Pitch* Matrix. You use it to map between pitches and
 drums. The output is a stack of *Set Dum* blocks.
 
-### <a name="stairs"></a>4.7 Exploring Musical Proportions
+### <a name="stairs">4.7 Exploring Musical Proportions</a>
 
 The *Pitch Staircase* block is used to launch a widget similar to the
 *Phrase maker*, which can be used to generate different pitches
@@ -1920,7 +1923,7 @@ the rows in the matrix.
 
 ![widget](./pitchstaircase5.svg "Pitch Stair block")
 
-### <a name="slider"></a>4.8 Generating Arbritary Pitches
+### <a name="slider">4.8 Generating Arbritary Pitches</a>
 
 The *Pitch Slider* block is used to launch a widget that is used to
 generate arbitrary pitches. It differs from the *Pitch Staircase*
@@ -1954,7 +1957,7 @@ Clicking in a column will extact the corresponding *Note* blocks, for example:
 
 ![widget](./pitchslider5.svg " Pitch Slider block")
 
-### <a name="tempo"></a>4.9 Changing Tempo
+### <a name="tempo">4.9 Changing Tempo</a>
 
 The *Tempo* block is used to launch a widget that enables the user to
 visualize Tempo, defined in beats per minute (BPM). When the *Tempo* block
@@ -1979,7 +1982,7 @@ in the widget: the new beats per minute (BPM) is determined as the
 time between the two clicks. For example, if there is `1/2` second
 between clicks, the new BPM will be set as `120`.
 
-### <a name="timbre"></a>4.10 Custom Timbres
+### <a name="timbre">4.10 Custom Timbres</a>
 
 While Music Blocks comes with many built-in instruments, it is also
 possible to create custom timbres with unique sound qualities.
@@ -2050,7 +2053,7 @@ As you add synthesizers, effects, and filters with the widget, blocks
 corresponding to your choices are added to the *Timbre* block. This
 lets you reopen the widget to fine-tune your custom timbre.
 
-### <a name="keyboard"></a>4.11 Music Keyboard
+### <a name="keyboard">4.11 The Music Keyboard</a>
 
 The Music Keyboard is used to generate notes by pressing keys of a virtual
 keyboard.
@@ -2074,7 +2077,7 @@ The MIDI input allows for a using a MIDI device to generate notes.
 
 The metronome feature will generate a beat to enable candence.
 
-###  <a name="temperament"></a>4.12 Changing Temperament
+###  <a name="temperament">4.12 Changing Temperament</a>
 
 *Tempering* is the process of altering the size of an interval by
 making it narrower or wider than pure. It is also possible to change
@@ -2172,7 +2175,7 @@ The *Drag* button will drag the widget.
 
 The *Close* button will close the widget.
 
-###  <a name="oscilloscope"></a>4.13 Oscilloscope
+###  <a name="oscilloscope">4.13 The Oscilloscope</a>
 
 Music Blocks has an Oscillosope Widget to visualize the music as it plays.
 
@@ -2182,7 +2185,7 @@ Music Blocks has an Oscillosope Widget to visualize the music as it plays.
 
 A separate wave will be displayed for each mouse.
 
-###  <a name="sampler"></a>4.14 Sampler
+###  <a name="sampler">4.14 Sampler</a>
 
 ![widget](../documentation/sampler_block.svg "Sampler")
  
@@ -2202,7 +2205,7 @@ Instrument* block.
 Music Blocks is a waypoint, not a destination. One of the goals is to
 point the learner towards other powerful tools.
 
-## <a name="LILYPOND"></a>5.1 Lilypond
+## <a name="LILYPOND">5.1 Lilypond</a>
 
 One such tool is [Lilypond](http://lilypond.org), a music engraving program.
 
@@ -2241,7 +2244,7 @@ e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523043053377623&run=True)
 
-## <a name="EXPORTS"></a>5.2 Other Exports
+## <a name="EXPORTS">5.2 Other Exports</a>
 
 In addition to Lilypond, there are several other export formats
 supported, including ABC, MusicXML, WAV, SVG, and PNG.
@@ -2276,7 +2279,7 @@ Note that artwork saved as PNG or SVG can subsequently be imported
 into Music Blocks to be used with either the *Show* or *Avatar*
 blocks.
 
-## <a name="JAVASCRIPT"></a>5.3 JavaScript
+## <a name="JAVASCRIPT">5.3 The JavaScript Editor</a>
 
 There are practical limits to the size and complexity of Music Blocks
 programs. At some point we expect Music Blocks programmers to move on
@@ -2336,9 +2339,11 @@ MusicBlocks.run();
 Here's the complete [API](../js/js-export/samples/sample.js) of
 methods, getters, setters.
 
-## <a name="APPENDIX_1"></a>Appendix: Palette Tables
+## <a name="APPENDIX">6. Appendix</a>
 
 [Previous Section (5. Beyond Music Blocks)](#5-beyond-music-blocks) | [Back to Table of Contents](#TABLE-OF-CONTENTS)
+
+### <a name="BEGINNER_PALETTES">6.1 Beginner Palettes</a>
 
 Looking for a block? The tables below (one for beginner mode and one for advanced mode) list the blocks by the palette where they are found.
 
@@ -2405,7 +2410,7 @@ Looking for a block? The tables below (one for beginner mode and one for advance
 | | rhythm |
 | | simple tuplet |
 
-### Advanced mode
+### <a name="ADVANCED_PALETTES">6.2 Advanced Palettes</a>
 
 | Music | | | Programming | | | Graphics | |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
