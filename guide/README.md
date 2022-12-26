@@ -1095,25 +1095,8 @@ The *On-Beat-Do* and *Off-Beat-Do* blocks let you specify actions to
 take on specific beats. (Note that the action is run before any blocks
 inside the note block associated with the beat are run.)
 
-![graphics](./graphics5.svg "using beat to synchronize graphics")
-
-Another approach to graphics is to use modulate them based on the
-beat. In the example above, we call the same graphics action for each
-note, but the parameters associated with the action, such as pen
-width, are dependent upon which beat we are on. On Beat 1, the pen
-size is set to `50` and the volume to `75`. On Beat `3`, the pen size is set
-to `25` and the volume to `50`. On off beats, the pen size is set to `5` and
-the volumne to `5`. The resultant graphic is shown below.
-
-![graphics](./graphics6.svg "graphics modulated by beat")
-
-The *On-Every-Note-Do* block lets you specify an action to take
-whenever a note is played. In the example above, the note value is
-used to determine the portion of an arc to draw, i.e., a 1/4 note
-draws a 1/4 circle, a 1/2 note draw 1/2 circle, and a whole note draws
-a full circle.
-
-![on-every-note-do](../documentation/arc_block.svg)
+More examples can be found in the [Graphics](#36-adding-graphcis)
+section below.
 
 #### <a name="BEAT-TRANSFORMATIONS">3.3.6 Staccato and Slur</a>
 
@@ -1291,12 +1274,42 @@ graphics commands inside of *Note value* blocks
 [RUN
 LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
 
-![no clock](../documentation/drift_block.svg "No-clock block")
+![graphics](./graphics5.svg "using beat to synchronize graphics")
+
+Another approach to graphics is to use modulate them based on the
+[beat](#335-beat). In the example above, we call the same graphics
+action for each note, but the parameters associated with the action,
+such as pen width, are dependent upon which beat we are on. On Beat 1,
+the pen size is set to `50` and the volume to `75`. On Beat `3`, the
+pen size is set to `25` and the volume to `50`. On off beats, the pen
+size is set to `5` and the volumne to `5`. The resultant graphic is
+shown below.
+
+![graphics](./graphics6.svg "graphics modulated by beat")
+
+The *On-Every-Note-Do* block lets you specify an action to take
+whenever a note is played. In the example above, the note value is
+used to determine the portion of an arc to draw, i.e., a 1/4 note
+draws a 1/4 circle, a 1/2 note draw 1/2 circle, and a whole note draws
+a full circle.
+
+![on-every-note-do](../documentation/arc_block.svg)
+
+The *On-Every-Note-Do* block is found in the Crab Canon project on the
+Planet to "plot the music". The mouse moves up and down based on the
+change in pich between notes and to the right in proportion to the
+note value.
+
+![crab-canon](./crab-canon.svg)
+
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1522885323588493)
 
 Music Blocks has an internal "conductor" maintaining the beat.  When
 the Run button is clicked, the program begins and an internal master
 (or "conductor") clock starts up. All of the music tries to stay
 synced to that clock.
+
+![no clock](../documentation/drift_block.svg "No-clock block")
 
 For example, if you have multiple voices (mice), they all share the
 same conductor in order to keep on the same beat. If a voice (mouse)
