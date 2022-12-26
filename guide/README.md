@@ -1095,7 +1095,7 @@ The *On-Beat-Do* and *Off-Beat-Do* blocks let you specify actions to
 take on specific beats. (Note that the action is run before any blocks
 inside the note block associated with the beat are run.)
 
-More examples can be found in the [Graphics](#36-adding-graphcis)
+More examples can be found in the [Graphics](#36-adding-graphics)
 section below.
 
 #### <a name="BEAT-TRANSFORMATIONS">3.3.6 Staccato and Slur</a>
