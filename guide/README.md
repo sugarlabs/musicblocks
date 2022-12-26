@@ -10,7 +10,13 @@ is a good place to start learning about the basics. In this guide, we
 illustrate the musical features by walking the reader through numerous
 examples.
 
-A short [Guide to Debugging](http://github.com/sugarlabs/musicblocks/tree/master/Debugging.md) is also available.
+The Music Blocks [basic documentation](../documentation/README.md) is
+also a good resource.
+
+And there is a short [Guide to Debugging](../Debugging.md) to help you
+with your programming.
+
+This guide details the many musical features of the language.
 
 ## <a name="TOC">TABLE OF CONTENTS</a>
 
