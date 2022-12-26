@@ -1107,13 +1107,13 @@ the volumne to `5`. The resultant graphic is shown below.
 
 ![graphics](./graphics6.svg "graphics modulated by beat")
 
-![on-every-note-do](../documentation/arc_block.svg)
-
 The *On-Every-Note-Do* block lets you specify an action to take
 whenever a note is played. In the example above, the note value is
 used to determine the portion of an arc to draw, i.e., a 1/4 note
 draws a 1/4 circle, a 1/2 note draw 1/2 circle, and a whole note draws
 a full circle.
+
+![on-every-note-do](../documentation/arc_block.svg)
 
 #### <a name="BEAT-TRANSFORMATIONS">3.3.6 Staccato and Slur</a>
 
