@@ -106,13 +106,13 @@ distros, or equivalent on others.)
     for _Linux_ and _macOS_:
 
     ```bash
-    python -c \"import os, sys; os.system('python -m SimpleHTTPServer 3000 --bind 127.0.0.1') if sys.version_info.major==2 else os.system('python -m http.server 3000 --bind 127.0.0.1');
+    python -c "import os, sys; os.system('python -m SimpleHTTPServer 3000 --bind 127.0.0.1') if sys.version_info.major==2 else os.system('python -m http.server 3000 --bind 127.0.0.1')"
     ```
 
     for _Windows_:
 
     ```bash
-    py -c \"import os, sys; os.system('py -m SimpleHTTPServer 3000') if sys.version_info.major==2 else os.system('py -m http.server 3000 --bind 127.0.0.1');
+    python -c "import os, sys; os.system('python -m SimpleHTTPServer 3000') if sys.version_info.major==2 else os.system('python -m http.server 3000 --bind 127.0.0.1')"
     ```
 
     If you have `npm` installed, simply run `npm run serve` for Linux
