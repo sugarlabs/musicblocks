@@ -12,7 +12,7 @@ examples.
 
 A short [Guide to Debugging](http://github.com/sugarlabs/musicblocks/tree/master/Debugging.md) is also available.
 
-## <a name="TOC"></a>TOC
+## <a name="TOC">TABLE OF CONTENTS</a>
 
 1. [Getting Started](#GETTING-STARTED)
 2. [Making Sounds](#NOTES)
@@ -83,7 +83,7 @@ run. Look for `RUN LIVE` links.
 
 ## <a name="GETTING-STARTED"></a>1. Getting Started
 
-[Back to Table of Contents](#TOC) | [Next Section (2. Making Sounds)](#NOTES)
+[Back to Table of Contents](#TABLE-OF-CONTENTS) | [Next Section (2. Making Sounds)](#NOTES)
 
 Music Blocks is designed to run in a browser. Most of the development
 has been done in Chrome, but it should also work in Firefox, Opera,
@@ -107,7 +107,7 @@ JS](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
 ## <a name="NOTES"></a>2. Making Sounds
 
 [Previous Section (1. Getting Started)](#GETTING-STARTED) | [Back to
-Table of Contents](#TOC) | [Next Section (3. Programming with
+Table of Contents](#TABLE-OF-CONTENTS) | [Next Section (3. Programming with
 Music)](#PROGRAMMING-WITH-MUSIC)
 
 Music Blocks incorporates many common elements of music, such as
@@ -249,7 +249,7 @@ with *Pitch* blocks as well.
 ## <a name="PROGRAMMING-WITH-MUSIC"></a>3. Programming with Music
 
 [Previous Section (2. Making Sounds)](#NOTES) | [Back to Table of
-Contents](#TOC) | [Next Section (4. Widgets)](#WIDGETS)
+Contents](#TABLE-OF-CONTENTS) | [Next Section (4. Widgets)](#WIDGETS)
 
 This section of the guide discusses how to use chunks of notes to
 program music. Note that you can program with chunks you create by
@@ -1468,7 +1468,7 @@ The *Set mouse* block sends a stack of blocks to be run by the specified mouse.
 
 ## <a name="WIDGETS"></a>Widgets
 
-[Previous Section (3. Programming with Music)](#PROGRAMMING-WITH-MUSIC) | [Back to Table of Contents](#TOC) | [Next Section (5. Beyond Music Blocks)](#BEYOND-MUSIC-BLOCKS)
+[Previous Section (3. Programming with Music)](#PROGRAMMING-WITH-MUSIC) | [Back to Table of Contents](#TABLE-OF-CONTENTS) | [Next Section (5. Beyond Music Blocks)](#BEYOND-MUSIC-BLOCKS)
 
 This section of the guide will talk about the various Widgets that can
 be used within Music Blocks to enhance your experience.
@@ -2197,7 +2197,7 @@ Instrument* block.
 
 ## <a name="BEYOND-MUSIC-BLOCKS"></a>5. Beyond Music Blocks
 
-[Previous Section (4. Widgets)](#WIDGETS) | [Back to Table of Contents](#TOC)
+[Previous Section (4. Widgets)](#WIDGETS) | [Back to Table of Contents](#TABLE-OF-CONTENTS)
 
 Music Blocks is a waypoint, not a destination. One of the goals is to
 point the learner towards other powerful tools.
@@ -2338,7 +2338,7 @@ methods, getters, setters.
 
 ## <a name="APPENDIX_1"></a>Appendix: Palette Tables
 
-[Previous Section (5. Beyond Music Blocks)](#BEYOND-MUSIC-BLOCKS) | [Back to Table of Contents](#TOC)
+[Previous Section (5. Beyond Music Blocks)](#BEYOND-MUSIC-BLOCKS) | [Back to Table of Contents](#TABLE-OF-CONTENTS)
 
 Looking for a block? The tables below (one for beginner mode and one for advanced mode) list the blocks by the palette where they are found.
 
@@ -2559,4 +2559,4 @@ Looking for a block? The tables below (one for beginner mode and one for advance
 | | 1/64 note |
 | | custom mode |
 
-[Back to Table of Contents](#TOC)
+[Back to Table of Contents](#TABLE-OF-CONTENTS)
