@@ -58,7 +58,7 @@ A short [Guide to Debugging](http://github.com/sugarlabs/musicblocks/tree/master
        1. [The Phrase Maker](#421-the-phrase-maker)
        2. [The Rhythm Block](#422-the-rhythm-block) 
        3. [Creating Tuplets](#423-creating-tuplets)
-       4. [What is a Tuplet?](#424-what-is-tuplet)
+       4. [What is a Tuplet?](#424-what-is-a-tuplet)
        5. [Using Individual Notes](#425-using-individual-notes)
        6. [Using a Scale of Pitches](#426-using-a-scale-of-pitches)
     3. [Generating Rhythms](#43-generating-rhythms)
@@ -77,9 +77,9 @@ A short [Guide to Debugging](http://github.com/sugarlabs/musicblocks/tree/master
     1. [LilyPond](#51-lilypond)
     2. [Other exports](#52-other-exports)
     3. [The JavaScript Editor](#53-the-javascript-editor)
-6. [Appendix](6-appendix)
-    1. [Beginner Palette Tables](61-beginner-palettes)
-    2. [Advanced Palette Tables](62-advanced-palettes)
+6. [Appendix](#6-appendix)
+    1. [Beginner Palette Tables](#61-beginner-palettes)
+    2. [Advanced Palette Tables](#62-advanced-palettes)
 
 Many of the examples given in the guide have links to code you can
 run. Look for `RUN LIVE` links.
@@ -114,13 +114,15 @@ Table of Contents](#TABLE-OF-CONTENTS) | [Next Section (3. Programming with
 Music)](#3-programming-with-music)
 
 Music Blocks incorporates many common elements of music, such as
-[pitch](#PITCH), [rhythm](#rhythms), [volume](#MORE-TRANSFORMATIONS),
-and, to some degree, [timbre and texture](#VOICES).
+[pitch](#22-pitch-blocks), [rhythm](#21-note-value-blocks),
+[volume](#341-set-volume-and-crescendo), and, to some degree,
+[timbre](#342-setting-instrument) and
+[texture](#344-vibrato-tremelo-et-al).
 
 ### <a name="NOTE-VALUE">2.1 Note Value Blocks</a>
 
 At the heart of Music Blocks is the *Note value* block. The *Note
-value* block is a container for a [*Pitch* block](#PITCH) that
+value* block is a container for a [*Pitch* block](#22-pitch-blocks) that
 specifies the duration (note value) of the pitch.
 
 ![notes](./note1.svg "A single Note value block (top) and two consecutive Note valueblocks (bottom)")
@@ -155,7 +157,7 @@ values.
 ### <a name="PITCH">2.2 Pitch Blocks</a>
 
 As we have seen, *Pitch* blocks are used inside the
-[*Note value*](#NOTE-VALUE) blocks. The *Pitch* block specifies the
+[*Note value*](#21-note-value-blocks) blocks. The *Pitch* block specifies the
 pitch name and pitch octave of a note that in combination determines
 the frequency (and therefore pitch) at which the note is played.
 
@@ -245,9 +247,9 @@ to choose. The default drum is a kick drum.
 
 ![drums](./note5.svg "Multiple Drum Sample blocks in combinations")
 
-Just as in the [chord](#CHORD) example above, you can use multiple
-*Drum* blocks within a single *Note value* blocks, and combine them
-with *Pitch* blocks as well.
+Just as in the [multi-pitch](#23-multiple-pitches) example above, you
+can use multiple *Drum* blocks within a single *Note value* blocks,
+and combine them with *Pitch* blocks as well.
 
 ## <a name="PROGRAMMING-WITH-MUSIC">3. Programming with Music</a>
 
@@ -256,8 +258,8 @@ Contents](#TABLE-OF-CONTENTS) | [Next Section (4. Widgets)](#4-widgets)
 
 This section of the guide discusses how to use chunks of notes to
 program music. Note that you can program with chunks you create by
-hand or use the [*Phrase maker*](#pitch-time) widget to help you
-get started.
+hand or use [*The Phrase Maker*](#42-generating-chunks-of-notes)
+widget to help you get started.
 
 ### <a name="ACTIONS">3.1 Actions</a>
 
@@ -299,8 +301,8 @@ block to execute them sequentially.
 
 ![repeat action](./chunk-4.svg "usage of Repeat block")
 
-You can [repeat](#REPETITION) actions either by using multiple *Action*
-blocks or using a *Repeat* block.
+You can [repeat](#333-repeating-notes) actions either by using
+multiple *Action* blocks or using a *Repeat* block.
 
 ![multiple actions](./chunk-6.svg "multiple action stacks")
 
@@ -339,9 +341,9 @@ LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523032034365533&run=True)
 Another way to move up and down notes in a scale is to use the *Scalar
 Step Up* and *Scalar Step Down* blocks. These blocks calculate the
 number of half-steps to the next note in the current mode. (You can
-read more about [Musical Modes](#modes) below.) Note that the *Mouse
-Pitch Number* block returns the pitch number of the most recent note
-played.
+read more about [Musical Modes](#44-musical-modes) below.) Note that
+the *Mouse Pitch Number* block returns the pitch number of the most
+recent note played.
 
 In this example, we are using the *Mode length* block, which returns
 the number of scalar steps in the current mode (7 for Major and Minor
@@ -352,11 +354,12 @@ modes).
 ![sharp and flat](./transform1.svg "Using Sharp and Flat blocks")
 
 The *Accidental* block can be wrapped around *Pitch* blocks, *Note
-value* blocks, or [chunks](#CHUNKS). A sharp will raise the pitch by
-one half step. A flat will lower by one half step. In the example, on
-the left, just the *Pitch* block `Mi` is lowered by one half step; on
-the right, both *Pitch* blocks are raised by one half step. (You can
-also use a double-sharp or double-flat accidental.)
+value* blocks, or chuncks of notes inside of [*Action*](#31-actions)
+blocks. A sharp will raise the pitch by one half step. A flat will
+lower by one half step. In the example, on the left, just the *Pitch*
+block `Mi` is lowered by one half step; on the right, both *Pitch*
+blocks are raised by one half step. (You can also use a double-sharp
+or double-flat accidental.)
 
 #### <a name="ADJUST-TRANSPOSITION">3.2.3 Adjusting Transposition</a>
 
@@ -1026,7 +1029,7 @@ will result in the equivalent of a `1/4` note.
 
 ![drums](./drum4.svg "speeding up drum beats over time")
 
-In the above example, the sequence of [drum](#DRUMS) note values is
+In the above example, the sequence of [drum](#25-drums) note values is
 decreased over time, at each repetition.
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
@@ -1182,8 +1185,8 @@ is being played. Music Blocks does not yet have this functionality.
 The default instrument is an electronic synthesizer, so by default,
 that is the instrument used when playing notes. You can override this
 default for a group of notes by using the *Set Instrument* block. It
-will select a [voice](#VOICES) for the synthesizer for any contained
-blocks, e.g., violin.
+will select an [instrument](#342-setting-instrument) for the
+synthesizer for any contained blocks, e.g., violin.
 
 ![default voice](../documentation/setdefaultinstrument_block.svg "Set Default Instrument")
 
@@ -1499,9 +1502,9 @@ row per voice in the status table.
 
 Additional *Print* blocks can be added to the *Status* widget to
 display additional music factors, e.g., duplicate, transposition,
-skip, [staccato](#MORE-TRANSFORMATIONS),
-[slur](#MORE-TRANSFORMATIONS), and [graphics](#GRAPHICS) factors,
-e.g., x, y, heading, color, shade, grey, and pensize.
+skip, [staccato and slur](#336-staccato-and-slur), and
+[graphics](#36-adding-graphics) factors, e.g., x, y, heading, color,
+shade, grey, and pensize.
 
 ![widget](./status3.svg "additional programming within the Status
  block")
@@ -1748,15 +1751,16 @@ use the *Undo* button and try again.
 ### <a name="modes">4.4 Musical Modes</a>
 
 Musical modes are used to specify the relationship between
-[intervals](#INTERVALS-AND-ARTICULATION) (or steps) in a scale. Since
+[intervals](#327-intervals) (or steps) in a scale. Since
 Western music is based on 12 half-steps per octave, modes speficy how
 many half steps there are between each note in a scale.
 
 By default, Music Blocks uses the *Major* mode, which, in the
-[Key](#SETTING) of C, maps to the white keys on a piano. The intervals
-in the *Major* mode are `2, 2, 1, 2, 2, 2, 1`. Many other common modes
-are built into Music Blocks, including, of course, *Minor* mode, which
-uses `2, 1, 2, 2, 1, 2, 2` as its intervals.
+[Key](#343-setting-key-and-mode) of C, maps to the white keys on a
+piano. The intervals in the *Major* mode are `2, 2, 1, 2, 2, 2,
+1`. Many other common modes are built into Music Blocks, including, of
+course, *Minor* mode, which uses `2, 1, 2, 2, 1, 2, 2` as its
+intervals.
 
 Note that not every mode uses 7 intervals per octave. For example, the
 *Chromatic* mode uses 11 intervals: `1, 1, 1, 1, 1, 1, 1, 1, 1,
