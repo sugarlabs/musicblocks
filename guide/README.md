@@ -32,9 +32,9 @@ A short [Guide to Debugging](http://github.com/sugarlabs/musicblocks/tree/master
       6. [Fixed and Movable Pitch Systems](#326-fixed-and-movable-pitch-systems)
       7. [Intervals](#327-intervals)
           1. [Absolute Intervals](#3271-absolute-intervals)
-	  2. [Chords](#3272-chords)
-      8. [Inversion](#328-inversion)
-      9. [Converters](#329-converters)
+      8. [Chords](#328-chords)
+      9. [Inversion](#329-inversion)
+      10. [Converters](#3210-converters)
    3. [Note Value Transformations](#33-note-value-transformations)
       1. [Dotted Notes](#331-dotted-notes)
       2. [Speeding Up and Slowing Down Notes via Mathematical Operations](#332-speeding-up-and-slowing-down-notes-via-mathematical-operations)
@@ -782,7 +782,7 @@ double diminishment.
 The *Semi-tone interval measure* block can be used to measure the
 number of half-steps between two pitched.
 
-#### <a name= "CHORDS">3.2.7.2 Chords</a>
+#### <a name= "CHORDS">3.2.8 Chords</a>
 
 A chord is a group of notes that are played together (often used for
 harmony in music). There are triads (three notes), tetrachords (four
@@ -802,7 +802,7 @@ We support many basic chords:
 | minor 7 | 1 3 7 10 | Cmin7 C - E♭ - G - B♭ |
 | major 7 | 1 4 7 11 | Cmaj7 C - E - G - B |
 
-#### <a name= "INVERSION">3.2.8 Inversion</a>
+#### <a name= "INVERSION">3.2.9 Inversion</a>
 
 The *Invert* block will rotate a series of notes around a target
 note. There are three different modes of the *Invert* block: *even*,
@@ -899,7 +899,7 @@ midway between `C5` and `C♯5`.  In the *invert (scalar)* example,
 notes are inverted around `C5`, by scalar steps rather than
 half-steps.
 
-#### <a name="CONVERTERS">3.2.9 Converters</a>
+#### <a name="CONVERTERS">3.2.10 Converters</a>
 
 Converters are used to transform one form of inputs into other, more usable form of outputs. This section of the guide will talk about the various conversion options Music Blocks has to offer.
 
