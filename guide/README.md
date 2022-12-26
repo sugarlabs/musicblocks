@@ -14,16 +14,16 @@ A short [Guide to Debugging](http://github.com/sugarlabs/musicblocks/tree/master
 
 ## <a name="TOC">TABLE OF CONTENTS</a>
 
-1. [Getting Started](#GETTING-STARTED)
-2. [Making Sounds](#NOTES)
+1. [Getting Started](#1-getting-started)
+2. [Making Sounds](#2-making-sounds)
    1. [Note Value Blocks](#NOTE-VALUE)
    2. [Pitch Blocks](#PITCH)
    3. [Multiple pitches](#MULTI-PITCH)
    4. [Rests](#RESTS)
    5. [Drums](#DRUMS)
-3. [Programming with Music](#PROGRAMMING-WITH-MUSIC)
-   1. [Actions](#ACTIONS)
-   2. [Pitch Transformations](#PITCH-TRANSFORMATION)
+3. [Programming with Music](#3-programming-with-music)
+   1. [Actions](#31-actions)
+   2. [Pitch Transformations](#32-pitch-transformation)
       1. [Step Pitch Block](#STEP-PITCH)
       2. [Sharps and Flats](#SHARPS-AND-FLATS)
       3. [Adjusting Transposition](#ADJUST-TRANSPOSITION)
@@ -33,7 +33,7 @@ A short [Guide to Debugging](http://github.com/sugarlabs/musicblocks/tree/master
       7. [Intervals](#INTERVALS)
       8. [Inversion](#INVERSION)
       9. [Converters](#CONVERTERS)
-   3. [Note Value Transformations](#NOTE-VALUE-TRANSFORMATION)
+   3. [Note Value Transformations](#33-note-value-transformation)
       1. [Dotted Notes](#DOTTED)
       2. [Speeding Up and Slowing Down Notes via Mathematical Operations](#MULTIPLY-AND-DIVIDE)
       3. [Repeating Notes](#REPETITION)
@@ -41,16 +41,16 @@ A short [Guide to Debugging](http://github.com/sugarlabs/musicblocks/tree/master
       5. [Beat](#BEAT)
       6. [Staccato and Slur Blocks](#BEAT-TRANSFORMATIONS)
       7. [Backwards](#BACKWARDS)
-   4. [Other Transformations](#OTHER-TRANSFORMATION)
+   4. [Other Transformations](#34-other-transformation)
       1. [Set Volume and Crescendo Blocks](#VOLUME-TRANSFORMATIONS)
       2. [Setting Voice](#SETTINGVOICE)
       3. [Setting Key and Mode](#SETTINGKEY)
       4. [Vibrato, Tremelo, et al.](#VIBRATO)
-   5. [Voices](#VOICES)
-   6. [Graphics](#GRAPHICS)
-   7. [Interactions](#INTERACTIONS)
-   8. [Ensemble](#ENSEMBLE)
-4. [Widgets](#WIDGETS)
+   5. [Voices](#35-voices)
+   6. [Graphics](#36-adding-graphics)
+   7. [Interactions](#37-interactions)
+   8. [Ensemble](#38-ensemble)
+4. [Widgets](#4-widgets)
     1. [Monitoring Status](#status)
     2. [Generating groups of Notes](#pitch-time)
        1. [Phrase Maker](#pitch-time) 
@@ -71,7 +71,7 @@ A short [Guide to Debugging](http://github.com/sugarlabs/musicblocks/tree/master
     12. [Changing Temperament](#temperament)
     13. [Oscilloscope](#oscilloscope)
     14. [Sampler](#sampler)
-5. [Beyond Music Blocks](#BEYOND-MUSIC-BLOCKS)
+5. [Beyond Music Blocks](#5-beyond-music-blocks)
     1. [LilyPond](#LILYPOND)
     2. [Other exports](#EXPORTS)
     3. [JavaScript](#JAVASCRIPT)
@@ -81,7 +81,7 @@ A short [Guide to Debugging](http://github.com/sugarlabs/musicblocks/tree/master
 Many of the examples given in the guide have links to code you can
 run. Look for `RUN LIVE` links.
 
-## <a name="GETTING-STARTED"></a>1. Getting Started
+## <a name="#GETTING-STARTED">1. Getting Started</a>
 
 [Back to Table of Contents](#TABLE-OF-CONTENTS) | [Next Section (2. Making Sounds)](#NOTES)
 
@@ -104,11 +104,11 @@ Blocks](http://github.com/sugarlabs/musicblocks/tree/master/documentation).
 For more details on how to use Turtle Blocks, see [Using Turtle Blocks
 JS](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
 
-## <a name="NOTES"></a>2. Making Sounds
+## <a name="NOTES">2. Making Sounds</a>
 
-[Previous Section (1. Getting Started)](#GETTING-STARTED) | [Back to
+[Previous Section (1. Getting Started)](#1-getting-started) | [Back to
 Table of Contents](#TABLE-OF-CONTENTS) | [Next Section (3. Programming with
-Music)](#PROGRAMMING-WITH-MUSIC)
+Music)](#3-programming-with-music)
 
 Music Blocks incorporates many common elements of music, such as
 [pitch](#PITCH), [rhythm](#rhythms), [volume](#MORE-TRANSFORMATIONS),
@@ -246,17 +246,17 @@ Just as in the [chord](#CHORD) example above, you can use multiple
 *Drum* blocks within a single *Note value* blocks, and combine them
 with *Pitch* blocks as well.
 
-## <a name="PROGRAMMING-WITH-MUSIC"></a>3. Programming with Music
+## <a name="PROGRAMMING-WITH-MUSIC">3. Programming with Music</a>
 
-[Previous Section (2. Making Sounds)](#NOTES) | [Back to Table of
-Contents](#TABLE-OF-CONTENTS) | [Next Section (4. Widgets)](#WIDGETS)
+[Previous Section (2. Making Sounds)](#2-making-sounds) | [Back to Table of
+Contents](#TABLE-OF-CONTENTS) | [Next Section (4. Widgets)](#4-widgets)
 
 This section of the guide discusses how to use chunks of notes to
 program music. Note that you can program with chunks you create by
 hand or use the [*Phrase maker*](#pitch-time) widget to help you
 get started.
 
-### <a name="ACTIONS"></a>3.1 Actions
+### <a name="ACTIONS">3.1 Actions</a>
 
 ![action](./chunk-2.svg "working of action stack")
 
@@ -314,7 +314,7 @@ A few more chunks and we can make a song. (Can you read the block
 notation well enough to guess the outcome? Are you familiar with the
 song we created?)
 
-### <a name="PITCH-TRANSFORMATION"></a>3.2 Pitch Transformations
+### <a name="PITCH-TRANSFORMATION">3.2 Pitch Transformations</a>
 
 There are many ways to transform pitch, rhythm, and other sonic qualities.
 
@@ -893,7 +893,7 @@ midway between `C5` and `C♯5`.  In the *invert (scalar)* example,
 notes are inverted around `C5`, by scalar steps rather than
 half-steps.
 
-## <a name="CONVERTERS"></a>3.2.9 Converters
+#### <a name="CONVERTERS"></a>3.2.9 Converters
 
 Converters are used to transform one form of inputs into other, more usable form of outputs. This section of the guide will talk about the various conversion options Music Blocks has to offer.
 
@@ -983,7 +983,7 @@ This converter takes a numeric value which denotes pitch number and returns the 
 | pitch to color | Converts pitch to a color value (0-100). C maps to 0, G maps to 58.3, etc. |
 | pitch to shade | Coverts the octave value of the current pitch to a shade. Octave 4 maps to 50. |
 
-### <a name="NOTE-VALUE-TRANSFORMATION"></a>3.3 Note Value Transformations
+### <a name="NOTE-VALUE-TRANSFORMATION">3.3 Note Value Transformations</a>
 
 #### <a name="DOTTED"></a>3.3.1 Dotted Notes
 
@@ -1139,7 +1139,7 @@ Note that all of the blocks inside a *Backward* block are reverse, so
 use this feature with caution if you include logic intermixed with
 notes.
 
-### <a name="OTHER-TRANSFORMATION"></a>3.4 Other Transformations
+### <a name="OTHER-TRANSFORMATION">3.4 Other Transformations</a>
 
 #### <a name="VOLUME-TRANSFORMATIONS"></a>3.4.1 Set Volume and Crescendo
 
@@ -1219,7 +1219,7 @@ the rate of the variation.
 
 The other effects blocks also modulate pitch over time. Give them a try.
 
-### <a name="VOICES"></a>3.5 Voices
+### <a name="VOICES">3.5 Voices</a>
 
 Each *Start* block runs as a separate voice in Music Blocks. (When
 you click on the Run button, all of the *Start* blocks are run
@@ -1260,7 +1260,7 @@ from a drum will be played as `C2` with the default drum sample. In
 the example above, all of the notes in `chunk` will be played with a
 kick drum.
 
-### <a name="GRAPHICS"></a>3.6 Adding graphics
+### <a name="GRAPHICS">3.6 Adding graphics</a>
 
 ![graphics](./graphics1.svg "adding graphics")
 
@@ -1331,7 +1331,7 @@ tree drawing, where the pitch goes up as the branches assend.
 
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523029986215035&run=True)
 
-### <a name="INTERACTIONS"></a>3.7 Interactions
+### <a name="INTERACTIONS">3.7 Interactions</a>
 
 There are many ways to interactive with Music Blocks, including
 tracking the mouse position to impact some aspect of the music.
@@ -1403,7 +1403,7 @@ the link below, takes musical paint in a novel direction.
 [RUN
 LIVE](https://walterbender.github.io/musicblocks/index.html?id=1523896294964170&run=True&run=True)
 
-## <a name="ENSEMBLE"></a>3.8 Ensemble
+## <a name="ENSEMBLE">3.8 Ensemble</a>
 
 Much of music involves multiple instruments (voices or "mice" in Music
 Blocks) playing together. There are a number of special blocks that
@@ -1466,9 +1466,9 @@ The *Set mouse* block sends a stack of blocks to be run by the specified mouse.
 
 ![set](../documentation/setturtle_block.svg "set mouse")
 
-## <a name="WIDGETS"></a>Widgets
+## <a name="WIDGETS">4. Widgets</a>
 
-[Previous Section (3. Programming with Music)](#PROGRAMMING-WITH-MUSIC) | [Back to Table of Contents](#TABLE-OF-CONTENTS) | [Next Section (5. Beyond Music Blocks)](#BEYOND-MUSIC-BLOCKS)
+[Previous Section (3. Programming with Music)](#3-programming-with-music) | [Back to Table of Contents](#TABLE-OF-CONTENTS) | [Next Section (5. Beyond Music Blocks)](#5-beyond-music-blocks)
 
 This section of the guide will talk about the various Widgets that can
 be used within Music Blocks to enhance your experience.
@@ -2195,9 +2195,9 @@ Instrument* block.
 
 ![widget](./sampler2.svg "Sampler Widget")
 
-## <a name="BEYOND-MUSIC-BLOCKS"></a>5. Beyond Music Blocks
+## <a name="BEYOND-MUSIC-BLOCKS">5. Beyond Music Blocks</a>
 
-[Previous Section (4. Widgets)](#WIDGETS) | [Back to Table of Contents](#TABLE-OF-CONTENTS)
+[Previous Section (4. Widgets)](#4-widgets) | [Back to Table of Contents](#TABLE-OF-CONTENTS)
 
 Music Blocks is a waypoint, not a destination. One of the goals is to
 point the learner towards other powerful tools.
@@ -2338,7 +2338,7 @@ methods, getters, setters.
 
 ## <a name="APPENDIX_1"></a>Appendix: Palette Tables
 
-[Previous Section (5. Beyond Music Blocks)](#BEYOND-MUSIC-BLOCKS) | [Back to Table of Contents](#TABLE-OF-CONTENTS)
+[Previous Section (5. Beyond Music Blocks)](#5-beyond-music-blocks) | [Back to Table of Contents](#TABLE-OF-CONTENTS)
 
 Looking for a block? The tables below (one for beginner mode and one for advanced mode) list the blocks by the palette where they are found.
 
