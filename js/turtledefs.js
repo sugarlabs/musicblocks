@@ -32,7 +32,7 @@
    getAuxToolbarButtonNames
  */
 
-const VERSION = "3.5.2.6";
+const VERSION = "3.5.2.7";
 let LOGODEFAULT;
 let LOGOJA1 = LOGODEFAULT;
 let LOGOJA = LOGODEFAULT;
