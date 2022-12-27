@@ -36,7 +36,9 @@
    SHOWBLOCKSBUTTON, SMALLERBUTTON, SMALLERDISABLEBUTTON, SOPRANO,
    SPECIALINPUTS, STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
    TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, Turtles, TURTLESVG,
-   updatePluginObj, ZERODIVIDEERRORMSG
+   updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_GB, GRAND_F,
+   GRAND_FS, GRAND_EB, GRAND_E, GRAND_D, GRAND_DB, GRAND_C, GRAND_CS,
+   GRAND_CB, GRAND_B, GRAND_BB, GRAND_A, GRAND_AB, SHARP, FLAT
  */
 
 /*
@@ -202,6 +204,21 @@ function Activity() {
     this.polarBitmap = null;
     this.trebleBitmap = null;
     this.grandBitmap = null;
+    this.grandABBitmap = null;
+    this.grandABitmap = null;
+    this.grandBBBitmap = null;
+    this.grandBBitmap = null;
+    this.grandCBBitmap = null;
+    this.grandCBitmap = null;
+    this.grandCSBitmap = null;
+    this.grandDBBitmap = null;
+    this.grandDBitmap = null;
+    this.grandEBitmap = null;
+    this.grandEBBitmap = null;
+    this.grandFSBitmap = null;
+    this.grandFBitmap = null;
+    this.grandGBBitmap = null;
+    this.grandGBitmap = null;
     this.sopranoBitmap = null;
     this.altoBitmap = null;
     this.tenorBitmap = null;
@@ -2428,6 +2445,36 @@ function Activity() {
         this.trebleBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
         this.grandBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
         this.grandBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+        this.grandABBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandABitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandBBBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandBBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandCBBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandCBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandCSBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandDBBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandDBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandEBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandEBBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandFSBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandFBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandGBBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandGBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandABBitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
+        this.grandABitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
+        this.grandBBBitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
+        this.grandBBitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
+        this.grandCBBitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
+        this.grandCBitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
+        this.grandCSBitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
+        this.grandDBBitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
+        this.grandDBitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
+        this.grandEBitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
+        this.grandEBBitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
+        this.grandFSBitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
+        this.grandFBitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
+        this.grandGBBitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
+        this.grandGBitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
         this.sopranoBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
         this.sopranoBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
         this.altoBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
@@ -3347,6 +3394,44 @@ function Activity() {
     this._hideGrand = function () {
         this.grandBitmap.visible = false;
         this.grandBitmap.updateCache();
+        this._hideAccidentals();
+        this.update = true;
+    };
+
+    /*
+     * Hides accidentals
+     */
+    this._hideAccidentals = function () {
+        this.grandABBitmap.visible = false;
+        this.grandABitmap.visible = false;
+        this.grandBBBitmap.visible = false;
+        this.grandBBitmap.visible = false;
+        this.grandCBBitmap.visible = false;
+        this.grandCBitmap.visible = false;
+        this.grandCSBitmap.visible = false;
+        this.grandDBBitmap.visible = false;
+        this.grandDBitmap.visible = false;
+        this.grandEBitmap.visible = false;
+        this.grandEBBitmap.visible = false;
+        this.grandFSBitmap.visible = false;
+        this.grandFBitmap.visible = false;
+        this.grandGBBitmap.visible = false;
+        this.grandGBitmap.visible = false;
+        this.grandABBitmap.updateCache();
+        this.grandABitmap.updateCache();
+        this.grandBBBitmap.updateCache();
+        this.grandBBitmap.updateCache();
+        this.grandCBBitmap.updateCache();
+        this.grandCBitmap.updateCache();
+        this.grandCSBitmap.updateCache();
+        this.grandDBBitmap.updateCache();
+        this.grandDBitmap.updateCache();
+        this.grandEBitmap.updateCache();
+        this.grandEBBitmap.updateCache();
+        this.grandFSBitmap.updateCache();
+        this.grandFBitmap.updateCache();
+        this.grandGBBitmap.updateCache();
+        this.grandGBitmap.updateCache();
         this.update = true;
     };
 
@@ -3356,6 +3441,70 @@ function Activity() {
     this._showGrand = function () {
         this.grandBitmap.visible = true;
         this.grandBitmap.updateCache();
+        this._hideAccidentals();
+        console.log(activity.KeySignatureEnv);
+        if (activity.KeySignatureEnv[1] === "major") {
+            switch(activity.KeySignatureEnv[0]) {
+            case "G":
+                this.grandGBitmap.visible = true;
+                this.grandGBitmap.updateCache();
+                break;
+            case "D":
+                this.grandDBitmap.visible = true;
+                this.grandDBitmap.updateCache();
+                break;
+            case "A":
+                this.grandABitmap.visible = true;
+                this.grandABitmap.updateCache();
+                break;
+            case "E":
+                this.grandEBitmap.visible = true;
+                this.grandEBitmap.updateCache();
+                break;
+            case "B":
+                this.grandBBitmap.visible = true;
+                this.grandBBitmap.updateCache();
+                break;
+            case "F" + SHARP:
+                this.grandFSBitmap.visible = true;
+                this.grandFSBitmap.updateCache();
+                break;
+            case "C" + SHARP:
+                this.grandCSBitmap.visible = true;
+                this.grandCSBitmap.updateCache();
+                break;
+            case "F":
+                this.grandFBitmap.visible = true;
+                this.grandFBitmap.updateCache();
+                break;
+            case "B" + FLAT:
+                this.grandBBBitmap.visible = true;
+                this.grandBBBitmap.updateCache();
+                break;
+            case "E" + FLAT:
+                this.grandEBBitmap.visible = true;
+                this.grandEBBitmap.updateCache();
+                break;
+            case "A" + FLAT:
+                this.grandABBitmap.visible = true;
+                this.grandABBitmap.updateCache();
+                break;
+            case "C" + FLAT:
+                this.grandCBBitmap.visible = true;
+                this.grandCBBitmap.updateCache();
+                break;
+            case "G" + FLAT:
+                this.grandGBBitmap.visible = true;
+                this.grandGBBitmap.updateCache();
+                break;
+            case "D" + FLAT:
+                this.grandDBBitmap.visible = true;
+                this.grandDBBitmap.updateCache();
+                break;
+            default:
+                break;
+            }
+        }
         this.update = true;
     };
 
@@ -4373,6 +4522,51 @@ function Activity() {
         );
         this.grandBitmap = this._createGrid(
             "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND)))
+        );
+        this.grandABBitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_AB)))
+        );
+        this.grandABitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_A)))
+        );
+        this.grandBBBitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_BB)))
+        );
+        this.grandBBitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_B)))
+        );
+        this.grandCBBitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_CB)))
+        );
+        this.grandCBitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_C)))
+        );
+        this.grandCSBitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_CS)))
+        );
+        this.grandDBBitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_DB)))
+        );
+        this.grandDBitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_D)))
+        );
+        this.grandEBitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_E)))
+        );
+        this.grandEBBitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_EB)))
+        );
+        this.grandFSBitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_FS)))
+        );
+        this.grandFBitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_F)))
+        );
+        this.grandGBBitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_GB)))
+        );
+        this.grandGBitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_G)))
         );
         this.sopranoBitmap = this._createGrid(
             "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(SOPRANO)))
