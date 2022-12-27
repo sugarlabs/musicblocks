@@ -2441,6 +2441,15 @@ msgstr "intervalo semitono"
 msgid "chord5"
 msgstr "acorde V"
 
+msgid "arpeggio"
+msgstr "arpeggio"
+
+msgid "The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord."
+msgstr "El bloque Arpeggio ejecutará cada bloque de notas varias veces, agregando una transposición basada en el acorde especificado."
+
+msgid "The output of the example is: do, mi, sol, sol, ti, mi"
+msgstr "La salida del ejemplo es: do, mi, sol, sol, ti, mi"
+
 #: js/IntervalsBlocks.js:537
 #: js/IntervalsBlocks.js:543
 #: js/IntervalsBlocks.js:549
