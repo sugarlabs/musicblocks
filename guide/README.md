@@ -808,6 +808,15 @@ We support many basic chords:
 | minor 7 | 1 3 7 10 | Cmin7 C - E♭ - G - B♭ |
 | major 7 | 1 4 7 11 | Cmaj7 C - E - G - B |
 
+The *Arpeggio* block also builds a chord from a base note, but rather
+than playing all of the pitches at once, each pitch is played in
+sequence.
+
+![arpeggio](../documentation/arpeggio_block.svg "Arpeggio Block")
+
+In the example above, since the Major chord intervals are 1 4 7, the
+notes played are do, mi, sol, sol, ti, mi.
+
 #### <a name= "INVERSION">3.2.9 Inversion</a>
 
 The *Invert* block will rotate a series of notes around a target
