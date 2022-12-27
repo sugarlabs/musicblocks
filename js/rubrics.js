@@ -179,6 +179,7 @@ const TACAT = {
     voicename: "tone",
     settimbre: "tone",
     settemperament: "tone",
+
     // interval palette
 
     modename: "ignore",
@@ -186,6 +187,9 @@ const TACAT = {
     intervalname: "ignore",
     measureintervalsemitones: "pitchfactor",
     measureintervalscalar: "pitchfactor",
+    arpeggio: "pitchchord",
+    chordname: "ignore",
+    chordinterval: "pitchchord",
     semitoneinterval: "pitchchord",
     interval: "pitchchord",
     definemode: "pitchchord",
