@@ -123,6 +123,8 @@ class Singer {
         this.turtleTime = 0;
         this.pushedNote = false;
         this.duplicateFactor = 1;
+        this.arpeggio = [];
+        this.arpeggioIndex = 0;
         this.inDuplicate = false;
         this.skipFactor = 1;
         this.skipIndex = 0;
@@ -787,11 +789,16 @@ class Singer {
             for (let i = 0; i < duplicateFactor; i++) {
                 // Apply transpositions
                 const transposition = 2 * delta + tur.singer.transposition;
+                let alen = tur.singer.arpeggio.length;
+                let atrans = transposition;
+                if (alen > 0 && i < alen) {
+                    atrans += tur.singer.arpeggio[i];
+                }
 
                 const nnote = getNote(
                     note,
                     octave,
-                    transposition,
+                    atrans,  // transposition,
                     tur.singer.keySignature,
                     tur.singer.moveable,
                     null,
@@ -821,11 +828,16 @@ class Singer {
             for (let i = 0; i < duplicateFactor; i++) {
                 // Apply transpositions
                 const transposition = 2 * delta + tur.singer.transposition;
+                let alen = tur.singer.arpeggio.length;
+                let atrans = transposition;
+                if (alen > 0 && i < alen) {
+                    atrans += tur.singer.arpeggio[i];
+                }
 
                 const noteObj = getNote(
                     note,
                     octave,
-                    transposition,
+                    atrans,  // transposition,
                     tur.singer.keySignature,
                     tur.singer.moveable,
                     null,
@@ -869,12 +881,21 @@ class Singer {
             const addPitch = (note, octave, cents, direction) => {
                 // Apply transpositions
                 const transposition = 2 * delta + tur.singer.transposition;
+                let alen = tur.singer.arpeggio.length;
+                let atrans = transposition;
+                if (alen > 0) {
+                    atrans += tur.singer.arpeggio[tur.singer.arpeggioIndex];
+                    tur.singer.arpeggioIndex += 1;
+                    if (tur.singer.arpeggioIndex === alen) {
+                        tur.singer.arpeggioIndex = 0;
+                    }
+                }
 
                 const noteObj = getNote(
                     note,
                     octave,
                     // FIXME: should not be hardwired to 12
-                    transposition + tur.singer.register * 12,
+                    atrans + tur.singer.register * 12,  // transposition + tur.singer.register * 12,
                     tur.singer.keySignature,
                     tur.singer.moveable,
                     direction,
