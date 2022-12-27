@@ -38,7 +38,8 @@
    TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, Turtles, TURTLESVG,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_GB, GRAND_F,
    GRAND_FS, GRAND_EB, GRAND_E, GRAND_D, GRAND_DB, GRAND_C, GRAND_CS,
-   GRAND_CB, GRAND_B, GRAND_BB, GRAND_A, GRAND_AB, SHARP, FLAT
+   GRAND_CB, GRAND_B, GRAND_BB, GRAND_A, GRAND_AB, SHARP, FLAT,
+   buildScale
  */
 
 /*
@@ -219,6 +220,20 @@ function Activity() {
     this.grandFBitmap = null;
     this.grandGBBitmap = null;
     this.grandGBitmap = null;
+    this.grandG1Bitmap = null;
+    this.grandG2Bitmap = null;
+    this.grandG3Bitmap = null;
+    this.grandG4Bitmap = null;
+    this.grandG5Bitmap = null;
+    this.grandG6Bitmap = null;
+    this.grandG7Bitmap = null;
+    this.grandF1Bitmap = null;
+    this.grandF2Bitmap = null;
+    this.grandF3Bitmap = null;
+    this.grandF4Bitmap = null;
+    this.grandF5Bitmap = null;
+    this.grandF6Bitmap = null;
+    this.grandF7Bitmap = null;
     this.sopranoBitmap = null;
     this.altoBitmap = null;
     this.tenorBitmap = null;
@@ -2483,6 +2498,34 @@ function Activity() {
         this.tenorBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
         this.bassBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
         this.bassBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+        this.grandG1Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandG1Bitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
+        this.grandG2Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandG2Bitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1025;
+        this.grandG3Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandG3Bitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1075;
+        this.grandG4Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandG4Bitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1037.5;
+        this.grandG5Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandG5Bitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1000;
+        this.grandG6Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandG6Bitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1050;
+        this.grandG7Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandG7Bitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1012.5;
+        this.grandF1Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandF1Bitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
+        this.grandF2Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandF2Bitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1100;
+        this.grandF3Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandF3Bitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1050;
+        this.grandF4Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandF4Bitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1087.5;
+        this.grandF5Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandF5Bitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1037.5;
+        this.grandF6Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandF6Bitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1075;
+        this.grandF7Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandF7Bitmap.y = this.canvas.width / (2 * this.turtleBlocksScale) - 1025;
         this.update = true;
 
         // Hide tooltips on mobile
@@ -3432,6 +3475,50 @@ function Activity() {
         this.grandFBitmap.updateCache();
         this.grandGBBitmap.updateCache();
         this.grandGBitmap.updateCache();
+
+        this.grandG1Bitmap.visible = false;
+        this.grandG1Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandG1Bitmap.updateCache();
+        this.grandG2Bitmap.visible = false;
+        this.grandG2Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandG2Bitmap.updateCache();
+        this.grandG3Bitmap.visible = false;
+        this.grandG3Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandG3Bitmap.updateCache();
+        this.grandG4Bitmap.visible = false;
+        this.grandG4Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandG4Bitmap.updateCache();
+        this.grandG5Bitmap.visible = false;
+        this.grandG5Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandG5Bitmap.updateCache();
+        this.grandG6Bitmap.visible = false;
+        this.grandG6Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandG6Bitmap.updateCache();
+        this.grandG7Bitmap.visible = false;
+        this.grandG7Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandG7Bitmap.updateCache();
+        this.grandF1Bitmap.visible = false;
+        this.grandF1Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandF1Bitmap.updateCache();
+        this.grandF2Bitmap.visible = false;
+        this.grandF2Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandF2Bitmap.updateCache();
+        this.grandF3Bitmap.visible = false;
+        this.grandF3Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandF3Bitmap.updateCache();
+        this.grandF4Bitmap.visible = false;
+        this.grandF4Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandF4Bitmap.updateCache();
+        this.grandF5Bitmap.visible = false;
+        this.grandF5Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandF5Bitmap.updateCache();
+        this.grandF6Bitmap.visible = false;
+        this.grandF6Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandF6Bitmap.updateCache();
+        this.grandF7Bitmap.visible = false;
+        this.grandF7Bitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+        this.grandF7Bitmap.updateCache();
+
         this.update = true;
     };
 
@@ -3442,7 +3529,6 @@ function Activity() {
         this.grandBitmap.visible = true;
         this.grandBitmap.updateCache();
         this._hideAccidentals();
-        console.log(activity.KeySignatureEnv);
         if (activity.KeySignatureEnv[1] === "major") {
             switch(activity.KeySignatureEnv[0]) {
             case "G":
@@ -3503,6 +3589,93 @@ function Activity() {
                 break;
             default:
                 break;
+            }
+        } else {
+            let scale = buildScale(activity.KeySignatureEnv[0] + " " + activity.KeySignatureEnv[1])[0];
+            let dx = 0;
+            if (scale.indexOf("F" + SHARP) !== -1) {
+                this.grandG1Bitmap.x += dx;
+                this.grandG1Bitmap.visible = true;
+                this.grandG1Bitmap.updateCache();
+                dx += 15;
+            }
+            if (scale.indexOf("C" + SHARP) !== -1) {
+                this.grandG2Bitmap.x += dx;
+                this.grandG2Bitmap.visible = true;
+                this.grandG2Bitmap.updateCache();
+                dx += 15;
+            }
+            if (scale.indexOf("G" + SHARP) !== -1) {
+                this.grandG3Bitmap.x += dx;
+                this.grandG3Bitmap.visible = true;
+                this.grandG3Bitmap.updateCache();
+                dx += 15;
+            }
+            if (scale.indexOf("D" + SHARP) !== -1) {
+                this.grandG4Bitmap.x += dx;
+                this.grandG4Bitmap.visible = true;
+                this.grandG4Bitmap.updateCache();
+                dx += 15;
+            }
+            if (scale.indexOf("A" + SHARP) !== -1) {
+                this.grandG5Bitmap.x += dx;
+                this.grandG5Bitmap.visible = true;
+                this.grandG5Bitmap.updateCache();
+                dx += 15;
+            }
+            if (scale.indexOf("E" + SHARP) !== -1) {
+                this.grandG6Bitmap.x += dx;
+                this.grandG6Bitmap.visible = true;
+                this.grandG6Bitmap.updateCache();
+                dx += 15;
+            }
+            if (scale.indexOf("B" + SHARP) !== -1) {
+                this.grandG7Bitmap.x += dx;
+                this.grandG7Bitmap.visible = true;
+                this.grandG7Bitmap.updateCache();
+                dx += 15;
+            }
+            if (scale.indexOf("B" + FLAT) !== -1) {
+                this.grandF1Bitmap.x += dx;
+                this.grandF1Bitmap.visible = true;
+                this.grandF1Bitmap.updateCache();
+                dx += 15;
+            }
+            if (scale.indexOf("E" + FLAT) !== -1) {
+                this.grandF2Bitmap.x += dx;
+                this.grandF2Bitmap.visible = true;
+                this.grandF2Bitmap.updateCache();
+                dx += 15;
+            }
+            if (scale.indexOf("A" + FLAT) !== -1) {
+                this.grandF3Bitmap.x += dx;
+                this.grandF3Bitmap.visible = true;
+                this.grandF3Bitmap.updateCache();
+                dx += 15;
+            }
+            if (scale.indexOf("D" + FLAT) !== -1) {
+                this.grandF4Bitmap.x += dx;
+                this.grandF4Bitmap.visible = true;
+                this.grandF4Bitmap.updateCache();
+                dx += 15;
+            }
+            if (scale.indexOf("G" + FLAT) !== -1) {
+                this.grandF5Bitmap.x += dx;
+                this.grandF5Bitmap.visible = true;
+                this.grandF5Bitmap.updateCache();
+                dx += 15;
+            }
+            if (scale.indexOf("C" + FLAT) !== -1) {
+                this.grandF6Bitmap.x += dx;
+                this.grandF6Bitmap.visible = true;
+                this.grandF6Bitmap.updateCache();
+                dx += 15;
+            }
+            if (scale.indexOf("F" + FLAT) !== -1) {
+                this.grandF7Bitmap.x += dx;
+                this.grandF7Bitmap.visible = true;
+                this.grandF7Bitmap.updateCache();
+                dx += 15;
             }
         }
         this.update = true;
@@ -4579,6 +4752,49 @@ function Activity() {
         );
         this.bassBitmap = this._createGrid(
             "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(BASS)))
+        );
+
+        this.grandG1Bitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_G)))
+        );
+        this.grandG2Bitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_G)))
+        );
+        this.grandG3Bitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_G)))
+        );
+        this.grandG4Bitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_G)))
+        );
+        this.grandG5Bitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_G)))
+        );
+        this.grandG6Bitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_G)))
+        );
+        this.grandG7Bitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_G)))
+        );
+        this.grandF1Bitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_F)))
+        );
+        this.grandF2Bitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_F)))
+        );
+        this.grandF3Bitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_F)))
+        );
+        this.grandF4Bitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_F)))
+        );
+        this.grandF5Bitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_F)))
+        );
+        this.grandF6Bitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_F)))
+        );
+        this.grandF7Bitmap = this._createGrid(
+            "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_F)))
         );
 
         const URL = window.location.href;
