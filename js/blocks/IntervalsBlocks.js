@@ -13,7 +13,7 @@
    global
 
    last, _, ValueBlock, FlowClampBlock, FlowBlock, NOINPUTERRORMSG,
-   LeftBlock, Singer, CHORDNAMES, CHORDVALUES, DEFAULTCHORD
+   LeftBlock, Singer, CHORDNAMES, CHORDVALUES, DEFAULTCHORD, Queue
  */
 
 /*
@@ -518,12 +518,10 @@ function setupIntervalsBlocks(activity) {
 
             let i = CHORDNAMES.indexOf(args[0]);
             if (i === -1) {
-                i = CHORDNAMES.indexOf(DEFAULTCHORDS);
+                i = CHORDNAMES.indexOf(DEFAULTCHORD);
             }
             // CHORDVALUES do not include the starting note, hence + 1.
-            let arg0 = CHORDVALUES[i].length + 1;
-
-            const factor = Math.floor(arg0);
+            const factor = Math.floor(CHORDVALUES[i].length + 1);
             const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.duplicateFactor *= factor;
@@ -557,7 +555,7 @@ function setupIntervalsBlocks(activity) {
                 tur.singer.inDuplicate = false;
                 tur.singer.duplicateFactor /= factor;
                 tur.singer.arpeggio = [];
-                 // Check for a race condition.
+                // Check for a race condition.
                 // FIXME: Do something about the race condition.
                 if (logo.connectionStoreLock) {
                     // eslint-disable-next-line no-console
@@ -579,7 +577,7 @@ function setupIntervalsBlocks(activity) {
                 } else {
                     delete logo.connectionStore[turtle][blk];
                 }
-                 logo.connectionStoreLock = false;
+                logo.connectionStoreLock = false;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -622,7 +620,7 @@ function setupIntervalsBlocks(activity) {
                         tur.parentFlowQueue.push(blk);
                         tur.queue.push(queueBlock);
                     }
-                     child = activity.blocks.blockList[child].connections[0];
+                    child = activity.blocks.blockList[child].connections[0];
                 }
 
                 // Break the connections between blocks in the clamp so

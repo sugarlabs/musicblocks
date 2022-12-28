@@ -4346,9 +4346,9 @@ function getPitchInfo(activity, type, currentNote, tur) {
     pitch = pitch.replace("#", SHARP).replace("b", FLAT);
     if (buildScale(tur.singer.keySignature)[0].indexOf(pitch) === -1) {
         if (pitch in EQUIVALENTFLATS) {
-            pitch = EQUIVALENTFLATS[pitch]
+            pitch = EQUIVALENTFLATS[pitch];
         } else if (pitch in EQUIVALENTSHARPS) {
-            pitch = EQUIVALENTSHARPS[pitch]
+            pitch = EQUIVALENTSHARPS[pitch];
         }
     }
 
@@ -4377,11 +4377,11 @@ function getPitchInfo(activity, type, currentNote, tur) {
                 )[0];
             case "scale degree":
                 obj = scaleDegreeToPitchMapping(
-                        tur.singer.keySignature,
-                        null,
-                        tur.singer.moveable,
-                        pitch
-                    )
+                    tur.singer.keySignature,
+                    null,
+                    tur.singer.moveable,
+                    pitch
+                );
                 return (obj[0] + obj[1]);
             case "nth degree":
                 return buildScale(tur.singer.keySignature)[0].indexOf(pitch);
