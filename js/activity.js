@@ -3396,8 +3396,8 @@ function Activity() {
         this.grandBitmap.updateCache();
         this._hideAccidentals();
         // eslint-disable-next-line no-console
-        console.log(activity.KeySignatureEnv[0] + " " + activity.KeySignatureEnv[1]);
-        let scale = buildScale(activity.KeySignatureEnv[0] + " " + activity.KeySignatureEnv[1])[0];
+        console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
+        const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
         // eslint-disable-next-line no-console
         console.log(scale);
         const _sharps = ["F" + SHARP, "C" + SHARP, "G" + SHARP, "D" + SHARP, "A" + SHARP, "E" + SHARP, "B" + SHARP];
