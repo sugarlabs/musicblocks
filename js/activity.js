@@ -2439,25 +2439,25 @@ function Activity() {
         this.tenorBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
         this.bassBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
         this.bassBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
-	for (let i = 0; i < 7; i++) {
+        for (let i = 0; i < 7; i++) {
             this.grandSharpBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
             this.grandFlatBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-	}
+        }
         // Position the sharps and flats
         this.grandSharpBitmap[0].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
         this.grandSharpBitmap[1].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1025;
-	this.grandSharpBitmap[2].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1075;
-	this.grandSharpBitmap[3].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1037.5;
-	this.grandSharpBitmap[4].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1000;
-	this.grandSharpBitmap[5].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1050;
-	this.grandSharpBitmap[6].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1012.5;
+        this.grandSharpBitmap[2].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1075;
+        this.grandSharpBitmap[3].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1037.5;
+        this.grandSharpBitmap[4].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1000;
+        this.grandSharpBitmap[5].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1050;
+        this.grandSharpBitmap[6].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1012.5;
         this.grandFlatBitmap[0].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
-	this.grandFlatBitmap[1].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1100;
-	this.grandFlatBitmap[2].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1050;
-	this.grandFlatBitmap[3].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1087.5;
-	this.grandFlatBitmap[4].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1037.5;
-	this.grandFlatBitmap[5].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1075;
-	this.grandFlatBitmap[6].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1025;
+        this.grandFlatBitmap[1].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1100;
+        this.grandFlatBitmap[2].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1050;
+        this.grandFlatBitmap[3].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1087.5;
+        this.grandFlatBitmap[4].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1037.5;
+        this.grandFlatBitmap[5].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1075;
+        this.grandFlatBitmap[6].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1025;
         this.update = true;
 
         // Hide tooltips on mobile
@@ -3377,14 +3377,14 @@ function Activity() {
      * Hides accidentals
      */
     this._hideAccidentals = function () {
-	for (let i = 0; i < 7; i++) {
+        for (let i = 0; i < 7; i++) {
             this.grandSharpBitmap[i].visible = false;
             this.grandSharpBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
             this.grandSharpBitmap[i].updateCache();
             this.grandFlatBitmap[i].visible = false;
             this.grandFlatBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
             this.grandFlatBitmap[i].updateCache();
-	}
+        }
         this.update = true;
     };
 
@@ -3395,7 +3395,11 @@ function Activity() {
         this.grandBitmap.visible = true;
         this.grandBitmap.updateCache();
         this._hideAccidentals();
+        // eslint-disable-next-line no-console
+        console.log(activity.KeySignatureEnv[0] + " " + activity.KeySignatureEnv[1]);
         let scale = buildScale(activity.KeySignatureEnv[0] + " " + activity.KeySignatureEnv[1])[0];
+        // eslint-disable-next-line no-console
+        console.log(scale);
         const _sharps = ["F" + SHARP, "C" + SHARP, "G" + SHARP, "D" + SHARP, "A" + SHARP, "E" + SHARP, "B" + SHARP];
         const _flats = ["B" + FLAT, "E" + FLAT, "A" + FLAT, "D" + FLAT, "G" + FLAT, "C" + FLAT, "F" + FLAT];
         let dx = 0;
@@ -3412,7 +3416,7 @@ function Activity() {
                 this.grandFlatBitmap[i].updateCache();
                 dx += 15;
             }
-	}
+        }
         this.update = true;
     };
 
@@ -4444,14 +4448,18 @@ function Activity() {
             "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(BASS)))
         );
 
-	for (let i = 0; i < 7; i++) {
-	    this.grandSharpBitmap[i] = this._createGrid(
-		"data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_G)))
+        // We use G (one sharp) and F (one flat) as prototypes for all
+        // of the accidentals. When applied, these graphics are offset
+        // vertically to rendering different sharps and flats and
+        // horizonally so as not to overlap.
+        for (let i = 0; i < 7; i++) {
+            this.grandSharpBitmap[i] = this._createGrid(
+                "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_G)))
             );
-	    this.grandFlatBitmap[i] = this._createGrid(
-		"data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_F)))
+            this.grandFlatBitmap[i] = this._createGrid(
+                "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_F)))
             );
-	}
+        }
 
         const URL = window.location.href;
         const flags = {
