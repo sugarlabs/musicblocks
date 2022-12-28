@@ -186,7 +186,30 @@ const EQUIVALENTSHARPS = {
     "B♭": "A" + SHARP
 };
 const EQUIVALENTNATURALS = { "E♯": "F", "B♯": "C", "C♭": "B", "F♭": "E" };
-const EQUIVALENTACCIDENTALS = { F: "E♯", C: "B♯", B: "C♭", E: "F♭", G: "F𝄪", D: "C𝄪", A: "G𝄪" };
+// const EQUIVALENTACCIDENTALS = { F: "E♯", C: "B♯", B: "C♭", E: "F♭", G: "F𝄪", D: "C𝄪", A: "G𝄪" };
+const CONVERT_DOWN = {
+    "C": "B" + SHARP,
+    "C♭": "B",
+    "D♭": "C" + SHARP,
+    "E♭": "D" + SHARP,
+    "F": "E" + SHARP,
+    "F♭": "E",
+    "G♭": "F" + SHARP,
+    "A♭": "G" + SHARP,
+    "B♭": "A" + SHARP
+};
+
+const CONVERT_UP = {
+    "C♯": "D" + FLAT,
+    "D♯": "E" + FLAT,
+    "E♯": "F",
+    "E": "F" + FLAT,
+    "F♯": "G" + FLAT,
+    "G♯": "A" + FLAT,
+    "A♯": "B" + FLAT,
+    "B♯": "C",
+    "B": "C" + FLAT,
+};
 
 const EXTRATRANSPOSITIONS = {
     "E♯": ["F", 0],
@@ -3285,27 +3308,35 @@ function buildScale(keySignature) {
     }
 
     // Make sure there are no repeated letter names for seven step scales
-    if (scale.length === 8) {
-        for (let n = 0; n < 7; n++) {
-            if (scale[n][0] === scale[n + 1][0]) {
-                if (scale[n] in EQUIVALENTACCIDENTALS) {
-                    scale[n] = EQUIVALENTACCIDENTALS[scale[n]];
-                } else if (scale[n] in EQUIVALENTNATURALS) {
-                    scale[n] = EQUIVALENTNATURALS[scale[n]];
+    if (scale.length < 9) {
+        for (let i = 0; i < scale.length - 1; i++) {
+            if (i === 0) {
+                if (scale[i][0] === scale[i + 1][0]) {
+                    if (scale[i + 1] in CONVERT_UP) {
+                        scale[i + 1] = CONVERT_UP[scale[i + 1]];
+                    }
                 }
-            }
-        }
-        // Two passes because we may have collisions.
-        for (let n = 0; n < 7; n++) {
-            if (scale[n][0] === scale[n + 1][0]) {
-                if (scale[n] in EQUIVALENTACCIDENTALS) {
-                    scale[n] = EQUIVALENTACCIDENTALS[scale[n]];
-                } else if (scale[n] in EQUIVALENTNATURALS) {
-                    scale[n] = EQUIVALENTNATURALS[scale[n]];
+            } else {
+                // Do we go up or down?
+                if (thisScale === NOTESSHARP) {
+                    if (scale[i][0] === scale[i + 1][0]) {
+                        // We need to go down.
+                        if (scale[i] in CONVERT_DOWN) {
+                            scale[i] = CONVERT_DOWN[scale[i]];
+                        }
+                    }
+                } else {
+                    if (scale[i - 1][0] === scale[i][0]) {
+                        // We need to go up.
+                        if (scale[i] in CONVERT_UP) {
+                            scale[i] = CONVERT_UP[scale[i]];
+                        }
+                    }
                 }
             }
         }
     }
+
     return [scale, halfSteps];
 }
 
