@@ -44,7 +44,7 @@
    STATSBUTTON, PLUGINSBUTTON, PLUGINSDELETEBUTTON, SCROLLLOCKBUTTON,
    SCROLLUNLOCKBUTTON, EMPTYTRASHCONFIRMBUTTON, COPYBUTTON,
    PASTEBUTTON, EXTRACTBUTTON, METRONOMESVG, PITCHPREVIEWBUTTON,
-   JAVASCRIPTBUTTON, GRAND_G, GRAND_F
+   JAVASCRIPTBUTTON, GRAND_G, GRAND_F, TREBLE_G, TREBLE_F
 */
 
 // Defined below are the inline SVGs used for turtles and blocks. SVGs
@@ -730,3 +730,9 @@ const GRAND_F = // One flat each on the treble and bass clefs
 
 const GRAND_G = // One sharp each on the treble and bass clefs
       '<svg version="1.0" width="1200" height="900" id="svg296" sodipodi:docname="grand-g.svg" inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"> <text xml:space="preserve" style="font-size:48px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px" x="99.945312" y="340.08594" id="text583"><tspan id="tspan581" x="99.945312" y="340.08594" style="font-size:48px">♯</tspan></text> <text xml:space="preserve" style="font-size:48px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px" x="99.945312" y="515.08594" id="text583-3"><tspan id="tspan581-6" x="99.945312" y="515.08594" style="font-size:48px">♯</tspan></text> </svg>';
+
+const TREBLE_F = // One flat each on the treble and bass clefs
+      '<svg version="1.0" width="1200" height="900" id="svg296" sodipodi:docname="grand-f.svg" inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"> <text xml:space="preserve" style="font-size:48px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px" x="103.94531" y="384.08594" id="text583"><tspan id="tspan581" x="103.94531" y="384.08594" style="font-size:48px">♭</tspan></text> </svg>';
+
+const TREBLE_G = // One sharp each on the treble and bass clefs
+      '<svg version="1.0" width="1200" height="900" id="svg296" sodipodi:docname="grand-g.svg" inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"> <text xml:space="preserve" style="font-size:48px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px" x="99.945312" y="340.08594" id="text583"><tspan id="tspan581" x="99.945312" y="340.08594" style="font-size:48px">♯</tspan></text> </svg>';
