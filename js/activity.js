@@ -209,6 +209,8 @@ function Activity() {
     this.grandFlatBitmap = [null, null, null, null, null, null, null];
     this.sopranoBitmap = null;
     this.altoBitmap = null;
+    this.altoSharpBitmap = [null, null, null, null, null, null, null];
+    this.altoFlatBitmap = [null, null, null, null, null, null, null];
     this.tenorBitmap = null;
     this.bassBitmap = null;
     this.bassSharpBitmap = [null, null, null, null, null, null, null];
@@ -2448,6 +2450,8 @@ function Activity() {
             this.grandFlatBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
             this.trebleSharpBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
             this.trebleFlatBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+            this.altoSharpBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+            this.altoFlatBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
             this.bassSharpBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
             this.bassFlatBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
         }
@@ -2481,6 +2485,25 @@ function Activity() {
         this.trebleFlatBitmap[4].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1037.5;
         this.trebleFlatBitmap[5].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1075;
         this.trebleFlatBitmap[6].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1025;
+
+        this.altoSharpBitmap[0].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
+        this.altoSharpBitmap[1].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1025;
+        this.altoSharpBitmap[2].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1075;
+        this.altoSharpBitmap[3].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1037.5;
+        this.altoSharpBitmap[4].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1000;
+        this.altoSharpBitmap[5].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1050;
+        this.altoSharpBitmap[6].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1012.5;
+        this.altoFlatBitmap[0].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
+        this.altoFlatBitmap[1].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1100;
+        this.altoFlatBitmap[2].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1050;
+        this.altoFlatBitmap[3].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1087.5;
+        this.altoFlatBitmap[4].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1037.5;
+        this.altoFlatBitmap[5].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1075;
+        this.altoFlatBitmap[6].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1025;
+        for (let i = 0; i < 7; i++) {
+            this.altoSharpBitmap[i].y += 87.5;
+            this.altoFlatBitmap[i].y += 87.5;
+        }
 
         this.bassSharpBitmap[0].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
         this.bassSharpBitmap[1].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1025;
@@ -3407,6 +3430,13 @@ function Activity() {
             this.trebleFlatBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
             this.trebleFlatBitmap[i].updateCache();
 
+            this.altoSharpBitmap[i].visible = false;
+            this.altoSharpBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+            this.altoSharpBitmap[i].updateCache();
+            this.altoFlatBitmap[i].visible = false;
+            this.altoFlatBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+            this.altoFlatBitmap[i].updateCache();
+
             this.bassSharpBitmap[i].visible = false;
             this.bassSharpBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
             this.bassSharpBitmap[i].updateCache();
@@ -3517,6 +3547,8 @@ function Activity() {
     this._showSoprano = function () {
         this.sopranoBitmap.visible = true;
         this.sopranoBitmap.updateCache();
+        this._hideAccidentals();
+        this.__showAltoAccidentals();
         this.update = true;
     };
 
@@ -3526,7 +3558,33 @@ function Activity() {
     this._hideAlto = function () {
         this.altoBitmap.visible = false;
         this.altoBitmap.updateCache();
+        this._hideAccidentals();
         this.update = true;
+    };
+
+    this.__showAltoAccidentals = function () {
+        // eslint-disable-next-line no-console
+        console.log(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1]);
+        const scale = buildScale(this.KeySignatureEnv[0] + " " + this.KeySignatureEnv[1])[0];
+        // eslint-disable-next-line no-console
+        console.log(scale);
+        const _sharps = ["F" + SHARP, "C" + SHARP, "G" + SHARP, "D" + SHARP, "A" + SHARP, "E" + SHARP, "B" + SHARP];
+        const _flats = ["B" + FLAT, "E" + FLAT, "A" + FLAT, "D" + FLAT, "G" + FLAT, "C" + FLAT, "F" + FLAT];
+        let dx = 0;
+        for (let i = 0; i < 7; i++) {
+            if (scale.indexOf(_sharps[i]) !== -1) {
+                this.altoSharpBitmap[i].x += dx;
+                this.altoSharpBitmap[i].visible = true;
+                this.altoSharpBitmap[i].updateCache();
+                dx += 15;
+            }
+            if (scale.indexOf(_flats[i]) !== -1) {
+                this.altoFlatBitmap[i].x += dx;
+                this.altoFlatBitmap[i].visible = true;
+                this.altoFlatBitmap[i].updateCache();
+                dx += 15;
+            }
+        }
     };
 
     /*
@@ -3535,6 +3593,8 @@ function Activity() {
     this._showAlto = function () {
         this.altoBitmap.visible = true;
         this.altoBitmap.updateCache();
+        this._hideAccidentals();
+        this.__showAltoAccidentals();
         this.update = true;
     };
 
@@ -3553,6 +3613,8 @@ function Activity() {
     this._showTenor = function () {
         this.tenorBitmap.visible = true;
         this.tenorBitmap.updateCache();
+        this._hideAccidentals();
+        this.__showAltoAccidentals();
         this.update = true;
     };
 
@@ -4570,6 +4632,12 @@ function Activity() {
                 "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(TREBLE_G)))
             );
             this.trebleFlatBitmap[i] = this._createGrid(
+                "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(TREBLE_F)))
+            );
+            this.altoSharpBitmap[i] = this._createGrid(
+                "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(TREBLE_G)))
+            );
+            this.altoFlatBitmap[i] = this._createGrid(
                 "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(TREBLE_F)))
             );
             this.bassSharpBitmap[i] = this._createGrid(
