@@ -112,6 +112,7 @@ class Logo {
         // Widgets
         this.phraseMaker = null;
         this.pitchDrumMatrix = null;
+        this.arpeggio = null;
         this.rhythmRuler = null;
         this.timbre = null;
         this.pitchStaircase = null;

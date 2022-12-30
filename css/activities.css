@@ -611,6 +611,45 @@ table {
     margin-left: 53px;
 }
 
+#arpeggioDiv {
+    position: absolute;
+    top: 20%;
+    left: 20%;
+    background: rgba(255, 255, 255, 0.85) !important;
+}
+
+#arpeggioTableDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 1 !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    width: 680px;
+}
+
+#arpeggioButtonsDiv {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    border: 0 !important;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#arpeggioOuterDiv {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 5em;
+    overflow-y: auto;
+    overflow-x: none;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+#arpeggioInnerDiv {
+    overflow-x:auto;
+    margin-left: 53px;
+}
+
 #modeDiv {
     position: absolute;
     top: 20%;

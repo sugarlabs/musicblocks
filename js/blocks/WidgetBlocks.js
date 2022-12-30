@@ -17,7 +17,8 @@
    DEFAULTMODE, Tempo, PitchDrumMatrix, PhraseMaker, StatusMatrix,
    RhythmRuler, FILTERTYPES, instrumentsFilters, DEFAULTFILTERTYPE,
    TemperamentWidget, TimbreWidget, ModeWidget, PitchSlider,
-   MusicKeyboard, PitchStaircase, SampleWidget, _THIS_IS_MUSIC_BLOCKS_
+   MusicKeyboard, PitchStaircase, SampleWidget, _THIS_IS_MUSIC_BLOCKS_,
+   Arpeggio
  */
 
 /*
@@ -604,6 +605,26 @@ function setupWidgetBlocks(activity) {
             logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[0], 1];
+        }
+    }
+
+    class ArpeggioMatrixBlock extends FlowBlock {
+        constructor() {
+            super("arpeggiomatrix");
+            this.setPalette("widgets", activity);
+            this.setHelpString([
+                _(""),
+                "documentation",
+                ""
+            ]);
+            this.formBlock({ name: _("argeggio"), canCollapse: true });
+        }
+
+        flow(args, logo, turtle, blk) {
+            if (logo.arpeggio === null) {
+                logo.arpeggio = new Arpeggio();
+            }
+            logo.arpeggio.init(activity);
         }
     }
 
@@ -1215,6 +1236,7 @@ function setupWidgetBlocks(activity) {
         new ModeWidgetBlock().setup(activity);
         new TempoBlock().setup(activity);
         new SamplerBlock().setup(activity);
+        new ArpeggioMatrixBlock().setup(activity);
         new PitchDrumMatrixBlock().setup(activity);
         new oscilloscopeWidgetBlock().setup(activity);
         new PitchSliderBlock().setup(activity);
