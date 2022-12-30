@@ -49,7 +49,7 @@ class Arpeggio {
         // This array is preserved between sessions.
         // We populate the blockMap whenever a node is selected and
         // restore any nodes that might be present.
-        this._blockMap = [[12,1]];  // bottom left corner
+        this._blockMap = [[12, 1]];  // bottom left corner
     }
 
     /**
@@ -692,7 +692,10 @@ class Arpeggio {
             row = table.rows[0];
             for (let j = 0; j < row.cells.length; j++) {
                 cell = row.cells[j];
-                if (cell.style.backgroundColor === "black") {
+                if (i === 11 && j == 0) {
+                    cell.style.backgroundColor = "black";
+                    this._setCellArpeggio(0, 11, true);
+                } else if (cell.style.backgroundColor === "black") {
                     cell.style.backgroundColor = platformColor.selectorBackground;
                     this._setCellArpeggio(j, i, false);
                 }
