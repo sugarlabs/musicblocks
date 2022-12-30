@@ -610,14 +610,13 @@ function setupWidgetBlocks(activity) {
 
     class ArpeggioMatrixBlock extends FlowBlock {
         constructor() {
-            super("arpeggiomatrix");
+            super("arpeggiomatrix", _("argeggio"));
             this.setPalette("widgets", activity);
             this.setHelpString([
                 _(""),
                 "documentation",
                 ""
             ]);
-            this.formBlock({ name: _("argeggio"), canCollapse: true });
         }
 
         flow(args, logo, turtle, blk) {

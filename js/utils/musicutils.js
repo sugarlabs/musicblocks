@@ -52,7 +52,7 @@
   convertFactor, getOctaveRatio, setOctaveRatio, getTemperamentsList,
   addTemperamentToList, getTemperament, deleteTemperamentFromList,
   addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
-  DEFAULTCHORD, DEFAULTVOICE
+  DEFAULTCHORD, DEFAULTVOICE, setCustomChord
 */
 
 // Scalable sinewave graphic
@@ -812,7 +812,8 @@ const CHORDNAMES = [
     _("dominant 7th"),
     _("minor-major 7th"),
     _("fully-diminished 7th"),
-    _("half-diminished 7th")
+    _("half-diminished 7th"),
+    _("custom")
 ];
 
 const DEFAULTCHORD = CHORDNAMES[0];
@@ -828,8 +829,13 @@ const CHORDVALUES = [
     [4, 7, 10],
     [3, 7, 11],
     [3, 6, 9],
-    [3, 6, 10]
+    [3, 6, 10],
+    [4, 7]
 ];
+
+const setCustomChord = (chord) => {
+    CHORDVALUES[CHORDVALUES.length - 1] = chord;
+};
 
 const INVERTMODES = [
     [_("even"), "even"],
