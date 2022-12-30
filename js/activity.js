@@ -159,6 +159,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         "widgets/modewidget",
         "widgets/meterwidget",
         "widgets/phrasemaker",
+        "widgets/arpeggio",
         "widgets/pitchdrummatrix",
         "widgets/rhythmruler",
         "widgets/pitchstaircase",
@@ -187,7 +188,6 @@ const doAnalyzeProject = function() {
 function Activity() {
     globalActivity = this;
 
-    this.KeySignatureEnv = ["C", "major", false];
     this.cellSize = 55;
     this.searchSuggestions = [];
     this.homeButtonContainer;
@@ -280,6 +280,19 @@ function Activity() {
         console.error(e);
     }
 
+    this.KeySignatureEnv = ["C", "major", false];
+    try {
+        if (this.storage.KeySignatureEnv !== undefined) {
+            // eslint-disable-next-line no-console
+            console.log(this.storage.KeySignatureEnv);
+	    this.KeySignatureEnv = this.storage.KeySignatureEnv.split(",");
+	    this.KeySignatureEnv[2] = (this.KeySignatureEnv[2] === 'true');
+        }
+    } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+    }
+    
     /**
      * Initialises major variables and renders default stack.
      */

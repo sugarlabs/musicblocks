@@ -3718,6 +3718,7 @@ const piemenuKey = (activity) => {
         } else if (selection.length <= 2) {
             activity.KeySignatureEnv[0] = selection;
         }
+        activity.storage.KeySignatureEnv = activity.KeySignatureEnv;
     };
 
     const __setupActionKey = function (i) {
@@ -3755,6 +3756,7 @@ const piemenuKey = (activity) => {
         } else {
             activity.KeySignatureEnv[1] = selection;
         }
+        activity.storage.KeySignatureEnv = activity.KeySignatureEnv;
     };
 
     for (let i = 0; i < modes.length; i++) {
@@ -3766,6 +3768,7 @@ const piemenuKey = (activity) => {
     const __selectionChangedKey2 = function () {
         const selection = keyNameWheel2.navItems[keyNameWheel2.selectedNavItemIndex].title;
         activity.KeySignatureEnv[0] = selection;
+        activity.storage.KeySignatureEnv = activity.KeySignatureEnv;
     };
 
     for (let i = 0; i < keys2.length; i++) {
@@ -3779,8 +3782,10 @@ const piemenuKey = (activity) => {
         activity.KeySignatureEnv[0] = ks[0];
         activity.KeySignatureEnv[1] = ks[1];
         activity.KeySignatureEnv[2] = ks[2] == "true" ? true : false;
+        activity.storage.KeySignatureEnv = activity.KeySignatureEnv;
     } else {
         activity.KeySignatureEnv = ["C", "major", false];
+        activity.storage.KeySignatureEnv = activity.KeySignatureEnv;
     }
 
     let i = keys.indexOf(activity.KeySignatureEnv[0]);
