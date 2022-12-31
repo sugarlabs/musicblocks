@@ -33,23 +33,20 @@ class Arpeggio {
     static CELLSIZE = 28;
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
-    static ARPEGGIOMAX = 12;
+    static DEFAULTCOLS = 12;
 
     constructor() {
+        this.notesToPlay = [];
         this.rowLabels = ["12", "11", "10", "9", "8", "7", "6", "5", "4", "3", "2", "1"];
+        this.defaultCols = Arpeggio.DEFAULTCOLS;
         this._playing = false;
         // The half-step number associated with a row; a step (in
         // time) block is associated with a column. We need to keep
         // track of which intersections in the grid are populated.
 
         // These arrays get created each time the matrix is built.
-        this._rowBlocks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; // half-step number
-        this._colBlocks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; // time-step number
-
-        // This array is preserved between sessions.
-        // We populate the blockMap whenever a node is selected and
-        // restore any nodes that might be present.
-        this._blockMap = [[12, 1]];  // bottom left corner
+        this._rowBlocks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];  // half-step number
+        this._blockMap = [[12, 1]];  // pairs storage
     }
 
     /**
@@ -58,6 +55,12 @@ class Arpeggio {
      */
     init(activity) {
         this.activity = activity;
+        this._playList = [];
+        this._colBlocks = [];  // time steps
+        for (let i = 0; i < this.defaultCols; i++) {
+            this._colBlocks.push(i + 1);
+        }
+
         const w = window.innerWidth;
         this._cellScale = w / 1200;
 
@@ -190,7 +193,7 @@ class Arpeggio {
         arpeggioCell.innerHTML = '<table cellpadding="0px" id="arpeggioNoteTable"><tr></tr></table>';
 
         // Add any arpeggio blocks here.
-        for (let i = 0; i < Arpeggio.ARPEGGIOMAX; i++) {
+        for (let i = 0; i < this.defaultCols; i++) {
             this._addNote(i);
         }
 
@@ -220,7 +223,11 @@ class Arpeggio {
         this.makeClickable();
         this.activity.textMsg(_("Click in the grid to add steps to the arpeggio."));
 
-        this._setCellArpeggio(0, 11, true);
+        this._setCell(0, 11, true);
+
+        if (this.notesToPlay.length === 0) {
+            this.notesToPlay = [["C4", 0.5]];
+        }
     }
 
     /**
@@ -393,12 +400,12 @@ class Arpeggio {
                     const rowcol = currCell.id.split(",");
                     if (currCell.style.backgroundColor === "black") {
                         currCell.style.backgroundColor = platformColor.selectorBackground;
-                        this._setCellArpeggio(rowcol[1], rowcol[0], false);
+                        this._setCell(rowcol[1], rowcol[0], false);
                     } else {
                         // Only one cell per column can be set.
                         this._clearColumn(rowcol[1], rowcol[0]);
                         currCell.style.backgroundColor = "black";
-                        this._setCellArpeggio(rowcol[1], rowcol[0], true);
+                        this._setCell(rowcol[1], rowcol[0], true);
                     }
                 };
             }
@@ -435,7 +442,7 @@ class Arpeggio {
 
                 if (cell != undefined) {
                     cell.style.backgroundColor = "black";
-                    this._setPairCell(row, col, cell, false);
+                    this.__playCell(row, col, cell, false);
                 }
             }
         }
@@ -504,6 +511,34 @@ class Arpeggio {
         }
         this.activity.logo.synth.stop();
 
+        const pairs = this.__makePairsList();
+
+        this._playList = [];
+        // Make a list of all the notes to play.
+        for (let n = 0; n < this.notesToPlay.length; n++) {
+            const noteValue = this.notesToPlay[n][1];
+            const letter = this.notesToPlay[n][0].slice(0, -1);
+            const octave = Number(this.notesToPlay[n][0].substr(this.notesToPlay[n][0].length - 1));
+            for (let i = 0; i < pairs.length; i++) {
+                this._playList.push([getNote(
+                    letter,
+                    octave,
+                    this.defaultCols - pairs[i][0] - 1,  // Transposition
+                    this.activity.turtles.ithTurtle(0).singer.keySignature,
+                    false,
+                    null,
+                    this.activity.errorMsg
+                ), noteValue]);
+            }
+        }
+        this.__playNote(0);
+    }
+
+    /**
+     * @private
+     * @returns {obj}
+     */
+    __makePairsList() {
         const pairs = [];
 
         // For each column (time), look for a selected cell.
@@ -511,7 +546,7 @@ class Arpeggio {
         let table;
         let row;
         let cell;
-        for (let j = 0; j < Arpeggio.ARPEGGIOMAX; j++) {
+        for (let j = 0; j < this.defaultCols; j++) {
             for (let i = 0; i < arpeggioTable.rows.length - 1; i++) {
                 table = docById("arpeggioCellTable" + i);
                 row = table.rows[0];
@@ -523,64 +558,43 @@ class Arpeggio {
             }
         }
 
-        let isEmpty = true;
-        for (let i = 0; i < pairs.length; i++) {
-            if (pairs[i][1] != -1) {
-                isEmpty = false;
-                break;
-            }
-        }
-        if (!isEmpty) {
-            const ii = 0;
-            if (ii < pairs.length) {
-                this._playPitchArpeggio(ii, pairs);
-            }
-        }
+        return pairs;
     }
 
     /**
      * @private
-     * @param {number} i
-     * @param {number} pairs
+     * @param: {number} i
      * @returns {void}
      */
-    _playPitchArpeggio(i, pairs) {
-        // Find the arpeggio cell
-
-        if (!this._playing) {
-            return;
-        }
-
-        const table = docById("arpeggioCellTable" + i);
-        const row = table.rows[0];
-        const cell = row.cells[i];
-
-        if (pairs[i][1] !== -1) {
-            this._setPairCell(pairs[i][0], pairs[i][1], cell, true);
-        }
-
-        if (i < pairs.length - 1) {
+    __playNote(i) {
+        if (i < this._playList.length) {
+            this.activity.logo.synth.trigger(
+                0,
+                this._playList[i][0][0].replace(/♭/g, "b").replace(/♯/g, "#") + this._playList[i][0][1],
+                this._playList[i][1],
+                "default",
+                null,
+                null,
+                null
+            );
             setTimeout(() => {
-                const ii = i + 1;
-                this._playPitchArpeggio(ii, pairs);
-            }, 1000);
+                this.__playNote(i + 1);
+            }, 2600 * this._playList[i][1]);
         } else {
-            setTimeout(() => {
-                const icon = this.playButton;
-                icon.innerHTML =
-                    '&nbsp;&nbsp;<img src="header-icons/' +
-                    "play-button.svg" +
-                    '" title="' +
-                    _("Play") +
-                    '" alt="' +
-                    _("Play") +
-                    '" height="' +
-                    Arpeggio.ICONSIZE +
-                    '" width="' +
-                    Arpeggio.ICONSIZE +
-                    '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-                this._playing = false;
-            }, 1000);
+            const icon = this.playButton;
+            icon.innerHTML =
+                '&nbsp;&nbsp;<img src="header-icons/' +
+                "play-button.svg" +
+                '" title="' +
+                _("Play") +
+                '" alt="' +
+                _("Play") +
+                '" height="' +
+                Arpeggio.ICONSIZE +
+                '" width="' +
+                Arpeggio.ICONSIZE +
+                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            this._playing = false;
         }
     }
 
@@ -591,7 +605,7 @@ class Arpeggio {
      * @param {boolean} playNote
      * @returns {void}
      */
-    _setCellArpeggio(colIndex, rowIndex, playNote) {
+    _setCell(colIndex, rowIndex, playNote) {
         // Sets corresponding pitch/arpeggio when user clicks on any cell and
         // plays them.
         const coli = Number(colIndex);
@@ -613,7 +627,7 @@ class Arpeggio {
         for (let i = 0; i < row.cells.length; i++) {
             cell = row.cells[i];
             if (cell.style.backgroundColor === "black") {
-                this._setPairCell(rowi, i, cell, playNote);
+                this.__playCell(rowi, i, cell, playNote);
             }
         }
     }
@@ -626,24 +640,25 @@ class Arpeggio {
      * @param {boolean} playNote
      * @returns {void}
      */
-    _setPairCell(rowIndex, colIndex, cell, playNote) {
-        const noteObj = getNote(
-            this.activity.turtles.ithTurtle(0).singer.keySignature[0],
-            4,
-            Arpeggio.ARPEGGIOMAX - rowIndex - 1,  // Transposition
-            this.activity.turtles.ithTurtle(0).singer.keySignature,
-            false,
-            null,
-            this.activity.errorMsg
-        );
-
-        const note = noteObj[0] + noteObj[1];
-
+    __playCell(rowIndex, colIndex, cell, playNote) {
         if (playNote) {
+            const letter = this.notesToPlay[0][0].slice(0, -1);
+            const octave = Number(this.notesToPlay[0][0].substr(this.notesToPlay[0][0].length - 1));
+            const noteObj = getNote(
+                letter,
+                octave,
+                this.defaultCols - rowIndex - 1,  // Transposition
+                this.activity.turtles.ithTurtle(0).singer.keySignature,
+                false,
+                null,
+                this.activity.errorMsg
+            );
+
+            const note = noteObj[0] + noteObj[1];
             this.activity.logo.synth.trigger(
                 0,
                 note.replace(/♭/g, "b").replace(/♯/g, "#"),
-                0.125,
+                this.notesToPlay[0][1],
                 "default",
                 null,
                 null,
@@ -672,7 +687,7 @@ class Arpeggio {
             cell = row.cells[colIndex];
             if (cell.style.backgroundColor === "black") {
                 cell.style.backgroundColor = platformColor.selectorBackground;
-                this._setCellArpeggio(colIndex, i, false);
+                this._setCell(colIndex, i, false);
             }
         }
     }
@@ -694,10 +709,10 @@ class Arpeggio {
                 cell = row.cells[j];
                 if (i === 11 && j == 0) {
                     cell.style.backgroundColor = "black";
-                    this._setCellArpeggio(0, 11, true);
+                    this._setCell(0, 11, true);
                 } else if (cell.style.backgroundColor === "black") {
                     cell.style.backgroundColor = platformColor.selectorBackground;
-                    this._setCellArpeggio(j, i, false);
+                    this._setCell(j, i, false);
                 }
             }
         }
@@ -709,22 +724,34 @@ class Arpeggio {
      */
     _save() {
         // Saves the current matrix as a custom Chord
+        const pairs = this.__makePairsList();
         const chordValues = [];
-        for (let i = 0; i < Arpeggio.ARPEGGIOMAX; i++) {
-            // We go left to right, regardless of the order in the blockMap.
-            for (let j = 0; j < this._blockMap.length; j++) {
-                if (this._blockMap[j][1] !== i) {
-                    continue;
-                }
-                if (this._blockMap[j][0] === -1) {
-                    continue;
-                }
-                if (this._blockMap[j][0] === 12 && this._blockMap[j][1] === 1) {
-                    continue;
-                }
-                chordValues.push(12 - this._blockMap[j][0]);
+        for (let i = 0; i < pairs.length; i++) {
+            if (pairs[i][0] === 11 && pairs[i][1] === 0) {
+                continue;
             }
+            chordValues.push(12 - pairs[i][0]);
         }
+
+        // eslint-disable-next-line no-console
+        console.log(chordValues);
         setCustomChord(chordValues);
+
+        // Also, save as an arpeggio block.
+        const newStack = [
+            [0, "arpeggio", 100, 100, [null, 1, 2, 11]],
+            [1, ["chordname",{"value": "custom"}], 0, 0, [0]],
+            [2, ["newnote", {"collapsed":false}], 0, 0, [0, 3, 6, 10]],
+            [3, "divide", 0, 0, [2, 4, 5]],
+            [4, ["number", {"value":1}], 0, 0, [3]],
+            [5, ["number", {"value":12}], 0, 0, [3]],
+            [6, "vspace", 0, 0, [2, 7]],
+            [7, "pitch", 0, 0, [6, 8, 9, null]],
+            [8, ["solfege", {"value": "do"}], 0, 0, [7]],
+            [9, ["number", {"value": 4}], 0, 0, [7]],
+            [10, "hidden", 0, 0, [2, null]],
+            [11,"hidden", 0, 0, [0, null]]
+        ];
+        this.activity.blocks.loadNewBlocks(newStack);
     }
 }

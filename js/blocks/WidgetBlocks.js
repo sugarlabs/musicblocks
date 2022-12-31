@@ -608,14 +608,35 @@ function setupWidgetBlocks(activity) {
         }
     }
 
-    class ArpeggioMatrixBlock extends FlowBlock {
+    class ArpeggioMatrixBlock extends StackClampBlock {
         constructor() {
-            super("arpeggiomatrix", _("argeggio"));
+            super("arpeggiomatrix");
             this.setPalette("widgets", activity);
             this.setHelpString([
                 _(""),
                 "documentation",
                 ""
+            ]);
+
+            this.formBlock({
+                name: _("arpeggio"),
+                canCollapse: true,
+                args: 1,
+                defaults: [12]
+            });
+
+            this.makeMacro((x, y) => [
+                [0, "arpeggiomatrix", x, y, [null, 1, 3, 2]],
+                [1, ["number", { value: 12 }], 0, 0, [0]],
+                [2, "hiddennoflow", 0, 0, [0, null]],
+                [3, "newnote", 0, 0, [0, 4, 7, null]],
+                [4, "divide", 0, 0, [3, 5, 6]],
+                [5, ["number", { value: 1 }], 0, 0, [4]],
+                [6, ["number", { value: 12 }], 0, 0, [4]],
+                [7, "vspace", 0, 0, [3, 8]],
+                [8, "pitch", 0, 0, [7, 9, 10, null]],
+                [9, ["solfege", { value: "do" }], 0, 0, [8]],
+                [10, ["number", { value: 4 }], 0, 0, [8]]
             ]);
         }
 
@@ -623,7 +644,25 @@ function setupWidgetBlocks(activity) {
             if (logo.arpeggio === null) {
                 logo.arpeggio = new Arpeggio();
             }
-            logo.arpeggio.init(activity);
+
+            logo.inArpeggio = true;
+
+            if (args.length > 0) {
+                logo.arpeggio.defaultCols = args[0];
+            }
+
+            logo.arpeggio.notesToPlay = [];
+
+            const listenerName = "_arpeggio_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            const __listener = function () {
+                logo.arpeggio.init(activity);
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            return [args[1], 1];
         }
     }
 
