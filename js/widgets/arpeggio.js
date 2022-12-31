@@ -218,7 +218,7 @@ class Arpeggio {
         };
 
         this.makeClickable();
-        this.activity.textMsg(_("Click in the grid to map notes to steps."));
+        this.activity.textMsg(_("Click in the grid to add steps to the arpeggio."));
 
         this._setCellArpeggio(0, 11, true);
     }
