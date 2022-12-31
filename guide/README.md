@@ -79,6 +79,7 @@ This guide details the many musical features of the language.
     12. [Changing Temperament](#412-changing-temperament)
     13. [The Oscilloscope](#413-the-oscilloscope)
     14. [The Sampler](#414-the-sampler)
+    15. [Arpeggio](#415-arpeggio)
 5. [Beyond Music Blocks](#5-beyond-music-blocks)
     1. [LilyPond (or How to Generate Sheet Music)](#51-lilypond)
     2. [Other Exports](#52-other-exports)
@@ -2215,11 +2216,13 @@ Music Blocks has an Oscillosope Widget to visualize the music as it plays.
 
 A separate wave will be displayed for each mouse.
 
-###  <a name="sampler">4.14 Sampler</a>
+###  <a name="sampler">4.14 The Sampler</a>
 
 ![widget](../documentation/sampler_block.svg "Sampler")
  
-You can import sound samples (.WAV files) and use them with the *Set Instrument" block. The *Sampler* widget lets you set the center pitch of your sample so that it can be tuned.
+You can import sound samples (.WAV files) and use them with the *Set
+Instrument" block. The *Sampler* widget lets you set the center pitch
+of your sample so that it can be tuned.
 
 ![widget](./sampler1.svg "Sampler Widget")
 
@@ -2227,6 +2230,18 @@ You can then use the *Sample* block as you would any input to the *Set
 Instrument* block.
 
 ![widget](./sampler2.svg "Sampler Widget")
+
+###  <a name="arpeggio">4.15 Arpeggio</a>
+
+![widget](../documentation/arpeggiomatrix_block.svg "Arpeggio Widget")
+
+You can design custom sequences to use with the *Arpeggio* block using
+the *Arpeggio* widget. The widget lets you "paint" intervals that are
+then saved to a "custom" chord, which can be used with the *Arpeggio* block.
+
+![widget](./arpeggio_widget.png "Arpeggio_widget")
+
+![widget](../documentation/custom_arpeggio.svg "Custom Arpeggio")
 
 ## <a name="BEYOND-MUSIC-BLOCKS">5. Beyond Music Blocks</a>
 

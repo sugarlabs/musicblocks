@@ -2444,6 +2444,9 @@ msgstr "acorde V"
 msgid "arpeggio"
 msgstr "arpegio"
 
+msgid "The Arpeggio Widget is used to compose chord sequences."
+msgstr "El Arpegio Widget se usa para componer secuencias de acordes."
+
 msgid "Click in the grid to add steps to the arpeggio."
 msgstr "Haga clic en la cuadrícula para agregar pasos al arpegio."
 
