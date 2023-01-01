@@ -19,7 +19,7 @@
    DEFAULTVOICE, INLINECOLLAPSIBLES, NATURAL, NUMBERBLOCKDEFAULT,
    SPECIALINPUTS, STANDARDBLOCKHEIGHT, STRINGLEN, TEXTWIDTH,
    WESTERN2EISOLFEGENAMES, WIDENAMES, _, addTemperamentToDictionary,
-   Block, closeBlkWidgets, createjs, delayExecution,
+   Block, closeBlkWidgets, createjs, delayExecution, DEFAULTCHORD,
    deleteTemperamentFromList, getDrumSynthName, getNoiseName,
    getNoiseSynthName, getTemperamentsList, getTextWidth,
    getVoiceSynthName, i18nSolfege, last, MathUtility, mixedNumber,

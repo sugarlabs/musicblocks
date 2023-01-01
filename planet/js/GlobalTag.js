@@ -9,34 +9,46 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/*
+   global
+
+   _
+*/
+/*
+   exported
+
+   GlobalTag
+*/
+
 function GlobalTag(Planet) {
-    let tagNames = [
-	//.TRANS: On the Planet, we use labels to tag projects.
-	_('All Projects'),
-	//.TRANS: On the Planet, we use labels to tag projects.
-	_('My Projects'),
-	//.TRANS: On the Planet, we use labels to tag projects.
-	_('Examples'),
-	//.TRANS: On the Planet, we use labels to tag projects.
-	_('Music'),
-	//.TRANS: On the Planet, we use labels to tag projects.
-	_('Art'),
-	//.TRANS: On the Planet, we use labels to tag projects.
-	_('Math'),
-	//.TRANS: On the Planet, we use labels to tag projects.
-	_('Interactive'),
-	//.TRANS: On the Planet, we use labels to tag projects.
-	_('Design'),
-	//.TRANS: On the Planet, we use labels to tag projects.
-	_('Game'),
-	//.TRANS: On the Planet, we use labels to tag projects.
-	_('Media'),
-	//.TRANS: On the Planet, we use labels to tag projects.
-	_('Sensors'),
-	//.TRANS: On the Planet, we use labels to tag projects.
-	_('Effects'),
-	//.TRANS: On the Planet, we use labels to tag projects.
-	_('Code Snippet'),
+    // eslint-disable-next-line no-unused-vars
+    const tagNames = [
+        //.TRANS: On the Planet, we use labels to tag projects.
+        _("All Projects"),
+        //.TRANS: On the Planet, we use labels to tag projects.
+        _("My Projects"),
+        //.TRANS: On the Planet, we use labels to tag projects.
+        _("Examples"),
+        //.TRANS: On the Planet, we use labels to tag projects.
+        _("Music"),
+        //.TRANS: On the Planet, we use labels to tag projects.
+        _("Art"),
+        //.TRANS: On the Planet, we use labels to tag projects.
+        _("Math"),
+        //.TRANS: On the Planet, we use labels to tag projects.
+        _("Interactive"),
+        //.TRANS: On the Planet, we use labels to tag projects.
+        _("Design"),
+        //.TRANS: On the Planet, we use labels to tag projects.
+        _("Game"),
+        //.TRANS: On the Planet, we use labels to tag projects.
+        _("Media"),
+        //.TRANS: On the Planet, we use labels to tag projects.
+        _("Sensors"),
+        //.TRANS: On the Planet, we use labels to tag projects.
+        _("Effects"),
+        //.TRANS: On the Planet, we use labels to tag projects.
+        _("Code Snippet"),
     ];
 
     this.id = null;
@@ -50,23 +62,23 @@ function GlobalTag(Planet) {
     this.selectedClass = null;
 
     this.render = function() {
-        let tag = document.createElement('div');
-        tag.classList.add('chipselect');
-        tag.classList.add('cursor');
-        if (this.selected){
+        const tag = document.createElement("div");
+        tag.classList.add("chipselect");
+        tag.classList.add("cursor");
+        if (this.selected) {
             tag.classList.add(this.selectedClass);
         }
 
         tag.textContent = _(this.name);
 
-
-        tag.addEventListener('click',  (evt) => {
+        // eslint-disable-next-line no-unused-vars
+        tag.addEventListener("click",  (evt) => {
             this.onTagClick();
         });
 
-        let el = document.getElementById('morechips');
-        if (this.IsDisplayTag){
-            el = document.getElementById('primarychips');
+        let el = document.getElementById("morechips");
+        if (this.IsDisplayTag) {
+            el = document.getElementById("primarychips");
         }
 
         el.appendChild(tag);
@@ -74,7 +86,7 @@ function GlobalTag(Planet) {
     };
 
     this.onTagClick = function() {
-        if (this.specialTag){
+        if (this.specialTag) {
             if (!this.selected) {
                 this.globalPlanet.selectSpecialTag(this);
             }
@@ -99,26 +111,26 @@ function GlobalTag(Planet) {
         this.selected = false;
     };
 
-    this.init = function(obj){
+    this.init = function(obj) {
         if (obj.id !== undefined) {
             this.specialTag = false;
             this.id = obj.id;
             this.name = Planet.TagsManifest[this.id].TagName;
             this.func = null;
-            if (Planet.TagsManifest[this.id].IsDisplayTag === '1') {
+            if (Planet.TagsManifest[this.id].IsDisplayTag === "1") {
                 this.IsDisplayTag = true;
             } else {
                 this.IsDisplayTag = false;
             }
 
-            this.selectedClass = 'selected'
+            this.selectedClass = "selected";
         } else {
             this.specialTag = true;
             this.IsDisplayTag = true;
             this.id = null;
             this.name = obj.name;
             this.func = obj.func;
-            this.selectedClass = 'selected-special'
+            this.selectedClass = "selected-special";
         }
 
         this.render();

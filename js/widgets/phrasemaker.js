@@ -18,7 +18,7 @@
    DEFAULTVOICE, getDrumName, MATRIXSOLFEWIDTH, getDrumIcon,
    noteIsSolfege, isCustomTemperament, i18nSolfege, getNote, DEFAULTDRUM, last,
    DRUMS, SHARP, FLAT, PREVIEWVOLUME, DEFAULTVOLUME, noteToFrequency,
-   getDrumIndex, LCD, calcNoteValueToDisplay, NOTESYMBOLS,
+   LCD, calcNoteValueToDisplay, NOTESYMBOLS,
    EIGHTHNOTEWIDTH, docBySelector, getTemperament
 */
 
@@ -628,9 +628,9 @@ class PhraseMaker {
                         const label = this.rowLabels[i];
                         const notes = getTemperament(this.activity.logo.synth.inTemperament);
                         let note = [];
-                        for (let n in notes) {
+                        for (const n in notes) {
                             if (notes[n][1] === label) {
-                                let note = notes[n];
+                                note = notes[n];
                                 break;
                             }
                         }
@@ -1502,12 +1502,14 @@ class PhraseMaker {
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + "px";
             }
 
+            /*
             let noteStored = null;
             if (condition === "graphicsblocks") {
                 noteStored = this.rowLabels[blockIndex] + ": " + this.rowArgs[blockIndex];
             } else if (condition === "synthsblocks") {
                 noteStored = this.rowArgs[blockIndex];
             }
+            */
             this._noteStored[blockIndex] =
                 this.rowLabels[blockIndex] + ": " + this.rowArgs[blockIndex];
         };
@@ -2093,7 +2095,7 @@ class PhraseMaker {
         }
 
         const sortableList = [];
-        let drumName, drumIndex;
+        let drumName;
         // Make a list to sort, skipping drums and graphics.
         // frequency;label;arg;row index
         for (let i = 0; i < this.rowLabels.length; i++) {
@@ -2138,9 +2140,7 @@ class PhraseMaker {
         for (let i = 0; i < this.rowLabels.length; i++) {
             drumName = getDrumName(this.rowLabels[i]);
             if (drumName != null) {
-                drumIndex = getDrumIndex(this.rowLabels[i]);
                 sortableList.push([
-                    // -drumIndex,
                     -1 * i,
                     this.rowLabels[i],
                     this.rowArgs[i],
@@ -3960,10 +3960,12 @@ class PhraseMaker {
                         } else {
                             if (
                                 isCustomTemperament(this.activity.logo.synth.inTemperament)) {
-                                const notes = getTemperament(this.activity.logo.synth.inTemperament);
+                                const notes = getTemperament(
+                                    this.activity.logo.synth.inTemperament
+                                );
                                 const label = this.rowLabels[j];
                                 let customNote = [];
-                                for (let n in notes) {
+                                for (const n in notes) {
                                     if (notes[n][1] === label) {
                                         customNote = notes[n];
                                         break;

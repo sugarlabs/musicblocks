@@ -17,7 +17,7 @@
    DEFAULTOSCILLATORTYPE, platformColor, rationalToFraction, last,
    Singer, instrumentsEffects:writeable, instrumentsFilters:writeable,
    _, docById, DEFAULTFILTERTYPE, docByName, OSCTYPES, FILTERTYPES,
-   oneHundredToFraction
+   oneHundredToFraction, delayExecution
  */
 
 /*

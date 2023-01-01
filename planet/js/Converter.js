@@ -9,20 +9,27 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+
+/*
+   exported
+
+   Converter
+*/
+
 function Converter(Planet) {
     this.ServerInterface = Planet.ServerInterface;
 
     this.isConnected = function() {
         return Planet.ConnectedToServer;
-    }
+    };
 
     // callbacks: (success, data/error message)
     // Conversion Functions
 
     this.ly2pdf = function(data, callback) {
-        this.ServerInterface.convertFile('ly', 'pdf', window.btoa(encodeURIComponent(data)), function(result) {
-	    this.afterly2pdf(result,callback);
-	}.bind(this));
+        this.ServerInterface.convertFile("ly", "pdf", window.btoa(encodeURIComponent(data)), function(result) {
+            this.afterly2pdf(result,callback);
+        }.bind(this));
     };
     
     this.afterly2pdf = function(data, callback) {
@@ -35,19 +42,19 @@ function Converter(Planet) {
     
     // Ancillary Functions
     this.getDataURL = function(mime, data){
-        return 'data:' + mime + ';base64,' + data;
+        return "data:" + mime + ";base64," + data;
     };
 
     // Unused, but might be useful.
     this.getBlob = function(mime, data) {
-        let rawData = window.atob(data);
-        let len = rawData.length;
-        let arr = new Uint8Array(len);
+        const rawData = window.atob(data);
+        const len = rawData.length;
+        const arr = new Uint8Array(len);
         for (let i = 0; i < len; i++){
             arr[i] = rawData.charCodeAt(i);
         }
 
-        let blob = new Blob([arr], {type: mime});
+        const blob = new Blob([arr], {type: mime});
         return blob;
     };
 

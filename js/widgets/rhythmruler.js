@@ -875,7 +875,7 @@ class RhythmRuler {
                 const elapseTime = d.getTime() - this._longPressStartTime;
                 if (elapseTime > 1500) {
                     this._inLongPress = true;
-		    this.__toggleRestState(cell, true);
+                    this.__toggleRestState(cell, true);
                 }
             }
 
