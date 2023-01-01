@@ -9,6 +9,17 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/*
+   global
+
+   _
+*/
+/*
+   exported
+
+   StringHelper
+*/
+
 function StringHelper(Planet) {
     //[id, string, property (if present)]
     // append to innerhtml
@@ -55,7 +66,7 @@ function StringHelper(Planet) {
         ["projectviewer-report-close",_("Close")],
         ["projectviewer-download-file",_("Download as File"),"data-tooltip"],
         ["projectviewer-merge-mb",_("Merge with current project"),"data-tooltip"]
-    ]
+    ];
     if (Planet.IsMusicBlocks) {
         this.strings.push(["projectviewer-open-mb",_("Open in Music Blocks"),"data-tooltip"]);
     } else {
@@ -65,8 +76,8 @@ function StringHelper(Planet) {
 
     this.init = function(){
         for (let i = 0; i<this.strings.length; i++){
-            let obj = this.strings[i];
-            let elem = document.getElementById(obj[0]);
+            const obj = this.strings[i];
+            const elem = document.getElementById(obj[0]);
             if (this.strings[i].length==3){
                 elem.setAttribute(obj[2],obj[1]);
             } else {

@@ -21,7 +21,7 @@ class StatusMatrix {
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
     static OUTERWINDOWWIDTH = 620;
-    static INNERWINDOWWIDTH = StatusMatrix.OUTERWINDOWWIDTH - StatusMatrix.BUTTONSIZE * 1.5;
+    static INNERWINDOWWIDTH = this.OUTERWINDOWWIDTH - this.BUTTONSIZE * 1.5;
     static FONTSCALEFACTOR = 75;
 
     /**
