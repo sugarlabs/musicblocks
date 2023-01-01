@@ -159,6 +159,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         "widgets/modewidget",
         "widgets/meterwidget",
         "widgets/phrasemaker",
+        "widgets/arpeggio",
         "widgets/pitchdrummatrix",
         "widgets/rhythmruler",
         "widgets/pitchstaircase",
@@ -187,7 +188,6 @@ const doAnalyzeProject = function() {
 function Activity() {
     globalActivity = this;
 
-    this.KeySignatureEnv = ["C", "major", false];
     this.cellSize = 55;
     this.searchSuggestions = [];
     this.homeButtonContainer;
@@ -280,6 +280,19 @@ function Activity() {
         console.error(e);
     }
 
+    this.KeySignatureEnv = ["C", "major", false];
+    try {
+        if (this.storage.KeySignatureEnv !== undefined) {
+            // eslint-disable-next-line no-console
+            console.log(this.storage.KeySignatureEnv);
+            this.KeySignatureEnv = this.storage.KeySignatureEnv.split(",");
+            this.KeySignatureEnv[2] = (this.KeySignatureEnv[2] === 'true');
+        }
+    } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+    }
+    
     /**
      * Initialises major variables and renders default stack.
      */
@@ -2464,107 +2477,107 @@ function Activity() {
             this.bassFlatBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
         }
         // Position the sharps and flats
-        this.grandSharpBitmap[0].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
-        this.grandSharpBitmap[1].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1025;
-        this.grandSharpBitmap[2].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1075;
-        this.grandSharpBitmap[3].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1037.5;
-        this.grandSharpBitmap[4].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1000;
-        this.grandSharpBitmap[5].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1050;
-        this.grandSharpBitmap[6].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1012.5;
-        this.grandFlatBitmap[0].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
-        this.grandFlatBitmap[1].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1100;
-        this.grandFlatBitmap[2].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1050;
-        this.grandFlatBitmap[3].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1087.5;
-        this.grandFlatBitmap[4].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1037.5;
-        this.grandFlatBitmap[5].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1075;
-        this.grandFlatBitmap[6].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1025;
+        this.grandSharpBitmap[0].y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+        this.grandSharpBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 412.5;
+        this.grandSharpBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 462.5;
+        this.grandSharpBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 425;
+        this.grandSharpBitmap[4].y = this.canvas.height / (2 * this.turtleBlocksScale) - 387.5;
+        this.grandSharpBitmap[5].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5;
+        this.grandSharpBitmap[6].y = this.canvas.height / (2 * this.turtleBlocksScale) - 400;
+        this.grandFlatBitmap[0].y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+        this.grandFlatBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 487.5;
+        this.grandFlatBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5;
+        this.grandFlatBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 475;
+        this.grandFlatBitmap[4].y = this.canvas.height / (2 * this.turtleBlocksScale) - 425;
+        this.grandFlatBitmap[5].y = this.canvas.height / (2 * this.turtleBlocksScale) - 462.5;
+        this.grandFlatBitmap[6].y = this.canvas.height / (2 * this.turtleBlocksScale) - 412.5;
 
-        this.trebleSharpBitmap[0].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
-        this.trebleSharpBitmap[1].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1025;
-        this.trebleSharpBitmap[2].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1075;
-        this.trebleSharpBitmap[3].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1037.5;
-        this.trebleSharpBitmap[4].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1000;
-        this.trebleSharpBitmap[5].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1050;
-        this.trebleSharpBitmap[6].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1012.5;
-        this.trebleFlatBitmap[0].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
-        this.trebleFlatBitmap[1].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1100;
-        this.trebleFlatBitmap[2].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1050;
-        this.trebleFlatBitmap[3].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1087.5;
-        this.trebleFlatBitmap[4].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1037.5;
-        this.trebleFlatBitmap[5].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1075;
-        this.trebleFlatBitmap[6].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1025;
+        this.trebleSharpBitmap[0].y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+        this.trebleSharpBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 412.5;
+        this.trebleSharpBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 462.5;
+        this.trebleSharpBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 425;
+        this.trebleSharpBitmap[4].y = this.canvas.height / (2 * this.turtleBlocksScale) - 387.5;
+        this.trebleSharpBitmap[5].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5;
+        this.trebleSharpBitmap[6].y = this.canvas.height / (2 * this.turtleBlocksScale) - 400;
+        this.trebleFlatBitmap[0].y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+        this.trebleFlatBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 487.5;
+        this.trebleFlatBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5;
+        this.trebleFlatBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 475;
+        this.trebleFlatBitmap[4].y = this.canvas.height / (2 * this.turtleBlocksScale) - 425;
+        this.trebleFlatBitmap[5].y = this.canvas.height / (2 * this.turtleBlocksScale) - 462.5;
+        this.trebleFlatBitmap[6].y = this.canvas.height / (2 * this.turtleBlocksScale) - 412.5;
 
-        this.sopranoSharpBitmap[0].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
-        this.sopranoSharpBitmap[1].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1025;
-        this.sopranoSharpBitmap[2].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1075;
-        this.sopranoSharpBitmap[3].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1037.5;
-        this.sopranoSharpBitmap[4].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1000 - 87.5;
-        this.sopranoSharpBitmap[5].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1050;
-        this.sopranoSharpBitmap[6].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1012.5 - 87.5;
-        this.sopranoFlatBitmap[0].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5 - 87.5;
-        this.sopranoFlatBitmap[1].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1100;
-        this.sopranoFlatBitmap[2].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1050 - 87.5;
-        this.sopranoFlatBitmap[3].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1087.5;
-        this.sopranoFlatBitmap[4].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1037.5 - 87.5;
-        this.sopranoFlatBitmap[5].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1075;
-        this.sopranoFlatBitmap[6].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1025 - 87.5;
+        this.sopranoSharpBitmap[0].y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+        this.sopranoSharpBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 412.5;
+        this.sopranoSharpBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 462.5;
+        this.sopranoSharpBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 425;
+        this.sopranoSharpBitmap[4].y = this.canvas.height / (2 * this.turtleBlocksScale) - 387.5 - 87.5;
+        this.sopranoSharpBitmap[5].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5;
+        this.sopranoSharpBitmap[6].y = this.canvas.height / (2 * this.turtleBlocksScale) - 400 - 87.5;
+        this.sopranoFlatBitmap[0].y = this.canvas.height / (2 * this.turtleBlocksScale) - 450 - 87.5;
+        this.sopranoFlatBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 487.5;
+        this.sopranoFlatBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5 - 87.5;
+        this.sopranoFlatBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 475;
+        this.sopranoFlatBitmap[4].y = this.canvas.height / (2 * this.turtleBlocksScale) - 425 - 87.5;
+        this.sopranoFlatBitmap[5].y = this.canvas.height / (2 * this.turtleBlocksScale) - 462.5;
+        this.sopranoFlatBitmap[6].y = this.canvas.height / (2 * this.turtleBlocksScale) - 412.5 - 87.5;
         for (let i = 0; i < 7; i++) {
             this.sopranoSharpBitmap[i].y += 87.5;
             this.sopranoFlatBitmap[i].y += 87.5;
         }
 
-        this.altoSharpBitmap[0].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
-        this.altoSharpBitmap[1].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1025;
-        this.altoSharpBitmap[2].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1075;
-        this.altoSharpBitmap[3].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1037.5;
-        this.altoSharpBitmap[4].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1000;
-        this.altoSharpBitmap[5].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1050;
-        this.altoSharpBitmap[6].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1012.5;
-        this.altoFlatBitmap[0].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
-        this.altoFlatBitmap[1].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1100;
-        this.altoFlatBitmap[2].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1050;
-        this.altoFlatBitmap[3].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1087.5;
-        this.altoFlatBitmap[4].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1037.5;
-        this.altoFlatBitmap[5].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1075;
-        this.altoFlatBitmap[6].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1025;
+        this.altoSharpBitmap[0].y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+        this.altoSharpBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 412.5;
+        this.altoSharpBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 462.5;
+        this.altoSharpBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 425;
+        this.altoSharpBitmap[4].y = this.canvas.height / (2 * this.turtleBlocksScale) - 387.5;
+        this.altoSharpBitmap[5].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5;
+        this.altoSharpBitmap[6].y = this.canvas.height / (2 * this.turtleBlocksScale) - 400;
+        this.altoFlatBitmap[0].y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+        this.altoFlatBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 487.5;
+        this.altoFlatBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5;
+        this.altoFlatBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 475;
+        this.altoFlatBitmap[4].y = this.canvas.height / (2 * this.turtleBlocksScale) - 425;
+        this.altoFlatBitmap[5].y = this.canvas.height / (2 * this.turtleBlocksScale) - 462.5;
+        this.altoFlatBitmap[6].y = this.canvas.height / (2 * this.turtleBlocksScale) - 412.5;
         for (let i = 0; i < 7; i++) {
             this.altoSharpBitmap[i].y += 87.5;
             this.altoFlatBitmap[i].y += 87.5;
         }
 
-        this.tenorSharpBitmap[0].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5 + 87.5;
-        this.tenorSharpBitmap[1].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1025;
-        this.tenorSharpBitmap[2].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1075 + 87.5;
-        this.tenorSharpBitmap[3].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1037.5;
-        this.tenorSharpBitmap[4].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1000;
-        this.tenorSharpBitmap[5].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1050;
-        this.tenorSharpBitmap[6].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1012.5;
-        this.tenorFlatBitmap[0].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
-        this.tenorFlatBitmap[1].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1100;
-        this.tenorFlatBitmap[2].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1050;
-        this.tenorFlatBitmap[3].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1087.5;
-        this.tenorFlatBitmap[4].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1037.5;
-        this.tenorFlatBitmap[5].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1075;
-        this.tenorFlatBitmap[6].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1025;
+        this.tenorSharpBitmap[0].y = this.canvas.height / (2 * this.turtleBlocksScale) - 450 + 87.5;
+        this.tenorSharpBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 412.5;
+        this.tenorSharpBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 462.5 + 87.5;
+        this.tenorSharpBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 425;
+        this.tenorSharpBitmap[4].y = this.canvas.height / (2 * this.turtleBlocksScale) - 387.5;
+        this.tenorSharpBitmap[5].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5;
+        this.tenorSharpBitmap[6].y = this.canvas.height / (2 * this.turtleBlocksScale) - 400;
+        this.tenorFlatBitmap[0].y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+        this.tenorFlatBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 487.5;
+        this.tenorFlatBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5;
+        this.tenorFlatBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 475;
+        this.tenorFlatBitmap[4].y = this.canvas.height / (2 * this.turtleBlocksScale) - 425;
+        this.tenorFlatBitmap[5].y = this.canvas.height / (2 * this.turtleBlocksScale) - 462.5;
+        this.tenorFlatBitmap[6].y = this.canvas.height / (2 * this.turtleBlocksScale) - 412.5;
         for (let i = 0; i < 7; i++) {
             this.tenorSharpBitmap[i].y += 87.5;
             this.tenorFlatBitmap[i].y += 87.5;
         }
 
-        this.bassSharpBitmap[0].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
-        this.bassSharpBitmap[1].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1025;
-        this.bassSharpBitmap[2].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1075;
-        this.bassSharpBitmap[3].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1037.5;
-        this.bassSharpBitmap[4].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1000;
-        this.bassSharpBitmap[5].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1050;
-        this.bassSharpBitmap[6].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1012.5;
-        this.bassFlatBitmap[0].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1062.5;
-        this.bassFlatBitmap[1].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1100;
-        this.bassFlatBitmap[2].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1050;
-        this.bassFlatBitmap[3].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1087.5;
-        this.bassFlatBitmap[4].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1037.5;
-        this.bassFlatBitmap[5].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1075;
-        this.bassFlatBitmap[6].y = this.canvas.width / (2 * this.turtleBlocksScale) - 1025;
+        this.bassSharpBitmap[0].y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+        this.bassSharpBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 412.5;
+        this.bassSharpBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 462.5;
+        this.bassSharpBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 425;
+        this.bassSharpBitmap[4].y = this.canvas.height / (2 * this.turtleBlocksScale) - 387.5;
+        this.bassSharpBitmap[5].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5;
+        this.bassSharpBitmap[6].y = this.canvas.height / (2 * this.turtleBlocksScale) - 400;
+        this.bassFlatBitmap[0].y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+        this.bassFlatBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 487.5;
+        this.bassFlatBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5;
+        this.bassFlatBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 475;
+        this.bassFlatBitmap[4].y = this.canvas.height / (2 * this.turtleBlocksScale) - 425;
+        this.bassFlatBitmap[5].y = this.canvas.height / (2 * this.turtleBlocksScale) - 462.5;
+        this.bassFlatBitmap[6].y = this.canvas.height / (2 * this.turtleBlocksScale) - 412.5;
         for (let i = 0; i < 7; i++) {
             this.bassSharpBitmap[i].y += 175;
             this.bassFlatBitmap[i].y += 175;

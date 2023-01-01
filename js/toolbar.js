@@ -570,6 +570,8 @@ class Toolbar {
                 auxToolbar.style.display = "none";
                 menuIcon.innerHTML = "menu";
                 docById("toggleAuxBtn").className -= "blue darken-1";
+                docById("chooseKeyDiv").style.display = "none";
+                docById("moveable").style.display = "none";
             }
         };
     }
