@@ -2244,6 +2244,9 @@ then saved to a "custom" chord, which can be used with the *Arpeggio* block.
 The horizonal axis is time and the verical axis is half-step offsets
 from the base note.
 
+The sequence in the pattern above is ```do mi sol ti do sol do sol mi
+do ti mi```.
+
 ![widget](../documentation/custom_arpeggio.svg "Custom Arpeggio")
 
 ## <a name="BEYOND-MUSIC-BLOCKS">5. Beyond Music Blocks</a>
