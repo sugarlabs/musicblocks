@@ -789,7 +789,7 @@ class Singer {
             for (let i = 0; i < duplicateFactor; i++) {
                 // Apply transpositions
                 const transposition = 2 * delta + tur.singer.transposition;
-                let alen = tur.singer.arpeggio.length;
+                const alen = tur.singer.arpeggio.length;
                 let atrans = transposition;
                 if (alen > 0 && i < alen) {
                     atrans += tur.singer.arpeggio[i];
@@ -828,7 +828,7 @@ class Singer {
             for (let i = 0; i < duplicateFactor; i++) {
                 // Apply transpositions
                 const transposition = 2 * delta + tur.singer.transposition;
-                let alen = tur.singer.arpeggio.length;
+                const alen = tur.singer.arpeggio.length;
                 let atrans = transposition;
                 if (alen > 0 && i < alen) {
                     atrans += tur.singer.arpeggio[i];
@@ -881,7 +881,7 @@ class Singer {
             const addPitch = (note, octave, cents, direction) => {
                 // Apply transpositions
                 const transposition = 2 * delta + tur.singer.transposition;
-                let alen = tur.singer.arpeggio.length;
+                const alen = tur.singer.arpeggio.length;
                 let atrans = transposition;
                 if (alen > 0) {
                     atrans += tur.singer.arpeggio[tur.singer.arpeggioIndex];
@@ -1319,6 +1319,19 @@ class Singer {
                 activity.errorMsg
             );
             activity.logo.timbre.notesToPlay.push([noteObj[0] + noteObj[1], 1 / noteBeatValue]);
+            tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
+            tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], noteBeatValue];
+        } else if (activity.logo.inArpeggio) {
+            const noteObj = getNote(
+                tur.singer.notePitches[last(tur.singer.inNoteBlock)][0],
+                tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][0],
+                0,
+                tur.singer.keySignature,
+                tur.singer.moveable,
+                null,
+                activity.errorMsg
+            );
+            activity.logo.arpeggio.notesToPlay.push([noteObj[0] + noteObj[1], 1 / noteBeatValue]);
             tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
             tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], noteBeatValue];
         } else if (activity.logo.inMatrix || activity.logo.tuplet) {
@@ -1855,13 +1868,6 @@ class Singer {
                             denominator[k] = rationalToFraction(ratio[k])[1];
                         }
                     }
-
-                    // const notesInfo = "";
-
-                    const obj = rationalToFraction(1 / noteBeatValue);
-
-                    //         //-> Removed the WARNING to play a note longer than 2 whole 
-                    //         //   notes since some samples are very long.
 
                     if (!tur.singer.suppressOutput) {
                         tur.blink(duration, last(Singer.masterVolume));

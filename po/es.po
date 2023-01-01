@@ -2442,10 +2442,16 @@ msgid "chord5"
 msgstr "acorde V"
 
 msgid "arpeggio"
-msgstr "arpeggio"
+msgstr "arpegio"
+
+msgid "The Arpeggio Widget is used to compose chord sequences."
+msgstr "El Arpegio Widget se usa para componer secuencias de acordes."
+
+msgid "Click in the grid to add steps to the arpeggio."
+msgstr "Haga clic en la cuadrícula para agregar pasos al arpegio."
 
 msgid "The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord."
-msgstr "El bloque Arpeggio ejecutará cada bloque de notas varias veces, agregando una transposición basada en el acorde especificado."
+msgstr "El bloque Arpegio ejecutará cada bloque de notas varias veces, agregando una transposición basada en el acorde especificado."
 
 msgid "The output of the example is: do, mi, sol, sol, ti, mi"
 msgstr "La salida del ejemplo es: do, mi, sol, sol, ti, mi"

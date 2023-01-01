@@ -112,6 +112,7 @@ class Logo {
         // Widgets
         this.phraseMaker = null;
         this.pitchDrumMatrix = null;
+        this.arpeggio = null;
         this.rhythmRuler = null;
         this.timbre = null;
         this.pitchStaircase = null;
@@ -174,6 +175,7 @@ class Logo {
         this.inMusicKeyboard = false;
         this._currentDrumlock = null;
         this.inTimbre = false;
+        this.inArpeggio = false;
         this.insideModeWidget = false;
         this.insideMeterWidget = false;
         this.insideTemperament = false;
@@ -361,7 +363,7 @@ class Logo {
                 "noise2": [DEFAULTVOLUME],
                 "noise3": [DEFAULTVOLUME]
             };
-	    tur.singer.synthVolume[DEFAULTVOICE] = [DEFAULTVOLUME];
+            tur.singer.synthVolume[DEFAULTVOICE] = [DEFAULTVOLUME];
         }
 
         Singer.setMasterVolume(this, DEFAULTVOLUME);
@@ -1053,6 +1055,7 @@ class Logo {
         this.inMatrix = false;
         this.inMusicKeyboard = false;
         this.inTimbre = false;
+        this.inArpeggio = false;
         this.inRhythmRuler = false;
         this.insideModeWidget = false;
         this.insideMeterWidget = false;
@@ -1953,7 +1956,7 @@ class Logo {
 
         const __print = (arg, timeout) => {
             if (suppressOutput) return;
-            if (arg === undefined) return
+            if (arg === undefined) return;
             setTimeout(() => this.activity.textMsg(arg.toString()), timeout);
         };
 

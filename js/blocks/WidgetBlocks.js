@@ -1,4 +1,5 @@
 // Copyright (c) 2019 Bottersnike
+// Copyright (c) 2019-22 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -17,7 +18,8 @@
    DEFAULTMODE, Tempo, PitchDrumMatrix, PhraseMaker, StatusMatrix,
    RhythmRuler, FILTERTYPES, instrumentsFilters, DEFAULTFILTERTYPE,
    TemperamentWidget, TimbreWidget, ModeWidget, PitchSlider,
-   MusicKeyboard, PitchStaircase, SampleWidget, _THIS_IS_MUSIC_BLOCKS_
+   MusicKeyboard, PitchStaircase, SampleWidget, _THIS_IS_MUSIC_BLOCKS_,
+   Arpeggio
  */
 
 /*
@@ -604,6 +606,64 @@ function setupWidgetBlocks(activity) {
             logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[0], 1];
+        }
+    }
+
+    class ArpeggioMatrixBlock extends StackClampBlock {
+        constructor() {
+            super("arpeggiomatrix");
+            this.setPalette("widgets", activity);
+            this.setHelpString([
+                _("The Arpeggio Widget is used to compose chord sequences."),
+                "documentation",
+                ""
+            ]);
+
+            this.formBlock({
+                name: _("arpeggio"),
+                canCollapse: true,
+                args: 1,
+                defaults: [12]
+            });
+
+            this.makeMacro((x, y) => [
+                [0, "arpeggiomatrix", x, y, [null, 1, 3, 2]],
+                [1, ["number", { value: 12 }], 0, 0, [0]],
+                [2, "hiddennoflow", 0, 0, [0, null]],
+                [3, "newnote", 0, 0, [0, 4, 7, null]],
+                [4, "divide", 0, 0, [3, 5, 6]],
+                [5, ["number", { value: 1 }], 0, 0, [4]],
+                [6, ["number", { value: 12 }], 0, 0, [4]],
+                [7, "vspace", 0, 0, [3, 8]],
+                [8, "pitch", 0, 0, [7, 9, 10, null]],
+                [9, ["solfege", { value: "do" }], 0, 0, [8]],
+                [10, ["number", { value: 4 }], 0, 0, [8]]
+            ]);
+        }
+
+        flow(args, logo, turtle, blk) {
+            if (logo.arpeggio === null) {
+                logo.arpeggio = new Arpeggio();
+            }
+
+            logo.inArpeggio = true;
+
+            if (args.length > 0) {
+                logo.arpeggio.defaultCols = args[0];
+            }
+
+            logo.arpeggio.notesToPlay = [];
+
+            const listenerName = "_arpeggio_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            const __listener = function () {
+                logo.arpeggio.init(activity);
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            return [args[1], 1];
         }
     }
 
@@ -1215,6 +1275,7 @@ function setupWidgetBlocks(activity) {
         new ModeWidgetBlock().setup(activity);
         new TempoBlock().setup(activity);
         new SamplerBlock().setup(activity);
+        new ArpeggioMatrixBlock().setup(activity);
         new PitchDrumMatrixBlock().setup(activity);
         new oscilloscopeWidgetBlock().setup(activity);
         new PitchSliderBlock().setup(activity);
