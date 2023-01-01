@@ -2239,7 +2239,10 @@ You can design custom sequences to use with the *Arpeggio* block using
 the *Arpeggio* widget. The widget lets you "paint" intervals that are
 then saved to a "custom" chord, which can be used with the *Arpeggio* block.
 
-![widget](./arpeggio_widget.png "Arpeggio_widget")
+![widget](./arpeggio_widget.svg "Arpeggio_widget")
+
+The horizonal axis is time and the verical axis is half-step offsets
+from the base note.
 
 ![widget](../documentation/custom_arpeggio.svg "Custom Arpeggio")
 
