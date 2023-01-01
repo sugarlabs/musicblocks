@@ -9,6 +9,17 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/*
+   global
+
+   setCookie, getCookie, StringHelper, ProjectStorage, ServerInterface,
+   Converter, SaveInterface, LocalPlanet, GlobalPlanet
+*/
+/*
+   exported
+
+   Planet
+*/
 
 function Planet(isMusicBlocks, storage) {
     this.LocalPlanet = null;
@@ -21,7 +32,7 @@ function Planet(isMusicBlocks, storage) {
     this.ConnectedToServer = null;
     this.TagsManifest = null;
     this.IsMusicBlocks = isMusicBlocks;
-    this.UserIDCookie = 'UserID';
+    this.UserIDCookie = "UserID";
     this.UserID = null;
     this.loadProjectFromData = null;
     this.loadNewProject = null;
@@ -31,7 +42,7 @@ function Planet(isMusicBlocks, storage) {
 
     this.prepareUserID = function() {
         let id = getCookie(this.UserIDCookie);
-        if (id === ''){
+        if (id === ""){
             id = this.ProjectStorage.generateID();
             setCookie(this.UserIDCookie, id, 3650);
         }
@@ -85,30 +96,37 @@ function Planet(isMusicBlocks, storage) {
         this.ServerInterface = new ServerInterface(this);
         this.ServerInterface.init();
 
-        let that = this;
+        const that = this;
 
-        document.getElementById('close-planet').addEventListener('click', function (evt) {
+        // eslint-disable-next-line no-unused-vars
+        document.getElementById("close-planet").addEventListener("click", function (evt) {
             that.closeButton();
         });
 
-        document.getElementById('planet-open-file').addEventListener('click', function (evt) {
+        // eslint-disable-next-line no-unused-vars
+        document.getElementById("planet-open-file").addEventListener("click", function (evt) {
             that.loadProjectFromFile();
         });
 
-        document.getElementById('planet-new-project').addEventListener('click', function (evt) {
+        // eslint-disable-next-line no-unused-vars
+        document.getElementById("planet-new-project").addEventListener("click", function (evt) {
             that.loadNewProject();
-        })
+        });
 
-        this.ServerInterface.getTagManifest(function(data){this.initPlanets(data)}.bind(this));
+        this.ServerInterface.getTagManifest(
+            function(data) {
+                this.initPlanets(data);
+            }.bind(this)
+        );
     };
 
     this.closeButton = function() {
         if (this.ProjectStorage.getCurrentProjectID() !== this.oldCurrentProjectID) {
-            let d = this.ProjectStorage.getCurrentProjectData();
+            const d = this.ProjectStorage.getCurrentProjectData();
             if (d === null){
-            this.loadNewProject();
+                this.loadNewProject();
             } else {
-            this.loadProjectFromData(d);
+                this.loadProjectFromData(d);
             }
         } else {
             this.planetClose();

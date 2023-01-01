@@ -10,14 +10,26 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 
+/*
+   global
+
+   _, GlobalTag, GlobalCard, jQuery, currentUserScrollPos:true,
+   maxScrollPos:true, ProjectViewer, debounce
+*/
+/*
+   exported
+
+   GlobalPlanet
+*/
+
 function GlobalPlanet(Planet) {
     this.ProjectViewer = null;
     if (Planet.IsMusicBlocks) {
-        this.offlineHTML = '<div class="container center-align">' + _('Feature unavailable - cannot connect to server. Reload Music Blocks to try again.') + '</div>';
+        this.offlineHTML = "<div class=\"container center-align\">" + _("Feature unavailable - cannot connect to server. Reload Music Blocks to try again.") + "</div>";
     } else {
-        this.offlineHTML = '<div class="container center-align">' + _('Feature unavailable - cannot connect to server. Reload Turtle Blocks to try again.') + '</div>';
+        this.offlineHTML = "<div class=\"container center-align\">" + _("Feature unavailable - cannot connect to server. Reload Turtle Blocks to try again.") + "</div>";
     }
-    this.noProjects = '<div class="container center-align">' + _('No results found.') + '</div>';
+    this.noProjects = "<div class=\"container center-align\">" + _("No results found.") + "</div>";
     this.tags = [];
     this.specialTags = null;
     this.defaultTag = false;
@@ -31,9 +43,9 @@ function GlobalPlanet(Planet) {
     this.cards = [];
     this.loadButtonShown = true;
     this.searching = false;
-    this.searchString = '';
-    this.oldSearchString = '';
-    this.remixPrefix = _('Remix of');
+    this.searchString = "";
+    this.oldSearchString = "";
+    this.remixPrefix = _("Remix of");
 
     this.initTagList = function() {
         let t;
@@ -46,20 +58,20 @@ function GlobalPlanet(Planet) {
             }
         }
 
-        let tagsToInitialise = [];
+        const tagsToInitialise = [];
 
-        let keys = Object.keys(Planet.TagsManifest);
+        const keys = Object.keys(Planet.TagsManifest);
         for (let i = 0; i < keys.length; i++) {
             t = new GlobalTag(Planet);
-            t.init({'id': keys[i]});
+            t.init({"id": keys[i]});
             this.tags.push(t);
             if (this.defaultMainTags.indexOf(Planet.TagsManifest[keys[i]].TagName)!=-1){
-                t.selected=true;  
+                t.selected=true;
                 tagsToInitialise.push(t);
             }
         }
 
-        this.sortBy = document.getElementById('sort-select').value;
+        this.sortBy = document.getElementById("sort-select").value;
         if (this.defaultTag!=false){
             this.selectSpecialTag(this.defaultTag);
         }
@@ -87,7 +99,7 @@ function GlobalPlanet(Planet) {
     };
 
     this.refreshTagList = function() {
-        let tagids = [];
+        const tagids = [];
         for (let i = 0; i < this.tags.length; i++) {
             if (this.tags[i].specialTag === false && this.tags[i].selected === true) {
                 tagids.push(this.tags[i].id);
@@ -103,12 +115,12 @@ function GlobalPlanet(Planet) {
     };
 
     this.searchAllProjects = function() {
-        this.searchMode = 'ALL_PROJECTS';
+        this.searchMode = "ALL_PROJECTS";
         this.refreshProjects();
     };
 
     this.searchMyProjects = function() {
-        this.searchMode = 'USER_PROJECTS';
+        this.searchMode = "USER_PROJECTS";
         this.refreshProjects();
     };
 
@@ -120,30 +132,54 @@ function GlobalPlanet(Planet) {
     this.refreshProjects = function() {
         this.index = 0;
         this.cards = [];
-        document.getElementById('global-projects').innerHTML = '';
+        document.getElementById("global-projects").innerHTML = "";
         this.showLoading();
         this.hideLoadMore();
-        if (this.oldSearchString !== '') {
-            Planet.ServerInterface.searchProjects(this.oldSearchString, this.sortBy, this.index, this.index + this.page + 1, this.afterRefreshProjects.bind(this));
+        if (this.oldSearchString !== "") {
+            Planet.ServerInterface.searchProjects(
+                this.oldSearchString,
+                this.sortBy,
+                this.index,
+                this.index + this.page + 1,
+                this.afterRefreshProjects.bind(this)
+            );
         } else {
-            Planet.ServerInterface.downloadProjectList(this.searchMode, this.sortBy, this.index, this.index + this.page + 1, this.afterRefreshProjects.bind(this));
+            Planet.ServerInterface.downloadProjectList(
+                this.searchMode,
+                this.sortBy,
+                this.index,
+                this.index + this.page + 1,
+                this.afterRefreshProjects.bind(this)
+            );
         }
     };
 
     this.loadMoreProjects = function() {
         this.showLoading();
         this.hideLoadMore();
-        if (this.oldSearchString !== '') {
-            Planet.ServerInterface.searchProjects(this.oldSearchString, this.sortBy, this.index, this.index + this.page + 1, this.afterRefreshProjects.bind(this));
+        if (this.oldSearchString !== "") {
+            Planet.ServerInterface.searchProjects(
+                this.oldSearchString,
+                this.sortBy,
+                this.index,
+                this.index + this.page + 1,
+                this.afterRefreshProjects.bind(this)
+            );
         } else {
-            Planet.ServerInterface.downloadProjectList(this.searchMode, this.sortBy, this.index, this.index + this.page + 1, this.afterRefreshProjects.bind(this));
+            Planet.ServerInterface.downloadProjectList(
+                this.searchMode,
+                this.sortBy,
+                this.index,
+                this.index + this.page + 1,
+                this.afterRefreshProjects.bind(this)
+            );
         }
     };
 
     this.search = function() {
         if (!this.searching) {
-            if (this.searchString === '') {
-                this.oldSearchString = '';
+            if (this.searchString === "") {
+                this.oldSearchString = "";
                 this.searching = false;
                 this.showTags();
             } else {
@@ -154,10 +190,16 @@ function GlobalPlanet(Planet) {
             this.oldSearchString = this.searchString;
             this.index = 0;
             this.cards = [];
-            document.getElementById('global-projects').innerHTML = '';
+            document.getElementById("global-projects").innerHTML = "";
             this.showLoading();
             this.hideLoadMore();
-            Planet.ServerInterface.searchProjects(this.oldSearchString, this.sortBy, this.index, this.index + this.page + 1, this.afterRefreshProjects.bind(this));
+            Planet.ServerInterface.searchProjects(
+                this.oldSearchString,
+                this.sortBy,
+                this.index,
+                this.index + this.page + 1,
+                this.afterRefreshProjects.bind(this)
+            );
         }
     };
 
@@ -177,8 +219,9 @@ function GlobalPlanet(Planet) {
     };
 
     this.addProjects = function(data) {
-        let toDownload = [];
+        const toDownload = [];
         for (let i = 0; i < data.length; i++) {
+            // eslint-disable-next-line no-prototype-builtins
             if (this.cache.hasOwnProperty(data[i][0])) {
                 if (this.cache[data[i][0]].ProjectLastUpdated !== data[i][1]) {
                     toDownload.push(data[i]);
@@ -189,7 +232,7 @@ function GlobalPlanet(Planet) {
         }
 
         this.loadCount = toDownload.length;
-        let l = data.length;
+        const l = data.length;
         if (l === this.page + 1) {
             data.pop();
         }
@@ -219,10 +262,10 @@ function GlobalPlanet(Planet) {
         this.loadCount = data.length;
         for (let i = 0; i < data.length; i++) {
             (function() {
-                let id = data[i][0];
+                const id = data[i][0];
                 Planet.ServerInterface.getProjectDetails(id, function(d) {
-                    let tempid = id;
-                    this.addProjectToCache(tempid, d, callback)
+                    const tempid = id;
+                    this.addProjectToCache(tempid, d, callback);
                 }.bind(this));
             }.bind(this))();
         }
@@ -243,7 +286,7 @@ function GlobalPlanet(Planet) {
 
     this.forceAddToCache = function(id, callback) {
         Planet.ServerInterface.getProjectDetails(id, function(d) {
-            this.addProjectToCache(id, d, callback)
+            this.addProjectToCache(id, d, callback);
         }.bind(this));
     };
 
@@ -275,7 +318,7 @@ function GlobalPlanet(Planet) {
         }
     
         Planet.ServerInterface.downloadProject(id, function(data) {
-            this.afterDownloadData(id, data, callback, error)
+            this.afterDownloadData(id, data, callback, error);
         }.bind(this));
     };
 
@@ -300,8 +343,9 @@ function GlobalPlanet(Planet) {
 
     this.render = function(data) {
         for (let i = 0; i < data.length; i++) {
+            // eslint-disable-next-line no-prototype-builtins
             if (this.cache.hasOwnProperty(data[i][0])) {
-                let g = new GlobalCard(Planet);
+                const g = new GlobalCard(Planet);
                 g.init(data[i][0]);
                 g.render();
                 this.cards.push(g);
@@ -311,14 +355,14 @@ function GlobalPlanet(Planet) {
             }
         }
 
-        jQuery('.tooltipped').tooltip({delay: 50});
+        jQuery(".tooltipped").tooltip({delay: 50});
         this.afterAddProjects();
     };
 
     this.afterAddProjects = function() {
         this.index += this.page;
         this.hideLoading();
-        if (this.oldSearchString !== '') {
+        if (this.oldSearchString !== "") {
             this.afterSearch();
         }
     };
@@ -326,41 +370,41 @@ function GlobalPlanet(Planet) {
     this.throwOfflineError = function() {
         this.hideLoading();
         this.hideLoadMore();
-        document.getElementById('global-projects').innerHTML = this.offlineHTML;
+        document.getElementById("global-projects").innerHTML = this.offlineHTML;
     };
 
     this.throwNoProjectsError = function() {
         this.hideLoading();
         this.hideLoadMore();
-        document.getElementById('global-projects').innerHTML = this.noProjects;
+        document.getElementById("global-projects").innerHTML = this.noProjects;
     };
 
     this.hideLoading = function() {
-        document.getElementById('global-load').style.display = 'none';
+        document.getElementById("global-load").style.display = "none";
     };
 
     this.showLoading = function() {
-        document.getElementById('global-load').style.display = 'block';
+        document.getElementById("global-load").style.display = "block";
     };
 
     this.hideLoadMore = function() {
-        document.getElementById('load-more-projects').style.display = 'none';
+        document.getElementById("load-more-projects").style.display = "none";
         this.loadButtonShown = false;
     };
 
     this.showLoadMore = function() {
-        let l = document.getElementById('load-more-projects');
-        l.style.display = 'block';
-        l.classList.remove('disabled');
+        const l = document.getElementById("load-more-projects");
+        l.style.display = "block";
+        l.classList.remove("disabled");
         this.loadButtonShown = true;
     };
 
     this.hideTags = function() {
-        document.getElementById('tagscontainer').style.display = 'none';
+        document.getElementById("tagscontainer").style.display = "none";
     };
 
     this.showTags = function() {
-        document.getElementById('tagscontainer').style.display = 'block';
+        document.getElementById("tagscontainer").style.display = "block";
     };
 
     this.openGlobalProject = function(id, error) {
@@ -371,11 +415,15 @@ function GlobalPlanet(Planet) {
         this.getData(id, (data) => {
             let remixedName;
             if (id in this.cache) {
-                remixedName = this.remixPrefix + ' ' + this.cache[id].ProjectName;
-                Planet.ProjectStorage.initialiseNewProject(remixedName, data, this.cache[id].ProjectImage);
+                remixedName = this.remixPrefix + " " + this.cache[id].ProjectName;
+                Planet.ProjectStorage.initialiseNewProject(
+                    remixedName, data, this.cache[id].ProjectImage
+                );
             } else {
-                remixedName = this.remixPrefix + ' ' + _('My Project');
-                Planet.ProjectStorage.initialiseNewProject(remixedName, data, null);
+                remixedName = this.remixPrefix + " " + _("My Project");
+                Planet.ProjectStorage.initialiseNewProject(
+                    remixedName, data, null
+                );
             }
 
             Planet.loadProjectFromData(data);
@@ -391,10 +439,14 @@ function GlobalPlanet(Planet) {
             let remixedName;
             if (id in this.cache) {
                 remixedName = Planet.ProjectStorage.getCurrentProjectName();
-                Planet.ProjectStorage.initialiseNewProject(remixedName, data, this.cache[id].ProjectImage);
+                Planet.ProjectStorage.initialiseNewProject(
+                    remixedName, data, this.cache[id].ProjectImage
+                );
             } else {
-                remixedName = this.remixPrefix + ' ' + _('My Project');
-                Planet.ProjectStorage.initialiseNewProject(remixedName, data, null);
+                remixedName = this.remixPrefix + " " + _("My Project");
+                Planet.ProjectStorage.initialiseNewProject(
+                    remixedName, data, null
+                );
             }
 
             Planet.loadProjectFromData(data, true);
@@ -403,59 +455,71 @@ function GlobalPlanet(Planet) {
     
     this.init = function() {
         if (!Planet.ConnectedToServer) {
-            document.getElementById('globaltitle').textContent = _('Cannot connect to server');
-            document.getElementById('globalcontents').innerHTML = this.offlineHTML;
+            document.getElementById("globaltitle").textContent = _("Cannot connect to server");
+            document.getElementById("globalcontents").innerHTML = this.offlineHTML;
         } else {
 
-            jQuery('#sort-select').material_select( (evt) => {
-                this.sortBy = document.getElementById('sort-select').value;
+            // eslint-disable-next-line no-unused-vars
+            jQuery("#sort-select").material_select( (evt) => {
+                this.sortBy = document.getElementById("sort-select").value;
                 this.refreshProjects();
             });
 
 
             if (Planet.IsMusicBlocks){
                 this.defaultMainTags = ["Music"];
-                this.specialTags = 
-                [{'name': 'All Projects', 'func': this.searchAllProjects.bind(this), 'defaultTag': true}, 
-                 {'name': 'My Projects', 'func': this.searchMyProjects.bind(this), 'defaultTag': false}];
+                this.specialTags = [
+                    {"name": "All Projects", "func": this.searchAllProjects.bind(this), "defaultTag": true},
+                    {"name": "My Projects", "func": this.searchMyProjects.bind(this), "defaultTag": false}
+                ];
             } else {
                 this.defaultMainTags = [];
-                this.specialTags = 
-                [{'name': 'All Projects', 'func': this.searchAllProjects.bind(this), 'defaultTag': true}, 
-                 {'name': 'My Projects', 'func': this.searchMyProjects.bind(this), 'defaultTag': false}];
+                this.specialTags = [
+                    {"name": "All Projects", "func": this.searchAllProjects.bind(this), "defaultTag": true},
+                    {"name": "My Projects", "func": this.searchMyProjects.bind(this), "defaultTag": false}
+                ];
             }
 
             this.initTagList();
 
-            document.getElementById('load-more-projects').addEventListener('click',  (evt) => {
+            // eslint-disable-next-line no-unused-vars
+            document.getElementById("load-more-projects").addEventListener("click",  (evt) => {
                 if (this.loadButtonShown) {
                     this.loadMoreProjects();
                 }
             });
 
-            let debouncedfunction = debounce(this.search.bind(this), 250);
+            const debouncedfunction = debounce(this.search.bind(this), 250);
 
-            document.getElementById('global-search').addEventListener('input',  (evt) => {
-                this.searchString = document.getElementById('global-search').value;
+            // eslint-disable-next-line no-unused-vars
+            document.getElementById("global-search").addEventListener("input",  (evt) => {
+                this.searchString = document.getElementById("global-search").value;
                 debouncedfunction();
             });
 
-            document.getElementById('search-close').addEventListener('click',  (evt) => {
-                document.getElementById('global-search').value = '';
-                this.searchString = '';
-                document.getElementById('search-close').style.display = 'none';
+            // eslint-disable-next-line no-unused-vars
+            document.getElementById("search-close").addEventListener("click",  (evt) => {
+                document.getElementById("global-search").value = "";
+                this.searchString = "";
+                document.getElementById("search-close").style.display = "none";
                 debouncedfunction();
             });
             
             document.body.onscroll =  () => {
                 currentUserScrollPos = window.pageYOffset || document.documentElement.scrollTop;
-                maxScrollPos = Math.max( document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight);
+                maxScrollPos = Math.max(
+                    document.body.scrollHeight,
+                    document.body.offsetHeight,
+                    document.documentElement.clientHeight,
+                    document.documentElement.scrollHeight,
+                    document.documentElement.offsetHeight
+                );
                 
                 if ((currentUserScrollPos/maxScrollPos) * 100 >= 75) {
                     if (this.loadButtonShown) {
                         this.loadMoreProjects();
                     }
-               }
+                }
             };
 
             this.ProjectViewer = new ProjectViewer(Planet);
