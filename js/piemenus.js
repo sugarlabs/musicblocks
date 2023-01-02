@@ -2309,6 +2309,7 @@ const piemenuChords = function (block, selectedChord) {
 
     // the chord selector
     block._chordWheel = new wheelnav("wheelDiv", null, 800, 800);
+    block._exitWheel = new wheelnav("_exitWheel", block._chordWheel.raphael);
 
     const chordLabels = CHORDNAMES;
 
@@ -2331,6 +2332,22 @@ const piemenuChords = function (block, selectedChord) {
         block._chordWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
         block._chordWheel.navItems[i].titleSelectedAttr.font = "30 30px sans-serif";
     }
+
+    block._exitWheel.colors = platformColor.exitWheelcolors;
+    block._exitWheel.slicePathFunction = slicePath().DonutSlice;
+    block._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+    block._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+    block._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+    block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
+    block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
+    block._exitWheel.clickModeRotate = false;
+    block._exitWheel.initWheel(["×", " "]);
+    block._exitWheel.navItems[1].enabled = false;
+    block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
+    block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
+    block._exitWheel.createWheel();
 
     const that = block;
 
@@ -2396,6 +2413,10 @@ const piemenuChords = function (block, selectedChord) {
             __exitMenu();
         };
     }
+
+    block._exitWheel.navItems[0].navigateFunction = function () {
+        __exitMenu();
+    };
 };
 
 
