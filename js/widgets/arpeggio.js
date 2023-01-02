@@ -37,7 +37,7 @@ class Arpeggio {
 
     constructor() {
         this.notesToPlay = [];
-        this.rowLabels = ["12", "11", "10", "9", "8", "7", "6", "5", "4", "3", "2", "1"];
+        this.rowLabels = ["12", "11", "10", "9", "8", "7", "6", "5", "4", "3", "2", "1", "0"];
         this.defaultCols = Arpeggio.DEFAULTCOLS;
         this._playing = false;
         // The half-step number associated with a row; a step (in
@@ -45,8 +45,8 @@ class Arpeggio {
         // track of which intersections in the grid are populated.
 
         // These arrays get created each time the matrix is built.
-        this._rowBlocks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];  // half-step number
-        this._blockMap = [[12, 1]];  // pairs storage
+        this._rowBlocks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];  // half-step number
+        this._blockMap = [[13, 1]];  // pairs storage
     }
 
     /**
@@ -523,7 +523,7 @@ class Arpeggio {
                 this._playList.push([getNote(
                     letter,
                     octave,
-                    this.defaultCols - pairs[i][0] - 1,  // Transposition
+                    this.rowLabels.length - pairs[i][0] - 1,  // Transposition
                     this.activity.turtles.ithTurtle(0).singer.keySignature,
                     false,
                     null,
@@ -647,7 +647,7 @@ class Arpeggio {
             const noteObj = getNote(
                 letter,
                 octave,
-                this.defaultCols - rowIndex - 1,  // Transposition
+                this.rowLabels.length - rowIndex - 1,  // Transposition
                 this.activity.turtles.ithTurtle(0).singer.keySignature,
                 false,
                 null,
@@ -709,7 +709,7 @@ class Arpeggio {
                 cell = row.cells[j];
                 if (i === 11 && j == 0) {
                     cell.style.backgroundColor = "black";
-                    this._setCell(0, 11, true);
+                    this._setCell(0, 12, true);
                 } else if (cell.style.backgroundColor === "black") {
                     cell.style.backgroundColor = platformColor.selectorBackground;
                     this._setCell(j, i, false);
@@ -727,10 +727,10 @@ class Arpeggio {
         const pairs = this.__makePairsList();
         const chordValues = [];
         for (let i = 0; i < pairs.length; i++) {
-            if (pairs[i][0] === 11 && pairs[i][1] === 0) {
+            if (pairs[i][0] === this._rowBlocks.length - 1 && pairs[i][1] === 0) {
                 continue;
             }
-            chordValues.push(12 - pairs[i][0]);
+            chordValues.push(this._rowBlocks.length - pairs[i][0] - 1);
         }
 
         // eslint-disable-next-line no-console

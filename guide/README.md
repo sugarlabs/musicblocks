@@ -2239,13 +2239,18 @@ You can design custom sequences to use with the *Arpeggio* block using
 the *Arpeggio* widget. The widget lets you "paint" intervals that are
 then saved to a "custom" chord, which can be used with the *Arpeggio* block.
 
+The numeric argument to the widget block, ```12``` in the figure
+above, designates the number of columns. The widget always provides a
+range of 12 half-steps (one octave in the default a [12-step
+equal-temperament tuning](#412-changing-temperament)).
+
 ![widget](./arpeggio_widget.svg "Arpeggio_widget")
 
 The horizonal axis is time and the verical axis is half-step offsets
 from the base note.
 
-The sequence in the pattern above is ```do mi sol ti do sol do sol mi
-do ti mi```.
+The sequence in the pattern above is ```do mi sol do do mi do sol mi
+do do sol```.
 
 ![widget](../documentation/custom_arpeggio.svg "Custom Arpeggio")
 
