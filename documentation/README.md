@@ -493,11 +493,3 @@ can download.
 ![Planet](./planet-3.png)
 
 ![Planet](./planet-4.png)
-
-Creating help artwork
----------------------
-
-Note for translators: The artwork used by the help widget (and used in
-this README file) can be created by typing *Alt-H* into Music
-Blocks. Artwork for each block will be generated and saved by the
-browser.
