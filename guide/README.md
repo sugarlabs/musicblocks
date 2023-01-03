@@ -2335,6 +2335,13 @@ Note that artwork saved as PNG or SVG can subsequently be imported
 into Music Blocks to be used with either the *Show* or *Avatar*
 blocks.
 
+**Help artwork**
+
+Note for translators: The artwork used by the help widget (and used in
+this README file) can be created by typing *Alt-H* into Music
+Blocks. Artwork for each block will be generated and saved by the
+browser.
+
 ## <a name="JAVASCRIPT">5.3 The JavaScript Editor</a>
 
 There are practical limits to the size and complexity of Music Blocks
