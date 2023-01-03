@@ -1,1 +1,781 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="349.5" height="616.5"><g><g transform="translate(0, 0)"><g transform="scale(1.5, 1.5)"><path d="m0.5 14.5 L 0.5 10.5 A 4 4 90 0 1 4.5 6.5 L 8.5 6.5 L 13.5 0.5 L 18.5 6.5 L 27.5 6.5 L 86.5 6.5 L 90.5 6.5 A 4 4 90 0 1 94.5 10.5 L 94.5 14.5 L 90.5 14.5 L 90.5 11.5 L 86.5 11.5 L 86.5 21.5 L 90.5 21.5 L 90.5 18.5 L 94.5 18.5 L 94.5 22.5 A 4 4 90 0 1 90.5 26.5 L 86.5 26.5 L 27.5 26.5 L 26.5 26.5 L 26.5 28.5 L 18.5 28.5 L 18.5 26.5 L 17.5 26.5 L 13.5 26.5 A 5 5 90 0 0 8.5 31.5 L 8.5 35.5 L 8.5 39.5 L 8.5 375.5 L 8.5 379.5 A 5 5 90 0 0 13.5 384.5 L 17.5 384.5 L 17.5 386.5 L 27.5 386.5 L 27.5 384.5 L 35.5 384.5 L 35.5 390.5 L 35.5 396.5 L 35.5 400.5 A 4 4 90 0 1 31.5 404.5 L 27.5 404.5 L 18.5 404.5 L 13.5 410.5 L 8.5 404.5 L 4.5 404.5 A 4 4 90 0 1 0.5 400.5 L 0.5 396.5 z" style="fill:#FFBF00;fill-opacity:1;stroke:#DAAF30;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="20" y="22">action</tspan></text><text style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="84" y="6"></tspan></text></g></g><g transform="translate(0, 12) scale(0.5 0.5)"><g style="isolation:isolate"><g id="レイヤー_2" data-name="レイヤー 2"><g id="Icon"><rect width="42" height="42" rx="5" ry="5" style="fill:#292929;opacity:0.4;mix-blend-mode:multiply"/><path d="M30.56,29.8l-4.17-4.16h2.26a1,1,0,1,0,0-2.07H23.94a1.08,1.08,0,0,0-1.11,1v0s0,0,0,.06v4.64h0a1,1,0,1,0,2.08,0V27.08l4.19,4.19a1,1,0,0,0,1.46,0A1,1,0,0,0,30.56,29.8Z" style="fill:#fff"/><path d="M19.17,24.6a1.08,1.08,0,0,0-1.11-1H13.35a1,1,0,1,0,0,2.07H15.6L11.44,29.8a1,1,0,0,0,1.47,1.47l4.18-4.19v2.26a1,1,0,1,0,2.08,0V24.7s0,0,0-.06A.08.08,0,0,1,19.17,24.6Z" style="fill:#fff"/><path d="M23.94,20.5h4.7a1,1,0,1,0,0-2.08H26.39l4.17-4.16a1,1,0,0,0,0-1.47,1,1,0,0,0-1.46,0L24.91,17V14.72a1,1,0,1,0-2.08,0v4.64a.43.43,0,0,0,0,.05v.05A1.09,1.09,0,0,0,23.94,20.5Z" style="fill:#fff"/><path d="M18.13,13.62a1.08,1.08,0,0,0-1,1.09V17l-4.18-4.19a1,1,0,0,0-1.47,0,1,1,0,0,0,0,1.46l4.16,4.17H13.35a1,1,0,1,0,0,2.08h4.71a1.09,1.09,0,0,0,1.11-1,.08.08,0,0,1,0,0s0,0,0-.06V14.71A1.07,1.07,0,0,0,18.13,13.62Z" style="fill:#fff"/></g></g></g></g></g><g transform="translate(14, 41)"><g transform="scale(1.5, 1.5)"><path d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 27.5 0.5 L 68.5 0.5 L 72.5 0.5 A 4 4 90 0 1 76.5 4.5 L 76.5 8.5 L 72.5 8.5 L 72.5 5.5 L 68.5 5.5 L 68.5 15.5 L 72.5 15.5 L 72.5 12.5 L 76.5 12.5 L 76.5 16.5 A 4 4 90 0 1 72.5 20.5 L 68.5 20.5 L 27.5 20.5 L 26.5 20.5 L 26.5 22.5 L 18.5 22.5 L 18.5 20.5 L 17.5 20.5 L 13.5 20.5 A 5 5 90 0 0 8.5 25.5 L 8.5 29.5 L 8.5 33.5 L 8.5 327.5 L 8.5 331.5 A 5 5 90 0 0 13.5 336.5 L 17.5 336.5 L 17.5 338.5 L 27.5 338.5 L 27.5 336.5 L 35.5 336.5 L 35.5 342.5 L 35.5 348.5 L 35.5 352.5 A 4 4 90 0 1 31.5 356.5 L 27.5 356.5 L 18.5 356.5 L 17.5 356.5 L 17.5 358.5 L 9.5 358.5 L 9.5 356.5 L 8.5 356.5 L 4.5 356.5 A 4 4 90 0 1 0.5 352.5 L 0.5 348.5 z" style="fill:#3EDCDD;fill-opacity:1;stroke:#1DBCBD;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="5" y="15">set timbre</tspan></text><text style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="66" y="12"></tspan></text></g></g><g transform="translate(118, 41)"><g transform="scale(1.5, 1.5)"><path d="m8.5 0.5 L 118.5 0.5 L 118.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#3EDCDD;fill-opacity:1;stroke:#1DBCBD;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="13" y="14">guitar</tspan></text></g></g><g><g transform="translate(28, 73)"><g transform="scale(1.5, 1.5)"><path d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 27.5 0.5 L 87.5 0.5 L 91.5 0.5 A 4 4 90 0 1 95.5 4.5 L 95.5 8.5 L 91.5 8.5 L 91.5 5.5 L 87.5 5.5 L 87.5 15.5 L 91.5 15.5 L 91.5 12.5 L 95.5 12.5 L 95.5 16.5 A 4 4 90 0 1 91.5 20.5 L 87.5 20.5 L 27.5 20.5 L 26.5 20.5 L 26.5 22.5 L 18.5 22.5 L 18.5 20.5 L 17.5 20.5 L 13.5 20.5 A 5 5 90 0 0 8.5 25.5 L 8.5 29.5 L 8.5 33.5 L 8.5 75.5 L 8.5 79.5 A 5 5 90 0 0 13.5 84.5 L 17.5 84.5 L 17.5 86.5 L 27.5 86.5 L 27.5 84.5 L 35.5 84.5 L 35.5 90.5 L 35.5 96.5 L 35.5 100.5 A 4 4 90 0 1 31.5 104.5 L 27.5 104.5 L 18.5 104.5 L 17.5 104.5 L 17.5 106.5 L 9.5 106.5 L 9.5 104.5 L 8.5 104.5 L 4.5 104.5 A 4 4 90 0 1 0.5 100.5 L 0.5 96.5 z" style="fill:#FE994F;fill-opacity:1;stroke:#E86B0E;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="20" y="15">note</tspan></text><text style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="85" y="12">value</tspan></text></g></g><g transform="translate(28, 77) scale(0.5 0.5)"><g style="isolation:isolate"><g id="レイヤー_2" data-name="レイヤー 2"><g id="Icon"><rect width="42" height="42" rx="5" ry="5" style="fill:#292929;opacity:0.4;mix-blend-mode:multiply"/><path d="M30.56,29.8l-4.17-4.16h2.26a1,1,0,1,0,0-2.07H23.94a1.08,1.08,0,0,0-1.11,1v0s0,0,0,.06v4.64h0a1,1,0,1,0,2.08,0V27.08l4.19,4.19a1,1,0,0,0,1.46,0A1,1,0,0,0,30.56,29.8Z" style="fill:#fff"/><path d="M19.17,24.6a1.08,1.08,0,0,0-1.11-1H13.35a1,1,0,1,0,0,2.07H15.6L11.44,29.8a1,1,0,0,0,1.47,1.47l4.18-4.19v2.26a1,1,0,1,0,2.08,0V24.7s0,0,0-.06A.08.08,0,0,1,19.17,24.6Z" style="fill:#fff"/><path d="M23.94,20.5h4.7a1,1,0,1,0,0-2.08H26.39l4.17-4.16a1,1,0,0,0,0-1.47,1,1,0,0,0-1.46,0L24.91,17V14.72a1,1,0,1,0-2.08,0v4.64a.43.43,0,0,0,0,.05v.05A1.09,1.09,0,0,0,23.94,20.5Z" style="fill:#fff"/><path d="M18.13,13.62a1.08,1.08,0,0,0-1,1.09V17l-4.18-4.19a1,1,0,0,0-1.47,0,1,1,0,0,0,0,1.46l4.16,4.17H13.35a1,1,0,1,0,0,2.08h4.71a1.09,1.09,0,0,0,1.11-1,.08.08,0,0,1,0,0s0,0,0-.06V14.71A1.07,1.07,0,0,0,18.13,13.62Z" style="fill:#fff"/></g></g></g></g></g><g transform="translate(160, 73)"><g transform="scale(1.5, 1.5)"><path d="m8.5 8.5 L 8.5 4.5 A 4 4 90 0 1 12.5 0.5 L 16.5 0.5 L 26.5 0.5 L 56.5 0.5 L 60.5 0.5 A 4 4 90 0 1 64.5 4.5 L 64.5 8.5 L 60.5 8.5 L 60.5 5.5 L 56.5 5.5 L 56.5 15.5 L 60.5 15.5 L 60.5 12.5 L 64.5 12.5 L 64.5 29.5 L 60.5 29.5 L 60.5 26.5 L 56.5 26.5 L 56.5 36.5 L 60.5 36.5 L 60.5 33.5 L 64.5 33.5 L 64.5 37.5 A 4 4 90 0 1 60.5 41.5 L 56.5 41.5 L 26.5 41.5 L 16.5 41.5 L 12.5 41.5 A 4 4 90 0 1 8.5 37.5 L 8.5 33.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:9px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="54" y="23">/</tspan></text><text style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="54" y="12"></tspan></text><text style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="54" y="33"></tspan></text></g></g><g transform="translate(246, 73)"><g transform="scale(1.5, 1.5)"><path d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="13" y="14">1</tspan></text></g></g><g transform="translate(246, 105)"><g transform="scale(1.5, 1.5)"><path d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="13" y="14">4</tspan></text></g></g><g transform="translate(42, 105)"><g transform="scale(1.5, 1.5)"><path d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 38.5 0.5 L 42.5 0.5 A 4 4 90 0 1 46.5 4.5 L 46.5 8.5 L 46.5 12.5 L 46.5 16.5 A 4 4 90 0 1 42.5 20.5 L 38.5 20.5 L 18.5 20.5 L 17.5 20.5 L 17.5 22.5 L 9.5 22.5 L 9.5 20.5 L 8.5 20.5 L 4.5 20.5 A 4 4 90 0 1 0.5 16.5 L 0.5 12.5 z" style="fill:#C4C4C4;fill-opacity:1;stroke:#A0A0A0;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="36" y="14">↓</tspan></text></g></g><g transform="translate(42, 137)"><g transform="scale(1.5, 1.5)"><path d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 48.5 0.5 L 52.5 0.5 A 4 4 90 0 1 56.5 4.5 L 56.5 8.5 L 52.5 8.5 L 52.5 5.5 L 48.5 5.5 L 48.5 15.5 L 52.5 15.5 L 52.5 12.5 L 56.5 12.5 L 56.5 29.5 L 52.5 29.5 L 52.5 26.5 L 48.5 26.5 L 48.5 36.5 L 52.5 36.5 L 52.5 33.5 L 56.5 33.5 L 56.5 37.5 A 4 4 90 0 1 52.5 41.5 L 48.5 41.5 L 18.5 41.5 L 17.5 41.5 L 17.5 43.5 L 9.5 43.5 L 9.5 41.5 L 8.5 41.5 L 4.5 41.5 A 4 4 90 0 1 0.5 37.5 L 0.5 33.5 L 0.5 12.5 L 0.5 8.5 z" style="fill:#7CD622;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="46" y="24">pitch</tspan></text><text style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="46" y="12">name</tspan></text><text style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="46" y="33">octave</tspan></text></g></g><g transform="translate(116, 137)"><g transform="scale(1.5, 1.5)"><path d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#7CD622;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="13" y="14">sol</tspan></text></g></g><g transform="translate(116, 169)"><g transform="scale(1.5, 1.5)"><path d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="13" y="14">4</tspan></text></g></g><g><g transform="translate(28, 231)"><g transform="scale(1.5, 1.5)"><path d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 27.5 0.5 L 87.5 0.5 L 91.5 0.5 A 4 4 90 0 1 95.5 4.5 L 95.5 8.5 L 91.5 8.5 L 91.5 5.5 L 87.5 5.5 L 87.5 15.5 L 91.5 15.5 L 91.5 12.5 L 95.5 12.5 L 95.5 16.5 A 4 4 90 0 1 91.5 20.5 L 87.5 20.5 L 27.5 20.5 L 26.5 20.5 L 26.5 22.5 L 18.5 22.5 L 18.5 20.5 L 17.5 20.5 L 13.5 20.5 A 5 5 90 0 0 8.5 25.5 L 8.5 29.5 L 8.5 33.5 L 8.5 75.5 L 8.5 79.5 A 5 5 90 0 0 13.5 84.5 L 17.5 84.5 L 17.5 86.5 L 27.5 86.5 L 27.5 84.5 L 35.5 84.5 L 35.5 90.5 L 35.5 96.5 L 35.5 100.5 A 4 4 90 0 1 31.5 104.5 L 27.5 104.5 L 18.5 104.5 L 17.5 104.5 L 17.5 106.5 L 9.5 106.5 L 9.5 104.5 L 8.5 104.5 L 4.5 104.5 A 4 4 90 0 1 0.5 100.5 L 0.5 96.5 z" style="fill:#FE994F;fill-opacity:1;stroke:#E86B0E;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="20" y="15">note</tspan></text><text style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="85" y="12">value</tspan></text></g></g><g transform="translate(28, 235) scale(0.5 0.5)"><g style="isolation:isolate"><g id="レイヤー_2" data-name="レイヤー 2"><g id="Icon"><rect width="42" height="42" rx="5" ry="5" style="fill:#292929;opacity:0.4;mix-blend-mode:multiply"/><path d="M30.56,29.8l-4.17-4.16h2.26a1,1,0,1,0,0-2.07H23.94a1.08,1.08,0,0,0-1.11,1v0s0,0,0,.06v4.64h0a1,1,0,1,0,2.08,0V27.08l4.19,4.19a1,1,0,0,0,1.46,0A1,1,0,0,0,30.56,29.8Z" style="fill:#fff"/><path d="M19.17,24.6a1.08,1.08,0,0,0-1.11-1H13.35a1,1,0,1,0,0,2.07H15.6L11.44,29.8a1,1,0,0,0,1.47,1.47l4.18-4.19v2.26a1,1,0,1,0,2.08,0V24.7s0,0,0-.06A.08.08,0,0,1,19.17,24.6Z" style="fill:#fff"/><path d="M23.94,20.5h4.7a1,1,0,1,0,0-2.08H26.39l4.17-4.16a1,1,0,0,0,0-1.47,1,1,0,0,0-1.46,0L24.91,17V14.72a1,1,0,1,0-2.08,0v4.64a.43.43,0,0,0,0,.05v.05A1.09,1.09,0,0,0,23.94,20.5Z" style="fill:#fff"/><path d="M18.13,13.62a1.08,1.08,0,0,0-1,1.09V17l-4.18-4.19a1,1,0,0,0-1.47,0,1,1,0,0,0,0,1.46l4.16,4.17H13.35a1,1,0,1,0,0,2.08h4.71a1.09,1.09,0,0,0,1.11-1,.08.08,0,0,1,0,0s0,0,0-.06V14.71A1.07,1.07,0,0,0,18.13,13.62Z" style="fill:#fff"/></g></g></g></g></g><g transform="translate(160, 231)"><g transform="scale(1.5, 1.5)"><path d="m8.5 8.5 L 8.5 4.5 A 4 4 90 0 1 12.5 0.5 L 16.5 0.5 L 26.5 0.5 L 56.5 0.5 L 60.5 0.5 A 4 4 90 0 1 64.5 4.5 L 64.5 8.5 L 60.5 8.5 L 60.5 5.5 L 56.5 5.5 L 56.5 15.5 L 60.5 15.5 L 60.5 12.5 L 64.5 12.5 L 64.5 29.5 L 60.5 29.5 L 60.5 26.5 L 56.5 26.5 L 56.5 36.5 L 60.5 36.5 L 60.5 33.5 L 64.5 33.5 L 64.5 37.5 A 4 4 90 0 1 60.5 41.5 L 56.5 41.5 L 26.5 41.5 L 16.5 41.5 L 12.5 41.5 A 4 4 90 0 1 8.5 37.5 L 8.5 33.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:9px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="54" y="23">/</tspan></text><text style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="54" y="12"></tspan></text><text style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="54" y="33"></tspan></text></g></g><g transform="translate(246, 231)"><g transform="scale(1.5, 1.5)"><path d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="13" y="14">1</tspan></text></g></g><g transform="translate(246, 263)"><g transform="scale(1.5, 1.5)"><path d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="13" y="14">4</tspan></text></g></g><g transform="translate(42, 263)"><g transform="scale(1.5, 1.5)"><path d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 38.5 0.5 L 42.5 0.5 A 4 4 90 0 1 46.5 4.5 L 46.5 8.5 L 46.5 12.5 L 46.5 16.5 A 4 4 90 0 1 42.5 20.5 L 38.5 20.5 L 18.5 20.5 L 17.5 20.5 L 17.5 22.5 L 9.5 22.5 L 9.5 20.5 L 8.5 20.5 L 4.5 20.5 A 4 4 90 0 1 0.5 16.5 L 0.5 12.5 z" style="fill:#C4C4C4;fill-opacity:1;stroke:#A0A0A0;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="36" y="14">↓</tspan></text></g></g><g transform="translate(42, 295)"><g transform="scale(1.5, 1.5)"><path d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 48.5 0.5 L 52.5 0.5 A 4 4 90 0 1 56.5 4.5 L 56.5 8.5 L 52.5 8.5 L 52.5 5.5 L 48.5 5.5 L 48.5 15.5 L 52.5 15.5 L 52.5 12.5 L 56.5 12.5 L 56.5 29.5 L 52.5 29.5 L 52.5 26.5 L 48.5 26.5 L 48.5 36.5 L 52.5 36.5 L 52.5 33.5 L 56.5 33.5 L 56.5 37.5 A 4 4 90 0 1 52.5 41.5 L 48.5 41.5 L 18.5 41.5 L 17.5 41.5 L 17.5 43.5 L 9.5 43.5 L 9.5 41.5 L 8.5 41.5 L 4.5 41.5 A 4 4 90 0 1 0.5 37.5 L 0.5 33.5 L 0.5 12.5 L 0.5 8.5 z" style="fill:#7CD622;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="46" y="24">pitch</tspan></text><text style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="46" y="12">name</tspan></text><text style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="46" y="33">octave</tspan></text></g></g><g transform="translate(116, 295)"><g transform="scale(1.5, 1.5)"><path d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#7CD622;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="13" y="14">mi</tspan></text></g></g><g transform="translate(116, 327)"><g transform="scale(1.5, 1.5)"><path d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="13" y="14">4</tspan></text></g></g><g><g transform="translate(28, 389)"><g transform="scale(1.5, 1.5)"><path d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 27.5 0.5 L 87.5 0.5 L 91.5 0.5 A 4 4 90 0 1 95.5 4.5 L 95.5 8.5 L 91.5 8.5 L 91.5 5.5 L 87.5 5.5 L 87.5 15.5 L 91.5 15.5 L 91.5 12.5 L 95.5 12.5 L 95.5 16.5 A 4 4 90 0 1 91.5 20.5 L 87.5 20.5 L 27.5 20.5 L 26.5 20.5 L 26.5 22.5 L 18.5 22.5 L 18.5 20.5 L 17.5 20.5 L 13.5 20.5 A 5 5 90 0 0 8.5 25.5 L 8.5 29.5 L 8.5 33.5 L 8.5 75.5 L 8.5 79.5 A 5 5 90 0 0 13.5 84.5 L 17.5 84.5 L 17.5 86.5 L 27.5 86.5 L 27.5 84.5 L 35.5 84.5 L 35.5 90.5 L 35.5 96.5 L 35.5 100.5 A 4 4 90 0 1 31.5 104.5 L 27.5 104.5 L 18.5 104.5 L 17.5 104.5 L 17.5 106.5 L 9.5 106.5 L 9.5 104.5 L 8.5 104.5 L 4.5 104.5 A 4 4 90 0 1 0.5 100.5 L 0.5 96.5 z" style="fill:#FE994F;fill-opacity:1;stroke:#E86B0E;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="20" y="15">note</tspan></text><text style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="85" y="12">value</tspan></text></g></g><g transform="translate(28, 393) scale(0.5 0.5)"><g style="isolation:isolate"><g id="レイヤー_2" data-name="レイヤー 2"><g id="Icon"><rect width="42" height="42" rx="5" ry="5" style="fill:#292929;opacity:0.4;mix-blend-mode:multiply"/><path d="M30.56,29.8l-4.17-4.16h2.26a1,1,0,1,0,0-2.07H23.94a1.08,1.08,0,0,0-1.11,1v0s0,0,0,.06v4.64h0a1,1,0,1,0,2.08,0V27.08l4.19,4.19a1,1,0,0,0,1.46,0A1,1,0,0,0,30.56,29.8Z" style="fill:#fff"/><path d="M19.17,24.6a1.08,1.08,0,0,0-1.11-1H13.35a1,1,0,1,0,0,2.07H15.6L11.44,29.8a1,1,0,0,0,1.47,1.47l4.18-4.19v2.26a1,1,0,1,0,2.08,0V24.7s0,0,0-.06A.08.08,0,0,1,19.17,24.6Z" style="fill:#fff"/><path d="M23.94,20.5h4.7a1,1,0,1,0,0-2.08H26.39l4.17-4.16a1,1,0,0,0,0-1.47,1,1,0,0,0-1.46,0L24.91,17V14.72a1,1,0,1,0-2.08,0v4.64a.43.43,0,0,0,0,.05v.05A1.09,1.09,0,0,0,23.94,20.5Z" style="fill:#fff"/><path d="M18.13,13.62a1.08,1.08,0,0,0-1,1.09V17l-4.18-4.19a1,1,0,0,0-1.47,0,1,1,0,0,0,0,1.46l4.16,4.17H13.35a1,1,0,1,0,0,2.08h4.71a1.09,1.09,0,0,0,1.11-1,.08.08,0,0,1,0,0s0,0,0-.06V14.71A1.07,1.07,0,0,0,18.13,13.62Z" style="fill:#fff"/></g></g></g></g></g><g transform="translate(160, 389)"><g transform="scale(1.5, 1.5)"><path d="m8.5 8.5 L 8.5 4.5 A 4 4 90 0 1 12.5 0.5 L 16.5 0.5 L 26.5 0.5 L 56.5 0.5 L 60.5 0.5 A 4 4 90 0 1 64.5 4.5 L 64.5 8.5 L 60.5 8.5 L 60.5 5.5 L 56.5 5.5 L 56.5 15.5 L 60.5 15.5 L 60.5 12.5 L 64.5 12.5 L 64.5 29.5 L 60.5 29.5 L 60.5 26.5 L 56.5 26.5 L 56.5 36.5 L 60.5 36.5 L 60.5 33.5 L 64.5 33.5 L 64.5 37.5 A 4 4 90 0 1 60.5 41.5 L 56.5 41.5 L 26.5 41.5 L 16.5 41.5 L 12.5 41.5 A 4 4 90 0 1 8.5 37.5 L 8.5 33.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:9px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="54" y="23">/</tspan></text><text style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="54" y="12"></tspan></text><text style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="54" y="33"></tspan></text></g></g><g transform="translate(246, 389)"><g transform="scale(1.5, 1.5)"><path d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="13" y="14">1</tspan></text></g></g><g transform="translate(246, 421)"><g transform="scale(1.5, 1.5)"><path d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="13" y="14">2</tspan></text></g></g><g transform="translate(42, 421)"><g transform="scale(1.5, 1.5)"><path d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 38.5 0.5 L 42.5 0.5 A 4 4 90 0 1 46.5 4.5 L 46.5 8.5 L 46.5 12.5 L 46.5 16.5 A 4 4 90 0 1 42.5 20.5 L 38.5 20.5 L 18.5 20.5 L 17.5 20.5 L 17.5 22.5 L 9.5 22.5 L 9.5 20.5 L 8.5 20.5 L 4.5 20.5 A 4 4 90 0 1 0.5 16.5 L 0.5 12.5 z" style="fill:#C4C4C4;fill-opacity:1;stroke:#A0A0A0;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="36" y="14">↓</tspan></text></g></g><g transform="translate(42, 453)"><g transform="scale(1.5, 1.5)"><path d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 48.5 0.5 L 52.5 0.5 A 4 4 90 0 1 56.5 4.5 L 56.5 8.5 L 52.5 8.5 L 52.5 5.5 L 48.5 5.5 L 48.5 15.5 L 52.5 15.5 L 52.5 12.5 L 56.5 12.5 L 56.5 29.5 L 52.5 29.5 L 52.5 26.5 L 48.5 26.5 L 48.5 36.5 L 52.5 36.5 L 52.5 33.5 L 56.5 33.5 L 56.5 37.5 A 4 4 90 0 1 52.5 41.5 L 48.5 41.5 L 18.5 41.5 L 17.5 41.5 L 17.5 43.5 L 9.5 43.5 L 9.5 41.5 L 8.5 41.5 L 4.5 41.5 A 4 4 90 0 1 0.5 37.5 L 0.5 33.5 L 0.5 12.5 L 0.5 8.5 z" style="fill:#7CD622;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="46" y="24">pitch</tspan></text><text style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="46" y="12">name</tspan></text><text style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"><tspan x="46" y="33">octave</tspan></text></g></g><g transform="translate(116, 453)"><g transform="scale(1.5, 1.5)"><path d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#7CD622;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="13" y="14">sol</tspan></text></g></g><g transform="translate(116, 485)"><g transform="scale(1.5, 1.5)"><path d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="13" y="14">4</tspan></text></g></g><g transform="translate(131, 9)"><g transform="scale(1.5, 1.5)"><path d="m8.5 0.5 L 98.5 0.5 L 98.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z" style="fill:#FF664B;fill-opacity:1;stroke:#EA4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1;" /><text style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"><tspan x="13" y="14">action</tspan></text></g></g></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="349.5"
+   height="616.5"
+   version="1.1"
+   id="svg428"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs432" />
+  <g
+     id="g32">
+    <g
+       transform="translate(0, 0)"
+       id="g14">
+      <g
+         transform="scale(1.5, 1.5)"
+         id="g12">
+        <path
+           d="m0.5 14.5 L 0.5 10.5 A 4 4 90 0 1 4.5 6.5 L 8.5 6.5 L 13.5 0.5 L 18.5 6.5 L 27.5 6.5 L 86.5 6.5 L 90.5 6.5 A 4 4 90 0 1 94.5 10.5 L 94.5 14.5 L 90.5 14.5 L 90.5 11.5 L 86.5 11.5 L 86.5 21.5 L 90.5 21.5 L 90.5 18.5 L 94.5 18.5 L 94.5 22.5 A 4 4 90 0 1 90.5 26.5 L 86.5 26.5 L 27.5 26.5 L 26.5 26.5 L 26.5 28.5 L 18.5 28.5 L 18.5 26.5 L 17.5 26.5 L 13.5 26.5 A 5 5 90 0 0 8.5 31.5 L 8.5 35.5 L 8.5 39.5 L 8.5 375.5 L 8.5 379.5 A 5 5 90 0 0 13.5 384.5 L 17.5 384.5 L 17.5 386.5 L 27.5 386.5 L 27.5 384.5 L 35.5 384.5 L 35.5 390.5 L 35.5 396.5 L 35.5 400.5 A 4 4 90 0 1 31.5 404.5 L 27.5 404.5 L 18.5 404.5 L 13.5 410.5 L 8.5 404.5 L 4.5 404.5 A 4 4 90 0 1 0.5 400.5 L 0.5 396.5 z"
+           style="fill:#FFBF00;fill-opacity:1;stroke:#DAAF30;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="path2" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           id="text6"><tspan
+             x="20"
+             y="22"
+             id="tspan4">action</tspan></text>
+        <text
+           style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="text10"><tspan
+             x="84"
+             y="6"
+             id="tspan8" /></text>
+      </g>
+    </g>
+    <g
+       transform="translate(0, 12) scale(0.5 0.5)"
+       id="g30">
+      <g
+         style="isolation:isolate"
+         id="g28">
+        <g
+           id="レイヤー_2"
+           data-name="レイヤー 2">
+          <g
+             id="Icon">
+            <rect
+               width="42"
+               height="42"
+               rx="5"
+               ry="5"
+               style="fill:#292929;opacity:0.4;mix-blend-mode:multiply"
+               id="rect16" />
+            <path
+               d="M30.56,29.8l-4.17-4.16h2.26a1,1,0,1,0,0-2.07H23.94a1.08,1.08,0,0,0-1.11,1v0s0,0,0,.06v4.64h0a1,1,0,1,0,2.08,0V27.08l4.19,4.19a1,1,0,0,0,1.46,0A1,1,0,0,0,30.56,29.8Z"
+               style="fill:#fff"
+               id="path18" />
+            <path
+               d="M19.17,24.6a1.08,1.08,0,0,0-1.11-1H13.35a1,1,0,1,0,0,2.07H15.6L11.44,29.8a1,1,0,0,0,1.47,1.47l4.18-4.19v2.26a1,1,0,1,0,2.08,0V24.7s0,0,0-.06A.08.08,0,0,1,19.17,24.6Z"
+               style="fill:#fff"
+               id="path20" />
+            <path
+               d="M23.94,20.5h4.7a1,1,0,1,0,0-2.08H26.39l4.17-4.16a1,1,0,0,0,0-1.47,1,1,0,0,0-1.46,0L24.91,17V14.72a1,1,0,1,0-2.08,0v4.64a.43.43,0,0,0,0,.05v.05A1.09,1.09,0,0,0,23.94,20.5Z"
+               style="fill:#fff"
+               id="path22" />
+            <path
+               d="M18.13,13.62a1.08,1.08,0,0,0-1,1.09V17l-4.18-4.19a1,1,0,0,0-1.47,0,1,1,0,0,0,0,1.46l4.16,4.17H13.35a1,1,0,1,0,0,2.08h4.71a1.09,1.09,0,0,0,1.11-1,.08.08,0,0,1,0,0s0,0,0-.06V14.71A1.07,1.07,0,0,0,18.13,13.62Z"
+               style="fill:#fff"
+               id="path24" />
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g
+     transform="translate(14, 41)"
+     id="g46">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g44">
+      <path
+         d="m 0.5,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 10 v -2 h 9 54.333333 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 c -2.761424,0 -5,2.238576 -5,5 v 4 4 294 4 c 0,2.76142 2.238576,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.20914 -1.790861,4 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -4,-1.79086 -4,-4 v -4 z"
+         style="fill:#3edcdd;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path34" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+         id="text38"><tspan
+           x="5"
+           y="15"
+           id="tspan36">set instrument</tspan></text>
+      <text
+         style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text42"><tspan
+           x="66"
+           y="12"
+           id="tspan40" /></text>
+    </g>
+  </g>
+  <g
+     transform="translate(138,41)"
+     id="g56">
+    <g
+       transform="scale(1.5)"
+       id="g54">
+      <path
+         d="m 8.5,0.5 h 110 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#3edcdd;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path48" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+         id="text52"><tspan
+           x="13"
+           y="14"
+           id="tspan50">guitar</tspan></text>
+    </g>
+  </g>
+  <g
+     id="g90">
+    <g
+       transform="translate(28, 73)"
+       id="g70">
+      <g
+         transform="scale(1.5, 1.5)"
+         id="g68">
+        <path
+           d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 27.5 0.5 L 87.5 0.5 L 91.5 0.5 A 4 4 90 0 1 95.5 4.5 L 95.5 8.5 L 91.5 8.5 L 91.5 5.5 L 87.5 5.5 L 87.5 15.5 L 91.5 15.5 L 91.5 12.5 L 95.5 12.5 L 95.5 16.5 A 4 4 90 0 1 91.5 20.5 L 87.5 20.5 L 27.5 20.5 L 26.5 20.5 L 26.5 22.5 L 18.5 22.5 L 18.5 20.5 L 17.5 20.5 L 13.5 20.5 A 5 5 90 0 0 8.5 25.5 L 8.5 29.5 L 8.5 33.5 L 8.5 75.5 L 8.5 79.5 A 5 5 90 0 0 13.5 84.5 L 17.5 84.5 L 17.5 86.5 L 27.5 86.5 L 27.5 84.5 L 35.5 84.5 L 35.5 90.5 L 35.5 96.5 L 35.5 100.5 A 4 4 90 0 1 31.5 104.5 L 27.5 104.5 L 18.5 104.5 L 17.5 104.5 L 17.5 106.5 L 9.5 106.5 L 9.5 104.5 L 8.5 104.5 L 4.5 104.5 A 4 4 90 0 1 0.5 100.5 L 0.5 96.5 z"
+           style="fill:#FE994F;fill-opacity:1;stroke:#E86B0E;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="path58" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           id="text62"><tspan
+             x="20"
+             y="15"
+             id="tspan60">note</tspan></text>
+        <text
+           style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="text66"><tspan
+             x="85"
+             y="12"
+             id="tspan64">value</tspan></text>
+      </g>
+    </g>
+    <g
+       transform="translate(28, 77) scale(0.5 0.5)"
+       id="g88">
+      <g
+         style="isolation:isolate"
+         id="g86">
+        <g
+           id="g84"
+           data-name="レイヤー 2">
+          <g
+             id="g82">
+            <rect
+               width="42"
+               height="42"
+               rx="5"
+               ry="5"
+               style="fill:#292929;opacity:0.4;mix-blend-mode:multiply"
+               id="rect72" />
+            <path
+               d="M30.56,29.8l-4.17-4.16h2.26a1,1,0,1,0,0-2.07H23.94a1.08,1.08,0,0,0-1.11,1v0s0,0,0,.06v4.64h0a1,1,0,1,0,2.08,0V27.08l4.19,4.19a1,1,0,0,0,1.46,0A1,1,0,0,0,30.56,29.8Z"
+               style="fill:#fff"
+               id="path74" />
+            <path
+               d="M19.17,24.6a1.08,1.08,0,0,0-1.11-1H13.35a1,1,0,1,0,0,2.07H15.6L11.44,29.8a1,1,0,0,0,1.47,1.47l4.18-4.19v2.26a1,1,0,1,0,2.08,0V24.7s0,0,0-.06A.08.08,0,0,1,19.17,24.6Z"
+               style="fill:#fff"
+               id="path76" />
+            <path
+               d="M23.94,20.5h4.7a1,1,0,1,0,0-2.08H26.39l4.17-4.16a1,1,0,0,0,0-1.47,1,1,0,0,0-1.46,0L24.91,17V14.72a1,1,0,1,0-2.08,0v4.64a.43.43,0,0,0,0,.05v.05A1.09,1.09,0,0,0,23.94,20.5Z"
+               style="fill:#fff"
+               id="path78" />
+            <path
+               d="M18.13,13.62a1.08,1.08,0,0,0-1,1.09V17l-4.18-4.19a1,1,0,0,0-1.47,0,1,1,0,0,0,0,1.46l4.16,4.17H13.35a1,1,0,1,0,0,2.08h4.71a1.09,1.09,0,0,0,1.11-1,.08.08,0,0,1,0,0s0,0,0-.06V14.71A1.07,1.07,0,0,0,18.13,13.62Z"
+               style="fill:#fff"
+               id="path80" />
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g
+     transform="translate(160, 73)"
+     id="g108">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g106">
+      <path
+         d="m8.5 8.5 L 8.5 4.5 A 4 4 90 0 1 12.5 0.5 L 16.5 0.5 L 26.5 0.5 L 56.5 0.5 L 60.5 0.5 A 4 4 90 0 1 64.5 4.5 L 64.5 8.5 L 60.5 8.5 L 60.5 5.5 L 56.5 5.5 L 56.5 15.5 L 60.5 15.5 L 60.5 12.5 L 64.5 12.5 L 64.5 29.5 L 60.5 29.5 L 60.5 26.5 L 56.5 26.5 L 56.5 36.5 L 60.5 36.5 L 60.5 33.5 L 64.5 33.5 L 64.5 37.5 A 4 4 90 0 1 60.5 41.5 L 56.5 41.5 L 26.5 41.5 L 16.5 41.5 L 12.5 41.5 A 4 4 90 0 1 8.5 37.5 L 8.5 33.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z"
+         style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path92" />
+      <text
+         style="font-size:9px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text96"><tspan
+           x="54"
+           y="23"
+           id="tspan94">/</tspan></text>
+      <text
+         style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text100"><tspan
+           x="54"
+           y="12"
+           id="tspan98" /></text>
+      <text
+         style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text104"><tspan
+           x="54"
+           y="33"
+           id="tspan102" /></text>
+    </g>
+  </g>
+  <g
+     transform="translate(246, 73)"
+     id="g118">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g116">
+      <path
+         d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z"
+         style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path110" />
+      <text
+         style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+         id="text114"><tspan
+           x="13"
+           y="14"
+           id="tspan112">1</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(246, 105)"
+     id="g128">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g126">
+      <path
+         d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z"
+         style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path120" />
+      <text
+         style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+         id="text124"><tspan
+           x="13"
+           y="14"
+           id="tspan122">4</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(42, 105)"
+     id="g138">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g136">
+      <path
+         d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 38.5 0.5 L 42.5 0.5 A 4 4 90 0 1 46.5 4.5 L 46.5 8.5 L 46.5 12.5 L 46.5 16.5 A 4 4 90 0 1 42.5 20.5 L 38.5 20.5 L 18.5 20.5 L 17.5 20.5 L 17.5 22.5 L 9.5 22.5 L 9.5 20.5 L 8.5 20.5 L 4.5 20.5 A 4 4 90 0 1 0.5 16.5 L 0.5 12.5 z"
+         style="fill:#C4C4C4;fill-opacity:1;stroke:#A0A0A0;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path130" />
+      <text
+         style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text134"><tspan
+           x="36"
+           y="14"
+           id="tspan132">↓</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(42, 137)"
+     id="g156">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g154">
+      <path
+         d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 48.5 0.5 L 52.5 0.5 A 4 4 90 0 1 56.5 4.5 L 56.5 8.5 L 52.5 8.5 L 52.5 5.5 L 48.5 5.5 L 48.5 15.5 L 52.5 15.5 L 52.5 12.5 L 56.5 12.5 L 56.5 29.5 L 52.5 29.5 L 52.5 26.5 L 48.5 26.5 L 48.5 36.5 L 52.5 36.5 L 52.5 33.5 L 56.5 33.5 L 56.5 37.5 A 4 4 90 0 1 52.5 41.5 L 48.5 41.5 L 18.5 41.5 L 17.5 41.5 L 17.5 43.5 L 9.5 43.5 L 9.5 41.5 L 8.5 41.5 L 4.5 41.5 A 4 4 90 0 1 0.5 37.5 L 0.5 33.5 L 0.5 12.5 L 0.5 8.5 z"
+         style="fill:#7CD622;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path140" />
+      <text
+         style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text144"><tspan
+           x="46"
+           y="24"
+           id="tspan142">pitch</tspan></text>
+      <text
+         style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text148"><tspan
+           x="46"
+           y="12"
+           id="tspan146">name</tspan></text>
+      <text
+         style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text152"><tspan
+           x="46"
+           y="33"
+           id="tspan150">octave</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(116, 137)"
+     id="g166">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g164">
+      <path
+         d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z"
+         style="fill:#7CD622;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path158" />
+      <text
+         style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+         id="text162"><tspan
+           x="13"
+           y="14"
+           id="tspan160">sol</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(116, 169)"
+     id="g176">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g174">
+      <path
+         d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z"
+         style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path168" />
+      <text
+         style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+         id="text172"><tspan
+           x="13"
+           y="14"
+           id="tspan170">4</tspan></text>
+    </g>
+  </g>
+  <g
+     id="g210">
+    <g
+       transform="translate(28, 231)"
+       id="g190">
+      <g
+         transform="scale(1.5, 1.5)"
+         id="g188">
+        <path
+           d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 27.5 0.5 L 87.5 0.5 L 91.5 0.5 A 4 4 90 0 1 95.5 4.5 L 95.5 8.5 L 91.5 8.5 L 91.5 5.5 L 87.5 5.5 L 87.5 15.5 L 91.5 15.5 L 91.5 12.5 L 95.5 12.5 L 95.5 16.5 A 4 4 90 0 1 91.5 20.5 L 87.5 20.5 L 27.5 20.5 L 26.5 20.5 L 26.5 22.5 L 18.5 22.5 L 18.5 20.5 L 17.5 20.5 L 13.5 20.5 A 5 5 90 0 0 8.5 25.5 L 8.5 29.5 L 8.5 33.5 L 8.5 75.5 L 8.5 79.5 A 5 5 90 0 0 13.5 84.5 L 17.5 84.5 L 17.5 86.5 L 27.5 86.5 L 27.5 84.5 L 35.5 84.5 L 35.5 90.5 L 35.5 96.5 L 35.5 100.5 A 4 4 90 0 1 31.5 104.5 L 27.5 104.5 L 18.5 104.5 L 17.5 104.5 L 17.5 106.5 L 9.5 106.5 L 9.5 104.5 L 8.5 104.5 L 4.5 104.5 A 4 4 90 0 1 0.5 100.5 L 0.5 96.5 z"
+           style="fill:#FE994F;fill-opacity:1;stroke:#E86B0E;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="path178" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           id="text182"><tspan
+             x="20"
+             y="15"
+             id="tspan180">note</tspan></text>
+        <text
+           style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="text186"><tspan
+             x="85"
+             y="12"
+             id="tspan184">value</tspan></text>
+      </g>
+    </g>
+    <g
+       transform="translate(28, 235) scale(0.5 0.5)"
+       id="g208">
+      <g
+         style="isolation:isolate"
+         id="g206">
+        <g
+           id="g204"
+           data-name="レイヤー 2">
+          <g
+             id="g202">
+            <rect
+               width="42"
+               height="42"
+               rx="5"
+               ry="5"
+               style="fill:#292929;opacity:0.4;mix-blend-mode:multiply"
+               id="rect192" />
+            <path
+               d="M30.56,29.8l-4.17-4.16h2.26a1,1,0,1,0,0-2.07H23.94a1.08,1.08,0,0,0-1.11,1v0s0,0,0,.06v4.64h0a1,1,0,1,0,2.08,0V27.08l4.19,4.19a1,1,0,0,0,1.46,0A1,1,0,0,0,30.56,29.8Z"
+               style="fill:#fff"
+               id="path194" />
+            <path
+               d="M19.17,24.6a1.08,1.08,0,0,0-1.11-1H13.35a1,1,0,1,0,0,2.07H15.6L11.44,29.8a1,1,0,0,0,1.47,1.47l4.18-4.19v2.26a1,1,0,1,0,2.08,0V24.7s0,0,0-.06A.08.08,0,0,1,19.17,24.6Z"
+               style="fill:#fff"
+               id="path196" />
+            <path
+               d="M23.94,20.5h4.7a1,1,0,1,0,0-2.08H26.39l4.17-4.16a1,1,0,0,0,0-1.47,1,1,0,0,0-1.46,0L24.91,17V14.72a1,1,0,1,0-2.08,0v4.64a.43.43,0,0,0,0,.05v.05A1.09,1.09,0,0,0,23.94,20.5Z"
+               style="fill:#fff"
+               id="path198" />
+            <path
+               d="M18.13,13.62a1.08,1.08,0,0,0-1,1.09V17l-4.18-4.19a1,1,0,0,0-1.47,0,1,1,0,0,0,0,1.46l4.16,4.17H13.35a1,1,0,1,0,0,2.08h4.71a1.09,1.09,0,0,0,1.11-1,.08.08,0,0,1,0,0s0,0,0-.06V14.71A1.07,1.07,0,0,0,18.13,13.62Z"
+               style="fill:#fff"
+               id="path200" />
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g
+     transform="translate(160, 231)"
+     id="g228">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g226">
+      <path
+         d="m8.5 8.5 L 8.5 4.5 A 4 4 90 0 1 12.5 0.5 L 16.5 0.5 L 26.5 0.5 L 56.5 0.5 L 60.5 0.5 A 4 4 90 0 1 64.5 4.5 L 64.5 8.5 L 60.5 8.5 L 60.5 5.5 L 56.5 5.5 L 56.5 15.5 L 60.5 15.5 L 60.5 12.5 L 64.5 12.5 L 64.5 29.5 L 60.5 29.5 L 60.5 26.5 L 56.5 26.5 L 56.5 36.5 L 60.5 36.5 L 60.5 33.5 L 64.5 33.5 L 64.5 37.5 A 4 4 90 0 1 60.5 41.5 L 56.5 41.5 L 26.5 41.5 L 16.5 41.5 L 12.5 41.5 A 4 4 90 0 1 8.5 37.5 L 8.5 33.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z"
+         style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path212" />
+      <text
+         style="font-size:9px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text216"><tspan
+           x="54"
+           y="23"
+           id="tspan214">/</tspan></text>
+      <text
+         style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text220"><tspan
+           x="54"
+           y="12"
+           id="tspan218" /></text>
+      <text
+         style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text224"><tspan
+           x="54"
+           y="33"
+           id="tspan222" /></text>
+    </g>
+  </g>
+  <g
+     transform="translate(246, 231)"
+     id="g238">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g236">
+      <path
+         d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z"
+         style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path230" />
+      <text
+         style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+         id="text234"><tspan
+           x="13"
+           y="14"
+           id="tspan232">1</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(246, 263)"
+     id="g248">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g246">
+      <path
+         d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z"
+         style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path240" />
+      <text
+         style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+         id="text244"><tspan
+           x="13"
+           y="14"
+           id="tspan242">4</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(42, 263)"
+     id="g258">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g256">
+      <path
+         d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 38.5 0.5 L 42.5 0.5 A 4 4 90 0 1 46.5 4.5 L 46.5 8.5 L 46.5 12.5 L 46.5 16.5 A 4 4 90 0 1 42.5 20.5 L 38.5 20.5 L 18.5 20.5 L 17.5 20.5 L 17.5 22.5 L 9.5 22.5 L 9.5 20.5 L 8.5 20.5 L 4.5 20.5 A 4 4 90 0 1 0.5 16.5 L 0.5 12.5 z"
+         style="fill:#C4C4C4;fill-opacity:1;stroke:#A0A0A0;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path250" />
+      <text
+         style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text254"><tspan
+           x="36"
+           y="14"
+           id="tspan252">↓</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(42, 295)"
+     id="g276">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g274">
+      <path
+         d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 48.5 0.5 L 52.5 0.5 A 4 4 90 0 1 56.5 4.5 L 56.5 8.5 L 52.5 8.5 L 52.5 5.5 L 48.5 5.5 L 48.5 15.5 L 52.5 15.5 L 52.5 12.5 L 56.5 12.5 L 56.5 29.5 L 52.5 29.5 L 52.5 26.5 L 48.5 26.5 L 48.5 36.5 L 52.5 36.5 L 52.5 33.5 L 56.5 33.5 L 56.5 37.5 A 4 4 90 0 1 52.5 41.5 L 48.5 41.5 L 18.5 41.5 L 17.5 41.5 L 17.5 43.5 L 9.5 43.5 L 9.5 41.5 L 8.5 41.5 L 4.5 41.5 A 4 4 90 0 1 0.5 37.5 L 0.5 33.5 L 0.5 12.5 L 0.5 8.5 z"
+         style="fill:#7CD622;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path260" />
+      <text
+         style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text264"><tspan
+           x="46"
+           y="24"
+           id="tspan262">pitch</tspan></text>
+      <text
+         style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text268"><tspan
+           x="46"
+           y="12"
+           id="tspan266">name</tspan></text>
+      <text
+         style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text272"><tspan
+           x="46"
+           y="33"
+           id="tspan270">octave</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(116, 295)"
+     id="g286">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g284">
+      <path
+         d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z"
+         style="fill:#7CD622;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path278" />
+      <text
+         style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+         id="text282"><tspan
+           x="13"
+           y="14"
+           id="tspan280">mi</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(116, 327)"
+     id="g296">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g294">
+      <path
+         d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z"
+         style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path288" />
+      <text
+         style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+         id="text292"><tspan
+           x="13"
+           y="14"
+           id="tspan290">4</tspan></text>
+    </g>
+  </g>
+  <g
+     id="g330">
+    <g
+       transform="translate(28, 389)"
+       id="g310">
+      <g
+         transform="scale(1.5, 1.5)"
+         id="g308">
+        <path
+           d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 27.5 0.5 L 87.5 0.5 L 91.5 0.5 A 4 4 90 0 1 95.5 4.5 L 95.5 8.5 L 91.5 8.5 L 91.5 5.5 L 87.5 5.5 L 87.5 15.5 L 91.5 15.5 L 91.5 12.5 L 95.5 12.5 L 95.5 16.5 A 4 4 90 0 1 91.5 20.5 L 87.5 20.5 L 27.5 20.5 L 26.5 20.5 L 26.5 22.5 L 18.5 22.5 L 18.5 20.5 L 17.5 20.5 L 13.5 20.5 A 5 5 90 0 0 8.5 25.5 L 8.5 29.5 L 8.5 33.5 L 8.5 75.5 L 8.5 79.5 A 5 5 90 0 0 13.5 84.5 L 17.5 84.5 L 17.5 86.5 L 27.5 86.5 L 27.5 84.5 L 35.5 84.5 L 35.5 90.5 L 35.5 96.5 L 35.5 100.5 A 4 4 90 0 1 31.5 104.5 L 27.5 104.5 L 18.5 104.5 L 17.5 104.5 L 17.5 106.5 L 9.5 106.5 L 9.5 104.5 L 8.5 104.5 L 4.5 104.5 A 4 4 90 0 1 0.5 100.5 L 0.5 96.5 z"
+           style="fill:#FE994F;fill-opacity:1;stroke:#E86B0E;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+           id="path298" />
+        <text
+           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           id="text302"><tspan
+             x="20"
+             y="15"
+             id="tspan300">note</tspan></text>
+        <text
+           style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           id="text306"><tspan
+             x="85"
+             y="12"
+             id="tspan304">value</tspan></text>
+      </g>
+    </g>
+    <g
+       transform="translate(28, 393) scale(0.5 0.5)"
+       id="g328">
+      <g
+         style="isolation:isolate"
+         id="g326">
+        <g
+           id="g324"
+           data-name="レイヤー 2">
+          <g
+             id="g322">
+            <rect
+               width="42"
+               height="42"
+               rx="5"
+               ry="5"
+               style="fill:#292929;opacity:0.4;mix-blend-mode:multiply"
+               id="rect312" />
+            <path
+               d="M30.56,29.8l-4.17-4.16h2.26a1,1,0,1,0,0-2.07H23.94a1.08,1.08,0,0,0-1.11,1v0s0,0,0,.06v4.64h0a1,1,0,1,0,2.08,0V27.08l4.19,4.19a1,1,0,0,0,1.46,0A1,1,0,0,0,30.56,29.8Z"
+               style="fill:#fff"
+               id="path314" />
+            <path
+               d="M19.17,24.6a1.08,1.08,0,0,0-1.11-1H13.35a1,1,0,1,0,0,2.07H15.6L11.44,29.8a1,1,0,0,0,1.47,1.47l4.18-4.19v2.26a1,1,0,1,0,2.08,0V24.7s0,0,0-.06A.08.08,0,0,1,19.17,24.6Z"
+               style="fill:#fff"
+               id="path316" />
+            <path
+               d="M23.94,20.5h4.7a1,1,0,1,0,0-2.08H26.39l4.17-4.16a1,1,0,0,0,0-1.47,1,1,0,0,0-1.46,0L24.91,17V14.72a1,1,0,1,0-2.08,0v4.64a.43.43,0,0,0,0,.05v.05A1.09,1.09,0,0,0,23.94,20.5Z"
+               style="fill:#fff"
+               id="path318" />
+            <path
+               d="M18.13,13.62a1.08,1.08,0,0,0-1,1.09V17l-4.18-4.19a1,1,0,0,0-1.47,0,1,1,0,0,0,0,1.46l4.16,4.17H13.35a1,1,0,1,0,0,2.08h4.71a1.09,1.09,0,0,0,1.11-1,.08.08,0,0,1,0,0s0,0,0-.06V14.71A1.07,1.07,0,0,0,18.13,13.62Z"
+               style="fill:#fff"
+               id="path320" />
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g
+     transform="translate(160, 389)"
+     id="g348">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g346">
+      <path
+         d="m8.5 8.5 L 8.5 4.5 A 4 4 90 0 1 12.5 0.5 L 16.5 0.5 L 26.5 0.5 L 56.5 0.5 L 60.5 0.5 A 4 4 90 0 1 64.5 4.5 L 64.5 8.5 L 60.5 8.5 L 60.5 5.5 L 56.5 5.5 L 56.5 15.5 L 60.5 15.5 L 60.5 12.5 L 64.5 12.5 L 64.5 29.5 L 60.5 29.5 L 60.5 26.5 L 56.5 26.5 L 56.5 36.5 L 60.5 36.5 L 60.5 33.5 L 64.5 33.5 L 64.5 37.5 A 4 4 90 0 1 60.5 41.5 L 56.5 41.5 L 26.5 41.5 L 16.5 41.5 L 12.5 41.5 A 4 4 90 0 1 8.5 37.5 L 8.5 33.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z"
+         style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path332" />
+      <text
+         style="font-size:9px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text336"><tspan
+           x="54"
+           y="23"
+           id="tspan334">/</tspan></text>
+      <text
+         style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text340"><tspan
+           x="54"
+           y="12"
+           id="tspan338" /></text>
+      <text
+         style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text344"><tspan
+           x="54"
+           y="33"
+           id="tspan342" /></text>
+    </g>
+  </g>
+  <g
+     transform="translate(246, 389)"
+     id="g358">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g356">
+      <path
+         d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z"
+         style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path350" />
+      <text
+         style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+         id="text354"><tspan
+           x="13"
+           y="14"
+           id="tspan352">1</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(246, 421)"
+     id="g368">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g366">
+      <path
+         d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z"
+         style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path360" />
+      <text
+         style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+         id="text364"><tspan
+           x="13"
+           y="14"
+           id="tspan362">2</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(42, 421)"
+     id="g378">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g376">
+      <path
+         d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 38.5 0.5 L 42.5 0.5 A 4 4 90 0 1 46.5 4.5 L 46.5 8.5 L 46.5 12.5 L 46.5 16.5 A 4 4 90 0 1 42.5 20.5 L 38.5 20.5 L 18.5 20.5 L 17.5 20.5 L 17.5 22.5 L 9.5 22.5 L 9.5 20.5 L 8.5 20.5 L 4.5 20.5 A 4 4 90 0 1 0.5 16.5 L 0.5 12.5 z"
+         style="fill:#C4C4C4;fill-opacity:1;stroke:#A0A0A0;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path370" />
+      <text
+         style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text374"><tspan
+           x="36"
+           y="14"
+           id="tspan372">↓</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(42, 453)"
+     id="g396">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g394">
+      <path
+         d="m0.5 8.5 L 0.5 4.5 A 4 4 90 0 1 4.5 0.5 L 8.5 0.5 L 8.5 2.5 L 18.5 2.5 L 18.5 0.5 L 48.5 0.5 L 52.5 0.5 A 4 4 90 0 1 56.5 4.5 L 56.5 8.5 L 52.5 8.5 L 52.5 5.5 L 48.5 5.5 L 48.5 15.5 L 52.5 15.5 L 52.5 12.5 L 56.5 12.5 L 56.5 29.5 L 52.5 29.5 L 52.5 26.5 L 48.5 26.5 L 48.5 36.5 L 52.5 36.5 L 52.5 33.5 L 56.5 33.5 L 56.5 37.5 A 4 4 90 0 1 52.5 41.5 L 48.5 41.5 L 18.5 41.5 L 17.5 41.5 L 17.5 43.5 L 9.5 43.5 L 9.5 41.5 L 8.5 41.5 L 4.5 41.5 A 4 4 90 0 1 0.5 37.5 L 0.5 33.5 L 0.5 12.5 L 0.5 8.5 z"
+         style="fill:#7CD622;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path380" />
+      <text
+         style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text384"><tspan
+           x="46"
+           y="24"
+           id="tspan382">pitch</tspan></text>
+      <text
+         style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text388"><tspan
+           x="46"
+           y="12"
+           id="tspan386">name</tspan></text>
+      <text
+         style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+         id="text392"><tspan
+           x="46"
+           y="33"
+           id="tspan390">octave</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(116, 453)"
+     id="g406">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g404">
+      <path
+         d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z"
+         style="fill:#7CD622;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path398" />
+      <text
+         style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+         id="text402"><tspan
+           x="13"
+           y="14"
+           id="tspan400">sol</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(116, 485)"
+     id="g416">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g414">
+      <path
+         d="m8.5 0.5 L 68.5 0.5 L 68.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z"
+         style="fill:#FF6EA1;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path408" />
+      <text
+         style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+         id="text412"><tspan
+           x="13"
+           y="14"
+           id="tspan410">4</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(131, 9)"
+     id="g426">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g424">
+      <path
+         d="m8.5 0.5 L 98.5 0.5 L 98.5 20.5 L 8.5 20.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z"
+         style="fill:#FF664B;fill-opacity:1;stroke:#EA4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
+         id="path418" />
+      <text
+         style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+         id="text422"><tspan
+           x="13"
+           y="14"
+           id="tspan420">action</tspan></text>
+    </g>
+  </g>
+</svg>
