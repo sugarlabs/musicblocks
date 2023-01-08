@@ -702,6 +702,9 @@ function setupIntervalsBlocks(activity) {
                 i = CHORDNAMES.indexOf(DEFAULTCHORD);
             }
             for (let ii = 0; ii < CHORDVALUES[i].length; ii++) {
+                if (isNaN(CHORDVALUES[i][ii])) {
+                    continue;
+                }
                 if (CHORDVALUES[i][ii] === 0) {
                     continue;
                 }

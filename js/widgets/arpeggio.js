@@ -520,15 +520,19 @@ class Arpeggio {
             const letter = this.notesToPlay[n][0].slice(0, -1);
             const octave = Number(this.notesToPlay[n][0].substr(this.notesToPlay[n][0].length - 1));
             for (let i = 0; i < pairs.length; i++) {
-                this._playList.push([getNote(
-                    letter,
-                    octave,
-                    this.rowLabels.length - pairs[i][0] - 1,  // Transposition
-                    this.activity.turtles.ithTurtle(0).singer.keySignature,
-                    false,
-                    null,
-                    this.activity.errorMsg
-                ), noteValue]);
+                if (pairs[i][0] === -1) {
+                    this._playList.push(["", noteValue]);
+                } else {
+                    this._playList.push([getNote(
+                        letter,
+                        octave,
+                        this.rowLabels.length - pairs[i][0] - 1,  // Transposition
+                        this.activity.turtles.ithTurtle(0).singer.keySignature,
+                        false,
+                        null,
+                        this.activity.errorMsg
+                    ), noteValue]);
+                }
             }
         }
         this.__playNote(0);
@@ -547,15 +551,18 @@ class Arpeggio {
         let row;
         let cell;
         for (let j = 0; j < this.defaultCols; j++) {
+            let thisPair = [-1, j];
             for (let i = 0; i < arpeggioTable.rows.length - 1; i++) {
                 table = docById("arpeggioCellTable" + i);
                 row = table.rows[0];
                 cell = row.cells[j];
                 if (cell.style.backgroundColor === "black") {
-                    pairs.push([i, j]);
+                    thisPair = [i, j];
+                    //pairs.push([i, j]);
                     break;
                 }
             }
+            pairs.push(thisPair);
         }
 
         return pairs;
@@ -568,15 +575,17 @@ class Arpeggio {
      */
     __playNote(i) {
         if (i < this._playList.length) {
-            this.activity.logo.synth.trigger(
-                0,
-                this._playList[i][0][0].replace(/♭/g, "b").replace(/♯/g, "#") + this._playList[i][0][1],
-                this._playList[i][1],
-                "default",
-                null,
-                null,
-                null
-            );
+            if (this._playList[i][0].length > 0) {
+                this.activity.logo.synth.trigger(
+                    0,
+                    this._playList[i][0][0].replace(/♭/g, "b").replace(/♯/g, "#") + this._playList[i][0][1],
+                    this._playList[i][1],
+                    "default",
+                    null,
+                    null,
+                    null
+                );
+            }
             setTimeout(() => {
                 this.__playNote(i + 1);
             }, 2600 * this._playList[i][1]);
@@ -724,7 +733,11 @@ class Arpeggio {
         const pairs = this.__makePairsList();
         const chordValues = [];
         for (let i = 0; i < pairs.length; i++) {
-            chordValues.push(this._rowBlocks.length - pairs[i][0] - 1);
+            if (pairs[i][0] === -1) {
+                chordValues.push("-");  // rest
+            } else {
+                chordValues.push(this._rowBlocks.length - pairs[i][0] - 1);
+            }
         }
 
         // eslint-disable-next-line no-console
