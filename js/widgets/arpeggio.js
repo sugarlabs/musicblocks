@@ -33,7 +33,7 @@ class Arpeggio {
     static CELLSIZE = 28;
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
-    static DEFAULTCOLS = 12;
+    static DEFAULTCOLS = 4;
 
     constructor() {
         this.notesToPlay = [];
@@ -707,10 +707,7 @@ class Arpeggio {
             row = table.rows[0];
             for (let j = 0; j < row.cells.length; j++) {
                 cell = row.cells[j];
-                if (i === 11 && j == 0) {
-                    cell.style.backgroundColor = "black";
-                    this._setCell(0, 12, true);
-                } else if (cell.style.backgroundColor === "black") {
+                if (cell.style.backgroundColor === "black") {
                     cell.style.backgroundColor = platformColor.selectorBackground;
                     this._setCell(j, i, false);
                 }
@@ -727,9 +724,6 @@ class Arpeggio {
         const pairs = this.__makePairsList();
         const chordValues = [];
         for (let i = 0; i < pairs.length; i++) {
-            if (pairs[i][0] === this._rowBlocks.length - 1 && pairs[i][1] === 0) {
-                continue;
-            }
             chordValues.push(this._rowBlocks.length - pairs[i][0] - 1);
         }
 
