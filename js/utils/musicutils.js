@@ -820,17 +820,17 @@ const DEFAULTCHORD = CHORDNAMES[0];
 
 // This list must follow the order of the CHORDNAMES list.
 const CHORDVALUES = [
-    [4, 7],
-    [3, 7],
-    [4, 8],
-    [3, 6],
-    [4, 7, 11],
-    [3, 7, 10],
-    [4, 7, 10],
-    [3, 7, 11],
-    [3, 6, 9],
-    [3, 6, 10],
-    [4, 7]
+    [0, 4, 7],
+    [0, 3, 7],
+    [0, 4, 8],
+    [0, 3, 6],
+    [0, 4, 7, 11],
+    [0, 3, 7, 10],
+    [0, 4, 7, 10],
+    [0, 3, 7, 11],
+    [0, 3, 6, 9],
+    [0, 3, 6, 10],
+    [0, 4, 7]
 ];
 
 const setCustomChord = (chord) => {

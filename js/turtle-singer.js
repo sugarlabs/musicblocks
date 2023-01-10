@@ -883,16 +883,22 @@ class Singer {
                 const transposition = 2 * delta + tur.singer.transposition;
                 const alen = tur.singer.arpeggio.length;
                 let atrans = transposition;
+                let anote = note;
                 if (alen > 0) {
-                    atrans += tur.singer.arpeggio[tur.singer.arpeggioIndex];
-                    tur.singer.arpeggioIndex += 1;
-                    if (tur.singer.arpeggioIndex === alen) {
-                        tur.singer.arpeggioIndex = 0;
+                    if (isNaN(tur.singer.arpeggio[tur.singer.arpeggioIndex])) {
+                        anote = "rest";
+                        tur.singer.arpeggioIndex += 1;
+                    } else {
+                        atrans += tur.singer.arpeggio[tur.singer.arpeggioIndex];
+                        tur.singer.arpeggioIndex += 1;
+                        if (tur.singer.arpeggioIndex === alen) {
+                            tur.singer.arpeggioIndex = 0;
+                        }
                     }
                 }
 
                 const noteObj = getNote(
-                    note,
+                    anote,
                     octave,
                     // FIXME: should not be hardwired to 12
                     atrans + tur.singer.register * 12,  // transposition + tur.singer.register * 12,
