@@ -490,7 +490,6 @@ function setupIntervalsBlocks(activity) {
         constructor() {
             super("arpeggio");
             this.setPalette("intervals", activity);
-            this.piemenuValuesC1 = [2, 3, 4, 5, 6, 7, 8];
             this.setHelpString([
                 _("The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord.") +
                     " " +
@@ -520,12 +519,11 @@ function setupIntervalsBlocks(activity) {
             if (i === -1) {
                 i = CHORDNAMES.indexOf(DEFAULTCHORD);
             }
-            // CHORDVALUES do not include the starting note, hence + 1.
-            const factor = Math.floor(CHORDVALUES[i].length + 1);
+            const factor = Math.floor(CHORDVALUES[i].length);
             const tur = activity.turtles.ithTurtle(turtle);
 
             tur.singer.duplicateFactor *= factor;
-            tur.singer.arpeggio = [0];
+            tur.singer.arpeggio = [];
             for (let ii = 0; ii < CHORDVALUES[i].length; ii++) {
                 tur.singer.arpeggio.push(CHORDVALUES[i][ii]);
             }
@@ -704,6 +702,12 @@ function setupIntervalsBlocks(activity) {
                 i = CHORDNAMES.indexOf(DEFAULTCHORD);
             }
             for (let ii = 0; ii < CHORDVALUES[i].length; ii++) {
+                if (isNaN(CHORDVALUES[i][ii])) {
+                    continue;
+                }
+                if (CHORDVALUES[i][ii] === 0) {
+                    continue;
+                }
                 Singer.IntervalsActions.setSemitoneInterval(
                     CHORDVALUES[i][ii], turtle, blk
                 );
