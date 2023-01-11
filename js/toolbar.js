@@ -499,7 +499,9 @@ class Toolbar {
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     saveWAV = docById("save-wav");
 
-                    saveWAV.onclick = wave_onclick;
+                    saveWAV.onclick = () => {
+                        wave_onclick(this.activity);
+                    };
 
                     saveLY = docById("save-ly");
 
