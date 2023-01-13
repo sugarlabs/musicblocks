@@ -2293,12 +2293,12 @@ msgstr "<h2>メトロノームブロック</h2><br>メトロノームを表示�
 
 #: js/WidgetBlocks.js:617
 msgid "The Arpeggio Widget is used to compose chord sequences."
-msgstr ""
+msgstr "「アルペジオ」ウィジェットは コード進行 を作るためです。"
 
 #: js/WidgetBlocks.js:623
 #: js/IntervalsBlocks.js:503
 msgid "arpeggio"
-msgstr ""
+msgstr "アルペジオ"
 
 #: js/WidgetBlocks.js:675
 msgid "The Pitch drum matrix is used to map pitches to drum sounds."
@@ -2456,11 +2456,11 @@ msgstr "半音階的音程"
 
 #: js/IntervalsBlocks.js:494
 msgid "The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord."
-msgstr ""
+msgstr "「アルペジオ」ブロックは 「音符」ブロックを回数 再生して、コードによって 変更します。"
 
 #: js/IntervalsBlocks.js:496
 msgid "The output of the example is: do, mi, sol, sol, ti, mi"
-msgstr ""
+msgstr "例の解決は「ド、ミ、ソ、ソ、シ、ミ」"
 
 #: js/IntervalsBlocks.js:678
 msgid "The Chord block calculates common chords."
@@ -6987,7 +6987,7 @@ msgstr "クリックで強い拍の位置を選べます。"
 
 #: js/arpeggio.js:224
 msgid "Click in the grid to add steps to the arpeggio."
-msgstr ""
+msgstr "テーブルを クリックでアルペジオのピッチを加える。"
 
 #: js/ProjectStorage.js:258
 msgid "anonymous"

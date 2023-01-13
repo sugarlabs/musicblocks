@@ -631,7 +631,7 @@ function setupRhythmBlocks(activity) {
 
     class Note8Block extends _NoteValueBlock {
         constructor() {
-            super("note8", "scale degree");
+            super("note8", _("scale degree"));
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "newnote", x, y, [null, 1, 4, 8]],
