@@ -800,8 +800,6 @@ function setupWidgetBlocks(activity) {
                 [10, ["steppitch", {}], 0, 0, [8, 11, null]],
                 [11, ["number", { value: -1 }], 0, 0, [10]]
             ]);
-
-            if (this.lang !== "ja") this.hidden = true;
         }
 
         flow() {}
