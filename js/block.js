@@ -269,7 +269,7 @@ class Block {
                     if (counter !== undefined) {
                         loopCount = counter;
                     }
-                    if (loopCount > 5) {
+                    if (loopCount > 10) {  // race condition?
                         throw new Error("COULD NOT CREATE CACHE");
                     }
 
@@ -1650,9 +1650,16 @@ class Block {
     hide() {
         this.container.visible = false;
         if (this.isCollapsible()) {
-            this.collapseText.visible = false;
-            this.expandButtonBitmap.visible = false;
-            this.collapseButtonBitmap.visible = false;
+            // Sometimes these fields are not set.
+            if (this.collapseText !== null) {
+                this.collapseText.visible = false;
+            }
+            if (this.expandButtonBitmap !== null) {
+                this.expandButtonBitmap.visible = false;
+            }
+            if (this.collapseButtonBitmap !== null) {
+                this.collapseButtonBitmap.visible = false;
+            }
         }
 
         this.updateCache();
