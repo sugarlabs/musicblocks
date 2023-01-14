@@ -4,37 +4,62 @@
    height="160.5"
    version="1.1"
    id="svg120"
+   sodipodi:docname="scaledegree_block.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <defs
      id="defs124" />
+  <sodipodi:namedview
+     id="namedview122"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="1.7364044"
+     inkscape:cx="-186.59248"
+     inkscape:cy="-82.929993"
+     inkscape:window-width="2560"
+     inkscape:window-height="1371"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg120" />
   <g
-     id="g32">
+     id="g32"
+     transform="translate(-490,-326)">
     <g
+       transform="translate(490,326)"
        id="g14">
       <g
          transform="scale(1.5)"
          id="g12">
         <path
            d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 40 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -40 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
-           style="fill:#fe994f;fill-opacity:1;stroke:#e86b0e;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           style="fill:#ff8700;fill-opacity:1;stroke:#e86b0e;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
            id="path2" />
         <text
            style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="text6"><tspan
              x="20"
              y="15"
-             id="tspan4">note</tspan></text>
+             id="tspan4">音符</tspan></text>
         <text
            style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="text10"><tspan
              x="65"
              y="12"
-             id="tspan8">value</tspan></text>
+             id="tspan8">長さ</tspan></text>
       </g>
     </g>
     <g
-       transform="scale(0.5)"
+       transform="matrix(0.5,0,0,0.5,490,330)"
        id="g30">
       <g
          style="isolation:isolate"
@@ -89,7 +114,7 @@
          id="text38"><tspan
            x="54"
            y="23"
-           id="tspan36">/</tspan></text>
+           id="tspan36">➗</tspan></text>
       <text
          style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
          id="text42"><tspan
@@ -119,7 +144,7 @@
          id="text56"><tspan
            x="13"
            y="14"
-           id="tspan54">5</tspan></text>
+           id="tspan54">1</tspan></text>
     </g>
   </g>
   <g
@@ -165,31 +190,31 @@
        transform="scale(1.5)"
        id="g96">
       <path
-         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 67.817383 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 40 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -40 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
          style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
          id="path82" />
       <text
          style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
          id="text86"><tspan
-           x="84"
+           x="56"
            y="24"
-           id="tspan84">nth modal pitch</tspan></text>
+           id="tspan84">ピッチ度</tspan></text>
       <text
          style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
          id="text90"><tspan
-           x="84"
+           x="56"
            y="12"
-           id="tspan88">number</tspan></text>
+           id="tspan88">すうち</tspan></text>
       <text
          style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
          id="text94"><tspan
-           x="84"
+           x="56"
            y="33"
-           id="tspan92">octave</tspan></text>
+           id="tspan92">オクターヴの高さ</tspan></text>
     </g>
   </g>
   <g
-     transform="translate(144,64)"
+     transform="translate(103,64)"
      id="g108">
     <g
        transform="scale(1.5)"
@@ -207,7 +232,7 @@
     </g>
   </g>
   <g
-     transform="translate(144,95)"
+     transform="translate(103,96)"
      id="g118">
     <g
        transform="scale(1.5)"
@@ -221,7 +246,7 @@
          id="text114"><tspan
            x="13"
            y="14"
-           id="tspan112">1</tspan></text>
+           id="tspan112">4</tspan></text>
     </g>
   </g>
 </svg>
