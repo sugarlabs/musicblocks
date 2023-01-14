@@ -603,7 +603,7 @@ class Activity {
                         const paletteName = obj[1];
                         const protoName = obj[2];
                         // eslint-disable-next-line no-prototype-builtins
-                        if (this.blocks.protoBlockDict.hasOwnProperty(protoName)) {
+                        if (that.blocks.protoBlockDict.hasOwnProperty(protoName)) {
                             that.palettes.dict[paletteName].makeBlockFromSearch(
                                 protoblk,
                                 protoName,
@@ -614,7 +614,7 @@ class Activity {
                         }
                     } else if (typeof message[3] === "string") {
                         // If it is a string, load the macro associated with this block.
-                        const blocksToLoad = getMacroExpansion(this, message[3], 0, 0);
+                        const blocksToLoad = getMacroExpansion(that, message[3], 0, 0);
                         that.blocks.loadNewBlocks(blocksToLoad);
                     } else {
                         // Load the block.
@@ -623,7 +623,10 @@ class Activity {
                     }
 
                     setTimeout(function () {
-                        this.save.saveBlockArtwork(name + "_block.svg");
+                        // eslint-disable-next-line no-console
+                        console.log("Saving help artwork: " + name + "_block.svg");
+                        const svg = "data:image/svg+xml;utf8," + that.printBlockSVG();
+                        that.save.download("svg", svg, name + "_block.svg");
                     }, 500);
                 }, 500);
             }, delay + 1000);
