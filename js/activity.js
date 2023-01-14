@@ -627,9 +627,9 @@ class Activity {
                         console.log("Saving help artwork: " + name + "_block.svg");
                         const svg = "data:image/svg+xml;utf8," + that.printBlockSVG();
                         that.save.download("svg", svg, name + "_block.svg");
-                    }, 1000);
-                }, 1000);
-            }, delay + 2000);
+                    }, 500);
+                }, 500);
+            }, delay + 1000);
         };
 
         this._saveHelpBlocks = function () {
