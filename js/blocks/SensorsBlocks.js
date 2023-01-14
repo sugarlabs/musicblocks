@@ -37,8 +37,6 @@ function setupSensorsBlocks(activity) {
                 argTypes: ["anyin"],
                 defaults: [_("Input a value")],
             });
-
-            if (this.lang === "ja") this.hidden = true;
         }
 
         flow(args, logo, turtle, blk) {
@@ -95,8 +93,6 @@ function setupSensorsBlocks(activity) {
                 null,
                 "input"
             ]);
-
-            if (this.lang === "ja") this.hidden = true;
         }
 
         updateParameter(logo, turtle) {
