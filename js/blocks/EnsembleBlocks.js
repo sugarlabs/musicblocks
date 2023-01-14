@@ -1132,7 +1132,6 @@ function setupEnsembleBlocks(activity) {
             }
 
             this.setPalette("ensemble", activity);
-            this.hidden = this.lang === "ja";
 
             this.formBlock({
                 outType: "numberout"
@@ -1167,7 +1166,6 @@ function setupEnsembleBlocks(activity) {
             }
 
             this.setPalette("ensemble", activity);
-            this.hidden = this.lang === "ja";
 
             this.formBlock({
                 outType: "textout",
