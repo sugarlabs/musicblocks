@@ -1839,7 +1839,21 @@ class Logo {
 
         const suppressOutput = tur.singer.suppressOutput;
 
-        const __pen = (turtle, name, arg, timeout) => {
+        const __pen = (turtle, name, b, timeout) => {
+            switch (name) {
+            case "penup":
+            case "pendown":
+                break;
+            default:
+                const arg = this.parseArg(
+                    this,
+                    turtle,
+                    this.blockList[b].connections[1],
+                    b,
+                    this.receivedArg
+                );
+                break;
+            }
             const _penSwitch = (name) => {
                 switch (name) {
                     case "penup":
@@ -1904,11 +1918,27 @@ class Logo {
             }
         };
 
-        const __setheading = (turtle, arg, timeout) => {
+        const __setheading = (turtle, b, timeout) => {
             if (suppressOutput) {
+                const arg = this.parseArg(
+                    this,
+                    turtle,
+                    this.blockList[b].connections[1],
+                    b,
+                    this.receivedArg
+                );
                 tur.painter.doSetHeading(arg);
             } else {
-                setTimeout(() => tur.painter.doSetHeading(arg), timeout);
+                setTimeout(() => {
+                    const arg = this.parseArg(
+                        this,
+                        turtle,
+                        this.blockList[b].connections[1],
+                        b,
+                        this.receivedArg
+                    );
+                    tur.painter.doSetHeading(arg);
+                }, timeout);
             }
         };
 
@@ -1923,22 +1953,82 @@ class Logo {
             }
         };
 
-        const __scrollxy = (turtle, arg1, arg2, timeout) => {
+        const __scrollxy = (turtle, b, timeout) => {
             if (suppressOutput) {
+                const arg1 = this.parseArg(
+                    this,
+                    turtle,
+                    this.blockList[b].connections[1],
+                    b,
+                    this.receivedArg
+                );
+                const arg2 = this.parseArg(
+                    this,
+                    turtle,
+                    this.blockList[b].connections[2],
+                    b,
+                    this.receivedArg
+                );
                 tur.painter.doScrollXY(arg1, arg2);
             } else {
-                setTimeout(() => tur.painter.doScrollXY(arg1, arg2), timeout);
+                setTimeout(() => {
+                    const arg1 = this.parseArg(
+                        this,
+                        turtle,
+                        this.blockList[b].connections[1],
+                        b,
+                        this.receivedArg
+                    );
+                    const arg2 = this.parseArg(
+                        this,
+                        turtle,
+                        this.blockList[b].connections[2],
+                        b,
+                        this.receivedArg
+                    );
+                    tur.painter.doScrollXY(arg1, arg2);
+                }, timeout);
             }
         };
 
-        const __setxy = (turtle, arg1, arg2, timeout) => {
+        const __setxy = (turtle, b, timeout) => {
             if (suppressOutput) {
                 const savedPenState = tur.painter.penState;
+                const arg1 = this.parseArg(
+                    this,
+                    turtle,
+                    this.blockList[b].connections[1],
+                    b,
+                    this.receivedArg
+                );
+                const arg2 = this.parseArg(
+                    this,
+                    turtle,
+                    this.blockList[b].connections[2],
+                    b,
+                    this.receivedArg
+                );
                 tur.painter.penState = false;
                 tur.painter.doSetXY(arg1, arg2);
                 tur.painter.penState = savedPenState;
             } else {
-                setTimeout(() => tur.painter.doSetXY(arg1, arg2), timeout);
+                setTimeout(() => {
+                    const arg1 = this.parseArg(
+                        this,
+                        turtle,
+                        this.blockList[b].connections[1],
+                        b,
+                        this.receivedArg
+                    );
+                    const arg2 = this.parseArg(
+                        this,
+                        turtle,
+                        this.blockList[b].connections[2],
+                        b,
+                        this.receivedArg
+                    );
+                    tur.painter.doSetXY(arg1, arg2);
+                }, timeout);
             }
         };
 
@@ -1954,10 +2044,19 @@ class Logo {
             setTimeout(() => this.processSpeak(arg), timeout);
         };
 
-        const __print = (arg, timeout) => {
+        const __print = (arg, b, timeout) => {
             if (suppressOutput) return;
             if (arg === undefined) return;
-            setTimeout(() => this.activity.textMsg(arg.toString()), timeout);
+            setTimeout(() => {
+                const arg_ = this.parseArg(
+                    this,
+                    turtle,
+                    this.blockList[b].connections[1],
+                    b,
+                    this.receivedArg
+                );
+                this.activity.textMsg(arg_.toString());
+            }, timeout);
         };
 
         const __arc = (turtle, arg1, arg2, timeout) => {
@@ -1971,38 +2070,124 @@ class Logo {
             }
         };
 
-        const __cp1 = (turtle, arg1, arg2, timeout) => {
+        const __cp1 = (turtle, b, timeout) => {
             if (suppressOutput) {
+                const arg1 = this.parseArg(
+                    this,
+                    turtle,
+                    this.blockList[b].connections[1],
+                    b,
+                    this.receivedArg
+                );
+                const arg2 = this.parseArg(
+                    this,
+                    turtle,
+                    this.blockList[b].connections[2],
+                    b,
+                    this.receivedArg
+                );
                 tur.painter.cp1x = arg1;
                 tur.painter.cp1y = arg2;
             } else {
                 setTimeout(() => {
+                    const arg1 = this.parseArg(
+                        this,
+                        turtle,
+                        this.blockList[b].connections[1],
+                        b,
+                        this.receivedArg
+                    );
+                    const arg2 = this.parseArg(
+                        this,
+                        turtle,
+                        this.blockList[b].connections[2],
+                        b,
+                        this.receivedArg
+                    );
                     tur.painter.cp1x = arg1;
                     tur.painter.cp1y = arg2;
                 }, timeout);
             }
         };
 
-        const __cp2 = (turtle, arg1, arg2, timeout) => {
+        const __cp2 = (turtle, b, timeout) => {
             if (suppressOutput) {
+                const arg1 = this.parseArg(
+                    this,
+                    turtle,
+                    this.blockList[b].connections[1],
+                    b,
+                    this.receivedArg
+                );
+                const arg2 = this.parseArg(
+                    this,
+                    turtle,
+                    this.blockList[b].connections[2],
+                    b,
+                    this.receivedArg
+                );
                 tur.painter.cp2x = arg1;
                 tur.painter.cp2y = arg2;
             } else {
                 setTimeout(() => {
+                    const arg1 = this.parseArg(
+                        this,
+                        turtle,
+                        this.blockList[b].connections[1],
+                        b,
+                        this.receivedArg
+                    );
+                    const arg2 = this.parseArg(
+                        this,
+                        turtle,
+                        this.blockList[b].connections[2],
+                        b,
+                        this.receivedArg
+                    );
                     tur.painter.cp2x = arg1;
                     tur.painter.cp2y = arg2;
                 }, timeout);
             }
         };
 
-        const __bezier = (turtle, arg1, arg2, timeout) => {
+        const __bezier = (turtle, b, timeout) => {
             if (suppressOutput) {
                 const savedPenState = tur.painter.penState;
+                const arg1 = this.parseArg(
+                    this,
+                    turtle,
+                    this.blockList[b].connections[1],
+                    b,
+                    this.receivedArg
+                );
+                const arg2 = this.parseArg(
+                    this,
+                    turtle,
+                    this.blockList[b].connections[2],
+                    b,
+                    this.receivedArg
+                );
                 tur.painter.penState = false;
                 tur.painter.doBezier(arg1, arg2);
                 tur.painter.penState = savedPenState;
             } else {
-                setTimeout(() => tur.painter.doBezier(arg1, arg2), timeout);
+                setTimeout(() => {
+                    const arg1 = this.parseArg(
+                        this,
+                        turtle,
+                        this.blockList[b].connections[1],
+                        b,
+                        this.receivedArg
+                    );
+                    const arg2 = this.parseArg(
+                        this,
+                        turtle,
+                        this.blockList[b].connections[2],
+                        b,
+                        this.receivedArg
+                    );
+                    tur.painter.doBezier(arg1, arg2);
+                }, timeout);
             }
         };
 
@@ -2113,14 +2298,7 @@ class Logo {
                 case "settranslucency":
                 case "setgrey":
                 case "setpensize":
-                    arg = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[1],
-                        b,
-                        this.receivedArg
-                    );
-                    __pen(turtle, name, arg, waitTime);
+                    __pen(turtle, name, b, waitTime);
                     break;
 
                 case "penup":
@@ -2143,39 +2321,11 @@ class Logo {
                     break;
 
                 case "controlpoint1":
-                    arg1 = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[1],
-                        b,
-                        this.receivedArg
-                    );
-                    arg2 = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[2],
-                        b,
-                        this.receivedArg
-                    );
-                    __cp1(turtle, arg1, arg2, waitTime);
+                    __cp1(turtle, b, waitTime);
                     break;
 
                 case "controlpoint2":
-                    arg1 = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[1],
-                        b,
-                        this.receivedArg
-                    );
-                    arg2 = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[2],
-                        b,
-                        this.receivedArg
-                    );
-                    __cp2(turtle, arg1, arg2, waitTime);
+                    __cp2(turtle, b, waitTime);
                     break;
 
                 case "bezier":
@@ -2183,32 +2333,11 @@ class Logo {
                      * @todo Is there a reasonable way to break the bezier
                      * curve up into small steps?
                      */
-                    arg1 = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[1],
-                        b,
-                        this.receivedArg
-                    );
-                    arg2 = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[2],
-                        b,
-                        this.receivedArg
-                    );
-                    __bezier(turtle, arg1, arg2, waitTime);
+                    __bezier(turtle, b, waitTime);
                     break;
 
                 case "setheading":
-                    arg = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[1],
-                        b,
-                        this.receivedArg
-                    );
-                    __setheading(turtle, arg, waitTime);
+                    __setheading(turtle, b, waitTime);
                     break;
 
                 case "right":
@@ -2284,39 +2413,11 @@ class Logo {
                     break;
 
                 case "setxy":
-                    arg1 = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[1],
-                        b,
-                        this.receivedArg
-                    );
-                    arg2 = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[2],
-                        b,
-                        this.receivedArg
-                    );
-                    __setxy(turtle, arg1, arg2, waitTime);
+                    __setxy(turtle, b, waitTime);
                     break;
 
                 case "scrollxy":
-                    arg1 = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[1],
-                        b,
-                        this.receivedArg
-                    );
-                    arg2 = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[2],
-                        b,
-                        this.receivedArg
-                    );
-                    __scrollxy(turtle, arg1, arg2, waitTime);
+                    __scrollxy(turtle, b, waitTime);
                     break;
 
                 case "show":
@@ -2356,7 +2457,7 @@ class Logo {
                         b,
                         this.receivedArg
                     );
-                    __print(arg, waitTime);
+                    __print(arg, b, waitTime);
                     break;
 
                 case "arc":
