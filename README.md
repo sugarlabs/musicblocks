@@ -38,9 +38,9 @@ Some background on why we combine music and programming can be found
 
 **Refer to the following sections to get familiar with this application:**
 
-- [Running Music Blocks](#RUNNING_MUSIC_BLOCKS)
-- [How to set up a local server](#HOW_TO_SET_UP_A_LOCAL_SERVER)
-- [Using Music Blocks](#USING_MUSIC_BLOCKS)
+- [Running Music Blocks](#RUNNING-MUSIC-BLOCKS)
+- [How to set up a local server](#HOW-TO-SET-UP-A-LOCAL-SERVER)
+- [Using Music Blocks](#USING-MUSIC-BLOCKS)
 
 If you are a developer (beginner, experienced, or pro), you are very
 welcome to participate in the evolution of Music Blocks.
@@ -49,14 +49,14 @@ welcome to participate in the evolution of Music Blocks.
 
 - [Code of Conduct](#CODE-OF-CONDUCT)
 - [Contributing](#CONTRIBUTING)
-- [Modifying Music Blocks](#MODIFYING_MUSIC_BLOCKS)
-- [Reporting Bugs](#REPORTING_BUGS)
+- [Modifying Music Blocks](#MODIFYING-MUSIC-BLOCKS)
+- [Reporting Bugs](#REPORTING-BUGS)
 
 **Refer to the following for more information regarding the evolution
   of this project:**
 
 - [Credits](#CREDITS)
-- [Music Blocks in Japan](#MUSIC_BLOCKS_IN_JAPAN)
+- [Music Blocks in Japan](#MUSIC-BLOCKS-IN-JAPAN)
 
 ## <a name="RUNNING_MUSIC_BLOCKS"></a>Running Music Blocks
 
