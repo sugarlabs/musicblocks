@@ -47,7 +47,7 @@ welcome to participate in the evolution of Music Blocks.
 
 **Refer to the following sections to get an idea:**
 
-- [Code of Conduct](#CODEOFCONDUCT)
+- [Code of Conduct](#CODE-OF-CONDUCT)
 - [Contributing](#CONTRIBUTING)
 - [Modifying Music Blocks](#MODIFYING_MUSIC_BLOCKS)
 - [Reporting Bugs](#REPORTING_BUGS)
