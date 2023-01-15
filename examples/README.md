@@ -176,6 +176,10 @@
 
 | Example | Description |
 | --- | --- |
+| heart-and-soul.html | Classic by Hoagy Carmicheal with examples of scalar transposition, chords, and repeats |
+
+| Example | Description |
+| --- | --- |
 | modified-Bach.html | A short excerpt from Bach with two voices |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
