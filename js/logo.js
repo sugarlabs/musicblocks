@@ -1839,20 +1839,21 @@ class Logo {
 
         const suppressOutput = tur.singer.suppressOutput;
 
+        let arg;
         const __pen = (turtle, name, b, timeout) => {
             switch (name) {
-            case "penup":
-            case "pendown":
-                break;
-            default:
-                const arg = this.parseArg(
-                    this,
-                    turtle,
-                    this.blockList[b].connections[1],
-                    b,
-                    this.receivedArg
-                );
-                break;
+                case "penup":
+                case "pendown":
+                    break;
+                default:
+                    arg = this.parseArg(
+                        this,
+                        turtle,
+                        this.blockList[b].connections[1],
+                        b,
+                        this.receivedArg
+                    );
+                    break;
             }
             const _penSwitch = (name) => {
                 switch (name) {
@@ -1907,14 +1908,25 @@ class Logo {
             }
         };
 
-        const __right = (turtle, arg, timeout) => {
+        const __right = (turtle, b, waitTime, stepTime, sign) => {
+            const arg = this.parseArg(
+                this,
+                turtle,
+                this.blockList[b].connections[1],
+                b,
+                this.receivedArg
+            ) * sign;
             if (suppressOutput) {
                 const savedPenState = tur.painter.penState;
                 tur.painter.penState = false;
                 tur.painter.doRight(arg);
                 tur.painter.penState = savedPenState;
             } else {
-                setTimeout(() => tur.painter.doRight(arg), timeout);
+                for (let t = 0; t < NOTEDIV / tur.singer.dispatchFactor; t++) {
+                    const deltaTime = waitTime + t * stepTime * tur.singer.dispatchFactor;
+                    const deltaArg = arg / (NOTEDIV / tur.singer.dispatchFactor);
+                    setTimeout(() => tur.painter.doRight(deltaArg), deltaTime);
+                }
             }
         };
 
@@ -1942,14 +1954,25 @@ class Logo {
             }
         };
 
-        const __forward = (turtle, arg, timeout) => {
+        const __forward = (turtle, b, waitTime, stepTime, sign) => {
+            const arg = this.parseArg(
+                this,
+                turtle,
+                this.blockList[b].connections[1],
+                b,
+                this.receivedArg
+            ) * sign;
             if (suppressOutput) {
                 const savedPenState = tur.painter.penState;
                 tur.painter.penState = false;
                 tur.painter.doForward(arg);
                 tur.painter.penState = savedPenState;
             } else {
-                setTimeout(() => tur.painter.doForward(arg), timeout);
+                for (let t = 0; t < NOTEDIV / tur.singer.dispatchFactor; t++) {
+                    const deltaTime = waitTime + t * stepTime * tur.singer.dispatchFactor;
+                    const deltaArg = arg / (NOTEDIV / tur.singer.dispatchFactor);
+                    setTimeout(() => tur.painter.doForward(deltaArg), deltaTime);
+                }
             }
         };
 
@@ -2059,14 +2082,32 @@ class Logo {
             }, timeout);
         };
 
-        const __arc = (turtle, arg1, arg2, timeout) => {
+        const __arc = (turtle, b, waitTime, stepTime) => {
+            const arg1 = this.parseArg(
+                this,
+                turtle,
+                this.blockList[b].connections[1],
+                b,
+                this.receivedArg
+            );
+            const arg2 = this.parseArg(
+                this,
+                turtle,
+                this.blockList[b].connections[2],
+                b,
+                this.receivedArg
+            );
             if (suppressOutput) {
                 const savedPenState = tur.painter.penState;
                 tur.painter.penState = false;
                 tur.painter.doArc(arg1, arg2);
                 tur.painter.penState = savedPenState;
             } else {
-                setTimeout(() => tur.painter.doArc(arg1, arg2), timeout);
+                for (let t = 0; t < NOTEDIV / tur.singer.dispatchFactor; t++) {
+                    const deltaTime = waitTime + t * stepTime * tur.singer.dispatchFactor;
+                    const deltaArg = arg1 / (NOTEDIV / tur.singer.dispatchFactor);
+                    setTimeout(() => tur.painter.doArc(deltaArg, arg2), deltaTime);
+                }
             }
         };
 
@@ -2341,74 +2382,22 @@ class Logo {
                     break;
 
                 case "right":
-                    arg = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[1],
-                        b,
-                        this.receivedArg
-                    );
-
-                    for (let t = 0; t < NOTEDIV / tur.singer.dispatchFactor; t++) {
-                        const deltaTime = waitTime + t * stepTime * tur.singer.dispatchFactor;
-                        const deltaArg = arg / (NOTEDIV / tur.singer.dispatchFactor);
-                        __right(turtle, deltaArg, deltaTime);
-                    }
-
+                    __right(turtle, b, waitTime, stepTime, 1);
                     waitTime += NOTEDIV * stepTime;
                     break;
 
                 case "left":
-                    arg = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[1],
-                        b,
-                        this.receivedArg
-                    );
-
-                    for (let t = 0; t < NOTEDIV / tur.singer.dispatchFactor; t++) {
-                        const deltaTime = waitTime + t * stepTime * tur.singer.dispatchFactor;
-                        const deltaArg = arg / (NOTEDIV / tur.singer.dispatchFactor);
-                        __right(turtle, -deltaArg, deltaTime);
-                    }
-
+                    __right(turtle, b, waitTime, stepTime, -1);
                     waitTime += NOTEDIV * stepTime;
                     break;
 
                 case "forward":
-                    arg = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[1],
-                        b,
-                        this.receivedArg
-                    );
-
-                    for (let t = 0; t < NOTEDIV / tur.singer.dispatchFactor; t++) {
-                        const deltaTime = waitTime + t * stepTime * tur.singer.dispatchFactor;
-                        const deltaArg = arg / (NOTEDIV / tur.singer.dispatchFactor);
-                        __forward(turtle, deltaArg, deltaTime);
-                    }
-
+                    __forward(turtle, b, waitTime, stepTime, 1);
                     waitTime += NOTEDIV * stepTime;
                     break;
 
                 case "back":
-                    arg = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[1],
-                        b,
-                        this.receivedArg
-                    );
-
-                    for (let t = 0; t < NOTEDIV / tur.singer.dispatchFactor; t++) {
-                        const deltaTime = waitTime + t * stepTime * tur.singer.dispatchFactor;
-                        const deltaArg = arg / (NOTEDIV / tur.singer.dispatchFactor);
-                        __forward(turtle, -deltaArg, deltaTime);
-                    }
-
+                    __forward(turtle, b, waitTime, stepTime, -1);
                     waitTime += NOTEDIV * stepTime;
                     break;
 
@@ -2461,32 +2450,11 @@ class Logo {
                     break;
 
                 case "arc":
-                    arg1 = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[1],
-                        b,
-                        this.receivedArg
-                    );
-                    arg2 = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[2],
-                        b,
-                        this.receivedArg
-                    );
-
-                    for (let t = 0; t < NOTEDIV / tur.singer.dispatchFactor; t++) {
-                        const deltaTime = waitTime + t * stepTime * tur.singer.dispatchFactor;
-                        const deltaArg = arg1 / (NOTEDIV / tur.singer.dispatchFactor);
-                        __arc(turtle, deltaArg, arg2, deltaTime);
-                    }
-
+                    __arc(turtle, b, waitTime, stepTime);
                     waitTime += NOTEDIV * stepTime;
                     break;
 
                 default:
-                    // console.debug(name + " is not supported inside of Note Blocks");
                     break;
             }
         }
