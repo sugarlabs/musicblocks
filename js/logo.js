@@ -1369,6 +1369,10 @@ class Logo {
                 }
                 if (
                     logo.activity.turtles.ithTurtle(turtle).singer.inNoteBlock.length > 0 &&
+                    logo.blockList[blk].connections[i] !== undefined &&
+                    logo.blockList[
+                        logo.blockList[blk].connections[i]
+                    ] !== undefined &&
                     logo.blockList[
                         logo.blockList[blk].connections[i]
                     ].name === "currentpitch"
@@ -2055,31 +2059,48 @@ class Logo {
             }
         };
 
-        const __show = (turtle, arg1, arg2, timeout) => {
+        const __show = (turtle, b, timeout) => {
             if (suppressOutput) return;
-
+            const arg1 = this.parseArg(
+                this,
+                turtle,
+                this.blockList[b].connections[1],
+                b,
+                this.receivedArg
+            );
+            const arg2 = this.parseArg(
+                this,
+                turtle,
+                this.blockList[b].connections[2],
+                b,
+                this.receivedArg
+            );
             setTimeout(() => this.processShow(turtle, null, arg1, arg2), timeout);
         };
 
-        const __speak = (turtle, arg, timeout) => {
+        const __speak = (turtle, b, timeout) => {
             if (suppressOutput) return;
-
+            const arg = this.parseArg(
+                this,
+                turtle,
+                this.blockList[b].connections[1],
+                b,
+                this.receivedArg
+            );
             setTimeout(() => this.processSpeak(arg), timeout);
         };
 
-        const __print = (arg, b, timeout) => {
+        const __print = (turtle, b, timeout) => {
             if (suppressOutput) return;
+            const arg = this.parseArg(
+                this,
+                turtle,
+                this.blockList[b].connections[1],
+                b,
+                this.receivedArg
+            );
             if (arg === undefined) return;
-            setTimeout(() => {
-                const arg_ = this.parseArg(
-                    this,
-                    turtle,
-                    this.blockList[b].connections[1],
-                    b,
-                    this.receivedArg
-                );
-                this.activity.textMsg(arg_.toString());
-            }, timeout);
+            setTimeout(() => this.activity.textMsg(arg.toString()), timeout);
         };
 
         const __arc = (turtle, b, waitTime, stepTime) => {
@@ -2330,8 +2351,6 @@ class Logo {
             const b = tur.singer.embeddedGraphics[blk][i];
             const name = this.blockList[b].name;
 
-            let arg, arg1, arg2;
-
             switch (name) {
                 case "setcolor":
                 case "sethue":
@@ -2410,43 +2429,15 @@ class Logo {
                     break;
 
                 case "show":
-                    arg1 = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[1],
-                        b,
-                        this.receivedArg
-                    );
-                    arg2 = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[2],
-                        b,
-                        this.receivedArg
-                    );
-                    __show(turtle, arg1, arg2, waitTime);
+                    __show(turtle, b, waitTime);
                     break;
 
                 case "speak":
-                    arg = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[1],
-                        b,
-                        this.receivedArg
-                    );
-                    __speak(turtle, arg, waitTime);
+                    __speak(turtle, b, waitTime);
                     break;
 
                 case "print":
-                    arg = this.parseArg(
-                        this,
-                        turtle,
-                        this.blockList[b].connections[1],
-                        b,
-                        this.receivedArg
-                    );
-                    __print(arg, b, waitTime);
+                    __print(turtle, b, waitTime);
                     break;
 
                 case "arc":
