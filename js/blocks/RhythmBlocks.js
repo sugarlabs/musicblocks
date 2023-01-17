@@ -810,8 +810,11 @@ function setupRhythmBlocks(activity) {
                 tur.queue.push(queueBlock);
             };
 
+            const tur = activity.turtles.ithTurtle(turtle);
+            if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.delayedNotes.push([blk, value]);
+            }
             Singer.RhythmActions.playNote(value, "newnote", turtle, blk, _callback);
-
             return [args[1], 1];
         }
     }

@@ -95,6 +95,8 @@ class Singer {
         this.noteHertz = {};
         this.noteBeatValues = {};
         this.embeddedGraphics = {};
+        this.delayedNotes = [];
+        // this.embeddedNotes = {};
         this.lastNotePlayed = null;
         this.lastPitchPlayed = {}; // for a stand-alone pitch block
         this.previousNotePlayed = null;
@@ -1172,6 +1174,8 @@ class Singer {
         let doChorus = false;
         let doNeighbor = false;
         let filters = null;
+        let noteInNote = false;
+        let future = 0;
 
         // Apply any effects and filters associated with a custom timbre
         if (tur.inSetTimbre && last(tur.singer.instrumentNames)) {
@@ -1619,9 +1623,24 @@ class Singer {
                     if (!tur.singer.suppressOutput) {
                         tur.doWait(Math.max(bpmFactor / duration - turtleLag, 0));
                     }
+                    // Clear the list when the last note is played.
+                    tur.singer.delayedNotes = [];
+                } else {
+                    // Notes within Notes need to be played in the "future".
+                    noteInNote = true;
+                    future = 0;
+                    for (let i = 0; i < tur.singer.delayedNotes.length; i++) {
+                        if (i > 0) {
+                            future += (bpmFactor * tur.singer.delayedNotes[i - 1][1]);
+                        }
+                        if (tur.singer.delayedNotes[i][0] === blk) {
+                            break;
+                        }
+                    }
+                    // eslint-disable-next-line no-console
+                    console.log("Note in note " + blk + " delay " + future);
                 }
             }
-
             let forceSilence = false;
             if (tur.singer.skipFactor > 1) {
                 if (tur.singer.skipIndex % tur.singer.skipFactor > 0) {
@@ -1634,7 +1653,6 @@ class Singer {
             const chordDrums = [];
             const __playnote = () => {
                 const thisBlk = last(tur.singer.inNoteBlock);
-
                 // Rest?
                 if (tur.singer.notePitches[thisBlk] === undefined) return;
 
@@ -1681,7 +1699,8 @@ class Singer {
                 // to infinity or NaN.
                 if (!isFinite(duration)) return;
 
-                // Use the beatValue of the first note in the group since there can only be one
+                // Use the beatValue of the first note in the group
+                // since there can only be one.
                 const portamento = tur.singer.glide.length > 0 ? last(tur.singer.glide) : 0;
 
                 let beatValue = bpmFactor / noteBeatValue;
@@ -1966,7 +1985,8 @@ class Singer {
                                             last(tur.singer.oscList[thisBlk]),
                                             paramsEffects,
                                             null,
-                                            false
+                                            false,
+                                            future
                                         );
                                     }
                                 } else if (
@@ -1982,7 +2002,8 @@ class Singer {
                                             last(tur.singer.drumStyle),
                                             null,
                                             null,
-                                            false
+                                            false,
+                                            future
                                         );
                                     }
                                 } else {
@@ -2000,7 +2021,8 @@ class Singer {
                                                     tur.singer.pitchDrumTable[notes[d]],
                                                     null,
                                                     null,
-                                                    false
+                                                    false,
+                                                    future
                                                 );
                                             }
                                         } else if (last(tur.singer.instrumentNames)) {
@@ -2015,7 +2037,8 @@ class Singer {
                                                             last(tur.singer.instrumentNames),
                                                             paramsEffects,
                                                             filters,
-                                                            true
+                                                            true,
+                                                            future
                                                         );
                                                     } else {
                                                         // trigger first note for entire duration of the glissando
@@ -2028,7 +2051,8 @@ class Singer {
                                                             last(tur.singer.instrumentNames),
                                                             paramsEffects,
                                                             filters,
-                                                            false
+                                                            false,
+                                                            future
                                                         );
                                                         tur.singer.glideOverride = 0;
                                                     }
@@ -2040,7 +2064,8 @@ class Singer {
                                                         last(tur.singer.instrumentNames),
                                                         paramsEffects,
                                                         filters,
-                                                        false
+                                                        false,
+                                                        future
                                                     );
                                                 }
                                             }
@@ -2056,7 +2081,8 @@ class Singer {
                                                     last(tur.singer.voices),
                                                     paramsEffects,
                                                     null,
-                                                    false
+                                                    false,
+                                                    future
                                                 );
                                             }
                                         } else {
@@ -2068,7 +2094,8 @@ class Singer {
                                                     DEFAULTVOICE,
                                                     paramsEffects,
                                                     null,
-                                                    false
+                                                    false,
+                                                    future
                                                 );
                                             }
                                         }
@@ -2127,7 +2154,8 @@ class Singer {
                                                 last(tur.singer.drumStyle),
                                                 null,
                                                 null,
-                                                false
+                                                false,
+                                                future
                                             );
                                         }
                                     } else {
@@ -2139,14 +2167,16 @@ class Singer {
                                                 drums[i],
                                                 null,
                                                 null,
-                                                false
+                                                false,
+                                                future
                                             );
                                         }
                                     }
                                 }
                             }
                         }
-                        // If the drum is played by itself, we need to update the lastNotePlayed.
+                        // If the drum is played by itself, we need to
+                        // update the lastNotePlayed.
                         if (notes.length === 0) {
                             tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
                             tur.singer.lastNotePlayed = ["C2", noteBeatValue];
@@ -2162,7 +2192,8 @@ class Singer {
                     }
                 }
 
-                // While we tie notes together, we don't want to tie the corresponding graphics
+                // While we tie notes together, we don't want to tie
+                // the corresponding graphics.
                 if (tur.singer.tie && noteBeatValue === 0) {
                     if (tieDelay > 0) {
                         activity.logo.dispatchTurtleSignals(
@@ -2192,7 +2223,7 @@ class Singer {
                     }
                 }
 
-                // After the note plays, clear the embedded graphics queue
+                // After the note plays, clear the embedded graphics and notes queue.
                 tur.singer.embeddedGraphics[blk] = [];
 
                 // Ensure note value block unhighlights after note plays.
@@ -2203,7 +2234,7 @@ class Singer {
                 }, beatValue * 1000);
             };
 
-            if (last(tur.singer.inNoteBlock) !== null) {
+            if (last(tur.singer.inNoteBlock) !== null || noteInNote) {
                 __playnote();
 
                 if (activity.logo.specialArgs.length > 0) {
