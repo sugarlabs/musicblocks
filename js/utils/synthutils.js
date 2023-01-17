@@ -1224,7 +1224,7 @@ function Synth() {
         return null;
     };
 
-    this._performNotes = function (synth, notes, beatValue, paramsEffects, paramsFilters, setNote) {
+    this._performNotes = function (synth, notes, beatValue, paramsEffects, paramsFilters, setNote, future) {
         if (this.inTemperament !== "equal" && !isCustomTemperament(this.inTemperament)) {
             if (typeof notes === "number") {
                 notes = notes;
@@ -1253,14 +1253,12 @@ function Synth() {
 
         if (isCustomTemperament(this.inTemperament)) {
             const notes1 = notes;
-            console.log(notes);
             if (notes.search("[+]") !== -1 || notes.search("[-]") !== -1) {
                 notes = this.getCustomFrequency(notes, this.inTemperament);
             }
             if (notes === undefined || notes === "undefined") {
                 notes = notes1;
             }
-            console.debug(notes);
             /* eslint-enable */
         }
 
@@ -1269,7 +1267,7 @@ function Synth() {
         if (paramsEffects === null && paramsFilters === null) {
             // See https://github.com/sugarlabs/musicblocks/issues/2951
             try {
-                synth.triggerAttackRelease(notes, beatValue, Tone.now() + 0.0);
+                synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
             } catch(e) {
                 // eslint-disable-next-line no-console
                 console.debug(e);
@@ -1400,7 +1398,7 @@ function Synth() {
                         }
                     }
                 } else {
-                    synth.triggerAttackRelease(notes, beatValue);
+                    synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
                 }
             }
 
@@ -1448,7 +1446,8 @@ function Synth() {
         instrumentName,
         paramsEffects,
         paramsFilters,
-        setNote
+        setNote,
+        future
     ) {
         // eslint-disable-next-line no-console
         console.debug(
@@ -1464,7 +1463,9 @@ function Synth() {
                 " " +
                 paramsFilters +
                 " " +
-                setNote
+                setNote +
+                " " +
+                future
         );
         // Effects don't work with sine, sawtooth, et al.
         if (["sine", "sawtooth", "triangle", "square"].indexOf(instrumentName) !== -1) {
@@ -1509,18 +1510,21 @@ function Synth() {
         }
 
         // Get note values as per the source of the synth.
+        if (future === undefined) {
+            future = 0.0;
+        }
         switch (flag) {
             case 1: // drum
                 if (
                     instrumentName.slice(0, 4) === "http" ||
                     instrumentName.slice(0, 21) === "data:audio/wav;base64"
                 ) {
-                    tempSynth.start(Tone.now() + 0.0);
+                    tempSynth.start(Tone.now() + future);
                 } else if (instrumentName.slice(0, 4) === "file") {
-                    tempSynth.start(Tone.now() + 0.0);
+                    tempSynth.start(Tone.now() + future);
                 } else {
                     try {
-                        tempSynth.start(Tone.now() + 0.0);
+                        tempSynth.start(Tone.now() + future);
                     } catch (e) {
                         // Occasionally we see "Start time must be
                         // strictly greater than previous start time"
@@ -1536,7 +1540,8 @@ function Synth() {
                     beatValue,
                     paramsEffects,
                     paramsFilters,
-                    setNote
+                    setNote,
+                    future
                 );
                 break;
             case 3: // builtin synth
@@ -1550,11 +1555,12 @@ function Synth() {
                     beatValue,
                     paramsEffects,
                     paramsFilters,
-                    setNote
+                    setNote,
+                    future
                 );
                 break;
             case 4:
-                tempSynth.triggerAttackRelease("c2", beatValue);
+                tempSynth.triggerAttackRelease("c2", beatValue, Tone.now + future);
                 break;
             case 0: // default synth
             default:
@@ -1564,7 +1570,8 @@ function Synth() {
                     beatValue,
                     paramsEffects,
                     paramsFilters,
-                    setNote
+                    setNote,
+                    future
                 );
                 break;
         }
