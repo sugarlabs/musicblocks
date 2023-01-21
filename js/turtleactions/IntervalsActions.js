@@ -294,6 +294,38 @@ function setupIntervalsActions(activity) {
         }
 
         /**
+         * "ratio interval" block.
+         * Calculates a relative interval based on a ratio.
+         *
+         * @static
+         * @param {Number} value - ratio
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number|String} [blk] - corresponding Block index in blocks.blockList
+         * @returns {void}
+         */
+        static setRatioInterval(value, turtle, blk) {
+            let arg = value;
+            if (arg === null || typeof arg !== "number") {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                arg = 1;
+            }
+
+            const tur = activity.turtles.ithTurtle(turtle);
+            tur.singer.ratioIntervals.push(value);
+            const listenerName = "_ratio_interval_" + turtle;
+            if (blk !== undefined && blk in activity.blocks.blockList) {
+                activity.logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                const mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
+            }
+
+            const __listener = () => tur.singer.ratioIntervals.pop();
+
+            activity.logo.setTurtleListener(turtle, listenerName, __listener);
+        }
+
+        /**
          * "temperament" block.
          * Sets the tuning system used by Music Blocks.
          *

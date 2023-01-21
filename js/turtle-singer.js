@@ -136,6 +136,7 @@ class Singer {
         this.crescendoInitialVolume = { DEFAULTVOICE: [DEFAULTVOLUME] };
         this.intervals = []; // relative interval (based on scale degree)
         this.semitoneIntervals = []; // absolute interval (based on semitones)
+        this.ratioIntervals = []; // ratio based on hertz value
         this.staccato = [];
         this.glide = [];
         this.glideOverride = 0;
@@ -956,6 +957,21 @@ class Singer {
                     activity.logo.synth.inTemperament
                 );
                 addPitch(noteObj2[0], noteObj2[1], cents, tur.singer.semitoneIntervals[i][1]);
+            }
+
+            for (let i = 0; i < tur.singer.ratioIntervals.length; i++) {
+                // Now that we have the note, we need to:
+                // (1) convert it to Hertz
+                // (2) apply the ratio
+                // (3) convert it to pitch, octave, cents
+                const hertz = pitchToFrequency(
+                    noteObj1[0],
+                    noteObj1[1],
+                    0,
+                    tur.singer.keySignature
+                ) * tur.singer.ratioIntervals[i];
+                const noteObj2 = frequencyToPitch(hertz);
+                addPitch(noteObj2[0], noteObj2[1], noteObj2[2]);
             }
 
             if (tur.singer.inNoteBlock.length > 0) {

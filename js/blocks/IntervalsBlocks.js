@@ -717,6 +717,47 @@ function setupIntervalsBlocks(activity) {
     }
     
 
+    class RatioIntervalBlock extends FlowClampBlock {
+        constructor() {
+            super("ratiointerval");
+            this.setPalette("intervals", activity);
+            this.setHelpString([
+                _("The Ratio block calculates an interval based on a ratio."),
+                "documentation",
+                ""
+            ]);
+            this.formBlock({
+                name: _("ratio"),
+                args: 1,
+                argTypes: ["anyin"],
+                defaults: [3 / 2]  // fifth
+            });
+            this.makeMacro((x, y) => [
+                [0, "ratiointerval", x, y, [null, 1, 4, 5]],
+                [1, "divide", 0, 0, [0, 2, 3]],
+                [2, ["number", {"value": 3}], 0, 0, [1]],
+                [3, ["number", {"value": 2}], 0, 0, [1]],
+                [4, "vspace", 0, 0, [0, null]],
+                [5, "hidden", 0, 0, [0, null]]
+            ]);
+        }
+
+        flow(args, logo, turtle, blk) {
+            if (args[1] === undefined) return;
+            let r = args[0];
+            if (isNaN(r) || r < 1.0) {
+                r = 1;
+                // eslint-disable-next-line no-console
+                console.debug("ratio " + r + " must be a number >= 1");
+            }
+            Singer.IntervalsActions.setRatioInterval(
+                r, turtle, blk
+            );
+            return [args[1], 1];
+        }
+    }
+    
+
     class ScalarIntervalBlock extends FlowClampBlock {
         constructor() {
             super("interval");
@@ -1003,6 +1044,7 @@ function setupIntervalsBlocks(activity) {
     new PerfectBlock().setup(activity);
     new ArpeggioBlock().setup(activity);
     new ChordIntervalBlock().setup(activity);
+    new RatioIntervalBlock().setup(activity);
     new SemitoneIntervalBlock().setup(activity);
     // makeIntervalMacroBlocks();
     new ScalarIntervalBlock().setup(activity);
