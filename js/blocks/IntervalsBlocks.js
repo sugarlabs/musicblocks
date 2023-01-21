@@ -722,12 +722,12 @@ function setupIntervalsBlocks(activity) {
             super("ratiointerval");
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _("The Ratio block calculates an interval based on a ratio."),
+                _("The Ratio Interval block calculates an interval based on a ratio."),
                 "documentation",
                 ""
             ]);
             this.formBlock({
-                name: _("ratio"),
+                name: _("ratio interval"),
                 args: 1,
                 argTypes: ["anyin"],
                 defaults: [3 / 2]  // fifth
