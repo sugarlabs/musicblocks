@@ -80,6 +80,7 @@ class Singer {
         this.scalarTranspositionValues = [];
         this.transposition = 0;
         this.transpositionValues = [];
+        this.transpositionRatios = [];
 
         // Parameters used by notes
         this.register = 0;
@@ -900,7 +901,7 @@ class Singer {
                     }
                 }
 
-                const noteObj = getNote(
+                let noteObj = getNote(
                     anote,
                     octave,
                     // FIXME: should not be hardwired to 12
@@ -911,6 +912,25 @@ class Singer {
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
                 );
+
+                // Apply ratio transposition:
+                // (1) convert note to Hertz
+                // (2) apply ratio
+                // (3) convert back to pitch, octave, cents
+                let ratio = 1;
+                for (let i = 0; i < tur.singer.transpositionRatios.length; i++) {
+                    ratio *= tur.singer.transpositionRatios[i];
+                }
+                if (ratio != 1) {
+                    const hertz = pitchToFrequency(
+                        noteObj[0],
+                        noteObj[1],
+                        0,
+                        tur.singer.keySignature
+                    ) * ratio;
+                    noteObj = frequencyToPitch(hertz);
+                }
+
 
                 if (tur.singer.drumStyle.length > 0) {
                     const drumname = last(tur.singer.drumStyle);
