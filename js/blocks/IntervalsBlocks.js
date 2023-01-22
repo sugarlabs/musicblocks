@@ -745,10 +745,10 @@ function setupIntervalsBlocks(activity) {
         flow(args, logo, turtle, blk) {
             if (args[1] === undefined) return;
             let r = args[0];
-            if (isNaN(r) || r < 1.0) {
+            if (isNaN(r) || r < 0) {
                 r = 1;
                 // eslint-disable-next-line no-console
-                console.debug("ratio " + r + " must be a number >= 1");
+                console.debug("ratio " + r + " must be a number > 0");
             }
             Singer.IntervalsActions.setRatioInterval(
                 r, turtle, blk

@@ -1081,13 +1081,13 @@ function setupPitchBlocks(activity) {
             super("setratio");
             this.setPalette("pitch", activity);
             this.setHelpString([
-                _("The Ratio transposition block will shift the pitches contained inside Note blocks up (or down) by a ratio"),
+                _("The Transpose by Ratio block will shift the pitches contained inside Note blocks up (or down) by a ratio"),
                 "documentation",
                 ""
             ]);
             this.formBlock({
                 //.TRANS: adjust the amount of shift (up or down) of a pitch
-                name: _("ratio transpose"),
+                name: _("transpose by ratio"),
                 args: 1,
                 defaults: [3 / 2]
             });
