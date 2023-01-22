@@ -805,7 +805,7 @@ octave shift dowm; 3/2 would be a fifth.
 
 ![ratio interval](../documentation/ratiointerval_block.svg "Ratio Interval example")
 
-The *Ratio Interval* block lets you generate an interval based on a a
+The *Ratio Interval* block lets you generate an interval based on a
 ratio.
 
 #### <a name= "CHORDS">3.2.8 Chords</a>
