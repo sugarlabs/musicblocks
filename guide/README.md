@@ -2260,8 +2260,10 @@ then saved to a "custom" chord, which can be used with the *Arpeggio* block.
 
 The numeric argument to the widget block, ```12``` in the figure
 above, designates the number of columns. The widget always provides a
-range of 12 half-steps (one octave in the default a [12-step
-equal-temperament tuning](#412-changing-temperament)).
+range of half-steps (one octave in the default a [12-step
+equal-temperament tuning](#412-changing-temperament)). (If you are in
+a temperament with more notes per ocatve, the grid will expand.) The
+rows that represent notes in the current mode are highlighted.
 
 ![widget](./arpeggio_widget.svg "Arpeggio_widget")
 
