@@ -19,7 +19,8 @@
    NOTENAMES, NOTENAMES1, getPitchInfo, YSTAFFOCTAVEHEIGHT,
    YSTAFFNOTEHEIGHT, MUSICALMODES, keySignatureToMode, ALLNOTENAMES,
    nthDegreeToPitch, A0, C8, calcOctave, SOLFEGECONVERSIONTABLE,
-   NOTESFLAT, NOTESSHARP, NOTESTEP, scaleDegreeToPitchMapping
+   NOTESFLAT, NOTESSHARP, NOTESTEP, scaleDegreeToPitchMapping,
+   INTERVALVALUES
  */
 
 /* exported setupPitchBlocks */
@@ -1103,12 +1104,29 @@ function setupPitchBlocks(activity) {
 
         flow(args, logo, turtle, blk) {
             if (args[1] === undefined) return;
-
-            if (args[0] !== null && typeof args[0] === "number" && args[0] > 0) {
-                Singer.PitchActions.setRatioTranspose(args[0], turtle, blk);
-
-                return [args[1], 1];
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            let r = args[0];
+            if (cblk === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                r = 1;
+            } else if (activity.blocks.blockList[cblk].name === "intervalname") {
+                const intervalName = activity.blocks.blockList[cblk].value;
+                if (intervalName in INTERVALVALUES) {
+                    r = INTERVALVALUES[intervalName][2];
+                } else {
+                    // eslint-disable-next-line no-console
+                    console.log("could not find " + intervalName + " in INTERVALVALUES");
+                    r = 1;
+                }
             }
+
+            if (isNaN(r) || r < 0) {
+                r = 1;
+                // eslint-disable-next-line no-console
+                console.debug("ratio " + r + " must be a number > 0");
+            }
+            Singer.PitchActions.setRatioTranspose(r, turtle, blk);
+            return [args[1], 1];
         }
     }
 

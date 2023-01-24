@@ -377,6 +377,10 @@ function Synth() {
         this.tone = Tone;
     };
 
+    this.whichTemperament = function() {
+        return this.inTemperament;
+    };
+
     this.temperamentChanged = function (temperament, startingPitch) {
         let startPitch = startingPitch;
         const t = getTemperament(temperament);

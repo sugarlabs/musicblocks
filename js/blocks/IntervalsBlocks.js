@@ -13,7 +13,8 @@
    global
 
    last, _, ValueBlock, FlowClampBlock, FlowBlock, NOINPUTERRORMSG,
-   LeftBlock, Singer, CHORDNAMES, CHORDVALUES, DEFAULTCHORD, Queue
+   LeftBlock, Singer, CHORDNAMES, CHORDVALUES, DEFAULTCHORD,
+   Queue, INTERVALVALUES
  */
 
 /*
@@ -702,13 +703,13 @@ function setupIntervalsBlocks(activity) {
                 i = CHORDNAMES.indexOf(DEFAULTCHORD);
             }
             for (let ii = 0; ii < CHORDVALUES[i].length; ii++) {
-                if (isNaN(CHORDVALUES[i][ii])) {
+                if (isNaN(CHORDVALUES[i][ii][0])) {
                     continue;
                 }
-                if (CHORDVALUES[i][ii] === 0) {
+                if (CHORDVALUES[i][ii][0] === 0 && CHORDVALUES[i][ii][1] === 0) {
                     continue;
                 }
-                Singer.IntervalsActions.setSemitoneInterval(
+                Singer.IntervalsActions.setChordInterval(
                     CHORDVALUES[i][ii], turtle, blk
                 );
             }
@@ -744,7 +745,22 @@ function setupIntervalsBlocks(activity) {
 
         flow(args, logo, turtle, blk) {
             if (args[1] === undefined) return;
+            const cblk = activity.blocks.blockList[blk].connections[1];
             let r = args[0];
+            if (cblk === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                r = 1;
+            } else if (activity.blocks.blockList[cblk].name === "intervalname") {
+                const intervalName = activity.blocks.blockList[cblk].value;
+                if (intervalName in INTERVALVALUES) {
+                    r = INTERVALVALUES[intervalName][2];
+                } else {
+                    // eslint-disable-next-line no-console
+                    console.log("could not find " + intervalName + " in INTERVALVALUES");
+                    r = 1;
+                }
+            }
+
             if (isNaN(r) || r < 0) {
                 r = 1;
                 // eslint-disable-next-line no-console

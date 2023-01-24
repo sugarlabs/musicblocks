@@ -137,7 +137,7 @@ it. Follow [Using Music Blocks](./documentation/README.md) and [Music
 Blocks Guide](./guide/README.md).
 
 Looking for a block? Find it in the
-[Palette Tables](./guide/README.md#APPENDIX_1).
+[Palette Tables](./guide/README.md#6-appendix).
 
 ## <a name="CODEOFCONDUCT"></a>Code of Conduct
 
