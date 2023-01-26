@@ -4208,6 +4208,19 @@ msgstr "sine"
 msgid "sawtooth"
 msgstr "diente de sierra"
 
+msgid "The Transpose by Ratio block will shift the pitches contained inside Note blocks up (or down) by a ratio"
+
+msgstr "El bloque transponer por razón cambiará los tonos contenidos dentro de los bloques de notas hacia arriba (o hacia abajo) en una proporción"
+
+msgid "transpose by ratio"
+msgstr "transponer por razón"
+
+msgid "The Ratio Interval block calculates an interval based on a ratio."
+msgstr "El bloque intervalo de razón calcula un intervalo basado en una razón".
+
+msgid "ratio interval"
+msgstr "intervalo de razón"
+
 #: js/PitchBlocks.js:140
 #.TRANS: musical transposition (adjustment of pitch up or down)
 msgid "transposition"
@@ -5951,6 +5964,15 @@ msgstr "descanso"
 #.TRANS: ordinal number. Please keep exactly one space between each number.
 msgid "1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th"
 msgstr "1º 2º 3º 4º 5º 6º 7º 8º 9º 10º 11º 12º"
+
+msgid "chromatic semitone"
+msgstr "semitono cromático"
+
+msgid "whole tone"
+msgstr "tono completo"
+
+msgid "diminished octave"
+msgstr "octava disminuida"
 
 #: js/musicutils.js:606
 #: js/musicutils.js:808

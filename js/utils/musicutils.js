@@ -52,7 +52,8 @@
   convertFactor, getOctaveRatio, setOctaveRatio, getTemperamentsList,
   addTemperamentToList, getTemperament, deleteTemperamentFromList,
   addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
-  DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS
+  DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
+  INTERVALVALUES, getIntervalRatio
 */
 
 // Scalable sinewave graphic
@@ -818,19 +819,18 @@ const CHORDNAMES = [
 
 const DEFAULTCHORD = CHORDNAMES[0];
 
-// This list must follow the order of the CHORDNAMES list.
 const CHORDVALUES = [
-    [0, 4, 7],
-    [0, 3, 7],
-    [0, 4, 8],
-    [0, 3, 6],
-    [0, 4, 7, 11],
-    [0, 3, 7, 10],
-    [0, 4, 7, 10],
-    [0, 3, 7, 11],
-    [0, 3, 6, 9],
-    [0, 3, 6, 10],
-    [0, 4, 7]
+    [[0, 0], [2, 0], [4, 0]],
+    [[0, 0], [2, -1], [4, 0]],
+    [[0, 0], [2, 0], [4, +1]],
+    [[0, 0], [2, -1], [4, -1]],
+    [[0, 0], [2, 0], [4, 0], [6, 0]],
+    [[0, 0], [2, -1], [4, 0], [6, -1]],
+    [[0, 0], [2, 0], [4, 0], [6, -1]],
+    [[0, 0], [2, -1], [4, 0], [6, 0]],
+    [[0, 0], [2, -1], [4, -1], [6, -2]],
+    [[0, 0], [2, 0], [4, -1], [6, -1]],
+    [[0, 0], [2, 0], [4, 0]],
 ];
 
 const setCustomChord = (chord) => {
@@ -851,35 +851,39 @@ const INTERVALS = [
     [_("major"), "major", [2, 3, 6, 7]]
 ];
 
-// [semi-tones, direction -1 === down; 0 === neutral; 1 === up]
+// [semi-tones, direction (-1 === down; 0 === neutral; 1 === up), ratio]
 const INTERVALVALUES = {
-    "perfect 1": [0, 0],
-    "augmented 1": [1, 1],
-    "diminished 2": [0, -1],
-    "minor 2": [1, -1],
-    "major 2": [2, 1],
-    "augmented 2": [3, 1],
-    "diminished 3": [2, -1],
-    "minor 3": [3, -1],
-    "major 3": [4, 1],
-    "augmented 3": [5, 1],
-    "diminished 4": [4, -1],
-    "perfect 4": [5, 0],
-    "augmented 4": [6, 1],
-    "diminished 5": [6, -1],
-    "perfect 5": [7, 0],
-    "augmented 5": [8, 1],
-    "diminished 6": [7, -1],
-    "minor 6": [8, -1],
-    "major 6": [9, 1],
-    "augmented 6": [10, 1],
-    "diminished 7": [9, -1],
-    "minor 7": [10, -1],
-    "major 7": [11, 1],
-    "augmented 7": [12, 1],
-    "diminished 8": [11, -1],
-    "perfect 8": [12, 0],
-    "augmented 8": [13, 1]
+    "perfect 1": [0, 0, 1 / 1],
+    "diminished 2": [0, -1, 128 / 125],
+    "augmented 1": [1, 1, 25 / 24],
+    "chromatic semitone": [1, 1, 25 / 24],
+    "minor 2": [1, -1, 16 / 15],
+    "major 2": [2, 1, 9 / 8],
+    "whole tone": [2, 1, 9 / 8],
+    "diminished 3": [2, -1, 144 / 125],
+    "augmented 2": [3, 1, 75 / 64],
+    "minor 3": [3, -1, 6 / 5],
+    "major 3": [4, 1, 5 / 4],
+    "diminished 4": [4, -1, 32 / 25],
+    "augmented 3": [5, 1, 125 / 96],
+    "perfect 4": [5, 0, 4 / 3],
+    "augmented 4": [6, 1, 25 / 18],
+    "diminished 5": [6, -1, 36 / 25],
+    "perfect 5": [7, 0, 3 / 2],
+    "diminished 6": [7, -1, 192 / 125],
+    "augmented 5": [8, 1, 25 / 16],
+    "minor 6": [8, -1, 8 / 5],
+    "major 6": [9, 1, 5 / 3],
+    "diminished 7": [9, -1, 9 / 5],
+    "augmented 6": [10, 1, 125 / 72],
+    "minor 7": [10, -1, 9 / 5],
+    "major 7": [11, 1, 15 / 8],
+    "diminished 8": [11, -1, 48 / 25],
+    "diminished octave": [11, -1, 48 / 25],
+    "augmented 7": [12, 1, 125 / 64],
+    "perfect 8": [12, 0, 2 / 1],
+    "octave": [12, 0, 2 / 1],
+    "augmented 8": [13, 1, 25 / 12]
 };
 
 // This list of modes is used in the pie menu associated with the mode
@@ -1419,6 +1423,10 @@ function getIntervalNumber(name) {
 
 function getIntervalDirection(name) {
     return INTERVALVALUES[name][1];
+}
+
+function getIntervalRatio(name) {
+    return INTERVALVALUES[name][2];
 }
 
 function getModeNumbers(name) {

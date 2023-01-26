@@ -19,7 +19,8 @@
    NOTENAMES, NOTENAMES1, getPitchInfo, YSTAFFOCTAVEHEIGHT,
    YSTAFFNOTEHEIGHT, MUSICALMODES, keySignatureToMode, ALLNOTENAMES,
    nthDegreeToPitch, A0, C8, calcOctave, SOLFEGECONVERSIONTABLE,
-   NOTESFLAT, NOTESSHARP, NOTESTEP, scaleDegreeToPitchMapping
+   NOTESFLAT, NOTESSHARP, NOTESTEP, scaleDegreeToPitchMapping,
+   INTERVALVALUES
  */
 
 /* exported setupPitchBlocks */
@@ -1075,6 +1076,60 @@ function setupPitchBlocks(activity) {
         }
     }
 
+
+    class SetRatioTranspositionBlock extends FlowClampBlock {
+        constructor() {
+            super("setratio");
+            this.setPalette("pitch", activity);
+            this.setHelpString([
+                _("The Transpose by Ratio block will shift the pitches contained inside Note blocks up (or down) by a ratio"),
+                "documentation",
+                ""
+            ]);
+            this.formBlock({
+                //.TRANS: adjust the amount of shift (up or down) of a pitch
+                name: _("transpose by ratio"),
+                args: 1,
+                defaults: [3 / 2]
+            });
+            this.makeMacro((x, y) => [
+                [0, "setratio", x, y, [null, 1, 4, 5]],
+                [1, "divide", 0, 0, [0, 2, 3]],
+                [2, ["number", { value: 3 }], 0, 0, [1]],
+                [3, ["number", { value: 2 }], 0, 0, [1]],
+                [4, "vspace", 0, 0, [0, null]],
+                [5, "hidden", 0, 0, [0, null]]
+            ]);
+        }
+
+        flow(args, logo, turtle, blk) {
+            if (args[1] === undefined) return;
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            let r = args[0];
+            if (cblk === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                r = 1;
+            } else if (activity.blocks.blockList[cblk].name === "intervalname") {
+                const intervalName = activity.blocks.blockList[cblk].value;
+                if (intervalName in INTERVALVALUES) {
+                    r = INTERVALVALUES[intervalName][2];
+                } else {
+                    // eslint-disable-next-line no-console
+                    console.log("could not find " + intervalName + " in INTERVALVALUES");
+                    r = 1;
+                }
+            }
+
+            if (isNaN(r) || r < 0) {
+                r = 1;
+                // eslint-disable-next-line no-console
+                console.debug("ratio " + r + " must be a number > 0");
+            }
+            Singer.PitchActions.setRatioTranspose(r, turtle, blk);
+            return [args[1], 1];
+        }
+    }
+
     class OctaveBlock extends FlowBlock {
         constructor() {
             //.TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
@@ -1949,6 +2004,7 @@ function setupPitchBlocks(activity) {
     new Invert2Block().setup(activity);
     new InvertBlock().setup(activity);
     new RegisterBlock().setup(activity);
+    new SetRatioTranspositionBlock().setup(activity);
     new SetTranspositionBlock().setup(activity);
     new OctaveBlock().setup(activity);
     new DownSixthBlock().setup(activity);

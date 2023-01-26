@@ -671,6 +671,34 @@ function setupPitchActions(activity) {
         }
 
         /**
+         * Shifts the pitches contained inside Note blocks by a ratio.
+         *
+         * @param {Number} ratio
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} [blk] - corresponding Block object index in blocks.blockList
+         * @returns {void}
+         */
+        static setRatioTranspose(value, turtle, blk) {
+            const tur = activity.turtles.ithTurtle(turtle);
+
+            tur.singer.transpositionRatios.push(value);
+
+            const listenerName = "_transposition_ratio_" + turtle;
+            if (blk !== undefined && blk in activity.blocks.blockList) {
+                activity.logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                const mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
+            }
+
+            const __listener = () => {
+                tur.singer.transpositionRatios.pop();
+            };
+
+            activity.logo.setTurtleListener(turtle, listenerName, __listener);
+        }
+
+        /**
          * Provides an easy way to modify the register (octave) of the notes that follow it.
          *
          * @param {Number} value - register value

@@ -38,6 +38,7 @@ This guide details the many musical features of the language.
       6. [Fixed and Movable Pitch Systems](#326-fixed-and-movable-pitch-systems)
       7. [Intervals](#327-intervals)
           1. [Absolute Intervals](#3271-absolute-intervals)
+          2. [Ratio Intervals](#3272-ratio-intervals)
       8. [Chords](#328-chords)
       9. [Inversion](#329-inversion)
       10. [Converters](#3210-converters)
@@ -372,12 +373,13 @@ or double-flat accidental.)
 
 ![transposition](./transform2.svg "Adjusting transpositions")
 
-There are several ways to transpose a pitch: by semi-tone or scalar
-steps. The *Semi-tone-transposition* block (above left) can be used to
-make larger shifts in pitch in half-step units. A positive number
-shifts the pitch up and a negative number shifts the pitch down. The
-input must be a whole number. To shift up an entire octave, transpose
-by `12` half-steps. `-12` will shift down an entire octave.
+There are multiple ways to transpose a pitch: by semi-tone or scalar
+steps or by a ratio. The *Semi-tone-transposition* block (above left)
+can be used to make larger shifts in pitch in half-step units. A
+positive number shifts the pitch up and a negative number shifts the
+pitch down. The input must be a whole number. To shift up an entire
+octave, transpose by `12` half-steps. `-12` will shift down an entire
+octave.
 
 The *Scalar-transposition* block (above right) shifts a pitch based on
 the current key and mode. For example, in `C Major`, a scalar
@@ -386,6 +388,12 @@ transposition of `2` half steps). To transpose `E` to `F` is `1`
 scalar step (or `1` half step). To shift an entire octave, scalar
 transpose by the mode length up or down. (In major scales, the mode
 length is `7`.)
+
+![ratio transposition](../documentation/setratio_block.svg "raising by a fifth using transpose by ratio")
+
+The *Transpose-by-ratio* block shifts a pitch based on a ratio. For
+example, a ratio of 2:1 would shift a pitch by an octave; a ratio of
+3:2 would shift a pitch by a fifth.
 
 As a convenience, a number of standard scalar transpositions are
 provided: *Unison*, *Second*, *Third*, ..., *Seventh*, *Down third*,
@@ -787,7 +795,18 @@ The *Doubly* block can be used to create a double augmentation or
 double diminishment.
 
 The *Semi-tone interval measure* block can be used to measure the
-number of half-steps between two pitched.
+number of half-steps between two pitches.
+
+#### <a name= "RATIO-INTERVALS">3.2.7.2 Ratio Intervals</a>
+
+Another way to think about intervals is in terms of ratios. For
+example, a ratio of 2:1 would be an octave shift up; 1:2 would be an
+octave shift dowm; 3/2 would be a fifth.
+
+![ratio interval](../documentation/ratiointerval_block.svg "Ratio Interval example")
+
+The *Ratio Interval* block lets you generate an interval based on a
+ratio.
 
 #### <a name= "CHORDS">3.2.8 Chords</a>
 
@@ -2241,8 +2260,10 @@ then saved to a "custom" chord, which can be used with the *Arpeggio* block.
 
 The numeric argument to the widget block, ```12``` in the figure
 above, designates the number of columns. The widget always provides a
-range of 12 half-steps (one octave in the default a [12-step
-equal-temperament tuning](#412-changing-temperament)).
+range of half-steps (one octave in the default a [12-step
+equal-temperament tuning](#412-changing-temperament)). (If you are in
+a temperament with more notes per ocatve, the grid will expand.) The
+rows that represent notes in the current mode are highlighted.
 
 ![widget](./arpeggio_widget.svg "Arpeggio_widget")
 
