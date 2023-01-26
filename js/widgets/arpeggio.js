@@ -44,7 +44,7 @@ class Arpeggio {
         // track of which intersections in the grid are populated.
         // These arrays get created each time the matrix is built.
         this._blockMap = [];  // pairs storage
-        this._defaultCols = Arpeggio.DEFAULTCOLS;
+        this.defaultCols = Arpeggio.DEFAULTCOLS;
     }
 
     /**
@@ -72,7 +72,7 @@ class Arpeggio {
         this._playing = false;
         this._playList = [];
         this._colBlocks = [];  // time steps
-        for (let i = 0; i < this._defaultCols; i++) {
+        for (let i = 0; i < this.defaultCols; i++) {
             this._colBlocks.push(i + 1);
         }
 
@@ -208,7 +208,7 @@ class Arpeggio {
         arpeggioCell.innerHTML = '<table cellpadding="0px" id="arpeggioNoteTable"><tr></tr></table>';
 
         // Add any arpeggio blocks here.
-        for (let i = 0; i < this._defaultCols; i++) {
+        for (let i = 0; i < this.defaultCols; i++) {
             this._addNote(i);
         }
 
@@ -596,7 +596,7 @@ class Arpeggio {
         let table;
         let row;
         let cell;
-        for (let j = 0; j < this._defaultCols; j++) {
+        for (let j = 0; j < this.defaultCols; j++) {
             let thisPair = [-1, j];
             for (let i = 0; i < arpeggioTable.rows.length - 1; i++) {
                 table = docById("arpeggioCellTable" + i);
