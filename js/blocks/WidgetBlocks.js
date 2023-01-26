@@ -649,7 +649,9 @@ function setupWidgetBlocks(activity) {
             logo.inArpeggio = true;
 
             if (args.length > 0) {
-                logo.arpeggio.defaultCols = args[0];
+                if (args[0] > 1 && args[0] < 21) {
+                    logo.arpeggio.defaultCols = args[0];
+                }
             }
 
             logo.arpeggio.notesToPlay = [];
