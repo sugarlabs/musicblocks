@@ -2311,8 +2311,15 @@ const piemenuChords = function (block, selectedChord) {
     block._chordWheel = new wheelnav("wheelDiv", null, 800, 800);
     block._exitWheel = new wheelnav("_exitWheel", block._chordWheel.raphael);
 
-    const chordLabels = CHORDNAMES;
-
+    const chordLabels = [];
+    for (let i = 0; i < CHORDNAMES.length; i++) {
+        const name = _(CHORDNAMES[i]);
+        if (name.length === 0) {
+            chordLabels.push(CHORDNAMES[i]);  // In case i18n fails
+        } else {
+            chordLabels.push(name);
+        }
+    }
     wheelnav.cssMode = true;
 
     block._chordWheel.keynavigateEnabled = false;
@@ -2352,9 +2359,8 @@ const piemenuChords = function (block, selectedChord) {
     const that = block;
 
     const __selectionChanged = function () {
-        const label = that._chordWheel.navItems[that._chordWheel.selectedNavItemIndex].title;
-        that.value = label;
-        that.text.text = label;
+        that.text.text = that._chordWheel.navItems[that._chordWheel.selectedNavItemIndex].title;
+        that.value = CHORDNAMES[that._chordWheel.selectedNavItemIndex];
 
         // Make sure text is on top.
         that.container.setChildIndex(that.text, that.container.children.length - 1);
