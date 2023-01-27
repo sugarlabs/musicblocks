@@ -31,7 +31,6 @@
 
 /* exported setupIntervalsBlocks */
 
-
 function setupIntervalsBlocks(activity) {
     class SetTemperamentBlock extends FlowBlock {
         constructor() {
@@ -40,7 +39,9 @@ function setupIntervalsBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Set temperament block is used to choose the tuning system used by Music Blocks."),
+                _(
+                    "The Set temperament block is used to choose the tuning system used by Music Blocks."
+                ),
                 "documentation",
                 ""
             ]);
@@ -168,12 +169,42 @@ function setupIntervalsBlocks(activity) {
         }
     }
 
+    class IntervalNumberBlock extends ValueBlock {
+        constructor() {
+            super("intervalnumber", _("Interval number"));
+            this.setPalette("intervals", activity);
+            this.setHelpString();
+            this.beginnerBlock(true);
+            this.hidden = true;
+            this.formBlock({ outType: "numberout" });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return activity.blocks.blockList[blk].value;
+        }
+
+        arg(logo, turtle, blk) {
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            if (
+                logo.inStatusMatrix &&
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
+            ) {
+                logo.statusFields.push([blk, "intervalnumber"]);
+            } else {
+                return Singer.IntervalsActions.GetIntervalNumber(turtle);
+            }
+        }
+    }
+
     class MeasureIntervalSemitonesBlock extends LeftBlock {
         constructor() {
             super("measureintervalsemitones");
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _("The Semi-tone interval block measures the distance between two notes in semi-tones."),
+                _(
+                    "The Semi-tone interval block measures the distance between two notes in semi-tones."
+                ),
                 "documentation",
                 ""
             ]);
@@ -269,7 +300,9 @@ function setupIntervalsBlocks(activity) {
             super("measureintervalscalar");
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _("The Scalar interval block measures the distance between two notes in the current key and mode."),
+                _(
+                    "The Scalar interval block measures the distance between two notes in the current key and mode."
+                ),
                 "documentation",
                 ""
             ]);
@@ -427,34 +460,13 @@ function setupIntervalsBlocks(activity) {
             super("semitoneinterval");
             this.setPalette("intervals", activity);
             this.piemenuValuesC1 = [
-                -12,
-                -11,
-                -10,
-                -9,
-                -8,
-                -7,
-                -6,
-                -5,
-                -4,
-                -3,
-                -2,
-                -1,
-                0,
-                1,
-                2,
-                3,
-                4,
-                5,
-                6,
-                7,
-                8,
-                9,
-                10,
-                11,
-                12
+                -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                11, 12
             ];
             this.setHelpString([
-                _("The Semi-tone interval block calculates a relative interval based on half steps.") +
+                _(
+                    "The Semi-tone interval block calculates a relative interval based on half steps."
+                ) +
                     " " +
                     _("In the figure, we add sol# to sol."),
                 "documentation",
@@ -492,7 +504,9 @@ function setupIntervalsBlocks(activity) {
             super("arpeggio");
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _("The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord.") +
+                _(
+                    "The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord."
+                ) +
                     " " +
                     _("The output of the example is: do, mi, sol, sol, ti, mi"),
                 "documentation",
@@ -533,7 +547,7 @@ function setupIntervalsBlocks(activity) {
             const listenerName = "_duplicate_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __lookForOtherTurtles = function(blk, turtle) {
+            const __lookForOtherTurtles = function (blk, turtle) {
                 for (const t in logo.connectionStore) {
                     if (t !== turtle.toString()) {
                         for (const b in logo.connectionStore[t]) {
@@ -550,7 +564,7 @@ function setupIntervalsBlocks(activity) {
             tur.singer.inDuplicate = true;
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = event => {
+            const __listener = (event) => {
                 tur.singer.inDuplicate = false;
                 tur.singer.duplicateFactor /= factor;
                 tur.singer.arpeggio = [];
@@ -628,36 +642,20 @@ function setupIntervalsBlocks(activity) {
                 logo.connectionStore[turtle][blk] = [];
                 child = args[1];
                 while (child != null) {
-                    const lastConnection =
-                        activity.blocks.blockList[child].connections.length - 1;
-                    const nextBlk =
-                        activity.blocks.blockList[child].connections[
-                            lastConnection
-                        ];
+                    const lastConnection = activity.blocks.blockList[child].connections.length - 1;
+                    const nextBlk = activity.blocks.blockList[child].connections[lastConnection];
                     // Don't disconnect a hidden block from its parent.
-                    if (
-                        nextBlk != null &&
-                        activity.blocks.blockList[nextBlk].name === "hidden"
-                    ) {
+                    if (nextBlk != null && activity.blocks.blockList[nextBlk].name === "hidden") {
                         logo.connectionStore[turtle][blk].push([
                             nextBlk,
                             1,
                             activity.blocks.blockList[nextBlk].connections[1]
                         ]);
-                        child =
-                            activity.blocks.blockList[nextBlk].connections[1];
-                        activity.blocks.blockList[
-                            nextBlk
-                        ].connections[1] = null;
+                        child = activity.blocks.blockList[nextBlk].connections[1];
+                        activity.blocks.blockList[nextBlk].connections[1] = null;
                     } else {
-                        logo.connectionStore[turtle][blk].push([
-                            child,
-                            lastConnection,
-                            nextBlk
-                        ]);
-                        activity.blocks.blockList[child].connections[
-                            lastConnection
-                        ] = null;
+                        logo.connectionStore[turtle][blk].push([child, lastConnection, nextBlk]);
+                        activity.blocks.blockList[child].connections[lastConnection] = null;
                         child = nextBlk;
                     }
 
@@ -709,14 +707,11 @@ function setupIntervalsBlocks(activity) {
                 if (CHORDVALUES[i][ii][0] === 0 && CHORDVALUES[i][ii][1] === 0) {
                     continue;
                 }
-                Singer.IntervalsActions.setChordInterval(
-                    CHORDVALUES[i][ii], turtle, blk
-                );
+                Singer.IntervalsActions.setChordInterval(CHORDVALUES[i][ii], turtle, blk);
             }
             return [args[1], 1];
         }
     }
-    
 
     class RatioIntervalBlock extends FlowClampBlock {
         constructor() {
@@ -731,13 +726,13 @@ function setupIntervalsBlocks(activity) {
                 name: _("ratio interval"),
                 args: 1,
                 argTypes: ["anyin"],
-                defaults: [3 / 2]  // fifth
+                defaults: [3 / 2] // fifth
             });
             this.makeMacro((x, y) => [
                 [0, "ratiointerval", x, y, [null, 1, 4, 5]],
                 [1, "divide", 0, 0, [0, 2, 3]],
-                [2, ["number", {"value": 3}], 0, 0, [1]],
-                [3, ["number", {"value": 2}], 0, 0, [1]],
+                [2, ["number", { value: 3 }], 0, 0, [1]],
+                [3, ["number", { value: 2 }], 0, 0, [1]],
                 [4, "vspace", 0, 0, [0, null]],
                 [5, "hidden", 0, 0, [0, null]]
             ]);
@@ -766,13 +761,10 @@ function setupIntervalsBlocks(activity) {
                 // eslint-disable-next-line no-console
                 console.debug("ratio " + r + " must be a number > 0");
             }
-            Singer.IntervalsActions.setRatioInterval(
-                r, turtle, blk
-            );
+            Singer.IntervalsActions.setRatioInterval(r, turtle, blk);
             return [args[1], 1];
         }
     }
-    
 
     class ScalarIntervalBlock extends FlowClampBlock {
         constructor() {
@@ -780,7 +772,9 @@ function setupIntervalsBlocks(activity) {
             this.setPalette("intervals", activity);
             this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.setHelpString([
-                _("The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode.") +
+                _(
+                    "The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode."
+                ) +
                     " " +
                     _("In the figure, we add la to sol."),
                 "documentation",
@@ -814,7 +808,9 @@ function setupIntervalsBlocks(activity) {
             super("definemode");
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _("The Define mode block allows you define a custom mode by specifiying pitch numbers."),
+                _(
+                    "The Define mode block allows you define a custom mode by specifiying pitch numbers."
+                ),
                 "documentation",
                 null,
                 "definemode"
@@ -863,9 +859,13 @@ function setupIntervalsBlocks(activity) {
             this.setPalette("intervals", activity);
             this.beginnerBlock(true);
             this.setHelpString([
-                _("When Moveable do is false, the solfege note names are always tied to specific pitches,") +
+                _(
+                    "When Moveable do is false, the solfege note names are always tied to specific pitches,"
+                ) +
                     " " +
-                    _('eg "do" is always "C-natural" when Moveable do is true, the solfege note names are assigned to scale degrees "do" is always the first degree of the major scale.'),
+                    _(
+                        'eg "do" is always "C-natural" when Moveable do is true, the solfege note names are assigned to scale degrees "do" is always the first degree of the major scale.'
+                    ),
                 "documentation",
                 null,
                 "movablehelp"
@@ -911,7 +911,8 @@ function setupIntervalsBlocks(activity) {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "modelength"]);
             } else {
@@ -936,7 +937,8 @@ function setupIntervalsBlocks(activity) {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "currentmode"]);
             } else {
@@ -961,7 +963,8 @@ function setupIntervalsBlocks(activity) {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "key"]);
             } else {
@@ -1054,6 +1057,7 @@ function setupIntervalsBlocks(activity) {
     new ModeNameBlock().setup(activity);
     new DoublyBlock().setup(activity);
     new IntervalNameBlock().setup(activity);
+    new IntervalNumberBlock().setup(activity);
     new MeasureIntervalSemitonesBlock().setup(activity);
     new MeasureIntervalScalarBlock().setup(activity);
     makeSemitoneIntervalMacroBlocks();

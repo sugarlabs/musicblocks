@@ -66,6 +66,19 @@ function setupIntervalsActions(activity) {
         }
 
         /**
+         * @static
+         * @param {number} turtle
+         * @returns {String}
+         */
+        static GetIntervalNumber(turtle) {
+            const intervals = activity.turtles.ithTurtle(turtle).singer.intervals;
+            let totalIntervals = 0;
+            for (let i = 0; i < intervals.length; i++) {
+                totalIntervals += intervals[i];
+            }
+            return totalIntervals;
+        }
+        /**
          * "set key" block.
          * Sets the key and mode.
          *
@@ -377,8 +390,8 @@ function setupIntervalsActions(activity) {
             const len = activity.logo.temperamentSelected.length;
 
             if (
-                activity.logo.temperamentSelected[len - 1]
-                    !== activity.logo.temperamentSelected[len - 2]
+                activity.logo.temperamentSelected[len - 1] !==
+                activity.logo.temperamentSelected[len - 2]
             ) {
                 activity.logo.synth.changeInTemperament = true;
             }
