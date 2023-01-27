@@ -782,7 +782,19 @@ const SELECTORSTRINGS = [
     //.TRANS: sharp is a music term related to pitch
     _("sharp"),
     //.TRANS: double sharp is a music term related to pitch
-    _("double sharp")
+    _("double sharp"),
+    // Chord names
+    _("major"),
+    _("minor"),
+    _("augmented"),
+    _("diminished"),
+    _("major 7th"),
+    _("minor 7th"),
+    _("dominant 7th"),
+    _("minor-major 7th"),
+    _("fully-diminished 7th"),
+    _("half-diminished 7th"),
+    _("custom")
 ];
 
 const ACCIDENTALLABELS = [
@@ -804,17 +816,17 @@ const ACCIDENTALNAMES = [
 const ACCIDENTALVALUES = [2, 1, 0, -1, -2];
 
 const CHORDNAMES = [
-    _("major"),
-    _("minor"),
-    _("augmented"),
-    _("diminished"),
-    _("major 7th"),
-    _("minor 7th"),
-    _("dominant 7th"),
-    _("minor-major 7th"),
-    _("fully-diminished 7th"),
-    _("half-diminished 7th"),
-    _("custom")
+    "major",
+    "minor",
+    "augmented",
+    "diminished",
+    "major 7th",
+    "minor 7th",
+    "dominant 7th",
+    "minor-major 7th",
+    "fully-diminished 7th",
+    "half-diminished 7th",
+    "custom"
 ];
 
 const DEFAULTCHORD = CHORDNAMES[0];
