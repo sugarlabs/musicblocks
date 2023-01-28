@@ -710,8 +710,10 @@ const piemenuCustomNotes = function (
     for (const t of customLabels) {
         for (const k in noteLabels[t]) {
             if (k !== "pitchNumber") {
-                labels.push(noteLabels[t][k][1]);
-                blockCustom++;
+                for (let ii = 0; ii < noteLabels[t][k].length; ii++) {
+                    labels.push(noteLabels[t][k][ii][1]);
+                    blockCustom++;
+                }
             }
         }
         for (let extra = max - blockCustom; extra > 0; extra--) {
