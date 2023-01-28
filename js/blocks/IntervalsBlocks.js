@@ -171,7 +171,7 @@ function setupIntervalsBlocks(activity) {
 
     class IntervalNumberBlock extends ValueBlock {
         constructor() {
-            super("intervalnumber", _("Interval number"));
+            super("intervalnumber", _("interval number"));
             this.setPalette("intervals", activity);
             this.setHelpString();
             this.beginnerBlock(true);
