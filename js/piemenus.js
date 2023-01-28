@@ -707,12 +707,24 @@ const piemenuCustomNotes = function (
         max = max > noteLabels[t]["pitchNumber"] ? max : noteLabels[t]["pitchNumber"];
     }
 
+    // There seems to be two different representations... maybe because
+    // of some legacy projects restoring customTemperamentNotes
     for (const t of customLabels) {
         for (const k in noteLabels[t]) {
-            if (k !== "pitchNumber") {
-                for (let ii = 0; ii < noteLabels[t][k].length; ii++) {
-                    labels.push(noteLabels[t][k][ii][1]);
+            if (k !== "pitchNumber" && k !== "interval") {
+                if (typeof(noteLabels[t][k]) === "number") {
+                    labels.push(k);
                     blockCustom++;
+                } else {
+                    if (noteLabels[t][k].length === 3) {
+                        labels.push(noteLabels[t][k][1]);
+                        blockCustom++;
+                    } else {
+                        for (let ii = 0; ii < noteLabels[t][k].length; ii++) {
+                            labels.push(noteLabels[t][k][ii][1]);
+                            blockCustom++;
+                        }
+                    }
                 }
             }
         }
