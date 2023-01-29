@@ -699,7 +699,7 @@ const piemenuCustomNotes = function (
 
     //Disable rotation, set navAngle and create the menus
     block._cusNoteWheel.clickModeRotate = false;
-    block._cusNoteWheel.titleRotateAngle = 0;
+    block._cusNoteWheel.titleRotateAngle = 180;
     block._cusNoteWheel.animatetime = 0; // 300;
     const labels = [];
     let blockCustom = 0;
