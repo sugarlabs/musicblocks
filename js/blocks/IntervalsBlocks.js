@@ -168,6 +168,34 @@ function setupIntervalsBlocks(activity) {
         }
     }
 
+  class IntervalNumberBlock extends ValueBlock {
+        constructor() {
+            super("intervalnumber", _("interval number"));
+            this.setPalette("intervals", activity);
+            this.setHelpString();
+            this.beginnerBlock(true);
+            this.hidden = true;
+            this.formBlock({ outType: "numberout" });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return activity.blocks.blockList[blk].value;
+        }
+
+        arg(logo, turtle, blk) {
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            if (
+                logo.inStatusMatrix &&
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
+            ) {
+                logo.statusFields.push([blk, "intervalnumber"]);
+            } else {
+                return Singer.IntervalsActions.GetIntervalNumber(turtle);
+            }
+        }
+    }
+
     class MeasureIntervalSemitonesBlock extends LeftBlock {
         constructor() {
             super("measureintervalsemitones");
@@ -1054,6 +1082,7 @@ function setupIntervalsBlocks(activity) {
     new ModeNameBlock().setup(activity);
     new DoublyBlock().setup(activity);
     new IntervalNameBlock().setup(activity);
+    new IntervalNumberBlock().setup(activity);
     new MeasureIntervalSemitonesBlock().setup(activity);
     new MeasureIntervalScalarBlock().setup(activity);
     makeSemitoneIntervalMacroBlocks();

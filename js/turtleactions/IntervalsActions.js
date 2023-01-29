@@ -65,6 +65,20 @@ function setupIntervalsActions(activity) {
             return modename;
         }
 
+ /**
+         * @static
+         * @param {number} turtle
+         * @returns {String}
+         */
+        static GetIntervalNumber(turtle) {
+            const intervals = activity.turtles.ithTurtle(turtle).singer.intervals;
+            let totalIntervals = 0;
+            for (let i = 0; i < intervals.length; i++) {
+                totalIntervals += intervals[i];
+            }
+            return totalIntervals;
+        }
+
         /**
          * "set key" block.
          * Sets the key and mode.
