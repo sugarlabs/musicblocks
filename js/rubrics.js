@@ -186,6 +186,7 @@ const TACAT = {
     modename: "ignore",
     doubly: "pitchchord",
     intervalname: "ignore",
+    intervalnumber: "ignore",
     measureintervalsemitones: "pitchfactor",
     measureintervalscalar: "pitchfactor",
     arpeggio: "pitchchord",
