@@ -201,7 +201,7 @@ function setupIntervalsBlocks(activity) {
             super("measureintervalsemitones");
             this.setPalette("intervals", activity);
             this.setHelpString([
-                 _("The Semi-tone interval block measures the distance between two notes in semi-tones."),
+                _("The Semi-tone interval block measures the distance between two notes in semi-tones."),
                 "documentation",
                 ""
             ]);
@@ -520,7 +520,7 @@ function setupIntervalsBlocks(activity) {
             super("arpeggio");
             this.setPalette("intervals", activity);
             this.setHelpString([
-                 _("The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord.") +
+                _("The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord.") +
                     " " +
                     _("The output of the example is: do, mi, sol, sol, ti, mi"),
                 "documentation",
@@ -663,7 +663,7 @@ function setupIntervalsBlocks(activity) {
                             lastConnection
                         ];
                     // Don't disconnect a hidden block from its parent.
-                     if (
+                    if (
                         nextBlk != null &&
                         activity.blocks.blockList[nextBlk].name === "hidden"
                     ) {
@@ -672,7 +672,7 @@ function setupIntervalsBlocks(activity) {
                             1,
                             activity.blocks.blockList[nextBlk].connections[1]
                         ]);
-                          child =
+                        child =
                             activity.blocks.blockList[nextBlk].connections[1];
                         activity.blocks.blockList[
                             nextBlk
@@ -745,6 +745,7 @@ function setupIntervalsBlocks(activity) {
         }
     }
 
+
     class RatioIntervalBlock extends FlowClampBlock {
         constructor() {
             super("ratiointerval");
@@ -793,12 +794,13 @@ function setupIntervalsBlocks(activity) {
                 // eslint-disable-next-line no-console
                 console.debug("ratio " + r + " must be a number > 0");
             }
-             Singer.IntervalsActions.setRatioInterval(
+            Singer.IntervalsActions.setRatioInterval(
                 r, turtle, blk
             );
             return [args[1], 1];
         }
     }
+
 
     class ScalarIntervalBlock extends FlowClampBlock {
         constructor() {
@@ -840,7 +842,7 @@ function setupIntervalsBlocks(activity) {
             super("definemode");
             this.setPalette("intervals", activity);
             this.setHelpString([
-                 _("The Define mode block allows you define a custom mode by specifiying pitch numbers."),
+                _("The Define mode block allows you define a custom mode by specifiying pitch numbers."),
                 "documentation",
                 null,
                 "definemode"
@@ -889,9 +891,9 @@ function setupIntervalsBlocks(activity) {
             this.setPalette("intervals", activity);
             this.beginnerBlock(true);
             this.setHelpString([
-                 _("When Moveable do is false, the solfege note names are always tied to specific pitches,") +
+                _("When Moveable do is false, the solfege note names are always tied to specific pitches,") +
                     " " +
-                      _('eg "do" is always "C-natural" when Moveable do is true, the solfege note names are assigned to scale degrees "do" is always the first degree of the major scale.'),
+                    _('eg "do" is always "C-natural" when Moveable do is true, the solfege note names are assigned to scale degrees "do" is always the first degree of the major scale.'),
                 "documentation",
                 null,
                 "movablehelp"

@@ -784,8 +784,7 @@ const getStatsFromNotation = (activity) => {
                     let freq;
                     if (isCustomTemperament(activity.logo.synth.inTemperament)) {
                         freq = activity.logo.synth.getCustomFrequency(
-                             note, activity.logo.synth.inTemperament);
-            
+                            note, activity.logo.synth.inTemperament);
                         const test = getTemperament(activity.logo.synth.inTemperament).filter(
                             (ele) => ele[3] === note.slice(0, note.length - 1)
                         );
