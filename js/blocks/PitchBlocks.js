@@ -1588,16 +1588,7 @@ function setupPitchBlocks(activity) {
             } else if (logo.inPitchSlider) {
                 logo.pitchSlider.frequencies.push(args[0]);
             } else {
-                try {
-                    return Singer.PitchActions.playHertz(arg, turtle, blk);
-                } catch (e) {
-                    if (e === "NoNoteError") {
-                        activity.errorMsg(_("Hertz Block: Did you mean to use a Note block?"), blk);
-                    } else {
-                        // eslint-disable-next-line no-console
-                        console.error(e);
-                    }
-                }
+                return Singer.PitchActions.playHertz(arg, turtle, blk);
             }
         }
     }
