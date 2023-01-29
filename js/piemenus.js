@@ -2343,7 +2343,7 @@ const piemenuChords = function (block, selectedChord) {
     block._chordWheel.slicePathFunction = slicePath().DonutSlice;
     block._chordWheel.slicePathCustom = slicePath().DonutSliceCustomization();
     block._chordWheel.slicePathCustom.minRadiusPercent = 0.2;
-    block._chordWheel.slicePathCustom.maxRadiusPercent = 1;
+    block._chordWheel.slicePathCustom.maxRadiusPercent = 1.0;
     block._chordWheel.sliceSelectedPathCustom = block._chordWheel.slicePathCustom;
     block._chordWheel.sliceInitPathCustom = block._chordWheel.slicePathCustom;
     block._chordWheel.titleRotateAngle = 0;
@@ -2351,8 +2351,8 @@ const piemenuChords = function (block, selectedChord) {
     block._chordWheel.createWheel(chordLabels);
 
     for (let i = 0; i < block._chordWheel.navItems.length; i++) {
-        block._chordWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
-        block._chordWheel.navItems[i].titleSelectedAttr.font = "30 30px sans-serif";
+        block._chordWheel.navItems[i].titleAttr.font = "32 32px sans-serif";
+        block._chordWheel.navItems[i].titleSelectedAttr.font = "32 32px sans-serif";
     }
 
     block._exitWheel.colors = platformColor.exitWheelcolors;
