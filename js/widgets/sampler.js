@@ -19,7 +19,7 @@
 
 /* exported SampleWidget */
 
-function SampleWidget() {
+const SampleWidget= () => {
     const ICONSIZE = 32;
     const SAMPLEWIDTH = 800;
     const SAMPLEHEIGHT = 400;
@@ -51,7 +51,7 @@ function SampleWidget() {
     this.sampleLength = 1000;
     this.pitchAnalysers = {};
 
-    this._updateBlocks = function () {
+    this._updateBlocks = () => {
         let mainSampleBlock;
         let audiofileBlock;
         let solfegeBlock;
@@ -90,7 +90,7 @@ function SampleWidget() {
         }
     };
 
-    this.pause = function () {
+    this.pause = () => {
         this.playBtn.innerHTML =
             '<img src="header-icons/play-button.svg" title="' +
             _("Play") +
@@ -104,7 +104,7 @@ function SampleWidget() {
         this.isMoving = false;
     };
 
-    this.resume = function () {
+    this.resume = () => {
         this.playBtn.innerHTML =
             '<img src="header-icons/pause-button.svg" title="' +
             _("Pause") +
@@ -118,33 +118,33 @@ function SampleWidget() {
         this.isMoving = true;
     };
 
-    this._usePitch = function (p) {
+    this._usePitch = p => {
         const number = SOLFEGENAMES.indexOf(p);
         this.pitchCenter = number == -1 ? 0 : number;
     };
 
-    this._useAccidental = function (a) {
+    this._useAccidental = a => {
         const number = ACCIDENTALNAMES.indexOf(a);
         this.accidentalCenter = number === -1 ? 2 : number;
     };
 
-    this._useOctave = function (o) {
+    this._useOctave = o => {
         this.octaveCenter = parseInt(o);
     };
 
-    this.getSampleLength = function () {
+    this.getSampleLength = () => {
         if (this.sampleData.length > 1333333) {
             this.activity.errorMsg(_("Warning: Sample is bigger than 1MB."), this.timbreBlock);
         }
     };
 
-    this.showSampleTypeError = function () {
+    this.showSampleTypeError = () => {
             this.activity.errorMsg(_("Upload failed: Sample is not a .wav file."), this.timbreBlock);
     };
 
-    this.__save = function () {
+    this.__save = () => {
         var that = this;
-        setTimeout(function () {
+        setTimeout(() => {
             that._addSample();
 
             var newStack = [
@@ -165,11 +165,11 @@ function SampleWidget() {
         }, 1000);
     };
 
-    this._saveSample = function () {
+    this._saveSample = () =>{
         this.__save();
     };
 
-    this._get_save_lock = function () {
+    this._get_save_lock = () => {
         return this._save_lock;
     };
 
@@ -254,18 +254,18 @@ function SampleWidget() {
             ICONSIZE,
             _("Upload sample"),
             ""
-        ).onclick = function () {
+        ).onclick = () => {
             const fileChooser = docById("myOpenAll");
 
             // eslint-disable-next-line no-unused-vars
-            const __readerAction = function (event) {
+            const __readerAction = event => {
                 window.scroll(0, 0);
                 const sampleFile = fileChooser.files[0];
                 const reader = new FileReader();
                 reader.readAsDataURL(sampleFile);
 
                 // eslint-disable-next-line no-unused-vars
-                reader.onload = function (event) {
+                reader.onload = event => {
                     // if the file is of .wav type, save it
                     if (reader.result.substring(reader.result.indexOf(":")+1, reader.result.indexOf(";")) === 'audio/wav') {
                         that.sampleData = reader.result;
@@ -279,7 +279,7 @@ function SampleWidget() {
                     }
                 };
 
-                reader.onloadend = function () {
+                reader.onloadend = () => {
                     if (reader.result) {
                         // eslint-disable-next-line no-unused-vars
                         const value = [fileChooser.files[0].name, reader.result];
@@ -305,12 +305,12 @@ function SampleWidget() {
             ICONSIZE,
             _("Save sample"),
             ""
-        ).onclick = function () {
+        ).onclick = () => {
             // Debounce button
             if (!that._get_save_lock()) {
                 that._save_lock = true;
                 that._saveSample();
-                setTimeout(function () {
+                setTimeout(() => {
                     that._save_lock = false;
                 }, 1000);
             }
@@ -332,7 +332,7 @@ function SampleWidget() {
         widgetWindow.sendToCenter();
     };
 
-    this._addSample = function () {
+    this._addSample = () => {
         for (let i = 0; i < CUSTOMSAMPLES.length; i++) {
             if (CUSTOMSAMPLES[i][0] == this.sampleName) {
                 return;
@@ -341,7 +341,7 @@ function SampleWidget() {
         CUSTOMSAMPLES.push([this.sampleName, this.sampleData]);
     };
 
-    this._parseSamplePitch = function () {
+    this._parseSamplePitch = () => {
         const first_part = this.samplePitch.substring(0, 2);
         if (first_part === "so") {
             this.pitchCenter = 4;
@@ -367,13 +367,13 @@ function SampleWidget() {
         this.octaveCenter = this.sampleOctave;
     };
 
-    this._updateSamplePitchValues = function () {
+    this._updateSamplePitchValues = () => {
         this.samplePitch =
             SOLFEGENAMES[this.pitchCenter] + EXPORTACCIDENTALNAMES[this.accidentalCenter];
         this.sampleOctave = this.octaveCenter.toString();
     };
 
-    this.setTimbre = function () {
+    this.setTimbre = () => {
         if (this.sampleName != null && this.sampleName != "") {
             this.originalSampleName = this.sampleName + "_original";
             const sampleArray = [this.originalSampleName, this.sampleData, "la", 4];
@@ -381,7 +381,7 @@ function SampleWidget() {
         }
     };
 
-    this._playReferencePitch = function () {
+    this._playReferencePitch = () => {
         this._updateSamplePitchValues();
         this._updateBlocks();
 
@@ -408,7 +408,7 @@ function SampleWidget() {
         this._playDelayedSample();
     };
 
-    this._playSample = function () {
+    this._playSample = () => {
         if (this.sampleName != null && this.sampleName != "") {
             this.reconnectSynthsToAnalyser();
 
@@ -424,7 +424,7 @@ function SampleWidget() {
         }
     };
 
-    this._waitAndPlaySample = function () {
+    this._waitAndPlaySample = () => {
         return new Promise((resolve) => {
             setTimeout(() => {
                 this._playSample();
@@ -434,11 +434,11 @@ function SampleWidget() {
         });
     };
 
-    this._playDelayedSample = async function () {
+    this._playDelayedSample = async () => {
         await this._waitAndPlaySample();
     };
 
-    this._waitAndEndPlaying = function () {
+    this._waitAndEndPlaying = () => {
         return new Promise((resolve) => {
             setTimeout(() => {
                 this.pause();
@@ -447,11 +447,11 @@ function SampleWidget() {
         });
     };
 
-    this._endPlaying = async function () {
+    this._endPlaying = async () => {
         await this._waitAndEndPlaying();
     };
 
-    this.reconnectSynthsToAnalyser = function () {
+    this.reconnectSynthsToAnalyser = () => {
         // Make two pitchAnalysers for the ref tone and the sample.
         for (const instrument in [0, 1]) {
             if (this.pitchAnalysers[instrument] === undefined) {
@@ -476,7 +476,7 @@ function SampleWidget() {
         }
     };
 
-    this._createPieMenu = function () {
+    this._createPieMenu = () => {
         docById("wheelDivptm").style.display = "";
 
         const accidentals = ["𝄪", "♯", "♮", "♭", "𝄫"];
@@ -641,7 +641,7 @@ function SampleWidget() {
         }
     };
 
-    this.getPitchName = function () {
+    this.getPitchName = () => {
         let name = "";
         name = PITCHNAMES[this.pitchCenter];
         name += EXPORTACCIDENTALNAMES[this.accidentalCenter];
@@ -651,7 +651,7 @@ function SampleWidget() {
         this.pitchBtn.value = this.pitchName;
     };
 
-    this._scale = function () {
+    this._scale = () => {
         let width, height;
         const canvas = document.getElementsByClassName("samplerCanvas");
         Array.prototype.forEach.call(canvas, (ele) => {
@@ -669,7 +669,7 @@ function SampleWidget() {
         this.reconnectSynthsToAnalyser();
     };
 
-    this.makeCanvas = function (width, height, turtleIdx, resized) {
+    this.makeCanvas = (width, height, turtleIdx, resized) => {
         const canvas = document.createElement("canvas");
         canvas.height = height;
         canvas.width = width;
