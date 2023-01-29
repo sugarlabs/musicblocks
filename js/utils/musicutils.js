@@ -179,6 +179,7 @@ const EQUIVALENTFLATS = {
     "G♯": "A" + FLAT,
     "A♯": "B" + FLAT
 };
+
 const EQUIVALENTSHARPS = {
     "D♭": "C" + SHARP,
     "E♭": "D" + SHARP,
@@ -186,6 +187,7 @@ const EQUIVALENTSHARPS = {
     "A♭": "G" + SHARP,
     "B♭": "A" + SHARP
 };
+
 const EQUIVALENTNATURALS = { "E♯": "F", "B♯": "C", "C♭": "B", "F♭": "E" };
 const EQUIVALENTACCIDENTALS = { F: "E♯", C: "B♯", B: "C♭", E: "F♭", G: "F𝄪", D: "C𝄪", A: "G𝄪" };
 const CONVERT_DOWN = {
@@ -200,6 +202,16 @@ const CONVERT_DOWN = {
     "B♭": "A" + SHARP
 };
 
+const CONVERT_DOUBLE_DOWN = {
+    "C♯": "B" + DOUBLESHARP,
+    "D": "C" + DOUBLESHARP,
+    "E": "D" + DOUBLESHARP,
+    "F♯": "E" + DOUBLESHARP,
+    "G": "F" + DOUBLESHARP,
+    "A": "G" + DOUBLESHARP,
+    "B": "A" + DOUBLESHARP
+};
+
 const CONVERT_UP = {
     "C♯": "D" + FLAT,
     "D♯": "E" + FLAT,
@@ -210,6 +222,16 @@ const CONVERT_UP = {
     "A♯": "B" + FLAT,
     "B♯": "C",
     "B": "C" + FLAT,
+};
+
+const CONVERT_DOUBLE_UP = {
+    "C": "D" + DOUBLEFLAT,
+    "D": "E" + DOUBLEFLAT,
+    "E♭": "F" + DOUBLEFLAT,
+    "F": "G" + DOUBLEFLAT,
+    "G": "A" + DOUBLEFLAT,
+    "A": "B" + DOUBLEFLAT,
+    "B♭": "C" + DOUBLEFLAT
 };
 
 const EXTRATRANSPOSITIONS = {
@@ -1823,6 +1845,9 @@ function keySignatureToMode(keySignature) {
     } else if (key == "B" + SHARP) {
         parts = keySignature.split(" ");
         key = "B" + SHARP;
+    } else if (key == "F" + FLAT) {
+        parts = keySignature.split(" ");
+        key = "F" + FLAT;
     } else if (NOTESSHARP.indexOf(key) === -1 && NOTESFLAT.indexOf(key) === -1) {
         // eslint-disable-next-line no-console
         console.debug("Invalid key or missing name; reverting to C.");
@@ -3288,7 +3313,10 @@ function _calculate_pitch_number(activity, np, tur) {
 function buildScale(keySignature) {
     // FIX ME: temporary hard-coded fix to avoid errors in pitch preview
     if (keySignature == "C♭ major") {
-        const scale = ["C♭", "D♭", "E♭", "F♭", "G♭", "A♭", "B♭", "C♭"];
+        const scale = ["C" + FLAT, "D" + FLAT, "E" + FLAT, "F" + FLAT, "G" + FLAT, "A" + FLAT, "B" + FLAT, "C" + FLAT];
+        return [scale, [2, 2, 1, 2, 2, 2, 1]];
+    } else if (keySignature == "F♭ major") {
+        const scale = ["F" + FLAT, "G" + FLAT, "A" + FLAT, "B" + DOUBLEFLAT, "C" + FLAT, "D" + FLAT, "E" + FLAT, "F" + FLAT];
         return [scale, [2, 2, 1, 2, 2, 2, 1]];
     }
 
@@ -3361,8 +3389,30 @@ function buildScale(keySignature) {
                 }
             }
         }
+        // Final check -- we may need to use double sharps or double flats.
+        if (myKeySignature.length === 2 && myKeySignature[1] === SHARP) {
+            for (let i = scale.length - 1; i > 0; i--) {
+                if (scale[i][0] === scale[i - 1][0]) {
+                    if (scale[i - 1] in CONVERT_DOWN) {
+                        scale[i - 1] = CONVERT_DOWN[scale[i - 1]];
+                    } else if (scale[i - 1] in CONVERT_DOUBLE_DOWN) {
+                        scale[i - 1] = CONVERT_DOUBLE_DOWN[scale[i - 1]];
+                    }
+                }
+            }
+        } else if (myKeySignature.length === 2 && myKeySignature[1] === FLAT) {
+            for (let i = 0; i < scale.length - 2; i++) {
+                if (scale[i][0] === scale[i + 1][0]) {
+                    if (scale[i + 1] in CONVERT_UP) {
+                        scale[i + 1] = CONVERT_UP[scale[i + 1]];
+                    } else if (scale[i + 1] in CONVERT_DOUBLE_UP) {
+                        scale[i + 1] = CONVERT_DOUBLE_UP[scale[i + 1]];
+                    }
+                }
+            }
+        }
     }
-
+ 
     return [scale, halfSteps];
 }
 
@@ -3388,31 +3438,33 @@ function _getStepSize(keySignature, pitch, direction, transposition, temperament
     }
 
     function logicalEquals(s1, s2) {
-        // console.debug(s1,s2);
         if (s1 == s2) {
             return true;
-        } else if (s1 == "E♯" && s2 == "F") {
+        } else if (s1 == "E" + SHARP && s2 == "F") {
             return true;
-        } else if (s1 == "E" && s2 == "F♭") {
+        } else if (s1 == "E" && s2 == "F" + FLAT) {
             return true;
         } else if (s1 == "F" && s2 == "E♯") {
             return true;
-        } else if (s1 == "F♭" && s2 == "E") {
+        } else if (s1 == "F" + FLAT && s2 == "E") {
             return true;
-        } else if (s1 == "B♯" && s2 == "C") {
+        } else if (s1 == "B" + SHARP && s2 == "C") {
             return true;
-        } else if (s1 == "B" && s2 == "C♭") {
+        } else if (s1 == "B" && s2 == "C" + FLAT) {
             return true;
         } else if (s1 == "C" && s2 == "B♯") {
             return true;
-        } else if (s1 == "C♭" && s2 == "B") {
+        } else if (s1 == "C" + FLAT && s2 == "B") {
+            return true;
+        } else if (s1 == "B" + DOUBLEFLAT && s2 == "A") {
+            return true;
+        } else if (s1 == "F" + DOUBLESHARP && s2 == "G") {
             return true;
         }
         return false;
     }
 
-    let ii = scale.findIndex((scale) => logicalEquals(scale, pitch)); //indexOf() replaced by findIndex()
-    // let ii = scale.indexOf(thisPitch);
+    let ii = scale.findIndex((scale) => logicalEquals(scale, pitch));
     if (ii !== -1) {
         if (direction === "up") {
             return halfSteps[ii];
