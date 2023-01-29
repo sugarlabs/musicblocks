@@ -838,6 +838,17 @@ const ACCIDENTALNAMES = [
 const ACCIDENTALVALUES = [2, 1, 0, -1, -2];
 
 const CHORDNAMES = [
+    // scalar
+    "triad (root position)",
+    "triad (1st inversion)",
+    "triad (2nd inversion)",
+    "seventh (root position)",
+    "seventh (1st inversion)",
+    "seventh (2nd inversion)",
+    "seventh (3rd inversion)",
+    "ninth (root position)",
+    "thirteenth (root position)",
+    // semitone
     "major",
     "minor",
     "augmented",
@@ -848,23 +859,38 @@ const CHORDNAMES = [
     "minor-major 7th",
     "fully-diminished 7th",
     "half-diminished 7th",
+    // custom must always be at the end of the list.
     "custom"
 ];
 
-const DEFAULTCHORD = CHORDNAMES[0];
+// major
+const DEFAULTCHORD = CHORDNAMES[9];
 
+// The pairs are [scalar, semitone]
 const CHORDVALUES = [
+    //scalar
     [[0, 0], [2, 0], [4, 0]],
-    [[0, 0], [2, -1], [4, 0]],
-    [[0, 0], [2, 0], [4, +1]],
-    [[0, 0], [2, -1], [4, -1]],
+    [[2, 0], [4, 0], [7, 0]],
+    [[-3, 0], [0, 0], [2, 0]],
     [[0, 0], [2, 0], [4, 0], [6, 0]],
-    [[0, 0], [2, -1], [4, 0], [6, -1]],
-    [[0, 0], [2, 0], [4, 0], [6, -1]],
-    [[0, 0], [2, -1], [4, 0], [6, 0]],
-    [[0, 0], [2, -1], [4, -1], [6, -2]],
-    [[0, 0], [2, 0], [4, -1], [6, -1]],
-    [[0, 0], [2, 0], [4, 0]],
+    [[2, 0], [4, 0], [6, 0], [7, 0]],
+    [[-3, 0], [-1, 0], [0, 0], [2, 0]],
+    [[-1, 0], [0, 0], [2, 0], [4, 0]],
+    [[0, 0], [2, 0], [4, 0], [6, 0], [8, 0]],
+    [[0, 0], [2, 0], [4, 0], [6, 0], [12, 0]],
+    //semitone
+    [[0, 0], [0, 4], [0, 7]],
+    [[0, 0], [0, 3], [0, 7]],
+    [[0, 0], [0, 4], [0, 8]],
+    [[0, 0], [0, 3], [0, 6]],
+    [[0, 0], [0, 4], [0, 7], [0, 11]],
+    [[0, 0], [0, 3], [0, 7], [0, 10]],
+    [[0, 0], [0, 4], [0, 7], [0, 10]],
+    [[0, 0], [0, 3], [0, 7], [0, 11]],
+    [[0, 0], [0, 3], [0, 6], [0, 9]],
+    [[0, 0], [0, 3], [0, 6], [0, 10]],
+    // custom is always at the end of the list
+    [[0, 0], [0, 4], [0, 7]],
 ];
 
 const setCustomChord = (chord) => {
