@@ -9,14 +9,18 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/*
-   global
+/** 
+   @global
 
    _, FlowBlock, ValueBlock, LeftBlock, NOINPUTERRORMSG, SOLFEGENAMES,
    NOBOXERRORMSG
 */
 
-/* exported setupBoxesBlocks */
+/**
+Function to setup the box blocks.
+@param {object} activity - The activity object
+@returns {null}
+*/
 
 function setupBoxesBlocks(activity) {
     class IncrementBlock extends FlowBlock {
@@ -51,7 +55,14 @@ function setupBoxesBlocks(activity) {
                 argTypes: ["anyin", "anyin"]
             });
         }
-
+    /**
+        Flow of the block.
+        @param {array} args - Arguments of the block
+        @param {object} logo - The logo object
+        @param {object} turtle - The turtle object
+        @param {number} blk - The block id
+        @returns {null}
+    */
         flow(args, logo, turtle, blk) {
             // If the 2nd arg is not set, default to 1.
             const i = args.length === 2 ? args[1] : 1;
