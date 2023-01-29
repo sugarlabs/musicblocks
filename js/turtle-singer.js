@@ -83,6 +83,7 @@ class Singer {
         this.transpositionRatios = [];
 
         // Parameters used by notes
+        this.defaultNoteValue = 4;
         this.register = 0;
         this.beatFactor = 1;
         this.dotCount = 0;
@@ -1195,7 +1196,7 @@ class Singer {
 
             tur.singer.pushedNote = true;
 
-            Singer.processNote(activity, 4, false, blk, turtle, () => {
+            Singer.processNote(activity, tur.singer.defaultNoteValue, false, blk, turtle, () => {
                 tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
             });
         }

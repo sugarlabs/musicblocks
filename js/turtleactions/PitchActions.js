@@ -558,7 +558,9 @@ function setupPitchActions(activity) {
                     );
                 }
             } else {
+                tur.singer.defaultNoteValue = 32;
                 Singer.processPitch(activity, note, octave, cents, turtle, blk);
+                tur.singer.defaultNoteValue = 4;
             }
         }
 
