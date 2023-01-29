@@ -6553,6 +6553,34 @@ msgstr "solo entonación"
 msgid "meantone"
 msgstr ""
 
+#: js/musicutils.js:842
+msgid "triad (root position)"
+msgstr "tríada (posición raíz)"
+
+msgid "triad (1st inversion)"
+msgstr "tríada (primera inversión)"
+
+msgid "triad (2nd inversion)"
+msgstr "tríada (segunda inversión)"
+
+msgid "seventh (root position)"
+msgstr "séptimo (posición raíz)"
+
+msgid "seventh (1st inversion)"
+msgstr "séptima (primera inversión)"
+
+msgid "seventh (2nd inversion)"
+msgstr "séptima (segunda inversión)"
+
+msgid "seventh (3rd inversion)"
+msgstr "séptima (tercera inversión)"
+
+msgid "ninth (root position)"
+msgstr "noveno (posición raíz)"
+
+msgid "thirteenth (root position)"
+msgstr "decimotercero (posición raíz)"
+
 #: js/musicutils.js:810
 msgid "major 7th"
 msgstr ""
