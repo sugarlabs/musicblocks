@@ -1442,7 +1442,7 @@ function getIntervalRatio(name) {
 }
 
 function getModeNumbers(name) {
-    const __convert = function (obj) {
+    const __convert =  obj => {
         let n = 0;
         let m = "";
         for (let i = 0; i < obj.length; i++) {
@@ -1933,7 +1933,7 @@ function getScaleAndHalfSteps(keySignature) {
     return [thisScale, solfege, myKeySignature, obj[1]];
 }
 
-const modeMapper = function (key, mode) {
+const modeMapper = (key, mode) => {
     // map common modes into their major/minor equivalent
     // console.debug(key + ' ' + mode + ' >>');
     key = key.toLowerCase();
@@ -3949,7 +3949,7 @@ function getInterval(interval, keySignature, pitch) {
 }
 
 function reducedFraction(a, b) {
-    const greatestCommonMultiple = function (a, b) {
+    const greatestCommonMultiple =  (a, b) => {
         return b === 0 ? a : greatestCommonMultiple(b, a % b);
     };
 
@@ -4197,7 +4197,7 @@ function getNumNote(value, delta) {
     return [note, octave + 1];
 }
 
-const calcOctave = function (currentOctave, arg, lastNotePlayed, currentNote) {
+const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
     // Calculate the octave based on the current Octave and the arg,
     // which can be a number, a 'number' as a string, 'current',
     // 'previous', or 'next'.
@@ -4275,7 +4275,7 @@ const calcOctave = function (currentOctave, arg, lastNotePlayed, currentNote) {
     }
 };
 
-const calcOctaveInterval = function (arg) {
+const calcOctaveInterval = arg => {
     // Used by intervals to determine octave to use in an interval.
     let value = 0;
     switch (arg) {
@@ -4325,7 +4325,7 @@ function convertFromSolfege(note) {
     return note;
 }
 
-const convertFactor = function (factor) {
+const convertFactor = factor => {
     switch (factor) {
         case 0.0625: // 1/16
             return "16";
