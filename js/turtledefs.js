@@ -459,7 +459,11 @@ function createHelpContent(activity) {
             [
                 _("Welcome to Music Blocks"),
                 _("Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way."),
-                "data:image/svg+xml;base64," +
+                    " " +
+                    _("The current version is") +
+                    " " +
+                    VERSION,
+                    "data:image/svg+xml;base64," +
                     window.btoa(unescape(encodeURIComponent(LOGO)))
             ],
             [

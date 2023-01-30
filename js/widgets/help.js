@@ -96,12 +96,16 @@ class HelpWidget {
             let cell = docById("left-arrow");
 
             cell.onclick = () => {
-                page = page - 1;
-                if (page < 0) {
-                    page = HELPCONTENT.length - 1;
+                if(page !== 0)
+                {
+                    page = page - 1;
+                    if (page < 0) {
+                        page = HELPCONTENT.length - 1;
+                    }
+    
+                    this._showPage(page);
                 }
-
-                this._showPage(page);
+                
             };
 
             cell = docById("right-arrow");
