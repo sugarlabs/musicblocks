@@ -178,7 +178,7 @@ document.querySelector("meta[name=theme-color]").content = platformColor.header;
  * @param  {Object} stage
  * @returns {Object}
  */
-function showButtonHighlight(x, y, r, event, scale, stage) {
+let showButtonHighlight = (x, y, r, event, scale, stage) => {
     if (platform.FFOS) return {};
     return showMaterialHighlight(x, y, r, event, scale, stage);
 }

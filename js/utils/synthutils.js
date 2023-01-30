@@ -299,7 +299,7 @@ const stringInstruments = ["piano", "guitar", "acoustic guitar", "electric guita
 
 // Validate the passed on parameters in a function as per the default
 // parameters values
-function validateAndSetParams(defaultParams, params) {
+let validateAndSetParams = (defaultParams, params) => {
     if (defaultParams && defaultParams !== null && params && params !== undefined) {
         for (const key in defaultParams) {
             if (key in params && params[key] !== undefined) defaultParams[key] = params[key];
