@@ -61,7 +61,7 @@ function GlobalTag(Planet) {
     this.selected = false;
     this.selectedClass = null;
 
-    this.render = function() {
+    this.render = () => {
         const tag = document.createElement("div");
         tag.classList.add("chipselect");
         tag.classList.add("cursor");
@@ -85,7 +85,7 @@ function GlobalTag(Planet) {
         this.tagElement = tag;
     };
 
-    this.onTagClick = function() {
+    this.onTagClick = () => {
         if (this.specialTag) {
             if (!this.selected) {
                 this.globalPlanet.selectSpecialTag(this);
@@ -101,17 +101,17 @@ function GlobalTag(Planet) {
         }
     };
 
-    this.select = function() {
+    this.select = () => {
         this.tagElement.classList.add(this.selectedClass);
         this.selected = true;
     };
 
-    this.unselect = function() {
+    this.unselect = () => {
         this.tagElement.classList.remove(this.selectedClass);
         this.selected = false;
     };
 
-    this.init = function(obj) {
+    this.init = obj => {
         if (obj.id !== undefined) {
             this.specialTag = false;
             this.id = obj.id;

@@ -74,7 +74,7 @@ function StringHelper(Planet) {
     }
 
 
-    this.init = function(){
+    this.init = () => {
         for (let i = 0; i<this.strings.length; i++){
             const obj = this.strings[i];
             const elem = document.getElementById(obj[0]);

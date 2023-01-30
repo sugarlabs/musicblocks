@@ -19,20 +19,20 @@
 function Converter(Planet) {
     this.ServerInterface = Planet.ServerInterface;
 
-    this.isConnected = function() {
+    this.isConnected = () => {
         return Planet.ConnectedToServer;
     };
 
     // callbacks: (success, data/error message)
     // Conversion Functions
 
-    this.ly2pdf = function(data, callback) {
+    this.ly2pdf = (data, callback) => {
         this.ServerInterface.convertFile("ly", "pdf", window.btoa(encodeURIComponent(data)), function(result) {
             this.afterly2pdf(result,callback);
         }.bind(this));
     };
     
-    this.afterly2pdf = function(data, callback) {
+    this.afterly2pdf = (data, callback) => {
         if (!data.success) {
             callback(false, data.error);
         } else {
@@ -41,12 +41,12 @@ function Converter(Planet) {
     };
     
     // Ancillary Functions
-    this.getDataURL = function(mime, data){
+    this.getDataURL = (mime, data) => {
         return "data:" + mime + ";base64," + data;
     };
 
     // Unused, but might be useful.
-    this.getBlob = function(mime, data) {
+    this.getBlob = (mime, data) => {
         const rawData = window.atob(data);
         const len = rawData.length;
         const arr = new Uint8Array(len);
@@ -58,6 +58,6 @@ function Converter(Planet) {
         return blob;
     };
 
-    this.init = function() {
+    this.init = () => {
     };
 };
