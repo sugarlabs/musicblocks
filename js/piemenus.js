@@ -701,7 +701,8 @@ const piemenuCustomNotes = function (
     block._cusNoteWheel.clickModeRotate = false;
     block._cusNoteWheel.titleRotateAngle = 180;
     block._cusNoteWheel.animatetime = 0; // 300;
-    const labels = [];
+    const labelsDict = {};
+    let labels = [];
     let blockCustom = 0;
     let max = 0;
     for (const t of customLabels) {
@@ -711,18 +712,22 @@ const piemenuCustomNotes = function (
     // There seems to be two different representations... maybe because
     // of some legacy projects restoring customTemperamentNotes
     for (const t of customLabels) {
+        labelsDict[t] = [];
         for (const k in noteLabels[t]) {
             if (k !== "pitchNumber" && k !== "interval") {
                 if (typeof(noteLabels[t][k]) === "number") {
-                    labels.push(k);
+                    // labels.push(k);
+                    labelsDict[t].push(k);
                     blockCustom++;
                 } else {
                     if (noteLabels[t][k].length === 3) {
-                        labels.push(noteLabels[t][k][1]);
+                        // labels.push(noteLabels[t][k][1]);
+                        labelsDict[t].push(noteLabels[t][k][1]);
                         blockCustom++;
                     } else {
                         for (let ii = 0; ii < noteLabels[t][k].length; ii++) {
-                            labels.push(noteLabels[t][k][ii][1]);
+                            // labels.push(noteLabels[t][k][ii][1]);
+                            labelsDict[t].push(noteLabels[t][k][1]);
                             blockCustom++;
                         }
                     }
@@ -730,11 +735,20 @@ const piemenuCustomNotes = function (
             }
         }
         for (let extra = max - blockCustom; extra > 0; extra--) {
-            labels.push("");
+            // labels.push("");
         }
         blockCustom = 0;
     }
-
+    if (!(selectedCustom in labelsDict)) {
+        selectedCustom = labelsDict[0];
+    }
+    for (let i = 0; i < max; i++) {
+        if (i < labelsDict[selectedCustom].length) {
+            labels.push(labelsDict[selectedCustom][i]);
+        } else {
+            labels.push("");
+        }
+    }
     block._cusNoteWheel.navAngle = -(180 / customLabels.length) + 180 / labels.length;
     block._cusNoteWheel.createWheel(labels);
 
@@ -796,22 +810,37 @@ const piemenuCustomNotes = function (
     }
 
     // Add function to each main menu for show/hide sub menus
-    // FIXME: Add all tabs to each interval
     const __setupAction = function (i) {
         that._customWheel.navItems[i].navigateFunction = function () {
             that.customID =
                 that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
-            for (let l = 0; l < customLabels.length; l++) {
-                for (let j = 0; j < max; j++) {
-                    if (l !== i) {
-                        that._cusNoteWheel.navItems[l * max + j].navItem.hide();
-                    } else if (labels[l * max + j] == "") {
-                        that._cusNoteWheel.navItems[l * max + j].navItem.hide();
-                    } else {
-                        that._cusNoteWheel.navItems[l * max + j].navItem.show();
-                    }
+            labels = [];
+            for (let ii = 0; ii < max; ii++) {
+                if (ii < labelsDict[that._customWheel.navItems[i].title].length) {
+                    labels.push(labelsDict[that._customWheel.navItems[i].title][ii]);
+                } else {
+                    labels.push("");
                 }
             }
+            // Update the navItems
+            for (let ii = 0; ii < labels.length; ii++) {
+                if (labels[ii].length === 0) {
+                    that._cusNoteWheel.navItems[ii].navItem.hide();
+                } else {
+                    that._cusNoteWheel.navItems[ii].title = labels[ii];
+                    that._cusNoteWheel.navItems[ii].navItem.title = labels[ii];
+                    that._cusNoteWheel.navItems[ii].basicNavTitleMax.title = labels[ii];
+                    that._cusNoteWheel.navItems[ii].basicNavTitleMin.title = labels[ii];
+                    that._cusNoteWheel.navItems[ii].hoverNavTitleMax.title = labels[ii];
+                    that._cusNoteWheel.navItems[ii].hoverNavTitleMin.title = labels[ii];
+                    that._cusNoteWheel.navItems[ii].selectedNavTitleMax.title = labels[ii];
+                    that._cusNoteWheel.navItems[ii].selectedNavTitleMin.title = labels[ii];
+                    that._cusNoteWheel.navItems[ii].initNavTitle.title = labels[ii];
+                    that._cusNoteWheel.navItems[ii].navItem.show();
+                }
+            }
+            that._customWheel.refreshWheel();
+            that._cusNoteWheel.navigateWheel(0);
         };
     };
 
@@ -3040,7 +3069,7 @@ const piemenuModes = function (block, selectedMode) {
             that._modeNameWheel.createWheel(labels);
         } else {
             for (let i = 0; i < that._modeNameWheel.navItems.length; i++) {
-                // Maybe there is a method that does block.
+                // Maybe there is a method that does this?
                 that._modeNameWheel.navItems[i].title = labels[i];
                 that._modeNameWheel.navItems[i].basicNavTitleMax.title = labels[i];
                 that._modeNameWheel.navItems[i].basicNavTitleMin.title = labels[i];
