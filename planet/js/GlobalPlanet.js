@@ -47,7 +47,7 @@ function GlobalPlanet(Planet) {
     this.oldSearchString = "";
     this.remixPrefix = _("Remix of");
 
-    this.initTagList = function() {
+    this.initTagList = () => {
         let t;
         for (let i = 0; i < this.specialTags.length; i++) {
             t = new GlobalTag(Planet);
@@ -82,7 +82,7 @@ function GlobalPlanet(Planet) {
         this.refreshTagList();
     };
 
-    this.selectSpecialTag = function(tag) {
+    this.selectSpecialTag = tag => {
         for (let i = 0; i < this.tags.length; i++) {
             this.tags[i].unselect();
         }
@@ -90,7 +90,7 @@ function GlobalPlanet(Planet) {
         tag.func();
     };
 
-    this.unselectSpecialTags = function() {
+    this.unselectSpecialTags = () => {
         for (let i = 0; i < this.tags.length; i++) {
             if (this.tags[i].specialTag) {
                 this.tags[i].unselect();
@@ -98,7 +98,7 @@ function GlobalPlanet(Planet) {
         }
     };
 
-    this.refreshTagList = function() {
+    this.refreshTagList = () => {
         const tagids = [];
         for (let i = 0; i < this.tags.length; i++) {
             if (this.tags[i].specialTag === false && this.tags[i].selected === true) {
@@ -114,22 +114,22 @@ function GlobalPlanet(Planet) {
         }
     };
 
-    this.searchAllProjects = function() {
+    this.searchAllProjects = () => {
         this.searchMode = "ALL_PROJECTS";
         this.refreshProjects();
     };
 
-    this.searchMyProjects = function() {
+    this.searchMyProjects = () => {
         this.searchMode = "USER_PROJECTS";
         this.refreshProjects();
     };
 
-    this.searchTags = function(tagids) {
+    this.searchTags = tagids => {
         this.searchMode = JSON.stringify(tagids);
         this.refreshProjects();
     };
 
-    this.refreshProjects = function() {
+    this.refreshProjects = () => {
         this.index = 0;
         this.cards = [];
         document.getElementById("global-projects").innerHTML = "";
@@ -154,7 +154,7 @@ function GlobalPlanet(Planet) {
         }
     };
 
-    this.loadMoreProjects = function() {
+    this.loadMoreProjects = () =>{
         this.showLoading();
         this.hideLoadMore();
         if (this.oldSearchString !== "") {
@@ -176,7 +176,7 @@ function GlobalPlanet(Planet) {
         }
     };
 
-    this.search = function() {
+    this.search = () => {
         if (!this.searching) {
             if (this.searchString === "") {
                 this.oldSearchString = "";
@@ -203,14 +203,14 @@ function GlobalPlanet(Planet) {
         }
     };
 
-    this.afterSearch = function() {
+    this.afterSearch = () => {
         this.searching = false;
         if (this.searchString !== this.oldSearchString) {
             this.search();
         }
     };
 
-    this.afterRefreshProjects = function(data) {
+    this.afterRefreshProjects = data => {
         if (data.success) {
             this.addProjects(data.data);
         } else {
@@ -218,7 +218,7 @@ function GlobalPlanet(Planet) {
         }
     };
 
-    this.addProjects = function(data) {
+    this.addProjects = data => {
         const toDownload = [];
         for (let i = 0; i < data.length; i++) {
             // eslint-disable-next-line no-prototype-builtins
@@ -258,7 +258,7 @@ function GlobalPlanet(Planet) {
         }
     };
 
-    this.downloadProjectsToCache = function(data, callback) {
+    this.downloadProjectsToCache = (data, callback) => {
         this.loadCount = data.length;
         for (let i = 0; i < data.length; i++) {
             (function() {
@@ -271,7 +271,7 @@ function GlobalPlanet(Planet) {
         }
     };
 
-    this.addProjectToCache = function(id, data, callback) {
+    this.addProjectToCache = (id, data, callback) => {
         if (data.success) {
             this.cache[id] = data.data;
             this.cache[id].ProjectData = null;
@@ -284,13 +284,13 @@ function GlobalPlanet(Planet) {
         }
     };
 
-    this.forceAddToCache = function(id, callback) {
+    this.forceAddToCache = (id, callback) => {
         Planet.ServerInterface.getProjectDetails(id, function(d) {
             this.addProjectToCache(id, d, callback);
         }.bind(this));
     };
 
-    this.afterForceAddToCache = function(id, data, callback) {
+    this.afterForceAddToCache = (id, data, callback) => {
         if (data.success) {
             this.cache[id] = data.data;
             this.cache[id].ProjectData = null;
@@ -300,7 +300,7 @@ function GlobalPlanet(Planet) {
         }
     };
 
-    this.getData = function(id, callback, error) {
+    this.getData = (id, callback, error) => {
         if (error === undefined) {
             error = null;
         }
@@ -312,7 +312,7 @@ function GlobalPlanet(Planet) {
         }
     };
 
-    this.downloadDataToCache = function(id, callback, error) {
+    this.downloadDataToCache = (id, callback, error) => {
         if (error === undefined) {
             error = null;
         }
@@ -322,7 +322,7 @@ function GlobalPlanet(Planet) {
         }.bind(this));
     };
 
-    this.afterDownloadData = function(id, data, callback, error) {
+    this.afterDownloadData = (id, data, callback, error) => {
         if (error === undefined) {
             error = null;
         }
@@ -341,7 +341,7 @@ function GlobalPlanet(Planet) {
         }
     };
 
-    this.render = function(data) {
+    this.render = data => {
         for (let i = 0; i < data.length; i++) {
             // eslint-disable-next-line no-prototype-builtins
             if (this.cache.hasOwnProperty(data[i][0])) {
@@ -359,7 +359,7 @@ function GlobalPlanet(Planet) {
         this.afterAddProjects();
     };
 
-    this.afterAddProjects = function() {
+    this.afterAddProjects = () => {
         this.index += this.page;
         this.hideLoading();
         if (this.oldSearchString !== "") {
@@ -367,47 +367,47 @@ function GlobalPlanet(Planet) {
         }
     };
 
-    this.throwOfflineError = function() {
+    this.throwOfflineError = () => {
         this.hideLoading();
         this.hideLoadMore();
         document.getElementById("global-projects").innerHTML = this.offlineHTML;
     };
 
-    this.throwNoProjectsError = function() {
+    this.throwNoProjectsError = () => {
         this.hideLoading();
         this.hideLoadMore();
         document.getElementById("global-projects").innerHTML = this.noProjects;
     };
 
-    this.hideLoading = function() {
+    this.hideLoading = () => {
         document.getElementById("global-load").style.display = "none";
     };
 
-    this.showLoading = function() {
+    this.showLoading = () => {
         document.getElementById("global-load").style.display = "block";
     };
 
-    this.hideLoadMore = function() {
+    this.hideLoadMore = () => {
         document.getElementById("load-more-projects").style.display = "none";
         this.loadButtonShown = false;
     };
 
-    this.showLoadMore = function() {
+    this.showLoadMore = () => {
         const l = document.getElementById("load-more-projects");
         l.style.display = "block";
         l.classList.remove("disabled");
         this.loadButtonShown = true;
     };
 
-    this.hideTags = function() {
+    this.hideTags = () => {
         document.getElementById("tagscontainer").style.display = "none";
     };
 
-    this.showTags = function() {
+    this.showTags = () => {
         document.getElementById("tagscontainer").style.display = "block";
     };
 
-    this.openGlobalProject = function(id, error) {
+    this.openGlobalProject = (id, error) => {
         if (error === undefined) {
             error = null;
         }
@@ -430,7 +430,7 @@ function GlobalPlanet(Planet) {
         }, error);
     };
 
-    this.mergeGlobalProject = function(id, error) {
+    this.mergeGlobalProject = (id, error) => {
         if (error === undefined) {
             error = null;
         }
@@ -453,7 +453,7 @@ function GlobalPlanet(Planet) {
         }, error);
     };
     
-    this.init = function() {
+    this.init = () => {
         if (!Planet.ConnectedToServer) {
             document.getElementById("globaltitle").textContent = _("Cannot connect to server");
             document.getElementById("globalcontents").innerHTML = this.offlineHTML;

@@ -40,7 +40,7 @@ function Planet(isMusicBlocks, storage) {
     this.oldCurrentProjectID = null;
     this.loadProjectFromFile = null;
 
-    this.prepareUserID = function() {
+    this.prepareUserID = () => {
         let id = getCookie(this.UserIDCookie);
         if (id === ""){
             id = this.ProjectStorage.generateID();
@@ -49,45 +49,45 @@ function Planet(isMusicBlocks, storage) {
         this.UserID = id;
     };
 
-    this.open = function(image) {
+    this.open = image => {
         this.LocalPlanet.setCurrentProjectImage(image);
         this.LocalPlanet.updateProjects();
         this.oldCurrentProjectID = this.ProjectStorage.getCurrentProjectID();
     };
 
-    this.saveLocally = function(data, image) {
+    this.saveLocally = (data, image) => {
         this.ProjectStorage.saveLocally(data, image);
     };
 
-    this.setAnalyzeProject = function(func) {
+    this.setAnalyzeProject = func => {
         this.analyzeProject = func;
     };
 
-    this.setLoadProjectFromData = function(func) {
+    this.setLoadProjectFromData = func => {
         this.loadProjectFromData = func;
     };
 
-    this.setPlanetClose = function(func) {
+    this.setPlanetClose = func => {
         this.planetClose = func;
     };
 
-    this.setLoadNewProject = function(func) {
+    this.setLoadNewProject = func => {
         this.loadNewProject = func;
     };
 
-    this.setLoadProjectFromFile = function(func) {
+    this.setLoadProjectFromFile = func => {
         this.loadProjectFromFile = func;
     };
 
-    this.setOnConverterLoad = function(func) {
+    this.setOnConverterLoad = func => {
         this.onConverterLoad = func;
     };
 
-    this.openProjectFromPlanet = function(id,error) {
+    this.openProjectFromPlanet = (id,error) => {
         this.GlobalPlanet.openGlobalProject(id,error);
     };
 
-    this.init = async function() {
+    this.init = async () => {
         this.StringHelper = new StringHelper(this);
         this.StringHelper.init();
         this.ProjectStorage = new ProjectStorage(this);
@@ -96,21 +96,20 @@ function Planet(isMusicBlocks, storage) {
         this.ServerInterface = new ServerInterface(this);
         this.ServerInterface.init();
 
-        const that = this;
 
         // eslint-disable-next-line no-unused-vars
-        document.getElementById("close-planet").addEventListener("click", function (evt) {
-            that.closeButton();
+        document.getElementById("close-planet").addEventListener("click", evt => {
+            this.closeButton();
         });
 
         // eslint-disable-next-line no-unused-vars
-        document.getElementById("planet-open-file").addEventListener("click", function (evt) {
-            that.loadProjectFromFile();
+        document.getElementById("planet-open-file").addEventListener("click", evt => {
+            this.loadProjectFromFile();
         });
 
         // eslint-disable-next-line no-unused-vars
-        document.getElementById("planet-new-project").addEventListener("click", function (evt) {
-            that.loadNewProject();
+        document.getElementById("planet-new-project").addEventListener("click", evt => {
+            this.loadNewProject();
         });
 
         this.ServerInterface.getTagManifest(
@@ -120,7 +119,7 @@ function Planet(isMusicBlocks, storage) {
         );
     };
 
-    this.closeButton = function() {
+    this.closeButton = () => {
         if (this.ProjectStorage.getCurrentProjectID() !== this.oldCurrentProjectID) {
             const d = this.ProjectStorage.getCurrentProjectData();
             if (d === null){
@@ -133,7 +132,7 @@ function Planet(isMusicBlocks, storage) {
         }
     };
 
-    this.initPlanets = function(tags) {
+    this.initPlanets = tags => {
         if (!tags.success){
             this.ConnectedToServer = false;
         } else {

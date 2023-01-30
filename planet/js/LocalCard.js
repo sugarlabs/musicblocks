@@ -49,7 +49,7 @@ function LocalCard(Planet) {
         </div>  \
 </div>";
 
-    this.download = function() {
+    this.download = () => {
         let image = Planet.ProjectStorage.ImageDataURL;
         if (this.ProjectData.ProjectImage !== null) {
             image = this.ProjectData.ProjectImage;
@@ -68,12 +68,12 @@ function LocalCard(Planet) {
         );
     };
 
-    this.duplicate = function() {
+    this.duplicate = () => {
         Planet.ProjectStorage.initialiseNewProject(this.ProjectData.ProjectName + " " + this.CopySuffix, this.ProjectData.ProjectData, this.ProjectData.ProjectImage);
         Planet.LocalPlanet.updateProjects();
     };
 
-    this.render = function() {
+    this.render = () => {
         // TODO: Have a TB placeholder image specific to TB projects
         const html = this.renderData.replace(new RegExp("{ID}", "g"), this.id);
         const frag = document.createRange().createContextualFragment(html);
@@ -90,65 +90,64 @@ function LocalCard(Planet) {
         // set input text
         frag.getElementById("local-project-input-" + this.id).value = this.ProjectData.ProjectName;
 
-        const that = this;
 
         // set edit modify listener
         // eslint-disable-next-line no-unused-vars
-        frag.getElementById("local-project-edit-" + this.id).addEventListener("click", function (evt) {
-            Planet.LocalPlanet.openProject(that.id);
+        frag.getElementById("local-project-edit-" + this.id).addEventListener("click", evt => {
+            Planet.LocalPlanet.openProject(this.id);
         });
 
         // set image listener
         // eslint-disable-next-line no-unused-vars
-        frag.getElementById("local-project-image-" + this.id).addEventListener("click", function (evt) {
-            Planet.LocalPlanet.openProject(that.id);
+        frag.getElementById("local-project-image-" + this.id).addEventListener("click", evt => {
+            Planet.LocalPlanet.openProject(this.id);
         });
 
         // set merge modify listener
         // eslint-disable-next-line no-unused-vars
-        frag.getElementById("local-project-merge-" + this.id).addEventListener("click", function (evt) {
-            Planet.LocalPlanet.openProject(that.id);
+        frag.getElementById("local-project-merge-" + this.id).addEventListener("click", evt => {
+            Planet.LocalPlanet.openProject(this.id);
         });
 
         // set input modify listener
         // eslint-disable-next-line no-unused-vars
-        frag.getElementById("local-project-input-" + this.id).addEventListener("input", function (evt) {
-            Planet.ProjectStorage.renameProject(that.id, this.value);
+        frag.getElementById("local-project-input-" + this.id).addEventListener("input", evt => {
+            Planet.ProjectStorage.renameProject(this.id, this.value);
         });
 
         // set delete button listener
         // eslint-disable-next-line no-unused-vars
-        frag.getElementById("local-project-delete-" + this.id).addEventListener("click", function (evt) {
-            Planet.LocalPlanet.openDeleteModal(that.id);
+        frag.getElementById("local-project-delete-" + this.id).addEventListener("click", evt => {
+            Planet.LocalPlanet.openDeleteModal(this.id);
         });
                 
         // set publish button listener
         // eslint-disable-next-line no-unused-vars
-        frag.getElementById("local-project-publish-" + this.id).addEventListener("click", function (evt) {
-            Planet.LocalPlanet.Publisher.open(that.id);
+        frag.getElementById("local-project-publish-" + this.id).addEventListener("click", evt => {
+            Planet.LocalPlanet.Publisher.open(this.id);
         });
 
         // set download button listener
         // eslint-disable-next-line no-unused-vars
-        frag.getElementById("local-project-download-" + this.id).addEventListener("click", function (evt) {
-            that.download();
+        frag.getElementById("local-project-download-" + this.id).addEventListener("click", evt => {
+            this.download();
         });
 
         // set duplicate button listener
         // eslint-disable-next-line no-unused-vars
-        frag.getElementById("local-project-duplicate-" + this.id).addEventListener("click", function (evt) {
-            that.duplicate();
+        frag.getElementById("local-project-duplicate-" + this.id).addEventListener("click", evt => {
+            this.duplicate();
         });
 
         // set published cloud listener
         if (this.ProjectData.PublishedData !== null) {
             frag.getElementById("local-project-cloud-" + this.id).style.display = "initial";
             // eslint-disable-next-line no-unused-vars
-            frag.getElementById("local-project-cloud-" + this.id).addEventListener("click", function (evt) {
+            frag.getElementById("local-project-cloud-" + this.id).addEventListener("click", evt => {
                 // TODO: Implement view-published-project thing
                 document.getElementById("global-tab").click();
-                Planet.GlobalPlanet.forceAddToCache(that.id, function() {
-                    Planet.GlobalPlanet.ProjectViewer.open(that.id);
+                Planet.GlobalPlanet.forceAddToCache(this.id, () => {
+                    Planet.GlobalPlanet.ProjectViewer.open(this.id);
                 });
             });
         }
@@ -156,7 +155,7 @@ function LocalCard(Planet) {
         document.getElementById("local-projects").appendChild(frag);
     };
 
-    this.init = function(id) {
+    this.init = id => {
         this.id = id;
         this.ProjectData = Planet.LocalPlanet.ProjectTable[this.id];
     };

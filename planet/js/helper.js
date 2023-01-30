@@ -29,11 +29,11 @@
 
 function debounce(func, wait, immediate) {
     let timeout;
-    return function () {
+    return () => {
         const context = this,
             args = arguments;
 
-        const later = function () {
+        const later = () => {
             timeout = null;
             if (!immediate) func.apply(context, args);
         };
@@ -99,7 +99,7 @@ function toggleExpandable(id, c) {
 
 function hideOnClickOutside(eles, other) {
     // if click not in id, hide
-    const outsideClickListener = function (event) {
+    const outsideClickListener = event => {
         // eslint-disable-next-line max-len
         const path = event.path || (event.composedPath && event.composedPath()) || event.composedPath(event.target);
         let ok = false;
@@ -116,7 +116,7 @@ function hideOnClickOutside(eles, other) {
         }
     };
 
-    const removeClickListener = function () {
+    const removeClickListener = () => {
         document.removeEventListener("click", outsideClickListener);
     };
 
@@ -134,12 +134,12 @@ function updateCheckboxes(id) {
     urlel.value = url;
 };
 
-$(document).ready(function () {
+$(document).ready(() => {
     $("#publisher").modal();
     $("#deleter").modal();
     $("#projectviewer").modal();
     // eslint-disable-next-line no-unused-vars
-    document.getElementById("global-search").addEventListener("input", function (evt) {
+    document.getElementById("global-search").addEventListener("input", (evt) => {
         if (this.value !== "") {
             document.getElementById("search-close").style.display = "initial";
         } else {
@@ -147,15 +147,15 @@ $(document).ready(function () {
         }
     });
     // eslint-disable-next-line no-unused-vars
-    document.getElementById("local-tab").addEventListener("click", function (evt) {
+    document.getElementById("local-tab").addEventListener("click", (evt) => {
         toggleSearch(false);
     });
     // eslint-disable-next-line no-unused-vars
-    document.getElementById("global-tab").addEventListener("click", function (evt) {
+    document.getElementById("global-tab").addEventListener("click", (evt) => {
         toggleSearch(true);
     });
     // eslint-disable-next-line no-unused-vars
-    document.getElementById("view-more-chips").addEventListener("click", function (evt) {
+    document.getElementById("view-more-chips").addEventListener("click", (evt) => {
         const showMore = _("Show more tags");
         const showLess = _("Show fewer tags");
         toggleExpandable("morechips", "flexchips");
