@@ -561,7 +561,7 @@ function setupIntervalsBlocks(activity) {
             const listenerName = "_duplicate_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __lookForOtherTurtles = function(blk, turtle) {
+            const __lookForOtherTurtles = (blk, turtle) => {
                 for (const t in logo.connectionStore) {
                     if (t !== turtle.toString()) {
                         for (const b in logo.connectionStore[t]) {
