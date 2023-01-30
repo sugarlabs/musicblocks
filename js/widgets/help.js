@@ -78,10 +78,9 @@ class HelpWidget {
         // this._helpDiv.style.maxHeight = "100%";
         // this._helpDiv.style.overflowY = "auto";
         this._helpDiv.innerHTML =
-            '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
+            '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div></div><div id="helpBodyDiv" tabindex="-1"></div>';
 
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
-
         let leftArrow, rightArrow;
         if (!useActiveBlock) {
             this.widgetWindow.updateTitle(_("Take a tour"));
@@ -96,12 +95,15 @@ class HelpWidget {
             let cell = docById("left-arrow");
 
             cell.onclick = () => {
-                page = page - 1;
-                if (page < 0) {
-                    page = HELPCONTENT.length - 1;
+                if (page !==0){
+                    page = page-1;
+                    if (page < 0) {
+                        page = HELPCONTENT.length - 1;
+                    }
+    
+                    this._showPage(page);
                 }
-
-                this._showPage(page);
+                
             };
 
             cell = docById("right-arrow");
