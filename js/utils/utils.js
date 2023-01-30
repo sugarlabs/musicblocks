@@ -252,7 +252,7 @@ function doBrowserCheck() {
 
 // Check for Internet Explorer
 
-window.onload = function () {
+window.onload = () => {
     const userAgent = window.navigator.userAgent;
     // For IE 10 or older
     const MSIE = userAgent.indexOf("MSIE ");

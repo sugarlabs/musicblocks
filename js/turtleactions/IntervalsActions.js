@@ -65,6 +65,20 @@ function setupIntervalsActions(activity) {
             return modename;
         }
 
+ /**
+         * @static
+         * @param {number} turtle
+         * @returns {String}
+         */
+        static GetIntervalNumber(turtle) {
+            const intervals = activity.turtles.ithTurtle(turtle).singer.intervals;
+            let totalIntervals = 0;
+            for (let i = 0; i < intervals.length; i++) {
+                totalIntervals += intervals[i];
+            }
+            return totalIntervals;
+        }
+
         /**
          * "set key" block.
          * Sets the key and mode.
@@ -256,6 +270,40 @@ function setupIntervalsActions(activity) {
         }
 
         /**
+         * "chord interval" block.
+         * Calculates a scalar interval modified by a semitone interval
+         *
+         * @static
+         * @param {Object} value - interval array: [scalar, semitone]
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number|String} [blk] - corresponding Block index in blocks.blockList
+         * @returns {void}
+         */
+        static setChordInterval(obj, turtle, blk) {
+            let arg = obj;
+            if (arg === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                arg = [1, 0];
+            }
+
+            const tur = activity.turtles.ithTurtle(turtle);
+
+            tur.singer.chordIntervals.push(arg);
+
+            const listenerName = "_chord_interval_" + turtle;
+            if (blk !== undefined && blk in activity.blocks.blockList) {
+                activity.logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                const mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
+            }
+
+            const __listener = () => tur.singer.chordIntervals.pop();
+
+            activity.logo.setTurtleListener(turtle, listenerName, __listener);
+        }
+
+        /**
          * "semi-tone interval" block.
          * Calculates a relative interval of half-steps for the notes with it.
          *
@@ -291,6 +339,38 @@ function setupIntervalsActions(activity) {
 
                 activity.logo.setTurtleListener(turtle, listenerName, __listener);
             }
+        }
+
+        /**
+         * "ratio interval" block.
+         * Calculates a relative interval based on a ratio.
+         *
+         * @static
+         * @param {Number} value - ratio
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number|String} [blk] - corresponding Block index in blocks.blockList
+         * @returns {void}
+         */
+        static setRatioInterval(value, turtle, blk) {
+            let arg = value;
+            if (arg === null || typeof arg !== "number") {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                arg = 1;
+            }
+
+            const tur = activity.turtles.ithTurtle(turtle);
+            tur.singer.ratioIntervals.push(value);
+            const listenerName = "_ratio_interval_" + turtle;
+            if (blk !== undefined && blk in activity.blocks.blockList) {
+                activity.logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                const mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
+            }
+
+            const __listener = () => tur.singer.ratioIntervals.pop();
+
+            activity.logo.setTurtleListener(turtle, listenerName, __listener);
         }
 
         /**

@@ -13,7 +13,8 @@
    global
 
    last, _, ValueBlock, FlowClampBlock, FlowBlock, NOINPUTERRORMSG,
-   LeftBlock, Singer, CHORDNAMES, CHORDVALUES, DEFAULTCHORD, Queue
+   LeftBlock, Singer, CHORDNAMES, CHORDVALUES, DEFAULTCHORD,
+   Queue, INTERVALVALUES
  */
 
 /*
@@ -164,6 +165,34 @@ function setupIntervalsBlocks(activity) {
             this.setHelpString();
             this.extraWidth = 50;
             this.formBlock({ outType: "numberout" });
+        }
+    }
+
+  class IntervalNumberBlock extends ValueBlock {
+        constructor() {
+            super("intervalnumber", _("interval number"));
+            this.setPalette("intervals", activity);
+            this.setHelpString();
+            this.beginnerBlock(true);
+            this.hidden = true;
+            this.formBlock({ outType: "numberout" });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return activity.blocks.blockList[blk].value;
+        }
+
+        arg(logo, turtle, blk) {
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            if (
+                logo.inStatusMatrix &&
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
+            ) {
+                logo.statusFields.push([blk, "intervalnumber"]);
+            } else {
+                return Singer.IntervalsActions.GetIntervalNumber(turtle);
+            }
         }
     }
 
@@ -532,7 +561,7 @@ function setupIntervalsBlocks(activity) {
             const listenerName = "_duplicate_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __lookForOtherTurtles = function(blk, turtle) {
+            const __lookForOtherTurtles = (blk, turtle) => {
                 for (const t in logo.connectionStore) {
                     if (t !== turtle.toString()) {
                         for (const b in logo.connectionStore[t]) {
@@ -702,16 +731,72 @@ function setupIntervalsBlocks(activity) {
                 i = CHORDNAMES.indexOf(DEFAULTCHORD);
             }
             for (let ii = 0; ii < CHORDVALUES[i].length; ii++) {
-                if (isNaN(CHORDVALUES[i][ii])) {
+                if (isNaN(CHORDVALUES[i][ii][0])) {
                     continue;
                 }
-                if (CHORDVALUES[i][ii] === 0) {
+                if (CHORDVALUES[i][ii][0] === 0 && CHORDVALUES[i][ii][1] === 0) {
                     continue;
                 }
-                Singer.IntervalsActions.setSemitoneInterval(
+                Singer.IntervalsActions.setChordInterval(
                     CHORDVALUES[i][ii], turtle, blk
                 );
             }
+            return [args[1], 1];
+        }
+    }
+    
+
+    class RatioIntervalBlock extends FlowClampBlock {
+        constructor() {
+            super("ratiointerval");
+            this.setPalette("intervals", activity);
+            this.setHelpString([
+                _("The Ratio Interval block calculates an interval based on a ratio."),
+                "documentation",
+                ""
+            ]);
+            this.formBlock({
+                name: _("ratio interval"),
+                args: 1,
+                argTypes: ["anyin"],
+                defaults: [3 / 2]  // fifth
+            });
+            this.makeMacro((x, y) => [
+                [0, "ratiointerval", x, y, [null, 1, 4, 5]],
+                [1, "divide", 0, 0, [0, 2, 3]],
+                [2, ["number", {"value": 3}], 0, 0, [1]],
+                [3, ["number", {"value": 2}], 0, 0, [1]],
+                [4, "vspace", 0, 0, [0, null]],
+                [5, "hidden", 0, 0, [0, null]]
+            ]);
+        }
+
+        flow(args, logo, turtle, blk) {
+            if (args[1] === undefined) return;
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            let r = args[0];
+            if (cblk === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                r = 1;
+            } else if (activity.blocks.blockList[cblk].name === "intervalname") {
+                const intervalName = activity.blocks.blockList[cblk].value;
+                if (intervalName in INTERVALVALUES) {
+                    r = INTERVALVALUES[intervalName][2];
+                } else {
+                    // eslint-disable-next-line no-console
+                    console.log("could not find " + intervalName + " in INTERVALVALUES");
+                    r = 1;
+                }
+            }
+
+            if (isNaN(r) || r < 0) {
+                r = 1;
+                // eslint-disable-next-line no-console
+                console.debug("ratio " + r + " must be a number > 0");
+            }
+            Singer.IntervalsActions.setRatioInterval(
+                r, turtle, blk
+            );
             return [args[1], 1];
         }
     }
@@ -997,12 +1082,14 @@ function setupIntervalsBlocks(activity) {
     new ModeNameBlock().setup(activity);
     new DoublyBlock().setup(activity);
     new IntervalNameBlock().setup(activity);
+    new IntervalNumberBlock().setup(activity);
     new MeasureIntervalSemitonesBlock().setup(activity);
     new MeasureIntervalScalarBlock().setup(activity);
     makeSemitoneIntervalMacroBlocks();
     new PerfectBlock().setup(activity);
     new ArpeggioBlock().setup(activity);
     new ChordIntervalBlock().setup(activity);
+    new RatioIntervalBlock().setup(activity);
     new SemitoneIntervalBlock().setup(activity);
     // makeIntervalMacroBlocks();
     new ScalarIntervalBlock().setup(activity);

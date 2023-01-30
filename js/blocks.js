@@ -5415,6 +5415,7 @@ class Blocks {
                 }
 
                 switch (name) {
+                    case "arpeggio":
                     case "articulation":
                     case "backward":
                     case "crescendo":
@@ -5434,10 +5435,12 @@ class Blocks {
                     case "newswing2":
                     case "osctime":
                     case "pluck":
+                    case "ratiointerval":
                     case "rhythmicdot":
                     case "semitoneinterval":
                     case "setbpm":
                     case "setnotevolume2":
+                    case "setratio":
                     case "setscalartransposition":
                     case "settransposition":
                     case "setvoice":

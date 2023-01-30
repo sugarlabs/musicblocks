@@ -89,7 +89,7 @@ function setupActionBlocks(activity) {
                 const xmlHttp = new XMLHttpRequest();
                 xmlHttp.open("POST", outurl, true);
                 // Call a function when the state changes.
-                xmlHttp.onreadystatechange = function() {
+                xmlHttp.onreadystatechange = () => {
                     if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
                         alert(xmlHttp.responseText);
                     }

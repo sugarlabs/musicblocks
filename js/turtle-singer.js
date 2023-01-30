@@ -80,8 +80,10 @@ class Singer {
         this.scalarTranspositionValues = [];
         this.transposition = 0;
         this.transpositionValues = [];
+        this.transpositionRatios = [];
 
         // Parameters used by notes
+        this.defaultNoteValue = 4;
         this.register = 0;
         this.beatFactor = 1;
         this.dotCount = 0;
@@ -96,7 +98,6 @@ class Singer {
         this.noteBeatValues = {};
         this.embeddedGraphics = {};
         this.delayedNotes = [];
-        // this.embeddedNotes = {};
         this.lastNotePlayed = null;
         this.lastPitchPlayed = {}; // for a stand-alone pitch block
         this.previousNotePlayed = null;
@@ -136,6 +137,8 @@ class Singer {
         this.crescendoInitialVolume = { DEFAULTVOICE: [DEFAULTVOLUME] };
         this.intervals = []; // relative interval (based on scale degree)
         this.semitoneIntervals = []; // absolute interval (based on semitones)
+        this.chordIntervals = []; // combination of scale degree and semitones
+        this.ratioIntervals = []; // ratio based on hertz value
         this.staccato = [];
         this.glide = [];
         this.glideOverride = 0;
@@ -886,20 +889,38 @@ class Singer {
                 const alen = tur.singer.arpeggio.length;
                 let atrans = transposition;
                 let anote = note;
+                let noteObj;
                 if (alen > 0) {
-                    if (isNaN(tur.singer.arpeggio[tur.singer.arpeggioIndex])) {
+                    noteObj = getNote(
+                        note,
+                        octave,
+                        0,
+                        tur.singer.keySignature,
+                        tur.singer.moveable,
+                        direction,
+                        activity.errorMsg,
+                        activity.logo.synth.inTemperament
+                    );
+                    // Each arpeggio is a [scalar, semitone].
+                    if (isNaN(tur.singer.arpeggio[tur.singer.arpeggioIndex][0])) {
                         anote = "rest";
                         tur.singer.arpeggioIndex += 1;
                     } else {
-                        atrans += tur.singer.arpeggio[tur.singer.arpeggioIndex];
+                        const arpeggioTrans = getInterval(
+                            tur.singer.arpeggio[tur.singer.arpeggioIndex][0],
+                            tur.singer.keySignature,
+                            noteObj[0],
+                        ) + tur.singer.arpeggio[tur.singer.arpeggioIndex][1];
+                        atrans += arpeggioTrans;
+
                         tur.singer.arpeggioIndex += 1;
-                        if (tur.singer.arpeggioIndex === alen) {
-                            tur.singer.arpeggioIndex = 0;
-                        }
+                    }
+                    if (tur.singer.arpeggioIndex === alen) {
+                        tur.singer.arpeggioIndex = 0;
                     }
                 }
 
-                const noteObj = getNote(
+                noteObj = getNote(
                     anote,
                     octave,
                     // FIXME: should not be hardwired to 12
@@ -910,6 +931,24 @@ class Singer {
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
                 );
+
+                // Apply ratio transposition:
+                // (1) convert note to Hertz
+                // (2) apply ratio
+                // (3) convert back to pitch, octave, cents
+                let ratio = 1;
+                for (let i = 0; i < tur.singer.transpositionRatios.length; i++) {
+                    ratio *= tur.singer.transpositionRatios[i];
+                }
+                if (ratio != 1) {
+                    const hertz = pitchToFrequency(
+                        noteObj[0],
+                        noteObj[1],
+                        0,
+                        tur.singer.keySignature
+                    ) * ratio;
+                    noteObj = frequencyToPitch(hertz);
+                }
 
                 if (tur.singer.drumStyle.length > 0) {
                     const drumname = last(tur.singer.drumStyle);
@@ -956,6 +995,40 @@ class Singer {
                     activity.logo.synth.inTemperament
                 );
                 addPitch(noteObj2[0], noteObj2[1], cents, tur.singer.semitoneIntervals[i][1]);
+            }
+
+            // Combo of a scalar interval and a semitone interval
+            for (let i = 0; i < tur.singer.chordIntervals.length; i++) {
+                const noteObj2 = getNote(
+                    noteObj1[0],
+                    noteObj1[1],
+                    getInterval(
+                        tur.singer.chordIntervals[i][0],
+                        tur.singer.keySignature,
+                        noteObj1[0]
+                    ) + tur.singer.chordIntervals[i][1],
+                    tur.singer.keySignature,
+                    tur.singer.moveable,
+                    null,
+                    activity.errorMsg,
+                    activity.logo.synth.inTemperament
+                );
+                addPitch(noteObj2[0], noteObj2[1], cents);
+            }
+
+            for (let i = 0; i < tur.singer.ratioIntervals.length; i++) {
+                // Now that we have the note, we need to:
+                // (1) convert it to Hertz
+                // (2) apply the ratio
+                // (3) convert it to pitch, octave, cents
+                const hertz = pitchToFrequency(
+                    noteObj1[0],
+                    noteObj1[1],
+                    0,
+                    tur.singer.keySignature
+                ) * tur.singer.ratioIntervals[i];
+                const noteObj2 = frequencyToPitch(hertz);
+                addPitch(noteObj2[0], noteObj2[1], noteObj2[2]);
             }
 
             if (tur.singer.inNoteBlock.length > 0) {
@@ -1123,7 +1196,7 @@ class Singer {
 
             tur.singer.pushedNote = true;
 
-            Singer.processNote(activity, 4, false, blk, turtle, () => {
+            Singer.processNote(activity, tur.singer.defaultNoteValue, false, blk, turtle, () => {
                 tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
             });
         }

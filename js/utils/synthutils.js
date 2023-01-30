@@ -360,7 +360,7 @@ function Synth() {
     // this.tone = new Tone();
     this.tone = null;
 
-    Tone.Buffer.onload = function () {
+    Tone.Buffer.onload = () => {
         // eslint-disable-next-line no-console
         console.debug("sample loaded");
     };
@@ -373,11 +373,15 @@ function Synth() {
     this.startingPitch = "C4";
     this.noteFrequencies = {};
 
-    this.newTone = function () {
+    this.newTone = () => {
         this.tone = Tone;
     };
 
-    this.temperamentChanged = function (temperament, startingPitch) {
+    this.whichTemperament = () => {
+        return this.inTemperament;
+    };
+
+    this.temperamentChanged = (temperament, startingPitch) => {
         let startPitch = startingPitch;
         const t = getTemperament(temperament);
         const len = startPitch.length;
@@ -510,11 +514,11 @@ function Synth() {
         this.changeInTemperament = false;
     };
 
-    this.getFrequency = function (notes, changeInTemperament) {
+    this.getFrequency = (notes, changeInTemperament) => {
         return this._getFrequency(notes, changeInTemperament);
     };
 
-    this._getFrequency = function (notes, changeInTemperament, temperament) {
+    this._getFrequency = (notes, changeInTemperament, temperament) => {
         if (changeInTemperament) {
             if (temperament === undefined) {
                 this.temperamentChanged(this.inTemperament, this.startingPitch);
@@ -587,7 +591,7 @@ function Synth() {
     };
 
     this.getCustomFrequency = (notes, customID) => {
-        const __getCustomFrequency = function (oneNote, startingPitch) {
+        const __getCustomFrequency = (oneNote, startingPitch) => {
             const octave = oneNote.slice(-1);
             oneNote = getCustomNote(oneNote.substring(0, oneNote.length - 1));
             const pitch = startingPitch;
@@ -638,7 +642,7 @@ function Synth() {
         }
     };
 
-    this.resume = function () {
+    this.resume = () => {
         if (this.tone === null) {
             this.newTone();
         }
@@ -647,7 +651,7 @@ function Synth() {
     };
 
     /*eslint-disable no-undef*/
-    this.loadSamples = function () {
+    this.loadSamples = () => {
         this.samplesManifest = {
             voice: [
                 { name: "piano", data: PIANO_SAMPLE },
@@ -705,7 +709,7 @@ function Synth() {
             ]
         };
         /*eslint-enable no-undef*/
-        const data = function () {
+        const data = () => {
             return null;
         };
         this.samplesManifest.voice.push({ name: "empty", data: data });
@@ -721,7 +725,7 @@ function Synth() {
         }
     };
 
-    this._loadSample = function (sampleName) {
+    this._loadSample = sampleName => {
         // let accounted = false;
         for (const type in this.samplesManifest) {
             if (this.samplesManifest.hasOwnProperty(type)) {
@@ -801,7 +805,7 @@ function Synth() {
     };
 
     // Function that provides default parameters for various synths
-    this.getDefaultParamValues = function (sourceName) {
+    this.getDefaultParamValues = sourceName => {
         // sourceName may need to be 'untranslated'
         let sourceNameLC = sourceName.toLowerCase();
         if (getOscillatorTypes(sourceNameLC) !== null) {
@@ -987,7 +991,7 @@ function Synth() {
     };
 
     // Poly synth will be loaded as the default synth.
-    this.createDefaultSynth = function (turtle) {
+    this.createDefaultSynth = turtle => {
         // eslint-disable-next-line no-console
         console.debug("create default poly/default/custom synth for turtle " + turtle);
         const default_synth = new Tone.PolySynth(Tone.AMSynth, POLYCOUNT).toDestination();
@@ -999,7 +1003,7 @@ function Synth() {
 
     // Function reponsible for creating the synth using the existing
     // samples: drums and voices
-    this._createSampleSynth = function (turtle, instrumentName, sourceName) {
+    this._createSampleSynth = (turtle, instrumentName, sourceName) => {
         let tempSynth;
         if (sourceName in this.samples.voice) {
             instrumentsSource[instrumentName] = [2, sourceName];
@@ -1029,7 +1033,7 @@ function Synth() {
         return tempSynth;
     };
 
-    this._parseSampleCenterNo = function (solfege, octave) {
+    this._parseSampleCenterNo = (solfege, octave) => {
         // const pitchName = "C4";
         const solfegeDict = {"do":0, "re":2, "mi":4, "fa":5, "sol":7, "la":9, "ti":11};
         const letterDict = {"C":0, "D":2, "E":4, "F":5, "G":7, "A":9, "B":11};
@@ -1064,7 +1068,7 @@ function Synth() {
     };
 
     // Function using builtin synths from Tone.js
-    this._createBuiltinSynth = function (turtle, instrumentName, sourceName, params) {
+    this._createBuiltinSynth = (turtle, instrumentName, sourceName, params) => {
         let synthOptions, builtin_synth;
         if (sourceName in BUILTIN_SYNTHS) {
             synthOptions = this.getDefaultParamValues(sourceName);
@@ -1117,7 +1121,7 @@ function Synth() {
 
     // Function reponsible for creating the custom synth using the
     // Tonejs methods like AMSynth, FMSynth, etc.
-    this._createCustomSynth = function (sourceName, params) {
+    this._createCustomSynth = (sourceName, params) => {
         // Getting parameters for custom synth
         let synthOptions = this.getDefaultParamValues(sourceName);
         synthOptions = validateAndSetParams(synthOptions, params);
@@ -1136,7 +1140,7 @@ function Synth() {
         return tempSynth;
     };
 
-    this.__createSynth = function (turtle, instrumentName, sourceName, params) {
+    this.__createSynth = (turtle, instrumentName, sourceName, params) => {
 
         this._loadSample(sourceName);
         if (sourceName in this.samples.voice || sourceName in this.samples.drum) {
@@ -1188,7 +1192,7 @@ function Synth() {
     };
 
     // Create the synth as per the user's input in the 'Timbre' clamp.
-    this.createSynth = function (turtle, instrumentName, sourceName, params) {
+    this.createSynth = (turtle, instrumentName, sourceName, params) => {
         // We may have a race condition with the samples loader.
         if (this.samples === null) {
             this.samplesQueue.push([instrumentName, sourceName, params]);
@@ -1201,7 +1205,7 @@ function Synth() {
         }
     };
 
-    this.loadSynth = function (turtle, sourceName) {
+    this.loadSynth = (turtle, sourceName) => {
         /* eslint-disable */
         if (sourceName in instruments[turtle]) {
             if (sourceName.substring(0,13) === "customsample_") {
@@ -1224,7 +1228,7 @@ function Synth() {
         return null;
     };
 
-    this._performNotes = function (synth, notes, beatValue, paramsEffects, paramsFilters, setNote, future) {
+    this._performNotes = (synth, notes, beatValue, paramsEffects, paramsFilters, setNote, future) => {
         if (this.inTemperament !== "equal" && !isCustomTemperament(this.inTemperament)) {
             if (typeof notes === "number") {
                 notes = notes;
@@ -1382,7 +1386,7 @@ function Synth() {
                         );
                     }
 
-                    neighbor = new Tone.Part(function (time, value) {
+                    neighbor = new Tone.Part((time, value) => {
                         synth.triggerAttackRelease(value.note, value.duration, time);
                     }, obj).start();
                 }
@@ -1439,7 +1443,7 @@ function Synth() {
     };
 
     // Generalised version of 'trigger and 'triggerwitheffects' functions
-    this.trigger = function (
+    this.trigger = (
         turtle,
         notes,
         beatValue,
@@ -1448,7 +1452,7 @@ function Synth() {
         paramsFilters,
         setNote,
         future
-    ) {
+    ) => {
         // eslint-disable-next-line no-console
         console.debug(
             turtle +
@@ -1577,7 +1581,7 @@ function Synth() {
         }
     };
 
-    this.startSound = function (turtle, instrumentName, note) {
+    this.startSound = (turtle, instrumentName, note) => {
         const flag = instrumentsSource[instrumentName][0];
         switch (flag) {
             case 1: // drum
@@ -1589,7 +1593,7 @@ function Synth() {
         }
     };
 
-    this.stopSound = function (turtle, instrumentName, note) {
+    this.stopSound = (turtle, instrumentName, note) => {
         const flag = instrumentsSource[instrumentName][0];
         switch (flag) {
             case 1: // drum
@@ -1605,7 +1609,7 @@ function Synth() {
         }
     };
 
-    this.loop = function (turtle, instrumentName, note, duration, start, bpm, velocity) {
+    this.loop = (turtle, instrumentName, note, duration, start, bpm, velocity) => {
         const synthA = instruments[turtle][instrumentName];
         const flag = instrumentsSource[instrumentName][0];
         const now = Tone.now();
@@ -1618,15 +1622,15 @@ function Synth() {
         return loopA;
     };
 
-    this.start = function () {
+    this.start = () => {
         Tone.Transport.start();
     };
 
-    this.stop = function () {
+    this.stop =  () => {
         Tone.Transport.stop();
     };
 
-    this.rampTo = function (turtle, instrumentName, oldVol, volume, rampTime) {
+    this.rampTo = (turtle, instrumentName, oldVol, volume, rampTime) => {
         if (
             percussionInstruments.includes(instrumentName) ||
             stringInstruments.includes(instrumentName)
@@ -1670,7 +1674,7 @@ function Synth() {
         synth.volume.linearRampToValueAtTime(db, Tone.now() + rampTime);
     };
 
-    this.setVolume = function (turtle, instrumentName, volume) {
+    this.setVolume = (turtle, instrumentName, volume) => {
         // We pass in volume as a number from 0 to 100.
         // As per #1697, we adjust the volume of some instruments.
         let nv;
@@ -1694,7 +1698,7 @@ function Synth() {
     };
 
     // Unused and it is not clear that the return value is correct.
-    this.getVolume = function (turtle, instrumentName) {
+    this.getVolume = (turtle, instrumentName) => {
         if (instrumentName in instruments[turtle]) {
             return instruments[turtle][instrumentName].volume.value;
         } else {
@@ -1704,7 +1708,7 @@ function Synth() {
         }
     };
 
-    this.setMasterVolume = function (volume) {
+    this.setMasterVolume = volume => {
         const db = Tone.gainToDb(volume / 100);
         Tone.Destination.volume.rampTo(db, 0.01);
     };

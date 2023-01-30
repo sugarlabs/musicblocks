@@ -15,7 +15,8 @@
 /*
    global
 
-   platformColor, _, docById, getNote, setCustomChord
+   platformColor, _, docById, getNote, setCustomChord, keySignatureToMode,
+   getModeNumbers, getTemperament
 */
 /*
    Global locations
@@ -29,24 +30,21 @@
 /* exported Arpeggio */
 
 class Arpeggio {
-    static BUTTONDIVWIDTH = 295; // 5 buttons
+    static BUTTONDIVWIDTH = 295;
     static CELLSIZE = 28;
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
     static DEFAULTCOLS = 4;
 
     constructor() {
+        // Populated by notes blocks in the widget clamp.
         this.notesToPlay = [];
-        this.rowLabels = ["12", "11", "10", "9", "8", "7", "6", "5", "4", "3", "2", "1", "0"];
-        this.defaultCols = Arpeggio.DEFAULTCOLS;
-        this._playing = false;
         // The half-step number associated with a row; a step (in
         // time) block is associated with a column. We need to keep
         // track of which intersections in the grid are populated.
-
         // These arrays get created each time the matrix is built.
-        this._rowBlocks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];  // half-step number
-        this._blockMap = [[13, 1]];  // pairs storage
+        this._blockMap = [];  // pairs storage
+        this.defaultCols = Arpeggio.DEFAULTCOLS;
     }
 
     /**
@@ -54,7 +52,24 @@ class Arpeggio {
      * one in DOM (Document Object Model).
      */
     init(activity) {
-        this.activity = activity;
+        this._activity = activity;
+
+        this._rowLabels = [];
+        this._rowBlocks = [];
+        const _t = getTemperament(this._activity.logo.synth.whichTemperament());
+        for (let i = 0; i < _t.pitchNumber + 1; i++) {
+            this._rowBlocks.push(i);
+            this._rowLabels.push((_t.pitchNumber - i).toString());
+        }
+
+        // We use the mode number to highlight the scalar rows.
+        this._modeNumbers = getModeNumbers(
+            keySignatureToMode(
+                this._activity.turtles.ithTurtle(0).singer.keySignature
+            )[1]
+        ).split(" ");
+
+        this._playing = false;
         this._playList = [];
         this._colBlocks = [];  // time steps
         for (let i = 0; i < this.defaultCols; i++) {
@@ -77,7 +92,7 @@ class Arpeggio {
 
         this.playButton.onclick = () => {
             this._playing = !this._playing;
-            this.activity.logo.turtleDelay = 0;
+            this._activity.logo.turtleDelay = 0;
             this._playAll();
         };
 
@@ -119,7 +134,7 @@ class Arpeggio {
         // For the button callbacks
         widgetWindow.onclose = () => {
             arpeggioTableDiv.style.visibility = "hidden";
-            this.activity.hideMsgs();
+            this._activity.hideMsgs();
             widgetWindow.destroy();
         };
 
@@ -139,7 +154,7 @@ class Arpeggio {
         let arpeggioCell;
         let arpeggioRow;
         let arpeggioCellTable;
-        for (let i = 0; i < this.rowLabels.length; i++) {
+        for (let i = 0; i < this._rowLabels.length; i++) {
             arpeggioTableRow = arpeggioTable.insertRow();
 
             // A cell for the row label
@@ -151,7 +166,7 @@ class Arpeggio {
             labelCell.style.minWidth = 0;
             labelCell.style.maxWidth = 0;
             labelCell.className = "headcol";
-            labelCell.innerHTML = this.rowLabels[j];
+            labelCell.innerHTML = this._rowLabels[j];
 
             arpeggioCell = arpeggioTableRow.insertCell();
             // Create tables to store individual notes.
@@ -199,7 +214,7 @@ class Arpeggio {
 
         //Change widget size on fullscreen mode, else
         //revert back to original size on unfullscreen mode
-        widgetWindow.onmaximize = function () {
+        widgetWindow.onmaximize = () => {
             if (widgetWindow._maximized) {
                 widgetWindow.getWidgetBody().style.position = "absolute";
                 widgetWindow.getWidgetBody().style.height = "calc(100vh - 80px)";
@@ -221,13 +236,7 @@ class Arpeggio {
         };
 
         this.makeClickable();
-        this.activity.textMsg(_("Click in the grid to add steps to the arpeggio."));
-
-        this._setCell(0, 11, true);
-
-        if (this.notesToPlay.length === 0) {
-            this.notesToPlay = [["C4", 0.5]];
-        }
+        this._activity.textMsg(_("Click in the grid to add steps to the arpeggio."));
     }
 
     /**
@@ -262,11 +271,11 @@ class Arpeggio {
      * @param {number} arpeggioBlock
      * @returns {void}
      */
-    removeNode(pitchBlock, arpeggioBlock) {
+    removeNode(halfStep, timeStep) {
         let obj;
         for (let i = 0; i < this._blockMap.length; i++) {
             obj = this._blockMap[i];
-            if (obj[0] === pitchBlock && obj[1] === arpeggioBlock) {
+            if (obj[0] === halfStep && obj[1] === timeStep) {
                 this._blockMap[i] = [-1, -1]; // Mark as removed
             }
         }
@@ -318,6 +327,38 @@ class Arpeggio {
 
     /**
      * @private
+     * @param {number} row index
+     * @returns {boolean} true/false
+     */
+    _inMode(i) {
+        return this._modeNumbers.indexOf(i.toString()) !== -1;
+    }
+
+    /**
+     * @private
+     * @param {number} row index
+     * @returns {boolean} true/false
+     */
+    _rowInMode(i) {
+        const ii = (this._rowLabels.length - i - 1) %
+              (this._rowLabels.length - 1);
+        return this._inMode(ii);
+    }
+
+    /**
+     * @private
+     * @param {number} row index
+     * @returns {string} color, e.g. "#ffffff"
+     */
+    _getBackgroundColor(i) {
+        if (this._rowInMode(i)) {
+            return platformColor.selectorSelected;
+        }
+        return platformColor.selectorBackground;
+    }
+
+    /**
+     * @private
      * @param {number} arpeggioIdx
      * @returns {void}
      */
@@ -336,9 +377,11 @@ class Arpeggio {
             cell.style.width = cell.width;
             cell.style.minWidth = cell.style.width;
             cell.style.maxWidth = cell.style.width;
-            cell.style.backgroundColor = platformColor.selectorBackground;
+            cell.style.backgroundColor = this._getBackgroundColor(i);
             cell.style.border = "2px solid white";
             cell.style.borderRadius = "10px";
+
+            cell.setAttribute("id", i + "," + arpeggioIdx); // row,column
 
             cell.onmouseover = () => {
                 if (cell.style.backgroundColor !== "black") {
@@ -350,8 +393,6 @@ class Arpeggio {
                     cell.style.backgroundColor = platformColor.selectorBackground;
                 }
             };
-
-            cell.setAttribute("id", i + "," + arpeggioIdx); // row,column
         }
 
         const arpeggioNoteTable = docById("arpeggioNoteTable");
@@ -399,7 +440,9 @@ class Arpeggio {
                     const currCell = e.target;
                     const rowcol = currCell.id.split(",");
                     if (currCell.style.backgroundColor === "black") {
-                        currCell.style.backgroundColor = platformColor.selectorBackground;
+                        currCell.style.backgroundColor = this._getBackgroundColor(
+                            Number(rowcol[0])
+                        );
                         this._setCell(rowcol[1], rowcol[0], false);
                     } else {
                         // Only one cell per column can be set.
@@ -435,6 +478,9 @@ class Arpeggio {
 
                 // If we found a match, mark this cell and add this
                 // note to the play list.
+                if (row < 0) {
+                    continue;
+                }
                 table = docById("arpeggioCellTable" + row);
                 cellRow = table.rows[0];
 
@@ -509,7 +555,7 @@ class Arpeggio {
             this._playing = false;
             return;
         }
-        this.activity.logo.synth.stop();
+        this._activity.logo.synth.stop();
 
         const pairs = this.__makePairsList();
 
@@ -526,11 +572,11 @@ class Arpeggio {
                     this._playList.push([getNote(
                         letter,
                         octave,
-                        this.rowLabels.length - pairs[i][0] - 1,  // Transposition
-                        this.activity.turtles.ithTurtle(0).singer.keySignature,
+                        this._rowLabels.length - pairs[i][0] - 1,  // Transposition
+                        this._activity.turtles.ithTurtle(0).singer.keySignature,
                         false,
                         null,
-                        this.activity.errorMsg
+                        this._activity.errorMsg
                     ), noteValue]);
                 }
             }
@@ -576,7 +622,7 @@ class Arpeggio {
     __playNote(i) {
         if (i < this._playList.length) {
             if (this._playList[i][0].length > 0) {
-                this.activity.logo.synth.trigger(
+                this._activity.logo.synth.trigger(
                     0,
                     this._playList[i][0][0].replace(/♭/g, "b").replace(/♯/g, "#") + this._playList[i][0][1],
                     this._playList[i][1],
@@ -651,20 +697,30 @@ class Arpeggio {
      */
     __playCell(rowIndex, colIndex, cell, playNote) {
         if (playNote) {
-            const letter = this.notesToPlay[0][0].slice(0, -1);
-            const octave = Number(this.notesToPlay[0][0].substr(this.notesToPlay[0][0].length - 1));
+            let letter, octave;
+            if (this.notesToPlay.length === 0) {
+                letter = "C";
+                octave = 4;
+            } else {
+                letter = this.notesToPlay[0][0].slice(0, -1);
+                octave = Number(
+                    this.notesToPlay[0][0].substr(
+                        this.notesToPlay[0][0].length - 1
+                    )
+                );
+            }
             const noteObj = getNote(
                 letter,
                 octave,
-                this.rowLabels.length - rowIndex - 1,  // Transposition
-                this.activity.turtles.ithTurtle(0).singer.keySignature,
+                this._rowLabels.length - rowIndex - 1,  // Transposition
+                this._activity.turtles.ithTurtle(0).singer.keySignature,
                 false,
                 null,
-                this.activity.errorMsg
+                this._activity.errorMsg
             );
 
             const note = noteObj[0] + noteObj[1];
-            this.activity.logo.synth.trigger(
+            this._activity.logo.synth.trigger(
                 0,
                 note.replace(/♭/g, "b").replace(/♯/g, "#"),
                 this.notesToPlay[0][1],
@@ -695,7 +751,7 @@ class Arpeggio {
             row = table.rows[0];
             cell = row.cells[colIndex];
             if (cell.style.backgroundColor === "black") {
-                cell.style.backgroundColor = platformColor.selectorBackground;
+                cell.style.backgroundColor = this._getBackgroundColor(i);
                 this._setCell(colIndex, i, false);
             }
         }
@@ -717,7 +773,7 @@ class Arpeggio {
             for (let j = 0; j < row.cells.length; j++) {
                 cell = row.cells[j];
                 if (cell.style.backgroundColor === "black") {
-                    cell.style.backgroundColor = platformColor.selectorBackground;
+                    cell.style.backgroundColor = this._getBackgroundColor(i);
                     this._setCell(j, i, false);
                 }
             }
@@ -733,10 +789,31 @@ class Arpeggio {
         const pairs = this.__makePairsList();
         const chordValues = [];
         for (let i = 0; i < pairs.length; i++) {
+            // TODO: export as (scalar, semitone)
             if (pairs[i][0] === -1) {
-                chordValues.push("-");  // rest
+                chordValues.push(["-", "-"]);  // rest
             } else {
-                chordValues.push(this._rowBlocks.length - pairs[i][0] - 1);
+                const ii = this._rowBlocks.length - pairs[i][0] - 1;
+                if (this._inMode(ii)) {
+                    chordValues.push([this._modeNumbers.indexOf(
+                        ii.toString()
+                    ), 0]);
+                } else {
+                    if (pairs[i][0] === 0) { // top row -> octave
+                        chordValues.push([this._modeNumbers.length, 0]);
+                    } else {
+                        let j = 1;
+                        while(ii - j >= 0) {
+                            if (this._inMode(ii - j)) {
+                                chordValues.push([this._modeNumbers.indexOf(
+                                    (ii - j).toString()
+                                ), j]);
+                                break;
+                            }
+                            j += 1;
+                        }
+                    }
+                }
             }
         }
 
@@ -759,6 +836,6 @@ class Arpeggio {
             [10, "hidden", 0, 0, [2, null]],
             [11,"hidden", 0, 0, [0, null]]
         ];
-        this.activity.blocks.loadNewBlocks(newStack);
+        this._activity.blocks.loadNewBlocks(newStack);
     }
 }

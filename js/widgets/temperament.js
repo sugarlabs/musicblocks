@@ -356,7 +356,6 @@ function TemperamentWidget() {
                         return Math.min(a, b);
                     });
                     const index = centsDiff1.indexOf(min);
-
                     if (centsDiff[index] < 0) {
                         docById("noteInfo").innerHTML +=
                             '<div id="note">&nbsp;' +
@@ -1533,16 +1532,29 @@ function TemperamentWidget() {
                         return Math.min(a, b);
                     });
                     index = centsDiff1.indexOf(min);
+                    let updown = "";
                     if (centsDiff[index] < 0) {
+                        if (centsDiff[index] < -30) {
+                            updown = "vv";
+                        } else if (centsDiff[index] < -15) {
+                            updown = "v";
+                        }
                         this.notes[i] =
                             this.ratiosNotesPair[index][1][0] +
+                            updown +
                             "(-" +
                             centsDiff1[index].toFixed(0) +
                             "%)" +
                             this.ratiosNotesPair[index][1][1];
                     } else {
+                        if (centsDiff[index] > 30) {
+                            updown = "^^";
+                        } else if (centsDiff[index] > 15) {
+                            updown = "^";
+                        }
                         this.notes[i] =
                             this.ratiosNotesPair[index][1][0] +
+                            updown +
                             "(+" +
                             centsDiff1[index].toFixed(0) +
                             "%)" +

@@ -699,6 +699,7 @@ const piemenuCustomNotes = function (
 
     //Disable rotation, set navAngle and create the menus
     block._cusNoteWheel.clickModeRotate = false;
+    block._cusNoteWheel.titleRotateAngle = 180;
     block._cusNoteWheel.animatetime = 0; // 300;
     const labels = [];
     let blockCustom = 0;
@@ -707,11 +708,25 @@ const piemenuCustomNotes = function (
         max = max > noteLabels[t]["pitchNumber"] ? max : noteLabels[t]["pitchNumber"];
     }
 
+    // There seems to be two different representations... maybe because
+    // of some legacy projects restoring customTemperamentNotes
     for (const t of customLabels) {
         for (const k in noteLabels[t]) {
-            if (k !== "pitchNumber") {
-                labels.push(noteLabels[t][k][1]);
-                blockCustom++;
+            if (k !== "pitchNumber" && k !== "interval") {
+                if (typeof(noteLabels[t][k]) === "number") {
+                    labels.push(k);
+                    blockCustom++;
+                } else {
+                    if (noteLabels[t][k].length === 3) {
+                        labels.push(noteLabels[t][k][1]);
+                        blockCustom++;
+                    } else {
+                        for (let ii = 0; ii < noteLabels[t][k].length; ii++) {
+                            labels.push(noteLabels[t][k][ii][1]);
+                            blockCustom++;
+                        }
+                    }
+                }
             }
         }
         for (let extra = max - blockCustom; extra > 0; extra--) {
@@ -2311,8 +2326,15 @@ const piemenuChords = function (block, selectedChord) {
     block._chordWheel = new wheelnav("wheelDiv", null, 800, 800);
     block._exitWheel = new wheelnav("_exitWheel", block._chordWheel.raphael);
 
-    const chordLabels = CHORDNAMES;
-
+    const chordLabels = [];
+    for (let i = 0; i < CHORDNAMES.length; i++) {
+        const name = _(CHORDNAMES[i]);
+        if (name.length === 0) {
+            chordLabels.push(CHORDNAMES[i]);  // In case i18n fails
+        } else {
+            chordLabels.push(name);
+        }
+    }
     wheelnav.cssMode = true;
 
     block._chordWheel.keynavigateEnabled = false;
@@ -2321,7 +2343,7 @@ const piemenuChords = function (block, selectedChord) {
     block._chordWheel.slicePathFunction = slicePath().DonutSlice;
     block._chordWheel.slicePathCustom = slicePath().DonutSliceCustomization();
     block._chordWheel.slicePathCustom.minRadiusPercent = 0.2;
-    block._chordWheel.slicePathCustom.maxRadiusPercent = 1;
+    block._chordWheel.slicePathCustom.maxRadiusPercent = 1.0;
     block._chordWheel.sliceSelectedPathCustom = block._chordWheel.slicePathCustom;
     block._chordWheel.sliceInitPathCustom = block._chordWheel.slicePathCustom;
     block._chordWheel.titleRotateAngle = 0;
@@ -2329,8 +2351,8 @@ const piemenuChords = function (block, selectedChord) {
     block._chordWheel.createWheel(chordLabels);
 
     for (let i = 0; i < block._chordWheel.navItems.length; i++) {
-        block._chordWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
-        block._chordWheel.navItems[i].titleSelectedAttr.font = "30 30px sans-serif";
+        block._chordWheel.navItems[i].titleAttr.font = "32 32px sans-serif";
+        block._chordWheel.navItems[i].titleSelectedAttr.font = "32 32px sans-serif";
     }
 
     block._exitWheel.colors = platformColor.exitWheelcolors;
@@ -2352,9 +2374,8 @@ const piemenuChords = function (block, selectedChord) {
     const that = block;
 
     const __selectionChanged = function () {
-        const label = that._chordWheel.navItems[that._chordWheel.selectedNavItemIndex].title;
-        that.value = label;
-        that.text.text = label;
+        that.text.text = that._chordWheel.navItems[that._chordWheel.selectedNavItemIndex].title;
+        that.value = CHORDNAMES[that._chordWheel.selectedNavItemIndex];
 
         // Make sure text is on top.
         that.container.setChildIndex(that.text, that.container.children.length - 1);
