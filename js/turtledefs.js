@@ -458,7 +458,7 @@ function createHelpContent(activity) {
         HELPCONTENT = [
             [
                 _("Welcome to Music Blocks"),
-                _("Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way."),
+                _("Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way."),+
                     " " +
                     _("The current version is") +
                     " " +
