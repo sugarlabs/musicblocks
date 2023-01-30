@@ -258,7 +258,7 @@ function setupWidgetBlocks(activity) {
             const listenerName = "_temperament_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function () {
+            const __listener = () => {
                 logo.temperament.init(activity);
             };
 
@@ -306,7 +306,7 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = function (event) {
+            const __listener = event => {
                 logo.sample.init(activity);
             };
 
@@ -414,7 +414,7 @@ function setupWidgetBlocks(activity) {
             const listenerName = "_timbre_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function () {
+            const __listener = () => {
                 logo.timbre.init(activity);
             };
 
@@ -453,7 +453,7 @@ function setupWidgetBlocks(activity) {
             const listenerName = "_meterwidget_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function () {
+            const __listener = () => {
                 logo.meterWidget = new MeterWidget(activity, blk);
 
                 logo.insideMeterWidget = false;
@@ -509,7 +509,7 @@ function setupWidgetBlocks(activity) {
             const listenerName = "_oscilloscope_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function () {
+            const __listener = () => {
                 logo.Oscilloscope = new Oscilloscope(activity);
                 logo.inOscilloscope = false;
             };
@@ -549,7 +549,7 @@ function setupWidgetBlocks(activity) {
             const listenerName = "_modewidget_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function () {
+            const __listener = () => {
                 logo.modeWidget = new ModeWidget(activity);
                 logo.insideModeWidget = false;
             };
@@ -599,7 +599,7 @@ function setupWidgetBlocks(activity) {
             const listenerName = "_tempo_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function () {
+            const __listener = () => {
                 logo.tempo.init(activity);
             };
 
@@ -659,7 +659,7 @@ function setupWidgetBlocks(activity) {
             const listenerName = "_arpeggio_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function () {
+            const __listener = () => {
                 logo.arpeggio.init(activity);
             };
 
@@ -715,7 +715,7 @@ function setupWidgetBlocks(activity) {
             const listenerName = "_pitchdrummatrix_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function () {
+            const __listener = () => {
                 if (
                     logo.pitchDrumMatrix.drums.length === 0 ||
                     logo.pitchDrumMatrix.rowLabels.length === 0
@@ -768,7 +768,7 @@ function setupWidgetBlocks(activity) {
             const listenerName = "_pitchslider_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function () {
+            const __listener = () => {
                 logo.pitchSlider.init(activity);
                 logo.inPitchSlider = false;
             };
@@ -890,7 +890,7 @@ function setupWidgetBlocks(activity) {
             const listenerName = "_musickeyboard_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function () {
+            const __listener = () => {
                 logo.musicKeyboard.init(logo);
             };
 
@@ -937,7 +937,7 @@ function setupWidgetBlocks(activity) {
             const listenerName = "_pitchstaircase_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function () {
+            const __listener = () => {
                 logo.pitchStaircase.init(activity);
                 logo.inPitchStaircase = false;
             };
@@ -1021,7 +1021,7 @@ function setupWidgetBlocks(activity) {
             const listenerName = "_rhythmruler_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function () {
+            const __listener = () => {
                 logo.rhythmRuler.init(activity);
             };
 
@@ -1162,7 +1162,7 @@ function setupWidgetBlocks(activity) {
             const listenerName = "_matrix_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function () {
+            const __listener = () => {
                 if (logo.tupletRhythms.length === 0 || logo.phraseMaker.rowLabels.length === 0) {
                     activity.errorMsg(
                         _("You must have at least one pitch block and one rhythm block in the matrix."),
@@ -1255,7 +1255,7 @@ function setupWidgetBlocks(activity) {
             const listenerName = "_status_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __listener = function () {
+            const __listener = () => {
                 logo.statusMatrix.init(activity);
                 logo.inStatusMatrix = false;
             };

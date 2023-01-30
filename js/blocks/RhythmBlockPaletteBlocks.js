@@ -125,7 +125,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
 
                 const beatValue = bpmFactor / noteBeatValue;
 
-                const __rhythmPlayNote = function (thisBeat, blk, turtle, callback, timeout) {
+                const __rhythmPlayNote = (thisBeat, blk, turtle, callback, timeout) => {
                     setTimeout(
                         () => Singer.processNote(activity, thisBeat, false, blk, turtle, callback),
                         timeout
@@ -135,7 +135,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
 
                 for (let i = 0; i < arg0; i++) {
                     if (i === arg0 - 1) {
-                        __callback = function () {
+                        __callback = () => {
                             delete tur.singer.noteDrums[blk];
                             tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
                         };
@@ -335,7 +335,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = function (event) {
+            const __listener = event => {
                 if (logo.inMatrix) {
                     logo.tuplet = false;
                     logo.addingNotesToTuplet = false;
@@ -487,7 +487,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
 
                     let totalBeats = 0;
 
-                    const __tupletPlayNote = function (thisBeat, blk, turtle, callback, timeout) {
+                    const __tupletPlayNote = (thisBeat, blk, turtle, callback, timeout) => {
                         setTimeout(
                             () =>
                                 Singer.processNote(
@@ -673,7 +673,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
 
                 const beatValue = bpmFactor / noteBeatValue / arg0;
 
-                const __rhythmPlayNote = function (thisBeat, blk, turtle, callback, timeout) {
+                const __rhythmPlayNote = (thisBeat, blk, turtle, callback, timeout) => {
                     setTimeout(
                         () => Singer.processNote(activity, thisBeat, false, blk, turtle, callback),
                         timeout
@@ -683,7 +683,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 let __callback = null;
                 for (let i = 0; i < arg0; i++) {
                     if (i === arg0 - 1) {
-                        __callback = function () {
+                        __callback = () => {
                             delete tur.singer.noteDrums[blk];
                             tur.singer.inNoteBlock.splice(tur.singer.inNoteBlock.indexOf(blk), 1);
                         };
