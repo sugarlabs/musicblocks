@@ -6533,29 +6533,57 @@ msgstr "純正律"
 msgid "meantone"
 msgstr "中全音律"
 
+#: js/musicutils.js:842
+msgid "triad (root position)"
+msgstr "三和音 (基本形)"
+
+msgid "triad (1st inversion)"
+msgstr "三和音 (第1転回形)"
+
+msgid "triad (2nd inversion)"
+msgstr "三和音 (第2転回形)"
+
+msgid "seventh (root position)"
+msgstr "七の和音 (基本形)"
+
+msgid "seventh (1st inversion)"
+msgstr "七の和音 (第1転回形)"
+
+msgid "seventh (2nd inversion)"
+msgstr "七の和音 (第2転回形)"
+
+msgid "seventh (3rd inversion)"
+msgstr "七の和音 (第3転回形)"
+
+msgid "ninth (root position)"
+msgstr "九の和音 (基本形)"
+
+msgid "thirteenth (root position)"
+msgstr "十三の和音 (基本形)"
+
 #: js/musicutils.js:810
 msgid "major 7th"
-msgstr ""
+msgstr "長七の和音（メイジャー・セブンス)"
 
 #: js/musicutils.js:811
 msgid "minor 7th"
-msgstr ""
+msgstr "短七の和音（マイナー・セブンス）"
 
 #: js/musicutils.js:812
 msgid "dominant 7th"
-msgstr ""
+msgstr "属七の和音（ドミナント・セブンス）"
 
 #: js/musicutils.js:813
 msgid "minor-major 7th"
-msgstr ""
+msgstr "短三長七の和音（マイナー・メイジャー・セブンス）"
 
 #: js/musicutils.js:814
 msgid "fully-diminished 7th"
-msgstr ""
+msgstr "減七の和音（ディミニッシュト・セブンス）"
 
 #: js/musicutils.js:815
 msgid "half-diminished 7th"
-msgstr ""
+msgstr "減五短七の和音（ハーフ・ディミニッシュト）"
 
 #: js/musicutils.js:4235
 #: js/musicutils.js:4272
