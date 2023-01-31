@@ -681,7 +681,7 @@ function setupEnsembleBlocks(activity) {
                             thisTurtle.singer.noteOctaves[0],
                             0,
                             thisTurtle.singer.keySignature,
-                            tur.singer.moveable,
+                            tur.singer.movable,
                             null,
                             activity.errorMsg,
                             logo.synth.inTemperament
@@ -720,7 +720,7 @@ function setupEnsembleBlocks(activity) {
                         tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][0],
                         0,
                         tur.singer.keySignature,
-                        tur.singer.moveable,
+                        tur.singer.movable,
                         null,
                         activity.errorMsg,
                         logo.synth.inTemperament

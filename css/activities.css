@@ -1451,7 +1451,7 @@ input.timbreName {
     transition: width 2s linear 1s;
 }
 
-#moveable {
+#movable {
     margin: auto;
     z-index: 10;
     position: fixed;

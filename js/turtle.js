@@ -229,7 +229,7 @@ class Turtle {
 
         this.singer.notesPlayed = [0, 1];
         this.singer.whichNoteToCount = 1;
-        this.singer.moveable = false;
+        this.singer.movable = false;
 
         this.singer.bpm = [];
         this.singer.previousTurtleTime = 0;

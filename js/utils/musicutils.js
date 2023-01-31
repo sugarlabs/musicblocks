@@ -3317,7 +3317,7 @@ const _calculate_pitch_number = (activity, np, tur) => {
             tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][0],
             0,
             tur.singer.keySignature,
-            tur.singer.moveable,
+            tur.singer.movable,
             null,
             activity.errorMsg
         );
@@ -3607,7 +3607,7 @@ const getModeLength = keySignature => { return buildScale(keySignature)[1].lengt
 
 // A two-way function to get pitch according to scale degree and vice versa for a chosen mode
 
-const scaleDegreeToPitchMapping = (keySignature, scaleDegree, moveable, pitch) => {
+const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) => {
     if (pitch === null) {
         scaleDegree -= 1;
     }
@@ -3630,8 +3630,8 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, moveable, pitch) =
     let finalScale = [];
     const sd = [];
 
-    // if moveable do is present just return the major/perfect tones
-    if (moveable) {
+    // if movable do is present just return the major/perfect tones
+    if (movable) {
         finalScale = buildScale(chosenMode[0] + " major")[0];
 
         if (pitch === null) {
@@ -3886,7 +3886,7 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, moveable, pitch) =
 
 const nthDegreeToPitch = (keySignature, scaleDegree) => {
     // Returns note corresponding to scale degree in current key
-    // signature. Used for moveable solfege.
+    // signature. Used for movable solfege.
     const scale = buildScale(keySignature)[0];
     // Scale degree is specified as do === 1, re === 2, etc., so we need
     // to subtract 1 to make it zero-based.
@@ -4496,7 +4496,7 @@ const getPitchInfo = (activity, type, currentNote, tur) => {
                     // Remove sharps and flats.
                     pitch = pitch.replace(SHARP).replace(FLAT);
                 }
-                if (tur.singer.moveable === false) {
+                if (tur.singer.movable === false) {
                     return SOLFEGECONVERSIONTABLE[pitch];
                 }
                 return SOLFEGENAMES[buildScale(tur.singer.keySignature)[0].indexOf(pitch)];
@@ -4506,14 +4506,14 @@ const getPitchInfo = (activity, type, currentNote, tur) => {
                 return scaleDegreeToPitchMapping(
                     tur.singer.keySignature,
                     null,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     pitch
                 )[0];
             case "scale degree":
                 obj = scaleDegreeToPitchMapping(
                     tur.singer.keySignature,
                     null,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     pitch
                 );
                 return (obj[0] + obj[1]);
