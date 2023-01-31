@@ -4210,6 +4210,18 @@ msgstr "サインは"
 msgid "sawtooth"
 msgstr "ぎざぎざの なみ"
 
+msgid "The Transpose by Ratio block will shift the pitches contained inside Note blocks up (or down) by a ratio"
+msgstr "「ひで いどう」ブロックは おんぷの なかの ピッチを ひで いどうさせる。"
+
+msgid "transpose by ratio"
+msgstr "ひで いどう"
+
+msgid "The Ratio Interval block calculates an interval based on a ratio."
+msgstr "「比で音程」ブロックは比の音程のピッチを経産する。"
+
+msgid "ratio interval"
+msgstr "ひで おんてい"
+
 #: js/PitchBlocks.js:140
 #.TRANS: musical transposition (adjustment of pitch up or down)
 msgid "transposition"

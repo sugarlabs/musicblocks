@@ -4209,7 +4209,6 @@ msgid "sawtooth"
 msgstr "diente de sierra"
 
 msgid "The Transpose by Ratio block will shift the pitches contained inside Note blocks up (or down) by a ratio"
-
 msgstr "El bloque transponer por razón cambiará los tonos contenidos dentro de los bloques de notas hacia arriba (o hacia abajo) en una proporción"
 
 msgid "transpose by ratio"
