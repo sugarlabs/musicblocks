@@ -26,7 +26,7 @@ function ServerInterface(Planet) {
     this.ConnectionFailureData = {"success": false, "error": "ERROR_CONNECTION_FAILURE"};
     this.APIKey = "3f2d3a4c-c7a4-4c3c-892e-ac43784f7381";
 
-    this.request = function(data, callback) {
+    this.request = (data, callback) => {
         const that = this;
         data["api-key"] = this.APIKey;
 
@@ -44,51 +44,51 @@ function ServerInterface(Planet) {
             });
     };
 
-    this.getTagManifest = function(callback) {
+    this.getTagManifest = (callback) => {
         const obj = {"action": "getTagManifest"};
         this.request(obj, callback);
     };
 
-    this.addProject = function(data, callback) {
+    this.addProject = (data, callback) => {
         const obj = {"action": "addProject", "ProjectJSON": data};
         this.request(obj, callback);
     };
 
-    this.downloadProjectList = function(ProjectTags, ProjectSort, Start, End, callback) {
+    this.downloadProjectList = (ProjectTags, ProjectSort, Start, End, callback) => {
         const obj = {"action": "downloadProjectList", "ProjectTags": ProjectTags, "ProjectSort": ProjectSort, "Start": Start, "End": End};
         this.request(obj, callback);
     };
 
-    this.getProjectDetails = function(ProjectID, callback) {
+    this.getProjectDetails = (ProjectID, callback) => {
         const obj = {"action": "getProjectDetails", "ProjectID": ProjectID};
         this.request(obj, callback);
     };
 
-    this.searchProjects = function(Search, ProjectSort, Start, End, callback) {
+    this.searchProjects = (Search, ProjectSort, Start, End, callback) => {
         const obj = {"action": "searchProjects", "Search": Search, "ProjectSort": ProjectSort, "Start": Start, "End": End};
         this.request(obj, callback);
     };
 
-    this.downloadProject = function(ProjectID, callback) {
+    this.downloadProject = (ProjectID, callback) => {
         const obj = {"action": "downloadProject", "ProjectID": ProjectID};
         this.request(obj, callback);
     };
 
-    this.likeProject = function(ProjectID, Like, callback) {
+    this.likeProject = (ProjectID, Like, callback) => {
         const obj = {"action": "likeProject", "ProjectID": ProjectID, "Like": ((Like) ? "true" : "false")};
         this.request(obj, callback);
     };
 
-    this.reportProject = function(ProjectID, Description, callback) {
+    this.reportProject = (ProjectID, Description, callback) => {
         const obj = {"action": "reportProject", "ProjectID": ProjectID, "Description": Description};
         this.request(obj, callback);
     };
 
-    this.convertFile = function(From, To, Data, callback) {
+    this.convertFile = (From, To, Data, callback) => {
         const obj = {"action": "convertData", "From": From, "To": To, "Data": Data};
         this.request(obj, callback);
     };
 
-    this.init = function() {
+    this.init = () => {
     };
 };

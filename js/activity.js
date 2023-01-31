@@ -181,7 +181,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
 // blocks, logo, palettes, and turtles for plugins and js-export.
 let globalActivity;
 
-const doAnalyzeProject = function() {
+const doAnalyzeProject = () => {
     return analyzeProject(globalActivity);
 };
 
@@ -297,7 +297,7 @@ class Activity {
         /**
          * Initialises major variables and renders default stack.
          */
-        this.setupDependencies = function () {
+        this.setupDependencies =  () => {
             createDefaultStack();
             createHelpContent(this);
             window.scroll(0, 0);
@@ -381,7 +381,7 @@ class Activity {
          * Sets up right click functionality opening the context menus
          * (if block is right clicked)
          */
-        this.doContextMenus = function () {
+        this.doContextMenus =  () => {
             document.addEventListener(
                 "contextmenu",
                 function (event) {
@@ -4596,7 +4596,7 @@ class Activity {
                 }
             };
 
-            const __handleDragOver = function (event) {
+            const __handleDragOver =  (event) => {
                 event.stopPropagation();
                 event.preventDefault();
                 event.dataTransfer.dropEffect = "copy";
@@ -4775,7 +4775,7 @@ class Activity {
                                 case "inurl":
                                     url = args[1];
                                     // eslint-disable-next-line no-case-declarations
-                                    const getJSON = function (url) {
+                                    const getJSON =  (url) => {
                                         return new Promise(function (resolve, reject) {
                                             const xhr = new XMLHttpRequest();
                                             xhr.open("get", url, true);
@@ -4844,7 +4844,7 @@ class Activity {
             */
 
             const activity = this;
-            document.onkeydown = function () {
+            document.onkeydown =  () =>{
                 activity.__keyPressed(event);
             };
 

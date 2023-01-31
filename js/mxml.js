@@ -12,7 +12,7 @@
 /* global saveMxmlOutput:writable,voiceNum:writable */
 /* exported saveMxmlOutput */
 
-saveMxmlOutput = function (logo) {
+saveMxmlOutput =  (logo) => {
     // temporary until I get more things sorted out
     const ignore = ["voice two", "voice one", "one voice"];
     let res = "";

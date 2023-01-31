@@ -77,7 +77,7 @@ function Publisher(Planet) {
         return tags;
     };
 
-    this.findTagWithName = function(name) {
+    this.findTagWithName = (name) => {
         const keys = Object.keys(Planet.TagsManifest);
         for (let i = 0; i < keys.length; i++) {
             if (Planet.TagsManifest[keys[i]].TagName === name) {
@@ -87,7 +87,7 @@ function Publisher(Planet) {
         return null;
     };
 
-    this.addTags = function() {
+    this.addTags = () => {
         const tags = Planet.TagsManifest;
         this.ChipTags = {};
         const keys = Object.keys(tags);
@@ -126,7 +126,7 @@ function Publisher(Planet) {
         });
     };
 
-    this.setTagInput = function(arr) {
+    this.setTagInput = (arr) => {
         jQuery("#tagsadd").material_chip({
             data: arr,
             autocompleteOptions: {
@@ -137,7 +137,7 @@ function Publisher(Planet) {
         });
     };
 
-    this.setTags = function(arr) {
+    this.setTags = (arr) => {
         const a = [];
         for (let i = 0; i < arr.length; i++) {
             const o = {};
@@ -148,7 +148,7 @@ function Publisher(Planet) {
         this.setTagInput(a);
     };
 
-    this.getTags = function() {
+    this.getTags = () => {
         const t = jQuery("#tagsadd").material_chip("data");
         const a = [];
         for (let i = 0; i < t.length; i++) {
@@ -157,7 +157,7 @@ function Publisher(Planet) {
         return a;
     };
 
-    this.initSubmit = function() {
+    this.initSubmit = () => {
         document.getElementById("publisher-submit").addEventListener("click", this.publishProject.bind(this));
     };
 
@@ -207,7 +207,7 @@ function Publisher(Planet) {
         jQuery("#publisher").modal("open");
     };
 
-    this.publishProject = function() {
+    this.publishProject = () => {
         document.getElementById("publisher-error").textContent = "";
         document.getElementById("publisher-error").style.display = "none";
         document.getElementById("publisher-progress").style.visibility = "visible";
@@ -285,7 +285,7 @@ function Publisher(Planet) {
         }
     };
 
-    this.parseProject = function(tb) {
+    this.parseProject = (tb) => {
         try {
             tb = JSON.parse(tb);
         } catch (e) {
@@ -314,11 +314,11 @@ function Publisher(Planet) {
         return s.slice(0, -1);
     };
 
-    this.hideProgressBar = function() {
+    this.hideProgressBar = () => {
         document.getElementById("publisher-progress").style.visibility = "hidden";
     };
 
-    this.afterPublishProject = function(data, id, name, published) {
+    this.afterPublishProject = (data, id, name, published) => {
         if (data.success) {
             Planet.ProjectStorage.addPublishedData(id, published);
             Planet.ProjectStorage.renameProject(id, name);
@@ -344,16 +344,16 @@ function Publisher(Planet) {
         document.body.style.cursor = "default";
     };
 
-    this.throwError = function(error) {
+    this.throwError = (error) => {
         document.getElementById("publisher-error").textContent = error;
         document.getElementById("publisher-error").style.display = "initial";
     };
 
-    this.close = function() {
+    this.close = () => {
         jQuery("#publisher").modal("close");
     };
 
-    this.init = function() {
+    this.init = () => {
         if (!Planet.ConnectedToServer) {
             let element = document.getElementById("publisher-form");
             element.parentNode.removeChild(element);

@@ -32,7 +32,7 @@ const processABCNotes = function(logo, turtle) {
     //        insideChord, staccato]
     logo.notationNotes[turtle] = "";
 
-    const __convertDuration = function(duration) {
+    const __convertDuration = (duration) => {
         let returnString = "";
         switch (duration) {
             case 64:

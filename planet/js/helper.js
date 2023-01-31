@@ -99,7 +99,7 @@ function toggleExpandable(id, c) {
 
 function hideOnClickOutside(eles, other) {
     // if click not in id, hide
-    const outsideClickListener = function (event) {
+    const outsideClickListener = (event) => {
         // eslint-disable-next-line max-len
         const path = event.path || (event.composedPath && event.composedPath()) || event.composedPath(event.target);
         let ok = false;
@@ -116,7 +116,7 @@ function hideOnClickOutside(eles, other) {
         }
     };
 
-    const removeClickListener = function () {
+    const removeClickListener = () => {
         document.removeEventListener("click", outsideClickListener);
     };
 

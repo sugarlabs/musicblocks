@@ -49,7 +49,7 @@ function LocalCard(Planet) {
         </div>  \
 </div>";
 
-    this.download = function() {
+    this.download = () => {
         let image = Planet.ProjectStorage.ImageDataURL;
         if (this.ProjectData.ProjectImage !== null) {
             image = this.ProjectData.ProjectImage;
@@ -68,12 +68,12 @@ function LocalCard(Planet) {
         );
     };
 
-    this.duplicate = function() {
+    this.duplicate = () => {
         Planet.ProjectStorage.initialiseNewProject(this.ProjectData.ProjectName + " " + this.CopySuffix, this.ProjectData.ProjectData, this.ProjectData.ProjectImage);
         Planet.LocalPlanet.updateProjects();
     };
 
-    this.render = function() {
+    this.render = () => {
         // TODO: Have a TB placeholder image specific to TB projects
         const html = this.renderData.replace(new RegExp("{ID}", "g"), this.id);
         const frag = document.createRange().createContextualFragment(html);
@@ -156,7 +156,7 @@ function LocalCard(Planet) {
         document.getElementById("local-projects").appendChild(frag);
     };
 
-    this.init = function(id) {
+    this.init = (id) => {
         this.id = id;
         this.ProjectData = Planet.LocalPlanet.ProjectTable[this.id];
     };

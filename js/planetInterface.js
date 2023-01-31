@@ -62,7 +62,7 @@ class PlanetInterface {
             docById("buttoncontainerTOP").style.display = "block";
         };
 
-        this.showPlanet = function () {
+        this.showPlanet =  () => {
             const png = docById("overlayCanvas").toDataURL("image/png");
             this.planet.open(png);  // this.mainCanvas.toDataURL("image/png"));
             this.iframe.style.display = "block";
@@ -74,22 +74,22 @@ class PlanetInterface {
             }
         };
 
-        this.hidePlanet = function () {
+        this.hidePlanet = () => {
             this.iframe.style.display = "none";
         };
 
-        this.openPlanet = function () {
+        this.openPlanet = () => {
             this.saveLocally();
             this.hideMusicBlocks();
             this.showPlanet();
         };
 
-        this.closePlanet = function () {
+        this.closePlanet = () => {
             this.hidePlanet();
             this.showMusicBlocks();
         };
 
-        this.loadProjectFromData = function (data, merge) {
+        this.loadProjectFromData = (data, merge) => {
             if (merge === undefined) {
                 merge = false;
             }
@@ -112,7 +112,7 @@ class PlanetInterface {
             // First, hide the palettes as they will need updating.
             this.activity.blocks.palettes._hideMenus(true);
 
-            const __afterLoad = function () {
+            const __afterLoad = () => {
                 document.removeEventListener("finishedLoading", __afterLoad);
             };
 

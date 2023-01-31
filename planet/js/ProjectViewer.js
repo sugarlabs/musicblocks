@@ -71,11 +71,11 @@ function ProjectViewer(Planet) {
         jQuery("#projectviewer").modal("open");
     };
 
-    this.download = function() {
+    this.download = () => {
         Planet.GlobalPlanet.getData(this.id,this.afterDownload.bind(this));
     };
 
-    this.afterDownload = function(data) {
+    this.afterDownload = (data) => {
         const proj = this.ProjectCache[this.id];
         let image = Planet.ProjectStorage.ImageDataURL;
         if (proj.ProjectImage !== "") {
@@ -91,19 +91,19 @@ function ProjectViewer(Planet) {
         );
     };
 
-    this.openProject = function() {
+    this.openProject = () => {
         // newPageTitle = proj.ProjectName;
         // document.title = newPageTitle;
         Planet.GlobalPlanet.openGlobalProject(this.id);
     };
 
-    this.mergeProject = function() {
+    this.mergeProject = () => {
         // newPageTitle = proj.ProjectName;
         // document.title = newPageTitle;
         Planet.GlobalPlanet.mergeGlobalProject(this.id);
     };
 
-    this.openReporter = function() {
+    this.openReporter = () => {
         // eslint-disable-next-line no-console
         console.log("load");
         document.getElementById("reportdescription").value = "";
@@ -121,7 +121,7 @@ function ProjectViewer(Planet) {
         );
     };
 
-    this.submitReporter = function() {
+    this.submitReporter = () => {
         const text = document.getElementById("reportdescription").value;
         if (text === ""){
             document.getElementById("report-error").textContent = this.ReportDescriptionError;
@@ -137,7 +137,7 @@ function ProjectViewer(Planet) {
         }
     };
 
-    this.afterReport = function(data) {
+    this.afterReport = (data) => {
         if (data.success) {
             document.getElementById("submittext").textContent = this.ReportSuccess;
             Planet.ProjectStorage.report(this.id,true);
@@ -152,11 +152,11 @@ function ProjectViewer(Planet) {
         document.getElementById("projectviewer-reportsubmit-content").style.display = "block";
     };
 
-    this.closeReporter = function() {
+    this.closeReporter = () => {
         document.getElementById("projectviewer-report-card").style.display = "none";
     };
 
-    this.init = function(){
+    this.init = () =>{
         const that = this;
 
         // eslint-disable-next-line no-unused-vars

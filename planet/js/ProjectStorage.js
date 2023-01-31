@@ -47,7 +47,7 @@ function ProjectStorage(Planet) {
         return prefix+suffix;
     };
 
-    this.saveLocally = function(data, image) {
+    this.saveLocally = (data, image) => {
         if (this.data.CurrentProject === undefined) {
             this.initialiseNewProject();
         }
@@ -78,7 +78,7 @@ function ProjectStorage(Planet) {
         }
     };
 
-    this.getCurrentProjectName = function() {
+    this.getCurrentProjectName = () => {
         const c = this.data.CurrentProject;
         if (this.data.Projects[c] === undefined) {
             return this.defaultProjectName;
@@ -87,7 +87,7 @@ function ProjectStorage(Planet) {
         }
     };
 
-    this.getCurrentProjectDescription = function() {
+    this.getCurrentProjectDescription = () => {
         const c = this.data.CurrentProject;
         if (this.data.Projects[c]!=undefined) {
             if (this.data.Projects[c].PublishedData !== null) {
@@ -98,7 +98,7 @@ function ProjectStorage(Planet) {
         return null;
     };
 
-    this.getCurrentProjectImage = function() {
+    this.getCurrentProjectImage = () => {
         const c = this.data.CurrentProject;
         if (this.data.Projects[c] !== undefined) {
             if (this.data.Projects[c].ProjectImage !== null) {
@@ -133,39 +133,39 @@ function ProjectStorage(Planet) {
         this.save();
     };
 
-    this.renameProject = function(id, name) {
+    this.renameProject = (id, name) => {
         this.data.Projects[id].ProjectName = name;
         this.save();
     };
 
-    this.addPublishedData = function(id, data) {
+    this.addPublishedData = (id, data) => {
         this.data.Projects[id].PublishedData = data;
         this.save();
     };
 
-    this.deleteProject = function(id) {
+    this.deleteProject = (id) => {
         delete this.data.Projects[id];
         this.save();
         Planet.LocalPlanet.updateProjects();
     };
 
-    this.getCurrentProjectID = function() {
+    this.getCurrentProjectID = () => {
         return this.data.CurrentProject;
     };
 
-    this.setCurrentProjectID = function(id) {
+    this.setCurrentProjectID = (id) => {
         this.data.CurrentProject = id;
     };
 
-    this.encodeTB = function(tb) {
+    this.encodeTB = (tb) => {
         return window.btoa(encodeURIComponent(tb));
     };
 
-    this.decodeTB = function(tb) {
+    this.decodeTB = (tb) => {
         return decodeURIComponent(window.atob(tb));
     };
 
-    this.isLiked = function(id) {
+    this.isLiked = (id) => {
         if (this.data.LikedProjects[id] === true) {
             return true;
         }
@@ -173,12 +173,12 @@ function ProjectStorage(Planet) {
         return false;
     };
 
-    this.like = function(id,like) {
+    this.like = (id,like) => {
         this.data.LikedProjects[id] = like;
         this.save();
     };
 
-    this.isReported = function(id) {
+    this.isReported = (id) => {
         if (this.data.ReportedProjects[id] === true) {
             return true;
         }
@@ -186,7 +186,7 @@ function ProjectStorage(Planet) {
         return false;
     };
 
-    this.report = function(id, report) {
+    this.report = (id, report) => {
         this.data.ReportedProjects[id] = report;
         this.save();
     };

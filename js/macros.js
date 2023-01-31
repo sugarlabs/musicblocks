@@ -47,7 +47,7 @@
 
 /* exported getMacroExpansion, blockIsMacro */
 
-function blockIsMacro(activity, blkname) {
+const blockIsMacro = (activity, blkname) => {
     const protoBlock = activity.blocks.protoBlockDict[blkname];
     if (protoBlock && protoBlock.macroFunc) return true;
 
