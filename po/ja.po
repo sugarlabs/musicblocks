@@ -4210,6 +4210,18 @@ msgstr "サイン波"
 msgid "sawtooth"
 msgstr "ぎざぎざの波"
 
+msgid "The Transpose by Ratio block will shift the pitches contained inside Note blocks up (or down) by a ratio"
+msgstr "「比で移動」ブロックは 音符の中のピッチを比で移動させる。"
+
+msgid "transpose by ratio"
+msgstr "比で移動"
+
+msgid "The Ratio Interval block calculates an interval based on a ratio."
+msgstr "「比で音程」ブロックは比の音程のピッチを経産する。"
+
+msgid "ratio interval"
+msgstr "比で音程"
+
 #: js/PitchBlocks.js:140
 #.TRANS: musical transposition (adjustment of pitch up or down)
 msgid "transposition"
