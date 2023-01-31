@@ -75,7 +75,7 @@ function GlobalCard(Planet) {
     </div> \
 </div>";
 
-    this.render = function() {
+    this.render = () => {
         //TODO: Have a TB placeholder image specific to TB projects
         const html = this.renderData.replace(new RegExp("{ID}", "g"), this.id);
         const frag = document.createRange().createContextualFragment(html);
@@ -171,7 +171,7 @@ function GlobalCard(Planet) {
         updateCheckboxes("global-sharebox-" + this.id);
     };
 
-    this.like = function() {
+    this.like = () => {
         let like = true;
         if (Planet.ProjectStorage.isLiked(this.id)) {
             like = false;
@@ -182,7 +182,7 @@ function GlobalCard(Planet) {
         }.bind(this));
     };
 
-    this.afterLike = function(data, like) {
+    this.afterLike = (data, like) => {
         if (!data.success) {
             if (data.error === "ERROR_ACTION_NOT_PERMITTED") {
                 this.setLike(like);
@@ -192,7 +192,7 @@ function GlobalCard(Planet) {
         }
     };
 
-    this.setLike = function(like) {
+    this.setLike = (like) => {
         Planet.ProjectStorage.like(this.id,like);
         let incr = 1;
         let text = "favorite";
@@ -206,7 +206,7 @@ function GlobalCard(Planet) {
         document.getElementById("global-like-icon-" + this.id).textContent = text;
     };
 
-    this.init = function(id) {
+    this.init = id => {
         this.id = id;
         this.ProjectData = Planet.GlobalPlanet.cache[id];
     };
