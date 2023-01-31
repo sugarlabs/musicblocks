@@ -53,7 +53,7 @@
   addTemperamentToList, getTemperament, deleteTemperamentFromList,
   addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
   DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
-  INTERVALVALUES, getIntervalRatio
+  INTERVALVALUES, getIntervalRatio, frequencyToPitch
 */
 
 // Scalable sinewave graphic
@@ -1787,19 +1787,19 @@ let frequencyToPitch = (hz) => {
     // the nearest cent.
 
     if (hz < A0) {
-        return ["A", 0];
+        return ["A", 0, 0];
     } else if (hz > C8) {
         // FIXME: set upper bound of C10
-        return ["C", 8];
+        return ["C", 8, 0];
     }
 
     // Calculate cents to keep track of drift
     let cents = 0;
-    for (let i = 0; i < 8800; i++) {
+    for (let i = 0; i < 8 * 1200; i++) {
         const f = A0 * Math.pow(TWELVEHUNDRETHROOT2, i);
         if (hz < f * 1.0003 && hz > f * 0.9997) {
             cents = i % 100;
-            const j = Math.floor(i / 100 + 0.5);
+            const j = Math.floor(i / 100); // + 0.5);
             return [
                 PITCHES[(j + PITCHES.indexOf("A")) % 12],
                 Math.floor((j + PITCHES.indexOf("A")) / 12),
