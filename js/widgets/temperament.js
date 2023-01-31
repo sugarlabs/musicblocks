@@ -1558,9 +1558,9 @@ function TemperamentWidget() {
                             updown = "v";
                         }
                         this.notes[i] =
+                            updown +
                             newPitch +
                             addOctave +
-                            updown +
                             "(" +
                             newCents.toFixed(0) +
                             "%)" +
@@ -1572,9 +1572,9 @@ function TemperamentWidget() {
                             updown = "^";
                         }
                         this.notes[i] =
+                            updown +
                             newPitch +
                             addOctave +
-                            updown +
                             "(+" +
                             newCents.toFixed(0) +
                             "%)" +
