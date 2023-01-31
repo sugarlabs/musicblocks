@@ -1,4 +1,4 @@
-// Copyright (c) 2016-21 Walter Bender
+// Copyright (c) 2016-23 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -1799,7 +1799,10 @@ const frequencyToPitch = (hz) => {
         const f = A0 * Math.pow(TWELVEHUNDRETHROOT2, i);
         if (hz < f * 1.0003 && hz > f * 0.9997) {
             cents = i % 100;
-            const j = Math.floor(i / 100); // + 0.5);
+            if (cents > 50) {
+                cents -= 100;
+            }
+            const j = Math.floor((i / 100) + 0.5);
             return [
                 PITCHES[(j + PITCHES.indexOf("A")) % 12],
                 Math.floor((j + PITCHES.indexOf("A")) / 12),
