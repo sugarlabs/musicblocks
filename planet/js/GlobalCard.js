@@ -206,6 +206,7 @@ function GlobalCard(Planet) {
         document.getElementById("global-like-icon-" + this.id).textContent = text;
     };
 
+
     this.init = (id) => {
         this.id = id;
         this.ProjectData = Planet.GlobalPlanet.cache[id];

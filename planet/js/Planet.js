@@ -49,6 +49,7 @@ function Planet(isMusicBlocks, storage) {
         this.UserID = id;
     };
 
+
     this.open = (image) => {
         this.LocalPlanet.setCurrentProjectImage(image);
         this.LocalPlanet.updateProjects();
@@ -58,6 +59,7 @@ function Planet(isMusicBlocks, storage) {
     this.saveLocally = (data, image) => {
         this.ProjectStorage.saveLocally(data, image);
     };
+
 
     this.setAnalyzeProject = (func) => {
         this.analyzeProject = func;
@@ -80,6 +82,7 @@ function Planet(isMusicBlocks, storage) {
     };
 
     this.setOnConverterLoad = (func) => {
+
         this.onConverterLoad = func;
     };
 
@@ -87,7 +90,7 @@ function Planet(isMusicBlocks, storage) {
         this.GlobalPlanet.openGlobalProject(id,error);
     };
 
-    this.init = async function() {
+    this.init = async () => {
         this.StringHelper = new StringHelper(this);
         this.StringHelper.init();
         this.ProjectStorage = new ProjectStorage(this);
@@ -96,21 +99,20 @@ function Planet(isMusicBlocks, storage) {
         this.ServerInterface = new ServerInterface(this);
         this.ServerInterface.init();
 
-        const that = this;
 
         // eslint-disable-next-line no-unused-vars
-        document.getElementById("close-planet").addEventListener("click", function (evt) {
-            that.closeButton();
+        document.getElementById("close-planet").addEventListener("click", evt => {
+            this.closeButton();
         });
 
         // eslint-disable-next-line no-unused-vars
-        document.getElementById("planet-open-file").addEventListener("click", function (evt) {
-            that.loadProjectFromFile();
+        document.getElementById("planet-open-file").addEventListener("click", evt => {
+            this.loadProjectFromFile();
         });
 
         // eslint-disable-next-line no-unused-vars
-        document.getElementById("planet-new-project").addEventListener("click", function (evt) {
-            that.loadNewProject();
+        document.getElementById("planet-new-project").addEventListener("click", evt => {
+            this.loadNewProject();
         });
 
         this.ServerInterface.getTagManifest(
@@ -132,6 +134,7 @@ function Planet(isMusicBlocks, storage) {
             this.planetClose();
         }
     };
+
 
     this.initPlanets = (tags) => {
         if (!tags.success){

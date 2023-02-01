@@ -27,6 +27,7 @@ function ServerInterface(Planet) {
     this.APIKey = "3f2d3a4c-c7a4-4c3c-892e-ac43784f7381";
 
     this.request = (data, callback) => {
+
         const that = this;
         data["api-key"] = this.APIKey;
 
@@ -36,13 +37,14 @@ function ServerInterface(Planet) {
             url: this.ServerURL,
             data: data
         })
-            .done(function(data) {
+            .done(data => {
                 callback(data);
             })
-            .fail(function() {
-                callback(that.ConnectionFailureData);
+            .fail(() => {
+                callback(this.ConnectionFailureData);
             });
     };
+
 
     this.getTagManifest = (callback) => {
         const obj = {"action": "getTagManifest"};

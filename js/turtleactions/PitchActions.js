@@ -128,7 +128,7 @@ function setupPitchActions(activity) {
                     octave,
                     transposition_temp,
                     tur.singer.keySignature,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     null,
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
@@ -289,7 +289,7 @@ function setupPitchActions(activity) {
                     noteObj1[1],
                     ii,
                     tur.singer.keySignature,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     null,
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
@@ -303,7 +303,7 @@ function setupPitchActions(activity) {
                     noteObj1[1],
                     tur.singer.semitoneIntervals[i][0],
                     tur.singer.keySignature,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     null,
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
@@ -465,7 +465,7 @@ function setupPitchActions(activity) {
                     octave,
                     0,
                     tur.singer.keySignature,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     null,
                     activity.errorMsg
                 );
@@ -491,7 +491,7 @@ function setupPitchActions(activity) {
                         octave,
                         t,
                         tur.singer.keySignature,
-                        tur.singer.moveable,
+                        tur.singer.movable,
                         direction,
                         activity.errorMsg,
                         activity.logo.synth.inTemperament
@@ -521,7 +521,7 @@ function setupPitchActions(activity) {
                         noteObj1[1],
                         ii,
                         tur.singer.keySignature,
-                        tur.singer.moveable,
+                        tur.singer.movable,
                         null,
                         activity.errorMsg,
                         activity.logo.synth.inTemperament
@@ -535,7 +535,7 @@ function setupPitchActions(activity) {
                         noteObj1[1],
                         tur.singer.semitoneIntervals[i][0],
                         tur.singer.keySignature,
-                        tur.singer.moveable,
+                        tur.singer.movable,
                         null,
                         activity.errorMsg,
                         activity.logo.synth.inTemperament
@@ -845,7 +845,7 @@ function setupPitchActions(activity) {
                             octave,
                             nhalf,
                             tur.singer.keySignature,
-                            tur.singer.moveable,
+                            tur.singer.movable,
                             null,
                             activity.errorMsg,
                             activity.logo.synth.inTemperament

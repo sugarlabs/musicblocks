@@ -61,7 +61,7 @@ function GlobalTag(Planet) {
     this.selected = false;
     this.selectedClass = null;
 
-    this.render = function() {
+    this.render = () => {
         const tag = document.createElement("div");
         tag.classList.add("chipselect");
         tag.classList.add("cursor");
@@ -100,6 +100,7 @@ function GlobalTag(Planet) {
             this.globalPlanet.refreshTagList();
         }
     };
+
 
     this.select = ()  => {
         this.tagElement.classList.add(this.selectedClass);

@@ -194,7 +194,7 @@ draw hollow lines           : hollowLine(flow)
 FLOW BLOCK SETTERS:
 -------------------
 pickup                      : PICKUP
-movable                     : MOVEABLE
+movable                     : MOVABLE
 set master volume           : MASTERVOLUME
 set panning                 : PANNING
 
@@ -211,7 +211,7 @@ change in pitch vs previous : CHANGEINPITCH
 scalar change in pitch      : SCALARCHANGEINPITCH
 scalar step up              : SCALARSTEPUP
 scalar step down            : SCALARSTEPDOWN
-is solfege moveable         : MOVEABLEDO
+is solfege movable          : MOVABLEDO
 current key                 : CURRENTKEY
 current mode                : CURRENTMODE
 current mode length         : MODELENGTH

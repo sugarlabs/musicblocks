@@ -24,7 +24,7 @@
    getOctaveRatio, getTemperament, getTemperamentKeys,
    isCustomTemperament, pitchToFrequency, platformColor,
    rationalToFraction, setOctaveRatio, setOctaveRatio, SHARP, Singer,
-   slicePath, updateTemperaments, wheelnav, frequencyToPitch, getNote
+   slicePath, updateTemperaments, wheelnav, frequencyToPitch
  */
 
 /* exported TemperamentWidget */
@@ -812,6 +812,7 @@ function TemperamentWidget() {
                 this.tempRatios.sort(function (a, b) {
                     return a - b;
                 });
+                
                 pitchNumber = this.tempRatios.length - 1;
                 this.typeOfEdit = "equal";
                 this.divisions = divisions;
@@ -1006,7 +1007,6 @@ function TemperamentWidget() {
                 return a - b;
             });
             const pitchNumber = that.tempRatios.length - 1;
-
             if (event.target.innerHTML === _("done")) {
                 that.ratios = that.tempRatios.slice();
                 that.typeOfEdit = "nonequal";
@@ -1504,7 +1504,6 @@ function TemperamentWidget() {
     };
 
     this._save = function () {
-        let notesMatch = false;
         this.notes = [];
 
         if (isCustomTemperament(this.inTemperament)) {
@@ -1516,70 +1515,46 @@ function TemperamentWidget() {
                 0,
                 "C Major"
             );
+
+            let addOctave = "";
             for (let i = 0; i < this.ratios.length; i++) {
-                for (let j = 0; j < this.ratiosNotesPair.length; j++) {
-                    notesMatch = false;
-                    if (this.ratios[i] == this.ratiosNotesPair[j][0]) {
-                        notesMatch = true;
-                        this.notes[i] =
-                            this.ratiosNotesPair[j][1][0] + "(+0%)" + this.ratiosNotesPair[j][1][1];
-                        break;
-                    }
+                const obj = frequencyToPitch(this.ratios[i] * startPitch);
+                const newPitch = obj[0];
+                const newOctave = obj[1];
+                const newCents = obj[2];
+                if (this.powerBase !== 2) {
+                    addOctave = newOctave;
                 }
 
-                if (!notesMatch) {
-                    const obj = frequencyToPitch(this.ratios[i] * startPitch);
-                    let newPitch = obj[0];
-                    let newOctave = obj[1];
-                    let newCents = obj[2];
-                    if (obj[2] > 50) {
-                        // Bump up to the next semi-tone and use neg. cents.
-                        const obj2 = getNote(
-                            obj[0],
-                            obj[1],
-                            1,
-                            this.activity.turtles.ithTurtle(0).singer.keySignature,
-                            false);
-                        newPitch = obj2[0];
-                        newOctave = obj2[1];
-                        newCents = obj[2] - 100;
+                let updown = "";
+                if (newCents < 0) {
+                    if (newCents < -30) {
+                        updown = "vv";
+                    } else if (newCents < -15) {
+                        updown = "v";
                     }
-
-                    let addOctave = "";
-                    if (this.powerBase !== 2) {
-                        addOctave = newOctave;
+                    this.notes[i] =
+                        updown +
+                        newPitch +
+                        addOctave +
+                        "(" +
+                        newCents.toFixed(0) +
+                        "%)" +
+                        newOctave;
+                } else {
+                    if (newCents > 30) {
+                        updown = "^^";
+                    } else if (newCents > 15) {
+                        updown = "^";
                     }
-
-                    let updown = "";
-                    if (newCents < 0) {
-                        if (newCents < -30) {
-                            updown = "vv";
-                        } else if (newCents < -15) {
-                            updown = "v";
-                        }
-                        this.notes[i] =
-                            updown +
-                            newPitch +
-                            addOctave +
-                            "(" +
-                            newCents.toFixed(0) +
-                            "%)" +
-                            newOctave;
-                    } else {
-                        if (newCents > 30) {
-                            updown = "^^";
-                        } else if (newCents > 15) {
-                            updown = "^";
-                        }
-                        this.notes[i] =
-                            updown +
-                            newPitch +
-                            addOctave +
-                            "(+" +
-                            newCents.toFixed(0) +
-                            "%)" +
-                            newOctave;
-                    }
+                    this.notes[i] =
+                        updown +
+                        newPitch +
+                        addOctave +
+                        "(+" +
+                        newCents.toFixed(0) +
+                        "%)" +
+                        newOctave;
                 }
             }
         }

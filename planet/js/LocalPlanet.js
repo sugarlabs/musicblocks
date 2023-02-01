@@ -36,10 +36,12 @@ function LocalPlanet(Planet) {
         this.renderAllProjects();
     };
 
+
     this.setCurrentProjectImage = (image)=> {
         this.currentProjectImage = image;
         this.currentProjectID = Planet.ProjectStorage.getCurrentProjectID();
     };
+
 
     this.refreshProjectArray = () =>{
         this.projects = [];
@@ -50,11 +52,10 @@ function LocalPlanet(Planet) {
             }
         }
 
-        const that = this;
 
-        this.projects.sort(function(a, b) {
+        this.projects.sort((a, b) => {
             // eslint-disable-next-line max-len
-            return that.ProjectTable[b[0]].DateLastModified - that.ProjectTable[a[0]].DateLastModified;
+            return this.ProjectTable[b[0]].DateLastModified - this.ProjectTable[a[0]].DateLastModified;
         });
     };
 
@@ -64,6 +65,7 @@ function LocalPlanet(Planet) {
             this.projects[i][1].init(this.projects[i][0]);
         }
     };
+
 
     this.renderAllProjects = ()=> {
         document.getElementById("local-projects").innerHTML = "";
@@ -83,6 +85,7 @@ function LocalPlanet(Planet) {
         }
         jQuery(".tooltipped").tooltip({delay: 50});
     };
+
 
     this.initDeleteModal = ()=> {
         const t = this;
@@ -105,10 +108,12 @@ function LocalPlanet(Planet) {
         jQuery("#deleter").modal("open");
     };
 
+
     this.openProject = (id) => {
         Planet.ProjectStorage.setCurrentProjectID(id);
         Planet.loadProjectFromData(this.ProjectTable[id].ProjectData);
     };
+
 
     this.mergeProject = (id) => {
         const d = this.ProjectStorage.getCurrentProjectData();
@@ -119,6 +124,7 @@ function LocalPlanet(Planet) {
             Planet.loadProjectFromData(this.ProjectTable[id].ProjectData, true);
         }
     };
+
 
     this.init = ()=> {
         this.ProjectTable = Planet.ProjectStorage.data.Projects;

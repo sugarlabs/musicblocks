@@ -397,9 +397,9 @@ class MusicBlocks {
 
     // ============================ INTERVALS =================================
 
-    set MOVEABLEDO(moveable) {
-        const args = JSInterface.validateArgs("MOVEABLEDO", [moveable]);
-        Singer.IntervalsActions.setMoveableDo(args[0], this.turIndex);
+    set MOVABLEDO(movable) {
+        const args = JSInterface.validateArgs("MOVABLEDO", [movable]);
+        Singer.IntervalsActions.setMovableDo(args[0], this.turIndex);
     }
 
     get CURRENTKEY() {

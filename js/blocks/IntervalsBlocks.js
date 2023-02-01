@@ -885,18 +885,18 @@ function setupIntervalsBlocks(activity) {
         }
     }
 
-    class MoveableBlock extends FlowBlock {
+    class MovableBlock extends FlowBlock {
         constructor() {
-            super("movable", _("moveable Do")); // legacy typo
+            super("moveable", _("movable Do")); // legacy typo
             this.setPalette("intervals", activity);
             this.beginnerBlock(true);
             this.setHelpString([
-                _("When Moveable do is false, the solfege note names are always tied to specific pitches,") +
+                _("When Movable do is false, the solfege note names are always tied to specific pitches,") +
                     " " +
-                    _('eg "do" is always "C-natural" when Moveable do is true, the solfege note names are assigned to scale degrees "do" is always the first degree of the major scale.'),
+                    _('eg "do" is always "C-natural" when Movable do is true, the solfege note names are assigned to scale degrees "do" is always the first degree of the major scale.'),
                 "documentation",
                 null,
-                "movablehelp"
+                "moveablehelp"
             ]);
             this.size = 0;
             this.formBlock({
@@ -904,14 +904,14 @@ function setupIntervalsBlocks(activity) {
                 argTypes: ["booleanin"]
             });
             this.makeMacro((x, y) => [
-                [0, "movable", x, y, [null, 1, null]],
+                [0, "moveable", x, y, [null, 1, null]],
                 [1, ["boolean", { value: true }], 0, 0, [0]]
             ]);
         }
 
         flow(args, logo, turtle) {
             if (args.length === 1) {
-                Singer.IntervalsActions.setMoveableDo(args[0], turtle);
+                Singer.IntervalsActions.setMovableDo(args[0], turtle);
             }
         }
     }
@@ -1094,7 +1094,7 @@ function setupIntervalsBlocks(activity) {
     // makeIntervalMacroBlocks();
     new ScalarIntervalBlock().setup(activity);
     new DefineModeBlock().setup(activity);
-    new MoveableBlock().setup(activity);
+    new MovableBlock().setup(activity);
     new ModeLengthBlock().setup(activity);
     new CurrentModeBlock().setup(activity);
     new KeyBlock().setup(activity);

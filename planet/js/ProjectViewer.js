@@ -32,7 +32,7 @@ function ProjectViewer(Planet) {
     this.ReportDescriptionTooLongError = _("Report description too long");
     this.id = null;
 
-    this.open = function(id) {
+    this.open = id => {
         this.id = id;
         const proj = this.ProjectCache[id];
         document.getElementById("projectviewer-title").textContent = proj.ProjectName;
@@ -74,6 +74,7 @@ function ProjectViewer(Planet) {
     this.download = () => {
         Planet.GlobalPlanet.getData(this.id,this.afterDownload.bind(this));
     };
+
 
     this.afterDownload = (data) => {
         const proj = this.ProjectCache[this.id];
@@ -137,6 +138,7 @@ function ProjectViewer(Planet) {
         }
     };
 
+
     this.afterReport = (data) => {
         if (data.success) {
             document.getElementById("submittext").textContent = this.ReportSuccess;
@@ -156,37 +158,38 @@ function ProjectViewer(Planet) {
         document.getElementById("projectviewer-report-card").style.display = "none";
     };
 
+
     this.init = () =>{
         const that = this;
 
         // eslint-disable-next-line no-unused-vars
-        document.getElementById("projectviewer-download-file").addEventListener("click", function (evt) {
-            that.download();
+        document.getElementById("projectviewer-download-file").addEventListener("click", evt => {
+            this.download();
         });
 
         // eslint-disable-next-line no-unused-vars
-        document.getElementById("projectviewer-open-mb").addEventListener("click", function (evt) {
-            that.openProject();
+        document.getElementById("projectviewer-open-mb").addEventListener("click", evt => {
+            this.openProject();
         });
 
         // eslint-disable-next-line no-unused-vars
-        document.getElementById("projectviewer-merge-mb").addEventListener("click", function (evt) {
-            that.mergeProject();
+        document.getElementById("projectviewer-merge-mb").addEventListener("click", evt => {
+            this.mergeProject();
         });
 
         // eslint-disable-next-line no-unused-vars
-        document.getElementById("projectviewer-report-project").addEventListener("click", function (evt) {
-            that.openReporter();
+        document.getElementById("projectviewer-report-project").addEventListener("click", evt => {
+            this.openReporter();
         });
 
         // eslint-disable-next-line no-unused-vars
-        document.getElementById("projectviewer-report-submit").addEventListener("click", function (evt) {
-            that.submitReporter();
+        document.getElementById("projectviewer-report-submit").addEventListener("click", evt => {
+            this.submitReporter();
         });
 
         // eslint-disable-next-line no-unused-vars
-        document.getElementById("projectviewer-report-close").addEventListener("click", function (evt) {
-            that.closeReporter();
+        document.getElementById("projectviewer-report-close").addEventListener("click", evt => {
+            this.closeReporter();
         });
     };
 };

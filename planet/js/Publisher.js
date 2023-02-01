@@ -77,6 +77,7 @@ function Publisher(Planet) {
         return tags;
     };
 
+
     this.findTagWithName = (name) => {
         const keys = Object.keys(Planet.TagsManifest);
         for (let i = 0; i < keys.length; i++) {
@@ -106,22 +107,21 @@ function Publisher(Planet) {
         });
 
         const maxLength = 5;
-        const that = this;
 
-        jQuery("#tagsadd").on("chip.add", function(e, chip) {
+        jQuery("#tagsadd").on("chip.add", (e, chip) => {
             // you have the added chip here
             let arr = jQuery("#tagsadd").material_chip("data");
-            if (!(chip.tag in that.ChipTags)) {
+            if (!(chip.tag in this.ChipTags)) {
                 arr.splice(arr.length - 1, 1);
             } else {
-                chip.id = that.findTagWithName(chip.tag);
+                chip.id = this.findTagWithName(chip.tag);
             }
 
             if (arr.length>maxLength) {
                 arr=arr.slice(0,maxLength);
             }
 
-            that.setTagInput(arr);
+            this.setTagInput(arr);
             jQuery("#tagsadd :input").focus();
         });
     };
@@ -136,6 +136,7 @@ function Publisher(Planet) {
             }
         });
     };
+
 
     this.setTags = (arr) => {
         const a = [];
@@ -161,7 +162,7 @@ function Publisher(Planet) {
         document.getElementById("publisher-submit").addEventListener("click", this.publishProject.bind(this));
     };
 
-    this.open = function(id, IsShareLink) {
+    this.open = (id, IsShareLink) => {
         if (IsShareLink === undefined) {
             IsShareLink = false;
         }
@@ -285,6 +286,7 @@ function Publisher(Planet) {
         }
     };
 
+
     this.parseProject = (tb) => {
         try {
             tb = JSON.parse(tb);
@@ -343,6 +345,7 @@ function Publisher(Planet) {
         }
         document.body.style.cursor = "default";
     };
+
 
     this.throwError = (error) => {
         document.getElementById("publisher-error").textContent = error;

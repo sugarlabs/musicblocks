@@ -82,6 +82,7 @@ function GlobalPlanet(Planet) {
         this.refreshTagList();
     };
 
+
     this.selectSpecialTag = (tag) => {
         for (let i = 0; i < this.tags.length; i++) {
             this.tags[i].unselect();
@@ -124,6 +125,7 @@ function GlobalPlanet(Planet) {
         this.refreshProjects();
     };
 
+
     this.searchTags = (tagids) => {
         this.searchMode = JSON.stringify(tagids);
         this.refreshProjects();
@@ -153,6 +155,7 @@ function GlobalPlanet(Planet) {
             );
         }
     };
+
 
     this.loadMoreProjects = () => {
         this.showLoading();
@@ -322,7 +325,7 @@ function GlobalPlanet(Planet) {
         }.bind(this));
     };
 
-    this.afterDownloadData = function(id, data, callback, error) {
+    this.afterDownloadData = (id, data, callback, error) => {
         if (error === undefined) {
             error = null;
         }
@@ -340,6 +343,7 @@ function GlobalPlanet(Planet) {
             }
         }
     };
+
 
     this.render = (data) => {
         for (let i = 0; i < data.length; i++) {
@@ -453,7 +457,7 @@ function GlobalPlanet(Planet) {
         }, error);
     };
     
-    this.init = function() {
+    this.init = () => {
         if (!Planet.ConnectedToServer) {
             document.getElementById("globaltitle").textContent = _("Cannot connect to server");
             document.getElementById("globalcontents").innerHTML = this.offlineHTML;

@@ -2493,15 +2493,15 @@ msgid "define mode"
 msgstr ""
 
 #: js/IntervalsBlocks.js:805
-msgid "moveable Do"
+msgid "movable Do"
 msgstr ""
 
 #: js/IntervalsBlocks.js:809
-msgid "When Moveable do is false, the solfege note names are always tied to specific pitches,"
+msgid "When Movable do is false, the solfege note names are always tied to specific pitches,"
 msgstr ""
 
 #: js/IntervalsBlocks.js:811
-msgid "eg \"do\" is always \"C-natural\" when Moveable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
+msgid "eg \"do\" is always \"C-natural\" when Movable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
 msgstr ""
 
 #: js/IntervalsBlocks.js:837
@@ -7592,7 +7592,7 @@ msgstr ""
 #~msgstr ""
 
 #: js/IntervalsBlocks.js:658
-#~msgid "eg \"do\" is always \"C-natural\" when Moveable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
+#~msgid "eg \"do\" is always \"C-natural\" when Movable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
 #~msgstr ""
 
 #: js/StringHelper.js:30

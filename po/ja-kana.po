@@ -2492,15 +2492,15 @@ msgid "define mode"
 msgstr "ちょうを ていぎ する"
 
 #: js/IntervalsBlocks.js:805
-msgid "moveable Do"
+msgid "movable Do"
 msgstr "いどう ド"
 
 #: js/IntervalsBlocks.js:809
-msgid "When Moveable do is false, the solfege note names are always tied to specific pitches,"
+msgid "When Movable do is false, the solfege note names are always tied to specific pitches,"
 msgstr ""
 
 #: js/IntervalsBlocks.js:811
-msgid "eg \"do\" is always \"C-natural\" when Moveable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
+msgid "eg \"do\" is always \"C-natural\" when Movable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
 msgstr ""
 
 #: js/IntervalsBlocks.js:837
@@ -4209,6 +4209,18 @@ msgstr "サインは"
 #.TRANS: sawtooth wave
 msgid "sawtooth"
 msgstr "ぎざぎざの なみ"
+
+msgid "The Transpose by Ratio block will shift the pitches contained inside Note blocks up (or down) by a ratio"
+msgstr "「ひで いどう」ブロックは おんぷの なかの ピッチを ひで いどうさせる。"
+
+msgid "transpose by ratio"
+msgstr "ひで いどう"
+
+msgid "The Ratio Interval block calculates an interval based on a ratio."
+msgstr "「比で音程」ブロックは比の音程のピッチを経産する。"
+
+msgid "ratio interval"
+msgstr "ひで おんてい"
 
 #: js/PitchBlocks.js:140
 #.TRANS: musical transposition (adjustment of pitch up or down)
@@ -8162,7 +8174,7 @@ msgstr "z座標の動き"
 
 #: js/turtledefs.js:439
 
-#~msgid "eg \"do\" is always \"C-natural\"); when Moveable do is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
+#~msgid "eg \"do\" is always \"C-natural\"); when Movable do is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
 #~msgstr ""
 
 #: js/turtledefs.js:459
@@ -8499,7 +8511,7 @@ msgstr "z座標の動き"
 #~msgid "hi-hat"
 #~msgstr "ハイハット"
 
-#~msgid "moveable"
+#~msgid "movable"
 #~msgstr "いどうド"
 
 #~msgid "untitled"

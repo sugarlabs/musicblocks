@@ -2490,16 +2490,16 @@ msgid "define mode"
 msgstr "definir el modo"
 
 #: js/IntervalsBlocks.js:805
-msgid "moveable Do"
+msgid "movable Do"
 msgstr "movible Do"
 
 #: js/IntervalsBlocks.js:809
-msgid "When Moveable do is false, the solfege note names are always tied to specific pitches,"
-msgstr "Cuando Moveable do es falso, los nombres de las notas de solfeo siempre están vinculados a tonos específicos,"
+msgid "When Movable do is false, the solfege note names are always tied to specific pitches,"
+msgstr "Cuando Movible do es falso, los nombres de las notas de solfeo siempre están vinculados a tonos específicos,"
 
 #: js/IntervalsBlocks.js:811
-msgid "eg \"do\" is always \"C-natural\" when Moveable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
-msgstr "Por ejemplo, \"do\" siempre es \"C-natural\" cuando Moveable do es verdadero, los nombres de las notas del solfeo se asignan a grados de escala. \"do\" siempre es el primer grado de la escala mayor."
+msgid "eg \"do\" is always \"C-natural\" when Movable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
+msgstr "Por ejemplo, \"do\" siempre es \"C-natural\" cuando Movible do es verdadero, los nombres de las notas del solfeo se asignan a grados de escala. \"do\" siempre es el primer grado de la escala mayor."
 
 #: js/IntervalsBlocks.js:837
 #.TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
@@ -4209,7 +4209,6 @@ msgid "sawtooth"
 msgstr "diente de sierra"
 
 msgid "The Transpose by Ratio block will shift the pitches contained inside Note blocks up (or down) by a ratio"
-
 msgstr "El bloque transponer por razón cambiará los tonos contenidos dentro de los bloques de notas hacia arriba (o hacia abajo) en una proporción"
 
 msgid "transpose by ratio"
@@ -8068,8 +8067,8 @@ msgstr "z del acelerómetro"
 #~msgid "The Whole notes played block returns the total number of whole notes played."
 #~msgstr "El bloque Nota completa reproducidas devuelve el número total de notas completas reproducidas."
 
-#~msgid "eg \"do\" is always \"C-natural\"); when Moveable do is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
-#~msgstr "por ejemplo, \ "do \" es siempre \ "C-natural \"); cuando Moveable do es verdadero, los nombres de las notas de solfeo se asignan a grados de escala (\ "do \" es siempre el primer grado de la escala principal)."
+#~msgid "eg \"do\" is always \"C-natural\"); when Movable do is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
+#~msgstr "por ejemplo, \ "do \" es siempre \ "C-natural \"); cuando Movible do es verdadero, los nombres de las notas de solfeo se asignan a grados de escala (\ "do \" es siempre el primer grado de la escala principal)."
 
 #~msgid "The Note volume block returns the current volume of the current synthesizer."
 #~msgstr "El bloque Volumen de notas devuelve el volumen actual del sintetizador actual."

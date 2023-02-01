@@ -37,7 +37,7 @@ function ProjectStorage(Planet) {
         // eslint-disable-next-line no-console
         console.debug("DATA LOADED");
     });
-    this.generateID = function() {
+    this.generateID = () => {
         const n = Date.now();
         const prefix = n.toString();
         let suffix = "";
@@ -68,7 +68,7 @@ function ProjectStorage(Planet) {
         this.save();
     };
 
-    this.getCurrentProjectData = async function() {
+    this.getCurrentProjectData = async () => {
         await this.dataLoaded;
         const c = this.data.CurrentProject;
         if (this.data.Projects[c] === undefined) {
@@ -109,7 +109,7 @@ function ProjectStorage(Planet) {
         return this.ImageDataURL;
     };
 
-    this.initialiseNewProject = function(name, data, image) {
+    this.initialiseNewProject = (name, data, image) => {
         if (name === undefined) {
             name = this.defaultProjectName;
         }
@@ -143,6 +143,7 @@ function ProjectStorage(Planet) {
         this.save();
     };
 
+
     this.deleteProject = (id) => {
         delete this.data.Projects[id];
         this.save();
@@ -152,6 +153,7 @@ function ProjectStorage(Planet) {
     this.getCurrentProjectID = () => {
         return this.data.CurrentProject;
     };
+
 
     this.setCurrentProjectID = (id) => {
         this.data.CurrentProject = id;
@@ -166,6 +168,7 @@ function ProjectStorage(Planet) {
     };
 
     this.isLiked = (id) => {
+
         if (this.data.LikedProjects[id] === true) {
             return true;
         }
@@ -177,6 +180,7 @@ function ProjectStorage(Planet) {
         this.data.LikedProjects[id] = like;
         this.save();
     };
+
 
     this.isReported = (id) => {
         if (this.data.ReportedProjects[id] === true) {
@@ -193,7 +197,7 @@ function ProjectStorage(Planet) {
 
     // Ancillary Functions
 
-    this.set = async function(key, obj) {
+    this.set = async (key, obj) => {
         const jsonobj = JSON.stringify(obj);
         await this.LocalStorage.setItem(key, jsonobj);
         const savedjsonobj = await this.LocalStorage.getItem(key);
@@ -202,7 +206,7 @@ function ProjectStorage(Planet) {
         }
     };
 
-    this.get = async function(key) {
+    this.get = async (key) => {
         const jsonobj = await this.LocalStorage.getItem(key);
         if (jsonobj === null || jsonobj === "") {
             return null;
@@ -217,12 +221,12 @@ function ProjectStorage(Planet) {
         }
     };
 
-    this.save = async function() {
+    this.save = async () => {
         this.TimeLastSaved = Date.now();
         await this.set(this.LocalStorageKey, this.data);
     };
 
-    this.restore = async function() {
+    this.restore = async () => {
         const currentData = await this.get(this.LocalStorageKey);
         try {
             if(typeof currentData === "string"){
@@ -237,7 +241,7 @@ function ProjectStorage(Planet) {
         }
     };
 
-    this.initialiseStorage = async function() {
+    this.initialiseStorage = async () => {
         if (this.data === null || this.data === undefined) {
             this.data = {};
         }
@@ -261,11 +265,11 @@ function ProjectStorage(Planet) {
         await this.save();
     };
 
-    this.getDefaultCreatorName = function() {
+    this.getDefaultCreatorName = () => {
         return this.data.DefaultCreatorName;
     };
 
-    this.port = async function () {
+    this.port = async () => {
         const oldProjectData = localStorage.getItem(this.LocalStorageKey);
         const isPortedAlready = await this.get(this.VersionKey);
         if(isPortedAlready !== this.Version){
@@ -277,7 +281,7 @@ function ProjectStorage(Planet) {
         }
     };
 
-    this.init = async function() {
+    this.init = async () => {
         // don't use Planet's localStorage, use IndexedDB if available to allow bigger projects.
         this.LocalStorage = localforage;
         await this.port();

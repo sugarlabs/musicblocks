@@ -19,7 +19,7 @@
 function Converter  (Planet)  {
     this.ServerInterface = Planet.ServerInterface;
 
-    this.isConnected = function() {
+    this.isConnected = () => {
         return Planet.ConnectedToServer;
     };
 
