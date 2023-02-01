@@ -118,7 +118,7 @@ class Singer {
         this.notesPlayed = [0, 1];
         this.whichNoteToCount = 1;
         this.tallyNotes = 0;
-        this.moveable = false; // moveable solfege?
+        this.movable = false; // movable solfege?
 
         // Parameters used by the note block
         this.bpm = [];
@@ -284,7 +284,7 @@ class Singer {
             octave,
             0,
             tur.singer.keySignature,
-            tur.singer.moveable,
+            tur.singer.movable,
             null,
             activity.errorMsg,
             logo.synth.inTemperament
@@ -308,7 +308,7 @@ class Singer {
                         logo.synth.inTemperament
                     ),
                 tur.singer.keySignature,
-                tur.singer.moveable,
+                tur.singer.movable,
                 null,
                 activity.errorMsg,
                 logo.synth.inTemperament
@@ -322,7 +322,7 @@ class Singer {
                         ? getStepSizeUp(tur.singer.keySignature, noteObj[0])
                         : getStepSizeDown(tur.singer.keySignature, noteObj[0]),
                     tur.singer.keySignature,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     null,
                     activity.logo.errorMsg,
                     logo.synth.inTemperament
@@ -393,7 +393,7 @@ class Singer {
             octave,
             0,
             tur.singer.keySignature,
-            tur.singer.moveable,
+            tur.singer.movable,
             null,
             activity.errorMsg
         );
@@ -407,7 +407,7 @@ class Singer {
                 tur.singer.invertList[i][1],
                 0,
                 tur.singer.keySignature,
-                tur.singer.moveable,
+                tur.singer.movable,
                 null,
                 activity.errorMsg
             );
@@ -708,7 +708,7 @@ class Singer {
                 octave,
                 tur.singer.transposition,
                 tur.singer.keySignature,
-                tur.singer.moveable,
+                tur.singer.movable,
                 null,
                 activity.errorMsg,
                 activity.logo.synth.inTemperament
@@ -730,7 +730,7 @@ class Singer {
                         noteObj2[1],
                         tur.singer.transposition,
                         tur.singer.keySignature,
-                        tur.singer.moveable,
+                        tur.singer.movable,
                         null,
                         activity.errorMsg,
                         activity.logo.synth.inTemperament
@@ -742,7 +742,7 @@ class Singer {
                     octave,
                     tur.singer.transposition + parseInt(tur.singer.neighborStepPitch),
                     tur.singer.keySignature,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     null,
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
@@ -765,7 +765,7 @@ class Singer {
                 octave,
                 transposition,
                 tur.singer.keySignature,
-                tur.singer.moveable,
+                tur.singer.movable,
                 null,
                 activity.errorMsg,
                 activity.logo.synth.inTemperament
@@ -805,7 +805,7 @@ class Singer {
                     octave,
                     atrans,  // transposition,
                     tur.singer.keySignature,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     null,
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
@@ -844,7 +844,7 @@ class Singer {
                     octave,
                     atrans,  // transposition,
                     tur.singer.keySignature,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     null,
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
@@ -896,7 +896,7 @@ class Singer {
                         octave,
                         0,
                         tur.singer.keySignature,
-                        tur.singer.moveable,
+                        tur.singer.movable,
                         direction,
                         activity.errorMsg,
                         activity.logo.synth.inTemperament
@@ -926,7 +926,7 @@ class Singer {
                     // FIXME: should not be hardwired to 12
                     atrans + tur.singer.register * 12,  // transposition + tur.singer.register * 12,
                     tur.singer.keySignature,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     direction,
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
@@ -975,7 +975,7 @@ class Singer {
                     noteObj1[1],
                     getInterval(tur.singer.intervals[i], tur.singer.keySignature, noteObj1[0]),
                     tur.singer.keySignature,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     null,
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
@@ -989,7 +989,7 @@ class Singer {
                     noteObj1[1],
                     tur.singer.semitoneIntervals[i][0],
                     tur.singer.keySignature,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     null,
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
@@ -1008,7 +1008,7 @@ class Singer {
                         noteObj1[0]
                     ) + tur.singer.chordIntervals[i][1],
                     tur.singer.keySignature,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     null,
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
@@ -1045,7 +1045,7 @@ class Singer {
                 octave,
                 transposition,
                 tur.singer.keySignature,
-                tur.singer.moveable,
+                tur.singer.movable,
                 null,
                 activity.errorMsg
             );
@@ -1057,7 +1057,7 @@ class Singer {
                 octave,
                 0,
                 tur.singer.keySignature,
-                tur.singer.moveable,
+                tur.singer.movable,
                 null,
                 activity.errorMsg
             );
@@ -1104,7 +1104,7 @@ class Singer {
                 octave,
                 transposition,
                 tur.singer.keySignature,
-                tur.singer.moveable,
+                tur.singer.movable,
                 null,
                 activity.errorMsg
             );
@@ -1137,7 +1137,7 @@ class Singer {
                     // FIXME: should not be hardwired to 12
                     transposition + tur.singer.register * 12,
                     tur.singer.keySignature,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     direction,
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
@@ -1168,7 +1168,7 @@ class Singer {
                     noteObj1[1],
                     getInterval(tur.singer.intervals[i], tur.singer.keySignature, noteObj1[0]),
                     tur.singer.keySignature,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     null,
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
@@ -1182,7 +1182,7 @@ class Singer {
                     noteObj1[1],
                     tur.singer.semitoneIntervals[i][0],
                     tur.singer.keySignature,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     null,
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
@@ -1397,7 +1397,7 @@ class Singer {
                 tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][0],
                 0,
                 tur.singer.keySignature,
-                tur.singer.moveable,
+                tur.singer.movable,
                 null,
                 activity.errorMsg
             );
@@ -1410,7 +1410,7 @@ class Singer {
                 tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][0],
                 0,
                 tur.singer.keySignature,
-                tur.singer.moveable,
+                tur.singer.movable,
                 null,
                 activity.errorMsg
             );
@@ -1835,7 +1835,7 @@ class Singer {
                                 tur.singer.noteOctaves[thisBlk][i],
                                 0,
                                 tur.singer.keySignature,
-                                tur.singer.moveable,
+                                tur.singer.movable,
                                 null,
                                 activity.errorMsg,
                                 activity.logo.synth.inTemperament

@@ -3556,7 +3556,7 @@ const piemenuGrid = function (activity) {
 
 const piemenuKey = (activity) => {
     docById("chooseKeyDiv").style.display = "block";
-    docById("moveable").style.display = "block";
+    docById("movable").style.display = "block";
 
     const keyNameWheel = new wheelnav("chooseKeyDiv", null, 1200, 1200);
     const keyNameWheel2 = new wheelnav("keyNameWheel2", keyNameWheel.raphael);
@@ -3631,8 +3631,8 @@ const piemenuKey = (activity) => {
 
     docById("chooseKeyDiv").style.left = x - 175 + "px";
     docById("chooseKeyDiv").style.top = y + 50 + "px";
-    docById("moveable").style.left = x - 110 + "px";
-    docById("moveable").style.top = y + 400 + "px";
+    docById("movable").style.left = x - 110 + "px";
+    docById("movable").style.top = y + 400 + "px";
 
     const __generateSetKeyBlocks = () => {
         // Find all setkey blocks in the code.
@@ -3736,8 +3736,8 @@ const piemenuKey = (activity) => {
 
     const __exitMenu = () => {
         docById("chooseKeyDiv").style.display = "none";
-        docById("moveable").style.display = "none";
-        const ele = document.getElementsByName("moveable");
+        docById("movable").style.display = "none";
+        const ele = document.getElementsByName("movable");
         for (let i = 0; i < ele.length; i++) {
             if (ele[i].checked) {
                 activity.KeySignatureEnv[2] = ele[i].value == "true" ? true : false;

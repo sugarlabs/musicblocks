@@ -448,7 +448,7 @@ JSInterface._methodArgConstraints = {
             }
         }
     ],
-    MOVEABLEDO: [
+    MOVABLEDO: [
         {
             type: "boolean"
         }

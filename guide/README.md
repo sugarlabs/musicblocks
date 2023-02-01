@@ -579,11 +579,11 @@ You can find the *Set key* block on the *Intervals* palette.
 
 | Music Blocks Code with Set Key and Movable Do |
 | --- |
-| ![moveable do](./pitchmovement5.svg "moveable do") |
+| ![movable do](./pitchmovement5.svg "movable do") |
 
 | Standard Notation Code for Set Key and Movable Do |
 | --- |
-| ![moveable do](./pitchmovement5.png "moveable do") |
+| ![movable do](./pitchmovement5.png "movable do") |
 
 | Representation | Pitch Movement | Properties |
 | --- | --- | --- |
@@ -591,11 +591,11 @@ You can find the *Set key* block on the *Intervals* palette.
 
 | Music Blocks for Set Key and Scalar Step |
 | --- |
-| ![moveable do](./pitchmovement6.svg "moveable do") |
+| ![movable do](./pitchmovement6.svg "movable do") |
 
 | Standard Notation with Set Key and Scalar Step |
 | --- |
-| ![moveable do](./pitchmovement6.png "moveable do") |
+| ![movable do](./pitchmovement6.png "movable do") |
 
 #### <a name="FIXED-AND-MOVABLE-PITCH-SYSTEMS">3.2.6 Fixed and Movable Pitch Systems</a>
 
@@ -2545,7 +2545,7 @@ Looking for a block? The tables below (one for beginner mode and one for advance
 | | current key | | | - | | | note to frequency |
 | | current mode | | | - | | | hertz |
 | | mode length | | | x | | | stop media |
-| | moveable Do | | | / | | | open file |
+| | movable Do | | | / | | | open file |
 | | define mode | | | abs | | | height |
 | | scalar interval (+/-) | | | sqrt | | | width |
 | | semi tone interval (+/-) | | | ^ | | | bottom (screen) |

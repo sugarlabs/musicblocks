@@ -150,16 +150,16 @@ function setupIntervalsActions(activity) {
         }
 
         /**
-         * "moveable do" block.
+         * "movable do" block.
          * Attaches or detaches solfege names to specific pitches.
          *
          * @static
-         * @param {Boolean} moveable - whether solfeges are fixed or moveable
+         * @param {Boolean} movable - whether solfeges are fixed or movable
          * @param {Number} turtle - Turtle index in turtles.turtleList
          * @returns {void}
          */
-        static setMoveableDo(moveable, turtle) {
-            activity.turtles.ithTurtle(turtle).singer.moveable = moveable;
+        static setMovableDo(movable, turtle) {
+            activity.turtles.ithTurtle(turtle).singer.movable = movable;
         }
 
         /**

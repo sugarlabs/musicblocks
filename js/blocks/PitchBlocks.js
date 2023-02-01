@@ -303,7 +303,7 @@ function setupPitchBlocks(activity) {
                         tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][0],
                         0,
                         tur.singer.keySignature,
-                        tur.singer.moveable,
+                        tur.singer.movable,
                         null,
                         activity.errorMsg
                     );
@@ -493,7 +493,7 @@ function setupPitchBlocks(activity) {
                     notePlayed = scaleDegreeToPitchMapping(
                         tur.singer.keySignature,
                         activity.blocks.blockList[cblk1].value,
-                        tur.singer.moveable,
+                        tur.singer.movable,
                         null
                     );
                     notePlayed += tur.singer.currentOctave ? tur.singer.currentOctave : 4;
@@ -1866,7 +1866,7 @@ function setupPitchBlocks(activity) {
                 note = scaleDegreeToPitchMapping(
                     tur.singer.keySignature,
                     sd,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     null
                 );
                 let semitones = ref;
@@ -1900,12 +1900,12 @@ function setupPitchBlocks(activity) {
                 arg0 = Number(arg0);
 
                 // We interpret numbers two different ways:
-                //  (1) a positive integer between 1 and 12 is taken to be a moveable solfege, e.g. 1 : do, 2 : re ...
+                //  (1) a positive integer between 1 and 12 is taken to be a movable solfege, e.g. 1 : do, 2 : re ...
                 //  (2) if frequency is input, ignore octave (arg1)
                 // Negative numbers will throw an error.
 
                 if (arg0 <= 12) {
-                    // moveable solfege
+                    // movable solfege
                     if (arg0 < 1) {
                         activity.errorMsg(INVALIDPITCH, blk);
                         arg0 = 7; // set default value to 7th semitone
