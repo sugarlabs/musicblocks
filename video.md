@@ -37,7 +37,7 @@ ffmpeg -i my-animation.gif -c vp9 -b:v 0 -crf 41 my-animation.webm
 Animated GIFs have three key traits that a video needs to replicate:
 
 -Play automatically.
--Loop continuously (usually, but it is possible to prevent looping).
+-Loop continuously (usually, but possible to prevent looping).
 -silent.
 
 Luckily, you can recreate these behaviors using the <video> element.
