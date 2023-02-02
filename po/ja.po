@@ -496,6 +496,12 @@ msgstr "変化記号"
 msgid "interval name"
 msgstr "音程名"
 
+msgid "interval number"
+msgstr "音程を数で表示"
+
+msgid "The Interval number block returns the number of scalar steps in the current interval."
+msgstr "「音程を数で表示」ブロックは音階の数を経産して表示する"
+
 #: js/palette.js:611
 #: js/PitchBlocks.js:404
 msgid "pitch converter"

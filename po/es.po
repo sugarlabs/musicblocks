@@ -494,6 +494,12 @@ msgstr "accidental"
 msgid "interval name"
 msgstr "nombre de intervalo"
 
+msgid "interval number"
+msgstr "número de intervalo"
+
+msgid "The Interval number block returns the number of scalar steps in the current interval."
+msgstr "El bloque de número de intervalo devuelve el número de pasos escalares en el intervalo actual."
+
 #: js/palette.js:611
 #: js/PitchBlocks.js:404
 msgid "pitch converter"

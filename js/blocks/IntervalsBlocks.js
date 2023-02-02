@@ -168,11 +168,11 @@ function setupIntervalsBlocks(activity) {
         }
     }
 
-  class IntervalNumberBlock extends ValueBlock {
+    class IntervalNumberBlock extends ValueBlock {
         constructor() {
             super("intervalnumber", _("interval number"));
             this.setPalette("intervals", activity);
-            this.setHelpString();
+            this.setHelpString(_("The Interval number block returns the number of scalar steps in the current interval."));
             this.beginnerBlock(true);
             this.hidden = true;
             this.formBlock({ outType: "numberout" });
@@ -183,7 +183,6 @@ function setupIntervalsBlocks(activity) {
         }
 
         arg(logo, turtle, blk) {
-            const cblk = activity.blocks.blockList[blk].connections[1];
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
