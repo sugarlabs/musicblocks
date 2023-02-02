@@ -496,6 +496,12 @@ msgstr "へんかきごう"
 msgid "interval name"
 msgstr "おんていめい"
 
+msgid "interval number"
+msgstr "おんていを かずで ひょうじ"
+
+msgid "The Interval number block returns the number of scalar steps in the current interval."
+msgstr "「おんていを かずで ひょうじ」ブロックは おんかいの かずを けいさんして ひょうじする"
+
 #: js/palette.js:611
 #: js/PitchBlocks.js:404
 msgid "pitch converter"
