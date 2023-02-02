@@ -435,7 +435,10 @@ function createHelpContent(activity) {
         HELPCONTENT = [
             [
                 _("Welcome to Turtle Blocks"),
-                _("Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."),
+                _("Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks.") +
+		    _("The current version is") +
+                    " " +
+                    VERSION,
                 "data:image/svg+xml;base64," +
                     window.btoa(unescape(encodeURIComponent(LOGO)))
             ],
@@ -458,7 +461,7 @@ function createHelpContent(activity) {
         HELPCONTENT = [
             [
                 _("Welcome to Music Blocks"),
-                _("Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way."),+
+                _("Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way.") +
                     " " +
                     _("The current version is") +
                     " " +
@@ -739,8 +742,8 @@ function createHelpContent(activity) {
                 _("A full list of contributors can be found in the Turtle Blocks GitHub repository.") +
                 " " +
                 _("Turtle Blocks is licensed under the AGPL.") +
-                " "
-                + _("The current version is") +
+                " " +
+                _("The current version is") +
                 " " +
                 VERSION,
             "data:image/svg+xml;base64," +
