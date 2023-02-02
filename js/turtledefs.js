@@ -436,7 +436,7 @@ function createHelpContent(activity) {
             [
                 _("Welcome to Turtle Blocks"),
                 _("Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks.") +
-		    _("The current version is") +
+                    _("The current version is") +
                     " " +
                     VERSION,
                 "data:image/svg+xml;base64," +
@@ -466,7 +466,7 @@ function createHelpContent(activity) {
                     _("The current version is") +
                     " " +
                     VERSION,
-                    "data:image/svg+xml;base64," +
+                "data:image/svg+xml;base64," +
                     window.btoa(unescape(encodeURIComponent(LOGO)))
             ],
             [
