@@ -162,7 +162,7 @@ const PIEMENUS = [
     "wrapmode"
 ];
 
-function _blockMakeBitmap(data, callback, args) {
+const _blockMakeBitmap = (data, callback, args) => {
     // Async creation of bitmap from SVG data.
     // Works with Chrome, Safari, Firefox (untested on IE).
     const img = new Image();
@@ -173,7 +173,7 @@ function _blockMakeBitmap(data, callback, args) {
     };
 
     img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(data)));
-}
+};
 
 // Define block instance objects and any methods that are intra-block.
 class Block {
@@ -269,7 +269,8 @@ class Block {
                     if (counter !== undefined) {
                         loopCount = counter;
                     }
-                    if (loopCount > 10) {  // race condition?
+                    if (loopCount > 10) {
+                        // race condition?
                         throw new Error("COULD NOT CREATE CACHE");
                     }
 
@@ -673,11 +674,11 @@ class Block {
                 that.collapseButtonBitmap.scaleX =
                     that.collapseButtonBitmap.scaleY =
                     that.collapseButtonBitmap.scale =
-                    scale / 3;
+                        scale / 3;
                 that.expandButtonBitmap.scaleX =
                     that.expandButtonBitmap.scaleY =
                     that.expandButtonBitmap.scale =
-                    scale / 3;
+                        scale / 3;
                 that.updateCache();
                 that._calculateBlockHitArea();
             };
@@ -1376,7 +1377,7 @@ class Block {
                 that.collapseButtonBitmap.scaleX =
                     that.collapseButtonBitmap.scaleY =
                     that.collapseButtonBitmap.scale =
-                    that.protoblock.scale / 3;
+                        that.protoblock.scale / 3;
                 that.container.addChild(that.collapseButtonBitmap);
                 that.collapseButtonBitmap.x = 2 * that.protoblock.scale;
                 if (that.isInlineCollapsible()) {
@@ -1408,7 +1409,7 @@ class Block {
                 that.expandButtonBitmap.scaleX =
                     that.expandButtonBitmap.scaleY =
                     that.expandButtonBitmap.scale =
-                    that.protoblock.scale / 3;
+                        that.protoblock.scale / 3;
 
                 that.container.addChild(that.expandButtonBitmap);
                 that.expandButtonBitmap.visible = that.collapsed;
@@ -1617,7 +1618,7 @@ class Block {
          * @param that - = this
          * @returns {void}
          */
-        const __processCollapseBitmap = function (bitmap, that) {
+        const __processCollapseBitmap = (bitmap, that) => {
             that.collapseBlockBitmap = bitmap;
             that.collapseBlockBitmap.name = "collapse_" + thisBlock;
             that.container.addChild(that.collapseBlockBitmap);
@@ -2483,11 +2484,15 @@ class Block {
      */
     _positionMedia(bitmap, width, height, blockScale) {
         if (width > height) {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale =
-                ((MEDIASAFEAREA[2] / width) * blockScale) / 2;
+            bitmap.scaleX =
+                bitmap.scaleY =
+                bitmap.scale =
+                    ((MEDIASAFEAREA[2] / width) * blockScale) / 2;
         } else {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale =
-                ((MEDIASAFEAREA[3] / height) * blockScale) / 2;
+            bitmap.scaleX =
+                bitmap.scaleY =
+                bitmap.scale =
+                    ((MEDIASAFEAREA[3] / height) * blockScale) / 2;
         }
         bitmap.x = ((MEDIASAFEAREA[0] - 10) * blockScale) / 2;
         bitmap.y = (MEDIASAFEAREA[1] * blockScale) / 2;
@@ -3449,12 +3454,7 @@ class Block {
 
             let gridLabels = [];
             if (_THIS_IS_TURTLE_BLOCKS_) {
-                gridLabels = [
-                    _("Cartesian"),
-                    _("polar"),
-                    _("Cartesian+polar"),
-                    _("none")
-                ];
+                gridLabels = [_("Cartesian"), _("polar"), _("Cartesian+polar"), _("none")];
             } else {
                 gridLabels = [
                     _("Cartesian"),
@@ -3688,13 +3688,13 @@ class Block {
 
             this.label.style.left =
                 Math.round(
-                    (x + this.activity.blocksContainer.x) * this.activity.getStageScale()
-                        + canvasLeft
+                    (x + this.activity.blocksContainer.x) * this.activity.getStageScale() +
+                        canvasLeft
                 ) + "px";
             this.label.style.top =
                 Math.round(
-                    (y + this.activity.blocksContainer.y) * this.activity.getStageScale()
-                        + canvasTop
+                    (y + this.activity.blocksContainer.y) * this.activity.getStageScale() +
+                        canvasTop
                 ) + "px";
             this.label.style.width =
                 Math.round((selectorWidth * this.blocks.blockScale * this.protoblock.scale) / 2) +

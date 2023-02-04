@@ -44,17 +44,17 @@ const LILYPONDHEADER =
  * @deprecated
  */
 // eslint-disable-next-line no-unused-vars
-const getLilypondHeader = function () {
+const getLilypondHeader = () => {
     return LILYPONDHEADER;
 };
 
-const processLilypondNotes = function (lilypond, logo, turtle) {
+const processLilypondNotes = (lilypond, logo, turtle) => {
     // obj = [instructions] or
     // obj = [note, duration, dotCount, tupletValue, roundDown, insideChord, staccato]
 
     logo.notationNotes[turtle] = "\\meter\n";
 
-    function __toLilynote(note) {
+    const __toLilynote = (note) => {
         // Lilypond notes use is for sharp, es for flat,
         // , and ' for shifts in octave.
         // Also, notes must be lowercase.
@@ -81,7 +81,7 @@ const processLilypondNotes = function (lilypond, logo, turtle) {
             .replace(/8/g, "''''''")
             .replace(/9/g, "'''''''")
             .toLowerCase();
-    }
+    };
 
     let noteCounter = 0;
     let queueSlur = false;
@@ -95,7 +95,7 @@ const processLilypondNotes = function (lilypond, logo, turtle) {
     let note;
     let notes;
 
-    function __processTuplet(logo, turtle, i, count) {
+    const __processTuplet = (logo, turtle, i, count) => {
         let j = 0;
         let k = 0;
         let ii;
@@ -166,7 +166,7 @@ const processLilypondNotes = function (lilypond, logo, turtle) {
         }
 
         return j;
-    }
+    };
 
     for (let i = 0; i < logo.notation.notationStaging[turtle].length; i++) {
         let obj = logo.notation.notationStaging[turtle][i];
@@ -593,8 +593,7 @@ const processLilypondNotes = function (lilypond, logo, turtle) {
     }
 };
 
-const saveLilypondOutput = function (activity) {
-
+const saveLilypondOutput =  (activity) => {
     //.TRANS Animal names used in Lilypond output
     const RODENTS = [
         _("mouse"),
@@ -839,7 +838,8 @@ const saveLilypondOutput = function (activity) {
                 // console.debug("shortInstrumentName: " + shortInstrumentName);
             }
 
-            activity.logo.notationOutput += instrumentName.replace(/ /g, "").replace(".", "") + "Voice = ";
+            activity.logo.notationOutput +=
+                instrumentName.replace(/ /g, "").replace(".", "") + "Voice = ";
             if (tNumber > startDrums - 1) {
                 activity.logo.notationOutput += "\\new DrumStaff \\with {\n";
             } else {
@@ -853,7 +853,8 @@ const saveLilypondOutput = function (activity) {
                 activity.logo.notationOutput += '   shortInstrumentName = "' + "d" + num + '"\n';
                 activity.logo.notationOutput += '   midiInstrument = "snare drum"\n';
             } else {
-                activity.logo.notationOutput += '   shortInstrumentName = "' + shortInstrumentName + '"\n';
+                activity.logo.notationOutput +=
+                    '   shortInstrumentName = "' + shortInstrumentName + '"\n';
                 activity.logo.notationOutput += '   midiInstrument = "acoustic grand"\n';
             }
             // Automatic note splitting

@@ -28,10 +28,10 @@
 const PALETTE_SCALE_FACTOR = 0.5;
 const PALETTE_WIDTH_FACTOR = 3;
 
-function paletteBlockButtonPush(blocks, name, arg) {
+const paletteBlockButtonPush = (blocks, name, arg) => {
     const blk = blocks.makeBlock(name, arg);
     return blk;
-}
+};
 
 // There are several components to the palette system:
 //
@@ -45,13 +45,13 @@ function paletteBlockButtonPush(blocks, name, arg) {
 //
 // loadPaletteMenuItemHandler is the event handler for the palette menu.
 
-function makePaletteIcons(data, width, height) {
+const makePaletteIcons = (data, width, height) => {
     const img = new Image();
     img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(data)));
     if (width) img.width = width;
     if (height) img.height = height;
     return img;
-}
+};
 
 class Palettes {
     constructor(activity) {
@@ -311,7 +311,7 @@ class Palettes {
 
         this.activity.hideSearchWidget(true);
         this.dict[name].showMenu(true);
-        this.activePalette = name;  // used to delete plugins
+        this.activePalette = name; // used to delete plugins
     }
 
     _showMenus() {}
@@ -377,13 +377,11 @@ class Palettes {
     _loadPaletteButtonHandler(name, row) {
         // eslint-disable-next-line no-unused-vars
         row.onmouseover = (event) => {
-            if(name == "search"){
+            if (name == "search") {
                 document.body.style.cursor = "text";
-            }
-            else{
+            } else {
                 document.body.style.cursor = "pointer";
             }
-
         };
 
         // eslint-disable-next-line no-unused-vars
@@ -1165,7 +1163,7 @@ class Palette {
             ["namedbox", "nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(
                 protoblk.name
             ) === -1 &&
-                blockIsMacro(this.activity, blkname)
+            blockIsMacro(this.activity, blkname)
         ) {
             this._makeBlockFromProtoblock(protoblk, true, blkname, null, 100, 100);
             callback(lastBlock);
@@ -1286,7 +1284,7 @@ class Palette {
     }
 }
 
-async function initPalettes(palettes) {
+const initPalettes = async (palettes) => {
     // Instantiate the palettes object on first load.
 
     for (let i = 0; i < BUILTINPALETTES.length; i++) {
@@ -1298,4 +1296,4 @@ async function initPalettes(palettes) {
     // eslint-disable-next-line no-console
     console.debug("Time to show the palettes.");
     palettes.show();
-}
+};
