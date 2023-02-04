@@ -3218,6 +3218,8 @@ class Activity {
             globalActivity._hideArrows();
         };
 
+        window.hideArrows = hideArrows;
+        
         this._hideArrows = function () {
             if (this.errorMsgArrow !== null) {
                 this.errorMsgArrow.removeAllChildren();
