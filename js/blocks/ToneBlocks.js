@@ -19,7 +19,7 @@
 
 /* exported setupToneBlocks */
 
-function setupToneBlocks(activity) {
+let setupToneBlocks = (activity) => {
     class OscillatorBlock extends FlowBlock {
         constructor() {
             super("oscillator", _("oscillator"));
@@ -57,9 +57,7 @@ function setupToneBlocks(activity) {
 
             if (logo.inTimbre) {
                 if (logo.timbre.osc.length != 0) {
-                    activity.errorMsg(
-                        _("You are adding multiple oscillator blocks.")
-                    );
+                    activity.errorMsg(_("You are adding multiple oscillator blocks."));
                 } else {
                     logo.timbre.oscParams = [];
                     logo.synth.createSynth(
@@ -173,7 +171,9 @@ function setupToneBlocks(activity) {
             super("partial", _("partial"));
             this.setPalette("tone", activity);
             this.setHelpString([
-                _("The Partial block is used to specify a weight for a specific partical harmonic."),
+                _(
+                    "The Partial block is used to specify a weight for a specific partical harmonic."
+                ),
                 "documentation",
                 ""
             ]);
@@ -210,7 +210,9 @@ function setupToneBlocks(activity) {
             super("harmonic");
             this.setPalette("tone", activity);
             this.setHelpString([
-                _("The Weighted partials block is used to specify the partials associated with a timbre."),
+                _(
+                    "The Weighted partials block is used to specify the partials associated with a timbre."
+                ),
                 "documentation",
                 ""
             ]);
@@ -240,7 +242,7 @@ function setupToneBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = event => {
+            const __listener = (event) => {
                 tur.singer.inHarmonic.pop();
                 tur.singer.partials.pop();
             };
@@ -357,7 +359,7 @@ function setupToneBlocks(activity) {
             Singer.ToneActions.doTremolo(args[0], args[1], turtle, blk);
 
             const tur = activity.turtles.ithTurtle(turtle);
-    
+
             if (logo.inTimbre) {
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["tremoloActive"] = true;
                 logo.timbre.tremoloEffect.push(blk);
@@ -376,11 +378,11 @@ function setupToneBlocks(activity) {
         constructor() {
             super("phaser");
             this.setPalette("tone", activity);
-            this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5,
-                10, 20];
+            this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 20];
             this.piemenuValuesC2 = [1, 2, 3];
-            this.piemenuValuesC3 = [220, 247, 262, 294, 330, 349, 392, 440,
-                494, 523, 587, 659, 698, 783, 880];
+            this.piemenuValuesC3 = [
+                220, 247, 262, 294, 330, 349, 392, 440, 494, 523, 587, 659, 698, 783, 880
+            ];
             this.setHelpString([
                 _("The Phaser block adds a sweeping sound."),
                 "documentation",
@@ -408,8 +410,7 @@ function setupToneBlocks(activity) {
                 logo.timbre.phaserParams.push(last(tur.singer.octaves));
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["octaves"] = args[1];
                 logo.timbre.phaserParams.push(last(tur.signer.baseFrequency));
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["baseFrequency"] =
-                    args[2];
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["baseFrequency"] = args[2];
             }
 
             return [args[3], 1];
@@ -550,7 +551,7 @@ function setupToneBlocks(activity) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
                 // eslint-disable-next-line no-unused-vars
-                const __listener = event => tur.singer.voices.pop();
+                const __listener = (event) => tur.singer.voices.pop();
 
                 logo.setTurtleListener(turtle, listenerName, __listener);
             }
@@ -571,7 +572,8 @@ function setupToneBlocks(activity) {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "synthname"]);
             } else {
@@ -585,7 +587,9 @@ function setupToneBlocks(activity) {
             super("setdefaultvoice", _("set default instrument"));
             this.setPalette("tone", activity);
             this.setHelpString([
-                _("The set default instrument block changes the default instrument from electronic synth to the instrument of your choice."),
+                _(
+                    "The set default instrument block changes the default instrument from electronic synth to the instrument of your choice."
+                ),
                 "documentation",
                 ""
             ]);
@@ -726,10 +730,10 @@ function setupToneBlocks(activity) {
             this.parameter = true;
 
             this.makeMacro((x, y) => [
-                [0, ["customsample", {value: ["", "", "do", 4]}], x, y, [null, 1, 2, 3]],
-                [1, ["audiofile", {value: null}], 0 ,0, [0]],
-                [2, ["solfege", {value: "do"}], 0, 0, [0]],
-                [3, ["number", {value: 4}], 0, 0, [0]],
+                [0, ["customsample", { value: ["", "", "do", 4] }], x, y, [null, 1, 2, 3]],
+                [1, ["audiofile", { value: null }], 0, 0, [0]],
+                [2, ["solfege", { value: "do" }], 0, 0, [0]],
+                [3, ["number", { value: 4 }], 0, 0, [0]]
             ]);
         }
 
@@ -740,7 +744,8 @@ function setupToneBlocks(activity) {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "customsample"]);
             } else {
@@ -819,4 +824,4 @@ function setupToneBlocks(activity) {
     new SynthNameBlock().setup(activity);
     new VoiceNameBlock().setup(activity);
     new SetTimbreBlock().setup(activity);
-}
+};

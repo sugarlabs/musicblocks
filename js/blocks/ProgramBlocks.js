@@ -17,8 +17,7 @@
 
 /* exported setupProgramBlocks */
 
-function setupProgramBlocks(activity) {
-
+let setupProgramBlocks = (activity) => {
     class LoadHeapFromAppBlock extends FlowBlock {
         constructor() {
             super("loadHeapFromApp");
@@ -114,10 +113,7 @@ function setupProgramBlocks(activity) {
                 const data = JSON.stringify(logo.turtleHeaps[name]);
                 const xmlHttp = new XMLHttpRequest();
                 xmlHttp.open("POST", url, true);
-                xmlHttp.setRequestHeader(
-                    "Content-Type",
-                    "application/json;charset=UTF-8"
-                );
+                xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
                 xmlHttp.send(data);
             } else {
                 activity.errorMsg(_("Cannot find a valid heap for") + " " + name);
@@ -182,11 +178,7 @@ function setupProgramBlocks(activity) {
         constructor() {
             super("setHeap");
             this.setPalette("program", activity);
-            this.setHelpString([
-                _("The Set-heap block loads the heap."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Set-heap block loads the heap."), "documentation", ""]);
 
             this.formBlock({
                 //.TRANS: load the heap from a JSON encoding
@@ -208,17 +200,13 @@ function setupProgramBlocks(activity) {
             const c = block.connections[1];
             if (c !== null) {
                 try {
-                    logo.turtleHeaps[turtle] = JSON.parse(
-                        activity.blocks.blockList[c].value
-                    );
+                    logo.turtleHeaps[turtle] = JSON.parse(activity.blocks.blockList[c].value);
                     if (!Array.isArray(logo.turtleHeaps[turtle])) {
                         throw "is not array";
                     }
                 } catch (e) {
                     logo.turtleHeaps[turtle] = oldHeap;
-                    activity.errorMsg(
-                        _("The block you selected does not contain a valid heap.")
-                    );
+                    activity.errorMsg(_("The block you selected does not contain a valid heap."));
                 }
             } else {
                 activity.errorMsg(_("The Set heap block needs a heap."));
@@ -275,7 +263,7 @@ function setupProgramBlocks(activity) {
                         if (target !== null) {
                             // Copy any internal entries now.
                             const k = Object.keys(d);
-                            for (let i=0; i < k.length; i++) {
+                            for (let i = 0; i < k.length; i++) {
                                 Turtle.DictActions.setDictValue(target, turtle, k[i], d[k[i]]);
                             }
                         } else if (!(a in logo.turtleDicts[turtle])) {
@@ -339,7 +327,7 @@ function setupProgramBlocks(activity) {
                     if (target !== null) {
                         // Copy any internal entries now.
                         const k = Object.keys(d);
-                        for (let i=0; i < k.length; i++) {
+                        for (let i = 0; i < k.length; i++) {
                             Turtle.DictActions.setDictValue(target, turtle, k[i], d[k[i]]);
                         }
                     } else if (!(a in logo.turtleDicts[turtle])) {
@@ -379,8 +367,7 @@ function setupProgramBlocks(activity) {
             if (args[0] !== null && turtle in logo.turtleHeaps) {
                 activity.save.download(
                     "json",
-                    "data:text/json;charset-utf-8," +
-                        JSON.stringify(logo.turtleHeaps[turtle]),
+                    "data:text/json;charset-utf-8," + JSON.stringify(logo.turtleHeaps[turtle]),
                     args[0]
                 );
             }
@@ -427,8 +414,7 @@ function setupProgramBlocks(activity) {
             if (target === null) {
                 activity.save.download(
                     "json",
-                    "data:text/json;charset-utf-8," +
-                        JSON.stringify(logo.turtleDicts[turtle][a]),
+                    "data:text/json;charset-utf-8," + JSON.stringify(logo.turtleDicts[turtle][a]),
                     args[1]
                 );
             } else {
@@ -446,11 +432,7 @@ function setupProgramBlocks(activity) {
         constructor() {
             super("openpalette");
             this.setPalette("program", activity);
-            this.setHelpString([
-                _("The Open palette block opens a palette."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Open palette block opens a palette."), "documentation", ""]);
 
             this.formBlock({
                 name: _("open palette"),
@@ -467,10 +449,7 @@ function setupProgramBlocks(activity) {
             }
 
             for (const p in activity.blocks.palettes.dict) {
-                if (
-                    _(activity.blocks.palettes.dict[p].name) ===
-                    args[0].toLowerCase()
-                ) {
+                if (_(activity.blocks.palettes.dict[p].name) === args[0].toLowerCase()) {
                     activity.blocks.palettes.hide();
                     activity.blocks.palettes.dict[p].show();
                     activity.blocks.palettes.show();
@@ -519,11 +498,7 @@ function setupProgramBlocks(activity) {
             const c = activity.blocks.blockList[args[0]].connections[0];
             activity.blocks.blockList[args[0]].connections[0] = null;
             if (c !== null) {
-                for (
-                    let i = 0;
-                    i < activity.blocks.blockList[c].connections.length;
-                    i++
-                ) {
+                for (let i = 0; i < activity.blocks.blockList[c].connections.length; i++) {
                     if (activity.blocks.blockList[c].connections[i] === args[0]) {
                         activity.blocks.blockList[c].connections[i] = null;
                     }
@@ -542,11 +517,7 @@ function setupProgramBlocks(activity) {
         constructor() {
             super("moveblock");
             this.setPalette("program", activity);
-            this.setHelpString([
-                _("The Move block block moves a block."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Move block block moves a block."), "documentation", ""]);
 
             this.formBlock({
                 //.TRANS: Move the position of a block on the screen.
@@ -578,7 +549,9 @@ function setupProgramBlocks(activity) {
             super("runblock");
             this.setPalette("program", activity);
             this.setHelpString([
-                _("The Run block block runs a block. It accepts two types of arguments: block number or block name."),
+                _(
+                    "The Run block block runs a block. It accepts two types of arguments: block number or block name."
+                ),
                 "documentation",
                 ""
             ]);
@@ -602,10 +575,8 @@ function setupProgramBlocks(activity) {
                 // Look for a block with logo name
                 for (let i = 0; i < activity.blocks.blockList.length; i++) {
                     if (
-                        activity.blocks.blockList[i].protoblock.staticLabels
-                            .length > 0 &&
-                        activity.blocks.blockList[i].protoblock.staticLabels[0] ===
-                            args[0]
+                        activity.blocks.blockList[i].protoblock.staticLabels.length > 0 &&
+                        activity.blocks.blockList[i].protoblock.staticLabels[0] === args[0]
                     ) {
                         args[0] = i;
                         return;
@@ -655,11 +626,7 @@ function setupProgramBlocks(activity) {
                 //.TRANS: We can connect a block to another block.
                 name: _("connect blocks"),
                 args: 3,
-                argLabels: [
-                    _("target block"),
-                    _("connection number"),
-                    _("block number")
-                ]
+                argLabels: [_("target block"), _("connection number"), _("block number")]
             });
         }
 
@@ -673,9 +640,7 @@ function setupProgramBlocks(activity) {
 
             if (args[0] < 0 || args[0] > activity.blocks.blockList.length - 1) {
                 // eslint-disable-next-line no-console
-                console.debug(
-                    args[0] + " > " + activity.blocks.blockList.length - 1
-                );
+                console.debug(args[0] + " > " + activity.blocks.blockList.length - 1);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
@@ -689,9 +654,7 @@ function setupProgramBlocks(activity) {
 
             if (args[2] < 0 || args[2] > activity.blocks.blockList.length - 1) {
                 // eslint-disable-next-line no-console
-                console.debug(
-                    args[2] + " > " + activity.blocks.blockList.length - 1
-                );
+                console.debug(args[2] + " > " + activity.blocks.blockList.length - 1);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
@@ -718,14 +681,8 @@ function setupProgramBlocks(activity) {
                     args[1] = 1;
                 } else {
                     // Or disconnection the old connection.
-                    for (
-                        let i = 0;
-                        i < activity.blocks.blockList[c].connections.length;
-                        i++
-                    ) {
-                        if (
-                            activity.blocks.blockList[c].connections[i] === args[0]
-                        ) {
+                    for (let i = 0; i < activity.blocks.blockList[c].connections.length; i++) {
+                        if (activity.blocks.blockList[c].connections[i] === args[0]) {
                             activity.blocks.blockList[c].connections[i] = null;
                             return;
                         }
@@ -769,14 +726,10 @@ function setupProgramBlocks(activity) {
         }
 
         arg(logo, turtle, blk, receivedArg) {
-            activity.blocks.showBlocks();   // Force blocks to be visible.
+            activity.blocks.showBlocks(); // Force blocks to be visible.
             const blockArgs = [null];
             if (activity.blocks.blockList[blk].argClampSlots.length > 0) {
-                for (
-                    let i = 0;
-                    i < activity.blocks.blockList[blk].argClampSlots.length;
-                    i++
-                ) {
+                for (let i = 0; i < activity.blocks.blockList[blk].argClampSlots.length; i++) {
                     const t = logo.parseArg(
                         logo,
                         turtle,
@@ -867,8 +820,7 @@ function setupProgramBlocks(activity) {
                     const newBlock = [[0, protoName, x, y, [null]]];
                     for (
                         let i = 1;
-                        i <
-                        activity.blocks.protoBlockDict[protoblk].dockTypes.length;
+                        i < activity.blocks.protoBlockDict[protoblk].dockTypes.length;
                         i++
                     ) {
                         // FIXME: type check args
@@ -876,39 +828,21 @@ function setupProgramBlocks(activity) {
                             if (typeof blockArgs[i] === "number") {
                                 if (
                                     ["anyin", "numberin"].indexOf(
-                                        activity.blocks.protoBlockDict[protoblk]
-                                            .dockTypes[i]
+                                        activity.blocks.protoBlockDict[protoblk].dockTypes[i]
                                     ) === -1
                                 ) {
-                                    activity.errorMsg(
-                                        _("Warning: block argument type mismatch")
-                                    );
+                                    activity.errorMsg(_("Warning: block argument type mismatch"));
                                 }
-                                newBlock.push([
-                                    i,
-                                    ["number", { value: blockArgs[i] }],
-                                    0,
-                                    0,
-                                    [0]
-                                ]);
+                                newBlock.push([i, ["number", { value: blockArgs[i] }], 0, 0, [0]]);
                             } else if (typeof blockArgs[i] === "string") {
                                 if (
                                     ["anyin", "textin"].indexOf(
-                                        activity.blocks.protoBlockDict[protoblk]
-                                            .dockTypes[i]
+                                        activity.blocks.protoBlockDict[protoblk].dockTypes[i]
                                     ) === -1
                                 ) {
-                                    activity.errorMsg(
-                                        _("Warning: block argument type mismatch")
-                                    );
+                                    activity.errorMsg(_("Warning: block argument type mismatch"));
                                 }
-                                newBlock.push([
-                                    i,
-                                    ["string", { value: blockArgs[i] }],
-                                    0,
-                                    0,
-                                    [0]
-                                ]);
+                                newBlock.push([i, ["string", { value: blockArgs[i] }], 0, 0, [0]]);
                             } else {
                                 newBlock[0][4].push(null);
                             }
@@ -954,13 +888,13 @@ function setupProgramBlocks(activity) {
 
             const url = args[0];
 
-            function ValidURL(str) {
+            let ValidURL = (str) => {
                 const pattern = new RegExp(
                     "^(https?:\\/\\/)?" + // protocol
-                    "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
-                    "((\\d{1,3}\\.) {3}\\d{1,3}))" + // OR ip (v4) address
-                    "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-                    "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+                        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+                        "((\\d{1,3}\\.) {3}\\d{1,3}))" + // OR ip (v4) address
+                        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+                        "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
                         "(\\#[-a-z\\d_]*)?$",
                     "i"
                 ); // fragment locator
@@ -970,7 +904,7 @@ function setupProgramBlocks(activity) {
                 } else {
                     return true;
                 }
-            }
+            };
 
             if (ValidURL(url)) {
                 const win = window.open(url, "_blank");
@@ -1000,4 +934,4 @@ function setupProgramBlocks(activity) {
     new SaveHeapBlock().setup(activity);
     new LoadHeapBlock().setup(activity);
     new SetHeapBlock().setup(activity);
-}
+};

@@ -20,7 +20,7 @@
    ProjectViewer
 */
 
-function ProjectViewer(Planet) {
+let ProjectViewer = (Planet) => {
     this.ProjectCache = Planet.GlobalPlanet.cache;
     this.PlaceholderMBImage = "images/mbgraphic.png";
     this.PlaceholderTBImage = "images/tbgraphic.png";

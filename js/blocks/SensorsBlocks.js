@@ -19,7 +19,7 @@
 
 /* exported setupSensorsBlocks */
 
-function setupSensorsBlocks(activity) {
+let setupSensorsBlocks = (activity) => {
     class InputBlock extends FlowBlock {
         constructor() {
             super("input");
@@ -35,7 +35,7 @@ function setupSensorsBlocks(activity) {
                 name: _("input"),
                 args: 1,
                 argTypes: ["anyin"],
-                defaults: [_("Input a value")],
+                defaults: [_("Input a value")]
             });
         }
 
@@ -60,8 +60,9 @@ function setupSensorsBlocks(activity) {
             docById("labelDiv").classList.add("hasKeyboard");
 
             // Add a handler to continue flow after the input.
-            function __keyPressed(event) {
-                if (event.keyCode === 13) { // RETURN
+            let __keyPressed = (event) => {
+                if (event.keyCode === 13) {
+                    // RETURN
                     const inputElem = docById("textLabel");
                     const value = inputElem.value;
                     if (isNaN(value)) {
@@ -78,7 +79,7 @@ function setupSensorsBlocks(activity) {
             };
 
             docById("textLabel").addEventListener("keypress", __keyPressed);
-        };
+        }
     }
 
     class InputValueBlock extends ValueBlock {
@@ -132,24 +133,23 @@ function setupSensorsBlocks(activity) {
                 logo.pitchAnalyser = new Tone.Analyser({
                     type: "fft",
                     size: logo.limit,
-                    smoothing : 0
+                    smoothing: 0
                 });
                 logo.mic.connect(logo.pitchAnalyser);
             }
 
-
             const values = logo.pitchAnalyser.getValue();
             let max = Infinity;
-            let idx = 0;                                // frequency bin
+            let idx = 0; // frequency bin
             for (let i = 0; i < logo.limit; i++) {
-                const v2 = -values[i] ;
+                const v2 = -values[i];
                 if (v2 < max) {
                     max = v2;
                     idx = i;
                 }
             }
             const freq = idx / (logo.pitchAnalyser.sampleTime * logo.limit * 2);
-            return freq ;
+            return freq;
         }
     }
 
@@ -232,14 +232,18 @@ function setupSensorsBlocks(activity) {
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _("The Cursor over block triggers an event when the cursor is moved over a mouse."),
+                    _(
+                        "The Cursor over block triggers an event when the cursor is moved over a mouse."
+                    ),
                     "documentation",
                     null,
                     "cursoroverhelp"
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Cursor over block triggers an event when the cursor is moved over a turtle."),
+                    _(
+                        "The Cursor over block triggers an event when the cursor is moved over a turtle."
+                    ),
                     "documentation",
                     null,
                     "cursoroverhelp"
@@ -261,7 +265,9 @@ function setupSensorsBlocks(activity) {
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
                     // TRANS: hover
-                    _("The Cursor out block triggers an event when the cursor is moved off of a mouse."),
+                    _(
+                        "The Cursor out block triggers an event when the cursor is moved off of a mouse."
+                    ),
                     "documentation",
                     null,
                     "cursorouthelp"
@@ -269,7 +275,9 @@ function setupSensorsBlocks(activity) {
             } else {
                 this.setHelpString([
                     // TRANS: hover
-                    _("The Cursor out block triggers an event when the cursor is moved off of a turtle."),
+                    _(
+                        "The Cursor out block triggers an event when the cursor is moved off of a turtle."
+                    ),
                     "documentation",
                     null,
                     "cursorouthelp"
@@ -289,14 +297,18 @@ function setupSensorsBlocks(activity) {
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _("The Cursor button down block triggers an event when the curson button is press on a mouse."),
+                    _(
+                        "The Cursor button down block triggers an event when the curson button is press on a mouse."
+                    ),
                     "documentation",
                     null,
                     "cursordownhelp"
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Cursor button down block triggers an event when the curson button is press on a turtle."),
+                    _(
+                        "The Cursor button down block triggers an event when the curson button is press on a turtle."
+                    ),
                     "documentation",
                     null,
                     "cursordownhelp"
@@ -316,14 +328,18 @@ function setupSensorsBlocks(activity) {
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _("The Cursor button up block triggers an event when the cursor button is released while over a mouse."),
+                    _(
+                        "The Cursor button up block triggers an event when the cursor button is released while over a mouse."
+                    ),
                     "documentation",
                     null,
                     "cursoruphelp"
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Cursor button up block triggers an event when the cursor button is released while over a turtle."),
+                    _(
+                        "The Cursor button up block triggers an event when the cursor button is released while over a turtle."
+                    ),
                     "documentation",
                     null,
                     "cursoruphelp"
@@ -343,13 +359,17 @@ function setupSensorsBlocks(activity) {
             this.parameter = true;
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _("The Get blue block returns the blue component of the pixel under the mouse."),
+                    _(
+                        "The Get blue block returns the blue component of the pixel under the mouse."
+                    ),
                     "documentation",
                     ""
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Get blue block returns the blue component of the pixel under the turtle."),
+                    _(
+                        "The Get blue block returns the blue component of the pixel under the turtle."
+                    ),
                     "documentation",
                     ""
                 ]);
@@ -362,8 +382,7 @@ function setupSensorsBlocks(activity) {
 
         arg(logo, turtle) {
             let colorString = activity.turtles.turtleList[turtle].painter.canvasColor;
-            if (colorString[2] === "#")
-                colorString = hex2rgb(colorString.split("#")[1]);
+            if (colorString[2] === "#") colorString = hex2rgb(colorString.split("#")[1]);
             const obj = colorString.split("(")[1].split(",");
             return parseInt(Number(obj[0]) / 2.55);
         }
@@ -376,13 +395,17 @@ function setupSensorsBlocks(activity) {
             this.parameter = true;
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _("The Get green block returns the green component of the pixel under the mouse."),
+                    _(
+                        "The Get green block returns the green component of the pixel under the mouse."
+                    ),
                     "documentation",
                     ""
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Get green block returns the green component of the pixel under the turtle."),
+                    _(
+                        "The Get green block returns the green component of the pixel under the turtle."
+                    ),
                     "documentation",
                     ""
                 ]);
@@ -395,8 +418,7 @@ function setupSensorsBlocks(activity) {
 
         arg(logo, turtle) {
             let colorString = activity.turtles.turtleList[turtle].painter.canvasColor;
-            if (colorString[1] === "#")
-                colorString = hex2rgb(colorString.split("#")[1]);
+            if (colorString[1] === "#") colorString = hex2rgb(colorString.split("#")[1]);
             const obj = colorString.split("(")[1].split(",");
             return parseInt(Number(obj[0]) / 2.55);
         }
@@ -428,8 +450,7 @@ function setupSensorsBlocks(activity) {
 
         arg(logo, turtle) {
             let colorString = activity.turtles.turtleList[turtle].painter.canvasColor;
-            if (colorString[0] === "#")
-                colorString = hex2rgb(colorString.split("#")[1]);
+            if (colorString[0] === "#") colorString = hex2rgb(colorString.split("#")[1]);
             const obj = colorString.split("(")[1].split(",");
             return parseInt(Number(obj[0]) / 2.55);
         }
@@ -468,8 +489,7 @@ function setupSensorsBlocks(activity) {
 
             const canvas = docById("overlayCanvas");
             const ctx = canvas.getContext("2d");
-            const imgData = ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1)
-                .data;
+            const imgData = ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
             let color = searchColors(imgData[0], imgData[1], imgData[2]);
             if (imgData[3] === 0) {
                 (color = platformColor.background
@@ -478,7 +498,7 @@ function setupSensorsBlocks(activity) {
                         platformColor.background.lastIndexOf(")")
                     )
                     .split(/,\s*/)),
-                (color = searchColors(color[0], color[1], color[2]));
+                    (color = searchColors(color[0], color[1], color[2]));
             }
 
             if (wasVisible) {
@@ -497,7 +517,9 @@ function setupSensorsBlocks(activity) {
             this.beginnerBlock(!(this.lang === "ja"));
 
             this.setHelpString([
-                _("The Time block returns the number of seconds that the program has been running."),
+                _(
+                    "The Time block returns the number of seconds that the program has been running."
+                ),
                 "documentation",
                 ""
             ]);
@@ -612,8 +634,8 @@ function setupSensorsBlocks(activity) {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "toascii"]);
             } else {
@@ -681,4 +703,4 @@ function setupSensorsBlocks(activity) {
     new MouseButtonBlock().setup(activity);
     new MouseYBlock().setup(activity);
     new MouseXBlock().setup(activity);
-}
+};

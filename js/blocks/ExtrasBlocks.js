@@ -19,7 +19,7 @@
 
 /* exported setupExtrasBlocks */
 
-function setupExtrasBlocks(activity) {
+let setupExtrasBlocks = (activity) => {
     class FloatToStringBlock extends LeftBlock {
         constructor() {
             super("float2string", _("fraction"));
@@ -266,7 +266,9 @@ function setupExtrasBlocks(activity) {
             super("comment");
             this.setPalette("extras", activity);
             this.setHelpString([
-                _("The Comment block prints a comment at the top of the screen when the program is running in slow mode."),
+                _(
+                    "The Comment block prints a comment at the top of the screen when the program is running in slow mode."
+                ),
                 "documentation",
                 ""
             ]);
@@ -341,9 +343,9 @@ function setupExtrasBlocks(activity) {
                             } else {
                                 const tur = activity.turtles.ithTurtle(turtle);
                                 if (tur.singer.inNoteBlock.length > 0) {
-                                    tur.singer.embeddedGraphics[
-                                        last(tur.singer.inNoteBlock)
-                                    ].push(blk);
+                                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(
+                                        blk
+                                    );
                                 } else {
                                     activity.textMsg(args[0].toString());
                                 }
@@ -574,4 +576,4 @@ function setupExtrasBlocks(activity) {
     new NOPTwoArgBlock().setup(activity);
     new NOPThreeArgBlock().setup(activity);
     new NOPFourArgBlock().setup(activity);
-}
+};

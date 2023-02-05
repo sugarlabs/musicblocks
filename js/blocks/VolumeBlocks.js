@@ -19,7 +19,7 @@
 
 /* exported setupVolumeBlocks */
 
-function setupVolumeBlocks(activity) {
+let setupVolumeBlocks = (activity) => {
     class SynthVolumeBlock extends LeftBlock {
         constructor() {
             //.TRANS: the volume for this synth
@@ -51,7 +51,8 @@ function setupVolumeBlocks(activity) {
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "synth volume"]);
             } else {
@@ -93,7 +94,8 @@ function setupVolumeBlocks(activity) {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "volume"]);
             } else {
@@ -318,11 +320,12 @@ function setupVolumeBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = event => {
+            const __listener = (event) => {
                 tur.singer.synthVolume[synth].pop();
                 // Restore previous volume
                 if (
-                    tur.singer.justCounting.length === 0 && tur.singer.synthVolume[synth].length > 0
+                    tur.singer.justCounting.length === 0 &&
+                    tur.singer.synthVolume[synth].length > 0
                 ) {
                     Singer.setSynthVolume(logo, turtle, synth, last(tur.singer.synthVolume[synth]));
                 }
@@ -524,7 +527,7 @@ function setupVolumeBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = event => {
+            const __listener = (event) => {
                 Singer.masterVolume.pop();
                 // Restore previous volume
                 if (tur.singer.justCounting.length === 0 && Singer.masterVolume.length > 0) {
@@ -563,8 +566,7 @@ function setupVolumeBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined)
-                return;
+            if (args[1] === undefined) return;
 
             let arg = args[0];
             if (arg === null || typeof arg !== "number") {
@@ -586,9 +588,13 @@ function setupVolumeBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played.") +
+                _(
+                    "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
+                ) +
                     " " +
-                    _("For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."),
+                    _(
+                        "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
+                    ),
                 "documentation",
                 null,
                 "crescendohelp"
@@ -610,7 +616,10 @@ function setupVolumeBlocks(activity) {
         flow(args, logo, turtle, blk) {
             if (args.length > 1 && args[0] !== 0) {
                 Singer.VolumeActions.doCrescendo(
-                    activity.blocks.blockList[blk].name, args[0], turtle, blk
+                    activity.blocks.blockList[blk].name,
+                    args[0],
+                    turtle,
+                    blk
                 );
 
                 return [args[1], 1];
@@ -626,9 +635,13 @@ function setupVolumeBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Crescendo block will increase the volume of the contained notes by a specified amount for every note played.") +
+                _(
+                    "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
+                ) +
                     " " +
-                    _("For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."),
+                    _(
+                        "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
+                    ),
                 "documentation",
                 null,
                 "crescendohelp"
@@ -667,4 +680,4 @@ function setupVolumeBlocks(activity) {
     new ArticulationBlock().setup(activity);
     new DecrescendoBlock().setup(activity);
     new CrescendoBlock().setup(activity);
-}
+};

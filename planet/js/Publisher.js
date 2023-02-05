@@ -20,7 +20,7 @@
    Publisher
 */
 
-function Publisher(Planet) {
+let Publisher = (Planet) => {
     this.ChipTags = null;
     this.PlaceholderMBImage = "images/mbgraphic.png";
     this.PlaceholderTBImage = "images/tbgraphic.png";

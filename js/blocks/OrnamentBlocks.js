@@ -18,7 +18,7 @@
 
 /* exported setupOrnamentBlocks */
 
-function setupOrnamentBlocks(activity) {
+let setupOrnamentBlocks = (activity) => {
     class StaccatoFactorBlock extends ValueBlock {
         constructor() {
             //.TRANS: the duration of a note played as staccato
@@ -38,7 +38,8 @@ function setupOrnamentBlocks(activity) {
 
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "staccato"]);
             } else if (tur.singer.staccato.length > 0) {
@@ -68,7 +69,8 @@ function setupOrnamentBlocks(activity) {
 
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "slur"]);
             } else if (tur.singer.staccato.length > 0) {
@@ -203,7 +205,7 @@ function setupOrnamentBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = event => {
+            const __listener = (event) => {
                 if (tur.singer.justCounting.length === 0) {
                     logo.notation.notationEndSlur(turtle);
                 }
@@ -237,8 +239,7 @@ function setupOrnamentBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined)
-                return;
+            if (args[1] === undefined) return;
 
             let arg = args[0];
             if (arg === null || typeof arg !== "number") {
@@ -271,8 +272,7 @@ function setupOrnamentBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined)
-                return;
+            if (args[1] === undefined) return;
 
             let arg = args[0];
             if (arg === null || typeof arg !== "number") {
@@ -292,7 +292,9 @@ function setupOrnamentBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes."),
+                _(
+                    "The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes."
+                ),
                 "documentation",
                 null,
                 "slurhelp"
@@ -321,7 +323,9 @@ function setupOrnamentBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes."),
+                _(
+                    "The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes."
+                ),
                 "documentation",
                 null,
                 "staccatohelp"
@@ -354,4 +358,4 @@ function setupOrnamentBlocks(activity) {
     new StaccatoBlock().setup(activity);
     new NewSlurBlock().setup(activity);
     new NewStaccatoBlock().setup(activity);
-}
+};

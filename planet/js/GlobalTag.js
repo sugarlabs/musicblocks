@@ -20,7 +20,7 @@
    GlobalTag
 */
 
-function GlobalTag(Planet) {
+let GlobalTag = (Planet) => {
     // eslint-disable-next-line no-unused-vars
     const tagNames = [
         //.TRANS: On the Planet, we use labels to tag projects.

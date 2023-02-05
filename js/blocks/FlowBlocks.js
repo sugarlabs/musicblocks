@@ -18,7 +18,7 @@
 
 /* exported setupFlowBlocks */
 
-function setupFlowBlocks(activity) {
+let setupFlowBlocks = (activity) => {
     class BackwardBlock extends FlowClampBlock {
         constructor() {
             super("backward");
@@ -63,7 +63,7 @@ function setupFlowBlocks(activity) {
             }
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = event => tur.singer.backward.pop();
+            const __listener = (event) => tur.singer.backward.pop();
 
             logo.setTurtleListener(turtle, listenerName, __listener);
             return [childFlow, childFlowCount];
@@ -78,7 +78,9 @@ function setupFlowBlocks(activity) {
             this.setHelpString([
                 _("The Duplicate block will run each block multiple times.") +
                     " " +
-                    _("The output of the example is: Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol."),
+                    _(
+                        "The output of the example is: Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol."
+                    ),
                 "documentation",
                 null,
                 "duphelp"
@@ -100,11 +102,7 @@ function setupFlowBlocks(activity) {
             if (args[1] === undefined) return;
 
             let arg0;
-            if (
-                args[0] === null ||
-                typeof args[0] !== "number" ||
-                args[0] < 1
-            ) {
+            if (args[0] === null || typeof args[0] !== "number" || args[0] < 1) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg0 = 2;
             } else {
@@ -141,7 +139,7 @@ function setupFlowBlocks(activity) {
                 tur.singer.inDuplicate = true;
 
                 // eslint-disable-next-line no-unused-vars
-                const __listener = event => {
+                const __listener = (event) => {
                     tur.singer.inDuplicate = false;
                     tur.singer.duplicateFactor /= factor;
 
@@ -224,9 +222,7 @@ function setupFlowBlocks(activity) {
                         const lastConnection =
                             activity.blocks.blockList[child].connections.length - 1;
                         const nextBlk =
-                            activity.blocks.blockList[child].connections[
-                                lastConnection
-                            ];
+                            activity.blocks.blockList[child].connections[lastConnection];
                         // Don't disconnect a hidden block from its parent.
                         if (
                             nextBlk != null &&
@@ -237,20 +233,15 @@ function setupFlowBlocks(activity) {
                                 1,
                                 activity.blocks.blockList[nextBlk].connections[1]
                             ]);
-                            child =
-                                activity.blocks.blockList[nextBlk].connections[1];
-                            activity.blocks.blockList[
-                                nextBlk
-                            ].connections[1] = null;
+                            child = activity.blocks.blockList[nextBlk].connections[1];
+                            activity.blocks.blockList[nextBlk].connections[1] = null;
                         } else {
                             logo.connectionStore[turtle][blk].push([
                                 child,
                                 lastConnection,
                                 nextBlk
                             ]);
-                            activity.blocks.blockList[child].connections[
-                                lastConnection
-                            ] = null;
+                            activity.blocks.blockList[child].connections[lastConnection] = null;
                             child = nextBlk;
                         }
 
@@ -287,10 +278,7 @@ function setupFlowBlocks(activity) {
         flow(args, logo, turtle, blk) {
             const switchBlk = last(logo.switchBlocks[turtle]);
             if (switchBlk === null) {
-                activity.errorMsg(
-                    _("The Case Block must be used inside of a Switch Block."),
-                    blk
-                );
+                activity.errorMsg(_("The Case Block must be used inside of a Switch Block."), blk);
                 logo.stopTurtle = true;
                 return;
             }
@@ -325,10 +313,7 @@ function setupFlowBlocks(activity) {
         flow(args, logo, turtle, blk) {
             const switchBlk = last(logo.switchBlocks[turtle]);
             if (switchBlk === null) {
-                activity.errorMsg(
-                    _("The Case Block must be used inside of a Switch Block."),
-                    blk
-                );
+                activity.errorMsg(_("The Case Block must be used inside of a Switch Block."), blk);
                 logo.stopTurtle = true;
                 return;
             }
@@ -389,12 +374,7 @@ function setupFlowBlocks(activity) {
                 if (argBlk == null) {
                     switchCase = "__default__";
                 } else {
-                    switchCase = logo.parseArg(
-                        logo,
-                        turtle,
-                        argBlk,
-                        logo.receievedArg
-                    );
+                    switchCase = logo.parseArg(logo, turtle, argBlk, logo.receievedArg);
                 }
 
                 let caseFlow = null;
@@ -676,7 +656,9 @@ function setupFlowBlocks(activity) {
 
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    _("Conditionals lets your program take different actions depending on the condition.") +
+                    _(
+                        "Conditionals lets your program take different actions depending on the condition."
+                    ) +
                         " " +
                         _("In this example if the mouse button is pressed a snare drum will play."),
                     "documentation",
@@ -685,9 +667,13 @@ function setupFlowBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    _("Conditionals lets your program take different actions depending on the condition.") +
+                    _(
+                        "Conditionals lets your program take different actions depending on the condition."
+                    ) +
                         " " +
-                        _("In this example if the mouse button is pressed a snare drum will play, else a kick drum will play."),
+                        _(
+                            "In this example if the mouse button is pressed a snare drum will play, else a kick drum will play."
+                        ),
                     "documentation",
                     null,
                     "elifhelp"
@@ -719,7 +705,9 @@ function setupFlowBlocks(activity) {
 
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    _("Conditionals lets your program take different actions depending on the condition.") +
+                    _(
+                        "Conditionals lets your program take different actions depending on the condition."
+                    ) +
                         " " +
                         _("In this example if the mouse button is pressed a snare drum will play."),
                     "documentation",
@@ -728,7 +716,9 @@ function setupFlowBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    _("Conditionals lets your program take different actions depending on the condition.") +
+                    _(
+                        "Conditionals lets your program take different actions depending on the condition."
+                    ) +
                         " " +
                         _("In this example if the mouse button is pressed a snare drum will play."),
                     "documentation",
@@ -761,7 +751,9 @@ function setupFlowBlocks(activity) {
             this.setHelpString([
                 _("The Forever block will repeat the contained blocks forever.") +
                     " " +
-                    _("In this example of a simple drum machine a kick drum will play 1/4 notes forever."),
+                    _(
+                        "In this example of a simple drum machine a kick drum will play 1/4 notes forever."
+                    ),
                 "documentation",
                 null,
                 "foreverhelp"
@@ -806,14 +798,9 @@ function setupFlowBlocks(activity) {
             if (args[1] === undefined) return;
 
             let arg;
-            if (
-                args[0] === null ||
-                typeof args[0] !== "number" ||
-                args[0] < 1
-            ) {
-                if (args[0] < 0)
-                    activity.errorMsg(POSNUMBER, blk);
-                return [null , 0];
+            if (args[0] === null || typeof args[0] !== "number" || args[0] < 1) {
+                if (args[0] < 0) activity.errorMsg(POSNUMBER, blk);
+                return [null, 0];
             } else {
                 arg = args[0];
             }
@@ -834,8 +821,8 @@ function setupFlowBlocks(activity) {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]]
-                    .name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "duplicate"]);
             } else {
@@ -887,4 +874,4 @@ function setupFlowBlocks(activity) {
     new DuplicateFactorBlock().setup(activity);
     new HiddenNoFlowBlock().setup(activity);
     new HiddenBlock().setup(activity);
-}
+};

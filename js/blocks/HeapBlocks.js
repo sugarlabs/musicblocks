@@ -17,19 +17,14 @@
 
 /* exported setupHeapBlocks */
 
-function setupHeapBlocks(activity) {
-
+let setupHeapBlocks = (activity) => {
     class HeapBlock extends ValueBlock {
         constructor() {
             super("heap");
             this.setPalette("heap", activity);
             this.beginnerBlock(true);
 
-            this.setHelpString([
-                _("The Heap block returns the heap."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Heap block returns the heap."), "documentation", ""]);
 
             this.formBlock({
                 name: _("heap"),
@@ -40,7 +35,8 @@ function setupHeapBlocks(activity) {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "heap"]);
             } else {
@@ -57,7 +53,9 @@ function setupHeapBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Show-heap block displays the contents of the heap at the top of the screen."),
+                _(
+                    "The Show-heap block displays the contents of the heap at the top of the screen."
+                ),
                 "documentation",
                 ""
             ]);
@@ -101,7 +99,8 @@ function setupHeapBlocks(activity) {
             }
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "heapLength"]);
             } else {
@@ -130,8 +129,7 @@ function setupHeapBlocks(activity) {
         }
 
         arg(logo, turtle) {
-            if (turtle in logo.turtleHeaps)
-                return logo.turtleHeaps[turtle].length === 0;
+            if (turtle in logo.turtleHeaps) return logo.turtleHeaps[turtle].length === 0;
             return true;
         }
     }
@@ -142,11 +140,7 @@ function setupHeapBlocks(activity) {
             this.setPalette("heap", activity);
             this.beginnerBlock(true);
 
-            this.setHelpString([
-                _("The Empty-heap block empties the heap."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Empty-heap block empties the heap."), "documentation", ""]);
 
             this.formBlock({
                 //.TRANS: empty the heap
@@ -257,10 +251,7 @@ function setupHeapBlocks(activity) {
                 argTypes: ["numberin", "anyin"],
                 defaults: [1, 100],
                 //.TRANS: value1 is a numeric value (JAPANESE ONLY)
-                argLabels: [
-                    _("index"),
-                    this.lang === "ja" ? _("value1") : _("value")
-                ]
+                argLabels: [_("index"), this.lang === "ja" ? _("value1") : _("value")]
             });
         }
 
@@ -318,10 +309,7 @@ function setupHeapBlocks(activity) {
         }
 
         arg(logo, turtle) {
-            if (
-                turtle in logo.turtleHeaps &&
-                logo.turtleHeaps[turtle].length > 0
-            ) {
+            if (turtle in logo.turtleHeaps && logo.turtleHeaps[turtle].length > 0) {
                 return logo.turtleHeaps[turtle].pop();
             }
             activity.errorMsg(_("empty heap"));
@@ -374,4 +362,4 @@ function setupHeapBlocks(activity) {
     new SetHeapEntryBlock().setup(activity);
     new PopBlock().setup(activity);
     new PushBlock().setup(activity);
-}
+};

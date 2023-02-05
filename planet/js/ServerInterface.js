@@ -21,7 +21,7 @@
 */
 
 // eslint-disable-next-line no-unused-vars
-function ServerInterface(Planet) {
+let ServerInterface = (Planet) => {
     this.ServerURL = "https://musicblocks.sugarlabs.org/planet-server/index.php";
     this.ConnectionFailureData = {"success": false, "error": "ERROR_CONNECTION_FAILURE"};
     this.APIKey = "3f2d3a4c-c7a4-4c3c-892e-ac43784f7381";

@@ -120,9 +120,9 @@ let format = (str, data) => {
     return str.replace(/{_([a-zA-Z0-9]+)}/g, (match, item) => {
         return _(item);
     });
-}
+};
 
-function canvasPixelRatio() {
+let canvasPixelRatio = () => {
     const devicePixelRatio = window.devicePixelRatio || 1;
     const context = document.querySelector("#myCanvas").getContext("2d");
     const backingStoreRatio =
@@ -133,25 +133,25 @@ function canvasPixelRatio() {
         context.backingStorePixelRatio ||
         1;
     return devicePixelRatio / backingStoreRatio;
-}
+};
 
-function windowHeight() {
+let windowHeight = () => {
     const onAndroid = /Android/i.test(navigator.userAgent);
     if (onAndroid) {
         return window.outerHeight;
     } else {
         return window.innerHeight;
     }
-}
+};
 
-function windowWidth() {
+let windowWidth = () => {
     const onAndroid = /Android/i.test(navigator.userAgent);
     if (onAndroid) {
         return window.outerWidth;
     } else {
         return window.innerWidth;
     }
-}
+};
 
 let httpGet = (projectName) => {
     let xmlHttp = null;
@@ -170,7 +170,7 @@ let httpGet = (projectName) => {
     }
 
     return xmlHttp.responseText;
-}
+};
 
 let httpPost = (projectName, data) => {
     let xmlHttp = null;
@@ -180,9 +180,9 @@ let httpPost = (projectName, data) => {
     xmlHttp.send(data);
     return xmlHttp.responseText;
     // return 'https://apps.facebook.com/turtleblocks/?file=' + projectName;
-}
+};
 
-function HttpRequest(url, loadCallback, userCallback) {
+let HttpRequest = (url, loadCallback, userCallback) => {
     // userCallback is an optional callback-handler.
     const req = (this.request = new XMLHttpRequest());
     this.handler = loadCallback;
@@ -213,9 +213,9 @@ function HttpRequest(url, loadCallback, userCallback) {
 
         this.request = this.handler = this.userCallback = null;
     }
-}
+};
 
-function doBrowserCheck() {
+let doBrowserCheck = () => {
     jQuery.uaMatch = (ua) => {
         ua = ua.toLowerCase();
 
@@ -248,7 +248,7 @@ function doBrowserCheck() {
     }
 
     jQuery.browser = browser;
-}
+};
 
 // Check for Internet Explorer
 
@@ -301,25 +301,25 @@ window.onload = () => {
     }
 };
 
-function docByClass(classname) {
+let docByClass = (classname) => {
     return document.getElementsByClassName(classname);
-}
+};
 
-function docByTagName(tag) {
+let docByTagName = (tag) => {
     document.getElementsByTagName(tag);
-}
+};
 
-function docById(id) {
+let docById = (id) => {
     return document.getElementById(id);
-}
+};
 
-function docByName(name) {
+let docByName = (name) => {
     return document.getElementsByName(name);
-}
+};
 
-function docBySelector(selector) {
+let docBySelector = (selector) => {
     return document.querySelector(selector);
-}
+};
 
 let last = (myList) => {
     const i = myList.length;
@@ -328,7 +328,7 @@ let last = (myList) => {
     } else {
         return myList[i - 1];
     }
-}
+};
 
 let getTextWidth = (text, font) => {
     // re-use canvas object for better performance
@@ -337,9 +337,9 @@ let getTextWidth = (text, font) => {
     context.font = font;
     const metrics = context.measureText(text);
     return metrics.width;
-}
+};
 
-function doSVG(canvas, logo, turtles, width, height, scale) {
+let doSVG = (canvas, logo, turtles, width, height, scale) => {
     // Aggregate SVG output from each turtle. If there is none, return an empty string.
 
     let turtleSVG = "";
@@ -376,7 +376,7 @@ let isSVGEmpty = (turtles) => {
         }
     }
     return true;
-}
+};
 
 let fileExt = (file) => {
     if (file === null) {
@@ -389,7 +389,7 @@ let fileExt = (file) => {
     }
 
     return parts.pop();
-}
+};
 
 let fileBasename = (file) => {
     const parts = file.split(".");
@@ -401,14 +401,14 @@ let fileBasename = (file) => {
         parts.pop(); // throw away suffix
         return parts.join(".");
     }
-}
+};
 
 let toTitleCase = (str) => {
     if (typeof str !== "string") return;
     let tempStr = "";
     if (str.length > 1) tempStr = str.substring(1);
     return str.toUpperCase()[0] + tempStr;
-}
+};
 
 let processPluginData = (activity, pluginData) => {
     // Plugins are JSON-encoded dictionaries.
@@ -606,7 +606,8 @@ let processPluginData = (activity, pluginData) => {
                 console.debug("Cannot find palette for protoblock " + protoblock);
             } else {
                 activity.blocks.protoBlockDict[protoblock].palette.add(
-                    activity.blocks.protoBlockDict[protoblock]);
+                    activity.blocks.protoBlockDict[protoblock]
+                );
             }
         } catch (e) {
             // eslint-disable-next-line no-console
@@ -625,7 +626,7 @@ let processPluginData = (activity, pluginData) => {
 
     // Return the object in case we need to save it to local storage.
     return obj;
-}
+};
 
 let processRawPluginData = (activity, rawData) => {
     const lineData = rawData.split("\n");
@@ -660,7 +661,7 @@ let processRawPluginData = (activity, rawData) => {
     }
 
     return obj;
-}
+};
 
 let updatePluginObj = (activity, obj) => {
     if (obj === null) {
@@ -723,14 +724,14 @@ let updatePluginObj = (activity, obj) => {
     for (const name in obj["ONSTOP"]) {
         activity.pluginObjs["ONSTOP"][name] = obj["ONSTOP"][name];
     }
-}
+};
 
 let preparePluginExports = (activity, obj) => {
     // add obj to plugin dictionary and return as JSON encoded text
     updatePluginObj(activity, obj);
 
     return JSON.stringify(activity.pluginObjs);
-}
+};
 
 let processMacroData = (macroData, palettes, blocks, macroDict) => {
     // Macros are stored in a JSON-encoded dictionary.
@@ -753,7 +754,7 @@ let processMacroData = (macroData, palettes, blocks, macroDict) => {
             console.debug(e);
         }
     }
-}
+};
 
 let prepareMacroExports = (name, stack, macroDict) => {
     if (name !== null) {
@@ -761,7 +762,7 @@ let prepareMacroExports = (name, stack, macroDict) => {
     }
 
     return JSON.stringify(macroDict);
-}
+};
 
 // Some block-specific code
 // TODO: Move to camera plugin
@@ -782,7 +783,7 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
         errorMsg("Your browser does not support the webcam");
     }
 
-    function draw() {
+    let draw = () => {
         canvas.width = w;
         canvas.height = h;
         canvas.getContext("2d").drawImage(video, 0, 0, w, h);
@@ -841,9 +842,9 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
         },
         false
     );
-}
+};
 
-function doStopVideoCam(cameraID, setCameraID) {
+let doStopVideoCam = (cameraID, setCameraID)=> {
     if (cameraID !== null) {
         window.clearInterval(cameraID);
     }
@@ -852,7 +853,7 @@ function doStopVideoCam(cameraID, setCameraID) {
     document.querySelector("#camVideo").pause();
 }
 
-function hideDOMLabel() {
+let hideDOMLabel = ()=> {
     const textLabel = docById("textLabel");
     if (textLabel !== null) {
         textLabel.style.display = "none";
@@ -880,7 +881,7 @@ function displayMsg(/*blocks, text*/) {
     return;
 }
 
-function safeSVG(label) {
+let  safeSVG = (label) => {
     if (typeof label === "string") {
         return label.replace(/&/, "&amp;").replace(/</, "&lt;").replace(/>/, "&gt;");
     } else {
@@ -888,7 +889,7 @@ function safeSVG(label) {
     }
 }
 
-function toFixed2(d) {
+let  toFixed2 = (d) => {
     // Return number as fixed 2 precision
     if (typeof d === "number") {
         const floor = Math.floor(d);
@@ -902,7 +903,7 @@ function toFixed2(d) {
     }
 }
 
-function rationalToFraction(d) {
+let rationalToFraction = (d) => {
     /*
     Convert float to its approximate fractional representation. '''
 
@@ -953,7 +954,7 @@ readable-fractions/681534#681534
     }
 }
 
-function GCD(a, b) {
+let GCD = (a, b) => {
     a = Math.abs(a);
     b = Math.abs(b);
 
@@ -992,11 +993,11 @@ let mixedNumber = (d) => {
     } else {
         return d;
     }
-}
+};
 
 let LCD = (a, b) => {
     return Math.abs((a * b) / GCD(a, b));
-}
+};
 
 let rationalSum = (a, b) => {
     if (a === 0 || b === 0) {
@@ -1039,7 +1040,7 @@ let rationalSum = (a, b) => {
     const lcd = LCD(a[1], b[1]);
     // const c0 = (a[0] * lcd) / a[1] + (b[0] * lcd) / b[1];
     return [(a[0] * lcd) / a[1] + (b[0] * lcd) / b[1], lcd];
-}
+};
 
 let nearestBeat = (d, b) => {
     // Find the closest beat for a given fraction.
@@ -1053,7 +1054,7 @@ let nearestBeat = (d, b) => {
     }
 
     return [count, b];
-}
+};
 
 let oneHundredToFraction = (d) => {
     // Generate some simple fractions based on a scale of 1-100
@@ -1197,22 +1198,22 @@ let oneHundredToFraction = (d) => {
         default:
             return [d, 100];
     }
-}
+};
 
 let rgbToHex = (r, g, b) => {
     return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-}
+};
 
 let hexToRGB = (hex) => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
         ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        }
+              r: parseInt(result[1], 16),
+              g: parseInt(result[2], 16),
+              b: parseInt(result[3], 16)
+          }
         : null;
-}
+};
 
 /**
  * Converts hexcode to rgb.
@@ -1227,7 +1228,7 @@ let hex2rgb = (hex) => {
     const b = bigint & 255;
 
     return "rgba(" + r + "," + g + "," + b + ",1)";
-}
+};
 
 let delayExecution = (duration) => {
     return new Promise((resolve) => {
@@ -1235,9 +1236,9 @@ let delayExecution = (duration) => {
             resolve(true);
         }, duration);
     });
-}
+};
 
-function closeWidgets() {
+let closeWidgets = () => {
     window.widgetWindows.hideAllWindows();
 }
 
@@ -1249,7 +1250,7 @@ let closeBlkWidgets = (name) => {
             break;
         }
     }
-}
+};
 
 /**
  * Adds methods and variables of model and view objects to controller
@@ -1321,4 +1322,4 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
 
     // Add members of View (class type has to be controller's name + "View")
     addMembers(obj, eval(cname + "." + cname + "View"), viewArgs);
-}
+};

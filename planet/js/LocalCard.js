@@ -20,7 +20,7 @@
    LocalCard
 */
 
-function LocalCard(Planet) {
+let LocalCard = (Planet) => {
     this.PlaceholderMBImage = "images/mbgraphic.png";
     this.PlaceholderTBImage = "images/tbgraphic.png";
     this.id = null;

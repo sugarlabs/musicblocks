@@ -20,7 +20,7 @@
    ProjectStorage
 */
 
-function ProjectStorage(Planet) {
+let ProjectStorage = (Planet) => {
     this.defaultProjectName = _("My Project");
     this.LocalStorage = null;
     this.data = null;
