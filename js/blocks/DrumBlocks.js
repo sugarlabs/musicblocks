@@ -18,7 +18,7 @@
 
 /* exported setupDrumBlocks */
 
-function setupDrumBlocks(activity) {
+let setupDrumBlocks = (activity) => {
     class NoiseNameBlock extends ValueBlock {
         constructor() {
             super("noisename", _("noise name"));
@@ -94,7 +94,7 @@ function setupDrumBlocks(activity) {
         }
     }
 
-    function _createPlayDrumMacros() {
+    let _createPlayDrumMacros = () => {
         class PlayDrumMacroBlock extends FlowBlock {
             constructor(name, displayName, isDrum, drumName) {
                 if (displayName === undefined) {
@@ -107,12 +107,16 @@ function setupDrumBlocks(activity) {
                 this.makeMacro((x, y) => [
                     [0, "playdrum", x, y, [null, 1, null]],
                     [
-                        1, [
+                        1,
+                        [
                             isDrum ? "drumname" : "effectsname",
                             {
                                 value: drumName || isDrum ? displayName || name : name
                             }
-                        ], 0, 0, [0]
+                        ],
+                        0,
+                        0,
+                        [0]
                     ]
                 ]);
             }
@@ -142,7 +146,7 @@ function setupDrumBlocks(activity) {
         new PlayDrumMacroBlock("tom", "tom tom", true).setup(activity);
         new PlayDrumMacroBlock("kick", "kick drum", true).setup(activity);
         new PlayDrumMacroBlock("snare", "snare drum", true).setup(activity);
-    }
+    };
 
     class MapDrumBlock extends FlowClampBlock {
         constructor() {
@@ -185,14 +189,18 @@ function setupDrumBlocks(activity) {
 
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    _("The Set drum block will select a drum sound to replace the pitch of any contained notes."),
+                    _(
+                        "The Set drum block will select a drum sound to replace the pitch of any contained notes."
+                    ),
                     "documentation",
                     null,
                     "rhythmruler2"
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Set drum block will select a drum sound to replace the pitch of any contained notes.") +
+                    _(
+                        "The Set drum block will select a drum sound to replace the pitch of any contained notes."
+                    ) +
                         " " +
                         _("In the example above, a kick drum sound will be played instead of sol."),
                     "documentation",
@@ -294,8 +302,8 @@ function setupDrumBlocks(activity) {
                 logo.musicKeyboard.addRowBlock(blk);
             } else if (
                 tur.singer.inNoteBlock.length > 0 ||
-                activity.blocks.blockList[blk].connections[0] == null &&
-                    last(activity.blocks.blockList[blk].connections) == null
+                (activity.blocks.blockList[blk].connections[0] == null &&
+                    last(activity.blocks.blockList[blk].connections) == null)
             ) {
                 Singer.DrumActions.playDrum(args[0], turtle, blk);
             } else {
@@ -321,4 +329,4 @@ function setupDrumBlocks(activity) {
     new SetDrumBlock().setup(activity);
     new PlayEffectBlock().setup(activity);
     new PlayDrumBlock().setup(activity);
-}
+};

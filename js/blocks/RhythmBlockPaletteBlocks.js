@@ -25,7 +25,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
     rhythmBlockPalette = "rhythm";
 }
 
-function setupRhythmBlockPaletteBlocks(activity) {
+let setupRhythmBlockPaletteBlocks = (activity) => {
     class RhythmBlock extends FlowBlock {
         constructor(name) {
             super(name || "rhythm");
@@ -35,9 +35,9 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 name:
                     this.lang === "ja"
                         ? //.TRANS: rhythm block
-                        _("rhythm1")
+                          _("rhythm1")
                         : //.TRANS: an arrangement of notes based on duration
-                        _("rhythm"),
+                          _("rhythm"),
                 args: 2,
                 defaults: [3, 4],
                 argLabels: [_("number of notes"), _("note value")],
@@ -168,7 +168,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 name:
                     this.lang === "ja"
                         ? //.TRANS: translate "rhythm1" as rhythm
-                        _("rhythm1")
+                          _("rhythm1")
                         : _("rhythm"),
                 args: 2,
                 defaults: [3, 4],
@@ -335,7 +335,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = event => {
+            const __listener = (event) => {
                 if (logo.inMatrix) {
                     logo.tuplet = false;
                     logo.addingNotesToTuplet = false;
@@ -383,7 +383,9 @@ function setupRhythmBlockPaletteBlocks(activity) {
             super("tuplet4");
             this.setPalette(rhythmBlockPalette, activity);
             this.setHelpString([
-                _("The Tuplet block is used to generate a group of notes played in a condensed amount of time."),
+                _(
+                    "The Tuplet block is used to generate a group of notes played in a condensed amount of time."
+                ),
                 "documentation",
                 null,
                 "tuplet4"
@@ -598,7 +600,9 @@ function setupRhythmBlockPaletteBlocks(activity) {
             this.setHelpString([
                 _("Tuplets are a collection of notes that get scaled to a specific duration.") +
                     " " +
-                    _("Using tuplets makes it easy to create groups of notes that are not based on a power of 2."),
+                    _(
+                        "Using tuplets makes it easy to create groups of notes that are not based on a power of 2."
+                    ),
                 "documentation",
                 null,
                 "matrix"
@@ -721,4 +725,4 @@ function setupRhythmBlockPaletteBlocks(activity) {
     new QuintupletBlock().setup(activity);
     new TripletBlock().setup(activity);
     new STupletBlock().setup(activity);
-}
+};

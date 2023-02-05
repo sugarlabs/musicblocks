@@ -20,7 +20,7 @@
    GlobalCard, copyURLToClipboard
 */
 
-function GlobalCard(Planet) {
+let GlobalCard = (Planet) => {
     this.ProjectData = null;
     this.id = null;
     this.PlaceholderMBImage = "images/mbgraphic.png";
@@ -212,7 +212,7 @@ function GlobalCard(Planet) {
     };
 };
 
-function copyURLToClipboard() {
+let copyURLToClipboard = () => {
     const clipboard = new ClipboardJS(".copyshareurl");
     clipboard.on("success", (e) => {
         // eslint-disable-next-line no-console

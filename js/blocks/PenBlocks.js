@@ -18,7 +18,7 @@
 
 /* exported setupPenBlocks */
 
-function setupPenBlocks(activity) {
+let setupPenBlocks = (activity) => {
     class PurpleBlock extends FlowBlock {
         constructor() {
             super("purple", _("purple"));
@@ -867,4 +867,4 @@ function setupPenBlocks(activity) {
     new SetShadeBlock().setup(activity);
     new SetGreyBlock().setup(activity);
     new SetColorBlock().setup(activity);
-}
+};

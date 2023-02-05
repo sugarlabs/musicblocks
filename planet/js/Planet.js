@@ -21,7 +21,7 @@
    Planet
 */
 
-function Planet(isMusicBlocks, storage) {
+let Planet = (isMusicBlocks, storage) => {
     this.LocalPlanet = null;
     this.GlobalPlanet = null;
     this.ProjectStorage = null;

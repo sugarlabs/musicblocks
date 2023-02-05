@@ -19,7 +19,7 @@
 
 /* exported setupMediaBlocks */
 
-function setupMediaBlocks(activity) {
+let setupMediaBlocks = (activity) => {
     class RightPosBlock extends ValueBlock {
         constructor() {
             //.TRANS: right side of the screen
@@ -31,7 +31,9 @@ function setupMediaBlocks(activity) {
                 this.setHelpString([
                     _("The Right block returns the position of the right of the canvas.") +
                         " " +
-                        _("In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."),
+                        _(
+                            "In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
+                        ),
                     "documentation",
                     null,
                     "lrhelp"
@@ -40,7 +42,9 @@ function setupMediaBlocks(activity) {
                 this.setHelpString([
                     _("The Right block returns the position of the right of the canvas.") +
                         " " +
-                    _("In this example, the turtle moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."),
+                        _(
+                            "In this example, the turtle moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
+                        ),
                     "documentation",
                     null,
                     "lrhelp"
@@ -48,9 +52,7 @@ function setupMediaBlocks(activity) {
             }
         }
         updateParameter() {
-            return toFixed2(
-                activity.turtles._canvas.width / (2.0 * activity.turtles.scale)
-            );
+            return toFixed2(activity.turtles._canvas.width / (2.0 * activity.turtles.scale));
         }
 
         arg() {
@@ -69,7 +71,9 @@ function setupMediaBlocks(activity) {
                 this.setHelpString([
                     _("The Left block returns the position of the left of the canvas.") +
                         " " +
-                        _("In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."),
+                        _(
+                            "In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
+                        ),
                     "documentation",
                     null,
                     "lrhelp"
@@ -78,7 +82,9 @@ function setupMediaBlocks(activity) {
                 this.setHelpString([
                     _("The Left block returns the position of the left of the canvas.") +
                         " " +
-                        _("In this example, the turtle moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."),
+                        _(
+                            "In this example, the turtle moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
+                        ),
                     "documentation",
                     null,
                     "lrhelp"
@@ -87,15 +93,11 @@ function setupMediaBlocks(activity) {
         }
 
         updateParameter() {
-            return toFixed2(
-                -1 * (activity.turtles._canvas.width / (2.0 * activity.turtles.scale))
-            );
+            return toFixed2(-1 * (activity.turtles._canvas.width / (2.0 * activity.turtles.scale)));
         }
 
         arg() {
-            return (
-                -1 * (activity.turtles._canvas.width / (2.0 * activity.turtles.scale))
-            );
+            return -1 * (activity.turtles._canvas.width / (2.0 * activity.turtles.scale));
         }
     }
 
@@ -109,7 +111,9 @@ function setupMediaBlocks(activity) {
                 this.setHelpString([
                     _("The Top block returns the position of the top of the canvas.") +
                         " " +
-                        _("In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."),
+                        _(
+                            "In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
+                        ),
                     "documentation",
                     null,
                     "bottomposhelp"
@@ -118,7 +122,9 @@ function setupMediaBlocks(activity) {
                 this.setHelpString([
                     _("The Top block returns the position of the top of the canvas.") +
                         " " +
-                        _("In this example, the turtle moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."),
+                        _(
+                            "In this example, the turtle moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
+                        ),
                     "documentation",
                     null,
                     "bottomposhelp"
@@ -127,9 +133,7 @@ function setupMediaBlocks(activity) {
         }
 
         updateParameter() {
-            return toFixed2(
-                activity.turtles._canvas.height / (2.0 * activity.turtles.scale)
-            );
+            return toFixed2(activity.turtles._canvas.height / (2.0 * activity.turtles.scale));
         }
 
         arg() {
@@ -147,7 +151,9 @@ function setupMediaBlocks(activity) {
                 this.setHelpString([
                     _("The Bottom block returns the position of the bottom of the canvas.") +
                         " " +
-                        _("In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."),
+                        _(
+                            "In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
+                        ),
                     "documentation",
                     null,
                     "bottomposhelp"
@@ -156,7 +162,9 @@ function setupMediaBlocks(activity) {
                 this.setHelpString([
                     _("The Bottom block returns the position of the bottom of the canvas.") +
                         " " +
-                        _("In this example, the turtle moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."),
+                        _(
+                            "In this example, the turtle moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
+                        ),
                     "documentation",
                     null,
                     "bottomposhelp"
@@ -171,9 +179,7 @@ function setupMediaBlocks(activity) {
         }
 
         arg() {
-            return (
-                -1 * (activity.turtles._canvas.height / (2.0 * activity.turtles.scale))
-            );
+            return -1 * (activity.turtles._canvas.height / (2.0 * activity.turtles.scale));
         }
     }
 
@@ -398,8 +404,9 @@ function setupMediaBlocks(activity) {
         constructor() {
             super("tone", _("hertz"));
             this.setPalette("media", activity);
-            this.piemenuValuesC1 = [220, 247, 262, 294, 330, 349, 392, 440, 494, 523,
-                587, 659, 698, 784, 880];
+            this.piemenuValuesC1 = [
+                220, 247, 262, 294, 330, 349, 392, 440, 494, 523, 587, 659, 698, 784, 880
+            ];
             this.setHelpString();
             this.formBlock({
                 args: 2,
@@ -439,10 +446,7 @@ function setupMediaBlocks(activity) {
                 args: 2,
                 defaults: ["G", 4],
                 argTypes: ["notein", "anyin"],
-                argLabels: [
-                    this.lang === "ja" ? _("name2") : _("name"),
-                    _("octave")
-                ]
+                argLabels: [this.lang === "ja" ? _("name2") : _("name"), _("octave")]
             });
         }
 
@@ -513,10 +517,7 @@ function setupMediaBlocks(activity) {
                 if (typeof args[0] === "string") {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else {
-                    activity.turtles.turtleList[turtle].doTurtleShell(
-                        args[0],
-                        args[1]
-                    );
+                    activity.turtles.turtleList[turtle].doTurtleShell(args[0], args[1]);
                 }
             }
         }
@@ -597,11 +598,7 @@ function setupMediaBlocks(activity) {
             this.setPalette("media", activity);
             this.beginnerBlock(true);
 
-            this.setHelpString([
-                _("The Text block holds a text string."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Text block holds a text string."), "documentation", ""]);
 
             this.formBlock({
                 outType: "textout"
@@ -629,4 +626,4 @@ function setupMediaBlocks(activity) {
     new ShowBlock().setup(activity);
     new MediaBlock().setup(activity);
     new TextBlock().setup(activity);
-}
+};

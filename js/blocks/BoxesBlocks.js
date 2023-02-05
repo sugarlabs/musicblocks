@@ -18,7 +18,7 @@
 
 /* exported setupBoxesBlocks */
 
-function setupBoxesBlocks(activity) {
+let setupBoxesBlocks = (activity) => {
     class IncrementBlock extends FlowBlock {
         constructor(name) {
             super(name || "increment");

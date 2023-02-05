@@ -22,7 +22,7 @@
    GlobalPlanet
 */
 
-function GlobalPlanet(Planet) {
+let GlobalPlanet = (Planet) => {
     this.ProjectViewer = null;
     if (Planet.IsMusicBlocks) {
         this.offlineHTML = "<div class=\"container center-align\">" + _("Feature unavailable - cannot connect to server. Reload Music Blocks to try again.") + "</div>";

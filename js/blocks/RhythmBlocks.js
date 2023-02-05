@@ -18,7 +18,7 @@
 
 /* exported setupRhythmBlocks */
 
-function setupRhythmBlocks(activity) {
+let setupRhythmBlocks = (activity) => {
     class MyNoteValueBlock extends ValueBlock {
         constructor() {
             //.TRANS: the value (e.g., 1/4 note) of the note being played.
@@ -27,7 +27,9 @@ function setupRhythmBlocks(activity) {
             this.parameter = true;
             this.beginnerBlock(true);
             this.setHelpString([
-                _("The Note value block is the value of the duration of the note currently being played."),
+                _(
+                    "The Note value block is the value of the duration of the note currently being played."
+                ),
                 "documentation",
                 null,
                 "everybeathelp"
@@ -41,7 +43,8 @@ function setupRhythmBlocks(activity) {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "mynotevalue"]);
             } else {
@@ -66,7 +69,8 @@ function setupRhythmBlocks(activity) {
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "skip"]);
             } else {
@@ -80,7 +84,9 @@ function setupRhythmBlocks(activity) {
             super("osctime");
             this.setPalette("rhythm", activity);
             this.setHelpString([
-                _("The Milliseconds block is similar to a Note block except that it uses time (in MS) to specify the note duration."),
+                _(
+                    "The Milliseconds block is similar to a Note block except that it uses time (in MS) to specify the note duration."
+                ),
                 "documentation",
                 null,
                 "osctimehelp"
@@ -108,14 +114,13 @@ function setupRhythmBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk, receivedArg) {
-            if (args[1] === undefined)
-                return;
+            if (args[1] === undefined) return;
 
             if (args[0] === null || typeof args[0] !== "number")
                 activity.errorMsg(NOINPUTERRORMSG, blk);
-            else if (args[0] <= 0)
-                activity.errorMsg(_("Note value must be greater than 0."), blk);
-            const value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
+            else if (args[0] <= 0) activity.errorMsg(_("Note value must be greater than 0."), blk);
+            const value =
+                args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
             const _callback = () => {
                 const tur = activity.turtles.ithTurtle(turtle);
@@ -162,7 +167,7 @@ function setupRhythmBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = event => {
+            const __listener = (event) => {
                 if (!tur.singer.suppressOutput) {
                     tur.singer.swingTarget.pop();
                     tur.singer.swing.pop();
@@ -212,7 +217,7 @@ function setupRhythmBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = event => {
+            const __listener = (event) => {
                 if (!tur.singer.suppressOutput) {
                     tur.singer.swingTarget.pop();
                     tur.singer.swing.pop();
@@ -232,7 +237,9 @@ function setupRhythmBlocks(activity) {
             super("newswing2");
             this.setPalette("rhythm", activity);
             this.setHelpString([
-                _("The Swing block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note."),
+                _(
+                    "The Swing block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note."
+                ),
                 "documentation",
                 null,
                 "swinghelp"
@@ -265,13 +272,17 @@ function setupRhythmBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[2] === undefined)
-                return;
+            if (args[2] === undefined) return;
 
             if (
-                args[0] === null || typeof args[0] !== "number" || args[0] <= 0 ||
-                args[1] === null || typeof args[1] !== "number" || args[1] <= 0
-            )   activity.errorMsg(NOINPUTERRORMSG, blk);
+                args[0] === null ||
+                typeof args[0] !== "number" ||
+                args[0] <= 0 ||
+                args[1] === null ||
+                typeof args[1] !== "number" ||
+                args[1] <= 0
+            )
+                activity.errorMsg(NOINPUTERRORMSG, blk);
             const arg0 =
                 args[0] === null || typeof args[0] !== "number" || args[0] <= 0 ? 1 / 24 : args[0];
             const arg1 =
@@ -317,7 +328,7 @@ function setupRhythmBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = event => {
+            const __listener = (event) => {
                 tur.singer.skipFactor -= arg;
             };
 
@@ -332,7 +343,9 @@ function setupRhythmBlocks(activity) {
             super("multiplybeatfactor");
             this.setPalette("rhythm", activity);
             this.setHelpString([
-                _("The Multiply note value block changes the duration of notes by changing their note values."),
+                _(
+                    "The Multiply note value block changes the duration of notes by changing their note values."
+                ),
                 "documentation",
                 null,
                 "multiplybeathelp"
@@ -356,8 +369,7 @@ function setupRhythmBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined)
-                return;
+            if (args[1] === undefined) return;
 
             let factor = args[0];
             if (factor === null || typeof factor !== "number" || factor <= 0) {
@@ -396,8 +408,7 @@ function setupRhythmBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk) {
-            if (args[0] === undefined)
-                return;
+            if (args[0] === undefined) return;
 
             Singer.RhythmActions.doTie(turtle, blk);
 
@@ -445,7 +456,7 @@ function setupRhythmBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = event => {
+            const __listener = (event) => {
                 const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
                 tur.singer.beatFactor *= currentDotFactor;
                 tur.singer.dotCount -= arg >= 0 ? arg : 1 / arg;
@@ -491,7 +502,7 @@ function setupRhythmBlocks(activity) {
             if (args[0] === null) activity.errorMsg(NOINPUTERRORMSG, blk);
             const arg = args[0] === null ? 0 : args[0];
 
-            Singer.RhythmActions.doRhythmicDot(arg, turtle ,blk);
+            Singer.RhythmActions.doRhythmicDot(arg, turtle, blk);
 
             return [args[1], 1];
         }
@@ -503,7 +514,9 @@ function setupRhythmBlocks(activity) {
             this.setPalette("rhythm", activity);
             this.beginnerBlock(true);
             this.setHelpString([
-                _("A rest of the specified note value duration can be constructed using a Silence block."),
+                _(
+                    "A rest of the specified note value duration can be constructed using a Silence block."
+                ),
                 "documentation",
                 null,
                 "rest2"
@@ -535,7 +548,7 @@ function setupRhythmBlocks(activity) {
                 name:
                     this.lang === "ja"
                         ? //.TRANS: Japanese only: note value block for drum
-                        _("note value drum")
+                          _("note value drum")
                         : _("note value") + " " + _("drum"),
                 args: 1,
                 canCollapse: true
@@ -733,14 +746,13 @@ function setupRhythmBlocks(activity) {
 
         flow(args, logo, turtle, blk, receivedArg) {
             // Should never happen, but if it does, nothing to do
-            if (args[1] === undefined)
-                return;
+            if (args[1] === undefined) return;
 
             if (args[0] === null || typeof args[0] !== "number")
                 activity.errorMsg(NOINPUTERRORMSG, blk);
-            else if (args[0] <= 0)
-                activity.errorMsg(_("Note value must be greater than 0."), blk);
-            const value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
+            else if (args[0] <= 0) activity.errorMsg(_("Note value must be greater than 0."), blk);
+            const value =
+                args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
             const _callback = () => {
                 const tur = activity.turtles.ithTurtle(turtle);
@@ -792,15 +804,14 @@ function setupRhythmBlocks(activity) {
 
         flow(args, logo, turtle, blk, receivedArg) {
             // Should never happen, but if it does, nothing to do
-            if (args[1] === undefined)
-                return;
+            if (args[1] === undefined) return;
 
             if (args[0] === null || typeof args[0] !== "number")
                 activity.errorMsg(NOINPUTERRORMSG, blk);
-            else if (args[0] <= 0)
-                activity.errorMsg(_("Note value must be greater than 0."), blk);
+            else if (args[0] <= 0) activity.errorMsg(_("Note value must be greater than 0."), blk);
 
-            const value = args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
+            const value =
+                args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
             const _callback = () => {
                 const tur = activity.turtles.ithTurtle(turtle);
@@ -870,4 +881,4 @@ function setupRhythmBlocks(activity) {
     new NewNoteBlock().setup(activity);
     new DefineFrequencyBlock().setup(activity);
     new OctaveSpaceBlock().setup(activity);
-}
+};

@@ -16,7 +16,7 @@
    Converter
 */
 
-function Converter(Planet) {
+let Converter = (Planet) => {
     this.ServerInterface = Planet.ServerInterface;
 
     this.isConnected = () => {

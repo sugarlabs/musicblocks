@@ -27,7 +27,7 @@
    updateCheckboxes
 */
 
-function debounce(func, wait, immediate) {
+let debounce = (func, wait, immediate) => {
     let timeout;
     return () => {
         const context = this,
@@ -45,7 +45,7 @@ function debounce(func, wait, immediate) {
     };
 };
 
-function getCookie(cname) {
+let getCookie = (cname) =>{
     // from W3Schools
     const name = cname + "=";
     const decodedCookie = decodeURIComponent(document.cookie);
@@ -63,7 +63,7 @@ function getCookie(cname) {
     return "";
 };
 
-function setCookie(cname, cvalue, exdays) {
+let setCookie = (cname, cvalue, exdays)=> {
     // from W3Schools
     const d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
@@ -71,7 +71,7 @@ function setCookie(cname, cvalue, exdays) {
     document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 };
 
-function toggleSearch(on) {
+let toggleSearch = (on)=> {
     if (on) {
         document.getElementById("searchcontainer").style.display = "block";
     } else {
@@ -79,7 +79,7 @@ function toggleSearch(on) {
     }
 };
 
-function toggleText(id, a, b) {
+let toggleText = (id, a, b)=> {
     const t = document.getElementById(id).innerHTML;
     if (t.indexOf(a) !== -1) {
         document.getElementById(id).innerHTML = t.replace(a, b);
@@ -88,7 +88,7 @@ function toggleText(id, a, b) {
     }
 };
 
-function toggleExpandable(id, c) {
+let toggleExpandable = (id, c)=> {
     const d = document.getElementById(id).className;
     if (d === c + " open") {
         document.getElementById(id).className = c;
@@ -97,7 +97,7 @@ function toggleExpandable(id, c) {
     }
 };
 
-function hideOnClickOutside(eles, other) {
+let hideOnClickOutside = (eles, other) => {
     // if click not in id, hide
     const outsideClickListener = event => {
         // eslint-disable-next-line max-len
@@ -123,7 +123,7 @@ function hideOnClickOutside(eles, other) {
     document.addEventListener("click", outsideClickListener);
 };
 
-function updateCheckboxes(id) {
+let updateCheckboxes = (id) => {
     const elements = document.getElementById(id).querySelectorAll("input:checked");
     const urlel = document.getElementById(id).querySelectorAll("input[type=text]")[0];
     let url = urlel.getAttribute("data-originalurl");

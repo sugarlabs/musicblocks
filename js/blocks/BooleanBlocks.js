@@ -17,7 +17,7 @@
 
 /* exported setupBooleanBlocks */
 
-function setupBooleanBlocks(activity) {
+let setupBooleanBlocks = (activity) => {
     class NotBlock extends BooleanBlock {
         constructor() {
             super("not");

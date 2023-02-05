@@ -32,7 +32,7 @@
 
 /* exported setupGraphicsBlocks */
 
-function setupGraphicsBlocks(activity) {
+let setupGraphicsBlocks = (activity) => {
     class HeadingBlock extends ValueBlock {
         constructor() {
             //.TRANS: orientation or compass direction
