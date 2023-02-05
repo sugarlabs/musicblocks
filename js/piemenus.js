@@ -99,19 +99,19 @@ const piemenuPitches = function (
 
     docById("wheelDiv").style.display = "";
 
-    // the pitch selector
+    // The pitch selector
     block._pitchWheel = new wheelnav("wheelDiv", null, 600, 600);
 
     if (!custom) {
-        // the accidental selector
+        // The accidental selector
         block._accidentalsWheel = new wheelnav("_accidentalsWheel", block._pitchWheel.raphael);
     }
-    // the octave selector
+    // The octave selector
     if (hasOctaveWheel) {
         block._octavesWheel = new wheelnav("_octavesWheel", block._pitchWheel.raphael);
     }
 
-    // exit button
+    // The exit button
     block._exitWheel = new wheelnav("_exitWheel", block._pitchWheel.raphael);
 
     wheelnav.cssMode = true;
@@ -271,12 +271,12 @@ const piemenuPitches = function (
     for (const j in attrList) {
         for (const i in NOTENAMES) {
             const tempScale = buildScale(NOTENAMES[i] + attrList[j] + " major")[0];
-            if (tempScale[k - 1] == block.activity.KeySignatureEnv[0]) {
+            if (tempScale[k - 1] === block.activity.KeySignatureEnv[0]) {
                 key = NOTENAMES[i] + attrList[j];
                 break;
             }
         }
-        if (key != undefined) {
+        if (key !== undefined) {
             break;
         }
     }
@@ -287,8 +287,8 @@ const piemenuPitches = function (
         scale.push(scale.shift());
     }
 
-    // auto selection of sharps and flats in fixed solfege
-    // handles the case of opening the pie-menu, not whilst in the pie-menu
+    // Auto-selection of sharps and flats in fixed solfege handles the
+    // case of opening the pie-menu, not whilst in the pie-menu.
     if (
         (!block.activity.KeySignatureEnv[2] && block.name === "solfege") ||
         (block.name === "notename" &&
@@ -298,7 +298,7 @@ const piemenuPitches = function (
                 ) === -1
                 : true))
     ) {
-        if (scale[6 - i][0] == FIXEDSOLFEGE[note] || scale[6 - i][0] == note) {
+        if (scale[6 - i][0] === FIXEDSOLFEGE[note] || scale[6 - i][0] === note) {
             accidental = scale[6 - i].substr(1);
         } else {
             accidental = EQUIVALENTACCIDENTALS[scale[6 - i]].substr(1);
@@ -340,12 +340,12 @@ const piemenuPitches = function (
         // Use the octave associated with block block, if available.
         const pitchOctave = block.blocks.findPitchOctave(block.connections[0]);
 
-        // Navigate to current octave
+        // Navigate to current octave.
         block._octavesWheel.navigateWheel(8 - pitchOctave);
         // const prevOctave = 8 - pitchOctave;
     }
 
-    // Set up event handlers
+    // Set up event handlers.
     const that = block;
     const selection = {
         note: note,
@@ -480,14 +480,14 @@ const piemenuPitches = function (
         const i = noteLabels.indexOf(selection["note"]);
         that.value = noteValues[i];
 
-        // auto selection of sharps and flats in fixed solfege
-        // handles the case of opening the pie-menu, not whilst in the pie-menu
-        // FIXEDSOLFEGE converts solfege to alphabet, needed for solfege pie-menu
-        // In case of alphabet, direct comparison is performed
-
+        // Auto-selection of sharps and flats in fixed solfege handles
+        // the case of opening the pie-menu, not whilst in the
+        // pie-menu. FIXEDSOLFEGE converts solfege to alphabet, needed
+        // for solfege pie-menu In. case of alphabet, direct comparison
+        // is performed.
         if (
-            (!block.activity.KeySignatureEnv[2] && that.name == "solfege") ||
-            (that.name == "notename" &&
+            (!block.activity.KeySignatureEnv[2] && that.name === "solfege") ||
+            (that.name === "notename" &&
                 (that.connections[0] != undefined
                     ? ["setkey", "setkey2"].indexOf(
                         that.blocks.blockList[that.connections[0]].name
@@ -495,12 +495,13 @@ const piemenuPitches = function (
                     : true))
         ) {
             let i = NOTENAMES.indexOf(FIXEDSOLFEGE[selection["note"]]);
-            if (i == -1) {
-                i = NOTENAMES.indexOf(selection["note"]);
+            if (i === -1) {
+                i = NOTENAMES.indexOf(FIXEDSOLFEGE[that.value]);
             }
             if (
-                scale[i][0] == FIXEDSOLFEGE[selection["note"]] ||
-                scale[i][0] == selection["note"]
+                scale[i][0] === FIXEDSOLFEGE[selection["note"]] ||
+                scale[i][0] === FIXEDSOLFEGE[that.value] ||
+                scale[i][0] === selection["note"]
             ) {
                 selection["attr"] = scale[i].substr(1);
             } else {
@@ -537,7 +538,7 @@ const piemenuPitches = function (
         that.updateCache();
 
         if (hasOctaveWheel) {
-            // Set the octave of the pitch block if available
+            // Set the octave of the pitch block, if available.
             const octave = Number(
                 that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
             );
@@ -563,14 +564,17 @@ const piemenuPitches = function (
     };
 
     const __selectionChangedAccidental = () => {
+        selection["note"] = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
         selection["attr"] =
             that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
-        if (selection["attr"] !== "♮") {
-            that.value = selection["note"] + selection["attr"];
+
+        if (selection["attr"] === "♮") {
+            that.text.text = selection["note"];
         } else {
-            that.value = selection["note"];
+            that.value += selection["attr"];
+            that.text.text = selection["note"] + selection["attr"];
         }
-        that.text.text = that.value;
+
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
         __pitchPreview();
