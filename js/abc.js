@@ -22,17 +22,17 @@
 // This header is prepended to the Abc output.
 const ABCHEADER = "X:1\nT:Music Blocks composition\nC:Mr. Mouse\nL:1/16\nM:C\n";
 
-const getABCHeader = function() {
+const getABCHeader = () => {
     return ABCHEADER;
 };
 
-const processABCNotes = function(logo, turtle) {
+const processABCNotes = (logo, turtle) => {
     // obj = [instructions] or
     // obj = [[notes], duration, dotCount, tupletValue, roundDown,
     //        insideChord, staccato]
     logo.notationNotes[turtle] = "";
 
-    const __convertDuration = function(duration) {
+    const __convertDuration = (duration) => {
         let returnString = "";
         switch (duration) {
             case 64:
@@ -64,7 +64,7 @@ const processABCNotes = function(logo, turtle) {
         return returnString;
     };
 
-    const __toABCnote = function (note) {
+    const __toABCnote = (note) => {
         // beams -- no space between notes
         // ties use ()
         // % comment
@@ -263,7 +263,7 @@ const processABCNotes = function(logo, turtle) {
                 }
             }
 
-            const __processTuplet = function (logo, turtle, i, count) {
+            const __processTuplet = (logo, turtle, i, count) => {
                 let j = 0;
                 let k = 0;
 
@@ -426,7 +426,7 @@ const processABCNotes = function(logo, turtle) {
     }
 };
 
-const saveAbcOutput = function(activity) {
+const saveAbcOutput = (activity) => {
     // let turtleCount = 0;
 
     activity.logo.notationOutput = getABCHeader();

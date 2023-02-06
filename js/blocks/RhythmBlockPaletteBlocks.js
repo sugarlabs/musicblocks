@@ -25,7 +25,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
     rhythmBlockPalette = "rhythm";
 }
 
-function setupRhythmBlockPaletteBlocks(activity) {
+const setupRhythmBlockPaletteBlocks = (activity) => {
     class RhythmBlock extends FlowBlock {
         constructor(name) {
             super(name || "rhythm");

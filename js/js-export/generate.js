@@ -92,14 +92,14 @@ class JSGenerate {
          * @param {Number} level - for clamp/doubleclamp blocks: 0/undefined for first flow, 1 for second flow
          * @returns {[*]} tree from blk
          */
-        function GenerateStackTree(blk, tree, level) {
+        const GenerateStackTree = (blk, tree, level) => {
             /**
              * Recursively generates a tree representation of the arguments starting with blk.
              *
              * @param {Object} blk - Block object
              * @returns {[*]} tree representation
              */
-            function ParseArg(blk) {
+            const ParseArg = (blk) => {
                 let argLen = blk.protoblock.args;
                 if (blk.protoblock.style === "clamp") {
                     argLen -= 1;
@@ -222,14 +222,14 @@ class JSGenerate {
          * @param {[*]} tree - block stack tree
          * @param {Number} level - nesting level
          */
-        function PrintTree(tree, level) {
+        const PrintTree = (tree, level) => {
             /**
              * Recursively generates the string of arguments.
              *
              * @param {[*]} args - arguments list
              * @returns {String} serialized arguments
              */
-            function PrintArgs(args) {
+            const PrintArgs = (args) => {
                 if (args === null || args.length === 0) return "none";
 
                 let str = "(";

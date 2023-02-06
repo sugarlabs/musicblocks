@@ -18,7 +18,7 @@
 
 /* exported setupPenBlocks */
 
-function setupPenBlocks(activity) {
+const setupPenBlocks = (activity) => {
     class PurpleBlock extends FlowBlock {
         constructor() {
             super("purple", _("purple"));

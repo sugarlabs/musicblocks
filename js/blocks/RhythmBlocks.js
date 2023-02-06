@@ -18,7 +18,7 @@
 
 /* exported setupRhythmBlocks */
 
-function setupRhythmBlocks(activity) {
+const setupRhythmBlocks = (activity) => {
     class MyNoteValueBlock extends ValueBlock {
         constructor() {
             //.TRANS: the value (e.g., 1/4 note) of the note being played.

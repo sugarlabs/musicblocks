@@ -19,7 +19,7 @@
 
 /* exported setupNumberBlocks */
 
-function setupNumberBlocks(activity) {
+const setupNumberBlocks = (activity) => {
     class IntBlock extends LeftBlock {
         constructor() {
             super("int");

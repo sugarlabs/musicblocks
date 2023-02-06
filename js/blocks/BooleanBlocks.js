@@ -17,7 +17,7 @@
 
 /* exported setupBooleanBlocks */
 
-function setupBooleanBlocks(activity) {
+const setupBooleanBlocks = (activity) => {
     class NotBlock extends BooleanBlock {
         constructor() {
             super("not");
@@ -173,7 +173,7 @@ function setupBooleanBlocks(activity) {
             } else {
                 const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
                 const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                return ((a && !b)||(!a && b));
+                return ((a && !b) || (!a && b));
             }
         }
     }

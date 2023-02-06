@@ -18,7 +18,7 @@
 
 /* exported setupFlowBlocks */
 
-function setupFlowBlocks(activity) {
+const setupFlowBlocks = (activity) => {
     class BackwardBlock extends FlowClampBlock {
         constructor() {
             super("backward");

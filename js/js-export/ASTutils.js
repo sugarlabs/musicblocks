@@ -468,7 +468,7 @@ class ASTUtils {
             int: ["method", "Math.floor"]
         };
 
-        function getBinaryExpAST(operator, operand1, operand2) {
+        const getBinaryExpAST = (operator, operand1, operand2) => {
             return {
                 type: "BinaryExpression",
                 left: ASTUtils._getArgsAST([operand1])[0],
@@ -477,7 +477,7 @@ class ASTUtils {
             };
         }
 
-        function getUnaryExpAST(operator, operand) {
+        const getUnaryExpAST = (operator, operand) => {
             return {
                 type: "UnaryExpression",
                 operator: `${operator}`,
@@ -486,7 +486,7 @@ class ASTUtils {
             };
         }
 
-        function getCallExpAST(methodName, args) {
+        const getCallExpAST = (methodName, args) => {
             return {
                 type: "CallExpression",
                 callee: {

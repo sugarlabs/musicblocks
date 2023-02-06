@@ -59,7 +59,7 @@
    piemenuBasic, piemenuColor, piemenuNumber, piemenuNthModalPitch,
    piemenuNoteValue, piemenuAccidentals, piemenuKey, piemenuChords
 */
-const piemenuPitches = function (
+const piemenuPitches = (
     block,
     noteLabels,
     noteValues,
@@ -67,7 +67,7 @@ const piemenuPitches = function (
     note,
     accidental,
     custom
-) {
+) => {
     let prevPitch = null;
 
     // wheelNav pie menu for pitch selection
@@ -357,7 +357,7 @@ const piemenuPitches = function (
      * @return{void}
      * @private
      */
-    const __pitchPreview = function () {
+    const __pitchPreview = () => {
         const label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
         const i = noteLabels.indexOf(label);
 
@@ -470,12 +470,12 @@ const piemenuPitches = function (
             that.activity.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
         }
 
-        setTimeout(function () {
+        setTimeout(() => {
             that._triggerLock = false;
         }, 1 / 8);
     };
 
-    const __selectionChangedSolfege = function () {
+    const __selectionChangedSolfege = () => {
         selection["note"] = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
         const i = noteLabels.indexOf(selection["note"]);
         that.value = noteValues[i];
@@ -594,7 +594,7 @@ const piemenuPitches = function (
     }
 
     // Hide the widget when the exit button is clicked.
-    block._exitWheel.navItems[0].navigateFunction = function () {
+    block._exitWheel.navItems[0].navigateFunction = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
         that._pitchWheel.removeWheel();
@@ -608,13 +608,13 @@ const piemenuPitches = function (
     };
 };
 
-const piemenuCustomNotes = function (
+const piemenuCustomNotes = (
     block,
     noteLabels,
     customLabels,
     selectedCustom,
     selectedNote
-) {
+) => {
     // pie menu for customNote selection
     if (block.blocks.stageClick) {
         return;
@@ -810,8 +810,8 @@ const piemenuCustomNotes = function (
     }
 
     // Add function to each main menu for show/hide sub menus
-    const __setupAction = function (i) {
-        that._customWheel.navItems[i].navigateFunction = function () {
+    const __setupAction = (i) => {
+        that._customWheel.navItems[i].navigateFunction = () => {
             that.customID =
                 that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
             labels = [];
@@ -877,12 +877,12 @@ const piemenuCustomNotes = function (
         block._cusNoteWheel.navigateWheel(max * customLabels.indexOf(selectedCustom) + j);
     }
 
-    const __exitMenu = function () {
+    const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
     };
 
-    const __selectionChanged = function () {
+    const __selectionChanged = () => {
         const label = that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
         const note = that._cusNoteWheel.navItems[that._cusNoteWheel.selectedNavItemIndex].title;
         that.value = note;
@@ -925,7 +925,7 @@ const piemenuCustomNotes = function (
             }
         }
 
-        setTimeout(function () {
+        setTimeout(() => {
             that._triggerLock = false;
         }, 1 / 8);
     };
@@ -944,7 +944,7 @@ const piemenuCustomNotes = function (
     block._exitWheel.navItems[0].navigateFunction = __exitMenu;
 };
 
-const piemenuNthModalPitch = function (block, noteValues, note) {
+const piemenuNthModalPitch = (block, noteValues, note) => {
     // wheelNav pie menu for scale degree pitch selection
 
     // check if a non-integer value is connected to note argument
@@ -1091,7 +1091,7 @@ const piemenuNthModalPitch = function (block, noteValues, note) {
     // Set up event handlers
     const that = block;
 
-    block.label.addEventListener("change", function () {
+    block.label.addEventListener("change", () => {
         that._labelChanged(false, false);
     });
 
@@ -1100,7 +1100,7 @@ const piemenuNthModalPitch = function (block, noteValues, note) {
      * @return{void}
      * @private
      */
-    const __selectionChanged = function () {
+    const __selectionChanged = () => {
         const label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
         const i = noteLabels.indexOf(label);
         that.value = noteValues[i];
@@ -1122,7 +1122,7 @@ const piemenuNthModalPitch = function (block, noteValues, note) {
      * @return{void}
      * @private
      */
-    const __pitchPreview = function () {
+    const __pitchPreview = () => {
         const label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
         const i = noteLabels.indexOf(label);
 
@@ -1185,7 +1185,7 @@ const piemenuNthModalPitch = function (block, noteValues, note) {
             );
         }
 
-        setTimeout(function () {
+        setTimeout(() => {
             that._triggerLock = false;
         }, 1 / 8);
 
@@ -1201,7 +1201,7 @@ const piemenuNthModalPitch = function (block, noteValues, note) {
     }
 
     // Hide the widget when the exit button is clicked.
-    block._exitWheel.navItems[0].navigateFunction = function () {
+    block._exitWheel.navItems[0].navigateFunction = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
         that._pitchWheel.removeWheel();
@@ -1210,7 +1210,7 @@ const piemenuNthModalPitch = function (block, noteValues, note) {
     };
 };
 
-const piemenuAccidentals = function (block, accidentalLabels, accidentalValues, accidental) {
+const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidental) => {
     // wheelNav pie menu for accidental selection
 
     if (block.blocks.stageClick) {
@@ -1265,7 +1265,7 @@ const piemenuAccidentals = function (block, accidentalLabels, accidentalValues, 
 
     const that = block;
 
-    const __selectionChanged = function () {
+    const __selectionChanged = () => {
         const label =
             that._accidentalWheel.navItems[that._accidentalWheel.selectedNavItemIndex].title;
         const i = labels.indexOf(label);
@@ -1282,7 +1282,7 @@ const piemenuAccidentals = function (block, accidentalLabels, accidentalValues, 
      * @return{void}
      * @private
      */
-    const __exitMenu = function () {
+    const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
         that._accidentalWheel.removeWheel();
@@ -1330,19 +1330,19 @@ const piemenuAccidentals = function (block, accidentalLabels, accidentalValues, 
 
     // Hide the widget when the selection is made.
     for (let i = 0; i < accidentalLabels.length; i++) {
-        block._accidentalWheel.navItems[i].navigateFunction = function () {
+        block._accidentalWheel.navItems[i].navigateFunction = () => {
             __selectionChanged();
             __exitMenu();
         };
     }
 
     // Or use the exit wheel...
-    block._exitWheel.navItems[0].navigateFunction = function () {
+    block._exitWheel.navItems[0].navigateFunction = () => {
         __exitMenu();
     };
 };
 
-const piemenuNoteValue = function (block, noteValue) {
+const piemenuNoteValue = (block, noteValue) => {
     // input form and  wheelNav pie menu for note value selection
 
     if (block.blocks.stageClick) {
@@ -1447,7 +1447,7 @@ const piemenuNoteValue = function (block, noteValue) {
      * @return{void}
      * @private
      */
-    const __selectionChanged = function () {
+    const __selectionChanged = () => {
         that.text.text = that._tabsWheel.navItems[that._tabsWheel.selectedNavItemIndex].title;
         that.value = Number(that.text.text);
 
@@ -1461,7 +1461,7 @@ const piemenuNoteValue = function (block, noteValue) {
      * @return{void}
      * @public
      */
-    const __exitMenu = function () {
+    const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
         that._noteValueWheel.removeWheel();
@@ -1482,7 +1482,7 @@ const piemenuNoteValue = function (block, noteValue) {
 
     block.label.addEventListener("keypress", block._exitKeyPressed.bind(block));
 
-    block.label.addEventListener("change", function () {
+    block.label.addEventListener("change", () => {
         that._labelChanged(false, false);
     });
 
@@ -1521,7 +1521,7 @@ const piemenuNoteValue = function (block, noteValue) {
     block.label.style.width =
         (Math.round(selectorWidth * block.blocks.blockScale) * block.protoblock.scale) / 2 + "px";
 
-    const __showHide = function () {
+    const __showHide = () => {
         // const i = that._noteValueWheel.selectedNavItemIndex;
         for (let k = 0; k < WHEELVALUES.length; k++) {
             for (let j = 0; j < subWheelValues[WHEELVALUES[0]].length; j++) {
@@ -1574,19 +1574,19 @@ const piemenuNoteValue = function (block, noteValue) {
 
     // Hide the widget when the selection is made.
     for (let i = 0; i < tabsLabels.length; i++) {
-        block._tabsWheel.navItems[i].navigateFunction = function () {
+        block._tabsWheel.navItems[i].navigateFunction = () => {
             __selectionChanged();
             __exitMenu();
         };
     }
 
     // Or use the exit wheel...
-    block._exitWheel.navItems[0].navigateFunction = function () {
+    block._exitWheel.navItems[0].navigateFunction = () => {
         __exitMenu();
     };
 };
 
-const piemenuNumber = function (block, wheelValues, selectedValue) {
+const piemenuNumber = (block, wheelValues, selectedValue) => {
     // input form and  wheelNav pie menu for number selection
 
     if (block.blocks.stageClick) {
@@ -1690,7 +1690,7 @@ const piemenuNumber = function (block, wheelValues, selectedValue) {
 
     const that = block;
 
-    const __selectionChanged = function () {
+    const __selectionChanged = () => {
         that.value = wheelValues[that._numberWheel.selectedNavItemIndex];
         that.text.text = wheelLabels[that._numberWheel.selectedNavItemIndex];
 
@@ -1699,7 +1699,7 @@ const piemenuNumber = function (block, wheelValues, selectedValue) {
         that.updateCache();
     };
 
-    const __exitMenu = function () {
+    const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
         that._numberWheel.removeWheel();
@@ -1721,7 +1721,7 @@ const piemenuNumber = function (block, wheelValues, selectedValue) {
 
     block.label.addEventListener("keypress", block._exitKeyPressed.bind(block));
 
-    block.label.addEventListener("change", function () {
+    block.label.addEventListener("change", () => {
         that._labelChanged(false, false);
     });
 
@@ -1782,18 +1782,18 @@ const piemenuNumber = function (block, wheelValues, selectedValue) {
 
     // Hide the widget when the selection is made.
     for (let i = 0; i < wheelLabels.length; i++) {
-        block._numberWheel.navItems[i].navigateFunction = function () {
+        block._numberWheel.navItems[i].navigateFunction = () => {
             __selectionChanged();
             __exitMenu();
         };
     }
 
     // Or use the exit wheel...
-    block._exitWheel.navItems[0].navigateFunction = function () {
+    block._exitWheel.navItems[0].navigateFunction = () => {
         __exitMenu();
     };
 
-    block._exitWheel.navItems[1].navigateFunction = function () {
+    block._exitWheel.navItems[1].navigateFunction = () => {
         const cblk1 = that.connections[0];
         const cblk2 = that.blocks.blockList[cblk1].connections[0];
 
@@ -1817,7 +1817,7 @@ const piemenuNumber = function (block, wheelValues, selectedValue) {
         that.label.value = that.value;
     };
 
-    block._exitWheel.navItems[2].navigateFunction = function () {
+    block._exitWheel.navItems[2].navigateFunction = () => {
         that.value += 1;
         that.text.text = that.value.toString();
 
@@ -1828,7 +1828,7 @@ const piemenuNumber = function (block, wheelValues, selectedValue) {
         that.label.value = that.value;
     };
 
-    const __pitchPreviewForNum = function () {
+    const __pitchPreviewForNum = () => {
         const label = that._numberWheel.navItems[that._numberWheel.selectedNavItemIndex].title;
         const i = wheelLabels.indexOf(label);
         const actualPitch = numberToPitch(wheelValues[i] + 3);
@@ -1860,14 +1860,14 @@ const piemenuNumber = function (block, wheelValues, selectedValue) {
             );
         }
 
-        setTimeout(function () {
+        setTimeout(() => {
             that._triggerLock = false;
         }, 1 / 8);
 
         __selectionChanged();
     };
 
-    const __hertzPreview = function () {
+    const __hertzPreview = () => {
         const label = that._numberWheel.navItems[that._numberWheel.selectedNavItemIndex].title;
         const i = wheelLabels.indexOf(label);
         const actualPitch = frequencyToPitch(wheelValues[i]);
@@ -1899,7 +1899,7 @@ const piemenuNumber = function (block, wheelValues, selectedValue) {
             );
         }
 
-        setTimeout(function () {
+        setTimeout(() => {
             that._triggerLock = false;
         }, 1 / 8);
 
@@ -1926,7 +1926,7 @@ const piemenuNumber = function (block, wheelValues, selectedValue) {
     }
 };
 
-const piemenuColor = function (block, wheelValues, selectedValue, mode) {
+const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     // input form and  wheelNav pie menu for setcolor selection
 
     if (block.blocks.stageClick) {
@@ -2007,7 +2007,7 @@ const piemenuColor = function (block, wheelValues, selectedValue, mode) {
 
     const that = block;
 
-    const __selectionChanged = function () {
+    const __selectionChanged = () => {
         that.value = wheelValues[that._numberWheel.selectedNavItemIndex];
         that.text.text = wheelLabels[that._numberWheel.selectedNavItemIndex];
 
@@ -2016,7 +2016,7 @@ const piemenuColor = function (block, wheelValues, selectedValue, mode) {
         that.updateCache();
     };
 
-    const __exitMenu = function () {
+    const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
         that._numberWheel.removeWheel();
@@ -2034,7 +2034,7 @@ const piemenuColor = function (block, wheelValues, selectedValue, mode) {
 
     block.label.addEventListener("keypress", block._exitKeyPressed.bind(block));
 
-    block.label.addEventListener("change", function () {
+    block.label.addEventListener("change", () => {
         that._labelChanged(false, false);
     });
 
@@ -2089,19 +2089,19 @@ const piemenuColor = function (block, wheelValues, selectedValue, mode) {
 
     // Hide the widget when the selection is made.
     for (let i = 0; i < wheelLabels.length; i++) {
-        block._numberWheel.navItems[i].navigateFunction = function () {
+        block._numberWheel.navItems[i].navigateFunction = () => {
             __selectionChanged();
             __exitMenu();
         };
     }
 
     // Or use the exit wheel...
-    block._exitWheel.navItems[0].navigateFunction = function () {
+    block._exitWheel.navItems[0].navigateFunction = () => {
         __exitMenu();
     };
 };
 
-const piemenuBasic = function (block, menuLabels, menuValues, selectedValue, colors) {
+const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     // basic wheelNav pie menu
 
     if (block.blocks.stageClick) {
@@ -2165,7 +2165,7 @@ const piemenuBasic = function (block, menuLabels, menuValues, selectedValue, col
 
     const that = block;
 
-    const __selectionChanged = function () {
+    const __selectionChanged = () => {
         const label = that._basicWheel.navItems[that._basicWheel.selectedNavItemIndex].title;
         const i = labels.indexOf(label);
         if (that.name === "outputtools") {
@@ -2181,7 +2181,7 @@ const piemenuBasic = function (block, menuLabels, menuValues, selectedValue, col
         that.updateCache();
     };
 
-    const __exitMenu = function () {
+    const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
         that._basicWheel.removeWheel();
@@ -2228,18 +2228,18 @@ const piemenuBasic = function (block, menuLabels, menuValues, selectedValue, col
 
     // Hide the widget when the selection is made.
     for (let i = 0; i < menuLabels.length; i++) {
-        block._basicWheel.navItems[i].navigateFunction = function () {
+        block._basicWheel.navItems[i].navigateFunction = () => {
             __selectionChanged();
             __exitMenu();
         };
     }
 
-    block._exitWheel.navItems[0].navigateFunction = function () {
+    block._exitWheel.navItems[0].navigateFunction = () => {
         __exitMenu();
     };
 };
 
-const piemenuBoolean = function (block, booleanLabels, booleanValues, boolean) {
+const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
     // wheelNav pie menu for boolean selection
 
     if (block.blocks.stageClick) {
@@ -2273,7 +2273,7 @@ const piemenuBoolean = function (block, booleanLabels, booleanValues, boolean) {
 
     const that = block;
 
-    const __selectionChanged = function () {
+    const __selectionChanged = () => {
         const label = that._booleanWheel.navItems[that._booleanWheel.selectedNavItemIndex].title;
         const i = labels.indexOf(label);
         that.value = booleanValues[i];
@@ -2284,7 +2284,7 @@ const piemenuBoolean = function (block, booleanLabels, booleanValues, boolean) {
         that.updateCache();
     };
 
-    const __exitMenu = function () {
+    const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
         that._booleanWheel.removeWheel();
@@ -2330,19 +2330,19 @@ const piemenuBoolean = function (block, booleanLabels, booleanValues, boolean) {
     block._booleanWheel.navigateWheel(i);
 
     // Hide the widget when the selection is made.
-    block._booleanWheel.navItems[0].navigateFunction = function () {
+    block._booleanWheel.navItems[0].navigateFunction = () => {
         __selectionChanged();
         __exitMenu();
     };
 
-    block._booleanWheel.navItems[1].navigateFunction = function () {
+    block._booleanWheel.navItems[1].navigateFunction = () => {
         __selectionChanged();
         __exitMenu();
     };
 };
 
 
-const piemenuChords = function (block, selectedChord) {
+const piemenuChords = (block, selectedChord) => {
     // wheelNav pie menu for chord selection
 
     if (block.blocks.stageClick) {
@@ -2402,7 +2402,7 @@ const piemenuChords = function (block, selectedChord) {
 
     const that = block;
 
-    const __selectionChanged = function () {
+    const __selectionChanged = () => {
         that.text.text = that._chordWheel.navItems[that._chordWheel.selectedNavItemIndex].title;
         that.value = CHORDNAMES[that._chordWheel.selectedNavItemIndex];
 
@@ -2411,7 +2411,7 @@ const piemenuChords = function (block, selectedChord) {
         that.updateCache();
     };
 
-    const __exitMenu = function () {
+    const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
         that._chordWheel.removeWheel();
@@ -2458,19 +2458,19 @@ const piemenuChords = function (block, selectedChord) {
 
     // Hide the widget when the selection is made.
     for (let i = 0; i < chordLabels.length; i++) {
-        block._chordWheel.navItems[i].navigateFunction = function () {
+        block._chordWheel.navItems[i].navigateFunction = () => {
             __selectionChanged();
             __exitMenu();
         };
     }
 
-    block._exitWheel.navItems[0].navigateFunction = function () {
+    block._exitWheel.navItems[0].navigateFunction = () => {
         __exitMenu();
     };
 };
 
 
-const piemenuVoices = function (block, voiceLabels, voiceValues, categories, voice, rotate) {
+const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotate) => {
     // wheelNav pie menu for voice selection
 
     if (block.blocks.stageClick) {
@@ -2543,7 +2543,7 @@ const piemenuVoices = function (block, voiceLabels, voiceValues, categories, voi
 
     const that = block;
 
-    const __selectionChanged = function () {
+    const __selectionChanged = () => {
         const label = that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex].title;
         const i = voiceLabels.indexOf(label);
         that.value = voiceValues[i];
@@ -2565,7 +2565,7 @@ const piemenuVoices = function (block, voiceLabels, voiceValues, categories, voi
      * @return{void}
      * @private
      */
-    const __voicePreview = function () {
+    const __voicePreview = () => {
         const label = that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex].title;
         const i = voiceLabels.indexOf(label);
         const voice = voiceValues[i];
@@ -2587,7 +2587,7 @@ const piemenuVoices = function (block, voiceLabels, voiceValues, categories, voi
             timeout = 500;
         }
 
-        setTimeout(function () {
+        setTimeout(() => {
             that.activity.logo.synth.setMasterVolume(DEFAULTVOLUME);
             Singer.setSynthVolume(that.activity.logo, 0, voice, DEFAULTVOLUME);
             that.activity.logo.synth.trigger(0, "G4", 1 / 4, voice, null, null, false);
@@ -2642,13 +2642,13 @@ const piemenuVoices = function (block, voiceLabels, voiceValues, categories, voi
     }
 
     // Hide the widget when the exit button is clicked.
-    block._exitWheel.navItems[0].navigateFunction = function () {
+    block._exitWheel.navItems[0].navigateFunction = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
     };
 };
 
-const piemenuIntervals = function (block, selectedInterval) {
+const piemenuIntervals = (block, selectedInterval) => {
     // pie menu for interval selection
 
     if (block.blocks.stageClick) {
@@ -2765,8 +2765,8 @@ const piemenuIntervals = function (block, selectedInterval) {
 
     // Add function to each main menu for show/hide sub menus
     // FIXME: Add all tabs to each interval
-    const __setupAction = function (i, activeTabs) {
-        that._intervalNameWheel.navItems[i].navigateFunction = function () {
+    const __setupAction = (i, activeTabs) => {
+        that._intervalNameWheel.navItems[i].navigateFunction = () => {
             for (let l = 0; l < labels.length; l++) {
                 for (let j = 0; j < 8; j++) {
                     if (l !== i) {
@@ -2809,12 +2809,12 @@ const piemenuIntervals = function (block, selectedInterval) {
         block._intervalWheel.navigateWheel(INTERVALS[i][2][0] - 1);
     }
 
-    const __exitMenu = function () {
+    const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
         docById("wheelDiv").style.display = "none";
     };
 
-    const __selectionChanged = function () {
+    const __selectionChanged = () => {
         const label =
             that._intervalNameWheel.navItems[that._intervalNameWheel.selectedNavItemIndex].title;
         const number = that._intervalWheel.navItems[that._intervalWheel.selectedNavItemIndex].title;
@@ -2860,7 +2860,7 @@ const piemenuIntervals = function (block, selectedInterval) {
             );
         }
 
-        setTimeout(function () {
+        setTimeout(() => {
             that._triggerLock = false;
         }, 1 / 8);
     };
@@ -2873,7 +2873,7 @@ const piemenuIntervals = function (block, selectedInterval) {
     block._exitWheel.navItems[0].navigateFunction = __exitMenu;
 };
 
-const piemenuModes = function (block, selectedMode) {
+const piemenuModes = (block, selectedMode) => {
     // pie menu for mode selection
 
     if (block.blocks.stageClick) {
@@ -2965,7 +2965,7 @@ const piemenuModes = function (block, selectedMode) {
 
     const that = block;
 
-    const __selectionChanged = function () {
+    const __selectionChanged = () => {
         const title = that._modeNameWheel.navItems[that._modeNameWheel.selectedNavItemIndex].title;
         if (title === " ") {
             that._modeNameWheel.navigateWheel(
@@ -2997,8 +2997,8 @@ const piemenuModes = function (block, selectedMode) {
     };
 
     // Add function to each main menu for show/hide sub menus
-    const __setupAction = function (i, activeTabs) {
-        that._modeNameWheel.navItems[i].navigateFunction = function () {
+    const __setupAction = (i, activeTabs) => {
+        that._modeNameWheel.navItems[i].navigateFunction = () => {
             for (let j = 0; j < 12; j++) {
                 if (activeTabs.indexOf(j) === -1) {
                     that._modeWheel.navItems[j].navItem.hide();
@@ -3012,7 +3012,7 @@ const piemenuModes = function (block, selectedMode) {
     };
 
     // Build a pie menu of modes based on the current mode group.
-    const __buildModeNameWheel = function (grp) {
+    const __buildModeNameWheel = (grp) => {
         let newWheel = false;
         if (that._modeNameWheel === null) {
             that._modeNameWheel = new wheelnav("_modeNameWheel", that._modeWheel.raphael);
@@ -3129,7 +3129,7 @@ const piemenuModes = function (block, selectedMode) {
 
     let timeout;
 
-    const __exitMenu = function () {
+    const __exitMenu = () => {
         if (timeout) {
             clearTimeout(timeout);
         }
@@ -3140,7 +3140,7 @@ const piemenuModes = function (block, selectedMode) {
         }
     };
 
-    const __playNote = function () {
+    const __playNote = () => {
         let o = 0;
         if (octave) {
             o = 12;
@@ -3167,7 +3167,7 @@ const piemenuModes = function (block, selectedMode) {
         that.activity.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 12, DEFAULTVOICE, null, null);
     };
 
-    const __playScale = function (activeTabs, idx) {
+    const __playScale = (activeTabs, idx) => {
         // loop through selecting modeWheel slices with a delay.
         if (idx < activeTabs.length) {
             if (activeTabs[idx] < 12) {
@@ -3178,7 +3178,7 @@ const piemenuModes = function (block, selectedMode) {
                 that._modeWheel.navigateWheel(0);
             }
 
-            timeout = setTimeout(function () {
+            timeout = setTimeout(() => {
                 __playScale(activeTabs, idx + 1);
             }, 1000 / 10); // slight delay between notes
         }
@@ -3189,7 +3189,7 @@ const piemenuModes = function (block, selectedMode) {
      * @return{void}
      * @private
      */
-    const __prepScale = function () {
+    const __prepScale = () => {
         const activeTabs = [0];
         const mode = MUSICALMODES[that.value];
         for (let k = 0; k < mode.length - 1; k++) {
@@ -3206,7 +3206,7 @@ const piemenuModes = function (block, selectedMode) {
         docById("wheelnav-_exitWheel-title-1").style.fill = "#ffffff";
         docById("wheelnav-_exitWheel-title-1").style.pointerEvents = "none";
         docById("wheelnav-_exitWheel-slice-1").style.pointerEvents = "none";
-        setTimeout(function () {
+        setTimeout(() => {
             const playButtonTitle = docById("wheelnav-_exitWheel-title-1");
             const playButtonSlice = docById("wheelnav-_exitWheel-slice-1");
             if (playButtonTitle && playButtonSlice) {
@@ -3275,7 +3275,7 @@ const piemenuModes = function (block, selectedMode) {
         modeGroup = "7";
     }
 
-    const __buildModeWheel = function () {
+    const __buildModeWheel = () => {
         const i = that._modeGroupWheel.selectedNavItemIndex;
         modeGroup = that._modeGroupWheel.navItems[i].title;
         __buildModeNameWheel(modeGroup);
@@ -3299,7 +3299,7 @@ const piemenuModes = function (block, selectedMode) {
 /*
  * Sets up context menu for each block
  */
-const piemenuBlockContext = function (block) {
+const piemenuBlockContext = (block) => {
     if (block.blocks.activeBlock === null) {
         return;
     }
@@ -3386,7 +3386,7 @@ const piemenuBlockContext = function (block) {
 
     wheel.navItems[0].selected = false;
 
-    wheel.navItems[0].navigateFunction = function () {
+    wheel.navItems[0].navigateFunction = () => {
         that.blocks.activeBlock = blockBlock;
         that.blocks.prepareStackForCopy();
         that.blocks.pasteDx = pasteDx;
@@ -3396,20 +3396,20 @@ const piemenuBlockContext = function (block) {
         pasteDy += 21;
     };
 
-    wheel.navItems[1].navigateFunction = function () {
+    wheel.navItems[1].navigateFunction = () => {
         that.blocks.activeBlock = blockBlock;
         that.blocks.extract();
         docById("contextWheelDiv").style.display = "none";
     };
 
-    wheel.navItems[2].navigateFunction = function () {
+    wheel.navItems[2].navigateFunction = () => {
         that.blocks.activeBlock = blockBlock;
         that.blocks.extract();
         that.blocks.sendStackToTrash(that.blocks.blockList[blockBlock]);
         docById("contextWheelDiv").style.display = "none";
     };
 
-    wheel.navItems[3].navigateFunction = function () {
+    wheel.navItems[3].navigateFunction = () => {
         docById("contextWheelDiv").style.display = "none";
     };
 
@@ -3418,7 +3418,7 @@ const piemenuBlockContext = function (block) {
             block.name
         ) !== -1
     ) {
-        wheel.navItems[4].navigateFunction = function () {
+        wheel.navItems[4].navigateFunction = () => {
             that.blocks.activeBlock = blockBlock;
             that.blocks.prepareStackForCopy();
             that.blocks.saveStack();
@@ -3426,14 +3426,14 @@ const piemenuBlockContext = function (block) {
     }
 
     if (helpButton !== null) {
-        wheel.navItems[helpButton].navigateFunction = function () {
+        wheel.navItems[helpButton].navigateFunction = () => {
             that.blocks.activeBlock = blockBlock;
             new HelpWidget(that, true);
             docById("contextWheelDiv").style.display = "none";
         };
     }
 
-    setTimeout(function () {
+    setTimeout(() => {
         that.blocks.stageClick = false;
     }, 500);
 };
@@ -3443,7 +3443,7 @@ const piemenuBlockContext = function (block) {
  *
  * @returns {void}
  */
-const piemenuGrid = function (activity) {
+const piemenuGrid = (activity) => {
     docById("wheelDivptm").style.display = "none";
     const x = activity.turtles.gridButton.getBoundingClientRect().x;
     const y = activity.turtles.gridButton.getBoundingClientRect().y;
@@ -3792,8 +3792,8 @@ const piemenuKey = (activity) => {
         activity.storage.KeySignatureEnv = activity.KeySignatureEnv;
     };
 
-    const __setupActionKey = function (i) {
-        keyNameWheel.navItems[i].navigateFunction = function () {
+    const __setupActionKey = (i) => {
+        keyNameWheel.navItems[i].navigateFunction = () => {
             for (let j = 0; j < keys2.length; j++) {
                 if (Math.floor(j / 2) != i) {
                     keyNameWheel2.navItems[j].navItem.hide();
@@ -3831,19 +3831,19 @@ const piemenuKey = (activity) => {
     };
 
     for (let i = 0; i < modes.length; i++) {
-        modenameWheel.navItems[i].navigateFunction = function () {
+        modenameWheel.navItems[i].navigateFunction = () => {
             __selectionChangedMode();
         };
     }
 
-    const __selectionChangedKey2 = function () {
+    const __selectionChangedKey2 = () => {
         const selection = keyNameWheel2.navItems[keyNameWheel2.selectedNavItemIndex].title;
         activity.KeySignatureEnv[0] = selection;
         activity.storage.KeySignatureEnv = activity.KeySignatureEnv;
     };
 
     for (let i = 0; i < keys2.length; i++) {
-        keyNameWheel2.navItems[i].navigateFunction = function () {
+        keyNameWheel2.navItems[i].navigateFunction = () => {
             __selectionChangedKey2();
         };
     }

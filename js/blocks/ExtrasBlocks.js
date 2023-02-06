@@ -19,7 +19,7 @@
 
 /* exported setupExtrasBlocks */
 
-function setupExtrasBlocks(activity) {
+const setupExtrasBlocks = (activity) => {
     class FloatToStringBlock extends LeftBlock {
         constructor() {
             super("float2string", _("fraction"));

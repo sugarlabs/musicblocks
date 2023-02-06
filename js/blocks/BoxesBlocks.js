@@ -18,7 +18,7 @@
 
 /* exported setupBoxesBlocks */
 
-function setupBoxesBlocks(activity) {
+const setupBoxesBlocks = (activity) => {
     class IncrementBlock extends FlowBlock {
         constructor(name) {
             super(name || "increment");
@@ -34,8 +34,8 @@ function setupBoxesBlocks(activity) {
             } else {
                 this.setHelpString([
                     _("The Add-to block is used to add to the value stored in a box.") +
-                        " " +
-                        _("It can also be used with other blocks such as Color and Pen size."),
+                    " " +
+                    _("It can also be used with other blocks such as Color and Pen size."),
                     "documentation",
                     ""
                 ]);

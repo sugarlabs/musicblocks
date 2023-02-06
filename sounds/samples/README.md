@@ -24,7 +24,7 @@ How to add a new sample sound
    ```
    piano.js
 
-   PIANO_SAMPLE = function () {
+   PIANO_SAMPLE = () => {
     return "data:audio/wav;base64,BASE64ENCODEDSAMPLEDATA";
    };
    ```
@@ -50,7 +50,7 @@ on one line.
    const SAMPLECENTERNO = {
     'piano': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
 
-   this.loadSamples = function () {
+   this.loadSamples = () => {
        this.samplesManifest = {
            'voice': [
                {'name': 'piano', 'data': PIANO_SAMPLE},

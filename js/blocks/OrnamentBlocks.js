@@ -18,7 +18,7 @@
 
 /* exported setupOrnamentBlocks */
 
-function setupOrnamentBlocks(activity) {
+const setupOrnamentBlocks = (activity) => {
     class StaccatoFactorBlock extends ValueBlock {
         constructor() {
             //.TRANS: the duration of a note played as staccato

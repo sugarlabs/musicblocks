@@ -25,7 +25,7 @@
 
 /* exported setupPitchBlocks */
 
-function setupPitchBlocks(activity) {
+const setupPitchBlocks = (activity) => {
     class RestBlock extends ValueBlock {
         constructor() {
             super("rest");

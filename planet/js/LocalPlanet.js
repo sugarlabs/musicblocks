@@ -88,7 +88,7 @@ function LocalPlanet(Planet) {
         document.getElementById("deleter-button").addEventListener(
             "click",
             // eslint-disable-next-line no-unused-vars
-            function (evt) {
+            (evt) => {
                 if (t.DeleteModalID !== null) {
                     Planet.ProjectStorage.deleteProject(t.DeleteModalID);
                 }

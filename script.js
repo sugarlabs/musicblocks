@@ -4,7 +4,7 @@
    $
 */
 
-$(document).ready(function () {
+$(document).ready(() => {
     var mode = localStorage.beginnerMode;
 
     var modeIcon = document.getElementById("mode");

@@ -18,7 +18,7 @@
 
 /* exported setupMeterBlocks */
 
-function setupMeterBlocks(activity) {
+const setupMeterBlocks = (activity) => {
     class CurrentMeterBlock extends ValueBlock {
         constructor() {
             //.TRANS: musical meter (time signature), e.g., 4:4
