@@ -148,6 +148,13 @@
 | --- | --- |
 | drum-machine.html | Starting point for programming an interactive drum machine |
 
+| Example | Description |
+| --- | --- |
+| Fat-Backs.html | Drum exercise: multiple combination of ABAC and ABCB measures using floor tom and snare drums. |
+| Fat-Backs-2.html | Drum exercise: multiple combination of ABAC and ABCB measures, with a hi hat thrown into the mix. |
+
+
+
 # Transcriptions
 
 | Example | Description |
