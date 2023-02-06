@@ -752,7 +752,7 @@ block.
 
 ![Scale Degree Improv Example](./scale-degree-improv.svg "Scale Degree Improv")
 
-[Scale Degree Improv](https://rawgit.com/sugarlabs/musicblocks/master/examples/Scale-Degree-Improv.html)
+[Scale Degree Improv](https://musicblocks.sugarlabs.org/index.html?id=1675577999425474&run=True)
 
 #### <a name="INTERVALS">3.2.7 Intervals</a>
 
