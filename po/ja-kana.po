@@ -6354,6 +6354,9 @@ msgstr "タムタム"
 msgid "floor tom"
 msgstr "フロアタム"
 
+msgid "bass drum"
+msgstr "バスドラム"
+
 #: js/musicutils.js:737
 #: js/synthutils.js:135
 #.TRANS: a drum made from an inverted cup

@@ -6361,6 +6361,9 @@ msgstr "tom tom"
 msgid "floor tom"
 msgstr "piso tom"
 
+msgid "bass drum"
+msgstr "tambor de bajo"
+
 #: js/musicutils.js:737
 #: js/synthutils.js:135
 #.TRANS: a drum made from an inverted cup
