@@ -131,6 +131,8 @@ const DRUMNAMES = [
     [_("tom tom"), "tom tom", "images/tom.svg", "tomml", "drum"],
     //.TRANS: musical instrument
     [_("floor tom"), "floor tom tom", "images/floortom.svg", "tomfl", "drum"],
+    //.TRANS: musical instrument
+    [_("bass drum"), "bass drum", "images/kick.svg", "tomfl", "drum"],
     //.TRANS: a drum made from an inverted cup
     [_("cup drum"), "cup drum", "images/cup.svg", "hh", "drum"],
     //.TRANS: musical instrument
@@ -214,6 +216,7 @@ const SOUNDSAMPLESDEFINES = [
     "samples/clang",
     "samples/cup",
     "samples/floortom",
+    "samples/bassdrum",
     "samples/snare",
     "samples/piano",
     "samples/acguit",
@@ -246,6 +249,7 @@ const DEFAULTSYNTHVOLUME = {
     "kick drum": 100,
     "tom tom": 100,
     "floor tom": 100,
+    "bass drum": 100,
     "cup drum": 100,
     "darbuka drum": 100,
     "hi hat": 100,
@@ -705,6 +709,7 @@ function Synth() {
                 { name: "clang", data: CLANG_SAMPLE },
                 { name: "cup drum", data: CUP_SAMPLE },
                 { name: "floor tom tom", data: FLOORTOM_SAMPLE },
+                { name: "bass drum", data: BASSDRUM_SAMPLE },
                 { name: "snare drum", data: SNARE_SAMPLE }
             ]
         };
