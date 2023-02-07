@@ -141,7 +141,7 @@ class MusicBlocks {
          * Invoked at start of run.
          * @returns {void}
          */
-        function CreateAPIMethodList() {
+        const CreateAPIMethodList = () => {
             [
                 "Painter",
                 // "Painter.GraphicsActions",

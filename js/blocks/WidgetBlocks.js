@@ -64,7 +64,7 @@
 
 /* exported setupWidgetBlocks */
 
-function setupWidgetBlocks(activity) {
+const setupWidgetBlocks = (activity) => {
     class EnvelopeBlock extends FlowBlock {
         constructor() {
             //.TRANS: sound envelope (ADSR)
@@ -804,7 +804,7 @@ function setupWidgetBlocks(activity) {
             ]);
         }
 
-        flow() {}
+        flow() { }
     }
 
     class MusicKeyboard2Block extends StackClampBlock {

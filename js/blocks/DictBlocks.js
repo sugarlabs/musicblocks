@@ -17,7 +17,7 @@
 
 /* exported setupDictBlocks */
 
-function setupDictBlocks(activity) {
+const setupDictBlocks = (activity) => {
     class ShowDictBlock extends FlowBlock {
         constructor() {
             super("showDict");

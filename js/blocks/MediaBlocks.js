@@ -19,7 +19,7 @@
 
 /* exported setupMediaBlocks */
 
-function setupMediaBlocks(activity) {
+const setupMediaBlocks = (activity) => {
     class RightPosBlock extends ValueBlock {
         constructor() {
             //.TRANS: right side of the screen

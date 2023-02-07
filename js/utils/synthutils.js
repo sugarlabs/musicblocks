@@ -334,7 +334,7 @@ const instrumentsEffects = { 0: {} };
 
 const instrumentsFilters = { 0: {} };
 
-function Synth() {
+const Synth = () => {
     // Isolate synth functions here.
 
     const BUILTIN_SYNTHS = {

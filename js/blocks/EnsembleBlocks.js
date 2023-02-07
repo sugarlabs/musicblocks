@@ -25,7 +25,7 @@
  * @param   {number|string} targetTurtle
  * @returns {number|null}
  */
-function getTargetTurtle(turtles, targetTurtle) {
+const getTargetTurtle = (turtles, targetTurtle) => {
     // We'll compare the names as strings so convert to "string" if "number".
     targetTurtle = targetTurtle.toString();
 
@@ -43,7 +43,7 @@ function getTargetTurtle(turtles, targetTurtle) {
     return null;
 }
 
-function _blockFindTurtle(activity, turtle, blk, receivedArg) {
+const _blockFindTurtle = (activity, turtle, blk, receivedArg) => {
     const cblk = activity.blocks.blockList[blk].connections[1];
     if (cblk === null) {
         // eslint-disable-next-line no-console
@@ -59,7 +59,7 @@ function _blockFindTurtle(activity, turtle, blk, receivedArg) {
     return activity.turtles.turtleList[getTargetTurtle(activity.turtles, targetTurtle)];
 }
 
-function setupEnsembleBlocks(activity) {
+const setupEnsembleBlocks = (activity) => {
     class TurtleHeapBlock extends LeftBlock {
         constructor() {
             if (_THIS_IS_MUSIC_BLOCKS_) {

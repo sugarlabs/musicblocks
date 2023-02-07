@@ -17,7 +17,7 @@
 
 /* exported setupProgramBlocks */
 
-function setupProgramBlocks(activity) {
+const setupProgramBlocks = (activity) => {
 
     class LoadHeapFromAppBlock extends FlowBlock {
         constructor() {
@@ -954,7 +954,7 @@ function setupProgramBlocks(activity) {
 
             const url = args[0];
 
-            function ValidURL(str) {
+            const  ValidURL = (str) => {
                 const pattern = new RegExp(
                     "^(https?:\\/\\/)?" + // protocol
                     "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name

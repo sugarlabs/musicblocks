@@ -49,7 +49,7 @@ const changeImage = (imgElement, from, to) => {
     }
 };
 
-function _(text) {
+const _ = (text) => {
     if (text === null) {
         // console.debug("null string passed to _");
         return "";
@@ -122,7 +122,7 @@ let format = (str, data) => {
     });
 }
 
-function canvasPixelRatio() {
+const canvasPixelRatio = () => {
     const devicePixelRatio = window.devicePixelRatio || 1;
     const context = document.querySelector("#myCanvas").getContext("2d");
     const backingStoreRatio =
@@ -135,7 +135,7 @@ function canvasPixelRatio() {
     return devicePixelRatio / backingStoreRatio;
 }
 
-function windowHeight() {
+const windowHeight = () => {
     const onAndroid = /Android/i.test(navigator.userAgent);
     if (onAndroid) {
         return window.outerHeight;
@@ -144,7 +144,7 @@ function windowHeight() {
     }
 }
 
-function windowWidth() {
+const windowWidth = () => {
     const onAndroid = /Android/i.test(navigator.userAgent);
     if (onAndroid) {
         return window.outerWidth;
@@ -182,7 +182,7 @@ let httpPost = (projectName, data) => {
     // return 'https://apps.facebook.com/turtleblocks/?file=' + projectName;
 }
 
-function HttpRequest(url, loadCallback, userCallback) {
+const HttpRequest = (url, loadCallback, userCallback) => {
     // userCallback is an optional callback-handler.
     const req = (this.request = new XMLHttpRequest());
     this.handler = loadCallback;
@@ -215,7 +215,7 @@ function HttpRequest(url, loadCallback, userCallback) {
     }
 }
 
-function doBrowserCheck() {
+const doBrowserCheck = () => {
     jQuery.uaMatch = (ua) => {
         ua = ua.toLowerCase();
 
@@ -301,23 +301,23 @@ window.onload = () => {
     }
 };
 
-function docByClass(classname) {
+const docByClass = (classname) => {
     return document.getElementsByClassName(classname);
 }
 
-function docByTagName(tag) {
+const docByTagName = (tag) => {
     document.getElementsByTagName(tag);
 }
 
-function docById(id) {
+const docById = (id) => {
     return document.getElementById(id);
 }
 
-function docByName(name) {
+const docByName = (name) => {
     return document.getElementsByName(name);
 }
 
-function docBySelector(selector) {
+const docBySelector = (selector) => {
     return document.querySelector(selector);
 }
 
@@ -339,7 +339,7 @@ let getTextWidth = (text, font) => {
     return metrics.width;
 }
 
-function doSVG(canvas, logo, turtles, width, height, scale) {
+const doSVG = (canvas, logo, turtles, width, height, scale) => {
     // Aggregate SVG output from each turtle. If there is none, return an empty string.
 
     let turtleSVG = "";
@@ -782,7 +782,7 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
         errorMsg("Your browser does not support the webcam");
     }
 
-    function draw() {
+    const draw = () => {
         canvas.width = w;
         canvas.height = h;
         canvas.getContext("2d").drawImage(video, 0, 0, w, h);
@@ -843,7 +843,7 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
     );
 }
 
-function doStopVideoCam(cameraID, setCameraID) {
+const doStopVideoCam = (cameraID, setCameraID) => {
     if (cameraID !== null) {
         window.clearInterval(cameraID);
     }
@@ -852,7 +852,7 @@ function doStopVideoCam(cameraID, setCameraID) {
     document.querySelector("#camVideo").pause();
 }
 
-function hideDOMLabel() {
+const hideDOMLabel = () => {
     const textLabel = docById("textLabel");
     if (textLabel !== null) {
         textLabel.style.display = "none";
@@ -869,7 +869,7 @@ function hideDOMLabel() {
     }
 }
 
-function displayMsg(/*blocks, text*/) {
+const displayMsg = (/*blocks, text*/) => {
     /*
     let msgContainer = blocks.msgText.parent;
     msgContainer.visible = true;
@@ -880,7 +880,7 @@ function displayMsg(/*blocks, text*/) {
     return;
 }
 
-function safeSVG(label) {
+const safeSVG = (label) => {
     if (typeof label === "string") {
         return label.replace(/&/, "&amp;").replace(/</, "&lt;").replace(/>/, "&gt;");
     } else {
@@ -888,7 +888,7 @@ function safeSVG(label) {
     }
 }
 
-function toFixed2(d) {
+const toFixed2 = (d) => {
     // Return number as fixed 2 precision
     if (typeof d === "number") {
         const floor = Math.floor(d);
@@ -902,7 +902,7 @@ function toFixed2(d) {
     }
 }
 
-function rationalToFraction(d) {
+const rationalToFraction = (d) => {
     /*
     Convert float to its approximate fractional representation. '''
 
@@ -953,7 +953,7 @@ readable-fractions/681534#681534
     }
 }
 
-function GCD(a, b) {
+const GCD = (a, b) => {
     a = Math.abs(a);
     b = Math.abs(b);
 
@@ -1237,7 +1237,7 @@ let delayExecution = (duration) => {
     });
 }
 
-function closeWidgets() {
+const closeWidgets = () => {
     window.widgetWindows.hideAllWindows();
 }
 

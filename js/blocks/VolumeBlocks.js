@@ -19,7 +19,7 @@
 
 /* exported setupVolumeBlocks */
 
-function setupVolumeBlocks(activity) {
+const setupVolumeBlocks = (activity) => {
     class SynthVolumeBlock extends LeftBlock {
         constructor() {
             //.TRANS: the volume for this synth

@@ -18,7 +18,7 @@
 
 /* exported setupActionBlocks */
 
-function setupActionBlocks(activity) {
+const setupActionBlocks = (activity) => {
     class ReturnBlock extends FlowBlock {
         constructor() {
             super("return");
@@ -555,10 +555,10 @@ function setupActionBlocks(activity) {
 
             this.setHelpString([
                 _("The Do block is used to initiate an action.") +
-                    " " +
-                    _(
-                        "In the example, it is used with the One of block to choose a random phase."
-                    ),
+                " " +
+                _(
+                    "In the example, it is used with the One of block to choose a random phase."
+                ),
                 "documentation",
                 null,
                 "dohelp"
@@ -606,8 +606,8 @@ function setupActionBlocks(activity) {
             } else {
                 this.setHelpString([
                     _("The Listen block is used to listen for an event such as a mouse click.") +
-                        " " +
-                        _("When the event happens, an action is taken."),
+                    " " +
+                    _("When the event happens, an action is taken."),
                     "documentation",
                     null,
                     "broadcasthelp"
@@ -708,10 +708,10 @@ function setupActionBlocks(activity) {
 
             this.setHelpString([
                 _("Each Start block is a separate voice.") +
-                    " " +
-                    _(
-                        "All of the Start blocks run at the same time when the Play button is pressed."
-                    ),
+                " " +
+                _(
+                    "All of the Start blocks run at the same time when the Play button is pressed."
+                ),
                 "documentation",
                 ""
             ]);
@@ -748,8 +748,8 @@ function setupActionBlocks(activity) {
 
             this.setHelpString([
                 _("The Action block is used to group together blocks so that they can be used more than once.") +
-                    " " +
-                    _("It is often used for storing a phrase of music that is repeated."),
+                " " +
+                _("It is often used for storing a phrase of music that is repeated."),
                 "documentation",
                 null,
                 "actionhelp"
@@ -868,7 +868,7 @@ function setupActionBlocks(activity) {
             this.hidden = true;
         }
 
-        flow() {}
+        flow() { }
     }
 
     new ReturnBlock().setup(activity);

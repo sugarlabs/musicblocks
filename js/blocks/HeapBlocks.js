@@ -17,7 +17,7 @@
 
 /* exported setupHeapBlocks */
 
-function setupHeapBlocks(activity) {
+const setupHeapBlocks = (activity) => {
 
     class HeapBlock extends ValueBlock {
         constructor() {

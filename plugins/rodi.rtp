@@ -158,7 +158,7 @@ globalActivity.logo.pluginVars['rodi']['doSyncCall'] = function (logo, blk, url)
     }
 };
 
-globalActivity.logo.pluginVars['rodi']['doRodiStop'] = function () {
+globalActivity.logo.pluginVars['rodi']['doRodiStop'] = () => {
     globalActivity.logo.pluginVars['rodi']['doRodiMove'](null, null, 0, 0);
 };
 

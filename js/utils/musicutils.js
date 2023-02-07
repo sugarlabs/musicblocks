@@ -1481,12 +1481,12 @@ const getInvertMode = (name) => {
 
 const getIntervalNumber = name => { return INTERVALVALUES[name][0]; };
 
-const getIntervalDirection = name =>  { return INTERVALVALUES[name][1];};
+const getIntervalDirection = name => { return INTERVALVALUES[name][1]; };
 
-const getIntervalRatio = name => { return INTERVALVALUES[name][2];};
+const getIntervalRatio = name => { return INTERVALVALUES[name][2]; };
 
 const getModeNumbers = (name) => {
-    const __convert =  obj => {
+    const __convert = obj => {
         let n = 0;
         let m = "";
         for (let i = 0; i < obj.length; i++) {
@@ -2704,7 +2704,7 @@ const numberToPitch = (i, temperament, startPitch, offset) => {
     }
 };
 
-function getNote(
+const getNote = (
     noteArg,
     octave,
     transposition,
@@ -2713,7 +2713,7 @@ function getNote(
     direction,
     errorMsg,
     temperament
-) {
+) => {
     if (temperament === undefined) {
         temperament = "equal";
     }
@@ -2839,10 +2839,10 @@ function getNote(
                     // eslint-disable-next-line no-console
                     console.debug(
                         "WARNING: Key " +
-                            myKeySignature +
-                            " not found in " +
-                            thisScale +
-                            ". Using default of C"
+                        myKeySignature +
+                        " not found in " +
+                        thisScale +
+                        ". Using default of C"
                     );
                     offset = 0;
                     thisScale = NOTESSHARP;
@@ -3441,7 +3441,7 @@ const buildScale = (keySignature) => {
             }
         }
     }
- 
+
     return [scale, halfSteps];
 };
 
@@ -4028,7 +4028,7 @@ const getInterval = (interval, keySignature, pitch) => {
 };
 
 const reducedFraction = (a, b) => {
-    const greatestCommonMultiple =  (a, b) => {
+    const greatestCommonMultiple = (a, b) => {
         return b === 0 ? a : greatestCommonMultiple(b, a % b);
     };
 

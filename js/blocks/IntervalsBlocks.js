@@ -32,7 +32,7 @@
 /* exported setupIntervalsBlocks */
 
 
-function setupIntervalsBlocks(activity) {
+const setupIntervalsBlocks = (activity) => {
     class SetTemperamentBlock extends FlowBlock {
         constructor() {
             super("settemperament", _("set temperament"));
@@ -393,7 +393,7 @@ function setupIntervalsBlocks(activity) {
         }
     }
 
-    function makeSemitoneIntervalMacroBlocks() {
+    const makeSemitoneIntervalMacroBlocks = () => {
         class SemitoneIntervalMacroBlock extends FlowBlock {
             constructor(type, value, isDown) {
                 super(

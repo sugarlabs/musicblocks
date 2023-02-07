@@ -1030,7 +1030,7 @@ class Blocks {
                                     protoblock.name === "nameddo" &&
                                     protoblock.defaults[0] === that.blockList[oldBlock].value
                                 ) {
-                                    setTimeout(function () {
+                                    setTimeout(() => {
                                         blockPalette.remove(protoblock, that.blockList[oldBlock].value);
                                         delete that
                                             .protoBlockDict["myDo_" + that.blockList[oldBlock].value];
@@ -1072,7 +1072,7 @@ class Blocks {
             } else if (this.blockList[parentblk].name === "temperament1") {
                 cblk = this.blockList[parentblk].connections[1];
                 if (cblk == null) {
-                    const postProcess = function (args) {
+                    const postProcess = (args) => {
                         const parentblk = args[0];
                         const oldBlock = args[1];
 
@@ -3235,7 +3235,7 @@ class Blocks {
 
                 postProcessArg = [thisBlock, DEFAULTCHORD];
             } else if (name === "accidentalname") {
-                postProcess = function (args) {
+                postProcess = (args) => {
                     const b = args[0];
                     const v = args[1];
                     that.blockList[b].value = v;
@@ -3271,7 +3271,7 @@ class Blocks {
 
                 postProcessArg = [thisBlock, NUMBERBLOCKDEFAULT];
             } else if (name === "loudness" || name === "pitchness") {
-                postProcess = function () {
+                postProcess = () => {
                     that.activity.logo.initMediaDevices();
                 };
             } else if (name === "media") {
@@ -5707,7 +5707,7 @@ class Blocks {
                     case "start":
                         blkData[4][0] = null;
                         blkData[4][2] = null;
-                        postProcess = function (args) {
+                        postProcess = (args) => {
                             const thisBlock = args[0];
                             const blkInfo = args[1];
                             that.blockList[thisBlock].value = that.turtles.turtleList.length;
@@ -6533,7 +6533,7 @@ class Blocks {
                 blocksToCheck.push([bb, this._getNestingDepth(bb), "2arg"]);
             }
 
-            blocksToCheck = blocksToCheck.sort(function (a, b) {
+            blocksToCheck = blocksToCheck.sort((a, b) => {
                 return a[1] - b[1];
             });
 

@@ -19,7 +19,7 @@
 
 /* exported setupToneBlocks */
 
-function setupToneBlocks(activity) {
+const setupToneBlocks = (activity) => {
     class OscillatorBlock extends FlowBlock {
         constructor() {
             super("oscillator", _("oscillator"));

@@ -953,9 +953,9 @@ class TimbreWidget {
             }
         };
 
-        addFilterButtonCell.onmouseover = () => {};
+        addFilterButtonCell.onmouseover = () => { };
 
-        addFilterButtonCell.onmouseout = () => {};
+        addFilterButtonCell.onmouseout = () => { };
 
         widgetWindow.addButton(
             "restore-button.svg",
@@ -967,7 +967,7 @@ class TimbreWidget {
 
         // let cell = this._addButton(row, 'close-button.svg', TimbreWidget.ICONSIZE, _('Close'));
 
-        // cell.onclick = function () {
+        // cell.onclick = () => {
         //     docById('timbreDiv').style.visibility = 'hidden';
         //     docById('timbreButtonsDiv').style.visibility = 'hidden';
         //     docById('this.timbreTableDiv').style.visibility = 'hidden';
@@ -1189,8 +1189,8 @@ class TimbreWidget {
         let blockValue = 0;
 
         docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
-        docById("synthButtonCell").onmouseover = () => {};
-        docById("synthButtonCell").onmouseout = () => {};
+        docById("synthButtonCell").onmouseover = () => { };
+        docById("synthButtonCell").onmouseout = () => { };
 
         this.timbreTableDiv.style.display = "inline";
         this.timbreTableDiv.style.visibility = "visible";
@@ -1541,8 +1541,8 @@ class TimbreWidget {
         }
 
         docById("oscillatorButtonCell").style.backgroundColor = "#C8C8C8";
-        docById("oscillatorButtonCell").onmouseover = () => {};
-        docById("oscillatorButtonCell").onmouseout = () => {};
+        docById("oscillatorButtonCell").onmouseover = () => { };
+        docById("oscillatorButtonCell").onmouseout = () => { };
 
         this.timbreTableDiv.style.display = "inline";
         this.timbreTableDiv.style.visibility = "visible";
@@ -1674,8 +1674,8 @@ class TimbreWidget {
         }
 
         docById("envelopeButtonCell").style.backgroundColor = "#C8C8C8";
-        docById("envelopeButtonCell").onmouseover = () => {};
-        docById("envelopeButtonCell").onmouseout = () => {};
+        docById("envelopeButtonCell").onmouseover = () => { };
+        docById("envelopeButtonCell").onmouseout = () => { };
 
         this.timbreTableDiv.style.display = "inline";
         this.timbreTableDiv.style.visibility = "visible";
@@ -1754,8 +1754,8 @@ class TimbreWidget {
      */
     _filter() {
         docById("filterButtonCell").style.backgroundColor = "#C8C8C8";
-        docById("filterButtonCell").onmouseover = () => {};
-        docById("filterButtonCell").onmouseout = () => {};
+        docById("filterButtonCell").onmouseover = () => { };
+        docById("filterButtonCell").onmouseout = () => { };
 
         this.timbreTableDiv.style.display = "inline";
         this.timbreTableDiv.style.visibility = "visible";
@@ -2060,8 +2060,8 @@ class TimbreWidget {
         let blockValue = 0;
 
         docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
-        docById("effectsButtonCell").onmouseover = () => {};
-        docById("effectsButtonCell").onmouseout = () => {};
+        docById("effectsButtonCell").onmouseover = () => { };
+        docById("effectsButtonCell").onmouseout = () => { };
 
         this.timbreTableDiv.style.display = "inline";
         this.timbreTableDiv.style.visibility = "visible";

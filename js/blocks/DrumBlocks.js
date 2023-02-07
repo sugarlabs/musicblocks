@@ -18,7 +18,7 @@
 
 /* exported setupDrumBlocks */
 
-function setupDrumBlocks(activity) {
+const setupDrumBlocks = (activity) => {
     class NoiseNameBlock extends ValueBlock {
         constructor() {
             super("noisename", _("noise name"));
@@ -94,7 +94,7 @@ function setupDrumBlocks(activity) {
         }
     }
 
-    function _createPlayDrumMacros() {
+    const _createPlayDrumMacros = () => {
         class PlayDrumMacroBlock extends FlowBlock {
             constructor(name, displayName, isDrum, drumName) {
                 if (displayName === undefined) {
@@ -193,8 +193,8 @@ function setupDrumBlocks(activity) {
             } else {
                 this.setHelpString([
                     _("The Set drum block will select a drum sound to replace the pitch of any contained notes.") +
-                        " " +
-                        _("In the example above, a kick drum sound will be played instead of sol."),
+                    " " +
+                    _("In the example above, a kick drum sound will be played instead of sol."),
                     "documentation",
                     null,
                     "setdrumhelp"
@@ -295,7 +295,7 @@ function setupDrumBlocks(activity) {
             } else if (
                 tur.singer.inNoteBlock.length > 0 ||
                 activity.blocks.blockList[blk].connections[0] == null &&
-                    last(activity.blocks.blockList[blk].connections) == null
+                last(activity.blocks.blockList[blk].connections) == null
             ) {
                 Singer.DrumActions.playDrum(args[0], turtle, blk);
             } else {
