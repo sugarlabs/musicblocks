@@ -18,7 +18,7 @@
 
 /* exported setupActionBlocks */
 
-let setupActionBlocks = (activity) => {
+const setupActionBlocks = (activity) => {
     class ReturnBlock extends FlowBlock {
         constructor() {
             super("return");
