@@ -28,7 +28,7 @@ class PlanetInterface {
         this.mainCanvas = null;
         this.activity = activity;
 
-        this.hideMusicBlocks = function () {
+        this.hideMusicBlocks = () => {
             this.activity.hideSearchWidget();
             window.widgetWindows.hideAllWindows();
 
@@ -38,14 +38,14 @@ class PlanetInterface {
             document.querySelector("#canvas").style.display = "none";
             document.querySelector("#theme-color").content = "#8bc34a";
             const that = this;
-            setTimeout(function () {
+            setTimeout(() => {
                 // Time to release the mouse
                 that.activity.stage.enableDOMEvents(false);
             }, 250);
             window.scroll(0, 0);
         };
 
-        this.showMusicBlocks = function () {
+        this.showMusicBlocks = () => {
             document.title = this.activity.planet.getCurrentProjectName();
             document.getElementById("toolbars").style.display = "block";
             document.getElementById("palette").style.display = "block";
@@ -62,7 +62,7 @@ class PlanetInterface {
             docById("buttoncontainerTOP").style.display = "block";
         };
 
-        this.showPlanet = function () {
+        this.showPlanet = () => {
             const png = docById("overlayCanvas").toDataURL("image/png");
             this.planet.open(png);  // this.mainCanvas.toDataURL("image/png"));
             this.iframe.style.display = "block";
@@ -74,22 +74,22 @@ class PlanetInterface {
             }
         };
 
-        this.hidePlanet = function () {
+        this.hidePlanet = () => {
             this.iframe.style.display = "none";
         };
 
-        this.openPlanet = function () {
+        this.openPlanet = () => {
             this.saveLocally();
             this.hideMusicBlocks();
             this.showPlanet();
         };
 
-        this.closePlanet = function () {
+        this.closePlanet = () => {
             this.hidePlanet();
             this.showMusicBlocks();
         };
 
-        this.loadProjectFromData = function (data, merge) {
+        this.loadProjectFromData = (data, merge) => {
             if (merge === undefined) {
                 merge = false;
             }
@@ -112,7 +112,7 @@ class PlanetInterface {
             // First, hide the palettes as they will need updating.
             this.activity.blocks.palettes._hideMenus(true);
 
-            const __afterLoad = function () {
+            const __afterLoad = () => {
                 document.removeEventListener("finishedLoading", __afterLoad);
             };
 
@@ -133,27 +133,27 @@ class PlanetInterface {
             document.body.style.cursor = "default";
         };
 
-        this.loadProjectFromFile = function () {
+        this.loadProjectFromFile = () => {
             document.querySelector("#myOpenFile").focus();
             document.querySelector("#myOpenFile").click();
             window.scroll(0, 0);
         };
 
-        this.newProject = function () {
+        this.newProject = () => {
             this.closePlanet();
             this.initialiseNewProject();
             this.activity._loadStart();
             this.saveLocally();
         };
 
-        this.initialiseNewProject = function (name) {
+        this.initialiseNewProject = (name) => {
             this.planet.ProjectStorage.initialiseNewProject(name);
             this.activity.sendAllToTrash();
             this.activity.refreshCanvas();
             this.activity.blocks.trashStacks = [];
         };
 
-        this.saveLocally = function () {
+        this.saveLocally = () => {
             this.activity.stage.update(event);
             const data = this.activity.prepareExport();
             const svgData = doSVG(
@@ -170,7 +170,7 @@ class PlanetInterface {
                 } else {
                     const img = new Image();
                     const t = this;
-                    img.onload = function () {
+                    img.onload = () => {
                         const bitmap = new createjs.Bitmap(img);
                         const bounds = bitmap.getBounds();
                         bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
@@ -198,35 +198,35 @@ class PlanetInterface {
             }
         };
 
-        this.openCurrentProject = async function () {
+        this.openCurrentProject = async () => {
             return await this.planet.ProjectStorage.getCurrentProjectData();
         };
 
-        this.openProjectFromPlanet = function (id, error) {
+        this.openProjectFromPlanet = (id, error) => {
             this.planet.openProjectFromPlanet(id, error);
         };
 
-        this.onConverterLoad = function () {
+        this.onConverterLoad = () => {
             window.Converter = this.planet.Converter;
         };
 
-        this.getCurrentProjectName = function () {
+        this.getCurrentProjectName = () => {
             return this.planet.ProjectStorage.getCurrentProjectName();
         };
 
-        this.getCurrentProjectDescription = function () {
+        this.getCurrentProjectDescription = () => {
             return this.planet.ProjectStorage.getCurrentProjectDescription();
         };
 
-        this.getCurrentProjectImage = function () {
+        this.getCurrentProjectImage = () => {
             return this.planet.ProjectStorage.getCurrentProjectImage();
         };
 
-        this.getTimeLastSaved = function () {
+        this.getTimeLastSaved = () => {
             return this.planet.ProjectStorage.TimeLastSaved;
         };
 
-        this.init = async function () {
+        this.init = async () => {
             this.iframe = document.getElementById("planet-iframe");
             try {
                 await this.iframe.contentWindow.makePlanet(

@@ -12,13 +12,13 @@
 /* global saveMxmlOutput:writable,voiceNum:writable */
 /* exported saveMxmlOutput */
 
-saveMxmlOutput = function (logo) {
+saveMxmlOutput = (logo) => {
     // temporary until I get more things sorted out
     const ignore = ["voice two", "voice one", "one voice"];
     let res = "";
     let indent = 0;
 
-    const add = function (str) {
+    const add = (str) => {
         for (let i = 0; i < indent; i++) {
             res += "    ";
         }

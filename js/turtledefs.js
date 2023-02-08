@@ -282,7 +282,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
     MULTIPALETTENAMES = [_("music"), _("logic"), _("artwork")];
 }
 
-function getMainToolbarButtonNames(name) {
+const getMainToolbarButtonNames = (name) => {
     return (
         [
             "popdown-palette",
@@ -305,7 +305,7 @@ function getMainToolbarButtonNames(name) {
     );
 }
 
-function getAuxToolbarButtonNames(name) {
+const getAuxToolbarButtonNames = (name) => {
     return (
         [
             "paste-disabled",
@@ -320,7 +320,7 @@ function getAuxToolbarButtonNames(name) {
     );
 }
 
-function createDefaultStack() {
+const createDefaultStack = () => {
     if (_THIS_IS_TURTLE_BLOCKS_) {
         DATAOBJS =
             [
@@ -420,7 +420,7 @@ function createDefaultStack() {
     }
 }
 
-function createHelpContent(activity) {
+const createHelpContent = (activity) => {
     let language = localStorage.languagePreference;
     if (language === undefined) {
         language = navigator.language;
