@@ -297,7 +297,7 @@ class Activity {
         /**
          * Initialises major variables and renders default stack.
          */
-        this.setupDependencies = function () {
+        this.setupDependencies = () => {
             createDefaultStack();
             createHelpContent(this);
             window.scroll(0, 0);
@@ -381,10 +381,10 @@ class Activity {
          * Sets up right click functionality opening the context menus
          * (if block is right clicked)
          */
-        this.doContextMenus = function () {
+        this.doContextMenus = () => {
             document.addEventListener(
                 "contextmenu",
-                function (event) {
+                (event) => {
                     event.preventDefault();
                     event.stopPropagation();
                 },
@@ -395,7 +395,7 @@ class Activity {
         /*
          * Sets up plugin and palette boiler plate
          */
-        this.doPluginsAndPaletteCols = function () {
+        this.doPluginsAndPaletteCols = () => {
             // Calculate the palette colors.
             for (const p in platformColor.paletteColors) {
                 PALETTEFILLCOLORS[p] = platformColor.paletteColors[p][0];
@@ -455,11 +455,11 @@ class Activity {
         /**
          * Recenters blocks by finding their position on the screen and moving them accordingly.
          */
-        const findBlocks = function (activity) {
+        const findBlocks = (activity) => {
             activity._findBlocks();
         };
 
-        this._findBlocks = function () {
+        this._findBlocks = () => {
             if (!this.blocks.visible) {
                 this._changeBlockVisibility();
             }
@@ -573,7 +573,7 @@ class Activity {
          * @param zero {hides container}
          * @param one {shows container}
          */
-        this.setHomeContainers = function (homeState) {
+        this.setHomeContainers = (homeState) => {
             if (this.homeButtonContainer === null) {
                 return;
             }
@@ -585,16 +585,16 @@ class Activity {
             }
         };
 
-        this.__saveHelpBlock = function (name, delay) {
+        this.__saveHelpBlock = (name, delay) => {
             // Save the artwork for an individual help block.
             // (1) clear the block list
             // (2) generate the help blocks
             // (3) save the blocks as svg
 
             const that = this;
-            setTimeout(function () {
+            setTimeout(() => {
                 that.sendAllToTrash(false, true);
-                setTimeout(function () {
+                setTimeout(() => {
                     const message = that.blocks.protoBlockDict[name].helpString;
                     if (message.length < 4) {
                         // If there is nothing specified, just load the block.
@@ -607,7 +607,7 @@ class Activity {
                             that.palettes.dict[paletteName].makeBlockFromSearch(
                                 protoblk,
                                 protoName,
-                                function (newBlock) {
+                                (newBlock) => {
                                     that.blocks.moveBlock(newBlock, 0, 0);
                                 }
                             );
@@ -622,7 +622,7 @@ class Activity {
                         that.blocks.loadNewBlocks(blocksToLoad);
                     }
 
-                    setTimeout(function () {
+                    setTimeout(() => {
                         // eslint-disable-next-line no-console
                         console.log("Saving help artwork: " + name + "_block.svg");
                         const svg = "data:image/svg+xml;utf8," + that.printBlockSVG();
@@ -632,7 +632,7 @@ class Activity {
             }, delay + 1000);
         };
 
-        this._saveHelpBlocks = function () {
+        this._saveHelpBlocks = () => {
             // Save the artwork for every help block.
             const blockHelpList = [];
             for (const key in this.blocks.protoBlockDict) {
@@ -656,7 +656,7 @@ class Activity {
         /**
          * @returns {SVG} returns SVG of blocks
          */
-        this.printBlockSVG = function () {
+        this.printBlockSVG = () => {
             this.blocks.activeBlock = null;
             let startCounter = 0;
             let svg = "";
@@ -805,7 +805,7 @@ class Activity {
         /*
          * Clears "canvas"
          */
-        this._allClear = function (noErase) {
+        this._allClear = (noErase) => {
             this.blocks.activeBlock = null;
             hideDOMLabel();
 
@@ -830,11 +830,11 @@ class Activity {
             this.blocksContainer.y = 0;
 
             // Code specific to cleaning up Music Blocks
-            Element.prototype.remove = function () {
+            Element.prototype.remove = () => {
                 this.parentElement.removeChild(this);
             };
 
-            NodeList.prototype.remove = HTMLCollection.prototype.remove = function () {
+            NodeList.prototype.remove = HTMLCollection.prototype.remove = () => {
                 for (let i = 0, len = this.length; i < len; i++) {
                     if (this[i] && this[i].parentElement) {
                         this[i].parentElement.removeChild(this[i]);
@@ -852,11 +852,11 @@ class Activity {
          * Sets up play button functionality; runs Music Blocks.
          * @param env {specifies environment}
          */
-        const doFastButton = function (activity, env) {
+        const doFastButton = (activity, env) => {
             activity._doFastButton(env);
         };
 
-        this._doFastButton = function (env) {
+        this._doFastButton = (env) => {
             this.blocks.activeBlock = null;
             hideDOMLabel();
 
@@ -892,7 +892,7 @@ class Activity {
                     this.logo.doStopTurtles();
 
                     const that = this;
-                    setTimeout(function () {
+                    setTimeout(() => {
                         document.getElementById("stop").style.color = "#ea174c";
                         that.logo.runLogoCommands(null, env);
                     }, 500);
@@ -903,11 +903,11 @@ class Activity {
         /*
          * Runs Music Blocks at a slower rate
          */
-        const doSlowButton = function (activity) {
+        const doSlowButton = (activity) => {
             activity._doSlowButton();
         };
 
-        this._doSlowButton = function () {
+        this._doSlowButton = () => {
             this.blocks.activeBlock = null;
             hideDOMLabel();
 
@@ -924,11 +924,11 @@ class Activity {
         /*
          * Runs music blocks step by step
          */
-        const doStepButton = function (activity) {
+        const doStepButton = (activity) => {
             activity._doStepButton();
         };
 
-        this._doStepButton = function () {
+        this._doStepButton = () => {
             this.blocks.activeBlock = null;
             hideDOMLabel();
 
@@ -954,11 +954,11 @@ class Activity {
          * Stops running of music blocks; stops all mid-way synths.
          * @param onblur {when object loses focus}
          */
-        const doHardStopButton = function (activity, onblur) {
+        const doHardStopButton = (activity, onblur) => {
             activity._doHardStopButton(onblur);
         };
 
-        this._doHardStopButton = function (onblur) {
+        this._doHardStopButton = (onblur) => {
             this.blocks.activeBlock = null;
             hideDOMLabel();
 
@@ -986,11 +986,11 @@ class Activity {
         /*
          * Switches between beginner/advanced mode
          */
-        const doSwitchMode = function (activity) {
+        const doSwitchMode = (activity) => {
             activity._doSwitchMode();
         };
 
-        this._doSwitchMode = function () {
+        this._doSwitchMode = () => {
             this.blocks.activeBlock = null;
             const mode = this.storage.beginnerMode;
 
@@ -1019,12 +1019,12 @@ class Activity {
         /*
          * Initialises the functionality of the horizScrollIcon
          */
-        const setScroller = function (activity) {
+        const setScroller = (activity) => {
             activity._setScroller();
             activity._setupBlocksContainerEvents();
         };
 
-        this._setScroller = function () {
+        this._setScroller = () => {
             this.blocks.activeBlock = null;
             this.scrollBlockContainer = !this.scrollBlockContainer;
             const enableHorizScrollIcon = docById("enableHorizScrollIcon");
@@ -1039,7 +1039,7 @@ class Activity {
         };
 
         // Load animation handler.
-        this.doLoadAnimation = function () {
+        this.doLoadAnimation = () => {
             const messages = {
                 load_messages: [
                     _("Catching mice"),
@@ -1058,7 +1058,7 @@ class Activity {
 
             let counter = 0;
 
-            function changeText() {
+            const changeText = () => {
                 const randomLoadMessage =
                     messages.load_messages[Math.floor(Math.random() * messages.load_messages.length)];
                 document.getElementById("messageText").innerHTML = randomLoadMessage + "...";
@@ -1074,11 +1074,11 @@ class Activity {
         /*
          * Increases block size
          */
-        const doLargerBlocks = function (activity) {
+        const doLargerBlocks = (activity) => {
             activity._doLargerBlocks();
         };
 
-        this._doLargerBlocks = function () {
+        this._doLargerBlocks = () => {
             this.blocks.activeBlock = null;
 
             if (!this.resizeDebounce) {
@@ -1088,7 +1088,7 @@ class Activity {
                     this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
 
                     const that = this;
-                    setTimeout(function () {
+                    setTimeout(() => {
                         that.resizeDebounce = false;
                     }, 3000);
                 }
@@ -1100,11 +1100,11 @@ class Activity {
         /*
          * Decreases block size
          */
-        const doSmallerBlocks = function (activity) {
+        const doSmallerBlocks = (activity) => {
             activity._doSmallerBlocks();
         };
 
-        this._doSmallerBlocks = function () {
+        this._doSmallerBlocks = () => {
             this.blocks.activeBlock = null;
 
             if (!this.resizeDebounce) {
@@ -1115,7 +1115,7 @@ class Activity {
                 }
 
                 const that = this;
-                setTimeout(function () {
+                setTimeout(() => {
                     that.resizeDebounce = false;
                 }, 3000);
             }
@@ -1127,7 +1127,7 @@ class Activity {
          * If either the block size has reached its minimum or maximum,
          * then the icons to make them smaller/bigger will be hidden.
          */
-        this.setSmallerLargerStatus = function () {
+        this.setSmallerLargerStatus = () => {
             if (BLOCKSCALES[this.blockscale] < DEFAULTBLOCKSCALE) {
                 changeImage(this.smallerContainer.children[0], SMALLERBUTTON, SMALLERDISABLEBUTTON);
             } else {
@@ -1144,11 +1144,11 @@ class Activity {
         /*
          * Based on the active palette, remove a plugin palette from local storage.
          */
-        const deletePlugin = function (activity) {
+        const deletePlugin = (activity) => {
             activity._deletePlugin();
         };
 
-        this._deletePlugin = function () {
+        this._deletePlugin = () => {
             if (this.palettes.activePalette !== null) {
                 const obj = JSON.parse(this.storage.plugins);
 
@@ -1209,7 +1209,7 @@ class Activity {
         /*
          * Hides all grids (Cartesian/polar/treble/et al.)
          */
-        this.hideGrids = function () {
+        this.hideGrids = () => {
             this.turtles.setGridLabel(_("show Cartesian"));
             this._hideCartesian();
             this._hidePolar();
@@ -1295,7 +1295,7 @@ class Activity {
         /*
          * Sets up block actions with regards to different mouse events
          */
-        this._setupBlocksContainerEvents = function () {
+        this._setupBlocksContainerEvents = () => {
             const moving = false;
             let lastCoords = {
                 x: 0,
@@ -1305,7 +1305,7 @@ class Activity {
 
             const that = this;
 
-            const closeAnyOpenMenusAndLabels = function () {
+            const closeAnyOpenMenusAndLabels = () => {
                 if (docById("wheelDiv") !== null) docById("wheelDiv").style.display = "none";
                 if (docById("contextWheelDiv") !== null)
                     docById("contextWheelDiv").style.display = "none";
@@ -1359,7 +1359,7 @@ class Activity {
                 return { pixelX: pX, pixelY: pY };
             };
 
-            const __wheelHandler = function (event) {
+            const __wheelHandler = (event) => {
                 const data = normalizeWheel(event); // normalize over different browsers
                 const delY = data.pixelY;
                 const delX = data.pixelX;
@@ -1381,7 +1381,7 @@ class Activity {
 
             docById("myCanvas").addEventListener("wheel", __wheelHandler, false);
 
-            const __stageMouseUpHandler = function (event) {
+            const __stageMouseUpHandler = (event) => {
                 that.stageMouseDown = false;
                 that.moving = false;
 
@@ -1391,12 +1391,12 @@ class Activity {
                 }
             };
 
-            this.stage.on("stagemousemove", function (event) {
+            this.stage.on("stagemousemove", (event) => {
                 that.stageX = event.stageX;
                 that.stageY = event.stageY;
             });
 
-            this.stage.on("stagemousedown", function (event) {
+            this.stage.on("stagemousedown", (event) => {
                 that.stageMouseDown = true;
                 if ((that.stage.getObjectUnderPoint() !== null) | that.turtles.running()) {
                     that.stage.removeAllEventListeners("stagemouseup");
@@ -1414,7 +1414,7 @@ class Activity {
                 hideDOMLabel();
 
                 that.stage.removeAllEventListeners("stagemousemove");
-                that.stage.on("stagemousemove", function (event) {
+                that.stage.on("stagemousemove", (event) => {
                     that.stageX = event.stageX;
                     that.stageY = event.stageY;
 
@@ -1450,21 +1450,21 @@ class Activity {
         /*
          * Sets up scrolling functionality in palette and across canvas
          */
-        this.getStageScale = function () {
+        this.getStageScale = () => {
             return this.turtleBlocksScale;
         };
 
-        this.getStageX = function () {
+        this.getStageX = () => {
             return this.turtles.screenX2turtleX(this.stageX / this.turtleBlocksScale);
         };
 
-        this.getStageY = function () {
+        this.getStageY = () => {
             return this.turtles.screenY2turtleY(
                 (this.stageY - this.toolbarHeight) / this.turtleBlocksScale
             );
         };
 
-        this.getStageMouseDown = function () {
+        this.getStageMouseDown = () => {
             return this.stageMouseDown;
         };
 
@@ -1472,7 +1472,7 @@ class Activity {
          * Renders grid.
          * @param imagePath {path of grid to be rendered}
          */
-        this._createGrid = function (imagePath) {
+        this._createGrid = (imagePath) => {
             const img = new Image();
             img.src = imagePath;
             const container = new createjs.Container();
@@ -1498,7 +1498,7 @@ class Activity {
          * @param  y           {position on canvas}
          * @returns {description}
          */
-        this._createMsgContainer = function (fillColor, strokeColor, callback, y) {
+        this._createMsgContainer = (fillColor, strokeColor, callback, y) => {
             const container = new createjs.Container();
             this.stage.addChild(container);
             container.x = (this.canvas.width - 1000) / 2;
@@ -1513,7 +1513,7 @@ class Activity {
 
             const that = this;
 
-            img.onload = function () {
+            img.onload = () => {
                 const msgBlock = new createjs.Bitmap(img);
                 container.addChild(msgBlock);
                 const text = new createjs.Text("your message here", "20px Arial", "#000000");
@@ -1533,7 +1533,7 @@ class Activity {
                 container.hitArea = hitArea;
 
                 // eslint-disable-next-line no-unused-vars
-                container.on("click", function (event) {
+                container.on("click", (event) => {
                     container.visible = false;
                     // On the possibility that there was an error
                     // arrow associated with this container
@@ -1554,7 +1554,7 @@ class Activity {
         /*
          * Some error messages have special artwork.
          */
-        this._createErrorContainers = function () {
+        this._createErrorContainers = () => {
             for (let i = 0; i < ERRORARTWORK.length; i++) {
                 const name = ERRORARTWORK[i];
                 this._makeErrorArtwork(name);
@@ -1565,7 +1565,7 @@ class Activity {
          * Renders error message with appropriate artwork
          * @param  name {specifies svg to be rendered}
          */
-        this._makeErrorArtwork = function (name) {
+        this._makeErrorArtwork = (name) => {
             const container = new createjs.Container();
             this.stage.addChild(container);
             container.x = (this.canvas.width - 1000) / 2;
@@ -1575,7 +1575,7 @@ class Activity {
             this.errorArtwork[name].visible = false;
 
             const img = new Image();
-            img.onload = function () {
+            img.onload = () => {
                 const artwork = new createjs.Bitmap(img);
                 container.addChild(artwork);
                 const text = new createjs.Text("", "20px Sans", "#000000");
@@ -1594,7 +1594,7 @@ class Activity {
 
                 const that = this;
                 // eslint-disable-next-line no-unused-vars
-                container.on("click", function (event) {
+                container.on("click", (event) => {
                     container.visible = false;
                     // On the possibility that there was an error
                     // arrow associated with this container
@@ -1611,7 +1611,7 @@ class Activity {
         /*
           Prepare a list of blocks for the search bar autocompletion.
          */
-        this.prepSearchWidget = function () {
+        this.prepSearchWidget = () => {
             //searchWidget.style.visibility = "hidden";
             this.searchBlockPosition = [100, 100];
 
@@ -1727,7 +1727,7 @@ class Activity {
         /*
          * Hides search widget
          */
-        this.hideSearchWidget = function () {
+        this.hideSearchWidget = () => {
             // Hide the jQuery search results widget.
             const obj = docByClass("ui-menu");
             if (obj.length > 0) {
@@ -1741,7 +1741,7 @@ class Activity {
         /*
          * Shows search widget
          */
-        this.showSearchWidget = function () {
+        this.showSearchWidget = () => {
             // Bring widget to top.
             this.searchWidget.style.zIndex = 1;
             if (this.searchWidget.style.visibility === "visible") {
@@ -1785,7 +1785,7 @@ class Activity {
 
                 // Give the browser time to update before selecting
                 // focus.
-                setTimeout(function () {
+                setTimeout(() => {
                     that.searchWidget.focus();
                     that.doSearch();
                 }, 500);
@@ -1795,20 +1795,20 @@ class Activity {
         /*
          * Uses JQuery to add autocompleted search suggestions
          */
-        this.doSearch = function () {
+        this.doSearch = () => {
             const $j = jQuery.noConflict();
 
             const that = this;
             $j("#search").autocomplete({
                 source: that.searchSuggestions,
-                select: function (event, ui) {
+                select: (event, ui) => {
                     event.preventDefault();
                     that.searchWidget.value = ui.item.label;
                     that.searchWidget.idInput_custom = ui.item.value;
                     that.searchWidget.protoblk = ui.item.specialDict;
                     that.doSearch();
                 },
-                focus: function (event, ui) {
+                focus: (event, ui) => {
                     event.preventDefault();
                     that.searchWidget.value = ui.item.label;
                 }
@@ -1816,7 +1816,7 @@ class Activity {
 
             $j("#search").autocomplete("widget").addClass("scrollSearch");
 
-            $j("#search").autocomplete("instance")._renderItem = function (ul, item) {
+            $j("#search").autocomplete("instance")._renderItem = (ul, item) => {
                 return $j("<li></li>")
                     .data("item.autocomplete", item)
                     .append(
@@ -1842,7 +1842,7 @@ class Activity {
                 this.palettes.dict[paletteName].makeBlockFromSearch(
                     protoblk,
                     protoName,
-                    function (newBlock) {
+                    (newBlock) => {
                         that.blocks.moveBlock(
                             newBlock,
                             100 + that.searchBlockPosition[0] - that.blocksContainer.x,
@@ -1867,7 +1867,7 @@ class Activity {
         /*
          * Makes initial "start up" note for a brand new MB project
          */
-        this.__makeNewNote = function (octave, solf) {
+        this.__makeNewNote = (octave, solf) => {
             const newNote = [
                 [
                     0,
@@ -1964,7 +1964,7 @@ class Activity {
         /*
          * Handles keyboard shortcuts in MB
          */
-        this.__keyPressed = function (event) {
+        this.__keyPressed = (event) => {
             if (window.widgetWindows.isOpen("JavaScript Editor") === true) return;
 
             if (!this.keyboardEnableFlag) {
@@ -2365,14 +2365,14 @@ class Activity {
         /**
          * @returns currentKeyCode
          */
-        this.getCurrentKeyCode = function () {
+        this.getCurrentKeyCode = () => {
             return this.currentKeyCode;
         };
 
         /*
          * Sets current key code to 0
          */
-        this.clearCurrentKeyCode = function () {
+        this.clearCurrentKeyCode = () => {
             this.currentKey = "";
             this.currentKeyCode = 0;
         };
@@ -2382,7 +2382,7 @@ class Activity {
          * Detects width/height changes and closes any menus before actual resize.
          * Repositions containers/palette/home buttons
          */
-        this._onResize = function (force) {
+        this._onResize = (force) => {
             if (!force) {
                 if (this.saveLocally !== null) {
                     this.saveLocally();
@@ -2571,7 +2571,7 @@ class Activity {
         };
 
         const that = this;
-        window.onresize = function () {
+        window.onresize = () => {
             that._onResize(false);
         };
 
@@ -2580,11 +2580,11 @@ class Activity {
          * Hides palettes before update
          * Repositions blocks about trash area
          */
-        const restoreTrash = function (activity) {
+        const restoreTrash = (activity) => {
             activity._restoreTrash();
         };
 
-        this._restoreTrash = function () {
+        this._restoreTrash = () => {
             for (const name in this.palettes.dict) {
                 this.palettes.dict[name].hideMenu(true);
             }
@@ -2683,7 +2683,7 @@ class Activity {
         /*
          * Open aux menu
          */
-        this._openAuxMenu = function () {
+        this._openAuxMenu = () => {
             if (!this.turtles.running() && this.toolbarHeight === 0) {
                 this._showHideAuxMenu(false);
             }
@@ -2692,11 +2692,11 @@ class Activity {
         /*
          * Toggles Aux menu visibility and positioning
          */
-        const showHideAuxMenu = function (activity, resize) {
+        const showHideAuxMenu = (activity, resize) => {
             activity._showHideAuxMenu(resize);
         };
 
-        this._showHideAuxMenu = function (resize) {
+        this._showHideAuxMenu = (resize) => {
             const cellsize = 55;
             let dy;
             if (!resize && this.toolbarHeight === 0) {
@@ -2724,7 +2724,7 @@ class Activity {
         /*
          * Hides aux menu
          */
-        this.hideAuxMenu = function () {
+        this.hideAuxMenu = () => {
             if (this.toolbarHeight > 0) {
                 this._showHideAuxMenu(false);
                 this.menuButtonsVisible = false;
@@ -2736,7 +2736,7 @@ class Activity {
          * @param {boolean} addStartBlock {if true adds a new start block to new project instance}
          * @param {boolean} doNotSave     {if true discards any changes to project}
          */
-        this.sendAllToTrash = function (addStartBlock, doNotSave) {
+        this.sendAllToTrash = (addStartBlock, doNotSave) => {
             // Return to home position after loading new blocks.
             this.blocksContainer.x = 0;
             this.blocksContainer.y = 0;
@@ -2789,7 +2789,7 @@ class Activity {
             // Wait for palette to clear (#891)
             // We really need to signal when each palette item is deleted
             const that = this;
-            setTimeout(function () {
+            setTimeout(() => {
                 that.stage.dispatchEvent("trashsignal");
             }, 100 * actionBlockCounter); // 1000
 
@@ -2802,11 +2802,11 @@ class Activity {
         /*
          * Toggles block/palette visibility
          */
-        const changeBlockVisibility = function (activity) {
+        const changeBlockVisibility = (activity) => {
             activity._changeBlockVisibility();
         };
 
-        this._changeBlockVisibility = function () {
+        this._changeBlockVisibility = () => {
             hideDOMLabel();
 
             if (this.blocks.visible) {
@@ -2832,11 +2832,11 @@ class Activity {
         /*
          * Toggles collapsible stacks (if collapsed stacks expand and vice versa)
          */
-        const toggleCollapsibleStacks = function (activity) {
+        const toggleCollapsibleStacks = (activity) => {
             activity._toggleCollapsibleStacks();
         };
 
-        this._toggleCollapsibleStacks = function () {
+        this._toggleCollapsibleStacks = () => {
             hideDOMLabel();
 
             if (this.blocks.visible) {
@@ -2847,21 +2847,21 @@ class Activity {
         /*
          * When turtle stops running restore stop button to normal state
          */
-        this.onStopTurtle = function () {
+        this.onStopTurtle = () => {
             // TODO: plugin support
         };
 
         /*
          * When turtle starts running change stop button to running state
          */
-        this.onRunTurtle = function () {
+        this.onRunTurtle = () => {
             // TODO: plugin support
         };
 
         /*
          * Updates all canvas elements
          */
-        this.refreshCanvas = function () {
+        this.refreshCanvas = () => {
             if (this.blockRefreshCanvas) {
                 return;
             }
@@ -2869,7 +2869,7 @@ class Activity {
             this.blockRefreshCanvas = true;
 
             const that = this;
-            setTimeout(function () {
+            setTimeout(() => {
                 that.blockRefreshCanvas = false;
             }, 5);
 
@@ -2881,7 +2881,7 @@ class Activity {
          * This set makes it so the stage only re-renders when an
          * event handler indicates a change has happened.
          */
-        this.__tick = function (event) {
+        this.__tick = (event) => {
             if (this.update || createjs.Tween.hasActiveTweens()) {
                 this.update = false; // Only update once
                 this.stage.update(event);
@@ -2891,11 +2891,11 @@ class Activity {
         /*
          * Opens samples on planet after closing all sub menus.
          */
-        const doOpenSamples = function (that) {
+        const doOpenSamples = (that) => {
             that._doOpenSamples();
         };
 
-        this._doOpenSamples = function () {
+        this._doOpenSamples = () => {
             if (docById("palette").style.display !== "none") docById("palette").style.display = "none";
             this.toolbar.closeAuxToolbar(showHideAuxMenu);
             this.planet.openPlanet();
@@ -2908,14 +2908,14 @@ class Activity {
         /*
          * Uploads MB file to Planet
          */
-        this.doUploadToPlanet = function () {
+        this.doUploadToPlanet = () => {
             this.planet.openPlanet();
         };
 
         /*
          * Opens piemenu for selecting master key signature
          */
-        const chooseKeyMenu = function (that) {
+        const chooseKeyMenu = (that) => {
             piemenuKey(that);
         };
 
@@ -2923,7 +2923,7 @@ class Activity {
          * @param merge {if specified the selected file's blocks merge into current project}
          *  Loads/merges existing MB file
          */
-        const doLoad = function (that, merge) {
+        const doLoad = (that, merge) => {
             that.toolbar.closeAuxToolbar(showHideAuxMenu);
             if (merge === undefined) {
                 merge = false;
@@ -2948,11 +2948,11 @@ class Activity {
          * Runs music blocks project.
          * @param env {specifies environment}
          */
-        this.runProject = function (env) {
+        this.runProject = (env) => {
             document.removeEventListener("finishedLoading", this.runProject);
 
             const that = this;
-            setTimeout(function () {
+            setTimeout(() => {
                 that._changeBlockVisibility();
                 that._doFastButton(env);
             }, 5000);
@@ -2964,12 +2964,12 @@ class Activity {
          * @param  flags     {parameteres}
          * @param  env       {specifies environment}
          */
-        const loadProject = function (activity, projectID, flags, env) {
+        const loadProject = (activity, projectID, flags, env) => {
             activity._loadProject(projectID, flags, env);
         };
 
-        const loadStart = async function (that) {
-            const __afterLoad = async function () {
+        const loadStart = async (that) => {
+            const __afterLoad = async () => {
                 if (!that.turtles.running()) {
                     that.stage.update(event);
                     for (let turtle = 0; turtle < that.turtles.turtleList.length; turtle++) {
@@ -3050,7 +3050,7 @@ class Activity {
         };
 
         // eslint-disable-next-line no-unused-vars
-        this._loadProject = function (projectID, flags, env) {
+        this._loadProject = (projectID, flags, env) => {
             if (this.planet === undefined) {
                 return;
             }
@@ -3072,9 +3072,9 @@ class Activity {
             this.textMsg(this.planet.getCurrentProjectName());
 
             const that = this;
-            setTimeout(function () {
+            setTimeout(() => {
                 try {
-                    that.planet.openProjectFromPlanet(projectID, function () {
+                    that.planet.openProjectFromPlanet(projectID, () => {
                         that.loadStartWrapper(loadStart);
                     });
                 } catch (e) {
@@ -3095,8 +3095,8 @@ class Activity {
             const show = flags.show;
             const collapse = flags.collapse;
 
-            const __functionload = function () {
-                setTimeout(function () {
+            const __functionload = () => {
+                setTimeout(() => {
                     if (!collapse && that.firstRun) {
                         that._toggleCollapsibleStacks();
                     }
@@ -3136,7 +3136,7 @@ class Activity {
          * animation will cycle at least once.
          * @param loadProject all params are from load project function
          */
-        this.loadStartWrapper = async function (func, arg1, arg2, arg3) {
+        this.loadStartWrapper = async (func, arg1, arg2, arg3) => {
             const time1 = new Date();
             await func(this, arg1, arg2, arg3);
 
@@ -3150,7 +3150,7 @@ class Activity {
          * Hides the loading animation and unhides the background.
          * Shows contents of MB after loading screen.
          */
-        this.showContents = function () {
+        this.showContents = () => {
             docById("loading-image-container").style.display = "none";
             docById("palette").style.display = "block";
             // docById('canvas').style.display = 'none';
@@ -3159,14 +3159,14 @@ class Activity {
             docById("buttoncontainerTOP").style.display = "block";
         };
 
-        this.justLoadStart = function () {
+        this.justLoadStart = () => {
             this.blocks.loadNewBlocks(DATAOBJS);
         };
 
         /*
          * Sets up a new "clean" MB i.e. new project instance
          */
-        const _afterDelete = function (that) {
+        const _afterDelete = (that) => {
             if (that.turtles.running()) {
                 that._doHardStopButton();
             }
@@ -3194,7 +3194,7 @@ class Activity {
         /*
          * Hides all message containers
          */
-        this.hideMsgs = function () {
+        this.hideMsgs = () => {
             // FIXME: When running before everything is set up.
             if (this.errorMsgText === null) {
                 return;
@@ -3214,18 +3214,18 @@ class Activity {
 
         // Accessed from index.html
         // eslint-disable-next-line no-unused-vars
-        const hideArrows = function () {
+        const hideArrows = () => {
             globalActivity._hideArrows();
         };
 
-        this._hideArrows = function () {
+        this._hideArrows = () => {
             if (this.errorMsgArrow !== null) {
                 this.errorMsgArrow.removeAllChildren();
                 this.refreshCanvas();
             }
         };
 
-        this.textMsg = function (msg) {
+        this.textMsg = (msg) => {
             if (this.msgTimeoutID !== null) {
                 clearTimeout(this.msgTimeoutID);
                 this.msgTimeoutID = null;
@@ -3240,13 +3240,13 @@ class Activity {
             this.printTextContent.innerHTML = msg;
 
             const that = this;
-            this.msgTimeoutID = setTimeout(function () {
+            this.msgTimeoutID = setTimeout(() => {
                 that.printText.classList.remove("show");
                 that.msgTimeoutID = null;
             }, _MSGTIMEOUT_);
         };
 
-        this.errorMsg = function (msg, blk, text, timeout) {
+        this.errorMsg = (msg, blk, text, timeout) => {
             if (this.errorMsgTimeoutID !== null) {
                 clearTimeout(this.errorMsgTimeoutID);
             }
@@ -3385,7 +3385,7 @@ class Activity {
 
             if (myTimeout > 0) {
                 const that = this;
-                this.errorMsgTimeoutID = setTimeout(function () {
+                this.errorMsgTimeoutID = setTimeout(() => {
                     that.hideMsgs();
                 }, myTimeout);
             }
@@ -3396,7 +3396,7 @@ class Activity {
         /*
          * Hides cartesian grid
          */
-        this._hideCartesian = function () {
+        this._hideCartesian = () => {
             this.cartesianBitmap.visible = false;
             this.cartesianBitmap.updateCache();
             this.update = true;
@@ -3405,7 +3405,7 @@ class Activity {
         /*
          * Shows cartesian grid
          */
-        this._showCartesian = function () {
+        this._showCartesian = () => {
             this.cartesianBitmap.visible = true;
             this.cartesianBitmap.updateCache();
             this.update = true;
@@ -3414,7 +3414,7 @@ class Activity {
         /*
          * Hides polar grid
          */
-        this._hidePolar = function () {
+        this._hidePolar = () => {
             this.polarBitmap.visible = false;
             this.polarBitmap.updateCache();
             this.update = true;
@@ -3423,7 +3423,7 @@ class Activity {
         /*
          * Shows polar grid
          */
-        this._showPolar = function () {
+        this._showPolar = () => {
             this.polarBitmap.visible = true;
             this.polarBitmap.updateCache();
             this.update = true;
@@ -3432,7 +3432,7 @@ class Activity {
         /*
          * Hides accidentals
          */
-        this._hideAccidentals = function () {
+        this._hideAccidentals = () => {
             for (let i = 0; i < 7; i++) {
                 this.grandSharpBitmap[i].visible = false;
                 this.grandSharpBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
@@ -3482,7 +3482,7 @@ class Activity {
         /*
          * Hides musical treble staff
          */
-        this._hideTreble = function () {
+        this._hideTreble = () => {
             this.trebleBitmap.visible = false;
             this.trebleBitmap.updateCache();
             this._hideAccidentals();
@@ -3492,7 +3492,7 @@ class Activity {
         /*
          * Shows musical treble staff
          */
-        this._showTreble = function () {
+        this._showTreble = () => {
             this.trebleBitmap.visible = true;
             this.trebleBitmap.updateCache();
             this._hideAccidentals();
@@ -3525,7 +3525,7 @@ class Activity {
         /*
          * Hides musical grand staff
          */
-        this._hideGrand = function () {
+        this._hideGrand = () => {
             this.grandBitmap.visible = false;
             this.grandBitmap.updateCache();
             this._hideAccidentals();
@@ -3535,7 +3535,7 @@ class Activity {
         /*
          * Shows musical grand staff
          */
-        this._showGrand = function () {
+        this._showGrand = () => {
             this.grandBitmap.visible = true;
             this.grandBitmap.updateCache();
             this._hideAccidentals();
@@ -3567,7 +3567,7 @@ class Activity {
         /*
          * Hides musical soprano staff
          */
-        this._hideSoprano = function () {
+        this._hideSoprano = () => {
             this.sopranoBitmap.visible = false;
             this.sopranoBitmap.updateCache();
             this.update = true;
@@ -3576,7 +3576,7 @@ class Activity {
         /*
          * Shows musical soprano staff
          */
-        this._showSoprano = function () {
+        this._showSoprano = () => {
             this.sopranoBitmap.visible = true;
             this.sopranoBitmap.updateCache();
             this._hideAccidentals();
@@ -3609,20 +3609,20 @@ class Activity {
         /*
          * Hides musical alto staff
          */
-        this._hideAlto = function () {
+        this._hideAlto = () => {
             this.altoBitmap.visible = false;
             this.altoBitmap.updateCache();
             this._hideAccidentals();
             this.update = true;
         };
 
-        this.__showAltoAccidentals = function () {
+        this.__showAltoAccidentals = () => {
         };
 
         /*
          * Shows musical alto staff
          */
-        this._showAlto = function () {
+        this._showAlto = () => {
             this.altoBitmap.visible = true;
             this.altoBitmap.updateCache();
             this._hideAccidentals();
@@ -3655,7 +3655,7 @@ class Activity {
         /*
          * Hides musical tenor staff
          */
-        this._hideTenor = function () {
+        this._hideTenor = () => {
             this.tenorBitmap.visible = false;
             this.tenorBitmap.updateCache();
             this.update = true;
@@ -3664,7 +3664,7 @@ class Activity {
         /*
          * Shows musical tenor staff
          */
-        this._showTenor = function () {
+        this._showTenor = () => {
             this.tenorBitmap.visible = true;
             this.tenorBitmap.updateCache();
             this._hideAccidentals();
@@ -3697,7 +3697,7 @@ class Activity {
         /*
          * Hides musical bass staff
          */
-        this._hideBass = function () {
+        this._hideBass = () => {
             this.bassBitmap.visible = false;
             this.bassBitmap.updateCache();
             this._hideAccidentals();
@@ -3707,7 +3707,7 @@ class Activity {
         /*
          * Shows musical bass staff
          */
-        this._showBass = function () {
+        this._showBass = () => {
             this.bassBitmap.visible = true;
             this.bassBitmap.updateCache();
             this._hideAccidentals();
@@ -3741,7 +3741,7 @@ class Activity {
          * We don't save blocks in the trash, so we need to
          * consolidate the block list and remap the connections.
          */
-        this.prepareExport = function () {
+        this.prepareExport = () => {
             const blockMap = [];
             this.hasMatrixDataBlock = false;
             for (let blk = 0; blk < this.blocks.blockList.length; blk++) {
@@ -3925,11 +3925,11 @@ class Activity {
         /*
          * Opens plugin by clicking on the plugin open chooser in the DOM (.json).
          */
-        const doOpenPlugin = function (activity) {
+        const doOpenPlugin = (activity) => {
             activity._doOpenPlugin();
         };
 
-        this._doOpenPlugin = function () {
+        this._doOpenPlugin = () => {
             this.toolbar.closeAuxToolbar(showHideAuxMenu);
             this.pluginChooser.focus();
             this.pluginChooser.click();
@@ -3939,7 +3939,7 @@ class Activity {
          * Specifies that loading an MB project should merge it
          * within the existing project
          */
-        const _doMergeLoad = function (that) {
+        const _doMergeLoad = (that) => {
             doLoad(that, true);
         };
 
@@ -3948,7 +3948,7 @@ class Activity {
          * e.g. Home, Collapse, Expand
          * These menu items are on the canvas, not the toolbar.
          */
-        this._setupPaletteMenu = function () {
+        this._setupPaletteMenu = () => {
             let removed = false;
             if (docById("buttoncontainerBOTTOM")) {
                 removed = true;
@@ -4038,18 +4038,18 @@ class Activity {
             new JSEditor(activity);
         };
 
-        const doAnalytics = function (activity) {
+        const doAnalytics = (activity) => {
             activity.statsWindow = new StatsWindow(activity);
         };
 
         /*
          * Shows help page
          */
-        const showHelp = function (activity) {
+        const showHelp = (activity) => {
             activity._showHelp();
         };
 
-        this._showHelp = function () {
+        this._showHelp = () => {
             // Will show welcome page by default.
             new HelpWidget(this, false);
         };
@@ -4057,11 +4057,11 @@ class Activity {
         /*
          * Shows about page
          */
-        const showAboutPage = function (activity) {
+        const showAboutPage = (activity) => {
             activity._showAboutPage();
         };
 
-        this._showAboutPage = function () {
+        this._showAboutPage = () => {
             // Will show welcome page by default.
             new HelpWidget(this, false);
         };
@@ -4069,7 +4069,7 @@ class Activity {
         /*
          * Makes non-toolbar buttons, e.g., the palette menu buttons
          */
-        this._makeButton = function (name, label, x, y) {
+        this._makeButton = (name, label, x, y) => {
             const container = document.createElement("div");
             container.setAttribute("id", "" + label);
             container.setAttribute("class", "tooltipped");
@@ -4116,10 +4116,10 @@ class Activity {
          * @param container longAction
          * @param hoverAction extraLongImg
          */
-        this._loadButtonDragHandler = function (container, actionClick, arg) {
+        this._loadButtonDragHandler = (container, actionClick, arg) => {
             const that = this;
             // eslint-disable-next-line no-unused-vars
-            container.onmousedown = function (event) {
+            container.onmousedown = (event) => {
                 if (!that.loading) {
                     document.body.style.cursor = "default";
                 }
@@ -4130,7 +4130,7 @@ class Activity {
         /*
          * Handles pasted strings into input fields
          */
-        this.pasted = function () {
+        this.pasted = () => {
             const rawData = docById("paste").value;
             let obj = "";
             if (rawData === null || rawData === "") {
@@ -4160,7 +4160,7 @@ class Activity {
          * Repositions elements on screen by a certain amount (dy).
          * @param dy how much of a change in y
          */
-        this.deltaY = function (dy) {
+        this.deltaY = (dy) => {
             this.toolbarHeight += dy;
             for (let i = 0; i < this.onscreenButtons.length; i++) {
                 this.onscreenButtons[i].y += dy;
@@ -4183,7 +4183,7 @@ class Activity {
          * Sets up dependencies and vars
          */
         // eslint-disable-next-line no-unused-vars
-        this.domReady = async function (doc) {
+        this.domReady = async (doc) => {
             this.saveLocally = undefined;
 
             // Do we need to update the stage?
@@ -4193,7 +4193,7 @@ class Activity {
             await this.init();
         };
 
-        this.__saveLocally = function () {
+        this.__saveLocally = () => {
             const data = this.prepareExport();
 
             if (this.storage.currentProject === undefined) {
@@ -4226,7 +4226,7 @@ class Activity {
                 320 / this.canvas.width
             );
 
-            img.onload = function () {
+            img.onload = () => {
                 const bitmap = new createjs.Bitmap(img);
                 const bounds = bitmap.getBounds();
                 bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
@@ -4244,7 +4244,7 @@ class Activity {
         /*
          * Inits everything. The main function.
          */
-        this.init = async function () {
+        this.init = async () => {
             this._clientWidth = document.body.clientWidth;
             this._clientHeight = document.body.clientHeight;
             this._innerWidth = window.innerWidth;
@@ -4266,7 +4266,7 @@ class Activity {
             const that = this;
 
             if (!jQuery.browser.mozilla) {
-                window.onblur = function () {
+                window.onblur = () => {
                     doHardStopButton(that, true);
                 };
             }
@@ -4280,21 +4280,21 @@ class Activity {
             // createjs.Ticker.addEventListener('tick', that.__tick);
 
             let mouseEvents = 0;
-            document.addEventListener("mousemove", function () {
+            document.addEventListener("mousemove", () => {
                 mouseEvents++;
                 if (mouseEvents % 4 === 0) {
                     that.__tick();
                 }
             });
 
-            document.addEventListener("click", function () {
+            document.addEventListener("click", () => {
                 that.__tick();
             });
 
             this._createMsgContainer(
                 "#ffffff",
                 "#7a7a7a",
-                function (text) {
+                (text) => {
                     that.msgText = text;
                 },
                 130
@@ -4303,7 +4303,7 @@ class Activity {
             this._createMsgContainer(
                 "#ffcbc4",
                 "#ff0031",
-                function (text) {
+                (text) =>{
                     that.errorMsgText = text;
                 },
                 130
@@ -4421,24 +4421,24 @@ class Activity {
             }
 
             // eslint-disable-next-line no-unused-vars
-            this.fileChooser.addEventListener("click", function (event) {
+            this.fileChooser.addEventListener("click", (event) => {
                 that.value = null;
             });
 
             this.fileChooser.addEventListener(
                 "change",
                 // eslint-disable-next-line no-unused-vars
-                function (event) {
+                (event) => {
                     // Read file here.
                     const reader = new FileReader();
 
                     // eslint-disable-next-line no-unused-vars
-                    reader.onload = function (theFile) {
+                    reader.onload = (theFile) => {
                         that.loading = true;
                         document.body.style.cursor = "wait";
                         that.doLoadAnimation();
 
-                        setTimeout(function () {
+                        setTimeout(() => {
                             const rawData = reader.result;
                             if (rawData === null || rawData === "") {
                                 that.errorMsg(
@@ -4465,7 +4465,7 @@ class Activity {
                                     if (!that.merging) {
                                         // Wait for the old blocks to be removed.
                                         // eslint-disable-next-line no-unused-vars
-                                        const __listener = function (event) {
+                                        const __listener = (event) => {
                                             that.blocks.loadNewBlocks(obj);
                                             that.stage.removeAllEventListeners("trashsignal");
                                             if (that.planet) {
@@ -4512,7 +4512,7 @@ class Activity {
                 false
             );
 
-            const __handleFileSelect = function (event) {
+            const __handleFileSelect = (event) => {
                 event.stopPropagation();
                 event.preventDefault();
 
@@ -4520,12 +4520,12 @@ class Activity {
                 const reader = new FileReader();
 
                 // eslint-disable-next-line no-unused-vars
-                reader.onload = function (theFile) {
+                reader.onload = (theFile) => {
                     that.loading = true;
                     document.body.style.cursor = "wait";
                     // doLoadAnimation();
 
-                    setTimeout(function () {
+                    setTimeout(() => {
                         const rawData = reader.result;
                         if (rawData === null || rawData === "") {
                             that.errorMsg(
@@ -4548,13 +4548,13 @@ class Activity {
 
                                 that.stage.removeAllEventListeners("trashsignal");
 
-                                const __afterLoad = function () {
+                                const __afterLoad = () => {
                                     document.removeEventListener("finishedLoading", __afterLoad);
                                 };
 
                                 // Wait for the old blocks to be removed.
                                 // eslint-disable-next-line no-unused-vars
-                                const __listener = function (event) {
+                                const __listener = (event) => {
                                     that.blocks.loadNewBlocks(obj);
                                     that.stage.removeAllEventListeners("trashsignal");
 
@@ -4596,7 +4596,7 @@ class Activity {
                 }
             };
 
-            const __handleDragOver = function (event) {
+            const __handleDragOver = (event) => {
                 event.stopPropagation();
                 event.preventDefault();
                 event.dataTransfer.dropEffect = "copy";
@@ -4607,12 +4607,12 @@ class Activity {
             dropZone.addEventListener("drop", __handleFileSelect, false);
 
             // eslint-disable-next-line no-unused-vars
-            this.allFilesChooser.addEventListener("click", function (event) {
+            this.allFilesChooser.addEventListener("click", (event) => {
                 this.value = null;
             });
 
             // eslint-disable-next-line no-unused-vars
-            this.pluginChooser.addEventListener("click", function (event) {
+            this.pluginChooser.addEventListener("click", (event) => {
                 window.scroll(0, 0);
                 this.value = null;
             });
@@ -4620,19 +4620,19 @@ class Activity {
             this.pluginChooser.addEventListener(
                 "change",
                 // eslint-disable-next-line no-unused-vars
-                function (event) {
+                (event) => {
                     window.scroll(0, 0);
 
                     // Read file here.
                     const reader = new FileReader();
 
                     // eslint-disable-next-line no-unused-vars
-                    reader.onload = function (theFile) {
+                    reader.onload = (theFile) =>{
                         that.loading = true;
                         document.body.style.cursor = "wait";
                         //doLoadAnimation();
 
-                        setTimeout(function () {
+                        setTimeout(() => {
                             const obj = processRawPluginData(that, reader.result);
                             // Save plugins to local storage.
                             if (obj !== null) {
@@ -4640,7 +4640,7 @@ class Activity {
                             }
 
                             // Refresh the palettes.
-                            setTimeout(function () {
+                            setTimeout(() => {
                                 if (that.palettes.visible) {
                                     that.palettes.hide();
                                 }
@@ -4775,12 +4775,12 @@ class Activity {
                                 case "inurl":
                                     url = args[1];
                                     // eslint-disable-next-line no-case-declarations
-                                    const getJSON = function (url) {
-                                        return new Promise(function (resolve, reject) {
+                                    const getJSON = (url) =>{
+                                        return new Promise((resolve, reject) =>{
                                             const xhr = new XMLHttpRequest();
                                             xhr.open("get", url, true);
                                             xhr.responseType = "json";
-                                            xhr.onload = function () {
+                                            xhr.onload = () => {
                                                 const status = xhr.status;
                                                 if (status === 200) {
                                                     resolve(xhr.response);
@@ -4793,12 +4793,12 @@ class Activity {
                                     };
 
                                     getJSON(url).then(
-                                        function (data) {
+                                        (data) => {
                                             const n = data.arg;
                                             env.push(parseInt(n));
                                         },
                                         // eslint-disable-next-line no-unused-vars
-                                        function (status) {
+                                        (status) =>{
                                             alert(
                                                 "Something went wrong reading JSON-encoded project data."
                                             );
@@ -4827,11 +4827,11 @@ class Activity {
             }
 
             if (this.projectID !== null) {
-                setTimeout(function () {
+                setTimeout(() => {
                     that.loadStartWrapper(loadProject, that.projectID, flags, env);
                 }, 200); // 2000
             } else {
-                setTimeout(function () {
+                setTimeout(() => {
                     that.loadStartWrapper(loadStart);
                 }, 200); // 2000
             }
@@ -4844,7 +4844,7 @@ class Activity {
             */
 
             const activity = this;
-            document.onkeydown = function () {
+            document.onkeydown = () => {
                 activity.__keyPressed(event);
             };
 
@@ -4857,15 +4857,15 @@ class Activity {
 
 const activity = new Activity();
 
-require(["domReady!"], function (doc) {
-    setTimeout(function () {
+require(["domReady!"], (doc) =>{
+    setTimeout(() => {
         activity.setupDependencies();
         activity.domReady(doc);
     }, 5000);
 });
 
 // eslint-disable-next-line no-unused-vars
-define(MYDEFINES, function (compatibility) {
+define(MYDEFINES, (compatibility) =>{
     activity.setupDependencies();
     activity.doContextMenus();
     activity.doPluginsAndPaletteCols();

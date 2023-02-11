@@ -64,7 +64,7 @@ const processABCNotes = function(logo, turtle) {
         return returnString;
     };
 
-    const __toABCnote = function (note) {
+    const __toABCnote = (note) => {
         // beams -- no space between notes
         // ties use ()
         // % comment
@@ -263,7 +263,7 @@ const processABCNotes = function(logo, turtle) {
                 }
             }
 
-            const __processTuplet = function (logo, turtle, i, count) {
+            const __processTuplet = (logo, turtle, i, count) => {
                 let j = 0;
                 let k = 0;
 

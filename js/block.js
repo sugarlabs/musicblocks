@@ -162,12 +162,12 @@ const PIEMENUS = [
     "wrapmode"
 ];
 
-function _blockMakeBitmap(data, callback, args) {
+const _blockMakeBitmap = (data, callback, args) => {
     // Async creation of bitmap from SVG data.
     // Works with Chrome, Safari, Firefox (untested on IE).
     const img = new Image();
 
-    img.onload = function () {
+    img.onload = () => {
         const bitmap = new createjs.Bitmap(img);
         callback(bitmap, args);
     };
@@ -264,7 +264,7 @@ class Block {
         return new Promise((resolve, reject) => {
             let loopCount = 0;
 
-            async function checkBounds(counter) {
+            const checkBounds = async (counter) => {
                 try {
                     if (counter !== undefined) {
                         loopCount = counter;
@@ -304,7 +304,7 @@ class Block {
         return new Promise((resolve, reject) => {
             let loopCount = 0;
 
-            async function updateBounds(counter) {
+            const updateBounds = async (counter) => {
                 try {
                     if (counter !== undefined) {
                         loopCount = counter;
@@ -669,7 +669,7 @@ class Block {
              * @param that - = this = container
              * @returns {void}
              */
-            const _postProcess = function (that) {
+            const _postProcess = (that) => {
                 that.collapseButtonBitmap.scaleX =
                     that.collapseButtonBitmap.scaleY =
                     that.collapseButtonBitmap.scale =
@@ -828,7 +828,7 @@ class Block {
          * @private
          * @returns {void}
          */
-        image.onload = function () {
+        image.onload = () => {
             const bitmap = new createjs.Bitmap(image);
             // Don't override the image on a media block.
             if (that.name === "media") {
@@ -911,7 +911,7 @@ class Block {
         let block_label = "";
 
         // Create the highlight bitmap for the block.
-        const __processHighlightBitmap = function (bitmap, that) {
+        const __processHighlightBitmap = (bitmap, that) => {
             if (that.highlightBitmap != null) {
                 that.container.removeChild(that.highlightBitmap);
             }
@@ -933,7 +933,7 @@ class Block {
                 that.container.uncache();
             }
 
-            const __callback = function (that, firstTime) {
+            const __callback = (that, firstTime) => {
                 that.activity.refreshCanvas();
                 const thisBlock = that.blocks.blockList.indexOf(that);
 
@@ -972,7 +972,7 @@ class Block {
         };
 
         // Create the disconnect highlight bitmap for the block.
-        const __processDisconnectedHighlightBitmap = function (bitmap, that) {
+        const __processDisconnectedHighlightBitmap = (bitmap, that) => {
             if (that.disconnectedHighlightBitmap != null) {
                 that.container.removeChild(that.disconnectedHighlightBitmap);
             }
@@ -1008,7 +1008,7 @@ class Block {
         };
 
         // Create the disconnect bitmap for the block.
-        const __processDisconnectedBitmap = function (bitmap, that) {
+        const __processDisconnectedBitmap = (bitmap, that) => {
             if (that.disconnectedBitmap != null) {
                 that.container.removeChild(that.disconnectedBitmap);
             }
@@ -1047,7 +1047,7 @@ class Block {
         };
 
         // Create the bitmap for the block.
-        const __processBitmap = function (bitmap, that) {
+        const __processBitmap = (bitmap, that) => {
             if (that.bitmap != null) {
                 that.container.removeChild(that.bitmap);
             }
@@ -1318,7 +1318,7 @@ class Block {
             obj = proto.generator();
             this.collapseArtwork = obj[0];
 
-            const postProcess = function (that) {
+            const postProcess = (that) => {
                 that.loadComplete = true;
 
                 if (that.postProcess !== null) {
@@ -1349,7 +1349,7 @@ class Block {
          * @private
          * @returns {void}
          */
-        const __finishCollapse = function (that) {
+        const __finishCollapse = (that) => {
             if (postProcess !== null) {
                 postProcess(that);
             }
@@ -1369,9 +1369,9 @@ class Block {
          * @param that - = this
          * @returns {void}
          */
-        const __processCollapseButton = function (that) {
+        const __processCollapseButton = (that) => {
             const image = new Image();
-            image.onload = function () {
+            image.onload = () => {
                 that.collapseButtonBitmap = new createjs.Bitmap(image);
                 that.collapseButtonBitmap.scaleX =
                     that.collapseButtonBitmap.scaleY =
@@ -1401,9 +1401,9 @@ class Block {
          * @param that - = this
          * @returns {void}
          */
-        const __processExpandButton = function (that) {
+        const __processExpandButton = (that) => {
             const image = new Image();
-            image.onload = function () {
+            image.onload = () => {
                 that.expandButtonBitmap = new createjs.Bitmap(image);
                 that.expandButtonBitmap.scaleX =
                     that.expandButtonBitmap.scaleY =
@@ -1435,7 +1435,7 @@ class Block {
          * @param that - = this
          * @returns {void}
          */
-        const __processHighlightCollapseBitmap = function (bitmap, that) {
+        const __processHighlightCollapseBitmap = (bitmap, that) => {
             that.highlightCollapseBlockBitmap = bitmap;
             that.highlightCollapseBlockBitmap.name = "highlight_collapse_" + thisBlock;
             that.container.addChild(that.highlightCollapseBlockBitmap);
@@ -1617,7 +1617,7 @@ class Block {
          * @param that - = this
          * @returns {void}
          */
-        const __processCollapseBitmap = function (bitmap, that) {
+        const __processCollapseBitmap = (bitmap, that) => {
             that.collapseBlockBitmap = bitmap;
             that.collapseBlockBitmap.name = "collapse_" + thisBlock;
             that.container.addChild(that.collapseBlockBitmap);
@@ -1855,7 +1855,7 @@ class Block {
         }
         const image = new Image();
 
-        image.onload = function () {
+        image.onload = () => {
             // Before adding new artwork, remove any old artwork.
             that.removeChildBitmap("media");
 
@@ -1905,11 +1905,11 @@ class Block {
         const fileChooser = docById("myOpenAll");
         const that = this;
 
-        const __readerAction = function () {
+        const __readerAction = () => {
             window.scroll(0, 0);
 
             const reader = new FileReader();
-            reader.onloadend = function () {
+            reader.onloadend = () => {
                 if (reader.result) {
                     if (that.name === "media") {
                         that.value = reader.result;
@@ -2540,7 +2540,7 @@ class Block {
 
         this._calculateBlockHitArea();
 
-        this.container.on("mouseover", function () {
+        this.container.on("mouseover", () => {
             docById("contextWheelDiv").style.display = "none";
 
             if (!that.activity.logo.runningLilypond) {
@@ -2557,7 +2557,7 @@ class Block {
         let locked = false;
         let getInput = window.hasMouse;
 
-        this.container.on("click", function (event) {
+        this.container.on("click", (event) => {
             // We might be able to check which button was clicked.
             if ("nativeEvent" in event) {
                 if ("button" in event.nativeEvent && event.nativeEvent.button == 2) {
@@ -2660,7 +2660,7 @@ class Block {
             }
         });
 
-        this.container.on("mousedown", function (event) {
+        this.container.on("mousedown", (event) =>{
             docById("contextWheelDiv").style.display = "none";
 
             // Track time for detecting long pause...
@@ -2698,7 +2698,7 @@ class Block {
             };
         });
 
-        this.container.on("pressmove", function (event) {
+        this.container.on("pressmove", (event) =>{
             // FIXME: More voodoo
             event.nativeEvent.preventDefault();
 
@@ -2789,7 +2789,7 @@ class Block {
             that.activity.refreshCanvas();
         });
 
-        this.container.on("mouseout", function (event) {
+        this.container.on("mouseout", (event) =>{
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false);
             } else {
@@ -2804,7 +2804,7 @@ class Block {
             moved = false;
         });
 
-        this.container.on("pressup", function (event) {
+        this.container.on("pressup", (event) =>{
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false);
             } else {
@@ -3641,7 +3641,7 @@ class Block {
         if (!this._usePiemenu()) {
             let focused = false;
 
-            const __blur = function (event) {
+            const __blur = (event) =>{
                 // Not sure why the change in the input is not available
                 // immediately in FireFox. We need a workaround if hardware
                 // acceleration is enabled.
@@ -3665,7 +3665,7 @@ class Block {
                 }
             };
 
-            const __input = function () {
+            const __input = () => {
                 that._labelChanged(false, true);
             };
 
@@ -3674,7 +3674,7 @@ class Block {
                 this.label.addEventListener("input", __input);
             }
 
-            let __keypress = function (event) {
+            let __keypress = (event) =>{
                 if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
                     __blur(event);
                 }
@@ -3682,7 +3682,7 @@ class Block {
 
             this.label.addEventListener("keypress", __keypress);
 
-            this.label.addEventListener("change", function () {
+            this.label.addEventListener("change", () => {
                 that._labelChanged(false, true);
             });
 
@@ -4201,7 +4201,7 @@ class Block {
  * @public
  * @returns {void}
  */
-function $() {
+const $ = () => {
     const elements = new Array();
 
     for (let i = 0; i < arguments.length; i++) {
@@ -4222,6 +4222,6 @@ function $() {
 
 window.hasMouse = false;
 // Mousemove is not emulated for touch
-document.addEventListener("mousemove", function () {
+document.addEventListener("mousemove", () => {
     window.hasMouse = true;
 });

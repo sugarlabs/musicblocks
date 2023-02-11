@@ -28,7 +28,7 @@
 const PALETTE_SCALE_FACTOR = 0.5;
 const PALETTE_WIDTH_FACTOR = 3;
 
-function paletteBlockButtonPush(blocks, name, arg) {
+const paletteBlockButtonPush = (blocks, name, arg) => {
     const blk = blocks.makeBlock(name, arg);
     return blk;
 }
@@ -45,7 +45,7 @@ function paletteBlockButtonPush(blocks, name, arg) {
 //
 // loadPaletteMenuItemHandler is the event handler for the palette menu.
 
-function makePaletteIcons(data, width, height) {
+const makePaletteIcons = (data, width, height) => {
     const img = new Image();
     img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(data)));
     if (width) img.width = width;
@@ -1286,7 +1286,7 @@ class Palette {
     }
 }
 
-async function initPalettes(palettes) {
+const initPalettes = async (palettes) => {
     // Instantiate the palettes object on first load.
 
     for (let i = 0; i < BUILTINPALETTES.length; i++) {
