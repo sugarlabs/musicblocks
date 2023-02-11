@@ -147,7 +147,7 @@ class Palettes {
         cover.style.height = "1px";
         cover.style.background = platformColor.selectorBackground;
         td.appendChild(cover);
-        td.onmouseover = () => {
+        td.onclick = () => {
             this.showSelection(i, tr);
             this.makePalettes(i);
         };
