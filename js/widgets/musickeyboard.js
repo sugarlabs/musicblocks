@@ -2625,7 +2625,7 @@ function MusicKeyboard(activity) {
             let currentSelectedNotes = selectedNotes.slice(actionGroup * actionGroupInterval,(actionGroup+1) * actionGroupInterval );
             const newStack = [
                 [0, ["action", { collapsed: false }], 100, 100, [null, 1, 2, null]],
-                [1, ["text", { value: _("action") }], 0, 0, [0]],
+                [1, ["text", { value: _(`action_${actionGroup}`) }], 0, 0, [0]],
                 [2, "hidden", 0, 0, [0, currentSelectedNotes.length == 0 ? null : 3]]
             ];
             const newNotes = this._clusterNotes(currentSelectedNotes);
