@@ -81,12 +81,12 @@ function LocalCard(Planet) {
         // set image
         if (this.ProjectData.ProjectImage !== null) {
             frag.getElementById("local-project-image-" + this.id).src = this.ProjectData.ProjectImage;
-        } else if (Planet.IsMusicBlocks==1) {
+        } else if (Planet.IsMusicBlocks == 1) {
             frag.getElementById("local-project-image-" + this.id).src = this.PlaceholderMBImage;
         } else {
             frag.getElementById("local-project-image-" + this.id).src = this.PlaceholderTBImage;
         }
-                
+
         // set input text
         frag.getElementById("local-project-input-" + this.id).value = this.ProjectData.ProjectName;
 
@@ -111,8 +111,8 @@ function LocalCard(Planet) {
 
         // set input modify listener
         // eslint-disable-next-line no-unused-vars
-        frag.getElementById("local-project-input-" + this.id).addEventListener("input", evt => {
-            Planet.ProjectStorage.renameProject(this.id, this.value);
+        frag.getElementById("local-project-input-" + this.id).addEventListener("input", (evt) => {
+            Planet.ProjectStorage.renameProject(this.id, evt.target.value);
         });
 
         // set delete button listener
@@ -120,7 +120,7 @@ function LocalCard(Planet) {
         frag.getElementById("local-project-delete-" + this.id).addEventListener("click", evt => {
             Planet.LocalPlanet.openDeleteModal(this.id);
         });
-                
+
         // set publish button listener
         // eslint-disable-next-line no-unused-vars
         frag.getElementById("local-project-publish-" + this.id).addEventListener("click", evt => {
