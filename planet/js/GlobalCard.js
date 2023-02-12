@@ -38,35 +38,35 @@ function GlobalCard(Planet) {
         </div> \
         <div class=\"card-action\"> \
             <div class=\"flexcontainer\"> \
-                <a class=\"project-icon tooltipped\" data-position=\"bottom\" data-delay=\"50\" data-tooltip=\"'+_('More Details')+'\" id=\"global-project-more-details-{ID}\"><i class=\"material-icons\">info</i></a> \
-                <a class=\"project-icon tooltipped\" data-position=\"bottom\" data-delay=\"50\" data-tooltip=\"'+_(\"Open in Music Blocks\")+'\" id=\"global-project-open-{ID}\"><i class=\"material-icons\">launch</i></a> \
+                <a class=\"project-icon tooltipped\" data-position=\"bottom\" data-delay=\"50\" data-tooltip=\"More Details\" id=\"global-project-more-details-{ID}\"><i class=\"material-icons\">info</i></a> \
+                <a class=\"project-icon tooltipped\" data-position=\"bottom\" data-delay=\"50\" data-tooltip=\"Open in Music Blocks\" id=\"global-project-open-{ID}\"><i class=\"material-icons\">launch</i></a> \
                 <a class=\"project-icon\"></a> \
-                <a class=\"project-icon tooltipped\" data-position=\"bottom\" data-delay=\"50\" data-tooltip=\"'+_('Merge with current project')+'\" id=\"global-project-merge-{ID}\"><i class=\"material-icons\">merge_type</i></a> ";
+                <a class=\"project-icon tooltipped\" data-position=\"bottom\" data-delay=\"50\" data-tooltip=\"Merge with current project\" id=\"global-project-merge-{ID}\"><i class=\"material-icons\">merge_type</i></a> ";
 
     if (Planet.ProjectStorage.isLiked(this.id)) {
         this.renderData += "\
-                <a class=\"project-icon tooltipped\" data-position=\"bottom\" data-delay=\"50\" data-tooltip=\"'+_('Unlike project')+'\"><i class=\"material-icons\"id=\"global-like-icon-{ID}\"></i><span class=\"likes-count\" id=\"global-project-likes-{ID}\"></span></a> ";
+                <a class=\"project-icon tooltipped\" data-position=\"bottom\" data-delay=\"50\" data-tooltip=\"Unlike project\"><i class=\"material-icons\"id=\"global-like-icon-{ID}\"></i><span class=\"likes-count\" id=\"global-project-likes-{ID}\"></span></a> ";
     } else {
         this.renderData += "\
-                <a class=\"project-icon tooltipped\" data-position=\"bottom\" data-delay=\"50\" data-tooltip=\"'+_('Like project')+'\"><i class=\"material-icons\"id=\"global-like-icon-{ID}\"></i><span class=\"likes-count\" id=\"global-project-likes-{ID}\"></span></a>";
+                <a class=\"project-icon tooltipped\" data-position=\"bottom\" data-delay=\"50\" data-tooltip=\"Like project\"><i class=\"material-icons\"id=\"global-like-icon-{ID}\"></i><span class=\"likes-count\" id=\"global-project-likes-{ID}\"></span></a>";
     }
     this.renderData += "\
                     <div id=\"global-share-{ID}\"> \
-                                        <a class=\"project-icon tooltipped\" data-position=\"bottom\" data-delay=\"50\" data-tooltip=\"'+_('Share project')+'\" id=\"global-project-share-{ID}\"><i class=\"material-icons\">share</i></a> \
+                                        <a class=\"project-icon tooltipped\" data-position=\"bottom\" data-delay=\"50\" data-tooltip=\"Share project\" id=\"global-project-share-{ID}\"><i class=\"material-icons\">share</i></a> \
                                         <div class=\"card share-card\" id=\"global-sharebox-{ID}\" style=\"display:none;\"> \
                                                 <div class=\"card-content shareurltext\"> \
-                                                        <div class=\"shareurltitle\">'+_('Share')+'</div> \
+                                                        <div class=\"shareurltitle\">Share</div> \
                                                         <input type=\"text\" name=\"shareurl\" class=\"shareurlinput\" data-originalurl=\"https://musicblocks.sugarlabs.org/index.html?id={ID}\"> \
-                                                        <a class=\"copyshareurl tooltipped\" onclick=\"copyURLToClipboard()\" data-clipboard-text=\"https://musicblocks.sugarlabs.org/index.html?id={ID}&run=True\" data-delay=\"50\" data-tooltip=\"'+_('Copy link to clipboard')+'\"><i class=\"material-icons\"alt=\"Copy!\">file_copy</i></a>\
+                                                        <a class=\"copyshareurl tooltipped\" onclick=\"copyURLToClipboard()\" data-clipboard-text=\"https://musicblocks.sugarlabs.org/index.html?id={ID}&run=True\" data-delay=\"50\" data-tooltip=\"Copy link to clipboard\"><i class=\"material-icons\"alt=\"Copy!\">file_copy</i></a>\
                                                         <div class=\"shareurl-advanced\" id=\"global-advanced-{ID}\"> \
-                                                                <div class=\"shareurltitle\">'+_('Flags')+'</div> \
-                                                                <div><input type=\"checkbox\" name=\"run\" id=\"global-checkboxrun-{ID}\" checked><label for=\"global-checkboxrun-{ID}\">'+_('Run project on startup.')+'</label></div> \
-                                                                <div><input type=\"checkbox\" name=\"show\" id=\"global-checkboxshow-{ID}\"><label for=\"global-checkboxshow-{ID}\">'+_('Show code blocks on startup.')+'</label></div> \
-                                                                <div><input type=\"checkbox\" name=\"collapse\" id=\"global-checkboxcollapse-{ID}\"><label for=\"global-checkboxcollapse-{ID}\">'+_('Collapse code blocks on startup.')+'</label></div> \
+                                                                <div class=\"shareurltitle\">Flags</div> \
+                                                                <div><input type=\"checkbox\" name=\"run\" id=\"global-checkboxrun-{ID}\" checked><label for=\"global-checkboxrun-{ID}\">Run project on startup.</label></div> \
+                                                                <div><input type=\"checkbox\" name=\"show\" id=\"global-checkboxshow-{ID}\"><label for=\"global-checkboxshow-{ID}\">Show code blocks on startup.</label></div> \
+                                                                <div><input type=\"checkbox\" name=\"collapse\" id=\"global-checkboxcollapse-{ID}\"><label for=\"global-checkboxcollapse-{ID}\">Collapse code blocks on startup.</label></div> \
                                                         </div> \
                                                 </div> \
                                                 <div class=\"card-action\"> \
-                                                        <a onclick=\"toggleExpandable('global-advanced-{ID}','shareurl-advanced');\">'+_('Advanced Options')+'</a> \
+                                                        <a onclick=\"toggleExpandable('global-advanced-{ID}','shareurl-advanced');\">Advanced Options</a> \
                                                 </div> \
                                         </div> \
                                 </div> \
