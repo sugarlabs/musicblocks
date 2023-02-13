@@ -173,7 +173,7 @@ const _blockMakeBitmap = (data, callback, args) => {
     };
 
     img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(data)));
-}
+};
 
 // Define block instance objects and any methods that are intra-block.
 class Block {
@@ -292,7 +292,7 @@ class Block {
                 } catch (e) {
                     reject(e);
                 }
-            }
+            };
             checkBounds();
         });
     }
@@ -325,7 +325,7 @@ class Block {
                 } catch (e) {
                     reject(e);
                 }
-            }
+            };
             updateBounds();
         });
     }
@@ -3474,14 +3474,18 @@ class Block {
             piemenuBasic(this, gridLabels, gridValues, selectedValue, platformColor.piemenuBasic);
         } else if (this.name === "outputtools") {
             selectedValue = this.privateData;
+            let values;
             let labels;
             if (this.activity.beginnerMode) {
-                labels = this.protoblock.extraSearchTerms.slice(0, 5);
+                values = this.protoblock.extraSearchTerms.slice(0, 6);
+                labels = this.protoblock.iemenuLabels.slice(0, 6);
             } else {
-                labels = this.protoblock.extraSearchTerms;
+                values = this.protoblock.extraSearchTerms;
+                labels = this.protoblock.piemenuLabels;
             }
-
-            const values = labels;
+            if (values.indexOf(selectedValue) === -1) {
+                selectedValue = values[3];  // letter class
+            }
             piemenuBasic(this, labels, values, selectedValue, platformColor.piemenuBasic);
         } else if (this.name === "wrapmode") {
             if (this.value != null) {
@@ -4204,13 +4208,13 @@ class Block {
 const $ = () => {
     const elements = new Array();
 
-    for (let i = 0; i < arguments.length; i++) {
-        let element = arguments[i];
+    for (let i = 0; i < elements.length; i++) {
+        let element = elements[i];
         if (typeof element === "string") {
             element = docById(element);
         }
 
-        if (arguments.length === 1) {
+        if (elements.length === 1) {
             return element;
         }
 
@@ -4218,7 +4222,7 @@ const $ = () => {
     }
 
     return elements;
-}
+};
 
 window.hasMouse = false;
 // Mousemove is not emulated for touch

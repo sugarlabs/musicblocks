@@ -413,9 +413,26 @@ function setupPitchBlocks(activity) {
                 "outputtoolshelp"
             ]);
             this.extraSearchTerms = [
+                "pitch number",
+                "pitch in hertz",
+                "alphabet",
+                "letter class",
+                "solfege class",
+                "staff y",
+                "solfege syllable",
+                "pitch class",
+                "scalar class",
+                "scale degree",
+                "nth degree",
+                "pitch to shade",
+                "pitch to color"
+            ];
+            // Ensure that these string are included for translation.
+            this.piemenuLabels = [
                 _("pitch number"),
                 _("pitch in hertz"),
-                _("letter"),
+                _("alphabet"),
+                //.TRANS: Translate as "alphabet class"
                 _("letter class"),
                 _("solfege class"),
                 _("staff y"),
