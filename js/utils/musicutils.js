@@ -1877,6 +1877,10 @@ const keySignatureToMode = (keySignature) => {
     } else if (key == "F" + FLAT) {
         parts = keySignature.split(" ");
         key = "F" + FLAT;
+    } else if (SOLFEGENAMES1.indexOf(key) !== -1) {
+        // This conversion will be a bit iffy depending upon the current mode.
+        // eslint-disable-next-line no-use-before-define
+        key = getNote(key, 4, 0, "C Major", false)[0];
     } else if (NOTESSHARP.indexOf(key) === -1 && NOTESFLAT.indexOf(key) === -1) {
         // eslint-disable-next-line no-console
         console.debug("Invalid key or missing name; reverting to C.");
