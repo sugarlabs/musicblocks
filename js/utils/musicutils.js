@@ -2722,17 +2722,16 @@ function getNote(
         temperament = "equal";
     }
 
-    // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
-    if (noteArg.substr(-1) === ">") {
-        // Read octave and solfege from HTML
-        octave = parseInt(noteArg.slice(noteArg.indexOf(">") + 1, noteArg.indexOf("/") - 1));
-        noteArg = noteArg.substr(0, noteArg.indexOf("<"));
-    }
-
     let sharpFlat = false;
     let rememberFlat = false;
     let rememberSharp = false;
     if (typeof noteArg !== "number") {
+        // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
+        if (noteArg.substr(-1) === ">") {
+            // Read octave and solfege from HTML
+            octave = parseInt(noteArg.slice(noteArg.indexOf(">") + 1, noteArg.indexOf("/") - 1));
+            noteArg = noteArg.substr(0, noteArg.indexOf("<"));
+        }
         if (
             noteArg.toLowerCase().substr(0, 4) === "rest" ||
             noteArg.toLowerCase().substr(0, 4) === "r"
@@ -2749,14 +2748,41 @@ function getNote(
 
     transposition = Math.round(transposition);
     if (typeof noteArg === "number") {
-        noteArg = noteArg.toString();
+        // Assume it is a pitch number.
+        if (!keySignature) {
+            keySignature = "C major";
+        }
+        let kOffset = 0;
+        if (movable) {
+            kOffset = PITCHES.indexOf(keySignature.split(" ")[0]);
+            if (kOffset === -1) {
+                kOffset = PITCHES.indexOf(keySignature.split(" ")[0]);
+            }
+            if (kOffset === -1) {
+                kOffset = PITCHES2.indexOf(keySignature.split(" ")[0]);
+            }
+            if (kOffset === -1) {
+                kOffset = 0;
+                // eslint-disable-next-line no-console
+                console.log(
+                    "Cannot find " +
+                    keySignature.split(" ")[0] +
+                    ". Reverting to C"
+                );
+            }
+        }
+        if (getSharpFlatPreference(keySignature) === "sharp") {
+            noteArg = PITCHES2[(noteArg + kOffset) % 12];
+        } else {
+            noteArg = PITCHES[(noteArg + kOffset) % 12];
+        }
     }
 
     let note;
     let articulation;
 
     if (temperament === "equal") {
-        // Check for double flat or double sharp. Since 𝄫 and 𝄪 behave
+        // Check for double flat or double sharp. Since bb and x behave
         // funny with string operations, we jump through some hoops.
         articulation = getArticulation(noteArg);
         noteArg = noteArg.replace(articulation, "");
@@ -2825,6 +2851,7 @@ function getNote(
             }
 
             let obj;
+
             if (movable) {
                 obj = getScaleAndHalfSteps(keySignature);
             } else {
