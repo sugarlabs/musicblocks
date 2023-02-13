@@ -4304,6 +4304,9 @@ msgstr ""
 msgid "This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."
 msgstr ""
 
+msgid "alphabet"
+msgstr "アルファベット"
+
 #: js/PitchBlocks.js:417
 msgid "letter class"
 msgstr "アルファベット・クラス"
