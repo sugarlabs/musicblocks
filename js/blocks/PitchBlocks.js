@@ -415,6 +415,7 @@ function setupPitchBlocks(activity) {
             this.extraSearchTerms = [
                 _("pitch number"),
                 _("pitch in hertz"),
+                _("letter"),
                 _("letter class"),
                 _("solfege class"),
                 _("staff y"),

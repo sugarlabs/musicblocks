@@ -4490,6 +4490,8 @@ const getPitchInfo = (activity, type, currentNote, tur) => {
 
     try {
         switch (type) {
+            case "letter":
+                return pitch;
             case "letter class":
                 return pitch[0];
             case "solfege syllable":
