@@ -112,4 +112,4 @@ const initBasicProtoBlocks = (activity) => {
             );
         }
     }
-}
+};

@@ -303,7 +303,7 @@ const getMainToolbarButtonNames = (name) => {
             "new"
         ].indexOf(name) > -1
     );
-}
+};
 
 const getAuxToolbarButtonNames = (name) => {
     return (
@@ -318,7 +318,7 @@ const getAuxToolbarButtonNames = (name) => {
             "go-home"
         ].indexOf(name) > -1
     );
-}
+};
 
 const createDefaultStack = () => {
     if (_THIS_IS_TURTLE_BLOCKS_) {
@@ -418,7 +418,7 @@ const createDefaultStack = () => {
             ];
         }
     }
-}
+};
 
 const createHelpContent = (activity) => {
     let language = localStorage.languagePreference;
@@ -789,4 +789,4 @@ const createHelpContent = (activity) => {
                 window.btoa(unescape(encodeURIComponent(LOGO)))
         ]);
     }
-}
+};
