@@ -81,7 +81,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             .replace(/8/g, "''''''")
             .replace(/9/g, "'''''''")
             .toLowerCase();
-    }
+    };
 
     let noteCounter = 0;
     let queueSlur = false;
@@ -166,7 +166,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
         }
 
         return j;
-    }
+    };
 
     for (let i = 0; i < logo.notation.notationStaging[turtle].length; i++) {
         let obj = logo.notation.notationStaging[turtle][i];

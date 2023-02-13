@@ -1066,7 +1066,7 @@ class Activity {
                 if (counter >= messages.load_messages.length) {
                     counter = 0;
                 }
-            }
+            };
 
             setInterval(changeText, 2000);
         };

@@ -126,7 +126,7 @@ const blockIsMacro = (activity, blkname) => {
         "xyhelp"
     ];
     return BLOCKISMACRO.indexOf(blkname) > -1;
-}
+};
 
 const getMacroExpansion = (activity, blkname, x, y) => {
     const protoBlock = activity.blocks.protoBlockDict[blkname];
@@ -1754,4 +1754,4 @@ const getMacroExpansion = (activity, blkname, x, y) => {
     } else {
         return null;
     }
-}
+};

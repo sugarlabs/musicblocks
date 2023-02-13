@@ -150,7 +150,7 @@ const showMaterialHighlight = (x, y, r, event, scale, stage) => {
 
     createjs.Tween.get(circles.active).to({ alpha: 0.05 }).to({ alpha: 0.3 }, 150);
     return circles;
-}
+};
 
 const hideButtonHighlight = (circles, stage) => {
     // Un-real circles!
@@ -163,13 +163,13 @@ const hideButtonHighlight = (circles, stage) => {
     setTimeout(() => {
         stage.removeChild(circles.active, circles.highlight);
     }, 410);
-}
+};
 
 const hidePaletteNameDisplay = (palette_text, stage) => {
     setTimeout(() => {
         stage.removeChild(palette_text);
     }, 150);
-}
+};
 
 const MENUWIDTH = 200;
 

@@ -31,7 +31,7 @@ const PALETTE_WIDTH_FACTOR = 3;
 const paletteBlockButtonPush = (blocks, name, arg) => {
     const blk = blocks.makeBlock(name, arg);
     return blk;
-}
+};
 
 // There are several components to the palette system:
 //
@@ -51,7 +51,7 @@ const makePaletteIcons = (data, width, height) => {
     if (width) img.width = width;
     if (height) img.height = height;
     return img;
-}
+};
 
 class Palettes {
     constructor(activity) {
@@ -1298,4 +1298,4 @@ const initPalettes = async (palettes) => {
     // eslint-disable-next-line no-console
     console.debug("Time to show the palettes.");
     palettes.show();
-}
+};
