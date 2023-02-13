@@ -969,11 +969,14 @@ All these options are provided in the form of a pie-menu which can be accessed s
 
 Below explained is the utility of every conversion option:
 
-#### **1. Letter class:**
+#### **0. Alphabet:**
+Prints the alphabet data of the note being played e.g A, B, C, D, E, F, G, inlcuding accidentals.
+
+#### **1. Alphabet class:**
 Prints the alphabet data of the note being played e.g A, B, C, D, E, F, G. It doesn't print any info regarding accidentals.
 
 #### **2. Solfege Syllable:**
-Similar to Letter class, returns the data in form of solfege e.g do, re, mi.
+Similar to Alphabet class, returns the data in form of solfege e.g do, re, mi.
 It too, gives no info regarding accidentals.
 
 #### **3. Pitch class:**
@@ -995,7 +998,7 @@ Returns the value in hertz of the pitch of the note being currently played.
 Value of the pitch of the note currently being played. It is different from Pitch class in the way that it can go below 0 and above 11 depending upon the octave.
 
 #### **9. Staff Y:**
-Returns the Y staff position of the note being played according to staff dimensions. It takes into account only the letter class, no accidental info is processed.
+Returns the Y staff position of the note being played according to staff dimensions. It takes into account only the alphabet class, no accidental info is processed.
 
 ### <a name="number-2-octave">3.2.9.3 Number to Octave  </a>
   
@@ -1011,7 +1014,8 @@ This converter takes a numeric value which denotes pitch number and returns the 
 
 | Converter Name | Description |
 | --- | --- |
-| letter class | Converts pitch to letter (as defined above). G maps to G. G♯ maps to G. |
+| alphabet | Converts pitch to letter (as defined above). G maps to G. G♯ maps to G#. |
+| alphabet class | Converts pitch to letter (as defined above). G maps to G. G♯ also maps to G. |
 | solfege syllable | Converts pitch to solfege (as defined above). G maps to sol. |
 | solfege class | Converts pitch to solfege class (as defined above). G maps to sol. G♯ maps to sol.|
 | pitch class | Converts pitch to pitch class (as defined above). G maps to 7. |

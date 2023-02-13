@@ -4303,8 +4303,12 @@ msgid "This block converts the pitch value of the last note played into differen
 msgstr "Este bloque convierte el valor de tono de la última nota tocada en diferentes formatos como hertz, nombre de letra, número de tono, etc."
 
 #: js/PitchBlocks.js:417
+msgid "alphabet"
+msgstr "alfabeto"
+
+#.TRANS: translate as alphabet class
 msgid "letter class"
-msgstr "clase de letras"
+msgstr "clase de alfabeto"
 
 #: js/PitchBlocks.js:418
 msgid "solfege class"
