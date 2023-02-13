@@ -65,7 +65,7 @@ function setupIntervalsActions(activity) {
             return modename;
         }
 
- /**
+        /**
          * @static
          * @param {number} turtle
          * @returns {String}
@@ -91,26 +91,19 @@ function setupIntervalsActions(activity) {
          */
         static setKey(key, mode, turtle) {
             const modename = Singer.IntervalsActions.GetModename(mode);
-
             const tur = activity.turtles.ithTurtle(turtle);
-            // Check to see if there are any transpositions on the key
-            if (tur.singer.transposition !== 0) {
-                const noteObj = getNote(
-                    key,
-                    4,
-                    tur.singer.transposition,
-                    tur.singer.keySignature,
-                    false,
-                    null,
-                    activity.errorMsg,
-                    activity.logo.synth.inTemperament
-                );
-                tur.singer.keySignature = noteObj[0] + " " + modename;
-                activity.logo.notation.notationKey(turtle, noteObj[0], modename);
-            } else {
-                tur.singer.keySignature = key + " " + modename;
-                activity.logo.notation.notationKey(turtle, key, modename);
-            }
+            const noteObj = getNote(
+                key,
+                4,
+                tur.singer.transposition,
+                tur.singer.keySignature,
+                false,
+                null,
+                activity.errorMsg,
+                activity.logo.synth.inTemperament
+            );
+            tur.singer.keySignature = noteObj[0] + " " + modename;
+            activity.logo.notation.notationKey(turtle, noteObj[0], modename);
         }
 
         /**

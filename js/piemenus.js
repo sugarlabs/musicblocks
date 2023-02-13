@@ -494,11 +494,18 @@ const piemenuPitches = (
                     ) === -1
                     : true))
         ) {
-            let i = NOTENAMES.indexOf(FIXEDSOLFEGE[selection["note"]]);
+            let i = scale.indexOf(selection["note"]);
+            if (i === -1) {
+                i = scale.indexOf(that.value);
+            }
+            if (i === -1) {
+                i = NOTENAMES.indexOf(FIXEDSOLFEGE[selection["note"]]);
+            }
             if (i === -1) {
                 i = NOTENAMES.indexOf(FIXEDSOLFEGE[that.value]);
             }
             if (
+                NOTENAMES.indexOf(selection["note"]) !== -1 ||
                 scale[i][0] === FIXEDSOLFEGE[selection["note"]] ||
                 scale[i][0] === FIXEDSOLFEGE[that.value] ||
                 scale[i][0] === selection["note"]
