@@ -3098,6 +3098,13 @@ class Blocks {
             myBlock.container.snapToPixelEnabled = true;
             myBlock.container.x = 0;
             myBlock.container.y = 0;
+            
+            // All the new generated block graphics have this default position when clicked.
+            requestAnimationFrame(function() {
+             myBlock.container.x = 550;
+             myBlock.container.y = 250;
+             },0);
+        
 
             /** and we need to load the images into the container. */
             myBlock.imageLoad();
