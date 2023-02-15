@@ -2805,7 +2805,7 @@ function MusicKeyboard(activity) {
                     }
                 }
             }
-            this.activity.blocks.loadNewBlocks(newStack);
+            setTimeout(this.activity.blocks.loadNewBlocks(newStack), 2000);
         } 
         this.activity.textMsg(_("New action blocks generated!"));
     };
