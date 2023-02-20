@@ -25,6 +25,19 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
     rhythmBlockPalette = "rhythm";
 }
 
+Blockly.inject('blocklyDiv', {
+  toolbox: document.getElementById('toolbox'),
+  toolboxPosition: 'start',
+  toolboxOptions: {horizontalLayout: true, scrollbars: true},
+  ...
+});
+var workspace = Blockly.inject('blocklyDiv', {
+  ...
+  disableContextMenu: true,
+  ...
+});
+
+
 function setupRhythmBlockPaletteBlocks(activity) {
     class RhythmBlock extends FlowBlock {
         constructor(name) {
