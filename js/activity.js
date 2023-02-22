@@ -3971,7 +3971,7 @@ class Activity {
 
             this.homeButtonContainer = this._makeButton(
                 GOHOMEFADEDBUTTON,
-                _("Home") + " [" + _("Home").toUpperCase() + "]",
+                _("Home"),
                 x,
                 y,
                 btnSize,
