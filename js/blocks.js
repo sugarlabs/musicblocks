@@ -3096,7 +3096,7 @@ class Blocks {
             myBlock.container = new createjs.Container();
             this.activity.blocksContainer.addChild(myBlock.container);
             myBlock.container.snapToPixelEnabled = true;
-            myBlock.container.x = 0;
+            myBlock.container.x = 300;
             myBlock.container.y = 0;
 
             /** and we need to load the images into the container. */
