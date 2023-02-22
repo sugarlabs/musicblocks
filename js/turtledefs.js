@@ -32,7 +32,7 @@
    getAuxToolbarButtonNames, TITLESTRING
  */
 
-const VERSION = "3.5.2.7";
+const VERSION = "3.5.3.3";
 let LOGODEFAULT;
 let LOGOJA1 = LOGODEFAULT;
 let LOGOJA = LOGODEFAULT;
@@ -282,7 +282,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
     MULTIPALETTENAMES = [_("music"), _("logic"), _("artwork")];
 }
 
-function getMainToolbarButtonNames(name) {
+const getMainToolbarButtonNames = (name) => {
     return (
         [
             "popdown-palette",
@@ -303,9 +303,9 @@ function getMainToolbarButtonNames(name) {
             "new"
         ].indexOf(name) > -1
     );
-}
+};
 
-function getAuxToolbarButtonNames(name) {
+const getAuxToolbarButtonNames = (name) => {
     return (
         [
             "paste-disabled",
@@ -318,9 +318,9 @@ function getAuxToolbarButtonNames(name) {
             "go-home"
         ].indexOf(name) > -1
     );
-}
+};
 
-function createDefaultStack() {
+const createDefaultStack = () => {
     if (_THIS_IS_TURTLE_BLOCKS_) {
         DATAOBJS =
             [
@@ -418,9 +418,9 @@ function createDefaultStack() {
             ];
         }
     }
-}
+};
 
-function createHelpContent(activity) {
+const createHelpContent = (activity) => {
     let language = localStorage.languagePreference;
     if (language === undefined) {
         language = navigator.language;
@@ -435,7 +435,10 @@ function createHelpContent(activity) {
         HELPCONTENT = [
             [
                 _("Welcome to Turtle Blocks"),
-                _("Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."),
+                _("Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks.") +
+                    _("The current version is") +
+                    " " +
+                    VERSION,
                 "data:image/svg+xml;base64," +
                     window.btoa(unescape(encodeURIComponent(LOGO)))
             ],
@@ -458,7 +461,11 @@ function createHelpContent(activity) {
         HELPCONTENT = [
             [
                 _("Welcome to Music Blocks"),
-                _("Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way."),
+                _("Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way.") +
+                    " " +
+                    _("The current version is") +
+                    " " +
+                    VERSION,
                 "data:image/svg+xml;base64," +
                     window.btoa(unescape(encodeURIComponent(LOGO)))
             ],
@@ -735,8 +742,8 @@ function createHelpContent(activity) {
                 _("A full list of contributors can be found in the Turtle Blocks GitHub repository.") +
                 " " +
                 _("Turtle Blocks is licensed under the AGPL.") +
-                " "
-                + _("The current version is") +
+                " " +
+                _("The current version is") +
                 " " +
                 VERSION,
             "data:image/svg+xml;base64," +
@@ -782,4 +789,4 @@ function createHelpContent(activity) {
                 window.btoa(unescape(encodeURIComponent(LOGO)))
         ]);
     }
-}
+};

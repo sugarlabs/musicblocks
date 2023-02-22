@@ -102,7 +102,7 @@ function _(text) {
     }
 }
 
-function format(str, data) {
+let format = (str, data) => {
     str = str.replace(/{([a-zA-Z0-9.]*)}/g, (match, name) => {
         let x = data;
         name.split(".").forEach((v) => {
@@ -153,7 +153,7 @@ function windowWidth() {
     }
 }
 
-function httpGet(projectName) {
+let httpGet = (projectName) => {
     let xmlHttp = null;
     xmlHttp = new XMLHttpRequest();
     if (projectName === null) {
@@ -172,7 +172,7 @@ function httpGet(projectName) {
     return xmlHttp.responseText;
 }
 
-function httpPost(projectName, data) {
+let httpPost = (projectName, data) => {
     let xmlHttp = null;
     xmlHttp = new XMLHttpRequest();
     xmlHttp.open("POST", window.server + projectName, false);
@@ -252,7 +252,7 @@ function doBrowserCheck() {
 
 // Check for Internet Explorer
 
-window.onload = function () {
+window.onload = () => {
     const userAgent = window.navigator.userAgent;
     // For IE 10 or older
     const MSIE = userAgent.indexOf("MSIE ");
@@ -321,7 +321,7 @@ function docBySelector(selector) {
     return document.querySelector(selector);
 }
 
-function last(myList) {
+let last = (myList) => {
     const i = myList.length;
     if (i === 0) {
         return null;
@@ -330,7 +330,7 @@ function last(myList) {
     }
 }
 
-function getTextWidth(text, font) {
+let getTextWidth = (text, font) => {
     // re-use canvas object for better performance
     const canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
     const context = canvas.getContext("2d");
@@ -368,7 +368,7 @@ function doSVG(canvas, logo, turtles, width, height, scale) {
     return svg;
 }
 
-function isSVGEmpty(turtles) {
+let isSVGEmpty = (turtles) => {
     for (const turtle in turtles.turtleList) {
         turtles.turtleList[turtle].painter.closeSVG();
         if (turtles.turtleList[turtle].painter.svgOutput !== "") {
@@ -378,7 +378,7 @@ function isSVGEmpty(turtles) {
     return true;
 }
 
-function fileExt(file) {
+let fileExt = (file) => {
     if (file === null) {
         return "";
     }
@@ -391,7 +391,7 @@ function fileExt(file) {
     return parts.pop();
 }
 
-function fileBasename(file) {
+let fileBasename = (file) => {
     const parts = file.split(".");
     if (parts.length === 1) {
         return parts[0];
@@ -403,14 +403,14 @@ function fileBasename(file) {
     }
 }
 
-function toTitleCase(str) {
+let toTitleCase = (str) => {
     if (typeof str !== "string") return;
     let tempStr = "";
     if (str.length > 1) tempStr = str.substring(1);
     return str.toUpperCase()[0] + tempStr;
 }
 
-function processPluginData(activity, pluginData) {
+let processPluginData = (activity, pluginData) => {
     // Plugins are JSON-encoded dictionaries.
     if (pluginData === undefined) {
         return null;
@@ -627,7 +627,7 @@ function processPluginData(activity, pluginData) {
     return obj;
 }
 
-function processRawPluginData(activity, rawData) {
+let processRawPluginData = (activity, rawData) => {
     const lineData = rawData.split("\n");
     let cleanData = "";
 
@@ -662,7 +662,7 @@ function processRawPluginData(activity, rawData) {
     return obj;
 }
 
-function updatePluginObj(activity, obj) {
+let updatePluginObj = (activity, obj) => {
     if (obj === null) {
         return;
     }
@@ -725,14 +725,14 @@ function updatePluginObj(activity, obj) {
     }
 }
 
-function preparePluginExports(activity, obj) {
+let preparePluginExports = (activity, obj) => {
     // add obj to plugin dictionary and return as JSON encoded text
     updatePluginObj(activity, obj);
 
     return JSON.stringify(activity.pluginObjs);
 }
 
-function processMacroData(macroData, palettes, blocks, macroDict) {
+let processMacroData = (macroData, palettes, blocks, macroDict) => {
     // Macros are stored in a JSON-encoded dictionary.
     if (macroData !== undefined && macroData !== "{}") {
         try {
@@ -755,7 +755,7 @@ function processMacroData(macroData, palettes, blocks, macroDict) {
     }
 }
 
-function prepareMacroExports(name, stack, macroDict) {
+let prepareMacroExports = (name, stack, macroDict) => {
     if (name !== null) {
         macroDict[name] = stack;
     }
@@ -766,7 +766,7 @@ function prepareMacroExports(name, stack, macroDict) {
 // Some block-specific code
 // TODO: Move to camera plugin
 let hasSetupCamera = false;
-function doUseCamera(args, turtles, turtle, isVideo, cameraID, setCameraID, errorMsg) {
+let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorMsg) => {
     const w = 320;
     const h = 240;
 
@@ -966,7 +966,7 @@ function GCD(a, b) {
     return a;
 }
 
-function mixedNumber(d) {
+let mixedNumber = (d) => {
     // Return number as a mixed fraction string, e.g., "2 1/4"
 
     if (typeof d === "number") {
@@ -994,11 +994,11 @@ function mixedNumber(d) {
     }
 }
 
-function LCD(a, b) {
+let LCD = (a, b) => {
     return Math.abs((a * b) / GCD(a, b));
 }
 
-function rationalSum(a, b) {
+let rationalSum = (a, b) => {
     if (a === 0 || b === 0) {
         // console.debug("divide by zero?");
         return [0, 1];
@@ -1041,7 +1041,7 @@ function rationalSum(a, b) {
     return [(a[0] * lcd) / a[1] + (b[0] * lcd) / b[1], lcd];
 }
 
-function nearestBeat(d, b) {
+let nearestBeat = (d, b) => {
     // Find the closest beat for a given fraction.
 
     let sum = 1 / (2 * b);
@@ -1055,7 +1055,7 @@ function nearestBeat(d, b) {
     return [count, b];
 }
 
-function oneHundredToFraction(d) {
+let oneHundredToFraction = (d) => {
     // Generate some simple fractions based on a scale of 1-100
 
     if (d < 1) {
@@ -1199,11 +1199,11 @@ function oneHundredToFraction(d) {
     }
 }
 
-function rgbToHex(r, g, b) {
+let rgbToHex = (r, g, b) => {
     return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 
-function hexToRGB(hex) {
+let hexToRGB = (hex) => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
         ? {
@@ -1220,7 +1220,7 @@ function hexToRGB(hex) {
  * @param {Number} hex - hexcode
  * @returns {String} - rgb values of hexcode + alpha which is 1
  */
-function hex2rgb(hex) {
+let hex2rgb = (hex) => {
     const bigint = parseInt(hex, 16);
     const r = (bigint >> 16) & 255;
     const g = (bigint >> 8) & 255;
@@ -1229,7 +1229,7 @@ function hex2rgb(hex) {
     return "rgba(" + r + "," + g + "," + b + ",1)";
 }
 
-function delayExecution(duration) {
+let delayExecution = (duration) => {
     return new Promise((resolve) => {
         setTimeout(() => {
             resolve(true);
@@ -1241,7 +1241,7 @@ function closeWidgets() {
     window.widgetWindows.hideAllWindows();
 }
 
-function closeBlkWidgets(name) {
+let closeBlkWidgets = (name) => {
     const widgetTitle = document.getElementsByClassName("wftTitle");
     for (let i = 0; i < widgetTitle.length; i++) {
         if (widgetTitle[i].innerHTML === name) {
@@ -1265,7 +1265,7 @@ function closeBlkWidgets(name) {
  * @param {*[]} viewArgs - constructor arguments for view
  * @returns {void}
  */
-function importMembers(obj, className, modelArgs, viewArgs) {
+let importMembers = (obj, className, modelArgs, viewArgs) => {
     /**
      * Adds methods and variables of one class, to another class' instance.
      *

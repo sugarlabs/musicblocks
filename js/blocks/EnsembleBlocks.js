@@ -681,7 +681,7 @@ function setupEnsembleBlocks(activity) {
                             thisTurtle.singer.noteOctaves[0],
                             0,
                             thisTurtle.singer.keySignature,
-                            tur.singer.moveable,
+                            tur.singer.movable,
                             null,
                             activity.errorMsg,
                             logo.synth.inTemperament
@@ -720,7 +720,7 @@ function setupEnsembleBlocks(activity) {
                         tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][0],
                         0,
                         tur.singer.keySignature,
-                        tur.singer.moveable,
+                        tur.singer.movable,
                         null,
                         activity.errorMsg,
                         logo.synth.inTemperament
@@ -1132,7 +1132,6 @@ function setupEnsembleBlocks(activity) {
             }
 
             this.setPalette("ensemble", activity);
-            this.hidden = this.lang === "ja";
 
             this.formBlock({
                 outType: "numberout"
@@ -1167,7 +1166,6 @@ function setupEnsembleBlocks(activity) {
             }
 
             this.setPalette("ensemble", activity);
-            this.hidden = this.lang === "ja";
 
             this.formBlock({
                 outType: "textout",

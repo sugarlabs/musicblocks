@@ -1387,11 +1387,11 @@ class ProtoBlock {
     }
 }
 
-function isObject(item) {
+const isObject = (item) => {
     return item && typeof item === "object" && !Array.isArray(item);
-}
+};
 
-function mergeDeep(target, ...sources) {
+const mergeDeep = (target, ...sources) => {
     // From https://stackoverflow.com/a/34749873
     if (!sources.length) return target;
     const source = sources.shift();
@@ -1408,7 +1408,7 @@ function mergeDeep(target, ...sources) {
     }
 
     return mergeDeep(target, ...sources);
-}
+};
 
 class BaseBlock extends ProtoBlock {
     constructor(name) {
@@ -1423,6 +1423,7 @@ class BaseBlock extends ProtoBlock {
         this.piemenuValuesC1 = [];
         this.piemenuValuesC2 = [];
         this.piemenuValuesC3 = [];
+        this.piemenuLabels = [];
 
         // Just for brevity
         this.lang = localStorage.languagePreference || navigator.language;

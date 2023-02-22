@@ -100,7 +100,7 @@ function setupDictActions(activity) {
                         targetTur.singer.noteOctaves[0],
                         0,
                         targetTur.singer.keySignature,
-                        targetTur.singer.moveable,
+                        targetTur.singer.movable,
                         null,
                         activity.errorMsg,
                         activity.logo.synth.inTemperament

@@ -88,6 +88,7 @@ const TACAT = {
     invert1: "transpose",
     register: "transpose",
     settransposition: "transpose",
+    setratio: "transpose",
     interval: "pitch",
     accidental: "pitch",
     hertz: "pitch",
@@ -185,6 +186,7 @@ const TACAT = {
     modename: "ignore",
     doubly: "pitchchord",
     intervalname: "ignore",
+    intervalnumber: "ignore",
     measureintervalsemitones: "pitchfactor",
     measureintervalscalar: "pitchfactor",
     arpeggio: "pitchchord",
@@ -192,6 +194,7 @@ const TACAT = {
     chordinterval: "pitchchord",
     semitoneinterval: "pitchchord",
     interval: "pitchchord",
+    ratiointerval: "pitchchord",
     definemode: "pitchchord",
     movable: "pitchchord",
     modelength: "pitchfactor",
@@ -529,7 +532,7 @@ const PALLABELS = [
     _("mice")
 ];
 
-function analyzeProject(activity) {
+const analyzeProject = (activity) => {
     // Parse block data and generate score based on rubric
 
     const blockList = [];
@@ -635,9 +638,9 @@ function analyzeProject(activity) {
     }
 
     return scores;
-}
+};
 
-function scoreToChartData(scores) {
+const scoreToChartData = (scores) => {
     const normalizedScores = [];
     let maxScore = 0;
     for (let i = 0; i < scores.length; i++) {
@@ -674,9 +677,9 @@ function scoreToChartData(scores) {
             }
         ]
     };
-}
+};
 
-function getChartOptions(callback) {
+const getChartOptions = (callback) => {
     return {
         // Callback for rendering chart into a bitmap
         onAnimationComplete: callback,
@@ -736,7 +739,7 @@ function getChartOptions(callback) {
         legendTemplate:
             '<ul class="<%=name.toLowerCase()%>-legend"><% for (var i=0; i<datasets.length; i++){%><li><span style="background-color:<%=datasets[i].strokeColor%>"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>'
     };
-}
+};
 
 const runAnalytics = (activity) => {
     const logo = activity.logo;

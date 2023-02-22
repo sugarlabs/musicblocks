@@ -123,7 +123,7 @@ const MEDIASAFEAREA = [40, 4, 108, 80];
 const HIGHLIGHTCOLOR = "#FFFFFF";
 const ACTIVECOLOR = "#212121";
 
-function showMaterialHighlight(x, y, r, event, scale, stage) {
+const showMaterialHighlight = (x, y, r, event, scale, stage) => {
     const circles = {
         highlight: new createjs.Shape(),
         active: new createjs.Shape()
@@ -150,9 +150,9 @@ function showMaterialHighlight(x, y, r, event, scale, stage) {
 
     createjs.Tween.get(circles.active).to({ alpha: 0.05 }).to({ alpha: 0.3 }, 150);
     return circles;
-}
+};
 
-function hideButtonHighlight(circles, stage) {
+const hideButtonHighlight = (circles, stage) => {
     // Un-real circles!
     if (circles.active === undefined) {
         return;
@@ -163,13 +163,13 @@ function hideButtonHighlight(circles, stage) {
     setTimeout(() => {
         stage.removeChild(circles.active, circles.highlight);
     }, 410);
-}
+};
 
-function hidePaletteNameDisplay(palette_text, stage) {
+const hidePaletteNameDisplay = (palette_text, stage) => {
     setTimeout(() => {
         stage.removeChild(palette_text);
     }, 150);
-}
+};
 
 const MENUWIDTH = 200;
 

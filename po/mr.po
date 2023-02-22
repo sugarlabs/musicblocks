@@ -4601,15 +4601,15 @@ msgid "define mode"
 msgstr ""
 
 #: js/IntervalsBlocks.js:805
-msgid "moveable Do"
+msgid "movable Do"
 msgstr ""
 
 #: js/IntervalsBlocks.js:809
-msgid "When Moveable do is false, the solfege note names are always tied to specific pitches,"
+msgid "When Movable do is false, the solfege note names are always tied to specific pitches,"
 msgstr ""
 
 #: js/IntervalsBlocks.js:811
-msgid "eg \"do\" is always \"C-natural\" when Moveable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
+msgid "eg \"do\" is always \"C-natural\" when Movable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
 msgstr ""
 
 #: js/IntervalsBlocks.js:837
@@ -10247,7 +10247,7 @@ msgstr "z चलऩ"
 
 #: js/turtledefs.js:439
 
-#~msgid "eg \"do\" is always \"C-natural\"); when Moveable do is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
+#~msgid "eg \"do\" is always \"C-natural\"); when Movable do is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
 #~msgstr ""
 
 #: js/turtledefs.js:459
@@ -10862,7 +10862,7 @@ msgstr "z चलऩ"
 
 #: js/turtledefs.js:343
 
-#~msgid "When <em>Moveable do</em> is false, the solfege note names are always tied to specific pitches (e.g. \"do\" is always \"C-natural\"); when <em>Moveable do</em> is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
+#~msgid "When <em>Movable do</em> is false, the solfege note names are always tied to specific pitches (e.g. \"do\" is always \"C-natural\"); when <em>Movable do</em> is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
 #~msgstr ""
 
 #: js/turtledefs.js:412
@@ -11229,7 +11229,7 @@ msgstr "z चलऩ"
 
 #: js/basicblocks.js:1946
 
-#~msgid "moveable"
+#~msgid "movable"
 #~msgstr ""
 
 #: js/turtledefs.js:370
@@ -13794,7 +13794,7 @@ msgstr "z चलऩ"
 
 #: js/turtledefs.js:352
 
-#~msgid "e.g. \"do\" is always \"C-natural\"); when Moveable do is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
+#~msgid "e.g. \"do\" is always \"C-natural\"); when Movable do is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
 #~msgstr ""
 
 #: js/basicblocks.js:83

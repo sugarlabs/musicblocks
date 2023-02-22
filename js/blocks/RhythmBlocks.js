@@ -631,7 +631,7 @@ function setupRhythmBlocks(activity) {
 
     class Note8Block extends _NoteValueBlock {
         constructor() {
-            super("note8", "scale degree");
+            super("note8", _("scale degree"));
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "newnote", x, y, [null, 1, 4, 8]],
@@ -810,8 +810,11 @@ function setupRhythmBlocks(activity) {
                 tur.queue.push(queueBlock);
             };
 
+            const tur = activity.turtles.ithTurtle(turtle);
+            if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.delayedNotes.push([blk, value]);
+            }
             Singer.RhythmActions.playNote(value, "newnote", turtle, blk, _callback);
-
             return [args[1], 1];
         }
     }

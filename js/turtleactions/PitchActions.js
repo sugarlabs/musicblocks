@@ -128,7 +128,7 @@ function setupPitchActions(activity) {
                     octave,
                     transposition_temp,
                     tur.singer.keySignature,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     null,
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
@@ -289,7 +289,7 @@ function setupPitchActions(activity) {
                     noteObj1[1],
                     ii,
                     tur.singer.keySignature,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     null,
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
@@ -303,7 +303,7 @@ function setupPitchActions(activity) {
                     noteObj1[1],
                     tur.singer.semitoneIntervals[i][0],
                     tur.singer.keySignature,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     null,
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
@@ -465,7 +465,7 @@ function setupPitchActions(activity) {
                     octave,
                     0,
                     tur.singer.keySignature,
-                    tur.singer.moveable,
+                    tur.singer.movable,
                     null,
                     activity.errorMsg
                 );
@@ -491,7 +491,7 @@ function setupPitchActions(activity) {
                         octave,
                         t,
                         tur.singer.keySignature,
-                        tur.singer.moveable,
+                        tur.singer.movable,
                         direction,
                         activity.errorMsg,
                         activity.logo.synth.inTemperament
@@ -521,7 +521,7 @@ function setupPitchActions(activity) {
                         noteObj1[1],
                         ii,
                         tur.singer.keySignature,
-                        tur.singer.moveable,
+                        tur.singer.movable,
                         null,
                         activity.errorMsg,
                         activity.logo.synth.inTemperament
@@ -535,7 +535,7 @@ function setupPitchActions(activity) {
                         noteObj1[1],
                         tur.singer.semitoneIntervals[i][0],
                         tur.singer.keySignature,
-                        tur.singer.moveable,
+                        tur.singer.movable,
                         null,
                         activity.errorMsg,
                         activity.logo.synth.inTemperament
@@ -558,7 +558,9 @@ function setupPitchActions(activity) {
                     );
                 }
             } else {
+                tur.singer.defaultNoteValue = 32;
                 Singer.processPitch(activity, note, octave, cents, turtle, blk);
+                tur.singer.defaultNoteValue = 4;
             }
         }
 
@@ -665,6 +667,34 @@ function setupPitchActions(activity) {
                 transValue = tur.singer.transpositionValues.pop();
                 tur.singer.transposition +=
                     tur.singer.invertList.length > 0 ? transValue : -transValue;
+            };
+
+            activity.logo.setTurtleListener(turtle, listenerName, __listener);
+        }
+
+        /**
+         * Shifts the pitches contained inside Note blocks by a ratio.
+         *
+         * @param {Number} ratio
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} [blk] - corresponding Block object index in blocks.blockList
+         * @returns {void}
+         */
+        static setRatioTranspose(value, turtle, blk) {
+            const tur = activity.turtles.ithTurtle(turtle);
+
+            tur.singer.transpositionRatios.push(value);
+
+            const listenerName = "_transposition_ratio_" + turtle;
+            if (blk !== undefined && blk in activity.blocks.blockList) {
+                activity.logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (MusicBlocks.isRun) {
+                const mouse = Mouse.getMouseFromTurtle(tur);
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
+            }
+
+            const __listener = () => {
+                tur.singer.transpositionRatios.pop();
             };
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
@@ -815,7 +845,7 @@ function setupPitchActions(activity) {
                             octave,
                             nhalf,
                             tur.singer.keySignature,
-                            tur.singer.moveable,
+                            tur.singer.movable,
                             null,
                             activity.errorMsg,
                             activity.logo.synth.inTemperament

@@ -496,6 +496,12 @@ msgstr "変化記号"
 msgid "interval name"
 msgstr "音程名"
 
+msgid "interval number"
+msgstr "音程を数で表示"
+
+msgid "The Interval number block returns the number of scalar steps in the current interval."
+msgstr "「音程を数で表示」ブロックは音階の数を経産して表示する"
+
 #: js/palette.js:611
 #: js/PitchBlocks.js:404
 msgid "pitch converter"
@@ -2293,12 +2299,12 @@ msgstr "<h2>メトロノームブロック</h2><br>メトロノームを表示�
 
 #: js/WidgetBlocks.js:617
 msgid "The Arpeggio Widget is used to compose chord sequences."
-msgstr ""
+msgstr "「アルペジオ」ウィジェットは コード進行 を作るためです。"
 
 #: js/WidgetBlocks.js:623
 #: js/IntervalsBlocks.js:503
 msgid "arpeggio"
-msgstr ""
+msgstr "アルペジオ"
 
 #: js/WidgetBlocks.js:675
 msgid "The Pitch drum matrix is used to map pitches to drum sounds."
@@ -2456,11 +2462,11 @@ msgstr "半音階的音程"
 
 #: js/IntervalsBlocks.js:494
 msgid "The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord."
-msgstr ""
+msgstr "「アルペジオ」ブロックは 「音符」ブロックを回数 再生して、コードによって 変更します。"
 
 #: js/IntervalsBlocks.js:496
 msgid "The output of the example is: do, mi, sol, sol, ti, mi"
-msgstr ""
+msgstr "例の解決は「ド、ミ、ソ、ソ、シ、ミ」"
 
 #: js/IntervalsBlocks.js:678
 msgid "The Chord block calculates common chords."
@@ -2492,15 +2498,15 @@ msgid "define mode"
 msgstr "モードを定義する"
 
 #: js/IntervalsBlocks.js:805
-msgid "moveable Do"
+msgid "movable Do"
 msgstr "移動ド"
 
 #: js/IntervalsBlocks.js:809
-msgid "When Moveable do is false, the solfege note names are always tied to specific pitches,"
+msgid "When Movable do is false, the solfege note names are always tied to specific pitches,"
 msgstr ""
 
 #: js/IntervalsBlocks.js:811
-msgid "eg \"do\" is always \"C-natural\" when Moveable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
+msgid "eg \"do\" is always \"C-natural\" when Movable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
 msgstr ""
 
 #: js/IntervalsBlocks.js:837
@@ -4210,6 +4216,18 @@ msgstr "サイン波"
 msgid "sawtooth"
 msgstr "ぎざぎざの波"
 
+msgid "The Transpose by Ratio block will shift the pitches contained inside Note blocks up (or down) by a ratio"
+msgstr "「比で移動」ブロックは 音符の中のピッチを比で移動させる。"
+
+msgid "transpose by ratio"
+msgstr "比で移動"
+
+msgid "The Ratio Interval block calculates an interval based on a ratio."
+msgstr "「比で音程」ブロックは比の音程のピッチを経産する。"
+
+msgid "ratio interval"
+msgstr "比で音程"
+
 #: js/PitchBlocks.js:140
 #.TRANS: musical transposition (adjustment of pitch up or down)
 msgid "transposition"
@@ -4285,6 +4303,9 @@ msgstr ""
 #: js/PitchBlocks.js:409
 msgid "This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."
 msgstr ""
+
+msgid "alphabet"
+msgstr "アルファベット"
 
 #: js/PitchBlocks.js:417
 msgid "letter class"
@@ -6336,6 +6357,9 @@ msgstr "タムタム"
 msgid "floor tom"
 msgstr "フロアタム"
 
+msgid "bass drum"
+msgstr "バスドラム"
+
 #: js/musicutils.js:737
 #: js/synthutils.js:135
 #.TRANS: a drum made from an inverted cup
@@ -6533,29 +6557,57 @@ msgstr "純正律"
 msgid "meantone"
 msgstr "中全音律"
 
+#: js/musicutils.js:842
+msgid "triad (root position)"
+msgstr "三和音 (基本形)"
+
+msgid "triad (1st inversion)"
+msgstr "三和音 (第1転回形)"
+
+msgid "triad (2nd inversion)"
+msgstr "三和音 (第2転回形)"
+
+msgid "seventh (root position)"
+msgstr "七の和音 (基本形)"
+
+msgid "seventh (1st inversion)"
+msgstr "七の和音 (第1転回形)"
+
+msgid "seventh (2nd inversion)"
+msgstr "七の和音 (第2転回形)"
+
+msgid "seventh (3rd inversion)"
+msgstr "七の和音 (第3転回形)"
+
+msgid "ninth (root position)"
+msgstr "九の和音 (基本形)"
+
+msgid "thirteenth (root position)"
+msgstr "十三の和音 (基本形)"
+
 #: js/musicutils.js:810
 msgid "major 7th"
-msgstr ""
+msgstr "長七の和音（メイジャー・セブンス)"
 
 #: js/musicutils.js:811
 msgid "minor 7th"
-msgstr ""
+msgstr "短七の和音（マイナー・セブンス）"
 
 #: js/musicutils.js:812
 msgid "dominant 7th"
-msgstr ""
+msgstr "属七の和音（ドミナント・セブンス）"
 
 #: js/musicutils.js:813
 msgid "minor-major 7th"
-msgstr ""
+msgstr "短三長七の和音（マイナー・メイジャー・セブンス）"
 
 #: js/musicutils.js:814
 msgid "fully-diminished 7th"
-msgstr ""
+msgstr "減七の和音（ディミニッシュト・セブンス）"
 
 #: js/musicutils.js:815
 msgid "half-diminished 7th"
-msgstr ""
+msgstr "減五短七の和音（ハーフ・ディミニッシュト）"
 
 #: js/musicutils.js:4235
 #: js/musicutils.js:4272
@@ -6987,7 +7039,7 @@ msgstr "クリックで強い拍の位置を選べます。"
 
 #: js/arpeggio.js:224
 msgid "Click in the grid to add steps to the arpeggio."
-msgstr ""
+msgstr "テーブルを クリックでアルペジオのピッチを加える。"
 
 #: js/ProjectStorage.js:258
 msgid "anonymous"
@@ -8274,7 +8326,7 @@ msgstr "z座標の動き"
 #~msgid "hi-hat"
 #~msgstr "ハイハット"
 
-#~msgid "moveable"
+#~msgid "movable"
 #~msgstr "移動の「ド、レ、ミ」"
 
 #~msgid "untitled"

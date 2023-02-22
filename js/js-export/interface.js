@@ -84,7 +84,7 @@ class JSInterface {
         // Meter blocks
         pickup: "PICKUP",
         // Intervals blocks
-        movable: "MOVEABLE",
+        moveable: "MOVABLE",
         // Volume blocks
         setnotevolume: "MASTERVOLUME",
         setpanning: "PANNING"

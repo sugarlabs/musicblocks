@@ -29,19 +29,19 @@ function LocalPlanet(Planet) {
     this.currentProjectImage = null;
     this.currentProjectID = null;
 
-    this.updateProjects = function() {
+    this.updateProjects = () => {
         jQuery(".tooltipped").tooltip("remove");
         this.refreshProjectArray();
         this.initCards();
         this.renderAllProjects();
     };
 
-    this.setCurrentProjectImage = function(image) {
+    this.setCurrentProjectImage = image => {
         this.currentProjectImage = image;
         this.currentProjectID = Planet.ProjectStorage.getCurrentProjectID();
     };
 
-    this.refreshProjectArray = function() {
+    this.refreshProjectArray = () => {
         this.projects = [];
         for (const project in this.ProjectTable) {
             // eslint-disable-next-line no-prototype-builtins
@@ -50,22 +50,21 @@ function LocalPlanet(Planet) {
             }
         }
 
-        const that = this;
 
-        this.projects.sort(function(a, b) {
+        this.projects.sort((a, b) => {
             // eslint-disable-next-line max-len
-            return that.ProjectTable[b[0]].DateLastModified - that.ProjectTable[a[0]].DateLastModified;
+            return this.ProjectTable[b[0]].DateLastModified - this.ProjectTable[a[0]].DateLastModified;
         });
     };
 
-    this.initCards = function() {
+    this.initCards = () => {
         for (let i = 0; i < this.projects.length; i++) {
             this.projects[i][1] = new LocalCard(Planet);
             this.projects[i][1].init(this.projects[i][0]);
         }
     };
 
-    this.renderAllProjects = function() {
+    this.renderAllProjects = () => {
         document.getElementById("local-projects").innerHTML = "";
         let index = -1;
         for (let i = 0; i < this.projects.length; i++) {
@@ -84,7 +83,7 @@ function LocalPlanet(Planet) {
         jQuery(".tooltipped").tooltip({delay: 50});
     };
 
-    this.initDeleteModal = function() {
+    this.initDeleteModal = () => {
         const t = this;
         document.getElementById("deleter-button").addEventListener(
             "click",
@@ -97,7 +96,7 @@ function LocalPlanet(Planet) {
         );
     };
 
-    this.openDeleteModal = function(id) {
+    this.openDeleteModal = id => {
         this.DeleteModalID = id;
         const name = this.ProjectTable[id].ProjectName;
         document.getElementById("deleter-title").textContent = name;
@@ -105,12 +104,12 @@ function LocalPlanet(Planet) {
         jQuery("#deleter").modal("open");
     };
 
-    this.openProject = function(id) {
+    this.openProject = id => {
         Planet.ProjectStorage.setCurrentProjectID(id);
         Planet.loadProjectFromData(this.ProjectTable[id].ProjectData);
     };
 
-    this.mergeProject = function(id) {
+    this.mergeProject = id => {
         const d = this.ProjectStorage.getCurrentProjectData();
         if (d === null) {
             this.ProjectStorage.initialiseNewProject();
@@ -120,7 +119,7 @@ function LocalPlanet(Planet) {
         }
     };
 
-    this.init = function() {
+    this.init = () => {
         this.ProjectTable = Planet.ProjectStorage.data.Projects;
         this.refreshProjectArray();
         this.initDeleteModal();

@@ -77,7 +77,7 @@ const BACKWARDCOMPATIBILIYDICT = {
  * @param  {Object} blocks
  * @returns {void}
  */
-function initBasicProtoBlocks(activity) {
+const initBasicProtoBlocks = (activity) => {
     activity.blocks.palettes = activity.palettes;
     setupRhythmBlockPaletteBlocks(activity);
     setupRhythmBlocks(activity);
@@ -112,4 +112,4 @@ function initBasicProtoBlocks(activity) {
             );
         }
     }
-}
+};

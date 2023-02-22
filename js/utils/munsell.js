@@ -6712,7 +6712,7 @@ const MUNSELL = [
     "#ffffff"
 ];
 
-function interpColor(hex1, hex2, p) {
+let interpColor = (hex1, hex2, p)  => {
     if (hex1 === undefined && hex2 === undefined) {
         null;
     } else if (hex1 === undefined) {
@@ -6741,7 +6741,7 @@ function interpColor(hex1, hex2, p) {
     }
 }
 
-function getMunsellColor(hue, value, chroma) {
+let getMunsellColor = (hue, value, chroma) => {
     // hue (aka color) 0-100 -> 0-39
     // value (aka shade) 0-100 -> 0-10
     // chroma (aka grey) 0-100 -> 0-14
@@ -6780,7 +6780,7 @@ function getMunsellColor(hue, value, chroma) {
     return interpColor(MUNSELL[h * 165 + v1 * 15 + c], MUNSELL[h * 165 + v2 * 15 + c], p);
 }
 
-function getcolor(color) {
+let getcolor = (color) => {
     let h1 = Math.floor(color / 2.5);
     let h2 = h1 + 1;
     const p = h2 - color / 2.5;
@@ -6806,7 +6806,7 @@ function getcolor(color) {
  * @param {number} g - intensity of green
  * @param {number} b - intensity of blue
  */
-function searchColors(r, g, b) {
+let searchColors = (r, g, b) => {
     let nearestColor = -1;
     let distance = 10000000;
     for (let i = 0; i < 100; i++) {

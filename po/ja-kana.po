@@ -496,6 +496,12 @@ msgstr "へんかきごう"
 msgid "interval name"
 msgstr "おんていめい"
 
+msgid "interval number"
+msgstr "おんていを かずで ひょうじ"
+
+msgid "The Interval number block returns the number of scalar steps in the current interval."
+msgstr "「おんていを かずで ひょうじ」ブロックは おんかいの かずを けいさんして ひょうじする"
+
 #: js/palette.js:611
 #: js/PitchBlocks.js:404
 msgid "pitch converter"
@@ -2293,12 +2299,12 @@ msgstr "<h2>メトロノームブロック</h2><br>メトロノームを ひょ�
 
 #: js/WidgetBlocks.js:617
 msgid "The Arpeggio Widget is used to compose chord sequences."
-msgstr ""
+msgstr "「アルペジオ」ウィジェットは コードしんこう をつくる ためです。"
 
 #: js/WidgetBlocks.js:623
 #: js/IntervalsBlocks.js:503
 msgid "arpeggio"
-msgstr ""
+msgstr "アルペジオ"
 
 #: js/WidgetBlocks.js:675
 msgid "The Pitch drum matrix is used to map pitches to drum sounds."
@@ -2456,11 +2462,11 @@ msgstr "半おんかい的音程"
 
 #: js/IntervalsBlocks.js:494
 msgid "The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord."
-msgstr ""
+msgstr "「アルペジオ」ブロックは 「おんぷ」ブロックを かいすう さいせいして、コードによって へんかします。"
 
 #: js/IntervalsBlocks.js:496
 msgid "The output of the example is: do, mi, sol, sol, ti, mi"
-msgstr ""
+msgstr "れいの かいけつは 「ド、ミ、ソ、ソ、シ、ミ」"
 
 #: js/IntervalsBlocks.js:678
 msgid "The Chord block calculates common chords."
@@ -2492,15 +2498,15 @@ msgid "define mode"
 msgstr "ちょうを ていぎ する"
 
 #: js/IntervalsBlocks.js:805
-msgid "moveable Do"
+msgid "movable Do"
 msgstr "いどう ド"
 
 #: js/IntervalsBlocks.js:809
-msgid "When Moveable do is false, the solfege note names are always tied to specific pitches,"
+msgid "When Movable do is false, the solfege note names are always tied to specific pitches,"
 msgstr ""
 
 #: js/IntervalsBlocks.js:811
-msgid "eg \"do\" is always \"C-natural\" when Moveable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
+msgid "eg \"do\" is always \"C-natural\" when Movable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
 msgstr ""
 
 #: js/IntervalsBlocks.js:837
@@ -4210,6 +4216,18 @@ msgstr "サインは"
 msgid "sawtooth"
 msgstr "ぎざぎざの なみ"
 
+msgid "The Transpose by Ratio block will shift the pitches contained inside Note blocks up (or down) by a ratio"
+msgstr "「ひで いどう」ブロックは おんぷの なかの ピッチを ひで いどうさせる。"
+
+msgid "transpose by ratio"
+msgstr "ひで いどう"
+
+msgid "The Ratio Interval block calculates an interval based on a ratio."
+msgstr "「比で音程」ブロックは比の音程のピッチを経産する。"
+
+msgid "ratio interval"
+msgstr "ひで おんてい"
+
 #: js/PitchBlocks.js:140
 #.TRANS: musical transposition (adjustment of pitch up or down)
 msgid "transposition"
@@ -4285,6 +4303,9 @@ msgstr ""
 #: js/PitchBlocks.js:409
 msgid "This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."
 msgstr ""
+
+msgid "alphabet"
+msgstr "アルファベット"
 
 #: js/PitchBlocks.js:417
 msgid "letter class"
@@ -6336,6 +6357,9 @@ msgstr "タムタム"
 msgid "floor tom"
 msgstr "フロアタム"
 
+msgid "bass drum"
+msgstr "バスドラム"
+
 #: js/musicutils.js:737
 #: js/synthutils.js:135
 #.TRANS: a drum made from an inverted cup
@@ -6533,29 +6557,57 @@ msgstr "じゅんせいりつ"
 msgid "meantone"
 msgstr "ちゅうぜん おんりつ"
 
+#: js/musicutils.js:842
+msgid "triad (root position)"
+msgstr "さんわおん (きほんけい)"
+
+msgid "triad (1st inversion)"
+msgstr "さんわおん (だい1てんかいけい)"
+
+msgid "triad (2nd inversion)"
+msgstr "さんわおん (だい2てんかいけい)"
+
+msgid "seventh (root position)"
+msgstr "しちのわおん (きほんけい)"
+
+msgid "seventh (1st inversion)"
+msgstr "しちのわおん (だい1てんかいけい)"
+
+msgid "seventh (2nd inversion)"
+msgstr "しちのわおん (だい2てんかいけい)"
+
+msgid "seventh (3rd inversion)"
+msgstr "しちのわおん (だい3てんかいけい)"
+
+msgid "ninth (root position)"
+msgstr "きゅうのわおん (きほんけい)"
+
+msgid "thirteenth (root position)"
+msgstr "じゅうさんのわおん (きほんけい)"
+
 #: js/musicutils.js:810
 msgid "major 7th"
-msgstr ""
+msgstr "ちょうしちのわおん（メイジャー・セブンス）"
 
 #: js/musicutils.js:811
 msgid "minor 7th"
-msgstr ""
+msgstr "たんしちのわおん（マイナー・セブンス）"
 
 #: js/musicutils.js:812
 msgid "dominant 7th"
-msgstr ""
+msgstr "ぞくしちのわおん（ドミナント・セブンス）"
 
 #: js/musicutils.js:813
 msgid "minor-major 7th"
-msgstr ""
+msgstr "たんさんちょうしちのわおん（マイナー・メ イジャー・セブンス）"
 
 #: js/musicutils.js:814
 msgid "fully-diminished 7th"
-msgstr ""
+msgstr "げんしちのわおん（ディミニッシュト・セブンス）"
 
 #: js/musicutils.js:815
 msgid "half-diminished 7th"
-msgstr ""
+msgstr "げんごたんしちのわおん（ハーフ・ディミニッシュト）"
 
 #: js/musicutils.js:4235
 #: js/musicutils.js:4272
@@ -6987,7 +7039,7 @@ msgstr "クリックで つよい はくの いちを えらべます。"
 
 #: js/arpeggio.js:224
 msgid "Click in the grid to add steps to the arpeggio."
-msgstr ""
+msgstr "テーブルを クリックでアルペジオのピッチを加える。"
 
 #: js/ProjectStorage.js:258
 msgid "anonymous"
@@ -8134,7 +8186,7 @@ msgstr "z座標の動き"
 
 #: js/turtledefs.js:439
 
-#~msgid "eg \"do\" is always \"C-natural\"); when Moveable do is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
+#~msgid "eg \"do\" is always \"C-natural\"); when Movable do is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
 #~msgstr ""
 
 #: js/turtledefs.js:459
@@ -8471,7 +8523,7 @@ msgstr "z座標の動き"
 #~msgid "hi-hat"
 #~msgstr "ハイハット"
 
-#~msgid "moveable"
+#~msgid "movable"
 #~msgstr "いどうド"
 
 #~msgid "untitled"

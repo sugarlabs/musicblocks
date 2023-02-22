@@ -38,6 +38,7 @@ This guide details the many musical features of the language.
       6. [Fixed and Movable Pitch Systems](#326-fixed-and-movable-pitch-systems)
       7. [Intervals](#327-intervals)
           1. [Absolute Intervals](#3271-absolute-intervals)
+          2. [Ratio Intervals](#3272-ratio-intervals)
       8. [Chords](#328-chords)
       9. [Inversion](#329-inversion)
       10. [Converters](#3210-converters)
@@ -372,12 +373,13 @@ or double-flat accidental.)
 
 ![transposition](./transform2.svg "Adjusting transpositions")
 
-There are several ways to transpose a pitch: by semi-tone or scalar
-steps. The *Semi-tone-transposition* block (above left) can be used to
-make larger shifts in pitch in half-step units. A positive number
-shifts the pitch up and a negative number shifts the pitch down. The
-input must be a whole number. To shift up an entire octave, transpose
-by `12` half-steps. `-12` will shift down an entire octave.
+There are multiple ways to transpose a pitch: by semi-tone or scalar
+steps or by a ratio. The *Semi-tone-transposition* block (above left)
+can be used to make larger shifts in pitch in half-step units. A
+positive number shifts the pitch up and a negative number shifts the
+pitch down. The input must be a whole number. To shift up an entire
+octave, transpose by `12` half-steps. `-12` will shift down an entire
+octave.
 
 The *Scalar-transposition* block (above right) shifts a pitch based on
 the current key and mode. For example, in `C Major`, a scalar
@@ -386,6 +388,12 @@ transposition of `2` half steps). To transpose `E` to `F` is `1`
 scalar step (or `1` half step). To shift an entire octave, scalar
 transpose by the mode length up or down. (In major scales, the mode
 length is `7`.)
+
+![ratio transposition](../documentation/setratio_block.svg "raising by a fifth using transpose by ratio")
+
+The *Transpose-by-ratio* block shifts a pitch based on a ratio. For
+example, a ratio of 2:1 would shift a pitch by an octave; a ratio of
+3:2 would shift a pitch by a fifth.
 
 As a convenience, a number of standard scalar transpositions are
 provided: *Unison*, *Second*, *Third*, ..., *Seventh*, *Down third*,
@@ -571,11 +579,11 @@ You can find the *Set key* block on the *Intervals* palette.
 
 | Music Blocks Code with Set Key and Movable Do |
 | --- |
-| ![moveable do](./pitchmovement5.svg "moveable do") |
+| ![movable do](./pitchmovement5.svg "movable do") |
 
 | Standard Notation Code for Set Key and Movable Do |
 | --- |
-| ![moveable do](./pitchmovement5.png "moveable do") |
+| ![movable do](./pitchmovement5.png "movable do") |
 
 | Representation | Pitch Movement | Properties |
 | --- | --- | --- |
@@ -583,11 +591,11 @@ You can find the *Set key* block on the *Intervals* palette.
 
 | Music Blocks for Set Key and Scalar Step |
 | --- |
-| ![moveable do](./pitchmovement6.svg "moveable do") |
+| ![movable do](./pitchmovement6.svg "movable do") |
 
 | Standard Notation with Set Key and Scalar Step |
 | --- |
-| ![moveable do](./pitchmovement6.png "moveable do") |
+| ![movable do](./pitchmovement6.png "movable do") |
 
 #### <a name="FIXED-AND-MOVABLE-PITCH-SYSTEMS">3.2.6 Fixed and Movable Pitch Systems</a>
 
@@ -744,7 +752,7 @@ block.
 
 ![Scale Degree Improv Example](./scale-degree-improv.svg "Scale Degree Improv")
 
-[Scale Degree Improv](https://rawgit.com/sugarlabs/musicblocks/master/examples/Scale-Degree-Improv.html)
+[Scale Degree Improv](https://musicblocks.sugarlabs.org/index.html?id=1675577999425474&run=True)
 
 #### <a name="INTERVALS">3.2.7 Intervals</a>
 
@@ -787,7 +795,18 @@ The *Doubly* block can be used to create a double augmentation or
 double diminishment.
 
 The *Semi-tone interval measure* block can be used to measure the
-number of half-steps between two pitched.
+number of half-steps between two pitches.
+
+#### <a name= "RATIO-INTERVALS">3.2.7.2 Ratio Intervals</a>
+
+Another way to think about intervals is in terms of ratios. For
+example, a ratio of 2:1 would be an octave shift up; 1:2 would be an
+octave shift dowm; 3/2 would be a fifth.
+
+![ratio interval](../documentation/ratiointerval_block.svg "Ratio Interval example")
+
+The *Ratio Interval* block lets you generate an interval based on a
+ratio.
 
 #### <a name= "CHORDS">3.2.8 Chords</a>
 
@@ -950,11 +969,14 @@ All these options are provided in the form of a pie-menu which can be accessed s
 
 Below explained is the utility of every conversion option:
 
-#### **1. Letter class:**
+#### **0. Alphabet:**
+Prints the alphabet data of the note being played e.g A, B, C, D, E, F, G, inlcuding accidentals.
+
+#### **1. Alphabet class:**
 Prints the alphabet data of the note being played e.g A, B, C, D, E, F, G. It doesn't print any info regarding accidentals.
 
 #### **2. Solfege Syllable:**
-Similar to Letter class, returns the data in form of solfege e.g do, re, mi.
+Similar to Alphabet class, returns the data in form of solfege e.g do, re, mi.
 It too, gives no info regarding accidentals.
 
 #### **3. Pitch class:**
@@ -976,7 +998,7 @@ Returns the value in hertz of the pitch of the note being currently played.
 Value of the pitch of the note currently being played. It is different from Pitch class in the way that it can go below 0 and above 11 depending upon the octave.
 
 #### **9. Staff Y:**
-Returns the Y staff position of the note being played according to staff dimensions. It takes into account only the letter class, no accidental info is processed.
+Returns the Y staff position of the note being played according to staff dimensions. It takes into account only the alphabet class, no accidental info is processed.
 
 ### <a name="number-2-octave">3.2.9.3 Number to Octave  </a>
   
@@ -992,7 +1014,8 @@ This converter takes a numeric value which denotes pitch number and returns the 
 
 | Converter Name | Description |
 | --- | --- |
-| letter class | Converts pitch to letter (as defined above). G maps to G. G♯ maps to G. |
+| alphabet | Converts pitch to letter (as defined above). G maps to G. G♯ maps to G#. |
+| alphabet class | Converts pitch to letter (as defined above). G maps to G. G♯ also maps to G. |
 | solfege syllable | Converts pitch to solfege (as defined above). G maps to sol. |
 | solfege class | Converts pitch to solfege class (as defined above). G maps to sol. G♯ maps to sol.|
 | pitch class | Converts pitch to pitch class (as defined above). G maps to 7. |
@@ -2241,8 +2264,10 @@ then saved to a "custom" chord, which can be used with the *Arpeggio* block.
 
 The numeric argument to the widget block, ```12``` in the figure
 above, designates the number of columns. The widget always provides a
-range of 12 half-steps (one octave in the default a [12-step
-equal-temperament tuning](#412-changing-temperament)).
+range of half-steps (one octave in the default a [12-step
+equal-temperament tuning](#412-changing-temperament)). (If you are in
+a temperament with more notes per ocatve, the grid will expand.) The
+rows that represent notes in the current mode are highlighted.
 
 ![widget](./arpeggio_widget.svg "Arpeggio_widget")
 
@@ -2524,7 +2549,7 @@ Looking for a block? The tables below (one for beginner mode and one for advance
 | | current key | | | - | | | note to frequency |
 | | current mode | | | - | | | hertz |
 | | mode length | | | x | | | stop media |
-| | moveable Do | | | / | | | open file |
+| | movable Do | | | / | | | open file |
 | | define mode | | | abs | | | height |
 | | scalar interval (+/-) | | | sqrt | | | width |
 | | semi tone interval (+/-) | | | ^ | | | bottom (screen) |

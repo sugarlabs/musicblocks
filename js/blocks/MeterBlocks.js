@@ -750,7 +750,7 @@ function setupMeterBlocks(activity) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
                 // eslint-disable-next-line no-unused-vars
-                const __listener = function(event) {
+                const __listener = event => {
                     tur.singer.bpm.pop();
                 };
 

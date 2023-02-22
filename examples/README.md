@@ -148,6 +148,13 @@
 | --- | --- |
 | drum-machine.html | Starting point for programming an interactive drum machine |
 
+| Example | Description |
+| --- | --- |
+| Fat-Backs.html | Drum exercise: multiple combination of ABAC and ABCB measures using floor tom and snare drums. |
+| Fat-Backs-2.html | Drum exercise: multiple combination of ABAC and ABCB measures, with a hi hat thrown into the mix. |
+
+
+
 # Transcriptions
 
 | Example | Description |
@@ -173,6 +180,10 @@
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Music, Examples | 10 | 0 | 0 | C, E, G, F, A, D, B | 319 | G2, 98Hz | B6, 1976Hz |
+
+| Example | Description |
+| --- | --- |
+| heart-and-soul.html | Classic by Hoagy Carmicheal with examples of scalar transposition, chords, and repeats |
 
 | Example | Description |
 | --- | --- |

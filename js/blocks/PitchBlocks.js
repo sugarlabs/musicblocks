@@ -19,7 +19,8 @@
    NOTENAMES, NOTENAMES1, getPitchInfo, YSTAFFOCTAVEHEIGHT,
    YSTAFFNOTEHEIGHT, MUSICALMODES, keySignatureToMode, ALLNOTENAMES,
    nthDegreeToPitch, A0, C8, calcOctave, SOLFEGECONVERSIONTABLE,
-   NOTESFLAT, NOTESSHARP, NOTESTEP, scaleDegreeToPitchMapping
+   NOTESFLAT, NOTESSHARP, NOTESTEP, scaleDegreeToPitchMapping,
+   INTERVALVALUES
  */
 
 /* exported setupPitchBlocks */
@@ -302,7 +303,7 @@ function setupPitchBlocks(activity) {
                         tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][0],
                         0,
                         tur.singer.keySignature,
-                        tur.singer.moveable,
+                        tur.singer.movable,
                         null,
                         activity.errorMsg
                     );
@@ -412,8 +413,26 @@ function setupPitchBlocks(activity) {
                 "outputtoolshelp"
             ]);
             this.extraSearchTerms = [
+                "pitch number",
+                "pitch in hertz",
+                "alphabet",
+                "letter class",
+                "solfege class",
+                "staff y",
+                "solfege syllable",
+                "pitch class",
+                "scalar class",
+                "scale degree",
+                "nth degree",
+                "pitch to shade",
+                "pitch to color"
+            ];
+            // Ensure that these string are included for translation.
+            this.piemenuLabels = [
                 _("pitch number"),
                 _("pitch in hertz"),
+                _("alphabet"),
+                //.TRANS: Translate as "alphabet class"
                 _("letter class"),
                 _("solfege class"),
                 _("staff y"),
@@ -492,7 +511,7 @@ function setupPitchBlocks(activity) {
                     notePlayed = scaleDegreeToPitchMapping(
                         tur.singer.keySignature,
                         activity.blocks.blockList[cblk1].value,
-                        tur.singer.moveable,
+                        tur.singer.movable,
                         null
                     );
                     notePlayed += tur.singer.currentOctave ? tur.singer.currentOctave : 4;
@@ -1075,6 +1094,60 @@ function setupPitchBlocks(activity) {
         }
     }
 
+
+    class SetRatioTranspositionBlock extends FlowClampBlock {
+        constructor() {
+            super("setratio");
+            this.setPalette("pitch", activity);
+            this.setHelpString([
+                _("The Transpose by Ratio block will shift the pitches contained inside Note blocks up (or down) by a ratio"),
+                "documentation",
+                ""
+            ]);
+            this.formBlock({
+                //.TRANS: adjust the amount of shift (up or down) of a pitch
+                name: _("transpose by ratio"),
+                args: 1,
+                defaults: [3 / 2]
+            });
+            this.makeMacro((x, y) => [
+                [0, "setratio", x, y, [null, 1, 4, 5]],
+                [1, "divide", 0, 0, [0, 2, 3]],
+                [2, ["number", { value: 3 }], 0, 0, [1]],
+                [3, ["number", { value: 2 }], 0, 0, [1]],
+                [4, "vspace", 0, 0, [0, null]],
+                [5, "hidden", 0, 0, [0, null]]
+            ]);
+        }
+
+        flow(args, logo, turtle, blk) {
+            if (args[1] === undefined) return;
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            let r = args[0];
+            if (cblk === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                r = 1;
+            } else if (activity.blocks.blockList[cblk].name === "intervalname") {
+                const intervalName = activity.blocks.blockList[cblk].value;
+                if (intervalName in INTERVALVALUES) {
+                    r = INTERVALVALUES[intervalName][2];
+                } else {
+                    // eslint-disable-next-line no-console
+                    console.log("could not find " + intervalName + " in INTERVALVALUES");
+                    r = 1;
+                }
+            }
+
+            if (isNaN(r) || r < 0) {
+                r = 1;
+                // eslint-disable-next-line no-console
+                console.debug("ratio " + r + " must be a number > 0");
+            }
+            Singer.PitchActions.setRatioTranspose(r, turtle, blk);
+            return [args[1], 1];
+        }
+    }
+
     class OctaveBlock extends FlowBlock {
         constructor() {
             //.TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
@@ -1533,16 +1606,7 @@ function setupPitchBlocks(activity) {
             } else if (logo.inPitchSlider) {
                 logo.pitchSlider.frequencies.push(args[0]);
             } else {
-                try {
-                    return Singer.PitchActions.playHertz(arg, turtle, blk);
-                } catch (e) {
-                    if (e === "NoNoteError") {
-                        activity.errorMsg(_("Hertz Block: Did you mean to use a Note block?"), blk);
-                    } else {
-                        // eslint-disable-next-line no-console
-                        console.error(e);
-                    }
-                }
+                return Singer.PitchActions.playHertz(arg, turtle, blk);
             }
         }
     }
@@ -1777,89 +1841,94 @@ function setupPitchBlocks(activity) {
                 cname = activity.blocks.blockList[c].name;
             }
 
-            if (cname === "scaledegree2" || !isNaN(Number(arg0[0])) || !isNaN(Number(arg0[1]))) {
-                let scaledegree = activity.blocks.blockList[c].value;
-                let attr;
+            if (!isNaN(Number(arg0[0])) || !isNaN(Number(arg0[1]))) {
+                if (cname === "scaledegree2") {
+                    let scaledegree = activity.blocks.blockList[c].value;
+                    let attr;
 
-                if (scaledegree.indexOf(SHARP) !== -1) {
-                    attr = SHARP;
-                } else if (scaledegree.indexOf(FLAT) !== -1) {
-                    attr = FLAT;
-                } else if (scaledegree.indexOf(DOUBLESHARP) !== -1) {
-                    attr = DOUBLESHARP;
-                } else if (scaledegree.indexOf(DOUBLEFLAT) !== -1) {
-                    attr = DOUBLEFLAT;
-                } else {
-                    attr = NATURAL;
-                }
+                    if (scaledegree.indexOf(SHARP) !== -1) {
+                        attr = SHARP;
+                    } else if (scaledegree.indexOf(FLAT) !== -1) {
+                        attr = FLAT;
+                    } else if (scaledegree.indexOf(DOUBLESHARP) !== -1) {
+                        attr = DOUBLESHARP;
+                    } else if (scaledegree.indexOf(DOUBLEFLAT) !== -1) {
+                        attr = DOUBLEFLAT;
+                    } else {
+                        attr = NATURAL;
+                    }
 
-                scaledegree = Number(scaledegree.replace(attr, ""));
-                if (attr != NATURAL) {
-                    note += attr;
-                }
+                    scaledegree = Number(scaledegree.replace(attr, ""));
+                    if (attr != NATURAL) {
+                        note += attr;
+                    }
 
-                const obj = keySignatureToMode(tur.singer.keySignature);
+                    const obj = keySignatureToMode(tur.singer.keySignature);
 
-                const isNegativeArg = scaledegree <= 0 ? true : false;
-                let sd;
-                if (isNegativeArg) {
-                    const multiplier = Math.floor(Math.abs(scaledegree) / 7);
-                    sd = scaledegree + (multiplier + 1) * 7;
-                } else {
-                    sd = Math.floor(scaledegree) % 7;
-                    if (sd == 0) sd = 7;
-                }
-                scaledegree = Math.abs(scaledegree);
+                    const isNegativeArg = scaledegree <= 0 ? true : false;
+                    let sd;
+                    if (isNegativeArg) {
+                        const multiplier = Math.floor(Math.abs(scaledegree) / 7);
+                        sd = scaledegree + (multiplier + 1) * 7;
+                    } else {
+                        sd = Math.floor(scaledegree) % 7;
+                        if (sd == 0) sd = 7;
+                    }
+                    scaledegree = Math.abs(scaledegree);
 
-                let ref = NOTESTEP[obj[0].substr(0, 1)] - 1;
-                if (obj[0].substr(1) === FLAT) {
-                    ref--;
-                } else if (obj[0].substr(1) === SHARP) {
-                    ref++;
-                }
-                note = scaleDegreeToPitchMapping(
-                    tur.singer.keySignature,
-                    sd,
-                    tur.singer.moveable,
-                    null
-                );
-                let semitones = ref;
-
-                semitones +=
-                    NOTESFLAT.indexOf(note) !== -1
-                        ? NOTESFLAT.indexOf(note) - ref
-                        : NOTESSHARP.indexOf(note) - ref;
-
-                /** calculates changes in reference octave which occur a semitone before the reference key */
-                const deltaOctave = isNegativeArg
-                    ? Math.floor((scaledegree + 1) / 7)
-                    : Math.floor((scaledegree - 1) / 7);
-
-                /** calculates changes in octave when crossing B */
-                const deltaSemi = isNegativeArg
-                    ? semitones > ref
-                        ? 1
-                        : 0
-                    : semitones < ref
-                        ? 1
-                        : 0;
-
-                octave =
-                    (isNegativeArg ? -1 : 1) * (deltaOctave + deltaSemi) +
-                    Math.floor(
-                        calcOctave(tur.singer.currentOctave, arg1, tur.singer.lastNotePlayed, note)
+                    let ref = NOTESTEP[obj[0].substr(0, 1)] - 1;
+                    if (obj[0].substr(1) === FLAT) {
+                        ref--;
+                    } else if (obj[0].substr(1) === SHARP) {
+                        ref++;
+                    }
+                    note = scaleDegreeToPitchMapping(
+                        tur.singer.keySignature,
+                        sd,
+                        tur.singer.movable,
+                        null
                     );
+                    let semitones = ref;
+
+                    semitones +=
+                        NOTESFLAT.indexOf(note) !== -1
+                            ? NOTESFLAT.indexOf(note) - ref
+                            : NOTESSHARP.indexOf(note) - ref;
+    
+                    /** calculates changes in reference octave which occur a semitone before the reference key */
+                    const deltaOctave = isNegativeArg
+                        ? Math.floor((scaledegree + 1) / 7)
+                        : Math.floor((scaledegree - 1) / 7);
+
+                    /** calculates changes in octave when crossing B */
+                    const deltaSemi = isNegativeArg
+                        ? semitones > ref
+                            ? 1
+                            : 0
+                        : semitones < ref
+                            ? 1
+                            : 0;
+
+                    octave =
+                        (isNegativeArg ? -1 : 1) * (deltaOctave + deltaSemi) +
+                        Math.floor(
+                            calcOctave(tur.singer.currentOctave, arg1, tur.singer.lastNotePlayed, note)
+                        );
+                } else {
+                    note = arg0;
+                    octave = arg1;
+                }
                 cents = 0;
             } else if (typeof arg0 === "number" || !isNaN(Number(arg0))) {
                 arg0 = Number(arg0);
 
                 // We interpret numbers two different ways:
-                //  (1) a positive integer between 1 and 12 is taken to be a moveable solfege, e.g. 1 : do, 2 : re ...
+                //  (1) a positive integer between 1 and 12 is taken to be a movable solfege, e.g. 1 : do, 2 : re ...
                 //  (2) if frequency is input, ignore octave (arg1)
                 // Negative numbers will throw an error.
 
                 if (arg0 <= 12) {
-                    // moveable solfege
+                    // movable solfege
                     if (arg0 < 1) {
                         activity.errorMsg(INVALIDPITCH, blk);
                         arg0 = 7; // set default value to 7th semitone
@@ -1949,6 +2018,7 @@ function setupPitchBlocks(activity) {
     new Invert2Block().setup(activity);
     new InvertBlock().setup(activity);
     new RegisterBlock().setup(activity);
+    new SetRatioTranspositionBlock().setup(activity);
     new SetTranspositionBlock().setup(activity);
     new OctaveBlock().setup(activity);
     new DownSixthBlock().setup(activity);

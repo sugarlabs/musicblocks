@@ -24,7 +24,7 @@
    getOctaveRatio, getTemperament, getTemperamentKeys,
    isCustomTemperament, pitchToFrequency, platformColor,
    rationalToFraction, setOctaveRatio, setOctaveRatio, SHARP, Singer,
-   slicePath, updateTemperaments, wheelnav
+   slicePath, updateTemperaments, wheelnav, frequencyToPitch
  */
 
 /* exported TemperamentWidget */
@@ -356,7 +356,6 @@ function TemperamentWidget() {
                         return Math.min(a, b);
                     });
                     const index = centsDiff1.indexOf(min);
-
                     if (centsDiff[index] < 0) {
                         docById("noteInfo").innerHTML +=
                             '<div id="note">&nbsp;' +
@@ -813,6 +812,7 @@ function TemperamentWidget() {
                 this.tempRatios.sort(function (a, b) {
                     return a - b;
                 });
+                
                 pitchNumber = this.tempRatios.length - 1;
                 this.typeOfEdit = "equal";
                 this.divisions = divisions;
@@ -1007,7 +1007,6 @@ function TemperamentWidget() {
                 return a - b;
             });
             const pitchNumber = that.tempRatios.length - 1;
-
             if (event.target.innerHTML === _("done")) {
                 that.ratios = that.tempRatios.slice();
                 that.typeOfEdit = "nonequal";
@@ -1505,49 +1504,57 @@ function TemperamentWidget() {
     };
 
     this._save = function () {
-        let notesMatch = false;
-        let index = [];
         this.notes = [];
 
         if (isCustomTemperament(this.inTemperament)) {
+            const startingPitch = this._logo.synth.startingPitch;
+            const startingPitchOcatve = Number(startingPitch.slice(-1));
+            const startPitch = pitchToFrequency(
+                startingPitch.substring(0, startingPitch.length - 1),
+                startingPitchOcatve,
+                0,
+                "C Major"
+            );
+
+            let addOctave = "";
             for (let i = 0; i < this.ratios.length; i++) {
-                for (let j = 0; j < this.ratiosNotesPair.length; j++) {
-                    notesMatch = false;
-                    if (this.ratios[i] == this.ratiosNotesPair[j][0]) {
-                        notesMatch = true;
-                        this.notes[i] =
-                            this.ratiosNotesPair[j][1][0] + "(+0%)" + this.ratiosNotesPair[j][1][1];
-                        break;
-                    }
+                const obj = frequencyToPitch(this.ratios[i] * startPitch);
+                const newPitch = obj[0];
+                const newOctave = obj[1];
+                const newCents = obj[2];
+                if (this.powerBase !== 2) {
+                    addOctave = newOctave;
                 }
 
-                if (!notesMatch) {
-                    const cents = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
-                    const centsDiff = [];
-                    const centsDiff1 = [];
-                    for (let j = 0; j < this.cents.length; j++) {
-                        centsDiff[j] = cents - this.cents[j];
-                        centsDiff1[j] = Math.abs(cents - this.cents[j]);
+                let updown = "";
+                if (newCents < 0) {
+                    if (newCents < -30) {
+                        updown = "vv";
+                    } else if (newCents < -15) {
+                        updown = "v";
                     }
-                    const min = centsDiff1.reduce(function (a, b) {
-                        return Math.min(a, b);
-                    });
-                    index = centsDiff1.indexOf(min);
-                    if (centsDiff[index] < 0) {
-                        this.notes[i] =
-                            this.ratiosNotesPair[index][1][0] +
-                            "(-" +
-                            centsDiff1[index].toFixed(0) +
-                            "%)" +
-                            this.ratiosNotesPair[index][1][1];
-                    } else {
-                        this.notes[i] =
-                            this.ratiosNotesPair[index][1][0] +
-                            "(+" +
-                            centsDiff1[index].toFixed(0) +
-                            "%)" +
-                            this.ratiosNotesPair[index][1][1];
+                    this.notes[i] =
+                        updown +
+                        newPitch +
+                        addOctave +
+                        "(" +
+                        newCents.toFixed(0) +
+                        "%)" +
+                        newOctave;
+                } else {
+                    if (newCents > 30) {
+                        updown = "^^";
+                    } else if (newCents > 15) {
+                        updown = "^";
                     }
+                    this.notes[i] =
+                        updown +
+                        newPitch +
+                        addOctave +
+                        "(+" +
+                        newCents.toFixed(0) +
+                        "%)" +
+                        newOctave;
                 }
             }
         }

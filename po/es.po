@@ -494,6 +494,12 @@ msgstr "accidental"
 msgid "interval name"
 msgstr "nombre de intervalo"
 
+msgid "interval number"
+msgstr "número de intervalo"
+
+msgid "The Interval number block returns the number of scalar steps in the current interval."
+msgstr "El bloque de número de intervalo devuelve el número de pasos escalares en el intervalo actual."
+
 #: js/palette.js:611
 #: js/PitchBlocks.js:404
 msgid "pitch converter"
@@ -2490,16 +2496,16 @@ msgid "define mode"
 msgstr "definir el modo"
 
 #: js/IntervalsBlocks.js:805
-msgid "moveable Do"
+msgid "movable Do"
 msgstr "movible Do"
 
 #: js/IntervalsBlocks.js:809
-msgid "When Moveable do is false, the solfege note names are always tied to specific pitches,"
-msgstr "Cuando Moveable do es falso, los nombres de las notas de solfeo siempre están vinculados a tonos específicos,"
+msgid "When Movable do is false, the solfege note names are always tied to specific pitches,"
+msgstr "Cuando Movible do es falso, los nombres de las notas de solfeo siempre están vinculados a tonos específicos,"
 
 #: js/IntervalsBlocks.js:811
-msgid "eg \"do\" is always \"C-natural\" when Moveable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
-msgstr "Por ejemplo, \"do\" siempre es \"C-natural\" cuando Moveable do es verdadero, los nombres de las notas del solfeo se asignan a grados de escala. \"do\" siempre es el primer grado de la escala mayor."
+msgid "eg \"do\" is always \"C-natural\" when Movable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
+msgstr "Por ejemplo, \"do\" siempre es \"C-natural\" cuando Movible do es verdadero, los nombres de las notas del solfeo se asignan a grados de escala. \"do\" siempre es el primer grado de la escala mayor."
 
 #: js/IntervalsBlocks.js:837
 #.TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
@@ -4208,6 +4214,18 @@ msgstr "sine"
 msgid "sawtooth"
 msgstr "diente de sierra"
 
+msgid "The Transpose by Ratio block will shift the pitches contained inside Note blocks up (or down) by a ratio"
+msgstr "El bloque transponer por razón cambiará los tonos contenidos dentro de los bloques de notas hacia arriba (o hacia abajo) en una proporción"
+
+msgid "transpose by ratio"
+msgstr "transponer por razón"
+
+msgid "The Ratio Interval block calculates an interval based on a ratio."
+msgstr "El bloque intervalo de razón calcula un intervalo basado en una razón".
+
+msgid "ratio interval"
+msgstr "intervalo de razón"
+
 #: js/PitchBlocks.js:140
 #.TRANS: musical transposition (adjustment of pitch up or down)
 msgid "transposition"
@@ -4285,8 +4303,12 @@ msgid "This block converts the pitch value of the last note played into differen
 msgstr "Este bloque convierte el valor de tono de la última nota tocada en diferentes formatos como hertz, nombre de letra, número de tono, etc."
 
 #: js/PitchBlocks.js:417
+msgid "alphabet"
+msgstr "alfabeto"
+
+#.TRANS: translate as alphabet class
 msgid "letter class"
-msgstr "clase de letras"
+msgstr "clase de alfabeto"
 
 #: js/PitchBlocks.js:418
 msgid "solfege class"
@@ -5952,6 +5974,15 @@ msgstr "descanso"
 msgid "1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th"
 msgstr "1º 2º 3º 4º 5º 6º 7º 8º 9º 10º 11º 12º"
 
+msgid "chromatic semitone"
+msgstr "semitono cromático"
+
+msgid "whole tone"
+msgstr "tono completo"
+
+msgid "diminished octave"
+msgstr "octava disminuida"
+
 #: js/musicutils.js:606
 #: js/musicutils.js:808
 #: js/musicutils.js:850
@@ -6334,6 +6365,9 @@ msgstr "tom tom"
 msgid "floor tom"
 msgstr "piso tom"
 
+msgid "bass drum"
+msgstr "tambor de bajo"
+
 #: js/musicutils.js:737
 #: js/synthutils.js:135
 #.TRANS: a drum made from an inverted cup
@@ -6530,6 +6564,34 @@ msgstr "solo entonación"
 #.TRANS: musical temperament
 msgid "meantone"
 msgstr ""
+
+#: js/musicutils.js:842
+msgid "triad (root position)"
+msgstr "tríada (posición raíz)"
+
+msgid "triad (1st inversion)"
+msgstr "tríada (primera inversión)"
+
+msgid "triad (2nd inversion)"
+msgstr "tríada (segunda inversión)"
+
+msgid "seventh (root position)"
+msgstr "séptimo (posición raíz)"
+
+msgid "seventh (1st inversion)"
+msgstr "séptima (primera inversión)"
+
+msgid "seventh (2nd inversion)"
+msgstr "séptima (segunda inversión)"
+
+msgid "seventh (3rd inversion)"
+msgstr "séptima (tercera inversión)"
+
+msgid "ninth (root position)"
+msgstr "noveno (posición raíz)"
+
+msgid "thirteenth (root position)"
+msgstr "decimotercero (posición raíz)"
 
 #: js/musicutils.js:810
 msgid "major 7th"
@@ -8018,8 +8080,8 @@ msgstr "z del acelerómetro"
 #~msgid "The Whole notes played block returns the total number of whole notes played."
 #~msgstr "El bloque Nota completa reproducidas devuelve el número total de notas completas reproducidas."
 
-#~msgid "eg \"do\" is always \"C-natural\"); when Moveable do is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
-#~msgstr "por ejemplo, \ "do \" es siempre \ "C-natural \"); cuando Moveable do es verdadero, los nombres de las notas de solfeo se asignan a grados de escala (\ "do \" es siempre el primer grado de la escala principal)."
+#~msgid "eg \"do\" is always \"C-natural\"); when Movable do is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
+#~msgstr "por ejemplo, \ "do \" es siempre \ "C-natural \"); cuando Movible do es verdadero, los nombres de las notas de solfeo se asignan a grados de escala (\ "do \" es siempre el primer grado de la escala principal)."
 
 #~msgid "The Note volume block returns the current volume of the current synthesizer."
 #~msgstr "El bloque Volumen de notas devuelve el volumen actual del sintetizador actual."

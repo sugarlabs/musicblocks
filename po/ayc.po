@@ -3312,17 +3312,17 @@ msgstr "definir el modo"
 
 #: js/IntervalsBlocks.js:805
 #.TRANS: movible Do
-msgid "moveable Do"
+msgid "movable Do"
 msgstr "movible Do"
 
 #: js/IntervalsBlocks.js:809
-#.TRANS: Cuando Moveable do es falso, los nombres de las notas de solfeo siempre están vinculados a tonos específicos,
-msgid "When Moveable do is false, the solfege note names are always tied to specific pitches,"
+#.TRANS: Cuando Movable do es falso, los nombres de las notas de solfeo siempre están vinculados a tonos específicos,
+msgid "When Movable do is false, the solfege note names are always tied to specific pitches,"
 msgstr ""
 
 #: js/IntervalsBlocks.js:811
-#.TRANS: Por ejemplo, \"do\" siempre es \"C-natural\" cuando Moveable do es verdadero, los nombres de las notas del solfeo se asignan a grados de escala. \"do\" siempre es el primer grado de la escala mayor.
-msgid "eg \"do\" is always \"C-natural\" when Moveable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
+#.TRANS: Por ejemplo, \"do\" siempre es \"C-natural\" cuando Movable do es verdadero, los nombres de las notas del solfeo se asignan a grados de escala. \"do\" siempre es el primer grado de la escala mayor.
+msgid "eg \"do\" is always \"C-natural\" when Movable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
 msgstr ""
 
 #: js/IntervalsBlocks.js:837
