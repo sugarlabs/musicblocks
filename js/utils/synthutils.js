@@ -130,7 +130,7 @@ const DRUMNAMES = [
     //.TRANS: musical instrument
     [_("tom tom"), "tom tom", "images/tom.svg", "tomml", "drum"],
     //.TRANS: musical instrument
-    [_("floor tom"), "floor tom tom", "images/floortom.svg", "tomfl", "drum"],
+    [_("floor tom"), "floor tom", "images/floortom.svg", "tomfl", "drum"],
     //.TRANS: musical instrument
     [_("bass drum"), "bass drum", "images/kick.svg", "tomfl", "drum"],
     //.TRANS: a drum made from an inverted cup
@@ -708,7 +708,7 @@ function Synth() {
                 // {'name': 'japanese bell', 'data': JAPANESE_BELL_SAMPLE},
                 { name: "clang", data: CLANG_SAMPLE },
                 { name: "cup drum", data: CUP_SAMPLE },
-                { name: "floor tom tom", data: FLOORTOM_SAMPLE },
+                { name: "floor tom", data: FLOORTOM_SAMPLE },
                 { name: "bass drum", data: BASSDRUM_SAMPLE },
                 { name: "snare drum", data: SNARE_SAMPLE }
             ]
