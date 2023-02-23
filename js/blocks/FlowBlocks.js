@@ -393,7 +393,7 @@ function setupFlowBlocks(activity) {
                         logo,
                         turtle,
                         argBlk,
-                        logo.receievedArg
+                        logo.receivedArg
                     );
                 }
 
