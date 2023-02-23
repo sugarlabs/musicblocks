@@ -113,7 +113,7 @@ class Palettes {
             element.setAttribute("class", "disable_highlighting");
             element.setAttribute(
                 "style",
-                "position: fixed; display: none ; left :0px; top:" + this.top + "px"
+                "position: fixed; z-index: 1000; display: none ; left :0px; top:" + this.top + "px"
             );
             element.innerHTML =
                 '<div style="float: left"><table width ="' +
