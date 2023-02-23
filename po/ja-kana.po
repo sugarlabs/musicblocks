@@ -8721,7 +8721,7 @@ msgstr "z座標の動き"
 #~msgid "Offline. Sharing is unavailable."
 #~msgstr "オフライン。シェアきのうがつかえません"
 
-#~msgid "floor tom tom"
+#~msgid "floor tom"
 #~msgstr "フロアタム"
 
 #~msgid "fs"

@@ -13496,7 +13496,7 @@ msgstr "z del acelerómetro"
 
 #: js/synthutils.js:86
 
-#~msgid "floor tom tom"
+#~msgid "floor tom"
 #~msgstr " tom tom yvy atã pegua"
 
 #: js/lilypond.js:21
