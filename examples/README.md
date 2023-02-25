@@ -424,6 +424,14 @@
 
 | Example | Description |
 | --- | --- |
+| hilbert-recursive.html | A recursive implementation of Hilbert Space with a musical overlay. |
+
+| Example | Description |
+| --- | --- |
+| musical-tree.html | A recursive binary tree with a musical overlay. |
+
+| Example | Description |
+| --- | --- |
 | random-jazz-flute.html | A jazz progression that proceeds randomly |
 
 | Example | Description |
