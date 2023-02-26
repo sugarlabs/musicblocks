@@ -3448,12 +3448,19 @@ class Block {
             selectedValue = this.value;
 
             let gridLabels = [];
+            let gridValues = [];
             if (_THIS_IS_TURTLE_BLOCKS_) {
                 gridLabels = [
                     _("Cartesian"),
                     _("polar"),
                     _("Cartesian+polar"),
                     _("none")
+                ];
+                gridValues = [
+                    "Cartesian",
+                    "polar",
+                    "Cartesian+polar",
+                    "none"
                 ];
             } else {
                 gridLabels = [
@@ -3468,8 +3475,19 @@ class Block {
                     _("bass"),
                     _("none")
                 ];
+                gridValues = [
+                    "Cartesian",
+                    "polar",
+                    "Cartesian+polar",
+                    "treble",
+                    "grand staff",
+                    "mezzo-soprano",
+                    "alto",
+                    "tenor",
+                    "bass",
+                    "none"
+                ];
             }
-            const gridValues = gridLabels;
 
             piemenuBasic(this, gridLabels, gridValues, selectedValue, platformColor.piemenuBasic);
         } else if (this.name === "outputtools") {

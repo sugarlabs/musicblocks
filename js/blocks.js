@@ -2480,6 +2480,9 @@ class Blocks {
                     obj = myBlock.value.split(" ");
                     label = _(obj[0]) + " " + obj[1];
                     break;
+                case "grid":
+                    label = _(myBlock.value);
+                    break;
                 case "filtertype":
                 case "drumname":
                 case "effectsname":
