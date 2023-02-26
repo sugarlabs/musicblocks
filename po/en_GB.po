@@ -10942,7 +10942,7 @@ msgstr ""
 
 #: js/synthutils.js:86
 
-#~msgid "floor tom tom"
+#~msgid "floor tom"
 #~msgstr ""
 
 #: js/lilypond.js:21
