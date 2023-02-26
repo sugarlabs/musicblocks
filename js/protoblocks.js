@@ -1439,12 +1439,12 @@ class BaseBlock extends ProtoBlock {
 
     formBlock(style) {
         mergeDeep(this._style, style);
-        this._style.args = this._style.args || 0;
-        this._style.argTypes = this._style.argTypes || [];
-        this._style.argLabels = this._style.argLabels || [];
-        this._style.defaults = this._style.defaults || [];
-        this._style.flows = this._style.flows || {};
-        this._style.flows.labels = this._style.flows.labels || [];
+        this._style.args ||= 0;
+        this._style.argTypes ||= [];
+        this._style.argLabels ||= [];
+        this._style.defaults ||= [];
+        this._style.flows ||= {};
+        this._style.flows.labels ||= [];
 
         if (this._style.args > 1) {
             this.expandable = true;
@@ -1674,7 +1674,7 @@ class BaseBlock extends ProtoBlock {
 class ValueBlock extends BaseBlock {
     constructor(name, displayName) {
         super(name);
-        displayName = displayName || undefined;
+        displayName ||= undefined;
 
         this.formBlock(
             {
@@ -1706,7 +1706,7 @@ class BooleanBlock extends BaseBlock {
 class BooleanSensorBlock extends BaseBlock {
     constructor(name, displayName) {
         super(name);
-        displayName = displayName || undefined;
+        displayName ||= undefined;
 
         this.formBlock({
             name: displayName,
@@ -1722,7 +1722,7 @@ class BooleanSensorBlock extends BaseBlock {
 class FlowBlock extends BaseBlock {
     constructor(name, displayName) {
         super(name);
-        displayName = displayName || undefined;
+        displayName ||= undefined;
 
         this.formBlock(
             {
@@ -1740,7 +1740,7 @@ class FlowBlock extends BaseBlock {
 class LeftBlock extends BaseBlock {
     constructor(name, displayName) {
         super(name);
-        displayName = displayName || undefined;
+        displayName ||= undefined;
 
         this.formBlock(
             {
