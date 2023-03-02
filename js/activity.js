@@ -1743,7 +1743,7 @@ class Activity {
          */
         this.showSearchWidget = () => {
             // Bring widget to top.
-            this.searchWidget.style.zIndex = 1;
+            this.searchWidget.style.zIndex = 1001;
             if (this.searchWidget.style.visibility === "visible") {
                 this.hideSearchWidget();
             } else {
