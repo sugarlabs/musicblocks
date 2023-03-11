@@ -311,7 +311,7 @@ class Palettes {
 
         this.activity.hideSearchWidget(true);
         this.dict[name].showMenu(true);
-        this.activePalette = name;  // used to delete plugins
+        this.activePalette = name; // used to delete plugins
     }
 
     _showMenus() {}
@@ -377,13 +377,11 @@ class Palettes {
     _loadPaletteButtonHandler(name, row) {
         // eslint-disable-next-line no-unused-vars
         row.onmouseover = (event) => {
-            if(name == "search"){
+            if (name == "search") {
                 document.body.style.cursor = "text";
-            }
-            else{
+            } else {
                 document.body.style.cursor = "pointer";
             }
-
         };
 
         // eslint-disable-next-line no-unused-vars
@@ -782,10 +780,18 @@ class Palette {
         const palBody = document.createElement("table");
         palBody.id = "PaletteBody";
         const palBodyHeight = window.innerHeight - this.palettes.top - this.palettes.cellSize - 26;
-        palBody.innerHTML = `<thead></thead><tbody style = "display: block; height: ${palBodyHeight}px; overflow: auto; overflow-x: hidden;" id="PaletteBody_items" class="PalScrol"></tbody>`;
+
+        // palBody.innerHTML = `<thead></thead><tbody style = "display: block; height: ${palBodyHeight}px; overflow: auto; overflow-x: hidden;" id="PaletteBody_items" class="PalScrol"></tbody>`;
+
+        palBody.insertAdjacentHTML(
+            "afterbegin",
+            `<thead></thead><tbody style = "display: block;   width: 100% ; height:auto ; max-height: ${palBodyHeight}px;  overflow: auto; overflow-x: hidden;" id="PaletteBody_items" class="PalScrol"></tbody>`
+        );
+
         palBody.style.minWidth = "180px";
         palBody.style.background = platformColor.paletteBackground;
         palBody.style.float = "left";
+
         palBody.style.border = `1px solid ${platformColor.selectorSelected}`;
         [palBody.childNodes[0], palBody.childNodes[1]].forEach((item) => {
             item.style.boxSizing = "border-box";
@@ -1165,7 +1171,7 @@ class Palette {
             ["namedbox", "nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(
                 protoblk.name
             ) === -1 &&
-                blockIsMacro(this.activity, blkname)
+            blockIsMacro(this.activity, blkname)
         ) {
             this._makeBlockFromProtoblock(protoblk, true, blkname, null, 100, 100);
             callback(lastBlock);
