@@ -125,6 +125,7 @@ class Palettes {
             document.body.appendChild(element);
         }
         const tr = docById("palette").children[0].children[0].children[0].children[0];
+
         const td = tr.insertCell();
         td.width = 1.5 * this.cellSize;
         td.height = 1.5 * this.cellSize;
@@ -139,6 +140,7 @@ class Palettes {
                 1.5 * this.cellSize
             )
         );
+
         const cover = document.createElement("div");
         cover.style.position = "absolute";
         cover.style.zIndex = "10";
@@ -147,6 +149,7 @@ class Palettes {
         cover.style.height = "1px";
         cover.style.background = platformColor.selectorBackground;
         td.appendChild(cover);
+
         td.onmouseover = () => {
             this.showSelection(i, tr);
             this.makePalettes(i);
@@ -782,7 +785,18 @@ class Palette {
         const palBody = document.createElement("table");
         palBody.id = "PaletteBody";
         const palBodyHeight = window.innerHeight - this.palettes.top - this.palettes.cellSize - 26;
+<<<<<<< Updated upstream
         palBody.innerHTML = `<thead></thead><tbody style = "display: block; height: ${palBodyHeight}px; overflow: auto; overflow-x: hidden;" id="PaletteBody_items" class="PalScrol"></tbody>`;
+=======
+
+        // palBody.innerHTML = `<thead></thead><tbody style = "display: block; height: ${palBodyHeight}px; overflow: auto; overflow-x: hidden;" id="PaletteBody_items" class="PalScrol"></tbody>`;
+
+        palBody.insertAdjacentHTML(
+            "afterbegin",
+            `<thead></thead><tbody style = "display: block;  width: 100% ; height:auto ; max-height: ${palBodyHeight}px;  overflow: auto; overflow-x: hidden;" id="PaletteBody_items" class="PalScrol"></tbody>`
+        );
+
+>>>>>>> Stashed changes
         palBody.style.minWidth = "180px";
         palBody.style.background = platformColor.paletteBackground;
         palBody.style.float = "left";
