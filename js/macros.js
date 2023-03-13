@@ -131,7 +131,7 @@ const blockIsMacro = (activity, blkname) => {
 const getMacroExpansion = (activity, blkname, x, y) => {
     const protoBlock = activity.blocks.protoBlockDict[blkname];
     if (protoBlock && protoBlock.macroFunc) {
-        return protoBlock.macroFunc(x + activity.palettes.paletteWidth * 1.5, y);
+        return protoBlock.macroFunc(x + activity.palettes.paletteWidth * 2, y);
     }
 
     // Some blocks are expanded on load.
