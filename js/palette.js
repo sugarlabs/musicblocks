@@ -1183,15 +1183,16 @@ class Palette {
         ) {
             this._makeBlockFromProtoblock(protoblk, true, blkname, null, 100, 100);
             callback(lastBlock);
+            return(lastBlock);
         } else {
             const newBlock = paletteBlockButtonPush(this.activity.blocks, newBlk, arg);
             callback(newBlock);
+            return(newBlock);
         }
     }
 
     _makeBlockFromProtoblock(protoblk, moved, blkname, event, saveX, saveY) {
         let newBlock;
-
         const __myCallback = (newBlock) => {
             // Move the drag group under the cursor.
             this.activity.blocks.findDragGroup(newBlock);
@@ -1287,6 +1288,11 @@ class Palette {
                 }, 500);
             } else {
                 newBlock = this._makeBlockFromPalette(protoblk, blkname, __myCallback);
+                // Ensure that the newly created block is not under
+                // the palette.
+                if (this.activity.blocks.blockList[newBlock].container.x < this.activity.palettes.paletteWidth * 2) {
+                    this.activity.blocks.moveBlock(newBlock, this.activity.palettes.paletteWidth * 2, this.activity.blocks.blockList[newBlock].container.y);
+                }
             }
         }
     }
