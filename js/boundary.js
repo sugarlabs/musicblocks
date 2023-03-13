@@ -91,7 +91,7 @@ class Boundary {
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
-                    unescape(
+                    decodeURIComponent(
                         encodeURIComponent(
                             BOUNDARY.replace("HEIGHT", this.h)
                                 .replace("WIDTH", this.w)

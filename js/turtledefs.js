@@ -440,13 +440,13 @@ const createHelpContent = (activity) => {
                     " " +
                     VERSION,
                 "data:image/svg+xml;base64," +
-                    window.btoa(unescape(encodeURIComponent(LOGO)))
+                    window.btoa(decodeURIComponent(encodeURIComponent(LOGO)))
             ],
             [
                 _("Play"),
                 _("Click the run button to run the project in fast mode."),
                 "data:image/svg+xml;base64," +
-                    window.btoa(unescape(encodeURIComponent(RUNBUTTON)))
+                    window.btoa(decodeURIComponent(encodeURIComponent(RUNBUTTON)))
             ],
             [
                 _("Stop"),
@@ -454,7 +454,7 @@ const createHelpContent = (activity) => {
                     " " +
                     _("You can also type Alt-S to stop."),
                 "data:image/svg+xml;base64," +
-                    window.btoa(unescape(encodeURIComponent(STOPTURTLEBUTTON)))
+                    window.btoa(decodeURIComponent(encodeURIComponent(STOPTURTLEBUTTON)))
             ]
         ];
     } else {
@@ -467,7 +467,7 @@ const createHelpContent = (activity) => {
                     " " +
                     VERSION,
                 "data:image/svg+xml;base64," +
-                    window.btoa(unescape(encodeURIComponent(LOGO)))
+                    window.btoa(decodeURIComponent(encodeURIComponent(LOGO)))
             ],
             [
                 _("Meet Mr. Mouse!"),
@@ -477,13 +477,13 @@ const createHelpContent = (activity) => {
                     " " +
                     _("Let us start our tour!"),
                 "data:image/svg+xml;base64," +
-                    window.btoa(unescape(encodeURIComponent(MOUSEPALETTEICON)))
+                    window.btoa(decodeURIComponent(encodeURIComponent(MOUSEPALETTEICON)))
             ],
             [
                 _("Play"),
                 _("Click the run button to run the project in fast mode."),
                 "data:image/svg+xml;base64," +
-                    window.btoa(unescape(encodeURIComponent(RUNBUTTON)))
+                    window.btoa(decodeURIComponent(encodeURIComponent(RUNBUTTON)))
             ],
             [
                 _("Stop"),
@@ -491,7 +491,7 @@ const createHelpContent = (activity) => {
                     " " +
                     _("You can also type Alt-S to stop."),
                 "data:image/svg+xml;base64," +
-                    window.btoa(unescape(encodeURIComponent(STOPTURTLEBUTTON)))
+                    window.btoa(decodeURIComponent(encodeURIComponent(STOPTURTLEBUTTON)))
             ]
         ];
     }
@@ -500,20 +500,20 @@ const createHelpContent = (activity) => {
         _("New project"),
         _("Initialize a new project."),
         "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(NEWBUTTON)))
+            window.btoa(decodeURIComponent(encodeURIComponent(NEWBUTTON)))
     ]);
     HELPCONTENT.push([
         _("Load project from file"),
         _("You can also load projects from the file system."),
         "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(LOADBUTTON)))
+            window.btoa(decodeURIComponent(encodeURIComponent(LOADBUTTON)))
     ]);
     if (activity.beginnerMode) {
         HELPCONTENT.push([
             _("Save project"),
             _("Save your project to a file."),
             "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(SAVEBUTTON)))
+                window.btoa(decodeURIComponent(encodeURIComponent(SAVEBUTTON)))
         ]);
     } else {
         if (_THIS_IS_TURTLE_BLOCKS_) {
@@ -535,7 +535,7 @@ const createHelpContent = (activity) => {
                     ": " +
                     _("Save block artwork as an SVG file."),
                 "data:image/svg+xml;base64," +
-                    window.btoa(unescape(encodeURIComponent(SAVEBUTTON)))
+                    window.btoa(decodeURIComponent(encodeURIComponent(SAVEBUTTON)))
             ]);
         } else {
             HELPCONTENT.push([
@@ -568,7 +568,7 @@ const createHelpContent = (activity) => {
                     ": " +
                     _("Save block artwork as an SVG file."),
                 "data:image/svg+xml;base64," +
-                    window.btoa(unescape(encodeURIComponent(SAVEBUTTON)))
+                    window.btoa(decodeURIComponent(encodeURIComponent(SAVEBUTTON)))
             ]);
         }
     }
@@ -576,7 +576,7 @@ const createHelpContent = (activity) => {
         _("Load samples from server"),
         _("This button opens a viewer for loading example projects."),
         "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(PLANETBUTTON)))
+            window.btoa(decodeURIComponent(encodeURIComponent(PLANETBUTTON)))
     ]);
     if (_THIS_IS_MUSIC_BLOCKS_) {
         HELPCONTENT.push([
@@ -585,83 +585,83 @@ const createHelpContent = (activity) => {
                 " " +
                 _("Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."),
             "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(RHYTHMPALETTEICON)))
+                window.btoa(decodeURIComponent(encodeURIComponent(RHYTHMPALETTEICON)))
         ]);
     }
     HELPCONTENT.push([
         _("Cartesian/Polar"),
         _("Show or hide a coordinate grid."),
         "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(CARTESIANBUTTON)))
+            window.btoa(decodeURIComponent(encodeURIComponent(CARTESIANBUTTON)))
     ]);
     HELPCONTENT.push([
         _("Clean"),
         _("Clear the screen and return the mice to their initial positions."),
         "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(CLEARBUTTON)))
+            window.btoa(decodeURIComponent(encodeURIComponent(CLEARBUTTON)))
     ]);
     HELPCONTENT.push([
         _("Collapse"),
         _("Collapse the graphics window."),
         "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)))
+            window.btoa(decodeURIComponent(encodeURIComponent(COLLAPSEBUTTON)))
     ]);
     HELPCONTENT.push([
         _("Home"),
         _("Return all blocks to the center of the screen."),
         "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(GOHOMEBUTTON)))
+            window.btoa(decodeURIComponent(encodeURIComponent(GOHOMEBUTTON)))
     ]);
     HELPCONTENT.push([
         _("Show/hide blocks"),
         _("Hide or show the blocks and the palettes."),
         "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(HIDEBLOCKSBUTTON)))
+            window.btoa(decodeURIComponent(encodeURIComponent(HIDEBLOCKSBUTTON)))
     ]);
     HELPCONTENT.push([
         _("Expand/collapse collapsable blocks"),
         _("Expand or collapse start and action stacks."),
         "data:image/svg+xml;base64," +
             window.btoa(
-                unescape(encodeURIComponent(COLLAPSEBLOCKSBUTTON))
+                decodeURIComponent(encodeURIComponent(COLLAPSEBLOCKSBUTTON))
             )
     ]);
     HELPCONTENT.push([
         _("Decrease block size"),
         _("Decrease the size of the blocks."),
         "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(SMALLERBUTTON)))
+            window.btoa(decodeURIComponent(encodeURIComponent(SMALLERBUTTON)))
     ]);
     HELPCONTENT.push([
         _("Increase block size"),
         _("Increase the size of the blocks."),
         "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(BIGGERBUTTON)))
+            window.btoa(decodeURIComponent(encodeURIComponent(BIGGERBUTTON)))
     ]);
     HELPCONTENT.push([
         _("Expand/collapse option toolbar"),
         _("Click this button to expand or collapse the auxillary toolbar."),
         "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(MENUBUTTON)))
+            window.btoa(decodeURIComponent(encodeURIComponent(MENUBUTTON)))
     ]);
     HELPCONTENT.push([
         _("Run slow"),
         _("Click to run the project in slow mode."),
         "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(SLOWBUTTON)))
+            window.btoa(decodeURIComponent(encodeURIComponent(SLOWBUTTON)))
     ]);
     HELPCONTENT.push([
         _("Run step by step"),
         _("Click to run the project step by step."),
         "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(STEPBUTTON)))
+            window.btoa(decodeURIComponent(encodeURIComponent(STEPBUTTON)))
     ]);
     if (!activity.beginnerMode) {
         HELPCONTENT.push([
             _("Display statistics"),
             _("Display statistics about your Music project."),
             "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(STATSBUTTON)))
+                window.btoa(decodeURIComponent(encodeURIComponent(STATSBUTTON)))
         ]);
         // TODO: add plugin
         HELPCONTENT.push([
@@ -669,7 +669,7 @@ const createHelpContent = (activity) => {
             _("Delete a selected plugin."),
             "data:image/svg+xml;base64," +
                 window.btoa(
-                    unescape(encodeURIComponent(PLUGINSDELETEBUTTON))
+                    decodeURIComponent(encodeURIComponent(PLUGINSDELETEBUTTON))
                 )
         ]);
         HELPCONTENT.push([
@@ -677,7 +677,7 @@ const createHelpContent = (activity) => {
             _("You can scroll the blocks on the canvas."),
             "data:image/svg+xml;base64," +
                 window.btoa(
-                    unescape(encodeURIComponent(SCROLLUNLOCKBUTTON))
+                    decodeURIComponent(encodeURIComponent(SCROLLUNLOCKBUTTON))
                 )
         ]);
     }
@@ -687,7 +687,7 @@ const createHelpContent = (activity) => {
         _("Turn Turtle wrapping On or Off."),
         "data:image/svg+xml;base64," +
             window.btoa(
-                unescape(encodeURIComponent(WRAPTURTLEBUTTON))
+                decodeURIComponent(encodeURIComponent(WRAPTURTLEBUTTON))
             )
     ]);
     // TODO: Music Blocks: set pitch preview
@@ -697,41 +697,41 @@ const createHelpContent = (activity) => {
         _("Restore blocks from the trash."),
         "data:image/svg+xml;base64," +
             window.btoa(
-                unescape(encodeURIComponent(RESTORETRASHBUTTON))
+                decodeURIComponent(encodeURIComponent(RESTORETRASHBUTTON))
             )
     ]);
     HELPCONTENT.push([
         _("Switch mode"),
         _("Switch between beginner and advance modes."),
         "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(ADVANCEDBUTTON)))
+            window.btoa(decodeURIComponent(encodeURIComponent(ADVANCEDBUTTON)))
     ]);
     HELPCONTENT.push([
         _("Select language"),
         _("Select your language preference."),
         "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(LANGUAGEBUTTON)))
+            window.btoa(decodeURIComponent(encodeURIComponent(LANGUAGEBUTTON)))
     ]);
     if (_THIS_IS_MUSIC_BLOCKS_) {
         HELPCONTENT.push([
             _("Keyboard shortcuts"),
             _("You can type d to create a do block and r to create a re block etc."),
             "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(SHORTCUTSBUTTON)))
+                window.btoa(decodeURIComponent(encodeURIComponent(SHORTCUTSBUTTON)))
         ]);
     }
     HELPCONTENT.push([
         _("Help"),
         _("Show these messages."),
         "data:image/svg+xml;base64," +
-            window.btoa(unescape(encodeURIComponent(HELPBUTTON)))
+            window.btoa(decodeURIComponent(encodeURIComponent(HELPBUTTON)))
     ]);
     if (_THIS_IS_TURTLE_BLOCKS_) {
         HELPCONTENT.push([
             _("Guide"),
             _("A detailed guide to Turtle Blocks is available."),
             "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(LOGO))),
+                window.btoa(decodeURIComponent(encodeURIComponent(LOGO))),
             GUIDEURL,
             _("Turtle Blocks Guide")
         ]);
@@ -747,7 +747,7 @@ const createHelpContent = (activity) => {
                 " " +
                 VERSION,
             "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(LOGO))),
+                window.btoa(decodeURIComponent(encodeURIComponent(LOGO))),
             "https://github.com/sugarlabs/turtleblocksjs",
             _("Turtle Blocks GitHub repository")
         ]);
@@ -755,14 +755,14 @@ const createHelpContent = (activity) => {
             _("Congratulations."),
             _("You have finished the tour. Please enjoy Turtle Blocks!"),
             "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(LOGO)))
+                window.btoa(decodeURIComponent(encodeURIComponent(LOGO)))
         ]);
     } else {
         HELPCONTENT.push([
             _("Guide"),
             _("A detailed guide to Music Blocks is available."),
             "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(LOGO))),
+                window.btoa(decodeURIComponent(encodeURIComponent(LOGO))),
             GUIDEURL,
             _("Music Blocks Guide")
         ]);
@@ -778,7 +778,7 @@ const createHelpContent = (activity) => {
                 " " +
                 VERSION,
             "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(LOGO))),
+                window.btoa(decodeURIComponent(encodeURIComponent(LOGO))),
             "https://github.com/sugarlabs/musicblocks",
             _("Music Blocks GitHub repository")
         ]);
@@ -786,7 +786,7 @@ const createHelpContent = (activity) => {
             _("Congratulations."),
             _("You have finished the tour. Please enjoy Music Blocks!"),
             "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(LOGO)))
+                window.btoa(decodeURIComponent(encodeURIComponent(LOGO)))
         ]);
     }
 };

@@ -772,7 +772,7 @@ Turtles.TurtlesView = class {
                 }
             };
             const img = new Image();
-            img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(svg)));
+            img.src = "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(svg)));
 
             container.appendChild(img);
             container.setAttribute(
@@ -1021,7 +1021,7 @@ Turtles.TurtlesView = class {
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
-                    unescape(
+                    decodeURIComponent(
                         encodeURIComponent(
                             MBOUNDARY.replace("HEIGHT", this._h)
                                 .replace("WIDTH", this._w)
@@ -1062,7 +1062,7 @@ Turtles.TurtlesView = class {
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
-                    unescape(
+                    decodeURIComponent(
                         encodeURIComponent(
                             MBOUNDARY.replace("HEIGHT", this._h)
                                 .replace("WIDTH", this._w)
