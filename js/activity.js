@@ -1828,7 +1828,7 @@ class Activity {
                             item.label +
                             "</a>"
                     )
-                    .appendTo(ul);
+                    .appendTo(ul.css("z-index", 9999));
             };
             const searchInput = this.searchWidget.idInput_custom;
             if (!searchInput || searchInput.length <= 0) return;
