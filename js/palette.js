@@ -72,7 +72,7 @@ class Palettes {
         this.scale = 1.0;
         this.mobile = false;
         // Top of the palette
-        this.top = 55 + 20 + LEADING;
+        this.top = 105 + 20 + LEADING;
         this.current = DEFAULTPALETTE;
         this.x = []; // We track x and y for each of the multipalettes
         this.y = [];
