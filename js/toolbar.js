@@ -605,6 +605,12 @@ class Toolbar {
 
         helpIcon.onclick = () => {
             onclick(this.activity);
+
+            // In smaller viewport sizes, if help section is opened, palette should be hidden.
+            
+            if (window.innerWidth <= 600)
+                docById("palette").style.visibility = "hidden" ; 
+                
         };
     }
 

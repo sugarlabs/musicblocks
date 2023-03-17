@@ -517,6 +517,10 @@ class WidgetWindow {
      * @returns {void}
      */
     destroy() {
+        // When help Block is closed, the palette should be made visible.
+        if (window.innerWidth <= 600)
+            docById("palette").style.visibility = "visible" ; 
+            
         this._frame.remove();
         this._overlayframe.remove();
         window.widgetWindows.openWindows[this._key] = undefined;
