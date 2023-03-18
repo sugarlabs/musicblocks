@@ -23,6 +23,7 @@
     position: relative;
 }
 #floatingWindows > .windowFrame > .wfTopBar > .wfHandle {
+    display: none ;
     height: 2px;
     width: 50px;
     position: absolute;
@@ -38,9 +39,10 @@
     position: absolute;
     top: -4px;
     height: 2px;
-    width: 120%;
+    width: 120% ; 
     left: -10%;
     background-color: #666;
+    display: none ;
 }
 #floatingWindows > .windowFrame > .wfTopBar > .wfHandle::after {
     top: 4px;
@@ -64,6 +66,9 @@
 }
 #floatingWindows > .windowFrame > .wfTopBar .wftButton:last-child {
     margin: 0;
+}
+#floatingWindows > .windowFrame > .wfTopBar .wftButton.rollup {
+    order: 2 ; 
 }
 #floatingWindows > .windowFrame > .wfTopBar .wftButton.rollup::before {
     content: "";
@@ -96,6 +101,9 @@
     flex-grow: 1;
     color: #666;
     user-select: none;
+    text-align: center ;
+    text-transform: uppercase ;
+    letter-spacing: 1.2px ;
 }
 #floatingWindows > .windowFrame > .wfWinBody {
     min-height: 50px;
@@ -214,8 +222,12 @@
     #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
         flex-grow: 1;
         color: #fff;
-        font-size: 1.4em;
+        font-size: 1.5em;
         padding: 0 15px;
+        text-align: center ; 
+        text-transform: uppercase ; 
+        font-weight: 500;
+        letter-spacing: 1.5px ;
     }
     #floatingWindows > .windowFrame > .wfWinBody {
         flex-direction: column;
@@ -236,4 +248,3 @@
     #floatingWindows > .windowFrame > .wfWinBody > .wfbWidget {
         padding: 10px;
     }
-}
