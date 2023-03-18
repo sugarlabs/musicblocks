@@ -392,8 +392,7 @@ class WidgetWindow {
             siblings[i].style.zIndex = "0";
             siblings[i].style.opacity = ".7";
         }
-
-        // this._frame.style.zIndex = "1";
+        
         // When in focus, the zIndex of the help must be the highest. Even greater than the input search display block
         this._frame.style.zIndex = "10000" ;
         this._frame.style.opacity = "1";
