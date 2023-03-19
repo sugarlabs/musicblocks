@@ -305,9 +305,9 @@ class HelpWidget {
             ].indexOf(HELPCONTENT[page][0]) !== -1
         ) {
             // body = body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"></p>';
-            body = `<p>&nbsp;<img src=" ${HELPCONTENT[page][2]}"></p>` ;
+            body = `<figure>&nbsp;<img src=" ${HELPCONTENT[page][2]}"></figure>` ;
         } else {
-            body = `<p>&nbsp;<img src=" ${HELPCONTENT[page][2]}" width="64px" height="64px"></p>` ;
+            body = `<figure>&nbsp;<img src=" ${HELPCONTENT[page][2]}" width="64px" height="64px"></figure>` ;
         }
         
         const helpContentHTML =
@@ -489,7 +489,7 @@ class HelpWidget {
                     body += `<figure><img src="${imageSrc}"></figure>` ;
                 }
 
-                body += `<p>${message[0]}</p>` ;
+                body += `<p class="message">${message[0]}</p>` ;
                 helpBody.insertAdjacentHTML("afterbegin", body) ;
 
                 const loadIconHTML =

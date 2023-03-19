@@ -890,6 +890,46 @@ table {
     overflow-y: auto;
     width: 365px;
     background: #e8e8e8 !important;
+    padding: 1rem 1rem 0 0  ; 
+    display: flex ; 
+    flex-direction: column ; 
+    justify-content: center ;
+    align-items: center ;
+}
+
+#helpBodyDiv .heading, 
+#helpBodyDiv .description, 
+#helpBodyDiv .message { 
+    text-align: center ; 
+    line-height: 1.2 ; 
+}
+
+#helpBodyDiv .icon-container { 
+    width: 30% ; 
+    margin-top: 1.5rem ;
+    padding: 1px 1.2px ; 
+    display: flex ; 
+    justify-content: space-between ; 
+    align-items:center ; 
+}
+
+.icon-container #findIcon, 
+.icon-container #loadButton,
+.icon-container #advIconText {
+    transform: scale(1.2) ; 
+}
+
+@media (max-width: 600px) {
+    #helpBodyDiv .icon-container { 
+        margin-top: 0 ; 
+        padding-top: 0 ;  
+    }
+
+    .icon-container #findIcon, 
+    .icon-container #loadButton,
+    .icon-container #advIconText {
+        transform: scale(1.1) ; 
+    }
 }
 
 #pscDiv {
