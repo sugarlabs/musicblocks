@@ -919,6 +919,18 @@ table {
     transform: scale(1.2) ; 
 }
 
+#helpBodyDiv .blockImage-wrapper { 
+    height: 90% ; 
+    width: 100%;
+}
+
+#helpBodyDiv .blockImage { 
+    padding-top: 2rem ;
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
+}
+
 @media (max-width: 600px) {
     #helpBodyDiv .icon-container { 
         margin-top: 0 ; 

@@ -486,7 +486,7 @@ class HelpWidget {
                     }
 
                     const imageSrc = `${path}/${name}_block.svg` ;
-                    body += `<figure><img src="${imageSrc}"></figure>` ;
+                    body += `<figure class="blockImage-wrapper"><img class="blockImage" src="${imageSrc}"></figure>` ;
                 }
 
                 body += `<p class="message">${message[0]}</p>` ;
