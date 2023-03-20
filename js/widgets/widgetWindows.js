@@ -214,7 +214,7 @@ class WidgetWindow {
             this._overlayframe.style.border = "0.25vw solid black";
             this._overlayframe.style.backgroundColor = "rgba(255,255,255,0.75)";
         } else {
-            this._frame.style.zIndex = "1";
+            this._frame.style.zIndex = "10000";
             this._overlayframe.style.border = "0px";
             this._overlayframe.style.zIndex = "-1";
             this._overlayframe.style.backgroundColor = "rgba(255,255,255,0)";
@@ -229,7 +229,7 @@ class WidgetWindow {
     _docMouseDownHandler(e) {
         if (e.target === this._frame || this._frame.contains(e.target)) {
             this._frame.style.opacity = "1";
-            this._frame.style.zIndex = "1";
+            this._frame.style.zIndex = "10000";
         } else {
             this._frame.style.opacity = ".7";
             this._frame.style.zIndex = "0";
@@ -392,7 +392,9 @@ class WidgetWindow {
             siblings[i].style.zIndex = "0";
             siblings[i].style.opacity = ".7";
         }
-        this._frame.style.zIndex = "1";
+        
+        // When in focus, the zIndex of the help must be the highest. Even greater than the input search display block
+        this._frame.style.zIndex = "10000" ;
         this._frame.style.opacity = "1";
     }
 
