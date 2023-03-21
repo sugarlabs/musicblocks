@@ -22,31 +22,6 @@
     padding: 4px;
     position: relative;
 }
-#floatingWindows > .windowFrame > .wfTopBar > .wfHandle {
-    display: none ;
-    height: 2px;
-    width: 50px;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #666;
-}
-#floatingWindows > .windowFrame > .wfTopBar > .wfHandle::before,
-#floatingWindows > .windowFrame > .wfTopBar > .wfHandle::after {
-    content: "";
-    display: block;
-    position: absolute;
-    top: -4px;
-    height: 2px;
-    width: 120% ; 
-    left: -10%;
-    background-color: #666;
-    display: none ;
-}
-#floatingWindows > .windowFrame > .wfTopBar > .wfHandle::after {
-    top: 4px;
-}
 #floatingWindows > .windowFrame > .wfTopBar .wftButton {
     background-color: #666;
     border-radius: 2px;
@@ -189,9 +164,6 @@
         box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.16), 0px 2px 10px 0px rgba(0, 0, 0, 0.12);
         min-width: auto;
     }
-    #floatingWindows > .windowFrame > .wfTopBar > .wfHandle {
-        display: none;
-    }
     #floatingWindows > .windowFrame > .wfTopBar .wftButton {
         padding: 0 15px;
         background: none;
@@ -248,3 +220,4 @@
     #floatingWindows > .windowFrame > .wfWinBody > .wfbWidget {
         padding: 10px;
     }
+}
