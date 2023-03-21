@@ -86,10 +86,7 @@ class WidgetWindow {
         this._frame = this._create("div", "windowFrame", windows);
         this._overlayframe = this._create("div", "windowFrame", windows);
         this._drag = this._create("div", "wfTopBar", this._frame);
-        this._handle = this._create("div", "wfHandle", this._drag);
-        // The handle needs the events bound as it's a sibling of the dragging div
-        // not a relative in either direciton.
-
+       
         if (this._fullscreenEnabled) {
             this._drag.ondblclick = (e) => {
                 this._maximize();
@@ -100,7 +97,7 @@ class WidgetWindow {
             };
         }
 
-        this._drag.onmousedown = this._handle.onmousedown = (e) => {
+        this._drag.onmousedown = (e) => {
             this._dragging = true;
             if (this._maximized) {
                 // Perform special repositioning to make the drag feel right when
@@ -143,8 +140,9 @@ class WidgetWindow {
         };
 
         const titleEl = this._create("div", "wftTitle", this._drag);
-        titleEl.innerHTML = _(this._title);
-        titleEl.id = this._key + "WidgetID";
+        titleEl.innerHTML = "" ;
+        titleEl.insertAdjacentHTML("afterbegin", _(this._title));
+        titleEl.id = `${this._key}WidgetID` ;
 
         if (this._fullscreenEnabled) {
             const maxminButton = this._create("div", "wftButton wftMaxmin", this._drag);
@@ -282,7 +280,8 @@ class WidgetWindow {
      */
     addInputButton(initial, parent) {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
-        el.innerHTML = '<input value="' + initial + '" />';
+        el.innerHTML = "" ;
+        el.insertAdjacentHTML("afterbegin", `<input value="${initial}" />` );
         return el.querySelector("input");
     }
 
@@ -297,17 +296,14 @@ class WidgetWindow {
      */
     addRangeSlider(initial, parent, min, max, classNm) {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
+        const elInput = `
+          <input type="range" class="${classNm}" min="${min}" max="${max}" value="${initial}" />
+        `;
+
         el.style.height = "250px";
-        el.innerHTML =
-            '<input type="range" class="' +
-            classNm +
-            '"  min="' +
-            min +
-            '" max="' +
-            max +
-            '" value="' +
-            initial +
-            '">';
+        el.innerHTML = "" ;
+        el.insertAdjacentHTML("afterbegin", elInput) ;
+
         const slider = el.querySelector("input");
         slider.style = " position:absolute;transform:rotate(270deg);height:10px;width:250px;";
         return slider;
@@ -318,7 +314,8 @@ class WidgetWindow {
      */
     addSelectorButton(list, initial, parent) {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
-        el.innerHTML = '<select value="' + initial + '" />';
+        el.innerHTML = "" ;
+        el.insertAdjacentHTML("afterbegin", `<select value="${initial}" />`) ;
         const selector = el.querySelector("select");
         for (const i of list) {
             const newOption = new Option("turtle " + i, i);
@@ -345,18 +342,12 @@ class WidgetWindow {
      * @returns {HTMLElement}
      */
     modifyButton(index, icon, iconSize, label) {
-        this._buttons[index].innerHTML =
-            '<img src="header-icons/' +
-            icon +
-            '" title="' +
-            label +
-            '" alt="' +
-            label +
-            '" height="' +
-            iconSize +
-            '" width="' +
-            iconSize +
-            '" />';
+        const innerHTML = `
+            <img src="header-icons/${icon}" title="${label}" alt="${label}" height="${iconSize}" width="${iconSize}"/> 
+            ` ;
+        
+        this._buttons[index].innerHTML = "" ;
+        this._buttons[index].insertAdjacentHTML("afterbegin", innerHTML) ;
         return this._buttons[index];
     }
 
@@ -408,18 +399,17 @@ class WidgetWindow {
      */
     addButton(icon, iconSize, label, parent) {
         const el = this._create("div", "wfbtItem", parent || this._toolbar);
-        el.innerHTML =
-            '<img src="header-icons/' +
-            icon +
-            '" title="' +
-            label +
-            '" alt="' +
-            label +
-            '" height="' +
-            iconSize +
-            '" width="' +
-            iconSize +
-            '" />';
+
+        const innerHTML =
+            `<img src="header-icons/${icon}" 
+                  title="${label}" 
+                  alt="${label}" 
+                  height="${iconSize}" 
+                  width="${iconSize}" 
+             />`;
+        
+        el.innerHTML = "";
+        el.insertAdjacentHTML("afterbegin", innerHTML) ;
         this._buttons.push(el);
         return el;
     }
@@ -554,8 +544,8 @@ class WidgetWindow {
      * @returns {WidgetWindow} this
      */
     setPosition(x, y) {
-        this._frame.style.left = x + "px";
-        this._frame.style.top = Math.max(y, 64) + "px";
+        this._frame.style.left = `${x}px` ;
+        this._frame.style.top = `${Math.max(y, 64)}px`;
         window.widgetWindows._posCache[this._key] = [x, Math.max(y, 64)];
         return this;
     }
