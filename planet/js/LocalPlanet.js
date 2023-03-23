@@ -74,9 +74,8 @@ function LocalPlanet(Planet) {
             }
         }
         if (index!=-1) {
-            const id = "local-project-image-" + this.projects[index][0];
+            const id = `local-project-image-${this.projects[index][0]}`;
             // eslint-disable-next-line no-console
-            console.log(id);
             const cardimg = document.getElementById(id);
             cardimg.src=this.currentProjectImage;
         }
