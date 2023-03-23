@@ -24,12 +24,12 @@
 
 function GlobalPlanet(Planet) {
     this.ProjectViewer = null;
-    if (Planet.IsMusicBlocks) {
-        this.offlineHTML = "<div class=\"container center-align\">" + _("Feature unavailable - cannot connect to server. Reload Music Blocks to try again.") + "</div>";
-    } else {
-        this.offlineHTML = "<div class=\"container center-align\">" + _("Feature unavailable - cannot connect to server. Reload Turtle Blocks to try again.") + "</div>";
-    }
-    this.noProjects = "<div class=\"container center-align\">" + _("No results found.") + "</div>";
+
+    this.offlineHTML = `<div class= "container center-align">
+                        ${_(`Feature unavailable - cannot connect to server. Reload ${Planet.IsMusicBlocks ? "Music" : "Turtle"} Blocks to try again.`)}
+                        </div>`;
+
+    this.noProjects  = `<div class= "container center-align">${_("No results found.")}</div>` ;
     this.tags = [];
     this.specialTags = null;
     this.defaultTag = false;
@@ -205,17 +205,13 @@ function GlobalPlanet(Planet) {
 
     this.afterSearch = () => {
         this.searching = false;
-        if (this.searchString !== this.oldSearchString) {
+
+        if (this.searchString !== this.oldSearchString)
             this.search();
-        }
     };
 
     this.afterRefreshProjects = data => {
-        if (data.success) {
-            this.addProjects(data.data);
-        } else {
-            this.throwOfflineError();
-        }
+        data.success ? this.addProjects(data.data) : this.throwOfflineError() ;
     };
 
     this.addProjects = data => {
@@ -223,24 +219,23 @@ function GlobalPlanet(Planet) {
         for (let i = 0; i < data.length; i++) {
             // eslint-disable-next-line no-prototype-builtins
             if (this.cache.hasOwnProperty(data[i][0])) {
-                if (this.cache[data[i][0]].ProjectLastUpdated !== data[i][1]) {
+                if (this.cache[data[i][0]].ProjectLastUpdated !== data[i][1])
                     toDownload.push(data[i]);
-                }
-            } else {
-                toDownload.push(data[i]);
             }
+            else toDownload.push(data[i]);
         }
 
         this.loadCount = toDownload.length;
         const l = data.length;
-        if (l === this.page + 1) {
+        if (l === this.page + 1)
             data.pop();
-        }
 
         if (l === 0) {
             this.throwNoProjectsError();
             this.afterAddProjects();
-        } else if (this.loadCount === 0) {
+        }
+
+        else if (this.loadCount === 0) {
             this.render(data);
             if (l === this.page + 1) {
                 this.showLoadMore();
@@ -301,21 +296,18 @@ function GlobalPlanet(Planet) {
     };
 
     this.getData = (id, callback, error) => {
-        if (error === undefined) {
+        if (error === undefined)
             error = null;
-        }
 
-        if (this.cache[id] === undefined || this.cache[id].ProjectData === null) {
+        if (this.cache[id] === undefined || this.cache[id].ProjectData === null)
             this.downloadDataToCache(id, callback, error);
-        } else {
-            callback(this.cache[id].ProjectData);
-        }
+
+        else  callback(this.cache[id].ProjectData);
     };
 
     this.downloadDataToCache = (id, callback, error) => {
-        if (error === undefined) {
+        if (error === undefined)
             error = null;
-        }
     
         Planet.ServerInterface.downloadProject(id, function(data) {
             this.afterDownloadData(id, data, callback, error);
@@ -323,25 +315,26 @@ function GlobalPlanet(Planet) {
     };
 
     this.afterDownloadData = (id, data, callback, error) => {
-        if (error === undefined) {
+        if (error === undefined)
             error = null;
-        }
 
         if (data.success) {
             if (id in this.cache) {
                 this.cache[id].ProjectData = Planet.ProjectStorage.decodeTB(data.data);
                 callback(this.cache[id].ProjectData);
-            } else {
-                callback(Planet.ProjectStorage.decodeTB(data.data));
             }
-        } else {
-            if (error !== null) {
+
+            else callback(Planet.ProjectStorage.decodeTB(data.data));
+        }
+        
+        else {
+            if (error !== null)
                 error();
-            }
         }
     };
 
     this.render = data => {
+        console.log('Rendering') ;
         for (let i = 0; i < data.length; i++) {
             // eslint-disable-next-line no-prototype-builtins
             if (this.cache.hasOwnProperty(data[i][0])) {
@@ -362,21 +355,27 @@ function GlobalPlanet(Planet) {
     this.afterAddProjects = () => {
         this.index += this.page;
         this.hideLoading();
-        if (this.oldSearchString !== "") {
+
+        if (this.oldSearchString !== "")
             this.afterSearch();
-        }
     };
 
     this.throwOfflineError = () => {
         this.hideLoading();
         this.hideLoadMore();
-        document.getElementById("global-projects").innerHTML = this.offlineHTML;
+
+        const element = document.getElementById("global-projects") ;
+        element.innerHTML = "";
+        element.insertAdjacentHTML("afterbegin", this.offlineHTML);
     };
 
     this.throwNoProjectsError = () => {
         this.hideLoading();
         this.hideLoadMore();
-        document.getElementById("global-projects").innerHTML = this.noProjects;
+
+        const element = document.getElementById("global-projects") ;
+        element.innerHTML = "";
+        element.insertAdjacentHTML("afterbegin", this.noProjects);
     };
 
     this.hideLoading = () => {
@@ -408,19 +407,18 @@ function GlobalPlanet(Planet) {
     };
 
     this.openGlobalProject = (id, error) => {
-        if (error === undefined) {
+        if (error === undefined)
             error = null;
-        }
 
         this.getData(id, (data) => {
             let remixedName;
             if (id in this.cache) {
-                remixedName = this.remixPrefix + " " + this.cache[id].ProjectName;
+                remixedName = `${this.remixPrefix} ${this.cache[id].ProjectName}`;
                 Planet.ProjectStorage.initialiseNewProject(
                     remixedName, data, this.cache[id].ProjectImage
                 );
             } else {
-                remixedName = this.remixPrefix + " " + _("My Project");
+                remixedName = `${this.remixPrefix}  ${_("My Project")}` ;
                 Planet.ProjectStorage.initialiseNewProject(
                     remixedName, data, null
                 );
@@ -431,9 +429,8 @@ function GlobalPlanet(Planet) {
     };
 
     this.mergeGlobalProject = (id, error) => {
-        if (error === undefined) {
+        if (error === undefined)
             error = null;
-        }
 
         this.getData(id, (data) => {
             let remixedName;
@@ -442,8 +439,9 @@ function GlobalPlanet(Planet) {
                 Planet.ProjectStorage.initialiseNewProject(
                     remixedName, data, this.cache[id].ProjectImage
                 );
-            } else {
-                remixedName = this.remixPrefix + " " + _("My Project");
+            }
+            else {
+                remixedName = `${this.remixPrefix}  ${_("My Project")}` ;
                 Planet.ProjectStorage.initialiseNewProject(
                     remixedName, data, null
                 );
@@ -456,9 +454,10 @@ function GlobalPlanet(Planet) {
     this.init = () => {
         if (!Planet.ConnectedToServer) {
             document.getElementById("globaltitle").textContent = _("Cannot connect to server");
-            document.getElementById("globalcontents").innerHTML = this.offlineHTML;
-        } else {
-
+            document.getElementById("globalcontents").innerHTML = "" ;
+            document.getElementById("globalcontents").insertAdjacentHTML("afterbegin",this.offlineHTML);
+        }
+        else {
             // eslint-disable-next-line no-unused-vars
             jQuery("#sort-select").material_select( (evt) => {
                 this.sortBy = document.getElementById("sort-select").value;
