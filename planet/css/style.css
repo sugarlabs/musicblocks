@@ -303,6 +303,7 @@ a {
 .card-image {
 	width: 100%;
 	padding-bottom: 75%;
+	cursor: pointer;
 }
 
 #projectviewer-report-project, #projectviewer-report-project-disabled {
