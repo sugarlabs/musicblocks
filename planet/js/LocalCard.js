@@ -29,13 +29,13 @@ function LocalCard(Planet) {
     this.renderData = `
     <div class="col no-margin-left s12 m6 l4"> 
             <div class="card"> 
-               <a class="published-cloud tooltipped" data-position="top" data-delay="50" data-tooltip="'+_('View published project')+'" style="display:none;" id="local-project-cloud-{ID}">
+               <a class="published-cloud tooltipped" data-position="top" data-delay="50" data-tooltip="${_('View published project')}" style="display:none;" id="local-project-cloud-{ID}">
                  <i class="material-icons small">cloud_done</i>
                </a>
                 
                 <div class="card-image"> 
                     <img class="project-image project-card-image" id="local-project-image-{ID}"> 
-                    <a class="btn-floating halfway-fab waves-effect waves-light orange tooltipped" data-position="top" data-delay="50" data-tooltip="'+_('Publish project')+'" id="local-project-publish-{ID}"><i class="material-icons">cloud_upload</i></a> 
+                    <a class="btn-floating halfway-fab waves-effect waves-light orange tooltipped" data-position="top" data-delay="50" data-tooltip="${_("Publish project")}" id="local-project-publish-{ID}"><i class="material-icons">cloud_upload</i></a> 
                 </div> 
                     
                 <div class="card-content"> 
@@ -44,11 +44,11 @@ function LocalCard(Planet) {
                     
                 <div class="card-action"> 
                     <div class="flexcontainer"> 
-                        <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Edit project')+'" id="local-project-edit-{ID}"><i class="material-icons">edit</i></a> 
-                        <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Delete project')+'" id="local-project-delete-{ID}"><i class="material-icons">delete</i></a> 
-                        <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Download project')+'" id="local-project-download-{ID}"><i class="material-icons">file_download</i></a> 
-                        <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Merge with current project')+'" id="local-project-merge-{ID}"><i class="material-icons">merge_type</i></a> 
-                        <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="'+_('Duplicate project')+'" id="local-project-duplicate-{ID}"><i class="material-icons">content_copy</i></a> 
+                        <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_("Edit project")}" id="local-project-edit-{ID}"><i class="material-icons">edit</i></a> 
+                        <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_('Delete project')}" id="local-project-delete-{ID}"><i class="material-icons">delete</i></a> 
+                        <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_('Download project')}" id="local-project-download-{ID}"><i class="material-icons">file_download</i></a> 
+                        <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_('Merge with current project')}" id="local-project-merge-{ID}"><i class="material-icons">merge_type</i></a> 
+                        <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_('Duplicate project')}" id="local-project-duplicate-{ID}"><i class="material-icons">content_copy</i></a> 
                     </div> 
                 </div> 
             </div>  
