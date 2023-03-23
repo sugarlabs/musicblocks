@@ -91,6 +91,7 @@ function GlobalCard(Planet) {
 
         // set tags
         const tagcontainer = frag.getElementById("global-project-tags-" + this.id);
+        tagcontainer.classList.add("global-tags-container");
         for (let i = 0; i < this.ProjectData.ProjectTags.length; i++) {
             const chip = document.createElement("div");
             chip.classList.add("chipselect");
