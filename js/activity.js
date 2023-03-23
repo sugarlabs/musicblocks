@@ -2571,8 +2571,11 @@ class Activity {
         };
 
         const that = this;
+        const screenWidth = window.innerWidth
         window.onresize = () => {
-            that._onResize(false);
+            if (screenWidth !== window.innerWidth) {
+                that._onResize(false);
+            }
         };
 
         /*
