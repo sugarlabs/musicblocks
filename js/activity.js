@@ -2573,7 +2573,7 @@ class Activity {
         const that = this;
         const screenWidth = window.innerWidth
         window.onresize = () => {
-            if(screenWidth !== window.innerWidth ){
+            if (screenWidth !== window.innerWidth) {
                 that._onResize(false);
             }
         };
