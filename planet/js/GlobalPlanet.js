@@ -334,7 +334,6 @@ function GlobalPlanet(Planet) {
     };
 
     this.render = data => {
-        console.log('Rendering') ;
         for (let i = 0; i < data.length; i++) {
             // eslint-disable-next-line no-prototype-builtins
             if (this.cache.hasOwnProperty(data[i][0])) {
