@@ -348,7 +348,7 @@ function GlobalPlanet(Planet) {
     } ;
 
     this.render = data => {
-
+    
         // Makes sure that there are no error messages present when cards are available and thus being rendered. 
         this.cleanContainer() ;
 

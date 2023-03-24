@@ -185,7 +185,28 @@
 	color: #fff !important;
 }
 
-.global-tags-container { 
+#tagscontainer .container { 
+	padding: 0.5rem 0 ;  
+	display: flex ; 
+	flex-direction: column ; 
+	align-items: center ;
+	gap: 0.5rem ; 
+}
+
+#tagscontainer #primarychips, 
+#tagscontainer .open#morechips { 
+	display: flex ; 
+	flex-wrap: wrap ;
+	justify-content: center ;
+	gap: 0.5rem ; 
+}
+
+#tagscontainer #view-more-chips {
+	left: 0 ; 
+	transform: translateX(0) ; 
+}
+
+.global-tags-container {  
 	min-height: 30px ; 
 	display: flex ; 
 	flex-direction: row;
