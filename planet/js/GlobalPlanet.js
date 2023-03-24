@@ -333,8 +333,25 @@ function GlobalPlanet(Planet) {
         }
     };
 
+    this.cleanContainer = () => {
+        const element = document.getElementById("global-projects").firstElementChild ;
+        const list = element?.classList ?? "empty" ;
+
+        if (list === "empty")
+            return ;
+
+        list.forEach(name => {
+            if (name === "container" || name === "center-align")
+                element.remove() ;
+            return ;
+        });
+    } ;
+
     this.render = data => {
-        console.log('Rendering') ;
+
+        // Makes sure that there are no error messages present when cards are available and thus being rendered. 
+        this.cleanContainer() ;
+
         for (let i = 0; i < data.length; i++) {
             // eslint-disable-next-line no-prototype-builtins
             if (this.cache.hasOwnProperty(data[i][0])) {
