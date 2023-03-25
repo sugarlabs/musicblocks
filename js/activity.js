@@ -331,8 +331,8 @@ class Activity {
             // Error message containers
             this.errorText = docById("errorText");
             this.errorTextContent = docById("errorTextContent");
-            //hideArrow on hiding error message
-            this.errorText.addEventListener("click", this._hideArrows );
+            // Hide Arrow on hiding error message
+            this.errorText.addEventListener("click", this._hideArrows);
             // Show and populate the printText div.
             this.printText = docById("printText");
             this.printTextContent = docById("printTextContent");
