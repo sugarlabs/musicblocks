@@ -12,12 +12,14 @@
 
 /*
    global
+
    _, GlobalTag, GlobalCard, jQuery, currentUserScrollPos:true,
    maxScrollPos:true, ProjectViewer, debounce
 */
 /*
    exported
    GlobalPlanet
+
 */
 
 function GlobalPlanet(Planet) {
