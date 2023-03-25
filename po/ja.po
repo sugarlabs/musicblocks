@@ -7356,7 +7356,7 @@ msgstr "検索の結果に何もはありません"
 
 #: js/GlobalPlanet.js:48
 msgid "Remix of"
-msgstr "~プロジェクトのリミックス"
+msgstr "プロジェクトのリミックス"
 
 #: js/GlobalPlanet.js:458
 msgid "Cannot connect to server"

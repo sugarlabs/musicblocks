@@ -12,13 +12,11 @@
 
 /*
    global
-
    _, GlobalTag, GlobalCard, jQuery, currentUserScrollPos:true,
    maxScrollPos:true, ProjectViewer, debounce
 */
 /*
    exported
-
    GlobalPlanet
 */
 
@@ -411,16 +409,17 @@ function GlobalPlanet(Planet) {
 
         this.getData(id, (data) => {
             let remixedName;
-            if (id in this.cache) {
-                remixedName = `${this.remixPrefix} ${this.cache[id].ProjectName}`;
-                Planet.ProjectStorage.initialiseNewProject(
-                    remixedName, data, this.cache[id].ProjectImage
-                );
-            } else {
-                remixedName = `${this.remixPrefix}  ${_("My Project")}` ;
-                Planet.ProjectStorage.initialiseNewProject(
-                    remixedName, data, null
-                );
+            if(_language == "ja"){ if (id in this.cache) { remixedName = `「${this.cache[id].ProjectName}」プロジェクトの リミックス`; Planet.ProjectStorage.initialiseNewProject( remixedName, data, this.cache[id].ProjectImage ); } else { remixedName = `「${_("My Project")}」プロジェクトの リミックス` ; Planet.ProjectStorage.initialiseNewProject( remixedName, data, null ); } } else{                if (id in this.cache) {
+                    remixedName = `${this.remixPrefix} ${this.cache[id].ProjectName}`;
+                    Planet.ProjectStorage.initialiseNewProject(
+                        remixedName, data, this.cache[id].ProjectImage
+                    );
+                } else {
+                    remixedName = `${this.remixPrefix}  ${_("My Project")}` ;
+                    Planet.ProjectStorage.initialiseNewProject(
+                        remixedName, data, null
+                    );
+                }
             }
 
             Planet.loadProjectFromData(data);
@@ -525,3 +524,4 @@ function GlobalPlanet(Planet) {
         }
     };
 };
+  
