@@ -63,11 +63,10 @@ function GlobalTag(Planet) {
 
     this.render = () => {
         const tag = document.createElement("div");
-        tag.classList.add("chipselect");
-        tag.classList.add("cursor");
-        if (this.selected) {
-            tag.classList.add(this.selectedClass);
-        }
+        tag.classList.add("chipselect", "cursor") ;
+
+        if (this.selected)
+            tag.classList.add(this.selectedClass) ;
 
         tag.textContent = _(this.name);
 
@@ -76,27 +75,18 @@ function GlobalTag(Planet) {
             this.onTagClick();
         });
 
-        let el = document.getElementById("morechips");
-        if (this.IsDisplayTag) {
-            el = document.getElementById("primarychips");
-        }
+        const elementTag = `${this.IsDisplayTag ? "primary" : "more"}chips` ;
+        document.getElementById(elementTag).appendChild(tag);
 
-        el.appendChild(tag);
         this.tagElement = tag;
     };
 
     this.onTagClick = () => {
-        if (this.specialTag) {
-            if (!this.selected) {
-                this.globalPlanet.selectSpecialTag(this);
-            }
-        } else {
-            if (this.selected) {
-                this.unselect();
-            } else {
-                this.select();
-            }
-
+        if (this.specialTag && !this.selected)
+            this.globalPlanet.selectSpecialTag(this);
+                 
+        else {
+            this.selected ? this.unselect() : this.select() ;
             this.globalPlanet.refreshTagList();
         }
     };
@@ -117,14 +107,10 @@ function GlobalTag(Planet) {
             this.id = obj.id;
             this.name = Planet.TagsManifest[this.id].TagName;
             this.func = null;
-            if (Planet.TagsManifest[this.id].IsDisplayTag === "1") {
-                this.IsDisplayTag = true;
-            } else {
-                this.IsDisplayTag = false;
-            }
-
+            this.IsDisplayTag = Planet.TagsManifest[this.id].IsDisplayTag === "1" ; // ? "true":"false";
             this.selectedClass = "selected";
-        } else {
+        }
+        else {
             this.specialTag = true;
             this.IsDisplayTag = true;
             this.id = null;

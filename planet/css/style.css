@@ -185,6 +185,37 @@
 	color: #fff !important;
 }
 
+#tagscontainer .container { 
+	padding: 0.5rem 0 ;  
+	display: flex ; 
+	flex-direction: column ; 
+	align-items: center ;
+	gap: 0.5rem ; 
+}
+
+#tagscontainer #primarychips, 
+#tagscontainer .open#morechips { 
+	display: flex ; 
+	flex-wrap: wrap ;
+	justify-content: center ;
+	gap: 0.5rem ; 
+}
+
+#tagscontainer #view-more-chips {
+	left: 0 ; 
+	transform: translateX(0) ; 
+}
+
+.global-tags-container {  
+	min-height: 30px ; 
+	display: flex ; 
+	flex-direction: row;
+	justify-content: flex-start; 
+	align-items: center ;
+	gap: 0.5rem ; 
+	flex-wrap: wrap ;
+}
+
 .chipselect {
 	display: inline-block;
 	height: 32px;
@@ -195,8 +226,7 @@
 	padding: 0 12px;
 	border-radius: 16px;
 	background-color: #e4e4e4;
-	margin-bottom: 5px;
-	margin-right: 5px;
+	margin: auto 5px auto 0 ; 
 }
 
 .chipselect.selected {
@@ -294,6 +324,7 @@ a {
 .card-image {
 	width: 100%;
 	padding-bottom: 75%;
+	cursor: pointer;
 }
 
 #projectviewer-report-project, #projectviewer-report-project-disabled {

@@ -331,6 +331,8 @@ class Activity {
             // Error message containers
             this.errorText = docById("errorText");
             this.errorTextContent = docById("errorTextContent");
+            // Hide Arrow on hiding error message
+            this.errorText.addEventListener("click", this._hideArrows);
             // Show and populate the printText div.
             this.printText = docById("printText");
             this.printTextContent = docById("printTextContent");
@@ -1501,7 +1503,7 @@ class Activity {
         this._createMsgContainer = (fillColor, strokeColor, callback, y) => {
             const container = new createjs.Container();
             this.stage.addChild(container);
-            container.x = (this.canvas.width - 1000) / 2;
+            container.x = (this.canvas.width) / 2;
             container.y = y;
             container.visible = false;
 
@@ -1568,7 +1570,7 @@ class Activity {
         this._makeErrorArtwork = (name) => {
             const container = new createjs.Container();
             this.stage.addChild(container);
-            container.x = (this.canvas.width - 1000) / 2;
+            container.x = (this.canvas.width) / 2;
             container.y = 80;
             this.errorArtwork[name] = container;
             this.errorArtwork[name].name = name;
@@ -2571,8 +2573,11 @@ class Activity {
         };
 
         const that = this;
+        const screenWidth = window.innerWidth
         window.onresize = () => {
-            that._onResize(false);
+            if (screenWidth !== window.innerWidth) {
+                that._onResize(false);
+            }
         };
 
         /*
@@ -3262,7 +3267,7 @@ class Activity {
                 blk in this.blocks.blockList &&
                 !this.blocks.blockList[blk].collapsed
             ) {
-                const fromX = (this.canvas.width - 1000) / 2;
+                const fromX = (this.canvas.width) / 2;
                 const fromY = 128;
                 const toX = this.blocks.blockList[blk].container.x + this.blocksContainer.x;
                 const toY = this.blocks.blockList[blk].container.y + this.blocksContainer.y;
