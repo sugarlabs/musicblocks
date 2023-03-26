@@ -2574,11 +2574,12 @@ class Activity {
 
         const that = this;
         const screenWidth = window.innerWidth
-        window.onresize = () => {
+        const  resizeCanva = () => {
             if (screenWidth !== window.innerWidth) {
                 that._onResize(false);
             }
-        };
+        }
+        window.onresize = resizeCanva
 
         /*
          * Restore last stack pushed to trashStack back onto canvas.
