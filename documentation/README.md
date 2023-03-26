@@ -98,6 +98,26 @@ a block.
 
 Many blocks also incorporate "pie menus" for changing block parameters.
 
+## Right-Click Context Menu
+The right-click context menu in Music Blocks provides several options for working with blocks and the workspace. To access the right-click context menu, simply right-click anywhere in the workspace.
+
+# Cut, Copy, Paste, Delete
+These options are used to manipulate blocks on the workspace. Cut removes the selected block and stores it on the clipboard, Copy creates a duplicate of the selected block on the clipboard, Paste inserts the contents of the clipboard at the current cursor location, and Delete removes the selected block from the workspace.
+
+# Duplicate
+This option creates a duplicate of the selected block and places it next to the original block.
+
+# Change Icon
+This option allows you to change the icon associated with a block. You can choose from a variety of icons to make it easier to identify a block on the workspace.
+
+# Properties
+This option shows a dialog box with the properties of the selected block. You can modify various properties of a block, such as its name, color, and value.
+
+# Help
+This option shows a help screen with information about the selected block. You can use this option to learn more about the block's functionality and how to use it in your projects.
+
+By using the right-click context menu in Music Blocks, you can quickly perform common tasks and manipulate blocks on the workspace. This can help you to work more efficiently and effectively in your projects.
+
 Keyboard shortcuts
 ------------------
 
