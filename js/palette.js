@@ -263,7 +263,7 @@ class Palettes {
         listBody.parentNode.removeChild(listBody);
         listBody = palette.children[0].children[1].appendChild(document.createElement("tbody"));
         // Make an icon/button for each palette
-        this.makeButton(
+        this.makeSearchButton(
             "search",
             makePaletteIcons(PALETTEICONS["search"], this.cellSize, this.cellSize),
             listBody
@@ -281,6 +281,28 @@ class Palettes {
                 listBody
             );
         }
+    }
+    
+    makeSearchButton(name, icon, listBody) {
+        const row = listBody.insertRow(-1);
+        const img = row.insertCell(-1);
+        const label = row.insertCell(-1);
+        img.appendChild(icon);
+        img.style.padding = "4px";
+        img.style.boxSizing = "content-box";
+        img.style.width = `${this.cellSize}px`;
+        img.style.height = `${this.cellSize}px`;
+        label.textContent = toTitleCase(_(name));
+     //   label.style.color = platformColor.paletteText;
+        row.style.border="1px solid black";
+        label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
+        label.style.padding = "4px";
+        row.style.display = "flex";
+        row.style.flexDirection = "row";
+        row.style.alignItems = "center";
+        row.style.width = "126px";
+
+        this._loadPaletteButtonHandler(name, row);
     }
 
     makeButton(name, icon, listBody) {
