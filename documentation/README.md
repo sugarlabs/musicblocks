@@ -98,11 +98,23 @@ a block.
 
 Many blocks also incorporate "pie menus" for changing block parameters.
 
-## Right-Click Context Menu
-The right-click context menu in Music Blocks provides several options for working with blocks and the workspace. To access the right-click context menu, simply right-click anywhere in the workspace.
+## Context Menu
+Context menus are an important part of user interfaces that provide users with quick access to a set of actions relevant to the context in which they are working.The right-click context menu in Music Blocks provides several options for working with blocks and the workspace. To access the right-click context menu, simply right-click anywhere in the workspace.
 
-# Cut, Copy, Paste, Delete
-These options are used to manipulate blocks on the workspace. Cut removes the selected block and stores it on the clipboard, Copy creates a duplicate of the selected block on the clipboard, Paste inserts the contents of the clipboard at the current cursor location, and Delete removes the selected block from the workspace.
+# The Block context menu:
+This context menu appears when you right-click on a block in the workspace. It provides options such as "Duplicate," "Delete," "Help," and "Copy to Palette." The "Duplicate" option creates a copy of the selected block, while the "Delete" option removes the selected block from the workspace. The "Help" option opens a help dialog for the selected block, and the "Copy to Palette" option adds the selected block to the user's custom block palette.
+
+# The Palette context menu:
+This context menu appears when you right-click on a block in the palette. It provides options such as "Export," "Delete," "Edit," and "Copy." The "Export" option exports the selected block as a Python script, while the "Delete" option removes the selected block from the palette. The "Edit" option opens a dialog that allows the user to edit the selected block, and the "Copy" option creates a copy of the selected block.
+
+# The Workspace context menu:
+This context menu appears when you right-click on an empty area in the workspace. It provides options such as "Undo," "Redo," "Delete," "Duplicate," "Move to Trash," "Rename," and "Export." The "Undo" option undoes the previous action, while the "Redo" option redoes the previously undone action. The "Delete" option removes the selected block(s) from the workspace, while the "Duplicate" option creates a copy of the selected block(s). The "Move to Trash" option moves the selected block(s) to the trash. The "Rename" option allows the user to rename the selected block(s), while the "Export" option exports the selected block(s) as a Python script.
+
+# The Menu bar context menu:
+This context menu appears when you right-click on the menu bar at the top of the application window. It provides options such as "Minimize," "Maximize," "Move," and "Close." These options allow users to control the application window.
+
+#The Block Style context menu:
+This context menu appears when you right-click on a block in the workspace and select "Block Style." It provides options such as "Change Color," "Change Shape," "Change Icon," and "Reset Style." The "Change Color" option allows the user to change the color of the block, while the "Change Shape" option allows the user to change the shape of the block. The "Change Icon" option allows the user to change the icon on the block, and the "Reset Style" option resets the block style to its default settings.
 
 # Duplicate
 This option creates a duplicate of the selected block and places it next to the original block.
