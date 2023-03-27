@@ -243,6 +243,14 @@
 	cursor: pointer;
 }
 
+div.select-wrapper * {  
+	cursor: pointer ;
+}
+
+.select-wrapper ul.dropdown-content { 
+	top: 100% !important ;
+}
+
 .centre-button {
 	left: 50%;
 	-webkit-transform: translateX(-50%);
