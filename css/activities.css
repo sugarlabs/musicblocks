@@ -333,7 +333,7 @@ nav ul li {
     opacity: 0;
 }
 
-@media (max-width: 500px) {
+@media (max-width: 500px) and (min-width:400px) {
     .content li {
     width: 48.5%;
     padding-left: 1%;
@@ -343,7 +343,7 @@ nav ul li {
     transform: scale(0.485);
     }
     #helpBodyDiv {
-       left: 5%;
+       left: 8%;
      
     }
     nav h1 {
@@ -807,18 +807,21 @@ table {
 }
 
 #right-arrow {
-    left: 445px;
+    left: 380px;
     background: url('../header-icons/right-arrow.png');
+    z-index: 100;
 }
 
 #left-arrow {
     left: 5px;
     background: url('../header-icons/left-arrow.png');
+    z-index: 100;
 }
+
 
 #right-arrow, #left-arrow {
     position: absolute;
-    top: 195px;
+    top: 50%;
     background-size: 40px;
     height: 40px;
     width: 40px;
@@ -890,7 +893,7 @@ table {
 
 #helpBodyDiv {
     position: relative;
-    left: 45px;
+    left: 40px;
     border: 0 !important;
     overflow-x: hidden;
     overflow-y: auto;
@@ -939,10 +942,10 @@ table {
 
 @media(max-width :400px){
     #helpBodyDiv{
-        width:60% !important
+        width:80% !important
     }
     #right-arrow {
-        left: 317px;
+        left: 88%;
         z-index: 100000;
     }
 }
@@ -962,11 +965,7 @@ table {
         left: 370px;
         z-index: 100000;
     }
-    #helpBodyDiv {
-        left: 5%;
-        width:80% !important
-       
-    }
+   
 }
 
 #pscDiv {
