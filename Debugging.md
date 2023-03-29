@@ -85,7 +85,7 @@ e.g., x, y, heading, color, shade, grey, and pensize.
 ![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/status3.svg "additional programming within the Status block")
 
 You can do additional programming within the status block. In the
-example above, `whole notes played` is divided by `4` (e.g. quarter notes)
+example above, `whole notes played` is multiplied by `4` (e.g. quarter notes)
 before being displayed.
 
 ## 4. Playback modes

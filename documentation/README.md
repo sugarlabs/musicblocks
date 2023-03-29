@@ -216,7 +216,7 @@ loops. Whatever stack of blocks are placed inside its clamp will be
 repeated. It can be used to repeat individual notes, or entire phrases
 of music.
 
-![The Duplicate block(./duplicatenotes_block.svg "Duplicate block")
+![The Duplicate block](./duplicatenotes_block.svg "Duplicate block")
 
 The *Duplicate* block, found on the *Rhythms* palette, is used to
 repeat any contained notes. Similar to using a *Repeat* block, but
