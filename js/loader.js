@@ -11,6 +11,8 @@
 
 /* global requirejs */
 
+import { doSearch } from './js/articles.js';
+
 requirejs.config({
     baseUrl: "lib",
     shim: {
