@@ -1785,6 +1785,17 @@ class Activity {
                 };
                 document.addEventListener("mousedown", closeListener);
 
+                function doSearch(searchText) {
+                    let filteredArticles = articles.filter(article => {
+                     // Filter articles that contain the search text in either the title or body
+                         return article.title.includes(searchText) || article.body.includes(searchText);
+                                });
+
+                     // Display the filtered articles
+                     displayArticles(filteredArticles);
+              }
+
+
                 // Give the browser time to update before selecting
                 // focus.
                 setTimeout(() => {
