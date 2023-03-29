@@ -116,9 +116,6 @@ This option creates a duplicate of the selected block and places it next to the 
 
 ![Duplicate](./duplicate.png "Duplicate")
 
-# Change Icon
-This option allows you to change the icon associated with a block. You can choose from a variety of icons to make it easier to identify a block on the workspace.
-
 # Delete
 This option removes the selected block from your program
 
