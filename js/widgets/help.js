@@ -485,7 +485,7 @@ class HelpWidget {
                             break;
                     }
 
-                    const imageSrc = `${path}/${name}_block.svg` ;
+                    const imageSrc = `documentation/${name}_block.svg` ;
                     body += `<figure class="blockImage-wrapper"><img class="blockImage" src="${imageSrc}"></figure>` ;
                 }
 
