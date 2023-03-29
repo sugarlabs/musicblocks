@@ -101,26 +101,15 @@ Many blocks also incorporate "pie menus" for changing block parameters.
 ## Context Menu
 Context menus are an important part of user interfaces that provide users with quick access to a set of actions relevant to the context in which they are working.The right-click context menu in Music Blocks provides several options for working with blocks and the workspace. To access the right-click context menu, simply right-click anywhere in the workspace.
 
-![Display Window](./front.png "Display Window")
-
 # The Block context menu:
 This context menu appears when you right-click on a block in the workspace. It provides options such as "Duplicate," "Delete," "Help," and "Copy to Palette." The "Duplicate" option creates a copy of the selected block, while the "Delete" option removes the selected block from the workspace. The "Help" option opens a help dialog for the selected block, and the "Copy to Palette" option adds the selected block to the user's custom block palette.
 
-![Right-click context menu](./right-click_context_menu.png "Right-click context menu")
+![Right-click context menu](./block_context.png "Right-click context menu")
 
-# The Palette context menu:
-This context menu appears when you right-click on a block in the palette. It provides options such as "Export," "Delete," "Edit," and "Copy." The "Export" option exports the selected block as a Python script, while the "Delete" option removes the selected block from the palette. The "Edit" option opens a dialog that allows the user to edit the selected block, and the "Copy" option creates a copy of the selected block.
-
-# The Workspace context menu:
-This context menu appears when you right-click on an empty area in the workspace. It provides options such as "Undo," "Redo," "Delete," "Duplicate," "Move to Trash," "Rename," and "Export." The "Undo" option undoes the previous action, while the "Redo" option redoes the previously undone action. The "Delete" option removes the selected block(s) from the workspace, while the "Duplicate" option creates a copy of the selected block(s). The "Move to Trash" option moves the selected block(s) to the trash. The "Rename" option allows the user to rename the selected block(s), while the "Export" option exports the selected block(s) as a Python script.
+# Extract
+The "Extract" option in Music Blocks allows you to separate a nested block into its individual components or sub-blocks. This can be useful if you want to modify or reuse specific parts of a block without affecting the rest of the block.
 
 ![Extract the selected block](./extract.png "Extract the selected block")
-
-# The Menu bar context menu:
-This context menu appears when you right-click on the menu bar at the top of the application window. It provides options such as "Minimize," "Maximize," "Move," and "Close." These options allow users to control the application window.
-
-# The Block Style context menu:
-This context menu appears when you right-click on a block in the workspace and select "Block Style." It provides options such as "Change Color," "Change Shape," "Change Icon," and "Reset Style." The "Change Color" option allows the user to change the color of the block, while the "Change Shape" option allows the user to change the shape of the block. The "Change Icon" option allows the user to change the icon on the block, and the "Reset Style" option resets the block style to its default settings.
 
 # Duplicate
 This option creates a duplicate of the selected block and places it next to the original block.
@@ -130,8 +119,10 @@ This option creates a duplicate of the selected block and places it next to the 
 # Change Icon
 This option allows you to change the icon associated with a block. You can choose from a variety of icons to make it easier to identify a block on the workspace.
 
-# Properties
-This option shows a dialog box with the properties of the selected block. You can modify various properties of a block, such as its name, color, and value.
+# Delete
+This option removes the selected block from your program
+
+![Delete](./delete.png "Delete")
 
 # Help
 This option shows a help screen with information about the selected block. You can use this option to learn more about the block's functionality and how to use it in your projects.
