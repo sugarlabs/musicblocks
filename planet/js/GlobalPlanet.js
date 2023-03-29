@@ -333,7 +333,26 @@ function GlobalPlanet(Planet) {
         }
     };
 
+    this.cleanContainer = () => {
+        const element = document.getElementById("global-projects").firstElementChild ;
+        const list = element?.classList ?? "empty" ;
+
+        if (list === "empty")
+            return ;
+
+        list.forEach(name => {
+            if (name === "container" || name === "center-align") {
+                element.remove() ;
+                return ;
+            }
+        });
+    } ;
+
     this.render = data => {
+        
+        // Make sure the container doesn't display the offlineHTML or noProjectsHTML even when cards are being rendered.
+        this.cleanContainer() ;
+
         for (let i = 0; i < data.length; i++) {
             // eslint-disable-next-line no-prototype-builtins
             if (this.cache.hasOwnProperty(data[i][0])) {
