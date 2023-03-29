@@ -302,6 +302,15 @@ div.select-wrapper * {
 	#logo-container {
 		font-size: 0;
 	}
+
+	#globalcontents .row:first-child  { 
+		display: flex ; 
+		justify-content: center ;
+	}
+
+	#globalcontents .input-field { 
+		margin-left: 0 !important ;
+	}
 }
 
 a {
