@@ -1784,6 +1784,13 @@ class Activity {
                     }
                 };
                 document.addEventListener("mousedown", closeListener);
+                
+                function doSearch(query) {
+                    // function body to perform the search
+                    console.log('Search query:', query);
+                    // return search results or update the UI
+                  }
+                  
 
                 // Give the browser time to update before selecting
                 // focus.
