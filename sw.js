@@ -36,11 +36,17 @@ self.addEventListener("activate", function (event) {
     event.waitUntil(self.clients.claim());
 });
 
-function updateCache(request, response) {
-    return caches.open(CACHE).then(function (cache) {
-        return cache.put(request, response);
-    });
-}
+async function updateCache(request, response) {
+    if (response.status === 206) {
+      // Skip caching if response status code is 206
+      return;
+    }
+  
+    const cache = await caches.open(CACHE);
+    await cache.put(request, response);
+  }
+  
+  
 
 function fromCache(request) {
     // Check to see if you have it in the cache
