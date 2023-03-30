@@ -30,14 +30,41 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
         <script type="text/javascript">
-            function doSearch() {
-              console.log("Performing search...");
+        function doSearch() {
+            const query = document.getElementById("search-box").value.toLowerCase();
+            const resultsList = document.querySelector(".results-list");
+            resultsList.innerHTML = "";
+          
+            if (query.trim() === "") {
+              return;
             }
-      
-            $(document).ready(function() {
-              doSearch();
-            });
-          </script>
+          
+            const results = [];
+            for (const blockName in blockIndex) {
+              const block = blockIndex[blockName];
+              const keywords = `${blockName} ${block.description} ${block.tags.join(" ")}`;
+              if (keywords.toLowerCase().includes(query)) {
+                results.push(block);
+              }
+            }
+          
+            if (results.length === 0) {
+              resultsList.innerHTML = "<li>No results found.</li>";
+              return;
+            }
+          
+            for (const block of results) {
+              const li = document.createElement("li");
+              const a = document.createElement("a");
+              a.href = `blocks/${block.filename}.html`;
+              a.textContent = `${blockName} (${block.filename})`;
+              li.appendChild(a);
+              resultsList.appendChild(li);
+            }
+          }
+          
+
+        </script>
 
         <script src="lib/reqwest.js" defer></script>
 

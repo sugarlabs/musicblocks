@@ -2435,6 +2435,11 @@ class Activity {
                 */
             }
 
+            if (this.stage) {
+                this.stage.scaleX = this.turtleBlocksScale;
+              }
+              
+
             this.turtleBlocksScale = 1.0;
 
             this.stage.scaleX = this.turtleBlocksScale;
