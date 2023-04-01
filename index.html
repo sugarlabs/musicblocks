@@ -31,13 +31,19 @@
 
         <script type="text/javascript">
         function doSearch() {
-            const query = document.getElementById("search-box").value.toLowerCase();
+            const query = document.getElementById("search-box")
+            if(query!=null){
+            query = query.value.toLowerCase();
+            }
             const resultsList = document.querySelector(".results-list");
+            if(resultsList!=null){
             resultsList.innerHTML = "";
-          
+            }
+            if(query!=null){
             if (query.trim() === "") {
               return;
             }
+        }
           
             const results = [];
             for (const blockName in blockIndex) {
@@ -62,7 +68,7 @@
               resultsList.appendChild(li);
             }
           }
-          
+        
 
         </script>
 
