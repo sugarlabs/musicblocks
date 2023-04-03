@@ -40,6 +40,7 @@
 */
 /* exported MusicKeyboard */
 
+
 function MusicKeyboard(activity) {
     const FAKEBLOCKNUMBER = 100000;
     const BUTTONDIVWIDTH = 535; // 5 buttons
@@ -54,6 +55,8 @@ function MusicKeyboard(activity) {
 
     const saveOnKeyDown = document.onkeydown;
     const saveOnKeyUp = document.onkeyup;
+
+
 
     const w = window.innerWidth;
     this.activity = activity;
@@ -2216,6 +2219,41 @@ function MusicKeyboard(activity) {
 
             __selectionChanged();
         };
+        function splitNotesIntoActionBlocks(notes) {
+            var actionBlocks = [];
+            var currentBlock = [];
+            var maxNotesPerBlock = 50;
+            
+            for (var i = 0; i < notes.length; i++) {
+              currentBlock.push(notes[i]);
+              
+              if (currentBlock.length >= maxNotesPerBlock) {
+                actionBlocks.push(currentBlock);
+                currentBlock = [];
+              }
+            }
+            
+            if (currentBlock.length > 0) {
+              actionBlocks.push(currentBlock);
+            }
+            
+            return actionBlocks;
+          }
+          
+          function save() {
+            var notes = getNote();
+            
+            if (notes.length > 50) {
+              var actionBlocks = splitNotesIntoActionBlocks(notes);
+              
+              for (var i = 0; i < actionBlocks.length; i++) {
+                saveActionBlock(actionBlocks[i]);
+              }
+            } else {
+              saveActionBlock(notes);
+            }
+          }
+          
 
         if (condition === "pitchblocks") {
             for (let i = 0; i < noteLabels.length; i++) {
@@ -2566,6 +2604,27 @@ function MusicKeyboard(activity) {
 
         this.addKeyboardShortcuts();
     };
+  
+    this.save = function() {
+        var notes = this.notes;
+        if (notes.length > 50) {
+            var numBlocks = Math.ceil(notes.length / 50);
+            for (var i = 0; i < numBlocks; i++) {
+                var start = i * 50;
+                var end = (i + 1) * 50;
+                var blockNotes = notes.slice(start, end);
+                var actionBlock = new ActionBlock();
+                actionBlock.addAction(new NoteAction(blockNotes));
+                activity.addActionBlock(actionBlock);
+            }
+        } else {
+            var actionBlock = new ActionBlock();
+            actionBlock.addAction(new NoteAction(notes));
+            activity.addActionBlock(actionBlock);
+        }
+    };
+    
+
 
     this._save = function () {
         this.processSelected();
