@@ -73,7 +73,7 @@ class HelpWidget {
         // Which help page are we on?
         let page = 0;
 
-        this._helpDiv.style.width = iconSize * 2 + 425 + "px";
+        this._helpDiv.style.width = 100 +"%";
         this._helpDiv.style.backgroundColor = "#e8e8e8";
 
         // this._helpDiv.style.maxHeight = "100%";
@@ -141,7 +141,7 @@ class HelpWidget {
         if (!useActiveBlock) {
             // display help menu
             docById("helpBodyDiv").style.height = "325px";
-            docById("helpBodyDiv").style.width = "400px";
+            docById("helpBodyDiv").style.width = "345px";
             this._showPage(0);
         } else {
             // display help for this block
@@ -385,7 +385,7 @@ class HelpWidget {
         widgetWindow.clear();
         this._helpDiv = document.createElement("div");
 
-        this._helpDiv.style.width = "500px";
+        //this._helpDiv.style.width = "500px";
         this._helpDiv.style.height = "500px";
         this._helpDiv.style.backgroundColor = "#e8e8e8";
         
@@ -485,7 +485,7 @@ class HelpWidget {
                             break;
                     }
 
-                    const imageSrc = `${path}/${name}_block.svg` ;
+                    const imageSrc = `documentation/${name}_block.svg` ;
                     body += `<figure class="blockImage-wrapper"><img class="blockImage" src="${imageSrc}"></figure>` ;
                 }
 
