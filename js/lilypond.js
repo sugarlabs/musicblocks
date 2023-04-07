@@ -85,6 +85,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
 
     let noteCounter = 0;
     let queueSlur = false;
+    let queueCrescendo = false
     let articulation = false;
     let targetDuration = 0;
     let tupletDuration = 0;
@@ -209,8 +210,9 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                     articulation = false;
                     break;
                 case "begin crescendo":
-                    logo.notationNotes[turtle] += "\\< ";
-                    break;
+                    logo.notationNotes[turtle] += "  ";
+                    queueCrescendo = true
+                break;
                 case "begin decrescendo":
                     logo.notationNotes[turtle] += "\\> ";
                     break;
@@ -588,6 +590,10 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             if (queueSlur) {
                 queueSlur = false;
                 logo.notationNotes[turtle] += "(  ";
+            }
+            if (queueCrescendo) {
+                queueCrescendo = false;
+                logo.notationNotes[turtle] += "\\< ";
             }
         }
     }
