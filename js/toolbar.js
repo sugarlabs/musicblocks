@@ -52,6 +52,7 @@ class Toolbar {
                 ["planetIcon", _("Find and share projects")],
                 ["planetIconDisabled", _("Offline. Sharing is unavailable")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
+                ["fullScreenIcon", _("FullScreen")],
                 ["helpIcon", _("Help")],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
@@ -108,6 +109,7 @@ class Toolbar {
                 _("Find and share projects"),
                 _("Offline. Sharing is unavailable"),
                 _("Auxiliary menu"),
+                _("FullScreen"),
                 _("Help"),
                 _("Run slowly"),
                 _("Run step by step"),
@@ -145,6 +147,7 @@ class Toolbar {
                 ["planetIcon", _("Find and share projects")],
                 ["planetIconDisabled", _("Offline. Sharing is unavailable")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
+                ["fullScreenIcon", _("FullScreen")],
                 ["helpIcon", _("Help")],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
@@ -196,6 +199,7 @@ class Toolbar {
                 _("Find and share projects"),
                 _("Offline. Sharing is unavailable"),
                 _("Auxiliary menu"),
+                _("FullScreen"),
                 _("Help"),
                 _("Run slowly"),
                 _("Run step by step"),
@@ -552,7 +556,7 @@ class Toolbar {
             planetIconDisabled.style.display = "block";
         }
     }
-
+    
     /**
      * @public
      * @param {Function} onclick
