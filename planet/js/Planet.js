@@ -21,73 +21,78 @@
    Planet
 */
 
-function Planet(isMusicBlocks, storage) {
-    this.LocalPlanet = null;
-    this.GlobalPlanet = null;
-    this.ProjectStorage = null;
-    this.ServerInterface = null;
-    this.Converter = null;
-    this.SaveInterface = null;
-    this.LocalStorage = storage;
-    this.ConnectedToServer = null;
-    this.TagsManifest = null;
-    this.IsMusicBlocks = isMusicBlocks;
-    this.UserIDCookie = "UserID";
-    this.UserID = null;
-    this.loadProjectFromData = null;
-    this.loadNewProject = null;
-    this.planetClose = null;
-    this.oldCurrentProjectID = null;
-    this.loadProjectFromFile = null;
+class Planet {
 
-    this.prepareUserID = () => {
+    constructor(isMusicBlocks, storage) {
+        this.LocalPlanet = null;
+        this.GlobalPlanet = null;
+        this.ProjectStorage = null;
+        this.ServerInterface = null;
+        this.Converter = null;
+        this.SaveInterface = null;
+        this.LocalStorage = storage;
+        this.ConnectedToServer = null;
+        this.TagsManifest = null;
+        this.IsMusicBlocks = isMusicBlocks;
+        this.UserIDCookie = "UserID";
+        this.UserID = null;
+        this.loadProjectFromData = null;
+        this.loadNewProject = null;
+        this.planetClose = null;
+        this.oldCurrentProjectID = null;
+        this.loadProjectFromFile = null;
+    }
+
+    prepareUserID() {
         let id = getCookie(this.UserIDCookie);
+
         if (id === ""){
             id = this.ProjectStorage.generateID();
             setCookie(this.UserIDCookie, id, 3650);
         }
+
         this.UserID = id;
     };
 
-    this.open = image => {
+    open(image) {
         this.LocalPlanet.setCurrentProjectImage(image);
         this.LocalPlanet.updateProjects();
         this.oldCurrentProjectID = this.ProjectStorage.getCurrentProjectID();
     };
 
-    this.saveLocally = (data, image) => {
+    saveLocally(data, image) {
         this.ProjectStorage.saveLocally(data, image);
     };
 
-    this.setAnalyzeProject = func => {
+    setAnalyzeProject(func) {
         this.analyzeProject = func;
     };
 
-    this.setLoadProjectFromData = func => {
+    setLoadProjectFromData(func) {
         this.loadProjectFromData = func;
     };
 
-    this.setPlanetClose = func => {
+    setPlanetClose(func) {
         this.planetClose = func;
     };
 
-    this.setLoadNewProject = func => {
+    setLoadNewProject(func) {
         this.loadNewProject = func;
     };
 
-    this.setLoadProjectFromFile = func => {
+    setLoadProjectFromFile(func) {
         this.loadProjectFromFile = func;
     };
 
-    this.setOnConverterLoad = func => {
+    setOnConverterLoad(func) {
         this.onConverterLoad = func;
     };
 
-    this.openProjectFromPlanet = (id,error) => {
+    openProjectFromPlanet(id,error) {
         this.GlobalPlanet.openGlobalProject(id,error);
     };
-
-    this.init = async () => {
+    
+    async init() {
         this.StringHelper = new StringHelper(this);
         this.StringHelper.init();
         this.ProjectStorage = new ProjectStorage(this);
@@ -119,26 +124,19 @@ function Planet(isMusicBlocks, storage) {
         );
     };
 
-    this.closeButton = () => {
+    closeButton() {
         if (this.ProjectStorage.getCurrentProjectID() !== this.oldCurrentProjectID) {
-            const d = this.ProjectStorage.getCurrentProjectData();
-            if (d === null){
-                this.loadNewProject();
-            } else {
-                this.loadProjectFromData(d);
-            }
-        } else {
-            this.planetClose();
+            const data = this.ProjectStorage.getCurrentProjectData() ;
+            (!data) ? this.loadNewProject() : this.loadProjectFromData(data) ;
         }
+        
+        else this.planetClose();
     };
-
-    this.initPlanets = tags => {
-        if (!tags.success){
-            this.ConnectedToServer = false;
-        } else {
-            this.ConnectedToServer = true;
-            this.TagsManifest = tags.data;
-        }
+    
+    initPlanets(tags) {
+        const status = tags.success || false ;
+        this.ConnectedToServer = status ;
+        if (status) this.TagsManifest = tags.data ;
 
         this.Converter = new Converter(this);
         this.Converter.init();
@@ -150,4 +148,5 @@ function Planet(isMusicBlocks, storage) {
         this.GlobalPlanet = new GlobalPlanet(this);
         this.GlobalPlanet.init();
     };
-};
+
+}
