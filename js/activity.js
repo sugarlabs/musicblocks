@@ -2574,12 +2574,27 @@ class Activity {
 
         const that = this;
         const screenWidth = window.innerWidth
+        let isSaveInProgress = false;
+        
         window.onresize = () => {
-            if (screenWidth !== window.innerWidth) {
+            if (!isSaveInProgress && screenWidth !== window.innerWidth) {
                 that._onResize(false);
             }
         };
-
+        
+        // Call this function when the user initiates a save
+        function startSave() {
+            isSaveInProgress = true;
+            
+            // Code to save the image goes here
+            // Once the save is complete, call endSave()
+        }
+        
+        // Call this function once the save is complete
+        function endSave() {
+            isSaveInProgress = false;
+        }
+        
         /*
          * Restore last stack pushed to trashStack back onto canvas.
          * Hides palettes before update
