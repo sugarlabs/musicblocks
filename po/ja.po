@@ -12,6 +12,9 @@
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.0.1\n"
 
+msgid "Full screen"
+msgstr "全画面表示"
+
 #: js/planetInterface.js:101
 #: js/planetInterface.js:101
 #: js/planetInterface.js:101
