@@ -20,48 +20,53 @@
    GlobalTag
 */
 
-function GlobalTag(Planet) {
-    // eslint-disable-next-line no-unused-vars
-    const tagNames = [
-        //.TRANS: On the Planet, we use labels to tag projects.
-        _("All Projects"),
-        //.TRANS: On the Planet, we use labels to tag projects.
-        _("My Projects"),
-        //.TRANS: On the Planet, we use labels to tag projects.
-        _("Examples"),
-        //.TRANS: On the Planet, we use labels to tag projects.
-        _("Music"),
-        //.TRANS: On the Planet, we use labels to tag projects.
-        _("Art"),
-        //.TRANS: On the Planet, we use labels to tag projects.
-        _("Math"),
-        //.TRANS: On the Planet, we use labels to tag projects.
-        _("Interactive"),
-        //.TRANS: On the Planet, we use labels to tag projects.
-        _("Design"),
-        //.TRANS: On the Planet, we use labels to tag projects.
-        _("Game"),
-        //.TRANS: On the Planet, we use labels to tag projects.
-        _("Media"),
-        //.TRANS: On the Planet, we use labels to tag projects.
-        _("Sensors"),
-        //.TRANS: On the Planet, we use labels to tag projects.
-        _("Effects"),
-        //.TRANS: On the Planet, we use labels to tag projects.
-        _("Code Snippet"),
-    ];
+class GlobalTag {
 
-    this.id = null;
-    this.name = null;
-    this.func = null;
-    this.IsDisplayTag = null;
-    this.specialTag = null;
-    this.tagElement = null;
-    this.globalPlanet = Planet.GlobalPlanet;
-    this.selected = false;
-    this.selectedClass = null;
+    /* 
+     this.tagNames = [
+            //.TRANS: On the Planet, we use labels to tag projects.
+            _("All Projects"),
+            //.TRANS: On the Planet, we use labels to tag projects.
+            _("My Projects"),
+            //.TRANS: On the Planet, we use labels to tag projects.
+            _("Examples"),
+            //.TRANS: On the Planet, we use labels to tag projects.
+            _("Music"),
+            //.TRANS: On the Planet, we use labels to tag projects.
+            _("Art"),
+            //.TRANS: On the Planet, we use labels to tag projects.
+            _("Math"),
+            //.TRANS: On the Planet, we use labels to tag projects.
+            _("Interactive"),
+            //.TRANS: On the Planet, we use labels to tag projects.
+            _("Design"),
+            //.TRANS: On the Planet, we use labels to tag projects.
+            _("Game"),
+            //.TRANS: On the Planet, we use labels to tag projects.
+            _("Media"),
+            //.TRANS: On the Planet, we use labels to tag projects.
+            _("Sensors"),
+            //.TRANS: On the Planet, we use labels to tag projects.
+            _("Effects"),
+            //.TRANS: On the Planet, we use labels to tag projects.
+            _("Code Snippet"),
+        ];
+    */
 
-    this.render = () => {
+    constructor(Planet) {
+        this.Planet = Planet ;
+        this.id = null;
+        this.name = null;
+        this.func = null;
+        this.IsDisplayTag = null;
+        this.specialTag = null;
+        this.tagElement = null;
+        this.globalPlanet = Planet.GlobalPlanet;
+        this.selected = false;
+        this.selectedClass = null;
+    }
+
+    render() {
         const tag = document.createElement("div");
         tag.classList.add("chipselect", "cursor") ;
 
@@ -81,7 +86,7 @@ function GlobalTag(Planet) {
         this.tagElement = tag;
     };
 
-    this.onTagClick = () => {
+    onTagClick() {
         if (this.specialTag && !this.selected)
             this.globalPlanet.selectSpecialTag(this);
                  
@@ -91,17 +96,19 @@ function GlobalTag(Planet) {
         }
     };
 
-    this.select = () => {
+    select() {
         this.tagElement.classList.add(this.selectedClass);
         this.selected = true;
     };
 
-    this.unselect = () => {
+    unselect() {
         this.tagElement.classList.remove(this.selectedClass);
         this.selected = false;
     };
 
-    this.init = obj => {
+    init(obj) {
+        const Planet = this.Planet ;
+
         if (obj.id !== undefined) {
             this.specialTag = false;
             this.id = obj.id;
@@ -121,4 +128,5 @@ function GlobalTag(Planet) {
 
         this.render();
     };
-};
+
+}
