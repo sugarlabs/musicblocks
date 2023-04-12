@@ -10,8 +10,10 @@
 	<meta name="description" content="Learn to code through music with Music Blocks. Arrange colorful blocks to create everything from simple melodies to interactive games.">
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height"/>
 	
-        <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-        <link href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap" rel="stylesheet"> -->
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+            
+        <!-- <link href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap" rel="stylesheet"> --> 
+        
         <link rel="stylesheet" href="css/activities.css" />
         <link rel="stylesheet" href="dist/css/style.css" />
         <link rel="stylesheet" href="dist/css/keyboard.css" />
@@ -122,12 +124,12 @@
             <label for="fixed">Fixed</label>
     </div>
 
-    <body
+    <body id="body"
         onload="init();"
         data-title="index"
         id="body"
         style="background: #f9f9f9;"
-    >
+     >
         <div
             id="loading-image-container"
             style="position: absolute; width: 100%; height: 100%;cursor: wait;"
@@ -296,6 +298,7 @@
                         hideArrows(); // This function is declared in js/activity.js
                     }
                 </script>
+
 
                 <canvas id="myCanvas" width="1200" height="900"> </canvas>
 
@@ -497,12 +500,10 @@
                             <li>
                                 <a id="stop" class="left tooltipped"
                                     ><i class="material-icons main"
-                                    style="font-size: 70px;position: relative;right: 20px;"
                                     >stop</i>
                                 </a>
                                 
                             </li>
-                            
                             <li>
                                 <a id="start" title="Record" style="
                                         padding: 18px;
@@ -512,10 +513,17 @@
                                         top: 12px;
                                         ">
                                 </a>
-                                                
-                        </ul>
+
+                            </li>
+                            
                         <ul class="main right">
                             
+                            <li>
+                                <a id="FullScreen" class="FullScreen" onclick="setIcon()">
+                                    <i class="material-icons">&#xe5d0;</i>
+            
+                                </a>
+                            </li>
                             <li>
                                 <a
                                     id="newFile"
@@ -826,7 +834,50 @@
                 <ul id="newdropdown" class="dropdown-content">
                     <li><a id="new-project"></a></li>
                 </ul>
-            </div>
+ 
+            <script>             
+            var count=0;    
+            function setIcon() {
+                var property = document.getElementById(FullScreen);
+                //Calling full Screen
+                if (count == 0) {
+                    openFullscreen();
+                    
+                    count = 1;        
+                }
+                //Closing full Scree
+                else {
+                    closeFullscreen();
+                    count = 0;
+                }
+            }
+          </script>
+            <!-- Function to open and closing the screen -->
+            <script language="jscript">
+                var elem = document.documentElement;
+                    function openFullscreen() {
+                    if (elem.requestFullscreen) {
+                        elem.requestFullscreen();
+                        // For safari browser
+                    } else if (elem.webkitRequestFullscreen) {
+                        elem.webkitRequestFullscreen();
+                        // For IE(supported above 10)
+                    } else if (elem.msRequestFullscreen) { 
+                        elem.msRequestFullscreen();
+                    }
+                    }
+
+                    function closeFullscreen() {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) { /* Safari */
+                        document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) { /* IE11 */
+                        document.msExitFullscreen();
+                    }
+                    }
+            </script> 
+        </div>
         </div>
         <!-- hideContents -->
          <script>
