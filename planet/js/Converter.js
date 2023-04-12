@@ -16,48 +16,47 @@
    Converter
 */
 
-function Converter(Planet) {
-    this.ServerInterface = Planet.ServerInterface;
+class Converter {
+    
+    constructor(Planet) {
+        this.Planet = Planet ;
+        this.ServerInterface = Planet.ServerInterface;
+    }
 
-    this.isConnected = () => {
-        return Planet.ConnectedToServer;
+    isConnected() {
+        return this.Planet.ConnectedToServer;
     };
 
     // callbacks: (success, data/error message)
     // Conversion Functions
 
-    this.ly2pdf = (data, callback) => {
+    ly2pdf(data, callback) {
         this.ServerInterface.convertFile("ly", "pdf", window.btoa(encodeURIComponent(data)), function(result) {
             this.afterly2pdf(result,callback);
         }.bind(this));
     };
     
-    this.afterly2pdf = (data, callback) => {
-        if (!data.success) {
-            callback(false, data.error);
-        } else {
-            callback(true, this.getDataURL(data.data.contenttype, data.data.blob));
-        }
+    afterly2pdf (data, callback) {
+        (!data.success) ? callback(false, data.error) :
+            callback(true, this.getDataURL(data.data.contenttype, data.data.blob)) ;            
     };
-    
+
     // Ancillary Functions
-    this.getDataURL = (mime, data) => {
-        return "data:" + mime + ";base64," + data;
+    getDataURL (mime, data) {
+        return `data:${mime};base64,${data}` ;
     };
 
     // Unused, but might be useful.
-    this.getBlob = (mime, data) => {
+    getBlob(mime, data) {
         const rawData = window.atob(data);
         const len = rawData.length;
         const arr = new Uint8Array(len);
-        for (let i = 0; i < len; i++){
+
+        for (let i = 0; i < len; i++)
             arr[i] = rawData.charCodeAt(i);
-        }
 
         const blob = new Blob([arr], {type: mime});
         return blob;
     };
 
-    this.init = () => {
-    };
-};
+}
