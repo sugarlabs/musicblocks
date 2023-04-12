@@ -59,4 +59,6 @@ class Converter {
         return blob;
     };
 
+    init() {}
+
 }
