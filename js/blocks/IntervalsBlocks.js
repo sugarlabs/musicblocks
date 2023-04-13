@@ -886,7 +886,7 @@ function setupIntervalsBlocks(activity) {
 
     class MovableBlock extends FlowBlock {
         constructor() {
-            super("moveable", _("movable Do")); // legacy typo
+            super("movable", _("movable Do")); // legacy typo
             this.setPalette("intervals", activity);
             this.beginnerBlock(true);
             this.setHelpString([
@@ -903,7 +903,7 @@ function setupIntervalsBlocks(activity) {
                 argTypes: ["booleanin"]
             });
             this.makeMacro((x, y) => [
-                [0, "moveable", x, y, [null, 1, null]],
+                [0, "movable", x, y, [null, 1, null]],
                 [1, ["boolean", { value: true }], 0, 0, [0]]
             ]);
         }
