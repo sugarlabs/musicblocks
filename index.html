@@ -886,7 +886,7 @@
 
             start.addEventListener('click', async function(){
                 let stream = await recordScreen();
-                let mimeType = 'audio/M4A';
+                let mimeType = 'video/webm';
                 mediaRecorder = createRecorder(stream, mimeType);
             let node = document.createElement("p");
                 node.textContent = "Started recording";
@@ -901,11 +901,11 @@
 
                 async function recordScreen() {
                     return await navigator.mediaDevices.getDisplayMedia({
-                    
-                    audio: true
-                                
-                    
-                    
+                    preferCurrentTab:'True',
+                    systemAudio: "include",
+                    audio: 'True',
+
+                    video: { mediaSource: "tab"}                             
                     });
                 }
 
@@ -931,12 +931,12 @@
                 function saveFile(recordedChunks){
 
                 const blob = new Blob(recordedChunks, {
-                    type: 'audio/M4A'
+                    type: 'video/webm'
                     });
                     let filename = window.prompt('Enter file name'),
                         downloadLink = document.createElement('a');
                     downloadLink.href = URL.createObjectURL(blob);
-                    downloadLink.download = `${filename}.M4A`;
+                    downloadLink.download = `${filename}.webm`;
 
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
