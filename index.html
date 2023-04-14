@@ -503,7 +503,9 @@
                                 >
                             </li>
                             <li>                                
-                                <a id="start" title='record'
+                                <a id="start"
+                                 class="left tooltipped"
+                                 data-tooltip="Record"
                                  style="
                                         padding: 18px;
                                         border-radius: 100%;
@@ -517,8 +519,14 @@
 
                         <ul class="main right">
                             <li>
-                                <a id="FullScreen" class="FullScreen" onclick="setIcon()">
-                                    <i class="material-icons">&#xe5d0;</i>
+                                <a 
+                                 id="FullScreen"
+                                 class="tooltipped"
+                                 data-position="bottom"
+                                 data-activates="newdropdown"
+                                 data-tooltip="Resize"
+                                 onclick="setIcon()">
+                                <i class="material-icons">&#xe5d0;</i>
             
                                 </a>
                             </li>
@@ -833,7 +841,33 @@
                     <li><a id="new-project"></a></li>
                 </ul>
  
-            <script>             
+            <script>  
+        var elem = document.documentElement;
+                    function openFullscreen() {
+                    if (elem.requestFullscreen) {
+                        elem.requestFullscreen();
+                        // For safari browser
+                    } else if (elem.webkitRequestFullscreen) {
+                        elem.webkitRequestFullscreen();
+                        // For IE(supported above 10)
+                    } else if (elem.msRequestFullscreen) { 
+                        elem.msRequestFullscreen();
+                    }else if (elem.mozRequestFullscreen) { 
+                        elem.mozRequestFullscreen();
+                    }
+                    }
+
+                    function closeFullscreen() {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) { /* Safari */
+                        document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) { /* IE11 */
+                        document.msExitFullscreen();
+                    }else if (document.mozExitFullscreen) { /* IE11 */
+                        document.mozExitFullscreen();
+                    }
+                    }               
             var count=0;    
             function setIcon() {
                 var property = document.getElementById(FullScreen);
@@ -852,28 +886,7 @@
           </script>
             <!-- Function to open and closing the screen -->
             <script language="jscript">
-                var elem = document.documentElement;
-                    function openFullscreen() {
-                    if (elem.requestFullscreen) {
-                        elem.requestFullscreen();
-                        // For safari browser
-                    } else if (elem.webkitRequestFullscreen) {
-                        elem.webkitRequestFullscreen();
-                        // For IE(supported above 10)
-                    } else if (elem.msRequestFullscreen) { 
-                        elem.msRequestFullscreen();
-                    }
-                    }
-
-                    function closeFullscreen() {
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen();
-                    } else if (document.webkitExitFullscreen) { /* Safari */
-                        document.webkitExitFullscreen();
-                    } else if (document.msExitFullscreen) { /* IE11 */
-                        document.msExitFullscreen();
-                    }
-                    }
+                
             </script> 
         </div>
         </div>
