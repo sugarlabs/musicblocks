@@ -499,13 +499,14 @@
                             </li>
                             <li>
                                 <a id="stop" class="left tooltipped"
-                                    ><i class="material-icons main"
-                                    >stop</i>
-                                </a>
-                                
+                                    ><i class="material-icons main">stop</i></a
+                                >
                             </li>
-                            <li>
-                                <a id="start" title="Record" style="
+                            <li>                                
+                                <a id="start"
+                                 class="left tooltipped"
+                                 data-tooltip="Record"
+                                 style="
                                         padding: 18px;
                                         border-radius: 100%;
                                         position: relative;
@@ -513,14 +514,19 @@
                                         top: 12px;
                                         ">
                                 </a>
-
                             </li>
-                            
+                        </ul>
+
                         <ul class="main right">
-                            
                             <li>
-                                <a id="FullScreen" class="FullScreen" onclick="setIcon()">
-                                    <i class="material-icons">&#xe5d0;</i>
+                                <a 
+                                 id="FullScreen"
+                                 class="tooltipped"
+                                 data-position="bottom"
+                                 data-activates="newdropdown"
+                                 data-tooltip="Resize"
+                                 onclick="setIcon()">
+                                <i class="material-icons">&#xe5d0;</i>
             
                                 </a>
                             </li>
@@ -835,7 +841,33 @@
                     <li><a id="new-project"></a></li>
                 </ul>
  
-            <script>             
+            <script>  
+        var elem = document.documentElement;
+                    function openFullscreen() {
+                    if (elem.requestFullscreen) {
+                        elem.requestFullscreen();
+                        // For safari browser
+                    } else if (elem.webkitRequestFullscreen) {
+                        elem.webkitRequestFullscreen();
+                        // For IE(supported above 10)
+                    } else if (elem.msRequestFullscreen) { 
+                        elem.msRequestFullscreen();
+                    }else if (elem.mozRequestFullscreen) { 
+                        elem.mozRequestFullscreen();
+                    }
+                    }
+
+                    function closeFullscreen() {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) { /* Safari */
+                        document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) { /* IE11 */
+                        document.msExitFullscreen();
+                    }else if (document.mozExitFullscreen) { /* IE11 */
+                        document.mozExitFullscreen();
+                    }
+                    }               
             var count=0;    
             function setIcon() {
                 var property = document.getElementById(FullScreen);
@@ -854,40 +886,20 @@
           </script>
             <!-- Function to open and closing the screen -->
             <script language="jscript">
-                var elem = document.documentElement;
-                    function openFullscreen() {
-                    if (elem.requestFullscreen) {
-                        elem.requestFullscreen();
-                        // For safari browser
-                    } else if (elem.webkitRequestFullscreen) {
-                        elem.webkitRequestFullscreen();
-                        // For IE(supported above 10)
-                    } else if (elem.msRequestFullscreen) { 
-                        elem.msRequestFullscreen();
-                    }
-                    }
-
-                    function closeFullscreen() {
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen();
-                    } else if (document.webkitExitFullscreen) { /* Safari */
-                        document.webkitExitFullscreen();
-                    } else if (document.msExitFullscreen) { /* IE11 */
-                        document.msExitFullscreen();
-                    }
-                    }
+                
             </script> 
         </div>
         </div>
         <!-- hideContents -->
-         <script>
+
+        <script>
             let start = document.getElementById('start'),
             stop  = document.getElementById('stop'),
             mediaRecorder;
 
             start.addEventListener('click', async function(){
                 let stream = await recordScreen();
-                let mimeType = 'audio/M4A';
+                let mimeType = 'video/webm';
                 mediaRecorder = createRecorder(stream, mimeType);
             let node = document.createElement("p");
                 node.textContent = "Started recording";
@@ -902,11 +914,11 @@
 
                 async function recordScreen() {
                     return await navigator.mediaDevices.getDisplayMedia({
-                    
-                    audio: true
-                                
-                    
-                    
+                    preferCurrentTab:'True',
+                    systemAudio: "include",
+                    audio: 'True',
+
+                    video: { mediaSource: "tab"}                             
                     });
                 }
 
@@ -932,12 +944,12 @@
                 function saveFile(recordedChunks){
 
                 const blob = new Blob(recordedChunks, {
-                    type: 'audio/M4A'
+                    type: 'video/webm'
                     });
                     let filename = window.prompt('Enter file name'),
                         downloadLink = document.createElement('a');
                     downloadLink.href = URL.createObjectURL(blob);
-                    downloadLink.download = `${filename}.M4A`;
+                    downloadLink.download = `${filename}.webm`;
 
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
@@ -945,6 +957,7 @@
                     document.body.removeChild(downloadLink);
                 }
          </script>
+
         <div id="searchBar" tabindex="-1">
             <input
                 type="text"
