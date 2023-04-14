@@ -243,6 +243,14 @@
 	cursor: pointer;
 }
 
+div.select-wrapper * {  
+	cursor: pointer ;
+}
+
+.select-wrapper ul.dropdown-content { 
+	top: 100% !important ;
+}
+
 .centre-button {
 	left: 50%;
 	-webkit-transform: translateX(-50%);
@@ -293,6 +301,15 @@
 @media only screen and (max-width: 655px) {
 	#logo-container {
 		font-size: 0;
+	}
+
+	#globalcontents .row:first-child  { 
+		display: flex ; 
+		justify-content: center ;
+	}
+
+	#globalcontents .input-field { 
+		margin-left: 0 !important ;
 	}
 }
 
