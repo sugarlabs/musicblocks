@@ -503,17 +503,17 @@
                                 >
                             </li>
                             <li>                                
-                                <a id="start"
+                                <button id="start"
                                  class="left tooltipped"
                                  data-tooltip="Record"
                                  style="
-                                        padding: 18px;
+                                        padding: 14px ;
                                         border-radius: 100%;
                                         position: relative;
                                         background: #EB455F;
-                                        top: 12px;
+                                        top: 14px;
                                         ">
-                                </a>
+                                </button>
                             </li>
                         </ul>
 
@@ -884,10 +884,6 @@
                 }
             }
           </script>
-            <!-- Function to open and closing the screen -->
-            <script language="jscript">
-                
-            </script> 
         </div>
         </div>
         <!-- hideContents -->
@@ -896,58 +892,113 @@
             let start = document.getElementById('start'),
             stop  = document.getElementById('stop'),
             mediaRecorder;
+            function fnBrowserDetect(){                 
+                    let userAgent = navigator.userAgent;
+                    let browserName;
+                    
+                    if(userAgent.match(/chrome|chromium|crios/i)){
+                        browserName = "chrome";
+                    }else if(userAgent.match(/firefox|fxios/i)){
+                        browserName = "firefox";
+                    }  else if(userAgent.match(/safari/i)){
+                        browserName = "safari";
+                    }else if(userAgent.match(/opr\//i)){
+                        browserName = "opera";
+                    } else if(userAgent.match(/edg/i)){
+                        browserName = "edge";
+                    }else{
+                        browserName="No browser detection";
+                    }
+                    return browserName;       
+            }
+            const browser = fnBrowserDetect();
 
+
+            const btn = document.getElementById('start');
+            const hideIn = ['firefox', 'safari'];
+            if (hideIn.includes(browser)) {
+            btn.classList.add("hide");
+} 
+            function disableStart(){
+                start.disabled = true;
+
+            }
             start.addEventListener('click', async function(){
+                
                 let stream = await recordScreen();
                 let mimeType = 'video/webm';
                 mediaRecorder = createRecorder(stream, mimeType);
-            let node = document.createElement("p");
+                let node = document.createElement("p");
                 node.textContent = "Started recording";
                 document.body.appendChild(node);
+                start.style=NULL;
+                
             })  
-             stop.addEventListener('click', function(){
+            function stopRec(){
                 mediaRecorder.stop();
                 let node = document.createElement("p");
                 node.textContent = "Stopped recording";
                 document.body.appendChild(node);
-                })
+            }
+            stop.addEventListener('click', function(){
+                mediaRecorder.stop();
+                let node = document.createElement("p");
+                node.textContent = "Stopped recording";
+                document.body.appendChild(node);
+             
+            })
 
-                async function recordScreen() {
-                    return await navigator.mediaDevices.getDisplayMedia({
-                    preferCurrentTab:'True',
-                    systemAudio: "include",
-                    audio: 'True',
+            async function recordScreen(){
+                
+                return await navigator.mediaDevices.getDisplayMedia({
+                preferCurrentTab:'True',
+                systemAudio: "include",
+                audio: 'True',
+                video: { mediaSource: "tab"},
+                
+                    bandwidthProfile: {
+                        video: {
+                        clientTrackSwitchOffControl: 'auto',
+                        contentPreferencesMode: 'auto'
+                        }
+                    },
+                    preferredVideoCodecs: 'auto'
+                    
 
-                    video: { mediaSource: "tab"}                             
-                    });
-                }
+                });
+            }
 
-                function createRecorder (stream, mimeType) {
-                // the stream data is stored in this array
+            function createRecorder (stream, mimeType) {
+                disableStart();
                 let recordedChunks = []; 
 
                 const mediaRecorder = new MediaRecorder(stream);
+                stream.oninactive = function () {
+                    console.log("Recording is ready to save");
+                    stopRec();
+                };
+
+                mediaRecorder.onstop = function(){
+                    saveFile(recordedChunks);
+                    recordedChunks = [];
+                };
 
                 mediaRecorder.ondataavailable = function (e) {
                     if (e.data.size > 0) {
                     recordedChunks.push(e.data);
-                    }  
+                    }   
                 };
-                mediaRecorder.onstop = function () {
-                    saveFile(recordedChunks);
-                    recordedChunks = [];
-                };
+                                      
                 mediaRecorder.start(200); // For every 200ms the stream data will be stored in a separate chunk.
                 return mediaRecorder;
-                }
-
-                function saveFile(recordedChunks){
-
+            }
+            
+            function saveFile(recordedChunks){
                 const blob = new Blob(recordedChunks, {
                     type: 'video/webm'
                     });
                     let filename = window.prompt('Enter file name'),
-                        downloadLink = document.createElement('a');
+                    downloadLink = document.createElement('a');
                     downloadLink.href = URL.createObjectURL(blob);
                     downloadLink.download = `${filename}.webm`;
 
@@ -955,7 +1006,9 @@
                     downloadLink.click();
                     URL.revokeObjectURL(blob); // clear from memory
                     document.body.removeChild(downloadLink);
-                }
+                    start.disabled = false;
+            }
+            start.disabled = false;
          </script>
 
         <div id="searchBar" tabindex="-1">
