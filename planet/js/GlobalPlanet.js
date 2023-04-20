@@ -354,11 +354,7 @@ class GlobalPlanet {
         }
     };
 
-<<<<<<< HEAD
-    this.cleanContainer = () => {
-=======
     cleanContainer() {
->>>>>>> 72e40ae026a7237991de9d9e825000c8ef9286de
         const element = document.getElementById("global-projects").firstElementChild ;
         const list = element?.classList ?? "empty" ;
 
@@ -373,12 +369,7 @@ class GlobalPlanet {
         });
     } ;
 
-<<<<<<< HEAD
-    this.render = data => {
-        
-=======
     render(data) {
->>>>>>> 72e40ae026a7237991de9d9e825000c8ef9286de
         // Make sure the container doesn't display the offlineHTML or noProjectsHTML even when cards are being rendered.
         this.cleanContainer() ;
 
