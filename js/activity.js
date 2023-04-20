@@ -1746,6 +1746,7 @@ class Activity {
         this.showSearchWidget = () => {
             // Bring widget to top.
             this.searchWidget.style.zIndex = 1001;
+            this.searchWidget.style.border = "2px solid blue";
             if (this.searchWidget.style.visibility === "visible") {
                 this.hideSearchWidget();
             } else {
@@ -2574,11 +2575,12 @@ class Activity {
 
         const that = this;
         const screenWidth = window.innerWidth
-        window.onresize = () => {
+        const  resizeCanvas_ = () => {
             if (screenWidth !== window.innerWidth) {
                 that._onResize(false);
             }
-        };
+        }
+        window.onresize = resizeCanvas_
 
         /*
          * Restore last stack pushed to trashStack back onto canvas.

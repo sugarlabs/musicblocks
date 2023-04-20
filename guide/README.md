@@ -1947,7 +1947,7 @@ initialized. The widget contains row for every *Pitch* block contained
 in the clamp of the *Pitch Staircase* block. The input fields in the top
 row of the widget specify the musical proportions used to create new
 pitches in the staircase. The inputs correspond to the numerator and
-denominator in the proportion resectively. By default the proportion
+denominator in the proportion respectively. By default the proportion
 is 3:2.
 
 ![widget](./pitchstaircase1.svg "notes associated with the step in
