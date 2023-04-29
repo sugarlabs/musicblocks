@@ -407,6 +407,12 @@ body {
     overflow: hidden;
 }
 
+@media screen and (max-width: 798px) {
+    body {
+      overflow: overlay;
+    }
+  }
+
 body.noScroll {
     overflow: hidden;
 }
