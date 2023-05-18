@@ -148,6 +148,8 @@ Conduct](https://github.com/sugarlabs/sugar-docs/blob/master/src/CODE_OF_CONDUCT
 
 ## <a name="CONTRIBUTING"></a>Contributing
 
+![https://github.com/monoclehq](https://open-source-assets.middlewarehq.com/svgs/sugarlabs-musicblocks-contributor-metrics-dark-widget.svg)
+
 Please consider contributing to the project, with your ideas, your
 music, your lesson plans, your artwork, and your code.
 
