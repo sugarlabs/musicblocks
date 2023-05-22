@@ -1479,7 +1479,7 @@ input.timbreName {
     -o-transition: ease 1s;
     -webkit-transition: ease 1s;
     transition: ease 1s;
-    z-index: 10;
+    z-index: 100;
 }
 
 .wheelNav > svg {
@@ -1548,7 +1548,7 @@ input.timbreName {
     height: 3%;
     position: absolute;
     top: 130px;
-    left: 25%;
+    left: 33%;
     padding-top: 8px;
     border-radius: 8px;
     background-color: #8CC6FF;
