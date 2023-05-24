@@ -20,78 +20,91 @@
    GlobalCard, copyURLToClipboard
 */
 
-function GlobalCard(Planet) {
-    this.ProjectData = null;
-    this.id = null;
-    this.PlaceholderMBImage = "images/mbgraphic.png";
-    this.PlaceholderTBImage = "images/tbgraphic.png";
-    this.renderData = `
-    <div class="col no-margin-left s12 m6 l4"> 
-        <div class="card"> 
+class GlobalCard {
+    
+    constructor(Planet) {
+        this.Planet = Planet ;
+        this.ProjectData = null;
+        this.id = null;
+        this.PlaceholderMBImage = "images/mbgraphic.png";
+        this.PlaceholderTBImage = "images/tbgraphic.png";
         
-            <div class="card-image"> 
-                <img class="project-image project-card-image" id="global-project-image-{ID}" src="images/planetgraphic.png"> 
-            </div> 
+        this.renderData = `
+            <div class="col no-margin-left s12 m6 l4"> 
+                <div class="card"> 
+                
+                    <div class="card-image"> 
+                        <img class="project-image project-card-image" id="global-project-image-{ID}" src="images/planetgraphic.png"> 
+                    </div> 
 
-            <div class="card-content"> 
-                <span class="card-title global-title grey-text text-darken-4" id="global-project-title-{ID}"></span> 
-                <div id="global-project-tags-{ID}"> 
-                </div> 
-            </div> 
+                    <div class="card-content"> 
+                        <span class="card-title global-title grey-text text-darken-4" id="global-project-title-{ID}"></span> 
+                        <div id="global-project-tags-{ID}"> 
+                        </div> 
+                    </div> 
 
-            <div class="card-action"> 
-                <div class="flexcontainer"> 
-                    <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_("More Details")}" id="global-project-more-details-{ID}"><i class="material-icons">info</i></a> 
-                    <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_("Open in Music Blocks")}" id="global-project-open-{ID}"><i class="material-icons">launch</i></a> 
-                    <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_("Merge with current project")}" id="global-project-merge-{ID}"><i class="material-icons">merge_type</i></a> 
-                    <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${(`${Planet.ProjectStorage.isLiked(this.id) ? "Unlike" : "Like"} project`)}"><i class="material-icons"id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a>
+                    <div class="card-action"> 
+                        <div class="flexcontainer"> 
+                            <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_("More Details")}" id="global-project-more-details-{ID}"><i class="material-icons">info</i></a> 
+                            <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_("Open in Music Blocks")}" id="global-project-open-{ID}"><i class="material-icons">launch</i></a> 
+                            <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_("Merge with current project")}" id="global-project-merge-{ID}"><i class="material-icons">merge_type</i></a> 
+                            <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${(`${Planet.ProjectStorage.isLiked(this.id) ? "Unlike" : "Like"} project`)}"><i class="material-icons"id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a>
 
-                    <div id="global-share-{ID}"> 
-                        <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_("Share project")}" id="global-project-share-{ID}"><i class="material-icons">share</i></a> 
-                       
-                        <div class="card share-card" id="global-sharebox-{ID}" style="display:none;"> 
-                            <div class="card-content shareurltext"> 
-                                    <div class="shareurltitle">${_("Share")}</div> 
-                                    <input type="text" name="shareurl" class="shareurlinput" data-originalurl="https://musicblocks.sugarlabs.org/index.html?id={ID}"> 
-                                    <a class="copyshareurl tooltipped" onclick="copyURLToClipboard()" data-clipboard-text="https://musicblocks.sugarlabs.org/index.html?id={ID}&run=True" data-delay="50" data-tooltip="${_("Copy link to clipboard")}"><i class="material-icons"alt="Copy!">file_copy</i></a>
-                                    <div class="shareurl-advanced" id="global-advanced-{ID}"> 
-                                            <div class="shareurltitle">${_("Flags")}</div> 
-                                            <div><input type="checkbox" name="run" id="global-checkboxrun-{ID}" checked><label for="global-checkboxrun-{ID}">${_("Run project on startup.")}</label></div> 
-                                            <div><input type="checkbox" name="show" id="global-checkboxshow-{ID}"><label for="global-checkboxshow-{ID}">${_("Show code blocks on startup.")}</label></div> 
-                                            <div><input type="checkbox" name="collapse" id="global-checkboxcollapse-{ID}"><label for="global-checkboxcollapse-{ID}">${_("Collapse code blocks on startup.")}</label></div> 
+                            <div id="global-share-{ID}"> 
+                                <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_("Share project")}" id="global-project-share-{ID}"><i class="material-icons">share</i></a> 
+                            
+                                <div class="card share-card" id="global-sharebox-{ID}" style="display:none;"> 
+                                    <div class="card-content shareurltext"> 
+                                            <div class="shareurltitle">${_("Share")}</div> 
+                                            <input type="text" name="shareurl" class="shareurlinput" data-originalurl="https://musicblocks.sugarlabs.org/index.html?id={ID}"> 
+                                            <a class="copyshareurl tooltipped" onclick="copyURLToClipboard()" data-clipboard-text="https://musicblocks.sugarlabs.org/index.html?id={ID}&run=True" data-delay="50" data-tooltip="${_("Copy link to clipboard")}"><i class="material-icons"alt="Copy!">file_copy</i></a>
+                                            <div class="shareurl-advanced" id="global-advanced-{ID}"> 
+                                                    <div class="shareurltitle">${_("Flags")}</div> 
+                                                    <div><input type="checkbox" name="run" id="global-checkboxrun-{ID}" checked><label for="global-checkboxrun-{ID}">${_("Run project on startup.")}</label></div> 
+                                                    <div><input type="checkbox" name="show" id="global-checkboxshow-{ID}"><label for="global-checkboxshow-{ID}">${_("Show code blocks on startup.")}</label></div> 
+                                                    <div><input type="checkbox" name="collapse" id="global-checkboxcollapse-{ID}"><label for="global-checkboxcollapse-{ID}">${_("Collapse code blocks on startup.")}</label></div> 
+                                            </div> 
                                     </div> 
-                            </div> 
 
-                            <div class="card-action"> 
-                                 <a onclick="toggleExpandable('global-advanced-{ID}','shareurl-advanced');">${_("Advanced Options")}</a> 
+                                    <div class="card-action"> 
+                                        <a onclick="toggleExpandable('global-advanced-{ID}','shareurl-advanced');">${_("Advanced Options")}</a> 
+                                    </div> 
+                                </div> 
                             </div> 
                         </div> 
                     </div> 
+
                 </div> 
             </div> 
+         `;
+    }
 
-        </div> 
-    </div>
-`;
+    render() {
+        const Planet = this.Planet ;
 
-    this.render = () => {
         //TODO: Have a TB placeholder image specific to TB projects
         const html = this.renderData.replace(new RegExp("{ID}", "g"), this.id);
         const frag = document.createRange().createContextualFragment(html);
 
         // set image
-        const imageId = `global-project-image-${this.id}`;
+        let source ;
 
-        if (this.ProjectData.ProjectImage !== null && this.ProjectData.ProjectImage !== "") {
-            frag.getElementById(imageId).src = this.ProjectData.ProjectImage;
-        } else if (this.ProjectData.ProjectIsMusicBlocks === 1) {
-            frag.getElementById(imageId).src = this.PlaceholderMBImage;
-        } else {
-            frag.getElementById(imageId).src = this.PlaceholderTBImage;
+        const projectImage = this.ProjectData.ProjectImage ;
+        if (projectImage !== null && projectImage !== "")
+            source = projectImage ;
+
+        else {
+            source = (this.ProjectData.ProjectIsMusicBlocks === 1) ?
+                this.PlaceholderMBImage : this.PlaceholderTBImage ;
         }
+
+        const imageId = `global-project-image-${this.id}`;
+        frag.getElementById(imageId).src = source ;
 
         // set tags
         const tagcontainer = frag.getElementById(`global-project-tags-${this.id}`);
+        tagcontainer.classList.add("global-tags-container");
+        
         for (let i = 0; i < this.ProjectData.ProjectTags.length; i++) {
             const chip = document.createElement("div");
             chip.classList.add("chipselect");
@@ -134,12 +147,12 @@ function GlobalCard(Planet) {
         // eslint-disable-next-line no-unused-vars
         frag.getElementById(`global-project-share-${this.id}`).addEventListener("click", (evt) => {
             const s = document.getElementById(`global-sharebox-${this.id}`);
+           
             if (s.style.display=="none") {
                 s.style.display = "initial";
                 hideOnClickOutside([document.getElementById(`global-share-${this.id}`)], `global-sharebox-${this.id}`);
-            } else {
-                s.style.display = "none";
             }
+            else s.style.display = "none";
         });
 
         // set share checkbox listener
@@ -159,11 +172,8 @@ function GlobalCard(Planet) {
         // set like icon
         const likeIconId = `global-like-icon-${this.id}` ;
 
-        if (Planet.ProjectStorage.isLiked(this.id)) {
-            frag.getElementById(likeIconId).textContent = "favorite";
-        } else {
-            frag.getElementById(likeIconId).textContent = "favorite_border";
-        }
+        frag.getElementById(likeIconId).textContent =
+               (Planet.ProjectStorage.isLiked(this.id)) ? "favorite" : "favorite_border";
 
         // eslint-disable-next-line no-unused-vars
         frag.getElementById(`global-like-icon-${this.id}`).addEventListener("click", (evt) => {
@@ -174,31 +184,28 @@ function GlobalCard(Planet) {
         updateCheckboxes(`global-sharebox-${this.id}`);
     };
 
-    this.like = () => {
+    like() {
+        const Planet = this.Planet ;
+
         let like = true;
-        if (Planet.ProjectStorage.isLiked(this.id)) {
+        if (Planet.ProjectStorage.isLiked(this.id))
             like = false;
-        }
 
         Planet.ServerInterface.likeProject(this.id, like, function(data) {
             this.afterLike(data,like);
         }.bind(this));
     };
 
-    this.afterLike = (data, like) => {
-        if (!data.success) {
-            if (data.error === "ERROR_ACTION_NOT_PERMITTED") {
-                this.setLike(like);
-            }
-        } else {
-            this.setLike(like);
-        }
+    afterLike(data, like) {
+        (!data.success && data.error === "ERROR_ACTION_NOT_PERMITTED") ?
+            this.setLike(like) : this.setLike(like) ;
     };
 
-    this.setLike = (like) => {
-        Planet.ProjectStorage.like(this.id,like);
+    setLike(like) {
+        this.Planet.ProjectStorage.like(this.id,like);
         let incr = 1;
         let text = "favorite";
+
         if (!like) {
             incr = -1;
             text = "favorite_border";
@@ -209,14 +216,16 @@ function GlobalCard(Planet) {
         document.getElementById(`global-like-icon-${this.id}`).textContent = text;
     };
 
-    this.init = id => {
+    init(id) {
         this.id = id;
-        this.ProjectData = Planet.GlobalPlanet.cache[id];
+        this.ProjectData = this.Planet.GlobalPlanet.cache[id];
     };
-};
+
+}
 
 function copyURLToClipboard() {
     const clipboard = new ClipboardJS(".copyshareurl");
+
     clipboard.on("success", (e) => {
         // eslint-disable-next-line no-console
         console.info("Copied:", e.text);
