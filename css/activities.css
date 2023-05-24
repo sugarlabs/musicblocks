@@ -131,6 +131,16 @@
   line-height: 30px;
 }
 
+.blink {
+    animation: blink-animation 1.5s infinite;
+  }
+
+  @keyframes blink-animation {
+    50% {
+      opacity: 0;
+    }
+  }
+
 /*CSS for load animation*/
 #load-container {
    width: 100%;

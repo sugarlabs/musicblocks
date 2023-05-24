@@ -11,6 +11,7 @@
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height"/>
 	
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,300,1,0" />
             
         <!-- <link href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap" rel="stylesheet"> --> 
         
@@ -503,17 +504,9 @@
                                 >
                             </li>
                             <li>                                
-                                <button id="start"
-                                 class="left tooltipped"
-                                 data-tooltip="Record"
-                                 style="
-                                        padding: 14px ;
-                                        border-radius: 100%;
-                                        position: relative;
-                                        background: #EB455F;
-                                        top: 14px;
-                                        ">
-                                </button>
+                                <a id="start" class="left tooltipped" data-tooltip="Record">
+                                    <i class="material-icons main"> radio_button_checked</i>
+                                </a>   
                             </li>
                         </ul>
 
@@ -912,8 +905,6 @@
                     return browserName;       
             }
             const browser = fnBrowserDetect();
-
-
             const btn = document.getElementById('start');
             const hideIn = ['firefox', 'safari'];
             if (hideIn.includes(browser)) {
@@ -940,7 +931,9 @@
                 node.textContent = "Stopped recording";
                 document.body.appendChild(node);
             }
-            stop.addEventListener('click', function(){
+            stop.addEventListener('click', function()
+            {   
+                start.classList.remove('blink');
                 mediaRecorder.stop();
                 let node = document.createElement("p");
                 node.textContent = "Stopped recording";
@@ -969,6 +962,8 @@
             }
 
             function createRecorder (stream, mimeType) {
+                
+                start.classList.add('blink');
                 disableStart();
                 let recordedChunks = []; 
 
@@ -994,6 +989,8 @@
             }
             
             function saveFile(recordedChunks){
+                
+                start.classList.remove('blink');
                 const blob = new Blob(recordedChunks, {
                     type: 'video/webm'
                     });
