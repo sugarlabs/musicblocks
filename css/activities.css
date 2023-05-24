@@ -1479,7 +1479,7 @@ input.timbreName {
     -o-transition: ease 1s;
     -webkit-transition: ease 1s;
     transition: ease 1s;
-    z-index: 100;
+    z-index: 10000;
 }
 
 .wheelNav > svg {
@@ -1601,3 +1601,6 @@ input.timbreName {
   .disable_highlighting {
     user-select: none;
   }
+
+
+  
