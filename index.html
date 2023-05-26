@@ -507,7 +507,7 @@
                         <ul class="main right">
                             <li>
                                 <a id="FullScreen" class="FullScreen" onclick="setIcon()">
-                                    <i class="material-icons">&#xe5d0;</i>
+                                    <i class="material-icons" id="FullScrIcon">&#xe5d0;</i>
             
                                 </a>
                             </li>
@@ -826,15 +826,17 @@
             var count=0;    
             function setIcon() {
                 var property = document.getElementById(FullScreen);
+                var iconCode = document.querySelector('#FullScrIcon');
                 //Calling full Screen
                 if (count == 0) {
                     openFullscreen();
-                    
+                    iconCode.textContent='\ue5d1';
                     count = 1;        
                 }
                 //Closing full Scree
                 else {
                     closeFullscreen();
+                    iconCode.textContent='\ue5d0';
                     count = 0;
                 }
             }
