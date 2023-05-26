@@ -382,6 +382,10 @@
 
 | Example | Description |
 | --- | --- |
+| coin-flip.html | Animated (and musical) coin flip |
+
+| Example | Description |
+| --- | --- |
 | musical-dimensions.html | Interactive game: Test your listening skills by finding cards that match in (or differ by) instrument, pitch and note value. |
 
 | Example | Description |

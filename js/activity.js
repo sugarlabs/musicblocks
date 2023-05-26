@@ -331,6 +331,8 @@ class Activity {
             // Error message containers
             this.errorText = docById("errorText");
             this.errorTextContent = docById("errorTextContent");
+            // Hide Arrow on hiding error message
+            this.errorText.addEventListener("click", this._hideArrows);
             // Show and populate the printText div.
             this.printText = docById("printText");
             this.printTextContent = docById("printTextContent");
@@ -1744,6 +1746,7 @@ class Activity {
         this.showSearchWidget = () => {
             // Bring widget to top.
             this.searchWidget.style.zIndex = 1001;
+            this.searchWidget.style.border = "2px solid blue";
             if (this.searchWidget.style.visibility === "visible") {
                 this.hideSearchWidget();
             } else {
@@ -2572,11 +2575,12 @@ class Activity {
 
         const that = this;
         const screenWidth = window.innerWidth
-        window.onresize = () => {
+        const  resizeCanvas_ = () => {
             if (screenWidth !== window.innerWidth) {
                 that._onResize(false);
             }
-        };
+        }
+        window.onresize = resizeCanvas_
 
         /*
          * Restore last stack pushed to trashStack back onto canvas.
