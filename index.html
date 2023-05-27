@@ -870,7 +870,7 @@
                     
                     count = 1;        
                 }
-                //Closing full Scree
+                //Closing full Screen
                 else {
                     closeFullscreen();
                     count = 0;
@@ -907,42 +907,46 @@
             const browser = fnBrowserDetect();
             const btn = document.getElementById('start');
             const hideIn = ['firefox', 'safari'];
-            if (hideIn.includes(browser)) {
+            if (hideIn.includes(browser)){
             btn.classList.add("hide");
-} 
-            function disableStart(){
-                start.disabled = true;
-
-            }
-            start.addEventListener('click', async function(){
-                
+           } 
+           
+            let flag=0;
+            if(flag==0){
+            recording()};
+            function recording(){
+            start.addEventListener('click', async function handler(){
+               
                 let stream = await recordScreen();
                 let mimeType = 'video/webm';
                 mediaRecorder = createRecorder(stream, mimeType);
+                if(flag==1){
+                this.removeEventListener('click',handler);}
                 let node = document.createElement("p");
                 node.textContent = "Started recording";
                 document.body.appendChild(node);
                 start.style=NULL;
                 
-            })  
+            })}
             function stopRec(){
+                flag=0;
                 mediaRecorder.stop();
                 let node = document.createElement("p");
                 node.textContent = "Stopped recording";
                 document.body.appendChild(node);
             }
+
             stop.addEventListener('click', function()
-            {   
+            {   flag=0;
                 start.classList.remove('blink');
                 mediaRecorder.stop();
                 let node = document.createElement("p");
                 node.textContent = "Stopped recording";
-                document.body.appendChild(node);
-             
+                document.body.appendChild(node);   
             })
 
             async function recordScreen(){
-                
+               flag=1;
                 return await navigator.mediaDevices.getDisplayMedia({
                 preferCurrentTab:'True',
                 systemAudio: "include",
@@ -956,26 +960,27 @@
                         }
                     },
                     preferredVideoCodecs: 'auto'
-                    
-
-                });
-            }
+                });        
+                      
+            }        
 
             function createRecorder (stream, mimeType) {
-                
-                start.classList.add('blink');
-                disableStart();
+                flag=1;
+                start.classList.add('blink');   
+                start.removeEventListener('click',createRecorder,true);            
                 let recordedChunks = []; 
-
                 const mediaRecorder = new MediaRecorder(stream);
                 stream.oninactive = function () {
                     console.log("Recording is ready to save");
                     stopRec();
+                    flag=0;
                 };
 
                 mediaRecorder.onstop = function(){
                     saveFile(recordedChunks);
                     recordedChunks = [];
+                    flag=0;
+                   
                 };
 
                 mediaRecorder.ondataavailable = function (e) {
@@ -984,7 +989,7 @@
                     }   
                 };
                                       
-                mediaRecorder.start(200); // For every 200ms the stream data will be stored in a separate chunk.
+                mediaRecorder.start(200); 
                 return mediaRecorder;
             }
             
@@ -993,20 +998,21 @@
                 start.classList.remove('blink');
                 const blob = new Blob(recordedChunks, {
                     type: 'video/webm'
-                    });
-                    let filename = window.prompt('Enter file name'),
-                    downloadLink = document.createElement('a');
-                    downloadLink.href = URL.createObjectURL(blob);
-                    downloadLink.download = `${filename}.webm`;
+                });
+                let filename = window.prompt('Enter file name'),
+                downloadLink = document.createElement('a');
+                downloadLink.href = URL.createObjectURL(blob);
+                downloadLink.download = `${filename}.webm`;
 
-                    document.body.appendChild(downloadLink);
-                    downloadLink.click();
-                    URL.revokeObjectURL(blob); // clear from memory
-                    document.body.removeChild(downloadLink);
-                    start.disabled = false;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                URL.revokeObjectURL(blob); 
+                document.body.removeChild(downloadLink);   
+                flag=0;         
+                recording();
             }
-            start.disabled = false;
-         </script>
+            
+        </script>
 
         <div id="searchBar" tabindex="-1">
             <input
