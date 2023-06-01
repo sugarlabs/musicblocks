@@ -306,25 +306,24 @@ class Toolbar {
         let isPlayIconRunning = false;
         
         function handleClick(){
-            if (isPlayIconRunning==false) {
-                playIcon.onclick='null'
-                console.log("Wait for next 2 seconds to play the music");
+            if (!isPlayIconRunning) {
+                playIcon.onclick = 'null'
+                console.log("Wait for next 4.60 seconds to play the music");
                 
-            }else{
-                playIcon.onclick=tempclick;
+            } else {
+                playIcon.onclick = tempclick;
                 isPlayIconRunning = false;
             }
         } 
        
         var tempclick=playIcon.onclick=()=>{
-            isPlayIconRunning=false;
+            isPlayIconRunning = false;
             onclick(this.activity);
             handleClick();
             stopIcon.style.color = this.stopIconColorWhenPlaying;
             isPlayIconRunning = true; 
-            setTimeout(function() { handleClick(); },2000);  
+            setTimeout(function() { handleClick(); }, 4600);  
         } 
-    
     }
 
     /**
