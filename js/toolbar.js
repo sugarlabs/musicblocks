@@ -17,7 +17,7 @@
 
 let WRAP = true;
 const $j = jQuery.noConflict();
-
+let play_button_debounce_timeout = null; 
 class Toolbar {
     /**
      * @constructor
@@ -303,11 +303,33 @@ class Toolbar {
     renderPlayIcon(onclick) {
         const playIcon = docById("play");
         const stopIcon = docById("stop");
+        
+        let isPlayIconRunning = false;
+        function handleClick(){
+            if (!isPlayIconRunning) {
+                playIcon.onclick = null;
+                console.log("Wait for next 2 seconds to play the music");
+                
+            } else {
+                playIcon.onclick = tempClick;
+                isPlayIconRunning = false;
+            }
+        }    
 
-        playIcon.onclick = () => {
+        var tempClick = playIcon.onclick=()=>{
+            isPlayIconRunning = false;
             onclick(this.activity);
+            handleClick();
             stopIcon.style.color = this.stopIconColorWhenPlaying;
-        };
+            isPlayIconRunning = true; 
+            play_button_debounce_timeout = setTimeout(function() { handleClick(); }, 2000);
+            
+            stopIcon.addEventListener("click", function(){
+                clearTimeout(play_button_debounce_timeout);
+                isPlayIconRunning = true; 
+                handleClick();
+            })
+        } 
     }
 
     /**
@@ -317,7 +339,6 @@ class Toolbar {
      */
     renderStopIcon(onclick) {
         const stopIcon = docById("stop");
-
         stopIcon.onclick = () => {
             onclick(this.activity);
             stopIcon.style.color = "white";
