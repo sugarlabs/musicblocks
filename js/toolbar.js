@@ -17,6 +17,7 @@
 
 let WRAP = true;
 const $j = jQuery.noConflict();
+let variable=0;
 class Toolbar {
     /**
      * @constructor
@@ -302,27 +303,32 @@ class Toolbar {
     renderPlayIcon(onclick) {
         const playIcon = docById("play");
         const stopIcon = docById("stop");
-      
-        let isPlayIconRunning = false;
         
+        let isPlayIconRunning = false;
         function handleClick(){
             if (!isPlayIconRunning) {
                 playIcon.onclick = 'null'
-                console.log("Wait for next 4.60 seconds to play the music");
+                console.log("Wait for next 5 seconds to play the music");
                 
             } else {
                 playIcon.onclick = tempclick;
                 isPlayIconRunning = false;
             }
-        } 
-       
-        var tempclick=playIcon.onclick=()=>{
+        }    
+
+        var tempclick = playIcon.onclick=()=>{
             isPlayIconRunning = false;
             onclick(this.activity);
             handleClick();
             stopIcon.style.color = this.stopIconColorWhenPlaying;
             isPlayIconRunning = true; 
-            setTimeout(function() { handleClick(); }, 4600);  
+            variable= setTimeout(function() { handleClick(); }, 4600);
+            
+            stopIcon.addEventListener("click", function(){
+                clearTimeout(variable);
+                isPlayIconRunning = true; 
+                handleClick();
+            })
         } 
     }
 
