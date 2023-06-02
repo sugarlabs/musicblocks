@@ -322,7 +322,7 @@ class Toolbar {
             handleClick();
             stopIcon.style.color = this.stopIconColorWhenPlaying;
             isPlayIconRunning = true; 
-            play_button_debounce_timeout = setTimeout(function() { handleClick(); }, 4600);
+            play_button_debounce_timeout = setTimeout(function() { handleClick(); }, 2000);
             
             stopIcon.addEventListener("click", function(){
                 clearTimeout(play_button_debounce_timeout);
