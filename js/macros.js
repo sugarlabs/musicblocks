@@ -130,7 +130,9 @@ const blockIsMacro = (activity, blkname) => {
 
 const getMacroExpansion = (activity, blkname, x, y) => {
     const protoBlock = activity.blocks.protoBlockDict[blkname];
-    if (protoBlock && protoBlock.macroFunc) return protoBlock.macroFunc(x, y);
+    if (protoBlock && protoBlock.macroFunc) {
+        return protoBlock.macroFunc(x, y);
+    }
 
     // Some blocks are expanded on load.
     const ACTIONHELP = [

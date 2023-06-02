@@ -20,29 +20,34 @@
    LocalPlanet
 */
 
-function LocalPlanet(Planet) {
-    this.CookieDuration = 3650;
-    this.ProjectTable = null;
-    this.projects = null;
-    this.DeleteModalID = null;
-    this.Publisher = null;
-    this.currentProjectImage = null;
-    this.currentProjectID = null;
+class LocalPlanet {
 
-    this.updateProjects = () => {
+    constructor(Planet) {
+        this.Planet = Planet ;
+        this.CookieDuration = 3650;
+        this.ProjectTable = null;
+        this.projects = null;
+        this.DeleteModalID = null;
+        this.Publisher = null;
+        this.currentProjectImage = null;
+        this.currentProjectID = null;
+    }
+
+    updateProjects() {
         jQuery(".tooltipped").tooltip("remove");
         this.refreshProjectArray();
         this.initCards();
         this.renderAllProjects();
     };
 
-    this.setCurrentProjectImage = image => {
+    setCurrentProjectImage(image)  {
         this.currentProjectImage = image;
-        this.currentProjectID = Planet.ProjectStorage.getCurrentProjectID();
+        this.currentProjectID = this.Planet.ProjectStorage.getCurrentProjectID();
     };
 
-    this.refreshProjectArray = () => {
+    refreshProjectArray() {
         this.projects = [];
+
         for (const project in this.ProjectTable) {
             // eslint-disable-next-line no-prototype-builtins
             if (this.ProjectTable.hasOwnProperty(project)) {
@@ -50,53 +55,55 @@ function LocalPlanet(Planet) {
             }
         }
 
-
         this.projects.sort((a, b) => {
             // eslint-disable-next-line max-len
             return this.ProjectTable[b[0]].DateLastModified - this.ProjectTable[a[0]].DateLastModified;
         });
     };
 
-    this.initCards = () => {
+    initCards() {
         for (let i = 0; i < this.projects.length; i++) {
+            const Planet = this.Planet ;
             this.projects[i][1] = new LocalCard(Planet);
             this.projects[i][1].init(this.projects[i][0]);
         }
     };
 
-    this.renderAllProjects = () => {
+    renderAllProjects() {
         document.getElementById("local-projects").innerHTML = "";
+
         let index = -1;
         for (let i = 0; i < this.projects.length; i++) {
             this.projects[i][1].render();
-            if (this.projects[i][0] === this.currentProjectID) {
+            if (this.projects[i][0] === this.currentProjectID)
                 index = i;
-            }
         }
+
         if (index!=-1) {
-            const id = "local-project-image-" + this.projects[index][0];
+            const id = `local-project-image-${this.projects[index][0]}`;
             // eslint-disable-next-line no-console
-            console.log(id);
             const cardimg = document.getElementById(id);
             cardimg.src=this.currentProjectImage;
         }
+
         jQuery(".tooltipped").tooltip({delay: 50});
     };
 
-    this.initDeleteModal = () => {
+    initDeleteModal() {
         const t = this;
+
         document.getElementById("deleter-button").addEventListener(
             "click",
             // eslint-disable-next-line no-unused-vars
             function (evt) {
                 if (t.DeleteModalID !== null) {
-                    Planet.ProjectStorage.deleteProject(t.DeleteModalID);
+                    t.Planet.ProjectStorage.deleteProject(t.DeleteModalID);
                 }
             }
         );
     };
 
-    this.openDeleteModal = id => {
+    openDeleteModal(id)  {
         this.DeleteModalID = id;
         const name = this.ProjectTable[id].ProjectName;
         document.getElementById("deleter-title").textContent = name;
@@ -104,26 +111,31 @@ function LocalPlanet(Planet) {
         jQuery("#deleter").modal("open");
     };
 
-    this.openProject = id => {
+    openProject(id) {
+        const Planet = this.Planet ;
         Planet.ProjectStorage.setCurrentProjectID(id);
         Planet.loadProjectFromData(this.ProjectTable[id].ProjectData);
     };
 
-    this.mergeProject = id => {
+    mergeProject(id) {
+        const Planet = this.Planet ;
         const d = this.ProjectStorage.getCurrentProjectData();
+
         if (d === null) {
             this.ProjectStorage.initialiseNewProject();
             Planet.loadProjectFromData(this.ProjectTable[id].ProjectData);
-        } else {
-            Planet.loadProjectFromData(this.ProjectTable[id].ProjectData, true);
         }
+        else Planet.loadProjectFromData(this.ProjectTable[id].ProjectData, true);
     };
 
-    this.init = () => {
+    init() {
+        const Planet = this.Planet ;
+
         this.ProjectTable = Planet.ProjectStorage.data.Projects;
         this.refreshProjectArray();
         this.initDeleteModal();
         this.Publisher = new Publisher(Planet);
         this.Publisher.init();
     };
-};
+
+}

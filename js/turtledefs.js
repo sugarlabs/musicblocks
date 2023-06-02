@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2021 Walter Bender
+// Copyright (c) 2016-2023 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -20,7 +20,7 @@
    RHYTHMPALETTEICON, RUNBUTTON, SAVEBUTTON, SCROLLUNLOCKBUTTON,
    SHORTCUTSBUTTON, SLOWBUTTON, SMALLERBUTTON, STATSBUTTON,
    STEPBUTTON, STOPTURTLEBUTTON, WRAPTURTLEBUTTON, _THIS_IS_TURTLE_BLOCKS_,
-   _THIS_IS_MUSIC_BLOCKS_, MOUSEPALETTEICON
+   _THIS_IS_MUSIC_BLOCKS_, MOUSEPALETTEICON, FULLSCREENBUTTON
 */
 
 /* exported
@@ -495,7 +495,12 @@ const createHelpContent = (activity) => {
             ]
         ];
     }
-
+    HELPCONTENT.push([
+        _("Full screen"),
+        "",
+        "data:image/svg+xml;base64," +
+            window.btoa(unescape(encodeURIComponent(FULLSCREENBUTTON)))
+    ]);
     HELPCONTENT.push([
         _("New project"),
         _("Initialize a new project."),

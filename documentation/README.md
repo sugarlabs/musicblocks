@@ -98,6 +98,36 @@ a block.
 
 Many blocks also incorporate "pie menus" for changing block parameters.
 
+## Context Menu
+Context menus are an important part of user interfaces that provide users with quick access to a set of actions relevant to the context in which they are working.The right-click context menu in Music Blocks provides several options for working with blocks and the workspace. To access the right-click context menu, simply right-click anywhere in the workspace.
+
+# The Block context menu:
+This context menu appears when you right-click on a block in the workspace. It provides options such as "Duplicate," "Delete," "Help," and "Copy to Palette." The "Duplicate" option creates a copy of the selected block, while the "Delete" option removes the selected block from the workspace. The "Help" option opens a help dialog for the selected block, and the "Copy to Palette" option adds the selected block to the user's custom block palette.
+
+![Right-click context menu](./block_context.png "Right-click context menu")
+
+# Extract
+The "Extract" option in Music Blocks allows you to separate a nested block into its individual components or sub-blocks. This can be useful if you want to modify or reuse specific parts of a block without affecting the rest of the block.
+
+![Extract the selected block](./extract.png "Extract the selected block")
+
+# Duplicate
+This option creates a duplicate of the selected block and places it next to the original block.
+
+![Duplicate](./duplicate.png "Duplicate")
+
+# Delete
+This option removes the selected block from your program
+
+![Delete](./delete.png "Delete")
+
+# Help
+This option shows a help screen with information about the selected block. You can use this option to learn more about the block's functionality and how to use it in your projects.
+
+![Help](./help.png "Help")
+
+By using the right-click context menu in Music Blocks, you can quickly perform common tasks and manipulate blocks on the workspace. This can help you to work more efficiently and effectively in your projects.
+
 Keyboard shortcuts
 ------------------
 
@@ -216,7 +246,7 @@ loops. Whatever stack of blocks are placed inside its clamp will be
 repeated. It can be used to repeat individual notes, or entire phrases
 of music.
 
-![The Duplicate block(./duplicatenotes_block.svg "Duplicate block")
+![The Duplicate block](./duplicatenotes_block.svg "Duplicate block")
 
 The *Duplicate* block, found on the *Rhythms* palette, is used to
 repeat any contained notes. Similar to using a *Repeat* block, but

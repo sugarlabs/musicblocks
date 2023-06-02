@@ -20,34 +20,37 @@
    ProjectViewer
 */
 
-function ProjectViewer(Planet) {
-    this.ProjectCache = Planet.GlobalPlanet.cache;
-    this.PlaceholderMBImage = "images/mbgraphic.png";
-    this.PlaceholderTBImage = "images/tbgraphic.png";
-    this.ReportError = _("Error: Report could not be submitted. Try again later.");
-    this.ReportSuccess = _("Thank you for reporting this project. A moderator will review the project shortly, to verify violation of the Sugar Labs Code of Conduct.");
-    this.ReportEnabledButton = _("Report Project");
-    this.ReportDisabledButton = _("Project Reported");
-    this.ReportDescriptionError = _("Report description required");
-    this.ReportDescriptionTooLongError = _("Report description too long");
-    this.id = null;
+class ProjectViewer {
+    
+    constructor(Planet) {
+        this.Planet = Planet ;
+        this.ProjectCache = Planet.GlobalPlanet.cache;
+        this.PlaceholderMBImage = "images/mbgraphic.png";
+        this.PlaceholderTBImage = "images/tbgraphic.png";
+        this.ReportError = _("Error: Report could not be submitted. Try again later.");
+        this.ReportSuccess = _("Thank you for reporting this project. A moderator will review the project shortly, to verify violation of the Sugar Labs Code of Conduct.");
+        this.ReportEnabledButton = _("Report Project");
+        this.ReportDisabledButton = _("Project Reported");
+        this.ReportDescriptionError = _("Report description required");
+        this.ReportDescriptionTooLongError = _("Report description too long");
+        this.id = null;
+    }
 
-    this.open = id => {
+    open(id) {
+        const Planet = this.Planet ;
         this.id = id;
         const proj = this.ProjectCache[id];
+
         document.getElementById("projectviewer-title").textContent = proj.ProjectName;
         document.getElementById("projectviewer-last-updated").textContent = proj.ProjectLastUpdated;
         document.getElementById("projectviewer-date").textContent = proj.ProjectCreatedDate;
         document.getElementById("projectviewer-downloads").textContent = proj.ProjectDownloads;
         document.getElementById("projectviewer-likes").textContent = proj.ProjectLikes;
+
         let img = proj.ProjectImage;
-        if (img === "" || img === null) {
-            if (proj.ProjectIsMusicBlocks==1) {
-                img = this.PlaceholderMBImage;
-            } else {
-                img = this.PlaceholderTBImage;
-            }
-        }
+        if (img === "" || img === null)
+            img = (proj.ProjectIsMusicBlocks==1) ?
+                this.PlaceholderMBImage : this.PlaceholderTBImage ;
 
         document.getElementById("projectviewer-image").src = img;
         document.getElementById("projectviewer-description").textContent = proj.ProjectDescription;
@@ -63,7 +66,8 @@ function ProjectViewer(Planet) {
         if (Planet.ProjectStorage.isReported(this.id)){
             document.getElementById("projectviewer-report-project").style.display = "none";
             document.getElementById("projectviewer-report-project-disabled").style.display = "block";
-        } else {
+        }
+        else {
             document.getElementById("projectviewer-report-project").style.display = "block";
             document.getElementById("projectviewer-report-project-disabled").style.display = "none";
         }
@@ -71,16 +75,17 @@ function ProjectViewer(Planet) {
         jQuery("#projectviewer").modal("open");
     };
 
-    this.download = () => {
-        Planet.GlobalPlanet.getData(this.id,this.afterDownload.bind(this));
+    download() {
+        this.Planet.GlobalPlanet.getData(this.id,this.afterDownload.bind(this));
     };
 
-    this.afterDownload = data => {
+    afterDownload (data) {
+        const Planet = this.Planet ;
+
         const proj = this.ProjectCache[this.id];
         let image = Planet.ProjectStorage.ImageDataURL;
-        if (proj.ProjectImage !== "") {
+        if (proj.ProjectImage !== "")
             image = proj.ProjectImage;
-        }
 
         Planet.SaveInterface.saveHTML(
             proj.ProjectName,
@@ -91,27 +96,27 @@ function ProjectViewer(Planet) {
         );
     };
 
-    this.openProject = () => {
+    openProject() {
         // newPageTitle = proj.ProjectName;
         // document.title = newPageTitle;
-        Planet.GlobalPlanet.openGlobalProject(this.id);
+        this.Planet.GlobalPlanet.openGlobalProject(this.id);
     };
 
-    this.mergeProject = () => {
+    mergeProject() {
         // newPageTitle = proj.ProjectName;
         // document.title = newPageTitle;
-        Planet.GlobalPlanet.mergeGlobalProject(this.id);
+        this.Planet.GlobalPlanet.mergeGlobalProject(this.id);
     };
 
-    this.openReporter = () => {
+    openReporter() {
         // eslint-disable-next-line no-console
-        console.log("load");
         document.getElementById("reportdescription").value = "";
         document.getElementById("projectviewer-report-content").style.display = "block";
         document.getElementById("projectviewer-reportsubmit-content").style.display = "none";
         document.getElementById("projectviewer-report-progress").style.visibility = "hidden";
         document.getElementById("report-error").style.display = "none";
         document.getElementById("projectviewer-report-card").style.display = "block";
+        
         hideOnClickOutside(
             [
                 document.getElementById("projectviewer-report-card"),
@@ -121,42 +126,44 @@ function ProjectViewer(Planet) {
         );
     };
 
-    this.submitReporter = () => {
+    submitReporter() {
         const text = document.getElementById("reportdescription").value;
+
         if (text === ""){
             document.getElementById("report-error").textContent = this.ReportDescriptionError;
             document.getElementById("report-error").style.display = "block";
             return;
-        } else if (text.length > 1000){
+        }
+        else if (text.length > 1000){
             document.getElementById("report-error").textContent = this.ReportDescriptionTooLongError;
             document.getElementById("report-error").style.display = "block";
             return;
-        } else {
+        }
+        else {
             document.getElementById("projectviewer-report-progress").style.visibility = "hidden";
-            Planet.ServerInterface.reportProject(this.id, text, this.afterReport.bind(this));
+            this.Planet.ServerInterface.reportProject(this.id, text, this.afterReport.bind(this));
         }
     };
 
-    this.afterReport = data => {
+    afterReport(data) {
         if (data.success) {
             document.getElementById("submittext").textContent = this.ReportSuccess;
-            Planet.ProjectStorage.report(this.id,true);
+            this.Planet.ProjectStorage.report(this.id,true);
             document.getElementById("projectviewer-report-project").style.display = "none";
             document.getElementById("projectviewer-report-project-disabled").style.display = "block";
-        } else {
-            document.getElementById("submittext").textContent = this.ReportError;
         }
+        else document.getElementById("submittext").textContent = this.ReportError;
 
         document.getElementById("projectviewer-report-content").style.display = "none";
         document.getElementById("projectviewer-report-progress").style.visibility = "hidden";
         document.getElementById("projectviewer-reportsubmit-content").style.display = "block";
     };
 
-    this.closeReporter = () => {
+    closeReporter() {
         document.getElementById("projectviewer-report-card").style.display = "none";
     };
 
-    this.init = () => {
+    init() {
 
         // eslint-disable-next-line no-unused-vars
         document.getElementById("projectviewer-download-file").addEventListener("click", evt => {
@@ -188,4 +195,5 @@ function ProjectViewer(Planet) {
             this.closeReporter();
         });
     };
-};
+
+}

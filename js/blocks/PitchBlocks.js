@@ -1841,78 +1841,83 @@ function setupPitchBlocks(activity) {
                 cname = activity.blocks.blockList[c].name;
             }
 
-            if (cname === "scaledegree2" || !isNaN(Number(arg0[0])) || !isNaN(Number(arg0[1]))) {
-                let scaledegree = activity.blocks.blockList[c].value;
-                let attr;
+            if (!isNaN(Number(arg0[0])) || !isNaN(Number(arg0[1]))) {
+                if (cname === "scaledegree2") {
+                    let scaledegree = activity.blocks.blockList[c].value;
+                    let attr;
 
-                if (scaledegree.indexOf(SHARP) !== -1) {
-                    attr = SHARP;
-                } else if (scaledegree.indexOf(FLAT) !== -1) {
-                    attr = FLAT;
-                } else if (scaledegree.indexOf(DOUBLESHARP) !== -1) {
-                    attr = DOUBLESHARP;
-                } else if (scaledegree.indexOf(DOUBLEFLAT) !== -1) {
-                    attr = DOUBLEFLAT;
-                } else {
-                    attr = NATURAL;
-                }
+                    if (scaledegree.indexOf(SHARP) !== -1) {
+                        attr = SHARP;
+                    } else if (scaledegree.indexOf(FLAT) !== -1) {
+                        attr = FLAT;
+                    } else if (scaledegree.indexOf(DOUBLESHARP) !== -1) {
+                        attr = DOUBLESHARP;
+                    } else if (scaledegree.indexOf(DOUBLEFLAT) !== -1) {
+                        attr = DOUBLEFLAT;
+                    } else {
+                        attr = NATURAL;
+                    }
 
-                scaledegree = Number(scaledegree.replace(attr, ""));
-                if (attr != NATURAL) {
-                    note += attr;
-                }
+                    scaledegree = Number(scaledegree.replace(attr, ""));
+                    if (attr != NATURAL) {
+                        note += attr;
+                    }
 
-                const obj = keySignatureToMode(tur.singer.keySignature);
+                    const obj = keySignatureToMode(tur.singer.keySignature);
 
-                const isNegativeArg = scaledegree <= 0 ? true : false;
-                let sd;
-                if (isNegativeArg) {
-                    const multiplier = Math.floor(Math.abs(scaledegree) / 7);
-                    sd = scaledegree + (multiplier + 1) * 7;
-                } else {
-                    sd = Math.floor(scaledegree) % 7;
-                    if (sd == 0) sd = 7;
-                }
-                scaledegree = Math.abs(scaledegree);
+                    const isNegativeArg = scaledegree <= 0 ? true : false;
+                    let sd;
+                    if (isNegativeArg) {
+                        const multiplier = Math.floor(Math.abs(scaledegree) / 7);
+                        sd = scaledegree + (multiplier + 1) * 7;
+                    } else {
+                        sd = Math.floor(scaledegree) % 7;
+                        if (sd == 0) sd = 7;
+                    }
+                    scaledegree = Math.abs(scaledegree);
 
-                let ref = NOTESTEP[obj[0].substr(0, 1)] - 1;
-                if (obj[0].substr(1) === FLAT) {
-                    ref--;
-                } else if (obj[0].substr(1) === SHARP) {
-                    ref++;
-                }
-                note = scaleDegreeToPitchMapping(
-                    tur.singer.keySignature,
-                    sd,
-                    tur.singer.movable,
-                    null
-                );
-                let semitones = ref;
-
-                semitones +=
-                    NOTESFLAT.indexOf(note) !== -1
-                        ? NOTESFLAT.indexOf(note) - ref
-                        : NOTESSHARP.indexOf(note) - ref;
-
-                /** calculates changes in reference octave which occur a semitone before the reference key */
-                const deltaOctave = isNegativeArg
-                    ? Math.floor((scaledegree + 1) / 7)
-                    : Math.floor((scaledegree - 1) / 7);
-
-                /** calculates changes in octave when crossing B */
-                const deltaSemi = isNegativeArg
-                    ? semitones > ref
-                        ? 1
-                        : 0
-                    : semitones < ref
-                        ? 1
-                        : 0;
-
-                octave =
-                    (isNegativeArg ? -1 : 1) * (deltaOctave + deltaSemi) +
-                    Math.floor(
-                        calcOctave(tur.singer.currentOctave, arg1, tur.singer.lastNotePlayed, note)
+                    let ref = NOTESTEP[obj[0].substr(0, 1)] - 1;
+                    if (obj[0].substr(1) === FLAT) {
+                        ref--;
+                    } else if (obj[0].substr(1) === SHARP) {
+                        ref++;
+                    }
+                    note = scaleDegreeToPitchMapping(
+                        tur.singer.keySignature,
+                        sd,
+                        tur.singer.movable,
+                        null
                     );
+                    let semitones = ref;
+
+                    semitones +=
+                        NOTESFLAT.indexOf(note) !== -1
+                            ? NOTESFLAT.indexOf(note) - ref
+                            : NOTESSHARP.indexOf(note) - ref;
+    
+                    /** calculates changes in reference octave which occur a semitone before the reference key */
+                    const deltaOctave = isNegativeArg
+                        ? Math.floor((scaledegree + 1) / 7)
+                        : Math.floor((scaledegree - 1) / 7);
+
+                    /** calculates changes in octave when crossing B */
+                    const deltaSemi = isNegativeArg
+                        ? semitones > ref
+                            ? 1
+                            : 0
+                        : semitones < ref
+                            ? 1
+                            : 0;
+
+                    octave =
+                        (isNegativeArg ? -1 : 1) * (deltaOctave + deltaSemi) +
+                        Math.floor(
+                            calcOctave(tur.singer.currentOctave, arg1, tur.singer.lastNotePlayed, note)
+                        );
+                } else {
+                    note = arg0;
+                    octave = arg1;
+                }
                 cents = 0;
             } else if (typeof arg0 === "number" || !isNaN(Number(arg0))) {
                 arg0 = Number(arg0);

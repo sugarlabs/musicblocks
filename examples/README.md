@@ -382,6 +382,10 @@
 
 | Example | Description |
 | --- | --- |
+| coin-flip.html | Animated (and musical) coin flip |
+
+| Example | Description |
+| --- | --- |
 | musical-dimensions.html | Interactive game: Test your listening skills by finding cards that match in (or differ by) instrument, pitch and note value. |
 
 | Example | Description |
@@ -421,6 +425,14 @@
 | Example | Description |
 | --- | --- |
 | Music-Blocks-demo.html | An interactive tour of Music Blocks written in Music Blocks. (This is an example of self-modifying code.) |
+
+| Example | Description |
+| --- | --- |
+| hilbert-recursive.html | A recursive implementation of Hilbert Space with a musical overlay. |
+
+| Example | Description |
+| --- | --- |
+| musical-tree.html | A recursive binary tree with a musical overlay. |
 
 | Example | Description |
 | --- | --- |

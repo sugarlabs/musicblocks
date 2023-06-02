@@ -521,7 +521,7 @@ const DRUMS = [
     "snare drum",
     "kick drum",
     "tom tom",
-    "floor tom tom",
+    "floor tom",
     "bass drum",
     "cup drum",
     "darbuka drum",
@@ -2725,6 +2725,13 @@ function getNote(
     let sharpFlat = false;
     let rememberFlat = false;
     let rememberSharp = false;
+
+    if (transposition === undefined) {
+        transposition = 0;
+    }
+
+    transposition = Math.round(transposition);
+
     if (typeof noteArg !== "number") {
         // Could be mi#<sub>4</sub> (from matrix) or mi# (from note).
         if (noteArg.substr(-1) === ">") {
@@ -2738,15 +2745,23 @@ function getNote(
         ) {
             return ["R", ""];
         }
+        // Could be a number as a string (with or without an accidental.
+        let noteAsNumber = noteArg;
+        if (["#", SHARP, FLAT, "b"].indexOf(noteArg.substr(-1)) !== -1) {
+            noteAsNumber = noteArg.slice(0, noteArg.length - 1);
+        }
+        if (!isNaN(noteAsNumber)) {
+            if (["#", SHARP].indexOf(noteArg.substr(-1)) !== -1) {
+                transposition += 1;
+            } else if (["b", FLAT].indexOf(noteArg.substr(-1)) !== -1) {
+                transposition -= 1;
+            }
+            noteArg = Number(noteAsNumber);
+        }
     }
 
     octave = Math.round(octave);
 
-    if (transposition === undefined) {
-        transposition = 0;
-    }
-
-    transposition = Math.round(transposition);
     if (typeof noteArg === "number") {
         // Assume it is a pitch number.
         if (!keySignature) {

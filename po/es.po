@@ -9,6 +9,9 @@
 "Language: es\n"
 "X-Generator: Poedit 1.7.4\n"
 
+msgid "Full screen"
+msgstr "Pantalla completa"
+
 #: js/planetInterface.js:101
 #: js/planetInterface.js:101
 #: js/planetInterface.js:101
