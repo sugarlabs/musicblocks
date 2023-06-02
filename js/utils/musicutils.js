@@ -521,7 +521,7 @@ const DRUMS = [
     "snare drum",
     "kick drum",
     "tom tom",
-    "floor tom tom",
+    "floor tom",
     "bass drum",
     "cup drum",
     "darbuka drum",
