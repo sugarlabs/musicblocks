@@ -17,7 +17,7 @@
 
 let WRAP = true;
 const $j = jQuery.noConflict();
-let variable=0;
+let timeVar = 0; 
 class Toolbar {
     /**
      * @constructor
@@ -322,10 +322,10 @@ class Toolbar {
             handleClick();
             stopIcon.style.color = this.stopIconColorWhenPlaying;
             isPlayIconRunning = true; 
-            variable= setTimeout(function() { handleClick(); }, 4600);
+            timeVar = setTimeout(function() { handleClick(); }, 4600);
             
             stopIcon.addEventListener("click", function(){
-                clearTimeout(variable);
+                clearTimeout(timeVar);
                 isPlayIconRunning = true; 
                 handleClick();
             })
