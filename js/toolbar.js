@@ -17,7 +17,7 @@
 
 let WRAP = true;
 const $j = jQuery.noConflict();
-let play_button_debounce_timeout = 0; 
+let play_button_debounce_timeout = null; 
 class Toolbar {
     /**
      * @constructor
@@ -307,16 +307,16 @@ class Toolbar {
         let isPlayIconRunning = false;
         function handleClick(){
             if (!isPlayIconRunning) {
-                playIcon.onclick = 'null'
-                console.log("Wait for next 5 seconds to play the music");
+                playIcon.onclick = null;
+                console.log("Wait for next 2 seconds to play the music");
                 
             } else {
-                playIcon.onclick = tempclick;
+                playIcon.onclick = tempClick;
                 isPlayIconRunning = false;
             }
         }    
 
-        var tempclick = playIcon.onclick=()=>{
+        var tempClick = playIcon.onclick=()=>{
             isPlayIconRunning = false;
             onclick(this.activity);
             handleClick();
