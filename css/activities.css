@@ -11,7 +11,7 @@
     url(https://example.com/MaterialIcons-Regular.ttf) format('truetype');
 }
 */
-
+                
 *:focus {
     outline: none;
 }
@@ -326,12 +326,14 @@ nav ul li {
     float: left;
     padding-left: 1%;
 }
-
+#helpBodyDiv{
+    width:80%;
+}
 .content li[current=true] img.thumbnail {
     opacity: 0;
 }
 
-@media (max-width: 500px) {
+@media (max-width: 500px) and (min-width:400px) {
     .content li {
     width: 48.5%;
     padding-left: 1%;
@@ -340,11 +342,15 @@ nav ul li {
     .canvasHolder.hide {
     transform: scale(0.485);
     }
-
+    #helpBodyDiv {
+       left: 8%;
+     
+    }
     nav h1 {
     display: none;
     }
 }
+
 
 @media (max-width: 800px) and (min-width: 501px) {
     .content li {
@@ -801,18 +807,21 @@ table {
 }
 
 #right-arrow {
-    left: 445px;
+    left: 380px;
     background: url('../header-icons/right-arrow.png');
+    z-index: 100;
 }
 
 #left-arrow {
     left: 5px;
     background: url('../header-icons/left-arrow.png');
+    z-index: 100;
 }
+
 
 #right-arrow, #left-arrow {
     position: absolute;
-    top: 195px;
+    top: 50%;
     background-size: 40px;
     height: 40px;
     width: 40px;
@@ -884,12 +893,79 @@ table {
 
 #helpBodyDiv {
     position: relative;
-    left: 45px;
+    left: 40px;
     border: 0 !important;
     overflow-x: hidden;
     overflow-y: auto;
     width: 365px;
     background: #e8e8e8 !important;
+    padding: 1rem 1rem 0 0  ; 
+    display: flex ; 
+    flex-direction: column ; 
+    justify-content: center ;
+    align-items: center ;
+}
+
+#helpBodyDiv .heading, 
+#helpBodyDiv .description, 
+#helpBodyDiv .message { 
+    text-align: center ; 
+    line-height: 1.2 ; 
+}
+
+#helpBodyDiv .icon-container { 
+    width: 30% ; 
+    margin-top: 1.5rem ;
+    padding: 1px 1.2px ; 
+    display: flex ; 
+    justify-content: space-between ; 
+    align-items:center ; 
+}
+
+.icon-container #findIcon, 
+.icon-container #loadButton,
+.icon-container #advIconText {
+    transform: scale(1.2) ; 
+}
+
+#helpBodyDiv .blockImage-wrapper { 
+    height: 90% ; 
+    width: 100%;
+}
+
+#helpBodyDiv .blockImage { 
+    padding-top: 2rem ;
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
+}
+
+@media(max-width :400px){
+    #helpBodyDiv{
+        width:80% !important
+    }
+    #right-arrow {
+        left: 88%;
+        z-index: 100000;
+    }
+}
+
+@media (max-width: 600px) and (min-width:400px) {
+    #helpBodyDiv .icon-container { 
+        margin-top: 0 ; 
+        padding-top: 0 ;  
+    }
+
+    .icon-container #findIcon, 
+    .icon-container #loadButton,
+    .icon-container #advIconText {
+        transform: scale(1.1) ; 
+    }
+    #right-arrow {
+        left: 370px;
+        z-index: 100000;
+    }
+   
 }
 
 #pscDiv {

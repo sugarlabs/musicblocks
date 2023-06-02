@@ -20,82 +20,84 @@
    Publisher
 */
 
-function Publisher(Planet) {
-    this.ChipTags = null;
-    this.PlaceholderMBImage = "images/mbgraphic.png";
-    this.PlaceholderTBImage = "images/tbgraphic.png";
-    this.PublisherOfflineHTML = "<div>" + _("Feature unavailable - cannot connect to server. Reload Music Blocks to try again.") + "</div>";
-    this.TitleLowerBound = 1;
-    this.TitleUpperBound = 50;
-    this.DescriptionLowerBound = 1;
-    this.DescriptionUpperBound = 1000;
-    this.ProjectTable = Planet.LocalPlanet.ProjectTable;
-    this.IsShareLink = false;
+class Publisher {
 
-    this.dataToTags = (DATA) => {
+    constructor(Planet) {
+        this.Planet = Planet ;
+        this.ChipTags = null;
+        this.PlaceholderMBImage = "images/mbgraphic.png";
+        this.PlaceholderTBImage = "images/tbgraphic.png";
+        this.PublisherOfflineHTML = "<div>" + _("Feature unavailable - cannot connect to server. Reload Music Blocks to try again.") + "</div>";
+        this.TitleLowerBound = 1;
+        this.TitleUpperBound = 50;
+        this.DescriptionLowerBound = 1;
+        this.DescriptionUpperBound = 1000;
+        this.ProjectTable = Planet.LocalPlanet.ProjectTable;
+        this.IsShareLink = false;
+    }
+
+    dataToTags(DATA) {
         // convert to blocks like structure.
         DATA = JSON.parse(DATA);
+
         const blocks = {
             blockList: []
         };
 
         for (const i of DATA) {
             const block = {};
-            if (typeof i[1] === "string") {
-                block.name = i[1];
-            } else {
-                block.name = i[1][0];
-            }
+            block.name = (typeof i[1] === "string") ? i[1] : i[1][0] ;
             block.connections = i[4];
             blocks.blockList.push(block);
         }
+
         //convert blocks to score.
-        const score = Planet.analyzeProject();
+        const score = this.Planet.analyzeProject();
 
         //0("rhythm"),1("pitch"),2("tone"),3("mouse"),4("pen"),5("number"),
         //6("flow"),7("action"),8("sensors"),9("media"),10("mice")
 
         //use score to map tags.
         const tags = [];
+
         //Pitch, Tone, and/or Rhythm
-        if (score[1] && score[2]) {
+        if (score[1] && score[2])
             tags.push("2");  // music
-        }
+
         //pen,mouse
-        if (score[3] && score[4]) {
+        if (score[3] && score[4])
             tags.push("3");  // art
-        }
+        
         //sensors
-        if (score[8]) {
+        if (score[8])
             tags.push("5");  // interactive
-        }
+        
         //number
-        if (score[5]) {
+        if (score[5])
             tags.push("4");  // math
-        }
 
         return tags;
     };
 
-    this.findTagWithName = name => {
+    findTagWithName(name) {
+        const Planet = this.Planet ;
         const keys = Object.keys(Planet.TagsManifest);
-        for (let i = 0; i < keys.length; i++) {
-            if (Planet.TagsManifest[keys[i]].TagName === name) {
+
+        for (let i = 0; i < keys.length; i++)
+            if (Planet.TagsManifest[keys[i]].TagName === name)
                 return keys[i];
-            }
-        }
+      
         return null;
     };
 
-    this.addTags = () => {
-        const tags = Planet.TagsManifest;
+    addTags() {
+        const tags = this.Planet.TagsManifest;
         this.ChipTags = {};
         const keys = Object.keys(tags);
-        for (let i = 0; i < keys.length; i++) {
-            if (tags[keys[i]].IsTagUserAddable === "1") {
+
+        for (let i = 0; i < keys.length; i++)
+            if (tags[keys[i]].IsTagUserAddable === "1")
                 this.ChipTags[tags[keys[i]].TagName] = null;
-            }
-        }
 
         jQuery("#tagsadd").material_chip({
             autocompleteOptions: {
@@ -110,22 +112,21 @@ function Publisher(Planet) {
         jQuery("#tagsadd").on("chip.add", (e, chip) => {
             // you have the added chip here
             let arr = jQuery("#tagsadd").material_chip("data");
-            if (!(chip.tag in this.ChipTags)) {
+
+            if (!(chip.tag in this.ChipTags))
                 arr.splice(arr.length - 1, 1);
-            } else {
-                chip.id = this.findTagWithName(chip.tag);
-            }
 
-            if (arr.length>maxLength) {
+            else chip.id = this.findTagWithName(chip.tag);
+
+            if (arr.length>maxLength)
                 arr=arr.slice(0,maxLength);
-            }
-
+    
             this.setTagInput(arr);
             jQuery("#tagsadd :input").focus();
         });
     };
 
-    this.setTagInput = arr => {
+    setTagInput(arr) {
         jQuery("#tagsadd").material_chip({
             data: arr,
             autocompleteOptions: {
@@ -136,52 +137,48 @@ function Publisher(Planet) {
         });
     };
 
-    this.setTags = arr => {
+    setTags(arr) {
         const a = [];
+
         for (let i = 0; i < arr.length; i++) {
             const o = {};
-            o.tag = Planet.TagsManifest[arr[i]].TagName;
+            o.tag = this.Planet.TagsManifest[arr[i]].TagName;
             o.id = arr[i];
             a.push(o);
         }
         this.setTagInput(a);
     };
 
-    this.getTags = () => {
+    getTags() {
         const t = jQuery("#tagsadd").material_chip("data");
         const a = [];
-        for (let i = 0; i < t.length; i++) {
+
+        for (let i = 0; i < t.length; i++)
             a.push(t[i].id);
-        }
+
         return a;
     };
 
-    this.initSubmit = () => {
-        document.getElementById("publisher-submit").addEventListener("click", this.publishProject.bind(this));
+    initSubmit() {
+        document.getElementById("publisher-submit")
+                .addEventListener("click", this.publishProject.bind(this));
     };
 
-    this.open = (id, IsShareLink) => {
-        if (IsShareLink === undefined) {
-            IsShareLink = false;
-        }
+    open(id, IsShareLink) {
 
-        this.IsShareLink = IsShareLink;
+        this.IsShareLink = (IsShareLink === undefined) ? false : IsShareLink ;
         const name = this.ProjectTable[id].ProjectName;
         let image = this.ProjectTable[id].ProjectImage;
         const published = this.ProjectTable[id].PublishedData;
         const DATA = this.ProjectTable[id].ProjectData;
-        let description;
-        let tags;
-        if (published !== null) {
-            description = published.ProjectDescription;
-            tags = published.ProjectTags;
-            document.getElementById("publisher-ptitle").textContent = _("Republish Project");
-        } else {
-            description = "";
-            tags = this.dataToTags(DATA);
-            document.getElementById("publisher-ptitle").textContent = _("Publish Project");
-        }
+        const description = (published !== null) ? published.ProjectDescription : "" ;
+        const tags = (published !== null) ? published.ProjectTags: this.dataToTags(DATA); ;
+        
+        document.getElementById("publisher-ptitle").textContent =
+                 _(`${(published !== null) ? "Republish":"Publish"}  Project`) ;
 
+        const Planet = this.Planet ;
+        
         if (Planet.ConnectedToServer) {
             document.getElementById("publish-description").value = description;
             document.getElementById("publish-description-label").setAttribute("data-error", "");
@@ -189,12 +186,10 @@ function Publisher(Planet) {
             document.getElementById("publish-id").value = id;
             document.getElementById("publish-title").value = name;
             document.getElementById("publish-title-label").setAttribute("data-error", "");
+            
             if (image === null) {
-                if (Planet.IsMusicBlocks) {
-                    image = this.PlaceholderMBImage;
-                } else {
-                    image = this.PlaceholderTBImage;
-                }
+                image = (Planet.IsMusicBlocks) ?
+                    this.PlaceholderMBImage : this.PlaceholderTBImage ;
             }
 
             document.getElementById("publish-image").src = image;
@@ -206,7 +201,9 @@ function Publisher(Planet) {
         jQuery("#publisher").modal("open");
     };
 
-    this.publishProject = () => {
+    publishProject() {
+        const Planet = this.Planet ;
+
         document.getElementById("publisher-error").textContent = "";
         document.getElementById("publisher-error").style.display = "none";
         document.getElementById("publisher-progress").style.visibility = "visible";
@@ -215,6 +212,7 @@ function Publisher(Planet) {
         const id = document.getElementById("publish-id").value;
         const title = document.getElementById("publish-title");
         const titlelabel = document.getElementById("publish-title-label");
+
         if (title.value.length < this.TitleLowerBound) {
             errors = true;
             titlelabel.setAttribute("data-error", _("This field is required"));
@@ -231,6 +229,7 @@ function Publisher(Planet) {
 
         const description = document.getElementById("publish-description");
         const descriptionlabel = document.getElementById("publish-description-label");
+
         if (description.value.length < this.DescriptionLowerBound) {
             errors = true;
             descriptionlabel.setAttribute("data-error", _("This field is required"));
@@ -245,9 +244,10 @@ function Publisher(Planet) {
             descriptionlabel.classList.add("active");
         }
 
-        if (errors === true) {
+        if (errors === true)
             this.hideProgressBar();
-        } else {
+
+        else {
             const submitobj = {};
             submitobj.ProjectID = id;
             submitobj.ProjectName = title.value;
@@ -271,12 +271,13 @@ function Publisher(Planet) {
             published.ProjectTags = this.getTags();
             document.getElementById("publisher-submit").style.cursor = "wait";
             document.getElementById("publisher-cancel").style.cursor = "wait";
-            for (let i=0; i<document.getElementById("publisher-form").getElementsByTagName("INPUT").length; i++) {
+
+            for (let i=0; i<document.getElementById("publisher-form").getElementsByTagName("INPUT").length; i++)
                 document.getElementById("publisher-form").getElementsByTagName("INPUT")[i].style.cursor = "wait";
-            }
-            for (let i=0; i<document.getElementById("publisher-form").getElementsByTagName("TEXTAREA").length; i++) {
+            
+            for (let i=0; i<document.getElementById("publisher-form").getElementsByTagName("TEXTAREA").length; i++)
                 document.getElementById("publisher-form").getElementsByTagName("TEXTAREA")[i].style.cursor = "wait";
-            }
+            
             document.body.style.cursor = "wait";
             Planet.ServerInterface.addProject(send, function(data) {
                 this.afterPublishProject(data, id, title.value, published);
@@ -284,40 +285,45 @@ function Publisher(Planet) {
         }
     };
 
-    this.parseProject = tb => {
+    parseProject(tb) {
+
         try {
             tb = JSON.parse(tb);
-        } catch (e) {
+        }
+        catch (e) {
             // eslint-disable-next-line no-console
             console.log(e);
             return "";
         }
 
         const words = new Set();
+
         for (let i = 0; i < tb.length; i++) {
             const block = tb[i];
-            if (typeof block[1] === "string") {
+
+            if (typeof block[1] === "string")
                 words.add(block[1]);
-            } else if (Array.isArray(block[1])) {
+
+            else if (Array.isArray(block[1]))
                 words.add(block[1][0]);
-            } else if (typeof block[1] === "number") {
-                break;
-            }
+
+            else if (typeof block[1] === "number") break ;
         }
 
         let s = "";
-        for (const item of words) {
-            s += item + " ";
-        }
+        for (const item of words)
+            s += `${item} `;
 
         return s.slice(0, -1);
     };
 
-    this.hideProgressBar = () => {
+    hideProgressBar() {
         document.getElementById("publisher-progress").style.visibility = "hidden";
     };
 
-    this.afterPublishProject = (data, id, name, published) => {
+    afterPublishProject(data, id, name, published) {
+        const Planet = this.Planet ;
+
         if (data.success) {
             Planet.ProjectStorage.addPublishedData(id, published);
             Planet.ProjectStorage.renameProject(id, name);
@@ -325,34 +331,39 @@ function Publisher(Planet) {
             this.close();
             Planet.LocalPlanet.updateProjects();
             Planet.GlobalPlanet.refreshProjects();
-            if (this.IsShareLink) {
+
+            if (this.IsShareLink)
                 document.getElementById("sharebox-" + id).style.display = "initial";
-            }
-        } else {
+        }
+        else {
             this.throwError(_("Server Error") + " (" + data.error + ") - " + _("Try Again"));
             this.hideProgressBar();
         }
+
         document.getElementById("publisher-submit").style.cursor = "pointer";
         document.getElementById("publisher-cancel").style.cursor = "pointer";
-        for (let i=0; i<document.getElementById("publisher-form").getElementsByTagName("INPUT").length; i++) {
+
+        for (let i=0; i<document.getElementById("publisher-form").getElementsByTagName("INPUT").length; i++)
             document.getElementById("publisher-form").getElementsByTagName("INPUT")[i].style.cursor = "text";
-        }
-        for (let i=0; i<document.getElementById("publisher-form").getElementsByTagName("TEXTAREA").length; i++) {
+
+        for (let i=0; i<document.getElementById("publisher-form").getElementsByTagName("TEXTAREA").length; i++)
             document.getElementById("publisher-form").getElementsByTagName("TEXTAREA")[i].style.cursor = "text";
-        }
+
         document.body.style.cursor = "default";
     };
 
-    this.throwError = error => {
+    throwError(error) {
         document.getElementById("publisher-error").textContent = error;
         document.getElementById("publisher-error").style.display = "initial";
     };
 
-    this.close = () => {
+    close() {
         jQuery("#publisher").modal("close");
     };
 
-    this.init = () => {
+    init() {
+        const Planet = this.Planet ;
+
         if (!Planet.ConnectedToServer) {
             let element = document.getElementById("publisher-form");
             element.parentNode.removeChild(element);
@@ -360,9 +371,11 @@ function Publisher(Planet) {
             element.parentNode.removeChild(element);
             const frag = document.createRange().createContextualFragment(this.PublisherOfflineHTML);
             document.getElementById("publisher-content").appendChild(frag);
-        } else {
+        }
+        else {
             this.addTags();
             this.initSubmit();
         }
     };
-};
+
+}

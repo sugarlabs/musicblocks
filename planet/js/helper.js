@@ -47,18 +47,18 @@ function debounce(func, wait, immediate) {
 
 function getCookie(cname) {
     // from W3Schools
-    const name = cname + "=";
+    const name = `${cname}=`;
     const decodedCookie = decodeURIComponent(document.cookie);
     const ca = decodedCookie.split(";");
+
     for (let i = 0; i < ca.length; i++) {
         let c = ca[i];
-        while (c.charAt(0) === " ") {
-            c = c.substring(1);
-        }
 
-        if (c.indexOf(name) === 0) {
+        while (c.charAt(0) === " ")
+            c = c.substring(1);
+
+        if (c.indexOf(name) === 0)
             return c.substring(name.length, c.length);
-        }
     }
     return "";
 };
@@ -67,34 +67,28 @@ function setCookie(cname, cvalue, exdays) {
     // from W3Schools
     const d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-    const expires = "expires=" + d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    const expires = `expires=${d.toUTCString()}`;
+    document.cookie = `${cname}=${cvalue};${expires};path=/` ;
 };
 
 function toggleSearch(on) {
-    if (on) {
-        document.getElementById("searchcontainer").style.display = "block";
-    } else {
-        document.getElementById("searchcontainer").style.display = "none";
-    }
+    const displayValue = on ? "block" : "none" ;
+    document.getElementById("searchcontainer").style.display = displayValue;
 };
 
 function toggleText(id, a, b) {
-    const t = document.getElementById(id).innerHTML;
-    if (t.indexOf(a) !== -1) {
-        document.getElementById(id).innerHTML = t.replace(a, b);
-    } else {
-        document.getElementById(id).innerHTML = t.replace(b, a);
-    }
+    const el = document.getElementById(id);
+
+    const prevHTML = el.innerHTML ;
+    const updatedHTML = prevHTML.indexOf(a) !== -1 ? prevHTML.replace(a,b) : prevHTML.replace(b,a) ;
+
+    el.innerHTML = "" ;
+    el.insertAdjacentHTML("afterbegin", updatedHTML) ;
 };
 
 function toggleExpandable(id, c) {
-    const d = document.getElementById(id).className;
-    if (d === c + " open") {
-        document.getElementById(id).className = c;
-    } else {
-        document.getElementById(id).className = c + " open";
-    }
+    const el = document.getElementById(id) ;
+    el.className = (el.className === `${c} open`) ? c : `${c} open` ;
 };
 
 function hideOnClickOutside(eles, other) {
@@ -103,11 +97,10 @@ function hideOnClickOutside(eles, other) {
         // eslint-disable-next-line max-len
         const path = event.path || (event.composedPath && event.composedPath()) || event.composedPath(event.target);
         let ok = false;
-        for (let i = 0; i < eles.length; i++) {
-            if (path.indexOf(eles[i]) !== -1) {
+
+        for (let i = 0; i < eles.length; i++)
+            if (path.indexOf(eles[i]) !== -1)
                 ok = true;
-            }
-        }
 
         if (ok === false) {
             document.getElementById(other).style.display = "none";
@@ -127,9 +120,9 @@ function updateCheckboxes(id) {
     const elements = document.getElementById(id).querySelectorAll("input:checked");
     const urlel = document.getElementById(id).querySelectorAll("input[type=text]")[0];
     let url = urlel.getAttribute("data-originalurl");
-    for (let i = 0; i < elements.length; i++) {
-        url += "&" + elements[i].name + "=True";
-    }
+
+    for (let i = 0; i < elements.length; i++)
+        url += `&${elements[i].name}=True`;
 
     urlel.value = url;
 };
@@ -140,11 +133,8 @@ $(document).ready(() => {
     $("#projectviewer").modal();
     // eslint-disable-next-line no-unused-vars
     document.getElementById("global-search").addEventListener("input", (evt) => {
-        if (this.value !== "") {
-            document.getElementById("search-close").style.display = "initial";
-        } else {
-            document.getElementById("search-close").style.display = "none";
-        }
+        document.getElementById("search-close")
+                .style.display = this.value === "" ? "none" : "initial" ;
     });
     // eslint-disable-next-line no-unused-vars
     document.getElementById("local-tab").addEventListener("click", (evt) => {

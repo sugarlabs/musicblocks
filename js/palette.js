@@ -263,7 +263,7 @@ class Palettes {
         listBody.parentNode.removeChild(listBody);
         listBody = palette.children[0].children[1].appendChild(document.createElement("tbody"));
         // Make an icon/button for each palette
-        this.makeButton(
+        this.makeSearchButton(
             "search",
             makePaletteIcons(PALETTEICONS["search"], this.cellSize, this.cellSize),
             listBody
@@ -281,6 +281,28 @@ class Palettes {
                 listBody
             );
         }
+    }
+    
+    makeSearchButton(name, icon, listBody) {
+        const row = listBody.insertRow(-1);
+        const img = row.insertCell(-1);
+        const label = row.insertCell(-1);
+        img.appendChild(icon);
+        img.style.padding = "4px";
+        img.style.boxSizing = "content-box";
+        img.style.width = `${this.cellSize}px`;
+        img.style.height = `${this.cellSize}px`;
+        label.textContent = toTitleCase(_(name));
+        label.style.color = platformColor.paletteText;
+        row.style.borderBottom = "1px solid #0CAFFF"
+        label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
+        label.style.padding = "4px";
+        row.style.display = "flex";
+        row.style.flexDirection = "row";
+        row.style.alignItems = "center";
+        row.style.width = "126px";
+
+        this._loadPaletteButtonHandler(name, row);
     }
 
     makeButton(name, icon, listBody) {
@@ -1233,6 +1255,20 @@ class Palette {
 
             if (macroExpansion !== null) {
                 this.activity.blocks.loadNewBlocks(macroExpansion);
+                const thisBlock = this.activity.blocks.blockList.length - 1;
+                const topBlk = this.activity.blocks.findTopBlock(thisBlock);
+                // Ensure that the newly created block is not under
+                // the palette.
+                if (
+                    this.activity.blocks.blockList[topBlk].container.x <
+                        this.activity.palettes.paletteWidth * 2
+                ) {
+                    this.activity.blocks.moveBlock(
+                        topBlk,
+                        this.activity.palettes.paletteWidth * 2,
+                        this.activity.blocks.blockList[topBlk].container.y
+                    );
+                }
             } else if (this.name === "myblocks") {
                 // If we are on the myblocks palette, it is a macro.
                 const macroName = blkname.replace("macro_", "");
@@ -1280,9 +1316,21 @@ class Palette {
                 obj[0][3] = saveY;
                 this.activity.blocks.loadNewBlocks(obj);
 
-                // Ensure collapse state of new stack is set properly.
                 const thisBlock = this.activity.blocks.blockList.length - 1;
                 const topBlk = this.activity.blocks.findTopBlock(thisBlock);
+                // Ensure that the newly created block is not under
+                // the palette.
+                if (
+                    this.activity.blocks.blockList[topBlk].container.x <
+                        this.activity.palettes.paletteWidth * 2
+                ) {
+                    this.activity.blocks.moveBlock(
+                        topBlk,
+                        this.activity.palettes.paletteWidth * 2,
+                        this.activity.blocks.blockList[topBlk].container.y
+                    );
+                }
+                // Ensure collapse state of new stack is set properly.
                 setTimeout(() => {
                     this.activity.blocks.blockList[topBlk].collapseToggle();
                 }, 500);
@@ -1290,8 +1338,15 @@ class Palette {
                 newBlock = this._makeBlockFromPalette(protoblk, blkname, __myCallback);
                 // Ensure that the newly created block is not under
                 // the palette.
-                if (this.activity.blocks.blockList[newBlock].container.x < this.activity.palettes.paletteWidth * 2) {
-                    this.activity.blocks.moveBlock(newBlock, this.activity.palettes.paletteWidth * 2, this.activity.blocks.blockList[newBlock].container.y);
+                if (
+                    this.activity.blocks.blockList[newBlock].container.x <
+                        this.activity.palettes.paletteWidth * 2
+                ) {
+                    this.activity.blocks.moveBlock(
+                        newBlock,
+                        this.activity.palettes.paletteWidth * 2,
+                        this.activity.blocks.blockList[newBlock].container.y
+                    );
                 }
             }
         }
