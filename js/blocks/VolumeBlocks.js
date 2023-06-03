@@ -433,7 +433,7 @@ function setupVolumeBlocks(activity) {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else {
                     if (args[0] === 100 || args[0] === -100) {
-                        activity.errorMsg(_("Warning: Audio is currently going through a single channel."),blk);
+                        activity.errorMsg(_("Warning: Audio is currently going through a single channel."), blk);
                     }
                     Singer.VolumeActions.setPanning(args[0], turtle);
                 }
