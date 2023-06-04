@@ -9,8 +9,17 @@
 "Language: es\n"
 "X-Generator: Poedit 1.7.4\n"
 
+msgid "Record"
+msgstr "Grabar"
+
 msgid "Full screen"
 msgstr "Pantalla completa"
+
+msgid "Fullscreen"
+msgstr "Pantalla completa"
+
+msgid "Toggle full screen mode."
+msgstr "Alternar el modo de pantalla completa"
 
 #: js/planetInterface.js:101
 #: js/planetInterface.js:101

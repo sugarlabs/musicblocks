@@ -12,9 +12,6 @@
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.0.1\n"
 
-msgid "Full screen"
-msgstr "全画面表示"
-
 #: js/planetInterface.js:101
 #: js/planetInterface.js:101
 #: js/planetInterface.js:101
@@ -2005,6 +2002,18 @@ msgstr "プロジェクトの コードを ひひょうじに する"
 #: js/SaveInterface.js:43
 msgid "No description provided"
 msgstr "きにゅうが ありません"
+
+msgid "Record"
+msgstr "ろくおん"
+
+msgid "Fullscreen"
+msgstr "フルスクリーン"
+
+msgid "Full screen"
+msgstr "フルスクリーン"
+
+msgid "Toggle full screen mode."
+msgstr ""
 
 #: js/SaveInterface.js:226
 msgid "Your recording is in progress."

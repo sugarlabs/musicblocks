@@ -12,9 +12,6 @@
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.0.1\n"
 
-msgid "Full screen"
-msgstr "全画面表示"
-
 #: js/planetInterface.js:101
 #: js/planetInterface.js:101
 #: js/planetInterface.js:101
@@ -2005,6 +2002,18 @@ msgstr "プロジェクトのコードを非表示にする"
 #: js/SaveInterface.js:43
 msgid "No description provided"
 msgstr "記入がありません"
+
+msgid "Record"
+msgstr "録音"
+
+msgid "Fullscreen"
+msgstr "フルスクリーン"
+
+msgid "Full screen"
+msgstr "フルスクリーン"
+
+msgid "Toggle full screen mode."
+msgstr ""
 
 #: js/SaveInterface.js:226
 msgid "Your recording is in progress."
@@ -7980,45 +7989,15 @@ msgstr "z座標の動き"
 #~msgid "Drum Block: Did you mean to use a Note block?"
 #~msgstr "ドラムブロック：音符ブロックを使いますか？"
 
-#: js/pitchtracker.js:181
-
-#: js/pitchtracker.js:200
-
-#: js/pitchtracker.js:208
-
-#: js/pitchtracker.js:210
-
-#~msgid "Start Recording"
-#~msgstr ""
-
-#: js/pitchtracker.js:188
-
-#: js/pitchtracker.js:222
-
-#: js/pitchtracker.js:224
-
-#~msgid "Stop Recording"
-#~msgstr ""
-
 #: js/pitchtracker.js:312
 
 #~msgid "save rhythms"
 #~msgstr "リズムだけをほぞん"
 
-#: js/pitchtracker.js:475
-
-#~msgid "drag"
-#~msgstr ""
-
 #: js/PitchBlocks.js:934
 
 #~msgid "Pitch Block: Did you mean to use a Note block?"
 #~msgstr "音高ブロック：音符ブロックと一緒に使いますか?"
-
-#: js/EnsembleBlocks.js:295
-
-#~msgid "Mr. Mouse\", 0, 0)]"
-#~msgstr ""
 
 #: js/SensorsBlocks.js:195
 
