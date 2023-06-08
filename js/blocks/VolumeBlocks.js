@@ -432,6 +432,9 @@ function setupVolumeBlocks(activity) {
                 if (typeof args[0] !== "number") {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else {
+                    if (args[0] === 100 || args[0] === -100) {
+                        activity.errorMsg(_("Warning: Sound is coming out from only the left or right side."), blk);
+                    }
                     Singer.VolumeActions.setPanning(args[0], turtle);
                 }
             }
