@@ -491,7 +491,7 @@
                         </div>
                         <ul class="main left">
                             <li>
-                                <a id="play" class="left tooltipped"
+                                <a id="play" class="left tooltipped" 
                                     ><i class="material-icons main"
                                         >play_circle_filled</i
                                     ></a
@@ -506,10 +506,16 @@
                         </ul>
                         <ul class="main right">
                             <li>
-                                <a id="FullScreen" class="FullScreen" onclick="setIcon()">
-                                    <i class="material-icons">&#xe5d0;</i>
-            
-                                </a>
+                                <a 
+                                    id="FullScreen"
+                                    class="FullScreen tooltipped dropdown-trigger" 
+                                    data-position="bottom" 
+                                    onclick="setIcon()"
+                                    ><i class="material-icons" 
+                                        id="FullScrIcon"
+                                        >&#xe5d0;</i
+                                    ></a
+                                >
                             </li>
                             <li>
                                 <a
@@ -536,7 +542,7 @@
                                 <a
                                     id="saveButton"
                                     class="tooltipped dropdown-trigger"
-                                    data-position="bottom"
+                                    data-position="left"
                                     data-activates="saveddropdownbeg"
                                     ><i id="save" class="material-icons md-48"
                                         >save_alt</i
@@ -548,7 +554,7 @@
                                     style="display: none;"
                                     id="saveButtonAdvanced"
                                     class="tooltipped dropdown-trigger"
-                                    data-position="bottom"
+                                    data-position="left"
                                     data-activates="saveddropdown"
                                     ><i id="save" class="material-icons md-48"
                                         >save_alt</i
@@ -582,7 +588,7 @@
                                 <a
                                     id="toggleAuxBtn"
                                     class="tooltipped"
-                                    data-position="bottom"
+                                    data-position="left"
                                     ><i
                                         id="menu"
                                         class="animated-icon material-icons md-48 "
@@ -710,7 +716,7 @@
                                     <a
                                         id="chooseKeyIcon"
                                         class="tooltipped"
-                                        data-position="bottom"
+                                        data-position="left"
                                         ><i class="material-icons md-48"
                                             >music_note</i
                                         ></a
@@ -771,7 +777,7 @@
                                     <a
                                         id="languageSelectIcon"
                                         class="tooltipped dropdown-trigger"
-                                        data-position="bottom"
+                                        data-position="left"
                                         data-activates="languagedropdown"
                                         ><i class="material-icons md-48"
                                             >translate</i
@@ -826,15 +832,17 @@
             var count=0;    
             function setIcon() {
                 var property = document.getElementById(FullScreen);
+                var iconCode = document.querySelector('#FullScrIcon');
                 //Calling full Screen
                 if (count == 0) {
                     openFullscreen();
-                    
+                    iconCode.textContent='\ue5d1';
                     count = 1;        
                 }
                 //Closing full Scree
                 else {
                     closeFullscreen();
+                    iconCode.textContent='\ue5d0';
                     count = 0;
                 }
             }
