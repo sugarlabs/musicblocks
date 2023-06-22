@@ -66,6 +66,7 @@ class PlanetInterface {
             const png = docById("overlayCanvas").toDataURL("image/png");
             this.planet.open(png);  // this.mainCanvas.toDataURL("image/png"));
             this.iframe.style.display = "block";
+            this.iframe.style.zIndex = "9999" ;
             try {
                 this.iframe.contentWindow.document.getElementById("local-tab").click();
             } catch (e) {

@@ -11,7 +11,7 @@
     url(https://example.com/MaterialIcons-Regular.ttf) format('truetype');
 }
 */
-                
+
 *:focus {
     outline: none;
 }
@@ -336,14 +336,12 @@ nav ul li {
     float: left;
     padding-left: 1%;
 }
-#helpBodyDiv{
-    width:80%;
-}
+
 .content li[current=true] img.thumbnail {
     opacity: 0;
 }
 
-@media (max-width: 500px) and (min-width:400px) {
+@media (max-width: 500px) {
     .content li {
     width: 48.5%;
     padding-left: 1%;
@@ -352,15 +350,11 @@ nav ul li {
     .canvasHolder.hide {
     transform: scale(0.485);
     }
-    #helpBodyDiv {
-       left: 8%;
-     
-    }
+
     nav h1 {
     display: none;
     }
 }
-
 
 @media (max-width: 800px) and (min-width: 501px) {
     .content li {
@@ -817,21 +811,18 @@ table {
 }
 
 #right-arrow {
-    left: 380px;
+    left: 445px;
     background: url('../header-icons/right-arrow.png');
-    z-index: 100;
 }
 
 #left-arrow {
     left: 5px;
     background: url('../header-icons/left-arrow.png');
-    z-index: 100;
 }
-
 
 #right-arrow, #left-arrow {
     position: absolute;
-    top: 50%;
+    top: 195px;
     background-size: 40px;
     height: 40px;
     width: 40px;
@@ -903,7 +894,7 @@ table {
 
 #helpBodyDiv {
     position: relative;
-    left: 40px;
+    left: 45px;
     border: 0 !important;
     overflow-x: hidden;
     overflow-y: auto;
@@ -950,17 +941,7 @@ table {
     height: 100%;
 }
 
-@media(max-width :400px){
-    #helpBodyDiv{
-        width:80% !important
-    }
-    #right-arrow {
-        left: 88%;
-        z-index: 100000;
-    }
-}
-
-@media (max-width: 600px) and (min-width:400px) {
+@media (max-width: 600px) {
     #helpBodyDiv .icon-container { 
         margin-top: 0 ; 
         padding-top: 0 ;  
@@ -971,11 +952,6 @@ table {
     .icon-container #advIconText {
         transform: scale(1.1) ; 
     }
-    #right-arrow {
-        left: 370px;
-        z-index: 100000;
-    }
-   
 }
 
 #pscDiv {
@@ -1513,7 +1489,7 @@ input.timbreName {
     -o-transition: ease 1s;
     -webkit-transition: ease 1s;
     transition: ease 1s;
-    z-index: 10;
+    z-index: 10000;
 }
 
 .wheelNav > svg {
@@ -1582,7 +1558,7 @@ input.timbreName {
     height: 3%;
     position: absolute;
     top: 130px;
-    left: 25%;
+    left: 33%;
     padding-top: 8px;
     border-radius: 8px;
     background-color: #8CC6FF;
