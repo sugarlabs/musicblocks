@@ -16,6 +16,7 @@
 /* exported Toolbar */
 
 let WRAP = true;
+let isRendering = false; 
 const $j = jQuery.noConflict();
 let play_button_debounce_timeout = null; 
 class Toolbar {
@@ -45,6 +46,7 @@ class Toolbar {
                 ["mb-logo", _("About Music Blocks")],
                 ["play", _("Play")],
                 ["stop", _("Stop")],
+                ["record",_("Record")],
                 ["FullScreen", _("Full Screen")],
                 ["newFile", _("New project")],
                 ["load", _("Load project from file")],
@@ -102,6 +104,7 @@ class Toolbar {
                 _("About Music Blocks"),
                 _("Play"),
                 _("Stop"),
+                _("Record"),
                 _("Full Screen"),
                 _("New project"),
                 _("Load project from file"),
@@ -140,6 +143,7 @@ class Toolbar {
                 ["mb-logo", _("About Turtle Blocks")],
                 ["play", _("Play")],
                 ["stop", _("Stop")],
+                ["record",_("Record")]
                 ["FullScreen", _("Full Screen")],
                 ["newFile", _("New project")],
                 ["load", _("Load project from file")],
@@ -192,6 +196,7 @@ class Toolbar {
                 _("About Turtle Blocks"),
                 _("Play"),
                 _("Stop"),
+                _("Record"),
                 _("Full Screen"),
                 _("New project"),
                 _("Load project from file"),
@@ -354,6 +359,20 @@ class Toolbar {
      * @param {Function} onclick
      * @returns {void}
      */
+   
+    renderRecordIcon(onclick){
+        if (isRendering) {
+            return; // Exit the function if rendering is already in progress
+        }
+        isRendering = true; // Set the flag to indicate rendering has started
+        const RecIcon = document.getElementById("record");
+        RecIcon.innerHTML= `<i class=""material-icons main">${RECORDBUTTON}</i>`;
+        record.onclick = () => {
+            onclick(this.activity);
+        };
+
+        isRendering = false; // Set the flag to indicate rendering has completed
+    }
     renderNewProjectIcon(onclick) {
         const newProjectIcon = docById("new-project");
 
