@@ -901,8 +901,7 @@ class Activity {
                 }
             }
         };
-        
-        
+    
         let isExecuting = false; // Flag variable to track execution status
 
         const doRecordButton = (activity) => {
@@ -950,9 +949,7 @@ class Activity {
             start.dispatchEvent(clickEvent);};
 
             function recording(){
-                start.addEventListener('click', async function handler(){ 
-                  
-                console.log("hello");      
+                start.addEventListener('click', async function handler(){       
                 let stream = await recordScreen();
                 let mimeType = 'video/webm';
                 mediaRecorder = createRecorder(stream, mimeType);
