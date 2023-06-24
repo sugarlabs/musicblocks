@@ -362,7 +362,7 @@ class Toolbar {
     renderRecordIcon(onclick){
         const RecIcon = document.getElementById("record");
         RecIcon.innerHTML= `<i class=""material-icons main">${RECORDBUTTON}</i>`;
-        record.onclick = () => {
+        RecIcon.onclick = () => {
             onclick(this.activity);
         };
 

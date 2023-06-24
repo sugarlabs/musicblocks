@@ -902,13 +902,14 @@ class Activity {
             }
         };
         
+        
         let isExecuting = false; // Flag variable to track execution status
 
         const doRecordButton = (activity) => {
             if (isExecuting) {
                 return; // Exit the function if execution is already in progress
             }
-
+            
             isExecuting = true; // Set the flag to indicate execution has started
             activity._doRecordButton();
         };
@@ -942,13 +943,16 @@ class Activity {
             if (hideIn.includes(browser)){
             btn.classList.add("hide");
            } 
-           
+           var clickEvent = new Event('click');
             let flag = 0;
             if(flag == 0 && isExecuting){
-            recording()};
+            recording()
+            start.dispatchEvent(clickEvent);};
 
             function recording(){
-            start.addEventListener('click', async function handler(){          
+                start.addEventListener('click', async function handler(){ 
+                  
+                console.log("hello");      
                 let stream = await recordScreen();
                 let mimeType = 'video/webm';
                 mediaRecorder = createRecorder(stream, mimeType);
