@@ -497,7 +497,7 @@ const createHelpContent = (activity) => {
     }
     HELPCONTENT.push([
         _("Full screen"),
-        "",
+	_("Toggle full screen mode."),
         "data:image/svg+xml;base64," +
             window.btoa(unescape(encodeURIComponent(FULLSCREENBUTTON)))
     ]);

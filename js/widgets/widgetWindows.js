@@ -225,7 +225,7 @@ class WidgetWindow {
      * @returns {void}
      */
     _docMouseDownHandler(e) {
-        if (e.target === this._frame || this._frame.contains(e.target)) {
+        if (e.target === this._frame || this._frame.contains(e.target) || this._fullscreenEnabled) {
             this._frame.style.opacity = "1";
             this._frame.style.zIndex = "10000";
         } else {

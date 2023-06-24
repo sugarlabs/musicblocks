@@ -17,7 +17,7 @@
 
 let WRAP = true;
 const $j = jQuery.noConflict();
-
+let play_button_debounce_timeout = null; 
 class Toolbar {
     /**
      * @constructor
@@ -45,6 +45,8 @@ class Toolbar {
                 ["mb-logo", _("About Music Blocks")],
                 ["play", _("Play")],
                 ["stop", _("Stop")],
+                ["record",_("Record")],
+                ["FullScreen", _("Full Screen")],
                 ["newFile", _("New project")],
                 ["load", _("Load project from file")],
                 ["saveButton", _("Save project")],
@@ -101,6 +103,8 @@ class Toolbar {
                 _("About Music Blocks"),
                 _("Play"),
                 _("Stop"),
+                _("Record"),
+                _("Full Screen"),
                 _("New project"),
                 _("Load project from file"),
                 _("Save project"),
@@ -138,6 +142,8 @@ class Toolbar {
                 ["mb-logo", _("About Turtle Blocks")],
                 ["play", _("Play")],
                 ["stop", _("Stop")],
+                ["record",_("Record")]
+                ["FullScreen", _("Full Screen")],
                 ["newFile", _("New project")],
                 ["load", _("Load project from file")],
                 ["saveButton", _("Save project")],
@@ -189,6 +195,8 @@ class Toolbar {
                 _("About Turtle Blocks"),
                 _("Play"),
                 _("Stop"),
+                _("Record"),
+                _("Full Screen"),
                 _("New project"),
                 _("Load project from file"),
                 _("Save project"),
@@ -303,11 +311,33 @@ class Toolbar {
     renderPlayIcon(onclick) {
         const playIcon = docById("play");
         const stopIcon = docById("stop");
+        
+        let isPlayIconRunning = false;
+        function handleClick(){
+            if (!isPlayIconRunning) {
+                playIcon.onclick = null;
+                console.log("Wait for next 2 seconds to play the music");
+                
+            } else {
+                playIcon.onclick = tempClick;
+                isPlayIconRunning = false;
+            }
+        }    
 
-        playIcon.onclick = () => {
+        var tempClick = playIcon.onclick=()=>{
+            isPlayIconRunning = false;
             onclick(this.activity);
+            handleClick();
             stopIcon.style.color = this.stopIconColorWhenPlaying;
-        };
+            isPlayIconRunning = true; 
+            play_button_debounce_timeout = setTimeout(function() { handleClick(); }, 2000);
+            
+            stopIcon.addEventListener("click", function(){
+                clearTimeout(play_button_debounce_timeout);
+                isPlayIconRunning = true; 
+                handleClick();
+            })
+        } 
     }
 
     /**
@@ -317,7 +347,6 @@ class Toolbar {
      */
     renderStopIcon(onclick) {
         const stopIcon = docById("stop");
-
         stopIcon.onclick = () => {
             onclick(this.activity);
             stopIcon.style.color = "white";
@@ -329,6 +358,15 @@ class Toolbar {
      * @param {Function} onclick
      * @returns {void}
      */
+   
+    renderRecordIcon(onclick){
+        const RecIcon = document.getElementById("record");
+        RecIcon.innerHTML= `<i class=""material-icons main">${RECORDBUTTON}</i>`;
+        RecIcon.onclick = () => {
+            onclick(this.activity);
+        };
+
+    }
     renderNewProjectIcon(onclick) {
         const newProjectIcon = docById("new-project");
 
