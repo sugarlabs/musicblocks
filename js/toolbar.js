@@ -16,7 +16,6 @@
 /* exported Toolbar */
 
 let WRAP = true;
-let isRendering = false; 
 const $j = jQuery.noConflict();
 let play_button_debounce_timeout = null; 
 class Toolbar {
@@ -361,17 +360,12 @@ class Toolbar {
      */
    
     renderRecordIcon(onclick){
-        if (isRendering) {
-            return; // Exit the function if rendering is already in progress
-        }
-        isRendering = true; // Set the flag to indicate rendering has started
         const RecIcon = document.getElementById("record");
         RecIcon.innerHTML= `<i class=""material-icons main">${RECORDBUTTON}</i>`;
         record.onclick = () => {
             onclick(this.activity);
         };
 
-        isRendering = false; // Set the flag to indicate rendering has completed
     }
     renderNewProjectIcon(onclick) {
         const newProjectIcon = docById("new-project");

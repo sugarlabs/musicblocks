@@ -905,17 +905,15 @@ class Activity {
         let isExecuting = false; // Flag variable to track execution status
 
         const doRecordButton = (activity) => {
-        if (isExecuting) {
-            return; // Exit the function if execution is already in progress
-        }
+            if (isExecuting) {
+                return; // Exit the function if execution is already in progress
+            }
 
-        isExecuting = true; // Set the flag to indicate execution has started
-        activity._doRecordButton();
-        console.log("after running function: " + isExecuting);
+            isExecuting = true; // Set the flag to indicate execution has started
+            activity._doRecordButton();
         };
 
-        this._doRecordButton = () =>{ 
-           
+        this._doRecordButton = () =>{         
             let start = document.getElementById('record'),
             stop  = document.getElementById('stop'),
             mediaRecorder;
@@ -945,25 +943,25 @@ class Activity {
             btn.classList.add("hide");
            } 
            
-            let flag=0;
-            if(flag==0){
+            let flag = 0;
+            if(flag == 0 && isExecuting){
             recording()};
+
             function recording(){
-            start.addEventListener('click', async function handler(){
-               
+            start.addEventListener('click', async function handler(){          
                 let stream = await recordScreen();
                 let mimeType = 'video/webm';
                 mediaRecorder = createRecorder(stream, mimeType);
-                if(flag==1){
+                if(flag == 1){
                 this.removeEventListener('click',handler);}
                 let node = document.createElement("p");
                 node.textContent = "Started recording";
                 document.body.appendChild(node);
-                start.style=NULL;
-                
+                start.style = null;                
             })}
+
             function stopRec(){
-                flag=0;
+                flag = 0;
                 mediaRecorder.stop();
                 let node = document.createElement("p");
                 node.textContent = "Stopped recording";
@@ -971,7 +969,7 @@ class Activity {
             }
 
             stop.addEventListener('click', function()
-            {   flag=0;
+            {   flag = 0;
                 start.classList.remove('blink');
                 mediaRecorder.stop();
                 let node = document.createElement("p");
@@ -980,7 +978,7 @@ class Activity {
             })
 
             async function recordScreen(){
-               flag=1;
+                flag = 1;
                 return await navigator.mediaDevices.getDisplayMedia({
                 preferCurrentTab:'True',
                 systemAudio: "include",
@@ -994,12 +992,11 @@ class Activity {
                         }
                     },
                     preferredVideoCodecs: 'auto'
-                });        
-                      
+                });                              
             }        
 
             function createRecorder (stream, mimeType) {
-                flag=1;
+                flag = 1;
                 start.classList.add('blink');   
                 start.removeEventListener('click',createRecorder,true);            
                 let recordedChunks = []; 
@@ -1022,16 +1019,17 @@ class Activity {
                     }   
                 };
                                       
-                mediaRecorder.start(200); 
+                mediaRecorder.start(200);
                 return mediaRecorder;
             }
             
             function saveFile(recordedChunks){
-                
+                flag = 1;
                 start.classList.remove('blink');
                 const blob = new Blob(recordedChunks, {
                     type: 'video/webm'
                 });
+
                 let filename = window.prompt('Enter file name'),
                 downloadLink = document.createElement('a');
                 downloadLink.href = URL.createObjectURL(blob);
@@ -1041,11 +1039,10 @@ class Activity {
                 downloadLink.click();
                 URL.revokeObjectURL(blob); 
                 document.body.removeChild(downloadLink);   
-                flag=0;         
+                flag = 0;         
                 recording();
-                isExecuting = false;
+                doRecordButton();
             } 
-            console.log(isExecuting);
         }
 
         /*
