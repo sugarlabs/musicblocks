@@ -916,6 +916,7 @@ class Activity {
         this._doRecordButton = () =>{         
             let start = document.getElementById('record'),
             stop  = document.getElementById('stop'),
+            recInside = document.getElementById("rec_inside"),
             mediaRecorder;
             function fnBrowserDetect(){                 
                 let userAgent = navigator.userAgent;
@@ -958,7 +959,8 @@ class Activity {
                 let node = document.createElement("p");
                 node.textContent = "Started recording";
                 document.body.appendChild(node);
-                start.style = null;                
+                start.style = null;       
+                recInside.setAttribute("fill", "red");         
             })}
 
             function stopRec(){
@@ -971,7 +973,7 @@ class Activity {
 
             stop.addEventListener('click', function()
             {   flag = 0;
-                start.classList.remove('blink');
+                recInside.classList.remove('blink');
                 mediaRecorder.stop();
                 let node = document.createElement("p");
                 node.textContent = "Stopped recording";
@@ -998,7 +1000,7 @@ class Activity {
 
             function createRecorder (stream, mimeType) {
                 flag = 1;
-                start.classList.add('blink');   
+                recInside.classList.add('blink');   
                 start.removeEventListener('click',createRecorder,true);            
                 let recordedChunks = []; 
                 const mediaRecorder = new MediaRecorder(stream);
@@ -1012,6 +1014,7 @@ class Activity {
                     saveFile(recordedChunks);
                     recordedChunks = [];
                     flag=0;
+                    recInside.setAttribute("fill", "#ffffff");
                 };
 
                 mediaRecorder.ondataavailable = function (e) {
@@ -1026,7 +1029,7 @@ class Activity {
             
             function saveFile(recordedChunks){
                 flag = 1;
-                start.classList.remove('blink');
+                recInside.classList.remove('blink');
                 const blob = new Blob(recordedChunks, {
                     type: 'video/webm'
                 });
@@ -4509,7 +4512,6 @@ class Activity {
             this.toolbar.renderLogoIcon(showAboutPage);
             this.toolbar.renderPlayIcon(doFastButton);
             this.toolbar.renderStopIcon(doHardStopButton);
-            this.toolbar.renderRecordIcon(doRecordButton);
             this.toolbar.renderNewProjectIcon(_afterDelete);
             this.toolbar.renderLoadIcon(doLoad);
             this.toolbar.renderSaveIcons(
@@ -4529,7 +4531,7 @@ class Activity {
             this.toolbar.renderModeSelectIcon(doSwitchMode);
             this.toolbar.renderRunSlowlyIcon(doSlowButton);
             this.toolbar.renderRunStepIcon(doStepButton);
-            this.toolbar.renderAdvancedIcons(doAnalytics, doOpenPlugin, deletePlugin, setScroller);
+            this.toolbar.renderAdvancedIcons(doRecordButton, doAnalytics, doOpenPlugin, deletePlugin, setScroller);
             this.toolbar.renderMergeIcon(_doMergeLoad);
             this.toolbar.renderRestoreIcon(restoreTrash);
             if (_THIS_IS_MUSIC_BLOCKS_) {
