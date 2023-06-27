@@ -358,15 +358,7 @@ class Toolbar {
      * @param {Function} onclick
      * @returns {void}
      */
-   
-    renderRecordIcon(onclick){
-        const RecIcon = document.getElementById("record");
-        RecIcon.innerHTML= `<i class=""material-icons main">${RECORDBUTTON}</i>`;
-        RecIcon.onclick = () => {
-            onclick(this.activity);
-        };
-
-    }
+    
     renderNewProjectIcon(onclick) {
         const newProjectIcon = docById("new-project");
 
@@ -683,6 +675,7 @@ class Toolbar {
     }
     /**
      * @public
+     * @param  {Function} rec_onclick
      * @param  {Function} analytics_onclick
      * @param  {Function} openPlugin_onclick
      * @param  {Function} delPlugin_onclick
@@ -690,11 +683,13 @@ class Toolbar {
      * @returns {void}
      */
     renderAdvancedIcons(
+        rec_onclick,
         analytics_onclick,
         openPlugin_onclick,
         delPlugin_onclick,
         setScroller
     ) {
+        const RecIcon = docById("record");
         const displayStatsIcon = docById("displayStatsIcon");
         const loadPluginIcon = docById("loadPluginIcon");
         const delPluginIcon = docById("delPluginIcon");
@@ -702,6 +697,10 @@ class Toolbar {
         const disableHorizScrollIcon = docById("disableHorizScrollIcon");
 
         if (!this.activity.beginnerMode) {
+            RecIcon.innerHTML= `<i class=""material-icons main">${RECORDBUTTON}</i>`;
+            RecIcon.onclick = () => {
+               rec_onclick(this.activity);
+            }    
             displayStatsIcon.onclick = () => {
                 analytics_onclick(this.activity);
             };
