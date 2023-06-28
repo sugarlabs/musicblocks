@@ -695,6 +695,12 @@ class Toolbar {
         const delPluginIcon = docById("delPluginIcon");
         const enableHorizScrollIcon = docById("enableHorizScrollIcon");
         const disableHorizScrollIcon = docById("disableHorizScrollIcon");
+        const browser = fnBrowserDetect();
+        const btn = document.getElementById('record');
+        const hideIn = ['firefox', 'safari'];
+        if (hideIn.includes(browser)){
+        btn.classList.add("hide");
+        } 
 
         if (!this.activity.beginnerMode) {
             RecIcon.innerHTML= `<i class=""material-icons main">${RECORDBUTTON}</i>`;

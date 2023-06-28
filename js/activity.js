@@ -918,32 +918,7 @@ class Activity {
             stop  = document.getElementById('stop'),
             recInside = document.getElementById("rec_inside"),
             mediaRecorder;
-            function fnBrowserDetect(){                 
-                let userAgent = navigator.userAgent;
-                let browserName;
-                
-                if(userAgent.match(/chrome|chromium|crios/i)){
-                    browserName = "chrome";
-                }else if(userAgent.match(/firefox|fxios/i)){
-                    browserName = "firefox";
-                }  else if(userAgent.match(/safari/i)){
-                    browserName = "safari";
-                }else if(userAgent.match(/opr\//i)){
-                    browserName = "opera";
-                } else if(userAgent.match(/edg/i)){
-                    browserName = "edge";
-                }else{
-                    browserName="No browser detection";
-                }
-                return browserName;       
-            }
-            const browser = fnBrowserDetect();
-            const btn = document.getElementById('start');
-            const hideIn = ['firefox', 'safari'];
-            if (hideIn.includes(browser)){
-            btn.classList.add("hide");
-           } 
-           var clickEvent = new Event('click');
+            var clickEvent = new Event('click');
             let flag = 0;
             if(flag == 0 && isExecuting){
             recording()
