@@ -811,7 +811,7 @@ table {
 }
 
 #right-arrow {
-    left: 445px;
+    left: 385px;
     background: url('../header-icons/right-arrow.png');
 }
 
@@ -822,8 +822,8 @@ table {
 
 #right-arrow, #left-arrow {
     position: absolute;
-    top: 195px;
     background-size: 40px;
+    top: 195px;
     height: 40px;
     width: 40px;
 }
@@ -898,7 +898,7 @@ table {
     border: 0 !important;
     overflow-x: hidden;
     overflow-y: auto;
-    width: 365px;
+    width: 350px;
     background: #e8e8e8 !important;
     padding: 1rem 1rem 0 0  ; 
     display: flex ; 

@@ -20,7 +20,7 @@
    RHYTHMPALETTEICON, RUNBUTTON, SAVEBUTTON, SCROLLUNLOCKBUTTON,
    SHORTCUTSBUTTON, SLOWBUTTON, SMALLERBUTTON, STATSBUTTON,
    STEPBUTTON, STOPTURTLEBUTTON, WRAPTURTLEBUTTON, _THIS_IS_TURTLE_BLOCKS_,
-   _THIS_IS_MUSIC_BLOCKS_, MOUSEPALETTEICON, FULLSCREENBUTTON
+   _THIS_IS_MUSIC_BLOCKS_, MOUSEPALETTEICON, FULLSCREENBUTTON, RECORDBUTTON
 */
 
 /* exported
@@ -495,6 +495,12 @@ const createHelpContent = (activity) => {
             ]
         ];
     }
+    HELPCONTENT.push([
+        _("Record"),
+	_("Record your project as video."),
+        "data:image/svg+xml;base64," +
+            window.btoa(unescape(encodeURIComponent(RECORDBUTTON)))
+    ]);
     HELPCONTENT.push([
         _("Full screen"),
 	_("Toggle full screen mode."),
