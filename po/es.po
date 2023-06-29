@@ -7587,17 +7587,14 @@ msgstr "y del acelerómetro"
 msgid "motion z"
 msgstr "z del acelerómetro"
 
-#~msgid "Warning: Sound is coming out from only the left or right side."
-#~msgstr "Advertencia: el sonido sale solo del lado izquierdo o derecho."
+msgid "Warning: Sound is only coming out from one side."
+msgstr "Advertencia: el sonido solo sale por un lado."
 
 msgid "Record"
 msgstr "Grabar"
 
 msgid "Record your project as video."
 msgstr "Grabe su proyecto como video."
-
-msgid "Full Screen"
-msgstr "Pantalla completa"
 
 #: js/PitchBlocks.js:1540
 
