@@ -7597,11 +7597,8 @@ msgstr "z座標の動き"
 #~msgid "Warning: Sound is coming out from only the left or right side."
 #~msgstr "ワーニング：おとはみぎかひだりだけのスピーカーからでている"
 
-#~msgid "Record"
-#~msgstr "ろくおん"
-
-#~msgid "Fullscreen"
-#~msgstr "フルスクリーン"
+msgid "Record"
+msgstr "ろくおん"
 
 #: js/PitchBlocks.js:1540
 

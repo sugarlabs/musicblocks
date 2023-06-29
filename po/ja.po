@@ -680,13 +680,6 @@ msgstr "実行"
 msgid "Stop"
 msgstr "停止"
 
-#: js/toolbar.js:48
-#: js/toolbar.js:105
-#: js/toolbar.js:143
-#: js/toolbar.js:195
-msgid "Full Screen"
-msgstr ""
-
 #: js/toolbar.js:49
 #: js/toolbar.js:106
 #: js/toolbar.js:144
@@ -7597,11 +7590,8 @@ msgstr "z座標の動き"
 #~msgid "Warning: Sound is coming out from only the left or right side."
 #~msgstr "ワーニング：音は右か左だけのスピーカーから出ている"
 
-#~msgid "Record"
-#~msgstr "録音"
-
-#~msgid "Fullscreen"
-#~msgstr "フルスクリーン"
+msgid "Record"
+msgstr "録音"
 
 #: js/PitchBlocks.js:1540
 

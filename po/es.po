@@ -677,13 +677,6 @@ msgstr "Tocar"
 msgid "Stop"
 msgstr "Detener"
 
-#: js/toolbar.js:48
-#: js/toolbar.js:105
-#: js/toolbar.js:143
-#: js/toolbar.js:195
-msgid "Full Screen"
-msgstr ""
-
 #: js/toolbar.js:49
 #: js/toolbar.js:106
 #: js/toolbar.js:144
@@ -1391,7 +1384,10 @@ msgstr "Vamos a empezar nuestro recorrido!"
 msgid "Stop the music (and the mice)."
 msgstr "Detener la música (y los ratones)"
 
-#: js/turtledefs.js:499
+#: js/toolbar.js:48
+#: js/toolbar.js:105
+#: js/toolbar.js:143
+#: js/toolbar.js:195
 msgid "Full screen"
 msgstr "Pantalla completa"
 
@@ -7594,11 +7590,14 @@ msgstr "z del acelerómetro"
 #~msgid "Warning: Sound is coming out from only the left or right side."
 #~msgstr "Advertencia: el sonido sale solo del lado izquierdo o derecho."
 
-#~msgid "Record"
-#~msgstr "Grabar"
+msgid "Record"
+msgstr "Grabar"
 
-#~msgid "Fullscreen"
-#~msgstr "Pantalla completa"
+msgid "Record your project as video."
+msgstr "Grabe su proyecto como video."
+
+msgid "Full Screen"
+msgstr "Pantalla completa"
 
 #: js/PitchBlocks.js:1540
 
