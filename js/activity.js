@@ -293,7 +293,7 @@ class Activity {
             // eslint-disable-next-line no-console
             console.error(e);
         }
-    
+
         /**
          * Initialises major variables and renders default stack.
          */
@@ -901,91 +901,97 @@ class Activity {
                 }
             }
         };
-    
+
         let isExecuting = false; // Flag variable to track execution status
 
         const doRecordButton = (activity) => {
             if (isExecuting) {
                 return; // Exit the function if execution is already in progress
             }
-            
+
             isExecuting = true; // Set the flag to indicate execution has started
             activity._doRecordButton();
         };
 
-        this._doRecordButton = () =>{         
-            let start = document.getElementById('record'),
-            stop  = document.getElementById('stop'),
-            recInside = document.getElementById("rec_inside"),
-            mediaRecorder;
-            var clickEvent = new Event('click');
+        this._doRecordButton = () => {
+            const start = document.getElementById("record"),
+                stop = document.getElementById("stop"),
+                recInside = document.getElementById("rec_inside");
+            let mediaRecorder;
+            var clickEvent = new Event("click");
             let flag = 0;
-            if(flag == 0 && isExecuting){
-            recording()
-            start.dispatchEvent(clickEvent);};
 
-            function recording(){
-                start.addEventListener('click', async function handler(){       
-                let stream = await recordScreen();
-                let mimeType = 'video/webm';
-                mediaRecorder = createRecorder(stream, mimeType);
-                if(flag == 1){
-                this.removeEventListener('click',handler);}
-                let node = document.createElement("p");
-                node.textContent = "Started recording";
-                document.body.appendChild(node);
-                start.style = null;       
-                recInside.setAttribute("fill", "red");         
-            })}
+            async function recordScreen() {
+                flag = 1;
+                return await navigator.mediaDevices.getDisplayMedia(
+                    {
+                        preferCurrentTab: "True",
+                        systemAudio: "include",
+                        audio: "True",
+                        video: {mediaSource: "tab"},
+                        bandwidthProfile: {
+                            video: {
+                                clientTrackSwitchOffControl: "auto",
+                                contentPreferencesMode: "auto"
+                            }
+                        },
+                        preferredVideoCodecs: "auto"
+                    }
+                );
+            }
 
-            function stopRec(){
+            function saveFile(recordedChunks) {
+                flag = 1;
+                recInside.classList.remove("blink");
+                const blob = new Blob(
+                    recordedChunks,
+                    {
+                        type: "video/webm"
+                    }
+                );
+
+                const filename = window.prompt("Enter file name"),
+                    downloadLink = document.createElement("a");
+                downloadLink.href = URL.createObjectURL(blob);
+                downloadLink.download = `${filename}.webm`;
+
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                URL.revokeObjectURL(blob);
+                document.body.removeChild(downloadLink);
+                flag = 0;
+                // eslint-disable-next-line no-use-before-define
+                recording();
+                doRecordButton();
+            }
+
+            function stopRec() {
                 flag = 0;
                 mediaRecorder.stop();
-                let node = document.createElement("p");
+                const node = document.createElement("p");
                 node.textContent = "Stopped recording";
                 document.body.appendChild(node);
             }
 
-            stop.addEventListener('click', function()
-            {   flag = 0;
-                recInside.classList.remove('blink');
-                mediaRecorder.stop();
-                let node = document.createElement("p");
-                node.textContent = "Stopped recording";
-                document.body.appendChild(node);  
-            })
-
-            async function recordScreen(){
-                flag = 1;
-                return await navigator.mediaDevices.getDisplayMedia({
-                preferCurrentTab:'True',
-                systemAudio: "include",
-                audio: 'True',
-                video: { mediaSource: "tab"},
-                
-                    bandwidthProfile: {
-                        video: {
-                        clientTrackSwitchOffControl: 'auto',
-                        contentPreferencesMode: 'auto'
-                        }
-                    },
-                    preferredVideoCodecs: 'auto'
-                });                              
-            }        
-
+            // eslint-disable-next-line no-unused-vars
             function createRecorder (stream, mimeType) {
                 flag = 1;
-                recInside.classList.add('blink');   
-                start.removeEventListener('click',createRecorder,true);            
-                let recordedChunks = []; 
+                recInside.classList.add("blink");
+                start.removeEventListener(
+                    "click",
+                    createRecorder,
+                    true
+                );
+                let recordedChunks = [];
                 const mediaRecorder = new MediaRecorder(stream);
                 stream.oninactive = function () {
+                    // eslint-disable-next-line no-console
                     console.log("Recording is ready to save");
                     stopRec();
                     flag=0;
                 };
 
-                mediaRecorder.onstop = function(){
+                mediaRecorder.onstop = function() {
                     saveFile(recordedChunks);
                     recordedChunks = [];
                     flag=0;
@@ -994,35 +1000,51 @@ class Activity {
 
                 mediaRecorder.ondataavailable = function (e) {
                     if (e.data.size > 0) {
-                    recordedChunks.push(e.data);
-                    }   
+                        recordedChunks.push(e.data);
+                    }
                 };
-                                      
+
                 mediaRecorder.start(200);
                 return mediaRecorder;
             }
-            
-            function saveFile(recordedChunks){
-                flag = 1;
-                recInside.classList.remove('blink');
-                const blob = new Blob(recordedChunks, {
-                    type: 'video/webm'
-                });
 
-                let filename = window.prompt('Enter file name'),
-                downloadLink = document.createElement('a');
-                downloadLink.href = URL.createObjectURL(blob);
-                downloadLink.download = `${filename}.webm`;
+            function recording() {
+                start.addEventListener(
+                    "click",
+                    async function handler() {
+                        const stream = await recordScreen();
+                        const mimeType = "video/webm";
+                        mediaRecorder = createRecorder(stream, mimeType);
+                        if (flag == 1) {
+                            this.removeEventListener("click",handler);
+                        }
+                        const node = document.createElement("p");
+                        node.textContent = "Started recording";
+                        document.body.appendChild(node);
+                        start.style = null;
+                        recInside.setAttribute("fill", "red");
+                    }
+                );
+            }
 
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                URL.revokeObjectURL(blob); 
-                document.body.removeChild(downloadLink);   
-                flag = 0;         
+            if (flag == 0 && isExecuting) {
                 recording();
-                doRecordButton();
-            } 
-        }
+                start.dispatchEvent(clickEvent);
+            };
+
+            stop.addEventListener(
+                "click",
+                function() {
+                    flag = 0;
+                    recInside.classList.remove("blink");
+                    mediaRecorder.stop();
+                    const node = document.createElement("p");
+                    node.textContent = "Stopped recording";
+                    document.body.appendChild(node);
+                }
+            );
+
+        };
 
         /*
          * Runs Music Blocks at a slower rate
@@ -1184,7 +1206,9 @@ class Activity {
 
             const changeText = () => {
                 const randomLoadMessage =
-                    messages.load_messages[Math.floor(Math.random() * messages.load_messages.length)];
+                      messages.load_messages[
+                          Math.floor(Math.random() * messages.load_messages.length)
+                      ];
                 document.getElementById("messageText").innerHTML = randomLoadMessage + "...";
                 counter++;
                 if (counter >= messages.load_messages.length) {
@@ -1549,8 +1573,8 @@ class Activity {
                     // if we are moving the block container, deselect the active block.
                     that.blocks.activeBlock = null;
 
-                    const delta =
-                        Math.abs(event.stageX - lastCoords.x) + Math.abs(event.stageY - lastCoords.y);
+                    // eslint-disable-next-line max-len
+                    const delta = Math.abs(event.stageX - lastCoords.x) + Math.abs(event.stageY - lastCoords.y);
 
                     if (that.scrollBlockContainer) {
                         that.blocksContainer.x += event.stageX - lastCoords.x;
@@ -2344,7 +2368,9 @@ class Activity {
                                     this.blocks.blockMoved(this.blocks.activeBlock);
                                     this.blocks.adjustDocks(this.blocks.activeBlock, true);
                                 } else if (this.palettes.activePalette !== null) {
-                                    this.palettes.activePalette.scrollEvent(-STANDARDBLOCKHEIGHT, 1);
+                                    this.palettes.activePalette.scrollEvent(
+                                        -STANDARDBLOCKHEIGHT, 1
+                                    );
                                 } else {
                                     this.blocksContainer.y -= 20;
                                 }
@@ -2575,46 +2601,48 @@ class Activity {
             this._setupPaletteMenu();
 
             // Reposition coordinate grids.
-            this.cartesianBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-            this.cartesianBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
-            this.polarBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-            this.polarBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
-            this.trebleBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-            this.trebleBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
-            this.grandBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-            this.grandBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
-            this.sopranoBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-            this.sopranoBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
-            this.altoBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-            this.altoBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
-            this.tenorBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-            this.tenorBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
-            this.bassBitmap.x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-            this.bassBitmap.y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+            const newX = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+            const newY = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+            this.cartesianBitmap.x = newX;
+            this.cartesianBitmap.y = newY;
+            this.polarBitmap.x = newX;
+            this.polarBitmap.y = newY;
+            this.trebleBitmap.x = newX;
+            this.trebleBitmap.y = newY;
+            this.grandBitmap.x = newX;
+            this.grandBitmap.y = newY;
+            this.sopranoBitmap.x = newX;
+            this.sopranoBitmap.y = newY;
+            this.altoBitmap.x = newX;
+            this.altoBitmap.y = newY;
+            this.tenorBitmap.x = newX;
+            this.tenorBitmap.y = newY;
+            this.bassBitmap.x = newX;
+            this.bassBitmap.y = newY;
             // The accidental overlays
             for (let i = 0; i < 7; i++) {
-                this.grandSharpBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-                this.grandFlatBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-                this.trebleSharpBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-                this.trebleFlatBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-                this.sopranoSharpBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-                this.sopranoFlatBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-                this.altoSharpBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-                this.altoFlatBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-                this.tenorSharpBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-                this.tenorFlatBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-                this.bassSharpBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-                this.bassFlatBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+                this.grandSharpBitmap[i].x = newX;
+                this.grandFlatBitmap[i].x = newX;
+                this.trebleSharpBitmap[i].x = newX;
+                this.trebleFlatBitmap[i].x = newX;
+                this.sopranoSharpBitmap[i].x = newX;
+                this.sopranoFlatBitmap[i].x = newX;
+                this.altoSharpBitmap[i].x = newX;
+                this.altoFlatBitmap[i].x = newX;
+                this.tenorSharpBitmap[i].x = newX;
+                this.tenorFlatBitmap[i].x = newX;
+                this.bassSharpBitmap[i].x = newX;
+                this.bassFlatBitmap[i].x = newX;
             }
             // Position the sharps and flats
-            this.grandSharpBitmap[0].y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+            this.grandSharpBitmap[0].y = newY;
             this.grandSharpBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 412.5;
             this.grandSharpBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 462.5;
             this.grandSharpBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 425;
             this.grandSharpBitmap[4].y = this.canvas.height / (2 * this.turtleBlocksScale) - 387.5;
             this.grandSharpBitmap[5].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5;
             this.grandSharpBitmap[6].y = this.canvas.height / (2 * this.turtleBlocksScale) - 400;
-            this.grandFlatBitmap[0].y = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+            this.grandFlatBitmap[0].y = newY;
             this.grandFlatBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 487.5;
             this.grandFlatBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5;
             this.grandFlatBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 475;
@@ -2696,13 +2724,13 @@ class Activity {
         };
 
         const that = this;
-        const screenWidth = window.innerWidth
+        const screenWidth = window.innerWidth;
         const  resizeCanvas_ = () => {
             if (screenWidth !== window.innerWidth) {
                 that._onResize(false);
             }
-        }
-        window.onresize = resizeCanvas_
+        };
+        window.onresize = resizeCanvas_;
 
         /*
          * Restore last stack pushed to trashStack back onto canvas.
@@ -3562,47 +3590,48 @@ class Activity {
          * Hides accidentals
          */
         this._hideAccidentals = () => {
+            const newX = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
             for (let i = 0; i < 7; i++) {
                 this.grandSharpBitmap[i].visible = false;
-                this.grandSharpBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+                this.grandSharpBitmap[i].x = newX;
                 this.grandSharpBitmap[i].updateCache();
                 this.grandFlatBitmap[i].visible = false;
-                this.grandFlatBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+                this.grandFlatBitmap[i].x = newX;
                 this.grandFlatBitmap[i].updateCache();
 
                 this.trebleSharpBitmap[i].visible = false;
-                this.trebleSharpBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+                this.trebleSharpBitmap[i].x = newX;
                 this.trebleSharpBitmap[i].updateCache();
                 this.trebleFlatBitmap[i].visible = false;
-                this.trebleFlatBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+                this.trebleFlatBitmap[i].x = newX;
                 this.trebleFlatBitmap[i].updateCache();
 
                 this.sopranoSharpBitmap[i].visible = false;
-                this.sopranoSharpBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+                this.sopranoSharpBitmap[i].x = newX;
                 this.sopranoSharpBitmap[i].updateCache();
                 this.sopranoFlatBitmap[i].visible = false;
-                this.sopranoFlatBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+                this.sopranoFlatBitmap[i].x = newX;
                 this.sopranoFlatBitmap[i].updateCache();
 
                 this.altoSharpBitmap[i].visible = false;
-                this.altoSharpBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+                this.altoSharpBitmap[i].x = newX;
                 this.altoSharpBitmap[i].updateCache();
                 this.altoFlatBitmap[i].visible = false;
-                this.altoFlatBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+                this.altoFlatBitmap[i].x = newX;
                 this.altoFlatBitmap[i].updateCache();
 
                 this.tenorSharpBitmap[i].visible = false;
-                this.tenorSharpBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+                this.tenorSharpBitmap[i].x = newX;
                 this.tenorSharpBitmap[i].updateCache();
                 this.tenorFlatBitmap[i].visible = false;
-                this.tenorFlatBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+                this.tenorFlatBitmap[i].x = newX;
                 this.tenorFlatBitmap[i].updateCache();
 
                 this.bassSharpBitmap[i].visible = false;
-                this.bassSharpBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+                this.bassSharpBitmap[i].x = newX;
                 this.bassSharpBitmap[i].updateCache();
                 this.bassFlatBitmap[i].visible = false;
-                this.bassFlatBitmap[i].x = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
+                this.bassFlatBitmap[i].x = newX;
                 this.bassFlatBitmap[i].updateCache();
             }
             this.update = true;
@@ -3953,6 +3982,7 @@ class Activity {
                                 // temperament.
                                 let customName = "custom";
                                 if (myBlock.connections[1] !== null) {
+                                    // eslint-disable-next-line max-len
                                     customName = this.blocks.blockList[myBlock.connections[1]].value;
                                 }
                                 // eslint-disable-next-line no-console
@@ -4133,7 +4163,9 @@ class Activity {
                 btnSize,
                 0
             );
-            this._loadButtonDragHandler(this.collapseBlocksContainer, toggleCollapsibleStacks, this);
+            this._loadButtonDragHandler(
+                this.collapseBlocksContainer, toggleCollapsibleStacks, this
+            );
 
             x += dx;
 
@@ -4506,7 +4538,9 @@ class Activity {
             this.toolbar.renderModeSelectIcon(doSwitchMode);
             this.toolbar.renderRunSlowlyIcon(doSlowButton);
             this.toolbar.renderRunStepIcon(doStepButton);
-            this.toolbar.renderAdvancedIcons(doRecordButton, doAnalytics, doOpenPlugin, deletePlugin, setScroller);
+            this.toolbar.renderAdvancedIcons(
+                doRecordButton, doAnalytics, doOpenPlugin, deletePlugin, setScroller
+            );
             this.toolbar.renderMergeIcon(_doMergeLoad);
             this.toolbar.renderRestoreIcon(restoreTrash);
             if (_THIS_IS_MUSIC_BLOCKS_) {
