@@ -7,11 +7,10 @@
             concepts.
         </title>
 
-	<meta name="description" content="Learn to code through music with Music Blocks. Arrange colorful blocks to create everything from simple melodies to interactive games.">
+	    <meta name="description" content="Learn to code through music with Music Blocks. Arrange colorful blocks to create everything from simple melodies to interactive games.">
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height"/>
 	
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-            
         <!-- <link href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap" rel="stylesheet"> --> 
         
         <link rel="stylesheet" href="css/activities.css" />
@@ -502,11 +501,16 @@
                                     ><i class="material-icons main">stop</i></a
                                 >
                             </li>
-
+                            <li>                                
+                                <a id="record" class="left tooltipped" data-tooltip="Record">
+                                </a>   
+                            </li>
                         </ul>
+
                         <ul class="main right">
                             <li>
                                 <a 
+
                                     id="FullScreen"
                                     class="FullScreen tooltipped dropdown-trigger" 
                                     data-position="bottom" 
@@ -828,9 +832,35 @@
                     <li><a id="new-project"></a></li>
                 </ul>
  
-            <script>             
-            var count=0;    
-            function setIcon() {
+           <script>  
+                var elem = document.documentElement;
+                function openFullscreen() {
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                    // For safari browser
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                    // For IE(supported above 10)
+                } else if (elem.msRequestFullscreen) { 
+                    elem.msRequestFullscreen();
+                }else if (elem.mozRequestFullscreen) { 
+                    elem.mozRequestFullscreen();
+                }
+                }
+
+                function closeFullscreen() {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) { /* Safari */
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) { /* IE11 */
+                    document.msExitFullscreen();
+                }else if (document.mozExitFullscreen) { /* IE11 */
+                    document.mozExitFullscreen();
+                }
+                }               
+                var count=0;    
+                function setIcon() {
                 var property = document.getElementById(FullScreen);
                 var iconCode = document.querySelector('#FullScrIcon');
                 //Calling full Screen
@@ -839,7 +869,7 @@
                     iconCode.textContent='\ue5d1';
                     count = 1;        
                 }
-                //Closing full Scree
+                //Closing full Screen
                 else {
                     closeFullscreen();
                     iconCode.textContent='\ue5d0';
@@ -847,35 +877,8 @@
                 }
             }
           </script>
-            <!-- Function to open and closing the screen -->
-            <script language="jscript">
-                var elem = document.documentElement;
-                    function openFullscreen() {
-                    if (elem.requestFullscreen) {
-                        elem.requestFullscreen();
-                        // For safari browser
-                    } else if (elem.webkitRequestFullscreen) {
-                        elem.webkitRequestFullscreen();
-                        // For IE(supported above 10)
-                    } else if (elem.msRequestFullscreen) { 
-                        elem.msRequestFullscreen();
-                    }
-                    }
-
-                    function closeFullscreen() {
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen();
-                    } else if (document.webkitExitFullscreen) { /* Safari */
-                        document.webkitExitFullscreen();
-                    } else if (document.msExitFullscreen) { /* IE11 */
-                        document.msExitFullscreen();
-                    }
-                    }
-            </script> 
         </div>
         </div>
-        <!-- hideContents -->
-
         <div id="searchBar" tabindex="-1">
             <input
                 type="text"

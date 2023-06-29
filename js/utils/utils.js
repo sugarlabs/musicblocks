@@ -38,7 +38,8 @@
    importMembers, isSVGEmpty, last, mixedNumber, nearestBeat,
    oneHundredToFraction, prepareMacroExports, preparePluginExports,
    processMacroData, processRawPluginData, rationalSum, rgbToHex,
-   safeSVG, toFixed2, toTitleCase, windowHeight, windowWidth
+   safeSVG, toFixed2, toTitleCase, windowHeight, windowWidth,
+   fnBrowserDetect
 */
 
 const changeImage = (imgElement, from, to) => {
@@ -120,7 +121,27 @@ let format = (str, data) => {
     return str.replace(/{_([a-zA-Z0-9]+)}/g, (match, item) => {
         return _(item);
     });
-}
+};
+
+function fnBrowserDetect() {
+    const userAgent = navigator.userAgent;
+    let browserName;
+
+    if (userAgent.match(/chrome|chromium|crios/i)) {
+        browserName = "chrome";
+    } else if(userAgent.match(/firefox|fxios/i)) {
+        browserName = "firefox";
+    } else if(userAgent.match(/safari/i)) {
+        browserName = "safari";
+    } else if(userAgent.match(/opr\//i)) {
+        browserName = "opera";
+    } else if(userAgent.match(/edg/i)) {
+        browserName = "edge";
+    } else {
+        browserName="No browser detection";
+    }
+    return browserName;
+};
 
 function canvasPixelRatio() {
     const devicePixelRatio = window.devicePixelRatio || 1;
@@ -170,7 +191,7 @@ let httpGet = (projectName) => {
     }
 
     return xmlHttp.responseText;
-}
+};
 
 let httpPost = (projectName, data) => {
     let xmlHttp = null;
@@ -180,7 +201,7 @@ let httpPost = (projectName, data) => {
     xmlHttp.send(data);
     return xmlHttp.responseText;
     // return 'https://apps.facebook.com/turtleblocks/?file=' + projectName;
-}
+};
 
 function HttpRequest(url, loadCallback, userCallback) {
     // userCallback is an optional callback-handler.
@@ -328,7 +349,7 @@ let last = (myList) => {
     } else {
         return myList[i - 1];
     }
-}
+};
 
 let getTextWidth = (text, font) => {
     // re-use canvas object for better performance
@@ -337,7 +358,7 @@ let getTextWidth = (text, font) => {
     context.font = font;
     const metrics = context.measureText(text);
     return metrics.width;
-}
+};
 
 function doSVG(canvas, logo, turtles, width, height, scale) {
     // Aggregate SVG output from each turtle. If there is none, return an empty string.
@@ -376,7 +397,7 @@ let isSVGEmpty = (turtles) => {
         }
     }
     return true;
-}
+};
 
 let fileExt = (file) => {
     if (file === null) {
@@ -389,7 +410,7 @@ let fileExt = (file) => {
     }
 
     return parts.pop();
-}
+};
 
 let fileBasename = (file) => {
     const parts = file.split(".");
@@ -401,16 +422,16 @@ let fileBasename = (file) => {
         parts.pop(); // throw away suffix
         return parts.join(".");
     }
-}
+};
 
 let toTitleCase = (str) => {
     if (typeof str !== "string") return;
     let tempStr = "";
     if (str.length > 1) tempStr = str.substring(1);
     return str.toUpperCase()[0] + tempStr;
-}
+};
 
-let processPluginData = (activity, pluginData) => {
+const processPluginData = (activity, pluginData) => {
     // Plugins are JSON-encoded dictionaries.
     if (pluginData === undefined) {
         return null;
@@ -625,9 +646,9 @@ let processPluginData = (activity, pluginData) => {
 
     // Return the object in case we need to save it to local storage.
     return obj;
-}
+};
 
-let processRawPluginData = (activity, rawData) => {
+const processRawPluginData = (activity, rawData) => {
     const lineData = rawData.split("\n");
     let cleanData = "";
 
@@ -660,9 +681,9 @@ let processRawPluginData = (activity, rawData) => {
     }
 
     return obj;
-}
+};
 
-let updatePluginObj = (activity, obj) => {
+const updatePluginObj = (activity, obj) => {
     if (obj === null) {
         return;
     }
@@ -723,14 +744,14 @@ let updatePluginObj = (activity, obj) => {
     for (const name in obj["ONSTOP"]) {
         activity.pluginObjs["ONSTOP"][name] = obj["ONSTOP"][name];
     }
-}
+};
 
 let preparePluginExports = (activity, obj) => {
     // add obj to plugin dictionary and return as JSON encoded text
     updatePluginObj(activity, obj);
 
     return JSON.stringify(activity.pluginObjs);
-}
+};
 
 let processMacroData = (macroData, palettes, blocks, macroDict) => {
     // Macros are stored in a JSON-encoded dictionary.
@@ -753,7 +774,7 @@ let processMacroData = (macroData, palettes, blocks, macroDict) => {
             console.debug(e);
         }
     }
-}
+};
 
 let prepareMacroExports = (name, stack, macroDict) => {
     if (name !== null) {
@@ -761,7 +782,7 @@ let prepareMacroExports = (name, stack, macroDict) => {
     }
 
     return JSON.stringify(macroDict);
-}
+};
 
 // Some block-specific code
 // TODO: Move to camera plugin
@@ -841,7 +862,7 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
         },
         false
     );
-}
+};
 
 function doStopVideoCam(cameraID, setCameraID) {
     if (cameraID !== null) {
@@ -992,11 +1013,11 @@ let mixedNumber = (d) => {
     } else {
         return d;
     }
-}
+};
 
-let LCD = (a, b) => {
+const LCD = (a, b) => {
     return Math.abs((a * b) / GCD(a, b));
-}
+};
 
 let rationalSum = (a, b) => {
     if (a === 0 || b === 0) {
@@ -1039,7 +1060,7 @@ let rationalSum = (a, b) => {
     const lcd = LCD(a[1], b[1]);
     // const c0 = (a[0] * lcd) / a[1] + (b[0] * lcd) / b[1];
     return [(a[0] * lcd) / a[1] + (b[0] * lcd) / b[1], lcd];
-}
+};
 
 let nearestBeat = (d, b) => {
     // Find the closest beat for a given fraction.
@@ -1053,7 +1074,7 @@ let nearestBeat = (d, b) => {
     }
 
     return [count, b];
-}
+};
 
 let oneHundredToFraction = (d) => {
     // Generate some simple fractions based on a scale of 1-100
@@ -1197,11 +1218,11 @@ let oneHundredToFraction = (d) => {
         default:
             return [d, 100];
     }
-}
+};
 
 let rgbToHex = (r, g, b) => {
     return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-}
+};
 
 let hexToRGB = (hex) => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -1212,7 +1233,7 @@ let hexToRGB = (hex) => {
             b: parseInt(result[3], 16)
         }
         : null;
-}
+};
 
 /**
  * Converts hexcode to rgb.
@@ -1227,7 +1248,7 @@ let hex2rgb = (hex) => {
     const b = bigint & 255;
 
     return "rgba(" + r + "," + g + "," + b + ",1)";
-}
+};
 
 let delayExecution = (duration) => {
     return new Promise((resolve) => {
@@ -1235,11 +1256,11 @@ let delayExecution = (duration) => {
             resolve(true);
         }, duration);
     });
-}
+};
 
 function closeWidgets() {
     window.widgetWindows.hideAllWindows();
-}
+};
 
 let closeBlkWidgets = (name) => {
     const widgetTitle = document.getElementsByClassName("wftTitle");
@@ -1249,7 +1270,7 @@ let closeBlkWidgets = (name) => {
             break;
         }
     }
-}
+};
 
 /**
  * Adds methods and variables of model and view objects to controller
@@ -1321,4 +1342,4 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
 
     // Add members of View (class type has to be controller's name + "View")
     addMembers(obj, eval(cname + "." + cname + "View"), viewArgs);
-}
+};
