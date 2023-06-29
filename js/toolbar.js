@@ -10,14 +10,15 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /*
-   global _, jQuery, _THIS_IS_MUSIC_BLOCKS_, docById, doSVG
+  global _, jQuery, _THIS_IS_MUSIC_BLOCKS_, docById, doSVG, fnBrowserDetect,
+  RECORDBUTTON
  */
 
 /* exported Toolbar */
 
 let WRAP = true;
 const $j = jQuery.noConflict();
-let play_button_debounce_timeout = null; 
+let play_button_debounce_timeout = null;
 class Toolbar {
     /**
      * @constructor
@@ -142,7 +143,7 @@ class Toolbar {
                 ["mb-logo", _("About Turtle Blocks")],
                 ["play", _("Play")],
                 ["stop", _("Stop")],
-                ["record",_("Record")]
+                ["record", _("Record")],
                 ["FullScreen", _("Full Screen")],
                 ["newFile", _("New project")],
                 ["load", _("Load project from file")],
@@ -311,33 +312,35 @@ class Toolbar {
     renderPlayIcon(onclick) {
         const playIcon = docById("play");
         const stopIcon = docById("stop");
-        
+
         let isPlayIconRunning = false;
-        function handleClick(){
+
+        function handleClick() {
             if (!isPlayIconRunning) {
                 playIcon.onclick = null;
+                // eslint-disable-next-line no-console
                 console.log("Wait for next 2 seconds to play the music");
-                
             } else {
+                // eslint-disable-next-line no-use-before-define
                 playIcon.onclick = tempClick;
                 isPlayIconRunning = false;
             }
-        }    
+        }
 
-        var tempClick = playIcon.onclick=()=>{
+        var tempClick = playIcon.onclick = () => {
             isPlayIconRunning = false;
             onclick(this.activity);
             handleClick();
             stopIcon.style.color = this.stopIconColorWhenPlaying;
-            isPlayIconRunning = true; 
+            isPlayIconRunning = true;
             play_button_debounce_timeout = setTimeout(function() { handleClick(); }, 2000);
-            
+
             stopIcon.addEventListener("click", function(){
                 clearTimeout(play_button_debounce_timeout);
-                isPlayIconRunning = true; 
+                isPlayIconRunning = true;
                 handleClick();
-            })
-        } 
+            });
+        };
     }
 
     /**
@@ -358,7 +361,6 @@ class Toolbar {
      * @param {Function} onclick
      * @returns {void}
      */
-    
     renderNewProjectIcon(onclick) {
         const newProjectIcon = docById("new-project");
 
@@ -696,17 +698,18 @@ class Toolbar {
         const enableHorizScrollIcon = docById("enableHorizScrollIcon");
         const disableHorizScrollIcon = docById("disableHorizScrollIcon");
         const browser = fnBrowserDetect();
-        const btn = document.getElementById('record');
-        const hideIn = ['firefox', 'safari'];
-        if (hideIn.includes(browser)){
-        btn.classList.add("hide");
-        } 
+        const btn = document.getElementById("record");
+        const hideIn = ["firefox", "safari"];
+        if (hideIn.includes(browser)) {
+            btn.classList.add("hide");
+        }
 
         if (!this.activity.beginnerMode) {
             RecIcon.innerHTML= `<i class=""material-icons main">${RECORDBUTTON}</i>`;
             RecIcon.onclick = () => {
-               rec_onclick(this.activity);
-            }    
+                rec_onclick(this.activity);
+            };
+
             displayStatsIcon.onclick = () => {
                 analytics_onclick(this.activity);
             };
