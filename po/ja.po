@@ -12,6 +12,15 @@
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.0.1\n"
 
+msgid "Record your project as video."
+msgstr "再生されているビデオを録音する"
+
+msgid "Toggle full screen mode."
+msgstr "全画面を設定"
+
+msgid "Warning: Sound is only coming out from one side."
+msgstr "音は右か左の一つだけのスピーカから今なっています。"
+
 #: js/planetInterface.js:104
 msgid "project undefined"
 msgstr ""
