@@ -47,7 +47,8 @@ class Toolbar {
                 ["play", _("Play")],
                 ["stop", _("Stop")],
                 ["record",_("Record")],
-                ["FullScreen", _("Full Screen")],
+                ["Full Screen", _("Full screen")],
+                ["FullScreen", _("Full screen")],
                 ["newFile", _("New project")],
                 ["load", _("Load project from file")],
                 ["saveButton", _("Save project")],
@@ -106,6 +107,7 @@ class Toolbar {
                 _("Stop"),
                 _("Record"),
                 _("Full Screen"),
+		_("FullScreen"),
                 _("New project"),
                 _("Load project from file"),
                 _("Save project"),
@@ -144,6 +146,7 @@ class Toolbar {
                 ["play", _("Play")],
                 ["stop", _("Stop")],
                 ["record", _("Record")],
+                ["Full Screen", _("Full Screen")],
                 ["FullScreen", _("Full Screen")],
                 ["newFile", _("New project")],
                 ["load", _("Load project from file")],
@@ -198,6 +201,7 @@ class Toolbar {
                 _("Stop"),
                 _("Record"),
                 _("Full Screen"),
+                _("FullScreen"),
                 _("New project"),
                 _("Load project from file"),
                 _("Save project"),
@@ -262,7 +266,9 @@ class Toolbar {
             if (strings[i].length === 3) {
                 elem.innerHTML = obj[1];
             } else {
-                elem.setAttribute("data-tooltip", trans);
+                if (elem !== null) {
+                    elem.setAttribute("data-tooltip", trans);
+                }
             }
         }
 
