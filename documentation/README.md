@@ -104,27 +104,27 @@ Context menus are an important part of user interfaces that provide users with q
 # The Block context menu:
 This context menu appears when you right-click on a block in the workspace. It provides options such as "Duplicate," "Delete," "Help," and "Copy to Palette." The "Duplicate" option creates a copy of the selected block, while the "Delete" option removes the selected block from the workspace. The "Help" option opens a help dialog for the selected block, and the "Copy to Palette" option adds the selected block to the user's custom block palette.
 
-![Right-click context menu](./block-context.png "Right-click context menu")
+![Right-click context menu](./block_context.png "Right-click context menu")
 
 # Extract
 The "Extract" option in Music Blocks allows you to separate a nested block into its individual components or sub-blocks. This can be useful if you want to modify or reuse specific parts of a block without affecting the rest of the block.
 
-![Extract the selected block](./extract_e.png "Extract the selected block")
+![Extract the selected block](./extract.png "Extract the selected block")
 
 # Duplicate
 This option creates a duplicate of the selected block and places it next to the original block.
 
-![Duplicate](./duplicate_d.png "Duplicate")
+![Duplicate](./duplicate.png "Duplicate")
 
 # Delete
 This option removes the selected block from your program
 
-![Delete](./delete_de.png "Delete")
+![Delete](./delete.png "Delete")
 
 # Help
 This option shows a help screen with information about the selected block. You can use this option to learn more about the block's functionality and how to use it in your projects.
 
-![Help](./help_h.png "Help")
+![Help](./help.png "Help")
 
 By using the right-click context menu in Music Blocks, you can quickly perform common tasks and manipulate blocks on the workspace. This can help you to work more efficiently and effectively in your projects.
 
