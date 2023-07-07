@@ -1506,60 +1506,60 @@ class Activity {
 
                 return { pixelX: pX, pixelY: pY };
             };
-            const __wheelHandler = (event) => {
-                let delY, delX, touchMoveX, touchMoveY ,touchStartX ,touchStartY, scrollStartX, scrollStartY ;
-                function enableTouchScrolling() {
-                    const canvas = document.getElementById("myCanvas");
-                    touchStartX = 0;
+
+            const enableTouchScrolling = () => {
+                const canvas = document.getElementById("myCanvas");
+                let touchStartX = 0,
                     touchStartY = 0;
-                    scrollStartX = 0;
-                    scrollStartY = 0;
-                    canvas.addEventListener("touchstart", (event) => {
+                
+                canvas.addEventListener("touchstart", (event) => {
                     touchStartX = event.touches[0].clientX;
                     touchStartY = event.touches[0].clientY;
-                    scrollStartX = canvas.scrollLeft;
-                    scrollStartY = canvas.scrollTop;
-                    });
+                });
 
-                    canvas.addEventListener("touchmove", (event) => {
+                canvas.addEventListener("touchmove", (event) => {
                     event.preventDefault();
-                    touchMoveX = touchStartX - event.touches[0].clientX;
-                    touchMoveY = touchStartY - event.touches[0].clientY;
-                    canvas.scrollLeft = scrollStartX + touchMoveX;
-                    canvas.scrollTop = scrollStartY + touchMoveY;
-                    });
-                }
+                    closeAnyOpenMenusAndLabels();
+                    let touchMoveX = (touchStartX - event.touches[0].clientX),
+                        touchMoveY = (touchStartY - event.touches[0].clientY);
+                    delY = touchMoveY;
+                    delX = touchMoveX;
+                });
+            };
+
+            const __wheelHandler = (event) => {
+                let delY, 
+                    delX;   
                 // Check if the event is a touch event
-                if (event.type === "touchmove") {
-                    enableTouchScrolling();
-                    delY = scrollStartY + touchMoveY;
-                    delX = scrollStartX + touchMoveX;
-                    console.log("delY for touch ", delY);
+                const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+                if (event.type === "touchmove" || isTouchDevice) {
+                    enableTouchScrolling();   
                 } else {
                     const data = normalizeWheel(event); // normalize over different browsers
                     delY = data.pixelY;
                     delX = data.pixelX;
-                    console.log("delY for scroll", delY);
-                }
-                
+                }     
+
                 if (delY !== 0 && event.axis === event.VERTICAL_AXIS) {
                     closeAnyOpenMenusAndLabels();
                     that.blocksContainer.y -= delY;
-                }
-                
+                } 
+
                 if (that.scrollBlockContainer) {
                     if (delX !== 0 && event.axis === event.HORIZONTAL_AXIS) { //For Horizontal scrolling
-                    closeAnyOpenMenusAndLabels();
-                    that.blocksContainer.x -= delX;
+                        closeAnyOpenMenusAndLabels();
+                        that.blocksContainer.x -= delX;
                     }
                 } else {
                     event.preventDefault();
                 }  
+
                 that.refreshCanvas();
             };        
-            const myCanvas = docById("myCanvas");
+
+            const myCanvas = document.getElementById("myCanvas");
             myCanvas.addEventListener("wheel", __wheelHandler, false);
-            myCanvas.addEventListener("touchmove", __wheelHandler, false);      
+            myCanvas.addEventListener("touchmove", __wheelHandler, false);       
 
             const __stageMouseUpHandler = (event) => {
                 that.stageMouseDown = false;
