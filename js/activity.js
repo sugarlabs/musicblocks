@@ -1510,11 +1510,15 @@ class Activity {
             const enableTouchScrolling = () => {
                 const canvas = document.getElementById("myCanvas");
                 let touchStartX = 0,
-                    touchStartY = 0;
+                    touchStartY = 0,
+                    scrollStartX = 0,
+                    scrollStartY = 0;
                 
                 canvas.addEventListener("touchstart", (event) => {
                     touchStartX = event.touches[0].clientX;
                     touchStartY = event.touches[0].clientY;
+                    scrollStartX = canvas.scrollLeft;
+                    scrollStartY = canvas.scrollTop;
                 });
 
                 canvas.addEventListener("touchmove", (event) => {
@@ -1522,9 +1526,17 @@ class Activity {
                     closeAnyOpenMenusAndLabels();
                     let touchMoveX = (touchStartX - event.touches[0].clientX),
                         touchMoveY = (touchStartY - event.touches[0].clientY);
-                    delY = touchMoveY;
-                    delX = touchMoveX;
+                    canvas.scrollLeft = scrollStartX + touchMoveX;
+                    canvas.scrollTop = scrollStartY + touchMoveY; 
                 });
+
+                canvas.addEventListener("touchend", (event) => {
+                    touchStartX = 0,
+                    touchStartY = 0;
+                    scrollStartX = 0;
+                    scrollStartY = 0;
+                    enableTouchScrolling();
+                })
             };
 
             const __wheelHandler = (event) => {
@@ -1557,9 +1569,14 @@ class Activity {
                 that.refreshCanvas();
             };        
 
+            window.addEventListener("DOMContentLoaded", () => {
+                enableTouchScrolling();
+                __wheelHandler();
+            },Modernizr.passiveeventlisteners ? {passive: true} : false);
+
             const myCanvas = document.getElementById("myCanvas");
             myCanvas.addEventListener("wheel", __wheelHandler, false);
-            myCanvas.addEventListener("touchmove", __wheelHandler, false);       
+            myCanvas.addEventListener("touchmove", __wheelHandler, Modernizr.passiveeventlisteners ? {passive: true} : false);       
 
             const __stageMouseUpHandler = (event) => {
                 that.stageMouseDown = false;
