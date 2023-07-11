@@ -274,7 +274,7 @@ msgstr "音色サンプル"
 
 #: js/turtles.js:848
 msgid "Grid"
-msgstr ""
+msgstr " グリッド"
 
 #: js/turtles.js:866
 #: js/turtledefs.js:603
@@ -1736,65 +1736,65 @@ msgstr "ほうがん（ざひょう）を表示"
 
 #: js/activity.js:1647
 msgid "output tools"
-msgstr ""
+msgstr "出力ツール"
 
 #: js/activity.js:1650
 msgid "custom note"
-msgstr ""
+msgstr "カスタムノート"
 
 #: js/activity.js:1653
 msgid "accidental name"
-msgstr ""
+msgstr "偶然の名前"
 
 #: js/activity.js:1656
 #: js/PitchBlocks.js:843
 msgid "east indian solfege"
-msgstr ""
+msgstr "東インドのソルフェージュ"
 
 #: js/activity.js:1659
 #: js/PitchBlocks.js:857
 msgid "note name"
-msgstr ""
+msgstr "音名"
 
 #: js/activity.js:1662
 #: js/IntervalsBlocks.js:67
 msgid "temperament name"
-msgstr ""
+msgstr "気質名"
 
 #: js/activity.js:1668
-msgid "chord name"
+msgid ""chord name
 msgstr ""
 
 #: js/activity.js:1674
 msgid "filter type"
-msgstr ""
+msgstr "フィルターの種類"
 
 #: js/activity.js:1677
 msgid "oscillator type"
-msgstr ""
+msgstr "発振器の種類"
 
 #: js/activity.js:1683
 #: js/DrumBlocks.js:24
 msgid "noise name"
-msgstr ""
+msgstr "ノイズ名"
 
 #: js/activity.js:1686
 #: js/DrumBlocks.js:38
 msgid "drum name"
-msgstr ""
+msgstr "ドラム名"
 
 #: js/activity.js:1689
 #: js/DrumBlocks.js:53
 msgid "effects name"
-msgstr ""
+msgstr "エフェクト名"
 
 #: js/activity.js:1692
 msgid "wrap mode"
-msgstr ""
+msgstr "ラップモード"
 
 #: js/activity.js:1695
 msgid "load file"
-msgstr ""
+msgstr "ロード ファイル "
 
 #: js/activity.js:1861
 msgid "This block is deprecated."
@@ -5722,7 +5722,7 @@ msgstr "グリッドを表示"
 
 #: js/ExtrasBlocks.js:385
 msgid "The Display Grid Block changes the grid type"
-msgstr ""
+msgstr "表示グリッド ブロックのグリッド タイプの変更"
 
 #: js/ExtrasBlocks.js:465
 #: js/ExtrasBlocks.js:475
