@@ -312,8 +312,6 @@ function setupExtrasBlocks(activity) {
             });
         }
 
-        
-
         flow(args, logo, turtle, blk) {
             const cblk = activity.blocks.blockList[blk].connections[1];
             if (logo.inOscilloscope && cblk !== null) {
