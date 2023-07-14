@@ -2557,6 +2557,8 @@ class Activity {
             this._innerHeight = window.innerHeight;
             this._outerWidth = window.outerWidth;
             this._outerHeight = window.outerHeight;
+            console.log(this._innerHeight);
+            console.log(this._innerWidth);
 
             if (docById("labelDiv").classList.contains("hasKeyboard")) {
                 return;
@@ -2722,6 +2724,41 @@ class Activity {
 
             this.blocks.checkBounds();
         };
+        
+        const container = document.getElementById('canvasContainer');
+        const canvas = document.getElementById('myCanvas');
+        const overCanvas = document.getElementById('canvas');
+        const defaultWidth = 1200;
+        const defaultHeight = 900;
+
+        function handleResize() {
+            const isMaximized = window.innerWidth === window.screen.width && window.innerHeight === window.screen.height;
+            
+            if (isMaximized) {
+                container.style.width = defaultWidth + 'px';
+                container.style.height = defaultHeight + 'px';
+                canvas.width = defaultWidth;
+                canvas.height = defaultHeight;
+                overCanvas.width = canvas.width;
+                overCanvas.height =canvas.width;
+                resizeCanvas_();
+
+            } else {
+                const windowWidth = window.innerWidth;
+                const windowHeight = window.innerHeight;
+                container.style.width = windowWidth + 'px';
+                container.style.height = windowHeight + 'px';
+                canvas.width = windowWidth;
+                canvas.height = windowHeight;
+                overCanvas.width = canvas.width;
+                overCanvas.height =canvas.width;
+
+            }
+            
+        }
+
+        window.addEventListener('resize', handleResize);
+        handleResize();
 
         const that = this;
         const screenWidth = window.innerWidth;
@@ -2729,9 +2766,14 @@ class Activity {
             if (screenWidth !== window.innerWidth) {
                 that._onResize(false);
             }
+            const scrollX = 0;
+            const scrollY = 0;
+            canvas.scrollTo(scrollX, scrollY);
+            handleResize();
         };
-        window.onresize = resizeCanvas_;
-
+        
+        resizeCanvas_();
+        
         /*
          * Restore last stack pushed to trashStack back onto canvas.
          * Hides palettes before update
