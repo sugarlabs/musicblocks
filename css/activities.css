@@ -131,6 +131,15 @@
   line-height: 30px;
 }
 
+.touch-screen .touchScroll {
+    display: inline-block;
+}
+
+/* Style for the button hidden for non-touch screen devices */
+.no-touch .touchScroll {
+    display: none;
+}
+
 .blink {
     animation: blink-animation 1.5s infinite;
   }

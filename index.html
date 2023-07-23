@@ -298,10 +298,8 @@
                     }
                 </script>
 
-
-                <div style="position: relative; width: 1200px; height: 900px; overflow: hidden;">
-                    <canvas id="myCanvas" width="1200" height="900"> </canvas>
-                </div>
+                <canvas id="myCanvas" width="1200" height="900"> </canvas>
+                
 
 
                 <!--Load Animation Container-->
@@ -506,7 +504,7 @@
                             </li>
                            
                             <li>
-                                <a id="toggleScrollButton" class="left tooltipped"  data-tooltip="Scroll"
+                                <a id="toggleScrollButton" class="left tooltipped touchScroll"  data-tooltip="Scroll"
                                 ><i class="material-icons main">swap_vertical_circle</i></a
                                 >
                             </li>
@@ -841,7 +839,29 @@
                 <ul id="newdropdown" class="dropdown-content">
                     <li><a id="new-project"></a></li>
                 </ul>
- 
+           <script>
+            // Check if the device supports touch events
+            function isTouchDevice() {
+                return ('ontouchstart' in window || navigator.maxTouchPoints);
+            }
+
+            // Add or remove class to indicate touch/non-touch device
+            function updateButtonStyle() {
+                const button = document.getElementById('toggleScrollButton');
+                if (isTouchDevice()) {
+                    button.classList.add('touch-screen');
+                } else {
+                    button.classList.add('no-touch');
+                }
+            }
+
+            // Add event listener to update button style on window resize
+            window.addEventListener('resize', updateButtonStyle);
+
+            // Initial call to set button style on page load
+            updateButtonStyle();
+
+           </script>
            <script>  
                 var elem = document.documentElement;
                 function openFullscreen() {
