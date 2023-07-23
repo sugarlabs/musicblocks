@@ -299,7 +299,10 @@
                 </script>
 
 
-                <canvas id="myCanvas" width="1200" height="900"> </canvas>
+                <div style="position: relative; width: 1200px; height: 900px; overflow: hidden;">
+                    <canvas id="myCanvas" width="1200" height="900"> </canvas>
+                </div>
+
 
                 <!--Load Animation Container-->
                 <center>
@@ -501,6 +504,13 @@
                                     ><i class="material-icons main">stop</i></a
                                 >
                             </li>
+                           
+                            <li>
+                                <a id="toggleScrollButton" class="left tooltipped"  data-tooltip="Scroll"
+                                ><i class="material-icons main">swap_vertical_circle</i></a
+                                >
+                            </li>
+
                             <li>                                
                                 <a id="record" class="left tooltipped" data-tooltip="Record">
                                 </a>   

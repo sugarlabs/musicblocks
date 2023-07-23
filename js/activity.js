@@ -1507,50 +1507,65 @@ class Activity {
                 return { pixelX: pX, pixelY: pY };
             };
 
-            const enableTouchScrolling = () => {
                 const canvas = document.getElementById("myCanvas");
+                let isDragging = false;
                 let touchStartX = 0,
                     touchStartY = 0,
                     scrollStartX = 0,
                     scrollStartY = 0;
                 
-                canvas.addEventListener("touchstart", (event) => {
+                const onTouchStart = (event)  => {
+                    isDragging = true;
                     touchStartX = event.touches[0].clientX;
                     touchStartY = event.touches[0].clientY;
                     scrollStartX = canvas.scrollLeft;
                     scrollStartY = canvas.scrollTop;
-                });
+                    console.log("touchStartX",touchStartX);
+                    
+                }
 
-                canvas.addEventListener("touchmove", (event) => {
-                    event.preventDefault();
-                    closeAnyOpenMenusAndLabels();
-                    let touchMoveX = (touchStartX - event.touches[0].clientX),
-                        touchMoveY = (touchStartY - event.touches[0].clientY);
-                    canvas.scrollLeft = scrollStartX + touchMoveX;
-                    canvas.scrollTop = scrollStartY + touchMoveY; 
-                });
+                const onTouchMove = (event) =>{
+                    if(isDragging){
+                        event.preventDefault();
+                        closeAnyOpenMenusAndLabels();
+                        let touchMoveX = (touchStartX - event.touches[0].clientX),
+                            touchMoveY = (touchStartY - event.touches[0].clientY);
+                        
+                        if( touchMoveX !== 0  ){
+                            closeAnyOpenMenusAndLabels();
+                        that.blocksContainer.x=  touchMoveX;}
 
-                canvas.addEventListener("touchend", (event) => {
+                        if(touchMoveY !== 0  ){
+                            closeAnyOpenMenusAndLabels();
+                        that.blocksContainer.y =  touchMoveY;}
+                        
+                    
+                        
+                        console.log("touchMoveX", that.blocksContainer.y);
+                    }
+                }
+
+                const onTouchEnd = (event) => {
                     touchStartX = 0,
                     touchStartY = 0;
                     scrollStartX = 0;
                     scrollStartY = 0;
-                    enableTouchScrolling();
-                })
-            };
-
+                    isDragging = false;
+                }
+          
             const __wheelHandler = (event) => {
                 let delY, 
                     delX;   
                 // Check if the event is a touch event
                 const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
-                if (event.type === "touchmove" || isTouchDevice) {
-                    enableTouchScrolling();   
-                } else {
+                // if (event.type === "touchmove" || isTouchDevice) {
+                   
+                // } 
+                
                     const data = normalizeWheel(event); // normalize over different browsers
                     delY = data.pixelY;
                     delX = data.pixelX;
-                }     
+                   
 
                 if (delY !== 0 && event.axis === event.VERTICAL_AXIS) {
                     closeAnyOpenMenusAndLabels();
@@ -1569,14 +1584,25 @@ class Activity {
                 that.refreshCanvas();
             };        
 
-            window.addEventListener("DOMContentLoaded", () => {
-                enableTouchScrolling();
-                __wheelHandler();
-            },Modernizr.passiveeventlisteners ? {passive: true} : false);
-
             const myCanvas = document.getElementById("myCanvas");
             myCanvas.addEventListener("wheel", __wheelHandler, false);
-            myCanvas.addEventListener("touchmove", __wheelHandler, Modernizr.passiveeventlisteners ? {passive: true} : false);       
+            let isScrollEnabled = false;
+
+            toggleScrollButton.addEventListener("click", () => {
+                isScrollEnabled = !isScrollEnabled;
+                // toggleScrollButton.textContent = isScrollEnabled ? "Disable Scroll" : "Enable Scroll";
+            
+                if (isScrollEnabled) {
+                canvas.addEventListener("touchstart", onTouchStart, { passive: false });
+                canvas.addEventListener("touchmove", onTouchMove, { passive: false });
+                canvas.addEventListener("touchend", onTouchEnd, { passive: false });
+                onTouchMove(); 
+                } else {
+                canvas.removeEventListener("touchstart", onTouchStart);
+                canvas.removeEventListener("touchmove", onTouchMove);
+                canvas.removeEventListener("touchend", onTouchEnd);
+                }
+            });
 
             const __stageMouseUpHandler = (event) => {
                 that.stageMouseDown = false;
