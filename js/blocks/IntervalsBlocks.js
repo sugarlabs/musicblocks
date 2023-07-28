@@ -806,6 +806,7 @@ function setupIntervalsBlocks(activity) {
             super("interval");
             this.setPalette("intervals", activity);
             this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
+            this.beginnerBlock(true);
             this.setHelpString([
                 _("The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode.") +
                     " " +
