@@ -1243,6 +1243,8 @@ class Activity {
 
                 this.setSmallerLargerStatus();
             }
+            this.activity.refreshCanvas();
+            document.getElementById('hideContents').click();
         };
 
         /*
@@ -1269,6 +1271,8 @@ class Activity {
             }
 
             this.setSmallerLargerStatus();
+            this.activity.refreshCanvas();
+            document.getElementById('hideContents').click();
         };
 
         /*

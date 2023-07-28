@@ -6771,7 +6771,7 @@ class Blocks {
                     } else {
                         this.turtles.turtleList[turtle].inTrash = true;
                         this.turtles.turtleList[turtle].container.visible = false;
-                    }
+                    } 
                 }
             } else if (myBlock.name === "action") {
                 if (!myBlock.trash) {
@@ -6823,6 +6823,9 @@ class Blocks {
                 this._cleanupStacks();
                 this.activity.refreshCanvas();
             }
+            this.activity.refreshCanvas();
+            this.activity.trashcan.stopHighlightAnimation();
+            document.getElementById('hideContents').click();
         };
 
         /***
