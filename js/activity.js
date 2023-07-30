@@ -2557,9 +2557,7 @@ class Activity {
             this._innerHeight = window.innerHeight;
             this._outerWidth = window.outerWidth;
             this._outerHeight = window.outerHeight;
-            console.log(this._innerHeight);
-            console.log(this._innerWidth);
-
+    
             if (docById("labelDiv").classList.contains("hasKeyboard")) {
                 return;
             }
@@ -2728,12 +2726,13 @@ class Activity {
         const container = document.getElementById('canvasContainer');
         const canvas = document.getElementById('myCanvas');
         const overCanvas = document.getElementById('canvas');
+        const overlayCanvas = document.getElementById('overlayCanvas');
+        const canvasHolder = document.getElementById('canvasHolder');
         const defaultWidth = 1200;
         const defaultHeight = 900;
 
         function handleResize() {
             const isMaximized = window.innerWidth === window.screen.width && window.innerHeight === window.screen.height;
-            
             if (isMaximized) {
                 container.style.width = defaultWidth + 'px';
                 container.style.height = defaultHeight + 'px';
@@ -2741,7 +2740,10 @@ class Activity {
                 canvas.height = defaultHeight;
                 overCanvas.width = canvas.width;
                 overCanvas.height =canvas.width;
-                resizeCanvas_();
+                overlayCanvas.width = defaultWidth;
+                overlayCanvas.height = defaultHeight;
+                canvasHolder.width = defaultWidth;
+                canvasHolder.height = defaultHeight;
 
             } else {
                 const windowWidth = window.innerWidth;
@@ -2752,12 +2754,16 @@ class Activity {
                 canvas.height = windowHeight;
                 overCanvas.width = canvas.width;
                 overCanvas.height =canvas.width;
-
+                overlayCanvas.width = canvas.width;
+                overlayCanvas.height = canvas.height;
+                canvasHolder.width = canvas.width;
+                canvasHolder.height = canvas.height;
             }
-            
+            document.getElementById('hideContents').click();
         }
 
         window.addEventListener('resize', handleResize);
+        window.addEventListener('orientationchange',  handleResize);
         handleResize();
 
         const that = this;
@@ -2766,14 +2772,11 @@ class Activity {
             if (screenWidth !== window.innerWidth) {
                 that._onResize(false);
             }
-            const scrollX = 0;
-            const scrollY = 0;
-            canvas.scrollTo(scrollX, scrollY);
-            handleResize();
+            document.getElementById('hideContents').click();
         };
         
         resizeCanvas_();
-        
+        window.addEventListener('orientationchange', resizeCanvas_ );
         /*
          * Restore last stack pushed to trashStack back onto canvas.
          * Hides palettes before update
