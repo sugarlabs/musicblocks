@@ -2764,7 +2764,6 @@ class Activity {
 
         window.addEventListener('resize', handleResize);
         window.addEventListener('orientationchange',  handleResize);
-        handleResize();
 
         const that = this;
         const screenWidth = window.innerWidth;

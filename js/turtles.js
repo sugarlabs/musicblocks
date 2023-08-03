@@ -555,6 +555,17 @@ Turtles.TurtlesModel = class {
  * (of the Model), which it can do by calling methods of the Model, also
  * through Turtles (controller).
  */
+// Get the screen width and height
+var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
+// Set a scaling factor to adjust the dimensions based on the screen size
+var scale = Math.min(screenWidth / 1200, screenHeight / 900);
+
+// Calculate the new dimensions
+var newWidth = Math.round(1200 * scale);
+var newHeight = Math.round(900 * scale);
+
 Turtles.TurtlesView = class {
     /**
      * @constructor
@@ -583,6 +594,25 @@ Turtles.TurtlesView = class {
         this._queue = []; // temporarily stores [w, h, scale]
 
         this.currentGrid = null;
+
+
+        // Attach an event listener to the 'resize' event
+        window.addEventListener('resize', () => {
+            // Call the updateDimensions function when resizing occurs
+            var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
+            // Set a scaling factor to adjust the dimensions based on the screen size
+            var scale = Math.min(screenWidth / 1200, screenHeight / 900);
+
+            // Calculate the new dimensions
+            var newWidth = Math.round(1200 * scale);
+            var newHeight = Math.round(900 * scale);
+
+            // Update the dimensions
+            this._w = newWidth;
+            this._h = newHeight;
+        })
     }
 
     /**
@@ -849,7 +879,7 @@ Turtles.TurtlesView = class {
                 this._w - 10 - 3 * 55,
                 70 + LEADING + 6
             );
-
+    
             const that = this;
             this.gridButton.onclick  = () => {
                 piemenuGrid(that.activity);
@@ -871,7 +901,7 @@ Turtles.TurtlesView = class {
             this._clearButton.onclick = () => {
                 this.activity._allClear();
             };
-
+            
             if (doCollapse) {
                 __collapse();
             }
@@ -903,6 +933,8 @@ Turtles.TurtlesView = class {
                 this.gridButton.style.visibility = "hidden";
                 __collapse();
             };
+
+            
         };
 
         /**
@@ -1002,6 +1034,42 @@ Turtles.TurtlesView = class {
         /**
          * Makes second boundary for graphics (mouse) container by initialising 'MBOUNDARY' SVG.
          */
+        let stage;
+        let canvas;
+        const borderContainers = new createjs.Container();
+        
+        const handleCanvasResize = () => {
+            // Get the new canvas width and height after resizing
+            const newCanvasWidth = window.innerWidth;
+            const newCanvasHeight = window.innerHeight;
+
+            // Update the canvas dimensions
+            canvas.width = newCanvasWidth;
+            canvas.height = newCanvasHeight;
+
+            // Calculate new SVG container dimensions
+            const dx = newCanvasWidth - 20;
+            const dy = newCanvasHeight - 55 - LEADING;
+
+            // Scale the SVG container to maintain proportion
+            const scaleX = newCanvasWidth / this._w;
+            const scaleY = newCanvasHeight / this._h;
+            const minScale = Math.min(scaleX, scaleY);
+            this._collapsedBoundary.scaleX = minScale;
+            this._collapsedBoundary.scaleY = minScale;
+
+            // Center the SVG container
+            this._collapsedBoundary.x = (newCanvasWidth - (this._w * minScale)) / 2;
+            this._collapsedBoundary.y = 55 + LEADING;
+
+            if (doCollapse) {
+                __collapse();
+            }
+            this._clearButton.click();
+            // Update the stage to apply changes
+            stage.update();
+        };
+
         const __makeBoundary2 = () => {
             const img = new Image();
             img.onload = () => {
@@ -1010,12 +1078,16 @@ Turtles.TurtlesView = class {
                 }
 
                 this._collapsedBoundary = new createjs.Bitmap(img);
-                this._collapsedBoundary.x = 0;
-                this._collapsedBoundary.y = 55 + LEADING;
-                borderContainer.addChild(this._collapsedBoundary);
                 this._collapsedBoundary.visible = false;
+                borderContainers.addChild(this._collapsedBoundary);
             };
 
+            // Get the initial canvas dimensions
+            canvas = document.getElementById("myCanvas");
+            this._w = canvas.width;
+            this._h = canvas.height;
+
+            // Calculate initial SVG container dimensions
             const dx = this._w - 20;
             const dy = this._h - 55 - LEADING;
             img.src =
@@ -1038,6 +1110,21 @@ Turtles.TurtlesView = class {
             __makeAllButtons();
         };
 
+        // Call the __makeBoundary2 function once the document is loaded
+        document.addEventListener("resize", () => {
+            // Call the function to create the SVG boundary
+            __makeBoundary2();
+
+            // Create a Stage and add the borderContainer to it
+            stage = new createjs.Stage(canvas);
+            stage.addChild(borderContainers);
+
+            // Update the stage
+            stage.update();
+
+            // Add resize event listener to handle canvas resizing
+            window.addEventListener("resize", handleCanvasResize);
+        });
         /**
          * Makes boundary for graphics (mouse) container by initialising
          * 'MBOUNDARY' SVG.
@@ -1053,7 +1140,7 @@ Turtles.TurtlesView = class {
                 this._expandedBoundary = new createjs.Bitmap(img);
                 this._expandedBoundary.x = 0;
                 this._expandedBoundary.y = 55 + LEADING;
-                borderContainer.addChild(this._expandedBoundary);
+                borderContainers.addChild(this._expandedBoundary);
                 __makeBoundary2();
             };
 
