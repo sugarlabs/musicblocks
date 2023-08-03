@@ -6761,7 +6761,7 @@ class Blocks {
                 const turtle = myBlock.value;
                 if (turtle != null) {
                     // eslint-disable-next-line no-console
-                    console.debug("putting turtle " + turtle + " in the trash");
+                    // console.debug("putting turtle " + turtle + " in the trash");
                     const comp = this.turtles.turtleList[turtle].companionTurtle;
                     if (comp) {
                         this.turtles.turtleList[comp].inTrash = true;
@@ -6772,6 +6772,7 @@ class Blocks {
                         this.turtles.turtleList[turtle].inTrash = true;
                         this.turtles.turtleList[turtle].container.visible = false;
                     }
+                    this.turtles.turtleList.splice(turtle, 1);
                 }
             } else if (myBlock.name === "action") {
                 if (!myBlock.trash) {
