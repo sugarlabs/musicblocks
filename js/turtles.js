@@ -1044,30 +1044,13 @@ Turtles.TurtlesView = class {
             const newCanvasHeight = window.innerHeight;
 
             // Update the canvas dimensions
-            canvas.width = newCanvasWidth;
-            canvas.height = newCanvasHeight;
+            this._w = newCanvasWidth;
+            this._h = newCanvasHeight;
 
             // Calculate new SVG container dimensions
             const dx = newCanvasWidth - 20;
             const dy = newCanvasHeight - 55 - LEADING;
-
-            // Scale the SVG container to maintain proportion
-            const scaleX = newCanvasWidth / this._w;
-            const scaleY = newCanvasHeight / this._h;
-            const minScale = Math.min(scaleX, scaleY);
-            this._collapsedBoundary.scaleX = minScale;
-            this._collapsedBoundary.scaleY = minScale;
-
-            // Center the SVG container
-            this._collapsedBoundary.x = (newCanvasWidth - (this._w * minScale)) / 2;
-            this._collapsedBoundary.y = 55 + LEADING;
-
-            if (doCollapse) {
-                __collapse();
-            }
-            this._clearButton.click();
-            // Update the stage to apply changes
-            stage.update();
+            console.log("Resizing took place");
         };
 
         const __makeBoundary2 = () => {
@@ -1102,7 +1085,7 @@ Turtles.TurtlesView = class {
                                 .replace("DY", dy)
                                 .replace("DX", dx)
                                 .replace("stroke_color", platformColor.ruleColor)
-                                .replace("fill_color", this._backgroundColor)
+                                .replace("fill_color", this.c)
                                 .replace("STROKE", 20)
                         )
                     )
@@ -1111,20 +1094,14 @@ Turtles.TurtlesView = class {
         };
 
         // Call the __makeBoundary2 function once the document is loaded
-        document.addEventListener("resize", () => {
-            // Call the function to create the SVG boundary
-            __makeBoundary2();
+        // document.addEventListener("resize", () => {
+            
+        //     // Create a Stage and add the borderContainer to it
+            
 
-            // Create a Stage and add the borderContainer to it
-            stage = new createjs.Stage(canvas);
-            stage.addChild(borderContainers);
-
-            // Update the stage
-            stage.update();
-
-            // Add resize event listener to handle canvas resizing
-            window.addEventListener("resize", handleCanvasResize);
-        });
+        //     // Add resize event listener to handle canvas resizing
+        //     window.addEventListener("resize", handleCanvasResize);
+        // });
         /**
          * Makes boundary for graphics (mouse) container by initialising
          * 'MBOUNDARY' SVG.
@@ -1143,9 +1120,9 @@ Turtles.TurtlesView = class {
                 borderContainers.addChild(this._expandedBoundary);
                 __makeBoundary2();
             };
-
-            const dx = this._w - 5;
-            const dy = this._h - 55 - LEADING;
+            let dx = this._w - 5;
+            let dy = this._h - 55 - LEADING;
+            handleCanvasResize();
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
