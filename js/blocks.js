@@ -6771,8 +6771,7 @@ class Blocks {
                     } else {
                         this.turtles.turtleList[turtle].inTrash = true;
                         this.turtles.turtleList[turtle].container.visible = false;
-                    }
-                    this.turtles.turtleList.splice(turtle, 1);
+                    } 
                 }
             } else if (myBlock.name === "action") {
                 if (!myBlock.trash) {
