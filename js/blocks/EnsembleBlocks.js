@@ -1139,7 +1139,7 @@ function setupEnsembleBlocks(activity) {
         }
 
         arg() {
-            return activity.turtles.turtleList.length;
+            return activity.turtles.turtleCount();
         }
     }
 
