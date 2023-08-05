@@ -274,7 +274,7 @@ msgstr "音色サンプル"
 
 #: js/turtles.js:848
 msgid "Grid"
-msgstr " グリッド"
+msgstr "グリッド"
 
 #: js/turtles.js:866
 #: js/turtledefs.js:603
@@ -1762,8 +1762,8 @@ msgid "temperament name"
 msgstr "気質名"
 
 #: js/activity.js:1668
-msgid ""chord name
-msgstr ""
+msgid "chord name"
+msgstr "chord name"
 
 #: js/activity.js:1674
 msgid "filter type"
