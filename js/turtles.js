@@ -585,7 +585,6 @@ Turtles.TurtlesView = class {
 
         this.currentGrid = null;
 
-
         // Attach an event listener to the 'resize' event
         window.addEventListener('resize', () => {
             // Call the updateDimensions function when resizing occurs
@@ -1033,7 +1032,6 @@ Turtles.TurtlesView = class {
             // Calculate new SVG container dimensions
             const dx = newCanvasWidth - 20;
             const dy = newCanvasHeight - 55 - LEADING;
-            console.log("Resizing took place in turtle");
         };
 
         const __makeBoundary2 = () => {
@@ -1090,7 +1088,7 @@ Turtles.TurtlesView = class {
                 borderContainer.addChild(this._expandedBoundary);
                 __makeBoundary2();
             };
-            console.log("making boundary after resizing");
+
             let dx = this._w - 5;
             let dy = this._h - 55 - LEADING;
             img.src =
@@ -1115,9 +1113,13 @@ Turtles.TurtlesView = class {
         if (!this._locked) {
             __makeBoundary();
         }
-        window.addEventListener("resize", handleCanvasResize);
-        window.addEventListener("resize",__makeBoundary);
-        window.addEventListener("resize",__makeBoundary2);
+
+        window.addEventListener("resize", ()=>{
+            handleCanvasResize();
+            __makeBoundary();
+            __makeBoundary2()
+        });
+
         return this;
     }
 };

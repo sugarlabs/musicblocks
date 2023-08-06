@@ -2759,7 +2759,6 @@ class Activity {
                 canvasHolder.width = canvas.width;
                 canvasHolder.height = canvas.height;
             }
-            console.log("Resizing took place(activity.js)");
             document.getElementById('hideContents').click();
         }
 
