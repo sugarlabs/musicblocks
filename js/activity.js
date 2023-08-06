@@ -2726,7 +2726,6 @@ class Activity {
         const container = document.getElementById('canvasContainer');
         const canvas = document.getElementById('myCanvas');
         const overCanvas = document.getElementById('canvas');
-        const overlayCanvas = document.getElementById('overlayCanvas');
         const canvasHolder = document.getElementById('canvasHolder');
         const defaultWidth = 1200;
         const defaultHeight = 900;
@@ -2740,8 +2739,6 @@ class Activity {
                 canvas.height = defaultHeight;
                 overCanvas.width = canvas.width;
                 overCanvas.height =canvas.width;
-                // overlayCanvas.width = defaultWidth;
-                // overlayCanvas.height = defaultHeight;
                 canvasHolder.width = defaultWidth;
                 canvasHolder.height = defaultHeight;
 
@@ -2754,8 +2751,6 @@ class Activity {
                 canvas.height = windowHeight;
                 overCanvas.width = canvas.width;
                 overCanvas.height =canvas.width;
-                // overlayCanvas.width = canvas.width;
-                // overlayCanvas.height = canvas.height;
                 canvasHolder.width = canvas.width;
                 canvasHolder.height = canvas.height;
             }
