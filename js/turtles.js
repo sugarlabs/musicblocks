@@ -555,16 +555,6 @@ Turtles.TurtlesModel = class {
  * (of the Model), which it can do by calling methods of the Model, also
  * through Turtles (controller).
  */
-// Get the screen width and height
-var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-
-// Set a scaling factor to adjust the dimensions based on the screen size
-var scale = Math.min(screenWidth / 1200, screenHeight / 900);
-
-// Calculate the new dimensions
-var newWidth = Math.round(1200 * scale);
-var newHeight = Math.round(900 * scale);
 
 Turtles.TurtlesView = class {
     /**
@@ -781,7 +771,6 @@ Turtles.TurtlesView = class {
         const _makeButton = (svg, label, x, y) => {
             const container = document.createElement("div");
             container.setAttribute("id", "" + label);
-
             container.setAttribute("class", "tooltipped");
             container.setAttribute("data-tooltip", label);
             container.setAttribute("data-position", "bottom");
@@ -1031,10 +1020,7 @@ Turtles.TurtlesView = class {
         /**
          * Makes second boundary for graphics (mouse) container by initialising 'MBOUNDARY' SVG.
          */
-        let stage;
-        let canvas;
-       
-        
+
         const handleCanvasResize = () => {
             // Get the new canvas width and height after resizing
             const newCanvasWidth = window.innerWidth;
@@ -1058,16 +1044,12 @@ Turtles.TurtlesView = class {
                 }
 
                 this._collapsedBoundary = new createjs.Bitmap(img);
-                this._collapsedBoundary.visible = false;
+                this._collapsedBoundary.x = 0;
+                this._collapsedBoundary.y = 55 + LEADING;
                 borderContainer.addChild(this._collapsedBoundary);
+                this._collapsedBoundary.visible = false;
             };
 
-            // Get the initial canvas dimensions
-            canvas = document.getElementById("myCanvas");
-            this._w = canvas.width;
-            this._h = canvas.height;
-            console.log("making boundary after resizing");
-            // Calculate initial SVG container dimensions
             const dx = this._w - 20;
             const dy = this._h - 55 - LEADING;
             img.src =
@@ -1082,14 +1064,13 @@ Turtles.TurtlesView = class {
                                 .replace("DY", dy)
                                 .replace("DX", dx)
                                 .replace("stroke_color", platformColor.ruleColor)
-                                .replace("fill_color", this.c)
+                                .replace("fill_color", this._backgroundColor)
                                 .replace("STROKE", 20)
                         )
                     )
                 );
             __makeAllButtons();
         };
-
         // Call the __makeBoundary2 function once the document is loaded
         /**
          * Makes boundary for graphics (mouse) container by initialising
@@ -1099,7 +1080,7 @@ Turtles.TurtlesView = class {
             this._locked = true;
             const img = new Image();
             img.onload = () => {
-                if (this._expandedBoundary !== null) {
+                if (this._expandedBoundary !== null) {                 
                     this._expandedBoundary.visible = false;
                 }
 
