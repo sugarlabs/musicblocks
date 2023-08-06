@@ -1033,7 +1033,7 @@ Turtles.TurtlesView = class {
          */
         let stage;
         let canvas;
-        const borderContainers = new createjs.Container();
+       
         
         const handleCanvasResize = () => {
             // Get the new canvas width and height after resizing
@@ -1047,7 +1047,7 @@ Turtles.TurtlesView = class {
             // Calculate new SVG container dimensions
             const dx = newCanvasWidth - 20;
             const dy = newCanvasHeight - 55 - LEADING;
-            console.log("Resizing took place");
+            console.log("Resizing took place in turtle");
         };
 
         const __makeBoundary2 = () => {
@@ -1059,14 +1059,14 @@ Turtles.TurtlesView = class {
 
                 this._collapsedBoundary = new createjs.Bitmap(img);
                 this._collapsedBoundary.visible = false;
-                borderContainers.addChild(this._collapsedBoundary);
+                borderContainer.addChild(this._collapsedBoundary);
             };
 
             // Get the initial canvas dimensions
             canvas = document.getElementById("myCanvas");
             this._w = canvas.width;
             this._h = canvas.height;
-
+            console.log("making boundary after resizing");
             // Calculate initial SVG container dimensions
             const dx = this._w - 20;
             const dy = this._h - 55 - LEADING;
@@ -1091,14 +1091,6 @@ Turtles.TurtlesView = class {
         };
 
         // Call the __makeBoundary2 function once the document is loaded
-        // document.addEventListener("resize", () => {
-            
-        //     // Create a Stage and add the borderContainer to it
-            
-
-        //     // Add resize event listener to handle canvas resizing
-        //     window.addEventListener("resize", handleCanvasResize);
-        // });
         /**
          * Makes boundary for graphics (mouse) container by initialising
          * 'MBOUNDARY' SVG.
@@ -1114,12 +1106,12 @@ Turtles.TurtlesView = class {
                 this._expandedBoundary = new createjs.Bitmap(img);
                 this._expandedBoundary.x = 0;
                 this._expandedBoundary.y = 55 + LEADING;
-                borderContainers.addChild(this._expandedBoundary);
+                borderContainer.addChild(this._expandedBoundary);
                 __makeBoundary2();
             };
+            console.log("making boundary after resizing");
             let dx = this._w - 5;
             let dy = this._h - 55 - LEADING;
-            handleCanvasResize();
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
@@ -1142,7 +1134,9 @@ Turtles.TurtlesView = class {
         if (!this._locked) {
             __makeBoundary();
         }
-
+        window.addEventListener("resize", handleCanvasResize);
+        window.addEventListener("resize",__makeBoundary);
+        window.addEventListener("resize",__makeBoundary2);
         return this;
     }
 };
