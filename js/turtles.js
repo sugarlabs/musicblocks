@@ -879,7 +879,6 @@ Turtles.TurtlesView = class {
                 this._w - 10 - 3 * 55,
                 70 + LEADING + 6
             );
-    
             const that = this;
             this.gridButton.onclick  = () => {
                 piemenuGrid(that.activity);
@@ -932,9 +931,7 @@ Turtles.TurtlesView = class {
                 this._collapseButton.style.visibility = "hidden";
                 this.gridButton.style.visibility = "hidden";
                 __collapse();
-            };
-
-            
+            };            
         };
 
         /**
