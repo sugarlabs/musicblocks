@@ -2727,7 +2727,7 @@ class Activity {
         const canvas = document.getElementById('myCanvas');
         const overCanvas = document.getElementById('canvas');
         const canvasHolder = document.getElementById('canvasHolder');
-        const defaultWidth = 1200;
+        const defaultWidth = 1600;
         const defaultHeight = 900;
 
         function handleResize() {
