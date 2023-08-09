@@ -161,7 +161,6 @@ class Trashcan {
         let resizeTimeout;
 
         function delayedResize() {
-            console.log("trashing");
             const newWidth = (window.innerWidth / self._scale - Trashcan.TRASHWIDTH) / 2;
             const newHeight = window.innerHeight / self._scale - Trashcan.TRASHHEIGHT;
 

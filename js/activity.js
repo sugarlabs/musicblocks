@@ -4161,7 +4161,6 @@ class Activity {
                     docById("buttoncontainerBOTTOM")
                 );
             }
-            console.log("resizing");
             const btnSize = this.cellSize;
             // Lower right
             let x = window.innerWidth - 4 * btnSize - 27.5;
