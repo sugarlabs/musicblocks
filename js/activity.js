@@ -2757,7 +2757,14 @@ class Activity {
             document.getElementById('hideContents').click();
         }
 
-        window.addEventListener('resize', handleResize);
+        let resizeTimeout;
+        window.addEventListener("resize", () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                handleResize();
+                this._setupPaletteMenu();
+            }, 100);
+        });
         window.addEventListener('orientationchange',  handleResize);
 
         const that = this;
@@ -4154,10 +4161,11 @@ class Activity {
                     docById("buttoncontainerBOTTOM")
                 );
             }
+            console.log("resizing");
             const btnSize = this.cellSize;
             // Lower right
-            let x = this._innerWidth - 4 * btnSize - 27.5;
-            const y = this._innerHeight - 57.5;
+            let x = window.innerWidth - 4 * btnSize - 27.5;
+            const y = window.innerHeight - 57.5;
             const dx = btnSize;
 
             const ButtonHolder = document.createElement("div");
