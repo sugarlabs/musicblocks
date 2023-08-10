@@ -586,10 +586,18 @@ Turtles.TurtlesView = class {
         this.currentGrid = null;
 
         // Attach an event listener to the 'resize' event
-        window.addEventListener('resize', () => {
+        window.addEventListener("resize", () => {
             // Call the updateDimensions function when resizing occurs
-            var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-            var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+            var screenWidth = (
+                window.innerWidth ||
+                    document.documentElement.clientWidth ||
+                    document.body.clientWidth
+            );
+            var screenHeight = (
+                window.innerHeight ||
+                    document.documentElement.clientHeight ||
+                    document.body.clientHeight
+            );
 
             // Set a scaling factor to adjust the dimensions based on the screen size
             var scale = Math.min(screenWidth / 1200, screenHeight / 900);
@@ -601,7 +609,7 @@ Turtles.TurtlesView = class {
             // Update the dimensions
             this._w = newWidth;
             this._h = newHeight;
-        })
+        });
     }
 
     /**
@@ -919,7 +927,7 @@ Turtles.TurtlesView = class {
                 this._collapseButton.style.visibility = "hidden";
                 this.gridButton.style.visibility = "hidden";
                 __collapse();
-            };            
+            };
         };
 
         /**
@@ -1030,8 +1038,8 @@ Turtles.TurtlesView = class {
             this._h = newCanvasHeight;
 
             // Calculate new SVG container dimensions
-            const dx = newCanvasWidth - 20;
-            const dy = newCanvasHeight - 55 - LEADING;
+            // const dx = newCanvasWidth - 20;
+            // const dy = newCanvasHeight - 55 - LEADING;
         };
 
         const __makeBoundary2 = () => {
@@ -1078,7 +1086,7 @@ Turtles.TurtlesView = class {
             this._locked = true;
             const img = new Image();
             img.onload = () => {
-                if (this._expandedBoundary !== null) {                 
+                if (this._expandedBoundary !== null) {
                     this._expandedBoundary.visible = false;
                 }
 
@@ -1089,8 +1097,8 @@ Turtles.TurtlesView = class {
                 __makeBoundary2();
             };
 
-            let dx = this._w - 5;
-            let dy = this._h - 55 - LEADING;
+            const dx = this._w - 5;
+            const dy = this._h - 55 - LEADING;
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
@@ -1117,7 +1125,7 @@ Turtles.TurtlesView = class {
         window.addEventListener("resize", ()=>{
             handleCanvasResize();
             __makeBoundary();
-            __makeBoundary2()
+            __makeBoundary2();
         });
 
         return this;

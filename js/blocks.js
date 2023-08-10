@@ -6825,7 +6825,7 @@ class Blocks {
             }
             this.activity.refreshCanvas();
             this.activity.trashcan.stopHighlightAnimation();
-            document.getElementById('hideContents').click();
+            document.getElementById("hideContents").click();
         };
 
         /***
