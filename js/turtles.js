@@ -555,6 +555,7 @@ Turtles.TurtlesModel = class {
  * (of the Model), which it can do by calling methods of the Model, also
  * through Turtles (controller).
  */
+
 Turtles.TurtlesView = class {
     /**
      * @constructor
@@ -583,6 +584,24 @@ Turtles.TurtlesView = class {
         this._queue = []; // temporarily stores [w, h, scale]
 
         this.currentGrid = null;
+
+        // Attach an event listener to the 'resize' event
+        window.addEventListener('resize', () => {
+            // Call the updateDimensions function when resizing occurs
+            var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
+            // Set a scaling factor to adjust the dimensions based on the screen size
+            var scale = Math.min(screenWidth / 1200, screenHeight / 900);
+
+            // Calculate the new dimensions
+            var newWidth = Math.round(1200 * scale);
+            var newHeight = Math.round(900 * scale);
+
+            // Update the dimensions
+            this._w = newWidth;
+            this._h = newHeight;
+        })
     }
 
     /**
@@ -751,7 +770,6 @@ Turtles.TurtlesView = class {
         const _makeButton = (svg, label, x, y) => {
             const container = document.createElement("div");
             container.setAttribute("id", "" + label);
-
             container.setAttribute("class", "tooltipped");
             container.setAttribute("data-tooltip", label);
             container.setAttribute("data-position", "bottom");
@@ -849,7 +867,6 @@ Turtles.TurtlesView = class {
                 this._w - 10 - 3 * 55,
                 70 + LEADING + 6
             );
-
             const that = this;
             this.gridButton.onclick  = () => {
                 piemenuGrid(that.activity);
@@ -871,7 +888,7 @@ Turtles.TurtlesView = class {
             this._clearButton.onclick = () => {
                 this.activity._allClear();
             };
-
+            
             if (doCollapse) {
                 __collapse();
             }
@@ -902,7 +919,7 @@ Turtles.TurtlesView = class {
                 this._collapseButton.style.visibility = "hidden";
                 this.gridButton.style.visibility = "hidden";
                 __collapse();
-            };
+            };            
         };
 
         /**
@@ -1002,6 +1019,21 @@ Turtles.TurtlesView = class {
         /**
          * Makes second boundary for graphics (mouse) container by initialising 'MBOUNDARY' SVG.
          */
+
+        const handleCanvasResize = () => {
+            // Get the new canvas width and height after resizing
+            const newCanvasWidth = window.innerWidth;
+            const newCanvasHeight = window.innerHeight;
+
+            // Update the canvas dimensions
+            this._w = newCanvasWidth;
+            this._h = newCanvasHeight;
+
+            // Calculate new SVG container dimensions
+            const dx = newCanvasWidth - 20;
+            const dy = newCanvasHeight - 55 - LEADING;
+        };
+
         const __makeBoundary2 = () => {
             const img = new Image();
             img.onload = () => {
@@ -1037,7 +1069,7 @@ Turtles.TurtlesView = class {
                 );
             __makeAllButtons();
         };
-
+        // Call the __makeBoundary2 function once the document is loaded
         /**
          * Makes boundary for graphics (mouse) container by initialising
          * 'MBOUNDARY' SVG.
@@ -1046,7 +1078,7 @@ Turtles.TurtlesView = class {
             this._locked = true;
             const img = new Image();
             img.onload = () => {
-                if (this._expandedBoundary !== null) {
+                if (this._expandedBoundary !== null) {                 
                     this._expandedBoundary.visible = false;
                 }
 
@@ -1057,8 +1089,8 @@ Turtles.TurtlesView = class {
                 __makeBoundary2();
             };
 
-            const dx = this._w - 5;
-            const dy = this._h - 55 - LEADING;
+            let dx = this._w - 5;
+            let dy = this._h - 55 - LEADING;
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
@@ -1081,6 +1113,12 @@ Turtles.TurtlesView = class {
         if (!this._locked) {
             __makeBoundary();
         }
+
+        window.addEventListener("resize", ()=>{
+            handleCanvasResize();
+            __makeBoundary();
+            __makeBoundary2()
+        });
 
         return this;
     }

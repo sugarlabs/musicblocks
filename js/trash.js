@@ -144,10 +144,35 @@ class Trashcan {
      * @param {number} scale
      * @returns {void}
      */
+    updateContainerPosition() {
+        this._container.x = (window.innerWidth / this._scale - Trashcan.TRASHWIDTH) / 2;
+        this._container.y = window.innerHeight / this._scale - Trashcan.TRASHHEIGHT;
+    }
+
+    shouldResize(newWidth, newHeight) {
+        return this._container.x !== newWidth || this._container.y !== newHeight;
+    }
+
     resizeEvent(scale) {
         this._scale = scale;
-        this._container.x = (this.activity.canvas.width / this._scale - Trashcan.TRASHWIDTH) / 2;
-        this._container.y = this.activity.canvas.height / this._scale - Trashcan.TRASHHEIGHT;
+        this.updateContainerPosition();
+
+        const self = this; // Capture the current instance of 'this'
+        let resizeTimeout;
+
+        function delayedResize() {
+            const newWidth = (window.innerWidth / self._scale - Trashcan.TRASHWIDTH) / 2;
+            const newHeight = window.innerHeight / self._scale - Trashcan.TRASHHEIGHT;
+
+            if (self.shouldResize(newWidth, newHeight)) {
+                self.updateContainerPosition();
+            }
+        }
+
+        window.addEventListener("resize", function () {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(delayedResize, 300); // Delayed execution using debouncing
+        });
     }
 
     /**
@@ -253,3 +278,6 @@ class Trashcan {
         return true;
     }
 }
+
+// eslint-disable-next-line no-undef
+window.addEventListener("resize", resizeEvent);

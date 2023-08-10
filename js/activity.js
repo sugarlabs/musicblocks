@@ -2561,7 +2561,7 @@ class Activity {
             this._innerHeight = window.innerHeight;
             this._outerWidth = window.outerWidth;
             this._outerHeight = window.outerHeight;
-
+    
             if (docById("labelDiv").classList.contains("hasKeyboard")) {
                 return;
             }
@@ -2726,6 +2726,54 @@ class Activity {
 
             this.blocks.checkBounds();
         };
+        
+        const container = document.getElementById("canvasContainer");
+        const canvas = document.getElementById("myCanvas");
+        const overCanvas = document.getElementById("canvas");
+        const canvasHolder = document.getElementById("canvasHolder");
+        const defaultWidth = 1600;
+        const defaultHeight = 900;
+
+        function handleResize() {
+            const isMaximized = (
+                window.innerWidth ===
+                    window.screen.width && window.innerHeight ===
+                    window.screen.height
+            );
+            if (isMaximized) {
+                container.style.width = defaultWidth + "px";
+                container.style.height = defaultHeight + "px";
+                canvas.width = defaultWidth;
+                canvas.height = defaultHeight;
+                overCanvas.width = canvas.width;
+                overCanvas.height =canvas.width;
+                canvasHolder.width = defaultWidth;
+                canvasHolder.height = defaultHeight;
+
+            } else {
+                const windowWidth = window.innerWidth;
+                const windowHeight = window.innerHeight;
+                container.style.width = windowWidth + "px";
+                container.style.height = windowHeight + "px";
+                canvas.width = windowWidth;
+                canvas.height = windowHeight;
+                overCanvas.width = canvas.width;
+                overCanvas.height =canvas.width;
+                canvasHolder.width = canvas.width;
+                canvasHolder.height = canvas.height;
+            }
+            document.getElementById("hideContents").click();
+        }
+
+        let resizeTimeout;
+        window.addEventListener("resize", () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                handleResize();
+                this._setupPaletteMenu();
+            }, 100);
+        });
+        window.addEventListener("orientationchange",  handleResize);
 
         const that = this;
         const screenWidth = window.innerWidth;
@@ -2733,9 +2781,11 @@ class Activity {
             if (screenWidth !== window.innerWidth) {
                 that._onResize(false);
             }
+            document.getElementById("hideContents").click();
         };
-        window.onresize = resizeCanvas_;
-
+        
+        resizeCanvas_();
+        window.addEventListener("orientationchange", resizeCanvas_ );
         /*
          * Restore last stack pushed to trashStack back onto canvas.
          * Hides palettes before update
@@ -4121,8 +4171,8 @@ class Activity {
             }
             const btnSize = this.cellSize;
             // Lower right
-            let x = this._innerWidth - 4 * btnSize - 27.5;
-            const y = this._innerHeight - 57.5;
+            let x = window.innerWidth - 4 * btnSize - 27.5;
+            const y = window.innerHeight - 57.5;
             const dx = btnSize;
 
             const ButtonHolder = document.createElement("div");
