@@ -169,7 +169,7 @@ class Trashcan {
             }
         }
 
-        window.addEventListener('resize', function () {
+        window.addEventListener("resize", function () {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(delayedResize, 300); // Delayed execution using debouncing
         });
@@ -278,4 +278,6 @@ class Trashcan {
         return true;
     }
 }
-window.addEventListener('resize',resizeEvent);
+
+// eslint-disable-next-line no-undef
+window.addEventListener("resize", resizeEvent);
