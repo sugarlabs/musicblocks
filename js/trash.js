@@ -278,6 +278,3 @@ class Trashcan {
         return true;
     }
 }
-
-// eslint-disable-next-line no-undef
-window.addEventListener("resize", resizeEvent);
