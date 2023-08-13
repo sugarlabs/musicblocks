@@ -59,6 +59,31 @@
    piemenuBasic, piemenuColor, piemenuNumber, piemenuNthModalPitch,
    piemenuNoteValue, piemenuAccidentals, piemenuKey, piemenuChords
 */
+
+const setWheelSize = (i) => {
+    const wheelDiv = document.getElementById("wheelDiv");
+    const screenWidth = window.innerWidth;
+
+    wheelDiv.style.position = "absolute";
+
+    if (screenWidth >= 1200) {
+        wheelDiv.style.width = i + "px";
+        wheelDiv.style.height = i + "px";
+    } else if (screenWidth >= 768) {
+        wheelDiv.style.width = (i - 50) + "px";
+        wheelDiv.style.height = (i - 50) + "px";
+    } else {
+        wheelDiv.style.width = (i - 100) + "px";
+        wheelDiv.style.height = (i - 100) + "px";
+    }
+
+    wheelDiv.style.height = wheelDiv.style.width;
+}
+
+// Call the function initially and whenever the window is resized
+setWheelSize();
+window.addEventListener("resize", setWheelSize);
+
 const piemenuPitches = (
     block,
     noteLabels,
@@ -215,8 +240,7 @@ const piemenuPitches = (
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
-    docById("wheelDiv").style.height = "300px";
-    docById("wheelDiv").style.width = "300px";
+    setWheelSize(300);
     docById("wheelDiv").style.left =
         Math.min(
             block.blocks.turtles._canvas.width - 300,
@@ -789,8 +813,7 @@ const piemenuCustomNotes = (
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
-    docById("wheelDiv").style.height = "400px";
-    docById("wheelDiv").style.width = "400px";
+    setWheelSize(400);
     docById("wheelDiv").style.left =
         Math.min(
             block.blocks.turtles._canvas.width - 400,
@@ -1057,8 +1080,7 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
-    docById("wheelDiv").style.height = "300px";
-    docById("wheelDiv").style.width = "300px";
+    setWheelSize(300);
 
     const selectorWidth = 150;
     const left = Math.round(
@@ -1308,8 +1330,7 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
-    docById("wheelDiv").style.height = "300px";
-    docById("wheelDiv").style.width = "300px";
+    setWheelSize(300);
     docById("wheelDiv").style.left =
         Math.min(
             block.blocks.turtles._canvas.width - 300,
@@ -1505,8 +1526,7 @@ const piemenuNoteValue = (block, noteValue) => {
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
-    docById("wheelDiv").style.height = "300px";
-    docById("wheelDiv").style.width = "300px";
+    setWheelSize(300);
 
     const selectorWidth = 150;
     const left = Math.round(
@@ -1744,8 +1764,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
-    docById("wheelDiv").style.height = "300px";
-    docById("wheelDiv").style.width = "300px";
+    setWheelSize(300);
 
     const selectorWidth = 150;
     const left = Math.round(
@@ -2057,8 +2076,7 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
-    docById("wheelDiv").style.height = "300px";
-    docById("wheelDiv").style.width = "300px";
+    setWheelSize(300);
 
     const selectorWidth = 150;
     const left = Math.round(
@@ -2206,8 +2224,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
-    docById("wheelDiv").style.height = "300px";
-    docById("wheelDiv").style.width = "300px";
+    setWheelSize(300);
     docById("wheelDiv").style.left =
         Math.min(
             block.blocks.turtles._canvas.width - 300,
@@ -2309,8 +2326,7 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
-    docById("wheelDiv").style.height = "300px";
-    docById("wheelDiv").style.width = "300px";
+    setWheelSize(300);
     docById("wheelDiv").style.left =
         Math.min(
             block.blocks.turtles._canvas.width - 300,
@@ -2436,8 +2452,7 @@ const piemenuChords = (block, selectedChord) => {
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
-    docById("wheelDiv").style.height = "300px";
-    docById("wheelDiv").style.width = "300px";
+    setWheelSize(300);
     docById("wheelDiv").style.left =
         Math.min(
             block.blocks.turtles._canvas.width - 300,
@@ -2616,8 +2631,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
-    docById("wheelDiv").style.height = "400px";
-    docById("wheelDiv").style.width = "400px";
+    setWheelSize(400);
     docById("wheelDiv").style.left =
         Math.min(
             block.blocks.turtles._canvas.width - 400,
@@ -2751,8 +2765,7 @@ const piemenuIntervals = (block, selectedInterval) => {
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
-    docById("wheelDiv").style.height = "400px";
-    docById("wheelDiv").style.width = "400px";
+    setWheelSize(400);
     docById("wheelDiv").style.left =
         Math.min(
             block.blocks.turtles._canvas.width - 400,
@@ -3238,8 +3251,7 @@ const piemenuModes = (block, selectedMode) => {
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
-    docById("wheelDiv").style.height = "600px";
-    docById("wheelDiv").style.width = "600px";
+    setWheelSize(600);
 
     // Block widget is large. Be sure it fits on the screen.
     docById("wheelDiv").style.left =
