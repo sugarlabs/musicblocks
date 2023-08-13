@@ -915,7 +915,6 @@ class Activity {
 
         this._doRecordButton = () => {
             const start = document.getElementById("record"),
-                stop = document.getElementById("stop"),
                 recInside = document.getElementById("rec_inside");
             let mediaRecorder;
             var clickEvent = new Event("click");
@@ -1032,7 +1031,7 @@ class Activity {
                 start.dispatchEvent(clickEvent);
             };
 
-            stop.addEventListener(
+            recInside.addEventListener(
                 "click",
                 function() {
                     flag = 0;
