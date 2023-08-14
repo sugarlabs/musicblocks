@@ -71,7 +71,7 @@ class PhraseMaker {
     static INNERWINDOWWIDTH = 630;
     static BUTTONSIZE = 53;
     static ICONSIZE = 24;
-
+    // stylePhraseMaker();
     constructor() {
         this._stopOrCloseClicked = false;
         this._instrumentName = DEFAULTVOICE;
@@ -148,6 +148,31 @@ class PhraseMaker {
         this.notesBlockMap = [];
         this._blockMapHelper = [];
         this.columnBlocksMap = [];
+    }
+
+     stylePhraseMaker(){
+
+        var floatingWindowsDiv = document.getElementById("floatingWindows");
+        var windowFrameElements = floatingWindowsDiv.querySelectorAll(".windowFrame");
+    
+        for (var i = 0; i < windowFrameElements.length; i++) {
+          var windowFrame = windowFrameElements[i];
+          var wfWinBody = document.querySelector(".wfWinBody");
+          var wfbWidget = document.querySelector(".wfbWidget");
+         
+    
+          windowFrame.style.height = "405px";
+          windowFrame.style.width = "685px";
+          wfWinBody.style.position = "absolute";
+          wfWinBody.style.overflow = "auto";
+          wfWinBody.style.width = "-webkit-fill-available";
+          wfWinBody.style.height = "-webkit-fill-available";
+          wfWinBody.style.background = "#cccccc";
+    
+          wfbWidget.style.position = "absolute";
+          wfbWidget.style.left = "55px";
+        }
+        console.log("styling the phrase maker");
     }
 
     clearBlocks() {
@@ -2231,6 +2256,7 @@ class PhraseMaker {
                 console.debug("pushing " + obj[1] + " " + last(this.rowLabels));
                 this._sortedRowMap.push(last(this._sortedRowMap) + 1);
                 lastObj = i;
+                this.stylePhraseMaker();
             }
 
             this.rowLabels.push(obj[1]);

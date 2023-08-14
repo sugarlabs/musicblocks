@@ -10,12 +10,9 @@
     border-radius: 8px;
     border: 2px solid #666;
     background-color: #ccc;
-    overflow-y: auto;
     position: absolute;
     top: 0;
     left: 0;
-    max-height:600px;
-    max-width: 800px
 }
 
 #floatingWindows > .windowFrame > .wfTopBar {
@@ -123,8 +120,7 @@
 }
 #floatingWindows > .windowFrame > .wfWinBody > .wfbWidget {
     flex-grow: 1;
-    position: relative;
-    overflow-x: auto;
+    overflow: hidden;
 }
 #floatingWindows td {
     padding: 0;

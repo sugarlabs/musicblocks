@@ -134,7 +134,9 @@ class WidgetWindow {
             if (this._rolled) this.unroll();
             else this._rollup();
             this.takeFocus();
-
+            this._frame.style.width = "auto";
+            this._frame.style.height = "auto";
+            this._frame.style.minHeight = "0px";
             e.preventDefault();
             e.stopPropagation();
         };
@@ -381,7 +383,7 @@ class WidgetWindow {
         const siblings = windows.children;
         for (let i = 0; i < siblings.length; i++) {
             siblings[i].style.zIndex = "0";
-            siblings[i].style.opacity = ".7";
+            siblings[i].style.opacity = "0";
         }
         
         // When in focus, the zIndex of the help must be the highest. Even greater than the input search display block
@@ -454,6 +456,8 @@ class WidgetWindow {
         this._overlay(false);
         this._frame.style.width = "auto";
         this._frame.style.height = "auto";
+        this._frame.style.minHeight = "420px";
+        this._frame.style.minWidth = "470px";
     }
 
     /**
