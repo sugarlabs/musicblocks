@@ -171,12 +171,9 @@ class PhraseMaker {
           wfbToolbar.style.position = "fixed";
           wfbToolbar.style.background = "#cccccc";
           wfbToolbar.style.zIndex = "10";
-        //   headcolElement.style.position = 'fixed';
-        //   headcolElement.style.zIndex = '1';
           wfbWidget.style.position = "absolute";
           wfbWidget.style.left = "55px";
         }
-        console.log("styling the phrase maker 2");
     }
 
     clearBlocks() {
