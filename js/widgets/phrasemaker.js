@@ -159,8 +159,8 @@ class PhraseMaker {
           var windowFrame = windowFrameElements[i];
           var wfWinBody = document.querySelector(".wfWinBody");
           var wfbWidget = document.querySelector(".wfbWidget");
-         
-    
+          var wfbToolbar = document.querySelector(".wfbToolbar");
+          
           windowFrame.style.height = "405px";
           windowFrame.style.width = "685px";
           wfWinBody.style.position = "absolute";
@@ -168,11 +168,15 @@ class PhraseMaker {
           wfWinBody.style.width = "-webkit-fill-available";
           wfWinBody.style.height = "-webkit-fill-available";
           wfWinBody.style.background = "#cccccc";
-    
+          wfbToolbar.style.position = "fixed";
+          wfbToolbar.style.background = "#cccccc";
+          wfbToolbar.style.zIndex = "10";
+        //   headcolElement.style.position = 'fixed';
+        //   headcolElement.style.zIndex = '1';
           wfbWidget.style.position = "absolute";
           wfbWidget.style.left = "55px";
         }
-        console.log("styling the phrase maker");
+        console.log("styling the phrase maker 2");
     }
 
     clearBlocks() {
