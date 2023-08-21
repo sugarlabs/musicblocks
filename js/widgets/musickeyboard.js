@@ -1228,6 +1228,8 @@ function MusicKeyboard(activity) {
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + "px";
             cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + "px";
             cell.style.maxWidth = cell.style.minWidth;
+            cell.style.position = "sticky";
+            cell.style.left = "0px";
             cell.className = "headcol"; // This cell is fixed horizontally.
             if (this.displayLayout[i].noteName === "drum") {
                 cell.innerHTML = this.displayLayout[i].voice;
@@ -1272,6 +1274,8 @@ function MusicKeyboard(activity) {
         }
 
         mkbTableRow = mkbTable.insertRow();
+        mkbTableRow.style.position = "sticky";
+        mkbTableRow.style.bottom = "0px"
         cell = mkbTableRow.insertCell();
         cell.style.backgroundColor = platformColor.graphicsLabelBackground;
         cell.style.fontSize = this._cellScale * 100 + "%";
@@ -1281,6 +1285,9 @@ function MusicKeyboard(activity) {
         cell.style.maxWidth = cell.style.minWidth;
         cell.className = "headcol"; // This cell is fixed horizontally.
         cell.innerHTML = _("duration");
+        cell.style.position = "sticky";
+        cell.style.left = "0px";
+        cell.style.zIndex = "1";
 
         const newCell = mkbTableRow.insertCell();
         newCell.innerHTML =
