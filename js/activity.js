@@ -1520,30 +1520,34 @@ class Activity {
                     touchStartY = event.touches[0].clientY;
                     scrollStartX = canvas.scrollLeft;
                     scrollStartY = canvas.scrollTop;
-                    console.log("touchStartX",touchStartX);
                     
                 }
 
-                const onTouchMove = (event) =>{
-                    if(isDragging){
+                const onTouchMove = (event) => {
+                    if (isDragging) {
                         event.preventDefault();
                         closeAnyOpenMenusAndLabels();
-                        let touchMoveX = (touchStartX - event.touches[0].clientX),
-                            touchMoveY = (touchStartY - event.touches[0].clientY);
-                        
-                        if( touchMoveX !== 0  ){
-                            closeAnyOpenMenusAndLabels();
-                        that.blocksContainer.x=  touchMoveX;}
-
-                        if(touchMoveY !== 0  ){
-                            closeAnyOpenMenusAndLabels();
-                        that.blocksContainer.y =  touchMoveY;}
-                        
-                    
-                        
-                        console.log("touchMoveX", that.blocksContainer.y);
+                
+                        let touchMoveX = (touchStartX - event.touches[0].clientX) * 0.03; // Adjust the speed factor as needed
+                        let touchMoveY = (touchStartY - event.touches[0].clientY) * 0.03; 
+                
+                        if (Math.abs(touchMoveX) > Math.abs(touchMoveY)) {
+                            // Move in the X direction
+                            that.blocksContainer.x -= touchMoveX;
+                
+                            // Limit the minimum and maximum scrollLeft
+                            canvas.scrollLeft -= touchMoveX;
+                        } else {
+                            // Move in the Y direction
+                            that.blocksContainer.y -= touchMoveY;
+                
+                            // Limit the minimum and maximum scrollTop
+                            canvas.scrollTop -= touchMoveY;
+                        }
                     }
                 }
+                
+                
 
                 const onTouchEnd = (event) => {
                     touchStartX = 0,
@@ -1556,15 +1560,10 @@ class Activity {
             const __wheelHandler = (event) => {
                 let delY, 
                     delX;   
-                // Check if the event is a touch event
-                const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
-                // if (event.type === "touchmove" || isTouchDevice) {
-                   
-                // } 
-                
-                    const data = normalizeWheel(event); // normalize over different browsers
-                    delY = data.pixelY;
-                    delX = data.pixelX;
+                    
+                const data = normalizeWheel(event); // normalize over different browsers
+                delY = data.pixelY;
+                delX = data.pixelX;
                    
 
                 if (delY !== 0 && event.axis === event.VERTICAL_AXIS) {
