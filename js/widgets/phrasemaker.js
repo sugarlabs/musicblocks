@@ -159,7 +159,6 @@ class PhraseMaker {
           var windowFrame = windowFrameElements[i];
           var wfWinBody = document.querySelector(".wfWinBody");
           var wfbWidget = document.querySelector(".wfbWidget");
-          var wfbToolbar = document.querySelector(".wfbToolbar");
           wfbWidget.style.overflow = "auto"
           wfbWidget.style.width = "-webkit-fill-available"
           wfbWidget.style.height = "-webkit-fill-available"
@@ -170,9 +169,6 @@ class PhraseMaker {
           wfWinBody.style.width = "-webkit-fill-available";
           wfWinBody.style.height = "-webkit-fill-available";
           wfWinBody.style.background = "#cccccc";
-          wfbToolbar.style.position = "fixed";
-          wfbToolbar.style.background = "#cccccc";
-          wfbToolbar.style.zIndex = "10";
           wfbWidget.style.position = "absolute";
           wfbWidget.style.left = "55px";
         }
