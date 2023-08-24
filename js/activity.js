@@ -915,7 +915,6 @@ class Activity {
 
         this._doRecordButton = () => {
             const start = document.getElementById("record"),
-                stop = document.getElementById("stop"),
                 recInside = document.getElementById("rec_inside");
             let mediaRecorder;
             var clickEvent = new Event("click");
@@ -940,6 +939,8 @@ class Activity {
                 );
             }
 
+            let that = this;
+
             function saveFile(recordedChunks) {
                 flag = 1;
                 recInside.classList.remove("blink");
@@ -963,8 +964,8 @@ class Activity {
                 // eslint-disable-next-line no-use-before-define
                 recording();
                 doRecordButton();
+                that.textMsg("click on stop sharing");
             }
-
             function stopRec() {
                 flag = 0;
                 mediaRecorder.stop();
@@ -988,7 +989,7 @@ class Activity {
                     // eslint-disable-next-line no-console
                     console.log("Recording is ready to save");
                     stopRec();
-                    flag=0;
+                    flag = 0;
                 };
 
                 mediaRecorder.onstop = function() {
@@ -1021,7 +1022,6 @@ class Activity {
                         const node = document.createElement("p");
                         node.textContent = "Started recording";
                         document.body.appendChild(node);
-                        start.style = null;
                         recInside.setAttribute("fill", "red");
                     }
                 );
@@ -1030,19 +1030,13 @@ class Activity {
             if (flag == 0 && isExecuting) {
                 recording();
                 start.dispatchEvent(clickEvent);
+                flag = 1;
             };
 
-            stop.addEventListener(
-                "click",
-                function() {
-                    flag = 0;
-                    recInside.classList.remove("blink");
-                    mediaRecorder.stop();
-                    const node = document.createElement("p");
-                    node.textContent = "Stopped recording";
-                    document.body.appendChild(node);
-                }
-            );
+            if(flag == 1 && isExecuting){
+                start.addEventListener('click',stopRec);
+                flag = 0;
+            }
 
         };
 
