@@ -1154,7 +1154,7 @@ msgstr "arriba"
 #: js/block.js:3467
 #: js/ExtrasBlocks.js:409
 msgid "Cartesian"
-msgstr "Cartesian"
+msgstr "Cartesiano"
 
 #: js/block.js:3455
 #: js/block.js:3468
@@ -1166,7 +1166,7 @@ msgstr "polar"
 #: js/block.js:3469
 #: js/ExtrasBlocks.js:417
 msgid "Cartesian+polar"
-msgstr "Cartesian+polar"
+msgstr "Cartesiano+polar"
 
 #: js/block.js:3457
 #: js/block.js:3476
@@ -1177,7 +1177,7 @@ msgstr "ninguno"
 #: js/block.js:3470
 #: js/ExtrasBlocks.js:422
 msgid "treble"
-msgstr "treble"
+msgstr "agudos"
 
 #: js/block.js:3471
 #: js/ExtrasBlocks.js:426
@@ -1463,7 +1463,7 @@ msgstr "Haga clic para mostrar las paletas de bloques y bloques de arrastre de l
 
 #: js/turtledefs.js:597
 msgid "Cartesian/Polar"
-msgstr "Cartesian/Polar"
+msgstr "Cartesiano/Polar"
 
 #: js/turtledefs.js:598
 msgid "Show or hide a coordinate grid."
@@ -1723,7 +1723,7 @@ msgstr "los plugins se eliminarán al reiniciar."
 
 #: js/activity.js:1215
 msgid "show Cartesian"
-msgstr "Mostrar Cartesian"
+msgstr "Mostrar Cartesiano"
 
 #: js/activity.js:1647
 msgid "output tools"
@@ -7873,7 +7873,7 @@ msgstr "Grabe su proyecto como video."
 #: js/activity.js:1618
 
 #~msgid "show treble"
-#~msgstr "Mostrar treble"
+#~msgstr "Mostrar agudos"
 
 #: js/activity.js:1621
 
@@ -7915,7 +7915,7 @@ msgstr "Grabe su proyecto como video."
 #: js/activity.js:1668
 
 #~msgid "hide Cartesian"
-#~msgstr "Ocultar Cartesian"
+#~msgstr "Ocultar Cartesiano"
 
 #: js/notation.js:296
 

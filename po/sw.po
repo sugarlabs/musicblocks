@@ -2379,7 +2379,7 @@ msgstr ""
 
 #: js/turtles.js:848
 msgid "Grid"
-msgstr ""
+msgstr "Gridi"
 
 #: js/turtles.js:866
 #: js/turtledefs.js:603
@@ -2536,7 +2536,7 @@ msgstr ""
 
 #: js/palette.js:569
 msgid "grid"
-msgstr ""
+msgstr "Gridi"
 
 #: js/palette.js:575
 #: js/block.js:1540
