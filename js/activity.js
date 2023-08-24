@@ -1507,54 +1507,47 @@ class Activity {
                 return { pixelX: pX, pixelY: pY };
             };
 
-                const canvas = document.getElementById("myCanvas");
-                let isDragging = false;
-                let touchStartX = 0,
-                    touchStartY = 0,
-                    scrollStartX = 0,
-                    scrollStartY = 0;
-                
+                let initialTouchY = null;
+                let initialTouchX = null;
+
                 const onTouchStart = (event)  => {
-                    isDragging = true;
-                    touchStartX = event.touches[0].clientX;
-                    touchStartY = event.touches[0].clientY;
-                    scrollStartX = canvas.scrollLeft;
-                    scrollStartY = canvas.scrollTop;
+                    initialTouchY = event.touches[0].clientY;
+                    initialTouchX = event.touches[0].clientX;
                     
                 }
 
                 const onTouchMove = (event) => {
-                    if (isDragging) {
-                        event.preventDefault();
-                        closeAnyOpenMenusAndLabels();
+                    if (initialTouchY !== null) {
+                        const touchY = event.touches[0].clientY;
+                        const deltaY = touchY - initialTouchY;
                 
-                        let touchMoveX = (touchStartX - event.touches[0].clientX) * 0.03; // Adjust the speed factor as needed
-                        let touchMoveY = (touchStartY - event.touches[0].clientY) * 0.03; 
-                
-                        if (Math.abs(touchMoveX) > Math.abs(touchMoveY)) {
-                            // Move in the X direction
-                            that.blocksContainer.x -= touchMoveX;
-                
-                            // Limit the minimum and maximum scrollLeft
-                            canvas.scrollLeft -= touchMoveX;
-                        } else {
-                            // Move in the Y direction
-                            that.blocksContainer.y -= touchMoveY;
-                
-                            // Limit the minimum and maximum scrollTop
-                            canvas.scrollTop -= touchMoveY;
+                        if (deltaY !== 0) {
+                            closeAnyOpenMenusAndLabels();
+                            that.blocksContainer.y -= deltaY;
                         }
+                
+                        initialTouchY = touchY;
                     }
+                
+                    if (initialTouchX !== null) {
+                        const touchX = event.touches[0].clientX;
+                        const deltaX = touchX - initialTouchX;
+                
+                        if (deltaX !== 0) {
+                            closeAnyOpenMenusAndLabels();
+                            that.blocksContainer.x -= deltaX;
+                        }
+                
+                        initialTouchX = touchX;
+                    }
+                
+                    that.refreshCanvas();
+                    
                 }
                 
-                
-
-                const onTouchEnd = (event) => {
-                    touchStartX = 0,
-                    touchStartY = 0;
-                    scrollStartX = 0;
-                    scrollStartY = 0;
-                    isDragging = false;
+                const onTouchEnd = () => {
+                    initialTouchY = null;
+                    initialTouchX = null;
                 }
           
             const __wheelHandler = (event) => {
@@ -1592,16 +1585,61 @@ class Activity {
                 // toggleScrollButton.textContent = isScrollEnabled ? "Disable Scroll" : "Enable Scroll";
             
                 if (isScrollEnabled) {
-                canvas.addEventListener("touchstart", onTouchStart, { passive: false });
-                canvas.addEventListener("touchmove", onTouchMove, { passive: false });
-                canvas.addEventListener("touchend", onTouchEnd, { passive: false });
+                    myCanvas.addEventListener("touchstart", onTouchStart, { passive: false });
+                    myCanvas.addEventListener("touchmove", onTouchMove, { passive: false });
+                    myCanvas.addEventListener("touchend", onTouchEnd, { passive: false });
                 onTouchMove(); 
                 } else {
-                canvas.removeEventListener("touchstart", onTouchStart);
-                canvas.removeEventListener("touchmove", onTouchMove);
-                canvas.removeEventListener("touchend", onTouchEnd);
+                    myCanvas.removeEventListener("touchstart", onTouchStart);
+                    myCanvas.removeEventListener("touchmove", onTouchMove);
+                    myCanvas.removeEventListener("touchend", onTouchEnd);
                 }
             });
+
+            // Assuming you have defined 'that' and 'closeAnyOpenMenusAndLabels' elsewhere in your code
+
+                
+                // let initialTouchY = null;
+                // let initialTouchX = null;
+
+                // myCanvas.addEventListener("touchstart", (event) => {
+                //     // initialTouchY = event.touches[0].clientY;
+                //     // initialTouchX = event.touches[0].clientX;
+                // });
+
+                // myCanvas.addEventListener("touchmove", (event) => {
+                //     if (initialTouchY !== null) {
+                //         const touchY = event.touches[0].clientY;
+                //         const deltaY = touchY - initialTouchY;
+                
+                //         if (deltaY !== 0) {
+                //             closeAnyOpenMenusAndLabels();
+                //             that.blocksContainer.y -= deltaY;
+                //         }
+                
+                //         initialTouchY = touchY;
+                //     }
+                
+                //     if (initialTouchX !== null) {
+                //         const touchX = event.touches[0].clientX;
+                //         const deltaX = touchX - initialTouchX;
+                
+                //         if (deltaX !== 0) {
+                //             closeAnyOpenMenusAndLabels();
+                //             that.blocksContainer.x -= deltaX;
+                //         }
+                
+                //         initialTouchX = touchX;
+                //     }
+                
+                //     that.refreshCanvas();
+                // });
+
+                // myCanvas.addEventListener("touchend", () => {
+                //     initialTouchY = null;
+                //     initialTouchX = null;
+                // });
+
 
             const __stageMouseUpHandler = (event) => {
                 that.stageMouseDown = false;
