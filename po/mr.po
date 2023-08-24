@@ -2229,7 +2229,7 @@ msgstr "पेटी"
 
 #: js/blocks.js:1680
 msgid "Consider breaking this stack into parts."
-msgstr ""
+msgstr "इस ढेर को भागों में तोड़ने पर विचार करें"
 
 #: js/blocks.js:2408
 #: js/palette.js:651
@@ -2241,7 +2241,7 @@ msgstr "फाइल उघडा"
 #: js/blocks.js:2423
 #: js/activity.js:1680
 msgid "audio file"
-msgstr ""
+msgstr "ऑडियो फाइल"
 
 #: js/blocks.js:2536
 #: js/blocks.js:3147
@@ -2253,7 +2253,7 @@ msgstr ""
 #: js/blocks.js:3149
 #: js/block.js:3522
 msgid "off"
-msgstr ""
+msgstr "बंद"
 
 #: js/blocks.js:2543
 #: js/blocks.js:3154
@@ -2269,7 +2269,7 @@ msgstr ""
 #: js/BooleanBlocks.js:343
 #: js/SensorsBlocks.js:581
 msgid "true"
-msgstr ""
+msgstr "सत्य"
 
 #: js/blocks.js:2545
 #: js/blocks.js:3156
@@ -2283,7 +2283,7 @@ msgstr ""
 #: js/BooleanBlocks.js:302
 #: js/SensorsBlocks.js:583
 msgid "false"
-msgstr ""
+msgstr "असत्य"
 
 #: js/blocks.js:3183
 #: js/palette.js:572
@@ -2297,7 +2297,7 @@ msgstr "मजकूर"
 #: js/palette.js:640
 #: js/BoxesBlocks.js:273
 msgid "store in box"
-msgstr ""
+msgstr "बॉक्स में स्टोर करें"
 
 #: js/blocks.js:3384
 #: js/blocks.js:3824
@@ -2307,7 +2307,7 @@ msgstr ""
 #: js/blocks.js:5794
 #: js/BoxesBlocks.js:376
 msgid "box1"
-msgstr ""
+msgstr "बॉक्स 1"
 
 #: js/blocks.js:3386
 #: js/blocks.js:3826
@@ -2317,7 +2317,7 @@ msgstr ""
 #: js/blocks.js:5796
 #: js/BoxesBlocks.js:331
 msgid "box2"
-msgstr ""
+msgstr "बॉक्स 2"
 
 #: js/blocks.js:4058
 #: js/palette.js:637
@@ -2357,7 +2357,7 @@ msgstr "मूल्य"
 
 #: js/blocks.js:4907
 msgid "There is no block selected."
-msgstr ""
+msgstr "कोई ब्लॉक चयनित नहीं है"
 
 #: js/blocks.js:5002
 #: js/MediaBlocks.js:539
@@ -2368,18 +2368,18 @@ msgstr "दाखवा"
 #: js/MediaBlocks.js:478
 #.TRANS: Avatar is the image used to determine the appearance of the mouse.
 msgid "avatar"
-msgstr ""
+msgstr "अवतार"
 
 #: js/blocks.js:5008
 #: js/ToneBlocks.js:709
 #: js/sampler.js:693
 #.TRANS: The sound sample that the user uploads.
 msgid "sample"
-msgstr ""
+msgstr "नमूना"
 
 #: js/turtles.js:848
 msgid "Grid"
-msgstr ""
+msgstr "जाल"
 
 #: js/turtles.js:866
 #: js/turtledefs.js:603
@@ -2389,15 +2389,15 @@ msgstr "स्वच्छ"
 #: js/turtles.js:887
 #: js/turtledefs.js:609
 msgid "Collapse"
-msgstr ""
+msgstr "गिर जाना"
 
 #: js/turtles.js:915
 msgid "Expand"
-msgstr ""
+msgstr "बढ़ाना"
 
 #: js/languagebox.js:188
 msgid "Refresh your browser to change your language preference."
-msgstr ""
+msgstr "अपनी भाषा बदलने के लिए अपने ब्राउज़र को रीफ़्रेश करें"
 
 #: js/piemenus.js:175
 #: js/musicutils.js:809
@@ -2407,7 +2407,7 @@ msgstr ""
 #: js/sampler.js:544
 #.TRANS: double sharp is a music term related to pitch
 msgid "double sharp"
-msgstr ""
+msgstr "दोगुना तेज़"
 
 #: js/piemenus.js:176
 #: js/PitchBlocks.js:1498
@@ -2493,25 +2493,25 @@ msgstr ""
 #: js/musicutils.js:664
 #.TRANS: modal scale for music
 msgid "aeolian"
-msgstr ""
+msgstr "वातज"
 
 #: js/piemenus.js:3382
 msgid "Duplicate"
-msgstr ""
+msgstr "डुप्लिकेट"
 
 #: js/piemenus.js:3383
 msgid "Extract"
-msgstr ""
+msgstr "निकालना"
 
 #: js/piemenus.js:3384
 msgid "Move to trash"
-msgstr ""
+msgstr "कचरे में ले जाएं"
 
 #: js/piemenus.js:3385
 #: js/timbre.js:968
 #: js/StringHelper.js:69
 msgid "Close"
-msgstr ""
+msgstr "बंद करना"
 
 #: js/piemenus.js:3391
 msgid "Save stack"
@@ -2528,15 +2528,15 @@ msgstr "मदत"
 
 #: js/piemenus.js:3737
 msgid "You have chosen key "
-msgstr ""
+msgstr "आपने कुंजी चुन ली है"
 
 #: js/piemenus.js:3741
 msgid " for your pitch preview."
-msgstr ""
+msgstr "आपके पिच पूर्वावलोकन के लिए"
 
 #: js/palette.js:569
 msgid "grid"
-msgstr ""
+msgstr "जाल"
 
 #: js/palette.js:575
 #: js/block.js:1540
@@ -2551,15 +2551,15 @@ msgstr ""
 #: js/VolumeBlocks.js:348
 #: js/phrasemaker.js:788
 msgid "drum"
-msgstr ""
+msgstr "ड्रम"
 
 #: js/palette.js:578
 msgid "effect"
-msgstr ""
+msgstr "प्रभाव"
 
 #: js/palette.js:584
 msgid "sargam"
-msgstr ""
+msgstr "सरगम"
 
 #: js/palette.js:587
 #: js/activity.js:1638
@@ -2568,27 +2568,27 @@ msgstr ""
 #: js/PitchBlocks.js:1736
 #.TRANS: a numeric mapping of the notes in an octave based on the musical mode
 msgid "scale degree"
-msgstr ""
+msgstr "पैमाने की डिग्री"
 
 #: js/palette.js:590
 #: js/activity.js:1665
 msgid "mode name"
-msgstr ""
+msgstr "मोड का नाम"
 
 #: js/palette.js:593
 #: js/activity.js:1644
 msgid "invert mode"
-msgstr ""
+msgstr "उलटा मोड"
 
 #: js/palette.js:596
 #: js/activity.js:1641
 msgid "voice name"
-msgstr ""
+msgstr "आवाज का नाम"
 
 #: js/palette.js:599
 #: js/PitchBlocks.js:1169
 msgid "custom pitch"
-msgstr ""
+msgstr "कस्टम पिच"
 
 #: js/palette.js:603
 #: js/block.js:1456
@@ -2596,21 +2596,21 @@ msgstr ""
 #: js/WidgetBlocks.js:218
 #: js/IntervalsBlocks.js:50
 msgid "temperament"
-msgstr ""
+msgstr "स्वभाव"
 
 #: js/palette.js:607
 msgid "accidental"
-msgstr ""
+msgstr "accidental"
 
 #: js/palette.js:613
 #: js/activity.js:1671
 msgid "interval name"
-msgstr ""
+msgstr "अंतराल नाम"
 
 #: js/palette.js:631
 #: js/PitchBlocks.js:405
 msgid "pitch converter"
-msgstr ""
+msgstr "पिच कनवर्टर"
 
 #: js/rubrics.js:522
 #: js/turtledefs.js:120
@@ -2625,7 +2625,7 @@ msgstr ""
 #: js/rhythmruler.js:1827
 #.TRANS: an arrangement of notes based on duration
 msgid "rhythm"
-msgstr ""
+msgstr "लय"
 
 #: js/rubrics.js:523
 #: js/block.js:2339
@@ -2640,13 +2640,13 @@ msgstr ""
 #.TRANS: pitch number
 #.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
 msgid "pitch"
-msgstr ""
+msgstr "आवाज़ का उतार-चढ़ाव"
 
 #: js/rubrics.js:524
 #: js/turtledefs.js:124
 #: js/turtledefs.js:226
 msgid "tone"
-msgstr ""
+msgstr "सुर"
 
 #: js/rubrics.js:525
 #: js/lilypond.js:613
@@ -2654,7 +2654,7 @@ msgstr ""
 #: js/lilypond.js:918
 #: js/lilypond.js:956
 msgid "mouse"
-msgstr ""
+msgstr "चूहा"
 
 #: js/rubrics.js:526
 #: js/turtledefs.js:133
@@ -2693,19 +2693,19 @@ msgstr "मीडिया"
 
 #: js/rubrics.js:532
 msgid "mice"
-msgstr ""
+msgstr "चूहे"
 
 #: js/macros.js:711
 #: js/musicutils.js:784
 #: js/synthutils.js:181
 #.TRANS: animal sound effect
 msgid "duck"
-msgstr ""
+msgstr "बत्तख"
 
 #: js/toolbar.js:45
 #: js/toolbar.js:102
 msgid "About Music Blocks"
-msgstr ""
+msgstr "संगीत ब्लॉक के बारे में"
 
 #: js/toolbar.js:46
 #: js/toolbar.js:103
@@ -2770,7 +2770,7 @@ msgstr ""
 #: js/arpeggio.js:644
 #: js/arpeggio.js:646
 msgid "Play"
-msgstr ""
+msgstr "चलायें"
 
 #: js/toolbar.js:47
 #: js/toolbar.js:104
@@ -2799,7 +2799,7 @@ msgstr "थांबवा"
 #: js/toolbar.js:143
 #: js/toolbar.js:195
 msgid "Full Screen"
-msgstr ""
+msgstr "पूर्ण स्क्रीन"
 
 #: js/toolbar.js:49
 #: js/toolbar.js:106
@@ -2808,7 +2808,7 @@ msgstr ""
 #: js/turtledefs.js:505
 #: js/StringHelper.js:33
 msgid "New project"
-msgstr ""
+msgstr "नया काम"
 
 #: js/toolbar.js:50
 #: js/toolbar.js:107
@@ -2840,35 +2840,35 @@ msgstr "प्रकल्प जतन करा"
 #: js/toolbar.js:217
 #: js/toolbar.js:219
 msgid "Save project as HTML"
-msgstr ""
+msgstr "प्रोजेक्ट को HTML के रूप में सहेजें"
 
 #: js/toolbar.js:53
 #: js/toolbar.js:110
 #: js/toolbar.js:148
 #: js/toolbar.js:200
 msgid "Find and share projects"
-msgstr ""
+msgstr "प्रोजेक्ट ढूंढें और साझा करें"
 
 #: js/toolbar.js:54
 #: js/toolbar.js:111
 #: js/toolbar.js:149
 #: js/toolbar.js:201
 msgid "Offline. Sharing is unavailable"
-msgstr ""
+msgstr "ऑफ़लाइन. साझा करना अनुपलब्ध है"
 
 #: js/toolbar.js:55
 #: js/toolbar.js:112
 #: js/toolbar.js:150
 #: js/toolbar.js:202
 msgid "Auxiliary menu"
-msgstr ""
+msgstr "सहायक मेनू"
 
 #: js/toolbar.js:57
 #: js/toolbar.js:114
 #: js/toolbar.js:152
 #: js/toolbar.js:204
 msgid "Run slowly"
-msgstr ""
+msgstr "धीरे-धीरे दौड़ें"
 
 #: js/toolbar.js:58
 #: js/toolbar.js:115
@@ -2876,7 +2876,7 @@ msgstr ""
 #: js/toolbar.js:205
 #: js/turtledefs.js:659
 msgid "Run step by step"
-msgstr ""
+msgstr "चरण दर चरण चलाएँ"
 
 #: js/toolbar.js:59
 #: js/toolbar.js:116
@@ -2891,7 +2891,7 @@ msgstr "आकडेवारी दाखवणे"
 #: js/toolbar.js:155
 #: js/toolbar.js:207
 msgid "Load plugin"
-msgstr ""
+msgstr "प्लगइन लोड करें"
 
 #: js/toolbar.js:61
 #: js/toolbar.js:118
@@ -2899,21 +2899,21 @@ msgstr ""
 #: js/toolbar.js:208
 #: js/turtledefs.js:673
 msgid "Delete plugin"
-msgstr ""
+msgstr "प्लगइन हटाएँ"
 
 #: js/toolbar.js:62
 #: js/toolbar.js:119
 #: js/toolbar.js:157
 #: js/toolbar.js:209
 msgid "Enable horizontal scrolling"
-msgstr ""
+msgstr "क्षैतिज स्क्रॉलिंग सक्षम करें"
 
 #: js/toolbar.js:63
 #: js/toolbar.js:120
 #: js/toolbar.js:158
 #: js/toolbar.js:210
 msgid "Disable horizontal scrolling"
-msgstr ""
+msgstr "क्षैतिज स्क्रॉलिंग अक्षम करें"
 
 #: js/toolbar.js:64
 #: js/toolbar.js:121
@@ -2923,7 +2923,7 @@ msgstr ""
 #: js/LocalCard.js:54
 #: js/StringHelper.js:71
 msgid "Merge with current project"
-msgstr ""
+msgstr "वर्तमान प्रोजेक्ट के साथ विलय करें"
 
 #: js/toolbar.js:65
 #: js/toolbar.js:122

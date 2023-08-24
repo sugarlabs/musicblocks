@@ -6823,6 +6823,9 @@ class Blocks {
                 this._cleanupStacks();
                 this.activity.refreshCanvas();
             }
+            this.activity.refreshCanvas();
+            this.activity.trashcan.stopHighlightAnimation();
+            document.getElementById("hideContents").click();
         };
 
         /***
