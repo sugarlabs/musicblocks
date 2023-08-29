@@ -310,6 +310,7 @@ function MusicKeyboard(activity) {
                     docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
                     docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
                     docById("mkbInnerDiv").style.width = "95.5vw";
+                    docById("mkbInnerDiv").style.height = "75%";
                     const innerDiv = docById("mkbInnerDiv");
                     innerDiv.scrollLeft = innerDiv.scrollWidth;
                     this.widgetWindow.getWidgetBody().style.left = "60px";
@@ -321,6 +322,7 @@ function MusicKeyboard(activity) {
                     this.widgetWindow.getWidgetBody().style.height = "550px";
                     this.widgetWindow.getWidgetBody().style.width = "1000px";
                     docById("mkbOuterDiv").style.width = w + "px";
+                    docById("mkbInnerDiv").style.height = "100%";
                 }
                 delete startTime[id];
                 delete temp1[id];
@@ -425,6 +427,7 @@ function MusicKeyboard(activity) {
                 docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
                 docById("keyboardHolder2").style.width = "calc(200vh - 64px)";
                 docById("mkbInnerDiv").style.width = "95.5vw";
+                docById("mkbInnerDiv").style.height = "75%";
                 this.widgetWindow.getWidgetBody().style.left = "60px";
             } else {
                 const outerDiv = docById("mkbOuterDiv");
@@ -434,6 +437,7 @@ function MusicKeyboard(activity) {
                 this.widgetWindow.getWidgetBody().style.height = "550px";
                 this.widgetWindow.getWidgetBody().style.width = "1000px";
                 docById("mkbOuterDiv").style.width = w + "px";
+                docById("mkbInnerDiv").style.height = "100%";
             }
         };
 
@@ -468,6 +472,7 @@ function MusicKeyboard(activity) {
                 docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
                 docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
                 widgetWindow.getWidgetBody().style.left = "60px";
+                docById("mkbInnerDiv").style.height = "75%";
             } else {
                 const outerDiv = docById("mkbOuterDiv");
                 outerDiv.style.maxHeight = "400px";
@@ -476,6 +481,7 @@ function MusicKeyboard(activity) {
                 widgetWindow.getWidgetBody().style.height = "550px";
                 widgetWindow.getWidgetBody().style.width = "1000px";
                 docById("mkbOuterDiv").style.width = w + "px";
+                docById("mkbInnerDiv").style.height = "100%";
             }
         };
 
@@ -534,6 +540,7 @@ function MusicKeyboard(activity) {
                 outerDiv.style.maxHeight = "725px";
                 docById("mkbOuterDiv").style.height = "calc(100vh - 64px)";
                 docById("mkbOuterDiv").style.width = "calc(200vh - 64px)";
+                docById("mkbInnerDiv").style.height = "75%";
                 widgetWindow.getWidgetBody().style.left = "60px";
             } else {
                 const outerDiv = docById("mkbOuterDiv");
@@ -543,6 +550,7 @@ function MusicKeyboard(activity) {
                 widgetWindow.getWidgetBody().style.height = "550px";
                 widgetWindow.getWidgetBody().style.width = "1000px";
                 docById("mkbOuterDiv").style.width = w + "px";
+                docById("mkbInnerDiv").style.height = "100%";
             }
             // }
         };
@@ -1228,6 +1236,8 @@ function MusicKeyboard(activity) {
             cell.style.width = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + "px";
             cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + "px";
             cell.style.maxWidth = cell.style.minWidth;
+            cell.style.position = "sticky";
+            cell.style.left = "0px";
             cell.className = "headcol"; // This cell is fixed horizontally.
             if (this.displayLayout[i].noteName === "drum") {
                 cell.innerHTML = this.displayLayout[i].voice;
@@ -1272,6 +1282,8 @@ function MusicKeyboard(activity) {
         }
 
         mkbTableRow = mkbTable.insertRow();
+        mkbTableRow.style.position = "sticky";
+        mkbTableRow.style.bottom = "0px"
         cell = mkbTableRow.insertCell();
         cell.style.backgroundColor = platformColor.graphicsLabelBackground;
         cell.style.fontSize = this._cellScale * 100 + "%";
@@ -1281,6 +1293,9 @@ function MusicKeyboard(activity) {
         cell.style.maxWidth = cell.style.minWidth;
         cell.className = "headcol"; // This cell is fixed horizontally.
         cell.innerHTML = _("duration");
+        cell.style.position = "sticky";
+        cell.style.left = "0px";
+        cell.style.zIndex = "1";
 
         const newCell = mkbTableRow.insertCell();
         newCell.innerHTML =

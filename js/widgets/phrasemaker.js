@@ -71,7 +71,7 @@ class PhraseMaker {
     static INNERWINDOWWIDTH = 630;
     static BUTTONSIZE = 53;
     static ICONSIZE = 24;
-
+    // stylePhraseMaker();
     constructor() {
         this._stopOrCloseClicked = false;
         this._instrumentName = DEFAULTVOICE;
@@ -148,6 +148,30 @@ class PhraseMaker {
         this.notesBlockMap = [];
         this._blockMapHelper = [];
         this.columnBlocksMap = [];
+    }
+
+     stylePhraseMaker(){
+
+        var floatingWindowsDiv = document.getElementById("floatingWindows");
+        var windowFrameElements = floatingWindowsDiv.querySelectorAll(".windowFrame");
+    
+        for (var i = 0; i < windowFrameElements.length; i++) {
+          var windowFrame = windowFrameElements[i];
+          var wfWinBody = document.querySelector(".wfWinBody");
+          var wfbWidget = document.querySelector(".wfbWidget");
+          wfbWidget.style.overflow = "auto"
+          wfbWidget.style.width = "-webkit-fill-available"
+          wfbWidget.style.height = "-webkit-fill-available"
+          windowFrame.style.height = "405px";
+          windowFrame.style.width = "685px";
+          wfWinBody.style.position = "absolute";
+          wfWinBody.style.overflow = "auto";
+          wfWinBody.style.width = "-webkit-fill-available";
+          wfWinBody.style.height = "-webkit-fill-available";
+          wfWinBody.style.background = "#cccccc";
+          wfbWidget.style.position = "absolute";
+          wfbWidget.style.left = "55px";
+        }
     }
 
     clearBlocks() {
@@ -412,6 +436,8 @@ class PhraseMaker {
             cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + "px";
             cell.style.maxWidth = cell.style.minWidth;
             cell.className = "headcol"; // This cell is fixed horizontally.
+            cell.style.position = "sticky";
+            cell.style.left = "1.2px";
             cell.innerHTML = "";
             this._headcols[i] = cell;
 
@@ -515,6 +541,7 @@ class PhraseMaker {
             cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) + "px";
             cell.style.maxWidth = cell.style.minWidth;
             cell.className = "labelcol"; // This cell is fixed horizontally.
+            cell.style.position = "sticky";
             cell.style.left = PhraseMaker.BUTTONSIZE * this._cellScale + "px";
             cell.setAttribute("alt", i);
             this._labelcols[i] = cell;
@@ -678,7 +705,15 @@ class PhraseMaker {
         // An extra row for the note and tuplet values
         ptmTableRow = ptmTable.insertRow();
         ptmCell = ptmTableRow.insertCell();
+        ptmTableRow.setAttribute('id', 'bottomRow');
+        ptmTableRow.style.position = "sticky";
+        ptmTableRow.style.bottom = '0px';
+        ptmTableRow.style.zIndex = '1';         
+
         ptmCell.setAttribute("colspan", "2");
+        ptmCell.style.position = "sticky";
+        ptmCell.style.left = '1.2px';
+        ptmCell.style.zIndex = '1';
         ptmCell.className = "headcol"; // This cell is fixed horizontally.
 
         tempTable = document.createElement("table");
@@ -2231,6 +2266,7 @@ class PhraseMaker {
                 console.debug("pushing " + obj[1] + " " + last(this.rowLabels));
                 this._sortedRowMap.push(last(this._sortedRowMap) + 1);
                 lastObj = i;
+                this.stylePhraseMaker();
             }
 
             this.rowLabels.push(obj[1]);
