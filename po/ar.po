@@ -2133,13 +2133,13 @@ msgstr ""
 
 #: js/logo.js:61
 msgid "Not a valid pitch name"
-msgstr ""
+msgstr "ليست نغمة صحيحة"
 
 #: js/logo.js:507
 #: js/ProgramBlocks.js:159
 #: js/ProgramBlocks.js:269
 msgid "You must select a file."
-msgstr ""
+msgstr "يجب عليك إختيار ملف"
 
 #: js/logo.js:1184
 #: js/turtles.js:118
@@ -2156,7 +2156,7 @@ msgstr "ابدأ"
 
 #: js/logo.js:1696
 msgid "Playback is ready."
-msgstr ""
+msgstr "الإستماع مرة أخرى حاضر"
 
 #: js/blocks.js:1011
 #: js/blocks.js:3427
@@ -2230,7 +2230,7 @@ msgstr "صندوق المتغير"
 
 #: js/blocks.js:1680
 msgid "Consider breaking this stack into parts."
-msgstr ""
+msgstr "فكر في تقسيم هذه البطارية إلى أجزاء"
 
 #: js/blocks.js:2408
 #: js/palette.js:651
@@ -2242,7 +2242,7 @@ msgstr "فتح الملف"
 #: js/blocks.js:2423
 #: js/activity.js:1680
 msgid "audio file"
-msgstr ""
+msgstr "ملف صوتي"
 
 #: js/blocks.js:2536
 #: js/blocks.js:3147
@@ -2254,7 +2254,7 @@ msgstr ""
 #: js/blocks.js:3149
 #: js/block.js:3522
 msgid "off"
-msgstr ""
+msgstr "إيقاف"
 
 #: js/blocks.js:2543
 #: js/blocks.js:3154
@@ -2270,7 +2270,7 @@ msgstr ""
 #: js/BooleanBlocks.js:343
 #: js/SensorsBlocks.js:581
 msgid "true"
-msgstr ""
+msgstr "صحيح"
 
 #: js/blocks.js:2545
 #: js/blocks.js:3156
@@ -2284,7 +2284,7 @@ msgstr ""
 #: js/BooleanBlocks.js:302
 #: js/SensorsBlocks.js:583
 msgid "false"
-msgstr ""
+msgstr "خاطئ"
 
 #: js/blocks.js:3183
 #: js/palette.js:572
@@ -2298,7 +2298,7 @@ msgstr "نص"
 #: js/palette.js:640
 #: js/BoxesBlocks.js:273
 msgid "store in box"
-msgstr ""
+msgstr "موجود في الصندوق"
 
 #: js/blocks.js:3384
 #: js/blocks.js:3824
@@ -2308,7 +2308,7 @@ msgstr ""
 #: js/blocks.js:5794
 #: js/BoxesBlocks.js:376
 msgid "box1"
-msgstr ""
+msgstr "صندوق1"
 
 #: js/blocks.js:3386
 #: js/blocks.js:3826
@@ -2318,7 +2318,7 @@ msgstr ""
 #: js/blocks.js:5796
 #: js/BoxesBlocks.js:331
 msgid "box2"
-msgstr ""
+msgstr "صندوق2"
 
 #: js/blocks.js:4058
 #: js/palette.js:637
@@ -2358,7 +2358,7 @@ msgstr "قيمة المتغير"
 
 #: js/blocks.js:4907
 msgid "There is no block selected."
-msgstr ""
+msgstr "ليس هنالك صندوق تم إختياره"
 
 #: js/blocks.js:5002
 #: js/MediaBlocks.js:539
@@ -2369,18 +2369,18 @@ msgstr "نص"
 #: js/MediaBlocks.js:478
 #.TRANS: Avatar is the image used to determine the appearance of the mouse.
 msgid "avatar"
-msgstr ""
+msgstr "الصورة"
 
 #: js/blocks.js:5008
 #: js/ToneBlocks.js:709
 #: js/sampler.js:693
 #.TRANS: The sound sample that the user uploads.
 msgid "sample"
-msgstr ""
+msgstr "النموذج"
 
 #: js/turtles.js:848
 msgid "Grid"
-msgstr ""
+msgstr "الشبكة"
 
 #: js/turtles.js:866
 #: js/turtledefs.js:603
@@ -2390,15 +2390,15 @@ msgstr "نظف"
 #: js/turtles.js:887
 #: js/turtledefs.js:609
 msgid "Collapse"
-msgstr ""
+msgstr "إسقاط"
 
 #: js/turtles.js:915
 msgid "Expand"
-msgstr ""
+msgstr "التوسيع"
 
 #: js/languagebox.js:188
 msgid "Refresh your browser to change your language preference."
-msgstr ""
+msgstr "أعد فتح الصفحة لتغير لغة التطبيق"
 
 #: js/piemenus.js:175
 #: js/musicutils.js:809
@@ -2408,7 +2408,7 @@ msgstr ""
 #: js/sampler.js:544
 #.TRANS: double sharp is a music term related to pitch
 msgid "double sharp"
-msgstr ""
+msgstr "ثنائي حاد"
 
 #: js/piemenus.js:176
 #: js/PitchBlocks.js:1498
@@ -2421,7 +2421,7 @@ msgstr ""
 #.TRANS: sharp is a half-step up in pitch
 #.TRANS: sharp is a music term related to pitch
 msgid "sharp"
-msgstr ""
+msgstr "حاد"
 
 #: js/piemenus.js:177
 #: js/musicutils.js:805
@@ -2431,7 +2431,7 @@ msgstr ""
 #: js/sampler.js:546
 #.TRANS: natural is a music term related to pitch
 msgid "natural"
-msgstr ""
+msgstr "طبيعي"
 
 #: js/piemenus.js:178
 #: js/PitchBlocks.js:1457
@@ -2444,7 +2444,7 @@ msgstr ""
 #.TRANS: flat is a half-step down in pitch
 #.TRANS: flat is a music term related to pitch
 msgid "flat"
-msgstr ""
+msgstr "مبسط"
 
 #: js/piemenus.js:179
 #: js/musicutils.js:801
@@ -2454,7 +2454,7 @@ msgstr ""
 #: js/sampler.js:548
 #.TRANS: double flat is a music term related to pitch
 msgid "double flat"
-msgstr ""
+msgstr "ثنائي مبسط"
 
 #: js/piemenus.js:2835
 #: js/PitchBlocks.js:1345
