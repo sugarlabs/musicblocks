@@ -915,6 +915,7 @@ class Activity {
 
         this._doRecordButton = () => {
             const start = document.getElementById("record"),
+                stop = document.getElementById("stop"),
                 recInside = document.getElementById("rec_inside");
             let mediaRecorder;
             var clickEvent = new Event("click");
@@ -939,8 +940,6 @@ class Activity {
                 );
             }
 
-            let that = this;
-
             function saveFile(recordedChunks) {
                 flag = 1;
                 recInside.classList.remove("blink");
@@ -964,8 +963,8 @@ class Activity {
                 // eslint-disable-next-line no-use-before-define
                 recording();
                 doRecordButton();
-                that.textMsg("click on stop sharing");
             }
+
             function stopRec() {
                 flag = 0;
                 mediaRecorder.stop();
@@ -989,7 +988,7 @@ class Activity {
                     // eslint-disable-next-line no-console
                     console.log("Recording is ready to save");
                     stopRec();
-                    flag = 0;
+                    flag=0;
                 };
 
                 mediaRecorder.onstop = function() {
@@ -1022,6 +1021,7 @@ class Activity {
                         const node = document.createElement("p");
                         node.textContent = "Started recording";
                         document.body.appendChild(node);
+                        start.style = null;
                         recInside.setAttribute("fill", "red");
                     }
                 );
@@ -1030,13 +1030,19 @@ class Activity {
             if (flag == 0 && isExecuting) {
                 recording();
                 start.dispatchEvent(clickEvent);
-                flag = 1;
             };
 
-            if(flag == 1 && isExecuting){
-                start.addEventListener('click',stopRec);
-                flag = 0;
-            }
+            stop.addEventListener(
+                "click",
+                function() {
+                    flag = 0;
+                    recInside.classList.remove("blink");
+                    mediaRecorder.stop();
+                    const node = document.createElement("p");
+                    node.textContent = "Stopped recording";
+                    document.body.appendChild(node);
+                }
+            );
 
         };
 
@@ -1237,8 +1243,6 @@ class Activity {
 
                 this.setSmallerLargerStatus();
             }
-            this.activity.refreshCanvas();
-            document.getElementById('hideContents').click();
         };
 
         /*
@@ -1265,8 +1269,6 @@ class Activity {
             }
 
             this.setSmallerLargerStatus();
-            this.activity.refreshCanvas();
-            document.getElementById('hideContents').click();
         };
 
         /*
@@ -1505,27 +1507,94 @@ class Activity {
                 return { pixelX: pX, pixelY: pY };
             };
 
-            const __wheelHandler = (event) => {
-                const data = normalizeWheel(event); // normalize over different browsers
-                const delY = data.pixelY;
-                const delX = data.pixelX;
-                if (delY !== 0 && event.axis === event.VERTICAL_AXIS) {
-                    closeAnyOpenMenusAndLabels(); // closes all wheelnavs when scrolling .
-                    that.blocksContainer.y -= delY;
+                let initialTouchY = null;
+                let initialTouchX = null;
+
+                const onTouchStart = (event)  => {
+                    initialTouchY = event.touches[0].clientY;
+                    initialTouchX = event.touches[0].clientX;
+                    
                 }
-                // horizontal scroll
+
+                const onTouchMove = (event) => {
+                    if (initialTouchY !== null) {
+                        const touchY = event.touches[0].clientY;
+                        const deltaY = touchY - initialTouchY;
+                
+                        if (deltaY !== 0) {
+                            closeAnyOpenMenusAndLabels();
+                            that.blocksContainer.y -= deltaY;
+                        }
+                
+                        initialTouchY = touchY;
+                    }
+                
+                    if (initialTouchX !== null) {
+                        const touchX = event.touches[0].clientX;
+                        const deltaX = touchX - initialTouchX;
+                
+                        if (deltaX !== 0) {
+                            closeAnyOpenMenusAndLabels();
+                            that.blocksContainer.x -= deltaX;
+                        }
+                
+                        initialTouchX = touchX;
+                    }
+                    
+                    that.refreshCanvas();
+                    
+                }
+                
+                const onTouchEnd = () => {
+                    initialTouchY = null;
+                    initialTouchX = null;
+                }
+          
+            const __wheelHandler = (event) => {
+                let delY, 
+                    delX;   
+                    
+                const data = normalizeWheel(event); // normalize over different browsers
+                delY = data.pixelY;
+                delX = data.pixelX;
+                   
+
+                if (delY !== 0 && event.axis === event.VERTICAL_AXIS) {
+                    closeAnyOpenMenusAndLabels();
+                    that.blocksContainer.y -= delY;
+                } 
+
                 if (that.scrollBlockContainer) {
-                    if (delX !== 0 && event.axis === event.HORIZONTAL_AXIS) {
+                    if (delX !== 0 && event.axis === event.HORIZONTAL_AXIS) { //For Horizontal scrolling
                         closeAnyOpenMenusAndLabels();
                         that.blocksContainer.x -= delX;
                     }
                 } else {
                     event.preventDefault();
-                }
-                that.refreshCanvas();
-            };
+                }  
 
-            docById("myCanvas").addEventListener("wheel", __wheelHandler, false);
+                that.refreshCanvas();
+            };        
+
+            const myCanvas = document.getElementById("myCanvas");
+            myCanvas.addEventListener("wheel", __wheelHandler, false);
+            let isScrollEnabled = false;
+
+            toggleScrollButton.addEventListener("click", () => {
+                isScrollEnabled = !isScrollEnabled;
+                // toggleScrollButton.textContent = isScrollEnabled ? "Disable Scroll" : "Enable Scroll";
+            
+                if (isScrollEnabled) {
+                    myCanvas.addEventListener("touchstart", onTouchStart, { passive: false });
+                    myCanvas.addEventListener("touchmove", onTouchMove, { passive: false });
+                    myCanvas.addEventListener("touchend", onTouchEnd, { passive: false });
+                onTouchMove(); 
+                } else {
+                    myCanvas.removeEventListener("touchstart", onTouchStart);
+                    myCanvas.removeEventListener("touchmove", onTouchMove);
+                    myCanvas.removeEventListener("touchend", onTouchEnd);
+                }
+            });
 
             const __stageMouseUpHandler = (event) => {
                 that.stageMouseDown = false;
@@ -2555,7 +2624,7 @@ class Activity {
             this._innerHeight = window.innerHeight;
             this._outerWidth = window.outerWidth;
             this._outerHeight = window.outerHeight;
-    
+
             if (docById("labelDiv").classList.contains("hasKeyboard")) {
                 return;
             }
@@ -2720,54 +2789,6 @@ class Activity {
 
             this.blocks.checkBounds();
         };
-        
-        const container = document.getElementById("canvasContainer");
-        const canvas = document.getElementById("myCanvas");
-        const overCanvas = document.getElementById("canvas");
-        const canvasHolder = document.getElementById("canvasHolder");
-        const defaultWidth = 1600;
-        const defaultHeight = 900;
-
-        function handleResize() {
-            const isMaximized = (
-                window.innerWidth ===
-                    window.screen.width && window.innerHeight ===
-                    window.screen.height
-            );
-            if (isMaximized) {
-                container.style.width = defaultWidth + "px";
-                container.style.height = defaultHeight + "px";
-                canvas.width = defaultWidth;
-                canvas.height = defaultHeight;
-                overCanvas.width = canvas.width;
-                overCanvas.height =canvas.width;
-                canvasHolder.width = defaultWidth;
-                canvasHolder.height = defaultHeight;
-
-            } else {
-                const windowWidth = window.innerWidth;
-                const windowHeight = window.innerHeight;
-                container.style.width = windowWidth + "px";
-                container.style.height = windowHeight + "px";
-                canvas.width = windowWidth;
-                canvas.height = windowHeight;
-                overCanvas.width = canvas.width;
-                overCanvas.height =canvas.width;
-                canvasHolder.width = canvas.width;
-                canvasHolder.height = canvas.height;
-            }
-            document.getElementById("hideContents").click();
-        }
-
-        let resizeTimeout;
-        window.addEventListener("resize", () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                handleResize();
-                this._setupPaletteMenu();
-            }, 100);
-        });
-        window.addEventListener("orientationchange",  handleResize);
 
         const that = this;
         const screenWidth = window.innerWidth;
@@ -2775,11 +2796,9 @@ class Activity {
             if (screenWidth !== window.innerWidth) {
                 that._onResize(false);
             }
-            document.getElementById("hideContents").click();
         };
-        
-        resizeCanvas_();
-        window.addEventListener("orientationchange", resizeCanvas_ );
+        window.onresize = resizeCanvas_;
+
         /*
          * Restore last stack pushed to trashStack back onto canvas.
          * Hides palettes before update
@@ -4165,8 +4184,8 @@ class Activity {
             }
             const btnSize = this.cellSize;
             // Lower right
-            let x = window.innerWidth - 4 * btnSize - 27.5;
-            const y = window.innerHeight - 57.5;
+            let x = this._innerWidth - 4 * btnSize - 27.5;
+            const y = this._innerHeight - 57.5;
             const dx = btnSize;
 
             const ButtonHolder = document.createElement("div");
