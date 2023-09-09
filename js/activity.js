@@ -1505,6 +1505,57 @@ class Activity {
                 return { pixelX: pX, pixelY: pY };
             };
 
+                // Assuming you have defined 'that' and 'closeAnyOpenMenusAndLabels' elsewhere in your code
+
+                const myCanvas = document.getElementById("myCanvas");
+                const initialTouches = [[null, null], [null, null]]; // Array to track two fingers (Y and X coordinates)
+
+                myCanvas.addEventListener("touchstart", (event) => {
+                    if (event.touches.length === 2) {
+                        for (let i = 0; i < 2; i++) {
+                            initialTouches[i][0] = event.touches[i].clientY;
+                            initialTouches[i][1] = event.touches[i].clientX;
+                        }
+                    }
+                });
+
+                myCanvas.addEventListener("touchmove", (event) => {
+                    if (event.touches.length === 2) {
+                        for (let i = 0; i < 2; i++) {
+                            const touchY = event.touches[i].clientY;
+                            const touchX = event.touches[i].clientX;
+
+                            if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
+                                const deltaY = touchY - initialTouches[i][0];
+                                const deltaX = touchX - initialTouches[i][1];
+
+                                if (deltaY !== 0) {
+                                    closeAnyOpenMenusAndLabels();
+                                    that.blocksContainer.y -= deltaY;
+                                }
+
+                                if (deltaX !== 0) {
+                                    closeAnyOpenMenusAndLabels();
+                                    that.blocksContainer.x -= deltaX;
+                                }
+
+                                initialTouches[i][0] = touchY;
+                                initialTouches[i][1] = touchX;
+                            }
+                        }
+
+                        that.refreshCanvas();
+                    }
+                });
+
+                myCanvas.addEventListener("touchend", () => {
+                    for (let i = 0; i < 2; i++) {
+                        initialTouches[i][0] = null;
+                        initialTouches[i][1] = null;
+                    }
+                });
+
+
             const __wheelHandler = (event) => {
                 const data = normalizeWheel(event); // normalize over different browsers
                 const delY = data.pixelY;
