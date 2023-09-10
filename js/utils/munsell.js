@@ -6712,7 +6712,7 @@ const MUNSELL = [
     "#ffffff"
 ];
 
-let interpColor = (hex1, hex2, p)  => {
+const interpColor = (hex1, hex2, p)  => {
     if (hex1 === undefined && hex2 === undefined) {
         null;
     } else if (hex1 === undefined) {
@@ -6739,7 +6739,7 @@ let interpColor = (hex1, hex2, p)  => {
 
         return createjs.Graphics.getRGB(nr, ng, nb, 1.0);
     }
-}
+};
 
 let getMunsellColor = (hue, value, chroma) => {
     // hue (aka color) 0-100 -> 0-39
@@ -6778,7 +6778,7 @@ let getMunsellColor = (hue, value, chroma) => {
     }
 
     return interpColor(MUNSELL[h * 165 + v1 * 15 + c], MUNSELL[h * 165 + v2 * 15 + c], p);
-}
+};
 
 let getcolor = (color) => {
     let h1 = Math.floor(color / 2.5);
@@ -6798,7 +6798,7 @@ let getcolor = (color) => {
     const v = Math.floor(COLORS40[h1][0] * p + COLORS40[h2][0] * (1 - p));
     const c = Math.floor(COLORS40[h1][1] * p + COLORS40[h2][1] * (1 - p));
     return [v * 10, c * 100 / 28, interpColor(COLORS40[h1][2], COLORS40[h2][2], p)];
-}
+};
 
 /**
  * Searches for nearest match to high chroma colors, scaled from 0-100
@@ -6822,7 +6822,7 @@ let searchColors = (r, g, b) => {
     }
 
     return nearestColor;
-}
+};
 
 // /**
 //  * @deprecated
