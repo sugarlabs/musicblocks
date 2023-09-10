@@ -1283,7 +1283,7 @@ function MusicKeyboard(activity) {
 
         mkbTableRow = mkbTable.insertRow();
         mkbTableRow.style.position = "sticky";
-        mkbTableRow.style.bottom = "0px"
+        mkbTableRow.style.bottom = "0px";
         cell = mkbTableRow.insertCell();
         cell.style.backgroundColor = platformColor.graphicsLabelBackground;
         cell.style.fontSize = this._cellScale * 100 + "%";

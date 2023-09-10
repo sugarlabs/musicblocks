@@ -69,7 +69,6 @@ class HelpWidget {
      * @returns {void}
      */
     _setup(useActiveBlock) {
-        const iconSize = HelpWidget.ICONSIZE;
         // Which help page are we on?
         let page = 0;
 
