@@ -78,7 +78,7 @@ const setWheelSize = (i) => {
     }
 
     wheelDiv.style.height = wheelDiv.style.width;
-}
+};
 
 // Call the function initially and whenever the window is resized
 setWheelSize();

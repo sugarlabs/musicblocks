@@ -107,7 +107,7 @@ class Toolbar {
                 _("Stop"),
                 _("Record"),
                 _("Full Screen"),
-		_("FullScreen"),
+                _("FullScreen"),
                 _("New project"),
                 _("Load project from file"),
                 _("Save project"),
