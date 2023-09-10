@@ -611,6 +611,18 @@ function setupPitchBlocks(activity) {
         }
     }
 
+    class OneOfPitchBlock extends ValueBlock {
+        constructor() {
+            super("oneOfPitchBlock", _("one of"));
+            this.setPalette("pitch", activity);
+            this.makeMacro((x, y) => [
+                [0, "oneOf", x, y, [null, 1, 2, null]],
+                [1, ["solfege", { value: "do" }], 0, 0, [0]],
+                [2, ["solfege", { value: "sol" }], 0, 0, [0]]
+            ]);
+        }
+    }
+
     class MIDIBlock extends FlowBlock {
         constructor() {
             //.TRANS: MIDI is a technical standard for electronic music
@@ -2035,6 +2047,7 @@ function setupPitchBlocks(activity) {
     new AccidentalBlock().setup(activity);
     new FlatBlock().setup(activity);
     new SharpBlock().setup(activity);
+    new OneOfPitchBlock().setup(activity);
     new ScaleDegree2Block().setup(activity);
     new EastIndianSolfegeBlock().setup(activity);
     new NoteNameBlock().setup(activity);

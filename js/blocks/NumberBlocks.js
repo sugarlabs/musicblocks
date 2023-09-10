@@ -787,8 +787,8 @@ function setupNumberBlocks(activity) {
 
             this.makeMacro((x, y) => [
                 [0, "oneOf", x, y, [null, 1, 2, null]],
-                [1, ["solfege", { value: "do" }], 0, 0, [0]],
-                [2, ["solfege", { value: "sol" }], 0, 0, [0]]
+                [1, ["number", { value: 0 }], 0, 0, [0]],
+                [2, ["number", { value: 1 }], 0, 0, [0]]
             ]);
         }
 
