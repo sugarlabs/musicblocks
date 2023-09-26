@@ -695,7 +695,7 @@ class Painter {
     doForward(steps) {
 
         if (steps > 3125) {
-            // throw new Error(`Step count exceeds the limit of 3000.`);
+           
             this.errorText = docById("errorText");
             this.errorText.classList.add("show");
             this.errorText.innerHTML = "Step count exceeds the limit of 50000.";
