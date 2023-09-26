@@ -303,7 +303,8 @@ class Painter {
 
             let radiusScaled = step * turtlesScale;
 
-            const steps = Math.max(Math.floor(savedStroke, 1));
+            
+            const steps = Math.max(Math.floor(savedStroke), 1);
             this._svgArc(steps, cx * turtlesScale, cy * turtlesScale, radiusScaled, sa);
             this._svgOutput += nxScaled + "," + nyScaled + " ";
 
@@ -471,7 +472,7 @@ class Painter {
 
             this.turtle.ctx.arc(cx, cy, radius + step, sa, ea, anticlockwise);
             const nsteps = Math.max(Math.floor((radius * Math.abs(sa - ea)) / 2), 2);
-            const steps = Math.max(Math.floor(savedStroke, 1));
+            const steps = Math.max(Math.floor(savedStroke), 1);
 
             this._svgArc(
                 nsteps,
@@ -692,89 +693,101 @@ class Painter {
      * @param steps - the number of steps the turtle goes forward by
      */
     doForward(steps) {
-        this._processColor();
 
-        if (!this._fillState) {
-            this.turtle.ctx.lineWidth = this.stroke;
-            this.turtle.ctx.lineCap = "round";
-            this.turtle.ctx.beginPath();
-            this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
+        if (steps > 3125) {
+            // throw new Error(`Step count exceeds the limit of 3000.`);
+            this.errorText = docById("errorText");
+            this.errorText.classList.add("show");
+            this.errorText.innerHTML = "Step count exceeds the limit of 50000.";
+            
         }
-
-        const turtles = this.turtles;
-
-        // old turtle point
-        let ox = turtles.screenX2turtleX(this.turtle.container.x);
-        let oy = turtles.screenY2turtleY(this.turtle.container.y);
-
-        const angleRadians = (this.turtle.orientation * Math.PI) / 180.0;
-
-        // new turtle point
-        let nx = ox + Number(steps) * Math.sin(angleRadians);
-        let ny = oy + Number(steps) * Math.cos(angleRadians);
-
-        const w = this.turtle.ctx.canvas.width;
-        const h = this.turtle.ctx.canvas.height;
-
-        const out = this._outOfBounds(
-            turtles.turtleX2screenX(nx),
-            turtles.turtleY2screenY(ny),
-            w,
-            h
-        );
-
-        const wrap = this.wrap !== null ? this.wrap : WRAP;
-
-        if (this._fillState || !wrap || !out) {
-            this._move(ox, oy, nx, ny, true);
-            this.activity.refreshCanvas();
-        } else {
-            const stepUnit = 5;
-            let xIncrease, yIncrease;
-            if (steps > 0) {
-                xIncrease = stepUnit * Math.sin(angleRadians);
-                yIncrease = stepUnit * Math.cos(angleRadians);
-            } else {
-                xIncrease = -stepUnit * Math.sin(angleRadians);
-                yIncrease = -stepUnit * Math.cos(angleRadians);
-                steps = -steps;
-            }
-
-            while (steps >= 0) {
-                if (this.turtle.container.x > w) {
-                    this.turtle.container.x = 0;
-                    this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
-                }
-                if (this.turtle.container.x < 0) {
-                    this.turtle.container.x = w;
-                    this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
-                }
-                if (this.turtle.container.y > h) {
-                    this.turtle.container.y = 0;
-                    this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
-                }
-                if (this.turtle.container.y < 0) {
-                    this.turtle.container.y = h;
-                    this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
-                }
-
-                // Get old turtle point
-                oy = turtles.screenY2turtleY(this.turtle.container.y);
-                ox = turtles.screenX2turtleX(this.turtle.container.x);
-
-                // Increment new turtle point
-                nx = ox + xIncrease;
-                ny = oy + yIncrease;
-
-                this._move(ox, oy, nx, ny, true);
-                this.turtle.container.x = turtles.turtleX2screenX(nx);
-                this.turtle.container.y = turtles.turtleY2screenY(ny);
+        else{
+            
+            console.log("steps ", steps)
+            this._processColor();
+    
+            if (!this._fillState) {
+                this.turtle.ctx.lineWidth = this.stroke;
+                this.turtle.ctx.lineCap = "round";
+                this.turtle.ctx.beginPath();
                 this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
-
-                steps -= stepUnit;
             }
-
-            this.activity.refreshCanvas();
+    
+            const turtles = this.turtles;
+    
+            // old turtle point
+            let ox = turtles.screenX2turtleX(this.turtle.container.x);
+            let oy = turtles.screenY2turtleY(this.turtle.container.y);
+    
+            const angleRadians = (this.turtle.orientation * Math.PI) / 180.0;
+    
+            // new turtle point
+            let nx = ox + Number(steps) * Math.sin(angleRadians);
+            let ny = oy + Number(steps) * Math.cos(angleRadians);
+    
+            const w = this.turtle.ctx.canvas.width;
+            const h = this.turtle.ctx.canvas.height;
+    
+            const out = this._outOfBounds(
+                turtles.turtleX2screenX(nx),
+                turtles.turtleY2screenY(ny),
+                w,
+                h
+            );
+    
+            const wrap = this.wrap !== null ? this.wrap : WRAP;
+    
+            if (this._fillState || !wrap || !out) {
+                this._move(ox, oy, nx, ny, true);
+                this.activity.refreshCanvas();
+            } else {
+                const stepUnit = 5;
+                let xIncrease, yIncrease;
+                if (steps > 0) {
+                    xIncrease = stepUnit * Math.sin(angleRadians);
+                    yIncrease = stepUnit * Math.cos(angleRadians);
+                } else {
+                    xIncrease = -stepUnit * Math.sin(angleRadians);
+                    yIncrease = -stepUnit * Math.cos(angleRadians);
+                    steps = -steps;
+                }
+    
+                while (steps >= 0) {
+                    if (this.turtle.container.x > w) {
+                        this.turtle.container.x = 0;
+                        this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
+                    }
+                    if (this.turtle.container.x < 0) {
+                        this.turtle.container.x = w;
+                        this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
+                    }
+                    if (this.turtle.container.y > h) {
+                        this.turtle.container.y = 0;
+                        this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
+                    }
+                    if (this.turtle.container.y < 0) {
+                        this.turtle.container.y = h;
+                        this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
+                    }
+    
+                    // Get old turtle point
+                    oy = turtles.screenY2turtleY(this.turtle.container.y);
+                    ox = turtles.screenX2turtleX(this.turtle.container.x);
+    
+                    // Increment new turtle point
+                    nx = ox + xIncrease;
+                    ny = oy + yIncrease;
+    
+                    this._move(ox, oy, nx, ny, true);
+                    this.turtle.container.x = turtles.turtleX2screenX(nx);
+                    this.turtle.container.y = turtles.turtleY2screenY(ny);
+                    this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
+    
+                    steps -= stepUnit;
+                }
+    
+                this.activity.refreshCanvas();
+            }
         }
     }
 
