@@ -693,15 +693,23 @@ class Painter {
      * @param steps - the number of steps the turtle goes forward by
      */
     doForward(steps) {
-
-        if (steps > 3125) {
-           
-            this.errorText = docById("errorText");
-            this.errorText.classList.add("show");
-            this.errorText.innerHTML = "Step count exceeds the limit of 50000.";
-            
-        }
-        else{
+        console.log("inital steps ",steps)
+       
+            if (steps > 3125) {
+                this.errorText = docById("errorText");
+                this.errorText.classList.add("show");
+                this.errorText.innerHTML = "Do not put Forward greater than 50,000.";
+                let newSteps = steps*16
+                const resStr = newSteps.toString();
+                
+             
+                if (resStr.length > 5) {
+                   
+                    const truncatedRes = resStr.slice(0, 5);
+                    newSteps=Math.round(truncatedRes / 16)
+                    steps = parseFloat(newSteps); 
+                }
+            }
             
             console.log("steps ", steps)
             this._processColor();
@@ -788,7 +796,7 @@ class Painter {
     
                 this.activity.refreshCanvas();
             }
-        }
+     
     }
 
     /**
