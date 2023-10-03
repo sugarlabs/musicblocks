@@ -695,10 +695,10 @@ class Painter {
     doForward(steps) {
         // console.log("inital steps ",steps)
        
-            if (steps > 3125) {
+            if (steps > 6250) {
                 this.errorText = docById("errorText");
                 this.errorText.classList.add("show");
-                this.errorText.innerHTML = "Do not put Forward greater than 50,000.";
+                this.errorText.innerHTML = "Do not put Forward greater than 100,000.";
                 let newSteps = steps*16
                 const resStr = newSteps.toString();
                 
