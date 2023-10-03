@@ -693,7 +693,7 @@ class Painter {
      * @param steps - the number of steps the turtle goes forward by
      */
     doForward(steps) {
-        console.log("inital steps ",steps)
+        // console.log("inital steps ",steps)
        
             if (steps > 3125) {
                 this.errorText = docById("errorText");
@@ -711,7 +711,7 @@ class Painter {
                 }
             }
             
-            console.log("steps ", steps)
+            // console.log("steps ", steps)
             this._processColor();
     
             if (!this._fillState) {
