@@ -3660,10 +3660,10 @@ class Block {
                     // Add an input event listener to enforce the 4-digit limit
         this.label.addEventListener("input", function () {
         const inputValue = this.value;
-        if (inputValue.length > 4) {
+        if (inputValue.length > 7) {
             this.errorText = docById("errorText");
             this.errorText.classList.add("show");
-            this.errorText.innerHTML = "Do not put Forward greater than 9999";
+            this.errorText.innerHTML = "Do not put input greater than 7 digits";
             this.value = inputValue.slice(0, 4);
         }
     });

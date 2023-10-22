@@ -1109,6 +1109,7 @@ class Blocks {
                         this.blockList[parentblk].connections[2] = blk;
 
                         const octave = this.blockList[oldBlock].value;
+                        console.log("ovtave ", octave , typeof octave)
                         this.blockList[blk].value = octave;
 
                         this.blockList[blk].text.text = octave.toString();
