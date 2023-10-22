@@ -693,25 +693,7 @@ class Painter {
      * @param steps - the number of steps the turtle goes forward by
      */
     doForward(steps) {
-        // console.log("inital steps ",steps)
-       
-            if (steps > 6250) {
-                this.errorText = docById("errorText");
-                this.errorText.classList.add("show");
-                this.errorText.innerHTML = "Do not put Forward greater than 100,000.";
-                let newSteps = steps*16
-                const resStr = newSteps.toString();
-                
-             
-                if (resStr.length > 5) {
-                   
-                    const truncatedRes = resStr.slice(0, 5);
-                    newSteps=Math.round(truncatedRes / 16)
-                    steps = parseFloat(newSteps); 
-                }
-            }
-            
-            // console.log("steps ", steps)
+
             this._processColor();
     
             if (!this._fillState) {
