@@ -764,17 +764,15 @@ function setupGraphicsBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk) {
-            console.log(args, logo, turtle, blk)
             
             let newArgs = args[0]
             if(args[0].toString().length>4){
-                newArgs = parseInt(args[0].toString().slice(0,4))
+                args[0] = parseInt(args[0].toString().slice(0,4))
             }
-            console.log("truncated value ", newArgs, typeof newArgs)
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
-                if (typeof newArgs === "string") {
+                if (typeof args[0] === "string") {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {
                     logo.phraseMaker.addRowBlock(blk);
@@ -782,21 +780,24 @@ function setupGraphicsBlocks(activity) {
                         logo.pitchBlocks.push(blk);
                     }
                     logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
-                    logo.phraseMaker.rowArgs.push(newArgs);
+                    logo.phraseMaker.rowArgs.push(args[0]);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
                     if (tur.singer.suppressOutput) {
                         const savedPenState = tur.painter.penState;
                         tur.painter.penState = false;
-                        tur.painter.doForward(newArgs);
+                        tur.painter.doForward(args[0]);
                         tur.painter.penState = savedPenState;
                     } else {
-                        tur.painter.doForward(newArgs);
+                        tur.painter.doForward(args[0]);
                     }
                 }
             }
         }
+
+
+
     }
 
     class WrapModeBlock extends ValueBlock {
