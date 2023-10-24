@@ -764,11 +764,6 @@ function setupGraphicsBlocks(activity) {
         }
 
         flow(args, logo, turtle, blk) {
-            
-            let newArgs = args[0]
-            if(args[0].toString().length>4){
-                args[0] = parseInt(args[0].toString().slice(0,4))
-            }
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
@@ -795,9 +790,6 @@ function setupGraphicsBlocks(activity) {
                 }
             }
         }
-
-
-
     }
 
     class WrapModeBlock extends ValueBlock {

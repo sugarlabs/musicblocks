@@ -269,7 +269,8 @@ class Block {
                     if (counter !== undefined) {
                         loopCount = counter;
                     }
-                    if (loopCount > 10) {  // race condition?
+                    if (loopCount > 10) {
+                        // race condition?
                         throw new Error("COULD NOT CREATE CACHE");
                     }
 
@@ -673,11 +674,11 @@ class Block {
                 that.collapseButtonBitmap.scaleX =
                     that.collapseButtonBitmap.scaleY =
                     that.collapseButtonBitmap.scale =
-                    scale / 3;
+                        scale / 3;
                 that.expandButtonBitmap.scaleX =
                     that.expandButtonBitmap.scaleY =
                     that.expandButtonBitmap.scale =
-                    scale / 3;
+                        scale / 3;
                 that.updateCache();
                 that._calculateBlockHitArea();
             };
@@ -1376,7 +1377,7 @@ class Block {
                 that.collapseButtonBitmap.scaleX =
                     that.collapseButtonBitmap.scaleY =
                     that.collapseButtonBitmap.scale =
-                    that.protoblock.scale / 3;
+                        that.protoblock.scale / 3;
                 that.container.addChild(that.collapseButtonBitmap);
                 that.collapseButtonBitmap.x = 2 * that.protoblock.scale;
                 if (that.isInlineCollapsible()) {
@@ -1408,7 +1409,7 @@ class Block {
                 that.expandButtonBitmap.scaleX =
                     that.expandButtonBitmap.scaleY =
                     that.expandButtonBitmap.scale =
-                    that.protoblock.scale / 3;
+                        that.protoblock.scale / 3;
 
                 that.container.addChild(that.expandButtonBitmap);
                 that.expandButtonBitmap.visible = that.collapsed;
@@ -2483,11 +2484,15 @@ class Block {
      */
     _positionMedia(bitmap, width, height, blockScale) {
         if (width > height) {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale =
-                ((MEDIASAFEAREA[2] / width) * blockScale) / 2;
+            bitmap.scaleX =
+                bitmap.scaleY =
+                bitmap.scale =
+                    ((MEDIASAFEAREA[2] / width) * blockScale) / 2;
         } else {
-            bitmap.scaleX = bitmap.scaleY = bitmap.scale =
-                ((MEDIASAFEAREA[3] / height) * blockScale) / 2;
+            bitmap.scaleX =
+                bitmap.scaleY =
+                bitmap.scale =
+                    ((MEDIASAFEAREA[3] / height) * blockScale) / 2;
         }
         bitmap.x = ((MEDIASAFEAREA[0] - 10) * blockScale) / 2;
         bitmap.y = (MEDIASAFEAREA[1] * blockScale) / 2;
@@ -2660,7 +2665,7 @@ class Block {
             }
         });
 
-        this.container.on("mousedown", (event) =>{
+        this.container.on("mousedown", (event) => {
             docById("contextWheelDiv").style.display = "none";
 
             // Track time for detecting long pause...
@@ -2698,7 +2703,7 @@ class Block {
             };
         });
 
-        this.container.on("pressmove", (event) =>{
+        this.container.on("pressmove", (event) => {
             // FIXME: More voodoo
             event.nativeEvent.preventDefault();
 
@@ -2789,7 +2794,7 @@ class Block {
             that.activity.refreshCanvas();
         });
 
-        this.container.on("mouseout", (event) =>{
+        this.container.on("mouseout", (event) => {
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false);
             } else {
@@ -2804,7 +2809,7 @@ class Block {
             moved = false;
         });
 
-        this.container.on("pressup", (event) =>{
+        this.container.on("pressup", (event) => {
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false);
             } else {
@@ -3450,18 +3455,8 @@ class Block {
             let gridLabels = [];
             let gridValues = [];
             if (_THIS_IS_TURTLE_BLOCKS_) {
-                gridLabels = [
-                    _("Cartesian"),
-                    _("polar"),
-                    _("Cartesian+polar"),
-                    _("none")
-                ];
-                gridValues = [
-                    "Cartesian",
-                    "polar",
-                    "Cartesian+polar",
-                    "none"
-                ];
+                gridLabels = [_("Cartesian"), _("polar"), _("Cartesian+polar"), _("none")];
+                gridValues = ["Cartesian", "polar", "Cartesian+polar", "none"];
             } else {
                 gridLabels = [
                     _("Cartesian"),
@@ -3502,7 +3497,7 @@ class Block {
                 labels = this.protoblock.piemenuLabels;
             }
             if (values.indexOf(selectedValue) === -1) {
-                selectedValue = values[3];  // letter class
+                selectedValue = values[3]; // letter class
             }
             piemenuBasic(this, labels, values, selectedValue, platformColor.piemenuBasic);
         } else if (this.name === "wrapmode") {
@@ -3657,16 +3652,18 @@ class Block {
                 labelElem.classList.add("hasKeyboard");
                 this.label = docById("numberLabel");
 
-                    // Add an input event listener to enforce the 4-digit limit
-        this.label.addEventListener("input", function () {
-        const inputValue = this.value;
-        if (inputValue.length > 6) {
-            this.errorText = docById("errorText");
-            this.errorText.classList.add("show");
-            this.errorText.innerHTML = "Do not put input greater than 6 digits";
-            this.value = inputValue.slice(0, 6);
-        }
-    });
+                // Add an input event listener to enforce the 6-digit limit
+                this.label.addEventListener("input", function () {
+                    let inputValue = this.value;
+                    inputValue = (Math.floor(parseFloat(inputValue))).toString()
+                    console.log("inputValue ", inputValue) 
+                    if (inputValue.length > 6) {
+                        this.errorText = docById("errorText");
+                        this.errorText.classList.add("show");
+                        this.errorText.innerHTML = _("Do not put input greater than 6 digits");
+                        this.value = inputValue.slice(0, 6);
+                    }
+                });
             }
         }
 
@@ -3674,7 +3671,7 @@ class Block {
         if (!this._usePiemenu()) {
             let focused = false;
 
-            const __blur = (event) =>{
+            const __blur = (event) => {
                 // Not sure why the change in the input is not available
                 // immediately in FireFox. We need a workaround if hardware
                 // acceleration is enabled.
@@ -3707,7 +3704,7 @@ class Block {
                 this.label.addEventListener("input", __input);
             }
 
-            let __keypress = (event) =>{
+            let __keypress = (event) => {
                 if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
                     __blur(event);
                 }
@@ -3721,13 +3718,13 @@ class Block {
 
             this.label.style.left =
                 Math.round(
-                    (x + this.activity.blocksContainer.x) * this.activity.getStageScale()
-                        + canvasLeft
+                    (x + this.activity.blocksContainer.x) * this.activity.getStageScale() +
+                        canvasLeft
                 ) + "px";
             this.label.style.top =
                 Math.round(
-                    (y + this.activity.blocksContainer.y) * this.activity.getStageScale()
-                        + canvasTop
+                    (y + this.activity.blocksContainer.y) * this.activity.getStageScale() +
+                        canvasTop
                 ) + "px";
             this.label.style.width =
                 Math.round((selectorWidth * this.blocks.blockScale * this.protoblock.scale) / 2) +

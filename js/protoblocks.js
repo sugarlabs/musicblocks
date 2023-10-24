@@ -1413,7 +1413,6 @@ const mergeDeep = (target, ...sources) => {
 class BaseBlock extends ProtoBlock {
     constructor(name) {
         super(name);
-
         this.macroFunc = null;
         this._style = {};
         this.beginnerModeBlock = false;
