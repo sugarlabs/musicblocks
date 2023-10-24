@@ -699,8 +699,6 @@ class Painter {
             if(requiredSteps.length>4){
                 requiredSteps= parseFloat(requiredSteps.slice(0,4)/8)
 
-                console.log("reqiredSteps ", requiredSteps)
-
                 if (!this._fillState) {
                     this.turtle.ctx.lineWidth = this.stroke;
                     this.turtle.ctx.lineCap = "round";
