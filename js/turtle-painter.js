@@ -696,6 +696,7 @@ class Painter {
 
             this._processColor();
             let requiredSteps= (Math.floor(steps*8)).toString()
+            steps = parseFloat(requiredSteps/8)
             if(requiredSteps.length>4){
                 requiredSteps= parseFloat(requiredSteps.slice(0,4)/8)
 
