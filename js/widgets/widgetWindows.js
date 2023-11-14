@@ -123,7 +123,7 @@ class WidgetWindow {
 
         const closeButton = this._create("div", "wftButton close", this._drag);
         closeButton.onclick = (e) => {
-            this.close();
+            this.destroy();
 
             e.preventDefault();
             e.stopPropagation();
@@ -513,8 +513,12 @@ class WidgetWindow {
      * @returns {void}
      */
     destroy() {
-        this._frame.remove();
-        this._overlayframe.remove();
+        if (this._frame && this._frame.parentElement) {
+            this._frame.parentElement.removeChild(this._frame);
+        }
+        if (this._overlayframe && this._overlayframe.parentElement) {
+            this._overlayframe.parentElement.removeChild(this._overlayframe);
+        }
         window.widgetWindows.openWindows[this._key] = undefined;
     }
 
