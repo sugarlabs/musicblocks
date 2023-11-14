@@ -3097,10 +3097,28 @@ class Block {
 
         const labelElem = docById("labelDiv");
 
+	var safetext = function(text){
+            // Best to avoid using these special characters in text strings
+            // without first converting them to their "safe" form.
+	    var table = {
+		'<': 'lt',
+		'>': 'gt',
+		'"': 'quot',
+		'\'': 'apos',
+		'&': 'amp',
+		'\r': '#10',
+		'\n': '#13'
+	    };
+	
+	    return text.toString().replace(/[<>"'\r\n&]/g, function(chr){
+		return '&' + table[chr] + ';';
+	    });
+	};
+
         if (this.name === "text") {
             labelElem.innerHTML =
                 '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="text" type="text" value="' +
-                labelValue +
+                safetext(labelValue) +
                 '" />';
             labelElem.classList.add("hasKeyboard");
             this.label = docById("textLabel");
