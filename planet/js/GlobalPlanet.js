@@ -452,13 +452,22 @@ class GlobalPlanet {
 
         this.getData(id, (data) => {
             let remixedName;
+            let language = localStorage.languagePreference;
             if (id in this.cache) {
-                remixedName = `${this.remixPrefix} ${this.cache[id].ProjectName}`;
+		if (language === "ja") {
+                    remixedName = `「${this.cache[id].ProjectName}」 ${this.remixPrefix}`;
+		} else {
+		    remixedName = `${this.remixPrefix} ${this.cache[id].ProjectName}`;
+		}
                 Planet.ProjectStorage.initialiseNewProject(
                     remixedName, data, this.cache[id].ProjectImage
                 );
             } else {
-                remixedName = `${this.remixPrefix}  ${_("My Project")}` ;
+		if (language === "ja") {
+                    remixedName = `「${_("My Project")}」 ${this.remixPrefix}` ;
+		} else {
+                    remixedName = `${this.remixPrefix}  ${_("My Project")}` ;
+		}
                 Planet.ProjectStorage.initialiseNewProject(
                     remixedName, data, null
                 );
