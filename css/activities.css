@@ -67,6 +67,10 @@
     border: 2px solid #87CEFA;
 }
 
+#search.open {
+    margin-top: 60px;
+}
+
 .ui-menu {
     position: relative;
     background-color: rgba(255,255,255,1.0);
