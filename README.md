@@ -369,7 +369,7 @@ Music Blocks is licensed under the
 will always be free to copy, modify, and hopefully improve. We respect
 your privacy: while Music Blocks stores your session information in
 your browser's local storage, it does not and will never access these
-data for purpoes other than to restore your session. Music Blocks will
+data for purpose other than to restore your session. Music Blocks will
 never share these data with any third parties.
 
 There is a Planet where you can share your projects with others and
