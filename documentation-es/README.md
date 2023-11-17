@@ -148,7 +148,7 @@ use musical notation, referring to whole notes (`1`), half notes
 the note duration. (There are some practical limitations, which you
 can discover through experimentation.) The relative length of a
 quarter note is half as long as a half note. By default, Music Blocks
-will play 90 quarter notes per second, so each quarter note is `2/3`
+will play 90 quarter notes per minute, so each quarter note is `2/3`
 seconds (`666` microseconds) in duration.
 
 The *Pitch* block (found on the Pitch Palette) is used to specify the
