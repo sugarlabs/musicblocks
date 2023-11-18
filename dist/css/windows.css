@@ -40,6 +40,10 @@
 #floatingWindows > .windowFrame > .wfTopBar .wftButton:hover {
     opacity: 0.7;
 }
+#floatingWindows > .windowFrame > .wfTopBar .wftButton.close:hover {
+    background-color: red;
+}
+
 #floatingWindows > .windowFrame > .wfTopBar .wftButton:last-child {
     margin: 0;
 }
@@ -58,7 +62,7 @@
     transform: translate(-50%, -50%);
 }
 #floatingWindows > .windowFrame > .wfTopBar .wftButton.close::before,
-#floatingWindows > .windowFrame > .wfTopBar .wftButton.close::after {
+#floatingWindows > .windowFrame > .wfTopBar .wftButton.close::after{
     content: "";
     display: block;
     height: 2px;
