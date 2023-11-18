@@ -303,7 +303,7 @@ const stringInstruments = ["piano", "guitar", "acoustic guitar", "electric guita
 
 // Validate the passed on parameters in a function as per the default
 // parameters values
-let validateAndSetParams = (defaultParams, params) => {
+const validateAndSetParams = (defaultParams, params) => {
     if (defaultParams && defaultParams !== null && params && params !== undefined) {
         for (const key in defaultParams) {
             if (key in params && params[key] !== undefined) defaultParams[key] = params[key];
@@ -311,7 +311,7 @@ let validateAndSetParams = (defaultParams, params) => {
     }
 
     return defaultParams;
-}
+};
 
 // This object contains mapping between instrument name and
 // corresponding synth object.  The instrument name is the one that

@@ -139,7 +139,7 @@ function SampleWidget() {
     };
 
     this.showSampleTypeError = function () {
-            this.activity.errorMsg(_("Upload failed: Sample is not a .wav file."), this.timbreBlock);
+        this.activity.errorMsg(_("Upload failed: Sample is not a .wav file."), this.timbreBlock);
     };
 
     this.__save = function () {
@@ -267,7 +267,7 @@ function SampleWidget() {
                 // eslint-disable-next-line no-unused-vars
                 reader.onload = function (event) {
                     // if the file is of .wav type, save it
-                    if (reader.result.substring(reader.result.indexOf(":")+1, reader.result.indexOf(";")) === 'audio/wav') {
+                    if (reader.result.substring(reader.result.indexOf(":")+1, reader.result.indexOf(";")) === "audio/wav") {
                         that.sampleData = reader.result;
                         that.sampleName = fileChooser.files[0].name;
                         that._addSample();

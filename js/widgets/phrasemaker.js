@@ -150,27 +150,27 @@ class PhraseMaker {
         this.columnBlocksMap = [];
     }
 
-     stylePhraseMaker(){
+    stylePhraseMaker(){
 
         var floatingWindowsDiv = document.getElementById("floatingWindows");
         var windowFrameElements = floatingWindowsDiv.querySelectorAll(".windowFrame");
     
         for (var i = 0; i < windowFrameElements.length; i++) {
-          var windowFrame = windowFrameElements[i];
-          var wfWinBody = document.querySelector(".wfWinBody");
-          var wfbWidget = document.querySelector(".wfbWidget");
-          wfbWidget.style.overflow = "auto"
-          wfbWidget.style.width = "-webkit-fill-available"
-          wfbWidget.style.height = "-webkit-fill-available"
-          windowFrame.style.height = "405px";
-          windowFrame.style.width = "685px";
-          wfWinBody.style.position = "absolute";
-          wfWinBody.style.overflow = "auto";
-          wfWinBody.style.width = "-webkit-fill-available";
-          wfWinBody.style.height = "-webkit-fill-available";
-          wfWinBody.style.background = "#cccccc";
-          wfbWidget.style.position = "absolute";
-          wfbWidget.style.left = "55px";
+            var windowFrame = windowFrameElements[i];
+            var wfWinBody = document.querySelector(".wfWinBody");
+            var wfbWidget = document.querySelector(".wfbWidget");
+            wfbWidget.style.overflow = "auto";
+            wfbWidget.style.width = "-webkit-fill-available";
+            wfbWidget.style.height = "-webkit-fill-available";
+            windowFrame.style.height = "405px";
+            windowFrame.style.width = "685px";
+            wfWinBody.style.position = "absolute";
+            wfWinBody.style.overflow = "auto";
+            wfWinBody.style.width = "-webkit-fill-available";
+            wfWinBody.style.height = "-webkit-fill-available";
+            wfWinBody.style.background = "#cccccc";
+            wfbWidget.style.position = "absolute";
+            wfbWidget.style.left = "55px";
         }
     }
 
@@ -705,15 +705,15 @@ class PhraseMaker {
         // An extra row for the note and tuplet values
         ptmTableRow = ptmTable.insertRow();
         ptmCell = ptmTableRow.insertCell();
-        ptmTableRow.setAttribute('id', 'bottomRow');
+        ptmTableRow.setAttribute("id", "bottomRow");
         ptmTableRow.style.position = "sticky";
-        ptmTableRow.style.bottom = '0px';
-        ptmTableRow.style.zIndex = '1';         
+        ptmTableRow.style.bottom = "0px";
+        ptmTableRow.style.zIndex = "1";
 
         ptmCell.setAttribute("colspan", "2");
         ptmCell.style.position = "sticky";
-        ptmCell.style.left = '1.2px';
-        ptmCell.style.zIndex = '1';
+        ptmCell.style.left = "1.2px";
+        ptmCell.style.zIndex = "1";
         ptmCell.className = "headcol"; // This cell is fixed horizontally.
 
         tempTable = document.createElement("table");
