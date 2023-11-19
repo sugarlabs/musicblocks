@@ -455,7 +455,7 @@ class GlobalPlanet {
             let language = localStorage.languagePreference;
             if (id in this.cache) {
 		if (language === "ja") {
-                    remixedName = `「${this.cache[id].ProjectName}」 ${this.remixPrefix}`;
+                    remixedName = `「${this.cache[id].ProjectName}」${this.remixPrefix}`;
 		} else {
 		    remixedName = `${this.remixPrefix} ${this.cache[id].ProjectName}`;
 		}
@@ -464,7 +464,7 @@ class GlobalPlanet {
                 );
             } else {
 		if (language === "ja") {
-                    remixedName = `「${_("My Project")}」 ${this.remixPrefix}` ;
+                    remixedName = `「${_("My Project")}」${this.remixPrefix}` ;
 		} else {
                     remixedName = `${this.remixPrefix}  ${_("My Project")}` ;
 		}
