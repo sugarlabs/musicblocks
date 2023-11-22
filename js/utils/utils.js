@@ -1302,11 +1302,12 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
         }
 
         // Add class type's instance to adding object
-        if (args === undefined || args === []) {
+        if (args === undefined || args.length === 0) {
             obj.added = new ctype();
         } else {
             obj.added = new ctype(...args);
         }
+        
 
         // Loop for all method names of class type
         for (const name of Object.getOwnPropertyNames(ctype.prototype)) {
