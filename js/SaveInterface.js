@@ -75,7 +75,7 @@ class SaveInterface {
 
         this.timeLastSaved = -100;
         const $j = jQuery.noConflict();
-        $j(window).bind("beforeunload", (event) => {
+        $j(window).on("beforeunload", (event) => {
             let saveButton = "#saveButtonAdvanced";
             if (this.activity.beginnerMode) {
                 saveButton = "#saveButton";
@@ -86,7 +86,6 @@ class SaveInterface {
                 this.PlanetInterface !== undefined
             ) {
                 event.preventDefault();
-                event.returnValue = "";
                 // Will trigger when exit/reload cancelled.
                 $j(saveButton).trigger("mouseenter");
                 return "";
@@ -292,7 +291,7 @@ class SaveInterface {
             activity.save.saveLYFile(false);
         };
         // if (this.planet){
-        //     docById('submitPDF').onclick = function(){this.saveLYFile(true);}.bind(this);
+        //     docById('submitPDF').onclick = function(){this.saveLYFile(true);}.on(this);
         //     docById('submitPDF').disabled = false;
         // } else {
         //     docById('submitPDF').disabled = true;
