@@ -1586,6 +1586,10 @@ input.timbreName {
     border:0;
  }
 
+ #palette th:hover, #palette tr:hover {
+    background-color: rgba(211, 211, 211, 0.7);
+  }
+
  #printText {
     border: 2px solid rgb(150, 150, 150);
     z-index: 100;
