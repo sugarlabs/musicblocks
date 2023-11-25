@@ -75,12 +75,13 @@ class JSEditor {
      * Sets up CodeJar.
      * @returns {void}
      */
+
     _setup() {
         this.widgetWindow.onmaximize = () => {
             const editor = this.widgetWindow.getWidgetBody().childNodes[0];
             editor.style.width = this.widgetWindow._maximized ? "100%" : "39rem";
             editor.style.height = this.widgetWindow._maximized
-                ? `calc(100vh - ${64 + 33}px`
+                ? `calc(100vh - ${64 + 33}px)`
                 : `${docById("overlayCanvas").height - 33 - 128 - 12}px`;
         };
 
