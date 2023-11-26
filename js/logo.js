@@ -1810,9 +1810,10 @@ class Logo {
         // When turtle commands (forward, right, arc) are inside of notes,
         // they are run progressively over the course of the note duration.
 
+
         const tur = this.activity.turtles.ithTurtle(turtle);
 
-        if (tur.singer.embeddedGraphics === {}) return;
+        if (Object.keys(tur.singer.embeddedGraphics).length === 0) return;
 
         if (!(blk in tur.singer.embeddedGraphics)) return;
 
