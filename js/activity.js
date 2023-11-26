@@ -818,15 +818,6 @@ class Activity {
             this.turtles.setBackgroundColor(-1);
             this.logo.svgOutput = "";
             this.logo.notationOutput = "";
-            for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-                this.logo.turtleHeaps[turtle] = [];
-                this.logo.turtleDicts[turtle] = {};
-                this.logo.notation.notationStaging[turtle] = [];
-                this.logo.notation.notationDrumStaging[turtle] = [];
-                if (noErase === undefined || !noErase) {
-                    this.turtles.turtleList[turtle].painter.doClear(true, true, true);
-                }
-            }
 
             this.blocksContainer.x = 0;
             this.blocksContainer.y = 0;
