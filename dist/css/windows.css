@@ -38,9 +38,15 @@
     align-items: center;
     justify-content: center;
 }
-#floatingWindows > .windowFrame > .wfTopBar .wftButton:hover {
+#floatingWindows > .windowFrame > .wfTopBar .wftButton.close:hover {
+    background-color: #f44336;
     opacity: 0.7;
 }
+#floatingWindows > .windowFrame > .wfTopBar .wftButton.rollup:hover {
+    background-color: #18b500;
+    opacity: 0.7;
+}
+
 #floatingWindows > .windowFrame > .wfTopBar .wftButton:last-child {
     margin: 0;
 }
