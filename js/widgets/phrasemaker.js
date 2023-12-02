@@ -2269,6 +2269,7 @@ class PhraseMaker {
                 this.stylePhraseMaker();
             }
 
+            if(obj[1]!=='fa♯')
             this.rowLabels.push(obj[1]);
             this.rowArgs.push(Number(obj[2]));
         }
