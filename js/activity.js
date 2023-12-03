@@ -861,7 +861,6 @@ class Activity {
         this._doFastButton = (env) => {
             this.blocks.activeBlock = null;
             hideDOMLabel();
-
             const currentDelay = this.logo.turtleDelay;
             this.logo.turtleDelay = 0;
             this.logo.synth.resume();
@@ -1101,7 +1100,8 @@ class Activity {
         this._doHardStopButton = (onblur) => {
             this.blocks.activeBlock = null;
             hideDOMLabel();
-
+            // Clear Canvas after hard stop audio
+            this._allClear();
             if (onblur === undefined) {
                 onblur = false;
             }
@@ -3205,7 +3205,7 @@ class Activity {
          */
         this.runProject = (env) => {
             document.removeEventListener("finishedLoading", this.runProject);
-
+            console.log("run project :", env)
             const that = this;
             setTimeout(() => {
                 that._changeBlockVisibility();

@@ -1791,6 +1791,8 @@ class Logo {
                         logo.activity.showBlocksAfterRun = false;
                     }
                 }
+                // clearing canvas when audio is completed
+                this.activity._allClear();
                 document.getElementById("stop").style.color = "white";
             }
         }
